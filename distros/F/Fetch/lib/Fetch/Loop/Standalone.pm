@@ -7,9 +7,15 @@ our $VERSION = '0.09';
 
 require Fetch;
 
+sub _ft_await {
+    my ($self, $f) = @_;
+    $self->run_until($f);
+    return;
+}
+
 sub install_await {
     my ($self) = @_;
-    $Fetch::Future::AWAIT = sub { $self->run_until($_[0]) };
+    $Fetch::Future::AWAIT = sub { $self->_ft_await($_[0]) };
     return $self;
 }
 

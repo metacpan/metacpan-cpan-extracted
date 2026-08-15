@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::Code;
 # ABSTRACT: Coderef-backed Knarr handler for fakes, tests, and custom logic
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 use Moose;
 use Future;
 use Future::AsyncAwait;
@@ -64,7 +64,7 @@ Langertha::Knarr::Handler::Code - Coderef-backed Knarr handler for fakes, tests,
 
 =head1 VERSION
 
-version 1.100
+version 1.101
 
 =head1 SYNOPSIS
 

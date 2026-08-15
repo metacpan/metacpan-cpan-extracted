@@ -18,9 +18,11 @@ use Langertha::Response;
   has captured   => ( is => 'rw' );
   has caps       => ( is => 'ro', default => sub {
     {
-      tools_native  => 1,
-      temperature   => 1,
-      response_size => 1,
+      tools_native                => 1,
+      temperature                 => 1,
+      response_size               => 1,
+      response_format_json_object => 1,
+      response_format_json_schema => 1,
     };
   });
   sub supports { $_[0]->caps->{ $_[1] } ? 1 : 0 }
@@ -86,6 +88,55 @@ subtest 'unsupported caps cause params to be dropped' => sub {
   ok !exists $cap->{max_tokens},  'max_tokens dropped';
   ok !exists $cap->{tools},       'tools dropped';
   ok !exists $cap->{tool_choice}, 'tool_choice dropped';
+};
+
+# response_format is gated on the capability matching the *kind* of format
+# asked for, not on json_schema alone -- Langertha registers
+# response_format_json_object and response_format_json_schema separately.
+sub _captured_rf {
+  my ( $caps, $response_format ) = @_;
+  my $engine = CaptureEngine->new( caps => $caps );
+  my $h = Langertha::Knarr::Handler::Engine->new( engine => $engine );
+  my $req = Langertha::Knarr::Request->new(
+    protocol        => 'openai',
+    model           => 'cap-1',
+    messages        => [ { role => 'user', content => 'hi' } ],
+    response_format => $response_format,
+  );
+  $h->handle_chat_f( Langertha::Knarr::Session->new( id => 's' ), $req )->get;
+  return $engine->captured;
+}
+
+subtest 'json_object survives on an engine without json_schema support' => sub {
+  my $cap = _captured_rf(
+    { response_format_json_object => 1, response_format_json_schema => 0 },
+    { type => 'json_object' },
+  );
+  is $cap->{response_format}, { type => 'json_object' },
+    'json_object needs only the json_object capability';
+};
+
+subtest 'json_schema dropped on an engine without json_schema support' => sub {
+  my $cap = _captured_rf(
+    { response_format_json_object => 1, response_format_json_schema => 0 },
+    { type => 'json_schema', json_schema => { name => 'x', schema => { type => 'object' } } },
+  );
+  ok !exists $cap->{response_format}, 'json_schema needs the json_schema capability';
+};
+
+subtest 'response_format dropped when engine composes no ResponseFormat role' => sub {
+  # Langertha::Engine::LMStudio advertises neither flag on Langertha 0.502.
+  ok !exists _captured_rf( {}, { type => 'json_object' } )->{response_format},
+    'json_object dropped';
+  ok !exists _captured_rf( {}, { type => 'json_schema', json_schema => {} } )->{response_format},
+    'json_schema dropped';
+  ok !exists _captured_rf( {}, 'json' )->{response_format},
+    "Ollama's bare 'json' dropped";
+};
+
+subtest "Ollama's bare 'json' format needs only json_object" => sub {
+  my $cap = _captured_rf( { response_format_json_object => 1 }, 'json' );
+  is $cap->{response_format}, 'json', "bare 'json' forwarded";
 };
 
 subtest 'tool_calls survive into Knarr::Response' => sub {

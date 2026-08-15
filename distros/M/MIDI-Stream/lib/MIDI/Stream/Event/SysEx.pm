@@ -8,7 +8,7 @@ package MIDI::Stream::Event::SysEx;
 class MIDI::Stream::Event::SysEx :isa( MIDI::Stream::Event );
 
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 
 field $msg_str;
@@ -37,7 +37,7 @@ MIDI::Stream::Event::SysEx - SysEx event class
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

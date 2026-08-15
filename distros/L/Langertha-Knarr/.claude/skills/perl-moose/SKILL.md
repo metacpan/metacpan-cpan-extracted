@@ -1,3 +1,8 @@
+---
+name: perl-moose
+description: Moose-Klassen — Attribute, Roles vs. Inheritance, BUILD/BUILDARGS, Type-Constraints, MooseX::Singleton, make_immutable, Method-Modifier.
+---
+
 # Perl/Moose – Architecture & Implementation Patterns
 
 ## Core Principle

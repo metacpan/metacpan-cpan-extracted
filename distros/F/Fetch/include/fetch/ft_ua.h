@@ -241,11 +241,38 @@ static SV *ft_load_new(pTHX_ const char *class, SV *arg) {
     return obj;
 }
 
+/* The implicit loop - the one you get when you do not pass `loop` - is a
+ * per-process singleton. Every Fetch->new used to mint its own, so two agents
+ * in one program ran two loops that could not see each other's sockets, and
+ * since install_await writes a process global, whichever agent was built last
+ * owned the await path for both. Sharing one loop also lets independent agents
+ * multiplex: awaiting on one now drives the other's transfers rather than
+ * stalling them for the duration.
+ *
+ * Kept in a package global rather than a C static so that each interpreter
+ * gets its own under ithreads, and rebuilt after a fork - a child inheriting
+ * the parent's kqueue/epoll descriptor shares its readiness state, which is
+ * its own class of hang. */
+static SV *ft_default_loop(pTHX) {
+    SV *slot = get_sv("Fetch::Loop::Standalone::DEFAULT", GV_ADD);
+    SV *pidv = get_sv("Fetch::Loop::Standalone::DEFAULT_PID", GV_ADD);
+    IV  pid  = (IV)PerlProc_getpid();
+    SV *l;
+
+    if (SvROK(slot) && SvIOK(pidv) && SvIV(pidv) == pid)
+        return SvREFCNT_inc(slot);
+
+    l = ft_load_new(aTHX_ "Fetch::Loop::Standalone", NULL);
+    sv_setsv(slot, l);       /* the global holds it for the life of the process */
+    sv_setiv(pidv, pid);
+    return l;                /* owned reference for the caller */
+}
+
 /* Turn whatever was passed as `loop` into a Fetch::Loop adapter (see
  * Fetch::_resolve_loop). Returns an owned reference. */
 static SV *ft_resolve_loop(pTHX_ SV *loop) {
     if (!loop || !SvOK(loop))
-        return ft_load_new(aTHX_ "Fetch::Loop::Standalone", NULL);
+        return ft_default_loop(aTHX);
     if (sv_isobject(loop)) {
         if (sv_derived_from(loop, "Fetch::Loop::Standalone")
             || sv_derived_from(loop, "Fetch::Loop"))
@@ -478,6 +505,7 @@ static SV *ft_request_once(pTHX_ SV *self_sv, ft_ua *ua, const char *method,
                         body ? body : &PL_sv_undef,
                         on_body ? on_body : &PL_sv_undef, NULL);
         ft_conn_on_headers_next = NULL;   /* borrowed; do not keep past the call */
+        hmf_pin_loop(aTHX_ f, ua->loop);  /* only this loop can resolve it */
     }
 
     /* store any Set-Cookie before the caller/redirect-follower runs */
@@ -727,6 +755,7 @@ static SV *ft_websocket(pTHX_ ft_ua *ua, const char *url, HV *opt) {
         f = ft_h1_start(aTHX_ l, lsv, NULL, u.host, portbuf, rb, rl, tls, verify,
                         timeout, m_sv, sc_sv, au_sv, pa_sv, empty_rv,
                         &PL_sv_undef, &PL_sv_undef, wskey);
+        hmf_pin_loop(aTHX_ f, ua->loop);  /* only this loop can resolve it */
     }
 
     free(authority);

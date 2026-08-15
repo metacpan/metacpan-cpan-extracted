@@ -52,7 +52,7 @@
          "web" : "https://github.com/giterlizzi/perl-SSVC"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_purl" : "pkg:cpan/SSVC",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

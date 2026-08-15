@@ -1,10 +1,11 @@
 package Langertha::Knarr::Config;
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 # ABSTRACT: YAML configuration loader and validator
 use Moo;
 use YAML::PP;
 use Carp qw( croak );
 use Log::Any qw( $log );
+use Langertha ();
 
 
 has file => (
@@ -53,31 +54,90 @@ sub _interpolate_env {
   }
 }
 
+# Engine catalog: which Langertha engines are worth auto-detecting from the
+# environment, and under which variable names, in priority order.
+# First match wins per engine: LANGERTHA_ > bare vendor name > TEST_.
+#
+# Only hosted, API-key authenticated engines belong here. Local engines
+# (Ollama, LMStudio, vLLM, SGLang, LlamaCpp, Whisper) are reached by URL and
+# have no meaningful key to detect, and protocol variants of an engine
+# (MiniMaxAnthropic, MoonshotAnthropic, AKIOpenAI, OpenAIResponses) share
+# their vendor's key — listing them would emit two model entries per key.
+my @ENGINE_DEFS = (
+  { engine => 'OpenAI',      vars => [qw( LANGERTHA_OPENAI_API_KEY       OPENAI_API_KEY       TEST_LANGERTHA_OPENAI_API_KEY       )] },
+  { engine => 'Anthropic',   vars => [qw( LANGERTHA_ANTHROPIC_API_KEY    ANTHROPIC_API_KEY    TEST_LANGERTHA_ANTHROPIC_API_KEY    )] },
+  { engine => 'Groq',        vars => [qw( LANGERTHA_GROQ_API_KEY         GROQ_API_KEY         TEST_LANGERTHA_GROQ_API_KEY         )] },
+  { engine => 'Mistral',     vars => [qw( LANGERTHA_MISTRAL_API_KEY      MISTRAL_API_KEY      TEST_LANGERTHA_MISTRAL_API_KEY      )] },
+  { engine => 'DeepSeek',    vars => [qw( LANGERTHA_DEEPSEEK_API_KEY     DEEPSEEK_API_KEY     TEST_LANGERTHA_DEEPSEEK_API_KEY     )] },
+  { engine => 'MiniMax',     vars => [qw( LANGERTHA_MINIMAX_API_KEY      MINIMAX_API_KEY      TEST_LANGERTHA_MINIMAX_API_KEY      )] },
+  { engine => 'Cerebras',    vars => [qw( LANGERTHA_CEREBRAS_API_KEY     CEREBRAS_API_KEY     TEST_LANGERTHA_CEREBRAS_API_KEY     )] },
+  { engine => 'OpenRouter',  vars => [qw( LANGERTHA_OPENROUTER_API_KEY   OPENROUTER_API_KEY   TEST_LANGERTHA_OPENROUTER_API_KEY   )] },
+  { engine => 'Perplexity',  vars => [qw( LANGERTHA_PERPLEXITY_API_KEY   PERPLEXITY_API_KEY   TEST_LANGERTHA_PERPLEXITY_API_KEY   )] },
+  { engine => 'Replicate',   vars => [qw( LANGERTHA_REPLICATE_API_KEY    REPLICATE_API_TOKEN  TEST_LANGERTHA_REPLICATE_API_KEY    )] },
+  { engine => 'HuggingFace', vars => [qw( LANGERTHA_HUGGINGFACE_API_KEY  HUGGINGFACE_API_KEY  TEST_LANGERTHA_HUGGINGFACE_API_KEY  )] },
+  { engine => 'Gemini',      vars => [qw( LANGERTHA_GEMINI_API_KEY       GEMINI_API_KEY       TEST_LANGERTHA_GEMINI_API_KEY       )] },
+  { engine => 'XAI',         vars => [qw( LANGERTHA_XAI_API_KEY          XAI_API_KEY          TEST_LANGERTHA_XAI_API_KEY          )] },
+  { engine => 'Moonshot',    vars => [qw( LANGERTHA_MOONSHOT_API_KEY     MOONSHOT_API_KEY     TEST_LANGERTHA_MOONSHOT_API_KEY     )] },
+  { engine => 'NousResearch', vars => [qw( LANGERTHA_NOUSRESEARCH_API_KEY NOUSRESEARCH_API_KEY TEST_LANGERTHA_NOUSRESEARCH_API_KEY )] },
+  { engine => 'AKI',         vars => [qw( LANGERTHA_AKI_API_KEY          AKI_API_KEY          TEST_LANGERTHA_AKI_API_KEY          )] },
+  { engine => 'Scaleway',    vars => [qw( LANGERTHA_SCALEWAY_API_KEY     SCALEWAY_API_KEY     TEST_LANGERTHA_SCALEWAY_API_KEY     )] },
+  { engine => 'TSystems',    vars => [qw( LANGERTHA_TSYSTEMS_API_KEY     TSYSTEMS_API_KEY     TEST_LANGERTHA_TSYSTEMS_API_KEY     )] },
+  # No bare HETZNER_API_KEY: that name is in wide use for the Hetzner Cloud
+  # infrastructure API and would false-positive into an unusable model entry.
+  { engine => 'Hetzner',     vars => [qw( LANGERTHA_HETZNER_API_KEY                           TEST_LANGERTHA_HETZNER_API_KEY      )] },
+);
+
+# Last resort for engines whose Langertha class deliberately has no usable
+# default_model (it croaks, demanding an explicit model). Everything else is
+# read off the engine class — see default_model_for. An engine only belongs
+# here while its class refuses to name a default; t/10-config.t asserts that.
+my %DEFAULT_MODEL_FALLBACK = (
+  Groq       => 'llama-3.3-70b-versatile',
+  OpenRouter => 'openai/gpt-4o-mini',
+);
+
+my %DEFAULT_MODEL_CACHE;
+
+
+sub engine_catalog {
+  return [ map { { engine => $_->{engine}, vars => [@{$_->{vars}}] } } @ENGINE_DEFS ];
+}
+
+
+sub default_model_for {
+  my ($class, $engine) = @_;
+  return undef unless defined $engine && length $engine;
+  return $DEFAULT_MODEL_CACHE{$engine} if exists $DEFAULT_MODEL_CACHE{$engine};
+
+  my $model;
+  my $engine_class = eval { Langertha->resolve_engine_class($engine) };
+  if (!defined $engine_class) {
+    $log->debugf("No Langertha engine class for %s: %s", $engine, $@);
+  } elsif ($engine_class->can('default_model')) {
+    # Engines without a sensible default croak here instead of returning one.
+    $model = eval { $engine_class->default_model };
+    $log->debugf("Engine %s names no default model: %s", $engine, $@)
+      unless defined $model;
+  }
+
+  undef $model unless defined $model && length $model;
+  $model = $DEFAULT_MODEL_FALLBACK{$engine} unless defined $model;
+
+  return $DEFAULT_MODEL_CACHE{$engine} = $model;
+}
+
 
 # Build config purely from environment variables (zero-config Docker mode)
 sub from_env {
   my ($class, %opts) = @_;
   my $found = $class->scan_env(%opts);
 
-  my %default_models = (
-    OpenAI     => 'gpt-4o-mini',
-    Anthropic  => 'claude-sonnet-4-6',
-    Groq       => 'llama-3.3-70b-versatile',
-    Mistral    => 'mistral-large-latest',
-    DeepSeek   => 'deepseek-chat',
-    MiniMax    => 'MiniMax-M2.1',
-    Cerebras   => 'llama-3.3-70b',
-    OpenRouter => 'openai/gpt-4o-mini',
-    Perplexity => 'sonar',
-    Gemini     => 'gemini-2.0-flash',
-  );
-
   my %models;
   for my $engine (keys %$found) {
     my $name = lc($engine);
     $models{$name} = {
       engine      => $engine,
-      model       => $default_models{$engine},
+      model       => $class->default_model_for($engine),
       api_key_env => $found->{$engine}{api_key_env},
     };
   }
@@ -292,27 +352,10 @@ sub scan_env {
     close $fh;
   }
 
-  # Engine definitions with env var names in priority order
-  # First match wins per engine: LANGERTHA_ > bare name > TEST_
-  my @engine_defs = (
-    { engine => 'OpenAI',     vars => [qw( LANGERTHA_OPENAI_API_KEY     OPENAI_API_KEY     TEST_LANGERTHA_OPENAI_API_KEY     )] },
-    { engine => 'Anthropic',  vars => [qw( LANGERTHA_ANTHROPIC_API_KEY  ANTHROPIC_API_KEY  TEST_LANGERTHA_ANTHROPIC_API_KEY  )] },
-    { engine => 'Groq',       vars => [qw( LANGERTHA_GROQ_API_KEY      GROQ_API_KEY       TEST_LANGERTHA_GROQ_API_KEY       )] },
-    { engine => 'Mistral',    vars => [qw( LANGERTHA_MISTRAL_API_KEY   MISTRAL_API_KEY    TEST_LANGERTHA_MISTRAL_API_KEY    )] },
-    { engine => 'DeepSeek',   vars => [qw( LANGERTHA_DEEPSEEK_API_KEY  DEEPSEEK_API_KEY   TEST_LANGERTHA_DEEPSEEK_API_KEY   )] },
-    { engine => 'MiniMax',    vars => [qw( LANGERTHA_MINIMAX_API_KEY   MINIMAX_API_KEY    TEST_LANGERTHA_MINIMAX_API_KEY    )] },
-    { engine => 'Cerebras',   vars => [qw( LANGERTHA_CEREBRAS_API_KEY  CEREBRAS_API_KEY   TEST_LANGERTHA_CEREBRAS_API_KEY   )] },
-    { engine => 'OpenRouter', vars => [qw( LANGERTHA_OPENROUTER_API_KEY OPENROUTER_API_KEY TEST_LANGERTHA_OPENROUTER_API_KEY )] },
-    { engine => 'Perplexity', vars => [qw( LANGERTHA_PERPLEXITY_API_KEY PERPLEXITY_API_KEY TEST_LANGERTHA_PERPLEXITY_API_KEY )] },
-    { engine => 'Replicate',  vars => [qw( LANGERTHA_REPLICATE_API_KEY REPLICATE_API_TOKEN TEST_LANGERTHA_REPLICATE_API_KEY  )] },
-    { engine => 'HuggingFace',vars => [qw( LANGERTHA_HUGGINGFACE_API_KEY HUGGINGFACE_API_KEY TEST_LANGERTHA_HUGGINGFACE_API_KEY )] },
-    { engine => 'Gemini',     vars => [qw( LANGERTHA_GEMINI_API_KEY    GEMINI_API_KEY     TEST_LANGERTHA_GEMINI_API_KEY     )] },
-  );
-
   my $include_test = $opts{include_test} // 1;
 
   my %found;
-  for my $def (@engine_defs) {
+  for my $def (@ENGINE_DEFS) {
     for my $var (@{$def->{vars}}) {
       next unless $env{$var};
       next if !$include_test && $var =~ /^TEST_/;
@@ -335,19 +378,6 @@ sub generate_config {
   my $listen = $opts{listen} // ['127.0.0.1:8080', '127.0.0.1:11434'];
   $listen = [$listen] unless ref $listen eq 'ARRAY';
 
-  my %default_models = (
-    OpenAI     => 'gpt-4o-mini',
-    Anthropic  => 'claude-sonnet-4-6',
-    Groq       => 'llama-3.3-70b-versatile',
-    Mistral    => 'mistral-large-latest',
-    DeepSeek   => 'deepseek-chat',
-    MiniMax    => 'MiniMax-M2.1',
-    Cerebras   => 'llama-3.3-70b',
-    OpenRouter => 'openai/gpt-4o-mini',
-    Perplexity => 'sonar',
-    Gemini     => 'gemini-2.0-flash',
-  );
-
   my @lines;
   push @lines, "# Knarr configuration - auto-generated";
   push @lines, "listen:";
@@ -359,7 +389,7 @@ sub generate_config {
 
   for my $engine (sort keys %$found) {
     my $info = $found->{$engine};
-    my $model = $default_models{$engine};
+    my $model = $class->default_model_for($engine);
     my $name = lc($engine);
     $name .= "-default" if $name eq 'openai' || $name eq 'anthropic';
     push @lines, "  $name:";
@@ -370,10 +400,11 @@ sub generate_config {
   }
 
   unless (keys %$found) {
+    my $example = $class->default_model_for('OpenAI') // 'gpt-4o-mini';
     push @lines, "  # No API keys found. Add your models here:";
     push @lines, "  # my-model:";
     push @lines, "  #   engine: OpenAI";
-    push @lines, "  #   model: gpt-4o-mini";
+    push @lines, "  #   model: $example";
     push @lines, "";
   }
 
@@ -427,7 +458,7 @@ Langertha::Knarr::Config - YAML configuration loader and validator
 
 =head1 VERSION
 
-version 1.100
+version 1.101
 
 =head1 SYNOPSIS
 
@@ -463,13 +494,33 @@ The raw configuration hashref, loaded from L</file> and with all
 C<${ENV_VAR}> references expanded. Can be supplied directly to bypass
 file loading.
 
+=head2 engine_catalog
+
+    my $defs = Langertha::Knarr::Config->engine_catalog;
+    for my $def (@$defs) { say $def->{engine}, ": @{$def->{vars}}" }
+
+Class method. Returns an ArrayRef of C<{engine, vars}> hashrefs describing
+every engine L</scan_env> can auto-detect, with its API key environment
+variable names in priority order. The list is a copy — mutating it does not
+affect scanning.
+
+=head2 default_model_for
+
+    my $model = Langertha::Knarr::Config->default_model_for('Anthropic');
+
+Class method. Returns the default model name for an engine, read from the
+Langertha engine class itself (C<< Langertha::Engine::Anthropic->default_model >>)
+so the catalog cannot drift away from the framework. Returns C<undef> when the
+engine class is not installed, or when it has no default model and no fallback
+is known. The result is cached per engine name.
+
 =head2 from_env
 
     my $config = Langertha::Knarr::Config->from_env(%opts);
 
 Class method. Builds a config object purely from environment variables
 (zero-config Docker mode). Calls L</scan_env> to detect which API keys are
-set, assigns a sensible default model for each detected engine, enables
+set, assigns each detected engine its L</default_model_for> model, enables
 C<auto_discover> and C<passthrough>, and sets OpenAI as the default engine
 when C<OPENAI_API_KEY> is present.
 
@@ -558,7 +609,8 @@ that at least one model or default engine is configured.
 
 Class method. Scans C<%ENV> and optional C<.env> files for known API key
 environment variables. Returns a HashRef of engine name → C<{engine,
-api_key_env}> for every engine whose key was found.
+api_key_env}> for every engine whose key was found. See L</engine_catalog>
+for the engines and variable names it knows about.
 
 Priority order per engine: C<LANGERTHA_*_API_KEY> beats the bare vendor key
 (e.g. C<OPENAI_API_KEY>), which beats the C<TEST_LANGERTHA_*_API_KEY> variant.

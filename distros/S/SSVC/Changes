@@ -1,5 +1,8 @@
 Revision history for Perl extension SSVC.
 
+1.01  2026-08-14
+	- FIX "to_vector_string" timestamp (github.com/giterlizzi/perl-SSVC#1)
+	- Added "examples/simple-cve-ssvc-calculator.pl"
+
 1.00  2026-08-06
 	- First public release of SSVC
-

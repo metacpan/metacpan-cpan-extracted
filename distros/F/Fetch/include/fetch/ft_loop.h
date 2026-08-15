@@ -25,6 +25,7 @@ struct hm_loop {                 /* name matches ft_future.h's forward decl */
     SV        **wcb;             /* [HM_MAXFD] write-ready callbacks */
     ft_timer   *timers;          /* live timers, for dispatch + cleanup */
     int         stop;
+    int         nio;             /* live fd interests, for the idle check */
 };
 typedef struct hm_loop ft_loop;
 /* hm_cur_loop is defined (static) in ft_future.h; we only read/write it. */
@@ -80,15 +81,15 @@ static void ft_call0(pTHX_ SV *cb) {
 
 static void ft_watch_io(pTHX_ ft_loop *l, int fd, int mask, SV *cb) {
     if (fd < 0 || fd >= HM_MAXFD) croak("watch_io: fd %d out of range", fd);
-    if (mask & HM_EV_READ)  { if (l->rcb[fd]) SvREFCNT_dec(l->rcb[fd]); l->rcb[fd] = SvREFCNT_inc(cb); }
-    if (mask & HM_EV_WRITE) { if (l->wcb[fd]) SvREFCNT_dec(l->wcb[fd]); l->wcb[fd] = SvREFCNT_inc(cb); }
+    if (mask & HM_EV_READ)  { if (l->rcb[fd]) SvREFCNT_dec(l->rcb[fd]); else l->nio++; l->rcb[fd] = SvREFCNT_inc(cb); }
+    if (mask & HM_EV_WRITE) { if (l->wcb[fd]) SvREFCNT_dec(l->wcb[fd]); else l->nio++; l->wcb[fd] = SvREFCNT_inc(cb); }
     l->be->add_io(l->be, fd, mask, 0);
 }
 
 static void ft_unwatch_io(pTHX_ ft_loop *l, int fd, int mask) {
     if (fd < 0 || fd >= HM_MAXFD) return;
-    if (mask & HM_EV_READ)  { if (l->rcb[fd]) { SvREFCNT_dec(l->rcb[fd]); l->rcb[fd] = NULL; } }
-    if (mask & HM_EV_WRITE) { if (l->wcb[fd]) { SvREFCNT_dec(l->wcb[fd]); l->wcb[fd] = NULL; } }
+    if (mask & HM_EV_READ)  { if (l->rcb[fd]) { SvREFCNT_dec(l->rcb[fd]); l->rcb[fd] = NULL; l->nio--; } }
+    if (mask & HM_EV_WRITE) { if (l->wcb[fd]) { SvREFCNT_dec(l->wcb[fd]); l->wcb[fd] = NULL; l->nio--; } }
     l->be->remove_io(l->be, fd, mask);
 }
 
@@ -139,6 +140,18 @@ static void hm_loop_run(pTHX_ struct hm_loop *l, SV *until) {
 
         hmf_pump(aTHX);                       /* drain future continuations */
         if (until && hmf_state(aTHX_ until) != HMF_PENDING) break;
+
+        /* Nothing armed and nothing timed means nothing can ever wake us:
+         * wait_ev below blocks in the kernel with no deadline, which is not
+         * a stall a Perl-level alarm can even interrupt. Awaiting a future
+         * this loop was never going to resolve is the way to get here, so
+         * say that rather than hanging the process. */
+        if (until && !l->nio && !l->timers) {
+            l->stop     = saved_stop;
+            hm_cur_loop = saved;
+            croak("Fetch::Future: awaited on a loop with no watchers - the "
+                  "future belongs to a different loop");
+        }
 
         n = l->be->wait_ev(l->be, evs, HM_MAXEV, -1.0);
         if (n < 0) { if (errno == EINTR) continue; break; }

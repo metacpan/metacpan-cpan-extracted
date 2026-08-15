@@ -45,6 +45,8 @@
 extern INFIX_TLS const char * g_infix_last_signature_context;
 /** @internal A safeguard against stack overflows from malicious or deeply nested signatures (e.g., `{{{{...}}}}`). */
 #define MAX_RECURSION_DEPTH 32
+/** @internal A safeguard against stack overflows when printing cyclic type graphs. */
+#define MAX_PRINT_RECURSION_DEPTH 128
 static infix_status parse_function_signature_details(parser_state * state,
                                                      infix_type ** out_ret_type,
                                                      infix_function_argument ** out_args,
@@ -100,6 +102,14 @@ static bool parse_size_t(parser_state * state, size_t * out_val) {
 
     // Check for truncation if size_t is smaller than unsigned long long (e.g. 32-bit builds)
     if (val > SIZE_MAX) {
+        _infix_set_parser_error(state, INFIX_CODE_INTEGER_OVERFLOW);
+        return false;
+    }
+    // ULLONG_MAX is returned by strtoull both for the literal 18446744073709551615 and
+    // for values that overflowed the range, so it can never be treated as a valid size.
+    // Accepting it would let `[18446744073709551615:uint8]` pass through and overflow
+    // downstream size arithmetic (e.g. (SIZE_MAX + 15) & ~15 wrapping to 0).
+    if (val == (unsigned long long)SIZE_MAX) {
         _infix_set_parser_error(state, INFIX_CODE_INTEGER_OVERFLOW);
         return false;
     }
@@ -284,7 +294,12 @@ static infix_struct_member * parse_aggregate_members(parser_state * state, char 
                     size_t width_val = 0;
                     if (!parse_size_t(state, &width_val))
                         return nullptr;  // Error set by parse_size_t
-                    if (width_val > 255) {
+                    size_t type_bits = member_type->size * 8;
+                    // Unresolved named reference (size 0) or a huge base type: cap at the
+                    // uint8_t storage limit so the width is never truncated.
+                    if (type_bits == 0 || type_bits > 255)
+                        type_bits = 255;
+                    if (width_val > type_bits) {
                         _infix_set_parser_error(state, INFIX_CODE_TYPE_TOO_LARGE);
                         return nullptr;
                     }
@@ -1198,6 +1213,7 @@ typedef struct {
     // MSVC mangling state
     const infix_type * msvc_types[10]; /**< First 10 encountered types for back-referencing. */
     size_t msvc_type_count;            /**< Number of types encountered. */
+    size_t depth;                      /**< Current recursion depth, to bound cyclic type graphs. */
 } printer_state;
 /**
  * @internal
@@ -1226,6 +1242,24 @@ static void _print(printer_state * state, const char * fmt, ...) {
 static void _infix_type_print_signature_recursive(printer_state * state, const infix_type * type);
 static void _infix_type_print_itanium_recursive(printer_state * state, const infix_type * type);
 static void _infix_type_print_msvc_recursive(printer_state * state, const infix_type * type);
+static void _infix_type_print_body_only_recursive(printer_state * state, const infix_type * type);
+/**
+ * @brief Recursively prints a type with a depth guard.
+ *
+ * Cyclic type graphs (e.g., a structure that directly embeds itself by value)
+ * would otherwise recurse forever; the guard bounds the descent and aborts
+ * the print with an error once the cap is exceeded.
+ */
+#define PRINT_RECURSE(state, fn, arg)                       \
+    do {                                                    \
+        if ((state)->depth >= MAX_PRINT_RECURSION_DEPTH) {  \
+            (state)->status = INFIX_ERROR_INVALID_ARGUMENT; \
+            return;                                         \
+        }                                                   \
+        (state)->depth++;                                   \
+        fn((state), (arg));                                 \
+        (state)->depth--;                                   \
+    } while (0)
 
 // Itanium Mangling Helpers
 static bool _find_itanium_sub(printer_state * state, const void * component, size_t * index) {
@@ -1312,14 +1346,14 @@ static void _infix_type_print_signature_recursive(printer_state * state, const i
             type->meta.pointer_info.pointee_type->category == INFIX_TYPE_VOID)
             _print(state, "void");
         else
-            _infix_type_print_signature_recursive(state, type->meta.pointer_info.pointee_type);
+            PRINT_RECURSE(state, _infix_type_print_signature_recursive, type->meta.pointer_info.pointee_type);
         break;
     case INFIX_TYPE_ARRAY:
         if (type->meta.array_info.is_flexible)
             _print(state, "[?:");
         else
             _print(state, "[%zu:", type->meta.array_info.num_elements);
-        _infix_type_print_signature_recursive(state, type->meta.array_info.element_type);
+        PRINT_RECURSE(state, _infix_type_print_signature_recursive, type->meta.array_info.element_type);
         _print(state, "]");
         break;
     case INFIX_TYPE_STRUCT:
@@ -1335,7 +1369,7 @@ static void _infix_type_print_signature_recursive(printer_state * state, const i
             const infix_struct_member * member = &type->meta.aggregate_info.members[i];
             if (member->name)
                 _print(state, "%s:", member->name);
-            _infix_type_print_signature_recursive(state, member->type);
+            PRINT_RECURSE(state, _infix_type_print_signature_recursive, member->type);
             if (member->bit_width > 0)
                 _print(state, ":%u", member->bit_width);
         }
@@ -1349,7 +1383,7 @@ static void _infix_type_print_signature_recursive(printer_state * state, const i
             const infix_struct_member * member = &type->meta.aggregate_info.members[i];
             if (member->name)
                 _print(state, "%s:", member->name);
-            _infix_type_print_signature_recursive(state, member->type);
+            PRINT_RECURSE(state, _infix_type_print_signature_recursive, member->type);
             // Bitfields in unions are rare but syntactically valid in C.
             if (member->bit_width > 0)
                 _print(state, ":%u", member->bit_width);
@@ -1364,7 +1398,7 @@ static void _infix_type_print_signature_recursive(printer_state * state, const i
             const infix_function_argument * arg = &type->meta.func_ptr_info.args[i];
             if (arg->name)
                 _print(state, "%s:", arg->name);
-            _infix_type_print_signature_recursive(state, arg->type);
+            PRINT_RECURSE(state, _infix_type_print_signature_recursive, arg->type);
         }
         if (type->meta.func_ptr_info.num_args > type->meta.func_ptr_info.num_fixed_args) {
             _print(state, ";");
@@ -1374,19 +1408,19 @@ static void _infix_type_print_signature_recursive(printer_state * state, const i
                 const infix_function_argument * arg = &type->meta.func_ptr_info.args[i];
                 if (arg->name)
                     _print(state, "%s:", arg->name);
-                _infix_type_print_signature_recursive(state, arg->type);
+                PRINT_RECURSE(state, _infix_type_print_signature_recursive, arg->type);
             }
         }
         _print(state, ")->");
-        _infix_type_print_signature_recursive(state, type->meta.func_ptr_info.return_type);
+        PRINT_RECURSE(state, _infix_type_print_signature_recursive, type->meta.func_ptr_info.return_type);
         break;
     case INFIX_TYPE_ENUM:
         _print(state, "e:");
-        _infix_type_print_signature_recursive(state, type->meta.enum_info.underlying_type);
+        PRINT_RECURSE(state, _infix_type_print_signature_recursive, type->meta.enum_info.underlying_type);
         break;
     case INFIX_TYPE_COMPLEX:
         _print(state, "c[");
-        _infix_type_print_signature_recursive(state, type->meta.complex_info.base_type);
+        PRINT_RECURSE(state, _infix_type_print_signature_recursive, type->meta.complex_info.base_type);
         _print(state, "]");
         break;
     case INFIX_TYPE_VECTOR:
@@ -1418,7 +1452,7 @@ static void _infix_type_print_signature_recursive(printer_state * state, const i
             }
             if (!printed_alias) {
                 _print(state, "v[%zu:", num_elements);
-                _infix_type_print_signature_recursive(state, element_type);
+                PRINT_RECURSE(state, _infix_type_print_signature_recursive, element_type);
                 _print(state, "]");
             }
         }
@@ -1559,7 +1593,7 @@ static void _infix_type_print_itanium_recursive(printer_state * state, const inf
     switch (type->category) {
     case INFIX_TYPE_POINTER:
         _print(state, "P");
-        _infix_type_print_itanium_recursive(state, type->meta.pointer_info.pointee_type);
+        PRINT_RECURSE(state, _infix_type_print_itanium_recursive, type->meta.pointer_info.pointee_type);
         _add_itanium_sub(state, type);
         break;
     case INFIX_TYPE_NAMED_REFERENCE:
@@ -1621,12 +1655,12 @@ static void _infix_type_print_itanium_recursive(printer_state * state, const inf
         break;
     case INFIX_TYPE_COMPLEX:
         _print(state, "C");
-        _infix_type_print_itanium_recursive(state, type->meta.complex_info.base_type);
+        PRINT_RECURSE(state, _infix_type_print_itanium_recursive, type->meta.complex_info.base_type);
         _add_itanium_sub(state, type);
         break;
     case INFIX_TYPE_VECTOR:
         _print(state, "Dv%zu_", type->size / type->meta.vector_info.element_type->size);
-        _infix_type_print_itanium_recursive(state, type->meta.vector_info.element_type);
+        PRINT_RECURSE(state, _infix_type_print_itanium_recursive, type->meta.vector_info.element_type);
         _add_itanium_sub(state, type);
         break;
     default:
@@ -1783,7 +1817,7 @@ static void _infix_type_print_msvc_recursive(printer_state * state, const infix_
         // A = const/volatile qualifiers (A = none)
         // Then the pointee type.
         _print(state, "PEA");
-        _infix_type_print_msvc_recursive(state, type->meta.pointer_info.pointee_type);
+        PRINT_RECURSE(state, _infix_type_print_msvc_recursive, type->meta.pointer_info.pointee_type);
         if (can_backref && state->msvc_type_count < 10)
             state->msvc_types[state->msvc_type_count++] = type;
         break;
@@ -1792,13 +1826,13 @@ static void _infix_type_print_msvc_recursive(printer_state * state, const infix_
         // A = __cdecl
         _print(state, "P6A");
         // Return type
-        _infix_type_print_msvc_recursive(state, type->meta.func_ptr_info.return_type);
+        PRINT_RECURSE(state, _infix_type_print_msvc_recursive, type->meta.func_ptr_info.return_type);
         // Arguments
         if (type->meta.func_ptr_info.num_args == 0)
             _print(state, "X");
         else
             for (size_t i = 0; i < type->meta.func_ptr_info.num_args; ++i)
-                _infix_type_print_msvc_recursive(state, type->meta.func_ptr_info.args[i].type);
+                PRINT_RECURSE(state, _infix_type_print_msvc_recursive, type->meta.func_ptr_info.args[i].type);
         _print(state, "@Z");
         if (can_backref && state->msvc_type_count < 10)
             state->msvc_types[state->msvc_type_count++] = type;
@@ -1861,7 +1895,7 @@ static void _infix_type_print_body_only_recursive(printer_state * state, const i
                 _print(state, "%s:", member->name);
             // For nested members, we can use the standard printer, which IS allowed
             // to use the `@Name` shorthand for brevity.
-            _infix_type_print_signature_recursive(state, member->type);
+            PRINT_RECURSE(state, _infix_type_print_signature_recursive, member->type);
             if (member->bit_width > 0)
                 _print(state, ":%u", member->bit_width);
         }
@@ -1875,7 +1909,7 @@ static void _infix_type_print_body_only_recursive(printer_state * state, const i
             const infix_struct_member * member = &type->meta.aggregate_info.members[i];
             if (member->name)
                 _print(state, "%s:", member->name);
-            _infix_type_print_signature_recursive(state, member->type);
+            PRINT_RECURSE(state, _infix_type_print_signature_recursive, member->type);
             if (member->bit_width > 0)
                 _print(state, ":%u", member->bit_width);
         }
@@ -1892,23 +1926,23 @@ static void _infix_type_print_body_only_recursive(printer_state * state, const i
             type->meta.pointer_info.pointee_type->category == INFIX_TYPE_VOID)
             _print(state, "void");
         else
-            _infix_type_print_signature_recursive(state, type->meta.pointer_info.pointee_type);
+            PRINT_RECURSE(state, _infix_type_print_signature_recursive, type->meta.pointer_info.pointee_type);
         break;
     case INFIX_TYPE_ARRAY:
         if (type->meta.array_info.is_flexible)
             _print(state, "[?:");
         else
             _print(state, "[%zu:", type->meta.array_info.num_elements);
-        _infix_type_print_signature_recursive(state, type->meta.array_info.element_type);
+        PRINT_RECURSE(state, _infix_type_print_signature_recursive, type->meta.array_info.element_type);
         _print(state, "]");
         break;
     case INFIX_TYPE_ENUM:
         _print(state, "e:");
-        _infix_type_print_signature_recursive(state, type->meta.enum_info.underlying_type);
+        PRINT_RECURSE(state, _infix_type_print_signature_recursive, type->meta.enum_info.underlying_type);
         break;
     case INFIX_TYPE_COMPLEX:
         _print(state, "c[");
-        _infix_type_print_signature_recursive(state, type->meta.complex_info.base_type);
+        PRINT_RECURSE(state, _infix_type_print_signature_recursive, type->meta.complex_info.base_type);
         _print(state, "]");
         break;
     case INFIX_TYPE_PRIMITIVE:
@@ -1966,7 +2000,7 @@ static void _infix_type_print_body_only_recursive(printer_state * state, const i
     case INFIX_TYPE_NAMED_REFERENCE:
     case INFIX_TYPE_REVERSE_TRAMPOLINE:
     case INFIX_TYPE_VECTOR:
-        _infix_type_print_signature_recursive(state, type);
+        PRINT_RECURSE(state, _infix_type_print_signature_recursive, type);
         break;
     default:
         state->status = INFIX_ERROR_INVALID_ARGUMENT;
@@ -1983,7 +2017,7 @@ c23_nodiscard infix_status _infix_type_print_body_only(char * buffer,
                                                        infix_print_dialect_t dialect) {
     if (!buffer || buffer_size == 0 || !type || dialect != INFIX_DIALECT_SIGNATURE)
         return INFIX_ERROR_INVALID_ARGUMENT;
-    printer_state state = {buffer, buffer_size, INFIX_SUCCESS, {0}, 0, {0}, 0};
+    printer_state state = {buffer, buffer_size, INFIX_SUCCESS, {0}, 0, {0}, 0, 0};
     *buffer = '\0';
     _infix_type_print_body_only_recursive(&state, type);
     if (state.remaining > 0)
@@ -2009,7 +2043,7 @@ INFIX_API c23_nodiscard infix_status infix_type_print(char * buffer,
         _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
-    printer_state state = {buffer, buffer_size, INFIX_SUCCESS, {0}, 0, {0}, 0};
+    printer_state state = {buffer, buffer_size, INFIX_SUCCESS, {0}, 0, {0}, 0, 0};
     *buffer = '\0';
     if (dialect == INFIX_DIALECT_SIGNATURE)
         _infix_type_print_signature_recursive(&state, type);
@@ -2060,7 +2094,7 @@ INFIX_API c23_nodiscard infix_status infix_function_print(char * buffer,
         _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
-    printer_state state = {buffer, buffer_size, INFIX_SUCCESS, {0}, 0, {0}, 0};
+    printer_state state = {buffer, buffer_size, INFIX_SUCCESS, {0}, 0, {0}, 0, 0};
     *buffer = '\0';
     if (dialect == INFIX_DIALECT_SIGNATURE) {
         (void)function_name;  // Unused
@@ -2210,7 +2244,7 @@ INFIX_API c23_nodiscard infix_status infix_function_print(char * buffer,
 c23_nodiscard infix_status infix_registry_print(char * buffer, size_t buffer_size, const infix_registry_t * registry) {
     if (!buffer || buffer_size == 0 || !registry)
         return INFIX_ERROR_INVALID_ARGUMENT;
-    printer_state state = {buffer, buffer_size, INFIX_SUCCESS, {0}, 0, {0}, 0};
+    printer_state state = {buffer, buffer_size, INFIX_SUCCESS, {0}, 0, {0}, 0, 0};
     *state.p = '\0';
     // Iterate through all buckets and their chains.
     for (size_t i = 0; i < registry->num_buckets; ++i) {

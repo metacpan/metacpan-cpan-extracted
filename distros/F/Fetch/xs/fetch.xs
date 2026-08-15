@@ -153,6 +153,7 @@ _request(loop, pool, host, port, req, tls, verify, timeout, method, scheme, auth
         RETVAL = ft_h1_start(aTHX_ l, lsv, pl, host, port, bytes, len, tls, verify,
                              timeout, method, scheme, authority, path, headers,
                              body, on_body, NULL);
+        hmf_pin_loop(aTHX_ RETVAL, loop);   /* only this loop can resolve it */
     }
     OUTPUT:
         RETVAL

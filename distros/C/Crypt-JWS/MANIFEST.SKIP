@@ -1,0 +1,14 @@
+\B\.git\b
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^Crypt-JWS-
+\.tar\.gz$
+^JWS\.c$
+^JWS\.o$
+^JWS\.bs$
+^Install/
+^cjws_probe_
+\.DS_Store

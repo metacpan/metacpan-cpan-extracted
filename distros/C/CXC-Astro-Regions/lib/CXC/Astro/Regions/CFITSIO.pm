@@ -6,7 +6,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef', 'lexical_subs';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use CXC::Astro::Regions::CFITSIO::Types qw(
   Angle
@@ -21,12 +21,6 @@ use CXC::Astro::Regions::CFITSIO::Types qw(
 );
 
 use CXC::Astro::Regions::CFITSIO::Variant;
-
-package CXC::Astro::Regions::CFITSIO::Role::Region {
-    use Moo::Role;
-}
-
-use constant RegionRole => __PACKAGE__ . '::Role::Region';
 
 use namespace::clean;
 
@@ -61,19 +55,10 @@ my $stash = Package::Stash->new( __PACKAGE__ );
 
 my sub REGION ( $region, %spec ) {
 
-    $spec{with} //= [RegionRole];
-    my $package = pkgpath( $region );
-
-    if ( exists $spec{name} && $spec{name} ne $region ) {
-        my $parent = pkgpath( $spec{name} );
-        Moo->import::into( $parent );
-        $spec{extends} = [$parent];
-    }
-
     my $variant = Variant( $region, %spec );
     Package::Stash->new( $variant )->add_symbol( q{@CARP_NOT}, [__PACKAGE__] );
 
-    $stash->add_symbol( q{&} . $region, sub { $package->new( @_ ) } );
+    $stash->add_symbol( q{&} . $region, sub { $variant->new( @_ ) } );
     push @EXPORT_OK, $region;
 }
 
@@ -88,10 +73,7 @@ my sub REGION ( $region, %spec ) {
 
 
 # Annulus       ( Xc, Yc, Rin, Rout )
-REGION annulus => (
-    name   => 'annulus',
-    params => [ VERTEX( 'center' ), LENGTHPAIR( 'radii' ) ],
-);
+REGION annulus => ( params => [ VERTEX( 'center' ), LENGTHPAIR( 'radii' ) ], );
 
 
 
@@ -114,9 +96,7 @@ REGION annulus => (
 
 # Box           ( Xc, Yc, Wdth, Hght, A )
 # Box           ( Xc, Yc, Wdth, Hght, A, Xcolumn, Ycolumn )
-REGION box => (
-    name   => 'box',
-    params =>
+REGION box => ( params =>
       [ VERTEX( 'center' ), LENGTH( 'width' ), LENGTH( 'height' ), ANGLE( default => 0 ), COLUMNPAIR, ],
 );
 
@@ -289,7 +269,7 @@ CXC::Astro::Regions::CFITSIO - CFITSIO Compatible Regions
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

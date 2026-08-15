@@ -493,7 +493,58 @@ EOF
     ok( $? != 0, 'stub decode rejects duration with non-zero N' );
 }
 
-# 27. Create log file
+# 27. Duration is restricted to one digit in human and stub formats
+{
+    my $human_encode =
+"$^X $inc $exe code --project TCGA-AML --entity biosample --format human --action encode --codebook $codebook "
+      . "--species Human --subject_id 1 --tissue Liver --sample_type Tumor "
+      . "--assay RNA_seq --condition I25.110 --timepoint Baseline --duration P10D 2>&1";
+    my $human_out = `$human_encode`;
+    ok( $? != 0, 'human encode rejects multi-digit duration' );
+    like( $human_out, qr/Invalid duration 'P10D'/,
+        'human encode reports invalid duration' );
+
+    my $stub_encode =
+"$^X $inc $exe code --project TCGA-AML --entity biosample --format stub --action encode --codebook $codebook "
+      . "--species Human --subject_id 1 --tissue Liver --sample_type Tumor "
+      . "--assay RNA_seq --condition I25.110 --timepoint Challenge --duration P10D 2>&1";
+    my $stub_out = `$stub_encode`;
+    ok( $? != 0, 'stub encode rejects multi-digit duration' );
+    like( $stub_out, qr/Invalid duration 'P10D'/,
+        'stub encode reports invalid duration' );
+
+    my $human_decode =
+"$^X $inc $exe code --entity biosample --format human --action decode --codebook $codebook "
+      . "--clar_id TCGA_AML-HomSap-00001-LIV-TUM-RNA-I25.110-BSL-P10D 2>&1";
+    my $human_decode_out = `$human_decode`;
+    ok( $? != 0, 'human decode rejects multi-digit duration' );
+    like( $human_decode_out, qr/Invalid duration 'P10D'/,
+        'human decode reports invalid duration' );
+
+    my $stub_decode =
+"$^X $inc $exe code --entity biosample --format stub --action decode --codebook $codebook "
+      . "--clar_id AML01001LTR2to01C10DB01R05 --subject_id_base62_width 3 2>&1";
+    my $stub_decode_out = `$stub_decode`;
+    ok( $? != 0, 'stub decode rejects multi-digit duration' );
+    like( $stub_decode_out, qr/Invalid duration 'P10D'/,
+        'stub decode reports invalid duration' );
+
+    for my $legacy_version (qw(0.02 0.03)) {
+        my $legacy_codebook = catfile( 'share', 'versions', $legacy_version,
+            'clarid-codebook.yaml' );
+        my $legacy_encode =
+"$^X $inc $exe code --project TCGA-AML --entity biosample --format human --action encode --codebook $legacy_codebook "
+          . "--species Human --subject_id 1 --tissue Liver --sample_type Tumor "
+          . "--assay RNA_seq --condition I25.110 --timepoint Baseline --duration P10D 2>&1";
+        my $legacy_out = `$legacy_encode`;
+        ok( $? != 0,
+            "codebook $legacy_version cannot re-enable multi-digit duration" );
+        like( $legacy_out, qr/Invalid duration 'P10D'/,
+            "codebook $legacy_version reports invalid duration" );
+    }
+}
+
+# 28. Create log file
 {   
     my $cmd = 
 "$^X $inc $exe code --project TCGA-AML --entity biosample --format human --action encode "
@@ -509,7 +560,7 @@ EOF
 unlink $logfile;
 }
 
-# 28. Biosample stub encode/decode with 3-char species stubs inferred from codebook
+# 29. Biosample stub encode/decode with 3-char species stubs inferred from codebook
 {
     my $cb3 = _temp_codebook(
         sub {
@@ -555,7 +606,7 @@ unlink $logfile;
     );
 }
 
-# 29. Mixed species stub widths in the codebook are rejected
+# 30. Mixed species stub widths in the codebook are rejected
 {
     my $bad_cb = _temp_codebook(
         sub {
@@ -576,12 +627,12 @@ unlink $logfile;
     );
 }
 
-# 30. Unsupported codebook version is rejected
+# 31. Unsupported codebook version is rejected
 {
     my $bad_cb = _temp_codebook(
         sub {
             my ($doc) = @_;
-            $doc->{metadata}{version} = '0.04';
+            $doc->{metadata}{version} = '0.05';
         }
     );
 
@@ -592,7 +643,7 @@ unlink $logfile;
     my $out = `$cmd`;
     like(
         $out,
-        qr/Unsupported codebook version '0\.04'.*supports: 0\.02, 0\.03/,
+        qr/Unsupported codebook version '0\.05'.*supports: 0\.02, 0\.03, 0\.04/,
         'unsupported codebook version is rejected in code mode'
     );
 }

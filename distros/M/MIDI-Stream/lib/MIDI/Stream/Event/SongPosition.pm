@@ -8,7 +8,7 @@ use Feature::Compat::Class;
 package MIDI::Stream::Event::SongPosition;
 class MIDI::Stream::Event::SongPosition :isa( MIDI::Stream::Event );
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use MIDI::Stream::Tables qw/ combine_bytes /;
 
@@ -33,7 +33,7 @@ MIDI::Stream::Event::SongPosition - Song Position event class
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

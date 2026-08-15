@@ -88,6 +88,17 @@ sub new {
 
             my $buf_app_name = "$appender->{name}_$CATALYST_APPENDER_SUFFIX";
 
+            # Somebody's already given this appender a buffer, so leave it
+            # alone. Building a second one here would drop it into the
+            # registry on top of the first, but the loggers already writing to
+            # the first one never get moved across, because the loop below
+            # only picks up loggers still on the raw appender. They'd carry on
+            # filling a buffer that _flush() can no longer see, and their
+            # messages would never come out. Happens as soon as two Catalyst
+            # apps share a process and a config.
+            next if exists
+                $Log::Log4perl::Logger::APPENDER_BY_NAME{ $buf_app_name };
+
             my $buf_app = Log::Log4perl::Appender->new(
                 'Log::Log4perl::Appender::Buffer',
                 name       => $buf_app_name,
@@ -336,33 +347,8 @@ The result is the same.
 
 =head1 LICENSE
 
-Copyright 2002-2013 by Mike Schilli E<lt>m@perlmeister.comE<gt> 
+Copyright 2002-2026 by Mike Schilli E<lt>m@perlmeister.comE<gt>
 and Kevin Goess E<lt>cpan@goess.orgE<gt>.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
-
-=head1 AUTHOR
-
-Please contribute patches to the project on Github:
-
-    http://github.com/mschilli/log4perl
-
-Send bug reports or requests for enhancements to the authors via our
-
-MAILING LIST (questions, bug reports, suggestions/patches): 
-log4perl-devel@lists.sourceforge.net
-
-Authors (please contact them via the list above, not directly):
-Mike Schilli <m@perlmeister.com>,
-Kevin Goess <cpan@goess.org>
-
-Contributors (in alphabetical order):
-Ateeq Altaf, Cory Bennett, Jens Berthold, Jeremy Bopp, Hutton
-Davidson, Chris R. Donnelly, Matisse Enzer, Hugh Esco, Anthony
-Foiani, James FitzGibbon, Carl Franks, Dennis Gregorovic, Andy
-Grundman, Paul Harrington, Alexander Hartmaier  David Hull, 
-Robert Jacobson, Jason Kohles, Jeff Macdonald, Markus Peter, 
-Brett Rann, Peter Rabbitson, Erik Selberg, Aaron Straup Cope, 
-Lars Thegler, David Viner, Mac Yang.
-
+it under the same terms as Perl itself.

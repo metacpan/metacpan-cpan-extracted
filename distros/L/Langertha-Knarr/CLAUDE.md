@@ -4,6 +4,20 @@
 
 Knarr is an LLM proxy that accepts requests in OpenAI, Anthropic, or Ollama format, routes them to any Langertha backend engine, and traces everything via Langfuse.
 
+## Delegation
+
+Delegate behavior-relevant code to the right agent instead of touching it yourself —
+principle and lane are in `.claude/rules/knarr-rules.md`.
+
+| Task | Agent |
+|---|---|
+| Implement / refactor / debug behavior-relevant code | `knarr-worker` (default) |
+| Write/extend tests | `knarr-test-writer` |
+| Pre-release audit | `knarr-release-checker` |
+
+The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main
+agent delegates rather than loading them. Skill sources live under `.claude/skills/`.
+
 ## Build System
 
 Uses `[@Author::GETTY]` Dist::Zilla plugin bundle.

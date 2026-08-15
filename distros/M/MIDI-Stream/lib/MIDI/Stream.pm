@@ -7,7 +7,7 @@ use Feature::Compat::Class 0.08;
 package MIDI::Stream;
 class MIDI::Stream;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 1;
 
@@ -23,7 +23,7 @@ MIDI::Stream - MIDI bytestream decoding and encoding
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

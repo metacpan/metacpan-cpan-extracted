@@ -47,15 +47,18 @@ sub _ft_untimer {
     return;
 }
 
+sub _ft_await {
+    my ($self, $f) = @_;
+    return if $f->is_ready;
+    my $cv = AE::cv();
+    $f->on_ready(sub { $cv->send });
+    $cv->recv;
+    return;
+}
+
 sub install_await {
     my ($self) = @_;
-    $Fetch::Future::AWAIT = sub {
-        my ($f) = @_;
-        return if $f->is_ready;
-        my $cv = AE::cv();
-        $f->on_ready(sub { $cv->send });
-        $cv->recv;
-    };
+    $Fetch::Future::AWAIT = sub { $self->_ft_await($_[0]) };
     return $self;
 }
 

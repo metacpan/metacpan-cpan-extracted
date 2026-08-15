@@ -1,5 +1,12 @@
 Revision history for CXC-Astro-Regions
 
+0.05      2026-08-14 11:59:04 EDT
+
+  [ENHANCMENTS]
+
+    * eliminate source of Perl-5.40 warnings leakage
+    * remove unused code
+
 0.04      2026-08-12 18:34:14 EDT
 
   [ENHANCEMENTS]

@@ -6,7 +6,7 @@ use v5.20;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
@@ -32,7 +32,7 @@ CXC::Astro::Regions - Astronomical region support
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

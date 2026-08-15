@@ -6,7 +6,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef', 'lexical_subs';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use CXC::Astro::Regions::CIAO::Types qw(
   Angle
@@ -20,10 +20,6 @@ use CXC::Astro::Regions::CIAO::Types qw(
 );
 
 use CXC::Astro::Regions::CIAO::Variant;
-
-package CXC::Astro::Regions::CIAO::Role::Region {
-    use Moo::Role;
-}
 
 use constant RegionRole => __PACKAGE__ . '::Role::Region';
 
@@ -57,19 +53,10 @@ my $stash = Package::Stash->new( __PACKAGE__ );
 
 my sub REGION ( $region, %spec ) {
 
-    $spec{with} //= [RegionRole];
-    my $package = pkgpath( $region );
-
-    if ( exists $spec{name} && $spec{name} ne $region ) {
-        my $parent = pkgpath( $spec{name} );
-        Moo->import::into( $parent );
-        $spec{extends} = [$parent];
-    }
-
     my $variant = Variant( $region, %spec );
     Package::Stash->new( $variant )->add_symbol( q{@CARP_NOT}, [__PACKAGE__] );
 
-    $stash->add_symbol( q{&} . $region, sub { $package->new( @_ ) } );
+    $stash->add_symbol( q{&} . $region, sub { $variant->new( @_ ) } );
     push @EXPORT_OK, $region;
 }
 
@@ -86,10 +73,7 @@ my sub REGION ( $region, %spec ) {
 # |-----------|-----------------------------------------------------|
 # | ANNULUS   | (xcenter,ycenter,iradius,oradius)                   |
 # |-----------|-----------------------------------------------------|
-REGION annulus => (
-    name   => 'annulus',
-    params => [ VERTEX( 'center' ), LENGTHPAIR( 'radii' ) ],
-);
+REGION annulus => ( params => [ VERTEX( 'center' ), LENGTHPAIR( 'radii' ) ], );
 
 
 
@@ -106,7 +90,6 @@ REGION annulus => (
 # | BOX       | (xcenter,ycenter,width,height,angle)                |
 # |-----------|-----------------------------------------------------|
 REGION box => (
-    name   => 'box',
     params => [ VERTEX( 'center' ), LENGTH( 'width' ), LENGTH( 'height' ), ANGLE( required => !!0 ) ],
 );
 
@@ -232,10 +215,8 @@ REGION region => ( params => [ STRING( 'file' ) ], );
 # |-----------|-----------------------------------------------------|
 # | ROTBOX    | (xcenter,ycenter,width,height,angle)                |
 # |-----------|-----------------------------------------------------|
-REGION rotbox => (
-    name   => 'rotbox',
-    params => [ VERTEX( 'center' ), LENGTH( 'width' ), LENGTH( 'height' ), ANGLE ],
-);
+REGION rotbox =>
+  ( params => [ VERTEX( 'center' ), LENGTH( 'width' ), LENGTH( 'height' ), ANGLE ], );
 
 
 
@@ -294,7 +275,7 @@ CXC::Astro::Regions::CIAO - CIAO Compatible Regions
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

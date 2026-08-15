@@ -7,7 +7,7 @@ use File::Path            qw(mkpath);
 use Cwd                   qw(getcwd);
 use File::Spec;
 
-# simple core-only check for qrencode in PATH
+# Simple core-only check for external QR helpers in PATH.
 sub have_in_path {
     my ($prog) = @_;
     for my $dir ( File::Spec->path ) {
@@ -18,11 +18,12 @@ sub have_in_path {
 }
 
 # Set plans
-if ( !have_in_path('qrencode') ) {
-    plan skip_all => 'qrencode not available in PATH';
+my @missing = grep { !have_in_path($_) } qw(qrencode zbarimg);
+if (@missing) {
+    plan skip_all => join( ', ', @missing ) . ' not available in PATH';
 }
 else {
-    plan tests => 7;    # keep your original count
+    plan tests => 7;
 }
 
 # Start
@@ -91,4 +92,3 @@ unlink $outbis;
 rmdir $work;
 
 done_testing();
-

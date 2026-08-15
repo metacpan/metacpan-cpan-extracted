@@ -1,0 +1,45 @@
+Punk-GraphQL
+
+GraphQL endpoints for Punk applications, executed by GraphQL::Houtou -
+an XS-first GraphQL parser and native-VM runtime. The plugin keeps the
+request path short: Punk's C dispatcher matches the route, the envelope
+is decoded through the File::Raw::JSON C ABI, GraphQL::Houtou renders
+the response straight to JSON bytes on its XS lane, and those bytes are
+returned as a PSGI triplet without re-encoding.
+
+	package MyApp;
+	use Punk;
+	use Punk::Plugin::GraphQL;
+
+	graphql '/graphql' => 'schema/app.graphql', {
+		resolvers => { Query => { user => sub { ... } } },
+		context   => sub { my ($c) = @_; ({ db => $c->db }) },
+		graphiql  => 1,
+	};
+
+	plugin 'GraphQL';
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+	perldoc Punk::GraphQL
+	perldoc Punk::Plugin::GraphQL
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+	The Artistic License 2.0 (GPL Compatible)

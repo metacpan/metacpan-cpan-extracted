@@ -13,7 +13,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::URI v12.6.0;
+package Protocol::Sys::Virt::URI v12.6.1;
 
 use parent qw(Exporter);
 
@@ -32,7 +32,7 @@ sub parse_url {
     pairmap {
         if ($a eq 'argv') {
             if (exists $args{argv}) {
-                push $args{argv}->@*, $b;
+                push @{ $args{argv} }, $b;
             }
             else {
                 $args{argv} = [ $b ];
@@ -94,7 +94,7 @@ Protocol::Sys::Virt::URI - Helper routines for parsing LibVirt URIs
 
 =head1 VERSION
 
-v12.6.0
+v12.6.1
 
 =head1 SYNOPSIS
 

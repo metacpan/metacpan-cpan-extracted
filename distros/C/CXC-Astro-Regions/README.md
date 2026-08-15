@@ -4,7 +4,7 @@ CXC::Astro::Regions - Astronomical region support
 
 # VERSION
 
-version 0.04
+version 0.05
 
 # DESCRIPTION
 

@@ -7,7 +7,7 @@ use experimental qw/ signatures /;
 package
     MIDI::Stream::EventFactory;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 require MIDI::Stream::Event::Note;
 require MIDI::Stream::Event::PolyTouch;
@@ -61,7 +61,7 @@ MIDI::Stream::EventFactory - Instantiate events from MIDI messages
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

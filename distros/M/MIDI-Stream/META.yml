@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: v5.26.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,55 +27,55 @@ no_index:
 provides:
   MIDI::Stream:
     file: lib/MIDI/Stream.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Decoder:
     file: lib/MIDI/Stream/Decoder.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Encoder:
     file: lib/MIDI/Stream/Encoder.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event:
     file: lib/MIDI/Stream/Event.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::AfterTouch:
     file: lib/MIDI/Stream/Event/AfterTouch.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::Channel:
     file: lib/MIDI/Stream/Event/Channel.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::ControlChange:
     file: lib/MIDI/Stream/Event/ControlChange.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::Note:
     file: lib/MIDI/Stream/Event/Note.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::PitchBend:
     file: lib/MIDI/Stream/Event/PitchBend.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::PolyTouch:
     file: lib/MIDI/Stream/Event/PolyTouch.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::ProgramChange:
     file: lib/MIDI/Stream/Event/ProgramChange.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::SongPosition:
     file: lib/MIDI/Stream/Event/SongPosition.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::SongSelect:
     file: lib/MIDI/Stream/Event/SongSelect.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::SysEx:
     file: lib/MIDI/Stream/Event/SysEx.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Event::TimeCode:
     file: lib/MIDI/Stream/Event/TimeCode.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::FIFO:
     file: lib/MIDI/Stream/FIFO.pm
-    version: '0.005'
+    version: '0.006'
   MIDI::Stream::Tables:
     file: lib/MIDI/Stream/Tables.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Feature::Compat::Class: '0.08'
   List::Util: '0'
@@ -87,7 +87,7 @@ resources:
   bugtracker: https://codeberg.org/jbarrett/MIDI-Stream/issues
   homepage: https://codeberg.org/jbarrett/MIDI-Stream/
   repository: https://codeberg.org/jbarrett/MIDI-Stream.git
-version: '0.005'
-x_generated_by_perl: v5.42.0
+version: '0.006'
+x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

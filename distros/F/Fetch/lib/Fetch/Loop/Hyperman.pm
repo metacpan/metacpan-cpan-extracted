@@ -95,15 +95,18 @@ sub _sweep {
     return;
 }
 
+sub _ft_await {
+    my ($self, $f) = @_;
+    return if $f->is_ready;
+    my $loop = $self->{loop};
+    $f->on_ready(sub { $loop->stop });
+    $loop->run;
+    return;
+}
+
 sub install_await {
     my ($self) = @_;
-    my $loop = $self->{loop};
-    $Fetch::Future::AWAIT = sub {
-        my ($f) = @_;
-        return if $f->is_ready;
-        $f->on_ready(sub { $loop->stop });
-        $loop->run;
-    };
+    $Fetch::Future::AWAIT = sub { $self->_ft_await($_[0]) };
     return $self;
 }
 

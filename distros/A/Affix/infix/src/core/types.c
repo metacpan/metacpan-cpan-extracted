@@ -268,8 +268,8 @@ static bool _layout_struct(infix_type * type) {
                 current_byte_offset = current_unit_offset;
             }
 
-            member->offset = current_unit_offset + (current_unit_bits_used / 8);
-            member->bit_offset = (uint8_t)(current_unit_bits_used % 8);
+            member->offset = current_unit_offset;
+            member->bit_offset = (uint8_t)current_unit_bits_used;
             current_unit_bits_used += member->bit_width;
 
             size_t bytes_used = (current_unit_bits_used + 7) / 8;

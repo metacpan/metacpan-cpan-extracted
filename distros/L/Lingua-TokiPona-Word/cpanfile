@@ -4,6 +4,7 @@
 requires "Carp" => "1.35";
 requires "Data::Displaycolour" => "v0.7.0";
 requires "Data::Identifier" => "v0.34.0";
+requires "Lingua::Generic::Interface" => "v0.1.0";
 requires "perl" => "v5.20.0";
 
 on 'test' => sub {

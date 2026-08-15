@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.96.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,45 +12,34 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 e020afc623d3ef834e4300a7b882b4fdf800f1b4 Build.PL
-SHA1 bae5b71cf8a591e383cc8ed61bf9514a9c85be1c Changes
-SHA1 f03b298e25fe30d6b027e72f04f2ded01ebd8d4a LICENSE
-SHA1 76b70d347b10798b7c2e81ed110d709174655523 MANIFEST
-SHA1 74465d2726d458e1d7f311fe9493f1618429825c MANIFEST.SKIP
-SHA1 c4c6c2b0168cf295bfd024f10b40cb5765c7d51a META.json
-SHA1 4864ba9cd9756620f57f1b8f7f7fa1a7650c267f META.yml
-SHA1 8be842c0285b4a9d01e0ce04b6bf9781a501de5a README
-SHA1 f4aebce6a9907011a72aad5baffdcf1c56290c30 lib/App/rainbarf.pm
-SHA1 1cc5316b987c94fac9615d8ce2b361d9fcef0bde perlcritic.rc
-SHA1 1b8aa753d4e8fdf505f43a49f2cac445f9e6a19b rainbarf
-SHA1 0d178c35706b9205185a8b42ab2dcb31db598cf6 t/00-compile.t
-SHA1 53a43fe2b4b1afc441c2114c475b92609ddbe432 t/01-tmux.t
-SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
-SHA1 2a4ded1fe37e912702d6682db5eb8e4fbce3b671 t/author-eol.t
-SHA1 7d3b616bb5a09bb59e6b222fb013b251e6de7d2c t/author-no-tabs.t
-SHA1 6c3dcb21edd9da7904c0ce1a152503fda9507170 t/release-consistent-version.t
-SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
-SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
-SHA1 d165f8ec069354540640243399f536af695046dd t/release-distmeta.t
-SHA1 a8a3b6c291113fff0f1765ef584a08bc4498bdc0 t/release-kwalitee.t
-SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
-SHA1 54b7f39e355424cbc367105b84ff02a6cb29d93b t/release-mojibake.t
-SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
-SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
-SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
-SHA1 327cbce635e237f8f2b7f93de33a1f16b3b0060d t/release-portability.t
-SHA1 af34d5f9f8bd79b21b6c01c69e0afdd81f25c16b t/release-test-version.t
-SHA1 17514255b5ff5f46ac8ce9e9e3c887c9a205c8ba t/release-unused-vars.t
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEcBAEBAgAGBQJXzo78AAoJEDlxU7ZVUpmivG4H/1g7jiTVYH28OzR2/4roe6Ll
-9eAqWMKsZi+xxbFjfbUOq7o8kiZnzOnv+pXiVUqbiSQeRbPvdd+UFklgROv7rqsj
-2snqGWMmsG+CkPansgfcmCvjQJSnK3hYSopivcOTcyEgXSuk4YrrbjBYJmlDHLQv
-RloRyMF8h28PgYwr0jJHFKEM1dbULEbwE5mutaitBPTHbYCtlI5KbxJ9tEBbh/TC
-uZkn3WHJrw4KZfggTrR0GHmjnOPDJbfR2pjPbVLHCITLow1HYjEmfnxvbWZOo33N
-NtMqmy7BfDTNo07e469CinProax2I0kCoKHxRE6As7Iwk3PMlfronWVi3Mb6Dbg=
-=od11
------END PGP SIGNATURE-----
+SHA256 3d5d3b44ac189bd05b767fd7c95bb5d26a15da71337e3f584f68e25c25cfaaf3 Build.PL
+SHA256 c1e2670bea804ec647bb5c0f275d48ff8f143fb376f5cde643748ec89ad9e8bf Changes
+SHA256 a932b51789bc697a99106009f64c8b6319fe2825c21053b0fb0f1106ba794456 LICENSE
+SHA256 d1a2fd48ee10f605c680f1782065517f4016d064d8dfc53a30448ba44607fae7 MANIFEST
+SHA256 1d421306d5fd2b07ca87bc1f1d889afbaefdaa63b564afe29ed13ee5dd4ab872 MANIFEST.SKIP
+SHA256 57f648c29e2f2ecc6c07f7f63833ceddbe33d72f42636bfd3976b994ea5f3460 META.json
+SHA256 afdca0f20bcdeade84712db69e2ac386e2526939ff6b00524ce0c528103c1673 META.yml
+SHA256 9e75802250fd0cde039e6a52316eb6166a64369cdb8719fce28ba664759f7bb4 README
+SHA256 c150ef12f533d4257a52e96146d7d7f85e13dd0265c1d98a3c6eb3aea8ed2c3b lib/App/rainbarf.pm
+SHA256 78beff39f0bf5cc7574641b0504821975f1bcbe43341541d7564ba166590588a perlcritic.rc
+SHA256 38cd395591bbd49a74d47a69d5a4fe2c8c578089d993653c7f73ba1e69059ce3 rainbarf
+SHA256 66c8b0dce5b220ac930b5f6bf2d39275f191a86ff6158b1543f6361f3461d62c t/00-compile.t
+SHA256 8fe4f01563cc2fea43983610cd5b7741277356b605dbcf163edde873a6b5259a t/01-tmux.t
+SHA256 62e59eac07749d863486ef9b2810a648a8d83144157a8b3f737b876c89a63b5c t/author-critic.t
+SHA256 d743b4850f41319b3e9590caf56ebc487130623d519da03df9b8f32f1e09250e t/author-eol.t
+SHA256 ef4fc611782dde873f8f82d359ba0a1d75e87fa57f64ddc374149956a5af7895 t/author-no-tabs.t
+SHA256 54261f9524af420b952f5c96ae617482c60c161222d59a41339af293094e7b19 t/release-consistent-version.t
+SHA256 095e6ef77920d96d9cbcec09f7624b3173f1054fbf9f53759b2563d60caad3c9 t/release-cpan-changes.t
+SHA256 8f169279b16f699780d6de03a71b8eeb56b2e149e380e3ab8934994dfdbd9e76 t/release-dist-manifest.t
+SHA256 a3003423f856af7b3af31e23d5b89383f36b0690aa0cf7354c98d6755022d94f t/release-distmeta.t
+SHA256 41d14e0c3b23c25d8852a1e42c8b07032df8927bdb88b63a5f16fe1f08bef848 t/release-kwalitee.t
+SHA256 3b34a2da4eabd1e0a32ec7135beb44b62c7f75565212a5a285ea6fa728026e10 t/release-minimum-version.t
+SHA256 4e3294a5085faa50bdb1312cde8a4de951fdf791bb638a55801f7877b99529d7 t/release-mojibake.t
+SHA256 187b4975cfce582d9f6e776ad47722687cc2d15c308e5fe6076befda51196d6f t/release-pod-coverage.t
+SHA256 f3ad51f4ba433004d064f6cddff7568e657a8b76441b1bf77f51ddcc66caf9ac t/release-pod-linkcheck.t
+SHA256 c8cd23d408eb57af9f75e9050a3a7e428ba5f7132fc38d5290dc260f21989775 t/release-pod-syntax.t
+SHA256 3a48ecf19c2496d15f705c9275d1a3ebd2847fc4da702e92f1b938446ffd87c5 t/release-portability.t
+SHA256 9c27a7eb85ad652b29f312f1af1bdd518e410b744d468f0ddef4b808146b9d60 t/release-test-version.t
+SHA256 54168e0c8ab0a2bfa37073a0918675947df921fdb40e391b99eef1c9cef8175d t/release-unused-vars.t

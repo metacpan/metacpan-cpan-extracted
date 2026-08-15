@@ -591,6 +591,10 @@ static infix_status prepare_reverse_call_frame_win_x64(infix_arena_t * arena,
     if (!context || !context->return_type)
         return INFIX_ERROR_INVALID_ARGUMENT;
     // Calculate space needed for each component, ensuring 16-byte alignment for safety.
+    if (context->return_type->size > INFIX_MAX_ARG_SIZE) {
+        *out_layout = nullptr;
+        return INFIX_ERROR_LAYOUT_FAILED;
+    }
     size_t return_size = (context->return_type->size + 15) & ~15;
     size_t args_array_size = context->num_args * sizeof(void *);
 

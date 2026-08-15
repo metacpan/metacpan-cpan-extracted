@@ -1,6 +1,15 @@
 Revision history for ClarID-Tools
 
-0.03 2025-04-01T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+0.04 2026-08-14T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Migrated project documentation from MkDocs to Docusaurus
+ - Added the 0.04 codebook/schema family and enforced single-digit durations across supported codebooks
+ - Added Python dependencies for CSV preprocessing utilities to the Docker image
+ - Skipped QR integration tests when the required system tools are unavailable
+ - Synchronized tagged CPAN and Docker builds and published canonical schema URLs
+ - Declared the tested Perl 5.32 minimum
+
+0.03 2026-04-01T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Moved csv pre-processing scripts from nb/data/scripts to utils/csv. Updated nb/*py accordingly
  - Updated 'code.pm' (and tests) to allow for alternative encodings for field 'species'

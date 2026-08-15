@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::Raider;
 # ABSTRACT: Knarr handler that backs each session with a Langertha::Raider
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 use Moose;
 use Future::AsyncAwait;
 use Storable qw( dclone );
@@ -61,7 +61,7 @@ Langertha::Knarr::Handler::Raider - Knarr handler that backs each session with a
 
 =head1 VERSION
 
-version 1.100
+version 1.101
 
 =head1 SYNOPSIS
 

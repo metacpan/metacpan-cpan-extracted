@@ -75,7 +75,7 @@ qr/Duplicate stub_code 'B' in category 'tissue' \(entity: 'biosample'\) for keys
     ok( $exit != 0, 'non-zero exit on unsupported codebook version' );
     like(
         $out,
-        qr/Unsupported codebook version '0\.04'.*supports: 0\.02, 0\.03/,
+        qr/Unsupported codebook version '0\.05'.*supports: 0\.02, 0\.03, 0\.04/,
         'reports unsupported codebook version'
     );
 }

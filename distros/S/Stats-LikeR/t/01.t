@@ -3107,7 +3107,10 @@ $test_data = wilcox_test(
 	'y' => [0.878, 0.647, 0.598, 2.05, 1.06, 1.29, 1.06, 3.14, 1.29]
 );
 is_approx($test_data->{statistic}, 58, 'Wilcox test statistic', 1e-14);
-is_approx($test_data->{'p_value'}, 0.132919458185319, 'Wilcox test p-value', 1e-15);
+# The y values contain ties. R >= 4.6.0 answers these exactly, conditioning on
+# the observed ranks (Streitberg-Roehmel), rather than falling back to the
+# normal approximation: wilcox.test(x, y)$p.value == 0.1299053887289181.
+is_approx($test_data->{'p_value'}, 0.1299053887289181, 'Wilcox test p-value', 1e-15);
 no_leaks_ok {
 	eval {
 		$test_data = wilcox_test(
@@ -3130,7 +3133,10 @@ $test_data = wilcox_test(
 	[0.878, 0.647, 0.598, 2.05, 1.06, 1.29, 1.06, 3.14, 1.29]
 );
 is_approx($test_data->{statistic}, 58, 'Wilcox test statistic', 1e-14);
-is_approx($test_data->{'p_value'}, 0.132919458185319, 'Wilcox test p-value', 1e-15);
+# The y values contain ties. R >= 4.6.0 answers these exactly, conditioning on
+# the observed ranks (Streitberg-Roehmel), rather than falling back to the
+# normal approximation: wilcox.test(x, y)$p.value == 0.1299053887289181.
+is_approx($test_data->{'p_value'}, 0.1299053887289181, 'Wilcox test p-value', 1e-15);
 no_leaks_ok {
 	eval {
 		$test_data = wilcox_test(
@@ -3160,10 +3166,16 @@ is_approx($wt_onesample->{statistic}, 15, 'wilcox_test: one-sample statistic (ex
 is_approx($wt_onesample->{p_value}, 0.0625, 'wilcox_test: one-sample p-value (exact)');
 like($wt_onesample->{method}, qr/exact/, 'wilcox_test: one-sample uses exact method by default');
 
-# 2. Ties trigger approximation and continuity correction
+# 2. Ties are handled by exact conditional inference, as in R >= 4.6.0
+# R: wilcox.test(c(1,2,2,3), c(2,3,3,4)) -> W = 3, p = 0.2857142857142857
 my $wt_ties = wilcox_test('x' => [1, 2, 2, 3], 'y' => [2, 3, 3, 4]);
-ok(defined $wt_ties->{p_value}, 'wilcox_test: completes with ties using normal approx');
-like($wt_ties->{method}, qr/continuity correction/, 'wilcox_test: uses continuity correction with ties');
+is_approx($wt_ties->{statistic}, 3, 'wilcox_test: W with ties', 1e-14);
+is_approx($wt_ties->{p_value}, 0.2857142857142857, 'wilcox_test: exact p with ties', 1e-14);
+like($wt_ties->{method}, qr/exact/, 'wilcox_test: ties still take the exact test');
+# ... and the approximation is still reachable on request
+my $wt_ties_approx = wilcox_test('x' => [1, 2, 2, 3], 'y' => [2, 3, 3, 4], exact => 0);
+like($wt_ties_approx->{method}, qr/continuity correction/,
+	'wilcox_test: exact => 0 uses continuity correction with ties');
 
 # 3. Alternative hypotheses
 my $wt_less = wilcox_test('x' => [1, 2, 3], 'y' => [10, 11, 12], alternative => 'less');

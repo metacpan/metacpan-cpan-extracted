@@ -137,5 +137,31 @@ subtest stop_and_type_global => sub {
     $decoder->decode( @midi );
 };
 
+subtest cancel_multi => sub {
+    my @tests = (
+        [ control_change => 0xf, 0x3f, 0x7f ],
+        [ control_change => 0xf, 0x3e, 0x20 ],
+        [ note_on => 0x2, 0x40, 0x40 ],
+        [ note_on => 0x2, 0x43, 0x35 ],
+    );
+
+    my $cb_spec = [ 'control_change', qr/^note/ ];
+
+    plan scalar @tests;
+
+    my $decoder = MIDI::Stream::Decoder->new;
+
+    $decoder->attach_event_callback(
+        $cb_spec => sub( $event ) {
+            is( $event->as_arrayref, shift @tests );
+        }
+    );
+
+    $decoder->decode( @midi );
+
+    $decoder->cancel_event_callback( $cb_spec );
+
+    $decoder->decode( @midi );
+};
 
 done_testing;

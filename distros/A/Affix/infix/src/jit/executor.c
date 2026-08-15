@@ -936,7 +936,11 @@ c23_nodiscard bool infix_executable_make_executable(infix_executable_t * exec,
     // separate. We must explicitly flush the D-cache (where the JIT wrote the code)
     // and invalidate the I-cache so the CPU fetches the new instructions.
     // We might as well do it on x64 too.
-#if defined(INFIX_COMPILER_MSVC)
+    // NOTE: key on the OS, not the compiler. clang on Windows defines `__clang__`
+    // (checked before `_MSC_VER`), so `INFIX_COMPILER_MSVC` is not set for it; the
+    // `dc cvau`/`ic ivau` inline-asm path below is illegal at EL0 on Windows NT and
+    // SIGILLs every JIT call (STATUS_ILLEGAL_INSTRUCTION, 0xC000001D).
+#if defined(INFIX_OS_WINDOWS)
     // Use the Windows-specific API.
     FlushInstructionCache(GetCurrentProcess(), exec->rw_ptr, exec->size);
 #elif defined(INFIX_OS_MACOS)

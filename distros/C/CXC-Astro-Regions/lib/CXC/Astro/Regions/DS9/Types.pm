@@ -5,7 +5,7 @@ package CXC::Astro::Regions::DS9::Types;
 use v5.20;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use CXC::Types::Astro::Coords 'Sexagesimal';
 
@@ -99,7 +99,7 @@ CXC::Astro::Regions::DS9::Types - Types for DS9 Regions
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SUPPORT
 

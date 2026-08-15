@@ -1,5 +1,6 @@
 # Knarr — Langertha LLM Proxy Configuration
 # See: https://github.com/Getty/langertha-knarr
+# Full reference: Langertha::Knarr (POD) and the README
 
 listen:
   - "127.0.0.1:8080"    # OpenAI/Anthropic clients
@@ -9,32 +10,51 @@ listen:
 # Model routing: model name → Langertha engine
 # Values support ${ENV_VAR} interpolation
 models:
+  # No `model:` key → the engine's default model is used
+  # (OpenAI defaults to gpt-5.6-terra)
   gpt-4o:
     engine: OpenAI
     # api_key from LANGERTHA_OPENAI_API_KEY env (engine default)
 
+  # Explicit `model:` overrides the engine default
   gpt-4o-mini:
     engine: OpenAI
     model: gpt-4o-mini
 
   claude-sonnet:
     engine: Anthropic
-    model: claude-sonnet-4-6
+    model: claude-sonnet-5
     api_key: ${ANTHROPIC_API_KEY}  # explicit ENV reference
 
   minimax:
     engine: MiniMax
-    model: MiniMax-M2.1
+    model: MiniMax-M3
     api_key: ${MINIMAX_API_KEY}
 
+  # Per-model generation defaults, applied to every request
+  groq-fast:
+    engine: Groq
+    model: llama-3.3-70b-versatile
+    temperature: 0.2
+    response_size: 4096
+    system_prompt: "You are a terse assistant. Answer in one sentence."
+
+  # api_key_env: read the key from a named environment variable
+  # (instead of the engine's default LANGERTHA_* / bare-name lookup)
+  mistral:
+    engine: Mistral
+    model: mistral-small-latest
+    api_key_env: MY_MISTRAL_KEY
+
+  # Local engines are reached by URL, no API key needed
   local-llama:
     engine: OllamaOpenAI
     url: http://localhost:11434/v1
-    model: llama3.2
+    model: llama3.3
 
   deepseek:
     engine: DeepSeek
-    model: deepseek-chat
+    model: deepseek-v4-flash
 
 # Default engine for models without explicit config (optional)
 default:
@@ -59,3 +79,9 @@ passthrough:
 #   url: http://localhost:3000
 #   public_key: pk-lf-...
 #   secret_key: sk-lf-...
+#   trace_name: my-proxy   # optional, default knarr-proxy
+
+# Optional: request logging — JSONL file and/or per-request JSON directory
+# logging:
+#   file: /var/log/knarr/requests.jsonl
+#   dir: /var/log/knarr/requests

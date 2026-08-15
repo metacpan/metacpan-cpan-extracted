@@ -1,3 +1,8 @@
+0.006 2026-08-15
+
+  - Fix cancel_event_callback when called with array of event names
+  - Add regex support for event names when setting callbacks
+
 0.005 2026-02-24
 
   - Incompatible change: New option in encoder 'concat' - concatenate multiple messages or return as array

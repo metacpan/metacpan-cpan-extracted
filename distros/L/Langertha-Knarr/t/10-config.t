@@ -4,6 +4,7 @@ use Test::More;
 use File::Temp qw( tempfile );
 use YAML::PP;
 
+use Langertha ();
 use Langertha::Knarr::Config;
 
 # Test: empty config (no file)
@@ -287,6 +288,96 @@ YAML
   my $config = Langertha::Knarr::Config->from_env;
   ok $config->passthrough_url_for('anthropic'), 'from_env enables anthropic passthrough';
   ok $config->passthrough_url_for('openai'), 'from_env enables openai passthrough';
+}
+
+# Test: engine catalog / default models are derived from Langertha, not hardcoded.
+#
+# Runs against the *installed* Langertha, whatever version that is. Engines
+# whose class is not installed are skipped, so this stays green on an older
+# Langertha than the one in development.
+{
+  my $catalog = Langertha::Knarr::Config->engine_catalog;
+  ok scalar @$catalog >= 12, 'engine catalog is populated';
+
+  # These Langertha engine classes deliberately croak instead of naming a
+  # default model. Config.pm carries its own fallback for the first two.
+  # If one of them ever grows a real default_model this goes red -- which is
+  # the signal to drop the corresponding %DEFAULT_MODEL_FALLBACK entry.
+  my %names_no_default = map { $_ => 1 } qw( Groq OpenRouter HuggingFace Replicate );
+  my %has_fallback     = map { $_ => 1 } qw( Groq OpenRouter );
+
+  # engine => the model name Langertha itself declares; only engines whose
+  # class names none fall back to whatever Knarr supplies.
+  my %expected;
+  my $installed = 0;
+
+  for my $def (@$catalog) {
+    my $engine = $def->{engine};
+    my $class = eval { Langertha->resolve_engine_class($engine) };
+    unless (defined $class) {
+      note "$engine: no engine class in Langertha $Langertha::VERSION, skipped";
+      next;
+    }
+    $installed++;
+
+    my $declared = eval { $class->default_model };
+    $declared = undef unless defined $declared && length $declared;
+    my $got = Langertha::Knarr::Config->default_model_for($engine);
+
+    if ($names_no_default{$engine}) {
+      is $declared, undef, "$engine: $class names no default model";
+      if ($has_fallback{$engine}) {
+        ok defined $got, "$engine: Knarr fallback default model supplied";
+      } else {
+        is $got, undef, "$engine: no default model available";
+      }
+    } else {
+      ok defined $declared, "$engine: $class declares a default model";
+      is $got, $declared, "$engine: default_model_for matches ${class}->default_model";
+    }
+    $expected{$engine} = defined $declared ? $declared : $got;
+  }
+
+  ok $installed >= 8, "checked $installed installed engine classes";
+
+  # End-to-end: both config producers must emit exactly those models. This is
+  # what goes red if anyone reintroduces a hardcoded model table in from_env
+  # or generate_config.
+  my @keys = map { $_->{vars}[0] } @$catalog;
+  local @ENV{@keys};
+  $ENV{$_} = 'test-key' for @keys;
+
+  my $config = Langertha::Knarr::Config->from_env;
+  my $found  = Langertha::Knarr::Config->scan_env;
+  my $yaml   = Langertha::Knarr::Config->generate_config(engines => $found);
+  my $parsed = YAML::PP->new->load_string($yaml);
+
+  is scalar(keys %$found), scalar(@$catalog), 'scan_env finds every catalogued engine';
+
+  for my $def (@$catalog) {
+    my $engine = $def->{engine};
+    next unless exists $expected{$engine};
+
+    my $entry = $config->models->{lc $engine};
+    ok $entry, "from_env configured $engine";
+    is $entry->{model}, $expected{$engine}, "from_env model for $engine from engine class";
+    is $entry->{api_key_env}, $def->{vars}[0], "from_env api_key_env for $engine";
+
+    my $name = lc $engine;
+    $name .= '-default' if $name eq 'openai' || $name eq 'anthropic';
+    is $parsed->{models}{$name}{model}, $expected{$engine},
+      "generate_config model for $engine from engine class";
+  }
+}
+
+# Test: unknown engines resolve to no default model instead of dying
+{
+  is(Langertha::Knarr::Config->default_model_for('NoSuchEngineHere'), undef,
+    'unknown engine has no default model');
+  is(Langertha::Knarr::Config->default_model_for(undef), undef,
+    'undef engine has no default model');
+  is(Langertha::Knarr::Config->default_model_for(''), undef,
+    'empty engine name has no default model');
 }
 
 done_testing;

@@ -1,5 +1,9 @@
 -----
 
+12.6.1    2026-08-14
+   [Fixed]
+       * Test suite failing on Perl < 5.24 due to postfix deref
+
 12.6.0    2026-08-03
    [Changed]
        * Updated to libvirt tag v12.6.0

@@ -403,7 +403,11 @@ infix_status _emit_resolve_relocations(emit_context_t * ctx) {
         sec = sec->next;
     }
 
-    uint64_t section_offsets[32] = {0};
+    uint64_t * section_offsets = infix_malloc((size_t)count * sizeof(uint64_t));
+    if (!section_offsets) {
+        infix_free(secs);
+        return INFIX_ERROR_ALLOCATION_FAILED;
+    }
     for (int i = 0; i < count; i++) {
         section_offsets[i] = 0;
         for (int j = i + 1; j < count; j++)
@@ -455,6 +459,7 @@ infix_status _emit_resolve_relocations(emit_context_t * ctx) {
         }
     }
 
+    infix_free(section_offsets);
     infix_free(secs);
     return INFIX_SUCCESS;
 }

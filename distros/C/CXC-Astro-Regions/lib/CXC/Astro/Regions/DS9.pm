@@ -6,10 +6,19 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef', 'lexical_subs';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 package CXC::Astro::Regions::DS9::Role::Region {
     use Moo::Role;
+}
+package CXC::Astro::Regions::DS9::Box {
+    use Moo;
+}
+package CXC::Astro::Regions::DS9::Annulus {
+    use Moo;
+}
+package CXC::Astro::Regions::DS9::Ellipse {
+    use Moo;
 }
 
 use constant RegionRole => __PACKAGE__ . '::Role::Region';
@@ -133,18 +142,11 @@ my sub REGION ( $region, %spec ) {
 
     push( ( $spec{props} //= [] )->@*, @CommonProps );
     $spec{with} //= [RegionRole];
-    my $package = pkgpath( $region );
-
-    if ( exists $spec{name} && $spec{name} ne $region ) {
-        my $parent = pkgpath( $spec{name} );
-        Moo->import::into( $parent );
-        $spec{extends} = [$parent];
-    }
 
     my $variant = Variant( $region, %spec );
     Package::Stash->new( $variant )->add_symbol( q{@CARP_NOT}, [__PACKAGE__] );
 
-    $stash->add_symbol( q{&} . $region, sub { $package->new( @_ ) } );
+    $stash->add_symbol( q{&} . $region, sub { $variant->new( @_ ) } );
     push @EXPORT_OK, $region;
 }
 
@@ -662,7 +664,7 @@ CXC::Astro::Regions::DS9 - DS9 Compatible Regions
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,107 @@
 Revision history for Langertha-Knarr
 
+1.101     2026-08-15 00:13:51Z
+
+    - Fixed: the routed path died on any real engine response that
+      reported usage. Knarr::Response declared usage as Maybe[Object],
+      but Langertha::Response carries a plain Maybe[HashRef] and engines
+      write the provider's raw JSON hash straight through — so the
+      constructor rejected it and took the request with it. Present
+      since 1.100. It went unnoticed because passthrough is the default
+      (only explicitly configured models take the routed path) and
+      because t/27_usage_routing.t hand-built a Langertha::Usage object
+      that no engine ever produces. Knarr::Response now upgrades a raw
+      usage hashref via Langertha::Usage->from_hash in BUILDARGS, which
+      covers every door into the object: coerce() on a {content,usage}
+      hashref and clone_with re-running new() were two further ways into
+      the same crash. The type is not weakened, and an already-blessed
+      usage passes through as the same instance. Note the 1.100 entry
+      above describes a ToolCall/Usage symmetry that never existed on
+      the usage side — Langertha upgrades tool_calls to value objects
+      in BUILDARGS but leaves usage a hashref.
+
+    - Fixed: with Langfuse configured, a routed response carrying usage
+      then died a second time, in the Langfuse batch encode. Langertha's
+      value objects have no TO_JSON, and Tracing::flush encoded without
+      an eval, so a serialization failure inside end_trace turned an
+      already-answered, already-paid-for upstream call into a 500 — and
+      on the streaming path, where the trace closes after the last
+      chunk, into a client left waiting for an end marker. The JSONL
+      request log hit the same object but encodes inside an eval that
+      only warns, so it silently dropped whole log lines instead.
+      Usage is now flattened at the JSON boundary in both Tracing and
+      RequestLog, mirroring the _rate_limit_hash that already sat next
+      to it. Neither defect was reachable before, because the
+      constructor died first.
+
+    - Tracing::flush no longer throws. A failed encode is logged at
+      error level and the batch dropped, exactly as an ingestion HTTP
+      failure twenty lines below already was. The batch is detached
+      from _batch before the encode and unrecoverable either way, so
+      dying bought nothing and cost the request; the asymmetry between
+      "Langfuse is down" (warn) and "we built a payload we cannot
+      serialize" (fatal) was accidental.
+
+    - Model defaults are read off the Langertha engine classes instead
+      of being hardcoded. Config.pm carried two identical %default_models
+      hashes, in from_env and generate_config, both dating from April
+      and partly dead — deepseek-chat was retired by DeepSeek on
+      2026-07-24, so a generated config pointed at a model that no
+      longer exists. A single default_model_for() now asks
+      $engine_class->default_model, which cannot drift. Fixed three
+      further stale values on the way (Mistral large -> small, MiniMax
+      M2.1 -> M2.7, Cerebras llama-3.3-70b -> llama3.1-8b) and picked up
+      claude-sonnet-5 / gpt-5.6-terra / deepseek-v4-flash for free on a
+      newer Langertha. Groq and OpenRouter keep an explicit fallback
+      because their engine classes deliberately croak rather than name a
+      default; the test asserts they still do, so the fallback is itself
+      drift-monitored.
+
+    - Environment scanning knows 19 engines, up from 12: XAI, Moonshot,
+      NousResearch, AKI, Scaleway, TSystems and Hetzner. Hetzner is
+      detected only via LANGERTHA_HETZNER_API_KEY — the bare
+      HETZNER_API_KEY is in wide use for the Hetzner Cloud
+      infrastructure API and would false-positive into an unusable model
+      entry. Protocol variants sharing a vendor's credential
+      (MoonshotAnthropic, MiniMaxAnthropic, AKIOpenAI, OpenAIResponses)
+      stay out, since one key would emit two model stanzas for one
+      provider, and local engines reached by URL rather than by key
+      (LMStudio, vLLM, SGLang, LlamaCpp, Ollama, Whisper) have nothing
+      to detect. New engine_catalog class method exposes the list.
+
+    - Langfuse generations carry real latency. Langertha::Response grew
+      timing with ttft_seconds / total_seconds, but Knarr dropped it
+      along with id, thinking and rate_limit when normalizing. The
+      generation's endTime is now startTime + total_seconds and
+      completionStartTime (the Langfuse field for time-to-first-token)
+      is startTime + ttft_seconds, both anchored to the high-resolution
+      instant start_trace recorded rather than to a wall clock that has
+      moved on; the raw timing hash is kept in metadata so provider-native
+      stage durations survive. Only the routed non-streaming path has
+      engine-measured timing — streaming and raw passthrough keep the
+      proxy's own wall clock, and a new POD section says which path
+      measures what. rate_limit is flattened to its quota scalars, never
+      its raw headers.
+
+    - response_format is capability-gated like every other generation
+      parameter, and gated on the right one: Langertha registers
+      response_format_json_object and response_format_json_schema
+      separately, so an explicit json_schema demands the schema flag
+      while OpenAI's json_object and Ollama's bare 'json' need only the
+      object flag. Gating both on the schema flag would have dropped a
+      plain json_object request on an engine that can only do the loose
+      form.
+
+    - Documentation overhaul: README, example-config.yaml and module
+      POD updated to the current model defaults (gpt-5.6-terra,
+      claude-sonnet-5, deepseek-v4-flash, MiniMax-M3, ...), the full
+      19-engine provider and environment-variable tables, all config
+      options (logging, langfuse trace_name, api_key_env, generation
+      defaults), and examples for the less obvious features (A2A/ACP/
+      AG-UI clients, Handler::Code fakes, passthrough). The example
+      config no longer mixes explicit and default model keys without
+      comment, and bin/knarr documents --log-file / --log-dir.
+
 1.100     2026-04-26 20:36:43Z
 
     - Langertha floor 0.500 — for ToolCall/Usage value objects,

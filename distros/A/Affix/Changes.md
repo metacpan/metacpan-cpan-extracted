@@ -5,6 +5,22 @@ All notable changes to Affix.pm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.4] - 2026-08-15
+
+Plugging leaks...
+
+### Fixed
+
+- Use `SAVEVPTR` and `SAVEDESTRUCTOR_X` to swap out arenas to fix leaky allocator in situations where tons of structs are passed in a list and need to be marshalled in only one direction
+- Casting or binding an aggregate (`Affix::cast`, member pins) no longer leaks: member pins borrowed the freshly created parent hash/array as their lifeline, forming a strong reference cycle that Perl's refcounting cannot collect, so the whole pin tree plus its per-cast parse arena was never freed. The SDL3 `rope.pl` demo grew ~5.4 KB per mouse-move event (every `SDL_PollEvent` runs `Affix::cast`). Member pins now borrow the external lifeline instead, so `free_v2_pin()` runs on drop.
+- Passing a union to a wrapped call no longer segfaults: the argument sync read back *every* union member, and reading an inactive pointer/string member dereferenced the active member's float bytes as a C string pointer. Deep writes now skip members still bound to their original C slot.
+- The library probe in `Affix::Platform::Unix` (`_findLib_gcc`) no longer prints linker errors (`undefined reference to WinMain`/`main`) while searching: it probes with `-shared`, which needs no entry point.
+- Bitfields inside `Struct[...]` are no longer read or written out of bounds: `member->offset` now points at the storage unit base (with `bit_offset` relative to the unit) instead of the bitfield's own byte, so the unit-sized load/store in `push_struct`, the pull path, and the pinned bitfield magic stays within the aggregate (caught by ASan in `t/001`'s `sum_bitfield`).
+- Reading and writing packed struct members (and pinned primitives) no longer uses unaligned native loads/stores: the dispatch vtables, bitfield vtables, pull handlers, and push handlers now round-trip through `memcpy`, which is safe on strict-alignment architectures (like ARM) where `*(int32_t *)unaligned_ptr` traps.
+- Passing a wide string (`WString()`, i.e. `*wchar_t`) to a wrapped function now works on all platforms instead of croaking `Don't know how to handle this type of scalar as a pointer argument yet` on non-Windows systems, where the wide-string push opcode selection was gated behind `#if defined(INFIX_OS_WINDOWS)`. Pinned pointers are still passed through untouched, so `*uint32`-sized pointer arguments keep their existing behavior.
+- Returning a `WString` no longer crashes: the wide-string pull handler called `SvGROW` on an uninitialized target SV, faulting before any buffer was allocated.
+- [infix] Passing a 5-7 byte `Struct[...]` by value to a wrapped function no longer drops the trailing members on ARM64. The forward trampoline emitted a 32-bit register load unless the struct was exactly 8 bytes, so a `Struct[ arr => Array[2, UInt16], x => UInt16 ] ` lost `x` (read back as 0).
+
 ## [v1.2.3] - 2026-08-08
 
 ### Fixed
@@ -374,7 +390,8 @@ Based on infix v0.1.3
 
   - Affix.pm is born
 
-[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.2.3...HEAD
+[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.2.4...HEAD
+[v1.2.4]: https://github.com/sanko/Affix.pm/compare/v1.2.3...v1.2.4
 [v1.2.3]: https://github.com/sanko/Affix.pm/compare/v1.2.2...v1.2.3
 [v1.2.2]: https://github.com/sanko/Affix.pm/compare/v1.2.1...v1.2.2
 [v1.2.1]: https://github.com/sanko/Affix.pm/compare/v1.2.0...v1.2.1

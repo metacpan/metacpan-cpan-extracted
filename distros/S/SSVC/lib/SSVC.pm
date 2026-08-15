@@ -15,7 +15,7 @@ use SSVC::CoordinatorTriage      ();
 use SSVC::Deployer               ();
 use SSVC::Supplier               ();
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 $VERSION =~ tr/_//d;    ## no critic
 
 my %METHODOLOGIES = (

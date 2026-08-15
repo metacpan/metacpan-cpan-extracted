@@ -234,8 +234,11 @@ const infix_type * resolve_type(pTHX_ const infix_type * type) {
         SvSMAGICAL_off(sv);                                             \
         if (!im->ptr)                                                   \
             sv_setsv(sv, &PL_sv_undef);                                 \
-        else                                                            \
-            SV_SET(sv, *(C_TYPE *)im->ptr);                             \
+        else {                                                          \
+            C_TYPE val;                                                 \
+            memcpy(&val, im->ptr, sizeof(C_TYPE));                      \
+            SV_SET(sv, val);                                            \
+        }                                                               \
         SvSMAGICAL_on(sv);                                              \
         return 0;                                                       \
     }                                                                   \
@@ -246,7 +249,8 @@ const infix_type * resolve_type(pTHX_ const infix_type * type) {
         if (!im->ptr)                                                   \
             return 0;                                                   \
         SvGMAGICAL_off(sv);                                             \
-        *(C_TYPE *)im->ptr = (C_TYPE)SV_GET(sv);                        \
+        C_TYPE val = (C_TYPE)SV_GET(sv);                                \
+        memcpy(im->ptr, &val, sizeof(C_TYPE));                          \
         SvGMAGICAL_on(sv);                                              \
         return 0;                                                       \
     }                                                                   \
@@ -647,13 +651,13 @@ int get_bitfield(pTHX_ SV * sv, MAGIC * mg) {
     uint64_t val = 0;
     size_t sz = type->size;
     if (sz == 1)
-        val = *(uint8_t *)im->ptr;
+        memcpy(&val, im->ptr, 1);
     else if (sz == 2)
-        val = *(uint16_t *)im->ptr;
+        memcpy(&val, im->ptr, 2);
     else if (sz == 4)
-        val = *(uint32_t *)im->ptr;
+        memcpy(&val, im->ptr, 4);
     else if (sz == 8)
-        val = *(uint64_t *)im->ptr;
+        memcpy(&val, im->ptr, 8);
 
     uint64_t mask = (im->bit_width == 64) ? ~0ULL : ((1ULL << im->bit_width) - 1);
     val = (val >> im->bit_offset) & mask;
@@ -689,26 +693,26 @@ int set_bitfield(pTHX_ SV * sv, MAGIC * mg) {
     uint64_t val = 0;
     size_t sz = type->size;
     if (sz == 1)
-        val = *(uint8_t *)im->ptr;
+        memcpy(&val, im->ptr, 1);
     else if (sz == 2)
-        val = *(uint16_t *)im->ptr;
+        memcpy(&val, im->ptr, 2);
     else if (sz == 4)
-        val = *(uint32_t *)im->ptr;
+        memcpy(&val, im->ptr, 4);
     else if (sz == 8)
-        val = *(uint64_t *)im->ptr;
+        memcpy(&val, im->ptr, 8);
     /* Calculate bitmask and apply overflow protection */
     uint64_t wmask = (im->bit_width == 64) ? ~0ULL : ((1ULL << im->bit_width) - 1);
     uint64_t mask = wmask << im->bit_offset;
     uint64_t new_bits = (SvUV(sv) & wmask) << im->bit_offset;
     val = (val & ~mask) | new_bits;
     if (sz == 1)
-        *(uint8_t *)im->ptr = (uint8_t)val;
+        memcpy(im->ptr, &val, 1);
     else if (sz == 2)
-        *(uint16_t *)im->ptr = (uint16_t)val;
+        memcpy(im->ptr, &val, 2);
     else if (sz == 4)
-        *(uint32_t *)im->ptr = (uint32_t)val;
+        memcpy(im->ptr, &val, 4);
     else if (sz == 8)
-        *(uint64_t *)im->ptr = (uint64_t)val;
+        memcpy(im->ptr, &val, 8);
     SvGMAGICAL_on(sv);
     return 0;
 }
@@ -1095,6 +1099,22 @@ int lazy_agg_get(pTHX_ SV * sv, MAGIC * mg) {
 }
 
 /**
+ * @brief True if the SV is a pin still bound to the given C slot.
+ * @details During a deep write (lazy_agg_set) the members/elements we placed at
+ * bind time are read back and written out again, which is a no-op for the C
+ * memory. Worse, reading a *union* member's pin back can dereference a garbage
+ * pointer (e.g. an inactive String/pointer member such as SDL_Event's
+ * `drop.file`, whose slot overlaps the active member's float data) and crash.
+ * Untouched pins are skipped instead.
+ */
+static bool is_same_slot_pin(pTHX_ SV * sv, void * expected_ptr, const infix_type * expected_type) {
+    if (!is_pin_v2(aTHX_ sv))
+        return false;
+    Affix_Pin_2_Point_Oh * im = get_pin_v2(aTHX_ sv);
+    return im && im->ptr == expected_ptr && im->type == expected_type;
+}
+
+/**
  * @brief Performs deep writes to structs when a user assigns a hash (`$struct = { x => 1 }`).
  */
 int lazy_agg_set(pTHX_ SV * sv, MAGIC * mg) {
@@ -1120,6 +1140,9 @@ int lazy_agg_set(pTHX_ SV * sv, MAGIC * mg) {
             const infix_struct_member * m = infix_type_get_member(type, i);
             SV ** val_ptr = hv_fetch(user_hv, m->name ? m->name : "", strlen(m->name ? m->name : ""), 0);
             if (val_ptr && *val_ptr) {
+                void * member_slot = (char *)im->ptr + m->offset;
+                if (is_same_slot_pin(aTHX_ * val_ptr, member_slot, m->type))
+                    continue; /* untouched bound pin: C memory already reflects it */
                 SV * temp = newSV(0);
                 sv_setsv(temp, *val_ptr);
                 bind_placeholder(aTHX_ temp,
@@ -1169,18 +1192,12 @@ int lazy_agg_set(pTHX_ SV * sv, MAGIC * mg) {
         for (size_t i = 0; i < copy_len; i++) {
             SV ** val_ptr = av_fetch(user_av, i, 0);
             if (val_ptr && *val_ptr) {
+                void * el_slot = (char *)im->ptr + (i * step);
+                if (is_same_slot_pin(aTHX_ * val_ptr, el_slot, el_type))
+                    continue; /* untouched bound pin: C memory already reflects it */
                 SV * temp = newSV(0);
                 sv_setsv(temp, *val_ptr);
-                bind_placeholder(aTHX_ temp,
-                                 (char *)im->ptr + (i * step),
-                                 el_type,
-                                 0,
-                                 0,
-                                 false,
-                                 owner,
-                                 nullptr,
-                                 im->readonly,
-                                 false);
+                bind_placeholder(aTHX_ temp, el_slot, el_type, 0, 0, false, owner, nullptr, im->readonly, false);
                 SvGMAGICAL_off(temp);
                 MAGIC * cmg = mg_find(temp, PERL_MAGIC_ext);
                 if (cmg && cmg->mg_virtual && cmg->mg_virtual->svt_set)
@@ -1473,8 +1490,13 @@ static SV * _bind_aggregate_internal(
             /* Propagate nullptr safely so getters don't read from 0x0 + offset */
             void * child_ptr = ptr ? ((char *)ptr + m->offset) : nullptr;
             // Don't read the memory now. Wait until the user accesses the hash key.
+            // NOTE: member pins borrow the *external* lifeline (`owner`), never the
+            // freshly created parent HV. Referencing the parent here creates a strong
+            // reference cycle (HV owns the members, each member's mg_obj owns the HV)
+            // that Perl's refcounting cannot collect, leaking the whole pin tree and
+            // its arena on every bind/cast.
             bind_placeholder(
-                aTHX_ v, child_ptr, m->type, m->bit_offset, m->bit_width, false, (SV *)hv, NULL, readonly, false);
+                aTHX_ v, child_ptr, m->type, m->bit_offset, m->bit_width, false, owner, NULL, readonly, false);
             hv_store(hv, m->name ? m->name : "", strlen(m->name ? m->name : ""), v, 0);
         }
         return newRV_noinc((SV *)hv);
@@ -1518,7 +1540,9 @@ static SV * _bind_aggregate_internal(
         for (size_t i = 0; i < n; i++) {
             SV * el = newSV(0);
             void * child_ptr = ptr ? ((char *)ptr + (i * step)) : nullptr;
-            bind_placeholder(aTHX_ el, child_ptr, el_type, 0, 0, true, (SV *)av, nullptr, readonly, false);
+            // Borrow the external lifeline (see struct branch above): referencing the
+            // parent AV here creates an uncollectable refcount cycle.
+            bind_placeholder(aTHX_ el, child_ptr, el_type, 0, 0, false, owner, nullptr, readonly, false);
             av_push(av, el);
         }
         return newRV_noinc((SV *)av);

@@ -176,7 +176,7 @@ option duration => (
     is     => 'ro',
     format => 's',
     isa    => Undef | Str,
-    doc    => 'duration: P<digits><D|W|M|Y> or P0N (Not Available)'
+    doc    => 'duration: P<digit><D|W|M|Y> or P0N (Not Available)'
 );
 option batch =>
   ( is => 'ro', format => 's', isa => Undef | Int, doc => 'batch' );
@@ -551,6 +551,12 @@ sub _parse_field {
     croak "Missing value for $field" unless defined $val;
     croak "No pattern for $field"    unless $pcfg && $pcfg->{regex};
 
+    # Duration width is structural, not a codebook extension point. The
+    # published 0.02/0.03 codebooks used \d+ here by mistake, so enforce the
+    # specification before applying any supported codebook's pattern.
+    croak "Invalid duration '$val'"
+      if $field eq 'duration' && $val !~ /^P?(?:[0-9][DWMY]|0N)$/;
+
     my ( $re, $fmt, $need ) = _prep_pattern( $pcfg, $mode );
     croak "Invalid $field '$val'" unless $val =~ $re;
 
@@ -720,6 +726,9 @@ sub _decode_human_biosample {
       grep { $cb->{timepoint}{$_}{code} eq $ptc } keys %{ $cb->{timepoint} };
     croak "Unknown timepoint code '$ptc'" unless defined $timepoint;
 
+    $du = _parse_field( $du, undef, $cb->{duration_pattern}, 'human',
+        'duration' );
+
     # condition decode (allow multiple codes separated by '+')
     my @parts = split /\+/, $cn;
     my @norm;
@@ -851,12 +860,14 @@ sub _decode_stub_biosample {
     if ( !defined $replicate && $id =~ s/(\d{2})$// ) { $replicate = 0 + $1 }
     if ( !defined $batch     && $id =~ s/(\d{2})$// ) { $batch     = 0 + $1 }
 
-    # 3) strip off duration: allow D/W/M/Y or 0N
+    # 3) strip and validate duration using the selected codebook pattern
     croak "Bad stub ID (duration)" unless $id =~ s/(\d+)([DWMYN])$//;
     my ( $d_num, $d_unit ) = ( $1, $2 );
-    croak "Invalid duration unit 'N' with non-zero"
-      if $d_unit eq 'N' && $d_num != 0;
     my $duration = 'P' . $d_num . $d_unit;
+    _parse_field( $duration, undef, $cb->{duration_pattern}, 'stub',
+        'duration' );
+    $duration = _parse_field( $duration, undef, $cb->{duration_pattern},
+        'human', 'duration' );
 
     # 4) strip off timepoint (variable-length stub_code from codebook)
     my %tp_by =

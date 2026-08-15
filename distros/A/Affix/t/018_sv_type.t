@@ -26,7 +26,7 @@ eval {
     }
     else {
         if ( $Config{useshrplib} && $Config{useshrplib} ne 'false' ) {
-            $ldflags .= '-L"' . $Config{archlib} . '/CORE" -l' . ( $Config{libperl} =~ s/^(?:lib)?([^.]+).*$/-l$1/r );
+            $ldflags .= '-L"' . $Config{archlib} . '/CORE" -l' . ( $Config{libperl} =~ s/^(?:lib)?([^.]+).*$/$1/r );
         }
     }
     diag $cflags;

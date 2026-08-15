@@ -1,3 +1,10 @@
+v0.03  2026-08-14Z
+    - Added more words
+    - Allow interaction with Lingua::famibeib::Word (mostly for fun)
+    - Added $word->natural_language
+    - Renamed class "words" to "word"
+    - Implemented Lingua::Generic::Interface::Word
+
 v0.02  2026-08-06Z
     - Improved documentation
     - Added support for Under-ConScript Unicode Registry (UCSUR) code points

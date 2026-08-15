@@ -5,7 +5,7 @@ package MIDI::Stream::Tables;
 # ABSTRACT: MIDI 1.0 look up tables and utility functions
 
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use parent 'Exporter';
 
@@ -58,6 +58,9 @@ my $event_keys = {
     timecode       => [qw/ byte /],
     sysex          => [qw/ msg /],
 };
+
+
+sub event_desc { $event_keys }
 
 
 sub keys_for {
@@ -127,6 +130,7 @@ use constant {
 };
 
 our @EXPORT_OK = qw/
+    event_desc
     keys_for
     status_name
     status_byte
@@ -156,7 +160,7 @@ MIDI::Stream::Tables - MIDI 1.0 look up tables and utility functions
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -171,6 +175,14 @@ manipulating MIDI messages and events. It is intended for use in
 L<MIDI::Stream> and related libraries.
 
 =head1 FUNCTIONS
+
+=head2 event_desc
+
+    my $event_hashref = event_desc
+
+Returns a hashref of supported events and their parameters, e.g.
+
+    $event_hashref->{ note_on }; # [qw/ channel note velocity /]
 
 =head2 keys_for
 

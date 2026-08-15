@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use File::Raw::JSON ();   # JSON encode/decode via its C ABI (ft_json.h / _abi_ptr)
 
@@ -29,7 +29,7 @@ Fetch - HTTP/2 Future-based user agent
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -94,6 +94,12 @@ L<Fetch::Loop::Standalone> (so C<< ->get >> just works with no framework). Pass
 a raw L<IO::Async::Loop> or L<Hyperman::Loop> and it is wrapped automatically;
 pass the string C<'AnyEvent'> to drive AnyEvent; or pass a ready-made
 L<Fetch::Loop> adapter. See L</"EVENT LOOPS">.
+
+Omitting it gives every such agent the B<same> loop - one implicit
+L<Fetch::Loop::Standalone> per process, rebuilt automatically in a child after
+a fork. Agents therefore multiplex: awaiting a request on one drives whatever
+the others have in flight rather than stalling them. Pass an explicit loop to
+opt out and get an isolated one.
 
 =item C<headers>
 
@@ -303,6 +309,13 @@ program - requests then fly concurrently on that one loop without blocking it:
 
 Supported loops: the built-in L<Fetch::Loop::Standalone>, plus
 L<Fetch::Loop::IOAsync>, L<Fetch::Loop::AnyEvent> and L<Fetch::Loop::Hyperman>.
+
+A request future remembers the loop it was issued on, and every future derived
+from it by C<then>/C<followed_by>/C<transform> inherits that. So C<< ->get >>
+always pumps the loop that owns the socket, however many agents and loops the
+program has, and in whatever order they were built. Awaiting a future on a loop
+that was never going to resolve it - one with no watchers and no timers - dies
+with a diagnostic rather than blocking in the kernel forever.
 
 =head1 C ABI
 

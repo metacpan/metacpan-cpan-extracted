@@ -21,14 +21,18 @@ my $lib = compile_ok(<<~'');
     DLLEXPORT unsigned int  stored_units()   { return g_person.name ? (unsigned int)wcslen( g_person.name ) : 0; }
     DLLEXPORT unsigned int  stored_unit( unsigned int i ) { return (unsigned int)g_person.name[i]; }
     DLLEXPORT void          set_fixed_name() { g_person.name = L"world"; }
+    DLLEXPORT int           wlen_arg( const wchar_t * s ) { return s ? (int)wcslen( s ) : -1; }
+    DLLEXPORT const wchar_t * wide_ret() { return L"hello"; }
 
 typedef Person => Struct [ name => WString ];
 #
-affix $lib, 'get_person',     []       => Pointer [ Person() ];
-affix $lib, 'stored_is_null', []       => Int32;
-affix $lib, 'stored_units',   []       => UInt32;
-affix $lib, 'stored_unit',    [UInt32] => UInt32;
-affix $lib, 'set_fixed_name', []       => Void;
+affix $lib, 'get_person',     []        => Pointer [ Person() ];
+affix $lib, 'stored_is_null', []        => Int32;
+affix $lib, 'stored_units',   []        => UInt32;
+affix $lib, 'stored_unit',    [UInt32]  => UInt32;
+affix $lib, 'set_fixed_name', []        => Void;
+affix $lib, 'wlen_arg',       [WString] => Int32;
+affix $lib, 'wide_ret',       []        => WString;
 #
 my $live = cast( get_person(), Struct [ name => WString ] );
 #
@@ -71,6 +75,17 @@ subtest 'deep copy of a struct with a WString field' => sub {
     my $copy = $live;
     $copy->{name} = 'deep';
     is $copy->{name}, 'deep', 'deep copy stores and reads back';
+};
+subtest 'WString as a direct argument' => sub {
+    is wlen_arg('hello'),  5, 'wide string argument roundtrips';
+    is wlen_arg('héllo'),  5, 'non-ASCII argument roundtrips';
+    is wlen_arg(undef),   -1, 'undef becomes a null pointer';
+};
+subtest 'WString as a return value' => sub {
+SKIP: {
+        skip 'WString returns resolve to a pin on non-Windows (wchar_t is 4 bytes)', 1 unless $^O eq 'MSWin32';
+        is wide_ret(), 'hello', 'wide string return roundtrips';
+    }
 };
 #
 done_testing;

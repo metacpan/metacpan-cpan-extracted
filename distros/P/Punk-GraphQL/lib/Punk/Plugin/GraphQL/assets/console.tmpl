@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GraphQL console - Punk::GraphQL {% version %}</title>
+<style>
+{% raw css %}
+</style>
+</head>
+<body data-endpoint="{% endpoint %}">
+<header>
+  <b>GraphQL console</b>
+  <span class="ep" id="endpoint"></span>
+  <span class="spacer"></span>
+  <span id="status"></span>
+</header>
+<main>
+  <div id="docs"><h3>Schema <a id="doc-refresh" href="#" title="re-run introspection with the current headers">refresh</a></h3><div id="doc-list" class="d">loading...</div></div>
+  <div id="left" class="col">
+    <div class="label"><span class="grow">Query</span>
+      <span class="d">Ctrl+Enter</span><button id="run">Run</button></div>
+    <textarea id="query" spellcheck="false">{
+  __typename
+}</textarea>
+    <div id="vars" class="col">
+      <div class="label">Variables (JSON)</div>
+      <textarea id="variables" spellcheck="false"></textarea>
+    </div>
+    <div id="hdrs" class="col">
+      <div class="label">Headers (JSON)</div>
+      <textarea id="headers" spellcheck="false"
+        placeholder='{"Authorization": "Bearer ..."}'></textarea>
+    </div>
+  </div>
+  <div id="right" class="col">
+    <div class="label">Response</div>
+    <pre id="out"></pre>
+  </div>
+</main>
+<script>
+{% raw js %}
+</script>
+</body>
+</html>

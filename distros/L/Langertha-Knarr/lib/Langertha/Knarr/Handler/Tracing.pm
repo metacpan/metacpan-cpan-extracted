@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::Tracing;
 # ABSTRACT: Decorator handler that records every request as a Langfuse trace
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 use Moose;
 use Future;
 use Future::AsyncAwait;
@@ -55,11 +55,19 @@ sub _open_trace {
 sub _close_trace {
   my ($self, $trace, $r) = @_;
   my $resp = Langertha::Knarr::Response->coerce($r);
+  # timing is the engine's own measurement (ttft/total); passing it lets
+  # Tracing anchor endTime/completionStartTime to the real call window
+  # instead of the proxy's wall clock. Streaming and passthrough have no
+  # response object and keep the wall-clock fallback.
   $self->tracing->end_trace(
     $trace,
     output => $resp->content,
     model  => $resp->model,
-    ( $resp->usage ? ( usage => $resp->usage ) : () ),
+    ( $resp->usage              ? ( usage       => $resp->usage )      : () ),
+    ( $resp->timing             ? ( timing      => $resp->timing )     : () ),
+    ( defined $resp->id         ? ( response_id => $resp->id )         : () ),
+    ( defined $resp->thinking   ? ( thinking    => $resp->thinking )   : () ),
+    ( $resp->rate_limit         ? ( rate_limit  => $resp->rate_limit ) : () ),
   );
 }
 
@@ -147,7 +155,7 @@ Langertha::Knarr::Handler::Tracing - Decorator handler that records every reques
 
 =head1 VERSION
 
-version 1.100
+version 1.101
 
 =head1 SYNOPSIS
 

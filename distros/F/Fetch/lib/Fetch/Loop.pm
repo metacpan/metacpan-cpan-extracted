@@ -45,8 +45,19 @@ given connection, so adapters may key their bookkeeping on C<$fd> alone.
 The C core calls this whenever a connection needs a different readiness
 direction, and once more with C<$mask == 0> when the connection closes.
 
+=head2 _ft_await($future)
+
+Pump this loop until C<$future> is ready. Fetch pins the issuing adapter onto
+every request future, so C<< $future->get >> calls this on the loop that
+actually owns the socket - which is what makes several agents on several loops
+work in one process. An adapter that does not implement it still works: the
+await falls back to the global hook below, which is only correct while one loop
+is in play.
+
 Adapters also provide C<install_await>, which sets C<$Fetch::Future::AWAIT> so
 a bare C<< $future->get >> pumps the underlying loop until the future is ready.
+That hook is a single process-wide variable, so the last adapter to install
+wins; it is the fallback for futures with no pinned loop.
 
 =head1 ADAPTERS
 

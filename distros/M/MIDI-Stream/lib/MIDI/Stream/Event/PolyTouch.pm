@@ -8,7 +8,7 @@ use Feature::Compat::Class;
 package MIDI::Stream::Event::PolyTouch;
 class MIDI::Stream::Event::PolyTouch :isa( MIDI::Stream::Event::Channel );
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 
 field $note     :reader;
@@ -33,7 +33,7 @@ MIDI::Stream::Event::PolyTouch - Polyphonic After Touch event class
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

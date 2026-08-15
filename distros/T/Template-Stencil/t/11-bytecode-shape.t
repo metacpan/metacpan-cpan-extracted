@@ -83,12 +83,30 @@ is(inspect('{% x %}')->{is_wrapper}, 0, 'no content, no wrapper');
     my $unit = '<li>' . ('x' x 20) . '{% item.name %}</li>';
     my $tail = '{% if a %}{% for i in items %}{% i %}{% end %}{% end %}';
 
+    # Time the compiler, not _inspect. _inspect walks the finished program
+    # and builds one Perl hash per op, so the big template pays ~10x the SV
+    # churn of the small one on top of the compile - and that half is at the
+    # mercy of the allocator, which is exactly what varies on a loaded
+    # smoker. A FreeBSD box reported 43.9x here on a compiler that is
+    # provably sublinear. _compile_handle/_free_handle is the same compile
+    # with none of the SV building, and drops the measurement to a fifth.
+    #
+    # Take the best of several rounds rather than an average, too: timing
+    # noise is one-sided, so the minimum is the closest thing to the real
+    # cost that a shared machine will ever show us.
     sub time_compile {
         my ($tmpl, $n) = @_;
-        inspect($tmpl) for 1 .. 20;      # warm caches, discard
-        my $t0 = Time::HiRes::time();
-        inspect($tmpl) for 1 .. $n;      # includes inspect overhead
-        return (Time::HiRes::time() - $t0) / $n * 1e6;
+        my $best;
+        for my $round (1 .. 5) {
+            my $t0 = Time::HiRes::time();
+            for (1 .. $n) {
+                Template::Stencil::_free_handle(
+                    Template::Stencil::_compile_handle($tmpl));
+            }
+            my $us = (Time::HiRes::time() - $t0) / $n * 1e6;
+            $best = $us if !defined $best || $us < $best;
+        }
+        return $best;
     }
 
     my $small = ($unit x 20)  . $tail;
@@ -97,18 +115,19 @@ is(inspect('{% x %}')->{is_wrapper}, 0, 'no content, no wrapper');
     my $us_big   = time_compile($big,   200);
     my $ratio    = $us_big / ($us_small || 1e-9);
 
-    diag(sprintf 'cold compile+inspect: %d bytes %.1f us, %d bytes %.1f us '
+    diag(sprintf 'cold compile: %d bytes %.2f us, %d bytes %.2f us '
                . '(%.1fx for 10x input)',
          length $small, $us_small, length $big, $us_big, $ratio);
 
-    # 10x the input for <=40x the time. Linear lands near 10x; anything
-    # quadratic lands near 100x and trips this on any machine.
+    # 10x the input for <=40x the time. Linear lands near 10x - in practice
+    # nearer 6x, since the fixed tail amortises - and anything quadratic
+    # lands near 100x and trips this on any machine.
     cmp_ok($ratio, '<', 40, 'compile time scales linearly with input');
 
     # The absolute budget is a real number worth defending, but only on
     # hardware we control - it says nothing on a random smoker.
     if ($ENV{AUTHOR_TESTING} || $ENV{EXTENDED_TESTING}) {
-        cmp_ok($us_small, '<', 1000, 'compile time within absolute budget');
+        cmp_ok($us_small, '<', 200, 'compile time within absolute budget');
     }
 }
 

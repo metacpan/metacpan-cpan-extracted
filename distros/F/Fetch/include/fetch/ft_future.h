@@ -2,7 +2,8 @@
 #define HM_FUTURE_H
 
 /* Fetch::Future - native array-slot async primitive.
- * Slots: 0 state, 1 result/failure AV, 2 callbacks, 3 weak upstream.
+ * Slots: 0 state, 1 result/failure AV, 2 callbacks, 3 weak upstream,
+ *        4 owning loop adapter (see hmf_pin_loop).
  * Continuations are trampolined through a fire queue, so long then-chains
  * run iteratively (bounded stack) with or without a loop.
  *
@@ -93,6 +94,35 @@ static int hm_is_awaitable(pTHX_ SV *sv) {
 static AV *hmf_values_av(pTHX_ SV *self) {
     SV **v = av_fetch((AV *)SvRV(self), 1, 0);
     return (v && SvROK(*v)) ? (AV *)SvRV(*v) : NULL;
+}
+
+/* ---- the owning loop (slot 4) -------------------------------------------
+ * A pending request future is only ever resolved by the loop its socket is
+ * armed on, so it has to carry that loop with it. Without the pin the await
+ * path had nothing but the process-global $Fetch::Future::AWAIT, which every
+ * Fetch->new overwrites - so two agents on two loops meant awaiting one
+ * agent's future pumped the *other* agent's loop, which has no watcher for
+ * that socket and blocks in the kernel forever.
+ *
+ * Weak, like the upstream link: the loop already owns the watcher that owns
+ * the connection that holds this future, so a strong ref here would close
+ * that ring and strand the loop's descriptors whenever a request is
+ * abandoned mid-flight. A pin that goes undef means the loop is gone, which
+ * is exactly when the await should fall back rather than drive it. */
+static void hmf_pin_loop(pTHX_ SV *self, SV *loop_sv) {
+    SV *w;
+    if (!loop_sv || !SvROK(loop_sv)) return;
+    if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) return;
+    w = newSVsv(loop_sv);
+    sv_rvweaken(w);
+    av_store((AV *)SvRV(self), 4, w);
+}
+
+static SV *hmf_pinned_loop(pTHX_ SV *self) {
+    SV **s;
+    if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) return NULL;
+    s = av_fetch((AV *)SvRV(self), 4, 0);
+    return (s && SvROK(*s)) ? *s : NULL;   /* undef once the loop is gone */
 }
 
 /* ---- trampoline ---------------------------------------------------------- */
@@ -226,6 +256,12 @@ static void hmf_set_upstream(pTHX_ SV *derived, SV *upstream) {
     SV *w = newSVsv(upstream);
     sv_rvweaken(w);
     av_store((AV *)SvRV(derived), 3, w);
+    /* Inherit the loop down the chain. ->get is called on the tail of a
+     * then-chain, but only the head - the request future - knows which loop
+     * the socket is armed on, and this is the one choke point every derived
+     * future passes through. */
+    if (!hmf_pinned_loop(aTHX_ derived))
+        hmf_pin_loop(aTHX_ derived, hmf_pinned_loop(aTHX_ upstream));
 }
 
 static void hmf_cancel(pTHX_ SV *self) {
@@ -248,8 +284,42 @@ static void hmf_cancel(pTHX_ SV *self) {
     }
 }
 
+/* Await on the loop the future was pinned to. Returns 1 if that loop was
+ * driven (whatever the outcome), 0 if it is a kind we cannot drive, in which
+ * case the caller falls back to hm_cur_loop / $AWAIT as before. */
+static int hmf_await_pinned(pTHX_ SV *lp, SV *self) {
+    if (!sv_isobject(lp)) return 0;
+    /* The native loop is a blessed IV holding the ft_loop*; drive it straight
+     * from C rather than paying a method call per await. */
+    if (sv_derived_from(lp, "Fetch::Loop::Standalone")
+        && SvTYPE(SvRV(lp)) == SVt_IV) {
+        hm_loop_run(aTHX_ INT2PTR(struct hm_loop *, SvIV(SvRV(lp))), self);
+        return 1;
+    }
+    /* Foreign adapters (Hyperman, IO::Async, AnyEvent, third parties) expose
+     * the same body their install_await installs globally. */
+    if (gv_fetchmethod_autoload(SvSTASH(SvRV(lp)), "_ft_await", 0)) {
+        dSP;
+        ENTER; SAVETMPS; PUSHMARK(SP);
+        XPUSHs(lp);
+        XPUSHs(self);
+        PUTBACK;
+        call_method("_ft_await", G_DISCARD);
+        FREETMPS; LEAVE;
+        return 1;
+    }
+    return 0;
+}
+
 static void hmf_await(pTHX_ SV *self) {
+    SV *lp;
     if (hmf_state(aTHX_ self) != HMF_PENDING) return;
+    /* The pinned loop outranks both hm_cur_loop and the global: it is the
+     * only one guaranteed to be watching this future's socket. */
+    if ((lp = hmf_pinned_loop(aTHX_ self)) && hmf_await_pinned(aTHX_ lp, self)) {
+        if (hmf_state(aTHX_ self) != HMF_PENDING) return;
+        croak("Fetch::Future: loop stopped before the future was ready");
+    }
     if (hm_cur_loop) {
         hm_loop_run(aTHX_ hm_cur_loop, self);
         if (hmf_state(aTHX_ self) != HMF_PENDING) return;

@@ -1,6 +1,6 @@
 package Langertha::Knarr::Stream;
 # ABSTRACT: Async chunk iterator returned by streaming Knarr handlers
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 use Moose;
 use Future;
 
@@ -78,7 +78,7 @@ Langertha::Knarr::Stream - Async chunk iterator returned by streaming Knarr hand
 
 =head1 VERSION
 
-version 1.100
+version 1.101
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,21 @@
 Revision history for Markdown-Simple
 
+0.22    2026-08-14
+        - Fixed a build failure on compilers older than GCC 4.3
+        - The SSE2 backend is no longer selected on x86_64 CPUs without
+          SSSE3. It shuffles with pshufb, which is SSSE3, but the
+          dispatcher tested only the SSE2 bit, so on a pre-SSSE3 x86_64
+          (K8, Prescott) the first classified chunk was an illegal
+          instruction. Those CPUs now get the scalar backend, which is
+          what the code always claimed happened.
+        - AVX2 selection now also requires OSXSAVE, an XCR0 that says
+          the YMM state is saved across a context switch, and the BMI2
+          the backend's target attribute lets the compiler emit. An
+          AVX2-capable CPU under a kernel that never enabled XSAVE was
+          running vector code with a silently truncated register.
+        - No more "'hot' attribute directive ignored" warnings on GCC
+          4.2, which predates both attributes.
+
 0.21    2026-08-12
         - Fix _abi_ptr on platforms that map the shared object at a high
           address.

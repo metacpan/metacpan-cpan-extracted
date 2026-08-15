@@ -6,7 +6,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Module::Runtime 'module_notional_filename';
 use Ref::Util qw( is_arrayref );
@@ -100,7 +100,7 @@ CXC::Astro::Regions::CFITSIO::Variant - Generate CFITSIO Region classes
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =for Pod::Coverage make_variant
 make_variant_package_name

@@ -1,6 +1,6 @@
 package Langertha::Knarr::Request;
 # ABSTRACT: Normalized chat request shared across all Knarr protocols
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 use Moose;
 
 
@@ -81,15 +81,27 @@ has extra => (
 );
 
 
+# Which capability flag a given response_format value requires. Only an
+# explicit json_schema type needs the schema flag; json_object, Ollama's
+# bare 'json' string and any raw-schema HashRef fall back to the object
+# flag, which is the weaker of the two.
+sub _response_format_cap {
+  my ($rf) = @_;
+  return 'response_format_json_schema'
+    if ref($rf) eq 'HASH' && ( $rf->{type} // '' ) eq 'json_schema';
+  return 'response_format_json_object';
+}
+
 sub chat_f_args {
   my ($self, $engine) = @_;
   my $supports = $engine && $engine->can('supports')
     ? sub { $engine->supports($_[0]) }
     : sub { 1 };
+  my $rf = $self->response_format;
   my @args = ( messages => $self->messages );
   push @args, tools           => $self->tools           if $self->tools           && $supports->('tools_native');
   push @args, tool_choice     => $self->tool_choice     if defined $self->tool_choice && $supports->('tools_native');
-  push @args, response_format => $self->response_format if defined $self->response_format;
+  push @args, response_format => $rf                    if defined $rf              && $supports->( _response_format_cap($rf) );
   push @args, temperature     => $self->temperature     if defined $self->temperature && $supports->('temperature');
   push @args, max_tokens      => $self->max_tokens      if defined $self->max_tokens  && $supports->('response_size');
   return @args;
@@ -110,7 +122,7 @@ Langertha::Knarr::Request - Normalized chat request shared across all Knarr prot
 
 =head1 VERSION
 
-version 1.100
+version 1.101
 
 =head1 DESCRIPTION
 
@@ -176,6 +188,15 @@ B<and> the engine reports support for the matching capability via
 C<< $engine->supports($cap) >>. Engines without C<supports()> get every
 defined parameter — older Langertha versions accepted unknown args
 silently.
+
+C<response_format> is gated on the capability matching the I<kind> of
+format requested, because Langertha registers the two separately
+(L<Langertha::Role::Capabilities>): an explicit
+C<< { type => 'json_schema' } >> needs C<response_format_json_schema>,
+while everything else — OpenAI's C<< { type => 'json_object' } >> and
+Ollama's bare C<'json'> — needs only C<response_format_json_object>.
+Gating both on the schema flag would drop a plain C<json_object>
+request on an engine that can only do the loose form.
 
 =head1 SUPPORT
 

@@ -10,7 +10,6 @@ README.md
 SECURITY.md
 builder/Affix/Builder.pm
 cpanfile
-fuzz/fuzz_shared_lib.pl
 infix/LICENSE-A2
 infix/LICENSE-CC
 infix/LICENSE-MIT
@@ -123,6 +122,8 @@ t/090_cb_struct_byval.t
 t/091_cb_struct_member.t
 t/092_struct_signature_layout.t
 t/093_malloc_lifeline.t
+t/094_cast_cycle.t
+t/095_union_sync.t
 t/900_leak.t
 t/999_marshaller_2.t
 t/src/std.h

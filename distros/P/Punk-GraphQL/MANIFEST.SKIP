@@ -1,0 +1,10 @@
+\B\.git\b
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^Punk-GraphQL-
+\.tar\.gz$
+^bench/hlib/
+\.DS_Store

@@ -3,7 +3,7 @@
 require 5.010;
 use strict;
 package Stats::LikeR;
-our $VERSION = 0.297;
+our $VERSION = 0.298;
 require XSLoader;
 use autodie ':default';
 use warnings FATAL => 'all';
@@ -5008,7 +5008,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.297
+version 0.298
 
 =head1 Synopsis
 
@@ -8586,7 +8586,7 @@ p-value by about 2%.
 <tr>
   <td><code>aic</code></td>
   <td><code>Double</code></td>
-  <td>Akaike's Information Criterion for the fitted model.</td>
+  <td>Akaike's Information Criterion for the fitted model (lower is better).</td>
   <td><code>123.45</code></td>
 </tr>
 <tr>
@@ -9576,7 +9576,8 @@ Arguments may be given positionally (as above) or by name:
 
  $ks = ks_test(x => \@x, y => \@y, alternative => 'less', exact => 1);
 
-Non-numeric and undefined elements are silently dropped before the test runs.
+Non-numeric, undefined and NaN elements are silently dropped before the test
+runs, matching R's C<x[!is.na(x)]>.
 
 C<alternative> selects which gap between the ECDFs is measured:
 
@@ -9604,7 +9605,8 @@ C<< exact =E<gt> 0 >> to force the asymptotic one. Exact p-values cannot be comp
 when the data contain ties; if ties are present on the exact path, the test
 warns and falls back to the asymptotic p-value. (The exact one-sample test is
 only available for the two-sided alternative; a one-sided one-sample request
-also falls back to asymptotic.)
+also falls back to asymptotic.) In either fallback the returned C<method> is
+the asymptotic one, so it always names the p-value you actually got.
 
 =head3 Return value
 
@@ -12941,9 +12943,9 @@ Returns a hash of C<< predictor =E<gt> VIF >>.
      [0.878, 0.647, 0.598, 2.05, 1.06, 1.29, 1.06, 3.14, 1.29]
  );
 
-Computes the Wilcoxon rank-sum / Mann-Whitney test (two samples) or the Wilcoxon signed-rank test (one sample or paired), following R's C<wilcox.test> conventions.
+Computes the Wilcoxon rank-sum / Mann-Whitney test (two samples) or the Wilcoxon signed-rank test (one sample or paired), following R's C<wilcox.test> conventions as of R 4.6.1.
 This is an alternative to the t-test, that does not assume a normal distribution.
-With two array refs and no C<paired> flag it runs the two-sample rank-sum test; with a single sample, or with C<< paired =E<gt> 1 >>, it runs the signed-rank test. It calculates exact p-values by default for C<< N E<lt> 50 >> without ties; when ties (or, for the signed-rank case, zero differences) are present it automatically switches to the normal approximation with continuity correction.
+With two array refs and no C<paired> flag it runs the two-sample rank-sum test; with a single sample, or with C<< paired =E<gt> 1 >>, it runs the signed-rank test. It calculates exact p-values by default for C<< N E<lt> 50 >>, including when there are ties or zero differences: as in R 4.6.0 and later, tied data is answered from the conditional (permutation) distribution given the observed ranks rather than falling back to the normal approximation. Optionally it also returns a Hodges-Lehmann point estimate and a distribution-free confidence interval.
 
 =head3 Calling conventions
 
@@ -12954,6 +12956,11 @@ The first one or two array-ref arguments are taken positionally as C<x> and C<y>
 
  # fully named
  wilcox_test(x => \@x, y => \@y, alternative => "greater", exact => 0);
+
+ # with a confidence interval and point estimate
+ wilcox_test(\@x, \@y, conf_int => 1, conf_level => 0.99);
+
+Arguments that R spells with a dot are accepted with either spelling: C<conf.int> and C<conf_int>, C<conf.level> and C<conf_level>, C<digits.rank> and C<digits_rank>, C<tol.root> and C<tol_root>.
 
 =head3 Input parameters
 
@@ -12971,19 +12978,19 @@ The first one or two array-ref arguments are taken positionally as C<x> and C<y>
   <td><code>x</code></td>
   <td>ARRAY ref</td>
   <td><i>(required)</i></td>
-  <td>The first sample. Passed positionally or as <code>x =&gt;</code>. Non-numeric and undefined elements are silently dropped; an empty or all-missing <code>x</code> is fatal. In the two-sample test <code>mu</code> is subtracted from each <code>x</code> value.</td>
+  <td>The first sample. Passed positionally or as <code>x =&gt;</code>. Non-numeric, undefined and <code>NaN</code> elements are silently dropped (<code>NaN</code> is R's <code>NA</code>); <code>+Inf</code> and <code>-Inf</code> are kept, since a rank test has no trouble with them. An empty or all-missing <code>x</code> is fatal. In the two-sample test <code>mu</code> is subtracted from each <code>x</code> value.</td>
 </tr>
 <tr>
   <td><code>y</code></td>
   <td>ARRAY ref</td>
   <td><code>undef</code></td>
-  <td>The second sample. If present and <code>paired</code> is false, a two-sample rank-sum test is run. If <code>paired</code> is true, <code>y</code> is required and must be the same length as <code>x</code>. Omit it for the one-sample signed-rank test.</td>
+  <td>The second sample. If present and <code>paired</code> is false, a two-sample rank-sum test is run. If <code>paired</code> is true, <code>y</code> is required and must be the same length as <code>x</code>. Omit it, or pass <code>undef</code>, for the one-sample signed-rank test. A <code>y</code> that is present but empty (or entirely missing) is fatal rather than silently becoming a one-sample test.</td>
 </tr>
 <tr>
   <td><code>paired</code></td>
   <td>boolean</td>
   <td><code>0</code> (false)</td>
-  <td>Run a paired signed-rank test on the per-element differences <code>x[i] - y[i] - mu</code>. Requires <code>y</code> of equal length.</td>
+  <td>Run a paired signed-rank test on the per-element differences <code>x[i] - y[i] - mu</code>. Requires <code>y</code> of equal length. A pair is dropped if either member is missing, or if the difference is <code>NaN</code> (which is what <code>Inf - Inf</code> gives).</td>
 </tr>
 <tr>
   <td><code>correct</code></td>
@@ -12992,22 +12999,52 @@ The first one or two array-ref arguments are taken positionally as C<x> and C<y>
   <td>Apply the continuity correction (±0.5) when using the normal approximation. Ignored when an exact p-value is computed.</td>
 </tr>
 <tr>
+  <td><code>edgeworth</code></td>
+  <td>integer 0-3</td>
+  <td><code>0</code></td>
+  <td>Number of Edgeworth series terms used to refine the normal approximation, for the untied case. This is what R reaches through its integer <code>correct = 1, 2, 3</code>; see the note below on why it is spelled separately here. Ignored on the exact path, and — as in R — ignored when there are ties, or when the signed-rank test dropped a zero difference, because the series is derived for untied ranks.</td>
+</tr>
+<tr>
   <td><code>mu</code></td>
   <td>number</td>
   <td><code>0.0</code></td>
-  <td>Null-hypothesis location shift. Subtracted from <code>x</code> (two-sample) or from each difference (one-sample / paired).</td>
+  <td>Null-hypothesis location shift. Subtracted from <code>x</code> (two-sample) or from each difference (one-sample / paired). Must be finite.</td>
 </tr>
 <tr>
   <td><code>exact</code></td>
   <td>boolean / undef</td>
   <td><code>undef</code> (auto)</td>
-  <td>Tri-state. <code>undef</code> (or absent) selects exact automatically: when both group sizes are <code>&lt; 50</code> and there are no ties (two-sample), or <code>n &lt; 50</code> with no ties (signed-rank). A true value forces the exact test, a false value forces the approximation. Exact is impossible with ties — or, for the signed-rank test, with zero differences — and falls back to the approximation with a warning.</td>
+  <td>Tri-state. <code>undef</code> (or absent) selects exact automatically: when both group sizes are <code>&lt; 50</code> (two-sample), or <code>n &lt; 50</code> (signed-rank). A true value forces the exact test, a false value forces the approximation. Ties and zero differences no longer disable it.</td>
 </tr>
 <tr>
   <td><code>alternative</code></td>
   <td>string</td>
   <td><code>"two.sided"</code></td>
   <td>One of <code>"two.sided"</code>, <code>"less"</code>, or <code>"greater"</code>. Selects the tail(s) used for the p-value.</td>
+</tr>
+<tr>
+  <td><code>conf.int</code></td>
+  <td>boolean</td>
+  <td><code>0</code> (false)</td>
+  <td>Also compute a point estimate and confidence interval for the location (one-sample) or location shift (two-sample / paired).</td>
+</tr>
+<tr>
+  <td><code>conf.level</code></td>
+  <td>number in (0,1)</td>
+  <td><code>0.95</code></td>
+  <td>Requested confidence level. The level a rank test can actually deliver is discrete, so the level achieved is reported back in <code>conf_level</code> and is generally not the one asked for.</td>
+</tr>
+<tr>
+  <td><code>digits.rank</code></td>
+  <td>number / undef</td>
+  <td><code>undef</code> (Inf)</td>
+  <td>Round each value to this many significant digits before ranking, so that ties are decided on the rounded values. R's <code>digits.rank</code>, and worth reaching for when the data are the result of arithmetic and two values that ought to tie differ in the last bit. <code>undef</code> means no rounding.</td>
+</tr>
+<tr>
+  <td><code>tol.root</code></td>
+  <td>number &gt; 0</td>
+  <td><code>1e-4</code></td>
+  <td>Convergence tolerance for the root search behind the <i>asymptotic</i> confidence interval. The exact interval is made of order statistics and does not use it.</td>
 </tr>
 </tbody>
 </table>
@@ -13031,6 +13068,11 @@ Returns a hash ref with the following keys:
   <td>The test statistic. For the two-sample test this is the Mann-Whitney <b>W</b> (the <code>x</code> rank sum minus <code>nx*(nx+1)/2</code>). For the signed-rank test it is <b>V</b>, the sum of the ranks assigned to the positive differences.</td>
 </tr>
 <tr>
+  <td><code>statistic_name</code></td>
+  <td>string</td>
+  <td><code>"W"</code> or <code>"V"</code>, matching what R prints.</td>
+</tr>
+<tr>
   <td><code>p_value</code></td>
   <td>number</td>
   <td>The p-value for the chosen <code>alternative</code>, capped at <code>1.0</code>. Two-sided p-values are <code>2 * min(p_less, p_greater)</code>.</td>
@@ -13045,6 +13087,31 @@ Returns a hash ref with the following keys:
   <td>string</td>
   <td>Echoes the <code>alternative</code> actually used (<code>"two.sided"</code>, <code>"less"</code>, or <code>"greater"</code>).</td>
 </tr>
+<tr>
+  <td><code>null_value</code></td>
+  <td>number</td>
+  <td>Echoes <code>mu</code>.</td>
+</tr>
+<tr>
+  <td><code>null_value_name</code></td>
+  <td>string</td>
+  <td><code>"location shift"</code> for the two-sample and paired tests, <code>"location"</code> for the one-sample test.</td>
+</tr>
+<tr>
+  <td><code>estimate</code></td>
+  <td>number</td>
+  <td><i>(only with <code>conf.int</code>)</i> The Hodges-Lehmann estimator: the median of the Walsh averages <code>(x[i] + x[j]) / 2</code> in the one-sample case, or of the pairwise differences <code>x[i] - y[j]</code> in the two-sample case. On the asymptotic path it is instead the shift at which the standardised statistic is zero, as in R.</td>
+</tr>
+<tr>
+  <td><code>conf_int</code></td>
+  <td>ARRAY ref</td>
+  <td><i>(only with <code>conf.int</code>)</i> Two elements, the lower and upper limits. A one-sided alternative gives an unbounded end (<code>-Inf</code> or <code>Inf</code>).</td>
+</tr>
+<tr>
+  <td><code>conf_level</code></td>
+  <td>number</td>
+  <td><i>(only with <code>conf.int</code>)</i> The confidence level actually achieved, which for the exact interval is a step function of the data and rarely equals <code>conf.level</code>.</td>
+</tr>
 </tbody>
 </table>
 
@@ -13054,17 +13121,43 @@ The C<method> string reports which path executed:
 
 =item * Two-sample: C<"Wilcoxon rank sum exact test">, C<"Wilcoxon rank sum test with continuity correction">, or C<"Wilcoxon rank sum test">.
 
-=item * One-sample / paired: C<"Wilcoxon exact signed rank test">, C<"Wilcoxon signed rank test with continuity correction">, or C<"Wilcoxon signed rank test">.
+=item * One-sample / paired: C<"Wilcoxon signed rank exact test">, C<"Wilcoxon signed rank test with continuity correction">, or C<"Wilcoxon signed rank test">.
 
 =back
 
+=head3 Exact inference with ties
+
+Before R 4.6.0 — and in earlier releases of this module — ties ruled out an exact p-value and the test silently fell back to the normal approximation. It no longer does. When ties are present the exact null distribution is the conditional one given the observed ranks, computed with the Streitberg-Röhmel shift algorithm, and the same holds for zero differences in the signed-rank test. Two consequences are worth knowing about:
+
+=over
+
+=item * p-values on tied data change from earlier versions. R's own documented example, C<wilcox_test(\@x, \@y)> on the C<?wilcox.test> data, moves from C<0.13292> (approximation) to C<0.12991> (exact).
+
+=item * with zero differences, B<V> itself changes. The exact test ranks C<|x - mu|> over every observation and only then drops the ranks belonging to the zeroes; the approximation drops the zeroes first and ranks what is left. C<wilcox_test([-1, 0, 1])> gives C<V = 2.5> on the exact path and C<V = 1.5> with C<< exact =E<gt> 0 >>. R behaves the same way.
+
+=back
+
+The exact table is refused rather than attempted if it would need more than 16 million cells, with a message suggesting C<< exact =E<gt> 0 >>. This is only reachable by forcing C<< exact =E<gt> 1 >> on samples far larger than the automatic threshold.
+
 =head3 Notes and edge cases
 
-Missing data is handled by listwise removal of non-numeric / undefined cells before ranking; in the paired case a pair is dropped if either member is missing. An empty C<x> (or, in the two-sample case, an empty C<y>) after this filtering is fatal.
+Missing data is handled by listwise removal of non-numeric, undefined and C<NaN> cells before ranking; in the paired case a pair is dropped if either member is missing or if the difference is not a number. An empty C<x> (or a C<y> that is present but empty) after this filtering is fatal. All-zero differences are not: C<wilcox_test([0, 0, 0, 0, 0])> returns C<V = 0>, C<p = 1>, which is what the permutation distribution over an empty set of sign flips says.
 
-For the signed-rank test, exact zero differences are discarded before ranking (matching R), and their presence disables the exact computation. Both empty-after-filtering and all-zero-difference inputs are fatal.
+Ties are detected during ranking and trigger the tie-corrected variance in the normal approximation. When C<exact> is left on auto, the size thresholds (C<< E<lt> 50 >> per group, or C<< E<lt> 50 >> observations) are the only thing gating the exact vs. approximate decision.
 
-Ties are detected during ranking and trigger the tie-corrected variance in the normal approximation; they also rule out the exact p-value. When C<exact> is left on auto, the size thresholds (C<< E<lt> 50 >> per group, or C<< E<lt> 50 >> differences) are what gate the exact vs. approximate decision.
+=head3 Differences from R
+
+Two, both deliberate:
+
+=over
+
+=item * B<< C<correct> is a boolean here. >> R 4.6.0 turned its C<correct> into an integer C<0:3>, in which numeric C<0> still applies the continuity correction and only C<FALSE> removes it. Keeping that would mean C<< correct =E<gt> 0 >> no longer meaning "off", which is what it means for every other flag in this module. So C<correct> stays a boolean and the Edgeworth terms live under C<edgeworth>: R's C<correct = k> for C<k> in C<1, 2, 3> is C<< correct =E<gt> 1, edgeworth =E<gt> k >> here, and R's C<correct = 0> is C<< correct =E<gt> 1 >>.
+
+=item * B<A zero variance is reported, not propagated.> With C<< exact =E<gt> 0 >> and every observation tied there is nothing to divide by; R divides anyway and returns C<NaN> for the p-value, and its two-sample confidence interval then dies inside C<uniroot> with I<missing value where TRUE/FALSE needed>. This warns instead, and returns C<p = 1> and a C<NaN> interval at level C<0> — which is what R's own one-sample code does. The default path no longer reaches any of this, since the exact test handles all-tied data.
+
+=back
+
+Everything else is checked against R's and SciPy's own test suites in C<t/wilcox_test.R.scipy.t>.
 
 =head2 write_table
 
@@ -13384,6 +13477,596 @@ C<f.sf> / C<norm.sf> and statsmodels' C<anova_oneway>; see
 C<t/model_pvalue_tails.t> and C<t/oneway_test.R.scipy.t>.
 
 =head1 Changes
+
+=head2 0.298 2026-08-12 CDT
+
+=head3 wilcox_test
+
+A rewrite of C<wilcox_test> against R 4.6.1, driven by R's and SciPy's own test
+suites rather than by cases invented here. It brings the function up to the
+exact conditional inference R gained in 4.6.0, fixes six bugs — two of which
+returned confidently wrong p-values on the I<default> code path — and adds the
+Hodges-Lehmann estimate and confidence interval, C<digits.rank>, and the
+Edgeworth series.
+
+Everything below is checked in the new C<t/wilcox_test.R.scipy.t> (3,242 tests),
+whose expected values are frozen literals with their provenance recorded in the
+file header; it needs no R and no Python to run. The full suite is 120 files and
+23,149 tests, and C<./test.all.perls.pl> passes on all five local perls —
+C<5.10.1>, C<5.12.5> (long double), C<5.42.3>, C<5.44.0> and C<5.44.0-quadmath> —
+with no warnings on any of them.
+
+=head4 Exact p-values are now computed when there are ties
+
+R 4.6.0 added exact (conditional) inference in the presence of ties, via Torsten
+Hothorn's implementation of the Streitberg-Röhmel shift algorithm; R's
+C<doc/NEWS.Rd> announces it and C<tests/reg-tests-1d.R> records the consequence at
+its degenerate one-sample cases: I<< "For R >= 4.6.0 warnings for exact with ties
+are gone." >> Before that, ties ruled out an exact p-value and both R and this
+module fell back to the normal approximation with a warning.
+
+C<wilcox_test> now does what R does. When ties are present the null distribution
+is the conditional one given the observed ranks, and the same holds for zero
+differences in the signed-rank test. The warnings are gone with them.
+
+This changes published answers on tied data, including R's own documented
+examples:
+
+=for html <table>
+<thead>
+<tr>
+  <th>case</th>
+  <th>was</th>
+  <th>is (R 4.6.1)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>?wilcox.test</code> man-page data, <code>wilcox_test(\@x, \@y)</code></td>
+  <td><code>0.13291945818531886</code></td>
+  <td><code>0.12990538872891813</code></td>
+</tr>
+<tr>
+  <td>the <code>airquality</code> Ozone example (<code>W = 127.5</code>)</td>
+  <td><code>1.2080783e-04</code></td>
+  <td><code>6.1087351888e-05</code></td>
+</tr>
+<tr>
+  <td><code>wilcox_test([1,2,2,3], [4,5,5,6], exact =&gt; 1)</code></td>
+  <td><code>0.02842953599879653</code> + a warning</td>
+  <td><code>0.028571428571428571</code></td>
+</tr>
+<tr>
+  <td><code>wilcox_test([1,1])</code></td>
+  <td><code>0.34577858615116</code></td>
+  <td><code>0.5</code></td>
+</tr>
+<tr>
+  <td><code>wilcox_test([4,3,2], [3,2,1], paired =&gt; 1)</code></td>
+  <td><code>0.14891467317876567</code></td>
+  <td><code>0.25</code></td>
+</tr>
+</tbody>
+</table>
+
+Two further consequences are worth knowing about. B<V> itself changes when zero
+differences are present, because the exact test ranks C<|x - mu|> over every
+observation and only afterwards drops the ranks belonging to the zeroes, where
+the approximation drops the zeroes first and ranks what is left:
+C<wilcox_test([-1, 0, 1])> gives C<V = 2.5> exactly and C<V = 1.5> with
+C<< exact =E<gt> 0 >>. R's two branches differ in exactly the same way. And degenerate
+inputs that used to be fatal now return a result, as they must for
+C<tests/reg-tests-1d.R> line 332 to pass: C<wilcox_test([0])> gives C<V = 0>,
+C<p = 1>, and so does C<wilcox_test([0,0,0,0,0])>, which SciPy pins as
+C<test_all_zeros_exact>.
+
+If you need the old numbers, C<< exact =E<gt> 0 >> still asks for the approximation and
+is unchanged.
+
+=head4 The exact upper tail was returning zero, on the default path
+
+C<p_greater> was computed as C<1 - CDF(q - 1)>. That subtraction cancels away every
+significant digit once the true p falls below C<NV_EPSILON>, and then returns a
+flat C<0>. It did not take a contrived input to reach: two perfectly separated
+samples of 30 apiece are inside the automatic exact branch, no C<< exact =E<gt> 1 >>
+required.
+
+=for html <table>
+<thead>
+<tr>
+  <th>m = n</th>
+  <th>was</th>
+  <th>is</th>
+  <th>R 4.6.1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>20</td>
+  <td><code>7.2544192875e-12</code></td>
+  <td><code>7.2544445519e-12</code></td>
+  <td><code>7.2544445519e-12</code></td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>7.8825834748e-15</code></td>
+  <td><code>7.9107286024e-15</code></td>
+  <td><code>7.9107286024e-15</code></td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><b><code>0</code></b></td>
+  <td><code>8.4556169461e-18</code></td>
+  <td><code>8.4556169461e-18</code></td>
+</tr>
+<tr>
+  <td>49</td>
+  <td><b><code>0</code></b></td>
+  <td><code>3.9250145965e-29</code></td>
+  <td><code>3.9250145965e-29</code></td>
+</tr>
+</tbody>
+</table>
+
+Both tails are now summed directly. That alone is not enough for the rank-sum
+table, whose Gaussian-binomial recurrence is built with subtractions, so far up
+the support a count of C<1> is the difference of numbers around C<C(m+n, n)> and
+has already been rounded into noise. The table is folded about its centre before
+summing, so only well-conditioned entries are ever touched — the same thing R's
+C<pwilcox()> does when it folds C<q> about C<m*n/2> and flips C<lower_tail>.
+
+The signed-rank tail was accurate to C<n = 49> by luck (C<1 - 2^-49> is exactly
+representable) and reached C<0> from about C<n = 53>; forcing
+C<< exact =E<gt> 1 >> on C<n = 120> returned C<0> where R gives C<1.5046327690525337e-36>,
+and now returns it too.
+
+=head4 C<int m * n> overflowed, and said the samples were identical
+
+C<exact_pwilcox> took C<int m, int n> and computed C<int max_u = m * n>. For two
+separated samples of 50,000 that wraps negative, every statistic looks out of
+range, and the function returns C<1.0>:
+
+C<< perl
+wilcox_test([1 .. 50000], [50001 .. 100000], exact =E<gt> 1);   # p = 1
+ >>
+
+Signed overflow is also undefined behaviour, so a different optimiser was
+entitled to do something else entirely. Sizes and indices in the exact
+distributions are C<size_t> now, the multiplications are checked for wrap before
+they happen, and a table that would need more than 16 million cells is refused
+outright with a message naming C<< exact =E<gt> 0 >> rather than attempted.
+
+=head4 NaN was ranked instead of dropped
+
+C<NaN> is C<NA> to R, and R drops it. C<looks_like_number> accepts it, C<d == 0.0>
+is false for it, so it went into the rank buffer — and C<cmp_nv3> returns C<0> for
+every comparison involving it, which leaves C<qsort> without the strict weak
+ordering the C standard entitles it to.
+
+The visible symptom is R's own regression case, C<tests/reg-tests-1d.R> line
+3546, which asserts that a paired test is unaffected by pairs whose difference
+is C<Inf - Inf>:
+
+=for html <table>
+<thead>
+<tr>
+  <th></th>
+  <th>was</th>
+  <th>is (and R)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>1:5</code> vs <code>4*(0:4)</code></td>
+  <td><code>V = 1</code>, <code>p = 0.125</code></td>
+  <td><code>V = 1</code>, <code>p = 0.125</code></td>
+</tr>
+<tr>
+  <td>the same with <code>+Inf</code> appended to both</td>
+  <td><code>V = 1</code>, <code>p = 0.0625</code></td>
+  <td><code>V = 1</code>, <code>p = 0.125</code></td>
+</tr>
+<tr>
+  <td>the same with <code>-Inf</code> and <code>+Inf</code> on both</td>
+  <td><code>V = 2</code>, <code>p = 0.046875</code></td>
+  <td><code>V = 1</code>, <code>p = 0.125</code></td>
+</tr>
+</tbody>
+</table>
+
+C<NaN> — in either sample, and however it arises — is now dropped with the other
+missing values. C<±Inf> is not missing and is kept, since a rank test has no
+trouble with it; SciPy's C<test_gh_11355b> pins five cases of that and they all
+agree.
+
+=head4 An empty C<y> ran a different test
+
+C<wilcox_test([1,2,3], [])> fell through to the one-sample branch and returned a
+signed-rank result, silently answering a question nobody asked. It croaks now,
+with R's message.
+
+C<mu> was likewise unvalidated: C<< mu =E<gt> Inf >> or C<< mu =E<gt> NaN >> turned every
+difference into a non-number and produced a confident answer from the wreckage.
+Both croak now, as they do in R.
+
+=head4 A dying C<$SIG{__WARN__}> handler leaked the rank buffer
+
+The warnings in C<wilcox_test> were emitted while the C<RankInfo> and difference
+buffers were held as raw pointers. A C<__WARN__> handler that dies — or C<warnings
+FATAL> at the call site — longjmps straight past the C<Safefree>. Under valgrind,
+500 iterations of the ties path with such a handler lost 95,616 bytes in 498
+blocks. Every allocation now goes through C<Newx> plus C<SAVEFREEPV>, the idiom
+C<chisq_test> in the same file already used, so it is released by the save stack
+however the call unwinds. The same 500 iterations now report C<definitely lost: 0
+bytes>, as does a sweep over every croak path and every branch of the function.
+
+=head4 New: C<conf.int>, and a Hodges-Lehmann estimate
+
+R has returned a distribution-free confidence interval and a point estimate
+since PR#1150 in 2001, and C<tests/reg-tests-1a.R> has guarded them ever since
+with Hollander & Wolfe's published numbers. C<wilcox_test> now computes both, by
+all four of R's routes — the exact interval from the order statistics of the
+Walsh averages or the pairwise differences, the exact interval conditional on
+the observed ranks when there are ties, and the asymptotic interval from a root
+search:
+
+```perl
+my $r = wilcox_test(\@y, \@x, paired => 1, conf_int => 1);
+
+=head1 $r->{estimate}   == -0.46
+
+=head1 $r->{conf_int}   == [-0.786, -0.010]
+
+=head1 $r->{conf_level} == 0.9609375
+
+```
+
+Those are Hollander & Wolfe (1999) 2nd ed., pp. 40 and 53, to the digit. So are
+the two-sample values from pp. 111 and 126: estimate C<-0.305>, interval
+C<(-0.76, 0.15)>.
+
+The level a rank test can actually deliver is a step function of the data, so
+C<conf_level> reports what was achieved rather than echoing what was asked for —
+C<0.9609375> above, not C<0.95>. C<conf.level>, C<tol.root> and R's alpha-doubling
+search for a level the data can support (with its I<requested conf.level not
+achievable> warning) all behave as R's do.
+
+=head4 New: C<digits.rank>, C<edgeworth>, and more of R's result fields
+
+C<digits.rank> rounds each value to a given number of significant digits before
+ranking, so that ties are decided on the rounded values. R's man page recommends
+it because tie detection is an exact C<==> on floating point, and its own worked
+example shows C<(4:2)/10> against C<(3:1)/10> — three differences that ought to be
+C<0.1> and are three different doubles. Ported from R's C<fprec()>, half-to-even
+rounding included.
+
+C<< edgeworth =E<gt> 1, 2, 3 >> adds up to three Edgeworth correction terms to the normal
+approximation, the refinement R 4.6.0 reaches through its integer C<correct>. It
+is ignored on the exact path, and — as in R — ignored when there are ties, or
+when the signed-rank test dropped a zero, because the series is derived for
+untied ranks.
+
+The result hash gains C<statistic_name> (C<"W"> or C<"V">, as R prints), plus
+C<null_value> and C<null_value_name>, and C<estimate> / C<conf_int> / C<conf_level>
+when an interval was asked for.
+
+=head4 Three deliberate differences from R
+
+Each is asserted in the test file, so that changing one later is a choice rather
+than a drift.
+
+=over
+
+=item 1. B<< C<correct> is a boolean here. >> R 4.6.0 turned its C<correct> into an integer
+C<0:3>, in which numeric C<0> still applies the continuity correction and only
+C<FALSE> removes it — so in R, C<correct = 0> and C<correct = FALSE> are
+different tests. Keeping that would mean C<< correct =E<gt> 0 >> no longer meaning
+"off", which is what it means for every other flag in this module. C<correct>
+stays a boolean, and R's C<correct = k> is C<< correct =E<gt> 1, edgeworth =E<gt> k >>.
+
+=item 2. B<A zero variance is reported, not propagated.> With C<< exact =E<gt> 0 >> and every
+observation tied there is nothing to divide by. R divides anyway and returns
+C<NaN>; this warns and returns C<p = 1>. The default path no longer reaches it
+at all, since the exact test handles all-tied data.
+
+=item 3. B<An all-tied interval does not raise.> R's one-sample code warns and hands
+back a C<NaN> interval at level C<0>; its two-sample code warns and then dies
+inside C<uniroot> with I<missing value where TRUE/FALSE needed>. We give the
+one-sample answer in both places.
+
+=back
+
+There is one place where this module is simply more accurate than R. R's exact
+p-values on tied data come from a density it normalises entry by entry;
+C<wilcox_test> sums the integer permutation counts and divides once. For the
+worst case in the corpus — an 11-against-12 tied rank sum whose p-value is
+exactly C<4/676039> — this returns the correctly rounded double and R is
+C<1.2e-11> high. Checked against exact rational arithmetic, and recorded in the
+test file rather than papered over.
+
+=head4 Testing
+
+C<t/wilcox_test.R.scipy.t> takes its cases from the references' own suites:
+
+=over
+
+=item * R's C<tests/reg-tests-1a.R> (the PR#1150 Hollander & Wolfe intervals),
+C<reg-tests-1b.R> (the Wolfgang Huber C<wilcox.test(1, 2:60)> case, and the
+check that the asymptotic estimate does not move with C<alternative>),
+C<reg-tests-1d.R> (the six degenerate one-sample calls and the C<±Inf>
+identities), and the man-page examples whose printed output is pinned in
+C<tests/Examples/stats-Ex.Rout.save>.
+
+=item * SciPy 1.17.1's C<TestMannWhitneyU>, whose header reads I<"All magic numbers are
+from R wilcox.test"> — C<cases_basic>, C<cases_continuity>, C<cases_9184>,
+C<cases_2118>, C<test_tie_correct>, C<test_exact_U_equals_mean>,
+C<test_gh_11355b> and the 30-against-20 asymptotic cases — and
+C<TestWilcoxon>'s C<test_accuracy_wilcoxon>, C<test_wilcoxon_tie>,
+C<test_onesided>, C<test_exact_pval>, C<test_exact_p_1>, C<test_all_zeros_exact>
+and C<test_symmetry_gh19872_gh20752>.
+
+=item * A 663-case sweep generated by C<t/wilcox_test.R.scipy.R>, committed next to the
+test, crossing four data shapes against every alternative, C<exact> state,
+C<correct> state, C<mu> and C<conf.int> setting.
+
+=back
+
+Beyond the file, 960 further randomised calls were compared against R 4.6.1 and
+agree everywhere except the three divergences above.
+
+One lesson from getting that to pass on every NV width is worth recording: the
+corpus data has to be B<exactly representable>. Whether two values tie decides
+which branch runs, and C<1.6 - 2 - 0.5> does not land on the same value in a
+C<double>, an x87 C<long double> and a C<__float128>. A corpus of one-decimal
+values passed on the default perl and failed on C<perl-5.12.5> and quadmath with
+a I<different statistic>, not merely a different last digit. Every generated
+value is now a whole number of quarters or of 1024ths. For the same reason the
+asymptotic interval, which is only ever pinned down to C<tol.root>, is generated
+at C<tol.root = 1e-12> rather than freezing wherever Brent's method happened to
+stop on one machine.
+
+A compiler-warning audit of C<LikeR.xs> for C<-Wint-conversion>, C<-Wimplicit-int>,
+C<-Wreturn-mismatch> and C<-Wdeclaration-missing-parameter-type>, and a pass
+tightening integer types that can only hold a count or a flag. No behaviour
+changed: the full suite (116 files, 18,546 tests) passes, and every function
+touched was diffed call-for-call against a build of the previous release, with
+C<dnorm>, C<pnorm>, one- and two-sample C<ks_test>, C<fisher_test>, C<auc> and the set
+operations re-checked against R 4.6.1 and found bit-identical.
+
+All four of those warnings were already clean, and stay clean on a C<double>, a
+C<long double> and a C<__float128> build. Two of them cannot be tested with the
+GCC most systems still default to: C<-Wreturn-mismatch> and
+C<-Wdeclaration-missing-parameter-type> are GCC 14 additions — where they are
+errors rather than warnings — and GCC 13 rejects both as unrecognized options,
+so a check that appears to pass on 13 has really only skipped them.
+
+=head3 Dead code removed
+
+Turning the audit up to C<-Wextra> found two branches that could never run, both
+of them a test for negativity on a value whose type is unsigned:
+
+=over
+
+=item 1. C<r_pow_di> takes C<unsigned int n>, so its C<< if (n E<lt> 0) return 1.0 / r_pow_di(x, -n); >>
+was unreachable — a leftover of R's C<R_pow_di>, which takes a signed exponent.
+All three callers (in C<K2x>, for the exact one-sample Kolmogorov-Smirnov
+distribution) pass a non-negative exponent, so the unsigned parameter is the
+correct one and the reciprocal branch simply goes.
+
+=item 2. C<hoa2aoh> casts C<HvUSEDKEYS> to C<U32> and then clamps with C<< if (ncols E<lt> 0) ncols = 0; >>.
+
+=back
+
+=head3 Types narrowed to what they can actually hold
+
+Eighteen C<int>s that only ever hold 0 or 1 became C<bool>, a convention the file
+already followed in some 219 other places; each was confirmed by reading every
+call site rather than by name. The flag parameters of C<ft_pnhyper>, C<K2l>,
+C<c_dnorm>, C<c_pnorm>, C<c_pnorm_both>, C<set_multiplicity> and C<roc_split>, the
+C<is_cat> field of C<AnFac>, the C<lower_pos> and C<frac_low> locals of C<auc>,
+C<auroc>, C<roc> and C<bedroc>, and the return types of C<mg_key> and
+C<psmirnov_exact_test>. Several of these were already being handed a C<bool> by
+their callers — C<dnorm>'s and C<pnorm>'s C<log> and C<lower> options, for instance —
+so only the helper signatures were behind. C<c_pnorm_both>'s loop counter became
+C<unsigned int>.
+
+Two that look like flags and are not: C<c_pnorm_both>'s C<i_tail> is three-valued,
+and C<set_multiplicity>'s C<gimme> carries a Perl C<G_*> context value. Both stay
+C<int>.
+
+Also six coefficient tables in C<c_pnorm_both> written C<const static double>,
+which puts the storage class after the qualifier and draws
+C<-Wold-style-declaration>; they are now C<static const double>.
+
+=head3 runif argument validation, and every warning names its function
+
+C<runif> accepts its arguments either positionally or by name, and decided which
+was which by asking whether the current argument was a string I<and> whether
+another argument followed it. A key at the end of the list therefore failed the
+second half of that test and fell through to the positional branch, where it was
+read as a number: C<runif(5, 'min')> took C<SvNV("min")>, which is 0, silently set
+C<min = 0>, and returned five values. The only sign anything was wrong was perl's
+own C<Argument "min" isn't numeric>, which does not say which function provoked
+it. C<< runif(5, bogus =E<gt> 1) >> went the same way, taking C<bogus> as C<min> and C<1> as
+C<max>. Every sibling that parses named arguments — C<rbinom>, C<binom_test>,
+C<fisher_test>, C<dnorm>, C<pnorm> — rejects both of those.
+
+C<runif> now does too. A string argument is treated as a key when it is not a
+number, which is decidable from the key alone, so a dangling or misspelled key
+is an error instead of a silent coercion; a numeric string is still positional,
+so C<runif("9")> is unchanged. Named values are checked for numerichood before
+use, which is what keeps perl's unattributed warning from being the diagnostic.
+
+C<n> is also range-checked now. It was read straight through C<SvUV()>, so
+C<runif(-1)> wrapped to 2**64-1, C<av_extend()> read that back as a negative
+C<SSize_t>, and perl died with C<panic: av_extend_guts() negative count (-2)> --
+which names neither the function nor the argument at fault. A negative or
+over-large C<n> now croaks and says so. Non-integer C<n> still truncates toward
+zero, as R's C<runif()> does, and C<runif(0)> still returns an empty list.
+
+Separately, three warnings did not name the function emitting them, unlike every
+other warning in the file: one in C<ks_test> (the 1-sided exact 1-sample case
+falling back to asymptotic) and two in C<wilcox_test>'s signed-rank branch (exact
+p-value abandoned for ties, and for zeroes). All three now carry the prefix
+their siblings already had. The one warning left deliberately bare is the
+C<warn("%s", m)> in the uninitialized-value catcher, which re-emits somebody
+else's warning verbatim and must not add to it.
+
+=head3 Argument-stack indices are now Stack_off_t
+
+C<-Wextra> reported 58 C<-Wsign-compare> warnings, and 33 of them were one idiom:
+an index declared C<size_t>, C<unsigned>, C<unsigned int> or C<unsigned short int>
+and then compared against C<items>. C<items> is neither of those — XSUB.h's
+C<dITEMS> declares it C<Stack_off_t items = (Stack_off_t)(SP - MARK)>, a I<signed>
+type, because it is a stack-pointer difference. Every one of those comparisons
+was converting the signed side to unsigned.
+
+The indices are now C<Stack_off_t> themselves, which is the type they are
+compared against: 25 declarations across 23 functions — C<binom_test>,
+C<ks_test>, C<wilcox_test>, C<write_table>, C<max>, C<runif>, C<quantile>, C<mean>,
+C<mode>, C<sum>, C<sd>, C<uniq>, C<var>, C<t_test>, C<median>, C<matrix>, C<fisher_test>,
+C<power_t_test>, C<var_test>, C<dnorm>, C<value_counts>, C<prcomp> and C<pnorm>.
+That is a retype, not a cast: writing
+C<(size_t)items> at each comparison would silence the warning just as well, but
+it would be wrong the day C<Stack_off_t> widens, which is exactly what it exists
+to allow. C<t_test>'s index was C<unsigned short int>, which drew no warning at
+all — integer promotion made the comparison signed — and was the same latent
+mistake regardless.
+
+C<Stack_off_t> arrived in perl 5.39.2 and this distribution supports 5.010, so
+the preamble now carries a shim typedef guarded on C<PERL_STACK_OFFSET_DEFINED>,
+the macro perl.h defines next to the typedef. On 5.10.1 and 5.12.5 neither the
+macro nor the type exists and the shim supplies C<I32>, which is what the stack
+offset was on every perl before that.
+
+The 33 warnings are gone, 25 remain, and no warning category increased —
+verified by compiling the before and after trees and diffing the warning sets.
+The remaining 25 are unrelated signedness pairs (C<size_t> against C<ssize_t>,
+C<IV> against C<size_t>, C<STRLEN> against C<ssize_t>) and are left alone. The full
+suite passes on perl 5.10.1 and 5.12.5, the two builds that depend on the shim,
+as well as on 5.42.3, 5.44.0 and 5.44.0-quadmath; and 94 calls covering all 23
+retyped functions — positional and named forms, bare lists against arrayrefs,
+C<write_table>'s emitted bytes, and the odd-argument and unknown-argument croaks
+that this index arithmetic drives — produce identical output before and after.
+
+=head3 NV was being computed at double precision on wide builds
+
+Every libm call in C<LikeR.xs> was written bare — C<sqrt(x)>, C<log(x)>,
+C<lgamma(x)> — and C has no type-generic C<< E<lt>math.hE<gt> >>. Those functions take a
+C<double>, so on a perl built with C<-Duselongdouble> or C<-Dusequadmath> every one
+of them converted the C<NV> down to 53 bits of mantissa, computed there, and
+converted the result back. Nothing warned and nothing failed to compile; the
+answers were simply less accurate than the perl running them. On perl-5.12.5
+(C<long double>), C<sd(1..5)> returned exactly the double-rounded C<sqrt(2.5)>,
+9.5e-17 away from the value perl's own C<sqrt> gives.
+
+All 412 of those calls now go through C<nv_*> macros that paste on the suffix for
+the width C<NV> actually is: none for C<double>, C<l> for C<long double>, C<q> for
+C<__float128>. The 80 C<isnan>/C<isinf>/C<isfinite> calls became
+C<Perl_isnan>/C<Perl_isinf>/C<Perl_isfinite>, which matters most where the C99
+type-generic macros are absent: there C<isfinite()> is a plain C<double> function,
+and narrowing a large-but-finite long double into it reports the value as
+infinite rather than merely rounding it.
+
+The long-double row is conditional. The C<l> variants are C99 but some libms —
+the thinner BSD ones especially — do not ship the whole set, so C<Makefile.PL>
+link-tests all twenty as a unit and defines C<LIKER_HAVE_LONG_DOUBLE_MATH> only
+if every one resolves; otherwise the build falls back to the C<double> functions,
+which is exactly what it did before and so cannot regress. C<__float128> needs no
+probe: C<< E<lt>quadmath.hE<gt> >> and C<-lquadmath> come with the quadmath perl itself, and
+the built object was checked with C<nm> — it references C<lgammaq>, C<expq>,
+C<sqrtq> and no double-width libm symbol at all.
+
+Accuracy on the long-double build, measured against values that are exact in
+binary or known in closed form: C<sd(1..5)> is now bit-identical to perl's
+C<sqrt(2.5)>, and C<fisher_test([[3,1],[1,3]])> moves from 1.5e-16 to 6.4e-18
+relative error against the exact 17/35. The remaining 6.4e-18 is an accuracy
+floor in that function's own summation, not a width problem — the C<__float128>
+build lands on the same figure.
+
+This costs time where the wide math is software-emulated: the suite takes 352s
+on the quadmath perl, against 67s when it was quietly running on hardware
+doubles. The other four perls are unaffected.
+
+=head3 The build ran itself twice, and clobbered its own Makefile doing it
+
+C<make> had to be run twice or the C<.so> came out stamped with the wrong version
+and refused to load. The cause: ExtUtils::MakeMaker scans the directory for
+C<*.PL> files to run during the build, and C<dev.Makefile.PL> — a local
+convenience wrapper, not part of the distribution — looks like one. It was being
+run mid-build as C<perl dev.Makefile.PL dev.Makefile>, and since it calls
+C<WriteMakefile()> it overwrote the real C<Makefile> with its own: no C<DEFINE>, no
+probed C99 flag, and a different C<VERSION>. The second C<make> then rebuilt from
+that. C<< PL_FILES =E<gt> {} >> turns the scan off; nothing here is generated by a C<.PL>
+file.
+
+The version half was a stale literal: the checked-in C<Makefile.PL> pinned
+C<< VERSION =E<gt> "0.28" >> while C<lib/Stats/LikeR.pm> had moved to 0.298, and
+C<XSLoader::load()> passes C<$VERSION> to a C<.so> compiled with C<-DXS_VERSION>
+from that literal. It now reads C<< VERSION_FROM =E<gt> lib/Stats/LikeR.pm >>. One C<make>
+after C<perl Makefile.PL> is enough again, and the non-quadmath builds are about
+a third faster for not doing the work twice.
+
+=head3 Portability: Solaris, the BSDs, and vendor compilers
+
+The C99 flag is now probed instead of guessed. C<Makefile.PL> was selecting
+C<-std=gnu99> on any compiler whose name matched C</\b(?:g?cc|clang)\b/>, and
+C<$Config{cc}> is plain C<cc> for Oracle Studio on Solaris and for aCC on HP-UX —
+both of which reject that flag outright, so the build failed there before it
+compiled a line. Each candidate is now trial-compiled and the first that works
+wins: C<-std=gnu99>/C<-std=c99> for gcc and clang, C<-xc99=all> for Studio,
+C<-qlanglvl=extc99> for AIX C<xlc>, C<-AC99> for HP-UX, and nothing at all for a
+compiler already in C99 mode. MSVC is skipped outright, since it warns rather
+than errors on switches it does not know and would make the probe settle on a
+no-op.
+
+Two things that would have failed to compile off Linux are gone. C<< E<lt>strings.hE<gt> >>
+and its C<strcasecmp> — POSIX-only, absent on MSVC — are replaced by a small
+C<str_ieq_ascii()>, which also drops the locale dependency: C<tolower()> under a
+Turkish locale maps C<I> outside ASCII, which should never decide whether
+C<"TRUE"> matches C<"true">. And bare C99 C<restrict>, used on 151 pointers here,
+now has an C<#ifdef> mapping it to C<__restrict> on MSVC and C<__restrict__> on
+older gcc, and defining it away where no spelling exists, rather than losing the
+annotation.
+
+C<LikeR.xs> also compiles clean under strict C<-std=c99> with no GNU extensions,
+which is the closest available local proxy for a vendor compiler.
+
+=head3 Dead code: sample()'s private PRNG
+
+A splitmix64 generator sat at the top of the file under a comment promising a
+PRNG stream separate from C<Drand01()>, seeded lazily from C</dev/urandom> with a
+C<time()^PID> fallback. None of it was true: no seeding code was ever written, no
+caller ever existed, and its state started at a fixed 0, so had anything called
+it the "random" sample would have been the same sequence in every process.
+C<sample()> draws from C<Drand01()> and always did, which is the behaviour that is
+wanted — C<srand($seed)> governs it the way C<set.seed()> governs R. The generator
+and its comment are removed.
+
+=head3 Tests
+
+Two files, 273 assertions, and both were checked against a deliberately broken
+build rather than merely observed to pass.
+
+C<t/nv_width.t> fails if the math width ever comes undone. Its sharp assertion
+needs no tolerance at all: C<sd(1..5)> must be the identical NV to perl's
+C<sqrt(2.5)>, which holds on any width and breaks the moment a C<double> gets in
+the way. It is width-adaptive rather than skipped on a C<double> perl, computing
+the NV epsilon of the running build instead of assuming one.
+
+C<t/scale.keywords.t> covers C<scale()>'s string options — C<"mean">, C<"sd">,
+C<"none">, C<"true">, C<"false">, C<""> and their case variants — which had no
+coverage at all: C<t/01.t> passes only the numeric forms. Expected values come
+from R 4.6.1 C<base::scale()> at C<options(digits=17)> and are frozen in the file,
+so it needs no R at run time. Deleting the case fold from C<str_ieq_ascii()>
+fails 11 of its assertions; usefully, all 11 are the "off" spellings, because an
+unmatched string falls through to C<SvTRUE> and still means "compute it", so
+C<"MEAN"> would keep working while C<"NONE"> flipped. That is recorded in the file
+so the section is not trusted for more than it proves.
+
+The suite is 118 files and 18,819 tests, passing on perl 5.10.1, 5.12.5, 5.42.3
+(threaded), 5.44.0 and 5.44.0-quadmath, with no compiler warnings on any of
+them.
 
 =head2 0.297 2026-08-10 CDT
 

@@ -1,5 +1,5 @@
 package Langertha::Knarr::Router;
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 # ABSTRACT: Model name to Langertha engine routing with caching
 use Moo;
 use Carp qw( croak );
@@ -203,7 +203,7 @@ Langertha::Knarr::Router - Model name to Langertha engine routing with caching
 
 =head1 VERSION
 
-version 1.100
+version 1.101
 
 =head1 SYNOPSIS
 
@@ -211,7 +211,7 @@ version 1.100
 
     my $router = Langertha::Knarr::Router->new(config => $config);
 
-    my ($engine, $model) = $router->resolve('gpt-4o');
+    my ($engine, $model) = $router->resolve('gpt-5.6-terra');
     my $result = $engine->simple_chat(@messages);
 
     my $models = $router->list_models;

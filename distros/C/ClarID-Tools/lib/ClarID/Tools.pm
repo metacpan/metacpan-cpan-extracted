@@ -8,8 +8,8 @@ use File::ShareDir::ProjectDistDir qw(dist_dir);
 use App::Cmd::Setup -app;
 
 # Central version for your entire CLI suite
-our $VERSION = '0.03';
-our @SUPPORTED_CODEBOOK_VERSIONS = qw(0.02 0.03);
+our $VERSION = '0.04';
+our @SUPPORTED_CODEBOOK_VERSIONS = qw(0.02 0.03 0.04);
 
 # Share dir
 our $share_dir = dist_dir('ClarID-Tools');
@@ -44,7 +44,10 @@ L<https://github.com/CNAG-Biomedical-Informatics/clarid-tools#readme>
 
 The author requests that any published work that utilizes C<ClarID-Tools> includes a cite to the following reference:
 
-Manuel Rueda and Ivo G. Gut (2025). ClarID: A Human-Readable and Compact Identifier Specification for Biomedical Metadata Integration. I<Submitted>.
+Rueda, M. and Gut, I.G. (2026). ClarID: a human-readable and compact
+identifier specification for biomedical metadata integration.
+I<Journal of Biomedical Semantics> 17, 9.
+L<https://doi.org/10.1186/s13326-026-00349-6>.
 
 
 =head1 AUTHOR

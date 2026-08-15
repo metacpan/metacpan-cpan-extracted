@@ -1,4 +1,4 @@
-package Affix::Build v1.2.3 {
+package Affix::Build v1.2.4 {
     use v5.40;
     use experimental qw[class try];
     use Config;
@@ -60,6 +60,7 @@ package Affix::Build v1.2.3 {
             if ( ref $input eq 'SCALAR' ) {    # Inline source code
                 $args{lang} // croak q[Parameter 'lang' (extension) is required for inline source];
                 $lang = lc $args{lang};
+                croak "Invalid language '$lang'" unless $lang =~ /^[a-z0-9+#]+$/;
 
                 # Generate a unique filename in the build dir
                 state $counter = 0;

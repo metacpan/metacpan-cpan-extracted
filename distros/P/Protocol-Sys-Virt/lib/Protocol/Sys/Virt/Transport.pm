@@ -13,7 +13,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Transport v12.6.0;
+package Protocol::Sys::Virt::Transport v12.6.1;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -342,7 +342,7 @@ Protocol::Sys::Virt::Transport - Low level Libvirt connection protocol
 
 =head1 VERSION
 
-v12.6.0
+v12.6.1
 
 Based on LibVirt tag v12.6.0
 

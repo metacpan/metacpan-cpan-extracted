@@ -1,5 +1,5 @@
 package Langertha::Knarr::CLI::Cmd::Start;
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 # ABSTRACT: Start the Knarr proxy server
 use Moo;
 use MooX::Cmd;
@@ -283,7 +283,7 @@ Langertha::Knarr::CLI::Cmd::Start - Start the Knarr proxy server
 
 =head1 VERSION
 
-version 1.100
+version 1.101
 
 =head1 DESCRIPTION
 

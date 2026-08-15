@@ -565,34 +565,7 @@ static infix_status _infix_forward_create_direct_impl(infix_forward_t ** out_tra
     code_buffer buf;
     code_buffer_init(&buf, temp_arena);
 
-    // 2. JIT Compilation Pipeline
-    status = spec->prepare_direct_forward_call_frame(
-        temp_arena, &layout, return_type, arg_types, num_args, handlers, target_fn);
-    if (status != INFIX_SUCCESS)
-        goto cleanup;
-
-    status = spec->generate_direct_forward_prologue(&buf, layout);
-    if (status != INFIX_SUCCESS)
-        goto cleanup;
-
-    status = spec->generate_direct_forward_argument_moves(&buf, layout);
-    if (status != INFIX_SUCCESS)
-        goto cleanup;
-
-    status = spec->generate_direct_forward_call_instruction(&buf, layout);
-    if (status != INFIX_SUCCESS)
-        goto cleanup;
-
-    status = spec->generate_direct_forward_epilogue(&buf, layout, return_type);
-    if (status != INFIX_SUCCESS)
-        goto cleanup;
-
-    if (buf.error || temp_arena->error) {
-        status = INFIX_ERROR_ALLOCATION_FAILED;
-        goto cleanup;
-    }
-
-    // 3. Finalize Handle
+    // Finalize the handle before code generation
     handle = infix_calloc(1, sizeof(infix_forward_t));
     if (handle == nullptr) {
         status = INFIX_ERROR_ALLOCATION_FAILED;
@@ -629,7 +602,35 @@ static infix_status _infix_forward_create_direct_impl(infix_forward_t ** out_tra
     handle->target_fn = target_fn;
     handle->ref_count = 1;
 
-    // 4. Allocate and Finalize Executable Memory
+    // Pass the stable type metadata so the machine code embeds pointers
+    // that live as long as the trampoline itself
+    status = spec->prepare_direct_forward_call_frame(
+        temp_arena, &layout, handle->return_type, handle->arg_types, num_args, handlers, target_fn);
+    if (status != INFIX_SUCCESS)
+        goto cleanup;
+
+    status = spec->generate_direct_forward_prologue(&buf, layout);
+    if (status != INFIX_SUCCESS)
+        goto cleanup;
+
+    status = spec->generate_direct_forward_argument_moves(&buf, layout);
+    if (status != INFIX_SUCCESS)
+        goto cleanup;
+
+    status = spec->generate_direct_forward_call_instruction(&buf, layout);
+    if (status != INFIX_SUCCESS)
+        goto cleanup;
+
+    status = spec->generate_direct_forward_epilogue(&buf, layout, handle->return_type);
+    if (status != INFIX_SUCCESS)
+        goto cleanup;
+
+    if (buf.error || temp_arena->error) {
+        status = INFIX_ERROR_ALLOCATION_FAILED;
+        goto cleanup;
+    }
+
+    // Allocate and Finalize Executable Memory
     handle->exec = infix_executable_alloc(buf.size);
     if (handle->exec.rw_ptr == nullptr) {
         status = INFIX_ERROR_ALLOCATION_FAILED;

@@ -1,6 +1,7 @@
 use v5.26;
 use warnings;
 use Feature::Compat::Class;
+use experimental qw/ signatures /;
 
 # ABSTRACT: MIDI bytestream decoder
 
@@ -8,13 +9,16 @@ package MIDI::Stream::Decoder;
 class MIDI::Stream::Decoder :isa( MIDI::Stream );
 
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Time::HiRes qw/ gettimeofday tv_interval /;
 use Carp qw/ carp croak /;
-use MIDI::Stream::Tables qw/ is_cc is_realtime message_length combine_bytes /;
+use MIDI::Stream::Tables qw/ is_cc is_realtime message_length combine_bytes event_desc /;
 use MIDI::Stream::FIFO;
 use MIDI::Stream::EventFactory;
+
+my $event_desc = event_desc();
+my @event_keys = keys $event_desc->%*;
 
 
 field $retain_events :param = 1;
@@ -168,19 +172,32 @@ method decode( @bytestrings ) {
 }
 
 
+my $matching_events = sub( $event ) {
+    [ grep { $_ =~ $event } @event_keys ]
+};
+
 method attach_callback( $event, $callback ) {
     if ( ref $event eq 'ARRAY' ) {
         $self->attach_callback( $_, $callback ) for $event->@*;
         return;
     }
+    if ( ref $event eq 'Regexp' ) {
+        $self->attach_callback( $matching_events->( $event ), $callback );
+    }
     push $filter_cb->{ $event }->@*, $callback;
 }
 
 
+*attach_event_callback = \&attach_callback;
+
+
 method cancel_event_callback( $event ) {
     if ( ref $event eq 'ARRAY' ) {
-        $self->cancel_event_callbacks( $_ ) for $event->@*;
+        $self->cancel_event_callback( $_ ) for $event->@*;
         return;
+    }
+    if ( ref $event eq 'Regexp' ) {
+        $self->cancel_event_callback( $matching_events->( $event ) );
     }
     delete $filter_cb->{ $event };
 }
@@ -223,7 +240,7 @@ MIDI::Stream::Decoder - MIDI bytestream decoder
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -342,14 +359,15 @@ the decoded events will be invoked.
     );
 
     $decoder->attach_callback(
-        [ qw/ note_on note_off / ] => sub( $event ) {
+        [ qr/^note/, 'control_change' ] => sub( $event ) {
             ...
             $decoder->continue;
         }
     );
 
 Attaches the given callback to the specified event type. Multiple event types
-may be bound by setting $event to be an arrayref of event types.
+may be bound by setting $event to be an arrayref of event types. Regular
+expressions matching event names may also be passed.
 
 Any number of callbacks may be attached to an event. They will be executed in
 the order they were attached. Should you wish to stop processing further
@@ -360,12 +378,19 @@ be called before the global callback, if one was passed to the constructor.
 If set, the global callback will always be called no matter the return value
 of attached event callbacks.
 
+=head2 attach_event_callback
+
+Alias for L</attach_callback>
+
 =head2 cancel_event_callback
 
     $decoder->cancel_event_callback( $event );
 
+    $decoder->cancel_event_callback( [ qr/^note/, 'control_change' ] );
+
 Cancels the callbacks associated with the given event name.
-As with attach_callback, $event may be an arrayref of event names.
+As with attach_callback, $event may be an arrayref or regular expression
+matching event names.
 
 =head2 cancel_callback
 

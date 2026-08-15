@@ -1,0 +1,43 @@
+Crypt-JWS
+
+JSON Web Signatures (RFC 7515) over OpenSSL's libcrypto, bound directly -
+no CPAN crypto stack. Sign and verify RS256/384/512, ES256/384/512, and
+HS256/384/512 compact serializations; import and generate keys from PEM
+and JWK; RFC 7638 thumbprints; plus the small primitives everything
+token-shaped needs (SHA-2, HMAC, unpadded base64url, constant-time
+equality, CSPRNG bytes).
+
+	use Crypt::JWS qw(sign verify);
+	use Crypt::JWS::Key;
+
+	my $key   = Crypt::JWS::Key->generate('ES256');
+	my $token = sign($key, $payload, alg => 'ES256',
+	                 kid => $key->thumbprint);
+	my $bytes = verify($token, $key, algs => ['ES256']);
+
+The verifier demands an explicit algorithm allowlist, the none algorithm
+has no code path, and key types are cross-checked against algorithm
+families in C. A versioned C ABI (jws_abi.h, via ExtUtils::Depends)
+serves C-level consumers.
+
+INSTALLATION
+
+Requires OpenSSL's libcrypto (1.1 or 3.x) with headers.
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+	perldoc Crypt::JWS
+	perldoc Crypt::JWS::Key
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+	The Artistic License 2.0 (GPL Compatible)

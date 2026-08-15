@@ -1,0 +1,37 @@
+Changes
+ignore.txt
+include/cjws/cjws_b64.h
+include/cjws/cjws_compact.h
+include/cjws/cjws_compat.h
+include/cjws/cjws_digest.h
+include/cjws/cjws_jws.h
+include/cjws/cjws_key.h
+include/cjws/cjws_rand.h
+include/cjws/cjws_util.h
+include/jws_abi.h
+JWS.xs
+lib/Crypt/JWS.pm
+lib/Crypt/JWS/Key.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+ppport.h
+README
+t/00-load.t
+t/01-primitives.t
+t/02-key.t
+t/03-rfc7515.t
+t/04-sign-verify.t
+t/05-negatives.t
+t/06-abi.t
+t/07-openssl-cli.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xs/digest.xs
+xs/jws.xs
+xs/key.xs
+xs/util.xs
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

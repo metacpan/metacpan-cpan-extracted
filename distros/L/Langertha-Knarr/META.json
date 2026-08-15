@@ -65,6 +65,144 @@
          }
       }
    },
+   "provides" : {
+      "Langertha::Knarr" : {
+         "file" : "lib/Langertha/Knarr.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::CLI" : {
+         "file" : "lib/Langertha/Knarr/CLI.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::CLI::Cmd::Check" : {
+         "file" : "lib/Langertha/Knarr/CLI/Cmd/Check.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::CLI::Cmd::Container" : {
+         "file" : "lib/Langertha/Knarr/CLI/Cmd/Container.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::CLI::Cmd::Init" : {
+         "file" : "lib/Langertha/Knarr/CLI/Cmd/Init.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::CLI::Cmd::Models" : {
+         "file" : "lib/Langertha/Knarr/CLI/Cmd/Models.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::CLI::Cmd::Start" : {
+         "file" : "lib/Langertha/Knarr/CLI/Cmd/Start.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Config" : {
+         "file" : "lib/Langertha/Knarr/Config.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Handler" : {
+         "file" : "lib/Langertha/Knarr/Handler.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Handler::A2AClient" : {
+         "file" : "lib/Langertha/Knarr/Handler/A2AClient.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Handler::ACPClient" : {
+         "file" : "lib/Langertha/Knarr/Handler/ACPClient.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Handler::Code" : {
+         "file" : "lib/Langertha/Knarr/Handler/Code.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Handler::Engine" : {
+         "file" : "lib/Langertha/Knarr/Handler/Engine.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Handler::Passthrough" : {
+         "file" : "lib/Langertha/Knarr/Handler/Passthrough.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Handler::Raider" : {
+         "file" : "lib/Langertha/Knarr/Handler/Raider.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Handler::RequestLog" : {
+         "file" : "lib/Langertha/Knarr/Handler/RequestLog.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Handler::Router" : {
+         "file" : "lib/Langertha/Knarr/Handler/Router.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Handler::Tracing" : {
+         "file" : "lib/Langertha/Knarr/Handler/Tracing.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::PSGI" : {
+         "file" : "lib/Langertha/Knarr/PSGI.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::PSGI::FakeReq" : {
+         "file" : "lib/Langertha/Knarr/PSGI.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Protocol" : {
+         "file" : "lib/Langertha/Knarr/Protocol.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Protocol::A2A" : {
+         "file" : "lib/Langertha/Knarr/Protocol/A2A.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Protocol::ACP" : {
+         "file" : "lib/Langertha/Knarr/Protocol/ACP.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Protocol::AGUI" : {
+         "file" : "lib/Langertha/Knarr/Protocol/AGUI.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Protocol::Anthropic" : {
+         "file" : "lib/Langertha/Knarr/Protocol/Anthropic.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Protocol::Ollama" : {
+         "file" : "lib/Langertha/Knarr/Protocol/Ollama.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Protocol::OpenAI" : {
+         "file" : "lib/Langertha/Knarr/Protocol/OpenAI.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Request" : {
+         "file" : "lib/Langertha/Knarr/Request.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::RequestLog" : {
+         "file" : "lib/Langertha/Knarr/RequestLog.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Response" : {
+         "file" : "lib/Langertha/Knarr/Response.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Router" : {
+         "file" : "lib/Langertha/Knarr/Router.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Session" : {
+         "file" : "lib/Langertha/Knarr/Session.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Stream" : {
+         "file" : "lib/Langertha/Knarr/Stream.pm",
+         "version" : "1.101"
+      },
+      "Langertha::Knarr::Tracing" : {
+         "file" : "lib/Langertha/Knarr/Tracing.pm",
+         "version" : "1.101"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -79,7 +217,7 @@
       "x_IRC" : "irc://irc.perl.org/#langertha",
       "x_IRC_user" : "Getty"
    },
-   "version" : "1.100",
+   "version" : "1.101",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -184,11 +322,11 @@
                      "docker push raudssus/langertha-knarr:$(echo %v | cut -d. -f1)",
                      "docker push raudssus/langertha-knarr:latest"
                   ],
-                  "version" : "0.049"
+                  "version" : "0.050"
                }
             },
             "name" : "@Author::GETTY/Run::AfterRelease",
-            "version" : "0.049"
+            "version" : "0.050"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
@@ -204,6 +342,38 @@
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::GETTY/PodSyntaxTests",
             "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
+            "name" : "@Author::GETTY/Test::ChangesHasContent",
+            "version" : "0.011"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.037"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::GETTY/MetaProvides::Package",
+            "version" : "2.004003"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -428,7 +598,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.100",
+                  "tag" : "1.101",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -512,6 +682,11 @@
             "version" : "2.052"
          },
          {
+            "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
+            "name" : "@Author::GETTY/GitHub::CreateRelease",
+            "version" : "0.0012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
             "version" : "6.037"
@@ -559,6 +734,11 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
             "version" : "6.037"
          }
       ],

@@ -32,10 +32,31 @@
 #  define MAP_ANONYMOUS MAP_ANON
 #endif
 
-/* Atomics. GCC/Clang __atomic covers every platform this ships on; without it
- * the arena is simply disabled and the whole feature fails open. */
-#if defined(__GNUC__)
+/* Atomics. The __atomic builtins are the ones we want, but they only arrived
+ * in GCC 4.7: __GNUC__ alone is not the question to ask, and asking it broke
+ * the build on FreeBSD 9, whose base cc is gcc 4.2.1 ('__ATOMIC_ACQUIRE'
+ * undeclared). That compiler does have the older __sync family (GCC 4.1), and
+ * __sync says everything needed here: a lock test-and-set IS an acquire, a
+ * lock release IS a release, and a full barrier either side of a plain
+ * aligned word turns it into the acquire load / release store the denylist
+ * publishes with. Only when neither family exists is the arena disabled and
+ * the whole feature left to fail open. */
+#if defined(__has_builtin)
+#  if __has_builtin(__atomic_load_n)
+#    define HM_RL_ATOMIC_GNU 1
+#  endif
+#endif
+#if !defined(HM_RL_ATOMIC_GNU) && defined(__GNUC__) \
+    && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7))
+#  define HM_RL_ATOMIC_GNU 1
+#endif
+
+#if defined(HM_RL_ATOMIC_GNU)
 #  define HM_RL_HAVE_ATOMICS 1
+#elif defined(__GNUC__) \
+    && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1))
+#  define HM_RL_HAVE_ATOMICS 1
+#  define HM_RL_ATOMIC_SYNC 1
 #else
 #  define HM_RL_HAVE_ATOMICS 0
 #endif
@@ -93,18 +114,54 @@ static uint64_t hm_rl_fnv(const void *data, size_t len) {
 }
 
 #if HM_RL_HAVE_ATOMICS
+/* The four operations the arena needs, over whichever builtin family exists.
+ * Reads and writes of `state` are of one naturally aligned 32-bit word, which
+ * no target this builds on can tear; the barrier is what orders them against
+ * the slot's other fields, and that is all the __sync spelling has to add. */
+static int hm_rl_tas(volatile unsigned char *l) {
+#if defined(HM_RL_ATOMIC_SYNC)
+    return __sync_lock_test_and_set(l, (unsigned char)1) != 0;
+#else
+    return __atomic_test_and_set(l, __ATOMIC_ACQUIRE) != 0;
+#endif
+}
+static void hm_rl_clear(volatile unsigned char *l) {
+#if defined(HM_RL_ATOMIC_SYNC)
+    __sync_lock_release(l);
+#else
+    __atomic_clear(l, __ATOMIC_RELEASE);
+#endif
+}
+static uint32_t hm_rl_load_acq(volatile uint32_t *p) {
+#if defined(HM_RL_ATOMIC_SYNC)
+    uint32_t v = *p;
+    __sync_synchronize();          /* nothing below may be hoisted above it */
+    return v;
+#else
+    return __atomic_load_n(p, __ATOMIC_ACQUIRE);
+#endif
+}
+static void hm_rl_store_rel(volatile uint32_t *p, uint32_t v) {
+#if defined(HM_RL_ATOMIC_SYNC)
+    __sync_synchronize();          /* the slot's fields land before the state */
+    *p = v;
+#else
+    __atomic_store_n(p, v, __ATOMIC_RELEASE);
+#endif
+}
+
 /* Bounded acquire; returns 1 if the lock was taken, 0 if it gave up (a worker
  * that died holding it must not wedge the pool - the caller fails open). */
 static int hm_rl_lock(hm_rl_arena *a, uint64_t h) {
     volatile unsigned char *l = &a->locks[h % HM_RL_LOCKS];
     long spin = 0;
-    while (__atomic_test_and_set(l, __ATOMIC_ACQUIRE)) {
+    while (hm_rl_tas(l)) {
         if (++spin >= HM_RL_SPIN_MAX) return 0;
     }
     return 1;
 }
 static void hm_rl_unlock(hm_rl_arena *a, uint64_t h) {
-    __atomic_clear(&a->locks[h % HM_RL_LOCKS], __ATOMIC_RELEASE);
+    hm_rl_clear(&a->locks[h % HM_RL_LOCKS]);
 }
 #endif
 
@@ -156,7 +213,7 @@ static int hm_rl_deny_check(const char *ip) {
     now   = (long)time(NULL);
     for (i = 0; i < cap; i++) {
         hm_rl_deny_slot *s = &a->deny[(start + i) % cap];
-        uint32_t st = __atomic_load_n(&s->state, __ATOMIC_ACQUIRE);
+        uint32_t st = hm_rl_load_acq(&s->state);
         if (st == 0) return 0;                       /* empty: not present */
         if (st == 2) continue;                       /* tombstone: keep going */
         if (strncmp(s->ip, ip, HM_RL_IPLEN) != 0) continue;
@@ -200,7 +257,7 @@ static void hm_rl_deny_add(const char *ip, long ttl_secs) {
         memset(s->ip, 0, HM_RL_IPLEN);
         strncpy(s->ip, ip, HM_RL_IPLEN - 1);
         s->expiry = expiry;
-        __atomic_store_n(&s->state, 1u, __ATOMIC_RELEASE);   /* publish */
+        hm_rl_store_rel(&s->state, 1u);                      /* publish */
     }
     hm_rl_unlock(a, h);
 #else
@@ -222,7 +279,7 @@ static void hm_rl_deny_remove(const char *ip) {
         hm_rl_deny_slot *s = &a->deny[(start + i) % cap];
         if (s->state == 0) break;
         if (s->state == 1 && strncmp(s->ip, ip, HM_RL_IPLEN) == 0) {
-            __atomic_store_n(&s->state, 2u, __ATOMIC_RELEASE);  /* tombstone */
+            hm_rl_store_rel(&s->state, 2u);                     /* tombstone */
             break;
         }
     }

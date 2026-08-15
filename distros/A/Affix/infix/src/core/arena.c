@@ -199,3 +199,40 @@ INFIX_API c23_nodiscard void * infix_arena_calloc(infix_arena_t * arena, size_t 
         memset(ptr, 0, total_size);
     return ptr;
 }
+
+/**
+ * @brief Captures the current allocation state of an arena chain.
+ */
+INFIX_API c23_nodiscard infix_arena_mark_t infix_arena_get_mark(infix_arena_t * arena) {
+    infix_arena_mark_t mark = {nullptr, 0};
+    if (arena == nullptr)
+        return mark;
+
+    infix_arena_t * current = arena;
+    while (current->next_block != nullptr && current->next_block->current_offset > 0)
+        current = current->next_block;
+    mark.block = current;
+    mark.offset = current->current_offset;
+    return mark;
+}
+
+/**
+ * @brief Rewinds an arena chain back to a previously captured mark,
+ * resetting all secondary blocks for immediate reuse.
+ */
+INFIX_API void infix_arena_rewind(infix_arena_t * arena, infix_arena_mark_t mark) {
+    if (arena == nullptr || mark.block == nullptr)
+        return;
+
+    // Reset offset in the marked block
+    mark.block->current_offset = mark.offset;
+    mark.block->error = false;
+
+    // Reset offsets in all subsequent blocks so they can be reused
+    infix_arena_t * current = mark.block->next_block;
+    while (current != nullptr) {
+        current->current_offset = 0;
+        current->error = false;
+        current = current->next_block;
+    }
+}

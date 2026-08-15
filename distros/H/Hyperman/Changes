@@ -1,5 +1,14 @@
 Revision history for Hyperman
 
+0.19    2026-08-14
+        - Fixed a build failure on compilers older than GCC 4.7, which
+          took out every perl on FreeBSD 9 (base cc is gcc 4.2.1):
+          hm_ratelimit.h probed for __GNUC__ and then used the __atomic
+          builtins, which arrived five releases later, so the arena
+          added in 0.18 would not compile there at all. It now probes
+          for the builtins themselves and falls back to the older
+          __sync family, which also has everything the arena needs.
+
 0.18    2026-08-13
         - Abuse controls on a fork-shared arena: an IP denylist enforced
           at accept and fixed-window rate counters, both in one anonymous

@@ -70,6 +70,10 @@ t/interpolate.t
 t/interpolate_methods.t
 t/intersection.t
 t/is_equivalent.t
+t/ks_test.R.scipy.R
+t/ks_test.R.scipy.py
+t/ks_test.R.scipy.t
+t/ks_test.mpmath.py
 t/ks_test.t
 t/lm.R.scipy.t
 t/lm.bugs.t
@@ -82,6 +86,7 @@ t/merge.t
 t/model_pvalue_tails.t
 t/ncol.t
 t/nrow.t
+t/nv_width.t
 t/oneway_test.R.scipy.t
 t/oneway_test.bugs.t
 t/p_adjust.frames.t
@@ -102,6 +107,7 @@ t/read_table.comments.t
 t/read_table.t
 t/read_table.xlsx.t
 t/roc.t
+t/scale.keywords.t
 t/select_drop_rename_cols.t
 t/set_ops.t
 t/skew_kurtosis.t
@@ -121,6 +127,8 @@ t/view.t
 t/view2.t
 t/view_aoa.t
 t/vif_hoslem.t
+t/wilcox_test.R.scipy.R
+t/wilcox_test.R.scipy.t
 t/wilcox_test.t
 t/write_table.announce.t
 t/write_table.longtable.t

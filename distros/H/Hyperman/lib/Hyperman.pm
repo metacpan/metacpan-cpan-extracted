@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);

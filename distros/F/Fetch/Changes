@@ -1,5 +1,23 @@
 Revision history for Fetch
 
+0.13    2026-08-15
+        - Two agents with no passed loop in one process no longer hang each other. Every
+          Fetch->new built its own Standalone loop, but install_await
+          writes the process-global $Fetch::Future::AWAIT, so the agent
+          constructed last owned the await path for both: awaiting the
+          first agent's future pumped the second agent's loop, which has
+          no watcher for that socket, and the backend blocked in the
+          kernel with no deadline.
+        - The implicit loop (no `loop` argument) is now one per process
+          rather than one per agent, rebuilt in a child after a fork.
+          Agents that did not ask for a specific loop therefore multiplex:
+          awaiting on one drives what the others have in flight.
+        - Loop adapters gained _ft_await($future), the per-instance form of
+          what install_await put in the global. Third-party adapters
+          without it keep working through the old global hook.
+        - Awaiting on a loop with no watchers and no timers dies with a
+          diagnostic instead of blocking forever.
+
 0.12    2026-08-12
         - A keep-alive connection the server closes at the moment it is reused
           no longer fails the request. 

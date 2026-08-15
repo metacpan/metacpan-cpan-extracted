@@ -1,5 +1,13 @@
 Revision history for Template-Stencil
 
+0.06    2026-08-14
+        - The compile-scaling test in t/11-bytecode-shape.t timed
+          _inspect, whose per-op Perl hash building dominated the
+          measurement and made the ratio an allocator benchmark rather
+          than a compiler one; a FreeBSD smoker duly reported 43.9x on a
+          compiler that measures sublinear. It now times
+          _compile_handle/_free_handle and takes the best of five rounds.
+
 0.05    2026-08-12
         - Require perl 5.10.1.
         - _abi_ptr returns a UV rather than an IV.

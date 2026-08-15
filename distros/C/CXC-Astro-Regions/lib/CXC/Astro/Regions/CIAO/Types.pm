@@ -5,7 +5,7 @@ package CXC::Astro::Regions::CIAO::Types;
 use v5.20;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Types::Standard        qw( Enum Bool Num Str StrMatch );
 use Types::Common::Numeric qw( PositiveNum );
@@ -62,7 +62,7 @@ CXC::Astro::Regions::CIAO::Types - Types for CIAO Regions
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SUPPORT
 

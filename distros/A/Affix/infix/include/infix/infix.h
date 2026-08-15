@@ -222,6 +222,7 @@ typedef struct infix_arena_t infix_arena_t;
 typedef struct infix_library_t infix_library_t;
 /** @brief An opaque handle to a named type registry. */
 typedef struct infix_registry_t infix_registry_t;
+
 /**
  * @brief Enumerates the fundamental categories of types that `infix` can represent.
  */
@@ -333,11 +334,13 @@ struct infix_type_t {
  * @brief Describes a single member of a C struct or union.
  */
 struct infix_struct_member_t {
-    const char * name;  /**< The name of the member, or `nullptr` if anonymous. */
-    infix_type * type;  /**< The `infix_type` of the member. */
-    size_t offset;      /**< The byte offset of the member from the start of the aggregate. */
+    const char * name; /**< The name of the member, or `nullptr` if anonymous. */
+    infix_type * type; /**< The `infix_type` of the member. */
+    size_t offset; /**< The byte offset of the member from the start of the aggregate. For bitfields, the offset of the
+                      storage unit that contains them. */
     uint8_t bit_width;  /**< The width of the bitfield in bits. 0 for standard members. */
-    uint8_t bit_offset; /**< The bit offset within the byte (0-7). */
+    uint8_t bit_offset; /**< For bitfields, the bit offset of the field within its storage unit (0-63); 0 for standard
+                           members. */
     bool is_bitfield;   /**< True if this member is a bitfield (even if width is 0). */
 };
 /**
@@ -1554,6 +1557,14 @@ typedef struct {
     /** @brief For "out" or "in-out" parameters. Called after the C function returns. */
     infix_writeback_fn writeback_handler;
 } infix_direct_arg_handler_t;
+
+typedef struct {
+    infix_arena_t * block;
+    size_t offset;
+} infix_arena_mark_t;
+
+INFIX_API infix_arena_mark_t infix_arena_get_mark(infix_arena_t * arena);
+INFIX_API void infix_arena_rewind(infix_arena_t * arena, infix_arena_mark_t mark);
 
 /**
  * @brief Creates a forward trampoline with direct, JIT-bound marshalling.

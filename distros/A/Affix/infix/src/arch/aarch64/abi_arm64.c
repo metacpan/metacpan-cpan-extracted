@@ -535,10 +535,13 @@ static infix_status generate_forward_argument_moves_arm64(code_buffer * buf,
                         emit_arm64_ldrb_imm(buf, GPR_ARGS[loc->reg_index], X9_REG, 0);
                     else if (type->size == 2)
                         emit_arm64_ldrh_imm(buf, GPR_ARGS[loc->reg_index], X9_REG, 0);
+                    else if (type->size <= 4)
+                        // 3-4 byte values: 32-bit load (zero-extends to 64-bit)
+                        emit_arm64_ldr_imm(buf, false, GPR_ARGS[loc->reg_index], X9_REG, 0);  // ldr wN, [x9]
                     else
-                        // 4-byte or 8-byte load
-                        emit_arm64_ldr_imm(
-                            buf, type->size == 8, GPR_ARGS[loc->reg_index], X9_REG, 0);  // ldr xN/wN, [x9]
+                        // 5-8 byte values: must load the full 64-bit register, otherwise the
+                        // trailing members of a small struct would be lost.
+                        emit_arm64_ldr_imm(buf, true, GPR_ARGS[loc->reg_index], X9_REG, 0);  // ldr xN, [x9]
                 }
                 break;
             }
@@ -813,6 +816,10 @@ static infix_status prepare_reverse_call_frame_arm64(infix_arena_t * arena,
     if (!layout)
         return INFIX_ERROR_ALLOCATION_FAILED;
     // The return buffer must be large enough and aligned for any type.
+    if (context->return_type->size > INFIX_MAX_ARG_SIZE) {
+        *out_layout = nullptr;
+        return INFIX_ERROR_LAYOUT_FAILED;
+    }
     size_t return_size = (context->return_type->size + 15) & ~15;
     // The array of pointers that will be passed to the C dispatcher.
     size_t args_array_size = (context->num_args * sizeof(void *) + 15) & ~15;

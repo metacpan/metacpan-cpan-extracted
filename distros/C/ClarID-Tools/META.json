@@ -4,9 +4,9 @@
       "Manuel Rueda <mrueda@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -48,7 +48,7 @@
             "Types::Standard" : "2.004000",
             "YAML::XS" : "0.88",
             "namespace::autoclean" : "0.31",
-            "perl" : "5.036000"
+            "perl" : "5.032000"
          }
       },
       "test" : {
@@ -61,20 +61,9 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/CNAG-Biomedical-Informatics/clarid-tools/issues"
-      },
-      "homepage" : "https://github.com/CNAG-Biomedical-Informatics/clarid-tools",
-      "license" : [
-         "http://www.opensource.org/licenses/artistic-license-2.0"
-      ],
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/CNAG-Biomedical-Informatics/clarid-tools.git",
-         "web" : "https://github.com/CNAG-Biomedical-Informatics/clarid-tools"
-      }
+      "homepage" : "https://github.com/CNAG-Biomedical-Informatics/clarid-tools"
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [],
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

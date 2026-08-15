@@ -126,6 +126,18 @@ DLLEXPORT bitfield_t make_bitfield(uint32_t a, uint32_t b, uint32_t c, uint32_t 
     return v;
 }
 
+typedef struct {
+    uint32_t a : 16;
+    uint32_t b : 16;
+    uint32_t c : 16;
+    uint32_t d : 16;
+    uint8_t  tail;
+} trailing_bitfield_t;
+
+DLLEXPORT uint8_t check_trailing(trailing_bitfield_t v) {
+    return v.tail;
+}
+
 DLLEXPORT long long multi_arg_sum(
     long long a, long long b, long long c, long long d,
     long long e, long long f, long long g, long long h, long long i
@@ -174,6 +186,25 @@ subtest 'Bitfields' => sub {
     isa_ok my $make = wrap( $lib_path, 'make_bitfield', [ UInt32, UInt32, UInt32, UInt32 ] => $struct ), ['Affix'];
     my $res = $make->( 2, 4, 8, 16 );
     is $res, { a => 2, b => 4, c => 8, d => 16 }, 'make_bitfield returns correct hash';
+};
+subtest 'Bitfield trailing-unit marshalling' => sub {
+
+    # a,b,c,d : uint32 : 16 fill a trailing 4-byte storage unit at byte 4;
+    # `d` sits at bit offset 16 within that unit. Exercises the marshaller
+    # with a non-zero storage-unit base (bit_offset >= 8) and verifies a
+    # member following the bitfield area is left intact.
+    my $trailing = Struct [
+        a => UInt32,
+        16,                    # a : uint32 : 16
+        b    => UInt32, 16,    # b : uint32 : 16
+        c    => UInt32, 16,    # c : uint32 : 16
+        d    => UInt32, 16,    # d : uint32 : 16
+        tail => UInt8          # tail : uint8
+    ];
+    isa_ok my $check = wrap( $lib_path, 'check_trailing', [$trailing] => UInt8 ), ['Affix'];
+    is $check->( { a => 1, b => 2, c => 3, d => 4, tail => 0x5A } ), 0x5A, 'd (bit offset 16) marshals without disturbing the following member';
+    is $check->( { a => 0xFFFF, b => 0xFFFF, c => 0xFFFF, d => 0xFFFF, tail => 0x5A } ), 0x5A,
+        'max-value d (bit offset 16) marshals without disturbing the following member';
 };
 subtest 'Forward Call with Many Arguments' => sub {
     note 'Testing a C function with more arguments than available registers.';

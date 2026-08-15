@@ -63,13 +63,16 @@ sub _ft_untimer {
     return;
 }
 
+sub _ft_await {
+    my ($self, $f) = @_;
+    my $loop = $self->{loop};
+    $loop->loop_once until $f->is_ready;
+    return;
+}
+
 sub install_await {
     my ($self) = @_;
-    my $loop = $self->{loop};
-    $Fetch::Future::AWAIT = sub {
-        my ($f) = @_;
-        $loop->loop_once until $f->is_ready;
-    };
+    $Fetch::Future::AWAIT = sub { $self->_ft_await($_[0]) };
     return $self;
 }
 

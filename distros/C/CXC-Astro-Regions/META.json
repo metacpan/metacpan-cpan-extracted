@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -79,7 +79,7 @@
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Spelling" : "0.12",
+            "Test::Spelling" : "0.17",
             "Test::TrailingSpace" : "0.0203",
             "Test::Version" : "1"
          }
@@ -124,55 +124,59 @@
    "provides" : {
       "CXC::Astro::Regions" : {
          "file" : "lib/CXC/Astro/Regions.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Astro::Regions::CFITSIO" : {
          "file" : "lib/CXC/Astro/Regions/CFITSIO.pm",
-         "version" : "0.04"
-      },
-      "CXC::Astro::Regions::CFITSIO::Role::Region" : {
-         "file" : "lib/CXC/Astro/Regions/CFITSIO.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Astro::Regions::CFITSIO::Types" : {
          "file" : "lib/CXC/Astro/Regions/CFITSIO/Types.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Astro::Regions::CFITSIO::Variant" : {
          "file" : "lib/CXC/Astro/Regions/CFITSIO/Variant.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Astro::Regions::CIAO" : {
          "file" : "lib/CXC/Astro/Regions/CIAO.pm",
-         "version" : "0.04"
-      },
-      "CXC::Astro::Regions::CIAO::Role::Region" : {
-         "file" : "lib/CXC/Astro/Regions/CIAO.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Astro::Regions::CIAO::Types" : {
          "file" : "lib/CXC/Astro/Regions/CIAO/Types.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Astro::Regions::CIAO::Variant" : {
          "file" : "lib/CXC/Astro/Regions/CIAO/Variant.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Astro::Regions::DS9" : {
          "file" : "lib/CXC/Astro/Regions/DS9.pm",
-         "version" : "0.04"
+         "version" : "0.05"
+      },
+      "CXC::Astro::Regions::DS9::Annulus" : {
+         "file" : "lib/CXC/Astro/Regions/DS9.pm",
+         "version" : "0.05"
+      },
+      "CXC::Astro::Regions::DS9::Box" : {
+         "file" : "lib/CXC/Astro/Regions/DS9.pm",
+         "version" : "0.05"
+      },
+      "CXC::Astro::Regions::DS9::Ellipse" : {
+         "file" : "lib/CXC/Astro/Regions/DS9.pm",
+         "version" : "0.05"
       },
       "CXC::Astro::Regions::DS9::Role::Region" : {
          "file" : "lib/CXC/Astro/Regions/DS9.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Astro::Regions::DS9::Types" : {
          "file" : "lib/CXC/Astro/Regions/DS9/Types.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CXC::Astro::Regions::DS9::Variant" : {
          "file" : "lib/CXC/Astro/Regions/DS9/Variant.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -187,9 +191,9 @@
          "web" : "https://codeberg.com/CXC-Optics/p5-CXC-Astro-Regions"
       }
    },
-   "version" : "0.04",
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.42.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

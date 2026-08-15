@@ -13,13 +13,13 @@ WriteMakefile(
     NAME          => 'ClarID::Tools',
     ABSTRACT_FROM => 'lib/ClarID/Tools.pm',
     AUTHOR        => q{Manuel Rueda <mrueda@cpan.org>},
-    LICENSE       => 'perl',
+    LICENSE       => 'artistic_2',
+    MIN_PERL_VERSION => '5.032000',
     VERSION_FROM  => 'lib/ClarID/Tools.pm',
     META_MERGE    => {
         'dynamic_config' => 0,
         'meta-spec' => { version   => 0 },
         'no_index'  => { directory => [qw(docs t nb)] },
-        'prereqs'   => { runtime   => { requires => { perl => '5.036000' } } },
         'resources' => {
             bugtracker => { web => "$GITHUB_URL/issues" },
             homepage   => $GITHUB_URL,

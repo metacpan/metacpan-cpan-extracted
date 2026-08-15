@@ -8,6 +8,8 @@
 !.claude/settings.local.json
 !.claude/agents/
 !.claude/agents/**
+!.claude/rules/
+!.claude/rules/**
 !.claude/skills/
 !.claude/skills/**
 !.claude/hooks/
@@ -29,9 +31,14 @@
 .build/
 _build/
 blib/
+/Build
+/Makefile
 /pm_to_blib
 /MANIFEST
 /MANIFEST.bak
+/MYMETA.*
+*.o
+*.bs
 
 # Generated metadata
 /META.json
@@ -42,6 +49,8 @@ blib/
 
 # Release artifacts (Dist-Name-X.Y.Z)
 [Dd]ist-*/
+Langertha-Knarr-*/
+*.tar.gz
 
 # Carton / Dependency Manager
 /local/
@@ -53,6 +62,7 @@ blib/
 *.swo
 *.bak
 *.old
+*~
 .vscode/
 .idea/
 .history/
@@ -60,44 +70,24 @@ blib/
 
 # OS
 .DS_Store
+Thumbs.db
 
 # Environment
 .env
+.env.*
 .envrc
-# Dist::Zilla build artifacts
-Langertha-Knarr-*/
-*.tar.gz
-/.build/
-
-# Perl artifacts
-/blib/
-/_build/
-/Build
-/Makefile
-/MYMETA.*
-/pm_to_blib
-/MANIFEST.bak
-*.o
-*.bs
-*.sw[op]
+!.env.example
 
 # Local/test configs
 knarr.yaml
-.env
-.env.*
-!.env.example
 
 # Docker
 docker-compose.override.yml
 docker-compose.override.yaml
 
-# IDE / editor
-.vscode/
-.idea/
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
+# Devcontainer
 .devcontainer.json
+
+# karr materialized task view -- never commit
+tasks/
+config.yml

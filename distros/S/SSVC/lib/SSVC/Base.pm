@@ -131,7 +131,7 @@ sub to_vector_string {
         $prefix = uc $self->METADATA->{key};
     }
 
-    my $now     = Time::Piece->new->to_gmtime->datetime;
+    my $now     = Time::Piece->gmtime->datetime;
     my @vectors = (map { join ':', $_, $self->{vector}->{$_} || Carp::croak 'Missing metric' } @{$self->VECTOR});
 
     return join '/', "${prefix}v1", @vectors, "${now}.000Z";

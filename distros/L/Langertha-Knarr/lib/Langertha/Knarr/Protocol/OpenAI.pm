@@ -1,7 +1,7 @@
 package Langertha::Knarr::Protocol::OpenAI;
 # ABSTRACT: OpenAI-compatible wire protocol (chat/completions, models) for Knarr
 
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 use Moose;
 use JSON::MaybeXS;
 use Time::HiRes qw( time );
@@ -114,7 +114,7 @@ Langertha::Knarr::Protocol::OpenAI - OpenAI-compatible wire protocol (chat/compl
 
 =head1 VERSION
 
-version 1.100
+version 1.101
 
 =head1 DESCRIPTION
 

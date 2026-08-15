@@ -241,7 +241,7 @@ sub to_vector_string {
 
     my $self = shift;
 
-    my $now     = Time::Piece->new->to_gmtime->datetime;
+    my $now     = Time::Piece->gmtime->datetime;
     my @vectors = (map { join ':', $_, $self->{vector}->{$_} || Carp::croak 'Missing metric' } qw[E A T P B M D]);
 
     return join '/', 'SSVCv2', @vectors, "${now}.000Z";

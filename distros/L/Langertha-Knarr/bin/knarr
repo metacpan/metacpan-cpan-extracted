@@ -18,7 +18,7 @@ knarr - Langertha LLM Proxy with Langfuse Tracing
 
 =head1 VERSION
 
-version 1.100
+version 1.101
 
 =head1 SYNOPSIS
 
@@ -37,8 +37,9 @@ version 1.100
 =head1 DESCRIPTION
 
 C<knarr> is the command-line interface for L<Langertha::Knarr>, an LLM proxy
-that accepts requests in OpenAI, Anthropic, or Ollama format, routes them to
-any Langertha backend engine, and traces everything via Langfuse.
+that accepts requests in OpenAI, Anthropic, Ollama, A2A, ACP, or AG-UI
+format, routes them to any Langertha backend engine, and traces everything
+via Langfuse.
 
 See L<Langertha::Knarr> for full documentation including Docker usage, config
 file format, routing behaviour, and environment variable reference.
@@ -96,6 +97,16 @@ Number of worker processes. Defaults to C<1>.
 =item B<-n>, B<--trace-name> I<name>
 
 Langfuse trace name. Overrides C<KNARR_TRACE_NAME> and the config file.
+
+=item B<--log-file> I<path>
+
+JSONL log file path for request logging. Overrides C<KNARR_LOG_FILE> and
+the config file.
+
+=item B<--log-dir> I<path>
+
+Directory for per-request JSON log files. Overrides C<KNARR_LOG_DIR> and
+the config file.
 
 =back
 

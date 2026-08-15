@@ -16,28 +16,24 @@ use Data::Identifier v0.34;
 use Data::Identifier::Generate;
 use Data::Displaycolour;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
-use parent qw(Data::Identifier::Interface::Known Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Simple);
+use parent qw(Data::Identifier::Interface::Known Lingua::Generic::Interface::Word);
 
 use constant {
     WK_WORD_GENERATOR => Data::Identifier->new(uuid => '45823114-5f38-47d8-a749-2e7f3ec819c3', tagname => 'toki-pona-word-generator')->register,
     WK_WORD_NAMESPACE => Data::Identifier->new(uuid => '8d043e5e-b7da-4a37-a87a-26bb361288a1', tagname => 'toki-pona-word-namespace')->register,
     WK_WORD_TYPE      => Data::Identifier->new(uuid => 'baf7bee1-0889-4a84-afc2-4904857d0571', tagname => 'toki-pona-word')->register,
+    WK_LT_TOK         => Data::Identifier->new(uuid => 'f21986c8-baa1-5b7e-b357-2a76285c4778', displayname => 'Toki Pona', request => 'tok')->register,
 };
-
-use overload (
-    '""'    => \&as_string,
-    'eq'    => sub {  $_[0]->eq($_[1]) },
-    'ne'    => sub { !$_[0]->eq($_[1]) },
-    'cmp'   => sub {  $_[0]->cmp($_[1]) },
-);
 
 my %_words;
 my %_by_ise;
 my %_by_ucsur;
 
-__PACKAGE__->_new($_) foreach qw(
+__PACKAGE__->_new($_) foreach (
+    # NOTE: Each list only contains the words not already in one of the lists above it.
+    qw(
     a kin akesi ala alasa ale ali anpa ante anu awen e en esun ijo ike ilo insa jaki jan
     jelo jo kala kalama kama kasi ken kepeken kili kiwen ko kon kule kulupu kute la lape
     laso lawa len lete li lili linja lipu loje lon luka lukin oko lupa ma mama mani meli
@@ -45,6 +41,17 @@ __PACKAGE__->_new($_) foreach qw(
     open pakala pali palisa pan pana pi pilin pimeja pini pipi poka poki pona pu sama seli
     selo seme sewi sijelo sike sin namako sina sinpin sitelen sona soweli suli suno supa suwi
     tan taso tawa telo tenpo toki tomo tu unpa uta utala walo wan waso wawa weka wile
+    ),
+    qw(kijetesantakalu kin kipisi ku leko misikeke monsuta n soko tonsi), # Common
+    qw(epiku jasima lanpan linluwi majuna meso nimisin su), # Uncommon
+    qw(
+    apeja isipin jami kamalawala kapesi kiki kokosila konwe kulijo melome mijomi misa nja
+    ojuta oke omekapo owe pake penpo pika po powe puwa san soto sutopatikuna taki te teje
+    to unu usawi wa wasoweli wekama wuwojiti yupekosi
+    ), # Obscure
+    qw(suke toma), # Typo
+    qw(ete ewe kan ke kese kuntu likujo loka mulapisu neja pata peto polinpin pomotolo samu tuli umesu waleja), # nimi ku lili
+    qw(ju lu nu u), # Reserved words
 );
 
 __PACKAGE__->new(string => $_)->{class}{stopword} = 1 foreach qw(a kin anu e en la li o pi seme);
@@ -264,6 +271,11 @@ sub new {
                 return $value;
             } elsif ($value->isa('Data::Identifier')) {
                 $type = 'Data::Identifier';
+            } elsif ($value->isa('Lingua::famibeib::Word')) {
+                $value = $value->as(__PACKAGE__);
+                return $value if scalar(@opts) == 0;
+                $value = $value->as('Data::Identifier');
+                $type = 'Data::Identifier';
             } else {
                 $type = 'Data::Identifier';
                 $value = Data::Identifier->new(from => $value);
@@ -291,10 +303,7 @@ sub new {
 }
 
 
-sub as_string {
-    my ($self, @opts) = @_;
-    return $self->{string};
-}
+# NOTE: Implemented via Lingua::Generic::Interface::Word
 
 
 sub ucsur {
@@ -321,41 +330,10 @@ sub ucsur {
 }
 
 
-sub eq {
-    my ($self, $other, @opts) = @_;
-
-    croak 'Stray options passed' if scalar @opts;
-
-    return 1 if !defined($self) && !defined($other);
-    return undef unless defined($self) && defined($other);
-
-    $self  = __PACKAGE__->new(from => $self) unless eval {$self->isa(__PACKAGE__)};
-    $other = __PACKAGE__->new(from => $other) unless eval {$other->isa(__PACKAGE__)};
-
-    return $self->as_string eq $other->as_string;
-}
+# NOTE: Implemented via Lingua::Generic::Interface::Word
 
 
-sub cmp {
-    my ($self, $other, @opts) = @_;
-
-    croak 'Stray options passed' if scalar @opts;
-
-    return 1 if !defined($self) && !defined($other);
-    return undef unless defined($self) && defined($other);
-
-    $self  = __PACKAGE__->new(from => $self) unless eval {$self->isa(__PACKAGE__)};
-    $other = __PACKAGE__->new(from => $other) unless eval {$other->isa(__PACKAGE__)};
-
-    {
-        my $str_self  = $self->as_string;
-        my $str_other = $other->as_string;
-
-        return $str_self cmp $str_other;
-    }
-
-    croak 'BUG!';
-}
+# NOTE: Implemented via Lingua::Generic::Interface::Word
 
 
 sub has_type {
@@ -370,6 +348,12 @@ sub has_type {
     return WK_WORD_TYPE if !defined($as) || WK_WORD_TYPE->isa($as);
 
     return WK_WORD_TYPE->as($as, so => $self);
+}
+
+
+sub natural_language {
+    my ($self) = @_;
+    return WK_LT_TOK;
 }
 
 # ---- Overridden methods ----
@@ -408,22 +392,27 @@ sub as {
     my ($self, $as, @opts) = @_;
     my Data::Identifier $id = $self->{id};
 
-    return $id if $as eq 'Data::Identifier' && scalar(@opts) == 0;
+    if (scalar(@opts) == 0) {
+        return $self if $self->isa($as);
+        return $id if $as eq 'Data::Identifier';
+
+        if ($as eq 'Lingua::famibeib::Word') {
+            require Lingua::famibeib::Word;
+            return Lingua::famibeib::Word->new(from => $self);
+        }
+    }
+
     return $id->as($as, @opts);
 }
 
-sub displayname {
-    my ($self, @opts) = @_;
-    return $self->as_string if scalar(@opts) == 0;
-    return $self->{id}->displayname(@opts);
-}
+sub ise { goto &Data::Identifier::Interface::Simple::ise } # overridden using tail-call
 
 sub _known_provider {
     my ($pkg, $class, %opts) = @_;
 
     croak 'Unsupported options passed' if scalar(keys %opts);
 
-    if ($class eq 'words') {
+    if ($class eq 'word' || $class eq 'words') {
         return ([values %_words], rawtype => __PACKAGE__);
     } elsif ($class eq 'stopword') {
         return ([grep {$_->{class}{$class}} values %_words], rawtype => __PACKAGE__);
@@ -432,6 +421,7 @@ sub _known_provider {
                 values(%_words),
                 WK_WORD_GENERATOR, WK_WORD_NAMESPACE,
                 WK_WORD_TYPE,
+                WK_LT_TOK,
             ], rawtype => 'Data::Identifier::Interface::Simple');
     }
 
@@ -452,7 +442,7 @@ Lingua::TokiPona::Word - module to interact with the words of Toki Pona
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -463,9 +453,10 @@ version v0.02
     say $word->as_string;
 
 This module inherits from
-L<Data::Identifier::Interface::Known>,
-L<Data::Identifier::Interface::Simple>,
-and L<Data::Identifier::Interface::Subobjects>.
+L<Lingua::Generic::Interface::Word> (since v0.03),
+L<Data::Identifier::Interface::Known> (since v0.01),
+L<Data::Identifier::Interface::Simple> (since v0.01),
+and L<Data::Identifier::Interface::Subobjects> (since v0.01).
 
 =head1 OVERVIEW
 
@@ -545,6 +536,8 @@ Accepts the numerical code point or standard Unicode notation (C<U+xxxx>).
 
 Returns the string representation of the word.
 
+See also: L<Lingua::Generic::Interface::Word/as_string>.
+
 =head2 ucsur
 
     my $ucsur = $word->ucsur( [ %opts ] );
@@ -592,6 +585,8 @@ L</new> with the type C<from> is used.
 
 The operators L<perlop/eq> and L<perlop/ne> are overloaded to this method.
 
+See also: L<Lingua::Generic::Interface::Word/eq>.
+
 =head2 cmp
 
     my $val = $word->cmp($other); # $word must be non-undef
@@ -620,6 +615,8 @@ The order is stable
 The order is the same for C<$a-E<gt>cmp($b)> as for C<- $b-E<gt>cmp($a)>.
 
 =back
+
+See also: L<Lingua::Generic::Interface::Word/cmp>.
 
 =head2 has_type
 
@@ -651,6 +648,19 @@ This option is accepted but ignored.
 
 =back
 
+=head2 natural_language
+
+    my Data::Identifier $natural_language = $word->natural_language;
+
+(since v0.03)
+
+Returns the natural language this word is in.
+
+For Toki Pona words it will always return Toki Pona.
+However this method might be useful together with other modules from the C<Lingua> namespace.
+
+See also: L<Lingua::Generic::Interface::Word/natural_language>.
+
 =head2 known
 
     my @list = Lingua::TokiPona::Word->known($class [, %opts ] );
@@ -671,11 +681,17 @@ The following classes are supported:
 
 Returns all known things.
 
-=item C<words>
+=item C<word>
 
-(since v0.02)
+(since v0.03)
 
 Returns all known words.
+
+=item C<words>
+
+(since v0.02, deprecated since 0.03)
+
+Deprecated alias for C<word>.
 
 =item C<stopword>
 
