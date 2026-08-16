@@ -27,13 +27,13 @@
       },
       "configure" : {
          "requires" : {
-            "Colouring::In::XS" : "0",
+            "Colouring::In::XS" : "0.11",
             "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Colouring::In::XS" : "0",
+            "Colouring::In::XS" : "0.11",
             "perl" : "5.010"
          }
       },
@@ -44,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

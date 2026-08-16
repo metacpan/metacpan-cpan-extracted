@@ -42,16 +42,12 @@
 #else
 #  include <io.h>
 #  include <direct.h>
-#  ifdef __MINGW32__
-/* opendir/readdir/closedir are hidden behind __STRICT_ANSI__ with -std=c99;
- * request POSIX extensions explicitly. */
-#    ifndef _XOPEN_SOURCE
-#      define _XOPEN_SOURCE 700
-#    endif
-#    include <dirent.h>
-#  else
-#    include "dirent_win.h"  /* MSVC needs a compat header */
-#  endif
+/* Every Windows toolchain takes the FindFirstFile compat header, MinGW
+ * included: MinGW's own <dirent.h> hides struct dirent and
+ * opendir/readdir/closedir behind __STRICT_ANSI__ under -std=c99, and a
+ * feature macro defined this late (perl.h already pulled the libc
+ * headers) cannot bring them back - Strawberry's smokers proved it. */
+#  include "dirent_win.h"
 #  ifndef S_ISREG
 #    define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
 #  endif

@@ -1,7 +1,134 @@
 # Syntax file for bash
 # Converted from: bash.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: bash
 extensions: bash
+
+[keyword:Conditional]
+elif else in then
+
+[keyword:Error]
+elif else then
+
+[keyword:Function]
+function namespace
+
+[keyword:PreProc]
+CDPATH COLUMNS EDITOR ENV ERRNO FCEDIT FPATH HISTFILE HISTSIZE HOME IFS LINENO
+LINES MAIL MAILCHECK MAILPATH OLDPWD OPTARG OPTIND PATH PPID PS1 PS2 PS3 PS4
+PWD RANDOM REPLY SECONDS SHELL TMOUT VISUAL
+
+[keyword:Statement]
+autoload bg bind break builtin caller cat cd chdir chmod clear command compgen
+complete compopt compound continue cp daemon declare dirs disown du egrep
+enable enum eval exec exit export expr false fc fg fgrep find float functions
+getconf getopts gnufind gnugrep grep hash head help hist history integer jobs
+kill killall killproc less let local login logout ls mapfile mkdir mv nameref
+newgrp nice nohup popd printenv printf pushd pwd r read readarray readonly
+redirect reload restart return rm rmdir rpm sed setgroups setsenv shift shopt
+sleep sort source start status stop strip stty suspend tail test time times
+tput trap true type typeset ulimit umask unalias wait whence
+
+[keyword:Todo]
+COMBAK FIXME TODO XXX
+
+[match:Statement]
+pattern: \balias\b
+
+[match:Error]
+pattern: \bdone\b
+
+[match:Error]
+pattern: \bfi\b
+
+[match:Error]
+pattern: \bin\b
+
+[match:Error]
+pattern: ;;
+
+[match:Error]
+pattern: \besac\b
+
+[match:Error]
+pattern: }
+
+[match:Error]
+pattern: ]]
+
+[match:Error]
+pattern: ]
+
+[match:Operator]
+pattern: \d?>(?:&[-0-9])?
+
+[match:Operator]
+pattern: \d?>>-?
+
+[match:Operator]
+pattern: \d?<(?:&[-0-9])?
+
+[match:Operator]
+pattern: \d<<-?
+
+[match:Operator]
+pattern: <<|>>
+
+[match:Operator]
+pattern: [!&;|]
+
+[match:Operator]
+pattern: \[[[^:]|\]]
+
+[match:Operator]
+pattern: [-=/*+%]?=
+
+[match:Operator]
+pattern: \\$
+
+[match:Operator]
+pattern: ^\.\s
+
+[match:Operator]
+pattern: \s\.\s
+
+[match:Number]
+pattern: \b\d+\b#?
+
+[match:Number]
+pattern: \b-?\.?\d+\b#?
+
+[match:Special]
+pattern: \\\d\d\d|\\[abcfnrtv0]
+
+[match:Special]
+pattern: [^[:print:] \t]
+
+[match:Statement]
+pattern: ^\s*set\s+$
+
+[match:Statement]
+pattern: ^\s*set\s+$
+
+[match:Error]
+pattern: [^}$[~]
+
+[region:Special]
+start: \$((
+end: ))
+escape: \
+
+[region:Special]
+start: \$\[
+end: \]
+escape: \
+
+[region:Special]
+start: \$(
+end: )
+
+[region:String]
+start: '
+end: '
 

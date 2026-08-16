@@ -1,6 +1,6 @@
 # Syntax file for bc
 # Converted from: bc.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: bc
 extensions: bc

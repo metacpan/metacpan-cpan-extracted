@@ -1,0 +1,22 @@
+<doc page-size="A4" margin="40" columns="1">
+  <style h1="size:20;line-height:24;colour:#12263a" h2="size:13;line-height:16;colour:#12263a" text="size:10;line-height:13" />
+  <header>{% report.title %}</header>
+  <footer>{% report.period %}</footer>
+
+  <h1>{% report.title %}</h1>
+  <text colour="#555555">{% report.summary %}</text>
+  <hr />
+
+  <h2>Figures</h2>
+  <table>
+    <tr><th weight="3">Measure</th><th align="right">This period</th><th align="right">Last period</th><th align="right">Change</th></tr>
+    {% for m in metrics %}
+    <tr><td>{% m.name %}</td><td align="right">{% m.now %}</td><td align="right">{% m.before %}</td><td align="right">{% m.change %}</td></tr>
+    {% end %}
+  </table>
+
+  <h2>Notes</h2>
+  {% for n in notes %}
+  <text spacing="4">{% n %}</text>
+  {% end %}
+</doc>

@@ -1,5 +1,5 @@
 package Kubernetes::REST::AuthToken;
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 # ABSTRACT: Kubernetes API authentication token
 use Moo;
 use Types::Standard qw/Str/;
@@ -22,7 +22,7 @@ Kubernetes::REST::AuthToken - Kubernetes API authentication token
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,8 @@ version 1.106
 =head1 DESCRIPTION
 
 Authentication credentials for Kubernetes API requests using bearer token authentication.
+
+L<Kubernetes::REST>'s C<credentials> attribute accepts an instance of this class, a plain hashref (coerced into one automatically), or any other object that implements a C<token()> method.
 
 =head2 token
 
@@ -71,7 +73,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

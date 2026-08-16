@@ -1,6 +1,6 @@
 # Syntax file for rebol
 # Converted from: rebol.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: rebol
 extensions: rebol
@@ -71,4 +71,12 @@ pattern: [<>=]=?
 
 [match:Operator]
 pattern: <>
+
+[region:String]
+start: "
+end: "
+
+[region:Number]
+start: \d*#{
+end: }
 

@@ -205,4 +205,48 @@ subtest 'CLI V# finds uppercase V rc filename' => sub {
     is($exit, 0, 'exit code is 0');
 };
 
+subtest 'an @INC hook survives the dev-lib re-exec' => sub {
+    my $tdir = tempdir(CLEANUP => 1);
+
+    # A dev-lib flag in the rc file makes the script re-exec itself. PERL5OPT
+    # reinstalls the hook in the new process, so it must still be in @INC once
+    # the script has finished setting @INC up. Carmel works exactly this way,
+    # and its modules are reachable through nothing else.
+    my $rcfile = File::Spec->catfile($tdir, '.yath.v0.rc');
+    open(my $rcfh, '>', $rcfile) or die "Cannot write $rcfile: $!";
+    print $rcfh "-D\n";
+    close($rcfh) or die "Cannot close $rcfile: $!";
+
+    my $probe = File::Spec->catfile($tdir, 'HookProbe.pm');
+    open(my $pfh, '>', $probe) or die "Cannot write $probe: $!";
+    print $pfh <<'EOT';
+package HookProbe;
+use strict;
+use warnings;
+
+# Fully qualified on purpose: perl compiles a bare `sub INC` into main::
+# no matter which package is current, so the method would never be found.
+sub HookProbe::INC { return }
+
+unshift @INC, bless({}, __PACKAGE__);
+
+END {
+    print "HOOKS: " . scalar(grep { ref $_ } @INC) . "\n";
+    print "CORPSES: " . scalar(grep { !ref($_) && m/HookProbe=HASH\(/ } @INC) . "\n";
+}
+
+1;
+EOT
+    close($pfh) or die "Cannot close $probe: $!";
+
+    local $ENV{PERL5OPT} = "-I$tdir -MHookProbe";
+    my ($output, $exit) = run_yath_in($tdir, 'hook_arg');
+
+    like($output, qr/^RUNTIME: hook_arg$/m, 'runtime arg processed');
+    like($output, qr/^HOOKS: 1$/m,          'hook is still in @INC after the re-exec');
+    like($output, qr/^CORPSES: 0$/m,        'no stringified hook was put into @INC');
+
+    is($exit, 0, 'exit code is 0');
+};
+
 done_testing;

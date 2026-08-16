@@ -4,30 +4,23 @@ author:
   - 'Ben Hutton (@relequestual) <relequest@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
   JSON::PP: '4.11'
-  Scalar::Util: '0'
   Test2::Suite: '0.000131'
   Test2::Tools::Exception: '0'
   Test2::V0: '0'
   Test2::Warnings: '0'
   Test::Deep: '0'
   Test::File::ShareDir: '0'
-  Test::More: '0'
   Test::Simple: '1.302176'
-  Tie::Hash: '0'
   builtin::compat: '0'
-  lib: '0'
-  open: '0'
   perl: '5.020'
-  utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
   Text::ParseWords: '0'
   perl: '5.020'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -43,43 +36,35 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '1.037'
+    version: '1.038'
 requires:
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
   Git::Wrapper: '0'
   JSON::PP: '4.11'
   List::Util: '1.33'
-  Mojo::JSON: '0'
   Mojolicious: '7.87'
   Moo: '0'
   MooX::TypeTiny: '0.002002'
   Path::Tiny: '0.069'
-  Ref::Util: '0'
-  Test2::API: '0'
   Test2::Todo: '0'
-  Test2::Tools::Compare: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '1.016003'
   autovivification: '0'
-  constant: '0'
   experimental: '0'
-  feature: '0'
   if: '0'
   namespace::clean: '0'
   perl: '5.020'
   stable: '0.031'
-  strict: '0'
   strictures: '2'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '1.037'
+version: '1.038'
 x_Dist_Zilla:
   perl:
-    version: '5.043007'
+    version: '5.045001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeBuild
@@ -150,7 +135,7 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Author::ETHER/pluginbundle version'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -167,7 +152,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FileFinder::ByName
       name: '@Author::ETHER/Examples'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -191,23 +176,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ETHER/MetaYAML'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::ETHER/MetaJSON'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::ETHER/Readme'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::ETHER/Manifest'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::ETHER/License'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::GenerateFile::FromShareDir
       config:
@@ -223,12 +208,12 @@ x_Dist_Zilla:
           repo_root: .
           version: '0.009'
       name: '@Author::ETHER/generate CONTRIBUTING'
-      version: '0.015'
+      version: '0.016'
     -
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: '@Author::ETHER/InstallGuide'
       version: '1.200014'
@@ -281,7 +266,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaTests
       name: '@Author::ETHER/MetaTests'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Changes
       config:
@@ -304,7 +289,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ETHER/PodSyntaxTests'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe
       config:
@@ -401,8 +386,8 @@ x_Dist_Zilla:
               name: '@Author::ETHER/Name'
               version: '4.020'
             -
-              class: Pod::Weaver::Section::Version
-              name: '@Author::ETHER/Version'
+              class: Pod::Weaver::Section::GenerateSection
+              name: '@Author::ETHER/generate VERSION'
               version: '4.020'
             -
               class: Pod::Weaver::Section::Region
@@ -497,7 +482,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::ETHER/MetaNoIndex'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -508,7 +493,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: ':InstallModules'
-              version: '6.036'
+              version: '6.037'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -516,14 +501,14 @@ x_Dist_Zilla:
           inherit_version: 0
           meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: '@Author::ETHER/MetaProvides::Package'
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::ETHER/MetaConfig'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Keywords
       config:
@@ -541,7 +526,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::ETHER/AutoPrereqs'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Prereqs::AuthorDeps
       name: '@Author::ETHER/Prereqs::AuthorDeps'
@@ -556,7 +541,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
       name: '@Author::ETHER/MakeMaker'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -567,7 +552,7 @@ x_Dist_Zilla:
           order_by: commits
           paths: []
       name: '@Author::ETHER/Git::Contributors'
-      version: '0.038'
+      version: '0.039'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -590,7 +575,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: '@Author::ETHER/CheckSelfDependency'
       version: '0.011'
@@ -628,7 +613,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20260119'
+          Module::CoreList: '5.20260803'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -664,7 +649,7 @@ x_Dist_Zilla:
           git_version: 2.52.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
@@ -672,7 +657,7 @@ x_Dist_Zilla:
           git_version: 2.52.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Git::Remote::Check
       name: '@Author::ETHER/Git::Remote::Check'
@@ -684,7 +669,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::ETHER/TestRelease'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -706,7 +691,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::ETHER/UploadToCPAN'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -734,7 +719,7 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Author::ETHER/@Git::VersionManager/pluginbundle version'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -792,9 +777,9 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.037
+          tag: v1.038
           tag_format: v%V
-          tag_message: v%v%t
+          tag_message: v%v%t%n%n%c
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.52.0
           repo_root: .
@@ -816,7 +801,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::ETHER/@Git::VersionManager/NextRelease'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -846,7 +831,7 @@ x_Dist_Zilla:
           phase: x_Dist_Zilla
           type: requires
       name: '@Author::ETHER/@Git::VersionManager/prereqs for @Git::VersionManager'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -891,7 +876,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::ETHER/ConfirmRelease'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -899,7 +884,7 @@ x_Dist_Zilla:
           phase: x_Dist_Zilla
           type: requires
       name: '@Author::ETHER/prereqs for @Author::ETHER'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -907,7 +892,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: RuntimeRequires
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -915,7 +900,7 @@ x_Dist_Zilla:
           phase: runtime
           type: suggests
       name: RuntimeSuggests
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -923,63 +908,85 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::DynamicPrereqs
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: DynamicPrereqs
       version: '0.040'
     -
+      class: Dist::Zilla::Plugin::RemovePrereqs
+      config:
+        Dist::Zilla::Plugin::RemovePrereqs:
+          modules_to_remove:
+            - B
+            - File::Spec
+            - Mojo::JSON
+            - Scalar::Util
+            - Test2::API
+            - Test2::Tools::Compare
+            - Test::More
+            - Tie::Hash
+            - constant
+            - feature
+            - lib
+            - open
+            - strict
+            - utf8
+            - warnings
+      name: RemovePrereqs
+      version: '6.037'
+    -
       class: Dist::Zilla::Plugin::GenerateFile
       name: submodule_status
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: ShareDir
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.036'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::VerifyPhases
       name: '@Author::ETHER/PHASE VERIFICATION'
@@ -988,12 +995,12 @@ x_Dist_Zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.036'
+    version: '6.037'
 x_authority: cpan:RELEQUEST
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Daniel Perrett <dp13@sanger.ac.uk>'
-x_generated_by_perl: v5.43.7
+x_generated_by_perl: v5.45.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT
 x_static_install: 0

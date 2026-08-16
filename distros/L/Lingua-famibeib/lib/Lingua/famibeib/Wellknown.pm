@@ -13,16 +13,17 @@ use warnings;
 
 use Carp;
 use Lingua::famibeib::Word;
+use Lingua::famibeib::Modifier;
 use Lingua::famibeib::Prefix; # This will also load some prefixes
 use Data::Identifier::Util;
 use Data::Displaycolour v0.07;
 use Data::IconText v0.06;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 use parent qw(Data::Identifier::Interface::Known);
 
-my @_wellknown = map {Lingua::famibeib::Word->new(from => $_)->register} (
+my @_wellknown_words = map {Lingua::famibeib::Word->new(from => $_)->register} (
     (map {$_, $_.'ab'} qw(baba babe babi  bafa bafe bafi bafo  baka bake baki bako baku)), # Pronouns
     (map {Lingua::famibeib::Word->new(number => $_)} -1 .. 32), # Numbers
     (qw(fokiba fokibe fokibi  fokifa fokife fokifi  fokika fokike fokiki fokiko  fokila)), # Colours
@@ -33,6 +34,14 @@ my @_wellknown = map {Lingua::famibeib::Word->new(from => $_)->register} (
                                     fama fame fami famo famu  fasa fase fasi faso fasu  fata fate fati fato fatu)), # Common Verbs
     (map {     $_,      $_.'am'} qw(fababa fababe fababi fababo fababu  fabafa fabafe fabafi  fabaka fabake)), # Relatives
     (map {     $_,      $_.'am'} qw(fabala fabale fabali fabalu  fabama fabame  fabasa fabase fabasi fabaso fabasu)), # Other Persons
+);
+
+my @_wellknown_modifiers = map {Lingua::famibeib::Modifier->new(from => $_)->register} (
+    qw(ab eb ib ub  af ef  ak ek ok uk  al il ol  am em im),
+);
+
+my @_wellknown_prefixs = map {Lingua::famibeib::Prefix->new(string => $_)->register} (
+    qw(ba be  fa fe fi fo fu  ta to tu),
 );
 
 my %_concept = (
@@ -76,7 +85,21 @@ my %_concept = (
     #fabakeam    => '',
 );
 
-foreach my Lingua::famibeib::Word $word (@_wellknown) {
+my @_wellknown_extra = (
+    Lingua::famibeib::Word->natural_language, # force load
+    Data::Identifier::Util->register_generator(
+        'e2afa39e-fd57-45f8-89fd-8662b275cc68',
+        namespace   => '10ce38bf-6238-4ed7-96ef-98ea9642a4c6',
+        style       => 'id-based',
+    ),
+    Data::Identifier::Util->register_generator(
+        '306baa6e-e672-4327-a6b4-ba1d3de89a1e',
+        namespace   => '5c2b24f0-e0d9-4746-bd72-0d07061d0dd7',
+        style       => 'id-based',
+    ),
+);
+
+foreach my Lingua::famibeib::Word $word (@_wellknown_words) {
     my $id = $word->as('Data::Identifier')->register;
     my $str = $word->as_string;
     my $concept;
@@ -88,31 +111,28 @@ foreach my Lingua::famibeib::Word $word (@_wellknown) {
 
     $concept->register;
 
+    push(@_wellknown_extra, $concept);
+
     foreach my $obj ($word, $id) {
         $obj->Data::Displaycolour::mark(for => $concept);
         $obj->Data::IconText::mark(for => $concept);
     }
 }
 
-Lingua::famibeib::Word->natural_language; # force load
-
-Data::Identifier::Util->register_generator(
-    'e2afa39e-fd57-45f8-89fd-8662b275cc68',
-    namespace   => '10ce38bf-6238-4ed7-96ef-98ea9642a4c6',
-    style       => 'id-based',
-);
-Data::Identifier::Util->register_generator(
-    '306baa6e-e672-4327-a6b4-ba1d3de89a1e',
-    namespace   => '5c2b24f0-e0d9-4746-bd72-0d07061d0dd7',
-    style       => 'id-based',
-);
-
 # ---- Private helpers ----
 
 sub _known_provider {
     my ($pkg, $class, %opts) = @_;
     croak 'Unsupported options passed' if scalar(keys %opts);
-    return (\@_wellknown, rawtype => 'Lingua::famibeib::Word') if $class eq ':all';
+    if ($class eq 'word') {
+        return (\@_wellknown_words, rawtype => 'Lingua::famibeib::Word');
+    } elsif ($class eq 'modifier') {
+        return (\@_wellknown_modifiers, rawtype => 'Lingua::famibeib::Modifier');
+    } elsif ($class eq 'prefix') {
+        return (\@_wellknown_prefixs, rawtype => 'Lingua::famibeib::Prefix');
+    } elsif ($class eq ':all') {
+        return ([@_wellknown_words, @_wellknown_modifiers, @_wellknown_prefixs, @_wellknown_extra], rawtype => 'Data::Identifier::Interface::Simple');
+    }
     croak 'Unsupported class';
 }
 
@@ -130,7 +150,7 @@ Lingua::famibeib::Wellknown - database of famibeib words
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -146,6 +166,28 @@ This module inherits from L<Data::Identifier::Interface::Known>.
 B<Note:>
 This package might also register L<Data::Identifier> objects related to the words.
 Depending on the usecase results might improve if L<Data::Identifier::Wellknown> is also loaded.
+
+=head1 CLASSES
+
+The following classes are supported:
+
+=head2 :all
+
+All objects known by this module.
+This includes all from the other classes.
+It may also contain additional entries.
+
+=head2 word
+
+All words known to this module.
+
+=head2 modifier
+
+All modifiers known to this module.
+
+=head2 prefix
+
+All prefixes known to this module.
 
 =head1 AUTHOR
 

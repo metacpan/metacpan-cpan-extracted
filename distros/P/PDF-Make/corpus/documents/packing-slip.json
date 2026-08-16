@@ -1,0 +1,26 @@
+{
+   "order" : {
+      "lines" : [
+         {
+            "name" : "Widget, standard",
+            "ordered" : 50,
+            "packed" : 50
+         },
+         {
+            "name" : "Widget, reinforced",
+            "ordered" : 25,
+            "packed" : 20
+         },
+         {
+            "name" : "Mounting kit",
+            "ordered" : 5,
+            "packed" : 5
+         }
+      ],
+      "note" : "One item is on back order and will follow separately.",
+      "number" : "SO-88213",
+      "packer" : "D. Patel",
+      "placed" : "28 August 2026",
+      "ship_to" : "Beta Industries, 14 Long Lane, Manchester M1 4AB"
+   }
+}

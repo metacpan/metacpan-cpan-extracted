@@ -1,0 +1,7 @@
+{"company":{"name":"Acme Widgets Ltd","number":"04123456"},
+ "customer":{"name":"Beta Industries","address":"14 Long Lane, Manchester M1 4AB"},
+ "invoice":{"number":"INV-1042","issued":"1 September 2026","due":"1 October 2026",
+   "subtotal":1033.75,"vat_rate":20,"vat":206.75,"total":1240.5,"terms":30,
+   "lines":[{"name":"Widget, standard","qty":50,"unit":9.99,"total":499.5},
+            {"name":"Widget, reinforced","qty":25,"unit":14.5,"total":362.5},
+            {"name":"Delivery and handling","qty":1,"unit":171.75,"total":171.75}]}}

@@ -1,6 +1,6 @@
 # Syntax file for fasm
 # Converted from: fasm.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: fasm
 extensions: fasm
@@ -42,8 +42,4 @@ pattern: ^\s*[^; \t]+:
 [region:Comment]
 start: ;
 end: $
-
-[region:String]
-start: "
-end: "\|$
 

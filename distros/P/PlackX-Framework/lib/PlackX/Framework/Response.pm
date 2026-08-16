@@ -158,9 +158,28 @@ Note: All render and redirect methods return $self (the response object).
 
 =over 4
 
+=item add_cleanup_callback($coderef)
+
+Add a cleanup callback. If the PSGI server supports the PSGI extension
+psgix.cleanup, PlackX::Framework will add it to the psgi.cleanup.handlers
+arrayref (but see note below). If the server does not support cleanup
+handlers, PXF will simulate them by executing them just before sending the
+response.
+
+Note that callbacks are added to the response object to itself. They are not
+recognized by the framework until that response object is returned by the
+application. This means if you add callbacks to a response object, throw it
+away, and create a new response object, and return that one as your response
+instead, the original callbacks will be lost.
+
 =item charset(), charset($newval)
 
 Get or set the charset portion of the content-type header.
+
+=item cleanup_callbacks()
+
+Get cleanup callback coderefs as an arrayref. Intended only for internal use
+or debugging.
 
 =item content_type(), content_type($newval)
 

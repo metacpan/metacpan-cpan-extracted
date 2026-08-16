@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroup;
 # ABSTRACT: APIGroup contains the name, the supported versions, and the preferred version of a group.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s apiVersion => Str;
@@ -35,7 +35,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroup - APIGroup contains the nam
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 apiVersion
 

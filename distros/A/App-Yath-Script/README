@@ -100,7 +100,8 @@ EXPORTS
 
       Re-executes the current script with the given arguments. Sets the
       T2_HARNESS_INCLUDES environment variable to preserve the current
-      @INC.
+      @INC. Only paths are preserved; @INC hooks cannot cross an exec and
+      are reinstalled in the new process by whatever added them.
 
     $clean_path = clean_path($path)
 
@@ -124,15 +125,15 @@ EXPORTS
 SOURCE
 
     The source code repository for Test2-Harness can be found at
-    http://github.com/Test-More/Test2-Harness/.
+    http://github.com/Test-More/App-Yath-Script/.
 
 MAINTAINERS
 
-    Chad Granum <exodist@cpan.org>
+    Chad Granum <exodist7@gmail.com>
 
 AUTHORS
 
-    Chad Granum <exodist@cpan.org>
+    Chad Granum <exodist7@gmail.com>
 
 COPYRIGHT
 

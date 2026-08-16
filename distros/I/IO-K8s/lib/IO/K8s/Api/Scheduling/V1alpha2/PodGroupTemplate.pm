@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha2::PodGroupTemplate;
 # ABSTRACT: PodGroupTemplate represents a template for a set of pods with a scheduling policy.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s disruptionMode => Str;
@@ -38,7 +38,7 @@ IO::K8s::Api::Scheduling::V1alpha2::PodGroupTemplate - PodGroupTemplate represen
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 disruptionMode
 

@@ -1,6 +1,6 @@
 # Syntax file for scala
 # Converted from: scala.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: scala
 extensions: scala
@@ -39,13 +39,7 @@ pattern: \\[\\"'ntbrf]
 pattern: \[A-Z][A-Fa-f0-9]{4}
 
 [match:Operator]
-pattern: ||
-
-[match:Operator]
 pattern: &&
-
-[match:Operator]
-pattern: |
 
 [match:Operator]
 pattern: &

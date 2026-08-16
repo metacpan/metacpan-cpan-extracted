@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ContainerStateRunning;
 # ABSTRACT: ContainerStateRunning is a running state of a container.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s startedAt => Time;
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::ContainerStateRunning - ContainerStateRunning is a runni
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 startedAt
 

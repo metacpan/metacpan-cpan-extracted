@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::VolumeStatus;
 # ABSTRACT: VolumeStatus represents the status of a mounted volume. At most one of its members must be specified.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s image => 'Core::V1::ImageVolumeStatus';
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::VolumeStatus - VolumeStatus represents the status of a m
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 image
 

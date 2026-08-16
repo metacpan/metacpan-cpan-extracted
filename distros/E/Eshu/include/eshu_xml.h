@@ -15,6 +15,14 @@
  *  Scanner context
  * ══════════════════════════════════════════════════════════════════ */
 
+/* The open-element stack. Depth alone cannot tell a real closer from a
+ * spurious one: an unmatched </tag> must not pull later closers left, and
+ * a closer for an element further down (implied closes, e.g. <li> without
+ * </li>) should pop through to it. Names longer than the slot are
+ * truncated consistently on push and match, so they still pair up. */
+#define ESHU_XML_STACK_MAX 256
+#define ESHU_XML_NAME_MAX  32
+
 typedef struct {
 	int             depth;
 	enum eshu_state state;
@@ -25,6 +33,10 @@ typedef struct {
 	int             script_depth;/* HTML depth for script base indent */
 	eshu_buf_t      script_buf;  /* collected script content          */
 	eshu_config_t   cfg;
+	char            tag_stack[ESHU_XML_STACK_MAX][ESHU_XML_NAME_MAX];
+	int             stack_len;
+	char            pending_tag[ESHU_XML_NAME_MAX]; /* multi-line open */
+	int             pending_tag_len;
 } eshu_xml_ctx_t;
 
 static void eshu_xml_ctx_init(eshu_xml_ctx_t *ctx, const eshu_config_t *cfg) {
@@ -39,6 +51,8 @@ static void eshu_xml_ctx_init(eshu_xml_ctx_t *ctx, const eshu_config_t *cfg) {
 	ctx->script_buf.len  = 0;
 	ctx->script_buf.cap  = 0;
 	ctx->cfg          = *cfg;
+	ctx->stack_len    = 0;
+	ctx->pending_tag_len = 0;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -53,6 +67,34 @@ static int eshu_xml_ci_prefix(const char *str, const char *prefix, size_t plen) 
 			return 0;
 	}
 	return 1;
+}
+
+static void eshu_xml_stack_push(eshu_xml_ctx_t *ctx,
+                                const char *name, int nlen) {
+	if (ctx->stack_len >= ESHU_XML_STACK_MAX) return; /* overflow: count-only */
+	if (nlen > ESHU_XML_NAME_MAX - 1) nlen = ESHU_XML_NAME_MAX - 1;
+	memcpy(ctx->tag_stack[ctx->stack_len], name, (size_t)nlen);
+	ctx->tag_stack[ctx->stack_len][nlen] = '\0';
+	ctx->stack_len++;
+}
+
+/* The depth adjustment a </name> earns: 0 when nothing on the stack
+ * matches (a spurious closer changes nothing), else minus the number of
+ * elements popped to reach the match (1 for the well-formed case).
+ * do_pop actually pops; the peek form drives the line's pre-indent. */
+static int eshu_xml_stack_close(eshu_xml_ctx_t *ctx,
+                                const char *name, int nlen, int do_pop) {
+	int i, cmp = nlen > ESHU_XML_NAME_MAX - 1 ? ESHU_XML_NAME_MAX - 1 : nlen;
+	for (i = ctx->stack_len - 1; i >= 0; i--) {
+		const char *have = ctx->tag_stack[i];
+		if ((int)strlen(have) == cmp
+		    && eshu_xml_ci_prefix(have, name, (size_t)cmp)) {
+			int drop = ctx->stack_len - i;
+			if (do_pop) ctx->stack_len = i;
+			return -drop;
+		}
+	}
+	return 0;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -127,6 +169,26 @@ static int eshu_xml_is_verbatim(const char *name, int name_len) {
 /* verbatim_tag stores the tag we're waiting to close */
 static char eshu_xml_verbatim_tag[32];
 static int  eshu_xml_verbatim_tag_len;
+
+/* A same-line close for a verbatim element: from p, find </name ws* > and
+ * return the pointer just past its '>', or NULL. Per the HTML spec the
+ * closing sequence ends the element regardless of what surrounds it, so
+ * no string-awareness is needed (or wanted). */
+static const char *eshu_xml_inline_close(const char *p, const char *eol,
+                                         const char *name, int nlen) {
+	while (p + 1 < eol) {
+		if (p[0] == '<' && p[1] == '/'
+		    && eshu_xml_ci_prefix(p + 2, name, (size_t)nlen)) {
+			const char *after = p + 2 + nlen;
+			while (after < eol && (*after == ' ' || *after == '\t'))
+				after++;
+			if (after < eol && *after == '>')
+				return after + 1;
+		}
+		p++;
+	}
+	return NULL;
+}
 
 /* Check if line contains the closing tag for current verbatim section */
 static int eshu_xml_verbatim_end(const char *line, const char *eol) {
@@ -203,6 +265,8 @@ static void eshu_xml_scan_line(eshu_xml_ctx_t *ctx,
 				if (!ctx->tag_is_close) {
 					/* opening tag completed — depth++ */
 					*post_adj += 1;
+					eshu_xml_stack_push(ctx, ctx->pending_tag,
+					                    ctx->pending_tag_len);
 				}
 				p++;
 				break;
@@ -294,16 +358,21 @@ static void eshu_xml_scan_line(eshu_xml_ctx_t *ctx,
 
 		/* Closing tag: </ */
 		if (p + 1 < eol && p[1] == '/') {
+			const char *name;
 			p += 2;
+			name = p;
 			int nlen = eshu_xml_tag_name_len(p);
 			if (nlen > 0) {
 				p += nlen;
 				/* Skip to > */
 				while (p < eol && *p != '>') p++;
 				if (p < eol) p++; /* skip > */
-				/* This closing tag was already depth-- if it was
-				   first on the line (pre_adj). Otherwise depth-- now. */
-				*post_adj -= 1;
+				/* Ask the stack: an unmatched closer adjusts
+				   nothing, a matched one pops to its element
+				   (through any implied closes). The line's
+				   pre-indent already peeked the same answer for
+				   a line-initial closer; the caller cancels it. */
+				*post_adj += eshu_xml_stack_close(ctx, name, nlen, 1);
 			}
 			continue;
 		}
@@ -354,14 +423,33 @@ static void eshu_xml_scan_line(eshu_xml_ctx_t *ctx,
 					ctx->in_tag = 1;
 					ctx->tag_is_close = 0;
 					ctx->state = ESHU_XML_TAG;
+					/* Remember the name for the push when the
+					   '>' lands on a later line */
+					ctx->pending_tag_len =
+						nlen > ESHU_XML_NAME_MAX - 1
+						? ESHU_XML_NAME_MAX - 1 : nlen;
+					memcpy(ctx->pending_tag, tag_start,
+					       (size_t)ctx->pending_tag_len);
+					ctx->pending_tag[ctx->pending_tag_len] = '\0';
 					/* Don't increment depth yet — wait for > */
 					return;
 				}
 
 				if (!self_closing && !is_void_el) {
 					if (is_verbatim_el) {
+						/* Closed on the same line? Then this is an
+						   inline pair - no state, no net depth; keep
+						   scanning the rest of the line rather than
+						   swallowing it into the verbatim buffer. */
+						const char *past = eshu_xml_inline_close(
+							p, eol, tag_start, nlen);
+						if (past) {
+							p = past;
+							continue;
+						}
 						/* Enter verbatim — depth++ for the open tag */
 						*post_adj += 1;
+						eshu_xml_stack_push(ctx, tag_start, nlen);
 						ctx->state = ESHU_XML_VERBATIM;
 						/* Store verbatim tag name */
 						eshu_xml_verbatim_tag_len = nlen > 31 ? 31 : nlen;
@@ -380,6 +468,7 @@ static void eshu_xml_scan_line(eshu_xml_ctx_t *ctx,
 						return;
 					}
 					*post_adj += 1;
+					eshu_xml_stack_push(ctx, tag_start, nlen);
 				}
 				continue;
 			}
@@ -393,9 +482,16 @@ static void eshu_xml_scan_line(eshu_xml_ctx_t *ctx,
  *  Determine pre-indent adjustment for closing tags at line start
  * ══════════════════════════════════════════════════════════════════ */
 
-static int eshu_xml_line_pre_adjust(const char *content, const char *eol) {
-	if (content < eol && content[0] == '<' && content + 1 < eol && content[1] == '/') {
-		return -1;
+/* A line-initial closer indents at the depth of the element it closes: a
+ * peek at the stack, so a spurious closer (no match) stays where it is
+ * and an implied-close pop lands on the right column. */
+static int eshu_xml_line_pre_adjust(eshu_xml_ctx_t *ctx,
+                                    const char *content, const char *eol) {
+	if (content < eol && content[0] == '<'
+	    && content + 1 < eol && content[1] == '/') {
+		int nlen = eshu_xml_tag_name_len(content + 2);
+		if (nlen > 0)
+			return eshu_xml_stack_close(ctx, content + 2, nlen, 0);
 	}
 	return 0;
 }
@@ -469,7 +565,12 @@ static void eshu_xml_process_line(eshu_xml_ctx_t *ctx,
 				ctx->in_script = 0;
 			}
 
-			ctx->depth--;
+			{	/* pop the verbatim element off the stack too */
+				int adj = eshu_xml_stack_close(ctx,
+					eshu_xml_verbatim_tag,
+					eshu_xml_verbatim_tag_len, 1);
+				ctx->depth += adj ? adj : -1;
+			}
 			if (ctx->depth < 0) ctx->depth = 0;
 			ctx->state = ESHU_CODE;
 			eshu_emit_indent(out, ctx->depth, &ctx->cfg);
@@ -522,8 +623,8 @@ static void eshu_xml_process_line(eshu_xml_ctx_t *ctx,
 	{
 		int line_pre, scan_pre = 0, scan_post = 0;
 
-		/* Check if line starts with closing tag */
-		line_pre = eshu_xml_line_pre_adjust(content, eol);
+		/* Check if line starts with closing tag (a stack peek) */
+		line_pre = eshu_xml_line_pre_adjust(ctx, content, eol);
 
 		/* Indent */
 		eshu_emit_indent(out, ctx->depth + line_pre, &ctx->cfg);
@@ -534,11 +635,9 @@ static void eshu_xml_process_line(eshu_xml_ctx_t *ctx,
 		eshu_xml_scan_line(ctx, content, eol, &scan_pre, &scan_post);
 
 		/* Cancel double-count: the first closing tag on the line
-		 * was already applied via line_pre, but scan_line also
-		 * counted it in scan_post. */
-		if (line_pre == -1) {
-			scan_post += 1;
-		}
+		 * was already applied via line_pre, and scan_line's pop of
+		 * the same closer produced the same adjustment. */
+		scan_post -= line_pre;
 
 		ctx->depth += line_pre + scan_post;
 		if (ctx->depth < 0) ctx->depth = 0;

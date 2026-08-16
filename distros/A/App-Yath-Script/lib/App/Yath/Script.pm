@@ -22,7 +22,7 @@ our @EXPORT_OK = (
     },
 );
 
-our $VERSION = '2.000016';
+our $VERSION = '2.000017';
 
 our ($SCRIPT, $MOD);
 
@@ -81,7 +81,10 @@ sub do_runtime { $MOD->do_runtime(@_) }
 
 sub do_exec {
     my ($argv) = @_;
-    $ENV{T2_HARNESS_INCLUDES} = join ';' => @INC;
+    # Hooks (coderef, arrayref, blessed object) cannot be serialized. Anything
+    # that installed one via PERL5OPT installs it again in the new process, so
+    # only the paths need to survive the exec.
+    $ENV{T2_HARNESS_INCLUDES} = join ';' => grep { !ref $_ } @INC;
     exec($^X, $SCRIPT, @$argv);
 }
 
@@ -279,7 +282,10 @@ sub load_latest_yath_module {
 
 sub inject_includes {
     return unless $ENV{T2_HARNESS_INCLUDES};
-    @INC = split /;/, $ENV{T2_HARNESS_INCLUDES};
+    # Keep any hooks this process already has. PERL5OPT runs before us, so a
+    # tool like Carmel has already reinstalled the hook that makes its modules
+    # findable, and replacing @INC outright would throw it away.
+    @INC = (grep({ ref $_ } @INC), split(/;/, $ENV{T2_HARNESS_INCLUDES}));
 }
 
 # Scan ./lib/App/Yath/Script for V#.pm modules and return the highest
@@ -527,6 +533,8 @@ Returns the name of the currently loaded C<App::Yath::Script::V{X}> module.
 
 Re-executes the current script with the given arguments. Sets the
 C<T2_HARNESS_INCLUDES> environment variable to preserve the current C<@INC>.
+Only paths are preserved; C<@INC> hooks cannot cross an C<exec> and are
+reinstalled in the new process by whatever added them.
 
 =item $clean_path = clean_path($path)
 
@@ -552,13 +560,13 @@ Converts a module name (e.g., C<App::Yath::Script>) to a file path
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-L<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/App-Yath-Script/>.
 
 =head1 MAINTAINERS
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 
@@ -566,7 +574,7 @@ L<http://github.com/Test-More/Test2-Harness/>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 

@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.34;
+our $VERSION = v0.35;
 
 use constant {
     WK_UUID         => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -281,7 +281,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.34
+version v0.35
 
 =head1 SYNOPSIS
 
@@ -1608,8 +1608,10 @@ $type uuid
 % Handled above: 208 - 215
 % Unassigned: 216 - 223
 % Handled above: 224 - 229
-% Unassigned: 230 - 239
-% Handled above: 240 - 254
+% Unassigned: 231 - 232
+% Handled above: 233
+% Unassigned: 234 - 237
+% Handled above: 238 - 254
 % Reserved: 255
 
 $end

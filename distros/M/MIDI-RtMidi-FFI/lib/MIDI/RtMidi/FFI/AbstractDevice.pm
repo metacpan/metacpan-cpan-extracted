@@ -7,7 +7,7 @@ package
     MIDI::RtMidi::FFI::AbstractDevice;
 class MIDI::RtMidi::FFI::AbstractDevice;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # ABSTRACT: Base class for MIDI::RtMidi::FFI input and output devices
 
@@ -36,6 +36,9 @@ field $name :param :reader = "RtMidi Client " . __CLASS__;
 field $api_name :param = 'unspecified';
 field $api :param = $api_by_name->( $api_name )->[1];
 field $port_name :reader;
+
+field $connected_to :reader;
+field $connected_to_name :reader;
 
 field $midi_event_map :param = {
     key_after_touch     => 'polytouch',
@@ -75,7 +78,7 @@ method open_virtual_port( $virtual_port_name ) {
 
     if ( $self->ok ) {
         $port_name = $virtual_port_name;
-        return 1;
+        return !!1;
     }
 
     croak "Error opening virtual port: " . $self->msg;
@@ -90,13 +93,15 @@ method open_port( $port_number, $open_port_name ) {
 
     if ( $self->ok ) {
         $port_name = $open_port_name;
-        return 1;
+        $connected_to = $port_number;
+        $connected_to_name = $self->get_port_name( $port_number );
+        return !!1;
     }
 
     croak("Error opening port: " . $self->msg);
 }
 
-method open_port_by_name( $name, $open_port_name = 'in-' . time() ) {
+method open_port_by_name( $name, $open_port_name = time() ) {
     my @ports = $self->get_ports_by_name( $name );
     croak "No available device found matching supplied criteria" unless @ports;
     $self->open_port( $ports[0], $open_port_name );
@@ -144,7 +149,11 @@ method close_port {
     return unless $port_name;
     $self->ok(1);
     rtmidi_close_port( $self->device );
-    return 1 if $self->ok;
+    if ( $self->ok ) {
+        undef $connected_to;
+        undef $connected_to_name;
+        return !!1;
+    }
     croak "Error closing port: " . $self->msg;
 }
 
@@ -190,7 +199,7 @@ MIDI::RtMidi::FFI::AbstractDevice - Base class for MIDI::RtMidi::FFI input and o
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 DESCRIPTION
 

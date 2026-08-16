@@ -57,14 +57,19 @@ XS_INTERNAL(pki_kw_cb) {
             break;
 
         case PKW_ROUTE:
-            /* $app->route($METHOD, $path, $target, []) - the empty guard list
-             * is what `under` fills in for a scoped route */
-            EXTEND(SP, 5);
+            /* $app->route($METHOD, $path, $target, [], $opts?) - the empty
+             * guard list is what `under` fills in for a scoped route; the
+             * optional trailing hashref is the route options */
+            if (items > 3)
+                croak("Punk: a route takes a path, a target and at most "
+                      "one options hashref");
+            EXTEND(SP, 6);
             PUSHs(app);
             PUSHs(name);
             PUSHs(items > 0 ? ST(0) : &PL_sv_undef);
             PUSHs(items > 1 ? ST(1) : &PL_sv_undef);
             mPUSHs(newRV_noinc((SV *)newAV()));
+            if (items > 2) PUSHs(ST(2));
             break;
 
         case PKW_HELPER:
@@ -133,6 +138,9 @@ static const pki_kw PKI_KEYWORDS[] = {
     { "ua",         "ua",          PKW_FWD    },
     { "csrf",       "csrf",        PKW_FWD    },
     { "cors",       "cors",        PKW_FWD    },
+    { "headers",    "headers",     PKW_FWD    },
+    { "auth",       "auth",        PKW_FWD    },
+    { "auth_guard", "auth_guard",  PKW_FWD    },
     { "logging",    "logging",     PKW_FWD    },
     { "docs",       "docs",        PKW_FWD    },
     { "static",     "static",      PKW_FWD    },
@@ -147,6 +155,7 @@ static const pki_kw PKI_KEYWORDS[] = {
     { "rate_limit", "rate_limit",  PKW_FWD    },
     { "middleware", "middleware",  PKW_FWD    },
     { "on_error",   "on_error",    PKW_FWD    },
+    { "on_not_found", "on_not_found", PKW_FWD  },
     { "plugin",     "plugin",      PKW_FWD    },
 
     { "helper",     "helper",      PKW_HELPER },

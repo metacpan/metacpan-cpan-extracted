@@ -47,7 +47,7 @@ use PDF::Make::Signature;
 use PDF::Make::Structure;
 use PDF::Make::Watermark;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 BEGIN {
     Object::Proto::define('PDF::Make::Builder',
@@ -74,6 +74,8 @@ BEGIN {
         '_flatten_pending:Bool:default(0)',
         '_apply_redactions_pending:Bool:default(0)',
         '_sanitize_pending:Bool:default(0)',
+        '_finalised:Bool:default(0)',
+        '_signed_cache:Any',
     );
     Object::Proto::import_accessors('PDF::Make::Builder');
 }
@@ -328,6 +330,12 @@ sub _tag_end {
 sub add_text {
     my ($self, %args) = @_;
     $self->_apply_configure('text', \%args);
+    # Styled runs still need the plain string: text is a required property,
+    # and it is what tagged output and extraction read.
+    if (!defined $args{text} && ref $args{runs} eq 'ARRAY') {
+        $args{text} =
+            PDF::Make::Builder::Text::plain_text_from_runs($args{runs});
+    }
     $self->_tag_begin('P');
     my $t = PDF::Make::Builder::Text->new(%args);
     $t->add($self);
@@ -749,42 +757,6 @@ sub page_count {
 
 # ── Output ───────────────────────────────────────────────
 
-sub to_bytes {
-    my ($self) = @_;
-
-    # Finalize all pages (same as save but return bytes)
-    my $all_pages = pages $self;
-    my $offset = page_offset $self;
-    my $rewrite = _apply_redactions_pending $self;
-    for my $bp (@$all_pages) {
-        next if $bp->imported;
-        my $hdr = $bp->header;
-        my $ftr = $bp->footer;
-        my $pnum = $bp->num + $offset;
-        $hdr->render($self, $bp, $pnum) if $hdr;
-        $ftr->render($self, $bp, $pnum) if $ftr;
-        my $bytes = ($rewrite && @{$bp->redactions})
-            ? $self->_rewrite_redacted_canvas_bytes($bp)
-            : $bp->canvas->to_bytes;
-        $bp->xs_page->set_content($bytes);
-    }
-
-    if (_sanitize_pending $self) {
-        PDF::Make::Redaction->sanitize(doc $self);
-    }
-
-    # Finalize form
-    {
-        my $xs_doc = doc $self;
-        my $form = eval { PDF::Make::FormPtr::get($xs_doc) };
-        if ($form) {
-            PDF::Make::FormPtr::finalize($form);
-        }
-    }
-
-    return (doc $self)->to_bytes;
-}
-
 # ── Attachments ───────────────────────────────────────────
 
 sub attach {
@@ -1126,7 +1098,31 @@ sub add_toc {
 
 # ── Save ───────────────────────────────────────────────────
 
-sub save {
+# Everything save() does up to the point where bytes exist: the TOC, the
+# headers and footers, redactions, watermarks and signing. Split out so that
+# a caller can have the bytes without a file - a render service produces
+# millions of documents that never want to touch a disk - while save() stays
+# exactly the sequence it always was.
+#
+# It draws on the pages, so it must happen once. Calling save() and then
+# to_bytes() renders one document, not one with two sets of headers.
+sub _finalise {
+    my ($self) = @_;
+    return _signed_cache($self) if _finalised $self;
+    my $signed = $self->_finalise_once;
+    _finalised $self, 1;
+    _signed_cache $self, $signed;
+    return $signed;
+}
+
+sub to_bytes {
+    my ($self) = @_;
+    my $signed = $self->_finalise;
+    return $signed if defined $signed;
+    return (doc $self)->to_bytes;
+}
+
+sub _finalise_once {
     my ($self) = @_;
 
     # Render TOC if present
@@ -1246,6 +1242,14 @@ sub save {
             appearance    => $sig->{appearance},
         );
     }
+
+    return $signed_bytes;
+}
+
+sub save {
+    my ($self) = @_;
+
+    my $signed_bytes = $self->_finalise;
 
     # Write to file
     my $xs_doc = doc $self;

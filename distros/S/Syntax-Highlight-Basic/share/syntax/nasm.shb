@@ -1,6 +1,6 @@
 # Syntax file for nasm
 # Converted from: nasm.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: nasm
 extensions: nasm
@@ -107,9 +107,6 @@ STDCALL TWORD WORD
 [match:Todo]
 pattern: \b?\$?[_.][_.]*\b
 
-[match:Error]
-pattern: ["'`]
-
 [match:String]
 pattern: (?:"[^"] *?"|'[^'] *?')
 
@@ -198,9 +195,6 @@ pattern: \bST(?:(\d)|[8-9]\b)
 pattern: \bE(?:[A-D][HL]|[C-GS]S)\b
 
 [match:Error]
-pattern: [[\]]
-
-[match:Error]
 pattern: \bTO\b
 
 [match:Operator]
@@ -256,6 +250,10 @@ pattern: \bVP(?:INS|EXT)R[BDQW]\b
 
 [match:Todo]
 pattern: \bPOP\s[^;]*\bCS\b
+
+[region:Comment]
+start: ;
+end: $
 
 [region:SpecialComment]
 start: ;\*\*\*

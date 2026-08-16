@@ -1,6 +1,6 @@
 # Syntax file for plsql
 # Converted from: plsql.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: plsql
 extensions: plsql
@@ -611,9 +611,6 @@ pattern: %(?:TYPE|ROWTYPE)\b
 [match:Macro]
 pattern: %(?:BULK_EXCEPTIONS|BULK_ROWCOUNT|ISOPEN|FOUND|NOTFOUND|ROWCOUNT)\b
 
-[match:Error]
-pattern: [\])]
-
 [match:Statement]
 pattern: \bBODY\b
 
@@ -631,6 +628,30 @@ pattern: \b(?:ELSIF|IF|ELSE)\b
 
 [match:Conditional]
 pattern: \bEND\b[\s\n]+\bIF\b
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Special]
+start: (
+end: )
+
+[region:Special]
+start: (
+end: )
+
+[region:Special]
+start: (
+end: )
+
+[region:Special]
+start: (
+end: )
 
 [region:PreProc]
 start: \(SET\|DEFINE\|PROMPT\|ACCEPT\|EXEC\|HOST\|SHOW\|VAR\|VARIABLE\|COL\|WHENEVER\|TIMING\)\( \|$\)

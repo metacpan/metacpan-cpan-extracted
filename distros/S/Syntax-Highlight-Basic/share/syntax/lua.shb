@@ -1,12 +1,15 @@
 # Syntax file for lua
 # Converted from: lua.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: lua
 extensions: lua
 
 [keyword:Constant]
 false nil true
+
+[keyword:Error]
+else elseif end in then until
 
 [keyword:Function]
 __add __band __bnot __bor __bxor __call __close __concat __div __eq __gc
@@ -509,4 +512,16 @@ pattern: \bdebug\.upvaluejoin\b
 
 [match:Identifier]
 pattern: \bdebug.setcstacklimit\b
+
+[region:Comment]
+start: --\[\[
+end: \]\]
+
+[region:String]
+start: '
+end: '
+
+[region:String]
+start: "
+end: "
 

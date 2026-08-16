@@ -45,6 +45,7 @@ t/23-detach.t
 t/24-loop-fork.t
 t/25-tls-session.t
 t/26-ratelimit.t
+t/27-sendfile.t
 t/lib/HMTest.pm
 t/manifest.t
 t/pod-coverage.t

@@ -1,0 +1,38 @@
+{
+   "agreement" : {
+      "date" : "1 September 2026",
+      "title" : "Supply Agreement"
+   },
+   "clauses" : [
+      {
+         "body" : "The supplier shall supply the goods described in the schedule in the quantities ordered, and shall deliver them to the address stated on each order within the agreed lead time.",
+         "heading" : "Supply",
+         "number" : 1
+      },
+      {
+         "body" : "Prices are those set out in the schedule and hold for twelve months from the date of this agreement. Invoices are payable within thirty days of the invoice date.",
+         "heading" : "Price and payment",
+         "number" : 2
+      },
+      {
+         "body" : "The goods shall conform to their specification and be free from defects in materials and workmanship for twelve months from delivery.",
+         "heading" : "Quality",
+         "number" : 3
+      },
+      {
+         "body" : "Either party may end this agreement by giving three months written notice, without affecting any order already accepted.",
+         "heading" : "Termination",
+         "number" : 4
+      }
+   ],
+   "parties" : {
+      "first" : {
+         "address" : "1 Foundry Road, Sheffield S1 2AB",
+         "name" : "Acme Widgets Ltd"
+      },
+      "second" : {
+         "address" : "14 Long Lane, Manchester M1 4AB",
+         "name" : "Beta Industries"
+      }
+   }
+}

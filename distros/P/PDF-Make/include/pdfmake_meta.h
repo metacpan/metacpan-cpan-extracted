@@ -180,6 +180,14 @@ pdfmake_trapped_t pdfmake_meta_get_trapped(pdfmake_doc_t *doc);
  */
 void pdfmake_meta_auto_fill(pdfmake_doc_t *doc);
 
+/*
+ * Resolve SOURCE_DATE_EPOCH. Returns 1 and writes the epoch to *out when the
+ * variable holds a valid non-negative integer, 0 otherwise. Callers fall back
+ * to time(NULL). Used by the metadata auto-fill and by /ID generation so that
+ * a render is byte-reproducible when the variable is set.
+ */
+int pdfmake_source_date(time_t *out);
+
 #ifdef __cplusplus
 }
 #endif

@@ -4,6 +4,7 @@ use warnings;
 use overload '%{}' => '_as_hashref', fallback => 1;
 use Object::Proto;
 use PDF::Make::Builder::Font;
+use PDF::Make::Builder::Runs;
 
 BEGIN {
     Object::Proto::define('PDF::Make::Builder::Layout::Cell',
@@ -22,10 +23,21 @@ BEGIN {
     Object::Proto::import_accessors('PDF::Make::Builder::Layout::Cell');
 }
 
+# A cell item is either a plain string or a list of styled runs. The plain
+# form keeps the original wrapping loop, so documents written before runs
+# existed still produce the same bytes.
 sub text {
     my ($self, $str, %args) = @_;
     my $content = content $self;
-    push @$content, { type => 'text', text => $str, %args };
+    push @$content, { type => "text", text => $str, %args };
+    return $self;
+}
+
+sub runs {
+    my ($self, $runs, %args) = @_;
+    my $content = content $self;
+    my $plain = join "", map { defined $_->{text} ? $_->{text} : "" } @$runs;
+    push @$content, { type => "text", text => $plain, runs => $runs, %args };
     return $self;
 }
 
@@ -78,6 +90,10 @@ sub measure_height {
     my $inner_w = $cell_w - 2 * (pad $self);
     for my $item (@{content $self}) {
         if ($item->{type} eq 'text') {
+            if ($item->{runs}) {
+                $h += $self->runs_height($font, $item, $inner_w);
+                next;
+            }
             my $item_font = $self->_resolve_item_font($font, $item);
             my $sz = $item->{size} // $item_font->size;
             my $lh = $item->{line_height} // $sz;
@@ -89,6 +105,93 @@ sub measure_height {
         }
     }
     return $h;
+}
+
+# Styled runs inside a cell go through the same line breaker Builder::Text
+# uses, so a bold word wraps identically whether it sits in a paragraph or in
+# a table cell. The plain-text loop below is untouched: existing documents
+# depend on those bytes.
+#
+# Height of a run item at a given width: the real line breaking, not an
+# estimate, so a row grows to fit a wrapped bold phrase rather than clipping
+# it.
+sub runs_height {
+    my ($self, $font, $item, $width) = @_;
+    my $rruns = $self->_resolve_runs($font, $item);
+    return 0 unless @$rruns;
+    my $lines = PDF::Make::Builder::Runs->layout(
+        runs  => $rruns,
+        width => ($width && $width > 1 ? $width : 1),
+    );
+    my $h = 0;
+    $h += $_->{lh} for @$lines;
+    return $h;
+}
+
+sub _render_runs {
+    my ($self, $canvas, $font, $page, $item, $cx, $cy, $cw, $text_y, $align) = @_;
+
+    my $rruns = $self->_resolve_runs($font, $item);
+    return $text_y unless @$rruns;
+
+    my $lines = PDF::Make::Builder::Runs->layout(
+        runs  => $rruns,
+        width => $cw + wrap_slack($self),
+    );
+
+    my %ensured;
+    for my $line (@$lines) {
+        $text_y -= $line->{lh};
+        last if $text_y < $cy;
+
+        my $tx = $cx;
+        if ($align eq 'center') {
+            $tx = $cx + ($cw - $line->{w}) / 2;
+        } elsif ($align eq 'right') {
+            $tx = $cx + $cw - $line->{w};
+        }
+
+        $canvas->BT;
+        for my $seg (@{ $line->{segs} }) {
+            my $f   = $seg->{font};
+            my $res = $ensured{"$f"} ||= $f->ensure_loaded($page->xs_page);
+            my ($r, $g, $b) = $f->hex_to_rgb($f->colour);
+            $canvas->rg($r, $g, $b)
+                   ->Tf($res, $f->size)
+                   ->Tm(1, 0, 0, 1, $tx, $text_y)
+                   ->Tj($seg->{text});
+            $tx += $seg->{w};
+        }
+        $canvas->ET;
+    }
+    return $text_y;
+}
+
+# Build the run list for a cell item, resolving each run's overrides against
+# the cell's own font. Identical styles share one font object so that
+# adjacent segments coalesce and single-run text measures as one string.
+sub _resolve_runs {
+    my ($self, $font, $item) = @_;
+    my $base = $self->_resolve_item_font($font, $item);
+    my %cache;
+    my @out;
+
+    for my $run (@{ $item->{runs} }) {
+        next unless defined $run->{text} && length $run->{text};
+        my %spec = (
+            colour      => $run->{colour}      // $base->colour,
+            size        => $run->{size}        // $base->size,
+            family      => $run->{family}      // $base->family,
+            bold        => $run->{bold}        // $base->bold,
+            italic      => $run->{italic}      // $base->italic,
+            line_height => $run->{line_height} // $base->effective_line_height,
+        );
+        my $key = join "\0", map { defined $spec{$_} ? $spec{$_} : '' }
+                             qw(colour size family bold italic line_height);
+        $cache{$key} ||= PDF::Make::Builder::Font->new(%spec);
+        push @out, { font => $cache{$key}, text => $run->{text} };
+    }
+    return \@out;
 }
 
 sub render_content {
@@ -105,6 +208,12 @@ sub render_content {
 
     for my $item (@{content $self}) {
         next unless $item->{type} eq 'text';
+
+        if ($item->{runs}) {
+            $text_y = $self->_render_runs($canvas, $font, $page, $item,
+                                          $cx, $cy, $cw, $text_y, $align);
+            next;
+        }
 
         my $item_font = $self->_resolve_item_font($font, $item);
         my $sz = $item->{size} // $item_font->size;

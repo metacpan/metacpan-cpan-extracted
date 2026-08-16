@@ -8,16 +8,22 @@
 #if PERL_API_REVISION != 5
 #error This module is only for Perl 5
 #else
-#if PERL_API_VERSION == 38
-#else
 #if PERL_API_VERSION == 40
+#define RC_OWN_NEXT_OFF_SET
 #else
 #if PERL_API_VERSION == 42
+#define RC_OWN_NEXT_OFF_SET
+#else
+#if PERL_API_VERSION == 44
 #else
 #error Unsupported PERL_API_VERSION
 #endif
 #endif
 #endif
+#endif
+
+#ifdef RC_OWN_NEXT_OFF_SET
+#define NEXT_OFF_set(p, v) (NEXT_OFF(p) = (v))
 #endif
 
 #define SIZEOF_ARRAY(a) (sizeof(a) / sizeof(a[0]))
@@ -3740,7 +3746,7 @@ static int compare_set(int anchored, Arrow *a1, Arrow *a2, unsigned char *b1)
 
     FLAGS(alt) = 1;
     OP(alt) = EXACT;
-    NEXT_OFF(alt) = 2;
+    NEXT_OFF_set(alt, 2);
     memcpy(alt + 2, t1, sizeof(regnode) * sz);
 
     left.origin = a1->origin;

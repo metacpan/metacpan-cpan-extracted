@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use Data::Identifier v0.34;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 use parent qw(Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Simple);
 
@@ -132,6 +132,8 @@ sub ise {
 }
 
 
+
+
 # ---- Private helpers ----
 
 1;
@@ -148,7 +150,7 @@ Lingua::Generic::Interface::Word - module to interact with the words of any lang
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -352,6 +354,62 @@ It is undefined if this method will also register related objects (such as the w
 =head3 Default implementation
 
 Unimplemented. Future versions may provide a default implementation.
+
+=head2 stem
+
+    my Lingua::Generic::Interface::Word $stem = $word->stem;
+
+(experimental since v0.02)
+
+Returns the stem of a word (if any) or die (if none can be identified).
+If the word is already a stem it returns itself.
+
+=head3 Default implementation
+
+Unimplemented. Future versions may provide a default implementation.
+
+=head1 RESERVED METHODS
+
+The following methods are reserved for future use:
+
+=over
+
+=item concept
+
+=item concepts
+
+=item tagname
+
+=item as_number
+
+=item combine
+
+=item language
+
+=item modifiers
+
+=item prefix
+
+=item suffix
+
+=item type
+
+=item has_type
+
+=item role
+
+=item roles
+
+=item has_roles
+
+=item flags
+
+=item markers
+
+=back
+
+Also the methods from the following interfaces are reserved for their designated usages:
+L<Data::Identifier::Interface::Known>.
 
 =head1 AUTHOR
 

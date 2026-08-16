@@ -16,7 +16,7 @@ use parent 'Data::Identifier::Interface::Userdata';
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.34;
+our $VERSION = v0.35;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -103,7 +103,7 @@ Data::Identifier::Interface::Subobjects - format independent identifier object
 
 =head1 VERSION
 
-version v0.34
+version v0.35
 
 =head1 SYNOPSIS
 

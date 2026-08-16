@@ -1,0 +1,375 @@
+#!perl
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptionsFromArray);
+use File::Basename qw(basename);
+
+use PDF::Make;
+use PDF::Make::Markup::Parse;
+use PDF::Make::Markup::Style;
+use PDF::Make::Markup::Render;
+
+our $VERSION = '0.10';
+
+# pdfmake - render, check and benchmark document templates without a server.
+#
+# The whole engine runs here, on a laptop, with no account and no network.
+# That is the point: a customer can hold the thing that renders their
+# documents, and the golden corpus and the benchmark are runnable by anyone
+# who doubts either.
+
+sub usage {
+    my $me = basename($0);
+    return <<"USAGE";
+$me - render document templates to PDF
+
+Usage:
+  $me render TEMPLATE [DATA.json] -o OUT.pdf [options]
+  $me check  TEMPLATE [DATA.json]
+  $me bench  [TEMPLATE] [--iterations N]
+  $me tags   [--attributes]
+
+Commands:
+  render   Template plus data to a PDF file, or to stdout with -o -.
+  check    Validate without rendering. With DATA.json it runs the whole
+           pipeline; without, it checks the structure with the template
+           tags removed. Exit status 1 on any error, for use in CI.
+  bench    Documents per second and peak memory, on this machine.
+  tags     The tag and attribute reference, generated from the parser's
+           own tables so it cannot drift from what the engine accepts.
+
+Options:
+  -o, --out FILE      Where to write (- for stdout).
+      --engine N      Pin the layout engine version (default @{[
+                        PDF::Make::Markup::Render->engine_version ]}).
+      --dir DIR       Template directory, for {% include %}.
+      --date EPOCH    Set SOURCE_DATE_EPOCH, making output reproducible.
+      --iterations N  bench only; default 200.
+      --attributes    tags only; list each tag's attributes.
+  -h, --help          This.
+      --version       Version.
+USAGE
+}
+
+sub slurp {
+    my ($path) = @_;
+    open my $fh, '<:raw', $path or die "cannot read '$path': $!\n";
+    local $/;
+    my $bytes = <$fh>;
+    close $fh;
+    return defined $bytes ? $bytes : '';
+}
+
+sub read_json {
+    my ($path) = @_;
+    eval { require JSON::PP; 1 }
+        or die "reading '$path' needs JSON::PP, which is not installed\n";
+    my $data = eval { JSON::PP->new->utf8->decode(slurp($path)) };
+    die "'$path' is not valid JSON: $@" if $@;
+    die "'$path' must hold a JSON object\n" unless ref $data eq 'HASH';
+    return $data;
+}
+
+sub write_out {
+    my ($path, $bytes) = @_;
+    if ($path eq '-') {
+        binmode STDOUT, ':raw';
+        print STDOUT $bytes;
+        return;
+    }
+    $path .= '.pdf' unless $path =~ /\.pdf\z/i;
+    open my $fh, '>:raw', $path or die "cannot write '$path': $!\n";
+    print $fh $bytes;
+    close $fh;
+    return $path;
+}
+
+# Report an error the way an editor and a CI log both want it: one line,
+# with the position first if the message carries one.
+sub complain {
+    my ($what, $err) = @_;
+    $err =~ s/ at \S+ line \d+\.?\s*\z//;    # drop Carp's own trailer
+    $err =~ s/\s+\z//;
+    print STDERR "$what: $err\n";
+    return 1;
+}
+
+# ---------------------------------------------------------------------------
+
+sub cmd_render {
+    my (@argv) = @_;
+    my ($out, $engine, $dir, $date);
+    GetOptionsFromArray(\@argv,
+        'o|out=s'  => \$out,
+        'engine=i' => \$engine,
+        'dir=s'    => \$dir,
+        'date=i'   => \$date,
+    ) or return 2;
+
+    my ($tpl, $data_file) = @argv;
+    return complain('render', 'no template given') unless defined $tpl;
+    return complain('render', 'no output given (use -o)') unless defined $out;
+
+    local $ENV{SOURCE_DATE_EPOCH} = $date if defined $date;
+
+    my $src  = slurp($tpl);
+    my $data = defined $data_file ? read_json($data_file) : {};
+
+    my $bytes = eval {
+        PDF::Make::Markup::Render->render($src, $data,
+            (defined $engine ? (engine_version => $engine) : ()),
+            (defined $dir    ? (template_dir   => $dir)    : ()),
+        );
+    };
+    return complain($tpl, $@) if $@;
+
+    my $written = write_out($out, $bytes);
+    print STDERR sprintf "%s: %d bytes\n", $written, length $bytes
+        if defined $written;
+    return 0;
+}
+
+# Structural check without data: remove the template tags and see whether
+# what is left is a document. It cannot catch everything a real render would
+# - a loop that emits a <td> outside a <tr> only exists once the loop has run
+# - but it catches unknown tags, unclosed elements and bad attributes, which
+# is what a template author gets wrong at three in the afternoon.
+sub strip_template_tags {
+    my ($src) = @_;
+    $src =~ s/\{\%.*?\%\}//gs;
+    return $src;
+}
+
+sub cmd_check {
+    my (@argv) = @_;
+    my ($dir, $engine);
+    GetOptionsFromArray(\@argv, 'dir=s' => \$dir, 'engine=i' => \$engine)
+        or return 2;
+
+    my ($tpl, $data_file) = @argv;
+    return complain('check', 'no template given') unless defined $tpl;
+
+    my $src = slurp($tpl);
+
+    # Template-level rules apply either way.
+    eval { PDF::Make::Markup::Profile->check_source($src); 1 }
+        or return complain($tpl, $@);
+
+    if (defined $data_file) {
+        my $data = read_json($data_file);
+        eval {
+            PDF::Make::Markup::Render->render($src, $data,
+                (defined $engine ? (engine_version => $engine) : ()),
+                (defined $dir    ? (template_dir   => $dir)    : ()));
+            1;
+        } or return complain($tpl, $@);
+        print "$tpl: ok (rendered with $data_file)\n";
+        return 0;
+    }
+
+    my $r = PDF::Make::Markup::Parse->check(strip_template_tags($src));
+    unless ($r->{ok}) {
+        print STDERR "$tpl:$r->{line}:$r->{col}: $r->{error}\n";
+        return 1;
+    }
+    print "$tpl: ok (structure only; pass a data file to check a real render)\n";
+    return 0;
+}
+
+# ---------------------------------------------------------------------------
+
+my $BENCH_TEMPLATE = <<'TPL';
+<doc page-size="A4" margin="36">
+  <style h1="size:20;colour:#1a1a2e" text="size:10;colour:#333333" />
+  <h1>Invoice {% invoice.number %}</h1>
+  <text>Amount due: <b>{% invoice.total | money %}</b> from {% invoice.customer %}.</text>
+  <hr />
+  <row>
+    <cell weight="2" pad="6" bg="#eeeeee">{% invoice.customer %}</cell>
+    <cell weight="1" pad="6" align="right">{% invoice.due %}</cell>
+  </row>
+  <table>
+    <tr><th weight="4">Item</th><th align="right">Qty</th><th align="right">Price</th></tr>
+    {% for l in invoice.lines %}
+    <tr><td>{% l.name %}</td><td align="right">{% l.qty %}</td><td align="right">{% l.price | money %}</td></tr>
+    {% end %}
+  </table>
+  <text spacing="6">Payment within 30 days. Late payment carries interest at the statutory rate.</text>
+</doc>
+TPL
+
+sub bench_data {
+    return {
+        invoice => {
+            number   => 1042,
+            customer => 'Acme Limited',
+            due      => '30 September',
+            total    => 1240.5,
+            lines    => [
+                map { { name => "Line item $_", qty => $_, price => $_ * 9.99 } }
+                1 .. 12
+            ],
+        },
+    };
+}
+
+sub rss_kb {
+    my $out = `ps -o rss= -p $$ 2>/dev/null`;
+    return undef unless defined $out;
+    $out =~ s/\D//g;
+    return length $out ? $out + 0 : undef;
+}
+
+sub cmd_bench {
+    my (@argv) = @_;
+    my $iterations = 200;
+    my $date;
+    GetOptionsFromArray(\@argv,
+        'iterations=i' => \$iterations,
+        'date=i'       => \$date,
+    ) or return 2;
+
+    my ($tpl_file) = @argv;
+    my $src  = defined $tpl_file ? slurp($tpl_file) : $BENCH_TEMPLATE;
+    my $data = defined $tpl_file ? {} : bench_data();
+
+    local $ENV{SOURCE_DATE_EPOCH} = defined $date ? $date : 1600000000;
+
+    # Warm: the first render compiles the template and loads font metrics,
+    # and reporting that as the steady-state number would flatter us.
+    my $bytes = eval { PDF::Make::Markup::Render->render($src, $data) };
+    return complain('bench', $@) if $@;
+    PDF::Make::Markup::Render->render($src, $data) for 1 .. 20;
+
+    my $before = rss_kb();
+    my $t0     = time_hires();
+    PDF::Make::Markup::Render->render($src, $data) for 1 .. $iterations;
+    my $elapsed = time_hires() - $t0;
+    my $after   = rss_kb();
+
+    my $per = $elapsed / $iterations;
+    printf "template:    %s\n", defined $tpl_file ? $tpl_file : '(built-in invoice)';
+    printf "output:      %d bytes\n", length $bytes;
+    printf "iterations:  %d\n", $iterations;
+    printf "elapsed:     %.3f s\n", $elapsed;
+    printf "per document: %.3f ms\n", $per * 1000;
+    printf "throughput:  %.0f documents/second/core\n", 1 / $per if $per > 0;
+    if (defined $before && defined $after) {
+        printf "rss:         %d KB before, %d KB after (%+d KB over %d renders)\n",
+            $before, $after, $after - $before, $iterations;
+    }
+    return 0;
+}
+
+sub time_hires {
+    if (eval { require Time::HiRes; 1 }) {
+        return Time::HiRes::time();
+    }
+    return time();
+}
+
+# ---------------------------------------------------------------------------
+
+sub cmd_tags {
+    my (@argv) = @_;
+    my $attrs;
+    GetOptionsFromArray(\@argv, 'attributes' => \$attrs) or return 2;
+
+    my @tags = PDF::Make::Markup::Parse->tags;
+    printf "%d tags, engine version %d\n\n", scalar @tags,
+        PDF::Make::Markup::Render->engine_version;
+
+    for my $t (sort { $a->{name} cmp $b->{name} } @tags) {
+        my @flags;
+        push @flags, 'void'      if $t->{void};
+        push @flags, 'container' if $t->{container};
+        push @flags, 'inline'    if $t->{inline};
+        printf "  <%s>%s\n", $t->{name},
+            @flags ? '  (' . join(', ', @flags) . ')' : '';
+        next unless $attrs;
+        my $allow = PDF::Make::Markup::Style->allowed($t->{name}) || [];
+        printf "      %s\n", @$allow ? join(' ', sort @$allow) : '(none)';
+    }
+    return 0;
+}
+
+# ---------------------------------------------------------------------------
+
+sub main {
+    my (@argv) = @_;
+    my $cmd = shift @argv;
+
+    if (!defined $cmd || $cmd eq '-h' || $cmd eq '--help' || $cmd eq 'help') {
+        print usage();
+        return 0;
+    }
+    if ($cmd eq '--version') {
+        printf "pdfmake %s (PDF::Make %s, engine version %d)\n",
+            $VERSION, PDF::Make->VERSION,
+            PDF::Make::Markup::Render->engine_version;
+        return 0;
+    }
+
+    require PDF::Make::Markup::Profile;
+
+    return cmd_render(@argv) if $cmd eq 'render';
+    return cmd_check(@argv)  if $cmd eq 'check';
+    return cmd_bench(@argv)  if $cmd eq 'bench';
+    return cmd_tags(@argv)   if $cmd eq 'tags';
+
+    print STDERR "pdfmake: unknown command '$cmd'\n\n" . usage();
+    return 2;
+}
+
+exit main(@ARGV) unless caller;
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+pdfmake - render document templates to PDF from the command line
+
+=head1 SYNOPSIS
+
+    pdfmake render invoice.tmpl data.json -o invoice.pdf
+    pdfmake check  invoice.tmpl
+    pdfmake check  invoice.tmpl data.json
+    pdfmake bench  --iterations 500
+    pdfmake tags   --attributes
+
+=head1 DESCRIPTION
+
+The whole engine, on a laptop, with no account and no network.
+
+=head2 check
+
+Exits non-zero on any error, with the position first, so it can be a step in
+a template repository's CI:
+
+    invoice.tmpl:12:5: unknown tag '<dvi>'
+
+Without a data file it removes the template tags and checks what is left,
+which catches unknown tags, unclosed elements and bad attributes. With one it
+runs the whole pipeline, which catches everything.
+
+=head2 bench
+
+Prints documents per second per core and the memory a run costs. It is
+deliberately part of the shipped tool rather than a private script: the
+performance claim should be checkable by anyone who doubts it, on their
+hardware.
+
+=head2 Reproducible output
+
+C<--date EPOCH> sets C<SOURCE_DATE_EPOCH>, so two renders of the same
+template and data produce identical bytes.
+
+=head1 SEE ALSO
+
+L<PDF::Make::Markup::Render>
+
+=cut

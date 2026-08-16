@@ -8,7 +8,7 @@
 #
 # See COPYRIGHT section in DBI.pm for usage and distribution rights.
 
-use 5.008_001;
+use 5.012_000;
 
 use ExtUtils::MakeMaker 5.16, qw(WriteMakefile $Verbose prompt);
 use Getopt::Long;
@@ -59,7 +59,7 @@ my %opts = (
     AUTHOR                    => 'DBI team (dbi-users@perl.org)',
     VERSION_FROM              => "DBI.pm",
     ABSTRACT_FROM             => "DBI.pm",
-    MIN_PERL_VERSION          => "5.008001",
+    MIN_PERL_VERSION          => "5.012000",
     BUILD_REQUIRES            => {
         "ExtUtils::MakeMaker" => "6.48",
         "Test::Simple"        => "0.96",
@@ -77,6 +77,7 @@ my %opts = (
 	    IRC               => "irc://irc.perl.org/#dbi",
 	    },
 	suggests              => {
+	    "RPC::PlClient"   => 0.2020,
 	    "RPC::PlServer"   => 0.2020,
 	    "Net::Daemon"     => 0,
 	    "SQL::Statement"  => 1.414,
@@ -92,8 +93,10 @@ my %opts = (
 	OTHERLDFLAGS          => "$::opt_g",
 	},
     clean                     => {
-	FILES                 => "\$(DISTVNAME) Perl.xsi t/zv*_*.t dbi__null_test_tmp* test_output_*"
-                ." dbiproxy$ext_pl dbiprof$ext_pl dbilogstrip$ext_pl dbiproxy.*log dbitrace.log dbi*.prof ndtest.prt" },
+	FILES                 => join " " => "\$(DISTVNAME)", "Perl.xsi cover_db",
+				"t/zv*_*.t dbi__null_test_tmp* test_output_*",
+				"dbiproxy$ext_pl dbiprof$ext_pl dbilogstrip$ext_pl",
+				"dbiproxy.*log dbitrace.log dbi*.prof ndtest.prt" },
     dist                      => {
 	DIST_DEFAULT          => "clean distcheck disttest tardist",
 	PREOP                 => '$(MAKE) -f Makefile.old distdir',
@@ -155,9 +158,7 @@ if ($os eq "MSWin32"  &&  $Config{libs} =~ /\bPerlCRT.lib\b/ &&  -f "$Config{arc
 # Set aside some values for post_initialize() in package MY
 my ($cfg_privlibexp, $cfg_archlibexp, $cfg_sitelibexp, $cfg_sitearchexp, $cfg_man3direxp) =
      @Config{qw( privlibexp archlibexp sitelibexp sitearchexp man3direxp )};
-for ($cfg_privlibexp, $cfg_archlibexp, $cfg_sitelibexp, $cfg_sitearchexp, $cfg_man3direxp) {
-     $_ = "" unless defined $_;
-    }
+$_ //= "" for $cfg_privlibexp, $cfg_archlibexp, $cfg_sitelibexp, $cfg_sitearchexp, $cfg_man3direxp;
 
 my $conflictMsg = <<EOCM;
 ***
@@ -260,8 +261,20 @@ warn <<EOT if $os eq "MSWin32";
 EOT
 
     # This here instead of post_constants, as otherwise xt/ would be tested *before* t/
+    my %no_inc =
+	map  { $_ => 1 }
+	map  { s{^(.*/)inline.h$}{-ignore_re $1.*}; $_ }
+	grep { -s $_ }
+	map  { "$_/CORE/inline.h" }
+	@INC;
+    my $no_inc = join " " => "-ignore doc/make-doc.pl", sort keys %no_inc;
     my $min_vsn = ($] >= 5.024 && -d "xt" && -d "sandbox" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
 	? join "\n" =>
+	    'cover $make_sep test_cover:',
+	    '	ccache -C',
+	    '	-@rm -f *.gc??',
+	    '	env AUTOMATED_TESTING=1 cover -test -jobs 17',
+	    "	cover -report html $no_inc",
 	    'test ::',
 	    '	-@env TEST_FILES="xt/*.t" make -e test_dynamic',
 	    ''
@@ -375,7 +388,7 @@ spellcheck checkpod:	doc
 dbipport:
 	perl sandbox/genPPPort_h.pl
 ppport:		dbipport.h
-	perl dbipport.h --compat-version=5.8.1 DBI.xs
+	perl dbipport.h --compat-version=5.12.0 DBI.xs
 
 # make dist does not remove existing .tar.gz causing questions
 newdist:

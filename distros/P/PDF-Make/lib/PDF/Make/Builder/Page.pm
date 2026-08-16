@@ -49,7 +49,19 @@ sub top_y {
     my $pad = page_padding $self;
     my $hdr = page_header $self;
     my $top = $ph - $pad;
-    $top -= $hdr->h if $hdr;
+    if ($hdr) {
+        # A header is anchored to its own padding, not to the page margin: it
+        # occupies [ph - hdr_pad - hdr_h, ph - hdr_pad], which for the default
+        # padding of 20 is the strip from 20 to 50 points down the page.
+        # Subtracting its height from an already-margined top stacked the two
+        # instead of overlapping them, so every point by which the margin
+        # exceeded the header's padding became dead space between the header
+        # and the first line of content - 20pt on a 40pt margin, 30pt on 50.
+        # Content starts below the header, or below the margin, whichever is
+        # lower down the page.
+        my $below_header = $ph - $hdr->padding - $hdr->h;
+        $top = $below_header if $below_header < $top;
+    }
     return $top;
 }
 

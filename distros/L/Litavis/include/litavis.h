@@ -17,6 +17,22 @@
 #include "XSUB.h"
 #include "ppport.h"
 
+/* On a PERL_IMPLICIT_SYS perl (Windows) XSUB.h remaps the libc allocator
+ * and stdio names to interpreter-context macros that need my_perl in
+ * scope; the engine below is plain C with no pTHX, so restore the CRT
+ * names (CPAN Testers: 0.04 failed on Strawberry with "'my_perl'
+ * undeclared" at every malloc/free). Allocation and free pairs all live
+ * inside the engine, so CRT malloc/free is self-consistent. */
+#ifdef PERL_IMPLICIT_SYS
+#  undef malloc
+#  undef calloc
+#  undef realloc
+#  undef free
+#  undef abort
+#  undef fprintf
+#  undef stderr
+#endif
+
 /* Route fatal errors through Perl's croak() */
 #define LITAVIS_FATAL(msg) croak("litavis: %s", (msg))
 

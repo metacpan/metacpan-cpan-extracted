@@ -2,7 +2,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -45,7 +45,7 @@ use WebDyne::PAGI::Constant;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='3.012';
+$VERSION='3.014';
 
 
 #  Check for supporting modules
@@ -116,7 +116,7 @@ if (!caller || exists $ENV{PAR_TEMP}) {
         'dump_opt|dump-opt|opt'
         )
     );
-    map {$opt{"no_${_}"} = !($opt{$_})} map { /^([^|!:=+]+)/ } grep {!ref($_) && /\!$/} @opt;
+    map {$opt{"no_${_}"} = $opt{$_} ? 0 : 1} map { /^([^|!:=+]+)/ } grep {!ref($_) && /\!$/} @opt;
     
     
     #  Last argument is root directory
@@ -481,7 +481,7 @@ Andrew Speer <andrew.speer@isolutions.com.au>
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -489,6 +489,7 @@ the same terms as the Perl 5 programming language system itself.
 Full license text is available at:
 
 <http://dev.perl.org/licenses/>
+
 
 =end markdown
 

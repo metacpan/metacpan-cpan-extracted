@@ -4,7 +4,7 @@
       "John Barrett <john@jbrt.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -53,7 +53,7 @@
             "Feature::Compat::Class" : "0",
             "IO::Handle" : "0",
             "IO::Socket" : "0",
-            "MIDI::Stream" : "0.005",
+            "MIDI::Stream" : "0.006",
             "MIDI::Stream::Decoder" : "0",
             "MIDI::Stream::Encoder" : "0",
             "MIDI::Stream::Tables" : "0",
@@ -64,8 +64,6 @@
       },
       "test" : {
          "requires" : {
-            "Future::AsyncAwait" : "0",
-            "Future::IO" : "0",
             "Proc::Find" : "0",
             "Test2::Require::Module" : "0",
             "Test2::V0" : "0",
@@ -78,48 +76,48 @@
    "provides" : {
       "MIDI::RtMidi::FFI" : {
          "file" : "lib/MIDI/RtMidi/FFI.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "MIDI::RtMidi::FFI::AbstractDevice" : {
          "file" : "lib/MIDI/RtMidi/FFI/AbstractDevice.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "MIDI::RtMidi::FFI::Device" : {
          "file" : "lib/MIDI/RtMidi/FFI/Device.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "MIDI::RtMidi::FFI::Device::In" : {
          "file" : "lib/MIDI/RtMidi/FFI/Device/In.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "MIDI::RtMidi::FFI::Device::Out" : {
          "file" : "lib/MIDI/RtMidi/FFI/Device/Out.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "RtMidiIn" : {
          "file" : "lib/MIDI/RtMidi/FFI/Device.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "RtMidiOut" : {
          "file" : "lib/MIDI/RtMidi/FFI/Device.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://codeberg.org/jbarrett/Alien-RtMidi/issues"
+         "web" : "https://codeberg.org/jbarrett/MIDI-RtMidi-FFI/issues"
       },
-      "homepage" : "https://codeberg.org/jbarrett/Alien-RtMidi/",
+      "homepage" : "https://codeberg.org/jbarrett/MIDI-RtMidi-FFI/",
       "repository" : {
          "type" : "git",
-         "url" : "https://codeberg.org/jbarrett/Alien-RtMidi.git",
-         "web" : "https://codeberg.org/jbarrett/Alien-RtMidi/"
+         "url" : "https://codeberg.org/jbarrett/MIDI-RtMidi-FFI.git",
+         "web" : "https://codeberg.org/jbarrett/MIDI-RtMidi-FFI/"
       }
    },
-   "version" : "0.12",
-   "x_generated_by_perl" : "v5.42.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "version" : "0.13",
+   "x_generated_by_perl" : "v5.44.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

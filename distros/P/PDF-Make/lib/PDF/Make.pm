@@ -3,7 +3,7 @@ package PDF::Make;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use DynaLoader;
 our @ISA = ('DynaLoader');
@@ -25,6 +25,29 @@ __END__
 PDF::Make - PDF generation, parsing, and editing
 
 =head1 SYNOPSIS
+
+    # Markup API - a template and data in, PDF bytes out
+    use PDF::Make::Markup::Render;
+
+    my $pdf = PDF::Make::Markup::Render->render(<<'TPL', $data);
+    <doc page-size="A4" margin="36">
+      <style h1="size:22;line-height:26" text="size:10" />
+      <header>{% company.name %}</header>
+
+      <h1>Invoice {% invoice.number %}</h1>
+      <text>Payment due {% invoice.due %}</text>
+
+      <table>
+        <tr><th weight="4">Description</th><th align="right">Amount</th></tr>
+        {% for l in invoice.lines %}
+        <tr><td>{% l.name %}</td><td align="right">{% l.total | money %}</td></tr>
+        {% end %}
+      </table>
+
+      <hr />
+      <text align="right" size="12">Total due: <b>{% invoice.total | money %}</b></text>
+    </doc>
+    TPL
 
     # High-level Builder API (recommended)
     use PDF::Make::Builder;
@@ -57,9 +80,15 @@ PDF::Make - PDF generation, parsing, and editing
 
 =head1 DESCRIPTION
 
-The distribution provides two API layers:
+The distribution provides three API layers:
 
 =over 4
+
+=item B<PDF::Make::Markup::Render> - Highest level: a document is a template
+and a hash of data, not a program. The markup is a small fixed grammar
+(headings, text, tables, rows, boxes, images) and the template syntax is
+L<Template::Stencil>, so the layout lives in a file a designer can edit and
+the Perl only supplies the data. Compiles onto the Builder.
 
 =item B<PDF::Make::Builder> - High-level, chainable, Object::Proto-based API
 for common document creation tasks. Handles coordinate translation, page
@@ -161,6 +190,22 @@ streams, object graphs, and page structure.
 
 =back
 
+=head2 Markup (Template API)
+
+=over 4
+
+=item L<PDF::Make::Markup::Render> - Template and data in, PDF out
+
+=item L<PDF::Make::Markup::Profile> - The template profile (escaping on, fixed filters)
+
+=item L<PDF::Make::Markup::Parse> - Markup parser, errors carry line and column
+
+=item L<PDF::Make::Markup::Style> - Attribute and C<< <style> >> declaration handling
+
+=item L<PDF::Make::Markup::Build> - Compiles a parsed tree onto the Builder
+
+=back
+
 =head2 Builder (High-Level API)
 
 =over 4
@@ -205,10 +250,14 @@ Returns the C<libpdfmake> version string.
 
 =back
 
-No other runtime dependencies.
+No other runtime dependencies. L<Template::Stencil> is needed only to render a
+template through L<PDF::Make::Markup::Render/render>; C<render_markup>, which
+takes markup with no data in it, does not need it, and neither does anything
+else in the distribution.
 
 =head1 SEE ALSO
 
+L<PDF::Make::Markup::Render> for the template API, and
 L<PDF::Make::Builder> for the recommended high-level API.
 
 L<Object::Proto>

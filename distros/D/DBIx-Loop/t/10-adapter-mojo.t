@@ -6,7 +6,7 @@ use lib 't/lib';
 use Test::More;
 
 BEGIN {
-    plan skip_all => 'Mojolicious required' unless eval { require Mojo::IOLoop; 1 };
+    plan skip_all => 'Mojolicious required' unless eval { require Mojo::IOLoop; require Mojo::Promise; 1 };
     plan skip_all => 'DBD::SQLite required' unless eval { require DBD::SQLite; 1 };
 }
 use AdapterConformance;

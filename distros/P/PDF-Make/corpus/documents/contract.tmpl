@@ -1,0 +1,22 @@
+<doc page-size="A4" margin="50">
+  <style h1="size:16;line-height:19" h2="size:12;line-height:14;colour:#333333" text="size:10;line-height:14" />
+  <header>{% agreement.title %}</header>
+  <footer>{% parties.first.name %} and {% parties.second.name %}</footer>
+
+  <h1>{% agreement.title %}</h1>
+  <text>This agreement is made on {% agreement.date %} between <b>{% parties.first.name %}</b> of {% parties.first.address %} and <b>{% parties.second.name %}</b> of {% parties.second.address %}.</text>
+
+  {% for c in clauses %}
+  <h2>{% c.number %}. {% c.heading %}</h2>
+  <text>{% c.body %}</text>
+  {% end %}
+
+  <pagebreak />
+  <h2>Signatures</h2>
+  <row>
+    <cell weight="1" pad="10" border="#999999">Signed for {% parties.first.name %}
+      <i>Date</i></cell>
+    <cell weight="1" pad="10" border="#999999">Signed for {% parties.second.name %}
+      <i>Date</i></cell>
+  </row>
+</doc>

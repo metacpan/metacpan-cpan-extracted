@@ -1,6 +1,6 @@
 # Syntax file for make
 # Converted from: make.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: make
 extensions: make
@@ -73,6 +73,28 @@ pattern: #.*
 
 [match:Comment]
 pattern: #$
+
+[region:Define]
+start: \s*define\s
+end: \s*endef\s*\(#.*\)\?$
+
+[region:Identifier]
+start: \$(
+end: )
+escape: \
+
+[region:Identifier]
+start: \${
+end: }
+escape: \
+
+[region:Function]
+start: [~A-Za-z0-9_./$(){}%-][A-Za-z0-9_./\t ${}()%-]*&\?:\?:\{1,2}[^:=]
+end: [^\]$
+
+[region:Number]
+start: ;
+end: [^\t#]
 
 [region:Comment]
 start: #

@@ -1,6 +1,6 @@
 # Syntax file for ocaml
 # Converted from: ocaml.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: ocaml
 extensions: ocaml
@@ -29,17 +29,11 @@ pattern: ^#!.*
 [match:Include]
 pattern: ^#\b(?:quit|labels|warnings|warn_error|directory|remove_directory|cd|load|load_rec|use|mod_use|install_printer|remove_printer|require|list|ppx|principal|predicates|rectypes|thread|trace|untrace|untrace_all|print_depth|print_length|camlp4o|camlp4r|topfind_log|topfind_verbose)\b
 
-[match:Keyword]
-pattern: |
-
 [match:Error]
 pattern: }
 
 [match:Error]
 pattern: \]
-
-[match:Error]
-pattern: |]
 
 [match:Error]
 pattern: \bdownto\b
@@ -111,9 +105,6 @@ pattern: ;;
 pattern: \b_\b
 
 [match:Keyword]
-pattern: |[^\]]
-
-[match:Keyword]
 pattern: ;
 
 [match:Operator]
@@ -149,11 +140,43 @@ pattern: -?\b\d(?:_|\d)*\.\?(?:_|\d)*(?:[eE][-+]?\d(?:_|\d)*)?\b
 [match:Label]
 pattern: (?:[a-z]|_)(?:\w|')*
 
+[region:Keyword]
+start: (
+end: )
+
+[region:Keyword]
+start: {
+end: }
+
+[region:Keyword]
+start: \[
+end: \]
+
+[region:Keyword]
+start: \[|
+end: |\]
+
 [region:Comment]
 start: (\*
 end: \*)
 
+[region:Include]
+start: ([^*]
+end: )
+
+[region:Keyword]
+start: \sfunctor\(\s\|(\)\=
+end: ->
+
+[region:Include]
+start: ([^*)]
+end: )
+
 [region:String]
 start: "
 end: "
+
+[region:Label]
+start: [~?](\(\l\|_\)\(\w\|
+end: )
 

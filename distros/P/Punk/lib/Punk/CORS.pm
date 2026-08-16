@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk (); 
 
-our $VERSION = '0.02';
+our $VERSION = '0.12';
 
 sub _chain {
     my ($future, $cfg, $allow) = @_;

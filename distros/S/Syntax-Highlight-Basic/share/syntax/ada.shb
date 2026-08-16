@@ -1,6 +1,6 @@
 # Syntax file for ada
 # Converted from: ada.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: ada
 extensions: ada
@@ -152,4 +152,8 @@ end: >>
 [region:String]
 start: "
 end: "
+
+[region:Comment]
+start: --
+end: $
 

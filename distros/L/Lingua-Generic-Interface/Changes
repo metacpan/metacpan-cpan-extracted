@@ -1,2 +1,6 @@
+v0.02  2026-08-16Z
+    - Added a number of reserved methods
+    - Defined new method stem()
+
 v0.01  2026-08-13Z
     - Initial release

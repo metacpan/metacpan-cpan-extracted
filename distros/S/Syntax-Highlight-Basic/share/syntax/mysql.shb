@@ -1,6 +1,6 @@
 # Syntax file for mysql
 # Converted from: mysql.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: mysql
 extensions: mysql
@@ -84,12 +84,20 @@ start: float$
 end: .
 
 [region:Type]
+start: float(
+end: )
+
+[region:Type]
 start: double\W
 end: .
 
 [region:Type]
 start: double$
 end: .
+
+[region:Type]
+start: double(
+end: )
 
 [region:Type]
 start: double precision\W
@@ -100,12 +108,24 @@ start: double precision$
 end: .
 
 [region:Type]
+start: double precision(
+end: )
+
+[region:Type]
 start: real\W
 end: .
 
 [region:Type]
 start: real$
 end: .
+
+[region:Type]
+start: real(
+end: )
+
+[region:Type]
+start: numeric(
+end: )
 
 [region:Type]
 start: dec\W
@@ -116,12 +136,20 @@ start: dec$
 end: .
 
 [region:Type]
+start: dec(
+end: )
+
+[region:Type]
 start: decimal\W
 end: .
 
 [region:Type]
 start: decimal$
 end: .
+
+[region:Type]
+start: decimal(
+end: )
 
 [region:Type]
 start: \Wtimestamp\W
@@ -132,10 +160,554 @@ start: \Wtimestamp$
 end: .
 
 [region:Type]
+start: \Wtimestamp(
+end: )
+
+[region:Type]
 start: timestamp\W
 end: .
 
 [region:Type]
 start: timestamp$
 end: .
+
+[region:Type]
+start: timestamp(
+end: )
+
+[region:Type]
+start: \Wyear(
+end: )
+
+[region:Type]
+start: year(
+end: )
+
+[region:Type]
+start: char(
+end: )
+
+[region:Type]
+start: varchar(
+end: )
+
+[region:Type]
+start: enum(
+end: )
+
+[region:Type]
+start: \Wset(
+end: )
+
+[region:Type]
+start: set(
+end: )
+
+[region:Operator]
+start: isnull(
+end: )
+
+[region:Operator]
+start: coalesce(
+end: )
+
+[region:Operator]
+start: interval(
+end: )
+
+[region:Statement]
+start: ifnull(
+end: )
+
+[region:Statement]
+start: nullif(
+end: )
+
+[region:Statement]
+start: if(
+end: )
+
+[region:Function]
+start: abs(
+end: )
+
+[region:Function]
+start: acos(
+end: )
+
+[region:Function]
+start: adddate(
+end: )
+
+[region:Function]
+start: ascii(
+end: )
+
+[region:Function]
+start: asin(
+end: )
+
+[region:Function]
+start: atan(
+end: )
+
+[region:Function]
+start: atan2(
+end: )
+
+[region:Function]
+start: avg(
+end: )
+
+[region:Function]
+start: benchmark(
+end: )
+
+[region:Function]
+start: bin(
+end: )
+
+[region:Function]
+start: bit_and(
+end: )
+
+[region:Function]
+start: bit_count(
+end: )
+
+[region:Function]
+start: bit_or(
+end: )
+
+[region:Function]
+start: ceiling(
+end: )
+
+[region:Function]
+start: character_length(
+end: )
+
+[region:Function]
+start: char_length(
+end: )
+
+[region:Function]
+start: concat(
+end: )
+
+[region:Function]
+start: concat_ws(
+end: )
+
+[region:Function]
+start: connection_id(
+end: )
+
+[region:Function]
+start: conv(
+end: )
+
+[region:Function]
+start: cos(
+end: )
+
+[region:Function]
+start: cot(
+end: )
+
+[region:Function]
+start: count(
+end: )
+
+[region:Function]
+start: curdate(
+end: )
+
+[region:Function]
+start: curtime(
+end: )
+
+[region:Function]
+start: date_add(
+end: )
+
+[region:Function]
+start: date_format(
+end: )
+
+[region:Function]
+start: date_sub(
+end: )
+
+[region:Function]
+start: dayname(
+end: )
+
+[region:Function]
+start: dayofmonth(
+end: )
+
+[region:Function]
+start: dayofweek(
+end: )
+
+[region:Function]
+start: dayofyear(
+end: )
+
+[region:Function]
+start: decode(
+end: )
+
+[region:Function]
+start: degrees(
+end: )
+
+[region:Function]
+start: elt(
+end: )
+
+[region:Function]
+start: encode(
+end: )
+
+[region:Function]
+start: encrypt(
+end: )
+
+[region:Function]
+start: exp(
+end: )
+
+[region:Function]
+start: export_set(
+end: )
+
+[region:Function]
+start: extract(
+end: )
+
+[region:Function]
+start: field(
+end: )
+
+[region:Function]
+start: find_in_set(
+end: )
+
+[region:Function]
+start: floor(
+end: )
+
+[region:Function]
+start: format(
+end: )
+
+[region:Function]
+start: from_days(
+end: )
+
+[region:Function]
+start: from_unixtime(
+end: )
+
+[region:Function]
+start: get_lock(
+end: )
+
+[region:Function]
+start: greatest(
+end: )
+
+[region:Function]
+start: group_unique_users(
+end: )
+
+[region:Function]
+start: hex(
+end: )
+
+[region:Function]
+start: inet_aton(
+end: )
+
+[region:Function]
+start: inet_ntoa(
+end: )
+
+[region:Function]
+start: instr(
+end: )
+
+[region:Function]
+start: lcase(
+end: )
+
+[region:Function]
+start: least(
+end: )
+
+[region:Function]
+start: length(
+end: )
+
+[region:Function]
+start: load_file(
+end: )
+
+[region:Function]
+start: locate(
+end: )
+
+[region:Function]
+start: log(
+end: )
+
+[region:Function]
+start: log10(
+end: )
+
+[region:Function]
+start: lower(
+end: )
+
+[region:Function]
+start: lpad(
+end: )
+
+[region:Function]
+start: ltrim(
+end: )
+
+[region:Function]
+start: make_set(
+end: )
+
+[region:Function]
+start: master_pos_wait(
+end: )
+
+[region:Function]
+start: max(
+end: )
+
+[region:Function]
+start: md5(
+end: )
+
+[region:Function]
+start: mid(
+end: )
+
+[region:Function]
+start: min(
+end: )
+
+[region:Function]
+start: mod(
+end: )
+
+[region:Function]
+start: monthname(
+end: )
+
+[region:Function]
+start: now(
+end: )
+
+[region:Function]
+start: oct(
+end: )
+
+[region:Function]
+start: octet_length(
+end: )
+
+[region:Function]
+start: ord(
+end: )
+
+[region:Function]
+start: period_add(
+end: )
+
+[region:Function]
+start: period_diff(
+end: )
+
+[region:Function]
+start: pi(
+end: )
+
+[region:Function]
+start: position(
+end: )
+
+[region:Function]
+start: pow(
+end: )
+
+[region:Function]
+start: power(
+end: )
+
+[region:Function]
+start: quarter(
+end: )
+
+[region:Function]
+start: radians(
+end: )
+
+[region:Function]
+start: rand(
+end: )
+
+[region:Function]
+start: release_lock(
+end: )
+
+[region:Function]
+start: repeat(
+end: )
+
+[region:Function]
+start: reverse(
+end: )
+
+[region:Function]
+start: round(
+end: )
+
+[region:Function]
+start: rpad(
+end: )
+
+[region:Function]
+start: rtrim(
+end: )
+
+[region:Function]
+start: sec_to_time(
+end: )
+
+[region:Function]
+start: session_user(
+end: )
+
+[region:Function]
+start: sign(
+end: )
+
+[region:Function]
+start: sin(
+end: )
+
+[region:Function]
+start: soundex(
+end: )
+
+[region:Function]
+start: space(
+end: )
+
+[region:Function]
+start: sqrt(
+end: )
+
+[region:Function]
+start: std(
+end: )
+
+[region:Function]
+start: stddev(
+end: )
+
+[region:Function]
+start: strcmp(
+end: )
+
+[region:Function]
+start: subdate(
+end: )
+
+[region:Function]
+start: substring(
+end: )
+
+[region:Function]
+start: substring_index(
+end: )
+
+[region:Function]
+start: subtime(
+end: )
+
+[region:Function]
+start: sum(
+end: )
+
+[region:Function]
+start: sysdate(
+end: )
+
+[region:Function]
+start: system_user(
+end: )
+
+[region:Function]
+start: tan(
+end: )
+
+[region:Function]
+start: time_format(
+end: )
+
+[region:Function]
+start: time_to_sec(
+end: )
+
+[region:Function]
+start: to_days(
+end: )
+
+[region:Function]
+start: trim(
+end: )
+
+[region:Function]
+start: ucase(
+end: )
+
+[region:Function]
+start: unique_users(
+end: )
+
+[region:Function]
+start: unix_timestamp(
+end: )
+
+[region:Function]
+start: upper(
+end: )
+
+[region:Function]
+start: user(
+end: )
+
+[region:Function]
+start: version(
+end: )
+
+[region:Function]
+start: week(
+end: )
+
+[region:Function]
+start: weekday(
+end: )
+
+[region:Function]
+start: yearweek(
+end: )
 

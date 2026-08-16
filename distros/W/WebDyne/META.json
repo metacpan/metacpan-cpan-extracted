@@ -38,15 +38,16 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Plack" : "0"
-         },
          "requires" : {
             "CGI::Simple" : "0",
+            "Capture::Tiny" : "0",
             "Crypt::URandom" : "0",
             "Devel::Confess" : "0",
             "Digest::MD5" : "0",
             "Env::Path" : "0",
+            "File::Temp" : "0",
+            "HTML::Element" : "0",
+            "HTML::Entities" : "0",
             "HTML::Tagset" : "0",
             "HTML::Tiny" : "0",
             "HTML::TreeBuilder" : "0",
@@ -54,6 +55,8 @@
             "HTTP::Headers::Fast" : "0",
             "HTTP::Headers::Util" : "0",
             "HTTP::Negotiate" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
             "HTTP::Status" : "0",
             "Hash::MultiValue" : "0",
             "IO::String" : "0",
@@ -65,7 +68,18 @@
             "Text::Template" : "0",
             "Tie::IxHash" : "0",
             "Time::HiRes" : "0",
+            "URI" : "0",
             "perl" : "5.006"
+         },
+         "suggests" : {
+            "HTML::Tidy5" : "0",
+            "Module::Reload" : "0",
+            "Syntax::Highlight::Engine::Kate" : "0",
+            "Task::WebDyne::Apache" : "0",
+            "Task::WebDyne::PAGI" : "0",
+            "Task::WebDyne::Plack" : "0",
+            "Task::WebDyne::Starman" : "0",
+            "Text::Diff" : "0"
          }
       }
    },
@@ -81,7 +95,7 @@
          "web" : "https://github.com/aspeer/WebDyne"
       }
    },
-   "version" : "3.012",
+   "version" : "3.014",
    "x_authority" : "cpan:ASPEER",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

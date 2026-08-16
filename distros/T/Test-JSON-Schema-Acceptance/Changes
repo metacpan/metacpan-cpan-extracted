@@ -1,5 +1,10 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.038     2026-08-16 00:22:45Z
+        - removed dependency on Ref::Util
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/75995a1c8112322024d5c04a5eac27813aeb46f0...6648e8194c69697b2e1a15fe76a06a480b183a51
+
 1.037     2026-01-21 22:49:02Z
         - when dumping data for a failed test, include its type when blessed
           (e.g. a Math::BigInt object)

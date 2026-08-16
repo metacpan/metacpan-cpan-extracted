@@ -28,3 +28,7 @@ dzil-local/
 !/.claude/rules/**
 !/.claude/hooks/
 !/.claude/hooks/**
+
+# karr materialized task view -- never commit
+tasks/
+config.yml

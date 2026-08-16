@@ -30,21 +30,7 @@ static int use_xsbypass = 1; /* set in dbi_bootinit() */
 
 #define DBI_MAGIC '~'
 
-/* HvMROMETA introduced in 5.9.5, but mro_meta_init not exported in 5.10.0 */
-#if (PERL_REVISION == 5)
-#  if (PERL_VERSION < 10)
-#    define MY_cache_gen(stash) 0
-#  else
-#    if ((PERL_VERSION == 10) && (PERL_SUBVERSION == 0))
-#      define MY_cache_gen(stash) \
-          (HvAUX(stash)->xhv_mro_meta \
-          ? HvAUX(stash)->xhv_mro_meta->cache_gen \
-          : 0)
-#    else
-#      define MY_cache_gen(stash) HvMROMETA(stash)->cache_gen
-#    endif
-#  endif
-#endif
+#define MY_cache_gen(stash) HvMROMETA(stash)->cache_gen
 
 /* If the tests fail with errors about 'setlinebuf' then try    */
 /* deleting the lines in the block below except the setvbuf one */
@@ -63,13 +49,6 @@ static int use_xsbypass = 1; /* set in dbi_bootinit() */
 #  define DBI_save_hv_fetch_ent
 # endif
 
-/* prior to 5.8.9: when a CV is duped, the mg dup method is called,
- * then *afterwards*, any_ptr is copied from the old CV to the new CV.
- * This wipes out anything which the dup method did to any_ptr.
- * This needs working around */
-# if defined(USE_ITHREADS) && (PERL_VERSION == 8) && (PERL_SUBVERSION < 9)
-#  define BROKEN_DUP_ANY_PTR
-# endif
 #endif
 
 /* types of method name */
@@ -104,7 +83,7 @@ static I32      dbi_hash _((const char *string, long i));
 static void     dbih_dumphandle _((pTHX_ SV *h, const char *msg, int level));
 static int      dbih_dumpcom _((pTHX_ imp_xxh_t *imp_xxh, const char *msg, int level));
 static int      dbi_ima_free(pTHX_ SV* sv, MAGIC* mg);
-#if defined(USE_ITHREADS) && !defined(BROKEN_DUP_ANY_PTR)
+#if defined(USE_ITHREADS)
 static int      dbi_ima_dup(pTHX_ MAGIC* mg, CLONE_PARAMS *param);
 #endif
 char *neatsvpv _((SV *sv, STRLEN maxlen));
@@ -171,9 +150,6 @@ typedef struct dbi_ima_st {
     HV *stash;          /* the stash we found the GV in */
     GV *gv;             /* the GV containing the inner sub */
     U32 generation;     /* cache invalidation */
-#ifdef BROKEN_DUP_ANY_PTR
-    PerlInterpreter *my_perl; /* who owns this struct */
-#endif
 
 } dbi_ima_t;
 
@@ -236,7 +212,7 @@ static char *dbi_build_opt = "-nothread";
 
 static MGVTBL dbi_ima_vtbl = { 0, 0, 0, 0, dbi_ima_free,
                                     0,
-#if defined(USE_ITHREADS) && !defined(BROKEN_DUP_ANY_PTR)
+#if defined(USE_ITHREADS)
                                     dbi_ima_dup
 #else
                                     0
@@ -251,17 +227,13 @@ static MGVTBL dbi_ima_vtbl = { 0, 0, 0, 0, dbi_ima_free,
 static int dbi_ima_free(pTHX_ SV* sv, PERL_UNUSED_DECL MAGIC* mg)
 {
     dbi_ima_t *ima = (dbi_ima_t *)(CvXSUBANY((CV*)sv).any_ptr);
-#ifdef BROKEN_DUP_ANY_PTR
-    if (ima->my_perl != my_perl)
-        return 0;
-#endif
     SvREFCNT_dec(ima->stash);
     SvREFCNT_dec(ima->gv);
     Safefree(ima);
     return 0;
 }
 
-#if defined(USE_ITHREADS) && !defined(BROKEN_DUP_ANY_PTR)
+#if defined(USE_ITHREADS)
 static int dbi_ima_dup(pTHX_ MAGIC* mg, CLONE_PARAMS *param)
 {
     dbi_ima_t *ima, *nima;
@@ -2709,7 +2681,8 @@ dbi_caller_cop()
         if (cxix < 0) {
             break;
         }
-        if (PL_DBsub && cxix >= 0 && ccstack[cxix].blk_sub.cv == GvCV(PL_DBsub))
+        /* skip the automatic calls to &DB::sub, as perl's pp_caller does */
+        if (PL_DBsub && GvCV(PL_DBsub) && cxix >= 0 && ccstack[cxix].blk_sub.cv == GvCV(PL_DBsub))
             continue;
         cx = &ccstack[cxix];
         stashname = CopSTASHPV(cx->blk_oldcop);
@@ -3217,20 +3190,6 @@ XS(XS_DBI_dispatch)
     SV          *qsv       = Nullsv; /* quick result from a shortcut method   */
 
 
-#ifdef BROKEN_DUP_ANY_PTR
-    if (ima->my_perl != my_perl) {
-        /* we couldn't dup the ima struct at clone time, so do it now */
-        dbi_ima_t *nima;
-        Newx(nima, 1, dbi_ima_t);
-        *nima = *ima; /* structure copy */
-        CvXSUBANY(cv).any_ptr = nima;
-        nima->stash = NULL;
-        nima->gv    = NULL;
-        nima->my_perl = my_perl;
-        ima = nima;
-    }
-#endif
-
     ima_flags  = ima->flags;
     meth_type = ima->meth_type;
     if (trace_level >= 9) {
@@ -3423,19 +3382,17 @@ XS(XS_DBI_dispatch)
         }
 
         if (ima_flags & IMA_HAS_USAGE) {
-            const char *err = NULL;
-            char msg[200];
+            SV *usage_err = Nullsv;
 
             if (ima->minargs && (items < ima->minargs
                                 || (ima->maxargs>0 && items > ima->maxargs))) {
-                sprintf(msg,
+                usage_err = sv_2mortal(newSVpvf(
                     "DBI %s: invalid number of arguments: got handle + %ld, expected handle + between %d and %d\n",
-                    meth_name, (long)items-1, (int)ima->minargs-1, (int)ima->maxargs-1);
-                err = msg;
+                    meth_name, (long)items-1, (int)ima->minargs-1, (int)ima->maxargs-1));
             }
             /* arg type checking could be added here later */
-            if (err) {
-                croak("%sUsage: %s->%s(%s)", err, "$h", meth_name,
+            if (usage_err) {
+                croak("%sUsage: %s->%s(%s)", SvPV_nolen(usage_err), "$h", meth_name,
                     (ima->usage_msg) ? ima->usage_msg : "...?");
             }
         }
@@ -3451,11 +3408,11 @@ XS(XS_DBI_dispatch)
     ) {
         for(i=1; i < items; ++i) {
             if (SvTAINTED(ST(i))) {
-                char buf[100];
-                sprintf(buf,"parameter %d of %s->%s method call",
-                        i, SvPV_nolen(h), meth_name);
+                SV *taint_msg = sv_2mortal(newSVpvf(
+		    "parameter %d of %s->%s method call",
+		    i, SvPV_nolen(h), meth_name));
                 PL_tainted = 1; /* needed for TAINT_PROPER to work      */
-                TAINT_PROPER(buf);      /* die's */
+                TAINT_PROPER(SvPV_nolen(taint_msg));      /* die's */
             }
         }
     }
@@ -4187,6 +4144,7 @@ preparse(SV *dbh, const char *statement, IV ps_return, IV ps_accept, void *foo)
         we add support for odbc escape sequences.
 */
     int idx = 1;
+    int sln;
 
     char in_quote = '\0';
     char in_comment = '\0';
@@ -4210,7 +4168,14 @@ preparse(SV *dbh, const char *statement, IV ps_return, IV ps_accept, void *foo)
      * using factor 6: :p1 .. :p11106
      * using factor 7: :p1 .. :p111105
      * and that count is insane already */
-    new_stmt_sv = newSV(strlen(statement) * 7 + 16);
+    sln = strlen(statement);
+    if (sln > 306783375) { /* x * 7 + 16 would overflow maxint on 32bit ints */
+        char buf[99];
+        sprintf(buf, "preparse statement length exceeds maximum length (306783375).");
+        set_err_char(dbh, imp_xxh, "1", 1, buf, 0, "preparse");
+        return &PL_sv_undef;
+    }
+    new_stmt_sv = newSV(sln * 7 + 16);
     sv_setpv(new_stmt_sv,"");
     src  = statement;
     dest = SvPVX(new_stmt_sv);
@@ -4392,9 +4357,17 @@ preparse(SV *dbh, const char *statement, IV ps_return, IV ps_accept, void *foo)
         }
         else if (isDIGIT(*src)) {   /* :1 */
             const int pln = atoi(src);
+
+            if (pln > 99999 || pln <= 0) {
+                char buf[99];
+                sprintf(buf, "preparse found :p%d which is outside the allowed range.", pln);
+                set_err_char(dbh, imp_xxh, "1", 1, buf, 0, "preparse");
+                return &PL_sv_undef;
+            }
+
             style = ":1";
 
-            if (PS_return(DBIpp_ph_cn)) { /* ':1'->':p1'  */
+            if (PS_return(DBIpp_ph_cn)) { /* ':1'-> ':p1'  */
                 idx = pln;
                 *dest++ = 'p';
                 while(isDIGIT(*src))
@@ -4783,11 +4756,7 @@ _install_method(dbi_class, meth_name, file, attribs=Nullsv)
      * pointer to the mg, but not the SV) */
     mg = sv_magicext((SV*)cv, NULL, DBI_MAGIC, &dbi_ima_vtbl,
                         (char *)cv, 0);
-#ifdef BROKEN_DUP_ANY_PTR
-    ima->my_perl = my_perl; /* who owns this struct */
-#else
     mg->mg_flags |= MGf_DUP;
-#endif
     ST(0) = &PL_sv_yes;
     }
 

@@ -44,6 +44,11 @@
                 "valid": true
             },
             {
+                "description": "hostname with consecutive hyphens (RFC1123)",
+                "data": "ab--cd.example",
+                "valid": true
+            },
+            {
                 "description": "a host name starting with an illegal character",
                 "data": "-a-host-name-that-starts-with--",
                 "valid": false
@@ -136,6 +141,16 @@
             {
                 "description": "IDN label separator",
                 "data": "example\uff0ecom",
+                "valid": false
+            },
+            {
+                "description": "trailing newline is invalid",
+                "data": "example.com\n",
+                "valid": false
+            },
+            {
+                "description": "invalid non-ASCII KELVIN SIGN (U+212A)",
+                "data": "\u212Aelvin.example.com",
                 "valid": false
             }
         ]

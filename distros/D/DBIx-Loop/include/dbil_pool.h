@@ -65,11 +65,23 @@ static SV *dbil_thaw(pTHX_ const char *p, STRLEN len) {   /* mortal ref, or NULL
 
 /* ---- frame I/O ------------------------------------------------------------- */
 
-/* write all n bytes (EINTR-safe). 0 ok, -1 on error. */
+/* write all n bytes (EINTR-safe). 0 ok, -1 on error.
+ *
+ * A peer that died mid-conversation must surface as the -1 the callers
+ * treat as a death notice - NOT as SIGPIPE, whose default disposition
+ * kills the whole process before write() can return EPIPE (CPAN Testers:
+ * t/02-pool.t exited with signal 13 after every assertion had passed).
+ * Linux suppresses it per-send with MSG_NOSIGNAL; where that is missing
+ * (macOS, the BSDs) dbil_pool_spawn sets SO_NOSIGPIPE on the pair. */
 static int dbil_write_all(int fd, const char *p, STRLEN n) {
     STRLEN off = 0;
     while (off < n) {
-        ssize_t w = write(fd, p + off, n - off);
+        ssize_t w;
+#ifdef MSG_NOSIGNAL
+        w = send(fd, p + off, n - off, MSG_NOSIGNAL);
+#else
+        w = write(fd, p + off, n - off);
+#endif
         if (w < 0) { if (errno == EINTR) continue; return -1; }
         off += (STRLEN)w;
     }
@@ -245,6 +257,15 @@ static int dbil_pool_spawn(pTHX_ dbil_pool *p, int wi) {
     pid_t pid;
     dbil_worker *w = &p->w[wi];
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sp) < 0) return -1;
+#ifdef SO_NOSIGPIPE
+    /* no MSG_NOSIGNAL on this platform: suppress SIGPIPE at the socket,
+     * so a write to a dead peer returns EPIPE (see dbil_write_all) */
+    {
+        int one = 1;
+        (void)setsockopt(sp[0], SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof one);
+        (void)setsockopt(sp[1], SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof one);
+    }
+#endif
     pid = fork();
     if (pid < 0) { close(sp[0]); close(sp[1]); return -1; }
     if (pid == 0) {

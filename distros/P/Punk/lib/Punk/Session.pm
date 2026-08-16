@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.12';
 
 1;
 
@@ -85,6 +85,45 @@ end of the request if it changed.
 =head2 session_expire
 
 Log out: empty the session and delete the cookie.
+
+=head2 flash
+
+=head2 flash_keep
+
+One-request messages riding the session - see L</FLASH>.
+
+=head1 FLASH
+
+    post '/save' => sub {
+        my ($c) = @_;
+        $c->flash(notice => 'Saved.');       # for the NEXT request
+        $c->redirect('/list');
+    };
+
+    get '/list' => sub {
+        my ($c) = @_;
+        $c->render('list', { flash => $c->flash });
+    };
+
+A flash message lives exactly one request: set it, redirect, and the
+redirected-to page reads it once. It rides the session under one reserved
+key (C<punk.flash>), so it shares the session's machinery - the signing,
+the change-detected write-back, and the ~4KB cap - and needs the
+C<session> keyword configured.
+
+C<< $c->flash(key => $value, ...) >> sets messages for the next request;
+C<< $c->flash('key') >> reads one of this request's inbound messages; a
+bare C<< $c->flash >> returns the whole inbound hashref (possibly empty) -
+which is also how a template gets it, passed explicitly like any other
+render data. C<< $c->flash_keep >> re-arms the inbound messages for one
+more request - the redirect-through-a-redirect case.
+
+The rotation is the session's own change detection: the first flash call
+of a request moves the inbound hash out of the session, so the consuming
+response rewrites the cookie without it, while a request that never
+touches flash leaves it riding untouched. Setting and reading in the same
+request do not meet: reads see the previous request's messages, writes
+feed the next one's.
 
 =head1 SEE ALSO
 

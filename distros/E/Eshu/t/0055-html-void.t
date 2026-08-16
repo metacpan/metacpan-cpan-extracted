@@ -47,7 +47,9 @@ END
 	is($got, $expected, 'void input elements with attributes');
 }
 
-# In XML mode, unclosed tags increase depth
+# In XML mode, unclosed tags increase depth for their content - but the
+# closer of an OUTER element pops through them (the open stack), so
+# </root> aligns with its <root> instead of inheriting the drift.
 {
 	my $input = <<'END';
 <root>
@@ -60,7 +62,7 @@ END
 <root>
 	<br>
 		<p>text</p>
-	</root>
+</root>
 END
 
 	my $got = Eshu->indent_xml($input);

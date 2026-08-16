@@ -9,14 +9,14 @@
 
 package DBI;
 
-require 5.008001;
+require 5.012000;
 
 use strict;
 use warnings;
 
 our ($XS_VERSION, $VERSION);
 BEGIN {
-$VERSION = "1.651"; # ==> ALSO update the version in the pod text below!
+$VERSION = "1.652"; # ==> ALSO update the version in the pod text below!
 $XS_VERSION = $VERSION;
 $VERSION =~ tr/_//d;
 }
@@ -148,7 +148,7 @@ sure that your issue isn't related to the driver you're using.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.651
+This is the DBI specification that corresponds to DBI version 1.652
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -681,15 +681,15 @@ sub connect {
 
 	my $dbh;
 	unless ($dbh = $drh->$connect_meth($dsn, $user, $pass, $attr)) {
-	    $user = '' if !defined $user;
-	    $dsn = '' if !defined $dsn;
+	    $user //= '';
+	    $dsn  //= '';
 	    # $drh->errstr isn't safe here because $dbh->DESTROY may not have
 	    # been called yet and so the dbh errstr would not have been copied
 	    # up to the drh errstr. Certainly true for connect_cached!
 	    my $errstr = $DBI::errstr;
             # Getting '(no error string)' here is a symptom of a ref loop
-	    $errstr = '(no error string)' if !defined $errstr;
-	    my $msg = "$class connect('$dsn','$user',...) failed: $errstr";
+	    $errstr //= '(no error string)';
+	    my $msg   = "$class connect('$dsn','$user',...) failed: $errstr";
 	    DBI->trace_msg("       $msg\n");
 	    # XXX HandleWarn
 	    unless ($attr->{HandleError} && $attr->{HandleError}->($msg, $drh, $dbh)) {
@@ -1082,8 +1082,8 @@ sub data_sources {
 
 sub neat_list {
     my ($listref, $maxlen, $sep) = @_;
-    $maxlen = 0 unless defined $maxlen;	# 0 == use internal default
-    $sep = ", " unless defined $sep;
+    $maxlen //= 0;	# 0 == use internal default
+    $sep    //= ", ";
     join($sep, map { neat($_,$maxlen) } @$listref);
 }
 
@@ -1441,7 +1441,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 
     sub visit_child_handles {
 	my ($h, $code, $info) = @_;
-	$info = {} if not defined $info;
+	$info //= {};
 	for my $ch (@{ $h->{ChildHandles} || []}) {
 	    next unless $ch;
 	    my $child_info = $code->($ch, $info)
@@ -1460,8 +1460,8 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 
     sub default_user {
 	my ($drh, $user, $pass, $attr) = @_;
-	$user = $ENV{DBI_USER} unless defined $user;
-	$pass = $ENV{DBI_PASS} unless defined $pass;
+	$user //= $ENV{DBI_USER};
+	$pass //= $ENV{DBI_PASS};
 	return ($user, $pass);
     }
 
@@ -1981,7 +1981,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 		$maxlen = @$ary if !$maxlen || @$ary > $maxlen;
 	    }
 	    # if there are no arrays then execute scalars once
-	    $maxlen = 1 unless defined $maxlen;
+	    $maxlen //= 1;
 	    my @bind_ids = 1..keys(%hash_of_arrays);
 
 	    my $tuple_idx = 0;
@@ -2046,7 +2046,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 	    # we copy the array here because fetch (currently) always
 	    # returns the same array ref. XXX
 	    if ($slice && @$slice) {
-                $max_rows = -1 unless defined $max_rows;
+                $max_rows //= -1;
 		push @rows, [ @{$row}[ @$slice] ]
 		    while($max_rows-- and $row = $sth->fetch);
 	    }
@@ -3870,15 +3870,15 @@ The same logic applies to other attributes, including C<PrintError>.
 
 Type: code ref, inherited
 
-The C<HandleError> attribute can be used to provide your own alternative behaviour
-in case of errors. If set to a reference to a subroutine then that
+The C<HandleError> attribute can be used to provide your own alternative
+behaviour in case of errors. If set to a reference to a subroutine then that
 subroutine is called when an error is detected (at the same point that
 C<RaiseError> and C<PrintError> are handled). It is called also when
 C<RaiseWarn> is enabled and a warning is detected.
 
-The subroutine is called with three parameters: the error message
-string that C<RaiseError>, C<RaiseWarn> or C<PrintError> would use,
-the DBI handle being used, and the first value being returned by
+The subroutine is called with three parameters: the error message string that
+C<RaiseError>, C<RaiseWarn> or C<PrintError> would use, the DBI handle being
+used (dbh, sth or drh as appropriate) and the first value being returned by
 the method that failed (typically undef).
 
 If the subroutine returns a false value then the C<RaiseError>, C<RaiseWarn>
@@ -6339,7 +6339,7 @@ For example:
   else {
       for my $tuple (0..@last_names-1) {
           my $status = $tuple_status[$tuple];
-          $status = [0, "Skipped"] unless defined $status;
+          $status //= [0, "Skipped"];
           next unless ref $status;
           printf "Failed to insert (%s, %s): %s\n",
               $first_names[$tuple], $last_names[$tuple], $status->[1];
@@ -7445,7 +7445,7 @@ Here's how to convert fetched NULLs (undefined values) into empty strings:
 
   while($row = $sth->fetchrow_arrayref) {
     # this is a fast and simple way to deal with nulls:
-    foreach (@$row) { $_ = '' unless defined }
+    $_ //= '' for @$row;
     print "@$row\n";
   }
 
@@ -7489,25 +7489,10 @@ Using DBI with perl threads is not yet recommended for production
 environments. For more information see
 L<https://www.perlmonks.org/index.pl?node_id=288022>
 
-Note: There is a bug in perl 5.8.2 when configured with threads and
-debugging enabled (bug #24463) which would cause some DBI tests to fail.
-These tests have been disabled for perl-5.8.2 and below.
-
-Tests for inner method cache are disabled for perl-5.10.x
-
 =head2 Signal Handling and Canceling Operations
 
 [The following only applies to systems with unix-like signal handling.
 I'd welcome additions for other systems, especially Windows.]
-
-The first thing to say is that signal handling in Perl versions less
-than 5.8 is I<not> safe. There is always a small risk of Perl
-crashing and/or core dumping when, or after, handling a signal
-because the signal could arrive and be handled while internal data
-structures are being changed. If the signal handling code
-used those same internal data structures it could cause all manner
-of subtle and not-so-subtle problems.  The risk was reduced with
-5.4.4 but was still present in all perls up through 5.8.0.
 
 Beginning in perl 5.8.0 perl implements 'safe' signal handling if
 your system has the POSIX sigaction() routine. Now when a signal
@@ -7630,11 +7615,10 @@ See previous example for the reasoning around the double eval.
 
 Similar techniques can be used for canceling statement execution.
 
-Unfortunately, this solution is somewhat messy, and it does I<not> work with
-perl versions less than perl 5.8 where C<POSIX::sigaction()> appears to be broken.
+Unfortunately, this solution is somewhat messy.
 
-For a cleaner implementation that works across perl versions, see Lincoln Baxter's
-Sys::SigAction module at L<Sys::SigAction>.
+For a cleaner implementation that works across perl versions, see
+Lincoln Baxter's Sys::SigAction module at L<Sys::SigAction>.
 The documentation for Sys::SigAction includes an longer discussion
 of this problem, and a DBD::Oracle test script.
 
@@ -7914,13 +7898,10 @@ Tied filehandles are not currently supported, as
 tie operations are not available to the PerlIO
 methods used by the DBI.
 
-=item *
-PerlIO layer support requires Perl version 5.8 or higher.
-
 =back
 
-As of version 5.8, Perl provides the ability to layer various
-"disciplines" on an open filehandle via the L<PerlIO> module.
+Perl provides the ability to layer various "disciplines" on an open
+filehandle via the L<PerlIO> module.
 
 A simple example of using PerlIO layers is to use a scalar as the output:
 
@@ -8319,7 +8300,7 @@ The DBI module is Copyright (c) 1994-2024 Tim Bunce. Ireland.
 The DBI developer group (2024-2024) All rights reserved.
 
 You may distribute under the terms of either the GNU General Public
-License or the Artistic License, as specified in the Perl 5.10.0 README file.
+License or the Artistic License, as specified in the Perl 5.12.0 README file.
 
 =head1 SUPPORT / WARRANTY
 

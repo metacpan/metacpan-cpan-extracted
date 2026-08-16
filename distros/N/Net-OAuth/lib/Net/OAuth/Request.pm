@@ -6,7 +6,7 @@ use URI;
 use URI::QueryParam;
 
 use Net::OAuth;
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 __PACKAGE__->mk_classdata(required_message_params => [qw/
     consumer_key
@@ -89,9 +89,9 @@ L<Net::OAuth>, L<http://oauth.net>
 
 =head1 AUTHOR
 
-Originally by Keith Grennan <kgrennan@cpan.org>
+Originally by Keith Grennan <foss@nearlyfree.org>
 
-Currently maintained by Robert Rothenberg <rrwo@cpan.org>
+Currently maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT & LICENSE
 

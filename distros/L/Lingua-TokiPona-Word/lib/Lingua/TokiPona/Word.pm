@@ -16,7 +16,7 @@ use Data::Identifier v0.34;
 use Data::Identifier::Generate;
 use Data::Displaycolour;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 use parent qw(Data::Identifier::Interface::Known Lingua::Generic::Interface::Word);
 
@@ -56,11 +56,24 @@ __PACKAGE__->_new($_) foreach (
 
 __PACKAGE__->new(string => $_)->{class}{stopword} = 1 foreach qw(a kin anu e en la li o pi seme);
 
-__PACKAGE__->new(string => 'loje'  )->Data::Displaycolour::mark(for => Data::Identifier->new(uuid => 'c9ec3bea-558e-4992-9b76-91f128b6cf29')); # red
-__PACKAGE__->new(string => 'jelo'  )->Data::Displaycolour::mark(for => Data::Identifier->new(uuid => '2892c143-2ae7-48f1-95f4-279e059e7fc3')); # yellow
-__PACKAGE__->new(string => 'laso'  )->Data::Displaycolour::mark(for => Data::Identifier->new(uuid => 'abcbf48d-c302-4be1-8c5c-a8de4471bcbb')); # cyan
-__PACKAGE__->new(string => 'walo'  )->Data::Displaycolour::mark(for => Data::Identifier->new(uuid => '1a2c23fa-2321-47ce-bf4f-5f08934502de')); # white
-__PACKAGE__->new(string => 'pimeja')->Data::Displaycolour::mark(for => Data::Identifier->new(uuid => 'fade296d-c34f-4ded-abd5-d9adaf37c284')); # black
+my %_concepts = (
+    loje    => 'c9ec3bea-558e-4992-9b76-91f128b6cf29', # red
+    jelo    => '2892c143-2ae7-48f1-95f4-279e059e7fc3', # yellow
+    laso    => 'abcbf48d-c302-4be1-8c5c-a8de4471bcbb', # cyan
+    walo    => '1a2c23fa-2321-47ce-bf4f-5f08934502de', # white
+    pimeja  => 'fade296d-c34f-4ded-abd5-d9adaf37c284', # black
+);
+
+foreach my $str (keys %_concepts) {
+    my __PACKAGE__ $word = __PACKAGE__->new(string => $str);
+    my Data::Identifier $word_id = $word->as('Data::Identifier')->register;
+    my Data::Identifier $concept = Data::Identifier->new(uuid => $_concepts{$str})->register;
+
+    $_concepts{$str} = $concept;
+
+    $word->Data::Displaycolour::mark(for => $concept);
+    $word_id->Data::Displaycolour::mark(for => $concept);
+}
 
 {
     my %ucsur = (
@@ -351,9 +364,36 @@ sub has_type {
 }
 
 
+#@returns Data::Identifier
 sub natural_language {
-    my ($self) = @_;
+    my ($self, @opts) = @_;
+    croak 'Stray options passed' if scalar @opts;
     return WK_LT_TOK;
+}
+
+
+#@returns __PACKAGE__
+sub register {
+    my ($self, @opts) = @_;
+    croak 'Stray options passed' if scalar @opts;
+    return $self;
+}
+
+
+#@returns __PACKAGE__
+sub stem {
+    my ($self, @opts) = @_;
+    croak 'Stray options passed' if scalar @opts;
+    return $self;
+}
+
+
+sub concepts {
+    my ($self, @opts) = @_;
+    my $concept = $_concepts{$self->as_string};
+    croak 'Stray options passed' if scalar @opts;
+    return () unless defined $concept;
+    return ($concept);
 }
 
 # ---- Overridden methods ----
@@ -442,7 +482,7 @@ Lingua::TokiPona::Word - module to interact with the words of Toki Pona
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -660,6 +700,33 @@ For Toki Pona words it will always return Toki Pona.
 However this method might be useful together with other modules from the C<Lingua> namespace.
 
 See also: L<Lingua::Generic::Interface::Word/natural_language>.
+
+=head2 register
+
+    $word->register
+
+(since v0.04)
+
+Implements L<Lingua::Generic::Interface::Word/register>.
+As all words known by this module are always registered anyway this is a no-op.
+
+=head2 stem
+
+    my Lingua::TokiPona::Word $stem = $word->stem
+
+(since v0.04)
+
+Implements L<Lingua::Generic::Interface::Word/stem>.
+As all Toki Pona words are stems anyway this is a no-op.
+
+=head2 concepts
+
+    my @concepts = $word->concepts;
+
+(experimental since v0.04)
+
+Implements L<Lingua::Generic::Interface::Word/stem>.
+Returns a list of related concepts.
 
 =head2 known
 

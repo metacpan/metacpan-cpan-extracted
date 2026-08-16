@@ -1,6 +1,6 @@
 # Syntax file for mma
 # Converted from: mma.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: mma
 extensions: mma
@@ -47,4 +47,8 @@ pattern: &
 
 [match:String]
 pattern: \\\[\w+\d*\]
+
+[region:Comment]
+start: (\*
+end: \*)
 

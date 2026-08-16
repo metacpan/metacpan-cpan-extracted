@@ -1,6 +1,6 @@
 # Syntax file for elm
 # Converted from: elm.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: elm
 extensions: elm
@@ -30,9 +30,6 @@ pattern: \b[A-Z][0-9A-Za-z_-]*
 pattern: \b(?:[A-Z][0-9A-Za-z_'-\.]*)+\.[A-Za-z]
 
 [match:Delimiter]
-pattern: [,;]
-
-[match:Delimiter]
 pattern: [()[\]{}]
 
 [match:Special]
@@ -55,6 +52,10 @@ pattern: -\?(?:\b\d+\.\d+\b)
 
 [match:Function]
 pattern: ^[a-z]\w*
+
+[region:Comment]
+start: {-|\=
+end: -}
 
 [region:Function]
 start: \

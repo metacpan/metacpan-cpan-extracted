@@ -1,8 +1,5 @@
 Changes
-demo/.htaccess
-demo/app.psgi
-demo/config.yml
-demo/dispatch.cgi
+CONTRIBUTING.md
 lib/Net/OAuth.pm
 lib/Net/OAuth/AccessToken.pm
 lib/Net/OAuth/AccessTokenRequest.pm
@@ -45,5 +42,8 @@ t/10-misc.t
 t/11-spec-1.0a.t
 t/12-xauth.t
 t/13-hmac-sha256.t
+t/15-client-v1a-downgrade.t
 t/rsakey
 t/rsakey.pub
+xt/author/manifest.t
+xt/author/pod.t

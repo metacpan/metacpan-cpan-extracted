@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::SelfSubjectAccessReviewSpec;
 # ABSTRACT: SelfSubjectAccessReviewSpec is a description of the access request.  Exactly one of ResourceAuthorizationAttributes and NonResourceAuthorizationAttributes must be set
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s nonResourceAttributes => 'Authorization::V1::NonResourceAttributes';
@@ -23,7 +23,7 @@ IO::K8s::Api::Authorization::V1::SelfSubjectAccessReviewSpec - SelfSubjectAccess
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 nonResourceAttributes
 

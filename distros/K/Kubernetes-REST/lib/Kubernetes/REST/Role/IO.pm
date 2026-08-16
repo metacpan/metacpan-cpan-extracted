@@ -1,5 +1,5 @@
 package Kubernetes::REST::Role::IO;
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 # ABSTRACT: Interface role for HTTP backends
 use Moo::Role;
 
@@ -30,7 +30,7 @@ Kubernetes::REST::Role::IO - Interface role for HTTP backends
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -62,19 +62,44 @@ This role defines the interface that HTTP backends must implement. L<Kubernetes:
 
 The default backend is L<Kubernetes::REST::LWPIO> (using L<LWP::UserAgent>). An alternative L<Kubernetes::REST::HTTPTinyIO> (using L<HTTP::Tiny>) is provided. To use an async event loop, implement this role with e.g. L<Net::Async::HTTP>.
 
+Both shipped backends are synchronous, request/response-only transports: neither
+implements C<call_duplex> (see L</supports_duplex> below), so L<Kubernetes::REST>
+methods that need full-duplex transport (C<port_forward>, C<exec>, C<attach>)
+croak against them by design. A backend that wants to support those needs to
+implement C<call_duplex($req, %callbacks)> itself, as sketched in the L</SYNOPSIS>.
+
 =head2 Encoding contract
 
-Request and response bodies are B<bytes>, never character strings.
+Request and response bodies are B<bytes>, never character strings - this holds
+for C<call> and C<call_streaming> alike, whatever kind of request they carry.
 
-A backend receives C<< $req->content >> already UTF-8 encoded and must put it on
-the wire unchanged. It must hand back C<< $res->content >> - and every streaming
-chunk - as the bytes it received, undoing C<Content-Encoding> (gzip) but B<not>
-the charset. L<Kubernetes::REST> decodes UTF-8 itself, together with L<IO::K8s>,
-so a backend that decodes on its own causes silent double decoding (mojibake) on
-any non-ASCII value.
+A backend receives C<< $req->content >> already UTF-8 encoded (the core client's
+JSON encoder runs with C<utf8 =E<gt> 1>) and must put it on the wire unchanged.
+It must hand back C<< $res->content >> - and every streaming chunk - as the
+bytes it received, undoing C<Content-Encoding> (gzip) but B<not> the charset.
+
+Two different callers rely on this, for two different reasons:
+
+=over
+
+=item *
+
+For C<get>/C<list>/C<watch>, L<Kubernetes::REST> decodes UTF-8 itself once the
+JSON is parsed, together with L<IO::K8s>. A backend that decodes the charset
+first causes silent double decoding (mojibake) on any non-ASCII value.
+
+=item *
+
+For C<log> (streamed via C<call_streaming> just like C<watch>), the bytes are
+handed straight back to the caller undecoded, on purpose: container output is
+not guaranteed to be UTF-8, or even text, so there is no safe charset for the
+backend to assume. See L<Kubernetes::REST/log>.
+
+=back
 
 With L<LWP::UserAgent> that means C<< $res->decoded_content(charset => 'none') >>
-rather than C<< $res->decoded_content >>.
+rather than C<< $res->decoded_content >>. See also L<Kubernetes::REST/ENCODING>
+for the full picture from the caller's side of this module.
 
 =head2 call
 
@@ -140,7 +165,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

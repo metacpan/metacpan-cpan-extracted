@@ -1,6 +1,6 @@
 # Syntax file for modula3
 # Converted from: modula3.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: modula3
 extensions: modula3
@@ -50,7 +50,19 @@ pattern: \\[0-7]{3}
 [match:Special]
 pattern: \\\\
 
+[region:String]
+start: "
+end: "
+
 [region:PreProc]
 start: <\*
 end: \*>
+
+[region:Comment]
+start: (\*
+end: \*)
+
+[region:Comment]
+start: (\*
+end: \*)
 

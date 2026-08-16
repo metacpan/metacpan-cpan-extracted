@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::Device;
 # ABSTRACT: Device represents one individual hardware instance that can be selected based on its attributes. Besides the name, exactly one field must be set.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s allNodes => Bool;
@@ -56,7 +56,7 @@ IO::K8s::Api::Resource::V1beta2::Device - Device represents one individual hardw
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 allNodes
 

@@ -6,7 +6,6 @@ use Config;
 use Cwd;
 use strict;
 
-
 $^W = 1;
 $| = 1;
 
@@ -28,8 +27,6 @@ sub mk_tainted {
 plan skip_all => "Taint attributes not supported with DBI::PurePerl" if $DBI::PurePerl;
 plan skip_all => "Taint attribute tests require taint mode (perl -T)" unless is_tainted($^X);
 plan skip_all => "Taint attribute tests not functional with DBI_AUTOPROXY" if $ENV{DBI_AUTOPROXY};
-
-plan tests => 36;
 
 # get a dir always readable on all platforms
 my $dir = getcwd() || cwd();
@@ -114,6 +111,9 @@ eval { $dbh->prepare($tainted_sql); 1; };
 ok($@ =~ /Insecure dependency/, $@);
 eval { $csr_a->execute($tainted_dot); 1; };
 ok($@ =~ /Insecure dependency/, $@);
+eval { $dbh->func($tainted_dot, 'M' x 180); 1; };
+ok($@ =~ /Insecure dependency.*parameter 1/s,
+    'long func method name is safely included in taint rejection');
 undef $@;
 
 $dbh->{'TaintIn'} = $csr_a->{'TaintIn'} = 0;
@@ -129,5 +129,7 @@ ok($csr_a->{Taint} == 0);
 $csr_a->finish;
 
 $dbh->disconnect;
+
+done_testing;
 
 1;

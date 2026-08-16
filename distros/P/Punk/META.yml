@@ -11,6 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::Raw::JSON: '0.06'
   Hyperman: '0.18'
+  JSON::Schema::Fast: '0.05'
   Markdown::Simple: '0.21'
   Open::API: '0.09'
   Search::Trigram: '0.03'
@@ -28,6 +29,7 @@ no_index:
     - inc
 recommends:
   DBI: '0'
+  Eshu: '0'
   Future: '0'
 requires:
   DBIx::Loop: '0.03'
@@ -41,5 +43,5 @@ requires:
   Template::Stencil: '0.05'
   YAML::XS: '0'
   perl: '5.010000'
-version: '0.08'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

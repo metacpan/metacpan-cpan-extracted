@@ -2,3 +2,10 @@ TYPEMAP
 GD::Image	T_PTROBJ
 GD::Font	T_PTROBJ
 GD::Polygon	T_PTROBJ
+GD::UHDR	T_PTROBJ
+GD::WebpAnimReader	T_PTROBJ
+GD::WebpAnimWriter	T_PTROBJ
+GD::JxlAnimReader	T_PTROBJ
+GD::JxlAnimWriter	T_PTROBJ
+GD::TiffMultiReader	T_PTROBJ
+GD::TiffMultiWriter	T_PTROBJ

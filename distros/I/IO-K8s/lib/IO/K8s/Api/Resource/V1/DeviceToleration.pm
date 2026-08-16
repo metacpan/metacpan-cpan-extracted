@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceToleration;
 # ABSTRACT: The ResourceClaim this DeviceToleration is attached to tolerates any taint that matches the triple using the matching operator.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s effect => Str;
@@ -32,7 +32,7 @@ IO::K8s::Api::Resource::V1::DeviceToleration - The ResourceClaim this DeviceTole
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 effect
 

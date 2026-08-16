@@ -1,6 +1,6 @@
 # Syntax file for swift
 # Converted from: swift.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: swift
 extensions: swift
@@ -76,4 +76,16 @@ pattern: ^\s*#(?:\bif\b|\belse\b|\belseif\b|\bendif\b|\berror\b|\bwarning\b)
 
 [match:Type]
 pattern: @\b\w+\b
+
+[region:Type]
+start: [^@]\?(
+end: )
+
+[region:Delimiter]
+start: <
+end: >
+
+[region:Comment]
+start: /\*
+end: \*/
 

@@ -1,6 +1,6 @@
 # Syntax file for tcl
 # Converted from: tcl.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: tcl
 extensions: tcl
@@ -82,4 +82,9 @@ pattern: \b\d+e[-+]?\d+[fl]?\b
 
 [match:Number]
 pattern: 0x[0-9a-fA-F]+(?:u?l?|lu)\b
+
+[region:Comment]
+start: \s*\#
+end: $
+escape: \
 

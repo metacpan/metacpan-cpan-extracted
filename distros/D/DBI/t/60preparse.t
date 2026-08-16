@@ -10,9 +10,6 @@ BEGIN {
 	if ($DBI::PurePerl) {
 		plan skip_all => 'preparse not supported for DBI::PurePerl';
 	}
-	else {
-		plan tests => 39;
-	}
 }
 
 my $dbh = DBI->connect("dbi:ExampleP:", "", "", {
@@ -143,6 +140,21 @@ is( $DBI::errstr, "preparse found unterminated bracketed {...} comment" );
 
 # --------------------------------------------------------------------- #
 
+is( pp($dbh, 'a = :99999', DBIpp_ph_qm, DBIpp_ph_cs|DBIpp_ph_cn), undef, 'out of sequence');
+ok( $DBI::err );
+is( $DBI::errstr, "preparse found placeholder :99999 out of sequence, expected :1");
+is( pp($dbh, 'a = :100000', DBIpp_ph_qm, DBIpp_ph_cs|DBIpp_ph_cn), undef, 'exceeds limit');
+ok( $DBI::err );
+is( $DBI::errstr, "preparse found :p100000 which is outside the allowed range.");
+is( pp($dbh, 'a = :2147483648', DBIpp_ph_qm, DBIpp_ph_cs|DBIpp_ph_cn), undef, 'exceeds limit');
+ok( $DBI::err );
+is( $DBI::errstr, "preparse found :p-2147483648 which is outside the allowed range.");
+is( pp($dbh, 'a = :12345678987654321', DBIpp_ph_qm, DBIpp_ph_cs|DBIpp_ph_cn), undef, 'exceeds limit');
+ok( $DBI::err );
+like( $DBI::errstr, qr{^preparse found :p\d+ which is outside the allowed range.$});
+
 $dbh->disconnect;
+
+done_testing;
 
 1;

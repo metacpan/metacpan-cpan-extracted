@@ -253,6 +253,7 @@ t/0256-realworld-ruby.t
 t/0257-realworld-sql.t
 t/0258-realworld-yaml.t
 t/0259-realworld-php.t
+t/0260-html-recovery.t
 t/lib/Sample/Cache.pm
 t/lib/Sample/Router.pm
 t/lib/sample_hashtable.h

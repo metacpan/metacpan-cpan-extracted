@@ -6,7 +6,7 @@ use warnings;
 use Getopt::Long ();
 use Punk ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.10';
 
 # The punk command. Argument handling and exit codes only - the work lives in
 # Punk::Generate, so it is testable without spawning a process. Subcommands

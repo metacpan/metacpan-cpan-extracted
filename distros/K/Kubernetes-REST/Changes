@@ -1,5 +1,206 @@
 Revision history for Kubernetes-REST
 
+1.107     2026-08-15 16:15:27Z
+
+ - New patch_status() and update_status(), writing through the /status
+   subresource. A resource with a status subresource -- every CRD carrying a
+   "status" entry under "subresources", and the built-in kinds that always
+   had one -- has its status stripped from every write to the main endpoint by
+   the API server, which then answers 2xx anyway. create(), update(),
+   patch() and server-side apply all looked like they worked and stored
+   nothing. patch_status() takes the same arguments as patch() (object or
+   class plus name, both call forms, the same patch types) but defaults to
+   merge patch rather than strategic, because custom resources answer 415 to
+   a strategic merge patch. update_status() is the PUT counterpart of
+   update().
+ - build_path() -- the published path-building seam used by
+   Net::Async::Kubernetes -- takes an optional subresource argument that
+   appends /status, /log, /exec, /attach or /portforward to the resource
+   path. This is additive: existing calls keep their signature and return
+   exactly the paths they did before. A subresource without a name now
+   croaks instead of silently producing a path pointing at the collection
+   endpoint. log(), exec(), attach() and port_forward() build their paths
+   through this argument now rather than concatenating their own suffix; the
+   URLs they request are unchanged.
+ - Fix Kubernetes::REST::Core->new(...) -- and its 16 sibling v0 group
+   classes -- dying with 'Can't call method "_v0_group" on an undefined
+   value'. Each v0 group accessor in Kubernetes::REST shares its name with
+   the class it wraps, so once Kubernetes::REST is loaded Perl resolves the
+   bareword against the sub and calls it as Kubernetes::REST::Core()->new(),
+   without an invocant. The accessors now hand back the class name in that
+   case, putting the ->new(...) back on the class the caller was aiming at.
+   Reaching a group through $api->Core is unaffected and behaves as before.
+ - Reword the v0 compatibility modules so their ABSTRACT says what they do
+   instead of shouting their status. Kubernetes::REST::Core and its 16
+   siblings now read "Compatibility helper for deprecated v0 Core calls"
+   rather than "DEPRECATED - v0 API group for Core resources", and the same
+   goes for Kubernetes::REST::Error and ::RemoteError. These modules are
+   working translation layers onto the v1 API, not dead weight -- the ones
+   that really were dead left in 1.105. Behaviour is unchanged: every v0
+   call still warns unless HIDE_KUBERNETES_REST_V0_API_WARNING is set.
+ - Fix the v0 groups Apiextensions and Apiregistration dying with "Can't
+   locate IO/K8s/Api/Apiextensions/V1/CustomResourceDefinition.pm in @INC"
+   instead of reaching the cluster. V0Group named every class
+   IO::K8s::Api::<Group>::<Version>::<Kind>, but those two groups keep their
+   IO::K8s classes in the upstream staging namespaces they are generated
+   from -- ApiextensionsApiserver::Pkg::Apis::Apiextensions:: and
+   KubeAggregator::Pkg::Apis::Apiregistration::. fetch_resource_map already
+   special-cased both; that knowledge is now one table shared by the two
+   callers rather than a copy in each, so they cannot drift apart again.
+   The other 15 v0 groups resolve to exactly the class names they did
+   before, and fetch_resource_map returns exactly the map it did before:
+   the exception is still matched on the full group name, so a custom
+   resource served under a group like apiextensions.example.com keeps
+   mapping to Api::Apiextensions:: the way any other group does.
+ - kube_client create reads YAML manifests, not only JSON. YAML is the usual
+   format for Kubernetes manifests and the documentation claimed support for
+   it, but the file went straight into inflate(), which is a JSON decode --
+   so every "kube_client create -f deployment.yaml" died on the first line of
+   the file. Manifests are parsed by IO::K8s load_yaml() now. The format is
+   detected from the content rather than the file name, so "-f -" behaves
+   exactly like a named file: a manifest starting with "{" after optional
+   whitespace still takes the JSON path it always took, everything else is
+   read as YAML.
+ - kube_client create accepts multi-document YAML, the common shape of a
+   Kubernetes manifest. Every "---"-separated document is created in the
+   order it appears in the file -- so a manifest listing a Namespace before
+   the objects inside it works -- and each created object is printed in the
+   --output format. If one document fails, the error names which one; the
+   documents before it have already been created. A manifest with no
+   documents at all, or an empty file, is now an error naming the source
+   instead of an obscure decode failure.
+ - Fix the usage line of "kube_client raw" and five examples in
+   kube_client's own documentation naming the v0 groups with a version
+   suffix, "kube_client raw CoreV1 ListNamespace". The groups are called
+   Core, Apps, Batch and so on, without a version, so anyone following the
+   example got an error.
+ - Fix kube_client and kube_watch ignoring the KUBECONFIG environment
+   variable. Their shared --kubeconfig option defaulted to
+   "$ENV{HOME}/.kube/config" and passed that value on unconditionally, so
+   Kubernetes::REST::Kubeconfig never reached its own default and anyone
+   selecting a cluster through KUBECONFIG -- the normal way to juggle
+   several -- was silently pointed at the home one. The option now has no
+   default of its own and is only passed on when given, making the
+   precedence --kubeconfig, then KUBECONFIG, then ~/.kube/config, which is
+   what kubectl does and what the library already documented. Note that
+   KUBECONFIG is read as a single path here, not as the ":"-separated list
+   of files kubectl merges. Scripts that relied on --kubeconfig always being
+   set are unaffected; the option is only undef when it was not given.
+ - Kubernetes::REST delegates four more IO::K8s methods to its k8s
+   attribute: load_yaml, load, object_to_json and object_to_struct. The
+   first two mean a YAML or .pk8s manifest can be read with
+   $api->load_yaml($yaml) instead of reaching through
+   $api->k8s->load_yaml($yaml), and the last two complete the pairs whose
+   inflating halves, json_to_object and struct_to_object, were delegated
+   already. This is purely additive: reaching through k8s keeps working and
+   is the same call. Mind that load_yaml parses characters while inflate
+   takes UTF-8 bytes, and that a .pk8s manifest handed to load is Perl code
+   that gets evaluated in-process. IO::K8s' add() is deliberately not
+   delegated, because it mutates a resource map this client mirrors in its
+   own resource_map attribute.
+ - KUBECONFIG is read as the list of files kubectl merges, not as a single
+   path. "KUBECONFIG=/a/config:/b/config" went into one open() and died with
+   "Cannot open /a/config:/b/config: No such file or directory" -- a hard
+   failure on a setting that works everywhere else in the ecosystem, and the
+   normal shape of the variable for anyone layering a per-project kubeconfig
+   over a base one with direnv. Kubernetes::REST::Kubeconfig now splits
+   kubeconfig_path on the platform path separator (":" everywhere but Win32,
+   where it is ";") and merges the files the way kubectl does: clusters,
+   contexts and users are unioned by name and the first file defining a name
+   wins, whole entry at a time rather than field by field, and
+   current-context comes from the first file that sets one. Entries naming a
+   file that is not there are skipped silently, as are empty entries, so
+   "/a::/b" and a trailing ":" are harmless; relative entries resolve against
+   the working directory. kubeconfig_path keeps its shape -- a single path
+   behaves exactly as it did, is still returned unsplit, and now also accepts
+   an arrayref of paths -- and the new read-only kubeconfig_paths attribute
+   is the split list. --kubeconfig on kube_client and kube_watch takes a list
+   too, since it is passed straight through.
+ - Fix Kubernetes::REST::Kubeconfig warning "Use of uninitialized value
+   $ENV{HOME} in concatenation" and then looking for "/.kube/config" when
+   HOME is unset -- the case in cron jobs, some systemd units and minimal
+   containers, where the resulting "Cannot open /.kube/config" named
+   everything except the real problem. With neither KUBECONFIG nor HOME set
+   there is nothing to guess, so kubeconfig_path defaults to undef and
+   kubeconfig_paths is empty. api() then goes straight to the in-cluster
+   service account, which makes a pod without HOME but with a mounted token
+   work rather than fail; when there is no token either, and for the other
+   methods, the error is "Kubeconfig not found: neither KUBECONFIG nor HOME
+   is set". An empty KUBECONFIG counts as unset, as it does for kubectl.
+   contexts(), current_context_name(), context(), cluster() and user() croak
+   with that message instead of dying on an undefined hashref whenever no
+   kubeconfig could be read.
+ - Relative file references inside a kubeconfig -- certificate-authority on a
+   cluster, client-certificate and client-key on a user -- are resolved
+   against the directory of the kubeconfig file that defines the entry, the
+   way kubectl resolves them, instead of against the process working
+   directory. This changes what an existing kubeconfig means, not just when
+   it works: a kubeconfig saying "certificate-authority: ca.crt" used to find
+   the file only when the program was started from the directory holding it,
+   and now always finds the one sitting next to the kubeconfig. A setup that
+   relies on the old reading -- a cert deliberately placed in the working
+   directory rather than beside the config -- stops finding it, and fails
+   with a TLS error naming the CA file it now looks for; a kubeconfig checked
+   in next to its certs starts working from any directory instead of exactly
+   one. It matters most for a merged KUBECONFIG list, where the directory
+   belongs to the entry rather than to the configuration: a cluster that won
+   from /a/config resolves its CA against /a even when the current context
+   came from /b/config. Resolution happens as each file is read, before the
+   merge, so cluster(), user() and api() hand back absolute paths that a
+   later chdir cannot invalidate. Absolute references, the inline base64 of
+   the *-data fields, and an exec plugin's command -- a PATH lookup, not a
+   file reference -- are untouched, and a leading "~" is not expanded, no
+   more than kubectl expands it.
+ - A kubeconfig user's tokenFile is read and used as the bearer token. The
+   field was ignored: such a user matched neither "token" nor "exec", fell
+   into the client-certificate branch and was given an empty bearer token, so
+   a kubeconfig pointing at a projected service account token or at a file
+   some login helper refreshes authenticated as nobody and collected 401s,
+   next to a kubectl working from the very same file. The order is kubectl's,
+   read off client-go: an inline "token" wins over a "tokenFile", and either
+   wins over an "exec" block, which is then not run at all -- so no
+   kubeconfig that works today changes meaning. A relative tokenFile resolves
+   against the directory of the kubeconfig that defines the user, like the
+   certificate fields. Leading and trailing whitespace is stripped, since
+   such a file ends in a newline more often than not and a newline inside an
+   Authorization header does not reach the server as intended. A tokenFile
+   that cannot be read, or that holds nothing but whitespace, is fatal and
+   names the user and the resolved path, rather than falling through to the
+   next mechanism -- that would trade a clear error for a 401 with nothing
+   pointing at the file. The in-cluster service account token is read through
+   the same code now, so it gets the same treatment instead of losing exactly
+   one trailing newline.
+ - New Kubernetes::REST::AuthTokenFile: credentials whose bearer token lives
+   in a file and are re-read when that file changes. Kubernetes rotates those
+   files -- the kubelet replaces a projected service account token well
+   before it expires -- so a client that read the token once at startup went
+   on sending it and started collecting 401s an hour in, with a valid token
+   sitting in the file next to it. A user's tokenFile and the in-cluster
+   service account token are now handed to Kubernetes::REST as one of these,
+   so a rotated token is picked up on the first request after the rotation
+   without rebuilding anything.
+   The trigger is the file, not a timer: every token() call stats the file
+   and re-reads when device, inode, size or modification time differ from the
+   last read. Inode is what carries it, because the kubelet does not
+   overwrite the token -- it writes a new timestamped directory and renames a
+   new "..data" symlink over the old one, so the path resolves to a different
+   file while the old inode is never touched. That costs one stat per
+   request, which is deliberate and documented. What it cannot see is an
+   in-place rewrite that keeps the inode, the exact size and the
+   modification time; nothing short of reading the file every time would, and
+   nothing Kubernetes does looks like that.
+   A read that fails after a successful one -- the file gone for a moment
+   mid-rotation, or momentarily empty -- keeps the last good token instead of
+   dying, the way client-go does; only the first read, when the client is
+   built, is fatal, exactly as before. Set refresh_token_files => 0 on
+   Kubernetes::REST::Kubeconfig to switch the whole thing off and get one
+   read at build time and no stat per request.
+   Note that $api->credentials is therefore no longer always a
+   Kubernetes::REST::AuthToken for a kubeconfig with a tokenFile or an
+   in-cluster client. It still answers token(), which is all the credentials
+   attribute has ever required of it and all this distribution calls; code
+   testing the class rather than the method is the only thing that notices.
+
 1.106     2026-08-08 19:03:58Z
 
  - Fix "HTTP::Message content must be bytes" on any request body containing

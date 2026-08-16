@@ -1,10 +1,13 @@
 # Syntax file for forth
 # Converted from: forth.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: forth
 extensions: forth
 case: ignore
+
+[keyword:Boolean]
+FALSE TRUE
 
 [keyword:Debug]
 DUMP PRINTDEBUGDATA PRINTDEBUGLINE SEE WORDS

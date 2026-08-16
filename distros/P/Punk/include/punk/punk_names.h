@@ -46,11 +46,14 @@
 #define K_HELPERS    "helpers"
 #define K_KEYWORDS   "keywords"    /* plugin-installed DSL keywords */
 #define K_ON_ERROR   "on_error"
+#define K_ON_NOT_FOUND "on_not_found"
 #define K_COMPILED   "compiled"
 #define K_CONFIG     "config"
 #define K_API_MOUNTS "api_mounts"
 #define K_WS_ROUTES  "ws_routes"
 #define K_SSE_ROUTES "sse_routes"
+#define K_VALIDATE   "validate"
+#define K_VALIDATE_ROUTES "validate_routes"
 #define K_SSE        "sse"
 #define K_DOCS       "docs"
 #define K_MODEL_AUTO "model_auto"
@@ -91,5 +94,8 @@
 #define K_RESPONSE "response"
 #define K_CSRF     "csrf"
 #define K_CORS     "cors"
+#define K_HEADERS  "headers"
+#define K_HEADERS_SCOPED "headers_scoped"
+#define K_AUTH     "auth"
 
 #endif /* PUNK_NAMES_H */

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequestSpec;
 # ABSTRACT: ResourcePoolStatusRequestSpec defines the filters for the pool status request.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s driver => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequestSpec - ResourcePoolSt
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 driver
 

@@ -6,7 +6,7 @@ do_tests();
 done_testing();
 
 #######################################################################
-# We test the three "single-file" app examples here                   #
+# We test the four "single-file" app examples here                    #
 #######################################################################
 
 sub do_tests {

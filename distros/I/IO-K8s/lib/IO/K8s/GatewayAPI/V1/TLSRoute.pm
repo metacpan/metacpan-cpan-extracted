@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::TLSRoute;
 # ABSTRACT: Gateway API TLS SNI routing rules
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
     resource_plural => 'tlsroutes';
@@ -25,7 +25,7 @@ IO::K8s::GatewayAPI::V1::TLSRoute - Gateway API TLS SNI routing rules
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 DESCRIPTION
 

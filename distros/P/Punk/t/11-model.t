@@ -194,4 +194,38 @@ is($m->get(id => 3), undef, 'and the row is gone');
         'selecting an unconfigured database croaks at first use');
 }
 
+# ---- auto-discovery from the symbol table ------------------------------------
+{
+    {
+        package T::Model::Gadget;
+        use Punk::Model;
+        table 'gadgets';
+        field id => { type => 'integer' };
+        package T::Model::Bystander;    # in the namespace, not a model
+        sub assist { 1 }
+    }
+    my $app = Punk::App->new(caller => 'T');
+    $app->database(backend => 'T::Backend::Memory');
+    $app->_compile_models;
+    isa_ok($app->model_instance('Gadget'), 'T::Model::Gadget',
+        'an in-memory ${caller}::Model:: class is discovered by default');
+    isa_ok($app->model_instance('Widget'), 'T::Model::Widget',
+        'and so are its siblings');
+    eval { $app->model_instance('Bystander') };
+    like($@, qr/no model 'Bystander'/,
+        'a non-model package in the namespace is skipped, not fatal');
+}
+
+# ---- bare model; forces discovery on next to named registrations -------------
+{
+    my $app = Punk::App->new(caller => 'T');
+    $app->database(backend => 'T::Backend::Memory');
+    $app->model_class('Widget');    # naming one would switch discovery off
+    $app->model_class();            # the bare form switches it back on
+    is($app->model_auto, 1, 'bare model; sets the auto flag');
+    $app->_compile_models;
+    isa_ok($app->model_instance('Gadget'), 'T::Model::Gadget',
+        'bare model; discovers the rest even alongside a named model');
+}
+
 done_testing();

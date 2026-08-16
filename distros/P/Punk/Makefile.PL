@@ -7,6 +7,7 @@ use Config;
 
 my @PROVIDERS = (
     [ 'File::Raw::JSON'   => '../File-Raw-JSON/include'     ],  # frj_abi.h
+    [ 'JSON::Schema::Fast'=> '../JSON-Schema-Fast/include'  ],  # jsf_abi.h
     [ 'Open::API'         => '../Open-API/include'          ],  # oa_abi.h
     [ 'Template::Stencil' => '../Template-Stencil/include'  ],  # st_abi.h
     [ 'Hyperman'          => '../Hyperman/include/hyperman' ],  # hm_abi.h
@@ -34,6 +35,13 @@ my $INC = '-Iinclude';
 # BSDs. It is declared in <sys/random.h> on macOS and <unistd.h> on glibc, so
 # both are probed. Where it is missing punk_csrf.h falls back to a cached
 # /dev/urandom descriptor, so this is a convenience, not a requirement.
+#
+# The probe must LINK, not just compile: FreeBSD before 12 has no
+# getentropy in libc and declares nothing, and its old compilers (gcc
+# 4.2.1, clang 3.4) take the implicit declaration as a warning - so a
+# compile-only probe false-positives and the built .so fails to load with
+# "Undefined symbol getentropy" (CPAN Testers, Punk 0.09). Only the
+# linker asks libc the real question.
 my @DEFINE;
 {
     my $dir = "punk_probe_$$";
@@ -47,13 +55,13 @@ my @DEFINE;
                 . "int main(void) { char b[4]; return getentropy(b, 4); }\n";
             close $fh;
             my $cc = $Config{cc} || 'cc';
-            if (system("$cc -c $src -o $dir/probe.o >/dev/null 2>&1") == 0) {
+            if (system("$cc $src -o $dir/probe >/dev/null 2>&1") == 0) {
                 push @DEFINE, '-DPUNK_HAVE_GETENTROPY';
                 push @DEFINE, $extra if length $extra;
-                unlink $src, "$dir/probe.o";
+                unlink $src, "$dir/probe";
                 last;
             }
-            unlink $src, "$dir/probe.o";
+            unlink $src, "$dir/probe";
         }
         rmdir $dir;
     }
@@ -78,6 +86,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
         'File::Raw::JSON'     => '0.06',   # provides frj_abi.h
+        'JSON::Schema::Fast'  => '0.05',   # provides jsf_abi.h
         'Open::API'           => '0.09',   # provides oa_abi.h
         'Template::Stencil'   => '0.05',   # provides st_abi.h
         'Hyperman'            => '0.18',   # provides hm_abi.h (v3: rate limit)
@@ -114,6 +123,8 @@ my %WriteMakefileArgs = (
                 recommends => {
                     'Future'          => '0',     # non-blocking handlers
                     'DBI'             => '0',     # Punk::Model::DBI backend
+                    'Eshu'            => '0',     # syntax-highlighted snippets
+                                                  # on the dev error page
                 },
             },
         },

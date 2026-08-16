@@ -12,6 +12,52 @@ DBI::Changes - List of significant changes to the DBI
 
 =encoding UTF-8
 
+=head2 Changes in DBI 1.652 - 15 Aug 2026
+
+=over 2
+
+=item *
+
+DBI now requires perl-5.12, driven by CVE's
+
+=item *
+
+Fix test for perl configured without threads (caught by perl-5.45.1)
+
+=item *
+
+Small doc fix, (issue#155), thanks Dick Franks
+
+=item *
+
+Add suggested dependency (issue#145), thanks Dick Franks
+
+=item *
+
+Force placeholder limit on :# and :p# too (CVE-2026-73194)
+
+=item *
+
+Limit statements to 292 Mb in preparse (CVE-2026-73193)
+
+=item *
+
+Add a security policy (issue#174)
+
+=item *
+
+Add dbm_updatable_key attribute to DBD::DBM to configure how keys are updated
+
+=item *
+
+Fix missing import in DBI::DBD::SqlEngine
+
+=item *
+
+Fix !Caller2 caller loss when $^P is set (PR#184) (Thanks Paul)
+
+=back
+
 =head2 Changes in DBI 1.651 - 14 Jul 2026
 
 =over 2
@@ -152,7 +198,7 @@ Remove "experimental" tag from statistics_info () (issue#134)
 
 =item *
 
-RT tickets moved to github issues (rwfranks++)
+RT tickets moved to github issues (Dick Franks++)
 - All RT tickets now marked as resolved with reference to GitHub issue
 
 =item *

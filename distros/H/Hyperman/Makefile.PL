@@ -140,6 +140,57 @@ my ($h2_inc, $h2_libs) = ('', '');
     }
 }
 
+# ---------------------------------------------------------------------------
+# sendfile(2): three incompatible signatures, so probe each until one links
+# (the feature, not the platform - the read-drip is the fallback everywhere).
+my $sf_inc = '';
+{
+    my @flavours = (
+        [ 'HM_HAVE_SENDFILE_LINUX', <<'C' ],
+#include <sys/sendfile.h>
+int main(void) { off_t o = 0; return (int)sendfile(1, 0, &o, (size_t)0); }
+C
+        [ 'HM_HAVE_SENDFILE_FREEBSD', <<'C' ],
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/uio.h>
+int main(void) { off_t s = 0; return sendfile(0, 1, (off_t)0, (size_t)0, 0, &s, 0); }
+C
+        [ 'HM_HAVE_SENDFILE_MACOS', <<'C' ],
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/uio.h>
+int main(void) { off_t l = 0; return sendfile(0, 1, (off_t)0, &l, 0, 0); }
+C
+    );
+    for my $f (@flavours) {
+        if (probe_c($f->[1])) {
+            $sf_inc = " -D$f->[0]";
+            print "Found sendfile(2): zero-copy file responses enabled.\n";
+            last;
+        }
+    }
+    print "sendfile(2) not usable here: file responses use the read path.\n"
+        unless $sf_inc;
+}
+
+# True if the given C program compiles and links as-is.
+sub probe_c {
+    my ($code) = @_;
+    my $dir = "hm_sf_probe_$$";
+    mkdir $dir or return 0;
+    my ($src, $bin, $ok) = ("$dir/probe.c", "$dir/probe", 0);
+    if (open my $fh, '>', $src) {
+        print $fh $code;
+        close $fh;
+        my $cc = $Config{cc} || 'cc';
+        $ok = system("$cc $src -o $bin >/dev/null 2>&1") == 0;
+    }
+    unlink $src, $bin;
+    rmdir $dir;
+    return $ok;
+}
+
 # True if a clock_gettime(CLOCK_MONOTONIC) program links with the given libs.
 sub probe_clock_gettime {
     my ($extra) = @_;
@@ -258,7 +309,7 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.010000',
     OBJECT           => 'Hyperman$(OBJ_EXT)',
     INC              => join(' ', grep { defined && length }
-                            '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc,
+                            '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc . $sf_inc,
                             $dep_inc),
     LIBS             => [ join(' ', grep { defined && length } $uring_libs, $h2_libs, $tls_libs, $rt_libs, $dep_libs) ],
     depend           => {

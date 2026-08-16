@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceRequest;
 # ABSTRACT: DeviceRequest is a request for devices required for a claim. This is typically a request for a single resource like a device, but can also ask for several identical devices. With FirstAvailable it is also possible to provide a prioritized list of requests.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s exactly => 'Resource::V1::ExactDeviceRequest';
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1::DeviceRequest - DeviceRequest is a request for devic
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 exactly
 

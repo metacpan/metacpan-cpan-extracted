@@ -16,7 +16,7 @@ use GD::Polygon;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
 
-$VERSION = '2.87';
+$VERSION = '2.91';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -484,6 +484,21 @@ support.
 NOTE: The libgd library is unable to read certain XPM files, returning
 an all-black image instead.
 
+=item B<$image = GD::Image-E<gt>newFromWebp($file)>
+
+=item B<$image = GD::Image-E<gt>newFromHeif($file)>
+
+=item B<$image = GD::Image-E<gt>newFromAvif($file)>
+
+=item B<$image = GD::Image-E<gt>newFromJxl($file)>
+
+=item B<$image = GD::Image-E<gt>newFromJxlData($data)>
+
+These work just like C<newFromPng()> and C<newFromPngData()>, reading a
+WEBP, HEIF, AVIF or JPEG XL image respectively. Each is only available
+if libgd and GD.pm were both compiled with the matching support (WEBP,
+HEIF, AVIF, JXL).
+
 =item B<$bool = GD::supportsFileType($filename, $is_writing)>
 
 This returns a TRUE or FALSE value, if libgd supports reading or when
@@ -505,6 +520,7 @@ following extensions are supported:
     .webp
     .heic, .heix
     .avif
+    .jxl
     .xpm
 
 Filenames are parsed case-insensitively.
@@ -665,6 +681,14 @@ This returns the truecolor image data in AVIF format, with the
 AVif encoder and 444 chroma, and the optional quality argument.
 If truecolor is not set, this fails.
 The default compression quality 1-100 is -1, the default speed 0-10 is 6.
+
+=item B<$jxldata = $image-E<gt>jxl([$lossless, $distance, $effort])>
+
+This returns the image data in JPEG XL format. C<$lossless> defaults
+to false (0). C<$distance> is the Butteraugli target distance for
+lossy encoding (0 = visually lossless, default 1.0; ignored when
+C<$lossless> is true). C<$effort> is the encoder speed/compression
+trade-off, 1 (fastest) to 9 (slowest, best compression), default 7.
 
 =item B<$success = $image-E<gt>_file($filename)>
 
@@ -1258,6 +1282,11 @@ Example:
 	... various drawing stuff ...
         $copy = $myImage->clone;
 
+With libgd E<gt>= 2.4.0, C<clone()> uses the native C<gdImageClone()>
+(see C<cloneImage()> below); on older libgd it falls back to
+allocating a new image and copying into it. Either way the clone
+preserves the source image's truecolor-ness.
+
 =item B<$image-E<gt>copyMerge($sourceImage,$dstX,$dstY,>
 
 B<				$srcX,$srcY,$width,$height,$percent)>
@@ -1375,6 +1404,38 @@ This is the same as createPaletteFromTrueColor with the
 quantization method GD_QUANT_NEUQUANT. This does not support dithering.
 This method is only available with libgd >= 2.1.0
 
+=item B<$ok = $image-E<gt>trueColorToPaletteSetMethod($method, [$speed])>
+
+Selects the quantization method used by subsequent calls to
+C<trueColorToPalette()> and C<createPaletteFromTrueColor()>. C<$method>
+is one of:
+
+  GD_QUANT_DEFAULT   - GD_QUANT_LIQ if libimagequant is available, else GD_QUANT_NEUQUANT
+  GD_QUANT_JQUANT    - libjpeg's old median cut (does not retain alpha)
+  GD_QUANT_NEUQUANT  - NeuQuant, a Kohonen neural network approximation
+  GD_QUANT_LIQ       - libimagequant, aiming for the highest quality
+
+C<$speed> ranges from 1 (highest quality) to 10 (fastest); 0 selects
+the method-specific default. Returns FALSE if C<$method> is invalid or
+if C<GD_QUANT_LIQ> was requested but libgd was not built with
+libimagequant support. Requires libgd built with C<--options IMAGEQUANT>
+support and GD.pm configured with C<--options IMAGEQUANT>.
+
+=item B<$image-E<gt>trueColorToPaletteSetQuality($min_quality, $max_quality)>
+
+Sets the quality range, 1 (ugly) to 100 (perfect), that a subsequent
+C<trueColorToPalette()> call will aim for when C<GD_QUANT_LIQ> is the
+active quantization method. If the image cannot be represented with at
+least C<$min_quality>, it remains truecolor; if a lower color count
+would still reach C<$max_quality>, fewer palette colors are used.
+C<$max_quality> must be greater than C<$min_quality>. Has no effect
+unless C<GD_QUANT_LIQ> is selected and the source image is truecolor.
+
+=item B<$ok = $image-E<gt>paletteToTrueColor()>
+
+Converts a palette image to truecolor in place; the reverse of
+C<trueColorToPalette()>. Only available with libgd E<gt>= 2.1.0.
+
 =back
 
 =head2 Image Transformation Commands
@@ -1457,6 +1518,86 @@ Returns a copy, using interpolation.
 
 =back
 
+=head2 Affine Transformations
+
+Since libgd 2.1.0, gd offers affine matrix transformations: arbitrary
+combinations of scaling, rotation, shearing and translation applied in
+one resampling pass, rather than gd's older single-purpose C<rotate>/
+C<copyRotateInterpolated>-style methods.
+L<https://github.com/lstein/Perl-GD/issues/21>
+
+A matrix is a plain 6-element Perl list/array C<($m0,$m1,$m2,$m3,$m4,$m5)>,
+matching gd's C<double affine[6]>: applying it maps a source point
+C<(x,y)> to C<(m0*x + m2*y + m4, m1*x + m3*y + m5)>. The matrix builders
+below are class methods on C<GD::Image> (they don't operate on any
+particular image); angles are in degrees.
+
+=over 4
+
+=item B<@matrix = GD::Image-E<gt>affineIdentity()>
+
+=item B<@matrix = GD::Image-E<gt>affineScale($scaleX, $scaleY)>
+
+=item B<@matrix = GD::Image-E<gt>affineRotate($angle)>
+
+=item B<@matrix = GD::Image-E<gt>affineShearHorizontal($angle)>
+
+=item B<@matrix = GD::Image-E<gt>affineShearVertical($angle)>
+
+=item B<@matrix = GD::Image-E<gt>affineTranslate($offsetX, $offsetY)>
+
+Build a standard 6-element affine matrix.
+
+=item B<@matrix = GD::Image-E<gt>affineConcat(\@matrix1, \@matrix2)>
+
+Concatenates two matrices: the result applies C<@matrix1> first, then
+C<@matrix2>.
+
+=item B<@matrix = GD::Image-E<gt>affineInvert(\@matrix)>
+
+Returns the inverse of C<@matrix>, or an empty list if C<@matrix> is
+singular (not invertible).
+
+=item B<@matrix = GD::Image-E<gt>affineFlip(\@matrix, $flipHorizontal, $flipVertical)>
+
+Builds a horizontal and/or vertical flip from C<@matrix>.
+
+=item B<$factor = GD::Image-E<gt>affineExpansion(\@matrix)>
+
+Returns the linear scaling factor of C<@matrix>.
+
+=item B<$bool = GD::Image-E<gt>affineRectilinear(\@matrix)>
+
+True if C<@matrix> maps axis-aligned rectangles to axis-aligned
+rectangles (i.e. it has no rotation or shear component).
+
+=item B<$bool = GD::Image-E<gt>affineEqual(\@matrix1, \@matrix2)>
+
+=item B<($x2, $y2) = GD::Image-E<gt>affineApplyToPoint($x, $y, \@matrix)>
+
+Applies C<@matrix> to the point C<($x, $y)> and returns the transformed
+coordinates.
+
+=item B<$newimage = $image-E<gt>transformAffineGetImage(\@matrix, [\@srcRect])>
+
+Applies C<@matrix> to C<$image> (or to the C<[$x, $y, $width, $height]>
+region C<\@srcRect>, if given) and returns a newly allocated image sized
+to fit the transformed content. Dies on error.
+
+=item B<$bool = $image-E<gt>transformAffineCopy($srcImage, $dstX, $dstY, \@matrix, [\@srcRect])>
+
+Applies C<@matrix> to C<$srcImage> (or to the C<[$x, $y, $width, $height]>
+region C<\@srcRect>, if given, otherwise the whole image) and pastes the
+result into C<$image> with its origin at C<($dstX, $dstY)>. Dies on
+error.
+
+=item B<($x, $y, $width, $height) = GD::Image-E<gt>transformAffineBoundingBox(\@srcRect, \@matrix)>
+
+Returns the axis-aligned bounding box, as C<[$x, $y, $width, $height]>,
+that contains C<\@srcRect> after C<@matrix> is applied. Dies on error.
+
+=back
+
 =head2 Image Filter Commands
 
 Gd also provides some common image filters, they modify the image in
@@ -1532,6 +1673,91 @@ represents the "fatness" of the curve (lower == fatter).
 The result is always truecolor.
 
 =back
+
+=head2 Additional Image Utilities
+
+A collection of image utilities added to libgd over the years, most
+since 2.1.0.
+
+=over 4
+
+=item B<$newimage = $image-E<gt>crop(\@rect)>
+
+Returns a new image containing the C<[$x, $y, $width, $height]> region
+C<\@rect> of C<$image>. Only available with libgd E<gt>= 2.1.0.
+
+=item B<$newimage = $image-E<gt>cropAuto([$mode])>
+
+Returns a new image with a uniform border automatically stripped.
+C<$mode> is one of C<GD_CROP_DEFAULT> (same as C<GD_CROP_TRANSPARENT>),
+C<GD_CROP_TRANSPARENT>, C<GD_CROP_BLACK>, C<GD_CROP_WHITE>,
+C<GD_CROP_SIDES> (uses the color of the 4 corners), or
+C<GD_CROP_THRESHOLD>; defaults to C<GD_CROP_DEFAULT>. Only available
+with libgd E<gt>= 2.1.0.
+
+=item B<$newimage = $image-E<gt>cropThreshold($color, $threshold)>
+
+Returns a new image with a border matching C<$color> (within
+C<$threshold>) stripped. Only available with libgd E<gt>= 2.1.0.
+
+=item B<$count = $image-E<gt>colorReplace($fromColor, $toColor)>
+
+Replaces every pixel using C<$fromColor> with C<$toColor> and returns
+the number of pixels changed. Only available with libgd E<gt>= 2.1.0.
+
+=item B<$count = $image-E<gt>colorReplaceThreshold($fromColor, $toColor, $threshold)>
+
+Like C<colorReplace()>, but also replaces colors that are perceptually
+within C<$threshold> of C<$fromColor>. Only available with libgd
+E<gt>= 2.1.0.
+
+=item B<$count = $image-E<gt>colorReplaceArray(\@fromColors, \@toColors)>
+
+Replaces every color in C<\@fromColors> with the corresponding color
+in C<\@toColors> (the two arrays must be the same length) and returns
+the total number of pixels changed. Only available with libgd
+E<gt>= 2.1.0.
+
+=item B<$ok = $image-E<gt>convolution(\@filter, $filterDiv, $offset)>
+
+Applies a 3x3 convolution kernel to the image in place. C<\@filter> is
+a 9-element, row-major array. Each output channel is the weighted sum
+of the kernel divided by C<$filterDiv> plus C<$offset>. Only available
+with libgd E<gt>= 2.1.0.
+
+  # simple box blur
+  $image->convolution([(1/9) x 9], 1, 0);
+
+=item B<($resX, $resY) = $image-E<gt>resolution([$resX, $resY])>
+
+Gets, or with both arguments sets, the image resolution in DPI.
+Defaults to 96x96. Only available with libgd E<gt>= 2.1.0.
+
+=item B<$newimage = $image-E<gt>cloneImage()>
+
+Returns a copy of the image using the native C<gdImageClone()>, which
+correctly preserves truecolor-ness. This is what C<clone()> uses when
+available; see the note under C<clone()> above. Only available with
+libgd E<gt>= 2.4.0.
+
+=item B<$pixel = $image-E<gt>getTrueColorPixel($x, $y)>
+
+Returns the truecolor ARGB value of the pixel at C<($x, $y)>, even on
+a palette image (bypassing the palette-to-RGB lookup that
+C<getPixel()> would otherwise require). Only available with libgd
+E<gt>= 2.4.0.
+
+=item B<($pixelsChanged, $maxDelta) = $image-E<gt>perceptualDiff($otherImage, $threshold)>
+
+Compares C<$image> and C<$otherImage>, which must be the same size,
+using a perceptual (YIQ-based) distance metric rather than
+C<compare()>'s exact bitwise comparison. Returns the number of pixels
+that differ by more than C<$threshold> (0.0 to 1.0) and the largest
+perceptual distance found (0.0 to 1.0). Dies if the images differ in
+size. Only available with libgd E<gt>= 2.4.0.
+
+=back
+
 
 
 =head2 Character and String Drawing
@@ -2118,6 +2344,321 @@ Returns the string of the libgd VERSION, like "2.2.4".
 =item GD::constant
 
 =back
+
+
+=head1 GD::UHDR - UltraHDR Support
+
+libgd E<gt>= 2.4.0, built with libultrahdr support, can read, transform
+and write UltraHDR JPEG images (a standard JPEG carrying an extra HDR
+gain map). Because a gain map has no equivalent in a plain GD::Image,
+UltraHDR images are represented by a separate opaque C<GD::UHDR>
+handle rather than by C<GD::Image>. Use C<getSdr()> to obtain an
+ordinary SDR C<GD::Image> once gain-map-preserving edits are no longer
+needed; that image can be inspected or saved like any other, but it no
+longer carries the gain map, so it can't be turned back into UltraHDR.
+
+  my $u = GD::UHDR->newFromFile('input.jpg');
+  $u->resize(640, 360);
+  $u->file('output.jpg');
+  my $sdr = $u->getSdr;   # ordinary GD::Image, viewable as SDR
+
+=over 4
+
+=item B<$bool = GD::UHDR-E<gt>isAvailable()>
+
+Returns true if libgd was built with libultrahdr support.
+
+=item B<$uhdr = GD::UHDR-E<gt>newFromFile($filename, [$format])>
+
+=item B<$uhdr = GD::UHDR-E<gt>newFromData($data, [$format])>
+
+Reads an UltraHDR image from a file path or from an in-memory buffer.
+C<$format> defaults to C<GD_UHDR_FORMAT_JPEG>, currently the only
+supported format. Dies with the libultrahdr error message on failure.
+
+=item B<$width = $uhdr-E<gt>width()>
+
+=item B<$height = $uhdr-E<gt>height()>
+
+=item B<$bool = $uhdr-E<gt>hasGainMap()>
+
+Query the image's current committed dimensions and whether it carries
+a gain map.
+
+=item B<$uhdr-E<gt>resize($width, $height)>
+
+=item B<$uhdr-E<gt>crop($left, $top, $width, $height)>
+
+=item B<$uhdr-E<gt>rotate($degrees)>
+
+=item B<$uhdr-E<gt>mirror($axis)>
+
+Queue a gain-map-preserving transform; C<$axis> is
+C<GD_UHDR_MIRROR_HORIZONTAL> or C<GD_UHDR_MIRROR_VERTICAL>. The base
+image and its gain map are transformed together when the image is
+next written, so C<width()>/C<height()> keep reporting the
+pre-transform size until then. Dies with the libultrahdr error message
+on failure.
+
+=item B<$uhdr-E<gt>file($filename, [$format], [$quality])>
+
+=item B<$data = $uhdr-E<gt>write([$format], [$quality])>
+
+Write the (possibly transformed) UltraHDR image to a file path or
+return it as an in-memory buffer. C<$format> defaults to
+C<GD_UHDR_FORMAT_JPEG>, C<$quality> to 90 (1-95).
+
+=item B<$image = $uhdr-E<gt>getSdr()>
+
+Decodes and returns the SDR base image as an ordinary C<GD::Image>.
+The gain map is not retained; see the caveat above.
+
+=back
+
+=head1 GD::WebpAnimReader / GD::WebpAnimWriter - Animated WebP Support
+
+libgd E<gt>= 2.4.0 can read and write animated WebP files frame by
+frame instead of only through the single-image C<newFromWebp()>/
+C<webp()> methods. As with C<GD::UHDR>, the underlying gd handles
+(C<gdWebpReadPtr>/C<gdWebpWritePtr>) are distinct from C<gdImagePtr>,
+so they get their own classes. Readers always decode full-canvas
+("coalesced") frames.
+
+  my $writer = GD::WebpAnimWriter->new({ loop_count => 0 });
+  $writer->addImage($_, 100) for @frames; # 100ms per frame
+  my $bytes = $writer->finish;             # WebP animation bytes
+
+  my $reader = GD::WebpAnimReader->newFromData($bytes);
+  my %info = $reader->info;                # width, height, frame_count, ...
+  while (my ($delayMs, $image) = $reader->nextImage) {
+      ...
+  }
+
+=over 4
+
+=item B<$writer = GD::WebpAnimWriter-E<gt>new([\%options])>
+
+Creates a new in-memory animation writer. C<%options> may set
+C<canvas_width>, C<canvas_height> (both default to the first added
+image's size), C<loop_count> (0 = infinite), C<background_color>,
+C<quality> (0-100, or -1 for the default), C<lossless>, C<method>,
+C<minimize_size>, C<kmin>, C<kmax>, and C<allow_mixed>.
+
+=item B<$ok = $writer-E<gt>addImage($image, [$durationMs])>
+
+Adds C<$image> as the next frame, shown for C<$durationMs>
+milliseconds (default 100). Dies on error, or if the writer has
+already been finished.
+
+=item B<$data = $writer-E<gt>finish()>
+
+Assembles and returns the encoded WebP animation bytes. A writer can
+only be finished once; using it afterwards (via C<addImage()> or a
+second C<finish()>) dies rather than risking a stale-handle crash.
+
+=item B<$reader = GD::WebpAnimReader-E<gt>newFromData($data)>
+
+Opens a reader over an in-memory WebP file (animated or not). Dies on
+error.
+
+=item B<%info = $reader-E<gt>info()>
+
+Returns the container's C<width>, C<height>, C<frame_count>,
+C<loop_count>, C<background_color>, C<format_flags>, and
+C<is_animation>.
+
+=item B<($durationMs, $image) = $reader-E<gt>nextImage()>
+
+Returns the next full-canvas frame and its display duration in
+milliseconds, or an empty list once every frame has been read. Dies on
+a decode error.
+
+=back
+
+=head1 GD::JxlAnimReader / GD::JxlAnimWriter - Animated/Multi-Image JPEG XL Support
+
+libgd E<gt>= 2.4.0 can also read and write multi-image/animated JPEG
+XL files frame by frame, in addition to the single-image
+C<newFromJxl()>/C<jxl()> methods. Mirrors C<GD::WebpAnimReader>/
+C<GD::WebpAnimWriter>; see that section for the general shape.
+
+  my $writer = GD::JxlAnimWriter->new({ loop_count => 0, distance => 1.0 });
+  $writer->addImage($_, 100) for @frames; # 100ms per frame
+  my $bytes = $writer->finish;
+
+  my $reader = GD::JxlAnimReader->newFromData($bytes);
+  my %info = $reader->info;                # width, height, animated, loop_count
+  while (my ($delayMs, $image) = $reader->nextImage) {
+      ...
+  }
+
+=over 4
+
+=item B<$writer = GD::JxlAnimWriter-E<gt>new([\%options])>
+
+Creates a new in-memory animation writer. C<%options> may set
+C<canvas_width>, C<canvas_height> (both default to the first added
+image's size), C<lossless>, C<distance> (Butteraugli target distance
+for lossy encoding, default 1.0, ignored when C<lossless> is true),
+C<effort> (1 fastest to 9 slowest/best compression, default 7), and
+C<loop_count> (0 = infinite).
+
+=item B<$ok = $writer-E<gt>addImage($image, [$delayMs])>
+
+Adds C<$image> as the next frame, shown for C<$delayMs> milliseconds
+(default 100). Dies on error, or if the writer has already been
+finished.
+
+=item B<$data = $writer-E<gt>finish()>
+
+Assembles and returns the encoded JPEG XL bytes. A writer can only be
+finished once; using it afterwards dies rather than risking a
+stale-handle crash.
+
+=item B<$reader = GD::JxlAnimReader-E<gt>newFromData($data)>
+
+Opens a reader over an in-memory JPEG XL file (animated or not). Dies
+on error.
+
+=item B<%info = $reader-E<gt>info()>
+
+Returns the stream's C<width>, C<height>, C<animated>, and
+C<loop_count>.
+
+=item B<($delayMs, $image) = $reader-E<gt>nextImage()>
+
+Returns the next full-canvas frame and its display duration in
+milliseconds, or an empty list once every frame has been read. Dies on
+a decode error.
+
+=back
+
+=head1 GD::TiffMultiReader / GD::TiffMultiWriter - Multi-Page TIFF Support
+
+libgd E<gt>= 2.4.0 can also read and write multi-page TIFF files page
+by page, in addition to the single-image C<newFromTiff()>/
+C<newFromTiffData()>/C<tiff()> methods. Mirrors
+C<GD::WebpAnimReader>/C<GD::WebpAnimWriter>, except TIFF pages have no
+per-page delay, so C<addImage()> and C<nextImage()> don't take/return
+one, and C<nextImage()> returns a page-info I<hashref> (there are more
+per-page facts worth naming than a single duration).
+
+  my $writer = GD::TiffMultiWriter->new({
+      colorspace  => GD::GD_TIFF_RGBA(),
+      compression => GD::GD_TIFF_COMPRESSION_ADOBE_DEFLATE(),
+  });
+  $writer->addImage($_) for @pages;
+  my $bytes = $writer->finish;
+
+  my $reader = GD::TiffMultiReader->newFromData($bytes);
+  my %info = $reader->info;                # width, height, page_count, ...
+  while (my ($pageInfo, $image) = $reader->nextImage) {
+      print "page $pageInfo->{page_index}: $pageInfo->{width}x$pageInfo->{height}\n";
+  }
+
+=over 4
+
+=item B<$writer = GD::TiffMultiWriter-E<gt>new([\%options])>
+
+Creates a new in-memory TIFF writer. C<%options> may set C<bit_depth>
+(1, 8, or 16), C<colorspace> (C<GD_TIFF_RGB>, C<GD_TIFF_RGBA>,
+C<GD_TIFF_GRAY>, or C<GD_TIFF_BILEVEL>), C<compression> (one of the
+C<GD_TIFF_COMPRESSION_*> constants), C<jpeg_quality> (when
+C<compression> is C<GD_TIFF_COMPRESSION_JPEG>), C<min_is_white>,
+C<resolution_unit> (C<GD_TIFF_RESUNIT_NONE>, C<_INCH>, or
+C<_CENTIMETER>), C<x_resolution>, C<y_resolution>, and C<alpha_type>
+(C<GD_TIFF_ALPHA_UNASSOCIATED> or C<GD_TIFF_ALPHA_ASSOCIATED>).
+Defaults: 8-bit RGBA, Adobe Deflate compression, inch resolution
+units, 72x72 resolution, unassociated alpha.
+
+=item B<$ok = $writer-E<gt>addImage($image)>
+
+Adds C<$image> as the next page. Dies on error, or if the writer has
+already been finished.
+
+=item B<$data = $writer-E<gt>finish()>
+
+Assembles and returns the encoded TIFF bytes. A writer can only be
+finished once; using it afterwards dies rather than risking a
+stale-handle crash.
+
+=item B<$reader = GD::TiffMultiReader-E<gt>newFromData($data)>
+
+Opens a reader over an in-memory TIFF file (single- or multi-page).
+Dies on error.
+
+=item B<%info = $reader-E<gt>info()>
+
+Returns facts about the first page and the container: C<width>,
+C<height>, C<page_count>, C<bits_per_sample>, C<samples_per_pixel>,
+C<compression>, C<photometric>, C<x_resolution>, C<y_resolution>, and
+C<resolution_unit>.
+
+=item B<(\%pageInfo, $image) = $reader-E<gt>nextImage()>
+
+Returns the next page's image and a hashref describing it
+(C<page_index>, C<width>, C<height>, C<bits_per_sample>,
+C<samples_per_pixel>, C<compression>, C<photometric>, C<planar>,
+C<has_alpha>, C<is_tiled>, C<x_resolution>, C<y_resolution>,
+C<resolution_unit>), or an empty list once every page has been read.
+Dies on a decode error.
+
+=back
+
+=head1 Format Header Introspection
+
+libgd E<gt>= 2.4.0 exposes read-only header/container introspection for six
+formats, independent of decoding the image itself. Each method takes the raw
+file bytes and returns a flat list a caller assigns to a hash; each dies if
+the data isn't valid for its format.
+
+ my $bytes = do { local $/; open my $fh, '<', 'photo.jpg' or die $!; binmode $fh; <$fh> };
+ my %info = GD::Image->jpegInfoData($bytes);
+ print "$info{width}x$info{height}, $info{components} components\n";
+
+=over 4
+
+=item C<< %info = GD::Image->pngInfoData($bytes) >>
+
+Returns C<width>, C<height>, C<bit_depth>, C<color_type>, C<has_alpha>,
+C<has_transparency>, C<palette_entries>, C<interlace_method>,
+C<x_pixels_per_unit>, C<y_pixels_per_unit>, C<physical_unit>,
+C<decoded_truecolor>, C<resolution_x>, C<resolution_y>.
+
+=item C<< %info = GD::Image->jpegInfoData($bytes) >>
+
+Returns C<width>, C<height>, C<bits_per_sample>, C<components>,
+C<color_space>, C<progressive>, C<density_unit>, C<x_density>, C<y_density>.
+
+=item C<< %info = GD::Image->gifInfoData($bytes) >>
+
+Returns C<version> (the 3-character GIF version, e.g. C<"89a">), C<width>,
+C<height>, C<background_index>, C<global_color_table>, C<color_resolution>,
+C<pixel_aspect_ratio>, C<loop_count>, C<loop_count_present>.
+
+=item C<< %info = GD::Image->bmpInfoData($bytes) >>
+
+Returns C<header_type>, C<width>, C<height>, C<top_down>, C<planes>,
+C<bits_per_pixel>, C<compression>, C<image_size>,
+C<horizontal_resolution>, C<vertical_resolution>, C<colors_used>,
+C<important_colors>, C<palette_type>, C<palette_entries>, C<red_mask>,
+C<green_mask>, C<blue_mask>, C<alpha_mask>.
+
+=item C<< %info = GD::Image->avifInfoData($bytes) >>
+
+Returns C<width>, C<height>, C<is_animation>, C<is_progressive>,
+C<frame_count>, C<duration>, C<has_alpha>, C<bit_depth>, C<yuv_format>.
+
+=item C<< %info = GD::Image->heifInfoData($bytes) >>
+
+Returns C<width>, C<height>, C<top_level_image_count>, C<has_alpha>,
+C<bit_depth>, C<is_animation>.
+
+=back
+
+
+
+
 
 =head1 Obtaining the C-language version of gd
 

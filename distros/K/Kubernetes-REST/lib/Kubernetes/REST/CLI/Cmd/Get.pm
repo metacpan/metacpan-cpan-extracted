@@ -1,5 +1,5 @@
 package Kubernetes::REST::CLI::Cmd::Get;
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 # ABSTRACT: The get command of kube_client
 use Moo;
 use MooX::Cmd;
@@ -42,7 +42,7 @@ Kubernetes::REST::CLI::Cmd::Get - The get command of kube_client
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

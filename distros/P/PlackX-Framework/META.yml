@@ -28,7 +28,7 @@ provides:
     file: lib/PXF/Util.pm
   PlackX::Framework:
     file: lib/PlackX/Framework.pm
-    version: '0.30'
+    version: '0.31'
   PlackX::Framework::Config:
     file: lib/PlackX/Framework/Config.pm
   PlackX::Framework::Handler:
@@ -69,6 +69,6 @@ resources:
   bugtracker: https://github.com/dstroma/PlackX-Framework/issues
   homepage: https://github.com/dstroma/PlackX-Framework
   repository: https://github.com/dstroma/PlackX-Framework.git
-version: '0.30'
+version: '0.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

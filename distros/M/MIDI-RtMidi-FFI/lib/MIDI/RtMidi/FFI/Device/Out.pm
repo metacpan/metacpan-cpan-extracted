@@ -6,7 +6,7 @@ use experimental qw/ signatures /;
 package MIDI::RtMidi::FFI::Device::Out;
 class MIDI::RtMidi::FFI::Device::Out :isa( MIDI::RtMidi::FFI::AbstractDevice );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # ABSTRACT: OO interface for MIDI::RtMidi::FFI output deviced
 
@@ -143,7 +143,7 @@ MIDI::RtMidi::FFI::Device::Out - OO interface for MIDI::RtMidi::FFI output devic
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,12 @@
+v0.04  2026-08-16Z
+    - Hardened code
+    - Added $word->register() as a no-op
+    - Added $word->stem() as returning the word itself,
+      in Toki Pona words are never modified, so all are their own stems
+    - Added missing #@returns
+    - Added $word->concepts(), including some generalisation of existing code
+    - Updated dependencies
+
 v0.03  2026-08-14Z
     - Added more words
     - Allow interaction with Lingua::famibeib::Word (mostly for fun)

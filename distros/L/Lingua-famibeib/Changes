@@ -1,3 +1,9 @@
+v0.07  2026-08-16Z
+    - Updated dependencies
+    - Implemented Lingua::Generic::Interface::Word
+    - Added new known classes: word, modifier, and prefix
+    - Added more objects to known class :all
+
 v0.06  2026-08-09Z
     - Corrected prefix handling for to- and tu-
     - Added improved support for foreign words via new Lingua::famibeib::ForeignWord

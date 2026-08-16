@@ -48,7 +48,7 @@ load(class, ...)
         cfg->files   = newAV();
         cfg->env     = (env && SvOK(env)) ? newSVsv(env)
                      : newSVpv(getenv("PUNK_ENV") ? getenv("PUNK_ENV")
-                                                  : "development", 0);
+                                                  : "production", 0);
 
         /* config/punk.yml -> punk.yml, punk.<env>.yml, punk.local.yml */
         {

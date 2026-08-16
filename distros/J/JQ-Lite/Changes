@@ -1,3 +1,16 @@
+2.50  2026-08-16
+
+  - Define and document the stable JQ::Lite Library API contract.
+  - Clarify the public API boundary between supported interfaces and
+    internal parser, filter, and utility modules.
+  - Add downstream integration guidance for applications and CPAN
+    distributions using JQ::Lite as a library.
+  - Add structured Library API exceptions for input, parse, and
+    evaluation errors while preserving human-readable stringification.
+  - Add regression coverage for the documented Library API error
+    classes and compatibility behavior.
+  - Bump module version to 2.50.
+
 2.49  2026-07-24
 
   - Validate slice function and bracket-slice arguments consistently.

@@ -74,30 +74,33 @@ _route(self, ...)
         static const char *NAME[] =
             { "_route", "get", "post", "put", "patch", "del", "any" };
         HV *h = scope_hv(aTHX_ self);
-        SV *method, *path, *target, *argv[4];
+        SV *method, *path, *target, *opts = NULL, *argv[5];
 
         if (ix) {
-            if (items != 3)
-                croak("Usage: Punk::Router::Scope::%s(self, path, target)",
-                      NAME[ix]);
+            if (items != 3 && items != 4)
+                croak("Usage: Punk::Router::Scope::%s(self, path, target, "
+                      "\\%%opts?)", NAME[ix]);
             method = sv_2mortal(newSVpv(VERB[ix], 0));
             path   = ST(1);
             target = ST(2);
+            if (items == 4) opts = ST(3);
         }
         else {
-            if (items != 4)
+            if (items != 4 && items != 5)
                 croak("Usage: Punk::Router::Scope::_route(self, method, "
-                      "path, target)");
+                      "path, target, \\%%opts?)");
             method = ST(1);
             path   = ST(2);
             target = ST(3);
+            if (items == 5) opts = ST(4);
         }
 
         argv[0] = method;
         argv[1] = scope_full_path(aTHX_ h, path);
         argv[2] = target;
         argv[3] = sv_2mortal(scope_guards_copy(aTHX_ h, NULL));
-        scope_app_call(aTHX_ h, "route", argv, 4);
+        if (opts) argv[4] = opts;
+        scope_app_call(aTHX_ h, "route", argv, opts ? 5 : 4);
         RETVAL = newSVsv(self);
     }
     OUTPUT:
@@ -142,6 +145,42 @@ websocket(self, path, target, opts = &PL_sv_undef)
         argv[2] = opts;
         argv[3] = sv_2mortal(scope_guards_copy(aTHX_ h, NULL));
         scope_app_call(aTHX_ h, "websocket", argv, 4);
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
+# headers(%pairs) / headers(\%pairs): this scope's response-header policy -
+# the same pairs the app-wide `headers` keyword takes, applied only to
+# requests under this prefix (including the 404s under it) and ahead of the
+# application-wide policy, so a scope can tighten, add, or - with an undef
+# value - drop a header for its subtree. Chains.
+SV *
+headers(self, ...)
+        SV *self
+    CODE:
+    {
+        HV *h = scope_hv(aTHX_ self);
+        HV *cfg = newHV();
+        SV *pfx = scope_get(aTHX_ h, "prefix");
+        SV *argv[2];
+        int i;
+        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+            HE *e; HV *given = (HV *)SvRV(ST(1));
+            hv_iterinit(given);
+            while ((e = hv_iternext(given))) {
+                STRLEN kl; const char *k = HePV(e, kl);
+                (void)hv_store(cfg, k, (I32)kl,
+                               newSVsv(hv_iterval(given, e)), 0);
+            }
+        }
+        else for (i = 1; i + 1 < items; i += 2) {
+            STRLEN kl; const char *k = SvPV_const(ST(i), kl);
+            (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
+        }
+        argv[0] = (pfx && SvOK(pfx)) ? pfx : &PL_sv_no;
+        argv[1] = sv_2mortal(newRV_noinc((SV *)cfg));
+        scope_app_call(aTHX_ h, "headers_scoped", argv, 2);
         RETVAL = newSVsv(self);
     }
     OUTPUT:

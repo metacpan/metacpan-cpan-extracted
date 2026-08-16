@@ -1,6 +1,6 @@
 # Syntax file for xml
 # Converted from: xml.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: xml
 extensions: xml
@@ -11,9 +11,30 @@ CDATA DOCTYPE PUBLIC SYSTEM
 [keyword:Todo]
 FIXME TODO XXX
 
-[match:Error]
-pattern: [<&]
-
 [match:Type]
 pattern: ]]>
+
+[region:String]
+start: "
+end: "
+
+[region:String]
+start: '
+end: '
+
+[region:Comment]
+start: <!
+end: >
+
+[region:Comment]
+start: <!
+end: >
+
+[region:Type]
+start: <?
+end: ?>
+
+[region:Function]
+start: \[
+end: ]
 

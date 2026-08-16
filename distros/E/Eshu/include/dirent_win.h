@@ -1,5 +1,7 @@
 /*
- * dirent_win.h — minimal opendir/readdir/closedir for MSVC on Windows
+ * dirent_win.h — minimal opendir/readdir/closedir for Windows (MSVC and
+ * MinGW alike: MinGW's <dirent.h> is unusable under -std=c99, see
+ * eshu_file.h).
  *
  * Wraps FindFirstFile/FindNextFile/FindClose.
  * Only the d_name field of struct dirent is populated (all we use).
@@ -9,7 +11,7 @@
 #define DIRENT_WIN_H
 
 #ifndef _WIN32
-#  error "dirent_win.h is for Windows / MSVC only"
+#  error "dirent_win.h is for Windows only"
 #endif
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -20,7 +22,9 @@
 #include <string.h>
 #include <errno.h>
 
-#define NAME_MAX 260
+#ifndef NAME_MAX
+#  define NAME_MAX 260
+#endif
 
 struct dirent {
     char d_name[NAME_MAX + 1];

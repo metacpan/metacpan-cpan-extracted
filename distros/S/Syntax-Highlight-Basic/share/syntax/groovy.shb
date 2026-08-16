@@ -1,6 +1,6 @@
 # Syntax file for groovy
 # Converted from: groovy.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: groovy
 extensions: groovy
@@ -118,9 +118,6 @@ pattern: \b\d+(?:[eE][-+]?\d+)?[fFdD]\b
 [match:Special]
 pattern: \[A-Z]\d{4}
 
-[match:Function]
-pattern: [{}]
-
 [match:Error]
 pattern: "(?:[^"\\]|\\.)*$
 
@@ -130,7 +127,51 @@ pattern: \bException\b|\b[A-Z]{1,}[a-zA-Z0-9]*Exception\b
 [match:Error]
 pattern: \]
 
+[region:String]
+start: "
+end: "
+
+[region:String]
+start: "
+end: $\|"
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:SpecialComment]
+start: /\*\*
+end: \.$
+
 [region:Special]
 start: {@\(link\|linkplain\|inherit[Dd]oc\|doc[rR]oot\|value\)
 end: }
+
+[region:String]
+start: "
+end: "
+
+[region:String]
+start: '
+end: '
+
+[region:Function]
+start: \(\t\| \{8\}\)[$_a-zA-Z][$_a-zA-Z0-9_. \[\]]*([^-
+end: )
+
+[region:Function]
+start:   [$_a-zA-Z][$_a-zA-Z0-9_. \[\]]*([^-
+end: )
+
+[region:Function]
+start: \s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*([^0-9]
+end: )
+
+[region:String]
+start: "
+end: "
+
+[region:Debug]
+start: (
+end: )
 

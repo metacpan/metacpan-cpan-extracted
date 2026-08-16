@@ -86,6 +86,13 @@ subtest 'inject_includes' => sub {
     App::Yath::Script::inject_includes();
     is(\@INC, ['/fake/path1', '/fake/path2'], 'replaces @INC from env var');
 
+    # A hook installed by PERL5OPT must survive. Only paths come from the env
+    # var; it cannot carry a ref.
+    my $hook = sub { return };
+    @INC = ($hook, '/whatever');
+    App::Yath::Script::inject_includes();
+    is(\@INC, [exact_ref($hook), '/fake/path1', '/fake/path2'], 'keeps @INC hooks, replaces paths');
+
     # Restore
     @INC = @orig_inc;
 };

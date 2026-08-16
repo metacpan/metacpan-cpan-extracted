@@ -4,9 +4,11 @@
 
 #include "pdfmake_meta.h"
 #include "pdfmake_arena.h"
+#include "pdfmake.h"        /* PDFMAKE_VERSION, so Producer tracks the dist */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 /*----------------------------------------------------------------------------
  * PDF date formatting (§7.9.4)
@@ -303,17 +305,37 @@ pdfmake_trapped_t pdfmake_meta_get_trapped(pdfmake_doc_t *doc) {
  * Auto-metadata (called during write)
  *--------------------------------------------------------------------------*/
 
-/* Producer string constant */
-#ifndef PDFMAKE_VERSION
-#define PDFMAKE_VERSION "0.05"
-#endif
+/*
+ * SOURCE_DATE_EPOCH (the reproducible-builds convention): when set to a
+ * non-negative integer, it replaces the wall clock everywhere a timestamp
+ * would otherwise leak into the output. Two runs over the same input then
+ * produce the same bytes, which is what makes a golden corpus - and the
+ * promise that a customer's documents do not move - checkable at all.
+ *
+ * Anything unparseable is ignored rather than diagnosed: this is a build
+ * knob, and a document that fails to render because an environment
+ * variable had a typo would be a worse failure than a timestamp.
+ */
+int pdfmake_source_date(time_t *out) {
+    const char *s = getenv("SOURCE_DATE_EPOCH");
+    char *end;
+    long long v;
+
+    if (!s || !*s) return 0;
+    errno = 0;
+    v = strtoll(s, &end, 10);
+    if (errno || end == s || *end || v < 0) return 0;
+    if (out) *out = (time_t)v;
+    return 1;
+}
 
 void pdfmake_meta_auto_fill(pdfmake_doc_t *doc) {
     time_t now;
 
     if (!doc) return;
 
-    now = time(NULL);
+    if (!pdfmake_source_date(&now))
+        now = time(NULL);
 
     /* Set Producer if not already set */
     if (!pdfmake_meta_get(doc, PDFMAKE_META_PRODUCER)) {

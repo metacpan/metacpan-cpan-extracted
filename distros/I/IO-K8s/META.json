@@ -55,3391 +55,3391 @@
    "provides" : {
       "IO::K8s" : {
          "file" : "lib/IO/K8s.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::APIObject" : {
          "file" : "lib/IO/K8s/APIObject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::AgentSandbox" : {
          "file" : "lib/IO/K8s/AgentSandbox.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::AgentSandbox::V1alpha1::Sandbox" : {
          "file" : "lib/IO/K8s/AgentSandbox/V1alpha1/Sandbox.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::AgentSandbox::V1alpha1::SandboxClaim" : {
          "file" : "lib/IO/K8s/AgentSandbox/V1alpha1/SandboxClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::AgentSandbox::V1alpha1::SandboxTemplate" : {
          "file" : "lib/IO/K8s/AgentSandbox/V1alpha1/SandboxTemplate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::AgentSandbox::V1alpha1::SandboxWarmPool" : {
          "file" : "lib/IO/K8s/AgentSandbox/V1alpha1/SandboxWarmPool.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::AgentSandbox::V1beta1::Sandbox" : {
          "file" : "lib/IO/K8s/AgentSandbox/V1beta1/Sandbox.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::AgentSandbox::V1beta1::SandboxClaim" : {
          "file" : "lib/IO/K8s/AgentSandbox/V1beta1/SandboxClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::AgentSandbox::V1beta1::SandboxTemplate" : {
          "file" : "lib/IO/K8s/AgentSandbox/V1beta1/SandboxTemplate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::AgentSandbox::V1beta1::SandboxWarmPool" : {
          "file" : "lib/IO/K8s/AgentSandbox/V1beta1/SandboxWarmPool.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ApplyConfiguration" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ApplyConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::AuditAnnotation" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/AuditAnnotation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ExpressionWarning" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ExpressionWarning.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::JSONPatch" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/JSONPatch.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::MatchCondition" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/MatchCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::MatchResources" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/MatchResources.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::MutatingAdmissionPolicy" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/MutatingAdmissionPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::MutatingAdmissionPolicyBinding" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/MutatingAdmissionPolicyBinding.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::MutatingAdmissionPolicyBindingSpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/MutatingAdmissionPolicyBindingSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::MutatingAdmissionPolicySpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/MutatingAdmissionPolicySpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::MutatingWebhook" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/MutatingWebhook.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::MutatingWebhookConfiguration" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/MutatingWebhookConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::Mutation" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/Mutation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::NamedRuleWithOperations" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/NamedRuleWithOperations.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ParamKind" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ParamKind.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ParamRef" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ParamRef.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::RuleWithOperations" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/RuleWithOperations.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ServiceReference" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ServiceReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::TypeChecking" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/TypeChecking.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ValidatingAdmissionPolicy" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ValidatingAdmissionPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ValidatingAdmissionPolicyBinding" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ValidatingAdmissionPolicyBinding.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ValidatingAdmissionPolicyBindingSpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ValidatingAdmissionPolicyBindingSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ValidatingAdmissionPolicySpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ValidatingAdmissionPolicySpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ValidatingAdmissionPolicyStatus" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ValidatingAdmissionPolicyStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ValidatingWebhook" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ValidatingWebhook.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::ValidatingWebhookConfiguration" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/ValidatingWebhookConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::Validation" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/Validation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::Variable" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/Variable.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1::WebhookClientConfig" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1/WebhookClientConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::ApplyConfiguration" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/ApplyConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::AuditAnnotation" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/AuditAnnotation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::ExpressionWarning" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/ExpressionWarning.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::JSONPatch" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/JSONPatch.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::MatchCondition" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/MatchCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::MatchResources" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/MatchResources.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::MutatingAdmissionPolicy" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/MutatingAdmissionPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::MutatingAdmissionPolicyBinding" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/MutatingAdmissionPolicyBinding.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::MutatingAdmissionPolicyBindingSpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/MutatingAdmissionPolicyBindingSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::MutatingAdmissionPolicySpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/MutatingAdmissionPolicySpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::Mutation" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/Mutation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::NamedRuleWithOperations" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/NamedRuleWithOperations.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::ParamKind" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/ParamKind.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::ParamRef" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/ParamRef.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::TypeChecking" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/TypeChecking.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::ValidatingAdmissionPolicy" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/ValidatingAdmissionPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::ValidatingAdmissionPolicyBinding" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/ValidatingAdmissionPolicyBinding.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::ValidatingAdmissionPolicyBindingSpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/ValidatingAdmissionPolicyBindingSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::ValidatingAdmissionPolicySpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/ValidatingAdmissionPolicySpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::ValidatingAdmissionPolicyStatus" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/ValidatingAdmissionPolicyStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::Validation" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/Validation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1alpha1::Variable" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1alpha1/Variable.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::ApplyConfiguration" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/ApplyConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::AuditAnnotation" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/AuditAnnotation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::ExpressionWarning" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/ExpressionWarning.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::JSONPatch" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/JSONPatch.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::MatchCondition" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/MatchCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::MatchResources" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/MatchResources.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::MutatingAdmissionPolicy" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/MutatingAdmissionPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::MutatingAdmissionPolicyBinding" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/MutatingAdmissionPolicyBinding.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::MutatingAdmissionPolicyBindingSpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/MutatingAdmissionPolicyBindingSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::MutatingAdmissionPolicySpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/MutatingAdmissionPolicySpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::Mutation" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/Mutation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::NamedRuleWithOperations" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/NamedRuleWithOperations.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::ParamKind" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/ParamKind.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::ParamRef" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/ParamRef.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::TypeChecking" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/TypeChecking.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::ValidatingAdmissionPolicy" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/ValidatingAdmissionPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::ValidatingAdmissionPolicyBinding" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/ValidatingAdmissionPolicyBinding.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::ValidatingAdmissionPolicyBindingSpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/ValidatingAdmissionPolicyBindingSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::ValidatingAdmissionPolicySpec" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/ValidatingAdmissionPolicySpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::ValidatingAdmissionPolicyStatus" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/ValidatingAdmissionPolicyStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::Validation" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/Validation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Admissionregistration::V1beta1::Variable" : {
          "file" : "lib/IO/K8s/Api/Admissionregistration/V1beta1/Variable.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apiserverinternal::V1alpha1::ServerStorageVersion" : {
          "file" : "lib/IO/K8s/Api/Apiserverinternal/V1alpha1/ServerStorageVersion.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersion" : {
          "file" : "lib/IO/K8s/Api/Apiserverinternal/V1alpha1/StorageVersion.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersionCondition" : {
          "file" : "lib/IO/K8s/Api/Apiserverinternal/V1alpha1/StorageVersionCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersionSpec" : {
          "file" : "lib/IO/K8s/Api/Apiserverinternal/V1alpha1/StorageVersionSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersionStatus" : {
          "file" : "lib/IO/K8s/Api/Apiserverinternal/V1alpha1/StorageVersionStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::ControllerRevision" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/ControllerRevision.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::DaemonSet" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/DaemonSet.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::DaemonSetCondition" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/DaemonSetCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::DaemonSetSpec" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/DaemonSetSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::DaemonSetStatus" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/DaemonSetStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::DaemonSetUpdateStrategy" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/DaemonSetUpdateStrategy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::Deployment" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/Deployment.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::DeploymentCondition" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/DeploymentCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::DeploymentSpec" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/DeploymentSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::DeploymentStatus" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/DeploymentStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::DeploymentStrategy" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/DeploymentStrategy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::ReplicaSet" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/ReplicaSet.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::ReplicaSetCondition" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/ReplicaSetCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::ReplicaSetSpec" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/ReplicaSetSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::ReplicaSetStatus" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/ReplicaSetStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::RollingUpdateDaemonSet" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/RollingUpdateDaemonSet.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::RollingUpdateDeployment" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/RollingUpdateDeployment.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::RollingUpdateStatefulSetStrategy" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/RollingUpdateStatefulSetStrategy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::StatefulSet" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/StatefulSet.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::StatefulSetCondition" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/StatefulSetCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::StatefulSetOrdinals" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/StatefulSetOrdinals.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::StatefulSetPersistentVolumeClaimRetentionPolicy" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/StatefulSetPersistentVolumeClaimRetentionPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::StatefulSetSpec" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/StatefulSetSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::StatefulSetStatus" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/StatefulSetStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Apps::V1::StatefulSetUpdateStrategy" : {
          "file" : "lib/IO/K8s/Api/Apps/V1/StatefulSetUpdateStrategy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1::BoundObjectReference" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1/BoundObjectReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1::SelfSubjectReview" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1/SelfSubjectReview.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1::SelfSubjectReviewStatus" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1/SelfSubjectReviewStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1::TokenRequest" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1/TokenRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1::TokenRequestSpec" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1/TokenRequestSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1::TokenRequestStatus" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1/TokenRequestStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1::TokenReview" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1/TokenReview.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1::TokenReviewSpec" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1/TokenReviewSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1::TokenReviewStatus" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1/TokenReviewStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1::UserInfo" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1/UserInfo.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1alpha1::SelfSubjectReview" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1alpha1/SelfSubjectReview.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1alpha1::SelfSubjectReviewStatus" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1alpha1/SelfSubjectReviewStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1beta1::SelfSubjectReview" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1beta1/SelfSubjectReview.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authentication::V1beta1::SelfSubjectReviewStatus" : {
          "file" : "lib/IO/K8s/Api/Authentication/V1beta1/SelfSubjectReviewStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::FieldSelectorAttributes" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/FieldSelectorAttributes.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::LabelSelectorAttributes" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/LabelSelectorAttributes.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::LocalSubjectAccessReview" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/LocalSubjectAccessReview.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::NonResourceAttributes" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/NonResourceAttributes.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::NonResourceRule" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/NonResourceRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::ResourceAttributes" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/ResourceAttributes.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::ResourceRule" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/ResourceRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::SelfSubjectAccessReview" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/SelfSubjectAccessReview.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::SelfSubjectAccessReviewSpec" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/SelfSubjectAccessReviewSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::SelfSubjectRulesReview" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/SelfSubjectRulesReview.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::SelfSubjectRulesReviewSpec" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/SelfSubjectRulesReviewSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::SubjectAccessReview" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/SubjectAccessReview.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::SubjectAccessReviewSpec" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/SubjectAccessReviewSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::SubjectAccessReviewStatus" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/SubjectAccessReviewStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Authorization::V1::SubjectRulesReviewStatus" : {
          "file" : "lib/IO/K8s/Api/Authorization/V1/SubjectRulesReviewStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V1::CrossVersionObjectReference" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V1/CrossVersionObjectReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V1::HorizontalPodAutoscaler" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V1/HorizontalPodAutoscaler.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V1::HorizontalPodAutoscalerSpec" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V1/HorizontalPodAutoscalerSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V1::HorizontalPodAutoscalerStatus" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V1/HorizontalPodAutoscalerStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V1::Scale" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V1/Scale.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V1::ScaleSpec" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V1/ScaleSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V1::ScaleStatus" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V1/ScaleStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::ContainerResourceMetricSource" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/ContainerResourceMetricSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::ContainerResourceMetricStatus" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/ContainerResourceMetricStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::CrossVersionObjectReference" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/CrossVersionObjectReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::ExternalMetricSource" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/ExternalMetricSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::ExternalMetricStatus" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/ExternalMetricStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::HPAScalingPolicy" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/HPAScalingPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::HPAScalingRules" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/HPAScalingRules.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscaler" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/HorizontalPodAutoscaler.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscalerBehavior" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/HorizontalPodAutoscalerBehavior.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscalerCondition" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/HorizontalPodAutoscalerCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscalerSpec" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/HorizontalPodAutoscalerSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscalerStatus" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/HorizontalPodAutoscalerStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::MetricIdentifier" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/MetricIdentifier.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::MetricSpec" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/MetricSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::MetricStatus" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/MetricStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::MetricTarget" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/MetricTarget.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::MetricValueStatus" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/MetricValueStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::ObjectMetricSource" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/ObjectMetricSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::ObjectMetricStatus" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/ObjectMetricStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::PodsMetricSource" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/PodsMetricSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::PodsMetricStatus" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/PodsMetricStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::ResourceMetricSource" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/ResourceMetricSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Autoscaling::V2::ResourceMetricStatus" : {
          "file" : "lib/IO/K8s/Api/Autoscaling/V2/ResourceMetricStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::CronJob" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/CronJob.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::CronJobSpec" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/CronJobSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::CronJobStatus" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/CronJobStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::Job" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/Job.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::JobCondition" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/JobCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::JobSpec" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/JobSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::JobStatus" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/JobStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::JobTemplateSpec" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/JobTemplateSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::PodFailurePolicy" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/PodFailurePolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::PodFailurePolicyOnExitCodesRequirement" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/PodFailurePolicyOnExitCodesRequirement.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::PodFailurePolicyOnPodConditionsPattern" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/PodFailurePolicyOnPodConditionsPattern.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::PodFailurePolicyRule" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/PodFailurePolicyRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::SuccessPolicy" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/SuccessPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::SuccessPolicyRule" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/SuccessPolicyRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Batch::V1::UncountedTerminatedPods" : {
          "file" : "lib/IO/K8s/Api/Batch/V1/UncountedTerminatedPods.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1::CertificateSigningRequest" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1/CertificateSigningRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1::CertificateSigningRequestCondition" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1/CertificateSigningRequestCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1::CertificateSigningRequestSpec" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1/CertificateSigningRequestSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1::CertificateSigningRequestStatus" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1/CertificateSigningRequestStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1alpha1::ClusterTrustBundle" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1alpha1/ClusterTrustBundle.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1alpha1::ClusterTrustBundleSpec" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1alpha1/ClusterTrustBundleSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1beta1::ClusterTrustBundle" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1beta1/ClusterTrustBundle.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1beta1::ClusterTrustBundleSpec" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1beta1/ClusterTrustBundleSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1beta1::PodCertificateRequest" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1beta1/PodCertificateRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1beta1::PodCertificateRequestSpec" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1beta1/PodCertificateRequestSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Certificates::V1beta1::PodCertificateRequestStatus" : {
          "file" : "lib/IO/K8s/Api/Certificates/V1beta1/PodCertificateRequestStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Coordination::V1::Lease" : {
          "file" : "lib/IO/K8s/Api/Coordination/V1/Lease.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Coordination::V1::LeaseSpec" : {
          "file" : "lib/IO/K8s/Api/Coordination/V1/LeaseSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Coordination::V1alpha1::LeaseCandidate" : {
          "file" : "lib/IO/K8s/Api/Coordination/V1alpha1/LeaseCandidate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Coordination::V1alpha1::LeaseCandidateSpec" : {
          "file" : "lib/IO/K8s/Api/Coordination/V1alpha1/LeaseCandidateSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Coordination::V1alpha2::LeaseCandidate" : {
          "file" : "lib/IO/K8s/Api/Coordination/V1alpha2/LeaseCandidate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Coordination::V1alpha2::LeaseCandidateSpec" : {
          "file" : "lib/IO/K8s/Api/Coordination/V1alpha2/LeaseCandidateSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Coordination::V1beta1::LeaseCandidate" : {
          "file" : "lib/IO/K8s/Api/Coordination/V1beta1/LeaseCandidate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Coordination::V1beta1::LeaseCandidateSpec" : {
          "file" : "lib/IO/K8s/Api/Coordination/V1beta1/LeaseCandidateSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::AWSElasticBlockStoreVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/AWSElasticBlockStoreVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Affinity" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Affinity.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::AppArmorProfile" : {
          "file" : "lib/IO/K8s/Api/Core/V1/AppArmorProfile.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::AttachedVolume" : {
          "file" : "lib/IO/K8s/Api/Core/V1/AttachedVolume.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::AzureDiskVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/AzureDiskVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::AzureFilePersistentVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/AzureFilePersistentVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::AzureFileVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/AzureFileVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Binding" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Binding.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::CSIPersistentVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/CSIPersistentVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::CSIVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/CSIVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Capabilities" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Capabilities.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::CephFSPersistentVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/CephFSPersistentVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::CephFSVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/CephFSVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::CinderPersistentVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/CinderPersistentVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::CinderVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/CinderVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ClientIPConfig" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ClientIPConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ClusterTrustBundleProjection" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ClusterTrustBundleProjection.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ComponentCondition" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ComponentCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ComponentStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ComponentStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ConfigMap" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ConfigMap.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ConfigMapEnvSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ConfigMapEnvSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ConfigMapKeySelector" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ConfigMapKeySelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ConfigMapNodeConfigSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ConfigMapNodeConfigSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ConfigMapProjection" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ConfigMapProjection.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ConfigMapVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ConfigMapVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Container" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Container.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerExtendedResourceRequest" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerExtendedResourceRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerImage" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerImage.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerPort" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerPort.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerResizePolicy" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerResizePolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerRestartRule" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerRestartRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerRestartRuleOnExitCodes" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerRestartRuleOnExitCodes.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerState" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerState.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerStateRunning" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerStateRunning.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerStateTerminated" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerStateTerminated.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerStateWaiting" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerStateWaiting.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ContainerUser" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ContainerUser.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::DaemonEndpoint" : {
          "file" : "lib/IO/K8s/Api/Core/V1/DaemonEndpoint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::DownwardAPIProjection" : {
          "file" : "lib/IO/K8s/Api/Core/V1/DownwardAPIProjection.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::DownwardAPIVolumeFile" : {
          "file" : "lib/IO/K8s/Api/Core/V1/DownwardAPIVolumeFile.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::DownwardAPIVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/DownwardAPIVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EmptyDirVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EmptyDirVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EndpointAddress" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EndpointAddress.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EndpointPort" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EndpointPort.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EndpointSubset" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EndpointSubset.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Endpoints" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Endpoints.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EnvFromSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EnvFromSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EnvVar" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EnvVar.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EnvVarSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EnvVarSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EphemeralContainer" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EphemeralContainer.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EphemeralVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EphemeralVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Event" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Event.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EventSeries" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EventSeries.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::EventSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/EventSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ExecAction" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ExecAction.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::FCVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/FCVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::FileKeySelector" : {
          "file" : "lib/IO/K8s/Api/Core/V1/FileKeySelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::FlexPersistentVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/FlexPersistentVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::FlexVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/FlexVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::FlockerVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/FlockerVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::GCEPersistentDiskVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/GCEPersistentDiskVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::GRPCAction" : {
          "file" : "lib/IO/K8s/Api/Core/V1/GRPCAction.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::GitRepoVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/GitRepoVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::GlusterfsPersistentVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/GlusterfsPersistentVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::GlusterfsVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/GlusterfsVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::HTTPGetAction" : {
          "file" : "lib/IO/K8s/Api/Core/V1/HTTPGetAction.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::HTTPHeader" : {
          "file" : "lib/IO/K8s/Api/Core/V1/HTTPHeader.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::HostAlias" : {
          "file" : "lib/IO/K8s/Api/Core/V1/HostAlias.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::HostIP" : {
          "file" : "lib/IO/K8s/Api/Core/V1/HostIP.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::HostPathVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/HostPathVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ISCSIPersistentVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ISCSIPersistentVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ISCSIVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ISCSIVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ImageVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ImageVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ImageVolumeStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ImageVolumeStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::KeyToPath" : {
          "file" : "lib/IO/K8s/Api/Core/V1/KeyToPath.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Lifecycle" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Lifecycle.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::LifecycleHandler" : {
          "file" : "lib/IO/K8s/Api/Core/V1/LifecycleHandler.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::LimitRange" : {
          "file" : "lib/IO/K8s/Api/Core/V1/LimitRange.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::LimitRangeItem" : {
          "file" : "lib/IO/K8s/Api/Core/V1/LimitRangeItem.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::LimitRangeSpec" : {
          "file" : "lib/IO/K8s/Api/Core/V1/LimitRangeSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::LinuxContainerUser" : {
          "file" : "lib/IO/K8s/Api/Core/V1/LinuxContainerUser.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::LoadBalancerIngress" : {
          "file" : "lib/IO/K8s/Api/Core/V1/LoadBalancerIngress.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::LoadBalancerStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/LoadBalancerStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::LocalObjectReference" : {
          "file" : "lib/IO/K8s/Api/Core/V1/LocalObjectReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::LocalVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/LocalVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ModifyVolumeStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ModifyVolumeStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NFSVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NFSVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Namespace" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Namespace.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NamespaceCondition" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NamespaceCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NamespaceSpec" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NamespaceSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NamespaceStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NamespaceStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Node" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Node.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeAddress" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeAddress.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeAffinity" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeAffinity.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeAllocatableResourceClaimStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeAllocatableResourceClaimStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeCondition" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeConfigSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeConfigSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeConfigStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeConfigStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeDaemonEndpoints" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeDaemonEndpoints.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeFeatures" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeFeatures.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeRuntimeHandler" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeRuntimeHandler.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeRuntimeHandlerFeatures" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeRuntimeHandlerFeatures.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeSelector" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeSelectorRequirement" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeSelectorRequirement.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeSelectorTerm" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeSelectorTerm.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeSpec" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeSwapStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeSwapStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::NodeSystemInfo" : {
          "file" : "lib/IO/K8s/Api/Core/V1/NodeSystemInfo.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ObjectFieldSelector" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ObjectFieldSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ObjectReference" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ObjectReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PersistentVolume" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolume.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PersistentVolumeClaim" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolumeClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PersistentVolumeClaimCondition" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolumeClaimCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PersistentVolumeClaimSpec" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolumeClaimSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PersistentVolumeClaimStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolumeClaimStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PersistentVolumeClaimTemplate" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolumeClaimTemplate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PersistentVolumeClaimVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolumeClaimVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PersistentVolumeSpec" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolumeSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PersistentVolumeStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PersistentVolumeStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PhotonPersistentDiskVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PhotonPersistentDiskVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Pod" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Pod.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodAffinity" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodAffinity.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodAffinityTerm" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodAffinityTerm.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodAntiAffinity" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodAntiAffinity.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodCertificateProjection" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodCertificateProjection.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodCondition" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodDNSConfig" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodDNSConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodDNSConfigOption" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodDNSConfigOption.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodExtendedResourceClaimStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodExtendedResourceClaimStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodIP" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodIP.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodOS" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodOS.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodReadinessGate" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodReadinessGate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodResourceClaim" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodResourceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodResourceClaimStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodResourceClaimStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodSchedulingGate" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodSchedulingGate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodSchedulingGroup" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodSchedulingGroup.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodSecurityContext" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodSecurityContext.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodSpec" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodTemplate" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodTemplate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PodTemplateSpec" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PodTemplateSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PortStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PortStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PortworxVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PortworxVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::PreferredSchedulingTerm" : {
          "file" : "lib/IO/K8s/Api/Core/V1/PreferredSchedulingTerm.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Probe" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Probe.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ProjectedVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ProjectedVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::QuobyteVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/QuobyteVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::RBDPersistentVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/RBDPersistentVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::RBDVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/RBDVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ReplicationController" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ReplicationController.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ReplicationControllerCondition" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ReplicationControllerCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ReplicationControllerSpec" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ReplicationControllerSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ReplicationControllerStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ReplicationControllerStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ResourceClaim" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ResourceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ResourceFieldSelector" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ResourceFieldSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ResourceHealth" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ResourceHealth.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ResourceQuota" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ResourceQuota.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ResourceQuotaSpec" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ResourceQuotaSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ResourceQuotaStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ResourceQuotaStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ResourceRequirements" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ResourceRequirements.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ResourceStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ResourceStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::SELinuxOptions" : {
          "file" : "lib/IO/K8s/Api/Core/V1/SELinuxOptions.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ScaleIOPersistentVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ScaleIOPersistentVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ScaleIOVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ScaleIOVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ScopeSelector" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ScopeSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ScopedResourceSelectorRequirement" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ScopedResourceSelectorRequirement.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::SeccompProfile" : {
          "file" : "lib/IO/K8s/Api/Core/V1/SeccompProfile.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Secret" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Secret.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::SecretEnvSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/SecretEnvSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::SecretKeySelector" : {
          "file" : "lib/IO/K8s/Api/Core/V1/SecretKeySelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::SecretProjection" : {
          "file" : "lib/IO/K8s/Api/Core/V1/SecretProjection.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::SecretReference" : {
          "file" : "lib/IO/K8s/Api/Core/V1/SecretReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::SecretVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/SecretVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::SecurityContext" : {
          "file" : "lib/IO/K8s/Api/Core/V1/SecurityContext.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Service" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Service.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ServiceAccount" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ServiceAccount.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ServiceAccountTokenProjection" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ServiceAccountTokenProjection.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ServicePort" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ServicePort.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ServiceSpec" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ServiceSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::ServiceStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/ServiceStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::SessionAffinityConfig" : {
          "file" : "lib/IO/K8s/Api/Core/V1/SessionAffinityConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::SleepAction" : {
          "file" : "lib/IO/K8s/Api/Core/V1/SleepAction.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::StorageOSPersistentVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/StorageOSPersistentVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::StorageOSVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/StorageOSVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Sysctl" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Sysctl.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::TCPSocketAction" : {
          "file" : "lib/IO/K8s/Api/Core/V1/TCPSocketAction.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Taint" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Taint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Toleration" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Toleration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::TopologySelectorLabelRequirement" : {
          "file" : "lib/IO/K8s/Api/Core/V1/TopologySelectorLabelRequirement.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::TopologySelectorTerm" : {
          "file" : "lib/IO/K8s/Api/Core/V1/TopologySelectorTerm.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::TopologySpreadConstraint" : {
          "file" : "lib/IO/K8s/Api/Core/V1/TopologySpreadConstraint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::TypedLocalObjectReference" : {
          "file" : "lib/IO/K8s/Api/Core/V1/TypedLocalObjectReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::TypedObjectReference" : {
          "file" : "lib/IO/K8s/Api/Core/V1/TypedObjectReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::Volume" : {
          "file" : "lib/IO/K8s/Api/Core/V1/Volume.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::VolumeDevice" : {
          "file" : "lib/IO/K8s/Api/Core/V1/VolumeDevice.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::VolumeMount" : {
          "file" : "lib/IO/K8s/Api/Core/V1/VolumeMount.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::VolumeMountStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/VolumeMountStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::VolumeNodeAffinity" : {
          "file" : "lib/IO/K8s/Api/Core/V1/VolumeNodeAffinity.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::VolumeProjection" : {
          "file" : "lib/IO/K8s/Api/Core/V1/VolumeProjection.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::VolumeResourceRequirements" : {
          "file" : "lib/IO/K8s/Api/Core/V1/VolumeResourceRequirements.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::VolumeStatus" : {
          "file" : "lib/IO/K8s/Api/Core/V1/VolumeStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::VsphereVirtualDiskVolumeSource" : {
          "file" : "lib/IO/K8s/Api/Core/V1/VsphereVirtualDiskVolumeSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::WeightedPodAffinityTerm" : {
          "file" : "lib/IO/K8s/Api/Core/V1/WeightedPodAffinityTerm.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Core::V1::WindowsSecurityContextOptions" : {
          "file" : "lib/IO/K8s/Api/Core/V1/WindowsSecurityContextOptions.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Discovery::V1::Endpoint" : {
          "file" : "lib/IO/K8s/Api/Discovery/V1/Endpoint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Discovery::V1::EndpointConditions" : {
          "file" : "lib/IO/K8s/Api/Discovery/V1/EndpointConditions.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Discovery::V1::EndpointHints" : {
          "file" : "lib/IO/K8s/Api/Discovery/V1/EndpointHints.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Discovery::V1::EndpointPort" : {
          "file" : "lib/IO/K8s/Api/Discovery/V1/EndpointPort.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Discovery::V1::EndpointSlice" : {
          "file" : "lib/IO/K8s/Api/Discovery/V1/EndpointSlice.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Discovery::V1::ForNode" : {
          "file" : "lib/IO/K8s/Api/Discovery/V1/ForNode.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Discovery::V1::ForZone" : {
          "file" : "lib/IO/K8s/Api/Discovery/V1/ForZone.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Events::V1::Event" : {
          "file" : "lib/IO/K8s/Api/Events/V1/Event.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Events::V1::EventSeries" : {
          "file" : "lib/IO/K8s/Api/Events/V1/EventSeries.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::ExemptPriorityLevelConfiguration" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/ExemptPriorityLevelConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::FlowDistinguisherMethod" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/FlowDistinguisherMethod.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::FlowSchema" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/FlowSchema.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::FlowSchemaCondition" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/FlowSchemaCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::FlowSchemaSpec" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/FlowSchemaSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::FlowSchemaStatus" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/FlowSchemaStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::GroupSubject" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/GroupSubject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::LimitResponse" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/LimitResponse.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::LimitedPriorityLevelConfiguration" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/LimitedPriorityLevelConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::NonResourcePolicyRule" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/NonResourcePolicyRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::PolicyRulesWithSubjects" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/PolicyRulesWithSubjects.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::PriorityLevelConfiguration" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/PriorityLevelConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::PriorityLevelConfigurationCondition" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/PriorityLevelConfigurationCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::PriorityLevelConfigurationReference" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/PriorityLevelConfigurationReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::PriorityLevelConfigurationSpec" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/PriorityLevelConfigurationSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::PriorityLevelConfigurationStatus" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/PriorityLevelConfigurationStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::QueuingConfiguration" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/QueuingConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::ResourcePolicyRule" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/ResourcePolicyRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::ServiceAccountSubject" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/ServiceAccountSubject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::Subject" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/Subject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1::UserSubject" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1/UserSubject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::ExemptPriorityLevelConfiguration" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/ExemptPriorityLevelConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::FlowDistinguisherMethod" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/FlowDistinguisherMethod.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::FlowSchema" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/FlowSchema.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::FlowSchemaCondition" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/FlowSchemaCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::FlowSchemaSpec" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/FlowSchemaSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::FlowSchemaStatus" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/FlowSchemaStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::GroupSubject" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/GroupSubject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::LimitResponse" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/LimitResponse.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::LimitedPriorityLevelConfiguration" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/LimitedPriorityLevelConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::NonResourcePolicyRule" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/NonResourcePolicyRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::PolicyRulesWithSubjects" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/PolicyRulesWithSubjects.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::PriorityLevelConfiguration" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/PriorityLevelConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::PriorityLevelConfigurationCondition" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/PriorityLevelConfigurationCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::PriorityLevelConfigurationReference" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/PriorityLevelConfigurationReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::PriorityLevelConfigurationSpec" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/PriorityLevelConfigurationSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::PriorityLevelConfigurationStatus" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/PriorityLevelConfigurationStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::QueuingConfiguration" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/QueuingConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::ResourcePolicyRule" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/ResourcePolicyRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::ServiceAccountSubject" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/ServiceAccountSubject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::Subject" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/Subject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Flowcontrol::V1beta3::UserSubject" : {
          "file" : "lib/IO/K8s/Api/Flowcontrol/V1beta3/UserSubject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::HTTPIngressPath" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/HTTPIngressPath.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::HTTPIngressRuleValue" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/HTTPIngressRuleValue.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IPAddress" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IPAddress.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IPAddressSpec" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IPAddressSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IPBlock" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IPBlock.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::Ingress" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/Ingress.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressBackend" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressBackend.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressClass" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressClassParametersReference" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressClassParametersReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressClassSpec" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressClassSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressLoadBalancerIngress" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressLoadBalancerIngress.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressLoadBalancerStatus" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressLoadBalancerStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressPortStatus" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressPortStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressRule" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressServiceBackend" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressServiceBackend.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressSpec" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressStatus" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::IngressTLS" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/IngressTLS.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::NetworkPolicy" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/NetworkPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::NetworkPolicyEgressRule" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/NetworkPolicyEgressRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::NetworkPolicyIngressRule" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/NetworkPolicyIngressRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::NetworkPolicyPeer" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/NetworkPolicyPeer.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::NetworkPolicyPort" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/NetworkPolicyPort.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::NetworkPolicySpec" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/NetworkPolicySpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::ParentReference" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/ParentReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::ServiceBackendPort" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/ServiceBackendPort.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::ServiceCIDR" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/ServiceCIDR.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::ServiceCIDRSpec" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/ServiceCIDRSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1::ServiceCIDRStatus" : {
          "file" : "lib/IO/K8s/Api/Networking/V1/ServiceCIDRStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1beta1::IPAddress" : {
          "file" : "lib/IO/K8s/Api/Networking/V1beta1/IPAddress.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1beta1::IPAddressSpec" : {
          "file" : "lib/IO/K8s/Api/Networking/V1beta1/IPAddressSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1beta1::ParentReference" : {
          "file" : "lib/IO/K8s/Api/Networking/V1beta1/ParentReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1beta1::ServiceCIDR" : {
          "file" : "lib/IO/K8s/Api/Networking/V1beta1/ServiceCIDR.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1beta1::ServiceCIDRSpec" : {
          "file" : "lib/IO/K8s/Api/Networking/V1beta1/ServiceCIDRSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Networking::V1beta1::ServiceCIDRStatus" : {
          "file" : "lib/IO/K8s/Api/Networking/V1beta1/ServiceCIDRStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Node::V1::Overhead" : {
          "file" : "lib/IO/K8s/Api/Node/V1/Overhead.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Node::V1::RuntimeClass" : {
          "file" : "lib/IO/K8s/Api/Node/V1/RuntimeClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Node::V1::Scheduling" : {
          "file" : "lib/IO/K8s/Api/Node/V1/Scheduling.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Policy::V1::Eviction" : {
          "file" : "lib/IO/K8s/Api/Policy/V1/Eviction.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Policy::V1::PodDisruptionBudget" : {
          "file" : "lib/IO/K8s/Api/Policy/V1/PodDisruptionBudget.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Policy::V1::PodDisruptionBudgetSpec" : {
          "file" : "lib/IO/K8s/Api/Policy/V1/PodDisruptionBudgetSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Policy::V1::PodDisruptionBudgetStatus" : {
          "file" : "lib/IO/K8s/Api/Policy/V1/PodDisruptionBudgetStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Rbac::V1::AggregationRule" : {
          "file" : "lib/IO/K8s/Api/Rbac/V1/AggregationRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Rbac::V1::ClusterRole" : {
          "file" : "lib/IO/K8s/Api/Rbac/V1/ClusterRole.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Rbac::V1::ClusterRoleBinding" : {
          "file" : "lib/IO/K8s/Api/Rbac/V1/ClusterRoleBinding.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Rbac::V1::PolicyRule" : {
          "file" : "lib/IO/K8s/Api/Rbac/V1/PolicyRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Rbac::V1::Role" : {
          "file" : "lib/IO/K8s/Api/Rbac/V1/Role.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Rbac::V1::RoleBinding" : {
          "file" : "lib/IO/K8s/Api/Rbac/V1/RoleBinding.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Rbac::V1::RoleRef" : {
          "file" : "lib/IO/K8s/Api/Rbac/V1/RoleRef.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Rbac::V1::Subject" : {
          "file" : "lib/IO/K8s/Api/Rbac/V1/Subject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::AllocatedDeviceStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/AllocatedDeviceStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::AllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/AllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::CELDeviceSelector" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/CELDeviceSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::CapacityRequestPolicy" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/CapacityRequestPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::CapacityRequestPolicyRange" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/CapacityRequestPolicyRange.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::CapacityRequirements" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/CapacityRequirements.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::Counter" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/Counter.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::CounterSet" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/CounterSet.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::Device" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/Device.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceAllocationConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceAllocationConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceAllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceAllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceAttribute" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceAttribute.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceCapacity" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceCapacity.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceClaim" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceClaimConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceClaimConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceClass" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceClassConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceClassConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceClassSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceClassSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceConstraint" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceConstraint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceCounterConsumption" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceCounterConsumption.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceRequest" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceRequestAllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceRequestAllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceSelector" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceSubRequest" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceSubRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceTaint" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceTaint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::DeviceToleration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/DeviceToleration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::ExactDeviceRequest" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/ExactDeviceRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::NetworkDeviceData" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/NetworkDeviceData.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::NodeAllocatableResourceMapping" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/NodeAllocatableResourceMapping.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::OpaqueDeviceConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/OpaqueDeviceConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::ResourceClaim" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/ResourceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::ResourceClaimConsumerReference" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/ResourceClaimConsumerReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::ResourceClaimSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/ResourceClaimSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::ResourceClaimStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/ResourceClaimStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::ResourceClaimTemplate" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/ResourceClaimTemplate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::ResourceClaimTemplateSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/ResourceClaimTemplateSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::ResourcePool" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/ResourcePool.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::ResourceSlice" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/ResourceSlice.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1::ResourceSliceSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1/ResourceSliceSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::AllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/AllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::BasicDevice" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/BasicDevice.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::CELDeviceSelector" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/CELDeviceSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::Device" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/Device.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceAllocationConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceAllocationConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceAllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceAllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceAttribute" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceAttribute.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceClaim" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceClaimConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceClaimConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceClass" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceClassConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceClassConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceClassSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceClassSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceConstraint" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceConstraint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceRequest" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceRequestAllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceRequestAllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceSelector" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceTaint" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceTaint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceTaintRule" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceTaintRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceTaintRuleSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceTaintRuleSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceTaintRuleStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceTaintRuleStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::DeviceTaintSelector" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/DeviceTaintSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::OpaqueDeviceConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/OpaqueDeviceConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::PoolStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/PoolStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourceClaim" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourceClaimConsumerReference" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourceClaimConsumerReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourceClaimSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourceClaimSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourceClaimStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourceClaimStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourceClaimTemplate" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourceClaimTemplate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourceClaimTemplateSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourceClaimTemplateSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourcePool" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourcePool.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequest" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourcePoolStatusRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequestSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourcePoolStatusRequestSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequestStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourcePoolStatusRequestStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourceSlice" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourceSlice.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1alpha3::ResourceSliceSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1alpha3/ResourceSliceSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::AllocatedDeviceStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/AllocatedDeviceStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::AllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/AllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::BasicDevice" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/BasicDevice.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::CELDeviceSelector" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/CELDeviceSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::CapacityRequestPolicy" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/CapacityRequestPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::CapacityRequestPolicyRange" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/CapacityRequestPolicyRange.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::CapacityRequirements" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/CapacityRequirements.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::Counter" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/Counter.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::CounterSet" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/CounterSet.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::Device" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/Device.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceAllocationConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceAllocationConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceAllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceAllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceAttribute" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceAttribute.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceCapacity" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceCapacity.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceClaim" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceClaimConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceClaimConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceClass" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceClassConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceClassConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceClassSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceClassSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceConstraint" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceConstraint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceCounterConsumption" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceCounterConsumption.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceRequest" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceRequestAllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceRequestAllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceSelector" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceSubRequest" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceSubRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceTaint" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceTaint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::DeviceToleration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/DeviceToleration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::NetworkDeviceData" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/NetworkDeviceData.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::NodeAllocatableResourceMapping" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/NodeAllocatableResourceMapping.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::OpaqueDeviceConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/OpaqueDeviceConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::ResourceClaim" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/ResourceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::ResourceClaimConsumerReference" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/ResourceClaimConsumerReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::ResourceClaimSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/ResourceClaimSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::ResourceClaimStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/ResourceClaimStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::ResourceClaimTemplate" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/ResourceClaimTemplate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::ResourceClaimTemplateSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/ResourceClaimTemplateSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::ResourcePool" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/ResourcePool.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::ResourceSlice" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/ResourceSlice.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta1::ResourceSliceSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta1/ResourceSliceSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::AllocatedDeviceStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/AllocatedDeviceStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::AllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/AllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::CELDeviceSelector" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/CELDeviceSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::CapacityRequestPolicy" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/CapacityRequestPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::CapacityRequestPolicyRange" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/CapacityRequestPolicyRange.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::CapacityRequirements" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/CapacityRequirements.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::Counter" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/Counter.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::CounterSet" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/CounterSet.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::Device" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/Device.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceAllocationConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceAllocationConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceAllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceAllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceAttribute" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceAttribute.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceCapacity" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceCapacity.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceClaim" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceClaimConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceClaimConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceClass" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceClassConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceClassConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceClassSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceClassSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceConstraint" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceConstraint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceCounterConsumption" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceCounterConsumption.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceRequest" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceRequestAllocationResult" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceRequestAllocationResult.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceSelector" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceSubRequest" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceSubRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceTaint" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceTaint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceTaintRule" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceTaintRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceTaintRuleSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceTaintRuleSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceTaintRuleStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceTaintRuleStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceTaintSelector" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceTaintSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::DeviceToleration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/DeviceToleration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::ExactDeviceRequest" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/ExactDeviceRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::NetworkDeviceData" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/NetworkDeviceData.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::NodeAllocatableResourceMapping" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/NodeAllocatableResourceMapping.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::OpaqueDeviceConfiguration" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/OpaqueDeviceConfiguration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::ResourceClaim" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/ResourceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::ResourceClaimConsumerReference" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/ResourceClaimConsumerReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::ResourceClaimSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/ResourceClaimSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::ResourceClaimStatus" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/ResourceClaimStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::ResourceClaimTemplate" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/ResourceClaimTemplate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::ResourceClaimTemplateSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/ResourceClaimTemplateSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::ResourcePool" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/ResourcePool.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::ResourceSlice" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/ResourceSlice.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Resource::V1beta2::ResourceSliceSpec" : {
          "file" : "lib/IO/K8s/Api/Resource/V1beta2/ResourceSliceSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1::PriorityClass" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1/PriorityClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::BasicSchedulingPolicy" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/BasicSchedulingPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::GangSchedulingPolicy" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/GangSchedulingPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::PodGroup" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/PodGroup.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::PodGroupResourceClaim" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/PodGroupResourceClaim.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::PodGroupResourceClaimStatus" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/PodGroupResourceClaimStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::PodGroupSchedulingConstraints" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/PodGroupSchedulingConstraints.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::PodGroupSchedulingPolicy" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/PodGroupSchedulingPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::PodGroupSpec" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/PodGroupSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::PodGroupStatus" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/PodGroupStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::PodGroupTemplate" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/PodGroupTemplate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::PodGroupTemplateReference" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/PodGroupTemplateReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::TopologyConstraint" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/TopologyConstraint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::TypedLocalObjectReference" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/TypedLocalObjectReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::Workload" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/Workload.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::WorkloadPodGroupTemplateReference" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/WorkloadPodGroupTemplateReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Scheduling::V1alpha2::WorkloadSpec" : {
          "file" : "lib/IO/K8s/Api/Scheduling/V1alpha2/WorkloadSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::CSIDriver" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/CSIDriver.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::CSIDriverSpec" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/CSIDriverSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::CSINode" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/CSINode.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::CSINodeDriver" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/CSINodeDriver.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::CSINodeSpec" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/CSINodeSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::CSIStorageCapacity" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/CSIStorageCapacity.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::StorageClass" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/StorageClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::TokenRequest" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/TokenRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::VolumeAttachment" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/VolumeAttachment.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::VolumeAttachmentSource" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/VolumeAttachmentSource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::VolumeAttachmentSpec" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/VolumeAttachmentSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::VolumeAttachmentStatus" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/VolumeAttachmentStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::VolumeAttributesClass" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/VolumeAttributesClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::VolumeError" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/VolumeError.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1::VolumeNodeResources" : {
          "file" : "lib/IO/K8s/Api/Storage/V1/VolumeNodeResources.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1alpha1::VolumeAttributesClass" : {
          "file" : "lib/IO/K8s/Api/Storage/V1alpha1/VolumeAttributesClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storage::V1beta1::VolumeAttributesClass" : {
          "file" : "lib/IO/K8s/Api/Storage/V1beta1/VolumeAttributesClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storagemigration::V1alpha1::GroupVersionResource" : {
          "file" : "lib/IO/K8s/Api/Storagemigration/V1alpha1/GroupVersionResource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storagemigration::V1alpha1::MigrationCondition" : {
          "file" : "lib/IO/K8s/Api/Storagemigration/V1alpha1/MigrationCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storagemigration::V1alpha1::StorageVersionMigration" : {
          "file" : "lib/IO/K8s/Api/Storagemigration/V1alpha1/StorageVersionMigration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storagemigration::V1alpha1::StorageVersionMigrationSpec" : {
          "file" : "lib/IO/K8s/Api/Storagemigration/V1alpha1/StorageVersionMigrationSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storagemigration::V1alpha1::StorageVersionMigrationStatus" : {
          "file" : "lib/IO/K8s/Api/Storagemigration/V1alpha1/StorageVersionMigrationStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storagemigration::V1beta1::StorageVersionMigration" : {
          "file" : "lib/IO/K8s/Api/Storagemigration/V1beta1/StorageVersionMigration.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storagemigration::V1beta1::StorageVersionMigrationSpec" : {
          "file" : "lib/IO/K8s/Api/Storagemigration/V1beta1/StorageVersionMigrationSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Api::Storagemigration::V1beta1::StorageVersionMigrationStatus" : {
          "file" : "lib/IO/K8s/Api/Storagemigration/V1beta1/StorageVersionMigrationStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceColumnDefinition" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceColumnDefinition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceConversion" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceConversion.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinition" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceDefinition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinitionCondition" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceDefinitionCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinitionNames" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceDefinitionNames.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinitionSpec" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceDefinitionSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinitionStatus" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceDefinitionStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinitionVersion" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceDefinitionVersion.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceSubresourceScale" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceSubresourceScale.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceSubresourceStatus" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceSubresourceStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceSubresources" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceSubresources.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceValidation" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/CustomResourceValidation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::ExternalDocumentation" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/ExternalDocumentation.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSON" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/JSON.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaProps" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/JSONSchemaProps.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrArray" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/JSONSchemaPropsOrArray.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrBool" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/JSONSchemaPropsOrBool.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrStringArray" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/JSONSchemaPropsOrStringArray.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::SelectableField" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/SelectableField.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::ServiceReference" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/ServiceReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::ValidationRule" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/ValidationRule.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::WebhookClientConfig" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/WebhookClientConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::WebhookConversion" : {
          "file" : "lib/IO/K8s/ApiextensionsApiserver/Pkg/Apis/Apiextensions/V1/WebhookConversion.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroup" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/APIGroup.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroupList" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/APIGroupList.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResource" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/APIResource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResourceList" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/APIResourceList.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIVersions" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/APIVersions.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Condition" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/Condition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::DeleteOptions" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/DeleteOptions.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::FieldSelectorRequirement" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/FieldSelectorRequirement.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::GroupResource" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/GroupResource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::GroupVersionForDiscovery" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/GroupVersionForDiscovery.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::LabelSelector" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/LabelSelector.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::LabelSelectorRequirement" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/LabelSelectorRequirement.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ListMeta" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/ListMeta.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ManagedFieldsEntry" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/ManagedFieldsEntry.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/ObjectMeta.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::OwnerReference" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/OwnerReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Preconditions" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/Preconditions.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ServerAddressByClientCIDR" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/ServerAddressByClientCIDR.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ShardInfo" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/ShardInfo.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Status" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/Status.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::StatusCause" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/StatusCause.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::StatusDetails" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/StatusDetails.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::WatchEvent" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/WatchEvent.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Apimachinery::Pkg::Version::Info" : {
          "file" : "lib/IO/K8s/Apimachinery/Pkg/Version/Info.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::AutoGen" : {
          "file" : "lib/IO/K8s/AutoGen.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::CertManager" : {
          "file" : "lib/IO/K8s/CertManager.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::CertManager::V1::Certificate" : {
          "file" : "lib/IO/K8s/CertManager/V1/Certificate.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::CertManager::V1::CertificateRequest" : {
          "file" : "lib/IO/K8s/CertManager/V1/CertificateRequest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::CertManager::V1::Challenge" : {
          "file" : "lib/IO/K8s/CertManager/V1/Challenge.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::CertManager::V1::ClusterIssuer" : {
          "file" : "lib/IO/K8s/CertManager/V1/ClusterIssuer.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::CertManager::V1::Issuer" : {
          "file" : "lib/IO/K8s/CertManager/V1/Issuer.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::CertManager::V1::Order" : {
          "file" : "lib/IO/K8s/CertManager/V1/Order.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium" : {
          "file" : "lib/IO/K8s/Cilium.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumBGPAdvertisement" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumBGPAdvertisement.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumBGPClusterConfig" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumBGPClusterConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumBGPNodeConfig" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumBGPNodeConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumBGPNodeConfigOverride" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumBGPNodeConfigOverride.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumBGPPeerConfig" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumBGPPeerConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumCIDRGroup" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumCIDRGroup.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumClusterwideEnvoyConfig" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumClusterwideEnvoyConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumClusterwideNetworkPolicy" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumClusterwideNetworkPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumEgressGatewayPolicy" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumEgressGatewayPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumEndpoint" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumEndpoint.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumEnvoyConfig" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumEnvoyConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumExternalWorkload" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumExternalWorkload.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumIdentity" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumIdentity.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumLoadBalancerIPPool" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumLoadBalancerIPPool.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumLocalRedirectPolicy" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumLocalRedirectPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumNetworkPolicy" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumNetworkPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumNode" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumNode.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2::CiliumNodeConfig" : {
          "file" : "lib/IO/K8s/Cilium/V2/CiliumNodeConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumBGPAdvertisement" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumBGPAdvertisement.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumBGPClusterConfig" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumBGPClusterConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumBGPNodeConfig" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumBGPNodeConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumBGPNodeConfigOverride" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumBGPNodeConfigOverride.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumBGPPeerConfig" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumBGPPeerConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumBGPPeeringPolicy" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumBGPPeeringPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumCIDRGroup" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumCIDRGroup.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumDatapathPlugin" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumDatapathPlugin.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumEndpointSlice" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumEndpointSlice.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumGatewayClassConfig" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumGatewayClassConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumL2AnnouncementPolicy" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumL2AnnouncementPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Cilium::V2alpha1::CiliumPodIPPool" : {
          "file" : "lib/IO/K8s/Cilium/V2alpha1/CiliumPodIPPool.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI" : {
          "file" : "lib/IO/K8s/GatewayAPI.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1::BackendTLSPolicy" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1/BackendTLSPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1::GRPCRoute" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1/GRPCRoute.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1::Gateway" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1/Gateway.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1::GatewayClass" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1/GatewayClass.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1::HTTPRoute" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1/HTTPRoute.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1::ListenerSet" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1/ListenerSet.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1::ReferenceGrant" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1/ReferenceGrant.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1::TCPRoute" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1/TCPRoute.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1::TLSRoute" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1/TLSRoute.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1::UDPRoute" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1/UDPRoute.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::GatewayAPI::V1beta1::ReferenceGrant" : {
          "file" : "lib/IO/K8s/GatewayAPI/V1beta1/ReferenceGrant.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::K3s" : {
          "file" : "lib/IO/K8s/K3s.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::K3s::V1::Addon" : {
          "file" : "lib/IO/K8s/K3s/V1/Addon.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::K3s::V1::ETCDSnapshotFile" : {
          "file" : "lib/IO/K8s/K3s/V1/ETCDSnapshotFile.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::K3s::V1::HelmChart" : {
          "file" : "lib/IO/K8s/K3s/V1/HelmChart.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::K3s::V1::HelmChartConfig" : {
          "file" : "lib/IO/K8s/K3s/V1/HelmChartConfig.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIService" : {
          "file" : "lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1/APIService.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceCondition" : {
          "file" : "lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1/APIServiceCondition.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceSpec" : {
          "file" : "lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1/APIServiceSpec.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceStatus" : {
          "file" : "lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1/APIServiceStatus.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::ServiceReference" : {
          "file" : "lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1/ServiceReference.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::List" : {
          "file" : "lib/IO/K8s/List.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Manifest" : {
          "file" : "lib/IO/K8s/Manifest.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Resource" : {
          "file" : "lib/IO/K8s/Resource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::APIObject" : {
          "file" : "lib/IO/K8s/Role/APIObject.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::CertManaged" : {
          "file" : "lib/IO/K8s/Role/CertManaged.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::HelmManaged" : {
          "file" : "lib/IO/K8s/Role/HelmManaged.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::Loadbalanced" : {
          "file" : "lib/IO/K8s/Role/Loadbalanced.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::MiddlewareBuilder" : {
          "file" : "lib/IO/K8s/Role/MiddlewareBuilder.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::Namespaced" : {
          "file" : "lib/IO/K8s/Role/Namespaced.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::NetworkPolicy" : {
          "file" : "lib/IO/K8s/Role/NetworkPolicy.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::Resource" : {
          "file" : "lib/IO/K8s/Role/Resource.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::ResourceMap" : {
          "file" : "lib/IO/K8s/Role/ResourceMap.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::Routable" : {
          "file" : "lib/IO/K8s/Role/Routable.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Role::SpecBuilder" : {
          "file" : "lib/IO/K8s/Role/SpecBuilder.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik" : {
          "file" : "lib/IO/K8s/Traefik.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik::V1alpha1::IngressRoute" : {
          "file" : "lib/IO/K8s/Traefik/V1alpha1/IngressRoute.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik::V1alpha1::IngressRouteTCP" : {
          "file" : "lib/IO/K8s/Traefik/V1alpha1/IngressRouteTCP.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik::V1alpha1::IngressRouteUDP" : {
          "file" : "lib/IO/K8s/Traefik/V1alpha1/IngressRouteUDP.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik::V1alpha1::Middleware" : {
          "file" : "lib/IO/K8s/Traefik/V1alpha1/Middleware.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik::V1alpha1::MiddlewareTCP" : {
          "file" : "lib/IO/K8s/Traefik/V1alpha1/MiddlewareTCP.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik::V1alpha1::ServersTransport" : {
          "file" : "lib/IO/K8s/Traefik/V1alpha1/ServersTransport.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik::V1alpha1::ServersTransportTCP" : {
          "file" : "lib/IO/K8s/Traefik/V1alpha1/ServersTransportTCP.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik::V1alpha1::TLSOption" : {
          "file" : "lib/IO/K8s/Traefik/V1alpha1/TLSOption.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik::V1alpha1::TLSStore" : {
          "file" : "lib/IO/K8s/Traefik/V1alpha1/TLSStore.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Traefik::V1alpha1::TraefikService" : {
          "file" : "lib/IO/K8s/Traefik/V1alpha1/TraefikService.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Types" : {
          "file" : "lib/IO/K8s/Types.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "IO::K8s::Types::Net" : {
          "file" : "lib/IO/K8s/Types/Net.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       }
    },
    "release_status" : "stable",
@@ -3454,7 +3454,7 @@
          "web" : "https://github.com/pplu/io-k8s-p5"
       }
    },
-   "version" : "1.106",
+   "version" : "1.107",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -3810,7 +3810,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.106",
+                  "tag" : "1.107",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -3896,7 +3896,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
             "name" : "@Author::GETTY/GitHub::CreateRelease",
-            "version" : "0.0009"
+            "version" : "0.0012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

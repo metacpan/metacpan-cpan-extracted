@@ -1,6 +1,6 @@
 # Syntax file for vim
 # Converted from: vim.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: vim
 extensions: vim
@@ -371,9 +371,6 @@ pattern: \s\K&t_\S[a-zA-Z0-9]\b
 pattern: \s\K&t_k;
 
 [match:Operator]
-pattern: |||&&|[-+*/%.!]
-
-[match:Operator]
 pattern: (?:\bis|\bisnot)[?#]{0,2}\b
 
 [match:Type]
@@ -429,11 +426,6 @@ pattern: \belse\s+if\b
 
 [match:SpecialChar]
 pattern: [--]
-
-[region:String]
-start: \[
-end: ]
-escape: \
 
 [region:Error]
 start: lua\s*<<\s*$

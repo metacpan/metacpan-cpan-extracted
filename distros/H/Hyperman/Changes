@@ -1,5 +1,12 @@
 Revision history for Hyperman
 
+0.20    2026-08-16
+        - Filehandle and IO-object response bodies stream instead of
+          being slurped into one SV. A glob over a regular file lifts to
+          (fd, position, remaining) - remaining is the Content-Length
+          header when the response carries one.
+        - use sendfile(2) on plaintext HTTP/1 file responses
+
 0.19    2026-08-14
         - Fixed a build failure on compilers older than GCC 4.7, which
           took out every perl on FreeBSD 9 (base cc is gcc 4.2.1):

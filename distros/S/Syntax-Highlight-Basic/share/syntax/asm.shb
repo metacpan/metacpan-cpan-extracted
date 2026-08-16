@@ -1,6 +1,6 @@
 # Syntax file for asm
 # Converted from: asm.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: asm
 extensions: asm
@@ -106,4 +106,12 @@ pattern: \.endm
 
 [match:Statement]
 pattern: \.[A-Za-z][0-9A-Za-z-_]*
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Comment]
+start: //
+end: $
 

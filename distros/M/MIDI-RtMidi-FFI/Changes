@@ -1,5 +1,11 @@
 Revision history for perl module MIDI::RtMidi::FFI
 
+0.13 2026-08-15
+
+  - New device methods: connected_to(), connected_to_name() - provide info on the target device connected to in an open_port* call.
+  - Minor doc, dist cleanups - repo/issue URLs should now be correct.
+  - Cleaned up dependencies. Bump MIDI::Stream dependency to 0.006 for misc. bugfixes.
+
 0.12 2026-07-17
 
   - Updated prereqs to install Alien::RtMidi more eagerly

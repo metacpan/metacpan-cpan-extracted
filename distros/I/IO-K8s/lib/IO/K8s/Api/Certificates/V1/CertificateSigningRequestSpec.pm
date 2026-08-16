@@ -1,6 +1,6 @@
 package IO::K8s::Api::Certificates::V1::CertificateSigningRequestSpec;
 # ABSTRACT: CertificateSigningRequestSpec contains the certificate request.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s expirationSeconds => Int;
@@ -41,7 +41,7 @@ IO::K8s::Api::Certificates::V1::CertificateSigningRequestSpec - CertificateSigni
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 expirationSeconds
 

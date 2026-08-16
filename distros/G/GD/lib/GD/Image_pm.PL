@@ -29,7 +29,7 @@ use strict;
 use GD;
 use Symbol 'gensym','qualify_to_ref';
 use vars '$VERSION';
-$VERSION = '2.86';
+$VERSION = '2.91';
 
 =head1 NAME
 
@@ -61,6 +61,7 @@ print OUT "=item GifAnim\n\n" if $DEFINES =~ /HAVE_GIFANIM/;
 print OUT "=item Webp\n\n" if $DEFINES =~ /HAVE_WEBP/;
 print OUT "=item Heif\n\n" if $DEFINES =~ /HAVE_HEIF/;
 print OUT "=item Avif\n\n" if $DEFINES =~ /HAVE_AVIF/;
+print OUT "=item Jxl\n\n" if $DEFINES =~ /HAVE_JXL/;
 
 print OUT << '!NO!SUBS!';
 =back
@@ -81,6 +82,7 @@ print OUT "=item GifAnim\n\n" if $DEFINES !~ /HAVE_GIFANIM/;
 print OUT "=item Webp\n\n" if $DEFINES !~ /HAVE_WEBP/;
 print OUT "=item Heif\n\n" if $DEFINES !~ /HAVE_HEIF/;
 print OUT "=item Avif\n\n" if $DEFINES !~ /HAVE_AVIF/;
+print OUT "=item Jxl\n\n" if $DEFINES !~ /HAVE_JXL/;
 print OUT "=item BMP\n\n" if $DEFINES !~ /HAVE_BMP/;
 
 print OUT << '!NO!SUBS!';
@@ -234,6 +236,8 @@ sub _image_type {
     $magic eq "IIN1";
   return 'Bmp' if $magic eq "BMF\000";
   return 'Webp' if $magic eq "RIFF" and substr($data,8,4) eq "WEBP";
+  return 'Jxl'  if substr($data,0,2) eq "\xFF\x0A"; # naked JPEG XL codestream
+  return 'Jxl'  if substr($data,0,12) eq "\x00\x00\x00\x0CJXL \x0D\x0A\x87\x0A"; # ISOBMFF JPEG XL container
   if (substr($data,4,4) eq "ftyp") { #possibly ISOBMFF-compliant container like HEIF which us used for AVIF and HEIC
     #first 4 bytes (they are now in $magic) must contain 32-bit Big Endian size of the 'ftyp' box (including size field and 'ftyp' mark)
     my $boxsize = unpack("N", $magic);
@@ -269,8 +273,12 @@ sub _image_type {
 sub clone {
   croak("Usage: clone(\$image)") unless @_ == 1;
   my $self = shift;
+  # Prefer the native gdImageClone() (libgd >= 2.4.0); the manual
+  # new()+copy() fallback below explicitly preserves the source
+  # image's truecolor-ness too, matching gdImageClone()'s behavior.
+  return $self->cloneImage if $self->can('cloneImage');
   my ($x,$y) = $self->getBounds;
-  my $new = $self->new($x,$y);
+  my $new = $self->new($x,$y,$self->isTrueColor);
   return unless $new;
   $new->copy($self,0,0,0,0,$x,$y);
   return $new;
@@ -411,6 +419,19 @@ sub newFromAvif {
 !NO!SUBS!
 }
 
+if ($DEFINES =~ /HAVE_JXL/) {
+  print OUT <<'!NO!SUBS!'
+sub newFromJxl {
+    croak("Usage: newFromJxl(class,filehandle)") unless @_==2;
+    my($class,$f) = @_;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromJxl($fh);
+}
+
+!NO!SUBS!
+}
+
 if (1 or $DEFINES =~ /HAVE_WBMP/) {
   print OUT <<'!NO!SUBS!';
 sub newFromWBMP {
@@ -457,6 +478,7 @@ print OUT "	gifanim\n" if $DEFINES =~ /HAVE_GIFANIM/;
 print OUT "	webp\n" if $DEFINES =~ /HAVE_WEBP/;
 print OUT "	heif\n" if $DEFINES =~ /HAVE_HEIF/;
 print OUT "	avif\n" if $DEFINES =~ /HAVE_AVIF/;
+print OUT "	jxl\n" if $DEFINES =~ /HAVE_JXL/;
 print OUT <<'!NO!SUBS!';
       );
 }

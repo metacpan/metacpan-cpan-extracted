@@ -1,6 +1,6 @@
 # Syntax file for dylan
 # Converted from: dylan.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: dylan
 extensions: dylan
@@ -65,6 +65,10 @@ pattern: \*\b[a-zA-Z0-9\-]+\b\*
 [region:Comment]
 start: /\*
 end: \*/
+
+[region:String]
+start: "
+end: "
 
 [region:Macro]
 start: [Mm]odule:

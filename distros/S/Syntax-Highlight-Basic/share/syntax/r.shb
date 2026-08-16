@@ -1,6 +1,6 @@
 # Syntax file for r
 # Converted from: r.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: r
 extensions: r
@@ -96,20 +96,8 @@ pattern: <{1,2}-
 [match:Statement]
 pattern: ->{1,2}
 
-[match:Delimiter]
-pattern: [,;:]
-
 [match:Error]
 pattern: [)\]}]
-
-[match:Error]
-pattern: [)}]
-
-[match:Error]
-pattern: [)\]]
-
-[match:Error]
-pattern: [\]}]
 
 [match:Type]
 pattern: \\
@@ -122,4 +110,8 @@ pattern: ^#endif.*
 
 [match:PreCondit]
 pattern: \\dontrun\b
+
+[region:SpecialComment]
+start: \s*#\{1,2}
+end: \(#\{1,2}
 

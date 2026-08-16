@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::NetworkDeviceData;
 # ABSTRACT: NetworkDeviceData provides network-related details for the allocated device. This information may be filled by drivers or other components to configure or identify the device within a network context.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s hardwareAddress => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1::NetworkDeviceData - NetworkDeviceData provides netwo
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 hardwareAddress
 

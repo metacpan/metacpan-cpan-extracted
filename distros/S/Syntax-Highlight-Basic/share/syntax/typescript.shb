@@ -1,7 +1,324 @@
 # Syntax file for typescript
 # Converted from: typescript.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: typescript
 extensions: typescript
+
+[keyword:Boolean]
+false null true undefined
+
+[keyword:Conditional]
+else if switch
+
+[keyword:Function]
+after afterAll afterEach assert before beforeAll beforeEach describe expect it
+new test
+
+[keyword:Identifier]
+arguments const in instanceof let new super this var
+
+[keyword:Keyword]
+ATTRIBUTE_NODE CDATA_SECTION_NODEN_NODE COMMENT_NODE Collator
+DOCUMENT_FRAGMENT_NODE DOCUMENT_NODE DOCUMENT_TYPE_NODE DateTimeFormat E
+ELEMENT_NODE ENTITY_NODE ENTITY_REFERENCE_NODE EPSILON LN10 LN2 LOG10E LOG2E
+MAX_SAFE_INTEGER MAX_VALUE MIN_SAFE_INTEGER MIN_VALUE NEGATIVE_INFINITY
+NOTATION_NODE NaN NumberFormat PI POSITIVE_INFINITY
+PROCESSING_INSTRUCTION_NODEN_NODE PluralRules SQRT1_2 SQRT2 TEXT_NODE UTC
+abort abs acceptCharset accessKey acos acosh action activeElement add addAll
+addEventListener addIdleObserver addressLine adoptNode alert alignContent
+alignItems alignSelf all amount anchor animation animationDelay
+animationDirection animationDuration animationFillMode animationIterationCount
+animationName animationPlayState animationTimingFunction appearance append
+appendChild apply asin asinh asserts assign async atan atan2 atanh attributes
+await back backfaceVisibility background backgroundAttachment
+backgroundBlendMode backgroundClip backgroundColor backgroundImage
+backgroundOrigin backgroundPosition backgroundRepeat backgroundSize baseURI
+baseURIObject battery bind body border borderBottom borderBottomColor
+borderBottomLeftRadius borderBottomRightRadius borderBottomStyle
+borderBottomWidth borderCollapse borderColor borderImage borderImageOutset
+borderImageRepeat borderImageSlice borderImageSource borderImageWidth
+borderLeft borderLeftColor borderLeftStyle borderLeftWidth borderRadius
+borderRight borderRightColor borderRightStyle borderRightWidth borderSpacing
+borderStyle borderTop borderTopColor borderTopLeftRadius borderTopRightRadius
+borderTopStyle borderTopWidth borderWidth bottom boxDecorationBreak boxShadow
+boxSizing breakAfter breakBefore breakInside bubbles buildID cache call
+canMakePayment cancelable captionSide careOf caret caretColor
+caretPositionFromPoint caretShape catch cbrt ceil charAt charCodeAt
+characterSet childNodes city class classList className clear clearWatch
+clientHeight clientLeft clientTop clientWidth clip clipPath clone cloneNode
+close clz32 codePointAt color columnCount columnFill columnGap columnRule
+columnRuleColor columnRuleStyle columnRuleWidth columnSpan columnWidth columns
+compareDocumentPosition compatMode complete concat confirm connection
+construct constructor content contentType context controller cookie
+cookieEnabled copyWithin cos cosh count counterIncrement counterReset country
+create createAttribute createCDATASection createComment createDocumentFragment
+createElement createElementNS createEvent createExpression createNSResolver
+createNodeIterator createObjectURL createProcessingInstruction createRange
+createTextNode createTreeWalker credentials current currentScript
+currentTarget cursor decode decrypt default defaultPrevented defaultView
+defineProperties defineProperty delete deleteProperty dependentLocality
+designMode details digest dir direction dispatchEvent display doNotTrack
+doctype documentElement documentURI documentURIObject domain downlink
+downlinkMax effectiveType elementFromPoint elements embeds emptyCells
+enableStyleSheetsForSet encode encoding encrypt enctype endsWith entries
+enumerate error evaluate eventPhase every exec execCommand exitPointerLock exp
+expm1 extends fatal fill filter finally find findIndex firstChild flex
+flexBasis flexDirection flexFlow flexGrow flexShrink flexWrap float floor font
+fontFamily fontFeatureSettings fontKerning fontLanguageOverride fontSize
+fontSizeAdjust fontStretch fontStyle fontSynthesis fontVariant
+fontVariantAlternates fontVariantCaps fontVariantEastAsian
+fontVariantLigatures fontVariantNumeric fontVariantPosition fontWeight for
+forEach forms forward freeze from fromCharCode fromCodePoint fround function
+geolocation get getAll getAllResponseHeaders getAttribute getAttributeNS
+getAttributeNode getAttributeNodeNS getBlob getBoundingClientRect
+getBoxObjectFor getClientRects getCurrentPosition getDate getDay
+getDeviceStorage getDeviceStorages getElementById getElementsByClassName
+getElementsByName getElementsByTagName getElementsByTagNameNS getFile
+getFullYear getGamepads getHours getItem getMilliseconds getMinutes getMonth
+getOwnPropertyDescriptor getOwnPropertyDescriptors getOwnPropertyNames
+getOwnPropertySymbols getPrototypeOf getRandomValues getRegistration
+getResponseHeader getSeconds getSelection getTime getTimezoneOffset getUTCDate
+getUTCDay getUTCFullYear getUTCHours getUTCMilliseconds getUTCMinutes
+getUTCMonth getUTCSeconds getUserData getUserMedia global go grad grid
+gridArea gridAutoColumns gridAutoFlow gridAutoPosition gridAutoRows gridColumn
+gridColumnEnd gridColumnStart gridRow gridRowEnd gridRowStart gridTemplate
+gridTemplateAreas gridTemplateColumns gridTemplateRows group groupCollapsed
+groupEnd has hasAttribute hasAttributeNS hasAttributes hasChildNodes hasFocus
+hasInstance hasOwn hasOwnProperty hash head headers height host hostname href
+hyphens hypot id ignoreBOM ignoreCase imageOrientation imageRendering
+imageResolution images imeMode implementation implements importNode imul
+includes indexOf info inherit initEvent innerHTML insertAdjacentHTML
+insertBefore interface is isArray isConcatSpreadable isDefaultNamespace
+isEqualNode isExtensible isFinite isFrozen isInteger isNaN isPrototypeOf
+isReload isSafeInteger isSameNode isSealed isSupported isTrusted item iterate
+iterator join justifyContent key keyFor keyof keys label languageCode
+lastChild lastIndex lastIndexOf lastModified lastStyleSheetSet left length
+letterSpacing lineBreak lineHeight link links listStyle listStyleImage
+listStylePosition listStyleType loadOverlay localName localStorage
+localeCompare location log log10 log1p log2 lookupNamespaceURI lookupPrefix
+map margin marginBottom marginLeft marginRight marginTop marks mask maskType
+match matchAll matches max maxHeight maxTouchPoints maxWidth method methodName
+min minHeight minWidth mixBlendMode mode multiline name namespaceURI next
+nextSibling nodeName nodePrincipal nodeType nodeValue normalize now objectFit
+objectPosition of onabort onafterscriptexecute onbeforescriptexecute
+onbeforeunload onblur onchange onclick onclose oncontextmenu oncopy oncut
+ondevicelight ondevicemotion ondeviceorientation ondeviceproximity ondragdrop
+onerror onfocus onhashchange onkeydown onkeypress onkeyup onload onmousedown
+onmousemove onmouseout onmouseover onmouseup onmozbeforepaint ononline
+onpagehide onpageshow onpaint onpaste onpopstate onreadystatechange onreset
+onresize onscroll onselect onshippingaddresschange onshippingoptionchange
+onsubmit ontimeout onunload onuserproximity onwheel opacity open order
+organization origin orphans oscpu outerHTML outline outlineColor outlineOffset
+outlineStyle outlineWidth overflow overflowClipBox overflowWrap overflowX
+overflowY overrideMimeType ownKeys ownerDocument padEnd padStart padding
+paddingBottom paddingLeft paddingRight paddingTop pageBreakAfter
+pageBreakBefore pageBreakInside parentElement parentNode parse parseFloat
+parseInt password pathname payerEmail payerPhone perspective perspectiveOrigin
+phone plugins pointerEvents pointerLockElement pop popupNode port position
+postMessage postalCode pow preferredStyleSheetSet prefix preventDefault
+preventExtensions previous previousSibling private productSub prompt
+propertyIsEnumerable protected protocol public push pushState put
+queryCommandSupported querySelector querySelectorAll quotes race random raw
+readAsArrayBuffer readAsBinaryString readAsDataURL readAsText readonly ready
+readyState recipient redirected reduce reduceRight referrer region register
+registerContentHandler registerElement registerProtocolHandler reject reload
+removeAttribute removeAttributeNS removeAttributeNode removeChild
+removeEventListener removeIdleObserver removeItem repeat replace replaceChild
+replaceState reportValidity requestFullscreen requestPointerLock
+requestWakeLock reset resize resolve respondWith response responseText
+responseType responseXML result reverse revokeObjectURL right round rtt
+scripts scrollHeight scrollIntoView scrollLeft scrollRestoration scrollTop
+scrollWidth seal search searchParams selected selectedStyleSheetSet send
+sendBeacon serviceWorker sessionStorage set setAttribute setAttributeNS
+setAttributeNode setAttributeNodeNS setCapture setDate setFullYear setHours
+setItem setMilliseconds setMinutes setMonth setPrototypeOf setRequestHeader
+setSeconds setTime setUTCDate setUTCFullYear setUTCHours setUTCMilliseconds
+setUTCMinutes setUTCMonth setUTCSeconds setUserData shapeImageThreshold
+shapeMargin shapeOutside share shift shippingAddress shippingOption show sign
+sin sinh size slice some sort sortingCode source species splice split sqrt
+startsWith state status statusText sticky stopImmediatePropagation
+stopPropagation stringify style styleSheetSets styleSheets submit substr
+substring subtle supports tabSize tableLayout tagName tan tanh target test
+textAlign textAlignLast textCombineHorizontal textContent textDecoration
+textDecorationColor textDecorationLine textDecorationStyle textIndent
+textOrientation textOverflow textRendering textShadow textTransform
+textUnderlinePosition then time timeEnd timeStamp timeout title toDateString
+toExponential toFixed toISOString toJSON toLocaleDateString toLocaleFormat
+toLocaleLowerCase toLocaleString toLocaleTimeString toLocaleUpperCase
+toLowerCase toPrecision toPrimitive toSource toString toStringTag toTimeString
+toUTCString toUpperCase tooltipNode top touchAction trace transform
+transformOrigin transformStyle transition transitionDelay transitionDuration
+transitionProperty transitionTimingFunction trim trunc type typeof unicodeBidi
+unicodeRange unscopables unshift upload url userSelect userZoom username
+valueOf values vendor vendorSub verify verticalAlign vibrate visibility
+vlinkColor waitUntil warn watch watchPosition whiteSpace width willChange
+withCredentials wordBreak wordSpacing wordWrap write writeln writingMode
+xmlEncoding zIndex
+
+[keyword:Operator]
+delete new typeof void
+
+[keyword:Repeat]
+do for in of while
+
+[keyword:Special]
+abstract as catch declare export finally from import in module namespace throw
+try type
+
+[keyword:SpecialComment]
+abstract access alpha animations arg argument arguments augments author beta
+borrows callback class classdesc const constant constructor constructs
+copyright default defaultValue defaultvalue define deprecated description dict
+enum event eventOf eventProperty eventType example exception experimental
+exports expose extends external file fileOverview fires func function global
+host ignore implements inheritDoc inner interface internal kind label lends
+license link memberOf method methodOf mixes mixin module name namespace ngdoc
+nosideeffects override overview packageDocumentation param preserve priority
+private privateRemarks prop property propertyOf protected public readonly
+remarks requires restrict return returns scope sealed see since static struct
+summary this throws todo tutorial type typeParam typedef variation version
+virtual
+
+[keyword:Statement]
+return with yield
+
+[keyword:StorageClass]
+static
+
+[keyword:Structure]
+AbortController AbstractWorker AnalyserNode AnimationEvent App Apps
+ArrayBuffer ArrayBufferView Attr AudioBuffer AudioBufferSourceNode
+AudioContext AudioDestinationNode AudioListener AudioNode AudioParam
+AudioProcessingEvent BatteryManager BeforeInputEvent BeforeUnloadEvent
+BiquadFilterNode BlobEvent BluetoothAdapter BluetoothDevice BluetoothManager
+Buffer CDATASection CSS CSSConditionRule CSSFontFaceLoadEvent CSSGroupingRule
+CSSKeyframeRule CSSKeyframesRule CSSMediaRule CSSNamespaceRule CSSPageRule
+CSSRule CSSRuleList CSSStyleDeclaration CSSStyleRule CSSStyleSheet
+CSSSupportsRule CameraCapabilities CameraControl CameraManager CanvasGradient
+CanvasImageSource CanvasPattern CanvasRenderingContext2D CaretPosition
+ChannelMergerNode ChannelSplitterNode CharacterData ChildNode ChromeWorker
+ClipboardEvent CloseEvent Comment Components CompositionEvent Connection
+Console ContactManager Contacts ConvolverNode Coordinates CustomEvent
+DOMCursor DOMError DOMException DOMHighResTimeStamp DOMImplementation
+DOMImplementationRegistry DOMParser DOMRequest DOMString DOMStringList
+DOMStringMap DOMTimeStamp DOMTokenList DOMTransactionEvent DataTransfer
+DataView DedicatedWorkerGlobalScope DelayNode DeviceAcceleration
+DeviceLightEvent DeviceMotionEvent DeviceOrientationEvent DeviceProximityEvent
+DeviceRotationRate DeviceStorage DirectoryEntry DirectoryEntrySync
+DirectoryReader DirectoryReaderSync Document DocumentFragment DocumentTouch
+DocumentType DragEvent DynamicsCompressorNode EditingBeforeInputEvent Element
+Entry EntrySync ErrorEvent Extensions FMRadio FileException Float32Array
+Float64Array FocusEvent FormData GainNode Gamepad GamepadButton GamepadEvent
+Geolocation HTMLAnchorElement HTMLAreaElement HTMLAudioElement HTMLBRElement
+HTMLBaseElement HTMLBodyElement HTMLButtonElement HTMLCanvasElement
+HTMLCollection HTMLDListElement HTMLDataElement HTMLDataListElement
+HTMLDivElement HTMLDocument HTMLElement HTMLEmbedElement HTMLFieldSetElement
+HTMLFormControlsCollection HTMLFormElement HTMLHRElement HTMLHeadElement
+HTMLHeadingElement HTMLHtmlElement HTMLIFrameElement HTMLImageElement
+HTMLInputElement HTMLKeygenElement HTMLLIElement HTMLLabelElement
+HTMLLegendElement HTMLLinkElement HTMLMapElement HTMLMediaElement
+HTMLMetaElement HTMLMeterElement HTMLModElement HTMLOListElement
+HTMLObjectElement HTMLOptGroupElement HTMLOptionElement HTMLOptionsCollection
+HTMLOutputElement HTMLParagraphElement HTMLParamElement HTMLPreElement
+HTMLProgressElement HTMLQuoteElement HTMLScriptElement HTMLSelectElement
+HTMLSourceElement HTMLSpanElement HTMLStyleElement HTMLTableCaptionElement
+HTMLTableCellElement HTMLTableColElement HTMLTableDataCellElement
+HTMLTableElement HTMLTableHeaderCellElement HTMLTableRowElement
+HTMLTableSectionElement HTMLTextAreaElement HTMLTimeElement HTMLTitleElement
+HTMLTrackElement HTMLUListElement HTMLUnknownElement HTMLVideoElement
+HashChangeEvent History IDBCursor IDBCursorSync IDBCursorWithValue IDBDatabase
+IDBDatabaseSync IDBEnvironment IDBEnvironmentSync IDBFactory IDBFactorySync
+IDBIndex IDBIndexSync IDBKeyRange IDBObjectStore IDBObjectStoreSync
+IDBOpenDBRequest IDBRequest IDBTransaction IDBTransactionSync
+IDBVersionChangeEvent ImageData IndexedDB Int16Array Int32Array Int8Array
+KeyboardEvent L10n LinkStyle LocalFileSystem LocalFileSystemSync Location
+LockedFile MediaQueryList MediaQueryListListener MediaRecorder MediaSource
+MediaStream MediaStreamEvent MediaStreamTrack MessageEvent MouseEvent
+MutationEvent MutationObserver Navigator NavigatorGeolocation NavigatorID
+NavigatorLanguage NavigatorOnLine NavigatorPlugins Node NodeFilter
+NodeIterator NodeList Notification OfflineAudioCompletionEvent
+OfflineAudioContext OscillatorNode PageTransitionEvent PannerNode ParentNode
+Performance PerformanceNavigation PerformanceTiming PermissionSettings
+Permissions Plugin PluginArray PointerEvent PopStateEvent Position
+PositionError PositionOptions PowerManager ProcessingInstruction ProgressEvent
+PromiseResolver PushManager QueryInterface RTCConfiguration RTCPeerConnection
+RTCPeerConnectionErrorCallback RTCPeerConnectionIceEvent RTCSessionDescription
+RTCSessionDescriptionCallback Range RelatedEvent SVGAElement SVGAngle
+SVGAnimateColorElement SVGAnimateElement SVGAnimateMotionElement
+SVGAnimateTransformElement SVGAnimatedAngle SVGAnimatedBoolean
+SVGAnimatedEnumeration SVGAnimatedInteger SVGAnimatedLength
+SVGAnimatedLengthList SVGAnimatedNumber SVGAnimatedNumberList
+SVGAnimatedPoints SVGAnimatedPreserveAspectRatio SVGAnimatedRect
+SVGAnimatedString SVGAnimatedTransformList SVGAnimationElement
+SVGCircleElement SVGClipPathElement SVGCursorElement SVGDefsElement
+SVGDescElement SVGElement SVGEllipseElement SVGEvent SVGFilterElement
+SVGFontElement SVGFontFaceElement SVGFontFaceFormatElement
+SVGFontFaceNameElement SVGFontFaceSrcElement SVGFontFaceUriElement
+SVGForeignObjectElement SVGGElement SVGGlyphElement SVGGradientElement
+SVGHKernElement SVGImageElement SVGLength SVGLengthList SVGLineElement
+SVGLinearGradientElement SVGMPathElement SVGMaskElement SVGMatrix
+SVGMissingGlyphElement SVGNumber SVGNumberList SVGPathElement
+SVGPatternElement SVGPoint SVGPolygonElement SVGPolylineElement
+SVGPreserveAspectRatio SVGRadialGradientElement SVGRect SVGRectElement
+SVGSVGElement SVGScriptElement SVGSetElement SVGStopElement SVGStringList
+SVGStylable SVGStyleElement SVGSwitchElement SVGSymbolElement SVGTRefElement
+SVGTSpanElement SVGTests SVGTextElement SVGTextPositioningElement
+SVGTitleElement SVGTransform SVGTransformList SVGTransformable SVGUseElement
+SVGVKernElement SVGViewElement SVGZoomEvent ScriptProcessorNode Selection
+SensorEvent SettingsLock SettingsManager SharedWorker StorageEvent StyleSheet
+StyleSheetList TCPServerSocket TCPSocket Telephony TelephonyCall Text
+TextDecoder TextEncoder TextMetrics TimeEvent TimeRanges Touch TouchEvent
+TouchList TrackEvent Transferable TransitionEvent TreeWalker UIEvent
+URLSearchParams URLUtilsReadOnly Uint16Array Uint32Array Uint8Array
+Uint8ClampedArray UserProximityEvent ValidityState VideoPlaybackQuality
+WaveShaperNode WebBluetooth WebGLRenderingContext WebSMS WebSocket WebVTT
+WheelEvent WifiManager Window Worker WorkerConsole WorkerLocation
+WorkerNavigator XDomainRequest XMLDocument XMLHttpRequest
+XMLHttpRequestEventTarget XMLSerializer alert applicationCache atob blur btoa
+clearImmediate clearInterval clearTimeout close closed confirm console
+controllers crypto decodeURI decodeURIComponent dialogArguments dispatchEvent
+document encodeURI encodeURIComponent eval exports fetch find focus
+frameElement frames fullScreen getAttention getAttentionWithCycleCount
+getComputedStyle getDefaulComputedStyle getSelection global history
+innerHeight innerWidth isFinite isNaN length location locationbar matchMedia
+maximize menubar messageManager module moveBy moveTo name navigator open
+openDialog opener outerHeight outerWidth pageXOffset pageYOffset parent
+parseFloat parseInt performance personalbar postMessage print process prompt
+removeEventListener resizeBy resizeTo restore returnValue screen screenX
+screenY scroll scrollBy scrollByLines scrollByPages scrollMaxX scrollMaxY
+scrollTo scrollX scrollY scrollbars self setCursor setImmediate setInterval
+setResizable setTimeout showModalDialog sidebar sizeToContent status statusbar
+stop toolbar top uneval updateCommands visualViewport window
+
+[keyword:Todo]
+FIXME TBD TODO XXX
+
+[keyword:Type]
+any boolean never null number object prototype string undefined unknown void
+
+[match:Number]
+pattern: \b0[bB][01][01_]*\b
+
+[match:Number]
+pattern: \b0[oO][0-7][0-7_]*\b
+
+[match:Number]
+pattern: \b0[xX][0-9a-fA-F][0-9a-fA-F_]*\b
+
+[match:Type]
+pattern: unique symbol
+
+[match:Function]
+pattern: =>
+
+[match:Operator]
+pattern: ,
+
+[match:Type]
+pattern: =>
+
+[region:Comment]
+start: /\*
+end: \*/
 

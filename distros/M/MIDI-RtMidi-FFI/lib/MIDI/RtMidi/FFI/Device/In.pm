@@ -6,7 +6,7 @@ use experimental qw/ signatures /;
 package MIDI::RtMidi::FFI::Device::In;
 class MIDI::RtMidi::FFI::Device::In :isa( MIDI::RtMidi::FFI::AbstractDevice );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # ABSTRACT: OO interface for MIDI::RtMidi::FFI input devices
 
@@ -152,7 +152,7 @@ MIDI::RtMidi::FFI::Device::In - OO interface for MIDI::RtMidi::FFI input devices
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -284,40 +284,40 @@ L</set_callback_decoded>.
     $device->ignore_types( $ignore_sysex, $ignore_timing, $ignore_sensing );
     $device->ignore_types( (1)x3 );
 
-Type 'in' only. Set message types to ignore.
+Set message types to ignore.
 
 =head2 ignore_sysex
 
     $device->ignore_sysex( 1 );
     $device->ignore_sysex( 0 );
 
-Type 'in' only. Set whether or not to ignore sysex messages.
+Set whether or not to ignore sysex messages.
 
 =head2 ignore_timing
 
     $device->ignore_timing( 1 );
     $device->ignore_timing( 0 );
 
-Type 'in' only. Set whether or not to ignore clock/timing messages.
+Set whether or not to ignore clock/timing messages.
 
 =head2 ignore_sensing
 
     $device->ignore_sensing( 1 );
     $device->ignore_sensing( 0 );
 
-Type 'in' only. Set whether or not to ignore active sensing messages.
+Set whether or not to ignore active sensing messages.
 
 =head2 get_message
 
     $device->get_message();
 
-Type 'in' only. Gets the next message from the queue, if available.
+Gets the next message from the queue, if available.
 
 =head2 get_message_decoded
 
     $device->get_message_decoded();
 
-Type 'in' only. Gets the next message from the queue, if available, decoded
+Gets the next message from the queue, if available, decoded
 as an event. See L</decode_message> for what to expect from incoming events.
 
 =head2 get_event

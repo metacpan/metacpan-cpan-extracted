@@ -1,5 +1,5 @@
 package Kubernetes::REST::CLI::Cmd::Raw;
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 # ABSTRACT: The raw command of kube_client
 use Moo;
 use MooX::Cmd;
@@ -13,7 +13,7 @@ sub execute {
 
     unless ($group && $method) {
         print STDERR "Usage: kube_client raw <Group> <Method> [key=value ...]\n";
-        print STDERR "Example: kube_client raw CoreV1 ListNamespace\n";
+        print STDERR "Example: kube_client raw Core ListNamespace\n";
         return 1;
     }
 
@@ -47,19 +47,25 @@ Kubernetes::REST::CLI::Cmd::Raw - The raw command of kube_client
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
     kube_client raw <Group> <Method> [key=value ...]
-    kube_client raw CoreV1 ListNamespace
+    kube_client raw Core ListNamespace
 
 =head1 DESCRIPTION
 
 Implements the C<raw> command of L<Kubernetes::REST::CLI>, which calls a method
 on one of the L<Kubernetes::REST::V0Group> compatibility groups directly.
-Arguments after the method name are passed as C<key=value> pairs. L<MooX::Cmd>
-finds and loads this class, you do not use it directly.
+C<Group> is one of C<Core>, C<Apps>, C<Batch>, C<Networking>, C<Storage>,
+C<Policy>, C<Autoscaling>, C<RbacAuthorization>, C<Certificates>,
+C<Coordination>, C<Events>, C<Scheduling>, C<Authentication>,
+C<Authorization>, C<Admissionregistration>, C<Apiextensions>, or
+C<Apiregistration>; C<Method> is a v0-style method name such as
+C<ListNamespacedPod> or C<ReadNamespacedPod>. Arguments after the method name
+are passed as C<key=value> pairs. L<MooX::Cmd> finds and loads this class, you
+do not use it directly.
 
 =head2 execute
 
@@ -97,7 +103,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

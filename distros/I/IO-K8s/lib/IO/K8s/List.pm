@@ -1,6 +1,6 @@
 package IO::K8s::List;
 # ABSTRACT: Generic list container for Kubernetes API responses
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use v5.10;
 use Moo;
 use Module::Runtime qw(require_module);
@@ -111,7 +111,7 @@ IO::K8s::List - Generic list container for Kubernetes API responses
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 

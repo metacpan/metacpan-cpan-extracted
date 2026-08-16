@@ -1,6 +1,6 @@
 package Kubernetes::REST::Example;
 # ABSTRACT: Working examples for Kubernetes::REST with Minikube, K3s, and other clusters
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 1;
 
 __END__
@@ -15,7 +15,7 @@ Kubernetes::REST::Example - Working examples for Kubernetes::REST with Minikube,
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 DESCRIPTION
 
@@ -608,6 +608,11 @@ because it won't overwrite changes made by other clients between your
 C<get()> and C<update()>. Use C<update()> when you need to replace the
 entire spec.
 
+Neither one ever changes a resource's C<status> once that kind has a status
+subresource - and most kinds with a meaningful C<status> field do, built-in
+or custom. Writing status needs C<patch_status()>/C<update_status()> instead;
+see L</The status Subresource> for why, and for the CRD case specifically.
+
 =head1 WAITING FOR READINESS
 
 Kubernetes operations are asynchronous. Poll the API to wait for a
@@ -862,6 +867,8 @@ for hosting static websites in your homelab:
                   properties:
                     readyReplicas: { type: integer }
                     url:           { type: string }
+          subresources:
+            status: {}
       scope: Namespaced
       names:
         plural: staticwebsites
@@ -960,6 +967,45 @@ Once registered, CRDs work exactly like built-in resources:
 B<Note:> For boolean CRD fields, use C<JSON::PP::true> and C<JSON::PP::false>
 instead of C<1> and C<0>. The Kubernetes API validates JSON types strictly
 for custom resources.
+
+=head2 The status Subresource
+
+The CRD defined above already carries a status subresource -- the
+C<subresources: { status: {} }> line under C<spec.versions[0]>. That single
+line splits C<spec> and C<status> into two separate write paths.
+
+B<Once it's set, C<create>, C<update>, C<patch> and server-side apply all
+stop writing C<status>.> The API server silently strips the C<status> stanza
+from every write to the main endpoint and still answers 2xx, so the call
+looks like it worked and nothing is stored:
+
+    # Looks fine. Does nothing to status.
+    $site->status({ readyReplicas => 2 });
+    $api->update($site);                          # 200 OK
+
+    my $refetched = $api->get('StaticWebSite', 'my-blog', namespace => 'default');
+    say defined $refetched->status ? 'status was written' : 'status is still undef';
+    # status is still undef
+
+Status has to go through the C</status> subresource instead, with
+L<Kubernetes::REST/patch_status> or L<Kubernetes::REST/update_status>:
+
+    # Partial update. Merge patch by default -- custom resources answer
+    # 415 to a strategic merge patch, so patch_status() doesn't use one.
+    my $updated = $api->patch_status('StaticWebSite', 'my-blog',
+        namespace => 'default',
+        patch     => { status => { readyReplicas => 2, url => 'blog.example.com' } },
+    );
+
+    # Full replace, like update() but scoped to status.
+    $site->status({ readyReplicas => 2, url => 'blog.example.com' });
+    $updated = $api->update_status($site);
+
+The built-in kinds (C<Pod>, C<Node>, C<Deployment>, ...) have always worked
+this way -- see L</INSPECTING POD STATUS> for reading one. Any controller
+that writes status, for a built-in kind or your own CRD, needs C<patch_status>
+or C<update_status>; C<create>/C<update>/C<patch> stay for C<spec> and
+C<metadata>.
 
 =head2 Serialization
 
@@ -1079,8 +1125,9 @@ type safety, YAML loading, and custom resource support.
 =head1 DEMO SCRIPT
 
 This distribution ships with a comprehensive runnable demo at
-C<eg/demo.pl>. It exercises every feature documented above in
-20 steps against a live cluster:
+C<eg/demo.pl>. It exercises most of the CRUD and watch functionality
+documented above in 22 steps against a live cluster (CRDs are not part of
+the script; see L</CUSTOM RESOURCE DEFINITIONS (CRDs)> above for those):
 
     perl eg/demo.pl
 
@@ -1088,10 +1135,11 @@ The script connects via kubeconfig, creates a dedicated namespace, then
 walks through: LimitRange, ResourceQuota, ConfigMap, Secret, ServiceAccount,
 Role + RoleBinding, PersistentVolumeClaim, Deployment (2 replicas with
 volumes, probes, ConfigMap/Secret env vars), Service (NodePort), pod
-inspection, scaling to 3 replicas, rolling image update, Job (run to
-completion), CronJob, utility Pod (with volume mounts and env vars from
-ConfigMap and Secret), full namespace inventory, YAML/JSON serialization
-with round-trip inflate, quota usage inspection, and ordered cleanup.
+inspection, scaling to 3 replicas, patching (strategic merge and JSON merge),
+rolling image update, Job (run to completion), CronJob, utility Pod (with
+volume mounts and env vars from ConfigMap and Secret), full namespace
+inventory, YAML/JSON serialization with round-trip inflate, quota usage
+inspection, a short pod watch, and ordered cleanup.
 
 It works on Minikube, K3s, Kind, or any cluster with a kubeconfig.
 
@@ -1122,7 +1170,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

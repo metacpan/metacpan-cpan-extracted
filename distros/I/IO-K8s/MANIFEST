@@ -925,6 +925,7 @@ t/44_list_api_version.t
 t/45_autogen_dispatch.t
 t/46_class_namespaces_inflate.t
 t/48_compare_to_schema_inheritance.t
+t/49_crd_resource_map_gvk.t
 t/author-pod-syntax.t
 t/data/short-name-compat.json
 t/data/spec-kinds.json

@@ -9,6 +9,7 @@ making it suitable as an **OS-level JSON utility** in constrained or long-lived 
 - No native libraries
 - No compilation step
 - Stable, test-backed CLI contract
+- Documented Library API compatibility contract
 
 ---
 
@@ -28,8 +29,8 @@ It is particularly suited for:
 jq-lite is available as an **official Alpine Linux package**:
 
 ```bash
-apk add jq-lite
-````
+apk add perl-jq-lite
+```
 
 ---
 
@@ -39,11 +40,16 @@ apk add jq-lite
   Exit codes, stderr prefixes, and error behavior are treated as
   long-term compatibility promises.
 
+* **Stable Library API contract**
+  Documented public Perl APIs are treated as compatibility promises within
+  a major release series.
+
 * **Minimal dependency footprint**
   Implemented in pure Perl without XS, C extensions, or external libraries.
 
 * **Predictable behavior**
-  Intended for use in shell scripts, CI pipelines, and infrastructure automation.
+  Intended for use in shell scripts, CI pipelines, infrastructure automation,
+  and downstream Perl modules.
 
 jq-lite intentionally prioritizes **reliability over feature growth**.
 
@@ -62,11 +68,31 @@ The contract specifies:
 * jq-compatible truthiness semantics (`-e/--exit-status`)
 * Broken pipe (SIGPIPE/EPIPE) behavior suitable for pipelines and CI
 
-📄 **Contract specification**:
-👉 [`docs/cli-contract.md`](docs/cli-contract.md)
+**Contract specification**: [`docs/cli-contract.md`](docs/cli-contract.md)
 
 Any change that would violate this contract **requires a major version bump**
 and is intentionally avoided.
+
+---
+
+## Stable Library API Contract
+
+`JQ::Lite` can be used as a dependency by applications and other CPAN
+distributions. The documented public Library API has its own compatibility
+contract covering public methods, documented arguments, return-value semantics,
+and versioning expectations.
+
+The stable 2.x entry points currently include:
+
+```perl
+my $jq = JQ::Lite->new(%options);
+my @results = $jq->run_query($json_text, $query);
+```
+
+**Contract specification**: [`docs/library-contract.md`](docs/library-contract.md)
+
+Intentional breaking changes to this documented Library API require a major
+version bump.
 
 ---
 
@@ -74,7 +100,6 @@ and is intentionally avoided.
 
 | Environment          | jq | jq-lite |
 | -------------------- | -- | ------- |
-| Alpine Linux         | △  | ✓       |
 | Legacy hosts         | ✗  | ✓       |
 | Air-gapped systems   | ✗  | ✓       |
 | No root privileges   | △  | ✓       |
@@ -192,11 +217,20 @@ my $jq = JQ::Lite->new;
 say for $jq->run_query($json, '.users[].name');
 ```
 
+For dependency declarations, result handling, and error-handling guidance, see
+[`docs/library-integration.md`](docs/library-integration.md).
+
+Downstream users should rely on documented public entry points rather than
+implementation submodules. See the [Library API contract](docs/library-contract.md)
+for compatibility guarantees.
+
 ---
 
 ## Documentation
 
 * [`docs/cli-contract.md`](docs/cli-contract.md) — **stable, test-backed CLI contract**
+* [`docs/library-contract.md`](docs/library-contract.md) — **stable Library API compatibility contract**
+* [`docs/library-integration.md`](docs/library-integration.md) — examples for downstream Perl/CPAN users
 * [`docs/FUNCTIONS.md`](docs/FUNCTIONS.md) — supported jq functions
 * [`docs/DESIGN.md`](docs/DESIGN.md) — design principles and scope
 * [CPAN documentation](https://metacpan.org/pod/JQ::Lite)
@@ -206,8 +240,3 @@ say for $jq->run_query($json, '.users[].name');
 ## License
 
 Same terms as Perl itself.
-
-
-
-
-

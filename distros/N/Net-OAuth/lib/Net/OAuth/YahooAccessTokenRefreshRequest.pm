@@ -17,9 +17,9 @@ L<http://developer.yahoo.com/oauth/guide/oauth-auth-flow.html>
 
 =head1 AUTHOR
 
-Originally by Keith Grennan <kgrennan@cpan.org>
+Originally by Keith Grennan <foss@nearlyfree.org>
 
-Currently maintained by Robert Rothenberg <rrwo@cpan.org>
+Currently maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 CONTRIBUTORS
 

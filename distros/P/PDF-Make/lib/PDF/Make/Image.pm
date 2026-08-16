@@ -3,7 +3,7 @@ package PDF::Make::Image;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # Load the XS code from PDF::Make
 use PDF::Make ();

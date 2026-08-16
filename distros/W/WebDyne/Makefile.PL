@@ -8,33 +8,36 @@ use Tie::File;
 
 BEGIN {
 
-    # ExtUtils::Manifest in some Perl versions walks the tree with symlink
-    # following enabled before MANIFEST.SKIP is applied. A local Python venv can
-    # therefore abort Makefile.PL when its python symlinks resolve twice.
-    require ExtUtils::Manifest;
-    require File::Find;
+    if (-d '.venv') {
 
-    no warnings 'redefine';
-    *ExtUtils::Manifest::manifind = sub {
-        my $found = {};
+        # ExtUtils::Manifest in some Perl versions walks the tree with symlink
+        # following enabled before MANIFEST.SKIP is applied. A local Python venv can
+        # therefore abort Makefile.PL when its python symlinks resolve twice.
+        require ExtUtils::Manifest;
+        require File::Find;
 
-        my $wanted = sub {
-            my $name = ExtUtils::Manifest::clean_up_filename($File::Find::name);
-            return if -d $File::Find::name;
-            $found->{$name} = '';
+        no warnings 'redefine';
+        *ExtUtils::Manifest::manifind = sub {
+            my $found = {};
+
+            my $wanted = sub {
+                my $name = ExtUtils::Manifest::clean_up_filename($File::Find::name);
+                return if -d $File::Find::name;
+                $found->{$name} = '';
+            };
+
+            File::Find::find(
+                {
+                    wanted     => $wanted,
+                    no_chdir   => 1,
+                    preprocess => sub { grep { $_ ne '.venv' } @_ },
+                },
+                '.'
+            );
+
+            return $found;
         };
-
-        File::Find::find(
-            {
-                wanted     => $wanted,
-                no_chdir   => 1,
-                preprocess => sub { grep { $_ ne '.venv' } @_ },
-            },
-            '.'
-        );
-
-        return $found;
-    };
+    }
 
 }
 
@@ -68,10 +71,16 @@ my %WriteMakefile=(
     MIN_PERL_VERSION => '5.006',
     PREREQ_PM        => {
         'CGI::Simple'       => 0,
+        'Capture::Tiny'     => 0,
+        'File::Temp'        => 0,
+        'HTML::Element'     => 0,
+        'HTML::Entities'    => 0,
         'HTML::Tiny'        => 0,
         'JSON'              => 0,
         'IO::String'        => 0,
         'Digest::MD5'       => 0,
+        'HTTP::Request'     => 0,
+        'HTTP::Request::Common' => 0,
         'HTTP::Status'      => 0,
         'HTTP::Negotiate'   => 0,
         'HTTP::AcceptLanguage' => 0,
@@ -88,15 +97,7 @@ my %WriteMakefile=(
         'Sub::Util'         => 0,
         'Term::ANSIColor'   => 0,
         'Crypt::URandom'    => 0,
-        
-        #  Plack
-        #
-        #'Plack'             => 0,
-        
-        
-        #  PAGI
-        #
-        #'PAGI'             => 0,
+        'URI'               => 0,
         
 
         #  Needed for installer - can be ignored if not using installer
@@ -120,8 +121,18 @@ my %WriteMakefile=(
         },
         "prereqs" => {
             "runtime" => {
-                "recommends" => {
-                    'Plack' => 0,
+                "suggests" => {
+                    # Optional server/runtime bundles.
+                    'Task::WebDyne::Plack'  => 0,
+                    'Task::WebDyne::PAGI'   => 0,
+                    'Task::WebDyne::Apache' => 0,
+                    'Task::WebDyne::Starman'=> 0,
+
+                    # Optional development/runtime helpers.
+                    'HTML::Tidy5'                    => 0,
+                    'Module::Reload'                 => 0,
+                    'Syntax::Highlight::Engine::Kate'=> 0,
+                    'Text::Diff'                     => 0,
                 },
             },
         },
@@ -138,7 +149,7 @@ my %WriteMakefile=(
         },
         x_authority => 'cpan:ASPEER'
     },
-    PM_FILTER => ($ENV{'PM_DEBUG'} || $ENV{'WEBDYNE_DEBUG'}) ? '' : do {
+    PM_FILTER => ($ENV{'PM_DEBUG'} || $ENV{'WEBDYNE_DEBUG'}) ? '$(PERL) -pe 1' : do {
         use IO::File;
         my $fn='.pm_filter.pf';
         my $fh=IO::File->new($fn, O_WRONLY | O_CREAT | O_TRUNC) ||
@@ -174,6 +185,21 @@ WriteMakefile(%WriteMakefile);
 
 #  Extend Makefile
 #
+sub MY::dist_basics {
+    my $mm_or=shift();
+    my $out=$mm_or->MY::SUPER::dist_basics(@_);
+    return $out unless -d '.venv';
+    my $replacement=<<'END';
+manifest :
+	$(NOECHO) $(ECHO) "Refusing to regenerate MANIFEST while .venv exists; remove .venv and rerun Makefile.PL first."
+	$(NOECHO) $(FALSE)
+END
+    $out=~s{^manifest\s*:\s*\n(?:\t[^\n]*\n)+}{$replacement}m ||
+        die "unable to replace MakeMaker manifest target";
+    return $out;
+}
+
+
 sub MY::post_initialize {
 
     #  Add license file, other support files here
@@ -290,8 +316,8 @@ doc_xml_tidy:
 
 filter_scripts :
 	@for f in $(EXE_FILES); do \
-	echo "Applying PM_FILTER to $$f..."; \
-		cat $$f | $(PM_FILTER) > blib/script/`basename $$f`; \
+		echo "Installing script $$f via PM_FILTER..."; \
+		$(PM_FILTER) $$f > blib/script/`basename $$f`; \
 	done
 
 pure_all :: filter_scripts

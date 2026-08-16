@@ -63,6 +63,30 @@ pdfmake_struct_tree_t *pdfmake_doc_struct_tree(pdfmake_doc_t *doc) {
     return doc ? (pdfmake_struct_tree_t *)doc->struct_tree : NULL;
 }
 
+/* The structure tree is the one part of a document allocated with plain
+ * calloc rather than from the arena - elements grow their child and MCR
+ * arrays with realloc, which an arena cannot do - so it has to be freed
+ * explicitly when the document goes. */
+static void struct_elem_free(pdfmake_struct_elem_t *elem) {
+    size_t i;
+    if (!elem) return;
+    for (i = 0; i < elem->child_count; i++)
+        struct_elem_free(elem->children[i]);
+    free(elem->children);
+    free(elem->content_refs);
+    free(elem);
+}
+
+void pdfmake_doc_free_struct_tree(pdfmake_doc_t *doc) {
+    pdfmake_struct_tree_t *tree;
+    if (!doc || !doc->struct_tree) return;
+    tree = (pdfmake_struct_tree_t *)doc->struct_tree;
+    struct_elem_free(tree->root);
+    free(tree->role_map);
+    free(tree);
+    doc->struct_tree = NULL;
+}
+
 /* ── Structure elements ────────────────────────────────── */
 
 pdfmake_struct_elem_t *pdfmake_struct_elem_create(
@@ -323,7 +347,11 @@ pdfmake_err_t pdfmake_doc_write_struct_tree(pdfmake_doc_t *doc) {
 
     if (!doc) return PDFMAKE_EINVAL;
 
-    tree = pdfmake_doc_create_struct_tree(doc);
+    /* Query, never create. Creating one here meant every untagged document -
+     * which is most of them - allocated a tree and a root element only to
+     * discover on the next line that there was nothing to write, and then
+     * leaked both. */
+    tree = pdfmake_doc_struct_tree(doc);
     if (!tree || !tree->root) return PDFMAKE_OK; /* No tree */
     if (tree->root->child_count == 0 && tree->root->mcr_count == 0)
         return PDFMAKE_OK; /* Empty tree */

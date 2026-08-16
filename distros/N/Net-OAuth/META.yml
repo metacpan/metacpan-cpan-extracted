@@ -1,7 +1,8 @@
 ---
 abstract: 'OAuth 1.0 for Perl'
 author:
-  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Keith Grennan <foss@nearlyfree.org>'
+  - 'Robert Rothenberg <perl@rhizomnic.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.66'
@@ -9,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,18 +20,22 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Crypt::OpenSSL::RSA: '0.38'
+  Crypt::SysRandom::XS: '0.010'
 requires:
   Class::Accessor: '0.31'
   Class::Data::Inheritable: '0.06'
-  Crypt::URandom: '0.37'
+  Crypt::SysRandom: '0.006'
   Digest::SHA: '5.47'
   Encode: '2.35'
   LWP::UserAgent: '1'
   Test::More: '0.66'
   Test::Warn: '0.21'
   URI: '5.15'
+  perl: '5.008001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth
   repository: https://github.com/keeth/Net-OAuth.git
-version: '0.31'
+version: '0.32'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

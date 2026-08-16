@@ -294,6 +294,47 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
                 if (k) sv_catpvs(joined, ", "); if (a && *a) sv_catsv(joined, *a); }
             return ps_err_triplet(aTHX_ 405, PS_ERR_405, sizeof(PS_ERR_405) - 1, joined);
         }
+        {   /* on_not_found: the app's own 404, the on_error contract - a
+             * reference return becomes the response (after hooks run, a
+             * Future is awaited), anything else keeps the default below,
+             * and a die inside it goes through on_error. The 405 above is
+             * deliberately not covered: its Allow semantics stay. */
+            SV *on_nf = ps_state(aTHX_ state, K_ON_NOT_FOUND);
+            if (on_nf && SvOK(on_nf)) {
+                HV *match = newHV();
+                SV *c, *r = NULL;
+                int died;
+                (void)hv_stores(match, "captures", newRV_noinc((SV *)newHV()));
+                c = sv_2mortal(ps_ctx(aTHX_ ctxcls, env, app,
+                                      newRV_noinc((SV *)match)));
+                {
+                    dSP; int count;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP); EXTEND(SP, 1);
+                    PUSHs(c);
+                    PUTBACK;
+                    count = call_sv(on_nf, G_SCALAR | G_EVAL);
+                    SPAGAIN;
+                    if (count > 0) { SV *t = POPs; r = SvREFCNT_inc(t); }
+                    PUTBACK; FREETMPS; LEAVE;
+                    died = SvTRUE(ERRSV) ? 1 : 0;
+                }
+                if (died) {
+                    SV *errsv = sv_2mortal(newSVsv(ERRSV));
+                    SV *out = punk_finish_c(aTHX_ app, c, &PL_sv_undef, errsv,
+                                            on_err, method, mlen, after, env);
+                    if (r) SvREFCNT_dec(r);
+                    return out;
+                }
+                if (r && SvROK(r)) {
+                    SV *out = punk_finish_c(aTHX_ app, c, r, &PL_sv_undef,
+                                            on_err, method, mlen, after, env);
+                    SvREFCNT_dec(r);
+                    return out;
+                }
+                if (r) SvREFCNT_dec(r);   /* declined: the default stands */
+            }
+        }
         return ps_err_triplet(aTHX_ 404, PS_ERR_404, sizeof(PS_ERR_404) - 1, NULL);
     }
 

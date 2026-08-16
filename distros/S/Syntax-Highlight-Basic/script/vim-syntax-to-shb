@@ -6,8 +6,12 @@ use warnings;
 
 use Getopt::Long qw(GetOptions);
 use Pod::Usage qw(pod2usage);
-use File::Basename qw(basename);
+use File::Basename qw(basename dirname);
+use File::Spec;
 use POSIX qw(strftime);
+
+# Maximum recursion depth when following runtime!/source/syn-include directives.
+use constant MAX_INCLUDE_DEPTH => 5;
 
 #===========================================================================
 # vim-syntax-to-shb — Convert Vim .vim syntax files to .shb data files
@@ -63,19 +67,27 @@ Main:
 sub _parse_options
 {
     my %cli = (
-        output_dir => '.',
-        language   => undef,
-        verbose    => 0,
-        help       => 0,
-        force      => 0,
+        output_dir      => '.',
+        language        => undef,
+        verbose         => 0,
+        help            => 0,
+        force           => 0,
+        min_sections    => 3,
+        warn_thin       => 1,
+        fail_on_thin    => 1,
+        follow_includes => 1,
     );
 
     GetOptions(
-        'output-dir=s' => \$cli{output_dir},
-        'language=s'   => \$cli{language},
-        'verbose'      => \$cli{verbose},
-        'force'        => \$cli{force},
-        'h|help'       => \$cli{help},
+        'output-dir=s'     => \$cli{output_dir},
+        'language=s'       => \$cli{language},
+        'verbose'          => \$cli{verbose},
+        'force'            => \$cli{force},
+        'min-sections=i'   => \$cli{min_sections},
+        'warn-thin!'       => \$cli{warn_thin},
+        'fail-on-thin!'    => \$cli{fail_on_thin},
+        'follow-includes!' => \$cli{follow_includes},
+        'h|help'           => \$cli{help},
     ) or pod2usage(2);
 
     if ($cli{help})
@@ -131,7 +143,11 @@ sub _run
         return 1;
     }
 
-    my $errors = 0;
+    my $errors      = 0;
+    my $converted   = 0;
+    my $thin_count  = 0;
+    my $min_sections = defined $cli->{min_sections} ? $cli->{min_sections} : 3;
+
     for my $file (@files)
     {
         my $lang = $cli->{language};
@@ -140,15 +156,6 @@ sub _run
             my $base = basename($file);
             $base =~ s/\.vim$//i;
             $lang = lc($base);
-        }
-
-        warn "Processing: $file -> $lang.shb\n" if $cli->{verbose};
-
-        my $result = _convert_file($file, $lang, $cli->{verbose});
-        if (!$result)
-        {
-            $errors++;
-            next;
         }
 
         my $outfile = "$cli->{output_dir}/$lang.shb";
@@ -160,6 +167,39 @@ sub _run
             next;
         }
 
+        warn "Processing: $file -> $lang.shb\n" if $cli->{verbose};
+
+        my $conv = _convert_file($file, $lang, $cli);
+        if (!$conv)
+        {
+            $errors++;
+            next;
+        }
+
+        $converted++;
+
+        if ($conv->{thin})
+        {
+            $thin_count++;
+
+            if ($cli->{warn_thin})
+            {
+                my $reason;
+                if ($conv->{delegated_only} && defined $conv->{directive_text})
+                {
+                    $reason = "(source delegates via: $conv->{directive_text})";
+                }
+                else
+                {
+                    $reason = "(below threshold $min_sections)";
+                }
+                warn sprintf(
+                    "THIN  %-20s sections=%d  %s\n",
+                    "$lang.shb", $conv->{section_count}, $reason
+                );
+            }
+        }
+
         if (!open(my $fh, '>', $outfile))
         {
             warn "Error: Cannot write '$outfile': $!\n";
@@ -168,13 +208,17 @@ sub _run
         }
         else
         {
-            print $fh $result;
+            print $fh $conv->{text};
             close $fh;
             warn "Wrote: $outfile\n" if $cli->{verbose};
         }
     }
 
-    return $errors ? 1 : 0;
+    warn "Converted $converted file(s); $thin_count thin.\n";
+
+    return 1 if $errors;
+    return 1 if $cli->{fail_on_thin} && $thin_count > 0;
+    return 0;
 }
 
 #===========================================================================
@@ -201,22 +245,156 @@ sub _is_curated
 }
 
 #===========================================================================
+# Read a .vim file into a flat list of lines, following runtime!/source/
+# syn-include directives (unless --no-follow-includes was given).
+#===========================================================================
+
+sub _read_vim_lines
+{
+    my ($path, $visited, $depth, $cli, $info) = @_;
+
+    my @lines;
+    my $abs;
+    my $dir;
+    my $own_rule;
+    my @out;
+    my $line;
+    my $target;
+    my $dirtext;
+    my $resolved;
+
+    $abs = File::Spec->rel2abs($path);
+    return () if $visited->{$abs};
+    $visited->{$abs} = 1;
+
+    if (!open(my $fh, '<', $path))
+    {
+        warn "Error: Cannot open '$path': $!\n";
+        return ();
+    }
+    else
+    {
+        local $/;
+        my $content = <$fh>;
+        close $fh;
+        @lines = split /\n/, (defined $content ? $content : '');
+    }
+
+    return @lines unless $cli->{follow_includes};
+    return @lines if $depth >= MAX_INCLUDE_DEPTH;
+
+    $dir       = dirname($abs);
+    $own_rule  = 0;
+    @out       = ();
+
+    for $line (@lines)
+    {
+        if ($line =~ /^\s*syn(?:tax)?\s+(?:keyword|match|region)\b/i)
+        {
+            $own_rule = 1;
+        }
+
+        ($target, $dirtext) = _detect_include_directive($line, $dir);
+        if (defined $target)
+        {
+            push @{$info->{directive_texts}}, $dirtext if $depth == 0;
+
+            $resolved = _resolve_include_target($target, $dir, $info->{synroot});
+            if ($resolved)
+            {
+                push @out, _read_vim_lines($resolved, $visited, $depth + 1, $cli, $info);
+            }
+            else
+            {
+                warn "Warning: cannot locate included file for '$dirtext' (referenced from '$path')\n";
+            }
+            next;
+        }
+
+        push @out, $line;
+    }
+
+    $info->{depth0_had_own_rule} = $own_rule if $depth == 0;
+
+    return @out;
+}
+
+#===========================================================================
+# Detect a runtime!/source/syn-include directive on a single Vim line.
+# Returns ($target, $directive_text) or (undef, undef) if none found.
+#===========================================================================
+
+sub _detect_include_directive
+{
+    my ($line, $dir) = @_;
+
+    my $text = $line;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+$//;
+
+    if ($line =~ /^\s*runtime!?\s+syntax\/(\S+?)\.vim\b/i)
+    {
+        return ("$1.vim", $text);
+    }
+    if ($line =~ /^\s*source\s+<sfile>:h\/(\S+)/i)
+    {
+        my $rel = $1;
+        return ("$dir/$rel", $text);
+    }
+    if ($line =~ /^\s*(?:source|so)\s+(\S+)/i)
+    {
+        return ($1, $text);
+    }
+    if ($line =~ /^\s*syn(?:tax)?\s+include\s+\@?\S+\s+syntax\/(\S+?)\.vim\b/i)
+    {
+        return ("$1.vim", $text);
+    }
+
+    return (undef, undef);
+}
+
+#===========================================================================
+# Resolve an include target to an actual filesystem path.
+# Search order: relative to the directory of the file being processed,
+# then relative to the top-level Vim syntax/ runtime directory.
+#===========================================================================
+
+sub _resolve_include_target
+{
+    my ($target, $dir, $synroot) = @_;
+
+    my @candidates;
+
+    if (File::Spec->file_name_is_absolute($target))
+    {
+        push @candidates, $target;
+    }
+    else
+    {
+        push @candidates, File::Spec->catfile($dir, $target);
+        push @candidates, File::Spec->catfile($synroot, $target) if defined $synroot;
+    }
+
+    for my $c (@candidates)
+    {
+        return $c if -f $c;
+    }
+
+    return undef;
+}
+
+#===========================================================================
 # Convert a single .vim file
 #===========================================================================
 
 sub _convert_file
 {
-    my ($file, $lang, $verbose) = @_;
+    my ($file, $lang, $cli) = @_;
 
-    my @lines;
-    {
-        local $/;
-        my $fh;
-        open($fh, '<', $file) or do { warn "Error: Cannot open '$file': $!\n"; return undef; };
-        my $content = <$fh>;
-        close $fh;
-        @lines = split /\n/, $content;
-    }
+    my $verbose = $cli->{verbose};
+    my %info    = (synroot => dirname(File::Spec->rel2abs($file)));
+    my $visited = {};
+    my @lines   = _read_vim_lines($file, $visited, 0, $cli, \%info);
 
     # Join continuation lines (lines ending with \ in Vim, next line starts with \)
     my @joined;
@@ -536,7 +714,28 @@ sub _convert_file
         $output .= "\n";
     }
 
-    return $output;
+    my $section_count =
+          (scalar grep { @{$keywords{$_}} } keys %keywords)
+        + scalar(@matches)
+        + scalar(@regions);
+
+    my $min_sections = defined $cli->{min_sections} ? $cli->{min_sections} : 3;
+    my $thin = ($section_count == 0) || ($section_count < $min_sections);
+
+    my $delegated_only =
+        (!$info{depth0_had_own_rule} && $info{directive_texts} && @{$info{directive_texts}})
+        ? 1
+        : 0;
+    my $directive_text =
+        ($info{directive_texts} && @{$info{directive_texts}}) ? $info{directive_texts}[0] : undef;
+
+    return {
+        text           => $output,
+        section_count  => $section_count,
+        thin           => $thin,
+        delegated_only => $delegated_only,
+        directive_text => $directive_text,
+    };
 }
 
 #===========================================================================
@@ -902,6 +1101,47 @@ Directory to write .shb files (default: current directory).
 
 Override the language name in the output file.  Only valid with a single input file.
 
+=item B<--follow-includes> / B<--no-follow-includes>
+
+Follow C<runtime!>/C<runtime>, C<source>, and C<syn include> directives found
+in the Vim source and splice the referenced file's lines into the input
+before conversion (default: B<on>). This fixes "delegating" Vim syntax files
+that pull all of their rules from another file (e.g. C<bash.vim> delegates to
+C<sh.vim> via C<runtime! syntax/sh.vim>) and would otherwise produce an
+effectively empty C<.shb>. Resolution order for a referenced file: relative
+to the directory of the file currently being processed, then relative to the
+top-level Vim C<syntax/> runtime directory the input came from. Includes are
+followed recursively (a visited-set guards against cycles; hard stop after 5
+levels). If a referenced file cannot be located, a warning is printed and
+conversion continues using whatever rules were found. Use
+B<--no-follow-includes> to reproduce the old single-file behavior.
+
+=item B<--min-sections N>
+
+The minimum number of rule sections (C<[keyword:...]>, C<[match:...]>,
+C<[region:...]>) a generated C<.shb> must contain to avoid being reported as
+"thin" (default: C<3>). A file with C<0> sections is always considered thin
+regardless of this setting.
+
+=item B<--warn-thin> / B<--no-warn-thin>
+
+Print a C<THIN ...> warning line to STDERR for each generated file that is
+thin (default: B<on>, i.e. warnings are printed). Use B<--no-warn-thin> to
+suppress the per-file lines (the end-of-run converted/thin summary line is
+always printed).
+
+=item B<--fail-on-thin> / B<--no-fail-on-thin>
+
+If any generated (non-curated, actually-written) output file is thin, exit
+with a non-zero status so the condition can gate CI/build scripts (default:
+B<on>). Use B<--no-fail-on-thin> for exploratory runs where a non-zero exit
+is not desired.
+
+=item B<--force>
+
+Overwrite curated C<.shb> files (those beginning with a C<# @curated> marker
+line) that would otherwise be protected from regeneration.
+
 =item B<--verbose>
 
 Print progress messages to stderr.
@@ -934,6 +1174,36 @@ The converter extracts:
 
 Vim regex syntax is converted to Perl regex syntax where possible.
 Patterns that are too complex to convert are skipped with a warning.
+
+=head2 Thin-file detection
+
+A generated C<.shb> is considered B<thin> if it has zero rule sections, or
+fewer than C<--min-sections> total rule sections. Thin output most commonly
+happens for two reasons:
+
+=over 4
+
+=item 1. The Vim source file delegates all of its rules to another file via
+C<runtime!>, C<source>, or C<syn include> and defines no rules of its own.
+This is fixed automatically by C<--follow-includes> (on by default), which
+inlines the referenced file's content before conversion.
+
+=item 2. The Vim source uses Vim-only regex magic (C<\v> "very magic" mode,
+C<\<>/C<\>> word-boundary atoms, etc.) that cannot be safely translated to
+Perl regex, or defines its keywords indirectly (via clusters, C<contains=>,
+generated word lists) in a way the converter deliberately does not follow.
+These languages require hand-curated C<.shb> content (see
+C<docs/syntax-format.md>), marked with a leading C<# @curated> line so the
+converter never overwrites the curation.
+
+=back
+
+When C<--warn-thin> is enabled (the default), each thin output file is
+reported on STDERR as it is written, including the delegation directive text
+when the thinness is due to reason 1 above. A one-line summary
+(C<Converted N file(s); M thin.>) is printed at the end of the run. When
+C<--fail-on-thin> is enabled (the default), the process exits non-zero if any
+thin file was produced, so this condition can gate CI/build scripts.
 
 =head1 VERSION
 

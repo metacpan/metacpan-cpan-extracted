@@ -1,6 +1,6 @@
 package IO::K8s::Api::Discovery::V1::EndpointHints;
 # ABSTRACT: EndpointHints provides hints describing how an endpoint should be consumed.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s forNodes => ['Discovery::V1::ForNode'];
@@ -23,7 +23,7 @@ IO::K8s::Api::Discovery::V1::EndpointHints - EndpointHints provides hints descri
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 forNodes
 

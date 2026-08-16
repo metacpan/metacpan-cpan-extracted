@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -65,7 +65,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.012';
+$VERSION='3.014';
 
 
 #==================================================================================================
@@ -535,6 +535,11 @@ my $app = WebDyne::PAGI->new(
     root  => '.',
     index => 1,
 )->to_app;
+
+my $single_file_app = WebDyne::PAGI->new(
+    root     => '.',
+    filename => 'app.psp',
+)->to_app;
 ```
 
 # DESCRIPTION #
@@ -545,7 +550,9 @@ my $app = WebDyne::PAGI->new(
 
 * **new(%options)**
 
-    Construct a PAGI application wrapper. Options include `root`, `index`, `test`, and related runtime settings.
+    Construct a PAGI application wrapper. Options include `root`, `index`, `test`, `filename`, and related runtime settings.
+
+    The `filename` option is an explicit source-file override for the application. When supplied, it is passed to `WebDyne::Request::PAGI` for every HTTP request and always wins over normal filename derivation from the PAGI request scope, including path-based dispatch, document-root resolution, default document handling, and API-style fallback resolution. This is useful for helper tools or deliberate single-file PAGI applications; do not set it for normal multi-page applications that should dispatch from the request path.
 
 * **to_app()**
 
@@ -583,7 +590,7 @@ Andrew Speer <andrew.speer@isolutions.com.au>
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -613,6 +620,11 @@ WebDyne::PAGI - PAGI application wrapper for WebDyne
      root  => '.',
      index => 1,
  )->to_app;
+ 
+ my $single_file_app = WebDyne::PAGI->new(
+     root     => '.',
+     filename => 'app.psp',
+ )->to_app;
 
 =head1 DESCRIPTION
 
@@ -627,7 +639,9 @@ C<WebDyne::PAGI> wraps the core WebDyne handler in a PAGI application. It suppor
 
 B<new(%options)>
 
-Construct a PAGI application wrapper. Options include C<root>, C<index>, C<test>, and related runtime settings.
+Construct a PAGI application wrapper. Options include C<root>, C<index>, C<test>, C<filename>, and related runtime settings.
+
+The C<filename> option is an explicit source-file override for the application. When supplied, it is passed to C<WebDyne::Request::PAGI> for every HTTP request and always wins over normal filename derivation from the PAGI request scope, including path-based dispatch, document-root resolution, default document handling, and API-style fallback resolution. This is useful for helper tools or deliberate single-file PAGI applications; do not set it for normal multi-page applications that should dispatch from the request path.
 
 
 

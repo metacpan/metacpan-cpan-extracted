@@ -1,8 +1,10 @@
 #ifndef engine_h
 #define engine_h
 
-/* necessary to include regcomp.h in perl-5.34 */
+/* necessary to include regcomp.h */
 #define PERL_EXT_RE_BUILD
+/* necessary to keep macros like PREVENT_LVALUE visible in perl-5.44+ */
+#define PERL_EXT
 
 #include "EXTERN.h"
 #include "perl.h"

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 # The loop adapter for Mojo::IOLoop, implementing the DBIx::Loop seam
 # (add_reader / add_writer / remove / timer / new_future / await) over the
@@ -120,6 +120,10 @@ DBIx::Loop::Loop::Mojo - drive DBIx::Loop on Mojo::IOLoop
 The loop adapter for L<Mojo::IOLoop>. Implements the DBIx::Loop loop seam over
 the Mojo reactor; C<to_native> bridges a query future to a L<Mojo::Promise>
 for promise-style chaining. See L<DBIx::Loop>.
+
+Needs a Mojolicious that ships L<Mojo::Promise> (7.54, mid-2018, or
+later) - an older install has the reactor but not the promise, and this
+adapter needs both.
 
 =head1 AUTHOR
 

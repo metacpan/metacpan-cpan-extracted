@@ -20,15 +20,16 @@ my %WriteMakefileArgs = (
     "Carp" => "1.35",
     "Data::Displaycolour" => "0.7.0",
     "Data::IconText" => "0.6.0",
-    "Data::Identifier" => "0.33.0",
-    "Digest::SHA3" => "1.05"
+    "Data::Identifier" => "0.35.0",
+    "Digest::SHA3" => "1.05",
+    "Lingua::Generic::Interface" => "0.2.0"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => "0.30",
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.06",
+  "VERSION" => "v0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,8 +40,9 @@ my %FallbackPrereqs = (
   "Carp" => "1.35",
   "Data::Displaycolour" => "0.7.0",
   "Data::IconText" => "0.6.0",
-  "Data::Identifier" => "0.33.0",
+  "Data::Identifier" => "0.35.0",
   "Digest::SHA3" => "1.05",
+  "Lingua::Generic::Interface" => "0.2.0",
   "Test::Exception" => "0.30",
   "Test::More" => "1.3",
   "Test::Warn" => "0.30"

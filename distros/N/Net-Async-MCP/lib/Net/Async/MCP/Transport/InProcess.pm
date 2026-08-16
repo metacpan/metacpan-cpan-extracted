@@ -20,7 +20,8 @@ sub new {
 
 
 sub send_request {
-  my ( $self, $method, $params ) = @_;
+  # %options: binding hints from the client, none of which apply in process
+  my ( $self, $method, $params, %options ) = @_;
 
   my $id = ++$self->{next_id};
   my $request = {
@@ -41,6 +42,20 @@ sub send_request {
     )->wait;
     return Future->fail("MCP async tool error: $error") if $error;
     $response = $resolved;
+  }
+
+  # A JSON-RPC response is plain data, so anything still blessed here is a
+  # return shape only a transport can serve. MCP::Server hands back an
+  # MCP::Server::Subscription for subscriptions/listen once the server has a
+  # notification capable transport of its own, expecting it to be turned into a
+  # notification stream. In process there is nothing to stream over, and that
+  # is our limitation to report, not a malformed response from the server.
+  if (blessed $response) {
+    return Future->fail(
+      "MCP server returned a " . ref($response) . " for '$method' instead of a "
+      . "JSON-RPC response: the in-process transport cannot carry "
+      . "server-initiated notifications, so subscriptions/listen is not usable "
+      . "here");
   }
 
   return $self->_process_response($response);
@@ -64,6 +79,12 @@ sub send_notification {
 sub close { Future->done }
 
 
+sub is_alive { 1 }
+
+
+sub mirrors_header_params { 0 }
+
+
 sub _process_response {
   my ( $self, $response ) = @_;
 
@@ -71,8 +92,12 @@ sub _process_response {
   return Future->fail("Invalid response from MCP server")
     unless ref $response eq 'HASH';
 
+  # The message alone cannot carry a code to switch on or an error->{data} to
+  # read, so the raw JSON-RPC error object travels with it as the details of a
+  # failure in category "mcp". The message stays the first element, so a caller
+  # reading the failure in scalar context sees exactly what it saw before.
   if (my $err = $response->{error}) {
-    return Future->fail("MCP error $err->{code}: $err->{message}");
+    return Future->fail("MCP error $err->{code}: $err->{message}", mcp => $err);
   }
 
   return Future->done($response->{result});
@@ -93,7 +118,7 @@ Net::Async::MCP::Transport::InProcess - In-process MCP transport via direct MCP:
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -124,6 +149,10 @@ implementation), the promise is resolved synchronously via C<wait()>. For
 fully non-blocking async tools, use L<Net::Async::MCP::Transport::Stdio>
 with a separate subprocess instead.
 
+Communication is strictly request/response: there is no stream the server
+could push notifications back over, so C<subscriptions/listen> is not usable
+with this transport. See L</send_request>.
+
 This transport is selected automatically by L<Net::Async::MCP> when
 constructed with a C<server> argument.
 
@@ -146,6 +175,39 @@ Sends a JSON-RPC request to the MCP server by calling C<handle()> directly.
 Returns a L<Future> that resolves to the C<result> value from the response,
 or fails with an error message if the server returns a JSON-RPC error.
 
+A JSON-RPC error fails the L<Future> with more than its message. L<Future>'s
+failure convention is C<< ( $message, $category, @details ) >>, so the failure
+reads C<< ( "MCP error $code: $message", 'mcp', $error ) >>: in scalar context
+C<< ->failure >> is the message and nothing has changed, and in list context
+the raw JSON-RPC error object comes with it.
+
+    my ( $message, $category, $error ) = $future->failure;
+    if (($category // '') eq 'mcp') {
+      my $code      = $error->{code};          # -32601, -32602, ...
+      my $supported = $error->{data}{supported};
+    }
+
+The C<mcp> category marks a genuine JSON-RPC error from the server and nothing
+else. The failures this transport raises on its own - a missing or unusable
+response, an async tool that rejected, and the C<subscriptions/listen> refusal
+below - carry their message alone, so a caller that finds no category knows
+there is no server error object behind it.
+
+Accepts the same optional trailing name/value options as the other transports,
+C<header_params> among them, and ignores all of them: they describe how a
+request is mirrored into HTTP headers, and this transport hands the request to
+the server as it stands. See
+L<Net::Async::MCP::Transport::HTTP/send_request>.
+
+C<subscriptions/listen> is the one method that cannot be served here. If the
+server object has a notification capable transport of its own, L<MCP::Server>
+answers that request with an L<MCP::Server::Subscription> object rather than a
+JSON-RPC response, leaving it to the transport to turn it into a notification
+stream; this transport has none, so the returned L<Future> fails saying that it
+cannot carry server-initiated notifications. A server without such a transport
+never gets that far and answers with JSON-RPC error -32601
+(C<METHOD_NOT_FOUND>), which is reported like any other server error.
+
 =head2 send_notification
 
     my $future = $transport->send_notification($method, \%params);
@@ -160,6 +222,22 @@ resolved L<Future>.
 
 No-op for the in-process transport since there is no external process or
 connection to close. Returns an immediately resolved L<Future>.
+
+=head2 is_alive
+
+    my $alive = $transport->is_alive;
+
+Always true: the server object lives in the same process, so there is no
+connection state that could go away. Used by L<Net::Async::MCP/ping> for its
+transport-level liveness check.
+
+=head2 mirrors_header_params
+
+    my $mirrors = $transport->mirrors_header_params;
+
+Always false: there are no HTTP headers here to mirror tool arguments
+annotated with C<x-mcp-header> into, so L<Net::Async::MCP/call_tool> resolves
+none and never fetches a tool list to do it.
 
 =head1 SEE ALSO
 

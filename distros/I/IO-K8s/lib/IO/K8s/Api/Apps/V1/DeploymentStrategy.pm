@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::DeploymentStrategy;
 # ABSTRACT: DeploymentStrategy describes how to replace existing pods with new ones.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s rollingUpdate => 'Apps::V1::RollingUpdateDeployment';
@@ -23,7 +23,7 @@ IO::K8s::Api::Apps::V1::DeploymentStrategy - DeploymentStrategy describes how to
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 rollingUpdate
 

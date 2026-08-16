@@ -505,6 +505,97 @@ compile(self)
                           "load: %s", SvPV_nolen(ERRSV));
             }
         }
+        {   /* the security-header policy: the defaults and the keyword's
+             * overrides merged once, so a request only walks a frozen pair
+             * list; absent when the keyword was never used */
+            SV **hd = hv_fetchs(h, K_HEADERS, 0);
+            if (hd && *hd && SvROK(*hd)
+                && SvTYPE(SvRV(*hd)) == SVt_PVHV) {
+                AV *pairs = phd_compile(aTHX_ (HV *)SvRV(*hd));
+                (void)hv_stores(state, K_HEADERS, newRV_noinc((SV *)pairs));
+                /* Punk::Headers::_chain is the one Perl piece of the path,
+                 * for the Future shape - required here, like Punk::CORS */
+                eval_pv(PK_REQUIRE("Punk::Headers"), FALSE);
+                if (SvTRUE(ERRSV))
+                    croak("Punk: headers needs Punk::Headers, which failed "
+                          "to load: %s", SvPV_nolen(ERRSV));
+            }
+        }
+        {   /* auth: the battery needs a session for the identity to live in,
+             * and a roles target resolves now so a typo croaks at boot */
+            SV **au = hv_fetchs(h, K_AUTH, 0);
+            if (au && *au && SvROK(*au)
+                && SvTYPE(SvRV(*au)) == SVt_PVHV) {
+                HV *acfg = (HV *)SvRV(*au);
+                SV **sc = hv_fetchs(h, "session", 0);
+                SV **rl;
+                if (!(sc && *sc && SvROK(*sc)))
+                    croak("Punk: `auth` needs a session for the identity to "
+                          "live in - add a `session` keyword");
+                rl = hv_fetchs(acfg, "roles", 0);
+                if (rl && *rl && SvOK(*rl) && !SvROK(*rl)) {
+                    SV *what = sv_2mortal(newSVpvs("auth roles"));
+                    SV *code = pc_resolve_target(aTHX_ self, *rl, what);
+                    (void)hv_stores(acfg, "roles", code);
+                }
+                /* the Perl half: current_user and the role/verified checks */
+                eval_pv(PK_REQUIRE("Punk::Auth"), FALSE);
+                if (SvTRUE(ERRSV))
+                    croak("Punk: auth needs Punk::Auth, which failed to "
+                          "load: %s", SvPV_nolen(ERRSV));
+            }
+        }
+        {   /* scoped header policies ($scope->headers): flattened per record
+             * and sorted longest-prefix-first, so a request under nested
+             * scopes reads the most specific mention of a name first */
+            SV **sh = hv_fetchs(h, K_HEADERS_SCOPED, 0);
+            if (sh && *sh && SvROK(*sh) && SvTYPE(SvRV(*sh)) == SVt_PVAV) {
+                AV *src = (AV *)SvRV(*sh);
+                SSize_t si, sn = av_len(src) + 1;
+                AV *outav = newAV();
+                for (si = 0; si < sn; si++) {
+                    SV **rp = av_fetch(src, si, 0);
+                    HV *rec, *out;
+                    SV **x;
+                    STRLEN pfl = 0;
+                    if (!(rp && *rp && SvROK(*rp))) continue;
+                    rec = (HV *)SvRV(*rp);
+                    out = newHV();
+                    x = hv_fetchs(rec, K_PREFIX, 0);
+                    if (x && *x && SvOK(*x)) (void)SvPV_const(*x, pfl);
+                    (void)hv_stores(out, K_PREFIX,
+                        (x && *x && SvOK(*x)) ? newSVsv(*x) : newSVpvs(""));
+                    (void)hv_stores(out, K_LEN, newSViv((IV)pfl));
+                    x = hv_fetchs(rec, K_HEADERS, 0);
+                    if (x && *x && SvROK(*x)
+                        && SvTYPE(SvRV(*x)) == SVt_PVHV)
+                        (void)hv_stores(out, K_HEADERS, newRV_noinc(
+                            (SV *)phd_flat(aTHX_ (HV *)SvRV(*x))));
+                    av_push(outav, newRV_noinc((SV *)out));
+                }
+                if (av_len(outav) > 0)
+                    sortsv(AvARRAY(outav), (STRLEN)(av_len(outav) + 1),
+                           pc_cmp_len_desc);
+                if (av_len(outav) >= 0) {
+                    (void)hv_stores(state, K_HEADERS_SCOPED,
+                                    newRV_noinc((SV *)outav));
+                    eval_pv(PK_REQUIRE("Punk::Headers"), FALSE);
+                    if (SvTRUE(ERRSV))
+                        croak("Punk: headers needs Punk::Headers, which "
+                              "failed to load: %s", SvPV_nolen(ERRSV));
+                }
+                else SvREFCNT_dec((SV *)outav);
+            }
+        }
+        {
+            SV **nf = hv_fetchs(h, K_ON_NOT_FOUND, 0);
+            SV *on_nf = &PL_sv_undef;
+            if (nf && *nf && SvOK(*nf)) {
+                SV *what = sv_2mortal(newSVpvs(K_ON_NOT_FOUND));
+                on_nf = sv_2mortal(pc_resolve_target(aTHX_ self, *nf, what));
+            }
+            (void)hv_stores(state, K_ON_NOT_FOUND, newSVsv(on_nf));
+        }
         {
             SV **oe = hv_fetchs(h, K_ON_ERROR, 0);
             SV *on_err = &PL_sv_undef;

@@ -1,0 +1,17 @@
+<doc page-size="A5" margin="24">
+  <style h1="size:16;line-height:19" text="size:9" />
+  <h1>Packing slip {% order.number %}</h1>
+  <row>
+    <cell weight="1" pad="6" border="#cccccc">Ship to
+      {% order.ship_to %}</cell>
+    <cell weight="1" pad="6" border="#cccccc">Ordered {% order.placed %}
+      Packed by {% order.packer %}</cell>
+  </row>
+  <table>
+    <tr><th weight="4">Item</th><th align="right">Ordered</th><th align="right">Packed</th></tr>
+    {% for l in order.lines %}
+    <tr><td>{% l.name %}</td><td align="right">{% l.ordered %}</td><td align="right">{% l.packed %}</td></tr>
+    {% end %}
+  </table>
+  <box pad="8" bg="#fff8e1" border="#f0c040">{% order.note %}</box>
+</doc>

@@ -60,9 +60,9 @@ L<Net::OAuth>
 
 =head1 AUTHOR
 
-Originally by Keith Grennan <kgrennan@cpan.org>
+Originally by Keith Grennan <foss@nearlyfree.org>
 
-Currently maintained by Robert Rothenberg <rrwo@cpan.org>
+Currently maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 LICENSE AND COPYRIGHT
 

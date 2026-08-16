@@ -1,5 +1,5 @@
 package Kubernetes::REST;
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 # ABSTRACT: A Perl REST Client for the Kubernetes API
 use Moo;
 use Carp qw(croak carp);
@@ -83,7 +83,11 @@ has k8s => (
         inflate
         json_to_object
         struct_to_object
+        object_to_json
+        object_to_struct
         expand_class
+        load
+        load_yaml
     )],
 );
 
@@ -118,6 +122,45 @@ has resource_map => (
 );
 
 
+# Kubernetes groups whose IO::K8s classes do NOT live under IO::K8s::Api::.
+# Their namespace follows the upstream Go staging repository the types are
+# generated from (apiextensions-apiserver, kube-aggregator), not the API group
+# name, so it cannot be derived - it has to be listed here.
+#
+# Keyed on the full group name, because that is the only globally unique
+# identifier: a cluster is free to serve a CRD group called
+# apiextensions.example.com, and that group is an ordinary one.
+my %NON_API_NAMESPACE = (
+    'apiextensions.k8s.io'   => 'ApiextensionsApiserver::Pkg::Apis::Apiextensions',
+    'apiregistration.k8s.io' => 'KubeAggregator::Pkg::Apis::Apiregistration',
+);
+
+# The same table, indexed by the IO::K8s group directory instead - the trailing
+# segment of each namespace above is exactly that directory name. Derived, so
+# there is still only one place to add a group.
+my %NON_API_NAMESPACE_BY_GROUP_PATH =
+    map { ((split /::/)[-1] => $_) } values %NON_API_NAMESPACE;
+
+# Namespace below IO::K8s:: for a Kubernetes API group name as the cluster's
+# OpenAPI spec reports it: '' for core, 'apps', 'apiextensions.k8s.io',
+# 'cert-manager.io', ... The exception table is matched exactly on the full
+# name - a CRD group that merely starts with 'apiextensions' is an ordinary
+# group and must keep landing under Api::.
+sub _io_k8s_namespace_for_group {
+    my ($self, $group) = @_;
+    return $NON_API_NAMESPACE{$group} if exists $NON_API_NAMESPACE{$group};
+    return 'Api::' . ($group eq '' ? 'Core' : ucfirst(lc((split /\./, $group)[0])));
+}
+
+# Namespace below IO::K8s:: for an IO::K8s group directory name - 'Core',
+# 'Apps', 'Apiextensions'. That is the form the v0 compatibility layer carries,
+# and it is a closed set of names this distribution ships, so unlike a group
+# name off the wire it needs no exact-match guard.
+sub _io_k8s_namespace_for_group_path {
+    my ($self, $group_path) = @_;
+    return $NON_API_NAMESPACE_BY_GROUP_PATH{$group_path} // "Api::${group_path}";
+}
+
 # Public method to fetch resource map from cluster's OpenAPI spec
 sub fetch_resource_map {
     my ($self) = @_;
@@ -148,20 +191,8 @@ sub fetch_resource_map {
             next unless $kind && $version;
 
             my $version_path = ucfirst($version);
-            my $new_path;
-
-            # Extension APIs have different base paths in IO::K8s
-            if ($group eq 'apiextensions.k8s.io') {
-                my $group_path = 'Apiextensions';
-                $new_path = "ApiextensionsApiserver::Pkg::Apis::${group_path}::${version_path}::${kind}";
-            } elsif ($group eq 'apiregistration.k8s.io') {
-                my $group_path = 'Apiregistration';
-                $new_path = "KubeAggregator::Pkg::Apis::${group_path}::${version_path}::${kind}";
-            } else {
-                # Standard API resources use Api:: prefix
-                my $group_path = $group eq '' ? 'Core' : ucfirst(lc((split /\./, $group)[0]));
-                $new_path = "Api::${group_path}::${version_path}::${kind}";
-            }
+            my $new_path = $self->_io_k8s_namespace_for_group($group)
+                . "::${version_path}::${kind}";
 
             # Prefer stable versions
             if (!$map{$kind} || $version !~ /alpha|beta/) {
@@ -240,30 +271,38 @@ sub _load_resource_map_from_cluster {
 }
 
 # V0 API compatibility - returns group wrapper objects
+#
+# Called as a plain function, not a method: each accessor below shares its name
+# with the group module it wraps, so once this package is loaded Perl resolves
+# a bareword like Kubernetes::REST::Core->new(...) against the sub instead of
+# the class and calls it as Kubernetes::REST::Core()->new(...) - with no
+# invocant. Returning the class name in that case puts the ->new(...) back on
+# the class the caller was aiming at.
 sub _v0_group {
-    my ($self, $group) = @_;
+    my ($group, $self) = @_;
     my $class = "Kubernetes::REST::$group";
     require_module($class);
+    return $class unless defined $self;
     return $class->new(api => $self);
 }
 
-sub Core { shift->_v0_group('Core') }
-sub Apps { shift->_v0_group('Apps') }
-sub Batch { shift->_v0_group('Batch') }
-sub Networking { shift->_v0_group('Networking') }
-sub Storage { shift->_v0_group('Storage') }
-sub Policy { shift->_v0_group('Policy') }
-sub Autoscaling { shift->_v0_group('Autoscaling') }
-sub RbacAuthorization { shift->_v0_group('RbacAuthorization') }
-sub Certificates { shift->_v0_group('Certificates') }
-sub Coordination { shift->_v0_group('Coordination') }
-sub Events { shift->_v0_group('Events') }
-sub Scheduling { shift->_v0_group('Scheduling') }
-sub Authentication { shift->_v0_group('Authentication') }
-sub Authorization { shift->_v0_group('Authorization') }
-sub Admissionregistration { shift->_v0_group('Admissionregistration') }
-sub Apiextensions { shift->_v0_group('Apiextensions') }
-sub Apiregistration { shift->_v0_group('Apiregistration') }
+sub Core { _v0_group('Core', @_) }
+sub Apps { _v0_group('Apps', @_) }
+sub Batch { _v0_group('Batch', @_) }
+sub Networking { _v0_group('Networking', @_) }
+sub Storage { _v0_group('Storage', @_) }
+sub Policy { _v0_group('Policy', @_) }
+sub Autoscaling { _v0_group('Autoscaling', @_) }
+sub RbacAuthorization { _v0_group('RbacAuthorization', @_) }
+sub Certificates { _v0_group('Certificates', @_) }
+sub Coordination { _v0_group('Coordination', @_) }
+sub Events { _v0_group('Events', @_) }
+sub Scheduling { _v0_group('Scheduling', @_) }
+sub Authentication { _v0_group('Authentication', @_) }
+sub Authorization { _v0_group('Authorization', @_) }
+sub Admissionregistration { _v0_group('Admissionregistration', @_) }
+sub Apiextensions { _v0_group('Apiextensions', @_) }
+sub Apiregistration { _v0_group('Apiregistration', @_) }
 
 # Build URL path from class metadata
 sub _build_path {
@@ -311,6 +350,15 @@ sub _build_path {
 
     if ($args{name}) {
         $path .= "/$args{name}";
+    }
+
+    # Subresource suffix: /status, /log, /exec, /attach, /portforward.
+    # Every subresource addresses one named resource - without a name the
+    # suffix would silently land on the collection endpoint instead.
+    if (defined $args{subresource} && length $args{subresource}) {
+        croak "subresource '$args{subresource}' requires a name for $class"
+            unless $args{name};
+        $path .= "/$args{subresource}";
     }
 
     return $path;
@@ -623,9 +671,13 @@ my %PATCH_TYPES = (
     json      => 'application/json-patch+json',
 );
 
-sub patch {
-    my ($self, $class_or_object, @rest) = @_;
-
+# Shared argument unpacking for patch() and patch_status(): accepts either a
+# blessed object or a class plus name, in both the shorthand
+# (patch('Pod', 'name', ...)) and the fully keyed (patch('Pod', name => ...))
+# call form. $label only appears in croak messages, $default_type is the patch
+# strategy used when the caller does not pass one.
+sub _unpack_patch_args {
+    my ($self, $label, $default_type, $class_or_object, @rest) = @_;
 
     my ($class, $name, $namespace, $patch, $patch_type);
 
@@ -637,8 +689,8 @@ sub patch {
         $name = $metadata->name or croak "object must have metadata.name";
         $namespace = $metadata->namespace;
         my %args = @rest;
-        $patch = $args{patch} // croak "patch requires 'patch' parameter";
-        $patch_type = $args{type} // 'strategic';
+        $patch = $args{patch} // croak "$label requires 'patch' parameter";
+        $patch_type = $args{type} // $default_type;
     } else {
         # Class + name: patch('Pod', 'name', namespace => 'ns', patch => {...})
         my %args;
@@ -648,23 +700,72 @@ sub patch {
         } elsif (@rest % 2 == 0) {
             %args = @rest;
         } else {
-            croak "Invalid arguments to patch()";
+            croak "Invalid arguments to $label()";
         }
 
         $class = $self->expand_class($class_or_object);
-        $name = $args{name} or croak "name required for patch";
+        $name = $args{name} or croak "name required for $label";
         $namespace = $args{namespace};
-        $patch = $args{patch} // croak "patch requires 'patch' parameter";
-        $patch_type = $args{type} // 'strategic';
+        $patch = $args{patch} // croak "$label requires 'patch' parameter";
+        $patch_type = $args{type} // $default_type;
     }
 
     my $content_type = $PATCH_TYPES{$patch_type}
         // croak "Unknown patch type '$patch_type' (use: strategic, merge, json)";
 
+    return ($class, $name, $namespace, $patch, $content_type);
+}
+
+sub patch {
+    my ($self, $class_or_object, @rest) = @_;
+
+
+    my ($class, $name, $namespace, $patch, $content_type)
+        = $self->_unpack_patch_args('patch', 'strategic', $class_or_object, @rest);
+
     my $path = $self->_build_path($class, name => $name, namespace => $namespace);
     my $response = $self->_request('PATCH', $path, $patch,
         content_type => $content_type);
     $self->_check_response($response, "patch $class");
+
+    return $self->_inflate_object($class, $response);
+}
+
+sub patch_status {
+    my ($self, $class_or_object, @rest) = @_;
+
+
+    my ($class, $name, $namespace, $patch, $content_type)
+        = $self->_unpack_patch_args('patch_status', 'merge', $class_or_object, @rest);
+
+    my $path = $self->_build_path($class,
+        name        => $name,
+        namespace   => $namespace,
+        subresource => 'status',
+    );
+    my $response = $self->_request('PATCH', $path, $patch,
+        content_type => $content_type);
+    $self->_check_response($response, "patch_status $class");
+
+    return $self->_inflate_object($class, $response);
+}
+
+sub update_status {
+    my ($self, $object) = @_;
+
+
+    my $class = ref($object);
+    my $metadata = $object->metadata or croak "object must have metadata";
+    my $name = $metadata->name or croak "object must have metadata.name";
+    my $namespace = $metadata->namespace;
+
+    my $path = $self->_build_path($class,
+        name        => $name,
+        namespace   => $namespace,
+        subresource => 'status',
+    );
+    my $response = $self->_request('PUT', $path, $object->TO_JSON);
+    $self->_check_response($response, "update_status " . ref($object));
 
     return $self->_inflate_object($class, $response);
 }
@@ -900,7 +1001,7 @@ sub log {
     my $limit_bytes  = delete $args{limitBytes};
 
     my $class = $self->expand_class($short_class);
-    my $path = $self->_build_path($class, %args) . '/log';
+    my $path = $self->_build_path($class, %args, subresource => 'log');
 
     my %params;
     $params{container}    = $container     if defined $container;
@@ -976,7 +1077,7 @@ sub port_forward {
     my $on_error = delete $args{on_error};
 
     my $class = $self->expand_class($short_class);
-    my $path = $self->_build_path($class, %args) . '/portforward';
+    my $path = $self->_build_path($class, %args, subresource => 'portforward');
 
     my $req = $self->_prepare_request('GET', $path,
         parameters => { ports => $ports },
@@ -1039,7 +1140,7 @@ sub exec {
     my $on_error = delete $args{on_error};
 
     my $class = $self->expand_class($short_class);
-    my $path = $self->_build_path($class, %args) . '/exec';
+    my $path = $self->_build_path($class, %args, subresource => 'exec');
 
     my %params = (
         command => $command,
@@ -1102,7 +1203,7 @@ sub attach {
     my $on_error = delete $args{on_error};
 
     my $class = $self->expand_class($short_class);
-    my $path = $self->_build_path($class, %args) . '/attach';
+    my $path = $self->_build_path($class, %args, subresource => 'attach');
 
     my %params = (
         stdin   => $stdin  ? 'true' : 'false',
@@ -1149,7 +1250,7 @@ Kubernetes::REST - A Perl REST Client for the Kubernetes API
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -1264,7 +1365,27 @@ See L</PLUGGABLE IO ARCHITECTURE> for custom backends.
 
 L<IO::K8s> instance configured with the same resource map. Automatically created when needed.
 
-Provides delegated methods: C<new_object>, C<inflate>, C<json_to_object>, C<struct_to_object>, C<expand_class>.
+Provides delegated methods: C<new_object>, C<inflate>, C<json_to_object>, C<struct_to_object>, C<object_to_json>, C<object_to_struct>, C<expand_class>, C<load>, C<load_yaml>.
+
+Delegation is a convenience only, every one of them behaves exactly as it does on L<IO::K8s>, including its argument contract:
+
+=over
+
+=item *
+
+C<inflate> takes a hashref, or JSON as B<UTF-8 bytes> - its decoder is C<utf8 =E<gt> 1>.
+
+=item *
+
+C<load_yaml> takes a file name or YAML as B<characters>. Handing it bytes turns every non-ASCII value into mojibake, so decode first (C<Encode::decode('UTF-8', $yaml)>). A newline-free argument is taken as a file name.
+
+=item *
+
+C<load> reads a C<.pk8s> manifest, which is Perl code and is C<eval>ed in-process. Only load C<.pk8s> files you trust; for data-only manifests use C<load_yaml>.
+
+=back
+
+Not delegated: C<add>, which registers extra classes in the L<IO::K8s> resource map. That map is mirrored by this client's own L</resource_map> attribute, and mutating one behind the other's back makes the two disagree - reach through C<< $api->k8s->add(...) >> if you really mean to.
 
 =head2 resource_map_from_cluster
 
@@ -1319,7 +1440,16 @@ Returns the comparison result from C<< IO::K8s::Resource->compare_to_schema >>.
     my $path = $api->build_path($class, name => 'my-pod', namespace => 'default');
     # => /api/v1/namespaces/default/pods/my-pod
 
-Build the REST API URL path for a resource class. Takes a fully-qualified class name (from L</expand_class>) and optional C<name>/C<namespace> arguments.
+    my $status = $api->build_path($class,
+        name        => 'my-pod',
+        namespace   => 'default',
+        subresource => 'status',
+    );
+    # => /api/v1/namespaces/default/pods/my-pod/status
+
+Build the REST API URL path for a resource class. Takes a fully-qualified class name (from C<expand_class>) and optional C<name>/C<namespace> arguments.
+
+The optional C<subresource> argument appends a subresource segment (C<status>, C<log>, C<exec>, C<attach>, C<portforward>) to the resource path. A subresource always addresses one named resource, so C<subresource> without C<name> croaks rather than returning a path pointing at the collection endpoint.
 
 This is a public API for async wrappers like L<Net::Async::Kubernetes> that need to construct request paths independently.
 
@@ -1433,6 +1563,50 @@ Supports three patch strategies via the C<type> parameter:
 =back
 
 See L<Kubernetes::REST/patch> for detailed examples.
+
+=head2 patch_status
+
+    my $node = $api->patch_status('OCPNode', 'cp-1',
+        namespace => 'ocp',
+        patch     => { status => { phase => 'Ready', ip => '10.0.0.7' } },
+    );
+
+    # Or with an object:
+    my $node = $api->patch_status($node,
+        patch => { status => { phase => 'Ready' } },
+    );
+
+Partially update a resource's B<status> through the C</status> subresource.
+
+Once a CustomResourceDefinition declares C<subresources: {status: {}}>, the API
+server strips the C<status> stanza from every write to the main endpoint -
+C<create>, C<update>, C<patch> and server-side apply alike - and still answers
+2xx. The write appears to succeed and nothing is stored. Status has to go to
+C</status>, which is what this method addresses.
+
+Takes the same arguments as L</patch> (object or class plus name, both call
+forms, the same C<type> values) and returns the full object from the server.
+The patch document is passed through unchanged, so it carries its own
+C<status> key.
+
+The default patch type is C<merge>, not C<strategic> as in L</patch>: custom
+resources do not support strategic merge patch and the API server rejects it
+with 415, and C<merge> works for built-in kinds as well. Pass
+C<type =E<gt> 'strategic'> explicitly when patching the status of a built-in
+resource and you need array merge semantics.
+
+=head2 update_status
+
+    my $node = $api->update_status($node);
+
+Replace a resource's B<status> through the C</status> subresource. The whole
+object is sent, as with L</update>, but the server only takes its C<status>
+and leaves C<spec> and C<metadata> untouched. Returns the updated object.
+
+This is the read-modify-write counterpart to L</patch_status>: it needs a
+current C<resourceVersion> and fails with a 409 conflict when the object
+changed in the meantime. Prefer L</patch_status> when you are setting
+individual status fields.
 
 =head2 delete
 
@@ -1640,8 +1814,9 @@ This version has been completely rewritten. Key changes that may affect your cod
 
 The old method-per-operation API (e.g., C<< $api->Core->ListNamespacedPod(...) >>)
 has been replaced with a simple API: C<list>, C<get>, C<create>, C<update>,
-C<patch>, C<delete>, C<ensure>, C<ensure_all>, C<ensure_only>, C<watch>,
-C<log>, C<port_forward>, C<exec>, C<attach>.
+C<patch>, C<patch_status>, C<update_status>, C<delete>, C<ensure>,
+C<ensure_all>, C<ensure_only>, C<watch>, C<log>, C<port_forward>, C<exec>,
+C<attach>.
 
 =item * B<Old API still works but deprecated>
 
@@ -1716,6 +1891,11 @@ To use an async event loop, provide your own IO backend:
 Optional. L<IO::K8s> instance configured with the same resource map as this client.
 Automatically created when needed.
 
+Its object methods are delegated onto this client, so C<< $api->load_yaml(...) >>
+and C<< $api->k8s->load_yaml(...) >> are the same call: C<new_object>,
+C<inflate>, C<json_to_object>, C<struct_to_object>, C<object_to_json>,
+C<object_to_struct>, C<expand_class>, C<load> and C<load_yaml>.
+
 =head2 resource_map_from_cluster
 
 Optional boolean. If true, loads the resource map dynamically from the cluster's
@@ -1748,6 +1928,107 @@ and either a hashref or a hash of attributes.
 
     # With hash
     my $ns = $api->new_object(Namespace => metadata => { name => 'foo' });
+
+Delegated to L<IO::K8s/new_object>.
+
+=head2 inflate($data)
+
+Inflate a JSON string or hashref into a typed L<IO::K8s> object. The class is
+auto-detected from the data's C<kind> field (and C<apiVersion>, where present).
+
+    my $pod = $api->inflate($json_string);
+    my $pod = $api->inflate(\%hashref);
+
+Delegated to L<IO::K8s/inflate>.
+
+=head2 json_to_object($class, $json)
+
+Decode a JSON string into a typed L<IO::K8s> object. Called with a single
+argument (just C<$json>), auto-detects the class from the decoded C<kind>
+field, like C<inflate>.
+
+    my $pod = $api->json_to_object($json_with_kind);
+    my $pod = $api->json_to_object('Pod', $json_string);
+
+Delegated to L<IO::K8s/json_to_object>.
+
+=head2 struct_to_object($class, $hashref)
+
+Inflate a plain hashref into a typed L<IO::K8s> object. Called with a single
+argument (just C<$hashref>), auto-detects the class from the hashref's
+C<kind> field, like C<inflate>.
+
+    my $pod = $api->struct_to_object($hashref_with_kind);
+    my $pod = $api->struct_to_object('Pod', \%hashref);
+
+Delegated to L<IO::K8s/struct_to_object>.
+
+=head2 object_to_json($object)
+
+Serialise a typed L<IO::K8s> object back to a JSON string. The inverse of
+C<json_to_object>.
+
+    my $json = $api->object_to_json($pod);
+
+Delegated to L<IO::K8s/object_to_json>.
+
+=head2 object_to_struct($object)
+
+Serialise a typed L<IO::K8s> object back to a plain hashref. The inverse of
+C<struct_to_object>.
+
+    my $hashref = $api->object_to_struct($pod);
+
+Delegated to L<IO::K8s/object_to_struct>.
+
+=head2 load_yaml($file_or_string, %opts)
+
+Parse a YAML manifest - a file name or a YAML string - into an arrayref of
+typed L<IO::K8s> objects, validated against the Kubernetes types.
+C<--->-separated multi-document YAML is supported and is the common case for
+Kubernetes manifests, so this returns an arrayref even for a single document.
+
+    for my $obj (@{ $api->load_yaml('deployment.yaml') }) {
+        $api->create($obj);
+    }
+
+Mind the argument contract, which differs from C<inflate>: C<load_yaml> parses
+B<characters>, while C<inflate>'s decoder is C<utf8 =E<gt> 1> and takes B<UTF-8
+bytes>. YAML read off disk or off C<STDIN> is bytes and has to be decoded
+first, or every non-ASCII value comes back as mojibake:
+
+    my $objects = $api->load_yaml(Encode::decode('UTF-8', $yaml_bytes));
+
+An argument containing no newline is taken as a file name, which is worth a
+trailing C<"\n"> on a one-line manifest built in memory.
+
+Delegated to L<IO::K8s/load_yaml>.
+
+=head2 load($file)
+
+Load a C<.pk8s> manifest file and return an arrayref of typed L<IO::K8s>
+objects.
+
+    my $objects = $api->load('myapp.pk8s');
+
+B<A C<.pk8s> manifest is Perl code, not data>: it is C<eval>ed in-process and
+can do anything the running program can. Only load files you trust; for
+data-only manifests use C<load_yaml>.
+
+Delegated to L<IO::K8s/load>.
+
+=head2 expand_class($short_name)
+
+Resolve a short resource name (e.g. C<'Pod'>), a domain-qualified name (e.g.
+C<'cilium.io/v2/NetworkPolicy'>), or an already-loaded class name to its
+fully-qualified L<IO::K8s> class, using this client's C<resource_map>. Used
+internally by every method that accepts a short class name; also useful for
+async wrappers that build request paths themselves — see L</build_path>.
+
+    my $class = $api->expand_class('Pod');
+    # => IO::K8s::Api::Core::V1::Pod
+
+Delegated to L<IO::K8s>.
 
 =head2 list($class, %args)
 
@@ -1850,12 +2131,139 @@ For namespaced resources, the namespace.
 
 Returns the full updated object from the server.
 
+=head2 patch_status($class_or_object, %args)
+
+Partially update a resource's status through the C</status> subresource.
+
+    my $node = $api->patch_status('OCPNode', 'cp-1',
+        namespace => 'ocp',
+        patch     => { status => { phase => 'Ready', ip => '10.0.0.7' } },
+    );
+
+    # Same thing with an object reference
+    my $node = $api->patch_status($node,
+        patch => { status => { phase => 'Ready' } },
+    );
+
+B<You need this whenever the resource has a status subresource.> A
+CustomResourceDefinition that declares
+
+    subresources:
+      status: {}
+
+makes the API server strip the C<status> stanza from every write to the main
+endpoint. C<create()>, C<update()>, C<patch()> and server-side apply are all
+affected, and all of them still answer 2xx - the call looks like it worked and
+nothing was stored. The same is true for the built-in kinds that have always
+had a status subresource (Pod, Node, Deployment, PersistentVolumeClaim, ...).
+
+Arguments are the same as L</patch>: an object or a class plus C<name>, both
+call forms, and the same C<type> values. The patch document is sent unchanged,
+so it carries its own C<status> key.
+
+The one difference is the default patch type, which is C<merge> rather than
+C<strategic>. Custom resources do not support strategic merge patch - the API
+server answers 415 Unsupported Media Type - while JSON Merge Patch works for
+custom and built-in kinds alike. Pass C<type =E<gt> 'strategic'> explicitly if
+you are patching a built-in resource's status and need array merge semantics.
+
+Returns the full updated object from the server.
+
+=head2 update_status($object)
+
+Replace a resource's status through the C</status> subresource.
+
+    my $node = $api->get('Node', 'cp-1');
+    $node->status->phase('Ready');
+    my $updated = $api->update_status($node);
+
+Sends the whole object like L</update> does, but the server takes only its
+C<status> and leaves C<spec> and C<metadata> alone. Being a full replace, it
+needs a current C<resourceVersion> and answers 409 when the object changed in
+the meantime; L</patch_status> is the better tool for setting individual
+fields.
+
+Returns the updated object from the server.
+
 =head2 delete($class_or_object, %args)
 
 Delete a resource.
 
     $api->delete($pod);
     $api->delete('Pod', name => 'my-pod', namespace => 'default');
+
+=head2 ensure($object)
+
+    my $obj = $api->ensure($pod);
+    # or from a plain hashref (treated as a Kubernetes manifest):
+    my $secret = $api->ensure({
+        apiVersion => 'v1',
+        kind       => 'Secret',
+        metadata   => { name => 'foo', namespace => 'default' },
+        stringData => { password => 'hunter2' },
+    });
+
+Idempotent create-or-update. Fetches the resource by kind/name/namespace; if
+it exists, updates it (preserving C<resourceVersion>), otherwise creates it.
+Returns the resulting IO::K8s object.
+
+Accepts either a typed IO::K8s object or a plain hashref. A hashref must carry
+a C<kind> field and is inflated to a typed object via L<IO::K8s/struct_to_object>.
+Hashref keys follow the Kubernetes API convention (camelCase, e.g.
+C<stringData>, not C<string_data>).
+
+B<Handles common race conditions:>
+
+=over 4
+
+=item * 404 on the initial get is treated as "does not exist" and falls
+through to create.
+
+=item * 409 AlreadyExists on create (resource appeared between get and
+create) is retried as an update.
+
+=item * 409 Conflict on update (C<resourceVersion> changed server-side, e.g.
+a controller wrote status) is retried by re-fetching and re-applying.
+
+=back
+
+B<Special-cases two kinds where the server rejects a plain update:>
+
+=over 4
+
+=item * C<PersistentVolumeClaim> - spec is immutable after creation, so an
+existing PVC is returned unchanged.
+
+=item * C<Job> - spec is immutable; an existing Job that is active or has
+succeeded is returned unchanged. A failed Job is deleted and recreated.
+
+=back
+
+=head2 ensure_all(@objects)
+
+    my @results = $api->ensure_all(@objects);
+
+Batch version of L</ensure>. Applies create-or-update to each object in order
+and returns the list of resulting objects.
+
+=head2 ensure_only(%args)
+
+    $api->ensure_only(
+        label      => 'app.kubernetes.io/component=queen',
+        objects    => \@objects,
+        kinds      => [qw(Role RoleBinding ClusterRoleBinding)],
+        namespaces => ['default', 'kube-system', undef],
+    );
+
+Like L</ensure_all>, but also B<deletes> any resources matching the label
+selector in the given kinds and namespaces that are not present in
+C<objects>. Use this for resources where stale objects must not survive
+(e.g. RBAC).
+
+Pass C<undef> inside C<namespaces> to scan cluster-scoped resources. If
+C<namespaces> is omitted, only cluster-scoped resources are scanned.
+
+Returns the list of applied objects (from L</ensure_all>).
 
 =head2 watch($class, %args)
 
@@ -2112,6 +2520,27 @@ Returns a hashref mapping short resource names (e.g., "Pod") to full IO::K8s
 class paths. This method is called automatically if C<resource_map_from_cluster>
 is enabled.
 
+=head2 schema_for($kind)
+
+    my $schema = $api->schema_for('Pod');
+
+Get the OpenAPI schema definition for a resource type from the cluster.
+Accepts short names (C<Pod>), full class names
+(C<IO::K8s::Api::Core::V1::Pod>), or OpenAPI definition names
+(C<io.k8s.api.core.v1.Pod>).
+
+Returns a hashref with the OpenAPI v2 schema definition.
+
+=head2 compare_schema($kind)
+
+    my $result = $api->compare_schema('Pod');
+
+Compare the local IO::K8s class definition against the cluster's OpenAPI
+schema. Useful for detecting version skew between your IO::K8s installation
+and the cluster's Kubernetes version.
+
+Returns the comparison result from C<< IO::K8s::Resource->compare_to_schema >>.
+
 =head1 BUILDING BLOCKS FOR ASYNC WRAPPERS
 
 Async wrappers like L<Net::Async::Kubernetes> need access to the request/response
@@ -2142,7 +2571,11 @@ Example async integration:
 
     # Build request using Kubernetes::REST
     my $class = $rest->expand_class('Pod');
-    my $path = $rest->build_path($class, name => $name, namespace => $ns) . '/log';
+    my $path = $rest->build_path($class,
+        name        => $name,
+        namespace   => $ns,
+        subresource => 'log',
+    );
     my $req = $rest->prepare_request('GET', $path, parameters => { follow => 'true' });
 
     # Execute through your own event loop
@@ -2318,7 +2751,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

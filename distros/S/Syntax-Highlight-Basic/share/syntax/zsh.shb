@@ -1,6 +1,6 @@
 # Syntax file for zsh
 # Converted from: zsh.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: zsh
 extensions: zsh
@@ -39,4 +39,17 @@ declare float integer local private readonly typeset
 
 [match:Keyword]
 pattern: \v^\s*%(%(un)?setopt|set\s+[-+]o)
+
+[region:String]
+start: "
+end: "
+
+[region:String]
+start: '
+end: '
+
+[region:PreProc]
+start: \${
+end: }
+escape: \
 

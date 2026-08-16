@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumBGPPeerConfig;
 # ABSTRACT: Cilium BGP peer configuration
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumbgppeerconfigs';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::CiliumBGPPeerConfig - Cilium BGP peer configuration
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 DESCRIPTION
 

@@ -24,6 +24,10 @@ typedef struct hm_h2_stream {
     SV      *body;           /* accumulating request body, or NULL    */
     SV      *resp_body;      /* response bytes the data provider feeds */
     size_t   resp_off;       /* data-provider read cursor             */
+    SV      *src_sv;         /* streamed file body: owned, or NULL    */
+    int      src_fd;         /* its fd, read at src_off               */
+    off_t    src_off;
+    UV       src_rem;        /* bytes still owed on the stream        */
     size_t   blen;           /* response body length (logging)        */
     int      status;         /* response status (logging)             */
     int      resp_status;    /* streaming: stashed until close        */
@@ -155,6 +159,39 @@ static SV *hm_h2_body_sv(pTHX_ SV **s2, size_t *blen) {
     return out;
 }
 
+/* Move a liftable filehandle body onto the stream as an fd source the data
+ * provider reads per window, instead of slurping it. Getline-only sources
+ * stay on the slurp: the provider's buffer is fixed-size and a getline
+ * chunk is not. Returns 1 when st owns a source. */
+static int hm_h2_body_src(pTHX_ hm_h2_stream *st, SV **s2, AV *hav) {
+    hm_bsrc bs;
+    UV clv = 0;
+    int cl_seen;
+    if (!(s2 && SvROK(*s2)) || SvTYPE(SvRV(*s2)) == SVt_PVAV) return 0;
+    cl_seen = hm_hav_clen(aTHX_ hav, &clv);
+    memset(&bs, 0, sizeof bs);
+    if (!hm_bsrc_lift(aTHX_ *s2, &bs, cl_seen, clv)) return 0;
+    if (bs.kind != 1) { hm_bsrc_release(aTHX_ &bs); return 0; }
+    st->src_sv  = bs.sv;                          /* ownership moves */
+    st->src_fd  = bs.fd;
+    st->src_off = bs.off;
+    st->src_rem = bs.remaining;
+    st->blen    = (size_t)bs.remaining;
+    return 1;
+}
+
+static void hm_h2_src_free(pTHX_ hm_h2_stream *st) {
+    hm_bsrc bs;
+    if (!st->src_sv) return;
+    memset(&bs, 0, sizeof bs);
+    bs.kind = 1;
+    bs.fd   = st->src_fd;
+    bs.sv   = st->src_sv;
+    hm_bsrc_release(aTHX_ &bs);
+    st->src_sv = NULL;
+    st->src_rem = 0;
+}
+
 static ssize_t hm_h2_data_read(nghttp2_session *ses, int32_t sid, uint8_t *buf,
                                size_t length, uint32_t *data_flags,
                                nghttp2_data_source *source, void *ud) {
@@ -164,6 +201,20 @@ static ssize_t hm_h2_data_read(nghttp2_session *ses, int32_t sid, uint8_t *buf,
     const char *bp = "";
     size_t remain, n;
     (void)ses; (void)sid; (void)ud;
+    if (st->src_sv) {                 /* file source: read per window */
+        size_t want = st->src_rem < length ? (size_t)st->src_rem : length;
+        ssize_t got = want ? pread(st->src_fd, buf, want, st->src_off) : 0;
+        if (got < 0) got = 0;
+        st->src_off += got;
+        st->src_rem -= (UV)got;
+        if (st->src_rem == 0 || got == 0) {
+            /* spent - or truncated under us, in which case the promised
+             * length cannot be met and ending the stream is all there is */
+            st->src_rem = 0;
+            *data_flags |= NGHTTP2_DATA_FLAG_EOF;
+        }
+        return (ssize_t)got;
+    }
     if (st->resp_body) bp = SvPV(st->resp_body, blen);
     remain = blen - st->resp_off;
     n = remain < length ? remain : length;
@@ -274,8 +325,10 @@ XS_INTERNAL(hm_xs_h2responder) {
 
     if (n >= 3) {
         SV **s2 = av_fetch(rav, 2, 0);
-        if (st->resp_body) SvREFCNT_dec(st->resp_body);
-        st->resp_body = hm_h2_body_sv(aTHX_ s2, &st->blen);
+        if (st->resp_body) { SvREFCNT_dec(st->resp_body); st->resp_body = NULL; }
+        hm_h2_src_free(aTHX_ st);
+        if (!hm_h2_body_src(aTHX_ st, s2, hav))
+            st->resp_body = hm_h2_body_sv(aTHX_ s2, &st->blen);
         hm_h2_submit_response(aTHX_ s, st, status, hav);
         hm_h2_flush_send(aTHX_ s);
         XSRETURN_EMPTY;
@@ -359,8 +412,10 @@ static void hm_h2_respond(pTHX_ hm_h2_sess *s, hm_h2_stream *st, SV *resp) {
         int status = s0 ? (int)SvIV(*s0) : 200;
         AV *hav = (s1 && SvROK(*s1) && SvTYPE(SvRV(*s1)) == SVt_PVAV)
                 ? (AV *)SvRV(*s1) : NULL;
-        if (st->resp_body) SvREFCNT_dec(st->resp_body);
-        st->resp_body = hm_h2_body_sv(aTHX_ s2, &st->blen);
+        if (st->resp_body) { SvREFCNT_dec(st->resp_body); st->resp_body = NULL; }
+        hm_h2_src_free(aTHX_ st);
+        if (!hm_h2_body_src(aTHX_ st, s2, hav))
+            st->resp_body = hm_h2_body_sv(aTHX_ s2, &st->blen);
         hm_h2_submit_response(aTHX_ s, st, status, hav);
     } else if (resp && SvROK(resp) && SvTYPE(SvRV(resp)) == SVt_PVCV) {
         hm_h2_run_delayed(aTHX_ s, st, resp);
@@ -560,6 +615,7 @@ static void hm_h2_stream_free(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
     if (st->body)         SvREFCNT_dec(st->body);
     if (st->resp_body)    SvREFCNT_dec(st->resp_body);
     if (st->resp_headers) SvREFCNT_dec(st->resp_headers);
+    hm_h2_src_free(aTHX_ st);
     free(st);
 }
 

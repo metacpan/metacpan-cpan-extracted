@@ -8,7 +8,7 @@ use Cwd ();
 use File::Spec ();
 use File::Basename ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.12';
 
 # The subcommands behind `punk`, other than `new` (which is Punk::Generate).
 # Each returns an exit code - 0 fine, 1 something is wrong with the
@@ -191,7 +191,7 @@ sub config_check {
         return 2;
     };
     my $file = $opt{file} || File::Spec->catfile($root, 'config', 'punk.yml');
-    my $env  = $opt{env} || $ENV{PUNK_ENV} || 'development';
+    my $env  = $opt{env} || $ENV{PUNK_ENV} || 'production';
 
     unless (-f $file) {
         print STDERR "punk config: no such file: $file\n";
@@ -497,6 +497,9 @@ sub dev {
         defined $child or die "punk dev: cannot fork: $!\n";
         unless ($child) {
             chdir $root or die "punk dev: cannot chdir to $root: $!\n";
+            # punk dev IS the development opt-in: the environment defaults
+            # to production everywhere else
+            $ENV{PUNK_ENV} //= 'development';
             # app.psgi reads $0 to find lib/ and its own root, exactly as a
             # server loading the file would
             local $0 = $psgi;

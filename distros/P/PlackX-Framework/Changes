@@ -1,5 +1,10 @@
 Revision history for Perl extension PlackX-Framework
 
+0.31 2026-08-16T08:09:23Z
+
+    - Remove unnecessary static file app integration
+    - Document undocumented cleanup callback feature
+
 0.30 2026-08-14T09:30:27Z
 
     - Fix bug when a streaming response was used with static file server

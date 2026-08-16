@@ -1,3 +1,284 @@
+0.004     2026-08-15 16:13:38Z
+  - Added an on_subscription_end event, so a caller is told when a
+    subscription's stream ends on its own - the server closing it, the
+    connection failing underneath it - instead of having to ask
+    subscriptions_stop and get false back. The HTTP transport fires it with
+    the subscription id the moment the stream ends without this client having
+    ended it: subscriptions_stop and close deregister before they close, so an
+    end the caller caused itself is not reported. The client forwards the event
+    through %TRANSPORT_KEYS like on_notification, so a handler set there is
+    called with the client. Only the HTTP transport can fire it; the InProcess
+    and Stdio transports cannot carry a subscription
+  - Fixed subscriptions_listen hanging on a stdio client instead of failing.
+    MCP::Server >= 0.15 serves subscriptions/listen over stdio too, answering
+    it with a notifications/subscriptions/acknowledged notification rather
+    than a response, and the stdio transport ignored resolve_on_notification:
+    the acknowledgement arrived at on_notification while the request waited
+    forever for an answer that was not coming. The transport now refuses
+    resolve_on_notification on the spot, so subscriptions/listen over stdio
+    fails loudly with the reason instead of hanging
+  - Added a client_capabilities option, so a caller can declare what the client
+    supports instead of the hardcoded empty object every request used to carry.
+    The default stays empty, which is what keeps a conforming server from
+    sending input requests this client could not answer
+  - Fixed list_tools, list_prompts and list_resources seeing only the first
+    page of a paginated listing: a nextCursor in the result was ignored, and
+    for list_tools that also left the header-parameter cache incomplete. All
+    three now follow the cursor to the end. A server that repeats a cursor, or
+    offers more than a hundred pages, fails the call loudly rather than
+    returning what happened to arrive - a truncated list is indistinguishable
+    from a short one, which is the same bug moved to a later page
+  - Fixed subscriptions_listen being unusable over HTTP, which it was by
+    construction: a subscription stream never carries a JSON-RPC response, so
+    the request waited for something that could not arrive and died on the
+    stall timeout. A server acknowledges by notification instead, and the
+    client now tells the transport which notification settles the request. It
+    resolves with the acknowledgement's own parameters - the subscription id
+    and the notification kinds the server honoured - while the stream stays
+    open and feeds on_notification. The new subscriptions_stop ends one by
+    closing its stream, which is what unsubscribing is on this binding, and
+    shutdown ends any that are left
+  - Fixed every HTTP request waiting for its stream to close rather than for
+    its answer. A server that holds the stream open after responding kept the
+    caller waiting until the stall timeout; the response now settles the
+    request the moment it lands. This is the same decoupling subscriptions
+    needed, so both are one change
+  - Fixed on_notification never reaching a Stdio client. The stdio transport
+    delivers notifications, but the client built that transport without passing
+    anything to it and forwarded a later configure only to an HTTP one, so the
+    attribute did nothing for anyone not using HTTP. Which options reach which
+    transport is now one table keyed by the class each option needs, so the
+    HTTP-only ones still cannot reach a transport that would croak on them, and
+    the InProcess transport - not a notifier at all - is excluded without
+    being named
+  - The default protocol version is now the revision this client builds
+    requests for, spelled out here, instead of whatever the installed
+    MCP::Constants names. Those were the same thing by coincidence; had MCP
+    moved ahead, the client would have quietly put a newer version on requests
+    shaped for the older one. lib/Net/Async/MCP.pm now loads no part of MCP at
+    all, which suits a stdio or HTTP client, where MCP is only a recommendation
+  - Renegotiation now picks from the revisions this client actually builds
+    requests for, rather than from the installed MCP::Server's list of what it
+    accepts. Those are different questions with a coincidentally identical
+    answer today: let MCP ship a revision its server accepts and this client
+    does not shape requests for, and the old reading would have renegotiated
+    straight into it - a bug that would first appear on a dependency upgrade
+  - Fixed the Stdio transport dropping every notification its server sends,
+    the same gap the HTTP transport had before it read SSE incrementally, and
+    delivered them to on_notification instead. Fixing the triage exposed a
+    worse one alongside it: a message carrying an id but no result or error is
+    a server-initiated request, and it went straight into the pending lookup -
+    the server numbers its requests from its own counter, so its id 1 answered
+    a caller's waiting id 1 with undef and a live tools/call silently received
+    nothing
+  - Fixed the Stdio transport leaving futures pending forever when it is
+    removed from its loop while requests or a close are in flight. Removal
+    takes the subprocess with it and unwatches the child, so the exit that
+    would have settled them is never seen. They now fail, saying that rather
+    than claiming an exit nothing observed, with the request case and the close
+    case distinguishable from one another
+  - A server refusing the client's protocol version is now answered by
+    switching to one it offers and sending the request again, once, with the
+    agreed version kept for everything that follows. Previously the refusal
+    went straight to the caller. An offer this client cannot use leaves the
+    server's own error untouched rather than replacing it. Note the reach of
+    this: the client speaks exactly one revision's request shapes, so it can
+    only ever switch back to that one - this catches a stale or mistaken
+    protocol_version, it does not make the client multi-revision
+  - on_notification set on the client is now invoked with the client as its
+    first argument, like on_input_request, instead of with the transport that
+    happened to receive the notification. A handler set directly on a transport
+    object is still that transport's own event and still gets the transport
+  - Added support for input required results, the current revision's way of
+    letting a server ask the client something mid-request (MRTR, SEP-2322):
+    instead of sending the client a request of its own, a server answers with
+    resultType input_required, and the client fulfils what it asks and retries.
+    The new on_input_request handler is invoked with the method and params of
+    each ask and returns the answer, directly or as a Future; the retry then
+    carries the answers under the server's own keys and mirrors requestState
+    back untouched. An ask for a capability that was not declared in
+    client_capabilities is refused as a server violation without ever reaching
+    the handler, and an ask with no handler set fails saying so rather than
+    handing back a result that would look like an empty answer
+  - Added on_notification to the client, which only the HTTP transport had
+    since it started reading SSE incrementally, so nobody using the client
+    rather than the transport directly could reach it. The Stdio transport
+    still drops what its server sends
+  - A failed request now carries the server's JSON-RPC error object, not just
+    a message about it. All three transports collapsed the error into a string,
+    so a caller could not tell -32601 from -32602 without parsing prose, and
+    error.data - where a server puts the versions it supports, or the scopes it
+    wanted - never arrived at all. The failure now reads
+    ( $message, 'mcp', $error ), which leaves the message in scalar context
+    exactly as it was; the category is present only when there really is a
+    server error object behind it, never for a transport-level failure
+  - Fixed the HTTP transport throwing away everything a server sends before
+    its answer. An SSE response was read to the end and only then parsed, and
+    the parser kept the one event that looked like the response, so the
+    notifications/progress and notifications/message a server may emit during a
+    long tools/call were discarded unseen. The body is now parsed as it
+    arrives, and a notification is delivered to the new on_notification event
+    handler on the transport. Non-JSON-RPC events, keep-alive comments and an
+    event torn across chunk boundaries - including in the middle of a
+    multi-byte character - are handled where the old whole-body parser either
+    could not see them or had no chance to get them wrong
+  - Fixed the Stdio transport never being reclaimed. The stdout on_read and
+    on_finish callbacks captured the transport strongly and live on the child
+    streams of the IO::Async::Process the transport itself owns, closing a
+    cycle no refcount breaks: a client that had been shut down and dropped left
+    its subprocess's stream handles held for the life of the program. Both
+    callbacks now hold the transport weakly and do nothing once it is gone
+  - Added a headers option to the client and the HTTP transport, settable at
+    construction and through configure, so an Authorization header can be sent
+    at all: a server behind OAuth was previously unreachable, since the
+    transport built its header list entirely by itself. Caller headers go on
+    underneath the ones derived from the request body and a colliding one is
+    dropped rather than sent alongside, because HTTP::Headers keeps a field
+    given twice as two values of one header instead of letting the later win,
+    which a conforming server sees as a header diverging from the body and
+    rejects with -32020. Configuring them on a client that already joined a
+    loop reaches the live transport, so a bearer token can be rotated
+  - Added timeout and stall_timeout options for the HTTP transport, which ran
+    without either: a hung server hung the caller indefinitely. stall_timeout
+    defaults to 60 seconds and fires only when a request spends that long
+    without a byte moving, so it catches the hung connection without touching
+    a tools/call that legitimately runs for minutes. timeout, the limit on a
+    whole request, deliberately has no default for that same reason
+  - Fixed the InProcess transport reporting a correct server answer as
+    "Invalid response from MCP server". A server object with a notification
+    capable transport of its own answers subscriptions/listen with an
+    MCP::Server::Subscription object rather than a JSON-RPC response, which
+    this transport has nothing to stream over; it now says that instead of
+    blaming the response
+  - Added cancellation to the Stdio transport: cancelling the Future returned
+    by send_request drops the pending entry and writes a
+    notifications/cancelled naming that request, which is the stdio form of
+    cancellation (on HTTP it is closing the response stream). Nothing is
+    written for a request that is already answered or whose subprocess has
+    exited. The callback holds the transport weakly, since the pending table
+    holds the future and the future holds the callback
+  - Fixed configure(protocol_version => undef) leaving the client without any
+    protocol version: the fallback was guarded by a check against an already
+    emptied hash and so never ran, after which every request carried a null
+    protocolVersion in _meta and MCP::Server answered -32602
+  - Fixed ping claiming liveness it had not checked. It now asks the transport
+    via the new is_alive method and fails the Future when the transport can no
+    longer carry requests, instead of always returning success
+  - Added is_alive to all three transports: false for Stdio once the subprocess
+    has exited or been closed, always true for InProcess and HTTP, which hold
+    no connection state between requests
+  - Fixed initialize autovivifying an empty _meta hash into the result it hands
+    back to the caller when the server sends none
+  - Fixed initialize still passing a top-level capabilities parameter left over
+    from the old handshake: server/discover ignores params entirely and the
+    client capabilities already travel in _meta, so it only put a second truth
+    on the wire
+  - Fixed the HTTP transport swallowing JSON-RPC errors that arrive with a
+    non-2xx status. MCP servers render METHOD_NOT_FOUND with a 404 and a
+    rejected _meta with a 400, so a subscriptions/listen error came back as a
+    bogus "session expired" (dropping the session ID with it) and -32602 hid
+    behind the HTTP status line. A JSON-RPC error body now wins over the
+    status
+  - Fixed double UTF-8 decoding in the HTTP transport, which made every
+    non-ASCII text/event-stream response fail to parse: bodies are now read as
+    bytes, which is what the JSON decoder expects
+  - Removed the unused _initialized flag; the current protocol revision is
+    stateless, so there is no handshake state left worth tracking
+  - Removed the Mcp-Session-Id machinery from the HTTP transport: requests no
+    longer carry the header, responses are no longer scanned for it, and
+    shutdown no longer sends a DELETE to the endpoint, since close is now a
+    no-op. SEP-2567 removed protocol sessions and the header in revision
+    2026-07-28, the only revision this client speaks: a server must ignore the
+    header and neither mint nor echo a session ID, and answers DELETE with 405,
+    so none of it could still have an effect. A bare 404 is now reported as the
+    HTTP error it is instead of a made up expired session. Talking to a legacy
+    server that still wants the header is no longer possible through this
+    transport
+  - Fixed the HTTP transport being unusable against a conforming server of the
+    current revision: it sent nothing but Content-Type and Accept, while
+    2026-07-28 mirrors a request's metadata into HTTP headers so intermediaries
+    can route on it without parsing the body, and a server must reject a
+    missing or diverging one with -32020 (HEADER_MISMATCH). Every single
+    request came back as that error. POSTs now carry MCP-Protocol-Version,
+    Mcp-Method and, for tools/call, prompts/get and resources/read, Mcp-Name,
+    each derived from the request body so that header and body cannot drift
+    apart; values outside printable ASCII travel base64 encoded in the
+    =?base64?...?= sentinel. Known limitation: the Mcp-Param-* headers for tool
+    arguments annotated with x-mcp-header are still not sent, so a tools/call
+    that passes such an argument stays rejected
+  - Raised the MCP prerequisite to 0.15, the release that added server/discover
+    and made 2026-07-28 the only supported revision, since the handshake this
+    client speaks cannot work against anything older
+  - Added HTTP::Message to the recommended prerequisites: the HTTP transport
+    requires HTTP::Request at runtime and so far only got it by accident
+    through Net::Async::HTTP, which is itself only a recommendation. Its tests
+    now skip rather than die when it is missing
+  - Fixed the HTTP transport documentation still naming protocol revision
+    2025-11-25 while its own seealso link pointed at 2026-07-28
+  - Added subscriptions_listen client method for the subscriptions/listen
+    request, completing the set of current-revision client methods
+    (list_tools/call_tool, list_prompts/get_prompt, list_resources/read_resource,
+    and subscriptions/listen). It carries the standard _meta on every request
+    and surfaces a server's METHOD_NOT_FOUND (e.g. when the server has no
+    notification transport) as a failed Future.
+  - Fixed obsolete Rev-2025-11-25 initialize protocol. initialize now sends the
+    current revision's server/discover request and carries protocol version,
+    client capabilities, and client info in _meta on every request, restoring a
+    working handshake with MCP::Server >= 0.15 / Rev-2026-07-28 (which dropped
+    the top-level protocolVersion initialize form and the initialize/ping
+    JSON-RPC methods in favor of _meta and server/discover)
+  - Added protocol_version accessor (defaults to MCP::Constants PROTOCOL_VERSION)
+    and client-side _meta injection in Net::Async::MCP; transports remain dumb
+  - server_info is now read from result._meta."io.modelcontextprotocol/serverInfo";
+    server_capabilities from result.capabilities
+  - ping is now a transport-level liveness no-op (the current MCP revision has
+    no client-addressable JSON-RPC ping request); it returns success without
+    sending a request that would fail against MCP::Server >= 0.15
+  - Removed the notifications/initialized notification initialize used to send
+    after the handshake request: it now sends server/discover and nothing else.
+    SEP-2575 removed the initialize/initialized handshake in revision
+    2026-07-28, the Streamable HTTP binding of that revision defines no
+    client-to-server notification at all (notifications/cancelled, the only one
+    left in the core protocol, exists on stdio), and MCP::Server discards
+    notifications anyway, so over HTTP it was one extra POST per initialize
+    with no effect. send_notification stays on all three transports as public
+    API for callers, this client just no longer uses it
+  - Fixed the HTTP transport dying instead of failing its Future when a 2xx
+    body carries an "error" that is not a JSON-RPC error object. MCP::Server's
+    own HTTP transport renders its refusals as {error => 'Method not allowed'}
+    and {error => 'Invalid JSON'}, and a gateway in between may invent another
+    shape, all of which the JSON and SSE paths read as a hash reference and
+    died on with "Can't use string as a HASH ref". Both paths now check the
+    shape like the non-2xx path already did and fail with the text the body
+    held; a JSON-RPC error without a message no longer warns about an
+    uninitialized value while interpolating it
+  - Fixed send_notification on the HTTP transport reporting every completed
+    POST as a delivered notification, 4xx and 5xx included, so a rejected
+    notification looked sent. A 2xx still resolves the Future (202 Accepted
+    with no body is the normal case), while a non-2xx now fails it with the
+    same precedence as the request path: a JSON-RPC error body wins over the
+    HTTP status line
+  - Added the Mcp-Param-{Name} headers for tool arguments annotated with
+    x-mcp-header, the last documented gap in the HTTP binding: a conforming
+    server rejects a tools/call that passes such an argument without its
+    header, so those tools were simply uncallable over HTTP. call_tool now
+    resolves them client-side from the tool's input schema - which arguments
+    are annotated and how their values are spelled is MCP semantics, only the
+    wire form belongs to a transport - and hands the finished name/value pairs
+    to send_request, which now takes optional binding hints as trailing named
+    options and encodes them like Mcp-Name. list_tools caches the annotations
+    per tool; a call_tool for a tool the client has not seen fetches the list
+    once, and only on a transport that mirrors headers at all, which the new
+    transport method mirrors_header_params answers (true only for HTTP). A
+    failed lookup does not fail the call: it goes out without headers and the
+    server decides. Values are formatted the way the server compares them,
+    including a \0 or JSON::PP::Boolean false, which as a Perl value is true
+    and would otherwise have put "true" in a header over a body saying false.
+    An argument the caller left out gets no header, since a server rejects an
+    unexpected one exactly as it rejects a missing one. Known limitation:
+    list_tools ignores a nextCursor, so only the first page of a paginated tool
+    list is known
+
 0.003     2026-07-12 20:46:34Z
   - Fixed InProcess transport to pass a real MCP::Server::Context to
     handle() instead of a plain hashref, restoring compatibility with

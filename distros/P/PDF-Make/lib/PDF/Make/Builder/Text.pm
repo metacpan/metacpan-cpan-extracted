@@ -2,6 +2,8 @@ package PDF::Make::Builder::Text;
 use strict;
 use warnings;
 use Object::Proto;
+use PDF::Make::Builder::Font;
+use PDF::Make::Builder::Runs;
 
 BEGIN {
     Object::Proto::define('PDF::Make::Builder::Text',
@@ -16,6 +18,7 @@ BEGIN {
         'overflow:Bool:default(0)',
         'preformatted:Bool:default(0)',
         'font:HashRef',
+        'runs:ArrayRef',
         'x:Num', 'y:Num', 'w:Num', 'h:Num',
         'end_w:Num:default(0)',
         'end_y:Num:default(0)',
@@ -91,8 +94,47 @@ sub _char_chunks {
     return @chunks;
 }
 
+# The plain string behind a run list: what tagged output, extraction and the
+# accessibility tree see. Callers that build a Text directly with runs must
+# still pass text (the property is required); Builder::add_text derives it.
+sub plain_text_from_runs {
+    my ($runs) = @_;
+    return '' unless ref $runs eq 'ARRAY';
+    return join '', map { defined $_->{text} ? $_->{text} : '' } @$runs;
+}
+
+# Resolve each run's style overrides against the block font, returning the
+# list PDF::Make::Builder::Runs wants. Identical styles share one font object,
+# which is what lets adjacent segments coalesce into a single measurement.
+sub _resolve_runs {
+    my ($self, $builder) = @_;
+    my $base = $self->_resolve_font($builder);
+    my %cache;
+    my @out;
+
+    for my $run (@{ runs $self }) {
+        next unless defined $run->{text} && length $run->{text};
+        my %spec = (
+            colour      => $run->{colour}      // $base->colour,
+            size        => $run->{size}        // $base->size,
+            family      => $run->{family}      // $base->family,
+            bold        => $run->{bold}        // $base->bold,
+            italic      => $run->{italic}      // $base->italic,
+            line_height => $run->{line_height} // $base->effective_line_height,
+        );
+        my $key = join "\0", map { defined $spec{$_} ? $spec{$_} : '' }
+                             qw(colour size family bold italic line_height);
+        $cache{$key} ||= PDF::Make::Builder::Font->new(%spec);
+        push @out, { font => $cache{$key}, text => $run->{text} };
+    }
+    return \@out;
+}
+
 sub add {
     my ($self, $builder) = @_;
+
+    my $runs = runs $self;
+    return $self->_add_runs($builder) if ref $runs eq 'ARRAY' && @$runs;
 
     my $page = $builder->page;
     my $canvas = $page->canvas;
@@ -275,6 +317,118 @@ sub add {
     return $self;
 }
 
+# Styled-run rendering. Deliberately a separate path from add() above: the
+# single-font code there produces bytes that existing documents depend on,
+# and the safest way to keep them is not to touch it. The two agree on where
+# lines break for single-run input, which t/45-runs.t asserts directly.
+sub _add_runs {
+    my ($self, $builder) = @_;
+
+    my $page   = $builder->page;
+    my $canvas = $page->canvas;
+    my $rruns  = $self->_resolve_runs($builder);
+    return $self unless @$rruns;
+
+    my $line_spacing = spacing $self;
+    $line_spacing = 0 if !defined($line_spacing) || $line_spacing < 0;
+
+    my $pad = padding $self;
+    $pad = 0 if !defined($pad) || $pad < 0;
+
+    my $text_w = ($self->w // $page->width) - (2 * $pad);
+    $text_w = 1 if $text_w < 1;
+    my $cx = ($self->x // $page->content_x) + $pad;
+    my $cy = $self->y;
+    $cy = $page->cursor_y if !defined $cy;
+    $cy -= $pad;
+
+    my $indent_w = 0;
+    my $ind = indent $self;
+    if ($ind > 0) {
+        $indent_w = $rruns->[0]{font}->space_width * $ind;
+    }
+
+    my $lines = PDF::Make::Builder::Runs->layout(
+        runs     => $rruns,
+        width    => $text_w,
+        indent_w => $indent_w,
+    );
+    return $self unless @$lines;
+
+    my $al           = align $self;
+    my $can_overflow = overflow $self;
+    my %ensured;
+
+    for my $idx (0 .. $#$lines) {
+        my $line = $lines->[$idx];
+        my $lh   = $line->{lh};
+
+        if ($cy - $lh < $page->bottom_y) {
+            if ($page->has_next_column) {
+                $page->next_column;
+                $cx     = $page->content_x + $pad;
+                $cy     = $page->cursor_y - $pad;
+                $text_w = $page->width - (2 * $pad);
+                $text_w = 1 if $text_w < 1;
+            } elsif ($can_overflow) {
+                $builder->add_page(
+                    page_size  => $page->page_size,
+                    padding    => $page->padding,
+                    columns    => $page->columns,
+                    background => $page->background,
+                );
+                $page   = $builder->page;
+                $canvas = $page->canvas;
+                %ensured = ();          # font resources are per page
+                $cx     = $page->content_x + $pad;
+                $cy     = $page->cursor_y - $pad;
+                $text_w = $page->width - (2 * $pad);
+                $text_w = 1 if $text_w < 1;
+            } else {
+                last;
+            }
+        }
+
+        # One baseline per line, set by the tallest run on it, so a larger or
+        # bold segment sits on the same line as its neighbours instead of
+        # drifting.
+        my $baseline_y = $cy - $line->{size};
+
+        my $tx = $cx;
+        if ($al eq 'center') {
+            $tx = $cx + ($text_w - $line->{w}) / 2;
+        } elsif ($al eq 'right') {
+            $tx = $cx + $text_w - $line->{w};
+        } elsif ($line->{is_first}) {
+            $tx += $indent_w;
+        }
+
+        $canvas->BT;
+        for my $seg (@{ $line->{segs} }) {
+            my $font = $seg->{font};
+            my $key  = "$font";
+            my $res  = $ensured{$key} ||= $font->ensure_loaded($page->xs_page);
+            my ($r, $g, $b) = $font->hex_to_rgb($font->colour);
+            $canvas->rg($r, $g, $b)
+                   ->Tf($res, $font->size)
+                   ->Tm(1, 0, 0, 1, $tx, $baseline_y)
+                   ->Tj($seg->{text});
+            $tx += $seg->{w};
+        }
+        $canvas->ET;
+
+        $cy -= $lh;
+        $cy -= $line_spacing if $idx < $#$lines;
+    }
+
+    my $final_y = $cy - (margin $self) - $line_spacing - $pad;
+    $page->y($final_y);
+    end_w $self, $lines->[-1]{w};
+    end_y $self, $cy;
+
+    return $self;
+}
+
 1;
 
 __END__
@@ -306,7 +460,29 @@ line breaking, alignment, indentation, and automatic page overflow.
 
 =item B<text> (Str, required)
 
-The text content to render.
+The text content to render. When C<runs> is given this is the plain string
+behind them, which tagged output and extraction read; C<add_text> derives it
+for you.
+
+=item B<runs> (ArrayRef)
+
+Styled inline runs, for text whose style changes mid-sentence:
+
+    $pdf->add_text(runs => [
+        { text => 'Amount due: ' },
+        { text => '1,240.00', bold => 1 },
+        { text => ' by 30 September.', italic => 1, colour => '#aa0000' },
+    ]);
+
+Each run is a hashref of C<text> plus any of C<bold>, C<italic>, C<colour>,
+C<size>, C<family> and C<line_height>, each defaulting to the block font.
+Lines break across run boundaries, and a line's baseline and height come from
+the largest run on it, so a bigger or bolder segment makes room for itself.
+
+When C<runs> is absent the original single-font path renders the block, and
+its output is unchanged - documents produced before runs existed still render
+byte for byte as they did. For a single run the two paths choose the same
+line breaks, which C<t/45-runs.t> asserts against the shipped algorithm.
 
 =item B<align> (Str, default C<'left'>)
 

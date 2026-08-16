@@ -1,0 +1,4 @@
+{"shop":{"name":"The Corner Shop","address":"2 High Street, Leeds LS1 1AA"},
+ "items":[{"name":"Coffee, 250g","price":6.5},{"name":"Oat milk","price":1.85},
+          {"name":"Almond croissant","price":2.4}],
+ "total":10.75,"footer":"Thank you. Returns within 28 days with this receipt."}

@@ -1,0 +1,20 @@
+<doc page-size="A4" margin="40">
+  <style h1="size:18;line-height:22" h2="size:11;line-height:13;colour:#0f3460" text="size:9" />
+  <header>{% bank.name %} statement</header>
+  <footer>{% account.holder %} - account {% account.number %}</footer>
+  <h1>Statement {% period %}</h1>
+  <row>
+    <cell weight="1" pad="6" bg="#eef2f7">Opening balance
+      {% opening | money %}</cell>
+    <cell weight="1" pad="6" bg="#eef2f7" align="right">Closing balance
+      {% closing | money %}</cell>
+  </row>
+  <h2>Transactions</h2>
+  <table>
+    <tr><th weight="2">Date</th><th weight="5">Detail</th><th align="right">In</th><th align="right">Out</th></tr>
+    {% for t in transactions %}
+    <tr><td>{% t.date %}</td><td>{% t.detail %}</td><td align="right">{% t.in %}</td><td align="right">{% t.out %}</td></tr>
+    {% end %}
+  </table>
+  <text size="8" colour="#666666" spacing="8">Interest is calculated daily and paid monthly. Contact us within 60 days about any entry you do not recognise.</text>
+</doc>

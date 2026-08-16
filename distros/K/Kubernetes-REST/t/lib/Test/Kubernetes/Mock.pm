@@ -16,9 +16,6 @@ my $json = JSON::MaybeXS->new->pretty->canonical;
 # Real IO backends hand back response bodies as bytes - so must the mock.
 my $wire_json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 
-# Keep kubeconfig object alive so temp cert files aren't deleted
-my $_kubeconfig;
-
 # Check if we should use live cluster
 # Requires TEST_KUBERNETES_REST_KUBECONFIG to be set explicitly (safety measure)
 sub is_live {
@@ -46,9 +43,10 @@ sub live_api {
         unless $ENV{TEST_KUBERNETES_REST_KUBECONFIG};
     my %args = (kubeconfig_path => $ENV{TEST_KUBERNETES_REST_KUBECONFIG});
     $args{context_name} = $ENV{TEST_KUBERNETES_REST_CONTEXT} if $ENV{TEST_KUBERNETES_REST_CONTEXT};
-    # Keep kubeconfig alive so temp cert files aren't deleted
-    $_kubeconfig = Kubernetes::REST::Kubeconfig->new(%args);
-    return $_kubeconfig->api;
+    # api() returns a self-contained Kubernetes::REST instance: cert/key material
+    # is copied into Kubernetes::REST::Server as PEM strings or file paths, so
+    # nothing here needs to outlive this call.
+    return Kubernetes::REST::Kubeconfig->new(%args)->api;
 }
 
 # Record a response to mock file

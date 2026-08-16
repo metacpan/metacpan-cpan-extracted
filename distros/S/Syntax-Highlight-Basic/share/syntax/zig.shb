@@ -1,13 +1,46 @@
-# Syntax file for zig
-# Converted from: zig.vim
-# Conversion date: 2026-07-13
-
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for Zig
+# Curated by hand: Vim's zig.vim relies on \v "very magic" regex and
+# < / > word-boundary atoms which vim-syntax-to-shb cannot safely translate,
+# and most keywords are defined indirectly via clusters/contains=.
 language: zig
 extensions: zig
 
-[keyword:Todo]
-TODO
+[keyword:Conditional]
+if else switch orelse
+
+[keyword:Repeat]
+while for
+
+[keyword:Exception]
+try catch defer errdefer
+
+[keyword:Statement]
+fn return break continue async await suspend resume test unreachable and or
+
+[keyword:StorageClass]
+const var comptime pub export extern packed inline threadlocal usingnamespace
+
+[keyword:Structure]
+struct enum union error
+
+[keyword:Type]
+i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 usize isize f16 f32 f64 f128 bool void
+anyerror anytype comptime_int comptime_float type
 
 [match:Type]
-pattern: \v<[iu][1-9]\d*>
+pattern: \b[iu][1-9][0-9]*\b
 
+[match:Macro]
+pattern: @\w+
+
+[match:Comment]
+pattern: //.*$
+
+[match:Number]
+pattern: \b(?:0x[0-9a-fA-F_]+|0b[01_]+|0o[0-7_]+|\d[\d_]*(?:\.[\d_]+)?(?:[eE][+-]?\d+)?)\b
+
+[region:String]
+start: "
+end: "
+escape: \

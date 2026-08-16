@@ -62,6 +62,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/PDF/Make.pm',
     ABSTRACT_FROM    => 'lib/PDF/Make.pm',
     LICENSE          => 'artistic_2',
+    EXE_FILES        => ['bin/pdfmake'],
     MIN_PERL_VERSION => '5.010001',
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     OBJECT           => join(' ', @obj),

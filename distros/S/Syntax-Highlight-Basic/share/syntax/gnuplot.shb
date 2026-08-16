@@ -1,6 +1,6 @@
 # Syntax file for gnuplot
 # Converted from: gnuplot.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: gnuplot
 extensions: gnuplot
@@ -185,9 +185,6 @@ pattern: \*\*
 [match:Operator]
 pattern: &&
 
-[match:Operator]
-pattern: ||
-
 [match:Keyword]
 pattern: \btransparent\b
 
@@ -197,4 +194,12 @@ pattern: @\w*
 [region:Special]
 start: \s*!
 end: $
+
+[region:Comment]
+start: #
+end: $
+
+[region:String]
+start: "
+end: "
 

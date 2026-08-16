@@ -1,6 +1,6 @@
 package Regexp::Compare;
 
-require 5.036_000;
+require 5.040_000;
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(is_less_or_equal);
 our @EXPORT = qw();
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 require XSLoader;
 XSLoader::load('Regexp::Compare', $VERSION);

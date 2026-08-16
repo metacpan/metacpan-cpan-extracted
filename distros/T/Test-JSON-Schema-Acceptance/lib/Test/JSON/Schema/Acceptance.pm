@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.036-3-ga8fe3f6
+package Test::JSON::Schema::Acceptance; # git description: v1.037-13-gee49d85
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.037';
+our $VERSION = '1.038';
 
 use 5.020;
 use Moo;
@@ -29,8 +29,8 @@ use Types::Standard 1.016003 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMeth
 use Types::Common::Numeric 'PositiveOrZeroInt';
 use Path::Tiny 0.069;
 use List::Util 1.33 qw(any max sum0);
-use Ref::Util qw(is_plain_arrayref is_plain_hashref is_ref);
 use Git::Wrapper;
+use B;
 use namespace::clean;
 
 # specification version => metaschema URI
@@ -150,7 +150,8 @@ sub acceptance {
     # this is essentially what `bin/jsonschema_suite remote` does: resolves the filename against the
     # base uri to determine the absolute schema location of each resource.
     my $base = 'http://localhost:1234';
-    $ctx->note('adding resources from '.$self->additional_resources.' with the base URI "'.$base.'"...');
+    my %note_seen;
+    my $resource_basename = $self->additional_resources->basename;  # "remotes"
     $self->additional_resources->visit(
       sub ($path, @) {
         return if not $path->is_file or $path !~ /\.json$/;
@@ -158,8 +159,11 @@ sub acceptance {
         # version-specific resources are stored in a subdirectory by version:
         # skip resource files that are marked as being for an unsupported draft
         my $relative_path = $path->relative($self->additional_resources);
-        my ($topdir) = split qr{/}, $relative_path, 2;
+        my ($topdir, $rest) = split qr{/}, $relative_path, 2;
         return if $topdir =~ /^(?:draft(?:[3467]|2019-09|2020-12)|v1)\z/ and not grep $topdir eq $_, $self->supported_specifications->@*;
+
+        $ctx->note('adding resource'.($rest//'' =~ m{/} ? 's' : '').' from '.$resource_basename.'/'.$topdir.' with the base URI "'.$base.'"...')
+          if not $note_seen{$resource_basename.'/'.$topdir}++;
 
         my $data = $self->json_deserialize($path->slurp_raw);
         my $uri = $base.'/'.$relative_path;
@@ -210,10 +214,10 @@ sub acceptance {
         die 'specification_version unknown: cannot evaluate schema against metaschema'
           if not $self->_has_specification;
 
-        my $metaschema_uri = is_plain_hashref($test_group->{schema}) && $test_group->{schema}{'$schema'}
+        my $metaschema_uri = ref $test_group->{schema} eq 'HASH' && $test_group->{schema}{'$schema'}
           ? $test_group->{schema}{'$schema'}
           : METASCHEMA->{$self->specification};
-        my $metaschema_schema = { '$ref' => $metaschema_uri };
+        my $metaschema_schema = $metaschema_uri;
         my $result = $options->{validate_data}
           ? $options->{validate_data}->($metaschema_schema, $test_group->{schema})
           : $options->{validate_json_string}->($metaschema_schema, $self->json_serialize($test_group->{schema}));
@@ -371,15 +375,15 @@ sub _mutation_check ($self, $data) {
     if (not defined $node->[1]) {
       next;
     }
-    if (is_plain_arrayref($node->[1])) {
+    if (ref $node->[1] eq 'ARRAY') {
       push @nodes, map [ $node->[0].'/'.$_, $node->[1][$_] ], 0 .. $node->[1]->$#*;
       push @error_paths, $node->[0] if tied($node->[1]->@*);
     }
-    elsif (is_plain_hashref($node->[1])) {
+    elsif (ref $node->[1] eq 'HASH') {
       push @nodes, map [ $node->[0].'/'.(s!~!~0!gr =~ s!/!~1!gr), $node->[1]{$_} ], keys $node->[1]->%*;
       push @error_paths, $node->[0] if tied($node->[1]->%*);
     }
-    elsif (is_ref($node->[1])) {
+    elsif (ref $node->[1]) {
       next; # boolean or bignum
     }
     else {
@@ -488,6 +492,7 @@ sub _build_results_text ($self) {
   my @lines;
   sub _pad ($s, $rest) { sprintf('%-29s', $s) . $rest }
   push @lines, _pad('generated with:', ref($self).' '.$self->VERSION);
+  push @lines, _pad('on perl: ', $^V);
 
   my $test_dir = $self->test_dir;
   my $orig_dir = $self->_build_test_dir;
@@ -532,7 +537,7 @@ sub _build_results_text ($self) {
   push @lines, map sprintf('%-'.$length.'s % 5d       % 4d  % 4d', $_->@{qw(file pass todo_fail fail)}),
     $self->results->@*;
 
-  my $total = +{ map { my $type = $_; $type => sum0(map $_->{$type}, $self->results->@*) } qw(pass todo_fail fail) };
+  my $total = +{ map do { my $type = $_; $type => sum0(map $_->{$type}, $self->results->@*) }, qw(pass todo_fail fail) };
   push @lines, '-'x($length + 23);
   push @lines, sprintf('%-'.$length.'s % 5d      % 5d % 5d', 'TOTAL', $total->@{qw(pass todo_fail fail)});
 
@@ -555,7 +560,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.037
+version 1.038
 
 =head1 SYNOPSIS
 

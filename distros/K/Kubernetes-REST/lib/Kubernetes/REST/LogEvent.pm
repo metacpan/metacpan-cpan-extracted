@@ -1,5 +1,5 @@
 package Kubernetes::REST::LogEvent;
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 # ABSTRACT: A single log line from the Kubernetes Pod Log API
 use Moo;
 use Types::Standard qw(Str);
@@ -22,7 +22,7 @@ Kubernetes::REST::LogEvent - A single log line from the Kubernetes Pod Log API
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -41,13 +41,17 @@ Represents a single log line from the Kubernetes Pod Log API. Wraps the raw text
 
 =head2 line
 
-The log line text. Does not include the trailing newline.
+Required. The log line text. Does not include the trailing newline.
 
 =head1 SEE ALSO
 
 =over
 
+=item * L<Kubernetes::REST> - Main API client
+
 =item * L<Kubernetes::REST/log> - Pod Log API documentation
+
+=item * L<Kubernetes::REST::WatchEvent> - Analogous event object for the Watch API
 
 =item * L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#read-log-pod-v1-core> - Kubernetes Pod log API reference
 
@@ -74,7 +78,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

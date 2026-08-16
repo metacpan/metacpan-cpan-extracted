@@ -1,6 +1,6 @@
 # Syntax file for fortran
 # Converted from: fortran.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: fortran
 extensions: fortran
@@ -160,4 +160,12 @@ pattern: \bthreadidx%[xyz]\b
 
 [match:Error]
 pattern: ^.{4}\d\S
+
+[region:String]
+start: '
+end: '
+
+[region:String]
+start: "
+end: "
 

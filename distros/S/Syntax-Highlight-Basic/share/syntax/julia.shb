@@ -1,13 +1,50 @@
-# Syntax file for julia
-# Converted from: julia.vim
-# Conversion date: 2026-07-13
-
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for Julia
+# Curated by hand: Vim's julia.vim relies on \v "very magic" regex and
+# < / > word-boundary atoms which vim-syntax-to-shb cannot safely translate,
+# and most keywords are defined indirectly via clusters/contains=.
 language: julia
-extensions: julia
+extensions: julia jl
 
-[keyword:Todo]
-FIXME TODO XXX
+[keyword:Conditional]
+if elseif else
 
-[match:Keyword]
-pattern: \bwhere\b
+[keyword:Repeat]
+for while
 
+[keyword:Statement]
+function end break continue return do begin quote throw where isa in
+
+[keyword:Exception]
+try catch finally
+
+[keyword:Include]
+using import export
+
+[keyword:StorageClass]
+local global const let mutable
+
+[keyword:Structure]
+struct abstract primitive type module macro
+
+[keyword:Boolean]
+true false
+
+[match:Comment]
+pattern: #.*$
+
+[region:Comment]
+start: #=
+end: =#
+
+[match:Number]
+pattern: \b(?:0x[0-9a-fA-F_]+|0b[01_]+|0o[0-7_]+|\d[\d_]*(?:\.[\d_]+)?(?:[eE][+-]?\d+)?)\b
+
+[region:String]
+start: """
+end: """
+
+[region:String]
+start: "
+end: "
+escape: \

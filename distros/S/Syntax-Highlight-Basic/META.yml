@@ -22,5 +22,5 @@ requires:
   File::Find: '0'
   File::ShareDir: '0'
   perl: '5.016'
-version: v0.1.1
+version: v0.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

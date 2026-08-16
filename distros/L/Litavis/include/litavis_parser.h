@@ -18,17 +18,19 @@
 #  endif
 #endif
 
-/* opendir/readdir/closedir are hidden behind __STRICT_ANSI__ on MinGW
- * when compiled with -std=c99; request POSIX extensions explicitly. */
-#ifdef __MINGW32__
-#  ifndef _XOPEN_SOURCE
-#    define _XOPEN_SOURCE 700
-#  endif
-#endif
-
 #include <stdio.h>
-#include <dirent.h>
 #include <sys/stat.h>
+#ifdef _WIN32
+/* Every Windows toolchain takes the FindFirstFile compat header, MinGW
+ * included: MinGW's <dirent.h> hides struct dirent and
+ * opendir/readdir/closedir behind __STRICT_ANSI__ under -std=c99, and a
+ * feature macro defined this late (perl.h already pulled the libc
+ * headers) cannot bring them back - the _XOPEN_SOURCE define that sat
+ * here through 0.04 never worked. */
+#  include "litavis_dirent_win.h"
+#else
+#  include <dirent.h>
+#endif
 
 /* ── Parser context ───────────────────────────────────────── */
 

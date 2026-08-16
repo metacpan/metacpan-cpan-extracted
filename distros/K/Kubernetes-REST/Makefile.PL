@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A Perl REST Client for the Kubernetes API",
-  "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de>, Jose Luis Martinez Torres <jlmartin\@cpan.org>",
+  "AUTHOR" => "Torsten Raudssus <getty\@cpan.org>, Jose Luis Martinez Torres <jlmartin\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "apache",
   "NAME" => "Kubernetes::REST",
   "PREREQ_PM" => {
-    "IO::K8s" => "1.105",
+    "IO::K8s" => "1.107",
     "IO::Socket::SSL" => 0,
     "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.106",
+  "VERSION" => "1.107",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "IO::K8s" => "1.105",
+  "IO::K8s" => "1.107",
   "IO::Socket::SSL" => 0,
   "JSON::MaybeXS" => 0,
   "LWP::UserAgent" => 0,

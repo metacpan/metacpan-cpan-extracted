@@ -24,7 +24,11 @@ lib/Net/Async/MCP/Transport/InProcess.pm
 lib/Net/Async/MCP/Transport/Stdio.pm
 t/00_load.t
 t/10_inprocess.t
+t/15_client.t
 t/20_stdio.t
+t/30_http.t
+t/40_errors.t
+t/50_subscriptions.t
 t/author-pod-syntax.t
 t/bin/test_mcp_server.pl
 t/release-changes_has_content.t

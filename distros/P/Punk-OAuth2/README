@@ -1,0 +1,51 @@
+Punk-OAuth2
+
+OAuth2 and OpenID Connect client (social login) for the Punk web
+framework: "Log in with Google / GitHub / any OIDC provider" using the
+authorization-code flow with PKCE, signed single-use state, and
+id_token verification through Crypt::JWS.
+
+	package MyApp;
+	use Punk;
+	use Punk::Plugin::OAuth2;
+
+	plugin 'OAuth2';
+	session secret => secret('session_key'), expires => '7d';
+
+	oauth2 google => {
+		preset        => 'google',
+		client_id     => secret('oauth.google_id'),
+		client_secret => secret('oauth.google_secret'),
+	};
+
+	oauth2_login '/auth' => {
+		on_login => 'Auth#on_login',
+		base_url => 'https://app.example.com',
+	};
+
+The flow crypto, token exchange, JWKS handling, and id_token
+verification run in XS over the Crypt::JWS, File::Raw::JSON, and Fetch C
+ABIs; the Perl layer is Punk registration glue.
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Requires Crypt::JWS, File::Raw::JSON, and Fetch (their C ABI headers at
+build time), and Punk 0.04+.
+
+SUPPORT AND DOCUMENTATION
+
+	perldoc Punk::OAuth2
+	perldoc Punk::Plugin::OAuth2
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+	The Artistic License 2.0 (GPL Compatible)

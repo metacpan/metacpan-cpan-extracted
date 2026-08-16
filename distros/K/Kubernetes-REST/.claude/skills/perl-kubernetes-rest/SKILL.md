@@ -61,6 +61,29 @@ $api->delete('Pod', 'my-pod', namespace => 'default');
 
 All return typed IO::K8s objects (not hashrefs). Lists return IO::K8s::List.
 
+## Status — needs the /status subresource (since 1.107)
+
+Once a resource has a status subresource — every CRD declaring a `status` entry under
+`subresources`, plus the built-in kinds that always had one (Pod, Node, Deployment,
+PersistentVolumeClaim, …) — the API server **strips the `status` stanza from every write
+to the main endpoint** and still answers 2xx. `create`, `update`, `patch` and server-side
+apply all look like they worked and store nothing.
+
+```perl
+# PATCH .../status — default patch type is merge, not strategic:
+# custom resources answer 415 to a strategic merge patch
+my $node = $api->patch_status('OCPNode', 'cp-1',
+    namespace => 'ocp',
+    patch     => { status => { phase => 'Ready', ip => '10.0.0.7' } },
+);
+$api->patch_status($node, patch => { status => { phase => 'Ready' } });
+
+# PUT .../status — full replace, needs a current resourceVersion, 409 on conflict
+# (status is a typed nested object, not a plain hashref — mutate it in place)
+$node->status->phase('Ready');
+my $updated = $api->update_status($node);
+```
+
 ## Watch
 
 ```perl

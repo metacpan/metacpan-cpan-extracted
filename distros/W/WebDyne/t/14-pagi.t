@@ -97,7 +97,7 @@ sub main {
     #
     note(fastcwd());
     ok(my $app_cr=WebDyne::PAGI->new(root=>File::Spec->catdir(fastcwd(), 't'))->to_app());
-    ok(my $test_or=PAGI::Test::Client->new(app => $app_cr));
+    ok(my $test_or=PAGI::Test::Client->new(app => $app_cr, raise_app_exceptions => 1));
 
     
     #  Repeat as required
@@ -141,7 +141,14 @@ sub main {
                 
                 #  Get results
                 #
-                ok(my $res=$test_or->get(basename($test_cn) || $test_cn));
+                my $request_path=basename($test_cn) || $test_cn;
+                my $res=eval { $test_or->get($request_path) };
+                my $err=$@;
+                ok($res, "PAGI renders $request_path without throwing");
+                if ($err) {
+                    diag("PAGI exception while rendering $test_cn: $err");
+                    next;
+                }
                 my $html_live=$res->content();
                 #diag("live: $html_live");
                 

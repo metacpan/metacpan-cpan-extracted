@@ -4,7 +4,7 @@ use warnings;
 
 use Getopt::Yath;
 
-our $VERSION = '2.000016';
+our $VERSION = '2.000017';
 
 my @BEGIN_ARGS;
 
@@ -90,13 +90,13 @@ specified multiple times.
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-L<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/App-Yath-Script/>.
 
 =head1 MAINTAINERS
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 
@@ -104,7 +104,7 @@ L<http://github.com/Test-More/Test2-Harness/>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 

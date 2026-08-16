@@ -1,9 +1,80 @@
 Revision history for Net-OAuth
 
+0.32   Sun 16 Aug 00:51:04 BST 2026
+       [Security]
+       - The Net::OAuth smart_require function no longer memoizes
+         failures, which allowed attackers to exhaust memory with
+         requests for invalid signature methods. CVE-2026-72888
+
+       - Net::OAuth::Client no longer allows silent downgrades from
+         OAuth 1.0a to 1.0 when the remote provider drops the
+         oauth_verifier.  The behavior can be re-enabled with the
+         allow_v1a_downgrade option. CVE-2026-72887
+
+       [Bug Fixes]
+       - RSA-SHA1 now pins PKCS#1 v1.5 padding and the SHA-1 hash rather
+         than inheriting Crypt::OpenSSL::RSA's defaults, which have drifted
+         (SHA-256 in 0.29_01, RSA-PSS in 0.35). Against 0.35 and later this
+         produced RSA-PSS signatures that no RFC 5849 3.4.3 compliant server
+         will accept. Reported as Debian #1142954.
+
+       [Other]
+       - Switched to use Crypt::SysRandom for generating random bytes.
+
+       [Tests]
+       - t/02-rsa.t asserts the signature base string separately from the
+         signature, so a failure distinguishes base-string construction from
+         the crypto layer.
+
+       - t/02-rsa.t skips with a diagnostic on Crypt::OpenSSL::RSA 0.35
+         through 0.37, which disabled the PKCS#1 v1.5 padding that OAuth
+         RSA-SHA1 requires; 0.38 re-enabled it.
+
+       [Toolchain]
+       - Recommend Crypt::OpenSSL::RSA 0.38 or later for RSA-SHA1.
+
+       - Declared MIN_PERL_VERSION as 5.008001, the floor imposed by URI
+         and MIME::Base32.
+
+       - Added GitHub Actions CI covering perl 5.16 through latest, and a
+         matrix pinning the Crypt::OpenSSL::RSA versions that bracket the
+         padding change behind Debian #1142954.
+
+       - Added author tests under xt/, guarded by AUTHOR_TESTING.
+
+       - Corrected the AUTHOR metadata, which credited only the current
+         maintainer. Keith Grennan is the author and copyright holder;
+         Robert Rothenberg maintains.
+
+       - Updated .mailmap and the AUTHOR POD to canonicalise on reachable
+         addresses, as cpan.org no longer forwards mail.
+
+       - MANIFEST now ships CONTRIBUTING.md, and no longer lists the
+         generated META.json and META.yml, which distmeta writes into the
+         distribution directory regardless.
+
+       [Documentation]
+       - Removed the Dancer demo application and rewrote the SYNOPSIS and
+         README to be framework-agnostic. The demo linked to a domain that
+         is now parked.
+
+       - Added =encoding utf8 to Net::OAuth, which had a non-ASCII
+         contributor name in its POD without one.
+
+       [Documentation]
+       - Added missing version and timestamp to Changes for v0.31.
+
+       - Added missing acknowledgement to Changes for v0.31.
+
+       - Added CONTRIBUTORS section to the POD.
+
+       - Added a "How to Contribute" document.
+
+0.31   Thu, 03 Apr 2025 16:51 BST
        [Bug Fixes]
        - Added missing dependency RT#70407.
 
-       - Removed use of Digest::HMAC_SHA1.
+       - Removed use of Digest::HMAC_SHA1 (thanks to James Raspass).
 
        [Documentation]
        - Updated Changes for v0.29 with CVE.

@@ -22,10 +22,9 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => 0
   },
   "TEST_REQUIRES" => {
-    "MCP" => "0.11",
     "Test2::V0" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +36,6 @@ my %FallbackPrereqs = (
   "Future::AsyncAwait" => "0.66",
   "IO::Async" => "0.78",
   "JSON::MaybeXS" => 0,
-  "MCP" => "0.11",
   "Test2::V0" => 0
 );
 

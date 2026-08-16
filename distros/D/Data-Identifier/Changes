@@ -1,3 +1,9 @@
+v0.35  2026-08-16Z
+    - Corrected calculation of displaynames from Data::TagDB::Tag objects
+    - Workaround a bug in I18N::LangTags::List
+      A fix was already merged upstream, this workaround is for versions of Perl currently in use
+    - Corrected some comments
+
 v0.34  2026-08-05Z
     - Updated documentation
     - Added chat0w identifier to those identifiers we already have in Data::Identifier::Wellknown

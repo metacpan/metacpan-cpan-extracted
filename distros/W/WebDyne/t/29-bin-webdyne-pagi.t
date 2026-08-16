@@ -13,7 +13,7 @@ ok(-f $script, 'webdyne.pagi script exists');
 
 BEGIN {
     my @missing;
-    for my $m (qw(PAGI::Server PAGI::Middleware::Builder PAGI::Request PAGI::Response PAGI::SSE PAGI::WebSocket Future::AsyncAwait)) {
+    for my $m (qw(PAGI::Server PAGI::Tools PAGI::Middleware::Builder PAGI::Request PAGI::Response PAGI::SSE PAGI::WebSocket Future::AsyncAwait)) {
         eval "require $m; 1" or push @missing, $m;
     }
     @missing and plan skip_all => 'Skipping webdyne.pagi script test: missing ' . join(', ', @missing);

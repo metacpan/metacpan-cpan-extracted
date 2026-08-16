@@ -1,26 +1,52 @@
 # Syntax file for objc
 # Converted from: objc.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: objc
 extensions: objc
 
+[keyword:Conditional]
+else if switch
+
 [keyword:Constant]
-NO NSASCIIStringEncoding NSActivityAutomaticTerminationDisabled
-NSActivityBackground NSActivityIdleDisplaySleepDisabled
-NSActivityIdleSystemSleepDisabled NSActivityLatencyCritical
-NSActivitySuddenTerminationDisabled NSActivityUserInitiated
-NSActivityUserInitiatedAllowingIdleSystemSleep NSAdminApplicationDirectory
-NSAlignAllEdgesInward NSAlignAllEdgesNearest NSAlignAllEdgesOutward
-NSAlignHeightInward NSAlignHeightNearest NSAlignHeightOutward
-NSAlignMaxXInward NSAlignMaxXNearest NSAlignMaxXOutward NSAlignMaxYInward
-NSAlignMaxYNearest NSAlignMaxYOutward NSAlignMinXInward NSAlignMinXNearest
-NSAlignMinXOutward NSAlignMinYInward NSAlignMinYNearest NSAlignMinYOutward
-NSAlignRectFlipped NSAlignWidthInward NSAlignWidthNearest NSAlignWidthOutward
-NSAllApplicationsDirectory NSAllDomainsMask NSAllLibrariesDirectory
-NSAnchoredSearch NSApplicationDirectory NSApplicationScriptsDirectory
-NSApplicationSupportDirectory NSArgumentDomain NSAtomicWrite
-NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
+BUFSIZ CHAR_BIT CHAR_MAX CHAR_MIN CLOCKS_PER_SEC DBL_DIG DBL_EPSILON
+DBL_MANT_DIG DBL_MAX DBL_MAX_10_EXP DBL_MAX_EXP DBL_MIN DBL_MIN_10_EXP
+DBL_MIN_EXP E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT EAGAIN EALREADY
+EBADF EBADMSG EBUSY ECANCELED ECHILD ECONNABORTED ECONNREFUSED ECONNRESET
+EDEADLK EDESTADDRREQ EDOM EDQUOT EEXIST EFAULT EFBIG EHOSTUNREACH EIDRM EILSEQ
+EINPROGRESS EINTR EINVAL EIO EISCONN EISDIR ELOOP EMFILE EMLINK EMSGSIZE
+EMULTIHOP ENAMETOOLONG ENETDOWN ENETRESET ENETUNREACH ENFILE ENOBUFS ENODATA
+ENODEV ENOENT ENOEXEC ENOLCK ENOLINK ENOMEM ENOMSG ENOPROTOOPT ENOSPC ENOSR
+ENOSTR ENOSYS ENOTBLK ENOTCONN ENOTDIR ENOTEMPTY ENOTRECOVERABLE ENOTSOCK
+ENOTSUP ENOTTY ENXIO EOF EOPNOTSUPP EOVERFLOW EOWNERDEAD EPERM EPIPE EPROTO
+EPROTONOSUPPORT EPROTOTYPE ERANGE EROFS ESPIPE ESRCH ESTALE ETIME ETIMEDOUT
+ETXTBSY EWOULDBLOCK EXDEV EXIT_FAILURE EXIT_SUCCESS FILENAME_MAX FLT_DIG
+FLT_EPSILON FLT_MANT_DIG FLT_MAX FLT_MAX_10_EXP FLT_MAX_EXP FLT_MIN
+FLT_MIN_10_EXP FLT_MIN_EXP FLT_RADIX FLT_ROUNDS FOPEN_MAX HUGE_VAL INT16_MAX
+INT16_MIN INT32_MAX INT32_MIN INT64_MAX INT64_MIN INT8_MAX INT8_MIN INTMAX_MAX
+INTMAX_MIN INTPTR_MAX INTPTR_MIN INT_FAST16_MAX INT_FAST16_MIN INT_FAST32_MAX
+INT_FAST32_MIN INT_FAST64_MAX INT_FAST64_MIN INT_FAST8_MAX INT_FAST8_MIN
+INT_LEAST16_MAX INT_LEAST16_MIN INT_LEAST32_MAX INT_LEAST32_MIN
+INT_LEAST64_MAX INT_LEAST64_MIN INT_LEAST8_MAX INT_LEAST8_MIN INT_MAX INT_MIN
+LC_ALL LC_COLLATE LC_CTYPE LC_MONETARY LC_NUMERIC LC_TIME LDBL_DIG
+LDBL_EPSILON LDBL_MANT_DIG LDBL_MAX LDBL_MAX_10_EXP LDBL_MAX_EXP LDBL_MIN
+LDBL_MIN_10_EXP LDBL_MIN_EXP LLONG_MAX LLONG_MIN LONG_MAX LONG_MIN L_tmpnam
+MB_CUR_MAX MB_LEN_MAX M_1_PI M_2_PI M_2_SQRTPI M_E M_LN10 M_LN2 M_LOG10E
+M_LOG2E M_PI M_PI_2 M_PI_4 M_SQRT1_2 M_SQRT2 NDEBUG NO NSASCIIStringEncoding
+NSActivityAutomaticTerminationDisabled NSActivityBackground
+NSActivityIdleDisplaySleepDisabled NSActivityIdleSystemSleepDisabled
+NSActivityLatencyCritical NSActivitySuddenTerminationDisabled
+NSActivityUserInitiated NSActivityUserInitiatedAllowingIdleSystemSleep
+NSAdminApplicationDirectory NSAlignAllEdgesInward NSAlignAllEdgesNearest
+NSAlignAllEdgesOutward NSAlignHeightInward NSAlignHeightNearest
+NSAlignHeightOutward NSAlignMaxXInward NSAlignMaxXNearest NSAlignMaxXOutward
+NSAlignMaxYInward NSAlignMaxYNearest NSAlignMaxYOutward NSAlignMinXInward
+NSAlignMinXNearest NSAlignMinXOutward NSAlignMinYInward NSAlignMinYNearest
+NSAlignMinYOutward NSAlignRectFlipped NSAlignWidthInward NSAlignWidthNearest
+NSAlignWidthOutward NSAllApplicationsDirectory NSAllDomainsMask
+NSAllLibrariesDirectory NSAnchoredSearch NSApplicationDirectory
+NSApplicationScriptsDirectory NSApplicationSupportDirectory NSArgumentDomain
+NSAtomicWrite NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
 NSAttributedStringEnumerationReverse NSAutosavedInformationDirectory
 NSBackwardsSearch NSBinarySearchingFirstEqual NSBinarySearchingInsertionIndex
 NSBinarySearchingLastEqual NSBuddhistCalendar NSBundleDidLoadNotification
@@ -301,11 +327,28 @@ NSWindowsCP1250StringEncoding NSWindowsCP1251StringEncoding
 NSWindowsCP1252StringEncoding NSWindowsCP1253StringEncoding
 NSWindowsCP1254StringEncoding NSWindowsNTOperatingSystem
 NSWrapCalendarComponents NSYearCalendarUnit NSYearForWeekOfYearCalendarUnit
-NSZeroPoint NSZeroRect NSZeroSize Nil YES __OBJC2__ __OBJC__ __clang__ assign
-copy nil nonatomic null_resettable readonly readwrite retain strong weak
+NSZeroPoint NSZeroRect NSZeroSize NULL Nil PTRDIFF_MAX PTRDIFF_MIN RAND_MAX
+SCHAR_MAX SCHAR_MIN SEEK_CUR SEEK_END SEEK_SET SHRT_MAX SHRT_MIN SIGABRT
+SIGALRM SIGBUS SIGCHLD SIGCONT SIGFPE SIGHUP SIGILL SIGINFO SIGINT SIGKILL
+SIGPIPE SIGPOLL SIGPROF SIGQUIT SIGSEGV SIGSTOP SIGSYS SIGTERM SIGTRAP SIGTSTP
+SIGTTIN SIGTTOU SIGURG SIGUSR1 SIGUSR2 SIGVTALRM SIGWINCH SIGXCPU SIGXFSZ
+SIG_ATOMIC_MAX SIG_ATOMIC_MIN SIG_DFL SIG_ERR SIG_IGN SINT_MAX SINT_MIN
+SIZE_MAX SLONG_MAX SLONG_MIN SSHRT_MAX SSHRT_MIN STDERR_FILENO STDIN_FILENO
+STDOUT_FILENO TMP_MAX UCHAR_MAX UINT16_MAX UINT32_MAX UINT64_MAX UINT8_MAX
+UINTMAX_MAX UINTPTR_MAX UINT_FAST16_MAX UINT_FAST32_MAX UINT_FAST64_MAX
+UINT_FAST8_MAX UINT_LEAST16_MAX UINT_LEAST32_MAX UINT_LEAST64_MAX
+UINT_LEAST8_MAX UINT_MAX ULLONG_MAX ULONG_MAX USHRT_MAX WCHAR_MAX WCHAR_MIN
+WEOF WINT_MAX WINT_MIN YES _IOFBF _IOLBF _IONBF __DATE__ __FILE__ __FUNCTION__
+__GNUC__ __LINE__ __OBJC2__ __OBJC__ __PRETTY_FUNCTION__ __STDC_HOSTED__
+__STDC_VERSION__ __STDC__ __TIME__ __VA_ARGS__ __clang__ __func__ assign copy
+false nil nonatomic null_resettable readonly readwrite retain stderr stdin
+stdout strong true weak
 
 [keyword:Identifier]
 KeyType ObjectType
+
+[keyword:Label]
+case default
 
 [keyword:Macro]
 NSIntegerMax NSIntegerMin NSMaximumStringLength NSNotAPointerMapKey
@@ -319,16 +362,32 @@ NS_REQUIRES_PROPERTY_DEFINITIONS NS_REQUIRES_SUPER NS_RETURNS_INNER_POINTER
 NS_RETURNS_NOT_RETAINED NS_RETURNS_RETAINED NS_ROOT_CLASS
 NS_VALID_UNTIL_END_OF_SCOPE
 
+[keyword:Operator]
+_Alignof _Generic _Static_assert __alignof__ __imag__ __real__ __typeof__
+alignof sizeof static_assert typeof
+
+[keyword:Repeat]
+do for while
+
 [keyword:Statement]
-_cmd self super
+__asm__ _cmd asm break continue goto return self super
 
 [keyword:StorageClass]
-_Nonnull _Null_unspecified _Nullable __autoreleasing __block __bridge
-__bridge_retained __bridge_transfer __nonnull __null_unspecified __nullable
-__strong __unsafe_unretained __weak nonnull null_unspecified nullable
+_Alignas _Atomic _Nonnull _Noreturn _Null_unspecified _Nullable _Thread_local
+__attribute__ __autoreleasing __block __bridge __bridge_retained
+__bridge_transfer __const__ __extension__ __inline__ __nonnull __noreturn__
+__null_unspecified __nullable __restrict__ __strong __unsafe_unretained
+__volatile__ __weak alignas auto const extern inline nonnull noreturn
+null_unspecified nullable register restrict static thread_local volatile
+
+[keyword:Structure]
+enum struct union
+
+[keyword:Todo]
+FIXME TODO XXX
 
 [keyword:Type]
-BOOL CGFloat CGPoint CGRect CGSize Class IMP NSActivityOptions
+BOOL CGFloat CGPoint CGRect CGSize Class DIR FILE IMP NSActivityOptions
 NSAlignmentOptions NSAttributedStringEnumerationOptions
 NSBinarySearchingOptions NSCalculationError NSCalendarOptions NSCalendarUnit
 NSComparator NSComparisonResult NSDataBase64DecodingOptions
@@ -354,7 +413,61 @@ NSStringEncoding NSStringEncodingConversionOptions NSStringEnumerationOptions
 NSTaskTerminationReason NSTimeInterval NSTimeZoneNameStyle NSUInteger
 NSURLBookmarkCreationOptions NSURLBookmarkFileCreationOptions
 NSURLBookmarkResolutionOptions NSURLRelationship NSUncaughtExceptionHandler
-NSVolumeEnumerationOptions SEL __covariant __kindof id instancetype unichar
+NSVolumeEnumerationOptions SEL _Bool _Complex _Imaginary __complex__
+__covariant __kindof __label__ atomic_bool atomic_char atomic_char16_t
+atomic_char32_t atomic_int_fast16_t atomic_int_fast32_t atomic_int_fast64_t
+atomic_int_fast8_t atomic_int_least16_t atomic_int_least32_t
+atomic_int_least64_t atomic_int_least8_t atomic_intmax_t atomic_intptr_t
+atomic_llong atomic_long atomic_ptrdiff_t atomic_schar atomic_size_t
+atomic_uchar atomic_uint_fast16_t atomic_uint_fast32_t atomic_uint_fast64_t
+atomic_uint_fast8_t atomic_uint_least16_t atomic_uint_least32_t
+atomic_uint_least64_t atomic_uint_least8_t atomic_uintmax_t atomic_uintptr_t
+atomic_ullong atomic_ulong atomic_wchar_t bool char char16_t char32_t clock_t
+complex div_t double float fpos_t id imaginary instancetype int int16_t
+int32_t int64_t int8_t int_fast16_t int_fast32_t int_fast64_t int_fast8_t
+int_least16_t int_least32_t int_least64_t int_least8_t intmax_t intptr_t
+jmp_buf ldiv_t long max_align_t mbstate_t off_t ptrdiff_t short sig_atomic_t
+signed size_t ssize_t time_t u_int16_t u_int32_t u_int64_t u_int8_t uint16_t
+uint32_t uint64_t uint8_t uint_fast16_t uint_fast32_t uint_fast64_t
+uint_fast8_t uint_least16_t uint_least32_t uint_least64_t uint_least8_t
+uintmax_t uintptr_t unichar unsigned va_list void wchar_t wctrans_t wctype_t
+wint_t
+
+[keyword:Typedef]
+typedef
+
+[match:Character]
+pattern: L?'[^\\]'
+
+[match:Error]
+pattern: L?'\\[^'\"?\[a-zA-Z]befnrtv]'
+
+[match:Special]
+pattern: L?'\\['\"?\[a-zA-Z]befnrtv]'
+
+[match:Error]
+pattern: L?'\\[^'\"?\[a-zA-Z]bfnrtv]'
+
+[match:Special]
+pattern: L?'\\['\"?\[a-zA-Z]bfnrtv]'
+
+[match:Character]
+pattern: [Uu]'[^\\]'
+
+[match:Error]
+pattern: [Uu]'\\[^'\"?\[a-zA-Z]befnrtv]'
+
+[match:Special]
+pattern: [Uu]'\\['\"?\[a-zA-Z]befnrtv]'
+
+[match:Error]
+pattern: [Uu]'\\[^'\"?\[a-zA-Z]bfnrtv]'
+
+[match:Special]
+pattern: [Uu]'\\['\"?\[a-zA-Z]bfnrtv]'
+
+[match:Error]
+pattern: }
 
 [match:Constant]
 pattern: (?:(|\s)nullable(?:,|))
@@ -631,6 +744,36 @@ pattern: NSMapTable\s*\*
 
 [match:Type]
 pattern: NSPointerFunctions\s*\*
+
+[region:Comment]
+start: //
+end: $
+escape: \
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Comment]
+start: //
+end: $
+escape: \
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:String]
+start: "
+end: "
 
 [region:String]
 start: "

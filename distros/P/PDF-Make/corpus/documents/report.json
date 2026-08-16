@@ -1,0 +1,38 @@
+{
+   "metrics" : [
+      {
+         "before" : "11,120",
+         "change" : "+12%",
+         "name" : "Orders shipped",
+         "now" : "12,480"
+      },
+      {
+         "before" : "2.9 days",
+         "change" : "-28%",
+         "name" : "Average lead time",
+         "now" : "2.1 days"
+      },
+      {
+         "before" : "0.9%",
+         "change" : "-0.2pp",
+         "name" : "Returns",
+         "now" : "0.7%"
+      },
+      {
+         "before" : "3.81",
+         "change" : "-10%",
+         "name" : "Cost per order",
+         "now" : "3.44"
+      }
+   ],
+   "notes" : [
+      "The backlog cleared on 18 September, a week ahead of plan.",
+      "One supplier remains on watch after two late deliveries in August.",
+      "Headcount is unchanged at 34 full time equivalents."
+   ],
+   "report" : {
+      "period" : "Q3 2026",
+      "summary" : "Volumes rose against a flat headcount, and the backlog cleared in the final month.",
+      "title" : "Quarterly Operations Review"
+   }
+}

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::AllocationResult;
 # ABSTRACT: AllocationResult contains attributes of an allocated resource.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s allocationTimestamp => Time;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1beta2::AllocationResult - AllocationResult contains at
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 allocationTimestamp
 

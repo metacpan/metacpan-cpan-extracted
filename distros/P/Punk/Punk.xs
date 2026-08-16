@@ -56,10 +56,12 @@ static const frj_abi *punk_frj(pTHX) {
 #include "punk/punk_route.h"
 #include "punk/punk_response.h"
 #include "punk/punk_request.h"
+#include "punk/punk_accept.h"    /* Accept negotiation for respond_to     */
 #include "punk/punk_multipart.h" /* multipart/form-data + uploads      */
 #include "punk/punk_context.h"    /* the per-request context object        */
 #include "punk/punk_cookie.h"     /* build a Set-Cookie value              */
 #include "punk/punk_session.h"    /* signed cookie sessions (SHA-256/HMAC) */
+#include "punk/punk_flash.h"      /* one-request messages over the session */
 #include "punk/punk_ua.h"        /* the shared outbound Fetch agent        */
 #include "punk/punk_log.h"       /* the level-based logger               */
 #include "punk/punk_dispatch.h"   /* the Open::API C ABI consumer (phase 6) */
@@ -74,6 +76,9 @@ static const frj_abi *punk_frj(pTHX) {
 #include "punk/punk_dbi.h"       /* the shipped DBI model backend           */
 #include "punk/punk_model.h"     /* the model tier: DSL, metadata, contract */
 #include "punk/punk_csrf.h"      /* single-use tokens over the session */
+#include "punk/punk_password.h"  /* PBKDF2 password hashing (needs session+csrf) */
+#include "punk/punk_auth.h"      /* the auth battery's guard + denial path */
+#include "punk/punk_validate.h"  /* collecting validation, on the jsf ABI */
 #include "punk/punk_stencil.h"   /* the shipped view engine, on Stencil's ABI */
 #include "punk/punk_markdown.h"  /* the `markdown` docs mount (needs static,
                                   * stencil and request) */
@@ -88,6 +93,7 @@ static const frj_abi *punk_frj(pTHX) {
                                       C ABI (needs punk_dbi.h + punk_future.h) */
 #include "punk/punk_import.h"     /* `use Punk` and the DSL table */
 #include "punk/punk_cors.h"       /* cross-origin: preflight + headers   */
+#include "punk/punk_headers.h"    /* security headers on every response  */
 #include "punk/punk_compile.h"    /* the boot compiler (needs static+serve) */
 
 /* Every Punk::Router is an IV-ref to a pr_router (new through compile through
@@ -118,7 +124,11 @@ INCLUDE: xs/serve.xs
 INCLUDE: xs/views.xs
 INCLUDE: xs/stencil.xs
 INCLUDE: xs/csrf.xs
+INCLUDE: xs/password.xs
+INCLUDE: xs/auth.xs
+INCLUDE: xs/validate.xs
 INCLUDE: xs/cors.xs
+INCLUDE: xs/headers.xs
 INCLUDE: xs/websocket.xs
 INCLUDE: xs/wshandshake.xs
 INCLUDE: xs/sse.xs

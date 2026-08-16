@@ -1,5 +1,22 @@
 Revision history for WebDyne
 
+3.013 2026-08-16
+
+    * Normalized generated no_* wrapper options to numeric booleans so
+      --dump_opt output is stable across Perl and Data::Dumper versions.
+
+    * Made the webdyne.apache wrapper tests less sensitive to whitespace in
+      Apache::TestRunPerl argument dumps and avoided macOS APXS probing by
+      using a fake test apxs helper.
+
+    * Improved PAGI smoke-test diagnostics by allowing PAGI::Test::Client
+      application exceptions to surface in t/14-pagi.t instead of comparing
+      only against a generic Internal Server Error response.
+
+    * Added PAGI::Tools to the webdyne.pagi wrapper test prerequisite gate,
+      matching the wrapper's runtime check and avoiding noisy failures on
+      partial PAGI installations.
+
 3.012 2026-08-10
 
     * Disabled the redundant webdyne.apache ulimit probe, avoiding noisy

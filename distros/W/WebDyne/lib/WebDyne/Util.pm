@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -58,7 +58,7 @@ require Exporter;
 
 #  Version information
 #
-$VERSION='3.012';
+$VERSION='3.014';
 
 
 #  Var to hold package wide hash, for data shared across package, and error stack
@@ -771,6 +771,10 @@ sub apache_startup {
         '-one-process',
         '-start-httpd',
     );
+    unshift(@argv, '-apxs',  $ENV{'APACHE_TEST_APXS'})
+        if $ENV{'APACHE_TEST_APXS'};
+    unshift(@argv, '-httpd', $ENV{'APACHE_TEST_HTTPD'})
+        if $ENV{'APACHE_TEST_HTTPD'};
 
     $runner->run(@argv);
     return $runner;
@@ -871,7 +875,7 @@ Andrew Speer <andrew.speer@isolutions.com.au>
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 # Syntax file for lisp
 # Converted from: lisp.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: lisp
 extensions: lisp
@@ -327,7 +327,7 @@ end: "
 start: "
 end: "
 
-[region:String]
-start: "
-end: "
+[region:Comment]
+start: #|
+end: |#
 

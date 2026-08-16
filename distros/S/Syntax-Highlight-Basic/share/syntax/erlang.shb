@@ -1,6 +1,6 @@
 # Syntax file for erlang
 # Converted from: erlang.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: erlang
 extensions: erlang

@@ -13,22 +13,15 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
-use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
+use parent qw(Lingua::Generic::Interface::Word);
 
 use constant {
     _GENERATOR          => Data::Identifier->new(uuid => 'e2afa39e-fd57-45f8-89fd-8662b275cc68')->register,
     _GENERATOR_UINTEGER => Data::Identifier->new(uuid => '53863a15-68d4-448d-bd69-a9b19289a191')->register,
     _GENERATOR_SINTEGER => Data::Identifier->new(uuid => 'e8aa9e01-8d37-4b4b-8899-42ca0a2a906f')->register,
 };
-
-use overload (
-    '""'    => \&as_string,
-    'eq'    => sub {  $_[0]->eq($_[1]) },
-    'ne'    => sub { !$_[0]->eq($_[1]) },
-    'cmp'   => sub {  $_[0]->cmp($_[1]) },
-);
 
 my @_word_mora = qw(
     ba be bi bo bu
@@ -265,10 +258,7 @@ sub combine {
 }
 
 
-sub as_string {
-    my ($self) = @_;
-    return $self->{string};
-}
+# NOTE: Implemented via Lingua::Generic::Interface::Word
 
 
 sub as_number {
@@ -364,19 +354,7 @@ sub get_modifier_by_master_mora {
 }
 
 
-sub eq {
-    my ($self, $other, @opts) = @_;
-
-    croak 'Stray options passed' if scalar @opts;
-
-    return 1 if !defined($self) && !defined($other);
-    return undef unless defined($self) && defined($other);
-
-    $self  = __PACKAGE__->new(from => $self) unless eval {$self->isa(__PACKAGE__)};
-    $other = __PACKAGE__->new(from => $other) unless eval {$other->isa(__PACKAGE__)};
-
-    return $self->as_string eq $other->as_string;
-}
+# NOTE: Implemented via Lingua::Generic::Interface::Word
 
 
 sub cmp {
@@ -401,14 +379,7 @@ sub cmp {
         }
     }
 
-    {
-        my $str_self  = $self->as_string;
-        my $str_other = $other->as_string;
-
-        return $str_self cmp $str_other;
-    }
-
-    croak 'BUG!';
+    return $self->SUPER::cmp($other);
 }
 
 
@@ -503,6 +474,8 @@ sub as {
     return $id->as($as, @opts);
 }
 
+sub ise { goto &Data::Identifier::Interface::Simple::ise } # overridden using tail-call
+
 sub displayname {
     my ($self, @opts) = @_;
     return $self->as_string if scalar(@opts) == 0;
@@ -529,7 +502,7 @@ Lingua::famibeib::Word - module to interact with the famibeib words
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -541,7 +514,10 @@ version v0.06
 
 This package is used to store individual famibeib words and query them about their properties.
 
-This module inherits from L<Data::Identifier::Interface::Simple>, and L<Data::Identifier::Interface::Subobjects>.
+This module inherits from
+L<Lingua::Generic::Interface::Word> (since v0.07),
+L<Data::Identifier::Interface::Simple> (since v0.01),
+and L<Data::Identifier::Interface::Subobjects> (since v0.01).
 Instances are overloaded so they will stringify to their string representation as per L</as_string>.
 
 =head1 METHODS
@@ -614,6 +590,8 @@ In order to do so the last given modifier always wins.
 (since v0.01)
 
 Returns the string representation of the word.
+
+See also: L<Lingua::Generic::Interface::Word/as_string>.
 
 =head2 as_number
 
@@ -694,6 +672,8 @@ L</new> with the type C<from> is used.
 
 The operators L<perlop/eq> and L<perlop/ne> are overloaded to this method.
 
+See also: L<Lingua::Generic::Interface::Word/eq>.
+
 =head2 cmp
 
     my $val = $word->cmp($other); # $word must be non-undef
@@ -726,6 +706,8 @@ The order is stable
 The order is the same for C<$a-E<gt>cmp($b)> as for C<- $b-E<gt>cmp($a)>.
 
 =back
+
+See also: L<Lingua::Generic::Interface::Word/cmp>.
 
 =head2 is_verb
 
@@ -775,6 +757,8 @@ B<Note:>
 It is undefined (since v0.01) whether or not this will also register
 the corresponding L<Data::Identifier>.
 
+See also: L<Lingua::Generic::Interface::Word/register>.
+
 =head2 natural_language
 
     my Data::Identifier $natural_language = $word->natural_language;
@@ -785,6 +769,8 @@ Returns the natural language this word is in.
 
 For famibeib words it will always return famibeib.
 However this method might be useful together with other modules from the C<Lingua> namespace.
+
+See also: L<Lingua::Generic::Interface::Word/natural_language>.
 
 =head2 prefix
 

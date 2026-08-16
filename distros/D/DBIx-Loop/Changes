@@ -1,5 +1,12 @@
 Revision history for DBIx-Loop
 
+0.05    2026-08-15
+        - The pool no longer dies of SIGPIPE when a worker's peer is
+          already gone.
+        - t/10 and t/11 now skip on a Mojolicious too old to ship
+          Mojo::Promise (pre-7.54): the gate tested Mojo::IOLoop but the
+          adapter needs both.
+
 0.04    2026-08-13
         - The IO::Async adapter no longer dies in to_native / new_future on
           IO::Async before 0.805 paired with Future 0.50 or newer.

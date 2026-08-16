@@ -9,7 +9,7 @@ use JQ::Lite::Filters;
 use JQ::Lite::Parser;
 use JQ::Lite::Util ();
 
-our $VERSION = '2.49';
+our $VERSION = '2.50';
 
 sub new {
     my ($class, %opts) = @_;
@@ -78,7 +78,7 @@ JQ::Lite - jq-compatible JSON query engine in pure Perl (no external binaries)
 
 =head1 VERSION
 
-Version 2.49
+Version 2.50
 
 =head1 SYNOPSIS
 
@@ -668,8 +668,8 @@ the supplied suffix. Non-string values yield C<false>.
 
 Example:
 
-  .title | endswith("World")     # => true
-  .tags  | endswith("n")         # => [false, true, false]
+  .title | endswith("World")   # => true
+  .tags  | endswith("n")       # => [false, true, false]
 
 =item * substr(start[, length])
 
@@ -819,8 +819,8 @@ Example:
 
 =item * floor()
 
-Rounds numbers down to the nearest integer. Scalars and array elements that
-look like numbers are rounded downward, leaving non-numeric values untouched.
+Rounds numbers down to the nearest integer. Scalars and array elements that look
+like numbers are rounded downward, leaving non-numeric values untouched.
 
 Example:
 

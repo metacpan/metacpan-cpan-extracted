@@ -1,6 +1,6 @@
 # Syntax file for pike
 # Converted from: pike.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: pike
 extensions: pike
@@ -81,4 +81,32 @@ typedef
 
 [match:Error]
 pattern: '\\[^'\"?\[a-zA-Z]befnrtv]'
+
+[region:String]
+start: "
+end: $
+
+[region:String]
+start: "
+end: $
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:String]
+start: "
+end: "
 

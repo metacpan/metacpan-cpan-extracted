@@ -1,6 +1,6 @@
 # Syntax file for cmake
 # Converted from: cmake.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: cmake
 extensions: cmake
@@ -808,4 +808,16 @@ FIXME TODO XXX
 
 [match:Special]
 pattern: (?:\\\\|\\"|\\n|\\t)
+
+[region:Underlined]
+start: \[
+end: ]
+
+[region:Type]
+start: ${
+end: }
+
+[region:Special]
+start: $ENV{
+end: }
 

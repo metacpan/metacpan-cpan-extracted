@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk (); 
 
-our $VERSION = '0.02';
+our $VERSION = '0.12';
 
 1;
 
@@ -249,6 +249,10 @@ no C<use Punk::Model>.
 =head1 SEE ALSO
 
 L<Punk::Model::DBI>, L<Punk>, L<Punk::Context>, L<JSON::Schema::Fast>.
+
+L<Punk::Validate> is the other half of the same coin: the model
+croaks at write time because bad data reaching it is a bug, while the
+request edge collects, because bad input there is the expected case.
 
 =head1 AUTHOR
 

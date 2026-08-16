@@ -112,6 +112,11 @@ typedef struct pdfmake_struct_tree {
 pdfmake_struct_tree_t *pdfmake_doc_create_struct_tree(pdfmake_doc_t *doc);
 pdfmake_struct_tree_t *pdfmake_doc_struct_tree(pdfmake_doc_t *doc);
 
+/* Release the structure tree. Called from pdfmake_doc_free; the tree is
+ * calloc-allocated rather than arena-allocated, so it does not go with the
+ * arena. */
+void pdfmake_doc_free_struct_tree(pdfmake_doc_t *doc);
+
 /* ── Structure elements ────────────────────────────────── */
 
 pdfmake_struct_elem_t *pdfmake_struct_elem_create(

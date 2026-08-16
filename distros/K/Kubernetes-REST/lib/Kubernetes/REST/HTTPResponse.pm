@@ -1,5 +1,5 @@
 package Kubernetes::REST::HTTPResponse;
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 # ABSTRACT: HTTP response object
 use Moo;
 use Types::Standard qw/Str Int/;
@@ -25,7 +25,7 @@ Kubernetes::REST::HTTPResponse - HTTP response object
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,9 @@ Internal HTTP response object used by L<Kubernetes::REST>.
 
 =head2 content
 
-The response body content.
+The response body content, as bytes: an IO backend must undo
+C<Content-Encoding> (e.g. gzip) but leave the charset alone, and never decode
+it itself. See L<Kubernetes::REST::Role::IO/Encoding contract>.
 
 =head2 status
 
@@ -51,6 +53,8 @@ The HTTP status code (e.g., 200, 404, 500).
 =head1 SEE ALSO
 
 =over
+
+=item * L<Kubernetes::REST> - Main API client
 
 =item * L<Kubernetes::REST::HTTPRequest> - Request object
 
@@ -79,7 +83,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Punk ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.12';
 
 1;
 
@@ -55,6 +55,16 @@ mount. See L<Punk::Mount::OpenAPI>.
 =head2 websocket ($path => $target, \%opts?)
 
 A WebSocket route under this scope; chainable. See L<Punk/websocket>.
+
+=head2 headers (%pairs)
+
+    $scope->headers('X-Frame-Options' => 'DENY',
+                    'Referrer-Policy' => undef);
+
+A response-header policy for this scope's prefix - the pairs the app-wide
+C<headers> keyword takes, applied ahead of it for requests under the
+prefix (including their C<404>s); an C<undef> value drops a header for the
+subtree. Chainable. See L<Punk::Headers/SCOPED POLICIES>.
 
 =head2 prefix
 

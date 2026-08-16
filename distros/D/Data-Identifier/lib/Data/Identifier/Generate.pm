@@ -32,7 +32,7 @@ use constant {
 };
 
 
-our $VERSION = v0.34;
+our $VERSION = v0.35;
 
 my %_multiplicity_prefix = (
     total   => '4.1',
@@ -295,7 +295,11 @@ sub language {
     my $name;
     my $identifier;
 
-    require I18N::LangTags::List;
+    {
+        local $_; # Workaround invalid usage in earlier versions of I18N::LangTags::List
+                  # Fix https://github.com/Perl/perl5/pull/24697 was merged 2026-08-13
+        require I18N::LangTags::List;
+    }
 
     $opts{request}      = $req;
     $opts{style}        = 'id-based';
@@ -665,7 +669,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.34
+version v0.35
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::DeviceClassConfiguration;
 # ABSTRACT: DeviceClassConfiguration is used in DeviceClass.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s opaque => 'Resource::V1beta1::OpaqueDeviceConfiguration';
@@ -20,7 +20,7 @@ IO::K8s::Api::Resource::V1beta1::DeviceClassConfiguration - DeviceClassConfigura
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 opaque
 

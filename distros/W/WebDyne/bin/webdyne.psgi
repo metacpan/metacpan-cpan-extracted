@@ -2,7 +2,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -44,7 +44,7 @@ use WebDyne::PSGI::Constant;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='3.012';
+$VERSION='3.014';
 
 
 #  Check for supporting modules
@@ -115,7 +115,7 @@ if (!caller || exists $ENV{PAR_TEMP}) {
         'dump_opt|dump-opt|opt'
         )
     );
-    map {$opt{"no_${_}"} = !($opt{$_})} map { /^([^|!:=+]+)/ } grep {!ref($_) && /\!$/} @opt;
+    map {$opt{"no_${_}"} = $opt{$_} ? 0 : 1} map { /^([^|!:=+]+)/ } grep {!ref($_) && /\!$/} @opt;
     
     
     #  Last argument is root directory
@@ -433,7 +433,7 @@ Andrew Speer <andrew.speer@isolutions.com.au>
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -441,6 +441,7 @@ the same terms as the Perl 5 programming language system itself.
 Full license text is available at:
 
 <http://dev.perl.org/licenses/>
+
 
 =end markdown
 
@@ -668,6 +669,7 @@ Supplies the relevant WebDyne settings used by the PSGI modules.
 =back
 
 When the PSGI app is built, the wrapper also reads local WebDyne configuration from C<DOCUMENT_ROOT/.webdyne.conf.pl>. This applies both when C<webdyne.psgi> is launched directly and when it is loaded by an external PSGI server such as C<plackup> or C<starman>.
+
 
 =head1 AUTHOR
 

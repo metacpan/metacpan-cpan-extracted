@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1beta1::SandboxClaim;
 # ABSTRACT: Request for sandbox allocation from a warm pool
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::APIObject
     api_version     => 'extensions.agents.x-k8s.io/v1beta1',
     resource_plural => 'sandboxclaims';
@@ -44,7 +44,7 @@ IO::K8s::AgentSandbox::V1beta1::SandboxClaim - Request for sandbox allocation fr
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 DESCRIPTION
 

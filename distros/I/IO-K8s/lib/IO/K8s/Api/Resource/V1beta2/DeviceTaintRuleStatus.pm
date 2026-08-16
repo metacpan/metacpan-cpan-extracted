@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::DeviceTaintRuleStatus;
 # ABSTRACT: DeviceTaintRuleStatus provides information about an on-going pod eviction.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s conditions => ['Meta::V1::Condition'];
@@ -20,7 +20,7 @@ IO::K8s::Api::Resource::V1beta2::DeviceTaintRuleStatus - DeviceTaintRuleStatus p
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 conditions
 

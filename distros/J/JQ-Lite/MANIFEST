@@ -4,8 +4,11 @@ CONTRIBUTING.md
 docs/cli-contract.md
 docs/DESIGN.md
 docs/FUNCTIONS.md
+docs/library-contract.md
+docs/library-integration.md
 install-jq-lite.ps1
 lib/JQ/Lite.pm
+lib/JQ/Lite/Error.pm
 lib/JQ/Lite/Expression.pm
 lib/JQ/Lite/Filters.pm
 lib/JQ/Lite/Parser.pm
@@ -83,6 +86,7 @@ t/keys.t
 t/keys_unsorted.t
 t/leaf_paths.t
 t/length.t
+t/library_errors.t
 t/limit.t
 t/map.t
 t/map_values.t

@@ -6,7 +6,7 @@ use warnings;
 
 use DBIx::Loop ();   # the XS bootstrap defines this package's methods
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 1;
 

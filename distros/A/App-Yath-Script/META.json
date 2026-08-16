@@ -1,7 +1,7 @@
 {
    "abstract" : "Script initialization and utility functions for Test2::Harness",
    "author" : [
-      "Chad Granum <exodist@cpan.org>"
+      "Chad Granum <exodist7@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
@@ -45,14 +45,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Test-More/Test2-Harness/issues"
+         "web" : "https://github.com/Test-More/App-Yath-Script/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Test-More/Test2-Harness/"
+         "url" : "https://github.com/Test-More/App-Yath-Script/"
       }
    },
-   "version" : "2.000016",
+   "version" : "2.000017",
    "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

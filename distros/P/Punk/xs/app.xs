@@ -63,19 +63,43 @@ config_object(self)
     OUTPUT:
         RETVAL
 
-# route($method, $path, $target, $guards): $self->{router}->add(...). Chains.
+# route($method, $path, $target, $guards, $opts?): $self->{router}->add(...)
+# plus, for a `validate` option, a record in validate_routes for
+# compile_extras to compile once at boot. Unknown option keys croak. Chains.
 SV *
-route(self, method, path, target, guards = &PL_sv_undef)
+route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
         SV *self
         SV *method
         SV *path
         SV *target
         SV *guards
+        SV *opts
     CODE:
     {
         HV *h = app_hv(aTHX_ self);
         SV *router = app_get(aTHX_ h, K_ROUTER);
         SV *argv[8], *r;
+        if (SvOK(opts)) {
+            HV *oh; HE *he; SV **vp;
+            if (!(SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV))
+                croak("Punk: route options must be a hashref");
+            oh = (HV *)SvRV(opts);
+            hv_iterinit(oh);
+            while ((he = hv_iternext(oh))) {
+                STRLEN kl; const char *k = HePV(he, kl);
+                if (!strEQ(k, K_VALIDATE))
+                    croak("Punk: unknown route option '%s'", k);
+            }
+            vp = hv_fetchs(oh, K_VALIDATE, 0);
+            if (vp && *vp && SvOK(*vp)) {
+                HV *rec = newHV();
+                (void)hv_stores(rec, K_METHOD,   newSVsv(method));
+                (void)hv_stores(rec, K_PATH,     newSVsv(path));
+                (void)hv_stores(rec, K_VALIDATE, newSVsv(*vp));
+                av_push(app_av(aTHX_ h, K_VALIDATE_ROUTES),
+                        newRV_noinc((SV *)rec));
+            }
+        }
         argv[0] = sv_2mortal(newSVpvs(K_METHOD)); argv[1] = method;
         argv[2] = sv_2mortal(newSVpvs(K_PATH));   argv[3] = path;
         argv[4] = sv_2mortal(newSVpvs(K_TARGET)); argv[5] = target;
@@ -245,6 +269,288 @@ cors(self, ...)
             (void)hv_store(h, K_CORS, (I32)strlen(K_CORS),
                            newRV_noinc((SV *)cfg), 0);
         }
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
+# headers('Content-Security-Policy' => "default-src 'self'", ...) or
+# headers(\%opts): freeze the security-header policy on the app. Bare
+# `headers` is the safe default set; a header name with an undef value drops
+# that default; every value else is a literal header string. Chains.
+SV *
+headers(self, ...)
+        SV *self
+    CODE:
+    {
+        HV *h = app_hv(aTHX_ self);
+        HV *cfg = newHV();
+        int i;
+        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+            HE *e; HV *given = (HV *)SvRV(ST(1));
+            hv_iterinit(given);
+            while ((e = hv_iternext(given))) {
+                STRLEN kl; const char *k = HePV(e, kl);
+                (void)hv_store(cfg, k, (I32)kl,
+                               newSVsv(hv_iterval(given, e)), 0);
+            }
+        }
+        else for (i = 1; i + 1 < items; i += 2) {
+            STRLEN kl; const char *k = SvPV_const(ST(i), kl);
+            (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
+        }
+        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) {
+            SvREFCNT_dec((SV *)cfg);
+            (void)hv_delete(h, K_HEADERS, (I32)strlen(K_HEADERS), G_DISCARD);
+        }
+        else {
+            /* a value must be a literal header string (or undef to drop a
+             * default) - a reference here is always a mistake */
+            HE *e;
+            hv_iterinit(cfg);
+            while ((e = hv_iternext(cfg))) {
+                STRLEN kl; const char *k = HePV(e, kl);
+                SV *v = hv_iterval(cfg, e);
+                if (!kl || v == NULL) {
+                    SvREFCNT_dec((SV *)cfg);
+                    croak("Punk: headers needs header names as keys");
+                }
+                if (SvROK(v)) {
+                    SV *msg = sv_2mortal(newSVpvf(
+                        "Punk: headers value for '%.*s' must be a string "
+                        "(or undef to drop a default), not a reference",
+                        (int)kl, k));
+                    SvREFCNT_dec((SV *)cfg);
+                    croak("%s", SvPV_nolen(msg));
+                }
+            }
+            (void)hv_store(h, K_HEADERS, (I32)strlen(K_HEADERS),
+                           newRV_noinc((SV *)cfg), 0);
+        }
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
+# auth(model => 'User', ...) or auth(\%opts): freeze the authentication
+# config on the app. Unknown keys croak at keyword time - a typo in an auth
+# option must not become a silently-open door. `auth 0` turns it off. Chains.
+SV *
+auth(self, ...)
+        SV *self
+    CODE:
+    {
+        HV *h = app_hv(aTHX_ self);
+        HV *cfg = newHV();
+        HV *fields = newHV();
+        int i;
+        static const char *known[] =
+            { "model", "token_model", "session_key", "login_path",
+              "iterations", "roles", "rank", "fields" };
+        static const char *fknown[] =
+            { "id", "email", "password", "verified" };
+        (void)hv_stores(cfg, "session_key", newSVpvs("user_id"));
+        (void)hv_stores(cfg, "login_path",  newSVpvs("/login"));
+        (void)hv_stores(fields, "id",       newSVpvs("id"));
+        (void)hv_stores(fields, "email",    newSVpvs("email"));
+        (void)hv_stores(fields, "password", newSVpvs("password_hash"));
+        (void)hv_stores(fields, "verified", newSVpvs("verified"));
+        (void)hv_stores(cfg, "fields", newRV_noinc((SV *)fields));
+        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+            HE *e; HV *given = (HV *)SvRV(ST(1));
+            hv_iterinit(given);
+            while ((e = hv_iternext(given))) {
+                STRLEN kl; const char *k = HePV(e, kl);
+                (void)hv_store(cfg, k, (I32)kl,
+                               newSVsv(hv_iterval(given, e)), 0);
+            }
+        }
+        else for (i = 1; i + 1 < items; i += 2) {
+            STRLEN kl; const char *k = SvPV_const(ST(i), kl);
+            (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
+        }
+        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) {
+            SvREFCNT_dec((SV *)cfg);
+            (void)hv_delete(h, K_AUTH, (I32)strlen(K_AUTH), G_DISCARD);
+        }
+        else {
+            HE *e;
+            hv_iterinit(cfg);
+            while ((e = hv_iternext(cfg))) {
+                STRLEN kl; const char *k = HePV(e, kl);
+                int ok = 0, j;
+                for (j = 0; j < 8; j++)
+                    if (strEQ(k, known[j])) { ok = 1; break; }
+                if (!ok) {
+                    SV *msg = sv_2mortal(newSVpvf(
+                        "Punk: unknown auth option '%.*s'", (int)kl, k));
+                    SvREFCNT_dec((SV *)cfg);
+                    croak("%s", SvPV_nolen(msg));
+                }
+            }
+            {   /* a fields hashref merges over the defaults */
+                SV **f = hv_fetchs(cfg, "fields", 0);
+                if (f && *f && SvRV(*f) != (SV *)fields) {
+                    HV *merged = newHV(), *given;
+                    HE *fe;
+                    int j;
+                    if (!(SvROK(*f) && SvTYPE(SvRV(*f)) == SVt_PVHV)) {
+                        SvREFCNT_dec((SV *)cfg);
+                        croak("Punk: auth fields must be a hashref");
+                    }
+                    given = (HV *)SvRV(*f);
+                    (void)hv_stores(merged, "id",       newSVpvs("id"));
+                    (void)hv_stores(merged, "email",    newSVpvs("email"));
+                    (void)hv_stores(merged, "password", newSVpvs("password_hash"));
+                    (void)hv_stores(merged, "verified", newSVpvs("verified"));
+                    hv_iterinit(given);
+                    while ((fe = hv_iternext(given))) {
+                        STRLEN kl; const char *k = HePV(fe, kl);
+                        int ok = 0;
+                        for (j = 0; j < 4; j++)
+                            if (strEQ(k, fknown[j])) { ok = 1; break; }
+                        if (!ok) {
+                            SV *msg = sv_2mortal(newSVpvf(
+                                "Punk: unknown auth field '%.*s'",
+                                (int)kl, k));
+                            SvREFCNT_dec((SV *)merged);
+                            SvREFCNT_dec((SV *)cfg);
+                            croak("%s", SvPV_nolen(msg));
+                        }
+                        (void)hv_store(merged, k, (I32)kl,
+                                       newSVsv(hv_iterval(given, fe)), 0);
+                    }
+                    (void)hv_stores(cfg, "fields",
+                                    newRV_noinc((SV *)merged));
+                }
+            }
+            {
+                SV **it = hv_fetchs(cfg, "iterations", 0);
+                if (it && *it && SvOK(*it) && SvIV(*it) <= 0) {
+                    SvREFCNT_dec((SV *)cfg);
+                    croak("Punk: auth iterations must be positive");
+                }
+            }
+            (void)hv_store(h, K_AUTH, (I32)strlen(K_AUTH),
+                           newRV_noinc((SV *)cfg), 0);
+        }
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
+# auth_guard() / auth_guard(role => 'admin', verified => 1, on_denied =>
+# '404'|'403'|coderef): a guard coderef for `under`. The bare form runs
+# entirely in C. Croaks on unknown options.
+SV *
+auth_guard(self, ...)
+        SV *self
+    CODE:
+    {
+        HV *opts = newHV();
+        AV *cap;
+        int i;
+        static const char *known[] = { "role", "verified", "on_denied" };
+        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+            HE *e; HV *given = (HV *)SvRV(ST(1));
+            hv_iterinit(given);
+            while ((e = hv_iternext(given))) {
+                STRLEN kl; const char *k = HePV(e, kl);
+                (void)hv_store(opts, k, (I32)kl,
+                               newSVsv(hv_iterval(given, e)), 0);
+            }
+        }
+        else for (i = 1; i + 1 < items; i += 2) {
+            STRLEN kl; const char *k = SvPV_const(ST(i), kl);
+            (void)hv_store(opts, k, (I32)kl, newSVsv(ST(i + 1)), 0);
+        }
+        {
+            HE *e;
+            hv_iterinit(opts);
+            while ((e = hv_iternext(opts))) {
+                STRLEN kl; const char *k = HePV(e, kl);
+                int ok = 0, j;
+                for (j = 0; j < 3; j++)
+                    if (strEQ(k, known[j])) { ok = 1; break; }
+                if (!ok) {
+                    SV *msg = sv_2mortal(newSVpvf(
+                        "Punk: unknown auth_guard option '%.*s'",
+                        (int)kl, k));
+                    SvREFCNT_dec((SV *)opts);
+                    croak("%s", SvPV_nolen(msg));
+                }
+            }
+            {   /* on_denied is '403', '404' or a coderef - anything else is
+                 * a typo croaking now, not a request-time surprise */
+                SV **od = hv_fetchs(opts, "on_denied", 0);
+                if (od && *od && SvOK(*od)) {
+                    int fine = SvROK(*od)
+                               && SvTYPE(SvRV(*od)) == SVt_PVCV;
+                    if (!fine && !SvROK(*od)) {
+                        STRLEN ol; const char *o = SvPV_const(*od, ol);
+                        fine = ol == 3
+                               && (memEQ(o, "403", 3) || memEQ(o, "404", 3));
+                    }
+                    if (!fine) {
+                        SvREFCNT_dec((SV *)opts);
+                        croak("Punk: auth_guard on_denied takes '403', "
+                              "'404' or a coderef");
+                    }
+                }
+            }
+        }
+        cap = newAV();
+        av_push(cap, newSVsv(self));
+        av_push(cap, newRV_noinc((SV *)opts));
+        RETVAL = punk_closure(aTHX_ pauth_guard_cb, cap);
+    }
+    OUTPUT:
+        RETVAL
+
+# headers_scoped($prefix, \%pairs): the scope form of `headers`, reached via
+# $scope->headers(...) rather than a DSL keyword. Recorded with the scope's
+# accumulated prefix; to_app freezes the records longest-prefix-first, and
+# the dispatcher applies them ahead of the application-wide policy for
+# requests under the prefix. Chains.
+SV *
+headers_scoped(self, prefix, pairs)
+        SV *self
+        SV *prefix
+        SV *pairs
+    CODE:
+    {
+        HV *h = app_hv(aTHX_ self);
+        HV *cfg = newHV();
+        HV *rec;
+        HE *e; HV *given;
+        if (!(SvROK(pairs) && SvTYPE(SvRV(pairs)) == SVt_PVHV)) {
+            SvREFCNT_dec((SV *)cfg);
+            croak("Punk: headers_scoped takes a prefix and a hashref");
+        }
+        given = (HV *)SvRV(pairs);
+        hv_iterinit(given);
+        while ((e = hv_iternext(given))) {
+            STRLEN kl; const char *k = HePV(e, kl);
+            SV *v = hv_iterval(given, e);
+            if (!kl || v == NULL) {
+                SvREFCNT_dec((SV *)cfg);
+                croak("Punk: headers needs header names as keys");
+            }
+            if (SvROK(v)) {
+                SV *msg = sv_2mortal(newSVpvf(
+                    "Punk: headers value for '%.*s' must be a string "
+                    "(or undef to drop it here), not a reference",
+                    (int)kl, k));
+                SvREFCNT_dec((SV *)cfg);
+                croak("%s", SvPV_nolen(msg));
+            }
+            (void)hv_store(cfg, k, (I32)kl, newSVsv(v), 0);
+        }
+        rec = newHV();
+        (void)hv_stores(rec, K_PREFIX,
+            SvOK(prefix) ? newSVsv(prefix) : newSVpvs(""));
+        (void)hv_stores(rec, K_HEADERS, newRV_noinc((SV *)cfg));
+        av_push(app_av(aTHX_ h, K_HEADERS_SCOPED), newRV_noinc((SV *)rec));
         RETVAL = newSVsv(self);
     }
     OUTPUT:
@@ -581,15 +887,22 @@ database(self, ...)
     OUTPUT:
         RETVAL
 
-# model_class(@names): register model names. Chains.
+# model_class(@names): register model names. Bare `model;` turns
+# auto-discovery on explicitly - load everything under ${caller}::Model:: -
+# which also survives alongside named registrations (naming a model
+# normally switches auto off). Chains.
 SV *
 model_class(self, ...)
         SV *self
     CODE:
     {
-        AV *m = app_av(aTHX_ app_hv(aTHX_ self), K_MODELS);
+        HV *h = app_hv(aTHX_ self);
+        AV *m = app_av(aTHX_ h, K_MODELS);
         int i;
-        for (i = 1; i < items; i++) av_push(m, newSVsv(ST(i)));
+        if (items == 1)
+            (void)hv_stores(h, K_MODEL_AUTO, newSViv(1));
+        else
+            for (i = 1; i < items; i++) av_push(m, newSVsv(ST(i)));
         RETVAL = newSVsv(self);
     }
     OUTPUT:
@@ -653,6 +966,18 @@ on_error(self, code)
         SV *code
     CODE:
         (void)hv_stores(app_hv(aTHX_ self), K_ON_ERROR, newSVsv(code));
+        RETVAL = newSVsv(self);
+    OUTPUT:
+        RETVAL
+
+# on_not_found($code): set the 404 handler - same contract as on_error, a
+# reference return becomes the response. Chains.
+SV *
+on_not_found(self, code)
+        SV *self
+        SV *code
+    CODE:
+        (void)hv_stores(app_hv(aTHX_ self), K_ON_NOT_FOUND, newSVsv(code));
         RETVAL = newSVsv(self);
     OUTPUT:
         RETVAL
@@ -1077,6 +1402,43 @@ _apply_config(self, cfg)
                 else if (co && *co && !SvROK(*co) && SvTRUE(*co)) {
                     app_call_list(aTHX_ self, K_CORS,
                                   (AV *)sv_2mortal((SV *)newAV()));
+                }
+            }
+
+            /* headers: a mapping of header names, or `headers: true` for the
+             * bare default set */
+            {
+                SV **hd = hv_fetchs(c, K_HEADERS, 0);
+                if (hd && *hd && SvROK(*hd)
+                    && SvTYPE(SvRV(*hd)) == SVt_PVHV) {
+                    HV *oh = (HV *)SvRV(*hd); HE *e;
+                    AV *args = (AV *)sv_2mortal((SV *)newAV());
+                    hv_iterinit(oh);
+                    while ((e = hv_iternext(oh))) {
+                        av_push(args, newSVsv(hv_iterkeysv(e)));
+                        av_push(args, newSVsv(hv_iterval(oh, e)));
+                    }
+                    app_call_list(aTHX_ self, K_HEADERS, args);
+                }
+                else if (hd && *hd && !SvROK(*hd) && SvTRUE(*hd)) {
+                    app_call_list(aTHX_ self, K_HEADERS,
+                                  (AV *)sv_2mortal((SV *)newAV()));
+                }
+            }
+
+            /* auth: a mapping of options -> the auth keyword */
+            {
+                SV **at = hv_fetchs(c, K_AUTH, 0);
+                if (at && *at && SvROK(*at)
+                    && SvTYPE(SvRV(*at)) == SVt_PVHV) {
+                    HV *oh = (HV *)SvRV(*at); HE *e;
+                    AV *args = (AV *)sv_2mortal((SV *)newAV());
+                    hv_iterinit(oh);
+                    while ((e = hv_iternext(oh))) {
+                        av_push(args, newSVsv(hv_iterkeysv(e)));
+                        av_push(args, newSVsv(hv_iterval(oh, e)));
+                    }
+                    app_call_list(aTHX_ self, K_AUTH, args);
                 }
             }
 

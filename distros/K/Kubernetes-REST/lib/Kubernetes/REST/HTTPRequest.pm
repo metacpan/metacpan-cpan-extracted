@@ -1,5 +1,5 @@
 package Kubernetes::REST::HTTPRequest;
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 # ABSTRACT: HTTP request object
 use Moo;
 use Types::Standard qw/Str HashRef/;
@@ -56,7 +56,7 @@ Kubernetes::REST::HTTPRequest - HTTP request object
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,9 @@ Optional. L<Kubernetes::REST::Server> instance for building the full URL.
 
 =head2 credentials
 
-Optional. L<Kubernetes::REST::AuthToken> instance for authentication.
+Optional. Credentials for authentication: a L<Kubernetes::REST::AuthToken>, a
+L<Kubernetes::REST::AuthTokenFile>, or any other object with a C<token()>
+method.
 
 =head2 authenticate
 
@@ -106,11 +108,15 @@ Hashref of query parameters.
 
 =head2 content
 
-The request body content (typically JSON).
+The request body content (typically JSON). L<Kubernetes::REST> sets this as
+already UTF-8-encoded bytes; treat it as opaque and send it on the wire
+unchanged. See L<Kubernetes::REST::Role::IO/Encoding contract>.
 
 =head1 SEE ALSO
 
 =over
+
+=item * L<Kubernetes::REST> - Main API client
 
 =item * L<Kubernetes::REST::HTTPResponse> - Response object
 
@@ -139,7 +145,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

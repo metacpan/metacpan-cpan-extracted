@@ -7,6 +7,7 @@
 #include "pdfmake_page.h"
 #include "pdfmake_writer.h"
 #include "pdfmake_attach.h"
+#include "pdfmake_tag.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -71,6 +72,7 @@ void pdfmake_doc_free(pdfmake_doc_t *doc) {
             free(doc->pages[i]->annots);
         }
     }
+    pdfmake_doc_free_struct_tree(doc);   /* calloc'd, not from the arena */
     pdfmake_arena_free(doc->arena);
     free(doc->objects);
     free(doc->pages);       /* Page structs are in arena, just free the pointer array */
@@ -182,19 +184,41 @@ void pdfmake_doc_generate_id(pdfmake_doc_t *doc) {
         uint64_t counter;
     } seed;
     static uint64_t counter = 0;
+    time_t src;
     uint64_t h1;
     uint64_t h2;
 
     if (!doc) return;
 
-    seed.t = time(NULL);
-    seed.ptr = doc;
-    seed.count = doc->obj_count;
-    seed.counter = ++counter;
+    /* Zero the whole struct: it is hashed by bytes, and padding between the
+     * members is otherwise uninitialised, which would make the ID vary run
+     * to run even with every field pinned. */
+    memset(&seed, 0, sizeof(seed));
 
-    h1 = fnv1a_64(&seed, sizeof(seed));
-    seed.counter = ++counter;
-    h2 = fnv1a_64(&seed, sizeof(seed));
+    if (pdfmake_source_date(&src)) {
+        /* Reproducible mode: the pointer (ASLR) and the process-wide counter
+         * are exactly the two inputs that stop identical documents hashing
+         * alike, so both are dropped. Two renders of the same document then
+         * carry the same /ID, which is the intent - the ID identifies the
+         * document, not the run that produced it. */
+        seed.t     = src;
+        seed.ptr   = NULL;
+        seed.count = doc->obj_count;
+        seed.count += (size_t)doc->page_count * 1000003u;
+        seed.counter = 0;
+        h1 = fnv1a_64(&seed, sizeof(seed));
+        seed.counter = 1;
+        h2 = fnv1a_64(&seed, sizeof(seed));
+    } else {
+        seed.t = time(NULL);
+        seed.ptr = doc;
+        seed.count = doc->obj_count;
+        seed.counter = ++counter;
+
+        h1 = fnv1a_64(&seed, sizeof(seed));
+        seed.counter = ++counter;
+        h2 = fnv1a_64(&seed, sizeof(seed));
+    }
 
     /* Pack two 64-bit hashes into two 16-byte IDs */
     memcpy(doc->id1, &h1, 8);

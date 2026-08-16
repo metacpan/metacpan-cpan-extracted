@@ -105,5 +105,6 @@ t/03-output-ansi.t
 t/03-output-pygments.t
 t/06-integration.t
 t/07-cli.t
+t/08-no-thin-shb.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

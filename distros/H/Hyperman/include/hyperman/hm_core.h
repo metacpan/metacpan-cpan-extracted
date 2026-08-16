@@ -15,7 +15,33 @@
 #include "hm_parse.h"   /* hm_hline, hm_parse_index, hm_chunked_* */
 #include "hm_abi.h"     /* public C ABI: hm_abi table + callback typedefs */
 
+#if defined(HM_HAVE_SENDFILE_LINUX)
+#include <sys/sendfile.h>
+#elif defined(HM_HAVE_SENDFILE_FREEBSD) || defined(HM_HAVE_SENDFILE_MACOS)
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/uio.h>
+#endif
+
 typedef struct hm_loop hm_loop;
+
+/* A streaming response body (filehandle / IO-object PSGI bodies): instead
+ * of slurping the whole file into one SV, the connection drains its write
+ * buffer and refills it a chunk at a time - or hands the file straight to
+ * sendfile(2) on a plaintext socket. `sv` keeps the body (and so its fd)
+ * alive; kind 1 reads the fd at an explicit offset (pread), kind 2 pulls
+ * a getline object. At most HM_BSRC_CHUNK response-body bytes are ever
+ * buffered per connection. */
+#define HM_BSRC_CHUNK    65536
+#define HM_SENDFILE_MAX  (1 << 20)   /* bytes per sendfile(2) call */
+typedef struct {
+    int           kind;        /* 0 none, 1 regular-file fd, 2 getline    */
+    int           fd;          /* kind 1: borrowed from the body's handle */
+    off_t         off;         /* kind 1: next byte to read               */
+    UV            remaining;   /* bytes still owed to the client          */
+    SV           *sv;          /* the body, owned: keeps the fd alive     */
+    unsigned char nosf;        /* sendfile(2) refused; use the read path  */
+} hm_bsrc;
 typedef struct hm_conn hm_conn;
 
 /* A bound listening socket. The loop holds an array of these; a connection
@@ -69,6 +95,7 @@ struct hm_conn {
     unsigned char tls_r_wants_w;  /* SSL_read blocked wanting write  */
     unsigned char tls_w_wants_r;  /* SSL_write blocked wanting read  */
     unsigned char detached;       /* app took the socket (see hm_detach) */
+    hm_bsrc  bsrc;          /* streaming body being dripped, if any */
     int      last_status;   /* last response status/bytes (logging) */
     size_t   last_blen;
     char     peer[INET6_ADDRSTRLEN];  /* REMOTE_ADDR, filled at accept    */
@@ -171,6 +198,9 @@ static int hm_flush(pTHX_ hm_conn *c);
 static void hm_process(pTHX_ hm_conn *c);
 static int hm_queue_response(pTHX_ hm_conn *c, SV *resp);
 static void hm_close(pTHX_ hm_loop *loop, hm_conn *c);
+static void hm_wb_reserve(hm_conn *c, size_t need);
+static void hm_wb_put(hm_conn *c, const char *p, size_t n);
+static void hm_again_push(hm_loop *loop, hm_conn *c);
 static void hm_h2_free(pTHX_ void *h2);   /* defined in hm_http2.h */
 static void hm_readable(pTHX_ hm_conn *c);
 
@@ -367,6 +397,194 @@ static SV *hm_slurp_body(pTHX_ SV *body) {
     return out;
 }
 
+/* ---- streaming body sources ---------------------------------------------- *
+ * The lift: can this filehandle-ish body be streamed rather than slurped?
+ *
+ *   - a glob / IO ref over a regular file lifts to (fd, tell, remaining):
+ *     remaining is the Content-Length header when the response carries one,
+ *     else file-size minus position (which is then also what the auto
+ *     Content-Length announces).
+ *   - a blessed object lifts when it has BOTH getline and fileno over a
+ *     regular file AND the response promises a Content-Length - the range
+ *     contract Punk::SendFile::Reader satisfies; the raw fd position is
+ *     taken as the read point, so hand over a handle that has not been
+ *     buffer-read from. Without a usable fd, a getline object with a
+ *     Content-Length still streams, one chunk per getline (kind 2).
+ *
+ * Anything else returns 0 and the caller slurps, exactly as before. */
+
+static UV hm_bsrc_method_uv(pTHX_ SV *obj, const char *meth, int *ok) {
+    dSP;
+    UV out = 0;
+    int n;
+    *ok = 0;
+    ENTER; SAVETMPS; PUSHMARK(SP);
+    XPUSHs(obj);
+    PUTBACK;
+    n = call_method(meth, G_SCALAR | G_EVAL);
+    SPAGAIN;
+    if (n > 0) {
+        SV *r = POPs;
+        if (!SvTRUE(ERRSV) && SvOK(r) && SvIV(r) >= 0) {
+            out = (UV)SvUV(r);
+            *ok = 1;
+        }
+    }
+    PUTBACK; FREETMPS; LEAVE;
+    return out;
+}
+
+static int hm_bsrc_lift(pTHX_ SV *body, hm_bsrc *bs, int has_len, UV clen) {
+    if (!SvROK(body)) return 0;
+
+    if (sv_isobject(body)) {
+        HV *stash = SvSTASH(SvRV(body));
+        int fd = -1, ok = 0;
+        if (!gv_fetchmethod_autoload(stash, "getline", 0)) return 0;
+        if (!has_len) return 0;      /* no promised length, keep the slurp */
+        if (gv_fetchmethod_autoload(stash, "fileno", 0)) {
+            UV v = hm_bsrc_method_uv(aTHX_ body, "fileno", &ok);
+            if (ok) fd = (int)v;
+        }
+        if (fd >= 0) {
+            struct stat st;
+            off_t pos;
+            if (fstat(fd, &st) == 0 && S_ISREG(st.st_mode)
+                && (pos = lseek(fd, 0, SEEK_CUR)) >= 0) {
+                bs->kind = 1;
+                bs->fd   = fd;
+                bs->off  = pos;
+                bs->remaining = clen;
+                bs->sv = SvREFCNT_inc(body);
+                return 1;
+            }
+        }
+        bs->kind = 2;
+        bs->remaining = clen;
+        bs->sv = SvREFCNT_inc(body);
+        return 1;
+    }
+
+    if (SvTYPE(SvRV(body)) == SVt_PVGV || SvTYPE(SvRV(body)) == SVt_PVIO) {
+        IO *io = sv_2io(body);
+        PerlIO *fp = io ? IoIFP(io) : NULL;
+        struct stat st;
+        int fd;
+        off_t pos;
+        if (!fp) return 0;
+        fd = PerlIO_fileno(fp);
+        if (fd < 0 || fstat(fd, &st) < 0 || !S_ISREG(st.st_mode)) return 0;
+        pos = (off_t)PerlIO_tell(fp);
+        if (pos < 0 || pos > st.st_size) return 0;
+        bs->kind = 1;
+        bs->fd   = fd;
+        bs->off  = pos;
+        bs->remaining = has_len ? clen : (UV)(st.st_size - pos);
+        bs->sv = SvREFCNT_inc(body);
+        return 1;
+    }
+    return 0;
+}
+
+/* Close out a source: the PSGI body contract says the server closes the
+ * handle it was given (hm_slurp_body has always done so). Objects get
+ * their close method; a glob's PerlIO is closed directly. */
+static void hm_bsrc_release(pTHX_ hm_bsrc *bs) {
+    if (!bs->kind) return;
+    if (bs->sv) {
+        if (sv_isobject(bs->sv)) {
+            if (gv_fetchmethod_autoload(SvSTASH(SvRV(bs->sv)), "close", 0)) {
+                dSP;
+                ENTER; SAVETMPS; PUSHMARK(SP);
+                XPUSHs(bs->sv);
+                PUTBACK;
+                call_method("close", G_DISCARD | G_EVAL);
+                FREETMPS; LEAVE;
+            }
+        }
+        else {
+            IO *io = sv_2io(bs->sv);
+            if (io && IoIFP(io)) {
+                PerlIO_close(IoIFP(io));
+                IoIFP(io) = NULL;
+                IoOFP(io) = NULL;
+            }
+        }
+        SvREFCNT_dec(bs->sv);
+    }
+    memset(bs, 0, sizeof(*bs));
+}
+
+/* Refill the write buffer with the next chunk of the source. Returns the
+ * bytes added; 0 when the source is spent; -1 on a source that ended
+ * early (file truncated under us, getline died or dried up) - the client
+ * was promised more bytes than it will get, so the connection must not
+ * be reused. */
+static ssize_t hm_bsrc_fill(pTHX_ hm_conn *c) {
+    hm_bsrc *bs = &c->bsrc;
+    if (!bs->remaining) return 0;
+    if (bs->kind == 1) {
+        size_t want = bs->remaining < HM_BSRC_CHUNK
+                          ? (size_t)bs->remaining : HM_BSRC_CHUNK;
+        ssize_t n;
+        hm_wb_reserve(c, want);
+        n = pread(bs->fd, c->wbuf + c->wlen, want, bs->off);
+        if (n <= 0) { c->keepalive = 0; return -1; }
+        c->wlen += (size_t)n;
+        bs->off += n;
+        bs->remaining -= (UV)n;
+        return n;
+    }
+    for (;;) {                                   /* kind 2: one getline */
+        dSP;
+        SV *chunk;
+        STRLEN l = 0;
+        const char *p = NULL;
+        int n;
+        ENTER; SAVETMPS; PUSHMARK(SP);
+        XPUSHs(bs->sv);
+        PUTBACK;
+        n = call_method("getline", G_SCALAR | G_EVAL);
+        SPAGAIN;
+        chunk = n > 0 ? POPs : NULL;
+        if (SvTRUE(ERRSV) || !chunk || !SvOK(chunk)) {
+            PUTBACK; FREETMPS; LEAVE;
+            c->keepalive = 0;                    /* remaining > 0 here */
+            return -1;
+        }
+        p = SvPV(chunk, l);
+        if (l > bs->remaining) l = (STRLEN)bs->remaining;  /* hold the framing */
+        if (l) hm_wb_put(c, p, l);
+        bs->remaining -= (UV)l;
+        PUTBACK; FREETMPS; LEAVE;
+        if (l) return (ssize_t)l;
+        if (!bs->remaining) return 0;
+        /* an empty chunk with bytes still owed: ask again */
+    }
+}
+
+/* Scan a header AV for Content-Length; fills *out and returns 1 if found. */
+static int hm_hav_clen(pTHX_ AV *hav, UV *out) {
+    SSize_t i, n;
+    if (!hav) return 0;
+    n = av_len(hav) + 1;
+    for (i = 0; i + 1 < n; i += 2) {
+        SV **k = av_fetch(hav, i, 0);
+        STRLEN kl;
+        const char *ks;
+        if (!k || !*k) continue;
+        ks = SvPV(*k, kl);
+        if (kl == 14 && strncasecmp(ks, "Content-Length", 14) == 0) {
+            SV **v = av_fetch(hav, i + 1, 0);
+            if (v && *v && SvOK(*v)) {
+                *out = (UV)SvUV(*v);
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 /* a [500, [...], [$msg]] PSGI triple (mortal) */
 static SV *hm_500_resp(pTHX_ const char *msg) {
     AV *resp = newAV();
@@ -406,6 +624,7 @@ static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
     SV *pending = c->resp_f;      /* cancelled below, once state is consistent */
     c->resp_f = NULL;
     loop->be->remove_io(loop->be, fd, HM_EV_READ | (c->writing ? HM_EV_WRITE : 0));
+    if (c->bsrc.kind) hm_bsrc_release(aTHX_ &c->bsrc);   /* mid-stream abort */
     if (c->ssl) hm_tls_conn_free(c);
     close(fd);
     hm_lru_unlink(loop, c);
@@ -468,7 +687,8 @@ static int hm_detach(pTHX_ hm_loop *loop, int fd, UV id) {
     if (!c || c->id != id)       return -1;   /* gone, or a stale ticket    */
     if (c->h2)                   return -2;   /* HTTP/2 streams share a conn */
     if (c->ssl)                  return -3;   /* TLS state cannot be handed on */
-    if (c->wlen != c->woff)      return -4;   /* output still draining      */
+    if (c->wlen != c->woff
+        || c->bsrc.kind)         return -4;   /* output still draining      */
     if (c->detached)             return -5;   /* already handed over        */
     loop->be->remove_io(loop->be, fd,
                         HM_EV_READ | (c->writing ? HM_EV_WRITE : 0));
@@ -482,6 +702,7 @@ static void hm_conn_release(pTHX_ hm_loop *loop, hm_conn *c) {
     int fd = c->fd;
     SV *pending = c->resp_f;
     c->resp_f = NULL;
+    if (c->bsrc.kind) hm_bsrc_release(aTHX_ &c->bsrc);
     hm_lru_unlink(loop, c);
     loop->conns[fd] = NULL;
     loop->nconns--;
@@ -1152,9 +1373,16 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
             if (e) { STRLEN l; (void)SvPV(*e, l); blen += l; }
         }
     } else if (s2 && SvROK(*s2)) {
-        /* filehandle or IO::Handle-like body */
-        fh_body = hm_slurp_body(aTHX_ *s2);
-        { STRLEN l; (void)SvPV(fh_body, l); blen = l; }
+        /* filehandle or IO::Handle-like body: stream it when it lifts to
+         * a byte-countable source, else slurp exactly as before */
+        UV clv = 0;
+        int cl_seen = hm_hav_clen(aTHX_ hav, &clv);
+        if (!c->bsrc.kind && hm_bsrc_lift(aTHX_ *s2, &c->bsrc, cl_seen, clv))
+            blen = (size_t)c->bsrc.remaining;
+        else {
+            fh_body = hm_slurp_body(aTHX_ *s2);
+            { STRLEN l; (void)SvPV(fh_body, l); blen = l; }
+        }
     }
 
     /* status line + headers */
@@ -1190,6 +1418,7 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
         int no_entity = (status < 200 || status == 204 || status == 304);
         if (no_entity) {
             if (fh_body) { SvREFCNT_dec(fh_body); fh_body = NULL; }
+            if (c->bsrc.kind) hm_bsrc_release(aTHX_ &c->bsrc);
             bav = NULL; bn = 0; blen = 0;
         } else if (!has_len) {
             memcpy(line, "Content-Length: ", 16);
@@ -1208,7 +1437,7 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
     /* fast path: nothing queued before this response -> writev header+body
      * straight from the response SVs, no body copy */
     if (hdr_start == 0 && c->woff == 0 && !c->writing && !fh_body && !c->ssl
-        && bav && bn >= 0 && bn < HM_IOV_MAX) {
+        && !c->bsrc.kind && bav && bn >= 0 && bn < HM_IOV_MAX) {
         struct iovec iov[HM_IOV_MAX];
         size_t total = c->wlen;
         int niov = 1;
@@ -1277,28 +1506,101 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
 }
 
 /* Flush c->wbuf; on EAGAIN arm a write watcher. Returns 0 to keep the
- * connection, -1 if it was closed. */
+ * connection, -1 if it was closed. A streaming body source (c->bsrc) is
+ * drained here: buffer empties, source refills it a chunk at a time - or
+ * skips the buffer entirely via sendfile(2) on a plaintext socket - so a
+ * large file response never holds more than one chunk in memory. */
 static int hm_flush(pTHX_ hm_conn *c) {
     hm_loop *loop = c->loop;
-    if (c->wlen == 0) {
+    int src_done = 0;
+    if (c->wlen == 0 && !c->bsrc.kind) {
         if (!c->keepalive && !c->awaiting) { hm_close(aTHX_ loop, c); return -1; }
         return 0;
     }
-    while (c->woff < c->wlen) {
-        ssize_t n = hm_cwrite(c, c->wbuf + c->woff, c->wlen - c->woff);
-        if (n > 0) {
-            c->woff += (size_t)n;
-        } else if (n < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-            /* arm a write watcher, unless the TLS engine is blocked wanting a
-             * read (the always-armed read watcher re-drives us then) */
-            if (!c->writing && !c->tls_w_wants_r) {
-                loop->be->add_io(loop->be, c->fd, HM_EV_WRITE, 0);
-                c->writing = 1;
+    for (;;) {
+        while (c->woff < c->wlen) {
+            ssize_t n = hm_cwrite(c, c->wbuf + c->woff, c->wlen - c->woff);
+            if (n > 0) {
+                c->woff += (size_t)n;
+            } else if (n < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+                /* arm a write watcher, unless the TLS engine is blocked
+                 * wanting a read (the always-armed read watcher re-drives
+                 * us then) */
+                if (!c->writing && !c->tls_w_wants_r) {
+                    loop->be->add_io(loop->be, c->fd, HM_EV_WRITE, 0);
+                    c->writing = 1;
+                }
+                return 0;
+            } else {
+                hm_close(aTHX_ loop, c);
+                return -1;
             }
-            return 0;
-        } else {
-            hm_close(aTHX_ loop, c);
-            return -1;
+        }
+        /* buffer drained; keep the capacity for the next round */
+        c->wlen = c->woff = 0;
+        if (!c->bsrc.kind) break;
+
+#if defined(HM_HAVE_SENDFILE_LINUX) || defined(HM_HAVE_SENDFILE_FREEBSD) \
+    || defined(HM_HAVE_SENDFILE_MACOS)
+        /* file straight to a plaintext socket, no copy through userspace */
+        if (c->bsrc.kind == 1 && !c->ssl && !c->bsrc.nosf) {
+            size_t want = c->bsrc.remaining < HM_SENDFILE_MAX
+                              ? (size_t)c->bsrc.remaining : HM_SENDFILE_MAX;
+            ssize_t sent = -1;
+            int again = 0;
+#if defined(HM_HAVE_SENDFILE_LINUX)
+            off_t off = c->bsrc.off;
+            sent = sendfile(c->fd, c->bsrc.fd, &off, want);
+            again = (sent < 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
+#elif defined(HM_HAVE_SENDFILE_FREEBSD)
+            off_t sbytes = 0;
+            int r = sendfile(c->bsrc.fd, c->fd, c->bsrc.off, want,
+                             NULL, &sbytes, 0);
+            if (r == 0 || errno == EAGAIN || errno == EWOULDBLOCK) {
+                sent = (ssize_t)sbytes;
+                again = (r != 0);
+            }
+#elif defined(HM_HAVE_SENDFILE_MACOS)
+            off_t len = (off_t)want;
+            int r = sendfile(c->bsrc.fd, c->fd, c->bsrc.off, &len, NULL, 0);
+            if (r == 0 || errno == EAGAIN || errno == EWOULDBLOCK) {
+                sent = (ssize_t)len;
+                again = (r != 0);
+            }
+#endif
+            if (sent > 0) {
+                c->bsrc.off += sent;
+                c->bsrc.remaining -= (UV)sent;
+            }
+            if (c->bsrc.remaining == 0) {
+                hm_bsrc_release(aTHX_ &c->bsrc);
+                src_done = 1;
+                break;
+            }
+            if (again || sent > 0) {
+                if (again) {
+                    if (!c->writing) {
+                        loop->be->add_io(loop->be, c->fd, HM_EV_WRITE, 0);
+                        c->writing = 1;
+                    }
+                    return 0;
+                }
+                continue;                    /* kernel took it all; try more */
+            }
+            /* sendfile refused this pairing (filesystem, socket state):
+             * fall back to the read path for the rest of this body */
+            c->bsrc.nosf = 1;
+        }
+#endif
+        {
+            ssize_t n = hm_bsrc_fill(aTHX_ c);
+            if (n <= 0) {
+                /* spent (0), or ended early (-1, keepalive already off) */
+                hm_bsrc_release(aTHX_ &c->bsrc);
+                src_done = 1;
+                if (c->wlen) continue;       /* write what the fill added */
+                break;
+            }
         }
     }
     /* fully written; keep the buffer + capacity for the next response */
@@ -1308,6 +1610,9 @@ static int hm_flush(pTHX_ hm_conn *c) {
         c->writing = 0;
     }
     if (!c->keepalive && !c->awaiting) { hm_close(aTHX_ loop, c); return -1; }
+    /* requests that pipelined in behind the stream were parked; pick them
+     * up on the next loop turn */
+    if (src_done && c->rlen > 0) hm_again_push(loop, c);
     return 0;
 }
 
@@ -1608,6 +1913,8 @@ static void hm_process(pTHX_ hm_conn *c) {
 
     for (;;) {
         if (c->awaiting) break;   /* parked; resumes via hm_deliver */
+        if (c->bsrc.kind) break;  /* a body is still streaming out; the
+                                     flush that finishes it re-queues us */
 
         char *end = (char *)memmem(c->rbuf, c->rlen, "\r\n\r\n", 4);
         if (!end) break;
@@ -2026,7 +2333,8 @@ static void hm_run_again(pTHX_ hm_loop *loop) {
     loop->again_n = 0;
     for (i = 0; i < n; i++) {
         hm_conn *c = loop->conns[loop->again[i].fd];
-        if (c && c->id == loop->again[i].id && !c->awaiting) {
+        if (c && c->id == loop->again[i].id && !c->awaiting
+            && !c->bsrc.kind) {
             hm_process(aTHX_ c);
             if (loop->conns[c->fd] == c) hm_flush(aTHX_ c);
         }

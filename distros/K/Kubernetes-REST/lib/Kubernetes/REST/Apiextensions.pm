@@ -1,6 +1,6 @@
 package Kubernetes::REST::Apiextensions;
-our $VERSION = '1.106';
-# ABSTRACT: DEPRECATED - v0 API group for API Extensions resources
+our $VERSION = '1.107';
+# ABSTRACT: Compatibility helper for deprecated v0 API Extensions calls
 use Moo;
 extends 'Kubernetes::REST::V0Group';
 has '+group' => (default => sub { 'Apiextensions' });
@@ -16,15 +16,13 @@ __END__
 
 =head1 NAME
 
-Kubernetes::REST::Apiextensions - DEPRECATED - v0 API group for API Extensions resources
+Kubernetes::REST::Apiextensions - Compatibility helper for deprecated v0 API Extensions calls
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
-
-    # DEPRECATED API - use the new v1 API instead
 
     # Old way (deprecated):
     my $crds = $api->Apiextensions->ListCustomResourceDefinition();
@@ -34,7 +32,7 @@ version 1.106
 
 =head1 DESCRIPTION
 
-B<This module is DEPRECATED>. It provides backwards compatibility for the v0 API (Kubernetes::REST 0.01/0.02 by JLMARTIN) which used method names like C<< $api->Apiextensions->ListCustomResourceDefinition(...) >>.
+This module keeps the deprecated v0 API usable. Kubernetes::REST 0.01/0.02 (by JLMARTIN) used method names like C<< $api->Apiextensions->ListCustomResourceDefinition(...) >>; calls like that still reach the cluster from here, translated onto the v1 API.
 
 The new v1 API uses simple methods directly on the main L<Kubernetes::REST> object:
 
@@ -75,7 +73,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

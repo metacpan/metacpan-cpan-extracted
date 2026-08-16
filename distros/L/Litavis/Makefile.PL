@@ -15,11 +15,21 @@ eval {
     $colour_inc = Colouring::In::XS->include_dir();
     $colour_inc = undef unless $colour_inc && -d $colour_inc;
 };
+if (!$colour_inc) {
+    # include_dir() arrived in 0.09; older installs still put the header
+    # at .../Colouring/In/XS/include next to the .pm, so derive it - the
+    # CPAN smokers holding 0.08 satisfied `configure_requires => 0` and
+    # then died here for the want of one method.
+    for my $dir (@INC) {
+        next if ref $dir;
+        my $pm = "$dir/Colouring/In/XS.pm";
+        next unless -f $pm;
+        (my $inc = $pm) =~ s{\.pm\z}{/include};
+        if (-d $inc) { $colour_inc = $inc; last }
+    }
+}
 if (!$colour_inc && -d '../Colouring-In-XS/include') {
     $colour_inc = '../Colouring-In-XS/include';
-}
-if (!$colour_inc && -d '../Colouring-In-XS-0.07/include') {
-    $colour_inc = '../Colouring-In-XS-0.07/include';
 }
 die "Cannot find Colouring::In::XS include directory. Install Colouring::In::XS first.\n"
     unless $colour_inc;
@@ -34,13 +44,16 @@ my %WriteMakefileArgs = (
     macro 	     => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
-        'Colouring::In::XS'   => '0',
+        # 0.11: include_dir() (0.09) plus colouring.h's PERL_IMPLICIT_SYS
+        # guard for Windows perls. A floor of 0 leaves a smoker's stale
+        # install in place - which is exactly what failed 0.04.
+        'Colouring::In::XS'   => '0.11',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',
     },
     PREREQ_PM => {
-        'Colouring::In::XS'   => '0',
+        'Colouring::In::XS'   => '0.11',
     },
 
     INC    => "-I. -Iinclude -I$colour_inc",
@@ -57,6 +70,7 @@ my %WriteMakefileArgs = (
         'include/litavis_vars.h'         => '$(INST_LIB)/Litavis/include/litavis_vars.h',
         'include/litavis_emitter.h'      => '$(INST_LIB)/Litavis/include/litavis_emitter.h',
         'include/litavis_colour.h'       => '$(INST_LIB)/Litavis/include/litavis_colour.h',
+        'include/litavis_dirent_win.h'   => '$(INST_LIB)/Litavis/include/litavis_dirent_win.h',
     },
 
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },

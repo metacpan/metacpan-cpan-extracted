@@ -1,11 +1,31 @@
+# @curated — do not overwrite with vim-syntax-to-shb
 # Syntax file for dockerfile
-# Converted from: dockerfile.vim
-# Conversion date: 2026-07-13
-
+# Converted from: dockerfile.vim (originally), hand-curated to add
+# Comment/Number/String/Identifier rules the converted file lacked.
 language: dockerfile
 extensions: dockerfile
 
 [keyword:Keyword]
 ADD ARG CMD COPY ENTRYPOINT ENV EXPOSE HEALTHCHECK LABEL MAINTAINER ONBUILD
-RUN SHELL STOPSIGNAL USER VOLUME WORKDIR
+RUN SHELL STOPSIGNAL USER VOLUME WORKDIR FROM AS
 
+[match:Comment]
+pattern: #.*$
+
+[match:Number]
+pattern: \b\d+\b
+
+[match:Identifier]
+pattern: \$\{?\w+\}?
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=%!&|^~?:]+
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:String]
+start: '
+end: '

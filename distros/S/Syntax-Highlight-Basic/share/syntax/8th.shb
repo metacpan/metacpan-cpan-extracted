@@ -1,6 +1,6 @@
 # Syntax file for 8th
 # Converted from: 8th.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: 8th
 extensions: 8th
@@ -44,7 +44,7 @@ pattern: db:exec\[]
 [match:Define]
 pattern: db:col\[]
 
-[region:String]
-start: \.\?"
-end: $
+[region:Error]
+start: needs\[
+end: ]
 

@@ -1,6 +1,6 @@
 package Kubernetes::REST::Scheduling;
-our $VERSION = '1.106';
-# ABSTRACT: DEPRECATED - v0 API group for Scheduling resources
+our $VERSION = '1.107';
+# ABSTRACT: Compatibility helper for deprecated v0 Scheduling calls
 use Moo;
 extends 'Kubernetes::REST::V0Group';
 has '+group' => (default => sub { 'Scheduling' });
@@ -16,15 +16,13 @@ __END__
 
 =head1 NAME
 
-Kubernetes::REST::Scheduling - DEPRECATED - v0 API group for Scheduling resources
+Kubernetes::REST::Scheduling - Compatibility helper for deprecated v0 Scheduling calls
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
-
-    # DEPRECATED API - use the new v1 API instead
 
     # Old way (deprecated):
     my $pcs = $api->Scheduling->ListPriorityClass();
@@ -34,7 +32,7 @@ version 1.106
 
 =head1 DESCRIPTION
 
-B<This module is DEPRECATED>. It provides backwards compatibility for the v0 API (Kubernetes::REST 0.01/0.02 by JLMARTIN) which used method names like C<< $api->Scheduling->ListPriorityClass(...) >>.
+This module keeps the deprecated v0 API usable. Kubernetes::REST 0.01/0.02 (by JLMARTIN) used method names like C<< $api->Scheduling->ListPriorityClass(...) >>; calls like that still reach the cluster from here, translated onto the v1 API.
 
 The new v1 API uses simple methods directly on the main L<Kubernetes::REST> object:
 
@@ -74,7 +72,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

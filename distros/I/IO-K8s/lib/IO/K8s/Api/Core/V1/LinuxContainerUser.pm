@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::LinuxContainerUser;
 # ABSTRACT: LinuxContainerUser represents user identity information in Linux containers
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s gid => Int, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::LinuxContainerUser - LinuxContainerUser represents user 
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 gid
 

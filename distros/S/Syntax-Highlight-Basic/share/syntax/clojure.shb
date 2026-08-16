@@ -1,6 +1,6 @@
 # Syntax file for clojure
 # Converted from: clojure.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: clojure
 extensions: clojure

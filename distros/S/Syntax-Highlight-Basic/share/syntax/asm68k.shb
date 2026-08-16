@@ -1,6 +1,6 @@
 # Syntax file for asm68k
 # Converted from: asm68k.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: asm68k
 extensions: asm68k
@@ -429,9 +429,6 @@ pattern: '[ -~]*'
 
 [match:Error]
 pattern: '[ -~]*$
-
-[match:Error]
-pattern: [^ -~]
 
 [match:Operator]
 pattern: [-+*/]

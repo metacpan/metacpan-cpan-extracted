@@ -15,57 +15,33 @@ package PlackX::Framework::Handler {
   # App assembly section
   #
   sub build_app ($class, %options) {
-    my $app = _build_app($class, %options);
+    my $app = prebuild_app($class, %options);
     if (my $wrapper = $class->app_namespace->can('apply_middleware')) {
       $app = $wrapper->($app);
     }
     return $app;
   }
 
-  sub _build_app ($class, %options)  {
+  sub prebuild_app ($class, %options)  {
     # Freeze the router
     my $rt_engine = ($class->app_namespace . '::Router::Engine')->instance;
     $rt_engine->freeze;
 
-    # Honestly, it is probably better for the user to use Plack::Builder
-    # or URLMap or Cascade instead of doing this, but we do it here for
-    # convenience in development environments, at least for now. Think about
-    # removing this feature at a later date.
-    my $serve_static_files = delete $options{'serve_static_files'};
-    my $static_docroot     = delete $options{'static_docroot'};
-    die "Unknown options: " . join(', ', keys %options) if %options;
+    # Make app
+    my $app = sub ($env) {
+      psgi_response($class->handle_request($env, undef, $rt_engine))
+    };
 
-    my $main_app = sub ($env) { psgi_response($class->handle_request($env, undef, $rt_engine)) };
-    my $file_app = ($serve_static_files and do {
-      require Plack::App::File;
-      Plack::App::File->new(root => $static_docroot)->to_app;
-    });
-
-    # if app_base is specified, use URLMap
+    # if app_base is specified, use URLMap, we don't need to cascade
     if (my $app_base = $class->app_base) {
       require Plack::App::URLMap;
       my $mapper = Plack::App::URLMap->new;
-      $mapper->map($app_base => $main_app);
-      $mapper->map('/'       => $file_app) if $file_app;
+      $mapper->map($app_base => $app);
+      #$mapper->map('/'       => $file_app) if $file_app;
       return $mapper->to_app;
     }
 
-    # Static file app with no app_base, so try one, try the other if it's 404
-    # (basically our own cascade whereas we could use Plack::App::Cascade).
-    # We prefer to serve the app's 404 page if the file app also returns 404
-    # because it is easier to customize the 404 page with PXF.
-    # Add a later date we might add a feature to intercept all 4xx and 5xx
-    # error codes at the last possible moment and render a user-defined page.
-    return sub ($env) {
-      my $main_resp = $main_app->($env);
-      return $main_resp if ref $main_resp and (ref $main_resp eq 'CODE' or $main_resp->[0] != 404);
-      my $file_resp = $file_app->($env);
-      return $file_resp if ref $file_resp and $file_resp->[0] != 404;
-      return $main_resp;
-    } if $file_app;
-
-    # no app_base, no static file app, just return the main app
-    return $main_app;
+    return $app
   }
 
   sub app_base ($class) {

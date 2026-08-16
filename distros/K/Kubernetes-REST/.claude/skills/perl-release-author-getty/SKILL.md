@@ -20,7 +20,7 @@ copyright_holder = Copyright Owner
 ## @Author::GETTY Options
 
 ### Feature Toggles (Boolean)
-- `no_cpan` - Skip UploadToCPAN
+- `no_cpan` - Skip UploadToCPAN; also defaults `version_finder` to `:MainModule`
 - `no_podweaver` - Skip PodWeaver
 - `no_changes` - Skip NextRelease
 - `no_installrelease` - Skip InstallRelease
@@ -28,6 +28,15 @@ copyright_holder = Copyright Owner
 - `xs` - Use ModuleBuildTiny (for pure-Perl XS without Alien deps)
 - `deprecated` - Add Deprecated plugin
 - `adoptme` - Add x_adoptme metadata
+- `no_github` - Skip GithubMeta and GitHub::CreateRelease, use Repository instead. Auto-set to 1 when `.git/config` has no github.com remote; set `no_github = 0` to force GitHub plugins on anyway
+- `no_github_release` - Skip only GitHub::CreateRelease. Same auto-detection; when active, `dzil release` creates a GitHub Release and attaches the tarball, which needs `~/.github-identity` (login + token)
+- `gitea` - Treat the remote host as Gitea/Forgejo (repository/bugtracker/homepage via GiteaMeta). Only needed for self-hosted instances — codeberg.org and the author's own are auto-detected. No effect when a GitHub remote exists
+- `include_readme` - Ship README.md (excluded from the tarball by default)
+- `no_install` - Resulting distribution can't be installed
+
+### Identity & Metadata
+- `author` - CPAN author name used for the authority
+- `authority` - Override the authority, e.g. `authority = ETHER` when uploading modules owned by another author (default: the `author` value)
 
 ### XS with Alien
 - `xs_alien = Alien::Foo` - Auto-configures MakeMaker::Awesome for XS+Alien
@@ -37,7 +46,17 @@ copyright_holder = Copyright Owner
 - `task = 1` - TaskWeaver + AutoVersion
 - `manual_version = x.x` - Manual version
 - `major_version = 2` - Major version for AutoVersion
-- `version_finder = :MainModule` - restrict `$VERSION` rewrites/bumps to the main module only (see "version_finder = :MainModule — opt-in, not the default" below). Multi-value; forwarded to RewriteVersion::Transitional + BumpVersionAfterRelease (default path) and PkgVersion (task/manual_version path).
+- `version_finder` - multi-value; forwarded as the `finder` option of RewriteVersion::Transitional + BumpVersionAfterRelease (default path) and PkgVersion (task/manual_version path). Defaults to `:MainModule` when `no_cpan` is set, otherwise unset.
+
+### Build & Release
+- `weaver_config` - PodWeaver `config_plugin` to use (default: the bundle's own)
+- `installrelease_command` - Command used to install after release, instead of cpanm
+
+### Docker
+- `docker_image` - Image repository. Auto-adds one Docker::API plugin, which is a working Releaser on its own (no UploadToCPAN needed for non-CPAN dists)
+- `docker_tags` - Whitespace-separated tag list (default: `latest %V %v`)
+- `docker_local` - Build and tag the image, but don't push
+- `docker_default` - Set to 0 to suppress the auto-added plugin when you configure builds exclusively through `[@Author::GETTY::Docker / name]` subsections
 
 ### Support
 - `irc = #channel` - IRC channel
@@ -46,8 +65,12 @@ copyright_holder = Copyright Owner
 
 ### Git
 - `release_branch` - Branch for releases (default: main)
+- `tag_format` - Release tag format. Default `%v`, the bare `$VERSION` (`0.317`) — *not* a v-prefixed SemVer tag. Use `v%v.0` when the tag must satisfy strict vMAJOR.MINOR.PATCH (Perl's decimal `$VERSION` has only two parts, the `.0` supplies the patch part)
+- `commit_files_after_release` - Multi-value; extra files folded into the release commit (via Git::Commit's `allow_dirty`). For artefacts a `run_before_release` hook rewrites, e.g. a sibling Python/JS version file
 
 ### Alien (prefix `alien_`)
+
+- `alien_build = 1` - Alien::Build-based dist: adds AlienBuild (Makefile.PL driven by Alien::Build::MM), implies `no_makemaker`, expects an `alienfile` in the dist root
 
 For wrapping C libraries with Alien::Base:
 
@@ -120,40 +143,28 @@ After `dzil release` runs:
 
 **Do NOT bump the version manually before a release** — `dzil release` handles this automatically.
 
-### `version_finder = :MainModule` — opt-in, not the default
+### Every file carries its own `$VERSION`
 
-**Default across GETTY's distributions: `our $VERSION` in every `.pm` file**, rewritten/bumped
-by `[@Git::VersionManager]` (RewriteVersion::Transitional + BumpVersionAfterRelease) on release.
-Do not strip `$VERSION` from sibling modules unless the dist.ini says otherwise — this is the
-normal case, not a legacy fallback.
+**Each file under `lib/` and `bin/` needs its own `our $VERSION = '...';`**, set to
+the version that will be released NEXT — one higher than what is on CPAN (or
+higher). A file without a `$VERSION` ships versionless and breaks consumers that
+pin against it.
 
-A small number of distributions instead scope `$VERSION` to the main module only (`lib/Foo.pm`),
-with no `$VERSION` line in sibling `.pm` files. This is strictly opt-in via:
+**Only the FIRST `our $VERSION` in a file gets rewritten.** RewriteVersion::Transitional
+and BumpVersionAfterRelease both stop after the first match, so a file holding two
+packages leaves the second one frozen at whatever version it was written with —
+while MetaProvides::Update happily reports the real release version. The result is
+a distribution whose META and whose code disagree, silently, for as many releases
+as it takes someone to notice.
 
-```ini
-[@Author::GETTY]
-version_finder = :MainModule
-```
+So: **one package per file.** If you find several `package` statements in one file,
+split them out before releasing.
 
-**Do not add this option to a distribution's dist.ini on your own initiative** and do not
-describe it as "the convention" — check the actual dist.ini before assuming either style applies.
-
-How it works when set:
-- `version_finder = :MainModule` scopes the RewriteVersion::Transitional/BumpVersionAfterRelease
-  rewrite/bump to the main module, so sibling files are never touched.
-- `[MetaProvides::Package] inherit_version=1, inherit_missing=1` (always in the bundle) fills
-  `META.json` `provides` with the dist version for **every** package, so PAUSE/CPAN indexing
-  stays correct even though the sibling `.pm` files have no `$VERSION` at runtime.
-- Sibling modules resolve their version as `$MainModule::VERSION` at runtime
-  (e.g. `$Foo::VERSION`) — there is no per-file `$VERSION` to read.
-- On the `[PkgVersion]` path it also avoids the build-time failure when a sibling
-  module already carries its own `$VERSION` — PkgVersion refuses to overwrite one.
-
-Verify before touching a `:MainModule` distribution:
-```bash
-grep -n "version_finder" dist.ini   # confirm the option is actually set
-grep -rl 'our $VERSION' lib         # should list ONLY the main module
-```
+**Executables belong in `bin/`, never `script/`.** The bundle sets no `ExecDir`, so
+Dist::Zilla's default of `bin` applies: files under `script/` are not installed as
+executables and their `$VERSION` is never rewritten. A distribution with a `script/`
+directory should have it renamed to `bin/` — otherwise none of the above takes
+effect.
 
 ## Release Workflow
 

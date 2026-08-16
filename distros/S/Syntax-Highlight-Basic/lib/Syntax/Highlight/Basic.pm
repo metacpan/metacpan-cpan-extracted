@@ -4,7 +4,7 @@ use 5.016;
 use strict;
 use warnings;
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 use Syntax::Highlight::Basic::Parser;
 use Syntax::Highlight::Basic::Output::Pygments;

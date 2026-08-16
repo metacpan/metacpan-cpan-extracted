@@ -9,7 +9,7 @@ package MIDI::RtMidi::FFI::Device;
 use MIDI::RtMidi::FFI ':all';
 use Carp qw/ carp croak /;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 
 sub new {
@@ -63,7 +63,7 @@ MIDI::RtMidi::FFI::Device - OO interface for MIDI::RtMidi::FFI
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -177,6 +177,16 @@ Open a (numeric) port on a device, with a name of your choosing.
 
 See L</open_port_by_name> for a potentially more flexible option.
 
+=head2 connected_to
+
+This returns the port number connected to in a successful call to
+L</open_port> or L</open_port_by_name>.
+
+=head2 connected_to_name
+
+This returns the port name connected to in a successful call to
+L</open_port> or L</open_port_by_name>.
+
 =head2 get_ports_by_name
 
     $device->get_ports_by_name( $name );
@@ -216,7 +226,8 @@ Prints the port number and name of all ports visible to the device.
 
     $device->close_port();
 
-Closes the currently open port
+Closes the currently open port. This will clear L</connected_to> and </connected_to_name>
+if successful.
 
 =head2 get_port_count
 

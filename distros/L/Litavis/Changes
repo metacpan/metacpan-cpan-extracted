@@ -1,5 +1,24 @@
 Revision history for Litavis
 
+0.05    2026-08-15
+        Three CPAN Testers fixes for 0.04:
+        - Configure no longer dies on a smoker holding Colouring::In::XS
+          0.08: include_dir() only arrived in 0.09, so the header
+          directory is now also derived from the installed .pm's own
+          location, and the configure/runtime floor is 0.11 (which adds
+          colouring.h's Windows guard below).
+        - Windows (PERL_IMPLICIT_SYS) perls remap malloc/calloc/realloc/
+          free/stderr/abort in XSUB.h to macros needing my_perl; the
+          plain-C engine headers broke with "'my_perl' undeclared" at
+          every allocation. litavis.h now restores the CRT names before
+          including the engine (the 0.03 fopen/fclose undefs were the
+          same fix for a different name set).
+        - The MinGW <dirent.h> include never worked: its declarations
+          hide behind __STRICT_ANSI__ under -std=c99 and the
+          _XOPEN_SOURCE define was both wrong and too late. All Windows
+          toolchains now use litavis_dirent_win.h, a vendored
+          FindFirstFile wrapper.
+
 0.03    2026-07-11
         - litavis_parser.h: undef Perl's fopen/fclose/fread/fwrite macros on
           Windows+MULTIPLICITY before plain-C static functions (PerlSIO

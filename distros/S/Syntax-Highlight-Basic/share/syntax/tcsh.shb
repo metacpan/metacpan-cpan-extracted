@@ -1,7 +1,8 @@
+# @curated — do not overwrite with vim-syntax-to-shb
 # Syntax file for tcsh
-# Converted from: tcsh.vim
-# Conversion date: 2026-07-13
-
+# Converted from: tcsh.vim (originally), hand-curated to add Comment/Number/
+# String/Identifier rules — tcsh.vim defines nearly all of its keywords via
+# generated word lists and left no match:/region: sections after conversion.
 language: tcsh
 extensions: tcsh
 
@@ -43,4 +44,26 @@ popd printenv pushd rehash repeat rootnode sched set setenv setpath setspath
 settc setty setxvers shift source stop suspend switch telltc termname time
 umask unalias uncomplete unhash universe unlimit unset unsetenv ver wait warp
 watchlog where which while
+
+[match:Comment]
+pattern: #.*$
+
+[match:Number]
+pattern: \b\d+\b
+
+[match:Identifier]
+pattern: \$\{?\w+\}?|\$\?\w+
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=%!&|^~?:]+
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:String]
+start: '
+end: '
+
 

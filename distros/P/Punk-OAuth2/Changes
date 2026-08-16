@@ -1,0 +1,40 @@
+Revision history for Punk-OAuth2
+
+0.01    2026-08-15
+        First version.
+        - the client side of OAuth2 and OpenID Connect for Punk:
+          authorization-code flow with PKCE (S256), signed single-use
+          state, OIDC nonce, id_token verification through Crypt::JWS and
+          a cached JWKS, normalized identities
+        - oauth2 and oauth2_login keywords (both plugin/keyword orderings
+          valid, to_app tripwire); presets google, github, generic oidc
+          with RFC 8414/OIDC discovery (issuer-checked, SSRF-guarded)
+        - context helpers oauth2_authurl, oauth2_refresh, oauth2_provider
+        - implemented in XS over the house C ABIs (jws_abi, frj_abi,
+          fetch_abi), with an xs/ directory of fragments like Punk: the
+          Provider and JWKS objects, Tokens, presets, the whole login
+          flow (state/nonce/PKCE mint, session flow records, the
+          callback's state/iss/code validation, token exchange, identity
+          normalization), id_token verification, form/URL/base_url/
+          safe_url/await all run in C; the only Perl is the plugin's Punk
+          registration wiring (install_kw/route/helper) and POD-only
+          module loaders
+        - identity-only session default: provider tokens are handed to
+          on_login and discarded (nothing token-shaped in the 4KB
+          signed-cookie session)
+        - authorization server (oauth2_server keyword): /authorize,
+          /token, /revoke, /introspect, /jwks.json and RFC 8414
+          metadata; grants authorization_code + PKCE (S256), refresh
+          with rotation and family revocation on reuse, and
+          client_credentials; ES256 JWT access tokens (RFC 9068 at+jwt)
+          the resource-server checker validates statelessly; client auth
+          (basic or body, constant-time on digests); authenticate and
+          consent hooks; a pluggable DBI store (SQLite, digest-only,
+          auto_migrate) - all protocol logic in XS
+        - resource-server checkers (Punk::OAuth2::Checker): jwt (local
+          JWT validation via JWKS or a static key - allowlist, signature,
+          iss/aud/exp/nbf, scope) and introspect (RFC 7662, cached by
+          token SHA-256), matching the OpenAPI security-map contract,
+          plus a guard wrapper emitting RFC 6750 WWW-Authenticate
+          (401 invalid_token / 403 insufficient_scope); all validation
+          in XS

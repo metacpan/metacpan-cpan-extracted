@@ -10,7 +10,7 @@ use Scalar::Util ();
 use IO::K8s::AutoGen;
 use namespace::clean;
 
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
@@ -353,7 +353,13 @@ sub _qualify_class_path {
         ? substr($class_path, 1) : "IO::K8s::$class_path";
 
     return unless _class_exists($full_class) && $full_class->can('api_version');
-    my $api_version = $full_class->api_version;
+    # Ask as a class method, but only accept an answer that comes back without
+    # error (same guard as IO::K8s::List::api_version). An external provider's
+    # class may implement api_version as an instance attribute rather than a
+    # constant, in which case the class-method call dies -- skip qualifying it
+    # instead of letting add() blow up.
+    my $api_version = eval { $full_class->api_version };
+    return if $@;
     return unless $api_version;
 
     my $qkey = "$api_version/$kind";
@@ -418,15 +424,25 @@ sub expand_class {
     my $map = ref($self) ? $self->resource_map : \%DEFAULT_RESOURCE_MAP;
 
     # An explicitly supplied apiVersion is an exact GVK request, including
-    # undef or an empty string. It must never fall through to a bare Kind or
-    # class-name fallback. AutoGen joins in only for an exact group/version
-    # match in the openapi_spec's x-kubernetes-group-version-kind metadata
-    # and fails closed otherwise (no silent fallback to another version).
+    # undef or an empty string. It never falls through to a bare Kind or
+    # class-name fallback: a class that cannot confirm the requested version
+    # must not be substituted silently (karr #17). The one exception is the
+    # resource_map's own short-name key — a legitimate GVK source when the
+    # mapped class's api_version() matches the request (karr #31). AutoGen
+    # joins in only for an exact group/version match in the openapi_spec's
+    # x-kubernetes-group-version-kind metadata and fails closed otherwise
+    # (no silent fallback to another version).
     if ($api_version_supplied) {
         return undef unless defined $api_version;
         my $qualified = "$api_version/$class";
         if (exists $map->{$qualified}) {
             return $self->_resolve_mapped($map->{$qualified}, $class);
+        }
+        # No qualified key: the short-name key is a GVK source when the
+        # mapped class itself confirms the requested version (karr #31).
+        # It has priority over AutoGen — the user explicitly registered it.
+        if (my $mapped_class = $self->_resolve_short_name_gvk($map, $class, $api_version)) {
+            return $mapped_class;
         }
         if (ref($self) && $self->has_openapi_spec) {
             my $autogen = $self->_autogen_class_for($class, $api_version);
@@ -445,6 +461,11 @@ sub expand_class {
     if ($class =~ m{/}) {
         if (exists $map->{$class}) {
             return $self->_resolve_mapped($map->{$class}, (split m{/}, $class)[-1]);
+        }
+        # karr #31: same short-name fallback, apiVersion taken from the string.
+        my ($av, $kind) = $class =~ m{\A(.*)/([^/]*)\z};
+        if (my $mapped_class = $self->_resolve_short_name_gvk($map, $kind, $av)) {
+            return $mapped_class;
         }
         return undef;
     }
@@ -517,6 +538,40 @@ sub _resolve_mapped {
 
     # Fall back to IO::K8s:: path (might not exist, but let load_class handle error)
     return $builtin_class;
+}
+
+# karr #31: resolve a resource_map short-name key as a GVK source on the
+# explicit-apiVersion path. The qualified '$api_version/$Kind' key is the
+# primary lookup; this is the fallback for a map that only carries the
+# short name (e.g. a CRD registered as 'StaticWebSite => "+My::StaticWebSite"').
+#
+# Fail closed: the mapped class must exist, expose api_version(), and report
+# exactly the requested version — otherwise undef (karr #17 semantics: never
+# substitute a class that cannot verify the request). No class is loaded
+# unless the short-name key exists, and _class_exists short-circuits on
+# $class->can('new'), so the common qualified-key hit costs nothing.
+sub _resolve_short_name_gvk {
+    my ($self, $map, $kind, $api_version) = @_;
+
+    return unless exists $map->{$kind};
+    my $mapped = $map->{$kind};
+
+    # Same full-class derivation as _qualify_class_path: a '+' prefix means
+    # the mapped value is already a full class name.
+    my $full_class = $mapped =~ /^\+/
+        ? substr($mapped, 1) : "IO::K8s::$mapped";
+
+    return unless _class_exists($full_class) && $full_class->can('api_version');
+    # Ask as a class method, but only accept an answer that comes back without
+    # error (same guard as IO::K8s::List::api_version). A class registered via
+    # resource_map need not be an IO::K8s::APIObject: api_version may be an
+    # instance attribute (class-method call dies) or simply return undef. Both
+    # fail closed here rather than dying or warning.
+    my $class_api_version = eval { $full_class->api_version };
+    return if $@;
+    return unless defined $class_api_version && $class_api_version eq $api_version;
+
+    return $self->_resolve_mapped($mapped, $kind);
 }
 
 # Check if a class exists (is loaded or can be loaded)
@@ -878,7 +933,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 

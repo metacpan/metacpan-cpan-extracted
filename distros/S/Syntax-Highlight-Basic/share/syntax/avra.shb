@@ -1,6 +1,6 @@
 # Syntax file for avra
 # Converted from: avra.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: avra
 extensions: avra
@@ -36,8 +36,4 @@ pattern: ^\s*[^; \t]+:
 [region:Comment]
 start: ;
 end: $
-
-[region:String]
-start: "
-end: "\|$
 

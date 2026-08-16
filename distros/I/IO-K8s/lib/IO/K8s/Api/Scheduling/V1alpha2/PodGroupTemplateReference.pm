@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha2::PodGroupTemplateReference;
 # ABSTRACT: PodGroupTemplateReference references a PodGroup template defined in some object (e.g. Workload). Exactly one reference must be set.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s workload => 'Scheduling::V1alpha2::WorkloadPodGroupTemplateReference';
@@ -20,7 +20,7 @@ IO::K8s::Api::Scheduling::V1alpha2::PodGroupTemplateReference - PodGroupTemplate
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 workload
 

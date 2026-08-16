@@ -1,5 +1,25 @@
 Revision history for Eshu
 
+0.11	2026-08-15
+	- The HTML/XML indenter now keeps an open-element stack instead of a
+	  bare depth counter. Two bugs fixed (found through Template::Stencil's
+	  pretty goldens and Punk::DevError):
+	  - a same-line <script ...></script> entered verbatim mode without
+	    seeing its own closer and silently swallowed the rest of the
+	    document; an inline verbatim pair is now scanned past, leaving the
+	    rest of the line live.
+	  - an unmatched closer (</tag> with no open) decremented depth
+	    unconditionally, dragging every later closer one level left; it
+	    now adjusts nothing. A closer for an element further down pops
+	    through the unclosed tags in between, so </ul> after bare <li>s
+	    and </root> after a non-void <br> land back on their own column.
+	- Fixed the Strawberry (MinGW) build: MinGW's <dirent.h> hides struct
+	  dirent and opendir/readdir/closedir behind __STRICT_ANSI__ under
+	  -std=c99, and the _XOPEN_SOURCE define was both the wrong macro and
+	  too late to help - every Windows toolchain now uses the
+	  FindFirstFile compat header dirent_win.h (CPAN Testers, MSWin32
+	  perl 5.42).
+
 0.10	2026-07-21
 	- Switch to ExtUtils::Depends
 

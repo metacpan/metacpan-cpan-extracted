@@ -4,6 +4,7 @@ use warnings;
 use Object::Proto;
 use PDF::Make::Builder::Layout::Cell;
 use Layout::Flex;
+use Scalar::Util ();
 
 BEGIN {
     Object::Proto::define('PDF::Make::Builder::Layout::Row',
@@ -14,6 +15,27 @@ BEGIN {
         'cells:ArrayRef:default([])',
     );
     Object::Proto::import_accessors('PDF::Make::Builder::Layout::Row');
+}
+
+# A cell keeps a reference to its row and the row keeps its cells, which is a
+# cycle: reference counting never collects either, so every laid-out row was
+# leaked for the life of the process. A document with a table used to cost
+# around 90KB that was never given back, which is invisible in a script and
+# fatal in a server rendering documents all day.
+#
+# The back-reference is weakened rather than removed: cells genuinely need to
+# reach their row. The slot is found by identity rather than by index so that
+# reordering the property list in the define() above cannot silently turn this
+# back into a leak, and t/55-layout-cycle.t checks it still bites.
+sub _weaken_row_ref {
+    my ($cell, $row) = @_;
+    for my $i (0 .. $#$cell) {
+        next unless ref $cell->[$i];
+        next unless $cell->[$i] == $row;
+        Scalar::Util::weaken($cell->[$i]);
+        return 1;
+    }
+    return 0;
 }
 
 sub cell {
@@ -31,8 +53,10 @@ sub cell {
     $cell_args{bg} = $args{bg} if defined $args{bg};
     $cell_args{border} = $args{border} if defined $args{border};
     $cell_args{text_border} = $args{text_border} if defined $args{text_border};
-    push @$cells, PDF::Make::Builder::Layout::Cell->new(%cell_args);
-    return $cells->[-1];
+    my $cell = PDF::Make::Builder::Layout::Cell->new(%cell_args);
+    _weaken_row_ref($cell, $self);
+    push @$cells, $cell;
+    return $cell;
 }
 
 sub render {
@@ -55,6 +79,13 @@ sub render {
 
         for my $ci (@{$cell->content}) {
             if ($ci->{type} eq 'text') {
+                if ($ci->{runs}) {
+                    my $inner = defined $avail_w
+                        ? $avail_w - 2 * $cell->pad : undef;
+                    $h += $cell->runs_height($font, $ci,
+                        defined $inner && $inner > 1 ? $inner : 1);
+                    next;
+                }
                 my $item_font = $cell->_resolve_item_font($font, $ci);
                 my $sz = $ci->{size}        // $item_font->size;
                 my $lh = $ci->{line_height} // $sz;
@@ -99,9 +130,10 @@ sub render {
         };
     }
 
+    my $cross = 10000;
     my @rects = Layout::Flex->compute(
         main_size  => $total_w,
-        cross_size => 10000,
+        cross_size => $cross,
         align      => 'start',
         gap        => $gap,
         measure    => $measure,
@@ -112,7 +144,15 @@ sub render {
     unless ($row_h) {
         $row_h = 0;
         for my $i (0 .. $#rects) {
-            my $h = $rects[$i][3] + 2 * $cells[$i]->pad;
+            my $h = $rects[$i][3];
+            # A cell with no content measures zero, and Layout::Flex hands a
+            # zero-height item the whole cross size back. Taken at face value
+            # that made one empty <td> a ten-thousand point row: the cursor
+            # ran off the page, clamped to the top, and every row after it
+            # drew in the same place. An empty cell contributes nothing to the
+            # row height, which is what it looks like on the page.
+            $h = 0 if $h >= $cross;
+            $h += 2 * $cells[$i]->pad;
             $row_h = $h if $h > $row_h;
         }
     }

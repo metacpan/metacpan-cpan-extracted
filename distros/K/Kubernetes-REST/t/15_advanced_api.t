@@ -291,6 +291,38 @@ subtest 'v0 group accessors return V0Group subclasses' => sub {
     }
 };
 
+subtest 'v0 group classes survive the bareword collision with their accessor' => sub {
+    my $api = mock_api();
+    local $ENV{HIDE_KUBERNETES_REST_V0_API_WARNING} = 1;
+
+    # Every accessor shares its name with the class it wraps, so Perl resolves
+    # the bareword below against &Kubernetes::REST::Core and calls it without
+    # an invocant. The accessor has to hand back the class name for that to
+    # land on ->new the way the caller meant it.
+    my $group;
+    lives_ok { $group = Kubernetes::REST::Core->new(api => $api) }
+        'Kubernetes::REST::Core->new survives the bareword collision';
+    isa_ok $group, 'Kubernetes::REST::V0Group';
+
+    SKIP: {
+        skip 'no group object to dispatch through', 1 unless ref $group;
+
+        $api->io->add_response('GET', '/api/v1/namespaces/myns/pods', {
+            kind => 'PodList', items => [],
+        });
+        isa_ok $group->ListNamespacedPod(namespace => 'myns'), 'IO::K8s::List';
+    }
+
+    for my $name (qw(Core Apps Batch Networking Storage Policy Autoscaling
+                     RbacAuthorization Certificates Coordination Events
+                     Scheduling Authentication Authorization
+                     Admissionregistration Apiextensions Apiregistration)) {
+        my $class = eval { Kubernetes::REST->can($name)->() };
+        is $class, "Kubernetes::REST::$name",
+            "$name accessor without invocant returns the class name";
+    }
+};
+
 subtest 'v0 group AUTOLOAD dispatches to new API' => sub {
     my $api = mock_api();
     local $ENV{HIDE_KUBERNETES_REST_V0_API_WARNING} = 1;

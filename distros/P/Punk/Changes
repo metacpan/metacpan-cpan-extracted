@@ -1,5 +1,61 @@
 Revision history for Punk
 
+0.12    2026-08-15
+        - Adds Punk::Auth. The `auth` keyword freezes the config at 
+	  to_app (model, a fields map so existing schemas need no renames, 
+          session_key, roles hook, rank ladder); croaks without a session, on any
+          unknown option, and on a roles target typo - at boot.
+        - Context surface: $c->login / logout / auth_id /
+          current_user (memoized per request, model loaded through an
+          await seam so the blocking DBI backend and the
+          future-returning DBIx::Loop backend both work).
+        - auth_guard for `under`: the bare is-anyone-signed-in form
+          runs entirely in C. Denial negotiates - a browser is
+          redirected to login_path with a relative-only ?to= return-to,
+          an API client gets the house 401 - with on_denied '403',
+          '404' or a coderef. The roles hook may return one role, a
+          list or an arrayref; a required role on the rank ladder means
+          "this or better", one outside it matches exactly (a staff
+          role next to tenant roles). Guards record what they learned
+          in $c->stash->{auth}.
+        - Bare `model;` registers everything under MyApp::Model::*
+
+0.11    2026-08-15
+        - Security response headers (Punk::Headers): a `headers` keyword
+          freezing a header policy at to_app, applied in C on the way
+          out of the dispatcher.
+        - Content negotiation ($c->respond_to): calls the handler for
+          the most acceptable offered format (json/html/text/xml or a
+          full media type) and returns its response. 
+
+0.10    2026-08-15
+        - Development error pages (Punk::DevError): in development a die
+          renders an HTML debug page
+        - The environment now defaults to production; development is an
+          opt-in: punk dev sets PUNK_ENV=development for its server, or
+          set it yourself in the Env.
+        - Punk::Validate: request validation, all in C on the
+          JSON::Schema::Fast C ABI. $c->validate($schema) collects into
+          a Result - errors in the Open::API shape plus name, valid()
+          hands back typed filtered params - and a bare $c->validate
+          reads the Result a route-level check stashed. Routes take an
+          options hashref: get '/x' => $target, { validate => \%schema }
+          (or { schema, source, on_invalid }), compiled once at to_app
+          and run as a C guard after any auth guards; failures answer
+          the OpenAPI-mount-shaped 400 or the on_invalid target.
+        - New on_not_found keyword: the on_error contract for a 404 so
+          you can return a custom response
+        - The getentropy probe now links instead of only compiling.
+          FreeBSD before 12 has no getentropy and its old compilers take
+          the implicit declaration as a warning, so 0.09's compile-only
+          probe false-positived and the .so failed to load with
+          "Undefined symbol getentropy".
+
+0.09    2026-08-15
+        - Adds Punk::Test, Punk::Test::WS and Punk::Test::WS::Conn
+        - Flash messages, in C (punk_flash.h): $c->flash and
+          $c->flash_keep over the session's reserved punk.flash key. 
+
 0.08    2026-08-14
         - t/42-immortal-refcount.t failed the distribution on perl 5.18,
           where perl itself moves the refcount it measures. Before 5.20

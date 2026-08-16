@@ -1,6 +1,6 @@
 # Syntax file for icon
 # Converted from: icon.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: icon
 extensions: icon
@@ -79,4 +79,12 @@ pattern: \b\d+e[-+]?\d+\b
 
 [match:PreProc]
 pattern: _V\d+
+
+[region:String]
+start: "
+end: "
+
+[region:String]
+start: '
+end: '
 

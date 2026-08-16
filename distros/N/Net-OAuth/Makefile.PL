@@ -4,7 +4,10 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'          => 'Net::OAuth',
-    'AUTHOR'        => 'Robert Rothenberg <rrwo@cpan.org>',
+    'AUTHOR'        => [
+        'Keith Grennan <foss@nearlyfree.org>',
+        'Robert Rothenberg <perl@rhizomnic.com>',
+    ],
     "LICENSE"       => 'perl',
     'ABSTRACT_FROM' => 'lib/Net/OAuth.pm',
     'VERSION_FROM'  => 'lib/Net/OAuth.pm',
@@ -15,7 +18,7 @@ WriteMakefile(
     'PREREQ_PM' => {
         'Class::Accessor'          => '0.31',
         'Class::Data::Inheritable' => '0.06',
-        'Crypt::URandom'           => '0.37',
+        'Crypt::SysRandom'         => '0.006',
         'Digest::SHA'              => '5.47',
         'Encode'                   => '2.35',
         'LWP::UserAgent'           => '1',
@@ -23,10 +26,30 @@ WriteMakefile(
         'Test::Warn'               => '0.21',
         'URI'                      => '5.15'
     },
+    # The source itself parses as 5.006, but URI and MIME::Base32 both require
+    # 5.008001, so that is the real floor. CI covers 5.16 and up; anything
+    # older is supported-but-untested rather than known-broken.
+    'MIN_PERL_VERSION' => '5.008001',
     'INSTALLDIRS' => 'site',
     'EXE_FILES'   => [],
     'PL_FILES'    => {},
     'META_MERGE'  => {
+        # Deliberately meta-spec 1.4 shaped. A spec 2 "prereqs" key here does
+        # not merge on ExtUtils::MakeMaker older than 7.x -- it replaces the
+        # generated prereqs wholesale, silently dropping every runtime and
+        # test requirement from META. Perl 5.16 ships 6.63_02, so that is a
+        # live configuration. A top level "recommends" sits beside "requires"
+        # instead of overwriting it, and newer toolchains still convert it to
+        # prereqs.runtime.recommends in the spec 2 output.
+        #
+        # Only RSA-SHA1 needs this, hence a recommends rather than a hard
+        # prereq. 0.38 is a floor rather than a preference: 0.35 through 0.37
+        # disabled the PKCS#1 v1.5 padding that RFC 5849 3.4.3 mandates, and
+        # 0.38 re-enabled it.
+        recommends => {
+            'Crypt::OpenSSL::RSA'  => '0.38',
+            'Crypt::SysRandom::XS' => '0.010',
+        },
         resources => {
             bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth',
             repository => 'https://github.com/keeth/Net-OAuth.git',

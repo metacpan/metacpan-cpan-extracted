@@ -1,6 +1,6 @@
 # Syntax file for sml
 # Converted from: sml.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: sml
 extensions: sml
@@ -20,9 +20,6 @@ FIXME TODO XXX
 
 [keyword:Type]
 bool char exn int list option real string unit
-
-[match:Keyword]
-pattern: |
 
 [match:Error]
 pattern: }
@@ -107,6 +104,30 @@ pattern: \b-?0[x|X][0-9a-fA-F]+\b
 
 [match:Float]
 pattern: \b-?\d+\.\d*(?:[eE][-+]?\d+)?[fl]?\b
+
+[region:Keyword]
+start: (
+end: )
+
+[region:Keyword]
+start: {
+end: }
+
+[region:Keyword]
+start: \[
+end: \]
+
+[region:Keyword]
+start: #\[
+end: \]
+
+[region:Comment]
+start: (\*
+end: \*)
+
+[region:Keyword]
+start: \sfunctor\(\s\|(\)\=
+end: ->
 
 [region:String]
 start: "

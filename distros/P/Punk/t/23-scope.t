@@ -107,8 +107,8 @@ $s->_route('HEAD', '/h', 'T#h');
 is($calls[0][1], 'HEAD', '_route takes an explicit method');
 
 eval { $s->get('/only-one') };
-like($@, qr/Usage.*::get\(self, path, target\)/,
-    'a verb called wrong names itself');
+like($@, qr/Usage.*::get\(self, path, target, \\%opts\?\)/,
+    'a verb called wrong names itself, options included');
 eval { $s->_route('GET', '/a') };
 like($@, qr/Usage.*_route/, 'and so does _route');
 

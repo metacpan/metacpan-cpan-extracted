@@ -1,6 +1,6 @@
 # Syntax file for dart
 # Converted from: dart.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: dart
 extensions: dart
@@ -46,4 +46,12 @@ pattern: -?\b\d+L?\b|0[xX][0-9a-fA-F]+\b
 [region:Comment]
 start: /\*
 end: \*/
+
+[region:String]
+start: "
+end: "
+
+[region:String]
+start: '
+end: '
 

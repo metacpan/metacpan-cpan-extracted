@@ -45,7 +45,7 @@ SKIP: {
 }
 
 SKIP: {
-    skip 'Mojolicious required', 2 unless eval { require Mojo::IOLoop; 1 };
+    skip 'Mojolicious required', 2 unless eval { require Mojo::IOLoop; require Mojo::Promise; 1 };
     require DBIx::Loop::Loop::Mojo;
     my $ad = DBIx::Loop::Loop::Mojo->new;
 

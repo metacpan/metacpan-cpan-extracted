@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1beta1::JSONPatch;
 # ABSTRACT: JSONPatch defines a JSON Patch.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s expression => Str, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Admissionregistration::V1beta1::JSONPatch - JSONPatch defines a JS
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 expression
 

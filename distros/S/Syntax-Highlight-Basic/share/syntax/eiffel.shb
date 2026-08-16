@@ -1,6 +1,6 @@
 # Syntax file for eiffel
 # Converted from: eiffel.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: eiffel
 extensions: eiffel
@@ -54,9 +54,6 @@ pattern: \bclass\b
 [match:Keyword]
 pattern: \bend\b
 
-[match:Special]
-pattern: [[\]]
-
 [match:Error]
 pattern: \]
 
@@ -97,9 +94,6 @@ pattern: \$
 pattern: !
 
 [match:Special]
-pattern: [{}]
-
-[match:Special]
 pattern: <<
 
 [match:Special]
@@ -131,4 +125,16 @@ pattern: -?\.\d+(?:_\d+)*(?:[eE][-+]?\d+(?:_\d+)*)?
 
 [match:Type]
 pattern: \b[A-Z][A-Z0-9_]*\b
+
+[region:Special]
+start: \[
+end: \]
+
+[region:Special]
+start: \[
+end: \]
+
+[region:String]
+start: "
+end: "
 

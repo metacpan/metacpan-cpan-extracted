@@ -5,6 +5,8 @@ use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
 use Config;
 
+mkdir 'Install' unless -d 'Install';
+
 # Platform-specific linker flags for symbol export
 # Only add --export-dynamic on platforms where GNU ld is used.
 # Solaris/SunOS use their own ld which doesn't support this flag.

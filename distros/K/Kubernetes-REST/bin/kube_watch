@@ -7,7 +7,7 @@ use warnings;
 
 use Kubernetes::REST::CLI::Watch;
 
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 
 my $watcher = Kubernetes::REST::CLI::Watch->new_with_options;
 $watcher->run(shift @ARGV);
@@ -24,7 +24,7 @@ kube_watch - Watch Kubernetes resources for changes
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -113,7 +113,30 @@ Kubernetes context to use from the kubeconfig.
 
 =item B<--kubeconfig>=PATH
 
-Path to kubeconfig file. Defaults to F<~/.kube/config>.
+Path to kubeconfig file, or a C<:>-separated list of them. Without it the
+C<KUBECONFIG> environment variable is used, and without that F<~/.kube/config>.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item C<KUBECONFIG>
+
+Kubeconfig to use when C<--kubeconfig> is not given. As with C<kubectl> this is
+a C<:>-separated list of files (C<;>-separated on Win32), merged into one
+configuration: for each named cluster, context and user the first file that
+defines it wins, and C<current-context> comes from the first file that sets
+one. Entries naming a file that does not exist are skipped, so is an empty
+entry. See L<Kubernetes::REST::Kubeconfig/MERGING>.
+
+=item C<HOME>
+
+Used to locate the default kubeconfig at F<~/.kube/config> when neither
+C<--kubeconfig> nor C<KUBECONFIG> is set. With C<HOME> unset as well there is
+no kubeconfig to read, and the client is built from the pod's service account
+if there is one, or the error names both variables.
 
 =back
 
@@ -150,7 +173,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

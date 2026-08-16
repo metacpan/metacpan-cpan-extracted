@@ -4,13 +4,78 @@ use strict;
 use warnings;
 
 use JQ::Lite::Util ();
+use JQ::Lite::Error ();
 use JSON::PP ();
+
+sub _parse_error {
+    my ($message) = @_;
+    die JQ::Lite::Error::Parse->new(message => $message);
+}
+
+sub _validate_query_syntax {
+    my ($query) = @_;
+
+    return if !defined $query || $query eq '';
+
+    my @stack;
+    my $string;
+    my $escape = 0;
+    my %pairs = (')' => '(', ']' => '[', '}' => '{');
+
+    for my $char (split //, $query) {
+        if (defined $string) {
+            if ($escape) {
+                $escape = 0;
+                next;
+            }
+            if ($char eq '\\') {
+                $escape = 1;
+                next;
+            }
+            if ($char eq $string) {
+                undef $string;
+            }
+            next;
+        }
+
+        if ($char eq "'" || $char eq '"') {
+            $string = $char;
+            next;
+        }
+
+        if ($char eq '(' || $char eq '[' || $char eq '{') {
+            push @stack, $char;
+            next;
+        }
+
+        if (exists $pairs{$char}) {
+            my $open = pop @stack;
+            _parse_error('Invalid query syntax: unmatched brackets')
+                if !defined $open || $open ne $pairs{$char};
+        }
+    }
+
+    _parse_error('Invalid query syntax: unmatched brackets')
+        if defined $string || @stack;
+
+    my @pipeline_parts = JQ::Lite::Util::_split_top_level_pipes($query);
+    _parse_error('Invalid query syntax: empty filter segment')
+        if grep { !defined $_ || $_ !~ /\S/ } @pipeline_parts;
+
+    for my $segment (@pipeline_parts) {
+        my @comma_parts = JQ::Lite::Util::_split_top_level_commas($segment);
+        _parse_error('Invalid query syntax: empty filter segment')
+            if grep { !defined $_ || $_ !~ /\S/ } @comma_parts;
+    }
+}
 
 sub parse_query {
     my ($query) = @_;
 
     return () unless defined $query;
     return () if $query =~ /^\s*\.\s*$/;
+
+    _validate_query_syntax($query);
 
     my @parts = JQ::Lite::Util::_split_top_level_pipes($query);
     @parts = map {
@@ -26,13 +91,13 @@ sub parse_query {
         elsif ($_ =~ /^\.(.+)$/) {
             my $rest = $1;
             if ($rest eq 'count') {
-                $_;    # distinguish field access from the count filter
+                $_;
             }
             elsif ($rest =~ /,/) {
-                $_;    # preserve leading dot when sequence filters are present
+                $_;
             }
             elsif ($rest =~ /^\s*\[/) {
-                $_;    # preserve leading dot for array indexing and bracket access
+                $_;
             }
             elsif ($rest =~ /^\s*[+\-*\/%]/
                 || $rest =~ /[+\-*\/%]/

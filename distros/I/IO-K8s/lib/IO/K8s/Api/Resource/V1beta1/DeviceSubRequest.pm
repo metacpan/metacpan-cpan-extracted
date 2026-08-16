@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::DeviceSubRequest;
 # ABSTRACT: DeviceSubRequest describes a request for device provided in the claim.spec.devices.requests[].firstAvailable array. Each is typically a request for a single resource like a device, but can also ask for several identical devices.  DeviceSubRequest is similar to Request, but doesn't expose the AdminAccess or FirstAvailable fields, as those can only be set on the top-level request. AdminAccess is not supported for requests with a prioritized list, and recursive FirstAvailable fields are not supported.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s allocationMode => Str;
@@ -38,7 +38,7 @@ IO::K8s::Api::Resource::V1beta1::DeviceSubRequest - DeviceSubRequest describes a
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 allocationMode
 

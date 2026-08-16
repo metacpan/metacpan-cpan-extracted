@@ -7,7 +7,7 @@ use Punk::Request;
 use Punk::Response;
 use Punk ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.12';
 
 1;
 
@@ -128,6 +128,23 @@ See L<Punk::Views>.
 Finished responses. Status and headers previously set through
 L</status> and L</header> are folded in.
 
+=head2 respond_to(%format_handlers)
+
+    return $c->respond_to(
+        json => sub { $_[0]->json({ book => $book }) },
+        html => sub { $_[0]->render('book/view', { book => $book }) },
+        any  => sub { $_[0]->text('book', 200) },
+    );
+
+Accept negotiation: calls the handler for the most acceptable offered
+format and returns its response. Formats are C<json>, C<html>, C<text>,
+C<xml> or any full media type (C<'application/vnd.book+json'>); q-values
+order the choice and C<q=0> excludes. A client that expressed no
+preference - no C<Accept>, or only a wildcard match - gets the format its
+own request Content-Type names when that is offered, else the first
+registered. When nothing fits, the C<any> handler is called if given;
+otherwise the response is a C<406>. Every outcome carries C<Vary: Accept>.
+
 =head2 status($code)
 
 =head2 header($name => $value)
@@ -153,6 +170,55 @@ end of the request if it changed.
 =head2 session_expire
 
 Log out: empty the session and delete its cookie. Chainable.
+
+=head2 flash
+
+    $c->flash(notice => 'Saved.');      # set, for the NEXT request
+    my $note = $c->flash('notice');     # read this request's inbound
+    my $all  = $c->flash;               # the whole inbound hashref
+
+One-request messages over the session (requires the C<session> keyword):
+set with pairs (chainable), read by key, or take the whole inbound
+hashref for a template. See L<Punk::Session/FLASH> for the lifecycle.
+
+=head2 flash_keep
+
+Re-arm this request's inbound flash for one more request. Chainable.
+
+=head2 validate($schema?, $data?)
+
+    my $v = $c->validate(\%json_schema);    # run a validation now
+    return $c->json({ errors => $v->errors }, 400) if $v->has_errors;
+
+    my $v = $c->validate;                   # no args: the last Result
+
+Collecting request validation - never croaks on invalid data. With a
+schema, runs: C<$data> defaults to the decoded JSON body for a JSON
+request, the merged params otherwise; returns a L<Punk::Validate>
+Result. With no arguments, reads: the last Result this request produced
+(a route-level C<validate> option ran before the handler), or undef.
+
+=head2 login($user_or_id)
+
+=head2 logout
+
+=head2 auth_id
+
+=head2 current_user
+
+=head2 check_password($user, $password)
+
+=head2 issue_token($user_id, $kind, $ttl)
+
+=head2 take_token($token, @kinds)
+
+The authentication battery's surface; all need the C<auth> keyword.
+C<login> records the identity in the session and C<logout> expires it;
+C<auth_id> is the raw session id, C<current_user> the row loaded once per
+request through the configured model. C<check_password> burns the same
+PBKDF2 work when there is no user or hash, so login timing reveals
+nothing. The token pair mints and spends single-use email tokens -
+spending deletes first, then validates. See L<Punk::Auth>.
 
 =head2 upload($name)
 

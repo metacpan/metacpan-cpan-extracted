@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.34;
+our $VERSION = v0.35;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/,
@@ -359,7 +359,7 @@ sub new {
                 $type = 'ise';
                 $id   = $id->ise;
             } elsif ($id->isa('Data::TagDB::Tag')) {
-                $opts{displayname} //= sub { $from->displayname };
+                $opts{displayname} //= sub { $from->displayname(default => undef, no_defaults => 1) };
                 $type = 'ise';
                 $id   = $id->ise;
             } elsif ($id->isa('File::FStore::File') || $id->isa('File::FStore::Adder') || $id->isa('File::FStore::Base')) {
@@ -1122,7 +1122,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.34
+version v0.35
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -74,7 +74,7 @@ local $Data::Dumper::Sortkeys=1;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='3.012';
+$VERSION='3.014';
 
 
 #  Run main
@@ -1252,7 +1252,7 @@ Andrew Speer <andrew.speer@isolutions.com.au>
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -1418,11 +1418,15 @@ B<--warn>
 
 Enable or disable warnings about missing Tidy or Colourise modules.
 
+
+
 =item *
 
 B<--quiet>
 
 Suppress informational output, including warnings about missing optional Tidy or Colourise modules.
+
+
 
 =item *
 
@@ -1773,14 +1777,13 @@ C<wdrender> aims to reproduce WebDyne output from the command line, but it canno
 Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
 
 
-=head1 LICENSE and COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
 This file is part of WebDyne.
 
 This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
 
 Full license text is available at:
 

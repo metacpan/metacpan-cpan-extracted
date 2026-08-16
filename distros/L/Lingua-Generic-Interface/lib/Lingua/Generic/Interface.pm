@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 1;
 
@@ -29,7 +29,7 @@ Lingua::Generic::Interface - Perl module to provide generic, language independen
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

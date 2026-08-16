@@ -328,6 +328,135 @@ not_found(self)
     OUTPUT:
         RETVAL
 
+# respond_to(json => sub {...}, html => sub {...}, any => sub {...}):
+# Accept negotiation (punk_accept.h). The most acceptable offered format's
+# coderef is called with $c and its return is the response; `any` catches a
+# request nothing else fits, and without it that request is a 406. A client
+# that is indifferent (no Accept, or only a wildcard match) gets the format
+# its own Content-Type names if that is offered, else the first registered.
+# Every outcome carries Vary: Accept.
+SV *
+respond_to(self, ...)
+        SV *self
+    CODE:
+    {
+#define PRT_MAX 16
+        AV *av = pcx_av(aTHX_ self);
+        SV *cbs[PRT_MAX];
+        const char *bt[PRT_MAX], *bs[PRT_MAX];
+        STRLEN btl[PRT_MAX], bsl[PRT_MAX];
+        int bq[PRT_MAX], bspec[PRT_MAX];
+        SV *any_cb = NULL, *accept_sv = NULL, *ctype_sv = NULL;
+        pa_range ranges[PA_RANGE_MAX];
+        int nb = 0, nr = 0, have_accept = 0, i;
+        int best = -1, best_q = 0, best_spec = -1, best_order = 0;
+
+        if (items < 3 || !(items % 2))
+            croak("Punk: respond_to takes format => coderef pairs");
+        for (i = 1; i + 1 < items; i += 2) {
+            STRLEN nl; const char *nm = SvPV_const(ST(i), nl);
+            SV *cb = ST(i + 1);
+            if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV))
+                croak("Punk: respond_to format '%.*s' needs a coderef",
+                      (int)nl, nm);
+            if (nl == 3 && memEQ(nm, "any", 3)) { any_cb = cb; continue; }
+            if (nb >= PRT_MAX)
+                croak("Punk: respond_to takes at most %d formats", PRT_MAX);
+            if (!pa_fmt_mime(nm, nl, &bt[nb], &btl[nb], &bs[nb], &bsl[nb]))
+                croak("Punk: respond_to does not know format '%.*s' - "
+                      "name a full media type", (int)nl, nm);
+            cbs[nb] = cb;
+            nb++;
+        }
+
+        {   /* the request's Accept and Content-Type, straight off the env */
+            SV *env = pcx_get(aTHX_ av, PCX_ENV);
+            if (env && SvROK(env) && SvTYPE(SvRV(env)) == SVt_PVHV) {
+                HV *eh = (HV *)SvRV(env);
+                SV **e = hv_fetchs(eh, "HTTP_ACCEPT", 0);
+                if (e && *e && SvOK(*e) && SvCUR(*e)) accept_sv = *e;
+                e = hv_fetchs(eh, "CONTENT_TYPE", 0);
+                if (e && *e && SvOK(*e) && SvCUR(*e)) ctype_sv = *e;
+            }
+        }
+        if (accept_sv) {
+            STRLEN al; const char *a = SvPV_const(accept_sv, al);
+            nr = pa_parse(a, al, ranges, PA_RANGE_MAX);
+            /* unparseable garbage is indifference, not an error */
+            have_accept = nr > 0;
+        }
+
+        for (i = 0; i < nb; i++) {
+            int q = 1000, order = 0, spec = 0;
+            if (have_accept) {
+                spec = pa_match(aTHX_ ranges, nr, bt[i], btl[i],
+                                bs[i], bsl[i], &q, &order);
+                if (spec < 0 || q <= 0) { bq[i] = -1; bspec[i] = -1; continue; }
+            }
+            bq[i] = q; bspec[i] = spec;
+            if (best < 0
+                || q > best_q
+                || (q == best_q && spec > best_spec)
+                || (q == best_q && spec == best_spec && order < best_order)) {
+                best = i; best_q = q; best_spec = spec; best_order = order;
+            }
+        }
+
+        /* An indifferent client (wildcard or no Accept) that itself sent one
+         * of the offered types wants that type back - a JSON POST from curl
+         * with no Accept should not be answered in HTML. Only a branch as
+         * acceptable as the provisional winner may take over. */
+        if (best >= 0 && best_spec == 0 && ctype_sv) {
+            STRLEN cl; const char *cs = SvPV_const(ctype_sv, cl);
+            const char *ce = (const char *)memchr(cs, ';', cl);
+            STRLEN ml = ce ? (STRLEN)(ce - cs) : cl;
+            const char *slash = (const char *)memchr(cs, '/', ml);
+            while (ml && pa_ws(cs[ml - 1])) ml--;
+            if (slash && slash > cs) {
+                STRLEN tl1 = (STRLEN)(slash - cs);
+                const char *s1 = slash + 1;
+                STRLEN sl1 = ml > tl1 ? ml - tl1 - 1 : 0;
+                for (i = 0; i < nb; i++) {
+                    if (bq[i] == best_q
+                        && btl[i] == tl1 && foldEQ(bt[i], cs, (I32)tl1)
+                        && bsl[i] == sl1 && foldEQ(bs[i], s1, (I32)sl1)) {
+                        best = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        {   /* every outcome of a negotiation varies on Accept */
+            SV *res = pcx_force(aTHX_ av, PCX_RES, "Punk::Response", NULL);
+            AV *rav = pcx_res_av(aTHX_ av);
+            PERL_UNUSED_VAR(res);
+            if (rav) pa_vary_accept(aTHX_ punk_res_headers(aTHX_ rav));
+        }
+
+        if (best < 0 && !any_cb) {
+            AV *rav = pcx_res_av(aTHX_ av);
+            RETVAL = punk_triplet(aTHX_ 406,
+                        sv_2mortal(newSVpvs("application/json")),
+                        newSVpvs("{\"errors\":[{\"message\":"
+                                 "\"Not Acceptable\"}]}"),
+                        rav ? punk_res_headers(aTHX_ rav) : NULL);
+        }
+        else {
+            SV *cb = best >= 0 ? cbs[best] : any_cb;
+            dSP; int count;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP); EXTEND(SP, 1); PUSHs(self); PUTBACK;
+            count = call_sv(cb, G_SCALAR);
+            SPAGAIN;
+            RETVAL = count > 0 ? newSVsv(POPs) : newSV(0);
+            PUTBACK; FREETMPS; LEAVE;
+        }
+#undef PRT_MAX
+    }
+    OUTPUT:
+        RETVAL
+
 # ---- pending response state --------------------------------------------------
 
 # no args -> the pending status (or undef); with args -> set it, chainable.
@@ -480,6 +609,85 @@ session_expire(self)
         HV *stash = ps_stash(aTHX_ pcx_av(aTHX_ self));
         (void)hv_stores(stash, "punk.session", newRV_noinc((SV *)newHV()));
         (void)hv_stores(stash, "punk.session.expire", newSViv(1));
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
+# flash: one-request messages over the session (punk_flash.h). Any flash call
+# rotates the inbound hash out of the session, so the consuming response's
+# cookie no longer carries it; writes fill a fresh outbound hash the NEXT
+# request will read. No args: the whole inbound hashref (the template
+# hand-off). One arg: one inbound value. Pairs: set outbound, chainable.
+SV *
+flash(self, ...)
+        SV *self
+    CODE:
+    {
+        if (items == 1) {
+            RETVAL = newRV_inc((SV *)pf_inbound(aTHX_ self));
+        }
+        else if (items == 2) {
+            HV *in = pf_inbound(aTHX_ self);
+            HE *he = hv_fetch_ent(in, ST(1), 0, 0);
+            RETVAL = he ? newSVsv(HeVAL(he)) : newSV(0);
+        }
+        else if ((items - 1) % 2) {
+            croak("Punk: flash(key => value, ...) takes pairs");
+        }
+        else {
+            I32 i;
+            HV *out;
+            (void)pf_inbound(aTHX_ self);       /* rotate before writing */
+            out = pf_outbound(aTHX_ self);
+            for (i = 1; i + 1 < items; i += 2)
+                (void)hv_store_ent(out, ST(i), newSVsv(ST(i + 1)), 0);
+            RETVAL = newSVsv(self);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+# validate: collecting request validation, all in C (punk_validate.h, on
+# the JSON::Schema::Fast C ABI). With a schema, runs a validation and
+# returns the Punk::Validate::Result (also stashed at punk.validation).
+# With no arguments, the reader: the last Result this request produced -
+# a route-level validate ran before the handler, so this is how the
+# handler collects its outcome - or undef.
+SV *
+validate(self, schema = &PL_sv_undef, source = &PL_sv_undef)
+        SV *self
+        SV *schema
+        SV *source
+    CODE:
+    {
+        if (items == 1) {
+            HV *stash = ps_stash(aTHX_ pcx_av(aTHX_ self));
+            SV **v = hv_fetchs(stash, "punk.validation", 0);
+            RETVAL = (v && *v && SvOK(*v)) ? newSVsv(*v) : newSV(0);
+        }
+        else {
+            RETVAL = pv_validate(aTHX_ self, schema, source);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+# flash_keep: re-arm this request's inbound flash for one more request - the
+# redirect-through-a-redirect case. Chainable.
+SV *
+flash_keep(self)
+        SV *self
+    CODE:
+    {
+        HV *in  = pf_inbound(aTHX_ self);
+        HV *out = pf_outbound(aTHX_ self);
+        HE *he;
+        hv_iterinit(in);
+        while ((he = hv_iternext(in))) {
+            (void)hv_store_ent(out, hv_iterkeysv(he),
+                               newSVsv(HeVAL(he)), 0);
+        }
         RETVAL = newSVsv(self);
     }
     OUTPUT:

@@ -1,0 +1,14 @@
+<doc page-size="A6" margin="18">
+  <style h1="size:14;line-height:17" text="size:8;colour:#222222" />
+  <h1 align="center">{% shop.name %}</h1>
+  <text align="center" size="7" colour="#666666">{% shop.address %}</text>
+  <hr />
+  <table>
+    {% for l in items %}
+    <tr><td weight="3">{% l.name %}</td><td align="right">{% l.price | money %}</td></tr>
+    {% end %}
+  </table>
+  <hr />
+  <text align="right" size="10">Total <b>{% total | money %}</b></text>
+  <text align="center" size="7" spacing="6">{% footer %}</text>
+</doc>

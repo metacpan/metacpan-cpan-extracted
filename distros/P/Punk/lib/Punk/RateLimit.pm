@@ -3,7 +3,7 @@ package Punk::RateLimit;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.12';
 
 # Documentation only. The `rate_limit` keyword and the enforcement it installs
 # live in C - Punk::App::rate_limit (xs/ratelimit.xs) captures a rule into a

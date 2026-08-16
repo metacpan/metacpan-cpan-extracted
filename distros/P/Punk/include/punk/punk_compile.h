@@ -39,6 +39,9 @@ XS_INTERNAL(pc_app_cb) {
              * after-dispatch hook, because 404s and 405s never reach one */
             pco_decorate(aTHX_ st, env, &out);
         }
+        /* security headers go on outside the branch, so the preflight 204
+         * carries the policy too */
+        phd_decorate(aTHX_ st, env, &out);
         ST(0) = sv_2mortal(out);
     }
     XSRETURN(1);
@@ -247,10 +250,11 @@ static void pc_discover_namespace(pTHX_ SV *ns_sv, AV *out) {
             (void)hv_store_ent(seen, class, PUNK_SET_TRUE, 0);
             if (!pc_class_can(aTHX_ SvPVX(class), SvCUR(class),
                               "_punk_model_meta")) {
-                SV *file = sv_2mortal(newSVsv(dir));
-                SV *req;
-                sv_catpvs(file, "/"); sv_catsv(file, *ep);
-                req = sv_2mortal(newSVpvf("require q\1%s\1; 1;", SvPV_nolen(file)));
+                /* by module name, not by the path the scan found: a
+                 * path-form require of "lib/..." is @INC-searched too and
+                 * misses when the entry that held the file is relative */
+                SV *req = sv_2mortal(newSVpvf("require %s; 1;",
+                                              SvPV_nolen(class)));
                 eval_sv(req, G_SCALAR | G_EVAL);
                 if (SvTRUE(ERRSV))
                     croak("Punk: model %s failed to load: %s",
@@ -282,9 +286,16 @@ static void pc_compile_models(pTHX_ SV *self) {
                                                  : !have_named;
     if (autoflag) {
         HV *stash;
+        STRLEN nsl2 = SvCUR(ns);
         pc_discover_namespace(aTHX_ ns, names);
-        /* plus any ${ns}* already in the symbol table that isa Punk::Model */
-        stash = gv_stashpvn(SvPVX(ns), SvCUR(ns), 0);
+        /* plus any ${ns}* already in the symbol table that isa Punk::Model -
+         * gv_stashpvn wants the bare package name, so the namespace's
+         * trailing '::' comes off first (with it, the lookup misses and
+         * in-memory model classes were silently never discovered) */
+        if (nsl2 >= 2 && SvPVX(ns)[nsl2 - 1] == ':'
+                      && SvPVX(ns)[nsl2 - 2] == ':')
+            nsl2 -= 2;
+        stash = gv_stashpvn(SvPVX(ns), nsl2, 0);
         if (stash) {
             HE *he; AV *syms = (AV *)sv_2mortal((SV *)newAV()); SSize_t si, sn;
             hv_iterinit(stash);

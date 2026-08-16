@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.12';
 
 # Capture a command's standard output, without a shell. Called from C for
 # { $exec: [...] }; a non-zero exit is fatal, so a broken secret store stops
@@ -106,7 +106,7 @@ C<auth> matches only as a whole key, so an C<author> field is left alone.
 =head2 Layering
 
 C<config/punk.yml> is read first, then C<config/punk.$PUNK_ENV.yml>
-(C<development> unless C<PUNK_ENV> says otherwise), then
+(C<production> unless C<PUNK_ENV> says otherwise), then
 C<config/punk.local.yml>. Later layers win. Hashes merge key by key;
 anything else replaces, so an array in an overlay is a replacement rather
 than an append.

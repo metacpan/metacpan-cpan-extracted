@@ -1,6 +1,6 @@
 # Syntax file for pascal
 # Converted from: pascal.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: pascal
 extensions: pascal
@@ -113,16 +113,7 @@ pattern: <>
 pattern: :=
 
 [match:Operator]
-pattern: [()]
-
-[match:Operator]
 pattern: \.\.
-
-[match:Operator]
-pattern: [\^.]
-
-[match:Identifier]
-pattern: [][]
 
 [match:Number]
 pattern: -?\b\d+\b
@@ -148,7 +139,63 @@ pattern: \t
 [match:Float]
 pattern: -?\b\d+\.\d+[dD]-?\d+\b
 
+[region:String]
+start: '
+end: '
+
+[region:String]
+start: "
+end: "
+
+[region:Error]
+start: "
+end: "
+
+[region:Error]
+start: '
+end: '
+
+[region:Error]
+start: "
+end: "
+
+[region:Error]
+start: "
+end: "
+
+[region:String]
+start: '
+end: '
+
+[region:String]
+start: "
+end: "
+
+[region:Error]
+start: "
+end: "
+
+[region:Comment]
+start: (\*\|{
+end: \*)\|}
+
+[region:PreProc]
+start: (\*\$
+end: \*)
+
 [region:PreProc]
 start: {\$
 end: }
+
+[region:Comment]
+start: //
+end: $
+
+[region:Comment]
+start: //
+end: $
+
+[region:Comment]
+start: //
+end: $
 

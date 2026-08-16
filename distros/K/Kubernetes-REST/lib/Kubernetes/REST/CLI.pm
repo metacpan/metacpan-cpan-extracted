@@ -1,6 +1,6 @@
 package Kubernetes::REST::CLI;
 # ABSTRACT: CLI base class for Kubernetes::REST command-line tools
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use Moo;
 use MooX::Options;
 use MooX::Cmd;
@@ -25,6 +25,7 @@ option output => (
     default => sub { 'json' },
     doc => 'Output format: json, yaml, name',
 );
+
 
 has json => (
     is => 'ro',
@@ -93,7 +94,7 @@ Kubernetes::REST::CLI - CLI base class for Kubernetes::REST command-line tools
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -113,7 +114,7 @@ version 1.106
 
 Base class for the C<kube_client> command-line tool. Provides common functionality for managing Kubernetes resources from the command line.
 
-This tool uses L<Kubernetes::REST::Kubeconfig> to connect to the cluster, so it reads from C<~/.kube/config> by default.
+This tool uses L<Kubernetes::REST::Kubeconfig> to connect to the cluster: C<--kubeconfig> if given, otherwise the C<KUBECONFIG> environment variable, otherwise C<~/.kube/config>. A C<:>-separated list of kubeconfig files is merged the way C<kubectl> merges it, see L<Kubernetes::REST::Kubeconfig/MERGING>.
 
 =head1 COMMANDS
 
@@ -141,7 +142,9 @@ Get a resource or list resources.
 
     kube_client create -f <file>
 
-Create a resource from a YAML or JSON file. Use C<-f -> to read from stdin.
+Create resources from a YAML or JSON manifest. Use C<-f -> to read from stdin.
+The format is detected from the content, and multi-document YAML creates every
+C<--->-separated document in order.
 
 =head2 delete
 
@@ -153,17 +156,17 @@ Delete a resource by name.
 
     kube_client raw <Group> <Method> [key=value ...]
 
-Make a raw v0 API call (DEPRECATED).
+Make a raw call through the deprecated v0 API.
 
 =head1 GLOBAL OPTIONS
 
-=head2 --namespace
+=head2 namespace
 
 Namespace for namespaced resources. Defaults to C<default>.
 
 Short form: C<-n>
 
-=head2 --output
+=head2 output
 
 Output format. One of: C<json>, C<yaml>, C<name>.
 
@@ -171,21 +174,30 @@ Defaults to C<json>.
 
 Short form: C<-o>
 
+=head1 ATTRIBUTES
+
 =head2 json
 
-L<JSON::MaybeXS> encoder instance for JSON output. Encodes with C<utf8>, so
-C<format_output> prints UTF-8 bytes and non-ASCII values survive the way to
-the terminal.
+L<JSON::MaybeXS> encoder instance used for C<--output json>. Configured
+C<pretty>, C<canonical> (stable key ordering) and C<utf8> - the C<utf8> flag
+is what makes C<format_output> print UTF-8 bytes instead of characters, so
+non-ASCII values survive the way to the terminal instead of triggering "Wide
+character in print".
+
+=head1 METHODS
 
 =head2 format_output
 
     $cli->format_output($result);
 
-Format and print the result according to the C<--output> option.
+Format and print the result according to the C<--output> option
+(C<json>, C<yaml>, or C<name>). Any other value falls back to a raw dump via
+L<Data::Dumper>, mainly useful for debugging.
 
 =head2 execute
 
-Default execute method. Prints usage information.
+Default C<execute> method, invoked by L<MooX::Cmd> when C<kube_client> is run
+without a recognized subcommand. Prints usage information to STDOUT.
 
 =head1 SEE ALSO
 
@@ -228,7 +240,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

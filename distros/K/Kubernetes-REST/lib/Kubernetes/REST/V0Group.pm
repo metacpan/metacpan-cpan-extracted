@@ -1,5 +1,5 @@
 package Kubernetes::REST::V0Group;
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 # ABSTRACT: Base class for backwards-compatible v0 API group wrappers
 use Moo;
 use Carp qw(croak carp);
@@ -28,8 +28,9 @@ has version => (is => 'ro', default => sub { 'v1' });
 #   Actions: List, Read, Create, Replace, Patch, Delete, Watch
 #   Example: ListNamespacedPod → list('IO::K8s::Api::Core::V1::Pod', ...)
 #
-# The old Call classes are now deprecation stubs (warn + return 1).
-# This entire layer can be removed once no downstream code uses the old API.
+# The old Call classes no longer ship here at all - their names are tombstoned
+# in Kubernetes-REST-Deprecated. This layer is the only thing left keeping the
+# v0 method names alive, and can go once no downstream code uses them.
 # ============================================================================
 
 our $AUTOLOAD;
@@ -74,36 +75,26 @@ sub _parse_method {
     return (undef, undef, undef);
 }
 
+# v0 group name -> IO::K8s group path. Only entries that actually rename
+# something belong here; anything else falls through to the group name as
+# written, which is already the IO::K8s spelling for every shipped group.
+my %GROUP_MAP = (
+    RbacAuthorization => 'Rbac',
+);
+
 sub _build_class {
     my ($self, $resource) = @_;
     my $group = $self->group;
     my $version = ucfirst(lc($self->version));
 
-    # Map group names to IO::K8s paths
-    my %group_map = (
-        Core => 'Core',
-        Apps => 'Apps',
-        Batch => 'Batch',
-        Networking => 'Networking',
-        Rbac => 'Rbac',
-        Storage => 'Storage',
-        Policy => 'Policy',
-        Autoscaling => 'Autoscaling',
-        Certificates => 'Certificates',
-        Coordination => 'Coordination',
-        Discovery => 'Discovery',
-        Events => 'Events',
-        Node => 'Node',
-        Scheduling => 'Scheduling',
-        Authentication => 'Authentication',
-        Authorization => 'Authorization',
-        Admissionregistration => 'Admissionregistration',
-        Apiextensions => 'Apiextensions',
-        RbacAuthorization => 'Rbac',
-    );
+    my $io_group = $GROUP_MAP{$group} // $group;
 
-    my $io_group = $group_map{$group} // $group;
-    return "IO::K8s::Api::${io_group}::${version}::${resource}";
+    # Not every group lives under IO::K8s::Api:: - apiextensions and
+    # apiregistration sit in their own staging namespaces. Kubernetes::REST
+    # owns that table, so ask it rather than reimplementing the exception
+    # here; the two copies drifting apart is exactly what broke this before.
+    return 'IO::K8s::' . $self->api->_io_k8s_namespace_for_group_path($io_group)
+        . "::${version}::${resource}";
 }
 
 sub _warn_deprecated {
@@ -190,7 +181,7 @@ Kubernetes::REST::V0Group - Base class for backwards-compatible v0 API group wra
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -209,8 +200,10 @@ This module provides backwards compatibility for the old v0 API that used method
 names like C<ListNamespacedPod>, C<ReadNamespacedPod>, etc. It translates these
 calls to the new simplified API.
 
-B<This API is deprecated>. All calls emit deprecation warnings unless you set
+Every call through this layer emits a deprecation warning unless you set
 C<$ENV{HIDE_KUBERNETES_REST_V0_API_WARNING}>.
+
+See L<Kubernetes::REST/"UPGRADING FROM 0.02"> for migration guide.
 
 =head1 NAME
 
@@ -264,7 +257,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

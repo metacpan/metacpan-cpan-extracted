@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::MutatingAdmissionPolicyBindingSpec;
 # ABSTRACT: MutatingAdmissionPolicyBindingSpec is the specification of the MutatingAdmissionPolicyBinding.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s matchResources => 'Admissionregistration::V1::MatchResources';
@@ -26,7 +26,7 @@ IO::K8s::Api::Admissionregistration::V1::MutatingAdmissionPolicyBindingSpec - Mu
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 matchResources
 

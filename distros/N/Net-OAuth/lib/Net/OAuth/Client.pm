@@ -2,16 +2,16 @@ package Net::OAuth::Client;
 use warnings;
 use strict;
 use base qw(Class::Accessor::Fast);
-__PACKAGE__->mk_accessors(qw/id secret callback is_v1a user_agent site debug session/);
+__PACKAGE__->mk_accessors(qw/id secret callback is_v1a user_agent site debug session allow_v1a_downgrade/);
 use LWP::UserAgent;
 use URI;
 use Net::OAuth;
 use Net::OAuth::Message;
 use Net::OAuth::AccessToken;
 use Carp;
-use Crypt::URandom qw( urandom );
+use Crypt::SysRandom qw( random_bytes );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 =head1 NAME
 
@@ -19,53 +19,32 @@ Net::OAuth::Client - OAuth 1.0A Client
 
 =head1 SYNOPSIS
 
-  # Web Server Example (Dancer)
-
-  # This example is simplified for illustrative purposes, see the complete code in /demo
-
-  # Note that client_id is the Consumer Key and client_secret is the Consumer Secret
-
-  use Dancer;
   use Net::OAuth::Client;
 
-  sub client {
-  	Net::OAuth::Client->new(
-  		config->{client_id},
-  		config->{client_secret},
-  		site => 'https://www.google.com/',
-  		request_token_path => '/accounts/OAuthGetRequestToken?scope=https%3A%2F%2Fwww.google.com%2Fm8%2Ffeeds%2F',
-  		authorize_path => '/accounts/OAuthAuthorizeToken',
-  		access_token_path => '/accounts/OAuthGetAccessToken',
-  		callback => uri_for("/auth/google/callback"),
-  		session => \&session,
-  	);
-  }
+  # client_id is the Consumer Key, client_secret the Consumer Secret.
+  # Framework-agnostic: supply your own redirect and session handling.
 
-  # Send user to authorize with service provider
-  get '/auth/google' => sub {
-  	redirect client->authorize_url;
-  };
+  my $client = Net::OAuth::Client->new(
+      $client_id,
+      $client_secret,
+      site               => 'https://provider.example/',
+      request_token_path => '/oauth/request_token',
+      authorize_path     => '/oauth/authorize',
+      access_token_path  => '/oauth/access_token',
+      callback           => 'https://you.example/auth/callback',
+      session            => \&session,
+  );
 
-  # User has returned with token and verifier appended to the URL.
-  get '/auth/google/callback' => sub {
+  # 1. Send the user to the provider to authorize.
+  $client->authorize_url;
 
-  	# Use the auth code to fetch the access token
-  	my $access_token =  client->get_access_token(params->{oauth_token}, params->{oauth_verifier});
+  # 2. They return to your callback with oauth_token and oauth_verifier.
+  my $access_token = $client->get_access_token($token, $verifier);
 
-  	# Use the access token to fetch a protected resource
-  	my $response = $access_token->get('/m8/feeds/contacts/default/full');
-
-  	# Do something with said resource...
-
-  	if ($response->is_success) {
-  	  return "Yay, it worked: " . $response->decoded_content;
-  	}
-  	else {
-  	  return "Error: " . $response->status_line;
-  	}
-  };
-
-  dance;
+  # 3. Use the access token to fetch a protected resource.
+  my $response = $access_token->get('/profile');
+  die $response->status_line unless $response->is_success;
+  print $response->decoded_content;
 
 =head1 DESCRIPTION
 
@@ -105,9 +84,39 @@ AKA Consumer Secret - you get this from the service provider when you register y
 
 =item * $params{session}
 
+=item * $params{allow_v1a_downgrade}
+
+Permit the fallback to OAuth 1.0 described in L</OAUTH 1.0A AND THE
+CALLBACK CONFIRMATION>. Off by default.
+
 =back
 
 =back
+
+=head2 OAUTH 1.0A AND THE CALLBACK CONFIRMATION
+
+Passing a C<callback> to C<new> selects OAuth 1.0a. In 1.0a the service
+provider echoes C<oauth_callback_confirmed> in its request token response,
+and later hands the user back with an C<oauth_verifier> that the client
+must present when it exchanges the request token for an access token.
+
+If the provider's request token response does not contain
+C<oauth_callback_confirmed>, this client cannot use 1.0a. It used to drop
+back to plain OAuth 1.0 by itself, and that fallback was invisible: the
+access token request is then built from the 1.0 message class, which has
+no C<verifier> parameter, so C<oauth_verifier> is quietly left off the
+wire even when the caller passed one to L</get_access_token>. The verifier
+is exactly what 1.0a added to stop an attacker starting a flow, getting a
+victim to authorize the attacker's request token, and then completing the
+exchange - so an application that asked for 1.0a and silently got 1.0 is
+open to that, with nothing to tell it so.
+
+C<get_request_token> now croaks in that situation instead. An application
+that has to talk to a provider which is not 1.0a can opt in with
+
+  allow_v1a_downgrade => 1
+
+which restores the fallback and warns rather than dying.
 
 =cut
 
@@ -187,7 +196,22 @@ sub get_request_token {
     $self->request_token_method => $oauth_req->to_url
   ));
   my $oauth_res = $self->_parse_oauth_response('get a request token', $http_res);
-  $self->is_v1a(0) unless defined $oauth_res->{callback_confirmed};
+  if ($self->is_v1a and !defined $oauth_res->{callback_confirmed}) {
+    # The application asked for OAuth 1.0a by configuring a callback and the
+    # provider did not confirm it.  Dropping to 1.0 here also drops
+    # oauth_verifier from the access token request further down, which is
+    # the parameter 1.0a added to prevent session fixation, so this is not a
+    # decision to take on the application's behalf without telling it.
+    croak "Unable to get a request token: the service provider did not "
+        . "confirm the OAuth 1.0a callback (no oauth_callback_confirmed in "
+        . "its response). Pass allow_v1a_downgrade => 1 to "
+        . "Net::OAuth::Client->new to fall back to OAuth 1.0 instead"
+      unless $self->allow_v1a_downgrade;
+    carp "Net::OAuth::Client warning: service provider did not confirm the "
+       . "OAuth 1.0a callback; falling back to OAuth 1.0, so oauth_verifier "
+       . "will not be sent";
+    $self->is_v1a(0);
+  }
   return $oauth_res;
 }
 
@@ -218,6 +242,15 @@ sub get_access_token {
 
   if (defined $self->session) {
     $params{token_secret} = $self->session->($token);
+  }
+
+  # In OAuth 1.0 mode the access token request class has no verifier message
+  # parameter, so gather_message_parameters() would drop this on the floor
+  # without a word.  Say so rather than sending a request that is missing
+  # the credential the caller believed it was presenting.
+  if (defined $verifier and !$self->is_v1a) {
+    carp "Net::OAuth::Client warning: an oauth_verifier was supplied but "
+       . "this client is in OAuth 1.0 mode, so it will not be sent";
   }
 
   my $oauth_req = $self->_make_request(
@@ -267,7 +300,7 @@ sub _make_request {
     signature_method => 'HMAC-SHA1',
     request_method => 'GET',
   );
-  $defaults{nonce} = unpack("H*", urandom(16)) unless exists $params{nonce};
+  $defaults{nonce} = unpack("H*", random_bytes(16)) unless exists $params{nonce};
   $defaults{protocol_version} = Net::OAuth::PROTOCOL_VERSION_1_0A if $self->is_v1a;
   my $req = Net::OAuth->request($type)->new(
     %defaults,
@@ -302,9 +335,9 @@ sub site_url {
 
 =head1 AUTHOR
 
-Originally by Keith Grennan <kgrennan@cpan.org>
+Originally by Keith Grennan <foss@nearlyfree.org>
 
-Currently maintained by Robert Rothenberg <rrwo@cpan.org>
+Currently maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha2::BasicSchedulingPolicy;
 # ABSTRACT: BasicSchedulingPolicy indicates that standard Kubernetes scheduling behavior should be used.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 
@@ -18,7 +18,7 @@ IO::K8s::Api::Scheduling::V1alpha2::BasicSchedulingPolicy - BasicSchedulingPolic
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 DESCRIPTION
 

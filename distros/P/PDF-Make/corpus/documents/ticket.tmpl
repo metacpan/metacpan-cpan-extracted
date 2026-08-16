@@ -1,0 +1,16 @@
+<doc page-size="A6" margin="20">
+  <style h1="size:20;line-height:24;colour:#10233f" text="size:9" />
+  <h1 align="center">{% event.name %}</h1>
+  <text align="center" size="11">{% event.venue %}</text>
+  <text align="center" size="11">{% event.date %} at {% event.time %}</text>
+  <hr />
+  <row>
+    <cell weight="1" pad="6" bg="#10233f" colour="#ffffff" align="center">Section
+      {% seat.section %}</cell>
+    <cell weight="1" pad="6" bg="#10233f" colour="#ffffff" align="center">Row
+      {% seat.row %}</cell>
+    <cell weight="1" pad="6" bg="#10233f" colour="#ffffff" align="center">Seat
+      {% seat.number %}</cell>
+  </row>
+  <text align="center" size="8" spacing="8" colour="#666666">{% reference %}</text>
+</doc>

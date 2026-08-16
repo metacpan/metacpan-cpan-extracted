@@ -1,6 +1,6 @@
 # Syntax file for d
 # Converted from: d.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: d
 extensions: d
@@ -175,14 +175,14 @@ pattern: \[A-Z]\d{4}
 pattern: \basm\b
 
 [region:String]
-start: `
-end: `[cwd]\=
+start: "
+end: "
 
 [region:String]
-start: r"
-end: "[cwd]\=
+start: "
+end: +
 
 [region:String]
-start: x"
+start: "
 end: "[cwd]\=
 

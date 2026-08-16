@@ -7,7 +7,7 @@ use warnings;
 
 use Kubernetes::REST::CLI;
 
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 
 Kubernetes::REST::CLI->new_with_cmd;
 
@@ -23,7 +23,7 @@ kube_client - Kubernetes CLI client using Kubernetes::REST
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -42,8 +42,11 @@ version 1.106
     # Output only names
     kube_client get Pod -o name
 
-    # Create resource from file
+    # Create resources from a YAML or JSON manifest
     kube_client create -f pod.yaml
+
+    # Multi-document YAML creates every document in order
+    kube_client create -f manifests/all.yaml
 
     # Create resource from stdin
     cat pod.json | kube_client create
@@ -58,8 +61,8 @@ version 1.106
     kube_client --kubeconfig /path/to/config get Pod
 
     # Raw API call
-    kube_client raw CoreV1 ListNamespace
-    kube_client raw CoreV1 ReadNamespacedPod namespace=default name=nginx
+    kube_client raw Core ListNamespace
+    kube_client raw Core ReadNamespacedPod namespace=default name=nginx
 
 =head1 DESCRIPTION
 
@@ -77,7 +80,8 @@ kube_client - Kubernetes CLI client using Kubernetes::REST
 
 =item B<--kubeconfig>=PATH
 
-Path to kubeconfig file. Defaults to F<~/.kube/config>.
+Path to kubeconfig file, or a C<:>-separated list of them. Without it the
+C<KUBECONFIG> environment variable is used, and without that F<~/.kube/config>.
 
 =item B<-c>, B<--context>=NAME
 
@@ -111,9 +115,16 @@ resource. Otherwise lists all resources of that kind.
 
     kube_client create -f <file>
 
-Create a resource from a JSON or YAML file. Use C<-f -> to read from stdin.
+Create resources from a YAML or JSON manifest. Use C<-f -> to read from stdin,
+which is also the default. The format is detected from the content, so stdin
+works exactly like a named file.
+
+Multi-document YAML is supported: every C<--->-separated document is created in
+the order it appears, and each created object is printed in the C<--output>
+format.
 
     kube_client create -f deployment.yaml
+    kube_client create -f manifests/all.yaml
     cat pod.json | kube_client create
 
 =head2 delete
@@ -129,19 +140,37 @@ Delete a resource by kind and name.
 
     kube_client raw <Group> <Method> [key=value ...]
 
-Make a raw API call using Kubernetes::REST method groups.
+Make a raw API call through the deprecated v0 API groups. C<Group> is a
+L<Kubernetes::REST::V0Group> subclass name without a version suffix - C<Core>,
+C<Apps>, C<Batch> and so on, not C<CoreV1> or C<AppsV1>.
 
-    kube_client raw CoreV1 ListNamespace
-    kube_client raw CoreV1 ReadNamespacedPod namespace=default name=nginx
-    kube_client raw AppsV1 ListNamespacedDeployment namespace=default
+    kube_client raw Core ListNamespace
+    kube_client raw Core ReadNamespacedPod namespace=default name=nginx
+    kube_client raw Apps ListNamespacedDeployment namespace=default
 
 =head1 ENVIRONMENT
 
 =over 4
 
+=item C<KUBECONFIG>
+
+Kubeconfig to use when C<--kubeconfig> is not given. As with C<kubectl> this is
+a C<:>-separated list of files (C<;>-separated on Win32), merged into one
+configuration: for each named cluster, context and user the first file that
+defines it wins, and C<current-context> comes from the first file that sets
+one. Entries naming a file that does not exist are skipped, so is an empty
+entry. See L<Kubernetes::REST::Kubeconfig/MERGING>.
+
 =item C<HOME>
 
-Used to locate the default kubeconfig at F<~/.kube/config>.
+Used to locate the default kubeconfig at F<~/.kube/config> when neither
+C<--kubeconfig> nor C<KUBECONFIG> is set. With C<HOME> unset as well there is
+no kubeconfig to read, and the client is built from the pod's service account
+if there is one, or the error names both variables.
+
+=item C<HIDE_KUBERNETES_REST_V0_API_WARNING>
+
+Silences the deprecation warning C<raw> prints on every call.
 
 =back
 
@@ -170,7 +199,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

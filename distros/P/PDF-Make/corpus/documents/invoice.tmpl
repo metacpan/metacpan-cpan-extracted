@@ -1,0 +1,30 @@
+<doc page-size="A4" margin="36">
+  <style h1="size:22;line-height:26;colour:#1a1a2e" h2="size:13;line-height:16;colour:#0f3460" text="size:10;colour:#333333" />
+  <header>{% company.name %}</header>
+  <footer>Registered in England, number {% company.number %}</footer>
+
+  <h1>Invoice {% invoice.number %}</h1>
+
+  <img src="corpus/documents/logo.png" width="64" height="64" align="right" />
+
+  <row>
+    <cell weight="2" pad="8" bg="#f4f4f4">{% customer.name %}
+      {% customer.address %}</cell>
+    <cell weight="1" pad="8" align="right">Issued {% invoice.issued %}
+      Due {% invoice.due %}</cell>
+  </row>
+
+  <h2>Items</h2>
+  <table>
+    <tr><th weight="5">Description</th><th align="right">Qty</th><th align="right">Unit</th><th align="right">Total</th></tr>
+    {% for l in invoice.lines %}
+    <tr><td>{% l.name %}</td><td align="right">{% l.qty %}</td><td align="right">{% l.unit | money %}</td><td align="right">{% l.total | money %}</td></tr>
+    {% end %}
+  </table>
+
+  <hr />
+  <text align="right">Subtotal {% invoice.subtotal | money %}</text>
+  <text align="right">VAT at {% invoice.vat_rate %} percent: {% invoice.vat | money %}</text>
+  <text align="right" size="12">Total due: <b>{% invoice.total | money %}</b></text>
+  <text spacing="8" size="9" colour="#666666">Payment is due within {% invoice.terms %} days. Late payment carries interest at the statutory rate.</text>
+</doc>

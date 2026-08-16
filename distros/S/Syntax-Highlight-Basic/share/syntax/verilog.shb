@@ -1,6 +1,6 @@
 # Syntax file for verilog
 # Converted from: verilog.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: verilog
 extensions: verilog
@@ -113,4 +113,12 @@ pattern: //\s*synopsys\b.*$
 
 [match:SpecialComment]
 pattern: //\s*\$s\b.*$
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:String]
+start: "
+end: "
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceAllocationResult;
 # ABSTRACT: DeviceAllocationResult is the result of allocating devices.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s config => ['Resource::V1::DeviceAllocationConfiguration'];
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1::DeviceAllocationResult - DeviceAllocationResult is t
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 config
 

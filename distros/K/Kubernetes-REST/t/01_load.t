@@ -8,6 +8,7 @@ use lib "$FindBin::Bin/../lib";
 use_ok('Kubernetes::REST');
 use_ok('Kubernetes::REST::Server');
 use_ok('Kubernetes::REST::AuthToken');
+use_ok('Kubernetes::REST::AuthTokenFile');
 use_ok('Kubernetes::REST::Kubeconfig');
 
 # Internal modules

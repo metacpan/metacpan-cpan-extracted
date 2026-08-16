@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ContainerRestartRuleOnExitCodes;
 # ABSTRACT: ContainerRestartRuleOnExitCodes describes the condition for handling an exited container based on its exit codes.
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::Resource;
 
 k8s operator => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::ContainerRestartRuleOnExitCodes - ContainerRestartRuleOn
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head2 operator
 

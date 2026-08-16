@@ -2,6 +2,7 @@ package PDF::Make::Builder::Layout;
 use strict;
 use warnings;
 use Object::Proto;
+use Scalar::Util ();
 use PDF::Make::Builder::Layout::Row;
 
 BEGIN {
@@ -10,6 +11,20 @@ BEGIN {
         'rows:ArrayRef:default([])',
     );
     Object::Proto::import_accessors('PDF::Make::Builder::Layout');
+}
+
+# Layout holds its rows and each row points back at the layout: the same
+# cycle as Row and Cell, and leaked the same way. Weakened here for the same
+# reason and by the same identity scan.
+sub _weaken_layout_ref {
+    my ($row, $layout) = @_;
+    for my $i (0 .. $#$row) {
+        next unless ref $row->[$i];
+        next unless $row->[$i] == $layout;
+        Scalar::Util::weaken($row->[$i]);
+        return 1;
+    }
+    return 0;
 }
 
 sub row {
@@ -21,8 +36,10 @@ sub row {
         gap    => $args{gap} // 0,
     );
     $row_args{height} = $args{height} if defined $args{height};
-    push @$rows, PDF::Make::Builder::Layout::Row->new(%row_args);
-    return $rows->[-1];
+    my $row = PDF::Make::Builder::Layout::Row->new(%row_args);
+    _weaken_layout_ref($row, $self);
+    push @$rows, $row;
+    return $row;
 }
 
 sub render {

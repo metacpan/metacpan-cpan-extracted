@@ -3,6 +3,7 @@ include/litavis.h
 include/litavis_ast.h
 include/litavis_cascade.h
 include/litavis_colour.h
+include/litavis_dirent_win.h
 include/litavis_emitter.h
 include/litavis_parser.h
 include/litavis_tokeniser.h

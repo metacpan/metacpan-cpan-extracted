@@ -1,6 +1,6 @@
 # Syntax file for cs
 # Converted from: cs.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: cs
 extensions: cs
@@ -24,13 +24,15 @@ case default
 break continue do for foreach goto return while
 
 [keyword:Statement]
-a as ascending b br by c code cref descending equals example exception from
-group href i in include inheritdoc into is join let list lock nameof new on
-orderby out para param paramref params ref remarks returns see seealso select
-sizeof stackalloc summary typeparam typeparamref u using value
+CDATA DOCTYPE PUBLIC SYSTEM a as ascending b br by c code cref descending
+equals example exception from group href i in include inheritdoc into is join
+let list lock nameof new on orderby out para param paramref params ref remarks
+returns see seealso select sizeof stackalloc summary typeparam typeparamref u
+using value
 
 [keyword:StorageClass]
-abstract const event operator override readonly sealed static virtual volatile
+abstract const event extern fixed operator override readonly sealed static
+unsafe virtual volatile
 
 [keyword:Structure]
 class enum interface namespace struct
@@ -94,19 +96,16 @@ pattern: =>
 pattern: &&
 
 [match:Operator]
-pattern: ||
-
-[match:Operator]
 pattern: :
+
+[match:Type]
+pattern: ]]>
 
 [match:PreProc]
 pattern: \%^#!.*
 
 [match:Error]
 pattern: \\.
-
-[match:Error]
-pattern: [^']
 
 [match:SpecialChar]
 pattern: \\["\\'0abfnrtv]
@@ -122,4 +121,36 @@ pattern: ""
 
 [match:Identifier]
 pattern: @[a-zA-Z_]\w*
+
+[region:Typedef]
+start: (
+end: )
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:String]
+start: "
+end: "
+
+[region:String]
+start: '
+end: '
+
+[region:Type]
+start: <?
+end: ?>
+
+[region:Function]
+start: \[
+end: ]
+
+[region:Type]
+start:  is 
+end: [A-Za-z0-9]\+
+
+[region:Type]
+start:  as 
+end: [A-Za-z0-9]\+
 

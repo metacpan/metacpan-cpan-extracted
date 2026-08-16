@@ -1,5 +1,5 @@
 package Kubernetes::REST::CLI::Watch;
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 # ABSTRACT: CLI for watching Kubernetes resources
 use Moo;
 use MooX::Options;
@@ -42,12 +42,14 @@ option event_type => (
     doc => 'Only show these event types (comma-separated)',
 );
 
+
 option label => (
     is => 'ro',
     format => 's',
     short => 'l',
     doc => 'Label selector',
 );
+
 
 option field => (
     is => 'ro',
@@ -56,12 +58,14 @@ option field => (
     doc => 'Field selector',
 );
 
+
 option names => (
     is => 'ro',
     format => 's',
     short => 'N',
     doc => 'Filter by resource name (Perl regex)',
 );
+
 
 option timestamp_format => (
     is => 'ro',
@@ -70,6 +74,7 @@ option timestamp_format => (
     default => sub { 'datetime' },
     doc => 'Timestamp format: datetime, date, time, epoch, iso',
 );
+
 
 has _json => (
     is => 'ro',
@@ -143,6 +148,7 @@ sub run {
         # Normal timeout, restart watch
     }
 }
+
 
 sub _handle_event {
     my ($self, $event) = @_;
@@ -227,7 +233,7 @@ Kubernetes::REST::CLI::Watch - CLI for watching Kubernetes resources
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 SYNOPSIS
 
@@ -257,6 +263,57 @@ Short option: C<-o>
 Server-side timeout per watch cycle in seconds. Default: 300.
 
 Short option: C<-t>
+
+=head2 event_type
+
+Comma-separated list of watch event types to show, e.g. C<ADDED,DELETED>.
+Matched case-insensitively (values are uppercased before comparing) against
+C<ADDED>, C<MODIFIED>, C<DELETED>, C<ERROR>, and C<BOOKMARK>. Omit to show all
+event types.
+
+Short option: C<-T>
+
+=head2 label
+
+Kubernetes label selector passed through as C<labelSelector>, e.g.
+C<app=web,env=prod>.
+
+Short option: C<-l>
+
+=head2 field
+
+Kubernetes field selector passed through as C<fieldSelector>, e.g.
+C<status.phase=Running>.
+
+Short option: C<-f>
+
+=head2 names
+
+Perl regular expression. Only events for resources whose C<metadata.name>
+matches are printed; all others are silently skipped. Applied client-side,
+after the event has already been received from the server.
+
+Short option: C<-N>
+
+=head2 timestamp_format
+
+Timestamp format used in C<text> output. One of C<datetime> (C<%Y-%m-%d
+%H:%M:%S>, the default), C<date>, C<time>, C<epoch> (seconds since the Unix
+epoch), or C<iso>. Ignored for C<json>/C<yaml> output.
+
+Short option: C<-F>
+
+=head2 run
+
+    $watcher->run($kind);
+
+Watches resources of C<$kind>, printing each event as it arrives (formatted
+per C<--output>). Calls L<Kubernetes::REST/watch> in an infinite loop: a
+normal server-side timeout restarts the watch from the last seen
+C<resourceVersion>, and a C<410 Gone> (the C<resourceVersion> has expired)
+warns and restarts a fresh watch from scratch. Any other error is rethrown.
+Dies with a usage message if C<$kind> is missing. This method never returns
+under normal operation - it is the entry point called by C<bin/kube_watch>.
 
 =head1 SEE ALSO
 
@@ -291,7 +348,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =item *
 

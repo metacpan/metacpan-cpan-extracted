@@ -1,5 +1,22 @@
 Revision history for Syntax-Highlight-Basic
 
+0.1.2  2026-08-15
+       - vim-syntax-to-shb: detect and report "thin" (effectively empty)
+         generated .shb files; new --min-sections, --warn-thin,
+         --fail-on-thin options (fail-on-thin gates CI/build scripts)
+       - vim-syntax-to-shb: follow runtime!/source/syn-include directives
+         (new --follow-includes option, on by default) so Vim syntax files
+         that delegate all their rules to another file (bash -> sh,
+         scss -> sass, typescript -> shared/typescriptcommon) now produce
+         real highlighting rules instead of an empty stub
+       - Curated share/syntax/zig.shb, julia.shb, tcsh.shb, dockerfile.shb
+         by hand (Vim-magic regex / indirectly-defined keywords that the
+         converter cannot safely translate)
+       - Regenerated the bundled non-curated share/syntax/*.shb set with
+         the improved converter
+       - Added t/08-no-thin-shb.t regression test asserting every bundled
+         .shb ships with at least one usable rule section
+
 0.1.1  2026-07-14
        - Fix _find_shb_file: return inside eval{} does not exit subroutine
        - Fix _find_pygments_map: same eval{} return bug

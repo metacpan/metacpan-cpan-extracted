@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 use parent 'Data::Identifier::Interface::Known';
 
@@ -44,7 +44,7 @@ Lingua::famibeib - module to interact with the famibeib language
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

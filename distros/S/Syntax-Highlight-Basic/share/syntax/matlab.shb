@@ -1,6 +1,6 @@
 # Syntax file for matlab
 # Converted from: matlab.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: matlab
 extensions: matlab
@@ -32,9 +32,6 @@ TODO
 global persistent
 
 [match:Operator]
-pattern: [-+]
-
-[match:Operator]
 pattern: \.?[*/\\^]
 
 [match:Operator]
@@ -42,9 +39,6 @@ pattern: [=~]=
 
 [match:Operator]
 pattern: [<>]=?
-
-[match:Operator]
-pattern: [&|~]
 
 [match:Special]
 pattern: \.{3}
@@ -57,9 +51,6 @@ pattern: \b\d+(?:\.\d*)?(?:[edED][-+]?\d+)?[ij]?\b
 
 [match:Float]
 pattern: \.\d+(?:[edED][-+]?\d+)?[ij]?\b
-
-[match:Delimiter]
-pattern: [][]
 
 [match:Operator]
 pattern: [])a-zA-Z0-9.]'

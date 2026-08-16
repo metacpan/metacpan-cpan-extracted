@@ -5,45 +5,26 @@ use warnings;
 use FindBin ();
 use lib "$FindBin::Bin/../lib";
 use Test::More;
+use Punk::Test;
 
 # The application is compiled once, at to_app, so a test that builds the app
-# is testing the same frozen coderef the server runs.
+# is testing the same frozen coderef the server runs - and one Punk::Test
+# object is one browser: its cookie jar carries the session across every
+# request below. See `perldoc Punk::Test` for the full assertion set.
 chdir "$FindBin::Bin/.." or die "cannot chdir to the application root: $!\n";
 
-use_ok('{% name %}');
+my $t = Punk::Test->new('{% name %}');
 
-my $app = {% name %}->to_app;
-ok($app, 'the application compiles to a PSGI coderef');
+$t->get_ok('/')
+  ->status_is(200)
+  ->content_like(qr/{% name %}/, 'renders the welcome page');
 
-sub request {
-    my (%args) = @_;
-    return $app->({
-        REQUEST_METHOD  => $args{method} || 'GET',
-        PATH_INFO       => $args{path},
-        QUERY_STRING    => $args{query} // '',
-        SERVER_NAME     => 'localhost',
-        SERVER_PORT     => 80,
-        HTTP_HOST       => 'localhost',
-        'psgi.url_scheme' => 'http',
-    });
-}
-
-{
-    my $res = request(path => '/');
-    is($res->[0], 200, 'GET / is 200');
-    like($res->[2][0], qr/{% name %}/, '...and renders the welcome page');
-}
-
-{
-    my $res = request(path => '/no-such-page');
-    is($res->[0], 404, 'an unknown path is 404');
-}
+$t->get_ok('/no-such-page')->status_is(404);
 {% if api %}
 # The API mount answers from the spec. The generated stubs return 501 until
 # you implement them - change this assertion as you do.
-{
-    my $res = request(method => '{% first_op.method %}', path => '/api{% first_op.path_literal %}');
-    isnt($res->[0], 404, '{% first_op.id %} is routed from the spec');
-}
+my $op = lc('{% first_op.method %}') . '_ok';
+$t->$op('/api{% first_op.path_literal %}')
+  ->status_isnt(404, '{% first_op.id %} is routed from the spec');
 {% end %}
 done_testing();

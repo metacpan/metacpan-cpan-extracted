@@ -1,7 +1,103 @@
 # Syntax file for scss
 # Converted from: scss.vim
-# Conversion date: 2026-07-13
+# Conversion date: 2026-08-15
 
 language: scss
 extensions: scss
+case: ignore
+
+[keyword:PreProc]
+active after and any-link autofill before checked default defined disabled
+empty enabled from fullscreen host hover in in-range indeterminate invalid
+left link modal not only optional out-of-range paused picture-in-picture
+placeholder-shown playing read-only read-write required right root scope
+target through to visited
+
+[keyword:Special]
+all aural braille embossed handheld print projection screen speech tty tv
+
+[keyword:Statement]
+a abbr address and area article aside audio b base bdi bdo blockquote body br
+button canvas caption cite code col colgroup command data datalist dd del
+details dfn dialog div dl dt em embed fieldset figcaption figure footer form
+h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins isindex
+kbd keygen label legend li link main map mark menu menuitem meta meter nav
+noscript not object ol only optgroup option output p param picture pre
+progress q rp rt ruby s samp script section small source span strong sub
+summary sup svg tbody td textarea tfoot th thead time title tr track u ul var
+video wbr
+
+[keyword:Todo]
+FIXME NOTE OPTIMIZE TODO XXX
+
+[match:Statement]
+pattern: \bselect\b|\bstyle\b|\btable\b
+
+[match:Statement]
+pattern: \*
+
+[match:Special]
+pattern: [,>+~]
+
+[match:Special]
+pattern: [~|^$*]\?=
+
+[match:Function]
+pattern: #[A-Za-zÀ-ÿ_@][A-Za-zÀ-ÿ0-9_@-]*
+
+[match:Function]
+pattern: #[A-Za-z_@][A-Za-z0-9_@-]*
+
+[match:Error]
+pattern: }
+
+[match:Special]
+pattern: ,
+
+[match:Special]
+pattern: \\[0-9a-fA-F]{1,6}\s\?
+
+[match:PreProc]
+pattern: @(?:font-face|media|keyframes|import|charset|namespace|page|supports)
+
+[match:PreProc]
+pattern: :(?:left|right|first|blank)
+
+[match:Identifier]
+pattern: $[[:alnum:]_-]+
+
+[match:PreProc]
+pattern: ^=
+
+[match:Special]
+pattern: ^\s*\K\\
+
+[match:Identifier]
+pattern: [[:alnum:]_-]+
+
+[match:Type]
+pattern: [[:alnum:]_-]+
+
+[match:Character]
+pattern: &
+
+[region:String]
+start: "
+end: "
+
+[region:String]
+start: '
+end: '
+
+[region:PreProc]
+start: @charset
+end: ;\|$
+
+[region:Include]
+start: @import
+end: ;\|$
+
+[region:Comment]
+start: /\*
+end: \*/
 

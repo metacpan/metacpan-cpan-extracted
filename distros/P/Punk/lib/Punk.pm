@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.08';
+    $VERSION = '0.12';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -72,6 +72,11 @@ C<punk doctor> reports the environment and C ABIs, C<punk config check>
 resolves the configuration and its secrets, and C<punk dev> serves with
 restart-on-change. See L<Punk::Generate> and L<Punk::Command>.
 
+The generated test drives the app through L<Punk::Test>: an in-process
+client with a cookie jar and chained assertions, so sessions, CSRF,
+JSON APIs, server-sent events and websockets are all testable against
+the same frozen coderef a server would run.
+
 =head1 DESCRIPTION
 
 Punk resolves and freezes everything - routes, guard chains, handler
@@ -94,6 +99,15 @@ A route. The target is a coderef, or C<'Controller#method'> resolved
 against C<MyApp::Controller::> at boot - typos croak before the app
 serves. C<:name> captures one path segment, C<*name> captures the
 rest; captures are available as C<< $c->param($name) >>.
+
+An optional trailing hashref carries route options; unknown keys croak
+at boot. The one option today is C<validate> - a JSON Schema (or
+C<< { schema, source, on_invalid } >>) compiled once at C<to_app> and
+run before the handler, collecting errors into a Result a bare
+C<< $c->validate >> reads
+and answering C<< 400 { errors => [...] } >> (or the C<on_invalid>
+target) on failure. See L<Punk::Validate>. Scoped verbs
+(C<< $scope->get(...) >>) take the same hashref.
 
 =head2 under
 
@@ -210,6 +224,45 @@ every response, including the C<404>s and C<405>s that never build a
 context. C<Access-Control-Allow-Methods> comes from the router, so it
 cannot promise a method the application does not serve. See L<Punk::CORS>.
 
+=head2 headers
+
+    headers;                                # the safe default set
+    headers 'Content-Security-Policy'   => "default-src 'self'",
+            'Strict-Transport-Security' => 'max-age=31536000';
+    headers 'X-Frame-Options' => undef;     # keep the rest, drop this one
+
+Security response headers on everything the application sends, from the
+same place CORS decorates: outside the hook chain, so the C<404>s, C<405>s
+and preflight replies carry the policy too. Set-if-absent - a header a
+handler already set wins. The bare form is C<X-Content-Type-Options>,
+C<X-Frame-Options> and C<Referrer-Policy>; CSP and HSTS are opt-in by
+spelling. An C<under> scope can carry its own policy for its prefix:
+C<< $scope->headers(...) >>. See L<Punk::Headers>.
+
+=head2 auth
+
+    auth model => 'User',
+         roles => sub { my ($c, $user) = @_; $user->{role} };
+
+The authentication battery: a signed-in identity over the session
+(C<< $c->login / logout / auth_id / current_user >>), password hashing in C
+(L<Punk::Auth::Password>, PBKDF2 over the bundled SHA-256), C<check_password>
+with a timing-safe dummy verify, and single-use email tokens
+(C<issue_token>/C<take_token>) on a C<token_model>. Needs C<session>.
+See L<Punk::Auth>.
+
+=head2 auth_guard
+
+    my $account = under '/account' => auth_guard;
+    under '/admin' => auth_guard(role => 'admin');
+    under '/staff' => auth_guard(role => 'staff', on_denied => '404');
+
+A guard for C<under>: the bare form admits any signed-in user and runs
+entirely in C. Denial negotiates - a browser is redirected to the login page
+with a C<?to=> return-to, an API client gets a C<401>. Roles rank on a
+ladder ("admin or better") or match exactly when outside it. See
+L<Punk::Auth/GUARDS>.
+
 =head2 static
 
     static '/static' => 'root/static';
@@ -307,13 +360,21 @@ L<Punk::Views>.
 =head2 database / model
 
     database dsn => 'dbi:SQLite:dbname=myapp.db';
-    model    'Book';
+    model;                    # everything under MyApp::Model::
+    model 'Book';             # or just the ones named
 
 Model tier configuration; see L<Punk::Model>. C<database> records the
 backend connection options (a C<dsn>, optional C<user>/C<password>/
 C<attr>, or C<< backend => 'Class' >> to swap the backend); C<model>
 registers model classes by name, resolved against C<< MyApp::Model:: >>
 at boot.
+
+The bare form loads and registers everything under C<< MyApp::Model:: >> -
+every F<.pm> in that namespace across C<@INC>, plus any model class already
+compiled into the symbol table. Naming models normally switches
+auto-discovery off; the bare form switches it back on, so C<model;> next
+to C<model 'Special'> registers everything and is harmless. Discovery is
+also the default when no C<model> keyword appears at all.
 
 Several databases may be configured by giving each a name and an options
 hashref; a model then names the one it lives in with its own C<database>
@@ -345,6 +406,40 @@ An outer PSGI wrap, applied at C<to_app>.
 
 Runs when a guard or handler dies; a reference return becomes the
 response, otherwise the 500 C<{"errors":[...]}> default is served.
+
+In the C<development> environment - an opt-in: C<punk dev>, or
+C<PUNK_ENV=development>, or the config's C<env>; the default is
+C<production> - that default is a debug response instead: an HTML page
+with the stack and source snippets for a browser, the same JSON shape
+plus a C<trace> array for everything else. A handler registered here
+still runs first and its reference return still wins, in every
+environment. See L<Punk::DevError>.
+
+Which suggests the branded-page pattern: decline in development so the
+debug page stays, take over in production -
+
+    on_error sub {
+        my ($c, $err) = @_;
+        return if $c->app->env ne 'production';
+        $c->log->error("$err");
+        return $c->render('error', {}, status => 500);
+    };
+
+=head2 on_not_found
+
+    on_not_found sub {
+        my ($c) = @_;
+        return $c->render('404', { path => $c->req->path }, status => 404);
+    };
+    on_not_found 'Web::Err#not_found';
+
+Runs when no route, mount or API operation matched - the same contract
+as L</on_error>: a reference return becomes the response (after hooks
+run, so sessions and flash work on the page; a returned L<Punk::Future>
+is awaited), anything else keeps the default
+C<404 {"errors":[...]}> byte-identical. A die inside it goes through
+L</on_error>. The 405 answer for a known path with the wrong method is
+deliberately not covered: its C<Allow> header semantics stay.
 
 =head2 plugin
 
@@ -392,7 +487,7 @@ answers two seconds later without pinning a worker.
 
 =head1 SEE ALSO
 
-L<Punk::Context>, L<Punk::Router::Scope>, L<Punk::Plugin>,
+L<Punk::Test>, L<Punk::Context>, L<Punk::Router::Scope>, L<Punk::Plugin>,
 L<Punk::CSRF>, L<Punk::CORS>, L<Punk::UA>,
 L<Punk::Controller>, L<Open::API>, L<Template::Stencil>, L<Hyperman>.
 

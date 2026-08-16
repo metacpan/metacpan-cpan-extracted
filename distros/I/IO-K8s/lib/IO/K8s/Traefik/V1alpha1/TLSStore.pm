@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::TLSStore;
 # ABSTRACT: Traefik TLS certificate store
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'tlsstores';
@@ -23,7 +23,7 @@ IO::K8s::Traefik::V1alpha1::TLSStore - Traefik TLS certificate store
 
 =head1 VERSION
 
-version 1.106
+version 1.107
 
 =head1 DESCRIPTION
 

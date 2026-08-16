@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # Load the XS module
 require PDF::Make;

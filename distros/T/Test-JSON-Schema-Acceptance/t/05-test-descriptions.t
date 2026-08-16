@@ -49,13 +49,13 @@ cmp_deeply(
 cmp_result(
   [ map $_->name, @bool_tests ],
   [
-    map {
+    map do {
       my $file = $_;
-      map {
+      map do {
         my $group = $_;
         map $file.'.json: "'.$group.'" - "'.$_.'"', 'integer', 'boolean false', 'boolean true'
-      } 'empty schema', 'false schema', 'true schema'
-    } qw(bar foo)
+      }, 'empty schema', 'false schema', 'true schema'
+    }, qw(bar foo)
   ],
   'test names are shown correctly',
 );
