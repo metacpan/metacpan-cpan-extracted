@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-Fondation-Menu
 
+0.04      2026-08-16 19:51:58+02:00 Europe/Paris
+   - requires Fondation::Model::DBIx::Async 0.06
+   - remove the color from the menu icon
+
 0.03      2026-08-06 23:48:28+02:00 Europe/Paris
    - use Mojolicious::Plugin::Fondation::Schema::Result::Base
    - drop _render_error, simplify create on_fail

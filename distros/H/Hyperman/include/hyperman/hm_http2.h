@@ -203,7 +203,7 @@ static ssize_t hm_h2_data_read(nghttp2_session *ses, int32_t sid, uint8_t *buf,
     (void)ses; (void)sid; (void)ud;
     if (st->src_sv) {                 /* file source: read per window */
         size_t want = st->src_rem < length ? (size_t)st->src_rem : length;
-        ssize_t got = want ? pread(st->src_fd, buf, want, st->src_off) : 0;
+        ssize_t got = want ? hm_os_pread(st->src_fd, buf, want, st->src_off) : 0;
         if (got < 0) got = 0;
         st->src_off += got;
         st->src_rem -= (UV)got;

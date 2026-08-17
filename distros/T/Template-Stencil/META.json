@@ -38,11 +38,12 @@
       },
       "test" : {
          "requires" : {
+            "Eshu" : "0.13",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -20,3 +20,4 @@ share/templates/layouts/navbar.html.ep
 share/templates/layouts/partials/messages.html.ep
 share/translations/en.json
 share/translations/fr.json
+t/00-load.t

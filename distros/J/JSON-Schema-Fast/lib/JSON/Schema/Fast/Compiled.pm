@@ -3,14 +3,7 @@ package JSON::Schema::Fast::Compiled;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
-
-# A compiled schema: a blessed scalar holding the C arena IR pointer (the
-# ecosystem convention for C-backed objects). Its methods are defined in XS
-# (see Fast.xs) - validate/is_valid/errors arrive in later phases; DESTROY
-# frees the arena. This file exists so the class has a home for POD and so the
-# distribution is self-documenting; it deliberately contains no Perl-level
-# method logic.
+our $VERSION = '0.09';
 
 1;
 

@@ -1,5 +1,11 @@
 Revision history for Mojolicious-Plugin-Fondation-Layout-Bootstrap
 
+0.05      2026-08-16 19:57:13+02:00 Europe/Paris
+  - Add t/00-load.t
+  - add render_zone 'head/css'
+  - test render_zone
+  - update dependencies
+
 0.04      2026-07-13 23:12:05+02:00 Europe/Paris
   - the version is built with 'dzil'
 

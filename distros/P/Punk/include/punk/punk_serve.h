@@ -268,6 +268,36 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
         }
     }
 
+    /* 5. trailing-slash rescue: "/account/" answers the route declared as
+     *    "/account". It runs only once everything above has missed, so a
+     *    route, API operation or mount that really does want the slash still
+     *    wins on its own terms first. Mounts are deliberately not retried:
+     *    a mounted app is entitled to tell "/docs" from "/docs/", and is the
+     *    one that should decide. */
+    if (!rec && rt && plen > 1 && path[plen - 1] == '/') {
+        STRLEN tl = plen;
+        IV i;
+        while (tl > 1 && path[tl - 1] == '/') tl--;
+        i = pr_static_match(aTHX_ rt, method, mlen, path, tl);
+        if (i >= 0) {
+            SV **rp = av_fetch(recs, i, 0);
+            if (rp && *rp) { rec = *rp; caps = NULL; }
+        }
+        if (!rec) {
+            HV *capsh = (HV *)sv_2mortal((SV *)newHV());
+            IV idx = pr_match(aTHX_ rt, method, mlen, path, tl, capsh);
+            if (idx >= 0) {
+                SV **rp = av_fetch(recs, idx, 0);
+                if (rp && *rp) { rec = *rp; caps = sv_2mortal(newRV_inc((SV *)capsh)); }
+            }
+            else if (!caps) {                /* keep the untrimmed Allow if any */
+                AV *allowv = (AV *)sv_2mortal((SV *)newAV());
+                if (pr_allow(aTHX_ rt, method, mlen, path, tl, allowv))
+                    caps = sv_2mortal(newRV_inc((SV *)allowv));
+            }
+        }
+    }
+
     if (!rec) {                              /* 405 (merge allow) or 404 */
         HV *seen = (HV *)sv_2mortal((SV *)newHV());
         AV *lists[2];

@@ -21,7 +21,9 @@
  * read-modify-write take a striped spinlock in the arena, with a bounded spin
  * that fails open rather than risk a stall if a worker died holding one. */
 
+#ifndef _WIN32
 #include <sys/mman.h>
+#endif
 #include <string.h>
 #include <time.h>
 #include <stdint.h>
@@ -51,7 +53,16 @@
 #  define HM_RL_ATOMIC_GNU 1
 #endif
 
-#if defined(HM_RL_ATOMIC_GNU)
+#if defined(_WIN32)
+/* No arena on Windows, and nothing to lose by it: the arena exists so a
+ * limit is exact across a FORKED pool, and Windows runs a single worker
+ * (there is no fork there), where the per-process
+ * counters the fail-open path already keeps are exact by construction.
+ * Every entry point below is written to fail open with no arena, so this
+ * is the tested path, not a new one. CreateFileMapping only becomes
+ * worth writing if a multi-process pool ever lands. */
+#  define HM_RL_HAVE_ATOMICS 0
+#elif defined(HM_RL_ATOMIC_GNU)
 #  define HM_RL_HAVE_ATOMICS 1
 #elif defined(__GNUC__) \
     && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1))
@@ -102,6 +113,13 @@ typedef struct hm_rl_arena {
 /* Process-global. NULL = disabled/fail-open. Set once, before the fork, so
  * every worker inherits the same pointer at the same address. */
 static hm_rl_arena *hm_rl = NULL;
+
+/* Is there an arena at all? No arena means every entry point below takes
+ * its fail-open path (deny_check says "not denied", ratelimit_hit says
+ * "allowed"), which is the contract on a platform without shared memory
+ * or without the atomics - Windows, or a compiler older than the __sync
+ * builtins. Callers that assert arena SEMANTICS have to ask first. */
+static int hm_rl_arena_live(void) { return hm_rl != NULL; }
 
 /* ---- primitives ------------------------------------------------------------ */
 

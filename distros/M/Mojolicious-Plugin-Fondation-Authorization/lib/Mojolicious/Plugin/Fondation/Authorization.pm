@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Authorization;
-$Mojolicious::Plugin::Fondation::Authorization::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Authorization::VERSION = '0.02';
 # ABSTRACT: Authorization plugin — grants loading and check_perm/check_group helpers
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -116,7 +116,7 @@ Mojolicious::Plugin::Fondation::Authorization - Authorization plugin — grants 
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -152,10 +152,6 @@ The grant chain is:
 
 There is no direct user-to-permission table. All permissions are inherited
 through group membership.
-
-=head1 NAME
-
-Mojolicious::Plugin::Fondation::Authorization - Permission and group authorization for Fondation
 
 =head1 DEPENDENCIES
 

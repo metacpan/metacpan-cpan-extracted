@@ -3,6 +3,9 @@ use 5.010;
 use strict;
 use warnings;
 use Test::More;
+
+plan skip_all => 'the worker pool and fork tests need fork(2); Windows runs a single worker'
+    if $^O eq 'MSWin32';
 use Hyperman;
 
 # A loop belongs to the process that created it, and so does every descriptor

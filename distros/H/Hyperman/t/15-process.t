@@ -15,6 +15,9 @@ use File::Temp ();
 my $dir  = File::Temp::tempdir(CLEANUP => 1);
 my $err  = "$dir/stderr.log";
 my ($port) = free_ports(1);
+plan skip_all => 'the worker pool and fork tests need fork(2); Windows runs a single worker'
+    if $^O eq 'MSWin32';
+
 plan skip_all => "no free loopback port" unless $port;
 
 my $sup = fork;

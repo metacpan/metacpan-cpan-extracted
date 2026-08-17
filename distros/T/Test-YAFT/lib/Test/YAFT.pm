@@ -4,7 +4,7 @@ use warnings;
 
 use Syntax::Construct qw (package-block package-version);
 
-package Test::YAFT v1.0.3 {
+package Test::YAFT v1.0.4 {
 	use parent qw (Exporter::Tiny);
 
 	use Context::Singleton;
@@ -19,6 +19,7 @@ package Test::YAFT v1.0.3 {
 	use Test::More     v0.970 qw ();
 	use Test::Warnings v0.038 qw (:no_end_test !done_testing);
 
+	use Test::YAFT::Act;
 	use Test::YAFT::Argument;
 	use Test::YAFT::Argument::Arrange;
 	use Test::YAFT::Argument::Got;
@@ -117,8 +118,6 @@ package Test::YAFT v1.0.3 {
 	my $SINGLETON_ACT = q (Test::YAFT::act);
 
 	sub _act_arrange;
-	sub _act_dependencies;
-	sub _act_singleton;
 	sub _build_got;
 	sub _run_act;
 	sub _run_coderef;
@@ -129,33 +128,24 @@ package Test::YAFT v1.0.3 {
 		my ($args) = @_;
 
 		proclaim $_->resolve
-			for @{ $args->{arrange} // [] };
-	}
-
-	sub _act_dependencies {
-		my ($act, @dependencies) = @{ deduce $SINGLETON_ACT };
-
-		return @dependencies;
-	}
-
-	sub _act_singleton {
-		my ($act, @dependencies) = @{ deduce $SINGLETON_ACT };
-
-		return $act;
+			for @{ $args->{arrange} // [] }
+			;
 	}
 
 	sub _build_got {
 		my ($args) = @_;
 
 		return _run_act
-			unless exists $args->{got};
+			unless exists $args->{got}
+			;
 
 		return _run_coderef ($args->{got}->{code})
 			if $args->{got}->$Safe::Isa::_isa (Test::YAFT::Argument::Got::)
 			;
 
 		return _run_coderef ($args->{got})
-			if Ref::Util::is_coderef ($args->{got});
+			if Ref::Util::is_coderef ($args->{got})
+			;
 
 		return +{
 			lives_ok => 1,
@@ -165,8 +155,9 @@ package Test::YAFT v1.0.3 {
 	}
 
 	sub _run_act {
-		my ($act, @dependencies) = @{ deduce $SINGLETON_ACT };
-		my @missing = grep { ! try_deduce $_ } @dependencies;
+		my $singleton = deduce ($SINGLETON_ACT)->context;
+
+		my @missing = $singleton->unresolved;
 
 		return {
 			lives_ok => 0,
@@ -174,7 +165,7 @@ package Test::YAFT v1.0.3 {
 			error    => qq (Act dependencies not fulfilled: ${\ join q (, ), sort @missing }),
 		} if @missing;
 
-		deduce _act_singleton;
+		_run_coderef ($singleton->act, $singleton->arguments);
 	}
 
 	sub _run_coderef {
@@ -191,13 +182,16 @@ package Test::YAFT v1.0.3 {
 		my ($diag, $stack, $got) = @_;
 
 		return
-			unless $diag;
+			unless $diag
+			;
 
 		return Test::More::diag ($diag->($stack, $got))
-			if Ref::Util::is_coderef ($diag);
+			if Ref::Util::is_coderef ($diag)
+			;
 
 		return Test::More::diag (@$diag)
-			if Ref::Util::is_arrayref ($diag);
+			if Ref::Util::is_arrayref ($diag)
+			;
 
 		return Test::More::diag ($diag);
 	}
@@ -220,8 +214,9 @@ package Test::YAFT v1.0.3 {
 
 			return fail $title, diag => $expected_to_live
 				? qq (Expected to live but died: $result->{error})
-				: q  (Expected to die by lives)
-				if $expected_to_live xor $result->{lives_ok}
+				: q  (Expected to die but lives)
+				if  $expected_to_live
+				xor $result->{lives_ok}
 				;
 
 			($got, $expect) = $result->{lives_ok}
@@ -240,13 +235,16 @@ package Test::YAFT v1.0.3 {
 			if ($expect->$Safe::Isa::_isa (Test::YAFT::Cmp::Complement::)) {
 				Test::More::ok ($ok, $title);
 				Test::More::diag (Test::Deep::deep_diag ($stack))
-					unless $ok;
+					unless $ok
+					;
 				return $ok;
 			}
 
 			Test::Differences::eq_or_diff $got, $expect, $title;
 			Test::More::diag (Test::Deep::deep_diag ($stack))
-				if ref $got || ref $expect;
+				if ref $got
+				|| ref $expect
+				;
 
 			return;
 		} or _run_diag ($args{diag}, $stack, $got);
@@ -287,21 +285,12 @@ package Test::YAFT v1.0.3 {
 
 	sub act (&;@) {
 		my ($act, @dependencies) = @_;
-		state $counter = 0;
 
-		# As far as Context::Singleton doesn't support frame local contrive (yet)
-		# we have to improvise
-		# - singleton 'Test::YAFT::act' will contain name of frame specific singleton
-		# - and that singleton will contain all dependencies
-
-		my $singleton = qq (${SINGLETON_ACT}::${\ ++$counter });
-
-		contrive $singleton
-			=> dep => \@dependencies
-			=> as  => sub { _run_coderef ($act, @_) }
+		die q (Act already known in current context)
+			if is_deduced $SINGLETON_ACT
 			;
 
-		proclaim $SINGLETON_ACT => [ $singleton, @dependencies ];
+		proclaim $SINGLETON_ACT => Test::YAFT::Act::->new ($act, @dependencies);
 	}
 
 	sub fail {
@@ -367,7 +356,8 @@ package Test::YAFT v1.0.3 {
 		}
 
 		Sub::Install::install_sub ({ into => $class, as => $_, code => $methods{$_} })
-			for keys %methods;
+			for keys %methods
+			;
 
 		return $class;
 	}

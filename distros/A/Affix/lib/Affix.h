@@ -177,16 +177,18 @@ struct Affix_Plan_Step {
 /// Represents a forward FFI call (a Perl sub that calls a C function).
 /// This struct holds the pre-compiled execution plan and is attached to the generated XS subroutine.
 struct Affix {
-    infix_forward_t * infix;       ///< Handle to the infix trampoline and type info.
-    infix_arena_t * args_arena;    ///< Fast memory allocator for arguments during a call.
-    infix_arena_t * ret_arena;     ///< Fast memory allocator for return value during a call.
-    infix_cif_func cif;            ///< A direct function pointer to the JIT-compiled trampoline code.
-    infix_library_t * lib_handle;  ///< If affix() loaded a library itself, stores the handle for cleanup.
-    SV * return_sv;                ///< Pre-allocated, reusable SV to hold the return value.
-    Affix_Plan_Step * plan;        ///< The linear array of operations (the "execution plan").
-    size_t plan_length;            ///< The total number of steps in the plan.
-    size_t num_args;               ///< Cached number of arguments for faster access.
-    size_t total_args_size;        ///< Pre-calculated total size of the C arguments buffer.
+    infix_forward_t * infix;          ///< Handle to the infix trampoline and type info.
+    infix_arena_t * args_arena;       ///< Persistent arena for type data (init-time only).
+    infix_arena_t * ret_arena;        ///< Persistent arena for return type data (init-time only).
+    infix_arena_t * call_args_arena;  ///< Per-call temp arena for arguments (fiber-safe: not restored via SAVEVPTR).
+    infix_arena_t * call_ret_arena;   ///< Per-call temp arena for return value (fiber-safe: not restored via SAVEVPTR).
+    infix_cif_func cif;               ///< A direct function pointer to the JIT-compiled trampoline code.
+    infix_library_t * lib_handle;     ///< If affix() loaded a library itself, stores the handle for cleanup.
+    SV * return_sv;                   ///< Pre-allocated, reusable SV to hold the return value.
+    Affix_Plan_Step * plan;           ///< The linear array of operations (the "execution plan").
+    size_t plan_length;               ///< The total number of steps in the plan.
+    size_t num_args;                  ///< Cached number of arguments for faster access.
+    size_t total_args_size;           ///< Pre-calculated total size of the C arguments buffer.
     // Pre-compiled plan for handling "out" parameters after the C call.
     OutParamInfo * out_param_info;
     size_t num_out_params;

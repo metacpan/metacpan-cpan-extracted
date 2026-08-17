@@ -69,7 +69,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Punk'            => '0.04',
-        'Crypt::JWS'      => '0.01',
+        'Crypt::JWS'      => '0.02',
         'File::Raw::JSON' => '0.05',
         'Fetch'           => '0.08',
     },

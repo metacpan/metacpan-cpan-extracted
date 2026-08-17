@@ -1,4 +1,8 @@
-Revision history for Punk-Queue
+Revision history for Punk::Queue
+
+0.04    2026-08-16
+        - `punk queue ...`: Punk::Command::Queue registers the queue CLI
+          with Punk 0.13's command registry.
 
 0.03    2026-08-12
         - t/21-supervisor.t read the worker registry the moment the queue

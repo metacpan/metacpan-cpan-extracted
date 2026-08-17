@@ -1,5 +1,14 @@
 Revision history for Eshu
 
+0.13	2026-08-16
+	- The Windows directory shim renaming EshuDIR / eshu_opendir / eshu_readdir /
+	  eshu_closedir, self-contained on FindFirstFile (kernel32), and
+	  the walker uses those spellings on every platform (mapped to the
+	  real dirent on POSIX). 
+
+0.12	2026-08-16
+	- Windows builds work again.
+
 0.11	2026-08-15
 	- The HTML/XML indenter now keeps an open-element stack instead of a
 	  bare depth counter. Two bugs fixed (found through Template::Stencil's

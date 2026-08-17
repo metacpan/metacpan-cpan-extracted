@@ -8,6 +8,9 @@ use IO::Socket::INET;
 use Time::HiRes ();
 use Hyperman;
 
+plan skip_all => 'detach is not supported on Windows'
+    if $^O eq 'MSWin32';
+
 # Hyperman::detach: the protocol-upgrade seam. An app takes the client
 # socket over - the server stops watching it, forgets the connection and
 # does not close it - and then drives it itself through the worker loop,

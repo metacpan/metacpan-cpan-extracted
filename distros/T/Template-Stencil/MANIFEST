@@ -58,6 +58,7 @@ t/40-filters.t
 t/41-filter-escape.t
 t/42-user-filters.t
 t/43-filter-alloc.t
+t/44-fmt.t
 t/50-new.t
 t/51-render-api.t
 t/52-errors.t

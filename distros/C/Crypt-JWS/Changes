@@ -1,4 +1,12 @@
 Revision history for Crypt-JWS
 
+0.02    2026-08-16
+        Fix load failure on LibreSSL (OpenBSD base): cjws_key_alloc no
+        longer calls OPENSSL_zalloc, which LibreSSL does not provide -
+        the implicit declaration only surfaced at dlopen as an
+        undefined symbol.
+        Report NA rather than an inconclusive result when libcrypto is
+        missing or predates OpenSSL 1.1.0 / LibreSSL 2.7.
+
 0.01    2026-08-15
         First version.

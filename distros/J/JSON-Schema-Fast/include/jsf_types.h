@@ -71,10 +71,16 @@ static unsigned jsf_classify_type(pTHX_ SV *sv) {
     /* Non-ref scalar: trust the numeric flags a JSON decoder set. */
     if (SvIOK(sv) && !SvPOK(sv)) return JSF_T_NUMBER | JSF_T_INTEGER;
     if (SvNOK(sv) && !SvPOK(sv)) {
+        /* An integer is a number with zero fractional part, at any magnitude.
+         * Testing that with (NV)(IV)nv is undefined behaviour once nv is
+         * outside the IV range - which on a 32-bit-IV perl starts at 2**31,
+         * where every JSON integer a decoder had to widen to an NV lives. */
         NV nv = SvNVX(sv);
-        NV iv = (NV)(IV)nv;
-        return (nv == iv) ? (unsigned)(JSF_T_NUMBER | JSF_T_INTEGER)
-                          : (unsigned)JSF_T_NUMBER;
+        if (nv - nv != 0) return (unsigned)JSF_T_NUMBER;   /* NaN or infinite */
+        /* Perl_floor, not floor: on a long-double or quadmath perl the plain
+         * one would round the NV through a double first. */
+        return (nv == Perl_floor(nv)) ? (unsigned)(JSF_T_NUMBER | JSF_T_INTEGER)
+                                      : (unsigned)JSF_T_NUMBER;
     }
     return JSF_T_STRING;
 }

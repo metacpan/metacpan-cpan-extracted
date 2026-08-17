@@ -74,8 +74,8 @@ my(%params) =
 		SUFFIX   => 'gz'
 	},
 	DISTNAME  => 'GraphViz2-Marpa-PathUtils',
-	NAME      => 'GraphViz2::Marpa::PathUtils',
 	LICENSE   => 'artistic_2',
+	NAME      => 'GraphViz2::Marpa::PathUtils',
 	PL_FILES  => {},
 	PL_FILES  => {},
 	PREREQ_PM =>
@@ -84,6 +84,7 @@ my(%params) =
 		'Config'           => 0,
 		'Config::Tiny'     => 2.20,
 		'Date::Simple'     => 3.03,
+		'ExtUtils::MakeMaker'	=> 7.70,
 		'File::Basename'   => 2.84,
 		'File::Copy'       => 2.21,
 		'File::HomeDir'    => 0.99,
@@ -106,12 +107,17 @@ my(%params) =
 		'Types::Standard'  => 1.000005,
 		'warnings'         => 0,
 	},
+	TEST_REQUIRES =>
+	{
+		'Test::Pod'		=> 1.51,
+		'Test::More'	=> 1.001002,
+	},
 	VERSION_FROM => 'lib/GraphViz2/Marpa/PathUtils.pm',
 );
 
 if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
 {
-	$params{LICENSE} = 'artistic_2';
+	$params{LICENSE} = 'perl';
 }
 
 if ($ExtUtils::MakeMaker::VERSION ge '6.46')

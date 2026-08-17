@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use 5.014;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use File::Temp;
 use File::Spec;
 use File::Which;

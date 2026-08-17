@@ -11,5 +11,7 @@ void stencil_filt_case(pTHX_ SV *in, SV *out, int to_upper);
 void stencil_filt_trim(pTHX_ SV *in, SV *out);
 void stencil_filt_html(pTHX_ SV *in, SV *out);
 void stencil_filt_uri(pTHX_ SV *in, SV *out);
+void stencil_filt_fmt(pTHX_ SV *in, SV *out, const char *fmt, STRLEN flen,
+                      int src_utf8);
 
 #endif /* STENCIL_FILTERS_H */

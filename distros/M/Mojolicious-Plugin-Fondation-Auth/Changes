@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-Fondation-Auth
 
+0.03      2026-08-16 20:00:02+02:00 Europe/Paris
+    - requires Fondation::Model::DBIx::Async 0.06
+
 0.02      2026-07-15 18:17:12+02:00 Europe/Paris
     - replace table name with result_class name
     - after Fondation::User::UI::Bootstrap if exist

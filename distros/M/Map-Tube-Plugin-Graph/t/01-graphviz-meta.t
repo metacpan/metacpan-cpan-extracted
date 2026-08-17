@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use 5.014;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use File::Spec;
 use Test::Lib;
 use Test::More tests => 2;

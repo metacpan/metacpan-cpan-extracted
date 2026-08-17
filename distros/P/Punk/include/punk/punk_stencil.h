@@ -29,11 +29,11 @@ static int PUNK_ST_TRIED = 0;
  * simulates a version mismatch for the guard test. */
 static const st_abi *punk_st_try(pTHX) {
     if (!PUNK_ST_TRIED) {
-        dSP; int count; IV p = 0;
+        dSP; int count, ok; IV p = 0;
         PUNK_ST_TRIED = 1;
-        eval_pv("require Template::Stencil;", FALSE);
+        ok = pk_require_once(aTHX_ "Template::Stencil", FALSE);
         SPAGAIN;   /* the require may have reallocated the value stack */
-        if (!SvTRUE(ERRSV)) {
+        if (ok) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("Template::Stencil::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;

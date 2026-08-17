@@ -30,13 +30,13 @@
             "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0",
             "Fetch" : "0.08",
-            "File::Raw::JSON" : "0.05"
+            "File::Raw::JSON" : "0.07"
          }
       },
       "runtime" : {
          "requires" : {
             "Fetch" : "0.08",
-            "File::Raw::JSON" : "0.05",
+            "File::Raw::JSON" : "0.07",
             "Object::Proto" : "0",
             "perl" : "5.008003"
          }
@@ -48,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.07",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

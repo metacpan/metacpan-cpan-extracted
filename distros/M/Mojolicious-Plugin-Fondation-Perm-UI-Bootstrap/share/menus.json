@@ -3,7 +3,6 @@
     "title":        "Permissions",
     "link":         "/perms",
     "icon":         "fas fa-key",
-    "icon_color":   "#000000",
     "menu":         "admin_menu",
     "parent_title": "Administration",
     "description":  "Manage access permissions"

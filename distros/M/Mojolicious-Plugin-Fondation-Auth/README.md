@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::Auth - Fondation authentication plugin — DBIx-
 
 # VERSION
 
-version 0.02
+version 0.03
 
 # SYNOPSIS
 

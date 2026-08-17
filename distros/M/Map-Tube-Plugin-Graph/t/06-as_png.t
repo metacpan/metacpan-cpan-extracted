@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use 5.014;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use File::Spec;
 use Test::Lib;
 use Test::More tests => 4;
@@ -20,5 +20,4 @@ is( $teststr, 'PNG', 'PNG in binary format' );
 
 eval { $diagram = $tube->as_png('Line 1', format => 'gv'); };
 is( $@, '' );
-$teststr = substr( $diagram, 0, 255);
-like( $teststr, qr/^digraph\s/, 'as_png() but with GV format' );
+like( $diagram, qr/^digraph\s/, 'as_png() but with GV format' );

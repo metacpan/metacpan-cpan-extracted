@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Menu::Controller::Menu;
-$Mojolicious::Plugin::Fondation::Menu::Controller::Menu::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Menu::Controller::Menu::VERSION = '0.04';
 # ABSTRACT: REST controller for Menu CRUD via DBIx::Class::Async
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
@@ -95,7 +95,7 @@ Mojolicious::Plugin::Fondation::Menu::Controller::Menu - REST controller for Men
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

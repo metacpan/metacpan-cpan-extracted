@@ -25,11 +25,11 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::Fondation::Authorization",
   "PREREQ_PM" => {
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => "0.01",
-    "Mojolicious::Plugin::Fondation::Auth" => "0.01",
-    "Mojolicious::Plugin::Fondation::Group" => "0.01",
-    "Mojolicious::Plugin::Fondation::Perm" => "0.01",
-    "Mojolicious::Plugin::Fondation::SessionStore" => "0.01"
+    "Mojolicious::Plugin::Fondation" => "0.07",
+    "Mojolicious::Plugin::Fondation::Auth" => "0.02",
+    "Mojolicious::Plugin::Fondation::Group" => "0.02",
+    "Mojolicious::Plugin::Fondation::Perm" => "0.03",
+    "Mojolicious::Plugin::Fondation::SessionStore" => "0.02"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => "3.00",
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "FindBin" => "1.00",
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,11 +49,11 @@ my %FallbackPrereqs = (
   "File::Temp" => "0.01",
   "FindBin" => "1.00",
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => "0.01",
-  "Mojolicious::Plugin::Fondation::Auth" => "0.01",
-  "Mojolicious::Plugin::Fondation::Group" => "0.01",
-  "Mojolicious::Plugin::Fondation::Perm" => "0.01",
-  "Mojolicious::Plugin::Fondation::SessionStore" => "0.01",
+  "Mojolicious::Plugin::Fondation" => "0.07",
+  "Mojolicious::Plugin::Fondation::Auth" => "0.02",
+  "Mojolicious::Plugin::Fondation::Group" => "0.02",
+  "Mojolicious::Plugin::Fondation::Perm" => "0.03",
+  "Mojolicious::Plugin::Fondation::SessionStore" => "0.02",
   "Test::More" => "1.00"
 );
 

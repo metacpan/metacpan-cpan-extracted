@@ -27,6 +27,41 @@
 /* the require of a fixed module, as one compile-time literal */
 #define PK_REQUIRE(mod) ("require " mod ";")
 
+/* Require a module from C, at most one eval per module per process.
+ *
+ * Every require in the C layer goes through here rather than a bare
+ * eval_pv, because Perl_eval_sv on perls through 5.20 spends immortal
+ * references on every call - whatever is evaluated, error or not - and
+ * before 5.20 the immortals' refcounts are small and unprotected, so a
+ * path that re-requires per app build (the markdown mount did) drains
+ * PL_sv_undef toward a segfault under `punk dev`'s rebuild loop. A CPAN
+ * smoker on 5.20.0 caught it via t/42-immortal-refcount.t.
+ *
+ * The %INC check makes the already-loaded case - every call after the
+ * first - eval-free. The one genuine first load still uses eval_pv so
+ * each caller keeps its own error handling (probe-and-fall-back sites
+ * pass fatal=0 and read ERRSV; boot-or-die sites pass fatal=1): a
+ * bounded handful of spends per process, which is what it always cost
+ * to load the module.
+ *
+ * Returns 1 when the module is loaded, 0 when the require failed and
+ * fatal was 0 (ERRSV holds why). */
+static int pk_require_once(pTHX_ const char *mod, int fatal) {
+    SV *file = sv_newmortal();
+    const char *p;
+    HV *inc;
+    sv_setpvs(file, "");
+    for (p = mod; *p; p++) {
+        if (p[0] == ':' && p[1] == ':') { sv_catpvs(file, "/"); p++; }
+        else sv_catpvn(file, p, 1);
+    }
+    sv_catpvs(file, ".pm");
+    inc = GvHVn(PL_incgv);
+    if (inc && hv_exists_ent(inc, file, 0)) return 1;
+    eval_pv(form("require %s;", mod), fatal);
+    return SvTRUE(ERRSV) ? 0 : 1;
+}
+
 /* ---- caller-relative namespace pieces ------------------------------------- */
 #define PK_NS_CONTROLLER "::Controller::"
 #define PK_NS_MODEL      "::Model::"

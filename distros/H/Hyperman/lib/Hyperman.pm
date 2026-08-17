@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -164,6 +164,12 @@ B<SNI (multiple certificates).> C<tls_sni> maps hostnames to their own
 C<cert>/C<key>; the certificate is chosen from the TLS ServerName, falling
 back to C<tls_cert>/C<tls_key>. See L</tls_reload> for replacing that map
 while the server is running.
+
+B<The library.> C<< Hyperman->tls_library >> returns the runtime TLS
+library banner (C<OpenSSL 3.0.13 30 Jan 2024>, C<LibreSSL 3.8.2>), or
+undef when TLS support was not built. The two stacks agree on the API but
+not on behaviour - LibreSSL performs no TLS 1.3 session resumption, for
+one - and this is how a deployment (or a test) tells them apart.
 
 B<h2c Upgrade.> With C<< http2 => 1 >> over cleartext, an HTTP/1.1 request
 carrying C<Upgrade: h2c> is answered with C<101 Switching Protocols> and the

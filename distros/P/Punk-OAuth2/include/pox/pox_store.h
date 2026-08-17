@@ -82,7 +82,10 @@ static IV pox_dbi_do(pTHX_ SV *dbh, const char *sql, SV **binds, int n) {
   PUTBACK;
   count = call_method("do", G_SCALAR | G_EVAL);
   SPAGAIN;
-  if (!SvTRUE(ERRSV) && count > 0) rv = SvIV(POPs);
+  /* POP first, convert after: SvIV is a multi-eval macro and SvIV(POPs)
+   * pops twice - it walks SP back into the caller's arguments (house
+   * trap, seen as an SvIVX assertion on a DEBUGGING perl). */
+  if (!SvTRUE(ERRSV) && count > 0) { SV *r = POPs; rv = SvIV(r); }
   else if (count > 0) (void)POPs;
   PUTBACK; FREETMPS; LEAVE;
   if (SvTRUE(ERRSV))

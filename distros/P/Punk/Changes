@@ -1,5 +1,51 @@
 Revision history for Punk
 
+0.15    2026-08-17
+        - A trailing slash on the request path no longer 404s:
+          GET /account/ answers the route declared as GET /account.
+          The retry runs only after every declared route, API operation
+          and mount has missed, so nothing that already matched changes
+          - a *splat still captures its trailing slash, and a mounted
+          app is still handed the path it was sent, since only it knows
+          whether /docs and /docs/ differ. Repeated slashes collapse,
+          and "/" is left alone. A trimmed path that matches a
+          different method still answers 405 with its Allow list.
+
+0.14    2026-08-16
+        - Requires from the C layer go through pk_require_once (an %INC
+          check, then at most one eval per module per process) instead
+          of a bare eval_pv per call. Perl's own eval_sv spends immortal
+          references on every call on perls through 5.20 - whatever is
+          evaluated, success or failure - and before 5.20 the immortals'
+          refcounts are small and unprotected, so a path that
+          re-requires per build (the markdown mount ran two) drains
+          PL_sv_undef toward a segfault under punk dev's rebuild loop.
+          Found by t/42-immortal-refcount.t on a CPAN smoker running
+          perl 5.20.0; verified fixed on 5.20.3.
+        - t/37-ua.t pins the per-request agent clones it compares by
+          address: a freed clone's memory is the allocator's to hand
+          straight back, so two DEAD clones can legally compare equal,
+          which a smoker's malloc duly demonstrated. Held alive,
+          distinct objects must differ.
+
+0.13    2026-08-16
+        - $c->send_file($path_or_scalarref, %opts): a finished download
+          response
+        - Static files inherit the send_file core
+        - The punk command line rebuilt around a registry: commands are
+          specs (abstract, options with docs and defaults, nested verbs,
+          code), and help is generated from them 
+        - Plugin subcommands: Punk::Command->register($name => \%spec)
+          with owner-collision croaks; an unknown command gets one
+          require of Punk::Command::<Ucfirst>, whose load registers it
+        - In-process testing seam: $Punk::Command::OUT/$ERR replace the
+          streams and main() returns the exit code.
+        - routes: --method, --path GLOB, --kind, and --json.
+        - dev: --workers, --watch (repeatable), --env; one watch loop.
+        - console: a history file, --eval 'CODE', and q/exit.
+        - New commands: `generate controller|model` into an existing
+          application 
+
 0.12    2026-08-15
         - Adds Punk::Auth. The `auth` keyword freezes the config at 
 	  to_app (model, a fields map so existing schemas need no renames, 

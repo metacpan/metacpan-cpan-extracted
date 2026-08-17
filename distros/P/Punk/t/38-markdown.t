@@ -209,6 +209,14 @@ sub header {
     my $r2 = hit($app, path => '/docs/guide/diagram.png',
                  env => { HTTP_IF_MODIFIED_SINCE => header($r, 'Last-Modified') });
     is $r2->[0], 304, 'and answers a conditional request';
+
+    # one range case proves the shared path: the asset serves 206 exactly
+    # like a static mount, because it is literally the same function
+    my $r3 = hit($app, path => '/docs/guide/diagram.png',
+                 env => { HTTP_RANGE => 'bytes=0-3' });
+    is $r3->[0], 206, 'an asset range is a 206';
+    is header($r3, 'Content-Range'),
+       'bytes 0-3/' . header($r, 'Content-Length'), 'with Content-Range';
 }
 
 # ---- the shipped stylesheet -------------------------------------------------

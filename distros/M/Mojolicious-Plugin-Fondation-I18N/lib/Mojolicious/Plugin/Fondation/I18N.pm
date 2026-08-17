@@ -1,11 +1,13 @@
 package Mojolicious::Plugin::Fondation::I18N;
-$Mojolicious::Plugin::Fondation::I18N::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::I18N::VERSION = '0.02';
 # ABSTRACT: Fondation I18N plugin -- JSON-backed localization for the Fondation ecosystem
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 use Mojo::JSON qw(encode_json);
 use I18N::LangTags;
 use I18N::LangTags::Detect;
+use Time::Piece;
+use POSIX qw(strftime setlocale LC_TIME);
 
 
 =head1 SYNOPSIS
@@ -189,6 +191,32 @@ sub register ($self, $app, $config) {
         );
     });
 
+    # ── format_date helper -- locale-aware date formatting ────────────────
+    # Overrides the identity fallback from Fondation core.
+    # Accepts DateTime objects, SQL datetime strings (YYYY-MM-DD HH:MM:SS),
+    # or ISO 8601 strings (YYYY-MM-DDTHH:MM:SSZ).
+
+    $app->helper(format_date => sub ($c, $val) {
+        return '' unless $val;
+        my $dt = ref $val
+            ? $val
+            : eval { Time::Piece->strptime($val, '%Y-%m-%d %H:%M:%S') }
+              || eval { Time::Piece->strptime($val, '%Y-%m-%dT%H:%M:%SZ') }
+              || return $val;
+
+        my $lang   = $c->stash('i18n_lang') // $default;
+        my $locale = $self->_locale_for($lang);
+        if ($locale) {
+            my $old = setlocale(LC_TIME);
+            setlocale(LC_TIME, $locale);
+            my $date = $dt->strftime('%x %R');
+            setlocale(LC_TIME, $old);
+            utf8::decode($date);
+            return $date;
+        }
+        return $dt->strftime('%Y-%m-%d %H:%M');
+    });
+
     # ── /i18n/<lang>.json endpoint for client-side JS ────────────────────
 
     $app->routes->get('/i18n/<lang>.json')->to(cb => sub ($c) {
@@ -235,6 +263,30 @@ sub _detect_language ($self, $c, $config) {
     push @languages, $self->{default};
 
     $c->stash(i18n_lang => $languages[0]) if $languages[0];
+}
+
+# ---------------------------------------------------------------------------
+# _locale_for -- map language code to POSIX locale
+# ---------------------------------------------------------------------------
+
+my %LOCALE_FOR = (
+    fr => 'fr_FR.UTF-8',
+    en => 'en_US.UTF-8',
+    ro => 'ro_RO.UTF-8',
+    zh => 'zh_CN.UTF-8',
+    de => 'de_DE.UTF-8',
+    es => 'es_ES.UTF-8',
+    it => 'it_IT.UTF-8',
+    pt => 'pt_PT.UTF-8',
+    ru => 'ru_RU.UTF-8',
+    ja => 'ja_JP.UTF-8',
+    ko => 'ko_KR.UTF-8',
+);
+
+sub _locale_for ($self, $lang) {
+    return $LOCALE_FOR{$lang} if $LOCALE_FOR{$lang};
+    my $short = substr($lang, 0, 2);
+    return $LOCALE_FOR{$short};
 }
 
 1;

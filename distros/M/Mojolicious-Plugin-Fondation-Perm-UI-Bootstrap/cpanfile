@@ -1,3 +1,3 @@
 requires 'Mojolicious', '>= 9.46';
-requires 'Mojolicious::Plugin::Fondation::Perm';
-requires 'Mojolicious::Plugin::Fondation::Layout::Bootstrap';
+requires 'Mojolicious::Plugin::Fondation::Perm' => '0.03';
+requires 'Mojolicious::Plugin::Fondation::Layout::Bootstrap' => '0.04';

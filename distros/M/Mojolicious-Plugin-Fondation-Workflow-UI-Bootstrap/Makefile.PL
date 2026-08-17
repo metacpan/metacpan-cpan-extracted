@@ -18,25 +18,25 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::Fondation::Workflow::UI::Bootstrap",
   "PREREQ_PM" => {
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => "0.01",
-    "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.01",
-    "Mojolicious::Plugin::Fondation::Workflow" => "0.01"
+    "Mojolicious::Plugin::Fondation" => "0.07",
+    "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.04",
+    "Mojolicious::Plugin::Fondation::Workflow" => "0.02"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => "0.01",
-  "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.01",
-  "Mojolicious::Plugin::Fondation::Workflow" => "0.01",
+  "Mojolicious::Plugin::Fondation" => "0.07",
+  "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.04",
+  "Mojolicious::Plugin::Fondation::Workflow" => "0.02",
   "Test::More" => "1.00"
 );
 

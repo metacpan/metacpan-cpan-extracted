@@ -1,5 +1,12 @@
 Revision history for File-Raw-JSON
 
+0.07    2026-08-17
+        - Fix silent truncation of large integers on 32-bit-IV perls:
+          an integer wider than the running perl's IV/UV was cast down
+          instead of falling back to an NV, so 9007199254740992
+          decoded as 0. Reported by the i686 smokers (through
+          JSON::Schema::Fast conformance).
+
 0.06    2026-08-06
         - Fix a false FAILING: t/29-abi.t
 

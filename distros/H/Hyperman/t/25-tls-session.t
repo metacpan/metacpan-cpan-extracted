@@ -102,12 +102,27 @@ like(sess('nope.test'), qr/CN\s*=\s*localhost/,
 }
 
 # ---- session resumption ----
+# LibreSSL (OpenBSD base, macOS's CLI) implements no TLS 1.3 session
+# resumption on either side of the connection: its server never sends a
+# NewSessionTicket and its s_client never stores one, so under 1.3 these
+# checks can never pass however correct the ticket key is. The key
+# machinery this file guards is protocol-independent, so on a LibreSSL
+# stack - the linked library or the CLI, either breaks it - the resumption
+# half runs over TLS 1.2, where LibreSSL's tickets work. Detected by
+# identity rather than probed, deliberately: a functional fallback would
+# also hide a real OpenSSL regression that stopped 1.3 tickets.
+my $cli   = `openssl version 2>/dev/null` // ''; chomp $cli;
+my $stack = (Hyperman->tls_library // '') . ' ' . $cli;
+my @resume_proto = $stack =~ /LibreSSL/i ? ('-tls1_2') : ();
+diag("resumption tested over TLS 1.2: LibreSSL in play ($stack)")
+    if @resume_proto;
+
 sub resumes {
     my ($host, $file) = @_;
     unlink $file;
-    sess($host, '-sess_out', $file);
+    sess($host, @resume_proto, '-sess_out', $file);
     return 0 unless -s $file;
-    return sess($host, '-sess_in', $file) =~ /Reused/ ? 1 : 0;
+    return sess($host, @resume_proto, '-sess_in', $file) =~ /Reused/ ? 1 : 0;
 }
 ok(resumes('alpha.test', "$dir/s1.pem"), 'a session resumes');
 
@@ -117,12 +132,12 @@ ok(resumes('alpha.test', "$dir/s1.pem"), 'a session resumes');
 # the running context's key is carried into the new one a ticket stops being
 # decryptable the moment anything rotates.
 unlink "$dir/pre.pem";
-sess('alpha.test', '-sess_out', "$dir/pre.pem");
+sess('alpha.test', @resume_proto, '-sess_out', "$dir/pre.pem");
 ok(-s "$dir/pre.pem", 'got a ticket before the reload');
 
 like(req('alpha.test', '/reload'), qr/reloaded=1/, 'tls_reload rebuilt the listener');
 
-like(sess('alpha.test', '-sess_in', "$dir/pre.pem"), qr/Reused/,
+like(sess('alpha.test', @resume_proto, '-sess_in', "$dir/pre.pem"), qr/Reused/,
      'a ticket issued before tls_reload still resumes after it');
 ok(resumes('alpha.test', "$dir/s2.pem"), 'new sessions still resume after tls_reload');
 like(sess('late.test'), qr/CN\s*=\s*late\.test/,

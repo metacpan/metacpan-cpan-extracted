@@ -52,6 +52,7 @@
             "Parallel::Pipes::App" : "v1.0.0",
             "Parse::LocalDistribution" : "0.20",
             "Proc::ForkSafe" : "v1.0.0",
+            "YAML::PP" : "0",
             "perl" : "v5.24.0"
          }
       }
@@ -59,7 +60,7 @@
    "provides" : {
       "App::cpm" : {
          "file" : "lib/App/cpm.pm",
-         "version" : "v1.1.4"
+         "version" : "v1.1.5"
       },
       "App::cpm::Builder::Base" : {
          "file" : "lib/App/cpm/Builder/Base.pm"
@@ -173,7 +174,7 @@
          "web" : "https://github.com/skaji/cpm"
       }
    },
-   "version" : "v1.1.4",
+   "version" : "v1.1.5",
    "x_contributors" : [
       "Andrew Rodland <andrew@cleverdomain.org>",
       "Dave Rolsky <autarch@urth.org>",
@@ -193,9 +194,8 @@
       "Will Sheppard <will.sheppard.uk@gmail.com>",
       "yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.42.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "x_generated_by_perl" : "v5.44.0",
+   "x_serialization_backend" : "JSON::PP version 4.18",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }
-

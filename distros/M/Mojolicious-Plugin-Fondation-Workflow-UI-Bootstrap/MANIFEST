@@ -10,3 +10,4 @@ README.md
 cpanfile
 dist.ini
 lib/Mojolicious/Plugin/Fondation/Workflow/UI/Bootstrap.pm
+t/00-load.t

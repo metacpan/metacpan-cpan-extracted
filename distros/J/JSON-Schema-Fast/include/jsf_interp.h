@@ -89,6 +89,26 @@ static int jsf_json_equal(pTHX_ SV *a, SV *b) {
     return 0;
 }
 
+/* enum/const under coercion: a string standing in for a number or a
+ * boolean must also compare as one, or "?page=1" passes `type: integer`
+ * and then fails `enum: [1, 2]` on the string it still is. Only the
+ * instance (a) is read across domains - the schema side keeps the type
+ * it declared. */
+static int jsf_json_equal_coerced(pTHX_ SV *a, SV *b) {
+    unsigned ta = jsf_classify_type(aTHX_ a);
+    unsigned tb = jsf_classify_type(aTHX_ b);
+    if ((ta & JSF_T_STRING) && !(tb & JSF_T_STRING)) {
+        if ((tb & JSF_T_NUMBER) && looks_like_number(a))
+            return SvNV(a) == jsf__nv_of(aTHX_ b);
+        if (tb & JSF_T_BOOLEAN) {
+            STRLEN l; const char *s = SvPV_const(a, l);
+            if (l == 4 && memEQ(s, "true", 4))  return SvTRUE(b) ? 1 : 0;
+            if (l == 5 && memEQ(s, "false", 5)) return SvTRUE(b) ? 0 : 1;
+        }
+    }
+    return jsf_json_equal(aTHX_ a, b);
+}
+
 /* ---- pattern regex (compiled once, cached) ------------------------------ */
 static REGEXP *jsf_get_regex(pTHX_ jsf_compiled_t *C, uint32_t pat_off) {
     int i; uint32_t len; const char *p; SV *pat; REGEXP *rx;
@@ -173,7 +193,9 @@ static unsigned jsf_coerce_bits(pTHX_ uint32_t mask, SV *data, unsigned t) {
     s = SvPV_const(data, l);
     if ((mask & (JSF_T_NUMBER | JSF_T_INTEGER)) && looks_like_number(data)) {
         NV nv = SvNV(data);
-        int integral = (nv == (NV)(IV)nv);
+        /* zero fractional part at any magnitude - see jsf_classify_type on
+         * why this is not (NV)(IV)nv */
+        int integral = (nv - nv == 0) && (nv == Perl_floor(nv));
         if (mask & JSF_T_NUMBER)  return (unsigned)(JSF_T_NUMBER | (integral ? JSF_T_INTEGER : 0));
         if ((mask & JSF_T_INTEGER) && integral) return JSF_T_NUMBER | JSF_T_INTEGER;
     }
@@ -282,13 +304,18 @@ static int jsf_validate(pTHX_ jsf_compiled_t *C, uint32_t off, SV *data, jsf_ctx
 
     if (n->present & JSF_HAS_CONST) {
         SV **cv = av_fetch(C->keep, n->const_keep, 0);
-        if (!cv || !jsf_json_equal(aTHX_ data, *cv)) JSF_FAIL("const");
+        int eq = cv && (C->coerce
+            ? jsf_json_equal_coerced(aTHX_ data, *cv)
+            : jsf_json_equal(aTHX_ data, *cv));
+        if (!eq) JSF_FAIL("const");
     }
     if (n->present & JSF_HAS_ENUM) {
         int found = 0; uint32_t i;
         for (i = 0; i < n->enum_n; i++) {
             SV **ev = av_fetch(C->keep, n->enum_keep + i, 0);
-            if (ev && jsf_json_equal(aTHX_ data, *ev)) { found = 1; break; }
+            if (ev && (C->coerce
+                    ? jsf_json_equal_coerced(aTHX_ data, *ev)
+                    : jsf_json_equal(aTHX_ data, *ev))) { found = 1; break; }
         }
         if (!found) JSF_FAIL("enum");
     }

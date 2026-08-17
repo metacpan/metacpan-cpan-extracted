@@ -39,6 +39,7 @@ include/pq_sqlite.h
 include/pq_super.h
 include/pq_time.h
 include/pq_worker.h
+lib/Punk/Command/Queue.pm
 lib/Punk/Plugin/Queue.pm
 lib/Punk/Plugin/Queue/assets/app.js
 lib/Punk/Plugin/Queue/assets/funky/css/01-dom.css

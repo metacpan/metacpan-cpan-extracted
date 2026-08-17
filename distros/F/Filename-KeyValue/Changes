@@ -1,3 +1,8 @@
+0.002   2026-04-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Remove directory separator suffix.
+
+
 0.001   2026-04-27  Released-By: PERLANCAR
 
         - First release.

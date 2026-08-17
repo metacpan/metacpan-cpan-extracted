@@ -1,5 +1,41 @@
 Revision history for Hyperman
 
+0.23    2026-08-16
+        - Hyperman attempt to build and serve on native Windows with no 
+          behaviour change on any platform it already ran on
+        - The socket/IO surface now goes through one shim header
+        - A WSAPoll readiness backend (backend_wsapoll.c) behind the
+          existing hm_backend vtable, so Windows has the floor that
+          poll(2) provides everywhere else
+        - The process model is now explicit about what a platform can
+          do. The supervisor half - fork, waitpid, the respawn backoff,
+          the HUP/USR2 recycle and the POSIX signal plumbing - is
+          compiled only where those exist.
+        - Fixed a latent bug in the C ABI selftest, which asserted
+          arena SEMANTICS (add a denylist entry, expect it to be found)
+          without first asking whether this build has an arena. 
+
+0.22    2026-08-16
+        - t/27-sendfile.t asserted the worker's ABSOLUTE RSS stayed
+          under 60MB after a 16MB download, but a worker's absolute
+          size is a property of the perl build - static-libperl and
+          threaded smokers idle at 62-83MB and failed the test with
+          streaming working perfectly. It now measures the GROWTH
+          across the download (baseline RSS before, probe after) and
+          asserts it stays under 8MB
+
+0.21    2026-08-16
+        - New Hyperman->tls_library: the runtime TLS library banner
+          ("OpenSSL 3.0.13 ...", "LibreSSL 3.8.2"), undef without the
+          TLS build - the supported way to tell the two stacks apart.
+        - t/25-tls-session.t no longer fails on LibreSSL (OpenBSD, from
+          CPAN Testers): LibreSSL implements no TLS 1.3 session
+          resumption on either side of a connection, so the resumption
+          checks could never pass there however correct the ticket key
+          was. The ticket-key machinery under test is protocol
+          independent, so on a LibreSSL stack those checks now run over
+          TLS 1.2, where LibreSSL's tickets work.
+
 0.20    2026-08-16
         - Filehandle and IO-object response bodies stream instead of
           being slurped into one SV. A glob over a regular file lifts to

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use 5.014;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use File::Temp;
 use File::Spec;
 use File::Which;
@@ -45,8 +45,7 @@ plan skip_all => 'SVG not supported by this GraphViz - skipping'  unless grep { 
 plan tests => 6;
 
 my ($diagram, $fname) = $tube->render( format => 'svg' );
-my $teststr = substr( $diagram, 0, 1024);
-like( $teststr, qr/<svg\s/, 'SVG format' );
+like( $diagram, qr/<svg\s/, 'SVG format' );
 
 unlink('xxxtest.svg');
 ($diagram, $fname) = $tube->render( format => 'svg', output_file => 'xxxtest.svg' );
@@ -60,8 +59,7 @@ unlink($fname);
 
 unlink('test_Line_1.svg');
 ($diagram, $fname) = $tube->render( 'Line 1', format => 'svg', output_file => undef );
-$teststr = substr( $diagram, 0, 1024 );
-like( $teststr, qr/<svg\s/, 'SVG format' );
+like( $diagram, qr/<svg\s/, 'SVG format' );
 is( $fname, 'test_Line_1.svg', 'Line with SVG output file' );
 unlink($fname);
 

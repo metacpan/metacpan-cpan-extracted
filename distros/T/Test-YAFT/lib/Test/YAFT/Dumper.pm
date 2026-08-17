@@ -4,7 +4,7 @@ use warnings;
 
 use Syntax::Construct qw (package-block package-version);
 
-package Test::YAFT::Dumper v1.0.3 {
+package Test::YAFT::Dumper v1.0.4 {
 	use parent q (Data::Dumper);
 
 	use Ref::Util;

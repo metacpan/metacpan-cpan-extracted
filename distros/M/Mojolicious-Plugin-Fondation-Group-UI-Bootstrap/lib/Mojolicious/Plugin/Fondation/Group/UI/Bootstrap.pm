@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Group::UI::Bootstrap;
-$Mojolicious::Plugin::Fondation::Group::UI::Bootstrap::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Group::UI::Bootstrap::VERSION = '0.02';
 # ABSTRACT: Web UI extension for Fondation::Group — injects group checkboxes into user forms
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -39,7 +39,7 @@ Mojolicious::Plugin::Fondation::Group::UI::Bootstrap - Web UI extension for Fond
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

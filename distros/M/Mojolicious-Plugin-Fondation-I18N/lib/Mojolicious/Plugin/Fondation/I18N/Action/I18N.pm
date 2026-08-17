@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::I18N::Action::I18N;
-$Mojolicious::Plugin::Fondation::I18N::Action::I18N::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::I18N::Action::I18N::VERSION = '0.02';
 # ABSTRACT: Scans all plugins for translations, merges them, writes share/i18n/<lang>.json
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Action::Base', -signatures;

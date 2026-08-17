@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Philipp Schafft
+# Copyright (c) 2024-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -27,7 +27,7 @@ use constant {
     FEATURE_HYBRID               => '5a1895b8-61f1-4ce1-a44f-1a239b7d9de7',
 };
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 my %table_defs = (
     SQLite => {
@@ -220,19 +220,26 @@ sub include {
                         ]);
             }
         } elsif (($source =~ /::/ || $source =~ /^[A-Z]/) && $source->isa('Data::Identifier::Interface::Known')) {
+            my Data::TagDB::Tag $asi = $wk->also_shares_identifier(1);
+            my Data::TagDB::Tag $tagname = $wk->tagname(1);
             my Data::TagDB::Tag $uuid = $wk->uuid(1);
             my %types;
 
-            foreach my $identifier ($source->known(':all', as => 'Data::Identifier')) {
+            foreach my Data::Identifier $identifier ($source->known(':all', as => 'Data::Identifier')) {
                 my $as_uuid = $identifier->uuid(default => undef);
                 my $type = $identifier->type;
+                my Data::TagDB::Tag $tag;
 
                 $types{$type->uuid} //= do { $db->create_tag($type) };
 
                 if (defined $as_uuid) {
-                    $db->create_tag([$uuid => $as_uuid], $identifier);
+                    $tag = $db->create_tag([$uuid => $as_uuid], $identifier);
                 } else {
-                    $db->create_tag($identifier);
+                    $tag = $db->create_tag($identifier);
+                }
+
+                foreach my $data ($identifier->tagname(default => [], no_defaults => 1, list => 1)) {
+                    $db->create_metadata(tag => $tag, relation => $asi, type => $tagname, data_raw => $data);
                 }
             }
         } elsif ($source eq 'file') {
@@ -509,7 +516,7 @@ Data::TagDB::Migration - Work with Tag databases
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -651,7 +658,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2024-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

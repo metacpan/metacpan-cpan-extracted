@@ -51,12 +51,12 @@ static int            PUNK_MDS_TRIED = 0;
 
 static const mds_abi *punk_mds_try(pTHX) {
     if (!PUNK_MDS && !PUNK_MDS_TRIED) {
-        dSP; int count; IV p = 0;
+        dSP; int count, ok; IV p = 0;
         PUNK_MDS_TRIED = 1;
         if (PerlEnv_getenv("PUNK_FAKE_MDS_BAD")) return NULL;
-        eval_pv(PK_REQUIRE("Markdown::Simple"), FALSE);
+        ok = pk_require_once(aTHX_ "Markdown::Simple", FALSE);
         SPAGAIN;
-        if (!SvTRUE(ERRSV)) {
+        if (ok) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("Markdown::Simple::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;
@@ -85,12 +85,12 @@ static int           PUNK_SG_TRIED = 0;
 
 static const sg_abi *punk_sg_try(pTHX) {
     if (!PUNK_SG && !PUNK_SG_TRIED) {
-        dSP; int count; IV p = 0;
+        dSP; int count, ok; IV p = 0;
         PUNK_SG_TRIED = 1;
         if (PerlEnv_getenv("PUNK_FAKE_SG_BAD")) return NULL;
-        eval_pv(PK_REQUIRE("Search::Trigram"), FALSE);
+        ok = pk_require_once(aTHX_ "Search::Trigram", FALSE);
         SPAGAIN;
-        if (!SvTRUE(ERRSV)) {
+        if (ok) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("Search::Trigram::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;

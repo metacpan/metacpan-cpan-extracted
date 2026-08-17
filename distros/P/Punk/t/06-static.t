@@ -66,6 +66,57 @@ is(hit($app, path => '/static/../secret')->[0], 404,
 is(hit($app, path => '/static/app.css')->[0], 200,
     'mount beats the /static/:x dynamic route');
 
+# ---- validators and ranges (the send_file core, since 0.13) ------------------
+{
+    my $body = "0123456789" x 10;
+    open my $fh, '>', "$dir/data.bin" or die $!;
+    binmode $fh;
+    print {$fh} $body;
+    close $fh;
+
+    my $r = hit($app, path => '/static/data.bin');
+    my %h = @{ $r->[1] };
+    like($h{ETag}, qr/^"[0-9a-f]+-64"$/,
+        'a strong hex ETag, sized like the file');
+    is($h{'Accept-Ranges'}, 'bytes', 'ranges are advertised');
+
+    my $etag = $h{ETag};
+    is(hit($app, path => '/static/data.bin',
+           env => { HTTP_IF_NONE_MATCH => $etag })->[0], 304,
+        'If-None-Match answers 304');
+    is(hit($app, path => '/static/data.bin',
+           env => { HTTP_IF_NONE_MATCH => '"stale"' })->[0], 200,
+        'a stale tag serves the file');
+
+    # the ETag is stable across requests
+    my %h2 = @{ hit($app, path => '/static/data.bin')->[1] };
+    is($h2{ETag}, $etag, 'the ETag is stable across requests');
+
+    $r = hit($app, path => '/static/data.bin',
+             env => { HTTP_RANGE => 'bytes=10-19' });
+    is($r->[0], 206, 'a range serves partial content');
+    %h = @{ $r->[1] };
+    is($h{'Content-Range'},  'bytes 10-19/100', 'with Content-Range');
+    is($h{'Content-Length'}, 10,                'and the range length');
+    {
+        my @chunks;
+        my $b = $r->[2];
+        while (defined(my $c = $b->getline)) { push @chunks, $c }
+        $b->close;
+        is(join('', @chunks), '0123456789', 'and exactly those bytes');
+    }
+
+    $r = hit($app, path => '/static/data.bin',
+             env => { HTTP_RANGE => 'bytes=999-' });
+    is($r->[0], 416, 'past the end is a 416');
+    %h = @{ $r->[1] };
+    is($h{'Content-Range'}, 'bytes */100', 'with the unsatisfied form');
+
+    is(hit($app, path => '/static/data.bin',
+           env => { HTTP_RANGE => 'bytes=0-1,5-9' })->[0], 200,
+        'a multi-range request legally gets the whole file');
+}
+
 # ---- generic PSGI mounts -----------------------------------------------------
 {
     package MountApp;

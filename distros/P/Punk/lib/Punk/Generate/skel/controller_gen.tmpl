@@ -1,0 +1,19 @@
+package {% app %}::Controller::{% ns %}::{% name %};
+
+use strict;
+use warnings;
+use parent 'Punk::Controller';
+
+# Controller methods are plain subs receiving the context - no instance, no
+# dispatch overhead. Wire it from {% app %}:
+#
+{% if api %}#     get '/api/{% route %}' => 'API::{% name %}#index';
+{% else %}#     get '/{% route %}' => 'Web::{% name %}#index';
+{% end %}
+sub index {
+    my ($c) = @_;
+{% if api %}    return $c->json({ ok => 1 });
+{% else %}    return $c->text('{% app %}::Controller::{% ns %}::{% name %} works');
+{% end %}}
+
+1;

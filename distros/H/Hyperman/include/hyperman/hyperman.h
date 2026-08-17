@@ -57,6 +57,8 @@ hm_backend *hm_backend_epoll_new(void);
 int         hm_backend_epoll_available(void);
 hm_backend *hm_backend_poll_new(void);
 int         hm_backend_poll_available(void);
+hm_backend *hm_backend_wsapoll_new(void);
+int         hm_backend_wsapoll_available(void);
 hm_backend *hm_backend_iouring_new(void);
 int         hm_backend_iouring_available(void);
 

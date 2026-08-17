@@ -728,7 +728,62 @@ static int32_t filter_builtin(const char *p, uint32_t n)
     if (word_is(p, n, "html"))    return STENCIL_FILT_HTML;
     if (word_is(p, n, "uri"))     return STENCIL_FILT_URI;
     if (word_is(p, n, "default")) return STENCIL_FILT_DEFAULT;
+    if (word_is(p, n, "fmt"))     return STENCIL_FILT_FMT;
     return STENCIL_FILT_USER;
+}
+
+/* fmt's format string, checked here so the render can trust it blind:
+ * literal text plus exactly one %-conversion of a known-safe shape.
+ *
+ *   %[-+ 0#]*[width][.precision]conv     conv in [diouxXeEfgGs]
+ *
+ * %% is a literal. No '*', no length modifiers, no %n; width and
+ * precision are capped so the render-side output buffer cannot be
+ * outgrown, and the whole format is capped so the rewritten format
+ * (the render inserts perl's IVdf/UVxf length modifiers) fits its own
+ * stack buffer. Returns NULL when valid, else the complaint. */
+#define STENCIL_FMT_MAXLEN  48
+#define STENCIL_FMT_MAXWID  256
+static const char *fmt_check(const char *p, uint32_t n)
+{
+    const char *end = p + n;
+    int convs = 0;
+    if (n > STENCIL_FMT_MAXLEN)
+        return "fmt: format is too long";
+    while (p < end) {
+        unsigned long w;
+        if (*p != '%') { p++; continue; }
+        p++;
+        if (p < end && *p == '%') { p++; continue; }      /* literal %% */
+        while (p < end && (*p == '-' || *p == '+' || *p == ' '
+                           || *p == '0' || *p == '#'))
+            p++;
+        w = 0;
+        while (p < end && *p >= '0' && *p <= '9')
+            w = w * 10 + (unsigned long)(*p++ - '0');
+        if (w > STENCIL_FMT_MAXWID)
+            return "fmt: width is too large";
+        if (p < end && *p == '.') {
+            p++;
+            w = 0;
+            while (p < end && *p >= '0' && *p <= '9')
+                w = w * 10 + (unsigned long)(*p++ - '0');
+            if (w > STENCIL_FMT_MAXWID)
+                return "fmt: precision is too large";
+        }
+        if (p >= end)
+            return "fmt: format ends inside a conversion";
+        if (*p == '*')
+            return "fmt: '*' is not allowed";
+        if (*p == '\0' || strchr("diouxXeEfgGs", *p) == NULL)
+            return "fmt: conversion must be one of diouxXeEfgGs";
+        p++;
+        convs++;
+    }
+    if (convs != 1)
+        return convs ? "fmt: only one conversion is allowed"
+                     : "fmt: format needs one % conversion";
+    return NULL;
 }
 
 /* parse `| name` / `| name(arg)` chains and emit SOP_FILTERs */
@@ -828,8 +883,17 @@ static int parse_filters(stencil_compiler *c)
         /* arity for built-ins is known at compile time */
         if (f.builtin_id == STENCIL_FILT_DEFAULT && !f.has_arg)
             return cerror(c, fname, "filter 'default' needs an argument");
+        if (f.builtin_id == STENCIL_FILT_FMT) {
+            const char *bad;
+            if (!f.has_arg || f.arg_is_num)
+                return cerror(c, fname,
+                    "filter 'fmt' needs a quoted format argument");
+            bad = fmt_check(c->pool.base + f.str_off, f.str_len);
+            if (bad)
+                return cerror(c, fname, "%s", bad);
+        }
         if (f.builtin_id >= 0 && f.builtin_id != STENCIL_FILT_DEFAULT
-            && f.has_arg)
+            && f.builtin_id != STENCIL_FILT_FMT && f.has_arg)
             return cerror(c, fname, "filter '%.*s' takes no argument",
                           (int)fnlen, fname);
 

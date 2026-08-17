@@ -150,7 +150,7 @@ static HV *pdbi_slot_for(pTHX_ SV *self) {
         }
         attr_rv = sv_2mortal(newRV_noinc((SV *)attr));
 
-        eval_pv("require DBI;", TRUE);
+        (void)pk_require_once(aTHX_ "DBI", TRUE);
         argv[0] = dsn;
         argv[1] = (user && SvOK(user)) ? user : &PL_sv_undef;
         argv[2] = (pass && SvOK(pass)) ? pass : &PL_sv_undef;

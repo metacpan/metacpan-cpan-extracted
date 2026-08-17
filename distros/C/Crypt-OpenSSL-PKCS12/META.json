@@ -61,7 +61,7 @@
          "web" : "https://github.com/dsully/perl-crypt-openssl-pkcs12"
       }
    },
-   "version" : "1.98",
+   "version" : "1.99",
    "x_contributors" : [
       "@mmuehlenhoff",
       "@sectokia",

@@ -23,10 +23,10 @@ no_index:
     - t
     - inc
 requires:
-  Crypt::JWS: '0.01'
+  Crypt::JWS: '0.02'
   Fetch: '0.08'
   File::Raw::JSON: '0.05'
   Punk: '0.04'
   perl: '5.024000'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

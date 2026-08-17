@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-Fondation-User
 
+0.04      2026-08-16 19:50:25+02:00 Europe/Paris
+  - requires Fondation::Model::DBIx::Async 0.06
+
 0.03      2026-08-06 23:40:06+02:00 Europe/Paris
   - update doc with many
   - use Mojolicious::Plugin::Fondation::Schema::Result::Base

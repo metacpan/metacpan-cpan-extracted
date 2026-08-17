@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Crypt::JWS', $VERSION);
@@ -29,7 +29,7 @@ Crypt::JWS - JSON Web Signatures over OpenSSL's libcrypto
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.98';
+our $VERSION = '1.99';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -58,7 +58,7 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 =head1 VERSION
 
-This documentation describes version 1.97 of Crypt::OpenSSL::PKCS12
+This documentation describes version 1.99 of Crypt::OpenSSL::PKCS12
 
 =head1 DESCRIPTION
 
@@ -130,9 +130,15 @@ password, corrupted file, or OpenSSL error).
 Re-encrypts the PKCS12 structure with a new password. C<$old> is the current
 password; C<$new> is the replacement. Returns false on failure.
 
-B<Note:> Changing the PKCS12 password is not reliably supported on OpenSSL
-3.x; C<changepass()> may return false or fail silently. Consider
-re-creating the PKCS12 structure with C<create()> instead.
+B<Note:> Changing the PKCS12 password is not supported on OpenSSL 3.x or
+4.x for PBES2-encrypted files (the default OpenSSL uses for newly created
+PKCS12 files) — C<changepass()> will return false. This is a known
+upstream OpenSSL limitation
+(L<openssl/openssl#19092|https://github.com/openssl/openssl/issues/19092>),
+not specific to this module; only OpenSSL 1.x is confirmed to work. See
+L<https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/62> for
+details. Consider re-creating the PKCS12 structure with C<create()>
+instead.
 
 =item * create( C<$cert>, C<$key>, C<$pass>, C<$output_file>, C<$friendly_name> )
 

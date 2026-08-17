@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Philipp Schafft
+# Copyright (c) 2024-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -14,7 +14,7 @@ use Carp;
 
 use Data::TagDB::Iterator;
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 
 
@@ -61,6 +61,7 @@ sub entries {
 }
 
 
+#@returns Data::TagDB::Iterator
 sub roots_iterator {
     my ($self) = @_;
     my @entries = $self->roots;
@@ -68,6 +69,7 @@ sub roots_iterator {
 }
 
 
+#@returns Data::TagDB::Iterator
 sub entries_iterator {
     my ($self) = @_;
     my @entries = $self->entries;
@@ -102,7 +104,7 @@ Data::TagDB::Cloudlet - Work with Tag databases
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -192,7 +194,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2024-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

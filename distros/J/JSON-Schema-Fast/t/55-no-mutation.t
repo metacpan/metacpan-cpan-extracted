@@ -103,11 +103,18 @@ for my $c (@cases) {
     my $e = JSON::Schema::Fast->compile({ enum => [1.0] });
     ok($e->is_valid(1),   'enum: likewise');
 
-    # large integers keep their precision through the non-forcing read
+    # large integers keep their precision through the non-forcing read.
+    # A perl without 64-bit integers stores the literal as an NV before any
+    # of this runs, so there is no IV left to preserve - the point of the
+    # assertion, not the assertion itself, is what is skipped there.
     my $big = 9007199254740993;
     my $b = JSON::Schema::Fast->compile({ const => 9007199254740993 });
     ok($b->is_valid($big), 'a large integer compares equal to itself');
-    is(nok($big), 0, 'and was not numified to get there');
+    SKIP: {
+        skip 'no 64-bit integers on this perl: the literal is already an NV', 1
+            if nok($big) && !iok($big);
+        is(nok($big), 0, 'and was not numified to get there');
+    }
 }
 
 # ---- the symptom that started it -------------------------------------------

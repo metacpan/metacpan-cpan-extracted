@@ -18,3 +18,4 @@ share/templates/zones/html/group/add/perms.html.ep
 share/templates/zones/js/group/add/perms.js.ep
 share/translations/en.json
 share/translations/fr.json
+t/00-load.t

@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Deprecated" => "0.007",
     "Dist::Zilla::Plugin::Docker::API" => "0.103",
     "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => "0.014",
-    "Dist::Zilla::Plugin::GitHub::CreateRelease" => "0.0008",
+    "Dist::Zilla::Plugin::GitHub::CreateRelease" => "0.0012",
     "Dist::Zilla::Plugin::GithubMeta" => "0.58",
     "Dist::Zilla::Plugin::InstallRelease" => "0.008",
     "Dist::Zilla::Plugin::MakeMaker::Awesome" => "0.49",
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "1.302219"
   },
-  "VERSION" => "0.318",
+  "VERSION" => "0.319",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,7 +65,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Deprecated" => "0.007",
   "Dist::Zilla::Plugin::Docker::API" => "0.103",
   "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => "0.014",
-  "Dist::Zilla::Plugin::GitHub::CreateRelease" => "0.0008",
+  "Dist::Zilla::Plugin::GitHub::CreateRelease" => "0.0012",
   "Dist::Zilla::Plugin::GithubMeta" => "0.58",
   "Dist::Zilla::Plugin::InstallRelease" => "0.008",
   "Dist::Zilla::Plugin::MakeMaker::Awesome" => "0.49",

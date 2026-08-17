@@ -4,9 +4,10 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Test::Builder ();
+use Scalar::Util ();
 use Socket qw(AF_UNIX SOCK_STREAM PF_UNSPEC);
 use POSIX ();
 use File::Raw::JSON qw(file_json_encode file_json_decode);
@@ -202,6 +203,12 @@ sub _set_response {
     my $body = $r->[2];
     if (ref $body eq 'ARRAY') {
         $body = join '', grep { defined } @$body;
+    }
+    elsif (Scalar::Util::blessed($body) && $body->can('getline')) {
+        my @chunks;                         # a PSGI body object (send_file)
+        while (defined(my $chunk = $body->getline)) { push @chunks, $chunk }
+        eval { $body->close };
+        $body = join '', @chunks;
     }
     else {                                  # a filehandle (Punk::Static)
         local $/;
@@ -828,7 +835,8 @@ sub DESTROY {
 }
 
 # The psgi.streaming writer handed to a delayed response.
-package Punk::Test::_Writer;
+package 
+    Punk::Test::_Writer;
 sub new   { bless { w => $_[1], c => $_[2] }, $_[0] }
 sub write { $_[0]{w}->($_[1]) }
 sub close { ${ $_[0]{c} } = 1 }

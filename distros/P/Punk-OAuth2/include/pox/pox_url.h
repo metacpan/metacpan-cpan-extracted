@@ -204,7 +204,8 @@ static SV *pox_await(pTHX_ SV *c, SV *value) {
     PUTBACK;
     count = call_method("can", G_SCALAR | G_EVAL);
     SPAGAIN;
-    if (!SvTRUE(ERRSV) && count > 0) has_get = SvTRUE(POPs);
+    /* POP first: SvTRUE multi-evaluates its argument on older perls. */
+    if (!SvTRUE(ERRSV) && count > 0) { SV *r = POPs; has_get = SvTRUE(r); }
     else if (count > 0) (void)POPs;
     PUTBACK; FREETMPS; LEAVE;
   }

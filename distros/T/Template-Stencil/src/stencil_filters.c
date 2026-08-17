@@ -140,3 +140,116 @@ void stencil_filt_uri(pTHX_ SV *in, SV *out)
     SvCUR_set(out, (STRLEN)(w - SvPVX(out)));
     SvUTF8_off(out); /* pure ASCII by construction */
 }
+
+/* fmt: sprintf with exactly one conversion, the shape fmt_check
+ * (stencil_compile.c) guaranteed at template compile - so this can scan
+ * blind. The format is rewritten on the way through: perl's own length
+ * modifiers (IVdf and friends) are spliced in so the value passed always
+ * matches the conversion's width on every platform; floats go through a
+ * plain double, which is what display formatting wants. */
+void stencil_filt_fmt(pTHX_ SV *in, SV *out, const char *fmt, STRLEN flen,
+                      int src_utf8)
+{
+    char        rf[96];             /* rewritten format */
+    char        obuf[640];          /* capped by STENCIL_FMT_MAXWID */
+    const char *p = fmt, *end = fmt + flen;
+    char       *w = rf;
+    char        conv = 's';
+    int         has_prec = 0;
+    int         fmt_hi = 0;         /* a high-bit byte in the literals */
+    int         want_utf8;
+    int         olen = 0;
+
+    while (p < end) {
+        if (((unsigned char)*p) & 0x80) fmt_hi = 1;
+        if (*p != '%') { *w++ = *p++; continue; }
+        if (p + 1 < end && p[1] == '%') { *w++ = '%'; *w++ = '%'; p += 2; continue; }
+        *w++ = *p++;                              /* '%' */
+        while (p < end && (*p == '-' || *p == '+' || *p == ' '
+                           || *p == '0' || *p == '#'))
+            *w++ = *p++;
+        while (p < end && *p >= '0' && *p <= '9')
+            *w++ = *p++;
+        if (p < end && *p == '.') {
+            has_prec = 1;
+            *w++ = *p++;
+            while (p < end && *p >= '0' && *p <= '9')
+                *w++ = *p++;
+        }
+        conv = *p++;
+        switch (conv) {
+        case 'd': case 'i':
+            { const char *m = IVdf; while (*m) *w++ = *m++; }
+            break;
+        case 'o':
+            { const char *m = UVof; while (*m) *w++ = *m++; }
+            break;
+        case 'u':
+            { const char *m = UVuf; while (*m) *w++ = *m++; }
+            break;
+        case 'x':
+            { const char *m = UVxf; while (*m) *w++ = *m++; }
+            break;
+        case 'X':
+            { const char *m = UVXf; while (*m) *w++ = *m++; }
+            break;
+        default:                                  /* eEfgGs: as written */
+            *w++ = conv;
+            break;
+        }
+    }
+    *w = '\0';
+
+    want_utf8 = fmt_hi && src_utf8;
+    switch (conv) {
+    case 'd': case 'i':
+        olen = my_snprintf(obuf, sizeof obuf, rf, SvIV(in));
+        break;
+    case 'o': case 'u': case 'x': case 'X':
+        olen = my_snprintf(obuf, sizeof obuf, rf, SvUV(in));
+        break;
+    case 's': {
+        const char *s;
+        STRLEN      sl;
+        if (SvUTF8(in) || want_utf8) {
+            s = SvPVutf8(in, sl);
+            want_utf8 = 1;
+        }
+        else s = SvPV(in, sl);
+        olen = my_snprintf(obuf, sizeof obuf, rf, s);
+        if (want_utf8 && has_prec) {
+            /* a byte-counted precision may have cut the final UTF-8
+             * sequence short; strip a trailing incomplete sequence */
+            size_t ol = (size_t)(olen < 0 ? 0 : olen);
+            size_t st;
+            if (ol >= sizeof obuf) ol = strlen(obuf);
+            st = ol;
+            while (st > 0 && (((unsigned char)obuf[st - 1]) & 0xC0) == 0x80)
+                st--;
+            if (st > 0 && (((unsigned char)obuf[st - 1]) & 0x80)
+                && (size_t)UTF8SKIP(&obuf[st - 1]) != ol - (st - 1)) {
+                obuf[st - 1] = '\0';
+                olen = (int)(st - 1);
+            }
+        }
+        break;
+    }
+    default:                                      /* eEfgG */
+        /* snprintf, not my_snprintf: on a quadmath perl my_snprintf hands any
+         * format that is one bare float spec ("%.2f") to quadmath_snprintf
+         * and reads an __float128 from the varargs, so passing a double there
+         * panics ("quadmath_snprintf failed") or prints rubbish. Splicing in
+         * NVff to match would only move the problem, since the same perl
+         * routes "$%.2Qf" - a spec with literal text around it - to vsnprintf,
+         * which has no Q modifier. A double and a plain format are well
+         * defined everywhere, and display formatting is what this is for. */
+        olen = snprintf(obuf, sizeof obuf, rf, (double)SvNV(in));
+        break;
+    }
+
+    if (olen < 0) olen = 0;
+    if ((size_t)olen >= sizeof obuf) olen = (int)(sizeof obuf) - 1;
+    sv_setpvn(out, obuf, (STRLEN)olen);
+    if (want_utf8) SvUTF8_on(out);
+    else           SvUTF8_off(out);
+}

@@ -37,11 +37,11 @@ on 'test' => sub {
   requires "JSON" => "0";
   requires "List::Util" => "0";
   requires "Test::EOL" => "0";
+  requires "Test::Load::Helper" => "0";
   requires "Test::Tester" => "1.302107";
   requires "Type::Tiny" => "0";
   requires "Types::Common::Numeric" => "0";
   requires "feature" => "0";
-  requires "require::relative" => "0";
 };
 
 on 'configure' => sub {

@@ -3,335 +3,64 @@
 use 5.010;
 use strict;
 use warnings;
-use Getopt::Long ();
-use Punk ();
+use Punk::Command;
 
-our $VERSION = '0.10';
+# Everything - the registry, the dispatcher, option parsing, generated help -
+# lives in Punk::Command, where it is testable in-process. The version this
+# prints is $Punk::VERSION and nothing else, so it cannot skew.
 
-# The punk command. Argument handling and exit codes only - the work lives in
-# Punk::Generate, so it is testable without spawning a process. Subcommands
-# are registered here; `new` is the first of them.
+exit Punk::Command->main(@ARGV);
 
-our %USAGE;
+__END__
 
-my %COMMANDS = (
-    new     => \&cmd_new,
-    routes  => \&cmd_routes,
-    api     => \&cmd_api,
-    config  => \&cmd_config,
-    doctor  => \&cmd_doctor,
-    console => \&cmd_console,
-    dev     => \&cmd_dev,
-    help    => \&cmd_help,
-);
+=head1 NAME
 
-sub main {
-    my (@argv) = @_;
-
-    if (!@argv || $argv[0] eq '-h' || $argv[0] eq '--help') {
-        usage(\*STDOUT);
-        return 0;
-    }
-    if ($argv[0] eq '-v' || $argv[0] eq '--version') {
-        print "punk $VERSION (Punk $Punk::VERSION)\n";
-        return 0;
-    }
-
-    my $cmd = shift @argv;
-    my $run = $COMMANDS{$cmd} or do {
-        print STDERR "punk: unknown command '$cmd'\n\n";
-        usage(\*STDERR);
-        return 2;
-    };
-    return $run->(@argv);
-}
-
-sub cmd_new {
-    my (@argv) = @_;
-    my %opt;
-    _getopt(\@argv,
-        'dir=s'   => \$opt{dir},
-        'api=s'   => \$opt{api},
-        'force'   => \$opt{force},
-        'help|h'  => \$opt{help},
-    ) or return usage_new(\*STDERR, 2);
-
-    return usage_new(\*STDOUT, 0) if $opt{help};
-
-    my $name = shift @argv;
-    unless (defined $name && length $name) {
-        print STDERR "punk new: an application name is required\n\n";
-        return usage_new(\*STDERR, 2);
-    }
-    if (@argv) {
-        print STDERR "punk new: unexpected argument '$argv[0]'\n";
-        return 2;
-    }
-
-    require Punk::Generate;
-    my $gen = eval {
-        Punk::Generate->new(
-            name  => $name,
-            (defined $opt{dir} ? (dir => $opt{dir}) : ()),
-            (defined $opt{api} ? (api => $opt{api}) : ()),
-            force => $opt{force},
-        );
-    } or return fail($@);
-
-    my @files = eval { $gen->run } or return fail($@,
-        # the one failure with an obvious next move worth spelling out
-        ($opt{force} ? () : (hint => 'use --force to write into it anyway',
-                             when => qr/is not empty/)));
-
-    my $dir = $gen->dir;
-    print "Created $name in $dir\n\n";
-    print "  $_\n" for @files;
-    print <<"NEXT";
-
-  cd $dir
-  plackup app.psgi
-
-Then open http://localhost:5000/
-NEXT
-    return 0;
-}
-
-# ---- the application subcommands ---------------------------------------------
-# Each parses its own options and hands off to Punk::Command, which does the
-# work and owns the exit code.
-
-sub cmd_routes {
-    my (@argv) = @_;
-    my %opt;
-    _getopt(\@argv, 'dir=s' => \$opt{dir}, 'sort' => \$opt{sort},
-                    'help|h' => \$opt{help}) or return 2;
-    return usage_for('routes', \*STDOUT, 0) if $opt{help};
-    require Punk::Command;
-    return Punk::Command::routes(%opt);
-}
-
-sub cmd_api {
-    my (@argv) = @_;
-    my $sub = (@argv && $argv[0] !~ /^-/) ? shift @argv : '';
-    unless ($sub eq 'sync') {
-        print STDERR "punk api: expected 'sync'\n\n" if length $sub;
-        return usage_for('api', \*STDERR, 2);
-    }
-    my %opt;
-    _getopt(\@argv, 'dir=s' => \$opt{dir}, 'spec=s' => \$opt{spec},
-                    'dry-run' => \$opt{dry_run}, 'help|h' => \$opt{help})
-        or return 2;
-    return usage_for('api', \*STDOUT, 0) if $opt{help};
-    require Punk::Command;
-    return Punk::Command::api_sync(%opt);
-}
-
-sub cmd_config {
-    my (@argv) = @_;
-    my $sub = (@argv && $argv[0] !~ /^-/) ? shift @argv : '';
-    unless ($sub eq 'check') {
-        print STDERR "punk config: expected 'check'\n\n" if length $sub;
-        return usage_for('config', \*STDERR, 2);
-    }
-    my %opt;
-    _getopt(\@argv, 'dir=s' => \$opt{dir}, 'file=s' => \$opt{file},
-                    'env=s' => \$opt{env}, 'secrets=s' => \$opt{secrets},
-                    'dump' => \$opt{dump}, 'help|h' => \$opt{help}) or return 2;
-    return usage_for('config', \*STDOUT, 0) if $opt{help};
-    require Punk::Command;
-    return Punk::Command::config_check(%opt);
-}
-
-sub cmd_doctor {
-    my (@argv) = @_;
-    my %opt;
-    _getopt(\@argv, 'dir=s' => \$opt{dir}, 'help|h' => \$opt{help}) or return 2;
-    return usage_for('doctor', \*STDOUT, 0) if $opt{help};
-    require Punk::Command;
-    return Punk::Command::doctor(%opt);
-}
-
-sub cmd_console {
-    my (@argv) = @_;
-    my %opt;
-    _getopt(\@argv, 'dir=s' => \$opt{dir}, 'help|h' => \$opt{help}) or return 2;
-    return usage_for('console', \*STDOUT, 0) if $opt{help};
-    require Punk::Command;
-    return Punk::Command::console(%opt);
-}
-
-sub cmd_dev {
-    my (@argv) = @_;
-    my %opt;
-    _getopt(\@argv, 'dir=s' => \$opt{dir}, 'port=i' => \$opt{port},
-                    'host=s' => \$opt{host}, 'no-reload' => \$opt{no_reload},
-                    'help|h' => \$opt{help}) or return 2;
-    return usage_for('dev', \*STDOUT, 0) if $opt{help};
-    require Punk::Command;
-    return Punk::Command::dev(%opt);
-}
-
-sub cmd_help {
-    my ($topic) = @_;
-    if (defined $topic && length $topic) {
-        return usage_new(\*STDOUT, 0) if $topic eq 'new';
-        return usage_for($topic, \*STDOUT, 0) if $USAGE{$topic};
-        print STDERR "punk help: no such command '$topic'\n\n";
-        usage(\*STDERR);
-        return 2;
-    }
-    usage(\*STDOUT);
-    return 0;
-}
-
-# Getopt::Long::Parser->getoptionsfromarray is 2.39; perl 5.10 through 5.14
-# ship 2.38, which has the GetOptionsFromArray function but not the method, so
-# every subcommand died with "Can't locate object method". Configure returns
-# the previous settings, so restoring them keeps this as scoped as the Parser
-# object was.
-sub _getopt {
-    my ($argv, %spec) = @_;
-    my $saved = Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case));
-    my $ok    = eval { Getopt::Long::GetOptionsFromArray($argv, %spec) };
-    my $err   = $@;
-    Getopt::Long::Configure($saved);
-    die $err if $err;
-    return $ok;
-}
-
-# Croaks arrive with a "at FILE line N." tail that means nothing to someone
-# running a command; one actionable line is the whole message.
-sub fail {
-    my ($err, %o) = @_;
-    $err = "$err";
-    $err =~ s/ at \S+ line \d+\.?\s*\z//;
-    $err =~ s/\s+\z//;
-    $err =~ s/\APunk::Generate: //;
-    print STDERR "punk new: $err\n";
-    print STDERR "         $o{hint}\n"
-        if $o{hint} && $err =~ $o{when};
-    return 1;
-}
-
-sub usage {
-    my ($fh) = @_;
-    print {$fh} <<'USAGE';
 punk - the Punk command line
 
-usage: punk <command> [options]
+=head1 SYNOPSIS
 
-commands:
-  new <AppName>   generate a new application
-  routes          the compiled routing table
-  api sync        add stubs for operations added to the spec
-  config check    resolve the configuration and every secret it references
-  doctor          versions, C ABIs and application health
-  console         a REPL with the application compiled
-  dev             run under Hyperman, restarting when files change
-  help [command]  this, or a command's own options
+    punk new MyApp              # generate a new application
+    punk routes                 # the compiled routing table
+    punk api sync               # stubs for operations added to the spec
+    punk config check           # resolve configuration and every secret
+    punk doctor                 # versions, C ABIs, application health
+    punk console                # a REPL with the application compiled
+    punk dev                    # Hyperman with restart-on-change
+    punk help [command]         # generated from each command's declaration
 
-  punk --version
-USAGE
-    return 0;
-}
+=head1 DESCRIPTION
 
-# One place per command, so `punk help x` and `punk x --help` cannot drift.
-%USAGE = (
-    routes => <<'U',
-usage: punk routes [options]
+The command line for L<Punk> applications. Except for C<new>, every command
+finds the application by walking up from the current directory looking for
+F<app.psgi>, and takes the class from that file's C<< Class->to_app >>.
 
-Print the compiled routing table: every route, API operation, websocket
-route and mounted application, with what it resolved to.
+Help is generated from each command's declared options, so C<punk help X>
+and C<punk X --help> always match what the command actually accepts. Exit
+codes: 0 success, 1 something is wrong with the application or its
+environment, 2 the command was used wrongly.
 
-options:
-  --dir PATH    the application (default: found by walking up for app.psgi)
-  --sort        order by path rather than by declaration
-U
-    api => <<'U',
-usage: punk api sync [options]
+Commands live in L<Punk::Command>, which also documents how a plugin
+distribution adds its own subcommand.
 
-Add a stub for every operation openapi.json declares that the controllers
-do not implement. Methods with no matching operation are reported, never
-removed, and an implemented operation is never touched.
+=head1 ENVIRONMENT
 
-options:
-  --dir PATH    the application
-  --spec PATH   the document (default: openapi.json in the application root)
-  --dry-run     report what would change, write nothing
-U
-    config => <<'U',
-usage: punk config check [options]
+C<PUNK_ENV> selects the environment (production when unset). C<punk dev>
+sets it to C<development> for the server it runs unless already set.
 
-Resolve config/punk.yml and report every $env, $file and $exec reference
-independently, so one missing secret does not hide the rest. Exits
-non-zero when anything failed - usable as a deployment gate.
+=head1 SEE ALSO
 
-options:
-  --dir PATH        the application
-  --file PATH       the config file (default: config/punk.yml)
-  --env NAME        the environment layer (default: $PUNK_ENV or development)
-  --secrets MODE    strict, warn or off, for the plaintext-secret guardrail
-  --dump            print the resolved structure, secrets redacted
-U
-    doctor => <<'U',
-usage: punk doctor [options]
+L<Punk>, L<Punk::Command>, L<Punk::Generate>.
 
-Report versions, which C ABI tables resolved and at what version, and -
-when run inside an application - its routes and configuration.
+=head1 AUTHOR
 
-options:
-  --dir PATH    the application (optional; the rest is reported anywhere)
-U
-    console => <<'U',
-usage: punk console [options]
+LNATION <email@lnation.org>
 
-A REPL with the application compiled: $app is the registrar, $psgi the
-compiled coderef, $c a throwaway context for $c->model and friends.
+=head1 LICENSE AND COPYRIGHT
 
-options:
-  --dir PATH    the application
-U
-    dev => <<'U',
-usage: punk dev [options]
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
 
-Run the application under Hyperman, restarting it when anything under
-lib/, config/ or root/templates/ changes.
+This is free software, licensed under:
 
-options:
-  --dir PATH    the application
-  --port N      default 5000
-  --host ADDR   default 127.0.0.1
-  --no-reload   do not watch for changes
-U
-);
+  The Artistic License 2.0 (GPL Compatible)
 
-sub usage_for {
-    my ($cmd, $fh, $code) = @_;
-    print {$fh} $USAGE{$cmd} // '';
-    return $code;
-}
-
-sub usage_new {
-    my ($fh, $code) = @_;
-    print {$fh} <<'USAGE';
-usage: punk new <AppName> [options]
-
-Generate a running Punk application: routes, a controller, Stencil views,
-config/punk.yml, a psgi entry point and a test.
-
-options:
-  --dir PATH    where to write it (default: the name, :: replaced by -)
-  --api SPEC    an OpenAPI 3.1 document to mount under /api, generating
-                one controller of operation stubs per tag
-  --force       write into a directory that is not empty
-  --help        this
-
-examples:
-  punk new MyApp
-  punk new MyApp --dir ~/code/myapp
-  punk new MyApp --api ./openapi.json
-USAGE
-    return $code;
-}
-
-exit main(@ARGV);
+=cut

@@ -1,0 +1,11 @@
+package {% app %}::Model::{% name %};
+
+use Punk::Model;
+
+table '{% table %}';
+
+# Fields compile into create/update validation; rows are plain hashrefs.
+# See Punk::Model for types and constraints.
+field id => { type => 'integer' };
+
+1;

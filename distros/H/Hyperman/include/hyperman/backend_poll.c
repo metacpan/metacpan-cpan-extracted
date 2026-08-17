@@ -5,6 +5,11 @@
 
 #include "hyperman.h"
 
+/* poll(2) is POSIX. On Windows the readiness floor is backend_wsapoll.c
+ * (WSAPoll), and this file contributes only the dispatcher at the bottom -
+ * which is why that half sits outside the guard. */
+#ifndef _WIN32
+
 #include <poll.h>
 #include <signal.h>
 #include <string.h>
@@ -274,22 +279,33 @@ hm_backend *hm_backend_poll_new(void) {
 
 int hm_backend_poll_available(void) { return 1; }
 
-/* ---- backend selection: kqueue > epoll > poll, HYPERMAN_BACKEND to force */
+#else /* _WIN32: no poll(2) */
+
+hm_backend *hm_backend_poll_new(void)       { return 0; }
+int         hm_backend_poll_available(void) { return 0; }
+
+#endif /* !_WIN32 */
+
+/* ---- backend selection: kqueue > epoll > wsapoll > poll ---------------- */
 
 hm_backend *hm_backend_create(const char *name) {
     if (name && *name) {
         if (strcmp(name, "kqueue")   == 0) return hm_backend_kqueue_new();
         if (strcmp(name, "io_uring") == 0) return hm_backend_iouring_new();
         if (strcmp(name, "epoll")    == 0) return hm_backend_epoll_new();
+        if (strcmp(name, "wsapoll")  == 0) return hm_backend_wsapoll_new();
         if (strcmp(name, "poll")     == 0) return hm_backend_poll_new();
         return NULL;
     }
-    /* auto: kqueue > epoll > poll; io_uring stays opt-in until benchmarked */
+    /* auto: kqueue > epoll > wsapoll > poll; io_uring stays opt-in until
+     * benchmarked. Each _new returns NULL where its platform is absent, so
+     * exactly one of wsapoll/poll can ever answer. */
     {
         hm_backend *be;
         if ((be = hm_backend_kqueue_new())) return be;
         if ((be = hm_backend_iouring_new())) return be;
         if ((be = hm_backend_epoll_new()))  return be;
+        if ((be = hm_backend_wsapoll_new())) return be;
         return hm_backend_poll_new();
     }
 }

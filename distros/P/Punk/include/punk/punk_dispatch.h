@@ -34,11 +34,11 @@ static int PUNK_OA_TRIED = 0;
  * version mismatch for the guard test. */
 static const oa_abi *punk_oa_try(pTHX) {
     if (!PUNK_OA_TRIED) {
-        dSP; int count; IV p = 0;
+        dSP; int count, ok; IV p = 0;
         PUNK_OA_TRIED = 1;
-        eval_pv("require Open::API;", FALSE);
+        ok = pk_require_once(aTHX_ "Open::API", FALSE);
         SPAGAIN;   /* the require may have reallocated the value stack */
-        if (!SvTRUE(ERRSV)) {
+        if (ok) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("Open::API::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;

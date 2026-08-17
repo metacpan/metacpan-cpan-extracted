@@ -131,8 +131,13 @@ SKIP: {
     package JarApp;
     use Punk;
     ua cookie_jar => 1;
-    get '/j' => sub { my ($c) = @_; $c->text(0 + $c->ua->cookie_jar) };
-    get '/a' => sub { my ($c) = @_; $c->text(0 + $c->ua) };
+    # The handlers pin what they address: a freed clone's memory is the
+    # allocator's to hand straight back, so comparing the addresses of two
+    # DEAD objects can legally find them equal (a smoker did). Held alive,
+    # distinct objects must have distinct addresses.
+    our @keep;
+    get '/j' => sub { my ($c) = @_; push @keep, $c->ua->cookie_jar; $c->text(0 + $keep[-1]) };
+    get '/a' => sub { my ($c) = @_; push @keep, $c->ua; $c->text(0 + $keep[-1]) };
     1;
 }
 {
@@ -181,9 +186,10 @@ SKIP: {
     ua timeout => 30;                                   # the default
     ua partner => { agent => 'partner/1' };
     ua billing => { agent => 'billing/1', cookie_jar => 1 };
+    our @keep;   # pin per-request clones: see JarApp above
     get '/d'  => sub { my ($c) = @_; $c->text(0 + $c->ua) };
     get '/p'  => sub { my ($c) = @_; $c->text(0 + $c->ua('partner')) };
-    get '/b'  => sub { my ($c) = @_; $c->text(0 + $c->ua('billing')) };
+    get '/b'  => sub { my ($c) = @_; push @keep, $c->ua('billing'); $c->text(0 + $keep[-1]) };
     get '/pp' => sub { my ($c) = @_; $c->text($c->ua('partner') == $c->ua('partner') ? 'same' : 'differ') };
     get '/x'  => sub { my ($c) = @_; eval { $c->ua('nope') }; $c->text($@ || 'no croak') };
     1;

@@ -86,7 +86,7 @@ app(class, dir, opts = NULL, prefix = NULL)
                  * located the way Open::API::UI locates its own */
                 HV *inc = get_hv("INC", 0);
                 SV **pm;
-                eval_pv(PK_REQUIRE(PK_MOUNT_MD), FALSE);
+                (void)pk_require_once(aTHX_ PK_MOUNT_MD, FALSE);
                 inc = get_hv("INC", 0);
                 pm = inc ? hv_fetchs(inc, "Punk/Mount/Markdown.pm", 0) : NULL;
                 if (!pm || !*pm || !SvOK(*pm))
@@ -103,8 +103,7 @@ app(class, dir, opts = NULL, prefix = NULL)
             /* punk_st resolves the ABI but the constructor below is an
              * ordinary method call, so the class has to be loaded too. */
             (void)punk_st(aTHX);
-            eval_pv(PK_REQUIRE("Template::Stencil"), FALSE);
-            if (SvTRUE(ERRSV))
+            if (!pk_require_once(aTHX_ "Template::Stencil", FALSE))
                 croak("Punk::Mount::Markdown: Template::Stencil failed to "
                       "load: %s", SvPV_nolen(ERRSV));
             argv[0] = sv_2mortal(newRV_noinc((SV *)sopts));

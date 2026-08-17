@@ -424,7 +424,7 @@ static void hm_tls_ctx_free(void *ctxv) {
 static int hm_tls_wrap(hm_conn *c, void *ctx) {
     SSL *ssl = SSL_new((SSL_CTX *)ctx);
     if (!ssl) return -1;
-    SSL_set_fd(ssl, c->fd);
+    SSL_set_fd(ssl, HM_SSL_FD(c->fd));
     SSL_set_accept_state(ssl);
     c->ssl = ssl;
     c->tls_hs = 1;
@@ -536,7 +536,7 @@ static void hm_tls_env(pTHX_ hm_conn *c, HV *env) {
  * the TLS engine would block; c->tls_r_wants_w records a needed writable). */
 static ssize_t hm_cread(hm_conn *c, void *buf, size_t n) {
     int r, e;
-    if (!c->ssl) return read(c->fd, buf, n);
+    if (!c->ssl) return hm_os_recv(c->fd, buf, n);
     ERR_clear_error();
     r = SSL_read((SSL *)c->ssl, buf, (int)(n > INT_MAX ? INT_MAX : n));
     if (r > 0) return r;
@@ -550,7 +550,7 @@ static ssize_t hm_cread(hm_conn *c, void *buf, size_t n) {
  * readable (e.g. during a TLS 1.2 renegotiation). */
 static ssize_t hm_cwrite(hm_conn *c, const void *buf, size_t n) {
     int r, e;
-    if (!c->ssl) return write(c->fd, buf, n);
+    if (!c->ssl) return hm_os_send(c->fd, buf, n);
     if (n == 0) return 0;
     ERR_clear_error();
     r = SSL_write((SSL *)c->ssl, buf, (int)(n > INT_MAX ? INT_MAX : n));
@@ -563,6 +563,19 @@ static ssize_t hm_cwrite(hm_conn *c, const void *buf, size_t n) {
 }
 
 static int hm_tls_available(void) { return 1; }
+
+/* The runtime library banner ("OpenSSL 3.0.13 30 Jan 2024", "LibreSSL
+ * 3.8.2"): which stack is actually loaded, not which headers built this.
+ * OpenSSL_version arrived in 1.1.0 and LibreSSL in 2.7.0; before those it
+ * is SSLeay_version, same string, older name. */
+static const char *hm_tls_library(void) {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L \
+    && (!defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+    return OpenSSL_version(OPENSSL_VERSION);
+#else
+    return SSLeay_version(SSLEAY_VERSION);
+#endif
+}
 
 #else /* !HM_HAVE_OPENSSL */
 
@@ -583,10 +596,11 @@ static void hm_tls_capture_peer(hm_conn *c) { (void)c; }
 static void hm_tls_conn_free(hm_conn *c) { (void)c; }
 static void hm_tls_env(pTHX_ hm_conn *c, HV *env) { (void)c; (void)env; }
 static ssize_t hm_cread(hm_conn *c, void *buf, size_t n)
-    { return read(c->fd, buf, n); }
+    { return hm_os_recv(c->fd, buf, n); }
 static ssize_t hm_cwrite(hm_conn *c, const void *buf, size_t n)
-    { return write(c->fd, buf, n); }
+    { return hm_os_send(c->fd, buf, n); }
 static int  hm_tls_available(void) { return 0; }
+static const char *hm_tls_library(void) { return 0; }
 
 #endif /* HM_HAVE_OPENSSL */
 

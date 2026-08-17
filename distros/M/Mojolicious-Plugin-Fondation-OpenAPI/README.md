@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::OpenAPI - OpenAPI specification generator and ru
 
 # VERSION
 
-version 0.03
+version 0.04
 
 # SYNOPSIS
 

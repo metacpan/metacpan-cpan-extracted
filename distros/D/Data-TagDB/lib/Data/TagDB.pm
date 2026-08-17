@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Philipp Schafft
+# Copyright (c) 2024-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -24,7 +24,7 @@ use Data::TagDB::WellKnown;
 use Data::TagDB::Cloudlet;
 use Data::URIID::Colour;
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 my %_queries = (
     _default => {
@@ -244,18 +244,21 @@ sub tag_by_specification {
 }
 
 
+#@returns Data::TagDB::Iterator
 sub relation {
     my ($self, %opts) = @_;
     return $self->_link_iterator(%opts, package => 'Data::TagDB::Relation');
 }
 
 
+#@returns Data::TagDB::Iterator
 sub metadata {
     my ($self, %opts) = @_;
     return $self->_link_iterator(%opts, package => 'Data::TagDB::Metadata');
 }
 
 
+#@returns Data::TagDB::Iterator
 sub link {
     my ($self, %opts) = @_;
     return Data::TagDB::MultiIterator->new(db => $self, iterators => [
@@ -657,6 +660,11 @@ sub _build_query {
         $parts{LIMIT} = $opts{limit};
     }
 
+    if (defined $opts{offset}) {
+        $parts{OFFSET} = $opts{offset};
+    }
+
+
     foreach my $key (qw(tag relation context filter related type encoding)) {
         foreach my $neg (0, 1) {
             my $curkey = ($neg ? 'no_' : '').$key;
@@ -685,7 +693,7 @@ sub _build_query {
         my @list = ref($opts{order_by}) eq 'ARRAY' ? @{$opts{order_by}} : ($opts{order_by});
         if (scalar @list) {
             $parts{ORDER} = 'BY '.join(', ',
-                map {sprintf('%s ASC', $_)} @list
+                map {sprintf('%s ASC', $_ eq 'data_int' ? 'CAST(data AS INTEGER)' : $_)} @list
             );
         }
     }
@@ -694,7 +702,7 @@ sub _build_query {
         my $q = '';
         my $sth;
 
-        foreach my $key (qw(SELECT FROM WHERE ORDER LIMIT)) {
+        foreach my $key (qw(SELECT FROM WHERE ORDER LIMIT OFFSET)) {
             if (defined $parts{$key}) {
                 $q .= ' ' if length $q;
                 $q .= $key.' '.$parts{$key};
@@ -767,6 +775,25 @@ sub _load_cloudlet {
     # WITH RECURSIVE X(related,root) AS (SELECT related,true FROM relation WHERE tag = 597 AND relation IN (7, 201) UNION SELECT relation.related,false FROM relation, X WHERE relation.relation = 140 AND relation.tag = X.related) SELECT *,(SELECT data FROM metadata WHERE tag = X.related AND relation = 1 AND type = 5 LIMIT 1) FROM X
 }
 
+# Highly experimental!
+sub _delete_tag {
+    my ($self, $tag) = @_;
+    my $dbh = $self->dbh;
+    my $dbid = $tag->dbid;
+
+    {
+        my @columns = qw(tag relation context type encoding);
+        $dbh->do('DELETE FROM metadata WHERE '.join(' OR ', map {$_.' = ?'} @columns), undef, map {$dbid} @columns);
+    }
+    {
+        my @columns = qw(tag relation context related filter);
+        $dbh->do('DELETE FROM relation WHERE '.join(' OR ', map {$_.' = ?'} @columns), undef, map {$dbid} @columns);
+    }
+
+    $dbh->do('DELETE FROM hint WHERE tag = ?', undef, $dbid);
+    $dbh->do('DELETE FROM tag WHERE id = ?', undef, $dbid);
+}
+
 # ---- AUTOLOAD ----
 
 sub AUTOLOAD {
@@ -804,7 +831,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -1188,7 +1215,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2024-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

@@ -1,6 +1,7 @@
 #ifndef CJWS_KEY_H
 #define CJWS_KEY_H
 
+#include <string.h>
 #include <openssl/pem.h>
 #include <openssl/bio.h>
 #include "cjws_compat.h"
@@ -30,8 +31,11 @@ static void cjws_key_free(cjws_key *k) {
   OPENSSL_free(k);
 }
 
+/* Not OPENSSL_zalloc: LibreSSL (OpenBSD base) has no such symbol, and the
+ * implicit declaration only bites at dlopen time as an undefined symbol. */
 static cjws_key *cjws_key_alloc(void) {
-  cjws_key *k = (cjws_key *)OPENSSL_zalloc(sizeof *k);
+  cjws_key *k = (cjws_key *)OPENSSL_malloc(sizeof *k);
+  if (k) memset(k, 0, sizeof *k);
   return k;
 }
 

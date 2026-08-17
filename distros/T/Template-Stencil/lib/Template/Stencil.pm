@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Template::Stencil', $VERSION);
@@ -103,6 +103,22 @@ because it changed the bytes). Built-ins, implemented in C:
     html        HTML-escape now (marks the value escaped)
     uri         RFC 3986 percent-encoding of the component
     default(x)  replace undef or '' with the literal x
+    fmt(f)      sprintf with exactly one conversion
+
+C<fmt> is the number-formatting filter, in C:
+
+    {% price | fmt('$%.2f') %}      $1.50
+    {% id    | fmt('%08d')  %}      00000042
+    {% hash  | fmt('%x')    %}      deadbeef
+
+The format is one sprintf conversion - C<diouxXeEfgGs>, with the usual
+flags, width and precision - surrounded by any literal text (C<%%> for
+a literal percent). It is validated when the template compiles: a
+second conversion, C<*>, a length modifier, C<%n>, or an oversized
+width is a compile-time error, never a render-time surprise. Integer
+conversions format the full IV/UV range on every platform; C<%s> with
+a precision counts bytes, and never leaves a broken UTF-8 sequence
+behind. Undef passes through, like the other filters.
 
 User filters are Perl coderefs registered on the constructor:
 
@@ -115,7 +131,9 @@ A filter argument is a single string or number literal. Unknown filter
 names are compile-time errors listing what is registered. A C<die>
 inside a filter becomes a render error carrying the filter name and
 template location. User filters cost a Perl call - the escape hatch,
-not the fast path.
+not the fast path: an application through a coderef is ~100ns of
+call-boundary before the body runs, where a built-in is free. If the
+coderef is only C<sprintf>, use C<fmt>.
 
 =head2 Conditionals
 

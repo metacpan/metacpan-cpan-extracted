@@ -3,7 +3,6 @@
     "title":        "Account",
     "link":         "",
     "icon":         "fas fa-user",
-    "icon_color":   "#000000",
     "menu":         "account_menu",
     "condition":    "auth",
     "order":        1,

@@ -111,7 +111,13 @@ for my $flag ('-O3', '-fomit-frame-pointer') {
         $optimize = join ' ', grep { length } $optimize, $flag;
     }
 }
-if (try_compile($trivial, "$optimize -flto", 1)) {
+# Not on Windows: MinGW's DLL auto-export cannot see symbols inside LTO
+# objects, so the probe (a plain exe) passes and the dll then exports
+# nothing - boot_Template__Stencil unfindable at load (two 0.07 smoker
+# FAILs on 32-bit Strawberry/gcc 4.6). The probe would have to be a dll
+# export to be honest, and LTO buys nothing worth that here.
+if ($^O !~ /^(?:MSWin32|cygwin)$/
+    && try_compile($trivial, "$optimize -flto", 1)) {
     $optimize .= ' -flto';
     $ldflags   = '-flto';
 }
@@ -145,6 +151,10 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+        # the pretty goldens: Eshu 0.10 truncated a same-line <script>
+        # pair, which is exactly what t/70 renders (three identical
+        # smoker FAILs on 0.07 were old-Eshu, not the engine)
+        'Eshu'       => '0.13',
     },
     PREREQ_PM => {},
     macro => { TARFLAGS => "--format=ustar -c -v -f" },

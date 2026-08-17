@@ -1,5 +1,9 @@
 Revision history for Open-API
 
+0.10	2026-08-17
+	- Update min version of deps
+	- Remove PAX headers
+
 0.09    2026-08-12
         - OpenAPI 3.0 documents are now accepted. A 3.1 Schema Object is
           JSON Schema 2020-12, which is what JSON::Schema::Fast validates;

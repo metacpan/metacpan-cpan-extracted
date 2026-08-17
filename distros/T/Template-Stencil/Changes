@@ -1,5 +1,29 @@
 Revision history for Template-Stencil
 
+0.09    2026-08-17
+        - Fix the fmt filter on quadmath and long-double perls. Perl's
+          my_snprintf hands any format that is one bare float spec
+          ("%.2f") to quadmath_snprintf and reads an NV from the
+          varargs, so the double the filter passed made it panic
+          ("quadmath_snprintf failed, format \"%.2f\"") or print 0.00.
+          The float branch now calls snprintf directly, where a double
+          and a plain format mean the same thing on every platform.
+        - t/44-fmt: the %d width case used a 2**53 literal, which a perl
+          without 64-bit integers holds as an NV that no %d can
+          represent (SvIV clamps it to UV_MAX, which reads back as -1).
+          It now formats IV_MAX and compares against perl's own sprintf.
+
+0.08    2026-08-16
+        - Eshu 0.13 is now the test-requires floor, and t/70 skips
+          under anything older (0.11 fixed the indenter but 0.11 and
+          0.12 do not build or walk correctly on Windows; 0.13 is the
+          same indenter, working everywhere). 
+        - -flto is no longer used on Windows.
+
+0.07    2026-08-16
+        - New built-in filter fmt: sprintf with exactly one conversion
+          {% price | fmt('$%.2f') %}
+
 0.06    2026-08-14
         - The compile-scaling test in t/11-bytecode-shape.t timed
           _inspect, whose per-op Perl hash building dominated the

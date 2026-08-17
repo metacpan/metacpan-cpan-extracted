@@ -17,3 +17,4 @@ share/templates/login.html.ep
 share/templates/user/list.html.ep
 share/translations/en.json
 share/translations/fr.json
+t/00-load.t

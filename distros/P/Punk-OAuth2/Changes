@@ -1,5 +1,11 @@
 Revision history for Punk-OAuth2
 
+0.02    2026-08-16
+        Fix stack corruption in the DBI-backed server store: SvIV(POPs)
+        in pox_dbi_do (and SvTRUE(POPs) in pox_await) evaluate POPs
+        twice, walking the stack pointer back into the caller's
+        arguments.
+
 0.01    2026-08-15
         First version.
         - the client side of OAuth2 and OpenID Connect for Punk:

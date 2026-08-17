@@ -317,7 +317,7 @@ static void pc_compile_models(pTHX_ SV *self) {
     }
     if (av_len(names) < 0) return;
 
-    eval_pv(PK_REQUIRE(PK_MODEL), TRUE);
+    (void)pk_require_once(aTHX_ PK_MODEL, TRUE);
     reg = newHV();
     n = av_len(names) + 1;
     for (i = 0; i < n; i++) {
@@ -404,8 +404,7 @@ static AV *pc_docs_routes(pTHX_ SV *self, AV *api_mounts) {
             mm = hv_fetchs(m0h, K_MOUNT, 0);
             mount = (mm && *mm) ? *mm : NULL;
         }
-        eval_pv(PK_REQUIRE(PK_OA_UI), FALSE);
-        if (SvTRUE(ERRSV))
+        if (!pk_require_once(aTHX_ PK_OA_UI, FALSE))
             croak("Punk: the docs keyword needs Open::API::UI - Open::API "
                   "0.03+ with Template::Stencil and Markdown::Simple - and "
                   "it failed to load: %s", SvPV_nolen(ERRSV));

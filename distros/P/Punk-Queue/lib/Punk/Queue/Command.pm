@@ -148,15 +148,52 @@ sub _queue {
         }
         (my $file = "$app.pm") =~ s{::}{/}g;
         my $loaded = eval { require $file; 1 };
-        if (!$loaded) {
+        # a failed require only matters when the class is genuinely absent -
+        # an already-compiled class (a preloaded app, a test) has no file
+        if (!$loaded && !$app->can('punk_app') && !$app->can('queue')) {
             print STDERR "punk-queue: could not load $app: $@";
             return undef;
+        }
+        # A Punk application class: compile it (task targets and cron
+        # declarations only resolve at to_app) and take the queue from the
+        # plugin's state. Calling $app->queue here would land in the `queue`
+        # KEYWORD's declaration form - it would register a queue named after
+        # the class and return undef, which is the silent-exit-2 bug this
+        # branch replaces. Every failure now says what to do.
+        if ($app->can('punk_app')) {
+            unless (eval { require Punk::Plugin::Queue; 1 }) {
+                print STDERR "punk-queue: $app is a Punk application but "
+                            . "Punk::Plugin::Queue is not installed\n";
+                return undef;
+            }
+            # a second to_app croaks 'already compiled' - that one is fine
+            eval { $app->to_app };
+            if ($@ && $@ !~ /already compiled/) {
+                print STDERR "punk-queue: $app failed to compile: $@";
+                return undef;
+            }
+            my $state = Punk::Plugin::Queue->state_for($app);
+            my $q = $state && $state->{queue};
+            unless ($q) {
+                print STDERR "punk-queue: $app compiled but the Queue "
+                            . "plugin never registered a queue - is "
+                            . "`plugin 'Queue'` (and anything gating it) "
+                            . "active in that class?\n";
+                return undef;
+            }
+            return $q;
         }
         if (!$app->can('queue')) {
             print STDERR "punk-queue: $app has no queue() method\n";
             return undef;
         }
-        return $app->queue;
+        my $q = $app->queue;
+        unless (ref $q && eval { $q->isa('Punk::Queue') }) {
+            print STDERR "punk-queue: $app->queue did not return a "
+                        . "Punk::Queue\n";
+            return undef;
+        }
+        return $q;
     }
     if (defined $opt->{dsn} && length $opt->{dsn}) {
         my $q = eval { Punk::Queue->new(dsn => $opt->{dsn}) };

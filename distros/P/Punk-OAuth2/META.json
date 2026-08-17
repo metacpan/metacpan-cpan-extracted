@@ -36,7 +36,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::JWS" : "0.01",
+            "Crypt::JWS" : "0.02",
             "Fetch" : "0.08",
             "File::Raw::JSON" : "0.05",
             "Punk" : "0.04",
@@ -53,6 +53,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

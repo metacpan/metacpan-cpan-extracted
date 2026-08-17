@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu;
-$Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu::VERSION = '0.04';
 # ABSTRACT: DBIx::Class Result class for menus table
 
 use strict;
@@ -200,7 +200,7 @@ Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu - DBIx::Class Result 
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

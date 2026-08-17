@@ -83,6 +83,7 @@ include/punk/punk_scope.h
 include/punk/punk_serve.h
 include/punk/punk_session.h
 include/punk/punk_sse.h
+include/punk/punk_sendfile.h
 include/punk/punk_static.h
 include/punk/punk_stencil.h
 include/punk/punk_ua.h
@@ -112,7 +113,9 @@ lib/Punk/Generate/skel/basic_t.tmpl
 lib/Punk/Generate/skel/controller_api.tmpl
 lib/Punk/Generate/skel/controller_auth.tmpl
 lib/Punk/Generate/skel/controller_web_root.tmpl
+lib/Punk/Generate/skel/controller_gen.tmpl
 lib/Punk/Generate/skel/gitignore.tmpl
+lib/Punk/Generate/skel/model_gen.tmpl
 lib/Punk/Generate/skel/punk_yml.tmpl
 lib/Punk/Generate/skel/readme_md.tmpl
 lib/Punk/Generate/skel/view/layout.tmpl
@@ -141,6 +144,7 @@ lib/Punk/Test.pm
 lib/Punk/Test/WS.pm
 lib/Punk/Test/WS/Conn.pm
 lib/Punk/UA.pm
+lib/Punk/SendFile/Reader.pm
 lib/Punk/Upload.pm
 lib/Punk/Validate.pm
 lib/Punk/View/Stencil.pm
@@ -206,6 +210,11 @@ t/51-headers.t
 t/52-respond-to.t
 t/53-password.t
 t/54-auth.t
+t/57-cli.t
+t/58-generate-into.t
+t/59-sendfile-parse.t
+t/60-sendfile.t
+t/lib/Punk/Command/Fakecmd.pm
 t/lib/PunkTest.pm
 t/lib/PunkWSRef.pm
 t/manifest.t
@@ -253,6 +262,7 @@ xs/scope.xs
 xs/serve.xs
 xs/session.xs
 xs/sse.xs
+xs/sendfile.xs
 xs/static.xs
 xs/stencil.xs
 xs/upload.xs

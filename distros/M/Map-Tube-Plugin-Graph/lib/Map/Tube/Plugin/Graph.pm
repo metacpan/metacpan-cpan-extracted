@@ -2,7 +2,7 @@ package Map::Tube::Plugin::Graph;
 
 use version;
 
-our $VERSION   = qv('v1.1.1');
+our $VERSION   = qv('v1.1.2');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -11,7 +11,7 @@ Map::Tube::Plugin::Graph - Graph plugin for Map::Tube.
 
 =head1 VERSION
 
-Version v1.1.1
+Version v1.1.2
 
 =cut
 
@@ -174,10 +174,11 @@ There are a number of parameters that influence the rendering process and the re
 
 By default, output is in the PNG bitmap format.  This can be changed by passing
 the C<format=> parameter. GraphViz supports many output formats, among them SVG
-and PDF and the native GraphViz DOT (or GV) format. While DOT and GV are formally
-identical, there is an important difference: GV yields the raw, un-layouted graph
-description, whereas DOT yields a graph description where each element is already
-precisely placed. -- For a list of supported formats, see the L<list_formats()> method.
+and PDF and the native GraphViz DOT (or GV) format. While DOT and GV are
+formally identical, this module makes an important distinction: GV yields the
+raw, un-layouted graph description, whereas DOT yields a graph description where
+each element is already precisely placed. -- For a list of supported formats,
+see the L<list_formats()> method.
 
 =item * C<driver =E<gt> ...>
 

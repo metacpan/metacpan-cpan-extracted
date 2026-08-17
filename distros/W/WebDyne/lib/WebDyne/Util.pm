@@ -58,7 +58,7 @@ require Exporter;
 
 #  Version information
 #
-$VERSION='3.014';
+$VERSION='3.015';
 
 
 #  Var to hold package wide hash, for data shared across package, and error stack
@@ -554,6 +554,10 @@ sub errdump {
     #
     my $info_hr=shift();
 
+    # formline writes to the global format accumulator. Keep errdump output
+    # isolated and restore any outer accumulator automatically on return.
+    local $^A=q();
+
 
     #  Return a dump of error in a nice format, no params. Do this with
     #  format strings, so define the ones we will use
@@ -626,6 +630,15 @@ sub errdump {
         foreach my $key (sort keys %{$info_hr}) {
             my $value=$info_hr->{$key};
 
+            # Older perls can interact badly with overloaded objects during
+            # formline formatting, so keep diagnostic fields as plain scalars.
+            if (ref($value)) {
+                my $string=eval {
+                    $value->can('as_string') ? $value->as_string() : "$value";
+                };
+                $value=defined($string) ? $string : ref($value);
+            }
+
             #  Print separator, info
             #
             formline $format[0];
@@ -652,10 +665,9 @@ sub errdump {
     }
 
 
-    #  Empty the format accumulator and return it
+    #  Return the localized format accumulator.
     #
-    my $return=$^A; undef $^A;
-    return $return;
+    return $^A;
 
 }
 

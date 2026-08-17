@@ -263,7 +263,6 @@ t/14-pagi.t
 t/15-request.psp                         
 t/15-request.t                           
 t/16-path-traversal.t
-t/16-path-traversal.t                    
 t/17-cgi-uploads.t                       
 t/18-wrapper-traversal.t                 
 t/19-static-binary.t                     
@@ -286,6 +285,7 @@ t/35-pagi-websocket.t
 t/37-psgi-api.t
 t/36-pagi-api.t
 t/38-start-html-style-extend.t
+t/39-errdump-object-format.t
 t/alpine.psp                             
 t/apache_harness_helper.pm
 t/api_bare.psp                           

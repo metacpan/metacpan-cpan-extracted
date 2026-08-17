@@ -1,6 +1,8 @@
 Revision history for Mojolicious-Plugin-Fondation-I18N
 
-0.01      2026-07-14 20:09:41+02:00 Europe/Paris
+0.02      2026-08-16 19:51:31+02:00 Europe/Paris
+   - add helper format_date
+   - update dependencies
 
 0.01  2026-06-10
     - Initial release

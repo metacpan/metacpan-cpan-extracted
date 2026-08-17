@@ -8,7 +8,7 @@ use Punk::Router::Scope;
 use Punk::Context;
 use Punk::Static;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 # The boot hook compile() probes just before the state hash freezes
 # (xs/compile.xs). The framework's own extras live here; a subclass that

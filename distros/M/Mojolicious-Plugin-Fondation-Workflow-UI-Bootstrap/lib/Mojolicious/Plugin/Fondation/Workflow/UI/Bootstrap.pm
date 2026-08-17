@@ -1,13 +1,11 @@
 package Mojolicious::Plugin::Fondation::Workflow::UI::Bootstrap;
-
+$Mojolicious::Plugin::Fondation::Workflow::UI::Bootstrap::VERSION = '0.02';
 # ABSTRACT: Bootstrap 5 UI components for Fondation::Workflow
 #
 # Provides template helpers for rendering workflow state badges,
 # action buttons, history timelines, progress bars, and Mermaid.js graphs.
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
-
-our $VERSION = '0.01';
 
 sub fondation_meta {
     return {

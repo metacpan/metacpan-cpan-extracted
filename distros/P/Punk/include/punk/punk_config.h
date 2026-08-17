@@ -49,8 +49,7 @@ static SV *pc_yaml_decode(pTHX_ SV *text, const char *path) {
     int count;
     SV *ret;
     static int shim = 0;
-    eval_pv("require YAML::XS;", FALSE);
-    if (SvTRUE(ERRSV))
+    if (!pk_require_once(aTHX_ "YAML::XS", FALSE))
         croak("Punk::Config: reading '%s' needs YAML::XS (not installed)",
               path);
     if (!shim) {

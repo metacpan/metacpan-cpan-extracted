@@ -28,7 +28,7 @@
             "Mojolicious::Plugin::Fondation" : "0.07",
             "Mojolicious::Plugin::Fondation::Authorization" : "0.02",
             "Mojolicious::Plugin::Fondation::Layout::Bootstrap" : "0.04",
-            "Mojolicious::Plugin::Fondation::Model::DBIx::Async" : "0.05",
+            "Mojolicious::Plugin::Fondation::Model::DBIx::Async" : "0.06",
             "Mojolicious::Plugin::Fondation::Problem" : "0.03",
             "perl" : "5.026"
          }
@@ -51,7 +51,7 @@
          "web" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-Menu"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

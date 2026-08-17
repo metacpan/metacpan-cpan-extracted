@@ -1,33 +1,30 @@
 ---
 abstract: 'Provide various analyses of Graphviz dot files'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: '0.98'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Pod: '1.51'
 configure_requires:
-  Module::Build: '0.38'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
-license: artistic_2
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: GraphViz2-Marpa-PathUtils
-provides:
-  GraphViz2::Marpa::PathUtils:
-    file: lib/GraphViz2/Marpa/PathUtils.pm
-    version: '2.00'
-  GraphViz2::Marpa::PathUtils::Config:
-    file: lib/GraphViz2/Marpa/PathUtils/Config.pm
-    version: '2.00'
-  GraphViz2::Marpa::PathUtils::Demo:
-    file: lib/GraphViz2/Marpa/PathUtils/Demo.pm
-    version: '2.00'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Capture::Tiny: '0.27'
   Config: '0'
   Config::Tiny: '2.2'
   Date::Simple: '3.03'
+  ExtUtils::MakeMaker: '7.7'
   File::Basename: '2.84'
   File::Copy: '2.21'
   File::HomeDir: '0.99'
@@ -41,6 +38,7 @@ requires:
   Pod::Usage: '1.36'
   Set::Tiny: '0.02'
   Sort::Key: '1.33'
+  Test::More: '0.98'
   Text::Xslate: v3.3.3
   Types::Standard: '1.000005'
   open: '0'
@@ -48,6 +46,7 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
-  repository: https://github.com/ronsavage/GraphViz2-Marpa-PathUtils
-version: '2.00'
+  license: http://opensource.org/licenses/Artistic-2.0
+  repository: https://github.com/ronsavage/GraphViz2-Marpa-PathUtils.git
+version: '2.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

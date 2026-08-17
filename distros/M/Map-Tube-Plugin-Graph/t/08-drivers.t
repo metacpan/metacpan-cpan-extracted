@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use 5.014;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use File::Spec;
 use Test::Lib;
 use Test::More;
@@ -16,6 +16,7 @@ my $tube = Sample->new( xml => $dataname );
 my @drivers = grep { $_ !~ /^nop/ } $tube->list_drivers( );
 
 for my $driver(@drivers) {
+  diag(" $driver");
   my ($diagram, undef) = $tube->render( driver => $driver );
   isnt( $diagram, '', "$driver driver" );
 }

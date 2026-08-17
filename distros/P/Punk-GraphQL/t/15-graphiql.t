@@ -37,6 +37,8 @@ use PGTest;
         'the endpoint rides in the page';
     unlike $r->[2][0], qr{https?://},
         'the page references no external URL at all';
+    like $r->[2][0], qr{id="headers"},
+        'the console has a request-headers pane';
     like $r->[2][0], qr{__schema},
         'schema docs come from introspection, in-page';
     ok my $etag = $h{ETag}, 'with an ETag';

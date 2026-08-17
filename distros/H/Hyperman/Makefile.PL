@@ -6,16 +6,20 @@ use ExtUtils::Depends;
 use File::Find ();
 use Config;
 
-# Hyperman is a Unix event-loop server: it relies on fork(2), BSD sockets,
-# POSIX signals, sys/uio (readv/writev), and a kqueue/epoll/io_uring/poll
-# readiness backend. None of that exists on native Windows - MSWin32/MinGW
-# lacks even <sys/uio.h> - so bail out cleanly before writing a Makefile.
-# Exiting 0 without a Makefile has CPAN Testers record NA rather than a
-# spurious C compilation FAIL. (Cygwin has fork+sys/uio and is left alone.)
+# Windows builds, with the platform's limits stated rather than discovered:
+# the socket/IO surface goes through include/hyperman/hm_win.h (Winsock
+# behind a CRT fd), readiness comes from the WSAPoll backend, and there is
+# no fork - so one worker, no shared abuse-control arena, no detach.
+# Everything Winsock needs is in ws2_32.
+# cmd.exe has no /dev/null: a probe redirecting there would create a file
+# and could read the wrong answer. NUL is the Windows spelling.
+my $DEVNULL = $^O eq 'MSWin32' ? 'NUL' : '/dev/null';
+
+my $win_libs = '';
 if ($^O eq 'MSWin32') {
-    print "OS unsupported: Hyperman needs a Unix-like platform "
-        . "(fork, POSIX signals, sockets, kqueue/epoll/io_uring/poll).\n";
-    exit 0;
+    $win_libs = '-lws2_32';
+    print "Windows: Winsock + WSAPoll backend, single worker "
+        . "(no fork: no pool, no shared arena, no detach).\n";
 }
 
 # --- io_uring backend: use liburing when available (Linux only) ----------
@@ -27,9 +31,9 @@ if ($^O eq 'MSWin32') {
 my ($uring_inc, $uring_libs) = ('', '');
 if ($^O eq 'linux') {
     my ($cflags, $libs);
-    if (system('pkg-config --exists liburing >/dev/null 2>&1') == 0) {
-        chomp($cflags = `pkg-config --cflags liburing 2>/dev/null`);
-        chomp($libs   = `pkg-config --libs liburing 2>/dev/null`);
+    if (system("pkg-config --exists liburing >$DEVNULL 2>&1") == 0) {
+        chomp($cflags = `pkg-config --cflags liburing 2>$DEVNULL`);
+        chomp($libs   = `pkg-config --libs liburing 2>$DEVNULL`);
         $libs ||= '-luring';
     }
     if (!$libs && probe_liburing()) {
@@ -54,9 +58,9 @@ if ($^O eq 'linux') {
 my ($tls_inc, $tls_libs) = ('', '');
 {
     my ($cflags, $libs);
-    if (system('pkg-config --exists openssl >/dev/null 2>&1') == 0) {
-        chomp($cflags = `pkg-config --cflags openssl 2>/dev/null`);
-        chomp($libs   = `pkg-config --libs openssl 2>/dev/null`);
+    if (system("pkg-config --exists openssl >$DEVNULL 2>&1") == 0) {
+        chomp($cflags = `pkg-config --cflags openssl 2>$DEVNULL`);
+        chomp($libs   = `pkg-config --libs openssl 2>$DEVNULL`);
         $libs ||= '-lssl -lcrypto';
     }
     if (!$libs && probe_openssl('')) {
@@ -98,7 +102,7 @@ int main(void) {
 C
         close $fh;
         my $cc = $Config{cc} || 'cc';
-        $ok = system("$cc $flags $src -o $bin -lssl -lcrypto >/dev/null 2>&1") == 0;
+        $ok = system("$cc $flags $src -o $bin -lssl -lcrypto >$DEVNULL 2>&1") == 0;
     }
     unlink $src, $bin;
     rmdir $dir;
@@ -113,9 +117,9 @@ C
 my ($h2_inc, $h2_libs) = ('', '');
 {
     my ($cflags, $libs);
-    if (system('pkg-config --exists libnghttp2 >/dev/null 2>&1') == 0) {
-        chomp($cflags = `pkg-config --cflags libnghttp2 2>/dev/null`);
-        chomp($libs   = `pkg-config --libs libnghttp2 2>/dev/null`);
+    if (system("pkg-config --exists libnghttp2 >$DEVNULL 2>&1") == 0) {
+        chomp($cflags = `pkg-config --cflags libnghttp2 2>$DEVNULL`);
+        chomp($libs   = `pkg-config --libs libnghttp2 2>$DEVNULL`);
         $libs ||= '-lnghttp2';
     }
     if (!$libs && probe_nghttp2()) {
@@ -184,7 +188,7 @@ sub probe_c {
         print $fh $code;
         close $fh;
         my $cc = $Config{cc} || 'cc';
-        $ok = system("$cc $src -o $bin >/dev/null 2>&1") == 0;
+        $ok = system("$cc $src -o $bin >$DEVNULL 2>&1") == 0;
     }
     unlink $src, $bin;
     rmdir $dir;
@@ -204,7 +208,7 @@ int main(void) { struct timespec ts; return clock_gettime(CLOCK_MONOTONIC, &ts);
 C
         close $fh;
         my $cc = $Config{cc} || 'cc';
-        $ok = system("$cc $src -o $bin $extra >/dev/null 2>&1") == 0;
+        $ok = system("$cc $src -o $bin $extra >$DEVNULL 2>&1") == 0;
     }
     unlink $src, $bin;
     rmdir $dir;
@@ -229,7 +233,7 @@ int main(void) {
 C
         close $fh;
         my $cc = $Config{cc} || 'cc';
-        $ok = system("$cc $extra $src -o $bin -lnghttp2 >/dev/null 2>&1") == 0;
+        $ok = system("$cc $extra $src -o $bin -lnghttp2 >$DEVNULL 2>&1") == 0;
     }
     unlink $src, $bin;
     rmdir $dir;
@@ -254,7 +258,7 @@ int main(void) {
 C
         close $fh;
         my $cc = $Config{cc} || 'cc';
-        $ok = system("$cc $src -o $bin -luring >/dev/null 2>&1") == 0;
+        $ok = system("$cc $src -o $bin -luring >$DEVNULL 2>&1") == 0;
     }
     unlink $src, $bin;
     rmdir $dir;
@@ -293,9 +297,11 @@ my $dep_libs = delete $DEP{LIBS};
 delete $DEP{LDFROM};
 
 # EU::Depends' PM map (installing hm_abi.h + Files.pm) replaces MakeMaker's
-# auto-detected PM, so re-add the module's own .pm files.
+# auto-detected PM, so re-add the module's own files. .pod as well as .pm:
+# MakeMaker would have installed both, and a standalone page (Windows.pod)
+# is silently dropped from the distribution if this only matches .pm.
 File::Find::find(sub {
-    return unless /\.pm\z/;
+    return unless /\.p(?:m|od)\z/;
     (my $rel = $File::Find::name) =~ s{^lib/}{};
     $DEP{PM}{$File::Find::name} = "\$(INST_LIB)/$rel";
 }, 'lib');
@@ -311,7 +317,7 @@ my %WriteMakefileArgs = (
     INC              => join(' ', grep { defined && length }
                             '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc . $sf_inc,
                             $dep_inc),
-    LIBS             => [ join(' ', grep { defined && length } $uring_libs, $h2_libs, $tls_libs, $rt_libs, $dep_libs) ],
+    LIBS             => [ join(' ', grep { defined && length } $uring_libs, $h2_libs, $tls_libs, $rt_libs, $win_libs, $dep_libs) ],
     depend           => {
         'Hyperman.c' => 'xs/hyperman.xs xs/future.xs xs/loop.xs '
                       . 'xs/writer.xs xs/event.xs xs/abi.xs',
@@ -319,9 +325,10 @@ my %WriteMakefileArgs = (
             'include/hyperman/hyperman.h include/hyperman/hm_core.h '
           . 'include/hyperman/hm_future.h include/hyperman/backend_kqueue.c '
           . 'include/hyperman/backend_epoll.c include/hyperman/backend_poll.c '
+          . 'include/hyperman/backend_wsapoll.c '
           . 'include/hyperman/backend_iouring.c include/hyperman/hm_http2.h '
           . 'include/hyperman/hm_tls.h include/hyperman/hm_abi.h '
-          . 'include/hyperman/hm_abi_impl.h',
+          . 'include/hyperman/hm_win.h include/hyperman/hm_abi_impl.h',
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',

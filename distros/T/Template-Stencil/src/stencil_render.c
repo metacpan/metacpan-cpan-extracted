@@ -562,6 +562,11 @@ static int filter_apply(pTHX_ stencil_rstate *r, uint32_t idx)
             case STENCIL_FILT_URI:
                 stencil_filt_uri(aTHX_ in, out);
                 break;
+            case STENCIL_FILT_FMT:
+                stencil_filt_fmt(aTHX_ in, out,
+                    r->pool + f->str_off, f->str_len,
+                    !!(r->prog->flags & STENCIL_PROG_SRC_UTF8));
+                break;
             default:
                 return rerror(r, "corrupt filter table");
             }

@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-Fondation-MigrationDBIx
 
+0.06      2026-08-16 19:50:57+02:00 Europe/Paris
+        - requires Fondation::Model::DBIx::Async 0.06
+
 0.05      2026-08-06 23:39:34+02:00 Europe/Paris
         - change dependencies
 

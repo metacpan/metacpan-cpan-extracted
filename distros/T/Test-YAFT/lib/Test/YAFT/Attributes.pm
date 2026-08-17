@@ -4,7 +4,7 @@ use warnings;
 
 use Syntax::Construct qw (package-block package-version);
 
-package Test::YAFT::Attributes v1.0.3 {
+package Test::YAFT::Attributes v1.0.4 {
 	use Attribute::Handlers;
 
 	require Ref::Util;

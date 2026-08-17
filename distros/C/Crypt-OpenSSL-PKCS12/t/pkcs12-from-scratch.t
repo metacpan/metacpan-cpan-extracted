@@ -116,16 +116,30 @@ ok($pkcs12->mac_ok($pass), 'Asserting mac');
 ok($pkcs12->as_string, 'Asserting PKCS12 as string');
 
 SKIP: {
-    # https://github.com/openssl/openssl/issues/19092
-    if ($major =~ /^3\./) {
-        skip("OpenSSL 3.x cannot change pkcs12 passwords", 3);
+    # PKCS12_newpass() is fundamentally broken for PBES2-encrypted PKCS12
+    # files (the default since OpenSSL 1.1/3.x): confirmed upstream at
+    # https://github.com/openssl/openssl/issues/19092. It also fails
+    # differently on 3.0 (ASN1 parse error) vs 3.5+/4.x (unknown pbe
+    # algorithm). Only OpenSSL 1.x is confirmed to work; see #62.
+    if ($major !~ /^1\./) {
+        skip("changepass unsupported on OpenSSL $major (see #62)", 3);
     } else {
         # try changing the password
-        ok($pkcs12->changepass($pass, 'foo'), 'Changing password');
+        local $@;
+        my $changed = eval { $pkcs12->changepass($pass, 'foo') };
+        ok($changed, 'Changing password') or diag($@ || 'changepass returned false');
 
-        ok($pkcs12->mac_ok('foo'), 'Reasserting mac');
+        SKIP: {
+            skip('changepass failed, skipping dependent checks', 2) unless $changed;
 
-        ok($pkcs12->changepass('foo', $pass), 'Changing password again');
+            local $@;
+            my $verified = eval { $pkcs12->mac_ok('foo') };
+            ok($verified, 'Reasserting mac') or diag($@ || 'mac_ok returned false');
+
+            local $@;
+            my $changed_again = eval { $pkcs12->changepass('foo', $pass) };
+            ok($changed_again, 'Changing password again') or diag($@ || 'changepass returned false');
+        }
     }
 }
 # Try creating a PKCS12 file.

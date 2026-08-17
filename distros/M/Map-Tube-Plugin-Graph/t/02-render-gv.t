@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use 5.014;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use File::Temp;
 use File::Spec;
 use File::Which;
@@ -44,17 +44,15 @@ pop(@localdir);
 
 my $dataname = File::Spec->catfile( @localdir, 'sample.xml' );
 my $tube = Sample->new( xml => $dataname );
-my ($diagram, $fname, $teststr);
+my ($diagram, $fname);
 
 ($diagram, $fname) = $tube->render( format => 'gv' );
-$teststr = substr( $diagram, 0, 255 );
-like( $teststr, qr/^digraph\s/, 'GV format (start)' );
-unlike( $teststr, qr/lwidth=/, 'GV format - should not include formatting instructions' );
+like( $diagram, qr/^digraph\s/, 'GV format (start)' );
+unlike( $diagram, qr/lwidth=/, 'GV format - should not include formatting instructions' );
 
 ($diagram, $fname) = $tube->render( format => 'dot' );
-$teststr = substr( $diagram, 0, 255 );
-like( $teststr, qr/^digraph\s/, 'DOT format (start)' );
-like( $teststr, qr/lwidth=/, 'DOT format - should include formatting instructions' );
+like( $diagram, qr/^digraph\s/, 'DOT format (start)' );
+like( $diagram, qr/lwidth=/, 'DOT format - should include formatting instructions' );
 
 unlink('xxxtest.dot');
 ($diagram, $fname) = $tube->render( format => 'dot', output_file => 'xxxtest.dot' );
@@ -68,14 +66,12 @@ unlink($fname);
 
 unlink('test_Line_1.dot');
 ($diagram, $fname) = $tube->render( 'Line 1', format => 'dot', output_file => undef );
-$teststr = substr( $diagram, 0, 255 );
-like( $teststr, qr/^digraph\s/, 'Line with DOT (1)' );
+like( $diagram, qr/^digraph\s/, 'Line with DOT (1)' );
 is( $fname, 'test_Line_1.dot', 'Line with DOT output file (1)' );
 unlink($fname);
 
 ($diagram, $fname) = $tube->render( format => 'dot', output_file => undef, line_name => 'Line 1' );
-$teststr = substr( $diagram, 0, 255 );
-like( $teststr, qr/^digraph\s/, 'Line with DOT (2)' );
+like( $diagram, qr/^digraph\s/, 'Line with DOT (2)' );
 is( $fname, 'test_Line_1.dot', 'Line with DOT output file (2)' );
 unlink($fname);
 

@@ -1,0 +1,104 @@
+Revision history for HTTP-API-Core
+
+1.00  2026-08-17
+    - Declare the documented HTTP::API::Core interfaces stable for the 1.x series.
+    - Stabilize constructor/request, response, error, retry, pagination, hooks,
+      rate-limit, authentication, and transport adapter contracts with regression tests.
+    - Add a written 1.x compatibility policy and release-readiness documentation.
+    - Add GitHub Actions coverage across supported Perl versions.
+    - Add CPAN distribution metadata and a repeatable maintainer release checklist.
+
+0.01  2026-08-16
+    - Initial HTTP::API::Core release under the new CPAN namespace.
+    - Renamed from the pre-release HTTP::API::Client project after a CPAN
+      namespace conflict.
+    - Carries forward the implementation and regression coverage developed
+      through HTTP::API::Client 0.12.
+    - Add a written public API compatibility policy for the path to 1.0.
+    - Add a public API regression guard covering documented entry points.
+    - Add constructor and request contract regression coverage.
+    - Document the retry policy contract and add compatibility-focused retry tests.
+    - Document the pagination contract and add compatibility-focused pagination tests.
+    - Document the lifecycle hook contract and add compatibility-focused hook tests.
+    - Document the rate-limit contract and add compatibility-focused rate-limit tests.
+    - Document the authentication helper contract and add compatibility-focused auth tests.
+    - Finalize the transport adapter compatibility contract and regression coverage.
+
+Pre-rename development history
+------------------------------
+
+0.12  2026-08-16
+    - Formalize the transport adapter contract.
+    - Support transport objects with a request() method in addition to code references.
+    - Document request arguments, response shape, and transport failure behavior.
+    - Preserve the existing code-reference transport API for backward compatibility.
+    - Add adapter-contract regression tests and an example transport object.
+
+0.11  2026-08-16
+    - Add transport-independent idempotency-key support.
+    - Accept per-request idempotency key and header name configuration.
+    - Preserve explicitly supplied request headers instead of overwriting them.
+    - Keep service-specific idempotency header naming outside the core.
+    - Add validation, documentation, and regression tests.
+
+0.10  2026-08-16
+    - Stabilize the structured error model and document public error categories.
+    - Define encode, decode, transport, http, and hook as machine-readable categories.
+    - Add body, text, json, headers, and header accessors on error objects.
+    - Document response availability and stringification behavior.
+    - Add compatibility-focused regression tests for error semantics.
+
+0.09  2026-08-16
+    - Refine response API ergonomics and documentation.
+    - Add text, has_content, content_type, and is_json helpers.
+    - Return undef from json() for empty or whitespace-only bodies.
+    - Keep explicit JSON decoding independent of Content-Type.
+    - Preserve structured decode errors for invalid non-empty JSON.
+    - Document defensive header copies and response body behavior.
+
+0.08  2026-08-16
+    - Add lightweight request observability metadata.
+    - Add elapsed transport time to responses and errors.
+    - Normalize common request ID headers on responses.
+    - Expose started_at, elapsed, and request_id in lifecycle hook context.
+    - Keep logging, metrics, tracing, and telemetry backends outside the core.
+
+0.07  2026-08-16
+    - Add HTTP::API::Core::Auth authentication hook helpers.
+    - Add Bearer token and HTTP Basic authentication helpers.
+    - Add API-key authentication via headers or query parameters.
+    - Keep authentication composable through before_request lifecycle hooks.
+    - Declare MIME::Base64 for Basic authentication encoding.
+
+0.06  2026-08-16
+    - Add first-class query parameter encoding to all requests.
+    - Support repeated keys with array references and omit undefined values.
+    - Preserve existing query strings and URL fragments when appending parameters.
+    - Expose the fully encoded URL to request lifecycle hooks.
+
+0.05  2026-08-16
+    - Add client-level and per-request lifecycle hooks.
+    - Add before_request, after_response, and on_error hooks.
+    - Allow before_request hooks to modify the outgoing request context.
+    - Wrap hook failures as structured non-retryable hook errors.
+
+0.04  2026-08-16
+    - Add normalized rate-limit metadata on responses and errors.
+    - Parse RateLimit-* and X-RateLimit-* quota headers.
+    - Expose limit, remaining, used, resource, reset, and wait_seconds helpers.
+    - Treat exhausted 403/429 responses as retryable and use reset metadata as a fallback delay.
+
+0.03  2026-08-16
+    - Add unified next-URL, page-number, and cursor pagination.
+
+0.02  2026-08-16
+    - Add conservative automatic retry support.
+    - Retry GET/HEAD/PUT/DELETE/OPTIONS by default, but not POST/PATCH.
+    - Add exponential backoff with jitter and numeric Retry-After support.
+    - Allow retry policy overrides per client and per request.
+
+0.01  2026-08-16
+    - Initial pre-rename development release.
+    - Add base URL and headers.
+    - Add JSON request/response helpers.
+    - Add structured errors and injectable transport.

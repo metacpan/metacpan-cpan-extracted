@@ -50,7 +50,7 @@ L<Test::YAFT> provides the Arrange-Act-Assert pattern:
 
 =item B<Arrange> - Set up test context using C<arrange { }>
 
-=item B<Act> - Execute code under test using C<got { }> or C<act { }>
+=item B<Act> - Execute code under test using C<got { }> or C<act {}>
 
 =item B<Assert> - Verify results using C<expect> or C<throws>
 
@@ -125,7 +125,7 @@ When C<throws> is specified, the test expects the code to die:
 		=> throws => expect_obj_isa (My::X::Positive_Quantity::)
 		;
 
-To specify such block across multiple assumptions, use the L<act { }|/act { }> block.
+To specify such block across multiple assumptions, use the L<act {}|/act {}> block.
 
 =head2 Context
 
@@ -638,23 +638,92 @@ Re-exported from L<Test::Deep/ignore>.
 
 Utility functions help organise tests. They are exported by default.
 
-=head2 act { }
+=head2 act {}
 
-	act { GET qq (/countries/$_[0]) }
-		q (continent)
+	act {
+		my ($login, $password) = @_;
+		...;
+		return $value_under_test;
+	}
+		q (login),
+		q (password),
+		;
+
+	assume q (user is authenticated)
+		=> with_login	 => ...
+		=> with_password => ...
+		=> expect		 => ...
+		;
+
+Inspired by the Arrange-Act-Assert testing approach, this utility defines
+a shared computation for C<got> across multiple assumptions. The block
+receives dependency values as arguments in their order of definition.
+
+Dependencies are listed after the block.
+
+Provide them using L</arrange {}> or C<with_NAME> parameters within assumptions.
+Each dependency can be provided only once.
+
+	assume q (...)
+		=> with_dependency => ...
+		=> arrange { dependency => ... }
+
+Dependencies can be provided for each test in context can be provided by
+L</arrange { }>
+
+There can be only one C<act {}> definition per context.
+
+Assumption without an explicit C<got> invokes C<act {}> automatically.
+All dependencies must be provided before invocation.
+
+See also:
+L</arrange { }>,
+L</got { }>
+
+=head3 Named parameter dispatch
+
+By default, dependencies are passed as positional arguments. To receive
+them as named parameters (key-value pairs), specify a hash reference as
+the first parameter after the block:
+
+	act { GET qq (/countries), @_ }
+		+{},
+		q (continent),
+		q (format),
 		;
 
 	it q (should list countries)
 		=> with_continent => q (europe)
+		=> with_format    => q (json)
 		=> expect         => ...
 		;
 
-Defines a shared computation for C<got> across multiple assumptions.
-The block receives dependency values as arguments.
+The act code receives: C<$code-E<gt>(continent =E<gt> q (europe), format =E<gt> q (json))>
 
-Dependencies are specified after the block and are provided via
-L<arrange { }|/arrange { }> block or via C<with_NAME> parameters
-in assumptions.
+=head3 Default values
+
+Parameters can specify default values when the dependency is not provided:
+
+	act { GET qq (/countries/$_[0]), format => $_[1] }
+		q (continent),
+		q (format), { default => q (json) },
+		;
+
+	it q (should use default format)
+		=> with_continent => q (europe)
+		=> expect         => ...
+		;
+
+	it q (should use custom format)
+		=> with_continent => q (asia)
+		=> with_format    => q (xml)
+		=> expect         => ...
+		;
+
+In the first assumption, C<format> receives the default value C<q (json)>.
+In the second assumption, the provided value C<q (xml)> overrides the default.
+
+Default values work with both positional and named parameter dispatch.
 
 =head2 arrange { }
 
@@ -821,7 +890,7 @@ Contributions are welcome!
 
 =head1 AUTHOR
 
-Branislav Zahradník <barney@cpan.org>
+Branislav Zahradník <barney.cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -17,7 +17,7 @@ my ($DEP_INC, %DEP);
                    'JSON::Schema::Fast', 'Fetch', 'File::Raw::JSON'); 1 } && $dep) {
         # consumer include paths come from the installed providers below
     } else {
-        die "JSON::Schema::Fast needs Fetch 0.08+ and File::Raw::JSON 0.05+ "
+        die "JSON::Schema::Fast needs Fetch 0.08+ and File::Raw::JSON 0.07+ "
           . "installed,\nor present as sibling directories (../Fetch, "
           . "../File-Raw-JSON).\n"
             unless -d '../Fetch/include/fetch' && -d '../File-Raw-JSON/include';
@@ -105,7 +105,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
         'Fetch'               => '0.08',
-        'File::Raw::JSON'     => '0.05',
+        'File::Raw::JSON'     => '0.07',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -113,10 +113,11 @@ my %WriteMakefileArgs = (
         # tests skip cleanly when it is absent, so it is not required here.
     },
     PREREQ_PM => {
-        'File::Raw::JSON' => '0.05',  # JSON decode via its C ABI (frj_abi.h)
+        'File::Raw::JSON' => '0.07',  # JSON decode via its C ABI (frj_abi.h)
         'Object::Proto'   => '0',
         'Fetch'           => '0.08',  # remote $ref fetch + its C ABI (fetch_abi.h)
     },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'JSON-Schema-Fast-* Fast.c Fast$(OBJ_EXT) Fast.bs '
                       . 'Install/Files.pm' },

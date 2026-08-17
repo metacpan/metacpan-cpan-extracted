@@ -17,13 +17,17 @@ my $dir = File::Temp->newdir;
     open $fh, '>', "$dir/rows.tmpl" or die $!;
     print $fh "<h1>{% title %}</h1>\n<table>\n"
         . "{% for row in rows %}<tr><td>{% row.id %}</td>"
-        . "<td>{% row.name %}</td><td>{% row.price | money %}</td></tr>\n"
+        . "<td>{% row.name %}</td><td>{% row.price %}</td></tr>\n"
         . "{% end %}</table>\n";
     close $fh;
 }
 
-my $rows = [ map { { id => $_, name => "item $_", price => $_ * 1.5 } }
-             1 .. 20 ];
+# prices pre-formatted at data-build time: a Perl-coderef filter in the
+# template costs a C-to-Perl crossing per cell (20/request here) and
+# triples the render cost - that would benchmark the callback boundary,
+# not the page path
+my $rows = [ map { { id => $_, name => "item $_",
+                     price => sprintf '%.2f', $_ * 1.5 } } 1 .. 20 ];
 
 package BenchPage;
 use Punk;
@@ -31,7 +35,6 @@ use Punk;
 views Stencil => {
     template_dir => "$dir",
     wrapper      => 'layout.tmpl',
-    filters      => { money => sub { sprintf '%.2f', $_[0] } },
 };
 
 get '/' => sub {

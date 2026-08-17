@@ -1,5 +1,10 @@
 Revision history for Perl extension GraphViz2::Marpa::PathUtils.
 
+2.01  2026-08-16
+	- Clean up distro
+	- Remove Build.PL, MANIFEST, MYMETA*
+	- Put /GraphViz2-Marpa-PathUtils- into .gitignore
+
 2.00  Fri Nov 28 11:14:00 2014
 	- Switch from Hash::FieldHash to Moo.
 	- Re-write to use GraphViz2::Marpa V 2.03. This involves many changes.

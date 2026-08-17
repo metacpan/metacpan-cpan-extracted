@@ -11,8 +11,13 @@ use Template::Stencil;
 # that alters produced bytes shows up here first. The golden is
 # pretty-formatted (pretty => 1, so Eshu is required to run this file).
 
-plan skip_all => 'Eshu required for the pretty golden'
-    unless eval { require Eshu; 1 };
+# A hard floor: the golden contains a same-line <script> pair, which
+# Eshu 0.10 truncated the document at - an older Eshu fails this file
+# with a byte-perfect render cut off at that line (three identical
+# smoker FAILs on 0.07). 0.13 rather than 0.11 because 0.11 and 0.12
+# do not build or walk correctly on Windows.
+plan skip_all => 'Eshu 0.13+ required for the pretty golden'
+    unless eval { require Eshu; Eshu->VERSION('0.13'); 1 };
 
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 
@@ -69,9 +74,10 @@ my %data = (
         { tags => [qw(z)] },
     ],
     map   => { beta => 'b&b', alpha => 'a' },
-    # all five escapables; not a <script> because Eshu's current
-    # same-line script handling truncates (see phase-09 notes)
-    evil  => q{<em a="1&2">'q'</em>},
+    # all five escapables, in the nastiest element for the pretty pass: a
+    # same-line <script> pair (Eshu 0.11+ handles it inline; 0.10
+    # truncated the document there, which is why this was an <em> once)
+    evil  => q{<script a="1&2">'q'</script>},
     link  => "a b/c?d=e&f=caf\x{e9}",
     price => 3.5,
     shout => '  MiXeD  ',

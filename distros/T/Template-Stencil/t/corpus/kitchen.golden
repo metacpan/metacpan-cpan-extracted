@@ -8,7 +8,7 @@
 	<t o="1" i="0" f="y" l="y" e="o">z</t>
 	<side for="Ada &lt;A&gt;" at="1/2"></side>
 	[alpha=A][beta=B&amp;B]
-	esc: &lt;em a=&quot;1&amp;2&quot;&gt;&#39;q&#39;&lt;/em&gt; raw: <em a="1&2">'q'</em> html: &lt;em a=&quot;1&amp;2&quot;&gt;&#39;q&#39;&lt;/em&gt; double: &amp;lt;em a=&amp;quot;1&amp;amp;2&amp;quot;&amp;gt;&amp;#39;q&amp;#39;&amp;lt;/em&amp;gt;
+	esc: &lt;script a=&quot;1&amp;2&quot;&gt;&#39;q&#39;&lt;/script&gt; raw: <script a="1&2">'q'</script> html: &lt;script a=&quot;1&amp;2&quot;&gt;&#39;q&#39;&lt;/script&gt; double: &amp;lt;script a=&amp;quot;1&amp;amp;2&amp;quot;&amp;gt;&amp;#39;q&amp;#39;&amp;lt;/script&amp;gt;
 	uri: a%20b%2Fc%3Fd%3De%26f%3Dcaf%C3%A9 default: &lt;d&gt;
 	money: 3.50 chain: MIXED
 	greeting: hi &quot; num: two-and-a-half

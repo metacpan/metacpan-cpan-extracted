@@ -25,23 +25,23 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::Fondation::User::UI::Bootstrap",
   "PREREQ_PM" => {
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => 0,
-    "Mojolicious::Plugin::Fondation::User" => 0
+    "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.04",
+    "Mojolicious::Plugin::Fondation::User" => "0.03"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.302190"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => 0,
-  "Mojolicious::Plugin::Fondation::User" => 0,
+  "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.04",
+  "Mojolicious::Plugin::Fondation::User" => "0.03",
   "Test::More" => "1.302190"
 );
 

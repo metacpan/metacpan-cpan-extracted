@@ -159,6 +159,18 @@ sub read_response {
 my $s = connect_srv();
 ok $s, 'server came up' or do { kill 'TERM', $sup; server_reap($sup); done_testing; exit };
 
+# ---- baseline RSS before any large response ---------------------------------
+# The worker's absolute size is a property of the perl build (a static
+# libperl on the FreeBSD smokers idles above 60MB); only the GROWTH
+# across the download says anything about streaming.
+my $rss_before;
+$s->print("GET /rss HTTP/1.1\r\nHost: t\r\n\r\n");
+{
+    my ($st, $h, $body) = read_response($s);
+    is $st, 200, 'rss baseline read';
+    $rss_before = 0 + $body;
+}
+
 # ---- the full file, byte for byte -------------------------------------------
 $s->print("GET /glob HTTP/1.1\r\nHost: t\r\n\r\n");
 {
@@ -173,9 +185,10 @@ $s->print("GET /rss HTTP/1.1\r\nHost: t\r\n\r\n");
 {
     my ($st, $h, $body) = read_response($s);
     is $st, 200, 'rss probe on the same worker';
-    my $mb = $body / 1024;
-    cmp_ok $mb, '<', 60,
-        "worker RSS ${mb}MB stays bounded (a slurp would hold the 16MB)";
+    my $grew = ($body - $rss_before) / 1024;
+    cmp_ok $grew, '<', 8,
+        sprintf('worker grew %.1fMB across a 16MB download '
+              . '(a slurp holds the whole file)', $grew);
 }
 
 # ---- a seeked window with explicit Content-Length, then reuse ---------------

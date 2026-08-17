@@ -39,14 +39,17 @@
 #ifndef _WIN32
 #  include <dirent.h>
 #  include <unistd.h>
+/* the walker uses the eshu_ spellings everywhere so the Windows shim
+ * never has to reuse (or fight) the ambient names - see dirent_win.h
+ * for the two releases of scar tissue behind that decision */
+#  define EshuDIR       DIR
+#  define eshu_dirent   dirent
+#  define eshu_opendir  opendir
+#  define eshu_readdir  readdir
+#  define eshu_closedir closedir
 #else
 #  include <io.h>
 #  include <direct.h>
-/* Every Windows toolchain takes the FindFirstFile compat header, MinGW
- * included: MinGW's own <dirent.h> hides struct dirent and
- * opendir/readdir/closedir behind __STRICT_ANSI__ under -std=c99, and a
- * feature macro defined this late (perl.h already pulled the libc
- * headers) cannot bring them back - Strawberry's smokers proved it. */
 #  include "dirent_win.h"
 #  ifndef S_ISREG
 #    define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
@@ -607,15 +610,15 @@ static void eshu_strlist_free(eshu_strlist_t *l) {
 static void eshu_walk_dir(const char *dir_path, eshu_strlist_t *files,
                           int recursive)
 {
-	DIR *d;
-	struct dirent *ent;
+	EshuDIR *d;
+	struct eshu_dirent *ent;
 	struct stat st;
 	char pathbuf[4096];
 
-	d = opendir(dir_path);
+	d = eshu_opendir(dir_path);
 	if (!d) return;
 
-	while ((ent = readdir(d)) != NULL) {
+	while ((ent = eshu_readdir(d)) != NULL) {
 		if (ent->d_name[0] == '.') continue;
 
 		snprintf(pathbuf, sizeof(pathbuf), "%s/%s", dir_path, ent->d_name);
@@ -634,7 +637,7 @@ static void eshu_walk_dir(const char *dir_path, eshu_strlist_t *files,
 			eshu_walk_dir(pathbuf, files, recursive);
 		}
 	}
-	closedir(d);
+	eshu_closedir(d);
 }
 
 /* Check if symlinked dir — lstat shows symlink, stat shows dir */

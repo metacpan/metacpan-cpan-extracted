@@ -284,7 +284,7 @@ compile(self)
             AV *recs = (all_recs && SvROK(all_recs)) ? (AV *)SvRV(all_recs) : NULL;
             SSize_t wi, wn = av_len(wsr) + 1;
             int any_blocking = 0, ok;
-            eval_pv(PK_REQUIRE(PK_WEBSOCKET), TRUE);
+            (void)pk_require_once(aTHX_ PK_WEBSOCKET, TRUE);
             for (wi = 0; wi < wn; wi++) {
                 HV *w = (HV *)SvRV(*av_fetch(wsr, wi, 0));
                 SV **pp = hv_fetchs(w, K_PATH, 0);
@@ -353,7 +353,7 @@ compile(self)
             AV *views = app_av(aTHX_ h, K_VIEWS);
             if (av_len(views) >= 0) {
                 SV *argv[1], *vobj;
-                eval_pv(PK_REQUIRE(PK_VIEWS), TRUE);
+                (void)pk_require_once(aTHX_ PK_VIEWS, TRUE);
                 argv[0] = sv_2mortal(newRV_inc((SV *)views));
                 vobj = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs(PK_VIEWS)),
                                      "new", argv, 1, 1);
@@ -499,8 +499,7 @@ compile(self)
                  * chains the decoration onto a Future - and nothing else
                  * loads the file, so it is required here rather than
                  * discovered missing on the first nonblocking response. */
-                eval_pv(PK_REQUIRE("Punk::CORS"), FALSE);
-                if (SvTRUE(ERRSV))
+                if (!pk_require_once(aTHX_ "Punk::CORS", FALSE))
                     croak("Punk: cors needs Punk::CORS, which failed to "
                           "load: %s", SvPV_nolen(ERRSV));
             }
@@ -515,8 +514,7 @@ compile(self)
                 (void)hv_stores(state, K_HEADERS, newRV_noinc((SV *)pairs));
                 /* Punk::Headers::_chain is the one Perl piece of the path,
                  * for the Future shape - required here, like Punk::CORS */
-                eval_pv(PK_REQUIRE("Punk::Headers"), FALSE);
-                if (SvTRUE(ERRSV))
+                if (!pk_require_once(aTHX_ "Punk::Headers", FALSE))
                     croak("Punk: headers needs Punk::Headers, which failed "
                           "to load: %s", SvPV_nolen(ERRSV));
             }
@@ -539,8 +537,7 @@ compile(self)
                     (void)hv_stores(acfg, "roles", code);
                 }
                 /* the Perl half: current_user and the role/verified checks */
-                eval_pv(PK_REQUIRE("Punk::Auth"), FALSE);
-                if (SvTRUE(ERRSV))
+                if (!pk_require_once(aTHX_ "Punk::Auth", FALSE))
                     croak("Punk: auth needs Punk::Auth, which failed to "
                           "load: %s", SvPV_nolen(ERRSV));
             }
@@ -579,8 +576,7 @@ compile(self)
                 if (av_len(outav) >= 0) {
                     (void)hv_stores(state, K_HEADERS_SCOPED,
                                     newRV_noinc((SV *)outav));
-                    eval_pv(PK_REQUIRE("Punk::Headers"), FALSE);
-                    if (SvTRUE(ERRSV))
+                    if (!pk_require_once(aTHX_ "Punk::Headers", FALSE))
                         croak("Punk: headers needs Punk::Headers, which "
                               "failed to load: %s", SvPV_nolen(ERRSV));
                 }

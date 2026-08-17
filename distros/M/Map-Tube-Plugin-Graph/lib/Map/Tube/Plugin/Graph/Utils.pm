@@ -2,7 +2,7 @@ package Map::Tube::Plugin::Graph::Utils;
 
 use version;
 
-our $VERSION   = qv('v1.1.1');
+our $VERSION   = qv('v1.1.2');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -11,7 +11,7 @@ Map::Tube::Plugin::Graph::Utils - Helper package for Map::Tube::Plugin::Graph.
 
 =head1 VERSION
 
-Version v1.1.1
+Version v1.1.2
 
 =cut
 

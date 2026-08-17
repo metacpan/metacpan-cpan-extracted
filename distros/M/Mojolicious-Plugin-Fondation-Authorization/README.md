@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::Authorization - Authorization plugin — grants 
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 
@@ -40,10 +40,6 @@ The grant chain is:
 
 There is no direct user-to-permission table. All permissions are inherited
 through group membership.
-
-# NAME
-
-Mojolicious::Plugin::Fondation::Authorization - Permission and group authorization for Fondation
 
 # DEPENDENCIES
 

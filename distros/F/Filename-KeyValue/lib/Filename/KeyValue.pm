@@ -10,7 +10,7 @@ use URI::Escape qw();
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2026-04-27'; # DATE
 our $DIST = 'Filename-KeyValue'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(
                        parse_keyvalue_filename
@@ -157,6 +157,8 @@ sub parse_keyvalue_filename {
     $opts->{array_value}  = delete($args{array_value}) // 0;
     $opts->{decode_value} = delete($args{decode_value}) // 1;
 
+    $filename =~ s!/+\z!!;
+
     length($filename) or return [400, "Filename cannot be empty"];
     $filename =~ s/\.(\w+)\z// and $res->{ext} = $1;
 
@@ -211,7 +213,7 @@ Filename::KeyValue - Parse filename using the KeyValue naming scheme
 
 =head1 VERSION
 
-This document describes version 0.001 of Filename::KeyValue (from Perl distribution Filename-KeyValue), released on 2026-04-27.
+This document describes version 0.002 of Filename::KeyValue (from Perl distribution Filename-KeyValue), released on 2026-04-27.
 
 =head1 SYNOPSIS
 
@@ -467,6 +469,12 @@ Source repository is at L<https://github.com/perlancar/perl-Filename-KeyValue>.
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar
+
+perlancar <perlancar@gmail.com>
 
 =head1 CONTRIBUTING
 

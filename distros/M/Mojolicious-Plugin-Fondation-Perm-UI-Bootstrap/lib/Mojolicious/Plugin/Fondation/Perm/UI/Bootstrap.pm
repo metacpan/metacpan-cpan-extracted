@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Perm::UI::Bootstrap;
-$Mojolicious::Plugin::Fondation::Perm::UI::Bootstrap::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Perm::UI::Bootstrap::VERSION = '0.02';
 # ABSTRACT: Web UI extension for Fondation::Perm — injects perm checkboxes into group forms
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -40,7 +40,7 @@ Mojolicious::Plugin::Fondation::Perm::UI::Bootstrap - Web UI extension for Fonda
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

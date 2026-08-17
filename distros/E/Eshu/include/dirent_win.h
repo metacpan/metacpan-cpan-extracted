@@ -1,10 +1,19 @@
 /*
- * dirent_win.h — minimal opendir/readdir/closedir for Windows (MSVC and
- * MinGW alike: MinGW's <dirent.h> is unusable under -std=c99, see
- * eshu_file.h).
+ * dirent_win.h - minimal directory iteration for Windows, under names
+ * that collide with nothing. Two releases proved the ambient spellings
+ * are a minefield: defining DIR/opendir clashed with the dirent.h that
+ * perl.h pulls in (0.11, every Windows toolchain), and leaning on the
+ * ambient opendir instead either fails to link (MSVC: Eshu.xs #undefs
+ * the PerlDir_* remaps, and msvcrt has no opendir) or links against
+ * MinGW's own dirent whose struct layout is not the one perl's header
+ * compiled us against, so readdir returns garbage names (0.12). So:
+ * eshu_opendir/eshu_readdir/eshu_closedir over EshuDIR, self-contained
+ * on FindFirstFile/FindNextFile/FindClose (kernel32, always linked),
+ * static, no exported or imported CRT dir symbols at all.
  *
- * Wraps FindFirstFile/FindNextFile/FindClose.
- * Only the d_name field of struct dirent is populated (all we use).
+ * Only the d_name field of struct eshu_dirent is populated (all we
+ * use). The -A variants are named explicitly so a UNICODE define in
+ * the environment cannot change the struct behind us.
  */
 
 #ifndef DIRENT_WIN_H
@@ -22,32 +31,32 @@
 #include <string.h>
 #include <errno.h>
 
-#ifndef NAME_MAX
-#  define NAME_MAX 260
+#ifndef ESHU_NAME_MAX
+#  define ESHU_NAME_MAX 260
 #endif
 
-struct dirent {
-    char d_name[NAME_MAX + 1];
+struct eshu_dirent {
+    char d_name[ESHU_NAME_MAX + 1];
 };
 
 typedef struct {
-    HANDLE          hFind;
-    WIN32_FIND_DATA wfd;
-    struct dirent   ent;
-    int             first;   /* 1 = FindFirstFile result not yet returned */
-    int             done;
-} DIR;
+    HANDLE            hFind;
+    WIN32_FIND_DATAA  wfd;
+    struct eshu_dirent ent;
+    int               first;  /* 1 = FindFirstFile result not yet returned */
+    int               done;
+} EshuDIR;
 
-static DIR *opendir(const char *path) {
+static EshuDIR *eshu_opendir(const char *path) {
     char pattern[MAX_PATH];
-    DIR *d;
+    EshuDIR *d;
 
     if (!path || !*path) { errno = ENOENT; return NULL; }
     if (snprintf(pattern, sizeof(pattern), "%s\\*", path) >= (int)sizeof(pattern)) {
         errno = ENAMETOOLONG; return NULL;
     }
 
-    d = (DIR *)calloc(1, sizeof(DIR));
+    d = (EshuDIR *)calloc(1, sizeof(EshuDIR));
     if (!d) { errno = ENOMEM; return NULL; }
 
     d->hFind = FindFirstFileA(pattern, &d->wfd);
@@ -61,7 +70,7 @@ static DIR *opendir(const char *path) {
     return d;
 }
 
-static struct dirent *readdir(DIR *d) {
+static struct eshu_dirent *eshu_readdir(EshuDIR *d) {
     if (!d || d->done) return NULL;
 
     if (d->first) {
@@ -73,12 +82,12 @@ static struct dirent *readdir(DIR *d) {
         }
     }
 
-    strncpy(d->ent.d_name, d->wfd.cFileName, NAME_MAX);
-    d->ent.d_name[NAME_MAX] = '\0';
+    strncpy(d->ent.d_name, d->wfd.cFileName, ESHU_NAME_MAX);
+    d->ent.d_name[ESHU_NAME_MAX] = '\0';
     return &d->ent;
 }
 
-static int closedir(DIR *d) {
+static int eshu_closedir(EshuDIR *d) {
     if (!d) return -1;
     if (d->hFind != INVALID_HANDLE_VALUE)
         FindClose(d->hFind);

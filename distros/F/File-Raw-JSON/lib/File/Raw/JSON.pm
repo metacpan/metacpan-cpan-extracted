@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use File::Raw;
 use Tie::OrderedHash;
@@ -22,7 +22,7 @@ File::Raw::JSON - Fast JSON / JSONL plugin for File::Raw
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 

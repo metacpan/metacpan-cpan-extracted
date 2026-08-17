@@ -41,6 +41,7 @@
 #include "backend_kqueue.c"
 #include "backend_epoll.c"
 #include "backend_iouring.c"
+#include "backend_wsapoll.c"
 #include "backend_poll.c"
 
 #include "hm_future.h"

@@ -187,13 +187,23 @@ sv_from_yyjson_d(pTHX_ yyjson_val *val, HV *boolean_stash,
 
         case YYJSON_TYPE_NUM:
             switch (st) {
+                /* yyjson parses integers as 64-bit whatever the perl is, so a
+                 * value wider than this perl's IV/UV must fall back to an NV
+                 * rather than be cast down: on a 32-bit-IV perl the cast
+                 * silently truncates (9007199254740992 lands as 0). NV keeps
+                 * the magnitude, and loses precision only past 2**53. */
                 case YYJSON_SUBTYPE_UINT: {
                     uint64_t u = yyjson_get_uint(val);
                     if (u <= (uint64_t)IV_MAX) return newSViv((IV)u);
-                    return newSVuv((UV)u);
+                    if (u <= (uint64_t)UV_MAX) return newSVuv((UV)u);
+                    return newSVnv((NV)u);
                 }
-                case YYJSON_SUBTYPE_SINT:
-                    return newSViv((IV)yyjson_get_sint(val));
+                case YYJSON_SUBTYPE_SINT: {
+                    int64_t i = yyjson_get_sint(val);
+                    if (i >= (int64_t)IV_MIN && i <= (int64_t)IV_MAX)
+                        return newSViv((IV)i);
+                    return newSVnv((NV)i);
+                }
                 case YYJSON_SUBTYPE_REAL:
                     return newSVnv(yyjson_get_real(val));
                 default:

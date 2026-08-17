@@ -26,6 +26,20 @@ my $loop = Hyperman::Loop->new;
 isa_ok($loop, 'Hyperman::Loop');
 ok(length $loop->backend, 'backend selected: ' . $loop->backend);
 
+# Backend selection by name. Exactly one readiness floor exists per
+# platform - poll(2) on Unix, WSAPoll on Windows - and asking for the
+# other one declines rather than quietly handing back something else.
+{
+    my $floor = $^O eq 'MSWin32' ? 'wsapoll' : 'poll';
+    my $other = $^O eq 'MSWin32' ? 'poll'    : 'wsapoll';
+    my $named = Hyperman::Loop->new($floor);
+    is($named->backend, $floor, "backend '$floor' selectable by name");
+    ok(!eval { Hyperman::Loop->new($other); 1 },
+       "backend '$other' declines on this platform");
+    ok(!eval { Hyperman::Loop->new('nosuchbackend'); 1 },
+       'an unknown backend name croaks');
+}
+
 # ---- one-shot callback timer ---------------------------------------------
 {
     my $fired = 0;

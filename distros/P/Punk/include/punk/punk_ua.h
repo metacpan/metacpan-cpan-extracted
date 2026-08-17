@@ -120,8 +120,7 @@ static SV *pua_build(pTHX_ SV *app, const char *name, STRLEN nlen) {
     /* Loaded on first use rather than at boot: an application that never
      * reaches for $c->ua should not pay for the agent's dependencies. */
     if (!gv_stashpvs("Fetch", 0)) {
-        eval_pv("require Fetch;", FALSE);
-        if (SvTRUE(ERRSV))
+        if (!pk_require_once(aTHX_ "Fetch", FALSE))
             croak("Punk: $c->ua needs Fetch: %s", SvPV_nolen(ERRSV));
     }
 

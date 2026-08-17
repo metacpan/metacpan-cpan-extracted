@@ -1,3 +1,12 @@
+0.319     2026-08-17 02:38:51Z
+
+  - The commit that records the $VERSION bump after a release now picks up
+    executables in "bin/" as well. @Git::VersionManager only allows
+    "^lib/.*\.pm$" to be dirty in that commit, while the bump itself rewrites
+    ":InstallModules" and ":ExecFiles" — so every distribution with a script
+    in "bin/" left the bumped file uncommitted, and git ended up with a "bin/"
+    one release behind its "lib/".
+
 0.318     2026-08-08 23:59:18Z
 
   - "no_cpan" now defaults "version_finder" to ":MainModule", so a

@@ -187,14 +187,17 @@ static int hm_abi_selftest(pTHX) {
         hm_loop *loop = hm_loop_new(aTHX_ NULL);
         int fds[2];
         if (!loop) return 0;
-        if (pipe(fds) == 0) {
+        /* hm_os_selfpipe, not pipe(2): on Windows the readiness backend
+         * polls sockets only, so the pair has to be a loopback connection
+         * there. hm_os_send/hm_os_close write and close either kind. */
+        if (hm_os_selfpipe(&fds[0], &fds[1]) == 0) {
             SV *fio = A->future_new(aTHX);
             SV *ftw = A->future_new(aTHX);
             hm_abi_st_io st;
             hm_abi_timer *dead;
             st.f    = fio;
             st.loop = (void *)loop;
-            if (write(fds[1], "x", 1) < 0) ok = 0;
+            if (hm_os_send(fds[1], "x", 1) < 0) ok = 0;
             A->io_watch(aTHX_ (void *)loop, fds[0], HM_ABI_READ,
                         hm_abi_st_io_cb, &st);
             dead = A->timer(aTHX_ (void *)loop, 3600.0, hm_abi_st_timer, ftw);
@@ -206,8 +209,8 @@ static int hm_abi_selftest(pTHX) {
             if (A->future_state(aTHX_ ftw) != HM_ABI_DONE) ok = 0;
             SvREFCNT_dec(fio);
             SvREFCNT_dec(ftw);
-            close(fds[0]);
-            close(fds[1]);
+            hm_os_close(fds[0]);
+            hm_os_close(fds[1]);
         } else ok = 0;
 
         /* v2 conn_detach: the entry is present and rejects tickets that
@@ -226,6 +229,17 @@ static int hm_abi_selftest(pTHX) {
         hm_rl_arena_init(0, 0);
         if (!A->deny_check || !A->deny_add || !A->deny_remove
             || !A->ratelimit_hit)                                 ok = 0;
+        else if (!hm_rl_arena_live()) {
+            /* No arena on this platform: the contract is that every entry
+             * point FAILS OPEN, and that is what gets asserted. Anything
+             * else here would be testing a feature the build does not
+             * have. (Windows, or a compiler without the atomics.) */
+            A->deny_add("203.0.113.7", 0);
+            if (A->deny_check("203.0.113.7") != 0)                ok = 0;
+            A->deny_remove("203.0.113.7");
+            if (A->ratelimit_hit("st", 2, 1, 60, &rem, &rst) != 1) ok = 0;
+            if (A->ratelimit_hit("st", 2, 1, 60, &rem, &rst) != 1) ok = 0;
+        }
         else {
             if (A->deny_check("203.0.113.7") != 0)                ok = 0;
             A->deny_add("203.0.113.7", 0);

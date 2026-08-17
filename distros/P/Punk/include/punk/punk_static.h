@@ -160,10 +160,15 @@ static int ps_path_unsafe(const char *p, STRLEN len) {
 }
 
 /* ---- serving one file ------------------------------------------------------
- * The stat / conditional-request / header / body half of a static response,
- * split out so the markdown mount can serve the images and other assets
- * sitting alongside its documents with exactly this behaviour rather than a
- * second implementation that drifts from it.
+ * The stat / conditional-request / range / header / body half of a static
+ * response, split out so the markdown mount can serve the images and other
+ * assets sitting alongside its documents with exactly this behaviour rather
+ * than a second implementation that drifts from it. Since 0.13 it is the
+ * send_file decision core with a fixed option block - the implementation
+ * lives in punk_sendfile.h (included right after this header), which is
+ * what gives static files their ETag, 304-on-If-None-Match and 206/416
+ * range answers; the If-Modified-Since exact-match convention is one
+ * branch of that core.
  *
  * Returns the finished triplet (+1 owned), or NULL when `file` is not a
  * regular file or cannot be opened - the caller decides what its own 404
@@ -171,63 +176,7 @@ static int ps_path_unsafe(const char *p, STRLEN len) {
  * whoever built it out of untrusted input. */
 
 static SV *ps_serve_file(pTHX_ HV *env, const char *file, STRLEN flen,
-                         int is_head) {
-    Stat_t st;
-    char date[64];
-    SV **e;
-
-    if (PerlLIO_stat(file, &st) < 0 || !S_ISREG(st.st_mode)) return NULL;
-    ps_http_date(date, sizeof date, (time_t)st.st_mtime);
-
-    /* If-Modified-Since: an exact match is all a static file needs - the
-     * date we would send is the date they were given. */
-    e = env ? hv_fetchs(env, "HTTP_IF_MODIFIED_SINCE", 0) : NULL;
-    if (e && *e && SvOK(*e) && strEQ(SvPV_nolen(*e), date)) {
-        AV *resp = newAV(), *headers = newAV(), *body = newAV();
-        av_push(headers, newSVpvs("Last-Modified"));
-        av_push(headers, newSVpv(date, 0));
-        av_push(body, newSVpvs(""));
-        av_push(resp, newSViv(304));
-        av_push(resp, newRV_noinc((SV *)headers));
-        av_push(resp, newRV_noinc((SV *)body));
-        return newRV_noinc((SV *)resp);
-    }
-
-    {
-        AV *resp = newAV(), *headers = newAV();
-        av_push(headers, newSVpvs("Content-Type"));
-        av_push(headers, newSVpv(ps_content_type(file, flen), 0));
-        av_push(headers, newSVpvs("Content-Length"));
-        av_push(headers, newSViv((IV)st.st_size));
-        av_push(headers, newSVpvs("Last-Modified"));
-        av_push(headers, newSVpv(date, 0));
-        av_push(resp, newSViv(200));
-        av_push(resp, newRV_noinc((SV *)headers));
-
-        if (is_head) {                        /* the headers, no body */
-            AV *body = newAV();
-            av_push(body, newSVpvs(""));
-            av_push(resp, newRV_noinc((SV *)body));
-        }
-        else {
-            /* a real filehandle: the server streams or sendfiles it rather
-             * than us slurping the file into memory */
-            PerlIO *fp = PerlIO_open(file, "rb");
-            GV *gv;
-            IO *io;
-            if (!fp) {
-                SvREFCNT_dec((SV *)resp);
-                return NULL;
-            }
-            gv = newGVgen("Punk::Static");
-            io = GvIOn(gv);
-            IoIFP(io)  = fp;
-            IoTYPE(io) = IoTYPE_RDONLY;
-            av_push(resp, newRV_inc((SV *)gv));
-        }
-        return newRV_noinc((SV *)resp);
-    }
-}
+                         int is_head);
 
 /* ---- the app ---------------------------------------------------------------
  * The PSGI coderef's body: a magic CV whose capture is [ $dir ]. Everything

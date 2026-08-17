@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-Fondation-OpenAPI
 
+0.04      2026-08-16 19:52:28+02:00 Europe/Paris
+  - requires Fondation::Model::DBIx::Async 0.06
+  - update README.md
+
 0.03      2026-08-06 23:50:56+02:00 Europe/Paris
   - Le fix pattern (spec + validators.js + échappement JS) : support pattern flat key in spec and validators.js
   - add no_validator_js option to disable client-side validation

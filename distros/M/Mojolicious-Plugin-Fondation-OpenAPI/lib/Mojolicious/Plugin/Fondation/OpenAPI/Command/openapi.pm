@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::OpenAPI::Command::openapi;
-$Mojolicious::Plugin::Fondation::OpenAPI::Command::openapi::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::OpenAPI::Command::openapi::VERSION = '0.04';
 # ABSTRACT: Generate OpenAPI specification from DBIx::Class sources
 
 use Mojo::Base 'Mojolicious::Command', -signatures;
@@ -868,7 +868,7 @@ Mojolicious::Plugin::Fondation::OpenAPI::Command::openapi - Generate OpenAPI spe
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

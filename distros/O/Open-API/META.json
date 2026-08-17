@@ -29,19 +29,19 @@
          "requires" : {
             "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0",
-            "Fetch" : "0.08",
-            "File::Raw::JSON" : "0.05",
-            "JSON::Schema::Fast" : "0.05"
+            "Fetch" : "0.13",
+            "File::Raw::JSON" : "0.07",
+            "JSON::Schema::Fast" : "0.09"
          }
       },
       "runtime" : {
          "recommends" : {
-            "Markdown::Simple" : "0.18",
-            "Template::Stencil" : "0.02"
+            "Markdown::Simple" : "0.22",
+            "Template::Stencil" : "0.09"
          },
          "requires" : {
-            "File::Raw::JSON" : "0.05",
-            "JSON::Schema::Fast" : "0.05",
+            "File::Raw::JSON" : "0.07",
+            "JSON::Schema::Fast" : "0.09",
             "perl" : "5.008003"
          }
       },
@@ -52,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

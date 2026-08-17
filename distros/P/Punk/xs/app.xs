@@ -717,7 +717,7 @@ api(self, spec, opts = &PL_sv_undef, scope = &PL_sv_undef)
     {
         HV *h = app_hv(aTHX_ self);
         SV *argv[8], *mount, *pfx, *grd;
-        eval_pv(PK_REQUIRE(PK_MOUNT_OA), TRUE);
+        (void)pk_require_once(aTHX_ PK_MOUNT_OA, TRUE);
         if (SvOK(scope)) {
             pfx = pcx_call_meth(aTHX_ scope, K_PREFIX, NULL, 0, 1);
             grd = pcx_call_meth(aTHX_ scope, K_GUARDS, NULL, 0, 1);
@@ -1122,7 +1122,7 @@ config(self, ...)
         else {
             int argc = items - 1, odd = argc % 2, i, m;
             SV **av2, *cfg, *aa[1];
-            eval_pv(PK_REQUIRE(PK_CONFIG), TRUE);
+            (void)pk_require_once(aTHX_ PK_CONFIG, TRUE);
             /* config $file => %opts  ==>  (file => $file, %opts) */
             m = odd ? argc + 1 : argc;
             Newx(av2, m, SV *);

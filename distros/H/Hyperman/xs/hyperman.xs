@@ -212,6 +212,21 @@ has_tls(...)
     OUTPUT:
         RETVAL
 
+# The runtime TLS library banner ("OpenSSL 3.0.13 30 Jan 2024",
+# "LibreSSL 3.8.2"), or undef when TLS support was not built. The two
+# stacks agree on the API but not on behaviour - LibreSSL has no TLS 1.3
+# session resumption, for one - and this is how a caller tells them apart.
+SV *
+tls_library(...)
+    PREINIT:
+        const char *s;
+    CODE:
+        PERL_UNUSED_VAR(items);
+        s = hm_tls_library();
+        RETVAL = s ? newSVpv(s, 0) : newSV(0);
+    OUTPUT:
+        RETVAL
+
 # Hyperman->tls_reload(\%sni) - replace this worker's TLS certificates
 # without replacing the process.
 #
@@ -291,6 +306,8 @@ detach(env)
             case -4: croak("Hyperman::detach: a response is still draining "
                            "on this connection");
             case -5: croak("Hyperman::detach: already detached");
+            case -6: croak("Hyperman::detach: not supported on this "
+                           "platform (it needs fork-style fd ownership)");
             default: croak("Hyperman::detach: failed (%d)", rc);
         }
         RETVAL = (IV)fd;

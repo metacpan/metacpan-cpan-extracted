@@ -38,8 +38,8 @@ if (!$ssl_libs) {   # homebrew keg-only path (no pkg-config on macOS)
         }
     }
 }
-die "Crypt::JWS requires OpenSSL's libcrypto (install libssl-dev / "
-  . "openssl-devel / brew install openssl) - configure aborted.\n"
+na("Crypt::JWS requires OpenSSL's libcrypto (install libssl-dev / "
+ . "openssl-devel / brew install openssl)")
     unless $ssl_libs;
 $INC  .= " $ssl_cflags" if $ssl_cflags;
 $LIBS .= " $ssl_libs";
@@ -62,8 +62,9 @@ elsif (probe('set0', $ssl_cflags,
     print "Found RSA_set0_key: OpenSSL 1.1 struct key import.\n";
 }
 else {
-    die "Crypt::JWS: libcrypto found but neither EVP_PKEY_fromdata (3.x) "
-      . "nor RSA_set0_key (1.1) compiled - OpenSSL too old?\n";
+    na("libcrypto found but neither EVP_PKEY_fromdata (3.x) nor "
+     . "RSA_set0_key (1.1) compiled - OpenSSL 1.1.0 or newer (or "
+     . "LibreSSL 2.7+) is required");
 }
 
 # --- ExtUtils::Depends: consume frj_abi.h, provide jws_abi.h --------------
@@ -140,6 +141,15 @@ WriteMakefile(
     clean => { FILES => 'Crypt-JWS-* JWS.c JWS.o JWS.bs Install/Files.pm' },
     %dep,
 );
+
+# A missing/too-old libcrypto is not a bug in this distribution, so bail
+# out the way CPAN::Reporter grades NA rather than UNKNOWN: the literal
+# phrase "OS unsupported" on stdout and a clean exit with no Makefile.
+sub na {
+    my $why = shift;
+    print "OS unsupported: $why - Crypt::JWS cannot be built here.\n";
+    exit 0;
+}
 
 sub probe {
     my ($name, $flags, $includes, $body, $libs) = @_;

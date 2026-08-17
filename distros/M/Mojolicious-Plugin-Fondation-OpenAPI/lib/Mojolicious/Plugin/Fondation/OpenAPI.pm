@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::OpenAPI;
-$Mojolicious::Plugin::Fondation::OpenAPI::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::OpenAPI::VERSION = '0.04';
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
 
@@ -155,7 +155,7 @@ Mojolicious::Plugin::Fondation::OpenAPI - OpenAPI specification generator and ru
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

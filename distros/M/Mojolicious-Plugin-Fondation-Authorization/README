@@ -1,5 +1,5 @@
 This archive contains the distribution Mojolicious-Plugin-Fondation-Authorization,
-version 0.01:
+version 0.02:
 
   Authorization plugin — grants loading and check_perm/check_group helpers
 

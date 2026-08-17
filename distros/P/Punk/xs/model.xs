@@ -109,12 +109,9 @@ _instantiate(class, ...)
         {   /* load it unless it is already there */
             HV *stash = gv_stashsv(backend_class, 0);
             if (!(stash && gv_fetchmethod_autoload(stash, "new", 0))) {
-                SV *err;
-                eval_pv(form("require %s;", SvPV_nolen(backend_class)), FALSE);
-                err = ERRSV;
-                if (SvTRUE(err))
+                if (!pk_require_once(aTHX_ SvPV_nolen(backend_class), FALSE))
                     croak("Punk::Model: backend '%s' failed to load: %s",
-                          SvPV_nolen(backend_class), SvPV_nolen(err));
+                          SvPV_nolen(backend_class), SvPV_nolen(ERRSV));
             }
         }
 
@@ -160,7 +157,7 @@ _instantiate(class, ...)
         if (should && SvTRUE(should)) {
             static const char *const which[] = { "cv_create", "cv_update" };
             int partial;
-            eval_pv("require JSON::Schema::Fast;", TRUE);
+            (void)pk_require_once(aTHX_ "JSON::Schema::Fast", TRUE);
             for (partial = 0; partial < 2; partial++) {
                 SV *schema = sv_2mortal(pm_object_schema(aTHX_ m, partial));
                 dSP;

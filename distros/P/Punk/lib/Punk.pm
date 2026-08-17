@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.12';
+    $VERSION = '0.15';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -70,7 +70,10 @@ that too, generating a controller of operation stubs per tag:
 Once it is running, C<punk routes> prints the compiled table,
 C<punk doctor> reports the environment and C ABIs, C<punk config check>
 resolves the configuration and its secrets, and C<punk dev> serves with
-restart-on-change. See L<Punk::Generate> and L<Punk::Command>.
+restart-on-change. C<punk generate controller|model> adds to an existing
+application, C<punk test> runs its suite, and C<punk secret> mints key
+material for the session config. See L<Punk::Generate> and
+L<Punk::Command>.
 
 The generated test drives the app through L<Punk::Test>: an in-process
 client with a cookie jar and chained assertions, so sessions, CSRF,
@@ -99,6 +102,13 @@ A route. The target is a coderef, or C<'Controller#method'> resolved
 against C<MyApp::Controller::> at boot - typos croak before the app
 serves. C<:name> captures one path segment, C<*name> captures the
 rest; captures are available as C<< $c->param($name) >>.
+
+A trailing slash on the request is not a different route: once every
+declared route, API operation and mount has been tried and none matched,
+C<GET /account/> is retried as C<GET /account>. Nothing that already
+matched is affected - a C<*splat> still captures a trailing slash as
+part of the remainder, and a mounted app still receives the path it was
+sent, since only it knows whether C</docs> and C</docs/> differ.
 
 An optional trailing hashref carries route options; unknown keys croak
 at boot. The one option today is C<validate> - a JSON Schema (or

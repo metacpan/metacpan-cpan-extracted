@@ -4,7 +4,7 @@ use warnings;
 
 use Syntax::Construct qw (package-block package-version);
 
-package Test::YAFT::Argument::Got v1.0.3 {
+package Test::YAFT::Argument::Got v1.0.4 {
 	use parent q (Test::YAFT::Argument::Scalar);
 
 	use constant argument_name => q (got);
@@ -24,7 +24,7 @@ Test::YAFT::Argument::Got - Internal implemention of got { }
 
 =head1 AUTHOR
 
-Branislav Zahradník <barney@cpan.org>
+Branislav Zahradník <barney.cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENCE
 

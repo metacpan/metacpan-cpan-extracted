@@ -72,6 +72,7 @@ static const frj_abi *punk_frj(pTHX) {
 #include "punk/punk_ws.h"         /* the RFC 6455 frame codec (phase 8)    */
 #include "punk/punk_config.h"      /* layered YAML config + resolved secrets */
 #include "punk/punk_static.h"    /* the static-file app (a magic-CV closure) */
+#include "punk/punk_sendfile.h"  /* $c->send_file: validators + ranges     */
 #include "punk/punk_oamount.h"   /* the `api` mount, boot half (needs static) */
 #include "punk/punk_dbi.h"       /* the shipped DBI model backend           */
 #include "punk/punk_model.h"     /* the model tier: DSL, metadata, contract */
@@ -136,6 +137,7 @@ INCLUDE: xs/wsroom.xs
 INCLUDE: xs/future.xs
 INCLUDE: xs/config.xs
 INCLUDE: xs/static.xs
+INCLUDE: xs/sendfile.xs
 INCLUDE: xs/markdown.xs
 INCLUDE: xs/model.xs
 INCLUDE: xs/oamount.xs

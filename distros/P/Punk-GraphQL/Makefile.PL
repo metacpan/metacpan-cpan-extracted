@@ -28,6 +28,7 @@ WriteMakefile(
             test => { recommends => { 'Hyperman' => '0.14' } },
         },
     },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
     clean => { FILES => 'Punk-GraphQL-*' },
 );

@@ -11,12 +11,18 @@
     <title><%= stash('title') || 'Fondation' %></title>
 
     %= asset 'app.css'
+
+    <!-- CSS extension zone (e.g. Emacs theme --bs-* overrides).
+         MUST stay after Bootstrap: plugins inject <link> tags here. -->
+    %== render_zone 'head/css'
+
     %== i18n_js
     %== render_zone 'head/auth'
+    %= content_for 'head'
 
   </head>
 
-  <body class="bg-light">
+  <body>
 
     %= include 'layouts/navbar'
 

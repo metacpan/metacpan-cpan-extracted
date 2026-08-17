@@ -32,6 +32,7 @@ t/gitea_autodetect.t
 t/giteameta.t
 t/github_autodetect.t
 t/irc_user.t
+t/post_release_commit.t
 t/readme_exclusion.t
 t/release-changes_has_content.t
 t/tag_format.t

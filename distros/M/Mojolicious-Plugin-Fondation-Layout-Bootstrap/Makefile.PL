@@ -24,22 +24,22 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.026",
   "NAME" => "Mojolicious::Plugin::Fondation::Layout::Bootstrap",
   "PREREQ_PM" => {
-    "Mojolicious::Plugin::Fondation" => "0.01",
-    "Mojolicious::Plugin::Fondation::Asset" => "0.01"
+    "Mojolicious::Plugin::Fondation" => "0.07",
+    "Mojolicious::Plugin::Fondation::Asset" => "0.04"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.302190"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
-  "Mojolicious::Plugin::Fondation" => "0.01",
-  "Mojolicious::Plugin::Fondation::Asset" => "0.01",
+  "Mojolicious::Plugin::Fondation" => "0.07",
+  "Mojolicious::Plugin::Fondation::Asset" => "0.04",
   "Test::More" => "1.302190"
 );
 

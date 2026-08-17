@@ -5,6 +5,12 @@ All notable changes to Affix.pm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.5] - 2026-08-17
+
+### Fixed
+
+- `SAVEVPTR`/`SAVEDESTRUCTOR_X` 'fix' broke thread safety. When a second thread or fiber entered the same Affix-generated XSUB, its `SAVEVPTR` captured the first fiber's temp arena as "old", so on scope exit the second fiber restored a dangling pointer.
+
 ## [v1.2.4] - 2026-08-15
 
 Plugging leaks...
@@ -390,7 +396,8 @@ Based on infix v0.1.3
 
   - Affix.pm is born
 
-[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.2.4...HEAD
+[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.2.5...HEAD
+[v1.2.5]: https://github.com/sanko/Affix.pm/compare/v1.2.4...v1.2.5
 [v1.2.4]: https://github.com/sanko/Affix.pm/compare/v1.2.3...v1.2.4
 [v1.2.3]: https://github.com/sanko/Affix.pm/compare/v1.2.2...v1.2.3
 [v1.2.2]: https://github.com/sanko/Affix.pm/compare/v1.2.1...v1.2.2

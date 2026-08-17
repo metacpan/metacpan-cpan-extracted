@@ -75,6 +75,28 @@ is(hit($app, path => '/no/such/path/here')->[0], 404, 'unknown path 404s');
     is($h{Allow}, 'GET', 'static Allow');
 }
 
+# ---- trailing slash ----------------------------------------------------------
+# /account/ answers the route declared as /account, rather than 404ing.
+is(hit($app, path => '/books/')->[2][0], 'list', 'trailing slash: static');
+is(hit($app, method => 'POST', path => '/books/')->[2][0], 'made',
+    'trailing slash: static, other method');
+is(file_json_decode(hit($app, path => '/books/7/')->[2][0])->{id}, 7,
+    'trailing slash: :param');
+is(hit($app, path => '/')->[2][0], 'home', 'the root itself is untouched');
+is(hit($app, path => '/books///')->[2][0], 'list', 'repeated slashes');
+{
+    my $r = hit($app, method => 'PUT', path => '/books/');
+    is($r->[0], 405, 'trailing slash still 405s an undeclared method');
+    my %h = @{ $r->[1] };
+    is($h{Allow}, 'GET, POST', 'and carries the trimmed path Allow');
+}
+{
+    # *splat owns everything after the prefix, trailing slash included, so
+    # the rescue must not reach a route that already matched
+    my $d = file_json_decode(hit($app, path => '/files/a/b/')->[2][0]);
+    is($d->{rest}, 'a/b/', 'splat keeps its own trailing slash');
+}
+
 # ---- boot-time route validation ----------------------------------------------
 {
     package BadPath;

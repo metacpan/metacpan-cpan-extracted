@@ -33,11 +33,11 @@ static int PUNK_JSF_TAB_TRIED = 0;
 
 static const jsf_abi *punk_jsf_try(pTHX) {
     if (!PUNK_JSF_TAB_TRIED) {
-        dSP; int count; IV p = 0;
+        dSP; int count, ok; IV p = 0;
         PUNK_JSF_TAB_TRIED = 1;
-        eval_pv("require JSON::Schema::Fast;", FALSE);
+        ok = pk_require_once(aTHX_ "JSON::Schema::Fast", FALSE);
         SPAGAIN;   /* the require may have reallocated the value stack */
-        if (!SvTRUE(ERRSV)) {
+        if (ok) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("JSON::Schema::Fast::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;

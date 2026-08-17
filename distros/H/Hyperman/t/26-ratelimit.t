@@ -7,6 +7,13 @@ use HMTest qw(free_ports);
 use IO::Socket::INET;
 use Time::HiRes ();
 
+# The denylist is enforced from the shared arena, which needs shared
+# memory and a fork to share it with. Windows has neither and fails
+# open by design; the ABI selftest in t/22-abi.t asserts that
+# fail-open contract there instead.
+plan skip_all => 'the shared arena needs fork(2) and shared memory'
+    if $^O eq 'MSWin32';
+
 # The v3 abuse controls: the shared arena's denylist enforced at accept. The
 # arena logic itself (deny add/check/remove + fixed-window ratelimit_hit,
 # shared across a fork) is driven through the ABI table by _abi_selftest and

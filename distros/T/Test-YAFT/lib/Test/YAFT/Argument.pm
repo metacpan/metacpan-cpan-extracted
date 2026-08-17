@@ -4,7 +4,7 @@ use warnings;
 
 use Syntax::Construct qw (package-block package-version);
 
-package Test::YAFT::Argument v1.0.3 {
+package Test::YAFT::Argument v1.0.4 {
 
 	sub argument_name;
 	sub set_argument;
@@ -38,7 +38,7 @@ Test::YAFT::Argument - Internals behind block arguments
 
 =head1 AUTHOR
 
-Branislav Zahradník <barney@cpan.org>
+Branislav Zahradník <barney.cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENCE
 

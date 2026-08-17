@@ -23,8 +23,8 @@
       "runtime" : {
          "requires" : {
             "Mojolicious" : "9.46",
-            "Mojolicious::Plugin::Fondation::Group" : "0",
-            "Mojolicious::Plugin::Fondation::Layout::Bootstrap" : "0",
+            "Mojolicious::Plugin::Fondation::Group" : "0.02",
+            "Mojolicious::Plugin::Fondation::Layout::Bootstrap" : "0.04",
             "perl" : "5.026"
          }
       },
@@ -36,6 +36,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-Group-UI-Bootstrap/issues"
+      },
       "homepage" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-Group-UI-Bootstrap",
       "repository" : {
          "type" : "git",
@@ -43,7 +46,7 @@
          "web" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-Group-UI-Bootstrap"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Auth::Provider;
-$Mojolicious::Plugin::Fondation::Auth::Provider::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Auth::Provider::VERSION = '0.03';
 use Mojo::Base -base, -signatures;
 
 has 'app';
@@ -48,7 +48,7 @@ Mojolicious::Plugin::Fondation::Auth::Provider
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -19,9 +19,9 @@ my %WriteMakefileArgs = (
     "I18N::LangTags" => 0,
     "I18N::LangTags::Detect" => 0,
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => 0
+    "Mojolicious::Plugin::Fondation" => "0.07"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,7 +32,7 @@ my %FallbackPrereqs = (
   "I18N::LangTags" => 0,
   "I18N::LangTags::Detect" => 0,
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => 0
+  "Mojolicious::Plugin::Fondation" => "0.07"
 );
 
 

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Auth;
-$Mojolicious::Plugin::Fondation::Auth::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Auth::VERSION = '0.03';
 # ABSTRACT: Fondation authentication plugin — DBIx-backed login/logout
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -162,7 +162,7 @@ Mojolicious::Plugin::Fondation::Auth - Fondation authentication plugin — DBIx-
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -62,11 +62,11 @@ static int PUNK_HM_TRIED = 0;
 static const hm_abi *punk_hm(pTHX) {
     if (getenv("PUNK_NO_HM_ABI")) return NULL;
     if (!PUNK_HM_TRIED) {
-        dSP; int count; IV p = 0;
+        dSP; int count, ok; IV p = 0;
         PUNK_HM_TRIED = 1;
-        eval_pv("require Hyperman;", FALSE);
+        ok = pk_require_once(aTHX_ "Hyperman", FALSE);
         SPAGAIN;   /* the require may have reallocated the value stack */
-        if (!SvTRUE(ERRSV)) {
+        if (ok) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("Hyperman::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;

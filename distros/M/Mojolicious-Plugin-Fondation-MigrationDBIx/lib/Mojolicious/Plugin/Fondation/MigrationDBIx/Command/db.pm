@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db;
-$Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db::VERSION = '0.05';
+$Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db::VERSION = '0.06';
 # ABSTRACT: Database migration and fixture commands for DBIx::Class backends
 
 use Mojo::Base 'Mojolicious::Command', -signatures;
@@ -859,7 +859,7 @@ Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db - Database migration 
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ use File::Spec ();
 use File::Raw::JSON ();
 use GraphQL::Houtou ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %STATE;
 
@@ -335,7 +335,7 @@ Punk::Plugin::GraphQL - mount GraphQL::Houtou endpoints into a Punk app
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -344,14 +344,51 @@ Version 0.01
 	use Punk::Plugin::GraphQL;
 
 	plugin 'GraphQL';
-	
-	graphql '/graphql' => 'schema/app.graphql', {
+
+	# the short form: a path and an SDL file
+	graphql '/graphql' => 'schema/app.graphql';
+
+	# an SDL string instead of a file - anything with a brace or a
+	# newline is read as SDL, everything else as a filename
+	graphql '/hello' => 'type Query { hello: String }', {
+		resolvers => { Query => { hello => sub { 'hi' } } },
+	};
+
+	# a schema built by hand - resolvers belong to it and cannot be
+	# passed here
+	my $schema = GraphQL::Houtou::build_schema($sdl, resolvers => \%r);
+	graphql '/prebuilt' => $schema;
+
+	# the usual production endpoint: controllers for resolvers, a
+	# per-request context, a guard, the console behind it
+	graphql '/books' => 'schema/books.graphql', {
 		resolvers => {
-			Query	=> 'Books',			  # MyApp::Controller::Books
+			Query    => 'Books',   # MyApp::Controller::Books
 			Mutation => { rename => 'Books#rename' },
 		},
 		context  => 'Books#context',
+		guard    => 'Auth#require_token',
 		graphiql => 1,
+	};
+
+	# one hashref, schema and options together - the same endpoint
+	# written the other way round
+	graphql '/books-again' => {
+		schema    => 'schema/books.graphql',
+		resolvers => { Query => 'Books' },
+		context   => 'Books#context',
+	};
+
+	# large or expensive documents: every ceiling raised deliberately
+	graphql '/reports' => 'schema/reports.graphql', {
+		resolvers           => { Query => 'Reports' },
+		max_body            => 8 * 1024 * 1024,  # bytes, default 1 MiB
+		max_cost            => 250_000,          # weighted, default 10_000
+		default_list_size   => 100,              # unsized list, default 10
+		max_depth           => 30,               # per execution
+		max_nodes           => 20_000,           # per execution
+		program_cache_max   => 2_000,            # compiled queries kept
+		allow_introspection => 0,                # shut in production
 	};
 
 	package MyApp::Controller::Books;
@@ -367,6 +404,15 @@ Version 0.01
 	}
 
 	1;
+
+Or declare the single endpoint at registration and skip the keyword
+entirely:
+
+	plugin 'GraphQL' => {
+		path      => '/graphql',
+		schema    => 'schema/app.graphql',
+		resolvers => { Query => 'Books' },
+	};
 
 =head1 DESCRIPTION
 
@@ -472,8 +518,12 @@ GraphiQL page shares the guard.
 =item graphiql
 
 Boolean. When true, GET on the endpoint serves a GraphQL console - a
-query editor with variables, response pane, and introspection-driven
-schema docs. The page is entirely self-contained: its template,
+query editor with variables, a headers pane (a JSON object merged into
+every request, so a guard's Authorization token or any custom header
+reaches the server; the schema-docs introspection sends them too, with
+a refresh control for after the token is pasted in), response pane, and
+introspection-driven schema docs. The page is entirely self-contained:
+its template,
 stylesheet, and script ship in this distribution's assets directory,
 are rendered once at boot through L<Template::Stencil>, and are served
 from memory as one HTML page that loads nothing from anywhere else - no

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Auth::Provider::DBIx;
-$Mojolicious::Plugin::Fondation::Auth::Provider::DBIx::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Auth::Provider::DBIx::VERSION = '0.03';
 # ABSTRACT: DBIx::Class-backed authentication provider for Fondation::Auth
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Auth::Provider', -signatures;
@@ -149,7 +149,7 @@ Mojolicious::Plugin::Fondation::Auth::Provider::DBIx - DBIx::Class-backed authen
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

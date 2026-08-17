@@ -2,7 +2,7 @@ NAME
     Filename::KeyValue - Parse filename using the KeyValue naming scheme
 
 VERSION
-    This document describes version 0.001 of Filename::KeyValue (from Perl
+    This document describes version 0.002 of Filename::KeyValue (from Perl
     distribution Filename-KeyValue), released on 2026-04-27.
 
 SYNOPSIS
@@ -246,6 +246,9 @@ SOURCE
 SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar <perlancar@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull

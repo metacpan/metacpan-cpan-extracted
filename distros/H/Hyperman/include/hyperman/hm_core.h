@@ -12,6 +12,9 @@
 #define HM_HIDX_STACK   64     /* header-line index on the stack before
                                   falling back to the loop's growable one  */
 
+#include "hm_win.h"     /* the socket/IO shim: hm_os_*, hm_iovec, hm_memmem.
+                           First, so every later header sees the platform
+                           headers it pulls; a passthrough on POSIX. */
 #include "hm_parse.h"   /* hm_hline, hm_parse_index, hm_chunked_* */
 #include "hm_abi.h"     /* public C ABI: hm_abi table + callback typedefs */
 
@@ -134,7 +137,8 @@ typedef struct {
 typedef struct { int fd; UV id; } hm_again;
 
 struct hm_loop {
-    pid_t       pid;                /* the process that created this loop */
+    int         pid;                /* the process that created this loop
+                                     (hm_os_getpid: MSVC has no pid_t) */
     hm_backend *be;
     hm_conn   **conns;              /* [HM_MAXFD] */
     hm_iow     *io_r, *io_w;        /* [HM_MAXFD] app io watchers */
@@ -186,9 +190,11 @@ static hm_listener *hm_listener_for_fd(hm_loop *loop, int fd) {
 }
 
 static SV      *hm_empty_input;     /* shared empty psgi.input */
-static pid_t    hm_children[1024];
+#ifndef _WIN32
+static pid_t    hm_children[1024];  /* the supervisor's pool (POSIX only) */
 static time_t   hm_child_start[1024];
 static int      hm_nchildren = 0;
+#endif
 static UV       hm_id_counter = 0;
 
 static SV *hm_loop_to_sv(pTHX_ hm_loop *loop);
@@ -287,10 +293,7 @@ static void hm_fmt_peer(char *out, size_t outlen, int *port, const struct sockad
     }
 }
 
-static void hm_set_nonblock(int fd) {
-    int fl = fcntl(fd, F_GETFL, 0);
-    fcntl(fd, F_SETFL, fl | O_NONBLOCK);
-}
+static void hm_set_nonblock(int fd) { hm_os_set_nonblock(fd); }
 
 /* fd of a filehandle / IO ref, or a plain fd number */
 static int hm_fd_of(pTHX_ SV *sv) {
@@ -334,21 +337,29 @@ static SV *hm_new_input(pTHX_ const char *body, STRLEN len) {
 }
 
 /* psgix.io: a dup of the client socket, so an app that hijacks it keeps
- * the socket alive after the server side closes. */
+ * the socket alive after the server side closes. Absent on Windows:
+ * duplicating a socket there is WSADuplicateSocket, not dup(2), and the
+ * result would have to be re-wrapped for perl's IO layer - unproven, and
+ * psgix.io is optional in PSGI, so it is simply not offered. */
 static SV *hm_fh_for_fd(pTHX_ int fd) {
+#ifdef _WIN32
+    (void)fd;
+    return &PL_sv_undef;
+#else
     int nfd = dup(fd);
     PerlIO *fp;
     GV *gv;
     IO *io;
     if (nfd < 0) return &PL_sv_undef;
     fp = PerlIO_fdopen(nfd, "r+");
-    if (!fp) { close(nfd); return &PL_sv_undef; }
+    if (!fp) { hm_os_close(nfd); return &PL_sv_undef; }
     gv = hm_anon_glob(aTHX);
     io = GvIO(gv);
     IoIFP(io) = fp;
     IoOFP(io) = fp;
     IoTYPE(io) = IoTYPE_RDWR;
     return newRV_noinc((SV *)gv);
+#endif
 }
 
 /* Read out a filehandle / IO::Handle-like response body, honouring
@@ -528,7 +539,7 @@ static ssize_t hm_bsrc_fill(pTHX_ hm_conn *c) {
                           ? (size_t)bs->remaining : HM_BSRC_CHUNK;
         ssize_t n;
         hm_wb_reserve(c, want);
-        n = pread(bs->fd, c->wbuf + c->wlen, want, bs->off);
+        n = hm_os_pread(bs->fd, c->wbuf + c->wlen, want, bs->off);
         if (n <= 0) { c->keepalive = 0; return -1; }
         c->wlen += (size_t)n;
         bs->off += n;
@@ -626,7 +637,7 @@ static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
     loop->be->remove_io(loop->be, fd, HM_EV_READ | (c->writing ? HM_EV_WRITE : 0));
     if (c->bsrc.kind) hm_bsrc_release(aTHX_ &c->bsrc);   /* mid-stream abort */
     if (c->ssl) hm_tls_conn_free(c);
-    close(fd);
+    hm_os_close(fd);
     hm_lru_unlink(loop, c);
     loop->conns[fd] = NULL;
     loop->nconns--;
@@ -682,6 +693,15 @@ static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
  * returns a sentinel (conventionally [101, [], []]) which is discarded. */
 static int hm_detach(pTHX_ hm_loop *loop, int fd, UV id) {
     hm_conn *c;
+#ifdef _WIN32
+    /* The fd is a CRT wrapper around a SOCKET (hm_win.h). Handing that to
+     * perl's IO layer to own, after this server stops watching it, has not
+     * been proven on a real Windows box - so it is refused rather than
+     * half-supported. A WebSocket tier over this server falls back to
+     * psgi.streaming, which is its documented second transport. */
+    (void)loop; (void)fd; (void)id; (void)c;
+    return -6;
+#else
     if (fd < 0 || fd >= HM_MAXFD) return -1;
     c = loop->conns[fd];
     if (!c || c->id != id)       return -1;   /* gone, or a stale ticket    */
@@ -695,6 +715,7 @@ static int hm_detach(pTHX_ hm_loop *loop, int fd, UV id) {
     c->writing  = 0;
     c->detached = 1;
     return 0;
+#endif
 }
 
 /* Deferred half of hm_detach: forget the connection without closing its fd. */
@@ -757,7 +778,7 @@ static hm_conn *hm_new_conn(hm_loop *loop, int fd, hm_listener *lst) {
     loop->conns[fd] = c;
     loop->nconns++;
     hm_set_nonblock(fd);
-    { int one = 1; setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one)); }
+    { int one = 1; hm_os_setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one)); }
     loop->be->add_io(loop->be, fd, HM_EV_READ, 0);
     if (lst && lst->tls_ctx) hm_tls_wrap(c, lst->tls_ctx);   /* TLS: handshake first */
     /* append to LRU tail */
@@ -1180,7 +1201,8 @@ static void hm_log_flush(hm_loop *loop) {
     size_t off = 0;
     if (loop->log_fd < 0 || loop->log_len == 0) return;
     while (off < loop->log_len) {
-        ssize_t n = write(loop->log_fd, loop->log_buf + off, loop->log_len - off);
+        ssize_t n = hm_os_write_file(loop->log_fd, loop->log_buf + off,
+                                     loop->log_len - off);
         if (n > 0) { off += (size_t)n; continue; }
         if (n < 0 && errno == EINTR) continue;
         break;   /* EAGAIN/error: keep the unwritten tail for the next flush */
@@ -1438,26 +1460,24 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
      * straight from the response SVs, no body copy */
     if (hdr_start == 0 && c->woff == 0 && !c->writing && !fh_body && !c->ssl
         && !c->bsrc.kind && bav && bn >= 0 && bn < HM_IOV_MAX) {
-        struct iovec iov[HM_IOV_MAX];
+        hm_iovec iov[HM_IOV_MAX];
         size_t total = c->wlen;
         int niov = 1;
         SSize_t i;
         ssize_t n;
-        iov[0].iov_base = c->wbuf;
-        iov[0].iov_len  = c->wlen;
+        HM_IOV_SET(iov, 0, c->wbuf, c->wlen);
         for (i = 0; i < bn; i++) {
             SV **e = av_fetch(bav, i, 0);
             if (e) {
                 STRLEN l; const char *p = SvPV(*e, l);
                 if (l) {
-                    iov[niov].iov_base = (void *)p;
-                    iov[niov].iov_len  = l;
+                    HM_IOV_SET(iov, niov, p, l);
                     niov++;
                     total += l;
                 }
             }
         }
-        n = writev(c->fd, iov, niov);
+        n = hm_os_writev(c->fd, iov, niov);
         if (n < 0) {
             if (errno != EAGAIN && errno != EWOULDBLOCK) { hm_close(aTHX_ loop, c); return -1; }
             n = 0;
@@ -1916,7 +1936,7 @@ static void hm_process(pTHX_ hm_conn *c) {
         if (c->bsrc.kind) break;  /* a body is still streaming out; the
                                      flush that finishes it re-queues us */
 
-        char *end = (char *)memmem(c->rbuf, c->rlen, "\r\n\r\n", 4);
+        char *end = (char *)hm_memmem(c->rbuf, c->rlen, "\r\n\r\n", 4);
         if (!end) break;
 
         if (served >= loop->max_pipeline) {     /* yield to other conns */
@@ -2118,7 +2138,7 @@ static void hm_readable(pTHX_ hm_conn *c) {
         if (c->rlen == c->rcap) {
             /* grow for large bodies; unbounded headers are rejected */
             if (c->rcap >= loop->max_read
-                || (c->rlen >= 65536 && !memmem(c->rbuf, c->rlen, "\r\n\r\n", 4))) {
+                || (c->rlen >= 65536 && !hm_memmem(c->rbuf, c->rlen, "\r\n\r\n", 4))) {
                 hm_close(aTHX_ loop, c);
                 return;
             }
@@ -2171,14 +2191,14 @@ static void hm_accept(pTHX_ hm_loop *loop, hm_listener *lst) {
         hm_conn *c;
         char peer[INET6_ADDRSTRLEN];
         int  peer_port;
-        int fd = accept(lst->fd, (struct sockaddr *)&ss, &slen);
+        int fd = hm_os_accept(lst->fd, (struct sockaddr *)&ss, &slen);
         if (fd < 0) break;                     /* EAGAIN: drained */
-        if (fd >= HM_MAXFD) { close(fd); continue; }
+        if (fd >= HM_MAXFD) { hm_os_close(fd); continue; }
         /* Denylist: format the peer and drop a blocked IP HERE, before a
          * connection object is allocated or a byte is read - the cheapest
          * possible rejection. Fails open (no arena -> deny_check is 0). */
         hm_fmt_peer(peer, sizeof(peer), &peer_port, (struct sockaddr *)&ss);
-        if (hm_rl_deny_check(peer)) { close(fd); loop->denied++; continue; }
+        if (hm_rl_deny_check(peer)) { hm_os_close(fd); loop->denied++; continue; }
         c = hm_new_conn(loop, fd, lst);
         memcpy(c->peer, peer, sizeof(c->peer));
         c->peer_port = peer_port;
@@ -2377,7 +2397,7 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
             fprintf(stderr,
                 "Hyperman worker %d: requests=%lu accepts=%lu conns=%d "
                 "bytes_out=%lu backend=%s%s\n",
-                (int)getpid(),
+                hm_os_getpid(),
                 (unsigned long)loop->requests, (unsigned long)loop->accepts,
                 loop->nconns, (unsigned long)loop->bytes_out,
                 loop->be->name, loop->stopping ? " (draining)" : "");
@@ -2463,7 +2483,7 @@ static hm_loop *hm_loop_new(pTHX_ const char *backend_name) {
         backend_name = getenv("HYPERMAN_BACKEND");
     loop->be = hm_backend_create(backend_name);
     if (!loop->be) { free(loop); return NULL; }
-    loop->pid = getpid();
+    loop->pid = hm_os_getpid();
     loop->conns = (hm_conn **)hm_xcalloc(HM_MAXFD, sizeof(hm_conn *));
     loop->io_r  = (hm_iow *)hm_xcalloc(HM_MAXFD, sizeof(hm_iow));
     loop->io_w  = (hm_iow *)hm_xcalloc(HM_MAXFD, sizeof(hm_iow));
@@ -2501,17 +2521,17 @@ static hm_loop *hm_loop_new(pTHX_ const char *backend_name) {
  * disown-in-a-forked-child hang, Punk t/39). kqueue merely hands the child
  * a dead descriptor, which is why macOS never showed it. The copied
  * user-space tables are ours to update; the kernel object is not. */
-#define HM_LOOP_INHERITED(loop) ((loop)->pid != getpid())
+#define HM_LOOP_INHERITED(loop) ((loop)->pid != hm_os_getpid())
 
 static void hm_loop_free(pTHX_ hm_loop *loop) {
     int i;
     int owned;
     if (!loop) return;
-    owned = (loop->pid == getpid());
+    owned = (loop->pid == hm_os_getpid());
     for (i = 0; i < HM_MAXFD; i++) {
         if (loop->conns[i]) {
             hm_conn *c = loop->conns[i];
-            if (owned) close(c->fd);
+            if (owned) hm_os_close(c->fd);
             if (c->h2)     hm_h2_free(aTHX_ c->h2);
             if (c->io_sv)  SvREFCNT_dec(c->io_sv);
             if (c->resp_f) SvREFCNT_dec(c->resp_f);
@@ -2536,7 +2556,7 @@ static void hm_loop_free(pTHX_ hm_loop *loop) {
         if (c->rbuf) free(c->rbuf);
         free(c);
     }
-    if (loop->log_fd >= 0 && owned) { hm_log_flush(loop); close(loop->log_fd); }
+    if (loop->log_fd >= 0 && owned) { hm_log_flush(loop); hm_os_close(loop->log_fd); }
     if (loop->log_buf) free(loop->log_buf);
     for (i = 0; i < loop->nlisteners; i++)
         if (loop->listeners[i].host) free(loop->listeners[i].host);
@@ -2567,10 +2587,15 @@ static void hm_attach_server(pTHX_ hm_loop *loop, SV *app) {
     loop->attached = 1;
     for (i = 0; i < loop->nlisteners; i++)
         loop->be->add_io(loop->be, loop->listeners[i].fd, HM_EV_READ, 0);
+#ifndef _WIN32
+    /* Ignore the default dispositions: these arrive through the backend's
+     * signal watcher instead. Windows has no signal to ignore - the
+     * WSAPoll backend's console handler is the only source there. */
     signal(SIGPIPE, SIG_IGN);
-    signal(SIGTERM, SIG_IGN);      /* delivered through the backend instead */
+    signal(SIGTERM, SIG_IGN);
     signal(SIGINT,  SIG_IGN);
     signal(SIGUSR1, SIG_IGN);
+#endif
     loop->be->add_signal(loop->be, SIGTERM);
     loop->be->add_signal(loop->be, SIGINT);
     loop->be->add_signal(loop->be, SIGUSR1);
@@ -2670,12 +2695,20 @@ static hm_loop *hm_need_loop(void) {
 static int hm_make_listener(const char *host, int port, int reuseport) {
     struct sockaddr_in addr;
     int one = 1;
-    int fd = socket(PF_INET, SOCK_STREAM, 0);
+    int fd = hm_os_socket(PF_INET, SOCK_STREAM, 0);
     if (fd < 0) return -1;
-    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+#ifdef _WIN32
+    /* SO_REUSEADDR on Windows lets a second bind STEAL a live listener,
+     * which is the opposite of the Unix meaning we want here (rebind a
+     * TIME_WAIT port). SO_EXCLUSIVEADDRUSE is the flag that buys what
+     * SO_REUSEADDR buys everywhere else. */
+    hm_os_setsockopt(fd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, &one, sizeof(one));
+#else
+    hm_os_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+#endif
 #ifdef SO_REUSEPORT
     if (reuseport)
-        setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &one, sizeof(one));
+        hm_os_setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &one, sizeof(one));
 #else
     (void)reuseport;
 #endif
@@ -2684,11 +2717,23 @@ static int hm_make_listener(const char *host, int port, int reuseport) {
     addr.sin_port   = htons((unsigned short)port);
     addr.sin_addr.s_addr = inet_addr(host);
     if (addr.sin_addr.s_addr == INADDR_NONE) addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) { close(fd); return -1; }
-    if (listen(fd, SOMAXCONN) < 0) { close(fd); return -1; }
+    if (hm_os_bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        hm_os_close(fd); return -1;
+    }
+    if (hm_os_listen(fd, SOMAXCONN) < 0) { hm_os_close(fd); return -1; }
     hm_set_nonblock(fd);
     return fd;
 }
+
+/* ---- the supervisor half: POSIX only --------------------------------------
+ * Everything from here to the end of hm_run_server's pool branch needs
+ * fork(2), waitpid(2) and POSIX signal delivery. Windows has none of the
+ * three, and perl's fork emulation is ithreads - N interpreters inside ONE
+ * process, sharing the file-scope state this server keeps per process - so
+ * a pool there would corrupt, not scale. Windows runs the single-worker
+ * in-process path instead (hm_run_server, above the pool branch), and an
+ * explicit workers > 1 is refused at boot. */
+#ifndef _WIN32
 
 /* Supervisor signal flags: TERM/INT = shut the pool down, HUP/USR2 =
  * recycle workers with zero downtime, USR1 = stats dump. */
@@ -2701,6 +2746,9 @@ static void hm_sup_sig(int sig) {
     else if (sig == SIGCHLD)             ;   /* no-op: just wakes sigsuspend() */
     else                                 hm_sup_term = 1;
 }
+
+#endif /* !_WIN32 - the rest of this section is shared; hm_spawn and the
+        * pool branch of hm_run_server re-open the guard below */
 
 /* One listener as configured by run(): its bind address, optional TLS, h2,
  * and https-redirect target. The bound fd and built SSL_CTX are filled in by
@@ -2900,6 +2948,7 @@ static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
     hm_loop_free(aTHX_ loop);
 }
 
+#ifndef _WIN32
 /* Fork one worker. With reuseport each worker binds its own listeners; with
  * affinity (Linux) worker widx is pinned to core widx % ncpu. */
 static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
@@ -2953,6 +3002,7 @@ static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
     }
     return pid;
 }
+#endif /* !_WIN32 */
 
 /* The full server: validate + bind, then either run in-process (1 worker)
  * or supervise a pool (respawn with backoff, HUP/USR2 recycle, USR1 stats,
@@ -2962,10 +3012,8 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
 
     if (!hm_empty_input)
         hm_empty_input = hm_new_input(aTHX_ "", 0);   /* inherited by workers */
-    if (workers < 1) {                     /* default: one per CPU */
-        long n = sysconf(_SC_NPROCESSORS_ONLN);
-        workers = n > 0 ? (int)n : 1;
-    }
+    if (workers < 1)                       /* default: one per CPU */
+        workers = hm_os_ncpu();               /* always 1 on Windows */
     cfg->nworkers = workers;
 
     /* The abuse-control arena, mapped HERE - before any worker forks - so
@@ -3013,7 +3061,7 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
     /* Open the access-log file once in the parent so all workers share (and
      * O_APPEND to) the same fd - whole-line writes stay atomic between them. */
     if (cfg->log_path && cfg->log_fd < 0) {
-        cfg->log_fd = open(cfg->log_path,
+        cfg->log_fd = hm_os_open_file(cfg->log_path,
                            O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0644);
         if (cfg->log_fd < 0)
             croak("Hyperman: open access_log '%s': %s",
@@ -3027,7 +3075,7 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
             s->fd = hm_make_listener(s->host, s->port, cfg->reuseport);
             if (s->fd < 0)
                 croak("Hyperman: bind %s:%d: %s", s->host, s->port, strerror(errno));
-            if (cfg->reuseport) { close(s->fd); s->fd = -1; }  /* probe only */
+            if (cfg->reuseport) { hm_os_close(s->fd); s->fd = -1; }  /* probe only */
         }
     }
 
@@ -3048,6 +3096,12 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
         return;
     }
 
+#ifdef _WIN32
+    /* Not a silent downgrade: an application sized for a pool is told, at
+     * boot, in the log it already reads. */
+    croak("Hyperman: a worker pool needs fork(2); Windows runs a single "
+          "worker (workers => 1).");
+#else
     {
         int i;
         int backoff = 0;
@@ -3196,6 +3250,7 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
             sigprocmask(SIG_SETMASK, &orig, NULL);
         }
     }
+#endif /* !_WIN32 */
 }
 
 /* loop object <-> pointer */

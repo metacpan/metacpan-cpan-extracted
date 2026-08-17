@@ -19,7 +19,7 @@ name: Filename-KeyValue
 provides:
   Filename::KeyValue:
     file: lib/Filename/KeyValue.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Exporter: '5.57'
   URI::Escape: '0'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-KeyValue
   homepage: https://metacpan.org/release/Filename-KeyValue
   repository: git://github.com/perlancar/perl-Filename-KeyValue.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.042000'
@@ -493,6 +493,8 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.036'
 x_authority: cpan:PERLANCAR
+x_contributors:
+  - 'perlancar <perlancar@gmail.com>'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

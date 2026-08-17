@@ -3,7 +3,7 @@
 
 requires "Carp" => "1.35";
 requires "DBI" => "1.643";
-requires "Data::Identifier" => "v0.28.0";
+requires "Data::Identifier" => "v0.36.0";
 requires "Data::URIID" => "v0.20.0";
 requires "Encode" => "3.06";
 requires "File::ValueFile::Simple::Reader" => "v0.10.0";

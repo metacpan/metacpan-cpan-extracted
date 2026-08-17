@@ -8,7 +8,7 @@ requires 'Dist::Zilla::Plugin::Docker::API', '0.103';
 requires 'Dist::Zilla::Plugin::Authority', '1.006';
 requires 'Dist::Zilla::Plugin::Deprecated', '0.007';
 requires 'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch', '0.014';
-requires 'Dist::Zilla::Plugin::GitHub::CreateRelease', '0.0008';
+requires 'Dist::Zilla::Plugin::GitHub::CreateRelease', '0.0012';
 requires 'Dist::Zilla::Plugin::GithubMeta', '0.58';
 requires 'Dist::Zilla::Plugin::InstallRelease', '0.008';
 requires 'Dist::Zilla::Plugin::MakeMaker::Awesome', '0.49';

@@ -15,6 +15,9 @@ my $dir    = File::Temp::tempdir(CLEANUP => 1);
 my $logfile = "$dir/access.log";
 my $errfile = "$dir/stderr.log";
 my ($port) = free_ports(1);
+plan skip_all => 'the worker pool and fork tests need fork(2); Windows runs a single worker'
+    if $^O eq 'MSWin32';
+
 plan skip_all => 'no free loopback port' unless $port;
 
 # Everything below reads worker pids out of response bodies. Against someone

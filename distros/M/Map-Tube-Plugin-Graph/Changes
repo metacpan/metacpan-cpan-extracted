@@ -1,7 +1,11 @@
 Revision history for module Map::Tube::Plugin::Graph
 
-1.1.1   2026-07-31
-        This release entirely belongs to @GWS.
+1.1.2   2026-08-16
+        Patch produced by @GWS.
+        - No functional hanges
+        - Another attempt at preventing spurious test failures.
+
+1.1.1   2026-07-26
         - No functional hanges
         - Augmented tests
         - Sped up tests

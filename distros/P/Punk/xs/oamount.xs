@@ -115,7 +115,7 @@ compile(self, app, resolve)
             argv[0] = sv_2mortal(newSVpvs("spec"));
             argv[1] = poa_get(aTHX_ h, "spec");
             if (!argv[1]) argv[1] = &PL_sv_undef;
-            eval_pv("require Open::API;", TRUE);
+            (void)pk_require_once(aTHX_ "Open::API", TRUE);
             api = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs("Open::API")), "new",
                                 argv, 2, 1);
             if (!api) croak("Punk: Open::API->new returned nothing");

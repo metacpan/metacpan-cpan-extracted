@@ -31,13 +31,13 @@ my %WriteMakefileArgs = (
     "Mojolicious" => "9.46",
     "Mojolicious::Plugin::Fondation" => "0.07",
     "Mojolicious::Plugin::Fondation::MigrationDBIx" => "0.05",
-    "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.05",
+    "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.06",
     "Mojolicious::Plugin::Fondation::Problem" => "0.03"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.302190"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,7 @@ my %FallbackPrereqs = (
   "Mojolicious" => "9.46",
   "Mojolicious::Plugin::Fondation" => "0.07",
   "Mojolicious::Plugin::Fondation::MigrationDBIx" => "0.05",
-  "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.05",
+  "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.06",
   "Mojolicious::Plugin::Fondation::Problem" => "0.03",
   "Test::More" => "1.302190"
 );

@@ -42,6 +42,7 @@ OSSL_PROVIDER *deflt    = NULL;
 #define CONST_ASN1_OBJECT ASN1_OBJECT
 #define CONST_ASN1_OCTET_STRING ASN1_OCTET_STRING
 #define CONST_VOID void
+#define ASN1_STRING_get0_data(x) ((const unsigned char *)ASN1_STRING_data(x))
 #else
 #define CONST_PKCS8_PRIV_KEY_INFO const PKCS8_PRIV_KEY_INFO
 #define CONST_X509_ALGOR const X509_ALGOR
@@ -62,7 +63,7 @@ int dump_certs_pkeys_bags(pTHX_ BIO *out, CONST_STACK_OF(PKCS12_SAFEBAG) *bags,
 static int alg_print(pTHX_ BIO *bio, CONST_X509_ALGOR *alg, HV* hash);
 void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **value);
 int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst, const char *name, HV *hash);
-void hex_prin(BIO *out, unsigned char *buf, int len);
+void hex_prin(BIO *out, const unsigned char *buf, int len);
 void dump_cert_text(BIO *out, X509 *x);
 SV * get_cert_subject_name(pTHX_ X509 *x);
 SV * get_cert_issuer_name(pTHX_ X509 *x);
@@ -631,7 +632,7 @@ SV * get_cert_issuer_name(pTHX_ X509 *x)
   return sv;
 }
 
-void get_hex(char *out, unsigned char *buf, int len)
+void get_hex(char *out, const unsigned char *buf, int len)
 {
   int i;
   for (i = 0; i < len; i++) {
@@ -643,7 +644,7 @@ void get_hex(char *out, unsigned char *buf, int len)
   *out = '\0';
 }
 
-void hex_prin(BIO *out, unsigned char *buf, int len)
+void hex_prin(BIO *out, const unsigned char *buf, int len)
 {
   int i;
   for (i = 0; i < len; i++)
@@ -662,10 +663,10 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
   */
   switch (av->type) {
   case V_ASN1_BMPSTRING:
-    length = av->value.bmpstring->length;
+    length = ASN1_STRING_length(av->value.bmpstring);
     if (length < 0 || length > (INT_MAX - 1))
       croak("BMPSTRING attribute length out of range (got %d)", length);
-    value = OPENSSL_uni2asc(av->value.bmpstring->data, length);
+    value = OPENSSL_uni2asc(ASN1_STRING_get0_data(av->value.bmpstring), length);
     /* Defensive: OPENSSL_uni2asc returns NULL on allocation failure, and on
        an odd-length BMPSTRING. Guard before either branch dereferences it:
        the else branch below passes value to BIO_printf. */
@@ -690,41 +691,41 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
     break;
 
   case V_ASN1_UTF8STRING:
-    length = av->value.utf8string->length;
+    length = ASN1_STRING_length(av->value.utf8string);
     if(*attribute != NULL) {
       if (length < 0 || length > (INT_MAX - 1))
         croak("UTF8STRING attribute length out of range (got %d)", length);
       Renew(*attribute, (size_t)length + 1, char);
       if (length)
-        memcpy(*attribute, av->value.utf8string->data, (size_t)length);
+        memcpy(*attribute, ASN1_STRING_get0_data(av->value.utf8string), (size_t)length);
       (*attribute)[length] = '\0';
     } else {
-      BIO_printf(out, "%.*s\n", length, av->value.utf8string->data);
+      BIO_printf(out, "%.*s\n", length, (const char *)ASN1_STRING_get0_data(av->value.utf8string));
     }
     break;
 
   case V_ASN1_OCTET_STRING:
-    length = av->value.octet_string->length;
+    length = ASN1_STRING_length(av->value.octet_string);
     if(*attribute != NULL) {
       if (length < 0 || length > INT_MAX / 4)
         croak("OCTET STRING attribute length out of range (got %d)", length);
       Renew(*attribute, (size_t)length * 4 + 1, char);
-      get_hex(*attribute, av->value.octet_string->data, length);
+      get_hex(*attribute, ASN1_STRING_get0_data(av->value.octet_string), length);
     } else {
-      hex_prin(out, av->value.octet_string->data, length);
+      hex_prin(out, ASN1_STRING_get0_data(av->value.octet_string), length);
       BIO_printf(out, "\n");
     }
     break;
 
   case V_ASN1_BIT_STRING:
-    length = av->value.bit_string->length;
+    length = ASN1_STRING_length(av->value.bit_string);
     if(*attribute != NULL) {
       if (length < 0 || length > INT_MAX / 4)
         croak("BIT STRING attribute length out of range (got %d)", length);
       Renew(*attribute, (size_t)length * 4 + 1, char);
-      get_hex(*attribute, av->value.bit_string->data, length);
+      get_hex(*attribute, ASN1_STRING_get0_data(av->value.bit_string), length);
     } else {
-      hex_prin(out, av->value.bit_string->data, length);
+      hex_prin(out, ASN1_STRING_get0_data(av->value.bit_string), length);
       BIO_printf(out, "\n");
     }
     break;
@@ -761,7 +762,7 @@ int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst,
                   const char *name, HV * hash)
 {
   X509_ATTRIBUTE *attr;
-  ASN1_TYPE *av;
+  CONST_ASN1_TYPE *av;
   int i, j, attr_nid;
   AV * bags_av = newAV();
   if (!attrlst) {
@@ -788,7 +789,7 @@ int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst,
 
   HV * bag_hv = newHV();
   for (i = 0; i < sk_X509_ATTRIBUTE_num(attrlst); i++) {
-    ASN1_OBJECT *attr_obj;
+    CONST_ASN1_OBJECT *attr_obj;
     attr = sk_X509_ATTRIBUTE_value(attrlst, i);
     attr_obj = X509_ATTRIBUTE_get0_object(attr);
     attr_nid = OBJ_obj2nid(attr_obj);
@@ -821,24 +822,25 @@ int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst,
             attribute_id = OBJ_nid2ln(attr_nid);
             if (attribute_id) {
               if((hv_store(bag_hv, attribute_id, strlen(attribute_id), newSVpvn(attribute_value, strlen(attribute_value)), 0)) == NULL)
-                croak("unable to add MAC to the hash");
+                croak("unable to store attribute in hash");
             }
           } else {
             BIO *attr_bio;
-            BUF_MEM* bptr;
+            char *attr_key = NULL;
+            long attr_key_len;
 
             CHECK_OPEN_SSL(attr_bio = BIO_new(BIO_s_mem()));
             i2a_ASN1_OBJECT(attr_bio, attr_obj);
 
             CHECK_OPEN_SSL(BIO_flush(attr_bio) == 1);
-            BIO_get_mem_ptr(attr_bio, &bptr);
+            attr_key_len = BIO_get_mem_data(attr_bio, &attr_key);
 
-            if (bptr->length > 0) {
-              if((hv_store(bag_hv,  bptr->data, bptr->length, newSVpvn(attribute_value, strlen(attribute_value)), 0)) == NULL)
-                croak("unable to add MAC to the hash");
+            if (attr_key_len > 0) {
+              if((hv_store(bag_hv, attr_key, (I32)attr_key_len, newSVpvn(attribute_value, strlen(attribute_value)), 0)) == NULL)
+                croak("unable to store attribute in hash");
             }
 
-            CHECK_OPEN_SSL(BIO_set_close(attr_bio, BIO_CLOSE) == 1);
+            (void)BIO_set_close(attr_bio, BIO_CLOSE);
             BIO_free(attr_bio);
           }
           Safefree(attribute_value);
@@ -1204,7 +1206,11 @@ changepass(pkcs12, oldpwd = &PL_sv_undef, newpwd = &PL_sv_undef)
   }
 
   if (!(PKCS12_newpass(pkcs12, oldpwd_str, newpwd_str))) {
-    warn("PKCS12_newpass failed: %s", ssl_error(aTHX));
+    warn("PKCS12_newpass failed: %s\n"
+         "Note: PKCS12_newpass() cannot change the password on PBES2-encrypted "
+         "PKCS12 files, which OpenSSL 3.x/4.x use by default for newly created "
+         "files. This is a known upstream OpenSSL limitation, not specific to "
+         "this module: https://github.com/openssl/openssl/issues/19092\n", ssl_error(aTHX));
     RETVAL = &PL_sv_no;
   } else {
     RETVAL = &PL_sv_yes;

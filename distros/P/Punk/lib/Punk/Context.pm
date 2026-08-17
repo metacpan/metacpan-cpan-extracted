@@ -7,7 +7,7 @@ use Punk::Request;
 use Punk::Response;
 use Punk ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 1;
 
@@ -127,6 +127,42 @@ See L<Punk::Views>.
 
 Finished responses. Status and headers previously set through
 L</status> and L</header> are folded in.
+
+=head2 send_file($source, %options)
+
+    get '/invoice/:id' => sub {
+        my $c = shift;
+        return $c->send_file("/var/store/$id.pdf",
+            filename => "invoice-$id.pdf");
+    };
+
+    # bytes already in memory (a generated document)
+    return $c->send_file(\$pdf_bytes, type => 'application/pdf');
+
+A finished download response, returned by the handler like any other.
+The source is a file path or a reference to a scalar of bytes. The whole
+download story is handled here: C<ETag> (strong, from mtime and size) and
+C<Last-Modified> with C<304> answers to C<If-None-Match> /
+C<If-Modified-Since>; a single byte C<Range> served as C<206> with
+C<Content-Range> (C<416> when unsatisfiable, and a multi-range or
+malformed header is legally answered with the full C<200>); C<If-Range>
+honoured on an exact validator match; C<HEAD> answered with the real
+headers and no body. Headers previously set through L</header> are
+folded in. Ranged file bodies ride L<Punk::SendFile::Reader>, so no more
+than 64KB of the file is in memory at once; a full-file body is a plain
+filehandle the server streams.
+
+Options: C<type> (Content-Type; otherwise inferred from the path or
+C<filename> extension, else C<application/octet-stream>), C<filename>
+(sets C<Content-Disposition: attachment> with the name, RFC 5987-encoded
+when it is not ASCII), C<inline> (disposition C<inline> instead),
+C<ranges =E<gt> 0> (ignore C<Range> and stop advertising
+C<Accept-Ranges>), C<mtime> / C<etag> (override the validators; C<mtime>
+is what gives a scalar source one), and C<missing =E<gt> 'not_found'>
+(answer the house 404 for an unreadable path instead of croaking).
+
+The path is served as given - if any part of it came from the request,
+the traversal guard is yours.
 
 =head2 respond_to(%format_handlers)
 

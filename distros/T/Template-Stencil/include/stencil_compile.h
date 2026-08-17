@@ -43,6 +43,7 @@ enum {
     STENCIL_FILT_HTML,
     STENCIL_FILT_URI,
     STENCIL_FILT_DEFAULT,
+    STENCIL_FILT_FMT,       /* sprintf, one conversion, validated at parse */
     STENCIL_FILT_USER = -1  /* engine-registered coderef, linked later */
 };
 
