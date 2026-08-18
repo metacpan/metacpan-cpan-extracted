@@ -1,0 +1,82 @@
+======================================================================
+ TUI::Handy Cheat Sheet                                  [KO] 한국어
+======================================================================
+
+[ 1. 설치 및 불러오기 ]
+
+  CPAN 의존성이 없습니다. Handy.pm을 @INC 안의 아무 디렉터리에 복사하거나 스크립트로 직접 실행하세요.
+
+  use TUI::Handy;
+  # or, as a command:  perl Handy.pm form.txt
+
+[ 2. 폼 생성과 실행 ]
+
+  DSL 문자열이나 파일로 폼을 만들고 run()을 호출합니다. 결과는 DSL의 라벨을 키로 하는 해시 참조입니다.
+
+  my $tui  = TUI::Handy->new(dsl => $text);   # or new(file => $path)
+  my $form = $tui->run;
+  print "Company = $form->{Company}\n";
+
+[ 3. 텍스트박스 기호 ]
+
+  [ ] 안의 채움 문자로 텍스트박스 종류를 정합니다: _는 반각, #는 숫자, $ 또는 \는 통화, YYYYMMDD 또는 %는 날짜, 전각 문자는 zenkaku 형식입니다.
+
+  Company: [__________]
+  Age:     [###]
+  Price:   [$$$$$$]
+  Date:    [YYYYMMDD]
+
+[ 4. 체크박스와 라디오버튼 ]
+
+  [X]/[ ]는 체크박스(값 1 또는 0)이고, (*)/( )는 바로 앞 제목 줄을 기준으로 그룹화되는 라디오버튼으로 선택된 라벨 텍스트가 값이 됩니다.
+
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+
+[ 5. 버튼 ]
+
+  라벨 텍스트 없이 대괄호만 있으면 버튼입니다. set()으로 동작을 등록하세요.
+
+  $tui->set('Register', sub { my $form = shift; save($form); 0 });
+  [Register]
+
+[ 6. 키 조작 ]
+
+  TAB/아래 화살표로 다음 필드, Shift-TAB/위 화살표로 이전 필드로 이동합니다. Enter, Space, 화살표 키로 편집하거나 버튼을 실행하며 ESC로 폼을 중단합니다.
+
+[ 7. 문자 인코딩 ]
+
+  Windows가 아닌 시스템에서는 UTF-8, Windows에서는 Shift_JIS(CP932)를 자동 판별합니다. EUC-JP도 지원됩니다. TUI_HANDY_ENCODING으로 재정의할 수 있습니다.
+
+  $ENV{TUI_HANDY_ENCODING} = 'euc';   # utf8 / sjis / euc
+
+[ 8. 라인 모드 대체 ]
+
+  stty를 사용할 수 없는 환경(순수 Windows cmd.exe)에서는 자동으로 라인 모드로 전환됩니다. TUI_HANDY_MODE로 강제 지정할 수 있습니다.
+
+  $ENV{TUI_HANDY_MODE} = 'line';      # ansi / line
+
+[ 9. 명령줄 사용법 ]
+
+  Perl 코드를 작성하지 않고 DSL 파일을 직접 실행할 수 있습니다.
+
+  perl Handy.pm form.txt
+
+[ 10. 전체 예제 ]
+
+  모든 위젯 종류를 조합한 간단한 DSL 예제입니다.
+
+  Registration
+  Company: [__________]
+  Age:     [###]
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+  [Register]
+
+[ 11. 참고 자료 ]
+
+  전체 문서는 lib/TUI/Handy.pm의 POD에 있습니다(perldoc TUI::Handy). 저자: INABA Hitoshi <ina.cpan@gmail.com>. 라이선스: Perl 본체와 동일합니다.

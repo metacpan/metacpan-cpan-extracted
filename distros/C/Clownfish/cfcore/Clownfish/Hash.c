@@ -50,7 +50,7 @@ static CFISH_INLINE HashEntry*
 SI_rebuild_hash(Hash *self);
 
 void
-Hash_init_class() {
+Hash_init_class(void) {
     String *tombstone = Str_newf("[HASHTOMBSTONE]");
     if (!Atomic_cas_ptr((void**)&TOMBSTONE, NULL, tombstone)) {
         DECREF(tombstone);
@@ -322,7 +322,7 @@ SI_rebuild_hash(Hash *self) {
 }
 
 String*
-Hash_get_tombstone() {
+Hash_get_tombstone(void) {
     return TOMBSTONE;
 }
 

@@ -20,6 +20,7 @@ t/07-headers.t
 t/08-stream-error.t
 t/09-upgrade-errors.t
 t/10-hyperman.t
+t/11-request-line.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

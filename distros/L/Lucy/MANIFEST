@@ -738,6 +738,7 @@ lib/LucyX/Search/MockMatcher.pm
 lib/LucyX/Search/ProximityQuery.pm
 lib/LucyX/Search/ProximityQuery.pod
 LICENSE
+Makefile.local
 MANIFEST			This list of files
 modules/analysis/snowstem/devel/update_snowstem.pl
 modules/analysis/snowstem/source/include/libstemmer.h

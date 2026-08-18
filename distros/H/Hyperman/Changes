@@ -1,5 +1,30 @@
 Revision history for Hyperman
 
+0.25    2026-08-17
+        - Response compression: `compress => 1` on run() gzips responses
+          on the way out (needs the zlib build; Hyperman->has_compression
+          reports it, and without zlib the option is accepted and inert).
+        - Hyperman NEVER touches a response that already carries a
+          Content-Encoding. That one rule is the whole contract with
+          whatever sits above: a framework serving precompressed .gz
+          files sets `gzip` and its bytes go out untouched; a route that
+          wants no compression sets `identity`, which is honoured and
+          stripped. A plain response header, so any PSGI framework can
+          use it.
+        - Compression is OFF by default, under run() and under
+          Plack::Handler::Hyperman alike, and both take the same
+          options. Nobody's server starts compressing because they
+          upgraded: whether the CPU is worth paying depends on whether
+          bandwidth or the processor limits the deployment, which only
+          its operator knows.
+        - New run() options: compress, compress_min_length (default
+          1400, one MTU), compress_level. Plack::Handler::Hyperman
+          passes all three through, so `plackup -s Hyperman
+          --compress 1` is the same server.
+
+0.24    2026-08-17
+	- More windows fixes
+
 0.23    2026-08-16
         - Hyperman attempt to build and serve on native Windows with no 
           behaviour change on any platform it already ran on

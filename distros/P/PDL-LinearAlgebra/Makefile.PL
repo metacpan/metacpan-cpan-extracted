@@ -1,9 +1,38 @@
 use ExtUtils::MakeMaker;
+use strict;
+use warnings;
 use Config;
 use Devel::CheckLib qw(check_lib check_lib_or_exit);
 use ExtUtils::F77;
 use PDL::Core::Dev;
+use Text::ParseWords qw(shellwords);
 
+my $f77_uscore = (ExtUtils::F77->trail_ ? '_' : '');
+our $inc = "-DF77_USCORE=$f77_uscore";
+my $fortran_checklib = <<EOF;
+/* The first line must not be a preprocessor macro or Devel::CheckLib will fail
+   because Devel::Checklib places this code on one line: main() { <code> }  */
+#define F77_USCORE $f77_uscore
+#define CONCAT_(A, B) A ## B
+#define CONCAT(A, B) CONCAT_(A, B)
+#define FORTRAN(name) CONCAT(name, F77_USCORE)
+
+/* dggsvd3 is LAPACK 3.7+ which in 2026 is not supported on macOS native */
+extern void FORTRAN(dggsvd3)(
+  char *jobu, char *jobv, char *jobq, long *m, long *n, long *p,
+  long *k, long *l, double *a, long *lda, double *b, long *ldb, double *alpha,
+  double *beta, double *u, long *ldu, double *v, long *ldv,
+  double *q, long *ldq, double *work, long *lwork, long *iwork, long *info);
+char n = 'N';
+long c_zero = 0, out_k=0, out_l=0, c_one = 1, c_m1 = -1, iwork[1], info;
+double A[]={0}, B[]={0}, alpha[1], beta[1], U[1], Q[1], work[1];
+/* argc is to try to stop optimiser eliminating */
+if (argc < 2) FORTRAN(dggsvd3)(&n, &n, &n, &c_zero, &c_zero, &c_zero,
+  &out_k, &out_l, A, &c_one, B, &c_one, alpha,
+  beta, U, &c_one, NULL, &c_one,
+  NULL, &c_one, work, &c_m1, iwork, &info);
+return 0;
+EOF
 our %ldloadlibs = ($^O =~ /MSWin/ && $Config{cc} eq 'cl')
   ? (LDLOADLIBS => 'oldnames.lib kernel32.lib user32.lib gdi32.lib winspool.lib  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib  netapi32.lib uuid.lib wsock32.lib mpr.lib winmm.lib  version.lib odbc32.lib odbccp32.lib msvcrt.lib  ../lapack/libacml.lib "C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\lib\msvcrt.lib" ')
   : ();
@@ -16,31 +45,16 @@ our $libs0 = (
   `pkg-config @pkgs --libs` ||
   '-L/usr/lib/atlas -llapack -lblas -latlas'
 ) . ' ' . ExtUtils::F77->runtime;
-our $inc = '-DF77_USCORE='. (ExtUtils::F77->trail_ ? '_' : '');
 {
   # work around Devel::CheckLib not doing Text::ParseWords::shellwords
-  use Text::ParseWords qw(shellwords);
   my @libpath = grep -d, map {my $r=$_;$r=~s/^-L//?$r:()} my @sw = shellwords $libs0;
   my @lib = grep check_lib(lib=>$_), map {my $r=$_;$r=~s/^-l//?$r:()} @sw;
   $libs0 = join ' ', (map qq{-L"$_"}, @libpath), (map "-l$_", @lib);
-  my $f77_uscore = (ExtUtils::F77->trail_ ? '_' : '');
   check_lib_or_exit(
     ldflags => $libs0,
+    lib => 'm', # "dummy" because assert_lib wants a lib
     header => [($^O =~ /MSWin/ ? 'float.h' : ()), qw(stdio.h math.h)],
-    function => <<EOF,
-
-#define F77_USCORE $f77_uscore
-#define CONCAT_(A, B) A ## B
-#define CONCAT(A, B) CONCAT_(A, B)
-#define FORTRAN(name) CONCAT(name, F77_USCORE)
-
-long c_zero = 0;
-long c_nine = 9;
-extern long FORTRAN(ilaenv)(long *ispec, char *name__, char *opts, long *n1,
-  long *n2, long *n3, long *n4, long name_len, long opts_len);
-long i = FORTRAN(ilaenv)(&c_nine, "SGESDD", " ", &c_zero, &c_zero, &c_zero, &c_zero, 6, 1);
-if (argc > 2) printf("%ld", i); /* try to stop optimiser eliminating */
-EOF
+    function => $fortran_checklib,
   );
 }
 
@@ -57,6 +71,7 @@ WriteMakefile(
   MIN_PERL_VERSION => '5.016',
   META_MERGE => {
     "meta-spec" => { version => 2 },
+    dynamic_config => 0,
     resources => {
       homepage => 'http://pdl.perl.org/',
       bugtracker  => {web=>"https://github.com/$repo/issues"},
@@ -69,12 +84,12 @@ WriteMakefile(
     },
   },
   CONFIGURE_REQUIRES =>  {
-    "PDL" => '2.104',
-    "Devel::CheckLib" => 0,
+    "PDL" => '2.105',
+    "Devel::CheckLib" => '1.16', # argc is not supplied in 1.05, but 1.16 works.
     "ExtUtils::F77" => '1.26',
   },
   PREREQ_PM => {
-    "PDL" => '2.104', # tritosym moved over
+    "PDL" => '2.105', # pdldoc_add
   },
   TEST_REQUIRES =>  {
     "Test::More" => '0.88', # done_testing
@@ -107,10 +122,13 @@ sub find_libs {
 
 sub find_macos_libs {
   return if $^O ne 'darwin';
-  my $pref = `brew --prefix lapack`;
-  return if !$pref;
-  chomp $pref;
-  qq{-L"$pref/lib" -llapack -lblas};
+  for my $pkg (qw(openblas lapack)) {
+    my $pref = `brew --prefix $pkg`;
+    chomp $pref;
+    next if !$pref or !-d $pref; # --prefix is where is *or would be* installed
+    return qq{-L"$pref/lib" -llapack -lblas};
+  }
+  ();
 }
 
 my @pd_srcs;
@@ -121,8 +139,4 @@ sub MY::init_PM {
   delete $self->{PM}{'pp_defc.pl'};
   @pd_srcs = ::pdlpp_eumm_update_deep($self);
 }
-sub MY::postamble {
-  my $oneliner = PDL::Core::Dev::_oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(shift); }});
-  pdlpp_postamble(@pd_srcs) .
-    qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
-}
+sub MY::postamble { pdlpp_postamble(@pd_srcs) . pdldoc_add() }

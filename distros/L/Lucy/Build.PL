@@ -45,25 +45,24 @@ else {
 my $builder = Lucy::Build->new(
     module_name => 'Lucy',
     license     => 'apache',
-    dist_author =>
-        'The Apache Lucy Project <dev at lucy dot apache dot org>',
-    dist_version       => '0.6.2',
+    dist_author => 'Lucy search project',
+    dist_version       => '0.7.0',
     requires           => {
         'perl'      => '5.8.3',
-        'Clownfish' => 0.006002,
+        'Clownfish' => 0.007000,
     },
     configure_requires => {
         'Module::Build'               => 0.280801,
-        'Clownfish'                   => 0.006002,
-        'Clownfish::CFC::Perl::Build' => 0.006002,
+        'Clownfish'                   => 0.007000,
+        'Clownfish::CFC::Perl::Build' => 0.007000,
     },
     build_requires     => {
         'Module::Build'      => 0.280801,
         'ExtUtils::CBuilder' => 0.21,
         'ExtUtils::ParseXS'  => 3.00,
         'Devel::PPPort'      => 3.14,
-        'Clownfish'          => 0.006002,
-        'Clownfish::CFC'     => 0.006002,
+        'Clownfish'          => 0.007000,
+        'Clownfish::CFC'     => 0.007000,
     },
     no_index => {
         directory => [qw( buildlib devel sample )],
@@ -72,9 +71,9 @@ my $builder = Lucy::Build->new(
     meta_merge => { keywords => [qw( search lucy lucene )], },
     meta_add   => {
         resources => {
-            homepage   => 'http://lucy.apache.org',
-            repository => 'https://git-wip-us.apache.org/repos/asf/lucy.git',
-            bugtracker => 'https://issues.apache.org/jira/browse/LUCY',
+            homepage   => 'https://github.com/lucysearch/lucy',
+            repository => 'https://github.com/lucysearch/lucy.git',
+            bugtracker => 'https://github.com/lucysearch/lucy/issues',
         },
     },
     include_dirs => [ $CORE_SOURCE_DIR ],

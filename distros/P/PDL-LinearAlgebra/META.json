@@ -3,7 +3,7 @@
    "author" : [
       "GrÃ©gory Vanuxem <ellipse@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -27,14 +27,14 @@
       },
       "configure" : {
          "requires" : {
-            "Devel::CheckLib" : "0",
+            "Devel::CheckLib" : "1.16",
             "ExtUtils::F77" : "1.26",
-            "PDL" : "2.104"
+            "PDL" : "2.105"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.104",
+            "PDL" : "2.105",
             "perl" : "5.016"
          }
       },
@@ -57,6 +57,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.436",
+   "version" : "0.437",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

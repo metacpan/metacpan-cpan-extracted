@@ -117,7 +117,7 @@ CFCPyClass_singleton(const char *class_name) {
 }
 
 CFCPyClass**
-CFCPyClass_registry() {
+CFCPyClass_registry(void) {
     if (!registry) {
         registry = (CFCPyClass**)CALLOCATE(1, sizeof(CFCPyClass*));
     }

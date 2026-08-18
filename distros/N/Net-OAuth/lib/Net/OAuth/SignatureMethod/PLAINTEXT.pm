@@ -1,6 +1,9 @@
 package Net::OAuth::SignatureMethod::PLAINTEXT;
+
 use warnings;
 use strict;
+
+use base 'Net::OAuth::SignatureMethod';
 
 sub sign {
     my $self = shift;
@@ -11,7 +14,7 @@ sub sign {
 sub verify {
     my $self = shift;
     my $request = shift;
-    return $request->signature eq $self->sign($request);
+    return $self->secure_compare( $request->signature, $self->sign($request) );
 }
 
 =head1 NAME
@@ -30,7 +33,7 @@ Currently maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2012, 2024-2025 Keith Grennan
+Copyright 2007-2012, 2024-2026 Keith Grennan
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

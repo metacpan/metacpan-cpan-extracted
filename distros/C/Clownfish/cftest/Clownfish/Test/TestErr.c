@@ -27,7 +27,7 @@
 #include "Clownfish/Class.h"
 
 TestErr*
-TestErr_new() {
+TestErr_new(void) {
     return (TestErr*)Class_Make_Obj(TESTERR);
 }
 

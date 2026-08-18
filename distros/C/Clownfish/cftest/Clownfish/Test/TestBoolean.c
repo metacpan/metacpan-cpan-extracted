@@ -27,7 +27,7 @@
 #include "Clownfish/Class.h"
 
 TestBoolean*
-TestBoolean_new() {
+TestBoolean_new(void) {
     return (TestBoolean*)Class_Make_Obj(TESTBOOLEAN);
 }
 

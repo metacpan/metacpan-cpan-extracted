@@ -1,4 +1,4 @@
-# Writing Apache Clownfish classes
+# Writing Clownfish classes
 
 ## Parcels
 
@@ -28,7 +28,7 @@ An example `.cfp` file might look like:
         "nickname": "Pfind",
         "version": "v2.3.8",
         "prerequisites": {
-            "Clownfish": "v0.6.4"
+            "Clownfish": "v0.7.0"
         }
     }
 

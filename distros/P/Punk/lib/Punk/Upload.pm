@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.14';
+our $VERSION = '0.17';
 
 1;
 
@@ -62,9 +62,38 @@ The uploaded bytes.
 
 Write the bytes to C<$path>. Croaks if it cannot open the file.
 
+Note what this is not: the bytes were already resident before the handler
+ran, so this is a write, not a stream. C<< ->save >> does not reduce the
+memory an upload costs; it only puts a copy on disk.
+
+=head1 SIZE, HONESTLY
+
+An upload arrives whole, in memory, twice over - once in the server's read
+buffer and again as the decoded part - before a handler sees it. So:
+
+=over 4
+
+=item * the practical maximum is the server's request ceiling, which for
+L<Hyperman> is C<max_body> and defaults to B<16MB>
+
+=item * raising that ceiling raises a worker's worst-case resident size in
+proportion: roughly C<workers x max_body x concurrent uploads per worker>
+
+=item * L<Punk/max_body> does B<not> help here. It refuses an oversize
+request after the bytes have arrived, which saves the parse and the
+handler but not the memory
+
+=back
+
+For genuinely large uploads, terminate them at a proxy or hand the client a
+pre-signed direct-to-storage URL and take only the resulting key. Raising a
+server ceiling to a gigabyte to accept gigabyte uploads does work, and
+costs a gigabyte per concurrent upload per worker.
+
 =head1 SEE ALSO
 
-L<Punk>, L<Punk::Request/upload>.
+L<Punk>, L<Punk::Request/upload>, L<Punk/max_body>,
+L<Hyperman/"max_body: the request ceiling">.
 
 =head1 AUTHOR
 

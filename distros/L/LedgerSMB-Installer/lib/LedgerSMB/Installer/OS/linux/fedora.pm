@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux::fedora v0.999.11;
+package LedgerSMB::Installer::OS::linux::fedora v0.999.13;
 
 use v5.20;
 use experimental qw(signatures);
@@ -27,7 +27,7 @@ sub name($self) {
 
 sub dependency_packages_identifier($self) {
     my $arch;
-    if (my $dnf5 = $self->have_cmd( 'dnf5' )) {
+    if (my $dnf5 = $self->have_cmd( 'dnf5', 0 )) {
         my ($out, $err, ) = capture {
             system( $dnf5, '--dump-variables' );
         };

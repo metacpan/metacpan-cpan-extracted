@@ -90,6 +90,31 @@ sub effective_line_height {
     return defined $lh && $lh > 0 ? $lh : size $self;
 }
 
+# The leading a set of overrides gets when it is resolved against $base.
+# Returns undef to mean "let effective_line_height take the size", which is
+# not the same as returning the base's leading.
+#
+# A size override has to bring its own line height with it. Taking the base
+# font's - which is what every caller here used to do - gave a 20pt run a
+# 9pt slot: the baseline sits one font size below the cursor, the cursor
+# advances by the slot, and the next block is drawn through the text above
+# it. That is the <text size="20"> collision.
+#
+# An explicit line_height always wins. Otherwise a size override with no
+# leading of its own scales the base's explicitly-set leading by the size
+# ratio - the unitless-line-height rule - and where the base never set one,
+# undef leaves the new size to speak for itself.
+sub resolve_line_height {
+    my ($class, $base, $overrides) = @_;
+    return $overrides->{line_height} if defined $overrides->{line_height};
+    return $base->effective_line_height unless defined $overrides->{size};
+
+    my $base_lh   = $base->line_height;
+    my $base_size = $base->size;
+    return undef unless defined $base_lh && $base_lh > 0 && $base_size;
+    return $base_lh * ($overrides->{size} / $base_size);
+}
+
 sub measure_text {
     my ($self, $text) = @_;
     my $xs = $self->_xs_font;

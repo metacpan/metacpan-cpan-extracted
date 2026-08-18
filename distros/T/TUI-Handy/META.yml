@@ -1,0 +1,30 @@
+--- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+name: TUI-Handy
+version: 0.01
+abstract: Text-based user interface (ANSI escape only, no external modules)
+author:
+  - ina <ina.cpan@gmail.com>
+license: perl
+generated_by: pmake.bat version 0.51
+configure_requires:
+  ExtUtils::MakeMaker: 5.4302
+requires:
+  perl: 5.005_03
+build_requires:
+  Exporter: 0
+  File::Spec: 0
+minimum_perl_version: 5.00503
+no_index:
+  directory:
+    - t
+    - eg
+    - doc
+provides:
+  TUI::Handy:
+    file: lib/TUI/Handy.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses/

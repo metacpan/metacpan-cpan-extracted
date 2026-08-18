@@ -154,6 +154,8 @@ my $default_dopts = Advanced::Config::Options::get_date_opts();
 
    dbug_ok (1, "-"x50);
 
+   special_31_tests ();
+
    # Since I didn't count the test cases, must end my program
    # with a call to this method.  Can't do tests in END anymore!
    done_testing ();
@@ -397,5 +399,44 @@ sub grab_options
    }
 
    DBUG_RETURN ( \%ropts, \%dopts, @section_tags );
+}
+
+# ====================================================================
+# This is a special one off test config file to verify using
+# RegExp chars doesn't cause problems.
+# ====================================================================
+sub special_31_tests
+{
+   DBUG_ENTER_FUNC (@_);
+
+   my $cfg = initialize_config ("31-using-regex-seps.cfg",
+			{ "assign"     => "...", "comment"     => ".+",
+			  "quote_left" => "..",  "quote_right" => "..",
+			  "section_left" => ".*", "section_right" => "*." },
+			{ "required" => 2 } );
+
+   my $cnt = $cfg->find_tags ();
+   $cnt = 0 unless (defined $cnt);
+   dbug_cmp_ok ($cnt, '==', 0, "There are no tags located in the main section.");
+
+   my $sect = $cfg->get_section ( "Section" );
+   dbug_ok (defined $sect, "Section 'Section' exists.");
+
+   my @lst = $sect->find_tags ();
+   $cnt = @lst;
+   dbug_cmp_ok ($cnt, ">", 0, "There are ${cnt} tags in this section.");
+
+   foreach my $tag ( @lst ) {
+      my $value = $sect->get_value ( $tag );
+      if ( $tag =~ m/^empty/ ) {
+	 dbug_cmp_ok ($value, "eq", "", "Tag ${tag}'s value is the empty string.");
+      } elsif ( $tag =~ m/^space/ ) {
+	 dbug_cmp_ok ($value, "eq", " ", "Tag ${tag}'s value is a space char.");
+      } else {
+	 dbug_cmp_ok ($value, "eq", $tag, "Tag ${tag}'s value is itself.");
+      }
+   }
+
+   DBUG_VOID_RETURN ();
 }
 

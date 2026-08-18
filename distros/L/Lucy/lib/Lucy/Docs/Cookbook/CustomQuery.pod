@@ -29,7 +29,7 @@ Lucy::Docs::Cookbook::CustomQuery - Sample subclass of Query
 
 =head1 DESCRIPTION
 
-Explore Apache Lucy’s support for custom query types by creating a
+Explore Lucy’s support for custom query types by creating a
 “PrefixQuery” class to handle trailing wildcards.
 
     my $prefix_query = PrefixQuery->new(

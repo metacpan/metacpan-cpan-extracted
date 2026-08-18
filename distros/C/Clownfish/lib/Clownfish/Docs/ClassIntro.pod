@@ -25,7 +25,7 @@
 
 =head1 NAME
 
-Clownfish::Docs::ClassIntro - Working with Apache Clownfish classes in C
+Clownfish::Docs::ClassIntro - Working with Clownfish classes in C
 
 =head1 DESCRIPTION
 

@@ -46,7 +46,7 @@ parallels in all the projections.
 The transformations that are authalic (equal-area), conformal
 (equal-angle), azimuthal (circularly symmetric), or perspective (true
 perspective on a focal plane from some viewpoint) are marked.  The
-first two categories are mutually exclusive for all but the 
+first two categories are mutually exclusive for all but the
 L<"unit sphere"|/t_unit_sphere> 3-D projection.
 
 Extra dimensions tacked on to each point to be transformed are, in
@@ -101,9 +101,9 @@ This is the projection that most consumer grade cameras produce.
 Magnification in an optical system changes the angle of incidence
 of the rays on the focal plane for a given angle of incidence at the
 aperture.  For example, a 10x telescope with a 2 degree field of view
-exhibits the same gnomonic distortion as a simple optical system with 
+exhibits the same gnomonic distortion as a simple optical system with
 a 20 degree field of view.  Wide-angle optics typically have magnification
-less than 1 ('fisheye lenses'), reducing the gnomonic distortion 
+less than 1 ('fisheye lenses'), reducing the gnomonic distortion
 considerably but introducing L<"equidistant azimuthal"|/t_az_eqd> distortion --
 there's no such thing as a free lunch!
 
@@ -112,8 +112,8 @@ PDL::Transform::Cartography includes perspective projections for
 producing maps of spherical bodies from perspective views.  Those
 projections are L<"t_vertical"|/t_vertical> and
 L<"t_perspective"|/t_perspective>.  They map between (lat,lon) on the
-spherical body and planar projected coordinates at the viewpoint.  
-L<"t_vertical"|/t_vertical> is the vertical perspective projection 
+spherical body and planar projected coordinates at the viewpoint.
+L<"t_vertical"|/t_vertical> is the vertical perspective projection
 given by Snyder, but L<"t_perspective"|/t_perspective> is a fully
 general perspective projection that also handles magnification correction.
 
@@ -121,16 +121,16 @@ general perspective projection that also handles magnification correction.
 
 Oblique projections rotate the sphere (and graticule) to an arbitrary
 angle before generating the projection; transverse projections rotate
-the sphere exactly 90 degrees before generating the projection.  
+the sphere exactly 90 degrees before generating the projection.
 
 Most of the projections accept the following standard options,
-useful for making transverse and oblique projection maps.  
+useful for making transverse and oblique projection maps.
 
 =over 3
 
 =item o, origin, Origin [default (0,0,0)]
 
-The origin of the oblique map coordinate system, in (old-theta, old-phi) 
+The origin of the oblique map coordinate system, in (old-theta, old-phi)
 coordinates.
 
 =item r, roll, Roll [default 0.0]
@@ -164,9 +164,7 @@ This parameter is a synonym for the roll angle, above.
 =item bad, Bad, missing, Missing [default nan]
 
 This is the value that missing points get.  Mainly useful for the
-inverse transforms.  (This should work fine if set to BAD, if you have
-bad-value support compiled in).  The default nan is asin(1.2), calculated
-at load time.
+inverse transforms. (This should work fine if set to BAD).
 
 =back
 
@@ -177,7 +175,7 @@ Draw a Mercator map of the world on-screen:
    $w = pgswin();
    $w->plot(with=>'polylines', earth_coast->apply(t_mercator)->clean_lines);
 
-Here, C<earth_coast()> returns a 3xn ndarray containing (lon, lat, pen) 
+Here, C<earth_coast()> returns a 3xn ndarray containing (lon, lat, pen)
 values for the included world coastal outline; C<t_mercator> converts
 the values to projected Mercator coordinates, and C<clean_lines> breaks
 lines that cross the 180th meridian.
@@ -189,7 +187,7 @@ Draw a Mercator map of the world, with lon/lat at 10 degree intervals:
    $w->plot(with=>'polylines', $x->apply(t_mercator)->clean_lines);
 
 This works just the same as the first example, except that a map graticule
-has been applied with interline spacing of 10 degrees lon/lat and 
+has been applied with interline spacing of 10 degrees lon/lat and
 inter-vertex spacing of 1 degree (so that each meridian contains 181 points,
 and each parallel contains 361 points).
 
@@ -199,10 +197,10 @@ Currently angular conversions are rather simpleminded.  A list of
 common conversions is present in the main constructor, which inserts a
 conversion constant to radians into the {params} field of the new
 transform.  Something like Math::Convert::Units should be used instead
-to generate the conversion constant. 
+to generate the conversion constant.
 
 A cleaner higher-level interface is probably needed (see the examples);
-for example, earth_coast could return a graticule if asked, instead of 
+for example, earth_coast could return a graticule if asked, instead of
 needing one to be glued on.
 
 The class structure is somewhat messy because of the varying needs of
@@ -227,7 +225,7 @@ The included digital world map is derived from the 1987 CIA World Map,
 translated to ASCII in 1988 by Joe Dellinger (geojoe@freeusp.org) and
 simplified in 1995 by Kirk Johnson (tuna@indra.com) for the program
 XEarth.  The map comes with NO WARRANTY.  An ASCII version of the map,
-and a sample PDL function to read it, may be found in the Demos
+and a sample PDL function to read it, may be found in the F<examples>
 subdirectory of the PDL source distribution.
 
 =head1 FUNCTIONS
@@ -273,10 +271,7 @@ our @PLATE_CARREE = ([qw(Longitude Latitude RGB)],
 # Steal _opt from PDL::Transform.
 *PDL::Transform::Cartography::_opt = \&PDL::Transform::_opt;
 use overload '""' => \&_strval;
-
-our $PI = $PDL::Transform::PI;
-our $DEG2RAD = $PDL::Transform::DEG2RAD;
-our $RAD2DEG = $PDL::Transform::RAD2DEG;
+use PDL::Constants qw(PI RAD2DEG DEG2RAD);
 
 sub _strval {
   my($me) = shift;
@@ -289,7 +284,7 @@ sub _strval {
 
 =for usage
 
-   $lonlatp     = graticule(<grid-spacing>,<line-segment-size>);   
+   $lonlatp     = graticule(<grid-spacing>,<line-segment-size>);
    $lonlatp     = graticule(<grid-spacing>,<line-segment-size>,1);
 
 =for ref
@@ -300,8 +295,8 @@ Returns a grid of meridians and parallels as a list of vectors suitable
 for sending to
 L<PDL::Graphics::Simple|PDL::Graphics::Simple/polylines>
 for plotting.
-The grid is in degrees in (theta, phi) coordinates -- this is (E lon, N lat) 
-for terrestrial grids or (RA, dec) for celestial ones.  You must then 
+The grid is in degrees in (theta, phi) coordinates -- this is (E lon, N lat)
+for terrestrial grids or (RA, dec) for celestial ones.  You must then
 transform the graticule in the same way that you transform the map.
 
 You can attach the graticule to a vector map using the syntax:
@@ -328,7 +323,7 @@ If a third argument is given, it is a hash of options, which can be:
 
 =item dup - if true, the meridian at the far boundary is duplicated.
 
-=back 
+=back
 
 =cut
 
@@ -342,25 +337,25 @@ sub graticule {
 
     $grid = 10 unless defined($grid);
     $grid = $grid->at(0) if(ref($grid) eq 'PDL');
-    
+
     $step = $grid/2 unless defined($step);
     $step = $step->at(0) if(ref($step) eq 'PDL');
 
     # Figure number of parallels and meridians
     my $np = 2 * int(90/$grid);
     my $nm = 2 * int(180/$grid);
-    
+
     # First do parallels.
     my $xp = xvals(360/$step + 1 + !!$two_cols, $np + 1) * $step       - 180 * (!$lonpos);
     my $yp = yvals(360/$step + 1 + !!$two_cols, $np + 1) * 180/$np     -  90;
-    $xp->slice("-1,:") .= $yp->slice("-1,:") .= asin(pdl(1.1)) if($two_cols);
+    $xp->slice("-1,:") .= $yp->slice("-1,:") .= nan() if($two_cols);
 
     # Next do meridians.
     my $xm = yvals( 180/$step + 1 + !!$two_cols,  $nm + !!$dup  ) * 360/$nm   - 180 * (!$lonpos);
     my $ym = xvals( 180/$step + 1 + !!$two_cols,  $nm + !!$dup  ) * $step     - 90;
-    $xm->slice("-1,:") .= $ym->slice("-1,:") .= asin(pdl(1.1)) if($two_cols);
+    $xm->slice("-1,:") .= $ym->slice("-1,:") .= nan() if($two_cols);
 
-    
+
     if($two_cols) {
 	return pdl( $xp->flat->append($xm->flat),
 		    $yp->flat->append($ym->flat)
@@ -373,7 +368,7 @@ sub graticule {
 	    return (  pdl( $xp->flat->append($xm->flat),
 			   $yp->flat->append($ym->flat)
 		      )->mv(1,0),
-		      
+
 		      $pp->flat->append($pm->flat)
 		);
 	} else {
@@ -381,7 +376,7 @@ sub graticule {
 			$yp->flat->append($ym->flat),
 			$pp->flat->append($pm->flat)
 		     )->mv(1,0);
-	}  
+	}
 	barf "This can't happen";
     }
 }
@@ -403,8 +398,8 @@ the L<apply|PDL::Transform/apply> method and cartographic transforms,
 and are suitable for plotting with the
 L<polylines|PDL::Graphics::Simple/polylines>
 plot type in the PDL::Graphics::Simple
-output library:  the first dimension is (X,Y,pen) with breaks having 
-a pen value of 0 and hairlines having negative pen values.  The second 
+output library:  the first dimension is (X,Y,pen) with breaks having
+a pen value of 0 and hairlines having negative pen values.  The second
 dimension broadcasts over all the points in the data set.
 
 The vector map includes lines that pass through the antipodean
@@ -444,7 +439,7 @@ sub earth_coast {
 
 =for ref
 
-(Cartography) PDL constructor - RGB pixel map of Earth 
+(Cartography) PDL constructor - RGB pixel map of Earth
 
 Returns an RGB image of Earth based on data from the MODIS instrument
 on the NASA EOS/Terra satellite.  (You can get a full-resolution
@@ -587,7 +582,7 @@ sub raster2fits {
 C<clean_lines> massages vector data to remove jumps due to singularities
 in the transform.
 
-In the first (scalar) form, C<$line_pen> contains both (X,Y) points and pen 
+In the first (scalar) form, C<$line_pen> contains both (X,Y) points and pen
 values in the 3rd column suitable to be fed to
 the L<polylines|PDL::Graphics::Simple/polylines>
 plot type in the PDL::Graphics::Simple.
@@ -633,7 +628,7 @@ Because this returns a selection of the inputs, it will not broadcast.
 NOTES
 
 This almost never catches stuff near the apex of cylindrical maps,
-because the anomalous vectors get arbitrarily small.  This could be 
+because the anomalous vectors get arbitrarily small.  This could be
 improved somewhat by looking at individual runs of the pen and using
 a relative length scale that is calibrated to the rest of each run.
 it is probably not worth the computational overhead.
@@ -690,7 +685,7 @@ sub clean_lines {
     $p = $p->dice_axis(0, $keep_inds)->sever;
   }
   wantarray ? ($l,$p) : $l->append($p->dummy(0,1));
-}    
+}
 
 ######################################################################
 
@@ -705,12 +700,12 @@ sub _uconv{
   local($_) = shift;
   my($silent) =shift;
 
-  my($x) = 
-    ( m/^deg/i    ? $DEG2RAD :
-      m/^arcmin/i ? $DEG2RAD / 60 :
-      m/^arcsec/i ? $DEG2RAD / 3600 :
-      m/^hour/i   ? $DEG2RAD * 15 :    # Right ascension
-      m/^min/i    ? $DEG2RAD * 15/60 : # Right ascension
+  my($x) =
+    ( m/^deg/i    ? DEG2RAD :
+      m/^arcmin/i ? DEG2RAD / 60 :
+      m/^arcsec/i ? DEG2RAD / 3600 :
+      m/^hour/i   ? DEG2RAD * 15 :    # Right ascension
+      m/^min/i    ? DEG2RAD * 15/60 : # Right ascension
       m/^microrad/i ? 1e-6 :
       m/^millirad/i ? 1e-3 :
       m/^rad(ian)?s?$/i ? 1.0 :
@@ -721,7 +716,7 @@ sub _uconv{
       m/^mile/  ? 1.0/(637100000/2.54/12/5280) :
       undef
       );
-  print STDERR "Cartography: unrecognized unit '$_'\n"    
+  print STDERR "Cartography: unrecognized unit '$_'\n"
     if( (!defined $x) && !$silent && ($PDL::debug || $PDL::verbose));
   $x;
 }
@@ -733,7 +728,7 @@ sub _uconv{
 # outside -- but the *last* argument is the name of the transform.
 #
 # The options list is put into the {options} field of the newly constructed
-# Transform -- fastidious subclass constructors will want to delete it before 
+# Transform -- fastidious subclass constructors will want to delete it before
 # returning.
 #
 
@@ -750,10 +745,10 @@ sub new {
     my($me) = __PACKAGE__->SUPER::new;
     $me->{idim} = $me->{odim} = 2;
     $me->{name} = $name;
- 
+
     ####
     # Parse origin and units arguments
-    # 
+    #
     my $or = _opt($o,['o','origin','Origin'],zeroes(2));
     if($or->nelem != 2) {
 	croak("PDL::Transform::Cartography: origin must have 2 elements\n");
@@ -793,7 +788,7 @@ sub new {
     $me->{params}->{roll} = $roll * $conv;
 
     $me->{params}->{bad} = _opt($o,['b','bad','Bad','missing','Missing'],
-			      asin(pdl(1.1)));
+			      nan());
 
     # Get the standard parallel (in general there's only one; the conics
     # have two but that's handled by _c_new)
@@ -805,14 +800,14 @@ sub new {
     $me;
 }
 
-# Compose self with t_rot_sphere if necessary -- useful for 
-# finishing off the transformations that accept the origin and roll 
+# Compose self with t_rot_sphere if necessary -- useful for
+# finishing off the transformations that accept the origin and roll
 # options.
 sub PDL::Transform::Cartography::_finish {
   my($me) = shift;
   if( ($me->{params}->{o}->slice("0") != 0) ||
       ($me->{params}->{o}->slice("1") != 0) ||
-      ($me->{params}->{roll} != 0) 
+      ($me->{params}->{roll} != 0)
       ) {
       my $out = t_compose($me,t_rot_sphere($me->{options}));
       $out->{itype} = $me->{itype};
@@ -822,7 +817,7 @@ sub PDL::Transform::Cartography::_finish {
       $out->{odim} = 2;
       $out->{idim} = 2;
       return $out;
-    } 
+    }
   return $me;
 }
 
@@ -846,22 +841,22 @@ yielding only a 2-D (lon/lat) output.  Similarly, the forward
 transform deprojects 2-D (lon/lat) coordinates onto the surface of a
 unit sphere.
 
-The cartesian system has its Z axis pointing through the pole of the 
-(lon,lat) system, and its X axis pointing through the equator at the 
+The cartesian system has its Z axis pointing through the pole of the
+(lon,lat) system, and its X axis pointing through the equator at the
 prime meridian.
 
 Unit sphere mapping is unusual in that it is both conformal and authalic.
-That is possible because it properly embeds the sphere in 3-space, as a 
+That is possible because it properly embeds the sphere in 3-space, as a
 notional globe.
 
-This is handy as an intermediate step in lots of transforms, as 
+This is handy as an intermediate step in lots of transforms, as
 Cartesian 3-space is cleaner to work with than spherical 2-space.
 
-Higher dimensional indices are preserved, so that "rider" indices (such as 
+Higher dimensional indices are preserved, so that "rider" indices (such as
 pen value) are propagated.
 
-There is no oblique transform for t_unit_sphere, largely because 
-it's so easy to rotate the output using t_linear once it's out into 
+There is no oblique transform for t_unit_sphere, largely because
+it's so easy to rotate the output using t_linear once it's out into
 Cartesian space.  In fact, the other projections implement oblique
 transforms by
 L<wrapping|PDL::Transform/t_wrap>
@@ -872,7 +867,7 @@ OPTIONS:
 
 =over 3
 
-=item radius, Radius (default 1.0) 
+=item radius, Radius (default 1.0)
 
 The radius of the sphere, for the inverse transform.  (Radius is ignored
 in the forward transform).  Defaults to 1.0 so that the resulting Cartesian
@@ -883,7 +878,7 @@ coordinates are in units of "body radii".
 =cut
 
 sub t_unit_sphere {
-  my($me) = _new(@_,'Unit Sphere Projection'); 
+  my($me) = _new(@_,'Unit Sphere Projection');
   $me->{odim} = 3;
 
   $me->{params}->{otype} = ['X','Y','Z'];
@@ -893,49 +888,48 @@ sub t_unit_sphere {
 				['r','radius','Radius'],
 				1.0)
 			   )->at(0);
-				    
-  
+
+
   $me->{func} = sub {
-    my($d,$o) = @_;
-    my(@dims) = $d->dims;
+    my ($d,$o) = @_;
+    my @dims = $d->dims;
     $dims[0] ++;
     my $out = zeroes(@dims);
-    
-    my($thetaphi) = ((defined $o->{conv} && $o->{conv} != 1.0) ? 
+
+    my($thetaphi) = ((defined $o->{conv} && $o->{conv} != 1.0) ?
 		     $d->slice("0:1") * $o->{conv} : $d->slice("0:1")
 		     );
 
-    my $th = $thetaphi->slice("(0)");
-    my $ph = $thetaphi->slice("(1)");
+    my ($th, $ph) = $thetaphi->using(0,1);
 
+    my ($out0, $out1, $out2) = $out->using(0..2);
     # use x as a holding tank for the cos-phi multiplier
-    $out->slice("(0)") .= $o->{r} * cos($ph) ;
-    $out->slice("(1)") .= $out->slice("(0)") * sin($th);
-    $out->slice("(0)") *= cos($th);
+    $out0 .= $o->{r} * cos($ph) ;
+    $out1 .= $out->slice("(0)") * sin($th);
+    $out0 *= cos($th);
 
-    $out->slice("(2)") .= $o->{r} * sin($ph);
+    $out2 .= $o->{r} * sin($ph);
 
-    if($d->dim(0) > 2) {
+    if ($d->dim(0) > 2) {
 	$out->slice("3:-1") .= $d->slice("2:-1");
     }
 
     $out;
-
   };
 
   $me->{inv} = sub {
     my($d,$o) = @_;
-	
-    my($d0,$d1,$d2) = ($d->slice("(0)"),$d->slice("(1)"),$d->slice("(2)"));
-    my($r) = $d->slice("0:2")->magnover;
-    my(@dims) = $d->dims;
+
+    my ($d0,$d1,$d2) = $d->using(0..2);
+    my $r = $d->slice("0:2")->magnover;
+    my @dims = $d->dims;
     $dims[0]--;
-    my($out) = zeroes(@dims);
-    
+    my $out = zeroes(@dims);
+
     $out->slice("(0)") .= atan2($d1,$d0);
     $out->slice("(1)") .= asin($d2/$r);
 
-    if($d->dim(0) > 3) {
+    if ($d->dim(0) > 3) {
 	$out->slice("2:-1") .= $d->slice("3:-1");
     }
 
@@ -945,7 +939,7 @@ sub t_unit_sphere {
     $out;
   };
 
-    
+
   $me;
 }
 
@@ -961,8 +955,8 @@ sub t_unit_sphere {
 
 (Cartography) Generate oblique projections
 
-You feed in the origin in (theta,phi) and a roll angle, and you get back 
-out (theta', phi') coordinates.  This is useful for making oblique or 
+You feed in the origin in (theta,phi) and a roll angle, and you get back
+out (theta', phi') coordinates.  This is useful for making oblique or
 transverse projections:  just compose t_rot_sphere with your favorite
 projection and you get an oblique one.
 
@@ -985,7 +979,7 @@ OPTIONS
 # helper routine for making the rotation matrix
 sub _rotmat {
   my($th,$ph,$r) = @_;
-  
+
   pdl( [ cos($th) ,  -sin($th),    0  ],   # apply theta
        [ sin($th) ,   cos($th),    0  ],
        [  0,          0,           1  ] )
@@ -995,7 +989,7 @@ sub _rotmat {
 	 [ sin($ph),   0,  cos($ph)  ] )
     x
   pdl( [ 1,         0 ,       0      ], # apply roll last
-	 [ 0,    cos($r),   -sin($r)   ], 
+	 [ 0,    cos($r),   -sin($r)   ],
 	 [ 0,    sin($r),    cos($r)   ])
     ;
 }
@@ -1055,7 +1049,7 @@ OPTIONS
 
 The hemisphere to keep in the projection (see L<PDL::Transform::Cartography>).
 
-=back 
+=back
 
 NOTES
 
@@ -1069,7 +1063,7 @@ coordinates.
 
 sub t_orthographic {
     my($me) = _new(@_,'Orthographic Projection');
-    
+
     $me->{otype} = ['projected X','projected Y'];
     $me->{ounit} = ['body radii','body radii'];
 
@@ -1086,10 +1080,10 @@ sub t_orthographic {
 	$me->{params}->{m} = $m;
     }
 
-    my $origin= $me->{params}->{o} * $RAD2DEG;
-    my $roll = $me->{params}->{roll} * $RAD2DEG;
+    my $origin= $me->{params}->{o} * RAD2DEG;
+    my $roll = $me->{params}->{roll} * RAD2DEG;
 
-    $me->{params}->{t_int} = 
+    $me->{params}->{t_int} =
 	t_compose(
 		  t_linear(rot=>[90 - $origin->at(1),
 				 0,
@@ -1097,8 +1091,8 @@ sub t_orthographic {
 			   d=>3),
 		  t_unit_sphere(u=>$me->{params}->{u})
 		  );
-    
-    $me->{params}->{t_int} = 
+
+    $me->{params}->{t_int} =
 	t_compose(
 		  t_linear(rot=>[0,0,$roll->at(0)],d=>3),
 		  $me->{params}->{t_int}
@@ -1167,7 +1161,7 @@ sub t_orthographic {
 
 This is the simple Plate Carree projection -- also called a "lat/lon plot".
 The horizontal axis is theta; the vertical axis is phi.  This is a no-op
-if the angular unit is radians; it is a simple scale otherwise. 
+if the angular unit is radians; it is a simple scale otherwise.
 
 OPTIONS
 
@@ -1178,7 +1172,7 @@ OPTIONS
 =item s, std, standard, Standard (default 0)
 
 The standard parallel where the transformation is conformal.  Conformality
-is achieved by shrinking of the horizontal scale to match the 
+is achieved by shrinking of the horizontal scale to match the
 vertical scale (which is correct everywhere).
 
 =back
@@ -1204,7 +1198,7 @@ sub t_carree {
 	$out->slice("0") *= $p->{stretch};
 	$out;
     };
-    
+
     $me->{inv} = sub {
 	my($d,$o)= @_;
 	my($out) = $d->new_or_inplace;
@@ -1212,7 +1206,7 @@ sub t_carree {
 	$out->slice("0") /= $p->{stretch};
 	$out;
     };
-    
+
     $me->_finish;
 }
 
@@ -1230,7 +1224,7 @@ sub t_carree {
 
 This is perhaps the most famous of all map projections: meridians are mapped
 to parallel vertical lines and parallels are unevenly spaced horizontal lines.
-The poles are shifted to +/- infinity.  The output values are in units of 
+The poles are shifted to +/- infinity.  The output values are in units of
 globe-radii for easy conversion to kilometers; hence the horizontal extent
 is -pi to pi.
 
@@ -1255,7 +1249,7 @@ list ref or ndarray.
 =item s, std, Standard (default 0)
 
 This is the parallel at which the map has correct scale.  The scale
-is also correct at the parallel of opposite sign.  
+is also correct at the parallel of opposite sign.
 
 =back
 
@@ -1269,7 +1263,7 @@ sub t_mercator {
     my $p = $me->{params};
 
 # This is a lot of shenanigans just to get the clip parallels, but what the
-# heck -- it's not a hot spot and it saves copying the input data (for 
+# heck -- it's not a hot spot and it saves copying the input data (for
 # nondestructive clipping).
     $p->{c} = _opt($me->{options},
 		   ['c','clip','Clip'],
@@ -1278,11 +1272,11 @@ sub t_mercator {
 	$p->{c} = topdl($p->{c});
 	$p->{c} *= $p->{conv};
     } else {
-	$p->{c} = pdl($DEG2RAD * 75);
+	$p->{c} = pdl(DEG2RAD * 75);
     }
     $p->{c} = abs($p->{c}) * pdl(-1,1) if($p->{c}->nelem == 1);
 
-    $p->{c} = log(tan(($p->{c}/2) + $PI/4));       
+    $p->{c} = log(tan(($p->{c}/2) + PI/4));
     $p->{c} = [$p->{c}->list];
 
     $p->{std} = topdl(_opt($me->{options},
@@ -1306,13 +1300,13 @@ sub t_mercator {
 
 	$out->slice("0:1") *= $o->{conv};
 
-	$out->slice("(1)") .= log(tan($out->slice("(1)")/2 + $PI/4));
+	$out->slice("(1)") .= log(tan($out->slice("(1)")/2 + PI/4));
 	$out->slice("(1)") .= $out->slice("(1)")->clip(@{$o->{c}})
 	    unless($o->{c}->[0] == $o->{c}->[1]);
 
 	$out->slice("0:1") *= $o->{stretch};
 	$out->slice("0:1") /= $o->{oconv} if(defined $o->{oconv});
-			    
+
 	$out;
     };
 
@@ -1322,14 +1316,14 @@ sub t_mercator {
 
 	$out->slice("0:1") *= $o->{oconv} if defined($o->{oconv});
 	$out->slice("0:1") /= $o->{stretch};
-	$out->slice("(1)") .= (atan(exp($out->slice("(1)"))) - $PI/4)*2;
+	$out->slice("(1)") .= (atan(exp($out->slice("(1)"))) - PI/4)*2;
 	$out->slice("0:1") /= $o->{conv};
 
 	$out;
     };
 
     $me->_finish;
-}    
+}
 
 ######################################################################
 
@@ -1343,12 +1337,12 @@ sub t_mercator {
 
 (Cartography) Universal Transverse Mercator projection (cylindrical)
 
-This is the internationally used UTM projection, with 2 subzones 
+This is the internationally used UTM projection, with 2 subzones
 (North/South).  The UTM zones are parametrized individually, so if you
 want a Zone 30 map you should use C<t_utm(30)>.  By default you get
-the northern subzone, so that locations in the southern hemisphere get 
-negative Y coordinates.  If you select the southern subzone (with the 
-"subzone=>-1" option), you get offset southern UTM coordinates.  
+the northern subzone, so that locations in the southern hemisphere get
+negative Y coordinates.  If you select the southern subzone (with the
+"subzone=>-1" option), you get offset southern UTM coordinates.
 
 The 20-subzone military system is not yet supported.  If/when it is
 implemented, you will be able to enter "subzone=>[a-t]" to select a N/S
@@ -1379,7 +1373,7 @@ Like the rest of the PDL::Transform::Cartography package, t_utm uses a
 spherical datum rather than the "official" ellipsoidal datums for the
 UTM system.
 
-This implementation was derived from the rather nice description by 
+This implementation was derived from the rather nice description by
 Denis J. Dean, located on the web at:
 http://www.cnr.colostate.edu/class_info/nr502/lg3/datums_coordinates/utm.html
 
@@ -1387,9 +1381,9 @@ OPTIONS
 
 =over 3
 
-=item STANDARD OPTIONS 
+=item STANDARD OPTIONS
 
-(No positional options -- Origin and Roll are ignored) 
+(No positional options -- Origin and Roll are ignored)
 
 =item ou, ounit, OutputUnit (default 'meters')
 
@@ -1408,9 +1402,9 @@ subzone, but that's too much effort for now.
 
 Set this to 1 to get the (European-style) tangent-plane Mercator with
 standard parallel on the prime meridian.  The default of 0 places the
-standard parallels 180km east/west of the prime meridian, yielding better 
+standard parallels 180km east/west of the prime meridian, yielding better
 average scale across the zone.  Setting gk=>1 makes the scale exactly 1.0
-at the central meridian, and >1.0 everywhere else on the projection. 
+at the central meridian, and >1.0 everywhere else on the projection.
 The difference in scale is about 0.3%.
 
 =back
@@ -1427,24 +1421,24 @@ sub t_utm {
   $x->{ounit} = [$x->{ounit},$x->{ounit}] unless ref($x->{ounit});
   $x->{params}->{oconv} = _uconv($x->{ounit}->[0]);
 
-  ## Define our zone and NS offset 
+  ## Define our zone and NS offset
   my $subzone = _opt($opt,['sz', 'subzone', 'SubZone'],1);
   my $offset = zeroes(2);
-  $offset->slice("0") .= 5e5*(2*$PI/40e6)/$x->{params}->{oconv};
-  $offset->slice("1") .= ($subzone < 0) ? $PI/2/$x->{params}->{oconv} : 0;
+  $offset->slice("0") .= 5e5*(2*PI/40e6)/$x->{params}->{oconv};
+  $offset->slice("1") .= ($subzone < 0) ? PI/2/$x->{params}->{oconv} : 0;
 
   my $merid = ($zone * 6) - 183;
 
   my $gk = _opt($opt,['gk','gausskruger'],0);
-  
+
   my($me) = t_compose(t_linear(post=>$offset,
 			       rot=>-90
 			       ),
 
-		      t_mercator(o=>[$merid,0], 
-				 r=>90, 
-				 ou=>$x->{ounit}, 
-				 s=>$gk ? 0 : ($RAD2DEG * (180/6371))
+		      t_mercator(o=>[$merid,0],
+				 r=>90,
+				 ou=>$x->{ounit},
+				 s=>$gk ? 0 : (RAD2DEG * (180/6371))
 				)
 		      );
 
@@ -1542,7 +1536,7 @@ sub t_sin_lat {
 Sinusoidal projection preserves the latitude scale but scales
 longitude according to sin(lat); in this respect it is the companion to
 L</t_sin_lat>, which is also authalic but preserves the
-longitude scale instead.  
+longitude scale instead.
 
 OPTIONS
 
@@ -1558,37 +1552,28 @@ sub t_sinusoidal {
   my($me) = _new(@_,"Sinusoidal Projection");
   $me->{otype} = ['longitude','latitude'];
   $me->{ounit} = [' ','radians'];
-  
-  $me->{func} = sub {
-    my($d,$o) = @_;
-    my($out) = $d->new_or_inplace;
-    $out->slice("0:1") *= $o->{conv};
 
+  $me->{func} = sub {
+    my ($d,$o) = @_;
+    my $out = $d->new_or_inplace;
+    $out->slice("0:1") *= $o->{conv};
     $out->slice("(0)") *= cos($out->slice("(1)"));
     $out;
   };
 
   $me->{inv} = sub {
-    my($d,$o) = @_;
-    my($out) = $d->new_or_inplace;
-    my($x) = $out->slice("(0)");
-    my($y) = $out->slice("(1)");
-    
-    $x /= cos($out->slice("(1)"));
-
-    my($rej) = ( (abs($x)>$PI) | (abs($y)>($PI/2)) )->flat;
-    $x->flat->slice($rej) .= $o->{bad};
-    $y->flat->slice($rej) .= $o->{bad};
-    
+    my ($d,$o) = @_;
+    my $out = $d->new_or_inplace;
+    my ($x, $y) = $out->using(0,1);
+    $x /= cos($y);
+    my $rej = ( (abs($x)>PI) | (abs($y)>(PI/2)) )->flat;
+    $_->flat->where($rej) .= $o->{bad} for $x, $y;
     $out->slice("0:1") /= $o->{conv};
     $out;
   };
 
   $me->_finish;
 }
-   
-
-
 
 
 ######################################################################
@@ -1610,11 +1595,11 @@ sub _c_new {
     $p->{std} = _opt($me->{options},['s','std','standard','Standard'],
 		     $def_std);
     $p->{std} = topdl($p->{std}) * $me->{params}->{conv};
-    $p->{std} = topdl([$PI/2 * ($p->{std}<0 ? -1 : 1), $p->{std}->at(0)])
+    $p->{std} = topdl([PI/2 * ($p->{std}<0 ? -1 : 1), $p->{std}->at(0)])
 	if($p->{std}->nelem == 1);
-    
+
     $me->{params}->{cylindrical} = 1
-	if(approx($p->{std}->slice("0"),-$p->{std}->slice("1")));
+	if approx($p->{std}->slice("0"),-$p->{std}->slice("1"));
 
     $me;
 }
@@ -1624,8 +1609,8 @@ sub PDL::Transform::Cartography::Conic::stringify {
     my($out) = $me->SUPER::stringify;
 
     $out .= sprintf("\tStd parallels: %6.2f,%6.2f %s\n",
-		    $me->{params}->{std}->at(0) / $me->{params}->{conv}, 
-		    $me->{params}->{std}->at(1) / $me->{params}->{conv}, 
+		    $me->{params}->{std}->at(0) / $me->{params}->{conv},
+		    $me->{params}->{std}->at(1) / $me->{params}->{conv},
 		    $me->{params}->{u});
     $out;
 }
@@ -1679,11 +1664,12 @@ sub t_conic {
 	return t_carree($me->{options});
     }
 
-    $p->{n} = ((cos($p->{std}->slice("(0)")) - cos($p->{std}->slice("(1)")))
+    my ($p0, $p1) = $p->{std}->using(0,1);
+    $p->{n} = ((cos($p0) - cos($p1))
 	       /
-	       ($p->{std}->slice("(1)") - $p->{std}->slice("(0)")));
+	       ($p1 - $p0));
 
-    $p->{G} = cos($p->{std}->slice("(0)"))/$p->{n} + $p->{std}->slice("(0)");
+    $p->{G} = cos($p0)/$p->{n} + $p0;
 
     $me->{otype} = ['Conic X','Conic Y'];
     $me->{ounit} = ['Proj. radians','Proj. radians'];
@@ -1694,7 +1680,7 @@ sub t_conic {
 
 	my($rho) = $o->{G} - $d->slice("(1)") * $o->{conv};
 	my($theta) = $o->{n} * $d->slice("(0)") * $o->{conv};
-	
+
 	$out->slice("(0)") .= $rho * sin($theta);
 	$out->slice("(1)") .= $o->{G} - $rho * cos($theta);
 
@@ -1710,14 +1696,15 @@ sub t_conic {
 	my($rho) = sqrt($x*$x + $y*$y);
 	$rho *= -1 if($o->{n}<0);
 
-	my($theta) = ($o->{n} < 0) ? atan2(-$x,-$y) : atan2($x,$y);
-    
-	$out->slice("(1)") .= $o->{G} - $rho;
-	$out->slice("(1)")->where(($out->slice("(1)") < -$PI/2) | ($out->slice("(1)") > $PI/2))
+	my $theta = ($o->{n} < 0) ? atan2(-$x,-$y) : atan2($x,$y);
+
+	my ($out0, $out1) = $out->using(0,1);
+	$out1 .= $o->{G} - $rho;
+	$out1->where(($out1 < -PI/2) | ($out1 > PI/2))
 	    .= $o->{bad};
 
-	$out->slice("(0)") .= $theta / $o->{n};
-	$out->slice("(0)")->where(($out->slice("(0)") < -$PI) | ($out->slice("(0)") > $PI/2))
+	$out0 .= $theta / $o->{n};
+	$out0->where(($out0 < -PI) | ($out0 > PI))
 	    .= $o->{bad};
 
 	$out->slice("0:1") /= $o->{conv};
@@ -1744,7 +1731,7 @@ sub t_conic {
 (Cartography) Albers conic projection (conic; authalic)
 
 This is the standard projection used by the US Geological Survey for
-sectionals of the 50 contiguous United States of America.  
+sectionals of the 50 contiguous United States of America.
 
 The projection reduces to the Lambert equal-area conic (infrequently
 used and not to be confused with the Lambert conformal conic,
@@ -1763,7 +1750,7 @@ OPTIONS
 
 =item s, std, standard, Standard (default (29.5,45.5))
 
-The locations of the standard parallel(s).  If you specify only one then 
+The locations of the standard parallel(s).  If you specify only one then
 the other is taken to be the nearest pole and a Lambert Equal-Area Conic
 map results.  If you specify both standard parallels to be the same pole,
 then the projection reduces to the Lambert Azimuthal Equal-Area map as
@@ -1796,10 +1783,11 @@ sub t_albers  {
 	return t_sin_lat($me->{options});
     }
 
+    my ($p1) = $p->{std}->using(0,1);
     $p->{n} = sin($p->{std})->sumover / 2;
-    $p->{C} = (cos($p->{std}->slice("(1)"))*cos($p->{std}->slice("(1)")) +
-		     2 * $p->{n} * sin($p->{std}->slice("(1)")) );
-    $p->{rho0} = sqrt($p->{C}) / $p->{n}; 
+    $p->{C} = (cos($p1)*cos($p1) +
+		     2 * $p->{n} * sin($p1) );
+    $p->{rho0} = sqrt($p->{C}) / $p->{n};
 
     $me->{otype} = ['Conic X','Conic Y'];
     $me->{ounit} = ['Proj. radians','Proj. radians'];
@@ -1830,7 +1818,7 @@ sub t_albers  {
 	$out->slice("(1)") .= asin( ( $o->{C} - ( $rho * $rho ) ) / (2 * $o->{n}) );
 
 	$out->slice("(0)") .= $theta / $o->{n};
-	$out->slice("(0)")->where(($out->slice("(0)")>$PI) | ($out->slice("(0)")<-$PI)) .= $o->{bad};
+	$out->slice("(0)")->where(($out->slice("(0)")>PI) | ($out->slice("(0)")<-PI)) .= $o->{bad};
 
 	$out->slice("0:1") /= $o->{conv};
 
@@ -1893,11 +1881,11 @@ sub t_lambert {
     my($p) = $me->{params};
 
     if($p->{cylindrical}){
-	print STDERR "Lambert conformal conic: std parallels are opposite & equal; using Mercator\n" 
+	print STDERR "Lambert conformal conic: std parallels are opposite & equal; using Mercator\n"
 	    if($PDL::verbose);
 	return t_mercator($me->{options});
     }
-    
+
     # Find clipping parallels
     $p->{c} = _opt($me->{options},['c','clip','Clip'],undef);
     if(defined($p->{c})) {
@@ -1908,22 +1896,23 @@ sub t_lambert {
     $p->{c} = abs($p->{c}) * topdl([-1,1]) if($p->{c}->nelem == 1);
     $p->{c} = [$p->{c}->list];
 
+    my ($p0, $p1) = $p->{std}->using(0,1);
     # Prefrobnicate
-    if(approx($p->{std}->slice("(0)"),$p->{std}->slice("(1)"))) {
-	$p->{n} = sin($p->{std}->slice("(0)"));
+    if (approx($p0,$p1)) {
+	$p->{n} = sin($p0);
     } else {
-	$p->{n} = (log(cos($p->{std}->slice("(0)"))/cos($p->{std}->slice("(1)")))
-		   / 
-		   log( tan( $PI/4 + $p->{std}->slice("(1)")/2 )
-			/ 
-			tan( $PI/4 + $p->{std}->slice("(0)")/2 )
+	$p->{n} = log(cos($p0)/cos($p1))
+		   /
+		   log( tan( PI/4 + $p1/2 )
+			/
+			tan( PI/4 + $p0/2 )
 			)
-		   );
+		   ;
     }
 
-    $p->{F} = ( cos($p->{std}->slice("(0)"))
+    $p->{F} = ( cos($p0)
 		*
-		( tan( $PI/4 + $p->{std}->slice("(0)")/2 ) ** $p->{n} ) / $p->{n}
+		( tan( PI/4 + $p0/2 ) ** $p->{n} ) / $p->{n}
 		);
 
     $p->{rho0} = $p->{F};
@@ -1935,12 +1924,12 @@ sub t_lambert {
 	my($d,$o) = @_;
 	my($out) = $d->new_or_inplace;
 
-	my($cl) = ( ($o->{c}->[0] == $o->{c}->[1]) ? 
+	my($cl) = ( ($o->{c}->[0] == $o->{c}->[1]) ?
 		    $d->slice("(1)")*$o->{conv} :
 		    ($d->slice("(1)")->clip(@{$o->{c}}) * $o->{conv})
 		    );
 
-	my($rho) = $o->{F} / ( tan($PI/4 + ($cl)/2 ) ** $o->{n} );
+	my($rho) = $o->{F} / ( tan(PI/4 + ($cl)/2 ) ** $o->{n} );
 	my($theta) = $o->{n} * $d->slice("(0)") * $o->{conv};
 
 	$out->slice("(0)") .= $rho * sin($theta);
@@ -1951,7 +1940,7 @@ sub t_lambert {
     $me->{inv} = sub {
 	my($d,$o) = @_;
 	my($out) = $d->new_or_inplace;
-	
+
 	my($x) = $d->slice("(0)");
 	my($y) = $o->{rho0} - $d->slice("(1)");
 
@@ -1961,11 +1950,11 @@ sub t_lambert {
 
 
 	$out->slice("(0)") .= $theta / $o->{n};
-	$out->slice("(0)")->where(($out->slice("(0)") > $PI) | ($out->slice("(0)") < -$PI)) .= $o->{bad};
+	$out->slice("(0)")->where(($out->slice("(0)") > PI) | ($out->slice("(0)") < -PI)) .= $o->{bad};
 
 
-	$out->slice("(1)") .= 2 * atan(($o->{F}/$rho)**(1.0/$o->{n})) - $PI/2;
-	$out->slice("(1)")->where(($out->slice("(1)") > $PI/2) | ($out->slice("(1)") < -$PI/2)) .= $o->{bad};
+	$out->slice("(1)") .= 2 * atan(($o->{F}/$rho)**(1.0/$o->{n})) - PI/2;
+	$out->slice("(1)")->where(($out->slice("(1)") > PI/2) | ($out->slice("(1)") < -PI/2)) .= $o->{bad};
 
 	$out->slice("0:1") /= $o->{conv};
 
@@ -1989,7 +1978,7 @@ sub t_lambert {
 (Cartography) Stereographic projection (az.; conf.; persp.)
 
 The stereographic projection is a true perspective (planar) projection
-from a point on the spherical surface opposite the origin of the map.  
+from a point on the spherical surface opposite the origin of the map.
 
 OPTIONS
 
@@ -1999,7 +1988,7 @@ OPTIONS
 
 =item c, clip, Clip (default 120)
 
-This is the angular distance from the center to the edge of the 
+This is the angular distance from the center to the edge of the
 projected map.  The default 120 degrees gives you most of the opposite
 hemisphere but avoids the hugely distorted part near the antipodes.
 
@@ -2009,7 +1998,7 @@ hemisphere but avoids the hugely distorted part near the antipodes.
 
 sub t_stereographic {
     my($me) = _new(@_,"Stereographic Projection");
-    
+
     $me->{params}->{k0} = 1.0;
     $me->{params}->{c} = _opt($me->{options},
 			      ['c','clip','Clip'],
@@ -2022,39 +2011,38 @@ sub t_stereographic {
 	my($d,$o) = @_;
 	my($out) = $d->new_or_inplace;
 
-	my($th,$ph) = ($out->slice("(0)") * $o->{conv},
-		       $out->slice("(1)") * $o->{conv});
+	my ($out0, $out1) = $out->using(0,1);
+	my ($th,$ph) = map $_ * $o->{conv}, $out0, $out1;
 
-	my($cph) = cos($ph); # gets re-used 
+	my $cph = cos($ph); # gets re-used
 	my($k) = 2 * $o->{k0} / (1 + cos($th) * $cph);
-	$out->slice("(0)") .= $k * $cph * sin($th);
-	$out->slice("(1)") .= $k * sin($ph);
+	$out0 .= $k * $cph * sin($th);
+	$out1 .= $k * sin($ph);
 
-	my($cl0) = 2*$o->{k0} / (1 + cos($o->{c}));
-	$out->slice("(0)")->where($k>$cl0) .= $o->{bad};
-	$out->slice("(1)")->where($k>$cl0) .= $o->{bad};
+	my $cl0 = 2*$o->{k0} / (1 + cos($o->{c}));
+	$out0->where($k>$cl0) .= $o->{bad};
+	$out1->where($k>$cl0) .= $o->{bad};
 	$out;
     };
 
     $me->{inv} = sub {
 	my($d,$o) = @_;
 	my($out) = $d->new_or_inplace;
-	
-	my($x) = $d->slice("(0)");
-	my($y) = $d->slice("(1)");
+
+	my ($x, $y) = $d->using(0,1);
 	my($rho) = sqrt($x*$x + $y*$y);
 	my($c) = 2 * atan2($rho,2*$o->{k0});
-	
+
 	$out->slice("(0)") .= atan2($x * sin($c), $rho * cos($c));
 	$out->slice("(1)") .= asin($y * sin($c) / $rho);
-	
+
 	$out ->slice("0:1") /= $o->{conv};
 	$out;
     };
 
     $me->_finish;
 }
-     
+
 ######################################################################
 
 =head2 t_gnomonic
@@ -2069,7 +2057,7 @@ sub t_stereographic {
 
 The gnomonic projection projects a hemisphere onto a tangent plane.
 It is useful in cartography for the property that straight lines are
-great circles; and it is useful in scientific imaging because 
+great circles; and it is useful in scientific imaging because
 it is the projection generated by a simple optical system with a flat
 focal plane.
 
@@ -2081,8 +2069,8 @@ OPTIONS
 
 =item c, clip, Clip (default 75)
 
-This is the angular distance from the center to the edge of the 
-projected map.  The default 75 degrees gives you most of the 
+This is the angular distance from the center to the edge of the
+projected map.  The default 75 degrees gives you most of the
 hemisphere but avoids the hugely distorted part near the horizon.
 
 =back
@@ -2091,7 +2079,7 @@ hemisphere but avoids the hugely distorted part near the horizon.
 
 sub t_gnomonic {
     my($me) = _new(@_,"Gnomonic Projection");
-    
+
     $me->{params}->{k0} = 1.0;  # Useful for standard parallel (TBD: add one)
 
     $me->{params}->{c} = topdl(_opt($me->{options},
@@ -2107,44 +2095,42 @@ sub t_gnomonic {
 	my($d,$o) = @_;
 	my($out) = $d->new_or_inplace;
 
-	my($th,$ph) = ($out->slice("(0)") * $o->{conv},
-		       $out->slice("(1)") * $o->{conv});
+	my ($th, $ph) = map $_ * $o->{conv},
+          my ($out0, $out1) = $out->using(0,1);
 
-	my($cph) = cos($ph); # gets re-used 
+	my $cph = cos($ph); # gets re-used
 
-	my($k) = $o->{k0} / (cos($th) * $cph);
-	my($cl0) = $o->{k0} / (cos($o->{c}));
+	my $k = $o->{k0} / (cos($th) * $cph);
+	my $cl0 = $o->{k0} / (cos($o->{c}));
 
-	$out->slice("(0)") .= $k * $cph * sin($th);
-	$out->slice("(1)") .= $k * sin($ph);
+	$out0 .= $k * $cph * sin($th);
+	$out1 .= $k * sin($ph);
 
 	my $idx = whichND(($k > $cl0)  | ($k < 0) | (!isfinite($k)));
-	if($idx->nelem) {
-	  $out->slice("(0)")->range($idx) .= $o->{bad};
-	  $out->slice("(1)")->range($idx) .= $o->{bad};
+	if ($idx->nelem) {
+	  $_->range($idx) .= $o->{bad} for $out0, $out1;
 	}
 
 	$out;
     };
 
     $me->{inv} = sub {
-	my($d,$o) = @_;
-	my($out) = $d->new_or_inplace;
+	my ($d,$o) = @_;
+	my $out = $d->new_or_inplace;
 
-	my($x) = $d->slice("(0)");
-	my($y) = $d->slice("(1)");
+	my ($x, $y) = $d->using(0,1);
 
-	my($rho) = sqrt($x*$x + $y*$y);
-	my($c) = atan($rho/$o->{k0});
+	my $rho = sqrt($x*$x + $y*$y);
+	my $c = atan($rho/$o->{k0});
 
-	$out->slice("(0)") .= atan2($x * sin($c), $rho * cos($c));
-	$out->slice("(1)") .= asin($y * sin($c) / $rho);
+	my ($out0, $out1) = $out->using(0,1);
+	$out0 .= atan2($x * sin($c), $rho * cos($c));
+	$out1 .= asin($y * sin($c) / $rho);
 
 	my $idx = whichND($rho==0);
 
-	if($idx->nelem) {
-	  $out->slice("(0)")->range($idx) .= 0;
-	  $out->slice("(1)")->range($idx) .= 0;
+	if ($idx->nelem) {
+	  $_->range($idx) .= 0 for $out0, $out1;
 	}
 	$out->slice("0:1") /= $o->{conv};
 	$out;
@@ -2161,7 +2147,7 @@ sub t_gnomonic {
 
   $t = t_az_eqd(<options>);
 
-=for ref 
+=for ref
 
 (Cartography) Azimuthal equidistant projection (az.; equi.)
 
@@ -2206,7 +2192,7 @@ sub t_az_eqd {
   $me->{func} = sub {
     my($d,$o) = @_;
     my($out) = $d->new_or_inplace;
-    
+
     my($ph) = $d->slice("(1)") * $o->{conv};
     my($th) = $d->slice("(0)") * $o->{conv};
 
@@ -2214,16 +2200,15 @@ sub t_az_eqd {
     my $c = acos($cos_c);
     my $k = $c / sin($c);
     $k->where($c==0) .= 1;
-    
-    my($x,$y) = ($out->slice("(0)"), $out->slice("(1)"));
+
+    my ($x, $y) = $out->using(0,1);
 
     $x .= $k * cos($ph) * sin($th);
     $y .= $k * sin($ph);
 
     my $idx = whichND($c > $o->{c});
-    if($idx->nelem) {
-      $x->range($idx) .= $o->{bad};
-      $y->range($idx) .= $o->{bad};
+    if ($idx->nelem) {
+      $_->range($idx) .= $o->{bad} for $x, $y;
     }
 
     $out;
@@ -2231,19 +2216,17 @@ sub t_az_eqd {
 
   $me->{inv} = sub {
     my($d,$o) = @_;
-    my($out) = $d->new_or_inplace;
-    my($x) = $d->slice("(0)");
-    my($y) = $d->slice("(1)");
+    my $out = $d->new_or_inplace;
+    my ($x, $y) = $d->using(0,1);
 
     my $rho = $d->slice("0:1")->magnover;
-    # Order is important -- ((0)) overwrites $x if is_inplace!
-    $out->slice("(0)") .= atan2( $x * sin($rho), $rho * cos $rho );
-    $out->slice("(1)") .= asin( $y * sin($rho) / $rho );
+    my ($out0, $out1) = $out->using(0,1);
+    $out0 .= atan2( $x * sin($rho), $rho * cos $rho );
+    $out1 .= asin( $y * sin($rho) / $rho );
 
-    my $idx = whichND($rho == 0);
-    if($idx->nelem) {
-      $out->slice("(0)")->range($idx) .= 0;
-      $out->slice("(1)")->range($idx) .= 0;
+    my $idx = whichND(($rho == 0) | ($rho > PI));
+    if ($idx->nelem) {
+      $_->range($idx) .= $o->{bad} for $out0, $out1;
     }
 
     $out->slice("0:1") /= $o->{conv};
@@ -2283,7 +2266,7 @@ The largest angle relative to the origin.  Default is the whole sphere.
 
 sub t_az_eqa {
   my($me) = _new(@_,"Equal-Area Azimuthal Projection");
-  
+
   $me->{params}->{c} = topdl(_opt($me->{options},
 				['c','clip','Clip'],
 				180) * $me->{params}->{conv});
@@ -2292,44 +2275,44 @@ sub t_az_eqa {
   $me->{ounit} = ['Proj. radians','Proj. radians'];
 
   $me->{func} = sub {
-    my($d,$o) = @_;
-    my($out) = $d->new_or_inplace;
-    
-    my($ph) = $d->slice("(1)") * $o->{conv};
-    my($th) = $d->slice("(0)") * $o->{conv};
-				
-    my($c) = acos(cos($ph) * cos($th));
-    my($rho) = 2 * sin($c/2);
-    my($k) = 1.0/cos($c/2);
+    my ($d,$o) = @_;
+    my $out = $d->new_or_inplace;
 
-    my($x,$y) = ($out->slice("(0)"),$out->slice("(1)"));
-    $x .= $k * cos($ph) * sin($th);
+    my ($th, $ph) = map $_ * $o->{conv},
+      my ($x, $y) = $out->using(0,1);
+
+    my $cos_ph = cos($ph);
+    my $c = acos($cos_ph * cos($th));
+    my $k = 1.0/cos($c/2);
+
+    $x .= $k * $cos_ph * sin($th);
     $y .= $k * sin($ph);
 
     my $idx = whichND($c > $o->{c});
-    if($idx->nelem) {
-      $x->range($idx) .= $o->{bad};
-      $y->range($idx) .= $o->{bad};
+    if ($idx->nelem) {
+      $_->range($idx) .= $o->{bad} for $x, $y;
     }
 
     $out;
   };
 
   $me->{inv} = sub {
-    my($d,$o) = @_;
-    my($out) = $d->new_or_inplace;
+    my ($d,$o) = @_;
+    my $out = $d->new_or_inplace;
 
-    my($x,$y) = ($d->slice("(0)"),$d->slice("(1)"));
-    my($ph,$th) = ($out->slice("(0)"),$out->slice("(1)"));
-    my($rho) = sqrt($x*$x + $y*$y);
-    my($c) = 2 * asin($rho/2);
+    my ($x, $y) = $d->using(0,1);
+    my ($th, $ph) = $out->using(0,1);
+    my $rho = sqrt($x*$x + $y*$y);
+    my $c = 2 * asin($rho/2);
+    my $sin_c = sin($c);
 
-    $ph .= asin($d->slice("(1)") * sin($c) / $rho);
-    $th .= atan2($x * sin($c),$rho * cos($c));
+    my $rho_no0 = $rho + ($rho == 0);
+    $ph .= asin($y * $sin_c / $rho_no0);
+    $th .= atan2($x * $sin_c,$rho * cos($c));
 
     $ph /= $o->{conv};
     $th /= $o->{conv};
-    
+
     $out;
   };
 
@@ -2339,11 +2322,7 @@ sub t_az_eqa {
 
 ######################################################################
 
-=head2 t_aitoff
-
-C<t_aitoff> in an alias for C<t_hammer>
-
-=head2 t_hammer
+=head2 t_hammer, t_aitoff
 
 =for ref
 
@@ -2351,8 +2330,8 @@ C<t_aitoff> in an alias for C<t_hammer>
 
 The Hammer/Aitoff projection is often used to display the Celestial
 sphere.  It is mathematically related to the Lambert Azimuthal Equal-Area
-projection (L</t_az_eqa>), and maps the sphere to an ellipse of unit 
-eccentricity, with vertical radius sqrt(2) and horizontal radius of 
+projection (L</t_az_eqa>), and maps the sphere to an ellipse of unit
+eccentricity, with vertical radius sqrt(2) and horizontal radius of
 2 sqrt(2).
 
 OPTIONS
@@ -2369,19 +2348,18 @@ OPTIONS
 
 sub t_hammer {
   my($me) = _new(@_,"Hammer/Aitoff Projection");
-  
+
   $me->{otype} = ['Longitude','Latitude'];
   $me->{ounit} = [' ',' '];
   $me->{odim} = 2;
   $me->{idim} = 2;
 
   $me->{func} = sub {
-    my($d,$o) = @_;
-    my($out) = $d->new_or_inplace;
+    my ($d,$o) = @_;
+    my $out = $d->new_or_inplace;
     $out->slice("0:1") *= $o->{conv};
-    my($th) = $out->slice("(0)");
-    my($ph) = $out->slice("(1)");
-    my($t) = sqrt( 2 / (1 + cos($ph) * cos($th/2)));
+    my ($th, $ph) = $out->using(0,1);
+    my $t = sqrt( 2 / (1 + cos($ph) * cos($th/2)));
     $th .= 2 * $t * cos($ph) * sin($th/2);
     $ph .= $t * sin($ph);
     $out;
@@ -2389,22 +2367,21 @@ sub t_hammer {
   ;
 
   $me->{inv} = sub {
-    my($d,$o) = @_;
-    my($out) = $d->new_or_inplace;
-    my($x) = $out->slice("(0)");
-    my($y) = $out->slice("(1)");
+    my ($d,$o) = @_;
+    my $out = $d->new_or_inplace;
+    my ($x, $y) = $out->using(0,1);
 
-    my($rej) = which(($x*$x/8 + $y*$y/2)->flat > 1);
-    
-    my($zz);
-    my($z) = sqrt( $zz = (1 - $x*$x/16 - $y*$y/4) );
+    my $rej = which(($x*$x/8 + $y*$y/2)->flat > 1);
+
+    my $z = sqrt( my $zz = (1 - $x*$x/16 - $y*$y/4) );
     $x .= 2 * atan( ($z * $x) / (4 * $zz - 2) );
     $y .= asin($y * $z);
-    
+
     $out->slice("0:1") /= $o->{conv};
 
-    $x->flat->slice($rej) .= $o->{bad};
-    $y->flat->slice($rej) .= $o->{bad};
+    if (!$rej->isempty) {
+      $_->flat->slice($rej) .= $o->{bad} for $x, $y;
+    }
 
     $out;
   };
@@ -2415,12 +2392,7 @@ sub t_hammer {
 
 ######################################################################
 
-=head2 t_zenithal
-
-Vertical projections are also called "zenithal", and C<t_zenithal> is an
-alias for C<t_vertical>.
-
-=head2 t_vertical
+=head2 t_vertical, t_zenithal
 
 =for usage
 
@@ -2430,9 +2402,10 @@ alias for C<t_vertical>.
 
 (Cartography) Vertical perspective projection (az.; persp.)
 
-Vertical perspective projection is a generalization of L<gnomonic|/t_gnomonic>
-and L<stereographic|/t_stereographic> projection, and a special case of 
-L<perspective|/t_perspective> projection.  It is a projection from the 
+Vertical (also called "zenithal") perspective projection is a
+generalization of L<gnomonic|/t_gnomonic>
+and L<stereographic|/t_stereographic> projection, and a special case of
+L<perspective|/t_perspective> projection.  It is a projection from the
 sphere onto a tangent plane from a point at the camera location.
 
 OPTIONS
@@ -2452,8 +2425,8 @@ places the point of view one radius above the surface.
 
 =item t, telescope, Telescope, cam, Camera (default '')
 
-If this is set, then the central scale is in telescope or camera 
-angular units rather than in planetary radii.  The angular units are 
+If this is set, then the central scale is in telescope or camera
+angular units rather than in planetary radii.  The angular units are
 parsed as with the normal 'u' option for the lon/lat specification.
 If you specify a non-string value (such as 1) then you get telescope-frame
 radians, suitable for working on with other transformations.
@@ -2471,7 +2444,7 @@ for '(t_az_eqd) x !(t_gnomonic) x (t_vertical)'.
 sub t_vertical {
     my($me) = _new(@_,'Vertical Perspective');
     my $p = $me->{params};
-    
+
     my $m= _opt($me->{options},
 		['m','mask','Mask','h','hemi','hemisphere','Hemisphere'],
 		1);
@@ -2494,108 +2467,94 @@ sub t_vertical {
 		     'd','dist','distance','Distance'],
 		    2.0
 		    );
-    
+
     if($p->{r0} == 0) {
       print "t_vertical: r0 = 0; using t_gnomonic instead\n"
 	if($PDL::verbose);
       return t_gnomonic($me->{options});
     }
-    
+
     if($p->{r0} == 1) {
       print "t_vertical: r0 = 1; using t_stereographic instead\n"
 	if($PDL::verbose);
       return t_stereographic($me->{options});
     }
-    
-    
+
+
     $p->{t} = _opt($me->{options},
 		   ['t','tele','telescope','Telescope',
 		    'cam','camera','Camera'],
 		   undef);
-    
+
     $p->{f} = _opt($me->{options},
 		   ['f','fish','fisheye','Fisheye'],
 		   undef);
-    
+
     $p->{t} = 'rad'
       if($p->{f} && !defined($p->{t}));
-      
+
     $p->{tconv} = _uconv($p->{t},1) || _uconv('rad')
       if(defined $p->{t});
 
     $me->{func} = sub {
-	my($d,$o) = @_;
-	my($out) = $d->new_or_inplace;
-	my($th) = $d->slice("(0)")*$o->{conv};
-	my($ph) = $d->slice("(1)")*$o->{conv};
+	my ($d,$o) = @_;
+	my $out = $d->new_or_inplace;
+	my ($th, $ph) = map $_*$o->{conv}, $d->using(0,1);
 
-	my($cph) = cos($ph);
+	my $cph = cos($ph);
+	my $cos_c = $cph * cos($th);
 
-	my($cos_c) = $cph * cos($th);
+	my $k = (($o->{r0} - 1) /
+		 ($o->{r0} - $cos_c));
 
-	my($k) = (($o->{r0} - 1) / 
-		  ($o->{r0} - $cos_c));
-
-	# If it's a telescope perspective, figure the apparent size
-	# of the globe and scale accordingly.
-	if($o->{t}) {
-	  my($theta) = asin(1/$o->{r0});
-	}
-	
 	$out->slice("0:1") /= ($o->{r0} - 1.0) * ($o->{f} ? 1.0 : $o->{tconv})
   	  if($o->{t});
 
-
-
-	$out->slice("(0)") .= $cph * sin($th);
-	$out->slice("(1)") .= sin($ph);
+	my ($out0, $out1) = $out->using(0,1);
+	$out0 .= $cph * sin($th);
+	$out1 .= sin($ph);
 
 	# Handle singularity at the origin
 	$k->where(($out->slice("(0)") == 0) & ($out->slice("(1)") == 0)) .= 0;
 	$out->slice("0:1") *= $k->dummy(0,2);
 
-	if($o->{m}) {
+	if ($o->{m}) {
 	    my $idx;
 	    $idx = whichND($cos_c < 1.0/$o->{r0})
-		if($o->{m} == 1);
+		if $o->{m} == 1;
 	    $idx = whichND($cos_c > 1.0/$o->{r0})
-		if($o->{m} == 2);
-
-	    if(defined $idx && ref $idx eq 'PDL' && $idx->nelem){
-	      $out->slice("(0)")->range($idx) .= $o->{bad};
-	      $out->slice("(1)")->range($idx) .= $o->{bad};
+		if $o->{m} == 2;
+	    if (defined $idx && ref $idx eq 'PDL' && $idx->nelem){
+	      $_->range($idx) .= $o->{bad} for $out0, $out1;
 	    }
 	}
-
 
 	$out;
     };
 
     $me->{inv} = sub {
-	my($d,$o) = @_;
-	my($out) = $d->new_or_inplace;
+	my ($d,$o) = @_;
+	my $out = $d->new_or_inplace;
 
 	# Reverse the hemisphere if the mask is set to 'far'
-	my($P) = ($o->{m} == 2) ? -$o->{r0} : $o->{r0};
+	my $P = ($o->{m} == 2) ? -$o->{r0} : $o->{r0};
 
 	$out->slice("0:1") *= ($P - 1.0) * ($o->{f} ? 1.0 : $o->{tconv})
      	    if($o->{t});
 
 	my $rho = $d->slice("0:1")->magnover;
-	my($sin_c) = ( (  $P - sqrt( 1 - ($rho*$rho * ($P+1)/($P-1)) ) ) /
-		       ( ($P-1)/$rho + $rho/($P-1) )
-		       );
+	my $sin_c = (  $P - sqrt( 1 - ($rho*$rho * ($P+1)/($P-1)) ) ) /
+		    ( ($P-1)/$rho + $rho/($P-1) );
 
-	my($cos_c) = sqrt(1 - $sin_c*$sin_c);
+	my $cos_c = sqrt(1 - $sin_c*$sin_c);
 
 	# Switch c's quadrant where necessary, by inverting cos(c).
-	if($P<0) {
+	if ($P<0) {
 	  my $idx = whichND($rho > ($P-1/$P));
 	  $cos_c->range($idx) *= -1
-	    if($idx->nelem > 0);
+	    if $idx->nelem > 0;
 	}
 
-	
 	$out->slice("(0)") .= atan( $d->slice("(0)") * $sin_c / ($rho * $cos_c) );
 	$out->slice("(1)") .= asin( $d->slice("(1)") * $sin_c / $rho );
 
@@ -2603,14 +2562,14 @@ sub t_vertical {
 
 	$out;
     };
-	      
+
 
     # Compose on both front and back as necessary.
-    return t_compose( t_scale(1.0/$p->{tconv}), 
-		      t_az_eqd, 
-		      t_gnomonic->inverse, 
+    return t_compose( t_scale(1.0/$p->{tconv}),
+		      t_az_eqd,
+		      t_gnomonic->inverse,
 		      $me->_finish )
-      if($p->{f}); 
+      if($p->{f});
 
     $me->_finish;
   }
@@ -2627,7 +2586,7 @@ sub t_vertical {
 
 =for ref
 
-(Cartography) Arbitrary perspective projection 
+(Cartography) Arbitrary perspective projection
 
 Perspective projection onto a focal plane from an arbitrary location
 within or without the sphere, with an arbitrary central look direction,
@@ -2650,8 +2609,8 @@ higher angles between the focal plane and focused rays within the
 optical system of your camera.  If you do not happen to know the
 magnification of your camera, a simple rule of thumb is that the
 magnification of a reflective telescope is roughly its focal length
-(plate scale) divided by its physical length; and the magnification of 
-a compound refractive telescope is roughly twice its physical length divided 
+(plate scale) divided by its physical length; and the magnification of
+a compound refractive telescope is roughly twice its physical length divided
 by its focal length.  Simple optical systems with a single optic have
 magnification = 1.  Fisheye lenses have magnification < 1.
 
@@ -2682,7 +2641,7 @@ from the body in question (e.g. images of other planets or the Sun).
 Be careful not to confuse 'p' (pointing) with 'P' (P angle, a standard
 synonym for roll).
 
-=item c, cam, camera, Camera (default undef) 
+=item c, cam, camera, Camera (default undef)
 
 Alternate way of specifying the camera pointing, using a spherical
 coordinate system with poles at the zenith (positive) and nadir
@@ -2694,13 +2653,13 @@ option, above.  This coordinate system is most useful for aerial photography
 or low-orbit work, where the nadir is not necessarily the most interesting
 part of the scene.
 
-=item r0, R0, radius, d, dist, distance [default 2.0] 
+=item r0, R0, radius, d, dist, distance [default 2.0]
 
 The altitude of the point of view above the center of the sphere.
 The default places the point of view 1 radius aboove the surface.
-Do not confuse this with 'r', the standard origin roll angle!  Setting 
+Do not confuse this with 'r', the standard origin roll angle!  Setting
 r0 < 1 gives a viewpoint inside the sphere.  In that case, the images are
-mirror-reversed to preserve the chiralty of the perspective.  Setting 
+mirror-reversed to preserve the chiralty of the perspective.  Setting
 r0=0 gives gnomonic projections; setting r0=-1 gives stereographic projections.
 Setting r0 < -1 gives strange results.
 
@@ -2712,23 +2671,23 @@ at the center of the image.
 =item mag, magnification, Magnification (default 1.0)
 
 This is the magnification factor applied to the optics -- it affects the
-amount of tangent-plane distortion within the telescope. 
-1.0 yields the view from a simple optical system; higher values are 
-telescopic, while lower values are wide-angle (fisheye).  Higher 
-magnification leads to higher angles within the optical system, and more 
-tangent-plane distortion at the edges of the image.  
+amount of tangent-plane distortion within the telescope.
+1.0 yields the view from a simple optical system; higher values are
+telescopic, while lower values are wide-angle (fisheye).  Higher
+magnification leads to higher angles within the optical system, and more
+tangent-plane distortion at the edges of the image.
 The magnification is applied to the incident angles themselves, rather than
 to their tangents (simple two-element telescopes magnify tan(theta) rather
 than theta itself); this is appropriate because wide-field optics more
-often conform to the equidistant azimuthal approximation than to the 
-tangent plane approximation.  If you need more detailed control of 
-the relationship between incident angle and focal-plane position, 
+often conform to the equidistant azimuthal approximation than to the
+tangent plane approximation.  If you need more detailed control of
+the relationship between incident angle and focal-plane position,
 use mag=1.0 and compose the transform with something else to tweak the
 angles.
 
 =item m, mask, Mask, h, hemisphere, Hemisphere [default 'near']
 
-'hemisphere' is by analogy to other cartography methods although the two 
+'hemisphere' is by analogy to other cartography methods although the two
 regions to be selected are not really hemispheres.
 
 =item f, fov, field_of_view, Field_Of_View [default 60 degrees]
@@ -2736,7 +2695,7 @@ regions to be selected are not really hemispheres.
 The field of view of the telescope -- sets the crop radius on the
 focal plane.  If you pass in a scalar, you get a circular crop.  If you
 pass in a 2-element list ref, you get a rectilinear crop, with the
-horizontal 'radius' and vertical 'radius' set separately. 
+horizontal 'radius' and vertical 'radius' set separately.
 
 =back
 
@@ -2755,7 +2714,7 @@ latitude:
 	     CUNIT1=>deg,CUNIT2=>deg,              # Unit of axes
 	     CDELT1=>0.05,CDELT2=>0.05,            # Scale of axes
 	     CRPIX1=>3601,CRPIX2=>1801,            # Center of map
-	     CRVAL1=>0,CRVAL2=>0                   # (lon,lat) of center 
+	     CRVAL1=>0,CRVAL2=>0                   # (lon,lat) of center
 	     };
 
   # Set up the perspective transformation, and apply it.
@@ -2782,267 +2741,263 @@ is just an expensive modified-gnomonic projection).
 =cut
 
 sub t_perspective {
-    my($me) = _new(@_,'Focal-Plane Perspective');
-    my $p = $me->{params};
-    
-    my $m= _opt($me->{options},
-		['m','mask','Mask','h','hemi','hemisphere','Hemisphere'],
-		1);
-    $p->{m} = $m;
-    $p->{m} = 0 if($m=~m/^b/i);
-    $p->{m} = 1 if($m=~m/^n/i);
-    $p->{m} = 2 if($m=~m/^f/i);
+  my $me = _new(@_,'Focal-Plane Perspective');
+  my $p = $me->{params};
 
-    $p->{r0} = _opt($me->{options},
-		    ['r0','R0','radius','Radius',
-		     'd','dist','distance','Distance'],
-		    2.0
-		    );
-    
-    $p->{iu} = _opt($me->{options},
-		   ['i','iu','image_unit','Image_Unit'],
-		   'degrees');
-    
-    $p->{tconv} = _uconv($p->{iu});
+  my $m= _opt($me->{options},
+              ['m','mask','Mask','h','hemi','hemisphere','Hemisphere'],
+              1);
+  $p->{m} = $m;
+  $p->{m} = 0 if($m=~m/^b/i);
+  $p->{m} = 1 if($m=~m/^n/i);
+  $p->{m} = 2 if($m=~m/^f/i);
 
-    $p->{mag} = _opt($me->{options},
-		     ['mag','magnification','Magnification'],
-		     1.0);
+  $p->{r0} = _opt($me->{options},
+                  ['r0','R0','radius','Radius',
+                   'd','dist','distance','Distance'],
+                  2.0
+                  );
 
-    # Regular pointing pseudovector -- make sure there are exactly 3 elements
-    $p->{p} = (topdl(_opt($me->{options},
-			['p','ptg','pointing','Pointing'],
-			[0,0,0])
-		   )
-	       * $p->{tconv}
-	       )->append(zeroes(3))->slice("0:2");
+  $p->{iu} = _opt($me->{options},
+                 ['i','iu','image_unit','Image_Unit'],
+                 'degrees');
 
-    $p->{pmat} = _rotmat( (- $p->{p})->list );
-    
-    # Funky camera pointing pseudovector overrides normal pointing option 
-    $p->{c} = _opt($me->{options},
-		   ['c','cam','camera','Camera'],
-		   undef
-		   );
+  $p->{tconv} = _uconv($p->{iu});
 
-    if(defined($p->{c})) {
-      $p->{c} = (topdl($p->{c}) * $p->{tconv})->append(zeroes(3))->slice("0:2");
+  $p->{mag} = _opt($me->{options},
+                   ['mag','magnification','Magnification'],
+                   1.0);
 
-      $p->{pmat} = ( _rotmat( 0,-$PI/2,0 ) x 
-		     _rotmat( (-$p->{c})->list ) 
-		     );
+  # Regular pointing pseudovector -- make sure there are exactly 3 elements
+  $p->{p} = (topdl(_opt($me->{options},
+                      ['p','ptg','pointing','Pointing'],
+                      [0,0,0])
+                 )
+             * $p->{tconv}
+             )->append(zeroes(3))->slice("0:2");
+
+  $p->{pmat} = _rotmat( (- $p->{p})->list );
+
+  # Funky camera pointing pseudovector overrides normal pointing option
+  $p->{c} = _opt($me->{options},
+                 ['c','cam','camera','Camera'],
+                 undef
+                 );
+
+  if(defined($p->{c})) {
+    $p->{c} = (topdl($p->{c}) * $p->{tconv})->append(zeroes(3))->slice("0:2");
+
+    $p->{pmat} = ( _rotmat( 0,-PI/2,0 ) x
+                   _rotmat( (-$p->{c})->list )
+                   );
+  }
+
+  # Reflect X axis if we're inside the sphere.
+  if($p->{r0}<1) {
+    $p->{pmat} = topdl([[-1,0,0],[0,1,0],[0,0,1]]) x $p->{pmat};
+  }
+
+  $p->{f} = ( _opt($me->{options},
+                   ['f','fov','field_of_view','Field_of_View'],
+                   topdl(PI*2/3) / $p->{tconv} / $p->{mag} )
+              * $p->{tconv}
+              );
+
+  $me->{otype} = ['Tan X','Tan Y'];
+  $me->{ounit} = [$p->{iu},$p->{iu}];
+
+  # "Prefilter" -- subsidiary transform to convert the
+  # spherical coordinates to 3-D coords in the viewer's
+  # reference frame (Y,Z are more-or-less tangent-plane X and Y,
+  # and -X is the direction toward the planet, before rotation
+  # to account for pointing).
+
+  $me->{params}->{prefilt} =
+    t_compose(
+              # Offset for the camera pointing.
+              t_linear(m=>$p->{pmat},
+                       d=>3),
+
+              # Rotate the sphere so the correct origin is at the
+              # maximum-X point, then move the whole thing in the
+              # -X direction  by r0.
+              t_linear(m=>(_rotmat($p->{o}->at(0),
+                                   $p->{o}->at(1),
+                                   $p->{roll}->at(0))
+                           ),
+                       d=>3,
+                       post=> topdl( [- $me->{params}->{r0},0,0] )
+                       ),
+
+              # Put initial sci. coords into Cartesian space
+              t_unit_sphere(u=>'radian')
+              );
+
+  # Store the origin of the sphere -- useful for the inverse function
+  $me->{params}->{sph_origin} = (
+                                 topdl([-$me->{params}->{r0},0,0]) x
+                                 $p->{pmat}
+                                 )->slice(":,(0)");
+
+  #
+  # Finally, the meat -- the forward function!
+  #
+  $me->{func} = sub {
+    my ($d,$o) = @_;
+
+    my $out = $d->new_or_inplace;
+    $out->slice("0:1") *= $o->{conv};
+
+    # If we're outside the sphere, do hemisphere filtering
+    my $idx;
+    if(abs($o->{r0}) < 1 ) {
+      $idx = null;
+    } else {
+      # Great-circle distance to origin
+      my $cos_c = (sin($o->{o}->slice("(1)")) * sin($out->slice("(1)"))
+                   +
+                   cos($o->{o}->slice("(1)")) * cos($out->slice("(1)")) *
+                   cos($out->slice("(0)") - $o->{o}->slice("(0)"))
+                   );
+
+      my $thresh = (1.0/$o->{r0});
+
+      if ($o->{m}==1) {
+        $idx = whichND($cos_c < $thresh);
+      } elsif ($o->{m}==2) {
+        $idx = whichND($cos_c > $thresh);
+      } else {
+        $idx = null;
+      }
     }
 
-    # Reflect X axis if we're inside the sphere.
-    if($p->{r0}<1) {
-      $p->{pmat} = topdl([[-1,0,0],[0,1,0],[0,0,1]]) x $p->{pmat};
+    ### Transform everything -- just chuck out the bad points at the end.
+
+    ## convert to 3-D viewer coordinates (there's a dimension change!)
+    my $dc = $out->apply($o->{prefilt});
+
+    ## Apply the tangent-plane transform, and scale by the magnification.
+    my $dcyz = $dc->slice("1:2");
+
+    my $r = $dcyz->magnover;
+    my $rscale;
+    if( $o->{mag} == 1.0 ) {
+        $rscale = - 1.0 / $dc->slice("(0)");
+    } else {
+        print "(using magnification...)\n" if $PDL::verbose;
+        $rscale = - tan( $o->{mag} * atan( $r / $dc->slice("(0)") ) ) / $r;
+    }
+    $r *= $rscale;
+    $out->slice("0:1") .= $dcyz * $rscale->dummy(0,1);
+
+    # Chuck points that are outside the FOV: glue those points
+    # onto the removal list.   The conditional works around a bug
+    # in 2.3.4cvs and earlier: null ndarrays make append() crash.
+    my $w;
+    if(ref $o->{f} eq 'ARRAY') {
+      $w = whichND( ( abs($dcyz->slice("(0)")) > $o->{f}->[0] ) |
+                    ( abs($dcyz->slice("(1)")) > $o->{f}->[1] ) |
+                    ($r < 0)
+                    );
+    } else {
+      $w = whichND( ($r > $o->{f}) | ($r < 0) );
     }
 
-    $p->{f} = ( _opt($me->{options},
-		     ['f','fov','field_of_view','Field_of_View'],
-		     topdl($PI*2/3) / $p->{tconv} / $p->{mag} )
-		* $p->{tconv}
-		);
-    
-    $me->{otype} = ['Tan X','Tan Y'];
-    $me->{ounit} = [$p->{iu},$p->{iu}];
+    $idx = ($idx->nelem) ?  $idx->glue(1,$w)  : $w
+      if($w->nelem);
 
-    # "Prefilter" -- subsidiary transform to convert the 
-    # spherical coordinates to 3-D coords in the viewer's 
-    # reference frame (Y,Z are more-or-less tangent-plane X and Y,
-    # and -X is the direction toward the planet, before rotation 
-    # to account for pointing).
+    if($idx->nelem) {
+      $out->slice("(0)")->range($idx) .= $o->{bad};
+      $out->slice("(1)")->range($idx) .= $o->{bad};
+    }
 
-    $me->{params}->{prefilt} = 
-      t_compose(
-                # Offset for the camera pointing.
-		t_linear(m=>$p->{pmat},
-			 d=>3),
+    ## Scale by the output conversion factor
+    $out->slice("0:1") /= $o->{tconv};
 
-                # Rotate the sphere so the correct origin is at the 
-		# maximum-X point, then move the whole thing in the 
-		# -X direction  by r0.
-		t_linear(m=>(_rotmat($p->{o}->at(0),
-				     $p->{o}->at(1),
-				     $p->{roll}->at(0))
-			     ),
-			 d=>3,
-			 post=> topdl( [- $me->{params}->{r0},0,0] )
-			 ),
+    $out;
+  };
 
-                # Put initial sci. coords into Cartesian space
-		t_unit_sphere(u=>'radian')  
-		);
 
-    # Store the origin of the sphere -- useful for the inverse function
-    $me->{params}->{sph_origin} = (
-				   topdl([-$me->{params}->{r0},0,0]) x 
-				   $p->{pmat}
-				   )->slice(":,(0)");
-
-    #
-    # Finally, the meat -- the forward function!
-    #
-    $me->{func} = sub {
+  #
+  # Inverse function
+  #
+  $me->{inv} = sub {
       my($d,$o) = @_;
 
-      my($out) = $d->new_or_inplace;
-      $out->slice("0:1") *= $o->{conv};
+      my $out = $d->new_or_inplace;
+      $out->slice("0:1") *= $o->{tconv};
+
+      my $oyz = $out->slice("0:1") ;
+
+      ## Inverse-magnify if required
+      if($o->{mag} != 1.0) {
+        my $r = $oyz->magnover;
+        my $scale = tan( atan( $r ) / $o->{mag} ) / $r;
+        $oyz *= $scale->dummy(0,1);
+      }
+
+      ## Solve for the X coordinate of the surface.
+      ## This is a quadratic in the tangent-plane coordinates;
+      ## so here we just figure out the coefficients and plug into
+      ## the quadratic formula.  $y here is actually -B/2.
+      my $a1 = ($oyz * $oyz)->sumover + 1;
+      my $y = ( $o->{sph_origin}->slice("(0)")
+                - ($o->{sph_origin}->slice("1:2") * $oyz)->sumover
+                );
+      my $c = topdl($o->{r0}*$o->{r0} - 1);
+
+      my $x;
+      if ($o->{m} == 2) {
+          # Exceptional case: mask asks for the far hemisphere
+          $x = - ( $y - sqrt($y*$y - $a1 * $c) ) / $a1;
+      } else {
+          # normal case: mask asks for the near hemisphere
+          $x = - ( $y + sqrt($y*$y - $a1 * $c) ) / $a1;
+      }
+
+      my ($out0, $out1) = $out->using(0,1);
+      ## Assemble the 3-space coordinates of the points
+      my $int = $out->slice("0")->append($out);
+      $int->slice("(0)") .= -1.0;
+      $int->slice("0:2") *= $x->dummy(0,3);
+
+      ## convert back to (lon,lat) coordinates...
+      $out .= $int->invert($o->{prefilt});
 
       # If we're outside the sphere, do hemisphere filtering
       my $idx;
-      if(abs($o->{r0}) < 1 ) {
-	$idx = null;
+      if (abs($o->{r0}) < 1) {
+          $idx = null;
       } else {
-	# Great-circle distance to origin
-	my($cos_c) = ( sin($o->{o}->slice("(1)")) * sin($out->slice("(1)"))
-		     +
-		     cos($o->{o}->slice("(1)")) * cos($out->slice("(1)")) *
-		     cos($out->slice("(0)") - $o->{o}->slice("(0)"))
-		     );
-
-	my($thresh) = (1.0/$o->{r0});
-	
-	if($o->{m}==1) {
-	  $idx = whichND($cos_c < $thresh);
-	} elsif($o->{m}==2) {
-	  $idx = whichND($cos_c > $thresh);
-	} else {
-	  $idx = null;
-	}
-      }	
-
-      ### Transform everything -- just chuck out the bad points at the end.
-
-      ## convert to 3-D viewer coordinates (there's a dimension change!)
-      my $dc = $out->apply($o->{prefilt});
-
-      ## Apply the tangent-plane transform, and scale by the magnification.
-      my $dcyz = $dc->slice("1:2");
-
-      my $r = $dcyz->magnover;
-      my $rscale;
-      if( $o->{mag} == 1.0 ) {
-	  $rscale = - 1.0 / $dc->slice("(0)");
-      } else {
-	  print "(using magnification...)\n" if $PDL::verbose;
-	  $rscale = - tan( $o->{mag} * atan( $r / $dc->slice("(0)") ) ) / $r;
+          # Great-circle distance to origin
+          my $cos_c = ( sin($o->{o}->slice("(1)")) * sin($out->slice("(1)"))
+                        +
+                        cos($o->{o}->slice("(1)")) * cos($out->slice("(1)")) *
+                        cos($out->slice("(0)") - $o->{o}->slice("(0)"))
+                      );
+          my $thresh = 1.0/$o->{r0};
+          if ($o->{m}==1) {
+              $idx = whichND($cos_c < $thresh);
+          } elsif ($o->{m}==2) {
+              $idx = whichND($cos_c > $thresh);
+          } else {
+              $idx = null;
+          }
       }
-      $r *= $rscale;
-      $out->slice("0:1") .= $dcyz * $rscale->dummy(0,1);
 
-      # Chuck points that are outside the FOV: glue those points
-      # onto the removal list.   The conditional works around a bug 
-      # in 2.3.4cvs and earlier: null ndarrays make append() crash.
-      my $w;
-      if(ref $o->{f} eq 'ARRAY') {
-	$w = whichND( ( abs($dcyz->slice("(0)")) > $o->{f}->[0] ) |
-		      ( abs($dcyz->slice("(1)")) > $o->{f}->[1] ) |
-		      ($r < 0)
-		      );
-      } else {
-	$w = whichND( ($r > $o->{f}) | ($r < 0) );
-      }
-    
-      $idx = ($idx->nelem) ?  $idx->glue(1,$w)  : $w
-	if($w->nelem);
+      ## Convert to the units the user requested
+      $out->slice("0:1") /= $o->{conv};
 
+      ## Mark bad values
       if($idx->nelem) {
-	$out->slice("(0)")->range($idx) .= $o->{bad};
-	$out->slice("(1)")->range($idx) .= $o->{bad};
+          $_->range($idx) .= $o->{bad} for $out0, $out1;
       }
-
-      ## Scale by the output conversion factor
-      $out->slice("0:1") /= $o->{tconv};
 
       $out;
-    };
 
-    
-    #
-    # Inverse function
-    #
-    $me->{inv} = sub {
-	my($d,$o) = @_;
+  };
 
-	my($out) = $d->new_or_inplace;
-	$out->slice("0:1") *= $o->{tconv};
-
-	my $oyz = $out->slice("0:1") ;
-
-	## Inverse-magnify if required
-	if($o->{mag} != 1.0) {
-	  my $r = $oyz->magnover;
-	  my $scale = tan( atan( $r ) / $o->{mag} ) / $r;
-	  $out->slice("0:1") *= $scale->dummy(0,1);
-	}
-	
-	## Solve for the X coordinate of the surface.  
-	## This is a quadratic in the tangent-plane coordinates;
-	## so here we just figure out the coefficients and plug into
-	## the quadratic formula.  $y here is actually -B/2.
-	my $a1 = ($oyz * $oyz)->sumover + 1;
-	my $y = ( $o->{sph_origin}->slice("(0)")
-		  - ($o->{sph_origin}->slice("1:2") * $oyz)->sumover
-		  );
-	my $c = topdl($o->{r0}*$o->{r0} - 1);
-	
-	my $x;
-	if($o->{m} == 2) { 
-	    # Exceptional case: mask asks for the far hemisphere
-	    $x = - ( $y - sqrt($y*$y - $a1 * $c) ) / $a1;
-	} else {
-	    # normal case: mask asks for the near hemisphere
-	    $x =   - ( $y + sqrt($y*$y - $a1 * $c) ) / $a1;
-	}
-
-	## Assemble the 3-space coordinates of the points
-	my $int = $out->slice("0")->append($out);
-	$int->sever;
-	$int->slice("(0)") .= -1.0;
-	$int->slice("0:2") *= $x->dummy(0,3);
-
-	## convert back to (lon,lat) coordinates...
-	$out .= $int->invert($o->{prefilt});	
-
-	# If we're outside the sphere, do hemisphere filtering
-	my $idx;
-	if(abs($o->{r0}) < 1 ) {
-	    $idx = null;
-	} else {
-	    # Great-circle distance to origin
-	    my($cos_c) = ( sin($o->{o}->slice("(1)")) * sin($out->slice("(1)"))
-			   +
-			   cos($o->{o}->slice("(1)")) * cos($out->slice("(1)")) *
-			   cos($out->slice("(0)") - $o->{o}->slice("(0)"))
-			   );
-	    
-	    my($thresh) = (1.0/$o->{r0});
-	    
-	    if($o->{m}==1) {
-		$idx = whichND($cos_c < $thresh);
-	    } elsif($o->{m}==2) {
-		$idx = whichND($cos_c > $thresh);
-	    }
-	    else {
-		$idx = null;
-	    }
-	}	
-
-	## Convert to the units the user requested
-	$out->slice("0:1") /= $o->{conv};
-
-	## Mark bad values
-	if($idx->nelem) {
-	    $out->slice("(0)")->range($idx) .= $o->{bad};
-	    $out->slice("(1)")->range($idx) .= $o->{bad};
-	}
-
-	$out;
-
-    };
-	      
-    $me;
-  }
+  $me;
+}
 
 1;

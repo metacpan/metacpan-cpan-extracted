@@ -197,7 +197,7 @@ You’ve made it to the end of the tutorial.
 
 =head2 See Also
 
-For additional thematic documentation, see the Apache Lucy
+For additional thematic documentation, see the Lucy
 L<Cookbook|Lucy::Docs::Cookbook>.
 
 ANDQuery has a companion class, L<ORQuery|Lucy::Search::ORQuery>, and a

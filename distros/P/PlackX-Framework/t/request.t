@@ -1,5 +1,6 @@
 #!perl
-use v5.36;
+use v5.26;
+use warnings;
 use Test::More;
 
 package MyExample::Request {
@@ -55,7 +56,7 @@ package MyExample::Request {
   # Flash
   require PlackX::Framework;
   ok(substr($request->flash_cookie_name, 0, 5) eq 'flash');
-  ok(8 < length $request->flash_cookie_name < 64);
+  ok(8 < length $request->flash_cookie_name && length $request->flash_cookie_name < 64);
 
   {
     # We have to subclass to override flash_cookie_name()

@@ -1,5 +1,6 @@
 use Test::More;
 use PDL::LiteF;
+use Test::PDL;
 
 sub IM {
     PDL->new(
@@ -24,6 +25,37 @@ is_deeply(
     ],
     'hclip'
 );
+
+{
+my $im = IM;
+$im->inplace->hclip(5);
+is_pdl $im, pdl('
+  1, 2, 3, 3, 5;
+  2, 3, 4, 5, 5;
+  5, 5, 5, 5, 5;
+  1, 3, 1, 3, 1;
+  5, 5, 2, 2, 2
+'), 'hclip inplace';
+}
+
+{
+my $im = IM;
+is_pdl $im->clip, IM, 'clip no args';
+is_pdl $im->clip(5), pdl('
+  5  5  5  5  5;
+  5  5  5  5  6;
+  13 13 13 13 13;
+  5  5  5  5  5;
+  10 10 5  5  5
+'), 'clip lower only';
+is_pdl $im->clip(undef, 5), pdl('
+  1, 2, 3, 3, 5;
+  2, 3, 4, 5, 5;
+  5, 5, 5, 5, 5;
+  1, 3, 1, 3, 1;
+  5, 5, 2, 2, 2
+'), 'clip upper only';
+}
 
 is_deeply(
     IM->lclip(5)->unpdl,

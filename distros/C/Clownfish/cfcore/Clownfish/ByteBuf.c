@@ -246,7 +246,7 @@ S_grow_and_oversize(ByteBuf *self, size_t min_size) {
 }
 
 static void
-S_overflow_error() {
+S_overflow_error(void) {
     THROW(ERR, "ByteBuf buffer overflow");
 }
 

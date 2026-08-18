@@ -1,0 +1,4 @@
+This directory contains numerous examples of PlackX::Framework. At this time,
+only the examples in the single-file-apps directory are maintained and subjected
+to unit testing. The other examples may show optional features or use features
+from perls later than 5.26.x.

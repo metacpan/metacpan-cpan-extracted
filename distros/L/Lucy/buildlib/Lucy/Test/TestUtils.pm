@@ -18,7 +18,7 @@ use warnings;
 
 package Lucy::Test::TestUtils;
 
-our $VERSION = '0.006002';
+our $VERSION = '0.007000';
 $VERSION = eval $VERSION;
 
 use Exporter 'import';

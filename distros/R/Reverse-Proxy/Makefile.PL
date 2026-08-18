@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Fetch' => '0.05',
+        'Fetch' => '0.13',
     },
     INC   => '-Iinclude',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Reverse-Proxy-*' },
 );

@@ -1647,6 +1647,31 @@ C<linespoints>).
 Selects a fractional size for point glyphs, relative to the default size
 on your terminal, for plots that render points as small glyphs.
 
+=item fillcolor (abbrev 'fc')
+
+Fills an area plot like C<filledcurves> with a color.
+It has the same format as C<linecolor>. This will fill the whole plot with
+the same color. To fill above a threshold or below a threshold, you need to
+use C<above> and C<below> options.
+
+An example to plot data in a single function call is below:
+
+    plot({ with => 'filledcurves', fillcolor => 'green', above => 'y=0' },
+        x, y,
+        { with => 'filledcurves', fillcolor => 'red', below => 'y=0' },
+        x, y);
+
+
+=item below
+
+This is used for C<filledcurves> to set a C<fillcolor> below a threshold.
+You can set the value like "y=0" if you want to color below the Y-axis value of 0.
+
+=item above
+
+This is used for C<filledcurves> to set a C<fillcolor> above a threshold.
+You can set the value like "y=0" if you want to color above the Y-axis value of 0.
+
 =item fillstyle (abbrev 'fs')
 
 Specify the way that filled regions should be colored, in plots that
@@ -2465,8 +2490,8 @@ Added in 2.025.
 
  $w=gpwin();
  $w->multiplot(layout=>[2,1]);
- $w->plot({title=>"points},with=>'points',$a,$b);
- $w->plot({title=>"lines",with=>"lines",$a,$b);
+ $w->plot({title=>"points"},with=>'points',$a,$b);
+ $w->plot({title=>"lines"},with=>"lines",$a,$b);
  $w->end_multi();
 
 =for ref

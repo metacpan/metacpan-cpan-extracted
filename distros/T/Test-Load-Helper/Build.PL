@@ -18,7 +18,7 @@ my %module_build_args = (
     "Branislav Zahradn\x{ed}k <barney.cpan\@gmail.com>"
   ],
   "dist_name" => "Test-Load-Helper",
-  "dist_version" => "1.0.1",
+  "dist_version" => "1.0.2",
   "license" => "artistic_2",
   "module_name" => "Test::Load::Helper",
   "recursive_test_files" => 1,
@@ -30,9 +30,12 @@ my %module_build_args = (
     "warnings" => 0
   },
   "test_requires" => {
+    "Carp::Always" => 0,
     "Path::Tiny" => "0.018",
+    "Test::Deep" => 0,
     "Test::EOL" => 0,
-    "Test::YAFT" => 0,
+    "Test::More" => 0,
+    "Test::Warnings" => "v0.38.0",
     "constant" => 0,
     "require::relative" => 0
   }
@@ -40,10 +43,13 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
+  "Carp::Always" => 0,
   "Module::Build" => "0.28",
   "Path::Tiny" => "0.018",
+  "Test::Deep" => 0,
   "Test::EOL" => 0,
-  "Test::YAFT" => 0,
+  "Test::More" => 0,
+  "Test::Warnings" => "v0.38.0",
   "constant" => 0,
   "require::relative" => 0
 );

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.14';
+our $VERSION = '0.17';
 
 # Capture a command's standard output, without a shell. Called from C for
 # { $exec: [...] }; a non-zero exit is fatal, so a broken secret store stops

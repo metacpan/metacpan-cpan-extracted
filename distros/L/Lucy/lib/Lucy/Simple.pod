@@ -58,7 +58,7 @@ Later, search the index.
 
 =head1 DESCRIPTION
 
-Lucy::Simple is a stripped-down interface for the Apache Lucy search
+Lucy::Simple is a stripped-down interface for the Lucy search
 engine library.
 
 =head1 CONSTRUCTORS

@@ -1,0 +1,82 @@
+======================================================================
+ TUI::Handy Cheat Sheet                                  [FR] Français
+======================================================================
+
+[ 1. Installation et chargement ]
+
+  Aucune dépendance CPAN ; copiez Handy.pm dans un répertoire de @INC ou exécutez-le directement comme script.
+
+  use TUI::Handy;
+  # or, as a command:  perl Handy.pm form.txt
+
+[ 2. Créer et exécuter un formulaire ]
+
+  Construisez le formulaire à partir d'une chaîne DSL ou d'un fichier, puis appelez run(). Le résultat est une référence de hachage indexée par les libellés du DSL.
+
+  my $tui  = TUI::Handy->new(dsl => $text);   # or new(file => $path)
+  my $form = $tui->run;
+  print "Company = $form->{Company}\n";
+
+[ 3. Marqueurs de zone de texte ]
+
+  Les caractères de remplissage entre [ ] choisissent le type de zone : _ demi-chasse, # nombre, $ ou \ devise, YYYYMMDD ou % date, tout caractère pleine chasse pour le type zenkaku.
+
+  Company: [__________]
+  Age:     [###]
+  Price:   [$$$$$$]
+  Date:    [YYYYMMDD]
+
+[ 4. Case à cocher et bouton radio ]
+
+  [X]/[ ] est une case à cocher (valeur 1 ou 0) ; (*)/( ) regroupe des boutons radio sous la ligne de titre précédente, la valeur étant le libellé sélectionné.
+
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+
+[ 5. Bouton ]
+
+  Des crochets sans libellé devant sont un bouton ; enregistrez son action avec set().
+
+  $tui->set('Register', sub { my $form = shift; save($form); 0 });
+  [Register]
+
+[ 6. Touches ]
+
+  TAB/flèche bas va au champ suivant, Maj-TAB/flèche haut au précédent. Entrée, Espace et les flèches modifient le champ ou activent le bouton ; ESC annule le formulaire.
+
+[ 7. Encodage ]
+
+  Détection automatique d'UTF-8 (hors Windows) ou de Shift_JIS (CP932) sous Windows ; EUC-JP est aussi pris en charge. À surcharger avec TUI_HANDY_ENCODING.
+
+  $ENV{TUI_HANDY_ENCODING} = 'euc';   # utf8 / sjis / euc
+
+[ 8. Repli en mode ligne ]
+
+  Sans stty (cmd.exe Windows nu), un pilote de secours en mode ligne est utilisé automatiquement ; forcez le mode avec TUI_HANDY_MODE.
+
+  $ENV{TUI_HANDY_MODE} = 'line';      # ansi / line
+
+[ 9. Utilisation en ligne de commande ]
+
+  Un fichier DSL peut être exécuté directement, sans écrire de code Perl.
+
+  perl Handy.pm form.txt
+
+[ 10. Exemple complet ]
+
+  Un court DSL combinant tous les types de widgets.
+
+  Registration
+  Company: [__________]
+  Age:     [###]
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+  [Register]
+
+[ 11. Ressources ]
+
+  Documentation complète dans le POD de lib/TUI/Handy.pm (perldoc TUI::Handy). Auteur : INABA Hitoshi <ina.cpan@gmail.com>. Licence : mêmes termes que Perl.

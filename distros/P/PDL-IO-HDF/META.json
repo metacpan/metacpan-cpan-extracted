@@ -4,7 +4,7 @@
       "PerlDL Developers <pdl-general@lists.sourceforge.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,7 +30,7 @@
             "Alien::HDF4" : "0",
             "ExtUtils::Depends" : "0.402",
             "ExtUtils::MakeMaker" : "0",
-            "PDL" : "2.094"
+            "PDL" : "2.105"
          }
       },
       "runtime" : {
@@ -57,6 +57,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.003",
+   "version" : "2.004",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

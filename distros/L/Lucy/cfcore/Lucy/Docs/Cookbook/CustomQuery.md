@@ -1,6 +1,6 @@
 # Sample subclass of Query
 
-Explore Apache Lucy's support for custom query types by creating a
+Explore Lucy's support for custom query types by creating a
 "PrefixQuery" class to handle trailing wildcards.
 
 ~~~ perl

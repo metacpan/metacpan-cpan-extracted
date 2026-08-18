@@ -30,12 +30,12 @@
 #include "Clownfish/Class.h"
 
 TestObj*
-TestObj_new() {
+TestObj_new(void) {
     return (TestObj*)Class_Make_Obj(TESTOBJ);
 }
 
 static Obj*
-S_new_testobj() {
+S_new_testobj(void) {
     String *class_name = SSTR_WRAP_C("TestObj");
     Obj *obj;
     Class *klass = Class_fetch_class(class_name);

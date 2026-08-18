@@ -1,0 +1,17 @@
+---
+abstract: Scan and remove invisible Unicode characters from text.
+author:
+  - bbwdadfg <bbwdadfg@users.noreply.github.com>
+dynamic_config: 0
+generated_by: hand
+license: mit
+meta-spec:
+  version: 2
+name: AtwrTools
+version: 0.1.0
+resources:
+  homepage: https://aitextwatermarkremover.com/
+  repository:
+    type: git
+    url: https://github.com/bbwdadfg/aitextwatermarkremover-tools.git
+    web: https://github.com/bbwdadfg/aitextwatermarkremover-tools

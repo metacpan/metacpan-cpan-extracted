@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Build inverted indexes.
  *
- * The Indexer class is Apache Lucy's primary tool for managing the content of
+ * The Indexer class is Lucy's primary tool for managing the content of
  * inverted indexes, which may later be searched using
  * [](cfish:IndexSearcher).
  *

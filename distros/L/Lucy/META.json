@@ -1,10 +1,10 @@
 {
-   "abstract" : "Apache Lucy search engine library.",
+   "abstract" : "Lucy search engine library.",
    "author" : [
-      "The Apache Lucy Project <dev at lucy dot apache dot org>"
+      "Lucy search project"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4232",
    "keywords" : [
       "search",
       "lucy",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lucy",
    "no_index" : {
@@ -31,8 +31,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Clownfish" : "0.006002",
-            "Clownfish::CFC" : "0.006002",
+            "Clownfish" : "0.007",
+            "Clownfish::CFC" : "0.007",
             "Devel::PPPort" : "3.14",
             "ExtUtils::CBuilder" : "0.21",
             "ExtUtils::ParseXS" : "3",
@@ -41,14 +41,14 @@
       },
       "configure" : {
          "requires" : {
-            "Clownfish" : "0.006002",
-            "Clownfish::CFC::Perl::Build" : "0.006002",
+            "Clownfish" : "0.007",
+            "Clownfish::CFC::Perl::Build" : "0.007",
             "Module::Build" : "0.280801"
          }
       },
       "runtime" : {
          "requires" : {
-            "Clownfish" : "0.006002",
+            "Clownfish" : "0.007",
             "perl" : "v5.8.3"
          }
       }
@@ -56,13 +56,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://issues.apache.org/jira/browse/LUCY"
+         "web" : "https://github.com/lucysearch/lucy/issues"
       },
-      "homepage" : "http://lucy.apache.org",
+      "homepage" : "https://github.com/lucysearch/lucy",
       "repository" : {
-         "url" : "https://git-wip-us.apache.org/repos/asf/lucy.git"
+         "url" : "https://github.com/lucysearch/lucy.git"
       }
    },
-   "version" : "v0.6.2",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v0.7.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

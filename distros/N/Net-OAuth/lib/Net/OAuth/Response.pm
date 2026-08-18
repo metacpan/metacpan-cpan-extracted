@@ -16,6 +16,7 @@ __PACKAGE__->mk_classdata(required_api_params => [qw/
 __PACKAGE__->mk_classdata(optional_api_params => [qw/
 	extra_params
 	protocol_version
+	allowed_signature_methods
 	/]);
 
 __PACKAGE__->mk_classdata(signature_elements => [qw/
@@ -56,7 +57,7 @@ Currently maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2012, 2024-2025 Keith Grennan
+Copyright 2007-2012, 2024-2026 Keith Grennan
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

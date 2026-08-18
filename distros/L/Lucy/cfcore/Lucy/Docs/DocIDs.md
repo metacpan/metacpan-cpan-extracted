@@ -1,8 +1,8 @@
-# Characteristics of Apache Lucy document ids.
+# Characteristics of Lucy document ids.
 
 ## Document ids are signed 32-bit integers
 
-Document ids in Apache Lucy start at 1.  Because 0 is never a valid doc id, we
+Document ids in Lucy start at 1.  Because 0 is never a valid doc id, we
 can use it as a sentinel value:
 
 ~~~ perl

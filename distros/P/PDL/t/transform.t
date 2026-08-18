@@ -104,16 +104,6 @@ EOF
 }
 
 {
-my $lonlatrad = allaxislinvals(double, pdl(-PI,-PI/2), pdl(PI,PI/2), 3,3)->append(1);
-is_pdl t_spherical()->inverse()->apply($lonlatrad), my $exp = pdl('
-  [0 0 -1; 0 0 -1; 0 0 -1]
-  [-1 0 0; 1 0 0; -1 0 0]
-  [0 0 1; 0 0 1; 0 0 1]
-');
-is_pdl t_spherical()->apply($exp)->sin, $lonlatrad->sin; # sin as -PI equiv to 0, PI
-}
-
-{
 	##############################
 	# Simple testing of the map autoscaling
 	my $pa = sequence(5,5);
@@ -298,6 +288,94 @@ is_pdl $pb->slice([0,4],[0,4]), $pa;
 is_pdl $pb->slice([9,5]), $pb->slice([0,4]);
 is_pdl $pb->slice('x',[5,9]), $pb->slice('x',[0,4]), "periodic and mirror boundary conditions work for jacobian methods";
 }
+}
+
+sub test_carto {
+  my ($tx, $in, $exp, $post) = @_;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  $post ||= sub { $_[0] };
+  is_pdl $post->($tx->apply($in)), $post->($exp), {atol=>7e-3, test_name=>"forward $tx"};
+  is_pdl $post->($tx->invert($exp)), $post->($in), {atol=>7e-3, test_name=>"inverse $tx"};
+}
+{
+local $PDL::doubleformat = "%10.4g";
+my $lonlatrad = allaxislinvals(double, pdl(-PI,-PI/2), pdl(PI,PI/2), 3,3)->append(1);
+test_carto(t_spherical(), pdl('
+  [0 0 -1; 0 0 -1; 0 0 -1]
+  [-1 0 0; 1 0 0; -1 0 0]
+  [0 0 1; 0 0 1; 0 0 1]
+'), $lonlatrad, sub {sin($_[0])});
+test_carto(t_perspective(), sequence(2,3), pdl('
+  0 0.99979696; 1.9929099 2.9927074; 3.9568835 4.9627286
+'));
+my $lonlat = allaxislinvals(double, pdl(-PI,-PI/2), pdl(PI,PI/2), 3,3);
+test_carto(t_aitoff(), $lonlat, pdl('
+  [-0.054817 -0.027429; 0 -0.027415; 0.054817 -0.027429]
+  [-0.054831 0; 0 0; 0.054831 0]
+  [-0.054817 0.027429; 0 0.027415; 0.054817 0.027429]
+'));
+my $conic_slice = allaxislinvals(double, pdl(-PI,-PI/2), pdl(PI/6,PI/4), 3,3);
+test_carto(t_albers(), $conic_slice, pdl('
+  [-0.0645 -0.02237; -0.02688 -0.02325; 0.01075 -0.02341]
+  [-0.06392 -0.004831; -0.02664 -0.005704; 0.01066  -0.005858]
+  [-0.06333 0.01288; -0.02639 0.01201; 0.01056 0.01186]
+'));
+test_carto(t_az_eqa(), $lonlat, pdl('
+  [-0.054817 -0.027429; 0 -0.027415; 0.054817 -0.027429]
+  [-0.054831 0; 0 0; 0.054831 0]
+  [-0.054817 0.027429; 0 0.027415; 0.054817 0.027429]
+'));
+test_carto(t_az_eqd(), $lonlat, pdl('
+  [-0.054817 -0.027429; 0 -0.027415; 0.054817 -0.027429]
+  [-0.054831 0; 0 0; 0.054831 0]
+  [-0.054817 0.027429; 0 0.027415; 0.054817 0.027429]
+'), sub {$_[0]->setnantobad->setbadtoval(0)});
+test_carto(t_conic(), $conic_slice, pdl('
+  [-0.06575 -0.02632; -0.0274 -0.02723; 0.01096 -0.02739]
+  [-0.06507 -0.005771; -0.02712 -0.006666; 0.01085 -0.006824]
+  [-0.06438 0.01478; -0.02683 0.01389; 0.01073 0.01374]
+'));
+test_carto(t_gnomonic(), $lonlat, pdl('
+  [-0.05489 -0.02746; 0 -0.02742; 0.05489 -0.02746]
+  [-0.05489 0; 0 0; 0.05489 0]
+  [-0.05489 0.02746; 0 0.02742; 0.05489 0.02746]
+'));
+test_carto(t_lambert(), $conic_slice, pdl('
+  [-0.06875 -0.0329; -0.02865 -0.03388; 0.01146 -0.03406]
+  [-0.06786 -0.007293; -0.02828 -0.008263; 0.01131 -0.008434]
+  [-0.06699 0.01798; -0.02792 0.01702; 0.01117 0.01686]
+'));
+test_carto(t_mercator(), $lonlat, pdl('
+  [-0.05489 -0.02746; 0 -0.02742; 0.05489 -0.02746]
+  [-0.05489 0; 0 0; 0.05489 0]
+  [-0.05489 0.02746; 0 0.02742; 0.05489 0.02746]
+'));
+test_carto(t_orthographic(), $lonlat, pdl('
+  [-0.05489 -0.02746; 0 -0.02742; 0.05489 -0.02746]
+  [-0.05489 0; 0 0; 0.05489 0]
+  [-0.05489 0.02746; 0 0.02742; 0.05489 0.02746]
+'));
+test_carto(t_sin_lat(), $lonlat, pdl('
+  [-0.05489 -0.02746; 0 -0.02742; 0.05489 -0.02746]
+  [-0.05489 0; 0 0; 0.05489 0]
+  [-0.05489 0.02746; 0 0.02742; 0.05489 0.02746]
+'));
+my $small_slice = allaxislinvals(double, pdl(-PI/2,PI/2), pdl(PI/6,PI/4), 3,3);
+test_carto(t_sinusoidal(), $small_slice, pdl('
+  [-0.02741 0.02742; -0.009135 0.02742; 0.009135 0.02742]
+  [-0.02741 0.02056; -0.009137 0.02056; 0.009137 0.02056]
+  [-0.02741 0.01371; -0.009138 0.01371; 0.009138 0.01371]
+'));
+test_carto(t_stereographic(), $conic_slice, pdl('
+  [-0.05483 -0.02744; -0.02284 -0.02742; 0.009137 -0.02742]
+  [-0.05484 -0.006859; -0.02285 -0.006855; 0.009138 -0.006854]
+  [-0.05484 0.01372; -0.02285 0.01371; 0.009138 0.01371]
+'));
+test_carto(t_vertical(), $small_slice, pdl('
+  [-0.02741 0.02742; -0.009135 0.02742; 0.009135 0.02742]
+  [-0.02741 0.02056; -0.009137 0.02056; 0.009137 0.02056]
+  [-0.02741 0.01371; -0.009138 0.01371; 0.009138 0.01371]
+'));
 }
 
 done_testing;

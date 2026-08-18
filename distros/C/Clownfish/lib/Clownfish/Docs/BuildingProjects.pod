@@ -25,12 +25,12 @@
 
 =head1 NAME
 
-Clownfish::Docs::BuildingProjects - Building Apache Clownfish projects in C environments
+Clownfish::Docs::BuildingProjects - Building Clownfish projects in C environments
 
 =head1 DESCRIPTION
 
 The following steps are required to build a project that uses
-Apache Clownfish:
+Clownfish:
 
 =over
 

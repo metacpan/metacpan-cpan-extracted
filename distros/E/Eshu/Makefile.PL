@@ -4,8 +4,12 @@ use warnings;
 use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
 
-my $has_xsmulti = eval { ExtUtils::MakeMaker->VERSION('7.12'); 1 };
-
+# Eshu.xs lives at the top of the dist, not under lib/, and the build is
+# the plain single-extension one MakeMaker defaults to. An XSMULTI build
+# from lib/Eshu.xs writes its linker export list to lib/Eshu.def, while
+# the import-library rule Strawberry adds for MinGW reads $(EXPORT_LIST),
+# which is always $(BASEEXT).def in the top directory - the two names
+# never met and dlltool failed the build (CPAN Testers, 5.42 Strawberry).
 my $pkg = ExtUtils::Depends->new('Eshu');
 $pkg->set_inc('-I. -Iinclude');
 $pkg->install(map { "include/$_" } qw(
@@ -61,18 +65,9 @@ my %WriteMakefileArgs = (
     },
     EXE_FILES => ['bin/eshu'],
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Eshu-* lib/*.o lib/*.c lib/*.bs Install/Files.pm' },
+    clean => { FILES => 'Eshu-* Eshu.c Eshu.o Eshu.def Install/Files.pm' },
     %dep_vars,
 );
-
-if ($has_xsmulti) {
-    $WriteMakefileArgs{XSMULTI} = 1;
-    $WriteMakefileArgs{XS}      = { 'lib/Eshu.xs' => 'lib/Eshu.c' };
-    $WriteMakefileArgs{OBJECT}  = 'lib/Eshu$(OBJ_EXT)';
-} else {
-    $WriteMakefileArgs{XS}     = { 'lib/Eshu.xs' => 'lib/Eshu.c' };
-    $WriteMakefileArgs{OBJECT} = 'lib/Eshu$(OBJ_EXT)';
-}
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
@@ -93,11 +88,3 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
-
-sub MY::postamble {
-    return '' if $has_xsmulti;
-    return <<'MAKE';
-lib/Eshu$(OBJ_EXT): lib/Eshu.c
-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $< -o $@
-MAKE
-}

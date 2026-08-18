@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Default posting type.
  *
- * ScorePosting is the default posting format in Apache Lucy.  The
+ * ScorePosting is the default posting format in Lucy.  The
  * term-document pairing used by MatchPosting is supplemented by additional
  * frequency, position, and weighting information.
  */

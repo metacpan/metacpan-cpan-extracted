@@ -170,8 +170,41 @@ sub sign {
 
 sub verify {
     my $self = shift;
+    $self->_check_signature_method_allowed;
     my $class = $self->_signature_method_class;
     return $class->verify($self, @_);
+}
+
+# The signature method named in a message we are verifying was chosen by
+# whoever sent that message, so on the verifying side it is untrusted
+# input.  Dispatching on it means the sender decides which key we check
+# their signature against.  The verifying party has to say which methods
+# it is prepared to accept; anything else - including saying nothing at
+# all - is refused before we dispatch.
+sub _check_signature_method_allowed {
+    my $self = shift;
+    my $allowed = $self->{allowed_signature_methods};
+    $allowed = \@Net::OAuth::ALLOWED_SIGNATURE_METHODS unless defined $allowed;
+    unless (ref $allowed eq 'ARRAY' and @$allowed) {
+        croak "Cannot verify: no acceptable signature method has been stated. "
+            . "Pass allowed_signature_methods => [...] to this message, or set "
+            . "\@Net::OAuth::ALLOWED_SIGNATURE_METHODS, naming the method or "
+            . "methods this party expects. Verifying with the method the "
+            . "message itself names would let the sender choose the algorithm, "
+            . "and so the key";
+    }
+    my $named = $self->signature_method;
+    $named = '' unless defined $named;
+    # compare on the same normalisation _signature_method_class resolves
+    # with, so 'HMAC-SHA1' and 'HMAC_SHA1' are not two different answers
+    (my $want = $named) =~ s/\W+/_/g;
+    foreach my $ok (@$allowed) {
+        next unless defined $ok;
+        (my $have = $ok) =~ s/\W+/_/g;
+        return if $have eq $want;
+    }
+    croak "Signature method '$named' is not an allowed signature method ("
+        . join(', ', grep {defined} @$allowed) . ")";
 }
 
 sub _signature_method_class {
@@ -330,7 +363,7 @@ Currently maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2012, 2024-2025 Keith Grennan
+Copyright 2007-2012, 2024-2026 Keith Grennan
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

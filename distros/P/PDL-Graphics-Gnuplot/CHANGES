@@ -1,3 +1,7 @@
+2.033 2026-08-17
+- handle Gnuplot 6 warning about expanding empty y range
+- update doc-installing
+
 2.032 2024-11-21
 - add filledcurves with above/below threshold and fillcolor (#105) - thanks @vikasnkumar
 

@@ -1,0 +1,82 @@
+======================================================================
+ TUI::Handy Cheat Sheet                                  [TL] Filipino
+======================================================================
+
+[ 1. Pag-install at pag-load ]
+
+  Walang CPAN dependency; kopyahin ang Handy.pm sa anumang direktoryo sa loob ng @INC, o patakbuhin ito nang direkta bilang script.
+
+  use TUI::Handy;
+  # or, as a command:  perl Handy.pm form.txt
+
+[ 2. Paggawa at pagpapatakbo ng form ]
+
+  Buuin ang form mula sa isang DSL string o file, pagkatapos ay tawagin ang run(); ang resulta ay isang hash reference na ang key ay ang mga label sa DSL.
+
+  my $tui  = TUI::Handy->new(dsl => $text);   # or new(file => $path)
+  my $form = $tui->run;
+  print "Company = $form->{Company}\n";
+
+[ 3. Mga marka ng text box ]
+
+  Ang mga fill character sa loob ng [ ] ang pumipili ng uri ng text box: _ para sa half-width, # para sa numero, $ o \ para sa currency, YYYYMMDD o % para sa petsa, at anumang full-width na karakter para sa uring zenkaku.
+
+  Company: [__________]
+  Age:     [###]
+  Price:   [$$$$$$]
+  Date:    [YYYYMMDD]
+
+[ 4. Checkbox at radio button ]
+
+  Ang [X]/[ ] ay isang checkbox (halaga 1 o 0); ang (*)/( ) ay nag-gugrupo ng mga radio button ayon sa nakaraang heading line, kung saan ang halaga ay ang napiling teksto ng label.
+
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+
+[ 5. Button ]
+
+  Ang square bracket na walang teksto ng label bago ito ay isang button; irehistro ang aksyon nito gamit ang set().
+
+  $tui->set('Register', sub { my $form = shift; save($form); 0 });
+  [Register]
+
+[ 6. Mga key ]
+
+  Ang TAB/down arrow ay pumupunta sa susunod na field, ang Shift-TAB/up arrow naman sa nauna. Ang Enter, Space, at mga arrow key ay nag-e-edit ng field o nag-a-activate ng button; ang ESC ay humihinto sa form.
+
+[ 7. Pag-encode ng karakter ]
+
+  Awtomatikong nadedetek ang UTF-8 sa hindi Windows na sistema at Shift_JIS (CP932) sa Windows; suportado rin ang EUC-JP. Maaaring i-override gamit ang TUI_HANDY_ENCODING.
+
+  $ENV{TUI_HANDY_ENCODING} = 'euc';   # utf8 / sjis / euc
+
+[ 8. Line-mode na fallback ]
+
+  Kapag walang stty (purong Windows cmd.exe), awtomatikong gagamitin ang portable na line-mode driver; ipwersa ang mode gamit ang TUI_HANDY_MODE.
+
+  $ENV{TUI_HANDY_MODE} = 'line';      # ansi / line
+
+[ 9. Paggamit sa command line ]
+
+  Maaaring patakbuhin nang direkta ang isang DSL file nang hindi kinakailangang sumulat ng Perl code.
+
+  perl Handy.pm form.txt
+
+[ 10. Buong halimbawa ]
+
+  Isang maikling DSL na pinagsasama ang lahat ng uri ng widget.
+
+  Registration
+  Company: [__________]
+  Age:     [###]
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+  [Register]
+
+[ 11. Mga sanggunian ]
+
+  Buong dokumentasyon ay nasa POD ng lib/TUI/Handy.pm (perldoc TUI::Handy). May-akda: INABA Hitoshi <ina.cpan@gmail.com>. Lisensya: parehong termino ng Perl.

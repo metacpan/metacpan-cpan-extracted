@@ -165,6 +165,9 @@ Here is the callback function's expected definition:
              options don't change.  The returned options override what's
              currently in use by "load_config" when loading the current file.
 
+  NOTE: This callback option is disabled if you use another config file to tell
+        how to parse the current config file.
+
 =back
 
 =head2 Parse Read Options
@@ -502,7 +505,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION = "1.14";
+$VERSION = "1.15";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( get_read_opts  get_get_opts  get_date_opts

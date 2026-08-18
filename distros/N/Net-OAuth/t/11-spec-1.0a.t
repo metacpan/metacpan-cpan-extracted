@@ -15,6 +15,11 @@ BEGIN {
 	use_ok( 'Net::OAuth::ProtectedResourceRequest' );
 }
 
+# verify() will not take the algorithm from the message being verified,
+# so say which methods these tests expect (see VERIFYING MESSAGES in the
+# Net::OAuth documentation).
+@Net::OAuth::ALLOWED_SIGNATURE_METHODS = qw/PLAINTEXT HMAC-SHA1/;
+
 my $request = Net::OAuth::RequestTokenRequest->new(
         consumer_key => 'dpf43f3p2l4k3l03',
         consumer_secret => 'kd94hf93k423kf44',

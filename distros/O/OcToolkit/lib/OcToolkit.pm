@@ -14,7 +14,7 @@ use v5.16; # or newer
 use strict;
 use warnings;
 
-our $VERSION = "1.18";
+our $VERSION = "1.19";
 
 use JSON::PP;
 use Tie::IxHash;
@@ -26,6 +26,8 @@ use File::Path qw(make_path rmtree);
 use MIME::Base64 qw(encode_base64 decode_base64);
 use YAML qw(LoadFile);
 use YAML::Safe;
+use File::Basename qw(basename);
+use Storable qw(dclone);
 
 use Data::Dumper;
 
@@ -42,26 +44,26 @@ sub new{
     
     $self->{secretsDir}           = $projectDir."secrets"               if not defined $self->{secretsDir};
     $self->{secretsJson}          = "secrets.json"                      if not defined $self->{secretsJson};
-    $self->{ocConfigFile}         = $projectDir."oc_config.json"        if not defined $self->{ocConfigFile};
+    $self->{octConfigFile}        = $projectDir."oct_config.json"       if not defined $self->{octConfigFile};
     $self->{templatesTTDir}       = $projectDir."templates_tt"          if not defined $self->{templatesTTDir};
     $self->{templatesYamlDir}     = $projectDir."templates_yaml"        if not defined $self->{templatesYamlDir};
     $self->{validationReportFile} = $projectDir."validation_report.txt" if not defined $self->{validationReportFile};
-    $self->{cliCommand}           = "oc"                                if not defined $self->{cloudCommand};
+    $self->{cloudCommand}         = "oc"                                if not defined $self->{cloudCommand};
     if((defined $self->{advanceFeatures}) && ($self->{advanceFeatures} =~ /kubectl/)){
-         $self->{cliCommand} = "kubectl";
+         $self->{cloudCommand} = "kubectl";
     }
     
-    if(!-e $self->{ocConfigFile}){
-        open(my $fh, '>', $self->{ocConfigFile}) or die "Could not create '$self->{ocConfigFile}': $!";
+    if(!-e $self->{octConfigFile}){
+        open(my $fh, '>', $self->{octConfigFile}) or die "Could not create '$self->{octConfigFile}': $!";
         print $fh '{}';
         close($fh);
-        print "$self->{ocConfigFile} is missing. Empty $self->{ocConfigFile} is created.\n";
+        print "$self->{octConfigFile} is missing. Empty $self->{octConfigFile} is created.\n";
     }
 
     if(not defined $self->{cluster}){
-        my $ocConfigFiletext = read_file($self->{ocConfigFile});
-        my $oCconfig = $self->{json}->utf8->decode($ocConfigFiletext);
-        $self->{cluster} = $oCconfig->{project}->{default_cluster};
+        my $octConfigFiletext = read_file($self->{octConfigFile});
+        my $octConfig = $self->{json}->utf8->decode($octConfigFiletext);
+        $self->{cluster} = $octConfig->{project}->{default_cluster};
         $self->{cluster} = "unknown" if not defined $self->{cluster};
     }
 
@@ -71,69 +73,74 @@ sub new{
 sub backup{
     my ($self, $instance) = @_;
 
-    $self->{instance} = $instance;
-    return if not defined $self->generateYaml();
+    $self->_initConfSecretsAndYaml($instance);
 
     $self->_createDir("backups");
     $self->_createDir("backups\/$instance");
     
     $self->_loopDir($self->{config}->{templates_yaml_dir}, "*", "_backupInstance");
+    $self->_runPostHook();
+    
+    return;
 }
 
 sub backupWholeOCProject{
     my ($self) = @_;
 
+    $self->_runPreHook();
     $self->_createDir("backups");
     $self->_createDir("backups\/wholeProject");
     $self->_clearDir("backups/wholeProject");
     
-    my $ocConfigFileText = read_file($self->{ocConfigFile});
-    my $ocConfig = $self->{json}->utf8->decode($ocConfigFileText);
+    my $octConfigFileText = read_file($self->{octConfigFile});
+    my $octConfig = $self->{json}->utf8->decode($octConfigFileText);
     
-    my $ocResourceKinds = $ocConfig->{project}->{oc_resource_kinds};
-    $ocResourceKinds = $self->{ocResourceKinds} if defined $self->{ocResourceKinds};
-    $ocResourceKinds = $self->_getDefaultKinds() if not defined $ocResourceKinds;
-    my @ocResourceKindsArray = split(';', $ocResourceKinds);
+    my $resourceKindsBackup = $octConfig->{project}->{resource_kinds_backup};
+    $resourceKindsBackup = $self->_getDefaultKindsBackup() if not defined $resourceKindsBackup;
+    my @resourceKindsBackupArray = split(';', $resourceKindsBackup);
     
-    foreach my $ocResourceKind (@ocResourceKindsArray){
-        my $ocResourceKinds = $ocResourceKind;
-        if($ocResourceKind ne "Ingress" &&
-           $ocResourceKind ne "StorageClass" &&
-           $ocResourceKind ne "NetworkPolicy"
+    foreach my $octResourceKind (@resourceKindsBackupArray){
+        my $resourceKindsBackup = $octResourceKind;
+        if($octResourceKind ne "Ingress" &&
+           $octResourceKind ne "StorageClass" &&
+           $octResourceKind ne "NetworkPolicy"
         ){
-            $ocResourceKinds .= "s";
+            $resourceKindsBackup .= "s";
         }
-        print "$ocResourceKinds:\n";
-        my $text = qx/$self->{cliCommand} get $ocResourceKinds/;
+        print "$resourceKindsBackup:\n";
+        my $text = qx/$self->{cloudCommand} get $resourceKindsBackup/;
         my @textArray = split('\n', $text);
         shift @textArray;
         foreach my $line (@textArray){
             my @lineArray = split(" ", $line);
-            my $ocItem = $lineArray[0];
-            print "kind: $ocResourceKind  item: $ocItem\n";
-            $self->_createDir("backups\/wholeProject\/$ocResourceKinds");
+            my $octItem = $lineArray[0];
+            print "kind: $octResourceKind  item: $octItem\n";
+            $self->_createDir("backups\/wholeProject\/$resourceKindsBackup");
             eval { 
-                my $ocItemJson = qx/$self->{cliCommand} get $ocResourceKind $ocItem -o json/;
-                my $ocItemHash = $self->{json}->utf8->decode($ocItemJson);
+                my $octItemJson = qx/$self->{cloudCommand} get $octResourceKind $octItem -o json/;
+                my $octItemHash = $self->{json}->utf8->decode($octItemJson);
                 if((defined $self->{advanceFeatures}) && 
                    ($self->{advanceFeatures} =~ /removeClutter/) && 
                    (defined $self->{removeClutterBackup})){
-                    my $subParams = {"ocKind" => $ocResourceKind, "ocName" => $ocItem};
-                    $ocItemHash = $self->{removeClutterBackup}->($ocItemHash, $subParams);
+                    my $subParams = {"octKind" => $octResourceKind, "octName" => $octItem};
+                    $octItemHash = $self->{removeClutterBackup}->($octItemHash, $subParams);
                 }
                 my $yamlSaveObj = YAML::Safe->new->boolean("JSON::PP");
-                my $yamlText = $yamlSaveObj->Dump($ocItemHash);
+                my $yamlText = $yamlSaveObj->Dump($octItemHash);
                 $yamlText =~ s/---\n//;
-                write_file("$self->{projectDir}backups\/wholeProject\/$ocResourceKinds/$ocItem".".yaml", $yamlText);
+                write_file("$self->{projectDir}backups\/wholeProject\/$resourceKindsBackup/$octItem".".yaml", $yamlText);
             };
             if($@){
-                # if error occured take yaml without calling '->removeClutterBackup()'
-                print "Removing clutter has failed, writing yaml file: $ocResourceKinds/$ocItem.yaml without removing clutter.\n";
-                my $yamlText = qx/$self->{cliCommand} get $ocResourceKind $ocItem -o yaml/;
-                write_file("$self->{projectDir}backups\/wholeProject\/$ocResourceKinds/$ocItem".".yaml", $yamlText);
+                # if error occurred take yaml without calling '->removeClutterBackup()'
+                print "Removing clutter has failed, writing yaml file: $resourceKindsBackup/$octItem.yaml without removing clutter.\n";
+                my $yamlText = qx/$self->{cloudCommand} get $octResourceKind $octItem -o yaml/;
+                write_file("$self->{projectDir}backups\/wholeProject\/$resourceKindsBackup/$octItem".".yaml", $yamlText);
             }
         }
     }
+    $self->_runPostHook();
+    
+    return;
 }
 
 sub convertYamlToTTExtention{
@@ -146,13 +153,23 @@ sub convertYamlToTTExtention{
 sub delete{
     my ($self, $instance) = @_;
     
-    $self->{instance} = $instance;
-    return if not defined $self->generateYaml();
+    $self->_initConfSecretsAndYaml($instance);
 
     my $cluster   = $self->{config}->{cluster};
     my $namespace = $self->{config}->{namespace};
-    print "\nDeleting Openshift components from instance: '$instance' in cluster: '$cluster' in namespace: '$namespace'\n";
-    $self->_loopDir($self->{config}->{templates_yaml_dir}, "yaml", "_deleteOc");
+    return if ($self->{omit} // '') =~ /cloud/;
+    return if not $self->_confirmOperation("Delete", $instance, $cluster, $namespace);
+    
+    $self->_loopDir($self->{config}->{templates_yaml_dir}, "yaml", "_deleteFromCloud");
+    
+    if((not $self->{config}->{oct_config}->{project}->{omit_deletion_of_not_defined_resources})  &&
+       (defined $self->{advanceFeatures} && $self->{advanceFeatures} =~ /deleteUndefinedInCloud/)
+    ){
+        $self->_deleteUndefinedResourcesInCloud($instance);
+    }
+
+    $self->_gitCommitAndPush();
+    $self->_runPostHook();
     
     return;
 }
@@ -160,12 +177,13 @@ sub delete{
 sub generateConfigJsonTemplate{
     my ($self, $instances) = @_;
     
-    print "Existing config file: $self->{ocConfigFile} will be overwriten do you want to continue?
-Press enter to contiue or ctrl+c to abort";
+    print "Existing config file: $self->{octConfigFile} will be overwriten do you want to continue?
+Press enter to contiue or type: 'skip' and press enter to skip this operation.\n";
     my $continue = <>;
-
+    return if $continue =~ /skip/;
+    
     # preserve order in hash
-    my $componentFromTemplatesTTDir = $self->_getComponentFromTemplatesTTDir();
+    my $componentFromTemplatesTTDir = $self->_getComponentsFromTemplatesTTDir();
     $componentFromTemplatesTTDir =~ s/\-/_/g;
     my @componentsArr = split(';', $componentFromTemplatesTTDir);
     tie my %configHash, 'Tie::IxHash';
@@ -181,48 +199,92 @@ Press enter to contiue or ctrl+c to abort";
     }
     $configHash{instance_specific_name} = {};
     $configHash{git_repo} = {};
+    
+    tie my %gitHash, 'Tie::IxHash';
+    $gitHash{auto_commit} = 0;
+    $gitHash{auto_push} = 0;
+    $gitHash{auto_commit_prompt} = 0;
+    $gitHash{auto_push_branch} = "master";
+    
     tie my %projectHash, 'Tie::IxHash';
     $projectHash{name} = "";
+    $projectHash{namespace} = undef;
     $projectHash{host} = "";
+    $projectHash{default_cluster} = undef;
+    $projectHash{allowed_clusters} = undef;
+    $projectHash{component_dirs} = undef;
+    $projectHash{resource_kinds_backup} = undef;
+    $projectHash{resource_kinds} = undef;
+    $projectHash{git} = \%gitHash;
+    $projectHash{url_prefix} = undef;
+    $projectHash{prompt_write_operations} = 1;
+    $projectHash{default_cloud_write_command} = undef;
+    $projectHash{output_log_file} = "output.log";
+    $projectHash{omit_deletion_of_not_defined_resources} = undef;
+    $projectHash{revert_exemptions} = undef;
+    $projectHash{cluster_base_address} = undef;
     $projectHash{cluster_ip_range} = "";
+    
     $configHash{project} = \%projectHash;
     
-    write_file($self->{ocConfigFile}, $self->{json}->pretty->encode(\%configHash));
+    write_file($self->{octConfigFile}, $self->{json}->pretty->encode(\%configHash));
 
     return;
 }
 
-sub generateYaml{
-    my ($self) = @_;
-
-    print "Instance is missing.\n" and return if not defined $self->{instance};
-
-    $self->{config} = $self->_generateConfig();
-    $self->_removeInitFromComponentDirs() if $self->{omit} =~ /init/;
-    $self->_loopDir($self->{config}->{templates_tt_dir}, "*", "_createTemplatesTTDirHash");
-    $self->_clearDir($self->{config}->{templates_yaml_dir});
-    $self->_createYamlFiles();
-    
-    return 1;
-}
-
-
-
 sub install{
     my ($self, $instance) = @_;
 
-    $self->{instance} = $instance;
-    return if not defined $self->generateYaml();
+    $self->_initConfSecretsAndYaml($instance);
 
     my $cluster   = $self->{config}->{cluster};
-    my $namespace = $self->{config}->{namespace};
-    print "\nInstalling Openshift components for instance: '$instance' in cluster: '$cluster' in namespace: '$namespace'\n";
+    my $namespace = $self->{config}->{namespace};    
+    return if ($self->{omit} // '') =~ /cloud/;
+    return if not $self->_confirmOperation("Install", $instance, $cluster, $namespace);
+
     # sent custom params
-    # $self->_loopDir($self->{config}->{templates_tt_dir}, "tt", "_callOc", {_callOc => {{param1 : "value1"}, {param2 : "value2"} }});
-    $self->_loopDir($self->{config}->{templates_yaml_dir}, "yaml", "_callOc") if $self->{omit} !~ /oc/;
+    # $self->_loopDir($self->{config}->{templates_tt_dir}, "tt", "_callCloudCommand", {_callCloudCommand => {param1 => "value1", param2 => "value2"}});
+    $self->_loopDir($self->{config}->{templates_yaml_dir}, "yaml", "_callCloudCommand");
+    $self->_gitCommitAndPush();
+    $self->_runPostHook();
     
-    print qq^\n\nTo get build and deployment status run: $self->{cliCommand} get pods | grep Running\n\n^;
+    print qq^\n\nTo get build and deployment status run: $self->{cloudCommand} get pods --sort-by=.metadata.creationTimestamp | tac | grep Running\n\n^;
     
+    return;
+}
+
+sub revert{
+    my ($self, $instance) = @_;
+     
+    # disable range narrowing, revert is meant to be used after 'git revert' or similar operation,
+    # whole project should be taken for revert
+    delete $self->{resourceKinds};
+    delete $self->{components};
+    delete $self->{specificYamlFile};
+    
+    if(defined $self->{gitRevertHash}){
+        print "git revert --no-commit $self->{gitRevertHash}..HEAD\n";
+        my $gitText = qx/git revert --no-commit $self->{gitRevertHash}..HEAD 2>&1/;
+        if($? != 0){
+            print "Unable to git revert:\n$gitText\n";
+            return;
+        }else{
+             $self->_writeLog($gitText);
+        }
+    }
+    
+    my $skipPostHooks = 1;
+    my $skipGitCommit = 1;
+    my $atLeastOneUpdated = $self->update($instance, $skipPostHooks, $skipGitCommit);
+
+    my $atLeastOneDeleted = 0; 
+    if(not $self->{config}->{oct_config}->{project}->{omit_deletion_of_not_defined_resources}){
+        $atLeastOneDeleted = $self->_deleteUndefinedResourcesInCloud($instance);
+    }
+    $self->_gitCommitAndPush() if $atLeastOneUpdated || $atLeastOneDeleted;
+     
+    $self->_runPostHook();
+     
     return;
 }
 
@@ -230,25 +292,26 @@ sub setParams{
     my ($self, $params) = @_;
 
     if (@_ == 2) {
-        $self->{advanceFeatures}       = $params->{advanceFeatures}      if defined $params->{advanceFeatures};
-        $self->{clusterBaseAddress}    = $params->{clusterBaseAddress}   if defined $params->{clusterBaseAddress};
-        $self->{cluster}               = $params->{cluster}              if defined $params->{cluster};
-        $self->{ocConfigFile}          = $params->{ocConfigFile}         if defined $params->{ocConfigFile};
-        $self->{host}                  = $params->{host}                 if defined $params->{host};
-        $self->{ocResourceKinds}       = $params->{ocResourceKinds}      if defined $params->{ocResourceKinds};
-        $self->{componentDirs}         = $params->{componentDirs}        if defined $params->{componentDirs};
-        $self->{namespace}             = $params->{namespace}            if defined $params->{namespace};
-        $self->{projectName}           = $params->{projectName}          if defined $params->{projectName};
-        $self->{omit}                  = $params->{omit}                 if defined $params->{omit};
-        $self->{urlPrefix}             = $params->{urlPrefix}            if defined $params->{urlPrefix};
-        $self->{clusterIpRange}        = $params->{clusterIpRange}       if defined $params->{clusterIpRange};
-        $self->{secretsDir}            = $params->{secretsDir}           if defined $params->{secretsDir};
-        $self->{sortType}              = $params->{sortType}             if defined $params->{sortType};
-        $self->{templatesTTDir}        = $params->{templatesTTDir}       if defined $params->{templatesTTDir};
-        $self->{yamlToTTconvertDir}    = $params->{yamlToTTconvertDir}   if defined $params->{yamlToTTconvertDir};
-        $self->{specificYamlFile}      = $params->{specificYamlFile}     if defined $params->{specificYamlFile};
-        $self->{templatesYamlDir}      = $params->{templatesYamlDir}     if defined $params->{templatesYamlDir};
-        $self->{validationReportFile}  = $params->{validationReportFile} if defined $params->{validationReportFile};
+        $self->{advanceFeatures}       = $params->{advanceFeatures}       if defined $params->{advanceFeatures};
+        $self->{clusterBaseAddress}    = $params->{clusterBaseAddress}    if defined $params->{clusterBaseAddress};
+        $self->{cluster}               = $params->{cluster}               if defined $params->{cluster};
+        $self->{octConfigFile}         = $params->{octConfigFile}         if defined $params->{octConfigFile};
+        $self->{gitRevertHash}         = $params->{gitRevertHash}         if defined $params->{gitRevertHash};
+        $self->{host}                  = $params->{host}                  if defined $params->{host};
+        $self->{resourceKinds}         = $params->{resourceKinds}         if defined $params->{resourceKinds};
+        $self->{components}            = $params->{components}            if defined $params->{components};
+        $self->{namespace}             = $params->{namespace}             if defined $params->{namespace};
+        $self->{projectName}           = $params->{projectName}           if defined $params->{projectName};
+        $self->{omit}                  = $params->{omit}                  if defined $params->{omit};
+        $self->{urlPrefix}             = $params->{urlPrefix}             if defined $params->{urlPrefix};
+        $self->{clusterIpRange}        = $params->{clusterIpRange}        if defined $params->{clusterIpRange};
+        $self->{secretsDir}            = $params->{secretsDir}            if defined $params->{secretsDir};
+        $self->{sortType}              = $params->{sortType}              if defined $params->{sortType};
+        $self->{templatesTTDir}        = $params->{templatesTTDir}        if defined $params->{templatesTTDir};
+        $self->{yamlToTTconvertDir}    = $params->{yamlToTTconvertDir}    if defined $params->{yamlToTTconvertDir};
+        $self->{specificYamlFile}      = $params->{specificYamlFile}      if defined $params->{specificYamlFile};
+        $self->{templatesYamlDir}      = $params->{templatesYamlDir}      if defined $params->{templatesYamlDir};
+        $self->{validationReportFile}  = $params->{validationReportFile}  if defined $params->{validationReportFile};
         $self->{projectDir}            = $params->{projectDir}            if defined $params->{projectDir};
         $self->{addFlagValuesToConfig} = $params->{addFlagValuesToConfig} if defined $params->{addFlagValuesToConfig};
         $self->{componentIsAllowed}    = $params->{componentIsAllowed}    if defined $params->{componentIsAllowed};
@@ -259,42 +322,95 @@ sub setParams{
     return;
 }
 
-sub upgrade{
-    my ($self, $instance) = @_;
-    
-    $self->validate($instance);
-    
-    my $validationReport      = read_file($self->{validationReportFile});
-    my @validationReportLines = split /\n/, $validationReport;
-    foreach my $line (@validationReportLines){
-        my @items = split /;/, $line;
-        if($items[-1] eq "MODIFIED"){
-            my $pathAndFile = $items[0];
-            my $ocKind      = $items[1];
-            my $ocName      = $items[2];
-            if($ocKind eq "PersistentVolumeClaim"){
-                print "You are trying to update PersistentVolumeClaim.
-Please make sure that all PODs that use this Persisten Volume are turned down before update.
-If update operation start hanging at this step press ctrl+c to abort. \n\n";
-            }
-            print "Upgrading ocKind:$ocKind, ocName: $ocName from $pathAndFile\n";
-            qx/$self->{cliCommand} delete $ocKind $ocName/;
-            qx/$self->{cliCommand} create -f $self->{config}->{templates_yaml_dir}\/$pathAndFile/;
-        }
-    }
+sub scaleToZero{
+     my ($self, $instance) = @_;
+
+     $self->_initConfSecretsAndYaml($instance);
+
+     foreach my $resourceName (keys %{$self->{templateManifests}->{Deployment}}){
+         print "$self->{cloudCommand} scale Deployment $resourceName --replicas=0\n";
+         qx/$self->{cloudCommand} scale Deployment $resourceName --replicas=0/;
+     }
+     foreach my $resourceName (keys %{$self->{templateManifests}->{DeploymentConfig}}){
+         print "$self->{cloudCommand} scale DeploymentConfig $resourceName --replicas=0\n";
+         qx/$self->{cloudCommand} scale DeploymentConfig $resourceName --replicas=0/;
+     }
+     foreach my $resourceName (keys %{$self->{templateManifests}->{StatefulSet}}){
+         print "$self->{cloudCommand} scale StatefulSet $resourceName --replicas=0\n";
+         qx/$self->{cloudCommand} scale StatefulSet $resourceName --replicas=0/;
+     }
+
+     return;
 }
 
-sub validate{
-    my ($self, $instance) = @_;
+sub update{
+    my ($self, $instance, $skipPostHooks, $skipGitCommit) = @_;
+        
+    $self->validateAgainstCloud($instance, $skipPostHooks);
 
-    qx/> $self->{validationReportFile}/; # clear file
-    $self->{instance} = $instance;
-    return if not defined $self->generateYaml();
+    if(not $self->{atLeastOneModified}){
+        print "No updated needed.\n";
+        return;
+    }
     
     my $cluster   = $self->{config}->{cluster};
     my $namespace = $self->{config}->{namespace};
-    print "\nValidating Openshift components for instance: '$instance' in cluster: '$cluster' in namespace: '$namespace'\n";
-    $self->_loopDir($self->{config}->{templates_yaml_dir}, "yaml", "_validateInstance");
+    return if ($self->{omit} // '') =~ /cloud/;
+    return if not $self->_confirmOperation("Update", $instance, $cluster, $namespace);
+    
+    my $validationReport      = read_file($self->{validationReportFile});
+    my @validationReportLines = split /\n/, $validationReport;
+    my $atLeastOneUpdated = 0;
+    foreach my $line (@validationReportLines){
+        my @items = split /;/, $line;
+        if($items[-1] eq "MODIFIED"){
+            $atLeastOneUpdated = 1;
+            my $pathAndFile = $items[0];
+            my $octKind     = $items[1];
+            my $octName     = $items[2];
+            if($octKind eq "PersistentVolumeClaim"){
+                my $text = "You are trying to update PersistentVolumeClaim.
+Please make sure that all PODs that use this Persisten Volume are turned down before update.
+If update operation start hanging at this step press ctrl+c to abort. \n\n";
+                $self->_writeLog($text);
+            }
+            $self->_writeLog("Updating octKind:$octKind, octName: $octName from $pathAndFile\n");
+            my $writeCommand = $self->_getCloudWriteCommand();
+            my $outputText = "";
+            $outputText = qx/$self->{cloudCommand} delete $octKind $octName 2>&1/ if $writeCommand eq "create";
+            $self->_writeLog($outputText);
+            my $templatesYamlDir = $self->{config}->{templates_yaml_dir};
+            $outputText = qx/$self->{cloudCommand} $writeCommand -f $templatesYamlDir\/$pathAndFile 2>&1/;
+            $self->_writeLog($outputText);
+        }
+    }
+    $self->_gitCommitAndPush() if $atLeastOneUpdated && (not $skipGitCommit);
+    $self->_runPostHook() if not defined $skipPostHooks;
+    
+    return $atLeastOneUpdated;
+}
+
+sub validateAgainstCloud{
+    my ($self, $instance, $skipPostHooks) = @_;
+
+    qx/> $self->{validationReportFile}/; # clear file
+    
+    $self->_initConfSecretsAndYaml($instance);
+    
+    $self->_loopDir($self->{config}->{templates_yaml_dir}, "yaml", "_validateAgainstCloud");
+    $self->_runPostHook() if not defined $skipPostHooks;
+    
+    return;
+}
+
+sub validateManifests{
+    my ($self, $instance, $skipPostHooks) = @_;
+    
+    $self->_initConfSecretsAndYaml($instance);
+    $self->_loopDir($self->{config}->{templates_yaml_dir}, "yaml", "_callCloudCommand", {_callCloudCommand => {dryRun => 1}});
+    $self->_runPostHook() if not defined $skipPostHooks;
+    
+    return;
 }
 
 sub _addSecretsToConfigHash{
@@ -304,9 +420,7 @@ sub _addSecretsToConfigHash{
     my $secretText = read_file($dirFileName);
     $config->{secrets}->{$dirFileNameArr[-1]} = $secretText;
   
-    my $secretTextBase64 = encode_base64($secretText);
-    $secretTextBase64 =~ s/\n//g;
-    $secretTextBase64 =~ s/\r//g;
+    my $secretTextBase64 = encode_base64($secretText, "");
     $config->{secrets}->{base64}->{$dirFileNameArr[-1]} = $secretTextBase64;
 
     return;
@@ -327,23 +441,23 @@ sub _backupInstance{
     if((defined $self->{advanceFeatures}) && 
        ($self->{advanceFeatures} =~ /removeClutter/) && 
        (defined $self->{removeClutterBackup})){
-        print "$self->{cliCommand} get $templateData->{kind} $templateData->{metadata}->{name} -o json\n";
-        my $ocJson = qx/$self->{cliCommand} get $templateData->{kind} $templateData->{metadata}->{name} -o json/;
-        my $ocHash  = $self->{json}->utf8->decode($ocJson); 
-        my $subParams = {"ocKind" => $templateData->{kind}, "ocName" => $templateData->{metadata}->{name}};
-        $ocHash = $self->{removeClutterBackup}->($ocHash, $subParams);
+        print "$self->{cloudCommand} get $templateData->{kind} $templateData->{metadata}->{name} -o json\n";
+        my $octJson = qx/$self->{cloudCommand} get $templateData->{kind} $templateData->{metadata}->{name} -o json/;
+        my $octHash  = $self->{json}->utf8->decode($octJson); 
+        my $subParams = {"octKind" => $templateData->{kind}, "octName" => $templateData->{metadata}->{name}};
+        $octHash = $self->{removeClutterBackup}->($octHash, $subParams);
         my $yamlSaveObj = YAML::Safe->new->boolean("JSON::PP");
-        $yamlText = $yamlSaveObj->Dump($ocHash);
+        $yamlText = $yamlSaveObj->Dump($octHash);
         $yamlText =~ s/---\n//;
     }else{
-         print "$self->{cliCommand} get $templateData->{kind} $templateData->{metadata}->{name} -o yaml\n";
-         $yamlText = qx/$self->{cliCommand} get $templateData->{kind} $templateData->{metadata}->{name} -o yaml/;
+         print "$self->{cloudCommand} get $templateData->{kind} $templateData->{metadata}->{name} -o yaml\n";
+         $yamlText = qx/$self->{cloudCommand} get $templateData->{kind} $templateData->{metadata}->{name} -o yaml/;
     }
 
     write_file("$self->{projectDir}backups\/$instance\/$dir/$templateName".".yaml", $yamlText);     
 }
 
-sub _callOc{
+sub _callCloudCommand{
     my ($self, $params) = @_;
     
     my @funcName = split /::/, (caller(0))[3];
@@ -352,19 +466,36 @@ sub _callOc{
     my $customParams = $params->{params}->{$funcName[-1]};
 
     return if (defined $self->{componentIsAllowed}) && 
-              (not $self->{componentIsAllowed}->($templateName, $dir, $self->{cluster}, $self->{instance}));
+              (not $self->{componentIsAllowed}->($templateName, $dir, $self->{config}->{cluster}, $self->{instance}));
 
     my $templateNameYaml = $templateName.".yaml";
     my $pathAndFile = $self->{config}->{templates_yaml_dir}."\/$dir\/$templateNameYaml";
     my $yamlData = LoadFile($pathAndFile);
 
-    if($yamlData->{kind} eq "CronJob"){
-        print "$self->{cliCommand} apply -f $pathAndFile\n";
-        qx/$self->{cliCommand} apply -f $pathAndFile/;
+    if(not defined $customParams->{dryRun}){
+        my $writeCommand = $self->_getCloudWriteCommand();
+        $self->_writeLog("$self->{cloudCommand} $writeCommand -f $pathAndFile\n");
+        my $outputText = qx/$self->{cloudCommand} $writeCommand -f $pathAndFile 2>&1/;
+        $self->_writeLog($outputText);
     }else{
-        print "$self->{cliCommand} create -f $pathAndFile\n";
-        qx/$self->{cliCommand} create -f $pathAndFile/;
+        my $infoText = "$dir\/$templateNameYaml";
+        my $text = qx/$self->{cloudCommand} apply --dry-run=server --validate=true -f $pathAndFile 2>&1/;
+        my $isError = $? >> 8;
+        if($isError){
+            $text = $self->{ignoreManifestValidationErrors}->($text) if defined $self->{ignoreManifestValidationErrors};
+            if($text ne ""){
+                print "$infoText ERROR\n";
+                print "============\n$text\n============\n";
+            }else{
+                # ignore this error
+                print "$infoText OK\n";
+            }
+        }else{
+            print "$infoText;OK\n";
+        }
     }
+    
+    return;
 }
 
 sub _clearDir{
@@ -372,6 +503,44 @@ sub _clearDir{
 
     rmtree $dir;
     make_path $dir;
+}
+
+sub _confirmOperation{
+    my ($self, $type, $instance, $cluster, $namespace) = @_;
+ 
+    return if ($self->{omit} // '') =~ /confirm/;
+    
+    $self->_writeLog(qx/oc project/);
+    
+    my $components;
+    if(($self->{omit} // '') =~ /init/ ){
+        $components = $self->{config}->{standard_component_dirs};
+    }else{
+        $components = $self->{config}->{component_dirs};
+    }
+    $components = "all" if not defined $components;
+    my $preposition = "for";
+    $preposition = "from" if $type eq "Delete";
+    my $componentsText = "\nCOMPONENT(S):      '$components' $preposition";
+    
+    my $confirmOperationText = ""; 
+    if(defined $self->{specificYamlFile}){
+        $confirmOperationText = "\nFILE NAME CONTAINS:'$self->{specificYamlFile}' in";
+    } 
+    
+    if(defined $self->{resourceKinds}){
+        $confirmOperationText .= "\nKIND(s):           '$self->{resourceKinds}' in";
+    }
+    
+    my $continue = "";
+    my $infoText = "\n$type $confirmOperationText $componentsText\nINSTANCE:          '$instance' in\nNAMESPACE:         '$namespace' in\nCLUSTER:           '$cluster'\n";
+    $self->_writeLog($infoText);
+    if(($self->{omit} // '') !~ /cloud/ && $self->{config}->{oct_config}->{project}->{prompt_write_operations}){
+        $self->_writeLog("Press enter to continue or type: 'skip' and press enter to skip this operation.\n");
+        $continue = <>;
+    }
+    
+    return $continue !~ /skip/;
 }
 
 sub _convertYamlToTTExtention{
@@ -393,14 +562,42 @@ sub _createTemplatesTTDirHash{
     my $dir          = $params->{dir};
     my $templateName = $params->{templateName};
 
-    # $self->{templatesTTHash}->{"40-api"}->{"40-build-config-api"} = "40-api/clusterPublic/40-build-config-api";    
+    # $self->{templatesTTHash}->{"40-api"}->{"40-build-config-api"} = "40-api/clusterIntern/40-build-config-api";
+    # $self->{templatesTTHash}->{"40-api"}->{"45-build-config-api"} = "40-api/test/40-build-config-api";
+    # $self->{templatesTTHash}->{"40-api"}->{"46-build-config-api"} = "40-api/clusterPublic/instance/prod/40-build-config-api"; 
     if(not -d "$self->{templatesTTDir}/$dir/$templateName"){
         $self->{templatesTTHash}->{$dir}->{$templateName} = "$dir/$templateName";
-    }elsif($templateName eq $self->{cluster}){
-        for my $dirFileName (File::Find::Rule->file()->name("*")->in("$self->{templatesTTDir}/$dir/$self->{cluster}")) {
+    }elsif($templateName eq $self->{config}->{cluster}){
+        for my $dirFileName (File::Find::Rule
+            ->file()
+            ->name("*")
+            ->maxdepth(1)
+            ->in("$self->{templatesTTDir}/$dir/$self->{config}->{cluster}")){
             my @dirFileNameArr = split('/', $dirFileName);
             my $templName = substr($dirFileNameArr[-1], 0, -3);
-            $self->{templatesTTHash}->{$dir}->{$templName} = "$dir/$self->{cluster}/$templName";
+            $self->{templatesTTHash}->{$dir}->{$templName} = "$dir/$self->{config}->{cluster}/$templName";
+        }
+        if(-d "$self->{templatesTTDir}/$dir/$self->{config}->{cluster}/instance/$self->{config}->{instance}"){
+            for my $dirFileName (File::Find::Rule
+                ->file()
+                ->name("*")
+                ->maxdepth(1)
+                ->in("$self->{templatesTTDir}/$dir/$self->{config}->{cluster}/instance/$self->{config}->{instance}")){
+                my @dirFileNameArr = split('/', $dirFileName);
+                my $templName = substr($dirFileNameArr[-1], 0, -3);
+                $self->{templatesTTHash}->{$dir}->{$templName} = 
+                    "$dir/$self->{config}->{cluster}/instance/$self->{config}->{instance}/$templName";
+            }
+        }
+    }elsif(($templateName eq "instance") && (-d "$self->{templatesTTDir}/$dir/instance/$self->{config}->{instance}")){
+        for my $dirFileName (File::Find::Rule
+            ->file()
+            ->name("*")
+            ->maxdepth(1)
+            ->in("$self->{templatesTTDir}/$dir/instance/$self->{config}->{instance}")){
+            my @dirFileNameArr = split('/', $dirFileName);
+            my $templName = substr($dirFileNameArr[-1], 0, -3);
+            $self->{templatesTTHash}->{$dir}->{$templName} = "$dir/instance/$self->{config}->{instance}/$templName";
         }
     }
 
@@ -413,84 +610,232 @@ sub _createDir{
     return;
 }
 
-sub _createYamlFiles{
-    my ($self) = @_;
-    
-    # $self->{templatesTTHash}->{"40-api"}->{"40-build-config-api"} = "40-api/clusterPublic/40-build-config-api.tt";
-    my $dirs = $self->{templatesTTHash};
-    if((defined $self->{sortType}) && ($self->{sortType}) eq "alphabetic"){
-        # alphabetic
-        foreach my $dir (sort {lc($a) cmp lc($b)} keys %{$dirs}){
-            my $files = $dirs->{$dir};
-            foreach my $templateName (sort {lc($a) cmp lc($b)} keys %{$files}){
-                $self->_generateYaml({dir => $dir, templateName => $templateName});
-            }
-        }
-    }else{
-        # numeric
-        no warnings 'numeric';
-        foreach my $dir (sort {lc($a) <=> lc($b)} keys %{$dirs}){
-            my $files = $dirs->{$dir};
-            foreach my $templateName (sort {lc($a) <=> lc($b)} keys %{$files}){
-                $self->_generateYaml({dir => $dir, templateName => $templateName});
-            }
-        }
-    }
-
-    return;
-}
-
-sub _deleteOc{
+sub _deleteFromCloud{
     my ($self, $params) = @_;
 
     my $dir          = $params->{dir};
     my $templateName = $params->{templateName};
 
     my $data = LoadFile("$self->{config}->{templates_yaml_dir}/$dir/$templateName".".yaml");
-    print "$self->{cliCommand} delete $data->{kind} $data->{metadata}->{name}\n";
-    qx/$self->{cliCommand} delete $data->{kind} $data->{metadata}->{name}/;
+    $self->_writeLog("$self->{cloudCommand} delete $data->{kind} $data->{metadata}->{name}\n");
+    my $outputText = qx/$self->{cloudCommand} delete $data->{kind} $data->{metadata}->{name} 2>&1/;
+    $self->_writeLog($outputText);
+    
+    return;
 }
 
-sub _generateConfig{
+sub _deleteUndefinedResourcesInCloud{
+    my ($self, $instance) = @_;
+    
+    # get $self->{templateManifests} for all instances in current cluster
+    my $allClusterInstances;
+    my $cluster = $self->{config}->{cluster};
+    my $confingProject = $self->{config}->{oct_config}->{project};
+    if(defined $confingProject->{git}                                              &&
+       defined $confingProject->{git}->{revert_multiple_instances_in_same_project} &&
+       defined $confingProject->{git}->{revert_multiple_instances_in_same_project}->{$cluster}
+      ){
+        $allClusterInstances = dclone($confingProject->{git}->{revert_multiple_instances_in_same_project}->{$cluster});
+        # remove current instance, it is already processed
+        @$allClusterInstances = grep { $_ ne $instance } @$allClusterInstances; 
+        
+        foreach my $cInstance (@$allClusterInstances){
+            $self->{instance} = $cInstance;
+            $self->{config} = $self->_getConfig();
+            $self->_generateYaml();
+        }    
+        # bring back current instace to 'template_yaml'
+        $self->{instance} = $instance;
+        $self->{config} = $self->_getConfig();
+        $self->_generateYaml();
+    }
+    
+    my $resourceKinds = $self->{config}->{resource_kinds};
+    my @resourceKindsArr = split(';', $resourceKinds);
+    
+    # get resources from Cloud
+    my $cloudVsManifestDiff;
+    foreach my $resourceKind (@resourceKindsArr){
+        my $text = qx/$self->{cloudCommand} get $resourceKind/;
+        my @textArr = split("\n", $text);
+        shift @textArr;
+        foreach my $textLine (@textArr){
+            my ($resourceName) = split /\s+/, $textLine =~ s/^\s+//r; # remove also leading spaces
+            $cloudVsManifestDiff->{$resourceKind}->{$resourceName} = 1;
+        }
+    }
+
+    my @revertExemptionsArr = ();
+    my $revertExemptions = $self->{config}->{oct_config}->{project}->{revert_exemptions};
+    @revertExemptionsArr = split(';', $revertExemptions) if defined $revertExemptions;
+    
+    foreach my $resourceKind (keys %{$cloudVsManifestDiff}){
+        foreach my $resourceName (keys %{$cloudVsManifestDiff->{$resourceKind}}){
+            foreach my $revertExemption (@revertExemptionsArr){
+                if($resourceName =~ /$revertExemption/){
+                    # don't delete this resource, remove him from template manifests vs cloud resources difference hash
+                    delete $cloudVsManifestDiff->{$resourceKind}->{$resourceName};
+                }
+            }
+            if((defined $self->{templateManifests}) && $self->{templateManifests}->{$resourceKind}->{$resourceName}){
+                delete $cloudVsManifestDiff->{$resourceKind}->{$resourceName};
+            }
+        }
+    }
+
+    my $cloudVsManifestDiffIsEmpty = 1;
+    foreach my $resourceKind (keys %{$cloudVsManifestDiff}){
+        foreach my $resourceName (keys %{$cloudVsManifestDiff->{$resourceKind}}){
+            if((defined $cloudVsManifestDiff->{$resourceKind}) && $cloudVsManifestDiff->{$resourceKind}->{$resourceName}){
+                $cloudVsManifestDiffIsEmpty = 0;
+            }
+        }
+    }
+    
+    my $atLeastOneDeleted = 0;
+    if(not $cloudVsManifestDiffIsEmpty){
+        $self->_writeLog("\nThis resources are not defined in Manifests but they are found in Cloud:\n");
+        foreach my $resourceKind (keys %{$cloudVsManifestDiff}){
+            foreach my $resourceName (keys %{$cloudVsManifestDiff->{$resourceKind}}){
+                $self->_writeLog(sprintf "Resource kind: %-25s Resource name: %s\n", $resourceKind, $resourceName);
+            }
+        }
+        my $continue = "";
+        if($self->{config}->{oct_config}->{project}->{prompt_write_operations}){
+            $self->_writeLog("\nPress enter to delete them or type 'skip' and press enter to keep them:\n");
+            $continue = <>;
+        }
+        if($continue !~ /skip/){
+            foreach my $resourceKind (keys %{$cloudVsManifestDiff}){
+                foreach my $resourceName (keys %{$cloudVsManifestDiff->{$resourceKind}}){
+                    if((defined $cloudVsManifestDiff->{$resourceKind}) && $cloudVsManifestDiff->{$resourceKind}->{$resourceName}){
+                        $atLeastOneDeleted = 1;
+                        $self->_writeLog("$self->{cloudCommand} delete $resourceKind $resourceName\n");
+                        my $outputText = qx/$self->{cloudCommand} delete $resourceKind $resourceName 2>&1/;
+                        $self->_writeLog($outputText);
+                    }
+                }
+            }
+        }
+    }
+
+    return $atLeastOneDeleted;
+}
+
+sub _encodeJsonHashToBase64{
+    my ($self, $jsonHash) = @_;
+
+    if(ref $jsonHash eq 'HASH'){
+        $_ = $self->_encodeJsonHashToBase64($_) for values %$jsonHash;
+    }
+    elsif(ref $jsonHash eq 'ARRAY'){
+        $_ = $self->_encodeJsonHashToBase64($_) for @$jsonHash;
+    }
+    elsif(defined $jsonHash){
+        return encode_base64($jsonHash, "");
+    }
+
+    return $jsonHash;
+}
+
+sub _generateYaml{
     my ($self) = @_;
 
-    my $ocConfigJson = read_file($self->{ocConfigFile});
-    my $config->{oc_config} = $self->{json}->utf8->decode($ocConfigJson);
+    $self->_writeLog("Instance is missing.\n") and return if not defined $self->{instance};
 
+    if(
+        ($self->{omit} // '') =~ /init/ || 
+        (
+          $self->{config}->{oct_config}->{project}->{omit_init} &&
+          ($self->{advanceFeatures} // '') !~ /useInit/
+        )
+      ){
+        $self->_removeInitFromComponentDirs();
+    }
+    $self->_loopDir($self->{config}->{templates_tt_dir}, "*", "_createTemplatesTTDirHash");
+    $self->_clearDir($self->{config}->{templates_yaml_dir});
+    $self->_writeYamlFiles();
+    
+    return;
+}
+
+sub _getComponentConfigNodes{
+    my ($self, $config) = @_;
+    
+    my @componentConfigNodes;
+    my $componentConfigNodesString;
+    if((defined $config->{oct_config}) && (defined $config->{oct_config}->{instance_specific_data})){
+        foreach my $componentConfigNode (keys %{$config->{oct_config}->{instance_specific_data}}){
+            push @componentConfigNodes, $componentConfigNode;
+        }
+    }
+
+    return \@componentConfigNodes;
+}
+
+sub _getComponentsFromTemplatesTTDir{
+    my ($self) = @_;
+
+    my $components = "";
+    foreach my $dirPath (sort {
+                # sort numerically
+                my ($an) = basename($a) =~ /^(\d+)/;
+                my ($bn) = basename($b) =~ /^(\d+)/;
+                ($an // 0) <=> ($bn // 0) || basename($a) cmp basename($b);
+            } glob "$self->{templatesTTDir}/*"){
+        next if not -d $dirPath;
+        my @dirPathArr = split('/', $dirPath);
+        my $componentDir = $dirPathArr[-1];
+        $componentDir  =~ s/^\d+-//;
+        $components .= $componentDir.";";
+    }
+    chop($components) if $components ne "";
+
+    return $components;
+}
+
+sub _getConfig{
+    my ($self) = @_;
+
+    my $octConfigJson = read_file($self->{octConfigFile});
+    my $config->{oct_config} = $self->{json}->utf8->decode($octConfigJson);
+
+    $self->{config}->{oct_config}->{project}->{git} = {} if not defined $self->{config}->{oct_config}->{project}->{git};
+    
     $config = $self->{addFlagValuesToConfig}->($config) if defined $self->{addFlagValuesToConfig};
 
     # set/generate instance specific names
-    foreach my $entry (keys %{$config->{oc_config}->{instance_specific_name}}){
-        $config->{oc_config}->{instance_specific_name}->{$entry} .= "-$self->{instance}";
+    foreach my $entry (keys %{$config->{oct_config}->{instance_specific_name}}){
+        $config->{oct_config}->{instance_specific_name}->{$entry} .= "-$self->{instance}";
     }
 
-    $config->{allowed_clusters}  = $config->{oc_config}->{project}->{allowed_clusters};
+    $config->{allowed_clusters}  = $config->{oct_config}->{project}->{allowed_clusters};
     if(not defined $config->{allowed_clusters}){
-        print "INFO: oc_config->project->allowed_clusters json node is empty. Marking 'allowed_clusters' as '$self->{cluster}'\n";
+        print "INFO: oct_config->project->allowed_clusters json node is empty. Marking 'allowed_clusters' as '$self->{cluster}'\n";
         $config->{allowed_clusters} = $self->{cluster};
     }else{
-        print "Warning: Unknown cluster $self->{cluster}\n" if $config->{allowed_clusters} !~ $self->{cluster};
+        print "Warning: Unknown cluster $self->{cluster}\n" if $config->{allowed_clusters} !~ /$self->{cluster}/;
     }
 
-    $config->{cluster_ip_range} = $config->{oc_config}->{project}->{cluster_ip_range};
+    $config->{cluster_ip_range} = $config->{oct_config}->{project}->{cluster_ip_range};
     $config->{cluster_ip_range} = $self->{clusterIpRange}       if defined $self->{clusterIpRange};
-    $config->{project_name}     = $config->{oc_config}->{project}->{name};
+    $config->{project_name}     = $config->{oct_config}->{project}->{name};
     $config->{project_name}     = $self->{projectName}          if defined $self->{projectName};
-    $config->{host}             = $config->{oc_config}->{project}->{host};
+    $config->{host}             = $config->{oct_config}->{project}->{host};
     $config->{host}             = $self->{host}                 if defined $self->{host};
-    $config->{namespace}        = $config->{oc_config}->{project}->{namespace};
-    $config->{namespace}        = $self->_getCurrentProject()   if not defined $config->{namespace};
+    $config->{namespace}        = $config->{oct_config}->{project}->{namespace};
     $config->{namespace}        = $self->{namespace}            if defined $self->{namespace};# from -n flag
+    $config->{namespace}        = $self->_getCurrentProject()   if not defined $config->{namespace};
     # default component dirs are set here, dirs in 'templates_tt' not set as default will be omitted
-    $config->{component_dirs}   = $config->{oc_config}->{project}->{component_dirs};
-    $config->{component_dirs}   = $self->{componentDirs}        if defined $self->{componentDirs};
-    $config->{component_dirs}   = $self->_getComponentFromTemplatesTTDir() if not defined $config->{component_dirs}; 
+    $config->{component_dirs}   = $config->{oct_config}->{project}->{component_dirs};
+    $config->{component_dirs}   = $self->{components}           if defined $self->{components};
+    $config->{component_dirs}   = $self->_getComponentsFromTemplatesTTDir() if not defined $config->{component_dirs}; 
     # component dirs can contains numbers e.g.: '50-solr' so regexp match is used => 
     # separate 'init' components in order to avoid false matches (e.g.: 20-init-api vs 50-api when 'api' searched)
-    my @componentDirs                  = split(';', $config->{component_dirs});
+    my @components                  = split(';', $config->{component_dirs});
     my $standardComponentDirs = "";
     my $initComponentDirs = "";
-    foreach my $componentDir (@componentDirs){
+    foreach my $componentDir (@components){
         if($componentDir =~ /init/){
             $initComponentDirs     .= $componentDir.";";
         }else{
@@ -501,29 +846,32 @@ sub _generateConfig{
     chop($standardComponentDirs); 
     $config->{init_component_dirs}        = $initComponentDirs;
     $config->{standard_component_dirs}    = $standardComponentDirs;
-    $config->{oc_resource_kinds}          = $config->{oc_config}->{project}->{oc_resource_kinds};
-    $config->{oc_resource_kinds}          = $self->{ocResourceKinds}  if defined $self->{ocResourceKinds};
-    $config->{oc_resource_kinds}          = $self->_getDefaultKinds() if not defined $config->{oc_resource_kinds};
+    $config->{resource_kinds_backup}      = $config->{oct_config}->{project}->{resource_kinds_backup};
+    $config->{resource_kinds_backup}      = $self->_getDefaultKindsBackup() if not defined $config->{resource_kinds_backup};
+    $config->{resource_kinds}             = $config->{oct_config}->{project}->{resource_kinds};
+    $config->{resource_kinds}             = $self->{resourceKinds}    if defined $self->{resourceKinds};
+    $config->{resource_kinds}             = $self->_getDefaultKinds() if not defined $config->{resource_kinds};
     $config->{templates_yaml_dir}         = $self->{templatesYamlDir};
     $config->{templates_tt_dir}           = $self->{templatesTTDir};
-    $config->{cluster_camelcase}          = $self->{cluster};
-    $config->{cluster}                    = lc $self->{cluster};
-    $config->{instance}                   = lc $self->{instance};
+    $config->{cluster}                    = $self->{cluster};
+    $config->{instance}                   = $self->{instance};
     $config->{instance_capitalized_first} = ucfirst $config->{instance};
+    $config->{url_prefix}                 = $config->{oct_config}->{project}->{url_prefix} if defined $config->{oct_config}->{project}->{url_prefix};
     $config->{url_prefix}                 = $self->{urlPrefix} if defined $self->{urlPrefix};
     $config->{cluster_base_address}       = $self->{clusterBaseAddress} if defined $self->{clusterBaseAddress}; 
-    $config->{cluster_base_address}       = $config->{oc_config}->{project}->{cluster_base_address} if not defined $config->{cluster_base_address};
+    $config->{cluster_base_address}       = $config->{oct_config}->{project}->{cluster_base_address} if not defined $config->{cluster_base_address};
     
     my $componentConfigNodes  = $self->_getComponentConfigNodes($config);
     foreach my $componentConfNode (@$componentConfigNodes){
         # set/generate default urls
-        if((defined $config->{oc_config}->{instance_specific_data}->{$componentConfNode}) && 
-           (ref($config->{oc_config}->{instance_specific_data}->{$componentConfNode}) eq 'HASH')){
-            foreach my $instanceKey (keys %{$config->{oc_config}->{instance_specific_data}->{$componentConfNode}}){
-                if(not defined $config->{oc_config}->{instance_specific_data}->{$componentConfNode}->{$instanceKey}->{url}){                    
+        if((defined $config->{oct_config}->{instance_specific_data}->{$componentConfNode}) && 
+           (ref($config->{oct_config}->{instance_specific_data}->{$componentConfNode}) eq 'HASH')){
+            foreach my $instanceKey (keys %{$config->{oct_config}->{instance_specific_data}->{$componentConfNode}}){
+                if(not defined $config->{oct_config}->{instance_specific_data}->{$componentConfNode}->{$instanceKey}->{url}){                    
                     my $componentNameKebab = $componentConfNode;
                     $componentNameKebab    =~ s/_/\-/g;
                     my $lcInstanceKey   = lc $instanceKey;
+                    $lcInstanceKey = undef if $componentConfNode =~ /init_/; # don't add instance name to url if in 'init_' component
                     my $url = "";
                     if(defined $self->{generateUrl}){
                         $url = $self->{generateUrl}->($config->{url_prefix}, 
@@ -533,100 +881,30 @@ sub _generateConfig{
                                                       $config->{cluster_base_address},
                                                       $config->{host});
                     }
-                    $config->{oc_config}->{instance_specific_data}->{$componentConfNode}->{$instanceKey}->{url} = $url;  
+                    $config->{oct_config}->{instance_specific_data}->{$componentConfNode}->{$instanceKey}->{url} = $url;  
                 }
             }
         }
         # select instance specific data
-        if(defined $config->{oc_config}->{instance_specific_data}->{$componentConfNode}->{$self->{instance}}){
-            $config->{oc_config}->{instance_specific_data}->{$componentConfNode} = 
-                $config->{oc_config}->{instance_specific_data}->{$componentConfNode}->{$self->{instance}};
+        if(defined $config->{oct_config}->{instance_specific_data}->{$componentConfNode}->{$self->{instance}}){
+            $config->{oct_config}->{instance_specific_data}->{$componentConfNode} = 
+                $config->{oct_config}->{instance_specific_data}->{$componentConfNode}->{$self->{instance}};
         }
     }
-    # in worse case 36 available IP addresses(see _generateYaml), make number smaller if more needed(max is 256)
+    # in worse case 36 available IP addresses(see _writeYamlFile), make number smaller if more needed(max is 256)
     $config->{ip_last_number} = int(rand(220));
     
     print "'Info: component_dirs' parameter is missing\n"   if not defined $config->{component_dirs};
     print "'Info: cluster_ip_range' parameter is missing\n" if not defined $config->{cluster_ip_range};
     print "'Info: host' parameter is missing\n"             if not defined $config->{host};
 
-    $self->_getSecrets($config);
-
     return $config;
-}
-
-sub _generateYaml{
-    my ($self, $params) = @_;
-
-    my $dir          = $params->{dir};
-    my $templateName = $params->{templateName};
-
-    return if $dir =~ /init/ && $self->{omit} =~ /init/;
-    return if (defined $self->{specificYamlFile}) && ($templateName !~ $self->{specificYamlFile});
-    return if (defined $self->{componentIsAllowed}) && 
-              (not $self->{componentIsAllowed}->($templateName, $dir, $self->{cluster}, $self->{instance}));
-    
-    my $yamlText;
-    my $templatesYamlFilePath = "$self->{config}->{templates_yaml_dir}/$dir";
-    make_path $templatesYamlFilePath or die("Failed to create path: $templatesYamlFilePath") if !-d $templatesYamlFilePath;
-
-    # $self->{templatesTTHash}->{"40-api"}->{"40-build-config-api"} = "40-api/clusterPublic/40-build-config-api";
-    my $templateTTFilePath = "$self->{templatesTTDir}/$self->{templatesTTHash}->{$dir}->{$templateName}";
-    $templateTTFilePath = $templateTTFilePath.".tt";
-    
-    eval { $self->{tt}->process($templateTTFilePath, $self->{config}, \$yamlText); };
-    if($@){
-        print "Error occured during generating yaml in: $dir  $templateName\n", Dumper($@), "\n";
-        return;
-    }
-    
-    my $yamlHash;
-    eval { $yamlHash = Load($yamlText);};
-    if($@){
-        print "Error occured during conversion to yaml in: $dir  $templateName\n", Dumper($@), "\n";
-        return;
-    }
-    
-    return if (defined $self->{ocResourceKinds}) && ($self->{ocResourceKinds} !~ $yamlHash->{kind});
-
-    write_file("$templatesYamlFilePath/$templateName\.yaml", $yamlText);
-    $self->{config}->{ip_last_number}++ if $yamlHash->{kind} eq "Service";
-}
-
-sub _getComponentConfigNodes{
-    my ($self, $config) = @_;
-    
-    my @componentConfigNodes;
-    my $componentConfigNodesString;
-    if((defined $config->{oc_config}) && (defined $config->{oc_config}->{instance_specific_data})){
-        foreach my $componentConfigNode (keys %{$config->{oc_config}->{instance_specific_data}}){
-            push @componentConfigNodes, $componentConfigNode;
-        }
-    }
-
-    return \@componentConfigNodes;
-}
-
-sub _getComponentFromTemplatesTTDir{
-    my ($self) = @_;
-
-    my $componentDirs = "";
-    foreach my $dirPath (glob "$self->{templatesTTDir}/*") {
-        next if not -d $dirPath;
-        my @dirPathArr = split('/', $dirPath);
-        my $componentDir = $dirPathArr[-1];
-        $componentDir  =~ s/^\d+-//;
-        $componentDirs .= $componentDir.";";
-    }
-    chop($componentDirs) if $componentDirs ne "";
-
-    return $componentDirs;
 }
 
 sub _getCurrentProject{
     my ($self) = @_; 
 
-    my $projectCmdLine    = qx/$self->{cliCommand} config current-context/;
+    my $projectCmdLine    = qx/$self->{cloudCommand} config current-context/;
     my @projectCmdLineArr = split('/', $projectCmdLine);
     my $project = $projectCmdLineArr[0];
     $project = "unknown" if not defined $project;
@@ -635,6 +913,10 @@ sub _getCurrentProject{
 }
 
 sub _getDefaultKinds{
+    return "PersistentVolumeClaim;ImageStream;BuildConfig;Deployment;DeploymentConfig;Secret;ConfigMap;CronJob;Job;Service;Route";
+}
+
+sub _getDefaultKindsBackup{
     return "PersistentVolumeClaim;StorageClass;VolumeSnapshot;ImageStream;BuildConfig;Deployment;DeploymentConfig;StatefulSet;Secret;ConfigMap;CronJob;Job;DaemonSet;ReplicaSet;ReplicationController;HorizontalPodAutoscaler;PodDisruptionBudget;Service;Route;Ingress;NetworkPolicy;ServiceAccount;ClusterRole;RoleBinding;ResourceQuota;LimitRange";
 }
 
@@ -657,23 +939,23 @@ sub _getSecrets{
     }
     
     my $clusterSpecificSecretsDirExist = 0;
-    foreach my $dirPath (glob "$self->{secretsDir}/*") {
+    foreach my $dirPath (glob "$self->{secretsDir}/*"){
         next if not -d $dirPath;
         my @dirPathArr = split('/', $dirPath);
         my $dirName = $dirPathArr[-1];
         next if $dirName eq "instance";
-        $clusterSpecificSecretsDirExist = 1 if $dirName eq $self->{cluster};
+        $clusterSpecificSecretsDirExist = 1 if $dirName eq $self->{config}->{cluster};
     }
     
     # secrets files for all instances and for specific cluster e.g.: secrets/clusterIntern/my_secret.txt
     if($clusterSpecificSecretsDirExist){
-        for my $dirFileName (File::Find::Rule->file()->name("*")->maxdepth(1)->in("$self->{secretsDir}/$self->{cluster}")) {
+        for my $dirFileName (File::Find::Rule->file()->name("*")->maxdepth(1)->in("$self->{secretsDir}/$self->{config}->{cluster}")) {
             my @dirFileNameArr = split('/', $dirFileName);
             next if $dirFileNameArr[-1] eq $secretJsonFileName;
             $self->_addSecretsToConfigHash($config, $dirFileName);
         }
         # secret files for specific instance and specific cluster e.g.: secrets/clusterIntern/instance/prod/my_secret.txt
-        for my $dirFileName (File::Find::Rule->file()->name("*")->maxdepth(1)->in("$self->{secretsDir}/$self->{cluster}/instance/$self->{instance}")) {
+        for my $dirFileName (File::Find::Rule->file()->name("*")->maxdepth(1)->in("$self->{secretsDir}/$self->{config}->{cluster}/instance/$self->{instance}")) {
             my @dirFileNameArr = split('/', $dirFileName);
             next if $dirFileNameArr[-1] eq $secretJsonFileName;
             $self->_addSecretsToConfigHash($config, $dirFileName);
@@ -688,14 +970,14 @@ sub _getSecrets{
     };
     if($clusterSpecificSecretsDirExist){
         # secrets json for all instances and specific cluster
-        my $path = "$self->{secretsDir}/$self->{cluster}/$secretJsonFileName";
+        my $path = "$self->{secretsDir}/$self->{config}->{cluster}/$secretJsonFileName";
         eval {
             my $secretJsonClusterSpecific = read_file($path);
             my $secretJsonClusterSpecificHash = $self->{json}->utf8->decode($secretJsonClusterSpecific);
             $self->_mergeSecretsJson($config->{secrets_json}, $secretJsonClusterSpecificHash);
         };
         # secrets json for specific instance and specific cluster
-        $path = "$self->{secretsDir}/$self->{cluster}/instance/$self->{instance}/$secretJsonFileName"; 
+        $path = "$self->{secretsDir}/$self->{config}->{cluster}/instance/$self->{instance}/$secretJsonFileName"; 
         eval {
             my $secretJsonClusterSpecificInstanceSpecific = read_file($path);
             my $secretJsonClusterSpecificInstanceSpecificHash = $self->{json}->utf8->decode($secretJsonClusterSpecificInstanceSpecific);
@@ -711,6 +993,68 @@ sub _getSecrets{
         };
     }
 
+    return;
+}
+
+sub _getCloudWriteCommand{
+    my ($self) = @_;
+
+    my $writeCommand = "create";
+    if(defined $self->{config}->{oct_config}->{project}->{default_cloud_write_command}){
+        $writeCommand = $self->{config}->{oct_config}->{project}->{default_cloud_write_command};
+    }
+    $writeCommand = "create" if defined $self->{advanceFeatures} && $self->{advanceFeatures} =~ /create/;
+    $writeCommand = "apply"  if defined $self->{advanceFeatures} && $self->{advanceFeatures} =~ /apply/;
+        
+    return $writeCommand;
+}
+
+sub _gitCommitAndPush{
+    my ($self, $instance) = @_;
+
+    if(not $self->{config}->{oct_config}->{project}->{git}->{auto_commit}){
+        if($self->{config}->{oct_config}->{project}->{git}->{auto_commit_prompt}){
+            $self->_writeLog("\nPress enter to commit(and push if enabled) to Git or type 'skip' and press enter to skip this operation(s).\n");
+            my $continue = <>;
+            return if $continue =~ /skip/;
+        }
+        $self->_writeLog("commiting to git...\n");
+        my $commitText = "committed on: " . localtime;
+        if($self->{config}->{oct_config}->{project}->{git}->{auto_commit_prompt}){
+            $self->_writeLog("Write your git commit message or press Enter to use default:\n($commitText)\n");
+            my $customMsg = <>;
+            $commitText = $customMsg if $customMsg ne "\n";
+            $commitText =~ s/\n//g;
+        }
+        $self->_writeLog("git commit -am \"$commitText\"\n");
+        `git commit -am "$commitText"`;
+        if($self->{config}->{oct_config}->{project}->{git}->{auto_push}){
+            my $branch = $self->{config}->{oct_config}->{project}->{git}->{auto_push_branch} // "master";
+            $self->_writeLog("git push origin $branch\n");
+            `git push origin $branch`;
+        }
+    }
+
+    return;
+}
+
+sub _initConfSecretsAndYaml{
+    my ($self, $instance) = @_;
+    
+    $self->{instance} = $instance;
+    $self->{config} = $self->_getConfig();
+    $self->_runPreHook();
+    
+    my $outputLogFile = "output.log";
+    if(defined $self->{config}->{oct_config}->{project}->{output_log_file}){
+        $outputLogFile = $self->{config}->{oct_config}->{project}->{output_log_file};
+     }
+    `touch $outputLogFile`;
+    `>$outputLogFile`; # clear file content
+
+    $self->_getSecrets($self->{config});
+    $self->_generateYaml();
+        
     return;
 }
 
@@ -741,10 +1085,10 @@ sub _loopDir {
             push @dirArray, $dir;
         }
     }
-    @dirArray = reverse @dirArray if $injectedSubName eq "_deleteOc";
+    @dirArray = reverse @dirArray if $injectedSubName eq "_deleteFromCloud";
 
     foreach my $dir (@dirArray){
-        print "\nInstalling components from: $dir:\n" if $injectedSubName eq "_callOc";
+        $self->_writeLog("\nComponent: $dir:\n") if $injectedSubName eq "_callCloudCommand";
         
         my @fileArray;
         if((defined $self->{sortType}) && ($self->{sortType}) eq "alphabetic"){
@@ -758,12 +1102,12 @@ sub _loopDir {
                 push @fileArray, $file;
             }
         }
-        @fileArray = reverse @fileArray if $injectedSubName eq "_deleteOc";
+        @fileArray = reverse @fileArray if $injectedSubName eq "_deleteFromCloud";
         foreach my $file (@fileArray){
             next if $file eq "dirNumber" || $self->_skipComponent($dir);
             my @fileArr = split('\.', $file);            
             if((not defined $fileArr[1]) && ($self->{config}->{allowed_clusters} !~ /$file/)){
-                print "Warning : Unknown cluster: $file\n";
+                $self->_writeLog("Warning : Unknown cluster: $file\n") if $file ne "instance";
             }
             my $injectedSub = \&$injectedSubName;
             $injectedSub->($self, {dir => $dir, templateName => $fileArr[0], params => $params});
@@ -774,8 +1118,11 @@ sub _loopDir {
 sub _mergeSecretsJson{
     my ($self, $jsonHashOriginal, $jsonHashAddition) = @_;
     
-    foreach my $key (keys %{$jsonHashAddition}){
-        $jsonHashOriginal->{$key} = $jsonHashAddition->{$key}
+    if(ref($jsonHashAddition) eq 'HASH'){
+        foreach my $key (keys %{$jsonHashAddition}){
+            $jsonHashOriginal->{$key} = $jsonHashAddition->{$key};
+            $jsonHashOriginal->{base64}->{$key} = $self->_encodeJsonHashToBase64(dclone($jsonHashAddition->{$key}));
+        }
     }
     
     return;
@@ -787,6 +1134,26 @@ sub _removeInitFromComponentDirs{
     my @componentsYamlDirArray       = split(';', $self->{config}->{component_dirs});
     @componentsYamlDirArray          = (grep {$_ !~ /init/} @componentsYamlDirArray);
     $self->{config}->{component_dirs} = join( ';', @componentsYamlDirArray);
+}
+
+sub _runPreHook{
+    my ($self) = @_;
+    
+    if((($self->{omit} // '') !~ /preHook/) && (defined $self->{preHook})){
+        $self->{preHook}->($self->{config});
+    }
+
+    return;
+}
+
+sub _runPostHook{
+    my ($self) = @_;
+
+    if((($self->{omit} // '') !~ /postHook/) && (defined $self->{postHook})){
+        $self->{postHook}->($self->{config});
+    }
+
+    return;
 }
 
 sub _skipComponent{
@@ -815,7 +1182,7 @@ sub _skipComponent{
     return 1;
 }
 
-sub _validateInstance{
+sub _validateAgainstCloud{
     my ($self, $params) = @_;
     
     my @funcName = split /::/, (caller(0))[3];
@@ -824,31 +1191,31 @@ sub _validateInstance{
 
     my $templateNameYaml = $templateName.".yaml";
     my $yamlData         = LoadFile("$self->{config}->{templates_yaml_dir}/$dir/$templateNameYaml");
-    my $ocName           = $yamlData->{metadata}->{name};
-    my $ocKind           = $yamlData->{kind};
-    my $ocJson           = qx/$self->{cliCommand} get $ocKind $ocName -o json/;
-    my $ocHash = {};
+    my $octName          = $yamlData->{metadata}->{name};
+    my $octKind          = $yamlData->{kind};
+    my $octJson          = qx/$self->{cloudCommand} get $octKind $octName -o json/;
+    my $octHash = {};
     eval { 
-        $ocHash  = $self->{json}->utf8->decode($ocJson); 
-        if(($ocKind eq "Secret") && (ref($ocHash->{data}) eq 'HASH')){
-            foreach my $key (keys %{$ocHash->{data}}){
-                my $secret = decode_base64($ocHash->{data}->{$key});
+        $octHash  = $self->{json}->utf8->decode($octJson); 
+        if(($octKind eq "Secret") && (ref($octHash->{data}) eq 'HASH')){
+            foreach my $key (keys %{$octHash->{data}}){
+                my $secret = decode_base64($octHash->{data}->{$key});
                 $secret =~ s/\n//g;
                 $secret =~ s/\r//g;
-                $ocHash->{data}->{$key} = $secret;
+                $octHash->{data}->{$key} = $secret;
             }
         }
     };
-    print Dumper($@) if $@;
+    $self->_writeLog(Dumper($@)) if $@;
     
     my $templateYamlText = read_file("$self->{config}->{templates_yaml_dir}/$dir/$templateNameYaml");
     my $yamlObj = YAML::Safe->new->boolean("JSON::PP");
     my $templateHash = $yamlObj->Load($templateYamlText);
-    my $subParams = {"dir" => $dir, "templateName" => $templateName, "ocKind" => $ocKind, "ocName" => $ocName};
-    $ocHash       = $self->{removeClutter}->($ocHash, $subParams)       if defined $self->{removeClutter};
+    my $subParams = {"dir" => $dir, "templateName" => $templateName, "octKind" => $octKind, "octName" => $octName};
+    $octHash       = $self->{removeClutter}->($octHash, $subParams)       if defined $self->{removeClutter};
     $templateHash = $self->{removeClutter}->($templateHash, $subParams) if defined $self->{removeClutter};
     
-    if($ocKind eq "Secret"){
+    if($octKind eq "Secret"){
         if((defined $templateHash->{data}) && (ref($templateHash->{data}) eq 'HASH')){
             foreach my $key (keys %{$templateHash->{data}}){
                 my $dataBase64Encoded = $templateHash->{data}->{$key};
@@ -860,12 +1227,12 @@ sub _validateInstance{
         }
     }
     
-    $ocJson          =  $self->{json}->utf8->pretty->canonical->encode($ocHash);
+    $octJson         =  $self->{json}->utf8->pretty->canonical->encode($octHash);
     my $templateJson =  $self->{json}->utf8->pretty->canonical->encode($templateHash);
-    my @ocJsonArr       = split /\n/, $ocJson;
+    my @octJsonArr       = split /\n/, $octJson;
     my @templateJsonArr = split /\n/, $templateJson;
-    my $diff = diff \@ocJsonArr, \@templateJsonArr, { STYLE => "Table", CONTEXT => 0 };
-    if(($ocKind eq "Secret") && ($diff ne "")){
+    my $diff = diff \@octJsonArr, \@templateJsonArr, { STYLE => "Table", CONTEXT => 0 };
+    if(($octKind eq "Secret") && ($diff ne "")){
         $diff = "+---+-----------------------------------------------------+---+---------------------------------+
 *   |           different secret, not displayed           *   | different secret, not displayed |
 +---+-----------------------------------------------------+---+---------------------------------+
@@ -876,13 +1243,107 @@ sub _validateInstance{
     my $diffStatus;
     if((defined $diff) && ($diff ne "")){
         $diffStatus = "MODIFIED";
+        $self->{"atLeastOneModified"} = 1;
     }else{
          $diffStatus = "OK";
     }
-    my $line = "$dir/$templateNameYaml;$ocKind;$ocName;$diffStatus\n";
-    print $line;
-    print $diff if $diff ne "";
+    my $line = "$dir/$templateNameYaml;$octKind;$octName;$diffStatus\n";
+    $self->_writeLog($line);
+    $self->_writeLog($diff) if $diff ne "";
     write_file($self->{validationReportFile}, {append => 1}, $line);
+}
+
+# used only during cloud write operations(install/update/delete)
+sub _writeLog{
+     my ($self, $text) = @_;
+
+     print $text;
+     
+     my $file = "output.log";
+     if(defined $self->{config}->{oct_config}->{project}->{output_log_file}){
+        $file = $self->{config}->{oct_config}->{project}->{output_log_file};
+     }
+     write_file($file, {append => 1}, $text);
+     
+     return;
+}
+
+sub _writeYamlFile{
+    my ($self, $params) = @_;
+
+    my $dir          = $params->{dir};
+    my $templateName = $params->{templateName};
+
+    # return if $dir =~ /init/ && (($self->{omit} // '') =~ /init/  || $self->{config}->{oct_config}->{project}->{omit_init});
+    
+    if($dir =~ /init/ && 
+       (
+         ($self->{omit} // '') =~ /init/  || 
+         ($self->{config}->{oct_config}->{project}->{omit_init} && ($self->{advanceFeatures} // '') !~ /useInit/)
+       )
+      ){
+        return;
+    }
+    
+    return if (defined $self->{specificYamlFile}) && ($templateName !~ /$self->{specificYamlFile}/);
+    return if (defined $self->{componentIsAllowed}) && 
+              (not $self->{componentIsAllowed}->($templateName, $dir, $self->{config}->{cluster}, $self->{instance}));
+    
+    my $yamlText;
+    my $templatesYamlFilePath = "$self->{config}->{templates_yaml_dir}/$dir";
+    make_path $templatesYamlFilePath or die("Failed to create path: $templatesYamlFilePath") if !-d $templatesYamlFilePath;
+
+    # $self->{templatesTTHash}->{"40-api"}->{"40-build-config-api"} = "40-api/clusterPublic/40-build-config-api";
+    my $templateTTFilePath = "$self->{templatesTTDir}/$self->{templatesTTHash}->{$dir}->{$templateName}";
+    $templateTTFilePath = $templateTTFilePath.".tt";
+
+    eval { $self->{tt}->process($templateTTFilePath, $self->{config}, \$yamlText); };
+    if($@){
+        $self->_writeLog("Error occurred during generating yaml in: $dir  $templateName\n".Dumper($@)."\n");
+        return;
+    }
+
+    my $yamlHash;
+    eval { $yamlHash = Load($yamlText);};
+    if($@){
+        $self->_writeLog("Error occurred during conversion to yaml in: $dir  $templateName\n".Dumper($@)."\n");
+        return;
+    }
+
+    $self->{templateManifests}->{$yamlHash->{kind}}->{$yamlHash->{metadata}->{name}} = 1;
+  
+    my $allowedResourceKinds = $self->{config}->{resource_kinds};
+    return if (defined $allowedResourceKinds) && ($allowedResourceKinds !~ /$yamlHash->{kind}/);
+
+    write_file("$templatesYamlFilePath/$templateName\.yaml", $yamlText);
+    $self->{config}->{ip_last_number}++ if $yamlHash->{kind} eq "Service";
+}
+
+sub _writeYamlFiles{
+    my ($self) = @_;
+
+    # $self->{templatesTTHash}->{"40-api"}->{"40-build-config-api"} = "40-api/clusterPublic/40-build-config-api.tt";
+    my $dirs = $self->{templatesTTHash};
+    if((defined $self->{sortType}) && ($self->{sortType}) eq "alphabetic"){
+        # alphabetic
+        foreach my $dir (sort {lc($a) cmp lc($b)} keys %{$dirs}){
+            my $files = $dirs->{$dir};
+            foreach my $templateName (sort {lc($a) cmp lc($b)} keys %{$files}){
+                $self->_writeYamlFile({dir => $dir, templateName => $templateName});
+            }
+        }
+    }else{
+        # numeric
+        no warnings 'numeric';
+        foreach my $dir (sort {lc($a) <=> lc($b)} keys %{$dirs}){
+            my $files = $dirs->{$dir};
+            foreach my $templateName (sort {lc($a) <=> lc($b)} keys %{$files}){
+                $self->_writeYamlFile({dir => $dir, templateName => $templateName});
+            }
+        }
+    }
+
+    return;
 }
 
 1;
@@ -961,7 +1422,7 @@ Generates YAML manifests from templates and applies them via C<oc create> or C<o
 
 Compares live cluster resources to offline templates using C<oc get>, computes diffs, and logs the status C<OK> or C<MODIFIED>.
 
-=item * B<upgrade(instance)>
+=item * B<update(instance)>
 
 Deletes and recreates modified resources, handling some types like PersistentVolumeClaims cautiously.
 
@@ -1048,7 +1509,7 @@ Here's the typical flow from the module's documentation:
 
     $ocObj->install('testInstance');
     $ocObj->validate('testInstance');
-    $ocObj->upgrade('testInstance');
+    $ocObj->update('testInstance');
     $ocObj->backup('production');
     $ocObj->delete('devInstance');
 
@@ -1062,7 +1523,7 @@ Converts templates into YAML and applies them via C<oc> commands.
 
 =item * B<Full lifecycle support>
 
-Can install, validate, upgrade, backup, and delete Openshift/Kubernetes resources.
+Can install, validate, update, backup, and delete Openshift/Kubernetes resources.
 
 =item * B<Multi-cluster aware>
 

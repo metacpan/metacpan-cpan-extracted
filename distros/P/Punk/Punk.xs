@@ -68,6 +68,7 @@ static const frj_abi *punk_frj(pTHX) {
 #include "punk/punk_views.h"      /* the view-engine registry              */
 #include "punk/punk_scope.h"      /* the `under` handle (needs context)     */
 #include "punk/punk_app.h"        /* the Punk::App registrar (needs context) */
+#include "punk/punk_proxy.h"      /* reverse-proxy trust (used by serve)    */
 #include "punk/punk_serve.h"      /* the request dispatcher                 */
 #include "punk/punk_ws.h"         /* the RFC 6455 frame codec (phase 8)    */
 #include "punk/punk_config.h"      /* layered YAML config + resolved secrets */

@@ -145,7 +145,19 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
                     ? (pr_router *)INT2PTR(void *, SvIV(SvRV(router))) : NULL;
 
     STRLEN mlen, plen;
-    const char *method = ps_env_str(aTHX_ env, "REQUEST_METHOD", "GET", &mlen);
+    const char *method;
+
+    {   /* Reverse-proxy trust, before anything reads the env: REMOTE_ADDR is
+         * rewritten to the real client so rate_limit, block_ip, the access
+         * log and $c->req all see it without any of them being changed.
+         * Absent a `proxy` policy this is one predictable branch. */
+        SV *px = ps_state(aTHX_ state, K_PROXY);
+        if (px && SvROK(px) && SvIOK(SvRV(px)))
+            pp_resolve(aTHX_ (const pp_policy *)INT2PTR(void *,
+                                                        SvIV(SvRV(px))), env);
+    }
+
+    method = ps_env_str(aTHX_ env, "REQUEST_METHOD", "GET", &mlen);
     const char *path   = ps_env_str(aTHX_ env, "PATH_INFO", "/", &plen);
     int is_head = (mlen == 4 && memEQ(method, "HEAD", 4));
     SV *rec = NULL, *caps = NULL;
@@ -381,6 +393,21 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
             (void)hv_stores(match, "captures", newRV_noinc((SV *)newHV()));
         c = sv_2mortal(ps_ctx(aTHX_ ctxcls, env, app, newRV_noinc((SV *)match)));
 
+        {   /* The body ceiling, before the hook chain and before the guards:
+             * an oversize request should cost no auth lookup, no validation,
+             * no body parse and no Perl frame. A route's own value wins over
+             * the app-wide one, and 0 on a route disables the check there. */
+            SV **rmb = hv_fetchs(rech, K_MAX_BODY, 0);
+            SV  *amb = ps_state(aTHX_ state, K_MAX_BODY);
+            IV   lim = (rmb && *rmb && SvOK(*rmb)) ? SvIV(*rmb)
+                     : (amb && SvOK(amb))          ? SvIV(amb)
+                     : 0;
+            if (lim > 0) {
+                SV *over = pd_body_limit(aTHX_ env, lim);
+                if (over) return over;
+            }
+        }
+
         shorted = pd_run_chain(aTHX_ before, c, &ret, &err);
         if (!shorted) {
             guardsp = hv_fetchs(rech, "guards", 0);
@@ -414,6 +441,35 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
             if (died) err = newSVsv(ERRSV);
         }
         out = punk_finish_c(aTHX_ app, c, ret, err, on_err, method, mlen, after, env);
+        {   /* compress => 0: say so in the one place the server will look.
+             * `identity` is the documented hands-off spelling (Hyperman
+             * strips it before writing); a response that already declares
+             * an encoding has said something more specific and is left. */
+            SV **nc = hv_fetchs(rech, K_COMPRESS, 0);
+            if (nc && *nc && !SvTRUE(*nc)
+                && out && SvROK(out) && SvTYPE(SvRV(out)) == SVt_PVAV) {
+                AV *ra = (AV *)SvRV(out);
+                SV **hp = av_fetch(ra, 1, 0);
+                if (hp && *hp && SvROK(*hp) && SvTYPE(SvRV(*hp)) == SVt_PVAV) {
+                    AV *hdrs = (AV *)SvRV(*hp);
+                    SSize_t j, hn = av_len(hdrs) + 1;
+                    int seen = 0;
+                    for (j = 0; j + 1 < hn; j += 2) {
+                        SV **k = av_fetch(hdrs, j, 0);
+                        STRLEN kl;
+                        const char *ks;
+                        if (!(k && *k)) continue;
+                        ks = SvPV_const(*k, kl);
+                        if (kl == 16 && foldEQ(ks, "Content-Encoding", 16))
+                            { seen = 1; break; }
+                    }
+                    if (!seen) {
+                        av_push(hdrs, newSVpvs("Content-Encoding"));
+                        av_push(hdrs, newSVpvs("identity"));
+                    }
+                }
+            }
+        }
         if (ret != &PL_sv_undef) SvREFCNT_dec(ret);
         if (err != &PL_sv_undef) SvREFCNT_dec(err);
         return out;

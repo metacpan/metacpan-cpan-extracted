@@ -37,7 +37,7 @@ my $x_y_z_version = sprintf( "%d.%d.%d", $major, $minor, $micro );
 
 say qq|###############################################################|;
 say qq|# Commands to execute ReleaseGuide for |
-    . qq|Apache Lucy $x_y_z_version RC $rc|;
+    . qq|Lucy $x_y_z_version RC $rc|;
 say qq|###############################################################\n|;
 
 say qq|# If your code signing key is not already available from pgp.mit.edu|;
@@ -167,7 +167,7 @@ say "";
 say qq|# Copy release artifacts to the production dist directory and|;
 say qq|# remove the RC dir.  The "svnmucc" app, which ships with Subversion|;
 say qq|# 1.7, is required.|;
-say qq|svnmucc -m "Publish Apache Lucy $x_y_z_version" |
+say qq|svnmucc -m "Publish Lucy $x_y_z_version" |
     . qq|-U https://dist.apache.org/repos/dist/ |
     . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz |
     . qq|release/lucy/apache-lucy-$x_y_z_version.tar.gz |
@@ -187,7 +187,7 @@ say qq|# Carefully remove the artifacts for any previous releases superseded|;
 say qq|# by this one.|;
 if ( $micro > 0 ) {
     my $prev = sprintf( "%d.%d.%d", $major, $minor, $micro - 1 );
-    say qq|svnmucc -m "Remove Apache Lucy $prev" |
+    say qq|svnmucc -m "Remove Lucy $prev" |
         . qq|-U https://dist.apache.org/repos/dist/release/lucy/ |
         . qq|rm apache-lucy-$prev.tar.gz |
         . qq|rm apache-lucy-$prev.tar.gz.md5 |
@@ -235,14 +235,14 @@ say qq|###############################################################|;
 say qq|# Boilerplate VOTE email for dev\@lucy.a.o|;
 say qq|# Suggested subject:|;
 say qq|#|;
-say qq|#    [VOTE] Apache Lucy $x_y_z_version RC $rc|;
+say qq|#    [VOTE] Lucy $x_y_z_version RC $rc|;
 say qq|#|;
 say qq|###############################################################\n|;
 
 say <<END_LUCY_DEV_VOTE;
 Hello,
 
-Release candidate $rc for Apache Lucy version $x_y_z_version can be
+Release candidate $rc for Lucy version $x_y_z_version can be
 found at:
 
     https://dist.apache.org/repos/dist/dev/lucy/apache-lucy-$full_rc_version/
@@ -258,7 +258,7 @@ It was cut using "git archive" from the tag at:
 
     https://git-wip-us.apache.org/repos/asf?p=lucy.git;a=tag;h=refs/tags/v$full_rc_version
 
-Please vote on releasing this candidate as Apache Lucy version
+Please vote on releasing this candidate as Lucy version
 $x_y_z_version.  The vote will be held open for at least the next 72
 hours.
 
@@ -267,16 +267,16 @@ and express approval or disapproval.  Votes from members of the Lucy
 PMC are binding; the vote passes if there are at least three binding
 +1 votes and more +1 votes than -1 votes. 
 
-For suggestions as to how to evaluate Apache Lucy release candidates,
+For suggestions as to how to evaluate Lucy release candidates,
 and for information on ASF voting procedures, see:
 
     http://wiki.apache.org/lucy/ReleaseVerification
     http://wiki.apache.org/lucy/ReleasePrep
     http://www.apache.org/foundation/voting.html
 
-[ ] +1 Release RC $rc as Apache Lucy $x_y_z_version.
+[ ] +1 Release RC $rc as Lucy $x_y_z_version.
 [ ] +0
-[ ] -1 Do not release RC $rc as Apache Lucy $x_y_z_version because...
+[ ] -1 Do not release RC $rc as Lucy $x_y_z_version because...
 
 Here's my +1.
 
@@ -287,34 +287,31 @@ say qq|###############################################################|;
 say qq|# Boilerplate ANNOUNCE email|;
 say qq|# Suggested subject:|;
 say qq|#|;
-say qq|#    [ANNOUNCE] Apache Lucy $x_y_z_version released|;
+say qq|#    [ANNOUNCE] Lucy $x_y_z_version released|;
 say qq|#|;
 say qq|###############################################################\n|;
 
 say <<END_ANNOUNCE_EMAIL;
 Greetings,
 
-The Apache Lucy team is pleased to announce the release of
+The Lucy team is pleased to announce the release of
 version $x_y_z_version!
 
-The Apache Lucy search engine library provides full-text search
-for dynamic programming languages.  For a list of issues resolved
-in this version, please see the release notes:
-
-  http://www.apache.org/dist/lucy/CHANGES-$x_y_z_version.txt
+The Lucy search engine library provides full-text search
+for dynamic programming languages.
 
 The most recent release can be obtained from our download page:
 
-  http://lucy.apache.org/download.html
+  https://github.com/lucysearch
 
-For general information on Apache Lucy, please visit the project
+For general information on Lucy, please visit the project
 website:
 
-  http://lucy.apache.org/
+  https://github.com/lucysearch
 
 Regards, 
 
-$name, on behalf of the Apache Lucy development team
+$name, on behalf of the Lucy development team
 and community
 
 END_ANNOUNCE_EMAIL

@@ -168,7 +168,7 @@ pp_addhdr('
 ');
 
 # Standard `-lm'
-my (@ufuncs1) = qw(acos asin atan cosh sinh tan tanh); # F,D only
+my (@ufuncs1) = qw(acos asin atan cosh sinh tan tanh);
 my (@ufuncs1g) = qw(ceil floor rint); # Any real type
 
 # Note:
@@ -202,7 +202,8 @@ EOF
 
 sub g_c {
   my ($func, $arg) = @_;
-  return 0 if $func !~ /[a-z]/;
+  return $got_complex{$func} if defined $got_complex{$func};
+  return $got_complex{$func} = 0 if $func !~ /[a-z]/;
   $got_complex{$func} = PDL::Core::Dev::got_complex_version($func, $arg);
   print "got_complex_version($func, $arg): $got_complex{$func}\n";
   $got_complex{$func};
@@ -517,7 +518,7 @@ EOF
   );
 }
 
-cequiv($_) for qw(sqrt log acos asin acosh atanh);
+cequiv($_) for qw(sqrt log acos asin asinh acosh atanh);
 
 pp_def('csqrt_up',
     GenericTypes => $AF,

@@ -1,5 +1,9 @@
 Revision history for Test::Load::Helper
 
+v1.0.2     2026-08-18 04:59 UTC
+
+	Break dependency circle with Test::YAFT
+
 v1.0.1     2026-06-23 18:24 UTC
 
 	Fix email address to not use @cpan.org

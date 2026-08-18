@@ -59,7 +59,7 @@ sub err_carp {
         require Data::Dumper;                                                                                                                                                
         $Data::Dumper::Indent=1;
         Data::Dumper->Dump(\@_); # not necessarily safe                                                                                                                    
-    };
+    } || $Carp::RefArgFormatter; # use || $Carp::RefArgFormatter to stop warning on older version of Carp
     &Carp::confess &diag(@_);
     
 }

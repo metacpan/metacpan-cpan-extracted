@@ -39,7 +39,7 @@ Lucy::Analysis::Token - Unit of text.
 
 =head1 DESCRIPTION
 
-Token is the fundamental unit used by Apache Lucy’s Analyzer subclasses.
+Token is the fundamental unit used by Lucy’s Analyzer subclasses.
 Each Token has 5 attributes: C<text>, C<start_offset>,
 C<end_offset>, C<boost>, and C<pos_inc>.
 

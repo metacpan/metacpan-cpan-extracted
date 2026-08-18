@@ -6,6 +6,7 @@ lib/LedgerSMB/Installer/Configuration.pm
 lib/LedgerSMB/Installer/OS/linux/debian.pm
 lib/LedgerSMB/Installer/OS/linux/fedora.pm
 lib/LedgerSMB/Installer/OS/linux.pm
+lib/LedgerSMB/Installer/OS/linux/rhel.pm
 lib/LedgerSMB/Installer/OS.pm
 lib/LedgerSMB/Installer/OS/unix.pm
 lib/LedgerSMB/Installer/PkgMan/APT.pm

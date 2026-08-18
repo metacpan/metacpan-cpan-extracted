@@ -1,3 +1,7 @@
+0.07 2026-08-18
+
+- Requires Perl 5.36
+
 0.06 2026-08-03
 
 - Add append_table method

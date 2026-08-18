@@ -1,7 +1,7 @@
-# Building Apache Clownfish projects in C environments
+# Building Clownfish projects in C environments
 
 The following steps are required to build a project that uses
-Apache Clownfish:
+Clownfish:
 
 - Run the `cfc` command-line application (Clownfish compiler) to
   generate C headers, C source files, and documentation.

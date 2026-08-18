@@ -1,4 +1,4 @@
-# Working with Apache Clownfish classes in C
+# Working with Clownfish classes in C
 
 ## Inititalizing Clownfish parcels
 

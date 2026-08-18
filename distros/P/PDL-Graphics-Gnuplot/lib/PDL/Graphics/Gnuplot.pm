@@ -2085,7 +2085,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.032';
+our $VERSION = '2.033';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -7677,6 +7677,9 @@ EOM
 	) {
 	if($this->{early_gnuplot}) {
 	    barf "PDL::Graphics::Gnuplot: ERROR: the deprecated pre-v$gnuplot_dep_v gnuplot backend issued an error:\n$fromerr\n";
+	} elsif ($fromerr =~ /^line \d+: warning:/) {
+	    warn "PDL::Graphics::Gnuplot: the gnuplot backend issued a warning:\n$fromerr\n";
+	    $fromerr = '';
 	} else {
 	    barf "PDL::Graphics::Gnuplot: ERROR: the gnuplot backend issued an error:\n$fromerr\n";
 	}

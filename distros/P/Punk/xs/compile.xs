@@ -181,6 +181,13 @@ _finish_future(self, c, ret, on_error = &PL_sv_undef, method = &PL_sv_undef, aft
             AV *cd = newAV(), *cf = newAV();
             SV *done, *fail, *argv[2];
             int j;
+            /* Does the app's future come from CPAN's Future? Then its `then`
+             * requires the callback to hand back a Future, and older
+             * releases enforce that strictly (CPAN Testers, 0.16, perls
+             * 5.20/5.22/5.24). Punk::Future's `then` takes the value
+             * directly and has no class-level `done` to wrap with, so the
+             * two are told apart once, here, rather than per callback. */
+            int wrap = (SvROK(ret) && sv_derived_from(ret, "Future"));
             for (j = 0; j < 2; j++) {
                 AV *cap = j ? cf : cd;
                 av_push(cap, newSVsv(c));
@@ -188,6 +195,7 @@ _finish_future(self, c, ret, on_error = &PL_sv_undef, method = &PL_sv_undef, aft
                 av_push(cap, newSVsv(method));
                 av_push(cap, SvOK(after) ? newSVsv(after)
                                          : newRV_noinc((SV *)newAV()));
+                av_push(cap, newSViv(wrap));
             }
             done = sv_2mortal(punk_closure(aTHX_ pc_ff_done_cb, cd));
             fail = sv_2mortal(punk_closure(aTHX_ pc_ff_fail_cb, cf));
@@ -318,6 +326,63 @@ compile(self)
                 croak("Punk: websocket routes need Hyperman 0.11 or later "
                       "(for its detach ABI), or blocking => 1 on the route "
                       "for other PSGI servers that provide psgix.io");
+        }
+
+        {   /* max_body: the app-wide ceiling into the compiled state, and
+             * the per-route overrides stamped onto their records. A route's
+             * own value wins, including 0, which legitimately means "do not
+             * check here" - unlike the server's ceiling, this one is policy
+             * and not the memory backstop. */
+            AV *recs = (all_recs && SvROK(all_recs)) ? (AV *)SvRV(all_recs) : NULL;
+            {
+                SV **mr = hv_fetchs(h, K_MAXBODY_ROUTES, 0);
+                if (mr && *mr && SvROK(*mr) && SvTYPE(SvRV(*mr)) == SVt_PVAV) {
+                    AV *mrr = (AV *)SvRV(*mr);
+                    SSize_t mi, mn = av_len(mrr) + 1;
+                    for (mi = 0; mi < mn; mi++) {
+                        HV *w = (HV *)SvRV(*av_fetch(mrr, mi, 0));
+                        SV **wm = hv_fetchs(w, K_METHOD, 0);
+                        SV **wp = hv_fetchs(w, K_PATH, 0);
+                        SV **wv = hv_fetchs(w, K_MAX_BODY, 0);
+                        SSize_t ri, rn = recs ? av_len(recs) + 1 : 0;
+                        if (!(wm && *wm && wp && *wp && wv && *wv)) continue;
+                        for (ri = 0; ri < rn; ri++) {
+                            HV *rr = (HV *)SvRV(*av_fetch(recs, ri, 0));
+                            SV **rm = hv_fetchs(rr, K_METHOD, 0);
+                            SV **rp = hv_fetchs(rr, K_PATH, 0);
+                            if (rm && *rm && rp && *rp
+                                && sv_eq(*rm, *wm) && sv_eq(*rp, *wp))
+                                (void)hv_stores(rr, K_MAX_BODY, newSVsv(*wv));
+                        }
+                    }
+                }
+            }
+        }
+
+        {   /* compress => 0 routes: stamp the compiled record, the same way
+             * ws and sse are stamped. punk_serve then adds the header on the
+             * way out, where it knows which route answered. */
+            SV **nc = hv_fetchs(h, K_NOCOMPRESS_ROUTES, 0);
+            AV *recs = (all_recs && SvROK(all_recs)) ? (AV *)SvRV(all_recs) : NULL;
+            if (nc && *nc && SvROK(*nc) && SvTYPE(SvRV(*nc)) == SVt_PVAV) {
+                AV *ncr = (AV *)SvRV(*nc);
+                SSize_t ci, cn = av_len(ncr) + 1;
+                for (ci = 0; ci < cn; ci++) {
+                    HV *w = (HV *)SvRV(*av_fetch(ncr, ci, 0));
+                    SV **wm = hv_fetchs(w, K_METHOD, 0);
+                    SV **wp = hv_fetchs(w, K_PATH, 0);
+                    SSize_t ri, rn = recs ? av_len(recs) + 1 : 0;
+                    if (!(wm && *wm && wp && *wp)) continue;
+                    for (ri = 0; ri < rn; ri++) {
+                        HV *rr = (HV *)SvRV(*av_fetch(recs, ri, 0));
+                        SV **rm = hv_fetchs(rr, K_METHOD, 0);
+                        SV **rp = hv_fetchs(rr, K_PATH, 0);
+                        if (rm && *rm && rp && *rp
+                            && sv_eq(*rm, *wm) && sv_eq(*rp, *wp))
+                            (void)hv_stores(rr, K_COMPRESS, newSViv(0));
+                    }
+                }
+            }
         }
 
         /* sse routes: mark the records; the transport is chosen per request
@@ -482,6 +547,12 @@ compile(self)
         }
 
         state = newHV();
+        {   /* the app-wide body ceiling; a route's own value overrides it,
+             * and is stamped onto the compiled record further up */
+            SV **mb = hv_fetchs(h, K_MAX_BODY, 0);
+            if (mb && *mb && SvOK(*mb))
+                (void)hv_stores(state, K_MAX_BODY, newSViv(SvIV(*mb)));
+        }
         (void)hv_stores(state, K_ROUTER, newSVsv(xs_router));
         (void)hv_stores(state, K_RECS,   newSVsv(all_recs));
         (void)hv_stores(state, K_API_MOUNTS, newRV_noinc((SV *)state_apims));
@@ -517,6 +588,33 @@ compile(self)
                 if (!pk_require_once(aTHX_ "Punk::Headers", FALSE))
                     croak("Punk: headers needs Punk::Headers, which failed "
                           "to load: %s", SvPV_nolen(ERRSV));
+            }
+        }
+        {   /* proxy: parse the CIDRs and settle the hop rule once, so a
+             * request is a header fetch and a walk. The policy is a C struct
+             * behind a blessed IV-ref (the Punk::Router shape), freed with
+             * the compiled app. */
+            SV **px = hv_fetchs(h, K_PROXY, 0);
+            if (px && *px && SvROK(*px)
+                && SvTYPE(SvRV(*px)) == SVt_PVHV) {
+                SV *envsv;
+                pp_policy *pol;
+                {   /* $app->env - production unless opted out of, which is
+                     * what decides whether trust => 'all' is allowed */
+                    dSP; int count;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP); EXTEND(SP, 1); PUSHs(self); PUTBACK;
+                    count = call_method("env", G_SCALAR);
+                    SPAGAIN;
+                    envsv = count > 0 ? newSVsv(POPs) : newSVpvs("production");
+                    PUTBACK; FREETMPS; LEAVE;
+                }
+                sv_2mortal(envsv);
+                pol = pp_compile(aTHX_ (HV *)SvRV(*px),
+                                 SvOK(envsv) ? SvPV_nolen(envsv) : "production");
+                (void)hv_stores(state, K_PROXY,
+                                sv_setref_iv(newSV(0), "Punk::Proxy",
+                                             PTR2IV(pol)));
             }
         }
         {   /* auth: the battery needs a session for the identity to live in,

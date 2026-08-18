@@ -68,9 +68,9 @@ WriteMakefile(
         'Test::More' => '0.98',
     },
     PREREQ_PM => {
-        'Punk'            => '0.04',
+        'Punk'            => '0.17',
         'Crypt::JWS'      => '0.02',
-        'File::Raw::JSON' => '0.05',
+        'File::Raw::JSON' => '0.07',
         'Fetch'           => '0.08',
     },
     META_MERGE => {
@@ -86,6 +86,7 @@ WriteMakefile(
         'POAuth2.c'         => $hdeps,
         'POAuth2$(OBJ_EXT)' => $hdeps,
     },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
     clean => { FILES => 'Punk-OAuth2-* POAuth2.c POAuth2.o POAuth2.bs' },
     %dep,

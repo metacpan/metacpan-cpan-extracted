@@ -76,4 +76,60 @@ my $app = FutureApp->to_app;
     is($f->get->[2][0], '', 'HEAD strip applies after resolution');
 }
 
-done_testing();
+
+# ---- the contract, pinned regardless of the installed Future ---------------
+#
+# A `then` callback must hand back a FUTURE, not the value it computed.
+# Older Future releases enforce that strictly; the one on this box no longer
+# does, which is exactly why Punk 0.16 passed here and failed on CPAN
+# Testers with "Expected __ANON__(Future.pm line 1140) to return a Future"
+# on perls 5.20, 5.22 and 5.24.
+#
+# StrictFuture reinstates the check locally, so this test fails if the
+# wrapping is ever lost again - on any Future version.
+{
+    package StrictFuture;
+    our @ISA = ('Future');
+    sub then {
+        my ($self, @cbs) = @_;
+        my @checked = map {
+            my $cb = $_;
+            ref $cb eq 'CODE' ? sub {
+                my $f = $cb->(@_);
+                die "Expected callback to return a Future, got "
+                  . (Scalar::Util::blessed($f) || ref($f) || 'a plain value')
+                  . "\n"
+                    unless Scalar::Util::blessed($f) && $f->isa('Future');
+                return $f;
+            } : $cb;
+        } @cbs;
+        return $self->SUPER::then(@checked);
+    }
+    package main;
+}
+
+{
+    package StrictApp;
+    use Punk;
+    get '/ok'   => sub { StrictFuture->done({ strict => 1 }) };
+    get '/fail' => sub { StrictFuture->fail("nope\n") };
+    package main;
+}
+{
+    my $app = StrictApp->to_app;
+
+    my $f = hit($app, path => '/ok', env => { 'psgi.nonblocking' => 1 });
+    my $r = eval { $f->get };
+    is($@, '', 'the done callback returns a Future, as `then` requires')
+        or diag "died: $@";
+    is($r->[0], 200, '...and the response still resolves');
+    is(file_json_decode($r->[2][0])->{strict}, 1, '...with its body');
+
+    my $ff = hit($app, path => '/fail', env => { 'psgi.nonblocking' => 1 });
+    my $rr = eval { $ff->get };
+    is($@, '', 'the fail callback returns a Future too');
+    is($rr->[0], 500, '...answering 500 for the failed future');
+}
+
+
+done_testing;

@@ -34,7 +34,7 @@ typedef struct HashEntry {
 } HashEntry;
 
 void
-HashIter_init_class() {
+HashIter_init_class(void) {
     TOMBSTONE = Hash_get_tombstone();
     if (!TOMBSTONE) {
         THROW(ERR, "Singleton tombstone not set in Hash.");

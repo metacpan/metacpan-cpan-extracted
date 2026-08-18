@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.48;
+use PDL::Core::Dev;
 
 # make sure we can run gnuplot before continuing
 use Alien::Gnuplot;
@@ -16,17 +17,7 @@ sub MY::libscan {
     return $self->SUPER::libscan ($file);
 }
 
-
-sub MY::postamble {
-    my $text = <<'FOO';
-install ::
-	@echo "Updating PDL documentation database...";
-	@$(PERL) -e "exit if $$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(q{PDL::Graphics::Gnuplot}); }; ";
-
-FOO
-    return $text;
-}
-
+sub MY::postamble { pdldoc_add() }
 
 WriteMakefile(
     NAME                      => 'PDL::Graphics::Gnuplot',
@@ -41,10 +32,11 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '6.64', # TEST_REQUIRES
         'Alien::Gnuplot'      => 0,
+        'PDL' => '2.105', # pdldoc_add
     },
     PREREQ_PM => { 
 	    'Alien::Gnuplot'      => '1.031',
-	    'PDL'                 => '2.093', # raster2fits
+	    'PDL' => '2.105',
 	    'PDL::Transform'      => 0, # anticipating split
 	    'PDL::Transform::Color' => 0,
 	    'IPC::Run'            => 0,

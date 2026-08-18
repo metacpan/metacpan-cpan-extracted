@@ -197,6 +197,28 @@ static HV *punk_oa_build_raw(pTHX_ HV *env, HV *caps, SV *body, IV cl) {
     return raw;
 }
 
+/* CONTENT_LENGTH against a ceiling: the 413 triplet (+1) when the declared
+ * body is over it, else NULL. One implementation, two callers - the OpenAPI
+ * mount's `max_body_size` and the `max_body` keyword - so a plain route and
+ * an API operation answer a client byte for byte identically.
+ *
+ * Note what this is NOT. By the time any of this runs the body is already
+ * resident in the server's buffer; the memory was spent before Punk was
+ * called. What the check buys is the parse, the multipart walk, the guards,
+ * the handler, and an honest answer instead of a mysterious success. The
+ * memory bound is the server's (Hyperman's `max_body`), and this cannot
+ * stand in for it. */
+static SV *pd_body_limit(pTHX_ HV *env, IV max_body) {
+    SV **e;
+    IV cl;
+    if (max_body <= 0 || !env) return NULL;
+    e = hv_fetchs(env, "CONTENT_LENGTH", 0);
+    cl = (e && *e && SvOK(*e)) ? SvIV(*e) : 0;
+    if (cl <= max_body) return NULL;
+    return punk_triplet(aTHX_ 413, sv_2mortal(newSVpvs("application/json")),
+                        newSVpvs(PD_ERR_413), NULL);
+}
+
 /* Dispatch one matched operation in C. *out_ret is the controller's return
  * value or an early PSGI triplet (+1 owned, or the immortal undef); *out_err
  * is a die message SV (+1) or the immortal undef. Mirrors the old Perl
@@ -226,10 +248,9 @@ static void punk_oa_dispatch(pTHX_ SV *c, AV *before, HV *rec, SV *api,
         SV **e = hv_fetchs(env, "CONTENT_LENGTH", 0);
         cl = (e && *e && SvOK(*e)) ? SvIV(*e) : 0;
     }
-    if (max_body > 0 && cl > max_body) {
-        ret = punk_triplet(aTHX_ 413, sv_2mortal(newSVpvs("application/json")),
-                           newSVpvs(PD_ERR_413), NULL);
-        goto done;
+    {
+        SV *over = pd_body_limit(aTHX_ env, max_body);
+        if (over) { ret = over; goto done; }
     }
     codep = hv_fetchs(rec, "code", 0);
     if (!(codep && *codep && SvOK(*codep))) {

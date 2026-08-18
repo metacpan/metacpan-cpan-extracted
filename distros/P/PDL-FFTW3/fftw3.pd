@@ -10,7 +10,7 @@ PDL::FFTW3 - PDL interface to the Fastest Fourier Transform in the West v3
 #
 # Each type of transform that is supported by this module has a plain,
 # unthreaded perl entry point the user calls. This entry point makes sure the
-# FFTW plan exists (or makes it). Then it calls the THREADED PP function to
+# FFTW plan exists (or makes it). Then it calls the PP function to
 # actually compute the transform
 
 use strict;
@@ -19,7 +19,7 @@ use warnings;
 # I generate code for up to 10-dimensional FFTs
 my $maxrank = 10;
 
-our $VERSION = '0.203';
+our $VERSION = '0.204';
 pp_setversion($VERSION);
 
 pp_addpm( {At => 'Top'}, slurp('README.pod') . <<'EOF' );
@@ -37,7 +37,7 @@ pp_addhdr( '
 ' );
 
 # I want to be able to say $X = fft1($x); rank is required. 'fft()' is ambiguous
-# about whether threading is desired or if a large fft is desired. Old PDL::FFTW
+# about whether broadcasting is desired or if a large fft is desired. Old PDL::FFTW
 # did one thing, matlab does another, so I do not include this function at all
 
 my $TEMPLATE_REAL_R2C = <<'EOF';
@@ -116,7 +116,7 @@ CODE:
   for( int i=0; i<rank; i++)
     dims_row_first[i] = SvIV( *av_fetch( dims_av, rank-i-1, 0) );
 
-  // I apply the requested mis-alignment. This comes from later thread slices
+  // I apply the requested mis-alignment. This comes from later broadcast slices
   UVTYPE in_data = PTR2UV(in_pdl->data);
   if( in_alignment < 16 )
     in_data |= in_alignment;
@@ -238,7 +238,7 @@ our $_last_do_double_precision;
 
 # This is a function that sits between the user's call into this module and the
 # PP-generated internals. Specifically, this function is called BEFORE any PDL
-# threading happens. Here I make sure the FFTW plan exists, or if it doesn't, I
+# broadcasting happens. Here I make sure the FFTW plan exists, or if it doesn't, I
 # make it. Thus the PP-based internals can safely assume that the plan exists
 sub __fft_internal {
   my $thisfunction = shift;
@@ -538,8 +538,8 @@ sub getPlan
 
   my $do_inplace = is_same_data( $in, $out );
 
-  # I compute a single plan for the whole set of thread slices. I make a
-  # worst-case plan, so I find the worst-aligned thread slice and plan off of
+  # I compute a single plan for the whole set of broadcast slices. I make a
+  # worst-case plan, so I find the worst-aligned broadcast slice and plan off of
   # it. So if $Nslices>1 then the worst-case alignment is the worse of (1st,
   # 2nd) slices
   my $in_alignment  = get_data_alignment_pdl( $in );

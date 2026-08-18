@@ -60,19 +60,19 @@ static void
 S_write_platform_h(CFCBindCore *self);
 
 static char*
-S_charmony_feature_defines();
+S_charmony_feature_defines(void);
 
 static char*
-S_charmony_string_defines();
+S_charmony_string_defines(void);
 
 static char*
-S_charmony_stdbool_defines();
+S_charmony_stdbool_defines(void);
 
 static char*
-S_charmony_stdint_defines();
+S_charmony_stdint_defines(void);
 
 static char*
-S_charmony_alloca_defines();
+S_charmony_alloca_defines(void);
 
 static void
 S_write_host_data_json(CFCBindCore *self, CFCParcel *parcel,
@@ -485,7 +485,7 @@ S_write_parcel_c(CFCBindCore *self, CFCParcel *parcel) {
         "}\n"
         "\n"
         "void\n"
-        "%sbootstrap_parcel() {\n"
+        "%sbootstrap_parcel(void) {\n"
         "%s" // Bootstrap prerequisite parcels.
         "    %sbootstrap_internal(0);\n"
         "}\n"
@@ -573,7 +573,7 @@ S_write_platform_h(CFCBindCore *self) {
 }
 
 static char*
-S_charmony_feature_defines() {
+S_charmony_feature_defines(void) {
     char *defines = CFCUtil_strdup("");
 
 #ifdef CHY_LITTLE_END
@@ -608,7 +608,7 @@ S_charmony_feature_defines() {
 }
 
 static char*
-S_charmony_string_defines() {
+S_charmony_string_defines(void) {
     const char *pattern =
         "#define CFISH_INLINE %s\n"
         "#define CFISH_EXPORT %s\n"
@@ -637,7 +637,7 @@ S_charmony_string_defines() {
 }
 
 static char*
-S_charmony_stdbool_defines() {
+S_charmony_stdbool_defines(void) {
 #ifdef CHY_HAS_STDBOOL_H
     const char *defines = "#include <stdbool.h>\n";
 #else
@@ -657,7 +657,7 @@ S_charmony_stdbool_defines() {
 }
 
 static char*
-S_charmony_stdint_defines() {
+S_charmony_stdint_defines(void) {
 #ifdef CHY_HAS_STDINT_H
     return CFCUtil_strdup("#include <stdint.h>\n");
 #else
@@ -681,7 +681,7 @@ S_charmony_stdint_defines() {
 }
 
 static char*
-S_charmony_alloca_defines() {
+S_charmony_alloca_defines(void) {
     char *defines = CFCUtil_strdup("");
 
 #if defined(CHY_HAS_ALLOCA_H)

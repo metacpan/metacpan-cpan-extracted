@@ -738,14 +738,35 @@ block_ip(self, ...)
     {
         const hm_abi *A = punk_hm(aTHX);
         const char *ip = NULL;
-        if (items > 1 && SvOK(ST(1))) {
-            ip = SvPV_nolen(ST(1));
-        } else {
+        HV *cenv = NULL;
+        {
             AV  *av = pcx_av(aTHX_ self);
             SV **e  = av_fetch(av, PCX_ENV, 0);
-            if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV) {
-                SV **r = hv_fetchs((HV *)SvRV(*e), "REMOTE_ADDR", 0);
-                if (r && *r && SvOK(*r)) ip = SvPV_nolen(*r);
+            if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV)
+                cenv = (HV *)SvRV(*e);
+        }
+        if (items > 1 && SvOK(ST(1))) {
+            ip = SvPV_nolen(ST(1));
+        } else if (cenv) {
+            SV **r = hv_fetchs(cenv, "REMOTE_ADDR", 0);
+            if (r && *r && SvOK(*r)) ip = SvPV_nolen(*r);
+        }
+        /* Behind a proxy, banning the address the socket came from bans the
+         * load balancer and takes the site down - and punk.peer_addr only
+         * exists when a `proxy` policy resolved this request, so this cannot
+         * fire on a directly-exposed app. Boot-time config cannot catch it;
+         * a silent no-op would leave an operator believing they had banned
+         * someone, which is worse than an error. */
+        if (ix == 0 && cenv && ip && *ip) {
+            SV **pa = hv_fetchs(cenv, "punk.peer_addr", 0);
+            if (pa && *pa && SvOK(*pa)) {
+                STRLEN pl;
+                const char *peer = SvPV_const(*pa, pl);
+                if (pl && strlen(ip) == pl && memEQ(ip, peer, pl))
+                    croak("Punk: block_ip would denylist %s, which is the "
+                          "reverse proxy this request came through, not a "
+                          "client - that would take the site down. Ban the "
+                          "client address ($c->req->address) instead", ip);
             }
         }
         if (!A || !A->deny_add || !ip || !*ip) {

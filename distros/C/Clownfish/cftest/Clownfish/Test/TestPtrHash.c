@@ -28,7 +28,7 @@
 #include "Clownfish/Util/Memory.h"
 
 TestPtrHash*
-TestPtrHash_new() {
+TestPtrHash_new(void) {
     return (TestPtrHash*)Class_Make_Obj(TESTPTRHASH);
 }
 

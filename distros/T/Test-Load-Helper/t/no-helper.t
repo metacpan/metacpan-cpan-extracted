@@ -14,7 +14,7 @@ setup_helper_root;
 
 it q (does not define any helper function in the caller namespace)
 	=> got    { require::relative::->import (q (fixtures/no-helper/test-case.pl)) }
-	=> expect => ! expect_helper_function (q (main::no_helper_loaded))
+	=> expect => do_not_expect_helper_function (q (main::no_helper_loaded))
 	;
 
 had_no_warnings;

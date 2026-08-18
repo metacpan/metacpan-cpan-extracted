@@ -4,17 +4,13 @@ use strict;
 use warnings;
 use Hyperman ();
 
-our $VERSION = '0.17';
+our $VERSION = '0.25';
 
 sub new {
     my ($class, %args) = @_;
     return bless { %args }, $class;
 }
 
-# Plack's runner passes `listen` as an arrayref of listen specs - "host:port"
-# or ":port" strings (from --listen, or synthesised from --host/--port). Turn
-# each into a Hyperman listener hashref; an entry that is already a hashref
-# (native Hyperman per-listener config) is passed through untouched.
 sub _parse_listen {
     my $spec = shift;
     return $spec if ref $spec eq 'HASH';
@@ -37,6 +33,7 @@ sub run {
         map { defined $self->{$_} ? ($_ => $self->{$_}) : () }
             qw(reuseport max_requests_per_worker shutdown_grace affinity
                idle_timeout header_timeout max_pipeline http2 redirect_https
+               compress compress_min_length compress_level max_body
                tls_cert tls_key tls_ca tls_verify tls_sni),
     );
 
@@ -68,6 +65,39 @@ Lets any Plack application run on L<Hyperman>, the kqueue event-loop PSGI
 server. Options: C<host>, C<port>, and C<workers> (alias C<max_workers>), plus
 C<listen> for binding several listeners (for example plain :80 beside TLS :443)
 in one server - see L<Hyperman/"Multiple listeners">.
+
+Every other C<< Hyperman->run >> option is passed through when given and
+left alone when not, so the server behaves identically however it was
+started: C<reuseport>, C<max_requests_per_worker>, C<shutdown_grace>,
+C<affinity>, C<idle_timeout>, C<header_timeout>, C<max_pipeline>,
+C<http2>, C<redirect_https>, C<max_body>, C<compress>,
+C<compress_min_length>, C<compress_level>, and the C<tls_*> family. The
+two that most often want setting have their own sections below.
+
+=head2 max_body
+
+The largest request Hyperman will buffer, headers plus body, before the
+application is called. Over it, the request is answered C<413 Payload Too
+Large>. The default is 16MB.
+
+    plackup -s Hyperman --max_body 67108864     # 64MB, for large uploads
+    plackup -s Hyperman --max_body 262144       # 256KB, for a JSON API
+
+=head2 Compression
+
+Response compression is B<off by default>, as it is under
+C<< Hyperman->run >>, and is turned on per server:
+
+    plackup -s Hyperman --compress 1
+    plackup -s Hyperman --compress 1 --compress_min_length 512
+    plackup -s Hyperman --compress 1 --compress_level 6
+
+A response is compressed only if the client accepted gzip, it carries no
+C<Content-Encoding> of its own, its media type is on the compressible
+allowlist, and it is at least C<compress_min_length> bytes. On a Hyperman
+built without zlib the option is accepted and inert. See
+L<Hyperman/"Response compression"> for the full contract, including the
+C<Content-Encoding: identity> opt-out and the C<ETag> rewrite.
 
 =head1 SEE ALSO
 

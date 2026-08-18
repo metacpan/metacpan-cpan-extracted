@@ -56,6 +56,7 @@ typedef enum {
     PDFMAKE_P_LEVEL,
     PDFMAKE_P_HEADER_REPEAT,
     PDFMAKE_P_PREFORMATTED,
+    PDFMAKE_P_TAGGED,
     PDFMAKE_P_MAX
 } pdfmake_prop_t;
 

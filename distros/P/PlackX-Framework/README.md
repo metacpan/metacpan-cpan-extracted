@@ -121,23 +121,25 @@ You would not normally have to subclass this module manually unless you would
 like to customize its behavior. It will prepare request and response objects,
 a stash, and if set up, templating.
 
-### PlackX::Framework::Request
-
-### PlackX::Framework::Response
+### PlackX::Framework::Request and ::Response
 
 The PlackX::Framework::Request and PlackX::Framework::Response modules are
 subclasses of Plack::Request and Plack::Response sprinkled with additional
-features. Both share stash and flash properties.
+features, including various convenience methods, request re-routing (not to be
+confused with HTTP redirects), cleanup handlers, and easier PSGI response
+streaming.
 
 For more information, see the documentation for [PlackX::Framework::Request](https://metacpan.org/pod/PlackX%3A%3AFramework%3A%3ARequest)
 and [PlackX::Framework::Response](https://metacpan.org/pod/PlackX%3A%3AFramework%3A%3AResponse).
 
+Both share common stash and flash properties, described below.
+
 - stash()
 
-    Both feature a shared "stash" which is a hashref in which you can store any
-    data you would like. The "stash" is not a user session but a way to
-    temporarily store information during a request/response cycle. It is
-    re-initialized for each cycle.
+    Request and Response objects share a "stash" which is a hashref in which you
+    can store any data you would like. This not a user session but a way to
+    temporarily store information during a single request/response cycle. It is
+    re-initialized to an empty hashref at the start of each cycle.
 
 - flash()
 
@@ -156,9 +158,10 @@ and [PlackX::Framework::Response](https://metacpan.org/pod/PlackX%3A%3AFramework
 
 ### PlackX::Framework::Router
 
-This module exports the route, route\_base, global\_filter, and filter functions
+This module exports the route, base, global\_filter, and filter functions
 to give you a minimalistic web app controller DSL. You can import this into
 your main app package, as shown in the introduction, or separate packages.
+If you manually subclass this module, you can also customize the keywords.
 
     # Set up the app
     package MyApp {
@@ -192,7 +195,19 @@ your main app package, as shown in the introduction, or separate packages.
       };
     }
 
-For more information, see [Plack::Framework::Router](https://metacpan.org/pod/Plack%3A%3AFramework%3A%3ARouter).
+Every route action is called with two arguments: a request object and response
+object. The response object is provided for convenience as the application may
+return it or a different response object, (or even another request object as
+described in the re-routing feature of PlackX::Framework::Request).
+
+Filters are also called the same way, but they should only return a response
+object if they wish to stop request processing. If a filter returns a false
+value ($response->next is provided for semantic convenience), request processing
+continues to the next matching filter or route.
+
+Note that unlike some other frameworks, routes CANNOT cascade, but filters can.
+
+For more information, see [PlackX::Framework::Router](https://metacpan.org/pod/PlackX%3A%3AFramework%3A%3ARouter).
 
 ### PlackX::Framework::Router::Engine
 
@@ -205,7 +220,7 @@ directly. It is used by PlackX::Framework::Router internally.
 This module is provided primarily for convenience. Currently not used by PXF
 directly except you may optionally store template system configuration there.
 
-For more information, see [Plack::Framework::Config](https://metacpan.org/pod/Plack%3A%3AFramework%3A%3AConfig).
+For more information, see [PlackX::Framework::Config](https://metacpan.org/pod/PlackX%3A%3AFramework%3A%3AConfig).
 
 ### PlackX::Framework::Template
 
@@ -221,7 +236,7 @@ been loaded. If so, it will automatically create an instance of the respective
 ::Template class and automatically add the template variables STASH, REQUEST,
 and RESPONSE to the object.
 
-For more information, see [Plack::Framework::Template](https://metacpan.org/pod/Plack%3A%3AFramework%3A%3ATemplate).
+For more information, see [PlackX::Framework::Template](https://metacpan.org/pod/PlackX%3A%3AFramework%3A%3ATemplate).
 
 ### PlackX::Framework::URIx
 

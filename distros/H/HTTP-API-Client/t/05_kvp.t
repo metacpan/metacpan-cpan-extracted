@@ -1,3 +1,12 @@
+=head1 NAME
+
+05_kvp.t - kvp2str encodes pre-defined and per-call data into a
+form-urlencoded query string, including nested arrays, CSV lists, and the
+DataTypeMarker boolean markers, and a keys callback can restrict which
+fields go out
+
+=cut
+
 ## Please see file perltidy.ERR
 use strict;
 use warnings;

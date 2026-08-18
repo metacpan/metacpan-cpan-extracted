@@ -89,8 +89,22 @@ static SV *pox_form_from_hv(pTHX_ HV *pairs) {
 }
 
 /* A ?return= destination must be a same-origin relative path: leading
- * slash, not protocol-relative, no CR/LF. Returns the (mortal) path or
- * NULL. */
+ * slash, not protocol-relative, no control bytes, no backslash.
+ * Returns the (mortal) path or NULL.
+ *
+ * Rejecting only "//" and CR/LF is not enough, because a browser does
+ * not parse the string we hand it byte for byte:
+ *
+ *   - it removes every TAB, CR and LF from a URL before parsing, so
+ *     "/<TAB>/evil.example" is parsed as "//evil.example";
+ *   - under a special scheme it treats '\' as '/', so "/\evil.example"
+ *     is likewise protocol-relative.
+ *
+ * Either one leaves the site. So instead of enumerating the bytes a
+ * parser might drop, reject every C0 control and DEL outright, and
+ * reject the backslash anywhere (a real path spells it %5C). What is
+ * left cannot be rewritten into an authority by anyone's URL parser,
+ * and cannot forge a response header either. */
 static SV *pox_same_origin_path(pTHX_ SV *path) {
   STRLEN n;
   const char *p;
@@ -99,8 +113,10 @@ static SV *pox_same_origin_path(pTHX_ SV *path) {
   p = SvPV_const(path, n);
   if (n < 1 || p[0] != '/') return NULL;
   if (n >= 2 && p[1] == '/') return NULL;
-  for (i = 0; i < n; i++)
-    if (p[i] == '\r' || p[i] == '\n') return NULL;
+  for (i = 0; i < n; i++) {
+    const unsigned char c = (unsigned char)p[i];
+    if (c < 0x20 || c == 0x7f || c == '\\') return NULL;
+  }
   return path;
 }
 

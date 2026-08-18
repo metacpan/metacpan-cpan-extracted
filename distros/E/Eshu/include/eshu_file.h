@@ -607,6 +607,37 @@ static void eshu_strlist_free(eshu_strlist_t *l) {
  *  Recursive directory walk
  * ══════════════════════════════════════════════════════════════════ */
 
+/* The separator to join a child name onto dir_path with. The reported
+ * paths are what the caller gets back keyed by file, so a directory
+ * handed to us as C:\foo has to come back as C:\foo\bar.c, not the
+ * mixed C:\foo/bar.c that a hardcoded slash produces. Mirror whichever
+ * separator the caller already used, defaulting to the native one. */
+static char eshu_path_sep(const char *dir_path) {
+#ifdef _WIN32
+	const char *p = dir_path + strlen(dir_path);
+	while (p-- > dir_path) {
+		if (*p == '\\') return '\\';
+		if (*p == '/')  return '/';
+	}
+	return '\\';
+#else
+	(void)dir_path;
+	return '/';
+#endif
+}
+
+#ifdef _WIN32
+/* stat() cannot tell a junction or a directory symlink from a real
+ * directory, and S_ISLNK is a constant 0 here, so ask Windows itself
+ * rather than walk into a reparse point and risk a cycle. */
+static int eshu_is_reparse_dir(const char *path) {
+	DWORD attr = GetFileAttributesA(path);
+	return attr != INVALID_FILE_ATTRIBUTES
+	    && (attr & FILE_ATTRIBUTE_REPARSE_POINT)
+	    && (attr & FILE_ATTRIBUTE_DIRECTORY);
+}
+#endif
+
 static void eshu_walk_dir(const char *dir_path, eshu_strlist_t *files,
                           int recursive)
 {
@@ -614,6 +645,13 @@ static void eshu_walk_dir(const char *dir_path, eshu_strlist_t *files,
 	struct eshu_dirent *ent;
 	struct stat st;
 	char pathbuf[4096];
+	size_t dir_len = strlen(dir_path);
+	char sep = eshu_path_sep(dir_path);
+
+	/* a trailing separator on the caller's path is theirs to keep, but
+	 * it must not become a doubled one in the paths we report */
+	if (dir_len && (dir_path[dir_len - 1] == '/' ||
+	                dir_path[dir_len - 1] == '\\')) sep = '\0';
 
 	d = eshu_opendir(dir_path);
 	if (!d) return;
@@ -621,7 +659,12 @@ static void eshu_walk_dir(const char *dir_path, eshu_strlist_t *files,
 	while ((ent = eshu_readdir(d)) != NULL) {
 		if (ent->d_name[0] == '.') continue;
 
-		snprintf(pathbuf, sizeof(pathbuf), "%s/%s", dir_path, ent->d_name);
+		if (sep)
+			snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
+			         dir_path, sep, ent->d_name);
+		else
+			snprintf(pathbuf, sizeof(pathbuf), "%s%s",
+			         dir_path, ent->d_name);
 
 		if (lstat(pathbuf, &st) != 0) continue;
 
@@ -634,6 +677,9 @@ static void eshu_walk_dir(const char *dir_path, eshu_strlist_t *files,
 		} else if (S_ISREG(st.st_mode)) {
 			eshu_strlist_push(files, pathbuf);
 		} else if (recursive && S_ISDIR(st.st_mode)) {
+#ifdef _WIN32
+			if (eshu_is_reparse_dir(pathbuf)) continue;
+#endif
 			eshu_walk_dir(pathbuf, files, recursive);
 		}
 	}

@@ -3,7 +3,7 @@ package Mojo::UserAgent::CookieJar::ChromeMacOS;
 use strict;
 use warnings;
 use v5.10;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Mojo::Base 'Mojo::UserAgent::CookieJar';
 
@@ -12,7 +12,7 @@ use DBI;
 use File::Temp qw/tempfile/;
 use File::Copy ();
 use PBKDF2::Tiny qw/derive/;
-use Crypt::CBC;
+use Crypt::Rijndael;
 
 # default Chrome cookie file for MacOSx
 has 'file' => sub {
@@ -32,21 +32,7 @@ sub find {
 
     return [] unless my $domain = my $host = $url->ihost;
 
-    my $salt = 'saltysalt';
-    my $iv = ' ' x 16;
-    my $salt_len = 16;
-    my $pass = $self->_get_pass();
-    my $iterations = 1003;
-    $iterations = 1 if $^O eq 'linux'; # Linux
-    my $key = derive( 'SHA-1', $pass, $salt, $iterations, $salt_len );
-    my $cipher = Crypt::CBC->new(
-        -cipher => 'Crypt::OpenSSL::AES',
-        -key    => $key,
-        -keysize => 16,
-        -iv => $iv,
-        -header => 'none',
-        -literal_key => 1,
-    );
+    my $cipher = $self->_make_cipher;
 
     my @found;
     my $dbh = $self->__get_dbh;
@@ -59,18 +45,21 @@ sub find {
         my $sth = $dbh->prepare('SELECT * FROM cookies WHERE host_key = ? OR host_key = ?');
         $sth->execute($domain, '.' . $domain);
         while (my $row = $sth->fetchrow_hashref) {
-            my $value = $row->{value} || $row->{encrypted_value} || '';
-            if ( $value =~ /^v10/ or $value =~ /^v11/ ) {
-                $value =~ s/^v10//;
-                $value =~ s/^v11//;
-                $value = $cipher->decrypt( $value );
+            my $value = $row->{value} || '';
+            my $encrypted = $row->{encrypted_value} || '';
+            if ( $encrypted =~ /^(v10|v11)/ ) {
+                $value = $self->_decrypt( $encrypted, $row->{host_key} );
             }
 
-            my $cookie = Mojo::Cookie::Request->new(name => $row->{name}, value => $value);
+            my $cookie = Mojo::Cookie::Request->new(
+                name     => $row->{name},
+                value   => $value,
+                httponly => $row->{is_httponly} ? 1 : 0,
+            );
             push @$new, $cookie;
 
             # Taste cookie (no care about expires since Chrome will handle it)
-            next if $row->{secure} && $url->protocol ne 'https';
+            next if $row->{is_secure} && $url->protocol ne 'https';
             next unless _path($row->{path}, $path);
 
             push @found, $cookie;
@@ -88,6 +77,79 @@ sub prepare {
     $req->cookies(@{$self->find($req->url)});
 }
 
+sub _make_cipher {
+    my ($self) = @_;
+
+    state $cipher;
+    return $cipher if $cipher;
+
+    my $salt = 'saltysalt';
+    my $salt_len = 16;
+    my $pass = $self->_get_pass();
+    my $iterations = 1003;
+    $iterations = 1 if $^O eq 'linux'; # Linux
+    my $key = derive( 'SHA-1', $pass, $salt, $iterations, $salt_len );
+
+    $cipher = Crypt::Rijndael->new( $key, Crypt::Rijndael::MODE_CBC() );
+    $cipher->set_iv( ' ' x 16 );
+    return $cipher;
+}
+
+sub _decrypt {
+    my( $self, $blob, $host_key ) = @_;
+
+    my $cipher = $self->_make_cipher;
+
+    my $type = substr $blob, 0, 3, '';
+
+    unless( $type eq 'v10' || $type eq 'v11' ) {
+        warn "Encrypted value is unexpected type <$type>\n";
+        return '';
+    }
+
+    my $plaintext = $cipher->decrypt( $blob );
+
+    # DB version 24+ prepends SHA256 of domain to plaintext
+    if( $self->_db_version >= 24 ) {
+        substr $plaintext, 0, 32, '';
+    }
+
+    # Remove PKCS7 padding
+    my $padding_count = ord( substr $plaintext, -1 );
+    if( $padding_count <= 16 && $padding_count > 0 ) {
+        substr( $plaintext, -$padding_count ) = '';
+    }
+
+    return $plaintext;
+}
+
+sub _db_version {
+    my( $self ) = @_;
+
+    state $version;
+    return $version if defined $version;
+
+    my $dbh = $self->__get_dbh;
+
+    my $has_meta = eval {
+        my $sql = q(SELECT 1 FROM sqlite_master WHERE type='table' AND name='meta');
+        my $array = $dbh->selectall_arrayref( $sql );
+        @$array > 0;
+    };
+    if( $@ ) { warn $@ }
+
+    return ($version = 0) unless $has_meta;
+
+    $version = eval {
+        my $sql = q(SELECT * FROM meta WHERE key = 'version');
+        my $rv = $dbh->selectall_arrayref( $sql );
+        @$rv ? $rv->[0][1] : 0;
+    } // 0;
+    if( $@ ) { warn $@ }
+
+    return $version;
+}
+
 sub __get_dbh {
     my ($self) = @_;
 
@@ -96,8 +158,10 @@ sub __get_dbh {
 
     # copy to read
     my ($fh, $filename) = tempfile();
+    close $fh;
     File::Copy::copy($self->file, $filename);
     my $sqlite_file = -e $filename ? $filename : $self->file; # make sure copy works
+    # warn "READ $sqlite_file\n";
 
     $dbh = DBI->connect( "dbi:SQLite:dbname=" . $sqlite_file, '', '', {
       sqlite_see_if_its_a_number => 1,

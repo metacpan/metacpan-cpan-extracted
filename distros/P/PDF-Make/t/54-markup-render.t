@@ -132,4 +132,95 @@ subtest 'a template cannot inject document structure through this path either' =
     }
 };
 
+# ---------------------------------------------------------------------------
+# Blocks stack, inside a <box> as much as outside it.
+#
+# Two bugs met here. A <text size="20"> kept the base font's leading, so the
+# block after it was drawn through it; and inside a <box> every block child
+# was treated as inline, so a whole certificate flowed onto one line.
+
+sub baselines {
+    my ($tpl) = @_;
+    my $bytes = $R->render($tpl, {});
+    my @y;
+    my $size;
+    for my $chunk ($bytes =~ /stream\r?\n(.*?)\r?\nendstream/gs) {
+        next unless $chunk =~ /Tj/;
+        for my $line (split /\n/, $chunk) {
+            $size = $1 if $line =~ m{/\S+\s+([\d.]+)\s+Tf};
+            push @y, [ $size, $2 ]
+                if $line =~ /^(?:1 0 0 1 )?([\d.]+) ([\d.]+) (?:Tm|Td)/;
+        }
+    }
+    return @y;
+}
+
+my $BLOCKS = <<'X';
+  <text size="11">alpha</text>
+  <text size="20">beta</text>
+  <text size="10">gamma</text>
+X
+
+for my $case (['bare', $BLOCKS],
+              ['in a box', qq{<box pad="12" border="#333">\n$BLOCKS</box>}]) {
+    my ($what, $body) = @$case;
+    my @y = baselines(
+        qq{<doc page-size="A4" margin="36">\n<style text="size:12" />\n$body</doc>});
+
+    is scalar @y, 3, "three blocks, three baselines ($what)";
+    is_deeply [ map { $_->[0] } @y ], [ '11', '20', '10' ],
+        "each block keeps its own size ($what)";
+
+    ok $y[0][1] > $y[1][1], "the second block sits below the first ($what)";
+    ok $y[1][1] > $y[2][1], "and the third below the second ($what)";
+
+    # The gap under a 20pt block has to clear 20pt, or its glyphs are drawn
+    # through the line above: that is the collision this guards.
+    cmp_ok $y[1][1] + 20, '<=', $y[0][1] + 0.001,
+        "a 20pt block gets 20pt of room, not the base font's ($what)";
+}
+
+# spacing separates the blocks stacked in a box, and the box grows by
+# exactly that much - the row is measured with the same slot the renderer
+# draws with, or it is sized for less than it draws and the last line goes
+# missing under the bottom edge.
+{
+    my $blocks = sub {
+        my ($sp) = @_;
+        my $s = $sp ? qq{ spacing="$sp"} : '';
+        return qq{<box pad="10" border="#333">
+  <text size="10"$s>alpha</text>
+  <text size="10"$s>beta</text>
+  <text size="10">gamma</text>
+</box>};
+    };
+    my $doc = sub {
+        qq{<doc page-size="A4" margin="36">\n<style text="size:12" />\n}
+        . $blocks->($_[0]) . "\n</doc>";
+    };
+
+    my @flat = baselines($doc->(0));
+    my @gap  = baselines($doc->(12));
+
+    is scalar @gap, 3, 'every block still drawn with spacing on';
+
+    is sprintf('%.0f', $flat[0][1] - $flat[1][1]), '10',
+        'without spacing the blocks are one line height apart';
+    is sprintf('%.0f', $gap[0][1] - $gap[1][1]), '22',
+        'with spacing="12" they are a line height plus the spacing apart';
+
+    # The box itself has to absorb it: two spaced blocks, two gaps.
+    my ($flat_h) = $R->render($doc->(0), {})  =~ /([\d.]+) ([\d.]+) ([\d.]+) ([\d.]+) re/
+        ? $4 : undef;
+    my ($gap_h)  = $R->render($doc->(12), {}) =~ /([\d.]+) ([\d.]+) ([\d.]+) ([\d.]+) re/
+        ? $4 : undef;
+    is sprintf('%.0f', $gap_h - $flat_h), '24',
+        'and the box grows by the spacing it now holds';
+
+    # Nothing fell off the bottom: the last baseline clears the box floor.
+    my ($gap_y) = $R->render($doc->(12), {}) =~ /([\d.]+) ([\d.]+) ([\d.]+) ([\d.]+) re/
+        ? $2 : undef;
+    cmp_ok $gap[-1][1], '>=', $gap_y, 'the last block is inside the box';
+}
+
 done_testing;

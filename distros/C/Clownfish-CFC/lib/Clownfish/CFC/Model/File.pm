@@ -15,7 +15,7 @@
 
 package Clownfish::CFC::Model::File;
 use Clownfish::CFC;
-our $VERSION = '0.006004';
+our $VERSION = '0.007000';
 $VERSION = eval $VERSION;
 
 1;

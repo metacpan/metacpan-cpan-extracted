@@ -1,5 +1,64 @@
 Revision history for Punk
 
+0.17    2026-08-17
+        - Fixed t/14-futures.t failing on every perl whose Future is
+          older than the one it was developed against - reported by
+          CPAN Testers against 0.16 on 5.20.0, 5.22.2 and 5.24.0 with
+          "Expected __ANON__(Future.pm line 1140) to return a Future".
+        - A route may now be declared as one hashref, with the handler
+          under `cb`:
+
+            post "/upload" => { cb => "Web::File#create",
+                                max_body => 50_000_000 };
+
+          instead of the positional form, which is unchanged and stays
+          the one `punk new` generates:
+
+            post "/upload" => "Web::File#create",
+                              { max_body => 50_000_000 };
+
+        - New route option { compress => 0 }, which opts a route out of
+          the server response compression Hyperman 0.25 adds. Punk does
+          not compress - that belongs to the write path - so the option
+          is spelled as a plain response header, Content-Encoding:
+          identity, which the server honours and strips. 
+        - New `max_body` keyword and per-route { max_body => N }: refuse
+          a request whose CONTENT_LENGTH is over a ceiling, with the
+          same 413 an oversize API operation gets. 
+        - Punk::Upload documents what an upload actually costs: it
+          arrives whole in memory before a handler sees it, ->save is a
+          write and not a stream, and `max_body` does not reduce the
+          memory.
+        - SECURITY: the `markdown` mount reflected the request path into
+          the Location header of its canonical 301 (the redirect that
+          strips a trailing slash or a .md suffix). PATH_INFO reaches a
+          PSGI app percent-DECODED, so that echoed bytes the client
+          chose: a decoded CR/LF split the response at any mount point,
+          and at a root mount "//evil.example/" came back as a
+          protocol-relative 301 off the site. Found while fixing the
+          same class of bug in Punk::OAuth2 (CVE-2026-75628).
+          The redirect now only names a path that IS a page - the
+          stripped target is looked up in the page table first - so the
+          only thing it can echo is one of the mount's own keys.
+          Anything else falls through to the 404 it was always going to
+          get. pmd_redirect also stops at the first control byte, in
+          case a mount prefix ever carries one.
+
+0.16    2026-08-17
+        - New `proxy` keyword: reverse-proxy trust. Behind nginx, an ELB
+          or a CDN, REMOTE_ADDR is the proxys on every request - and
+          because rate_limit's counters live in Hyperman's shared arena
+          they are exact across the whole worker pool, so every client
+          landed in ONE bucket and a limit => 100 rule throttled the
+          entire site at 100/min. block_ip, keyed the same way, it would ban
+          the load balancer. `proxy` resolves the real client at the
+          top of the dispatcher and OVERWRITES REMOTE_ADDR, so
+          rate_limit, block_ip, the access log and $c->req->address are
+          all correct with no change to any of them; the connecting
+          address stays as $c->env->{'punk.peer_addr'}.
+        - New $c->req->address: REMOTE_ADDR, which is the socket peer
+          directly exposed and the resolved client behind `proxy`.
+
 0.15    2026-08-17
         - A trailing slash on the request path no longer 404s:
           GET /account/ answers the route declared as GET /account.

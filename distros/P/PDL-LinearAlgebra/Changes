@@ -1,3 +1,10 @@
+0.437 2026-08-17
+- fix mpinv,mnull to use conjugate-transpose not transpose
+- fix mpinv to work with non-square input
+- fix complex gesdd including mdsvd with non-square input
+- fix mpinv to broadcast (#20) - thanks @KJ7LNW for report
+- fix mrank to broadcast
+
 0.436 2026-04-11
 - fix mnull test instability by testing returns actual null space (#32) - thanks @sebastic for report
 - re-export tritosym

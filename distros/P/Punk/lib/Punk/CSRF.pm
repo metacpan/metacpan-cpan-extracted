@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.14';
+our $VERSION = '0.17';
 
 1;
 
@@ -98,6 +98,14 @@ forms and in-flight requests work at the cost of a wider window.
 =item * C<max_body> - the largest urlencoded body the field will be looked for
 in (default 64KB); above it, and for any multipart body, the header is
 required.
+
+B<Not> the same thing as L<Punk/max_body>, which refuses an oversize request
+outright, or L<Hyperman/"max_body: the request ceiling">, which bounds what
+the server will buffer at all. This one only decides how far into a body
+C<csrf> will read looking for the token field; exceeding it rejects nothing,
+it just means the token has to come from the header instead. The names
+collide because each is the natural word in its own context, and renaming
+this one would break every application that sets it.
 
 =item * C<exempt> - path prefixes that skip the check, for endpoints
 authenticated another way (a payment provider's webhook).

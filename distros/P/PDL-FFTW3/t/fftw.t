@@ -92,7 +92,7 @@ my $Nplans = 0;
                       "Basic 2D complex FFT - inverse(forward) should be the same (normalized)" );
 }
 
-# lots of 1D ffts threaded in a 2d array
+# lots of 1D ffts broadcasted in a 2d array
 {
   my $x = pdl '
     4.24264068711928i  1+4.12310562561766i                 2+4i  3+3.87298334620742i  4+3.74165738677394i  5+3.60555127546399i;
@@ -112,13 +112,13 @@ my $Nplans = 0;
   ';
 
   ok_should_make_plan( all( approx( fft1($x), $Xref, approx_eps_double) ),
-     "1D FFTs threaded inside a 2D ndarray" );
+     "1D FFTs broadcasted inside a 2D ndarray" );
 
   ok_should_make_plan( all( approx( ifft1(fft1($x)), $x , approx_eps_double) ),
-                      "1D FFTs threaded inside a 2D ndarray - inverse(forward) should be the same" );
+                      "1D FFTs broadcasted inside a 2D ndarray - inverse(forward) should be the same" );
 }
 
-# lots of 1D ffts threaded in a 3d array
+# lots of 1D ffts broadcasted in a 3d array
 {
   my $x = PDL::czip(sequence(6,5,4)**1.1, (abs(sequence(6,5,4) - 10))**0.8);
 
@@ -150,10 +150,10 @@ my $Nplans = 0;
 
   my $f = fft1($x);
 
-  is( get_autopthread_actual(), 2, "1D FFTs threaded inside a 3D ndarray - CPU threading should work" );
+  is( get_autopthread_actual(), 2, "1D FFTs broadcasted inside a 3D ndarray - CPU threading should work" );
 
   ok_should_reuse_plan( all( approx( $f, $Xref, approx_eps_double) ),
-     "1D FFTs threaded inside a 3D ndarray" );
+     "1D FFTs broadcasted inside a 3D ndarray" );
 }
 
 # try out some different ways of calling the module, make sure the argument
@@ -222,7 +222,7 @@ my $Nplans = 0;
   ok( !$x->is_inplace, "After computation the in-place flag should be cleared" );
 }
 
-# lots of 2D ffts threaded in a 3d array
+# lots of 2D ffts broadcasted in a 3d array
 {
   my $x = PDL::czip( sequence(6,5,4)**1.1,
                     (abs(sequence(6,5,4) - 10))**0.8 );
@@ -263,10 +263,10 @@ my $Nplans = 0;
                    [[-1.17049392363129e+02,-2.46859689910763e+02],[2.39899060049070e-01,-1.38101687968226e-01],[1.59658915211960e-01,-6.48727639912472e-04],[1.20144019881925e-01,+6.82934899895806e-02],[8.10343889012709e-02,+1.37369911169460e-01],[4.03481145874271e-03,+2.75896474493798e-01]]] )->using(0,1));
 
   ok_should_make_plan( all( approx( fft2($x), $Xref, approx_eps_double) ),
-     "2D FFTs threaded inside a 3D ndarray" );
+     "2D FFTs broadcasted inside a 3D ndarray" );
 
   ok_should_make_plan( all( approx( fft2(cfloat $x), cfloat($Xref), approx_eps_single) ),
-     "2D FFTs threaded inside a 3D ndarray - single precision" );
+     "2D FFTs broadcasted inside a 3D ndarray - single precision" );
 
 
   # Now I take a slice of the input matrix, and fft that. This makes sure the
@@ -307,16 +307,16 @@ my $Nplans = 0;
           [[-9.74417295843736e+01,-2.05659722932842e+02],[1.79920562610709e-01,-8.03744824636155e-02],[1.19169692096844e-01,+2.45697427068684e-02],[8.21878607839186e-02,+8.96232824108548e-02],[2.32671625274674e-02,+1.95170681256241e-01]]] )->using(0,1));
 
   ok_should_make_plan( all( approx( fft2($x_slice1_severed), $X_slice1_ref, approx_eps_double) ),
-     "2D FFTs threaded inside a 3D ndarray - slice1 - severed" );
+     "2D FFTs broadcasted inside a 3D ndarray - slice1 - severed" );
 
   ok_should_reuse_plan( all( approx( fft2($x_slice1_connected), $X_slice1_ref, approx_eps_double) ),
-     "2D FFTs threaded inside a 3D ndarray - slice1 - connected" );
+     "2D FFTs broadcasted inside a 3D ndarray - slice1 - connected" );
 
   # now go again with single precision. If $P() didn't physicalize its input,
   # this would no longer be aligned like before, since the input has shifted by
   # 4 bytes
   ok_should_make_plan( all( approx( fft2(cfloat $x_slice1_connected), cfloat($X_slice1_ref), approx_eps_single) ),
-                       "2D FFTs threaded inside a 3D ndarray - slice1 - connected - single precision" );
+                       "2D FFTs broadcasted inside a 3D ndarray - slice1 - connected - single precision" );
 
 
 
@@ -356,30 +356,30 @@ my $Nplans = 0;
           [[-9.76419555018576e+01,-2.05773543168977e+02],[1.78415452819879e-01,-7.93210083326257e-02],[1.18035987634609e-01,+2.45615120500224e-02],[8.12721813043989e-02,+8.89567757119387e-02],[2.26856083517065e-02,+1.93436447059624e-01]]] )->using(0,1));
 
   ok_should_reuse_plan( all( approx( fft2($x_slice2_severed), $X_slice2_ref, approx_eps_double) ),
-                        "2D FFTs threaded inside a 3D ndarray - slice2 - severed" );
+                        "2D FFTs broadcasted inside a 3D ndarray - slice2 - severed" );
 
   ok_should_reuse_plan( all( approx( fft2($x_slice2_connected), $X_slice2_ref, approx_eps_double) ),
-                        "2D FFTs threaded inside a 3D ndarray - slice2 - connected" );
+                        "2D FFTs broadcasted inside a 3D ndarray - slice2 - connected" );
 
   # now go again with single precision. If $P() didn't physicalize its input,
   # this would no longer be aligned like before, since the input has shifted by
   # 4 bytes
   ok_should_reuse_plan( all( approx( fft2(cfloat $x_slice2_connected), cfloat($X_slice2_ref), approx_eps_single) ),
-                        "2D FFTs threaded inside a 3D ndarray - slice2 - connected - single precision" );
+                        "2D FFTs broadcasted inside a 3D ndarray - slice2 - connected - single precision" );
 
 
   # I now try to fft INTO a slice. The out-of-slice pieces shouldn't be touched
   my $x_orig = $x->copy;
   fft2( $x_slice2_severed, $x_slice2_connected );
-  is( get_autopthread_actual(), 2, "1D FFTs threaded inside a 3D ndarray - slice2 - connected - in-slice correct - CPU threading should work" );
+  is( get_autopthread_actual(), 2, "1D FFTs broadcasted inside a 3D ndarray - slice2 - connected - in-slice correct - CPU threading should work" );
   ok_should_reuse_plan( all( approx( $x_slice2_connected, $X_slice2_ref, approx_eps_double) ),
-                        "2D FFTs threaded inside a 3D ndarray - slice2 - connected - in-slice correct" );
+                        "2D FFTs broadcasted inside a 3D ndarray - slice2 - connected - in-slice correct" );
 
   my $X_partialfft_ref = $x_orig->copy;
   $X_partialfft_ref->slice('1:5') .= $x_slice2_connected;
 
   ok( all( approx( $x, $X_partialfft_ref, approx_eps_double) ),
-      "2D FFTs threaded inside a 3D ndarray - slice2 - connected - out-of-slice correct" );
+      "2D FFTs broadcasted inside a 3D ndarray - slice2 - connected - out-of-slice correct" );
 }
 
 # check the type logic
@@ -501,7 +501,7 @@ my $Nplans = 0;
   # logic. I'm leaving these tests here so that if error DO show up, we'll know
   # about them.
   #
-  # I have two 1d threaded real ffts with odd size. I do this both with
+  # I have two 1d broadcasted real ffts with odd size. I do this both with
   # single-precision and with double-precision
   #
   # octave code:
@@ -522,11 +522,11 @@ my $Nplans = 0;
 
   my $fx5_double = rfft1($x5_double);
   ok_should_make_plan( all( approx( $fx5_double, $fx5_ref->slice('0:2'), approx_eps_double) ),
-                       "rfft threaded double precision, odd number. May need 2 plans" );
+                       "rfft broadcasted double precision, odd number. May need 2 plans" );
 
   my $fx5_single = rfft1($x5_single);
   ok_should_make_plan( all( approx( $fx5_single, $fx5_ref->slice('0:2'), approx_eps_single) ),
-                       "rfft threaded single precision, odd number. May need 2 plans" ) or diag "got=$fx5_single\nexpected=", $fx5_ref->slice('0:2');
+                       "rfft broadcasted single precision, odd number. May need 2 plans" ) or diag "got=$fx5_single\nexpected=", $fx5_ref->slice('0:2');
 }
 
 # real fft 2D checks

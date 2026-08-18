@@ -1,7 +1,7 @@
 This is the Security Policy for the Perl distribution Net-OAuth.
 
 The latest version of this Security Policy can be found in the
-Git Repository for [Net-OAuth](https://github.com/keeth/Net-OAuth).
+Git Repository for [Net-OAuth](https://github.com/vurtdev/Net-OAuth).
 
 This text is based on the CPAN Security Group's
 [Guidelines for Adding a Security Policy to Perl Distributions](https://security.metacpan.org/docs/guides/security-policy-for-authors.html)
@@ -10,7 +10,7 @@ This text is based on the CPAN Security Group's
 # How to Report a Security Vulnerability
 
 Security vulnerabilities can be reported using this project's GitHub
-[Security Advisories](https://github.com/keeth/Net-OAuth/security/advisories).
+[Security Advisories](https://github.com/vurtdev/Net-OAuth/security/advisories).
 
 Please include as many details as possible, including code samples
 or test cases, so that we can reproduce the issue.  Check that your

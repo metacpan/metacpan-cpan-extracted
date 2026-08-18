@@ -121,6 +121,9 @@ is_pdl $x->isgood, long("1 1 0 0 1 1 0 1 1"), "isgood() works";
 is $x->nbad, 3, "nbad() works";
 is $x->ngood, 6, "ngood() works";
 
+$x = pdl('1 2 nan nan 5 6 nan 8 9');
+is_pdl $x->isnan, long("0 0 1 1 0 0 1 0 0"), "isnan() works";
+
 $x = byte('BAD BAD; BAD 0; 0 0');
 is_pdl $x->nbadover, indx("[2 1 0]"), "nbadover() works";
 is_pdl $x->ngoodover, indx("[0 1 2]"), "ngoodover() works";

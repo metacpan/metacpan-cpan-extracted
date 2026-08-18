@@ -7,7 +7,7 @@ use Carp ();
 use Punk::OAuth2 ();            # XS core: the whole flow (_flow_begin,
 use Punk::OAuth2::Provider ();  # _flow_complete, provider object, ...)
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my %STATE;
 
@@ -335,7 +335,7 @@ Punk::Plugin::OAuth2 - social login for Punk applications
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

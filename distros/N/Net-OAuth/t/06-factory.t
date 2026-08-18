@@ -7,6 +7,11 @@ BEGIN {
     $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0;
 }
 
+# verify() will not take the algorithm from the message being verified,
+# so say which methods these tests expect (see VERIFYING MESSAGES in the
+# Net::OAuth documentation).
+@Net::OAuth::ALLOWED_SIGNATURE_METHODS = qw/PLAINTEXT HMAC-SHA1/;
+
 my $request = Net::OAuth->request('user auth')->new(
     token => 'abcdef',
     callback => 'http://example.com/callback',

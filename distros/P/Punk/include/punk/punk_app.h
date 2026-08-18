@@ -158,4 +158,70 @@ static void app_call_list(pTHX_ SV *self, const char *meth, AV *args) {
     Safefree(argv);
 }
 
+/* ---- the one-hashref route form -------------------------------------------
+ *
+ *     post '/upload' => { cb => 'Web::File#create', max_body => 50_000_000 };
+ *
+ * instead of the positional
+ *
+ *     post '/upload' => 'Web::File#create', { max_body => 50_000_000 };
+ *
+ * Both spellings are supported; this splits the first into the second at the
+ * front door, so the router, the compiled records and every consumer
+ * downstream see exactly what they have always seen.
+ *
+ * Purely additive: a hashref in the target slot was a boot croak before this
+ * existed ("must be a coderef or 'Controller#method'"), so no application can
+ * have been relying on the behaviour being replaced.
+ *
+ * `what` names the declaration for the croaks ("route POST", "websocket",
+ * "sse"); `path` is only ever read for those messages. Both out-params are
+ * left alone when `*target` is not a hashref.
+ */
+static void pk_spec_split(pTHX_ const char *what, SV *path,
+                          SV **target, SV **opts) {
+    HV *spec, *o;
+    SV **cb;
+    HE *he;
+
+    if (!(*target && SvROK(*target) && SvTYPE(SvRV(*target)) == SVt_PVHV))
+        return;
+    spec = (HV *)SvRV(*target);
+
+    if (opts && *opts && SvOK(*opts))
+        croak("Punk: %s %s takes its options either inside the hashref or "
+              "after the target, not both",
+              what, SvOK(path) ? SvPV_nolen(path) : "(no path)");
+
+    cb = hv_fetchs(spec, "cb", 0);
+    if (!(cb && *cb && SvOK(*cb)))
+        croak("Punk: %s %s has options but no `cb` - a route needs a handler "
+              "(a coderef or 'Controller#method')",
+              what, SvOK(path) ? SvPV_nolen(path) : "(no path)");
+
+    /* Copy the remaining keys rather than deleting `cb` from the caller's
+     * hashref. A spec built once and declared twice
+     *
+     *     my %spec = (cb => \&h, max_body => 10);
+     *     get '/a' => \%spec;  post '/b' => \%spec;
+     *
+     * must give two working routes; mutating it would leave the second
+     * without a handler, and would pass every test but that one. */
+    o = newHV();
+    hv_iterinit(spec);
+    while ((he = hv_iternext(spec))) {
+        STRLEN kl;
+        const char *k = HePV(he, kl);
+        if (kl == 2 && memEQ(k, "cb", 2)) continue;
+        (void)hv_store(o, k, (I32)kl, newSVsv(hv_iterval(spec, he)), 0);
+    }
+
+    /* the target LAST: it aliases into the spec we have just finished
+     * reading, and reassigning it first would be reading a freed hashref if
+     * the caller held no other reference */
+    *target = sv_2mortal(newSVsv(*cb));
+    if (opts) *opts = sv_2mortal(newRV_noinc((SV *)o));
+    else      SvREFCNT_dec((SV *)o);
+}
+
 #endif /* PUNK_APP_H */

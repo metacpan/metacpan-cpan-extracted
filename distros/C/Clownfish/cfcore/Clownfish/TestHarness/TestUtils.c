@@ -29,7 +29,7 @@
 #include "Clownfish/Util/Memory.h"
 
 uint64_t
-TestUtils_random_u64() {
+TestUtils_random_u64(void) {
     uint64_t num = ((uint64_t)(rand()   & 0x7FFF) << 60)
                    | ((uint64_t)(rand() & 0x7FFF) << 45)
                    | ((uint64_t)(rand() & 0x7FFF) << 30)
@@ -123,7 +123,7 @@ TestUtils_get_str(const char *ptr) {
 #include <windows.h>
 
 uint64_t
-TestUtils_time() {
+TestUtils_time(void) {
     SYSTEMTIME system_time;
     GetSystemTime(&system_time);
 
@@ -144,7 +144,7 @@ TestUtils_time() {
 #include <sys/time.h>
 
 uint64_t
-TestUtils_time() {
+TestUtils_time(void) {
     struct timeval t;
     gettimeofday(&t, NULL);
 
@@ -228,7 +228,7 @@ TestUtils_thread_create(thread_routine_t routine, void *arg,
 }
 
 void
-TestUtils_thread_yield() {
+TestUtils_thread_yield(void) {
     SwitchToThread();
 }
 
@@ -289,7 +289,7 @@ TestUtils_thread_create(thread_routine_t routine, void *arg,
 }
 
 void
-TestUtils_thread_yield() {
+TestUtils_thread_yield(void) {
     sched_yield();
 }
 
@@ -318,7 +318,7 @@ TestUtils_thread_create(thread_routine_t routine, void *arg,
 }
 
 void
-TestUtils_thread_yield() {
+TestUtils_thread_yield(void) {
 }
 
 void

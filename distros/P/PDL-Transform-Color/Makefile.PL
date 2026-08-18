@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use PDL::Core::Dev;
 
 sub MY::libscan {
     package MY;
@@ -13,16 +14,7 @@ sub MY::libscan {
     return $self->SUPER::libscan ($file);
 }
 
-
-sub MY::postamble {
-    my $text = <<'FOO';
-install ::
-	@echo "Updating PDL documentation database...";
-	@$(PERL) -e "exit if $$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(q{PDL::Trasform::Color}); }; ";
-
-FOO
-    return $text;
-}
+sub MY::postamble { pdldoc_add() }
 
 WriteMakefile(
     NAME                      => 'PDL::Transform::Color',
@@ -33,6 +25,7 @@ WriteMakefile(
     MIN_PERL_VERSION          => '5.010',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '6.48',
+        'PDL' => '2.105', # pdldoc_add
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',

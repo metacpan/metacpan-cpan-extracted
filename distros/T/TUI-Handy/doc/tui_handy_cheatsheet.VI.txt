@@ -1,0 +1,82 @@
+======================================================================
+ TUI::Handy Cheat Sheet                                  [VI] Tiếng Việt
+======================================================================
+
+[ 1. Cài đặt và nạp module ]
+
+  Không phụ thuộc CPAN; sao chép Handy.pm vào một thư mục trong @INC hoặc chạy trực tiếp như một tập lệnh.
+
+  use TUI::Handy;
+  # or, as a command:  perl Handy.pm form.txt
+
+[ 2. Tạo và chạy biểu mẫu ]
+
+  Tạo biểu mẫu từ chuỗi DSL hoặc tệp, sau đó gọi run(); kết quả là một tham chiếu hash với khóa là nhãn trong DSL.
+
+  my $tui  = TUI::Handy->new(dsl => $text);   # or new(file => $path)
+  my $form = $tui->run;
+  print "Company = $form->{Company}\n";
+
+[ 3. Ký hiệu ô văn bản ]
+
+  Ký tự lấp đầy trong [ ] chọn loại ô văn bản: _ là nửa chiều rộng, # là số, $ hoặc \ là tiền tệ, YYYYMMDD hoặc % là ngày tháng, ký tự toàn chiều rộng là loại zenkaku.
+
+  Company: [__________]
+  Age:     [###]
+  Price:   [$$$$$$]
+  Date:    [YYYYMMDD]
+
+[ 4. Hộp kiểm và nút chọn ]
+
+  [X]/[ ] là hộp kiểm (giá trị 1 hoặc 0); (*)/( ) nhóm các nút chọn theo dòng tiêu đề phía trước, giá trị là nhãn được chọn.
+
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+
+[ 5. Nút bấm ]
+
+  Dấu ngoặc vuông không có nhãn phía trước là nút bấm; đăng ký hành động bằng set().
+
+  $tui->set('Register', sub { my $form = shift; save($form); 0 });
+  [Register]
+
+[ 6. Phím điều khiển ]
+
+  TAB/mũi tên xuống đến trường tiếp theo, Shift-TAB/mũi tên lên đến trường trước đó. Enter, Space và các phím mũi tên chỉnh sửa hoặc kích hoạt nút; ESC hủy biểu mẫu.
+
+[ 7. Bảng mã ký tự ]
+
+  Tự động nhận UTF-8 trên hệ không phải Windows, Shift_JIS (CP932) trên Windows; cũng hỗ trợ EUC-JP. Ghi đè bằng TUI_HANDY_ENCODING.
+
+  $ENV{TUI_HANDY_ENCODING} = 'euc';   # utf8 / sjis / euc
+
+[ 8. Chế độ dòng dự phòng ]
+
+  Khi không có stty (cmd.exe Windows thuần), tự động chuyển sang trình điều khiển chế độ dòng di động; ép buộc bằng TUI_HANDY_MODE.
+
+  $ENV{TUI_HANDY_MODE} = 'line';      # ansi / line
+
+[ 9. Sử dụng dòng lệnh ]
+
+  Có thể chạy trực tiếp một tệp DSL mà không cần viết mã Perl.
+
+  perl Handy.pm form.txt
+
+[ 10. Ví dụ đầy đủ ]
+
+  Một DSL ngắn kết hợp mọi loại điều khiển.
+
+  Registration
+  Company: [__________]
+  Age:     [###]
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+  [Register]
+
+[ 11. Tài liệu tham khảo ]
+
+  Tài liệu đầy đủ nằm trong POD của lib/TUI/Handy.pm (perldoc TUI::Handy). Tác giả: INABA Hitoshi <ina.cpan@gmail.com>. Giấy phép: cùng điều khoản với Perl.

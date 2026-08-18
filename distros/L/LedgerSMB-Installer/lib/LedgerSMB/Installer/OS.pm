@@ -1,8 +1,9 @@
-package LedgerSMB::Installer::OS v0.999.11;
+package LedgerSMB::Installer::OS v0.999.13;
 
 use v5.20;
 use experimental qw(signatures);
 
+use Config;
 use Cwd qw( getcwd );
 use File::Basename qw( fileparse );
 use File::Spec;
@@ -33,7 +34,10 @@ sub have_cmd($self, $cmd, $fatal = 1, $extra_path = []) {
             # Prefer specific added paths over system path; we may have
             # installed something specific; if we did, we don't want to
             # find the system global thing in its place.
-            for my $path ($extra_path->@*, File::Spec->path) {
+            # Prefer the Perl installation path over the system path:
+            # utilities specific to this Perl version should be found there
+            # (see issue #31 why this is important)
+            for my $path ($extra_path->@*, $Config{bin}, File::Spec->path) {
                 my $expanded = File::Spec->catfile( $path, $cmd );
                 next if not -x $expanded;
 

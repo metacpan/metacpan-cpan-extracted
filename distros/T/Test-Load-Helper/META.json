@@ -41,9 +41,12 @@
       },
       "test" : {
          "requires" : {
+            "Carp::Always" : "0",
             "Path::Tiny" : "0.018",
+            "Test::Deep" : "0",
             "Test::EOL" : "0",
-            "Test::YAFT" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "v0.38.0",
             "constant" : "0",
             "require::relative" : "0"
          }
@@ -52,7 +55,7 @@
    "provides" : {
       "Test::Load::Helper" : {
          "file" : "lib/Test/Load/Helper.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       }
    },
    "release_status" : "stable",
@@ -66,7 +69,7 @@
          "web" : "https://github.com/happy-barney/perl-Test-Load-Helper"
       }
    },
-   "version" : "1.0.1",
+   "version" : "1.0.2",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-2.0"

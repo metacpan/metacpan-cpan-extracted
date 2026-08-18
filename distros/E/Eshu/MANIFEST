@@ -30,7 +30,6 @@ include/eshu_xml.h
 include/eshu_xs.h
 include/eshu_yaml.h
 lib/Eshu.pm
-lib/Eshu.xs
 Makefile.PL
 MANIFEST			This list of files
 META.json			Module JSON meta-data (added by MakeMaker)

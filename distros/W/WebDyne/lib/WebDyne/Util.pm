@@ -58,7 +58,7 @@ require Exporter;
 
 #  Version information
 #
-$VERSION='3.015';
+$VERSION='3.018';
 
 
 #  Var to hold package wide hash, for data shared across package, and error stack
@@ -634,7 +634,7 @@ sub errdump {
             # formline formatting, so keep diagnostic fields as plain scalars.
             if (ref($value)) {
                 my $string=eval {
-                    $value->can('as_string') ? $value->as_string() : "$value";
+                    UNIVERSAL::can($value, 'as_string') ? $value->as_string() : "$value";
                 };
                 $value=defined($string) ? $string : ref($value);
             }

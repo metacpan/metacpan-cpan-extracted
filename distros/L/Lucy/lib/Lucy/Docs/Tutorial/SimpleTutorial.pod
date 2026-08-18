@@ -32,7 +32,7 @@ Lucy::Docs::Tutorial::SimpleTutorial - Bare-bones search app.
 =head2 Setup
 
 Copy the text presentation of the US Constitution from the C<sample> directory
-of the Apache Lucy distribution to the base level of your web server’s
+of the Lucy distribution to the base level of your web server’s
 C<htdocs> directory.
 
     $ cp -R sample/us_constitution /usr/local/apache2/htdocs/
@@ -284,8 +284,8 @@ The rest of the script is just text wrangling.
     
         <p style="font-size: smaller; color: #666">
           <em>
-            Powered by <a href="http://lucy.apache.org/"
-            >Apache Lucy<small><sup>TM</sup></small></a>
+            Powered by <a href="https://github.com/lucysearch"
+            >Lucy</a>
           </em>
         </p>
       </div><!--bodytext-->

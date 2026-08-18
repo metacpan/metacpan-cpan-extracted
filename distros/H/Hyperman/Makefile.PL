@@ -144,6 +144,82 @@ my ($h2_inc, $h2_libs) = ('', '');
     }
 }
 
+# --- response compression via zlib (any platform with the library) -------
+#
+# gzip on the way out: the largest remaining win over the wire, and the one
+# thing only this layer can do - it serves apps that are not Punk (the
+# openapi-proxy gateway calls Hyperman->run directly) and it owns the write
+# path. Detected like the others: pkg-config, then a -lz probe.
+#
+# The probe LINKS. A header-only check is how Punk 0.09 shipped a build that
+# compiled and then failed to load with an undefined symbol; zlib.h without
+# libz is exactly that shape on a minimal image.
+#
+# Absent zlib, hz_gzip() is a stub returning 0, `compress` is accepted and
+# inert, and nothing else changes. Hyperman must stay installable without it.
+my ($z_inc, $z_libs) = ('', '');
+# HM_NO_ZLIB=1 forces the passthrough build. The stub path is a supported
+# configuration - a smoker on a minimal image gets it whether we test it or
+# not - so it has to be buildable on demand rather than only in theory.
+if (!$ENV{HM_NO_ZLIB}) {
+    my ($cflags, $libs);
+    if (system("pkg-config --exists zlib >$DEVNULL 2>&1") == 0) {
+        chomp($cflags = `pkg-config --cflags zlib 2>$DEVNULL`);
+        chomp($libs   = `pkg-config --libs zlib 2>$DEVNULL`);
+        $libs ||= '-lz';
+    }
+    if (!$libs && probe_zlib('')) {
+        ($cflags, $libs) = ('', '-lz');
+    }
+    if (!$libs) {   # homebrew keg-only path (no pkg-config on macOS)
+        for my $p ('/opt/homebrew/opt/zlib', '/usr/local/opt/zlib') {
+            next unless -e "$p/include/zlib.h";
+            if (probe_zlib("-I$p/include -L$p/lib")) {
+                ($cflags, $libs) = ("-I$p/include", "-L$p/lib -lz");
+                last;
+            }
+        }
+    }
+    if ($libs) {
+        $z_inc  = " $cflags -DHM_HAVE_ZLIB";
+        $z_libs = " $libs";
+        print "Found zlib: response compression available "
+            . "(off by default; enable with compress => 1).\n";
+    } else {
+        print "zlib not found: response compression disabled "
+            . "(install zlib1g-dev to enable it).\n";
+    }
+}
+
+sub probe_zlib {
+    my $flags = shift;
+    my $dir = "hm_z_probe_$$";
+    mkdir $dir or return 0;
+    my ($src, $bin, $ok) = ("$dir/probe.c", "$dir/probe", 0);
+    if (open my $fh, '>', $src) {
+        # deflateInit2_ is the real entry point behind deflateInit2, and the
+        # gzip wrapper (windowBits 15|16) is the thing we actually need - a
+        # probe that only calls zlibVersion() would pass against a stub.
+        print $fh <<'C';
+#include <zlib.h>
+int main(void) {
+    z_stream s;
+    s.zalloc = 0; s.zfree = 0; s.opaque = 0;
+    if (deflateInit2(&s, 6, Z_DEFLATED, 15 | 16, 8, Z_DEFAULT_STRATEGY) != Z_OK)
+        return 1;
+    deflateEnd(&s);
+    return 0;
+}
+C
+        close $fh;
+        my $cc = $Config{cc} || 'cc';
+        $ok = system("$cc $flags $src -o $bin -lz >$DEVNULL 2>&1") == 0;
+    }
+    unlink $src, $bin;
+    rmdir $dir;
+    return $ok;
+}
+
 # ---------------------------------------------------------------------------
 # sendfile(2): three incompatible signatures, so probe each until one links
 # (the feature, not the platform - the read-drip is the fallback everywhere).
@@ -315,9 +391,9 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.010000',
     OBJECT           => 'Hyperman$(OBJ_EXT)',
     INC              => join(' ', grep { defined && length }
-                            '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc . $sf_inc,
+                            '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc . $sf_inc . $z_inc,
                             $dep_inc),
-    LIBS             => [ join(' ', grep { defined && length } $uring_libs, $h2_libs, $tls_libs, $rt_libs, $win_libs, $dep_libs) ],
+    LIBS             => [ join(' ', grep { defined && length } $uring_libs, $h2_libs, $tls_libs, $z_libs, $rt_libs, $win_libs, $dep_libs) ],
     depend           => {
         'Hyperman.c' => 'xs/hyperman.xs xs/future.xs xs/loop.xs '
                       . 'xs/writer.xs xs/event.xs xs/abi.xs',
@@ -328,7 +404,9 @@ my %WriteMakefileArgs = (
           . 'include/hyperman/backend_wsapoll.c '
           . 'include/hyperman/backend_iouring.c include/hyperman/hm_http2.h '
           . 'include/hyperman/hm_tls.h include/hyperman/hm_abi.h '
-          . 'include/hyperman/hm_win.h include/hyperman/hm_abi_impl.h',
+          . 'include/hyperman/hm_win.h include/hyperman/hm_abi_impl.h '
+          . 'include/hyperman/hm_compress.h include/hyperman/hm_parse.h '
+          . 'include/hyperman/hm_ratelimit.h',
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',

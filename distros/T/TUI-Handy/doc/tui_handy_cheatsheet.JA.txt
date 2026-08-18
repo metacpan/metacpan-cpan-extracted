@@ -1,0 +1,82 @@
+======================================================================
+ TUI::Handy Cheat Sheet                                  [JA] 日本語
+======================================================================
+
+[ 1. インストールと読み込み ]
+
+  CPAN依存はありません。Handy.pm を @INC 内の任意のディレクトリにコピーするか、直接スクリプトとして実行します。
+
+  use TUI::Handy;
+  # or, as a command:  perl Handy.pm form.txt
+
+[ 2. フォームの作成と実行 ]
+
+  DSL文字列またはファイルからフォームを作成し、run() を呼び出します。結果は DSL 中のラベルをキーとするハッシュリファレンスです。
+
+  my $tui  = TUI::Handy->new(dsl => $text);   # or new(file => $path)
+  my $form = $tui->run;
+  print "Company = $form->{Company}\n";
+
+[ 3. テキストボックスの記号 ]
+
+  [ ] の中の記号でテキストボックスの種類を選びます: _ は半角、# は数値、$ または \ は通貨、YYYYMMDD または % は日付、全角文字は zenkaku 型になります。
+
+  Company: [__________]
+  Age:     [###]
+  Price:   [$$$$$$]
+  Date:    [YYYYMMDD]
+
+[ 4. チェックボックスとラジオボタン ]
+
+  [X]/[ ] はチェックボックス（1 または 0）、(*)/( ) は直前の見出し行でグループ化されるラジオボタンで、選択されたラベル文字列が値になります。
+
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+
+[ 5. プッシュボタン ]
+
+  ラベルの前に何もない角括弧はボタンです。set() で動作を登録します。
+
+  $tui->set('Register', sub { my $form = shift; save($form); 0 });
+  [Register]
+
+[ 6. キー操作 ]
+
+  TAB / 下矢印で次のフィールド、Shift-TAB / 上矢印で前のフィールドへ移動します。Enter、Space、矢印キーで編集またはボタンを実行し、ESC で中止します。
+
+[ 7. 文字コード ]
+
+  Windows以外では UTF-8、Windowsでは Shift_JIS (CP932) を自動判定します。EUC-JP にも対応します。TUI_HANDY_ENCODING で上書きできます。
+
+  $ENV{TUI_HANDY_ENCODING} = 'euc';   # utf8 / sjis / euc
+
+[ 8. 行モードのフォールバック ]
+
+  stty が使えない環境（素の Windows cmd.exe）では自動的に行モードのフォールバックに切り替わります。TUI_HANDY_MODE で強制指定できます。
+
+  $ENV{TUI_HANDY_MODE} = 'line';      # ansi / line
+
+[ 9. コマンドラインでの実行 ]
+
+  Perl コードを書かずに DSL ファイルを直接実行できます。
+
+  perl Handy.pm form.txt
+
+[ 10. 全体の例 ]
+
+  全種類のウィジェットを組み合わせた簡単な DSL の例です。
+
+  Registration
+  Company: [__________]
+  Age:     [###]
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+  [Register]
+
+[ 11. 参考資料 ]
+
+  完全なドキュメントは lib/TUI/Handy.pm の POD にあります（perldoc TUI::Handy）。作者: INABA Hitoshi <ina.cpan@gmail.com>。ライセンス: Perl 本体と同じ条件です。

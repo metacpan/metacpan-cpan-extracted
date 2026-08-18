@@ -33,7 +33,7 @@
 #include "Clownfish/Class.h"
 
 TestHashIterator*
-TestHashIterator_new() {
+TestHashIterator_new(void) {
     return (TestHashIterator*)Class_Make_Obj(TESTHASHITERATOR);
 }
 

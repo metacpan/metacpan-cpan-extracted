@@ -316,7 +316,7 @@ You've made it to the end of the tutorial.
 
 ## See Also
 
-For additional thematic documentation, see the Apache Lucy
+For additional thematic documentation, see the Lucy
 [](cfish:Cookbook).
 
 ANDQuery has a companion class, [](cfish:lucy.ORQuery), and a

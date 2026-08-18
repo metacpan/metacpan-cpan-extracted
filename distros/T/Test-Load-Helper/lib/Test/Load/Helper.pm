@@ -2,7 +2,7 @@
 use v5.14;
 use warnings;
 
-package Test::Load::Helper v1.0.1 {
+package Test::Load::Helper v1.0.2 {
 
 	use Carp qw (croak);
 	use Path::Tiny qw ();

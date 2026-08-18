@@ -836,48 +836,28 @@ EOPM
 
 # clipping
 
-for my $opt (
-	     ['hclip','PDLMIN'],
-	     ['lclip','PDLMAX']
-	     ) {
-    my $name = $opt->[0];
-    my $op   = $opt->[1];
-    my $code = '$c() = '.$op.'($b(), $a());';
-    pp_def(
-	   $name,
-	   HandleBad => 1,
-	   Pars => 'a(); b(); [o] c()',
-	   Code =>
-	   'PDL_IF_BAD(if ( $ISBAD(a()) || $ISBAD(b()) ) {
-               $SETBAD(c());
-            } else,) { '.$code.' }',
-	   Doc =>  'clip (threshold) C<$a> by C<$b> (C<$b> is '.
-	   ($name eq 'hclip' ? 'upper' : 'lower').' bound)',
-          PMCode=>pp_line_numbers(__LINE__, <<"EOD"),
-sub PDL::$name {
-   my (\$x,\$y) = \@_;
-   my \$c;
-   if (\$x->is_inplace) {
-       \$x->set_inplace(0); \$c = \$x;
-   } elsif (\@_ > 2) {\$c=\$_[2]} else {\$c=PDL->nullcreate(\$x)}
-   PDL::_${name}_int(\$x,\$y,\$c);
-   return \$c;
+for my $opt ([qw(hclip PDLMIN upper)], [qw(lclip PDLMAX lower)]) {
+  my ($name, $op, $word) = @$opt;
+  pp_def(
+    $name,
+    HandleBad => 1,
+    Inplace => ['a'],
+    Pars => 'a(); b(); [o] c()',
+    Code =>
+    'PDL_IF_BAD(if ( $ISBAD(a()) || $ISBAD(b()) ) { $SETBAD(c()); continue; },)
+    '.'$c() = '.$op.'($b(), $a());',
+    Doc =>  'clip (threshold) C<$a> by C<$b> (C<$b> is '.$word.' bound)',
+  );
 }
-EOD
-    ); # pp_def $name
-
-} # for: my $opt
 
 pp_def('clip',
-	HandleBad => 1,
-	Pars => 'a(); l(); h(); [o] c()',
-	Code => <<'EOBC',
-         PDL_IF_BAD(
-	 if( $ISBAD(a()) || $ISBAD(l()) || $ISBAD(h()) ) {
-	   $SETBAD(c());
-         } else,) {
-           $c() = PDLMIN($h(), PDLMAX($l(), $a()));
-         }
+  HandleBad => 1,
+  Pars => 'a(); l(); h(); [o] c()',
+  Code => <<'EOBC',
+PDL_IF_BAD(
+  if ($ISBAD(a()) || $ISBAD(l()) || $ISBAD(h())) { $SETBAD(c()); continue; },
+)
+$c() = PDLMIN($h(), PDLMAX($l(), $a()));
 EOBC
 	Doc => <<'EOD',
 =for ref
@@ -893,38 +873,22 @@ EOD
 *clip = \&PDL::clip;
 sub PDL::clip {
   my($x, $l, $h) = @_;
+  return $x->new_or_inplace if !defined($l) && !defined($h);
+  return $x->lclip($l) if !defined($h);
+  return $x->hclip($h) if !defined($l);
   my $d;
-  unless(defined($l) || defined($h)) {
-      # Deal with pathological case
-      if($x->is_inplace) {
-	  $x->set_inplace(0);
-	  return $x;
-      } else {
-	  return $x->copy;
-      }
-  }
-
-  if($x->is_inplace) {
-      $x->set_inplace(0); $d = $x
+  if ($x->is_inplace) {
+    $x->set_inplace(0); $d = $x
   } elsif (@_ > 3) {
-      $d=$_[3]
+    $d=$_[3]
   } else {
-      $d = PDL->nullcreate($x);
+    $d = PDL->nullcreate($x);
   }
-  if(defined($l) && defined($h)) {
-      PDL::_clip_int($x,$l,$h,$d);
-  } elsif( defined($l) ) {
-      PDL::_lclip_int($x,$l,$d);
-  } elsif( defined($h) ) {
-      PDL::_hclip_int($x,$h,$d);
-  } else {
-      die "This can't happen (clip contingency) - file a bug";
-  }
-
-  return $d;
+  PDL::_clip_int($x,$l,$h,$d);
+  $d;
 }
 EOPM
-    ); # end of clip pp_def call
+);
 
 ############################################################
 # elementary statistics and histograms

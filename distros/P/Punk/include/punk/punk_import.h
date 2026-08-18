@@ -139,6 +139,8 @@ static const pki_kw PKI_KEYWORDS[] = {
     { "csrf",       "csrf",        PKW_FWD    },
     { "cors",       "cors",        PKW_FWD    },
     { "headers",    "headers",     PKW_FWD    },
+    { "proxy",      "proxy",       PKW_FWD    },
+    { "max_body",   "max_body",    PKW_FWD    },
     { "auth",       "auth",        PKW_FWD    },
     { "auth_guard", "auth_guard",  PKW_FWD    },
     { "logging",    "logging",     PKW_FWD    },

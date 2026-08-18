@@ -41,7 +41,7 @@ typedef struct ThreadArgs {
 } ThreadArgs;
 
 TestLockFreeRegistry*
-TestLFReg_new() {
+TestLFReg_new(void) {
     return (TestLockFreeRegistry*)Class_Make_Obj(TESTLOCKFREEREGISTRY);
 }
 

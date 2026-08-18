@@ -1,3 +1,10 @@
+=head1 NAME
+
+02_basic_auth.t - username/password produce a correctly base64-encoded
+Basic Authorization header
+
+=cut
+
 use strict;
 use warnings;
 use Test::More;

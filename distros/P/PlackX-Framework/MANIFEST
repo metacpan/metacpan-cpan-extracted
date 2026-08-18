@@ -4,6 +4,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+examples/README
 examples/app-change-keyword/app.psgi
 examples/app-change-keyword/lib/MyApp.pm
 examples/app-change-keyword/lib/MyApp/Router.pm

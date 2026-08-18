@@ -14,6 +14,12 @@ use warnings;
 use FindBin ();
 use lib "$FindBin::Bin/../blib/lib", "$FindBin::Bin/../blib/arch",
         "$FindBin::Bin/../lib";
+# Prefer a sibling Hyperman build when there is one, the way t/43-ratelimit.t
+# does: server-side features land there first and an installed copy is
+# usually a release behind, which shows up here as a server that croaks on an
+# unknown option and a silent 0 req/s.
+use lib "$FindBin::Bin/../../Hyperman/blib/lib",
+        "$FindBin::Bin/../../Hyperman/blib/arch";
 use Socket ();
 use Time::HiRes ();
 
@@ -76,8 +82,13 @@ sub bench_one {
         open STDOUT, '>', '/dev/null';
         open STDERR, '>', '/dev/null';
         if ($SERVER eq 'Hyperman') {
+            # PUNK_BENCH_COMPRESS=1 turns the server's response compression
+            # on for the whole run, which is the only way to measure what it
+            # costs. Read the bytes-on-wire column alongside the rate: a
+            # throughput drop that buys a much smaller response is a pass.
             Hyperman->run(app => $app, host => $HOST, port => $port,
-                          workers => $WORKERS);
+                          workers => $WORKERS,
+                          ($ENV{PUNK_BENCH_COMPRESS} ? (compress => 1) : ()));
         }
         else {
             Plack::Loader->load($SERVER, host => $HOST, port => $port,
@@ -89,19 +100,28 @@ sub bench_one {
         last if IO::Socket::INET->new(PeerAddr => "$HOST:$port");
         Time::HiRes::sleep(0.05);
     }
-    my $out = `wrk -t4 -c$CONNS -d${SECONDS}s http://$HOST:$port$path 2>&1`;
+    # -H Accept-Encoding only when we are measuring compression: wrk sends
+    # none by default, so without this the compressed run would measure the
+    # uncompressed path and report a flattering non-result.
+    my $hdr = $ENV{PUNK_BENCH_COMPRESS} ? q{-H 'Accept-Encoding: gzip'} : '';
+    my $out = `wrk -t4 -c$CONNS -d${SECONDS}s $hdr http://$HOST:$port$path 2>&1`;
     kill 'TERM', $pid;
     waitpid $pid, 0;
     my ($rps) = $out =~ /Requests\/sec:\s+([\d.]+)/;
-    return $rps || 0;
+    # bytes on the wire per request: the other half of the compression trade
+    my ($xfer) = $out =~ /Transfer\/sec:\s+([\d.]+)(\w+)/ ? "$1$2" : '';
+    my ($reqs, $bytes) = ($out =~ /(\d+) requests in [\d.]+\w+, ([\d.]+\w+) read/);
+    return ($rps || 0, $reqs && $bytes ? "$bytes/$reqs reqs" : $xfer);
 }
 
 require IO::Socket::INET;
 
 my %rps;
 for my $name (@APPS) {
-    $rps{$name} = bench_one($name);
-    printf "%-16s %10.0f req/s\n", $name, $rps{$name};
+    my ($r, $wire) = bench_one($name);
+    $rps{$name} = $r;
+    printf "%-16s %10.0f req/s%s\n", $name, $r,
+           (length $wire ? "   [$wire on the wire]" : '');
 }
 if ($rps{bare}) {
     print "\nrelative to bare:\n";

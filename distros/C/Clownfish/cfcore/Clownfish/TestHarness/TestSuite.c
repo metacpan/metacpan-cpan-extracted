@@ -35,7 +35,7 @@ static void
 S_unbuffer_stdout(void);
 
 TestSuite*
-TestSuite_new() {
+TestSuite_new(void) {
     TestSuite *self = (TestSuite*)Class_Make_Obj(TESTSUITE);
     return TestSuite_init(self);
 }
@@ -98,7 +98,7 @@ TestSuite_Run_All_Batches_IMP(TestSuite *self, TestFormatter *formatter) {
 }
 
 static void
-S_unbuffer_stdout() {
+S_unbuffer_stdout(void) {
     int check_val = setvbuf(stdout, NULL, _IONBF, 0);
     if (check_val != 0) {
         fprintf(stderr, "Failed when trying to unbuffer stdout\n");

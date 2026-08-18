@@ -12,6 +12,10 @@ WriteMakefile(
     MIN_PERL_VERSION  => '5.26.0',
     CONFIGURE_REQUIRES => {
         File::ShareDir::Install => 0,
+        ExtUtils::MakeMaker     >= 7.70,
+        ExtUtils::CBuilder      >= 0.280236,
+        CPAN::Meta              >= 2.150010,
+        CPAN::Meta::YAML        >= 0.018,
     },
     PREREQ_PM    => {
         'JSON' => 0,
@@ -22,7 +26,7 @@ WriteMakefile(
         'File::ShareDir' => 0,
         'FindBin' => 0,
         'Feature::Compat::Class' => 0.07,
-        ($^V < v5.38 ? ('Object::Pad' => 0) : ()),
+        'Object::Pad' => 0,
     },
     EXE_FILES    => [ 'bin/linksite' ],
     META_MERGE        => {

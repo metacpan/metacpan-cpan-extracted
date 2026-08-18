@@ -2,7 +2,7 @@ package PDF::Make::Markup::Style;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # No logic lives here. The attribute table, every coercion and the inheritance
 # rules are in src/pdfmake_markup_style.c, reached through xs/markup_style.xs;

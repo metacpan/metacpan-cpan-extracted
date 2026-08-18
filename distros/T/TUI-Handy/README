@@ -1,0 +1,155 @@
+NAME
+    TUI::Handy - Text-based user interface (ANSI-only form toolkit)
+
+WHY THIS MODULE EXISTS
+    Every existing way to build a terminal interface in Perl is unavailable
+    somewhere.  Curses and Curses::UI need an XS build and the ncurses
+    library.  Prima and Tk assume a display.  Term::Choose and Term::Menus
+    are pure Perl but present selection lists, not editable forms.
+    Term::ReadLine::Gnu needs XS and GNU readline.
+
+    TUI::Handy does not compete with Curses::UI; it fills the gap below it.
+    The situation it is written for is a machine where CPAN is unreachable,
+    no compiler is installed and the perl is whatever shipped with the
+    system: a plant or in-house server on a closed network, a customer site,
+    a locked image, a classroom.  Installing it there means copying one file
+    to TUI/Handy.pm somewhere in @INC.  Nothing is built and nothing is
+    downloaded, and the same file works on a perl that has not been updated
+    for twenty years.
+
+    The second reason is multibyte text.  Drawing a form containing Japanese
+    requires the display width of every character, and Encode is core only
+    from Perl 5.8.  TUI::Handy computes width and character boundaries at
+    the byte level for UTF-8, Shift_JIS (CP932) and EUC-JP, so a Japanese
+    form stays aligned without loading anything.
+
+DESCRIPTION
+    TUI::Handy renders a plain-text form definition as an interactive
+    console form, using nothing but ANSI escape sequences.  It is pure Perl
+    and has no dependencies at all beyond strict and vars.
+
+    The form definition is not a description of a screen; it is the screen.
+    The text you write is drawn as written, and the labels you write become
+    the keys of the hash that run() returns, so the layout and the data
+    structure cannot drift apart.  Moving a field one line up is an edit to
+    the text, not to any code.
+
+    The module source itself is US-ASCII; every non-ASCII byte lives in the
+    form definition, which is read at run time.
+
+SYNOPSIS
+        use TUI::Handy;
+
+        my $tui = TUI::Handy->new(dsl => $text);   # or new(file => $path)
+        $tui->set('Company',  'ACME');
+        $tui->set('Register', sub { my $form = shift; save($form); 0 });
+        my $form = $tui->run;                      # returns a hash reference
+        print "Company = $form->{'Company'}\n";
+
+    A definition looks like the screen it produces:
+
+        Customer registration
+        Company: [________________]
+        Qty:     [###]
+        [X] Shipped
+
+        Payment:
+        (*) Cash
+        ( ) Transfer
+        [Register]
+
+    The full DSL reference, the key bindings, the method list and the
+    environment variables are in the POD:
+
+        perldoc TUI::Handy
+
+    The distribution can also be run as a command, which prints the
+    collected values as tab-separated lines:
+
+        perl Handy.pm form.txt
+
+INSTALLATION
+    This distribution ships with pmake.bat, a portable Perl-based build tool
+    that requires only core Perl modules.
+
+        perl pmake.bat test        # run the test suite
+        perl pmake.bat install     # copy lib/TUI/Handy.pm into site_perl
+
+    On Windows:
+
+        pmake.bat test
+        pmake.bat install
+
+    You may also install by hand: copy lib/TUI/Handy.pm to a directory in
+    your @INC as TUI/Handy.pm.  That is the whole installation.
+
+EXAMPLES
+    eg/quickstart.pl     the smallest useful form
+    eg/setup_wizard.pl   edit a key=value configuration file
+    eg/master_entry.pl   repeated record entry appended to a TSV file
+
+LIMITATIONS
+    These are deliberate, and they are the price of the dependency-free
+    design.  If you need what is listed here, Curses::UI is the right tool.
+
+    *   One screen: there is no scrolling, so a form has to fit the
+        terminal.
+
+    *   Form widgets only: no lists, tables, menus, tabs or sub-windows.
+
+    *   No colour beyond reverse video for the focused widget, and no mouse
+        support.
+
+    *   A terminal resize during the run is not tracked.
+
+    *   Display width is decided from the encoding of each character rather
+        than from a Unicode table, because no table can be loaded.  ASCII,
+        the Japanese full-width ranges and half-width katakana come out
+        right in all three encodings; under UTF-8, everything else above
+        U+07FF is counted as two columns, so labels using narrow characters
+        from that range draw a little wide.
+
+    *   One key per label: a label written twice yields two widgets sharing
+        one hash key.  Labels within a form need to be distinct.
+
+    *   In line mode an empty answer keeps the current value, so a value
+        already entered cannot be cleared from that driver.
+
+    *   Full-screen ANSI mode needs a terminal that stty can place in cbreak
+        mode, which covers Linux, the other Unices, macOS, WSL, Cygwin and
+        Git Bash.  On a bare Windows cmd.exe, where stty is absent and no
+        external module may be used, TUI::Handy falls back to a portable
+        line-oriented driver.  The display is plainer -- one prompt per
+        line instead of a screen -- but the same definition yields the same
+        hash and button handlers behave identically.
+
+DEPENDENCIES
+    This software requires perl5.00503 or later.  No other module is
+    required, at run time or at build time.
+
+CHEATSHEET
+    Quick reference guides covering installation, the DSL widget syntax,
+    keys, encoding and the line-mode fallback are provided in doc/ in 21
+    languages:
+
+        BN Bengali         EN English        KM Khmer          NE Nepali         TR Turkish
+        BM Malay           FR French         KO Korean         SI Sinhala        TW Chinese (Traditional)
+        HI Hindi           ID Indonesian     MN Mongolian      TH Thai           UR Urdu
+        MY Burmese         JA Japanese       TL Filipino       UZ Uzbek          VI Vietnamese
+        ZH Chinese (Simplified)
+
+SEE ALSO
+    Curses::UI for a full widget toolkit where XS and ncurses are available;
+    Term::Choose and Term::Menus for selection lists; Prima and Tk for
+    graphical interfaces.
+
+AUTHOR
+    INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
+
+LICENSE AND COPYRIGHT
+    This software is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.  See perlartistic.
+
+    This software is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

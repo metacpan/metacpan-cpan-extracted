@@ -60,7 +60,7 @@ TestFormatter_batch_comment(TestFormatter *self, const char *fmt, ...) {
 }
 
 TestFormatterCF*
-TestFormatterCF_new() {
+TestFormatterCF_new(void) {
     TestFormatterCF *self
         = (TestFormatterCF*)Class_Make_Obj(TESTFORMATTERCF);
     return TestFormatterCF_init(self);
@@ -146,7 +146,7 @@ TestFormatterCF_Summary_IMP(TestFormatterCF *self, TestSuiteRunner *runner) {
 }
 
 TestFormatterTAP*
-TestFormatterTAP_new() {
+TestFormatterTAP_new(void) {
     TestFormatterTAP *self
         = (TestFormatterTAP*)Class_Make_Obj(TESTFORMATTERTAP);
     return TestFormatterTAP_init(self);

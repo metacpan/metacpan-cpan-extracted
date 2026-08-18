@@ -3,10 +3,13 @@ abstract: 'automatically load test helpers by walking the directory tree'
 author:
   - 'Branislav Zahradník <barney.cpan@gmail.com>'
 build_requires:
+  Carp::Always: '0'
   Module::Build: '0.28'
   Path::Tiny: '0.018'
+  Test::Deep: '0'
   Test::EOL: '0'
-  Test::YAFT: '0'
+  Test::More: '0'
+  Test::Warnings: v0.38.0
   constant: '0'
   require::relative: '0'
 configure_requires:
@@ -21,7 +24,7 @@ name: Test-Load-Helper
 provides:
   Test::Load::Helper:
     file: lib/Test/Load/Helper.pm
-    version: v1.0.1
+    version: v1.0.2
 requires:
   Carp: '0'
   Path::Tiny: '0.018'
@@ -31,7 +34,7 @@ requires:
 resources:
   bugtracker: https://github.com/happy-barney/perl-Test-Load-Helper/issues
   repository: git://github.com/happy-barney/perl-Test-Load-Helper.git
-version: 1.0.1
+version: 1.0.2
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

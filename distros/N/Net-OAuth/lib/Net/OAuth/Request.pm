@@ -6,7 +6,7 @@ use URI;
 use URI::QueryParam;
 
 use Net::OAuth;
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 __PACKAGE__->mk_classdata(required_message_params => [qw/
     consumer_key
@@ -31,6 +31,7 @@ __PACKAGE__->mk_classdata(optional_api_params => [qw/
     token_secret
     extra_params
     protocol_version
+    allowed_signature_methods
     /]);
 
 __PACKAGE__->mk_classdata(signature_elements => [qw/
@@ -95,7 +96,7 @@ Currently maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2012, 2024-2025 Keith Grennan
+Copyright 2007-2012, 2024-2026 Keith Grennan
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.25';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -68,6 +68,8 @@ interfaces (F<xs/>).
                                        # for custom logging:
                                        #   sub { my ($env,$status,$bytes)=@_ }
                                        # ($bytes is undef for streaming)
+        max_body       => 16777216,    # request ceiling, bytes (see below);
+                                       # the default is 16MB, 0 is refused
         max_requests_per_worker => 0,  # recycle a worker after N requests
         shutdown_grace => 30,          # bound on graceful drain (secs)
         affinity       => 0,           # pin worker i to core i%ncpu (Linux)
@@ -133,6 +135,129 @@ at accept and is also visible to the app in C<$env>.
 
 Pass a coderef instead (C<< sub { my ($env, $status, $bytes) = @_ } >>) for
 full control; that path calls back into Perl for every response.
+
+=head2 max_body: the request ceiling
+
+C<max_body> is the largest request Hyperman will buffer - B<headers plus
+body> - before the application is called. Over it, the request is answered
+C<413 Payload Too Large> and the connection is closed. The default is
+B<16MB>, which is what it was as a hard-coded literal before 0.25.
+
+    Hyperman->run(app => $app, max_body => 64 * 1024 * 1024);
+
+=head2 Response compression
+
+With C<< compress => 1 >>, responses are gzipped on the
+way out.
+
+    Hyperman->run(app => $app, compress => 1);
+
+B<Off by default>, here and under L<Plack::Handler::Hyperman>. A server
+that starts compressing because it was upgraded is a surprise, and the
+cost is real - see the C<compress_level> table below. Whether it is worth
+paying depends on whether bandwidth or CPU is what limits a given
+deployment, which is something only its operator knows.
+
+A response is compressed only when B<all> of these hold:
+
+=over 4
+
+=item * the request's C<Accept-Encoding> accepted gzip (C<q=0> is an
+explicit refusal and is honoured)
+
+=item * the response carries B<no C<Content-Encoding> of its own>
+
+=item * the body is a plain in-memory body, not a filehandle, reader or
+streamed source - compressing those would undo the sendfile and drip paths
+
+=item * it is at least C<compress_min_length> bytes (default 1400, one MTU)
+
+=item * the status is 200 or 203 - never 206, whose C<Content-Range>
+describes offsets into the B<uncompressed> representation
+
+=item * the C<Content-Type> is on the compressible allowlist: C<text/*>,
+C<application/json>, C<application/javascript>, C<application/xml>,
+C<application/x-ndjson>, C<image/svg+xml>, and anything ending C<+json> or
+C<+xml>. An allowlist, so a new binary media type never becomes
+compressible by default.
+
+=back
+
+=head3 The C<Content-Encoding> contract
+
+B<Hyperman never touches a response that already declares a
+C<Content-Encoding>.> That one rule is the whole interface with whatever is
+above it:
+
+=over 4
+
+=item * a framework serving precompressed C<.gz> files off disk sets
+C<gzip>, and its bytes go out as they are
+
+=item * a route that wants no compression sets C<< Content-Encoding:
+identity >>, which Hyperman honours and B<strips> before writing
+
+=back
+
+It is a plain response header, so it is a contract any PSGI framework can
+use rather than a private arrangement. L<Punk>'s C<< { compress => 0 } >>
+route option is exactly this spelling.
+
+=head3 Two things it changes about your response
+
+B<The C<ETag> is rewritten> - a C<-gzip> suffix is added inside the closing
+quote. The layer that compresses must be the layer that fixes the
+validator, or a shared cache serves the compressed bytes to a client that
+asked for none. nginx does the same. It is said plainly here because
+otherwise an application author finds it by debugging.
+
+B<C<Vary: Accept-Encoding> is added> whenever a response was compressed, for
+the same reason.
+
+An app-supplied C<Content-Length> is replaced, since it described the bytes
+that were just replaced.
+
+=head3 C<compress_level>
+
+Default 1, not the customary 6, on measurement rather than convention. A
+37KB JSON document, 2 workers / 5s / 64 connections on loopback:
+
+    off        130,000 req/s    37.3 KB/req
+    level 1     66,900 req/s     3.19 KB/req   11.7x smaller, 1.9x slower
+    level 6     26,300 req/s     2.96 KB/req   12.6x smaller, 4.9x slower
+
+Level 6 buys 7% more compression for 2.5x the CPU. Almost all of the win on
+repetitive text - which is what an API payload is - lands in the first
+level. Raise it with C<< compress_level => 6 >> if bandwidth costs you more
+than CPU does; the range is 1 to 9.
+
+B<Read that table carefully: a loopback benchmark charges the whole CPU
+cost and pays none of the benefit, because the network is free.> It is the
+worst case for compression and the best case for sending 37KB uncompressed.
+Once the link is finite, the same two numbers say the opposite thing -
+requests actually served, taking whichever of CPU and bandwidth binds
+first:
+
+    link        without gzip    with gzip    winner
+    100 Mbps             327        3,827    gzip, 11.7x
+    1 Gbps             3,273       38,267    gzip, 11.7x
+    10 Gbps           32,727       66,900    gzip, 2.0x
+    25 Gbps           81,817       66,900    uncompressed, 1.2x
+    40 Gbps          130,000       66,900    uncompressed, 1.9x
+
+Compression loses only above roughly 20 Gbps of egress per host, which is
+not a situation a PSGI application is usually in. Below that, halving the
+CPU per response buys nothing because the CPU was not the constraint.
+
+Small responses are unaffected either way: anything under
+C<compress_min_length> is never touched, and a benchmark of tiny bodies
+measures no difference at all.
+
+=head3 Without zlib
+
+C<compress> and C<compress_min_length> are accepted and inert, so one
+configuration is portable across builds. C<< Hyperman->has_compression >>
+is the honest answer.
 
 =head2 HTTP/2
 

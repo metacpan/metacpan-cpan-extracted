@@ -103,7 +103,7 @@ S_register(CFCDocument *self) {
 }
 
 CFCDocument**
-CFCDocument_get_registry() {
+CFCDocument_get_registry(void) {
     if (registry == NULL) {
         registry = (CFCDocument**)CALLOCATE(1, sizeof(CFCDocument*));
     }

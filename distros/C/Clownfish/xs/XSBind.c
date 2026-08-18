@@ -870,7 +870,7 @@ cfish_Err_init_class(void) {
 }
 
 cfish_Err*
-cfish_Err_get_error() {
+cfish_Err_get_error(void) {
     dTHX;
     dSP;
     ENTER;
@@ -1193,7 +1193,7 @@ cfish_TestUtils_clone_host_runtime() {
 
 void
 cfish_TestUtils_set_host_runtime(void *runtime) {
-    PERL_SET_CONTEXT(runtime);
+    PERL_SET_CONTEXT((PerlInterpreter*)runtime);
 }
 
 void
@@ -1218,7 +1218,7 @@ cfish_TestUtils_destroy_host_runtime(void *runtime) {
 #else /* CFISH_NOTHREADS */
 
 void*
-cfish_TestUtils_clone_host_runtime() {
+cfish_TestUtils_clone_host_runtime(void) {
     CFISH_THROW(CFISH_ERR, "No thread support");
     CFISH_UNREACHABLE_RETURN(void*);
 }

@@ -7,8 +7,9 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '7.12'
+  PDL: '2.105'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,11 +21,11 @@ no_index:
     - inc
 requires:
   File::Temp: '0'
-  PDL: '2.089'
+  PDL: '2.105'
   Time::HiRes: '0'
 resources:
   bugtracker: https://github.com/PDLPorters/PDL-Graphics-Simple/issues
   homepage: https://github.com/PDLPorters/PDL-Graphics-Simple
   repository: git://github.com/PDLPorters/PDL-Graphics-Simple.git
-version: '1.016'
+version: '1.017'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

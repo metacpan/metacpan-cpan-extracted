@@ -52,7 +52,7 @@ WriteMakefile(
         },
         resources => {
             bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth',
-            repository => 'https://github.com/keeth/Net-OAuth.git',
+            repository => 'https://github.com/vurtdev/Net-OAuth.git',
         },
     },
 );

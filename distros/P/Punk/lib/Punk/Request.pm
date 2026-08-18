@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.17';
 
 1;
 
@@ -39,6 +39,14 @@ Constructed by the dispatcher; wraps the PSGI environment.
 =head2 path
 
 The raw environment, request method and path (C</> when empty).
+
+=head2 address
+
+The client's address: C<REMOTE_ADDR>. On a directly-exposed application that
+is the socket peer. Behind a reverse proxy with the C<proxy> keyword in force
+it is the resolved client, because L<Punk> rewrites the env key rather than
+adding a second one - see L<Punk/proxy>. The connecting address is then
+available as C<< $c->env->{'punk.peer_addr'} >>.
 
 =head2 header($name)
 

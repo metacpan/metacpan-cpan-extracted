@@ -286,6 +286,9 @@ t/37-psgi-api.t
 t/36-pagi-api.t
 t/38-start-html-style-extend.t
 t/39-errdump-object-format.t
+t/40-node-helpers.t
+t/41-api-router-cache.t
+t/42-eval-require.t
 t/alpine.psp                             
 t/apache_harness_helper.pm
 t/api_bare.psp                           

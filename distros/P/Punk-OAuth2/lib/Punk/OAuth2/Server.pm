@@ -7,7 +7,7 @@ use warnings;
 use Punk::OAuth2;
 use Punk::OAuth2::Server::Store;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 

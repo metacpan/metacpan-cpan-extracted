@@ -2,7 +2,7 @@ package PDF::Make::Markup::Render;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # No logic lives here. The engine-version gate and the three-stage chain -
 # profile, parse, build - are in xs/markup_render.xs. The build stage is the

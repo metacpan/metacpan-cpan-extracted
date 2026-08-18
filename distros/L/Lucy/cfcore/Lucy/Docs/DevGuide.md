@@ -1,6 +1,6 @@
-# Quick-start guide to hacking on Apache Lucy.
+# Quick-start guide to hacking on Lucy.
 
-The Apache Lucy code base is organized into roughly four layers:
+The Lucy code base is organized into roughly four layers:
 
 * Charmonizer - compiler and OS configuration probing.
 * Clownfish - header files.

@@ -1,0 +1,24 @@
+# the SHELL defaults to /bin/sh which may vary depending on OS
+SHELL=/bin/bash
+# quiet calling of make internally
+MAKEFLAGS += --no-print-directory
+
+.PHONY: help
+help: ## View this help
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-24s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: clean
+clean: ## Clean repo
+	./Build distclean
+
+.PHONY: release
+release: ## Build a CPAN release package
+	./Build dist
+
+.PHONY: build
+build: ## Build app
+	./Build
+
+.PHONY: setup
+setup: ## Init the build env
+	perl Build.pl

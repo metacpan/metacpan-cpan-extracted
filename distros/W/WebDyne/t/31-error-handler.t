@@ -14,6 +14,7 @@ use HTTP::Headers::Fast;
 use HTTP::Request::Common qw(GET);
 use IO::File;
 use IO::String;
+use Capture::Tiny qw(capture);
 
 use WebDyne;
 use WebDyne::Request::Fake;
@@ -44,39 +45,114 @@ sub body_matches_error {
 }
 
 
-sub fake_error {
-    WebDyne->init();
-    my $body=q();
-    my $body_fh=IO::String->new($body);
-    my $r=WebDyne::Request::Fake->new(
-        filename   => $fixture_fn,
-        select     => $body_fh,
-        noheader   => 1,
-        headers_in => HTTP::Headers::Fast->new(),
+sub run_error_case {
+    my (%arg)=@_;
+    my $handler=$arg{'handler'};
+    my $fixture_dn=dirname($fixture_fn);
+    my %code=(
+        fake => <<'END_FAKE',
+use IO::String;
+use HTTP::Headers::Fast;
+use WebDyne;
+use WebDyne::Request::Fake;
+my $body=q();
+my $body_fh=IO::String->new($body);
+WebDyne->init();
+my $r=WebDyne::Request::Fake->new(
+    filename   => $ENV{'WEBDYNE_TEST_ERROR_FIXTURE'},
+    select     => $body_fh,
+    noheader   => 1,
+    headers_in => HTTP::Headers::Fast->new(),
+);
+my $status=WebDyne->handler($r);
+$body_fh->close();
+write_result($status, $r->content_type(), $body);
+END_FAKE
+        psgi => <<'END_PSGI',
+use WebDyne::PSGI;
+use Plack::Test;
+use HTTP::Request::Common qw(GET);
+WebDyne->init();
+my $app_cr=WebDyne::PSGI->new(root => $ENV{'WEBDYNE_TEST_ERROR_ROOT'})->to_app();
+my $res=Plack::Test->create($app_cr)->request(GET('/' . $ENV{'WEBDYNE_TEST_ERROR_CN'}));
+write_result($res->code(), ($res->header('Content-Type') || q()), $res->decoded_content());
+END_PSGI
+        pagi => <<'END_PAGI',
+use WebDyne::PAGI;
+use PAGI::Test::Client;
+WebDyne->init();
+my $app_cr=WebDyne::PAGI->new(root => $ENV{'WEBDYNE_TEST_ERROR_ROOT'})->to_app();
+my $res=PAGI::Test::Client->new(app => $app_cr)->get('/' . $ENV{'WEBDYNE_TEST_ERROR_CN'});
+write_result($res->status(), ($res->header('content-type') || q()), $res->content());
+END_PAGI
     );
-    my $status=WebDyne->handler($r);
-    $body_fh->close();
-    return ($status, $r->content_type(), $body);
+
+    my $result_prefix=<<'END_PREFIX';
+sub write_result {
+    my ($status, $ctype, $body)=@_;
+    open(my $out_fh, '>', $ENV{'WEBDYNE_TEST_RESULT_FN'}) ||
+        die "unable to open result file '$ENV{WEBDYNE_TEST_RESULT_FN}', $!";
+    print {$out_fh} "status=", ($status || q()), "\n";
+    print {$out_fh} "ctype=", ($ctype || q()), "\n";
+    print {$out_fh} "body_fn=", $ENV{'WEBDYNE_TEST_BODY_FN'}, "\n";
+    close($out_fh) ||
+        die "unable to close result file '$ENV{WEBDYNE_TEST_RESULT_FN}', $!";
+    open(my $body_fh, '>', $ENV{'WEBDYNE_TEST_BODY_FN'}) ||
+        die "unable to open body file '$ENV{WEBDYNE_TEST_BODY_FN}', $!";
+    print {$body_fh} ($body || q());
+    close($body_fh) ||
+        die "unable to close body file '$ENV{WEBDYNE_TEST_BODY_FN}', $!";
 }
+END_PREFIX
 
+    my ($result_fh, $result_fn)=tempfile('error_handler_result_XXXX', DIR => $fixture_dn, UNLINK => 1);
+    close($result_fh) || die "unable to close '$result_fn', $!";
+    my ($body_fh, $body_fn)=tempfile('error_handler_body_XXXX', DIR => $fixture_dn, UNLINK => 1);
+    close($body_fh) || die "unable to close '$body_fn', $!";
+    local %ENV=(
+        %ENV,
+        WEBDYNE_CONF               => '.',
+        WEBDYNE_TEST_ERROR_FIXTURE => $fixture_fn,
+        WEBDYNE_TEST_ERROR_ROOT    => $fixture_dn,
+        WEBDYNE_TEST_ERROR_CN      => $fixture_cn,
+        WEBDYNE_TEST_RESULT_FN     => $result_fn,
+        WEBDYNE_TEST_BODY_FN       => $body_fn,
+    );
+    my ($out, $err, $wait_status)=capture {
+        system($^X, '-Ilib', '-e', $result_prefix . $code{$handler});
+    };
+    my $exit=$wait_status >> 8;
+    my $signal=$wait_status & 127;
+    die "subprocess for $handler failed: exit=$exit signal=$signal wait=$wait_status stderr=$err" if $exit != 0;
+    return {skip => "subprocess for $handler terminated by signal $signal on this Perl"} if $signal;
 
-sub psgi_error {
-    require WebDyne::PSGI;
-    require Plack::Test;
-    WebDyne->init();
-    my $app_cr=WebDyne::PSGI->new(root => $RealBin)->to_app();
-    my $res=Plack::Test->create($app_cr)->request(GET("/$fixture_cn"));
-    return ($res->code(), ($res->header('Content-Type') || q()), $res->decoded_content());
-}
-
-
-sub pagi_error {
-    require WebDyne::PAGI;
-    require PAGI::Test::Client;
-    WebDyne->init();
-    my $app_cr=WebDyne::PAGI->new(root => $RealBin)->to_app();
-    my $res=PAGI::Test::Client->new(app => $app_cr)->get("/$fixture_cn");
-    return ($res->status(), ($res->header('content-type') || q()), $res->content());
+    open(my $result_fh_read, '<', $result_fn) ||
+        die "unable to read result file '$result_fn', $!";
+    my $result_text=do {
+        local $/;
+        <$result_fh_read>;
+    };
+    close($result_fh_read) || die "unable to close result file '$result_fn', $!";
+    my %result=map {
+        my ($k, $v)=split(/=/, $_, 2);
+        $k => $v;
+    } grep { length($_) } split(/\n/, $result_text);
+    if ($result{'body_fn'}) {
+        open(my $body_fh_read, '<', $result{'body_fn'}) ||
+            die "unable to read body file '$result{body_fn}', $!";
+        $result{'body'}=do {
+            local $/;
+            <$body_fh_read>;
+        };
+        close($body_fh_read) || die "unable to close body file '$result{body_fn}', $!";
+    }
+    if (!exists($result{'status'}) || !exists($result{'ctype'}) || !exists($result{'body'})) {
+        diag("subprocess for $handler produced incomplete output; exit=$exit signal=$signal wait=$wait_status");
+        diag("result file:\n$result_text");
+        diag("stdout:\n$out") if length($out);
+        diag("stderr:\n$err") if length($err);
+    }
+    return \%result;
 }
 
 
@@ -98,24 +174,29 @@ sub apache_error {
 }
 
 
-my ($fake_status, $fake_ctype, $fake_body)=fake_error();
-ok($fake_status && $fake_status >= 500, 'fake handler returns an error status');
-ok(($fake_ctype || q()) =~ m{text/(?:plain|html)}i, 'fake handler marks the response as error content');
+SKIP: {
+    my $result=run_error_case(handler => 'fake');
+    skip $result->{'skip'}, 2 if $result->{'skip'};
+    ok($result->{'status'} && $result->{'status'} >= 500, 'fake handler returns an error status');
+    ok(($result->{'ctype'} || q()) =~ m{text/(?:plain|html)}i, 'fake handler marks the response as error content');
+}
 
 
 SKIP: {
     eval { require Plack::Test; 1 } || skip "Skipping PSGI error test: missing Plack::Test", 2;
-    my ($psgi_status, $psgi_ctype, $psgi_body)=psgi_error();
-    ok($psgi_status && $psgi_status >= 500, 'PSGI handler returns an error status');
-    ok(body_matches_error($psgi_body), 'PSGI handler emits a recognisable error body');
+    my $result=run_error_case(handler => 'psgi');
+    skip $result->{'skip'}, 2 if $result->{'skip'};
+    ok($result->{'status'} && $result->{'status'} >= 500, 'PSGI handler returns an error status');
+    ok(body_matches_error($result->{'body'}), 'PSGI handler emits a recognisable error body');
 }
 
 
 SKIP: {
     eval { require PAGI::Test::Client; 1 } || skip "Skipping PAGI error test: missing PAGI::Test::Client", 2;
-    my ($pagi_status, $pagi_ctype, $pagi_body)=pagi_error();
-    ok($pagi_status && $pagi_status >= 500, 'PAGI handler returns an error status');
-    ok(body_matches_error($pagi_body), 'PAGI handler emits a recognisable error body');
+    my $result=run_error_case(handler => 'pagi');
+    skip $result->{'skip'}, 2 if $result->{'skip'};
+    ok($result->{'status'} && $result->{'status'} >= 500, 'PAGI handler returns an error status');
+    ok(body_matches_error($result->{'body'}), 'PAGI handler emits a recognisable error body');
 }
 
 

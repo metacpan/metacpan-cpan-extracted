@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.436';
+   our $VERSION = '0.437';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Real $VERSION;
@@ -36,13 +36,13 @@ use strict;
     $^W = 0;
   }
 
-  use overload (
-    'x' => sub {
-      !(grep ref($_) && !$_->type->real, @_[0,1])
-        ? PDL::mmult($_[0], $_[1])
-        : PDL::cmmult($_[0], $_[1])
-    },
-  );
+  sub overload_mmult {
+    !(grep ref($_) && !$_->type->real, @_[0,1])
+      ? PDL::mmult($_[0], $_[1])
+      : PDL::cmmult($_[0], $_[1])
+  }
+  use overload
+    'x' => \&overload_mmult;
 
   BEGIN{ $^W = $warningFlag;}
 }

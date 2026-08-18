@@ -1,5 +1,16 @@
 Revision history for Eshu
 
+0.14	2026-08-17
+	- Eshu.xs moves back to the top of the dist and the build drops
+	  XSMULTI. 
+	- indent_dir() reports child paths joined with the separator the
+	  caller's own path used, rather than always a forward slash.
+	- The walk no longer descends into a Windows junction or directory
+	  symlink. stat() cannot tell one from a real directory and S_ISLNK
+	  is a constant 0 there, so the reparse point is now read from the
+	  file attributes, matching the POSIX behaviour of not following a
+	  symlinked directory.
+
 0.13	2026-08-16
 	- The Windows directory shim renaming EshuDIR / eshu_opendir / eshu_readdir /
 	  eshu_closedir, self-contained on FindFirstFile (kernel32), and

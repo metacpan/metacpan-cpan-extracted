@@ -1,5 +1,6 @@
 #!perl
-use v5.36;
+use v5.26;
+use warnings;
 use Test::More;
 
 do_tests();
@@ -22,7 +23,7 @@ sub do_tests {
       my $el = $t2 - $t1;
       my $el_rnd = sprintf('%.4f', $el);
       ok(
-        ($interval*0.8 < $el < $interval*1.2 and $interval-0.2 < $el < $interval+0.2),
+        ($interval*0.8 < $el && $el < $interval*1.2 && $interval-0.2 < $el && $el < $interval+0.2),
         "Sleep for $interval seconds +/-20% +/-0.2s (actual: $el_rnd)"
       );
     }

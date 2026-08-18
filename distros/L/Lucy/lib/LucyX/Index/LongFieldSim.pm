@@ -18,7 +18,7 @@ use warnings;
 
 package LucyX::Index::LongFieldSim;
 use base qw( Lucy::Index::Similarity );
-our $VERSION = '0.006002';
+our $VERSION = '0.007000';
 $VERSION = eval $VERSION;
 
 sub length_norm {
@@ -46,7 +46,7 @@ LucyX::Index::LongFieldSim - Similarity optimized for long fields.
 
 =head1 DESCRIPTION
 
-Apache Lucy's default L<Similarity|Lucy::Index::Similarity>
+Lucy's default L<Similarity|Lucy::Index::Similarity>
 implmentation produces a bias towards extremely short fields.
 
     Lucy::Index::Similarity

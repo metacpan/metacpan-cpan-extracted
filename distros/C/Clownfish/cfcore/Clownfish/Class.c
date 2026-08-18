@@ -279,7 +279,7 @@ Class_Get_Methods_IMP(Class *self) {
 }
 
 void
-Class_init_registry() {
+Class_init_registry(void) {
     LockFreeRegistry *reg = LFReg_new(256);
     if (Atomic_cas_ptr((void*volatile*)&Class_registry, NULL, reg)) {
         return;

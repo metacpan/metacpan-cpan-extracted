@@ -1,5 +1,14 @@
 Revision history for Socket
 
+2.042   2026-08-17
+        [CHANGES]
+         * Provide also a `gai_strerror` to go with `getaddrinfo` and
+           `getnameinfo`
+
+        [BUGFIXES]
+         * Skip `getaddrinfo` test on "ftp" service if legacy resolver does
+           not have an answer for that service name
+
 2.041   2026-03-26
         [CHANGES]
          * Modernise Pod documentation formatting

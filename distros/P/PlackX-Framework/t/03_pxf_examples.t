@@ -1,5 +1,7 @@
 #!perl
-use v5.36;
+use v5.26;
+use warnings;
+use experimental 'signatures';
 use Test::More;
 
 do_tests();
@@ -23,7 +25,7 @@ sub do_tests {
       'app loaded correctly and is a coderef'
     );
 
-     $test_env = test_env();
+    $test_env = test_env();
     $response = $app->($test_env);
 
     ok(

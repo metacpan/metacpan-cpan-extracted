@@ -476,7 +476,7 @@ S_write_module_file(CFCPython *self, CFCParcel *parcel, const char *dest) {
                                        "\n", NULL);
             const char *prefix = CFCParcel_get_prefix(parcels[i]);
             parcel_boots = CFCUtil_cat(parcel_boots, "    ", prefix,
-                                       "bootstrap_parcel();\n", NULL);
+                                       "bootstrap_parcel(void);\n", NULL);
         }
     }
 

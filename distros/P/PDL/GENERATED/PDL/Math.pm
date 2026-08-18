@@ -3,7 +3,7 @@
 #
 package PDL::Math;
 
-our @EXPORT_OK = qw(acos asin atan cosh sinh tan tanh ceil floor rint pow acosh asinh atanh erf erfc bessj0 bessj1 bessy0 bessy1 bessjn bessyn lgamma isfinite erfi ndtri polyroots polyfromroots polyval csqrt clog cacos casin cacosh catanh csqrt_up );
+our @EXPORT_OK = qw(acos asin atan cosh sinh tan tanh ceil floor rint pow acosh asinh atanh erf erfc bessj0 bessj1 bessy0 bessy1 bessjn bessyn lgamma isfinite erfi ndtri polyroots polyfromroots polyval csqrt clog cacos casin casinh cacosh catanh csqrt_up );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -1195,7 +1195,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 366 "lib/PDL/Math.pd"
+#line 367 "lib/PDL/Math.pd"
 sub PDL::polyroots {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -1260,7 +1260,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 415 "lib/PDL/Math.pd"
+#line 416 "lib/PDL/Math.pd"
 sub PDL::polyfromroots {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -1325,7 +1325,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 464 "lib/PDL/Math.pd"
+#line 465 "lib/PDL/Math.pd"
 sub PDL::polyval {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -1522,6 +1522,47 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+=head2 casinh
+
+=for sig
+
+ Signature: (i(); complex [o] o())
+ Types: (float ldouble cfloat cdouble cldouble double)
+
+=for usage
+
+ $o = casinh($i);
+ casinh($i, $o);  # all arguments given
+ $o = $i->casinh; # method call
+ $i->casinh($o);
+
+=for ref
+
+Takes real or complex data, returns the complex C<asinh>.
+
+Added in 2.099.
+
+=pod
+
+Broadcasts over its inputs.
+
+=for bad
+
+C<casinh> does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*casinh = \&PDL::casinh;
+
+
+
+
+
+
 =head2 cacosh
 
 =for sig
@@ -1644,7 +1685,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 539 "lib/PDL/Math.pd"
+#line 540 "lib/PDL/Math.pd"
 
 =head1 AUTHOR
 
@@ -1660,11 +1701,12 @@ the PDL copyright notice should be included in the file.
 
 =cut
 
-#line 559 "lib/PDL/Math.pd"
+#line 560 "lib/PDL/Math.pd"
 our %got_complex = (
   acos => 1,
   acosh => 1,
   asin => 1,
+  asinh => 1,
   atan => 1,
   atanh => 1,
   cosh => 1,
@@ -1675,7 +1717,7 @@ our %got_complex = (
   tan => 1,
   tanh => 1,
 );
-#line 1679 "lib/PDL/Math.pm"
+#line 1721 "lib/PDL/Math.pm"
 
 # Exit with OK status
 

@@ -6,7 +6,7 @@ use warnings;
 use Carp ();
 use Fetch;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Reverse::Proxy', $VERSION);
@@ -26,7 +26,7 @@ Reverse::Proxy - a generic, non-blocking PSGI reverse proxy
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,28 @@ C<Connection> header names) are stripped in both directions; C<X-Forwarded-For>,
 C<X-Forwarded-Proto> and C<X-Forwarded-Host> are appended; multi-valued response
 headers such as C<Set-Cookie> are preserved; and an unreachable or failing
 upstream yields a C<502>.
+
+=head2 The forwarded request target
+
+C<PATH_INFO> reaches a PSGI application percent-B<decoded>, and the request
+target is written into a request line that terminates at the first space or
+CRLF. So the path is re-encoded on the way out: any byte at or below C<0x20>,
+C<0x7f> and above, and C<%>, C<#> and C<?> go back to C<%XX>.
+
+That is a security boundary, not tidiness. Forwarding the decoded bytes
+verbatim would let a client whose URL contains C<%0d%0a> end the request line
+and write a second, complete request onto the upstream connection - request
+smuggling, past whatever the proxy in front of it enforces. Re-encoding rather
+than rejecting also means a path that decoded to a space is still forwarded as
+the path that was asked for.
+
+C<QUERY_STRING> is B<not> decoded by the PSGI spec, so it is forwarded byte for
+byte, with the same control-byte encoding applied and nothing else.
+
+One thing the encoding cannot restore: a C<%2F> in the client's URL is already
+a plain C</> by the time any PSGI application sees it, so an upstream that
+distinguishes the two cannot be told apart through this or any other PSGI
+proxy.
 
 =head1 CONSTRUCTOR
 

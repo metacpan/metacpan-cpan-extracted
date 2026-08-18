@@ -47,7 +47,7 @@ it under the same terms as Perl itself.
 
 # OVERVIEW
 
-OcToolkit (short for Open Cloud Toolkit) is a Perl module designed for managing Openshift (and Kubernetes) projects, with added support for multi-cluster workflows. It incudes Buids/BuildConfigs so you can use one tool for uploading your project to the Cloud.  
+OcToolkit (short for Open Cloud Toolkit) is a Perl module designed for managing Openshift (and Kubernetes) projects, with added support for multi-cluster workflows. It includes Buids/BuildConfigs so you can use one tool for uploading your whole project to the Cloud. 
 
 # KEY FEATURES AND FUNCTIONALITY
 
@@ -67,7 +67,7 @@ Default values for directories and commands (e.g., `oc` or, in advanced mode, `k
 
     Compares live cluster resources to offline templates using `oc get`, computes diffs, and logs the status `OK` or `MODIFIED`.
 
-- **upgrade(instance)**
+- **update(instance)**
 
     Deletes and recreates modified resources, handling some types like PersistentVolumeClaims cautiously.
 
@@ -124,7 +124,7 @@ Here's the typical flow from the module's documentation:
 
     $ocObj->install('testInstance');
     $ocObj->validate('testInstance');
-    $ocObj->upgrade('testInstance');
+    $ocObj->update('testInstance');
     $ocObj->backup('production');
     $ocObj->delete('devInstance');
 
@@ -136,7 +136,7 @@ Here's the typical flow from the module's documentation:
 
 - **Full lifecycle support**
 
-    Can install, validate, upgrade, backup, and delete Openshift/Kubernetes resources.
+    Can install, validate, update, backup, and delete Openshift/Kubernetes resources.
 
 - **Multi-cluster aware**
 

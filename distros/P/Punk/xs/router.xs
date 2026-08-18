@@ -147,3 +147,46 @@ DESTROY(self)
         if (SvROK(self) && SvIOK(SvRV(self)))
             pr_free(aTHX_ punk_router_of(aTHX_ self));
     }
+
+MODULE = Punk        PACKAGE = Punk::Proxy
+
+PROTOTYPES: DISABLE
+
+# Punk::Proxy is the compiled `proxy` trust policy: a blessed IV-ref to a
+# pp_policy (punk_proxy.h), built once at to_app and read by pp_resolve at
+# the top of every request. There is no other method - the object exists so
+# the struct is freed with the compiled application.
+
+void
+DESTROY(self)
+        SV *self
+    CODE:
+    {
+        if (SvROK(self) && SvIOK(SvRV(self)))
+            pp_free(aTHX_ (pp_policy *)INT2PTR(void *, SvIV(SvRV(self))));
+    }
+
+# _client($xff, $peer, $trust): the hop walk alone, for t/61-proxy-parse.t.
+# $trust is a hop count, an arrayref of CIDRs, or 'all' - the same shapes the
+# keyword takes, compiled fresh per call. Author-facing, not documented.
+SV *
+_client(xff, peer, trust)
+        SV *xff
+        SV *peer
+        SV *trust
+    CODE:
+    {
+        HV *cfg = (HV *)sv_2mortal((SV *)newHV());
+        pp_policy *p;
+        STRLEN xl = 0, pl = 0, cl = 0;
+        const char *x = SvOK(xff)  ? SvPV_const(xff, xl)  : NULL;
+        const char *r = SvOK(peer) ? SvPV_const(peer, pl) : "";
+        const char *c;
+        (void)hv_stores(cfg, "trust", newSVsv(trust));
+        p = pp_compile(aTHX_ cfg, "development");
+        c = pp_xff_client(x, xl, p, r, pl, &cl);
+        RETVAL = newSVpvn(c, cl);
+        pp_free(aTHX_ p);
+    }
+    OUTPUT:
+        RETVAL

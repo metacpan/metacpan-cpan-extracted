@@ -19,7 +19,7 @@ it q (loads helper into the package named by into =>)
 
 it q (does not define helper symbols in the caller's own namespace)
 	=> got    { require::relative::->import (q (fixtures/explicit-into/test-case.pl)) }
-	=> expect => ! expect_helper_function (q (main::explicit_into_helper_loaded))
+	=> expect => do_not_expect_helper_function (q (main::explicit_into_helper_loaded))
 	;
 
 had_no_warnings;

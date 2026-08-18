@@ -18,7 +18,7 @@ use warnings;
 
 package LucyX::Remote::SearchClient;
 BEGIN { our @ISA = qw( Lucy::Search::Searcher ) }
-our $VERSION = '0.006002';
+our $VERSION = '0.007000';
 $VERSION = eval $VERSION;
 use Carp;
 use Storable qw( nfreeze thaw );

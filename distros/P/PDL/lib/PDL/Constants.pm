@@ -24,7 +24,7 @@ $VERSION = eval $VERSION;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(PI DEGRAD E I J);  # symbols to export
+our @EXPORT_OK = qw(PI DEGRAD E DEG2RAD RAD2DEG);
 
 use PDL::Lite;
 
@@ -43,6 +43,26 @@ The number of degrees of arc per radian (180/PI)
 =cut
 
 use constant DEGRAD => 180/PI;
+
+=head2 DEG2RAD
+
+The constant to convert degrees of arc into radians (PI/180)
+
+  $radians = DEG2RAD * $degrees;
+
+=cut
+
+use constant DEG2RAD => PI/180;
+
+=head2 RAD2DEG
+
+The constant to convert radians into degrees of arc (180/PI)
+
+  $degrees = RAD2DEG * $radians;
+
+=cut
+
+use constant RAD2DEG => 180/PI;
 
 =head2 E
 

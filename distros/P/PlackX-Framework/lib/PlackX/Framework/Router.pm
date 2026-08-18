@@ -1,4 +1,6 @@
-use v5.36;
+use v5.26;
+use warnings;
+use experimental 'signatures';
 package PlackX::Framework::Router {
   use Carp ();
 
@@ -177,7 +179,7 @@ PlackX::Framework::Router - Parse routes and export DSL for PXF apps
     package My::App::Controller {
       use My::App::Router;
 
-      request_base '/myapp';
+      base '/myapp';
 
       filter before => sub ($request, $resp) { ... }
 
@@ -247,7 +249,7 @@ object, processing will stop and the response will be rendered.
 
 =over 4
 
-=item request_base $STRING;
+=item base $STRING;
 
 Set the base URI path for all subsequent routes defined in the current package.
 

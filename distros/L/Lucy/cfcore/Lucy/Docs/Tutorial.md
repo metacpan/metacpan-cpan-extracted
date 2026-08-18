@@ -1,6 +1,6 @@
-# Step-by-step introduction to Apache Lucy.
+# Step-by-step introduction to Lucy.
 
-Explore Apache Lucy's basic functionality by starting with a minimalist CGI
+Explore Lucy's basic functionality by starting with a minimalist CGI
 search app based on Lucy::Simple and transforming it, step by step,
 into an "advanced search" interface utilizing more flexible core modules like
 [](cfish:lucy.Indexer) and [](cfish:lucy.IndexSearcher).

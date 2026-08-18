@@ -25,13 +25,13 @@ produces output
     de Fehlerstrom-Schutzschalter
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.06/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.07/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Table::Readable version 0.06
-corresponding to git commit L<e3e702ffac5414333ca3dadcfab0129b1162d578|https://github.com/benkasminbullock/Table-Readable/commit/e3e702ffac5414333ca3dadcfab0129b1162d578> released on Mon Aug 3 13:43:17 2026 +0900.
+This documents Table::Readable version 0.07
+corresponding to git commit L<d22f9bfccf5e16259afac966c7d8d761a93cb60a|https://github.com/benkasminbullock/Table-Readable/commit/d22f9bfccf5e16259afac966c7d8d761a93cb60a> released on Tue Aug 18 12:49:12 2026 +0900.
 
 =head1 DESCRIPTION
 
@@ -133,6 +133,13 @@ hash reference using the key specified as the second argument. If some
 entries of the table do not have the specified key, or if some entries
 have the same value for the key, warnings are printed.
 
+=head2 replace
+
+    replace($file, \%old, \%new);
+
+Look for C<%old> in C<$file> and replace it with C<%new>. If C<%old>
+does not match anything in C<$file>, it prints a warning and returns.
+
 =head2 sort_file
 
     sort_file ($file, $tag);
@@ -213,7 +220,7 @@ produces output
     2
 
 
-(This example is included as L<F<comment-not-row.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.06/examples/comment-not-row.pl> in the distribution.)
+(This example is included as L<F<comment-not-row.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.07/examples/comment-not-row.pl> in the distribution.)
 
 
 =head2 Encoding
@@ -295,7 +302,7 @@ produces output
     d'
 
 
-(This example is included as L<F<slash.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.06/examples/slash.pl> in the distribution.)
+(This example is included as L<F<slash.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.07/examples/slash.pl> in the distribution.)
 
 
 If you actually need a backslash at the start or end of your string,
@@ -340,7 +347,7 @@ produces output
     'a' = 'b'
 
 
-(This example is included as L<F<whitespace.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.06/examples/whitespace.pl> in the distribution.)
+(This example is included as L<F<whitespace.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.07/examples/whitespace.pl> in the distribution.)
 
 
 =head3 Empty values

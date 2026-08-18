@@ -1,4 +1,4 @@
-package LedgerSMB::Installer v0.999.11;
+package LedgerSMB::Installer v0.999.13;
 
 use v5.20;
 use experimental qw(signatures);
@@ -187,6 +187,9 @@ sub _compute_all_deps($class, $config) {
         my $r = $http->request( 'POST', 'https://fastapi.metacpan.org/v1/release/_search?size=1000',
                                 { headers => { 'Content-Type' => 'application/json' },
                                   content => $body });
+        unless ($r->{success}) {
+            die "Unable to request module dependencies; POST request failed for https://fastapi.metacpan.org/v1/release/_search, response: $r->{status} - $r->{reason}";
+        }
         my $hits = $json->decode($r->{content})->{hits};
 
         for my $release ($hits->{hits}->@*) {

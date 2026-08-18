@@ -98,6 +98,7 @@ struct hm_conn {
     unsigned char tls_r_wants_w;  /* SSL_read blocked wanting write  */
     unsigned char tls_w_wants_r;  /* SSL_write blocked wanting read  */
     unsigned char detached;       /* app took the socket (see hm_detach) */
+    unsigned char accepts_gzip;   /* this request's Accept-Encoding    */
     hm_bsrc  bsrc;          /* streaming body being dripped, if any */
     int      last_status;   /* last response status/bytes (logging) */
     size_t   last_blen;
@@ -164,6 +165,10 @@ struct hm_loop {
     double      header_timeout;
     int         max_pipeline;       /* fairness: requests per conn per wakeup */
     size_t      max_read;           /* request size ceiling (headers + body) */
+    int         compress;          /* gzip responses (0 = off, the default) */
+    size_t      compress_min;      /* below this, gzip buys nothing         */
+    int         compress_level;    /* gzip level; HZ_LEVEL by default       */
+    SV         *compress_types;    /* AV of extra compressible media types  */
     SV         *self_sv;            /* cached psgix.loop wrapper */
     SV         *log_cb;             /* access_log coderef, or NULL */
     int         log_fd;             /* fast access-log fd (C writer), or -1 */
@@ -585,7 +590,7 @@ static int hm_hav_clen(pTHX_ AV *hav, UV *out) {
         const char *ks;
         if (!k || !*k) continue;
         ks = SvPV(*k, kl);
-        if (kl == 14 && strncasecmp(ks, "Content-Length", 14) == 0) {
+        if (kl == 14 && hm_strncasecmp(ks, "Content-Length", 14) == 0) {
             SV **v = av_fetch(hav, i + 1, 0);
             if (v && *v && SvOK(*v)) {
                 *out = (UV)SvUV(*v);
@@ -804,7 +809,7 @@ static const char *hm_find_header(const char *head, size_t headlen,
         size_t len = eol ? (size_t)(eol - p) : (size_t)(hend - p);
         const char *colon = (const char *)memchr(p, ':', len);
         if (colon && (size_t)(colon - p) == nlen
-            && strncasecmp(p, name, nlen) == 0) {
+            && hm_strncasecmp(p, name, nlen) == 0) {
             const char *v = colon + 1;
             size_t vl = (size_t)((p + len) - v);
             while (vl && (*v == ' ' || *v == '\t')) { v++; vl--; }
@@ -822,7 +827,7 @@ static int hm_ci_contains(const char *hay, size_t hl, const char *needle) {
     size_t nl = strlen(needle), i;
     if (nl > hl) return 0;
     for (i = 0; i + nl <= hl; i++)
-        if (strncasecmp(hay + i, needle, nl) == 0) return 1;
+        if (hm_strncasecmp(hay + i, needle, nl) == 0) return 1;
     return 0;
 }
 
@@ -1054,6 +1059,10 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
     if (c->ssl) hm_tls_env(aTHX_ c, env);
 
     c->keepalive = (plen == 8 && memcmp(proto, "HTTP/1.1", 8) == 0);
+    /* Per request, not per connection: a keep-alive connection may send a
+     * different Accept-Encoding on its next request, and the response path
+     * has no env to read by the time it needs this. One bit, set below. */
+    c->accepts_gzip = 0;
 
     /* header lines, from the framing pass's index (no rescan) */
     char keybuf[300];
@@ -1084,6 +1093,14 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
                 keybuf[5 + i] = (char)ch;
             }
         }
+        /* Accept-Encoding is answered on this one pass and remembered as a
+         * bit on the connection: hm_queue_response has no env to consult by
+         * the time it must decide. Not an arm of the chain below - the
+         * header is still stored as HTTP_ACCEPT_ENCODING like any other. */
+        if (nk == 15 && p[6] == '-' && c->loop->compress
+            && memEQ(keybuf + 5, "ACCEPT_ENCODING", 15))
+            c->accepts_gzip = (unsigned char)hz_accepts_gzip(vp, nv);
+
         if (nk == 14 && p[7] == '-' && memEQ(keybuf + 5, "CONTENT_LENGTH", 14)) {
             hm_env_store(env, HMK_CONTENT_LENGTH, newSVpvn(vp, nv));
             have_cl = 1;
@@ -1120,8 +1137,8 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
             }
             /* the name is already canonical; only the value keeps wire case */
             if (nk == 10 && memEQ(keybuf + 5, "CONNECTION", 10)) {
-                if (nv >= 5 && strncasecmp(vp, "close", 5) == 0) c->keepalive = 0;
-                else if (nv >= 10 && strncasecmp(vp, "keep-alive", 10) == 0) c->keepalive = 1;
+                if (nv >= 5 && hm_strncasecmp(vp, "close", 5) == 0) c->keepalive = 0;
+                else if (nv >= 10 && hm_strncasecmp(vp, "keep-alive", 10) == 0) c->keepalive = 1;
             }
         }
     }
@@ -1363,6 +1380,7 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
     SV *fh_body = NULL;
     AV *bav = NULL;
     int status = 500, has_len = 0, has_conn = 0;
+    int gz_out = 0;
     size_t blen = 0;
     size_t hdr_start = c->wlen;
     SSize_t bn = 0;
@@ -1407,6 +1425,72 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
         }
     }
 
+    /* ---- compression decision, before a byte of the response is written --
+     * Cheapest test first, and the whole block is skipped on a server that
+     * did not ask for it. The rules, in order:
+     *   1. enabled, and this request accepted gzip
+     *   2. the response carries NO Content-Encoding. This one rule covers
+     *      every hands-off case at once - a framework's precompressed file
+     *      already says `gzip`, an opted-out route says `identity` (which
+     *      we strip below), and anything else was encoded deliberately.
+     *   3. a plain in-memory body, not a glob/reader/streamed source:
+     *      compressing those would undo the 0.20 sendfile and drip paths.
+     *   4. big enough to be worth a gzip member's header and trailer
+     *   5. a status that carries an entity, and never 206 (a range
+     *      describes offsets into the UNCOMPRESSED representation)
+     *   6. a compressible media type, from an allowlist                   */
+    if (loop->compress && c->accepts_gzip && bav && !c->bsrc.kind && !fh_body
+        && blen >= loop->compress_min
+        && (status == 200 || status == 203)) {
+        const char *ct = NULL;
+        STRLEN ctl = 0;
+        int enc_seen = 0;
+        SSize_t i, hn = hav ? av_len(hav) + 1 : 0;
+        for (i = 0; i + 1 < hn; i += 2) {
+            SV **k = av_fetch(hav, i, 0);
+            STRLEN kl;
+            const char *ks;
+            if (!k || !*k) continue;
+            ks = SvPV(*k, kl);
+            if ((ks[0] | 32) != 'c') continue;
+            if (kl == 16 && hm_strncasecmp(ks, "Content-Encoding", 16) == 0) {
+                enc_seen = 1;
+                break;
+            }
+            if (kl == 12 && hm_strncasecmp(ks, "Content-Type", 12) == 0) {
+                SV **v = av_fetch(hav, i + 1, 0);
+                if (v && *v) ct = SvPV(*v, ctl);
+            }
+        }
+        if (!enc_seen && hz_type_ok(ct, ctl)) {
+            /* one contiguous copy of the body, then one deflate */
+            char *flat, *gz = NULL;
+            size_t gzl = 0, off = 0;
+            SSize_t j;
+            Newx(flat, blen ? blen : 1, char);
+            for (j = 0; j < bn; j++) {
+                SV **e = av_fetch(bav, j, 0);
+                if (e) {
+                    STRLEN l;
+                    const char *p = SvPV(*e, l);
+                    if (l) { memcpy(flat + off, p, l); off += l; }
+                }
+            }
+            if (hz_gzip(flat, off, loop->compress_level, &gz, &gzl)) {
+                /* route it down the fh_body path: one SV, one copy into the
+                 * write buffer. A response that just paid a deflate is not
+                 * the one to spend the writev fast path on. */
+                fh_body = newSVpvn(gz, gzl);
+                Safefree(gz);
+                bav = NULL; bn = 0;
+                blen = gzl;
+                c->last_blen = blen;
+                gz_out = 1;
+            }
+            Safefree(flat);
+        }
+    }
+
     /* status line + headers */
     c->last_status = status;
     c->last_blen = blen;
@@ -1426,14 +1510,46 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
             /* both interesting names start with 'c', so one folded-byte test
              * skips the case-blind scans for every other header */
             if ((ks[0] | 32) == 'c') {
-                if (kl == 14 && strncasecmp(ks, "Content-Length", 14) == 0) has_len = 1;
-                if (kl == 10 && strncasecmp(ks, "Connection", 10) == 0)     has_conn = 1;
+                if (kl == 14 && hm_strncasecmp(ks, "Content-Length", 14) == 0) {
+                    has_len = 1;
+                    /* the app's length describes the bytes we just replaced */
+                    if (gz_out) { has_len = 0; continue; }
+                }
+                if (kl == 10 && hm_strncasecmp(ks, "Connection", 10) == 0)     has_conn = 1;
+                /* `identity` is the documented way for anything above to opt
+                 * a response out (see hm_compress.h). It has done its job by
+                 * now; sending it on would be noise. */
+                if (kl == 16 && vl == 8 && loop->compress
+                    && hm_strncasecmp(ks, "Content-Encoding", 16) == 0
+                    && hm_strncasecmp(vs, "identity", 8) == 0)
+                    continue;
+            }
+            /* The layer that compressed must be the layer that fixes the
+             * validator, or a cache serves these bytes to a client that
+             * asked for none. nginx does the same; it is in the POD because
+             * an app author will otherwise find it by debugging. */
+            if (gz_out && kl == 4 && hm_strncasecmp(ks, "ETag", 4) == 0) {
+                hm_wb_put(c, ks, kl);
+                hm_wb_put(c, ": ", 2);
+                if (vl > 1 && vs[vl - 1] == '"') {
+                    hm_wb_put(c, vs, vl - 1);
+                    hm_wb_put(c, "-gzip\"", 6);
+                } else {
+                    hm_wb_put(c, vs, vl);
+                    hm_wb_put(c, "-gzip", 5);
+                }
+                hm_wb_put(c, "\r\n", 2);
+                continue;
             }
             hm_wb_put(c, ks, kl);
             hm_wb_put(c, ": ", 2);
             hm_wb_put(c, vs, vl);
             hm_wb_put(c, "\r\n", 2);
         }
+    }
+    if (gz_out) {
+        hm_wb_put(c, "Content-Encoding: gzip\r\n", 24);
+        hm_wb_put(c, "Vary: Accept-Encoding\r\n", 23);
     }
     /* 1xx/204/304 carry no entity: no Content-Length, no body (RFC 7230) */
     {
@@ -1985,6 +2101,15 @@ static void hm_process(pTHX_ hm_conn *c) {
             size_t enc = 0, dec = 0;
             int r = hm_chunked_scan(c->rbuf + bodystart, c->rlen - bodystart,
                                     &enc, &dec, loop->max_read);
+            if (r == HM_CHUNKED_TOOBIG) {   /* well framed, just too large */
+                static const char e413[] =
+                    "HTTP/1.1 413 Payload Too Large\r\nContent-Length: 0\r\n"
+                    "Connection: close\r\n\r\n";
+                hm_wb_put(c, e413, sizeof(e413) - 1);
+                c->keepalive = 0;
+                c->last_status = 413;
+                break;
+            }
             if (r < 0) {                                 /* malformed chunked */
                 static const char e400[] =
                     "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n"
@@ -2030,7 +2155,7 @@ static void hm_process(pTHX_ hm_conn *c) {
                 static const char resp101[] =
                     "HTTP/1.1 101 Switching Protocols\r\n"
                     "Connection: Upgrade\r\nUpgrade: h2c\r\n\r\n";
-                int is_head = (headlen >= 5 && strncasecmp(c->rbuf, "HEAD ", 5) == 0);
+                int is_head = (headlen >= 5 && hm_strncasecmp(c->rbuf, "HEAD ", 5) == 0);
                 HV *env = hm_build_env(aTHX_ c->rbuf, headlen,
                                        c->rbuf + bodystart, clen, c, hidx, nhl);
                 (void)hv_stores(env, "SERVER_PROTOCOL", newSVpvs("HTTP/2"));
@@ -2139,6 +2264,30 @@ static void hm_readable(pTHX_ hm_conn *c) {
             /* grow for large bodies; unbounded headers are rejected */
             if (c->rcap >= loop->max_read
                 || (c->rlen >= 65536 && !hm_memmem(c->rbuf, c->rlen, "\r\n\r\n", 4))) {
+                /* The buffer is full and may not grow. Until max_body was
+                 * configurable this only happened to a genuinely enormous
+                 * request and a bare close was defensible; now that an
+                 * operator can set the ceiling BELOW the initial buffer
+                 * (HM_RBUF, 16KB), it is the ordinary way an oversize
+                 * request ends - and dropping the connection with no
+                 * response at all would leave every such client staring at
+                 * a timeout rather than a 413. Answer, then close.
+                 *
+                 * Only for a request that at least has a complete header
+                 * block: without one this is a client streaming garbage,
+                 * which has earned nothing but the close it used to get. */
+                if (c->rcap >= loop->max_read
+                    && hm_memmem(c->rbuf, c->rlen, "\r\n\r\n", 4)) {
+                    static const char e413[] =
+                        "HTTP/1.1 413 Payload Too Large\r\nContent-Length: 0\r\n"
+                        "Connection: close\r\n\r\n";
+                    hm_wb_put(c, e413, sizeof(e413) - 1);
+                    c->keepalive = 0;
+                    c->last_status = 413;
+                    c->last_blen = 0;
+                    (void)hm_flush(aTHX_ c);
+                    if (loop->conns[c->fd] != c) return;   /* flush closed it */
+                }
                 hm_close(aTHX_ loop, c);
                 return;
             }
@@ -2494,6 +2643,9 @@ static hm_loop *hm_loop_new(pTHX_ const char *backend_name) {
     loop->header_timeout = 30.0;
     loop->max_pipeline   = 32;
     loop->max_read       = 16 * 1024 * 1024;   /* request ceiling */
+    loop->compress       = 0;                  /* off by default */
+    loop->compress_min   = HZ_MIN_LENGTH;
+    loop->compress_level = HZ_LEVEL;
     loop->shutdown_grace = 30.0;
     return loop;
 }
@@ -2819,6 +2971,11 @@ typedef struct {
     int         nlspecs;
     double      idle_t, header_t, grace;
     int         max_pipe, reuseport, affinity, nworkers;
+    int         compress;
+    size_t      compress_min;
+    int         compress_level;
+    size_t      max_read;          /* request ceiling; 16MB by default    */
+    SV         *compress_types;
     UV          max_requests;
     SV         *log_cb;              /* access_log coderef, or NULL          */
     int         log_fd;             /* fast access-log fd, or -1            */
@@ -2935,6 +3092,12 @@ static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
     if (cfg->max_pipe > 0) loop->max_pipeline   = cfg->max_pipe;
     if (cfg->grace    > 0) loop->shutdown_grace = cfg->grace;
     loop->max_requests = cfg->max_requests;
+    loop->compress      = cfg->compress;
+    if (cfg->compress_min) loop->compress_min = cfg->compress_min;
+    if (cfg->compress_level) loop->compress_level = cfg->compress_level;
+    if (cfg->max_read) loop->max_read = cfg->max_read;
+    loop->compress_types = cfg->compress_types
+                           ? SvREFCNT_inc(cfg->compress_types) : NULL;
     if (hm_worker_listeners(loop, cfg, fds) < 0) {
         hm_loop_free(aTHX_ loop);
         _exit(1);

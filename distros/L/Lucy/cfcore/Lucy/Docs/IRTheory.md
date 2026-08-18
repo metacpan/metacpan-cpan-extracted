@@ -1,6 +1,6 @@
 # Crash course in information retrieval
 
-Just enough Information Retrieval theory to find your way around Apache Lucy.
+Just enough Information Retrieval theory to find your way around Lucy.
 
 ## Terminology
 

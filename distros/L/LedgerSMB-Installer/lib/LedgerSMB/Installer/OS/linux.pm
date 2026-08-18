@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux v0.999.11;
+package LedgerSMB::Installer::OS::linux v0.999.13;
 
 use v5.20;
 use experimental qw(signatures);
@@ -84,6 +84,7 @@ sub detect_dss($self) {
             my $dist_id = $self->{distro}->{ID};
             my $dist_like_id;
             $dss_class = __PACKAGE__ . '::' . $dist_id;
+            $log->trace( "Loading distribution support $dss_class" );
             if (not eval "require $dss_class") {
                 my $alt_dss_class;
                 if ($self->{distro}->{ID_LIKE}) { # ID_LIKE is optional
@@ -92,6 +93,7 @@ sub detect_dss($self) {
                     for my $like_dist (@like_dists) {
                         $dist_like_id = $like_dist;
                         my $alt = __PACKAGE__ . "::$like_dist";
+                        $log->trace( "  Loading alternative distribution support $alt" );
                         if (eval "require $alt") {
                             $alt_dss_class = $alt;
                             last;

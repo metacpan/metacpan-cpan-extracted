@@ -95,11 +95,4 @@ $descriptor{META_MERGE} = {
 
 WriteMakefile( %descriptor );
 
-sub MY::postamble {
-  return <<'FOO' . pdlpp_postamble(\@package);
-
-install ::
-	@echo "Updating PDL documentation database...";
-	@$(PERL) -e "exit if $$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(q{PDL::FFTW3}); }; ";
-FOO
-}
+sub MY::postamble { pdlpp_postamble(\@package) }

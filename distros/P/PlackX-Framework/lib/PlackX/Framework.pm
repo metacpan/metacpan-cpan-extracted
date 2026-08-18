@@ -1,7 +1,7 @@
-# strict (5.12), warnings (5.35), signatures (5.36)
-use v5.36;
-
-package PlackX::Framework 0.31 {
+use v5.26;
+use warnings;
+use experimental 'signatures';
+package PlackX::Framework 0.33 {
   use PXF::Util ();
   use List::Util qw(any);
 
@@ -207,25 +207,27 @@ like to customize its behavior. It will prepare request and response objects,
 a stash, and if set up, templating.
 
 
-=head3 PlackX::Framework::Request
-
-=head3 PlackX::Framework::Response
+=head3 PlackX::Framework::Request and ::Response
 
 The PlackX::Framework::Request and PlackX::Framework::Response modules are
 subclasses of Plack::Request and Plack::Response sprinkled with additional
-features. Both share stash and flash properties.
+features, including various convenience methods, request re-routing (not to be
+confused with HTTP redirects), cleanup handlers, and easier PSGI response
+streaming.
 
 For more information, see the documentation for L<PlackX::Framework::Request>
 and L<PlackX::Framework::Response>.
+
+Both share common stash and flash properties, described below.
 
 =over 4
 
 =item stash()
 
-Both feature a shared "stash" which is a hashref in which you can store any
-data you would like. The "stash" is not a user session but a way to
-temporarily store information during a request/response cycle. It is
-re-initialized for each cycle.
+Request and Response objects share a "stash" which is a hashref in which you
+can store any data you would like. This not a user session but a way to
+temporarily store information during a single request/response cycle. It is
+re-initialized to an empty hashref at the start of each cycle.
 
 =item flash()
 
@@ -246,9 +248,10 @@ one.
 
 =head3 PlackX::Framework::Router
 
-This module exports the route, route_base, global_filter, and filter functions
+This module exports the route, base, global_filter, and filter functions
 to give you a minimalistic web app controller DSL. You can import this into
 your main app package, as shown in the introduction, or separate packages.
+If you manually subclass this module, you can also customize the keywords.
 
     # Set up the app
     package MyApp {
@@ -282,7 +285,19 @@ your main app package, as shown in the introduction, or separate packages.
       };
     }
 
-For more information, see L<Plack::Framework::Router>.
+Every route action is called with two arguments: a request object and response
+object. The response object is provided for convenience as the application may
+return it or a different response object, (or even another request object as
+described in the re-routing feature of PlackX::Framework::Request).
+
+Filters are also called the same way, but they should only return a response
+object if they wish to stop request processing. If a filter returns a false
+value ($response->next is provided for semantic convenience), request processing
+continues to the next matching filter or route.
+
+Note that unlike some other frameworks, routes CANNOT cascade, but filters can.
+
+For more information, see L<PlackX::Framework::Router>.
 
 
 =head3 PlackX::Framework::Router::Engine
@@ -297,7 +312,7 @@ directly. It is used by PlackX::Framework::Router internally.
 This module is provided primarily for convenience. Currently not used by PXF
 directly except you may optionally store template system configuration there.
 
-For more information, see L<Plack::Framework::Config>.
+For more information, see L<PlackX::Framework::Config>.
 
 
 =head3 PlackX::Framework::Template
@@ -314,7 +329,7 @@ been loaded. If so, it will automatically create an instance of the respective
 ::Template class and automatically add the template variables STASH, REQUEST,
 and RESPONSE to the object.
 
-For more information, see L<Plack::Framework::Template>.
+For more information, see L<PlackX::Framework::Template>.
 
 
 =head3 PlackX::Framework::URIx

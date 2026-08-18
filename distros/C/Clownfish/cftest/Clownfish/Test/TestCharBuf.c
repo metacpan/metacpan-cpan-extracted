@@ -38,7 +38,7 @@ static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
 static uint32_t smiley_len = 3;
 
 TestCharBuf*
-TestCB_new() {
+TestCB_new(void) {
     return (TestCharBuf*)Class_Make_Obj(TESTCHARBUF);
 }
 

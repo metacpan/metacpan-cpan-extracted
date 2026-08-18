@@ -32,7 +32,7 @@
 #include "Clownfish/Class.h"
 
 TestNum*
-TestNum_new() {
+TestNum_new(void) {
     return (TestNum*)Class_Make_Obj(TESTNUM);
 }
 

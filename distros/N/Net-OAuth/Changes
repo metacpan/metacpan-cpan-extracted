@@ -1,5 +1,25 @@
 Revision history for Net-OAuth
 
+0.33   Mon 17 Aug 23:14:01 BST 2026
+       [Security]
+       - Restrict the verification algorithm to those specified in the allowed_signature_methods, which is
+         now required.  THIS IS A BREAKING CHANGE.
+
+         See https://github.com/vurtdev/Net-OAuth/security/advisories/GHSA-c8rm-g5cm-4pf5 (CVE-2026-72889)
+         for more information.
+
+       - HMAC_SHA1 and HMAC_SHA256 signature keys cannot be blank.
+
+       - HMAC_SHA1, HMAC_SHA256 and PLAINTEXT signature verification now use constant-time comparison (CVE-2026-75589).
+
+       [Documentation]
+       - Updated the GitHub repository location, which moved before the version 0.32 release.
+         (The former location does redirect to the new location.)
+
+       - Removed CONTRIBUTING.md due to changes in the AI policy.
+
+       - Updated copyright year.
+
 0.32   Sun 16 Aug 00:51:04 BST 2026
        [Security]
        - The Net::OAuth smart_require function no longer memoizes

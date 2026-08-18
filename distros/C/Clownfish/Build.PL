@@ -22,21 +22,20 @@ use Clownfish::Build;
 my $builder = Clownfish::Build->new(
     module_name => 'Clownfish',
     license     => 'apache',
-    dist_author =>
-        'The Apache Lucy Project <dev at lucy dot apache dot org>',
-    dist_version       => '0.6.4',
-    dist_abstract      => 'Apache Clownfish Runtime',
+    dist_author => 'Lucy search project',
+    dist_version       => '0.7.0',
+    dist_abstract      => 'Clownfish Runtime',
     requires           => { 'perl' => '5.8.3', },
     configure_requires => {
         'Module::Build'               => 0.280801,
-        'Clownfish::CFC::Perl::Build' => 0.006004,
+        'Clownfish::CFC::Perl::Build' => 0.007000,
     },
     build_requires => {
         'Module::Build'      => 0.280801,
         'ExtUtils::CBuilder' => 0.21,
         'ExtUtils::ParseXS'  => 3.00,
         'Devel::PPPort'      => 3.14,
-        'Clownfish::CFC'     => 0.006004,
+        'Clownfish::CFC'     => 0.007000,
     },
     no_index => {
         directory => [qw( buildlib )],
@@ -45,9 +44,9 @@ my $builder = Clownfish::Build->new(
     meta_merge => { keywords => [qw( clownfish )], },
     meta_add   => {
         resources => {
-            homepage   => 'http://lucy.apache.org',
-            repository => 'https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git',
-            bugtracker => 'https://issues.apache.org/jira/browse/CLOWNFISH',
+            homepage   => 'https://github.com/lucysearch/lucy-clownfish',
+            repository => 'https://github.com/lucysearch/lucy-clownfish.git',
+            bugtracker => 'https://github.com/lucysearch/lucy-clownfish/issues',
         },
     },
     add_to_cleanup => [

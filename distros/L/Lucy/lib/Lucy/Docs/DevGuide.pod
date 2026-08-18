@@ -25,11 +25,11 @@
 
 =head1 NAME
 
-Lucy::Docs::DevGuide - Quick-start guide to hacking on Apache Lucy.
+Lucy::Docs::DevGuide - Quick-start guide to hacking on Lucy.
 
 =head1 DESCRIPTION
 
-The Apache Lucy code base is organized into roughly four layers:
+The Lucy code base is organized into roughly four layers:
 
 =over
 

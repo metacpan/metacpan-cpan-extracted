@@ -1,3 +1,9 @@
+0.003   2026-05-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Add functions: normalize_keyvalue_filename, modify_keyvalue_filename,
+          rename_add_keyvalue_filenames, rename_remove_keyvalue_filenames.
+
+
 0.002   2026-04-27  Released-By: PERLANCAR; Urgency: medium
 
         - Remove directory separator suffix.

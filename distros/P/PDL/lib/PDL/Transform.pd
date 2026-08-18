@@ -266,24 +266,13 @@ use overload '!'  => \&t_inverse;
 
 use PDL::LiteF;
 use PDL::MatrixOps;
-
-our $PI = 3.1415926535897932384626;
-our $DEG2RAD = $PI / 180;
-our $RAD2DEG = 180/$PI;
-our $E  = exp(1);
-
+use PDL::Constants qw(PI DEG2RAD);
 
 #### little helper kludge parses a list of synonyms
 sub _opt {
-  my($hash) = shift;
-  my($synonyms) = shift;
-  my($alt) = shift;  # default is undef -- ok.
-  local($_);
-  foreach $_(@$synonyms){
-    return (UNIVERSAL::isa($alt,'PDL')) ? PDL->pdl($hash->{$_}) : $hash->{$_}
-    if defined($hash->{$_}) ;
-  }
-  return $alt;
+  my ($hash, $synonyms, $alt) = @_;  # default $alt is undef -- ok.
+  return $alt if !(my ($s) = grep defined $hash->{$_}, @$synonyms);
+  UNIVERSAL::isa($alt,'PDL') ? PDL->pdl($hash->{$s}) : $hash->{$s};
 }
 
 ######################################################################
@@ -2575,7 +2564,7 @@ with: if you supply a matrix, it defines the transformation; if you
 input offset vectors in the C<pre> and C<post> options, those define
 the number of dimensions.  But if you only supply scalars, there is no way
 to tell and the default number of dimensions is 2.  This provides a way
-to do, e.g., 3-D scaling: just set C<{s=><scale-factor>, dims=>3}> and
+to do, e.g., 3-D scaling: just set C<< {s=><scale-factor>, dims=>3} >> and
 you are on your way.
 
 =item idim
@@ -2602,6 +2591,7 @@ our @ISA = ('PDL::Transform');
 *_opt = \&PDL::Transform::_opt;
 *barf = \&PDL::Transform::barf;
 *identity = \&PDL::MatrixOps::identity;
+use PDL::Constants qw(DEG2RAD);
 
 sub PDL::Transform::t_linear { PDL::Transform::Linear->new(@_); }
 
@@ -2698,7 +2688,7 @@ sub new {
                        $angle = $angle->at(0)
                          if UNIVERSAL::isa($angle,'PDL');
 
-                       my($x) = $angle * $PDL::Transform::DEG2RAD;
+                       my($x) = $angle * DEG2RAD;
                        $subm .= $subm x PDL->pdl([cos($x),-sin($x)],[sin($x),cos($x)]);
                        $m .= $m x $i;
                      };
@@ -3008,7 +2998,7 @@ sub t_fits {
         ## CROTA2 is encouraged instead.
       my $cr = $hdr->{CROTA2} // $hdr->{CROTA} // $hdr->{CROTA1};
 
-      $cr *= $PDL::Transform::DEG2RAD;
+      $cr *= DEG2RAD();
         # Rotation matrix rotates counterclockwise to get from sci to pixel coords
         # (detector has been rotated ccw, according to FITS standard)
       $cpm .= pdl( [cos($cr), sin($cr)],[-sin($cr),cos($cr)] );
@@ -3107,7 +3097,7 @@ The number of output dimensions
 
 =item itype
 
-The type of the input dimensions, in an array ref (optional and advisiory)
+The type of the input dimensions, in an array ref (optional and advisory)
 
 =item otype
 
@@ -3255,6 +3245,7 @@ each piece of the image looks "natural" -- only scaled and not stretched.
 
 =cut
 
+use PDL::Constants qw(RAD2DEG);
 *t_cylindrical = \&t_radial;
 sub t_radial {
   my($class) = 'PDL::Transform';
@@ -3276,7 +3267,7 @@ sub t_radial {
 
   $me->{params}{u} = _opt($o,['u','unit','Unit'],'radians');
   ### Replace this kludge with a units call
-  $me->{params}{angunit} = ($me->{params}{u} =~ m/^d/i) ? $PDL::Transform::RAD2DEG : 1.0;
+  $me->{params}{angunit} = ($me->{params}{u} =~ m/^d/i) ? RAD2DEG : 1.0;
   print "radial: conversion is $me->{params}{angunit}\n" if $PDL::Transform::debug;
 
   $me->{name} = "radial (direct)";
@@ -3305,7 +3296,7 @@ sub t_radial {
       my($d1) = $d->slice("(1)");
 
       # (mod operator on atan2 puts everything in the interval [0,2*PI).)
-      $out->slice("(0)") .= (atan2(-$d1,$d0) % (2*$PDL::Transform::PI)) * $me->{params}->{angunit};
+      $out->slice("(0)") .= (atan2(-$d1,$d0) % (2*PDL::Transform::PI())) * $me->{params}->{angunit};
 
       $out->slice("(1)") .= (defined $o->{r0}) ?
               0.5 * log( ($d1*$d1 + $d0 * $d0) / ($o->{r0} * $o->{r0}) ) :
@@ -3823,7 +3814,7 @@ sub t_spherical {
 
   my $unit = _opt($o,['u','unit','Unit']);
   $me->{params}{angunit} = ($unit && $unit =~ m/^d/i) ?
-      $PDL::Transform::DEG2RAD : undef;
+      DEG2RAD() : undef;
 
   $me->{name} = "spherical";
 

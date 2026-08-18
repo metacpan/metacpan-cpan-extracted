@@ -10,84 +10,90 @@ endobj
 <</Type /Font/Subtype /Type1/BaseFont /Times-Bold>>
 endobj
 4 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Italic>>
-endobj
-5 0 obj
 <</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
 endobj
+5 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Italic>>
+endobj
 6 0 obj
-<</Length 699>>
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+7 0 obj
+<</Length 666>>
 stream
 q
 0.5 w
 0.690196 0.552941 0.247059 RG
-60.25 698.25 474.5 83.5 re
+60.25 600.25 474.5 181.5 re
 S
 Q
 BT
-0 0 0 rg
-/F_Helvetica_normal 12 Tf
-1 0 0 1 84 746 Tm
-(Certificate of Completion ) Tj
-0 0 0 rg
+0.290196 0.207843 0.062745 rg
+/F_Helvetica_normal 30 Tf
+1 0 0 1 133.280014 728 Tm
+(Certificate of Completion) Tj
+ET
+BT
 /F_Helvetica_normal 11 Tf
-1 0 0 1 218.71199 746 Tm
-(This is to certify that ) Tj
+0 0 0 rg
+248.594006 711 Td
+(This is to certify that) Tj
+ET
+BT
 0 0 0 rg
 /F_Helvetica_bold 20 Tf
-1 0 0 1 319.581978 746 Tm
+1 0 0 1 204.150009 681 Tm
 (Alexandra Whitfield) Tj
 ET
 BT
-0 0 0 rg
 /F_Helvetica_normal 11 Tf
-1 0 0 1 84 734 Tm
-(has completed the Advanced Bookbinding programme with distinction ) Tj
 0 0 0 rg
-/F_Helvetica_italic 10 Tf
-1 0 0 1 426.374939 734 Tm
-(3 October 2026 ) Tj
-0 0 0 rg
-/F_Helvetica_normal 10 Tf
-1 0 0 1 498.084946 734 Tm
-(H.) Tj
+127.841537 670 Td
+(has completed the Advanced Bookbinding programme with distinction) Tj
 ET
 BT
 0 0 0 rg
+/F_Helvetica_italic 10 Tf
+1 0 0 1 263.034996 650 Tm
+(3 October 2026) Tj
+ET
+BT
 /F_Helvetica_normal 10 Tf
-1 0 0 1 84 722 Tm
-(Okonkwo, Principal) Tj
+0 0 0 rg
+248.32 624 Td
+(H. Okonkwo, Principal) Tj
 ET
 
 endstream
 endobj
-7 0 obj
-<</Type /Pages/Kids [8 0 R]/Count 1>>
-endobj
 8 0 obj
-<</Type /Page/Parent 7 0 R/MediaBox [0 0 595 842]/Resources <</Font <</F_Helvetica_normal 5 0 R/F_Helvetica_bold 3 0 R/F_Helvetica_italic 4 0 R>>>>/Contents 6 0 R>>
+<</Type /Pages/Kids [9 0 R]/Count 1>>
 endobj
 9 0 obj
-<</Type /Catalog/Pages 7 0 R>>
+<</Type /Page/Parent 8 0 R/MediaBox [0 0 595 842]/Resources <</Font <</F_Helvetica_normal 6 0 R/F_Helvetica_bold 3 0 R/F_Helvetica_italic 5 0 R>>>>/Contents 7 0 R>>
 endobj
 10 0 obj
+<</Type /Catalog/Pages 8 0 R>>
+endobj
+11 0 obj
 <</Producer (PDF-Make/0.10)/CreationDate (D:20200913132640Z)/ModDate (D:20200913132640Z)>>
 endobj
 xref
-0 11
+0 12
 0000000000 65535 f 
 0000000015 00000 n 
 0000000083 00000 n 
 0000000151 00000 n 
 0000000218 00000 n 
-0000000287 00000 n 
+0000000286 00000 n 
 0000000355 00000 n 
-0000001103 00000 n 
-0000001156 00000 n 
-0000001336 00000 n 
-0000001382 00000 n 
+0000000423 00000 n 
+0000001138 00000 n 
+0000001191 00000 n 
+0000001371 00000 n 
+0000001418 00000 n 
 trailer
-<</Size 11/Root 9 0 R/Info 10 0 R/ID[<22BF1FDC9BFCDE5643090FE7A4C3D975><22BF1FDC9BFCDE5643090FE7A4C3D975>]>>
+<</Size 12/Root 10 0 R/Info 11 0 R/ID[<8535131DB8E3427C64EB2312AF1C485D><8535131DB8E3427C64EB2312AF1C485D>]>>
 startxref
-1489
+1525
 %%EOF

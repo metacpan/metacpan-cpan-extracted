@@ -25,7 +25,7 @@
 #include "Clownfish/Class.h"
 
 TestAtomic*
-TestAtomic_new() {
+TestAtomic_new(void) {
     return (TestAtomic*)Class_Make_Obj(TESTATOMIC);
 }
 

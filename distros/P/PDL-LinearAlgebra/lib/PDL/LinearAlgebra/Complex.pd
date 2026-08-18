@@ -280,8 +280,8 @@ EOF
   OtherPars => 'int jobz',
   ArgOrder => [qw{A jobz s U VT info}],
   RedoDimsCode => '
-    PDL_MAYBE_SIZE(PDL_Long, $COMP(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)<$SIZE(n)), $PDL(U), $SIZE(p), $SIZE(minmn))
-    PDL_MAYBE_SIZE(PDL_Long, $COMP(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)>=$SIZE(n)), $PDL(VT), $SIZE(s), $SIZE(minmn))
+    PDL_MAYBE_SIZE(PDL_Long, $COMP(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)<$SIZE(n)), $PDL(U), $SIZE(p), $SIZE(m))
+    PDL_MAYBE_SIZE(PDL_Long, $COMP(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)>=$SIZE(n)), $PDL(VT), $SIZE(s), $SIZE(n))
     $SIZE(iworkn) = 8 * $SIZE(minmn);
   ',
   Code => generate_code '

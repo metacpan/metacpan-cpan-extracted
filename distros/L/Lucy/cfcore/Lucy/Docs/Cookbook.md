@@ -1,6 +1,6 @@
-# Apache Lucy recipes
+# Lucy recipes
 
-The Cookbook provides thematic documentation covering some of Apache Lucy's
+The Cookbook provides thematic documentation covering some of Lucy's
 more sophisticated features.  For a step-by-step introduction to Lucy,
 see [](cfish:Tutorial).
 

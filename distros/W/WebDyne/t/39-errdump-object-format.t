@@ -45,7 +45,7 @@ my $dump_uri=WebDyne::Util::errdump({
     Line => 1,
 });
 like($dump_uri, qr/Bang !|Bang/i, 'errdump with URI object returns error text');
-like($dump_uri, qr/\Q$uri_text\E/, 'errdump stringifies URI object in diagnostic fields');
+like(normalize_dump_text($dump_uri), qr/\Q$uri_text\E/, 'errdump stringifies URI object in diagnostic fields');
 
 my $outer_accumulator='outer format accumulator';
 {
@@ -65,3 +65,11 @@ my $outer_accumulator='outer format accumulator';
 }
 
 done_testing();
+
+sub normalize_dump_text {
+
+    my $text=shift();
+    $text=~s/[|\s]+//g;
+    return $text;
+
+}

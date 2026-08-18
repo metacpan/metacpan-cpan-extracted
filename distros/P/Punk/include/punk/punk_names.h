@@ -132,5 +132,9 @@ static int pk_require_once(pTHX_ const char *mod, int fatal) {
 #define K_HEADERS  "headers"
 #define K_HEADERS_SCOPED "headers_scoped"
 #define K_AUTH     "auth"
+#define K_PROXY    "proxy"
+#define K_COMPRESS "compress"
+#define K_NOCOMPRESS_ROUTES "nocompress_routes"
+#define K_MAXBODY_ROUTES    "maxbody_routes"
 
 #endif /* PUNK_NAMES_H */

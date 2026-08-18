@@ -3,10 +3,18 @@ use warnings;
 use strict;
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw/read_table write_table read_table_hash append_table/;
+our @EXPORT_OK = qw/
+    append_table
+    read_table 
+    read_table_hash
+    replace
+    write_table
+/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use Carp;
+use v5.36;
+use feature 'signatures';
 
 # Private routine. This reads the file in and turns it into an array
 # containing the lines of the file, without doing any further
@@ -226,6 +234,42 @@ sub write_table
     else {
 	print $text;
     }
+}
+
+sub same_entry($a, $b) {
+    for my $k (keys %$a) {
+	if (! defined $b->{$k}) {
+	    return 0;
+	}
+	if ($a->{$k} ne $b->{$k}) {
+	    return 0;
+	}
+    }
+    for my $k (keys %$b) {
+	if (! defined $a->{$k}) {
+	    return 0;
+	}
+    }
+    return 1;
+}
+
+sub replace($file, $old, $new) {
+    my @table = read_table($file);
+    my @newtable;
+    my $changed;
+    for my $entry (@table) {
+	if (same_entry($entry, $old)) {
+	    push @newtable, $new;
+	    $changed = 1;
+	    next;
+	}
+	push @newtable, $entry;
+    }
+    if (! $changed) {
+	warn "replace: entry not found in $file";
+	return;
+    }
+    write_table(\@newtable, $file);
 }
 
 sub edit_entry

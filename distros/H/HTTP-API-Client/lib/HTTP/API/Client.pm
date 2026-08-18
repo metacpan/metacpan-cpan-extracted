@@ -1,42 +1,214 @@
 package HTTP::API::Client;
-$HTTP::API::Client::VERSION = '1.04';
+$HTTP::API::Client::VERSION = '1.10';
 use Moo;
 
 =head1 NAME
 
-HTTP::API::Client - API Client
+HTTP::API::Client - lightweight HTTP/REST client with per-request signing
+hooks, retry-with-backoff, and JSON/form encoding
+
+=head1 DESCRIPTION
+
+Talking to an authenticated JSON or form-urlencoded REST API with plain
+L<LWP::UserAgent> usually means the same boilerplate on every call: compute
+a signature or auth header from the request's own data, remember not to
+leak the signing secret into the body, retry on a flaky response, and
+serialize Perl values (which have no native boolean and no native
+comma-list) unambiguously. C<HTTP::API::Client> is that boilerplate,
+written once - a thin L<LWP::UserAgent> wrapper with:
+
+=over 4
+
+=item * An event/callback system (see L</"new_request(%options)">) that computes
+header or data values from the rest of the request at build time - the
+mechanism for a signed-request header, not a special case bolted on top
+of it.
+
+=item * Retry-with-backoff on failed responses, configurable per status
+code (see L</"ENVIRONMENT VARIABLES">).
+
+=item * JSON and form-urlencoded body encoding from the same C<%data>
+hash, including L<HTTP::API::DataTypeMarker>'s C<xTRUE>/C<xCSV>-family
+markers for the values Perl scalars can't represent unambiguously on
+their own.
+
+=back
+
+If none of that boilerplate applies to what you're calling - no signing,
+no retry policy, plain data - reaching for L<LWP::UserAgent> or
+L<HTTP::Tiny> directly is simpler. This module earns its weight
+specifically for authenticated API clients that would otherwise
+reimplement the same header-signing/retry logic by hand.
 
 =head1 USAGE
 
  use HTTP::API::Client;
 
- my $ua1 = HTTP::API::Client->new;
- my $ua2 = HTTP::API::Client->new(base_url => URI->new( $url ), pre_defined_headers => { X_COMPANY => 'ABC LTD' } );
- my $ua3 = HTTP::API::Client->new(base_url => URI->new( $url ), pre_defined_data => { api_key => 123 } );
+The constructor takes no required arguments:
 
- $ua->send( $method, $url, \%data, \%header );
+ my $ua = HTTP::API::Client->new(
+     base_url => "https://api.example.com",
+ );
 
-Send short hand methods - get, post, head, put and delete
+=head2 A signed request
 
-Example:
+This is the case the module exists for: compute an auth header from the
+request's own data, once, at construction - every call this client makes
+carries it automatically, and the secret used to compute it never appears
+in the request itself.
 
- $ua->get( $url ) same as $ua->send( GET, $url );
- $ua->post( $url, \%data, \%headers ) same as $ua->send( GET, $url, \%data, \%headers );
+ my $ua = HTTP::API::Client->new(
+     base_url => "https://api.example.com",
+     pre_defined_data => {
+         api_key    => "AKIA123",
+         api_secret => sub { "s3cr3t" },    # or read from config/env
+     },
+     pre_defined_headers => {
+         APIKEY    => sub { my (undef, %o) = @_; $o{data}{api_key} },
+         Signature => sub {
+             my (undef, %o) = @_;
+             "$o{data}{api_key}:$o{data}{api_secret}";    # a real HMAC in practice
+         },
+     },
+     pre_defined_events => {
+         not_include => { api_secret => 1 },    # keep the secret out of the body/query
+     },
+ );
 
-Get Json Data - grab the content body from the response and json decode
+ $ua->get("/search", { q => "widgets" });
+ # -> GET https://api.example.com/search?api_key=AKIA123&q=widgets
+ #    APIKEY: AKIA123
+ #    Signature: AKIA123:s3cr3t
 
- $ua = HTTP::API::Client->new(base_url => URI->new("http://google.com"));
- $ua->get("/search" => { q => "something" });
- my $hashref_from_decoded_json_string = $ua->json_response;
- ## ps. this is just an example to get json from a rest api
+See L</"new_request(%options)"> for the full list of build-time hooks this uses.
 
-Send a query string to server
+=head2 Shorthand methods
 
- $ua = HTTP::API::Client->new( content_type => "application/x-www-form-urlencoded" );
- $ua->post("http://google.com", { q => "something" });
- my $response = $ua->last_response; ## is a HTTP::Response object
+C<get>/C<post>/C<put>/C<head>/C<delete> are shorthand over C<send()>:
 
-At the moment, only support query string and json data in and out
+ $ua->get($url);                       # same as $ua->send( GET, $url )
+ $ua->post($url, \%data, \%headers);   # same as $ua->send( POST, $url, \%data, \%headers )
+
+=head2 JSON in, JSON out
+
+ my $ua = HTTP::API::Client->new(base_url => "http://example.com");
+ $ua->get("/search", { q => "something" });
+ my $decoded = $ua->json_response;   # the response body, JSON-decoded
+
+=head2 Form-urlencoded
+
+ my $ua = HTTP::API::Client->new(content_type => "application/x-www-form-urlencoded");
+ $ua->post("http://example.com", { q => "something" });
+ my $response = $ua->last_response;   # an HTTP::Response object
+
+Body encoding only knows how to serialize into JSON or a query string
+(see C<convert_data()> below) - any other content type must be built and
+passed in already-encoded.
+
+=head1 ATTRIBUTES
+
+All constructor arguments below are also read-write accessors
+(C<< $ua->base_url("http://new-host") >>), except C<engine> which is
+read-only after construction. Several fall back to an environment
+variable (see L</"ENVIRONMENT VARIABLES">) when not passed explicitly.
+
+=over 4
+
+=item base_url
+
+Prefixed onto every C<$path> passed to C<send()> (and the shorthand
+methods). Not set by default - a bare path is used as-is.
+
+=item username / password
+
+HTTP Basic auth credentials. If either is set, Basic auth is used and
+C<auth_token> is ignored. Default from C<HTTP_USERNAME>/C<HTTP_PASSWORD>.
+
+=item auth_token
+
+Sent verbatim as the C<Authorization> header when C<username>/C<password>
+are both unset. Default from C<HTTP_AUTH_TOKEN>.
+
+=item content_type
+
+Forces the request content type. Left unset, GET defaults to
+C<application/x-www-form-urlencoded> and every other method defaults to
+C<application/json; charset=$charset>.
+
+=item charset
+
+Used to build the default JSON content-type header and to decide whether
+UTF-8 byte-encoding is applied to the request body. Default C<utf8>, from
+C<HTTP_CHARSET>. Must be a real L<JSON::XS> charset method name (C<utf8>,
+C<latin1>, C<ascii>, ...) - an invalid value dies immediately and clearly,
+naming the bad value, the first time JSON encoding is needed.
+
+=item timeout
+
+Request timeout in seconds, passed to the underlying L<LWP::UserAgent>.
+Default C<60>, from C<HTTP_TIMEOUT>.
+
+=item ssl_verify
+
+Passed through as C<verify_hostname> to L<LWP::UserAgent>'s C<ssl_opts>.
+Default off (C<0>), from C<SSL_VERIFY>.
+
+=item pre_defined_data / pre_defined_headers / pre_defined_events
+
+Hashrefs merged underneath the C<%data>/C<%headers>/C<%events> passed to
+each individual call - set once at construction time for values every
+request should carry (an API key, a fixed header, a standing callback),
+then override per-call as needed.
+
+=item engine
+
+Read-only. Defaults to C<"LWP::UserAgent">, the only engine C<send()>
+actually dispatches requests through - C<_build_ua> will call a
+same-named method on a subclass to build an alternate UA object, but
+C<send()> itself does not yet know how to use anything other than
+L<LWP::UserAgent> with it (see C<t/12_unsupported_engine.t>: setting a
+different engine fails with a clear error rather than silently doing
+nothing).
+
+=item last_response
+
+Read-write. The most recent L<HTTP::Response>, set by C<send()> and read by
+L</json_response>/L</kvp_response>. C<undef> until the first request.
+
+=item ua
+
+Read-write. The underlying user-agent object C<send()> dispatches through
+- an L<LWP::UserAgent> by default, built lazily by C<_build_ua> on first
+use. Set this directly to inject a stand-in (a fake, a mock, a
+pre-configured instance) instead of the real one; this is how the test
+suite avoids making real network calls.
+
+=item browser_id
+
+Read-write. The C<User-Agent> header value passed to the underlying
+C<ua>. Defaults to C<"HTTP API Client v$VERSION"> - C<$VERSION> is only
+set when running the installed CPAN release (Dist::Zilla's
+C<[PkgVersion]> plugin injects it at build time), so a development
+checkout reports C<"HTTP API Client vdev"> instead.
+
+=item retry_config
+
+Read-write hashref C<< { fail_response => $n, fail_status => $csv, delay
+=> $seconds } >>. The programmatic equivalent of
+C<RETRY_FAIL_RESPONSE>/C<RETRY_FAIL_STATUS>/C<RETRY_DELAY> - set this
+directly to configure retry behavior at construction without touching
+process environment variables. See L</"ENVIRONMENT VARIABLES"> for what
+each key does.
+
+=item json
+
+Read-write. The L<JSON::XS> instance C<kvp2json()> encodes through,
+built lazily with C<->canonical->allow_nonref> and the C<charset>
+method applied. Set this directly to inject a differently-configured
+instance (e.g. one with C<->allow_blessed> enabled) instead of the
+default.
+
+=back
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -48,7 +220,7 @@ HTTP VARIABLES
  HTTP_PASSWORD   - basic auth password
  HTTP_AUTH_TOKEN - basic auth token string
  HTTP_CHARSET    - content type charset. default utf8
- HTTP_TIMEOUT    - timeout the request for ??? seconds. default 60 seconds.
+ HTTP_TIMEOUT    - timeout the request in seconds. default 60 seconds.
  SSL_VERIFY      - verify ssl url. default is off
 
 DEBUG VARIABLES
@@ -57,13 +229,162 @@ DEBUG VARIABLES
  DEBUG_SEND_OUT             - print out request in string to STDERR
  DEBUG_RESPONSE             - print out response in string to STDERR
  DEBUG_RESPONSE_HEADER_ONLY - print out response header only without the body
- DEBUG_RESPONSE_IF_FAIL     - only print out response in string if fail.
+ DEBUG_RESPONSE_IF_FAIL     - narrows DEBUG_IN_OUT/DEBUG_RESPONSE to only print
+                              on a failed response. Does nothing by itself -
+                              DEBUG_IN_OUT or DEBUG_RESPONSE must also be set.
 
 RETRY VARIABLES
 
- RETRY_FAIL_RESPONSE  - number of time to retry if resposne comes back is failed. default 0 retry
+ RETRY_FAIL_RESPONSE  - number of time to retry if response comes back is failed. default 0 retry.
+                        A negative value is clamped to 0 (no retry) rather than silently
+                        making zero attempts.
  RETRY_FAIL_STATUS    - only retry if specified status code. e.g. 500,404
- RETRY_DELAY          - retry with wait time of ??? seconds in between
+ RETRY_DELAY          - retry with wait time of 5 seconds in between, by default. A negative
+                        value is clamped to 0 rather than reaching sleep() as-is.
+
+=head1 METHODS
+
+=head2 get / post / put / head / delete ($path, \%data, \%headers, \%events)
+
+Shorthand for C<send($METHOD, $path, \%data, \%headers, \%events)>. C<$path>
+is appended to the C<base_url> attribute if one was given. Returns whatever
+C<send()> returns - normally an L<HTTP::Response>.
+
+=head2 send($method, $path, \%data, \%headers, \%events)
+
+Builds and sends one HTTP request, retrying per L</"ENVIRONMENT VARIABLES">
+if configured. C<%data> and C<%headers> are merged over C<pre_defined_data>
+and C<pre_defined_headers>. C<%events> are the per-call callbacks documented
+under C<new_request()> below. Sets and returns the C<last_response>
+attribute.
+
+Passing C<< $events->{test_request_object} = 1 >> makes it return the built
+L<HTTP::Request> instead of sending it - the way this module's own test
+suite inspects what would have gone out.
+
+=head2 json_response
+
+Decode the C<last_response> body as JSON and return the resulting hashref.
+Never dies - a missing response or invalid JSON comes back as
+C<< { status => "error", error => $message } >> instead.
+
+=head2 kvp_response
+
+Parse the C<last_response> body as a C<key=value&key=value> query string
+and return it as a hashref. Returns C<{}> if no request has been made yet,
+or the response body is empty.
+
+=head2 new_request(%options)
+
+Builds the L<HTTP::Request> for one call. This is where the C<%events>
+callbacks passed to C<send()> are read: C<before_headers>, C<headers_keys> /
+C<add_headers_keys> (which header keys to consider, in what order),
+C<before_header>/C<after_header> keyed by header name, and
+C<after_header_keys> - the hooks used to compute things like a signature
+header from other data at build time. See F<t/04_callbacks.t> for a worked
+example (API key + signature).
+
+C<%options> also accepts C<skip_headers>, a hashref of header names to
+exclude from the request no matter what C<%headers> or the events above
+say. Only reachable by calling C<new_request()> directly with it - C<send()>
+never sets it, and setting it inside an C<%events> callback has no effect
+(a callback receives a snapshot copy of C<%options>, not the one
+C<new_request()> itself is iterating). See F<t/23_skip_headers.t>.
+
+=head2 get_content_type(%options)
+
+Resolves the effective content type for one call: the C<content_type>
+attribute if set explicitly; otherwise C<application/x-www-form-urlencoded>
+for a GET, or C<application/json; charset=$charset> for anything else.
+Called internally by C<convert_data()>, C<prepare_request()>, and
+C<new_request()> - there is normally no need to call this directly.
+
+=head2 convert_data(%options)
+
+Turn C<%options>'s C<data> hashref into the request body, according to
+content type: JSON via C<kvp2json()> if the content type contains C<json>,
+a query string via C<kvp2str()> if it is exactly
+C<application/x-www-form-urlencoded>. Any other content type returns an
+empty string for empty data, or dies naming the content type - there is no
+generic way to serialize arbitrary data into an arbitrary content type.
+
+=head2 prepare_request(%options)
+
+Builds the bare L<HTTP::Request> (method, URL, content-type header) and
+applies authentication: C<username>/C<password> take priority and are sent
+as HTTP Basic auth via C<basic_authenticator()>; C<auth_token> is used only
+if neither is set, and is sent as a raw C<Authorization> header value
+verbatim (no C<Bearer> prefix is added for you - include it in the token
+itself if the API expects one). Called by C<new_request()> - there is
+normally no need to call this directly.
+
+=head2 basic_authenticator($request, $username, $password)
+
+Sets HTTP Basic auth on C<$request> via
+C<< $request->headers->authorization_basic >>. Override this in a subclass
+to change how basic auth is applied without touching the rest of request
+building.
+
+=head2 kvp2json(%options) / kvp2str(%options)
+
+The two body encoders C<convert_data> dispatches to. C<kvp2json> walks
+C<%options>'s C<data> hashref and JSON::XS-encodes it, resolving any
+C<CODE> values by calling them and unwrapping L<HTTP::API::DataTypeMarker>
+markers (C<xCSV>/C<xBOOLEAN> and friends) into their JSON form. C<kvp2str>
+does the same but produces a C<key=value&key=value> query string instead,
+with C<xCSV>-marked values joined by commas instead of repeated per key.
+Both respect an C<< $events->{keys} >> callback to control which keys are
+included and in what order, and both accept a C<skip_key> hashref in
+C<%options> (same reachability caveat as C<new_request()>'s
+C<skip_headers> above - only useful from a direct call, e.g. a C<data>
+callback recursively re-invoking C<kvp2str()>/C<kvp2json()> on itself to
+build its own value without infinite-looping on its own key; see
+F<t/04_callbacks.t>) to exclude a key from the encoded body.
+
+=head2 kvp2json_each(%options) / kvp2str_each(%options)
+
+The per-value helpers C<kvp2json()>/C<kvp2str()> recurse into for each key
+via C<%options>'s C<value>. Resolves a C<CODE> value by calling it,
+unwraps L<HTTP::API::DataTypeMarker> markers (C<xCSV>/C<xBOOLEAN> and
+friends), and recurses into plain array/hash values. There is normally
+no need to call these directly - they exist as public methods so a
+C<data>/C<value> callback can recursively re-invoke them on itself (see
+C<kvp2json()>/C<kvp2str()> above).
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by Michael Vu.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+The MIT License
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to
+whom the Software is furnished to do so, subject to the
+following conditions:
+
+The above copyright notice and this permission notice shall
+be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT
+WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
 
 =cut
 
@@ -142,7 +463,7 @@ has browser_id => (
 );
 
 sub _build_browser_id {
-    my $ver = _defor($HTTP::API::Client::VERSION, -1);
+    my $ver = _defor($HTTP::API::Client::VERSION, 'dev');
     return "HTTP API Client v$ver";
 }
 
@@ -225,7 +546,8 @@ sub _build_retry {
     my ($self) = @_;
     my %retry  = %{ _defor($self->retry_config, {}) };
     my $count  = $retry{fail_response};
-    my %status = map { $_ => 1 } split /,/, $retry{fail_status};
+    $count = 0 if defined $count && looks_like_number($count) && $count < 0;
+    my %status = map { s/^\s+|\s+$//g; $_ => 1 } split /,/, $retry{fail_status};
 
     my $delay = $retry{delay};
 
@@ -268,7 +590,7 @@ sub _build_json {
     my ($self)  = @_;
     my $json    = JSON::XS->new->canonical->allow_nonref;
     my $charset = $self->charset;
-    eval { $json->$charset };
+    eval { $json->$charset; 1 } or die "Unsupported charset '$charset': $@";
     return $json;
 }
 
@@ -342,7 +664,8 @@ sub _execute_callbacks {
 
     my $sth = $options{$type};
 
-    while (my ($key, $callback) = each %$sth) {
+    for my $key (keys %$sth) {
+        my $callback = $sth->{$key};
         next if !defined $callback;
         next if !UNIVERSAL::isa($callback, 'CODE');
         $sth->{$key} = $self->$callback(key => $key, %options);
@@ -354,6 +677,7 @@ sub send {
         $data, $headers, $events) = @_;
 
     $method  = uc $method;
+    $path    = _defor( $path,    '' );
     $data    = _defor( $data,    {} );
     $headers = _defor( $headers, {} );
     $events  = _defor( $events,  {} );
@@ -363,6 +687,7 @@ sub send {
     my $ua           = $self->ua;
     my $retry_count  = _defor( $self->retry->{count}, 1 );
     my $retry_delay  = _defor( $self->retry->{delay}, 5 );
+    $retry_delay = 0 if looks_like_number($retry_delay) && $retry_delay < 0;
     my %retry_status = %{ _defor($self->retry->{status}, {}) };
     my %debug        = %{ _defor($self->debug_flags, {}) };
     my $eng          = $self->engine;
@@ -406,6 +731,9 @@ sub send {
 
             $response = $ua->request($req);
         }
+        else {
+            die "Unsupported engine: $eng - only LWP::UserAgent is currently wired up in send()";
+        }
 
         if ( $debug{in_out} || $debug{send_out} ) {
             print STDERR "-- REQUEST --\n";
@@ -436,23 +764,21 @@ sub send {
         last RETRY    ## request is success, not further for retry
           if $response->is_success;
 
+        last RETRY    ## no attempts left, don't sleep for a retry that won't happen
+          if $retry >= $retry_count;
+
         if ( !%retry_status ) {
             sleep $retry_delay;
             ## no retry pattern at all then just retry
             next RETRY;
         }
 
-        my $pattern = $retry_status{ $response->code }
+        $retry_status{ $response->code }
           or
-          last RETRY;  ## no retry pattern for this status code, just stop retry
+          last RETRY;  ## status code not in RETRY_FAIL_STATUS, just stop retry
 
-        ## retry if pattern is match otherwise, just stop retry
-        if ( $response->decode_content =~ /$pattern/ ) {
-            sleep $retry_delay;
-            next RETRY;
-        }
-
-        last RETRY;
+        sleep $retry_delay;
+        next RETRY;
     }
 
     return $self->last_response($response);
@@ -476,7 +802,10 @@ sub json_response {
 sub kvp_response {
     my ($self) = @_;
 
-    my $content = $self->last_response->decoded_content
+    my $response = $self->last_response
+        or return {};
+
+    my $content = $response->decoded_content
         or return {};
 
     my %data = map {
@@ -525,6 +854,9 @@ sub new_request {
         $request = $self->prepare_request(%o);
         $request->content($content);
     }
+    else {
+        $request = $self->prepare_request(%o);
+    }
 
     %o = (%o,
         request => $request,
@@ -541,7 +873,8 @@ sub new_request {
         @keys = $self->$keys(%o);
     }
     elsif (my $add = $events->{add_headers_keys}) {
-        @keys = sort $self->$add(%o), keys %$headers;
+        my %seen;
+        @keys = sort grep { !$seen{$_}++ } $self->$add(%o), keys %$headers;
     }
     else {
         @keys = sort keys %$headers;
@@ -554,7 +887,7 @@ sub new_request {
 
         next if $o{skip_headers}{$key} || !exists $headers->{$key} || !defined $headers->{$key};
 
-        $request->header( $key => $headers->{$key} );
+        $request->header( $key => _encode_if_utf8_flagged( $headers->{$key} ) );
 
         if (my $do = $events->{after_header}{$key}) {
             $self->$do(%o);
@@ -583,7 +916,8 @@ sub prepare_request {
         qw(username password auth_token);
 
     if ($u || $p) {
-        $self->basic_authenticator($request, $u, $p);
+        $self->basic_authenticator( $request,
+            _encode_if_utf8_flagged($u), _encode_if_utf8_flagged($p) );
     }
     elsif ($at) {
         $headers->{authorization} = $at;
@@ -609,6 +943,22 @@ sub _tune_utf8 {
     return $content;
 }
 
+sub _should_skip_key {
+    my (%o) = @_;
+    my ($key, $data) = @o{qw(key data)};
+    return $o{skip_key}{$key} || !exists $data->{$key} || !defined $data->{$key};
+}
+
+sub _encode_if_utf8_flagged {
+    my ($v) = @_;
+    return utf8::is_utf8($v) ? Encode::encode( utf8 => $v ) : $v;
+}
+
+sub _uri_escape_bytes_or_chars {
+    my ($v) = @_;
+    return uri_escape( _encode_if_utf8_flagged($v) );
+}
+
 sub convert_data {
     my ($self, %o) = @_;
 
@@ -623,7 +973,8 @@ sub convert_data {
         return $self->kvp2str(%o);
     }
     else {
-        return $data;
+        return '' if !%$data;
+        die "Unable to convert data for content_type: $content_type";
     }
 }
 
@@ -647,7 +998,7 @@ sub kvp2json {
         if ($events->{not_include}{$key}) {
             next
         }
-        next if $o{skip_key}{$key} || !exists $data->{$key} || !defined $data->{$key};
+        next if _should_skip_key(%o, key => $key);
         $data{$key} = $self->kvp2json_each(%o, value => $data->{$key});
     }
 
@@ -664,6 +1015,7 @@ sub kvp2json_each {
     }
 
     if (!ref $v) {
+        $v = Encode::decode( utf8 => $v ) if !utf8::is_utf8($v);
         return looks_like_number($v) ? $v+0 : $v;
     }
     elsif (ref $v eq 'BOOL') {
@@ -696,7 +1048,7 @@ sub kvp2str {
 
     my ($data, $events) = @o{qw(data events)};
 
-    my @keys;
+    my @keys = keys %$data;
 
     if (my $do = $events->{before_sorting_keys}) {
         $self->$do(%o, keys => \@keys);
@@ -706,7 +1058,7 @@ sub kvp2str {
         @keys = $self->$do(%o);
     }
     else {
-        @keys = sort keys %$data;
+        @keys = sort @keys;
     }
 
     if (my $do = $events->{after_sorting_keys}) {
@@ -716,7 +1068,8 @@ sub kvp2str {
     my @parts;
 
     foreach my $key(@keys) {
-        next if $o{skip_key}{$key} || !exists $data->{$key} || !defined $data->{$key};
+        next if $events->{not_include}{$key};
+        next if _should_skip_key(%o, key => $key);
         push @parts, $self->kvp2str_each(%o, key => $key, value => $data->{$key});
     }
 
@@ -728,14 +1081,14 @@ sub kvp2str_each {
 
     my ($k, $v) = map { _defor($_, '') } @o{qw( key value )};
 
-    $k = uri_escape($k);
+    $k = _uri_escape_bytes_or_chars($k);
 
     if (UNIVERSAL::isa($v, 'CODE')) {
         $v = $self->$v(%o, key => $k);
     }
 
     if (!ref $v) {
-        $v = uri_escape($v);
+        $v = _uri_escape_bytes_or_chars($v);
 
         $v = $v + 0 if looks_like_number($v);
 
@@ -747,10 +1100,8 @@ sub kvp2str_each {
         }
     }
     elsif (ref $v eq 'BOOL') {
-        return ref $v->[0] eq 'SCALAR'
-            ? "$k=${$v->[0]}"
-            : "$k=$v->[0]";
-
+        my $bool_value = ref $v->[0] eq 'SCALAR' ? ${$v->[0]} : $v->[0];
+        return "$k=" . _uri_escape_bytes_or_chars($bool_value);
     }
     elsif (ref $v eq 'ARRAY') {
         my @parts;
@@ -783,6 +1134,9 @@ sub kvp2str_each {
         }
 
         return $csv;
+    }
+    elsif (UNIVERSAL::isa($v, 'HASH')) {
+        die "Unable to convert nested hash value for key '$k' into a form-urlencoded query string";
     }
 
     return $v;

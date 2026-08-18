@@ -58,7 +58,7 @@ package # hide from PAUSE/MetaCPAN
   PDL::PodParser;
 use strict;
 use warnings;
-use PDL::Core '';
+use Carp qw(confess);
 use Pod::Simple::PullParser;
 use parent qw(Pod::Text);
 
@@ -100,7 +100,7 @@ sub cmd_head2 {
   my @funcs = split ',', $text;
   # Remove parentheses (so myfunc and myfunc() both work)
   my @names = map {$1 if m/\s*([^\s\(]+)\s*/} @funcs;
-  barf "error parsing function list '$text'"
+  confess "error parsing function list '$text'"
     unless @funcs == @names;
   # check for signatures
   my $sym = $this->{SYMHASH};
@@ -453,7 +453,7 @@ alternatives.
 package PDL::Doc;
 use strict;
 use warnings;
-use PDL::Core '';
+use Carp qw(confess);
 use File::Basename;
 use File::Spec::Functions qw(file_name_is_absolute abs2rel rel2abs catdir catfile);
 use Cwd (); # to help Debian packaging
@@ -473,9 +473,8 @@ our $pager = $ENV{PERLDOC_PAGER} // $ENV{PAGER} // $Config{pager};
 sub new {
   my ($type,@files) = @_;
   my $this = bless {},$type;
-  $this->{File} = [@files];
+  $this->{File} = \@files;
   $this->{Scanned} = [];
-  $this->{Outfile} = $files[0];
   $this;
 }
 
@@ -507,18 +506,6 @@ sub addfiles {
   push @{$this->{File}}, @files;
 }
 
-=head2 outfile
-
-set the name of the output file for this online db
-
-=cut
-
-sub outfile {
-  my ($this,$file) = @_;
-  $this->{Outfile} = $file if defined $file;
-  return $this->{Outfile};
-}
-
 =head2 ensuredb
 
 Make sure that the database is slurped in
@@ -528,7 +515,7 @@ Make sure that the database is slurped in
 sub ensuredb {
   my ($this) = @_;
   while (my $fi = pop @{$this->{File}}) {
-    open my $fh, $fi or barf "can't open database $fi, scan docs first";
+    open my $fh, $fi or confess "can't open database $fi, scan docs first";
     my $got_hash = decodedb($fh, $fi);
     merge_hash($this->{SYMS} ||= {}, $got_hash);
     push @{$this->{Scanned}}, $fi;
@@ -539,15 +526,16 @@ sub ensuredb {
 =head2 savedb
 
 save the database (i.e., the hash of PDL symbols) to the file associated
-with this object.
+with this object. As of 2.105, you B<must> supply the output file.
 
 =cut
 
 sub savedb {
-  my ($this) = @_;
+  my ($this, $outfile) = @_;
+  confess "savedb: no \$outfile" if !defined $outfile;
   my $hash = $this->ensuredb;
-  open my $fh, '>', $this->{Outfile} or barf "can't write to symdb $this->{Outfile}: $!";
-  encodedb($hash, $fh, dirname($this->{Outfile}));
+  open my $fh, '>', $outfile or confess "can't write to symdb $outfile: $!";
+  encodedb($hash, $fh, dirname($outfile));
 }
 
 =head2 gethash
@@ -556,7 +544,7 @@ Return the PDL symhash (e.g. for custom search operations). To see what
 it has stored in it in JSON format:
 
   perl -MPDL::Doc -MJSON::PP -e \
-    'print encode_json +PDL::Doc->new(PDL::Doc::_find_inc([qw(PDL pdldoc.db)]))->gethash' |
+    'print encode_json +PDL::Doc->new(PDL::Doc::_find_inc([qw(PDL pdldoc.db)], 0, 1))->gethash' |
     json_pp -json_opt pretty,canonical
 
 The symhash is a multiply nested hash ref with the following structure:
@@ -684,7 +672,7 @@ sub checkregex {
   $sep = '(?<!\\\\)\\'.$sep; # Avoid '\' before the separator
 
   my ($pattern,$mod) = split($sep,$regex,2);
-  barf "unknown regex modifiers '$mod'" if $mod && $mod !~ /[imsx]+/;
+  confess "unknown regex modifiers '$mod'" if $mod && $mod !~ /[imsx]+/;
   $pattern = "(?$mod)$pattern" if $mod;
   return $pattern;
 }
@@ -698,7 +686,7 @@ for online documentation
 
 sub scan {
   my ($this,$file,$verbose) = @_;
-  barf "can't find file '$file'" unless -f $file;
+  confess "can't find file '$file'" unless -f $file;
   $file = Cwd::abs_path($file); # help Debian packaging
   $verbose = 0 unless defined $verbose;
   my $text = do { open my $infile, '<', $file or die "$file: $!"; local $/; <$infile> };
@@ -755,8 +743,8 @@ source file using the PDL::PodParser filter.
 sub funcdocs {
   my ($this,$func,$module,$fout) = @_;
   my $hash = $this->ensuredb;
-  barf "unknown function '$func'" unless defined($hash->{$func});
-  barf "funcdocs now requires 3 arguments" if defined fileno $module;
+  confess "unknown function '$func'" unless defined($hash->{$func});
+  confess "funcdocs now requires 3 arguments" if defined fileno $module;
   my $file = $hash->{$func}{$module}{File};
   my $dbf = $hash->{$func}{$module}{Dbfile};
   $file = Cwd::abs_path($file) if file_name_is_absolute($file);
@@ -879,12 +867,12 @@ sub scantext {
 
 sub funcdocs_fromfile {
   my ($func,$file) = @_;
-  barf "can't find file '$file'" unless -f $file;
+  confess "can't find file '$file'" unless -f $file;
   local $SIG{PIPE}= sub {}; # Prevent crashing if user exits the pager
-  open my $in, '<', $file or barf "can't open file $file";
+  open my $in, '<', $file or confess "can't open file $file";
   my $out = $_[2];
   open $out, "| pod2text | $PDL::Doc::pager" if !defined $out;
-  barf "can't open output handle" unless $out;
+  confess "can't open output handle" unless $out;
   getfuncdocs($func,$in,$out);
   print $out "Docs from $file\n\n";
 }
@@ -919,26 +907,24 @@ distribution is Perl modules (like L<PDL::LinearAlgebra>), then add a
 C<postamble> manually in the F<Makefile.PL>:
 
   use PDL::Core::Dev;
-  sub MY::postamble {
-    my $oneliner = PDL::Core::Dev::_oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(shift); }});
-    qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
-  }
+  sub MY::postamble { ::pdldoc_add() }
 
 =cut
 
 sub _find_inc {
-  my ($what, $want_dir) = @_;
+  my ($what, $want_dir, $only_one) = @_;
   my @ret;
   for my $dir (@INC) {
     my $ent = $want_dir ? catdir($dir, @$what) : catfile($dir, @$what);
     push @ret, $ent if $want_dir ? -d $ent : -f $ent;
+    return @ret if $only_one and @ret;
   }
   @ret;
 }
 
 sub add_module {
   my ($module) = @_;
-  my ($file) = _find_inc([qw(PDL pdldoc.db)], 0);
+  my ($file) = _find_inc([qw(PDL pdldoc.db)], 0, 1);
   die "Unable to find docs database - therefore not updating it.\n" if !defined $file;
   die "No write permission for $file - not updating docs database.\n"
     if !-w $file;
@@ -946,14 +932,18 @@ sub add_module {
   my $pdldoc = PDL::Doc->new($file);
   my @pkg = my @mfile = split /::/, $module;
   my $mlast = pop @mfile;
-  my @found = map _find_inc([@mfile, $mlast.$_]), qw(.pm .pod);
+  my @found;
+  for (qw(.pm .pod)) {
+    my @this = _find_inc([@mfile, $mlast.$_], 0, 1);
+    push(@found, @this), last if @this;
+  }
   die "Unable to find a .pm or .pod file in \@INC for module $module\n" if !@found;
   $pdldoc->ensuredb;
   my $n = 0;
   $n += $pdldoc->scan($_) for @found;
   print "Added @found, $n functions.\n";
-  $n += $pdldoc->scantree($_) for _find_inc(\@pkg, 1);
-  eval { $pdldoc->savedb; };
+  $n += $pdldoc->scantree($_) for _find_inc(\@pkg, 1, 1);
+  eval { $pdldoc->savedb($file); };
   warn $@ if $@;
   print "PDL docs database updated - total $n functions.\n";
 }
@@ -965,7 +955,7 @@ own code.
 
  use PDL::Doc;
  # Find the pdl documentation
- my ($file) = _find_inc([qw(PDL pdldoc.db)], 0);
+ my ($file) = _find_inc([qw(PDL pdldoc.db)], 0, 1);
  die "Unable to find docs database!\n" unless defined $file;
  print "Found docs database $file\n";
  my $pdldoc = PDL::Doc->new($file);

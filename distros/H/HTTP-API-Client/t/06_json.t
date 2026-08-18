@@ -1,3 +1,11 @@
+=head1 NAME
+
+06_json.t - kvp2json encodes pre-defined and per-call data as a JSON body
+(numbers unquoted, CSV-marked arrays flattened, xTRUE/xFALSE as real JSON
+booleans), and a keys callback can restrict which fields go out
+
+=cut
+
 ## Please see file perltidy.ERR
 use strict;
 use warnings;

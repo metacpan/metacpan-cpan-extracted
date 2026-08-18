@@ -6,12 +6,12 @@
 #include "cmark.h"
 #include "buffer.h"
 
-int cmark_version()
+int cmark_version(void)
 {
 	return CMARK_VERSION;
 }
 
-const char *cmark_version_string()
+const char *cmark_version_string(void)
 {
 	return CMARK_VERSION_STRING;
 }

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use PDL::Core::Dev;
 
 sub MY::libscan
 {
@@ -13,19 +14,13 @@ sub MY::libscan
     return $self->SUPER::libscan ($file);
 }
 
-sub MY::postamble {
-    my $text = <<'FOO';
-install ::
-	@echo "Updating PDL documentation database...";
-	@$(PERL) -e 'sub PDL::Doc::add_module {print STDERR "legacy PDL detected.  Cannot install docs.\n"}; eval q{use PDL::Doc; PDL::Doc::add_module(q[PDL::Graphics::Simple];}'
+sub MY::postamble { pdldoc_add() }
 
-FOO
-    return $text;
-}
-
-my %prereq = ( 'PDL'         => '2.089', # contour_polylines
-	       'File::Temp'  => 0,
-	       'Time::HiRes' => 0);
+my %prereq = (
+  'PDL' => '2.105', # pdldoc_add
+  'File::Temp'  => 0,
+  'Time::HiRes' => 0
+);
 my %min_version = (
   'PDL::Graphics::Gnuplot' => '2.029', # Gnuplot 6 warnings fixes
 );
@@ -45,6 +40,7 @@ WriteMakefile(
     PREREQ_PM => \%prereq,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '7.12', # working .g.c
+        'PDL' => '2.105', # pdldoc_add
     },
     TEST_REQUIRES => {
         'Test::More'  => '0.88',

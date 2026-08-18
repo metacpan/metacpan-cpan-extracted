@@ -273,7 +273,7 @@ use warnings;
 
 
 
-#line 318 "lib/PDL/Transform.pd"
+#line 307 "lib/PDL/Transform.pd"
 
 =head2 apply
 
@@ -328,7 +328,7 @@ sub apply {
   return $result;
 }
 
-#line 376 "lib/PDL/Transform.pd"
+#line 365 "lib/PDL/Transform.pd"
 
 =head2 invert
 
@@ -713,13 +713,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1541 "lib/PDL/Transform.pd"
+#line 1530 "lib/PDL/Transform.pd"
 
 sub PDL::match {
   # Set default for rectification to 0 for simple matching...
   push @_, {} if ref($_[-1]) ne 'HASH';
   my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
-#line 1546 "lib/PDL/Transform.pd"
+#line 1535 "lib/PDL/Transform.pd"
   unless(@k) {
       $_[-1]->{rectify} = 0;
   }
@@ -943,7 +943,7 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1772 "lib/PDL/Transform.pd"
+#line 1761 "lib/PDL/Transform.pd"
           };
       } else {
           # Non-rectified output -- generate a CDi_j matrix instead of the simple formalism.
@@ -989,7 +989,7 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1817 "lib/PDL/Transform.pd"
+#line 1806 "lib/PDL/Transform.pd"
           };
       }
     }
@@ -1105,7 +1105,7 @@ sub map {
 
 
 
-#line 1931 "lib/PDL/Transform.pd"
+#line 1920 "lib/PDL/Transform.pd"
 
 ######################################################################
 
@@ -1145,7 +1145,7 @@ sub unmap {
   return $me->inverse->map($data,@params);
 }
 
-#line 1974 "lib/PDL/Transform.pd"
+#line 1963 "lib/PDL/Transform.pd"
 
 =head2 t_inverse
 
@@ -1189,7 +1189,7 @@ sub inverse {
   }, ref $me;
 }
 
-#line 2021 "lib/PDL/Transform.pd"
+#line 2010 "lib/PDL/Transform.pd"
 
 =head2 t_compose
 
@@ -1285,7 +1285,7 @@ sub compose {
   return bless($me,'PDL::Transform::Composition');
 }
 
-#line 2120 "lib/PDL/Transform.pd"
+#line 2109 "lib/PDL/Transform.pd"
 
 =head2 t_wrap
 
@@ -1352,7 +1352,7 @@ sub _pow_op {
     t_compose(@l);
 }
 
-#line 2193 "lib/PDL/Transform.pd"
+#line 2182 "lib/PDL/Transform.pd"
 
 =head2 t_identity
 
@@ -1386,7 +1386,7 @@ sub new {
   return bless $me,$class;
 }
 
-#line 2231 "lib/PDL/Transform.pd"
+#line 2220 "lib/PDL/Transform.pd"
 
 =head2 t_lookup
 
@@ -1635,7 +1635,7 @@ sub t_lookup {
   return $me;
 }
 
-#line 2487 "lib/PDL/Transform.pd"
+#line 2476 "lib/PDL/Transform.pd"
 
 =head2 t_linear
 
@@ -1726,7 +1726,7 @@ with: if you supply a matrix, it defines the transformation; if you
 input offset vectors in the C<pre> and C<post> options, those define
 the number of dimensions.  But if you only supply scalars, there is no way
 to tell and the default number of dimensions is 2.  This provides a way
-to do, e.g., 3-D scaling: just set C<{s=><scale-factor>, dims=>3}> and
+to do, e.g., 3-D scaling: just set C<< {s=><scale-factor>, dims=>3} >> and
 you are on your way.
 
 =item idim
@@ -1753,6 +1753,7 @@ our @ISA = ('PDL::Transform');
 *_opt = \&PDL::Transform::_opt;
 *barf = \&PDL::Transform::barf;
 *identity = \&PDL::MatrixOps::identity;
+use PDL::Constants qw(DEG2RAD);
 
 sub PDL::Transform::t_linear { PDL::Transform::Linear->new(@_); }
 
@@ -1849,7 +1850,7 @@ sub new {
                        $angle = $angle->at(0)
                          if UNIVERSAL::isa($angle,'PDL');
 
-                       my($x) = $angle * $PDL::Transform::DEG2RAD;
+                       my($x) = $angle * DEG2RAD;
                        $subm .= $subm x PDL->pdl([cos($x),-sin($x)],[sin($x),cos($x)]);
                        $m .= $m x $i;
                      };
@@ -1960,7 +1961,7 @@ sub stringify {
 }
 }
 
-#line 2815 "lib/PDL/Transform.pd"
+#line 2805 "lib/PDL/Transform.pd"
 
 =head2 t_scale
 
@@ -1981,12 +1982,12 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2836 "lib/PDL/Transform.pd"
+#line 2826 "lib/PDL/Transform.pd"
         if ref $y eq 'HASH';
     t_linear(Scale=>$scale,$y,@_);
 }
 
-#line 2843 "lib/PDL/Transform.pd"
+#line 2833 "lib/PDL/Transform.pd"
 
 =head2 t_offset
 
@@ -2007,13 +2008,13 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2864 "lib/PDL/Transform.pd"
+#line 2854 "lib/PDL/Transform.pd"
         if ref $y eq 'HASH';
 
     t_linear(pre=>$pre,$y,@_);
 }
 
-#line 2872 "lib/PDL/Transform.pd"
+#line 2862 "lib/PDL/Transform.pd"
 
 =head2 t_rot
 
@@ -2035,13 +2036,13 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2894 "lib/PDL/Transform.pd"
+#line 2884 "lib/PDL/Transform.pd"
         if ref $y eq 'HASH';
 
     t_linear(rot=>$rot,$y,@_);
 }
 
-#line 2904 "lib/PDL/Transform.pd"
+#line 2894 "lib/PDL/Transform.pd"
 
 =head2 t_fits
 
@@ -2147,7 +2148,7 @@ sub t_fits {
         ## CROTA2 is encouraged instead.
       my $cr = $hdr->{CROTA2} // $hdr->{CROTA} // $hdr->{CROTA1};
 
-      $cr *= $PDL::Transform::DEG2RAD;
+      $cr *= DEG2RAD();
         # Rotation matrix rotates counterclockwise to get from sci to pixel coords
         # (detector has been rotated ccw, according to FITS standard)
       $cpm .= pdl( [cos($cr), sin($cr)],[-sin($cr),cos($cr)] );
@@ -2196,7 +2197,7 @@ sub t_fits {
   return $me;
 }
 
-#line 3067 "lib/PDL/Transform.pd"
+#line 3057 "lib/PDL/Transform.pd"
 
 =head2 t_code
 
@@ -2239,7 +2240,7 @@ The number of output dimensions
 
 =item itype
 
-The type of the input dimensions, in an array ref (optional and advisiory)
+The type of the input dimensions, in an array ref (optional and advisory)
 
 =item otype
 
@@ -2289,7 +2290,7 @@ sub t_code {
   $me;
 }
 
-#line 3166 "lib/PDL/Transform.pd"
+#line 3156 "lib/PDL/Transform.pd"
 
 =head2 t_cylindrical
 
@@ -2380,6 +2381,7 @@ each piece of the image looks "natural" -- only scaled and not stretched.
 
 =cut
 
+use PDL::Constants qw(RAD2DEG);
 *t_cylindrical = \&t_radial;
 sub t_radial {
   my($class) = 'PDL::Transform';
@@ -2400,7 +2402,7 @@ sub t_radial {
 
   $me->{params}{u} = _opt($o,['u','unit','Unit'],'radians');
   ### Replace this kludge with a units call
-  $me->{params}{angunit} = ($me->{params}{u} =~ m/^d/i) ? $PDL::Transform::RAD2DEG : 1.0;
+  $me->{params}{angunit} = ($me->{params}{u} =~ m/^d/i) ? RAD2DEG : 1.0;
   print "radial: conversion is $me->{params}{angunit}\n" if $PDL::Transform::debug;
 
   $me->{name} = "radial (direct)";
@@ -2429,7 +2431,7 @@ sub t_radial {
       my($d1) = $d->slice("(1)");
 
       # (mod operator on atan2 puts everything in the interval [0,2*PI).)
-      $out->slice("(0)") .= (atan2(-$d1,$d0) % (2*$PDL::Transform::PI)) * $me->{params}->{angunit};
+      $out->slice("(0)") .= (atan2(-$d1,$d0) % (2*PDL::Transform::PI())) * $me->{params}->{angunit};
 
       $out->slice("(1)") .= (defined $o->{r0}) ?
               0.5 * log( ($d1*$d1 + $d0 * $d0) / ($o->{r0} * $o->{r0}) ) :
@@ -2460,7 +2462,7 @@ sub t_radial {
   $me;
 }
 
-#line 3343 "lib/PDL/Transform.pd"
+#line 3334 "lib/PDL/Transform.pd"
 
 =head2 t_quadratic
 
@@ -2567,7 +2569,7 @@ sub t_quadratic {
     $me;
 }
 
-#line 3454 "lib/PDL/Transform.pd"
+#line 3445 "lib/PDL/Transform.pd"
 
 =head2 t_cubic
 
@@ -2707,7 +2709,7 @@ sub t_cubic {
     $me;
 }
 
-#line 3599 "lib/PDL/Transform.pd"
+#line 3590 "lib/PDL/Transform.pd"
 
 =head2 t_quartic
 
@@ -2853,7 +2855,7 @@ sub t_quartic {
     $me;
 }
 
-#line 3748 "lib/PDL/Transform.pd"
+#line 3739 "lib/PDL/Transform.pd"
 
 =head2 t_spherical
 
@@ -2931,7 +2933,7 @@ sub t_spherical {
 
   my $unit = _opt($o,['u','unit','Unit']);
   $me->{params}{angunit} = ($unit && $unit =~ m/^d/i) ?
-      $PDL::Transform::DEG2RAD : undef;
+      DEG2RAD() : undef;
 
   $me->{name} = "spherical";
 
@@ -2955,7 +2957,7 @@ sub t_spherical {
 
   $me;
 }
-#line 2959 "lib/PDL/Transform.pm"
+#line 2961 "lib/PDL/Transform.pm"
 
 *t_spherical_inv = \&PDL::t_spherical_inv;
 
@@ -2963,7 +2965,7 @@ sub t_spherical {
 
 
 
-#line 3873 "lib/PDL/Transform.pd"
+#line 3864 "lib/PDL/Transform.pd"
 
 =head2 t_projective
 
@@ -3199,23 +3201,13 @@ use overload '!'  => \&t_inverse;
 
 use PDL::LiteF;
 use PDL::MatrixOps;
-
-our $PI = 3.1415926535897932384626;
-our $DEG2RAD = $PI / 180;
-our $RAD2DEG = 180/$PI;
-our $E  = exp(1);
+use PDL::Constants qw(PI DEG2RAD);
 
 #### little helper kludge parses a list of synonyms
 sub _opt {
-  my($hash) = shift;
-  my($synonyms) = shift;
-  my($alt) = shift;  # default is undef -- ok.
-  local($_);
-  foreach $_(@$synonyms){
-    return (UNIVERSAL::isa($alt,'PDL')) ? PDL->pdl($hash->{$_}) : $hash->{$_}
-    if defined($hash->{$_}) ;
-  }
-  return $alt;
+  my ($hash, $synonyms, $alt) = @_;  # default $alt is undef -- ok.
+  return $alt if !(my ($s) = grep defined $hash->{$_}, @$synonyms);
+  UNIVERSAL::isa($alt,'PDL') ? PDL->pdl($hash->{$s}) : $hash->{$s};
 }
 
 ######################################################################
@@ -3243,7 +3235,7 @@ sub stringify {
   $out .= "fwd ". ((defined ($me->{func})) ? ( (ref($me->{func}) eq 'CODE') ? "ok" : "non-CODE(!!)" ): "missing")."; ";
   $out .= "inv ". ((defined ($me->{inv})) ?  ( (ref($me->{inv}) eq 'CODE') ? "ok" : "non-CODE(!!)" ):"missing").".\n";
 }
-#line 3247 "lib/PDL/Transform.pm"
+#line 3239 "lib/PDL/Transform.pm"
 
 # Exit with OK status
 

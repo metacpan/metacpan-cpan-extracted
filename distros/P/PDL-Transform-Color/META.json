@@ -4,7 +4,7 @@
       "Craig DeForest <craig@deforest.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "6.48",
+            "PDL" : "2.105"
          }
       },
       "runtime" : {
@@ -54,6 +55,6 @@
          "url" : "git://github.com/PDLPorters/PDL-Transform-Color.git"
       }
    },
-   "version" : "1.010",
+   "version" : "1.011",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

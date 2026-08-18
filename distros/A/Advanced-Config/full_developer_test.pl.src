@@ -45,7 +45,7 @@ use File::Copy;
 use File::Glob qw (bsd_glob);
 
 # The number of fish log files to locate for each 'make test' run!
-use constant MAX => 28;
+use constant MAX => 29;
 
 my $fish_dir_summary;
 my $fish_dir_details;

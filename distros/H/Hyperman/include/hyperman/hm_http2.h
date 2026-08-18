@@ -107,9 +107,9 @@ static void hm_h2_add_header(pTHX_ hm_h2_stream *st,
         }
         return;
     }
-    if (nl == 14 && strncasecmp(nm, "content-length", 14) == 0) {
+    if (nl == 14 && hm_strncasecmp(nm, "content-length", 14) == 0) {
         hv_stores(env, "CONTENT_LENGTH", newSVpvn(vl, vlen));
-    } else if (nl == 12 && strncasecmp(nm, "content-type", 12) == 0) {
+    } else if (nl == 12 && hm_strncasecmp(nm, "content-type", 12) == 0) {
         hv_stores(env, "CONTENT_TYPE", newSVpvn(vl, vlen));
     } else if (nl + 5 < 300) {
         char keybuf[300];

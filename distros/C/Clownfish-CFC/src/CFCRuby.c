@@ -203,7 +203,7 @@ S_write_boot_c(CFCRuby *self) {
         "\n"
         "void\n"
         "%s() {\n"
-        "    %sbootstrap_parcel();\n"
+        "    %sbootstrap_parcel(void);\n"
         "\n"
         "    cfish_StackString *alias = CFISH_SSTR_WRAP_UTF8(\"\", 0);\n"
         "}\n"

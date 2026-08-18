@@ -1,0 +1,82 @@
+======================================================================
+ TUI::Handy Cheat Sheet                                  [ZH] 中文
+======================================================================
+
+[ 1. 安装与加载 ]
+
+  无 CPAN 依赖；将 Handy.pm 复制到 @INC 中的任意目录，或直接作为脚本运行。
+
+  use TUI::Handy;
+  # or, as a command:  perl Handy.pm form.txt
+
+[ 2. 创建并运行表单 ]
+
+  通过 DSL 字符串或文件创建表单，然后调用 run()；结果是以 DSL 中标签为键的哈希引用。
+
+  my $tui  = TUI::Handy->new(dsl => $text);   # or new(file => $path)
+  my $form = $tui->run;
+  print "Company = $form->{Company}\n";
+
+[ 3. 文本框标记 ]
+
+  [ ] 中的填充字符决定文本框类型：_ 表示半角，# 表示数字，$ 或 \ 表示货币，YYYYMMDD 或 % 表示日期，全角字符表示 zenkaku 类型。
+
+  Company: [__________]
+  Age:     [###]
+  Price:   [$$$$$$]
+  Date:    [YYYYMMDD]
+
+[ 4. 复选框与单选按钮 ]
+
+  [X]/[ ] 是复选框（值为 1 或 0）；(*)/( ) 在前一个标题行下分组为单选按钮，值为所选标签文本。
+
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+
+[ 5. 按钮 ]
+
+  标签前没有任何文字的方括号是按钮，用 set() 注册其处理函数。
+
+  $tui->set('Register', sub { my $form = shift; save($form); 0 });
+  [Register]
+
+[ 6. 按键操作 ]
+
+  TAB / 下箭头移到下一个字段，Shift-TAB / 上箭头移到上一个字段；Enter、空格和箭头键用于编辑或激活按钮，ESC 中止表单。
+
+[ 7. 字符编码 ]
+
+  在非 Windows 系统自动检测为 UTF-8，在 Windows 上为 Shift_JIS (CP932)；同时支持 EUC-JP。可用 TUI_HANDY_ENCODING 覆盖。
+
+  $ENV{TUI_HANDY_ENCODING} = 'euc';   # utf8 / sjis / euc
+
+[ 8. 行模式回退 ]
+
+  当 stty 不可用时（纯 Windows cmd.exe），自动切换为便携的行模式驱动；可用 TUI_HANDY_MODE 强制指定。
+
+  $ENV{TUI_HANDY_MODE} = 'line';      # ansi / line
+
+[ 9. 命令行用法 ]
+
+  无需编写 Perl 代码即可直接运行 DSL 文件。
+
+  perl Handy.pm form.txt
+
+[ 10. 完整示例 ]
+
+  一个结合所有控件类型的简短 DSL 示例。
+
+  Registration
+  Company: [__________]
+  Age:     [###]
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+  [Register]
+
+[ 11. 参考资料 ]
+
+  完整文档见 lib/TUI/Handy.pm 的 POD（perldoc TUI::Handy）。作者：INABA Hitoshi <ina.cpan@gmail.com>。许可协议：与 Perl 本身相同。

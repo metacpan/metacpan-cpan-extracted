@@ -3,7 +3,7 @@ package PDF::Make::Arena;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # Load the XS code from PDF::Make
 use PDF::Make ();

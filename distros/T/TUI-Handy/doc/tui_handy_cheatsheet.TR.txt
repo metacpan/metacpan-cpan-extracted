@@ -1,0 +1,82 @@
+======================================================================
+ TUI::Handy Cheat Sheet                                  [TR] Türkçe
+======================================================================
+
+[ 1. Kurulum ve yükleme ]
+
+  CPAN bağımlılığı yoktur; Handy.pm dosyasını @INC içindeki herhangi bir dizine kopyalayın veya doğrudan betik olarak çalıştırın.
+
+  use TUI::Handy;
+  # or, as a command:  perl Handy.pm form.txt
+
+[ 2. Form oluşturma ve çalıştırma ]
+
+  Formu bir DSL dizesinden veya dosyadan oluşturun, ardından run() çağırın; sonuç, DSL'deki etiketleri anahtar olarak kullanan bir hash referansıdır.
+
+  my $tui  = TUI::Handy->new(dsl => $text);   # or new(file => $path)
+  my $form = $tui->run;
+  print "Company = $form->{Company}\n";
+
+[ 3. Metin kutusu işaretleri ]
+
+  [ ] içindeki dolgu karakterleri metin kutusu türünü belirler: _ yarım genişlik, # sayı, $ veya \ para birimi, YYYYMMDD ya da % tarih, tam genişlikteki herhangi bir karakter zenkaku türü içindir.
+
+  Company: [__________]
+  Age:     [###]
+  Price:   [$$$$$$]
+  Date:    [YYYYMMDD]
+
+[ 4. Onay kutusu ve seçenek düğmesi ]
+
+  [X]/[ ] bir onay kutusudur (1 veya 0 değeri); (*)/( ) önceki başlık satırına göre gruplanan seçenek düğmeleridir, değeri seçilen etiket metnidir.
+
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+
+[ 5. Düğme ]
+
+  Önünde etiket metni olmayan köşeli parantezler bir düğmedir; eylemini set() ile kaydedin.
+
+  $tui->set('Register', sub { my $form = shift; save($form); 0 });
+  [Register]
+
+[ 6. Tuşlar ]
+
+  TAB/aşağı ok bir sonraki alana, Shift-TAB/yukarı ok bir önceki alana geçer. Enter, Boşluk ve ok tuşları alanı düzenler ya da düğmeyi etkinleştirir; ESC formu iptal eder.
+
+[ 7. Karakter kodlaması ]
+
+  Windows dışında UTF-8, Windows'ta Shift_JIS (CP932) otomatik algılanır; EUC-JP da desteklenir. TUI_HANDY_ENCODING ile geçersiz kılınabilir.
+
+  $ENV{TUI_HANDY_ENCODING} = 'euc';   # utf8 / sjis / euc
+
+[ 8. Satır modu yedeği ]
+
+  stty bulunmadığında (salt Windows cmd.exe), taşınabilir satır modu sürücüsüne otomatik geçilir; TUI_HANDY_MODE ile modu zorlayın.
+
+  $ENV{TUI_HANDY_MODE} = 'line';      # ansi / line
+
+[ 9. Komut satırı kullanımı ]
+
+  Perl kodu yazmadan bir DSL dosyası doğrudan çalıştırılabilir.
+
+  perl Handy.pm form.txt
+
+[ 10. Tam örnek ]
+
+  Tüm bileşen türlerini birleştiren kısa bir DSL örneği.
+
+  Registration
+  Company: [__________]
+  Age:     [###]
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+  [Register]
+
+[ 11. Kaynaklar ]
+
+  Tam belgeler lib/TUI/Handy.pm dosyasının POD'unda bulunur (perldoc TUI::Handy). Yazar: INABA Hitoshi <ina.cpan@gmail.com>. Lisans: Perl'in kendisiyle aynı koşullar.

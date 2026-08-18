@@ -1,5 +1,8 @@
 Revision history for Mojo-UserAgent-CookieJar-ChromeMacOS
 
+0.04  2026-08-18 14:35:37 CST
+        - Upgrade to match HTTP::Cookies::Chrome v3: handle DB v24+ SHA256 prefix, PKCS7 padding, switch to Crypt::Rijndael, add is_httponly support
+
 0.03  2022-02-18 11:26:38 CST
         - support v11 and Linux keyring
 

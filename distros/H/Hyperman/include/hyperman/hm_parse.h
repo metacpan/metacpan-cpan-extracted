@@ -11,8 +11,22 @@
 
 #include <stddef.h>
 #include <string.h>
-#include <strings.h>   /* strncasecmp */
 #include <limits.h>    /* LONG_MAX, ULLONG_MAX */
+
+/* Case-insensitive compare. POSIX puts it in <strings.h>; MSVC has no such
+ * header at all and MinGW's is a thin inline over the CRT's _strnicmp, so we
+ * name the CRT call directly there. Prefixed rather than #defined over the
+ * system name: perl.h and the platform headers are already in this
+ * translation unit, and redefining an ambient symbol they may have declared
+ * is the mistake Eshu spent three releases undoing. This file stays
+ * dependency-free (tools/fuzz/ compiles it alone), so the shim lives here
+ * and not in hm_win.h. */
+#ifdef _WIN32
+#  define hm_strncasecmp(a, b, n) _strnicmp((a), (b), (n))
+#else
+#  include <strings.h>
+#  define hm_strncasecmp(a, b, n) strncasecmp((a), (b), (n))
+#endif
 
 /* One parsed header line: name at head+off (klen bytes), value at head+voff
  * (vlen bytes, leading OWS trimmed; trailing OWS kept, matching what the env
@@ -57,16 +71,16 @@ static int hm_parse_index(const char *head, size_t headlen, long *clen,
                 idx[n].vlen = (unsigned)(vend - v);
             }
             n++;
-            if (nk == 17 && strncasecmp(p, "Transfer-Encoding", 17) == 0) {
+            if (nk == 17 && hm_strncasecmp(p, "Transfer-Encoding", 17) == 0) {
                 const char *tvend = vend;
                 while (tvend > v && (tvend[-1] == ' ' || tvend[-1] == '\t')) tvend--;
                 if (seen_te) return 400;             /* repeated TE: ambiguous */
                 seen_te = 1;
-                if ((size_t)(tvend - v) == 7 && strncasecmp(v, "chunked", 7) == 0)
+                if ((size_t)(tvend - v) == 7 && hm_strncasecmp(v, "chunked", 7) == 0)
                     chunked = 1;
                 else
                     return 501;                      /* unsupported coding */
-            } else if (nk == 14 && strncasecmp(p, "Content-Length", 14) == 0) {
+            } else if (nk == 14 && hm_strncasecmp(p, "Content-Length", 14) == 0) {
                 const char *d, *dvend = vend;
                 while (dvend > v && (dvend[-1] == ' ' || dvend[-1] == '\t')) dvend--;
                 if (seen_cl || v == dvend) return 400;  /* duplicate or empty */
@@ -95,8 +109,15 @@ static int hm_frame_length(const char *head, size_t headlen, long *clen) {
 /* Validate a chunked request body in buf[0..avail) WITHOUT mutating it (so an
  * incomplete body can be re-checked as more bytes arrive). On a complete body
  * set *encoded (input octets through the terminating CRLF) and *decoded (total
- * data octets) and return 1; return 0 if more input is needed, -1 if malformed
- * or the decoded size would exceed max. */
+ * data octets) and return 1; return 0 if more input is needed, -1 if
+ * malformed, and HM_CHUNKED_TOOBIG if the decoded size would exceed max.
+ *
+ * "Too large" is a separate answer from "malformed" because they are
+ * different answers to the CLIENT: 400 says your framing is broken and
+ * retrying identically is pointless, 413 says the framing was fine and you
+ * should send less. Folding them together (as this did before 0.25) told
+ * every oversize chunked upload to go and fix its syntax. */
+#define HM_CHUNKED_TOOBIG (-2)
 static int hm_chunked_scan(const char *buf, size_t avail,
                            size_t *encoded, size_t *decoded, size_t max) {
     size_t pos = 0, dec = 0;
@@ -129,7 +150,7 @@ static int hm_chunked_scan(const char *buf, size_t avail,
                 i = j + 2;                               /* skip a trailer line */
             }
         }
-        if (size > max || dec + size > max) return -1;   /* decoded too large */
+        if (size > max || dec + size > max) return HM_CHUNKED_TOOBIG;
         if (i + size + 2 > avail) return 0;              /* await chunk + CRLF */
         if (buf[i + size] != '\r' || buf[i + size + 1] != '\n') return -1;
         dec += (size_t)size;

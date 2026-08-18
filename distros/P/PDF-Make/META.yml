@@ -25,5 +25,5 @@ requires:
   Layout::Flex: '0.01'
   Object::Proto: '0.16'
   perl: '5.010001'
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

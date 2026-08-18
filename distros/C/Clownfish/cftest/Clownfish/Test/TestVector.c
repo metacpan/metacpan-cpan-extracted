@@ -36,13 +36,13 @@
 #include "Clownfish/Class.h"
 
 TestVector*
-TestVector_new() {
+TestVector_new(void) {
     return (TestVector*)Class_Make_Obj(TESTVECTOR);
 }
 
 // Return an array of size 10 with 30 garbage pointers behind.
 static Vector*
-S_array_with_garbage() {
+S_array_with_garbage(void) {
     Vector *array = Vec_new(100);
 
     for (int i = 0; i < 40; i++) {

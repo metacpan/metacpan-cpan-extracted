@@ -59,9 +59,19 @@ sub full_login {
     is $h->{location}, '/after?x=1', 'return path honoured';
 }
 
-# absolute and protocol-relative return destinations fall back
+# absolute and protocol-relative return destinations fall back.
+# The backslash and tab forms are CVE-2026-75628: a browser folds '\'
+# to '/' and strips TAB/CR/LF before parsing, so these reach the
+# authority of another host even though the bytes we were handed do not
+# start with "//".
 for my $evil ('https%3A%2F%2Fevil.example%2F', '%2F%2Fevil.example',
-              'javascript%3Aalert(1)') {
+              'javascript%3Aalert(1)',
+              '%2F%5Cevil.example',        # /\evil.example
+              '%2F%5C%2Fevil.example',     # /\/evil.example
+              '%2F%09%2Fevil.example',     # /<TAB>/evil.example
+              '%2F%0A%2Fevil.example',     # /<LF>/evil.example
+              '%2F%00%2F%2Fevil.example',  # /<NUL>//evil.example
+              '%2Fok%2F%09%2F%2Fevil.example') {
     my ($s, $h) = full_login(start => "/auth/idp?return=$evil");
     is $s, 302, 'login still completes';
     is $h->{location}, '/home', "open-redirect '$evil' ignored";

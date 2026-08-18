@@ -1,9 +1,19 @@
 Revision history for Perl extension PlackX-Framework
 
+0.33 2026-08-18T07:48:40Z
+
+    - Fix more documentation mistakes
+
+0.32 2026-08-18T07:23:40Z
+
+    - Downgrade minimum perl version to 5.26.0
+    - Documentation fixes and updates
+
 0.31 2026-08-16T08:09:23Z
 
     - Remove unnecessary static file app integration
     - Document undocumented cleanup callback feature
+    - Happy Birthday CPAN!
 
 0.30 2026-08-14T09:30:27Z
 
@@ -27,4 +37,3 @@ Revision history for Perl extension PlackX-Framework
 0.26 2026-03-18T20:10:14Z
 
     - First CPAN release
-

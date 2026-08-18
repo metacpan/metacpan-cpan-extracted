@@ -373,7 +373,7 @@ S_grow_and_oversize(CharBuf *self, size_t min_size) {
 }
 
 static void
-S_overflow_error() {
+S_overflow_error(void) {
     THROW(ERR, "CharBuf buffer overflow");
 }
 

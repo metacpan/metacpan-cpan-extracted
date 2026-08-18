@@ -62,7 +62,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='3.015';
+$VERSION='3.018';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -347,7 +347,36 @@ sub handler : method {    # no subsort
     if (WEBDYNE_CACHE_DN) {
         debug("webdyne_cache_dn: $WEBDYNE_CACHE_DN");
         $cache_pn=File::Spec->catfile(WEBDYNE_CACHE_DN, $srce_inode);
-        $cache_mtime=((-f $cache_pn) && (stat(_))[9]);
+
+        #  Cache stat policy:
+        #    0  = always stat, preserving historical freshness behaviour.
+        #    >0 = reuse the last stat result until the TTL expires.
+        #    <0 = reuse the last stat result for the life of this process.
+        #
+        #  The combined test below is intentionally a little dense so both TTL
+        #  and process-lifetime caching go through the same cached-result path.
+        #  That avoids split logic in this hot request path; for negative TTL we
+        #  also avoid calling time() once a stat result has been cached.
+        #
+        my $cache_stat_ttl=WEBDYNE_CACHE_STAT_TTL;
+        if (
+            $cache_stat_ttl
+            && $cache_inode_hr->{'cache_stat_set'}
+            && (
+                ($cache_stat_ttl < 0)
+                || ((time() - $cache_inode_hr->{'cache_stat_time'}) < $cache_stat_ttl)
+            )
+        ) {
+            $cache_mtime=$cache_inode_hr->{'cache_stat_mtime'};
+        }
+        else {
+            $cache_mtime=((-f $cache_pn) && (stat(_))[9]);
+            if ($cache_stat_ttl) {
+                $cache_inode_hr->{'cache_stat_set'}=1;
+                $cache_inode_hr->{'cache_stat_time'}=time() if ($cache_stat_ttl > 0);
+                $cache_inode_hr->{'cache_stat_mtime'}=$cache_mtime;
+            }
+        }
         debug("webdyne_cache file: $cache_pn, cache_mtime: $cache_mtime");
     }
     else {
@@ -454,6 +483,12 @@ sub handler : method {    # no subsort
             $cache_mtime=(stat($cache_pn))[9] if $cache_pn;    # ||
                                                                #return $self->err_html("could not stat cache file '$cache_pn'");
             $cache_inode_hr->{'mtime'}=$cache_mtime || time();
+            my $cache_stat_ttl=WEBDYNE_CACHE_STAT_TTL;
+            if ($cache_stat_ttl && $cache_pn) {
+                $cache_inode_hr->{'cache_stat_set'}=1;
+                $cache_inode_hr->{'cache_stat_time'}=time() if ($cache_stat_ttl > 0);
+                $cache_inode_hr->{'cache_stat_mtime'}=$cache_mtime;
+            }
 
 
         }
@@ -702,7 +737,35 @@ sub handler : method {    # no subsort
         #  We are the main request handler. So process
         #
         debug("static flag detected, in main handler, looking for cache_pn: $cache_pn");
-        if ($cache_pn && (-f (my $fn="${cache_pn}.html")) && ((stat(_))[9] >= $srce_mtime) && !$self->{'_compile'}) {
+        my $fn=$cache_pn ? "${cache_pn}.html" : undef;
+        my $html_mtime;
+        if ($fn) {
+
+            #  Same stat policy as the compiled disk cache above. Keep this as
+            #  a single cached-result test so the TTL and never-check modes use
+            #  the same path, and so negative TTL avoids both stat() and time().
+            #
+            my $cache_stat_ttl=WEBDYNE_CACHE_STAT_TTL;
+            if (
+                $cache_stat_ttl
+                && $cache_inode_hr->{'html_stat_set'}
+                && (
+                    ($cache_stat_ttl < 0)
+                    || ((time() - $cache_inode_hr->{'html_stat_time'}) < $cache_stat_ttl)
+                )
+            ) {
+                $html_mtime=$cache_inode_hr->{'html_stat_mtime'};
+            }
+            else {
+                $html_mtime=((-f $fn) && (stat(_))[9]);
+                if ($cache_stat_ttl) {
+                    $cache_inode_hr->{'html_stat_set'}=1;
+                    $cache_inode_hr->{'html_stat_time'}=time() if ($cache_stat_ttl > 0);
+                    $cache_inode_hr->{'html_stat_mtime'}=$html_mtime;
+                }
+            }
+        }
+        if ($fn && $html_mtime && ($html_mtime >= $srce_mtime) && !$self->{'_compile'}) {
 
             #  Cache file exists, and is not stale, and user/cache code does not want a recompile. Tell Apache or FCGI
             #  to serve it up directly.
@@ -1920,15 +1983,28 @@ sub render_cr {
         #  Normal CGI tag, with attributes and perhaps child text
         #
         debug("rendering normal HTML tag: $html_tag with attr: %s", Dumper($attr_hr));
-        $html=$html_or->$html_tag(grep {$_} $attr_hr || {}, $html_chld) ||
+
+        #  Always pass the attribute hash for this branch, but only pass child
+        #  text when it is defined and non-empty. This preserves valid false
+        #  content such as "0" while avoiding an explicit empty child argument
+        #  for closed/shortcut tags that HTML::Tiny expects to receive as
+        #  attribute-only calls.
+        #
+        $html=$html_or->$html_tag(
+            ($attr_hr || {}),
+            ((defined($html_chld) && length($html_chld)) ? $html_chld : ())
+        ) ||
             return err( "CGI tag '<$html_tag>' did not return any text" );
         
 
     }
-    elsif ($html_chld) {
+    elsif (defined($html_chld) && length($html_chld)) {
 
 
         #  Normal CGI tag, no attributes but with child text
+        #
+        #  Use length rather than truth so "0" renders as real content; empty
+        #  string and undef still fall through to the empty-tag branch below.
         #
         debug("rendering normal HTML tag: $html_tag, no attributes but with child text");
         $html=$html_or->$html_tag($html_chld) ||
@@ -1989,6 +2065,7 @@ sub redirect {
         debug("restoring select handle to $select");
         CORE::select $select;
     }
+    untie *WEBDYNE if tied *WEBDYNE;
 
 
     #  If redirecting to a different uri, run its handler
@@ -2029,22 +2106,25 @@ sub redirect {
     else {
 
 
-        #  html/text/json must be a param
+        #  html/text/json must be a param. Test with exists rather than truth
+        #  so valid false body content such as "0" can be returned.
         #
-        my $html_sr=$param_hr->{'html'} || $param_hr->{'text'} || $param_hr->{'json'} ||
+        my ($redirect_type)=grep {exists($param_hr->{$_})} qw(html text json);
+        $redirect_type ||
             return err('no data supplied to redirect method');
+        my $html_sr=$param_hr->{$redirect_type};
 
 
         #  Set content type
         #
         my $r=$self->r() || return err();
-        if ($param_hr->{'html'}) {
+        if ($redirect_type eq 'html') {
             $r->content_type(WEBDYNE_CONTENT_TYPE_HTML)
         }
-        elsif ($param_hr->{'text'}) {
+        elsif ($redirect_type eq 'text') {
             $r->content_type(WEBDYNE_CONTENT_TYPE_TEXT)
         }
-        elsif ($param_hr->{'json'}) {
+        elsif ($redirect_type eq 'json') {
             $r->content_type(WEBDYNE_CONTENT_TYPE_JSON)
         }
 
@@ -2466,7 +2546,7 @@ sub render_block {
         #  Return scalar or array ref, depending on number of elements
         #
         #debug('returning %s', Dumper(\@html_sr));
-        return $#html_sr ? $html_sr[0] : \@html_sr;
+        return (@html_sr==1) ? $html_sr[0] : \@html_sr;
 
     }
     else {
@@ -2633,6 +2713,7 @@ sub json {
     #
     my $json_or=JSON->new() ||
         return err('unable to create new JSON object');
+    $json_or->allow_nonref(1);
     #$json_or->allow_blessed(1);
     #$json_or->convert_blessed(1);
     debug("json_or: $json_or");
@@ -2777,7 +2858,7 @@ sub api {
     #  Need Router::Simple. Build params needed allowing for synonyms
     #
     require Router::Simple;
-    my $rest_or=$self->{'_rest_or'} ||= Router::Simple->new();
+    my $rest_or=Router::Simple->new();
     my @route=(grep {$_}
         #@{$attr_hr}{qw(name method handler pattern match data dest destination)}
         @attr{qw(name method handler pattern match data dest destination)}
@@ -2820,6 +2901,7 @@ sub api {
         #
         my $json_or=JSON->new() ||
             return err('unable to create new JSON object');
+        $json_or->allow_nonref(1);
         debug("json_or: $json_or");
         $json_or->canonical(defined($attr_hr->{'canonical'}) ? $attr_hr->{'canonical'} : WEBDYNE_JSON_CANONICAL);
         my $json=eval {$json_or->encode($json_xr)} ||
@@ -3135,7 +3217,8 @@ sub eval_require {
         #  Need to load a file. Delete from INC so forced to reload in this inode package space;
         #
         delete $INC{$require_cn};
-        my $eval=sprintf(q[package WebDyne::%s; require '%s'], $inode, $require_cn);
+        (my $require_eval_cn=$require_cn)=~s/([\\'])/\\$1/g;
+        my $eval=sprintf(q[package WebDyne::%s; require '%s'], $inode, $require_eval_cn);
         return $eval_cr->($eval) ||
             err();
 
@@ -3146,6 +3229,8 @@ sub eval_require {
         #  Probably a module as no match above
         #
         debug("found perl require command for $require_fn, interpreting as module with import: %s", Dumper($attr_hr->{'import'}));
+        $require_fn=~m/\A[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*\z/ ||
+            return err("invalid module name '$require_fn'");
 
 
         #  Do any imports now
@@ -3840,12 +3925,13 @@ sub find_node {
     my ($data_ar, $tag, $attr_hr, $depth_max, $prnt_fg, $all_fg)=@{$param_hr}{
         qw(data_ar tag attr_hr depth prnt_fg all_fg)
     };
+    $attr_hr ||= {};
     debug("find_node looking for tag $tag in data_ar $data_ar, %s", Dumper($data_ar));
 
 
     #  Array to hold results, depth
     #
-    my ($depth, @node);
+    my @node;
 
 
     #  Create recursive anon sub
@@ -3855,7 +3941,7 @@ sub find_node {
 
         #  Get params
         #
-        my ($find_cr, $data_ar, $data_prnt_ar)=@_;
+        my ($find_cr, $data_ar, $data_prnt_ar, $depth)=@_;
         debug("find_cr, data_ar $data_ar, data_prnt_ar $data_prnt_ar");
 
 
@@ -3874,12 +3960,21 @@ sub find_node {
             debug("tag '$tag' match, $data_ar_tag, checking attr %s", Dumper($tag_attr_hr));
 
 
-            #  Check for match
+            #  Check only the attributes the caller asked to match. Missing
+            #  attr_hr means "tag name only", so the empty filter below matches
+            #  any node with the requested tag. Iterate over the filter rather
+            #  than the node's full attr hash to avoid accepting partial
+            #  matches accidentally and to keep the work proportional to the
+            #  requested search criteria.
             #
-            if (
-                (grep {$tag_attr_hr->{$_} eq $attr_hr->{$_}} keys %{$tag_attr_hr}) ==
-                (keys %{$attr_hr})
-            ) {
+            my $attr_match_fg=1;
+            foreach my $attr (keys %{$attr_hr}) {
+                if (!exists($tag_attr_hr->{$attr}) || ($tag_attr_hr->{$attr} ne $attr_hr->{$attr})) {
+                    $attr_match_fg=0;
+                    last;
+                }
+            }
+            if ($attr_match_fg) {
 
 
                 #  Match, debug
@@ -3905,7 +4000,7 @@ sub find_node {
 
         #  Return if out of depth
         #
-        return if ($depth_max && (++$depth > $depth_max));
+        return if ($depth_max && ($depth >= $depth_max));
 
 
         #  Start looking through current node
@@ -3922,7 +4017,7 @@ sub find_node {
 
                 #  We have a ref, recurse look for match
                 #
-                if (my $data_match_ar=$find_cr->($find_cr, $data_child_ar, $data_ar)) {
+                if (my $data_match_ar=$find_cr->($find_cr, $data_child_ar, $data_ar, $depth + 1)) {
 
 
                     #  Found match during recursion, return
@@ -3940,7 +4035,7 @@ sub find_node {
 
     #  Start it running with our top node
     #
-    $find_cr->($find_cr, $data_ar);
+    $find_cr->($find_cr, $data_ar, undef, 0);
 
 
     #  Debug
@@ -3997,6 +4092,11 @@ sub delete_node {
 
             }
             else {
+
+
+                #  Non-ref children are text nodes, not subtrees.
+                #
+                next unless ref($data_chld_ar);
 
 
                 #  Not target node - recurse
@@ -4331,12 +4431,17 @@ sub cache_html {
     #
     if ($html_sr) {
 
-        #  No point || return err(), just warn so (maybe) is written to logs, otherwise go for it
+        #  Write to a temporary file in the same directory, then rename into
+        #  place so other workers never see a partially written cache file.
         #
-        my $cache_fh=IO::File->new($cache_pn, O_WRONLY | O_CREAT | O_TRUNC) ||
-            return warn("unable to open cache file $cache_pn for write, $!");
+        my $cache_tmp_pn="${cache_pn}.$$";
+        my $cache_fh=IO::File->new($cache_tmp_pn, O_WRONLY | O_CREAT | O_TRUNC) ||
+            return warn("unable to open cache file $cache_tmp_pn for write, $!");
         CORE::print $cache_fh ${$html_sr};
-        $cache_fh->close();
+        $cache_fh->close() ||
+            return warn("unable to close cache file $cache_tmp_pn, $!");
+        rename($cache_tmp_pn, $cache_pn) ||
+            return warn("unable to rename cache file $cache_tmp_pn to $cache_pn, $!");
     }
     \undef;
 

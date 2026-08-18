@@ -88,7 +88,9 @@ sub render {
                 }
                 my $item_font = $cell->_resolve_item_font($font, $ci);
                 my $sz = $ci->{size}        // $item_font->size;
-                my $lh = $ci->{line_height} // $sz;
+                # spacing rides on the slot, exactly as the renderer takes it
+                my $lh = ($ci->{line_height} // $sz)
+                       + PDF::Make::Builder::Layout::Cell::item_spacing($ci);
 
                 if (defined $avail_w) {
                     my $inner_w = $avail_w - 2 * $cell->pad;
@@ -109,7 +111,7 @@ sub render {
                     }
                     $h += $lines * $lh;
                 } else {
-                    $h += $ci->{line_height} // $sz;
+                    $h += $lh;
                 }
             } elsif ($ci->{type} eq 'image') {
                 $h += $ci->{h} // 50;

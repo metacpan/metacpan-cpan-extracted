@@ -447,6 +447,75 @@ static SV *psf_respond(pTHX_ HV *env, psf_src *src, psf_opts *opt) {
     }
 }
 
+/* ---- precompressed siblings -------------------------------------------------
+ *
+ * If `style.css.gz` sits next to `style.css` and the client accepts gzip, we
+ * serve the sibling's BYTES under the original's IDENTITY: its Content-Type,
+ * its URL, its cache entry keyed by an ETag of its own. Nothing is
+ * compressed at request time - the win is a build step's, paid once - so
+ * this needs no zlib and costs one stat.
+ *
+ * `.br` is listed first and preferred when the client offers both. Serving a
+ * brotli file needs no brotli library, only this table entry: the bytes are
+ * already encoded and we are choosing a file, not compressing one.
+ */
+typedef struct { const char *suffix; STRLEN slen; const char *token; STRLEN tlen; }
+    psf_encoding;
+
+static const psf_encoding PSF_ENCODINGS[] = {
+    { ".br", 3, "br",   2 },
+    { ".gz", 3, "gzip", 4 },
+};
+#define PSF_NENCODINGS 2
+
+/* Is `token` an acceptable encoding per this Accept-Encoding header? A
+ * left-to-right walk: no split, no hash, no SV. `q=0` is an explicit refusal
+ * and loses to nothing; `*` matches anything not separately refused. */
+static int psf_accepts(pTHX_ const char *ae, STRLEN len, const char *tok, STRLEN tlen) {
+    STRLEN i = 0;
+    int star = 0;
+    while (i < len) {
+        STRLEN start, end, j;
+        int refused = 0, is_star, is_tok;
+        while (i < len && (ae[i] == ' ' || ae[i] == '\t' || ae[i] == ',')) i++;
+        start = i;
+        while (i < len && ae[i] != ',' && ae[i] != ';') i++;
+        end = i;
+        while (end > start && (ae[end - 1] == ' ' || ae[end - 1] == '\t')) end--;
+        /* parameters: only q matters, and only q=0 (with any zero spelling) */
+        if (i < len && ae[i] == ';') {
+            STRLEN ps = i;
+            while (i < len && ae[i] != ',') i++;
+            for (j = ps; j + 1 < i; j++) {
+                if ((ae[j] | 32) != 'q') continue;
+                while (j + 1 < i && (ae[j + 1] == ' ' || ae[j + 1] == '=')) j++;
+                if (j + 1 < i && ae[j + 1] == '0') {
+                    /* q=0, q=0.0, q=0.000 - anything that is not > 0 */
+                    STRLEN k = j + 2;
+                    int nonzero = 0;
+                    if (k < i && ae[k] == '.')
+                        for (k++; k < i && ae[k] >= '0' && ae[k] <= '9'; k++)
+                            if (ae[k] != '0') nonzero = 1;
+                    if (!nonzero) refused = 1;
+                }
+                break;
+            }
+        }
+        is_star = (end - start == 1 && ae[start] == '*');
+        is_tok  = (end - start == tlen && foldEQ(ae + start, tok, (I32)tlen));
+        if (is_tok) return !refused;               /* named: it decides */
+        if (is_star && !refused) star = 1;
+    }
+    return star;
+}
+
+/* The env's Accept-Encoding, or NULL. */
+static const char *psf_accept_encoding(pTHX_ HV *env, STRLEN *len) {
+    SV **e = hv_fetchs(env, "HTTP_ACCEPT_ENCODING", 0);
+    if (!(e && *e && SvOK(*e))) return NULL;
+    return SvPV_const(*e, *len);
+}
+
 /* ---- ps_serve_file ----------------------------------------------------------
  * The static/markdown "serve one file" (declared in punk_static.h): the
  * decision core with a fixed option block - no disposition, ranges on,
@@ -456,9 +525,15 @@ static SV *psf_respond(pTHX_ HV *env, psf_src *src, psf_opts *opt) {
 
 static SV *ps_serve_file(pTHX_ HV *env, const char *file, STRLEN flen,
                          int is_head) {
-    Stat_t st;
+    Stat_t st, sst;
     psf_src  s;
     psf_opts o;
+    char sib[MAXPATHLEN + 8];
+    char etagbuf[52];
+    AV *extra = NULL;
+    const char *ae;
+    STRLEN ael = 0;
+    int i;
     PERL_UNUSED_ARG(is_head);
     if (PerlLIO_stat(file, &st) < 0 || !S_ISREG(st.st_mode)) return NULL;
     Zero(&s, 1, psf_src);
@@ -469,6 +544,58 @@ static SV *ps_serve_file(pTHX_ HV *env, const char *file, STRLEN flen,
     s.mtime     = (UV)st.st_mtime;
     s.has_mtime = 1;
     o.ranges    = 1;
+
+    /* Vary goes on EVERY response from here, compressed or not: a shared
+     * cache that stored the identity bytes without it would hand them to a
+     * client that asked for gzip, and vice versa. It costs one header and
+     * it is the only spelling that is correct for both. */
+    extra = (AV *)sv_2mortal((SV *)newAV());
+    av_push(extra, newSVpvs("Vary"));
+    av_push(extra, newSVpvs("Accept-Encoding"));
+
+    ae = psf_accept_encoding(aTHX_ env, &ael);
+    if (ae && ael && flen + 4 < sizeof(sib)) {
+        for (i = 0; i < PSF_NENCODINGS; i++) {
+            const psf_encoding *enc = &PSF_ENCODINGS[i];
+            if (!psf_accepts(aTHX_ ae, ael, enc->token, enc->tlen)) continue;
+            memcpy(sib, file, flen);
+            memcpy(sib + flen, enc->suffix, enc->slen + 1);
+            if (PerlLIO_stat(sib, &sst) < 0 || !S_ISREG(sst.st_mode)) continue;
+            /* A sibling older than its source is a stale build artefact.
+             * Serving it would ship last week's CSS forever, silently,
+             * which is the failure nobody thinks to look for. */
+            if ((UV)sst.st_mtime < (UV)st.st_mtime) continue;
+
+            /* the bytes, the length and the validators are the sibling's;
+             * the Content-Type stays the original's, so ps_content_type
+             * must never see the .gz/.br suffix */
+            o.type  = sv_2mortal(newSVpv(ps_content_type(file, flen), 0));
+            s.path  = sib;
+            s.plen  = flen + enc->slen;
+            s.size  = (UV)sst.st_size;
+            s.mtime = (UV)sst.st_mtime;
+
+            /* an encoding-tagged ETag, so an identity client and this one
+             * never collide in a shared cache even if the two files should
+             * ever share an mtime and a size */
+            psf_etag(etagbuf, sizeof etagbuf, s.mtime, s.size);
+            {
+                STRLEN el = strlen(etagbuf);
+                if (el > 1 && etagbuf[el - 1] == '"'
+                    && el + enc->tlen + 1 < sizeof etagbuf) {
+                    etagbuf[el - 1] = '-';
+                    memcpy(etagbuf + el, enc->token, enc->tlen);
+                    etagbuf[el + enc->tlen]     = '"';
+                    etagbuf[el + enc->tlen + 1] = '\0';
+                }
+                o.etag = sv_2mortal(newSVpv(etagbuf, 0));
+            }
+            av_push(extra, newSVpvs("Content-Encoding"));
+            av_push(extra, newSVpvn(enc->token, enc->tlen));
+            break;
+        }
+    }
+    o.extra = extra;
     return psf_respond(aTHX_ env, &s, &o);
 }
 

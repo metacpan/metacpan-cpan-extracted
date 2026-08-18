@@ -271,7 +271,9 @@ docs/Environment.md
 docs/EnvironmentName.md
 docs/EomInvoiceResponse.md
 docs/Error.md
+docs/ErrorResponse.md
 docs/ErrorResponseData.md
+docs/ErrorResponseErrors.md
 docs/Event.md
 docs/EventAttributes.md
 docs/EventData.md
@@ -437,6 +439,8 @@ docs/LogAggregationsGetResponseMeta.md
 docs/LogAggregationsGetResponseMetaFilters.md
 docs/LogAggregationsResult.md
 docs/LogAggregationsValueField.md
+docs/LogError.md
+docs/LogErrorBatch.md
 docs/LogExplorerApi.md
 docs/LogExplorerInsightsResponseBodyEnable.md
 docs/LogExplorerInsightsResponseBodyGetAllServices.md
@@ -480,6 +484,7 @@ docs/LoggingDigitaloceanResponse.md
 docs/LoggingElasticsearchAdditional.md
 docs/LoggingElasticsearchApi.md
 docs/LoggingElasticsearchResponse.md
+docs/LoggingEndpointErrorsApi.md
 docs/LoggingFormatVersionInteger.md
 docs/LoggingFormatVersionString.md
 docs/LoggingFtpAdditional.md
@@ -1144,6 +1149,7 @@ lib/WebService/Fastly/LoggingCloudfilesApi.pm
 lib/WebService/Fastly/LoggingDatadogApi.pm
 lib/WebService/Fastly/LoggingDigitaloceanApi.pm
 lib/WebService/Fastly/LoggingElasticsearchApi.pm
+lib/WebService/Fastly/LoggingEndpointErrorsApi.pm
 lib/WebService/Fastly/LoggingFtpApi.pm
 lib/WebService/Fastly/LoggingGcsApi.pm
 lib/WebService/Fastly/LoggingGrafanacloudlogsApi.pm
@@ -1398,7 +1404,9 @@ lib/WebService/Fastly/Object/Environment.pm
 lib/WebService/Fastly/Object/EnvironmentName.pm
 lib/WebService/Fastly/Object/EomInvoiceResponse.pm
 lib/WebService/Fastly/Object/Error.pm
+lib/WebService/Fastly/Object/ErrorResponse.pm
 lib/WebService/Fastly/Object/ErrorResponseData.pm
+lib/WebService/Fastly/Object/ErrorResponseErrors.pm
 lib/WebService/Fastly/Object/Event.pm
 lib/WebService/Fastly/Object/EventAttributes.pm
 lib/WebService/Fastly/Object/EventData.pm
@@ -1549,6 +1557,8 @@ lib/WebService/Fastly/Object/LogAggregationsGetResponseMeta.pm
 lib/WebService/Fastly/Object/LogAggregationsGetResponseMetaFilters.pm
 lib/WebService/Fastly/Object/LogAggregationsResult.pm
 lib/WebService/Fastly/Object/LogAggregationsValueField.pm
+lib/WebService/Fastly/Object/LogError.pm
+lib/WebService/Fastly/Object/LogErrorBatch.pm
 lib/WebService/Fastly/Object/LogExplorerInsightsResponseBodyEnable.pm
 lib/WebService/Fastly/Object/LogExplorerInsightsResponseBodyGetAllServices.pm
 lib/WebService/Fastly/Object/LogExplorerInsightsResponseCustomer.pm

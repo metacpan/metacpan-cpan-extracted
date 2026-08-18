@@ -1,5 +1,6 @@
 #!perl
-use v5.36;
+use v5.26;
+use warnings;
 use Test::More;
 use List::Util qw(any);
 #our $verbose = grep { $_ eq '-v' or $_ eq '--verbose' } @ARGV;

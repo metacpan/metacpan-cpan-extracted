@@ -1,5 +1,6 @@
 #!perl
-use v5.36;
+use v5.26;
+use warnings;
 use Test::More;
 
 do_tests();

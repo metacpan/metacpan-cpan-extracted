@@ -21,7 +21,7 @@ Currently maintained by Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2012, 2024-2025 Keith Grennan
+Copyright 2007-2012, 2024-2026 Keith Grennan
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

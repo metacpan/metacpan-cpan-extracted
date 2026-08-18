@@ -579,7 +579,8 @@ static const char *hm_tls_library(void) {
 
 #else /* !HM_HAVE_OPENSSL */
 
-#include <unistd.h>
+/* The stubs read and write through hm_os_recv/hm_os_send, which hm_win.h
+ * has already provided along with <unistd.h> where there is one. */
 static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
                               const char *ca, int verify, SV *sni, int alpn,
                               const unsigned char *tkey, size_t tkeylen) {

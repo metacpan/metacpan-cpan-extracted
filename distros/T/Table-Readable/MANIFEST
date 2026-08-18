@@ -13,6 +13,7 @@ README
 t/bad-format.t
 t/bad-format.txt
 t/read-table-hash.t
+t/replace.t
 t/scalar.t
 t/slashes.t
 t/Table-Readable.t
@@ -21,6 +22,8 @@ t/test-hash-collide.txt
 t/test-hash-missing.txt
 t/test-hash.txt
 t/test-multiline.txt
+t/test-replace-compare.txt
+t/test-replace.txt
 t/test-table-1.txt
 t/test-table-comments.txt
 t/test-table-whitespace.txt

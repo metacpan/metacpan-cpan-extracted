@@ -1,9 +1,9 @@
 {
     "name": "TestLucy",
     "installed": false,
-    "version": "v0.6.2",
+    "version": "v0.7.0",
     "prerequisites": {
-        "Clownfish": "v0.6.0",
-        "Lucy": "v0.6.2"
+        "Clownfish": "v0.7.0",
+        "Lucy": "v0.7.0"
     }
 }

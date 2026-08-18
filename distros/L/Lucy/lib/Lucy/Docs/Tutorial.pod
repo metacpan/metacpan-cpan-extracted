@@ -25,11 +25,11 @@
 
 =head1 NAME
 
-Lucy::Docs::Tutorial - Step-by-step introduction to Apache Lucy.
+Lucy::Docs::Tutorial - Step-by-step introduction to Lucy.
 
 =head1 DESCRIPTION
 
-Explore Apache Lucy’s basic functionality by starting with a minimalist CGI
+Explore Lucy’s basic functionality by starting with a minimalist CGI
 search app based on Lucy::Simple and transforming it, step by step,
 into an “advanced search” interface utilizing more flexible core modules like
 L<Indexer|Lucy::Index::Indexer> and L<IndexSearcher|Lucy::Search::IndexSearcher>.

@@ -1,4 +1,6 @@
-use v5.36;
+use v5.26;
+use warnings;
+use experimental 'signatures';
 package PlackX::Framework::Request {
   use parent 'Plack::Request';
   use Carp qw(croak);
@@ -151,12 +153,16 @@ depending on context, like CGI.pm or the mod_perl Apache request object.
 
 =item route_param(NAME)
 
-Return's the value of a route parameter, parsed by PlackX::Framework's router
+Returns the value of a route parameter, parsed by PlackX::Framework's router
 engine. For example:
 
     route '/{page_name}' => sub ($request, $response) {
       my $page_name = $request->route_param('page_name');
     };
+
+At this time, route parameters do not get merged into the general parameters
+list, and cannot be obtaiend with the param() method (or the parent class
+parameters() method), even if the route param name is unique.
 
 =item stash_param(NAME)
 
@@ -175,6 +181,8 @@ on the given key. For example:
 =item flash()
 
 Gets the content of the PXF app's flash cookie, if set on the previous request.
+This feature is meant to help pass messages to users, and should not be used to
+store any information that might be subject to security concerns.
 
 =item flash_cookie_name()
 

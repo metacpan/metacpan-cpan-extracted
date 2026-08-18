@@ -84,6 +84,23 @@ path(self)
     OUTPUT:
         RETVAL
 
+# The client's address. This is REMOTE_ADDR, which is the socket peer on a
+# directly-exposed application and the resolved client when the `proxy`
+# keyword is in force (punk_proxy.h rewrites the env key, so there is
+# nothing to read differently here). The connecting address behind a proxy
+# is env->{'punk.peer_addr'}.
+SV *
+address(self)
+        SV *self
+    CODE:
+    {
+        HV *env = punk_req_env(aTHX_ punk_req_av(aTHX_ self));
+        SV **e  = hv_fetchs(env, "REMOTE_ADDR", 0);
+        RETVAL = e && *e ? newSVsv(*e) : newSV(0);
+    }
+    OUTPUT:
+        RETVAL
+
 SV *
 header(self, name)
         SV *self

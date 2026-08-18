@@ -105,6 +105,14 @@ need to provide overrides for C<postamble> as before, and also C<init_PM>:
   sub postamble { ::pdlpp_postamble(@pd_srcs) }
   }
 
+Please note that if you have a pure-Perl top-level driving module,
+like L<PDL::Graphics::TriD> or L<PDL::LinearAlgebra>, and you want
+that top-level module's C<FUNCTIONS> added to the C<pdldoc>
+documentation, you will want to replace the C<postamble> definition
+with something a lot like:
+
+  sub postamble { ::pdlpp_postamble(@pd_srcs) . ::pdldoc_add() }
+
 =head1 FUNCTIONS
 
 =cut
@@ -129,7 +137,7 @@ our @EXPORT = qw( isbigendian
   PDL_INCLUDE PDL_TYPEMAP
   PDL_AUTO_INCLUDE PDL_BOOT
   PDL_INST_INCLUDE PDL_INST_TYPEMAP
-  pdlpp_eumm_update_deep
+  pdlpp_eumm_update_deep pdldoc_add
   pdlpp_postamble_int pdlpp_stdargs_int
   pdlpp_postamble pdlpp_stdargs write_dummy_make
   unsupported trylink get_maths_libs
@@ -244,8 +252,7 @@ sub _postamble {
     $cdep .= join ' ', $ppo, ':', map catfile($ppdir, qw(Core), $_),
       qw(pdl.h pdlcore.h pdlbroadcast.h pdlmagic.h);
   } else {
-    my $oneliner = _oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(q{$mod}); }});
-    $install = qq|\ninstall ::\n\t\@echo "Updating PDL documentation database...";\n\t$oneliner\n|;
+    $install = pdldoc_add($mod);
   }
   my $pp_call_arg = _pp_call_arg($mod, $mod, $base, $callpack, $multi_c||'',$deep||'');
 qq|
@@ -271,6 +278,14 @@ sub pdlpp_postamble_int {
 sub pdlpp_postamble {
   my $w = whereami_any();
   join '', map _postamble($w, 0, @$_), @_;
+}
+
+sub pdldoc_add {
+  my ($mod) = @_;
+  my $end = defined $mod ? '' : " \$(NAME)";
+  $mod //= 'shift';
+  my $oneliner = _oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module($mod); }});
+  qq|\ninstall :: pure_install\n\t$oneliner$end\n|;
 }
 
 our %EXTRAS;

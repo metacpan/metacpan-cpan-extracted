@@ -1,5 +1,26 @@
 Revision history for Reverse-Proxy
 
+0.04    2026-08-18
+        - SECURITY: request smuggling through the forwarded request
+          target. PATH_INFO reaches a PSGI app percent-DECODED, so a
+          client URL containing %0d%0a arrived here as a real CRLF and
+          was spliced into the upstream request line verbatim, ending
+          it and starting a second, fully attacker-written request on
+          the upstream connection - past whatever the proxy in front
+          was enforcing. A decoded space, '?' or '#' truncated the
+          target the same way, which also meant a path with a space in
+          it was never forwarded correctly.
+          The target is now re-encoded rather than rejected, so those
+          paths reach the upstream as the paths that were asked for
+          while a CRLF reaches it as %0D%0A: one path segment, one
+          request. QUERY_STRING is not decoded, so it keeps its bytes
+          and only gets the control guard. A preserved client Host is
+          truncated at the first control byte, so a bare LF in it
+          cannot smuggle either. Both the ordinary path and the
+          WebSocket/Upgrade tunnel go through the same code.
+          Found while fixing the same class of bug in Punk::OAuth2
+          (CVE-2026-75628). New t/11-request-line.t.
+
 0.03    2026-08-05
         - include/rp_compat.h shims XS_INTERNAL and mg_findext
 

@@ -15,7 +15,7 @@
 
 package Clownfish::HashIterator;
 use Clownfish;
-our $VERSION = '0.006004';
+our $VERSION = '0.007000';
 $VERSION = eval $VERSION;
 
 1;

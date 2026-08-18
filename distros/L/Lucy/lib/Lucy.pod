@@ -15,11 +15,11 @@
 
 =head1 NAME
 
-Lucy - Apache Lucy search engine library.
+Lucy - Lucy search engine library.
 
 =head1 VERSION
 
-0.6.2
+0.7.0
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ Then, search the index:
 
 =head1 DESCRIPTION
 
-The Apache Lucy search engine library delivers high-performance, modular
+The Lucy search engine library delivers high-performance, modular
 full-text search.
 
 =head2 Features
@@ -212,7 +212,7 @@ always be either a L<Clownfish::Err> object or undef.
 
 =head1 SUPPORT
 
-The Apache Lucy homepage, where you'll find links to our mailing lists and so
+The Lucy homepage, where you'll find links to our mailing lists and so
 on, is L<http://lucy.apache.org>.  Please direct support questions
 to the Lucy users mailing list.
 
@@ -228,7 +228,7 @@ L<https://issues.apache.org/jira/browse/LUCY>.
 
 =head1 COPYRIGHT
 
-Apache Lucy is distributed under the Apache License, Version 2.0, as
+Lucy is distributed under the Apache License, Version 2.0, as
 described in the file C<LICENSE> included with the distribution.
 
 =cut

@@ -1,3 +1,10 @@
+=head1 NAME
+
+01_api_call.t - a subclass overriding send() can fake a response, and get()
+returns it unchanged
+
+=cut
+
 use strict;
 use warnings;
 use Test::More;

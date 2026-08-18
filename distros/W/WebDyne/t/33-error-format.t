@@ -10,8 +10,7 @@ use File::Basename qw(basename dirname);
 use File::Spec;
 use File::Temp qw(tempfile);
 use HTTP::Status qw(HTTP_INTERNAL_SERVER_ERROR);
-use IPC::Open3;
-use Symbol qw(gensym);
+use Capture::Tiny qw(capture);
 
 
 my $source_fn=File::Spec->catfile(dirname($RealBin), 't.error', 'error_basic.psp');
@@ -34,7 +33,6 @@ sub run_case {
     my $error_text=$arg{'error_text'};
     my $fixture_fn=$arg{'fixture_fn'};
     my $fixture_cn=$arg{'fixture_cn'};
-    my $repo_dn=$arg{'repo_dn'};
     my $fixture_dn=dirname($fixture_fn);
 
     my %code=(
@@ -43,6 +41,14 @@ use IO::String;
 use HTTP::Headers::Fast;
 use WebDyne;
 use WebDyne::Request::Fake;
+sub write_result {
+    my $text=shift;
+    open(my $out_fh, '>>', $ENV{'WEBDYNE_TEST_RESULT_FN'}) ||
+        die "unable to open result file '$ENV{WEBDYNE_TEST_RESULT_FN}', $!";
+    print {$out_fh} $text;
+    close($out_fh) ||
+        die "unable to close result file '$ENV{WEBDYNE_TEST_RESULT_FN}', $!";
+}
 WebDyne->init();
 my $body=q();
 my $fh=IO::String->new($body);
@@ -56,32 +62,47 @@ my $status=WebDyne->handler($r);
 $fh->close();
 my $ctype=$r->content_type() || q();
 my $kind=($body =~ /^\s*<!DOCTYPE html>|^\s*<html/i) ? 'html' : 'text';
-print "status=$status\nctype=$ctype\nkind=$kind\n";
+write_result("status=$status\nctype=$ctype\nkind=$kind\n");
 END_FAKE
         psgi => <<'END_PSGI',
 use WebDyne::PSGI;
 use Plack::Test;
 use HTTP::Request::Common qw(GET);
+sub write_result {
+    my $text=shift;
+    open(my $out_fh, '>>', $ENV{'WEBDYNE_TEST_RESULT_FN'}) ||
+        die "unable to open result file '$ENV{WEBDYNE_TEST_RESULT_FN}', $!";
+    print {$out_fh} $text;
+    close($out_fh) ||
+        die "unable to close result file '$ENV{WEBDYNE_TEST_RESULT_FN}', $!";
+}
 my $app=WebDyne::PSGI->new(root => $ENV{'WEBDYNE_TEST_ERROR_ROOT'})->to_app();
 my $res=Plack::Test->create($app)->request(GET('/' . $ENV{'WEBDYNE_TEST_ERROR_CN'}));
 my $body=$res->decoded_content();
 my $kind=($body =~ /^\s*<!DOCTYPE html>|^\s*<html/i) ? 'html' : 'text';
-print "status=".$res->code()."\n";
-print "ctype=".($res->header('Content-Type') || q())."\n";
-print "kind=$kind\n";
+write_result("status=".$res->code()."\nctype=".($res->header('Content-Type') || q())."\nkind=$kind\n");
 END_PSGI
         pagi => <<'END_PAGI',
 use WebDyne::PAGI;
 use PAGI::Test::Client;
+sub write_result {
+    my $text=shift;
+    open(my $out_fh, '>>', $ENV{'WEBDYNE_TEST_RESULT_FN'}) ||
+        die "unable to open result file '$ENV{WEBDYNE_TEST_RESULT_FN}', $!";
+    print {$out_fh} $text;
+    close($out_fh) ||
+        die "unable to close result file '$ENV{WEBDYNE_TEST_RESULT_FN}', $!";
+}
 my $app=WebDyne::PAGI->new(root => $ENV{'WEBDYNE_TEST_ERROR_ROOT'})->to_app();
 my $res=PAGI::Test::Client->new(app => $app)->get('/' . $ENV{'WEBDYNE_TEST_ERROR_CN'});
 my $body=$res->content();
 my $kind=($body =~ /^\s*<!DOCTYPE html>|^\s*<html/i) ? 'html' : 'text';
-print "status=".$res->status()."\n";
-print "ctype=".($res->header('content-type') || q())."\n";
-print "kind=$kind\n";
+write_result("status=".$res->status()."\nctype=".($res->header('content-type') || q())."\nkind=$kind\n");
 END_PAGI
     );
+
+    my ($result_fh, $result_fn)=tempfile('error_format_result_XXXX', DIR => $fixture_dn, UNLINK => 1);
+    close($result_fh) || die "unable to close '$result_fn', $!";
 
     my %env=(
         %ENV,
@@ -90,21 +111,41 @@ END_PAGI
         WEBDYNE_TEST_ERROR_FIXTURE => $fixture_fn,
         WEBDYNE_TEST_ERROR_ROOT    => $fixture_dn,
         WEBDYNE_TEST_ERROR_CN      => $fixture_cn,
+        WEBDYNE_TEST_RESULT_FN     => $result_fn,
     );
 
-    my $stderr=gensym();
     local %ENV=%env;
-    my $pid=open3(undef, my $stdout, $stderr, $^X, '-Ilib', '-e', $code{$handler});
-    my $out=do { local $/; <$stdout> };
-    my $err=do { local $/; <$stderr> };
-    waitpid($pid, 0);
-    my $exit=$? >> 8;
-    die "subprocess for $handler failed: $err" if $exit != 0;
+    my ($out, $err, $wait_status)=capture {
+        system($^X, '-Ilib', '-e', $code{$handler});
+    };
+    my $exit=$wait_status >> 8;
+    my $signal=$wait_status & 127;
+    die "subprocess for $handler failed: exit=$exit signal=$signal wait=$wait_status stderr=$err" if $exit != 0;
+
+    open(my $result_fh_read, '<', $result_fn) ||
+        die "unable to read result file '$result_fn', $!";
+    my $result_text=do {
+        local $/;
+        <$result_fh_read>;
+    };
+    close($result_fh_read) || die "unable to close result file '$result_fn', $!";
+
+    if ($signal) {
+        return {
+            skip => "subprocess for $handler terminated by signal $signal on this Perl",
+        };
+    }
 
     my %result=map {
         my ($k, $v)=split(/=/, $_, 2);
         $k => $v;
-    } grep { length($_) } split(/\n/, $out);
+    } grep { length($_) } split(/\n/, $result_text);
+    if (!exists($result{'status'}) || !exists($result{'ctype'}) || !exists($result{'kind'})) {
+        diag("subprocess for $handler produced incomplete output; exit=$exit signal=$signal wait=$wait_status");
+        diag("result file:\n$result_text");
+        diag("stdout:\n$out") if length($out);
+        diag("stderr:\n$err") if length($err);
+    }
     return \%result;
 }
 
@@ -131,8 +172,10 @@ for my $case (@case) {
             error_text => $error_text,
             fixture_fn => $fixture_fn,
             fixture_cn => $fixture_cn,
-            repo_dn    => dirname($RealBin),
         );
+        if (my $skip=$result->{'skip'}) {
+            skip $skip, 3;
+        }
 
         is($result->{'status'} + 0, HTTP_INTERNAL_SERVER_ERROR, "$handler returns 500 when rendering an error");
         if (defined($kind_expect)) {

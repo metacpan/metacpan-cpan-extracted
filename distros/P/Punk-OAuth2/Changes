@@ -1,5 +1,19 @@
 Revision history for Punk-OAuth2
 
+0.03    2026-08-18
+        - SECURITY: fix an open redirect in same_origin_path
+          (CVE-2026-75628) reported by cpansec. The guard rejected a leading "//" and any
+          CR/LF, but a browser removes TAB/CR/LF from a URL before it
+          parses it and treats "\" as "/" under a special scheme, so
+          "/\evil.example" and "/<TAB>/evil.example" both survived the
+          check and then resolved to another host. A ?return= destination
+          that a user controls could therefore redirect off-site after a
+          successful login.
+        - same_origin_path now rejects every C0 control byte and DEL, and
+          rejects a backslash anywhere in the path, rather than trying to
+          enumerate the bytes a URL parser might drop. Paths that need a
+          backslash must percent-encode it as %5C.
+
 0.02    2026-08-16
         Fix stack corruption in the DBI-backed server store: SvIV(POPs)
         in pox_dbi_do (and SvTRUE(POPs) in pox_await) evaluate POPs

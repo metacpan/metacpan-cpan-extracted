@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Unit of text.
  *
- * Token is the fundamental unit used by Apache Lucy's Analyzer subclasses.
+ * Token is the fundamental unit used by Lucy's Analyzer subclasses.
  * Each Token has 5 attributes: `text`, `start_offset`,
  * `end_offset`, `boost`, and `pos_inc`.
  *

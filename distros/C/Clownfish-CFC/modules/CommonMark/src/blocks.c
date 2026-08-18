@@ -51,7 +51,7 @@ static cmark_node* make_block(cmark_node_type tag, int start_line, int start_col
 }
 
 // Create a root document node.
-static cmark_node* make_document()
+static cmark_node* make_document(void)
 {
 	cmark_node *e = make_block(NODE_DOCUMENT, 1, 1);
 	return e;

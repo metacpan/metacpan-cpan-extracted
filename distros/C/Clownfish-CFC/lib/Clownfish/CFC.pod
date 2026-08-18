@@ -15,7 +15,7 @@
 
 =head1 NAME
 
-Clownfish::CFC - Compiler for Apache Clownfish.
+Clownfish::CFC - Compiler for Clownfish.
 
 =head1 DESCRIPTION
 

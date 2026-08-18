@@ -6,6 +6,11 @@ use Test::More tests => 3;
 
 use Net::OAuth::ProtectedResourceRequest;
 
+# verify() will not take the algorithm from the message being verified,
+# so say which methods these tests expect (see VERIFYING MESSAGES in the
+# Net::OAuth documentation).
+@Net::OAuth::ALLOWED_SIGNATURE_METHODS = qw/HMAC-SHA256/;
+
 SKIP: {
 
     skip "Digest::SHA not installed", 3 unless eval 'require Digest::SHA; 1';

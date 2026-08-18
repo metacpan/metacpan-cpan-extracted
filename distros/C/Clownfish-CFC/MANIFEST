@@ -50,6 +50,7 @@ lib/Clownfish/CFC/Perl/Build/Charmonic.pm
 lib/Clownfish/CFC/Test.pm
 lib/Clownfish/CFC/Util.pm
 LICENSE
+Makefile.local
 MANIFEST			This list of files
 modules/CommonMark/COPYING
 modules/CommonMark/README.md

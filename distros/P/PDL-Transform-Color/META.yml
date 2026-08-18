@@ -7,8 +7,9 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '6.48'
+  PDL: '2.105'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,5 +27,5 @@ resources:
   bugtracker: http://github.com/PDLPorters/PDL-Transform-Color/issues
   homepage: http://github.com/PDLPorters/PDL-Transform-Color
   repository: git://github.com/PDLPorters/PDL-Transform-Color.git
-version: '1.010'
+version: '1.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

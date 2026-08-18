@@ -5,7 +5,7 @@ use Carp ();
 use PDF::Make::Builder;
 use PDF::Make::Markup::Style;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my $S = 'PDF::Make::Markup::Style';
 
@@ -35,6 +35,12 @@ my %CONTENT = (
 
 my %IS_HEADING = map { $_ => 1 } qw(h1 h2 h3 h4 h5 h6);
 my %IS_CELL    = map { $_ => 1 } qw(cell th td);
+
+# What a tag IS, which is not what %CONTENT says a tag may HOLD. <h1> holds
+# inline content and is itself a block; only these three are inline-level.
+# Reading %CONTENT as the former is what made every block inside a <box>
+# flow onto one line.
+my %IS_INLINE  = map { $_ => 1 } qw(b i span);
 
 sub _err {
     my ($node, $fmt, @args) = @_;
@@ -186,7 +192,7 @@ sub _block {
         $cell{bg}     = $st->{bg}     if defined $st->{bg};
         $cell{border} = $st->{border} if defined $st->{border};
         my $cell = $row->cell(%cell);
-        $class->_cell_content($cell, $node, $st);
+        $class->_cell_content($cell, $node, $st, $pdf);
         $lay->render;
         return;
     }
@@ -252,7 +258,8 @@ sub _page_args {
 # child (a heading or a paragraph, as in a <box>) becomes an item of its own,
 # which is how a box stacks blocks without a second layout engine.
 sub _cell_content {
-    my ($class, $cell, $node, $style) = @_;
+    my ($class, $cell, $node, $style, $pdf) = @_;
+    my $cfg = $pdf ? ($pdf->configure || {}) : {};
 
     my @pending;    # inline nodes accumulating into one item
     my $flush = sub {
@@ -274,22 +281,24 @@ sub _cell_content {
     };
 
     for my $c (_kids($node)) {
-        my $kind = $c->{kind} eq 'text' ? 'inline'
-                 : ($CONTENT{ $c->{tag} } || '');
-        if ($kind eq 'inline') {
+        if ($c->{kind} eq 'text' || $IS_INLINE{ $c->{tag} || '' }) {
             push @pending, $c;
             next;
         }
 
         _err($c, "<%s> cannot appear inside <%s>", $c->{tag}, $node->{tag})
-            unless $kind eq 'inline' || $IS_HEADING{ $c->{tag} }
+            unless $IS_HEADING{ $c->{tag} }
                 || $c->{tag} eq 'p' || $c->{tag} eq 'text';
 
         $flush->();
         my $own = $S->attrs($c);
         my $st  = $S->inherit($style, $own);
         my $runs = $class->_runs($c, $st);
-        $class->_add_cell_item($cell, $runs, $st) if @$runs;
+        # <style h1="size:30"> reaches add_h1 through the builder's configure,
+        # which a cell item never goes near - so fold the tag's declared font
+        # in here, under anything the element said for itself.
+        my $tagf = $cfg->{ $c->{tag} } ? $cfg->{ $c->{tag} }{font} : undef;
+        $class->_add_cell_item($cell, $runs, $st, $tagf, $own) if @$runs;
     }
     $flush->();
     return;
@@ -299,8 +308,18 @@ sub _cell_content {
 # the block, a plain string otherwise. The plain form keeps the cell's
 # original wrapping, which existing documents depend on.
 sub _add_cell_item {
-    my ($class, $cell, $runs, $style) = @_;
+    my ($class, $cell, $runs, $style, $tag_font, $own) = @_;
+    # inherited < the tag's <style> declaration < what the element itself said
     my %f = %{ $S->font_args($style) };
+    if ($tag_font && %$tag_font) {
+        %f = (%f, %$tag_font);
+        %f = (%f, %{ $S->font_args($S->inherit({}, $own)) }) if $own;
+    }
+    # A cell has one alignment; its items each have their own, which is what
+    # a <box> of centred blocks needs. spacing is per item for the same
+    # reason: it is what separates the blocks stacked in one box.
+    $f{align}   = $style->{align}   if defined $style->{align};
+    $f{spacing} = $style->{spacing} if defined $style->{spacing};
 
     my $styled = 0;
     for my $r (@$runs) {
@@ -462,6 +481,14 @@ sub build {
         file_name => $opt{file_name},
         configure => $class->_configure($root),
     );
+
+    # <doc tagged="1">: accessibility is a property of the document, so
+    # it is declared where the document starts. Builder's add_* methods
+    # already push P/H1-H6/Figure structure elements; this turns the
+    # tree on so they land in a StructTreeRoot. Deeper semantics
+    # (Table/TR/TD) are future work and the docs say so plainly.
+    $pdf->enable_tagging
+        if defined $own->{tagged} && $own->{tagged} && $own->{tagged} ne '0';
 
     $pdf->add_page($class->_page_args($pdf, $own));
     $class->_children($pdf, $root, $S->inherit(undef, $own));

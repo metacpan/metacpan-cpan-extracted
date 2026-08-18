@@ -72,6 +72,32 @@ run(class, ...)
             }
             else if (strEQ(key, "max_requests_per_worker"))
                                                    cfg.max_requests = SvUV(val);
+            /* Response compression. Off by default: a server that starts
+             * compressing on upgrade is a surprise. Accepted and inert on a
+             * build without zlib, so a config is portable across them. */
+            else if (strEQ(key, "compress"))       cfg.compress = SvTRUE(val) ? 1 : 0;
+            else if (strEQ(key, "compress_min_length"))
+                                                   cfg.compress_min = (size_t)SvUV(val);
+            /* The request ceiling: headers plus body, buffered per
+             * connection before the app is called. This is the only thing
+             * bounding a worker's memory against a large POST, so 0 is
+             * REFUSED rather than read as "unlimited" - an unbounded read
+             * ceiling is a memory-exhaustion switch and must not be
+             * reachable by a config typo that produces a falsy value. */
+            else if (strEQ(key, "max_body")) {
+                UV n = SvUV(val);
+                if (!n)
+                    croak("Hyperman->run: max_body must be a byte count - "
+                          "0 would mean an unbounded request buffer, which "
+                          "is a memory-exhaustion switch, not a setting");
+                cfg.max_read = (size_t)n;
+            }
+            else if (strEQ(key, "compress_level")) {
+                IV lv = SvIV(val);
+                if (lv < 1 || lv > 9)
+                    croak("Hyperman->run: compress_level must be 1..9");
+                cfg.compress_level = (int)lv;
+            }
             else if (strEQ(key, "shutdown_grace")) cfg.grace = SvNV(val);
             else if (strEQ(key, "affinity"))       cfg.affinity = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "http2"))          dfl.http2 = SvTRUE(val) ? 1 : 0;
@@ -188,7 +214,7 @@ stats(...)
             hv_stores(h, "bytes_out",   newSVuv(hm_cur_loop->bytes_out));
             hv_stores(h, "connections", newSViv(hm_cur_loop->nconns));
             hv_stores(h, "backend",     newSVpv(hm_cur_loop->be->name, 0));
-            hv_stores(h, "pid",         newSViv((IV)getpid()));
+            hv_stores(h, "pid",         newSViv((IV)hm_os_getpid()));
             RETVAL = newRV_noinc((SV *)h);
         }
     OUTPUT:
@@ -200,6 +226,53 @@ has_http2(...)
     CODE:
         PERL_UNUSED_VAR(items);
         RETVAL = hm_h2_available();
+    OUTPUT:
+        RETVAL
+
+# _accepts_gzip($header): the Accept-Encoding walk alone, for
+# t/30-compress-accept.t. Author-facing, not documented.
+int
+_accepts_gzip(hdr)
+        SV *hdr
+    CODE:
+    {
+        STRLEN l = 0;
+        const char *h = SvOK(hdr) ? SvPV_const(hdr, l) : NULL;
+        RETVAL = hz_accepts_gzip(h, (size_t)l);
+    }
+    OUTPUT:
+        RETVAL
+
+# _gzip($bytes): the compressor alone, for t/31-compress.t - returns the
+# gzip member, or undef without zlib or when the result would not be
+# smaller. Author-facing, not documented.
+SV *
+_gzip(bytes)
+        SV *bytes
+    CODE:
+    {
+        STRLEN l = 0;
+        const char *b = SvOK(bytes) ? SvPV_const(bytes, l) : NULL;
+        char *out = NULL;
+        size_t ol = 0;
+        if (b && hz_gzip(b, (size_t)l, HZ_LEVEL, &out, &ol)) {
+            RETVAL = newSVpvn(out, ol);
+            Safefree(out);
+        } else {
+            RETVAL = newSV(0);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+# True when response compression was built in (zlib present). Without it
+# `compress => 1` is accepted and inert, so this is how a test skips
+# honestly rather than guessing.
+int
+has_compression(...)
+    CODE:
+        PERL_UNUSED_VAR(items);
+        RETVAL = hz_available();
     OUTPUT:
         RETVAL
 

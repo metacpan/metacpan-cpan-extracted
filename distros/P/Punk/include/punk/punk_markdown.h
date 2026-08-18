@@ -635,8 +635,16 @@ static SV *pmd_html_response(pTHX_ AV *cap, IV status, SV *body, int is_head) {
  * suffix does not become a second address for the same document. */
 static SV *pmd_redirect(pTHX_ SV *location) {
     AV *resp = newAV(), *headers = newAV(), *body = newAV();
+    STRLEN ll, i;
+    const char *lp = SvPV_const(location, ll);
+    /* A header value is \r-delimited, so one control byte in here is a
+     * response split. Callers are supposed to hand us a location built from
+     * the mount prefix and a page key, never from the request; stopping at
+     * the first control byte is the belt to that braces. */
+    for (i = 0; i < ll && (unsigned char)lp[i] >= 0x20 && lp[i] != 0x7f; i++)
+        ;
     av_push(headers, newSVpvs("Location"));
-    av_push(headers, newSVsv(location));
+    av_push(headers, newSVpvn(lp, i));
     av_push(headers, newSVpvs("Content-Type"));
     av_push(headers, newSVpvs("text/plain; charset=utf-8"));
     av_push(headers, newSVpvs("Content-Length"));
@@ -791,14 +799,26 @@ XS_INTERNAL(punk_md_cb) {
     if (plen == 1 && path[0] == '/') { path = ""; plen = 0; }
 
     /* Canonicalise: a trailing slash or a .md suffix redirects rather than
-     * becoming a second address for the same document. */
+     * becoming a second address for the same document.
+     *
+     * The target has to be a page we actually hold before we will name it in
+     * a Location header. PATH_INFO arrives percent-decoded, so reflecting it
+     * means echoing bytes the client chose: "//evil.example/" would come back
+     * as a protocol-relative 301 off the site, and a decoded CR/LF would end
+     * the header and split the response. Looking the stripped target up in
+     * the page table first means the only thing we can ever echo is one of
+     * our own keys. A path that is not a page falls through to the 404 it was
+     * always going to get. */
     if ((plen > 1 && path[plen - 1] == '/') ||
         (plen > 3 && memEQ(path + plen - 3, ".md", 3))) {
         STRLEN keep = path[plen - 1] == '/' ? plen - 1 : plen - 3;
-        SV *loc = sv_2mortal(newSVsv(*av_fetch(cap, PMDC_PREFIX, 0)));
-        sv_catpvn(loc, path, keep);
-        ST(0) = sv_2mortal(pmd_redirect(aTHX_ loc));
-        XSRETURN(1);
+        SV *ckey = sv_2mortal(newSVpvn(path, keep));
+        if (hv_exists_ent(pages, ckey, 0)) {
+            SV *loc = sv_2mortal(newSVsv(*av_fetch(cap, PMDC_PREFIX, 0)));
+            sv_catsv(loc, ckey);
+            ST(0) = sv_2mortal(pmd_redirect(aTHX_ loc));
+            XSRETURN(1);
+        }
     }
 
     /* the search page */

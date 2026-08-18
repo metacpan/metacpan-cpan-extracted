@@ -542,6 +542,40 @@ static AV *pc_after_of(pTHX_ SV *ref) {
            ? (AV *)SvRV(ref) : NULL;
 }
 
+/* A `then` callback must hand back a FUTURE, not the value it computed.
+ * Future's own sequencing enforces that - "Expected __ANON__(...) to return
+ * a Future" - and older releases enforce it strictly, so returning a raw
+ * triplet here fails on any perl whose Future predates the relaxation.
+ * Reported by CPAN Testers against 0.16 on perls 5.20, 5.22 and 5.24; it
+ * passed locally only because this box's Future no longer checks.
+ *
+ * The wrap is conditional because the two future flavours differ on this:
+ * `Future->done($v)` is a class method that mints a completed future, while
+ * Punk::Future's `done` is an instance method (its class-level constructor
+ * is done_future) and its own `then` accepts the value directly. So the
+ * capture carries a flag set at chain time from `$ret->isa('Future')`, and
+ * only that path is wrapped. Slot 4. */
+static int pc_ff_flag(pTHX_ AV *cap, int slot) {
+    SV **wp = av_fetch(cap, slot, 0);
+    return (wp && *wp && SvTRUE(*wp)) ? 1 : 0;
+}
+
+static SV *pc_ff_wrap(pTHX_ int wrap, SV *resp) {
+    SV *argv[1], *f;
+    if (!wrap) return resp;                            /* Punk::Future path */
+    argv[0] = sv_2mortal(resp);
+    f = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs("Future")), "done", argv, 1, 1);
+    return f ? f : newSVsv(argv[0]);
+}
+
+/* The streaming callbacks answer through the responder and have no value to
+ * carry, but they are still `then` callbacks and still owe a future back. */
+static SV *pc_ff_done_empty(pTHX) {
+    SV *f = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs("Future")), "done",
+                          NULL, 0, 1);
+    return f ? f : newSV(0);
+}
+
 XS_INTERNAL(pc_ff_done_cb);
 XS_INTERNAL(pc_ff_done_cb) {
     dXSARGS;
@@ -550,7 +584,8 @@ XS_INTERNAL(pc_ff_done_cb) {
     int hd  = pc_is_head(aTHX_ *av_fetch(cap, 2, 0));
     AV *aft = pc_after_of(aTHX_ *av_fetch(cap, 3, 0));
     SV *val = items > 0 ? ST(0) : &PL_sv_undef;
-    ST(0) = sv_2mortal(punk_deliver(aTHX_ c, val, hd, aft));
+    ST(0) = sv_2mortal(pc_ff_wrap(aTHX_ pc_ff_flag(aTHX_ cap, 4),
+                punk_deliver(aTHX_ c, val, hd, aft)));
     XSRETURN(1);
 }
 
@@ -564,7 +599,12 @@ XS_INTERNAL(pc_ff_fail_cb) {
     AV *aft = pc_after_of(aTHX_ *av_fetch(cap, 3, 0));
     SV *err = (items > 0 && SvOK(ST(0))) ? ST(0) : sv_2mortal(newSVpvs("failed"));
     SV *resp = punk_handle_error(aTHX_ c, err, SvOK(oe) ? oe : NULL);
-    ST(0) = sv_2mortal(punk_deliver(aTHX_ c, resp, hd, aft));
+    /* the same contract as the done side: a `then` callback returns a
+     * future, not the value. A failure that answers with a 500 triplet is
+     * still a SUCCESSFUL sequencing step - the error was handled - so this
+     * wraps with done, not fail. */
+    ST(0) = sv_2mortal(pc_ff_wrap(aTHX_ pc_ff_flag(aTHX_ cap, 4),
+                punk_deliver(aTHX_ c, resp, hd, aft)));
     SvREFCNT_dec(resp);
     XSRETURN(1);
 }
@@ -608,6 +648,7 @@ XS_INTERNAL(pc_ffs_done_cb) {
     SV *trip = punk_deliver(aTHX_ c, val, hd, aft);
     pc_respond(aTHX_ rsp, trip);
     SvREFCNT_dec(trip);
+    if (pc_ff_flag(aTHX_ cap, 5)) { ST(0) = sv_2mortal(pc_ff_done_empty(aTHX)); XSRETURN(1); }
     XSRETURN(0);
 }
 
@@ -626,6 +667,7 @@ XS_INTERNAL(pc_ffs_fail_cb) {
     pc_respond(aTHX_ rsp, trip);
     SvREFCNT_dec(trip);
     SvREFCNT_dec(resp);
+    if (pc_ff_flag(aTHX_ cap, 5)) { ST(0) = sv_2mortal(pc_ff_done_empty(aTHX)); XSRETURN(1); }
     XSRETURN(0);
 }
 
@@ -645,6 +687,7 @@ XS_INTERNAL(pc_ffs_cb) {
     SV *ret = *av_fetch(cap, 1, 0);
     SV *responder = items > 0 ? ST(0) : &PL_sv_undef;
     const hm_abi *A = punk_hm(aTHX);
+    int ffs_wrap = (SvROK(ret) && sv_derived_from(ret, "Future"));
     if (A && A->cur_loop(aTHX)) {
         SV *done, *fail, *argv[2], *chained;
         AV *caps[2];
@@ -658,6 +701,7 @@ XS_INTERNAL(pc_ffs_cb) {
             av_push(icap, (af && SvOK(*af)) ? newSVsv(*af)
                                             : newRV_noinc((SV *)newAV()));
             av_push(icap, newSVsv(responder));
+            av_push(icap, newSViv(ffs_wrap));
         }
         done = sv_2mortal(punk_closure(aTHX_ pc_ffs_done_cb, caps[0]));
         fail = sv_2mortal(punk_closure(aTHX_ pc_ffs_fail_cb, caps[1]));

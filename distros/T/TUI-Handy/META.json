@@ -1,0 +1,60 @@
+{
+    "name" : "TUI-Handy",
+    "version" : "0.01",
+    "abstract" : "Text-based user interface (ANSI escape only, no external modules)",
+    "author" : [
+        "ina <ina.cpan@gmail.com>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat version 0.51",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "no_index" : {
+        "directory" : [
+            "t",
+            "eg",
+            "doc"
+        ]
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ]
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "perl" : "5.005_03"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "perl" : "5.005_03"
+            }
+        },
+        "test" : {
+            "requires" : {
+                "Exporter" : "0",
+                "File::Spec" : "0",
+                "perl" : "5.005_03"
+            }
+        }
+    },
+    "provides" : {
+        "TUI::Handy" : {
+            "file" : "lib/TUI/Handy.pm",
+            "version" : "0.01"
+        }
+    }
+}

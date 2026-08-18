@@ -25,7 +25,7 @@
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 
 TestMethod*
-TestMethod_new() {
+TestMethod_new(void) {
     return (TestMethod*)Class_Make_Obj(TESTMETHOD);
 }
 

@@ -58,7 +58,7 @@ static const uint8_t UTF8_COUNT[256] = {
 };
 
 TestString*
-TestStr_new() {
+TestStr_new(void) {
     return (TestString*)Class_Make_Obj(TESTSTRING);
 }
 

@@ -13,7 +13,7 @@ use Exporter;
 
 use Fred::Fish::DBUG 2.09  qw / on_if_set  ADVANCED_CONFIG_FISH /;
 
-$VERSION   = "1.14";
+$VERSION   = "1.15";
 @ISA       = qw ( Exporter );
 @EXPORT    = qw ();
 @EXPORT_OK = qw ();
@@ -112,6 +112,45 @@ as a fatal error instead.  Recursion is detected even if you source in a
 symbolic link back to the original file.
 
 It is always a fatal error if the requested config file doesn't exist!
+
+=head1 SOURCING IN CONFIG FILES THAT USE DIFFERENT PARSING RULES
+
+Normally when you source in sub-files, both files use the same parsing rules so
+no additional logic is needed to handle parsing the config files.  But when
+both config files require different parsing rules in order to load, this module
+provides two ways to do this.
+
+The 1st way is to define a callback function using options I<source_cb> and
+I<source_cb_opts> so that the callback function is called whenever another
+config file is sourced into the current one.  The callback function is passed
+the file being sourced in and returns the updated option hashes needed when
+parsing that file.  How that is done is left up to the programmer.
+
+The 2nd way is to use a rule config file that tells how to parse your config
+files.  You use the special constructor B<newDefineConfigRules> to load this
+special config file into memory using default parsing rules.  Then you later
+call B<set_config_rules> to associate this rule file to your config file.
+
+This rule config file is referenced whenever a new file is parsed.  It looks up
+the section named after the file being parsed and returns the options needed to
+parse the config file.  It 1st tries to find a section in the rule config file
+that matches that filename.  If no match is found it tries for a wildcard
+lookup.  Say you define 3 wildcard sections: B<*>, B<*.cfg> & B<tom*.cfg>.
+
+So you try to load I<John.cfg> it will match section B<*.cfg>.
+
+Next you load I<wendy.INC>, it will match the default wildcard section B<*>.
+
+But loading I<Tommy.CFG> has a problem.  It matches both B<*.cfg> & B<tom*.cfg>.
+In this case it looks up a special tag B<__ORDER__> to see which section to use.
+The tag with the smallest integer value is the section to use.  If it still
+matches multiple sections it is a fatal error.  The reason it didn't match B<*>
+is that it assumes an B<__ORDER__> of infinity for this special case.
+
+Each section defines the options needed to parse the config file.  You can only
+define tags that match the options defined in L<Advanced::Config::Options> and
+the special tag B<__ORDER__>.  Any other tag is a fatal error.  All tags are
+case insensitive.
 
 =head1 CONTROLLING THE PARSING OF YOUR CONFIG FILES
 

@@ -17,12 +17,28 @@
 #     PDFMAKE_UPDATE_CORPUS=1 prove -lb t/56-golden-corpus.t
 #
 # and read the diff before committing it.
+#
+# It is an author test, because byte equality is a promise about one engine
+# on one machine, not about floating point everywhere. Text is placed at
+# accumulated glyph advances - the corpus is full of values like
+# 243.810005 and 159.444443 - and the writer prints those to six decimals.
+# A perl built -Duselongdouble accumulates the same sum in 80-bit registers
+# and hands the writer a double one ulp away; a different architecture
+# contracts a multiply-add differently. Either way a sum that lands on
+# 243.81 here lands on 243.810005 there, and a file that is byte-identical
+# on the machine the corpus was generated on is twelve bytes longer on a
+# smoker. That is not layout drift, which is the only thing this test
+# exists to catch, so it does not run where it cannot tell the two apart.
 
 use strict;
 use warnings;
 use Test::More;
 use File::Spec;
 use PDF::Make::Markup::Render;
+
+plan skip_all => 'author test: byte equality holds per platform, '
+               . 'set AUTHOR_TESTING=1 to run it'
+    unless $ENV{AUTHOR_TESTING} || $ENV{PDFMAKE_UPDATE_CORPUS};
 
 eval { require Template::Stencil; 1 }
     or plan skip_all => 'Template::Stencil required to render the corpus';

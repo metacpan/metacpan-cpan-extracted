@@ -5,14 +5,25 @@ use File::Temp qw(tempdir);
 use File::Spec;
 use File::Path qw(mkpath);
 
-# Symlinks may not be supported on all platforms
-eval { symlink("", ""); 1 } or plan skip_all => 'symlinks not supported';
+my $dir = tempdir(CLEANUP => 1);
+
+# Symlinks may not be supported on all platforms. symlink() is present on
+# Win32 but only succeeds for a privileged (or developer mode) process, so
+# probe with a real one instead of trusting the builtin to exist.
+{
+	my $target = File::Spec->catfile($dir, 'probe.target');
+	open my $pfh, '>', $target or die;
+	close $pfh;
+	my $link = File::Spec->catfile($dir, 'probe.link');
+	eval { symlink($target, $link) or die "$!\n"; 1 }
+		or plan skip_all => 'symlinks not supported on this platform';
+	unlink $link;
+	unlink $target;
+}
 
 plan tests => 5;
 
 use_ok('Eshu');
-
-my $dir = tempdir(CLEANUP => 1);
 
 # Create a real file
 my $real = File::Spec->catfile($dir, 'real.pm');

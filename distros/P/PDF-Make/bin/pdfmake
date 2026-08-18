@@ -9,7 +9,7 @@ use PDF::Make::Markup::Parse;
 use PDF::Make::Markup::Style;
 use PDF::Make::Markup::Render;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # pdfmake - render, check and benchmark document templates without a server.
 #
@@ -28,6 +28,7 @@ Usage:
   $me check  TEMPLATE [DATA.json]
   $me bench  [TEMPLATE] [--iterations N]
   $me tags   [--attributes]
+  $me push   BUNDLE.json | DIR [--name NAME] [--note TEXT]
 
 Commands:
   render   Template plus data to a PDF file, or to stdout with -o -.
@@ -37,6 +38,11 @@ Commands:
   bench    Documents per second and peak memory, on this machine.
   tags     The tag and attribute reference, generated from the parser's
            own tables so it cannot drift from what the engine accepts.
+  push     Send a template bundle to pdf-make.com (or your own host) as
+           a new immutable version, matched by name - what CI runs.
+           A DIR is assembled: template.tmpl (or template.st), partials/,
+           assets/, fixtures/*.json. Needs PDFMAKE_TOKEN, and
+           PDFMAKE_URL for a host other than https://pdf-make.com.
 
 Options:
   -o, --out FILE      Where to write (- for stdout).
@@ -266,6 +272,47 @@ sub time_hires {
         return Time::HiRes::time();
     }
     return time();
+}
+
+# template.tmpl (or template.st) at the top, partials/ and assets/ as
+# named files, fixtures/*.json by basename - a directory a repo wants
+# to hold, in the one-file shape the import endpoint takes.
+sub _assemble_bundle {
+    my ($dir) = @_;
+    my ($tpl) = grep { -f } "$dir/template.tmpl", "$dir/template.st";
+    die "no template.tmpl (or template.st) in '$dir'\n" unless $tpl;
+
+    my %bundle = (
+        pdfmake_bundle => 1,
+        name           => basename($dir),
+        template       => slurp($tpl),
+    );
+
+    if (-d "$dir/partials") {
+        for my $f (sort glob "$dir/partials/*") {
+            next unless -f $f;
+            $bundle{partials}{ basename($f) } = slurp($f);
+        }
+    }
+    if (-d "$dir/assets") {
+        require MIME::Base64;
+        my %mime = (png => 'image/png', jpg => 'image/jpeg',
+                    jpeg => 'image/jpeg', gif => 'image/gif');
+        for my $f (sort glob "$dir/assets/*") {
+            next unless -f $f;
+            my ($ext) = $f =~ /\.([A-Za-z0-9]+)\z/;
+            my $type = $mime{ lc($ext // '') } || 'application/octet-stream';
+            $bundle{assets}{ basename($f) } =
+                "data:$type;base64," . MIME::Base64::encode_base64(slurp($f), '');
+        }
+    }
+    if (-d "$dir/fixtures") {
+        for my $f (sort glob "$dir/fixtures/*.json") {
+            (my $fname = basename($f)) =~ s/\.json\z//;
+            $bundle{fixtures}{$fname} = read_json($f);
+        }
+    }
+    return \%bundle;
 }
 
 # ---------------------------------------------------------------------------

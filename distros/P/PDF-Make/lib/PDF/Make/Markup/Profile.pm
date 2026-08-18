@@ -2,7 +2,7 @@ package PDF::Make::Markup::Profile;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # No logic lives here. What a template may not do - reach code, or turn a data
 # value into markup - is decided in src/pdfmake_markup_profile.c and

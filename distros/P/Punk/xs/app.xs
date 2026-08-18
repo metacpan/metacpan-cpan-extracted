@@ -79,6 +79,15 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
         HV *h = app_hv(aTHX_ self);
         SV *router = app_get(aTHX_ h, K_ROUTER);
         SV *argv[8], *r;
+        /* the one-hashref form: post '/x' => { cb => ..., max_body => N }.
+         * Split here rather than in the keyword layer, because scoped verbs
+         * ($scope->post) reach this same method (xs/scope.xs) and get it for
+         * free. Everything below is untouched by which spelling was used. */
+        {
+            SV *wm = sv_2mortal(newSVpvs("route "));
+            sv_catsv(wm, method);
+            pk_spec_split(aTHX_ SvPV_nolen(wm), path, &target, &opts);
+        }
         if (SvOK(opts)) {
             HV *oh; HE *he; SV **vp;
             if (!(SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV))
@@ -87,8 +96,38 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
             hv_iterinit(oh);
             while ((he = hv_iternext(oh))) {
                 STRLEN kl; const char *k = HePV(he, kl);
-                if (!strEQ(k, K_VALIDATE))
+                if (!strEQ(k, K_VALIDATE) && !strEQ(k, K_COMPRESS)
+                    && !strEQ(k, K_MAX_BODY))
                     croak("Punk: unknown route option '%s'", k);
+            }
+            /* max_body: this route's ceiling on CONTENT_LENGTH, overriding
+             * the app-wide keyword. 0 means "do not check here", which is
+             * legitimate - unlike the server's ceiling, this one is policy
+             * and not the memory backstop. Recorded now, stamped onto the
+             * compiled record at to_app (the ws/sse/compress pattern). */
+            vp = hv_fetchs(oh, K_MAX_BODY, 0);
+            if (vp && *vp && SvOK(*vp)) {
+                HV *rec = newHV();
+                (void)hv_stores(rec, K_METHOD,   newSVsv(method));
+                (void)hv_stores(rec, K_PATH,     newSVsv(path));
+                (void)hv_stores(rec, K_MAX_BODY, newSViv(SvIV(*vp)));
+                av_push(app_av(aTHX_ h, K_MAXBODY_ROUTES),
+                        newRV_noinc((SV *)rec));
+            }
+            /* compress => 0 opts this route out of the server's response
+             * compression. Recorded now, stamped onto the compiled record
+             * at to_app (the ws/sse pattern), and spelled on the way out as
+             * `Content-Encoding: identity` - a plain response header, which
+             * is the documented contract Hyperman honours and any other
+             * PSGI server could. There is no compress => 1: compressing is
+             * the server's default answer for a route that says nothing. */
+            vp = hv_fetchs(oh, K_COMPRESS, 0);
+            if (vp && *vp && !SvTRUE(*vp)) {
+                HV *rec = newHV();
+                (void)hv_stores(rec, K_METHOD, newSVsv(method));
+                (void)hv_stores(rec, K_PATH,   newSVsv(path));
+                av_push(app_av(aTHX_ h, K_NOCOMPRESS_ROUTES),
+                        newRV_noinc((SV *)rec));
             }
             vp = hv_fetchs(oh, K_VALIDATE, 0);
             if (vp && *vp && SvOK(*vp)) {
@@ -148,9 +187,11 @@ websocket(self, path, target, opts = &PL_sv_undef, guards = &PL_sv_undef)
         HV *h = app_hv(aTHX_ self);
         static const char *known[] =
             { "protocols", "max_message_size", "write_buffer_limit", K_BLOCKING };
-        HV *oh = (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
-                 ? (HV *)SvRV(opts) : NULL;
+        HV *oh;
         SV *argv[8], *r; HE *he; HV *rec;
+        pk_spec_split(aTHX_ "websocket", path, &target, &opts);
+        oh = (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
+             ? (HV *)SvRV(opts) : NULL;
         if (oh) {
             hv_iterinit(oh);
             while ((he = hv_iternext(oh))) {
@@ -190,9 +231,11 @@ sse(self, path, target, opts = &PL_sv_undef, guards = &PL_sv_undef)
         HV *h = app_hv(aTHX_ self);
         static const char *known[] =
             { "heartbeat", "retry", "write_buffer_limit", K_BLOCKING };
-        HV *oh = (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
-                 ? (HV *)SvRV(opts) : NULL;
+        HV *oh;
         SV *argv[8], *r; HE *he; HV *rec;
+        pk_spec_split(aTHX_ "sse", path, &target, &opts);
+        oh = (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
+             ? (HV *)SvRV(opts) : NULL;
         if (oh) {
             hv_iterinit(oh);
             while ((he = hv_iternext(oh))) {
@@ -325,6 +368,104 @@ headers(self, ...)
                 }
             }
             (void)hv_store(h, K_HEADERS, (I32)strlen(K_HEADERS),
+                           newRV_noinc((SV *)cfg), 0);
+        }
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
+# max_body($bytes): the app-wide ceiling on a request's declared
+# CONTENT_LENGTH, overridable per route. This is POLICY, not memory
+# protection - by the time Punk runs, the body is already resident in the
+# server's buffer. What it buys is the parse, the guards, the handler, and
+# an honest 413 instead of a mysterious success. The memory bound is the
+# server's (Hyperman's own `max_body`). Chains.
+SV *
+max_body(self, bytes = &PL_sv_undef)
+        SV *self
+        SV *bytes
+    CODE:
+    {
+        HV *h = app_hv(aTHX_ self);
+        if (!SvOK(bytes))
+            croak("Punk: max_body needs a byte count");
+        if (SvROK(bytes))
+            croak("Punk: max_body takes a byte count, not a reference");
+        {
+            IV n = SvIV(bytes);
+            if (n < 0)
+                croak("Punk: max_body must not be negative");
+            (void)hv_store(h, K_MAX_BODY, (I32)strlen(K_MAX_BODY),
+                           newSViv(n), 0);
+        }
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
+# proxy() / proxy(trust => 1, ...) / proxy(\%opts): declare that this
+# application sits behind a reverse proxy, so the real client can be
+# recovered from the forwarded headers. Bare `proxy` means one hop, which is
+# the common case. Unknown options croak at keyword time; the values are
+# validated at to_app, where the CIDRs are parsed and 'all' is refused
+# outside development. Declaring it twice croaks: a second policy silently
+# replacing the first is how a staging config leaks into production. Chains.
+SV *
+proxy(self, ...)
+        SV *self
+    CODE:
+    {
+        HV *h = app_hv(aTHX_ self);
+        HV *cfg = newHV();
+        int i;
+        static const char *const PP_OPTS[] = {
+            "trust", "for_header", "proto_header", "host_header",
+            "port_header", NULL
+        };
+        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+            HE *e; HV *given = (HV *)SvRV(ST(1));
+            hv_iterinit(given);
+            while ((e = hv_iternext(given))) {
+                STRLEN kl; const char *k = HePV(e, kl);
+                (void)hv_store(cfg, k, (I32)kl,
+                               newSVsv(hv_iterval(given, e)), 0);
+            }
+        }
+        else for (i = 1; i + 1 < items; i += 2) {
+            STRLEN kl; const char *k = SvPV_const(ST(i), kl);
+            (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
+        }
+
+        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) {
+            SvREFCNT_dec((SV *)cfg);
+            (void)hv_delete(h, K_PROXY, (I32)strlen(K_PROXY), G_DISCARD);
+        }
+        else {
+            HE *e;
+            if (hv_exists(h, K_PROXY, (I32)strlen(K_PROXY))) {
+                SvREFCNT_dec((SV *)cfg);
+                croak("Punk: `proxy` is already declared - one trust policy "
+                      "per application, or a second one silently replaces "
+                      "the first");
+            }
+            hv_iterinit(cfg);
+            while ((e = hv_iternext(cfg))) {
+                STRLEN kl; const char *k = HePV(e, kl);
+                int j, known = 0;
+                for (j = 0; PP_OPTS[j]; j++)
+                    if (kl == strlen(PP_OPTS[j]) && memEQ(k, PP_OPTS[j], kl))
+                        { known = 1; break; }
+                if (!known) {
+                    SV *msg = sv_2mortal(newSVpvf(
+                        "Punk: proxy: unknown option '%.*s' (known: trust, "
+                        "for_header, proto_header, host_header, port_header)",
+                        (int)kl, k));
+                    SvREFCNT_dec((SV *)cfg);
+                    croak("%s", SvPV_nolen(msg));
+                }
+            }
+            (void)hv_store(h, K_PROXY, (I32)strlen(K_PROXY),
                            newRV_noinc((SV *)cfg), 0);
         }
         RETVAL = newSVsv(self);

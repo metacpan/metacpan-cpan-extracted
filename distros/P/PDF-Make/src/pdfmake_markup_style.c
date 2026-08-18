@@ -51,7 +51,10 @@ static const prop_ent_t PROPS[] = {
     { "title",        PDFMAKE_P_TITLE,         PDFMAKE_T_STR,    0 },
     { "level",        PDFMAKE_P_LEVEL,         PDFMAKE_T_NUM,    0 },
     { "header-repeat",PDFMAKE_P_HEADER_REPEAT, PDFMAKE_T_BOOL,   0 },
-    { "preformatted", PDFMAKE_P_PREFORMATTED,  PDFMAKE_T_BOOL,   0 }
+    { "preformatted", PDFMAKE_P_PREFORMATTED,  PDFMAKE_T_BOOL,   0 },
+    /* Accessibility is a property of the document, declared where the
+     * document starts: <doc tagged="1"> turns the structure tree on. */
+    { "tagged",       PDFMAKE_P_TAGGED,        PDFMAKE_T_BOOL,   0 }
 };
 
 #define PROP_COUNT (sizeof(PROPS) / sizeof(PROPS[0]))
@@ -79,7 +82,8 @@ static const prop_ent_t PROPS[] = {
 
 static uint64_t tag_allow(pdfmake_markup_tag_t tag) {
     switch (tag) {
-    case PDFMAKE_MK_DOC:       return TEXT_PROPS | PAGE_PROPS;
+    case PDFMAKE_MK_DOC:       return TEXT_PROPS | PAGE_PROPS |
+                                      BIT(PDFMAKE_P_TAGGED);
     case PDFMAKE_MK_STYLE:     return 0;   /* validated as declaration lists */
     case PDFMAKE_MK_PAGE:      return PAGE_PROPS;
     case PDFMAKE_MK_PAGEBREAK: return 0;

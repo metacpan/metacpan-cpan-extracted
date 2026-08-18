@@ -1,3 +1,205 @@
+2026-08-18 - v1.10
+    + docs: rewrote the USAGE section - the signed-request example (the
+      module's stated reason to exist per DESCRIPTION) now leads instead
+      of being buried after three generic examples, leftover casual-era
+      phrasing from the original docs was removed, and the section was
+      split into labeled subsections instead of one run-on block mixing
+      old and new writing styles (HAC-054)
+
+2026-08-18 - v1.09
+    + docs: added ATTRIBUTES entries for retry_config and json - real,
+      working programmatic alternatives to the env-var-only retry and
+      JSON encoding config, previously undocumented (HAC-052)
+    + docs: added a DESCRIPTION section explaining why this module
+      exists (repetitive signed-API-request boilerplate) and when
+      LWP::UserAgent/HTTP::Tiny are simpler choices instead, plus a
+      verified-working signed-request USAGE example showing the event
+      system computing a signature header while keeping the secret out
+      of the body. Both README.md files gained a matching purpose
+      paragraph before their setup instructions (HAC-051)
+
+2026-08-18 - v1.08
+    + docs: fixed 5 confirmed POD/README defects found by an explicit
+      audit - the post() USAGE example said 'same as send(GET,...)'
+      instead of POST, HTTP_TIMEOUT still had an unfilled '???'
+      placeholder, browser_id/ua were undocumented in ATTRIBUTES, and
+      src/README.md directly contradicted itself ("Docker only... no
+      other supported dev setup" immediately followed by full local Perl
+      instructions) with a stale coverage-baseline date (HAC-050)
+    + fix: browser_id's version fallback was -1, producing the
+      nonsensical User-Agent "HTTP API Client v-1" - $VERSION is only
+      set by Dist::Zilla's [PkgVersion] plugin at build time, so this
+      fallback fired for every non-CPAN-installed usage (a git checkout,
+      including this project's own dev/test environment). Now falls back
+      to "dev" instead (HAC-049)
+    + docs: RETRY VARIABLES POD had a leftover "???" placeholder never
+      filled in for RETRY_DELAY's default and a typo ("resposne") on
+      RETRY_FAIL_RESPONSE - fixed, and documented the HAC-044/045
+      negative-value clamping (HAC-048)
+    + docs: charset attribute POD now names valid values and the
+      HAC-046 invalid-value error behavior (HAC-047)
+    + fix: an invalid charset value (e.g. a typo in HTTP_CHARSET) was
+      silently swallowed by _build_json's eval, leaving JSON encoding
+      without byte-encoding forced - a JSON request with any non-ASCII
+      data then crashed much later with the confusing, unrelated
+      "HTTP::Message content must be bytes" instead of a clear error
+      naming the actual bad charset. Now dies immediately and clearly
+      (HAC-046)
+    + fix: a negative RETRY_DELAY reached sleep() as-is, producing
+      "sleep() with negative argument" on every retry - same class of
+      missing-validation gap as HAC-044, just in the delay rather than
+      the count. Now clamped to a minimum of 0 in send() (HAC-045)
+    + fix: a negative retry count (e.g. RETRY_FAIL_RESPONSE=-1) made
+      send()/get()/etc silently return undef - Perl's 0..N range is empty
+      for a negative N, so the retry loop's body (which builds and sends
+      the request) never ran at all, with no error or warning. Now
+      clamped to a minimum of 0 in _build_retry, matching the documented
+      "default 0 retry" floor (HAC-044)
+    + test: t/08_retry.t also switched to the shared t/lib/FakeUA.pm
+      fixture (HAC-042 follow-up) - it was a strict subset of the shared
+      fixture's behavior. No behavior change (HAC-043)
+    + test: t/11_retry_fail_status.t and t/24_retry_fail_status_whitespace.t
+      duplicated an identical FakeUA fixture verbatim - extracted into a
+      shared t/lib/FakeUA.pm. No behavior change (HAC-042)
+    + fix: send() defaulted $data/$headers/$events when omitted but not
+      $path - calling get()/post()/etc with no path argument (a plausible
+      pattern when base_url is meant to be the whole target URL) produced
+      a spurious "Use of uninitialized value $path" warning. Now defaults
+      $path via _defor(), matching the other three optional args (HAC-041)
+    + refactor: kvp2json and kvp2str duplicated the exact same skip-key
+      guard verbatim - the same shape of duplication that caused HAC-020
+      (the two encoders silently drifting out of sync). Extracted into a
+      shared _should_skip_key() helper. No behavior change (HAC-040)
+    + test: coverage added for json_response()'s documented "no request
+      made yet" behavior (never exercised before) - confirms it already
+      matches the POD (HAC-039)
+
+2026-08-17 - v1.07
+    + docs: added POD for get_content_type/kvp2json_each/kvp2str_each,
+      the only three public methods in Client.pm with none (Pod::Coverage
+      82.3% -> 100%) (HAC-038)
+    + fix: before_sorting_keys' keys parameter was always empty on entry,
+      and any mutation a callback made to it (add/remove a key before
+      sorting) was silently discarded a moment later when @keys got
+      unconditionally reassigned from keys %data. Unlike after_sorting_keys,
+      whose keys mutations are genuinely live, before_sorting_keys was
+      functionally inert for this purpose (HAC-037)
+    + fix: CPANTS Core Kwalitee was 93.75% (6 failing metrics) - added a
+      LICENSE AND COPYRIGHT POD section to Client.pm, declared
+      HTTP::Headers/HTTP::Request as runtime prereqs and HTTP::Request/
+      HTTP::Response as test-phase prereqs in cpanfile (both used but
+      previously undeclared), declared a minimum perl version, and added
+      [MetaJSON] to dist.ini so the release includes META.json (HAC-036)
+    + fix: Basic Auth (username/password) crashed outright on a wide
+      Unicode username or password - authorization_basic()'s internal
+      base64 encoding dies on a UTF8-flagged string, and unlike
+      auth_token (fixed by HAC-034) username/password never went
+      through any UTF-8 handling. Reuses _encode_if_utf8_flagged(),
+      completing the sweep across every credential/header/body path
+      (HAC-035)
+    + fix: header values got no UTF-8 handling at all, unlike body values
+      (fixed for body content just below by HAC-029/031/032) - a wide
+      Unicode header value stayed UTF8-flagged all the way through,
+      producing "Wide character in print" warnings and incorrect bytes
+      when the request was serialized. New _encode_if_utf8_flagged()
+      helper, shared with the body-encoding fixes, applied to header
+      values before they reach HTTP::Request::header() (HAC-034)
+    + fix: kvp2str_each's BOOL branch (xTRUE/xFALSE/xTrue/xFalse/xtrue/
+      xfalse/xt__e/xf___e) interpolated its value directly into the
+      query string with no percent-escaping at all, unlike every other
+      branch. A value containing '&' or '=' - reachable since xBOOLEAN's
+      own POD documents it as accepting any plain scalar, not just
+      boolean-safe strings - corrupted the query string by introducing
+      extra params (HAC-033)
+    + fix: the JSON path (kvp2json/kvp2json_each) had the same class of
+      bug as HAC-031, just below - JSON::XS's utf8 mode unconditionally
+      re-encodes string values, which double-encodes a value that is
+      already raw UTF-8 bytes, producing mojibake in the JSON body. Now
+      decodes any non-UTF8-flagged string value before it reaches
+      JSON::XS (HAC-032)
+    + fix: HAC-029's uri_escape_utf8() fix (below, v1.06) double-encoded a
+      value that was already raw UTF-8 bytes (utf8::is_utf8 false - the
+      common shape for data read from a file/DB/API without being
+      explicitly Encode::decode'd), producing mojibake instead of correct
+      percent-encoding. A genuine Unicode character string still encodes
+      correctly. New _uri_escape_bytes_or_chars() helper only encodes
+      when the input is actually UTF8-flagged, mirroring _tune_utf8's own
+      detect-then-encode approach (HAC-031)
+
+2026-08-17 - v1.06
+    + fix: any form-urlencoded request (the GET default, or content_type
+      set explicitly) containing a genuinely wide Unicode character in a
+      key or value - any CJK character, Cyrillic, Greek, emoji - crashed
+      outright instead of encoding. kvp2str_each used URI::Escape's
+      uri_escape(), which only handles codepoints up to 0xFF; switched to
+      uri_escape_utf8(). JSON requests were unaffected (HAC-029)
+    + test: coverage added for _tune_utf8's UTF-8 encoding path, tested
+      directly as it's unreachable through the public API - convert_data()
+      always hands it already byte-encoded content (HAC-028)
+    + fix: RETRY_FAIL_STATUS silently dropped any status code after a
+      comma-space separator (e.g. "500, 404") - the split didn't trim
+      whitespace, so the leading space left on every status but the first
+      never matched the response code and that status silently never
+      retried (HAC-027)
+    + test: coverage added for skip_headers/skip_key (new_request/
+      kvp2json/kvp2str), previously undocumented and, for skip_headers,
+      untested (HAC-026)
+    + test: coverage added for before_headers and before_sorting_keys/
+      after_sorting_keys events (never exercised before) (HAC-024)
+    + fix: add_headers_keys, following its own documented usage (mutate
+      %headers as a side effect, then return the key), caused that key to
+      be double-counted in new_request()'s @keys - before_header/
+      after_header for that key fired twice instead of once (HAC-025)
+    + test: coverage added for headers_keys/add_headers_keys/before_header/
+      after_header events (never exercised before), and for auth_token
+      including the documented username/password-wins precedence rule
+      (HAC-021, HAC-023)
+    + fix: the not_include event was silently ignored in form-urlencoded
+      mode (kvp2str) - it only worked for JSON (kvp2json). A key explicitly
+      excluded via not_include still leaked into a form-urlencoded request
+      body (HAC-022)
+    + fix: kvp2str_each() silently stringified a nested hash value as
+      'HASH(0x...)' in the query string - now dies with a clear message
+      naming the key, mirroring the same fix already applied to
+      convert_data() (HAC-020)
+
+2026-08-17 - v1.05
+    + test: coverage added for the DEBUG_* env vars (never exercised before);
+      clarified DEBUG_RESPONSE_IF_FAIL's POD - it only narrows DEBUG_IN_OUT/
+      DEBUG_RESPONSE, it does nothing by itself (HAC-017, HAC-018)
+    + fix: _execute_callbacks() used each() on the data/headers hash while
+      callbacks could mutate that same hash - confirmed via Perl's own
+      "each() after insertion" undefined-behavior warning. Now iterates a
+      keys() snapshot instead (HAC-016)
+    + fix: root Dockerfile never put lib/ on PERL5LIB, so docker run always
+      failed at 'use HTTP::API::Client' - verified with a real build+run,
+      all tests now pass in the container (HAC-013)
+    + test: coverage added for put()/head()/delete() (never exercised before)
+      and for json_response()/kvp_response()'s actual decode logic (only
+      their empty-input guards had coverage) - no behavior changed, all
+      confirmed already correct (HAC-014, HAC-015)
+    + fix: a client configured with an engine other than LWP::UserAgent now
+      dies with a clear message instead of crashing later with a confusing
+      "is_success on an undefined value" - real custom-engine dispatch is
+      still an open design question, not decided here (HAC-010)
+    + fix: RETRY_FAIL_STATUS crashed (wrong method name, decode_content vs
+      decoded_content) any time it was actually used - the body-pattern-match
+      it was trying to do was never wired up either, retry now happens purely
+      on status-code match as the POD has always documented (HAC-009)
+    + fix: kvp_response() crashed if called before any request was made -
+      now returns {} like json_response() already did (HAC-007)
+    + fix: convert_data() silently stringified a data hashref as 'HASH(0x...)'
+      for any content_type other than json/form-urlencoded - now returns an
+      empty body for empty data, dies with a clear message otherwise (HAC-008)
+    + fix: a non-GET request (POST/PUT/DELETE) with application/x-www-form-urlencoded
+      content-type and empty data never built an HTTP::Request object and crashed
+      in send() - now builds an empty-content request correctly (HAC-004)
+    + fix: send() slept RETRY_DELAY seconds on every failed request even with
+      RETRY_FAIL_RESPONSE=0 (the default, no retries) - now returns immediately
+      when no retry attempt is left (HAC-006)
+    + license changed to MIT
+    + Devel::Cover wired up as a develop-phase dependency, coverage documented in README
+
 2021-03-31 - v1.03
     + use lazy builder, so the sub classes can just overwrite the _build_ sub instead of using default => sub {}
 

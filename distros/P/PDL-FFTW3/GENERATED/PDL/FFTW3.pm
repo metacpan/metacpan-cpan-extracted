@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.203';
+   our $VERSION = '0.204';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::FFTW3 $VERSION;
@@ -140,12 +140,12 @@ this module have the C<N> in their name, so for instance a complex <-> complex
 always> be specified in this way; there is no function called simply C<fft>.
 
 In-place operation is supported for complex <-> complex functions, but not the
-real ones (real function don't have mathing dimensionality of the input and
+real ones (real functions don't have matching dimensionality of the input and
 output). An in-place transform of C<$x> can be computed with
 
  fft1( $x->inplace );
 
-All the functions in this module support PDL threading. For instance, if we have
+All the functions in this module support PDL broadcasting. For instance, if we have
 4 different image ndarrays C<$a>, C<$b>, C<$c>, C<$d> and we want to compute
 their 2D FFTs at the same time, we can say
 
@@ -217,11 +217,15 @@ including PDL.
 
 =head1 FUNCTIONS
 
-=head2 fftX (fft1, fft2, fft3, ..., fftn)
+=head2 fft1, fft2, fft3, fft4, fft5, fft6, fft7, fft8, fft9, fft10, fftn
 
-The basic complex <-> complex FFT. You can pass in the rank as a
+=for ref
+
+Basic complex -> complex FFT.
+
+You can pass in the rank as a
 parameter with the C<fftn> form, or append the rank to the function
-name for ranks up to 9. These functions all take one input ndarray and
+name for ranks up to 10. These functions all take one input ndarray and
 one output ndarray.  The dimensions of the input and the output are
 identical. The output parameter is optional and, if present, must be
 the last argument. If the output ndarray is passed in, the user I<must>
@@ -240,19 +244,26 @@ The following are equivalent:
  $X = fft1( $x );
  fft1( $x, my $X = $x->zeros );
 
-=head2 ifftX (ifft1, ifft2, ifft3, ..., ifftn)
+=head2 ifft1, ifft2, ifft3, ifft4, ifft5, ifft6, ifft7, ifft8, ifft9, ifft10, ifftn
 
-The basic, properly normalized, complex <-> complex backward
-FFT. Everything is exactly like in the C<fftX> functions, except the
+=for ref
+
+Basic, properly normalized, complex -> complex backward FFT.
+
+Everything is exactly like in the C<fftX> functions, except the
 inverse transform is computed and normalized, so that (for example)
 
  ifft1( fft1 ( $x ) )
 
 is a good approximation of C<$x> itself.
 
-=head2 rfftX (rfft1, rfft2, rfft3, ..., rfftn)
+=head2 rfft1, rfft2, rfft3, rfft4, rfft5, rfft6, rfft7, rfft8, rfft9, rfft10, rfftn
 
-The real -> complex FFT. You can pass in the rank with the C<rfftn>
+=for ref
+
+Real -> complex FFT.
+
+You can pass in the rank with the C<rfftn>
 form, or append the rank to the function name for ranks up to 9.
 These functions all take one input ndarray and one output ndarray. The
 dimensions of the input and the output are not identical, but are
@@ -271,13 +282,19 @@ The following are equivalent:
 As of 0.20, only returns native-complex data. Support for PDL::Complex
 has been removed.
 
-=head2 rNfftX (rNfft1, rNfft2, rNfft3, ..., rNfftn)
+=head2 rNfft1, rNfft2, rNfft3, rNfft4, rNfft5, rNfft6, rNfft7, rNfft8, rNfft9, rNfft10, rNfftn
+
+=for ref
 
 As of 0.20, just an alias for rfftX, etc.
 
-=head2 irfftX (irfft1, irfft2, irfft3, ..., irfftn)
+=head2 irfft1, irfft2, irfft3, irfft4, irfft5, irfft6, irfft7, irfft8, irfft9, irfft10, irfftn
 
-The complex -> real inverse FFT. You can pass in the rank with the
+=for ref
+
+Complex -> real inverse FFT.
+
+You can pass in the rank with the
 C<irfftn> form, or append the rank to the function name for ranks up
 to 9. Argument passing and interpretation is as described in
 C<rfftX> above. Please read L<Data formats> for details about dimension
@@ -316,7 +333,7 @@ our $_last_do_double_precision;
 
 # This is a function that sits between the user's call into this module and the
 # PP-generated internals. Specifically, this function is called BEFORE any PDL
-# threading happens. Here I make sure the FFTW plan exists, or if it doesn't, I
+# broadcasting happens. Here I make sure the FFTW plan exists, or if it doesn't, I
 # make it. Thus the PP-based internals can safely assume that the plan exists
 sub __fft_internal {
   my $thisfunction = shift;
@@ -616,8 +633,8 @@ sub getPlan
 
   my $do_inplace = is_same_data( $in, $out );
 
-  # I compute a single plan for the whole set of thread slices. I make a
-  # worst-case plan, so I find the worst-aligned thread slice and plan off of
+  # I compute a single plan for the whole set of broadcast slices. I make a
+  # worst-case plan, so I find the worst-aligned broadcast slice and plan off of
   # it. So if $Nslices>1 then the worst-case alignment is the worse of (1st,
   # 2nd) slices
   my $in_alignment  = get_data_alignment_pdl( $in );
@@ -886,7 +903,7 @@ sub irfftn  { _rank_springboard( "irfft", @_ ) }
 *PDL::ifftn  = \&ifftn;
 *PDL::rfftn  = \&rfftn;
 *PDL::irfftn = \&irfftn;
-#line 890 "FFTW3.pm"
+#line 907 "FFTW3.pm"
 
 # Exit with OK status
 

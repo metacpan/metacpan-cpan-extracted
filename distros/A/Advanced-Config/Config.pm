@@ -62,7 +62,7 @@ use strict;
 use warnings;
 
 # The version of this module!
-our $VERSION = "1.14";
+our $VERSION = "1.15";
 
 use File::Basename;
 use File::Copy;
@@ -277,10 +277,10 @@ It returns the I<Advanced::Config> object created.
 
 Here's a few examples:
 
-  # Sets up an empty object.
+  # Sets up an empty object with default options ...
   $cfg = Advanced::Config->new();
 
-  # Just specifies the config file to use ...
+  # Just specifies the config file to use with default options ...
   $cfg = Advanced::Config->new("MyFile.cfg");
 
   # Overrides some of the default featurs of the module ...
@@ -294,7 +294,7 @@ Here's a few examples:
 sub new
 {
    DBUG_ENTER_FUNC ( @_ );
-   my $prototype = shift;;
+   my $prototype = shift;
    my $filename  = shift;
    my $read_opts = shift;     # A hash ref of "read" options ...
    my $get_opts  = shift;     # Another hash ref of "get" options ...
@@ -314,6 +314,9 @@ sub new
    $control{read_opts} = get_read_opts ( $read_opts );
    $control{get_opts}  = get_get_opts ( $get_opts );
    $control{date_opts} = get_date_opts ( $date_opts );
+
+   $control{read_only} = 0;           # not created via newDefineConfigRules().
+   $control{ConfigRuleObj} = undef;   # not set by set_config_rules ().
 
    my ( %dates, %empty, %mods, %ropts, %rec, @lst );
 
@@ -417,6 +420,149 @@ sub _wipe_internal_data
 
 #######################################
 
+=item $ruleCfg = Advanced::Config->newDefineConfigRules ( $filename );
+
+This special case constructor creates a new B<Advanced::Config> object, loads
+it into memory and validates the resulting config file meets the requirements
+for using this method and calls B<die> on any unexpected issues.
+
+The resulting I<$ruleCfg> object is used to replace the 3 B<opts> hashes in the
+call to I<new()>, so that all your programs don't have to be modified whenever a
+vendor modifies how to parse their config files.   You just need to modify this
+configutation file and all your programs using it are updated all at once.
+
+Example:
+
+   my $ruleCfg = Advanced::Config->newDefineConfigRules ( "VendorRules.cfg" );
+   my $cfg = Advanced::Config->new ( "vendor.cfg" )->
+                                   set_config_rules ($ruleCfg)->load_config ();
+
+The B<VendorRules.cfg> assumes that any options not defined in this config file
+defaults to the module's settings in L<Advanced::Config::Options>.  So you only
+need to enter your overrides.  Meaning an empty config file just uses the
+default rules.  Any tag that doesn't match one of the option hash values is a
+fatal error.
+
+See I<set_config_rules()> for more information for what to expect inside this
+rule config file and how it's used.
+
+=cut
+
+sub newDefineConfigRules
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $prototype = shift;
+   my $filename  = shift;
+   my $refresh   = shift || 0; # undocumented arg requsting refresh not new obj
+
+   my $cfg;
+   unless ( $refresh ) {
+      $cfg = Advanced::Config->new ( $filename,
+                      { croak => 1, disable_variables => 1, tag_case => 1, source => 'x'x40 },
+                      { inherit => 1, required => 1 }
+				   );
+
+      # Mark as created by this special constructor.
+      $cfg->{CONTROL}->{read_only} = 1;
+
+   } else {
+      # Requesting the reload of an existing rule cfg object
+      $cfg = $prototype->{PARENT} || $prototype;
+      unless ($cfg->_chk_if_read_only () ) {
+	 die "This isn't a rule config object!\n";
+      }
+      $cfg->_wipe_internal_data ( $filename );
+   } 
+
+   # Temp disable read-only setting so the data can be loaded!
+   local $cfg->{CONTROL}->{read_only} = 0;
+ 
+
+   # Load all the default Read, Get & Special date options.
+   my $rOpts = get_read_opts ();
+   my $gOpts = get_get_opts ();
+   my $sOpts = get_date_opts ();
+
+   # My special lists for what is possible per option hash.
+   my %extra = ( ___list_read___ => 1, ___list_get___ => 1,
+	         ___list_spec___ => 1 );
+
+   my @read_list = keys %{$rOpts};
+   my @get_list  = keys %{$gOpts};
+   my @spec_list = keys %{$sOpts};
+
+   foreach my $k (@read_list, @get_list, @spec_list, keys %extra) {
+      my $cnt = (exists $rOpts->{$k} ? 1 : 0) +
+ 		(exists $gOpts->{$k} ? 1 : 0) +
+		(exists $sOpts->{$k} ? 1 : 0) +
+		(exists $extra{$k}   ? 1 : 0);
+      $cnt = 5  if ($k eq "__order__");    # always bad.
+
+      if ($cnt != 1) {
+         die ("Option '$k' may not be shared between the 3 option hashes!\n");
+      }
+   }
+
+   # Add all the default values to the default section so they can be overriden
+   $cfg->_base_set ("___list_read___", \@read_list);
+   $cfg->_base_set ("___list_get___",  \@get_list);
+   $cfg->_base_set ("___list_spec___", \@spec_list);
+
+   $cfg->_base_set ("__order__", 9999999999999999);
+
+   foreach my $r ( @read_list ) { $cfg->_base_set ( $r, $rOpts->{$r} ); }
+   foreach my $g ( @get_list )  { $cfg->_base_set ( $g, $gOpts->{$g} ); }
+   foreach my $p ( @spec_list ) { $cfg->_base_set ( $p, $sOpts->{$p} ); }
+
+   # Load what's in the config file.
+   my $bool = $cfg->merge_config ();
+
+   # Validate that it built ok.
+   foreach my $s ( $cfg->find_sections () ) {
+      my $sect = $cfg->get_section ($s, 1);
+      my $name = $sect->section_name ();
+      my @tags = $sect->find_tags ( undef, 0 );  # Search current section only.
+      foreach my $t ( @tags ) {
+         my $cnt = (exists $rOpts->{$t} ? 1 : 0) +
+                   (exists $gOpts->{$t} ? 1 : 0) +
+                   (exists $sOpts->{$t} ? 1 : 0);
+         $cnt = 1 if ( $cnt == 0 && $name eq DEFAULT_SECTION && $extra{$t} );
+         $cnt = 1 if ( $cnt == 0 && $name ne "*" && $t eq "__order__" );
+         if ( $cnt == 0 ) {
+            die "Tag '$t' is not a valid option hash value in section $name!\n";
+         }
+      }
+   }
+
+   DBUG_RETURN ( $cfg );
+}
+
+#######################################
+# Returns the rule object linked via set_config_rules ().
+
+sub _get_rule_object
+{
+   my $self = shift;
+
+   $self = $self->{PARENT} || $self;
+   
+   return ( $self->{CONTROL}->{ConfigRuleObj} );
+}
+
+#######################################
+# Checks if the object was created by newDefineConfigRules ().
+
+sub _chk_if_read_only
+{
+   my $self = shift;
+
+   $self = $self->{PARENT} || $self;
+   
+   return ( $self->{CONTROL}->{read_only} );
+}
+
+#######################################
+
 # =item $cfg = Advanced::Config->new_section ( $cfg_obj, $section );
 
 # This special case constructor creates a new B<Advanced::Config> object and
@@ -434,7 +580,7 @@ sub _wipe_internal_data
 sub new_section
 {
    DBUG_ENTER_FUNC ( @_ );
-   my $prototype = shift;;
+   my $prototype = shift;
    my $parent    = shift;
    my $section   = shift;
 
@@ -480,6 +626,246 @@ sub new_section
    $self->{SENSITIVE_SECTION} = should_we_hide_sensitive_data ($section, 1);
 
    DBUG_RETURN ( $self );
+}
+
+#######################################
+
+=back
+
+=head1 THE OPTIONAL CONSTRUCTOR MODIFIERS
+
+The next 2 methods provide optional ways to provide confuguration info to the
+objects created via a call to I<new()>.  They completely override the 3 opts
+hash arguments.
+
+These methods should only rarely be needed.
+
+=over 4
+
+=item $cfg = $cfg->copy_opts_from_cfg ( $otherCfg )
+
+When 2 or more config files share the exact same configuration settings you
+only need to provide the option hashes to the 1st config file created via
+I<new()>.
+
+       my $cfg = Advanced::Config->new ()->
+                       copy_opts_from_cfg ( $otherCfg );
+
+This call creates a new config object and configures it to use the same options
+used to set up the B<$otherCfg> object.  Tossing any options provided by this
+call to I<new()>.  If B<$otherCfg> used a rule file it is only used when
+sourcing in other config files.
+
+=cut
+
+sub copy_opts_from_cfg
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $self     = shift;
+   my $otherCfg = shift;
+
+   $self = $self->{PARENT} || $self;
+   $otherCfg = $otherCfg->{PARENT} || $otherCfg;
+
+   if ( $self->_chk_if_read_only () ) {
+      die "You may not override rules for object created by newDefineConfigRules ()\n";
+   }
+
+   foreach (keys %{$otherCfg->{CONTROL}->{read_opts}} ) {
+      $self->{CONTROL}->{read_opts}->{$_} =
+                                     $otherCfg->{CONTROL}->{read_opts}->{$_};
+   }
+
+   foreach (keys %{$otherCfg->{CONTROL}->{get_opts}} ) {
+      $self->{CONTROL}->{get_opts}->{$_} =
+                                     $otherCfg->{CONTROL}->{get_opts}->{$_};
+   }
+
+   foreach (keys %{$otherCfg->{CONTROL}->{date_opts}} ) {
+      $self->{CONTROL}->{date_opts}->{$_} =
+                                     $otherCfg->{CONTROL}->{date_opts}->{$_};
+   }
+
+   # Copy the optional rule config file for sourcing in other config files.
+   $self->{CONTROL}->{ConfigRuleObj} = $otherCfg->{CONTROL}->{ConfigRuleObj};
+
+   DBUG_RETURN ( $self );
+}
+
+#######################################
+
+=item $cfg = $cfg->set_config_rules ( $ruleCfg )
+
+With this method instead of defining the options used in your perl code, you
+decided to set up the rules to follow inside another config file which you
+loaded into memory via a call to I<newDefineConfigRules()> via B<$ruleCfg>.
+In this case the filename option in the call to I<new()> is required.
+
+This method overrides any B<opts> settings to I<new()> and any callback read
+options used when sourcing in other config files.
+
+This method becomes usefull when the passed config file sources in other
+config files requiring different options to load properly.
+
+   my $cfg = Advanced::Config->new ( "config/myData.cfg" )->
+                                   set_config_rules ($ruleCfg);
+
+For example, let's say that B<$ruleCfg> was set up with 4 sections, myData.cfg,
+*.cfg, tom*.cfg and *.  And myData.cfg sources in the following 3 files.
+bob.cfg, sue.config, and tomfile.cfg.
+
+During the call to I<set_config_rules()> it finds the basename of the passed
+filename, myData.cfg, and finds the section named after it and takes the rules
+defined in that section and applies it to the congig object. Had this section
+not existed, it would have followed the wildcard rules below.
+
+Later on when sourcing in bob.cfg it doesn't find a section called bob.cfg, so
+it attempts to lookup the section to use via wildcards and finds section
+B<*.cfg>
+
+Next when sourcing in sue.config there is no section called that and it doesn't
+match wildcard sections B<*.cfg> or B<tom*.cfg>, so it uses the default section
+B<*> to gather the rules from.
+
+Finally for tomfile.cfg it matches both B<*.cfg> and B<tom*.cfg> which is a
+fatal error.  To get arround this error you must define a special tag called
+B<__order__> and assign it an integer value.  The one with the smallest value
+is the name that will match.  So set to 100 for B<tom*.cfg> and 654321 for
+B<*.cfg> and it will match B<tom*.cfg>.  It will never match B<*> since it has
+an assumed B<__order__> of infinity.
+
+=cut
+
+sub set_config_rules
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $self    = shift;
+   my $ruleCfg = shift;
+
+   $self = $self->{PARENT} || $self;
+   $ruleCfg = $ruleCfg->{PARENT} || $ruleCfg;
+
+   if ( $self->_chk_if_read_only () ) {
+      die "You may not override rules for object created by newDefineConfigRules ()\n";
+   }
+
+   unless ( $ruleCfg->_chk_if_read_only () ) {
+      die "The ruleCfg argument must be created via newDefineConfigRules ()\n";
+   }
+
+   my $rule = $ruleCfg->_get_rule_section ( $self->filename () );
+
+   ( $self->{CONTROL}->{read_opts},
+     $self->{CONTROL}->{get_opts},
+     $self->{CONTROL}->{date_opts} ) = $rule->_get_rules_from_cfg ();
+
+   $self->{CONTROL}->{ConfigRuleObj} = $ruleCfg;
+
+   DBUG_RETURN ( $self );
+}
+
+#######################################
+# Get all rules from the config file & validate them.
+
+sub _get_rules_from_cfg
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $ruleCfg = shift;
+
+   unless ( $ruleCfg->_chk_if_read_only () ) {
+      die "This object must be created by newDefineConfigRules ()\n";
+   }
+
+   DBUG_PRINT ("DBUG", "Rule Sectoon: %s", $ruleCfg->section_name () );
+
+   my ($read_opts, $get_opts, $date_opts);
+   my (%read, %get, %date);
+
+   foreach ( @{$ruleCfg->get_value ( "___list_read___" )} ) {
+      $read{$_} = ( $ruleCfg->_base_get2 ($_) )[0];
+   }
+   $read_opts = get_read_opts ( \%read );
+
+   foreach ( @{$ruleCfg->get_value ( "___list_get___" )} ) {
+      $get{$_} = ( $ruleCfg->_base_get2 ($_) )[0];
+   }
+   $get_opts = get_get_opts ( \%get );
+
+   foreach ( @{$ruleCfg->get_value ( "___list_spec___" )} ) {
+      $date{$_} = ( $ruleCfg->_base_get2 ($_) )[0];
+   }
+   $date_opts = get_date_opts ( \%date );
+
+   DBUG_RETURN ( $read_opts, $get_opts, $date_opts );
+}
+
+#######################################
+
+sub _get_rule_section
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $ruleCfg = shift;
+   my $name    = shift;
+
+   if ((! defined $name) || $name =~ m/^\s+$/) {
+      die ("Missing filename argument!\n");
+   }
+   unless ( $ruleCfg->_chk_if_read_only () ) {
+      die "This object must be created by newDefineConfigRules ()\n";
+   }
+
+   my $bName = basename ($name);
+   my $cfg = $ruleCfg->get_section ($bName, 0);
+
+   if (defined $cfg) {
+      return DBUG_RETURN ($cfg);
+   }
+
+   my @wild_names = $ruleCfg->find_sections ( "\\*" );
+   my @match_names;
+   my $default_name;
+   foreach my $s (@wild_names) {
+      if ( $s eq "*" ) {
+	  $default_name = "*";
+      } else {
+	  my $n = $s;
+	  $n =~ s/\./\\./g;
+	  $n =~ s/\*/.*/g;
+	  if ( $bName =~ m/^${n}$/i ) {
+	     DBUG_PRINT ("MATCH", "Found a wildcad match with %s for %s",
+				  $s, $bName);
+	     push (@match_names, $s);
+	  }
+      }
+   }
+
+   my $cnt = @match_names;
+   if ( $cnt >= 2 ) {
+      $cfg = $ruleCfg->get_section ($match_names[0], 1);
+      my $order = $cfg->get_integer ( "__order__", 1);
+      my $total = 1;
+      for (1..$#match_names) {
+	 my $c = $ruleCfg->get_section ($match_names[$_], 1);
+         my $o = $c->get_integer ( "__order__", 1);
+	 if ( $o < $order ) {
+	   $total = 1;
+	   $cfg = $c;
+	   $order = $o;
+	 } elsif ( $o == $order ) {
+	    ++$total;
+	 }
+      }
+      if ( $total != 1 )  {
+	  die "File '$bName' matches $total wildcard sections with the same __order__ setting of $order.\n";
+      }
+
+   } elsif ( $cnt == 1 ) {
+      $cfg = $ruleCfg->get_section ($match_names[0], 1);
+   } else {
+      $cfg = $ruleCfg->get_section ($default_name, 1);
+   }
+
+   DBUG_RETURN ( $cfg );
 }
 
 #######################################
@@ -538,6 +924,10 @@ sub load_config
    my $read_opts = $_[0];    # Don't pop from the stack yet ...
 
    $self = $self->{PARENT} || $self;
+
+   if ( $self->_chk_if_read_only () ) {
+      die "You may not override rules for object created by newDefineConfigRules ()\n";
+   }
 
    # Get the filename to read ...
    if ( $filename ) {
@@ -648,6 +1038,10 @@ sub load_string
    my $read_opts = $_[0];    # Don't pop from the stack yet ...
 
    $self = $self->{PARENT} || $self;
+
+   if ( $self->_chk_if_read_only () ) {
+      die "You may not override rules for object created by newDefineConfigRules ()\n";
+   }
 
    # Get the read options ...
    $read_opts = {@_}  if ( ref ($read_opts) ne "HASH" );
@@ -914,6 +1308,14 @@ sub refresh_config
       }
    }
 
+   # Check if it's a rule config file that was updated.
+   if ( $self->_chk_if_read_only () ) {
+      if ( $updated && $skip == 0 ) {
+	 $self->newDefineConfigRules ( $self->filename(), 1 );
+      }
+      return DBUG_RETURN ( $updated );
+   }
+
    # Refresh the config file's contents in memory ...
    if ( $updated && $skip == 0 ) {
       my $f = $self->{CONTROL}->{filename};
@@ -924,6 +1326,14 @@ sub refresh_config
       if ( $self->{CONTROL}->{DATE_USED} ) {
          $self->{CONTROL}->{DATES}     = \%dates;
          $self->{CONTROL}->{DATE_USED} = 0;
+      }
+
+      # Always reload rule config file if there is one & refresh detected.
+      if ( $self->{CONTROL}->{ConfigRuleObj} ) {
+         DBUG_PRINT ("LOG", "Refreshing the RuleCfg file ... %s", ref ($f));
+         $self->{CONTROL}->{ConfigRuleObj}->newDefineConfigRules (
+                      $self->{CONTROL}->{ConfigRuleObj}->{CONTROL}->{filename},
+		      1 );
       }
 
       my $reload;
@@ -1387,14 +1797,22 @@ sub get_hyd_date
 
 #######################################
 
-=item $dow = $cfg->get_dow_date ( $tag[, $language[, %override_get_opts]] );
+=item $dow = $cfg->get_dow_date ( $tag[, $language[, $mode[, %override_get_opts]]] );
 
 Behaves the same as B<get_date> except that it returns the Day of Week (I<dow>)
-that the date falls on.  It returns the I<dow> as a number between B<0> and
-B<6>.   For Sunday to Saturday.
+that the date falls on.   The I<dow>'s format depends on the value of B<$mode>.
 
-But if the tag B<$tag> doesn't exist in the config file, and it's name is in the
-format of I<YYYY-MM-DD>, it will return the I<dow> for that date instead.
+If B<$mode> is B<2> it returns the full name in the requested language.
+ex: I<Monday>.
+
+If B<$mode> is B<1> it returns the abbreviated name in the requested language.
+ex: I<Mon>.
+
+Otherwise it returns the I<dow> as a number between B<0> and B<6>.  For Sunday
+to Saturday.
+
+But if the tag B<$tag> doesn't exist in the config file, and the tag's name is
+in the format of I<YYYY-MM-DD>, it will return the I<dow> for that date instead.
 
 Finally if B<$tag> still didn't match it checks if it's an integer and it
 assumes you want the I<dow> for a I<hyd> date.
@@ -1409,7 +1827,26 @@ sub get_dow_date
    my $self     = shift;       # Reference to the current section.
    my $tag      = shift;       # The tag to look up ...
    my $language = shift;       # The language the date appears in ...
-   my $opt_ref  = $self->_get_opt_args ( @_ );   # The override options ...
+   my $mode;                   # Determines format of return value.  0, 1 or 2. (new arg)
+   my $opt_ref;                # Must keep this arg last.  The override options.
+
+   # Messy to make backwards compatible.
+   # Since the order of args changed since func 1st defined in previous release.
+   my $c = @_;
+   if ( $c == 0 || ref ($_[0]) eq "HASH" ) {
+      $mode = 0;
+      $opt_ref  = $self->_get_opt_args ( @_ );
+   } elsif ( ref ($_[1]) eq "HASH" ) {
+      $mode = shift || 0;
+      $opt_ref  = $self->_get_opt_args ( @_ );
+   } elsif ( ($c % 2) == 1 ) {
+      $mode = shift || 0;
+      $opt_ref  = $self->_get_opt_args ( @_ );
+   } else {
+      $mode = 0;
+      $opt_ref  = $self->_get_opt_args ( @_ );
+   }
+
 
    local $opt_ref->{date_active} = 1;
    local $opt_ref->{date_language} = $language  if ( defined $language );
@@ -1421,7 +1858,14 @@ sub get_dow_date
    }
    return DBUG_RETURN (undef)  unless (defined $value);
 
-   $value = calc_day_of_week ( $value );
+   $value = calc_day_of_week ( $value );    # 0 .. 6
+
+   if ($mode =~ m/^[12]$/) {
+      DBUG_MASK_NEXT_FUNC_CALL (-1)  if ( $sensitive );
+      my ($m, $dow_ref) = init_special_date_arrays ($opt_ref->{date_language},
+	      					    $mode, 0, 1);
+      $value = $dow_ref->[$value]  if ( defined $dow_ref );
+   }
 
    DBUG_RETURN ( $value );
 }
@@ -2009,6 +2453,11 @@ sub set_value
    my $tag   = shift;   # The tag set to value ...
    my $value = shift;
 
+   if ( $self->_chk_if_read_only () ) {
+      die ("You may not modify a rules config file!\n");
+      return (0);
+   }
+
    my ( $worked, $sensitive ) = $self->_base_set ($tag, $value, undef);
 
    DBUG_MASK_NEXT_FUNC_CALL (2)  if ( $sensitive );
@@ -2039,6 +2488,11 @@ sub rename_tag
    my $self    = shift;
    my $old_tag = shift;
    my $new_tag = shift;
+
+   if ( $self->_chk_if_read_only () ) {
+      die ("You may not modify a rules config file!\n");
+      return DBUG_RETURN (0);
+   }
 
    unless ( defined $old_tag && defined $new_tag ) {
       warn ("All arguments to rename_tag() are required!\n");
@@ -2100,6 +2554,11 @@ sub move_tag
 
    $new_tag = $tag  unless ( defined $new_tag );
 
+   if ( $self->_chk_if_read_only () ) {
+      die ("You may not modify a rules config file!\n");
+      return DBUG_RETURN (0);
+   }
+
    unless ( defined $tag && defined $new_section ) {
       warn ("Both \$tag and \$new_section are required for move_tag()!\n");
       return DBUG_RETURN (0);
@@ -2143,6 +2602,11 @@ sub delete_tag
    DBUG_ENTER_FUNC (@_);
    my $self = shift;
    my $tag  = shift;
+
+   if ( $self->_chk_if_read_only () ) {
+      die ("You may not modify a rules config file!\n");
+      return DBUG_RETURN (0);
+   }
 
    unless ( defined $tag ) {
       return DBUG_RETURN (0);   # Nothing to delete!
@@ -2205,6 +2669,8 @@ sub get_section
    }
 
    if ( exists $self->{SECTIONS}->{$section} ) {
+      DBUG_PRINT  ("DBUG", "The section name is '%s'",
+			   $self->{SECTIONS}->{$section}->{SECTION_NAME});
       return DBUG_RETURN ( $self->{SECTIONS}->{$section} );
    }
 
@@ -2250,6 +2716,11 @@ sub create_section
    DBUG_ENTER_FUNC ( @_ );
    my $self = shift;
    my $name = shift;
+
+   if ( $self->_chk_if_read_only () ) {
+      die ("You may not modify a rules config file!\n");
+      return DBUG_RETURN (0);
+   }
 
    # This test bypasses all the die logic in the special case constructor!
    # That constructor is no longer exposed in the POD.

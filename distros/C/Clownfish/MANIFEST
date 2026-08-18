@@ -133,6 +133,7 @@ lib/Clownfish/Test.pm
 lib/Clownfish/Vector.pm
 lib/Clownfish/Vector.pod
 LICENSE
+Makefile.local
 MANIFEST			This list of files
 NOTICE
 README.md

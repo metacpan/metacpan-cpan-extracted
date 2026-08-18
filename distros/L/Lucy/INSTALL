@@ -1,4 +1,4 @@
-Installing Apache Lucy with Perl bindings
+Installing Lucy with Perl bindings
 =========================================
 
 Requirements
@@ -24,7 +24,7 @@ Or, if you're on the Windows shell:
 Build and installation
 ----------------------
 
-To install Apache Lucy as a suite of Perl modules, run the following commands:
+To install Lucy as a suite of Perl modules, run the following commands:
 
     perl Build.PL
     perl Build

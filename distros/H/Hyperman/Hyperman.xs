@@ -17,22 +17,28 @@
 #include "XSUB.h"
 #include "hm_compat.h"    /* perl API shims (XS_INTERNAL, mg_findext, croak_sv) */
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/uio.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
+/* The platform headers come from the shim, first and only - the same rule
+ * hm_core.h follows. On POSIX hm_win.h expands to exactly the <sys/socket.h>
+ * / <sys/uio.h> / netinet / <unistd.h> block this file used to spell out
+ * by hand; on Windows it expands to Winsock. Spelling them out here is what
+ * broke the 0.23 Windows build: <sys/uio.h> does not exist on MinGW, and it
+ * was included eighteen lines above the header that knows that. */
+#include "hm_win.h"
+
+/* CRT headers, present everywhere: not the shim's business. */
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <signal.h>
+
+/* The prefork supervisor's headers. hm_core.h compiles that whole half
+ * under #ifndef _WIN32 (no fork, no waitpid, no POSIX signals there), so
+ * its includes carry the same guard. */
+#ifndef _WIN32
 #include <sys/wait.h>
 #ifdef __linux__
 #include <sched.h>
+#endif
 #endif
 
 #include "hyperman.h"
@@ -46,6 +52,7 @@
 
 #include "hm_future.h"
 #include "hm_ratelimit.h"   /* fork-shared denylist + rate counters (arena) */
+#include "hm_compress.h"   /* gzip on the way out (zlib optional) */
 #include "hm_core.h"
 #include "hm_abi_impl.h"
 

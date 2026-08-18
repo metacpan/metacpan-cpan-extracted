@@ -28,7 +28,7 @@ Boolean *Bool_true_singleton;
 Boolean *Bool_false_singleton;
 
 void
-Bool_init_class() {
+Bool_init_class(void) {
     Boolean *true_obj = (Boolean*)Class_Make_Obj(BOOLEAN);
     true_obj->value   = true;
     true_obj->string  = Str_newf("true");

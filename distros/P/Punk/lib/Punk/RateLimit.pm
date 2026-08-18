@@ -3,7 +3,7 @@ package Punk::RateLimit;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.17';
 
 # Documentation only. The `rate_limit` keyword and the enforcement it installs
 # live in C - Punk::App::rate_limit (xs/ratelimit.xs) captures a rule into a
@@ -63,8 +63,35 @@ Everything B<fails open>: with no Hyperman E<gt>= ABI v3 under the application
 the limiter allows every request and blocking is a no-op, so it is never the
 reason a good request is refused.
 
+=head1 BEHIND A REVERSE PROXY
+
+B<If this application runs behind nginx, an ELB or a CDN, declare
+L<Punk/proxy> or the limiter is wrong in a way that will take the site
+down.>
+
+The exactness above is what makes it dangerous. C<REMOTE_ADDR> behind a
+proxy is the I<proxy's> address on every request, and because the counter is
+shared across the whole worker pool rather than per worker, every client on
+the internet lands in B<one bucket>: a C<< limit =E<gt> 100 >> rule then
+throttles the entire site at 100 per window, and C<< $c-E<gt>block_ip >>
+bans the load balancer.
+
+    use Punk;
+    proxy;                                  # one proxy in front
+    rate_limit limit => 100, window => 60;   # now keyed on the real client
+
+Do not reach for C<< by =E<gt> 'header:X-Forwarded-For' >> instead. Nothing
+validates that header, so on an application that is not actually behind a
+proxy any client can set it and step into a fresh bucket at will - a bypass
+in place of a shared bucket. L<Punk/proxy> validates the hop chain; this
+does not.
+
+Note also that once a proxy is in front, C<< $c-E<gt>block_ip >> can no
+longer be enforced at C<accept>: the edge sees only the proxy, so the ban
+becomes a C<403> at dispatch. Same outcome, one request's worth of cost.
+
 =head1 SEE ALSO
 
-L<Punk>, L<Hyperman>.
+L<Punk>, L<Punk/proxy>, L<Hyperman>.
 
 =cut

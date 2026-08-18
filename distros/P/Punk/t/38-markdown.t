@@ -94,6 +94,44 @@ sub header {
     is header($r, 'Location'), '/docs/guide/intro', 'to the same place';
 }
 
+{
+    # The canonical redirect names a url in a Location header, and PATH_INFO
+    # arrives percent-DECODED, so redirecting to whatever was asked for would
+    # echo bytes the client chose: "//evil/" is a protocol-relative 301 off
+    # the site, and a decoded CR/LF ends the header and splits the response.
+    # Only a path that IS a page may be named, so nothing else is ever echoed.
+    my %evil = (
+        'protocol-relative'  => '//evil.example/',
+        'backslash'          => '/\\evil.example/',
+        'CRLF'               => "/\r\nX-Injected: yes/",
+        'CRLF under .md'     => "/\r\nX-Injected: yes.md",
+        'tab'                => "/\t//evil.example/",
+        'unknown page'       => '/docs/nope.md',
+        'unknown dir'        => '/docs/nope/',
+    );
+    for my $why (sort keys %evil) {
+        my $r = hit($app, path => $evil{$why});
+        isnt $r->[0], 301, "no redirect for $why";
+        is header($r, 'Location'), undef, "nothing echoed into Location for $why";
+    }
+
+    # and the same at a root mount, where there is no prefix to keep a
+    # reflected path on-site
+    {
+        package MDRoot;
+        use Punk;
+        markdown '/' => $DOCS, title => 'Root Guide';
+    }
+    my $root = MDRoot->to_app;
+    is hit($root, path => '/guide/intro/')->[0], 301,
+        'a root mount still canonicalises a real page';
+    is header(hit($root, path => '/guide/intro/'), 'Location'), '/guide/intro',
+        'to the canonical url';
+    my $r = hit($root, path => '//evil.example/');
+    isnt $r->[0], 301, 'a root mount does not redirect to a protocol-relative path';
+    is header($r, 'Location'), undef, 'and names nothing in Location';
+}
+
 # ---- titles -----------------------------------------------------------------
 
 {

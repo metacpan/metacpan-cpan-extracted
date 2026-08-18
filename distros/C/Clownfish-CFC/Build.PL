@@ -22,10 +22,9 @@ use Clownfish::CFC::Build;
 my $builder = Clownfish::CFC::Build->new(
     module_name => 'Clownfish::CFC',
     license     => 'apache',
-    dist_author =>
-        'The Apache Lucy Project <dev at lucy dot apache dot org>',
-    dist_version       => '0.6.4',
-    dist_abstract      => 'CFC Apache Clownfish compiler',
+    dist_author => 'The Lucy search project',
+    dist_version       => '0.7.0',
+    dist_abstract      => 'CFC Clownfish compiler',
     requires           => { 'perl' => '5.8.3', },
     configure_requires => { 'Module::Build' => 0.280801 },
     build_requires    => {
@@ -37,9 +36,9 @@ my $builder = Clownfish::CFC::Build->new(
     meta_merge => { keywords => [qw( clownfish )], },
     meta_add   => {
         resources => {
-            homepage   => 'http://lucy.apache.org',
-            repository => 'https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git',
-            bugtracker => 'https://issues.apache.org/jira/browse/CLOWNFISH',
+            homepage   => 'https://github.com/lucysearch/lucy-clownfish',
+            repository => 'https://github.com/lucysearch/lucy-clownfish.git',
+            bugtracker => 'https://github.com/lucysearch/lucy-clownfish/issues',
         },
         no_index => {
             directory => [qw( buildlib )],

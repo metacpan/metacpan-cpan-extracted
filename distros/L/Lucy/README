@@ -1,9 +1,9 @@
-Apache Lucy
+Lucy
 ===========
 
 OVERVIEW
 
-The Apache Lucy search engine library provides full-text search for dynamic
+The Lucy search engine library provides full-text search for dynamic
 programming languages.
 
 INSTALLATION

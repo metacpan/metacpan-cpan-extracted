@@ -29,7 +29,7 @@ void cmark_strbuf_init(cmark_strbuf *buf, bufsize_t initial_size)
 		cmark_strbuf_grow(buf, initial_size);
 }
 
-void cmark_strbuf_overflow_err()
+void cmark_strbuf_overflow_err(void)
 {
 	fprintf(stderr, "String buffer overflow");
 	abort();

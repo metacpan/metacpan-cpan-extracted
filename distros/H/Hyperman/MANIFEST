@@ -8,6 +8,7 @@ include/hyperman/backend_wsapoll.c
 include/hyperman/hm_abi.h
 include/hyperman/hm_abi_impl.h
 include/hyperman/hm_compat.h
+include/hyperman/hm_compress.h
 include/hyperman/hm_core.h
 include/hyperman/hm_future.h
 include/hyperman/hm_http2.h
@@ -49,6 +50,9 @@ t/25-tls-session.t
 t/26-ratelimit.t
 t/27-sendfile.t
 t/28-windows.t
+t/30-compress-accept.t
+t/31-compress.t
+t/32-max-body.t
 t/lib/HMTest.pm
 t/manifest.t
 t/pod-coverage.t

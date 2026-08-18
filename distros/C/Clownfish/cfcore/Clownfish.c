@@ -20,7 +20,7 @@
 #include "Clownfish/Err.h"
 
 void
-cfish_init_parcel() {
+cfish_init_parcel(void) {
     cfish_Bool_init_class();
     cfish_Hash_init_class();
     cfish_HashIter_init_class();

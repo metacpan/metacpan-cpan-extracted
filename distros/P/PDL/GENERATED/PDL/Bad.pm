@@ -3,7 +3,7 @@
 #
 package PDL::Bad;
 
-our @EXPORT_OK = qw(badflag check_badflag badvalue orig_badvalue nbad nbadover ngood ngoodover setbadat  isbad isgood nbadover ngoodover setbadif setvaltobad setnantobad setinftobad setnonfinitetobad setbadtonan setbadtoval badmask copybad locf );
+our @EXPORT_OK = qw(badflag check_badflag badvalue orig_badvalue nbad nbadover ngood ngoodover setbadat  isbad isnan isgood nbadover ngoodover setbadif setvaltobad setnantobad setinftobad setnonfinitetobad setbadtonan setbadtoval badmask copybad locf );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -321,6 +321,49 @@ same as the input ndarray's flag.
 
 
 
+=head2 isnan
+
+=for sig
+
+ Signature: (a(); int [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = isnan($a);
+ isnan($a, $b);  # all arguments given
+ $b = $a->isnan; # method call
+ $a->isnan($b);
+
+=for ref
+
+Returns a binary mask indicating which values of the input are C<NaN>.
+
+Returns a 1 if the value is C<NaN>, 0 otherwise.
+Similar to L<isfinite|PDL::Math/isfinite>.
+
+=pod
+
+Broadcasts over its inputs.
+
+=for bad
+
+C<isnan> does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*isnan = \&PDL::isnan;
+
+
+
+
+
+
 =head2 isgood
 
 =for sig
@@ -468,7 +511,7 @@ flag set.
 
 
 
-#line 463 "lib/PDL/Bad.pd"
+#line 477 "lib/PDL/Bad.pd"
 
 *nbad = \&PDL::nbad;
 sub PDL::nbad {
@@ -477,7 +520,7 @@ sub PDL::nbad {
 	return $tmp;
 }
 
-#line 463 "lib/PDL/Bad.pd"
+#line 477 "lib/PDL/Bad.pd"
 *ngood = \&PDL::ngood;
 sub PDL::ngood {
 	my($x) = @_; my $tmp;
@@ -485,7 +528,7 @@ sub PDL::ngood {
 	return $tmp;
 }
 
-#line 475 "lib/PDL/Bad.pd"
+#line 489 "lib/PDL/Bad.pd"
 
 =head2 nbad
 
@@ -557,7 +600,7 @@ sub PDL::setbadat {
     $self->badflag(1);
     return $self;
 }
-#line 561 "lib/PDL/Bad.pm"
+#line 604 "lib/PDL/Bad.pm"
 
 
 =head2 setbadif
@@ -1065,7 +1108,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 915 "lib/PDL/Bad.pd"
+#line 929 "lib/PDL/Bad.pd"
 
 =head1 AUTHOR
 
@@ -1082,7 +1125,7 @@ separated from the PDL distribution, the copyright notice should be
 included in the file.
 
 =cut
-#line 1086 "lib/PDL/Bad.pm"
+#line 1129 "lib/PDL/Bad.pm"
 
 # Exit with OK status
 

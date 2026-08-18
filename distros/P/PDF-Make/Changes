@@ -1,5 +1,19 @@
 Revision history for PDF::Make
 
+0.11  2026-08-17
+     - New: PDF::Make::Markup::Diff - which pages changed between two
+       renders, and what text moved, from structured extraction with
+       positions. 
+     - Fix: blocks inside a <box> flowed onto one line.
+     - Fix: a font size override kept the base font's leading, so a
+       <text size="20"> after a 9pt base got a 9pt slot and the block
+       after it was drawn straight through it. 
+      - Fix: text in a cell now starts at the top of its line height.
+      - New: spacing= works on a block inside a <box>.
+      - t/56-golden-corpus.t is now an author test (AUTHOR_TESTING=1).
+      - Fix: Document::add_outline swallowed every bookmark after the
+	  first.
+
 0.10  2026-08-15
 	- New: PDF::Make::Markup* interface to generate PDFs.
 

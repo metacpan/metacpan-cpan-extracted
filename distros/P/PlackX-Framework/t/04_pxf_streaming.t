@@ -1,5 +1,7 @@
 #!perl
-use v5.36;
+use v5.26;
+use warnings;
+use experimental 'signatures';
 use Test::More;
 
 use PXF::Util ();
@@ -69,7 +71,7 @@ sub do_tests {
     my $t_1 = $body_data[-2]->{time};
     my $elapsed = $t_2 - $t_1;
     ok(
-      ($SLEEP_TIME*0.85 < $elapsed < $SLEEP_TIME*1.15),
+      ($SLEEP_TIME*0.85 < $elapsed && $elapsed < $SLEEP_TIME*1.15),
       "Last body content lines received ${SLEEP_TIME}s +/- 15% apart (actual: ${elapsed}s)"
     );
   }

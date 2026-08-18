@@ -18,7 +18,7 @@ package WebDyne::Constant;
 use strict qw(vars);
 use vars   qw($VERSION %Constant %Package);
 use warnings;
-no warnings qw(uninitialized);
+no warnings qw(uninitialized redefine);
 
 
 #  External modules
@@ -33,7 +33,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='3.015';
+$VERSION='3.018';
 
 
 #  Get mod_perl version taking intio account legacy strings. Clear $@ after evals
@@ -101,6 +101,7 @@ my %constant_temp;
     WEBDYNE_CACHE_HIGH_WATER   => 64,
     WEBDYNE_CACHE_LOW_WATER    => 32,
     WEBDYNE_CACHE_CLEAN_METHOD => 1,
+    WEBDYNE_CACHE_STAT_TTL     => 0,
 
 
     #  Type of eval code to run - use Safe module, or direct. Direct

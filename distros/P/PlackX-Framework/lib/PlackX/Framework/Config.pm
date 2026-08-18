@@ -1,4 +1,6 @@
-use v5.36;
+use v5.26;
+use warnings;
+use experimental 'signatures';
 package PlackX::Framework::Config {
   use Carp qw(croak);
 

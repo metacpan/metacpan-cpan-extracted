@@ -6,7 +6,7 @@ use warnings;
 
 use Punk::OAuth2;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 1;
@@ -89,9 +89,24 @@ site,
 
 =item *
 
-contain no CR or LF, which would let it forge a response header.
+contain no C0 control byte (C<\x00> to C<\x1f>) or C<DEL>, which covers
+CR and LF forging a response header, and covers TAB, CR and LF being
+B<removed> by the browser before it parses the URL - C<"/\tevil.example">
+reaching a browser as C<"//evil.example"> is the same open redirect
+spelled differently,
+
+=item *
+
+contain no backslash, which a browser treats as C</> under a special
+scheme, so C<"/\\evil.example"> is protocol-relative too. A path that
+really wants one spells it C<%5C>.
 
 =back
+
+The last two rules are deliberately blunt. The set of bytes a URL parser
+drops or folds is not fixed and not the same everywhere, so this does not
+try to enumerate it: it refuses the whole class rather than the two
+members of it that were known to bite.
 
 This is what a C<?return=> destination is put through before anything
 redirects to it. Note it returns the path rather than a boolean, so the

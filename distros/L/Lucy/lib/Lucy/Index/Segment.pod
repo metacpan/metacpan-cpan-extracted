@@ -61,7 +61,7 @@ Lucy::Index::Segment - Warehouse for information about one segment of an inverte
 
 =head1 DESCRIPTION
 
-Apache Lucy’s indexes are made up of individual “segments”, each of which is
+Lucy’s indexes are made up of individual “segments”, each of which is
 is an independent inverted index.  On the file system, each segment is a
 directory within the main index directory whose name starts with “seg_”:
 “seg_2”, “seg_5a”, etc.

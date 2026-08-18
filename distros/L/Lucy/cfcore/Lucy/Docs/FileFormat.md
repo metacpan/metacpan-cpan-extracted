@@ -1,7 +1,7 @@
 # Overview of index file format
 
 It is not necessary to understand the current implementation details of the
-index file format in order to use Apache Lucy effectively, but it may be
+index file format in order to use Lucy effectively, but it may be
 helpful if you are interested in tweaking for high performance, exotic usage,
 or debugging and development.  
 

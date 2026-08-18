@@ -17,6 +17,6 @@
 #include "testcfish_parcel.h"
 
 void
-testcfish_init_parcel() {
+testcfish_init_parcel(void) {
 }
 

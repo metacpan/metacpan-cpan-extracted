@@ -200,6 +200,14 @@ The constants below are defined by `WebDyne::Constant`. Each definition includes
 
     Memory cache cleanup method. `0` removes entries by oldest last-use time; `1` removes least-used entries first.
 
+* **WEBDYNE_CACHE_STAT_TTL**
+
+    **Default:** `0`
+
+    Controls how often WebDyne rechecks disk cache file mtimes after a compiled page has been loaded into the current process.
+
+    `0` preserves the historical behavior and stats cache files on every request. A positive value reuses the last stat result for that many seconds. `-1` reuses the last stat result for the lifetime of the current process, so externally updated cache files are not detected until the process restarts or recompilation is forced.
+
 * **WEBDYNE_EVAL_SAFE**
 
     **Default:** `0`

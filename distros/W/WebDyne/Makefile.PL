@@ -236,69 +236,103 @@ sub MY::post_initialize {
 
 #  Get ExtUtils::Git postamble if we are using it
 #
-sub MM::postamble {
+sub MY::postamble {
+
     my $mm_or=shift();
-    my $postamble;
-    eval {ExtUtils::Git->import(); $postamble=&MY::postamble($mm_or)};
+    my $postamble=$mm_or->MY::SUPER::postamble();
     $postamble.=<<'END';
 
+#==============================================================================
+# Script Filtering
+#==============================================================================
+
+filter_scripts : $(INST_SCRIPT)$(DFSEP).exists
+	@for f in $(EXE_FILES); do \
+		s=$(INST_SCRIPT)/`basename $$f`; \
+		echo "Installing script $$f via PM_FILTER..."; \
+		$(RM_F) $$s; \
+		$(PM_FILTER) $$f > $$s; \
+		$(FIXIN) $$s; \
+		$(CHMOD) $(PERM_RWX) $$s; \
+	done
+
+pure_all :: filter_scripts
+
+
+#==============================================================================
+# MkDocs Documentation
+#==============================================================================
 
 SRC_DIR := doc
 TMP_DIR := $(SRC_DIR)/build
-PSP_DIR := $(SRC_DIR)/example
-# doc/example is intentionally developer-only and is not shipped in CPAN
-# tarballs, so guard the scan to keep install/smoke-test make invocations quiet.
-PSP_FILES := $(shell test -d $(PSP_DIR) && find $(PSP_DIR) -type f -name '*.psp')
-BIN_DOC_FILES := $(wildcard bin/*.md)
-LIB_DOC_FILES := $(shell find lib -type f -name '*.md' ! -name '._*' | sort)
-
 DOC_DIR := docs
 SCRIPTS_DIR := scripts
 GH_PAGES_DOMAIN := webdyne.org
 
-DOCKER_DIR := mkdocs/docker
-DOCKER_IMAGE := webdyne-mkdocs:latest
-DOCKER_STAMP := $(DOCKER_DIR)/.built
+XMLLINT := xmllint
+XSLTPROC := xsltproc
+PANDOC := pandoc
+SPONGE := sponge
+MKDOCS := mkdocs
+DOCKER := docker
 
+BIN_DOC_FILES := $(wildcard bin/*.md)
+LIB_DOC_FILES := $(shell find lib -type f -name '*.md' ! -name '._*' | sort)
+
+.PHONY: doc
+doc :: $(SRC_DIR)/webdyne.md
 
 $(SRC_DIR)/webdyne.md : $(SRC_DIR)/webdyne.xml $(BIN_DOC_FILES) $(LIB_DOC_FILES)
-	mkdir -p $(TMP_DIR)
-	xmllint --xinclude --noent $< -o $(TMP_DIR)/$(notdir $<)
-	xsltproc $(SCRIPTS_DIR)/promote-title-ids.xsl $(TMP_DIR)/$(notdir $<) | sponge $(TMP_DIR)/$(notdir $<)
-	pandoc -f docbook -t markdown-smart --lua-filter=$(SCRIPTS_DIR)/admonition-advanced.lua --resource-path=$(SRC_DIR) --extract-media=$(DOC_DIR) -o $(TMP_DIR)/$(notdir $@) $(TMP_DIR)/$(notdir $<)
-	perl -pi -e 's/[\\]+</\&lt;/g; s/[\\]+>/\&gt;/g' $(TMP_DIR)/$(notdir $@)
+	$(MKPATH) $(TMP_DIR)
+	$(XMLLINT) --xinclude --noent $< -o $(TMP_DIR)/$(notdir $<)
+	$(XSLTPROC) $(SCRIPTS_DIR)/promote-title-ids.xsl $(TMP_DIR)/$(notdir $<) | $(SPONGE) $(TMP_DIR)/$(notdir $<)
+	$(PANDOC) -f docbook -t markdown-smart --lua-filter=$(SCRIPTS_DIR)/admonition-advanced.lua --resource-path=$(SRC_DIR) --extract-media=$(DOC_DIR) -o $(TMP_DIR)/$(notdir $@) $(TMP_DIR)/$(notdir $<)
 	# Fix image placeholders from pandoc
-	perl -pi -e 's{\Qdocs/images\E}{images}g' $(TMP_DIR)/$(notdir $@)
-	perl -0pi -e 's/\{\.manual-page-new-tab\s+role="manual-page-new-tab"\}/{target="_blank" rel="noopener"}/g' $(TMP_DIR)/$(notdir $@)
-	perl -pi -e 's/[ \t]+$$//' $(TMP_DIR)/$(notdir $@)
-	cp $(TMP_DIR)/$(notdir $@) $@
-	rm -f $(DOC_DIR)/*.md
-	perl $(SCRIPTS_DIR)/mdsplit.pl $(TMP_DIR)/$(notdir $@) $(DOC_DIR)
-	mkdir -p $(DOC_DIR)/utilities
-	rm -f $(DOC_DIR)/utilities/*.md
-	cp $(BIN_DOC_FILES) $(DOC_DIR)/utilities/
-	rm -rf $(DOC_DIR)/modules
-	mkdir -p $(DOC_DIR)/modules
-	perl -MFile::Copy=copy -e 'for my $$src (@ARGV) { (my $$dst=$$src)=~s{^lib/}{}; $$dst=~s{\.pm\.md$$}{.md}; $$dst=~s{/}{_}g; $$dst="$(DOC_DIR)/modules/$$dst"; copy($$src,$$dst) or die "$$src -> $$dst: $$!" }' $(LIB_DOC_FILES)
+	$(PERL) -0777 -pi -e 's/[\\]+</\&lt;/g; s/[\\]+>/\&gt;/g; s{\Qdocs/images\E}{images}g; s/\{\.manual-page-new-tab\s+role="manual-page-new-tab"\}/{target="_blank" rel="noopener"}/g; s/[ \t]+$$//mg' $(TMP_DIR)/$(notdir $@)
+	$(CP) $(TMP_DIR)/$(notdir $@) $@
+	$(RM_F) $(DOC_DIR)/*.md
+	$(PERL) $(SCRIPTS_DIR)/mdsplit.pl $(TMP_DIR)/$(notdir $@) $(DOC_DIR)
+	$(MKPATH) $(DOC_DIR)/utilities
+	$(RM_F) $(DOC_DIR)/utilities/*.md
+	$(CP) $(BIN_DOC_FILES) $(DOC_DIR)/utilities/
+	$(RM_RF) $(DOC_DIR)/modules
+	$(MKPATH) $(DOC_DIR)/modules
+	$(PERL) -MFile::Copy=copy -e 'for my $$src (@ARGV) { (my $$dst=$$src)=~s{^lib/}{}; $$dst=~s{\.pm\.md$$}{.md}; $$dst=~s{/}{_}g; $$dst="$(DOC_DIR)/modules/$$dst"; copy($$src,$$dst) or die "$$src -> $$dst: $$!" }' $(LIB_DOC_FILES)
 
 gh-deploy : $(SRC_DIR)/webdyne.md
 	find $(DOC_DIR) -type f -name '*._*' -delete
 	printf '%s\n' $(GH_PAGES_DOMAIN) > $(DOC_DIR)/CNAME
-	mkdocs gh-deploy -f mkdocs.gh.yml
+	$(MKDOCS) gh-deploy -f mkdocs.gh.yml
 
-serve : $(SRC_DIR)/webdyne.md docker
-	docker rm -f webdyne-mkdocs || true
-	docker run -d --name webdyne-mkdocs -e PORT=5000 -p 5000:5000 webdyne-mkdocs
-	mkdocs serve -f mkdocs.yml
+mkdocs-serve : $(SRC_DIR)/webdyne.md mkdocs-docker
+	$(DOCKER) rm -f webdyne-mkdocs || true
+	$(DOCKER) run -d --name webdyne-mkdocs -e PORT=5000 -p 5000:5000 webdyne-mkdocs
+	$(MKDOCS) serve -f mkdocs.yml
 
+
+#==============================================================================
+# MkDocs Docker Image
+#==============================================================================
+
+DOCKER_DIR := $(SRC_DIR)/docker
+DOCKER_IMAGE := webdyne-mkdocs:latest
+DOCKER_STAMP := $(DOCKER_DIR)/.built
+PSP_DIR := $(SRC_DIR)/example
+
+# doc/example is intentionally developer-only and is not shipped in CPAN
+# tarballs, so guard the scan to keep install/smoke-test make invocations quiet.
+PSP_FILES := $(shell test -d $(PSP_DIR) && find $(PSP_DIR) -type f -name '*.psp')
 
 mkdocs-docker: $(DOCKER_STAMP)
 
 $(DOCKER_STAMP) : $(PSP_FILES) $(DOCKER_DIR)/Dockerfile.alpine
-	docker build  -t $(DOCKER_IMAGE) -f ($DOCKET_DIR)/Dockerfile.alpine .
+	$(DOCKER) build -t $(DOCKER_IMAGE) -f $(DOCKER_DIR)/Dockerfile.alpine .
 	touch $(DOCKER_STAMP)
 
 
+#==============================================================================
+# XML Documentation
+#==============================================================================
 
 doc_xml:
 	@echo Generating doc
@@ -314,42 +348,15 @@ doc_xml_tidy:
 	find bin -type f -name '*.xml' -exec $(XML_TIDY) _ {} \;
 	find lib -type f -name '*.xml' -exec $(XML_TIDY) _ {} \;
 
-filter_scripts :
-	@for f in $(EXE_FILES); do \
-		echo "Installing script $$f via PM_FILTER..."; \
-		$(PM_FILTER) $$f > blib/script/`basename $$f`; \
-	done
 
-pure_all :: filter_scripts
-
-git_version_increment0 ::
-	cd docker && $(PERL) build.pl
+#==============================================================================
+# Docker Release Files
+#==============================================================================
 
 docker_update ::
 	cd docker && $(PERL) build.pl
 
 END
-    #return $mm_or->SUPER::postamble . $postamble;
-    return $mm_or->MY::SUPER::postamble . $postamble;
-}
 
-
-sub MM::init_main {
-
-    #  Strip .pl, .sh extension from script files before installing
-    #
-    my $mm_or=shift();
-    my @fn;
-    foreach my $fn (@{$mm_or->{'EXE_FILES'}}) {
-        (my $fn_new=$fn)=~s/\.(?:pl|sh)$//;
-        if ($fn_new ne $fn) {
-            -f $fn_new || do {
-                eval {symlink(abs_path($fn), $fn_new)} || copy(abs_path($fn), $fn_new)
-            }
-        }
-        push @fn, $fn_new;
-    }
-    $mm_or->{'EXE_FILES'}=\@fn;
-    $mm_or->MM::SUPER::init_main();
-
+    return $postamble;
 }

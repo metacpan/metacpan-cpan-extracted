@@ -36,7 +36,7 @@
 #include "Clownfish/Vector.h"
 
 TestClass*
-TestClass_new() {
+TestClass_new(void) {
     return (TestClass*)Class_Make_Obj(TESTCLASS);
 }
 

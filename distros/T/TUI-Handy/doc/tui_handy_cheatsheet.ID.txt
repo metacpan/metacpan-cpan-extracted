@@ -1,0 +1,82 @@
+======================================================================
+ TUI::Handy Cheat Sheet                                  [ID] Bahasa Indonesia
+======================================================================
+
+[ 1. Instalasi dan pemuatan ]
+
+  Tidak ada dependensi CPAN; salin Handy.pm ke direktori mana pun di @INC, atau jalankan langsung sebagai skrip.
+
+  use TUI::Handy;
+  # or, as a command:  perl Handy.pm form.txt
+
+[ 2. Membuat dan menjalankan formulir ]
+
+  Bangun formulir dari string DSL atau berkas, lalu panggil run(); hasilnya adalah referensi hash dengan kunci label pada DSL.
+
+  my $tui  = TUI::Handy->new(dsl => $text);   # or new(file => $path)
+  my $form = $tui->run;
+  print "Company = $form->{Company}\n";
+
+[ 3. Penanda kotak teks ]
+
+  Karakter pengisi di dalam [ ] menentukan jenis kotak teks: _ setengah lebar, # angka, $ atau \ mata uang, YYYYMMDD atau % tanggal, karakter lebar penuh untuk jenis zenkaku.
+
+  Company: [__________]
+  Age:     [###]
+  Price:   [$$$$$$]
+  Date:    [YYYYMMDD]
+
+[ 4. Kotak centang dan tombol radio ]
+
+  [X]/[ ] adalah kotak centang (nilai 1 atau 0); (*)/( ) mengelompokkan tombol radio berdasarkan baris judul sebelumnya, nilainya adalah teks label yang dipilih.
+
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+
+[ 5. Tombol ]
+
+  Tanda kurung siku tanpa teks label di depannya adalah tombol; daftarkan aksinya dengan set().
+
+  $tui->set('Register', sub { my $form = shift; save($form); 0 });
+  [Register]
+
+[ 6. Tombol keyboard ]
+
+  TAB/panah bawah ke bidang berikutnya, Shift-TAB/panah atas ke bidang sebelumnya. Enter, Spasi, dan tombol panah mengedit atau mengaktifkan tombol; ESC membatalkan formulir.
+
+[ 7. Pengkodean karakter ]
+
+  Mendeteksi UTF-8 otomatis di luar Windows dan Shift_JIS (CP932) di Windows; EUC-JP juga didukung. Timpa dengan TUI_HANDY_ENCODING.
+
+  $ENV{TUI_HANDY_ENCODING} = 'euc';   # utf8 / sjis / euc
+
+[ 8. Mode baris cadangan ]
+
+  Saat stty tidak tersedia (cmd.exe Windows murni), driver mode baris portabel otomatis digunakan; paksa mode dengan TUI_HANDY_MODE.
+
+  $ENV{TUI_HANDY_MODE} = 'line';      # ansi / line
+
+[ 9. Penggunaan baris perintah ]
+
+  Berkas DSL dapat dijalankan langsung tanpa menulis kode Perl.
+
+  perl Handy.pm form.txt
+
+[ 10. Contoh lengkap ]
+
+  Contoh DSL singkat yang menggabungkan semua jenis widget.
+
+  Registration
+  Company: [__________]
+  Age:     [###]
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+  [Register]
+
+[ 11. Sumber daya ]
+
+  Dokumentasi lengkap ada di POD lib/TUI/Handy.pm (perldoc TUI::Handy). Penulis: INABA Hitoshi <ina.cpan@gmail.com>. Lisensi: sama seperti Perl.

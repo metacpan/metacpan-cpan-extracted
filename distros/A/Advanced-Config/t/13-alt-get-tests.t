@@ -597,6 +597,14 @@ sub run_alt_date_tests
       $sts = dbug_cmp_ok ($ans, "==", 1, "dow test for tag $tag (Monday)");
       $ok = 0  unless ($sts);
 
+      $ans = $cfg->get_dow_date ($tag, undef, 2);
+      $sts = dbug_cmp_ok ($ans, "eq", "Monday", "dow test for tag $tag (Monday)");
+      $ok = 0  unless ($sts);
+
+      $ans = $cfg->get_dow_date ($tag, undef, 1);
+      $sts = dbug_cmp_ok (uc($ans), "eq", "MON", "dow test for tag $tag (Mon)");
+      $ok = 0  unless ($sts);
+
       $ans = $cfg->get_doy_date ($tag);
       $sts = dbug_cmp_ok ($ans, "==", 1, "doy test for tag $tag");
       $ok = 0  unless ($sts);

@@ -2,18 +2,22 @@
 abstract: 'API Client'
 author:
   - 'Michael Vu <email@michael.vu>'
-build_requires: {}
+build_requires:
+  HTTP::Request: '0'
+  HTTP::Response: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
-license: restrictive
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: HTTP-API-Client
 requires:
   Encode: '0'
+  HTTP::Headers: '0'
+  HTTP::Request: '0'
   JSON::XS: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
@@ -22,6 +26,8 @@ requires:
   Try::Tiny: '0'
   URI: '0'
   URI::Escape: '0'
-version: '1.04'
-x_generated_by_perl: v5.32.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  perl: '5.010'
+version: '1.10'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

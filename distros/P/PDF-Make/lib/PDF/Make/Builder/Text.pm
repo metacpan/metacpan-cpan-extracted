@@ -31,15 +31,16 @@ sub _resolve_font {
     my $base = $builder->font;
     my $overrides = font $self;
     if ($overrides) {
-        my $f = PDF::Make::Builder::Font->new(
+        my %init = (
             colour      => $overrides->{colour}      // $base->colour,
             size        => $overrides->{size}         // $base->size,
             family      => $overrides->{family}       // $base->family,
             bold        => $overrides->{bold}         // $base->bold,
             italic      => $overrides->{italic}       // $base->italic,
-            line_height => $overrides->{line_height}  // $base->effective_line_height,
         );
-        return $f;
+        my $lh = PDF::Make::Builder::Font->resolve_line_height($base, $overrides);
+        $init{line_height} = $lh if defined $lh;
+        return PDF::Make::Builder::Font->new(%init);
     }
     return $base;
 }

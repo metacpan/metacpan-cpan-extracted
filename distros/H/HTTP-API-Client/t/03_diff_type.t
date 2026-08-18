@@ -1,3 +1,10 @@
+=head1 NAME
+
+03_diff_type.t - content_type controls whether data is sent as a JSON body
+or a form-urlencoded query string
+
+=cut
+
 use strict;
 use warnings;
 use Test::More;

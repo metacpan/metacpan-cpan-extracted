@@ -34,7 +34,7 @@
 #include <string.h>
 
 TestByteBuf*
-TestBB_new() {
+TestBB_new(void) {
     return (TestByteBuf*)Class_Make_Obj(TESTBYTEBUF);
 }
 

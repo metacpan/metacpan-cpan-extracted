@@ -1,3 +1,13 @@
+=head1 NAME
+
+04_callbacks.t - the event system computes header values (an API key and a
+signature) from request data at build time, via CODE values inside the
+raw %headers hash (resolved by _execute_callbacks before the request is
+built) - not the before_headers event, which is covered separately in
+t/21_before_events.t
+
+=cut
+
 use strict;
 use warnings;
 use Test::More;

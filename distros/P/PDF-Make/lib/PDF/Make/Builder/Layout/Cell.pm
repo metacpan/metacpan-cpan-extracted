@@ -74,14 +74,16 @@ sub _resolve_item_font {
         && !defined($item->{bold})
         && !defined($item->{italic});
 
-    return PDF::Make::Builder::Font->new(
+    my %init = (
         colour      => $item->{colour}      // $base_font->colour,
         size        => $item->{size}        // $base_font->size,
         family      => $item->{family}      // $base_font->family,
         bold        => $item->{bold}        // $base_font->bold,
         italic      => $item->{italic}      // $base_font->italic,
-        line_height => $item->{line_height} // $base_font->effective_line_height,
     );
+    my $lh = PDF::Make::Builder::Font->resolve_line_height($base_font, $item);
+    $init{line_height} = $lh if defined $lh;
+    return PDF::Make::Builder::Font->new(%init);
 }
 
 sub measure_height {
@@ -123,9 +125,21 @@ sub runs_height {
         runs  => $rruns,
         width => ($width && $width > 1 ? $width : 1),
     );
+    my $sp = item_spacing($item);
     my $h = 0;
-    $h += $_->{lh} for @$lines;
+    $h += $_->{lh} + $sp for @$lines;
     return $h;
+}
+
+# An item's spacing: extra leading between its wrapped lines and once after
+# it, which is what the same attribute means on a text block outside a cell.
+# One gap per line, so measuring and rendering agree - they have to, or the
+# row is sized for less than it draws and the last line is clipped.
+sub item_spacing {
+    my ($item) = @_;
+    my $sp = $item->{spacing};
+    return 0 if !defined $sp || $sp < 0;
+    return $sp;
 }
 
 sub _render_runs {
@@ -139,10 +153,16 @@ sub _render_runs {
         width => $cw + wrap_slack($self),
     );
 
+    my $sp = item_spacing($item);
     my %ensured;
     for my $line (@$lines) {
-        $text_y -= $line->{lh};
-        last if $text_y < $cy;
+        # The baseline sits one font size below the top of the slot, and the
+        # slot is the line height: text starts at the top of its line-height,
+        # the way Builder::Text places it outside a cell. Drawing at the
+        # bottom instead - which is what subtracting the whole line height
+        # first did - put a line-height:230 heading 230pt down the page.
+        my $baseline = $text_y - $line->{size};
+        last if $baseline < $cy;
 
         my $tx = $cx;
         if ($align eq 'center') {
@@ -158,11 +178,12 @@ sub _render_runs {
             my ($r, $g, $b) = $f->hex_to_rgb($f->colour);
             $canvas->rg($r, $g, $b)
                    ->Tf($res, $f->size)
-                   ->Tm(1, 0, 0, 1, $tx, $text_y)
+                   ->Tm(1, 0, 0, 1, $tx, $baseline)
                    ->Tj($seg->{text});
             $tx += $seg->{w};
         }
         $canvas->ET;
+        $text_y -= $line->{lh} + $sp;
     }
     return $text_y;
 }
@@ -184,8 +205,9 @@ sub _resolve_runs {
             family      => $run->{family}      // $base->family,
             bold        => $run->{bold}        // $base->bold,
             italic      => $run->{italic}      // $base->italic,
-            line_height => $run->{line_height} // $base->effective_line_height,
         );
+        my $rlh = PDF::Make::Builder::Font->resolve_line_height($base, $run);
+        $spec{line_height} = $rlh if defined $rlh;
         my $key = join "\0", map { defined $spec{$_} ? $spec{$_} : '' }
                              qw(colour size family bold italic line_height);
         $cache{$key} ||= PDF::Make::Builder::Font->new(%spec);
@@ -204,10 +226,14 @@ sub render_content {
     }
 
     my $text_y = $cy + $ch - (pad $self);
-    my $align = align $self;
+    my $cell_align = align $self;
 
     for my $item (@{content $self}) {
-        next unless $item->{type} eq 'text';
+        next unless $item->{type} eq q{text};
+
+        # A cell has one alignment, but each item may carry its own - a box
+        # of centred blocks is one cell holding several.
+        my $align = $item->{align} // $cell_align;
 
         if ($item->{runs}) {
             $text_y = $self->_render_runs($canvas, $font, $page, $item,
@@ -217,7 +243,7 @@ sub render_content {
 
         my $item_font = $self->_resolve_item_font($font, $item);
         my $sz = $item->{size} // $item_font->size;
-        my $lh = $item->{line_height} // $sz;
+        my $lh = ($item->{line_height} // $sz) + item_spacing($item);
         my $colour = $item->{colour} // $item_font->colour;
         my ($r, $g, $b) = $item_font->hex_to_rgb($colour);
         my $res = $item_font->ensure_loaded($page->xs_page);
@@ -232,8 +258,8 @@ sub render_content {
             my $slack = wrap_slack $self;
 
             if ($test > $cw + $slack && $line ne '') {
-                $text_y -= $lh;
-                last if $text_y < $cy;
+                my $baseline = $text_y - $sz;
+                last if $baseline < $cy;
                 my $tx = $cx;
                 if ($align eq 'center') {
                     $tx = $cx + ($cw - $line_w) / 2;
@@ -241,7 +267,8 @@ sub render_content {
                     $tx = $cx + $cw - $line_w;
                 }
                 $canvas->BT->Tf($res, $sz)->rg($r, $g, $b)
-                    ->Td($tx, $text_y)->Tj($line)->ET;
+                    ->Td($tx, $baseline)->Tj($line)->ET;
+                $text_y -= $lh;
                 $line = $word;
                 $line_w = $item_font->measure_text($line);
             } else {
@@ -251,8 +278,8 @@ sub render_content {
         }
 
         if ($line ne '') {
-            $text_y -= $lh;
-            if ($text_y >= $cy) {
+            my $baseline = $text_y - $sz;
+            if ($baseline >= $cy) {
                 my $tx = $cx;
                 if ($align eq 'center') {
                     $tx = $cx + ($cw - $line_w) / 2;
@@ -260,8 +287,9 @@ sub render_content {
                     $tx = $cx + $cw - $line_w;
                 }
                 $canvas->BT->Tf($res, $sz)->rg($r, $g, $b)
-                    ->Td($tx, $text_y)->Tj($line)->ET;
+                    ->Td($tx, $baseline)->Tj($line)->ET;
             }
+            $text_y -= $lh;
         }
     }
 }

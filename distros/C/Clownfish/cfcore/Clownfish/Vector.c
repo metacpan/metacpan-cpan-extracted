@@ -339,7 +339,7 @@ S_grow_and_oversize(Vector *self, size_t min_size) {
 }
 
 static void
-S_overflow_error() {
+S_overflow_error(void) {
     THROW(ERR, "Vector index overflow");
 }
 

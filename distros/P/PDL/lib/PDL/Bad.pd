@@ -370,6 +370,20 @@ EOF
   GenericTypes => $A,
 );
 
+pp_def('isnan',
+  Pars => q(a(); int [o]b()),
+  Doc => <<'EOF',
+=for ref
+
+Returns a binary mask indicating which values of the input are C<NaN>.
+
+Returns a 1 if the value is C<NaN>, 0 otherwise.
+Similar to L<isfinite|PDL::Math/isfinite>.
+EOF
+  Code => '$b() = PDL_ISNAN_$PPSYM()($a());',
+  GenericTypes => $A,
+);
+
 pp_def('isgood',
   Pars => q(a(); int [o]b()),
   Doc => <<'EOF',

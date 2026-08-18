@@ -11,7 +11,6 @@ cpanfile
 lib/OcToolkit.pm
 lib/example/Readme.txt
 lib/example/ocToolkit.pl
-lib/example/oc_config.json
 lib/example/secrets/build-config-trigger-generic.txt
 lib/example/secrets/build-config-trigger-github.txt
 lib/example/secrets/clusterIntern/project-secret.json

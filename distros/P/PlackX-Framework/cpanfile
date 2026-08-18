@@ -1,5 +1,5 @@
 # Basic requirements
-requires 'perl' => '5.036000';
+requires 'perl' => '5.026000';
 requires 'Plack';
 requires 'Role::Tiny';
 requires 'Router::Boom';

@@ -46,23 +46,23 @@
    "provides" : {
       "BarefootJS" : {
          "file" : "lib/BarefootJS.pm",
-         "version" : "v0.31.6"
+         "version" : "v0.31.7"
       },
       "BarefootJS::Date" : {
          "file" : "lib/BarefootJS.pm",
-         "version" : "v0.31.6"
+         "version" : "v0.31.7"
       },
       "BarefootJS::DevReload" : {
          "file" : "lib/BarefootJS/DevReload.pm",
-         "version" : "v0.31.6"
+         "version" : "v0.31.7"
       },
       "BarefootJS::Evaluator" : {
          "file" : "lib/BarefootJS/Evaluator.pm",
-         "version" : "v0.31.6"
+         "version" : "v0.31.7"
       },
       "BarefootJS::SearchParams" : {
          "file" : "lib/BarefootJS/SearchParams.pm",
-         "version" : "v0.31.6"
+         "version" : "v0.31.7"
       }
    },
    "release_status" : "stable",
@@ -77,6 +77,6 @@
          "web" : "https://github.com/piconic-ai/barefootjs"
       }
    },
-   "version" : "v0.31.6",
+   "version" : "v0.31.7",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

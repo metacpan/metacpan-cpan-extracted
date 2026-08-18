@@ -18,6 +18,28 @@
 
 Version - YYYY/MM/DD
 ---------------------
+1.15 2026-08-17 08:30:00
+  - Added $mode arg to get_dow_date().  Added $mode to middle of arg list.  So
+    special care was needed to make the func backwards compatible.  It allows
+    the dow to be strings in the requested language.
+  - Modified t/13-alt-get-tests.t to test the changes.
+  - Added the following to Config.pm
+           newDefineConfigRules ()
+           copy_opts_from_cfg ()
+           set_config_rules ()
+           _get_rules_from_cfg()
+           _get_rule_section ()
+           _get_rule_object ()
+  - Modified source_file() in Reader.pm to take advantage of
+    newDefineConfigRules () & _get_rule_section ().  Uses the new rule logic
+    when sourcing in sub-files.  When using rules it overrides the old callback
+    options.
+  - Added t/65-rule-config.t to test these changes along with t/config/65-*.cfg
+    files.
+  - Added the new files to the MANIFEST
+  - Updated the POD in Options.pm & Examles.pm to mention this new logic.
+  - Added 31-using-regex-seps.cfg for more test cases in 30-alt_symbols_cfg.t.
+
 1.14 2026-01-16 08:30:00
   - Updated copyright dates in LICENCE file.
   - Fixed several typos in the README file.

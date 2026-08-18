@@ -494,9 +494,21 @@ add_outline(self, title, page_index, dest_type = "Fit", left = 0, top = 0, zoom 
             dest = pdfmake_dest_fit((size_t)page_index);
         }
 
-        item = pdfmake_doc_add_outline_root(self, title, dest);
-        if (!item)
-            croak("PDF::Make::Document::add_outline: failed to create outline root");
+        /* Top-level bookmarks are CHILDREN of an untitled root container
+         * (the serializer already knows a title-less root is the /Outlines
+         * dict, not a visible entry). Routing every doc-level add through
+         * add_outline_root made the first bookmark the root and silently
+         * swallowed every one after it - two bookmarks in, one out. */
+        {
+            pdfmake_outline_item_t *root = pdfmake_doc_get_outline(self);
+            if (!root)
+                root = pdfmake_doc_add_outline_root(self, NULL, dest);
+            if (!root)
+                croak("PDF::Make::Document::add_outline: failed to create outline root");
+            item = pdfmake_outline_add_child(root, title, dest);
+            if (!item)
+                croak("PDF::Make::Document::add_outline: failed to add outline item");
+        }
 
         sv = newSV(0);
         sv_setref_pv(sv, "PDF::Make::Outline", (void *)item);

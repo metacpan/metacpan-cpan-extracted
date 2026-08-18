@@ -29,7 +29,7 @@
 #include <string.h>
 
 TestBlob*
-TestBlob_new() {
+TestBlob_new(void) {
     return (TestBlob*)Class_Make_Obj(TESTBLOB);
 }
 

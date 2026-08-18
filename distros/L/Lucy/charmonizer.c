@@ -8443,12 +8443,12 @@ chaz_Strings_probe_c99_snprintf(void) {
 #include <stdlib.h>
 
 static const char chaz_SymbolVisibility_symbol_exporting_code[] =
-    CHAZ_QUOTE(  %s int exported_function() {   )
-    CHAZ_QUOTE(      return 42;                 )
-    CHAZ_QUOTE(  }                              )
-    CHAZ_QUOTE(  int main() {                   )
-    CHAZ_QUOTE(      return 0;                  )
-    CHAZ_QUOTE(  }                              );
+    CHAZ_QUOTE(  %s int exported_function(void) {   )
+    CHAZ_QUOTE(      return 42;                     )
+    CHAZ_QUOTE(  }                                  )
+    CHAZ_QUOTE(  int main(void) {                   )
+    CHAZ_QUOTE(      return 0;                      )
+    CHAZ_QUOTE(  }                                  );
 
 void
 chaz_SymbolVisibility_run(void) {
@@ -8683,8 +8683,8 @@ typedef struct SourceFileContext {
     chaz_MakeVar *var;
 } SourceFileContext;
 
-static const char lucy_version[]        = "0.6.2";
-static const char lucy_major_version[]  = "0.6";
+static const char lucy_version[]        = "0.7.0";
+static const char lucy_major_version[]  = "0.7";
 
 static void
 S_add_compiler_flags(struct chaz_CLI *cli);
@@ -8905,7 +8905,7 @@ lucy_MakeFile_new(chaz_CLI *cli) {
         self->cfish_lib_dir = NULL;
     }
     if (chaz_CC_binary_format() == CHAZ_CC_BINFMT_PE) {
-        self->cfish_lib_name = "clownfish-0.6";
+        self->cfish_lib_name = "clownfish-0.7";
     }
     else {
         self->cfish_lib_name = "clownfish";

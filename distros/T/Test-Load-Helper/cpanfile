@@ -12,9 +12,12 @@ on 'build' => sub {
 };
 
 on 'test' => sub {
+  requires "Carp::Always" => "0";
   requires "Path::Tiny" => "0.018";
+  requires "Test::Deep" => "0";
   requires "Test::EOL" => "0";
-  requires "Test::YAFT" => "0";
+  requires "Test::More" => "0";
+  requires "Test::Warnings" => "v0.38.0";
   requires "constant" => "0";
   requires "require::relative" => "0";
 };

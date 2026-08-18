@@ -832,17 +832,19 @@ sub initialize {
 { package # hide from MetaCPAN
     PDL;
   use Carp;
+  sub overload_assign {$_[0]} # Don't deep copy, just copy reference
+  sub overload_bool {
+    return 0 if $_[0]->isnull;
+    confess("multielement ndarray in conditional expression (see PDL::FAQ questions 6-10 and 6-11)")
+      unless $_[0]->nelem == 1;
+    confess("bad value ndarray in conditional expression")
+      if $_[0]->badflag and $_[0].'' eq 'BAD';
+    $_[0]->flat->at(0);
+  }
   use overload
     '""' => \&PDL::Core::string,
-    "=" => sub {$_[0]},          # Don't deep copy, just copy reference
-    bool => sub {
-      return 0 if $_[0]->isnull;
-      confess("multielement ndarray in conditional expression (see PDL::FAQ questions 6-10 and 6-11)")
-        unless $_[0]->nelem == 1;
-      confess("bad value ndarray in conditional expression")
-        if $_[0]->badflag and $_[0].'' eq 'BAD';
-      $_[0]->flat->at(0);
-    },
+    "=" => \&overload_assign,
+    bool => \&overload_bool,
     ;
 }
 

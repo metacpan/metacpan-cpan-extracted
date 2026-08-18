@@ -258,18 +258,17 @@ Their determinants are all equal to one and:
 sub PDL::mpascal {
   my ($m, $n) = @_;
   my $mat = eval {
-    require PDL::GSLSF::GAMMA;
+    require PDL::GSL::SF;
     if ($n > 1){
       my $mat = xvals($m);
-      return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat + $mat->dummy(0),$mat))[0];
+      return (PDL::GSL::SF::gsl_sf_choose($mat + $mat->dummy(0),$mat))[0];
     }else{
       my $mat = xvals($m, $m);
-      return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat->tritosym,$mat->xchg(0,1)->tritosym))[0]->mtri($n);
+      return (PDL::GSL::SF::gsl_sf_choose($mat->tritosym,$mat->xchg(0,1)->tritosym))[0]->mtri($n);
     }
   };
   return $mat if !$@;
-  warn("mpascal: can't compute binomial coefficients without".
-    " PDL::GSLSF::GAMMA\n");
+  warn "mpascal: can't compute binomial coefficients without PDL::GSL::SF\n";
   return;
 }
 

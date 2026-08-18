@@ -8,9 +8,16 @@ sub PROTOCOL_VERSION_1_0A() {1.001}
 
 sub OAUTH_VERSION() {'1.0'}
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 our $SKIP_UTF8_DOUBLE_ENCODE_CHECK = 0;
 our $PROTOCOL_VERSION = PROTOCOL_VERSION_1_0;
+
+# Process-wide default for the signature methods verify() will accept, for
+# deployments that cannot pass allowed_signature_methods at every call site.
+# While this is empty and no per-message list is given, verify() croaks
+# rather than take the algorithm from the message it is verifying -- see the
+# VERIFYING MESSAGES section of the documentation below.
+our @ALLOWED_SIGNATURE_METHODS = ();
 
 sub request {
     my $self = shift;
@@ -200,9 +207,69 @@ Before sending a request, the Consumer must first sign it:
 
  $request->sign;
 
-When receiving a request, the Service Provider should first verify the signature:
+When receiving a request, the Service Provider should first verify the signature, and should say which signature methods it is willing to accept:
 
+ $request = Net::OAuth->request('protected resource')->from_authorization_header(
+     $ENV{HTTP_AUTHORIZATION},
+     %api_params,
+     allowed_signature_methods => [qw/HMAC-SHA1 HMAC-SHA256/],
+ );
  die "Signature verification failed" unless $request->verify;
+
+See L</VERIFYING MESSAGES> for why the second part matters.
+
+=head2 VERIFYING MESSAGES
+
+C<oauth_signature_method> is a message parameter: it is chosen by whoever
+sent the message, and on the receiving side it arrives from the network
+along with the signature it describes. C<verify> dispatches on it, so
+without an C<allowed_signature_methods> list the sender is choosing which
+algorithm - and therefore which key - the receiver checks their signature
+with.
+
+That is a real problem for a Service Provider deployed with RSA-SHA1,
+because it holds only the Consumer's B<public> key. An attacker who sends
+C<oauth_signature_method=HMAC-SHA1> instead moves verification onto the
+symmetric path, whose key L<Net::OAuth::Request/signature_key> derives
+from C<consumer_secret> and C<token_secret> - fields RSA-SHA1 does not use
+and which such a deployment has no reason to keep secret. The equivalent
+downgrade between two symmetric methods (HMAC-SHA256 to HMAC-SHA1, or to
+PLAINTEXT) is weaker but is the same mechanism.
+
+Pass C<allowed_signature_methods> as an API parameter to any message you
+are going to C<verify>:
+
+ allowed_signature_methods => [qw/RSA-SHA1/]
+
+C<verify> croaks if the message names anything else. Deployments that
+cannot reach every call site - because verification happens inside a
+framework or a wrapper module - can set the process-wide default instead:
+
+ @Net::OAuth::ALLOWED_SIGNATURE_METHODS = qw/RSA-SHA1/;
+
+An C<allowed_signature_methods> on the message overrides that default.
+
+If neither is set, C<verify> croaks. There is no method it could safely
+assume on your behalf: only you know which one your Consumers registered
+with, and taking the answer from the message is the problem this list
+exists to solve.
+
+Signing is not affected: a Consumer choosing the method for a message it
+is about to send is choosing for itself, not on someone else's behalf.
+
+=head3 Upgrading
+
+This is a breaking change. Before this release C<verify> took the
+algorithm from the message; every existing caller is therefore unpinned,
+and will croak until it says what it accepts. The migration is one
+parameter per verifying call site, or one package variable per process,
+naming the method your Consumers already use - for the great majority of
+deployments:
+
+ @Net::OAuth::ALLOWED_SIGNATURE_METHODS = qw/HMAC-SHA1/;
+
+The break is deliberate: a warning would have left every deployment that
+does not read release notes verifying with an attacker-chosen algorithm.
 
 When sending a message the last step is to serialize it and send it to wherever it needs to go.  The following serialization methods are available:
 
@@ -327,10 +394,20 @@ Service Provider:
  use File::Slurp;
  $keystring = read_file('public_key.pem');
  $public_key = Crypt::OpenSSL::RSA->new_public_key($keystring);
- $request = Net::OAuth->request('request token')->new(%params);
+ $request = Net::OAuth->request('request token')->new(
+     %params,
+     allowed_signature_methods => ['RSA-SHA1'],
+ );
  if (!$request->verify($public_key)) {
  	die "Signature verification failed";
  }
+
+A Service Provider deployed this way holds only the Consumer's public
+key, so it is the deployment with the most to lose from letting the
+message choose the algorithm: without C<allowed_signature_methods> a
+request naming HMAC-SHA1 would be checked against C<consumer_secret>,
+which RSA-SHA1 does not use and such a deployment has no reason to keep
+secret. See L</VERIFYING MESSAGES>.
 
 Note that you can pass the key in as a parameter called 'signature_key' to the message constructor, rather than passing it to the sign/verify method, if you like.
 
@@ -483,7 +560,7 @@ Tomaž Šolc <avian@cpan.org>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2012, 2024-2025 Keith Grennan
+Copyright 2007-2012, 2024-2026 Keith Grennan
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

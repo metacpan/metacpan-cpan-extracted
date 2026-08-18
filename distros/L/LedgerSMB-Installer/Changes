@@ -1,5 +1,25 @@
 ---
 
+0.999.13    2026-08-17
+   [Added]
+       * Support for installation on RHEL and derivatives; RHEL uses
+         different package and package group names than Fedora
+       * Resolution of dependent executables looks in the Perl executable
+         directory ($Config{bin}) before consulting the system $PATH to
+         resolve specifically installed dependencies to the correct
+         versions
+   [Fixed]
+       * Error handling on HTTP(S) request failure against MetaCPAN API
+         while resolving the dependency tree
+       * On RedHat Linux 9 (RHEL9) and derivatives, execute the fallback
+         codepath because 'dnf5' is not available (instead of throwing
+         an error)
+
+0.999.12    2026-04-16
+   [Added]
+       * Generated 'server-start' script supports LSMB_BIND_ADDRESS
+         environment variable to specify address to bind to
+
 0.999.11    2026-01-09
    [Fixed]
        * MetaCPAN query adjusted to match upgraded ElasticSearch

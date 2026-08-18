@@ -33,7 +33,7 @@
 #include "Clownfish/Class.h"
 
 TestHash*
-TestHash_new() {
+TestHash_new(void) {
     return (TestHash*)Class_Make_Obj(TESTHASH);
 }
 

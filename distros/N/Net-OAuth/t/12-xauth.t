@@ -6,6 +6,11 @@ use Test::More tests => 5;
 
 use Net::OAuth;
 
+# verify() will not take the algorithm from the message being verified,
+# so say which methods these tests expect (see VERIFYING MESSAGES in the
+# Net::OAuth documentation).
+@Net::OAuth::ALLOWED_SIGNATURE_METHODS = qw/PLAINTEXT HMAC-SHA1/;
+
 my $request = Net::OAuth->request('xauth access token')->new(
         consumer_key => 'dpf43f3p2l4k3l03',
         consumer_secret => 'kd94hf93k423kf44',

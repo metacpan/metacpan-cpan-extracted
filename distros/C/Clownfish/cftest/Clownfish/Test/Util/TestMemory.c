@@ -27,7 +27,7 @@
 #include "Clownfish/Class.h"
 
 TestMemory*
-TestMemory_new() {
+TestMemory_new(void) {
     return (TestMemory*)Class_Make_Obj(TESTMEMORY);
 }
 

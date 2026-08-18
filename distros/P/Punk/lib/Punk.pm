@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.15';
+    $VERSION = '0.17';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -110,14 +110,62 @@ matched is affected - a C<*splat> still captures a trailing slash as
 part of the remainder, and a mounted app still receives the path it was
 sent, since only it knows whether C</docs> and C</docs/> differ.
 
-An optional trailing hashref carries route options; unknown keys croak
-at boot. The one option today is C<validate> - a JSON Schema (or
-C<< { schema, source, on_invalid } >>) compiled once at C<to_app> and
-run before the handler, collecting errors into a Result a bare
-C<< $c->validate >> reads
-and answering C<< 400 { errors => [...] } >> (or the C<on_invalid>
-target) on failure. See L<Punk::Validate>. Scoped verbs
-(C<< $scope->get(...) >>) take the same hashref.
+=head3 Route options
+
+An optional trailing hashref carries route options; unknown keys croak at
+boot. Scoped verbs (C<< $scope->get(...) >>) take the same hashref.
+
+    post '/upload' => 'Web::File#create', { max_body => 50_000_000 };
+
+Once a route carries options, the whole declaration may be written as one
+hashref instead, with the handler under C<cb>:
+
+    post '/upload' => { cb => 'Web::File#create', max_body => 50_000_000 };
+
+Both forms are supported and produce identical routes; C<cb> takes exactly
+what the target position takes, a coderef or C<'Controller#method'>. The
+options may go in one place or the other, not both, and a hashref with no
+C<cb> croaks at boot. C<websocket> and C<sse> accept the same form.
+
+=over 4
+
+=item * C<cb> - the handler. Only in the one-hashref form, where it is
+required.
+
+=item * C<validate> - a JSON Schema, or C<< { schema, source, on_invalid } >>
+for the longhand, compiled once at C<to_app> and run before the handler.
+Errors collect into a Result that a bare C<< $c->validate >> reads;
+failure answers C<< 400 { errors => [...] } >>, or the C<on_invalid>
+target. See L<Punk::Validate>.
+
+=item * C<schema> - the schema half of C<validate>, spelled separately.
+
+=item * C<source> - what C<validate> reads (the request body by default).
+
+=item * C<on_invalid> - a target to run instead of the house C<400>.
+
+=item * C<compress> - C<0> opts the route out of response compression.
+See below.
+
+=item * C<max_body> - refuse a request whose C<CONTENT_LENGTH> exceeds
+this, overriding the application's L</max_body>. C<0> disables the check
+for this route.
+
+=back
+
+C<< compress => 0 >> deserves its own note. Punk does not compress -
+L<Hyperman> does, because compression belongs to the write path - so this
+is spelled as a plain response header, C<< Content-Encoding: identity >>,
+which the server honours and strips. That makes it a contract any PSGI
+server could adopt rather than a private arrangement, and it is inert on
+one that has not. There is no C<< compress => 1 >>: compressing is
+already the server's answer for a route that says nothing.
+
+Reach for it when a response contains a CSRF token or a session identifier
+B<and> reflects user input - that combination is the BREACH compression
+side channel. Every major server compresses anyway, because the
+alternative is worse for everyone; this is the escape hatch for the
+handful of responses where it matters.
 
 =head2 under
 
@@ -249,6 +297,87 @@ C<X-Frame-Options> and C<Referrer-Policy>; CSP and HSTS are opt-in by
 spelling. An C<under> scope can carry its own policy for its prefix:
 C<< $scope->headers(...) >>. See L<Punk::Headers>.
 
+=head2 proxy
+
+    proxy;                                  # one proxy in front
+    proxy trust => 2;                       # a CDN in front of nginx
+    proxy trust => ['10.0.0.0/8', '172.16.0.0/12'];
+    proxy trust => 'all';                   # development only
+    proxy trust => 1, for_header => 'CF-Connecting-IP';
+
+Declares that the application sits behind a reverse proxy, so the real
+client can be recovered from the forwarded headers.
+
+C<REMOTE_ADDR> is B<overwritten> with the resolved client at the top of the
+dispatcher, before routing. That is the whole design: C<rate_limit>,
+C<< $c->block_ip >>, the access log and C<< $c->req->address >> all read
+C<REMOTE_ADDR> and become correct without any of them changing. The address
+the connection actually came from is kept as
+C<< $c->env->{'punk.peer_addr'} >>, and C<REMOTE_PORT> is dropped when the
+address moved, because it described the proxy's socket.
+
+C<X-Forwarded-Proto> sets C<psgi.url_scheme> (and C<HTTPS>),
+C<X-Forwarded-Host> sets C<HTTP_HOST>, and C<X-Forwarded-Port> sets
+C<SERVER_PORT>, all under the same trust decision.
+
+B<Without this keyword, a limiter behind a proxy is not just approximate -
+it is a site-wide outage waiting to happen.> See L</The shared bucket>
+below.
+
+=head3 How C<trust> counts
+
+C<X-Forwarded-For> reads C<< client, proxy1, proxy2 >>, and each hop
+B<appends> the address it received the connection I<from>. The socket peer
+is the last proxy and never appears in the header it forwarded. So with
+C<< trust => N >> the client sits at index C<N-1> counting from the
+B<right>.
+
+Counting from the left is the spoofable version, because the leftmost entry
+is the one the client writes. With one proxy in front and a client sending
+C<< X-Forwarded-For: 9.9.9.9 >>, the header arriving here is
+C<< 9.9.9.9, <real client> >> - and Punk answers with the real client.
+
+A chain shorter than C<trust> declares is a misconfiguration, or a client
+that sent nothing; the answer is then the socket peer, never the leftmost
+entry. An entry that is not a valid address ends the walk the same way -
+C<REMOTE_ADDR> feeds a shared-memory rate-limit key, so attacker-controlled
+bytes must never reach it.
+
+C<< trust => \@cidrs >> walks right to left while each entry is one of the
+named networks and takes the first one that is not, having first checked
+that the socket peer is itself trusted. C<< trust => 'all' >> takes the
+leftmost entry and is refused outside C<PUNK_ENV=development>: with no
+proxy actually in front it lets any client claim any address.
+
+Everything is validated at C<to_app> - a mistyped CIDR, a nonsense hop
+count, an unknown option or a second C<proxy> declaration all croak at boot.
+
+=head3 The shared bucket
+
+C<rate_limit> keys on C<REMOTE_ADDR>, and because the counters live in
+L<Hyperman>'s shared arena a limit is B<exact across the whole worker pool>
+rather than per worker. Behind a proxy without this keyword, C<REMOTE_ADDR>
+is the proxy for every request, so every client on the internet shares one
+bucket and a C<< limit => 100 >> rule throttles the entire site at 100 per
+window. C<< $c->block_ip >>, keyed the same way, bans the load balancer.
+
+Reaching for C<< by => 'header:X-Forwarded-For' >> instead is worse, not
+better: nothing validates the header, so on an application that is I<not>
+behind a proxy any client can set it and step into a fresh bucket at will.
+
+=head3 What this does not fix
+
+L<Hyperman>'s edge denylist drops a connection at C<accept>, before a byte
+is read, so it cannot see a header and never will. Behind a proxy it can
+only ever match the proxy's own address. C<< $c->block_ip($client) >> still
+writes to the arena, but the ban takes effect at dispatch as a C<403>
+rather than at the edge - the same outcome, at the cost of a request.
+
+C<< $c->block_ip >> croaks if the address it is about to ban is the one in
+C<punk.peer_addr>, because banning the proxy takes the site down. Boot-time
+config cannot catch that, and a silent no-op would leave an operator
+believing they had banned someone.
+
 =head2 auth
 
     auth model => 'User',
@@ -273,11 +402,47 @@ with a C<?to=> return-to, an API client gets a C<401>. Roles rank on a
 ladder ("admin or better") or match exactly when outside it. See
 L<Punk::Auth/GUARDS>.
 
+=head2 max_body
+
+    max_body 2_097_152;                          # app-wide, bytes
+
+    post '/upload'  => $t, { max_body => 50_000_000 };
+    post '/webhook' => $t, { max_body => 0 };    # no check on this route
+
+Refuse a request whose C<CONTENT_LENGTH> exceeds a ceiling, with the same
+C<413> an over-large L</api> operation gets. A route's own value wins over
+the app-wide one, and C<0> on a route switches the check off there.
+
+The check runs in C after routing and B<before> the hook chain, the guards
+and the handler, so an oversize request costs no auth lookup, no
+validation, no body parse and no Perl frame.
+
+B<This is policy, not memory protection.> By the time Punk sees a request,
+its body is already fully resident in the server's read buffer - the memory
+was spent before the application was called. What this buys is the parse,
+the guards, the handler, and an honest answer instead of a mysterious
+success. The thing that actually bounds a worker's memory is the server's
+own ceiling, L<Hyperman/"max_body: the request ceiling">, and this keyword
+cannot stand in for it. Set both.
+
+A request with no C<CONTENT_LENGTH> is passed through: that is a chunked
+body, which the server has already decoded and bounded against its own
+ceiling by the time Punk runs.
+
 =head2 static
 
     static '/static' => 'root/static';
 
 Serve files from a directory; see L<Punk::Static>.
+
+If C<style.css.gz> (or C<.br>) sits next to C<style.css> and the client
+accepts that encoding, the sibling's bytes are served under the original's
+identity - its C<Content-Type>, its URL, a C<Content-Encoding> and an
+encoding-tagged C<ETag> of its own. Nothing is compressed per request: the
+win is a build step's, paid once, so this needs no zlib and costs one
+C<stat>. A sibling older than its source is ignored rather than served
+stale, and C<Vary: Accept-Encoding> is on every response from the mount
+whether or not one was used.
 
 =head2 markdown
 

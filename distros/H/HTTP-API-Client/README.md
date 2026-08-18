@@ -1,63 +1,42 @@
 # Project Name - HTTP-API-Client #
 
-API Client
+A lightweight `LWP::UserAgent` wrapper for authenticated JSON/form REST
+APIs: an event/callback system for computing signed-request headers from
+the request's own data at build time, retry-with-backoff, and
+`xTRUE`/`xCSV`-style data type markers for the values a plain Perl scalar
+can't represent unambiguously. See `lib/HTTP/API/Client.pm`'s POD for the
+full API and a worked signing example.
 
 # SETUP #
 --------------------------------------------------------------
-## Setup your system with Docker and Vagrant ##
+## Prerequisites ##
 
-### Install Docker ###
+Either a system Perl with the `cpanfile` dependencies installed, or Docker.
 
-p.s. If you already have docker, skip to next.
+## Running the tests ##
 
- >> sudo wget -q0- https://get.docker.com|sh
- >> sudo adduser $USER docker
- >> echo "export VAGRANT_DEFAULT_PROVIDER=docker" >> $HOME/.bashrc;
- >> export VAGRANT_DEFAULT_PROVIDER=docker
- >> sudo reboot
- 
-### Install Vagrant ###
+Locally (needs a system Perl with the cpanfile deps installed):
 
-p.s. If you already have vagrant, or use docker composer then skip to next.
+ >> cd src
+ >> cpanm --installdeps .
+ >> PERL5LIB=lib prove -r t
 
-Download the latest version from https://www.vagrantup.com/downloads.html
+In Docker (matches CI - the root Dockerfile runs the same suite):
 
- >> sudo apt-get gdebi -y
- >> wget https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.2_x86_64.deb -cO vagrant.deb
- >> sudo gdebi vagrant.deb --no
+ >> docker build -t http-api-client .
+ >> docker run --rm http-api-client
 
-### Add ./bin and ./tools to PATH ###
+-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-===-=
 
-p.s. If you have already done that, skip this one. do not over done.
+## Coverage ##
 
- >> echo "export PATH=bin:tools:$PATH" >> ~/.bashrc
+ >> cpanm --installdeps --with-develop .
+ >> PERL5LIB="lib:$PERL5LIB" PERL5OPT=-MDevel::Cover prove -r t
+ >> PERL5LIB="lib:$PERL5LIB" cover
 
-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-===-=
+Threshold: **75% statement coverage** on `lib/`, tracked per-module. Current baseline (2026-08-18): `HTTP/API/Client.pm` 98.5% statement / 91.8% branch / 72.7% condition, `HTTP/API/DataTypeMarker.pm` 100%. Branch/condition coverage is measured and reported but not gated yet - most of the remaining gap is branches that are structurally always-true (e.g. `pre_defined_data` is never falsy, so its `if` guard has no untaken side) rather than genuinely missing scenarios.
 
-## Runing and Testing ##
-
-### Add dependancies and install locally ###
-
- >> echo 'requires "IO::File";' >> cpanfile
- >> carton install
-
-### Run your code ###
-
- >> carton exec prove -lr t
-
-### Get inside the container as normal user ###
-
- >> container inside
-
-### Get inside the container as root ###
-
- >> container inside-root
-
-## Finally, you coding structure is ready. Take care ##
-
-ps. get a list of command of container commands
-
- >> container help
+`cover_db/` is a generated artifact - never commit it.
 
 -=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-===-=
 
@@ -67,4 +46,4 @@ ps. get a list of command of container commands
 
 # License #
 
-None
+MIT

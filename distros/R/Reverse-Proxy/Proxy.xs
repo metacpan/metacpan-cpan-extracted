@@ -382,19 +382,56 @@ static SV *rp_resolve(pTHX_ SV *self_sv, HV *self, HV *env, SV **path_out) {
     return NULL;
 }
 
+/* Append the request target - path, then ?query - to an outbound request.
+ *
+ * PATH_INFO reaches a PSGI app percent-DECODED, so what the client wrote as
+ * %XX is a real byte by the time it gets here. Splicing that into a request
+ * line verbatim means "%0d%0a" in the client's URL ends the line and starts a
+ * second request on the upstream connection: request smuggling, straight past
+ * anything the proxy itself enforces. A decoded '?' or '#' truncates the
+ * target the same way, and a decoded space breaks the line into three.
+ *
+ * So re-encode rather than reject: a path that decoded to a space still
+ * reaches the upstream as the path the client asked for, and one that decoded
+ * to a CRLF reaches it as %0D%0A, which is one path segment and not two
+ * requests. '%' is re-encoded because a literal one here can only have come
+ * from %25. QUERY_STRING is handed over undecoded, so it needs the control
+ * guard but must otherwise stay byte for byte. */
+static void rp_cat_target(pTHX_ SV *out, SV *path, HV *env) {
+    static const char hex[] = "0123456789ABCDEF";
+    STRLEN pl, ql, i;
+    const char *pp = SvPV_const(path, pl), *qp;
+    char e[3];
+    e[0] = '%';
+    if (!pl || pp[0] != '/') sv_catpvs(out, "/");
+    for (i = 0; i < pl; i++) {
+        const unsigned char c = (unsigned char)pp[i];
+        if (c <= 0x20 || c >= 0x7f || c == '%' || c == '#' || c == '?') {
+            e[1] = hex[c >> 4]; e[2] = hex[c & 0x0f];
+            sv_catpvn(out, e, 3);
+        }
+        else sv_catpvn(out, (const char *)&c, 1);
+    }
+    qp = rp_env(aTHX_ env, "QUERY_STRING", 12, &ql);
+    if (!qp) return;
+    sv_catpvs(out, "?");
+    for (i = 0; i < ql; i++) {
+        const unsigned char c = (unsigned char)qp[i];
+        if (c <= 0x20 || c >= 0x7f || c == '#') {
+            e[1] = hex[c >> 4]; e[2] = hex[c & 0x0f];
+            sv_catpvn(out, e, 3);
+        }
+        else sv_catpvn(out, (const char *)&c, 1);
+    }
+}
+
 /* base + path + ?query -> mortal URL SV */
 static SV *rp_target_url(pTHX_ SV *base, SV *path, HV *env) {
     STRLEN bl; const char *bp = SvPV_const(base, bl);
-    STRLEN pl; const char *pp;
-    STRLEN ql; const char *qp;
     SV *url;
     while (bl > 0 && bp[bl - 1] == '/') bl--;         /* trim trailing '/' */
     url = newSVpvn(bp, bl);
-    pp = SvPV_const(path, pl);
-    if (!pl || pp[0] != '/') sv_catpvs(url, "/");
-    sv_catpvn(url, pp, pl);
-    qp = rp_env(aTHX_ env, "QUERY_STRING", 12, &ql);
-    if (qp) { sv_catpvs(url, "?"); sv_catpvn(url, qp, ql); }
+    rp_cat_target(aTHX_ url, path, env);
     return sv_2mortal(url);
 }
 
@@ -655,18 +692,21 @@ static SV *rp_raw_request(pTHX_ HV *env, SV *path, const char *host, int port,
                           int preserve, SV *via) {
     SV *req = newSVpvs("");
     SV **mp = hv_fetchs(env, "REQUEST_METHOD", 0);
-    STRLEN ml, pl, ql; const char *pp, *qp; HE *he;
+    STRLEN ml; HE *he;
     char pb[16];
     if (mp && *mp && SvOK(*mp)) { const char *m = SvPV_const(*mp, ml); sv_catpvn(req, m, ml); }
     else sv_catpvs(req, "GET");
     sv_catpvs(req, " ");
-    pp = SvPV_const(path, pl); sv_catpvn(req, pp, pl);
-    qp = rp_env(aTHX_ env, "QUERY_STRING", 12, &ql);
-    if (qp) { sv_catpvs(req, "?"); sv_catpvn(req, qp, ql); }
+    rp_cat_target(aTHX_ req, path, env);             /* encoded: see the note */
     sv_catpvs(req, " HTTP/1.1\r\nHost: ");
     {
         STRLEN hl; const char *hh = preserve ? rp_env(aTHX_ env, "HTTP_HOST", 9, &hl) : NULL;
-        if (hh) sv_catpvn(req, hh, hl);
+        /* the client's own Host, reflected into a request line we serialize:
+         * stop at the first control byte so a bare LF cannot smuggle either */
+        if (hh) { STRLEN i = 0;
+                  while (i < hl && (unsigned char)hh[i] > ' '
+                         && (unsigned char)hh[i] != 0x7f) i++;
+                  sv_catpvn(req, hh, i); }
         else {
             sv_catpv(req, host);
             if (port != 80 && port != 443)

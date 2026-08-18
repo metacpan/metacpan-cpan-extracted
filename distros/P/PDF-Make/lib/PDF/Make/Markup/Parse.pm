@@ -2,7 +2,7 @@ package PDF::Make::Markup::Parse;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # No logic lives here. The grammar, the entity table, the UTF-8 validation and
 # every line and column are in src/pdfmake_markup.c, reached through

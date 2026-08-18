@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use PDF::Make ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # Thin wrappers around the PDF::Make XS codec functions defined in xs/filter.xs.
 # These let Perl tests exercise the ASCII85, ASCIIHex, Flate, Raw DEFLATE, LZW,

@@ -1,0 +1,82 @@
+======================================================================
+ TUI::Handy Cheat Sheet                                  [UZ] O'zbekcha
+======================================================================
+
+[ 1. O'rnatish va yuklash ]
+
+  CPAN bog'liqligi yo'q; Handy.pm faylini @INC ichidagi istalgan katalogga nusxalang yoki uni to'g'ridan-to'g'ri skript sifatida ishga tushiring.
+
+  use TUI::Handy;
+  # or, as a command:  perl Handy.pm form.txt
+
+[ 2. Shakl yaratish va ishga tushirish ]
+
+  Shaklni DSL satridan yoki fayldan yarating, so'ng run() ni chaqiring; natija DSL'dagi yorliqlar kalit bo'lgan hash havolasidir.
+
+  my $tui  = TUI::Handy->new(dsl => $text);   # or new(file => $path)
+  my $form = $tui->run;
+  print "Company = $form->{Company}\n";
+
+[ 3. Matn maydoni belgilari ]
+
+  [ ] ichidagi to'ldiruvchi belgilar matn maydoni turini tanlaydi: _ yarim kenglik, # raqam, $ yoki \ valyuta, YYYYMMDD yoki % sana, to'liq kenglikdagi har qanday belgi zenkaku turi uchun.
+
+  Company: [__________]
+  Age:     [###]
+  Price:   [$$$$$$]
+  Date:    [YYYYMMDD]
+
+[ 4. Belgilash katakchasi va radio tugma ]
+
+  [X]/[ ] belgilash katakchasi (qiymati 1 yoki 0); (*)/( ) oldingi sarlavha qatoriga ko'ra guruhlangan radio tugmalar bo'lib, qiymati tanlangan yorliq matnidir.
+
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+
+[ 5. Tugma ]
+
+  Oldida yorliq matni bo'lmagan kvadrat qavslar tugmadir; harakatini set() bilan ro'yxatdan o'tkazing.
+
+  $tui->set('Register', sub { my $form = shift; save($form); 0 });
+  [Register]
+
+[ 6. Klaviatura tugmalari ]
+
+  TAB/pastga strelka keyingi maydonga, Shift-TAB/yuqoriga strelka oldingi maydonga o'tadi. Enter, bo'sh joy va strelka tugmalari maydonni tahrirlaydi yoki tugmani faollashtiradi; ESC shaklni bekor qiladi.
+
+[ 7. Belgilar kodlashi ]
+
+  Windowsdan tashqarida UTF-8, Windows'da Shift_JIS (CP932) avtomatik aniqlanadi; EUC-JP ham qo'llab-quvvatlanadi. TUI_HANDY_ENCODING bilan almashtirish mumkin.
+
+  $ENV{TUI_HANDY_ENCODING} = 'euc';   # utf8 / sjis / euc
+
+[ 8. Qator rejimidagi zaxira ]
+
+  stty mavjud bo'lmaganda (sof Windows cmd.exe), portativ qator rejimi drayveri avtomatik ishlatiladi; TUI_HANDY_MODE bilan rejimni majburlang.
+
+  $ENV{TUI_HANDY_MODE} = 'line';      # ansi / line
+
+[ 9. Buyruq qatoridan foydalanish ]
+
+  Perl kodi yozmasdan DSL faylini to'g'ridan-to'g'ri ishga tushirish mumkin.
+
+  perl Handy.pm form.txt
+
+[ 10. To'liq misol ]
+
+  Barcha vidjet turlarini birlashtirgan qisqa DSL namunasi.
+
+  Registration
+  Company: [__________]
+  Age:     [###]
+  [X] Agree to terms
+  Plan
+  (*) Basic
+  ( ) Premium
+  [Register]
+
+[ 11. Manbalar ]
+
+  To'liq hujjatlar lib/TUI/Handy.pm faylining POD qismida (perldoc TUI::Handy). Muallif: INABA Hitoshi <ina.cpan@gmail.com>. Litsenziya: Perlning o'zi bilan bir xil shartlar.

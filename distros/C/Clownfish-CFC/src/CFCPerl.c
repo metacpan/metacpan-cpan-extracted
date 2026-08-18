@@ -439,7 +439,7 @@ S_write_host_c(CFCPerl *self, CFCParcel *parcel) {
         "%s"
         "\n"
         "void\n"
-        "%sbootstrap_perl() {\n"
+        "%sbootstrap_perl(void) {\n"
         "    dTHX;\n"
         "    %sbootstrap_parcel();\n"
         "\n"

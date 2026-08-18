@@ -2116,8 +2116,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
  $c = $r->czip($i); # method call
  $r->czip($i, $c);
 
-convert real, imaginary to native complex, (sort of) like LISP zip
-function. Will add the C<r> ndarray to "i" times the C<i> ndarray. Only
+=for ref
+
+Convert real, imaginary to native complex, (sort of) like the LISP zip function.
+
+Will add the C<r> ndarray to "i" times the C<i> ndarray. Only
 takes real ndarrays as input.
 
 =pod
@@ -2185,7 +2188,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 475 "lib/PDL/Ops.pd"
+#line 478 "lib/PDL/Ops.pd"
 
 =head2 abs
 
@@ -2196,7 +2199,7 @@ Returns the absolute value of a number.
 =cut
 
 sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
-#line 2200 "lib/PDL/Ops.pm"
+#line 2203 "lib/PDL/Ops.pm"
 
 
 =head2 abs2
@@ -2334,7 +2337,7 @@ sub PDL::i2C ($) {
 
 
 
-#line 532 "lib/PDL/Ops.pd"
+#line 535 "lib/PDL/Ops.pd"
 
 # This is to used warn if an operand is non-numeric or non-PDL.
 sub warn_non_numeric_op_wrapper {
@@ -2389,7 +2392,7 @@ and Craig DeForest (deforest@boulder.swri.edu).
 
 =cut
 
-#line 577 "lib/PDL/Ops.pd"
+#line 580 "lib/PDL/Ops.pd"
 our %got_complex = (
   atan2 => 0,
   cos => 1,
@@ -2400,7 +2403,7 @@ our %got_complex = (
   sin => 1,
   sqrt => 1,
 );
-#line 2404 "lib/PDL/Ops.pm"
+#line 2407 "lib/PDL/Ops.pm"
 
 # Exit with OK status
 

@@ -229,8 +229,8 @@ sub blast_out_content {
   </div><!--bodytext-->
     <p style="font-size: smaller; color: #666">
       <em>
-        Powered by <a href="http://lucy.apache.org/"
-        >Apache Lucy<small><sup>TM</sup></small></a>
+        Powered by <a href="https://github.com/lucysearch/lucy"
+        >Lucy</a>
       </em>
     </p>
   </div><!--bodytext-->

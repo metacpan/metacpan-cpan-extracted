@@ -29,7 +29,7 @@ Lucy::Docs::IRTheory - Crash course in information retrieval
 
 =head1 DESCRIPTION
 
-Just enough Information Retrieval theory to find your way around Apache Lucy.
+Just enough Information Retrieval theory to find your way around Lucy.
 
 =head2 Terminology
 

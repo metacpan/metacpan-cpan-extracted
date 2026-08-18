@@ -12,6 +12,7 @@ lib/Net/OAuth/Request.pm
 lib/Net/OAuth/RequestTokenRequest.pm
 lib/Net/OAuth/RequestTokenResponse.pm
 lib/Net/OAuth/Response.pm
+lib/Net/OAuth/SignatureMethod.pm
 lib/Net/OAuth/SignatureMethod/HMAC_SHA1.pm
 lib/Net/OAuth/SignatureMethod/HMAC_SHA256.pm
 lib/Net/OAuth/SignatureMethod/PLAINTEXT.pm
@@ -42,6 +43,7 @@ t/10-misc.t
 t/11-spec-1.0a.t
 t/12-xauth.t
 t/13-hmac-sha256.t
+t/14-allowed-signature-methods.t
 t/15-client-v1a-downgrade.t
 t/rsakey
 t/rsakey.pub

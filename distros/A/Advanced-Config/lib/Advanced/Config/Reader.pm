@@ -70,7 +70,7 @@ use Fred::Fish::DBUG 2.09 qw / on_if_set  ADVANCED_CONFIG_FISH /;
 
 use File::Basename;
 
-$VERSION = "1.14";
+$VERSION = "1.15";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( read_config  source_file  make_new_section  parse_line
@@ -403,6 +403,10 @@ of I<$curr_file>, not the program's current directory!
 
 If a source callback was set up, it will call it here.
 
+If I<set_config_rules ()> was called against this config object, it looks in
+that config file for how to parse the sourced file instead of using the callback
+code.
+
 This method will also handle the removal of decryption related options if new
 ones weren't provided by the callback function.  See Advanced::Config::Options
 for more details.
@@ -420,13 +424,24 @@ sub source_file
    my $new_file       = shift;  # May contain variables to expand ...
    my $old_file       = shift;  # File we're currently parsing. (has abs path)
 
-   my $rOpts = $cfg->get_cfg_settings ();   # The Read Options ...
+   my $ruleObj = $cfg->_get_rule_object ();  # Is there a rule config file?
 
    local $global_sections{OVERRIDE} = $defaultSection  if ( $defaultSection );
 
    my $pcfg = $cfg->get_section ();  # Back to the main/default section ...
 
    my $file = $new_file = expand_variables ($pcfg, $new_file, undef, undef, 1);
+
+   my ( $rOpts, $sdOpts );
+   if ( $ruleObj )  {
+      # Get the Read & Date options from the correct section in rule config file
+      my $ruleSect = $ruleObj->_get_rule_section ($new_file);
+      ( $rOpts, $sdOpts ) = ( $ruleSect->_get_rules_from_cfg () )[0,2];
+
+   } else {
+      # The Current Read Options ...
+      $rOpts = $cfg->get_cfg_settings ();
+   }
 
    # Get the full name of the file we're sourcing in ...
    $file = $pcfg->_fix_path ( $file, dirname ( $old_file ) );
@@ -447,20 +462,26 @@ sub source_file
       }
    }
 
-   # The returned callback option(s) will be applied to the current
-   # settings, not the default settings if not a compete set!
-   my ($r_opts, $d_opts);
-   if ( exists $rOpts->{source_cb} && ref ( $rOpts->{source_cb} ) eq "CODE" ) {
-      ($r_opts, $d_opts) = $rOpts->{source_cb}->( $file, $rOpts->{source_cb_opts} );
-   }
+   my $res;
+   if ( $ruleObj )  {
+      $res = $pcfg->_load_config_with_new_date_opts ( $file, $rOpts, $sdOpts );
 
-   if ( $rOpts->{inherit_pass_phase} && $rOpts->{pass_phrase} ) {
-      my %empty;
-      $r_opts = \%empty  unless ( defined $r_opts );
-      $r_opts->{pass_phrase} = $rOpts->{pass_phrase}  unless ( $r_opts->{pass_phrase} );
-   }
+   } else {
+      # The returned callback option(s) will be applied to the current
+      # settings, not the default settings if not a compete set!
+      my ($r_opts, $d_opts);
+      if ( exists $rOpts->{source_cb} && ref ( $rOpts->{source_cb} ) eq "CODE" ) {
+         ($r_opts, $d_opts) = $rOpts->{source_cb}->( $file, $rOpts->{source_cb_opts} );
+      }
 
-   my $res = $pcfg->_load_config_with_new_date_opts ( $file, $r_opts, $d_opts );
+      if ( $rOpts->{inherit_pass_phase} && $rOpts->{pass_phrase} ) {
+         my %empty;
+         $r_opts = \%empty  unless ( defined $r_opts );
+         $r_opts->{pass_phrase} = $rOpts->{pass_phrase}  unless ( $r_opts->{pass_phrase} );
+      }
+
+      $res = $pcfg->_load_config_with_new_date_opts ( $file, $r_opts, $d_opts );
+   }
 
    DBUG_RETURN ( (defined $res) ? 1 : 0 );
 }

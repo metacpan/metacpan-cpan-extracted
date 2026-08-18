@@ -75,6 +75,7 @@ include/punk/punk_multipart.h
 include/punk/punk_names.h
 include/punk/punk_oamount.h
 include/punk/punk_password.h
+include/punk/punk_proxy.h
 include/punk/punk_ratelimit.h
 include/punk/punk_request.h
 include/punk/punk_response.h
@@ -210,10 +211,19 @@ t/51-headers.t
 t/52-respond-to.t
 t/53-password.t
 t/54-auth.t
+t/55-auth-tokens.t
 t/57-cli.t
 t/58-generate-into.t
 t/59-sendfile-parse.t
 t/60-sendfile.t
+t/61-proxy-parse.t
+t/62-proxy.t
+t/63-proxy-ratelimit.t
+t/64-static-precompressed.t
+t/65-compress-optout.t
+t/66-max-body.t
+t/67-route-spec.t
+t/lib/Kinds/Controller/Thing.pm
 t/lib/Punk/Command/Fakecmd.pm
 t/lib/PunkTest.pm
 t/lib/PunkWSRef.pm
