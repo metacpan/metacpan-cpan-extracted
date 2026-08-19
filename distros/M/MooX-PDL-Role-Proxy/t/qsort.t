@@ -61,11 +61,8 @@ Test->test(
 
 
 my $obj = My::Class::Single()->new();
-like(
-    dies { $obj->qsort },
-    qr/can't locate object method.*qsorti/i,
-    "class doesn't handle qsorti"
-);
+like( dies { $obj->qsort }, qr/can't locate object method.*qsorti/i,
+    "class doesn't handle qsorti" );
 
 
 done_testing;

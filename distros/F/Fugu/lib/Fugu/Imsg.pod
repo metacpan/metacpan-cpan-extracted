@@ -1,0 +1,107 @@
+=head1 NAME
+
+Fugu::Imsg - imsg messages over a connected stream socket
+
+=head1 SYNOPSIS
+
+    use Fugu::Imsg;
+
+    my $imsg = Fugu::Imsg->new(fh => $socket);
+
+    $imsg->send(type => 8, data => $payload)
+        or warn "send failed: $!";
+
+    my $msg = $imsg->recv(timeout => 10)
+        or warn "no reply";
+    say $msg->{type};
+
+    $imsg->close;
+
+=head1 DESCRIPTION
+
+B<Fugu::Imsg> sends and receives messages of the base-system
+imsg_init(3) facility over a stream socket that is already connected.
+
+The module owns the socket: the write loop, the C<SIGPIPE> guard, the
+poll, and the read loop. It owns no part of the frame.
+L<Protocol::Imsg> frames and unframes the bytes, and this module
+holds one such codec. The module never opens or names a socket, and
+it never logs. Callers decide what a failure means.
+
+This page does not repeat the wire format: the field layout, the
+length semantics, the size bounds, and the message boundary rules.
+L<Protocol::Imsg> documents the codec and its three limits, and the
+protocol reference F<spec/MDNS-Imsg.md> in this repository gives the
+full specification. That document is a curated reference, not an
+installed manual.
+
+=head2 MAX_PAYLOAD
+
+C<MAX_PAYLOAD> is the largest payload one message can carry, in
+bytes. The module re-exports the value of the codec. A caller that
+splits a long reply into messages reads it here.
+
+=head2 new
+
+C<new(fh =E<gt> $fh)> creates a transport over the connected socket
+C<$fh>. The handle is necessary. A call without the handle is a
+programming error, and C<new> dies.
+
+=head2 send
+
+C<send(type =E<gt> $type, data =E<gt> $bytes, peerid =E<gt> $n)>
+frames and writes one message. C<data> defaults to the empty string.
+C<peerid> defaults to 0.
+
+The module treats C<peerid> as opaque. A request and response
+protocol puts its correlation value there and reads it back from
+C<recv>. The method returns 1 on success. On failure, the method
+returns C<undef> and sets C<$!>. This occurs when the connection
+failed earlier (C<EPIPE>), when the payload is larger than
+C<MAX_PAYLOAD> (C<EMSGSIZE>), or when a write error occurs. The
+method tests the connection first, so a dead connection always
+reports C<EPIPE>: the two failures have different causes, and a
+caller shows this C<$!> to the operator. If the peer closed the
+socket, the method reports C<EPIPE>. The module suppresses C<SIGPIPE>
+during the write. The method refuses a payload that is too large, and
+it never truncates the payload.
+
+=head2 recv
+
+C<recv(timeout =E<gt> $seconds)> returns one whole message as a hash
+reference with C<type>, C<peerid>, C<pid> and C<data> keys. Short
+reads accumulate across calls. If several messages arrive in one
+read, the method returns them one for each call. The method returns
+C<undef> on a timeout, on a clean end-of-file, or on an unrecoverable
+framing error (C<EBADMSG>). After a framing error, the connection is
+dead, and every later call returns C<undef>. Without a C<timeout> the
+call blocks until a message or an end-of-file arrives.
+
+=head2 close
+
+C<close> closes the socket and marks the connection dead. The method
+is idempotent and returns 1. A caller that owns the socket closes it
+here, and never by reaching into the object. The method also empties
+the decode buffer. Thus a message that arrived before the close never
+comes out after it.
+
+=head2 is_dead
+
+C<is_dead> reports if the connection can no longer carry a message. A
+C<close>, an end-of-file, a write error, or a framing error all lead
+here.
+
+=head1 SEE ALSO
+
+imsg_init(3), L<Fugu::Mdnsd>
+
+L<Protocol::Imsg> documents the frame. It is a sidecar F<.pod> beside
+the module and not a manual page, so no cross-reference here resolves
+to it. The protocol reference F<spec/MDNS-Imsg.md> in this repository
+gives the wire format.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

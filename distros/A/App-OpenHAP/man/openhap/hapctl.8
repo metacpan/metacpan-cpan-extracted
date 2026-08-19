@@ -1,0 +1,234 @@
+.\" $OpenBSD$
+.\"
+.\" Copyright (c) 2025 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: August 2 2026 $
+.Dt HAPCTL 8
+.Os
+.Sh NAME
+.Nm hapctl
+.Nd control utility for openhapd
+.Sh SYNOPSIS
+.Nm hapctl
+.Op Fl c Ar file
+.Op Fl s Ar socket
+.Ar command
+.Sh DESCRIPTION
+.Nm
+is the control utility of the
+.Xr openhapd 8
+daemon.
+It checks the configuration file, it reports what the running daemon
+is doing, and it lists the devices.
+.Pp
+.Cm status
+and
+.Cm devices
+ask the daemon over its control socket.
+The daemon answers from what it holds in memory.
+A file on disk holds what the daemon wrote at some earlier time, and
+the two disagree whenever the answer matters.
+.Pp
+With no control socket,
+.Nm
+falls back to the PID file and to the configuration file, and it says
+which of the two answered.
+An operator thus always knows whether the report is live.
+.Pp
+The options are:
+.Bl -tag -width Ds
+.It Fl c Ar file
+Read the configuration from
+.Ar file .
+The default is
+.Pa /etc/openhapd.conf .
+.It Fl s Ar socket
+Reach the daemon at
+.Ar socket .
+The default is
+.Pa /var/run/openhapd/control.sock .
+Use this when the
+.Ic control
+directive of
+.Xr openhapd.conf 5
+names another path.
+.El
+.Pp
+These commands are available:
+.Bl -tag -width "devicesXX"
+.It Cm check
+Parse
+.Xr openhapd.conf 5
+and report what it holds.
+The command needs no daemon.
+It reports the line of the first error, and it exits 3 when the file
+does not parse.
+.Pp
+An absent configuration file is not an error.
+A fresh install has none, and the daemon then runs on its defaults.
+.It Cm status
+Report on the daemon: its name, its HAP port, its uptime, its
+pairing state and controller count, its configuration number, the
+number of loaded devices, the number of open connections, and the
+state of mDNS and MQTT.
+.Pp
+With no control socket, the command reports only whether a process
+is alive, from
+.Pa /var/run/openhapd.pid ,
+and it names that file in its output.
+.It Cm devices
+List the devices.
+With a control socket, the command lists the accessories that the
+daemon really loaded, with the HomeKit accessory ID of each.
+Without one, it lists the device blocks of the configuration file,
+which is what the daemon would load at its next start.
+.It Cm help
+Show the usage message.
+Each command also takes
+.Fl h .
+.El
+.Sh FILES
+.Bl -tag -width "/var/run/openhapd/control.sockXX" -compact
+.It Pa /etc/openhapd.conf
+The default configuration file.
+.It Pa /var/run/openhapd/control.sock
+The control socket of the running daemon, mode 0600 in a directory of
+mode 0700.
+.It Pa /var/run/openhapd.pid
+The process ID of the daemon, read only when the control socket is
+not there.
+.El
+.Pp
+.Nm
+opens no other file.
+It does not read
+.Pa /var/db/openhapd ,
+and it creates nothing.
+.Sh EXIT STATUS
+.Ex -std
+The commands exit 0 on success.
+.Pp
+.Cm check
+and
+.Cm devices
+exit 3 when the configuration file does not parse.
+Both read the same file through the same grammar.
+.Pp
+An unknown command and a bad option exit 2.
+.Pp
+.Cm status
+always exits 0.
+A stopped daemon is an answer, not a failure of the tool.
+.Sh EXAMPLES
+Check the configuration file:
+.Bd -literal -offset indent
+$ hapctl check
+Configuration file /etc/openhapd.conf is valid
+  Configured devices: 3
+.Ed
+.Pp
+Ask the running daemon what it is doing:
+.Bd -literal -offset indent
+$ hapctl status
+openhapd is running (Home Bridge)
+  HAP port:          51827
+  Uptime:            3d 4h 12m
+  Pairing status:    paired (2 controllers)
+  Configuration num: 7
+  Devices:           3
+  Connections:       1
+  mDNS:              published
+  MQTT:              connected
+.Ed
+.Pp
+The same command with the daemon stopped:
+.Bd -literal -offset indent
+$ hapctl status
+openhapd is not running
+  (read from /var/run/openhapd.pid: no control socket)
+.Ed
+.Pp
+List the devices:
+.Bd -literal -offset indent
+$ hapctl devices
+Loaded devices: 2
+
+  Bedroom Thermostat
+    AID:   2
+    Class: App::OpenHAP::Tasmota::Thermostat
+    Topic: tasmota_AABBCC
+    ID:    bedroom
+.Ed
+.Pp
+Use a different configuration file:
+.Bd -literal -offset indent
+$ hapctl -c /etc/openhapd.test.conf check
+.Ed
+.Sh DIAGNOSTICS
+.Nm
+writes configuration errors to
+.Em stderr .
+A line that the grammar does not accept names the file, the line
+number, and the reason:
+.Bd -literal -offset indent
+Configuration error: /etc/openhapd.conf:14: cannot parse: hap_prt 51827
+.Ed
+.Pp
+.Cm status
+names the reason it could not reach the daemon.
+An absent socket and a refused connection are different problems:
+.Bd -literal -offset indent
+  (read from /var/run/openhapd.pid: no control socket)
+  (read from /var/run/openhapd.pid: Cannot reach \
+/var/run/openhapd/control.sock: Permission denied)
+.Ed
+.Pp
+The first is a stopped daemon, or one with
+.Ic control off
+in its configuration.
+The second is a running daemon that the caller may not reach.
+A caller who is neither root nor
+.Dq _openhap
+cannot search the directory of the socket, and thus cannot even see
+that the socket is there.
+.Sh SEE ALSO
+.Xr openhapd.conf 5 ,
+.Xr openhapd 8 ,
+.Xr rc 8
+.Sh HISTORY
+The
+.Nm
+utility was first available with
+.Xr openhapd 8
+in 2025.
+The control socket was added in 2026.
+Before that,
+.Cm status
+guessed the pairing state from the files under
+.Pa /var/db/openhapd .
+.Sh AUTHORS
+.An Dick Olsson Aq Mt hi@senzilla.io
+.Sh CAVEATS
+The control socket is mode 0600 in a directory of mode 0700, both
+owned by the
+.Dq _openhap
+user.
+A user who is neither root nor
+.Dq _openhap
+cannot reach it, and
+.Cm status
+then reports from the PID file only.
+That is the intended boundary: the reply names the devices and the
+controller count of the home.

@@ -110,6 +110,17 @@ DESCRIPTION
 
     The detailed error message is available by calling Mail::DWIM::error().
 
+  Dry Run
+    Set the "dryrun" option to a true value to print a summary of the
+    message without opening a mail transport or sending anything:
+
+        mail(
+          dryrun  => 1,
+          to      => 'foo@bar.com',
+          subject => 'test message',
+          text    => 'test message text',
+        );
+
   Attaching files
     If you want to include an image, a PDF files or some other attachment in
     an email, use the "attach" parameter
@@ -165,15 +176,15 @@ DESCRIPTION
         CTRL-D
 
 LEGALESE
-    Copyright 2007 by Mike Schilli, all rights reserved. This program is
-    free software, you can redistribute it and/or modify it under the same
-    terms as Perl itself.
+    Copyright 2007-2026 by Mike Schilli, all rights reserved. This program
+    is free software, you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 
 AUTHOR
         2007, Mike Schilli <cpan@perlmeister.com>
 
 LICENSE
-    Copyright 2007-2014 by Mike Schilli, all rights reserved. This program
+    Copyright 2007-2026 by Mike Schilli, all rights reserved. This program
     is free software, you can redistribute it and/or modify it under the
     same terms as Perl itself.
 

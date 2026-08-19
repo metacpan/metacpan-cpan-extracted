@@ -15,7 +15,7 @@ requires qw(
 );
 
 sub test {
-    my $class = shift;
+    my $class   = shift;
     my $context = context();
     my ( $label, $sub, %expected ) = @_;
 
@@ -38,8 +38,7 @@ sub test_inplace_flat_obj {
     for my $p ( 'p1', 'p2' ) {
 
         subtest $p => sub {
-            ref_is( $orig->$p->get_dataref,
-                $new->$p->get_dataref, "refaddr orig.$p == new.$p" );
+            ref_is( $orig->$p->get_dataref, $new->$p->get_dataref, "refaddr orig.$p == new.$p" );
 
             pdl_is( $orig->$p, $expected->$p, "orig.$p: contents" );
         };
@@ -59,10 +58,8 @@ sub test_not_inplace_flat_obj {
     for my $p ( 'p1', 'p2' ) {
 
         subtest $p => sub {
-            is( refaddr( $orig->$p->get_dataref ),
-                $data{$p}->refaddr, "no change in orig.$p refaddr" );
-            isnt( refaddr( $new->$p->get_dataref ),
-                $data{$p}->refaddr, "new.$p: different refaddr" );
+            is( refaddr( $orig->$p->get_dataref ), $data{$p}->refaddr, "no change in orig.$p refaddr" );
+            isnt( refaddr( $new->$p->get_dataref ), $data{$p}->refaddr, "new.$p: different refaddr" );
 
             pdl_is( $orig->$p, $data{$p}->copy, "orig.$p: same contents" );
             pdl_is( $new->$p,  $expected->$p,   "new.$p: expected contents" );

@@ -1,0 +1,2 @@
+[hooks]
+pretxncommit.tidy = dev/pre-commit.sh $(hg log --template '{separate(" ",file_adds,file_mods)}' --rev $HG_NODE)

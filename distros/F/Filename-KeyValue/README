@@ -2,7 +2,7 @@ NAME
     Filename::KeyValue - Parse filename using the KeyValue naming scheme
 
 VERSION
-    This document describes version 0.003 of Filename::KeyValue (from Perl
+    This document describes version 0.004 of Filename::KeyValue (from Perl
     distribution Filename-KeyValue), released on 2026-05-28.
 
 SYNOPSIS
@@ -32,7 +32,7 @@ FUNCTIONS
 
         Result:
 
-         [200, "OK", "foo-bar-kw1=val1-kw2=val2.jpg", {}]
+         [200, "OK", "foo-bar--kw1=val1-kw2=val2.jpg", {}]
 
     This routine will:
 
@@ -94,7 +94,7 @@ FUNCTIONS
 
         Result:
 
-         [200, "OK", "foo-bar-kw1=val1-kw2=val2.jpg", {}]
+         [200, "OK", "foo-bar--kw1=val1-kw2=val2.jpg", {}]
 
     This routine will:
 
@@ -137,6 +137,19 @@ FUNCTIONS
 
     Examples:
 
+    *   No key=value pairs:
+
+         parse_keyvalue_filename(filename => "foo.jpg");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           { ext => "jpg", kv => {}, kv_raw => "", prefix => "foo" },
+           {},
+         ]
+
     *   A single key=value pair:
 
          parse_keyvalue_filename(filename => "foo-bar-kw1=val1.jpg");
@@ -150,7 +163,7 @@ FUNCTIONS
              ext => "jpg",
              kv => { kw1 => ["val1"] },
              kv_raw => "kw1=val1",
-             prefix => "foo-bar",
+             prefix => "foo-bar-",
            },
            {},
          ]
@@ -168,7 +181,7 @@ FUNCTIONS
              ext => "jpg",
              kv => { kw1 => ["val1"], kw2 => ["val2"] },
              kv_raw => "kw1=val1-kw2=val2",
-             prefix => "foo-bar",
+             prefix => "foo-bar-",
            },
            {},
          ]
@@ -186,7 +199,7 @@ FUNCTIONS
              ext => "jpg",
              kv => { kw1 => ["val1", "val1b"] },
              kv_raw => "kw1=val1,val1b",
-             prefix => "foo-bar",
+             prefix => "foo-bar-",
            },
            {},
          ]
@@ -204,7 +217,7 @@ FUNCTIONS
              ext => "jpg",
              kv => { kw1 => ["val1"], kw2 => ["val2", "val2b", "val2c"], kw3 => ["val3"] },
              kv_raw => "kw1=val1-kw2=val2,val2b,val2c-kw3=val3",
-             prefix => "foo-bar",
+             prefix => "foo-bar-",
            },
            {},
          ]
@@ -222,7 +235,7 @@ FUNCTIONS
              ext => "jpg",
              kv => { kw3 => ["val"] },
              kv_raw => "kw1=-kw2=-kw3=val",
-             prefix => "foo-bar",
+             prefix => "foo-bar-",
            },
            {},
          ]
@@ -243,7 +256,7 @@ FUNCTIONS
                kw2_also_containing_dash => ["containing-two-dashes"],
              },
              kv_raw => "kw1_containing_dash=containing%2ddash-kw2_also_containing_dash=containing%2Dtwo%2Ddashes",
-             prefix => "foo-bar",
+             prefix => "foo-bar-",
            },
            {},
          ]
@@ -261,7 +274,7 @@ FUNCTIONS
              ext => "jpg",
              kv => { kw1 => ["containing", "comma"] },
              kv_raw => "kw1=containing%2ccomma",
-             prefix => "foo-bar",
+             prefix => "foo-bar-",
            },
            {},
          ]

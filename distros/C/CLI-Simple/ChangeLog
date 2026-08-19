@@ -1,3 +1,55 @@
+Tue Aug 18 10:39:25 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.2.2]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.2.2.md: new
+	* README.md: generated
+	* VERSION: bump
+	* .includes/local.mk: updated by CPAN::Maker::Bootstrapper
+	* .gitignore
+	- extra-files.mk, local/*
+	* .includes/git.mk: likewise
+	* .includes/local.mk: likewise
+	* .includes/perl.mk: likewise
+	* .includes/update.mk: likewise
+	* .includes/version.mk: likewise
+	* builder: likewise
+	* Makefile: likewise
+	* lib/CLI/Simple.pm.in
+	- pod updates
+	(use_log4perl)
+	- $o, not $_
+	- better error message around eval { Log::Log4perl }
+	(new)
+	- check for bad value in extra_options
+	- if default points to a non-ref, that is the command
+	- send flag to custom help method
+	(init_logger)
+	- avoid undefined warning
+	(set_args): new
+	(run): dereference commands with handler if not a ref
+	* lib/CLI/Simple/Modulino.pm.in
+	- lower case to avoid err from cmb that validates values for upper case template vars
+	* lib/CLI/Simple/Utils.pm.in: export ToCamelCase
+
+Mon Aug  3 15:58:42 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.2.1]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.2.1.md: new
+	* README.md: generated
+	* VERSION: bump
+	* .includes/help.mk: updated by CPAN::Maker::Bootstrapper
+	* .includes/release-notes.mk: likewise
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* requires: likewise
+	* cpanfile: likewise
+	* lib/CLI/Simple.pm.in
+	(main): inject alias from manifest
+	* .includes/bash-completion.mk: new
+	* .includes/modulino.mk: new
+
 Mon Aug  3 11:58:23 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.2.0]:

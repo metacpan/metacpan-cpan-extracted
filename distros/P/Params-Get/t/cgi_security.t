@@ -26,7 +26,7 @@ use FindBin qw($Bin);
 use lib "$Bin/lib";
 
 use Test::Most;
-use Test::Returns;
+use Test::Needs;
 use Test::Memory::Cycle;
 use Readonly;
 use Scalar::Util qw(tainted);
@@ -80,6 +80,9 @@ Readonly::Scalar my $LARGE_PAIR_CNT => 1_000;
 # =========================================================================
 
 subtest 'command injection: pipe metacharacter passes through as literal' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	local %ENV = (%ENV,
 		QUERY_STRING   => 'cmd=' . $CMD_PIPE,
 		REQUEST_METHOD => 'GET',
@@ -474,6 +477,9 @@ subtest 'resource exhaustion: 64 KiB key name handled without error' => sub {
 };
 
 subtest 'resource exhaustion: 1000 key-value pairs normalised without error' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my @pairs = map { ("key_$_" => "val_$_") } 1 .. $LARGE_PAIR_CNT;
 
 	local %ENV = (%ENV, REQUEST_METHOD => 'GET');

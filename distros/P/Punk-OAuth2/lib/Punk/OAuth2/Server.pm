@@ -7,7 +7,7 @@ use warnings;
 use Punk::OAuth2;
 use Punk::OAuth2::Server::Store;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 1;
 
@@ -156,17 +156,25 @@ cannot be downgraded to.
 
 =item 3.
 
+Check the request against the client's B<registration>: the client must
+be registered for the C<authorization_code> grant
+(C<unauthorized_client>), and every scope in C<scope> must be one of its
+registered C<scopes> (C<invalid_scope>). Both redirect back with the
+error. See L</"WHAT A CLIENT MAY ASK FOR">.
+
+=item 4.
+
 Call C<authenticate>. A reference is returned to the browser unchanged,
 which is how you send the user to a login page. A false return
 redirects back with C<access_denied>.
 
-=item 4.
+=item 5.
 
 Call C<consent>, unless this user has already consented to this client.
 A reference renders your consent page; a false return is
 C<access_denied>; a true return is recorded so it is not asked again.
 
-=item 5.
+=item 6.
 
 Mint a 32-byte random code bound to the client, user, redirect URI,
 scope, nonce and challenge, valid for ten minutes, and redirect back
@@ -185,6 +193,11 @@ The token endpoint. Parses an C<application/x-www-form-urlencoded> body
 and authenticates the client (see L</"CLIENT AUTHENTICATION">) before
 looking at the grant; an unauthenticated client is 401
 C<invalid_client> whatever it asked for.
+
+The named grant must then be one the client is registered for, or it is
+400 C<unauthorized_client> before any arm runs - the grant type is a
+field in a body the client wrote, so it says what the client wants, not
+what it may have. See L</"WHAT A CLIENT MAY ASK FOR">.
 
 =over 4
 
@@ -215,6 +228,11 @@ C<invalid_grant>.
 =item C<client_credentials>
 
 No user, no refresh token. The access token's C<sub> is the client id.
+
+Confidential clients only: a public client is 401 C<invalid_client>
+here, because it authenticates on nothing but an identifier. The
+requested C<scope> must be registered to the client, or the request is
+C<invalid_scope>.
 
 =back
 
@@ -296,6 +314,54 @@ A client registered with no secret is public, and authenticates on its
 C<client_id> alone. That is not a weakening: a public client is one that
 cannot keep a secret, which is why the authorization code grant requires
 PKCE from everybody.
+
+It does mean a public client is only ever as authenticated as an
+identifier anyone can read out of a browser, so the
+C<client_credentials> grant - whose whole security is client
+authentication - is refused to one outright, with C<invalid_client>
+(RFC 6749 section 4.4).
+
+=head1 WHAT A CLIENT MAY ASK FOR
+
+Two things come out of the request rather than the registration: the
+C<grant_type> is a field in the token request body, and C<scope> is a
+query parameter on the authorization request. Neither is the client's
+to choose. Both are checked against the client's own row:
+
+=over 4
+
+=item *
+
+The C<grant_type> must be one of the client's registered
+C<grant_types>, or the token endpoint answers 400
+C<unauthorized_client>. C</authorize> requires C<authorization_code> the
+same way. Without this, a client registered for the authorization code
+flow alone could post C<< grant_type=client_credentials >> and be handed
+a token of its own.
+
+=item *
+
+Every space-separated scope must be one of the client's registered
+C<scopes>, or the request is C<invalid_scope> - at C</authorize>, at
+C</token> for C<client_credentials>, and again when a code or a refresh
+token is redeemed, so that narrowing a registration takes effect on
+credentials that were issued before it. A request that names no scope
+asks for nothing and is always allowed.
+
+=back
+
+Both lists are B<deny by default>, exactly as C<redirect_uris> is: a
+client with no registered C<scopes> gets no scope, and one with no
+registered C<grant_types> can use no grant. L<Punk::OAuth2::Server::Store>
+defaults C<grant_types> to C<authorization_code refresh_token> at
+registration when you do not say otherwise, so the list to think about
+in practice is C<scopes>.
+
+The point of the recheck at redemption is that an access token is signed
+and self-contained: once one is out, the only thing standing between a
+scope and a resource server is what was put in the token. So the
+registration is consulted every time one is minted, not once when the
+grant began.
 
 =head1 THE SIGNING KEY
 

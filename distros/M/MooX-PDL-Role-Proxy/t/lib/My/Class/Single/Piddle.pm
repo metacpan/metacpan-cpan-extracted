@@ -11,7 +11,7 @@ has p1 => (
 
 has p2 => (
     is      => 'rwp',
-    piddle => 1,
+    piddle  => 1,
     trigger => sub { $_[0]->triggered( 1 ) },
 );
 

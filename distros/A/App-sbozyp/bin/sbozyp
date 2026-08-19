@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.9.0';
 
 use Cwd qw();
 use Digest::MD5 qw();
@@ -324,7 +324,7 @@ sub main_null {
 
 sub pkg {
     my ($prgnam) = @_;
-    $prgnam = path_to_pkgname(Cwd::abs_path($prgnam)) if is_slackbuild_dir($prgnam);
+    $prgnam = path_to_pkgname(Cwd::abs_path($prgnam)) if is_slackbuild_path($prgnam);
     my $pkgname = prgnam_to_pkgname($prgnam) // sbozyp_die("could not find a package named $prgnam");
     state %pkg_cache; if (my $pkg = $pkg_cache{$pkgname}) { return $pkg }
     my $info_file = repo_dir()."$pkgname/@{[basename($pkgname)]}.info";
@@ -533,6 +533,13 @@ sub is_slackbuild_dir {
     return -f "$pkg_dir/$prgnam.info" && -f "$pkg_dir/$prgnam.SlackBuild";
 }
 
+sub is_slackbuild_path {
+    my ($path) = @_;
+    return defined $path
+        && ($path eq '.' || $path eq '..' || $path =~ m{^(?:\./|\.\./|/)})
+        && is_slackbuild_dir($path);
+}
+
 sub path_to_pkgname {
     my ($path) = @_;
     my $pkgname = basename(dirname($path)).'/'.basename($path);
@@ -737,7 +744,7 @@ sub remove_slackware_pkg {
 sub init_repo {
     my $repo_opts = shift;
     for my $pkg (@_) {
-        next unless is_slackbuild_dir($pkg);
+        next unless is_slackbuild_path($pkg);
         my $repo_dir = dirname(dirname(Cwd::abs_path($pkg)));
         sbozyp_die("package directory arguments must come from the same working tree")
             if defined $CONFIG{_REPO_DIR_OVERRIDE} && $CONFIG{_REPO_DIR_OVERRIDE} ne $repo_dir;
@@ -1248,10 +1255,11 @@ A package argument may be a package name or a SlackBuild package directory:
  sbozyp in -r .
 
 The directory must be C<CATEGORY/PRGNAM> and contain matching C<PRGNAM.info>
-and C<PRGNAM.SlackBuild> files. The tree need not be a Git or configured
-repository. If any package argument is a SlackBuild directory, its tree is used
-for the entire command, regardless of argument order. All other packages and
-dependencies come from that tree.
+and C<PRGNAM.SlackBuild> files. Relative directory arguments must begin with
+C<./> or C<../>. The tree need not be a Git or configured repository. If any
+package argument is a SlackBuild directory, its tree is used for the entire
+command, regardless of argument order. All other packages and dependencies
+come from that tree.
 
 Use C<-W> from the tree root when giving package names:
 

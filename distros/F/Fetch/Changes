@@ -1,5 +1,24 @@
 Revision history for Fetch
 
+0.15    2026-08-19
+        - HTTP/2 TRAILERS are captured and exposed as $res->trailers.
+          They were being discarded.
+        - t/24-h2-trailers.t tests this against nghttpd
+
+0.14    2026-08-18
+        - fetch_abi v2: on_request, an observer for outbound requests.
+        - Fetch->on_request(\&start, \&done): the same registry, reached
+          from Perl.
+
+            Fetch->on_request(
+                sub { my ($method, $url, $headers) = @_;
+                      push @$headers, traceparent => span_id();
+                      return { at => time, url => $url } },
+                sub { my ($token, $res, $err) = @_;
+                      record($token->{url}, time - $token->{at},
+                             $err ? "failed: $err" : $res->status) },
+            );
+
 0.13    2026-08-15
         - Two agents with no passed loop in one process no longer hang each other. Every
           Fetch->new built its own Standalone loop, but install_await

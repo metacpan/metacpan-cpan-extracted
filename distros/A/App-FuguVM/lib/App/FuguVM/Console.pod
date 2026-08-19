@@ -1,0 +1,72 @@
+=head1 NAME
+
+App::FuguVM::Console - drive the serial console of a guest
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::Console;
+
+    my $console = App::FuguVM::Console->new(
+        host => '127.0.0.1',
+        port => $console_port,
+    );
+
+    $console->run_install({
+        root_password => $password,
+        proxy_url     => $proxy->guest_url,
+    }) or die "installation failed\n";
+
+    $console->run_script('reboot.exp');
+
+=head1 DESCRIPTION
+
+The console answers no protocol, so an L<expect(1)> script types at it.
+The module runs the OpenBSD installer that way, and it runs any other
+script the operator names: C<fuguvm expect> is that second verb. The
+scripts ship under F<share/fuguvm/expect>, and L<Fugu::File> resolves
+them against the install root.
+
+The run is a passthrough: the child writes straight to the terminal of
+the caller. An installation writes for tens of minutes, and an
+operator who waits needs to see the progress while it happens.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguVM::Console->new(host => ..., port => ...)
+
+The host and port name the serial console. Each script reads its
+timeout from C<FUGUVM_TIMEOUT> in the environment and carries its own
+default.
+
+=head2 script_path
+
+    App::FuguVM::Console->script_path($name)
+
+Return the path of a shipped script, or C<undef>. The method also
+works on the class: L<App::FuguVM::DiskCache> hashes the installer script
+into its cache key, so it must resolve the script the same way
+C<run_install> does.
+
+=head2 run_install
+
+    $console->run_install(\%config)
+
+Drive a complete installation. The configuration gives the root
+password and the proxy URL that the guest fetches its sets through.
+
+=head2 run_script
+
+    $console->run_script($script, @args)
+
+Run one script against this console. The argument is a path, or the
+name of a shipped script.
+
+=head1 SEE ALSO
+
+L<expect(1)>, L<Fugu::File>, L<Fugu::Process>, L<App::FuguVM::Guest>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

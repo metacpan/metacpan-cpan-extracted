@@ -13,6 +13,8 @@ include/dbil_compat.h
 include/dbil_future.h
 include/dbil_hm.h
 include/dbil_loop.h
+include/dbil_obs.h
+include/dbil_obs_perl.h
 include/dbil_native.h
 include/dbil_pool.h
 include/dbil_run.h
@@ -45,6 +47,7 @@ t/lib/BackendParity.pm
 t/15-fork.t
 t/16-abi.t
 t/17-rowhash.t
+t/18-observer.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

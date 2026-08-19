@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.17';
+    $VERSION = '0.20';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -562,12 +562,65 @@ Every model on one database shares a single connection per worker.
 
 =head2 hook
 
+    hook before_request  => sub { my ($c) = @_; ...; return };
     hook before_dispatch => sub { my ($c) = @_; ...; return };
     hook after_dispatch  => sub { my ($c, $resp) = @_; ... };
 
-C<before_dispatch> runs after routing and before guards (a reference
-return short-circuits); C<after_dispatch> sees the finalized PSGI
-triplet and may mutate it or return a replacement.
+C<before_request> runs B<before routing>; C<before_dispatch> runs after
+routing and before guards (in both, a reference return short-circuits);
+C<after_dispatch> sees the finalized PSGI triplet and may mutate it or
+return a replacement.
+
+All three take a coderef or a C<'Controller#method'> target, run in
+registration order, and stop at the first reference return. A die goes
+through L</on_error>, and a returned Future is awaited.
+
+=head3 before_request vs before_dispatch
+
+They differ only in when they run, and therefore in what they can see:
+
+=over 4
+
+=item *
+
+C<before_request> is the only phase that runs for a request that does not
+match a route: a B<404>, a B<405>, and anything answered by a PSGI or
+static B<mount> - none of which reach C<before_dispatch> at all.
+
+=item *
+
+C<< $c->match >> is empty inside C<before_request> (there is no matched
+route yet). It is a real hashref with empty captures, so C<< $c->match >>
+and C<< $c->param >> behave rather than croak; it is populated by the time
+the handler or API operation runs.
+
+=item *
+
+B<Both hooks get the same context.> A stash written in C<before_request>
+is there in the handler and in C<after_dispatch>, which is what makes it
+useful for timing and annotating a request.
+
+=back
+
+The cost of running first is that C<before_request> is ahead of three
+things that refuse requests:
+
+    hook before_request => sub { ... };   # runs even when the request is
+                                          # about to be refused by:
+    csrf;                                 #   the csrf check
+    rate_limit ...;                       #   the rate limiter
+    max_body 1_000_000;                   #   the max_body ceiling
+
+For a hook that measures or records - a span, a request id, an access
+count - that is exactly right: a refused request is still a request, and
+you want it. For a hook that does work on the client's behalf, it is
+wrong, and C<before_dispatch> remains the correct phase. (The C<max_body>
+case costs no memory that was not already spent: the body is resident in
+the server's buffer before Punk is called at all.)
+
+An application with no C<before_request> hook pays nothing for the phase
+existing - the chain is omitted from the compiled state entirely, and no
+context is built before routing.
 
 =head2 middleware
 
@@ -659,6 +712,53 @@ else it blocks. So
     };
 
 answers two seconds later without pinning a worker.
+
+=head1 C ABI
+
+Punk publishes a C ABI, C<pk_abi.h>, installed through L<ExtUtils::Depends>
+and reached at runtime through C<< Punk::_abi_ptr >> - the same function-pointer
+table Punk itself uses to reach L<Open::API>, L<Hyperman> and L<DBIx::Loop>.
+It exists for the one thing a Perl hook cannot do cheaply: B<observe> every
+request, on every path, without paying a C<call_sv> per request for the
+privilege.
+
+    #include "pk_abi.h"
+
+    static void on_req(pTHX_ SV *c, void *ud) { ... }
+    static void on_res(pTHX_ SV *c, SV *response, void *ud) { ... }
+
+    A->on_request(aTHX_ on_req, NULL);
+    A->on_response(aTHX_ on_res, NULL);
+
+C<on_request> fires before routing - so before the csrf check, before
+C<rate_limit> and before the C<max_body> ceiling, the same trade
+L</before_request> makes. C<on_response> fires B<exactly once> per request, on
+every path: a matched route, an API operation, a mount, a 404, a 405, a 413,
+and an asynchronous answer, where it fires when the future settles rather than
+when the handler returned it. Both are handed the same context, so state left
+in its stash by one is there for the other.
+
+The table also gives a consumer the request's C<route_pattern_of> - the route
+as B<declared>, C<"/users/:id"> - which is the thing anything grouping by route
+needs and which nothing outside the router could previously ask for.
+
+C<on_query> (v2) observes statements run by the shipped L<Punk::Model::DBI>
+backend. Note that there are B<two> database paths here: L<DBIx::Loop> has its
+own observer, in C<dbil_abi>, and an application using the default C<model>
+backend generates no DBIx::Loop traffic at all. A consumer wanting to see every
+query an application makes registers with both. Neither is given the bind
+B<values> - only the statement text, which carries placeholders exactly where
+the literal data would have been.
+
+Registration is B<process-global>, not per application, which is the opposite
+of every other hook here: an app is a compiled artifact and a process may hold
+several, while an observer is a property of the process. Register at boot;
+there is no deregistration. Registering nothing costs nothing.
+
+The table only grows at the end, C<PK_ABI_VERSION> bumps on any append, and a
+consumer checks C<abi_version> before use. Nothing in it mutates a request or a
+response: L</after_dispatch> already does that, in Perl, where a reader can see
+it.
 
 =head1 SEE ALSO
 

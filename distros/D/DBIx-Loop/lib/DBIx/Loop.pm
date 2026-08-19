@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('DBIx::Loop', $VERSION);
@@ -19,7 +19,7 @@ DBIx::Loop - non-blocking DBI on your event loop
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
@@ -66,6 +66,7 @@ sub _auto_loop {
 }
 
 1;
+
 
 __END__
 
@@ -252,6 +253,80 @@ conformance suite (t/lib/AdapterConformance.pm) proves every adapter behaves
 identically. Adapters with a C-side loop (Hyperman) can install a C vtable so
 readiness dispatches with no Perl call frame.
 
+=head1 OBSERVING STATEMENTS
+
+=head2 DBIx::Loop->on_exec(\&start, \&done)
+
+Watch every statement this B<process> runs, on all three backends.
+
+    DBIx::Loop->on_exec(
+        sub {
+            my ($is_query, $sql, $nbind) = @_;
+            return { at => Time::HiRes::time(), sql => $sql };   # the token
+        },
+        sub {
+            my ($token, $res, $err) = @_;
+            my $ms = (Time::HiRes::time() - $token->{at}) * 1000;
+            warn "slow query (${ms}ms): $token->{sql}" if $ms > 100;
+        },
+    );
+
+C<start> fires before a statement runs; whatever it returns is the B<token>,
+handed back to C<done> when that statement's future settles, so the two halves
+correlate without a lookup table. C<done> fires exactly once for every
+C<start>, with exactly one of C<$res> and C<$err>. C<done> is optional.
+
+This is the only hook that sees everything. The native backend speaks the
+database's wire protocol and never builds a DBI statement handle, so
+C<< $dbh->{Callbacks} >>, L<DBI::Profile> and C<< DBI->trace >> observe
+nothing at all on the fast path. C<on_exec> hangs off C<dbil_exec>, the one
+place every backend passes through.
+
+=head3 What it is not given
+
+The bind B<values>. C<$sql> is the B<prepared> statement, and C<$nbind> is
+how many values there were - and that is deliberate: the values are the
+literal data, the names and tokens and card numbers, while the prepared text
+carries placeholders exactly where they would have been. That is the right
+thing to record anyway, and making it the only thing on offer means nobody
+has to remember the rule at three in the morning.
+
+=head3 Three things to know
+
+=over 4
+
+=item *
+
+B<Registration is process-global and permanent.> Not per handle. There is no
+deregistration, so register at boot - and note that the callbacks, and
+everything they close over, live as long as the process does.
+
+=item *
+
+B<An observer does not observe itself.> The obvious thing to build here is a
+query log, and the obvious place to write one is a database - which would run
+a statement from inside the observer for a statement, for ever. Any statement
+issued from inside a callback is therefore skipped by the callbacks, both
+halves, and runs normally otherwise.
+
+=item *
+
+B<A death is warned, not propagated.> An observer is a bystander, and a broken
+bystander must not fail the statement it was watching. If either callback
+dies, the death becomes a warning naming which half it came from, and the
+statement carries on.
+
+=back
+
+Returns 1, or 0 when the observer table is full
+(C<DBIL_ABI_MAX_OBSERVERS>, 8). Croaks if the callbacks are not code
+references, at registration, where the mistake is.
+
+This costs one Perl call per statement, paid only by a process that asked for
+it: a statement with no observer registered allocates nothing. Where that is
+too much, the same registry takes C function pointers through the C ABI's
+C<on_exec> below - the same contract with no Perl on the path.
+
 =head1 C ABI
 
 An XS module can run statements and consume the resulting futures without a
@@ -289,6 +364,33 @@ another future type.
 =item * C<reshape> - the C<select*> transforms over a result you already
 hold. Returns an error SV instead of croaking, because on the chaining path
 it runs inside a settle and must produce a failed future, not a die.
+
+=item * C<on_exec(start, done, ud)> I<(v2)> - observe statements.
+
+    static void *start(pTHX_ int is_query, const char *sql, STRLEN len,
+                       int nbind, void *ud);
+    static void  done(pTHX_ void *token, SV *res, SV *err, void *ud);
+
+C<start> fires before a statement runs and returns an opaque token; C<done>
+fires exactly once when that statement's future settles, with the token back,
+so the two correlate without a lookup table. It covers all three backends,
+because it hangs off C<exec> and off the future C<exec> returns.
+
+C<sql> is the B<prepared> statement and C<nbind> the number of bind values.
+The bind B<values> are deliberately not passed: they are the literal data, and
+the prepared text carries placeholders exactly where they would have been.
+
+Registration is process-global and there is no deregistration; register at
+boot. Neither callback may croak. Returns 1, or 0 when the table is full. A
+statement with no observer registered allocates nothing.
+
+L</DBIx::Loop-E<gt>on_exec(\&start, \&done)> is the same registry reached from
+Perl, for a consumer that is not an XS module: it registers a pair of shims
+holding coderefs. Same contract, one Perl call per statement instead of none,
+and the two rules C can state but Perl cannot keep - "do not croak", and "do
+not run a statement from in here" - become "a death is warned and the
+statement carries on" and "a statement issued from inside a callback is not
+observed".
 
 =back
 

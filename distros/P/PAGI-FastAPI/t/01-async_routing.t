@@ -44,7 +44,6 @@ subtest 'Valid Async GET Route with Path & Query Params' => sub {
         }
     };
 
-    # Resolve async execution with ->get
     $pagi_app->($scope, $receive, $send)->get;
 
     is $sent_start->{status}, 200, 'HTTP Status 200 OK';

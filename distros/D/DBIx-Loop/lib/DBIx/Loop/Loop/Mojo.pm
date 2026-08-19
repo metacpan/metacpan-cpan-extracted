@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # The loop adapter for Mojo::IOLoop, implementing the DBIx::Loop seam
 # (add_reader / add_writer / remove / timer / new_future / await) over the

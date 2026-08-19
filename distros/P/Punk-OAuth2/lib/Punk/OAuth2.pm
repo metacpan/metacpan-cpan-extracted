@@ -7,7 +7,7 @@ use File::Raw::JSON;
 use Crypt::JWS;
 use MIME::Base64 ();   # the XS calls MIME::Base64::{en,de}code_base64 by name
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Punk::OAuth2', $VERSION);
@@ -22,7 +22,7 @@ Punk::OAuth2 - OAuth2 and OpenID Connect for Punk applications
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

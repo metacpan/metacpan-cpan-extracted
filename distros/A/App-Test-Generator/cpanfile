@@ -6,6 +6,10 @@ requires 'Carp';
 requires 'Config::Abstraction', '0.36';
 requires 'Cwd';
 requires 'Data::Dumper';
+requires 'Data::Random';
+requires 'Data::Random::String';
+requires 'Data::Random::String::Matches', '0.02';
+requires 'Data::Random::Structure';
 requires 'Data::Section::Simple';
 requires 'File::Copy';
 requires 'File::Copy::Recursive';
@@ -32,16 +36,13 @@ requires 'Template';
 requires 'Text::Balanced';
 requires 'URI';
 requires 'UUID::Tiny';
+requires 'Unicode::GCString';
 requires 'WWW::RT::CPAN';
 requires 'YAML::XS';
 requires 'autodie';
 recommends 'Devel::Cover', '1.51';
 
 on 'test' => sub {
-	requires 'Data::Random';
-	requires 'Data::Random::String';
-	requires 'Data::Random::String::Matches', '0.02';
-	requires 'Data::Random::Structure';
 	requires 'Encode';
 	requires 'FindBin';
 	requires 'IPC::System::Simple';
@@ -56,7 +57,6 @@ on 'test' => sub {
 	requires 'Test::Needs';
 	requires 'Test::Returns', '0.03';
 	requires 'Test::Without::Module';
-	requires 'Unicode::GCString';
 	requires 'Unicode::Normalize';
 };
 

@@ -529,7 +529,7 @@ print "Running baseline tests...\n" if $opt{verbose};
 #
 # Use list form of system() to avoid shell interpolation of $opt{tests},
 # which could be a security risk if the path contains special characters
-if(system('prove', '-Mblib', '-l', $opt{tests}) != 0) {
+if(system('prove', '-Mblib', '-l', '-r', $opt{tests}) != 0) {
 	print STDERR "Baseline tests failed.\n";
 	exit 2;
 }
@@ -618,7 +618,7 @@ for my $file (@files) {
 		local $ENV{PERL5OPT} = '';
 
 		# -l adds the project's lib/ to @INC for tests that don't use 'use lib'.
-		my $survived = (system('prove', '-l', $opt{tests}) == 0);
+		my $survived = (system('prove', '-l', '-r', $opt{tests}) == 0);
 
 		# Always restore the original, even if prove crashes.
 		{ open(my $fh, '>', $file) or croak "Cannot restore $file: $!"; print $fh $orig_content; }

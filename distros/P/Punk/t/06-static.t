@@ -52,6 +52,21 @@ is(hit($app, path => '/static/sub/x.txt')->[0], 200, 'nested paths serve');
 is(hit($app, path => '/static/nope.css')->[0], 404, 'missing file 404s');
 is(hit($app, path => '/static/../secret')->[0], 404,
     'dotdot is a 404, never traversal');
+# A backslash ends a segment too. Here it is an ordinary filename byte and
+# "..\.." traverses nothing, but Windows reads it as a separator, so a guard
+# that splits on '/' alone would see one harmless segment where the OS sees
+# two levels up. Splitting on both is platform-independent, which is the
+# point: the wrong time to discover this is during a port.
+is(hit($app, path => '/static/..\\secret')->[0], 404,
+    'a backslash dotdot segment is refused');
+is(hit($app, path => '/static/..\\..\\secret')->[0], 404,
+    'and a chain of them');
+is(hit($app, path => '/static/sub\\../x.txt')->[0], 404,
+    'including one mid-path');
+# and a file whose name simply contains a backslash is NOT collateral damage:
+# it splits into ordinary segments, none of which is ".."
+is(hit($app, path => '/static/sub\\x.txt')->[0], 404,
+    'a backslash in a name is still just a name (no such file here)');
 {
     my $r = hit($app, method => 'HEAD', path => '/static/app.css');
     is($r->[0], 200, 'HEAD serves');

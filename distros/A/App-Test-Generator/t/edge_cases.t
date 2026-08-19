@@ -1309,4 +1309,374 @@ subtest '_compile_signature_isolated: pathological subprocess outputs are handle
 	}
 };
 
+# ==================================================================
+# Analyzer::Complexity — hostile method hashrefs
+# ==================================================================
+
+Readonly my $HUGE_BODY => "if(\$x > 1) { return 1; }\n" x 10_000;
+
+subtest 'Analyzer::Complexity::analyze: undef body key returns empty/zero report without crashing' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $ac = App::Test::Generator::Analyzer::Complexity->new;
+	my $r;
+	lives_ok { $r = $ac->analyze({ body => undef }) }
+		'analyze() lives when body key is undef';
+	ok(exists $r->{cyclomatic_score}, 'cyclomatic_score key present');
+	ok(exists $r->{complexity_level}, 'complexity_level key present');
+};
+
+subtest 'Analyzer::Complexity::analyze: missing body key treated as empty source' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $ac = App::Test::Generator::Analyzer::Complexity->new;
+	my $r;
+	lives_ok { $r = $ac->analyze({}) }
+		'analyze() lives when body key is absent entirely';
+	is($r->{cyclomatic_score}, 1, 'score starts at 1 (empty body = no branches)');
+	is($r->{complexity_level}, 'low', 'empty body is always low complexity');
+};
+
+subtest 'Analyzer::Complexity::analyze: 10,000-line body does not hang or crash' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $ac = App::Test::Generator::Analyzer::Complexity->new;
+	my $r;
+	lives_ok { $r = $ac->analyze({ body => $HUGE_BODY }) }
+		'10k-line body: analyze() lives';
+	ok($r->{cyclomatic_score} > 1, '10k branches: score above 1');
+	is($r->{complexity_level}, 'high', '10k branches: level is high');
+};
+
+subtest 'Analyzer::Complexity::analyze: keywords inside string literals are not counted' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $ac = App::Test::Generator::Analyzer::Complexity->new;
+	# All these keywords appear only inside a string — none should increment score
+	my $body = 'sub foo { my $msg = "if unless while until for foreach given when die croak confess"; return $msg; }';
+	my $r = $ac->analyze({ body => $body });
+	is($r->{cyclomatic_score}, 1, 'keywords inside string literal do not inflate score');
+};
+
+subtest 'Analyzer::Complexity::analyze: arrayref in place of method hashref stringifies without crashing' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $ac = App::Test::Generator::Analyzer::Complexity->new;
+	# An arrayref dereference as a hash will die — this is the correct Perl type error
+	throws_ok { $ac->analyze([]) }
+		qr/HASH ref|Not a HASH/,
+		'arrayref in place of method hashref dies with a clear type error';
+};
+
+# ==================================================================
+# Model::Method — argument hostility and documented error messages
+# ==================================================================
+
+subtest 'Model::Method::add_evidence: invalid category croaks with documented message' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'm', source => 'sub m {}');
+	throws_ok {
+		$m->add_evidence(category => 'invalid_category', signal => 'returns_constant')
+	} qr/Invalid evidence category/,
+		'invalid category croaks with the documented message';
+};
+
+subtest 'Model::Method::add_evidence: invalid signal croaks with documented message' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'm', source => 'sub m {}');
+	throws_ok {
+		$m->add_evidence(category => 'return', signal => 'not_a_real_signal')
+	} qr/Invalid.*signal/i,
+		'invalid signal croaks with the documented message';
+};
+
+subtest 'Model::Method::add_evidence: weight=0 is stored verbatim, not coerced to default 1' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'm', source => 'sub m {}');
+	$m->add_evidence(category => 'return', signal => 'returns_constant', weight => 0);
+	my ($entry) = $m->evidence;
+	is($entry->{weight}, 0, 'weight=0 stored as 0, not coerced to 1');
+};
+
+subtest 'Model::Method::new: "0" as name is accepted (falsy-but-defined string)' => sub {
+	require App::Test::Generator::Model::Method;
+	lives_ok {
+		App::Test::Generator::Model::Method->new(name => '0', source => 'sub m {}')
+	} '"0" as name is accepted — presence check is defined(), not truthiness';
+};
+
+subtest 'Model::Method::new: 100,000-char name is accepted without crash' => sub {
+	require App::Test::Generator::Model::Method;
+	my $long = 'x' x 100_000;
+	lives_ok {
+		App::Test::Generator::Model::Method->new(name => $long, source => 'sub m {}')
+	} '100k-char name accepted without crash';
+};
+
+subtest 'Model::Method::resolve_return_type: no evidence returns a string type, not undef' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'm', source => 'sub m {}');
+	my $rt;
+	lives_ok { $rt = $m->resolve_return_type } 'resolve_return_type with no evidence lives';
+	ok(defined $rt, 'result is defined even with no evidence');
+};
+
+subtest 'Model::Method::resolve_confidence: no evidence gives score=0, level=low' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'm', source => 'sub m {}');
+	my $c = $m->resolve_confidence;
+	is($c->{score}, 0, 'no evidence → score=0');
+	is($c->{level}, 'low', 'no evidence → level=low');
+};
+
+# ==================================================================
+# BenchmarkGenerator — hostile inputs not in unit.t/function.t
+# ==================================================================
+
+subtest 'BenchmarkGenerator::new: scalarref as schema croaks with documented message' => sub {
+	require App::Test::Generator::BenchmarkGenerator;
+	throws_ok {
+		App::Test::Generator::BenchmarkGenerator->new(schema => \42)
+	} qr/schema must be a hashref/,
+		'scalarref as schema croaks with "schema must be a hashref"';
+};
+
+subtest 'BenchmarkGenerator::new: arrayref as schema croaks with documented message' => sub {
+	require App::Test::Generator::BenchmarkGenerator;
+	throws_ok {
+		App::Test::Generator::BenchmarkGenerator->new(schema => [])
+	} qr/schema must be a hashref/,
+		'arrayref as schema croaks with "schema must be a hashref"';
+};
+
+subtest 'BenchmarkGenerator::generate: module name containing ".." is rejected by _assert_identifier' => sub {
+	require App::Test::Generator::BenchmarkGenerator;
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(
+		schema => { module => '../../../etc/passwd', function => 'greet' }
+	);
+	throws_ok { $bg->generate }
+		qr/not a valid Perl identifier/,
+		'module name with .. path traversal is rejected';
+};
+
+subtest 'BenchmarkGenerator::generate: function name with semicolon is rejected' => sub {
+	require App::Test::Generator::BenchmarkGenerator;
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(
+		schema => { module => 'Foo', function => 'bar; system("id")' }
+	);
+	throws_ok { $bg->generate }
+		qr/not a valid Perl identifier/,
+		'injection-shaped function name is rejected before output is generated';
+};
+
+subtest 'BenchmarkGenerator::generate: 100 transforms produces output without crashing' => sub {
+	require App::Test::Generator::BenchmarkGenerator;
+	my %xforms;
+	for my $i (1..100) {
+		$xforms{"variant_$i"} = { input => { x => { type => 'integer' } } };
+	}
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(
+		schema => { module => 'builtin', function => 'abs', transforms => \%xforms }
+	);
+	my $out;
+	lives_ok { $out = $bg->generate } '100 transforms: generate() lives';
+	like($out, qr/cmpthese/, '100 transforms: output contains cmpthese');
+	ok($out =~ /variant_1/,  '100 transforms: first variant present in output');
+};
+
+# ==================================================================
+# CoverageGuidedFuzzer — additional hostile inputs
+# ==================================================================
+
+subtest 'CoverageGuidedFuzzer::minimize_corpus: called before run() does not crash' => sub {
+	require App::Test::Generator::CoverageGuidedFuzzer;
+	my $f = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { input => { type => 'string' } },
+		target_sub => sub { 1 },
+		iterations => 0,
+		seed       => 42,
+	);
+	# Do NOT call run() — minimize_corpus() on a fresh unfuzzed fuzzer must not die
+	my $r;
+	lives_ok { $r = $f->minimize_corpus } 'minimize_corpus before run() lives';
+	is(ref($r), 'HASH', 'returns a hashref');
+	ok(exists $r->{before}, '"before" key present');
+	ok(exists $r->{after},  '"after" key present');
+	ok($r->{after} <= $r->{before}, 'after <= before');
+};
+
+subtest 'CoverageGuidedFuzzer::run: target_sub that dies is recorded as a bug' => sub {
+	require App::Test::Generator::CoverageGuidedFuzzer;
+	my $f = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { input => { type => 'string' } },
+		target_sub => sub { die "always dies\n" },
+		iterations => 3,
+		seed       => 42,
+		timeout    => 2,
+	);
+	my $report;
+	lives_ok { $report = $f->run } 'dying target_sub: run() lives without propagating';
+	ok(defined $report,           'run() returns a report');
+	ok($report->{bugs_found} > 0, 'dying target_sub is recorded as a bug entry');
+};
+
+subtest 'CoverageGuidedFuzzer::run: circular-reference schema does not hang or crash' => sub {
+	require App::Test::Generator::CoverageGuidedFuzzer;
+	my %schema = (input => { type => 'string' });
+	$schema{_self} = \%schema;  # circular reference
+	my $f = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => \%schema,
+		target_sub => sub { 1 },
+		iterations => 3,
+		seed       => 42,
+	);
+	lives_ok { $f->run } 'circular-reference schema: run() lives';
+};
+
+# ==================================================================
+# PodExampleExtractor — hostile file paths and pathological source
+# ==================================================================
+
+subtest 'PodExampleExtractor::new: undef file croaks with documented message' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	throws_ok {
+		App::Test::Generator::PodExampleExtractor->new(file => undef)
+	} qr/file is required/,
+		'undef file croaks "file is required"';
+};
+
+subtest 'PodExampleExtractor::new: non-existent file croaks with documented message' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	throws_ok {
+		App::Test::Generator::PodExampleExtractor->new(file => '/no/such/file.pm')
+	} qr/File not found/,
+		'non-existent file croaks "File not found: ..."';
+};
+
+subtest 'PodExampleExtractor::new: directory path croaks (not a file)' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	my $dir = tempdir(CLEANUP => 1);
+	throws_ok {
+		App::Test::Generator::PodExampleExtractor->new(file => $dir)
+	} qr/File not found/,
+		'directory instead of file croaks "File not found"';
+};
+
+subtest 'PodExampleExtractor::extract: empty file returns empty arrayref' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	close $fh;
+	my $ex = App::Test::Generator::PodExampleExtractor->new(file => $path);
+	my $r;
+	lives_ok { $r = $ex->extract } 'empty file: extract() lives';
+	is(ref($r), 'ARRAY', 'empty file returns arrayref');
+};
+
+subtest 'PodExampleExtractor::extract: file with no POD returns empty arrayref' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	print $fh "package NoPod;\nsub foo { return 1 }\n1;\n";
+	close $fh;
+	my $ex = App::Test::Generator::PodExampleExtractor->new(file => $path);
+	my $r  = $ex->extract;
+	is(ref($r), 'ARRAY', 'no-POD file returns ARRAY');
+	is(scalar @$r, 0, 'no-POD file returns empty arrayref');
+};
+
+subtest 'PodExampleExtractor::extract: unclosed =for example begin is handled gracefully' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	print $fh <<'PODPM';
+package BadPod;
+
+=head1 SYNOPSIS
+
+=for example begin
+
+    my $x = 1;
+
+1;
+PODPM
+	close $fh;
+	# Pod::Simple is tolerant of unclosed =for blocks — must not die
+	lives_ok {
+		my $ex = App::Test::Generator::PodExampleExtractor->new(file => $path);
+		$ex->extract;
+	} 'unclosed =for example begin: extract() lives gracefully';
+};
+
+subtest 'PodExampleExtractor::extract: very large file (1,000 verbatim lines) does not crash' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	print $fh "package BigPod;\n\n=head1 SYNOPSIS\n\n";
+	for my $i (1..1_000) {
+		print $fh "    my \$x_$i = $i;\n";
+	}
+	print $fh "\n=cut\n\n1;\n";
+	close $fh;
+	my $ex = App::Test::Generator::PodExampleExtractor->new(file => $path);
+	my $r;
+	lives_ok { $r = $ex->extract } '1000-line SYNOPSIS: extract() lives';
+	ok(ref($r) eq 'ARRAY', 'returns arrayref');
+};
+
+# ==================================================================
+# Mutator — context abuse and additional filesystem hostility
+# ==================================================================
+
+subtest 'Mutator::generate_mutants: scalar context returns arrayref, list context returns flat list' => sub {
+	require App::Test::Generator::Mutator;
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $lib    = File::Spec->catdir($tmpdir, 'lib');
+	mkdir $lib or die $!;
+	my $pm = File::Spec->catfile($lib, 'CtxTest.pm');
+	open my $fh, '>', $pm or die $!;
+	print $fh "package CtxTest;\nsub foo { if(1) { return 1 } return 0; }\n1;\n";
+	close $fh;
+
+	my $mutator = App::Test::Generator::Mutator->new(file => $pm, lib_dir => 'lib');
+
+	require Cwd;
+	my $orig = Cwd::cwd();
+	chdir $tmpdir or die $!;
+
+	my $aref = $mutator->generate_mutants;  # scalar context
+	my @list = $mutator->generate_mutants;  # list context
+
+	chdir $orig;
+
+	is(ref($aref), 'ARRAY', 'scalar context returns arrayref');
+	ok(scalar(@list) > 0, 'list context returns flat list of Mutant objects');
+	is(scalar(@list), scalar(@{$aref}), 'both contexts produce the same count of mutants');
+};
+
+subtest 'Mutator::apply_mutant: called without prepare_workspace croaks with documented message' => sub {
+	require App::Test::Generator::Mutator;
+	require App::Test::Generator::Mutant;
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $lib    = File::Spec->catdir($tmpdir, 'lib');
+	mkdir $lib or die $!;
+	my $pm = File::Spec->catfile($lib, 'NoWS.pm');
+	open my $fh, '>', $pm or die $!;
+	print $fh "package NoWS;\nsub foo { return 1; }\n1;\n";
+	close $fh;
+
+	my $mutator = App::Test::Generator::Mutator->new(file => $pm, lib_dir => 'lib');
+	my $dummy_mutant = App::Test::Generator::Mutant->new(
+		id          => 'T1',
+		description => 'test',
+		original    => 'x',
+		line        => 1,
+		transform   => sub { 1 },
+	);
+
+	throws_ok { $mutator->apply_mutant($dummy_mutant) }
+		qr/Workspace not prepared/,
+		'apply_mutant before prepare_workspace croaks "Workspace not prepared"';
+};
+
+subtest 'Mutator::new: path containing null byte croaks with "file not found"' => sub {
+	require App::Test::Generator::Mutator;
+	throws_ok {
+		App::Test::Generator::Mutator->new(file => "lib/Foo\0Bar.pm", lib_dir => 'lib')
+	} qr/file not found/i,
+		'path with null byte croaks "file not found"';
+};
+
 done_testing();
+

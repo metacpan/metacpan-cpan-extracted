@@ -5,7 +5,7 @@ use warnings;
 use Params::Validate::Strict 0.30;
 use YAML::XS;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 =head1 NAME
 
@@ -13,7 +13,7 @@ App::Test::Generator::Exporter::YAML - Serialise a test plan to YAML
 
 =head1 VERSION
 
-Version 0.45
+Version 0.46
 
 =cut
 
@@ -44,9 +44,9 @@ Nothing.
 =head4 input
 
     {
-        self => { type => OBJECT },
-        plan => { type => HASHREF },
-        file => { type => 'string' },
+        self => { type => 'object' },
+        plan => { type => 'hashref' },
+        file => { type => 'string', min => 1 },
     }
 
 =head4 output

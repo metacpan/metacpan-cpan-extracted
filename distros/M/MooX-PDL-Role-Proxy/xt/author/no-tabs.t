@@ -13,7 +13,6 @@ my @files = (
     't/00-report-prereqs.t',
     't/clip.t',
     't/inplace_flag.t',
-    't/inplace_flag.t.orig',
     't/lib/My/Class.pm',
     't/lib/My/Class/Nested.pm',
     't/lib/My/Class/Nested/NDarray.pm',

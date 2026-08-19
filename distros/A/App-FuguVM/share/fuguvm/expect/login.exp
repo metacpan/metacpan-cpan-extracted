@@ -1,0 +1,87 @@
+#!/usr/bin/expect -f
+#
+# Simple login automation for OpenBSD VM
+#
+# Usage: login.exp <host> <port> [user] [password]
+#
+
+# Use FUGUVM_TIMEOUT from the environment when it exceeds the
+# script default. Slow hosts need this, for example under TCG
+# emulation in CI.
+proc env_timeout {default} {
+    global env
+    if {[info exists env(FUGUVM_TIMEOUT)] && $env(FUGUVM_TIMEOUT) > $default} {
+        return $env(FUGUVM_TIMEOUT)
+    }
+    return $default
+}
+
+set timeout [env_timeout 30]
+
+if {[llength $argv] < 2} {
+    puts stderr "Usage: login.exp <host> <port> \[user\] \[password\]"
+    exit 1
+}
+
+set host [lindex $argv 0]
+set port [lindex $argv 1]
+set user [lindex $argv 2]
+set password [lindex $argv 3]
+
+if {$user eq ""} {
+    set user "root"
+}
+if {$password eq ""} {
+    set password "openbsd"
+}
+
+# Connect to console
+spawn telnet $host $port
+
+# Send a newline to trigger login prompt
+send "\r"
+
+# Wait for login prompt
+expect {
+    "login:" {
+        send "$user\r"
+    }
+    "#" {
+        # Already logged in
+        puts "Already logged in"
+        exit 0
+    }
+    eof {
+        puts stderr "telnet could not connect to the VM console"
+        exit 1
+    }
+    timeout {
+        puts stderr "Timeout waiting for login prompt"
+        exit 1
+    }
+}
+
+# Enter password
+expect "Password:" {
+    send "$password\r"
+}
+
+# Wait for shell prompt
+expect {
+    "#" {
+        puts "Login successful"
+        exit 0
+    }
+    "$" {
+        puts "Login successful"
+        exit 0
+    }
+    "Login incorrect" {
+        puts stderr "Login failed"
+        exit 1
+    }
+    timeout {
+        puts stderr "Timeout waiting for shell"
+        exit 1
+    }
+}

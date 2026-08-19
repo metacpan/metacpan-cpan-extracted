@@ -1,5 +1,17 @@
 Revision history for DBIx-Loop
 
+0.06    2026-08-18
+        - dbil_abi v2: on_exec, an observer for statements. 
+        - DBIx::Loop->on_exec(\&start, \&done): the same registry,
+          reached from Perl.
+
+            DBIx::Loop->on_exec(
+                sub { my ($is_query, $sql, $nbind) = @_;
+                      return { at => time, sql => $sql } },
+                sub { my ($token, $res, $err) = @_;
+                      record($token->{sql}, time - $token->{at}) },
+            );
+
 0.05    2026-08-15
         - The pool no longer dies of SIGPIPE when a worker's peer is
           already gone.

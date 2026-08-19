@@ -29,3 +29,22 @@ _abi_version()
         RETVAL = hm_abi_table.abi_version;
     OUTPUT:
         RETVAL
+
+# v4 on_worker_start, for t/33-worker-start.t. Registering a C callback is not
+# something Perl can do, so the test drives these two instead: install before
+# run(), then have the application report the count from inside a worker.
+IV
+_abi_worker_hook_install()
+    CODE:
+        RETVAL = hm_abi_worker_hook_install(aTHX);
+    OUTPUT:
+        RETVAL
+
+# How many times the hook fired IN THIS PROCESS, and whether it was handed a
+# real loop every time (0 = it was not, which is a failure).
+void
+_abi_worker_hook_state()
+    PPCODE:
+        EXTEND(SP, 2);
+        mPUSHi(HM_ABI_ST_WORKER_N);
+        mPUSHi(HM_ABI_ST_WORKER_LOOP_OK);

@@ -105,13 +105,16 @@ need to provide overrides for C<postamble> as before, and also C<init_PM>:
   sub postamble { ::pdlpp_postamble(@pd_srcs) }
   }
 
-Please note that if you have a pure-Perl top-level driving module,
-like L<PDL::Graphics::TriD> or L<PDL::LinearAlgebra>, and you want
-that top-level module's C<FUNCTIONS> added to the C<pdldoc>
-documentation, you will want to replace the C<postamble> definition
-with something a lot like:
+B<As of 2.106> please note that if you have a pure-Perl top-level
+driving module, like L<PDL::Graphics::TriD> or L<PDL::LinearAlgebra>,
+that top-level module's C<FUNCTIONS> will be added to the C<pdldoc>
+documentation, by the above incantation, without further addition
+by you. If it has a C<pdldoc_add> call, that will be silently and
+correctly handled.
 
-  sub postamble { ::pdlpp_postamble(@pd_srcs) . ::pdldoc_add() }
+If you have a B<pure Perl> distribution, you will need:
+
+  sub postamble { ::pdldoc_add() }
 
 =head1 FUNCTIONS
 
@@ -137,7 +140,7 @@ our @EXPORT = qw( isbigendian
   PDL_INCLUDE PDL_TYPEMAP
   PDL_AUTO_INCLUDE PDL_BOOT
   PDL_INST_INCLUDE PDL_INST_TYPEMAP
-  pdlpp_eumm_update_deep pdldoc_add
+  pdlpp_eumm_update_deep pdldoc_add doc_distro
   pdlpp_postamble_int pdlpp_stdargs_int
   pdlpp_postamble pdlpp_stdargs write_dummy_make
   unsupported trylink get_maths_libs
@@ -242,7 +245,7 @@ sub _postamble {
   $callpack //= '';
   $w = dirname($w);
   my $perlrun = "\$(PERLRUN) \"-I$w\"";
-  my ($pmdep, $install, $cdep) = ($src, '', '');
+  my ($pmdep, $pdldoc, $cdep) = ($src, doc_distro(), '');
   my ($ppc, $ppo) = ($multi_c && $flist_cache{File::Spec::Functions::rel2abs($src)})
     ? map "\$($_)", pdlpp_mod_vars($mod)
     : pdlpp_mod_values($internal, $src, $base, $multi_c);
@@ -251,8 +254,6 @@ sub _postamble {
     $pmdep .= join ' ', '', catfile($ppdir, 'PP.pm'), glob(catfile($ppdir, 'PP/*'));
     $cdep .= join ' ', $ppo, ':', map catfile($ppdir, qw(Core), $_),
       qw(pdl.h pdlcore.h pdlbroadcast.h pdlmagic.h);
-  } else {
-    $install = pdldoc_add($mod);
   }
   my $pp_call_arg = _pp_call_arg($mod, $mod, $base, $callpack, $multi_c||'',$deep||'');
 qq|
@@ -265,7 +266,7 @@ $ppc : $base.pm
 	\$(NOECHO) \$(NOOP)
 
 $cdep
-$install|
+$pdldoc|
 }
 
 sub pdlpp_postamble_int {
@@ -280,12 +281,24 @@ sub pdlpp_postamble {
   join '', map _postamble($w, 0, @$_), @_;
 }
 
-sub pdldoc_add {
-  my ($mod) = @_;
-  my $end = defined $mod ? '' : " \$(NAME)";
-  $mod //= 'shift';
-  my $oneliner = _oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module($mod); }});
-  qq|\ninstall :: pure_install\n\t$oneliner$end\n|;
+*pdldoc_add = \&doc_distro;
+
+my $EMITTED_PDLDOC = 0;
+sub doc_distro {
+  # if Makefile.PL above, is in subdir, which doesn't have right DISTNAME
+  return '' if -f catfile(updir, 'Makefile.PL') or $EMITTED_PDLDOC++;
+  my $libdir = dirname(whereami_any());
+  # deliberate space in oneliner arg to force "" on Windows
+  sprintf <<'EOF', _oneliner(q{PDL::Doc::gen_db( @ARGV )}, qq{"-I$libdir"}, qw(-MPDL::Doc));
+
+PDL_DOC_DB = $(INST_LIB)$(DIRFILESEP)PDL$(DIRFILESEP)Pdldoc$(DIRFILESEP)$(DISTNAME).db
+
+pure_all :: $(PDL_DOC_DB)
+
+$(PDL_DOC_DB) :: pm_to_blib subdirs
+	$(NOECHO) $(ECHO) "Building documentation database for $(NAME)"
+	%s "$@" "$(INST_LIB)" script
+EOF
 }
 
 our %EXTRAS;
@@ -436,7 +449,7 @@ sub pdlpp_mkgen {
   die "pdlpp_mkgen: non-existing '$file\'" unless -f $file;
   my @pairs = ();
   my $manifest = ExtUtils::Manifest::maniread($file);
-  for (grep !/^(t|xt)\// && /\.pd$/ && -f, sort keys %$manifest) {
+  for (grep !/^(t|xt)\// && /\.(?:pd|pod\.PL)$/ && -f, sort keys %$manifest) {
     my $content = do { local $/; open my $in, '<', $_; <$in> };
     warn("pdlpp_mkgen: unknown module name for '$_' (use proper '=head1 NAME' section)\n"), next
       if !(my ($name) = $content =~ /=head1\s+NAME\s+(\S+)\s+/sg);
@@ -449,22 +462,27 @@ sub pdlpp_mkgen {
     (my $prefix = $mod) =~ s|::|/|g;
     my $outfile = File::Spec::Functions::rel2abs("$dir/GENERATED/$prefix.pm");
     File::Path::mkpath(dirname($outfile));
-    my $old_cwd = Cwd::cwd();
-    my $maybe_lib_base = "lib/$prefix";
-    my $maybe_lib_path = "$maybe_lib_base.pd";
-    my $is_lib_path = substr($pd, -length $maybe_lib_path) eq $maybe_lib_path;
-    my $todir = $is_lib_path ? substr($pd, 0, -length($maybe_lib_path)-1) : dirname($pd);
-    chdir $todir if $todir;
-    my $basename = $is_lib_path ? $maybe_lib_base : (split '/', $prefix)[-1];
-    my $pp_call_arg = _pp_call_arg($mod, $mod, $basename, '', 0); # 0 so guarantee not create pp-*.c
-    #there is no way to use PDL::PP from perl code, thus calling via system()
-    my $rv = system $^X, @in, $pp_call_arg, $is_lib_path ? "$basename.pd" : basename($pd);
-    my $basefile = "$basename.pm";
-    die "pdlpp_mkgen: cannot convert '$pd'\n" unless $rv == 0 && -f $basefile;
-    File::Copy::copy($basefile, $outfile) or die "$outfile: $!";
-    unlink $basefile; # Transform::Proj4.pm is wrong without GIS::Proj built
-    unlink "$basename.xs"; # since may have been recreated wrong
-    chdir $old_cwd or die "chdir $old_cwd: $!";
+    if ($pd =~ /\.pod\.PL$/) {
+      my $rv = system $^X, @in, $pd, $outfile;
+      die "pdlpp_mkgen: cannot extract '$pd'\n" unless $rv == 0 && -f $outfile;
+    } else {
+      my $old_cwd = Cwd::cwd();
+      my $maybe_lib_base = "lib/$prefix";
+      my $maybe_lib_path = "$maybe_lib_base.pd";
+      my $is_lib_path = substr($pd, -length $maybe_lib_path) eq $maybe_lib_path;
+      my $todir = $is_lib_path ? substr($pd, 0, -length($maybe_lib_path)-1) : dirname($pd);
+      chdir $todir if $todir;
+      my $basename = $is_lib_path ? $maybe_lib_base : (split '/', $prefix)[-1];
+      my $pp_call_arg = _pp_call_arg($mod, $mod, $basename, '', 0); # 0 so guarantee not create pp-*.c
+      #there is no way to use PDL::PP from perl code, thus calling via system()
+      my $rv = system $^X, @in, $pp_call_arg, $is_lib_path ? "$basename.pd" : basename($pd);
+      my $basefile = "$basename.pm";
+      die "pdlpp_mkgen: cannot convert '$pd'\n" unless $rv == 0 && -f $basefile;
+      File::Copy::copy($basefile, $outfile) or die "$outfile: $!";
+      unlink $basefile; # Transform::Proj4.pm is wrong without GIS::Proj built
+      unlink "$basename.xs"; # since may have been recreated wrong
+      chdir $old_cwd or die "chdir $old_cwd: $!";
+    }
     $added{"GENERATED/$prefix.pm"} = "mod=$mod pd=$pd (added by pdlpp_mkgen)";
   }
   if (scalar(keys %added) > 0) {

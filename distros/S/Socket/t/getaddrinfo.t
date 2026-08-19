@@ -126,7 +126,7 @@ AI_NUMERICHOST: {
 # Now check that names with AI_NUMERICHOST fail
 
 SKIP: {
-    skip "Resolver has no answer for $goodhost", 1 unless gethostbyname( $goodhost );
+    skip "Resolver has no answer for $goodhost", 2 unless gethostbyname( $goodhost );
 
     ( $err, @res ) = getaddrinfo( $goodhost, "ftp", { flags => AI_NUMERICHOST, socktype => SOCK_STREAM } );
     ok( $err != 0, "\$err != 0 for host=$goodhost/service=ftp/flags=AI_NUMERICHOST/socktype=SOCK_STREAM" );

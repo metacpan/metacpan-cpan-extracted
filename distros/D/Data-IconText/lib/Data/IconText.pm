@@ -24,7 +24,7 @@ use constant {
 
 use overload '""' => sub {$_[0]->as_string};
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my %_for_version = (
     v0.01 => {
@@ -477,6 +477,21 @@ my %_for_version = (
             'a27015a5-e6f1-5d38-b00e-a65f7ddd39a3' => 'cn', # language-tag-identifier:zh
         },
     },
+    v0.08 => {
+        parent => v0.07,
+        identifier => {
+            '8be115d2-dc2f-4a98-91e1-a6e3075cbc31' => { # uuid
+                'aa4fe62f-9252-44e8-8496-26ae9adcc26f' => 0x1F577,  # ?             spider
+                '8359d502-528d-4ffb-ad07-58535c9f739a' => 0x1FAB2,  # ?             insect
+                '55bc75a3-9ebc-4b29-a401-d2ae63dc8b3e' => 0x1F98C,  # ?             deer
+                'bcd55a71-85df-4ba0-803e-d7192bf40e84' => 0x26C6,   # ?             rain
+                '3a5729ca-cec7-482b-b300-d88522aaafd7' => 0x1F3E2,  # ?             office
+                'd2e758fb-7f16-4bdb-9227-560d668fd094' => 0x1F443,  # ?             nose
+                'c55037dc-3c38-4d25-b971-506f15882e8c' => 0x1F401,  # ?             mouse
+                '9799d7e4-7d10-4748-9e3a-103b524d1d02' => 0x1F6D2,  # ?             shop
+            },
+        },
+    },
 );
 
 while (1) {
@@ -829,6 +844,7 @@ sub _known_provider {
     if ($class eq ':all') {
         my %media_subtypes;
         my %ids;
+        my %characters;
 
         require Data::Identifier::Generate;
 
@@ -837,6 +853,7 @@ sub _known_provider {
 
             foreach my $type (keys %{$identifier}) {
                 foreach my $id (keys %{$identifier->{$type}}) {
+                    $characters{$identifier->{$type}{$id}} = undef;
                     eval {
                         my $di = Data::Identifier->new($type => $id);
                         my $ise = $di->ise(no_defaults => 1);
@@ -846,6 +863,7 @@ sub _known_provider {
             }
 
             foreach my $media_subtype (keys %{$dataset->{media_subtype}//{}}) {
+                $characters{$dataset->{media_subtype}{$media_subtype}} = undef;
                 eval {
                     my $di = $media_subtypes{$media_subtype} //= Data::Identifier::Generate->generic(
                         request => $media_subtype,
@@ -858,6 +876,7 @@ sub _known_provider {
                 };
             }
             foreach my $media_type (keys %{$dataset->{media_type}//{}}) {
+                $characters{$dataset->{media_type}{$media_type}} = undef;
                 eval {
                     my $di = $media_subtypes{$media_type} //= Data::Identifier::Generate->generic(
                         request => $media_type,
@@ -869,6 +888,15 @@ sub _known_provider {
                     $ids{$ise} = $di;
                 };
             }
+            foreach my $cp (values %{$dataset->{special}//{}}) {
+                $characters{$cp} = undef;
+            }
+        }
+
+        foreach my $cp (keys %characters) {
+            my $di = Data::Identifier::Generate->unicode_character(unicode => $cp);
+            my $ise = $di->ise; # need to force ISE generation in this case.
+            $ids{$ise} = $di;
         }
 
         return ([values %ids], rawtype => 'Data::Identifier');
@@ -929,7 +957,7 @@ Data::IconText - Work with icon text
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

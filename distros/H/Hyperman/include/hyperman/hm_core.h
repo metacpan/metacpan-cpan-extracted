@@ -3107,6 +3107,12 @@ static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
     else if (cfg->log_cb && SvOK(cfg->log_cb))
         loop->log_cb = SvREFCNT_inc(cfg->log_cb);
     hm_attach_server(aTHX_ loop, cfg->app);
+    /* v4 on_worker_start: the loop exists and has not started turning, and in
+     * a prefork server this is already the child. The one moment a consumer
+     * can attach something loop-bound and have it belong to the process that
+     * will actually serve. Fires here rather than at either call site so the
+     * single-worker case, which never forks, gets it too. */
+    hm_worker_hook_fire(aTHX_ (void *)loop);
     hm_loop_run(aTHX_ loop, NULL);
     hm_loop_free(aTHX_ loop);
 }

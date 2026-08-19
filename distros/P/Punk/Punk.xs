@@ -53,12 +53,18 @@ static const frj_abi *punk_frj(pTHX) {
 }
 
 #include "punk/punk_names.h"      /* fixed module/slot/key strings, named once */
+#include "punk/punk_obs.h"        /* the C ABI's observer registry - early,
+                                   * because punk_context.h and punk_serve.h
+                                   * both fire from it (pk_abi_impl.h, which
+                                   * needs the context slots, comes after) */
 #include "punk/punk_route.h"
 #include "punk/punk_response.h"
 #include "punk/punk_request.h"
 #include "punk/punk_accept.h"    /* Accept negotiation for respond_to     */
 #include "punk/punk_multipart.h" /* multipart/form-data + uploads      */
 #include "punk/punk_context.h"    /* the per-request context object        */
+#include "punk/pk_abi_impl.h"     /* Punk's own C ABI table (needs PCX_*)  */
+#include "punk/punk_obs_selftest.h" /* a C consumer of that table, for t/  */
 #include "punk/punk_cookie.h"     /* build a Set-Cookie value              */
 #include "punk/punk_session.h"    /* signed cookie sessions (SHA-256/HMAC) */
 #include "punk/punk_flash.h"      /* one-request messages over the session */
@@ -111,6 +117,7 @@ MODULE = Punk        PACKAGE = Punk
 PROTOTYPES: DISABLE
 
 INCLUDE: xs/core.xs
+INCLUDE: xs/abi.xs
 INCLUDE: xs/router.xs
 INCLUDE: xs/request.xs
 INCLUDE: xs/upload.xs

@@ -145,7 +145,7 @@ sub filter {
     if (ref $iopts eq 'HASH') {
         $boundary = delete $iopts->{boundary} || 'periodic';
         $iopts->{N} = ($iopts->{N} and $iopts->{N} > 0) ? $iopts->{N} : $dat->nelem;
-        $kern = $iopts->{kern} || PDL::DSP::Fir::firwin($iopts);
+        $kern = defined $iopts->{kern} ? $iopts->{kern} : PDL::DSP::Fir::firwin($iopts);
     }
     else {
         $kern = $iopts;

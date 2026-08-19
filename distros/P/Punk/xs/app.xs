@@ -29,6 +29,7 @@ new(class, ...)
         (void)hv_stores(h, K_VIEWS,      newRV_noinc((SV *)newAV()));
         (void)hv_stores(h, K_DATABASES,  newRV_noinc((SV *)newHV()));
         (void)hv_stores(h, K_MODELS,     newRV_noinc((SV *)newAV()));
+        (void)hv_stores(hooks, K_BEFORE_R, newRV_noinc((SV *)newAV()));
         (void)hv_stores(hooks, K_BEFORE_D, newRV_noinc((SV *)newAV()));
         (void)hv_stores(hooks, K_AFTER_D,  newRV_noinc((SV *)newAV()));
         (void)hv_stores(h, K_HOOKS,      newRV_noinc((SV *)hooks));
@@ -813,6 +814,24 @@ session(self, ...)
             else
                 (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
         }
+        /* A session cookie is only as good as the key it is signed with, and
+         * an absent one used to mean an empty HMAC key: well-formed cookies
+         * that round-tripped perfectly and that anyone who knew the format
+         * could mint offline, carrying any user id or role the session holds.
+         * Nothing about it looked wrong at runtime, which is what made it
+         * worth failing on. So the keyword refuses to freeze a config it
+         * cannot sign with, at boot, the way Punk::Session::_seal already
+         * refused to seal one. */
+        {
+            SV **sp = hv_fetchs(cfg, "secret", 0);
+            if (!sp || !*sp || !SvOK(*sp) || !SvCUR(*sp)) {
+                SvREFCNT_dec((SV *)cfg);
+                croak("Punk: `session` needs a non-empty secret - without one "
+                      "the cookie is signed with an empty key and anyone can "
+                      "forge it. Try `session secret => secret('session_key')"
+                      "`, which fails closed when the key is missing");
+            }
+        }
         (void)hv_stores(h, "session", newRV_noinc((SV *)cfg));
         RETVAL = newSVsv(self);
     }
@@ -1082,7 +1101,8 @@ hook(self, name, code)
         STRLEN nl; const char *n = SvPV_const(name, nl);
         SV **slot = hv_fetch(hooks, n, (I32)nl, 0);
         if (!(slot && *slot && SvROK(*slot) && SvTYPE(SvRV(*slot)) == SVt_PVAV))
-            croak("Punk: unknown hook '%s' (before_dispatch, after_dispatch)", n);
+            croak("Punk: unknown hook '%s' "
+                  "(before_request, before_dispatch, after_dispatch)", n);
         av_push((AV *)SvRV(*slot), newSVsv(code));
         RETVAL = newSVsv(self);
     }

@@ -1,5 +1,63 @@
 Revision history for Punk
 
+0.20    2026-08-19
+        - The dynamic-route path no longer requires Open::API. It
+          checked that api_mounts EXISTED rather than that it held
+          anything, and api_mounts is always present in the compiled
+          state - so an app that never declared an `api` still reached
+          the API branch on any route that was not a static hit, and
+          croaked there when Open::API's C ABI did not match.
+        - Punk publishes a C ABI of its own, pk_abi.h, installed through
+          ExtUtils::Depends and reached at runtime through
+          Punk::_abi_ptr. 
+
+0.19    2026-08-18
+        - SECURITY: a session had no server-side lifetime. `expires` set
+          only the cookie's Max-Age, which is a request to a client that
+          is free to ignore it - the signature carried no time at all, so
+          a cookie captured once (a shared machine, a log, a backup, a
+          proxy) stayed valid for as long as the secret did, and
+          session_expire only asked the browser to forget a value that
+          still authenticated. The expiry is now stamped inside the signed payload
+        - New $c->safe_path($path, $fallback?): returns the path when it
+          is same-origin and relative, otherwise the fallback. Punk had
+          no such guard while auth_guard hands every application a ?to=
+          to redirect to, which made the obvious login form an open
+          redirect. Same rules as Punk::OAuth2's same_origin_path, for
+          the same reasons (CVE-2026-75628)
+        - The static traversal guard splits segments on a backslash as
+          well as a slash. On POSIX "..\.." is one ordinary filename and
+          traverses nothing, but Windows reads it as a separator, so a
+          guard that split on "/" alone saw one harmless segment where
+          the OS would see two levels up. 
+        - New hook phase `before_request`, which runs BEFORE routing:
+
+            hook before_request => sub {
+                my ($c) = @_;
+                $c->stash->{t0} = Time::HiRes::time();
+                return;
+            };
+
+          The earliest phase until now was before_dispatch, which runs
+          only after the router has matched - so nothing could observe a
+          request from its start, and nothing ran at all for a 404, a
+          405, or anything answered by a PSGI or static mount.
+          before_request runs for all of those.
+        - The logger takes a record: a lone unblessed hashref is a set of
+          fields, and its `message` key is the message.
+
+            $c->log->info({ message => 'listing books',
+                            books => 12, user => $id });
+
+
+0.18    2026-08-18
+        A security release. issue reported by CPANSec.
+        - SECURITY (CVE-2026-75870): `session` declared without a secret
+          signed the cookie with an EMPTY HMAC key. The keyword froze
+          whatever options it was given without requiring a secret,
+          warning, or refusing to start, and both the cookie read and the
+          write-back defaulted that key to "". a secret is now required
+
 0.17    2026-08-17
         - Fixed t/14-futures.t failing on every perl whose Future is
           older than the one it was developed against - reported by

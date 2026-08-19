@@ -4,7 +4,7 @@ use v5.38;
 use experimental 'class';
 use version;
 
-our $VERSION   = qv('v1.0.0');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Digest::SHA qw(sha256_hex hmac_sha256_hex);
@@ -78,7 +78,7 @@ PAGI::FastAPI::BotProtection::ProofOfWork - Stateless Proof-of-Work Bot Mitigati
 
 =head1 VERSION
 
-Version v1.0.0
+Version v1.1.0
 
 =head1 SYNOPSIS
 

@@ -10,6 +10,8 @@ t/00-load.t
 t/30-basics.t
 t/40-more.t
 t/cgi_security.t
+t/data-flow.t
+t/domain.t
 t/edge_cases.t
 t/eof.t
 t/eol.t
@@ -19,10 +21,12 @@ t/get_params.t
 t/integration.t
 t/lib/TestHelper.pm
 t/locales.t
+t/path.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-synopsis.t
 t/pod.t
+t/transaction.t
 t/unit.t
 t/validate-strict.t
 t/vars.t

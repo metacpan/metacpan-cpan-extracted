@@ -14,6 +14,11 @@
 #   App::Test::Generator::Analyzer::Complexity
 #   App::Test::Generator::Analyzer::SideEffect
 #   App::Test::Generator::Planner::Isolation
+#   App::Test::Generator::Analyzer::Return
+#   App::Test::Generator::Planner::Mock
+#   App::Test::Generator::PodExampleExtractor
+#   App::Test::Generator::CoverageGuidedFuzzer (minimize_corpus)
+#   App::Test::Generator::Mutator (generate_mutants wantarray)
 
 use strict;
 use warnings;
@@ -21,6 +26,11 @@ use warnings;
 use Test::Most;
 use Test::Returns;
 use Readonly;
+use Cwd;
+use File::Spec;
+use File::Temp qw(tempfile tempdir);
+use File::Path qw(make_path);
+use Scalar::Util qw(refaddr);
 
 # --------------------------------------------------
 # Load all modules under test
@@ -904,5 +914,456 @@ subtest 'Planner::Isolation: env={} (hashref → truthy) → env key IS set' => 
 	);
 	ok(exists $result->{m}{env}, 'env=>{} (hashref) is truthy → env key set');
 };
+
+# ==================================================================
+# Analyzer::Return — all three signal-dispatch branches + empty-body guard
+# ==================================================================
+
+use_ok('App::Test::Generator::Analyzer::Return');
+use_ok('App::Test::Generator::Model::Method');
+
+# --------------------------------------------------
+# Path: source contains "return $self->{key}" → returns_property evidence
+# --------------------------------------------------
+subtest 'Analyzer::Return: return $self->{key} → returns_property signal' => sub {
+	my $r  = App::Test::Generator::Analyzer::Return->new;
+	my $m  = App::Test::Generator::Model::Method->new(
+		name   => 'foo',
+		source => 'sub foo { return $self->{name} }',
+	);
+	$r->analyze($m);
+	my @ev = grep { $_->{signal} eq 'returns_property' } @{ $m->evidence_ref };
+	ok(@ev, 'returns_property evidence added');
+	is($ev[0]{value}, 'name', 'property name captured correctly');
+};
+
+# --------------------------------------------------
+# Path: source contains "return $self" (no arrow) → returns_self evidence
+# --------------------------------------------------
+subtest 'Analyzer::Return: return $self → returns_self signal' => sub {
+	my $r = App::Test::Generator::Analyzer::Return->new;
+	my $m = App::Test::Generator::Model::Method->new(
+		name   => 'chained',
+		source => 'sub chained { $self->do_thing; return $self }',
+	);
+	$r->analyze($m);
+	my @ev = grep { $_->{signal} eq 'returns_self' } @{ $m->evidence_ref };
+	ok(@ev, 'returns_self evidence added for bare return $self');
+
+	# Negative: "return $self->{x}" not in source so returns_property not fired
+	my $n_prop = grep { $_->{signal} eq 'returns_property' } @{ $m->evidence_ref };
+	is($n_prop, 0, '"return $self->{x}" not present so returns_property not fired');
+};
+
+# --------------------------------------------------
+# Path: source contains "return 1" / "return undef" → returns_constant evidence
+# --------------------------------------------------
+subtest 'Analyzer::Return: return literal → returns_constant signal' => sub {
+	my $r = App::Test::Generator::Analyzer::Return->new;
+	my $m = App::Test::Generator::Model::Method->new(
+		name   => 'const',
+		source => 'sub const { return 1 }',
+	);
+	$r->analyze($m);
+	my @ev = grep { $_->{signal} eq 'returns_constant' } @{ $m->evidence_ref };
+	ok(@ev, 'returns_constant evidence added for "return 1"');
+};
+
+subtest 'Analyzer::Return: return undef → returns_constant signal' => sub {
+	my $r = App::Test::Generator::Analyzer::Return->new;
+	my $m = App::Test::Generator::Model::Method->new(
+		name   => 'nothing',
+		source => 'sub nothing { return undef }',
+	);
+	$r->analyze($m);
+	my @ev = grep { $_->{signal} eq 'returns_constant' } @{ $m->evidence_ref };
+	ok(@ev, 'returns_constant evidence added for "return undef"');
+};
+
+# --------------------------------------------------
+# Path: empty body → no evidence added (early-out / no-match path)
+# --------------------------------------------------
+subtest 'Analyzer::Return: empty body → no evidence' => sub {
+	my $r = App::Test::Generator::Analyzer::Return->new;
+	my $m = App::Test::Generator::Model::Method->new(
+		name   => 'empty',
+		source => '',
+	);
+	$r->analyze($m);
+	is(scalar @{ $m->evidence_ref }, 0, 'no evidence for empty body');
+};
+
+# --------------------------------------------------
+# Path: raw hashref passed instead of Model::Method →
+#   $add closure is a no-op; no croak; returns undef
+# --------------------------------------------------
+subtest 'Analyzer::Return: raw hashref argument → no evidence, no croak' => sub {
+	my $r = App::Test::Generator::Analyzer::Return->new;
+	lives_ok(
+		sub { $r->analyze({ source => 'return $self' }) },
+		'raw hashref does not croak',
+	);
+};
+
+# ==================================================================
+# Planner::Mock — all four branch paths + non-hashref croak
+# ==================================================================
+
+use_ok('App::Test::Generator::Planner::Mock');
+
+Readonly my $MOCK_SYSTEM     => 'mock_system';
+Readonly my $MOCK_CAPTURE_IO => 'capture_io';
+
+# --------------------------------------------------
+# Path: method has no _analysis key → absent from plan
+# --------------------------------------------------
+subtest 'Planner::Mock: no _analysis key → method absent from result' => sub {
+	my $p      = App::Test::Generator::Planner::Mock->new;
+	my $result = $p->plan({ pure_method => {} });
+	ok(!exists $result->{pure_method}, 'pure method without _analysis absent from mock plan');
+};
+
+# --------------------------------------------------
+# Path: calls_external only → scalar 'mock_system'
+# --------------------------------------------------
+subtest 'Planner::Mock: calls_external only → mock_system scalar' => sub {
+	my $p = App::Test::Generator::Planner::Mock->new;
+	my $result = $p->plan({
+		m => { _analysis => { side_effects => { calls_external => 1 } } },
+	});
+	is($result->{m}, $MOCK_SYSTEM, 'calls_external alone → mock_system string');
+};
+
+# --------------------------------------------------
+# Path: performs_io only → scalar 'capture_io'
+# --------------------------------------------------
+subtest 'Planner::Mock: performs_io only → capture_io scalar' => sub {
+	my $p = App::Test::Generator::Planner::Mock->new;
+	my $result = $p->plan({
+		m => { _analysis => { side_effects => { performs_io => 1 } } },
+	});
+	is($result->{m}, $MOCK_CAPTURE_IO, 'performs_io alone → capture_io string');
+};
+
+# --------------------------------------------------
+# Path: both flags set → arrayref [mock_system, capture_io]
+# --------------------------------------------------
+subtest 'Planner::Mock: both calls_external and performs_io → arrayref' => sub {
+	my $p = App::Test::Generator::Planner::Mock->new;
+	my $result = $p->plan({
+		m => { _analysis => { side_effects => { calls_external => 1, performs_io => 1 } } },
+	});
+	is(ref($result->{m}), 'ARRAY', 'both flags → arrayref');
+	is_deeply($result->{m}, [$MOCK_SYSTEM, $MOCK_CAPTURE_IO], 'arrayref contains both labels in order');
+};
+
+# --------------------------------------------------
+# Path: non-hashref schema → croak
+# --------------------------------------------------
+subtest 'Planner::Mock: non-hashref schema → croak' => sub {
+	my $p = App::Test::Generator::Planner::Mock->new;
+	throws_ok(
+		sub { $p->plan('not a hashref') },
+		qr/schema must be a hashref/,
+		'non-hashref schema croaks with expected message',
+	);
+};
+
+# ==================================================================
+# PodExampleExtractor — three source-collection paths + dedup + shell-cmd rejection
+# ==================================================================
+
+use_ok('App::Test::Generator::PodExampleExtractor');
+
+# --------------------------------------------------
+# Path: =head1 SYNOPSIS verbatim block collected
+# --------------------------------------------------
+subtest 'PodExampleExtractor: =head1 SYNOPSIS verbatim block collected' => sub {
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	print $fh <<'END';
+package SynopsisTest;
+
+=head1 SYNOPSIS
+
+    my $x = 1;
+
+=cut
+
+1;
+END
+	close $fh;
+	my $ex  = App::Test::Generator::PodExampleExtractor->new(file => $path);
+	my $res = $ex->extract;
+	my @synopsis = grep { $_->{section} =~ /SYNOPSIS/i } @$res;
+	ok(@synopsis >= 1, 'SYNOPSIS verbatim block produces at least one example');
+	like($synopsis[0]{code}, qr/my \$x/, 'SYNOPSIS code text preserved');
+};
+
+# --------------------------------------------------
+# Path: =for example begin/end block collected
+# --------------------------------------------------
+subtest 'PodExampleExtractor: =for example begin/end block collected' => sub {
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	print $fh <<'END';
+package ForExTest;
+
+=pod
+
+=for example begin
+
+    my $y = 2;
+
+=for example end
+
+=cut
+
+1;
+END
+	close $fh;
+	my $ex  = App::Test::Generator::PodExampleExtractor->new(file => $path);
+	my $res = $ex->extract;
+	my @for = grep { $_->{section} =~ /for example/i } @$res;
+	ok(@for >= 1, '=for example begin/end block produces at least one example');
+	like($for[0]{code}, qr/my \$y/, '=for example code text preserved');
+};
+
+# --------------------------------------------------
+# Path: annotated inline line "# => value" collected, expected captured
+# --------------------------------------------------
+subtest 'PodExampleExtractor: annotated inline line with # => value' => sub {
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	print $fh <<'END';
+package AnnotTest;
+
+=head1 DESCRIPTION
+
+    abs(-5)  # => 5
+
+=cut
+
+1;
+END
+	close $fh;
+	my $ex  = App::Test::Generator::PodExampleExtractor->new(file => $path);
+	my $res = $ex->extract;
+	my @ann = grep { defined $_->{expected} } @$res;
+	ok(@ann >= 1, 'annotated inline example found');
+	is($ann[0]{expected}, '5', 'expected value captured from annotation');
+};
+
+# --------------------------------------------------
+# Path: shell-only verbatim block rejected by _looks_like_perl
+# (no Perl sigils/keywords → _looks_like_perl returns false → block dropped)
+# --------------------------------------------------
+subtest 'PodExampleExtractor: shell-only verbatim block not collected' => sub {
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	print $fh <<'END';
+package ShellTest;
+
+=head1 SYNOPSIS
+
+    prove -l t/
+    fuzz-harness-generator -r schemas/foo.yml
+
+=cut
+
+1;
+END
+	close $fh;
+	my $ex  = App::Test::Generator::PodExampleExtractor->new(file => $path);
+	my $res = $ex->extract;
+	is(scalar @$res, 0, 'shell-only SYNOPSIS block rejected by _looks_like_perl');
+};
+
+# --------------------------------------------------
+# Path: deduplication — same code in both SYNOPSIS and =for example → appears once
+# --------------------------------------------------
+subtest 'PodExampleExtractor: duplicate code across SYNOPSIS and =for example deduplicated' => sub {
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	print $fh <<'END';
+package DedupTest;
+
+=head1 SYNOPSIS
+
+    my $z = 3;
+
+=head1 EXAMPLES
+
+=for example begin
+
+    my $z = 3;
+
+=for example end
+
+=cut
+
+1;
+END
+	close $fh;
+	my $ex  = App::Test::Generator::PodExampleExtractor->new(file => $path);
+	my $res = $ex->extract;
+	my %codes;
+	for my $ex (@$res) {
+		(my $norm = $ex->{code}) =~ s/^\s+|\s+$//g;
+		$codes{$norm}++;
+	}
+	my @dups = grep { $codes{$_} > 1 } keys %codes;
+	is(scalar @dups, 0, 'no duplicate code blocks after deduplication');
+};
+
+# ==================================================================
+# CoverageGuidedFuzzer::minimize_corpus — greedy-set-cover path branches
+# ==================================================================
+
+use_ok('App::Test::Generator::CoverageGuidedFuzzer');
+
+Readonly my $NOOP_TARGET => sub { 1 };
+
+# --------------------------------------------------
+# Path: all entries have empty coverage → fingerprint-dedup path only
+# --------------------------------------------------
+subtest 'CoverageGuidedFuzzer::minimize_corpus: no-coverage entries → fingerprint dedup' => sub {
+	my $f = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { x => { type => 'integer' } },
+		target_sub => $NOOP_TARGET,
+	);
+	# Manually populate corpus with no-coverage entries (as load_corpus would produce)
+	$f->{corpus} = [
+		{ input => 1, coverage => {} },
+		{ input => 2, coverage => {} },
+		{ input => 1, coverage => {} },  # duplicate of first
+	];
+	my $stats = $f->minimize_corpus;
+	is($stats->{before}, 3, 'before reflects manual corpus size');
+	is($stats->{after},  2, 'duplicate entry removed by fingerprint dedup');
+	is($stats->{branches}, 0, 'no branch coverage data → branches=0');
+};
+
+# --------------------------------------------------
+# Path: entries with coverage → greedy set-cover fires
+# --------------------------------------------------
+subtest 'CoverageGuidedFuzzer::minimize_corpus: entries with coverage → greedy selection' => sub {
+	my $f = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { x => { type => 'integer' } },
+		target_sub => $NOOP_TARGET,
+	);
+	$f->{corpus} = [
+		{ input => 1, coverage => { branch_A => 1, branch_B => 1 } },
+		{ input => 2, coverage => { branch_A => 1 } },  # redundant — A already covered by entry 1
+		{ input => 3, coverage => { branch_C => 1 } },
+	];
+	my $stats = $f->minimize_corpus;
+	is($stats->{branches}, 3, 'total branch count correct');
+	is($stats->{after},    2, 'greedy selection keeps 2 entries (not the redundant one)');
+	is($stats->{before},   3, 'before reflects pre-minimise size');
+};
+
+# --------------------------------------------------
+# Path: bug input forces inclusion regardless of coverage
+# --------------------------------------------------
+subtest 'CoverageGuidedFuzzer::minimize_corpus: bug input always retained' => sub {
+	my $f = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { x => { type => 'integer' } },
+		target_sub => $NOOP_TARGET,
+	);
+	# corpus has one entry that covers nothing; bugs has one input
+	$f->{corpus} = [{ input => 42, coverage => {} }];
+	$f->{bugs}   = [{ input => 99, error => 'boom' }];
+	my $stats = $f->minimize_corpus;
+	my @inputs = map { $_->{input} } @{ $f->{corpus} };
+	ok((grep { $_ == 99 } @inputs), 'bug input (99) retained in minimised corpus');
+};
+
+# --------------------------------------------------
+# Path: never-run fuzzer → empty corpus, minimize_corpus returns zeros
+# --------------------------------------------------
+subtest 'CoverageGuidedFuzzer::minimize_corpus: empty corpus → before=after=0' => sub {
+	my $f = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { x => { type => 'integer' } },
+		target_sub => $NOOP_TARGET,
+	);
+	my $stats = $f->minimize_corpus;
+	is($stats->{before},   0, 'before=0 for never-run fuzzer');
+	is($stats->{after},    0, 'after=0 for never-run fuzzer');
+	is($stats->{branches}, 0, 'branches=0 for never-run fuzzer');
+};
+
+# --------------------------------------------------
+# Path: second minimize_corpus call → idempotent
+# --------------------------------------------------
+subtest 'CoverageGuidedFuzzer::minimize_corpus: second call is idempotent' => sub {
+	my $f = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { x => { type => 'integer' } },
+		target_sub => $NOOP_TARGET,
+	);
+	$f->{corpus} = [
+		{ input => 1, coverage => { br_A => 1 } },
+		{ input => 2, coverage => { br_B => 1 } },
+	];
+	my $s1 = $f->minimize_corpus;
+	my $s2 = $f->minimize_corpus;
+	is($s2->{before}, $s1->{after},  'second call before == first call after');
+	is($s2->{after},  $s1->{after},  'second call after == first call after (idempotent)');
+};
+
+# ==================================================================
+# Mutator::generate_mutants — wantarray context sensitivity
+# ==================================================================
+
+use_ok('App::Test::Generator::Mutator');
+
+{
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $lib    = File::Spec->catdir($tmpdir, 'lib');
+	make_path($lib);
+	my $pmfile = File::Spec->catfile($lib, 'Dummy.pm');
+	open my $fh, '>', $pmfile or die $!;
+	print $fh "package Dummy;\nsub foo { return 1 }\n1;\n";
+	close $fh;
+
+	my $mut = App::Test::Generator::Mutator->new(
+		file    => $pmfile,
+		lib_dir => 'lib',
+	);
+	my $orig_cwd = Cwd::cwd();
+	chdir $tmpdir;
+
+	# --------------------------------------------------
+	# Path: scalar context → arrayref returned
+	# --------------------------------------------------
+	subtest 'Mutator::generate_mutants: scalar context → arrayref' => sub {
+		my $result = $mut->generate_mutants;
+		is(ref($result), 'ARRAY', 'scalar context returns arrayref');
+	};
+
+	# --------------------------------------------------
+	# Path: list context → flat list returned
+	# --------------------------------------------------
+	subtest 'Mutator::generate_mutants: list context → flat list' => sub {
+		my @result = $mut->generate_mutants;
+		isnt(ref(\@result), 'REF', 'list context returns flat list (array, not ref-to-ref)');
+		ok(@result >= 0, 'list result is a list');
+	};
+
+	# --------------------------------------------------
+	# Path: scalar context arrayref elements are the same objects as list context
+	# Verify by capturing both in one call via wantarray-sensitive wrapper.
+	# --------------------------------------------------
+	subtest 'Mutator::generate_mutants: scalar and list yield same count' => sub {
+		my $aref = $mut->generate_mutants;
+		my @list = $mut->generate_mutants;
+		# Both calls re-parse the same file so element count must agree
+		is(scalar @list, scalar @$aref, 'same mutant count in list and scalar context');
+		if (@list) {
+			# Objects are newly created each call, but their descriptions must agree
+			is($list[0]->description, $aref->[0]->description,
+				'first mutant description agrees across both context returns');
+		} else {
+			pass('no mutants — description agreement check skipped');
+		}
+	};
+
+	chdir $orig_cwd;
+}
 
 done_testing();

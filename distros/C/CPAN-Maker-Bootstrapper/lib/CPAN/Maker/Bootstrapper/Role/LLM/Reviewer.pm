@@ -126,6 +126,8 @@ sub cmd_pod_finding {
 ########################################################################
   my ($self) = @_;
 
+  $self->_load_ASCIITable;
+
   my ($file) = $self->get_args;
 
   my ( $review, $review_file ) = $self->_get_latest_review( $file, 'pod' );
@@ -142,8 +144,6 @@ sub cmd_pod_finding {
 sub _show_pod_findings {
 ########################################################################
   my ( $self, $review, $review_file ) = @_;
-
-  require Text::ASCIITable;
 
   my $mode     = $review->{mode}     // 'review';
   my $findings = $review->{findings} // [];
@@ -187,6 +187,8 @@ sub cmd_code_review {
 ########################################################################
   my ($self) = @_;
 
+  $self->_load_ASCIITable;
+
   my ( $file, $api_key ) = $self->get_args;
 
   my ( $review, $review_file ) = $self->_get_latest_review( $file, 'code' );
@@ -215,6 +217,8 @@ sub cmd_code_review {
 sub cmd_pod_review {
 ########################################################################
   my ($self) = @_;
+
+  $self->_load_ASCIITable;
 
   my ( $file, $api_key ) = $self->get_args;
 
@@ -374,6 +378,8 @@ sub cmd_code_finding {
 ########################################################################
   my ($self) = @_;
 
+  $self->_load_ASCIITable;
+
   my ( $file, $finding_id ) = $self->get_args;
 
   die "ERROR: file argument is required\n"
@@ -399,8 +405,6 @@ sub cmd_code_finding {
     if !$finding;
 
   my $total = scalar @{ $review->{findings} };
-
-  require Text::ASCIITable;
 
   my $t = Text::ASCIITable->new( { headingText => sprintf 'Finding %d of %d  -  %s', $finding_id, $total, $review_file } );
 

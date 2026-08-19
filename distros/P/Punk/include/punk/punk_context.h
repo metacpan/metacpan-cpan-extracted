@@ -249,7 +249,10 @@ static SV *punk_deliver(pTHX_ SV *c, SV *resp, int is_head, AV *after) {
     SV *r = pcx_is_triplet(aTHX_ resp) ? SvREFCNT_inc(resp)
                                        : punk_coerce(aTHX_ c, resp);
     /* a streaming coderef has no triplet to mutate: skip after-hooks and HEAD */
-    if (SvROK(r) && SvTYPE(SvRV(r)) == SVt_PVCV) return r;
+    if (SvROK(r) && SvTYPE(SvRV(r)) == SVt_PVCV) {
+        if (PK_OBS_WANT_RES) pk_obs_fire_res(aTHX_ c, r);
+        return r;
+    }
     if (after) {
         SSize_t i, n = av_len(after) + 1;
         for (i = 0; i < n; i++) {
@@ -274,7 +277,47 @@ static SV *punk_deliver(pTHX_ SV *c, SV *resp, int is_head, AV *after) {
             (void)av_store(ra, 2, newRV_noinc((SV *)empty));
         }
     }
+    /* The C ABI's response observers. Here rather than in the dispatcher
+     * because this is the ONE place a final triplet is produced: the
+     * synchronous path reaches it through punk_finish_c, and every
+     * asynchronous completion reaches it from punk_compile.h when the future
+     * settles - so an observer sees the response that was actually sent, at
+     * the moment it was, and sees it exactly once either way. The four
+     * dispatcher exits that never come through here fire it themselves. */
+    if (PK_OBS_WANT_RES) pk_obs_fire_res(aTHX_ c, r);
     return r;
+}
+
+/* Is this a same-origin relative path - somewhere on this site, and nowhere
+ * else? Backs $c->safe_path, the guard for a redirect destination that came
+ * out of the request (?to=, ?return=, ?next=).
+ *
+ * Checking for a leading '/' and no leading '//' is NOT enough, because the
+ * browser does not read the string byte for byte the way this does:
+ *
+ *   - it removes every TAB, CR and LF from a URL before parsing it, so
+ *     "/<TAB>/evil.example" is parsed as "//evil.example";
+ *   - under a special scheme it treats '\' as '/', so "/\evil.example" is
+ *     protocol-relative too.
+ *
+ * Either one leaves the site, which is why this refuses the whole class -
+ * every C0 control, DEL, and a backslash anywhere - rather than trying to
+ * enumerate the bytes some parser somewhere might drop. The same rule (and
+ * the same reasoning) as Punk::OAuth2's same_origin_path, which is where it
+ * was learned the expensive way: CVE-2026-75628. A path that genuinely wants
+ * one of these spells it percent-encoded. */
+static int pk_same_origin_path(pTHX_ SV *path) {
+    STRLEN n, i;
+    const char *p;
+    if (!path || !SvOK(path)) return 0;
+    p = SvPV_const(path, n);
+    if (n < 1 || p[0] != '/') return 0;
+    if (n >= 2 && p[1] == '/') return 0;
+    for (i = 0; i < n; i++) {
+        const unsigned char ch = (unsigned char)p[i];
+        if (ch < 0x20 || ch == 0x7f || ch == '\\') return 0;
+    }
+    return 1;
 }
 
 #endif /* PUNK_CONTEXT_H */

@@ -1,5 +1,5 @@
 package HTTP::API::DataTypeMarker;
-$HTTP::API::DataTypeMarker::VERSION = '1.10';
+$HTTP::API::DataTypeMarker::VERSION = '1.23';
 =head1 NAME
 
 HTTP::API::DataTypeMarker - mark request data so it serializes as a specific
@@ -18,11 +18,18 @@ type, since Perl scalars have no native boolean and no native "comma list"
 =head1 DESCRIPTION
 
 Every value here is a blessed arrayref - either C<BOOL> (from L</"xBOOLEAN($value)">)
-or C<CSV> (from L</"xCSV(@values)">) - that HTTP::API::Client's C<kvp2json_each> and
-C<kvp2str_each> recognize and serialize specially instead of treating as a
-plain array. Marking a value is the only way to control how it is written,
-since a bare Perl scalar (C<1>, C<0>, C<"true">, ...) is always ambiguous
-about whether it means a JSON boolean, a string, or a number.
+or C<CSV> (from L</"xCSV(@values)">). C<BOOL> is recognized and unwrapped
+specially by both C<kvp2json_each> and C<kvp2str_each>, since a bare Perl
+scalar (C<1>, C<0>, C<"true">, ...) is always ambiguous about whether it
+means a JSON boolean, a string, or a number. C<CSV> is only special-cased
+by C<kvp2str_each>, which joins it into one comma-separated
+C<key=value,value> instead of a key repeated per element - a
+form-urlencoded-specific problem JSON doesn't have. C<kvp2json_each> has
+no C<CSV> handling at all; a blessed C<CSV> arrayref satisfies Perl's
+reftype-based C<ARRAY> check regardless of blessing, so it falls through
+to the plain-array branch and JSON-encodes as an ordinary array
+(C<xCSV(1,2,3)> becomes C<[1,2,3]>) - which is the natural JSON
+representation of a list anyway.
 
 =cut
 
@@ -41,12 +48,14 @@ our @EXPORT = qw( xCSV xBOOLEAN
 
 Mark a list so it serializes as one comma-joined value instead of one
 repeated key per element. C<xCSV(1, 2, 3)> becomes C<a=1,2,3> in a
-form-urlencoded request instead of the default C<a=1&a=2&a=3>.
+form-urlencoded request instead of the default C<a=1&a=2&a=3>. Each
+value is copied at call time - C<xCSV($x, $y)> then reassigning C<$x>
+does not change what was already captured.
 
 =cut
 
 sub xCSV {
-    return bless \@_, 'CSV';
+    return bless [ @_ ], 'CSV';
 }
 
 =head2 xBOOLEAN($value)
@@ -56,6 +65,15 @@ C<$value> (a plain scalar or a scalar ref) so C<kvp2json_each>/
 C<kvp2str_each> unwrap and emit it verbatim instead of treating it as an
 array. Use one of the named markers below rather than this directly unless
 none of them fit.
+
+A plain scalar is copied at call time, the same as C<xCSV>'s values -
+C<xBOOLEAN($flag)> then reassigning C<$flag> does not change what was
+already captured. Pass a scalar ref instead (C<xBOOLEAN(\$flag)>) to opt
+into tracking C<$flag> live - the marker then always reflects whatever
+C<$flag> currently holds when it's later read. Only a plain scalar or a
+scalar ref is accepted - wrapping anything else (an arrayref, a
+hashref) dies with a clear message when the marker is later encoded,
+rather than silently stringifying it.
 
 =head2 xTRUE / xFALSE
 
@@ -78,7 +96,7 @@ The single-character string C<"t"> / C<"f">.
 =cut
 
 sub xBOOLEAN {
-    return bless \@_, 'BOOL';
+    return bless [ @_ ], 'BOOL';
 }
 
 sub xTRUE {

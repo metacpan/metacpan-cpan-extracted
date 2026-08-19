@@ -38,14 +38,20 @@ use Fcntl;
 use Tie::IxHash;
 use Digest::MD5 qw(md5_hex);
 use File::Spec::Unix;
+use File::Basename qw(basename);
 use Data::Dumper;
-$Data::Dumper::Indent=1;
-$Data::Dumper::Sortkeys=1;
 use HTML::Entities qw(decode_entities encode_entities);
 use CGI::Simple;
 use JSON;
 use Cwd qw(fastcwd);
 use Sub::Util qw(set_subname);
+
+
+#  Data::Dumper config for debugging
+#
+local $Data::Dumper::Indent=1;
+local $Data::Dumper::Sortkeys=1;
+local $Data::Dumper::Terse=1;
 
 
 #  Inherit from the Compile module, not loaded until needed though.
@@ -62,7 +68,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='3.018';
+$VERSION='3.019';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -2851,6 +2857,22 @@ sub api {
     #  Perl ?
     #
     my %attr=%{$attr_hr};
+    if (WEBDYNE_API_STRIP_PREFIX && (my $pattern=$attr{'pattern'})) {
+        my $path_fn=$self->r()->filename();
+        my $api_fn=basename($path_fn, WEBDYNE_PSP_EXT);
+
+        #  API patterns should start from the PSP filename stem, e.g.
+        #  /api/foo for api.psp. If the document-root path has been
+        #  included by mistake, strip it here so /example/api/foo is
+        #  treated as /api/foo. The tradeoff is that a nested API file
+        #  cannot deliberately use document-root relative patterns while
+        #  this behaviour is enabled.
+        #
+        if ($pattern=~s{^/.+?/\Q$api_fn\E(?=/|$)}{/$api_fn}) {
+            debug("normalised api pattern for $path_fn from $attr{'pattern'} to $pattern");
+            $attr{'pattern'}=$pattern;
+        }
+    }
     if (my $perl=$attr{'perl'}) {
         $attr{'name'}='perl'
     }

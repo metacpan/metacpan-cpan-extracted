@@ -1,0 +1,68 @@
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+	NAME             => 'Fugu',
+	VERSION          => '0.1.2',
+	ABSTRACT         => 'OpenBSD-style daemon utilities for Perl',
+	LICENSE          => 'open_source',
+	MIN_PERL_VERSION => '5.036',
+	EXE_FILES        => [
+
+	],
+	PREREQ_PM        => {
+
+	},
+	PM               => {
+		'lib/Fugu.pm' => '$(INST_LIB)/Fugu.pm',
+		'lib/Fugu.pod' => '$(INST_LIB)/Fugu.pod',
+		'lib/Fugu/CLI.pm' => '$(INST_LIB)/Fugu/CLI.pm',
+		'lib/Fugu/CLI.pod' => '$(INST_LIB)/Fugu/CLI.pod',
+		'lib/Fugu/Config.pm' => '$(INST_LIB)/Fugu/Config.pm',
+		'lib/Fugu/Config.pod' => '$(INST_LIB)/Fugu/Config.pod',
+		'lib/Fugu/Control.pm' => '$(INST_LIB)/Fugu/Control.pm',
+		'lib/Fugu/Control.pod' => '$(INST_LIB)/Fugu/Control.pod',
+		'lib/Fugu/Daemon.pm' => '$(INST_LIB)/Fugu/Daemon.pm',
+		'lib/Fugu/Daemon.pod' => '$(INST_LIB)/Fugu/Daemon.pod',
+		'lib/Fugu/EventLoop.pm' => '$(INST_LIB)/Fugu/EventLoop.pm',
+		'lib/Fugu/EventLoop.pod' => '$(INST_LIB)/Fugu/EventLoop.pod',
+		'lib/Fugu/File.pm' => '$(INST_LIB)/Fugu/File.pm',
+		'lib/Fugu/File.pod' => '$(INST_LIB)/Fugu/File.pod',
+		'lib/Fugu/Imsg.pm' => '$(INST_LIB)/Fugu/Imsg.pm',
+		'lib/Fugu/Imsg.pod' => '$(INST_LIB)/Fugu/Imsg.pod',
+		'lib/Fugu/JSONSocket.pm' => '$(INST_LIB)/Fugu/JSONSocket.pm',
+		'lib/Fugu/JSONSocket.pod' => '$(INST_LIB)/Fugu/JSONSocket.pod',
+		'lib/Fugu/Log.pm' => '$(INST_LIB)/Fugu/Log.pm',
+		'lib/Fugu/Log.pod' => '$(INST_LIB)/Fugu/Log.pod',
+		'lib/Fugu/MQTT.pm' => '$(INST_LIB)/Fugu/MQTT.pm',
+		'lib/Fugu/MQTT.pod' => '$(INST_LIB)/Fugu/MQTT.pod',
+		'lib/Fugu/Mdnsd.pm' => '$(INST_LIB)/Fugu/Mdnsd.pm',
+		'lib/Fugu/Mdnsd.pod' => '$(INST_LIB)/Fugu/Mdnsd.pod',
+		'lib/Fugu/Pidfile.pm' => '$(INST_LIB)/Fugu/Pidfile.pm',
+		'lib/Fugu/Pidfile.pod' => '$(INST_LIB)/Fugu/Pidfile.pod',
+		'lib/Fugu/Privdrop.pm' => '$(INST_LIB)/Fugu/Privdrop.pm',
+		'lib/Fugu/Privdrop.pod' => '$(INST_LIB)/Fugu/Privdrop.pod',
+		'lib/Fugu/Process.pm' => '$(INST_LIB)/Fugu/Process.pm',
+		'lib/Fugu/Process.pod' => '$(INST_LIB)/Fugu/Process.pod',
+		'lib/Fugu/Proxy.pm' => '$(INST_LIB)/Fugu/Proxy.pm',
+		'lib/Fugu/Proxy.pod' => '$(INST_LIB)/Fugu/Proxy.pod',
+		'lib/Fugu/Random.pm' => '$(INST_LIB)/Fugu/Random.pm',
+		'lib/Fugu/Random.pod' => '$(INST_LIB)/Fugu/Random.pod',
+		'lib/Fugu/SSH.pm' => '$(INST_LIB)/Fugu/SSH.pm',
+		'lib/Fugu/SSH.pod' => '$(INST_LIB)/Fugu/SSH.pod',
+		'lib/Fugu/Sandbox.pm' => '$(INST_LIB)/Fugu/Sandbox.pm',
+		'lib/Fugu/Sandbox.pod' => '$(INST_LIB)/Fugu/Sandbox.pod',
+		'lib/Fugu/Signal.pm' => '$(INST_LIB)/Fugu/Signal.pm',
+		'lib/Fugu/Signal.pod' => '$(INST_LIB)/Fugu/Signal.pod',
+		'lib/Fugu/StateFile.pm' => '$(INST_LIB)/Fugu/StateFile.pm',
+		'lib/Fugu/StateFile.pod' => '$(INST_LIB)/Fugu/StateFile.pod',
+		'lib/Fugu/TestLog.pm' => '$(INST_LIB)/Fugu/TestLog.pm',
+		'lib/Fugu/TestLog.pod' => '$(INST_LIB)/Fugu/TestLog.pod',
+		'lib/Fugu/Timeout.pm' => '$(INST_LIB)/Fugu/Timeout.pm',
+		'lib/Fugu/Timeout.pod' => '$(INST_LIB)/Fugu/Timeout.pod',
+		'lib/Protocol/Imsg.pm' => '$(INST_LIB)/Protocol/Imsg.pm',
+		'lib/Protocol/Imsg.pod' => '$(INST_LIB)/Protocol/Imsg.pod'
+	},
+	test             => { TESTS => 't/fugu/*.t t/protocol/*.t t/conformance/*.t' },
+);

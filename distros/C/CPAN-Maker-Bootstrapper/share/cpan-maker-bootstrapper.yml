@@ -5,7 +5,9 @@ commands:
   code-review:        CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
   create-config:      CPAN::Maker::Bootstrapper::Role::CreateConfig
   create-deps:        CPAN::Maker::Bootstrapper::Role::CreateDeps
+  critique:           CPAN::Maker::Bootstrapper::Role::Critic
   default:            cmd_install
+  filter:             CPAN::Maker::Bootstrapper::Role::Filter 
   install:            CPAN::Maker::Bootstrapper::Role::Installer
   import-scaffold:    CPAN::Maker::Bootstrapper::Role::ScaffoldImporter
   models:             CPAN::Maker::Bootstrapper::Role::LLM::Models
@@ -14,6 +16,7 @@ commands:
   release-notes:      CPAN::Maker::Bootstrapper::Role::LLM::ReleaseNotes
   update-annotations: CPAN::Maker::Bootstrapper::Role::LLM::Annotator
   extra-files:        CPAN::Maker::Bootstrapper::Role::ExtraFiles
+  resolve-vars:       CPAN::Maker::Bootstrapper::Role::ResolveVars
 options:
 - auto-annotate|A
 - annotate|a=s@
@@ -22,6 +25,7 @@ options:
 - context|C=s@
 - debug|d
 - dry-run|D
+- file-list|L=s
 - finalize-annotations|F
 - history!
 - max-diff-files=i
@@ -41,6 +45,10 @@ options:
 - resources|r=s
 - stub|s=s
 - username|u=s
+- vars-file=s
+alias:
+  options:
+    dryrun: dry-run
 extra_options:
   - llm
   - llm_api_key_helper

@@ -1,0 +1,189 @@
+=head1 NAME
+
+Fugu::EventLoop - one select loop for a daemon with one process
+
+=head1 SYNOPSIS
+
+    use Fugu::EventLoop;
+
+    my $loop = Fugu::EventLoop->new(signal => $sig);
+
+    $loop->add_fd($listener, read => sub ($fh) { accept_one($fh) });
+    $loop->every(1, sub { $mqtt->tick(0) });
+    $loop->every(30, sub { $mqtt->reconnect unless $mqtt->is_connected });
+
+    my $flush = $loop->after(0.25, sub { flush_events() });
+
+    $loop->run;	# returns when a signal or a callback stops it
+
+=head1 DESCRIPTION
+
+B<Fugu::EventLoop> is the loop that a daemon with one process and no
+threads runs.
+A caller registers descriptors and timers, then calls C<run()>.
+
+Written by hand, that loop becomes one C<while> with a poll interval
+chosen for whichever job needs it most, an epoch comparison for each
+periodic job, and no way out but exit(3) inside a signal handler.
+This module is that loop, written one time.
+
+The select timeout comes from the nearest timer deadline.
+Thus a loop whose only job runs every second does not wake ten times
+a second, and a loop with a 250 ms job does not miss it by a whole
+interval.
+
+There are no threads.
+A callback runs in the process that called C<run()>, between passes,
+and nothing else runs while it does.
+A callback that blocks blocks the loop, so keep the work short or
+queue it.
+
+=head2 new
+
+C<new(%args)> creates a loop.
+
+These are the arguments:
+
+=over 4
+
+=item C<log>
+
+The logger for a callback that dies.
+The default is the process default of L<Fugu::Log>.
+
+=item C<signal>
+
+A L<Fugu::Signal> whose interrupt flag ends the loop.
+
+=back
+
+=head2 add_fd
+
+C<add_fd($fh, %args)> watches a descriptor.
+The loop calls the C<read> callback with the handle when the handle is
+readable.
+
+A second C<add_fd()> on the same handle replaces the callback rather
+than adding one, so a caller that re-registers does not get two calls
+for one readable event.
+
+The callback must read with sysread(2), not with a buffered read.
+A buffered read can take more bytes than the callback consumes, and
+then the descriptor is not readable again and the rest is never
+served.
+
+=head2 remove_fd
+
+C<remove_fd($fh)> stops watching a descriptor.
+The loop does not close it: the owner of a handle closes it.
+
+=head2 every
+
+C<every($seconds, $code)> runs the callback every C<$seconds>.
+The method returns a handle for C<cancel()>.
+
+=head2 after
+
+C<after($seconds, $code)> runs the callback one time, C<$seconds> from
+now.
+The method returns a handle for C<cancel()>.
+
+A caller that schedules the same work again before it runs gets two
+runs.
+Keep the handle, or test it first.
+
+=head2 cancel
+
+C<cancel($handle)> drops a timer.
+Cancelling a timer that already ran, or one that was cancelled, does
+nothing.
+
+=head2 stop
+
+C<stop()> ends the loop after the current pass.
+A callback calls this to stop the loop it runs inside.
+
+=head2 is_running
+
+C<is_running()> reports if the loop is between the start and the end
+of C<run()>.
+
+=head2 signal
+
+C<signal($manager)> sets or reads the signal manager.
+A caller that builds the loop before the manager uses this instead of
+the constructor argument.
+
+=head2 run
+
+C<run()> watches and dispatches until something stops the loop.
+
+Three things stop it: a callback that calls C<stop()>, an interrupt
+flag on the signal manager, and a loop with no descriptor and no timer
+left, which has nothing to wait for.
+
+The last one matters to a caller that drives the loop for one piece
+of work: register the work, call C<run()>, and the method returns when
+the work is done.
+
+=head1 RETURN VALUES
+
+C<every()> and C<after()> return a timer handle.
+C<cancel()> returns 1 when it removed a timer and 0 when there was
+none.
+C<is_running()> returns 1 or 0.
+Every other method returns the object.
+
+=head1 EXAMPLES
+
+A daemon that ends on a signal, and shuts down where an operator can
+read it:
+
+    my $sig = Fugu::Signal->new;
+    $sig->setup_interrupt_flag('INT', 'TERM');
+
+    my $loop = Fugu::EventLoop->new(signal => $sig);
+    $loop->add_fd($listener, read => \&accept_one);
+    $loop->run;
+
+    $log->info('Shutting down');
+    withdraw_advertisement();
+
+=head1 ERRORS
+
+C<add_fd()> dies without a code reference, and with a handle that has
+no descriptor.
+A timer dies without a code reference and without a positive
+interval.
+Those are programming errors.
+
+A callback that dies does not stop the loop.
+The loop logs the reason and carries on.
+A daemon that exits because one connection misbehaved is a daemon
+that a peer can stop.
+
+=head1 SEE ALSO
+
+L<Fugu::Log>, L<Fugu::Signal>, L<IO::Select>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+A pass never sleeps longer than one second, even with no timer due.
+The loop must come back often enough to see a stop request, and a
+caller must not have to add a timer of its own to get that.
+
+A periodic timer measures its next deadline from the end of the
+callback, not from the old deadline.
+A callback that overran does not then run several times in a row to
+catch up.
+Thus the interval is a minimum gap, not a rate.
+
+The loop watches for readable only.
+A caller that must know when a descriptor is writable, or that writes
+more than the socket buffer holds, needs a queue of its own.
+
+=cut

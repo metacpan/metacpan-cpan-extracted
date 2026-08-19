@@ -1,0 +1,33 @@
+=head1 NAME
+
+Protocol::HAP::Service - HAP service definitions
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::Service;
+
+    my $service = Protocol::HAP::Service->new(
+        type => 'Thermostat',
+        iid => 10,
+    );
+
+    $service->add_characteristic($characteristic);
+
+=head1 DESCRIPTION
+
+This module represents HAP services. A service holds related
+characteristics.
+
+=head1 THE LOGGER ARGUMENT
+
+The constructor takes an optional C<logger> argument: an object with
+C<debug>, C<info>, C<warning>, and C<error> methods that take
+printf-style arguments. The default is the null logger of
+L<Protocol::HAP>.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, L<Protocol::HAP::Characteristic>,
+F<spec/HAP-Services.md>
+
+=cut

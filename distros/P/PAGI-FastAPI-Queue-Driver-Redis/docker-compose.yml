@@ -1,0 +1,6 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: pagi-redis-test
+    ports:
+      - "6379:6379"

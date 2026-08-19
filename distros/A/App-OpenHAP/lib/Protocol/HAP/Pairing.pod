@@ -1,0 +1,42 @@
+=head1 NAME
+
+Protocol::HAP::Pairing - HAP pairing protocol implementation
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::Pairing;
+
+    my $pairing = Protocol::HAP::Pairing->new(
+        pin => '9876-5432',
+        store => $store,
+        accessory_ltsk => $ltsk,
+        accessory_ltpk => $ltpk,
+    );
+
+    my $response = $pairing->handle_pair_setup($body, $session);
+    my $response = $pairing->handle_pair_verify($body, $session);
+
+=head1 DESCRIPTION
+
+This module implements the HAP pairing protocol. The protocol has the
+pair-setup (SRP) flow and the pair-verify (X25519) flow.
+
+The C<store> argument is required: any object that satisfies the
+contract of F<Protocol/HAP/Store.pod>. The attempt counter of
+pair-setup needs persistence, so the limit of 100 failed attempts
+survives restarts; a silent in-memory fallback would fail open. The
+instance restores the counter from the store at construction and
+persists every change.
+
+The pairing lock and the attempt counter are instance state. Two
+C<Pairing> objects in one process never share a lock or a counter.
+
+The constructor also takes an optional C<logger> argument, defaulting
+to the null logger of L<Protocol::HAP>.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, L<Protocol::HAP::SRP>, L<Protocol::HAP::Crypto>,
+F<Protocol/HAP/Store.pod>, F<spec/HAP-Pairing.md>
+
+=cut

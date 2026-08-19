@@ -1,5 +1,23 @@
 Revision history for Params-Get
 
+0.17	Tue Aug 18 09:38:35 PM EDT 2026
+	[ Tests ]
+	- Improved usage of Test::Needs
+	- Add t/transaction.t: 34-subtest transaction-flow suite (9 sections): multi-step
+	    argument-normalisation lifecycle, three-package dispatch pipeline, mid-pipeline
+	    croak and recovery (state frozen at croak point; retry succeeds; $@ clean),
+	    idempotency (N-repeated normalisations -> consistent isolated results), caller-
+	    variable isolation ($val defensive-copy invariant), OO method chain, state
+	    machine lifecycle (idle->receiving->processing->complete each using a different
+	    calling convention), exception state integrity ($@/$!/$_/$,/$;), and concurrent-
+	    like independent invocations (closures sharing source args; no cross-contamination)
+	- Add t/path.t: 43-subtest CFG path-coverage suite (11 sections): one test per
+	    uniquely identifiable execution path (P01-P31); exercises all four shorthand
+	    AND-chain sub-conditions (E1-E4), all OO sub-dispatch branches (Q/R/S), the
+	    L395 from_arrayref wrap path, the flat even/odd terminal split (U=T/F), and
+	    confirms the ARRAY arm of the De Morgan disjunction is reachable only via the
+	    \@_ detect path (D=T); zero unreachable lines confirmed
+
 0.16	Fri Aug  7 09:51:33 AM EDT 2026
 	[ Bug fixes ]
 	- Don't rely on PVS (GitHub#5)
@@ -27,6 +45,20 @@ Revision history for Params-Get
 	    injection, path traversal, XSS, CRLF header injection, SQL injection
 	    passthrough, STDIN isolation, duplicate-key attack vector, hostile $default
 	    values, resource exhaustion, global-state integrity, and taint propagation
+	- Add t/domain.t: 53-subtest domain tests (11 sections): EP for all 12
+	    $default type partitions (EP1-EP12), BVA on $default string length
+	    (0/1/65536) and ARRAY key count (0/1/N>args/N<args), all 7 @args count
+	    partitions (CN0a-CN5) including large-count (1000), fast-path boundary,
+	    all single-arg type sub-partitions (undef/"0"/""/string/SCALAR/ARRAY/CODE/
+	    blessed/HASH-LIMITATION), OO options hash key-count BVA (0/1/N), falsy
+	    $default shorthand boundaries, and combinatorial edge interactions
+	- Add t/data-flow.t: 45-subtest DU-chain coverage (10 sections): $default
+	    lifecycle and caller-alias isolation, $default_ref cache correctness,
+	    $args dual-definition-site equivalence, $from_arrayref conditional flag,
+	    $num_args dispatch correctness, $arg/$kind dispatch integrity, $val
+	    defensive-copy invariant (caller not mutated via REF-unwrap), %rc
+	    positional-names assembly (fill, discard, undef slots), return-value
+	    identity (fast path vs. fresh hashref), and global-state isolation
 
 0.15	Tue Jun 30 10:17:42 EDT 2026
 	[ Bug fixes ]

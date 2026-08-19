@@ -1,0 +1,100 @@
+=head1 NAME
+
+App::FuguVM::Proxy - the OpenBSD mirror policy over Fugu::Proxy
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::Proxy;
+
+    my $proxy = App::FuguVM::Proxy->new(
+        cache   => App::FuguVM::Proxy::Cache->new($cache_dir),
+        pidfile => $state->proxy_pidfile,
+        store   => $state->store,
+        child   => 'App::FuguVM::Proxy',
+        logfile => $state->vm_state_dir . '/proxy.log',
+    );
+
+    my $port = $proxy->start;
+    my $url  = $proxy->guest_url;    # http://10.0.2.2:<port>
+
+=head1 DESCRIPTION
+
+An OpenBSD installation downloads a miniroot image and a full set of
+file sets. A second installation downloads them again. This proxy
+keeps them, thus a repeated install reads from the disk.
+
+L<Fugu::Proxy> holds the serve loop, the cache and the metadata.
+This file holds only what is true of an OpenBSD mirror and of a QEMU
+guest.
+
+The file has two packages. C<App::FuguVM::Proxy> inherits the supervisor
+and adds the guest URL. C<App::FuguVM::Proxy::Cache> inherits the cache and
+adds the mirror patterns and the version-scoped prune.
+
+=head1 METHODS
+
+Every method of L<Fugu::Proxy> and L<Fugu::Proxy::Cache> applies.
+These are the additions.
+
+=head2 run_child
+
+    App::FuguVM::Proxy->run_child($port, $cache_dir)
+
+The entry point of the spawned child. The child builds its own cache,
+warms the metadata table, and serves until a C<SIGTERM> arrives.
+
+=head2 guest_url
+
+    $proxy->guest_url
+
+Return the proxy URL as the guest reaches it. QEMU user-mode
+networking puts the host at 10.0.2.2, and no other address gets out of
+the SLIRP network. The loopback address serves the same proxy, but the
+guest cannot reach it.
+
+The method returns C<undef> while the proxy does not run.
+
+=head2 prune
+
+    my $removed = $cache->prune(@keep_versions);
+
+Remove the cached download tree of every OpenBSD version other than
+the ones named. The method returns an array reference of
+C<{ version, path, size }>, one for each removed tree.
+
+Nothing else bounds this cache. C<fuguvm cache clear --stale> prunes
+installed images, which live beside these downloads under the same
+C<cache_dir>, but no common key connects them. Thus a version bump
+left the full file sets of the previous version behind for good.
+Nothing read them again, because every cacheable pattern is
+version-scoped, and every copy that a continuous-integration cache
+made still carried them.
+
+The method removes whole directories and not matching files. Removal
+of the files alone leaves the empty version tree behind, and a
+continuous-integration cache walks that tree.
+
+The method does not touch a directory whose name is not a version. In
+practice there are none: every pattern puts its content under
+F<pub/OpenBSD/E<lt>versionE<gt>/> or
+F<pub/OpenBSD/syspatch/E<lt>versionE<gt>/>. A cache under C<$HOME> is
+the wrong place to delete on a guess.
+
+=head1 CACHEABLE CONTENT
+
+The cache keeps the release file sets, the packages, the syspatch
+sets, the checksums and their signatures, the miniroot images, the
+kernels, the build info and the index files. Every pattern names a
+version, and that is what makes C<prune> safe.
+
+Everything else is not cacheable, and neither is any response whose
+status is not 200. A cached 404 is a mirror that stays broken after
+the upstream is fixed.
+
+=head1 SEE ALSO
+
+L<Fugu::Proxy>, L<App::FuguVM::Miniroot>, L<App::FuguVM::Guest>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

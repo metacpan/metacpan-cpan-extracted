@@ -1,0 +1,44 @@
+=head1 NAME
+
+Protocol::HAP::TLV - TLV8 encoder and decoder for the HAP protocol
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::TLV;
+
+    # Encode
+    my $encoded = Protocol::HAP::TLV::encode(
+        0x06 => pack('C', 1),  # State
+        0x00 => pack('C', 0),  # Method
+    );
+
+    # Decode
+    my %decoded = Protocol::HAP::TLV::decode($encoded);
+
+=head1 DESCRIPTION
+
+This module encodes and decodes TLV8 (Type-Length-Value with 8-bit
+fields). The HomeKit Accessory Protocol specifies this format.
+
+=head1 FUNCTIONS
+
+=head2 encode(%items)
+
+This function encodes a hash of type => value pairs into the TLV8
+format. It automatically splits values that are longer than 255 bytes
+into chunks.
+
+=head2 decode($data)
+
+This function decodes TLV8 data into a hash of type => value pairs. It
+automatically concatenates the chunks that have the same type.
+
+The function returns the empty list if the buffer is malformed. A
+malformed buffer has a truncated record header, or it has a length
+field that points past the end of the buffer.
+
+=head1 SEE ALSO
+
+F<spec/HAP-TLV8.md>
+
+=cut

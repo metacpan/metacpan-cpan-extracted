@@ -63,6 +63,8 @@ BEGIN {
 	use_ok('App::Test::Generator::Emitter::Perl');
 	use_ok('App::Test::Generator::Template');
 	use_ok('App::Test::Generator::SchemaExtractor');
+	use_ok('App::Test::Generator::BenchmarkGenerator');
+	use_ok('App::Test::Generator::CoverageGuidedFuzzer');
 }
 
 # --------------------------------------------------
@@ -556,7 +558,8 @@ subtest '_normalize_config' => sub {
 	# test generation is maximally thorough unless explicitly disabled
 	my %config;
 	$fn->(\%config);
-	for my $field (App::Test::Generator::CONFIG_TYPES()) {
+	# The canonical set is now a lexical hash — test via _normalize_config behaviour
+	for my $field (qw(test_nuls test_undef test_empty test_non_ascii dedup close_stdin test_security)) {
 		next if $field eq 'properties';
 		next if $field eq 'timeout';	# numeric — absence means use generated-test default, not 1
 		is($config{$field}, 1, "$field defaults to 1 when absent");
@@ -1581,7 +1584,7 @@ subtest 'Exporter::YAML::export - rejects a missing or empty file path without t
 subtest 'Analyzer::Return - new and analyze API surface' => sub {
 	Readonly my $WEIGHT_RETURNS_PROPERTY => 20;
 
-	my $analyser = App::Test::Generator::Analyzer::Return->new();
+	my $analyser = new_ok('App::Test::Generator::Analyzer::Return');
 	isa_ok($analyser, 'App::Test::Generator::Analyzer::Return', 'new() returns correct class');
 
 	my @evidence;
@@ -1633,7 +1636,7 @@ subtest 'Analyzer::ReturnMeta - report shape and clamp interaction' => sub {
 	Readonly my $PENALTY_IMPLICIT_UNDEF_STABILITY => 20;
 	Readonly my $BONUS_BOOLEAN_STABILITY          => 5;
 
-	my $analyser = App::Test::Generator::Analyzer::ReturnMeta->new();
+	my $analyser = new_ok('App::Test::Generator::Analyzer::ReturnMeta');
 	isa_ok($analyser, 'App::Test::Generator::Analyzer::ReturnMeta', 'new() returns correct class');
 
 	# Baseline: empty output produces perfect scores and no risk flags
@@ -1720,7 +1723,7 @@ subtest 'Analyzer::Complexity - _strip_strings_and_comments isolated behaviour' 
 };
 
 subtest 'Analyzer::Complexity - new and analyze report shape' => sub {
-	my $analyser = App::Test::Generator::Analyzer::Complexity->new();
+	my $analyser = new_ok('App::Test::Generator::Analyzer::Complexity');
 	isa_ok($analyser, 'App::Test::Generator::Analyzer::Complexity', 'new() returns correct class');
 
 	my $method = { body => 'sub foo { if ($x) { return 1; } return 0; }' };
@@ -1780,7 +1783,7 @@ subtest 'Analyzer::SideEffect - _strip_strings_and_comments isolated behaviour' 
 };
 
 subtest 'Analyzer::SideEffect - new and analyze report shape' => sub {
-	my $analyser = App::Test::Generator::Analyzer::SideEffect->new();
+	my $analyser = new_ok('App::Test::Generator::Analyzer::SideEffect');
 	isa_ok($analyser, 'App::Test::Generator::Analyzer::SideEffect', 'new() returns correct class');
 
 	my $method = { body => 'sub save { my $self = shift; $self->{dirty} = 0; print "saved\n"; }' };
@@ -1824,7 +1827,7 @@ subtest 'Analyzer::SideEffect - new and analyze report shape' => sub {
 # and a memory-cycle check across both mock plan shapes.
 # ==================================================================
 subtest 'Planner::Mock - exception message and return shape' => sub {
-	my $planner = App::Test::Generator::Planner::Mock->new();
+	my $planner = new_ok('App::Test::Generator::Planner::Mock');
 	isa_ok($planner, 'App::Test::Generator::Planner::Mock', 'new() returns correct class');
 
 	# Exact error string, not just a pattern -- the skill requires
@@ -1874,7 +1877,7 @@ subtest 'Planner::Mock - exception message and return shape' => sub {
 # proven correct elsewhere.
 # ==================================================================
 subtest 'Planner::Fixture - exception message and return shape' => sub {
-	my $planner = App::Test::Generator::Planner::Fixture->new();
+	my $planner = new_ok('App::Test::Generator::Planner::Fixture');
 	isa_ok($planner, 'App::Test::Generator::Planner::Fixture', 'new() returns correct class');
 
 	throws_ok { $planner->plan({}, 'not a hashref') }
@@ -1896,7 +1899,7 @@ subtest 'Planner::Fixture - exception message and return shape' => sub {
 };
 
 subtest 'Planner::Grouping - exception message and return shape' => sub {
-	my $planner = App::Test::Generator::Planner::Grouping->new();
+	my $planner = new_ok('App::Test::Generator::Planner::Grouping');
 	isa_ok($planner, 'App::Test::Generator::Planner::Grouping', 'new() returns correct class');
 
 	throws_ok { $planner->plan('not a hashref') }
@@ -1927,7 +1930,7 @@ subtest 'Planner::Grouping - exception message and return shape' => sub {
 };
 
 subtest 'Planner::Isolation - exception message and return shape' => sub {
-	my $planner = App::Test::Generator::Planner::Isolation->new();
+	my $planner = new_ok('App::Test::Generator::Planner::Isolation');
 	isa_ok($planner, 'App::Test::Generator::Planner::Isolation', 'new() returns correct class');
 
 	throws_ok { $planner->plan({}, 'not a hashref') }
@@ -2124,7 +2127,7 @@ subtest 'LCSAJ::generate - exact exception message and return shape' => sub {
 # unchanged).
 # ==================================================================
 subtest 'Mutation::Base::_line_content - isolated line lookup' => sub {
-	my $base = App::Test::Generator::Mutation::Base->new();
+	my $base = new_ok('App::Test::Generator::Mutation::Base');
 	my $doc  = PPI::Document->new(\"my \$x = 1;\nmy \$y = 2;\nmy \$z = 3;\n");
 
 	is($base->_line_content($doc, 1), 'my $x = 1;', 'first line content returned');
@@ -2138,7 +2141,7 @@ subtest 'Mutation::Base::_line_content - isolated line lookup' => sub {
 };
 
 subtest 'Mutation::Base::_in_conditional - isolated ancestor-walk behaviour' => sub {
-	my $base = App::Test::Generator::Mutation::Base->new();
+	my $base = new_ok('App::Test::Generator::Mutation::Base');
 
 	my $doc = PPI::Document->new(\"if (\$x) { my \$y = 1; }\n");
 	# Walk to a token strictly inside the if-block's body
@@ -2173,7 +2176,7 @@ subtest 'Mutation::Base::_in_conditional - isolated ancestor-walk behaviour' => 
 # silently corrupting the mutant list.
 # ==================================================================
 subtest 'Mutation::ConditionalInversion::mutate - Mutant construction failure is skipped, not propagated' => sub {
-	my $strategy = App::Test::Generator::Mutation::ConditionalInversion->new();
+	my $strategy = new_ok('App::Test::Generator::Mutation::ConditionalInversion');
 	my $doc      = PPI::Document->new(\"if (\$x) { my \$y = 1; }\nif (\$z) { my \$w = 2; }\n");
 
 	Test::Mockingbird::mock('App::Test::Generator::Mutant', 'new', sub { die "boom\n" });
@@ -2189,7 +2192,7 @@ subtest 'Mutation::ConditionalInversion::mutate - Mutant construction failure is
 };
 
 subtest 'Mutation::ConditionalInversion::mutate - return shape and memory cycles' => sub {
-	my $strategy = App::Test::Generator::Mutation::ConditionalInversion->new();
+	my $strategy = new_ok('App::Test::Generator::Mutation::ConditionalInversion');
 	my $doc      = PPI::Document->new(\"if (\$x) { my \$y = 1; }\n");
 	my @mutants  = $strategy->mutate($doc);
 
@@ -2215,7 +2218,7 @@ subtest 'Mutation::ConditionalInversion::mutate - return shape and memory cycles
 # skill mandates.
 # ==================================================================
 subtest 'Mutation::NumericBoundary::mutate - Mutant construction failure is skipped, not propagated' => sub {
-	my $strategy = App::Test::Generator::Mutation::NumericBoundary->new();
+	my $strategy = new_ok('App::Test::Generator::Mutation::NumericBoundary');
 	my $doc      = PPI::Document->new(\"if (\$x > 1) { my \$y = 1; }\n");
 
 	Test::Mockingbird::mock('App::Test::Generator::Mutant', 'new', sub { die "boom\n" });
@@ -2231,7 +2234,7 @@ subtest 'Mutation::NumericBoundary::mutate - Mutant construction failure is skip
 };
 
 subtest 'Mutation::NumericBoundary::mutate - falsy construction result without dying is skipped' => sub {
-	my $strategy = App::Test::Generator::Mutation::NumericBoundary->new();
+	my $strategy = new_ok('App::Test::Generator::Mutation::NumericBoundary');
 	my $doc      = PPI::Document->new(\"if (\$x > 1) { my \$y = 1; }\n");
 
 	# Unlike the "boom" mock above, this exercises the other half of
@@ -2644,7 +2647,6 @@ subtest 'Model::Method::resolve_classification - isolated from resolve_return_ty
 		object   => 'chainable',
 		property => 'getter',
 		constant => 'constant',
-		bogus    => 'unknown',
 	);
 
 	for my $return_type (sort keys %expect) {
@@ -2661,6 +2663,19 @@ subtest 'Model::Method::resolve_classification - isolated from resolve_return_ty
 		is($m->resolve_classification, $expect{$return_type},
 			"mocked resolve_return_type() '$return_type' drives classification '$expect{$return_type}'");
 
+		Test::Mockingbird::unmock('App::Test::Generator::Model::Method', 'resolve_return_type');
+	}
+
+	# An alien return_type (unreachable via resolve_return_type) now confesses
+	{
+		my $m = App::Test::Generator::Model::Method->new(name => 'm', source => 'sub m {}');
+		Test::Mockingbird::mock(
+			'App::Test::Generator::Model::Method',
+			'resolve_return_type',
+			sub { $_[0]->{return_type} = 'bogus'; return 'bogus' },
+		);
+		throws_ok { $m->resolve_classification }
+			qr/invariant violation/, "mocked bogus return_type → confess fires";
 		Test::Mockingbird::unmock('App::Test::Generator::Model::Method', 'resolve_return_type');
 	}
 };
@@ -2904,7 +2919,7 @@ subtest 'Sample::Module::validate_score - happy path, croaks, and threshold boun
 };
 
 subtest 'Sample::Module::mysterious_method - deliberately unvalidated, doubles its input' => sub {
-	my $obj = App::Test::Generator::Sample::Module->new();
+	my $obj = new_ok('App::Test::Generator::Sample::Module');
 
 	is($obj->mysterious_method(21), 42, 'numeric input is doubled');
 	is($obj->mysterious_method(-5), -10, 'negative numeric input is doubled');
@@ -3790,6 +3805,389 @@ subtest 'SchemaExtractor::_log - prints to stdout only when verbose is true' => 
 	$e->{verbose} = 0;
 	$stdout = capture_stdout { $e->_log('should not appear') };
 	is($stdout, '', 'nothing is printed when verbose is false');
+};
+
+# ==================================================================
+# App::Test::Generator::BenchmarkGenerator
+# --------------------------------------------------
+# t/BenchmarkGenerator*.t and t/domain.t cover the public API from
+# the user-facing perspective.  This section adds white-box coverage
+# of the three private helpers (_build_call, _representative_value,
+# _quote_value) that are never called by their fully-qualified name
+# elsewhere, plus exact croak strings for new() and generate().
+# ==================================================================
+
+Readonly my $BG_MODULE   => 'My::Module';
+Readonly my $BG_FUNCTION => 'process';
+
+subtest 'BenchmarkGenerator::new - croaks for absent, undef, and wrong-type schema' => sub {
+	# Required arg absent — Params::Get usage error
+	throws_ok { App::Test::Generator::BenchmarkGenerator->new() }
+		qr/schema/i,
+		'new() without schema arg croaks mentioning "schema"';
+
+	# Explicit undef triggers the defined-check guard
+	throws_ok { App::Test::Generator::BenchmarkGenerator->new(schema => undef) }
+		qr/^schema is required/,
+		'new(schema => undef) croaks with exact documented message';
+
+	# Wrong reference type triggers the ref-check guard
+	throws_ok { App::Test::Generator::BenchmarkGenerator->new(schema => []) }
+		qr/^schema must be a hashref/,
+		'new(schema => []) croaks with exact documented message';
+
+	# Valid construction
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {});
+	isa_ok($bg, 'App::Test::Generator::BenchmarkGenerator', 'new() with empty hashref schema returns correct class');
+
+	memory_cycle_ok($bg, 'new() result has no reference cycles');
+
+	done_testing();
+};
+
+subtest 'BenchmarkGenerator::generate - croaks for missing module or function key' => sub {
+	# Missing module key
+	throws_ok {
+		App::Test::Generator::BenchmarkGenerator->new(
+			schema => { function => $BG_FUNCTION }
+		)->generate()
+	}
+		qr/^schema missing module/,
+		'generate() croaks with exact message when module key absent';
+
+	# Missing function key
+	throws_ok {
+		App::Test::Generator::BenchmarkGenerator->new(
+			schema => { module => $BG_MODULE }
+		)->generate()
+	}
+		qr/^schema missing function/,
+		'generate() croaks with exact message when function key absent';
+
+	done_testing();
+};
+
+subtest 'BenchmarkGenerator::generate - return shape and content invariants' => sub {
+	# Minimal schema: no input, no transforms, no new
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module   => $BG_MODULE,
+		function => $BG_FUNCTION,
+	});
+	my $script = $bg->generate();
+
+	ok(defined $script && length $script, 'generate() returns a non-empty string');
+	like($script, qr/use strict/,               'script contains "use strict"');
+	like($script, qr/use Benchmark/,            'script uses the Benchmark module');
+	like($script, qr/use \Q$BG_MODULE\E/,       'script emits use line for the target module');
+	like($script, qr/cmpthese/,                 'script contains exactly one cmpthese call');
+	like($script, qr/'default'/,                'no transforms => default variant emitted');
+
+	done_testing();
+};
+
+subtest 'BenchmarkGenerator::generate - builtin module skips use line' => sub {
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module   => 'builtin',
+		function => 'abs',
+		input    => { n => { type => 'integer' } },
+	});
+	my $script = $bg->generate();
+
+	unlike($script, qr/^use builtin/m, 'no "use builtin" line emitted for builtin module');
+	like($script,   qr/abs\(/,         'function called as plain builtin');
+
+	done_testing();
+};
+
+subtest 'BenchmarkGenerator::generate - OOP schema emits constructor and method call' => sub {
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module   => $BG_MODULE,
+		function => 'greet',
+		new      => { name => 'Alice' },
+		input    => { greeting => { type => 'string' } },
+	});
+	my $script = $bg->generate();
+
+	like($script, qr/My::Module->new\(/,  'constructor call emitted');
+	like($script, qr/\$obj->greet\(/,     'method called on $obj, not as class function');
+
+	done_testing();
+};
+
+subtest 'BenchmarkGenerator::generate - transforms produce named variants' => sub {
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module     => $BG_MODULE,
+		function   => $BG_FUNCTION,
+		transforms => {
+			fast => { input => { n => { type => 'integer' } } },
+			slow => { input => { n => { type => 'integer' } } },
+		},
+	});
+	my $script = $bg->generate();
+
+	like($script, qr/'fast'/, 'fast transform variant present');
+	like($script, qr/'slow'/, 'slow transform variant present');
+	unlike($script, qr/'default'/, '"default" variant not emitted when transforms defined');
+
+	done_testing();
+};
+
+subtest 'BenchmarkGenerator::_build_call - positional and named dispatch' => sub {
+	my $fn = \&App::Test::Generator::BenchmarkGenerator::_build_call;
+
+	# Named API (no position keys) with OOP
+	my $call = $fn->($BG_MODULE, 'greet', 1, { name => { type => 'string' } });
+	like($call, qr/\$obj->greet\(/, 'OOP named: call via $obj->');
+
+	# Named API without OOP
+	$call = $fn->($BG_MODULE, 'greet', 0, { name => { type => 'string' } });
+	like($call, qr/My::Module::greet\(/, 'non-OOP named: call via Module::');
+
+	# Positional API with OOP
+	$call = $fn->($BG_MODULE, 'greet', 1, { name => { type => 'string', position => 0 } });
+	like($call, qr/\$obj->greet\(/, 'OOP positional: call via $obj->');
+
+	# Positional builtin (no OOP, module eq builtin)
+	$call = $fn->('builtin', 'abs', 0, { n => { type => 'integer', position => 0 } });
+	like($call, qr/^abs\(/, 'builtin positional: bare function call');
+
+	done_testing();
+};
+
+subtest 'BenchmarkGenerator::_representative_value - type defaults and constraint edges' => sub {
+	my $fn = \&App::Test::Generator::BenchmarkGenerator::_representative_value;
+
+	is($fn->(undef),                          'undef',  'undef spec returns literal "undef"');
+	is($fn->({ type => 'integer' }),           42,       'integer default is 42');
+	is($fn->({ type => 'float' }),             3.14,     'float default is 3.14');
+	is($fn->({ type => 'boolean' }),           1,        'boolean default is 1');
+	is($fn->({ type => 'string' }),            "'hello'", 'string default is single-quoted hello');
+	is($fn->({ type => 'arrayref' }),          '[]',     'arrayref default is []');
+	is($fn->({ type => 'hashref' }),           '{}',     'hashref default is {}');
+	is($fn->({ type => 'unknown_xyz' }),       "'value'", 'unknown type falls back to "value"');
+
+	# min+max: midpoint
+	is($fn->({ type => 'integer', min => 10, max => 20 }), 15, 'integer midpoint of [10,20] = 15');
+
+	# min only: default (42) satisfies > 10, so default returned
+	is($fn->({ type => 'integer', min => 10 }), 42, 'default 42 > min 10, so 42 returned');
+
+	# min only: default (42) does NOT satisfy > 50, so min+1 returned
+	is($fn->({ type => 'integer', min => 50 }), 51, 'default 42 <= min 50, so min+1=51 returned');
+
+	# max only: default (42) satisfies < 100, so default returned
+	is($fn->({ type => 'integer', max => 100 }), 42, 'default 42 < max 100, so 42 returned');
+
+	# max only: default (42) does NOT satisfy < 10, so max-1 returned
+	is($fn->({ type => 'integer', max => 10 }), 9, 'default 42 >= max 10, so max-1=9 returned');
+
+	done_testing();
+};
+
+subtest 'BenchmarkGenerator::_quote_value - quoting rules' => sub {
+	my $fn = \&App::Test::Generator::BenchmarkGenerator::_quote_value;
+
+	is($fn->(undef),       'undef',        'undef becomes literal string "undef"');
+	is($fn->(0),           0,              'numeric 0 returned as-is (not quoted)');
+	is($fn->(42),          42,             'integer 42 returned as-is');
+	is($fn->('hello'),     "'hello'",      'plain string single-quoted');
+	is($fn->("it's"),      q{'it\\'s'},    "embedded single-quote is backslash-escaped");
+	is($fn->(''),          "''",           'empty string becomes two single-quotes');
+
+	done_testing();
+};
+
+# ==================================================================
+# App::Test::Generator::CoverageGuidedFuzzer
+# --------------------------------------------------
+# t/CoverageGuidedFuzzer*.t and t/data-flow.t cover run(),
+# minimize_corpus(), and the save/load round-trip via full
+# integration sequences.  This section adds the exact croak
+# strings for new(), save_corpus(), and load_corpus(), plus
+# memory-cycle checks on the constructed object and the
+# minimize_corpus() return value.
+# ==================================================================
+
+subtest 'CoverageGuidedFuzzer::new - croaks for absent schema or target_sub' => sub {
+	# Absent schema (falsy undef)
+	throws_ok {
+		App::Test::Generator::CoverageGuidedFuzzer->new(
+			target_sub => sub {},
+		)
+	}
+		qr/^schema required/,
+		'new() without schema croaks with exact documented message';
+
+	# Empty hashref is a truthy ref — new() must accept it (documented valid)
+	lives_ok {
+		App::Test::Generator::CoverageGuidedFuzzer->new(
+			schema     => {},
+			target_sub => sub {},
+		)
+	} 'new(schema => {}) lives — empty hashref is a truthy ref and is valid';
+
+	# Absent target_sub
+	throws_ok {
+		App::Test::Generator::CoverageGuidedFuzzer->new(
+			schema => { x => 1 },
+		)
+	}
+		qr/^target_sub required/,
+		'new() without target_sub croaks with exact documented message';
+
+	done_testing();
+};
+
+subtest 'CoverageGuidedFuzzer::new - default values and return shape' => sub {
+	my $fz = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { x => 1 },
+		target_sub => sub {},
+		iterations => 0,
+	);
+
+	isa_ok($fz, 'App::Test::Generator::CoverageGuidedFuzzer', 'new() returns correct class');
+	is(ref $fz->corpus(), 'ARRAY', 'corpus() returns an arrayref');
+	is(ref $fz->bugs(),   'ARRAY', 'bugs() returns an arrayref');
+	is(scalar @{ $fz->corpus() }, 0, 'corpus is empty at construction time');
+	is(scalar @{ $fz->bugs()   }, 0, 'bugs list is empty at construction time');
+
+	memory_cycle_ok($fz, 'new() result has no reference cycles');
+
+	done_testing();
+};
+
+subtest 'CoverageGuidedFuzzer::new - explicit seed, iterations, timeout stored' => sub {
+	Readonly my $SEED       => 12345;
+	Readonly my $ITERATIONS => 7;
+	Readonly my $TIMEOUT    => 2;
+
+	my $fz = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { x => 1 },
+		target_sub => sub {},
+		seed       => $SEED,
+		iterations => $ITERATIONS,
+		timeout    => $TIMEOUT,
+	);
+
+	is($fz->{seed},       $SEED,       'explicit seed stored verbatim');
+	is($fz->{iterations}, $ITERATIONS, 'explicit iterations stored verbatim');
+	is($fz->{timeout},    $TIMEOUT,    'explicit timeout stored verbatim');
+
+	done_testing();
+};
+
+subtest 'CoverageGuidedFuzzer::save_corpus - croaks without path' => sub {
+	my $fz = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { x => 1 },
+		target_sub => sub {},
+		iterations => 0,
+	);
+
+	throws_ok { $fz->save_corpus() }
+		qr/^path required/,
+		'save_corpus() without path arg croaks with exact documented message';
+
+	# Unwritable path (nonexistent directory)
+	my $bad = File::Spec->catfile(
+		File::Temp::tempdir(CLEANUP => 1), 'nodir', 'corpus.json'
+	);
+	throws_ok { $fz->save_corpus($bad) }
+		qr/Cannot write corpus to \Q$bad\E:/,
+		'save_corpus() croaks with path in message on write failure';
+
+	done_testing();
+};
+
+subtest 'CoverageGuidedFuzzer::load_corpus - croaks without path or for missing file' => sub {
+	my $fz = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { x => 1 },
+		target_sub => sub {},
+		iterations => 0,
+	);
+
+	throws_ok { $fz->load_corpus() }
+		qr/^path required/,
+		'load_corpus() without path arg croaks with exact documented message';
+
+	my $missing = File::Spec->catfile(
+		File::Temp::tempdir(CLEANUP => 1), 'no-such-file.json'
+	);
+	throws_ok { $fz->load_corpus($missing) }
+		qr/Cannot read corpus from \Q$missing\E:/,
+		'load_corpus() croaks with path in message when file not found';
+
+	done_testing();
+};
+
+subtest 'CoverageGuidedFuzzer::save_corpus + load_corpus - round-trip integrity' => sub {
+	my ($tmp_fh, $tmp_path) = File::Temp::tempfile(SUFFIX => '.json', UNLINK => 1);
+	close $tmp_fh;
+
+	# Fuzz briefly to build a small corpus
+	my $fz = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { n => { type => 'integer' } },
+		target_sub => sub { my ($n) = @_; defined($n) ? $n + 1 : 1 },
+		iterations => 5,
+		seed       => 42,
+	);
+	$fz->run();
+
+	my $before_count = scalar @{ $fz->corpus() };
+
+	$fz->save_corpus($tmp_path);
+	ok(-s $tmp_path, 'save_corpus() writes a non-empty file');
+
+	# Load into a fresh fuzzer — corpus is populated, bugs list stays empty
+	my $fz2 = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { n => { type => 'integer' } },
+		target_sub => sub { my ($n) = @_; $n + 1 },
+		iterations => 0,
+		seed       => 99,
+	);
+	$fz2->load_corpus($tmp_path);
+
+	is(scalar @{ $fz2->corpus() }, $before_count, 'loaded corpus entry count matches saved count');
+	is(scalar @{ $fz2->bugs()   }, 0,             'load_corpus() does not restore bugs');
+	is($fz2->{seed}, 99, 'load_corpus() does not overwrite constructor-supplied seed');
+
+	done_testing();
+};
+
+subtest 'CoverageGuidedFuzzer::minimize_corpus - return shape and idempotent convergence' => sub {
+	my $fz = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema     => { n => { type => 'integer' } },
+		target_sub => sub { my ($n) = @_; defined($n) ? $n * 2 : 0 },
+		iterations => 10,
+		seed       => 1,
+	);
+	$fz->run();
+
+	my $stats = $fz->minimize_corpus();
+
+	returns_ok(
+		$stats,
+		{
+			type   => 'hashref',
+			schema => {
+				before   => { type => 'integer' },
+				after    => { type => 'integer' },
+				branches => { type => 'integer' },
+			},
+		},
+		'minimize_corpus() returns a hashref with before/after/branches keys',
+	);
+
+	ok($stats->{after} <= $stats->{before}, 'after <= before (minimization never grows corpus)');
+	is(scalar @{ $fz->corpus() }, $stats->{after}, 'corpus() size agrees with returned after value');
+
+	# Second call must be idempotent
+	my $stats2 = $fz->minimize_corpus();
+	is($stats2->{before}, $stats->{after},  'second minimize: before == first after');
+	is($stats2->{after},  $stats2->{before}, 'second minimize: already minimal, after == before');
+
+	memory_cycle_ok($stats, 'minimize_corpus() return value has no reference cycles');
+
+	done_testing();
 };
 
 done_testing();

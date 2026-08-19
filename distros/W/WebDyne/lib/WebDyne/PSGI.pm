@@ -63,7 +63,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.018';
+$VERSION='3.019';
 
 
 #==================================================================================================
@@ -201,8 +201,17 @@ sub handler {
                 debug("status: $status, fn: $fn");
                 if (my $api_fn=$self->api_filename($r)) {
                     debug("status: $status, fn:$fn (%s), found API match, dispatching", $r->filename());
-                    #return &handler($env_hr, filename=>$api_fn);
-                    return $self->handler($env_hr, filename=>$api_fn);
+                    my %api_env=%{$env_hr};
+                    my $api_dn=dirname(File::Spec->abs2rel($api_fn, $r->document_root));
+                    if ($api_dn ne '.') {
+                        #  Treat the discovered API file as mounted at its
+                        #  containing directory. This keeps <api> patterns
+                        #  portable when the app is served from a parent dir,
+                        #  but means nested fallback APIs should use local
+                        #  patterns, not document-root relative patterns.
+                        $api_env{'PATH_INFO'}=~s{^/\Q$api_dn\E(?=/|$)}{}i;
+                    }
+                    return $self->handler(\%api_env, filename=>$api_fn);
                 }
                 
                 

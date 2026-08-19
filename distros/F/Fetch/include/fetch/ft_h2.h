@@ -35,9 +35,28 @@ static int ft_h2_header_cb(nghttp2_session *s, const nghttp2_frame *frame,
     ft_conn *c = (ft_conn *)user;
     dTHX;
     (void)s; (void)flags;
-    if (frame->hd.type != NGHTTP2_HEADERS ||
-        frame->headers.cat != NGHTTP2_HCAT_RESPONSE)
+    if (frame->hd.type != NGHTTP2_HEADERS) return 0;
+
+    /* TRAILERS: a second HEADERS frame, after the DATA.
+     *
+     * These used to be discarded along with everything that was not
+     * HCAT_RESPONSE, which is fine for ordinary HTTP - almost nothing uses
+     * trailers - and fatal for gRPC, where the CALL STATUS lives in them and
+     * nowhere else. A gRPC response is HTTP 200 whether it succeeded or
+     * failed; a client that cannot read trailers can only ever report
+     * success. Hence a separate list rather than merging them into the
+     * response headers: a trailer arrived after the body and a consumer that
+     * cares about the difference must be able to tell. */
+    if (frame->headers.cat == NGHTTP2_HCAT_HEADERS) {
+        if (namelen && name[0] != ':') {
+            if (!c->trailers) c->trailers = newAV();
+            av_push(c->trailers, newSVpvn((const char *)name, namelen));
+            av_push(c->trailers, newSVpvn((const char *)value, valuelen));
+        }
         return 0;
+    }
+    if (frame->headers.cat != NGHTTP2_HCAT_RESPONSE) return 0;
+
     if (namelen == 7 && memcmp(name, ":status", 7) == 0) {
         c->status = (int)strtol((const char *)value, NULL, 10);
     } else if (namelen && name[0] != ':') {         /* skip other pseudo-headers */

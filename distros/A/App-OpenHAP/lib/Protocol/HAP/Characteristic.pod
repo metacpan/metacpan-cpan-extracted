@@ -1,0 +1,37 @@
+=head1 NAME
+
+Protocol::HAP::Characteristic - HAP characteristic definitions
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::Characteristic;
+
+    my $char = Protocol::HAP::Characteristic->new(
+        type => 'CurrentTemperature',
+        iid => 13,
+        format => 'float',
+        perms => ['pr', 'ev'],
+        value => 21.5,
+        unit => 'celsius',
+    );
+
+    my $value = $char->get_value();
+    $char->set_value(22.0);
+
+=head1 DESCRIPTION
+
+This module supplies the HAP characteristic objects. Each
+characteristic holds its properties, its value, and its permissions.
+
+=head1 THE LOGGER ARGUMENT
+
+The constructor takes an optional C<logger> argument: an object with
+C<debug>, C<info>, C<warning>, and C<error> methods that take
+printf-style arguments. The default is the null logger of
+L<Protocol::HAP>. C<set_value> and C<enable_events> report through it.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, F<spec/HAP-Characteristics.md>
+
+=cut

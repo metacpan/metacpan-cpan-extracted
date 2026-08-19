@@ -5,7 +5,6 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
-  JSON: '4.10'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -23,25 +22,25 @@ no_index:
 provides:
   CPAN::Maker:
     file: lib/CPAN/Maker.pm
-    version: v2.0.5
+    version: v2.0.8
   CPAN::Maker::Constants:
     file: lib/CPAN/Maker/Constants.pm
-    version: v2.0.5
+    version: v2.0.8
   CPAN::Maker::Role::FileUtils:
     file: lib/CPAN/Maker/Role/FileUtils.pm
-    version: v2.0.5
+    version: v2.0.8
   CPAN::Maker::Role::ModuleUtils:
     file: lib/CPAN/Maker/Role/ModuleUtils.pm
-    version: v2.0.5
+    version: v2.0.8
   CPAN::Maker::Utils:
     file: lib/CPAN/Maker/Utils.pm
-    version: v2.0.5
+    version: v2.0.8
 recommends:
-  JSON::Validator: '0'
+  JSON::Validator: '5.15'
 requires:
-  CLI::Simple: v2.1.0
-  CLI::Simple::Constants: v2.1.0
-  CLI::Simple::Utils: v2.1.0
+  CLI::Simple: v2.1.2
+  CLI::Simple::Constants: v2.1.2
+  CLI::Simple::Utils: v2.1.2
   File::Process: v1.0.0
   File::ShareDir: '1.118'
   JSON: '4.10'
@@ -56,5 +55,5 @@ resources:
   bugtracker: https://github.com/rlauer6/CPAN-Maker/issues
   homepage: https://github.com/rlauer6/CPAN-Maker
   repository: https://github.com/rlauer6/CPAN-Maker
-version: v2.0.5
+version: v2.0.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

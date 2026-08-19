@@ -13,10 +13,10 @@ WriteMakefile(
   LICENSE => 'perl',
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 0,
-    'PDL' => '2.096',
+    'PDL' => '2.105',
   },
   PREREQ_PM => {
-    'PDL' => '2.096',
+    'PDL' => '2.105', # pdldoc_add
   },
   PM => {
     'Filter.pm' => '$(INST_LIBDIR)/Filter.pm',
@@ -37,7 +37,4 @@ WriteMakefile(
   },
 );
 
-sub MY::postamble {
-  my $oneliner = PDL::Core::Dev::_oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(shift); }});
-  qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
-}
+sub MY::postamble { pdldoc_add() }

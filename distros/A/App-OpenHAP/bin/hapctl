@@ -1,0 +1,265 @@
+#!/usr/bin/env perl
+use v5.36;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+
+use Fugu::CLI;
+use Fugu::Config;
+use Fugu::Control;
+use Fugu::Log;
+use Fugu::Pidfile;
+use App::OpenHAP::Devices;
+
+# hapctl - the control tool of openhapd.
+#
+# status asks the running daemon over its control socket. The daemon
+# knows what it is doing; a file on disk knows what the daemon wrote
+# at some earlier time, and the two disagree whenever it matters.
+# With no socket, the tool falls back to the PID file and says which
+# answer the operator is reading.
+#
+# check and devices read the configuration file and need no daemon.
+# An operator edits the file and checks it before a restart.
+
+use constant DEFAULT_CONTROL => '/var/run/openhapd/control.sock';
+use constant DEFAULT_CONFIG  => '/etc/openhapd.conf';
+use constant DEFAULT_PIDFILE => '/var/run/openhapd.pid';
+
+my %COMMANDS = (
+	check => {
+		run     => \&cmd_check,
+		summary => 'Check the configuration file',
+	},
+	status => {
+		run     => \&cmd_status,
+		summary => 'Show what the running daemon is doing',
+	},
+	devices => {
+		run     => \&cmd_devices,
+		summary => 'List the configured devices',
+	},
+);
+
+my $cli = Fugu::CLI->new(
+	name     => 'hapctl',
+	usage    => '[-c file] [-s socket] <command>',
+	commands => \%COMMANDS,
+	options  => {
+		'config|c=s' => 1,
+		'socket|s=s' => 1,
+	},
+	log      => Fugu::Log->new( mode => 'stderr', ident => 'hapctl' ),
+	epilogue => <<'EOF',
+See hapctl(8) for more information.
+EOF
+);
+
+exit $cli->run(@ARGV);
+
+# cmd_check($cli):
+#	Parse the configuration file and report what it holds.
+sub cmd_check ( $cli, @ )
+{
+	my $file = $cli->option('config') // DEFAULT_CONFIG;
+	unless ( -f $file ) {
+
+		# A fresh install has no file, and the daemon then runs
+		# on its defaults. Say that, rather than call an absent
+		# file valid.
+		printf "No configuration file at %s\n", $file;
+		printf "openhapd would run on its built-in defaults\n";
+		return Fugu::CLI::EXIT_SUCCESS;
+	}
+
+	my $config = load_config($cli)
+	    or return Fugu::CLI::EXIT_CONFIG_ERROR;
+
+	my @devices = App::OpenHAP::Devices->devices($config);
+	printf "Configuration file %s is valid\n", $file;
+	printf "  Configured devices: %d\n",       scalar @devices;
+
+	return Fugu::CLI::EXIT_SUCCESS;
+}
+
+# cmd_status($cli):
+#	Report on the daemon. The command always exits 0: a stopped
+#	daemon is an answer, not a failure of the tool.
+sub cmd_status ( $cli, @ )
+{
+	my $client = Fugu::Control::Client->new( path => $cli->option('socket')
+		    // DEFAULT_CONTROL );
+	my $status = $client->request('status');
+
+	if ($status) {
+		print_status($status);
+		return Fugu::CLI::EXIT_SUCCESS;
+	}
+
+	# No socket means no daemon, almost always. Say where the
+	# answer came from, because the fallback knows much less.
+	print_pidfile_status( $cli, $client );
+
+	return Fugu::CLI::EXIT_SUCCESS;
+}
+
+# cmd_devices($cli):
+#	List the devices. The running daemon knows which ones actually
+#	loaded, so ask it first and read the file only if it is not
+#	there.
+sub cmd_devices ( $cli, @ )
+{
+	my $client = Fugu::Control::Client->new( path => $cli->option('socket')
+		    // DEFAULT_CONTROL );
+
+	# The running daemon knows which devices actually loaded
+	if ( my $devices = $client->request('devices') ) {
+		return print_devices(
+			'loaded', $devices,
+			[
+				[ 'AID:' => sub ($d) { $d->{aid} } ],
+				[
+					'Class:' => sub ($d) {
+						$d->{class} // 'unknown';
+					}
+				],
+				[
+					'Topic:' =>
+					    sub ($d) { $d->{topic} // '<none>' }
+				],
+				[
+					'ID:' => sub ($d) {
+						$d->{serial} // '<none>';
+					}
+				],
+			] );
+	}
+
+	# The daemon is not there: read the configuration file instead
+	my $config = load_config($cli)
+	    or return Fugu::CLI::EXIT_CONFIG_ERROR;
+	my @devices = App::OpenHAP::Devices->devices($config);
+
+	return print_devices(
+		'configured',
+		\@devices,
+		[ [
+				'Type:' => sub ($d) {
+					( $d->{type} // 'unknown' ) . '/'
+					    . ( $d->{subtype} // 'unknown' );
+				}
+			],
+			[
+				'Topic:' =>
+				    sub ($d) { $d->{topic} // '<no topic>' }
+			],
+			[ 'ID:' => sub ($d) { $d->{id} // '<no id>' } ],
+		] );
+}
+
+# print_status($status):
+#	The reply of the running daemon.
+sub print_status ($status)
+{
+	printf "openhapd is running (%s)\n", $status->{name};
+	printf "  HAP port:          %d\n",  $status->{port};
+	printf "  Uptime:            %s\n",  uptime( $status->{started} );
+	printf "  Pairing status:    %s\n",
+	    $status->{paired}
+	    ? sprintf( 'paired (%d controller%s)',
+		$status->{pairings}, $status->{pairings} == 1 ? '' : 's' )
+	    : 'not paired';
+	printf "  Configuration num: %d\n", $status->{config_number};
+	printf "  Devices:           %d\n", $status->{devices};
+	printf "  Connections:       %d\n", $status->{connections};
+	printf "  mDNS:              %s\n", $status->{mdns};
+	printf "  MQTT:              %s\n", $status->{mqtt};
+
+	print "Use the Home app to pair with the setup code\n"
+	    unless $status->{paired};
+
+	return;
+}
+
+# print_pidfile_status($cli, $client):
+#	What the tool can say with no control socket.
+sub print_pidfile_status ( $cli, $client )
+{
+	my $pid = Fugu::Pidfile->new( path => DEFAULT_PIDFILE )->is_running;
+
+	if ( defined $pid ) {
+		printf "openhapd is running (PID %d)\n", $pid;
+	}
+	else {
+		print "openhapd is not running\n";
+	}
+
+	# The reason matters. An absent socket is a stopped daemon or
+	# one with the socket turned off; a refusal is a daemon that is
+	# there and would not answer, and permission is the usual
+	# cause.
+	printf "  (read from %s: %s)\n", DEFAULT_PIDFILE,
+	    $client->socket_absent
+	    ? 'no control socket'
+	    : ( $client->error // 'the daemon did not answer' );
+
+	return;
+}
+
+# print_devices($label, $devices, $fields):
+#	One formatter for both device listings. Each field row is
+#	[$tag, $code], and $code->($device) supplies the value.
+sub print_devices ( $label, $devices, $fields )
+{
+	unless (@$devices) {
+		print "No devices $label\n";
+		return Fugu::CLI::EXIT_SUCCESS;
+	}
+
+	printf "%s devices: %d\n\n", ucfirst $label, scalar @$devices;
+	for my $device (@$devices) {
+		printf "  %s\n", $device->{name} // '<unnamed>';
+		printf "    %-6s %s\n", $_->[0], $_->[1]->($device)
+		    for @$fields;
+		print "\n";
+	}
+
+	return Fugu::CLI::EXIT_SUCCESS;
+}
+
+# uptime($started):
+#	How long the daemon has run, as a person reads it.
+sub uptime ($started)
+{
+	return 'unknown' unless defined $started && $started =~ /^\d+$/;
+
+	my $seconds = time - $started;
+	return 'unknown' if $seconds < 0;
+
+	my $days  = int( $seconds / 86400 );
+	my $hours = int( ( $seconds % 86400 ) / 3600 );
+	my $mins  = int( ( $seconds % 3600 ) / 60 );
+
+	return sprintf '%dd %dh %dm', $days, $hours, $mins if $days;
+	return sprintf '%dh %dm', $hours, $mins if $hours;
+
+	return sprintf '%dm', $mins;
+}
+
+# load_config($cli):
+#	Parse the configuration file. An absent file is normal on a
+#	fresh install and gives empty settings. A file that exists but
+#	does not parse is an error that names the line, and the
+#	function returns nothing.
+sub load_config ($cli)
+{
+	my $file   = $cli->option('config') // DEFAULT_CONFIG;
+	my $config = Fugu::Config->new( file => $file );
+	return $config unless -f $file;
+
+	unless ( $config->load ) {
+		$cli->log->error( 'Configuration error: %s', $config->error );
+		return;
+	}
+
+	return $config;
+}

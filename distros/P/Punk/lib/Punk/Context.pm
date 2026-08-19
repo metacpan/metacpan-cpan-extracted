@@ -7,7 +7,7 @@ use Punk::Request;
 use Punk::Response;
 use Punk ();
 
-our $VERSION = '0.17';
+our $VERSION = '0.20';
 
 1;
 
@@ -127,6 +127,34 @@ See L<Punk::Views>.
 
 Finished responses. Status and headers previously set through
 L</status> and L</header> are folded in.
+
+C<redirect> sends where it is told. When the destination came out of the
+request, put it through L</safe_path> first.
+
+=head2 safe_path($path, $fallback?)
+
+    $c->redirect($c->safe_path($c->param('to'), '/'));
+
+Returns C<$path> when it is a same-origin relative path, and C<$fallback>
+(C<undef> by default) when it is not. This is the guard for a redirect target
+the request supplied - C<?to=>, C<?return=>, C<?next=> - which is otherwise
+an open redirect: an attacker sends a victim to your login page with
+C<?to=//evil.example>, and your own site bounces them somewhere else once
+they authenticate.
+
+A path passes only if it starts with C</>, does not start with C<//>, and
+contains no C0 control byte, no C<DEL>, and no backslash. The last two rules
+are blunter than they look necessary, because a browser does not read the
+string the way this check does: it removes every TAB, CR and LF from a URL
+before parsing it, so C<"/\tevil.example"> reaches it as C<"//evil.example">,
+and under a special scheme it treats C<\> as C</>. Both leave the site while
+passing a naive "starts with a slash" test. A path that genuinely wants one
+of these characters percent-encodes it.
+
+C<auth_guard> hands you exactly such a parameter when it redirects to
+C<login_path> with C<?to=>, so a login form that honours it wants this.
+These are the same rules as L<Punk::OAuth2>'s C<same_origin_path>, which is
+where they were learned: CVE-2026-75628.
 
 =head2 send_file($source, %options)
 
@@ -270,7 +298,21 @@ Configure with the C<logging> keyword. See L<Punk::Logger>.
 
 =head2 match
 
-Routing information for the matched route (captures, route record).
+Routing information for the matched route:
+
+=over 4
+
+=item * C<captures> - the path captures, as a hashref.
+
+=item * C<route> - the matched route record. Its C<path> is the route as
+B<declared> (C<"/users/:id">, not C<"/users/7">), and its C<method> the verb it
+was declared under. Absent for a 404, a 405, anything answered by a mount, and
+inside a L<Punk/before_request> hook, none of which have a route to name.
+
+=item * C<operation> - the C<operationId>, for a request answered by an C<api>
+mount. A route record and an operation are mutually exclusive.
+
+=back
 
 =head2 promise
 

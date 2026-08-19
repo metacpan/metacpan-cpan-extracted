@@ -42,7 +42,7 @@
  * against an older header keeps working against a newer provider - check
  * `abi_version >= the version you need`):
  *   1 - connect, adapter, exec/exec_shaped, future reads and writes, reshape */
-#define DBIL_ABI_VERSION 1
+#define DBIL_ABI_VERSION 2
 
 /* future_state results (match DBIx::Loop::Future's internal states) */
 #define DBIL_ABI_PENDING 0
@@ -64,6 +64,15 @@
 /* Fires exactly once when the future settles. `future` is borrowed for the
  * duration of the call - SvREFCNT_inc it if the callback stores it. */
 typedef void (*dbil_abi_ready_cb)(pTHX_ SV *future, void *ud);
+
+/* v2 statement observer. `start` fires before the statement runs and returns
+ * an opaque token; `done` fires exactly once when that statement's future
+ * settles, with the token back. `sql` is the prepared text - the bind VALUES
+ * are not passed, on purpose. */
+typedef void *(*dbil_obs_start_cb)(pTHX_ int is_query, const char *sql,
+                                   STRLEN sql_len, int nbind, void *ud);
+typedef void  (*dbil_obs_done_cb)(pTHX_ void *token, SV *res, SV *err,
+                                  void *ud);
 
 typedef struct dbil_abi {
     int abi_version;                    /* == DBIL_ABI_VERSION */
@@ -140,6 +149,30 @@ typedef struct dbil_abi {
      * (+1, caller owns) - it never croaks, because in the chaining path this
      * runs inside a settle and must produce a failed future, not a die. */
     SV *(*reshape)(pTHX_ int shape, SV *result, SV *arg, AV *out);
+
+    /* ---- v2: observe statements ----------------------------------------- *
+     * Every statement, on all three backends - the native fd path, the forked
+     * pool, and the plain synchronous handle - goes through one place. This
+     * is a callback pair on it: `start` before the statement runs, `done`
+     * exactly once when its future settles, correlated by the opaque token
+     * start returns.
+     *
+     * `sql` is the PREPARED statement, placeholders and all, and the bind
+     * VALUES are deliberately not passed: they are the literal data, and an
+     * observer that logged them would be logging whatever the application put
+     * in a WHERE clause. `nbind` is how many there were.
+     *
+     * `is_query` is 1 for a statement expected to return rows, 0 otherwise.
+     * On `done`, exactly one of res and err is non-NULL; both are borrowed.
+     *
+     * Registration is process-global. Register at boot; there is no
+     * deregistration. Neither callback may croak. Returns 1, or 0 when the
+     * table is full. A statement with no observer allocates nothing. */
+    int (*on_exec)(pTHX_ dbil_obs_start_cb start, dbil_obs_done_cb done,
+                   void *ud);
 } dbil_abi;
+
+/* How many statement observers DBIx::Loop will hold. */
+#define DBIL_ABI_MAX_OBSERVERS 8
 
 #endif /* DBIL_ABI_H */

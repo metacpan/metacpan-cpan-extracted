@@ -1,0 +1,241 @@
+=head1 NAME
+
+App::FuguVM::DiskCache - cache of installed OpenBSD disks
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::DiskCache;
+
+    my $cache = App::FuguVM::DiskCache->new('~/.cache/fuguvm');
+    my $key   = $cache->key($vm_config);
+
+    # Boot from a previous installation
+    if (my $hit = $cache->lookup($key)) {
+        $disk->create($name, undef, $hit->{base});
+        $state->set_root_password($hit->{meta}{root_password});
+    }
+
+    # Publish a freshly installed disk
+    $cache->store($key, $disk_path, { root_password => $password });
+
+    for my $entry (@{ $cache->list }) {
+        printf "%s %d bytes\n", $entry->{key}, $entry->{size};
+    }
+
+=head1 DESCRIPTION
+
+An installation of OpenBSD under TCG emulation takes tens of minutes.
+This module keeps the result, thus later runs do not do the
+installation again. The result is a clean, compacted copy of the
+disk. The module makes this copy when the installation is complete.
+Later VMs use this copy as the backing image of a throwaway qcow2
+overlay.
+
+The entries are in the configured C<cache_dir>, adjacent to the proxy
+cache that holds the miniroot and the install sets:
+
+    <cache_dir>/installed/<key>/base.qcow2              mode 0400
+    <cache_dir>/installed/<key>/meta.json               mode 0600
+    <cache_dir>/installed/<key>/snapshots/<name>.qcow2  mode 0400
+    <cache_dir>/installed/<key>/snapshots/<name>.json   mode 0600
+
+The entries are immutable and write-once. C<store> builds a full entry
+in a sibling C<.tmp.*> directory, and then it publishes the entry with
+a rename of that directory. Thus a reader never sees the base image of
+one installation adjacent to the metadata of a different installation.
+Such a mismatch looks live, but it then stops every later boot,
+because the root password does not open the image.
+
+=head2 Cache keys
+
+C<key> returns C<< <version>-<arch>-<hash8> >>. C<hash8> is a
+truncated SHA-256 over each input that shapes an installed disk. These
+inputs are:
+
+=over 4
+
+=item * the OpenBSD version
+
+=item * the architecture
+
+=item * the disk size
+
+=item * the contents of the F<install.exp> script that
+L<App::FuguVM::Console> resolves
+
+=item * the contents of F<share/fuguvm/cache-generation>
+
+=back
+
+The last file is a generation counter. Increase the number in this
+file when the install driver changes in a way that the F<install.exp>
+hash cannot see. One example is a change in how L<App::FuguVM::Guest> or
+L<App::FuguVM::Console> drives the installer.
+
+The counter is a data file, not a constant in this module. Thus a
+continuous-integration cache key can hash the file too. Keep the file
+content to the bare number: the hash covers the whole content, and an
+edit to a comment changes the key.
+
+The memory settings and the port settings do not shape the disk, and
+the key intentionally excludes them. Thus a change to these settings
+hits the same entry.
+
+=head2 Snapshots
+
+A snapshot is an immutable, named layer over the base image of an
+entry. Its purpose is to cache states that fuguvm itself does not
+know. One example is a provisioning script that caches its "guest
+packages installed" state. The mechanism is in this module. The
+policy stays in the callers: they select the states that get a cache.
+
+The snapshots are inside C<< installed/<key>/ >>. Thus, when a base
+becomes invalid - through a new key, or through C<cache clear> - the
+snapshots of that base also become invalid automatically.
+
+C<snapshot_store> B<flattens> the working disk onto C<base.qcow2>. It
+does not copy the disk. Thus each snapshot is a direct child of the
+base:
+
+    base.qcow2  <-  <name>.qcow2  <-  disk.qcow2
+
+A copy keeps the backing-file header of the working disk verbatim.
+That header is correct only while the disk hangs directly off the
+base. After a restore, the disk hangs off a snapshot. Thus a copy
+stacks chains without a limit, or it publishes a qcow2 that names
+itself as its own backing file. The second result occurs when a caller
+saves the same name again. A normal second run does this.
+
+Because C<snapshot_store> flattens the disk, no snapshot is the parent
+of a different snapshot. Thus C<snapshot_remove> cannot make a
+snapshot an orphan.
+
+The working disk must come from a stopped VM. A live overlay is not
+consistent.
+
+=head1 METHODS
+
+=over 4
+
+=item new($cache_dir)
+
+The constructor creates a cache over C<$cache_dir>. It expands a
+C<~> at the start of the path.
+
+=item installed_dir
+
+=item entry_dir($key)
+
+=item base_path($key)
+
+These methods return locations. The paths do not have to exist.
+
+=item key($vm_config)
+
+The method derives the cache key for a VM configuration hash. It
+returns C<undef> when it cannot read an input. The caller then has no
+key, and thus no cache.
+
+=item lookup($key)
+
+The method returns C<< { key, dir, base, meta } >> for a complete
+entry. In other cases, it returns C<undef>. A half-written entry is a
+miss, not an error.
+
+=item store($key, $disk_path, $meta)
+
+The method compacts C<$disk_path> into the cache as the base image
+for C<$key>, and writes C<$meta> adjacent to it. Put the guest
+C<root_password> in C<$meta>. The method returns the path of the base
+image. It returns C<undef> on a failure, and a try to overwrite a
+populated key is one such failure. The caller then degrades to a
+standalone disk.
+
+=item list
+
+The method returns each complete entry, newest first, as
+C<< { key, dir, base, meta, size, created_at, snapshots } >>.
+
+=item remove($key)
+
+The method deletes an entry and all data under it. It returns true
+when the entry is gone.
+
+=item sweep_temp
+
+The method removes the C<.tmp.*> trees that an interrupted C<store>
+left. This includes the trees of earlier processes. The method
+returns the count of removed trees.
+
+=item key_for_path($path)
+
+The method returns the key of the entry that holds C<$path>. The
+path points to a base image or a snapshot. The method returns
+C<undef> when C<$path> is outside the cache. The method answers this
+question: "Which cached image is the base of this working disk?"
+
+=item snapshot_dir($key)
+
+=item snapshot_path($key, $name)
+
+These methods return locations. The paths do not have to exist.
+
+=item valid_snapshot_name($name)
+
+The method returns true when C<$name> is usable. A name becomes a
+file name inside the cache. Thus a name must start with an
+alphanumeric character, it must hold only word characters, dots, and
+dashes, and it must have a bounded length.
+
+=item snapshot_store($key, $name, $disk_path, $meta)
+
+The method flattens the stopped working disk at C<$disk_path> onto
+the base image of C<$key>, and publishes the result as the named
+layer. Put the state fields that the disk holds in C<$meta>:
+C<installed> and the installed SSH public key. With these fields, a
+restore can reseed L<App::FuguVM::State>. The method copies the root
+password from the metadata of the base itself, and it does not trust
+the caller for this value. The method returns the snapshot path, or
+C<undef> on a failure.
+
+When a caller saves the same name again, the method replaces the
+snapshot. This is the normal second run of a provisioning script.
+
+=item snapshot_lookup($key, $name)
+
+The method returns C<< { key, name, path, base, meta } >> for a
+snapshot whose image, metadata, and backing chain all resolve. In
+other cases, it returns C<undef>. A snapshot with a removed base is a
+miss, not an error. Thus a caller can provision from scratch, and it
+does not fail hard.
+
+=item snapshot_list($key)
+
+The method returns the sorted snapshots of an entry, as
+C<< { name, path, size, created_at, meta } >>.
+
+=item snapshot_remove($key, $name)
+
+The method deletes a snapshot and its metadata. Deletion in any order
+is safe, because each snapshot is a direct child of the base, never
+of a different snapshot.
+
+=back
+
+=head1 SECURITY
+
+F<meta.json> is mode 0600, and it holds the generated guest root
+password, the same secret that the VM state directory keeps. The cache
+makes the life of this secret longer: the password stays after
+C<fuguvm destroy>, and it changes only when the base key changes.
+
+The guest permits root login with a password. QEMU forwards the SSH
+port and the serial console port of the guest on each host interface.
+Thus the password is not a localhost-only secret. See L<fuguvm(1)>.
+
+=head1 SEE ALSO
+
+L<App::FuguVM::Disk>, L<App::FuguVM::Console>, L<App::FuguVM::Miniroot>, L<App::FuguVM::Guest>,
+L<fuguvm(1)>
+
+=cut

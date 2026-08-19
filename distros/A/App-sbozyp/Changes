@@ -1,3 +1,7 @@
+1.9.0  2026-08-18
+
+  -  Distinguish category-prefixed package names from working tree paths
+
 1.8.0  2026-08-11
 
   -  Add working tree package support and the -W option

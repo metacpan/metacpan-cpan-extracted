@@ -20,6 +20,8 @@ include/fetch/ft_http.h
 include/fetch/ft_json.h
 include/fetch/ft_loop.h
 include/fetch/ft_tls.h
+include/fetch/ft_obs.h
+include/fetch/ft_obs_perl.h
 include/fetch/ft_ua.h
 include/fetch/ft_win.h
 include/fetch/ft_ws.h
@@ -62,6 +64,8 @@ t/19-clone.t
 t/20-stale-keepalive.t
 t/21-multi-agent.t
 t/22-idle-loop.t
+t/23-observer.t
+t/24-h2-trailers.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

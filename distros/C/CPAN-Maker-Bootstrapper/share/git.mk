@@ -39,3 +39,20 @@ git: ## initializes a git repository and commits artifacts (NO_COMMIT=1 to stop 
 	  commit -m 'BigBang'; \
 	fi
 
+repo: ## creates a new GitHub repository - make repo REPO=repo-name [PUBLIC= 1 REPO_DESCRIPTION="description..."]
+	@if [[ -z "$(GITHUB_ACTIONS)" ]]; then \
+	  echo "gha-aws is not available: cpan GitHub::Actions::AWS"; \
+	  exit 1; \
+	fi; \
+	if [[ -z "$$REPO" ]]; then \
+	  echo "usage: make repo REPO=repo-name [PUBLIC=1] [REPO_DESCRIPTION=\"description...\"]"; \
+	  exit 1; \
+	fi; \
+	if [[ -n "$$PUBLIC" ]]; then \
+	  PUBLIC="--public"; \
+	fi; \
+	if [[ -z "$$REPO_DESCRIPTION" ]]; then \
+	  REPO_DESCRIPTION="Created by CPAN::Maker::Bootstrapper"; \
+	fi; \
+	test -n "$$DRYRUN" && DRYRUN="--dryrun"; \
+	$(GITHUB_ACTIONS) $$PUBLIC $$DRYRUN --description "$$REPO_DESCRIPTION" --repo "$$REPO" create-repo

@@ -1,0 +1,214 @@
+=head1 NAME
+
+App::FuguWeb::Config - the site description over Fugu::Config
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Config;
+
+    my $config = App::FuguWeb::Config->load(error => \my $reason)
+        or die "$reason\n";
+
+    say $config->site;
+    say $_->{href} for $config->nav;
+    say $_->{file} for $config->pages;
+
+=head1 DESCRIPTION
+
+The class reads F<.fuguwebrc>, applies the defaults, and validates the
+result. The grammar, the quoting, and the yes/no spellings come from
+L<Fugu::Config>; this class holds what is true of a site.
+
+The object is immutable once loaded, and the module keeps no package
+state. Two sites in one process therefore share nothing.
+
+=head1 METHODS
+
+=head2 load
+
+    App::FuguWeb::Config->load(
+        root  => $dir,          # default: discover
+        error => \my $reason,
+    )
+
+Read and validate the description. The method returns the object, or
+C<undef> with the reason in C<$reason>.
+
+Without C<root>, the method walks up from the working directory to the
+first directory that holds F<.fuguwebrc>, as C<fuguvm> finds
+F<.fuguvmrc>.
+
+The reason travels through a reference because the object that would
+hold it does not exist when the load fails.
+
+A load fails when the file is absent, when a line does not parse, or
+when the description would make the build do something it must not.
+Every message names the file, and the block when a block is at fault.
+
+The description is rejected when:
+
+=over 4
+
+=item *
+
+there is no C<site> setting;
+
+=item *
+
+a C<page> block names no source, or more than one;
+
+=item *
+
+two C<page> blocks name the same file, or two manuals would become the
+same page;
+
+=item *
+
+a C<nav> block has no label;
+
+=item *
+
+a path setting steps out of the project with a C<..> component;
+
+=item *
+
+a C<page> block name is absolute or steps out of the output directory:
+the name becomes a file there, so it is a path and gets the same guard
+the sources get;
+
+=item *
+
+a C<manuals> namespace holds a path separator: it prefixes a manual
+name, and that name becomes both the staged file and the published
+page;
+
+=item *
+
+a C<modules> directory is not below C<module_root>, which would leave
+the module with no name to take but its whole path;
+
+=item *
+
+a yes/no setting holds something that is neither;
+
+=item *
+
+the source directory holds a symlink. Every file there that the build
+does not render is copied into the site, so a symlink would publish
+whatever it points at, from anywhere on the machine.
+
+=back
+
+=head2 root, path
+
+The project root, and the F<.fuguwebrc> that this object read.
+
+=head2 source_path
+
+    my $dir  = $config->source_path;
+    my $file = $config->source_path('footer.body.html');
+
+The source directory, or one file in it.
+
+=head2 site, lang, out_dir, source_dir, entry, module_root, mandoc_os, man_url, stylesheet
+
+The settings. C<site> is the only one a project must give.
+
+    site            (required)  the name in the title of every page,
+                                and the text of the header link
+    lang            en          the lang attribute of the document
+    out_dir         web/build   where the build writes
+    source_dir      web         the fragments and the assets
+    entry           index.html  the front page, and the header link
+    module_root     lib         the prefix a module name drops
+                                (a trailing slash is dropped)
+    mandoc_os       OpenBSD     the mandoc -I os=, which pins the footer
+    man_url         https://man.openbsd.org/   where a remote .Xr goes
+    stylesheet      (searched)  the base stylesheet
+
+C<stylesheet> overrides the search that L<Fugu::File/share_path> does.
+The search finds the sheet in a checkout and in an installed
+App-FuguWeb distribution alike, so most projects never set it.
+
+The C<pod2man> C<--center> and C<--release> values are not settings.
+They are constants of L<App::FuguWeb::Render>: they pin the C<pod2man>
+output so the site does not vary with the build host.
+
+=head2 nav
+
+The navigation, in file order. Each entry is a hashref with C<href> and
+C<label>.
+
+=head2 pages
+
+The pages, in file order. Each entry is a hashref:
+
+    file        the name of the page in the output
+    title       the title, which defaults to the file name
+    source      one of body, markdown or index
+    value       what the source names, and undef for index
+    unlinked    true when no other page links to it
+
+=head2 groups
+
+The manual groups, in file order. Each entry is an
+C<App::FuguWeb::Config::Group>, and the two block types interleave as
+the description wrote them.
+
+=head2 inventory
+
+Every name that the output directory must hold after a build: the
+pages of the description, one page for each manual of each group, the
+stylesheet, and the assets. The build and the checks read the same
+list, so the two can never disagree about what the site holds.
+
+=head1 GROUPS
+
+A C<manuals> or C<modules> block becomes one group. A group never holds
+a list of manuals: it reads its directory, so a manual that is added
+reaches the site with no edit anywhere.
+
+A group whose directory does not exist fails the load and names the
+directory. A silent empty group hides a typo in a path, and a rename
+that nothing catches is what this file exists to prevent.
+
+=head2 kind, heading, anchor, namespace
+
+C<kind> is C<manuals> or C<modules>. C<heading> is the block name, which
+becomes the C<< <h2> >>, and C<anchor> its C<id>.
+
+=head2 manuals
+
+The manuals of the group, in the order the index shows them, as
+L<App::FuguWeb::Manual> objects. The method reads the directory once and
+keeps the answer.
+
+A C<manuals> group reads its directory for F<*.1>, F<*.3p>, F<*.5> and
+F<*.8>, and takes a plain file only. It does not glob: Perl's C<glob>
+splits its pattern on whitespace and reads C<[ ] { } ? ~>, so a project
+whose path holds one of them would lose its manuals or collect a
+sibling directory's. It sorts by section, in the order 1, 3p, 5, 8, and
+then by file name. The
+C<namespace> setting prefixes the name and the staged file name, so
+F<man/fugu/Daemon.3p> becomes C<Fugu::Daemon(3p)>.
+
+A C<modules> group finds every F<.pod> file below its directory, and the
+sidecar that names the directory itself: F<lib/App/FuguWeb.pod> is the
+umbrella of F<lib/App/FuguWeb/>. It sorts by path, so F<Store.pod> stays
+before F<Store/Memory.pod>.
+
+Both sorts compare bytes and never read the locale of the builder. A
+site must not depend on the machine that built it.
+
+Never name a directory that holds more than one namespace. In this
+repository F<lib/App> is such a directory, and one group there would
+swallow three namespaces.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb>, L<App::FuguWeb::Manual>, L<Fugu::Config>,
+L<fuguweb(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

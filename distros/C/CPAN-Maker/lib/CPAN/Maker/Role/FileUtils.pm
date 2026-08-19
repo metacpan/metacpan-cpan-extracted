@@ -15,7 +15,7 @@ use Scalar::Util qw(reftype);
 
 use Role::Tiny;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.8';
 
 ########################################################################
 sub fetch_file_list {
@@ -23,6 +23,9 @@ sub fetch_file_list {
   my ( $self, %args ) = @_;
 
   my ( $file_list, $destdir, $project_root, $exclude ) = @args{qw(file_list destination project_root exclude)};
+  $project_root ||= getcwd;
+
+  $self->get_logger->debug( Dumper( [ args => \%args, project_root => $project_root ] ) );
 
   my @expanded_list;
   my @exclude = ( @{ $exclude // [] }, grep {/^!/xsm} @{$file_list} );
@@ -76,9 +79,9 @@ sub fetch_file_list {
       chdir $cwd;
 
       # remove project root since bash script will add it
-      for (@expanded_list) {
-        s/^$project_root//xsm;
-      }
+      #for (@expanded_list) {
+      #  s/^$project_root//xsm;
+      #}
     }
     else {
       # the intent is to cp files to root of distribution (not
@@ -92,7 +95,7 @@ sub fetch_file_list {
       push @expanded_list, sprintf '%s %s/%s%s', $f, $destdir, $name, $ext;
     }
   }
-
+  $self->get_logger->debug( Dumper( [ expanded_list => \@expanded_list ] ) );
   return @expanded_list;
 }
 
@@ -104,8 +107,6 @@ sub write_extra_files {
   $self->get_logger->debug('writing extra-files');
 
   my ( $extra_files, $extra, $project_root ) = @params{qw(extra_files extra project_root)};
-
-  my %args = %{ $params{args} };
 
   $extra_files //= [];
 
@@ -160,7 +161,7 @@ sub write_extra_files {
     }
   }
 
-  return %args
+  return
     if !@file_list;
 
   open my $fh, '>', $extra_files_path
@@ -173,57 +174,59 @@ sub write_extra_files {
   close $fh
     or die "ERROR: could not close $extra_files_path\n";
 
-  $args{f} = $extra_files_path;
+  # NOTE: 'extra' (the extra-files output path) has no corresponding
+  # CLI::Simple accessor (not in option_specs, no extra_options
+  # declared) -- there is currently nowhere valid to apply this
+  # value. The file is still written to $extra_files_path above;
+  # only the tracking of that path is unapplied here.
 
-  return %args;
+  return;
 }
 
 ########################################################################
 sub parse_path {
 ########################################################################
-  my ( $self, $project_root, $path, %args ) = @_;
+  my ( $self, $project_root, $path ) = @_;
 
   if ($path) {
     if ( $path->{recurse}
       && $path->{recurse} =~ /(yes|no)/ixsm ) {
-      $args{R} = $path->{recurse};
+      $self->set_recurse( $path->{recurse} eq 'yes' ? $TRUE : $FALSE );
     }
     elsif ( $path->{recurse} ) {
       die "ERROR: use only yes or no for 'recurse' option\n";
     }
 
-    # -l
     if ( $path->{'pm-module'} ) {
-      $args{l} = $path->{'pm-module'};
+      $self->set_module_path( $path->{'pm-module'} );
     }
 
-    if ( $path->{'exclude-files'} ) {
-      $args{E} = $path->{'exclude-files'};
-    }
+    # NOTE: 'exclude-files' has no corresponding CLI::Simple accessor
+    # (not in option_specs, no extra_options declared) -- there is
+    # currently nowhere valid to apply this buildspec.yml value. Left
+    # unapplied rather than guessing at an attribute name that
+    # doesn't exist.
 
-    # -e
     if ( $path->{'exe-files'} ) {
       if ( $self->check_path( $project_root, $path->{'exe-files'}, 'exe-files' ) ) {
-        $args{e} = $path->{'exe-files'};
+        $self->set_exec_path( $path->{'exe-files'} );
       }
     }
 
-    # -S
     if ( $path->{scripts} ) {
       if ( $self->check_path( $project_root, $path->{scripts}, 'scripts' ) ) {
-        $args{S} = $path->{scripts};
+        $self->set_scripts_path( $path->{scripts} );
       }
     }
 
-    # -t
     if ( $path->{tests} ) {
       if ( $self->check_path( $project_root, $path->{tests}, 'tests' ) ) {
-        $args{t} = $path->{tests};
+        $self->set_tests_path( $path->{tests} );
       }
     }
   }
 
-  return %args;
+  return;
 }
 
 ########################################################################

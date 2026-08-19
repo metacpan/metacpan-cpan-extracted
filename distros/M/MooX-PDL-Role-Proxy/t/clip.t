@@ -40,7 +40,7 @@ Test->test(
 Test->test(
     "clip_on (undef,max]",
     sub { $_[0]->clip_on( $_[0]->p1, undef, 5 ) },
-    p1 => [ 0,  1, 2, 3, 4, ],
+    p1 => [  0, 1, 2, 3, 4, ],
     p2 => [ -1, 1, 2, 3, 4, ],
 );
 

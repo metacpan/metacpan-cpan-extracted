@@ -1,0 +1,30 @@
+{
+   "abstract" : "install and manage OpenBSD virtual machines under QEMU",
+   "author" : [
+      "Dick Olsson <hi@senzilla.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "scripts/dist",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "version" : 2
+   },
+   "name" : "App-FuguVM",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "HTTP::Daemon" : 0,
+            "HTTP::Message" : 0,
+            "LWP::UserAgent" : 0,
+            "Net::SSH2" : 0,
+            "URI" : 0,
+            "perl" : "5.036"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

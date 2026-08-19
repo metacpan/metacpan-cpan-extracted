@@ -205,7 +205,8 @@ END_PM
 
 # ---------------------------------------------------------------
 # 10. prepare_workspace() — returns a path to an existing dir
-#     and populates self->{workspace} and self->{relative}
+#     and populates _workspace/_relative/_lib_basename (private keys)
+#     without touching the original lib_dir.
 # ---------------------------------------------------------------
 subtest 'prepare_workspace() creates workspace and sets relative path' => sub {
 	my ($pm, $lib, $tmpdir, $rel_pm) = _make_temp_module($SAMPLE_SOURCE);
@@ -216,14 +217,17 @@ subtest 'prepare_workspace() creates workspace and sets relative path' => sub {
 		file    => $rel_pm,
 		lib_dir => 'lib',
 	);
+	my $original_lib_dir = $mutator->{lib_dir};
 	my $workspace;
 	eval { $workspace = $mutator->prepare_workspace() };
 	my $err = $@;
 	chdir $orig;
-	is($err, '',              'prepare_workspace() does not croak');
-	ok(-d $workspace,         'workspace directory exists');
-	ok(defined $mutator->{workspace}, 'self->{workspace} set');
-	ok(defined $mutator->{relative},  'self->{relative} set');
+	is($err, '',                        'prepare_workspace() does not croak');
+	ok(-d $workspace,                    'workspace directory exists');
+	ok(defined $mutator->{_workspace},   '$self->{_workspace} set');
+	ok(defined $mutator->{_relative},    '$self->{_relative} set');
+	ok(defined $mutator->{_lib_basename},'$self->{_lib_basename} set');
+	is($mutator->{lib_dir}, $original_lib_dir, 'lib_dir not mutated');
 	my $copied = File::Spec->catdir($workspace, 'lib');
 	ok(-d $copied, 'lib tree copied into workspace');
 };

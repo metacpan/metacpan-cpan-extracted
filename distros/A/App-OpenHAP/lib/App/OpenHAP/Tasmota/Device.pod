@@ -1,0 +1,147 @@
+=head1 NAME
+
+App::OpenHAP::Tasmota::Device - a Tasmota device as a HAP accessory
+
+=head1 SYNOPSIS
+
+    use App::OpenHAP::Tasmota::Device;
+
+    package My::Switch;
+    our @ISA = qw(App::OpenHAP::Tasmota::Device);
+
+    sub _on_power_update ($self, $state) { ... }
+
+=head1 DESCRIPTION
+
+This class is a Tasmota device that is also a
+L<Protocol::HAP::Accessory>. It owns the MQTT subscriptions, the
+availability state, the temperature unit, and the power helpers. Every
+device class in F<lib/App/OpenHAP/Tasmota/> inherits from it and adds
+the HAP services of one device kind.
+
+The class is never used on its own. It subscribes and it caches, and it
+publishes no service.
+
+=head1 CONSTRUCTOR
+
+=head2 new(%args)
+
+The constructor takes the arguments of L<Protocol::HAP::Accessory>, and
+these:
+
+=over 4
+
+=item C<mqtt_topic>
+
+The Tasmota topic of the device, without a prefix. Required.
+
+=item C<mqtt_client>
+
+The MQTT client. Required.
+
+=item C<relay_index>
+
+The relay of a multi-relay device, counted from 1. The default 0 means
+that the device has one relay and no index.
+
+=back
+
+Every topic follows the default Tasmota C<FullTopic> pattern,
+C<%prefix%/%topic%/>. OpenHAP requires the device to run with that
+default.
+
+=head1 THE MQTT TOPIC CONTRACT
+
+C<subscribe_mqtt> subscribes to five topics of the device. A subclass
+that overrides the method must call C<SUPER::subscribe_mqtt> first.
+
+=over 4
+
+=item C<tele/LWT>
+
+The availability of the device. C<Online> also triggers
+C<query_initial_state>.
+
+=item C<tele/STATE>
+
+The periodic state. It reaches C<_process_state_data>.
+
+=item C<tele/SENSOR>
+
+The sensor readings. It reaches C<_process_sensor_data>, and it also
+carries the C<TempUnit> that C<convert_temperature> needs.
+
+=item C<stat/RESULT>
+
+The answer to a command. It reaches C<_process_result_data>.
+
+=item C<stat/STATUS11>
+
+The full state, for reconciliation after a connect. The class unwraps
+C<StatusSTS> and hands the content to C<_process_state_data>.
+
+=back
+
+The class publishes to C<cmnd/Power> and C<cmnd/Status>. The power
+topic carries the relay index, when it applies.
+
+=head1 METHODS
+
+=head2 subscribe_mqtt()
+
+Subscribe to the five topics above.
+
+=head2 query_initial_state()
+
+Ask the device for its full state with C<Status 11>.
+
+=head2 is_online()
+
+Report if the last C<LWT> message said C<Online>.
+
+=head2 set_power($state)
+
+Publish a power command. C<$state> is 1 for on and 0 for off.
+
+=head2 query_status($type)
+
+Ask the device for a status report.
+
+=head2 convert_temperature($temp)
+
+Return the temperature in Celsius. The device reports the unit in its
+C<SENSOR> message, and HAP always wants Celsius.
+
+=head1 METHODS A SUBCLASS OVERRIDES
+
+Each one does nothing by default, so a subclass takes only what it
+needs.
+
+=over 4
+
+=item C<_process_state_data($data)>
+
+The decoded C<STATE> or C<STATUS11> payload. The default extracts the
+power state, so an override calls C<SUPER> first.
+
+=item C<_process_result_data($data)>
+
+The decoded C<RESULT> payload. The default extracts the power state.
+
+=item C<_process_sensor_data($data)>
+
+The decoded C<SENSOR> payload.
+
+=item C<_on_power_update($state)>
+
+The power state changed. C<$state> is 1 for on and 0 for off.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protocol::HAP::Accessory>, L<App::OpenHAP::Devices>,
+F<spec/MQTT-Transport.md>, F<spec/MQTT-Control.md>,
+F<spec/MQTT-State.md>
+
+=cut

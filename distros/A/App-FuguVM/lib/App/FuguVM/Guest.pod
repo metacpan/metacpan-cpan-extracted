@@ -1,0 +1,80 @@
+=head1 NAME
+
+App::FuguVM::Guest - the lifecycle of one OpenBSD virtual machine
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::Guest;
+
+    my $vm = App::FuguVM::Guest->new(
+        config => $config->load_vm('default'),
+        state  => $state,
+        log    => $log,
+    );
+
+    exit $vm->up;
+
+=head1 DESCRIPTION
+
+The module runs QEMU for an OpenBSD guest, installs the system on the
+first run, and stops it again without corrupting its disk.
+
+Everything that is not QEMU comes from Fugu. Processes and liveness
+come from L<Fugu::Process>, which reaps: a QEMU that became a
+zombie reads as stopped, and a caller that is about to start a second
+one needs that answer. Bounded waits come from L<Fugu::Timeout>. The
+random root password comes from L<Fugu::Random>. The guest
+connection comes from L<Fugu::SSH>.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguVM::Guest->new(config => \%vm, state => $state, log => $log, ...)
+
+Build a controller. C<emulate> forces TCG instead of hardware
+acceleration; C<no_cache> ignores the installed-image cache.
+
+=head2 up
+
+Make sure the VM runs, and do whatever that needs: verify the backing
+chain, check the disk after an unclean shutdown, restore from the
+installed-image cache, start the proxy, download the miniroot, create
+the disk, start QEMU, install OpenBSD, and install the SSH key.
+
+The method is idempotent. A VM that already runs, and whose SSH key is
+current, returns success and changes nothing.
+
+=head2 down, destroy, start, stop, status
+
+C<down> stops the proxy and then the VM, gracefully, and records a
+clean shutdown. C<destroy> stops it and deletes the disk. C<start> and
+C<stop> are the narrow forms that do not touch the proxy. C<status>
+reports the state.
+
+=head2 wait_ssh, ssh_port, console_port, is_running
+
+C<wait_ssh> polls until the guest takes an authenticated connection;
+with a password argument it authenticates with that password instead
+of the SSH agent. C<console_port> is the port that C<telnet> reaches
+the serial console on.
+
+=head1 SHUTDOWN
+
+A shutdown syncs the guest filesystems first, then asks the guest to
+power off through ACPI, and only then forces the process to stop.
+Every step is bounded: a guest that stops answering must not hold the
+caller.
+
+The order matters. A force stop of a guest with unwritten buffers
+leaves a filesystem that the next boot has to repair.
+
+=head1 SEE ALSO
+
+L<Fugu::Process>, L<Fugu::SSH>, L<Fugu::Timeout>,
+L<App::FuguVM::Disk>, L<App::FuguVM::DiskCache>,
+L<App::FuguVM::QMP>, L<App::FuguVM::State>, L<fuguvm(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

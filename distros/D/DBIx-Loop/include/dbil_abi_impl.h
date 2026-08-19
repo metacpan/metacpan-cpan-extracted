@@ -230,7 +230,48 @@ static const dbil_abi dbil_abi_table = {
     dbil_abi_future_done1,
     dbil_abi_future_fail,
     dbil_abi_reshape,
+    dbil_obs_add,                /* v2 */
 };
+
+/* ---- the v2 observer, driven from C (t/13-observer.t) ------------------- *
+ * A Perl test cannot register a C callback, so the observable half lives
+ * here: the counters and the last statement seen. */
+static IV  DBIL_OBS_ST_STARTS = 0;
+static IV  DBIL_OBS_ST_DONES  = 0;
+static IV  DBIL_OBS_ST_OK     = 0;
+static IV  DBIL_OBS_ST_ERR    = 0;
+static IV  DBIL_OBS_ST_BIND   = -1;
+static IV  DBIL_OBS_ST_QUERY  = -1;
+static char DBIL_OBS_ST_SQL[512];
+
+static void *dbil_obs_st_start(pTHX_ int is_query, const char *sql,
+                               STRLEN sql_len, int nbind, void *ud) {
+    PERL_UNUSED_ARG(ud);
+    PERL_UNUSED_CONTEXT;
+    DBIL_OBS_ST_STARTS++;
+    DBIL_OBS_ST_BIND  = nbind;
+    DBIL_OBS_ST_QUERY = is_query;
+    if (sql_len >= sizeof(DBIL_OBS_ST_SQL)) sql_len = sizeof(DBIL_OBS_ST_SQL) - 1;
+    memcpy(DBIL_OBS_ST_SQL, sql, sql_len);
+    DBIL_OBS_ST_SQL[sql_len] = '\0';
+    return INT2PTR(void *, DBIL_OBS_ST_STARTS);
+}
+
+static void dbil_obs_st_done(pTHX_ void *token, SV *res, SV *err, void *ud) {
+    PERL_UNUSED_ARG(ud);
+    PERL_UNUSED_CONTEXT;
+    DBIL_OBS_ST_DONES++;
+    if (res) DBIL_OBS_ST_OK++;
+    if (err) DBIL_OBS_ST_ERR++;
+    if (PTR2IV(token) < 1 || PTR2IV(token) > DBIL_OBS_ST_STARTS)
+        DBIL_OBS_ST_ERR = -1;      /* correlation broke */
+}
+
+static int dbil_obs_selftest_install(pTHX) {
+    const dbil_abi *A = INT2PTR(const dbil_abi *, PTR2IV(&dbil_abi_table));
+    if (!A || A->abi_version != DBIL_ABI_VERSION) return 0;
+    return A->on_exec(aTHX_ dbil_obs_st_start, dbil_obs_st_done, NULL);
+}
 
 /* ---- _abi_selftest: drive the table from C (t/16-abi.t) ------------------ */
 

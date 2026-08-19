@@ -128,7 +128,32 @@ static const hm_abi hm_abi_table = {
     hm_abi_deny_add,
     hm_abi_deny_remove,
     hm_abi_ratelimit_hit,
+    hm_worker_hook_add,          /* v4 */
 };
+
+/* ---- v4 on_worker_start, driven from C (t/33-worker-start.t) ------------ *
+ * A Perl test cannot register a C callback, so the observable half lives
+ * here: _abi_worker_hook_install registers this through the TABLE, and the
+ * worker it fires in reports the count back through an ordinary request. The
+ * count is a plain static, so it is inherited as 0 across the fork and each
+ * worker increments its own copy - which is exactly the property being
+ * tested. */
+static IV  HM_ABI_ST_WORKER_N = 0;
+static int HM_ABI_ST_WORKER_LOOP_OK = 1;
+
+static void hm_abi_st_worker_cb(pTHX_ void *loop, void *ud) {
+    PERL_UNUSED_ARG(ud);
+    if (!loop) HM_ABI_ST_WORKER_LOOP_OK = 0;   /* must be handed a real loop */
+    HM_ABI_ST_WORKER_N++;
+}
+
+/* Register through the table, not by calling hm_worker_hook_add directly -
+ * the point of a selftest is to prove the function pointer works. */
+static int hm_abi_worker_hook_install(pTHX) {
+    const hm_abi *A = INT2PTR(const hm_abi *, PTR2IV(&hm_abi_table));
+    if (!A || A->abi_version != HM_ABI_VERSION) return 0;
+    return A->on_worker_start(aTHX_ hm_abi_st_worker_cb, NULL);
+}
 
 /* ---- _abi_selftest: drive the whole table from C (t/22-abi.t) ----------- */
 

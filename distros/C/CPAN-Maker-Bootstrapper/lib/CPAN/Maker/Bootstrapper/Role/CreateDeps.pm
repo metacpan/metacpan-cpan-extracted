@@ -8,7 +8,6 @@ use CLI::Simple::Utils qw(slurp);
 use Data::Dumper;
 use File::Find;
 use List::Util qw(none);
-use Module::ScanDeps::Static;
 use Role::Tiny;
 
 ########################################################################
@@ -20,7 +19,9 @@ sub find_modules {
 
   find(
     sub {
-      return if $File::Find::name !~ /[.]pm[.]in$/xsm;
+      return if !/[.]p[ml][.]in$/xsm;
+      return if /^[.]?[#]/xsm;  # ignore temp files
+
       push @modules, $File::Find::name;
     },
     q{.}
@@ -51,6 +52,8 @@ sub find_deps {
 
   my %requires;
 
+  require Module::ScanDeps::Static;
+
   foreach my $m ( @{$modules} ) {
     my $scanner = Module::ScanDeps::Static->new( { path => $m } );
     $scanner->parse;
@@ -64,6 +67,8 @@ sub find_deps {
 sub cmd_create_deps {
 ########################################################################
   my ($self) = @_;
+
+  my @output_modules = $self->get_args;
 
   my @modules = $self->find_modules();
 
@@ -80,8 +85,10 @@ sub cmd_create_deps {
   my $packages = $self->find_deps( \@modules );
 
   foreach my $p ( sort keys %{$packages} ) {
+    next if @output_modules && none { $p eq "./$_" } @output_modules;
+
     my $generated_p = $p;
-    $generated_p =~ s/\.pm\.in/.pm/;
+    $generated_p =~ s/[.](p[ml])[.]in/.$1/xsm;
 
     my @deps;
 

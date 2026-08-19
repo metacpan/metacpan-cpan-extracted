@@ -4,7 +4,7 @@ use v5.38;
 use experimental qw/class try for_list/;
 use version;
 
-our $VERSION   = qv('v1.0.0');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Future::AsyncAwait;
@@ -439,8 +439,10 @@ class PAGI::FastAPI {
                 }
             }
 
+            my $has_content_type = grep { lc($_->[0]) eq 'content-type' } @{$ctx->res_headers};
+
             my @res_headers = (
-                ($is_json ? (['content-type', 'application/json']) : ()),
+                ($is_json && !$has_content_type ? (['content-type', 'application/json']) : ()),
                 @{$ctx->res_headers}
             );
 
@@ -670,7 +672,7 @@ PAGI::FastAPI - Asynchronous, Type-Safe Micro-Framework with Dependency Injectio
 
 =head1 VERSION
 
-Version v1.0.0
+Version v1.1.0
 
 =head1 SYNOPSIS
 
@@ -855,6 +857,25 @@ dependencies and middleware, with no framework lock-in. For ready-made schemes
 (HTTP Bearer, HTTP Basic, API Key, OAuth2 password bearer), see the companion
 distribution L<PAGI::FastAPI::Security>, see L</AUTHENTICATION AND SECURITY>
 below.
+
+=item * B<Rate Limiting:> C<add_rate_limit> and the per-route C<rate_limit>
+option provide fixed-window request throttling with pluggable storage
+drivers, see L<PAGI::FastAPI::Middleware::RateLimit>.
+
+=item * B<Bot Protection:> C<add_bot_protection> enforces a stateless,
+cryptographic proof-of-work challenge/response flow on unauthenticated
+requests, see L<PAGI::FastAPI::Middleware::BotProtection>.
+
+=item * B<Server-Sent Events:> C<< $c->sse >> streams production-grade SSE
+responses with keepalives and auto-JSON serialisation, see
+L<PAGI::FastAPI::Response::SSE>.
+
+=item * B<CSRF Protection:> C<enable_csrf>, plus C<< $c->csrf_token >> and
+C<< $c->csrf_verify >>, for form and session-based CSRF defence.
+
+=item * B<Async Message Queue Facade:> L<PAGI::FastAPI::Queue> offers a
+pluggable, topic-based C<push>/C<pop>/C<size> queue for use as an ordinary
+dependency via C<< $queue->dep >>.
 
 =back
 
@@ -1138,8 +1159,8 @@ Returns an instance of L<PAGI::FastAPI::Response::SSE>.
     my $pagi_app = $app->to_pagi();
 
 Compiles the application into a single, executable PAGI-compliant async code
-reference ready to be served by an ASGI/PAGI application server (such as L<PAGI::Server>)
-or wrapped by L<PAGI::Test::Client>.
+reference ready to be served by an ASGI/PAGI application server (such as
+L<PAGI::Server>) or wrapped by L<PAGI::Test::Client>.
 
 This method:
 
@@ -1181,8 +1202,9 @@ B<Example Usage:>
     my $pagi_closure = $app->to_app;
 
 Generates and returns an asynchronous code reference conforming to the PAGI
-protocol specification. If sub-applications were registered via L<mount()|/"C<mount($path_prefix, $pagi_app)>">,
-C<to_app()> automatically wraps the routes using L<PAGI::App::URLMap>.
+protocol specification. If sub-applications were registered via
+L<mount()|/"C<mount($path_prefix, $pagi_app)>">, C<to_app()> automatically
+wraps the routes using L<PAGI::App::URLMap>.
 
 =head1 AUTO-GENERATED ENDPOINTS
 
@@ -1425,6 +1447,14 @@ the full documentation and an end-to-end JWT-verification example.
 =item * L<PAGI::FastAPI::Response::SSE>
 
 =item * L<PAGI::SSE>
+
+=item * L<PAGI::FastAPI::Middleware::RateLimit> - App-level and per-route rate limiting.
+
+=item * L<PAGI::FastAPI::RateLimit::Driver>, L<PAGI::FastAPI::RateLimit::Driver::Memory> - Pluggable rate-limit storage drivers.
+
+=item * L<PAGI::FastAPI::Queue> - Pluggable async message queue facade.
+
+=item * L<PAGI::FastAPI::Queue::Driver>, L<PAGI::FastAPI::Queue::Driver::Memory> - Pluggable queue storage drivers.
 
 =back
 

@@ -1,100 +1,58 @@
-# Release Notes: CPAN::Maker::Bootstrapper 2.0.11
+# CPAN::Maker::Bootstrapper 2.2.3 Release Notes
 
-**Release Date:** 2026-07-20
-**Version:** 2.0.11
+**Release Date:** August 18, 2026
+**Released by:** Rob Lauer
 
 ---
 
 ## Overview
 
-This release refactors the build system's syntax-checking
-infrastructure to decouple syntax/POD validation from the templating
-pipeline. The change resolves a class of build ordering failures
-caused by GNU Make treating intermediate `.pm`/`.pl` files as
-disposable, and introduces a cleaner, two-phase approach to module
-generation and validation.
+Version 2.2.3 is a maintenance release delivering targeted bug fixes
+and improvements to the build system, along with a new feature in the
+installer for configuring build mirrors via an environment variable.
 
 ---
 
-## What's Changed
+## What's New
 
-### Build System: Syntax Checking Decoupled from Templating (`perl.mk`)
+### `BUILD_MIRRORS` Environment Variable Support
 
-The most significant change in this release is the separation of Perl
-syntax and POD checking from the template expansion rules that
-generate `.pm` and `.pl` files.
+The `cmd_install` method in
+`CPAN::Maker::Bootstrapper::Role::Installer` now supports a
+`BUILD_MIRRORS` environment variable. When set, its value is written
+to a `build-mirrors` file prior to invoking `make`, allowing you to
+specify one or more CPAN mirrors (comma-separated) for use during
+CI/Docker builds.
 
-**Previously**, syntax checking was embedded directly in the `%.pm`
-and `%.pl` pattern rules. This caused two problems:
+**Example:**
 
-1. GNU Make could treat built `.pm`/`.pl` files as disposable
-   intermediate files and delete them after the check-syntax step
-   consumed them, even though they are actual build deliverables.
-2. During `deps.mk` regeneration, syntax checking could fail because
-   sibling modules referenced by a freshly added `use` statement might
-   not yet exist on disk.
-
-**Now**, a dedicated two-phase approach is used:
-
-- **Phase 1 — Templating** (`%.pm.in → %.pm`, `%.pl.in → %.pl`):
-  Performs only token substitution and POD extraction. Cannot fail due
-  to cross-module ordering issues.
-- **Phase 2 — Syntax checking** (`%.pm → %.pm.checked`, `%.pl →
-  %.pl.checked`): Runs `perl -wc` and `podchecker` only after *all*
-  modules and scripts in the build are already on disk, so
-  inter-module dependency ordering is a non-issue by the time
-  validation runs.
-
-A new `.PHONY` target, `check-syntax`, aggregates all sentinel
-`.checked` files:
-
-```make
-check-syntax: $(PERL_MODULES:%.pm=%.pm.checked) $(PERL_BIN_FILES:%.pl=%.pl.checked)
+```bash
+BUILD_MIRRORS="https://cpan.example.com,https://mirror.example.org" cmb install --module My::Module
 ```
 
-`.checked` sentinel files are added to `CLEANFILES` and to `.gitignore`/`gitignore`.
+---
 
-The `%.pm` and `%.pl` targets are now declared `.PRECIOUS` to prevent
-GNU Make from deleting them as intermediate files during the
-pattern-rule chain.
+## Build System Fixes & Improvements
 
-### Improved Skip-List Handling for Syntax Checking
+### Makefile
 
-Both `check_syntax_pm` and `check_syntax_pl` make macros now support a
-`compile.skip` file in addition to the existing `PERLWC_SKIP` make
-variable:
+- **`GIT_DIRTY` fix:** The fallback `echo 'unknown'` was previously
+  missing, causing the shell to silently fail if `git describe` was
+  unavailable. This has been corrected.
+- **`TEMPLATE_VARS` updated:** `MIN_PERL_VERSION` is now included in
+  the template variable set, making it available for use in `.in` file
+  templating and `buildspec.yml` generation.
+- **`buildspec.yml` recipe refactored:**
+  - Now calls `gen-vars-file` to generate `buildspec.yml.tmpl.vars` before resolving variables.
+  - A `trap` ensures `buildspec.yml.tmpl.vars` is cleaned up on exit.
+  - `resolve-vars` now locates `buildspec.yml.tmpl.vars` by default,
+    removing the need to pass template vars explicitly on the command
+    line.
 
-- If `compile.skip` exists in the project root, its contents are
-  merged with `PERLWC_SKIP`.
-- A temporary file is used to combine both sources cleanly, with a
-  `trap`-based cleanup to prevent temp file leakage.
-- Variable references now correctly use `$<` (the prerequisite) rather
-  than `$@` (the target), fixing a latent bug.
+### MANIFEST
 
-### `check-syntax` Added as a Tarball Dependency (`Makefile`)
-
-The `$(TARBALL)` target now explicitly depends on `check-syntax`,
-ensuring all modules and scripts pass syntax and POD validation before
-a distribution tarball is produced:
-
-```make
-$(TARBALL): $(DEPS) \
-    check-syntax \
-    ...
-```
-
-### `tidy` Target Updated
-
-The `tidy` convenience target has been updated to invoke `make
-check-syntax` rather than building the raw `.pm`/`.pl` files directly,
-keeping it consistent with the new two-phase build model.
-
-### Git::Raw is now optional
-
-In previous versions `Git::Raw` was required. It is now only
-*recommended*.  `Git::Raw` requires the libgit2 and building the XS
-module is typically rather slow. User's who want to use the `make
-release-notes` feature should install `Git::Raw` and `LLM::API`.
+- `local.mk` has been added to the distribution manifest, ensuring it
+  is included in packaged releases.
 
 ---
 
@@ -102,53 +60,16 @@ release-notes` feature should install `Git::Raw` and `LLM::API`.
 
 | File | Change |
 |------|--------|
-| `.includes/perl.mk` | Decoupled syntax checking; added `.checked` sentinel rules; added `compile.skip` support; added `.PRECIOUS` declaration; fixed `$@` → `$<` in check macros |
-| `Makefile` | Added `check-syntax` as a dependency of `$(TARBALL)` |
-| `.gitignore` | Added `**/*.checked` |
-| `gitignore` | Added `**/*.checked` |
-| `VERSION` | Bumped to `2.0.11` |
-| `README.md` | Regenerated from POD |
+| `lib/CPAN/Maker/Bootstrapper/Role/Installer.pm.in` | Added `BUILD_MIRRORS` environment variable support |
+| `Makefile` | Fixed `GIT_DIRTY`, added `MIN_PERL_VERSION` to `TEMPLATE_VARS`, refactored `buildspec.yml` recipe |
+| `MANIFEST` | Added `local.mk` |
+| `VERSION` | Bumped to `2.2.3` |
+| `README.md` | Regenerated |
+| `release-notes.md` | Updated |
 
 ---
 
 ## Upgrade Notes
 
-Run `make update` in any project using the bootstrapper to pull the
-updated `.includes/perl.mk` and `Makefile` into your project.
-
-```bash
-make update
-git diff .includes/ Makefile
-```
-
-If you have any files that cannot be compiled outside their runtime
-environment (e.g. Apache handlers, mod_perl modules), add them to a
-`compile.skip` file in your project root or to `PERLWC_SKIP` in
-`project.mk`:
-
-```make
-# project.mk
-PERLWC_SKIP = lib/My/Apache/Handler.pm
-```
-
-or:
-
-```
-# compile.skip
-lib/My/Apache/Handler.pm
-```
-
----
-
-## Bug Fixes
-
-- Fixed a latent variable reference bug in `check_syntax_pm` and
-  `check_syntax_pl` macros where `$@` (the rule target) was used
-  instead of `$<` (the rule prerequisite) when referring to the file
-  being checked.
-- Resolved a class of build failures where GNU Make deleted freshly
-  built `.pm`/`.pl` files as disposable intermediates during
-  pattern-rule chain execution.
-- Fixed a race-like build ordering issue where syntax checking of a
-  module containing a `use` of a sibling module could fail during
-  `deps.mk` regeneration if that sibling had not yet been built.
+This release is fully backward compatible with 2.2.2. No changes to
+public APIs or module interfaces are required.

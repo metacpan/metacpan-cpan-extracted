@@ -83,7 +83,7 @@ lib/PDL/ImageND.pd
 lib/PDL/ImageRGB.pd
 lib/PDL/ImageRGB/pdlppm.h
 lib/PDL/ImageRGB/ppm_quant.c
-lib/PDL/Index.pod
+lib/PDL/Index.pod.PL
 lib/PDL/Indexing.pod
 lib/PDL/Install/Files.pm
 lib/PDL/InstallGuide.pod
@@ -271,7 +271,6 @@ utils/address-pseudonymise
 utils/doc-pp
 utils/harness
 utils/perldlpp.pl
-utils/scantree.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 GENERATED/PDL/Bad.pm                     mod=PDL::Bad pd=lib/PDL/Bad.pd (added by pdlpp_mkgen)

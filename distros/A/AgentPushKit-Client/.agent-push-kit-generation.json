@@ -1,0 +1,14 @@
+{
+  "apiVersion": "0.1.0",
+  "generatorVersion": "7.24.0",
+  "id": "perl",
+  "language": "Perl",
+  "generator": "perl",
+  "stability": "stable",
+  "repository": "JustinBStrong/agent-push-kit-perl",
+  "properties": {
+    "moduleName": "AgentPushKit::Client",
+    "moduleVersion": "0.1.0",
+    "licenseName": "MIT"
+  }
+}

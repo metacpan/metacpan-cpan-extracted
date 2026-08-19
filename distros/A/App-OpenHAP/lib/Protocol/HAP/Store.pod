@@ -1,0 +1,96 @@
+=head1 NAME
+
+Protocol::HAP::Store - the persistence contract of Protocol::HAP
+
+=head1 DESCRIPTION
+
+C<Protocol::HAP> owns no files. Everything a paired accessory must
+remember goes through a store object that the host injects. Any object
+with the twelve methods below satisfies the contract.
+L<Protocol::HAP::Store::Memory> is the reference implementation;
+L<Protocol::HAP::Store::File> is the durable implementation over files.
+
+=head1 THE INCREMENT RULE
+
+The configuration number C<c#> tells a controller that the accessory
+database changed. The mutating pairing methods - C<save_pairing>,
+C<remove_pairing>, and C<remove_all_pairings> - increment the
+configuration number themselves.
+
+This rule has no slack. A store that skips the increment hides pairing
+changes from controllers. An engine that adds an increment on top
+counts every change twice. Both break C<c#>, in opposite directions.
+
+=head1 METHODS
+
+=head2 load_accessory_keys()
+
+Return the long-term identity as the list C<($ltsk, $ltpk)>: the
+Ed25519 secret and public key. Return the empty list when no identity
+is stored yet; the engine then generates one and saves it.
+
+=head2 save_accessory_keys($ltsk, $ltpk)
+
+Store the long-term identity. The secret key is the identity of the
+accessory: a durable store must never let it become readable by
+another user.
+
+=head2 load_pairings()
+
+Return every pairing as a hash reference keyed by controller id. Each
+value is a hash reference with C<ltpk> (the controller's Ed25519
+public key, raw bytes) and C<permissions> (1 for an admin, 0 for a
+regular controller).
+
+=head2 save_pairing($controller_id, $ltpk, $permissions)
+
+Add or replace one pairing, then increment the configuration number.
+C<$permissions> defaults to 1.
+
+=head2 remove_pairing($controller_id)
+
+Remove one pairing, then increment the configuration number. Removing
+an unknown id is not an error.
+
+=head2 remove_all_pairings()
+
+Remove every pairing, then increment the configuration number. This is
+the factory reset that follows the removal of the last admin.
+
+=head2 get_config_number()
+
+Return the configuration number. The value starts at 1 and only ever
+goes up: a controller that sees it go backwards drops the accessory
+and pairs again.
+
+=head2 increment_config_number()
+
+Add one to the configuration number and return the new value.
+
+=head2 get_config_digest()
+
+Return the stored digest of the accessory structure, or C<undef> when
+none is stored. The engine compares it against the current structure
+to decide whether C<c#> must move.
+
+=head2 save_config_digest($digest)
+
+Store the digest of the accessory structure.
+
+=head2 get_auth_attempts()
+
+Return the count of failed pairing attempts. Return 0 when none is
+stored. The limit of 100 failed attempts survives restarts through
+this counter.
+
+=head2 set_auth_attempts($count)
+
+Store the count of failed pairing attempts.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, L<Protocol::HAP::Store::Memory>,
+L<Protocol::HAP::Store::File>, L<Protocol::HAP::Pairing>,
+F<spec/HAP-Pairing.md>
+
+=cut

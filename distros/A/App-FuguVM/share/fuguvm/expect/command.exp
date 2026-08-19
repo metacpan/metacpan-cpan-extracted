@@ -1,0 +1,69 @@
+#!/usr/bin/expect -f
+#
+# Run a single command on the console and exit
+#
+# Usage: command.exp <host> <port> <command> [user] [password]
+#
+
+# Use the environment variable when it exists. Otherwise use 60.
+if {[info exists env(FUGUVM_TIMEOUT)]} {
+    set timeout $env(FUGUVM_TIMEOUT)
+} else {
+    set timeout 60
+}
+
+if {[llength $argv] < 3} {
+    puts stderr "Usage: command.exp <host> <port> <command> \[user\] \[password\]"
+    exit 1
+}
+
+set host [lindex $argv 0]
+set port [lindex $argv 1]
+set cmd [lindex $argv 2]
+set user [lindex $argv 3]
+set password [lindex $argv 4]
+
+if {$user eq ""} {
+    set user "root"
+}
+if {$password eq ""} {
+    set password "openbsd"
+}
+
+# Connect to console
+spawn telnet $host $port
+
+# Send a newline to trigger login prompt
+send "\r"
+
+# Wait for login prompt or shell
+expect {
+    "login:" {
+        send "$user\r"
+        expect "Password:"
+        send "$password\r"
+    }
+    "#" {
+        # Already logged in
+    }
+    eof {
+        puts stderr "telnet could not connect to the VM console"
+        exit 1
+    }
+    timeout {
+        puts stderr "Timeout waiting for prompt"
+        exit 1
+    }
+}
+
+# Wait for shell
+expect "#" {
+    send "$cmd\r"
+}
+
+# Wait for command to complete
+expect "#" {
+    send "exit\r"
+}
+
+exit 0

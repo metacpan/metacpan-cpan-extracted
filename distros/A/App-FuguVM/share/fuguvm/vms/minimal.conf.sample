@@ -1,0 +1,12 @@
+# Minimal OpenBSD VM configuration
+#
+# Smaller memory and disk for quick tests
+#
+
+name = openbsd-minimal
+version = 7.8
+memory = 1024
+disk_size = 4G
+
+ssh_port = 2223
+console_port = 4445

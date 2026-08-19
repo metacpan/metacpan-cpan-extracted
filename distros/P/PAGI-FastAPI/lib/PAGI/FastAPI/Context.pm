@@ -4,7 +4,7 @@ use v5.38;
 use experimental 'class';
 use version;
 
-our $VERSION   = qv('v1.0.0');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 class PAGI::FastAPI::Context {
@@ -68,6 +68,18 @@ class PAGI::FastAPI::Context {
     method res_headers { $res_headers }
 
     method set_header ($key, $val) {
+        my $lc_key = lc($key);
+        for my $h (@$res_headers) {
+            if (lc($h->[0]) eq $lc_key) {
+                $h->[0] = $key;
+                $h->[1] = $val;
+                return;
+            }
+        }
+        push @$res_headers, [$key, $val];
+    }
+
+    method add_header ($key, $val) {
         push @$res_headers, [$key, $val];
     }
 
@@ -133,7 +145,7 @@ PAGI::FastAPI::Context - Request and Response Lifecycle Context for PAGI::FastAP
 
 =head1 VERSION
 
-Version v1.0.0
+Version v1.1.0
 
 =head1 SYNOPSIS
 
@@ -293,9 +305,22 @@ tuple pairs C<[ [$name, $val], ... ]>.
 
 =head2 C<set_header($key, $val)>
 
-Appends an outgoing HTTP header pair to the response headers list.
+Sets an outgoing HTTP header, case-insensitively replacing any existing
+header of the same name (last write wins). Use this for headers that
+should only ever have one value.
 
     $c->set_header('X-Frame-Options' => 'DENY');
+    $c->set_header('Content-Type'    => 'text/plain'); # replaces any prior Content-Type
+
+=head2 C<add_header($key, $val)>
+
+Appends an additional outgoing HTTP header pair without touching any
+existing header of the same name. Use this only for headers that are
+legitimately allowed to appear more than once (e.g. C<Set-Cookie>,
+C<Vary>, C<Link>); for everything else prefer C<set_header>.
+
+    $c->add_header('Set-Cookie' => 'session=abc123; Path=/');
+    $c->add_header('Set-Cookie' => 'theme=dark; Path=/');
 
 =head2 C<header($name)>
 

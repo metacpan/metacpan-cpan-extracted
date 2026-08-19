@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.17';
+our $VERSION = '0.20';
 
 1;
 
@@ -48,6 +48,9 @@ when it actually changed. The client can read the contents but cannot forge
 them, so do not put secrets in a session; a tampered cookie is rejected and the
 session comes up empty.
 
+"Cannot forge them" is exactly as true as the secret is, which is why there is
+no default for it and no way to start without one. See L</"THE KEYWORD">.
+
 There is no server-side store in this cut: the whole session lives in the
 cookie. A session that serializes over ~4KB croaks, pointing at where a
 server-side store would go.
@@ -60,13 +63,26 @@ Enables sessions for the application. Options:
 
 =over 4
 
-=item * C<secret> - the signing key (required for a real deployment); source it
-from the L<secrets system|Punk/secret> so it never sits in the code.
+=item * C<secret> - the signing key. B<Required>, and required to be
+non-empty: C<session> croaks at boot without one rather than starting, because
+the alternative is signing with a zero-length HMAC key, which anybody who
+knows the cookie format can reproduce offline. Source it from the
+L<secrets system|Punk/secret> so it never sits in the code - and because
+C<secret> itself fails closed, an unset environment variable or a missing
+config path becomes a startup error rather than a forgeable cookie.
 
 =item * C<cookie> - the cookie name (default C<punk.sid>).
 
 =item * C<expires> - a lifetime like C<'7d'> / C<'12h'> / C<'30m'> / seconds;
 omitted means a session cookie (gone when the browser closes).
+
+This is a real lifetime, not just a C<Max-Age>: the expiry is stamped inside
+the signed payload and checked when the cookie is read, so a cookie past it
+is refused whatever the client chose to keep. A cookie with no C<expires> is
+still bounded, at 30 days - "until the browser closes" is a promise the
+client makes, not a limit on how long the value stays good. The stamp
+refreshes every time the session is written, so an active session does not
+expire out from under someone.
 
 =item * C<path> (default C</>), C<domain>, C<secure>, C<httponly> (default on),
 C<samesite> (default C<Lax>) - the cookie attributes.
@@ -85,6 +101,15 @@ end of the request if it changed.
 =head2 session_expire
 
 Log out: empty the session and delete the cookie.
+
+Be clear about what that can and cannot do. It tells the browser in front of
+you to drop the value; it cannot reach a copy someone already took, because
+there is no server-side record of the session to mark dead - the cookie B<is>
+the session. A stolen cookie therefore stays good until its stamped expiry
+runs out, which is the ceiling C<expires> sets and the reason it is enforced
+server-side rather than left to C<Max-Age>. If you need logout to revoke
+immediately, the session has to have server-side state to revoke: keep a
+per-user token or a session id in your own table and check it in a guard.
 
 =head2 flash
 

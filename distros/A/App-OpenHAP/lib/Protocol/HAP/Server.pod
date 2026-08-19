@@ -1,0 +1,129 @@
+=head1 NAME
+
+Protocol::HAP::Server - the sans-IO HAP accessory-server engine
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::Server;
+    use Protocol::HAP::Store::Memory;
+
+    my $engine = Protocol::HAP::Server->new(
+        name   => 'My Bridge',
+        pin    => '123-45-678',
+        store  => Protocol::HAP::Store::Memory->new,
+        output => sub ($session, $bytes) { ... },
+    );
+
+    # One session per connection
+    my $session = $engine->session_open;
+
+    # Feed it what the socket produced; responses arrive through
+    # the output contract
+    $engine->receive($session, $bytes)
+        or close_the_connection();
+
+    # On disconnect
+    $engine->session_close($session);
+
+=head1 DESCRIPTION
+
+This module is the HAP accessory server as a sans-IO engine: it
+consumes bytes and emits bytes. The host owns sockets, timers,
+logging, and persistence, injected through the contracts that
+L<Protocol::HAP> documents. The engine owns everything that is
+protocol: the read buffer and its 64 KB bound, decryption, HTTP
+parsing, the endpoint dispatch, the pairing state machines, the
+accessory database, and event delivery.
+
+The endpoints are C</pair-setup>, C</pair-verify>, C</identify>,
+C</pairings> (add, remove, list), C</accessories>,
+C</characteristics> GET and PUT, and C</prepare>.
+
+=head1 CONSTRUCTOR
+
+C<new> takes the identity arguments C<name>, C<pin>, C<setup_id>, and
+C<category> (default 2, a bridge), and the host contracts:
+
+=over 4
+
+=item store
+
+Required. An object with the twelve methods of
+F<Protocol/HAP/Store.pod>. The engine loads or generates the
+accessory identity through it.
+
+=item output
+
+Required. A code reference C<sub ($session, $bytes)>. The engine
+sends every write through it: responses and EVENT notifications
+alike. The host writes the bytes to the connection that it filed the
+session under.
+
+=item logger
+
+Optional. The default is the null logger of L<Protocol::HAP>.
+
+=item after and cancel
+
+Optional code references for one-shot timers, used for event
+coalescing. C<after($seconds, $code)> returns a handle;
+C<cancel($handle)> revokes it. Without them, the host calls
+C<flush_events> itself.
+
+=item on_pairing_changed
+
+Optional. A code reference C<sub ($paired)>. The engine calls it when
+the paired state flips, so the host can re-advertise its mDNS TXT
+record.
+
+=back
+
+=head1 THE CONNECTION CONTRACT
+
+=head2 session_open()
+
+Return a new L<Protocol::HAP::Session>. The engine allocates session
+ids from an instance counter; the host files the session beside the
+connection it belongs to.
+
+=head2 receive($session, $bytes)
+
+Consume what the host read from the connection: decrypt, buffer,
+parse, dispatch, and emit every response through C<output>. The
+method returns 1, or C<undef> on a fatal condition - a failed
+decryption or an over-limit request. On C<undef> the host closes the
+connection.
+
+=head2 session_close($session)
+
+Release the pairing lock and the event subscriptions that the session
+holds.
+
+=head1 EVENTS
+
+C<queue_event($aid, $iid, $value, $originator)> queues a
+notification; the value changes of C</characteristics> PUT and the
+device-side C<notify_change> path call it. Without a C<$value>, the
+current value of the characteristic goes out. Events coalesce for 250 ms
+through the C<after>/C<cancel> contract. C<flush_events> sends every
+queued event now; a host without the timer contract calls it
+directly. C<send_event> delivers one event to the subscribed
+sessions through C<output>, excluding the originator.
+
+=head1 IDENTITY AND DISCOVERY
+
+C<is_paired>, C<get_config_number>, C<update_config_number>,
+C<get_device_id>, and C<mdns_txt_records> expose what a host needs to
+advertise the accessory. C<mdns_txt_records> returns a hash
+reference; the wire format of the TXT string belongs to the host's
+mDNS responder, not to HAP.
+
+C<add_accessory> and C<get_bridged_accessories> pass through to the
+bridge, for the host and its device loader.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, L<Protocol::HAP::Session>, L<Protocol::HAP::Pairing>,
+F<Protocol/HAP/Store.pod>, F<spec/HAP-HTTP.md>
+
+=cut

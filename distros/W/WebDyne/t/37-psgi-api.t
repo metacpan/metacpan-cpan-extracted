@@ -68,11 +68,24 @@ sub uppercase {
 }
 EOF
         'example/route.psp' => <<'EOF',
-<api handler=route pattern="/example/route/{user}">
+<api handler=route pattern="/route/{user}">
 __PERL__
 sub route {
     my ($self, $match)=@_;
     return { user => uc($match->{user}) };
+}
+EOF
+        'example/api.psp' => <<'EOF',
+<api handler=uppercase pattern="/api/uppercase/{user}/:id">
+<api handler=lowercase pattern="/example/api/lowercase/{user}/:id">
+__PERL__
+sub uppercase {
+    my ($self, $match)=@_;
+    return { user => uc($match->{user}), id => $match->{id} };
+}
+sub lowercase {
+    my ($self, $match)=@_;
+    return { user => lc($match->{user}), id => $match->{id} };
 }
 EOF
         'normal.psp' => '<start_html>normal PSGI page</start_html>',
@@ -101,7 +114,19 @@ EOF
 
     $res=$test_or->request(GET('/example/route/bob'));
     is($res->code(), 200, 'nested API PSP returns HTTP 200');
-    like($res->decoded_content() || '', qr/"user"\s*:\s*"BOB"/, 'nested API route receives user');
+    like($res->decoded_content() || '', qr/"user"\s*:\s*"BOB"/, 'nested API local route receives user');
+
+    $res=$test_or->request(GET('/example/api/uppercase/bob/42'));
+    is($res->code(), 200, 'subdirectory API PSP with local route returns HTTP 200');
+    like($res->decoded_content() || '', qr/"user"\s*:\s*"BOB"/,
+        'subdirectory API PSP local route receives user');
+    like($res->decoded_content() || '', qr/"id"\s*:\s*"42"/,
+        'subdirectory API PSP local route receives id');
+
+    $res=$test_or->request(GET('/example/api/lowercase/BOB/42'));
+    is($res->code(), 200, 'subdirectory API PSP with prefixed pattern returns HTTP 200');
+    like($res->decoded_content() || '', qr/"user"\s*:\s*"bob"/,
+        'subdirectory API PSP prefixed pattern is normalised');
 
     $res=$test_or->request(GET('/normal.psp'));
     is($res->code(), 200, 'normal PSP request remains available');

@@ -13,7 +13,7 @@ use warnings;
 use Test::Most;
 
 use Test::Mockingbird 0.08;
-use Test::Returns;
+use Test::Needs;
 use Test::Memory::Cycle;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
@@ -36,6 +36,9 @@ Readonly::Scalar my $PKG => 'Params::Get';
 # =========================================================================
 
 subtest 'fast path: sole hashref returned by identity, no copy made' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my $h      = { foo => 'bar', baz => 42 };
 	my $result = get_params($h);
 
@@ -109,6 +112,9 @@ subtest '$default HASH ref: croaks immediately' => sub {
 # =========================================================================
 
 subtest 'arrayref default: two args mapped to named keys' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my $result = get_params([qw(name age)], 'Alice', 30);
 
 	is_deeply($result, { name => 'Alice', age => 30 }, 'positional args mapped correctly');
@@ -130,6 +136,9 @@ subtest 'arrayref default: extra args beyond key count are silently discarded' =
 };
 
 subtest 'arrayref default: empty names list returns empty hashref' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my $result = get_params([], 'ignored', 'also_ignored');
 	is_deeply($result, {}, 'empty key list yields empty hashref');
 	returns_ok($result, { type => 'hashref' }, 'return type: hashref');
@@ -153,6 +162,9 @@ subtest 'arrayref default: sole hashref passthrough consistent with scalar-defau
 # =========================================================================
 
 subtest '\@_ two-element shorthand: matching default + plain scalar value' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	# Simulates: caller does routine(country => 'US') and callee uses \@_.
 	my $result = get_params('country', ['country', 'US']);
 	is_deeply($result, { country => 'US' }, 'shorthand unwrapped correctly');
@@ -176,6 +188,9 @@ subtest '\@_ shorthand suppressed when element[0] does not match $default' => su
 };
 
 subtest '\@_ multi-value list wrapped under scalar default' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	# Simulates caller doing routine('a', 'b', 'c') and callee using get_params('items', \@_).
 	my $result = get_params('items', ['a', 'b', 'c']);
 	is_deeply($result, { items => ['a', 'b', 'c'] },
@@ -221,6 +236,9 @@ subtest 'zero args + defined $default: Carp::confess with "Usage" message' => su
 };
 
 subtest 'zero args + undef $default: returns undef gracefully' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my $result = get_params();
 	ok(!defined $result, 'undef returned for zero args with undef $default');
 	# undef satisfies an optional hashref spec
@@ -235,6 +253,9 @@ subtest 'zero args + undef $default: returns undef gracefully' => sub {
 # =========================================================================
 
 subtest 'one arg + defined $default: plain scalar wrapped under key' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my $result = get_params('country', 'DE');
 	is_deeply($result, { country => 'DE' }, 'scalar wrapped under default key');
 	returns_ok($result, { type => 'hashref' }, 'return type: hashref');
@@ -292,6 +313,9 @@ subtest 'one arg + undef $default: undef arg returns undef' => sub {
 };
 
 subtest 'one arg + undef $default: hashref passed through unchanged' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my $h      = { k => 'v' };
 	my $result = get_params(undef, $h);
 
@@ -349,6 +373,9 @@ subtest 'one arg + undef $default: unrecognised scalar croaks with "Usage"' => s
 # =========================================================================
 
 subtest 'two args, non-empty options: mandatory value merged with options' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my $result = get_params('name', 'Alice', { role => 'admin', active => 1 });
 	is_deeply(
 		$result,
@@ -385,6 +412,9 @@ subtest 'two args with hashref but no $default: treated as even-length key-value
 # =========================================================================
 
 subtest 'named pairs: two pairs returned as hashref' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my $result = get_params(undef, foo => 'bar', baz => 42);
 
 	is_deeply($result, { foo => 'bar', baz => 42 }, 'two named pairs normalised');
@@ -488,6 +518,9 @@ subtest 'REF-of-SCALAR-ref: caller var unchanged even when call croaks' => sub {
 # =========================================================================
 
 subtest 'Test::Returns: all success paths return hashref' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my @cases = (
 		[ 'single hashref (fast path)',     get_params({ a => 1 })                         ],
 		[ 'named pairs',                    get_params(undef, x => 1, y => 2)              ],
@@ -504,6 +537,9 @@ subtest 'Test::Returns: all success paths return hashref' => sub {
 };
 
 subtest 'Test::Returns: undef return satisfies optional-hashref spec' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	returns_ok(undef, { type => 'hashref', optional => 1 },
 		'get_params() with no args: undef ok for optional hashref');
 };

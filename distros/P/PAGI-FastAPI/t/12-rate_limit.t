@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use v5.38;
-use Test2::V0;
+use Test::More;
 use Future::AsyncAwait;
 use PAGI::FastAPI;
 

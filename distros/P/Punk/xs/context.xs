@@ -281,6 +281,25 @@ text(self, body, status = &PL_sv_undef)
     OUTPUT:
         RETVAL
 
+# safe_path($path, $fallback?): $path when it is a same-origin relative path,
+# otherwise the fallback (undef by default). The guard for anything that
+# redirects to a destination the request supplied - ?to=, ?return=, ?next=.
+# (Do not start a line in here with the word after "#" being if/else/endif:
+# xsubpp reads it as a preprocessor directive.)
+SV *
+safe_path(self, path, fallback = &PL_sv_undef)
+        SV *self
+        SV *path
+        SV *fallback
+    CODE:
+    {
+        PERL_UNUSED_VAR(self);
+        RETVAL = pk_same_origin_path(aTHX_ path)
+               ? newSVsv(path) : newSVsv(fallback);
+    }
+    OUTPUT:
+        RETVAL
+
 SV *
 redirect(self, url, status = &PL_sv_undef)
         SV *self

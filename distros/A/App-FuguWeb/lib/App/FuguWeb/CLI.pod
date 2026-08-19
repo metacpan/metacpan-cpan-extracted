@@ -1,0 +1,70 @@
+=head1 NAME
+
+App::FuguWeb::CLI - subcommand dispatch for fuguweb
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::CLI;
+
+    exit App::FuguWeb::CLI->run(@ARGV);
+
+=head1 DESCRIPTION
+
+L<Fugu::CLI> parses the command line and dispatches. This class holds
+the command table, the global options, and one method for each command.
+Nothing here repeats a L<Getopt::Long> block.
+
+C<< App::FuguWeb::CLI->run(@argv) >> returns the exit code. F<bin/fuguweb>
+passes it straight to C<exit>.
+
+Before a command runs, the class applies the global options and loads
+the site description with L<App::FuguWeb::Config>. A description that is
+absent or does not parse gives C<EXIT_CONFIG_ERROR> and one message on
+standard error.
+
+See L<fuguweb(1)> for the user documentation of the subcommands.
+
+=head1 GLOBAL OPTIONS
+
+=over 4
+
+=item B<--project> I<dir>
+
+The project root. Without it, the class walks up from the working
+directory to the first F<.fuguwebrc>.
+
+=item B<--quiet>
+
+Suppress informational output.
+
+=back
+
+=head1 SUBCOMMANDS
+
+C<build> and C<clean> take C<--out> I<dir>, which overrides the
+C<out_dir> setting. C<init> writes a starter description and is the one
+command that runs without one.
+
+=head1 EXIT CODES
+
+The first five come from L<Fugu::CLI> and mean the same in every Fugu
+tool. The rest belong to a site build.
+
+    0   EXIT_SUCCESS
+    1   EXIT_ERROR
+    2   EXIT_INVALID_ARGS
+    3   EXIT_CONFIG_ERROR
+    4   EXIT_RENDER_FAILED
+    5   EXIT_CHECK_FAILED
+    6   EXIT_TOOL_MISSING
+
+A caller that builds in a container can thus tell a renderer that is
+not installed from a page that is malformed.
+
+=head1 SEE ALSO
+
+L<fuguweb(1)>, L<App::FuguWeb>, L<App::FuguWeb::Config>, L<Fugu::CLI>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

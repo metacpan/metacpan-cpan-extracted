@@ -95,7 +95,7 @@
          "web" : "https://github.com/aspeer/WebDyne"
       }
    },
-   "version" : "3.018",
+   "version" : "3.019",
    "x_authority" : "cpan:ASPEER",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

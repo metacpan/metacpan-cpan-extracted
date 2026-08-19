@@ -6,7 +6,9 @@ use warnings;
 use Amazon::Signature4::Lite;
 use Amazon::S3::Lite::Credentials;
 use Amazon::S3::Lite::Logger;
+use Amazon::S3::Lite::Constants qw(:booleans);
 use Carp qw(croak);
+use Carp::Always;
 use Data::Dumper;
 use Digest::MD5 qw(md5_base64 md5);
 use English qw(-no_match_vars);
@@ -16,12 +18,12 @@ use MIME::Base64 qw(encode_base64);
 use Scalar::Util qw(blessed openhandle);
 use URI::Escape qw(uri_escape_utf8);
 use XML::Twig;
+use JSON::PP;
 
-use Readonly;
-Readonly our $TRUE  => 1;
-Readonly our $FALSE => 0;
+use Role::Tiny::With;
+with 'Amazon::S3::Lite::Policies';
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.3.1';
 
 ########################################################################
 sub new {
@@ -77,9 +79,8 @@ sub _init_logger {
     if ( !Log::Log4perl->initialized ) {
       Log::Log4perl->easy_init( { level => uc $log_level } );
     }
-    else {
-      $self->{logger} = Log::Log4perl->get_logger(__PACKAGE__);
-    }
+
+    $self->{logger} = Log::Log4perl->get_logger(__PACKAGE__);
     return;
   }
 
@@ -250,7 +251,7 @@ sub _request {
 
   my $content_is_coderef = ref $content eq 'CODE';
 
-  # sign — returns merged headers ready for HTTP::Tiny
+  # sign â returns merged headers ready for HTTP::Tiny
   my $signed = $self->_signer($region)->sign(
     method  => $method,
     url     => $url,
@@ -258,7 +259,7 @@ sub _request {
     payload => $content_is_coderef ? q{} : $content,
   );
 
-  # HTTP::Tiny sets Host itself — remove to avoid duplicate header error
+  # HTTP::Tiny sets Host itself â remove to avoid duplicate header error
   delete $signed->{host};
 
   $self->logger->debug("$method $url");
@@ -382,7 +383,7 @@ sub get_object {
 
     $self->_croak_on_error( $response, 'get_object' );
 
-    # Return metadata only — content is on disk
+    # Return metadata only â content is on disk
     return $self->_extract_object_metadata( $response->{headers} );
   }
 
@@ -407,7 +408,7 @@ sub get_object {
 #   version_id => $vid    delete a specific version
 #
 # Returns true on success. Note S3 returns 204 for both successful
-# deletes and deletes of non-existent keys — no distinction is made.
+# deletes and deletes of non-existent keys â no distinction is made.
 # Croaks on network or server errors.
 ########################################################################
 sub delete_object {
@@ -435,7 +436,7 @@ sub delete_object {
 #
 # Creates a new S3 bucket.
 #
-# us-east-1 is the S3 default region — the CreateBucketConfiguration
+# us-east-1 is the S3 default region â the CreateBucketConfiguration
 # body must NOT be sent for us-east-1 (S3 will error). All other regions
 # require it with LocationConstraint set to the target region.
 #
@@ -458,7 +459,7 @@ sub create_bucket {
 
   my $content = q{};
 
-  # us-east-1 is the implicit default — sending LocationConstraint for it
+  # us-east-1 is the implicit default â sending LocationConstraint for it
   # causes an error. All other regions require it.
   if ( $region ne 'us-east-1' ) {
     $content
@@ -476,6 +477,24 @@ sub create_bucket {
   $self->_croak_on_error( $response, 'create_bucket' );
 
   return 1;
+}
+
+########################################################################
+sub delete_bucket {
+########################################################################
+  my ( $self, $bucket, %options ) = @_;
+
+  croak 'bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  my $region = $options{region} // $self->region;
+  my $url    = $self->_endpoint($bucket);
+
+  my $response = $self->_request( 'DELETE', $url, {}, q{}, {}, $region );
+
+  $self->_croak_on_error( $response, 'delete_bucket' );
+
+  return $TRUE;
 }
 
 ########################################################################
@@ -582,7 +601,7 @@ sub copy_object {
 
   # S3 can return HTTP 200 with an XML error body for copies that fail
   # after the headers have been sent. Detect this by checking the root
-  # element — a success response has <CopyObjectResult>, an error has <Error>.
+  # element â a success response has <CopyObjectResult>, an error has <Error>.
   return $self->_parse_copy_response( $response->{content}, 'copy_object' );
 }
 
@@ -640,7 +659,7 @@ sub put_object {
     $headers{'x-amz-acl'} = $options{acl};
   }
 
-  # User metadata — prefix bare keys with x-amz-meta-
+  # User metadata â prefix bare keys with x-amz-meta-
   if ( my $meta = $options{metadata} ) {
     for my $k ( keys %{$meta} ) {
       my $header = $k =~ /^x-amz-meta-/xsm ? $k : "x-amz-meta-$k";
@@ -805,13 +824,13 @@ sub _parse_list_objects_v2 {
 #
 # Convenience wrapper that auto-paginates list_objects_v2 and returns
 # a flat list of all matching object hashrefs.
-# delimiter is ignored — use list_objects_v2 directly for that.
+# delimiter is ignored â use list_objects_v2 directly for that.
 ########################################################################
 sub list_all_objects_v2 {
 ########################################################################
   my ( $self, $bucket, %options ) = @_;
 
-  # delimiter is meaningless here — silently remove it
+  # delimiter is meaningless here â silently remove it
   delete $options{delimiter};
 
   my @all_objects;
@@ -854,6 +873,27 @@ sub put_bucket_notification_configuration {
   my $response = $self->_request( 'PUT', $url, \%headers, $xml );
 
   $self->_croak_on_error( $response, 'put_bucket_notification_configuration' );
+
+  return $TRUE;
+}
+########################################################################
+sub put_public_access_block {
+########################################################################
+  my ( $self, $bucket, %options ) = @_;
+
+  my $xml = $self->_create_public_access_block( $bucket, %options );
+
+  my $url = $self->_endpoint($bucket) . q{?publicAccessBlock=};
+
+  my %headers = (
+    'Content-Type'   => 'application/xml',
+    'Content-Length' => length $xml,
+    'Content-MD5'    => encode_base64( md5($xml), q{} ),
+  );
+
+  my $response = $self->_request( 'PUT', $url, \%headers, $xml );
+
+  $self->_croak_on_error( $response, 'put_public_access_block' );
 
   return $TRUE;
 }
@@ -1019,6 +1059,198 @@ sub _create_notification_configuration {
   return $resolved_xml;
 }
 
+########################################################################
+sub _create_public_access_block {
+########################################################################
+  my ( $self, $bucket, %permissions ) = @_;
+
+  croak 'ERROR: bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  foreach my $p (qw(block_public_acls ignore_public_acls block_public_policy restrict_public_buckets)) {
+    $permissions{$p} = defined $permissions{$p} ? $permissions{$p} ? 'true' : 'false' : 'true';
+  }
+
+  my $templates = $self->_fetch_templates();
+
+  my $xml = $self->_resolve( $templates->{'public_access_block'}, %permissions );
+  $xml = qq{<?xml version="1.0" encoding="UTF-8"?>\n} . $xml;
+
+  $self->logger->debug( Dumper( [ xml => $xml ] ) );
+
+  return $xml;
+}
+
+########################################################################
+sub put_bucket_website {
+########################################################################
+  my ( $self, $bucket, %options ) = @_;
+
+  my $xml = $self->_create_website_configuration( $bucket, %options );
+
+  my $url = $self->_endpoint($bucket) . q{?website=};
+
+  my %headers = (
+    'Content-Type'   => 'application/xml',
+    'Content-Length' => length $xml,
+    'Content-MD5'    => encode_base64( md5($xml), q{} ),
+  );
+
+  my $response = $self->_request( 'PUT', $url, \%headers, $xml );
+
+  $self->_croak_on_error( $response, 'put_bucket_website' );
+
+  return $TRUE;
+}
+
+########################################################################
+# get_bucket_policy( $bucket )
+#
+# Returns undef if the bucket has no policy (404
+# NoSuchBucketPolicy). Otherwise returns the policy as a decoded
+# hashref; pass raw => 1 to get the JSON string instead.
+########################################################################
+sub get_bucket_policy {
+########################################################################
+  my ( $self, $bucket, %options ) = @_;
+
+  croak 'bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  my $url = $self->_endpoint($bucket) . q{?policy=};
+
+  my $response = $self->_request( 'GET', $url );
+
+  return undef ## no critic (Subroutines::ProhibitExplicitReturnUndef)
+    if _is_not_found($response);
+
+  $self->_croak_on_error( $response, 'get_bucket_policy' );
+
+  return $options{raw} ? $response->{content} : JSON::PP::decode_json( $response->{content} );
+}
+
+########################################################################
+sub _create_website_configuration {
+########################################################################
+  my ( $self, $bucket, %options ) = @_;
+
+  croak 'ERROR: bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  my $index = $options{index} // 'index.html';
+
+  my $templates = $self->_fetch_templates;
+
+  my $error = q{};
+
+  if ( defined $options{error} && length $options{error} ) {
+    $error = $self->_resolve( $templates->{'website-error'}, error_key => $options{error} );
+  }
+
+  return $self->_resolve(
+    $templates->{website},
+    index => $index,
+    error => $error,
+  );
+}
+
+########################################################################
+sub _parse_website_configuration {
+########################################################################
+  my ( $self, $xml ) = @_;
+
+  my $root = XML::Twig->new->parse($xml)->root;
+
+  my %config;
+
+  if ( my $index = $root->first_child('IndexDocument') ) {
+    $config{index_document} = $index->first_child_text('Suffix');
+  }
+
+  if ( my $error = $root->first_child('ErrorDocument') ) {
+    $config{error_document} = $error->first_child_text('Key');
+  }
+
+  if ( my $redirect = $root->first_child('RedirectAllRequestsTo') ) {
+    $config{redirect_all_requests_to} = $redirect->first_child_text('HostName');
+  }
+
+  return \%config;
+}
+
+########################################################################
+# get_bucket_website( $bucket )
+#
+# Returns undef if the bucket has no website configuration (404).
+# Otherwise returns a hashref with index_document, error_document,
+# and (if present) redirect_all_requests_to.
+########################################################################
+sub get_bucket_website {
+########################################################################
+  my ( $self, $bucket ) = @_;
+
+  croak 'bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  my $url = $self->_endpoint($bucket) . q{?website=};
+
+  my $response = $self->_request( 'GET', $url );
+
+  return undef ## no critic (Subroutines::ProhibitExplicitReturnUndef)
+    if _is_not_found($response);
+
+  $self->_croak_on_error( $response, 'get_bucket_website' );
+
+  return $self->_parse_website_configuration( $response->{content} );
+}
+
+########################################################################
+sub delete_bucket_website {
+########################################################################
+  my ( $self, $bucket ) = @_;
+
+  croak 'bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  my $url = $self->_endpoint($bucket) . q{?website=};
+
+  my $response = $self->_request( 'DELETE', $url );
+
+  $self->_croak_on_error( $response, 'delete_bucket_website' );
+
+  return $TRUE;
+}
+
+########################################################################
+sub put_bucket_policy {
+########################################################################
+  my ( $self, $bucket, $policy ) = @_;
+
+  croak 'bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  croak 'policy is required'
+    if !defined $policy;
+
+  require JSON::PP;
+
+  my $json = ref $policy ? JSON::PP->new->canonical->encode($policy) : $policy;
+
+  my $url = $self->_endpoint($bucket) . q{?policy=};
+
+  my %headers = (
+    'Content-Type'   => 'application/json',
+    'Content-Length' => length $json,
+    'Content-MD5'    => encode_base64( md5($json), q{} ),
+  );
+
+  my $response = $self->_request( 'PUT', $url, \%headers, $json );
+
+  $self->_croak_on_error( $response, 'put_bucket_policy' );
+
+  return $TRUE;
+}
+
 my %TEMPLATES;
 
 ########################################################################
@@ -1145,6 +1377,24 @@ __DATA__
     @filters@
   </QueueConfiguration>
 </NotificationConfiguration>
+:website
+<WebsiteConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+  <IndexDocument>
+    <Suffix>@index@</Suffix>
+  </IndexDocument>
+  @error@
+</WebsiteConfiguration>
+:website-error
+<ErrorDocument>
+  <Key>@error_key@</Key>
+</ErrorDocument>
+:public_access_block
+<PublicAccessBlockConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+   <BlockPublicAcls>@block_public_acls@</BlockPublicAcls>
+   <IgnorePublicAcls>@ignore_public_acls@</IgnorePublicAcls>
+   <BlockPublicPolicy>@block_public_policy@</BlockPublicPolicy>
+   <RestrictPublicBuckets>@restrict_public_buckets@</RestrictPublicBuckets>
+</PublicAccessBlockConfiguration>
 
 =pod
 
@@ -1470,12 +1720,16 @@ Returns a (possibly empty) list of object hashrefs, each with the same
 fields as the elements of C<objects> in the C<list_objects_v2>
 response.
 
+=over 4
+
 =item log_level
 
 Log level for the internal logger. Accepted values: C<trace>, C<debug>,
 C<info>, C<warn>, C<error>, C<fatal>. Default is C<warn>. Only consulted
 when no C<logger> object is supplied and Log::Log4perl is not available
 or not yet initialized.
+
+=back
 
 =head2 get_object
 
@@ -1680,6 +1934,140 @@ Canned ACL string, e.g. C<private> (the S3 default), C<public-read>.
 =back
 
 Returns true on success. Croaks on failure.
+
+=head2 delete_bucket
+
+  $s3->delete_bucket($bucket);
+  $s3->delete_bucket($bucket, region => 'us-west-2');
+
+Deletes an empty bucket. Returns a true value on success. S3 refuses
+to delete a bucket that still contains objects, so callers must empty
+the bucket first (for example by iterating L</list_all_objects_v2> and
+calling L</delete_object> on each key).
+
+=over 4
+
+=item region
+
+Override the region the delete is signed against. Defaults to the
+region the object was constructed with.
+
+=back
+
+=head2 put_public_access_block
+
+  $s3->put_public_access_block($bucket);
+  $s3->put_public_access_block(
+    $bucket,
+    block_public_acls       => 1,
+    ignore_public_acls      => 1,
+    block_public_policy      => 0,
+    restrict_public_buckets => 0,
+  );
+
+Sets the Block Public Access configuration on a bucket. Each of the
+four settings is a boolean; any setting not supplied B<defaults to
+true> (fully locked down), so an argument-less call blocks all public
+access. Returns a true value on success.
+
+=over 4
+
+=item block_public_acls
+
+=item ignore_public_acls
+
+=item block_public_policy
+
+=item restrict_public_buckets
+
+Each accepts a true/false value. Omitted settings default to true.
+Note that hosting content publicly (for example a static website, or
+a policy-scoped private bucket that grants anonymous C<GetObject> from
+a VPC endpoint) requires the relevant setting to be false so the
+bucket policy is not rejected.
+
+=back
+
+=head2 put_bucket_website
+
+  $s3->put_bucket_website($bucket);
+  $s3->put_bucket_website($bucket, index => 'index.html', error => 'error.html');
+
+Configures the bucket as an S3 static website endpoint. Returns a true
+value on success.
+
+=over 4
+
+=item index
+
+The index document suffix. Defaults to C<index.html>.
+
+=item error
+
+The error document key. Optional; when omitted, no error document is
+configured.
+
+=back
+
+=head2 get_bucket_website
+
+  my $config = $s3->get_bucket_website($bucket);
+
+Returns the bucket's website configuration as a hashref, or C<undef>
+if the bucket has no website configuration. The hashref contains
+whichever of the following are set:
+
+=over 4
+
+=item index_document
+
+The index document suffix.
+
+=item error_document
+
+The error document key.
+
+=item redirect_all_requests_to
+
+The hostname all requests are redirected to, if the bucket is
+configured as a redirect.
+
+=back
+
+=head2 delete_bucket_website
+
+  $s3->delete_bucket_website($bucket);
+
+Removes the website configuration from a bucket. Returns a true value
+on success.
+
+=head2 put_bucket_policy
+
+  $s3->put_bucket_policy($bucket, \%policy);
+  $s3->put_bucket_policy($bucket, $json_string);
+
+Attaches a bucket policy. The policy may be given either as a Perl
+data structure (a hashref, which is encoded to canonical JSON) or as a
+pre-encoded JSON string. Returns a true value on success.
+
+=head2 get_bucket_policy
+
+  my $policy = $s3->get_bucket_policy($bucket);
+  my $json   = $s3->get_bucket_policy($bucket, raw => 1);
+
+Returns the bucket's policy, or C<undef> if the bucket has no policy
+(S3 returns C<NoSuchBucketPolicy>). By default the policy is decoded
+and returned as a hashref; pass C<< raw => 1 >> to get the raw JSON
+string instead.
+
+=over 4
+
+=item raw
+
+When true, return the policy as its raw JSON string rather than a
+decoded hashref.
+
+=back
 
 =head2 put_bucket_notification_configuration
 

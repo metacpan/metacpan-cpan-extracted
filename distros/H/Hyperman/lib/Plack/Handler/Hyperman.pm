@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Hyperman ();
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 sub new {
     my ($class, %args) = @_;
@@ -34,8 +34,18 @@ sub run {
             qw(reuseport max_requests_per_worker shutdown_grace affinity
                idle_timeout header_timeout max_pipeline http2 redirect_https
                compress compress_min_length compress_level max_body
+               access_log deny_capacity rate_capacity
                tls_cert tls_key tls_ca tls_verify tls_sni),
     );
+
+    # `deny` wants an arrayref, and plackup hands a single --deny through as
+    # a plain scalar - which run() would quietly ignore, since it only reads
+    # the option when it is a reference. Normalise, so one denied address
+    # works the same as several.
+    if (defined $self->{deny}) {
+        $args{deny} = ref $self->{deny} eq 'ARRAY'
+                    ? $self->{deny} : [ $self->{deny} ];
+    }
 
     if ($self->{listen} && @{ $self->{listen} }) {
         $args{listen} = [ map { _parse_listen($_) } @{ $self->{listen} } ];
@@ -66,13 +76,20 @@ server. Options: C<host>, C<port>, and C<workers> (alias C<max_workers>), plus
 C<listen> for binding several listeners (for example plain :80 beside TLS :443)
 in one server - see L<Hyperman/"Multiple listeners">.
 
-Every other C<< Hyperman->run >> option is passed through when given and
-left alone when not, so the server behaves identically however it was
-started: C<reuseport>, C<max_requests_per_worker>, C<shutdown_grace>,
-C<affinity>, C<idle_timeout>, C<header_timeout>, C<max_pipeline>,
-C<http2>, C<redirect_https>, C<max_body>, C<compress>,
-C<compress_min_length>, C<compress_level>, and the C<tls_*> family. The
-two that most often want setting have their own sections below.
+B<Every> other C<< Hyperman->run >> option is passed through when given
+and left alone when not, so a server started by C<plackup> behaves
+identically to the same options passed to C<run> directly:
+C<reuseport>, C<max_requests_per_worker>, C<shutdown_grace>, C<affinity>,
+C<idle_timeout>, C<header_timeout>, C<max_pipeline>, C<http2>,
+C<redirect_https>, C<max_body>, C<access_log>, C<deny>,
+C<deny_capacity>, C<rate_capacity>, C<compress>, C<compress_min_length>,
+C<compress_level>, and the C<tls_*> family. See L<Hyperman/run> for what
+each means; the two that most often want setting have their own sections
+below.
+
+C<deny> takes an arrayref, and a single C<--deny 1.2.3.4> on a command
+line arrives as a plain scalar, so one address is accepted as readily as
+several.
 
 =head2 max_body
 

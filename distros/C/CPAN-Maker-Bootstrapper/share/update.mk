@@ -4,7 +4,10 @@ MANAGED_FILES = \
     git.mk \
     help.mk \
     version.mk \
+    bash-completion.mk \
+    modulino.mk \
     perl.mk \
+    local.mk \
     release-notes.mk
 
 BOOTSTRAPPER_DIST_DIR := $(shell perl -MFile::ShareDir=dist_dir \
@@ -23,6 +26,13 @@ post-update:
 	  cp "$$src" "$(INCLUDES_DIR)/$$f"; \
 	  chmod -w "$(INCLUDES_DIR)/$$f"; \
 	done; \
+	if [[ -e .gitignore ]]; then \
+	  our_ignore="$$(mktemp)"; sort "$(BOOTSTRAPPER_DIST_DIR)/gitignore" > $$our_ignore; \
+	  their_ignore="$$(mktemp)"; sort .gitignore > $$their_ignore; \
+	  trap 'rm -r $$our_ignore $$their_ignore' EXIT; \
+	  echo "updating .gitignore..."; \
+	  comm -13 $$their_ignore $$our_ignore | tee -a .gitignore; \
+	fi; \
 	echo "Files updated. Review changes with: git diff"
 
 .PHONY: update  ## update managed project files from the installed bootstrapper
@@ -32,12 +42,12 @@ update:
 	  cp $(BOOTSTRAPPER_DIST_DIR)/builder builder; \
 	  chmod 0555 builder; \
 	fi; \
-	chmod +w Makefile; \
-	cp $(BOOTSTRAPPER_DIST_DIR)/Makefile.txt Makefile; \
 	chmod +w .includes/*; \
 	cp $(BOOTSTRAPPER_DIST_DIR)/update.mk .includes/; \
 	cp $(BOOTSTRAPPER_DIST_DIR)/upgrade.mk .includes/; \
 	$(MAKE) post-update; \
+	chmod +w Makefile; \
+	cp $(BOOTSTRAPPER_DIST_DIR)/Makefile.txt Makefile; \
 	chmod -w Makefile .includes/*
 
 .PHONY: update-available

@@ -1,0 +1,42 @@
+=head1 NAME
+
+Fugu::TestLog - a quiet process default logger for a test file
+
+=head1 SYNOPSIS
+
+    use Fugu::TestLog;
+
+    Fugu::TestLog->stderr;
+    Fugu::TestLog->quiet;
+
+=head1 DESCRIPTION
+
+Library code reports a recoverable failure through the process
+default of L<Fugu::Log>, which writes to standard error. A test that
+proves an error path would otherwise fill the TAP stream with the
+diagnostics it asked for.
+
+The import sets the quiet default. A test that wants to read what a
+module logged captures standard error around the call instead, and
+calls C<stderr()> to put the noisy default back.
+
+=head2 quiet
+
+C<quiet()> makes the process default drop every message. The import
+calls it.
+
+=head2 stderr
+
+C<stderr($level = 'debug')> makes the process default write to
+standard error again, for the one test that reads what a module
+reported.
+
+=head1 SEE ALSO
+
+L<Fugu::Log>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

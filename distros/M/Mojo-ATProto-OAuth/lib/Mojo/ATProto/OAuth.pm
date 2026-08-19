@@ -17,7 +17,7 @@ use feature 'try';
 
 use constant DEBUG => $ENV{MOJO_OAUTH_DEBUG} || 0;
 
-our $VERSION = '1.00'; # VERSION
+our $VERSION = '1.01'; # VERSION
 
 has 'ua'                 => sub { 
     my $ua = Mojo::UserAgent->new(request_timeout => 10);

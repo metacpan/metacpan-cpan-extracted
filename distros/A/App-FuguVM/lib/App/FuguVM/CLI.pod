@@ -1,0 +1,62 @@
+=head1 NAME
+
+App::FuguVM::CLI - the subcommands of fuguvm
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::CLI;
+
+    exit App::FuguVM::CLI->run(@ARGV);
+
+=head1 DESCRIPTION
+
+The module holds the subcommand bodies of L<fuguvm(1)>. The dispatch,
+the option parsing, the usage and the generic exit codes come from
+L<Fugu::CLI>.
+
+Each subcommand declares its own options in one table beside its body,
+so no command repeats a C<Getopt::Long> block. C<_prepare> applies the
+global options and loads the project before a body runs, and C<init>
+is the one command that runs without a project. The five lifecycle
+commands have no body of their own: their table entry names the
+L<App::FuguVM::Guest> verb, and C<run> calls it on the loaded VM.
+
+Command data goes to standard output; a diagnostic goes to the logger,
+which writes to standard error. Thus C<fuguvm snapshot list --names>
+stays readable in a pipeline when the tool has something to warn
+about.
+
+=head1 EXIT CODES
+
+The generic codes come from L<Fugu::CLI>: 0 success, 1 error, 2
+invalid arguments, 3 configuration error, 7 timeout.
+
+These are the codes that mean something to a VM:
+
+    4   the named VM is not in the configuration
+    5   the VM runs and the command needs it stopped
+    9   an expect script failed
+    11  the named snapshot does not exist
+
+Code 11 is scriptable: a script that runs C<snapshot restore ||
+provision-from-scratch> can tell a missing layer from a real failure.
+
+L<App::FuguVM::Guest> uses these constants from here rather than defining the
+same numbers a second time.
+
+=head1 METHODS
+
+=head2 run
+
+    App::FuguVM::CLI->run(@argv)
+
+Parse, dispatch and return an exit code. This is the whole of
+F<bin/fuguvm>.
+
+=head1 SEE ALSO
+
+L<Fugu::CLI>, L<App::FuguVM::Config>, L<App::FuguVM::Guest>, L<fuguvm(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

@@ -8,7 +8,7 @@ use Punk::Router::Scope;
 use Punk::Context;
 use Punk::Static;
 
-our $VERSION = '0.17';
+our $VERSION = '0.20';
 
 # The boot hook compile() probes just before the state hash freezes
 # (xs/compile.xs). The framework's own extras live here; a subclass that
@@ -117,6 +117,8 @@ no method or path. See L<Punk::Logger> and the C<logging> keyword.
 =head2 compile
 
 Freezes the configuration and returns the PSGI app. Dispatch order:
+before_request hooks (when any are registered - they run before anything
+is matched, so they are the only phase a 404, a 405 or a mount reaches),
 static table, PSGI/static-file mounts (longest prefix first), dynamic
 buckets, then 404/405. Matched requests construct the context, run
 before_dispatch hooks and the route's frozen guard chain (a reference
@@ -138,6 +140,11 @@ folding in any status/headers set through the context;
 C<500 {"errors":[{"message":...}]}>.
 
 =back
+
+"Construct the context" happens once per request, not once per phase: when
+a C<before_request> hook has already built one, the routed match is stored
+into it rather than a second context being made, so a stash written before
+routing is the same stash the handler reads.
 
 after_dispatch hooks see the finalized triplet (mutate it, or return a
 replacement); HEAD responses are stripped of their body.

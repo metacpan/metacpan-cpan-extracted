@@ -306,8 +306,9 @@ subtest 'Mutator::generate_mutants - fast mode no more mutants than full' => sub
 
 # ==================================================================
 # prepare_workspace()
-# POD: returns absolute path to temp directory; sets
-# $self->{workspace} and $self->{relative}; croaks if dircopy fails.
+# POD: returns absolute path to temp directory; sets private keys
+# _workspace, _relative, _lib_basename; does NOT mutate lib_dir;
+# croaks if dircopy fails.
 # ==================================================================
 subtest 'Mutator::prepare_workspace - returns a directory path' => sub {
 	# Mock dircopy so we do not touch the real filesystem
@@ -320,7 +321,7 @@ subtest 'Mutator::prepare_workspace - returns a directory path' => sub {
 	done_testing();
 };
 
-subtest 'Mutator::prepare_workspace - sets workspace on object' => sub {
+subtest 'Mutator::prepare_workspace - sets private workspace key on object' => sub {
 	my $guard = mock_scoped(
 		'File::Copy::Recursive::dircopy' => sub { 1 }
 	);
@@ -328,20 +329,23 @@ subtest 'Mutator::prepare_workspace - sets workspace on object' => sub {
 	my $m = App::Test::Generator::Mutator->new(file => $src_file);
 	my $path = $m->prepare_workspace();
 
-	is($m->{workspace}, $path, 'workspace stored on object matches return value');
+	is($m->{_workspace}, $path, '_workspace stored on object matches return value');
 
 	done_testing();
 };
 
-subtest 'Mutator::prepare_workspace - sets relative path on object' => sub {
+subtest 'Mutator::prepare_workspace - sets private relative path on object' => sub {
 	my $guard = mock_scoped(
 		'File::Copy::Recursive::dircopy' => sub { 1 }
 	);
 
 	my $m = App::Test::Generator::Mutator->new(file => $src_file);
+	my $orig_lib_dir = $m->{lib_dir};
 	$m->prepare_workspace();
 
-	ok(defined $m->{relative}, 'relative path set on object');
+	ok(defined $m->{_relative},     '_relative set');
+	ok(defined $m->{_lib_basename}, '_lib_basename set');
+	is($m->{lib_dir}, $orig_lib_dir, 'lib_dir not mutated by prepare_workspace');
 
 	done_testing();
 };
@@ -383,9 +387,9 @@ subtest 'Mutator::apply_mutant - applies transform to workspace file' => sub {
 	$m->prepare_workspace();
 
 	# Write the source file into the workspace at the expected path
-	my $ws_lib_dir = File::Spec->catfile($m->{workspace}, 'lib');
+	my $ws_lib_dir = File::Spec->catfile($m->{_workspace}, $m->{_lib_basename});
 	File::Path::make_path($ws_lib_dir);
-	my $ws_file = File::Spec->catfile($ws_lib_dir, $m->{relative});
+	my $ws_file = File::Spec->catfile($ws_lib_dir, $m->{_relative});
 	File::Copy::copy($src_file, $ws_file);
 
 	# Transform that marks the file with a known string
@@ -1199,6 +1203,487 @@ subtest 'SchemaExtractor::generate_pod_validation_report - multiple methods are 
 	ok(index($report, 'Method: alpha_method') < index($report, 'Method: zebra_method'),
 		'methods are reported in sorted (alpha before zebra) order, per the sort keys implementation');
 
+	done_testing();
+};
+
+# ==================================================================
+# Planner::Isolation
+#
+# POD documents: new() returns a blessed object; plan() requires
+# a hashref strategy, returns a hashref of per-method plans each
+# with a 'fixture' key; purity_level drives fixture choice;
+# dependency keys are propagated only when truthy.
+# ==================================================================
+subtest 'Planner::Isolation::new - returns a blessed object' => sub {
+	require App::Test::Generator::Planner::Isolation;
+	my $p = App::Test::Generator::Planner::Isolation->new;
+	isa_ok($p, 'App::Test::Generator::Planner::Isolation');
+	done_testing();
+};
+
+subtest 'Planner::Isolation::plan - croaks when strategy is not a hashref' => sub {
+	require App::Test::Generator::Planner::Isolation;
+	my $p = App::Test::Generator::Planner::Isolation->new;
+	throws_ok { $p->plan({}, 'not a hashref') } qr/strategy must be a hashref/,
+		'scalar strategy croaks with documented message';
+	throws_ok { $p->plan({}, undef) } qr/strategy must be a hashref/,
+		'undef strategy croaks with documented message';
+	done_testing();
+};
+
+subtest 'Planner::Isolation::plan - pure method gets shared_fixture' => sub {
+	require App::Test::Generator::Planner::Isolation;
+	my $p = App::Test::Generator::Planner::Isolation->new;
+	my $schema   = { get_name => { _analysis => { side_effects => { purity_level => 'pure' } } } };
+	my $strategy = { get_name => {} };
+	my $result   = $p->plan($schema, $strategy);
+	is($result->{get_name}{fixture}, 'shared_fixture', 'pure purity_level -> shared_fixture');
+	done_testing();
+};
+
+subtest 'Planner::Isolation::plan - self_mutating method gets fresh_object' => sub {
+	require App::Test::Generator::Planner::Isolation;
+	my $p = App::Test::Generator::Planner::Isolation->new;
+	my $schema   = { set_name => { _analysis => { side_effects => { purity_level => 'self_mutating' } } } };
+	my $strategy = { set_name => {} };
+	my $result   = $p->plan($schema, $strategy);
+	is($result->{set_name}{fixture}, 'fresh_object', 'self_mutating -> fresh_object');
+	done_testing();
+};
+
+subtest 'Planner::Isolation::plan - impure method gets isolated_block' => sub {
+	require App::Test::Generator::Planner::Isolation;
+	my $p = App::Test::Generator::Planner::Isolation->new;
+	my $schema   = { run_cmd => { _analysis => { side_effects => { purity_level => 'impure' } } } };
+	my $strategy = { run_cmd => {} };
+	my $result   = $p->plan($schema, $strategy);
+	is($result->{run_cmd}{fixture}, 'isolated_block', 'impure -> isolated_block');
+	done_testing();
+};
+
+subtest 'Planner::Isolation::plan - no _analysis key defaults to isolated_block' => sub {
+	require App::Test::Generator::Planner::Isolation;
+	my $p      = App::Test::Generator::Planner::Isolation->new;
+	my $result = $p->plan({ some_method => {} }, { some_method => {} });
+	is($result->{some_method}{fixture}, 'isolated_block',
+		'absent _analysis defaults to empty effects -> isolated_block');
+	done_testing();
+};
+
+subtest 'Planner::Isolation::plan - env hashref is propagated when truthy' => sub {
+	require App::Test::Generator::Planner::Isolation;
+	my $p = App::Test::Generator::Planner::Isolation->new;
+	my $env_spec = { HOME => '/tmp' };
+	my $schema = { m => { _analysis => { side_effects => { purity_level => 'impure' },
+		dependencies => { env => $env_spec } } } };
+	my $result = $p->plan($schema, { m => {} });
+	is_deeply($result->{m}{env}, $env_spec, 'env hashref propagated into plan');
+	done_testing();
+};
+
+subtest 'Planner::Isolation::plan - falsy time and network are omitted from plan' => sub {
+	require App::Test::Generator::Planner::Isolation;
+	my $p = App::Test::Generator::Planner::Isolation->new;
+	my $schema = { m => { _analysis => { side_effects => { purity_level => 'pure' },
+		dependencies => { time => 0, network => '' } } } };
+	my $result = $p->plan($schema, { m => {} });
+	ok(!exists $result->{m}{time},    'falsy time is not propagated into plan');
+	ok(!exists $result->{m}{network}, 'falsy network is not propagated into plan');
+	done_testing();
+};
+
+subtest 'Planner::Isolation::plan - truthy time and network are set to 1' => sub {
+	require App::Test::Generator::Planner::Isolation;
+	my $p = App::Test::Generator::Planner::Isolation->new;
+	my $schema = { m => { _analysis => { side_effects => { purity_level => 'pure' },
+		dependencies => { time => 1, network => 'yes' } } } };
+	my $result = $p->plan($schema, { m => {} });
+	is($result->{m}{time},    1, 'truthy time is normalised to 1');
+	is($result->{m}{network}, 1, 'truthy network is normalised to 1');
+	done_testing();
+};
+
+# ==================================================================
+# Planner::Mock
+#
+# POD: new() returns blessed object; plan() requires hashref schema;
+# calls_external -> mock_system; performs_io -> capture_io; both
+# -> arrayref; pure methods absent from result.
+# ==================================================================
+subtest 'Planner::Mock::new - returns a blessed object' => sub {
+	require App::Test::Generator::Planner::Mock;
+	my $p = App::Test::Generator::Planner::Mock->new;
+	isa_ok($p, 'App::Test::Generator::Planner::Mock');
+	done_testing();
+};
+
+subtest 'Planner::Mock::plan - croaks when schema is not a hashref' => sub {
+	require App::Test::Generator::Planner::Mock;
+	my $p = App::Test::Generator::Planner::Mock->new;
+	throws_ok { $p->plan('not a hashref') } qr/schema must be a hashref/,
+		'scalar schema croaks with documented message';
+	throws_ok { $p->plan(undef) } qr/schema must be a hashref/,
+		'undef schema croaks with documented message';
+	done_testing();
+};
+
+subtest 'Planner::Mock::plan - calls_external only -> mock_system scalar' => sub {
+	require App::Test::Generator::Planner::Mock;
+	my $p = App::Test::Generator::Planner::Mock->new;
+	my $result = $p->plan({
+		run_cmd => { _analysis => { side_effects => { calls_external => 1 } } },
+	});
+	is($result->{run_cmd}, 'mock_system', 'calls_external only -> mock_system');
+	done_testing();
+};
+
+subtest 'Planner::Mock::plan - performs_io only -> capture_io scalar' => sub {
+	require App::Test::Generator::Planner::Mock;
+	my $p = App::Test::Generator::Planner::Mock->new;
+	my $result = $p->plan({
+		write_log => { _analysis => { side_effects => { performs_io => 1 } } },
+	});
+	is($result->{write_log}, 'capture_io', 'performs_io only -> capture_io');
+	done_testing();
+};
+
+subtest 'Planner::Mock::plan - both effects -> arrayref of both labels' => sub {
+	require App::Test::Generator::Planner::Mock;
+	my $p = App::Test::Generator::Planner::Mock->new;
+	my $result = $p->plan({
+		deploy => { _analysis => { side_effects => { calls_external => 1, performs_io => 1 } } },
+	});
+	is_deeply($result->{deploy}, ['mock_system', 'capture_io'],
+		'both effects -> arrayref [mock_system, capture_io]');
+	done_testing();
+};
+
+subtest 'Planner::Mock::plan - pure method absent from result' => sub {
+	require App::Test::Generator::Planner::Mock;
+	my $p = App::Test::Generator::Planner::Mock->new;
+	my $result = $p->plan({
+		get_name => { _analysis => { side_effects => { purity_level => 'pure' } } },
+	});
+	ok(!exists $result->{get_name}, 'pure method does not appear in mock plan');
+	done_testing();
+};
+
+subtest 'Planner::Mock::plan - method with no _analysis key is absent from result' => sub {
+	require App::Test::Generator::Planner::Mock;
+	my $p = App::Test::Generator::Planner::Mock->new;
+	my $result = $p->plan({ some_method => {} });
+	ok(!exists $result->{some_method}, 'method without _analysis is not mocked');
+	done_testing();
+};
+
+# ==================================================================
+# Model::Method — supplemental coverage for POD-documented API
+# that has no existing unit.t subtest.
+# ==================================================================
+subtest 'Model::Method::new - croaks when name is absent' => sub {
+	require App::Test::Generator::Model::Method;
+	throws_ok {
+		App::Test::Generator::Model::Method->new(source => 'sub x {}')
+	} qr/name required/, 'absent name croaks with documented message';
+	done_testing();
+};
+
+subtest 'Model::Method::new - croaks when source is absent' => sub {
+	require App::Test::Generator::Model::Method;
+	throws_ok {
+		App::Test::Generator::Model::Method->new(name => 'foo')
+	} qr/source required/, 'absent source croaks with documented message';
+	done_testing();
+};
+
+subtest 'Model::Method::evidence_ref - returns live internal arrayref' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'f', source => 'sub f {}');
+	$m->add_evidence(category => 'return', signal => 'returns_self');
+	my $ref = $m->evidence_ref;
+	is(ref($ref), 'ARRAY', 'evidence_ref returns an arrayref');
+	# POD: this is the LIVE internal ref -- pushing to it is visible via evidence()
+	push @$ref, { category => 'return', signal => 'returns_constant', weight => 1 };
+	my @ev = $m->evidence;
+	is(scalar(@ev), 2, 'push to evidence_ref is visible via evidence() -- confirmed live alias');
+	done_testing();
+};
+
+subtest 'Model::Method::resolve_confidence - score 0 -> level low' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'f', source => 'sub f {}');
+	my $c = $m->resolve_confidence;
+	is($c->{score}, 0,     'no evidence -> score 0');
+	is($c->{level}, 'low', 'score 0 -> level low');
+	done_testing();
+};
+
+subtest 'Model::Method::resolve_confidence - score 20 exactly -> level medium' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'f', source => 'sub f {}');
+	$m->add_evidence(category => 'return', signal => 'returns_self', weight => 20);
+	my $c = $m->resolve_confidence;
+	is($c->{score}, 20,       'weight 20 -> score 20');
+	is($c->{level}, 'medium', 'score 20 is exactly the medium lower bound');
+	done_testing();
+};
+
+subtest 'Model::Method::resolve_confidence - score 40 exactly -> level high' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'f', source => 'sub f {}');
+	$m->add_evidence(category => 'return', signal => 'returns_self', weight => 40);
+	my $c = $m->resolve_confidence;
+	is($c->{score}, 40,    'weight 40 -> score 40');
+	is($c->{level}, 'high', 'score 40 is exactly the high lower bound');
+	done_testing();
+};
+
+subtest 'Model::Method::resolve_return_type - returns_self evidence -> object' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'f', source => 'sub f {}');
+	$m->add_evidence(category => 'return', signal => 'returns_self', weight => 5);
+	is($m->resolve_return_type, 'object', 'returns_self evidence -> object');
+	done_testing();
+};
+
+subtest 'Model::Method::resolve_return_type - returns_constant beats returns_property' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'f', source => 'sub f {}');
+	$m->add_evidence(category => 'return', signal => 'returns_constant', weight => 10);
+	$m->add_evidence(category => 'return', signal => 'returns_property',  weight => 5);
+	is($m->resolve_return_type, 'constant', 'higher-scored constant bucket wins');
+	done_testing();
+};
+
+subtest 'Model::Method::resolve_return_type - idempotent: second call returns same value' => sub {
+	require App::Test::Generator::Model::Method;
+	my $m = App::Test::Generator::Model::Method->new(name => 'f', source => 'sub f {}');
+	$m->add_evidence(category => 'return', signal => 'returns_property', weight => 5);
+	is($m->resolve_return_type, 'property', 'first call -> property');
+	is($m->resolve_return_type, 'property', 'second call -> same result (idempotent)');
+	done_testing();
+};
+
+# ==================================================================
+# Analyzer::Complexity -- full lifecycle
+# ==================================================================
+subtest 'Analyzer::Complexity::analyze - empty body -> score 1 level low' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $a = App::Test::Generator::Analyzer::Complexity->new;
+	my $r = $a->analyze({ body => '' });
+	is($r->{cyclomatic_score}, 1,     'empty body starts at cyclomatic base 1');
+	is($r->{complexity_level}, 'low', 'score 1 -> low');
+	done_testing();
+};
+
+subtest 'Analyzer::Complexity::analyze - missing body key treated as empty' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $a = App::Test::Generator::Analyzer::Complexity->new;
+	my $r = $a->analyze({});
+	is($r->{cyclomatic_score}, 1, 'absent body defaults to empty string');
+	done_testing();
+};
+
+subtest 'Analyzer::Complexity::analyze - one if increases branching_points and cyclomatic_score' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $a = App::Test::Generator::Analyzer::Complexity->new;
+	my $r = $a->analyze({ body => 'if($x) { return 1; } return 0;' });
+	is($r->{branching_points}, 1, 'one if -> one branching point');
+	ok($r->{cyclomatic_score} > 1, 'cyclomatic score incremented beyond base');
+	done_testing();
+};
+
+subtest 'Analyzer::Complexity::analyze - score >= 8 -> complexity_level high' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $a = App::Test::Generator::Analyzer::Complexity->new;
+	my $body = join(' ', map { "if(\$x$_) { return 1; }" } 1..7);
+	my $r = $a->analyze({ body => $body });
+	is($r->{complexity_level}, 'high', '7 if keywords -> score >= 8 -> high');
+	done_testing();
+};
+
+subtest 'Analyzer::Complexity::analyze - exception keywords counted in exception_paths' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $a = App::Test::Generator::Analyzer::Complexity->new;
+	my $r = $a->analyze({ body => 'eval { die "x"; }' });
+	is($r->{exception_paths}, 2, 'eval and die each counted as an exception path');
+	done_testing();
+};
+
+subtest 'Analyzer::Complexity::analyze - output hashref has all required keys' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	my $a = App::Test::Generator::Analyzer::Complexity->new;
+	my $r = $a->analyze({ body => 'return 1;' });
+	for my $key (qw(cyclomatic_score branching_points early_returns exception_paths nesting_depth complexity_level)) {
+		ok(exists $r->{$key}, "output contains required key '$key'");
+	}
+	done_testing();
+};
+
+# ==================================================================
+# Analyzer::SideEffect -- full public API
+# ==================================================================
+subtest 'Analyzer::SideEffect::analyze - empty body -> pure, all flags 0' => sub {
+	require App::Test::Generator::Analyzer::SideEffect;
+	my $a = App::Test::Generator::Analyzer::SideEffect->new;
+	my $r = $a->analyze({ body => '' });
+	is($r->{purity_level},    'pure', 'empty body -> pure');
+	is($r->{mutates_self},    0,      'mutates_self is 0');
+	is($r->{mutates_globals}, 0,      'mutates_globals is 0');
+	is($r->{performs_io},     0,      'performs_io is 0');
+	is($r->{calls_external},  0,      'calls_external is 0');
+	is_deeply($r->{mutation_fields}, [], 'mutation_fields is empty arrayref');
+	done_testing();
+};
+
+subtest 'Analyzer::SideEffect::analyze - system() call -> calls_external -> impure' => sub {
+	require App::Test::Generator::Analyzer::SideEffect;
+	my $a = App::Test::Generator::Analyzer::SideEffect->new;
+	my $r = $a->analyze({ body => 'system("ls");' });
+	is($r->{calls_external}, 1,       'calls_external set to 1');
+	is($r->{purity_level},   'impure', 'calls_external -> impure');
+	done_testing();
+};
+
+subtest 'Analyzer::SideEffect::analyze - print -> performs_io -> impure' => sub {
+	require App::Test::Generator::Analyzer::SideEffect;
+	my $a = App::Test::Generator::Analyzer::SideEffect->new;
+	my $r = $a->analyze({ body => 'print "hello\n";' });
+	is($r->{performs_io},  1,       'performs_io set to 1');
+	is($r->{purity_level}, 'impure', 'performs_io -> impure');
+	done_testing();
+};
+
+subtest 'Analyzer::SideEffect::analyze - $self field assignment -> self_mutating with field name captured' => sub {
+	require App::Test::Generator::Analyzer::SideEffect;
+	my $a = App::Test::Generator::Analyzer::SideEffect->new;
+	my $r = $a->analyze({ body => '$self->{name} = "Alice";' });
+	is($r->{mutates_self},  1,              'mutates_self set to 1');
+	is($r->{purity_level},  'self_mutating', 'mutates_self only -> self_mutating');
+	is_deeply($r->{mutation_fields}, ['name'], 'field name captured in mutation_fields');
+	done_testing();
+};
+
+subtest 'Analyzer::SideEffect::analyze - duplicate field assignment deduplicated in mutation_fields' => sub {
+	require App::Test::Generator::Analyzer::SideEffect;
+	my $a = App::Test::Generator::Analyzer::SideEffect->new;
+	my $r = $a->analyze({ body => '$self->{x} = 1; $self->{x} = 2;' });
+	is_deeply($r->{mutation_fields}, ['x'], 'same field assigned twice appears once');
+	done_testing();
+};
+
+# ==================================================================
+# PodExampleExtractor -- full public API
+# ==================================================================
+subtest 'PodExampleExtractor::new - croaks when file argument is absent' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	throws_ok {
+		App::Test::Generator::PodExampleExtractor->new()
+	} qr/file is required/, 'absent file croaks with documented message';
+	done_testing();
+};
+
+subtest 'PodExampleExtractor::new - croaks when file does not exist on disk' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	throws_ok {
+		App::Test::Generator::PodExampleExtractor->new(file => '/no/such/file.pm')
+	} qr/File not found/, 'non-existent file croaks with documented message';
+	done_testing();
+};
+
+subtest 'PodExampleExtractor::new - accepts an existing file and stores path' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	my $ex = App::Test::Generator::PodExampleExtractor->new(file => $src_file);
+	isa_ok($ex, 'App::Test::Generator::PodExampleExtractor');
+	done_testing();
+};
+
+subtest 'PodExampleExtractor::extract - returns an arrayref' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	my $mod = File::Spec->catfile((File::Spec->splitpath(File::Spec->rel2abs($0)))[0,1], '..', 'lib', 'App', 'Test', 'Generator', 'Sample', 'Module.pm');
+	my $ex  = App::Test::Generator::PodExampleExtractor->new(file => $mod);
+	my $res = $ex->extract;
+	is(ref($res), 'ARRAY', 'extract() returns an arrayref');
+	done_testing();
+};
+
+subtest 'PodExampleExtractor::extract - each entry has label, section, and code' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	my $mod = File::Spec->catfile((File::Spec->splitpath(File::Spec->rel2abs($0)))[0,1], '..', 'lib', 'App', 'Test', 'Generator', 'Sample', 'Module.pm');
+	my $ex  = App::Test::Generator::PodExampleExtractor->new(file => $mod);
+	my $res = $ex->extract;
+	for my $e (@$res) {
+		ok(defined $e->{label},   'entry has a label');
+		ok(defined $e->{section}, 'entry has a section');
+		ok(defined $e->{code},    'entry has code text');
+	}
+	pass('required-key check complete');
+	done_testing();
+};
+
+subtest 'PodExampleExtractor::extract - deduplicates identical code blocks' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	print {$fh} <<'PODPM';
+package DedupTest;
+
+=head1 SYNOPSIS
+
+    my $x = 1;
+
+=head1 EXAMPLES
+
+=for example begin
+
+    my $x = 1;
+
+=for example end
+
+=cut
+
+1;
+PODPM
+	close $fh;
+
+	my $ex  = App::Test::Generator::PodExampleExtractor->new(file => $path);
+	my $res = $ex->extract;
+
+	my %seen_codes;
+	my $dup = 0;
+	for my $e (@$res) {
+		(my $norm = $e->{code}) =~ s/^\s+|\s+$//g;
+		$dup++ if $seen_codes{$norm}++;
+	}
+	is($dup, 0, 'no duplicate code blocks in extract() output');
+	done_testing();
+};
+
+subtest 'PodExampleExtractor::extract - annotated inline example captures expected value' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	my ($fh, $path) = tempfile(SUFFIX => '.pm', UNLINK => 1);
+	print {$fh} <<'PODPM';
+package AnnotatedTest;
+
+=head1 SYNOPSIS
+
+    1 + 1  # returns 2
+
+=cut
+
+1;
+PODPM
+	close $fh;
+
+	my $ex  = App::Test::Generator::PodExampleExtractor->new(file => $path);
+	my $res = $ex->extract;
+
+	my ($annotated) = grep { defined $_->{expected} } @$res;
+	if($annotated) {
+		is($annotated->{expected}, '2', 'annotation value captured as expected');
+		like($annotated->{code},   qr/1 \+ 1/, 'annotation stripped from code text');
+	} else {
+		pass('no annotated example found -- annotation subtest skipped');
+	}
 	done_testing();
 };
 

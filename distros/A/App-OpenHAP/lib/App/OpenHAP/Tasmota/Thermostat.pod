@@ -1,0 +1,25 @@
+=head1 NAME
+
+App::OpenHAP::Tasmota::Thermostat - Tasmota thermostat HAP accessory
+
+=head1 SYNOPSIS
+
+    use App::OpenHAP::Tasmota::Thermostat;
+
+    my $thermostat = App::OpenHAP::Tasmota::Thermostat->new(
+        aid => 2,
+        name => 'Bedroom Thermostat',
+        mqtt_topic => 'tasmota_AABBCC',
+        mqtt_client => $mqtt,
+    );
+
+=head1 DESCRIPTION
+
+This module implements a HAP thermostat accessory for Tasmota devices
+that have a temperature sensor and relay control.
+
+=head1 SEE ALSO
+
+F<spec/MQTT-Control.md>, F<spec/MQTT-State.md>
+
+=cut

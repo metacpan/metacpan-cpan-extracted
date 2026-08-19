@@ -23,6 +23,8 @@
 #include "dbil_txn.h"      /* transactions pinned to a pool slot */
 #include "dbil_native.h"   /* Backend A: native fd async (Pg)    */
 #include "dbil_hm.h"       /* Hyperman adapter over its C ABI    */
+#include "dbil_obs.h"      /* statement observers (v2); fired by dbil_loop */
+#include "dbil_obs_perl.h" /* ... and the Perl door onto that registry */
 #include "dbil_loop.h"     /* driver-name, capability, dispatch  */
 #include "dbil_abi.h"      /* the public C ABI (installed header) */
 #include "dbil_abi_impl.h" /* ... and the provider side of it     */

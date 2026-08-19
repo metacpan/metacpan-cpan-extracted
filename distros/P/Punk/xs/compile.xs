@@ -242,6 +242,7 @@ compile(self)
         AV *state_apims = newAV();
         AV *mounts_out = newAV();
         AV *before_out = newAV(), *after_out = newAV();
+        AV *before_req_out = newAV();
         AV *docs_extra, *mount_src, *mw;
         SSize_t i, n;
         SV **x;
@@ -469,12 +470,19 @@ compile(self)
         /* before / after hooks and the app on_error, resolved to coderefs */
         {
             HV *hooks = app_hash(aTHX_ h, K_HOOKS);
+            SV **rp = hv_fetchs(hooks, K_BEFORE_R, 0);
             SV **bp = hv_fetchs(hooks, K_BEFORE_D, 0);
             SV **ap = hv_fetchs(hooks, K_AFTER_D, 0);
+            AV *rl = (rp && *rp && SvROK(*rp)) ? (AV *)SvRV(*rp) : NULL;
             AV *bl = (bp && *bp && SvROK(*bp)) ? (AV *)SvRV(*bp) : NULL;
             AV *al = (ap && *ap && SvROK(*ap)) ? (AV *)SvRV(*ap) : NULL;
+            SV *whatr = sv_2mortal(newSVpvs("before_request hook"));
             SV *whatb = sv_2mortal(newSVpvs("before_dispatch hook"));
             SV *whata = sv_2mortal(newSVpvs("after_dispatch hook"));
+            n = rl ? av_len(rl) + 1 : 0;
+            for (i = 0; i < n; i++)
+                av_push(before_req_out,
+                    pc_resolve_target(aTHX_ self, *av_fetch(rl, i, 0), whatr));
             n = bl ? av_len(bl) + 1 : 0;
             for (i = 0; i < n; i++)
                 av_push(before_out,
@@ -561,6 +569,16 @@ compile(self)
         (void)hv_stores(state, K_APP,    newSVsv(self));
         (void)hv_stores(state, K_BEFORE, newRV_noinc((SV *)before_out));
         (void)hv_stores(state, K_AFTER,  newRV_noinc((SV *)after_out));
+        /* The before_request chain is stored only when there is one. punk_serve
+         * reads it with ps_state_av, which is NULL for a key that was never
+         * set, so an app without the hook takes the NULL branch: one hv_fetch
+         * and one test, no context built and no chain walked. Storing an empty
+         * AV instead would make the common path the slower one. */
+        if (av_len(before_req_out) >= 0)
+            (void)hv_stores(state, K_BEFORE_REQ,
+                            newRV_noinc((SV *)before_req_out));
+        else
+            SvREFCNT_dec((SV *)before_req_out);
         {   /* the CORS policy, read once per request by pc_app_cb; absent
              * when the keyword was never used, so it costs one failed fetch */
             SV **co = hv_fetchs(h, K_CORS, 0);

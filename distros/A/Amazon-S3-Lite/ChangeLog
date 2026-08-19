@@ -1,3 +1,57 @@
+Tue Aug 18 17:48:40 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.3.1]:
+	* .includes/bash-completion.mk: added by CPAN::Makeer::Bootstrapper
+	* .includes/local.mk: likewise
+	* .includes/modulino.mk: likewise
+	* .gitignore: updated by CPAN::Makeer::Bootstrapper
+	* .includes/git.mk: likewise
+	* .includes/help.mk: likewise
+	* .includes/perl.mk: likewise
+	* .includes/release-notes.mk: likewise
+	* .includes/update.mk: likewise
+	* .includes/version.mk: likewise
+	* Makefile: likewise
+
+Sat Aug  1 14:49:16 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.3.0]:
+	* .gitignore: updated by CPA::Maker::Bootstrapper
+	* .includes/git.mk: likewise
+	* .includes/perl.mk: likewise
+	* .includes/release-notes.mk: likewise
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* deps.mk: likewise
+	* README.md: generated
+	* VERSION: bump
+	* lib/Amazon/S3/Lite.pm.in
+	- move constants to Constants.pm.in
+	- add Policies role
+	- POD updates
+	(delete_bucket): new
+	(put_public_access_block): new
+	(_create_public_access_block): new
+	(put_bucket_website): new
+	(DATA): +:website, :website-error, :public_access_block
+	* deps.mk: new
+	* lib/Amazon/S3/Lite/Constants.pm.in: new
+	* lib/Amazon/S3/Lite/Policies.pm.in: new
+	* project.mk: new
+	* recommends: new
+	* suggests: new
+	* t/02-put-bucket-website.t: new
+
+Wed Jul  1 12:35:15 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.3]:
+	* release-notes/release-notes-1.2.3.md: new
+	* release-notes.md: updated
+	* README.md: generated
+	* VERSION: bump
+	* lib/Amazon/S3/Lite.pm.in
+	(_init_logger): set $self->{logger} when using easy_init
+
 Thu Jun 18 16:13:55 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.2.2]:

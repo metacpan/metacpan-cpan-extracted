@@ -37,10 +37,10 @@ sub _check_llm {
   eval {
     require LLM::API;
     LLM::API->import(qw($LLM_MODEL));
+    1;
+  } or do {
+    die "ERROR: LLM::API is required to use AI assisted commands\n";
   };
-
-  die "ERROR: LLM::API is required to use AI assisted commands\n"
-    if $EVAL_ERROR;
 
   my $llm = LLM::API->new(
     api_key    => $api_key,
@@ -110,7 +110,7 @@ sub _pre_submission_report {
 
   my ( $input_token_cost, $output_token_cost ) = $self->get_llm->pricing( $self->get_model );
 
-  require Text::ASCIITable;
+  $self->_load_ASCIITable;
 
   my $title = sprintf "%s Review: Pre-Submission Estimate\nModel: %s", ucfirst($review_type), $self->get_model;
 
@@ -163,8 +163,12 @@ sub _fmt_tokens {
 ########################################################################
   my ($n) = @_;
 
-  return q{-}                         if !defined $n;
-  return sprintf( '%dK', $n / 1_000 ) if $n < 1_000_000;
+  return q{-}
+    if !defined $n;
+
+  return sprintf '%dK', $n / 1_000
+    if $n < 1_000_000;
+
   return sprintf '%.1fM', $n / 1_000_000;
 }
 
@@ -172,6 +176,8 @@ sub _fmt_tokens {
 sub _print_token_usage {
 ########################################################################
   my ( $self, $llm_rsp, $label ) = @_;
+
+  $self->_load_ASCIITable;
 
   $label //= 'Token Usage';
 
@@ -200,8 +206,6 @@ sub _print_token_usage {
   my $cache_read  = ( $usage->{cache_read_input_tokens}     // 0 );
   my $cache_write = ( $usage->{cache_creation_input_tokens} // 0 );
   my $total_cost  = $input_cost + $output_cost;
-
-  require Text::ASCIITable;
 
   my $model_name = $self->get_model // 'unknown model';
 

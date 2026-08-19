@@ -1,5 +1,17 @@
 Revision history for Hyperman
 
+0.27    2026-08-18
+        - Hyperman->on_worker_start(sub { ... }): run code in every
+          worker, after the fork, before its loop starts turning.
+        - Hyperman->deny_add / deny_remove / deny_check / ratelimit_hit:
+          the fork-shared arena, as class methods.
+
+0.26    2026-08-18
+        - hm_abi v4: on_worker_start. A C consumer registers a callback
+          before run(), and the server runs it once in every worker,
+          after the fork, in the child, with that child's own loop, and
+          before the loop starts turning.
+
 0.25    2026-08-17
         - Response compression: `compress => 1` on run() gzips responses
           on the way out (needs the zlib build; Hyperman->has_compression

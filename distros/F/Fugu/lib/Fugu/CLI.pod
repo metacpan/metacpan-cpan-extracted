@@ -1,0 +1,248 @@
+=head1 NAME
+
+Fugu::CLI - subcommand dispatch for a command-line tool
+
+=head1 SYNOPSIS
+
+    use Fugu::CLI;
+
+    my $cli = Fugu::CLI->new(
+        name    => 'mytool',
+        usage   => '[-c file] <command>',
+        options => { 'config|c=s' => 'the configuration file' },
+        commands => {
+            status => {
+                summary => 'report the state',
+                run     => sub ($cli, @argv) {
+                    say 'running';
+                    return Fugu::CLI::EXIT_SUCCESS;
+                },
+            },
+        },
+    );
+
+    exit $cli->run(@ARGV);
+
+=head1 DESCRIPTION
+
+B<Fugu::CLI> dispatches the subcommands of a command-line tool.
+A tool declares its global options once and its commands in a table.
+The module parses the global options, finds the command, parses that
+command's own options, and calls it.
+Every command in a tool would otherwise repeat the same
+L<Getopt::Long> setup.
+
+Output has two channels, and they are not the same channel.
+Data that a script reads goes to standard output; a command prints it
+itself.
+Diagnostics go to the logger, which writes to standard error.
+Thus C<mytool list --names | xargs> keeps working when the tool starts
+to warn about something.
+
+=head2 new
+
+C<new(%args)> creates a dispatcher.
+
+These are the arguments:
+
+=over 4
+
+=item C<commands>
+
+The subcommand table, as a hash reference.
+This argument is necessary.
+
+=item C<name>
+
+The program name in the usage line and in diagnostics.
+The default is C<cli>.
+
+=item C<options>
+
+The global options, as a hash reference whose keys are
+L<Getopt::Long> specifications and whose values describe them.
+
+=item C<usage>
+
+The one line that follows C<< usage: <name> >>.
+
+=item C<epilogue>
+
+Text that follows the command list in the help.
+Put examples here.
+
+=item C<log>
+
+The logger.
+The default is C<< Fugu::Log->default >>.
+
+=back
+
+Each entry of C<commands> maps a name to a hash reference:
+
+=over 4
+
+=item C<run>
+
+The body, as a code reference.
+This key is necessary.
+The body receives the dispatcher and the remaining arguments, and
+returns an exit code.
+
+=item C<usage>
+
+The argument summary of this command.
+
+=item C<summary>
+
+One line for the command list.
+
+=item C<options>
+
+This command's own options, in the same form as C<options>.
+
+=back
+
+=head2 run
+
+C<run(@argv)> parses, dispatches, and returns the exit code of the
+command.
+
+An unknown command, a bad option, and a missing command all give
+C<EXIT_INVALID_ARGS> with the usage line on standard error.
+
+A command name of C<help>, and an empty argument list, print the help
+and return C<EXIT_SUCCESS>.
+Asking for help is not a failure.
+Every command takes C<--help>, whether it declared the option or not.
+
+=head2 option
+
+C<option($name)> returns a parsed option value.
+The name is the first name of the specification, so C<config|c=s>
+arrives as C<config>.
+
+Global options and the running command's options share one namespace.
+A tool that gives the same name two meanings is a tool nobody can use.
+
+=head2 options
+
+C<options()> returns every parsed option as a hash reference.
+
+=head2 command
+
+C<command()> returns the name of the command that is running.
+
+=head2 name
+
+C<name()> returns the program name.
+
+=head2 log
+
+C<log()> returns the logger.
+A command body reports through it.
+
+=head2 print_help
+
+C<print_help($command)> prints the help for one command, or for the
+whole tool.
+The help goes to standard output, because the user asked for it.
+
+=head2 usage_error
+
+C<usage_error()> prints the usage line on standard error.
+
+=head2 command_usage_error
+
+C<command_usage_error($command)> prints the usage line of one command
+on standard error.
+
+=head1 EXIT CODES
+
+The module defines the codes that every tool shares:
+
+=over 4
+
+=item C<EXIT_SUCCESS>
+
+0
+
+=item C<EXIT_ERROR>
+
+1
+
+=item C<EXIT_INVALID_ARGS>
+
+2
+
+=item C<EXIT_CONFIG_ERROR>
+
+3
+
+=item C<EXIT_TIMEOUT>
+
+7
+
+=back
+
+A caller can import C<EXIT_SUCCESS> and C<EXIT_ERROR> with
+C<use Fugu::CLI qw(EXIT_SUCCESS EXIT_ERROR)>.
+
+A code that belongs to one tool is defined by that tool, not here, and
+starts above these.
+
+=head1 RETURN VALUES
+
+C<new()> returns a dispatcher.
+C<run()> returns an exit code.
+C<option()> returns a value or C<undef>.
+C<options()> returns a hash reference.
+C<name()> and C<command()> return a string.
+C<log()> returns a logger.
+
+=head1 EXAMPLES
+
+This example declares a command with its own option:
+
+    list => {
+        summary => 'list the cached images',
+        usage   => '[--names]',
+        options => { 'names' => 'print names only' },
+        run     => sub ($cli, @argv) {
+            for my $entry (@entries) {
+                say $cli->option('names')
+                    ? $entry->{name}
+                    : sprintf('%-20s %s', $entry->{name}, $entry->{size});
+            }
+            return Fugu::CLI::EXIT_SUCCESS;
+        },
+    },
+
+=head1 ERRORS
+
+C<new()> dies when the command table is absent, and when a command has
+no C<run> code reference.
+Both are programming errors that a tool hits on its first run.
+
+C<run()> does not die.
+Every input failure gives C<EXIT_INVALID_ARGS> and a usage line.
+
+=head1 SEE ALSO
+
+L<Fugu::Config>, L<Fugu::Log>, L<Getopt::Long>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+The module does not catch a die from a command body.
+A body that must not kill the tool catches its own errors.
+
+Global options must come before the command name, and a command's own
+options after it.
+The parser stops at the first argument that is not an option, which is
+how a command can take an option name that the tool also uses.
+
+=cut

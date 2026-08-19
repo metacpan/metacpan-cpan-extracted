@@ -1,0 +1,68 @@
+=head1 NAME
+
+App::FuguWeb::Index - the body of the manual index
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Index;
+
+    my $index = App::FuguWeb::Index->new(config => $config);
+
+    print $index->body;
+
+=head1 DESCRIPTION
+
+The index lists every manual of the site, grouped and described. The
+groups follow the source directories, which is already how a tree is
+organized, so the index cannot drift when a manual is added: no list
+here names one.
+
+The index does not retype a description either. It asks each
+L<App::FuguWeb::Manual>, and that reads the source.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguWeb::Index->new(config => $config)
+
+C<config> is an L<App::FuguWeb::Config> and is required.
+
+=head2 title
+
+The title of the index page. It comes from the C<page> block that names
+the index as its source, so the heading and the browser tab always
+agree. The build renders the index for such a block only, so the block
+is always there.
+
+=head2 body
+
+The body fragment. L<App::FuguWeb::Page> wraps it, exactly as it wraps
+a body fragment that a project wrote by hand.
+
+The fragment opens with the title and a paragraph about the manual
+sources, which names the configured manual host. A
+F<manuals.body.html> in the source directory replaces that opening: the
+prose is the project's, and only the project knows what its manuals are.
+
+Each group then emits an C<< <h2> >> that carries the group anchor, one
+C<< <dl> >>, and one blank line. A group with no manual emits nothing,
+so an empty group leaves no heading behind.
+
+Each manual emits a term and a definition:
+
+    <dt><a href="./Fugu::Daemon.3p.html">Fugu::Daemon(3p)</a></dt>
+    <dd>daemonize a process the OpenBSD way</dd>
+
+The C<./> is mandatory. A browser reads a relative URL whose first
+segment holds a colon as a scheme, so a bare F<Fugu::Daemon.3p.html>
+would be read as the C<fugu:> protocol.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Manual>,
+L<App::FuguWeb::Page>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

@@ -1,0 +1,118 @@
+=head1 NAME
+
+Fugu::Daemon - daemonization for Perl programs
+
+=head1 SYNOPSIS
+
+    use Fugu::Daemon;
+
+    Fugu::Daemon->daemonize(
+        logfile => '/var/log/mydaemon.log',
+        pidfile => '/var/run/mydaemon.pid',
+    );
+
+=head1 DESCRIPTION
+
+B<Fugu::Daemon> turns the program into a daemon, as daemon(3) does.
+The program forks, and the parent exits.
+The child becomes a session leader, redirects its standard descriptors
+away from the terminal, leaves the directory it started in, and sets
+its file creation mask.
+
+The module keeps no state that a caller can see and has one class
+method.
+
+=head2 daemonize
+
+C<daemonize(%args)> forks into the background and detaches from the
+controlling terminal.
+
+The parent exits with status 0.
+Thus C<daemonize()> returns only in the child.
+The child calls setsid(2) and reopens standard input from
+F</dev/null>.
+The child then appends standard output to C<logfile> and duplicates
+standard output onto standard error.
+It changes to the root directory and sets the file creation mask
+to 022.
+Last, it takes the PID file when the caller named one.
+
+The child redirects the descriptors before it changes the directory.
+Thus a relative C<logfile> keeps the meaning that the caller gave it.
+
+These are the arguments:
+
+=over 4
+
+=item C<logfile>
+
+The path for standard output and standard error.
+The default is F</dev/null>.
+This default is correct for a daemon that logs through L<Fugu::Log>
+in syslog mode.
+The module opens the file in append mode.
+
+=item C<pidfile>
+
+The PID file the child takes with L<Fugu::Pidfile>.
+The child acquires it after setsid(2), so the file holds the PID of
+the session leader.
+The child holds the lock for the life of the process, even if the
+caller discards the returned object.
+The default is no PID file.
+
+=back
+
+=head1 RETURN VALUES
+
+C<daemonize()> never returns in the parent.
+In the child it returns the L<Fugu::Pidfile> object when the caller
+gave a C<pidfile>, and nothing otherwise.
+
+=head1 EXAMPLES
+
+This example daemonizes the program, takes a PID file, and logs through
+syslog:
+
+    my $log = Fugu::Log->new(mode => 'syslog', ident => 'mydaemon');
+
+    Fugu::Daemon->daemonize(
+        logfile => '/var/log/mydaemon.log',
+        pidfile => '/var/run/mydaemon.pid',
+    );
+
+    $log->info('started, pid %d', $$);
+
+=head1 ERRORS
+
+C<daemonize()> dies and does not return if the fork fails, if
+setsid(2) fails, if the module cannot redirect one of the three
+standard descriptors, if it cannot change to the root directory, or if
+it cannot take the PID file.
+A daemon cannot recover from these startup conditions.
+
+A failure to take the PID file most often means that a second daemon
+already holds it.
+
+=head1 SEE ALSO
+
+setsid(2), umask(2), daemon(3), L<Fugu::Log>, L<Fugu::Pidfile>,
+L<Fugu::Privdrop>, L<Fugu::Process>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+Call C<daemonize()> before you open files or sockets that the daemon
+must keep.
+The child redirects the standard descriptors, but it inherits
+everything that is already open with no change.
+
+The daemon never removes the PID file.
+An unlink(2) in a root-owned directory needs a write permission on the
+directory that a daemon gives up at the privilege drop.
+The C<is_stale()> method of L<Fugu::Pidfile> covers the leftover file.
+
+=cut

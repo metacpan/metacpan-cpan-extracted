@@ -1060,4 +1060,234 @@ subtest 'SchemaExtractor _validate_pod_code_agreement — optional status mismat
 	is(scalar @opt_errors, 0, 'matching optional status (both required) produces no optional error');
 };
 
+# ===================================================================
+# SECTION 7: App::Test::Generator — additional survivors
+# Kills: BOOL_NEGATE_1838-1847 (sort comparator), COND_INV_1693_4
+#        (_is_perl_builtin), COND_INV_1749-1752 (_yamltest_hints),
+#        COND_INV_1759 (numeric normalisation), BOOL_NEGATE_3308
+#        (q_wrap last-resort), COND_INV_2876 (_validate_module env guard)
+# ===================================================================
+
+subtest 'Generator _is_perl_builtin() — true for builtins, false for module names (line 1693)' => sub {
+	# Kills COND_INV_1693_4: if(_is_perl_builtin($module)) {} negated so the guard
+	# is skipped — $module stays 'abs', causing _validate_module('abs') and
+	# potentially use_ok('abs') in the generated output.
+
+	ok(App::Test::Generator::_is_perl_builtin('abs'),    '_is_perl_builtin("abs") is true');
+	ok(App::Test::Generator::_is_perl_builtin('length'), '_is_perl_builtin("length") is true');
+	ok(App::Test::Generator::_is_perl_builtin('chr'),    '_is_perl_builtin("chr") is true');
+	ok(!App::Test::Generator::_is_perl_builtin('POSIX'), '_is_perl_builtin("POSIX") is false');
+	ok(!App::Test::Generator::_is_perl_builtin('Carp'),  '_is_perl_builtin("Carp") is false');
+	ok(!App::Test::Generator::_is_perl_builtin(''),      '_is_perl_builtin("") is false');
+	ok(!App::Test::Generator::_is_perl_builtin(undef),   '_is_perl_builtin(undef) is false');
+
+	# Integration: schema file named abs.yml must not emit use_ok('abs')
+	my $tmpdir  = tempdir(CLEANUP => 1);
+	my $abs_yml = File::Spec->catfile($tmpdir, 'abs.yml');
+	DumpFile($abs_yml, { function => 'abs', input => {type => 'integer'} });
+
+	local *STDOUT;
+	open STDOUT, '>', \my $out;
+	eval { App::Test::Generator->generate($abs_yml) };
+	close STDOUT;
+
+	unlike($out, qr/use_ok\(.*abs.*\)/i,
+		'generate() with abs.yml does not emit use_ok("abs")');
+};
+
+subtest 'Generator generate() — _yamltest_hints boundary_values reach generated output (lines 1749-1752)' => sub {
+	# Kills COND_INV_1749: if(my $hints = delete $schema->{_yamltest_hints}) negated
+	# so boundary_values are silently ignored and never reach the generated code.
+	# Also kills COND_INV_1751: if(my $boundaries = $hints->{boundary_values}) negated.
+
+	my ($out) = _capture_generate(
+		function        => 'test_fn',
+		input           => {type => 'string'},
+		_yamltest_hints => {boundary_values => ['sentinel_xyzabc123']},
+	);
+
+	like($out, qr/sentinel_xyzabc123/,
+		'_yamltest_hints boundary value appears verbatim in generated output');
+};
+
+subtest 'Generator generate() — numeric edge-case normalisation for integer type (lines 1759-1762)' => sub {
+	# Kills COND_INV_1759: if ($schema->{type} && $schema->{type} =~ /^(integer|number|float)$/)
+	# With negation the numeric-string "42.0" in boundary_values is NOT normalised and
+	# remains "42.0" in the generated code (q_wrap renders it as q{42.0}).
+	# With correct code: "42.0" += 0 → 42, so generated code has q{42} not q{42.0}.
+
+	my ($out) = _capture_generate(
+		function        => 'test_fn',
+		type            => 'integer',
+		input           => {type => 'integer'},
+		_yamltest_hints => {boundary_values => ['42.0']},
+	);
+
+	unlike($out, qr/42\.0/, 'numeric string "42.0" is normalised away from the generated output');
+};
+
+subtest 'Generator generate() — sort comparator: numbers before strings (lines 1837-1848)' => sub {
+	# Kills BOOL_NEGATE on:
+	#   return -1 if !defined $a  (line 1838) — undef moves to end
+	#   return  1 if !defined $b  (line 1839) — undef moves to end
+	#   return -1 if $na          (line 1845) — numbers move after strings
+	#   return  1 if $nb          (line 1846) — numbers move after strings
+	# Correct sort: undef first, then ascending numeric, then ascending string.
+
+	my ($out) = _capture_generate(
+		function        => 'test_fn',
+		input           => {type => 'string'},
+		_yamltest_hints => {boundary_values => ['zzz', 10, 1, 'aaa']},
+	);
+
+	my $q1   = index($out, 'q{1}');
+	my $q10  = index($out, 'q{10}');
+	my $qaaa = index($out, 'q{aaa}');
+	my $qzzz = index($out, 'q{zzz}');
+
+	ok($q1   >= 0, 'q{1} present in generated output');
+	ok($q10  >= 0, 'q{10} present in generated output');
+	ok($qaaa >= 0, 'q{aaa} present in generated output');
+	ok($qzzz >= 0, 'q{zzz} present in generated output');
+
+	cmp_ok($q1,   '<', $q10,  'q{1} appears before q{10} — numeric ascending');
+	cmp_ok($q10,  '<', $qaaa, 'q{10} appears before q{aaa} — numbers before strings');
+	cmp_ok($qaaa, '<', $qzzz, 'q{aaa} appears before q{zzz} — string ascending');
+};
+
+subtest 'Generator q_wrap() — last-resort single-quoted string with apostrophe escaping (line 3308)' => sub {
+	# Kills BOOL_NEGATE_3308_2: return "'$esc'" negated to return !"'$esc'"
+	# The negated form returns '' (empty string) because ! of a non-empty string is ''.
+	# Last resort fires when the input contains every bracket pair AND every single delimiter:
+	#   brackets: { } ( ) [ ] < >
+	#   singles:  ~ ! % ^ = + : , ; | / #
+	# Include an apostrophe to verify it is backslash-escaped in the output.
+
+	my $str = '{}()[]<>~!%^=+:,;|/#' . "it's";
+
+	my $result = App::Test::Generator::q_wrap($str);
+
+	isnt($result, '',    'last-resort q_wrap returns non-empty (negation would give empty)');
+	like($result, qr{\A'}, 'last-resort result starts with single-quote');
+	like($result, qr{'\z}, 'last-resort result ends with single-quote');
+	like($result, qr/\\'/,  "last-resort escapes embedded apostrophe (it's → it\\'s)");
+};
+
+subtest 'Generator _validate_module() — GENERATOR_VALIDATE_LOAD env guard (lines 2876-2886)' => sub {
+	# Kills COND_INV on if($ENV{GENERATOR_VALIDATE_LOAD}):
+	# - Without env: module is found via check_install but NOT loaded (returns 1)
+	# - With env=1 + loadable module: loads OK, still returns 1
+	# Also kills COND_INV on if(!$loaded): negation would make a successful
+	# load (loaded=1) trigger the carp+return 0 branch.
+
+	{
+		local %ENV = %ENV;
+		delete $ENV{GENERATOR_VALIDATE_LOAD};
+		my $result = App::Test::Generator::_validate_module('Carp', undef);
+		is($result, 1, '_validate_module returns 1 without GENERATOR_VALIDATE_LOAD');
+	}
+
+	{
+		local $ENV{GENERATOR_VALIDATE_LOAD} = 1;
+		my $result = App::Test::Generator::_validate_module('Carp', undef);
+		is($result, 1, '_validate_module returns 1 with env=1 and loadable module Carp');
+	}
+};
+
+# ===================================================================
+# SECTION 8: App::Test::Generator — _schema_to_lectrotest_generator
+# Kills survivors in the integer, string, hashref, and unknown-type
+# branches of the LectroTest generator builder (lines 4103-4244)
+# ===================================================================
+
+subtest 'Generator _schema_to_lectrotest_generator — integer unconstrained (line 4109)' => sub {
+	my $gen = App::Test::Generator::_schema_to_lectrotest_generator(
+		'n', {type => 'integer'},
+	);
+	is($gen, 'n <- Int', 'unconstrained integer uses plain Int generator');
+};
+
+subtest 'Generator _schema_to_lectrotest_generator — integer max-only (line 4112)' => sub {
+	# Kills COND_INV on !defined($min): negation fires max-only branch when both
+	# min and max are defined, emitting rand($max+1) without the min offset.
+	my $gen = App::Test::Generator::_schema_to_lectrotest_generator(
+		'n', {type => 'integer', max => 10},
+	);
+	like($gen, qr/^n <- Int/,   'max-only: starts with n <- Int');
+	like($gen, qr/rand\(10 \+ 1\)/,  'max-only: uses rand(max + 1) = rand(10 + 1)');
+	unlike($gen, qr/\d+\s*\+\s*int/, 'max-only: no offset addition (min absent)');
+};
+
+subtest 'Generator _schema_to_lectrotest_generator — integer min-only (line 4115)' => sub {
+	# Kills COND_INV on !defined($max)
+	my $gen = App::Test::Generator::_schema_to_lectrotest_generator(
+		'n', {type => 'integer', min => 5},
+	);
+	like($gen, qr/^n <- Int/,  'min-only: starts with n <- Int');
+	like($gen, qr/5\s*\+/,     'min-only: min offset (5 +) present');
+	like($gen, qr/int\(rand\(/, 'min-only: uses int(rand(...)) for distribution');
+};
+
+subtest 'Generator _schema_to_lectrotest_generator — integer both min and max (line 4119)' => sub {
+	my $gen = App::Test::Generator::_schema_to_lectrotest_generator(
+		'n', {type => 'integer', min => 2, max => 8},
+	);
+	like($gen, qr/^n <- Int/, 'both-constrained: starts with n <- Int');
+	like($gen, qr/2\s*\+/,    'both-constrained: min offset present');
+	like($gen, qr/rand\(6 \+ 1\)/, 'both-constrained: range = max-min = 6, rand(6 + 1) = 0..6');
+};
+
+subtest 'Generator _schema_to_lectrotest_generator — string with matches+max (line 4200)' => sub {
+	# Kills COND_INV on defined($spec->{'max'}) — negation: max branch fires when max absent
+	my $gen = App::Test::Generator::_schema_to_lectrotest_generator(
+		's', {type => 'string', matches => qr/\d+/, max => 8},
+	);
+	like($gen, qr/Data::Random::String::Matches/, 'matches+max: uses DRSM');
+	like($gen, qr/length.*8/,                    'matches+max: length set to max value 8');
+};
+
+subtest 'Generator _schema_to_lectrotest_generator — string with matches+min (line 4202)' => sub {
+	# Kills COND_INV on defined($spec->{'min'}) — negation: min branch fires when min absent
+	my $gen = App::Test::Generator::_schema_to_lectrotest_generator(
+		's', {type => 'string', matches => qr/\w+/, min => 3},
+	);
+	like($gen, qr/Data::Random::String::Matches/, 'matches+min: uses DRSM');
+	like($gen, qr/length.*3/,                    'matches+min: length set to min value 3');
+};
+
+subtest 'Generator _schema_to_lectrotest_generator — string with matches only (line 4205)' => sub {
+	my $gen = App::Test::Generator::_schema_to_lectrotest_generator(
+		's', {type => 'string', matches => qr/[a-z]/},
+	);
+	like($gen,   qr/Data::Random::String::Matches/, 'matches-only: uses DRSM');
+	unlike($gen, qr/length/,                        'matches-only: no length constraint');
+};
+
+subtest 'Generator _schema_to_lectrotest_generator — hashref with min/max (lines 4233-4236)' => sub {
+	# Kills COND_INV/BOOL_NEGATE on the min/max defaults via //
+	my $gen = App::Test::Generator::_schema_to_lectrotest_generator(
+		'h', {type => 'hashref', min => 1, max => 3},
+	);
+	like($gen, qr/^h <- Elements/, 'hashref: uses Elements generator');
+	like($gen, qr/1\.\.[^.\d]*3/, 'hashref: range 1..3 in Elements call');
+
+	# Default constraints (no min/max specified)
+	my $gen2 = App::Test::Generator::_schema_to_lectrotest_generator(
+		'h', {type => 'hashref'},
+	);
+	like($gen2, qr/^h <- Elements/, 'hashref default: uses Elements generator');
+	like($gen2, qr/0\.\./,          'hashref default: starts from 0');
+};
+
+subtest 'Generator _schema_to_lectrotest_generator — unknown type falls back to String (line 4243)' => sub {
+	# Kills: carp + return change that would suppress or alter the fallback
+	my $gen;
+	warning_like {
+		$gen = App::Test::Generator::_schema_to_lectrotest_generator(
+			'x', {type => 'wiggle'},
+		);
+	} qr/Unknown type/i, 'unknown type emits a warning mentioning "Unknown type"';
+	is($gen, 'x <- String', 'unknown type falls back to bare String generator');
+};
+
 done_testing();

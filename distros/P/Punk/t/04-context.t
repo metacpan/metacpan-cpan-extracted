@@ -133,4 +133,56 @@ is(file_json_decode(hit($app, path => '/stash')->[2][0])->{x}, 5, 'stash');
         qr/not a context object/, 'an accessor on a foreign invocant croaks');
 }
 
+# $c->safe_path: the guard for a redirect destination that came out of the
+# request. A browser strips TAB/CR/LF before parsing a URL and folds '\' to
+# '/', so "starts with a slash" is not the same question as "stays on this
+# site" - see Punk::OAuth2's CVE-2026-75628, whose rules these are.
+{
+    package SafeApp;
+    use Punk;
+    get '/go' => sub {
+        my ($c) = @_;
+        $c->text($c->safe_path($c->param('to'), '/fallback'));
+    };
+    get '/bare' => sub {
+        my ($c) = @_;
+        my $p = $c->safe_path($c->param('to'));
+        $c->text(defined $p ? $p : 'undef');
+    };
+    package main;
+
+    my $sapp = SafeApp->to_app;
+    my $go = sub {
+        my ($to, $path) = @_;
+        $to =~ s/([^A-Za-z0-9])/sprintf '%%%02X', ord $1/ge;
+        return hit($sapp, path => $path // '/go', env => { QUERY_STRING => "to=$to" })->[2][0];
+    };
+
+    for my $ok ('/', '/dashboard', '/a/b/c?x=1&y=2', '/a%5Cb', '/sp ace') {
+        is($go->($ok), $ok, "same-origin path passes: '$ok'");
+    }
+
+    my %evil = (
+        'protocol-relative' => '//evil.example',
+        'backslash'         => '/\\evil.example',
+        'backslash-slash'   => '/\\/evil.example',
+        'tab'               => "/\t/evil.example",
+        'CR'                => "/\r/evil.example",
+        'LF'                => "/\n/evil.example",
+        'NUL'               => "/\0//evil.example",
+        'DEL'               => "/\x7f//evil.example",
+        'absolute'          => 'https://evil.example/',
+        'scheme-relative'   => 'javascript:alert(1)',
+        'bare word'         => 'evil.example',
+        'empty'             => '',
+    );
+    for my $why (sort keys %evil) {
+        is($go->($evil{$why}), '/fallback', "refused, falls back: $why");
+    }
+
+    # with no fallback the refusal is undef, so `// '/'` at a call site works
+    is($go->('//evil.example', '/bare'), 'undef', 'no fallback means undef');
+    is($go->('/ok', '/bare'), '/ok', 'and a good path still comes back');
+}
+
 done_testing();

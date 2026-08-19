@@ -1,0 +1,105 @@
+=head1 NAME
+
+Fugu::Timeout - run something under a time limit
+
+=head1 SYNOPSIS
+
+    use Fugu::Timeout;
+
+    my $result = Fugu::Timeout::bounded(10, sub { $client->connect });
+
+    Fugu::Timeout::wait_until(60, 0.5, sub { -S $socket })
+        or die "the daemon never came up\n";
+
+=head1 DESCRIPTION
+
+Fugu::Timeout holds the two ways to run something under a time limit:
+C<bounded()> sets an alarm, and C<wait_until()> polls. An alarm
+interrupts a blocking system call that a poll loop cannot reach, and
+a poll loop leaves a signal handler alone. Neither can do the other's
+job, so both are here.
+
+The two are plain functions, not methods. They keep no state and they
+never log.
+
+=head2 bounded
+
+C<bounded($seconds, $code)> runs C<$code> under a hard wall-clock
+deadline. A blocked call inside C<$code> cannot stall the caller for
+longer than C<$seconds>.
+
+The guard is an alarm(3), so it interrupts a blocking system call
+that a poll loop cannot reach. That is why it exists next to
+C<wait_until()>, which cannot do that.
+
+A die inside C<$code> propagates, with the alarm already cleared.
+Thus a real failure keeps its own message and is not reported as a
+timeout.
+
+=head2 wait_until
+
+C<wait_until($timeout, $interval, $code)> calls C<$code> until it
+returns true, or until C<$timeout> seconds pass. C<$interval> is the
+pause between calls; its default is a quarter of a second.
+
+C<$code> runs at least once, even with a timeout of 0. A caller that
+asks "is it ready" always gets an answer about now.
+
+The loop also stops when a signal arrives, through L<Fugu::Signal>. A
+poll loop must not outlive the interrupt that told the program to
+stop.
+
+=head1 RETURN VALUES
+
+C<bounded()> returns what C<$code> returned. It returns C<undef> when
+the deadline elapsed.
+
+C<wait_until()> returns the first true value that C<$code> gave. It
+returns C<undef> on the timeout, and C<undef> when a signal arrived.
+
+=head1 EXAMPLES
+
+This example bounds a guest interaction that can block for ever:
+
+    my $out = Fugu::Timeout::bounded(15, sub {
+        return $ssh->run_command('sync; sync; sync');
+    });
+    warn "the guest did not answer\n" unless defined $out;
+
+This example waits for a port to open, and stops early on a
+C<SIGINT>:
+
+    Fugu::Timeout::wait_until(120, 1, sub {
+        IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
+    }) or die "port $port never opened\n";
+
+=head1 ERRORS
+
+C<bounded()> lets a die from C<$code> through unchanged. It has no
+error of its own: a deadline is a return value, not an exception.
+
+C<wait_until()> does not die.
+
+=head1 SEE ALSO
+
+alarm(3), L<Fugu::Process>, L<Fugu::Signal>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+C<bounded()> uses alarm(3), which is process-global and has one
+pending deadline. A nested C<bounded()> replaces the outer deadline
+and does not restore it. Do not nest the two.
+
+An alarm interrupts a system call in progress. A caller whose
+C<$code> writes to a file can therefore leave a partial write behind.
+Bound a read, a connect or a wait, and not a write that must be
+whole.
+
+C<wait_until()> cannot interrupt a C<$code> that blocks. The timeout
+bounds the loop, not one call inside it. Use C<bounded()> for that.
+
+=cut

@@ -1,0 +1,18 @@
+# AgentPushKit::Client::Object::PreferenceRecord
+
+## Load the model package
+```perl
+use AgentPushKit::Client::Object::PreferenceRecord;
+```
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**service_id** | **string** |  | 
+**type_key** | **string** |  | 
+**enabled** | **boolean** |  | 
+**updated_at** | **DATE_TIME** |  | 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

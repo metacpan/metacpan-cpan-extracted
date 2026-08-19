@@ -1,0 +1,106 @@
+=head1 NAME
+
+Protocol::HAP::Controller - a blocking HAP controller client
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::Controller;
+
+    my $controller = Protocol::HAP::Controller->new(
+        host          => '127.0.0.1',
+        port          => 51827,
+        pin           => '123-45-678',
+        controller_id => 'my-controller',
+    );
+
+    $controller->pair_setup  or die $controller->last_error;
+    $controller->pair_verify or die $controller->last_error;
+
+    my $response = $controller->request('GET', '/accessories');
+
+=head1 DESCRIPTION
+
+This module is a minimal HomeKit controller. It completes pair-setup
+(SRP M1-M6) and pair-verify (X25519), speaks the encrypted session
+framing, and sends plain and encrypted requests. The conformance
+suite drives it; an embedder uses it to talk to any HAP accessory.
+
+The controller is the documented exception to the sans-IO rule of
+L<Protocol::HAP>: it is a blocking convenience client that owns its
+TCP socket. An embedder with an event loop uses the codec modules
+directly instead.
+
+The constructor takes C<host>, C<port>, C<pin>, C<controller_id>,
+C<timeout>, an optional C<logger> (default: the null logger), and an
+optional C<transport> code reference that replaces the socket with an
+in-process byte exchange. C<controller_id> is required and C<new>
+dies without it: the id goes into the pair-setup signature, so the
+library must not invent one. C<timeout> is the socket read timeout in
+seconds; the default is 5.
+
+=head1 EXAMPLE
+
+This complete program pairs with an accessory and reads its database.
+It is the shortest path for a new implementer to a working
+controller. Run an unpaired C<openhapd> locally, then:
+
+    use v5.36;
+    use Protocol::HAP::Controller;
+
+    my $controller = Protocol::HAP::Controller->new(
+        host          => '127.0.0.1',
+        port          => 51827,
+        pin           => '1995-1018',
+        controller_id => 'my-controller',
+    );
+
+    $controller->pair_setup
+        or die 'pair-setup failed: ' . $controller->last_error;
+    $controller->pair_verify
+        or die 'pair-verify failed: ' . $controller->last_error;
+
+    my $response = $controller->request('GET', '/accessories');
+    die 'request failed' unless $response->{status} == 200;
+
+    say $response->{body};
+
+=head1 METHODS
+
+=head2 pair_setup()
+
+Complete SRP pair-setup M1-M6. On success, store the accessory LTPK
+and return true. On a protocol error, return C<undef> and put the TLV
+error code in C<last_error>.
+
+=head2 pair_verify()
+
+Complete pair-verify M1-M4 and switch the connection to the encrypted
+session framing. This requires a completed C<pair_setup>, or an
+C<accessory_ltpk> from the caller.
+
+=head2 request($method, $path, $body, $headers)
+
+Send one HTTP request over the session. After pair-verify completes,
+the session uses the encrypted framing. Return a hash reference with
+C<status>, C<headers> and C<body>, or C<undef> on a transport error.
+
+=head2 add_pairing($identifier, $ltpk, $permissions), remove_pairing($identifier), list_pairings()
+
+The pairings management methods of HAP-Pairing.md section 7.
+
+=head2 next_event($timeout)
+
+Wait for an EVENT/1.0 message on the socket, then decrypt and parse
+it. Return C<undef> on timeout. This requires a socket connection,
+not an injected transport.
+
+=head2 last_error()
+
+The TLV error code or message string of the last failed exchange.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, L<Protocol::HAP::Server>, L<Protocol::HAP::SRP>,
+F<spec/HAP-Pairing.md>, F<spec/HAP-Encryption.md>
+
+=cut

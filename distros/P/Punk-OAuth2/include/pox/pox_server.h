@@ -285,6 +285,106 @@ static int pox_redirect_ok(pTHX_ HV *client, SV *redirect_uri) {
   return ok;
 }
 
+/* Read a registered list off a client row into a fresh mortal AV.
+ *
+ * The column is documented as space-separated, custom stores may hand back
+ * an arrayref, and redirect_uris has always been allowed to be a JSON array,
+ * so all three are accepted here. Returns NULL when the client registered
+ * nothing at all, which the callers read as "nothing is allowed" - the same
+ * way an empty redirect_uris matches no redirect_uri. */
+static AV *pox_client_list(pTHX_ HV *client, const char *field, I32 flen) {
+  SV **sp = hv_fetch(client, field, flen, 0);
+  SV *v = sp ? *sp : NULL;
+  AV *out;
+  if (!v || !SvOK(v)) return NULL;
+  out = (AV *)sv_2mortal((SV *)newAV());
+  if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV) {
+    AV *src = (AV *)SvRV(v);
+    SSize_t i, n = av_count(src);
+    for (i = 0; i < n; i++) {
+      SV **e = av_fetch(src, i, 0);
+      if (e && *e && SvOK(*e)) av_push(out, newSVsv(*e));
+    }
+    return av_count(out) ? out : NULL;
+  }
+  {
+    STRLEN sl;
+    const char *s = SvPV_const(v, sl);
+    STRLEN a = 0, b;
+    if (sl && s[0] == '[') {                      /* a JSON array of names */
+      dSP; int count; SV *dec = NULL;
+      ENTER; SAVETMPS; PUSHMARK(SP);
+      XPUSHs(sv_2mortal(newSVpvn(s, sl))); PUTBACK;
+      count = call_pv("File::Raw::JSON::file_json_decode", G_SCALAR | G_EVAL);
+      SPAGAIN;
+      if (!SvTRUE(ERRSV) && count > 0) dec = SvREFCNT_inc(POPs);
+      else if (count > 0) (void)POPs;
+      PUTBACK; FREETMPS; LEAVE;
+      if (dec) {
+        sv_2mortal(dec);
+        if (SvROK(dec) && SvTYPE(SvRV(dec)) == SVt_PVAV) {
+          AV *src = (AV *)SvRV(dec);
+          SSize_t i, n = av_count(src);
+          for (i = 0; i < n; i++) {
+            SV **e = av_fetch(src, i, 0);
+            if (e && *e && SvOK(*e)) av_push(out, newSVsv(*e));
+          }
+          return av_count(out) ? out : NULL;
+        }
+      }
+    }
+    for (b = 0; b <= sl; b++)                     /* space or comma separated */
+      if (b == sl || s[b] == ' ' || s[b] == ',' || s[b] == '\t') {
+        if (b > a) av_push(out, newSVpvn(s + a, b - a));
+        a = b + 1;
+      }
+  }
+  return av_count(out) ? out : NULL;
+}
+
+/* exact membership of a registered list */
+static int pox_list_has(pTHX_ AV *av, const char *want, STRLEN wl) {
+  SSize_t i, n;
+  if (!av) return 0;
+  n = av_count(av);
+  for (i = 0; i < n; i++) {
+    SV **e = av_fetch(av, i, 0);
+    STRLEN el;
+    const char *ep;
+    if (!e || !*e || !SvOK(*e)) continue;
+    ep = SvPV_const(*e, el);
+    if (el == wl && memEQ(ep, want, wl)) return 1;
+  }
+  return 0;
+}
+
+/* Is this client registered for this grant type? A client registered for
+ * nothing may use nothing: the token endpoint dispatches on a grant_type the
+ * client puts in the request body, so without this a client registered for
+ * authorization_code alone can ask for client_credentials and be handed a
+ * signed token for it. */
+static int pox_grant_ok(pTHX_ HV *client, const char *gt) {
+  AV *av = pox_client_list(aTHX_ client, "grant_types", 11);
+  return pox_list_has(aTHX_ av, gt, strlen(gt));
+}
+
+/* Is every space-separated token of `scope` registered to this client?
+ * An absent or empty request scope is always fine; it asks for nothing. */
+static int pox_client_scope_ok(pTHX_ HV *client, SV *scope) {
+  AV *av;
+  STRLEN sl, a = 0, b;
+  const char *s;
+  if (!scope || !SvOK(scope)) return 1;
+  s = SvPV_const(scope, sl);
+  av = pox_client_list(aTHX_ client, "scopes", 6);
+  for (b = 0; b <= sl; b++)
+    if (b == sl || s[b] == ' ') {
+      if (b > a && !pox_list_has(aTHX_ av, s + a, b - a)) return 0;
+      a = b + 1;
+    }
+  return 1;
+}
+
 /* Redirect back to the client with error+state (RFC 6749). */
 static SV *pox_authorize_error(pTHX_ SV *redirect_uri, const char *error,
                                SV *state, SV *iss) {
@@ -345,6 +445,18 @@ static SV *pox_srv_authorize(pTHX_ SV *self, SV *c) {
                                state, iss);
   if (!challenge || !method || strNE(SvPV_nolen(method), "S256"))
     return pox_authorize_error(aTHX_ redirect_uri, "invalid_request",
+                               state, iss);
+
+  /* The registration decides what this client may ask for. Without these
+   * two the query string did: a client registered for nothing but
+   * authorization_code could name any scope it liked and have it copied into
+   * the code record and signed into the access token, with the optional
+   * consent hook the only thing in the way. */
+  if (!pox_grant_ok(aTHX_ (HV *)SvRV(client), "authorization_code"))
+    return pox_authorize_error(aTHX_ redirect_uri, "unauthorized_client",
+                               state, iss);
+  if (!pox_client_scope_ok(aTHX_ (HV *)SvRV(client), scope))
+    return pox_authorize_error(aTHX_ redirect_uri, "invalid_scope",
                                state, iss);
 
   /* authenticate hook: returns a user id, or a reference (a login
@@ -558,6 +670,10 @@ static SV *pox_srv_token(pTHX_ SV *self, SV *c) {
   if (!client)
     return pox_error_json(aTHX_ 401, "invalid_client", NULL);
   gt = grant ? SvPV_nolen(grant) : "";
+  /* The grant type arrives in the request body, so it is the client's choice
+   * of arm, not the registration's, unless this says otherwise. */
+  if (*gt && !pox_grant_ok(aTHX_ client, gt))
+    return pox_error_json(aTHX_ 400, "unauthorized_client", NULL);
   {
     SV *cid = pox_row_get(aTHX_ client, "client_id");
 
@@ -596,6 +712,10 @@ static SV *pox_srv_token(pTHX_ SV *self, SV *c) {
           if (!chal || !pox_ct_eq_sv(aTHX_ got, chal))
             return pox_error_json(aTHX_ 400, "invalid_grant", NULL);
         }
+        /* the scope was checked when the code was minted; check it again in
+         * case the registration has been narrowed since */
+        if (!pox_client_scope_ok(aTHX_ client, scope))
+          return pox_error_json(aTHX_ 400, "invalid_scope", NULL);
         return pox_token_success(aTHX_ srv, cid, uid,
                                  scope ? SvPV_nolen(scope) : "", 1);
       }
@@ -631,6 +751,10 @@ static SV *pox_srv_token(pTHX_ SV *self, SV *c) {
         }
         if (exp && SvIV(exp) < (IV)time(NULL))
           return pox_error_json(aTHX_ 400, "invalid_grant", NULL);
+        /* a refresh token outlives a registration change, so the scope it
+         * carries has to be re-checked rather than trusted */
+        if (!pox_client_scope_ok(aTHX_ client, scope))
+          return pox_error_json(aTHX_ 400, "invalid_scope", NULL);
         /* rotate: mint a new refresh in the same family, mark old
          * rotated */
         {
@@ -666,6 +790,15 @@ static SV *pox_srv_token(pTHX_ SV *self, SV *c) {
 
     if (strEQ(gt, "client_credentials")) {
       SV *scope = pox_field(aTHX_ form, "scope");
+      /* RFC 6749 4.4: this grant is for a confidential client. A public
+       * client authenticates on a client_id anyone can read out of a browser,
+       * so it must not be able to trade one for a token of its own. */
+      SV *digest = pox_row_get(aTHX_ client, "secret_digest");
+      SV *pub = pox_row_get(aTHX_ client, "is_public");
+      if (!digest || !SvOK(digest) || !SvCUR(digest) || (pub && SvTRUE(pub)))
+        return pox_error_json(aTHX_ 401, "invalid_client", NULL);
+      if (!pox_client_scope_ok(aTHX_ client, scope))
+        return pox_error_json(aTHX_ 400, "invalid_scope", NULL);
       return pox_token_success(aTHX_ srv, cid, &PL_sv_undef,
                                scope ? SvPV_nolen(scope) : "", 0);
     }

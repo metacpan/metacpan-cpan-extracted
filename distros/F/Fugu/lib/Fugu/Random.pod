@@ -1,0 +1,68 @@
+=head1 NAME
+
+Fugu::Random - random bytes and random passwords
+
+=head1 SYNOPSIS
+
+    use Fugu::Random;
+
+    my $nonce = Fugu::Random->random_bytes(12);
+    my $password = Fugu::Random->random_password(32);
+
+=head1 DESCRIPTION
+
+Fugu::Random gives random bytes from F</dev/urandom> and random
+passwords built from them.
+
+Every method is a class method. The module keeps no state, never
+logs, and uses core Perl only. A programming error dies. There is no
+partial result and no quiet fallback, because a caller cannot recover
+from a secret with a known prefix.
+
+=head2 random_bytes
+
+C<random_bytes($length)> returns C<$length> bytes from
+F</dev/urandom>.
+
+The method dies when the device does not open, and dies on a short
+read. Neither one has a recovery: a caller that continues with fewer
+bytes than it asked for builds a secret with a known prefix.
+
+=head2 random_password
+
+C<random_password($length)> returns a random password of exactly
+C<$length> characters. The default length is 32.
+
+The alphabet is URL-safe base64, so the password survives a shell, a
+URL and a configuration file with no quoting.
+
+=head1 RETURN VALUES
+
+C<random_bytes()> and C<random_password()> return a string of the
+asked-for length.
+
+=head1 ERRORS
+
+C<random_bytes()> dies when F</dev/urandom> does not open, on a short
+read, and on a length that is not positive. C<random_password()> dies
+on a length that is not positive.
+
+=head1 SEE ALSO
+
+arc4random(3), random(4)
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+C<random_password()> trims a base64 string to the asked-for length. A
+password of C<n> characters therefore carries about six bits of
+entropy for each character, and not eight.
+
+The HAP protocol library has its own randomness in
+C<Protocol::HAP::Crypto>. The duplication is deliberate: the protocol
+library stays self-contained across a distribution boundary.
+
+=cut

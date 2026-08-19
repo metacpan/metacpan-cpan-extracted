@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use Punk::Auth::Password;
 
-our $VERSION = '0.17';
+our $VERSION = '0.20';
 
 # The whole battery is C (punk_auth.h + xs/auth.xs): the guard fast path,
 # current_user and the await seam, check_password with the dummy-verify
@@ -104,6 +104,18 @@ C<?to=E<lt>pathE<gt>> so a login can return the user where they were headed;
 anything else gets a C<401> in the house error shape. C<on_denied> overrides
 with C<'403'>, C<'404'> (for pages whose existence is nobody's business - the
 staff-area convention) or a coderef receiving the context.
+
+The C<?to=> Punk writes is a percent-encoded relative path, but the value
+your login form reads back is whatever the browser sent, and someone else may
+have written that link. Put it through L<< C<< $c->safe_path >>|Punk::Context/safe_path >>
+before redirecting to it, or a crafted C<?to=> turns your login into an open
+redirect:
+
+    post '/login' => sub {
+        my ($c) = @_;
+        ...
+        $c->redirect($c->safe_path($c->param('to'), '/'));
+    };
 
 A passing guard records what it knows in C<< $c->stash->{auth} >> -
 C<user_id> always, C<user> and C<roles> (an arrayref of everything the

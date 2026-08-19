@@ -1,0 +1,13 @@
+^MYMETA.json$
+^MYMETA.yml$
+^_eumm
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+^Build$
+^Build.bat$
+^perl.core$
+^pod2htm
+^_build/
+^.git/

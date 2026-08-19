@@ -1,0 +1,211 @@
+=head1 NAME
+
+Fugu::Config - the OpenBSD-style configuration grammar
+
+=head1 SYNOPSIS
+
+    use Fugu::Config;
+
+    my $config = Fugu::Config->new(file => '/etc/mydaemon.conf');
+    $config->load or die $config->error . "\n";
+
+    my $port = $config->get('port', 8080);
+
+    for my $device ($config->blocks('device')) {
+        say $device->{settings}{name};
+    }
+
+    my $vm = $config->block('vm', 'default');
+
+=head1 DESCRIPTION
+
+B<Fugu::Config> parses the configuration grammar that OpenBSD daemons
+use.
+A file holds top-level settings and blocks:
+
+    log_level debug
+    hap_port = 51827
+
+    device tasmota thermostat bedroom {
+    	name = "Bedroom Thermostat"
+    	topic = tasmota_AABBCC
+    }
+
+Both C<key value> and C<key = value> parse.
+A double-quoted value loses its quotes.
+A C<#> starts a comment that runs to the end of the line.
+
+A block header is a type, then one or more arguments, then an opening
+brace.
+Blocks nest one level; a block inside a block is an error.
+
+The parser keeps the blocks of each type in file order, and also
+addresses each one by its name, which is the last argument of the
+header.
+Thus a caller that wants an ordered list of accessories and a caller
+that wants the machine called "default" read the same parse.
+
+A malformed line is an error with a file and a line number.
+The module never skips a line it did not understand.
+A typo that a parser ignores is a setting that silently does not
+apply, and the operator finds out from the behavior of the daemon
+weeks later.
+
+=head2 new
+
+C<new(%args)> creates a parser for one file.
+The method does not read the file.
+Call C<load()>.
+
+This is the argument:
+
+=over 4
+
+=item C<file>
+
+The configuration file.
+This argument is necessary.
+
+=back
+
+=head2 load
+
+C<load()> reads and parses the file.
+A second call starts over, so a setting that the file no longer holds
+is gone.
+
+An unreadable file is an error.
+A caller for whom an absent file is normal tests for the file first.
+A daemon that silently runs on defaults after a typo in a path is
+worse than one that refuses to start.
+
+=head2 file
+
+C<file()> returns the path that this object parses.
+
+=head2 error
+
+C<error()> returns the most recent failure, with its file and line.
+
+=head2 get
+
+C<get($key, $default)> returns a top-level setting, or the default.
+
+=head2 setting_names
+
+C<setting_names()> returns the names of the top-level settings, sorted.
+
+=head2 parse_bool
+
+C<parse_bool($value, $default)> parses a value as a switch.
+A setting inside a block comes through here.
+
+The accepted spellings are C<yes>, C<true>, C<on> and C<1>, and their
+opposites C<no>, C<false>, C<off> and C<0>.
+The comparison ignores case.
+
+Any other value returns the default and records an error.
+Thus a caller that checks gets told, and a caller that does not still
+gets a defined answer instead of the opposite of what the file said.
+
+=head2 blocks
+
+C<blocks($type)> returns every block of the type, in file order.
+
+Each entry is a hash reference with these keys:
+
+=over 4
+
+=item C<type>
+
+The block type.
+
+=item C<args>
+
+The header arguments, in order, as an array reference.
+
+=item C<name>
+
+The last header argument.
+
+=item C<settings>
+
+The settings inside the block, as a hash reference.
+
+=item C<order>
+
+The position of the block in the file, counted from zero over every
+block of every type.
+A caller that reads two block types and wants them interleaved as the
+file wrote them sorts on it.
+
+=back
+
+=head2 block
+
+C<block($type, $name)> returns the block of the type whose name
+matches, or C<undef>.
+When two blocks share a name, the last one in the file wins, as an
+assignment does.
+
+=head2 find_project_root
+
+C<find_project_root($marker)> walks up from the working directory to
+the first directory that holds C<$marker>.
+The method returns that directory, or C<undef> when the walk reaches
+the root without a match.
+
+=head1 RETURN VALUES
+
+C<load()> returns the object on success.
+It returns C<undef> when the file does not open or holds a line that
+the grammar does not accept, with the reason in C<error()>.
+
+C<get()>, C<file()> and C<error()> return a string or C<undef>.
+C<parse_bool()> returns 1 or 0.
+C<blocks()> and C<setting_names()> return a list.
+C<block()> returns a hash reference or C<undef>.
+
+=head1 EXAMPLES
+
+This example loads a file that may not exist yet:
+
+    my $config = Fugu::Config->new(file => $path);
+    if (-f $path) {
+        $config->load or die $config->error . "\n";
+    }
+
+    my $port = $config->get('port', 8080);
+
+=head1 ERRORS
+
+C<new()> dies when C<file> is absent or empty, and
+C<find_project_root()> dies without a marker.
+Both are programming errors.
+
+No other method dies.
+C<load()> reports every parse failure through its return value and
+C<error()>.
+
+=head1 SEE ALSO
+
+L<Fugu::File>, L<Fugu::StateFile>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+The grammar has no escape for the comment character.
+A value cannot hold a C<#>, even inside quotes.
+
+Every value is a string.
+The module does not convert a number, and C<0> as a string is true in
+Perl.
+Use C<parse_bool()> for a switch.
+
+A key with no value is not a setting, and the parser rejects the line.
+The grammar has no flag form.
+
+=cut

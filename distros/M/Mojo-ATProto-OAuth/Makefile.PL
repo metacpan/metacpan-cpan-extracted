@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "Crypt::PK::ECC" => 0,
     "Crypt::URandom" => 0,
     "Digest::SHA" => 0,
+    "JSON" => 0,
     "MIME::Base64" => 0,
     "Mojo::Base" => 0,
     "Mojo::IOLoop" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.00",
+  "VERSION" => "1.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "Crypt::PK::ECC" => 0,
   "Crypt::URandom" => 0,
   "Digest::SHA" => 0,
+  "JSON" => 0,
   "MIME::Base64" => 0,
   "Mojo::Base" => 0,
   "Mojo::IOLoop" => 0,

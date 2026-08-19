@@ -1,5 +1,5 @@
 ########################################################################
-# Minimal STDERR logger — used when Log::Log4perl is not available
+# Minimal STDERR logger â used when Log::Log4perl is not available
 # Implements the same interface callers expect
 ########################################################################
 package Amazon::S3::Lite::Logger;
@@ -7,7 +7,7 @@ package Amazon::S3::Lite::Logger;
 use strict;
 use warnings;
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.3.1';
 
 use Readonly;
 Readonly::Scalar our $LEVELS => {

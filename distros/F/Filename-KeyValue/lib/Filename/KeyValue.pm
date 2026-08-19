@@ -13,7 +13,7 @@ use URI::Escape qw();
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2026-05-28'; # DATE
 our $DIST = 'Filename-KeyValue'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(
                        parse_keyvalue_filename
@@ -121,6 +121,10 @@ MARKDOWN
     },
     examples => [
         {
+            args => {filename=>'foo.jpg'},
+            summary => 'No key=value pairs',
+        },
+        {
             args => {filename=>'foo-bar-kw1=val1.jpg'},
             summary => 'A single key=value pair',
         },
@@ -169,7 +173,6 @@ sub parse_keyvalue_filename {
                   \A
                   (?:
                       (.+?)                                     # optional prefix (part before the first key)
-                      -
                   )?
                   (?:
                       (
@@ -193,6 +196,11 @@ sub parse_keyvalue_filename {
     $res->{prefix} = $1 // '';
     $res->{kv_raw} = $2 // '';
     $res->{kv} = {};
+
+    if (length $res->{kv_raw}) {
+        $res->{prefix} =~ /-\z/ or return [400, "Invalid filename syntax, must be in PREFIX-(KW=VAL)*(.EXT)? format (2)"];
+    }
+
     if (length $res->{kv_raw}) {
         while ($res->{kv_raw} =~ /([A-Za-z_][^=]*)=([^-]+)/g) {
             $res->{kv}{$1} = _decode_val($opts, $res->{kv}, $1, $2);
@@ -429,7 +437,7 @@ Filename::KeyValue - Parse filename using the KeyValue naming scheme
 
 =head1 VERSION
 
-This document describes version 0.003 of Filename::KeyValue (from Perl distribution Filename-KeyValue), released on 2026-05-28.
+This document describes version 0.004 of Filename::KeyValue (from Perl distribution Filename-KeyValue), released on 2026-05-28.
 
 =head1 SYNOPSIS
 
@@ -464,7 +472,7 @@ Examples:
 
 Result:
 
- [200, "OK", "foo-bar-kw1=val1-kw2=val2.jpg", {}]
+ [200, "OK", "foo-bar--kw1=val1-kw2=val2.jpg", {}]
 
 =back
 
@@ -538,7 +546,7 @@ Examples:
 
 Result:
 
- [200, "OK", "foo-bar-kw1=val1-kw2=val2.jpg", {}]
+ [200, "OK", "foo-bar--kw1=val1-kw2=val2.jpg", {}]
 
 =back
 
@@ -594,6 +602,19 @@ Examples:
 
 =over
 
+=item * No key=value pairs:
+
+ parse_keyvalue_filename(filename => "foo.jpg");
+
+Result:
+
+ [
+   200,
+   "OK",
+   { ext => "jpg", kv => {}, kv_raw => "", prefix => "foo" },
+   {},
+ ]
+
 =item * A single key=value pair:
 
  parse_keyvalue_filename(filename => "foo-bar-kw1=val1.jpg");
@@ -607,7 +628,7 @@ Result:
      ext => "jpg",
      kv => { kw1 => ["val1"] },
      kv_raw => "kw1=val1",
-     prefix => "foo-bar",
+     prefix => "foo-bar-",
    },
    {},
  ]
@@ -625,7 +646,7 @@ Result:
      ext => "jpg",
      kv => { kw1 => ["val1"], kw2 => ["val2"] },
      kv_raw => "kw1=val1-kw2=val2",
-     prefix => "foo-bar",
+     prefix => "foo-bar-",
    },
    {},
  ]
@@ -643,7 +664,7 @@ Result:
      ext => "jpg",
      kv => { kw1 => ["val1", "val1b"] },
      kv_raw => "kw1=val1,val1b",
-     prefix => "foo-bar",
+     prefix => "foo-bar-",
    },
    {},
  ]
@@ -661,7 +682,7 @@ Result:
      ext => "jpg",
      kv => { kw1 => ["val1"], kw2 => ["val2", "val2b", "val2c"], kw3 => ["val3"] },
      kv_raw => "kw1=val1-kw2=val2,val2b,val2c-kw3=val3",
-     prefix => "foo-bar",
+     prefix => "foo-bar-",
    },
    {},
  ]
@@ -679,7 +700,7 @@ Result:
      ext => "jpg",
      kv => { kw3 => ["val"] },
      kv_raw => "kw1=-kw2=-kw3=val",
-     prefix => "foo-bar",
+     prefix => "foo-bar-",
    },
    {},
  ]
@@ -700,7 +721,7 @@ Result:
        kw2_also_containing_dash => ["containing-two-dashes"],
      },
      kv_raw => "kw1_containing_dash=containing%2ddash-kw2_also_containing_dash=containing%2Dtwo%2Ddashes",
-     prefix => "foo-bar",
+     prefix => "foo-bar-",
    },
    {},
  ]
@@ -718,7 +739,7 @@ Result:
      ext => "jpg",
      kv => { kw1 => ["containing", "comma"] },
      kv_raw => "kw1=containing%2ccomma",
-     prefix => "foo-bar",
+     prefix => "foo-bar-",
    },
    {},
  ]

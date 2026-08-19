@@ -1,5 +1,12 @@
 ---
 
+0.999.14    2026-08-18
+   [Added]
+       * Support for downloading and installing alpha, beta and release
+         candidate (rc) releases
+   [Fixed]
+       * POD error complaining of non-ascii input
+
 0.999.13    2026-08-17
    [Added]
        * Support for installation on RHEL and derivatives; RHEL uses

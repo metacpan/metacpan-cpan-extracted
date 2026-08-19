@@ -1,3 +1,388 @@
+2026-08-19 - v1.23
+    + cleanup: removed the trailing "return $v" (and its now-redundant
+      "if ref $v" guard) from kvp2json_each and kvp2str_each - a direct
+      follow-up to HAC-096's die guard, which left both lines provably
+      unreachable (every non-reference value already returns earlier,
+      and any remaining reference is now always caught by the die).
+      Zero behavior change; confirmed by an identical full-suite run
+      before and after, and by Devel::Cover no longer listing either
+      line as permanently-0%-executed dead weight (HAC-098)
+    + test: added regression coverage for send()'s "-- RETRY N of M"
+      debug line, only reachable when a debug flag is on AND an actual
+      retry attempt happens - no existing test combined both. Already
+      correct behavior; Client.pm now reaches 100% statement coverage
+      (HAC-099)
+    + test: added regression coverage for new_request() skipping
+      _tune_utf8 when charset is not "utf8" - already correct behavior,
+      never exercised through a real send()/post() call before this
+      (HAC-100)
+
+2026-08-19 - v1.22
+    + fix: kvp2str_each silently stringified a bare (not xBOOLEAN-wrapped)
+      SCALAR ref data value as "SCALAR(0x...)" instead of dying - the
+      same silent-corruption failure class HAC-020 (nested hash) and
+      HAC-093 (xBOOLEAN's own non-scalar-ref guard) already established
+      this project must never do. kvp2json_each's equivalent fallback
+      technically died too, but only by accident of JSON::XS itself
+      refusing to encode an arbitrary scalar ref, with a message that
+      never mentioned this module's own xBOOLEAN() vocabulary. Both
+      encoders now die with the same clear message, naming the ref
+      type and pointing at xBOOLEAN() (HAC-096)
+    + test: added regression coverage for new_request()'s GET branch
+      when the target URL already contains a '?' - the behavior was
+      already correct but had zero test executions before this
+      (HAC-097)
+
+2026-08-19 - v1.21
+    + fix: kvp2json/kvp2json_each silently emitted invalid JSON for a
+      string data value that Scalar::Util::looks_like_number() recognizes
+      as a non-finite number - exact casings "NaN", "Inf", "-Inf" (whose
+      Perl NV-to-string roundtrip matches the original string
+      byte-for-byte, satisfying the existing lossless-numify check meant
+      for ordinary numeric strings like "5") were numified into a real
+      Perl NaN/Infinity NV, which this module's utf8-mode JSON::XS
+      encoder then wrote as the bareword token nan/-nan/inf/-inf instead
+      of a quoted string - not valid JSON, undecodable by any standard
+      JSON parser including JSON::XS itself, with no error or warning.
+      _numify_if_lossless() now leaves such a value as its original
+      string via a POSIX::isnan/isinf guard, the same way any other
+      non-lossless numeric string already stays a string (HAC-095)
+
+2026-08-19 - v1.20
+    + fix: prepare_request() unconditionally wrote an Authorization
+      header from auth_token whenever set (and username/password
+      weren't), even when the caller had already explicitly passed
+      their own Authorization header (any casing) for that specific
+      call - the explicit per-call value was silently discarded with no
+      error or warning, reachable regardless of the header's casing
+      since HTTP::Headers normalizes names case-insensitively while the
+      underlying Perl hash keys don't. auth_token now only supplies a
+      default when no Authorization header is already present (HAC-094)
+    + fix: xBOOLEAN() wrapping a reference other than a scalar ref (an
+      ARRAY or HASH ref) silently stringified to "ARRAY(0x...)"/
+      "HASH(0x...)" in both kvp2json_each and kvp2str_each instead of
+      dying with a clear message - the same failure class HAC-020
+      already established this project must never do silently. Both
+      encoders now die naming the offending ref type; a plain scalar
+      and a genuine scalar ref (xBOOLEAN's two documented input shapes)
+      are unaffected (HAC-093)
+    + fix: kvp2json_each's BOOL branch applied HAC-055/HAC-070/HAC-084's
+      invalid-UTF-8-die and lossless-numify protection only to the LIVE
+      scalar-ref case (xBOOLEAN(\$var)) - a PLAIN (non-ref) value, e.g.
+      xBOOLEAN($value) called with a bare scalar, fell straight through
+      to the raw unprotected value. A plain xBOOLEAN() holding invalid
+      UTF-8 silently produced mojibake instead of dying, and a plain
+      numeric-looking xBOOLEAN() value was never numified. Both are
+      fully public, documented input shapes per xBOOLEAN's own POD ("a
+      plain scalar or a scalar ref") - the same gap HAC-084 fixed for
+      the live-ref case, missed for the plain-value case. The
+      native-JSON-boolean behavior for a live ref holding exactly
+      '0'/'1' (xTRUE/xFALSE's shape) is unaffected (HAC-092)
+    + fix: kvp2json_each's BOOL branch decided whether to pass a live
+      xBOOLEAN(\$var) scalar ref through unchanged to JSON::XS using
+      NUMERIC equality ($$inner == 0 || == 1), but JSON::XS itself only
+      accepts the exact canonical string/number 0 or 1. A live ref
+      holding "01", "1.0", " 1", or "1e0" (all numerically 1, none
+      canonically formatted) crashed with JSON::XS's raw "cannot encode
+      reference to scalar ... unless the scalar is 0 or 1" instead of
+      going through the numify/validate path every other live value
+      already uses. Fixed by comparing with eq against '0'/'1' instead
+      of == (HAC-090)
+    + fix: kvp2json_each crashed on a live xBOOLEAN(\$var) reference
+      holding undef - a regression introduced by HAC-084/HAC-090
+      combining without an undef guard: $$inner eq '0'/'1' warned on
+      undef, and since neither matched, the undef value reached
+      _json_validate_utf8()/numify unguarded and died with a confusing
+      "value is not valid UTF-8" error. Now defaults the live value to
+      '' before the comparison, matching kvp2str_each's own undef
+      handling (HAC-082) (HAC-091)
+    + fix: send() merged pre_defined_data/pre_defined_headers/
+      pre_defined_events directly into the caller's own
+      \%data/\%headers/\%events hashrefs instead of copying them first,
+      and new_request()/kvp2json()/kvp2str() autovivified
+      before_header/after_header/not_include keys into the caller's
+      actual \%events hashref even when never set. A caller reusing a
+      hashref across multiple calls (a natural pattern) got silently
+      corrupted state back. send() now shallow-copies all three
+      immediately, before any merging or event processing happens
+      (HAC-083)
+    + fix: kvp2json_each's BOOL branch bypassed HAC-055's invalid-UTF-8
+      protection for a live xBOOLEAN(\$var) reference holding raw
+      non-UTF8-valid bytes - it went straight to numification without
+      the UTF-8 validate-or-die step the main scalar branch does,
+      silently producing mojibake instead of dying with a clear error.
+      Both paths now share a _json_validate_utf8() helper (HAC-084)
+    + fix: DEBUG_RESPONSE_IF_FAIL's own POD says it narrows DEBUG_IN_OUT
+      to only print on a failed response, but only the RESPONSE half of
+      DEBUG_IN_OUT's output was actually narrowed - the REQUEST dump
+      printed unconditionally whenever DEBUG_IN_OUT was set, regardless
+      of whether the response succeeded. DEBUG_SEND_OUT (a separate
+      flag, not mentioned in DEBUG_RESPONSE_IF_FAIL's POD) is
+      deliberately left unnarrowed (HAC-085)
+    + fix: RETRY_FAIL_STATUS (and the equivalent retry_config->{
+      fail_status}) with an empty or whitespace-only entry (a doubled
+      comma, a lone whitespace segment) created a bogus '' key in the
+      retry-status match set. Harmless in practice, but inconsistent
+      with how empty segments are now skipped elsewhere in this module
+      (kvp_response, HAC-075). Empty entries are now skipped entirely
+      (HAC-086)
+    + test: xCSV() with zero elements emits "key=" (present, empty
+      value) rather than being omitted like a top-level empty plain
+      array is (HAC-065) - this was correct and intentional (no
+      join-corruption risk to avoid the way a nested empty array has)
+      but previously undocumented and untested (HAC-087)
+    + docs: the retry attribute (and its _build_retry builder) has been
+      disconnected from send()'s actual behavior since HAC-068 - send()
+      calls _build_retry directly on every call rather than reading the
+      memoized attribute, so retry_config changes take effect live, but
+      $api->retry itself is just a one-time snapshot. Added a code
+      comment to prevent this being mistaken for dead/reintroducible
+      logic (HAC-088)
+    + docs: refreshed README's coverage baseline, stale since v1.15 -
+      Client.pm 98.9%/93.1%/80.9% (was 98.8%/92.8%/76.6%),
+      DataTypeMarker.pm still 100% (HAC-089)
+
+2026-08-18 - v1.19
+    + fix: kvp2str_each's BOOL branch produced a spurious "Use of
+      uninitialized value" warning when a live xBOOLEAN(\$var) reference
+      currently held undef - the undef value reached string
+      interpolation undefaulted. kvp2json_each already handled the
+      identical input silently (encodes JSON null). kvp2str_each now
+      defaults an undef live value to '' before escaping, matching the
+      scalar branch's existing convention (HAC-082)
+
+2026-08-18 - v1.18
+    + fix: kvp2json_each's BOOL branch unconditionally returned the
+      marker's inner value, which is only safe when that value is
+      exactly \1 or \0 (xTRUE()/xFALSE()'s shape) - JSON::XS's own
+      convention for a native boolean via a scalar ref. xBOOLEAN(\$flag)
+      is documented as a general live-tracking mechanism, not restricted
+      to 0/1 - for any other live value (e.g. xBOOLEAN(\$status) where
+      $status holds "active"), kvp2json_each handed JSON::XS a raw
+      scalar ref it cannot encode at all, dying with "cannot encode
+      reference to scalar ... unless the scalar is 0 or 1". kvp2str_each
+      already dereferenced this exact case correctly. kvp2json_each now
+      matches it: a live ref currently holding exactly 0/1 still gets
+      JSON::XS's native boolean treatment, any other live value
+      dereferences and encodes as its own actual contents (HAC-081)
+
+2026-08-18 - v1.17
+    + docs: kvp2str's before_sorting_keys/after_sorting_keys events are
+      real, working, and tested (t/21_before_events.t,
+      t/33_before_sorting_keys_mutation.t) but were never mentioned in
+      the METHODS POD, which only documented the shared events->{keys}
+      callback both encoders use. Documented both hooks: kvp2str-only,
+      genuinely live (a callback mutating @$keys changes the actual
+      output), before_sorting_keys' mutation only survives if
+      events->{keys} isn't also set (HAC-079)
+    + refactor: send()'s outer $retry (a settings hashref: count/status/
+      delay) was immediately shadowed by the RETRY loop's own "foreach
+      my $retry (0..$retry_count)" loop counter. Currently harmless -
+      the hashref is fully consumed into separate lexicals before the
+      loop starts - but a real trap for any future edit inside the loop
+      expecting $retry->{...}. Renamed the outer variable to
+      $retry_settings; no behavior change (HAC-080)
+
+2026-08-18 - v1.16
+    + fix: kvp2str_each's CSV branch always prefixed "$k=" regardless of
+      %options' no_key flag, unlike the scalar/BOOL/ARRAY branches which
+      all respect it. An xCSV value nested inside another xCSV is
+      recursed into with no_key => 1 (the same mechanism HAC-071 fixed
+      for a BOOL nested in CSV), but the CSV branch ignored it -
+      xCSV(6, 7, xCSV(13, 14), 15) encoded to "e=6,7,e=13,14,15" (a
+      bogus embedded "e=") instead of "e=6,7,13,14,15". CSV nested in
+      CSV was the one nesting combination HAC-069/071 didn't cover
+      (HAC-078)
+
+2026-08-18 - v1.15
+    + fix: kvp_response() only decoded %XX percent-encoding, never the
+      application/x-www-form-urlencoded convention of a literal +
+      meaning a space - decoding "q=hello+world" returned
+      { q => "hello+world" } instead of { q => "hello world" }.
+      kvp2str_each's own encoder never emits a raw + (it uses %20), so
+      this only bit when kvp_response decoded a response body from any
+      other API using the + convention, which is extremely common. A
+      genuinely percent-encoded literal + (%2B) still decodes correctly,
+      distinct from a raw + meaning space (HAC-074)
+    + fix: kvp_response() produced a bogus '' => undef entry plus two
+      uninitialized-value warnings whenever the response body had an
+      empty &-separated segment (a leading, trailing, or doubled &,
+      e.g. "a=1&&a=2") - split /&/ yields an empty string for that
+      segment, and splitting *that* on = leaves both key and value
+      undef. Same failure signature HAC-060/061/065 already fixed on
+      the encode side, now closed on the decode side too - an empty
+      segment is skipped entirely (HAC-075)
+    + fix: json_response() never re-applied charset before decoding,
+      unlike kvp2json() (HAC-067) which does on the encode side - json
+      is lazy and memoized, built once in whatever charset mode was set
+      at the time. Changing charset afterward and calling
+      json_response() again on the same response body still decoded
+      through the stale mode, silently producing mojibake for a
+      UTF-8-encoded body if json had first been built in a non-utf8
+      mode. json_response() now re-applies charset on every call,
+      matching kvp2json()'s existing behavior (HAC-076)
+    + fix: xCSV()/xBOOLEAN() both blessed \@_ directly - a reference to
+      Perl's actual arguments array, which aliases the caller's
+      variables rather than copying their values. A marker built inside
+      a loop from a shared, reused scalar variable (a natural pattern)
+      silently ended up holding whatever value that variable had LAST,
+      not the value at the time each marker was created - e.g.
+      xCSV($x, $y, 3) then reassigning $x/$y afterward changed the
+      already-created marker's contents. Both constructors now bless a
+      fresh array (bless [ @_ ], ...), copying each value at call time;
+      explicitly passing a scalar ref (xBOOLEAN(\$flag)) still tracks
+      live, which remains the documented way to opt into that (HAC-077)
+
+2026-08-18 - v1.14
+    + fix: an empty ARRAY nested inside an xCSV(...) list left a stray
+      blank comma segment instead of being omitted - xCSV(6, 7, [], 15)
+      encoded to "e=6,7,,15" (a double comma) rather than "e=6,7,15".
+      kvp2str_each's ARRAY branch already returns '' for an empty array,
+      the same string a genuine empty-string scalar CSV element also
+      produces, so the CSV branch's loop couldn't tell them apart and
+      pushed both into the comma-joined list the same way. HAC-065
+      already established that an empty array is omitted entirely at
+      the top level of kvp2str - this extends the same treatment to an
+      empty array nested inside xCSV, without touching the genuinely
+      different case of a real empty-string element (HAC-069)
+    + fix: kvp2json_each/kvp2str_each both unconditionally coerced any
+      numeric-looking string value via looks_like_number($v) ? $v+0 : $v
+      - a leading-zero value like a US zip code "00501" silently became
+      501 in both JSON and form-urlencoded output. kvp2json_each now
+      only numifies when the round-trip is lossless (stringifying the
+      numified value reproduces the original exactly), so "5" still
+      becomes a real JSON number but "00501"/"5.0"/"+5" stay strings.
+      kvp2str_each's numification is removed entirely - a query string
+      has no separate number/string type, so it only ever risked
+      corrupting the original representation for no benefit (HAC-070)
+    + fix: kvp2str_each's BOOL branch ignored %options' no_key flag
+      entirely and always prefixed "$k=" onto its output, unlike the
+      scalar and ARRAY branches which respect it. A BOOL marker
+      (xTRUE/xFALSE) nested inside an xCSV(...) list is recursed into
+      with no_key => 1 like any other CSV element, but the leaked
+      prefix corrupted the comma-joined string - xCSV(6, 7, xTRUE(), 15)
+      encoded to "e=6,7,e=1,15" (a bogus embedded "e=") instead of
+      "e=6,7,1,15". Now respects no_key the same way the scalar branch
+      does (HAC-071)
+    + fix: kvp2json_each's HASH branch never passed the nested hash's
+      own key into %o, so a CODE-valued callback nested inside a hash
+      saw its *outer* field's key instead of its own - the same class
+      of bug HAC-064 fixed at the top level, one recursion level deeper,
+      in a case HAC-064's own test never reached (HAC-072)
+    + test: kvp2str_each's HASH branch already dies with a clear message
+      instead of recursing (a query string has no standard convention
+      for a nested hash, unlike kvp2json_each which recurses since JSON
+      has a native object type) - this was correct but undocumented and
+      untested, a third asymmetry alongside the two the METHODS POD
+      already called out (HAC-073)
+
+2026-08-18 - v1.13
+    + fix: kvp2str_each returned an empty string for a top-level
+      empty-arrayref-valued field instead of omitting it, and kvp2str's
+      caller loop pushed that empty string in among the other encoded
+      parts - { a => 1, tags => [], z => 9 } encoded to "a=1&&z=9" (a
+      stray double ampersand). Decoding that back through this module's
+      own kvp_response() produced a bogus '' => undef key and an
+      uninitialized-value warning - the same failure signature HAC-061
+      already fixed for a different trigger (an ARRAY nested inside
+      xCSV). An empty array is now omitted entirely, the same treatment
+      a key mapped to undef/missing already gets (HAC-065)
+    + fix: browser_id/timeout/ssl_verify are documented as plain
+      read-write attributes, but ua is lazy and memoized - built once,
+      on first use, from whatever those attributes were at the time.
+      Changing any of them after the first request was a silent no-op:
+      the underlying LWP::UserAgent's agent/timeout/ssl_opts never
+      updated, with no error or warning. send() now re-applies all
+      three to the existing ua object at the start of every call, each
+      guarded by a can() check so FakeUA and other minimal test doubles
+      aren't broken (HAC-066)
+    + fix: same class of bug as HAC-066, in the json attribute - lazy
+      and memoized, built once from whatever charset was set at the
+      time. Changing charset after the first JSON encode was a silent
+      no-op: an invalid charset no longer triggered HAC-046's documented
+      immediate die, and switching between two valid charsets had no
+      effect on the actual output bytes. kvp2json() now re-applies
+      charset to the existing json object at the start of every call
+      (HAC-067)
+    + fix: same class of bug as HAC-066/HAC-067, in retry_config - retry
+      is lazy and memoized from _build_retry, built once from whatever
+      retry_config was at the time send() first ran. Changing
+      retry_config after that first call was a silent no-op: send() kept
+      using the stale memoized retry count/delay/status on every later
+      call. send() now recomputes retry fresh from the current
+      retry_config at the start of every call (HAC-068)
+
+2026-08-18 - v1.12
+    + docs: DataTypeMarker.pm's DESCRIPTION and Client.pm's kvp2json POD
+      both claimed kvp2json_each special-cases xCSV the same way
+      kvp2str_each does. It doesn't - a CSV-blessed arrayref satisfies
+      Perl's reftype-based ARRAY check regardless of blessing, so it
+      falls through to the generic array branch and JSON-encodes as a
+      plain array (xCSV(1,2,3) becomes [1,2,3]), which is the natural
+      JSON representation anyway - form-urlencoded's one-key-per-element
+      problem that CSV's comma-join solves doesn't exist in JSON. Only
+      BOOL markers are genuinely special-cased by both encoders. Fixed
+      the docs to match the (correct) actual behavior rather than
+      changing working code to match an overclaim (HAC-063)
+    + fix: kvp2json() never passed a top-level field's own key into %o
+      for a CODE-valued field's callback, unlike kvp2str() which passes
+      key => $k - a callback nested inside JSON-encoded data couldn't
+      see its own key even though the identical callback could via the
+      form-urlencoded path. Same class of two-encoders-drift as
+      HAC-059/060/061, here in the callback mechanism rather than
+      array/CSV encoding (HAC-064)
+
+2026-08-18 - v1.11
+    + fix: kvp2json_each silently substituted U+FFFD replacement
+      characters into the JSON body for any data value that was raw
+      bytes but NOT valid UTF-8 (e.g. Latin-1 data from a legacy
+      file/DB), instead of erroring - now dies with a clear message
+      naming the raw bytes involved rather than silently corrupting the
+      value. The form-urlencoded encoder was never affected - only the
+      JSON path assumed all non-UTF8-flagged byte strings were valid
+      UTF-8 (HAC-055)
+    + docs: fixed 'enviornment' typo in ENVIRONMENT VARIABLES POD
+      (HAC-056)
+    + docs: documented that kvp2json_each's HAC-055 invalid-UTF8 die is
+      asymmetric with kvp2str_each, which has no such restriction for
+      the same input (HAC-057)
+    + test: added coverage for new_request()'s GET-with-wrong-content_type
+      die, previously reachable but never exercised by the suite. The
+      sibling die in convert_data() was already covered by
+      t/10_unsupported_content_type.t (HAC-058)
+    + fix: kvp2str_each double-escaped the key of any ARRAY-valued field
+      whose key contained a character uri_escape() touches (space, &, =,
+      %, non-ASCII) - { "a b" => ["x","y"] } produced "a%2520b=..."
+      instead of "a%20b=...", corrupting the outgoing query string. Caused
+      by the ARRAY (and CSV, though masked there by no_key short-
+      circuiting before it could surface) branch recursing with its own
+      already-escaped key instead of the raw one, so the next call's
+      unconditional escape ran twice. Existing tests never caught it
+      because none of their array/CSV-valued keys contained an escapable
+      character (HAC-059)
+    + fix: kvp_response() silently collapsed a repeated query-string key
+      to its last value - decoding "tags=a&tags=b&tags=c" (exactly the
+      shape kvp2str_each's ARRAY branch produces when encoding an
+      array-valued field) returned { tags => 'c' }, losing 'a' and 'b'
+      with no warning. Repeated keys now decode to an arrayref of every
+      value seen, in order; a singleton key still decodes to a plain
+      scalar, unchanged (HAC-060)
+    + fix: kvp2str_each double-ampersanded an ARRAY value nested inside
+      an xCSV(...) list - xCSV(6, 7, [13, 14], 15) encoded to
+      "e=6,7,15&&e=13&e=14" (double &). Decoding that back through this
+      module's own kvp_response() produced a bogus '' => undef key and
+      uninitialized-value warnings - a round-trip data-integrity bug.
+      t/05_kvp.t's existing expected-string literal had the double-&
+      baked in as "expected" rather than catching it (HAC-061)
+    + fix: retry_config set directly with only some keys (e.g. { delay =>
+      10 }) left the omitted keys undef instead of falling back to their
+      documented defaults - an omitted fail_response then hit send()'s
+      own safety-net default of 1, silently turning "0 retries" into 1,
+      and an omitted fail_status produced a spurious "Use of
+      uninitialized value" warning from split(). _build_retry now
+      defaults each key the same way the env-var path already did
+      (HAC-062)
+
 2026-08-18 - v1.10
     + docs: rewrote the USAGE section - the signed-request example (the
       module's stated reason to exist per DESCRIPTION) now leads instead

@@ -103,3 +103,28 @@ header(self, name)
     }
     OUTPUT:
         RETVAL
+
+# The response TRAILERS as a Fetch::Headers, or undef when the response
+# carried none - which is every HTTP/1 response and most HTTP/2 ones.
+#
+# Kept separate from headers() rather than merged: a trailer arrived AFTER the
+# body, and a consumer that cares about the difference has to be able to tell.
+# The case that needs them is gRPC, where the call status lives in the
+# trailers and nowhere else - a gRPC response is HTTP 200 whether it succeeded
+# or failed, so a client that cannot read them can only report success.
+SV *
+trailers(self)
+    SV *self
+    CODE:
+    {
+        HV  *hv = (HV *)SvRV(self);
+        SV **hp = hv_fetchs(hv, "trailers", 0);
+        SV  *h;
+        if (!(hp && *hp && SvROK(*hp))) XSRETURN_UNDEF;
+        h = *hp;
+        if (!SvOBJECT(SvRV(h)))
+            (void)sv_bless(h, gv_stashpv("Fetch::Headers", GV_ADD));
+        RETVAL = newSVsv(h);
+    }
+    OUTPUT:
+        RETVAL

@@ -443,10 +443,11 @@ subtest 'resolve_classification() constant return_type -> constant' => sub {
 	is($m->resolve_classification, 'constant', 'constant -> constant');
 };
 
-subtest 'resolve_classification() unrecognised return_type -> unknown' => sub {
+subtest 'resolve_classification() unrecognised return_type -> confess (invariant violation)' => sub {
 	my $m = _method();
 	$m->return_type('something_else');
-	is($m->resolve_classification, 'unknown', 'unrecognised type -> unknown');
+	throws_ok { $m->resolve_classification }
+		qr/invariant violation/, 'alien return_type bypassing resolve_return_type → confess fires';
 };
 
 subtest 'resolve_classification() triggers resolve_return_type when needed' => sub {

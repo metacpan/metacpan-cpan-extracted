@@ -30,8 +30,13 @@ is(Hyperman::_abi_selftest(), 1,
 # naming no connection); t/23-detach.t covers the success path live. It also
 # drives the v3 abuse controls (deny_check/add/remove and a fixed-window
 # ratelimit_hit) against the shared arena.
-is(Hyperman::_abi_version(), 3,
-   'ABI version 3 (v2 conn_detach, v3 denylist + rate limit)');
+is(Hyperman::_abi_version(), 4,
+   'ABI version 4 (v2 conn_detach, v3 denylist + rate limit, v4 worker start)');
+
+# v4 on_worker_start registers here; that it actually FIRES, once per worker
+# and after the fork, is t/33-worker-start.t, which needs a live server.
+is(Hyperman::_abi_worker_hook_install(), 1,
+   'v4 on_worker_start accepts a registration through the table');
 
 # Provider config: ExtUtils::Depends wrote Hyperman::Install::Files with an
 # include path, so a dependent's ExtUtils::Depends->new(..., 'Hyperman')

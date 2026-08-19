@@ -3,6 +3,10 @@ package App::Test::Generator;
 # TODO: Test validator from Params::Validate::Strict 0.16
 # TODO: $seed should be passed to Data::Random::String::Matches
 # TODO: positional args - when config_undef is set, see what happens when not all args are given
+# TODO: The Dup and TER1/2/3 columns should be moved from the Mutation table
+#	to a new table called Metrics.  Add Halstead and McCabes metrics to
+#	this new Metrics table.  Include links to the definitions of TER1/2/3,
+#	Halstead and McCabes metrics, perhaps from Wikipedia
 
 use 5.036;
 
@@ -14,7 +18,7 @@ use utf8;
 use open qw(:std :encoding(UTF-8));
 
 use App::Test::Generator::Template;
-use Carp qw(carp croak);
+use Carp qw(carp croak confess);
 use Config::Abstraction 0.36;
 use Data::Dumper;
 use Data::Section::Simple;
@@ -34,14 +38,16 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
-use constant {
-	DEFAULT_ITERATIONS => 30,
-	DEFAULT_PROPERTY_TRIALS => 1000
-};
+Readonly my $DEFAULT_ITERATIONS      => 30;
+Readonly my $DEFAULT_PROPERTY_TRIALS => 1000;
 
-use constant CONFIG_TYPES => ('test_nuls', 'test_undef', 'test_empty', 'test_non_ascii', 'dedup', 'properties', 'close_stdin', 'test_security', 'timeout');
+# Hash for O(1) lookup rather than a list needing grep O(n)
+Readonly my %VALID_CONFIG_KEYS => map { $_ => 1 } qw(
+	test_nuls test_undef test_empty test_non_ascii
+	dedup properties close_stdin test_security timeout
+);
 
 # --------------------------------------------------
 # Delimiter pairs tried in order when wrapping a
@@ -153,7 +159,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 =head1 VERSION
 
-Version 0.45
+Version 0.46
 
 =head1 SYNOPSIS
 
@@ -215,14 +221,15 @@ From Perl:
     output_dir => '/tmp',
   );
   my $schemas = $extractor->extract_all();
+  use File::Temp qw(tempfile);
   foreach my $schema(keys %{$schemas}) {
-    my $tempfile = '/var/tmp/foo.t';	# Use File::Temp in real life
+    my ($fh, $tempfile) = tempfile(SUFFIX => '.t', UNLINK => 1);
+    close $fh;
     App::Test::Generator->generate(
       schema => $schemas->{$schema},
       output_file => $tempfile,
     );
-    system("$^X -Ilib $tempfile");
-    unlink $tempfile;
+    system($^X, '-Ilib', $tempfile);
   }
 
 =head1 OVERVIEW
@@ -1710,7 +1717,7 @@ sub generate
 	# hook installed into the DB:: package regardless of its source
 	# package) are legitimate function names, not just bare identifiers
 	_assert_identifier($function, 'function', package => 1);
-	$iterations ||= DEFAULT_ITERATIONS;		 # default fuzz runs if not specified
+	$iterations ||= $DEFAULT_ITERATIONS;		 # default fuzz runs if not specified
 	$seed = undef if defined $seed && $seed eq '';	# treat empty as undef
 
 	# --- YAML corpus support (yaml_cases is filename string) ---
@@ -1959,14 +1966,16 @@ sub generate
 		my $type = $accessor{type};
 
 		if(!defined($new)) {
-			croak("BUG: $property: accessor $type can only work on an object, incorrectly tagged as $type");
+			# Internal invariant — schema has a contradictory accessor+type combination;
+			# confess gives the full call chain to aid debugging
+			confess("invariant violation: $property: accessor $type can only work on an object, incorrectly tagged as $type");
 		}
 		if($type eq 'getset') {
 			if(scalar(keys %input) != 1) {
-				croak("BUG: $property: getset must take one input argument, incorrectly tagged as getset");
+				confess("invariant violation: $property: getset must take one input argument, incorrectly tagged as getset");
 			}
 			if(scalar(keys %output) == 0) {
-				croak("BUG: $property: getset must give one output, incorrectly tagged as getset");
+				confess("invariant violation: $property: getset must give one output, incorrectly tagged as getset");
 			}
 		}
 	}
@@ -2191,7 +2200,7 @@ sub generate
 		iterations_code => int($iterations),
 		use_properties => $use_properties,
 		transform_properties_code => $transform_properties_code,
-		property_trials => $config{properties}{trials} // DEFAULT_PROPERTY_TRIALS,
+		property_trials => $config{properties}{trials} // $DEFAULT_PROPERTY_TRIALS,
 		relationships_code => $relationships_code,
 		module => $module
 	};
@@ -2446,9 +2455,9 @@ sub _validate_config {
 	# Validate any nested config sub-hash keys against known types
 	if(ref($schema->{config}) eq 'HASH') {
 		for my $k (keys %{$schema->{'config'}}) {
-			# CONFIG_TYPES is the authoritative list of valid keys
+			# %VALID_CONFIG_KEYS is the authoritative set — O(1) hash lookup
 			croak "unknown config setting '$k'"
-				unless grep { $_ eq $k } CONFIG_TYPES;
+				unless $VALID_CONFIG_KEYS{$k};
 		}
 	}
 }
@@ -2681,7 +2690,7 @@ sub _validate_transform_properties {
 sub _normalize_config {
 	my $config = $_[0];
 
-	for my $field (CONFIG_TYPES) {
+	for my $field (keys %VALID_CONFIG_KEYS) {
 		# Non-boolean fields are handled separately
 		next if $field eq $CONFIG_PROPERTIES_KEY;
 		next if $field eq 'timeout';	# numeric, not boolean; absence means use generated-test default
@@ -2860,8 +2869,8 @@ sub _validate_module {
 	my $verbose = $ENV{$ENV_TEST_VERBOSE} || $ENV{$ENV_GENERATOR_VERBOSE};
 
 	if($verbose) {
-		print STDERR "Found module '$module' at: $mod_info->{'file'}\n",
-			'  Version: ', ($mod_info->{'version'} || 'unknown'), "\n";
+		carp "Found module '$module' at: $mod_info->{'file'} " .
+			'(version ' . ($mod_info->{'version'} || 'unknown') . ')';
 	}
 
 	# Optional load validation — disabled by default because
@@ -2881,7 +2890,7 @@ sub _validate_module {
 		}
 
 		if($verbose) {
-			print STDERR "Successfully loaded module '$module'\n";
+			carp "Successfully loaded module '$module'";
 		}
 	}
 
@@ -3629,7 +3638,7 @@ sub _generate_transform_properties {
 			property_checks  => $property_checks,
 			should_die       => $should_die,
 			should_warn      => $should_warn,
-			trials           => $config->{'properties'}{'trials'} // DEFAULT_PROPERTY_TRIALS,
+			trials           => $config->{'properties'}{'trials'} // $DEFAULT_PROPERTY_TRIALS,
 		};
 	}
 
@@ -3685,9 +3694,7 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'Valid email addresses',
-		},
-
-		url => {
+		}, url => {
 			code => q{
 				Gen {
 					my @schemes = qw(http https);
@@ -3701,9 +3708,7 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'Valid HTTP/HTTPS URLs',
-		},
-
-		uuid => {
+		}, uuid => {
 			code => q{
 				Gen {
 					require UUID::Tiny;
@@ -3711,9 +3716,7 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'Valid UUIDv4 identifiers',
-		},
-
-		phone_us => {
+		}, phone_us => {
 			code => q{
 				Gen {
 					my $area = 200 + int(rand(800));
@@ -3723,9 +3726,7 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'US phone numbers (XXX-XXX-XXXX format)',
-		},
-
-		phone_e164 => {
+		}, phone_e164 => {
 			code => q{
 				Gen {
 					my $country = 1 + int(rand(999));
@@ -3735,27 +3736,21 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'E.164 international phone numbers',
-		},
-
-		ipv4 => {
+		}, ipv4 => {
 			code => q{
 				Gen {
 					join('.', map { int(rand(256)) } 1..4);
 				}
 			},
 			description => 'IPv4 addresses',
-		},
-
-		ipv6 => {
+		}, ipv6 => {
 			code => q{
 				Gen {
 					join(':', map { sprintf('%04x', int(rand(0x10000))) } 1..8);
 				}
 			},
 			description => 'IPv6 addresses',
-		},
-
-		username => {
+		}, username => {
 			code => q{
 				Gen {
 					my $len = 3 + int(rand(13));
@@ -3765,9 +3760,7 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'Valid usernames (alphanumeric with _ and -)',
-		},
-
-		slug => {
+		}, slug => {
 			code => q{
 				Gen {
 					my @words = qw(quick brown fox jumps over lazy dog hello world test data);
@@ -3776,18 +3769,14 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'URL slugs (lowercase words separated by hyphens)',
-		},
-
-		hex_color => {
+		}, hex_color => {
 			code => q{
 				Gen {
 					sprintf('#%06x', int(rand(0x1000000)));
 				}
 			},
 			description => 'Hex color codes (#RRGGBB)',
-		},
-
-		iso_date => {
+		}, iso_date => {
 			code => q{
 				Gen {
 					my $year = 2000 + int(rand(25));
@@ -3798,7 +3787,6 @@ sub _get_semantic_generators {
 			},
 			description => 'ISO 8601 date format (YYYY-MM-DD)',
 		},
-
 		iso_datetime => {
 			code => q{
 				Gen {
@@ -3813,9 +3801,7 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'ISO 8601 datetime format (YYYY-MM-DDTHH:MM:SSZ)',
-		},
-
-		semver => {
+		}, semver => {
 			code => q{
 				Gen {
 					my $major = int(rand(10));
@@ -3825,9 +3811,7 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'Semantic version strings (major.minor.patch)',
-		},
-
-		jwt => {
+		}, jwt => {
 			code => q{
 				Gen {
 					my @chars = ('A'..'Z', 'a'..'z', '0'..'9', '-', '_');
@@ -3838,9 +3822,7 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'JWT-like tokens (base64url format)',
-		},
-
-		json => {
+		}, json => {
 			code => q{
 				Gen {
 					my @keys = qw(id name value status count);
@@ -3850,9 +3832,7 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'Simple JSON objects',
-		},
-
-		base64 => {
+		}, base64 => {
 			code => q{
 				Gen {
 					my @chars = ('A'..'Z', 'a'..'z', '0'..'9', '+', '/');
@@ -3863,27 +3843,21 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'Base64-encoded strings',
-		},
-
-		md5 => {
+		}, md5 => {
 			code => q{
 				Gen {
 					join('', map { sprintf('%x', int(rand(16))) } 1..32);
 				}
 			},
 			description => 'MD5 hashes (32 hex characters)',
-		},
-
-		sha256 => {
+		}, sha256 => {
 			code => q{
 				Gen {
 					join('', map { sprintf('%x', int(rand(16))) } 1..64);
 				}
 			},
 			description => 'SHA-256 hashes (64 hex characters)',
-		},
-
-		unix_timestamp => {
+		}, unix_timestamp => {
 			code => q{
 				Gen {
 					time;
@@ -3948,27 +3922,21 @@ sub _get_builtin_properties {
 				return "do { my \$tmp = $call_code; \$result eq \$tmp }";
 			},
 			applicable_to => ['all'],
-		},
-
-		non_negative => {
+		}, non_negative => {
 			description   => 'Result is always non-negative',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				return '$result >= 0';
 			},
 			applicable_to => ['number', 'integer', 'float'],
-		},
-
-		positive => {
+		}, positive => {
 			description   => 'Result is always positive (> 0)',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				return '$result > 0';
 			},
 			applicable_to => ['number', 'integer', 'float'],
-		},
-
-		non_empty => {
+		}, non_empty => {
 			description   => 'Result is never empty',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;

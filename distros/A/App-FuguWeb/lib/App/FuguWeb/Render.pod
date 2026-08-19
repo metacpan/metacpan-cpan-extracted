@@ -1,0 +1,126 @@
+=head1 NAME
+
+App::FuguWeb::Render - the three external renderers
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Render;
+
+    my $render = App::FuguWeb::Render->new(config => $config);
+
+    my $missing = $render->probe;       # a tool that is not installed
+    $render->lint(@mdoc_sources)        or die "a manual is malformed\n";
+
+    my $html = $render->markdown('INSTALL.md');
+    my $man  = $render->mdoc('Fugu::Daemon.3p', "$out/.man");
+    my $pod  = $render->pod($path, 'Fugu::Daemon', '2026-08-04');
+
+=head1 DESCRIPTION
+
+The tool renders no format itself. C<mandoc> turns mdoc(7) into HTML,
+C<lowdown> turns Markdown into HTML, and C<pod2man> turns POD into mdoc
+for C<mandoc> to finish. Each one is a mature program that reads a
+format this project already writes; a Perl reimplementation would be a
+second, worse one.
+
+Every method returns the output as bytes, or C<undef> with a message in
+the log.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguWeb::Render->new(
+        config  => $config,     # required
+        log     => $logger,     # default: Fugu::Log->default
+        mandoc  => $program,    # default: mandoc
+        lowdown => $program,    # default: lowdown
+        pod2man => $program,    # default: pod2man
+    )
+
+The tool names are overridable, so a caller can name another binary and
+a test can name one that is not there.
+
+=head2 probe
+
+The name of the first renderer that is not on the path, or C<undef> when
+all three are there. The caller reports the name and exits with
+C<EXIT_TOOL_MISSING>, so an operator learns which package to install and
+not that "the build failed".
+
+=head2 lint
+
+    $render->lint(@paths)
+
+Run C<mandoc -Tlint -W warning> over every mdoc source. The method
+returns true when every page is clean, and C<undef> with the diagnostics
+in the log otherwise. A malformed page must fail the build, not render
+badly.
+
+=head2 markdown
+
+    $render->markdown($path)
+
+Render one Markdown file into an HTML body fragment, with
+C<lowdown -Thtml>.
+
+=head2 mdoc
+
+    $render->mdoc($file, $dir)
+
+Render one staged mdoc source into an HTML body fragment. The child runs
+in C<$dir>, through the C<cwd> option of L<Fugu::Process/run>.
+
+C<mandoc> decides between a local link and a link to the manual host by
+looking for a file named C<%N.%S> in its working directory. That is why
+L<App::FuguWeb::Site> stages every source in one directory under its
+L<App::FuguWeb::Manual/staged_name>, and why the child has to start
+there.
+
+=head2 pod
+
+    $render->pod($path, $name, $date)
+
+Render one POD sidecar into an HTML body fragment. C<pod2man> writes
+mdoc, and C<mandoc> finishes the job, so a module page carries the same
+chrome as a hand-written manual.
+
+C<$date> comes from the caller and never from the file time: git does not
+preserve file times, so a build that read one would give different bytes
+on every checkout. L<App::FuguWeb::Site/pod_date> supplies it.
+
+C<pod2man> reports a malformed directive on standard error and still
+writes the page. The page is what the site needs, so a diagnostic is a
+warning and only empty output is fatal.
+
+Note that C<pod2man> renders C<< L<Some::Module> >> as italic text, not
+as a link. POD pages therefore cross-reference as plain text while mdoc
+pages link. Making it work would mean post-processing the HTML of
+C<mandoc>.
+
+The C<--center> and C<--release> values are the C<POD_CENTER> and
+C<POD_RELEASE> constants. They are constants and not settings: they
+pin the C<pod2man> output so the site does not vary with the build
+host. Without them, C<pod2man> writes its own center text and the perl
+version of the machine that built the site.
+
+=head2 html_options
+
+The C<mandoc> options that every page shares.
+
+C<-I os=> pins the footer, which otherwise names the operating system of
+the build host, and the site would then vary with the machine that built
+it.
+
+The C<./> in the C<man=> template matters. A module page is named
+F<Fugu::Daemon.3p.html>, and a browser reads a relative URL whose first
+segment holds a colon as a scheme.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb>, L<App::FuguWeb::Site>, L<Fugu::Process>, mandoc(1),
+lowdown(1), L<pod2man>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

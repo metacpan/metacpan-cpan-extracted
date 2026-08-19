@@ -15,6 +15,8 @@ sub cmd_models {
 ########################################################################
   my ($self) = @_;
 
+  $self->_load_ASCIITable;
+
   my ($api_key) = $self->get_args;
 
   my $llm = $self->_check_llm($api_key);
@@ -28,8 +30,6 @@ sub cmd_models {
 sub _show_models {
 ########################################################################
   my ( $self, $models ) = @_;
-
-  require Text::ASCIITable;
 
   if ( !$models || !%{$models} ) {
     print {*STDOUT} "No models available.\n\n";

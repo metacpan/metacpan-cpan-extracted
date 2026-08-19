@@ -2,12 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN {
-    plan tests => 6;
-}
-
 use PDL::LiteF;
-use PDL::NiceSlice;
 use PDL::DSP::Fir qw( firwin ir_sinc spectral_reverse spectral_inverse );
 use PDL::Core qw( topdl );
 
@@ -37,4 +32,4 @@ $data = ir_sinc(.5,21);
 ok(tapprox( $data , spectral_inverse(spectral_inverse($data)), 1e-15));
 ok(tapprox( $data , spectral_reverse(spectral_reverse($data)), 1e-15));
 
-
+done_testing;

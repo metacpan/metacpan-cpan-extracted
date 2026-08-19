@@ -2,7 +2,7 @@
 #-*- mode: sh; -*-
 # modulino invocation
 
-MODULINO_WRAPPER=CPAN::Maker
+MODULINO_WRAPPER=cpan-maker
 MODULE_NAME=CPAN::Maker
 MODULE_PATH=$(MODULE_PATH="${MODULE_NAME//:://}.pm" perl -M$MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};')
 

@@ -1,5 +1,16 @@
 Revision history for MooX-PDL-Role-Proxy
 
+0.08      2026-08-18 18:17:35 EDT
+
+  [BUGFIX]
+
+    * if an attribute was tagged with both piddle and ndarray,
+      it was returned twice by the _ndarrays method.
+
+  [ADMIN]
+
+    * fiducial repo is now on codeberg.org
+
 0.07      2021-09-03 13:21:51-04:00 America/New_York
 
   [ENHANCEMENTS]

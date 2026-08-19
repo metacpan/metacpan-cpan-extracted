@@ -24,7 +24,7 @@ use strict;
 use warnings;
 
 use Test::Most;
-use Test::Returns;
+use Test::Needs;
 use Test::Mockingbird 0.08;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
@@ -186,7 +186,6 @@ subtest '\@_ single-element inner array + $default defined -> scalar-or-arrayref
 
 	is_deeply($result, { key => 'hello' },
 		'\@_ single scalar element wrapped under $default key');
-	returns_ok($result, { type => 'hashref' }, 'return type: hashref');
 
 	diag 'from_arrayref=1, num_args=1, arg is scalar -> one-arg defined-default branch'
 		if $ENV{TEST_VERBOSE};
@@ -214,7 +213,6 @@ subtest '\@_ 2-element (even), no $default, arg[1] is plain scalar -> named-pair
 
 	is_deeply($result, { a => 'b' },
 		'\@_ 2-element even-no-default: processed as named pairs');
-	returns_ok($result, { type => 'hashref' }, 'return type: hashref');
 
 	diag 'from_arrayref=1, no $default, 2 plain scalars -> even-length named-pair path'
 		if $ENV{TEST_VERBOSE};
@@ -373,6 +371,9 @@ subtest 'croak message: caller function name interpolated from caller(1)[3]' => 
 # =========================================================================
 
 subtest 'Return::Set: all new success paths return hashref' => sub {
+	test_needs 'Test::Returns';
+	Test::Returns->import();
+
 	my @cases = (
 		[ 'shorthand undef-val',       get_params('f', ['f', undef])           ],
 		[ 'shorthand numeric-0-val',   get_params('n', ['n', 0])               ],

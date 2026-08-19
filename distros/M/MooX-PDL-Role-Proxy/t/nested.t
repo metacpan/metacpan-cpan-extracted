@@ -91,11 +91,7 @@ subtest 'copy' => sub {
     for my $c ( 'c1', 'c2' ) {
 
         subtest $c => sub {
-            isnt(
-                refaddr( $new->$c ),
-                refaddr( $orig->$c ),
-                "same object not returned"
-            );
+            isnt( refaddr( $new->$c ), refaddr( $orig->$c ), "same object not returned" );
 
             for my $p ( 'p1', 'p2' ) {
 

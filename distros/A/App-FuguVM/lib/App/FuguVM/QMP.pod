@@ -1,0 +1,72 @@
+=head1 NAME
+
+App::FuguVM::QMP - the QEMU Machine Protocol command set
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::QMP;
+
+    my $qmp = App::FuguVM::QMP->new('/path/to/qmp.sock');
+    $qmp->open_connection or die "QEMU is not listening\n";
+
+    if ($qmp->is_running) {
+        $qmp->powerdown;
+    }
+
+    $qmp->disconnect;
+
+=head1 DESCRIPTION
+
+QEMU serves a machine-protocol socket that answers questions about the
+guest and takes lifecycle commands. The transport is
+L<Fugu::JSONSocket>: one JSON object for each line, with a
+wall-clock deadline on every read. This module holds only the command
+set.
+
+QMP sends a greeting and then refuses every command until
+C<qmp_capabilities> succeeds. C<open_connection> does both.
+
+=head1 METHODS
+
+=head2 new
+
+C<new> takes the socket path and opens nothing.
+
+=head2 open_connection, disconnect
+
+C<open_connection> connects, reads the greeting and negotiates
+capabilities. It returns 1 on success and 0 on failure. A second call
+on an open connection is a success that does nothing.
+
+=head2 run_command
+
+    $qmp->run_command($command, \%arguments)
+
+Run one command and return the whole reply, so a caller can tell an
+error reply from a missing one.
+
+=head2 query_status, is_running
+
+C<query_status> returns a hash reference with C<running> and C<status>,
+or C<undef> when QEMU answered with an error. C<is_running> reduces
+that to 1 or 0.
+
+=head2 powerdown, quit
+
+C<powerdown> asks the guest to shut down through the ACPI power
+button. C<quit> stops the QEMU process at once and closes the
+connection.
+
+=head1 CAVEATS
+
+An error reply is not an answer. Every method here tells the two
+apart, because a caller that reads an error as "not running" would
+stop a VM that is up.
+
+=head1 SEE ALSO
+
+L<Fugu::JSONSocket>, L<App::FuguVM::Guest>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

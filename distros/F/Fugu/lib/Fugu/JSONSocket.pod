@@ -1,0 +1,169 @@
+=head1 NAME
+
+Fugu::JSONSocket - newline-delimited JSON over a UNIX socket
+
+=head1 SYNOPSIS
+
+    use Fugu::JSONSocket;
+
+    my $client = Fugu::JSONSocket->new(
+        path     => '/tmp/qmp.sock',
+        timeout  => 10,
+        greeting => 1,
+    );
+
+    $client->connect or die $client->error . "\n";
+
+    my $reply = $client->request({ execute => 'query-status' });
+
+    $client->disconnect;
+
+=head1 DESCRIPTION
+
+B<Fugu::JSONSocket> is a client for a protocol of one JSON object for
+each line, in both directions. qemu(1) speaks this on its
+machine-protocol and guest-agent sockets, and so does every other
+program that wanted a protocol without inventing a framing.
+
+The codec is L<JSON::PP>, which is core Perl. Thus a program that
+only talks to a local socket needs nothing installed.
+
+Every read has a wall-clock deadline. The C<Timeout> of L<IO::Socket>
+governs its own connect and accept only, so a bare C<readline> blocks
+for ever against a peer that stopped answering on an open socket.
+
+Bytes after a newline stay buffered. Thus a reply that shares a
+segment with the one after it is not lost.
+
+=head2 new
+
+C<new(%args)> creates a client. The method does not open the socket.
+Call C<connect>.
+
+These are the arguments:
+
+=over 4
+
+=item C<path>
+
+The UNIX socket. This argument is necessary.
+
+=item C<timeout>
+
+The deadline for one read, in seconds. The default is 10.
+
+=item C<greeting>
+
+Read one line at connect. A protocol that announces itself before it
+takes a command sets this. Then C<connect> reads that line and
+C<greeting> returns it. The default is off.
+
+=back
+
+=head2 connect
+
+C<connect> opens the socket, and reads the greeting when the caller
+asked for one. A second call on an open connection is a success that
+does nothing.
+
+=head2 disconnect
+
+C<disconnect> closes the socket and drops the buffer. The method is
+idempotent.
+
+=head2 request
+
+C<request($hashref)> encodes, sends, and reads one reply.
+
+=head2 send_message
+
+C<send_message($hashref)> encodes and writes one message with its
+newline. Use this, and then C<read_message>, for a protocol whose
+replies do not pair one to one with its requests.
+
+=head2 read_message
+
+C<read_message> reads one line and decodes it.
+
+=head2 read_line
+
+C<read_line> reads one line without its terminator, and does not
+decode it.
+
+=head2 is_connected
+
+C<is_connected> reports if the socket is open.
+
+=head2 exists
+
+C<exists> reports if the socket file is there. A peer that has not
+started is not an error, so a caller can test before it connects.
+
+=head2 greeting
+
+C<greeting> returns the decoded greeting, for a connection that asked
+for one. It is C<undef> otherwise.
+
+=head2 path
+
+C<path> returns the socket path.
+
+=head2 error
+
+C<error> returns the most recent failure.
+
+=head1 RETURN VALUES
+
+C<connect> and C<send_message> return 1 on success and C<undef> on
+failure.
+
+C<request> and C<read_message> return the decoded value, or C<undef>.
+C<read_line> returns a string, or C<undef>. Every failure puts its
+reason in C<error>.
+
+C<disconnect> returns the object. C<is_connected> and C<exists>
+return 1 or 0.
+
+=head1 EXAMPLES
+
+This example builds a command set over the client:
+
+    sub query_status ($self)
+    {
+        my $reply = $self->{socket}->request({ execute => 'query-status' });
+        return if !defined $reply || exists $reply->{error};
+        return $reply->{return};
+    }
+
+=head1 ERRORS
+
+C<new> dies when C<path> is absent or empty. That is a programming
+error.
+
+No other method dies. A missing socket, a peer that closed the
+connection, a timeout, and a line that is not JSON all report through
+the return value and C<error>.
+
+A write error and an end of file both close the connection. A later
+call reports "not connected" until the caller connects again.
+
+=head1 SEE ALSO
+
+L<Fugu::Imsg>, L<IO::Socket::UNIX>, L<JSON::PP>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+The module is a client. It does not listen and does not accept.
+
+A reply must be one line. A peer that pretty-prints its JSON across
+several lines does not work with this module, and no such peer exists
+among the protocols it was written for.
+
+The timeout bounds one read. A reply that arrives in pieces resets
+nothing: the deadline covers the whole line.
+
+=cut

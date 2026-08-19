@@ -76,6 +76,7 @@ typedef struct ft_conn {
     size_t        hdr_end;     /* offset just past the \r\n\r\n   */
     int           status;
     AV           *headers;     /* [k,v,k,v,...] */
+    AV           *trailers;    /* [k,v,...] from a SECOND HEADERS frame (h2) */
     long          content_len; /* -1 = until close */
     int           want_close;  /* Connection: close */
     /* chunked transfer decoding */
@@ -198,6 +199,7 @@ static void ft_conn_free(pTHX_ ft_conn *c) {
     if (c->future)       SvREFCNT_dec(c->future);
     if (c->watcher)      SvREFCNT_dec(c->watcher);
     if (c->headers)      SvREFCNT_dec(c->headers);
+    if (c->trailers)     SvREFCNT_dec(c->trailers);
     if (c->rq_method)    SvREFCNT_dec(c->rq_method);
     if (c->rq_scheme)    SvREFCNT_dec(c->rq_scheme);
     if (c->rq_authority) SvREFCNT_dec(c->rq_authority);
@@ -291,6 +293,7 @@ static void ft_conn_park(pTHX_ ft_conn *c) {
     if (c->on_headers) { SvREFCNT_dec(c->on_headers); c->on_headers = NULL; }
     c->headers_fired = 0;
     if (c->headers) { SvREFCNT_dec(c->headers); c->headers = NULL; }
+    if (c->trailers) { SvREFCNT_dec(c->trailers); c->trailers = NULL; }
     c->rlen = 0; c->have_headers = 0; c->hdr_end = 0; c->status = 0;
     c->content_len = -1; c->want_close = 0; c->chunked = 0;
     c->cpos = 0; c->chunk_left = 0; c->chunk_done = 0;
@@ -313,6 +316,11 @@ static void ft_conn_finish(pTHX_ ft_conn *c) {
     (void)hv_stores(resp, "status",  newSViv(c->status));
     (void)hv_stores(resp, "headers",
         c->headers ? newRV_inc((SV *)c->headers) : newRV_noinc((SV *)newAV()));
+    /* Only when there were any: an HTTP/1 response has no trailers and should
+     * not grow an empty key, and a consumer can tell "none were sent" from
+     * "none were captured" by the absence. */
+    if (c->trailers)
+        (void)hv_stores(resp, "trailers", newRV_inc((SV *)c->trailers));
     (void)hv_stores(resp, "content", body);
     if (c->simple) {
         rv = newRV_noinc((SV *)resp);        /* raw hash: no bless, no methods */

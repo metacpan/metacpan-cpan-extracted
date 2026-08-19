@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 use File::Raw::JSON ();   # JSON encode/decode via its C ABI (ft_json.h / _abi_ptr)
 
@@ -29,7 +29,7 @@ Fetch - HTTP/2 Future-based user agent
 
 =head1 VERSION
 
-Version 0.13
+Version 0.15
 
 =head1 SYNOPSIS
 
@@ -286,6 +286,79 @@ The event-loop adapter this agent runs on.
 
 The L<Fetch::CookieJar> in use, or undef.
 
+=head1 OBSERVING OUTBOUND REQUESTS
+
+=head2 Fetch->on_request(\&start, \&done)
+
+Watch every request this B<process> makes, including ones it did not write.
+
+    Fetch->on_request(
+        sub {
+            my ($method, $url, $headers) = @_;
+            push @$headers, traceparent => current_span_id();
+            return { at => time, url => $url };        # the token
+        },
+        sub {
+            my ($token, $res, $err) = @_;
+            record($token->{url}, time - $token->{at},
+                   $err ? "failed: $err" : $res->status);
+        },
+    );
+
+C<start> fires just before a request goes out, with the merged header list
+still B<mutable>: push a name and a value onto C<$headers> and the request
+carries them. That is the point of the hook - L</REQUEST OPTIONS>' own
+C<headers> is set by whoever made the call, which is no use to a tracing
+layer that has to annotate a request the application wrote.
+
+Whatever C<start> returns is the B<token>, handed back to C<done> when that
+same request settles. It is an ordinary Perl scalar - a hashref of what you
+want to remember is the usual thing - so the two halves correlate without a
+lookup table keyed on something that might repeat.
+
+C<done> fires exactly once for every C<start>, with exactly one of C<$res>
+(a L<Fetch::Response>) and C<$err> (the failure message). That includes a
+timeout, a refused connection and a DNS failure, which are the endings an
+instrumented client most wants and the easiest to leak. C<done> is optional.
+
+Three things to know, all of which are the contract rather than an oversight:
+
+=over 4
+
+=item *
+
+B<Per hop, not per call.> A redirect chain is several requests, each of which
+went somewhere, and each is observed. One C<< ->get >> that follows two
+redirects fires C<start> three times.
+
+=item *
+
+B<Registration is process-global and permanent.> Not per agent: an agent is a
+per-worker object and a process may hold several, while an observer is a
+property of the process. There is no deregistration, so register at boot -
+and note that the callbacks (and everything they close over) live as long as
+the process does.
+
+=item *
+
+B<A death is warned, not propagated.> An observer is a bystander, and a
+broken bystander must not be able to fail the request it was watching. If
+either callback dies, the death becomes a warning naming which half it came
+from, and the request carries on - without whatever the callback had not yet
+done, such as the header it died before pushing.
+
+=back
+
+Returns 1, or 0 when the observer table is full (C<FETCH_ABI_MAX_OBSERVERS>,
+8). Croaks if the callbacks are not code references, at registration, where
+the mistake is.
+
+This costs one Perl call per hop, paid only by a process that asked for it: a
+request with no observer registered pays a single branch. Where that is too
+much - a proxy or a server instrumenting every request it forwards - the same
+registry takes C function pointers through the C ABI's L</The table>
+C<on_request>, which is the same contract with no Perl on the path.
+
 =head1 THE RESULT
 
 Awaiting a request future yields a L<Fetch::Response> with C<status>,
@@ -432,6 +505,39 @@ connection).
 C<tunnel_close(conn)> - shut the connection down and free the handle.
 
 =back
+
+=item C<on_request(start, done, ud)>  I<(v2)>
+
+Observe outbound requests.
+
+    static void *start(pTHX_ const char *method, STRLEN mlen,
+                       const char *url, STRLEN ulen, AV *headers, void *ud);
+    static void  done(pTHX_ void *token, SV *res, SV *err, void *ud);
+
+C<start> fires once per B<hop> with the merged header list still B<mutable> -
+push a name and a value onto C<headers> and the request carries them. That is
+what the hook is for: L</REQUEST OPTIONS>' C<headers> is set by the caller,
+which is no use to anything that wants to annotate a request the application
+wrote. It returns an opaque token, handed back to C<done> when that same hop
+settles, so the two correlate with no lookup table on the hot path.
+
+C<done> fires exactly once for every C<start>, with exactly one of C<res> and
+C<err> - including a timeout, a refused connection and a DNS failure. Both are
+borrowed.
+
+Per hop, not per call: a redirect chain is several requests, each of which went
+somewhere, and anything measuring them should see all of them.
+
+Registration is process-global, not per agent, and there is no deregistration;
+register at boot. Neither callback may croak. Returns 1, or 0 when the table is
+full (C<FETCH_ABI_MAX_OBSERVERS>). A request with no observer registered pays
+one branch and allocates nothing.
+
+L</Fetch-E<gt>on_request(\&start, \&done)> is the same registry reached from
+Perl, for a consumer that is not an XS module: it registers a pair of shims
+holding coderefs. Same contract, one Perl call per hop instead of none, and
+the one rule C could state and Perl cannot enforce - "neither may croak" -
+becomes "a death is warned and the request carries on".
 
 =back
 

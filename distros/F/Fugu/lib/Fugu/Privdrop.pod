@@ -1,0 +1,183 @@
+=head1 NAME
+
+Fugu::Privdrop - permanent drop of root privileges
+
+=head1 SYNOPSIS
+
+    use Fugu::Privdrop;
+
+    Fugu::Privdrop->prepare_statedir(
+        path => '/var/run/myapp',
+        user => '_myapp',
+    );
+    Fugu::Privdrop->drop_privileges(user => '_myapp');
+
+=head1 DESCRIPTION
+
+Fugu::Privdrop does the privilege drop that an OpenBSD daemon does
+when its privileged work is complete. The daemon binds the reserved
+port and prepares the state it must own. Then the daemon gives up root
+permanently and runs the event loop as an unprivileged user.
+
+The module keeps no state and has two class methods.
+
+=head2 prepare_statedir
+
+C<prepare_statedir(%args)> creates the state directory when it is
+absent, sets its mode, and gives it and the files inside to the
+unprivileged user. Root runs this before the drop.
+
+The create step is not a first-install special case. OpenBSD clears
+F</var/run> at every boot, so a daemon with a state directory there
+finds it absent on each start.
+
+These are the arguments:
+
+=over 4
+
+=item C<path>
+
+The state directory. This argument is necessary.
+
+=item C<user>
+
+The name of the user that owns the directory after the call. This
+argument is necessary.
+
+=item C<group>
+
+The name of the group. If you omit it, the method uses the user's
+primary group.
+
+=item C<mode>
+
+The directory mode. The default is 0700.
+
+=item C<on_warn>
+
+A code reference that the method calls with a message for each
+problem. A file inside the directory that stays unchanged is a
+warning, not a failure: the daemon may never need that file.
+
+=back
+
+=head2 drop_privileges
+
+C<drop_privileges(%args)> switches the process to the given user and
+group. It then makes sure that the process cannot get root again.
+
+These are the arguments:
+
+=over 4
+
+=item C<user>
+
+The name of the user to become. This argument is necessary.
+
+=item C<group>
+
+The name of the group to become. This argument is optional. If you
+omit it, the method uses the user's primary group.
+
+=item C<keep_groups>
+
+Keep the supplementary groups that the process inherits from root. The
+default is 0, which reduces the group list to the one group. On
+OpenBSD, a value of 1 is how a daemon keeps access to the mdnsd(8)
+socket after it drops to its own user.
+
+=back
+
+If the effective user ID is not 0, the method returns immediately.
+Thus a program that is already unprivileged can call it in all cases.
+In the other case, the method resolves the user and the group. It
+calls setgid(2), then sets the supplementary groups with
+setgroups(2), then calls setuid(2), and sets the real and effective
+IDs. Then it makes sure that the two IDs are not 0. It also makes sure
+that a call to setuid(2) with 0 does not bring root back.
+
+=head1 RETURN VALUES
+
+C<prepare_statedir()> returns 1 on success. It returns C<undef> when
+the directory itself is not usable.
+
+C<drop_privileges()> returns 1 on success. A call from a process that
+is already unprivileged is a success. The method never returns on
+failure.
+
+=head1 EXAMPLES
+
+This example binds a reserved port as root and then runs as
+C<_myapp>:
+
+    my $socket = IO::Socket::INET->new(
+        LocalPort => 80,
+        ReuseAddr => 1,
+        Listen    => SOMAXCONN,
+    ) or die "Cannot bind port 80: $!";
+
+    Fugu::Privdrop->prepare_statedir(
+        path    => '/var/db/myapp',
+        user    => '_myapp',
+        on_warn => sub ($msg) { $log->warning('%s', $msg) },
+    );
+    Fugu::Privdrop->drop_privileges(user => '_myapp');
+
+    while (my $client = $socket->accept) {
+        handle_client($client);
+    }
+
+=head1 ERRORS
+
+C<drop_privileges()> does not return a failure code. It dies in these
+conditions:
+
+=over 4
+
+=item *
+
+The C<user> argument is absent.
+
+=item *
+
+The method cannot resolve the user or the group.
+
+=item *
+
+setgid(2) or setuid(2) fails.
+
+=item *
+
+The process holds root after the calls.
+
+=item *
+
+A later setuid(2) with 0 brings root back.
+
+=back
+
+The caller must not continue after a privilege drop that is not
+complete. The re-escalation check therefore runs outside an C<eval>:
+a swallowed failure would report a successful drop for a process that
+kept root.
+
+C<prepare_statedir()> dies only when an argument is absent or a name
+does not resolve. Every other problem goes to C<on_warn>.
+
+=head1 SEE ALSO
+
+setgid(2), setgroups(2), setuid(2), L<Fugu::Daemon>, L<Fugu::Process>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+C<prepare_statedir()> does not walk into subdirectories. It changes
+the owner of the directory and of the files one level inside it.
+
+A daemon that must keep a root-owned file, for example a PID file in
+F</var/run>, must not put that file inside the prepared directory.
+
+=cut

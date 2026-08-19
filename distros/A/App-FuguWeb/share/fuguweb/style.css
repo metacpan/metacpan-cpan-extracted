@@ -1,0 +1,267 @@
+/*
+ * Copyright (c) 2026 Dick Olsson <hi@senzilla.io>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+/* Page */
+
+body {
+	background: #fff;
+	color: #000;
+	font-family: "Times New Roman", Times, serif;
+	font-size: 16px;
+	line-height: 1.4;
+	margin: 1em;
+	max-width: 55em;
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid #999;
+	margin: 1em 0;
+}
+
+/* Links: openbsd.org uses one color for visited and unvisited alike */
+
+a:link,
+a:visited {
+	color: #23238e;
+	text-decoration: underline;
+}
+
+a:active {
+	color: #ff0000;
+}
+
+/* Banner and navigation */
+
+.banner {
+	font-size: 2em;
+	font-weight: bold;
+	letter-spacing: 0.05em;
+	margin: 0 0 0.2em 0;
+}
+
+.banner a:link,
+.banner a:visited {
+	color: #000;
+	text-decoration: none;
+}
+
+nav {
+	font-size: 0.95em;
+}
+
+/* Headings */
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: "Times New Roman", Times, serif;
+	font-weight: bold;
+	line-height: 1.2;
+	margin: 1em 0 0.4em 0;
+}
+
+h1 {
+	background: #e0e0e8;
+	font-size: 1.5em;
+	padding: 0.15em 0.3em;
+}
+
+h2 {
+	background: #eeeef4;
+	font-size: 1.25em;
+	padding: 0.15em 0.3em;
+}
+
+h3 {
+	font-size: 1.1em;
+}
+
+h4 {
+	font-size: 1em;
+}
+
+/* Body text */
+
+p,
+li,
+dd,
+dt {
+	margin-top: 0.4em;
+	margin-bottom: 0.4em;
+}
+
+dt {
+	font-weight: bold;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+/* Code */
+
+code,
+pre,
+tt,
+kbd,
+samp,
+var {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 0.95em;
+}
+
+pre {
+	background: #f7f7f7;
+	border: 1px solid #ccc;
+	overflow-x: auto;
+	padding: 0.5em;
+}
+
+pre code {
+	background: none;
+	border: 0;
+	padding: 0;
+}
+
+/* Footer */
+
+footer {
+	color: #444;
+	font-size: 0.9em;
+}
+
+/*
+ * Manual pages.
+ *
+ * mandoc(1) emits its own class names.  The rules below adopt them into
+ * the site's typography instead of shipping mandoc's default stylesheet.
+ * Bold, italic and monospace are the whole vocabulary.  The target is a
+ * manual page, not a syntax-highlighted document.
+ */
+
+/* Running header and footer bars */
+
+table.head,
+table.foot {
+	font-size: 0.85em;
+	width: 100%;
+}
+
+table.head {
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 1em;
+}
+
+table.foot {
+	border-top: 1px solid #ccc;
+	margin-top: 1.5em;
+}
+
+td.head-vol,
+td.foot-date {
+	text-align: center;
+}
+
+td.head-rtitle,
+td.foot-os {
+	text-align: right;
+}
+
+/* Section and subsection headings.  As in a terminal, SECTION sits flush
+ * left, Subsection sits at a half indent, and the text sits past both. */
+
+h1.Sh,
+h2.Ss {
+	background: none;
+	padding: 0;
+}
+
+h1.Sh {
+	font-size: 1.2em;
+	margin-left: -3.5em;
+	margin-top: 1.4em;
+}
+
+h2.Ss {
+	font-size: 1.05em;
+	margin-left: -1.75em;
+}
+
+/* Heading permalinks stay clickable but do not look like body links */
+
+a.permalink:link,
+a.permalink:visited {
+	color: inherit;
+	text-decoration: none;
+}
+
+/* Body */
+
+.manual-text {
+	margin-left: 3.5em;
+}
+
+/* pod2man's preamble leaves a line break before the first section */
+
+.manual-text > br:first-child {
+	display: none;
+}
+
+/* The SYNOPSIS is a two-cell table: the name, then everything else */
+
+table.Nm td {
+	vertical-align: top;
+}
+
+table.Nm td:first-child {
+	padding-right: 0.4em;
+	white-space: nowrap;
+}
+
+.Bd-indent {
+	margin-left: 2em;
+}
+
+dl.Bl-tag > dd {
+	margin-left: 2em;
+}
+
+/* Inline semantics.  Bold marks what you type, and italic marks what
+ * you substitute. */
+
+.Nm,
+.Cm,
+.Fl,
+.Ic,
+.Fn,
+.Dv,
+.Er,
+.Ev {
+	font-weight: bold;
+}
+
+.Ar,
+.Va,
+.Pa {
+	font-family: "Courier New", Courier, monospace;
+	font-style: italic;
+}
+
+.Em {
+	font-style: italic;
+}

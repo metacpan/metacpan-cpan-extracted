@@ -6,7 +6,7 @@ use warnings;
 
 use Punk::OAuth2;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 1;
@@ -92,6 +92,16 @@ except C<client_put> (and the other client operations) for provisioning.
 
 Inserts or replaces a client. C<secret> is digested on the way in; a
 client with no secret is public (PKCE still applies).
+
+C<grant_types> and C<scopes> are enforced, and are B<deny by default> in
+the same way C<redirect_uris> is: what is not listed cannot be asked
+for. A client with no C<scopes> gets no scope, whatever it puts in the
+authorization request. Omitting C<grant_types> registers
+C<authorization_code refresh_token>, so C<client_credentials> is
+something a client has to be given deliberately. Both are accepted as a
+space-separated string (what the column holds), a comma-separated one,
+an arrayref, or a JSON array. See
+L<Punk::OAuth2::Server/"WHAT A CLIENT MAY ASK FOR">.
 
 =head2 client_get
 
@@ -241,9 +251,16 @@ codes and refresh tokens - as that same digest:
 =item client_get($client_id)
 
 Return a hashref with C<client_id>, C<secret_digest> (the base64url
-sha256 of the secret, or undef/empty for a public client), and
+sha256 of the secret, or undef/empty for a public client),
 C<redirect_uris> (an arrayref B<or> a JSON array string - both are
-accepted), or undef if unknown.
+accepted), C<grant_types> and C<scopes>, or undef if unknown.
+
+C<grant_types> and C<scopes> are authorization decisions, not
+bookkeeping: the server refuses a grant or a scope that is not in them,
+and a row that omits them permits nothing. A store that drops those two
+fields on the way out will register clients that cannot do anything.
+C<is_public> is read too, and keeps a public client out of the
+C<client_credentials> grant even if it is registered for it.
 
 =item code_put($code, \%rec) / code_take($code)
 

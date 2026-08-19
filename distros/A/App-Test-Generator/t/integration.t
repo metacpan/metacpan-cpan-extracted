@@ -1257,4 +1257,286 @@ subtest 'fuzz-harness-generator: invoked via $^X shares @INC with the test proce
 		'no "Can\'t locate" errors — @INC from $^X includes all required modules');
 };
 
+# ==================================================================
+# PIPELINE 17: Analyzer trio -> Model::Method composition
+#
+# Complexity, SideEffect, and Return analyzers each produce data
+# that is normally wired together by SchemaExtractor::_analyze_method.
+# This pipeline tests those four modules' interaction directly,
+# proving the documented wiring contract holds without SchemaExtractor
+# as an intermediary.
+# ==================================================================
+
+subtest 'Analyzer::Complexity + SideEffect -> schema _analysis keys populated' => sub {
+	require App::Test::Generator::Analyzer::Complexity;
+	require App::Test::Generator::Analyzer::SideEffect;
+
+	# A method that branches, performs IO, and mutates $self —
+	# chosen to exercise as many paths as possible in one subtest.
+	my $method = {
+		name => 'save',
+		body => <<'END_BODY',
+	my ($self, $path) = @_;
+	if(!defined $path) { croak 'path required'; }
+	$self->{saved} = 1;
+	open my $fh, '>', $path or die $!;
+	print $fh $self->{data};
+	close $fh;
+	return $self;
+END_BODY
+	};
+
+	my %ledger = (
+		complexity_score    => 1,
+		complexity_level    => 1,
+		purity_level        => 1,
+		performs_io         => 1,
+		mutates_self        => 1,
+	);
+
+	my $cx      = App::Test::Generator::Analyzer::Complexity->new;
+	my $cx_out  = $cx->analyze($method);
+	ok(defined $cx_out->{cyclomatic_score},       'cyclomatic_score key present');
+	ok(defined $cx_out->{complexity_level},       'complexity_level key present');
+	ok($cx_out->{cyclomatic_score} > 1,           'branching + croak raises score above base');
+	like($cx_out->{complexity_level}, qr/low|moderate|high/, 'complexity_level is a valid label');
+	delete $ledger{complexity_score};
+	delete $ledger{complexity_level};
+
+	my $se     = App::Test::Generator::Analyzer::SideEffect->new;
+	my $se_out = $se->analyze($method);
+	ok(defined $se_out->{purity_level},      'purity_level key present');
+	ok($se_out->{performs_io},               'IO keywords detected (print/open/close)');
+	ok($se_out->{mutates_self},              '$self assignment detected');
+	isnt($se_out->{purity_level}, 'pure',    'IO + self mutation -> not pure');
+	delete $ledger{purity_level};
+	delete $ledger{performs_io};
+	delete $ledger{mutates_self};
+
+	ok(!%ledger, 'all documented _analysis keys exercised')
+		or diag('untested ledger keys: ', explain \%ledger);
+};
+
+subtest 'Analyzer::Return -> Model::Method pipeline resolves return type' => sub {
+	require App::Test::Generator::Model::Method;
+	require App::Test::Generator::Analyzer::Return;
+
+	my %ledger = (
+		evidence_added    => 1,
+		resolve_called    => 1,
+		return_type_set   => 1,
+		confidence_set    => 1,
+	);
+
+	# A method that returns $self — Return analyzer should add
+	# a 'returns_self' signal, which Model::Method resolves to 'object'.
+	my $model = App::Test::Generator::Model::Method->new(
+		name   => 'builder',
+		source => "sub builder { my \$self = shift; \$self->{built} = 1; return \$self; }",
+	);
+
+	my $analyzer = App::Test::Generator::Analyzer::Return->new;
+	lives_ok(sub { $analyzer->analyze($model) }, 'Return::analyze lives');
+	ok(scalar @{ $model->evidence_ref } > 0, 'analyzer added at least one evidence entry');
+	delete $ledger{evidence_added};
+
+	lives_ok(sub { $model->resolve_return_type  }, 'resolve_return_type lives');
+	lives_ok(sub { $model->resolve_confidence    }, 'resolve_confidence lives');
+	delete $ledger{resolve_called};
+
+	ok(defined $model->return_type,   'return_type set after resolution');
+	ok(defined $model->confidence,    'confidence set after resolution');
+	delete $ledger{return_type_set};
+	delete $ledger{confidence_set};
+
+	ok(!%ledger, 'all documented Model::Method pipeline interactions exercised')
+		or diag('untested ledger keys: ', explain \%ledger);
+
+	# Two independent Model::Method instances must not share evidence state:
+	# adding evidence to model_b must not appear in model.
+	my $model_b = App::Test::Generator::Model::Method->new(
+		name   => 'helper',
+		source => "sub helper { return 42; }",
+	);
+	my $count_before = scalar @{ $model->evidence_ref };
+	$model_b->add_evidence(category => 'return', signal => 'returns_constant', weight => 10);
+	is(scalar @{ $model->evidence_ref }, $count_before,
+		'adding evidence to model_b does not affect model — no shared state');
+};
+
+subtest 'SchemaExtractor _analyze_method wires all three analyzers into schema _analysis' => sub {
+	# Confirm that after extract_all(), both _analysis.side_effects and
+	# _analysis.complexity keys exist with meaningful values — proving
+	# SchemaExtractor correctly chains all four modules.
+	my ($pm, $tmpdir) = _make_sample_module();
+	my $extractor = App::Test::Generator::SchemaExtractor->new(
+		input_file => $pm,
+	);
+	my $schemas = $extractor->extract_all(no_write => 1);
+
+	my %ledger = map { $_ => 1 } qw(side_effects complexity _model);
+
+	for my $method (sort keys %{$schemas}) {
+		my $s = $schemas->{$method};
+
+		if(exists $s->{_analysis}) {
+			if(exists $s->{_analysis}{side_effects}) {
+				ok(defined $s->{_analysis}{side_effects}{purity_level},
+					"$method: side_effects.purity_level set by SideEffect analyzer");
+				delete $ledger{side_effects};
+			}
+			if(exists $s->{_analysis}{complexity}) {
+				ok(defined $s->{_analysis}{complexity}{cyclomatic_score},
+					"$method: complexity.cyclomatic_score set by Complexity analyzer");
+				delete $ledger{complexity};
+			}
+		}
+		if(exists $s->{_model}) {
+			ok(defined $s->{_model}{confidence},
+				"$method: _model.confidence set by Model::Method");
+			delete $ledger{_model};
+		}
+		last unless %ledger;
+	}
+
+	ok(!%ledger, 'all three analyzer outputs found in at least one extracted schema')
+		or diag('missing keys: ', explain \%ledger);
+};
+
+# ==================================================================
+# PIPELINE 18: SchemaExtractor -> BenchmarkGenerator
+#
+# SchemaExtractor produces a schema hashref; BenchmarkGenerator
+# consumes it to emit a runnable Benchmark::cmpthese script.
+# This pipeline proves the two modules compose without SchemaExtractor
+# writing YAML to disk (in-memory handoff).
+# ==================================================================
+
+subtest 'SchemaExtractor -> BenchmarkGenerator: in-memory pipeline produces runnable benchmark' => sub {
+	require App::Test::Generator::BenchmarkGenerator;
+
+	my ($pm, $tmpdir) = _make_sample_module();
+	my $extractor = App::Test::Generator::SchemaExtractor->new(input_file => $pm);
+	my $schemas   = $extractor->extract_all(no_write => 1);
+	ok(scalar keys %{$schemas} > 0, 'schemas extracted');
+
+	my %ledger = (
+		generate_lives     => 1,
+		shebang_present    => 1,
+		cmpthese_present   => 1,
+		module_use_present => 1,
+	);
+
+	# Use the first extracted method as the benchmark target.
+	my ($method) = sort keys %{$schemas};
+	my $schema   = $schemas->{$method};
+
+	# BenchmarkGenerator expects a flat schema for one function.
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => $schema);
+	my $code;
+	lives_ok(sub { $code = $bg->generate }, 'generate() lives');
+	delete $ledger{generate_lives};
+
+	ok(defined $code && length($code) > 0, 'generate() returns non-empty string');
+	like($code, qr/^#!/ms,          'output has shebang line');
+	delete $ledger{shebang_present};
+	like($code, qr/cmpthese/,       'output contains cmpthese call');
+	delete $ledger{cmpthese_present};
+	# module key from Schema is 'Sample::Calculator' — a non-builtin module
+	like($code, qr/use\s+Sample::Calculator/, 'output contains use Module statement');
+	delete $ledger{module_use_present};
+
+	# Compile check must include the project lib/ AND the temp lib dir.
+	# Sample::Calculator lives at $tmpdir/lib/Sample/Calculator.pm, so
+	# $tmpdir/lib is the root. The ATG lib/ must also be present for any
+	# ATG modules the generated script may load transitively.
+	my $lib_inc     = File::Spec->catdir($tmpdir, 'lib');
+	my $atg_lib_inc = File::Spec->catdir(
+		(File::Spec->splitpath(File::Spec->rel2abs($0)))[0,1], '..', 'lib');
+	my $outfile = File::Spec->catfile($tmpdir, 'bench.pl');
+	open my $fh, '>', $outfile or die $!;
+	print $fh $code;
+	close $fh;
+	is(system($^X, "-I$lib_inc", "-I$atg_lib_inc", '-c', $outfile), 0,
+		'generated benchmark script compiles cleanly (with sample module in @INC)');
+
+	ok(!%ledger, 'all documented BenchmarkGenerator cross-module interactions exercised')
+		or diag('untested ledger keys: ', explain \%ledger);
+};
+
+subtest 'BenchmarkGenerator: two independent instances do not share schema state' => sub {
+	require App::Test::Generator::BenchmarkGenerator;
+
+	my $schema_a = { module => 'Foo', function => 'bar', input => {} };
+	my $schema_b = { module => 'Baz', function => 'qux', input => {} };
+
+	my $bg_a = App::Test::Generator::BenchmarkGenerator->new(schema => $schema_a);
+	my $bg_b = App::Test::Generator::BenchmarkGenerator->new(schema => $schema_b);
+
+	my $code_a = $bg_a->generate;
+	my $code_b = $bg_b->generate;
+
+	like($code_a, qr/Foo.*bar/s, 'instance A output references Foo::bar');
+	like($code_b, qr/Baz.*qux/s, 'instance B output references Baz::qux');
+	unlike($code_a, qr/Baz|qux/, 'instance A output is unaffected by instance B schema');
+	unlike($code_b, qr/Foo|bar/,  'instance B output is unaffected by instance A schema');
+};
+
+# ==================================================================
+# PIPELINE 19: PodExampleExtractor structural validation across lib/
+#
+# For every .pm file under lib/, PodExampleExtractor::extract() must:
+# 1. Return an arrayref (never croak, never return undef)
+# 2. Each entry has 'label', 'section', 'code' keys
+# 3. No two entries have identical code (deduplication active)
+# ==================================================================
+
+subtest 'PodExampleExtractor: structural validation across all lib/ modules' => sub {
+	require App::Test::Generator::PodExampleExtractor;
+	use FindBin qw($Bin);
+
+	my $lib_dir = File::Spec->catdir($Bin, '..', 'lib');
+	my @pm_files;
+	File::Find::find(sub { push @pm_files, $File::Find::name if /\.pm$/ }, $lib_dir);
+	require File::Find;
+	File::Find::find(sub { push @pm_files, $File::Find::name if /\.pm$/ }, $lib_dir);
+
+	# Dedup in case File::Find::find was called twice above
+	my %seen;
+	@pm_files = grep { !$seen{$_}++ } @pm_files;
+
+	ok(scalar @pm_files > 0, 'at least one .pm found under lib/');
+
+	my %ledger = map { $_ => 1 } qw(returns_arrayref entry_keys dedup_active);
+
+	for my $pm (sort @pm_files) {
+		my $ex = App::Test::Generator::PodExampleExtractor->new(file => $pm);
+		my $res;
+		lives_ok(sub { $res = $ex->extract }, "extract() lives for $pm");
+		is(ref($res), 'ARRAY', "extract() returns ARRAY for $pm");
+		delete $ledger{returns_arrayref};
+
+		# Structural check for every returned entry
+		for my $entry (@{$res}) {
+			ok(exists $entry->{label},   "$pm: entry has 'label' key");
+			ok(exists $entry->{section}, "$pm: entry has 'section' key");
+			ok(exists $entry->{code},    "$pm: entry has 'code' key");
+			delete $ledger{entry_keys};
+		}
+
+		# Deduplication: no two entries have the same normalised code
+		my %codes;
+		for my $entry (@{$res}) {
+			(my $norm = $entry->{code}) =~ s/^\s+|\s+$//g;
+			$codes{$norm}++;
+		}
+		my $dups = grep { $_ > 1 } values %codes;
+		is($dups, 0, "$pm: no duplicate code blocks in extract() output");
+		delete $ledger{dedup_active} if @{$res};
+	}
+
+	ok(!%ledger, 'all documented PodExampleExtractor structural properties verified')
+		or diag('untested ledger keys: ', explain \%ledger);
+};
+
 done_testing();

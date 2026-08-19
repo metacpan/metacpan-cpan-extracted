@@ -1,0 +1,229 @@
+=head1 NAME
+
+Fugu::Process - child process management
+
+=head1 SYNOPSIS
+
+    use Fugu::Process;
+
+    my $result = Fugu::Process->spawn_command(
+        cmd       => [ '/usr/local/bin/mydaemon', '-f' ],
+        daemonize => 1,
+        stdout    => '/var/log/mydaemon.log',
+    );
+
+    Fugu::Process->terminate($result->{pid}) if $result->{success};
+
+    my $r = Fugu::Process->run(cmd => [ 'rcctl', 'check', 'mydaemon' ]);
+    print $r->{stdout} if $r->{success};
+
+=head1 DESCRIPTION
+
+Fugu::Process does the parts of child-process control that are easy to
+get wrong. It shows the difference between a child that runs and a
+child that exits immediately. It sends C<SIGTERM> first and sends
+C<SIGKILL> after a delay. It reaps zombies and does not block.
+
+Two methods start a child. C<spawn_command()> leaves it running.
+C<run()> waits for it and captures what it wrote. Both report a failed
+execve(2) exactly, over a close-on-exec pipe, and never by a
+wait-and-guess sleep(3). Neither one runs a shell: the command is a
+list, so no argument needs quoting and no argument can become a shell
+operator.
+
+The module keeps no state. Every method is a class method.
+
+=head2 spawn_command
+
+C<spawn_command(%args)> forks, redirects the standard descriptors, and
+runs a command.
+
+These are the arguments:
+
+=over 4
+
+=item C<cmd>
+
+An array reference that holds the command and its arguments. This
+argument is necessary and must not be empty.
+
+=item C<daemonize>
+
+If this argument is true, the child calls setsid(2) before exec. The
+default is false.
+
+=item C<stdin>, C<stdout>, C<stderr>
+
+The paths for the child's standard descriptors. The default for each
+path is F</dev/null>.
+
+=back
+
+The parent always waits for the execve(2) to resolve. The child holds
+the write end of a close-on-exec pipe. A successful execve(2) closes
+that end, and the parent reads end-of-file. A failure leaves a message
+in the pipe, and the parent returns it in C<error>. Thus a command
+that does not exist reports its own reason at once.
+
+=head2 run
+
+C<run(%args)> runs a command to completion and captures what it wrote.
+
+These are the arguments:
+
+=over 4
+
+=item C<cmd>
+
+An array reference that holds the command and its arguments. This
+argument is necessary and must not be empty.
+
+=item C<timeout>
+
+The number of seconds to wait before the method stops the child. The
+default is no limit.
+
+=item C<stdin>
+
+A string to feed to the child on its standard input.
+
+=item C<cwd>
+
+A directory to run the child in. The child calls chdir(2) after the
+fork and before the execve(2), so the working directory of the caller
+does not change. A chdir(2) in the caller would change the meaning of
+every other relative path in the program, and a second call that ran
+at the same time would race it.
+
+A directory that the child cannot enter is a startup failure with the
+reason in C<error>, not a silent run in the wrong place.
+
+=item C<passthrough>
+
+Let the child write straight to the caller's terminal. C<stdout> and
+C<stderr> then come back empty.
+
+=back
+
+The method reads standard output and standard error at the same time.
+A reader that took them in sequence would deadlock: a child that fills
+one pipe blocks until someone drains it.
+
+=head2 exit_code
+
+C<exit_code($status)> maps a raw waitpid(2) status, or the return
+value of C<system>, to an exit code between 0 and 255. The low byte
+holds the terminating signal. The high byte holds the exit code. A
+value of -1 means the child never started.
+
+A caller that gives a raw status to C<exit> turns a remote exit code
+of 1 into C<exit(256)>, which the kernel truncates to 0. That silently
+reports a failed command as a success.
+
+=head2 is_alive
+
+C<is_alive($pid)> reports if a process exists and is not a zombie. The
+check reaps a zombie child as a side effect and then reports it as not
+alive. A caller that needs the exit status uses C<run()>, or waits
+itself.
+
+=head2 terminate
+
+C<terminate($pid, %args)> sends C<SIGTERM>, waits, and sends
+C<SIGKILL> if the process continues to run.
+
+These are the arguments:
+
+=over 4
+
+=item C<grace_period>
+
+The number of seconds to wait between the two signals. The default is
+5.
+
+=item C<on_kill>
+
+A code reference that the method calls when the process is gone.
+
+=back
+
+The wait polls with sub-second granularity. Thus a child that stops at
+once does not cost a whole second.
+
+=head2 wait_exit
+
+C<wait_exit($pid, $timeout)> polls until the process exits or until
+the timeout ends. The default for C<$timeout> is 30 seconds.
+
+=head2 spawn_perl
+
+C<spawn_perl(%args)> runs Perl code in a child process. It gives the
+child the parent's C<-I> paths. The parent gets these paths from
+C<-I>, C<use lib> or C<PERL5LIB>. Thus the child sees the same
+modules.
+
+C<code> is the program text. C<args> is an array reference of
+arguments for the program. The method gives all other arguments to
+C<spawn_command()>.
+
+=head1 RETURN VALUES
+
+C<spawn_command()> and C<spawn_perl()> return a hash reference. On
+success, the hash holds C<success> set to 1 and C<pid>. On failure,
+C<success> is 0 and C<error> gives the cause.
+
+C<run()> returns a hash reference that holds C<success>, C<stdout>,
+C<stderr>, C<exit_code> and C<timed_out>. On a failure to start the
+child, it also holds C<error>. C<success> is 1 only when the child
+exited with code 0 and did not time out.
+
+C<exit_code()> returns a number between 0 and 255.
+
+C<is_alive()> returns 1 or 0.
+
+C<terminate()> returns 1 if the process is gone. It returns 0 if the
+process continues after C<SIGKILL>.
+
+C<wait_exit()> returns 1 if the process exits in the timeout period.
+If not, it returns 0.
+
+=head1 EXAMPLES
+
+This example runs a helper and then stops it:
+
+    my $r = Fugu::Process->spawn_command(
+        cmd => [ 'mdnsctl', 'publish', $name, '_hap', 'tcp', $port ],
+    );
+
+    Fugu::Process->terminate($r->{pid}, grace_period => 10)
+        if $r->{success};
+
+=head1 ERRORS
+
+No method dies. The methods report failures through the hash reference
+or the boolean value that they return.
+
+=head1 SEE ALSO
+
+execve(2), kill(2), setsid(2), waitpid(2), L<Fugu::Log>,
+L<Fugu::Pidfile>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+C<run()> holds the whole output of the child in memory. Do not use it
+for a command that writes without a bound.
+
+C<is_alive()> calls waitpid(2). That call reaps only the children of
+the caller. For all other processes, it uses kill(2) with signal 0.
+This signal cannot show the difference between a live process and a
+zombie.
+
+The operating system uses process IDs again for new processes. The
+module cannot show the difference between the initial process and a
+later process with the same number.
+
+=cut

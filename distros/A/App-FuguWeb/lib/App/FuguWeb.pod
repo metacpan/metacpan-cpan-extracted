@@ -1,0 +1,173 @@
+=head1 NAME
+
+App::FuguWeb - a static documentation site for a Perl project
+
+=head1 SYNOPSIS
+
+    fuguweb build --out web/build
+    fuguweb check --out web/build
+
+    use App::FuguWeb;
+
+    my $safe = App::FuguWeb::escape_html($title);
+    my $file = App::FuguWeb::CONFIG_FILE;      # .fuguwebrc
+
+=head1 DESCRIPTION
+
+C<fuguweb> renders one static site from the documentation that a Perl
+project already keeps: mdoc(7) manuals, POD sidecars, and Markdown.
+There is no templating language and no JavaScript. The tool runs
+C<mandoc>, C<lowdown>, and C<pod2man>, and wraps each result in one
+shared chrome.
+
+A project needs no build recipe. It writes one F<.fuguwebrc> at its
+root, keeps its body fragments and its assets in one source directory,
+and runs C<fuguweb build>. See L<fuguweb(1)> for the subcommands and
+the exit codes.
+
+This file holds what more than one module in the namespace needs: two
+constants and four functions, documented below. The rest of the work
+is split by concern:
+
+=over 4
+
+=item L<App::FuguWeb::Config>
+
+The site description: the settings, the navigation, the pages, and the
+manual groups.
+
+=item L<App::FuguWeb::Page>
+
+The chrome around one body fragment.
+
+=item L<App::FuguWeb::Render>
+
+The three external renderers.
+
+=item L<App::FuguWeb::Manual>
+
+One manual source: its path, name, section, page, and description.
+
+=item L<App::FuguWeb::Index>
+
+The body of the manual index.
+
+=item L<App::FuguWeb::Site>
+
+The whole build.
+
+=item L<App::FuguWeb::Check>
+
+The checks over a built site.
+
+=item L<App::FuguWeb::CLI>
+
+Subcommand dispatch over L<Fugu::CLI>.
+
+=back
+
+=head1 THE CONFIGURATION FILE
+
+F<.fuguwebrc> sits at the project root and uses the L<Fugu::Config>
+grammar: a setting on a line of its own, and a block that opens with a
+brace at the end of its header line. A C<#> starts a comment, and the
+grammar has no escape for it, so a value may not hold one.
+
+    site       = OpenHAP
+    out_dir    = web/build
+    source_dir = web
+    entry      = index.html
+
+    nav "fugu.html" {
+            label = Fugu
+    }
+
+    page "install.html" {
+            title    = Install
+            markdown = INSTALL.md
+    }
+
+    manuals "Fugu" {
+            dir       = man/fugu
+            anchor    = fugu
+            namespace = "Fugu::"
+    }
+
+    modules "OpenHAP modules" {
+            dir    = lib/App/OpenHAP
+            anchor = modules
+    }
+
+A C<page> block names exactly one source: C<body> for a fragment in the
+source directory, C<markdown> for a Markdown file, or C<index = yes>
+for the generated manual index. C<unlinked = yes> marks a page that no
+other page links to, such as F<404.html>.
+
+Three rules keep a list out of the file. A C<manuals> block reads its
+directory. A C<modules> block finds every F<.pod> file below its
+directory, and the sidecar that names the directory itself. Every file
+in the source directory that the build does not render is an asset, and
+the build copies it; L<App::FuguWeb::Site/ASSETS> says exactly which
+those are.
+
+L<App::FuguWeb::Config> documents every setting and every default.
+
+=head1 FUNCTIONS
+
+=head2 escape_html
+
+    my $safe = App::FuguWeb::escape_html($text);
+
+Escape C<&>, C<< < >> and C<< > >>, in that order. The function takes
+bytes and returns bytes: no file in the namespace carries C<use utf8>,
+so a multi-byte character passes through untouched.
+
+=head2 escape_attr
+
+    my $safe = App::FuguWeb::escape_attr($text);
+
+The same, plus the double quote. Use it for a value on its way into a
+double-quoted attribute: a value that holds a quote ends the attribute
+early, and everything after it becomes markup. L</escape_html> alone
+does not guard an attribute.
+
+=head2 list_dir
+
+    my $names = App::FuguWeb::list_dir($dir) or die "cannot read: $!";
+
+The names in one directory, sorted, without C<.> and C<..>. The
+function returns an array reference, or C<undef> with the reason in
+C<$!>, so a caller can tell an empty directory from one it cannot
+read.
+
+The sort compares bytes and never reads the locale of the builder: a
+site must not depend on the machine that built it.
+
+=head2 path_below
+
+    App::FuguWeb::path_below($path, $root)
+
+Report whether C<$path> is C<$root> or lies below it. A trailing slash
+on either does not change the answer. Both paths must be of the same
+kind: both absolute, or both relative to the same directory.
+
+=head1 CONSTANTS
+
+=head2 CONFIG_FILE
+
+The name of the configuration file, F<.fuguwebrc>. The name and the
+discovery match F<.fuguvmrc>.
+
+=head2 STYLESHEET
+
+The name of the stylesheet in the output directory, F<style.css>. The
+site is served from one flat directory, so every page links it under
+that name and the build writes it there.
+
+=head1 SEE ALSO
+
+L<fuguweb(1)>, L<Fugu::Config>, mandoc(1), lowdown(1), L<pod2man>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

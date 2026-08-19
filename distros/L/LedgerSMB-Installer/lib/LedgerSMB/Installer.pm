@@ -1,4 +1,4 @@
-package LedgerSMB::Installer v0.999.13;
+package LedgerSMB::Installer v0.999.14;
 
 use v5.20;
 use experimental qw(signatures);
@@ -254,7 +254,12 @@ sub _compute_dep_pkgs($class, $dss, $config ) {
 
 sub _download($class, $installpath, $version) {
     my $fn   = "ledgersmb-$version.tar.gz";
-    my $url  = $ENV{ARTIFACT_LOCATION} // "https://download.ledgersmb.org/f/Releases/$version/";
+    my $url  =
+        $ENV{ARTIFACT_LOCATION} // (
+            ($version =~ m/\d+\.\d+\.\d+\-/)
+            ? "https://download.ledgersmb.org/f/Beta%20Releases/$version/"
+            :  "https://download.ledgersmb.org/f/Releases/$version/"
+        );
     my $http = HTTP::Tiny->new;
 
     do {
@@ -808,7 +813,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER

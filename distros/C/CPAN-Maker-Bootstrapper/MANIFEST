@@ -7,7 +7,9 @@ lib/CPAN/Maker/Bootstrapper/ConfigReader.pm
 lib/CPAN/Maker/Bootstrapper/Constants.pm
 lib/CPAN/Maker/Bootstrapper/Role/CreateConfig.pm
 lib/CPAN/Maker/Bootstrapper/Role/CreateDeps.pm
+lib/CPAN/Maker/Bootstrapper/Role/Critic.pm
 lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm
+lib/CPAN/Maker/Bootstrapper/Role/Filter.pm
 lib/CPAN/Maker/Bootstrapper/Role/Init.pm
 lib/CPAN/Maker/Bootstrapper/Role/Installer.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm
@@ -15,6 +17,7 @@ lib/CPAN/Maker/Bootstrapper/Role/LLM/Models.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm
+lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm
 lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm
 lib/Git/ReleaseDiffs.pm
 lib/Text/ASCIITable/FixANSI.pm
@@ -23,6 +26,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 postamble
 release-notes.md
+share/bash-completion.mk
 share/build.yml
 share/builder
 share/buildspec.yml.tmpl
@@ -34,8 +38,10 @@ share/cpan-maker-bootstrapper.yml
 share/git.mk
 share/gitignore
 share/help.mk
+share/local.mk
 share/Makefile.txt
 share/MANIFEST
+share/modulino.mk
 share/modulino.tmpl
 share/perl.mk
 share/pod-review.prompt

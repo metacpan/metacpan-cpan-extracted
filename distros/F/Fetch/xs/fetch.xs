@@ -172,3 +172,4 @@ _pool_new(max)
     }
     OUTPUT:
         RETVAL
+

@@ -31,6 +31,11 @@
       "enum": ["yes", "no", "0", "1", "off", "on"]
     },
 
+    "license": {
+      "description": "License under which the software may be use",
+      "type": "string"
+    },
+
     "version-from": {
       "description": "Module name or path that provides the package version",
       "type": "string"
@@ -127,6 +132,10 @@
         },
         "recommends": {
           "description": "Path to recommended dependency file",
+          "type": "string"
+        },
+        "suggests": {
+          "description": "Path to suggests dependency file",
           "type": "string"
         },
         "resolver": {

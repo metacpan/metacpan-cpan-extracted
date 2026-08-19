@@ -24,6 +24,20 @@ Readonly my $INT32_MAX            => 2**31 - 1;
 Readonly my $INT32_MIN            => -(2**31);
 
 # --------------------------------------------------
+# Character set and interesting-string constants —
+# computed once at load time rather than rebuilt on
+# every _rand_string / _mutate_string call.
+# --------------------------------------------------
+Readonly my @RAND_CHARS => ('a'..'z', 'A'..'Z', '0'..'9', ' ', "\t", "\n", "\0");
+Readonly my @INTERESTING_STRINGS => (
+	'', ' ', "\0", "\n", "\t",
+	'a' x 256,
+	'null', 'undefined',
+	"'; DROP TABLE foo; --",
+	'<script>alert(1)</script>',
+);
+
+# --------------------------------------------------
 # Type name constants — used in schema dispatch
 # --------------------------------------------------
 Readonly my $TYPE_INTEGER => 'integer';
@@ -38,7 +52,7 @@ Readonly my $TYPE_STRING  => 'string';
 # --------------------------------------------------
 Readonly my @JSON_MODULES => qw(JSON::MaybeXS JSON);
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 =head1 NAME
 
@@ -46,7 +60,7 @@ App::Test::Generator::CoverageGuidedFuzzer - AFL-style coverage-guided fuzzing f
 
 =head1 VERSION
 
-Version 0.45
+Version 0.46
 
 =head1 SYNOPSIS
 
@@ -160,6 +174,37 @@ A blessed hashref. Croaks if C<schema> or C<target_sub> is missing.
         isa  => 'App::Test::Generator::CoverageGuidedFuzzer',
     }
 
+=head3 EXAMPLE
+
+    my $fuzzer = App::Test::Generator::CoverageGuidedFuzzer->new(
+        schema     => { name => { type => 'string' } },
+        target_sub => sub { length($_[0]) },
+        iterations => 50,
+        seed       => 1234,
+    );
+
+=head3 MESSAGES
+
+=over 4
+
+=item C<schema required>
+
+C<schema> was not supplied or was falsy (e.g. C<undef> or C<0>).
+
+=item C<target_sub required>
+
+C<target_sub> was not supplied or was falsy.
+
+=back
+
+=head3 FORMAL SPECIFICATION
+
+Pre:  C<defined schema ∧ ref(target_sub) eq 'CODE'>
+
+Post: C<ref(result) eq 'App::Test::Generator::CoverageGuidedFuzzer'>
+      ∧ C<result-E<gt>{seed}> passed to C<srand()>
+      ∧ C<result-E<gt>{corpus} eq []>
+
 =cut
 
 sub new {
@@ -248,6 +293,35 @@ discarded.
         },
     }
 
+=head3 EXAMPLE
+
+    my $report = $fuzzer->run();
+    printf "Iterations:  %d\n", $report->{total_iterations};
+    printf "Corpus size: %d\n", $report->{corpus_size};
+    printf "Bugs found:  %d\n", $report->{bugs_found};
+    for my $bug (@{ $report->{bugs} }) {
+        printf "  input=%s  error=%s\n", $bug->{input}, $bug->{error};
+    }
+
+=head3 FORMAL SPECIFICATION
+
+Pre:  C<self-E<gt>{schema}> and C<self-E<gt>{target_sub}> are set
+
+Post: C<result-E<gt>{total_iterations} == self-E<gt>{iterations}>
+      ∧ C<result-E<gt>{corpus_size} == scalar @{self-E<gt>{corpus}}>
+      ∧ C<result-E<gt>{bugs_found} == scalar @{self-E<gt>{bugs}}>
+
+=head3 PSEUDOCODE
+
+    seed corpus with SEED_CORPUS_SIZE random inputs
+    for i in 1..iterations:
+        if corpus non-empty and rand < CORPUS_MUTATE_RATIO:
+            input = mutate(random corpus entry)
+        else:
+            input = generate_random()
+        run target_sub(input), record coverage and bugs
+    return report hashref
+
 =cut
 
 sub run {
@@ -294,6 +368,12 @@ C<input> and C<coverage>.
 
     { type => ARRAYREF }
 
+=head3 EXAMPLE
+
+    my $corpus = $fuzzer->corpus();
+    printf "%d entries in corpus\n", scalar @{$corpus};
+    # Each entry: { input => ..., coverage => { 'file:line:branch' => 1, ... } }
+
 =cut
 
 sub corpus { $_[0]->{corpus} }
@@ -314,6 +394,13 @@ C<error>.
 =head4 output
 
     { type => ARRAYREF }
+
+=head3 EXAMPLE
+
+    my $bugs = $fuzzer->bugs();
+    for my $b (@{$bugs}) {
+        printf "Bug: input=%s  error=%s\n", $b->{input}, $b->{error};
+    }
 
 =cut
 
@@ -357,6 +444,30 @@ Writes a JSON file to C<$path>.
 =head4 output
 
     { type => UNDEF }
+
+=head3 EXAMPLE
+
+    $fuzzer->run();
+    $fuzzer->minimize_corpus();
+    $fuzzer->save_corpus('t/corpus/my_func.json');
+
+=head3 MESSAGES
+
+=over 4
+
+=item C<path required>
+
+No path argument was supplied.
+
+=item C<Cannot write corpus to $path: $!>
+
+The file could not be opened for writing (permissions, missing directory, etc.).
+
+=item C<No JSON module available; install JSON or JSON::MaybeXS>
+
+Neither C<JSON::MaybeXS> nor C<JSON> is installed.
+
+=back
 
 =cut
 
@@ -418,6 +529,36 @@ Appends loaded entries to C<< $self->{corpus} >>.
 
     { type => UNDEF }
 
+=head3 EXAMPLE
+
+    my $fuzzer2 = App::Test::Generator::CoverageGuidedFuzzer->new(
+        schema     => $schema,
+        target_sub => \&My::Module::validate,
+    );
+    $fuzzer2->load_corpus('t/corpus/my_func.json');
+    my $report = $fuzzer2->run();
+
+=head3 MESSAGES
+
+=over 4
+
+=item C<path required>
+
+No path argument was supplied.
+
+=item C<Cannot read corpus from $path: $!>
+
+The file could not be opened for reading (missing file, permissions, etc.).
+
+=back
+
+=head3 FORMAL SPECIFICATION
+
+Note: C<load_corpus> does B<not> restore C<bugs> from the JSON file —
+the C<bugs> array in the JSON is written by C<save_corpus> but ignored on load.
+The loaded fuzzer starts with an empty C<bugs> list.  Seed values are also not
+restored; the constructor-supplied seed is retained.
+
 =cut
 
 sub load_corpus {
@@ -475,6 +616,32 @@ size after), and C<branches> (total unique branches still covered).
         type       => HASHREF,
         constraint => sub { defined $_[0]{before} && defined $_[0]{after} && defined $_[0]{branches} },
     }
+
+=head3 EXAMPLE
+
+    $fuzzer->run();
+    my $stats = $fuzzer->minimize_corpus();
+    printf "Corpus: %d -> %d entries (%d branches)\n",
+        $stats->{before}, $stats->{after}, $stats->{branches};
+    $fuzzer->save_corpus('t/corpus/my_func.json');
+
+=head3 FORMAL SPECIFICATION
+
+Post: C<result-E<gt>{before}> == pre corpus size
+      ∧ C<result-E<gt>{after}> ≤ C<result-E<gt>{before}>
+      ∧ C<scalar @{self-E<gt>{corpus}}> == C<result-E<gt>{after}>
+      ∧ every branch covered by the original corpus is still covered
+        by the minimized corpus
+      ∧ every bug-triggering input survives minimization
+
+=head3 PSEUDOCODE
+
+    partition corpus into with-coverage and without-coverage entries
+    greedy set-cover: repeatedly pick entry covering most uncovered branches
+    deduplicate without-coverage entries by JSON fingerprint
+    unconditionally add all bug inputs not already in minimized set
+    replace self.corpus with minimized list
+    return { before, after, branches }
 
 =cut
 
@@ -561,8 +728,12 @@ sub minimize_corpus {
 sub _fingerprint {
 	my ($val) = @_;
 	return 'null' unless defined $val;
-	my $mod = _load_json_module();
-	return eval { $mod->new->canonical(1)->encode($val) } // "$val";
+	state $encoder;
+	unless ($encoder) {
+		my $mod = _load_json_module();
+		$encoder = eval { $mod->new->canonical(1) };
+	}
+	return eval { $encoder->encode($val) } // "$val";
 }
 
 # --------------------------------------------------
@@ -582,13 +753,16 @@ sub _fingerprint {
 #             preferred over JSON.
 # --------------------------------------------------
 sub _load_json_module {
+	state $cached;
+	return $cached if defined $cached;
 	for my $mod (@JSON_MODULES) {
 		# Convert package name to file path — require $var does not
 		# do the :: -> / conversion that bareword require does
 		(my $file = $mod) =~ s{::}{/}g;
 		$file .= '.pm';
-		my $ok = eval { require $file; 1 };
-		return $mod if $ok;
+		if (eval { require $file; 1 }) {
+			return $cached = $mod;
+		}
 	}
 	croak 'No JSON module available; install JSON or JSON::MaybeXS';
 }
@@ -696,7 +870,8 @@ sub _run_with_cover {
 
 	Devel::Cover::start() if Devel::Cover->can('start');
 
-	my %before = %{ $self->{_last_cover_snapshot} || {} };
+	my $before_ref = $self->{_last_cover_snapshot} || {};
+	my %before = %{$before_ref};
 
 	# Include instance as invocant for method calls
 	my @call_args = defined($self->{instance})
@@ -714,13 +889,13 @@ sub _run_with_cover {
 	alarm(0) if $self->{timeout};
 	$$error_ref = $@ if $@;
 
-	my %after = $self->_snapshot_cover();
-	$self->{_last_cover_snapshot} = { %after };
+	my $after = $self->_snapshot_cover();
+	$self->{_last_cover_snapshot} = $after;
 	Devel::Cover::stop() if Devel::Cover->can('stop');
 
 	# Return only branches newly hit in this call
 	my %delta;
-	for my $key (keys %after) {
+	for my $key (keys %{$after}) {
 		$delta{$key} = 1 unless exists $before{$key};
 	}
 
@@ -762,7 +937,7 @@ sub _snapshot_cover {
 		}
 	};
 
-	return %snap;
+	return \%snap;
 }
 
 # --------------------------------------------------
@@ -945,8 +1120,7 @@ sub _rand_string {
 	# Clamp to non-negative
 	$len = 0 if $len < 0;
 
-	my @chars = ('a'..'z', 'A'..'Z', '0'..'9', ' ', "\t", "\n", "\0");
-	return join '', map { $chars[ int(rand(@chars)) ] } 1 .. $len;
+	return join '', map { $RAND_CHARS[ int(rand(@RAND_CHARS)) ] } 1 .. $len;
 }
 
 # --------------------------------------------------
@@ -1188,19 +1362,15 @@ sub _mutate {
 # --------------------------------------------------
 sub _mutate_int {
 	my ($self, $n) = @_;
-
-	my @ops = (
-		sub { $n + 1              },
-		sub { $n - 1              },
-		sub { $n * 2              },
-		sub { $n == 0 ? 1 : int($n / 2) },
-		sub { -$n                 },
-		sub { 0                   },
-		sub { $INT32_MAX          },
-		sub { $INT32_MIN          },
-	);
-
-	return $ops[ int(rand(@ops)) ]->();
+	my $op = int(rand(8));
+	return $n + 1                      if $op == 0;
+	return $n - 1                      if $op == 1;
+	return $n * 2                      if $op == 2;
+	return $n == 0 ? 1 : int($n / 2)  if $op == 3;
+	return -$n                         if $op == 4;
+	return 0                           if $op == 5;
+	return $INT32_MAX                  if $op == 6;
+	return $INT32_MIN;
 }
 
 # --------------------------------------------------
@@ -1215,16 +1385,12 @@ sub _mutate_int {
 # --------------------------------------------------
 sub _mutate_num {
 	my ($self, $n) = @_;
-
-	my @ops = (
-		sub { $n + rand(10)        },
-		sub { $n - rand(10)        },
-		sub { $n * (1 + rand())    },
-		sub { 0                    },
-		sub { -$n                  },
-	);
-
-	return $ops[ int(rand(@ops)) ]->();
+	my $op = int(rand(5));
+	return $n + rand(10)      if $op == 0;
+	return $n - rand(10)      if $op == 1;
+	return $n * (1 + rand())  if $op == 2;
+	return 0                  if $op == 3;
+	return -$n;
 }
 
 # --------------------------------------------------
@@ -1271,16 +1437,7 @@ sub _mutate_string {
 		# Double the string
 		sub { $s x 2 },
 		# Replace with a known interesting string
-		sub {
-			my @interesting = (
-				'', ' ', "\0", "\n", "\t",
-				'a' x 256,
-				'null', 'undefined',
-				"'; DROP TABLE foo; --",
-				'<script>alert(1)</script>',
-			);
-			$interesting[ int(rand(@interesting)) ]
-		},
+		sub { $INTERESTING_STRINGS[ int(rand(@INTERESTING_STRINGS)) ] },
 	);
 
 	return $ops[ int(rand(@ops)) ]->();
@@ -1399,6 +1556,80 @@ sub _build_report {
 		bugs               => $self->{bugs},
 	};
 }
+
+=head1 COMMON PITFALLS
+
+=over 4
+
+=item Forgetting that C<load_corpus> does not restore bugs
+
+The JSON written by C<save_corpus> contains a C<bugs> array, but C<load_corpus>
+reads only the C<corpus> key.  A freshly loaded fuzzer always starts with an
+empty bugs list.  If you need to carry bugs across sessions, persist them
+separately.
+
+=item Assuming coverage guidance is always active
+
+If C<Devel::Cover> is not installed, the fuzzer falls back to random-only mode
+and emits a warning.  Corpus entries in this mode have C<coverage =E<gt> {}>
+and are kept using the C<RANDOM_KEEP_RATIO> (20%) heuristic rather than branch
+novelty.  Install C<Devel::Cover> (or C<cpanm --with-recommends
+App::Test::Generator>) for full coverage-guided behaviour.
+
+=item Using C<refaddr> on C<corpus()> after C<minimize_corpus>
+
+C<minimize_corpus> replaces C<$self-E<gt>{corpus}> with a B<new> arrayref.
+Any caller that holds a reference to the old arrayref (e.g. from a prior
+C<corpus()> call) will see a stale snapshot.  Always call C<corpus()> after
+C<minimize_corpus> if you need the current list.
+
+=item Setting C<timeout =E<gt> 0> on blocking targets
+
+Setting C<timeout> to 0 disables the per-call C<alarm()>.  This is correct for
+targets that legitimately block (e.g. sleeping, waiting on I/O), but means a
+hung target_sub will hang the whole fuzzing run indefinitely.  Use a
+process-level timeout (e.g. C<Sys::AlarmCall>) if you need a safety net for
+blocking code.
+
+=back
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item Single-threaded
+
+All fuzzing iterations run sequentially in the calling process.  For large
+iteration counts, wall-clock time scales linearly.  Parallelism requires
+splitting the iteration budget across multiple fuzzer instances and merging
+their corpora.
+
+=item Coverage granularity is branch-level
+
+Branch coverage is the finest granularity Devel::Cover exposes via its public
+API.  Path coverage (distinct sequences of branches) is not tracked — two
+inputs that cover the same branches but exercise different call orders are
+treated as equivalent.
+
+=item No inter-run learning without save/load
+
+The corpus is entirely in memory.  To carry learning across separate
+invocations, call C<save_corpus> at the end and C<load_corpus> at the start of
+each subsequent run.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Devel::Cover>
+
+=item L<App::Test::Generator>
+
+=item C<bin/extract-schemas> (the C<--minimize-corpus> flag)
+
+=back
 
 =head1 AUTHOR
 

@@ -1,0 +1,109 @@
+=head1 NAME
+
+Protocol::HAP::Crypto - randomness and crypto primitives for HAP
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::Crypto;
+
+    my $nonce = Protocol::HAP::Crypto->random_bytes(12);
+
+    my ($secret, $public) = Protocol::HAP::Crypto->ed25519_keypair;
+    my $sig = Protocol::HAP::Crypto->ed25519_sign($msg, $secret, $public);
+
+    Protocol::HAP::Crypto->preload;   # before a pledge without prot_exec
+
+=head1 DESCRIPTION
+
+This module gives the randomness and the primitives that the HAP
+protocol needs: Ed25519 signatures, X25519 key agreement, HKDF over
+SHA-512, and ChaCha20-Poly1305.
+
+Every method is a class method. The module keeps no state and never
+logs. A programming error dies. There is no partial result and no
+quiet fallback, because a caller cannot recover from a key that is not
+a key.
+
+C<random_bytes> uses core Perl only. Each other group loads its
+C<Crypt::*> library on first use, so a program that never signs
+anything never needs that library installed.
+
+The read from F</dev/urandom> is a documented exception to the sans-IO
+rule of L<Protocol::HAP>: key material must come from the kernel.
+
+=head1 METHODS
+
+=head2 random_bytes($length)
+
+This method returns C<$length> bytes from F</dev/urandom>. It dies
+when the device does not open, and dies on a short read. Neither one
+has a recovery: a caller that continues with fewer bytes than it asked
+for builds a key with a known prefix.
+
+=head2 preload
+
+This method loads every C<Crypt::*> library now, and returns the number
+of libraries it loaded. A daemon that pledges without C<prot_exec> must
+call it before it pledges: a lazy C<require> after the pledge opens a
+shared object, and that kills the process. The method dies when a
+library is missing, because a daemon that finds that out after the
+pledge cannot report it.
+
+=head2 ed25519_keypair
+
+This method returns C<($secret_key, $public_key)> for a fresh Ed25519
+identity.
+
+=head2 ed25519_sign($message, $secret_key, $public_key)
+
+This method returns the 64-byte signature over the message.
+
+=head2 ed25519_verify($signature, $message, $public_key)
+
+This method reports if the signature is valid for the message and the
+key.
+
+=head2 x25519_keypair
+
+This method returns C<($secret_key, $public_key)> for a fresh X25519
+exchange.
+
+=head2 x25519_shared_secret($our_secret, $their_public)
+
+This method returns the 32-byte shared secret. Both sides of an
+exchange derive the same value.
+
+=head2 hkdf_sha512($ikm, $salt, $info, $length)
+
+This method derives C<$length> bytes from the input keying material,
+with HKDF over SHA-512. The derivation is deterministic.
+
+=head2 chacha20poly1305_encrypt($key, $nonce, $plaintext, $aad)
+
+This method returns C<($ciphertext, $tag)>. C<$aad> is the additional
+data, which the tag authenticates and the cipher does not hide. Its
+default is the empty string.
+
+=head2 chacha20poly1305_decrypt($key, $nonce, $ciphertext, $tag, $aad)
+
+This method returns the plaintext, or C<undef> when the tag does not
+verify. A failed verification is the normal answer for a forged or
+damaged message, so it is not fatal.
+
+=head1 ERRORS
+
+Every method that needs an optional library dies when that library is
+missing. The message names the module and the group of functions that
+needed it.
+
+=head1 CAVEATS
+
+The module does not choose a nonce and does not count one up. A nonce
+that repeats under one key destroys the security of ChaCha20-Poly1305.
+The protocol that uses the cipher owns that rule.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, L<Protocol::HAP::SRP>, F<spec/HAP-Pairing.md>
+
+=cut

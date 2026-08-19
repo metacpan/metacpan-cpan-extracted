@@ -10,7 +10,7 @@ use File::Spec;
 use Getopt::Long qw(GetOptions);
 use Pod::Usage;
 
-our $VERSION = '0.42';
+our $VERSION = '0.46';
 
 =head1 NAME
 
@@ -205,13 +205,14 @@ jobs:
               PPI \
               App::Prove \
               File::Copy::Recursive \
-              Test::LectroTest::Compat
+              Test::LectroTest::Compat \
+              Code::CutNPaste
           cpanm -iqn Data::Random::String::Matches Data::Random::Structure Data::Random Data::Random::String
         timeout-minutes: 10
 
       - name: Set snapshot variables
         run: |
-          echo "SNAPSHOT_TIMESTAMP=$(date +%Y-%m-%d)" >> $GITHUB_ENV
+          echo "SNAPSHOT_TIMESTAMP=$(date -u +%Y-%m-%dT%H%M%SZ)" >> $GITHUB_ENV
           echo "SNAPSHOT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Add local bin to PATH
@@ -224,7 +225,7 @@ jobs:
             perl Makefile.PL && make install
           else
             echo "Install ATG"
-            cpanm -iqn App::Test::Generator@0.41
+            cpanm -iqn App::Test::Generator@0.46
           fi
 
       - name: Generate dashboard
@@ -365,7 +366,7 @@ jobs:
         run: |
           if [ "${{ github.repository }}" != "nigelhorne/App-Test-Generator" ]; then
             cpanm -iqn Data::Random::Structure Data::Random::String::Matches Data::Random::String Data::Random
-            cpanm -iqn App::Test::Generator@0.41
+            cpanm -iqn App::Test::Generator@0.46
           fi
 
       - name: Generate the mutants

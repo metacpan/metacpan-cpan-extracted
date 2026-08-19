@@ -102,6 +102,7 @@ each CI push via C<.github/workflows/dashboard.yml>.
   mutation.json             - Mutation testing results from test-generator-mutate
   cover_html/lcsaj_hits.json - LCSAJ path hit data from the LCSAJ runtime debugger
   cover_html/mutation_html/lib/ - Per-file LCSAJ path definitions (.lcsaj.json)
+  cover_html/cpd.json       - Copy-paste duplicate block data from Code::CutNPaste
   coverage_history/*.json   - Historical coverage snapshots for the trend chart
 
 =head1 OUTPUTS
@@ -181,11 +182,11 @@ each CI push via C<.github/workflows/dashboard.yml>.
                       dependency version cliff detection, and root
                       cause confidence scoring
   Mutation Report   - Per-file mutation score (killed/survived/total),
-                      cyclomatic complexity, and TER3 (LCSAJ path
-                      coverage) with raw fraction
+                      cyclomatic complexity, TER3 (LCSAJ path coverage),
+                      and duplication percentage (Dup%)
   Per-file Pages    - Line-by-line mutation heatmap with TER1/TER2/TER3
-                      metrics, LCSAJ path markers, and expandable
-                      mutant details with suggested tests
+                      metrics, LCSAJ path markers, CPD duplicate markers,
+                      and expandable mutant details with suggested tests
 
 =head1 DEPENDENCIES
 
@@ -220,6 +221,8 @@ Readonly my %config => (
 	mutation_output_dir => 'cover_html/mutation_html',   # where files are written
 	lcsaj_root => 'cover_html/mutation_html/lib',
 	lcsaj_hits_file     => 'cover_html/lcsaj_hits.json', # Runtime.pm writes here
+	cpd_file            => 'cover_html/cpd.json',        # Code::CutNPaste output
+	cpd_output_dir      => 'cover_html/cpd_html',        # per-file CPD drill-down pages
 	output => 'cover_html/index.html',	# published to gh-pages
 	max_retry => 5,
 	min_locale_samples => 3,
@@ -384,7 +387,7 @@ push @html, <<"HTML";
 		/* Show cursor points on the headers to show that they are clickable */
 		th { background-color: #f2f2f2; cursor: pointer; }
 		th.sortable {
-			cursor: pointer;
+			cursor: grab;
 			user-select: none;
 			white-space: nowrap;
 		}
@@ -396,6 +399,11 @@ push @html, <<"HTML";
 			color: #000;	/* dark for active */
 			font-weight: bold;
 		}
+		/* Prevent child spans intercepting drag events so enter/leave fire only on the th */
+		th.sortable .label,
+		th.sortable .arrow { pointer-events: none; }
+		th.col-dragging { opacity: 0.4; cursor: grabbing; }
+		th.col-drag-over { outline: 2px dashed #555; background-color: #d8eaff !important; }
 		.sparkline {
 			display: inline-block;
 			vertical-align: middle;
@@ -479,7 +487,7 @@ push @html, <<"HTML";
 	<img src="$coverage_badge_url" alt="Coverage badge">
 </div>
 <h1>$config{package_name}</h1><h2>Coverage Report</h2>
-<table data-sort-col="0" data-sort-order="asc">
+<table data-sort-col="0" data-sort-order="asc" data-table-id="coverage">
 <!-- Make the column headers clickable -->
 <thead>
 <tr>
@@ -1072,7 +1080,10 @@ if(resetBtn) {
 	});
 }
 
-function sortTable(th, colIndex) {
+function sortTable(th) {
+	// Always recompute colIndex from DOM so it stays correct after drag-reordering.
+	// The historic onclick="sortTable(this, N)" calls still work; the N is ignored.
+	const colIndex = Array.from(th.parentElement.cells).indexOf(th);
 	const table = th.closest("table");
 	if(!table || !table.tBodies.length) return;
 
@@ -1083,21 +1094,30 @@ function sortTable(th, colIndex) {
 	const prevOrder = table.getAttribute("data-sort-order") || "desc";
 	const asc = (prevCol != colIndex) ? true : (prevOrder === "desc");
 
-	const isNumeric = colIndex === 0; // Date column
+	const isDate = th.dataset.sortType === 'date';
 
 	const normalRows = rows.filter(r => !r.classList.contains("nosort"));
 	const fixedRows = rows.filter(r => r.classList.contains("nosort"));
 
 	normalRows.sort((a, b) => {
-		let x = a.cells[colIndex]?.innerText.trim() || "";
-		let y = b.cells[colIndex]?.innerText.trim() || "";
+		const cellA = a.cells[colIndex];
+		const cellB = b.cells[colIndex];
+		let x = (cellA?.dataset.value ?? cellA?.innerText ?? "").trim();
+		let y = (cellB?.dataset.value ?? cellB?.innerText ?? "").trim();
 
-		if(isNumeric) {
+		if(isDate) {
 			x = Date.parse(x) || 0;
 			y = Date.parse(y) || 0;
 		} else {
-			x = x.toLowerCase();
-			y = y.toLowerCase();
+			const nx = parseFloat(x);
+			const ny = parseFloat(y);
+			if(!isNaN(nx) && !isNaN(ny)) {
+				x = nx;
+				y = ny;
+			} else {
+				x = x.toLowerCase();
+				y = y.toLowerCase();
+			}
 		}
 
 		if(x < y) return asc ? -1 : 1;
@@ -1125,28 +1145,235 @@ function sortTable(th, colIndex) {
 
 	table.setAttribute("data-sort-col", colIndex);
 	table.setAttribute("data-sort-order", asc ? "asc" : "desc");
+	saveSortState(table);
 }
 
+// ---------------------------------------------------------
+// Column drag-to-reorder
+// ---------------------------------------------------------
+let _dragSrcTh = null;
+let _initializingTables = false;
+
+// ---------------------------------------------------------
+// localStorage persistence for sort state and column order
+// ---------------------------------------------------------
+function _tableId(table) {
+	return table ? table.dataset.tableId : null;
+}
+
+function saveColOrder(table) {
+	const id = _tableId(table);
+	if(!id) return;
+	const headerRow = table.tHead && table.tHead.rows[0];
+	if(!headerRow) return;
+	const order = Array.from(headerRow.cells).map(th => parseInt(th.dataset.colId, 10));
+	try { localStorage.setItem('atg_col_order_' + id, JSON.stringify(order)); } catch(e) {}
+}
+
+function saveSortState(table) {
+	if(_initializingTables) return;
+	const id = _tableId(table);
+	if(!id) return;
+	const colIdx = parseInt(table.getAttribute('data-sort-col'), 10);
+	const order  = table.getAttribute('data-sort-order') || 'asc';
+	const headerRow = table.tHead && table.tHead.rows[0];
+	if(!headerRow) return;
+	const th = headerRow.cells[colIdx];
+	const colId = th ? parseInt(th.dataset.colId, 10) : colIdx;
+	try { localStorage.setItem('atg_sort_' + id, JSON.stringify({colId, order})); } catch(e) {}
+}
+
+function _restoreColOrder(table, savedOrder) {
+	const headerRow = table.tHead && table.tHead.rows[0];
+	if(!headerRow) return;
+	const placed = new Set();
+	savedOrder.forEach((wantedId, dstPos) => {
+		const srcTh = Array.from(headerRow.cells).find(
+			th => parseInt(th.dataset.colId, 10) === wantedId && !placed.has(th)
+		);
+		if(!srcTh) return;
+		const srcIdx = Array.from(headerRow.cells).indexOf(srcTh);
+		const dstIdx = dstPos < headerRow.cells.length ? dstPos : headerRow.cells.length - 1;
+		if(srcIdx === dstIdx) { placed.add(srcTh); return; }
+		Array.from(table.rows).forEach(row => {
+			if(row.cells.length <= Math.max(srcIdx, dstIdx)) return;
+			const moved = row.cells[srcIdx];
+			const ref = row.cells[dstIdx];
+			if(srcIdx < dstIdx) row.insertBefore(moved, ref ? ref.nextSibling : null);
+			else row.insertBefore(moved, ref);
+		});
+		placed.add(srcTh);
+	});
+}
+
+function _applySort(table, th, order) {
+	// Force the desired direction then call sortTable
+	const colIndex = Array.from(th.parentElement.cells).indexOf(th);
+	// Preset state so sortTable's toggle logic lands on `order`
+	table.setAttribute('data-sort-col', colIndex === 0 ? -1 : 0); // make it differ
+	table.setAttribute('data-sort-order', order === 'asc' ? 'desc' : 'asc');
+	sortTable(th);
+}
+
+function _colDragStart(e) {
+	_dragSrcTh = this;
+	e.dataTransfer.effectAllowed = 'move';
+	e.dataTransfer.setData('text/plain', ''); // required by Firefox
+	this.classList.add('col-dragging');
+}
+
+function _colDragOver(e) {
+	if(!_dragSrcTh || _dragSrcTh === this) return;
+	e.preventDefault();
+	e.dataTransfer.dropEffect = 'move';
+}
+
+function _colDragEnter(e) {
+	if(!_dragSrcTh || _dragSrcTh === this) return;
+	// Clear previous drag-over highlight before setting the new one
+	document.querySelectorAll('th.col-drag-over').forEach(t => t.classList.remove('col-drag-over'));
+	this.classList.add('col-drag-over');
+}
+
+function _colDragLeave(e) {
+	// Only clear when leaving to something truly outside this th
+	if(!this.contains(e.relatedTarget)) {
+		this.classList.remove('col-drag-over');
+	}
+}
+
+function _colDrop(e) {
+	e.preventDefault();
+	e.stopPropagation();
+	if(!_dragSrcTh || _dragSrcTh === this) return false;
+
+	const table = this.closest('table');
+	const srcIdx = Array.from(_dragSrcTh.parentElement.cells).indexOf(_dragSrcTh);
+	const dstIdx = Array.from(this.parentElement.cells).indexOf(this);
+
+	// Move the cell at srcIdx to dstIdx in every row (thead + tbody)
+	Array.from(table.rows).forEach(row => {
+		const cells = row.cells;
+		if(cells.length <= Math.max(srcIdx, dstIdx)) return;
+		const moved = cells[srcIdx];
+		if(srcIdx < dstIdx) {
+			row.insertBefore(moved, cells[dstIdx].nextSibling);
+		} else {
+			row.insertBefore(moved, cells[dstIdx]);
+		}
+	});
+
+	// Update data-sort-col so the next sort-click knows the active column's new position
+	const activeArrow = table.querySelector('thead .arrow.active');
+	if(activeArrow) {
+		const activeTh = activeArrow.closest('th');
+		const newIdx = Array.from(activeTh.parentElement.cells).indexOf(activeTh);
+		table.setAttribute('data-sort-col', newIdx);
+	}
+
+	saveColOrder(table);
+	return false;
+}
+
+function _colDragEnd(e) {
+	this.classList.remove('col-dragging');
+	document.querySelectorAll('th.col-drag-over').forEach(t => t.classList.remove('col-drag-over'));
+	_dragSrcTh = null;
+}
 
 // Initial display.
-// The table has been set up sorted in ascending order on the filename; reflect that in the GUI
+// The coverage table is pre-sorted ascending by filename from Perl; reflect that in the GUI.
+// The mutation and duplication tables are sorted by JS on load so the arrows always match data.
+// Saved column order and sort state are restored from localStorage when present.
 document.addEventListener("DOMContentLoaded", () => {
-	const table = document.querySelector("table");
-	if(!table) return;
+	_initializingTables = true;
 
-	const headers = table.tHead.rows[0].cells;
-	for(let i = 0; i < headers.length; i++) {
-		const arrow = headers[i].querySelector(".arrow");
-		if(!arrow) continue;
+	// Assign original column indices as data-col-id (must be done before any reordering)
+	document.querySelectorAll('table[data-table-id]').forEach(table => {
+		const headerRow = table.tHead && table.tHead.rows[0];
+		if(!headerRow) return;
+		Array.from(headerRow.cells).forEach((th, i) => { th.dataset.colId = i; });
+	});
 
-		if(i === 0) {
-			arrow.textContent = "▲";
-			arrow.classList.add("active");
-		} else {
-			arrow.textContent = "▲";
-			arrow.classList.remove("active");
+	// Restore saved column order, then sort state, for every identified table
+	document.querySelectorAll('table[data-table-id]').forEach(table => {
+		const id = _tableId(table);
+		// --- column order ---
+		let savedOrder = null;
+		try { savedOrder = JSON.parse(localStorage.getItem('atg_col_order_' + id)); } catch(e) {}
+		if(Array.isArray(savedOrder) && savedOrder.length) {
+			_restoreColOrder(table, savedOrder);
+		}
+
+		// --- sort state ---
+		let savedSort = null;
+		try { savedSort = JSON.parse(localStorage.getItem('atg_sort_' + id)); } catch(e) {}
+		if(savedSort && typeof savedSort.colId === 'number') {
+			const headerRow = table.tHead && table.tHead.rows[0];
+			const th = headerRow && Array.from(headerRow.cells).find(
+				c => parseInt(c.dataset.colId, 10) === savedSort.colId
+			);
+			if(th) {
+				_applySort(table, th, savedSort.order || 'asc');
+				return; // done with this table
+			}
+		}
+
+		// No saved sort — apply defaults
+		if(table.classList.contains('mut-table')) {
+			// Score% column (original col 5)
+			const headerRow = table.tHead && table.tHead.rows[0];
+			const th = headerRow && Array.from(headerRow.cells).find(
+				c => parseInt(c.dataset.colId, 10) === 5
+			);
+			if(th) _applySort(table, th, 'asc');
+		} else if(table.classList.contains('dup-table')) {
+			// File column (original col 0)
+			const headerRow = table.tHead && table.tHead.rows[0];
+			const th = headerRow && Array.from(headerRow.cells).find(
+				c => parseInt(c.dataset.colId, 10) === 0
+			);
+			if(th) _applySort(table, th, 'asc');
+		} else if(table.classList.contains('sortable-table') && !table.classList.contains('mut-table') && !table.classList.contains('dup-table')) {
+			// CPAN Testers: sort by Date (original col 0) ascending
+			const headerRow = table.tHead && table.tHead.rows[0];
+			const th = headerRow && Array.from(headerRow.cells).find(
+				c => parseInt(c.dataset.colId, 10) === 0
+			);
+			if(th) _applySort(table, th, 'asc');
+		}
+	});
+
+	// Coverage table: pre-sorted ascending by File (col 0) from Perl — just update arrows
+	const covTable = document.querySelector("table[data-table-id='coverage']");
+	if(covTable && covTable.tHead) {
+		const id = _tableId(covTable);
+		let savedSort = null;
+		try { savedSort = JSON.parse(localStorage.getItem('atg_sort_' + id)); } catch(e) {}
+		if(!savedSort) {
+			const headers = covTable.tHead.rows[0].cells;
+			for(let i = 0; i < headers.length; i++) {
+				const arrow = headers[i].querySelector(".arrow");
+				if(!arrow) continue;
+				arrow.textContent = "▲";
+				arrow.classList.toggle("active", i === 0);
+			}
 		}
 	}
+
+	_initializingTables = false;
+
+	// Wire up drag-to-reorder on every sortable column header
+	document.querySelectorAll('th.sortable').forEach(th => {
+		th.setAttribute('draggable', 'true');
+		th.title = (th.title ? th.title + ' · ' : '') + 'Drag to reorder columns';
+		th.addEventListener('dragstart',  _colDragStart);
+		th.addEventListener('dragover',   _colDragOver);
+		th.addEventListener('dragenter',  _colDragEnter);
+		th.addEventListener('dragleave',  _colDragLeave);
+		th.addEventListener('drop',       _colDrop);
+		th.addEventListener('dragend',    _colDragEnd);
+	});
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1624,10 +1851,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	update();
 });
-document.addEventListener("DOMContentLoaded", () => {
-	const th = document.querySelector("table.sortable-table th");
-	if(th) sortTable(th, 0);
-});
 </script>
 
 HTML
@@ -1689,10 +1912,10 @@ HTML
 	</label>
 </div>
 
-<table class="sortable-table" data-sort-col="0" data-sort-order="asc">
+<table class="sortable-table" data-sort-col="0" data-sort-order="asc" data-table-id="cpan">
 <thead>
 <tr>
-	<th class="sortable" onclick="sortTable(this, 0)">
+	<th class="sortable" onclick="sortTable(this, 0)" data-sort-type="date">
 		<span class="label">Date</span> <span class="arrow">&#x25B2;</span>
 	</th>
 	<th class="sortable" onclick="sortTable(this, 1)">
@@ -1820,9 +2043,17 @@ if($mutation_db) {
 		close $lfh;
 	}
 
+	my $cpd_data;
+
+	if($config{cpd_file} && -f $config{cpd_file}) {
+		open my $cfh, '<', $config{cpd_file};
+		$cpd_data = decode_json(do { local $/; <$cfh> });
+		close $cfh;
+	}
+
 	my $files = _group_by_file($mutation_db);
 
-	push @html, @{_mutation_index($mutation_db, $files, $cover_db, $config{lcsaj_root}, $lcsaj_hits)};
+	push @html, @{_mutation_index($mutation_db, $files, $cover_db, $config{lcsaj_root}, $lcsaj_hits, $cpd_data)};
 
 	# Pre-sort files worst-first so navigation order matches index order
 	my @sorted_files = sort { _file_score($files->{$a}) <=> _file_score($files->{$b}) || $a cmp $b } keys %$files;
@@ -1836,7 +2067,18 @@ if($mutation_db) {
 		# Only assign next if this is NOT the last file
 		my $next = $i < $#sorted_files ? $sorted_files[$i + 1] : undef;
 
-		_mutant_file_report($config{mutation_output_dir}, $file, $files->{$file}, $prev, $next, $cover_db, $config{lcsaj_root}, $lcsaj_hits);
+		_mutant_file_report($config{mutation_output_dir}, $file, $files->{$file}, $prev, $next, $cover_db, $config{lcsaj_root}, $lcsaj_hits, $cpd_data);
+	}
+
+	if($cpd_data) {
+		my @cpd_files = sort keys %$cpd_data;
+		for my $i (0 .. $#cpd_files) {
+			_cpd_file_report(
+				$config{cpd_output_dir}, $cpd_files[$i], $cpd_data, $github_base,
+				$i > 0            ? $cpd_files[$i - 1] : undef,
+				$i < $#cpd_files  ? $cpd_files[$i + 1] : undef,
+			);
+		}
 	}
 }
 
@@ -2033,11 +2275,19 @@ sub generate_reproduction_script {
 	my ($dist, $version, $report, $installed_mods, $outdir) = @_;
 
 	my $guid     = $report->{guid}     or return;
+	# Strip control characters (including CR/LF) from fields that are
+	# written verbatim into shell script lines — a CRLF could terminate a
+	# comment and make subsequent text executable.
+	$guid =~ s/[\r\n\x00-\x1f]//g;
+	return unless length $guid;
 	my $perl     = $report->{perl}     // 'unknown';
+	$perl =~ s/[\r\n\x00-\x1f]//g;
 	my $os       = $report->{osname}   // 'unknown';
+	$os =~ s/[\r\n\x00-\x1f]//g;
 	my $reporter = $report->{reporter} // '';
 	$reporter =~ s/"//g;
 	$reporter =~ s/<[^>]+>//g;
+	$reporter =~ s/[\r\n\x00-\x1f]//g;
 	$reporter =~ s/\s+$//g;
 
 	my $repro_dir  = File::Spec->catdir($outdir, 'reproduce');
@@ -4226,32 +4476,66 @@ sub _generate_fuzz_schemas {
 #             appear at the top.
 # --------------------------------------------------
 sub _mutation_index {
-	my ($data, $files, $coverage_data, $lcsaj_dir, $lcsaj_hits) = @_;
+	my ($data, $files, $coverage_data, $lcsaj_dir, $lcsaj_hits, $cpd_data) = @_;
 
 	my @html;
 
 	push @html, '<h2>Mutation Report</h2>';
 
-	push @html, '<h3>Mutation Summary</h3>';
-	push @html, '<ul>';
-	push @html, "<li><b>Score</b>: $data->{score}%</li>";
-	push @html, "<li><b>Total</b>: $data->{total}</li>";
+	push @html, '<h3>Mutation Summary</h3>',
+		'<ul>',
+		"<li><b>Score</b>: $data->{score}%</li>",
+		"<li><b>Total</b>: $data->{total}</li>";
 	push @html, '<li><b>Killed</b>: ', scalar(@{$data->{killed} || []}), '</li>';
 	push @html, '<li><b>Survived</b>: ', scalar(@{$data->{survived} || []}), '</li>';
+
+	if($cpd_data) {
+		my $cpd_files = scalar keys %$cpd_data;
+		my $cpd_blocks = 0;
+		$cpd_blocks += scalar @{ $cpd_data->{$_} } for keys %$cpd_data;
+		if($cpd_files) {
+			push @html, "<li><b>Duplication</b>: $cpd_blocks duplicate block(s) across $cpd_files file(s) (see Dup% column)</li>";
+		} else {
+			push @html, '<li><b>Duplication</b>: no duplicate code blocks detected</li>';
+		}
+	} else {
+		push @html, '<li><b>Duplication</b>: install <a href="https://metacpan.org/dist/Code-CutNPaste">Code::CutNPaste</a> to enable</li>';
+	}
 
 	push @html, '</ul>';
 
 	push @html, "<h3>Mutation Files</h3>\n";
-	push @html, "<table border='1' cellpadding='5'>\n";
+	push @html, "<table border='1' cellpadding='5' class=\"sortable-table mut-table\" data-sort-col=\"5\" data-sort-order=\"asc\" data-table-id=\"mut\">\n";
 
 	# Column headers for the mutation files table.
-	# TER3 = Third level Test Effectiveness Ratio (LCSAJ path coverage).
-	# Only shown when lcsaj_root is configured.
-	if($config{lcsaj_root}) {
-		push @html, "<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Skipped</th><th>Score%</th><th>Complexity</th><th title=\"TER1=Statement, TER2=Branch, TER3=LCSAJ Path\">TER1 / TER2 / TER3</th></tr>\n";
-	} else {
-		push @html, "<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Skipped</th><th>Score%</th><th>Complexity</th></tr>\n";
-	}
+	# TER is always column 7 in data rows; show the same column in the header
+	# regardless of lcsaj_root so the Dup% column index is always 8.
+	# TER3 label only shown when lcsaj_root is configured.
+	my $ter_hdr_label = $config{lcsaj_root}
+		? 'TER1 / TER2 / TER3'
+		: 'TER1 / TER2';
+	my $ter_hdr_title = $config{lcsaj_root}
+		? ' title="TER1=Statement, TER2=Branch, TER3=LCSAJ Path"'
+		: ' title="TER1=Statement coverage, TER2=Branch coverage"';
+	my $cpd_col_hdr = $cpd_data
+		? '<th class="sortable" onclick="sortTable(this, 8)"><span class="label">Dup%</span> <span class="arrow">&#x25B2;</span></th>'
+		: '';
+	push @html, <<"THEAD";
+<thead>
+<tr>
+<th class="sortable" onclick="sortTable(this, 0)"><span class="label">File</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 1)"><span class="label">Total</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 2)"><span class="label">Killed</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 3)"><span class="label">Survivors</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 4)"><span class="label">Skipped</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 5)"><span class="label">Score%</span> <span class="arrow active">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 6)"><span class="label">Complexity</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 7)"$ter_hdr_title><span class="label">$ter_hdr_label</span> <span class="arrow">&#x25B2;</span></th>
+$cpd_col_hdr
+</tr>
+</thead>
+<tbody>
+THEAD
 
 	for my $file (
 		sort { _file_score($files->{$a}) <=> _file_score($files->{$b}) || $a cmp $b } keys %$files
@@ -4359,8 +4643,26 @@ sub _mutation_index {
 			$ter_cell = "$ter1_badge / $ter2_badge";
 		}
 
+		# --------------------------------------------------
+		# CPD column — percentage of file lines that appear
+		# in at least one duplicate block.
+		# --------------------------------------------------
+		my $cpd_cell = '';
+		if($cpd_data) {
+			my $cpd_blocks = _cpd_blocks_for_file($file, $cpd_data);
+			my $dup_pct = _cpd_pct_for_file($file, $cpd_data);
+			# Invert badge colours: high duplication is bad (red), low is good (green)
+			my $cpd_badge = _dup_badge($dup_pct);
+			if(@$cpd_blocks) {
+				(my $cpd_display = $file) =~ s{^.*/lib/}{lib/};
+				my $cpd_url = "cpd_html/$cpd_display.html";
+				$cpd_badge .= qq{ <a href="$cpd_url" class="icon-link" title="View duplicate lines highlighted" target="_blank">&#128269;</a>};
+			}
+			$cpd_cell = "<td>$cpd_badge</td>";
+		}
+
 		push @html, sprintf(
-			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>},
+			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>%s</tr>},
 			$row_class,
 			$html_file,
 			$file,
@@ -4372,10 +4674,151 @@ sub _mutation_index {
 			$badge_html,
 			$complexity_html,
 			$ter_cell,
+			$cpd_cell,
 		);
 	}
 
-	push @html, "</table>\n";
+	push @html, "</tbody></table>\n";
+
+	unless($cpd_data) {
+		push @html, '<p><em>Install <a href="https://metacpan.org/dist/Code-CutNPaste">Code::CutNPaste</a> to enable copy-paste duplication analysis (Dup% column).</em></p>';
+	}
+
+	# --------------------------------------------------
+	# Duplication Report table — lists every duplicate
+	# block with its file, line range, and the file/line
+	# it duplicates, so the reader can see exactly which
+	# lines are copied without clicking into each file.
+	# --------------------------------------------------
+	if($cpd_data && %$cpd_data) {
+
+		# Change 5: staleness warning — compare cpd.json mtime to
+		# the newest .pm under lib/ so stale results are flagged.
+		if($config{cpd_file} && -f $config{cpd_file}) {
+			my $cpd_mtime  = (stat($config{cpd_file}))[9] // 0;
+			my $newest_pm  = 0;
+			if(opendir my $dh, 'lib') {
+				# Recursive mtime scan via find(1) kept dependency-free
+				my @pm_files;
+				my @dirs = ('lib');
+				while(my $dir = shift @dirs) {
+					next unless opendir(my $d, $dir);
+					for my $e (readdir $d) {
+						next if $e =~ /^\./;
+						my $path = "$dir/$e";
+						push @dirs, $path if -d $path;
+						if($e =~ /\.pm$/) {
+							my $mt = (stat($path))[9] // 0;
+							$newest_pm = $mt if $mt > $newest_pm;
+						}
+					}
+					closedir $d;
+				}
+				closedir $dh;
+			}
+			if($newest_pm > $cpd_mtime) {
+				push @html, '<p class="notice" style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:6px 10px;">'
+					. '&#9888; CPD data may be stale &mdash; source files have changed since the last duplication scan. '
+					. 'Re-run the dashboard workflow to refresh.</p>';
+			}
+		}
+
+		push @html, '<h2>Duplication Report</h2>';
+		push @html, "<p><em>Only duplicate blocks of 10 or more consecutive lines are shown. "
+			. "Each pair is listed once. Intra-file duplicates are labelled <b>(same file)</b>.</em></p>\n";
+		push @html, "<table border='1' cellpadding='5' class=\"sortable-table dup-table\" data-sort-col=\"0\" data-sort-order=\"asc\" data-table-id=\"dup\">\n";
+		push @html, <<"THEAD";
+<thead>
+<tr>
+<th class="sortable" onclick="sortTable(this, 0)"><span class="label">File</span> <span class="arrow active">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 1)"><span class="label">Lines (10+ consecutive)</span> <span class="arrow">&#x25B2;</span></th>
+<th class="sortable" onclick="sortTable(this, 2)"><span class="label">Duplicated in</span> <span class="arrow">&#x25B2;</span></th>
+</tr>
+</thead>
+<tbody>
+THEAD
+
+		# Change 4: sort files by filtered block count descending, then name.
+		my %filtered_blocks;
+		for my $f (keys %$cpd_data) {
+			$filtered_blocks{$f} = _cpd_blocks_for_file($f, $cpd_data);
+		}
+
+		# Change 1: deduplicate pairs — track canonical (side_a, side_b) pairs.
+		my %seen_pairs;
+
+		for my $f (sort { scalar @{$filtered_blocks{$b}} <=> scalar @{$filtered_blocks{$a}} || $a cmp $b } keys %$cpd_data) {
+			my $blocks = $filtered_blocks{$f};
+			next unless ref $blocks eq 'ARRAY' && @$blocks;
+			my $display_f = $f;
+			$display_f =~ s{^.*/lib/}{lib/};
+			my $source_url = $github_base . $display_f;
+			my $drill_url  = "cpd_html/$display_f.html";
+			my $file_cell = sprintf(
+				'<a href="%s" title="View duplicate lines highlighted" target="_blank">%s</a>'
+				. ' <a href="%s" class="icon-link" title="View source on GitHub" target="_blank">&#128269;</a>',
+				$drill_url, $display_f, $source_url
+			);
+			for my $b (sort { $a->{start} <=> $b->{start} } @$blocks) {
+				next unless ref $b eq 'HASH' && defined $b->{start};
+				my $end  = $b->{end}  // $b->{start};
+				next if ($end - $b->{start} + 1) < 10;
+				my $mf   = $b->{match_file} // '';
+				$mf =~ s{^.*/lib/}{lib/};
+				my $ml   = $b->{match_line} // '';
+
+				# Change 1: canonical pair key — deduplicate A↔B and B↔A
+				my $side_a    = "$display_f:$b->{start}";
+				my $side_b    = "$mf:$ml";
+				my $pair_key  = join "\0", sort($side_a, $side_b);
+				next if $seen_pairs{$pair_key}++;
+
+				my $range = $b->{start} == $end
+					? "line $b->{start}"
+					: "lines $b->{start}&ndash;$end";
+
+				# Change 3: sample tooltip — first real code line of block
+				my $sample = _block_sample($display_f, $b->{start}, $end);
+				(my $sample_esc = $sample) =~ s/"/&quot;/g;
+				my $range_cell = $sample_esc
+					? qq{<span title="$sample_esc">$range</span>}
+					: $range;
+
+				# Change 2: link match to CPD drill-down if page will exist,
+				#           fall back to GitHub otherwise.
+				# Change 7: label intra-file duplicates distinctly.
+				my $intra = ($mf eq $display_f);
+				my $match_cell;
+				if($intra) {
+					my $drill_match = "cpd_html/$display_f.html";
+					$match_cell = sprintf(
+						'<a href="%s" title="Duplicate within same file" target="_blank">%s lines %s&ndash;%s</a>'
+						. ' <em>(same file)</em>',
+						$drill_match, $display_f, $ml, $ml + $end - $b->{start}
+					);
+				} elsif(exists $cpd_data->{$mf} || exists $cpd_data->{"lib/$mf"}) {
+					my $drill_match = "cpd_html/$mf.html";
+					$match_cell = sprintf(
+						'<a href="%s" title="View highlighted in CPD report" target="_blank">%s line %s</a>',
+						$drill_match, $mf, $ml
+					);
+				} else {
+					my $match_url = $github_base . $mf;
+					$match_cell = sprintf(
+						'<a href="%s#L%s" title="View in GitHub" target="_blank">%s line %s</a>',
+						$match_url, $ml, $mf, $ml
+					);
+				}
+
+				push @html, sprintf(
+					qq{<tr><td>%s</td><td data-value="%d">%s</td><td>%s</td></tr>\n},
+					$file_cell, $b->{start}, $range_cell, $match_cell
+				);
+			}
+		}
+
+		push @html, "</tbody></table>\n";
+	}
 
 	# --------------------------------------------------
 	# Structural Coverage Summary (if provided)
@@ -4387,8 +4830,8 @@ sub _mutation_index {
 
 		my $branch_pct = $branch_total ? sprintf('%.2f', ($branch_hit / $branch_total) * 100) : 0;
 
-		push @html, "<h2>Structural Coverage (Approximate)</h2>";
-		push @html, "<div class='summary'>";
+		push @html, '<h2>Structural Coverage (Approximate)</h2>',
+			"<div class='summary'>";
 		push @html, "Statement Coverage: $stmt_pct% ($stmt_hit / $stmt_total)<br>";
 		push @html, "Branch Coverage: $branch_pct% ($branch_hit / $branch_total)<br>";
 		push @html, '<em>Approximate LCSAJ derived from branch and statement coverage.</em>';
@@ -4475,6 +4918,334 @@ sub _ter_badge {
 		$pct >= $config{med_threshold} ? ('badge-good', 'Excellent') :
 		$pct >= $config{low_threshold} ? ('badge-warn', 'Moderate')  :
 						 ('badge-bad',  'Needs improvement');
+
+	return sprintf(
+		'<span class="coverage-badge %s" title="%s">%.1f%%</span>',
+		$class, $tooltip, $pct
+	);
+}
+
+# --------------------------------------------------
+# _cpd_blocks_for_file
+#
+# Purpose:    Return the list of CPD duplicate blocks
+#             for a given file, normalising the key so
+#             it matches the lib/ form used in cpd.json.
+#
+# Entry:      $file     - source file path (any form)
+#             $cpd_data - decoded cpd.json hashref
+#
+# Exit:       Returns an arrayref of block hashrefs
+#             (each with start/end/match_file/match_line),
+#             or an empty arrayref if none found.
+#
+# Side effects: None.
+# --------------------------------------------------
+sub _cpd_blocks_for_file {
+	my ($file, $cpd_data) = @_;
+
+	return [] unless $cpd_data;
+
+	my $norm = $file;
+	$norm =~ s{^.*/blib/lib/}{lib/};
+	$norm =~ s{^.*/lib/}{lib/};
+	$norm = "lib/$norm" unless $norm =~ m{^lib/};
+
+	my $raw = $cpd_data->{$norm} // $cpd_data->{$file} // [];
+
+	# Filter out POD/boilerplate false positives.
+	# A block is discarded if any of its lines in the source file
+	# is a POD directive (starts with =), or if more than half the
+	# lines are blank — both are signatures of header boilerplate
+	# that appears identically in every module (VERSION, NAME pod,
+	# use strict, etc.).
+	my @kept;
+	BLOCK: for my $b (@$raw) {
+		next unless ref $b eq 'HASH' && defined $b->{start} && defined $b->{end};
+
+		# Try to read the block lines from the source file
+		my $src_path = $norm;   # lib/... relative
+		$src_path = $file unless -f $src_path;
+		if(open my $fh, '<', $src_path) {
+			my ($ln, @lines) = (0);
+			while(<$fh>) {
+				$ln++;
+				next if $ln < $b->{start};
+				last if $ln > $b->{end};
+				push @lines, $_;
+			}
+			close $fh;
+
+			if(@lines) {
+				# Any POD directive → boilerplate
+				next BLOCK if grep { /^=/ } @lines;
+
+				# Mostly blank → low-signal match
+				my $blank = grep { /^\s*$/ } @lines;
+				next BLOCK if ($blank / scalar @lines) > 0.5;
+			}
+		}
+
+		push @kept, $b;
+	}
+
+	return \@kept;
+}
+
+# --------------------------------------------------
+# _cpd_page_relpath
+#
+# Purpose:    Compute the relative URL from one CPD
+#             drill-down page to another, so prev/next
+#             links work regardless of directory depth.
+#
+# Entry:      $from - $display_f of the current page
+#             $to   - $display_f of the target page
+#
+# Exit:       Relative URL string (e.g. "Foo.pm.html"
+#             or "../Mutation/Bar.pm.html").
+#
+# Side effects: None.
+# --------------------------------------------------
+sub _cpd_page_relpath {
+	my ($from, $to) = @_;
+	(my $from_dir = $from) =~ s{[^/]+$}{};   # directory part of $from
+	# Prepend a fake absolute root so File::Spec can resolve correctly
+	return File::Spec->abs2rel("/$to.html", "/$from_dir");
+}
+
+# --------------------------------------------------
+# _block_sample
+#
+# Purpose:    Return the first meaningful code line of
+#             a duplicate block for use as a tooltip,
+#             truncated to 60 characters.
+#
+# Entry:      $file  - source file path (lib/...)
+#             $start - first line number of the block
+#             $end   - last  line number of the block
+#
+# Exit:       Returns a plain-text string (may be empty).
+#
+# Side effects: None.
+# --------------------------------------------------
+sub _block_sample {
+	my ($file, $start, $end) = @_;
+
+	open my $fh, '<', $file or return '';
+	my ($ln, $sample) = (0, '');
+	while(<$fh>) {
+		$ln++;
+		next if $ln < $start;
+		last if $ln > $end;
+		chomp(my $line = $_);
+		next if $line =~ /^\s*$/;     # blank
+		next if $line =~ /^\s*#/;     # comment
+		next if $line =~ /^=/;        # POD
+		$line =~ s/^\s+//;
+		$sample = length($line) > 60 ? substr($line, 0, 57) . '...' : $line;
+		last;
+	}
+	close $fh;
+	return $sample;
+}
+
+# --------------------------------------------------
+# _cpd_pct_for_file
+#
+# Purpose:    Compute the percentage of lines in a
+#             source file that fall within at least
+#             one CPD duplicate block.
+#
+# Entry:      $file     - source file path
+#             $cpd_data - decoded cpd.json hashref
+#
+# Exit:       Returns a percentage (0-100) or undef
+#             if the file is not in cpd.json.
+#
+# Side effects: None.
+# --------------------------------------------------
+sub _cpd_pct_for_file {
+	my ($file, $cpd_data) = @_;
+
+	my $blocks = _cpd_blocks_for_file($file, $cpd_data);
+	return 0 unless @$blocks;
+
+	my %dup_lines;
+	for my $b (@$blocks) {
+		next unless ref $b eq 'HASH' && defined $b->{start} && defined $b->{end};
+		$dup_lines{$_} = 1 for $b->{start} .. $b->{end};
+	}
+
+	# Use the actual file line count as the denominator
+	my $total_lines = 0;
+	if(open my $fh, '<', $file) {
+		$total_lines++ while <$fh>;
+		close $fh;
+	}
+
+	return $total_lines ? (scalar keys %dup_lines) / $total_lines * 100 : 0;
+}
+
+# --------------------------------------------------
+# _cpd_file_report
+#
+# Purpose:    Generate a standalone HTML page for one
+#             source file showing its content with
+#             duplicate regions highlighted in amber.
+#             Pages are written to $out_dir/$file.html.
+#
+# Entry:      $out_dir     - directory to write pages into
+#             $file        - source file path (lib/...)
+#             $cpd_data    - decoded cpd.json hashref
+#             $github_base - base URL for GitHub links
+#             $prev_file   - previous file in CPD list (for nav)
+#             $next_file   - next file in CPD list (for nav)
+#
+# Exit:       Returns nothing. Writes one HTML file.
+#
+# Side effects: Creates directories; writes HTML file.
+# --------------------------------------------------
+sub _cpd_file_report {
+	my ($out_dir, $file, $cpd_data, $github_base, $prev_file, $next_file) = @_;
+
+	my $display_f = $file;
+	$display_f =~ s{^.*/lib/}{lib/};
+
+	# Build line-number → list-of-match-locations map.
+	# Change 7: label intra-file matches "(same file, line N)"
+	my %dup_by_line;
+	my $blocks = _cpd_blocks_for_file($file, $cpd_data);
+	for my $b (@$blocks) {
+		next unless ref $b eq 'HASH' && defined $b->{start} && defined $b->{end};
+		next if ($b->{end} - $b->{start} + 1) < 10;
+		my $mf = $b->{match_file} // '';
+		$mf =~ s{^.*/lib/}{lib/};
+		my $ml = $b->{match_line} // '';
+		my $label = ($mf eq $display_f)
+			? "same file, line $ml"
+			: "$mf line $ml";
+		for my $ln ($b->{start} .. $b->{end}) {
+			push @{ $dup_by_line{$ln} }, $label;
+		}
+	}
+
+	return unless %dup_by_line || -f $file;
+
+	# Ensure output directory exists
+	(my $page_path = "$out_dir/$display_f.html") =~ s{//}{/}g;
+	my $page_dir = $page_path;
+	$page_dir =~ s{/[^/]+$}{};
+	make_path($page_dir) unless -d $page_dir;
+
+	open my $out, '>', $page_path or return;
+
+	my $source_url = $github_base . $display_f;
+	my $title      = "CPD: $display_f";
+
+	# Change 6: build prev/next navigation links
+	my $prev_link = '';
+	my $next_link = '';
+	if($prev_file) {
+		my $prev_display = $prev_file;
+		$prev_display =~ s{^.*/lib/}{lib/};
+		$prev_link = sprintf('&larr; <a href="%s">%s</a> &nbsp; ',
+			_cpd_page_relpath($display_f, $prev_display), $prev_display);
+	}
+	if($next_file) {
+		my $next_display = $next_file;
+		$next_display =~ s{^.*/lib/}{lib/};
+		$next_link = sprintf(' &nbsp; <a href="%s">%s</a> &rarr;',
+			_cpd_page_relpath($display_f, $next_display), $next_display);
+	}
+	# +1 for the cpd_html/ level that sits between cover_html/ and the file
+	my $depth_to_root = 1 + (() = $display_f =~ m{/}g);
+	my $root_prefix   = '../' x $depth_to_root;
+
+	print $out _mutant_file_header($title);
+	print $out qq{<div class="nav">${prev_link}<a href="${root_prefix}index.html">&uarr; Dashboard</a>${next_link} &nbsp; &nbsp;\n};
+	print $out qq{<a href="$source_url" target="_blank">View on GitHub &#128269;</a></div>\n};
+	print $out qq{<h1>$display_f &mdash; Duplicate Code Regions</h1>\n};
+	print $out qq{<div class="legend cpd-legend">\n};
+	print $out qq{  <span class="cpd-dot">&#9670;</span> Amber lines duplicate code in another file &mdash; hover for location.<br>\n};
+	print $out qq{  <span class="intra-dot">&#9670;</span> Purple: duplicate of another region within this same file.\n};
+	print $out qq{</div>\n};
+	print $out qq{<pre>\n};
+
+	# Render the file line by line
+	if(open my $src, '<', $file) {
+		my $ln = 0;
+		while(my $content = <$src>) {
+			$ln++;
+			chomp $content;
+			my $escaped = $content;
+			$escaped =~ s/&/&amp;/g;
+			$escaped =~ s/</&lt;/g;
+			$escaped =~ s/>/&gt;/g;
+
+			my $line_no = sprintf('%5d: ', $ln);
+
+			if(my $matches = $dup_by_line{$ln}) {
+				my %seen;
+				my $tips = '';
+				for my $loc (@$matches) {
+					next if $seen{$loc}++;
+					(my $tip_text = $loc) =~ s/"/&quot;/g;
+					# Purple dot for intra-file, amber for cross-file
+					my $dot_class = ($loc =~ /^same file/) ? 'intra-dot' : 'cpd-dot';
+					my $match_file = ($loc =~ /^(lib\/\S+\.pm) line/) ? $1 : '';
+					if($match_file) {
+						my $href = _cpd_page_relpath($display_f, $match_file);
+						$tips .= qq{<a href="$href" class="$dot_class" title="Duplicate: $tip_text" target="_blank">&#9670;</a>};
+					} elsif($loc =~ /^same file/) {
+						$tips .= qq{<span class="cpd-tip"><span class="$dot_class">&#9670;</span><span class="cpd-tip-text">Duplicate: $tip_text</span></span>};
+					} else {
+						$tips .= qq{<span class="cpd-tip"><span class="$dot_class">&#9670;</span><span class="cpd-tip-text">Duplicate: $tip_text</span></span>};
+					}
+				}
+				print $out qq{<span class="dup-line">$line_no$tips$escaped</span>};
+			} else {
+				print $out "$line_no$escaped\n";
+			}
+		}
+		close $src;
+	} else {
+		print $out "(source file not found)\n";
+	}
+
+	print $out "</pre>\n";
+	print $out _mutant_file_footer();
+
+	close $out;
+}
+
+# --------------------------------------------------
+# _dup_badge
+#
+# Purpose:    Format a duplication percentage as a
+#             colour-coded HTML badge. Colour logic is
+#             the inverse of _ter_badge: low duplication
+#             is good (green), high is bad (red).
+#
+# Entry:      $pct - duplication percentage (0-100),
+#                    or undef if no data.
+#
+# Exit:       Returns an HTML span string.
+#
+# Side effects: None.
+# --------------------------------------------------
+sub _dup_badge {
+	my ($pct) = @_;
+
+	unless(defined $pct) {
+		return qq{<span class="coverage-badge" style="background-color:#999" title="CPD tool not installed">n/a</span>};
+	}
+
+	# Invert: low dup% is green, high is red
+	my ($class, $tooltip) =
+		$pct <= (100 - $config{med_threshold}) ? ('badge-good', 'Low duplication') :
+		$pct <= (100 - $config{low_threshold}) ? ('badge-warn', 'Moderate duplication') :
+						          ('badge-bad',  'High duplication');
 
 	return sprintf(
 		'<span class="coverage-badge %s" title="%s">%.1f%%</span>',
@@ -4575,7 +5346,8 @@ sub _mutant_file_report {
 		$next,
 		$coverage_data,
 		$lcsaj_dir,
-		$lcsaj_hits
+		$lcsaj_hits,
+		$cpd_data,
 	) = @_;
 
 	return unless -f $file;
@@ -4585,11 +5357,12 @@ sub _mutant_file_report {
 	close $in;
 
 	# $file values come from mutation.json, keyed by paths discovered
-	# under lib/; reject any '..' segment before it can be used to
-	# build an output path, since the directory-preserving join below
-	# would otherwise let such a segment escape $dir.
+	# under lib/; reject any '..' segment or null byte before it can be
+	# used to build an output path, since the directory-preserving join
+	# below would otherwise let such a segment escape $dir.
 	croak("Refusing to report on suspicious file path: $file")
-		if grep { $_ eq File::Spec->updir } File::Spec->splitdir($file);
+		if $file =~ /\0/
+		|| grep { $_ eq File::Spec->updir } File::Spec->splitdir($file);
 
 	# Preserve directory structure inside report
 	my $relative_path = File::Spec->catfile($dir, $file . '.html');
@@ -4721,6 +5494,30 @@ sub _mutant_file_report {
 	}
 
 	# --------------------------------------------------
+	# CPD legend — only shown when cpd_data is provided
+	# and this file has at least one duplicate block.
+	# --------------------------------------------------
+	if($cpd_data) {
+		my $cpd_blocks = _cpd_blocks_for_file($file, $cpd_data);
+		if(@$cpd_blocks) {
+			my $cpd_page_url = "${ups}cpd_html/$file.html";
+			print $out qq{
+    <div class="legend">
+        <h3>Duplication Legend (CPD) &mdash; <a href="$cpd_page_url" target="_blank">View full CPD report &#128269;</a></h3>
+        <p>
+        <span class="cpd-dot">&#9670;</span>
+        <b>Duplicate block</b> &mdash; this line is part of a code block duplicated elsewhere.
+        Hover to see the matching location.
+        </p>
+        <p>
+        Multiple diamonds on a line mean the block is duplicated in more than one other place.
+        </p>
+    </div>
+};
+		}
+	}
+
+	# --------------------------------------------------
 	# Legend explaining line colours
 	# --------------------------------------------------
 	print $out qq{
@@ -4809,6 +5606,41 @@ sub _mutant_file_report {
 		}
 	}
 
+	# --------------------------------------------------
+	# Pre-compute CPD marker map for this file.
+	# Each line that falls within a duplicate block
+	# gets an entry listing the matching locations.
+	# The file key in cpd_data uses lib/ paths so we
+	# normalise $file to match that form.
+	# --------------------------------------------------
+	my %cpd_by_line;
+
+	if($cpd_data) {
+		my $cpd_norm = $file;
+		$cpd_norm =~ s{^.*/blib/lib/}{lib/};
+		$cpd_norm =~ s{^.*/lib/}{lib/};
+		$cpd_norm = "lib/$cpd_norm" unless $cpd_norm =~ m{^lib/};
+
+		my $blocks = $cpd_data->{$cpd_norm}
+			// $cpd_data->{$file}
+			// [];
+
+		for my $b (@$blocks) {
+			next unless ref $b eq 'HASH';
+			my ($start, $end) = ($b->{start}, $b->{end});
+			next unless defined $start && defined $end;
+
+			# Normalise the match file path for display
+			my $mf = $b->{match_file} // '';
+			$mf =~ s{^.*/lib/}{lib/};
+			my $ml = $b->{match_line} // '';
+
+			for my $ln ($start .. $end) {
+				push @{ $cpd_by_line{$ln} }, "$mf:$ml";
+			}
+		}
+	}
+
 	for my $i (0 .. $#lines) {
 		my $line_no = $i + 1;
 		my $content = encode_entities($lines[$i]);
@@ -4868,6 +5700,30 @@ sub _mutant_file_report {
 			}
 		}
 
+		# CPD markers — one diamond per duplicate match location
+		my $cpd_marker = '';
+
+		if(my $matches = $cpd_by_line{$line_no}) {
+			# Deduplicate match locations so the same file:line
+			# doesn't produce two diamonds from overlapping blocks
+			my %seen_cpd;
+			for my $loc (@$matches) {
+				next if $seen_cpd{$loc}++;
+				my $tip = "Duplicate: $loc";
+				$tip =~ s/"/&quot;/g;
+				# Build a link to the CPD drill-down page for the match file
+				my $cpd_link_file = ($loc =~ /^same file/) ? $file : ($loc =~ /^(lib\/\S+\.pm)/) ? $1 : '';
+				my $cpd_dot_html;
+				if($cpd_link_file) {
+					my $cpd_href = "${ups}cpd_html/$cpd_link_file.html";
+					$cpd_dot_html = qq{<a href="$cpd_href" class="cpd-dot" title="$tip" target="_blank">&#9670;</a>};
+				} else {
+					$cpd_dot_html = qq{<span class="cpd-tip"><span class="cpd-dot">&#9670;</span><span class="cpd-tip-text">$tip</span></span>};
+				}
+				$cpd_marker .= $cpd_dot_html;
+			}
+		}
+
 		# Add tooltip class only if tooltip text exists
 		my $extra_class = $tooltip ? ' tooltip' : '';
 
@@ -4877,7 +5733,7 @@ sub _mutant_file_report {
 		my $tooltip_attr = $tooltip ? qq{ data-tooltip="$tooltip"} : '';
 
 		print $out qq{<span class="$class$extra_class"$tooltip_attr>};
-		print $out $lcsaj_marker, sprintf('%5d: %s', $line_no, $content);
+		print $out $lcsaj_marker, $cpd_marker, sprintf('%5d: %s', $line_no, $content);
 
 		# --------------------------------------------------
 		# Build expandable mutant details for this line
@@ -4905,12 +5761,14 @@ sub _mutant_file_report {
 
 				for my $m (@line_mutants) {
 					if($m->{status} eq 'Survived') {
-						my $id = $m->{id} // 'unknown';
-						my $type = $m->{type} // '';
-						my $description = $m->{description} // '';
+						my $id          = encode_entities($m->{id}          // 'unknown');
+						my $type        = $m->{type} // '';
+						my $description = encode_entities($m->{description} // '');
+						my $difficulty  = encode_entities($m->{difficulty}  // '');
+						my $hint        = encode_entities($m->{hint}        // '');
 
 						$details .= "<li><b>$id: $description</b><br>";
-						$details .= "$m->{difficulty}: $m->{hint}\n";
+						$details .= "$difficulty: $hint\n";
 
 						# Show mutation type if available
 						if($type) {
@@ -5131,12 +5989,15 @@ sub _relative_link {
 }
 
 sub _mutant_file_header {
+	my ($title) = @_;
+	$title //= '';
+	my $title_tag = $title ? "<title>$title</title>\n" : '';
 	return qq{
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<style>
+${title_tag}<style>
 
 /* --------------------------------------------------
    CSS Variables (Light Mode Default)
@@ -5369,6 +6230,54 @@ pre details.mutant-details ul {
 	visibility: visible;
 }
 
+.cpd-dot {
+    color: #cc8800;
+    font-size: 10px;
+    margin-right: 3px;
+    cursor: help;
+    text-decoration: none;
+}
+a.cpd-dot { cursor: pointer; }
+a.cpd-dot:hover { color: #ff8800; }
+
+.cpd-tip {
+    position: relative;
+    display: inline-block;
+}
+
+.cpd-tip .cpd-tip-text {
+    visibility: hidden;
+    background-color: #333;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.cpd-tip:hover .cpd-tip-text {
+    visibility: visible;
+}
+
+/* CPD drill-down page styles */
+.dup-line { background-color: #fff3cd; display: block; }
+.dup-line:hover { background-color: #ffe082; }
+.intra-dot { color: #9944cc; margin-right: 4px; cursor: help; text-decoration: none; }
+a.intra-dot { cursor: pointer; }
+a.intra-dot:hover { color: #7700bb; }
+.cpd-legend {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+    display: inline-block;
+    padding: 6px 10px;
+    margin-bottom: 1em;
+    font-size: 0.9em;
+}
+
 </style>
 </head>
 <body>
@@ -5395,7 +6304,7 @@ function toggleTheme() {
 })();
 
 document.addEventListener("mousemove", function(e) {
-	document.querySelectorAll(".lcsaj-tip-text").forEach(function(tip) {
+	document.querySelectorAll(".lcsaj-tip-text, .cpd-tip-text").forEach(function(tip) {
 		tip.style.left = (e.clientX + 12) + "px";
 		tip.style.top  = (e.clientY + 12) + "px";
 	});

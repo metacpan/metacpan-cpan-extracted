@@ -35,7 +35,7 @@ my $api = HTTP::API::Client->new(
 );
 
 {
-    my $expected = 'a=1&b=2&b1=1&b2=0&b3=True&b4=False&b5=true&b6=false&b7=t&b8=f&c=3&c=4&c=5&e=6,7,8,15&&e=13&e=14&f=9&f=10,11&g=12&h=16&h=17&h=18,19&h=20';
+    my $expected = 'a=1&b=2&b1=1&b2=0&b3=True&b4=False&b5=true&b6=false&b7=t&b8=f&c=3&c=4&c=5&e=6,7,8,15&e=13&e=14&f=9&f=10,11&g=12&h=16&h=17&h=18,19&h=20';
 
     my $req = $api->get( '/test', { g => [ sub { 12 } ] },
         {}, { test_request_object => 1 } );

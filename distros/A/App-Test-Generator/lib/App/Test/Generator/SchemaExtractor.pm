@@ -50,6 +50,21 @@ Readonly my $SIGNATURE_TIMEOUT_SECS     => 3;
 Readonly my $MEMORY_LIMIT_BYTES         => 50_000_000;
 
 # --------------------------------------------------
+# Patterns for rejecting dangerous signature expressions
+# in _compile_signature_isolated
+# --------------------------------------------------
+Readonly my $UNSAFE_KEYWORD_RE => qr/\b(?:system|exec|open|fork|require|do|eval|qx)\b/;
+Readonly my $UNSAFE_CHAR_RE    => qr/[`{};]/;
+
+# --------------------------------------------------
+# strict_pod levels — integer values stored internally
+# but referred to by name everywhere in code
+# --------------------------------------------------
+Readonly my $STRICT_POD_OFF   => 0;
+Readonly my $STRICT_POD_WARN  => 1;
+Readonly my $STRICT_POD_FATAL => 2;
+
+# --------------------------------------------------
 # Numeric boundary values for test hint generation
 # --------------------------------------------------
 Readonly my $INT32_MAX => 2_147_483_647;
@@ -65,11 +80,11 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.45
+Version 0.46
 
 =cut
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 =head1 SYNOPSIS
 
@@ -1444,7 +1459,9 @@ sub extract_all {
 	$self->_log("Parsing $self->{input_file}...");
 	$self->_log('Strict POD mode: ' . (qw(off warn fatal))[$self->{strict_pod}]);
 
-	my $document = PPI::Document->new($self->{input_file}) or die "Failed to parse $self->{input_file}: $!";
+	# $! is not meaningful here — PPI does not set errno on failure
+	my $document = PPI::Document->new($self->{input_file})
+		or croak "Failed to parse $self->{input_file}";
 
 	# Store document for later use
 	$self->{_document} = $document;
@@ -1543,7 +1560,13 @@ sub _find_methods {
 	my ($self, $document) = @_;
 
 	my $subs = $document->find('PPI::Statement::Sub') || [];
-	my $sub_decls = $document->find('PPI::Statement') || [];
+	# Only fetch statements that begin with a Moose modifier keyword —
+	# fetching ALL PPI::Statement nodes on a large file returns thousands
+	# of nodes and then discards nearly all of them in the loop below.
+	my $sub_decls = $document->find(sub {
+		$_[1]->isa('PPI::Statement')
+		&& $_[1]->content =~ /^\s*(?:before|after|around)\b/
+	}) || [];
 
 	my @methods;
 	foreach my $sub (@$subs) {
@@ -1864,7 +1887,7 @@ sub _analyze_method {
 			$schema->{_pod_validation_errors} = \@validation_errors;
 
 			# Either croak immediately or log based on configuration
-			if($self->{strict_pod} == 2) {	# 2 = fatal errors
+			if($self->{strict_pod} == $STRICT_POD_FATAL) {
 				croak("[POD STRICT] $error_msg");
 			} else {	# 1 = warnings
 				carp("[POD STRICT] $error_msg");
@@ -2236,7 +2259,7 @@ sub _detect_accessor_methods {
 			factors => ['Detected combined getter/setter accessor'],
 		};
 		if (my $pod = $method->{pod}) {
-			if ($pod =~ /\b(LWP::UserAgent(::\w+)*)\b/) {
+			if ($pod =~ /\b(LWP::UserAgent(?:::\w+)*)\b/) {
 				my $class = $1;
 				$schema->{output} = {
 					type => 'object',
@@ -2304,7 +2327,7 @@ sub _detect_accessor_methods {
 
 		$self->_log("  Detected getter/setter accessor for property: $property");
 		if (my $pod = $method->{pod}) {
-			if ($pod =~ /\b(LWP::UserAgent(::\w+)*)\b/) {
+			if ($pod =~ /\b(LWP::UserAgent(?:::\w+)*)\b/) {
 				my $class = $1;
 				$schema->{output} = {
 					type => 'object',
@@ -2676,6 +2699,7 @@ sub _extract_pvs_schema {
 			next unless defined $next;
 			if($next->content() =~ /schema\s*=>\s*(\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})/s) {
 				my $schema_text = $1;
+				next if $schema_text =~ $UNSAFE_KEYWORD_RE;
 				my $compartment = Safe->new();
 				$compartment->permit_only(qw(:base_core :base_mem :base_orig));
 
@@ -2739,7 +2763,7 @@ sub _extract_pv_schema {
 			my $next = $call->next_sibling();
 			my ($arglist, $schema_text) = $self->_parse_pv_call($next);
 
-			if($schema_text) {
+			if($schema_text && $schema_text !~ $UNSAFE_KEYWORD_RE) {
 				my $compartment = Safe->new();
 				$compartment->permit_only(qw(:base_core :base_mem :base_orig));
 
@@ -2881,7 +2905,7 @@ sub _extract_moosex_params_schema
 			my $next = $call->next_sibling();
 			my ($arglist, $schema_text) = $self->_parse_pv_call($next);
 
-			if($schema_text) {
+			if($schema_text && $schema_text !~ $UNSAFE_KEYWORD_RE) {
 				my $compartment = Safe->new();
 				$compartment->permit_only(qw(:base_core :base_mem :base_orig));
 
@@ -3211,12 +3235,9 @@ sub _compile_signature_isolated {
 	# concatenation. The actual control here is the allow_signature_exec
 	# opt-in above: this code must never run against a module the caller
 	# has not already decided to trust enough to execute.
-	if ($signature_expr =~ /\b(?:system|exec|open|fork|require|do|eval|qx)\b/) {
-		die 'Unsafe signature expression';
-	}
-
-	if ($signature_expr =~ /[`{};]/) {
-		die "Unsafe signature expression";
+	# Both checks unified into one croak so the message and class are consistent
+	if ($signature_expr =~ $UNSAFE_KEYWORD_RE || $signature_expr =~ $UNSAFE_CHAR_RE) {
+		croak 'Unsafe signature expression -- rejected to prevent code execution';
 	}
 
 	my $payload = <<'PERL';
@@ -4377,7 +4398,7 @@ sub _enhance_boolean_detection {
 	# Look for stronger boolean indicators
 	if ($pod && !$output->{type}) {
 		# Common boolean return patterns in POD
-		if ($pod =~ /returns?\s+(true|false|true|false|1|0)\s+(?:on|for|upon)\s+(success|failure|error|valid|invalid)/i) {
+		if ($pod =~ /returns?\s+(?:true|false|1|0)\s+(?:on|for|upon)\s+(?:success|failure|error|valid|invalid)/i) {
 			$boolean_score += 30;
 			$self->_log('  OUTPUT: Strong boolean indicator in POD (+30)');
 		}
@@ -4422,7 +4443,7 @@ sub _enhance_boolean_detection {
 
 	# Check method name for boolean indicators
 	if ($method_name) {
-		if ($method_name =~ /^(is_|has_|can_|should_|contains_|exists_|check_|verify_|validate_)/) {
+		if ($method_name =~ /^(?:is_|has_|can_|should_|contains_|exists_|check_|verify_|validate_)/) {
 			$boolean_score += 25;
 			$self->_log("  OUTPUT: Method name '$method_name' suggests boolean return (+25)");
 		}
@@ -5019,7 +5040,7 @@ sub _parse_constraints {
 	# Non-negative
 	elsif ($constraint =~ /non-negative/i) {
 		$param->{min} = 0;
-	} elsif($constraint =~ /(.+)?\s(.+)/) {
+	} elsif($constraint =~ /^(\S+)\s+(.+)$/) {
 		my ($op, $val) = ($1, $2);
 		if(looks_like_number($val)) {
 			if ($op eq '<') {
@@ -5111,14 +5132,14 @@ sub _analyze_code {
 		}
 	}
 
-	if($code =~ /(croak|die)\(.*\)\s+if\s*\(\s*scalar\(\@_\)\s*<\s*(\d+)\s*\)/s) {
-		my $required_count = $2;
+	if($code =~ /(?:croak|die)\(.*\)\s+if\s*\(\s*scalar\(\@_\)\s*<\s*(\d+)\s*\)/s) {
+		my $required_count = $1;
 		my @param_names = sort { $params{$a}{position} <=> $params{$b}{position} } keys %params;
 		for my $i (0 .. $required_count-1) {
 			$params{$param_names[$i]}{optional} = 0;
 			$self->_log("  CODE: $param_names[$i] marked required due to croak scalar check");
 		}
-	} elsif ($code =~ /(croak|die)\(.*\)\s+if\s*\(\s*scalar\(\@_\)\s*==\s*(0)\s*\)/s) {
+	} elsif ($code =~ /(?:croak|die)\(.*\)\s+if\s*\(\s*scalar\(\@_\)\s*==\s*0\s*\)/s) {
 		foreach my $param (keys %params) {
 			$params{$param}{optional} = 0;
 			$self->_log("  CODE: $param: all parameters are required due to 'scalar(@_) == 0' check");
@@ -9903,9 +9924,14 @@ sub _log {
 
 =head1 NOTES
 
-This is pre-pre-alpha proof of concept code.
-Nevertheless,
-it is useful for creating a template which you can modify to create a working schema to pass into L<App::Test::Generator>.
+C<SchemaExtractor> uses heuristic analysis of Perl source and POD to infer
+parameter types and constraints. Inference accuracy improves with
+well-documented modules; C<=head3 Input> / C<=head4 Input> formal specs are
+parsed at highest priority and override all heuristics.
+
+The output is always a best-effort schema suitable as a starting template;
+review and augment the generated YAML before using it as a definitive
+specification. Pass it to L<App::Test::Generator> to generate fuzz harnesses.
 
 =head1 TODO
 

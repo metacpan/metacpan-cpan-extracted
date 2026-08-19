@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use base 'Exporter';
 
@@ -233,7 +233,7 @@ Return output kernel whose spectrum is the inverse of the spectrum
 of the input kernel.
 
 The number of samples in the input kernel must be odd.
-Input C<$fir> and output C<$fir_inv> are real-space fir filter kernels.
+Input C<$fir> and output C<$fir_inv> are real-space FIR filter kernels.
 The spectrum of the output kernel is the additive inverse
 with respect to 1 of the spectrum of the input kernel.
 

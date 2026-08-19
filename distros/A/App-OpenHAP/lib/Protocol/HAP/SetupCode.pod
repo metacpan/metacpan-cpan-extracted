@@ -1,0 +1,84 @@
+=head1 NAME
+
+Protocol::HAP::SetupCode - the rules of the HomeKit setup code
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::SetupCode qw(normalize_setup_code validate_setup_code);
+
+    # Normalize a setup code (remove dashes and spaces)
+    my $normalized = normalize_setup_code('9876-5432');  # Returns '98765432'
+    my $normalized = normalize_setup_code('9876 5432');  # Returns '98765432'
+    my $normalized = normalize_setup_code('98765432');   # Returns '98765432'
+
+    # Validate a setup code
+    if (validate_setup_code('9876-5432')) {
+        print "Valid setup code\n";
+    }
+
+    if (!validate_setup_code('1234-5678')) {
+        print "Invalid setup code (sequential pattern)\n";
+    }
+
+=head1 DESCRIPTION
+
+This module handles HAP setup codes: the 8-digit numeric codes that
+pairing uses. The specification calls them setup codes
+[HAP-Pairing §2], so no name here uses the word it replaced.
+
+The HAP specification says that dashes and spaces are format characters
+only. The module removes them before use. Thus C<9876-5432> and
+C<98765432> are the same setup code.
+
+=head1 FUNCTIONS
+
+=head2 normalize_setup_code($code)
+
+This function removes the dashes and the spaces from a setup code. It
+returns the 8-digit numeric string.
+
+    my $normalized = normalize_setup_code('9876-5432');
+    # Returns: '98765432'
+
+The function returns C<undef> if the input format is not valid. A valid
+input has exactly 8 digits after normalization.
+
+=head2 validate_setup_code($code)
+
+This function does a check of a setup code against these HAP
+requirements:
+
+=over 4
+
+=item * The code must have exactly 8 digits after the removal of the
+dashes and the spaces.
+
+=item * The code must not be a trivial or sequential pattern.
+
+=back
+
+The function returns C<1> if the setup code is valid. It returns
+C<undef> if the setup code is not valid.
+
+    if (validate_setup_code('9876-5432')) {
+        # the setup code is valid
+    }
+
+=head1 INVALID SETUP CODES
+
+The HAP specification rejects these setup codes:
+
+    00000000  11111111  22222222  33333333  44444444
+    55555555  66666666  77777777  88888888  99999999
+    12345678  87654321
+
+=head1 SEE ALSO
+
+L<Protocol::HAP::SRP>, L<Protocol::HAP::Pairing>, L<openhapd.conf(5)>, F<spec/HAP-Pairing.md>
+
+=head1 STANDARDS
+
+HomeKit Accessory Protocol Specification (Non-Commercial Version)
+Release R2, Section 5.6: Setup Code
+
+=cut

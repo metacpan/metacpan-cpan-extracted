@@ -269,7 +269,7 @@ subtest 'prepare_workspace() returns a path to an existing directory' => sub {
 	ok(-d $workspace, 'returned path is an existing directory');
 };
 
-subtest 'prepare_workspace() sets $self->{workspace} and $self->{relative}' => sub {
+subtest 'prepare_workspace() sets private _workspace/_relative/_lib_basename keys' => sub {
 	my ($pm, $lib, $tmpdir) = _make_pm();
 	require Cwd;
 	my $orig = Cwd::cwd();
@@ -278,10 +278,14 @@ subtest 'prepare_workspace() sets $self->{workspace} and $self->{relative}' => s
 		file    => File::Spec->catfile('lib', 'TestModule.pm'),
 		lib_dir => 'lib',
 	);
+	my $original_lib_dir = $m->{lib_dir};
 	eval { $m->prepare_workspace() };
 	chdir $orig;
-	ok(defined $m->{workspace}, '$self->{workspace} set');
-	ok(defined $m->{relative},  '$self->{relative} set');
+	ok(defined $m->{_workspace},    '$self->{_workspace} set');
+	ok(defined $m->{_relative},     '$self->{_relative} set');
+	ok(defined $m->{_lib_basename}, '$self->{_lib_basename} set');
+	# lib_dir must not be mutated — a second prepare_workspace() must still work
+	is($m->{lib_dir}, $original_lib_dir, 'lib_dir unchanged after prepare_workspace');
 };
 
 subtest 'prepare_workspace() copies lib tree into workspace' => sub {
@@ -389,6 +393,44 @@ subtest 'apply_mutant() transform is called with a PPI::Document' => sub {
 
 	ok(defined $received_doc, 'transform received a document');
 	isa_ok($received_doc, 'PPI::Document', 'document is a PPI::Document');
+};
+
+subtest 'generate_mutants returns an arrayref, not a list' => sub {
+	plan tests => 2;
+	my $m = App::Test::Generator::Mutator->new(
+		file           => 'lib/App/Test/Generator/Sample/Module.pm',
+		mutation_level => 'full',
+	);
+	my $result = $m->generate_mutants();
+	isa_ok($result, 'ARRAY', 'generate_mutants return value is an arrayref');
+	ok(scalar(@{$result}) >= 0, 'result is iterable');
+};
+
+subtest 'generate_mutants (fast) returns an arrayref, not a list' => sub {
+	plan tests => 1;
+	my $m = App::Test::Generator::Mutator->new(
+		file           => 'lib/App/Test/Generator/Sample/Module.pm',
+		mutation_level => 'fast',
+	);
+	my $result = $m->generate_mutants();
+	isa_ok($result, 'ARRAY', 'generate_mutants (fast) return value is an arrayref');
+};
+
+subtest 'apply_mutant croaks with correct message before workspace is prepared' => sub {
+	plan tests => 1;
+	my $m = App::Test::Generator::Mutator->new(
+		file => 'lib/App/Test/Generator/Sample/Module.pm',
+	);
+	my $dummy = App::Test::Generator::Mutant->new(
+		id          => 'x',
+		description => 'test dummy',
+		original    => 'x',
+		line        => 1,
+		transform   => sub {},
+	);
+	throws_ok { $m->apply_mutant($dummy) }
+		qr/Workspace not prepared/,
+		'apply_mutant croaks with the correct message before prepare_workspace';
 };
 
 done_testing();

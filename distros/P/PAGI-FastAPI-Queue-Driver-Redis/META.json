@@ -1,0 +1,67 @@
+{
+   "abstract" : "Redis Storage Driver for PAGI::FastAPI::Queue",
+   "author" : [
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PAGI-FastAPI-Queue-Driver-Redis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0.50",
+            "Future::AsyncAwait" : "0.60",
+            "JSON::PP" : "4.00",
+            "PAGI::FastAPI" : "v1.1.0",
+            "perl" : "5.038000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302"
+         }
+      }
+   },
+   "provides" : {
+      "PAGI::FastAPI::Queue::Driver::Redis" : {
+         "file" : "lib/PAGI/FastAPI/Queue/Driver/Redis.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/PAGI-FastAPI-Queue-Driver-Redis/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/PAGI-FastAPI-Queue-Driver-Redis.git",
+         "web" : "https://github.com/manwar/PAGI-FastAPI-Queue-Driver-Redis"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -1,0 +1,93 @@
+=head1 NAME
+
+App::FuguWeb::Manual - one manual source, and what the site asks of it
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Manual;
+
+    my $manual = App::FuguWeb::Manual->from_mdoc('man/fugu/Daemon.3p',
+        $group);
+
+    $manual->name;              # Fugu::Daemon
+    $manual->section;           # 3p
+    $manual->page;              # Fugu::Daemon.3p.html
+    $manual->staged_name;       # Fugu::Daemon.3p
+    $manual->description;       # read from the source
+
+=head1 DESCRIPTION
+
+A manual is an mdoc(7) page or a POD sidecar. The class answers the
+five questions that the build and the index ask about one: where it is,
+what it is called, which section it belongs to, which page it becomes,
+and what it is for.
+
+The class never retypes a description. The source page is the only
+copy, and L</description> reads it.
+
+L<App::FuguWeb::Config::Group> builds these objects. A caller normally
+asks a group for its manuals instead of constructing one.
+
+=head1 CONSTRUCTORS
+
+=head2 from_mdoc
+
+    App::FuguWeb::Manual->from_mdoc($path, $group)
+
+One mdoc source. The file extension gives the section, and the group
+namespace prefixes the name, so F<man/fugu/Daemon.3p> is the source of
+C<Fugu::Daemon(3p)>.
+
+=head2 from_pod
+
+    App::FuguWeb::Manual->from_pod($path, $group, $module_root)
+
+One POD sidecar. The section is always C<3p>. The name is the path below
+C<$module_root>, with the separators turned into the Perl ones, so
+F<lib/App/OpenHAP/Tasmota/Heater.pod> is the source of
+C<App::OpenHAP::Tasmota::Heater(3p)>.
+
+C<$path> and C<$module_root> must be paths of the same kind: both
+absolute, or both relative to the same directory.
+
+=head1 METHODS
+
+=head2 path, name, section
+
+The source, the manual name, and its section.
+
+=head2 is_pod
+
+Whether the source is a POD sidecar. A sidecar goes through C<pod2man>
+first; an mdoc source does not.
+
+=head2 page
+
+The name of the page in the output directory: C<< <name>.<section>.html >>.
+
+=head2 staged_name
+
+The name that the mdoc staging directory needs:
+C<< <name>.<section> >>.
+
+C<mandoc> reads a C<.Xr> target as a local link only when a file named
+C<%N.%S> sits in its working directory. That is why F<man/fugu/Daemon.3p>
+stages as F<Fugu::Daemon.3p> and not under its own file name.
+
+=head2 description
+
+The one-line description, read from the source.
+
+An mdoc page gives the argument of its first C<.Nd> macro. A POD sidecar
+gives the text after C<< Module - >> on the first non-blank line below
+C<=head1 NAME>. The method returns C<undef> when the source carries
+neither, and reads the file once.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Index>,
+mandoc(1)
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

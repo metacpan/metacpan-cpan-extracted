@@ -1,0 +1,73 @@
+=head1 NAME
+
+App::FuguVM - install and manage OpenBSD virtual machines under QEMU
+
+=head1 SYNOPSIS
+
+    fuguvm up
+    fuguvm wait --timeout 120
+    fuguvm ssh uname -a
+    fuguvm down
+
+=head1 DESCRIPTION
+
+C<fuguvm> installs an OpenBSD guest under QEMU without interaction,
+keeps its disk in a cache, and drives its lifecycle: boot, wait, ssh,
+snapshot, and shutdown. A project describes its guests in one
+F<.fuguvmrc> at its root. See L<fuguvm(1)> for the subcommands and the
+exit codes.
+
+This is the lead module of the App-FuguVM distribution. It holds no
+code of its own. The work is split by concern:
+
+=over 4
+
+=item L<App::FuguVM::CLI>
+
+The subcommands of C<fuguvm>.
+
+=item L<App::FuguVM::Config>
+
+The VM defaults over C<Fugu::Config>.
+
+=item L<App::FuguVM::Guest>
+
+The lifecycle of one OpenBSD virtual machine.
+
+=item L<App::FuguVM::Console>
+
+The serial console of a guest, driven with expect scripts.
+
+=item L<App::FuguVM::Disk>
+
+The qcow2 disk of a virtual machine.
+
+=item L<App::FuguVM::DiskCache>
+
+The cache of installed OpenBSD disks.
+
+=item L<App::FuguVM::Miniroot>
+
+The OpenBSD miniroot image.
+
+=item L<App::FuguVM::Proxy>
+
+The OpenBSD mirror policy over C<Fugu::Proxy>.
+
+=item L<App::FuguVM::QMP>
+
+The QEMU Machine Protocol command set.
+
+=item L<App::FuguVM::State>
+
+What FuguVM remembers about one VM between runs.
+
+=back
+
+=head1 SEE ALSO
+
+L<fuguvm(1)>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>

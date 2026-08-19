@@ -25,7 +25,7 @@ my $ptr = DBIx::Loop::_abi_ptr();
 isnt($ptr, 0, '_abi_ptr returns a non-zero address');
 is($ptr, DBIx::Loop::_abi_ptr(), 'and the same one every time (a static table)');
 
-is(DBIx::Loop::_abi_version(), 1, '_abi_version is 1');
+is(DBIx::Loop::_abi_version(), 2, '_abi_version is 2 (v2 on_exec)');
 
 # The table's own first entry must agree with the accessor, or a consumer that
 # gates on abi_version is gating on something other than what it will call.

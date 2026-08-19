@@ -544,7 +544,7 @@ Return the PDL symhash (e.g. for custom search operations). To see what
 it has stored in it in JSON format:
 
   perl -MPDL::Doc -MJSON::PP -e \
-    'print encode_json +PDL::Doc->new(PDL::Doc::_find_inc([qw(PDL pdldoc.db)], 0, 1))->gethash' |
+    'print encode_json +PDL::Doc->new(PDL::Doc::find_dbs())->gethash' |
     json_pp -json_opt pretty,canonical
 
 The symhash is a multiply nested hash ref with the following structure:
@@ -688,7 +688,7 @@ sub scan {
   my ($this,$file,$verbose) = @_;
   confess "can't find file '$file'" unless -f $file;
   $file = Cwd::abs_path($file); # help Debian packaging
-  $verbose = 0 unless defined $verbose;
+  $verbose //= 0;
   my $text = do { open my $infile, '<', $file or die "$file: $!"; local $/; <$infile> };
   # Handle RPM etc. case where we are building away from the final location
   my $file2 = $file;
@@ -708,27 +708,31 @@ documentation) files (using the File::Find module).
 
 sub scantree {
   my ($this,$dir,$verbose) = @_;
-  $verbose = 0 unless defined $verbose;
+  if (!-d $dir) {
+    print "$dir not found\n" if $verbose;
+    return 0;
+  }
+  $verbose //= 0;
   require File::Find;
-  print "Scanning $dir ... \n\n";
+  print "Scanning $dir ... \n\n" if $verbose;
   my $ntot = 0;
   my $sub = sub {
     return if -d $File::Find::name;
     return if
       $File::Find::dir !~ /script$/ and
       $File::Find::name !~ /\.(?:pm|pod)$/;
-    return if $File::Find::name =~ /(?:Index\.pod|PP\.pm)$/ or
+    return if $File::Find::name =~ /(?:PP\.pm)$/ or
       $File::Find::dir =~ m#/PP#;
-    printf "%-20s", $_.'...';
+    printf "%-20s", $_.'...' if $verbose;
     $ntot += my $n = $this->scan($File::Find::name,$verbose);
-    print "\t$n functions\n";
+    print "\t$n functions\n" if $verbose;
   };
   File::Find::find({
     no_chdir => 1,
     wanted => $sub,
     preprocess => sub { sort @_ }
   }, $dir);
-  print "\nfound $ntot functions\n";
+  print " found $ntot functions in $dir\n";
   $ntot;
 }
 
@@ -834,7 +838,7 @@ returning a hash of the functions found therein.
 sub scantext {
   my ($text, $filename, $verbose) = @_;
   my $parser = PDL::PodParser->new;
-  $parser->{verbose} = $verbose;
+  $parser->{verbose} = $verbose if ($verbose//0) > 0;
   open my $outfile, '>', \(my $outfile_text);
   $parser->output_fh($outfile);
   eval { $parser->parse_string_document($text) };
@@ -885,29 +889,16 @@ sub getfuncdocs {
   $parser->parse_from_file($in,$out);
 }
 
-=head2 add_module
-
-=for usage
-
- use PDL::Doc;
- PDL::Doc::add_module("PDL::Stats"); # add PDL::Stats, PDL::Stats::GLM, ...
+=head2 find_dbs
 
 =for ref
 
-The C<add_module> function allows you to add POD from a particular Perl
-module (and as of PDL 2.083, in fact all modules starting with that as
-a prefix) that you've installed somewhere in C<@INC>. It searches for the
-active PDL document database and the module's .pod and .pm files, and
-scans and indexes the module(s) into the database.
+Find the available doc databases for use by PDL::Doc objects.
 
-C<add_module> is meant to be added to your module's Makefile as part of the
-installation script. This is done automatically by
-L<PDL::Core::Dev/pdlpp_postamble>, but if the top level of your
-distribution is Perl modules (like L<PDL::LinearAlgebra>), then add a
-C<postamble> manually in the F<Makefile.PL>:
+=for usage
 
-  use PDL::Core::Dev;
-  sub MY::postamble { ::pdldoc_add() }
+  use PDL::Doc;
+  my $onlinedoc = PDL::Doc->new(PDL::Doc::find_dbs());
 
 =cut
 
@@ -922,9 +913,77 @@ sub _find_inc {
   @ret;
 }
 
+sub find_dbs {
+  my @found = _find_inc([qw(PDL pdldoc.db)], 0, 1); # CORE21 get rid
+  my %db_seen;
+  for my $dir (_find_inc([qw(PDL Pdldoc)], 1)) {
+    my @c = do { opendir my $dirfh, $dir or die "$dir: $!"; grep !/^\./, readdir $dirfh };
+    for my $f (grep /\.db$/ && -f catfile($dir, $_), @c) {
+      next if $db_seen{$f}++; # ignore any later ones in @INC
+      push @found, catfile($dir, $f);
+    }
+  }
+  @found;
+}
+
+=head2 gen_db
+
+=for usage
+
+ use PDL::Doc;
+ PDL::Doc::gen_db($db_file, $blib_dir, $script_dir);
+
+=for ref
+
+Generate a C<pdldoc> database into the given location, for just the
+given directories.
+
+Added in 2.106 for the new C<pdldoc> scheme of one database file
+per distribution in a centralised directory. Replaces C<add_module>.
+Used by L<PDL::Core::Dev/pdlpp_postamble>.
+
+=cut
+
+sub gen_db {
+  my ($db_file, @dirs) = @_;
+  die "gen_db: No directories given\n" if !@dirs;
+  die "gen_db: No docs database file given\n" if !defined $db_file;
+  unlink $db_file if -e $db_file and !-w $db_file;
+  my $pdldoc = PDL::Doc->new;
+  my $n = 0;
+  $n += $pdldoc->scantree($_) for @dirs;
+  if (!$n) {
+    print "PDL docs database $db_file would be empty - stopping.\n";
+    return;
+  }
+  require File::Basename;
+  require File::Path;
+  umask 0022;
+  File::Path::make_path(File::Basename::dirname($db_file));
+  $pdldoc->savedb($db_file);
+  print "PDL docs database $db_file created - total $n functions.\n";
+}
+
+=head2 add_module
+
+=for ref
+
+Replaced with PDL::Core::Dev pdldoc_add in 2.106.
+
+As of 2.106, C<pdldoc> documentation is stored in one centrally-installed file per distribution. If your distribution is pure-Perl, you need this in your F<Makefile.PL>:
+
+  use PDL::Core::Dev;
+  sub MY::postamble { ::pdldoc_add() }
+
+If your distribution already has a C<postamble> that calls
+L<PDL::Core::Dev/pdlpp_postamble>, this will be magically done for
+you.
+
+=cut
+
 sub add_module {
   my ($module) = @_;
-  my ($file) = _find_inc([qw(PDL pdldoc.db)], 0, 1);
+  my ($file) = find_dbs();
   die "Unable to find docs database - therefore not updating it.\n" if !defined $file;
   die "No write permission for $file - not updating docs database.\n"
     if !-w $file;
@@ -953,16 +1012,16 @@ sub add_module {
 Here's an example of how you might use the PDL Doc database in your
 own code.
 
- use PDL::Doc;
- # Find the pdl documentation
- my ($file) = _find_inc([qw(PDL pdldoc.db)], 0, 1);
- die "Unable to find docs database!\n" unless defined $file;
- print "Found docs database $file\n";
- my $pdldoc = PDL::Doc->new($file);
- # Print the reference line for zeroes:
- print map{$_->{Ref}} values %{$pdldoc->gethash->{zeroes}};
- # Or, if you remember that zeroes is in PDL::Core:
- print $pdldoc->gethash->{zeroes}{'PDL::Core'}{Ref};
+  use PDL::Doc;
+  # Find the pdl documentation
+  my ($file) = PDL::Doc::find_dbs();
+  die "Unable to find docs database!\n" unless defined $file;
+  print "Found docs database $file\n";
+  my $pdldoc = PDL::Doc->new($file);
+  # Print the reference line for zeroes:
+  print map{$_->{Ref}} values %{$pdldoc->gethash->{zeroes}};
+  # Or, if you remember that zeroes is in PDL::Core:
+  print $pdldoc->gethash->{zeroes}{'PDL::Core'}{Ref};
 
  # Get info for all the functions whose examples use zeroes
  my @entries = $pdldoc->search('zeroes','Example',1,1);

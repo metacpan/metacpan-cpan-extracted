@@ -1,0 +1,191 @@
+=head1 NAME
+
+Fugu::Log - logging to syslog, standard error, or nowhere
+
+=head1 SYNOPSIS
+
+    use Fugu::Log;
+
+    my $log = Fugu::Log->new(
+        mode     => 'syslog',
+        ident    => 'mydaemon',
+        level    => 'info',
+        facility => 'daemon',
+    );
+
+    $log->info('listening on port %d', $port);
+    $log->error('cannot open %s: %s', $path, $!);
+
+    Fugu::Log->set_default($log);
+
+=head1 DESCRIPTION
+
+B<Fugu::Log> gives a program one logging interface. The interface is
+the same when the program runs as a daemon and when it runs in the
+foreground. The caller selects the destination one time, when it
+creates the logger. Every call site then has the same form for all
+destinations.
+
+The logger discards messages below the configured level. The levels,
+from lowest to highest, are C<debug>, C<info>, C<notice>, C<warning>
+and C<error>. Each level is a method of the same name, and there is
+one spelling for each level.
+
+The module also holds one process default logger. Library code that
+gets no logger asks for it with C<default>, so no library has to die
+for the lack of one.
+
+=head2 new
+
+C<new(%args)> creates a logger. These are the arguments:
+
+=over 4
+
+=item C<mode>
+
+The destination for messages. The value is one of:
+
+=over 4
+
+=item C<syslog>
+
+Messages go through syslog(3). The logger calls openlog(3)
+immediately with the C<ndelay> and C<pid> options.
+
+=item C<stderr>
+
+Messages go to standard error, with one line for each message. Each
+line starts with a local-time stamp and the level in upper case.
+
+=item C<quiet>
+
+Messages go nowhere. The logger discards them before it does a check
+of the level.
+
+=back
+
+The default is C<stderr>.
+
+=item C<level>
+
+The lowest level to emit. The default is C<info>.
+
+=item C<ident>
+
+The program name that the logger passes to openlog(3). The default is
+C<fugu>. The logger uses this argument only when C<mode> is
+C<syslog>.
+
+=item C<facility>
+
+The syslog facility. The value is a L<Sys::Syslog> constant, or one
+of the names C<daemon>, C<user> or C<local0> through C<local7>. The
+default is C<LOG_DAEMON>.
+
+=back
+
+=head2 debug, info, notice, warning, error
+
+    $log->info($fmt, @args);
+
+Each method logs one message at the level that its name gives. When
+C<@args> is not empty, the method formats C<$fmt> through sprintf(3).
+When C<@args> is empty, the method uses C<$fmt> as a literal string.
+
+There is one method for each level, and no other spelling parses.
+
+=head2 set_level
+
+C<set_level($level)> changes the lowest level to emit on a logger
+after its creation. If the value is not a known level name, the
+logger uses C<info>.
+
+=head2 level
+
+C<level> returns the lowest level to emit, by name. The name is one
+of the six canonical levels, whatever spelling the caller used.
+
+=head2 mode
+
+C<mode> returns the destination, one of the C<MODE_SYSLOG>,
+C<MODE_STDERR> and C<MODE_QUIET> constants. The constants hold the
+strings C<syslog>, C<stderr> and C<quiet>.
+
+=head2 reopen
+
+C<reopen> closes and opens the log again with the same settings. A
+daemon calls this after it drops privileges: the syslog(3) connection
+belongs to the user that opened it. In the other modes the method
+does nothing.
+
+This replaces the older pattern of discarding the logger and building
+an identical one. That pattern needed every call site to learn the
+new object.
+
+=head2 default
+
+C<default> returns the process default logger. The first call creates
+a C<stderr> logger, so the method never returns C<undef>.
+
+This is the fallback for library code. A module takes a C<log>
+argument and uses C<default> when the caller gives none. Thus no
+library dies for the lack of a logger, and no library needs a global
+of its own.
+
+=head2 set_default
+
+C<set_default($log)> replaces the process default logger and returns
+the new default. A program calls this once at startup.
+
+=head1 RETURN VALUES
+
+C<new>, C<default> and C<set_default> return a logger object.
+C<reopen> returns the object. C<level> and C<mode> return a name. The
+logging methods and C<set_level> have no useful return value.
+
+=head1 EXAMPLES
+
+This example logs to standard error in the foreground, and to syslog
+in the background, with no change to the call sites:
+
+    my $log = Fugu::Log->new(
+        mode  => $foreground ? 'stderr' : 'syslog',
+        ident => 'mydaemon',
+        level => $verbose ? 'debug' : 'info',
+    );
+    Fugu::Log->set_default($log);
+
+This example opens the syslog connection again as the unprivileged
+user:
+
+    Fugu::Privdrop->drop_privileges(user => '_myapp');
+    $log->reopen;
+
+=head1 ERRORS
+
+C<new> dies if C<mode> is not one of the three names above. An
+unknown C<level> or C<facility> is not an error. The level becomes
+C<info>, and the facility becomes C<LOG_DAEMON>.
+
+=head1 SEE ALSO
+
+syslog(3), L<Fugu::Daemon>, L<Sys::Syslog>, syslog.conf(5)
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+The logging methods pass the format string to sprintf(3) only when
+arguments follow it. Thus a message that has a percent sign is safe
+alone, but not when an argument follows. Log variable text with
+C<%s>. Do not interpolate the text into the format string.
+
+A process must create no more than one syslog-mode logger. openlog(3)
+and closelog(3) act on process-wide state. Thus, when a second logger
+goes out of scope, it closes the connection that the first logger
+still uses. Use C<reopen> on the one logger instead of building a
+second one.
+
+=cut

@@ -1,5 +1,5 @@
 ########################################################################
-# Simple immutable credentials object — used when caller passes
+# Simple immutable credentials object â used when caller passes
 # raw key/secret/token rather than a credentials object
 ########################################################################
 package Amazon::S3::Lite::Credentials;
@@ -9,7 +9,7 @@ use warnings;
 
 use Carp qw(croak);
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.3.1';
 
 sub new {
   my ( $class, %args ) = @_;

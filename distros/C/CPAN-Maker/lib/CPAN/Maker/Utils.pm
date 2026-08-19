@@ -11,7 +11,7 @@ use Module::CoreList;
 use Scalar::Util qw(reftype);
 use version;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.8';
 
 use parent qw(Exporter);
 

@@ -15,6 +15,10 @@ echo "Cleaning up old coverage, LCSAJ, and mutation data..."
 if [ -f cover_html/lcsaj_hits.json ]; then
 	cp cover_html/lcsaj_hits.json /tmp/lcsaj_hits_prev.json
 fi
+# Preserve CPD results across runs — recomputing is expensive
+if [ -f cover_html/cpd.json ]; then
+	cp cover_html/cpd.json /tmp/cpd_prev.json
+fi
 rm -rf cover_db coverage lcsaj mutation_html cover_html t/tmp_*.t
 
 # --- Step 1: Build blib if needed ---
@@ -93,6 +97,44 @@ if [ -f cover_html/lcsaj_hits.json ]; then
 else
 	echo "lcsaj_hits.json MISSING"
 fi
+
+# --- Step 5e: Copy-Paste Detection (CPD) ---
+echo "Running copy-paste detection..."
+# Restore previous CPD results now so they are available while the new run proceeds.
+# The script below will overwrite with fresh data if Code::CutNPaste succeeds.
+if [ -f /tmp/cpd_prev.json ]; then
+	cp /tmp/cpd_prev.json cover_html/cpd.json
+fi
+timeout 300 perl -MCode::CutNPaste -MJSON::MaybeXS -MFile::Slurp -e '
+	my $window = 10;
+	my $c = Code::CutNPaste->new(
+		dirs         => ["lib"],
+		window       => $window,
+		renamed_vars => 1,
+		renamed_subs => 1,
+		jobs         => 4,
+	);
+	my $dups = $c->duplicates;
+	my %by_file;
+	for my $d (@$dups) {
+		my ($l, $r) = ($d->left, $d->right);
+		push @{ $by_file{ $l->file } }, {
+			start      => $l->line,
+			end        => $l->line + $window - 1,
+			match_file => $r->file,
+			match_line => $r->line,
+		};
+		push @{ $by_file{ $r->file } }, {
+			start      => $r->line,
+			end        => $r->line + $window - 1,
+			match_file => $l->file,
+			match_line => $l->line,
+		};
+	}
+	write_file("cover_html/cpd.json", encode_json(\%by_file));
+	printf "CPD: %d duplicate block(s) found across %d file(s)\n",
+		scalar @$dups, scalar keys %by_file;
+' 2>/dev/null || echo "::warning::CPD step timed out or failed — continuing without duplication data"
 
 # --- Step 5d: Diagnose LCSAJ hit file sources ---
 echo "Diagnosing LCSAJ hit file sources..."

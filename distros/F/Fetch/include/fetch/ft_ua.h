@@ -200,6 +200,35 @@ static SV *ft_build_request(pTHX_ ft_ua *ua, const char *method,
     return req;
 }
 
+/* The settle half of the v2 outbound observer. Attached with on_ready, so it
+ * runs however the hop ended - resolved, failed, or cancelled - and therefore
+ * exactly once per ft_obs_start. A timeout, a refused connection and a DNS
+ * failure all arrive here as a failure rather than as silence, which is the
+ * whole reason a client observer is worth having. The token travels as an IV
+ * in the closure because it is a C pointer the consumer owns and no SV should
+ * ever be holding it. */
+XS_INTERNAL(ft_obs_done_cb_xs);
+XS_INTERNAL(ft_obs_done_cb_xs) {
+    dXSARGS;
+    hm_clos *cl = hm_clos_of(aTHX_ cv);
+    ft_obs_tokens *t;
+    SV *f;
+    if (!cl || items < 1) XSRETURN_EMPTY;
+    t = INT2PTR(ft_obs_tokens *, cl->i);
+    f = ST(0);
+    if (!t) XSRETURN_EMPTY;
+    {
+        /* a settled future carries its value in the same place either way:
+         * the response when it resolved, the error when it did not */
+        AV  *vals = hmf_values_av(aTHX_ f);
+        SV **vp   = (vals && av_len(vals) >= 0) ? av_fetch(vals, 0, 0) : NULL;
+        SV  *v    = (vp && *vp) ? *vp : NULL;
+        if (hmf_state(aTHX_ f) == HMF_DONE) ft_obs_done(aTHX_ t, v, NULL);
+        else                                ft_obs_done(aTHX_ t, NULL, v);
+    }
+    XSRETURN_EMPTY;
+}
+
 /* ---- response peeking (for redirects/cookies) --------------------------- */
 
 static int ft_response_status(pTHX_ SV *res) {
@@ -353,6 +382,7 @@ static SV *ft_request_once(pTHX_ SV *self_sv, ft_ua *ua, const char *method,
     SV *body = NULL, *on_body = NULL, *on_headers = NULL, *json_body = NULL;
     ft_loop *l = NULL; SV *lsv = NULL;
     ft_pool *pl;
+    ft_obs_tokens *obs = NULL;
     SSize_t n, i;
 
     if (!ft_parse_url(url, &u))
@@ -432,6 +462,12 @@ static SV *ft_request_once(pTHX_ SV *self_sv, ft_ua *ua, const char *method,
         }
     }
 
+    /* v2 outbound observers, here because it is the last moment the header
+     * list is still one list: after this the h2 pass copies it, so a header
+     * added later would ride HTTP/1.1 and vanish over h2. Once per hop, which
+     * is what a redirect chain should look like to anything measuring it. */
+    obs = ft_obs_start(aTHX_ method, strlen(method), url, strlen(url), hav);
+
     /* h2 header list (lowercased names, minus hop-by-hop/length fields): only
      * consumed if ALPN negotiates h2, which can only happen on TLS. Skip the
      * whole thing - a full second pass over the headers - for cleartext. */
@@ -506,6 +542,13 @@ static SV *ft_request_once(pTHX_ SV *self_sv, ft_ua *ua, const char *method,
                         on_body ? on_body : &PL_sv_undef, NULL);
         ft_conn_on_headers_next = NULL;   /* borrowed; do not keep past the call */
         hmf_pin_loop(aTHX_ f, ua->loop);  /* only this loop can resolve it */
+    }
+
+    if (obs) {   /* settle the observers when this hop ends, however it ends */
+        SV *cb = hm_closure(aTHX_ ft_obs_done_cb_xs, NULL, NULL, NULL, NULL,
+                            PTR2IV(obs), 0);
+        hmf_on_ready(aTHX_ f, cb);
+        SvREFCNT_dec(cb);
     }
 
     /* store any Set-Cookie before the caller/redirect-follower runs */

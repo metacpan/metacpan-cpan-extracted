@@ -47,7 +47,6 @@
             "Test::Mockingbird" : "0.08",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::Returns" : "0",
             "Test::Without::Module" : "0"
          }
       }
@@ -66,6 +65,6 @@
          "web" : "https://github.com/nigelhorne/Params-Get"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

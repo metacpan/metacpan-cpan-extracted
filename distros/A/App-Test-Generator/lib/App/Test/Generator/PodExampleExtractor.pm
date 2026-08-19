@@ -5,7 +5,7 @@ use Carp qw(croak);
 use File::Slurp qw(read_file);
 use Readonly;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 Readonly my $ANNOTATION_RE => qr/\#\s*(?:=>|returns?)\s*(.+?)\s*$/;
 Readonly my $VERBATIM_RE   => qr/^[ \t]/;
@@ -50,9 +50,50 @@ downstream test generators to emit C<is()> assertions.
 
 =head2 new
 
-Constructor.
+Construct a new extractor for the given source file.
 
-    my $ex = App::Test::Generator::PodExampleExtractor->new(file => 'lib/My/Module.pm');
+    my $ex = App::Test::Generator::PodExampleExtractor->new(
+        file => 'lib/My/Module.pm',
+    );
+
+=head3 Arguments
+
+=over 4
+
+=item * C<file>
+
+Path to the Perl module to extract examples from.  Required.
+The file must exist on disk.
+
+=back
+
+=head3 Returns
+
+A blessed C<App::Test::Generator::PodExampleExtractor> object.
+Croaks if C<file> is missing or does not exist.
+
+=head3 EXAMPLE
+
+    use App::Test::Generator::PodExampleExtractor;
+
+    my $ex = App::Test::Generator::PodExampleExtractor->new(
+        file => 'lib/Acme/Widget.pm',
+    );
+    printf "Extracting examples from %s\n", 'lib/Acme/Widget.pm';
+
+=head3 MESSAGES
+
+=over 4
+
+=item C<file is required>
+
+C<file> was not supplied.
+
+=item C<File not found: $path>
+
+C<file> was supplied but the path does not exist on disk.
+
+=back
 
 =head3 API specification
 
@@ -63,6 +104,13 @@ Constructor.
 =head4 output
 
     { type => OBJECT, isa => 'App::Test::Generator::PodExampleExtractor' }
+
+=head3 FORMAL SPECIFICATION
+
+Pre:  C<defined file ∧ -f file>
+
+Post: C<ref(result) eq 'App::Test::Generator::PodExampleExtractor'>
+      ∧ C<result-E<gt>{file} eq file>
 
 =cut
 
@@ -79,31 +127,71 @@ Extract all runnable examples from the module's POD.
 
     my $examples = $ex->extract();
 
+=head3 Arguments
+
+None beyond C<$self>.
+
+=head3 Returns
+
+An arrayref of example hashrefs, deduplicated by C<code> text.  Each hashref
+has the following keys:
+
+=over 4
+
+=item * C<label> — human-readable name for use as a test label (e.g. C<"SYNOPSIS example 1">)
+
+=item * C<section> — the POD section heading (C<=head1>/C<=head2> text) where the example was found
+
+=item * C<code> — the raw code text, dedented.  May be multi-line for verbatim blocks.
+
+=item * C<expected> — the expected return value string from a C<# returns value> or C<< # => value >> annotation; C<undef> if not annotated.
+
+=item * C<annotated_line> — for annotated single-line examples, the bare expression with the annotation stripped; C<undef> for verbatim blocks.
+
+=back
+
+=head3 EXAMPLE
+
+    my $examples = $ex->extract();
+    for my $e (@{$examples}) {
+        printf "[%s] %s\n", $e->{label}, $e->{code};
+        if(defined $e->{expected}) {
+            printf "  expects: %s\n", $e->{expected};
+        }
+    }
+
+    # Count examples without a declared return value
+    my @unannotated = grep { !defined $_->{expected} } @{$examples};
+    printf "%d unannotated examples\n", scalar @unannotated;
+
+=head3 MESSAGES
+
+=over 4
+
+=item C<File not found: $path> (raised by C<File::Slurp::read_file>)
+
+The source file disappeared between construction and the C<extract> call.
+
+=back
+
 =head3 API specification
 
 =head4 input
 
-    {}
+    { self => { type => OBJECT, isa => 'App::Test::Generator::PodExampleExtractor' } }
 
 =head4 output
 
     { type => ARRAYREF }
 
-Each element is a hashref with keys:
+=head3 FORMAL SPECIFICATION
 
-=over 4
-
-=item * C<label>    - human-readable name for use as a test label
-
-=item * C<section>  - POD section/method from which it was extracted
-
-=item * C<code>     - the raw code text (may be multi-line)
-
-=item * C<expected> - expected return value string (undef if not annotated)
-
-=item * C<annotated_line> - the single line carrying a C<# returns> / C<< # => >> annotation, or undef
-
-=back
+Post: C<result> is an arrayref where:
+      ∀ e ∈ result:
+        C<defined e-E<gt>{label}>
+        ∧ C<defined e-E<gt>{section}>
+        ∧ C<defined e-E<gt>{code}>
+        ∧ no two entries share the same C<code> value (deduplication)
 
 =cut
 
@@ -330,14 +418,79 @@ sub _looks_like_perl {
 	return '';
 }
 
+=head1 COMMON PITFALLS
+
+=over 4
+
+=item Shell-command blocks are silently dropped
+
+Verbatim paragraphs that contain only shell commands (e.g. C<prove -l t/> or
+C<extract-schemas lib/My/Module.pm>) are filtered out by C<_looks_like_perl>.
+They would cause compile errors under C<use strict> in a generated test file.
+If you want a shell command to appear as an example, put it in a POD comment
+block, not a verbatim paragraph.
+
+=item Annotations must be on the B<same line> as the call expression
+
+The C<# returns> / C<< # => >> annotation is parsed as a line-level suffix.
+Multi-line calls spread across multiple lines will not pick up an annotation on
+the last line — only the last line is examined, and the call expression on
+earlier lines is lost.
+
+=item C<expected> is always a raw string
+
+The C<expected> field is the literal text captured after C<# returns> or
+C<< # => >>.  It is not evaluated or type-converted.  Downstream code that
+emits C<is($result, $expected)> must handle quoting appropriately.
+
+=item SYNOPSIS blocks from C<=head3> and deeper are not collected
+
+Only C<=head1 SYNOPSIS> and C<=head2 SYNOPSIS> sections are scanned for
+verbatim blocks.  Deeper heading levels are ignored.
+
+=back
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item No evaluation of verbatim blocks
+
+Verbatim blocks are returned as raw code strings.  The module does not evaluate
+them or check that they are syntactically valid Perl.  Blocks that are
+syntactically broken will cause the downstream test file to fail to compile.
+
+=item Deduplication is by exact C<code> text
+
+Two examples with identical C<code> strings are deduplicated even if they come
+from different sections.  If the same one-liner appears in both SYNOPSIS and a
+method docstring, only the first occurrence is kept.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item C<bin/pod-example-tester>
+
+=item L<App::Test::Generator>
+
+=item L<Pod::Simple>
+
+=back
+
 =head1 AUTHOR
 
-Nigel Horne
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
-=head1 LICENSE
+=head1 LICENCE AND COPYRIGHT
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the terms of GPL2.
+If you use it,
+please let me know.
 
 =cut
 

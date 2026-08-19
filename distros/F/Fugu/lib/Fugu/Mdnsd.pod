@@ -1,0 +1,138 @@
+=head1 NAME
+
+Fugu::Mdnsd - control mdnsd over its control socket
+
+=head1 SYNOPSIS
+
+    use Fugu::Mdnsd;
+
+    my $mdns = Fugu::Mdnsd->new;
+
+    $mdns->publish(
+        name  => 'My Bridge',
+        app   => 'hap',
+        proto => 'tcp',
+        port  => 51827,
+        txt   => 'c#=1.sf=1',
+    ) or warn 'publish failed: ' . $mdns->error;
+
+    $mdns->update_txt(txt => 'c#=1.sf=0');
+
+    $mdns->withdraw;
+
+=head1 DESCRIPTION
+
+Fugu::Mdnsd publishes services with mdnsd(8). The module uses the
+mdnsd control protocol directly over F</var/run/mdnsd.sock>, and it
+starts no mdnsctl(8) child process. It implements no mDNS of its own:
+every method here is a control operation, and no mDNS packet ever
+leaves the module. mdnsd(8) sends those. The connection is the
+lifetime of the advertisement. mdnsd withdraws the service when the
+socket closes. Thus a daemon keeps the object alive for as long as the
+daemon must be discoverable. To withdraw the advertisement, the daemon
+only closes the socket.
+
+The document F<spec/MDNS-Control.md> in this repository specifies the
+wire protocol. This specification has the message types, the payload
+layouts, the group state machine, and its timing. The module never
+logs. Every method returns an outcome and records the most recent
+failure for C<error()>.
+
+=head2 new
+
+C<new(socket_path =E<gt> $path, timeout =E<gt> $seconds)> creates a
+handle. C<$socket_path> defaults to F</var/run/mdnsd.sock>.
+C<$timeout> sets the maximum time that the publish methods wait for
+the replies from mdnsd. The default is 10 seconds. A healthy mdnsd
+confirms publication after approximately four seconds.
+
+The method proves the C<struct mdns_service> template at construction
+and dies when the encoded size is wrong. That size is a measured fact
+about the platform, not an input. A template that no longer matches
+means every publish would send a malformed record.
+
+=head2 publish
+
+C<publish(name =E<gt> $instance, app =E<gt> $app, proto =E<gt> $proto,
+port =E<gt> $port, txt =E<gt> $string, timeout =E<gt> $seconds)>
+connects if necessary, then publishes. This is the whole startup path
+of a daemon that advertises one service: one call, and one error to
+report. The arguments are those of C<publish_service()>.
+
+Use C<connect()> and C<publish_service()> separately only when the two
+steps need different handling.
+
+=head2 connect
+
+C<connect()> connects to the control socket. The method returns 1 on
+success. It returns C<undef> when the socket is absent or unreachable.
+When mdnsd does not run, this is a normal condition. The caller
+decides if this condition is important.
+
+=head2 publish_service
+
+C<publish_service(name =E<gt> $instance, app =E<gt> $app,
+proto =E<gt> $proto, port =E<gt> $port, txt =E<gt> $string,
+timeout =E<gt> $seconds)> advertises one service and waits for mdnsd
+to confirm publication. C<name> is the service instance name. mdnsd
+also uses this name as the publish group name. Thus the two names
+cannot be different. C<app> is the application protocol with no
+underscore at the start ("hap", not "_hap"). C<proto> must be "tcp" or
+"udp". C<txt> is the TXT string in its final format: key=value pairs
+with the C<.> character between them. mdnsd(8) splits the string on
+this delimiter, with no escape mechanism. The meaning of the keys is
+not important to the module.
+
+The method returns 1 after mdnsd publishes the service. The method
+returns C<undef> on input that is too long. This is an error, never a
+silent truncation. The method also returns C<undef> on an absent
+connection, on an error reply (for example, a name collision), on an
+end-of-file, or on a timeout.
+
+=head2 format_txt
+
+C<format_txt(%records)> formats TXT records for mdnsd: key=value pairs
+in sorted key order, joined with C<.>.
+
+The join is mdnsd's format, not the protocol's. mdnsd uses C<.> as the
+TXT record delimiter and does not support escaping. The sorted order
+keeps the wire form deterministic. This is a plain function, not a
+method.
+
+=head2 update_txt
+
+C<update_txt(txt =E<gt> $string, timeout =E<gt> $seconds)> replaces
+the TXT record. mdnsd cannot replace records on a held connection.
+Thus the method withdraws the advertisement and publishes it again
+over a fresh connection. The method uses the same parameters that the
+caller gave to C<publish_service()>. When the service is not
+published, the method does nothing and returns success.
+
+=head2 withdraw
+
+C<withdraw()> closes the control socket. This closure withdraws the
+advertisement. The method always returns 1.
+
+The destructor calls C<withdraw()>. The held socket is the lifetime of
+the advertisement, so the object going away must withdraw the service,
+whether the caller remembered to or not.
+
+=head2 is_published
+
+C<is_published()> returns true while the module advertises the service
+on a held connection.
+
+=head2 error
+
+C<error()> returns the most recent failure as a short string. The
+caller can log this string.
+
+=head1 SEE ALSO
+
+L<Fugu::Imsg>, mdnsd(8)
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

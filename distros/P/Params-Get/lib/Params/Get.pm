@@ -25,11 +25,11 @@ Params::Get - Normalise subroutine arguments regardless of calling convention
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 # Reference-type sentinels.  Collected here so a typo is a compile-time
 # error via Readonly and grep/ack finds every usage in one search.
@@ -155,6 +155,81 @@ because that almost always indicates a programming error.
 			position => 1,
 		}
 	}
+
+=head4 Domain Partitions and Boundary Values
+
+B<C<$default> -- position 0>
+
+    Valid partitions:
+      EP1  undef           No default key; caller must pass named pairs or a hashref.
+      EP2  non-empty str   Used as the hash key for a single positional argument.
+                           Truthy: the two-element \@_ shorthand is active.
+      EP3  ""              Valid but FALSY; the shorthand guard ($default && ...)
+                           is suppressed.  Named-pairs path is used instead.
+      EP4  "0"             Valid but FALSY; identical behaviour to EP3.
+      EP5  ARRAY ref       Positional-names mode: nth arg maps to nth key name.
+      EP6  []              Valid; 0 named slots -- all positional args discarded.
+
+    Invalid partitions (croak at guard, before @args is inspected):
+      EP7  CODE ref
+      EP8  HASH ref
+      EP9  SCALAR ref
+      EP10 REF (ref-of-ref)
+      EP11 Blessed non-ARRAY object  (ref() returns class name, not expected type)
+      EP12 Blessed ARRAY object      (ref() returns class name, not "ARRAY")
+
+    BVA edges for string $default:
+      length=0  ("")  Valid, falsy, opaque key.
+      length=1        Minimum truthy string; shorthand guard active.
+      length=65536    Maximum tested; accepted without error.
+
+    BVA edges for ARRAY ref $default key count:
+      0 keys          All positional args discarded; {} returned.
+      1 key           Only first arg mapped.
+      keys > @args    Missing args produce undef-valued slots (no warning).
+      keys < @args    Extra args silently discarded.
+
+B<C<@args> -- position 1..N>
+
+    Valid partitions:
+      CN0a  0 args, EP1 ($default undef)   Returns undef.
+      CN1   1 HASH ref, no $default        Fast path; hashref returned by identity.
+      CN2   1 non-HASH, defined $default   Arg wrapped under $default key.
+      CN3   2 args, 2nd HASH, defined $d   OO constructor path; see below.
+      CN4   even N >= 2, no CN3 match      Flat key/value pairs.
+
+    Invalid partitions:
+      CN0b  0 args, defined $default       Carp::confess with full stack trace.
+      CN5   odd N >= 3                     Carp::croak with usage message.
+
+    BVA edges for @args count:
+      0     Minimum; routes to CN0a or CN0b.
+      1     Single-arg dispatch; many sub-partitions by arg type (see below).
+      2     Even minimum; triggers CN3 when 2nd arg is a HASH ref.
+      3     Minimum odd; triggers CN5 (croak).
+      4     Minimum even for CN4 (plain pairs).
+      1000  Maximum tested; accepted in O(n).
+
+B<OO constructor options hash -- key-count BVA>
+
+When C<$num_args == 2> and C<ref($args-E<gt>[1]) eq 'HASH'>:
+
+    keys=0  Empty hashref stored as value: { $default => {} }.
+    keys=1  Non-empty; if first arg IS $default key name: hashref wrapped.
+            Otherwise: first arg is mandatory value; options merged in.
+    keys=N  Same as keys=1 non-match case; all options merged.
+
+B<Single-arg type sub-partitions (with defined C<$default>)>
+
+    undef          Wrapped: { $default => undef }
+    ""             Wrapped: { $default => "" }
+    "0"            Wrapped: { $default => "0" }
+    string         Wrapped as-is.
+    SCALAR ref     Dereferenced then wrapped: { $default => ${$arg} }.
+    ARRAY ref      Wrapped as-is (not dereferenced).
+    CODE ref       Wrapped as-is.
+    blessed object Wrapped as-is.
+    HASH ref       LIMITATION: bypasses $default; returned by identity.
 
 =head4 output
 

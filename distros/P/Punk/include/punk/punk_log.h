@@ -6,6 +6,11 @@
  * or filehandle overrides). A request logger (ctx set) adds the method/path.
  * Below-threshold calls return before any formatting.
  *
+ * A lone unblessed hashref is a record rather than a message: its `message`
+ * key is the message and the rest are fields, merged into the object under
+ * `format => 'json'` and rendered as sorted logfmt pairs otherwise. The six
+ * names the house owns (pl_reserved) cannot be taken by a field.
+ *
  * Must be included after punk_context.h (pcx_* / PCX_* / frj).
  */
 
@@ -48,6 +53,214 @@ static HV *pl_hv(pTHX_ SV *self) {
     if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
         croak("Punk::Logger: not a logger");
     return (HV *)SvRV(self);
+}
+
+/* The logger's configured level. Read before anything is formatted: a call
+ * below it must cost nothing, which is what Punk::Logger has always promised
+ * and, until this was hoisted out of pl_emit, did not do for the sprintf
+ * form. */
+static int pl_threshold(pTHX_ SV *self) {
+    SV **lev = hv_fetchs(pl_hv(aTHX_ self), "level", 0);
+    return (lev && *lev) ? (int)SvIV(*lev) : PL_INFO;
+}
+
+/* The keys the house owns. A field carrying one of these names is dropped
+ * rather than merged, in every format - a field called `level` must not be
+ * able to forge a line's severity, and a reader must be able to trust that
+ * they mean what the logger says they mean.
+ *
+ * `trace_id` and `span_id` are here for the same reason as the rest: a
+ * telemetry layer writes them from the active span, and an application field
+ * of the same name would forge a correlation, pointing a reader at somebody
+ * else's trace. */
+static int pl_reserved(const char *k, STRLEN l) {
+    switch (l) {
+        case 4:  return memEQ(k, "time", 4) || memEQ(k, "path", 4);
+        case 5:  return memEQ(k, "level", 5);
+        case 6:  return memEQ(k, "method", 6);
+        case 7:  return memEQ(k, "message", 7)
+                     || memEQ(k, "span_id", 7);
+        case 8:  return memEQ(k, "trace_id", 8);
+        case 10: return memEQ(k, "request_id", 10);
+        default: return 0;
+    }
+}
+
+
+/* Exactly what File::Raw::JSON refuses to encode: it croaks on a CODE, GLOB
+ * or Regexp reference, and takes everything else - hashes and arrays, blessed
+ * or not, and a scalar reference as a boolean. SvRXOK is frj's own regexp
+ * test, so the two agree by construction. */
+static int pl_reject(pTHX_ SV *v, SV *rv) {
+#ifdef SvRXOK
+    if (SvRXOK(v) || SvRXOK(rv)) return 1;
+#endif
+    return SvTYPE(rv) == SVt_PVCV || SvTYPE(rv) == SVt_PVGV;
+}
+
+#define PL_SCRUB_MAX 32   /* deeper than any log record; also the cycle stop */
+
+/* Does v hold something frj would croak on, anywhere inside it? Allocates
+ * nothing, and is the only walk the ordinary all-scalars record pays for. */
+static int pl_unsafe(pTHX_ SV *v, int depth) {
+    SV *rv;
+    if (!v || !SvROK(v) || depth > PL_SCRUB_MAX) return 0;
+    rv = SvRV(v);
+    if (pl_reject(aTHX_ v, rv)) return 1;
+    if (SvTYPE(rv) == SVt_PVHV) {
+        HV *h = (HV *)rv;
+        HE *he;
+        hv_iterinit(h);
+        while ((he = hv_iternext(h))) {
+            if (pl_unsafe(aTHX_ HeVAL(he), depth + 1)) {
+                hv_iterinit(h);      /* do not leave the shared iterator
+                                      * parked half way through the hash */
+                return 1;
+            }
+        }
+        return 0;
+    }
+    if (SvTYPE(rv) == SVt_PVAV) {
+        AV *a = (AV *)rv;
+        SSize_t i, n = av_len(a) + 1;
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(a, i, 0);
+            if (e && *e && pl_unsafe(aTHX_ *e, depth + 1)) return 1;
+        }
+    }
+    return 0;
+}
+
+/* A copy of v with every value frj rejects replaced by its stringification.
+ * Only ever called when pl_unsafe said so, so the cost lands on the record
+ * that earned it. The copy is plain - a blessed hash loses its class - which
+ * changes no output, because frj encodes a blessed hash as a plain object
+ * anyway. Mortal. */
+static SV *pl_scrubbed(pTHX_ SV *v, int depth) {
+    SV *rv;
+    if (!v) return &PL_sv_undef;
+    if (!SvROK(v) || depth > PL_SCRUB_MAX) return v;
+    rv = SvRV(v);
+    if (pl_reject(aTHX_ v, rv)) {
+        STRLEN l;
+        const char *s = SvPV_const(v, l);
+        return sv_2mortal(newSVpvn(s, l));
+    }
+    if (SvTYPE(rv) == SVt_PVHV) {
+        HV *src = (HV *)rv, *dst = newHV();
+        HE *he;
+        hv_iterinit(src);
+        while ((he = hv_iternext(src)))
+            (void)hv_store_ent(dst, hv_iterkeysv(he),
+                newSVsv(pl_scrubbed(aTHX_ HeVAL(he), depth + 1)), 0);
+        return sv_2mortal(newRV_noinc((SV *)dst));
+    }
+    if (SvTYPE(rv) == SVt_PVAV) {
+        AV *src = (AV *)rv, *dst = newAV();
+        SSize_t i, n = av_len(src) + 1;
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(src, i, 0);
+            av_push(dst, newSVsv((e && *e) ? pl_scrubbed(aTHX_ *e, depth + 1)
+                                           : &PL_sv_undef));
+        }
+        return sv_2mortal(newRV_noinc((SV *)dst));
+    }
+    return v;
+}
+
+/* A field value made safe to hand to frj: v itself when it already is. */
+static SV *pl_safe(pTHX_ SV *v) {
+    if (!v) return &PL_sv_undef;
+    return pl_unsafe(aTHX_ v, 0) ? pl_scrubbed(aTHX_ v, 0) : v;
+}
+
+/* A logfmt key. Anything that would break the line apart - a space, an `=`, a
+ * quote, a control character - becomes an underscore, because a field name is
+ * not always a literal in the source: `{ %$from_the_client }` is an ordinary
+ * thing to write, and a key holding a newline would otherwise forge a line. */
+static void pl_logfmt_key(pTHX_ SV *out, SV *k) {
+    STRLEN l, i;
+    const char *s = SvPV_const(k, l);
+    for (i = 0; i < l; i++) {
+        unsigned char c = (unsigned char)s[i];
+        if (c <= ' ' || c == '=' || c == '"' || c == '\\') sv_catpvs(out, "_");
+        else sv_catpvn(out, s + i, 1);
+    }
+}
+
+/* A logfmt value. An undef field renders as a bare `key=`; a reference is
+ * encoded as compact JSON first. Quoted whenever it is empty or holds
+ * anything that would break a space-split reader, and a newline inside a
+ * value is escaped rather than passed through - a log line has to stay one
+ * line whatever it was handed. */
+static void pl_logfmt_val(pTHX_ SV *out, SV *v) {
+    const char *s;
+    STRLEN l, i;
+    int quote = 0;
+    if (!v || !SvOK(v)) return;
+    v = pl_safe(aTHX_ v);          /* first: this may have turned a reference
+                                    * frj cannot take into a plain string, and
+                                    * that string wants rendering as a string
+                                    * and not as a JSON-encoded one */
+    if (SvROK(v)) {
+        SV *enc = sv_2mortal(punk_frj(aTHX)->encode(aTHX_ v, NULL));
+        s = SvPV_const(enc, l);
+    }
+    else s = SvPV_const(v, l);
+    if (l == 0) quote = 1;
+    for (i = 0; i < l && !quote; i++) {
+        unsigned char c = (unsigned char)s[i];
+        if (c <= ' ' || c == '"' || c == '=' || c == '\\') quote = 1;
+    }
+    if (!quote) { sv_catpvn(out, s, l); return; }
+    sv_catpvs(out, "\"");
+    for (i = 0; i < l; i++) {
+        const char c = s[i];
+        switch (c) {
+            case '"':  sv_catpvs(out, "\\\""); break;
+            case '\\': sv_catpvs(out, "\\\\"); break;
+            case '\n': sv_catpvs(out, "\\n");  break;
+            case '\r': sv_catpvs(out, "\\r");  break;
+            case '\t': sv_catpvs(out, "\\t");  break;
+            default:   sv_catpvn(out, &c, 1);  break;
+        }
+    }
+    sv_catpvs(out, "\"");
+}
+
+/* A record's fields as logfmt pairs, for the plain line and for the message
+ * handed to a psgix.logger. Sorted, because perl's hash order is randomised
+ * per process and a line that reorders itself between runs is one nobody can
+ * diff, grep or test. Mortal, and empty when the record says nothing the
+ * house does not already carry. */
+static SV *pl_logfmt(pTHX_ HV *fields) {
+    SV *out = sv_2mortal(newSVpvs(""));
+    AV *keys;
+    HE *he;
+    SSize_t i, n = 0;
+    if (!fields || !HvUSEDKEYS(fields)) return out;
+    keys = (AV *)sv_2mortal((SV *)newAV());
+    hv_iterinit(fields);
+    while ((he = hv_iternext(fields))) {
+        SV *k = hv_iterkeysv(he);
+        STRLEN kl;
+        const char *ks = SvPV_const(k, kl);
+        if (pl_reserved(ks, kl)) continue;
+        av_push(keys, newSVsv(k));
+        n++;
+    }
+    if (n > 1) sortsv(AvARRAY(keys), (STRLEN)n, Perl_sv_cmp);
+    for (i = 0; i < n; i++) {
+        SV **kp = av_fetch(keys, i, 0);
+        HE *e;
+        if (!kp || !*kp) continue;
+        if (SvCUR(out)) sv_catpvs(out, " ");
+        pl_logfmt_key(aTHX_ out, *kp);
+        sv_catpvs(out, "=");
+        e = hv_fetch_ent(fields, *kp, 0, 0);
+        pl_logfmt_val(aTHX_ out, e ? HeVAL(e) : NULL);
+    }
+    return out;
 }
 
 /* Punk::Logger::__fmt(fmt, @args) = sprintf - a named sub defined once (at
@@ -107,8 +320,9 @@ static void pl_call1(pTHX_ SV *cb, SV *arg) {
     SPAGAIN; PUTBACK; FREETMPS; LEAVE;
 }
 
-/* format and emit one already-built message at level lvl */
-static void pl_emit(pTHX_ SV *self, int lvl, SV *msg) {
+/* format and emit one already-built message at level lvl, with the record's
+ * fields (NULL for none) */
+static void pl_emit(pTHX_ SV *self, int lvl, SV *msg, HV *fields) {
     HV *lg = pl_hv(aTHX_ self);
     SV **lev = hv_fetchs(lg, "level", 0);
     int threshold = (lev && *lev) ? (int)SvIV(*lev) : PL_INFO;
@@ -121,6 +335,16 @@ static void pl_emit(pTHX_ SV *self, int lvl, SV *msg) {
     const char *name = PL_NAMES[lvl < 0 ? 0 : lvl > 4 ? 4 : lvl];
     SV *detail;
     if (lvl < threshold) return;                       /* dropped, no work */
+
+    /* The observers, before any rendering. They want the record - the level,
+     * the message and the fields - not a formatted line, and a line that was
+     * dropped for being below the threshold was never a record at all. */
+    if (PL_OBS_N) {
+        int oi;
+        for (oi = 0; oi < PL_OBS_N; oi++)
+            PL_OBS[oi].cb(aTHX_ name, strlen(name), msg, fields,
+                          PL_OBS[oi].ud);
+    }
 
     ctxp = hv_fetchs(lg, "ctx", 0);
     ctx = (ctxp && *ctxp && SvOK(*ctxp)) ? *ctxp : NULL;
@@ -148,6 +372,20 @@ static void pl_emit(pTHX_ SV *self, int lvl, SV *msg) {
     }
     sv_catsv(detail, msg);
 
+    /* the fields, as logfmt, after the message. The json branch below merges
+     * them into the object instead and reads `msg`, not this. */
+    if (fields) {
+        SV *pairs = pl_logfmt(aTHX_ fields);
+        if (SvCUR(pairs)) {
+            /* not when the message was empty: the method/path separator has
+             * already left a space, and "GET /x -  books=3" is a typo, not a
+             * log line */
+            if (SvCUR(detail) && SvEND(detail)[-1] != ' ')
+                sv_catpvs(detail, " ");
+            sv_catsv(detail, pairs);
+        }
+    }
+
     if (env) {                                          /* prefer psgix.logger */
         SV **pgl = hv_fetchs(env, "psgix.logger", 0);
         if (pgl && *pgl && SvROK(*pgl) && SvTYPE(SvRV(*pgl)) == SVt_PVCV) {
@@ -169,9 +407,24 @@ static void pl_emit(pTHX_ SV *self, int lvl, SV *msg) {
         pl_iso_time(ts, sizeof ts);
         if (json) {
             HV *o = newHV();
+            if (fields) {         /* the record first, the house keys after:
+                                   * a colliding field is dropped by
+                                   * pl_reserved, and the six below are the
+                                   * only things that can occupy those names */
+                HE *he;
+                hv_iterinit(fields);
+                while ((he = hv_iternext(fields))) {
+                    SV *k = hv_iterkeysv(he);
+                    STRLEN kl;
+                    const char *ks = SvPV_const(k, kl);
+                    if (pl_reserved(ks, kl)) continue;
+                    (void)hv_store_ent(o, k,
+                        newSVsv(pl_safe(aTHX_ HeVAL(he))), 0);
+                }
+            }
             (void)hv_stores(o, "time", newSVpv(ts, 0));
             (void)hv_stores(o, "level", newSVpv(name, 0));
-            (void)hv_stores(o, "message", newSVsv(msg));
+            (void)hv_stores(o, "message", newSVsv(pl_safe(aTHX_ msg)));
             if (ml)  (void)hv_stores(o, "method", newSVpvn(method, ml));
             if (pl2) (void)hv_stores(o, "path", newSVpvn(path, pl2));
             if (reqid) (void)hv_stores(o, "request_id", newSVsv(reqid));
@@ -203,11 +456,28 @@ static void pl_emit(pTHX_ SV *self, int lvl, SV *msg) {
     }
 }
 
-/* the shared body of the level methods: build the message (one arg as-is,
- * several via sprintf) and emit */
+/* the shared body of the level methods: build the message (a lone unblessed
+ * hashref is a record, one arg as-is, several via sprintf) and emit.
+ *
+ * The threshold is read here rather than in pl_emit, so a dropped call really
+ * does no work: it used to sprintf first and ask afterwards, which made every
+ * below-threshold ->debug('%s', $expensive) pay for a line nobody would see.
+ *
+ * A record is an UNBLESSED hashref only. An object is a message, however it
+ * is built: one with an overloaded "" is an ordinary thing to log, and
+ * dumping its guts as fields instead would be a silent change of meaning. */
 static void pl_method(pTHX_ SV *self, int lvl, SV **argv, int argc) {
     SV *msg;
-    if (argc <= 0) msg = sv_2mortal(newSVpvs(""));
+    HV *fields = NULL;
+    if (lvl < pl_threshold(aTHX_ self)) return;        /* dropped, no work */
+    if (argc == 1 && SvROK(argv[0]) && !SvOBJECT(SvRV(argv[0]))
+        && SvTYPE(SvRV(argv[0])) == SVt_PVHV) {
+        SV **m;
+        fields = (HV *)SvRV(argv[0]);
+        m = hv_fetchs(fields, "message", 0);
+        msg = (m && *m && SvOK(*m)) ? *m : sv_2mortal(newSVpvs(""));
+    }
+    else if (argc <= 0) msg = sv_2mortal(newSVpvs(""));
     else if (argc == 1) msg = argv[0];
     else {
         dSP; int count, i;
@@ -224,7 +494,7 @@ static void pl_method(pTHX_ SV *self, int lvl, SV **argv, int argc) {
         PUTBACK; FREETMPS; LEAVE;
         msg = sv_2mortal(result);
     }
-    pl_emit(aTHX_ self, lvl, msg);
+    pl_emit(aTHX_ self, lvl, msg, fields);
 }
 
 #endif /* PUNK_LOG_H */

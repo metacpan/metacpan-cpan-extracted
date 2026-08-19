@@ -101,7 +101,7 @@ get(self, ...)
         }
 
         sth = pdbi_sth_dbh(aTHX_ pdbi_get(aTHX_ slot, "dbh"), sql);
-        pdbi_execute(aTHX_ sth, bind);
+        pdbi_execute_sql(aTHX_ sth, bind, sql);
         row = pdbi_meth0(aTHX_ sth, "fetchrow_hashref");
         { SV *f = pdbi_meth0(aTHX_ sth, "finish"); if (f) SvREFCNT_dec(f); }
         RETVAL = (row && SvOK(row)) ? row : (row ? (SvREFCNT_dec(row), newSV(0))
@@ -178,7 +178,7 @@ search(self, filter = &PL_sv_undef, opts = &PL_sv_undef)
         sv_catpvf(sql, " LIMIT %" IVdf, (IV)(limit + 1));
 
         sth = pdbi_sth(aTHX_ self, sql);
-        pdbi_execute(aTHX_ sth, bind);
+        pdbi_execute_sql(aTHX_ sth, bind, sql);
         {
             SV *argv[1];
             argv[0] = sv_2mortal(newRV_noinc((SV *)newHV()));
@@ -269,7 +269,7 @@ create(self, data)
                 SV *row;
                 sv_catpvs(sql, " RETURNING *");
                 sth = pdbi_sth(aTHX_ self, sql);
-                pdbi_execute(aTHX_ sth, bind);
+                pdbi_execute_sql(aTHX_ sth, bind, sql);
                 row = pdbi_meth0(aTHX_ sth, "fetchrow_hashref");
                 { SV *f = pdbi_meth0(aTHX_ sth, "finish");
                   if (f) SvREFCNT_dec(f); }
@@ -280,7 +280,7 @@ create(self, data)
         }
 
         sth = pdbi_sth(aTHX_ self, sql);
-        pdbi_execute(aTHX_ sth, bind);
+        pdbi_execute_sql(aTHX_ sth, bind, sql);
         if (pk && SvOK(pk)) {
             HE *he = d ? hv_fetch_ent(d, pk, 0, 0) : NULL;
             SV *id;
@@ -370,7 +370,7 @@ update(self, data)
                 SV *row;
                 sv_catpvs(sql, " RETURNING *");
                 sth = pdbi_sth(aTHX_ self, sql);
-                pdbi_execute(aTHX_ sth, bind);
+                pdbi_execute_sql(aTHX_ sth, bind, sql);
                 row = pdbi_meth0(aTHX_ sth, "fetchrow_hashref");
                 { SV *f = pdbi_meth0(aTHX_ sth, "finish");
                   if (f) SvREFCNT_dec(f); }
@@ -380,7 +380,7 @@ update(self, data)
             }
         }
         sth = pdbi_sth(aTHX_ self, sql);
-        pdbi_execute(aTHX_ sth, bind);
+        pdbi_execute_sql(aTHX_ sth, bind, sql);
         {
             SV *argv[2];
             argv[0] = pk; argv[1] = id;
@@ -420,7 +420,7 @@ delete(self, ...)
         }
 
         sth = pdbi_sth_dbh(aTHX_ pdbi_get(aTHX_ slot, "dbh"), sql);
-        pdbi_execute(aTHX_ sth, bind);
+        pdbi_execute_sql(aTHX_ sth, bind, sql);
         n = pdbi_meth0(aTHX_ sth, "rows");
         { SV *f = pdbi_meth0(aTHX_ sth, "finish"); if (f) SvREFCNT_dec(f); }
         RETVAL = (n && SvOK(n)) ? SvIV(n) : 0;

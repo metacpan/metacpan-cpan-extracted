@@ -4,10 +4,6 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN {
-    plan tests => 6;
-}
-
 use PDL::LiteF;
 use PDL::NiceSlice;
 use PDL::DSP::Fir::Simple qw( filter testdata);

@@ -1,12 +1,45 @@
 Revision history for PAGI::FastAPI
 
+1.1.0  2026-08-18
+       [FEATURE]
+       - We have included PAGI::FastAPI::Queue which is an async-first
+         message queue facade with a topic-based push(), pop(), and
+         size() operations. We have also added dep() helper for use in
+         conjunction with PAGI::FastAPI::Depends and the support for the
+         choice of the storage driver by merely the short name or
+         fully-qualified class name provided by the driver constructor
+         option.
+       - PAGI::FastAPI::Queue::Driver has been added, which is an abstract
+         async base class used for all queue storage drivers (be it built-in
+         or 3rd party).
+       - We have added a new built-in storage driver called
+         PAGI::FastAPI::Queue::Driver::Memory.
+
+       [TESTS]
+       - The file t/22-queue_driver.t was added to contain contract tests of
+         the abstract PAGI::FastAPI::Queue::Driver base class which returns
+         failed Future errors for push, pop, and size methods in case they
+         are not overruled.
+       - The file t/23-queue_driver_memory.t was introduced to hold unit
+         tests for the PAGI::FastAPI::Queue::Driver::Memory subclass which
+         conducts FIFO operation tests.
+       - The file t/24-queue.t was created to run unit tests for the
+         functionalities of the PAGI::FastAPI::Queue interface, which
+         verifies its working of the driver name in its three possible forms
+         and the ability to handle possible errors in the absence of the
+         object in the class.
+       - The file t/25-rate_limit_stacked.t was created to test app-level
+         rate liimt and per route rate limit stacked together.
+       - All the newly added modules were included in t/00-load.t so that
+         they can be made use of  to call are OK.
+
 1.0.0  2026-08-12
        [FEATURE]
        - Refactored core framework to modern Perl syntax: use experimental 'class'.
        - Added PAGI::FastAPI::RateLimit::Driver abstract async base class
          for pluggable rate-limiting storage drivers.
        - Added PAGI::FastAPI::RateLimit::Driver::Memory as the built-in,
-          default in-memory storage driver.
+         default in-memory storage driver.
        - Added PAGI::FastAPI::Middleware::RateLimit to support app-level
          and route-level rate limiting using a fixed time-window counter.
        - Added PAGI::FastAPI::BotProtection::ProofOfWork for stateless
@@ -27,7 +60,7 @@ Revision history for PAGI::FastAPI
          response handling across HTML, SSE, and JSON handlers.
        - Improved route response dispatcher in PAGI::FastAPI to correctly
          route streaming responses (can('dispatch')) and response objects
-         without triggering JSON serialization errors.
+         without triggering JSON serialisation errors.
        - Added stringification overload fallback for response classes.
        - Added enable_csrf(), to_pagi() to PAGI::FastAPI.
        - Added csrf_token(), csrf_verify(), pagi_context() to PAGI::FastAPI::Context.

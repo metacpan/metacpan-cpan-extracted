@@ -9,9 +9,8 @@ use CPAN::Maker::Constants qw( :all );
 use CPAN::Maker::Utils;
 use CLI::Simple::Constants qw(:booleans :chars);
 use CLI::Simple::Utils qw(choose slurp);
-
 use Carp;
-use Cwd;
+use Cwd qw(getcwd);
 use Data::Dumper;
 use English qw( -no_match_vars );
 use ExtUtils::MM;
@@ -25,7 +24,7 @@ use IPC::Open3;
 use Symbol qw(gensym);
 use File::ShareDir qw(dist_dir dist_file);
 use JSON qw( encode_json decode_json );
-use List::Util qw( pairs uniq );
+use List::Util qw( pairs uniq none);
 use Log::Log4perl::Level;
 use Scalar::Util qw( reftype );
 use YAML::Tiny qw(Load Dump LoadFile);
@@ -36,7 +35,7 @@ use Role::Tiny::With;
 with 'CPAN::Maker::Role::ModuleUtils';
 with 'CPAN::Maker::Role::FileUtils';
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.8';
 
 __PACKAGE__->use_log4perl( level => 'info', color => $FALSE );
 
@@ -55,6 +54,7 @@ sub init {
   }
 
   my $log_level = $self->get_log_level;
+
   $self->_set_log_level($log_level);
 
   my $project_root = $self->get_project_root;
@@ -103,7 +103,7 @@ sub _set_log_level {
       return {@text_levels}->{$log_level};
     }
     else {
-      $log_level = {@text_levels}->{info};
+      return {@text_levels}->{info};
     }
   };
 
@@ -130,6 +130,12 @@ sub cmd_create_cpanfile {
   my ($self) = @_;
 
   my @file_list = $self->get_args;
+  my $dep_type  = $self->get_dependency_type // 'requires';
+
+  my @dep_types = qw(requires suggests recommends);
+
+  die sprintf "ERROR: --dependency-type must be one of %s\n", join q{, }, @dep_types
+    if none { $dep_type eq $_ } @dep_types;
 
   die "ERROR: usage cpan-maker create-cpanfile file1 file2 ...\n"
     if !@file_list;
@@ -185,7 +191,7 @@ sub cmd_create_cpanfile {
     }
 
     if ( keys %{$req} == 2 ) {
-      print {$fh} sprintf qq{requires "%s", "%s";\n}, $req->{module} // q{}, $req->{version} // q{};
+      print {$fh} sprintf qq{%s "%s", "%s";\n}, $dep_type, $req->{module} // q{}, $req->{version} // q{};
     }
     else {
       my @extra;
@@ -213,7 +219,7 @@ sub cmd_validate {
 ########################################################################
   my ($self) = @_;
 
-  my $is_validator_available = eval { require JSON::Validator; 1; };
+  my $is_validator_available = eval { require JSON::Validator; 1; }; ## scandeps: recommends
 
   die "ERROR: JSON::Validator must be installed to validate your 'buildspec.yml' file.\n"
     if !$is_validator_available;
@@ -243,14 +249,17 @@ sub cmd_build {
   die "ERROR: no buildspec.yml specified.\n"
     if !$self->get_buildspec;
 
-  my %args = $self->parse_buildspec;
-
-  $self->_apply_buildspec_args(%args);
-
-  $self->get_logger->debug( sub { return Dumper( [ args => \%args ] ) } );
+  $self->parse_buildspec;
 
   if ( $self->get_dryrun ) {
-    print {*STDOUT} Dumper( \%args );
+    print {*STDOUT} Dumper(
+      { requires       => $self->get_requires,
+        recommends     => $self->get_recommends,
+        suggests       => $self->get_suggests,
+        test_requires  => $self->get_test_requires,
+        build_requires => $self->get_build_requires,
+      }
+    );
     return $SUCCESS;
   }
 
@@ -264,7 +273,7 @@ sub cmd_build {
   chdir $project_root
     or die "ERROR: could not chdir to $project_root: $OS_ERROR\n";
 
-  my $provides_file = $self->stage_distribution( builddir => $builddir, args => \%args );
+  my $provides_file = $self->stage_distribution( builddir => $builddir );
 
   $self->set_work_dir($builddir);
 
@@ -305,16 +314,26 @@ sub cmd_build {
     close $fh;
   }
 
-  my @steps = ( [ $^X, 'Makefile.PL' ], [ 'make', 'manifest' ], [ 'make', 'dist' ], );
+  my @steps = ( [ $^X, 'Makefile.PL' ], [ 'make', 'manifest' ], sub { $self->_sort_manifest }, [ 'make', 'dist' ], );
 
   push @steps, [ 'make', 'test' ]
     if !$self->get_skip_tests;
 
   for my $step (@steps) {
-    my $rc = $self->_run_cmd( @{$step} );
+    my ( $rc, $label );
+
+    if ( ref $step eq 'CODE' ) {
+      $rc    = $step->();
+      $label = 'sort-manifest';
+    }
+    else {
+      $rc    = $self->_run_cmd( @{$step} );
+      $label = join $SPACE, @{$step};
+    }
+
     if ( $rc != 0 ) {
       chdir $cwd;
-      die sprintf "ERROR: '%s' failed with exit code %d\n", join( $SPACE, @{$step} ), $rc;
+      die sprintf "ERROR: '%s' failed with exit code %d\n", $label, $rc;
     }
   }
 
@@ -341,6 +360,35 @@ sub cmd_build {
 }
 
 ########################################################################
+sub _sort_manifest {
+########################################################################
+  my ($self) = @_;
+
+  my $file = 'MANIFEST';
+
+  open my $fh, '<', $file
+    or die sprintf "ERROR: cannot read %s: %s\n", $file, $OS_ERROR;
+  chomp( my @lines = <$fh> );
+  close $fh;
+
+  # ExtUtils::Manifest sorts with { lc $a cmp lc $b } and no tiebreaker, so
+  # entries differing only in case (botocore's JWT...Exception vs
+  # jwt...Exception) compare equal and fall back to directory-walk order,
+  # which varies between builds. Add a case-sensitive tiebreaker for a
+  # total, reproducible order.
+  my @sorted = sort { lc $a cmp lc $b or $a cmp $b } @lines;
+
+  open my $out, '>', $file
+    or die sprintf "ERROR: cannot write %s: %s\n", $file, $OS_ERROR;
+  print {$out} map {"$_\n"} @sorted;
+
+  close $out
+    or die sprintf "ERROR: cannot close %s: %s\n", $file, $OS_ERROR;
+
+  return 0;
+}
+
+########################################################################
 sub cmd_makefile {
 ########################################################################
   my ($self) = @_;
@@ -348,12 +396,14 @@ sub cmd_makefile {
   croak 'no module specified'
     if !$self->get_module;
 
-  croak 'no dependencies'
+  croak 'no requires file specified'
     if !$self->get_requires;
 
-  my $author   = $self->get_author   // 'Anonymouse <anonymouse@example.com>';
-  my $abstract = $self->get_abstract // 'my awesome Perl module!';
+  # TBD, update error to 'not found...use --scan path to create a requires file'
+  croak sprintf q{requires file '%s' not found}, $self->get_requires
+    if !-f $self->get_requires;
 
+  # TBD, use outfile if provided
   return $self->write_makefile( dest => \*STDOUT ) ? $SUCCESS : $FAILURE;
 }
 
@@ -537,7 +587,7 @@ sub read_resources {
 ########################################################################
 sub write_resources {
 ########################################################################
-  my ( $self, $resources, %args ) = @_;
+  my ( $self, $resources ) = @_;
 
   my $resources_file;
 
@@ -553,15 +603,15 @@ sub write_resources {
       or croak "could not close file $resources_file\n";
   }
 
-  return %args;
+  return;
 }
 
 ########################################################################
 sub write_pl_files {
 ########################################################################
-  my ( $self, $pl_files, %args ) = @_;
+  my ( $self, $pl_files ) = @_;
 
-  return %args
+  return
     if !$pl_files;
 
   my ( $fh, $filename ) = tempfile( 'make-cpan-dist-XXXXX', TMPDIR => $TRUE );
@@ -570,9 +620,9 @@ sub write_pl_files {
 
   close $fh;
 
-  $args{y} = $filename;
+  $self->set_pl_files($filename);
 
-  return %args;
+  return;
 }
 
 ########################################################################
@@ -594,9 +644,9 @@ sub _write_provides {
 ########################################################################
 sub write_provides {
 ########################################################################
-  my ( $self, $provides, %args ) = @_;
+  my ( $self, $provides ) = @_;
 
-  return %args
+  return
     if !$provides;
 
   my $provides_file = 'provides';
@@ -609,9 +659,13 @@ sub write_provides {
   close $fh
     or croak "could not close 'provides'\n";
 
-  $args{P} = $provides_file;
+  # NOTE: 'provides' has never been a real CLI::Simple accessor -
+  # get_provides (below) is a hand-written override that reads the
+  # file directly, and nothing else in this codebase ever reads a
+  # 'provides' object attribute. The file written above is the only
+  # thing anything downstream actually consumes.
 
-  return %args;
+  return;
 }
 
 ########################################################################
@@ -625,24 +679,29 @@ sub write_makefile {
   my $MODULE_ABSTRACT = $self->get_abstract;
   my $AUTHOR          = $self->get_author;
   my $project_root    = $self->get_project_root;
+  my $LICENSE         = $self->get_license // 'perl';
 
-  my $email;
-  my $author;
+  my ( $author, $email ) = choose {
 
-  if ( $AUTHOR && $AUTHOR =~ /^([^<]+)\s+<([^>]+)>\s*$/xsm ) {
-    $author = $1;
-    $email  = $2;
-  }
+    if ( $AUTHOR && $AUTHOR =~ /^([^<]+)\s+<([^>]+)>\s*$/xsm ) {
+      return ( $1, $2 );
+    }
+
+    # TBD: look in ENV, ~/.gitconfig ?
+    return ( 'Anonymouse', 'anonymouse@example.org' );
+  };
+
+  $AUTHOR = sprintf '%s <%s>', $author, $email;
 
   my $PM_MODULE = $self->get_module;
 
   my %buildspec = (
     version => $VERSION,
     project => {
-      description => $MODULE_ABSTRACT,
+      description => $MODULE_ABSTRACT // $PM_MODULE,
       author      => {
-        name   => $AUTHOR // 'Anonymouse',
-        mailto => $email  // 'anonymouse@example.org',
+        name   => $author,
+        mailto => $email,
       },
     },
     'pm-module' => $PM_MODULE,
@@ -662,18 +721,19 @@ sub write_makefile {
   local $Data::Dumper::Pad      = $SPACE x $INDENT;
 
   # dependencies = key name taken as file name if not provided
-  foreach my $d (qw(requires test_requires build_requires recommends)) {
+  foreach my $d (qw(requires test_requires build_requires recommends suggests)) {
     $self->set( $d, $self->get($d) || $d );
   }
 
   $buildspec{dependencies} = {
-    requires         => $self->get_requires,
-    'test-requires'  => $self->get_test_requires,
     'build-requires' => $self->get_build_requires,
-    recommends       => $self->get_recommends,
+    'recommends'     => $self->get_recommends,
+    'requires'       => $self->get_requires,
+    'suggests'       => $self->get_suggests,
+    'test-requires'  => $self->get_test_requires,
   };
 
-  foreach (qw(requires test-requires build-requires recommends)) {
+  foreach (qw(requires test-requires build-requires recommends suggests)) {
     my $dependency_file = $buildspec{dependencies}->{$_};
     $dependency_file =~ s/$project_root\/?//xsm;
     next if -s $dependency_file;
@@ -738,7 +798,7 @@ sub write_makefile {
 
   my $exe_files = $self->get_exe_files || $self->get_exec_path;
 
-  if ( $exe_files && -s $exe_files ) {
+  if ( $exe_files && -f $exe_files ) {
     @exe_file_list = $self->get_exe_file_list($exe_files);
     $self->set_exec_path($exe_files);
   }
@@ -815,6 +875,21 @@ sub write_makefile {
     );
   }
 
+  my $suggests = {};
+
+  if ( $self->get_suggests && -s $self->get_suggests ) {
+    $suggests = $self->fetch_requires(
+      requires             => $self->get_suggests,
+      include_core_modules => $core,
+      include_version      => $require_versions,
+      min_perl_version     => $MIN_PERL_VERSION,
+    );
+  }
+
+  my %prereqs_runtime;
+  $prereqs_runtime{recommends} = $recommends if keys %{$recommends};
+  $prereqs_runtime{suggests}   = $suggests   if keys %{$suggests};
+
   my $META_MERGE = 'META_MERGE ' . $FAT_ARROW;
 
   {
@@ -822,7 +897,7 @@ sub write_makefile {
     $META_MERGE .= Dumper(
       { 'meta-spec' => { version => 2 },
         'provides'  => \%provides,
-        ( keys %{$recommends} ? ( 'prereqs' => { 'runtime' => { 'recommends' => $recommends, } } ) : () ),
+        ( %prereqs_runtime ? ( 'prereqs' => { 'runtime' => \%prereqs_runtime } ) : () ),
         $resources ? ( 'resources' => $resources ) : ()
       }
     );
@@ -864,8 +939,6 @@ sub write_makefile {
   $buildspec{postamble} = $self->get_postamble;
 
   my $MAKEFILE = <<"END_OF_TEXT";
-# autogenerated by $PROGRAM_NAME on $timestamp
-
 use strict;
 use warnings;
 
@@ -884,7 +957,7 @@ WriteMakefile(
   AUTHOR           => '$AUTHOR',
   VERSION_FROM     => '$VERSION_FROM',
   ABSTRACT         => '$MODULE_ABSTRACT',
-  LICENSE          => 'perl',
+  LICENSE          => '$LICENSE',
   PL_FILES         => $PL_FILES,
   EXE_FILES        => $EXE_FILES,
   MAN1PODS         => $MAN1PODS,
@@ -933,13 +1006,16 @@ sub postamble {
 1;
 END_OF_MAKEFILE
 
+  # TBD: use openhandle and refactor this block
   if ( ref $dest ) {
     print {$dest} $MAKEFILE;
   }
   else {
     open my $fh, '>', $dest
       or die "ERROR: could not open $dest for writing: $OS_ERROR\n";
+
     print {$fh} $MAKEFILE;
+
     close $fh
       or die "ERROR: could not close $dest: $OS_ERROR\n";
   }
@@ -978,7 +1054,7 @@ sub write_buildspec_file {
 ########################################################################
 sub parse_dependencies {
 ########################################################################
-  my ( $self, $dependencies, %args ) = @_;
+  my ( $self, $dependencies ) = @_;
 
   if ($dependencies) {
     croak 'malformed buildspec.yml file - dependencies section with no keys?'
@@ -987,110 +1063,109 @@ sub parse_dependencies {
     $dependencies->{'core-modules'}     //= 'no';
     $dependencies->{'required-modules'} //= 'yes';
 
-    if ( $dependencies->{path} ) {  # deprecatd
-      $args{D} = $dependencies->{path};
+    if ( $dependencies->{path} ) {  # deprecated
+      $self->set_requires( $dependencies->{path} );
       warn "path is deprecated: use requires\n";
     }
 
     if ( $dependencies->{requires} ) {
-      $args{D} = $dependencies->{requires};
+      $self->set_requires( $dependencies->{requires} );
     }
 
     if ( $dependencies->{'test-requires'} ) {
-      $args{T} = $dependencies->{'test-requires'};
+      $self->set_test_requires( $dependencies->{'test-requires'} );
     }
 
     if ( $dependencies->{'build-requires'} ) {
-      $args{B} = $dependencies->{'build-requires'};
+      $self->set_build_requires( $dependencies->{'build-requires'} );
     }
 
     if ( $dependencies->{recommends} ) {
-      $args{Y} = $dependencies->{recommends};
+      $self->set_recommends( $dependencies->{recommends} );
+    }
+
+    if ( $dependencies->{suggests} ) {
+      $self->set_suggests( $dependencies->{suggests} );
     }
 
     if ( $dependencies->{'core-modules'} eq 'yes' ) {
-      $args{c} = $EMPTY;
+      $self->set_core_modules($TRUE);
     }
 
-    if ( $dependencies->{'required-modules'} eq 'no' ) {
-      $args{n} = $EMPTY;
-    }
+    # NOTE: required-modules and resolver have no corresponding
+    # CLI::Simple accessor (not in option_specs, no extra_options
+    # declared) -- there is currently nowhere valid to apply these
+    # buildspec.yml values. Preserved here as parsed/validated but
+    # intentionally not applied; flagging rather than guessing at
+    # attribute names that don't exist.
+    my $required_modules_requested = $dependencies->{'required-modules'} eq 'no';
+    my $resolver                   = $dependencies->{resolver};
 
-    if ( my $resolver = $dependencies->{resolver} ) {
-      if ( $resolver eq 'scandeps' ) {
-        $args{s} = $EMPTY;
-      }
-      else {
-        $args{r} = $dependencies->{resolver};
-      }
-    }
-
-    if ( $args{D} && $args{r} ) {
+    if ( $self->get_requires && $resolver ) {
       croak "use either path or resolver for dependencies, but not both\n";
     }
   }
 
-  return %args;
+  return;
 }
 
 ########################################################################
 sub parse_include_version {
 ########################################################################
-  my ( $self, $version, %args ) = @_;
+  my ( $self, $version ) = @_;
 
-  return %args
+  return
     if !defined $version;
 
   if ( $version =~ /(no|0|off)/ixsm ) {
-    $args{A} = $EMPTY;
+    $self->set_require_versions($FALSE);
   }
 
-  return %args;
+  return;
 }
 
 ########################################################################
 sub parse_project {
 ########################################################################
-  my ( $self, $project, %args ) = @_;
+  my ( $self, $project ) = @_;
 
-  return %args
+  return
     if !$project;
 
   if ( $project->{author} ) {
-    my $name = $project->{author}->{name} // 'anonymouse';
-    $args{a} = $name;
+    my $name   = $project->{author}->{name} // 'anonymouse';
+    my $author = $name;
 
     if ( my $mailto = $project->{author}->{mailto} ) {
-      $args{a} .= ' <' . $mailto . '>';
+      $author .= ' <' . $mailto . '>';
     }
 
-    $args{a} = sprintf q{'%s'}, $args{a};
+    $self->set_author($author);
   }
 
-  # -d
   if ( my $description = $project->{description} ) {
-    $args{d} = sprintf q{'%s'}, $description;
+    $self->set_abstract($description);
   }
 
-  # -g
-  if ( my $git = $project->{git} ) {
-    $args{g} = $git;
-  }
+  # NOTE: 'git' has no corresponding CLI::Simple accessor (not in
+  # option_specs, no extra_options declared) -- there is currently
+  # nowhere valid to apply this buildspec.yml value. Left unapplied
+  # rather than guessing at an attribute name that doesn't exist.
 
-  return %args;
+  return;
 }
 
 ########################################################################
 sub parse_pm_module {
 ########################################################################
-  my ( $self, $pm_module, %args ) = @_;
+  my ( $self, $pm_module ) = @_;
 
-  return %args
+  return
     if !$pm_module;
 
-  $args{m} = $pm_module;
+  $self->set_module($pm_module);
 
-  return %args;
+  return;
 }
 
 ########################################################################
@@ -1145,58 +1220,51 @@ sub parse_buildspec {
   croak 'invalid buildspec.yml'
     if !$self->validate_buildspec($buildspec);
 
-  my %args;
+  if ( $buildspec->{license} ) {
+    $self->set_license( $buildspec->{license} );
+  }
 
   if ( $buildspec->{'min-perl-version'} ) {
-    $args{M} = $buildspec->{'min-perl-version'};
+    $self->set_min_perl_version( $buildspec->{'min-perl-version'} );
   }
 
   if ( $buildspec->{'version-from'} ) {
-    $args{V} = $buildspec->{'version-from'};
-  }
-
-  if ($project_root) {
-    $args{H} = $project_root;
-  }
-
-  if ( my $postamble = $self->get_postamble ) {
-    $args{F} = $postamble;
+    $self->set_version_from( $buildspec->{'version-from'} );
   }
 
   if ( $buildspec->{'exe-files'} ) {
-    $args{e} = $self->create_temp_filelist( $project_root, $buildspec->{'exe-files'} );
+    $self->set_exe_files( $self->create_temp_filelist( $project_root, $buildspec->{'exe-files'} ) );
   }
 
   if ( $buildspec->{tests} ) {
-    $args{t} = $self->create_temp_filelist( $project_root, $buildspec->{tests} );
+    $self->set_tests_path( $self->create_temp_filelist( $project_root, $buildspec->{tests} ) );
   }
 
   if ( $buildspec->{scripts} ) {
-    $args{S} = $self->create_temp_filelist( $project_root, $buildspec->{scripts} );
+    $self->set_scripts_path( $self->create_temp_filelist( $project_root, $buildspec->{scripts} ) );
   }
 
-  %args = $self->write_resources( $buildspec->{resources}, %args );
+  $self->write_resources( $buildspec->{resources} );
 
-  %args = $self->parse_project( $buildspec->{project}, %args );
+  $self->parse_project( $buildspec->{project} );
 
-  %args = $self->parse_pm_module( $buildspec->{'pm-module'}, %args );
+  $self->parse_pm_module( $buildspec->{'pm-module'} );
 
-  %args = $self->parse_include_version( $buildspec->{'include-version'}, %args );
+  $self->parse_include_version( $buildspec->{'include-version'} );
 
-  %args = $self->parse_dependencies( $buildspec->{dependencies}, %args );
+  $self->parse_dependencies( $buildspec->{dependencies} );
 
-  %args = $self->parse_path( $project_root, $buildspec->{path}, %args );
+  $self->parse_path( $project_root, $buildspec->{path} );
 
-  %args = $self->write_extra_files(
+  $self->write_extra_files(
     extra_files  => $buildspec->{'extra-files'},
     extra        => $buildspec->{extra},
-    args         => \%args,
     project_root => $project_root,
   );
 
-  %args = $self->write_provides( $buildspec->{provides}, %args );
+  $self->write_provides( $buildspec->{provides} );
 
-  %args = $self->write_pl_files( $buildspec->{'pl-files'}, %args );
+  $self->write_pl_files( $buildspec->{'pl-files'} );
 
   if ( my $links = $buildspec->{'man-links'} ) {
     my $man_links_content = $self->_generate_man_links($links);
@@ -1204,54 +1272,32 @@ sub parse_buildspec {
     my ( $fh, $filename ) = tempfile( 'make-cpan-dist-XXXXX', TMPDIR => $TRUE );
 
     # preserve existing postamble if one was specified
-    if ( $args{F} && -e $args{F} ) {
-      local $RS = undef;
-      open my $existing, '<', $args{F}
-        or die "could not read postamble $args{F}: $OS_ERROR\n";
-      print {$fh} <$existing>;
-      close $existing;
+    if ( my $postamble = $self->get_postamble ) {
+      if ( -e $postamble ) {
+        local $RS = undef;
+        open my $existing, '<', $postamble
+          or die "could not read postamble $postamble: $OS_ERROR\n";
+        print {$fh} <$existing>;
+        close $existing;
+      }
     }
 
     print {$fh} $man_links_content;
     close $fh;
 
-    $args{F} = $filename;
+    $self->set_postamble($filename);
   }
 
-  # set boolean args from options
-
-  my @boolean_args = qw( verbose v cleanup !x scandeps s require-versions !A );
-
-  foreach my $pair ( pairs @boolean_args ) {
-    my ( $key, $value ) = @{$pair};
-
-    if ( $value =~ /^\!(.*)$/xsm ) {
-      if ( $self->get($1) ) {
-        $self->set( $1, undef );
-      }
-    }
-    elsif ( $self->get($key) ) {
-      $args{$value} = $EMPTY;
-    }
+  if ( $buildspec->{destdir} ) {
+    $self->set_destdir( $buildspec->{destdir} );
   }
 
-  # set value args from buildspec
-  foreach my $pair ( pairs qw( destdir o extra f ) ) {
-    my ( $key, $value ) = @{$pair};
+  # NOTE: top-level buildspec 'extra' has no corresponding
+  # CLI::Simple accessor (not in option_specs, no extra_options
+  # declared) -- it is still applied where it's actually used, as the
+  # extra-files output path in write_extra_files above.
 
-    if ( $buildspec->{$key} ) {
-      $args{$value} = $buildspec->{$key};
-    }
-  }
-
-  foreach my $k ( keys %args ) {
-    $args{ $DASH . $k } = $args{$k};
-    delete $args{$k};
-  }
-
-  $self->get_logger->debug( Dumper( [ args => \%args ] ) );
-
-  return %args;
+  return;
 }
 
 ########################################################################
@@ -1408,39 +1454,6 @@ sub _min_perl_version {
 }
 
 ########################################################################
-sub _apply_buildspec_args {
-########################################################################
-  my ( $self, %args ) = @_;
-
-  my %map = (
-    '-m' => 'module',
-    '-a' => 'author',
-    '-d' => 'abstract',
-    '-D' => 'requires',
-    '-T' => 'test_requires',
-    '-B' => 'build_requires',
-    '-Y' => 'recommends',
-    '-M' => 'min_perl_version',
-    '-V' => 'version_from',
-    '-l' => 'module_path',
-    '-S' => 'scripts_path',
-    '-t' => 'tests_path',
-    '-F' => 'postamble',
-    '-R' => 'recurse',
-  );
-
-  for my $flag ( keys %map ) {
-    next if !exists $args{$flag};
-    my $val = $args{$flag};
-    $val =~ s/^'(.*)'$/$1/xsm  # strip shell quoting added by parse_project
-      if defined $val;
-    $self->set( $map{$flag}, $val );
-  }
-
-  return;
-}
-
-########################################################################
 # _run_cmd: run an external command, logging its output.
 #
 # STDERR is deliberately merged into STDOUT (via '>&STDOUT') so we read
@@ -1493,7 +1506,7 @@ sub stage_distribution {
 ########################################################################
   my ( $self, %params ) = @_;
 
-  my ( $builddir, $args ) = @params{qw(builddir args)};
+  my ($builddir) = @params{qw(builddir)};
 
   my $buildspec    = $self->read_buildspec( $self->get_buildspec );
   my $project_root = $self->get_project_root;
@@ -1594,8 +1607,11 @@ sub stage_distribution {
 
   if ($extra_files) {
     my @file_list;
+    $self->get_logger->debug( Dumper( [ extra_files => $extra_files ] ) );
 
     for my $e ( @{$extra_files} ) {
+      $self->get_logger->debug( Dumper( [ e => $e ] ) );
+
       if ( !ref $e ) {
         push @file_list,
           $self->fetch_file_list(
@@ -1607,6 +1623,16 @@ sub stage_distribution {
       elsif ( ref $e eq 'HASH' ) {
         my ($destdir) = keys %{$e};
         my $file_list = $e->{$destdir};
+
+        $self->get_logger->debug(
+          Dumper(
+            [ destdir      => $destdir,
+              file_list    => $file_list,
+              project_root => $project_root
+            ]
+          )
+        );
+
         push @file_list,
           $self->fetch_file_list(
           file_list    => $file_list,
@@ -1616,13 +1642,22 @@ sub stage_distribution {
       }
     }
 
+    $builddir ||= getcwd;
+
+    $self->get_logger->debug( Dumper( [ file_list => \@file_list, builddir => $builddir ] ) );
+
     for my $entry (@file_list) {
+
       my ( $src, $dest ) = split /\s+/xsm, $entry, 2;
+      $self->get_logger->debug( Dumper( [ src => $src, dest => $dest ] ) );
 
       $src  = "$project_root/$src" if $src !~ /^\//xsm;
       $dest = $dest ? "$builddir/$dest" : "$builddir/" . File::Basename::basename($src);
 
+      $self->get_logger->debug( Dumper( [ src => $src, dest => $dest ] ) );
+
       make_path( File::Basename::dirname($dest) );
+
       cp( $src, $dest )
         or die "ERROR: could not copy $src to $dest: $OS_ERROR\n";
     }
@@ -1655,11 +1690,13 @@ sub main {
     color!
     create-buildspec=s
     debug|D
+    dependency-type=s
     dryrun
     exe-files|e=s
     exec-path=s
     extra-path=s
     help|h
+    license=s
     log-level|l=s
     min-perl-version|M=s
     module-path=s
@@ -1678,8 +1715,9 @@ sub main {
     destdir=s
     no-cleanup
     preserve-makefile
-    skip-tests
     scripts-path=s
+    skip-tests
+    suggests=s
     test-requires|t=s
     tests-path=s
     validate!
@@ -1689,7 +1727,7 @@ sub main {
     work-dir|w=s
   );
 
-  my $is_json_validator_available = eval { require JSON::Validator; 1 };  # default: true if available
+  my $is_json_validator_available = eval { require JSON::Validator; 1 }; ## scandeps: recommends
 
   my $default_options = {
     cleanup          => $TRUE,
@@ -1736,7 +1774,7 @@ CPAN::Maker - create a CPAN distribution
 
 =head2 Options
 
- -a, --author                author
+ -a, --author                author in 'name <email>' format (default: anonymouse <anonymouse@example.org) 
  -A, --abstract              description of the module
  -B, --build-requires        build dependencies
  -b, --buildspec             buildspec YAML file
@@ -1748,6 +1786,7 @@ CPAN::Maker - create a CPAN distribution
      --exe-files             path to the executables list
      --extra-path            path to the extra files list
  -h, --help                  help
+     --license               License under which the software can be used (default: perl)
  -l, --log-level             ERROR, WARN, INFO, DEBUG, TRACE
  -m, --module                module name
  -M, --min-perl-version      minimum perl version to consider core (default: 5.010)
@@ -1759,10 +1798,13 @@ CPAN::Maker - create a CPAN distribution
      --postamble             name of the file containing the postamble instructions
      --preserve-makefile     copy Makefile.PL to destdir after build
  -p, --project-root          default: current working directory
+     --recommends            path to the file containing the recommended modules and versions
      --recurse               recurse directories when searching for files
  -R, --require-versions      add version numbers to dependencies
+ -r, --requires              path to the file containing the required modules and versions (required for write-makefile)
      --scripts-path          path to the scripts listing
      --skip-tests            skip C<make test> during build
+     --suggests              path to the file containing the suggested modules and versions
      --tests-path            path to the tests listing
  -V, --verbose               verbose output
  -v, --version               version
@@ -1840,7 +1882,7 @@ Print the installed version of C<CPAN::Maker> and exit.
 C<CPAN::Maker> is a utility for creating CPAN distribution tarballs
 from a declarative YAML build specification. It handles dependency
 resolution, C<Makefile.PL> generation, file staging, and packaging
-entirely in Perl — no external bash scripts are required.
+entirely in Perl â no external bash scripts are required.
 
 The build pipeline, invoked via C<cpan-maker -b buildspec.yml>:
 
@@ -1966,6 +2008,13 @@ Useful for inspecting the result.
 Root of the project tree. Paths in the buildspec are resolved relative
 to this directory. Defaults to the current working directory.
 
+=item --recommends
+
+Path to a file listing recommended (but not strictly required)
+dependencies. Optional - a distribution with no recommended
+dependencies simply omits this option. See
+L</BUILD SPECIFICATION FORMAT>.
+
 =item --recurse
 
 Recurse into subdirectories of the C<pm-module> path when collecting
@@ -1976,9 +2025,28 @@ modules. Default: yes.
 Include version numbers in the generated C<PREREQ_PM> section.
 Default: include versions.
 
+=item -r, --requires
+
+Path to a file listing required (runtime) dependencies. Unlike
+C<--recommends> and C<--suggests>, this one is not optional: most CPAN
+installers (C<cpanm> in particular) only install C<requires>
+dependencies by default - C<--with-recommends> and C<--with-suggests>
+both default to off - so a distribution with no C<requires> entries at
+all has, for practical purposes, no guaranteed dependencies. The
+C<write-makefile> command enforces this and will refuse to proceed
+without a C<--requires> file that actually exists. See
+L</BUILD SPECIFICATION FORMAT>.
+
 =item --skip-tests
 
 Skip C<make test> during the build.
+
+=item --suggests
+
+Path to a file listing suggested (optional) dependencies - modules
+that meaningfully enhance the distribution but aren't needed for it to
+function. Optional - a distribution with no suggested dependencies
+simply omits this option. See L</BUILD SPECIFICATION FORMAT>.
 
 =item --version-from
 
@@ -2054,6 +2122,12 @@ URI of the project's git repository.
 The fully-qualified name of the primary module to package
 (e.g. C<Foo::Bar>).
 
+=item license 
+
+License under which the software can be use.
+
+default: perl
+
 =item version-from
 
 Module from which the version number is read. Defaults to C<pm-module>.
@@ -2098,6 +2172,13 @@ Path to a file listing build-time dependencies.
 Path to a file listing optional recommended dependencies. These appear
 under C<prereqs.runtime.recommends> in generated META files and are
 installed by C<cpanm --with-recommends>.
+
+=item suggests
+
+Path to a file listing optional suggested dependencies - a weaker
+signal than C<recommends>. These appear under
+C<prereqs.runtime.suggests> in generated META files and are installed
+by C<cpanm --with-suggests>.
 
 =item resolver (optional)
 
@@ -2235,7 +2316,7 @@ format.
 
 =head1 VERSION
 
-This documentation refers to version 2.0.1
+This documentation refers to version 2.0.8
 
 =head1 AUTHOR
 

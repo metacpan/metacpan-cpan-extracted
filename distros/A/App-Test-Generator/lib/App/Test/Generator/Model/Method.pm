@@ -3,13 +3,21 @@ package App::Test::Generator::Model::Method;
 use strict;
 use warnings;
 
-use Carp qw(croak);
+use Carp qw(confess croak);
 use Readonly;
 
 Readonly my $HIGH_CONFIDENCE_THRESHOLD   => 40;
 Readonly my $MEDIUM_CONFIDENCE_THRESHOLD => 20;
 
-our $VERSION = '0.45';
+Readonly my %VALID_CATEGORIES => map { $_ => 1 } qw(return input effect);
+Readonly my %VALID_SIGNALS    => map { $_ => 1 } qw(
+	returns_property returns_constant returns_self
+	legacy_type context_aware error_pattern
+	input_validated input_typed input_optional
+	has_side_effect no_side_effect
+);
+
+our $VERSION = '0.46';
 
 =head1 NAME
 
@@ -17,7 +25,7 @@ App::Test::Generator::Model::Method - Evidence-based model of a single method un
 
 =head1 VERSION
 
-Version 0.45
+Version 0.46
 
 =head1 DESCRIPTION
 
@@ -371,23 +379,11 @@ signal with C<category =E<gt> 'input'> does not croak.
 sub add_evidence {
 	my ($self, %args) = @_;
 
-	# Validate category — must be one of the three recognised kinds
-	my %valid_categories = map { $_ => 1 } qw(return input effect);
-
 	my $cat = $args{category} // '';
-	croak "Invalid evidence category '$cat'" unless $valid_categories{$cat};
-
-	# Validate signal — must be a known signal name to catch typos early.
-	# Signals are per-category; we validate the full set across all categories.
-	my %valid_signals = map { $_ => 1 } qw(
-		returns_property returns_constant returns_self
-		legacy_type context_aware error_pattern
-		input_validated input_typed input_optional
-		has_side_effect no_side_effect
-	);
+	croak "Invalid evidence category '$cat'" unless $VALID_CATEGORIES{$cat};
 
 	my $sig = $args{signal} // '';
-	croak "Invalid evidence signal '$sig'" unless $valid_signals{$sig};
+	croak "Invalid evidence signal '$sig'" unless $VALID_SIGNALS{$sig};
 
 	push @{ $self->{evidence} }, {
 		category => $args{category},
@@ -546,8 +542,9 @@ sub resolve_return_type {
 		# Unknown signals are ignored — they may be used by external consumers
 	}
 
-	# Tie-break alphabetically — deterministic but arbitrary
-	my ($winner) = sort { ($score{$b} || 0) <=> ($score{$a} || 0) || $a cmp $b } keys %score;
+	# Tie-break alphabetically — deterministic but arbitrary.
+	# %score is always initialised with all three keys, so the || 0 guard is dead.
+	my ($winner) = sort { $score{$b} <=> $score{$a} || $a cmp $b } keys %score;
 
 	return $self->{return_type} = $winner;
 }
@@ -656,7 +653,8 @@ sub resolve_classification {
 	} elsif ($self->{return_type} eq 'constant') {
 		$self->{classification} = 'constant';
 	} else {
-		$self->{classification} = 'unknown';
+		# Unreachable: resolve_return_type always returns object/property/constant
+		confess "invariant violation: unexpected return_type '$self->{return_type}'";
 	}
 
 	return $self->{classification};

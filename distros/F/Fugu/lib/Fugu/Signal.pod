@@ -1,0 +1,106 @@
+=head1 NAME
+
+Fugu::Signal - signal handlers for graceful shutdown
+
+=head1 SYNOPSIS
+
+    use Fugu::Signal;
+
+    my $sig = Fugu::Signal->new;
+    $sig->setup_interrupt_flag('INT', 'TERM');
+    until ($sig->interrupted) {
+        do_some_work();
+    }
+
+=head1 DESCRIPTION
+
+Fugu::Signal installs signal handlers so that a signal can interrupt
+a program safely. The program does not leave temporary files, child
+processes or half-written state behind.
+
+C<setup_interrupt_flag()> only sets a flag. The program must do a
+check of the flag and stop where a stop is safe.
+
+The object keeps the previous handlers. C<restore()> puts them back,
+and the destructor calls C<restore()>. Thus a scoped object leaves
+the process in its initial state.
+
+Each manager owns its handlers and its interrupt flag. Two managers
+in one process do not see each other's state. The installed handlers
+close over the object, so a handler always finds the manager that
+installed it.
+
+=head2 new
+
+C<new()> creates a signal handler manager. It does not install
+handlers.
+
+=head2 setup_interrupt_flag
+
+C<setup_interrupt_flag(@signals)> installs a handler for each named
+signal. The handler sets the interrupt flag and returns. No other
+action occurs until the program reads the flag.
+
+=head2 restore
+
+C<restore()> puts back the handlers that this object replaced.
+
+=head2 interrupted
+
+C<interrupted()> reports if this manager saw a handled signal.
+
+=head2 reset_interrupted
+
+C<reset_interrupted()> clears the interrupt flag of this manager.
+
+=head2 check_interrupted
+
+C<check_interrupted()> reports if any live manager saw a handled
+signal. It is a plain function, not a method. It serves code that
+runs far from the object, for example a poll loop deep in a library.
+Code that holds the object uses C<interrupted()>.
+
+=head1 RETURN VALUES
+
+C<new()> returns a signal handler manager.
+C<setup_interrupt_flag()>, C<reset_interrupted()> and C<restore()>
+return the object. Thus the calls can chain.
+
+C<interrupted()> and C<check_interrupted()> return true if a handled
+signal came.
+
+=head1 EXAMPLES
+
+This example stops between items and not in the middle of one:
+
+    my $sig = Fugu::Signal->new;
+    $sig->setup_interrupt_flag('INT', 'TERM');
+
+    for my $item (@items) {
+        last if $sig->interrupted;
+        process($item);
+    }
+
+=head1 ERRORS
+
+No method dies.
+
+=head1 SEE ALSO
+
+perlipc(1), kill(2), sigaction(2), L<Fugu::Process>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+C<check_interrupted()> answers for the whole process. It returns true
+when any live manager saw a signal, and it cannot tell the caller
+which one.
+
+The handlers are standard Perl signal handlers and run between
+opcodes, not immediately. A program that a system call blocks sees
+the signal when the call returns.
+
+=cut

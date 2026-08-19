@@ -544,7 +544,8 @@ BEGIN {
 	    '[^a-c]*' => '[^a]*', 'ab' => '(?:(?:)|.)(?:b)',
 	    'ab' => '(?:.|(?:))(?:b)', '.' => '\N', '\N' => '.',
 	    '\N' => '(?s:\N)', '(?s:\N)' => '\N',
-	    '(?a:\d)' => '\d', 'a(?<name>b)' => 'ab', 'ab' => 'a(?<name>b)'
+	    '(?a:\d)' => '\d', 'a(?<name>b)' => 'ab', 'ab' => 'a(?<name>b)',
+	    'a*$' => '$'
 	   );
 # things that should match but it isn''t clear how to make them:
 # '[^\\w]' => '\\W', (requires invlist comparison)
@@ -655,6 +656,7 @@ BEGIN {
 	   '\\d' => '[0-9]', '[^0-9]' => '\\D', # Unicode has numbers beyond ASCII - try e.g. \x{0660}" =~ /\d/
 	   '[[:xdigit:]]' => '[[:digit:]]',
 	   '[^[:digit:]]\\d' => '\\B',
+	   '[[:^punct:]]' => '[[:^digit:]]',
 	   '[[:alpha:][:alpha:]]' => '[^0-9]0',
 	   '\\w' => '[0-9a-zA-Z_]', '^$' => '^.$',
 	   '\\D' => '\\W', '(?s:.)' => '.', '[^0]' => '\\w',

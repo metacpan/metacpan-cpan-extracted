@@ -1,0 +1,199 @@
+.\" $OpenBSD$
+.\"
+.\" Copyright (c) 2026 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: August 7 2026 $
+.Dt FUGUWEB 1
+.Os
+.Sh NAME
+.Nm fuguweb
+.Nd build a documentation website for a Perl project
+.Sh SYNOPSIS
+.Nm fuguweb
+.Op Fl hq
+.Op Fl Fl project Ar dir
+.Ar command
+.Op Ar argument ...
+.Sh DESCRIPTION
+.Nm
+builds one static website from the documentation that a Perl project
+already keeps:
+.Xr mdoc 7
+manuals,
+POD sidecars,
+and Markdown.
+There is no templating language and no JavaScript.
+.Nm
+runs
+.Xr mandoc 1 ,
+.Xr lowdown 1
+and
+.Xr pod2man 1 ,
+and wraps each result in one shared chrome.
+.Pp
+.Nm
+operates on a project:
+a directory that has a
+.Pa .fuguwebrc
+file.
+The
+.Cm init
+command writes one.
+If you do not give
+.Fl Fl project ,
+.Nm
+searches up from the current directory for a
+.Pa .fuguwebrc
+file.
+The directory that holds this file is the project root.
+.Pp
+The build reads nothing from the network,
+writes nothing outside the output directory,
+and gives the same bytes for the same checkout.
+.Pp
+The options are:
+.Bl -tag -width Ds
+.It Fl Fl project Ar dir
+Use
+.Ar dir
+as the project root,
+and do not search for it.
+.It Fl q , Fl Fl quiet
+Do not show informational output.
+.It Fl h , Fl Fl help
+Show the usage message.
+.El
+.Pp
+These commands are available:
+.Bl -tag -width Ds
+.It Cm init Op Ar dir
+Write a starter
+.Pa .fuguwebrc
+in
+.Ar dir
+(default: the current directory).
+The command refuses a directory that already has one.
+.It Cm build Op Fl Fl out Ar dir
+Render the whole site.
+.Fl Fl out
+overrides the
+.Va out_dir
+setting,
+and a relative value is resolved against the project root,
+exactly as the setting is.
+.Pp
+The build also removes a page that the site no longer holds,
+so a manual that was renamed leaves nothing behind.
+.Pp
+The command checks the renderers first,
+and names the one that is missing.
+It then rejects a malformed manual source,
+because such a page must fail the build and not render badly.
+.It Cm clean Op Fl Fl out Ar dir
+Remove the output directory.
+.Pp
+The command removes a built site and refuses anything else.
+A build writes one flat directory of files,
+so a target that holds a subdirectory,
+a symlink,
+or anything else that no build made is refused by name.
+.Pp
+Both
+.Cm build
+and
+.Cm clean
+also refuse the root of the filesystem,
+the home directory,
+the project root,
+and any directory that holds the project.
+.Pp
+With
+.Fl Fl out
+the command needs no
+.Pa .fuguwebrc ,
+because the target is named on the command line.
+.Cm clean
+is the command you reach for when the description is the thing that is
+broken.
+.It Cm check Oo Fl Fl out Ar dir Oc Op Fl Fl verbose
+Check a built site:
+that every page and asset is there and is not empty,
+that every page has a title and the whole navigation,
+that every local link and every fragment resolves,
+that no reference is root-absolute or a
+.Ql file:
+URL,
+that no local link reads as a URL scheme,
+that no manual cross-reference dangles,
+that every page is reachable from the front page,
+and that the output holds the site and nothing else.
+.Pp
+The command prints one line for each problem and exits 5.
+It says nothing and exits 0 when the site is good.
+.Fl Fl verbose
+also notes every external link.
+The command never fetches one:
+the build and its checks touch no network.
+.El
+.Sh FILES
+.Bl -tag -width "share/fuguweb/style.css" -compact
+.It Pa .fuguwebrc
+The site description, at the project root.
+.It Pa share/fuguweb/style.css
+The base stylesheet, which ships with the tool.
+The
+.Va stylesheet
+setting overrides the search for it.
+.El
+.Sh EXIT STATUS
+.Nm
+exits with one of these values:
+.Pp
+.Bl -tag -width Ds -offset indent -compact
+.It 0
+Success.
+.It 1
+General error.
+.It 2
+Invalid arguments.
+.It 3
+Configuration error, or not in an
+.Nm
+project.
+.It 4
+A renderer failed.
+.It 5
+The check found a problem.
+.It 6
+A renderer is not installed.
+.El
+.Sh EXAMPLES
+Build the site and check it:
+.Bd -literal -offset indent
+$ fuguweb build --out web/build
+$ fuguweb check --out web/build
+.Ed
+.Sh SEE ALSO
+.Xr lowdown 1 ,
+.Xr mandoc 1 ,
+.Xr pod2man 1 ,
+.Xr mdoc 7
+.Pp
+The module documentation is in the
+.Pa .pod
+sidecars beside
+.Pa lib/App/FuguWeb/ .
+.Sh AUTHORS
+.An Dick Olsson Aq Mt hi@senzilla.io

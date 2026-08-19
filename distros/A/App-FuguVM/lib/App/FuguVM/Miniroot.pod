@@ -1,0 +1,52 @@
+=head1 NAME
+
+App::FuguVM::Miniroot - the OpenBSD miniroot image
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::Miniroot;
+
+    my $image = App::FuguVM::Miniroot->new($cache_dir, $proxy);
+    my $path  = $image->ensure('7.8')
+        or die "cannot get the miniroot for 7.8\n";
+
+=head1 DESCRIPTION
+
+An installation boots the miniroot image of its OpenBSD release. The
+module finds that image in the proxy cache, and downloads it through
+the proxy when it is absent.
+
+The module does not hold a copy of the cache layout. It asks the cache
+where a URL lands. A cache that changed that answer would otherwise
+leave this module looking in the old place, and every run would
+download the image again.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguVM::Miniroot->new($cache_dir, $proxy)
+
+The proxy is optional. Without one the module can find a cached image
+but cannot download a missing one.
+
+=head2 path, ensure, download
+
+C<path> returns the cached image, or C<undef>. C<ensure> returns it and
+downloads it first when it is absent. C<download> always downloads.
+
+The download runs the F<scripts/ftp> helper, which falls back through
+C<curl>, C<wget> and C<ftp>. It is a passthrough, because an image is
+a hundred megabytes and an operator who waits needs to see it move.
+
+=head2 url
+
+C<url> is the mirror URL of a version.
+
+=head1 SEE ALSO
+
+L<App::FuguVM::Proxy>, L<App::FuguVM::Guest>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

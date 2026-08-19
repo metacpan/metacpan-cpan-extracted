@@ -17,7 +17,7 @@ use File::Find;
 use Role::Tiny;
 use List::Util qw(max);
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.2.3';
 
 ########################################################################
 sub cmd_install {
@@ -169,6 +169,12 @@ sub cmd_install {
   }
 
   @args = grep {defined} $module_name_arg, $stub_arg;
+
+  if ( $ENV{BUILD_MIRRORS} ) {
+    open my $fh, '>', 'build-mirrors';
+    print {$fh} join "\n", split /,/xsm, $ENV{BUILD_MIRRORS};
+    close $fh;
+  }
 
   my $rc = system 'make', @args;
 

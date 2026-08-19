@@ -20,15 +20,13 @@ Readonly my $OUT_DIR => 'cover_html/lcsaj_hits';
 
 Devel::App::Test::Generator::LCSAJ::Runtime - Debugger backend for LCSAJ coverage
 
-=encoding UTF-8
-
 =head1 VERSION
 
-Version 0.45
+Version 0.46
 
 =cut
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 =head1 SYNOPSIS
 
@@ -174,7 +172,7 @@ obtained internally via C<caller(0)>.
 
 =head3 Returns
 
-Nothing meaningful — this is a void debugger callback.
+Nothing meaningful - this is a void debugger callback.
 
 =head3 Side effects
 
@@ -184,7 +182,7 @@ via C<Cwd::abs_path> once, memoising the result in C<%NORM_CACHE>.
 
 =head3 Usage example
 
-Not called directly — activated via the Perl debugger flag:
+Not called directly - activated via the Perl debugger flag:
 
     PERL5OPT='-d:App::Test::Generator::LCSAJ::Runtime -Mblib' prove -l t
 
@@ -197,24 +195,6 @@ Not called directly — activated via the Perl debugger flag:
 =head4 output
 
     { type => UNDEF }
-
-=head3 Formal specification
-
-Let H be the hits relation (file x line) → ℕ, T be the target-file set,
-and I be the internal-file predicate (true only for this module's own
-source path).
-
-  ┌ DB_DB ──────────────────────────────────────────
-  │ ΔH
-  │ file? : FilePath
-  │ line? : ℕ
-  ├─────────────────────────────────────────────────
-  │ norm == normalize(file?)
-  │ ¬I(norm) ∧ (T = ∅ ∨ norm ∈ T)
-  │   ⟹ H′(norm, line?) = H(norm, line?) + 1
-  │ I(norm) ∨ (T ≠ ∅ ∧ norm ∉ T)
-  │   ⟹ H′ = H
-  └─────────────────────────────────────────────────
 
 =cut
 
@@ -313,6 +293,26 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 Portions of this module's initial design and documentation were created
 with the assistance of AI.
+
+=encoding UTF-8
+
+=head1 FORMAL SPECIFICATION
+
+Let H be the hits relation (file x line) → ℕ, T be the target-file set,
+and I be the internal-file predicate (true only for this module's own
+source path).
+
+  ┌ DB_DB ──────────────────────────────────────────
+  │ ΔH
+  │ file? : FilePath
+  │ line? : ℕ
+  ├─────────────────────────────────────────────────
+  │ norm == normalize(file?)
+  │ ¬I(norm) ∧ (T = ∅ ∨ norm ∈ T)
+  │   ⟹ H′(norm, line?) = H(norm, line?) + 1
+  │ I(norm) ∨ (T ≠ ∅ ∧ norm ∉ T)
+  │   ⟹ H′ = H
+  └─────────────────────────────────────────────────
 
 =head1 LICENCE AND COPYRIGHT
 

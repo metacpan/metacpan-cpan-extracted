@@ -3,8 +3,6 @@ package Text::ASCIITable::FixANSI;
 use strict;
 use warnings;
 
-use Text::ASCIITable ();
-
 use Readonly;
 
 our $VERSION = '1.0.0';
@@ -13,6 +11,8 @@ Readonly::Scalar my $VERIFIED_AGAINST => '0.22';
 Readonly::Scalar my $ANSI_RE          => qr/\e\[[\d;]*[a-zA-Z]|\e\([0B]/;
 
 BEGIN {
+  require Text::ASCIITable;
+
   if ( $Text::ASCIITable::VERSION ne '0.22' ) {
     warn sprintf
       "Text::ASCIITable::FixANSI: patch verified against 0.22, found %s\n",

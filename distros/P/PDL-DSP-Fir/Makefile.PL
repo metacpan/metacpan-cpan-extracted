@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use PDL::Core::Dev;
 
 WriteMakefile(
     NAME                => 'PDL::DSP::Fir',
@@ -9,11 +10,15 @@ WriteMakefile(
     VERSION_FROM        => 'lib/PDL/DSP/Fir.pm',
     ABSTRACT_FROM       => 'lib/PDL/DSP/Fir.pm',
     LICENSE => 'perl',
-    PL_FILES            => {},
+    CONFIGURE_REQUIRES => {
+        'PDL' => '2.105', # pdldoc_add
+    },
+    TEST_REQUIRES => {
+        'Test::More' => '0.88', # done_testing
+    },
     PREREQ_PM => {
-        'Test::More' => 0,
         'PDL' => 0,
-        'PDL::DSP::Windows' => 0
+        'PDL::DSP::Windows' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'PDL-DSP-* ' },
@@ -31,32 +36,31 @@ WriteMakefile(
     },
 );
 
+sub MY::postamble { pdldoc_add() }
 
 # reroute the main POD into a separate README.pod if requested. This is here
 # purely to generate a README.pod for the github front page
 my $POD_header = <<EOF;
-=head1 OVERVIEW
+  =head1 OVERVIEW
 
-Two modules for PDL providing some fir filtering. These modules
-are on CPAN
+  Two modules for PDL providing some finite impulse response (FIR) filtering.
 
-=cut
+  =cut
 
 EOF
+$POD_header =~ s/^  //gm;
 
 if(exists $ARGV[0] && $ARGV[0] eq 'README.pod')
 {
-  open README, '>README.pod'              or die "Couldn't open README.pod";
-  print README $POD_header;
+  open my $fh, '>', 'README.pod' or die "Couldn't open README.pod";
+  print $fh $POD_header;
 
-  foreach my $mod  ('lib/PDL/DSP/Fir.pm', 'lib/PDL/DSP/Fir/Simple.pm') {
-      open MOD, $mod or die "Couldn't open main module";
-      while (<MOD>)
+  foreach my $mod (qw(lib/PDL/DSP/Fir.pm lib/PDL/DSP/Fir/Simple.pm)) {
+      open my $mod_fh, $mod or die "Couldn't open main module";
+      while (<$mod_fh>)
       {
           if (/^=/../^=cut/)
-          { print README; }
+          { print $fh $_; }
       }
-      close(MOD);
   }
-  close(README);
 }

@@ -18,7 +18,7 @@ use Data::URIID::Colour;
 
 use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Known);
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my %_abstract_names_to_ise = (
     black    => 'fade296d-c34f-4ded-abd5-d9adaf37c284',
@@ -45,7 +45,6 @@ my %_text_types = (
     displayname => $_default_text_ops,
     text        => $_default_text_ops,
     email       => $_default_text_ops,
-    _ise        => [],
 );
 
 my %_default_colours = (
@@ -315,72 +314,78 @@ sub new {
         }
     }
 
-    foreach my $key (keys %_text_types) {
-        if (defined(my $for_text = $opts{'for_'.$key})) {
-            foreach my $for (split(/[\s\x20-\x2F\x5B-\x60\x7B-\x7F]+/, $for_text)) {
-                require Data::Displaycolour::Data;
+    {
+        my @langs;
 
-                my %langs = %Data::Displaycolour::Data::_langs;
-                my @langs;
-                my %found;
+        foreach my $key (keys %_text_types) {
+            if (defined(my $for_text = $opts{'for_'.$key})) {
+                foreach my $for (split(/[\s\x20-\x2F\x5B-\x60\x7B-\x7F]+/, $for_text)) {
+                    require Data::Displaycolour::Data;
 
-                if (defined(my $list = delete $opts{language})) {
-                    my $n = 0;
-                    %langs = ();
-                    $list = [split/\s*,\s*|\s+/, $list] unless ref $list;
-                    $langs{$_} = $n++ foreach reverse @{$list};
-                }
+                    my %found;
 
-                if (defined(my $list = delete $opts{preferred_language})) {
-                    my $n = $Data::Displaycolour::Data::_lang_value;
-                    $list = [split/\s*,\s*|\s+/, $list] unless ref $list;
-                    $langs{$_} = $n++ foreach reverse @{$list};
-                }
+                    unless (scalar @langs) {
+                        my %langs = %Data::Displaycolour::Data::_langs;
 
-                if (defined(my $list = delete $opts{blacklist_language})) {
-                    $list = [split/\s*,\s*|\s+/, $list] unless ref $list;
-                    delete $langs{$_} foreach @{$list};
-                }
+                        if (defined(my $list = delete $opts{language})) {
+                            my $n = 0;
+                            %langs = ();
+                            $list = [split/\s*,\s*|\s+/, $list] unless ref $list;
+                            $langs{$_} = $n++ foreach reverse @{$list};
+                        }
 
-                @langs = sort {$langs{$b} <=> $langs{$a}} keys %langs;
+                        if (defined(my $list = delete $opts{preferred_language})) {
+                            my $n = $Data::Displaycolour::Data::_lang_value;
+                            $list = [split/\s*,\s*|\s+/, $list] unless ref $list;
+                            $langs{$_} = $n++ foreach reverse @{$list};
+                        }
 
-                outer:
-                foreach my $lang (@langs) {
-                    my $l = $Data::Displaycolour::Data::_extra{$lang};
-                    foreach my $name (@{$l->{__order__}}) {
-                        my $v = _match_with_quality($for, $name);
-                        $found{$l->{$name}} += $v if $v;
+                        if (defined(my $list = delete $opts{blacklist_language})) {
+                            $list = [split/\s*,\s*|\s+/, $list] unless ref $list;
+                            delete $langs{$_} foreach @{$list};
+                        }
+
+                        @langs = sort {$langs{$b} <=> $langs{$a}} keys %langs;
                     }
 
-                    $l = $Data::Displaycolour::Data::_names{$lang};
-                    foreach my $name (@{$l->{__order__}}) {
-                        my $v = _match_with_quality($for, $name);
-                        $found{$l->{$name}} += $v if $v;
-                    }
-                }
+                    outer:
+                    foreach my $lang (@langs) {
+                        my $l = $Data::Displaycolour::Data::_extra{$lang};
+                        foreach my $name (@{$l->{__order__}}) {
+                            my $v = _match_with_quality($for, $name);
+                            $found{$l->{$name}} += $v if $v;
+                        }
 
-                {
-                    my $best_v = 0;
-                    my $best;
-
-                    foreach my $key (keys %found) {
-                        my $v = $found{$key};
-                        if ($v > $best_v) {
-                            $best = $key;
-                            $best_v = $v;
+                        $l = $Data::Displaycolour::Data::_names{$lang};
+                        foreach my $name (@{$l->{__order__}}) {
+                            my $v = _match_with_quality($for, $name);
+                            $found{$l->{$name}} += $v if $v;
                         }
                     }
 
-                    $opts{from} //= $_abstract_names_to_ise{$best} if defined $best;
+                    {
+                        my $best_v = 0;
+                        my $best;
+
+                        foreach my $key (keys %found) {
+                            my $v = $found{$key};
+                            if ($v > $best_v) {
+                                $best = $key;
+                                $best_v = $v;
+                            }
+                        }
+
+                        $opts{from} //= $_abstract_names_to_ise{$best} if defined $best;
+                    }
                 }
             }
-        }
 
-        next if defined $opts{from};
+            next if defined $opts{from};
+        }
     }
 
     unless (delete($opts{no_defaults}) || defined $opts{from}) {
-        foreach my $key (keys %_text_types) {
+        foreach my $key ('_ise', keys %_text_types) {
             if (defined(my $for = $opts{'for_'.$key})) {
                 unless (defined $self->{origin}) {
                     require Digest;
@@ -394,7 +399,7 @@ sub new {
     }
 
     # Delete keys after we used them.
-    foreach my $key (keys %_text_types) {
+    foreach my $key ('_ise', keys %_text_types) {
         delete $opts{'for_'.$key};
     }
 
@@ -604,10 +609,9 @@ sub _register_colours_of_palette {
 
 sub _match_with_quality {
     my ($haystack, $needle) = @_;
-    my ($pre, $post) = $haystack =~ /^(.*)\Q$needle\E(.*)\z/;
+    $haystack =~ /\Q$needle\E/ or return 0;
 
-    return 0 unless defined($pre) && defined($post);
-    return 1 - (length($pre) ? 0.4 : 0) - (length($post) ? 0.4 : 0);
+    return 1 - (length($` // '') ? 0.4 : 0) - (length($' // '') ? 0.4 : 0);
     return 0;
 }
 
@@ -693,7 +697,7 @@ Data::Displaycolour - Work with display colours
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

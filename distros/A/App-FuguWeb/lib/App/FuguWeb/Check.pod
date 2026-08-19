@@ -1,0 +1,110 @@
+=head1 NAME
+
+App::FuguWeb::Check - what a built site must be true of
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Check;
+
+    my $check = App::FuguWeb::Check->new(
+        config => $config,
+        out    => 'web/build',
+    );
+
+    my @problems = $check->run;
+    warn "$_\n" for @problems;
+    note("external link: $_") for $check->external;
+
+=head1 DESCRIPTION
+
+The checks are generic, so every project that uses the tool gets them.
+A project keeps only the assertions that are about its own content.
+
+The class never fetches a link. It collects the external ones and
+reports them, because the build and its checks touch no network.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguWeb::Check->new(
+        config => $config,      # required
+        out    => $dir,         # required: the built site
+    )
+
+=head2 pages
+
+Every page that the site must hold, in a stable order: the pages of
+the description, then one page for each manual of each group. The full
+expectation, assets included, comes from
+L<App::FuguWeb::Config/inventory>, so the build and the checks can
+never disagree about what the site is.
+
+=head2 run
+
+Check the site and return the problems, each one a sentence that names
+the page. An empty list means the site is good.
+
+The checks are:
+
+=over 4
+
+=item *
+
+every expected page and asset exists and is not empty;
+
+=item *
+
+every page has a title;
+
+=item *
+
+every page carries the whole navigation;
+
+=item *
+
+no reference starts with C</>, because the host may serve the site from
+a path below the root;
+
+=item *
+
+no reference uses a C<file:> URL;
+
+=item *
+
+every relative reference resolves to a file in the output, a manual
+cross-reference included;
+
+=item *
+
+every fragment resolves to an C<id> on the target page;
+
+=item *
+
+no relative href reads as a URL scheme, so every local link keeps its
+C<./>;
+
+=item *
+
+every page is reachable from the entry page, except a page that the
+description marks C<unlinked>;
+
+=item *
+
+the output holds the site and nothing else: no staging directory, no
+editor backup, no stray source.
+
+=back
+
+=head2 external
+
+The external links that the last C<run> collected, sorted.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Site>,
+L<fuguweb(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

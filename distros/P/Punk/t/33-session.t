@@ -91,4 +91,94 @@ is(set_cookie(hit($app, path => '/plain')), undef,
     ok((grep { /too large/ } @warn), 'and it warns rather than truncating');
 }
 
+# A session with no secret used to sign with an empty HMAC key, which anyone
+# who knew the cookie format could reproduce offline - a forged cookie
+# carrying any user id or role the application trusts (CVE-2026-75870).
+# Nothing looked wrong at runtime, so the keyword refuses at boot instead.
+{
+    my $n = 0;
+    for my $decl ('session expires => "7d"',       # omitted entirely
+                  'session secret => undef',       # present but undefined
+                  'session secret => ""',          # present but empty
+                  'session { expires => "7d" }',   # the hashref form
+                  'session { secret => "" }') {
+        my $pkg = 'NoSecretApp' . $n++;
+        my $ok = eval "package $pkg; use Punk; $decl; 1";
+        my $err = $@;
+        ok(!$ok, "refused at boot: $decl");
+        like($err, qr/non-empty secret/, 'and says what is wrong');
+    }
+
+    # the same declarations with a real secret are still fine, in both forms
+    ok(eval 'package YesSecretA; use Punk; session secret => "k", expires => "7d"; 1',
+        'a non-empty secret is accepted');
+    ok(eval 'package YesSecretB; use Punk; session { secret => "k" }; 1',
+        'in the hashref form too');
+}
+
+# The lifetime is the server's, not the browser's. `expires` used to set only
+# Max-Age, which is a request to a client that is free to ignore it: the
+# signature carried no time, so a cookie captured once was good until the
+# secret changed. The expiry now rides inside the signed payload.
+{
+    package ExpApp;
+    use Punk;
+    session secret => 'k', expires => '7d';
+    get '/in' => sub { my $c = shift; $c->session->{uid} = 42; $c->text('in') };
+    get '/me' => sub { my $c = shift;
+        $c->text('uid:' . ($c->session->{uid} // 'none')
+               . ' keys:' . join(',', sort keys %{ $c->session })) };
+    get '/noop' => sub { my $c = shift; my $x = $c->session->{uid}; $c->text('read') };
+    package main;
+
+    my $ea = ExpApp->to_app;
+    my $login = hit($ea, path => '/in');
+    my ($val) = set_cookie($login) =~ /punk\.sid=([^;]+)/;
+
+    my $me = hit($ea, path => '/me', env => { HTTP_COOKIE => "punk.sid=$val" });
+    is($me->[2][0], 'uid:42 keys:uid', 'the session round-trips');
+    # the stamp is ours: the application must never see it in its own hash
+    unlike($me->[2][0], qr/punk\.exp/, 'the expiry is not visible to the app');
+
+    # and stripping it must not make every request look dirty
+    is(set_cookie(hit($ea, path => '/noop', env => { HTTP_COOKIE => "punk.sid=$val" })),
+        undef, 'an unchanged session still writes no cookie');
+
+    SKIP: {
+        skip 'needs Digest::SHA and MIME::Base64', 3
+            unless eval { require Digest::SHA; require MIME::Base64; 1 };
+        # mint payloads by hand so the clock does not have to move
+        my $mint = sub {
+            my ($exp) = @_;
+            my $p = MIME::Base64::encode_base64url(qq({"punk.exp":$exp,"uid":42}), '');
+            return "$p." . MIME::Base64::encode_base64url(
+                Digest::SHA::hmac_sha256($p, 'k'), '');
+        };
+        my $uid = sub {
+            my ($cookie) = @_;
+            hit($ea, path => '/me', env => { HTTP_COOKIE => "punk.sid=$cookie" })->[2][0];
+        };
+        like($uid->($mint->(time + 3600)), qr/^uid:42/, 'an unexpired payload loads');
+        like($uid->($mint->(time - 1)),    qr/^uid:none/, 'one second past expiry does not');
+        like($uid->($mint->(time - 86400)), qr/^uid:none/, 'nor does a day past it');
+    }
+
+    # a session cookie with no `expires` is still bounded: "until the browser
+    # closes" is the client's promise, not a limit on the value
+    {
+        package NoExpApp;
+        use Punk;
+        session secret => 'k';
+        get '/in' => sub { my $c = shift; $c->session->{uid} = 1; $c->text('in') };
+        package main;
+        my ($v) = set_cookie(hit(NoExpApp->to_app, path => '/in')) =~ /punk\.sid=([^;]+)/;
+        my ($payload) = split /\./, $v;
+        SKIP: {
+            skip 'needs MIME::Base64', 1 unless eval { require MIME::Base64; 1 };
+            like(MIME::Base64::decode_base64url($payload), qr/punk\.exp/,
+                'a browser-session cookie is still stamped with an expiry');
+        }
+    }
+}
+
 done_testing;

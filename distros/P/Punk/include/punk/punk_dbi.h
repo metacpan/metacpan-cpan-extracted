@@ -252,16 +252,30 @@ static SV *pdbi_sth(pTHX_ SV *self, SV *sql) {
     return pdbi_sth_dbh(aTHX_ pdbi_dbh(aTHX_ self), sql);
 }
 
-/* $sth->execute(@bind) */
-static void pdbi_execute(pTHX_ SV *sth, AV *bind) {
+/* $sth->execute(@bind)
+ *
+ * `sql` is carried purely for the C ABI's query observers: Punk::Model::DBI
+ * is a SECOND database path, entirely separate from DBIx::Loop's, and an
+ * application using the default model backend generates no DBIx::Loop traffic
+ * at all. Instrumenting only that one would leave a whole class of
+ * application with no database events and nothing to say so.
+ *
+ * The observer is handed the statement text and the bind COUNT, never the
+ * bind values - the same rule DBIx::Loop's observer follows, for the same
+ * reason: the values are the literal data and the SQL has placeholders
+ * exactly where they would be. */
+static void pdbi_execute_sql(pTHX_ SV *sth, AV *bind, SV *sql) {
     SSize_t n = bind ? av_len(bind) + 1 : 0, i;
     SV **argv = n ? (SV **)safemalloc(sizeof(SV *) * (size_t)n) : NULL;
     SV *r;
+    void *tok = NULL;
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(bind, i, 0);
         argv[i] = (e && *e) ? *e : &PL_sv_undef;
     }
+    if (PK_OBS_WANT_QUERY) tok = pk_obs_query_start(aTHX_ sql, (int)n);
     r = pcx_call_meth(aTHX_ sth, "execute", argv, (int)n, 1);
+    if (tok) pk_obs_query_done(aTHX_ tok, r);
     if (argv) safefree(argv);
     if (r) SvREFCNT_dec(r);
 }

@@ -4,7 +4,7 @@ use v5.38;
 use experimental 'class';
 use version;
 
-our $VERSION   = qv('v1.0.0');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Future::AsyncAwait;
@@ -40,9 +40,14 @@ class PAGI::FastAPI::Middleware::RateLimit {
         my $retry_after = ($reset_at // ($now + $window)) - $now;
         $retry_after    = 1 if $retry_after <= 0;
 
-        $c->set_header('x-ratelimit-limit'     => $requests);
-        $c->set_header('x-ratelimit-remaining' => $remaining);
-        $c->set_header('x-ratelimit-reset'     => $reset_at) if $reset_at;
+        # add_header (not set_header): when multiple RateLimit middleware
+        # instances are stacked (e.g. an app-wide limiter plus a per-route
+        # limiter), each layer's budget is independent and all of them
+        # should be visible on the response, so these are intentionally
+        # allowed to appear more than once.
+        $c->add_header('x-ratelimit-limit'     => $requests);
+        $c->add_header('x-ratelimit-remaining' => $remaining);
+        $c->add_header('x-ratelimit-reset'     => $reset_at) if $reset_at;
 
         if ($count > $requests) {
             $c->status(429);
@@ -66,7 +71,7 @@ PAGI::FastAPI::Middleware::RateLimit - Async Rate Limiting Middleware for PAGI::
 
 =head1 VERSION
 
-Version v1.0.0
+Version v1.1.0
 
 =head1 SYNOPSIS
 

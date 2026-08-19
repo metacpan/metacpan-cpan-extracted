@@ -1,0 +1,182 @@
+=head1 NAME
+
+App::FuguWeb::Site - the whole build, from the description to the pages
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Site;
+
+    my $site = App::FuguWeb::Site->new(
+        config => $config,
+        out    => 'web/build',
+    );
+
+    unless ($site->build) {
+        my $missing = $site->missing_tool;
+        die "$missing not found\n" if defined $missing;
+        die "the build failed\n";
+    }
+
+    $site->clean;
+
+=head1 DESCRIPTION
+
+One method renders the site. Each step reports its own failure and stops
+the build: a site that is half rendered must not look like a success.
+
+The build reads nothing from the network, writes nothing outside the
+output directory, and gives the same bytes for the same checkout.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguWeb::Site->new(
+        config => $config,      # required
+        out    => $dir,         # required: the output directory
+        log    => $logger,      # default: Fugu::Log->default
+        render => $render,      # default: one over the same description
+    )
+
+=head2 config, staging
+
+The site description, and the mdoc staging directory.
+
+=head2 missing_tool
+
+The renderer that failed the probe of the last L</build>, or C<undef>.
+The build probes once and names the tool in the log; the caller maps
+this value to its own exit code, so an operator learns which package
+to install.
+
+=head2 build
+
+Render the whole site:
+
+=over 4
+
+=item 1.
+
+check that every renderer is installed, and name the first one that is
+not;
+
+=item 2.
+
+refuse an output directory that no build may own;
+
+=item 3.
+
+lint every mdoc source;
+
+=item 4.
+
+create the output directory and the staging directory inside it;
+
+=item 5.
+
+copy every mdoc source into the staging directory under its staged name;
+
+=item 6.
+
+copy the base stylesheet and every asset;
+
+=item 7.
+
+render each C<page> block;
+
+=item 8.
+
+render one page for each manual in each group;
+
+=item 9.
+
+remove the staging directory, and every file the site no longer holds.
+
+=back
+
+The last step is what makes a second build over the same directory
+right. A manual that was renamed leaves its old page behind, and a site
+that carried both would fail its own check. The build owns the output
+directory, so it owns the removal too; it removes a plain file and
+never a tree.
+
+The method returns true on success, and C<undef> with a message in the
+log otherwise.
+
+The output directory is created on purpose. The recipe that this
+replaced got it as a side effect of the staging C<mkdir>, which would
+have broken the moment the staging step moved.
+
+=head2 clean
+
+Remove the output directory. The method returns true when the directory
+is gone, whether or not it was there to begin with.
+
+C<clean> removes a built site and refuses anything else. It deletes a
+tree without asking, so the one thing it must never do is delete a tree
+that no build made. A build writes one flat directory of files, plus
+the staging directory while it runs; a target that holds anything else
+is refused by name.
+
+=head2 THE OUTPUT DIRECTORY
+
+Both C<build> and C<clean> refuse a target that no build may own: the
+root of the filesystem, the home directory, the project root, and any
+directory that holds the project. C<--out> reaches them both, and the
+C<out_dir> setting it overrides is checked in the description, so the
+guard has to sit here as well.
+
+The rule is deliberately not "inside the project". The tests and the CI
+both build into a temporary directory outside it.
+
+A C<..> in the target is resolved before the comparison.
+C<File::Spec-E<gt>canonpath> leaves it alone by design, and a guard that
+compared the uncollapsed form would let C<< <project>/.. >> through as a
+directory it had never seen.
+
+=head2 pod_date
+
+The date that every POD page carries: the date of the last commit, and
+today when git does not answer. git does not preserve file times, so a
+build that read one would give different bytes on every checkout.
+
+=head1 THE STAGING DIRECTORY
+
+C<mandoc> decides between a local link and a link to the manual host by
+looking for a file named C<%N.%S> in its working directory. Every mdoc
+source is therefore copied into one directory under its
+L<App::FuguWeb::Manual/staged_name>, and C<mandoc> runs there.
+
+The directory lives inside the output directory, under F<.man>, and the
+build removes it. Staging is a build detail: a published tree that
+carried it would serve the mdoc sources beside the pages made from them.
+
+=head1 ASSETS
+
+An asset is any file directly in the source directory that the build
+does not render: not a C<*.body.html> fragment, not Markdown, and not a
+dot file. F<robots.txt> and F<CNAME> therefore need no entry in the
+description, and a F<CLAUDE.md> beside them is not published.
+
+Markdown in the source directory is either a page source, which a
+C<page> block names and C<lowdown> renders, or notes for the
+maintainers. Neither belongs in the output as it stands.
+
+=head1 THE STYLESHEET
+
+The base stylesheet ships with the tool, at F<share/fuguweb/style.css>,
+and L<Fugu::File/share_path> finds it: in a checkout through this
+module's location, and under the share tree of an installed App-FuguWeb
+distribution. The C<stylesheet> setting overrides the search.
+
+A stylesheet that is not found fails the build and names the path. A
+site with no stylesheet must not look like a success.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Render>,
+L<App::FuguWeb::Page>, L<App::FuguWeb::Index>, L<Fugu::File>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

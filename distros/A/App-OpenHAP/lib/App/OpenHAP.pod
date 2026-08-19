@@ -1,0 +1,88 @@
+=head1 NAME
+
+App::OpenHAP - HomeKit Accessory Protocol server for OpenBSD
+
+=head1 SYNOPSIS
+
+    openhapd -f /etc/openhap/openhap.conf
+    hapctl status
+
+=head1 DESCRIPTION
+
+OpenHAP is a HomeKit Accessory Protocol bridge, designed for OpenBSD.
+The daemon C<openhapd> serves the accessories that its configuration
+names, and C<hapctl> controls the running daemon. This lead module
+holds no code: it names the distribution, and this document is the
+module index.
+
+The manual pages openhapd(8), hapctl(8) and openhap.conf(5) hold the
+operational reference.
+
+=head1 MODULES
+
+The application:
+
+=over 4
+
+=item L<App::OpenHAP::Devices> - the configured devices of the bridge
+
+=item L<App::OpenHAP::Host> - the host of the Protocol::HAP engine
+
+=item L<App::OpenHAP::Tasmota::Device> - a Tasmota device as a HAP accessory
+
+=item L<App::OpenHAP::Tasmota::Heater> - Tasmota heater/switch HAP accessory
+
+=item L<App::OpenHAP::Tasmota::Lightbulb> - Tasmota light HAP accessory
+
+=item L<App::OpenHAP::Tasmota::Sensor> - Tasmota temperature-sensor HAP accessory
+
+=item L<App::OpenHAP::Tasmota::Thermostat> - Tasmota thermostat HAP accessory
+
+=item L<App::OpenHAP::Test::Integration> - base module for OpenHAP integration tests
+
+=back
+
+The protocol engine, sans IO:
+
+=over 4
+
+=item L<Protocol::HAP> - HomeKit Accessory Protocol library
+
+=item L<Protocol::HAP::Accessory> - base class for HAP accessories
+
+=item L<Protocol::HAP::Bridge> - HAP bridge accessory
+
+=item L<Protocol::HAP::Characteristic> - HAP characteristic definitions
+
+=item L<Protocol::HAP::Controller> - a blocking HAP controller client
+
+=item L<Protocol::HAP::Crypto> - randomness and crypto primitives for HAP
+
+=item L<Protocol::HAP::HTTP> - the HTTP/1.1 subset codec of HAP
+
+=item L<Protocol::HAP::Pairing> - HAP pairing protocol implementation
+
+=item L<Protocol::HAP::SRP> - SRP-6a implementation for HAP pairing
+
+=item L<Protocol::HAP::Server> - the sans-IO HAP accessory-server engine
+
+=item L<Protocol::HAP::Service> - HAP service definitions
+
+=item L<Protocol::HAP::Session> - encrypted session state for HAP connections
+
+=item L<Protocol::HAP::SetupCode> - the rules of the HomeKit setup code
+
+=item L<Protocol::HAP::Store> - the persistence contract of Protocol::HAP
+
+=item L<Protocol::HAP::TLV> - TLV8 encoder and decoder for the HAP protocol
+
+=back
+
+=head1 SEE ALSO
+
+The development guide and the release flow live in the repository at
+L<https://github.com/dickolsson/OpenHAP>.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>

@@ -75,6 +75,7 @@ static int pk_require_once(pTHX_ const char *mod, int fatal) {
 #define K_DATABASES  "databases"
 #define K_MODELS     "models"
 #define K_HOOKS      "hooks"
+#define K_BEFORE_R   "before_request"
 #define K_BEFORE_D   "before_dispatch"
 #define K_AFTER_D    "after_dispatch"
 #define K_MIDDLEWARE "middleware"
@@ -116,6 +117,7 @@ static int pk_require_once(pTHX_ const char *mod, int fatal) {
 #define K_MAX_BODY "max_body"
 #define K_RECS     "recs"
 #define K_CTX      "ctx"
+#define K_BEFORE_REQ "before_req"   /* compiled before_request chain */
 #define K_BEFORE   "before"
 #define K_AFTER    "after"
 #define K_CODE     "code"

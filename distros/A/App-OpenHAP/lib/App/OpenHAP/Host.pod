@@ -1,0 +1,81 @@
+=head1 NAME
+
+App::OpenHAP::Host - the host of the Protocol::HAP engine
+
+=head1 SYNOPSIS
+
+    use App::OpenHAP::Host;
+
+    my $server = App::OpenHAP::Host->new(
+        port         => 51827,
+        pin          => '123-45-678',
+        name         => 'My Bridge',
+        storage_path => '/var/db/openhapd',
+    );
+
+    $server->add_accessory($accessory);
+    $server->update_config_number;
+    $server->run;    # returns when a signal stops the loop
+    $server->shutdown;
+
+=head1 DESCRIPTION
+
+This module hosts the sans-IO L<Protocol::HAP::Server> engine on
+OpenBSD-style daemon plumbing. The engine owns the protocol; this
+module owns everything the operating system hands out: the listening
+socket, per-connection reads and writes, the event loop and its
+timers, the MQTT client, and the mDNS advertisement.
+
+The host builds the engine over C<Protocol::HAP::Store::File>, the process
+default logger, an output contract that writes through the connection
+map, the one-shot timers of L<Fugu::EventLoop>, and an
+C<on_pairing_changed> hook that re-advertises the mDNS TXT record.
+
+Each connection is filed under its session id: the session and its
+socket together. A fileno index resolves reads to the session id. The
+kernel reuses descriptors; session ids never repeat.
+
+=head1 METHODS
+
+=head2 new(%args)
+
+C<port>, C<pin>, C<name>, C<storage_path>, and C<setup_id>.
+
+=head2 engine()
+
+The L<Protocol::HAP::Server> engine of this host.
+
+=head2 run(), shutdown(), listen()
+
+The service lifecycle. C<run> serves until a signal ends the loop;
+C<shutdown> closes the listener and every client connection
+afterwards.
+
+=head2 set_mqtt_client($mqtt), set_mdns($mdns)
+
+Attach the MQTT client and the mDNS handle. The MQTT client ticks on
+the loop and reconnects on its own schedule; the mDNS handle receives
+a fresh TXT record when the engine reports a pairing change.
+
+=head2 mdns_txt_string()
+
+The TXT records of the engine in the format that mdnsd publishes,
+through C<Fugu::Mdnsd::format_txt>.
+
+=head2 add_accessory($accessory), is_paired(), update_config_number()
+
+Pass-throughs to the engine, for C<bin/openhapd> and the device
+loader.
+
+=head2 control_status(), control_devices()
+
+What the control socket answers: engine introspection composed with
+host state (uptime, MQTT, mDNS, connection count). Nothing here is a
+secret.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP::Server>, L<Protocol::HAP::Store::File>, L<openhapd(8)>,
+L<hapctl(8)>
+
+=cut

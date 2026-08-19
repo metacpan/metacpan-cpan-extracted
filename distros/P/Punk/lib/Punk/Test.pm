@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.20';
 
 use Test::Builder ();
 use Scalar::Util ();

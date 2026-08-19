@@ -1,4 +1,5 @@
-package Mojo::ATProto::OAuth::Resolver;
+package 
+    Mojo::ATProto::OAuth::Resolver;
 use Mojo::Base -base, -signatures;
 
 use Mojo::UserAgent qw//;
@@ -9,7 +10,7 @@ use Mojo::Log qw//;
 # metadata fetch+validation. 
 use constant DEBUG => $ENV{MOJO_OAUTH_DEBUG} || 0;
 
-our $VERSION = '1.00'; # VERSION
+our $VERSION = '1.01'; # VERSION
 
 has 'ua'     => sub($self) {
     my $ua = Mojo::UserAgent->new(request_timeout => 10);

@@ -1,0 +1,287 @@
+=head1 NAME
+
+App::OpenHAP::Test::Integration - base module for OpenHAP integration tests
+
+=head1 SYNOPSIS
+
+    use v5.36;
+    use Test::More;
+    use App::OpenHAP::Test::Integration;
+
+    my $env = App::OpenHAP::Test::Integration->new;
+    $env->setup;
+
+    # Run tests...
+    my $response = $env->http_request('GET', '/accessories');
+    ok(defined $response, 'received response');
+
+    $env->teardown;
+    done_testing();
+
+=head1 DESCRIPTION
+
+This module supplies the setup, the teardown, and the helpers for the
+integration tests. These tests run against an installed openhapd on
+OpenBSD, not against the modules in the checkout.
+
+When a requirement is not available, these tests fail. They do not skip as
+the unit tests do, because a silent skip in the VM reports a green run
+that tests nothing.
+
+=head1 ENVIRONMENT
+
+The integration tests must have these conditions:
+
+=over 4
+
+=item * The OPENHAP_INTEGRATION_TEST environment variable is set.
+
+=item * The system is OpenBSD with rcctl(8).
+
+=item * openhapd and hapctl are installed in /usr/local/bin.
+
+=item * The configuration file is at /etc/openhapd.conf.
+
+=item * The system has the user _openhap.
+
+=item * The system has the data directory /var/db/openhapd.
+
+=item * mosquitto(8) is installed, and rcctl can start it (for the
+MQTT tests).
+
+=item * mdnsd(8) is installed, its flags are set to a usable network
+interface, and rcctl can start it. mdnsctl(8) is installed; the mDNS
+tests use it to see the advertisements (the daemon itself no longer
+invokes mdnsctl).
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+    my $env = App::OpenHAP::Test::Integration->new(%options);
+
+The constructor creates a new environment for the integration tests.
+These are the options:
+
+=over 4
+
+=item config_file - the path to openhapd.conf (default:
+/etc/openhapd.conf)
+
+=item hap_port - the HAP server port (default: from the
+configuration, or 51827)
+
+=item mqtt_host - the MQTT broker host (default: 127.0.0.1)
+
+=item mqtt_port - the MQTT broker port (default: 1883)
+
+=back
+
+=head2 setup
+
+    $env->setup;
+
+The method does a check of the environment, and it prepares for the
+tests. It dies if the environment is not ready.
+
+=head2 teardown
+
+    $env->teardown;
+
+The method releases the resources after the tests. These resources
+include each controller connection that C<get_controller> supplied.
+
+=head2 get_controller
+
+    my $c = $env->get_controller;
+    $c->pair_setup or die 'pair-setup: ' . $c->last_error;
+
+The method constructs an L<Protocol::HAP::Controller> for the
+configured host, port, and setup code. It reads the setup code from
+the C<hap_pin> configuration key. The environment keeps a record of
+the connection and closes it in C<teardown>. The method passes extra
+arguments through to the controller constructor.
+
+=head2 ensure_unpaired
+
+    $env->ensure_unpaired or die 'cannot unpair';
+
+The method makes sure that the daemon is unpaired. When the pairings
+database (/var/db/openhapd/pairings.db) holds an entry, the method
+stops the daemon, removes the pairing state, and starts the daemon
+again. The removed state is pairings.db and auth_attempts. The
+accessory identity stays.
+
+The method then does a check of the result with POST /identify.
+That request returns 204 only while the daemon is unpaired. A paired answer fails
+the call. The method returns true when the check shows an unpaired
+daemon, and false in other cases. Each integration test file starts
+unpaired, unless the file pairs itself.
+
+=head2 http_request
+
+    my $response = $env->http_request($method, $path, $body, $headers);
+
+The method makes an HTTP request to the HAP server. The connection
+stays open and registered until C<teardown> (or C<close_sockets>).
+
+L<Protocol::HAP::HTTP> builds the request and frames the response. The
+method reads until the response is whole, and it refuses a response
+over 1 MB.
+
+=head2 close_sockets
+
+    $env->close_sockets;
+
+The method closes and forgets each raw socket that C<http_request>
+opened. Thus a probe connection does not stay registered with the
+daemon until the teardown.
+
+=head2 parse_http_response
+
+    my ($status, $headers, $body) =
+        App::OpenHAP::Test::Integration::parse_http_response($response);
+
+The function parses an HTTP response.
+
+=head2 status
+
+    my $status = App::OpenHAP::Test::Integration::status($response);
+
+The function returns the status code of an HTTP response. Use it in
+the tests that do not need the headers or the body.
+
+=head2 get_config_value
+
+    my $value = $env->get_config_value($key);
+
+The method gets a configuration value. L<Fugu::Config> reads the
+installed F</etc/openhapd.conf>, thus the tests see the file as the
+daemon sees it.
+
+=head2 get_device_topics
+
+    my @topics = $env->get_device_topics;
+
+The method gets all the MQTT topics of the devices.
+
+=head2 get_devices
+
+    my ($light) = grep { $_->{subtype} eq 'lightbulb' } $env->get_devices;
+
+The method gets the configured device records, read through
+L<App::OpenHAP::Devices>. Each record is a hash with C<type>,
+C<subtype>, C<id>, and the settings of the device block.
+
+=head2 find_char
+
+    my ($aid, $iid, $char) = $env->find_char($database, $type, %options);
+    my ($aid, $iid) = $env->find_char($database, '25', name => 'Light');
+
+The method finds a characteristic by its short type string in a
+decoded /accessories structure. The walk skips the bridge (aid 1).
+The method returns the accessory id, the instance id, and the
+characteristic hash of the first match. It returns the empty list
+when there is no match. These are the options:
+
+=over 4
+
+=item name - only search the accessory whose Name characteristic
+holds this value
+
+=item ev - only match a characteristic with the ev permission
+
+=back
+
+=head2 wait_value
+
+    $env->wait_value($code, $want, $timeout) or die 'no match';
+    $env->wait_value(sub { current_value() }, 42);
+
+The method polls C<< $code->() >> each quarter second, up to
+C<$timeout> seconds (default 10). A code reference in C<$want> is the
+predicate over the polled value. Any other C<$want> stops the poll
+when the value equals it as a string. The method returns 1 on
+success, and undef on the deadline.
+
+=head2 ensure_daemon_running
+
+    $env->ensure_daemon_running or die "Cannot start daemon";
+
+The method makes sure that openhapd runs and serves. If it is
+necessary, the method starts the daemon. The method then waits for
+the HAP port, because the daemon publishes its mDNS advertisement
+before it opens the listener.
+
+=head2 wait_for_hap_port
+
+    $env->wait_for_hap_port or die "daemon not serving";
+    $env->wait_for_hap_port(60);
+
+The method waits until the HAP port accepts connections. It polls for
+a maximum of the given number of seconds (default 30). Use this
+method, not a fixed sleep, after you restart the daemon.
+
+=head2 ensure_daemon_stopped
+
+    $env->ensure_daemon_stopped;
+
+The method makes sure that openhapd is stopped.
+
+=head2 restart_daemon
+
+    $env->restart_daemon or die 'daemon not serving';
+
+The method restarts openhapd through rcctl. It then waits for the
+HAP port, because the daemon publishes its mDNS advertisement before
+it opens the listener. The method returns 1 when the daemon serves,
+and undef on failure.
+
+=head2 ensure_mqtt_running
+
+    $env->ensure_mqtt_running or die "MQTT required";
+
+The method makes sure that the MQTT broker runs.
+
+=head2 ensure_mdnsd_running
+
+    $env->ensure_mdnsd_running or die "mdnsd required";
+
+The method makes sure that mdnsd runs and continues to run. If it is
+necessary, the method starts mdnsd. The method then does the check
+again across a settle window. A probe at one point in time can show
+green when mdnsd starts and then exits a short time after that. On a
+failure, the method sends the captured diagnostics as warnings: the
+rcctl state, the process list, and recent syslog lines.
+
+=head2 browse
+
+    my $output = $env->browse;
+
+The method makes one bounded mdnsctl observation of the advertised
+HAP services, and returns the output.
+
+=head2 browse_txt
+
+    my $output = $env->browse_txt;
+
+The method makes one bounded mdnsctl observation with the TXT
+strings resolved, and returns the output.
+
+=head2 get_mqtt
+
+    my $mqtt = $env->get_mqtt;
+
+The method gets the MQTT client connection.
+
+=head1 SEE ALSO
+
+L<Fugu::Config>, L<Protocol::HAP::HTTP>, L<Protocol::HAP::Controller>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>
+
+=cut

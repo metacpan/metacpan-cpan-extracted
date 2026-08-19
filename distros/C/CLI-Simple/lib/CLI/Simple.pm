@@ -23,7 +23,7 @@ use IO::Interactive;
 use List::Util qw(zip none pairs any);
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.2.0';
+our $VERSION = '2.2.2';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -160,6 +160,7 @@ sub main {
 
   my $cli = $class->new(
     option_specs    => $manifest ? ( $manifest->{options} // [] )           : [],
+    alias           => $manifest ? ( $manifest->{alias} // {} )             : {},
     default_options => $manifest ? ( $manifest->{default_options} // {} )   : {},
     extra_options   => $manifest ? ( $manifest->{extra_options} // [] )     : [],
     commands        => $manifest ? $manifest->{_dispatch}                   : { default => \&usage },
@@ -196,14 +197,14 @@ sub use_log4perl {
   );
 
   foreach my $o ( keys %args ) {
-    die "ERROR: unknown argument ($_)\n"
+    die "ERROR: unknown argument ($o)\n"
       if none { $o eq $_ } @valid_options;
   }
 
-  eval { require Log::Log4perl; 1; };
-
-  die "ERROR: Log4perl is not installed\n"
-    if $EVAL_ERROR;
+  eval { require Log::Log4perl; 1; }
+    or die "use_log4perl() requires Log::Log4perl, which is not installed.\n"
+    . "It is an opt-in feature, so CLI::Simple does not depend on it.\n"
+    . "If your app calls use_log4perl(), add 'Log::Log4perl' to your requires/cpanfile.\n";
 
   my $class = ref $self || $self;
 
@@ -338,6 +339,9 @@ sub new {
     = ( @{ $extra_options || [] }, map { ( split /[^\w\-]/xsm )[0] } @{$option_specs} );
 
   foreach (@accessors) {
+    die "ERROR: accessor must be a scalar\n"  # somebody did @extra_options = [qw( a b c )] ???
+      if ref $_;
+
     s/\-/_/xsmg;
 
     # can() can't tell "a human hand-wrote this method" apart from
@@ -433,7 +437,7 @@ sub new {
 
   if ( !$command ) {
     if ( $commands->{default} ) {
-      $command = 'default';
+      $command = ref $commands->{default} ? 'default' : $commands->{default};
     }
     elsif ($AUTO_HELP) {
       $command = 'help';
@@ -458,10 +462,10 @@ sub new {
     }
 
     if ( ref $help && reftype($help) eq 'ARRAY' ) {
-      $help->[0]->($self);
+      $help->[0]->( $self, $TRUE );
     }
     else {
-      $help->($self);
+      $help->( $self, $TRUE );
     }
   }
 
@@ -550,7 +554,7 @@ sub init_logger {
   my $command  = $self->command;
 
   return $self
-    if !$commands->{$command} || reftype( $commands->{$command} ) ne 'ARRAY';
+    if !$command || !$commands->{$command} || !ref( $commands->{command} ) || reftype( $commands->{$command} ) ne 'ARRAY';
 
   my ( $sub, $log_level ) = @{ $commands->{$command} };
 
@@ -579,6 +583,16 @@ sub get_kv_args {
   }
 
   return %args;
+}
+
+########################################################################
+sub set_args {
+########################################################################
+  my ( $self, $args ) = @_;
+
+  $self->set__command_args($args);
+
+  return $args;
 }
 
 ########################################################################
@@ -823,6 +837,13 @@ sub run {
 
   my $handler = $commands->{$command};
 
+  if ( $handler && !ref $handler ) {
+    $handler = $commands->{$handler};  # default?
+  }
+
+  die "ERROR: no such command '$command' has been registered.\n"
+    if !$handler;
+
   return $handler->($self)
     if ref $handler ne 'ARRAY';
 
@@ -978,7 +999,7 @@ distribution in one step.
 
 =head1 VERSION
 
-This documentation refers to version 2.2.0.
+This documentation refers to version 2.2.2.
 
 =head1 FEATURES
 
@@ -1628,7 +1649,7 @@ C<extra_options> and set the defaults for C<help_sections>:
     default_options => { help_sections => [qw(SYNOPIS COMMANDS OPTIONS)] },
     option_specs    => \@option_specs
   );
-                        
+
 Section names follow L<Pod::Usage> conventions. Subsections are
 specified with a C</> separator, e.g. C<DESCRIPTION/Commands> renders
 only the C<Commands> subsection under C<=head1 DESCRIPTION>.
@@ -2339,7 +2360,9 @@ internal use.
 C<CLI::Simple> integrates with L<Log::Log4perl> to provide structured
 logging for your scripts.
 
-To enable logging, call the class method C<use_log4perl()> in your
+C<CLI::Simple> will initialize L<Log::Log4perl> for you when you call C<use_log4perl()>.
+B<This is a convenience, not a requirement> -- you can log however you like.
+To enable logging via C<CLI::Simple>, call the class method C<use_log4perl()> in your
 module or script:
 
   __PACKAGE__->use_log4perl(
@@ -2356,6 +2379,16 @@ Once enabled, you can access the logger instance via:
 
 This logger supports the standard Log4perl methods like C<info>,
 C<debug>, C<warn>, etc.
+
+I<Note: Because it is opt-in, C<CLI::Simple> does not itself depend on
+L<Log::Log4perl>. B<If your application calls C<use_log4perl>, it owns that
+dependency> and must declare it in its own C<requires>/C<cpanfile>. Static
+dependency scanners cannot see it -- the module is loaded dynamically
+inside the method call -- so you must add it by hand.>
+
+I<Do not call C<use_log4perl> if you use a different logging framework, or if
+you initialize L<Log::Log4perl> yourself; it would override your
+configuration. Call it only when you want CLI::Simple to own logging setup.>
 
 =head2 Colored Output
 
@@ -2510,6 +2543,32 @@ Add entries to C<%INTERNAL_COMMANDS> before calling C<new()>:
     %CLI::Simple::INTERNAL_COMMANDS,
     '-my-command' => \&_cmd_my_command,
   );
+
+
+=item * My application dies with "use_log4perl() requires Log::Log4perl..."
+
+Something in your code calls C<< __PACKAGE__->use_log4perl(...) >> but
+L<Log::Log4perl> is not installed in the environment. This commonly first
+appears in a clean CI run, a hermetic build, or a fresh install -- anywhere
+the module was not already lying around.
+
+You have two choices, depending on what you meant:
+
+=over 4
+
+=item * B<You want Log::Log4perl logging.> Add it to your distribution's
+dependencies (C<requires 'Log::Log4perl';>). It is not a CLI::Simple
+prerequisite by design, and static scanners will not add it for you because
+the call is dynamic -- so declare it yourself.
+
+=item * B<You did not mean to use it.> If you log another way, or manage
+L<Log::Log4perl> yourself, just remove the C<use_log4perl> call.
+
+=back
+
+  # audit any CLI::Simple dist for the mismatch:
+  grep -rl use_log4perl lib bin && grep -q Log::Log4perl cpanfile \
+    || echo 'use_log4perl() called but Log::Log4perl not in cpanfile'
 
 =back
 

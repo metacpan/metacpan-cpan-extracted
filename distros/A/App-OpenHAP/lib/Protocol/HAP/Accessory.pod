@@ -1,0 +1,38 @@
+=head1 NAME
+
+Protocol::HAP::Accessory - base class for HAP accessories
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::Accessory;
+
+    my $accessory = Protocol::HAP::Accessory->new(
+        aid => 1,
+        name => 'My Accessory',
+        manufacturer => 'Acme Corp',
+        model => 'Model X',
+    );
+
+    $accessory->add_service($service);
+
+=head1 DESCRIPTION
+
+This module supplies the base class for HomeKit accessories. Each
+accessory holds the necessary Accessory Information service.
+
+=head1 THE LOGGER ARGUMENT
+
+The constructor takes an optional C<logger> argument: an object with
+C<debug>, C<info>, C<warning>, and C<error> methods that take
+printf-style arguments. The default is the null logger of
+L<Protocol::HAP>, which drops every message.
+
+The accessory passes its logger to the services and characteristics
+it builds itself, such as the Accessory Information service. It never
+touches the logger of an object it receives.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, L<Protocol::HAP::Service>, F<spec/HAP.md>
+
+=cut

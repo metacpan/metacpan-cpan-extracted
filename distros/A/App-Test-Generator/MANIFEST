@@ -59,6 +59,7 @@ t/Analyzer-ReturnMeta.t
 t/Analyzer-SideEffect.t
 t/app.t
 t/BenchmarkGenerator_unit.t
+t/cgi_security.t
 t/cli-benchmark-generator.t
 t/cli-deploy-workflows.t
 t/cli-extract-schemas.t
@@ -74,8 +75,10 @@ t/conf/data_text_set.yml
 t/conf/uc.conf
 t/CoverageGuided_Fuzzer.t
 t/CoverageGuided_Fuzzer_unit.t
+t/data-flow.t
 t/default_value_extraction.t
 t/dist.t
+t/domain.t
 t/edge_cases.t
 t/Emitter-Perl.t
 t/Emitter-Perl_unit.t
@@ -148,6 +151,7 @@ t/test-generator-index.t
 t/test_extractor.t
 t/test_hints.t
 t/TestStrategy.t
+t/transaction.t
 t/type_params.t
 t/unit.t
 t/unused.t

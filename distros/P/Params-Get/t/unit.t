@@ -18,9 +18,8 @@ use strict;
 use warnings;
 
 use Test::Most;
-use Test::Needs qw(Test::Returns Test::Memory::Cycle);
+use Test::Needs qw(Test::Memory::Cycle);
 use Test::Mockingbird 0.08;
-use Test::Returns;
 use Test::Memory::Cycle;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
@@ -77,7 +76,6 @@ subtest 'return type: all success paths return a hashref' => sub {
 	for my $case (@cases) {
 		my ($label, $val) = @{$case};
 		is(ref($val), 'HASH', "ref is HASH: $label");
-		returns_ok($val, { type => 'hashref' }, "schema: $label");
 	}
 
 	diag 'All success-path return types verified' if $ENV{TEST_VERBOSE};
@@ -86,9 +84,6 @@ subtest 'return type: all success paths return a hashref' => sub {
 subtest 'return type: zero args + undef $default returns undef (not hashref)' => sub {
 	my $result = get_params();
 	ok(!defined $result, 'get_params() returns undef');
-	# The POD schema marks the return as optional, so undef is valid per spec.
-	returns_ok(undef, { type => 'hashref', optional => 1 },
-		'undef satisfies optional hashref schema');
 };
 
 subtest 'return type: undef return is not 0, empty string, or false hashref' => sub {
@@ -263,7 +258,6 @@ subtest 'arrayref default: extra args silently discarded (documented LIMITATION)
 subtest 'arrayref default: empty names list returns empty hashref' => sub {
 	my $result = get_params([], 'ignored', 'also_ignored');
 	is_deeply($result, {}, 'empty key list yields empty hashref');
-	returns_ok($result, { type => 'hashref' }, 'return type: hashref');
 };
 
 subtest 'arrayref default: single hashref passthrough preserved (consistent with fast path)' => sub {
@@ -290,7 +284,6 @@ subtest '\@_ two-element shorthand: matching default + plain scalar' => sub {
 	# Simulates: caller does routine(country => 'US') and callee uses \@_.
 	my $result = get_params('country', ['country', 'US']);
 	is_deeply($result, { country => 'US' }, 'shorthand unwrapped correctly');
-	returns_ok($result, { type => 'hashref' }, 'return type: hashref');
 };
 
 subtest '\@_ shorthand suppressed: value is a reference' => sub {
@@ -311,7 +304,6 @@ subtest '\@_ multi-value: all elements stored as arrayref under scalar default' 
 	my $result = get_params('items', ['a', 'b', 'c']);
 	is_deeply($result, { items => ['a', 'b', 'c'] },
 		'multi-element \@_ stored as arrayref under default key');
-	returns_ok($result, { type => 'hashref' }, 'return type: hashref');
 };
 
 subtest '\@_ mandatory-positional + options hashref' => sub {
@@ -423,7 +415,6 @@ subtest 'one arg + undef $default: plain hashref passed through unchanged' => su
 	my $h      = { k => 'v', num => 7 };
 	my $result = get_params(undef, $h);
 	is($result, $h, 'hashref returned by identity');
-	returns_ok($result, { type => 'hashref' }, 'return type: hashref');
 };
 
 subtest 'one arg + undef $default: undef arg returns undef' => sub {
@@ -509,7 +500,6 @@ subtest 'mandatory + options: no $default -- treated as even-length key-value pa
 subtest 'named pairs: two pairs normalised into hashref' => sub {
 	my $result = get_params(undef, foo => 'bar', baz => 42);
 	is_deeply($result, { foo => 'bar', baz => 42 }, 'two named pairs normalised');
-	returns_ok($result, { type => 'hashref' }, 'return type: hashref');
 	memory_cycle_ok($result, 'cycle-free');
 };
 

@@ -1,0 +1,247 @@
+=head1 NAME
+
+Fugu::Proxy, Fugu::Proxy::Cache, Fugu::Proxy::Meta - a caching HTTP proxy
+
+=head1 SYNOPSIS
+
+    use Fugu::Proxy;
+
+    my $cache = Fugu::Proxy::Cache->new(
+        dir       => "$ENV{HOME}/.cache/myapp",
+        cacheable => sub ($url) { $url =~ m{/pub/.*\.tgz$} },
+    );
+
+    my $proxy = Fugu::Proxy->new(
+        cache   => $cache,
+        pidfile => Fugu::Pidfile->new(path => "$dir/proxy.pid"),
+        store   => Fugu::StateFile->new(path => "$dir/state.json")->load,
+    );
+
+    my $port = $proxy->start or die $proxy->error . "\n";
+
+=head1 DESCRIPTION
+
+This file holds three packages. Fugu::Proxy is the supervisor and the
+serve loop. Fugu::Proxy::Cache is the URL-to-file store.
+Fugu::Proxy::Meta is the metadata that makes a cache hit one write
+instead of a read and a re-encode.
+
+Nothing here knows what content is worth caching. That is a callback
+on the cache, because the answer is a property of the mirror and not
+of HTTP.
+
+L<HTTP::Daemon> and L<LWP::UserAgent> load in the child, at serve
+time. Thus the module keeps the core-Perl load contract of Fugu, and
+an installation without them still loads it.
+
+=head1 THE SUPERVISOR
+
+=head2 new
+
+C<new(%args)> creates a supervisor.
+
+These are the arguments:
+
+=over 4
+
+=item C<cache>
+
+A Fugu::Proxy::Cache. This argument is necessary.
+
+=item C<pidfile>
+
+A L<Fugu::Pidfile> for the child. This argument is necessary.
+
+=item C<store>
+
+A L<Fugu::StateFile> that holds the port. This argument is necessary.
+
+=item C<logfile>
+
+Where the output of the child goes. The default is F</dev/null>.
+
+=item C<ports>
+
+The range to look in, as [C<first>, C<last>]. The default is 8080 to
+8180.
+
+=item C<log>
+
+The logger.
+
+=back
+
+=head2 start
+
+C<start()> finds a free port, spawns the child, records its PID and
+port, and waits until it takes connections. A proxy that already runs
+returns its port and starts nothing.
+
+=head2 stop
+
+C<stop()> stops the child and forgets its port. The stop is a
+C<SIGTERM> with a grace period, then a C<SIGKILL>, through
+L<Fugu::Process>.
+
+=head2 is_running
+
+C<is_running()> reports if the child is alive. The check reaps, so a
+child that became a zombie reads as stopped.
+
+=head2 port
+
+C<port()> returns the port the running proxy listens on.
+
+=head2 wait_ready
+
+C<wait_ready($timeout)> polls until the proxy takes a connection. The
+default timeout is 30 seconds.
+
+=head2 serve
+
+C<serve($port)> runs the server loop. The spawned child calls this,
+and it returns when a C<SIGTERM> arrives.
+
+The signal handler writes one byte to a self-pipe that the select loop
+watches. Thus the loop notices the signal between requests and not
+inside one.
+
+=head2 warm
+
+C<warm()> fills the metadata table from what is already on disk. A
+cold proxy would otherwise stat every file on its first hit.
+
+=head2 cache, error
+
+C<cache()> returns the cache object. C<error()> returns the most
+recent failure.
+
+=head1 THE CACHE
+
+=head2 new
+
+C<new(%args)> creates a cache.
+
+These are the arguments:
+
+=over 4
+
+=item C<dir>
+
+The cache root. This argument is necessary. The mirrored tree goes
+under F<E<lt>dirE<gt>/proxy>.
+
+=item C<cacheable>
+
+A code reference that takes a URL and reports if it is worth keeping.
+The default says no. A cache that guesses fills a home directory with
+pages nobody will read again.
+
+=item C<types>
+
+Extra content types, as a hash reference of pattern to type.
+
+=back
+
+=head2 cache_path
+
+C<cache_path($url)> maps a URL to its file:
+F<E<lt>dirE<gt>/proxy/E<lt>hostE<gt>/E<lt>pathE<gt>>. The layout is
+the URL, so a person can find a file and a mirror tree survives a
+restart.
+
+The method returns C<undef> for a URL that would escape the cache
+root: no host, an empty path, or a path that walks up. A URL comes
+from a client, so that check is the boundary.
+
+=head2 is_cacheable
+
+C<is_cacheable($url, $status)> asks the callback. Only a status of 200
+is a candidate: a cached 404 is a mirror that stays broken after the
+upstream is fixed.
+
+=head2 lookup, store, store_from_file
+
+C<lookup($url)> returns the cached file, or C<undef>.
+
+C<store($url, $content)> writes the content and returns the path. The
+write is atomic, so a client that reads while another writes never
+gets a partial file.
+
+C<store_from_file($url, $source)> puts a file that is already on disk
+into the cache.
+
+=head2 size, list, clear
+
+C<size()> returns the total bytes. C<list()> returns every cached file
+as C<url>, C<path> and C<size>. C<clear()> removes them all and leaves
+the root.
+
+=head2 content_type, path_to_url, dir_size, walk
+
+C<content_type($path)> returns the type from the table.
+C<path_to_url($path)> rebuilds the URL a cached file came from.
+C<dir_size($dir)> returns the bytes under a directory.
+C<walk($dir, $callback)> calls the callback for every regular file
+under a directory. One walker serves the size, the listing and the
+metadata warm.
+
+=head1 THE METADATA
+
+=head2 new, store, lookup
+
+C<new()> creates an empty table.
+
+C<store($url, $path, $cache)> builds the entry: the path, the size,
+the modification time, the content type and an ETag. The C<$cache>
+argument names the content type; without it the type is
+C<application/octet-stream>.
+
+C<lookup($url)> returns the entry, or C<undef>. An entry whose file is
+gone, or whose size or modification time changed, is not valid and
+reads as absent. Thus a file that changed under the proxy invalidates
+its own entry.
+
+=head2 count, warm
+
+C<count()> returns the number of entries. C<warm($cache)> builds an
+entry for every file already in the cache and returns the count.
+
+=head1 RETURN VALUES
+
+C<start()> returns the port, or C<undef> with the reason in
+C<error()>. C<stop()> and C<serve()> return 1. C<is_running()> and
+C<wait_ready()> return 1 or 0.
+
+C<store()> and C<cache_path()> return a path, or C<undef>. C<list()>
+returns an array reference.
+
+=head1 ERRORS
+
+C<new()> dies when a necessary argument is absent. C<serve()> dies
+when L<HTTP::Daemon> is missing, and when it cannot listen. Both are
+startup failures of a child that exists to serve.
+
+No other method dies.
+
+=head1 SEE ALSO
+
+L<Fugu::File>, L<Fugu::Pidfile>, L<Fugu::Process>, L<Fugu::StateFile>,
+L<HTTP::Daemon>, L<LWP::UserAgent>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+The cache has no bound of its own and no expiry. Nothing removes an
+entry until the caller does. A caller whose URLs are version-scoped
+prunes by version; a caller whose URLs are not needs a policy that
+this module does not have.
+
+The serve loop handles one client at a time. A large transfer
+therefore holds the proxy. That is the right trade for a mirror that
+one machine reads.
+
+=cut

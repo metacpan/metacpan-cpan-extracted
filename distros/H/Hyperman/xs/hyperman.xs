@@ -387,3 +387,90 @@ detach(env)
     }
     OUTPUT:
         RETVAL
+
+# ---- the fork-shared arena, from Perl ------------------------------------
+#
+# The denylist and the rate counters live in an anonymous shared mapping made
+# before the workers fork, so every worker reads and writes the one copy.
+# Until now they were reachable only through the C ABI, which meant an
+# application had to be an XS module to ban an address or count a request -
+# and the obvious Perl substitute, a hash in the worker, is wrong in the two
+# ways that matter: a denylist becomes a different list per worker, and a
+# limit of N becomes N per worker.
+#
+# All four fail OPEN when no arena is mapped (outside a running server, or on
+# a platform without the atomics the arena needs): nothing is denied and
+# nothing is limited. That is the same answer the accept path gives itself,
+# and the safe one for a check that cannot run.
+
+# Hyperman->deny_add($ip, $ttl_seconds): block a peer at accept. A ttl of 0
+# (the default) means until the server stops.
+void
+deny_add(class, ip, ttl = 0)
+        SV *class
+        SV *ip
+        IV ttl
+    CODE:
+        PERL_UNUSED_VAR(class);
+        if (SvOK(ip)) hm_rl_deny_add(SvPV_nolen(ip), (long)ttl);
+
+# Hyperman->deny_remove($ip): unblock it again.
+void
+deny_remove(class, ip)
+        SV *class
+        SV *ip
+    CODE:
+        PERL_UNUSED_VAR(class);
+        if (SvOK(ip)) hm_rl_deny_remove(SvPV_nolen(ip));
+
+# Hyperman->deny_check($ip): is it blocked right now?
+IV
+deny_check(class, ip)
+        SV *class
+        SV *ip
+    CODE:
+        PERL_UNUSED_VAR(class);
+        RETVAL = SvOK(ip) ? hm_rl_deny_check(SvPV_nolen(ip)) : 0;
+    OUTPUT:
+        RETVAL
+
+# Hyperman->ratelimit_hit($key, $limit, $window) -> ($allowed, $remaining,
+# $reset). Counts one hit against $key in the current fixed window and says
+# whether it is within $limit. $reset is the epoch second the window rolls,
+# which is what an X-RateLimit-Reset header wants. A limit of 0 is unlimited
+# and reports a remaining of -1.
+void
+ratelimit_hit(class, key, limit, window = 60)
+        SV *class
+        SV *key
+        IV limit
+        IV window
+    PPCODE:
+    {
+        STRLEN klen;
+        const char *kp = SvOK(key) ? SvPV_const(key, klen) : "";
+        long rem = 0, reset = 0;
+        int ok;
+        if (!SvOK(key)) klen = 0;
+        ok = hm_rl_ratelimit_hit(kp, (size_t)klen, (long)limit, (long)window,
+                                 &rem, &reset);
+        EXTEND(SP, 3);
+        mPUSHi(ok);
+        mPUSHi(rem);
+        mPUSHi(reset);
+    }
+
+# ---- run code in every worker after the fork -----------------------------
+
+# Hyperman->on_worker_start(\&cb): register before run(); fires once in each
+# worker, after the fork, before its loop starts turning. The Perl door onto
+# the v4 registry the C ABI's on_worker_start writes to.
+IV
+on_worker_start(class, cb)
+        SV *class
+        SV *cb
+    CODE:
+        PERL_UNUSED_VAR(class);
+        RETVAL = hm_worker_hook_add_perl(aTHX_ cb);
+    OUTPUT:
+        RETVAL

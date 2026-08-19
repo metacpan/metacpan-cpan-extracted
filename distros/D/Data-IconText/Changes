@@ -1,3 +1,7 @@
+v0.08  2026-08-18Z
+    - Added more well known tags
+    - Added characters to known class :all
+
 v0.07  2026-08-03Z
     - Fixed new(for => $x)'s code path for mark()
     - Added more well known tags

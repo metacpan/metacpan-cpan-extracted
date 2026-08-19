@@ -1,0 +1,119 @@
+=head1 NAME
+
+Fugu::Sandbox - pledge and unveil as a platform abstraction
+
+=head1 SYNOPSIS
+
+    use Fugu::Sandbox;
+
+    Fugu::Sandbox->unveil(
+        paths => [
+            ['/var/db/mydaemon',  'rwc'],
+            ['/etc/mydaemon.conf', 'r', { optional => 1 }],
+            Fugu::Sandbox->system_paths,
+        ],
+        on_skip => sub ($path) { ... },
+    );
+    Fugu::Sandbox->unveil_lock;
+    Fugu::Sandbox->pledge(promises => 'stdio rpath inet');
+
+=head1 DESCRIPTION
+
+Fugu::Sandbox wraps pledge(2) and unveil(2) so that callers do not
+test the operating system themselves. On OpenBSD, the restrictions
+are real. On all other platforms, each method is a no-op that returns
+success. C<is_supported()> tells a caller or a test which of the two
+it gets.
+
+All methods are class methods. There is no object because the two
+syscalls that the module wraps are process-global. A method that
+fails dies with the promise string or the path that caused the
+failure, and with the errno. There is no force flag and no
+warn-and-continue mode. The module never logs. The caller decides
+what to report.
+
+Two methods, C<perl_lib_dirs()> and C<system_paths()>, assemble path
+lists and call no syscall. They never touch the filesystem view. Thus
+a unit test can prove the inventory of a daemon on any platform.
+
+On OpenBSD, Fugu::Sandbox loads the base-system modules
+L<OpenBSD::Pledge> and L<OpenBSD::Unveil> when it loads. If these
+modules do not load, the process dies immediately. On that platform,
+the absence of these modules shows a broken perl and not an
+unsupported system.
+
+=head2 is_supported
+
+C<is_supported()> returns true only where the restrictions are real,
+that is, on OpenBSD.
+
+=head2 pledge
+
+C<pledge(promises =E<gt> $string)> limits the process to the
+space-separated set of promises, as pledge(2) defines it. The method
+returns 1. On failure, it dies and gives the promises and the error.
+The first call defines the sandbox. Later calls can only make it
+smaller.
+
+=head2 unveil
+
+C<unveil(paths =E<gt> arrayref of pairs, on_skip =E<gt> sub)> limits
+the filesystem view to the listed paths with the listed unveil(2)
+permission strings. The argument is an ordered list of pairs, not a
+hash. unveil(2) replaces the permissions of a path and does not merge
+them. Thus the order of parent before child is necessary, and the key
+order of a hash makes that order random.
+
+Each entry can have C<{ optional =E<gt> 1 }> as a third element. If a
+I<necessary> path is absent, the method dies and gives the path. If
+the method accepts a path with a typo and gives no report, unveil
+becomes useless. If an I<optional> path is absent, the method skips
+it and reports it through the C<on_skip> callback. The optional flag
+is for paths that can be absent on a system that operates correctly.
+Examples are a configuration file and the socket of a daemon that
+does not run. The method returns 1.
+
+=head2 unveil_lock
+
+C<unveil_lock()> prevents more C<unveil()> calls and locks the view
+for the life of the process. The method returns 1. It dies on
+failure.
+
+=head2 perl_lib_dirs
+
+C<perl_lib_dirs()> returns the library directories of the perl that
+runs. The values are C<privlibexp>, C<archlibexp>, C<sitelibexp> and
+C<sitearchexp> from L<Config>.
+
+These are stable facts about the interpreter build. They are not the
+live C<@INC>. A program adds directories to C<@INC> at run time, and
+a module can add one later still. A daemon that unveils the library
+tree for a late C<require> must name the stable set, and never a set
+that depends on the moment of the call.
+
+=head2 system_paths
+
+C<system_paths()> returns the read-only C<unveil()> inventory that
+every daemon repeats: F</dev/urandom>, F</etc/resolv.conf>,
+F</etc/hosts>, F</etc/services>, F</etc/protocols> and
+F</etc/localtime>. The entries are ready for C<unveil()>. All of them
+carry the optional flag except F</dev/urandom>, which every system
+has. A resolver file is absent on a host with no name service, and
+that host still runs the daemon.
+
+=head1 RETURN VALUES
+
+C<perl_lib_dirs()> returns a list of directory names.
+
+C<system_paths()> returns a list of C<unveil()> entries.
+
+=head1 SEE ALSO
+
+pledge(2), unveil(2), L<Config>, L<OpenBSD::Pledge>,
+L<OpenBSD::Unveil>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

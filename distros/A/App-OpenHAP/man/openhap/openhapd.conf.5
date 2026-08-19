@@ -1,0 +1,294 @@
+.\" $OpenBSD$
+.\"
+.\" Copyright (c) 2025 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: August 2 2026 $
+.Dt OPENHAPD.CONF 5
+.Os
+.Sh NAME
+.Nm openhapd.conf
+.Nd OpenHAP daemon configuration file
+.Sh DESCRIPTION
+.Nm
+is the configuration file for the
+.Xr openhapd 8
+daemon.
+The file uses a simple key-value format with device blocks that
+define HomeKit accessories.
+.Sh SYNTAX
+A setting is a key and a value on one line.
+Both
+.Dq Ic key Ar value
+and
+.Dq Ic key No = Ar value
+parse.
+The two forms mean the same thing, thus a file can use either.
+.Pp
+Leading and trailing whitespace does not matter.
+A value in double quotes loses the quotes, thus a value can hold a
+space:
+.Bd -literal -offset indent
+hap_name = "Living Room Bridge"
+hap_port 51827
+.Ed
+.Pp
+A
+.Sq #
+starts a comment that runs to the end of the line.
+The grammar has no escape for it, thus no value can hold a
+.Sq # .
+An empty line does nothing.
+.Pp
+A block is a type, one or more arguments, and an opening brace.
+The settings of the block follow, and a
+.Sq }
+on its own line ends it.
+A block cannot hold a block.
+.Pp
+The daemon refuses to start on a line that it cannot parse.
+It reports the file, the line number, and the reason:
+.Bd -literal -offset indent
+openhapd: /etc/openhapd.conf:14: cannot parse: hap_prt 51827
+.Ed
+.Pp
+The daemon never skips a line it did not understand.
+A typo that a parser ignores is a setting that does not apply, and the
+operator has no way to see it.
+Fix the line and start the daemon again.
+.Sh GLOBAL OPTIONS
+These global options are available:
+.Bl -tag -width Ds
+.It Ic hap_name Ar string
+The name of the HomeKit bridge, as the iOS Home app shows it.
+Default:
+.Dq OpenHAP Bridge .
+.It Ic hap_port Ar number
+The TCP port for the HAP server.
+Default: 51827.
+.It Ic hap_pin Ar XXXX-XXXX
+The 8-digit setup code for pairing.
+The format is XXXX-XXXX.
+Each X is a digit 0-9.
+The dashes only make the code easy to read.
+The daemon removes them when it parses the value.
+The HAP specification does not permit these values (after removal of
+the dashes):
+00000000, 11111111, 22222222, 33333333, 44444444,
+55555555, 66666666, 77777777, 88888888, 99999999,
+12345678, 87654321.
+The daemon refuses a malformed or not-permitted code at startup,
+before it detaches from the terminal.
+Default: 1995-1018.
+.It Ic db_path Ar path
+The directory that holds the pairing database and the cryptographic
+keys.
+Default:
+.Pa /var/db/openhapd .
+.It Ic control Ar path | Cm off
+The UNIX socket where
+.Xr hapctl 8
+asks the running daemon what it is doing.
+Default:
+.Pa /var/run/openhapd/control.sock .
+.Pp
+The daemon creates the directory of the socket while it is still
+root, with owner
+.Dq _openhap
+and mode 0700, because
+.Ox
+clears
+.Pa /var/run
+at boot.
+The socket itself is mode 0600.
+A user who is neither root nor
+.Dq _openhap
+thus cannot reach it.
+.Pp
+The value
+.Cm off
+runs the daemon with no control channel.
+.Xr hapctl 8
+then reports from
+.Pa /var/run/openhapd.pid
+only, and it says so.
+.Pp
+No reply on this socket carries a secret: not the setup code, not the
+MQTT password, and no key.
+.It Ic log_level Ar level
+The log verbosity level.
+The valid values are:
+.Cm debug , info , notice , warning , error .
+The daemon refuses any other value at startup and names it.
+Default:
+.Cm info .
+.It Ic log_facility Ar facility
+The syslog facility for the log messages.
+The valid values are:
+.Cm daemon , local0 Ns \(en Ns Cm local7 , user .
+Default:
+.Cm daemon .
+.It Ic mqtt_host Ar hostname
+The hostname or the IP address of the MQTT broker.
+Default: 127.0.0.1.
+.It Ic mqtt_port Ar number
+The TCP port of the MQTT broker.
+Default: 1883.
+.It Ic mqtt_user Ar username
+The username for MQTT authentication.
+This option is optional.
+.It Ic mqtt_pass Ar password
+The password for MQTT authentication.
+This option is optional.
+.El
+.Sh DEVICE BLOCKS
+Define each device with this syntax:
+.Bd -literal -offset indent
+device <type> <subtype> <id> {
+    name = "<display name>"
+    topic = "<mqtt topic>"
+    [more options...]
+}
+.Ed
+.Pp
+The parameters are:
+.Bl -tag -width "subtypeXX"
+.It Ar type
+The device driver type.
+At this time, only
+.Cm tasmota
+is available.
+.It Ar subtype
+The device subtype.
+For
+.Cm tasmota ,
+the valid values are:
+.Cm thermostat , heater , sensor .
+.It Ar id
+The unique identifier of the device in the configuration.
+The daemon uses it for internal reference.
+.It Ic name
+The display name that the iOS Home app shows.
+This option is necessary.
+.It Ic topic
+The MQTT topic prefix for the device.
+For Tasmota devices, this is the topic from the MQTT settings of the
+device.
+The default of that setting is
+.Dq tasmota_%06X .
+The %06X part is the last 6 hex digits of the MAC address.
+This option is necessary.
+.El
+.Pp
+The other options are different for each device subtype:
+.Ss Sensor Options
+Tasmota sensor devices have this option:
+.Bl -tag -width "has_humidityXX"
+.It Ic has_humidity Cm 0 | 1
+Add a HomeKit humidity service beside the temperature service.
+Set it to 1 for a sensor that reports a Humidity field, for example
+a DHT22.
+Default: 0.
+.El
+.Sh FILES
+.Bl -tag -width "/var/db/openhapd/XX" -compact
+.It Pa /etc/openhapd.conf
+The default location of the configuration file.
+.It Pa /etc/examples/openhapd.conf
+The example configuration file that
+.Cm make install
+installs.
+.El
+.Sh EXAMPLES
+A minimal configuration with one thermostat:
+.Bd -literal -offset indent
+hap_name = "Home Bridge"
+hap_pin = 9876-5432
+
+mqtt_host = 192.168.1.10
+
+device tasmota thermostat bedroom {
+    name = "Bedroom Thermostat"
+    topic = tasmota_AABBCC
+}
+.Ed
+.Pp
+Three devices with custom MQTT settings:
+.Bd -literal -offset indent
+hap_name = "OpenHAP"
+hap_port = 51827
+hap_pin = 1112-2333
+
+mqtt_host = mqtt.local
+mqtt_port = 1883
+mqtt_user = homekit
+mqtt_pass = secretpassword
+
+log_level = debug
+log_facility = local0
+
+device tasmota thermostat bedroom {
+    name = "Bedroom"
+    topic = tasmota_AABBCC
+}
+
+device tasmota thermostat living_room {
+    name = "Living Room"
+    topic = tasmota_DDEEFF
+}
+
+device tasmota thermostat kitchen {
+    name = "Kitchen"
+    topic = tasmota_112233
+}
+.Ed
+.Sh SEE ALSO
+.Xr syslog.conf 5 ,
+.Xr hapctl 8 ,
+.Xr mdnsd 8 ,
+.Xr mosquitto 8 ,
+.Xr openhapd 8
+.Sh STANDARDS
+The MQTT topic structure obeys the Tasmota firmware conventions.
+See
+.Lk https://tasmota.github.io/docs/MQTT/
+for more data on the Tasmota MQTT topics.
+.Sh HISTORY
+The
+.Nm
+file format was first available with
+.Xr openhapd 8
+in 2025.
+.Sh AUTHORS
+.An Dick Olsson Aq Mt hi@senzilla.io
+.Sh CAVEATS
+The configuration file holds the
+.Ic hap_pin
+in plain text.
+Make sure that the file permissions are correct:
+mode 0600, with root as the owner.
+.Pp
+If you change the
+.Ic hap_name
+or the
+.Ic hap_pin
+after pairing, it can be necessary to pair all controllers again.
+.Pp
+The file holds
+.Ic mqtt_pass
+in plain text, and the daemon sends it to the broker without
+encryption.
+.Xr openhapd 8
+does not use MQTT over TLS.
+Keep the broker on the local machine or on a trusted network.

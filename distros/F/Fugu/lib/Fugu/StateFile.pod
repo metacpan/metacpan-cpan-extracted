@@ -1,0 +1,132 @@
+=head1 NAME
+
+Fugu::StateFile - a small JSON state file
+
+=head1 SYNOPSIS
+
+    use Fugu::StateFile;
+
+    my $store = Fugu::StateFile->new(
+        path => '/var/db/myapp/state.json',
+        mode => 0600,
+    )->load;
+
+    $store->set(installed => 1);
+    my $installed = $store->get('installed');
+
+=head1 DESCRIPTION
+
+Fugu::StateFile is the file where a daemon and its tools keep the
+handful of facts that must survive a restart: a counter, a flag, a
+timestamp. It is that file and nothing more. It holds no PID logic
+and starts no subprocess: L<Fugu::Pidfile> owns the first, and the
+caller owns the second.
+
+C<load()> tolerates a missing file and a corrupt one. A state file
+that a crash truncated must not stop the program that would rewrite
+it. C<save()> is atomic, through L<Fugu::File>, so the file is never
+the corrupt one that the next C<load()> has to tolerate.
+
+=head2 new
+
+C<new(%args)> creates a store. The method does not touch the file.
+Call C<load()>.
+
+These are the arguments:
+
+=over 4
+
+=item C<path>
+
+The state file. This argument is necessary.
+
+=item C<mode>
+
+The file mode. The default is 0600, because a state file often holds
+a secret and a wider mode is a decision, not a default.
+
+=back
+
+=head2 load
+
+C<load()> reads the state. An absent file gives empty state with no
+error. A corrupt file gives empty state and records the reason in
+C<error()>, so the caller can report it and carry on. The method
+returns the object either way.
+
+=head2 save
+
+C<save()> writes the state, with the mode applied before the content.
+
+=head2 get
+
+C<get($key)> returns one value, or C<undef>.
+
+=head2 set
+
+C<set($key, $value)> stores one value and saves. A caller that
+changes several keys uses C<data()> and C<save()> instead of one call
+for each.
+
+=head2 delete
+
+C<delete($key)> removes one value and saves.
+
+=head2 data
+
+C<data()> returns the state hash reference itself. A caller that
+changes several keys at once changes it and then calls C<save()>.
+
+=head2 path
+
+C<path()> returns the state file.
+
+=head2 error
+
+C<error()> returns the most recent failure.
+
+=head1 RETURN VALUES
+
+C<load()> returns the object. C<save()>, C<set()> and C<delete()>
+return the object on success and C<undef> on failure, with the reason
+in C<error()>.
+
+C<get()> returns a value or C<undef>. C<data()> returns a hash
+reference.
+
+=head1 EXAMPLES
+
+This example changes two keys with one write:
+
+    $store->data->{running}    = 1;
+    $store->data->{started_at} = time;
+    $store->save or warn $store->error . "\n";
+
+=head1 ERRORS
+
+C<new()> dies when C<path> is absent or empty. That is a programming
+error.
+
+No other method dies. A failed read and a failed write both report
+through the return value and C<error()>.
+
+=head1 SEE ALSO
+
+L<Fugu::Config>, L<Fugu::File>, L<Fugu::Pidfile>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+The store is not shared state. Two processes that hold the same file
+both keep their own copy in memory, and the last C<save()> wins. A
+process that must not lose a concurrent change reloads before it
+writes, or takes a lock of its own.
+
+Every value goes through JSON. A code reference, a file handle, or a
+blessed object does not encode, and the C<save()> that meets one
+fails.
+
+=cut

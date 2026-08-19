@@ -6,7 +6,7 @@ use warnings;
 use Punk::OAuth2;
 use Punk::OAuth2::JWKS;
 use Crypt::JWS::Key;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 1;
 

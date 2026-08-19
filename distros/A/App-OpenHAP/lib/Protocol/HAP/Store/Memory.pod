@@ -1,0 +1,32 @@
+=head1 NAME
+
+Protocol::HAP::Store::Memory - the store contract over plain hashes
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::Store::Memory;
+
+    my $store = Protocol::HAP::Store::Memory->new;
+
+    $store->save_pairing('controller-id', $ltpk, 1);
+    my $pairings = $store->load_pairings;
+
+=head1 DESCRIPTION
+
+This module is the reference implementation of the store contract
+that F<Protocol/HAP/Store.pod> documents. The state lives in the
+object and dies with it: nothing persists.
+
+Tests and embedders start here. A production host implements the same
+twelve methods over durable storage, including the rule that the
+mutating pairing methods increment the configuration number
+themselves.
+
+C<load_pairings> returns a copy. A caller that edits the result cannot
+bypass the increment rule of the mutating methods.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, F<Protocol/HAP/Store.pod>
+
+=cut

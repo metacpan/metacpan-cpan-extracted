@@ -1,0 +1,42 @@
+Revision history for PAGI::FastAPI::Queue::Driver::Redis
+
+0.0.1  2026-08-19
+       [FEATURE]
+       - Initial release.
+       - Added PAGI::FastAPI::Queue::Driver::Redis, a Redis-backed storage
+         driver for PAGI::FastAPI::Queue. Stores each topic as a Redis
+         list (RPUSH to enqueue, LPOP to dequeue), so queued items are
+         shared across every worker process and host pointed at the same
+         Redis instance and key prefix.
+       - Built on Async::Redis (Future::IO-based) rather than
+         Net::Async::Redis, matching PAGI::FastAPI's own documented
+         event-loop philosophy (Future::IO is the goal, IO::Async is an
+         implementation detail).
+       - Supports either an injected, pre-built client via the `redis`
+         constructor option, or auto-construction from host/port/uri/
+         username/password/database options.
+       - Connects lazily (on first use) and only once per driver
+         instance; no network I/O happens in the constructor.
+       - Aggregate size() (no topic given) walks the keyspace with
+         Redis's non-blocking SCAN command and sums LLEN per matching
+         key; documented as a best-effort, non-atomic snapshot.
+       - Added disconnect(), a driver-specific extension (not part of the
+         PAGI::FastAPI::Queue::Driver contract) for clean shutdown.
+
+       [TESTS]
+       - Added t/00-load.t.
+       - Added t/01-queue_driver_redis.t: full unit test suite (FIFO
+         ordering, JSON round-tripping of refs/falsy values, prefix
+         namespacing, per-topic and aggregate size, multi-page SCAN
+         cursor handling, lazy/once-only connect, disconnect
+         delegation), driven entirely by an injectable fake client
+         (t/lib/Test/FakeAsyncRedis.pm) so the suite runs offline without
+         a real Redis server or Async::Redis installed.
+       - Added t/02-queue_driver_redis_live.t: optional integration test
+         against a real Redis server, skipped unless both Async::Redis
+         is installed and PAGI_TEST_REDIS=host:port is set.
+
+       [DOCUMENTATION]
+       - Full POD for PAGI::FastAPI::Queue::Driver::Redis, including the
+         Async::Redis-vs-Net::Async::Redis rationale and the SCAN-based
+         aggregate size() caveat.

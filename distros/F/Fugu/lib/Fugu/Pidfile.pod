@@ -1,0 +1,145 @@
+=head1 NAME
+
+Fugu::Pidfile - locked PID file
+
+=head1 SYNOPSIS
+
+    use Fugu::Pidfile;
+
+    my $pidfile = Fugu::Pidfile->new(path => '/var/run/mydaemon.pid');
+
+    if (my $pid = $pidfile->is_running) {
+        die "already running as pid $pid\n";
+    }
+
+    $pidfile->acquire;
+
+=head1 DESCRIPTION
+
+Fugu::Pidfile manages one PID file. It also reports if the process
+that the file names still runs. The module exists so that a daemon,
+its rc.d(8) script, and a control utility can all agree on the same
+question.
+
+Every write takes the lock before it truncates. Thus a concurrent
+reader never sees an empty file.
+
+=head2 new
+
+C<new(%args)> creates an object for the named file. The method does
+not create and does not read the file at this point.
+
+This is the argument:
+
+=over 4
+
+=item C<path>
+
+The PID file. This argument is necessary.
+
+=back
+
+=head2 path
+
+C<path()> returns the file that the object manages.
+
+=head2 write_pid
+
+C<write_pid($pid)> writes C<$pid> and a newline to the PID file, then
+releases the lock. The default for C<$pid> is the process ID of the
+caller.
+
+=head2 acquire
+
+C<acquire($pid)> writes the PID and keeps the locked handle open. The
+lock lives until the object is destroyed, or until the process exits.
+While one process holds the lock, an C<acquire()> from a second
+process fails at once and does not wait. Thus "am I already running"
+has an authoritative answer that no C<read_pid()> race can spoil.
+
+=head2 read_pid
+
+C<read_pid()> returns the process ID that the file holds. The first
+line must be a sequence of decimal digits. If the contents are
+different, or if the file is absent, the method returns no PID.
+
+=head2 remove
+
+C<remove()> removes the PID file.
+
+=head2 is_running
+
+C<is_running()> returns the process ID from the file if that process
+is alive. The method uses L<Fugu::Process> for the liveness check.
+
+=head2 is_stale
+
+C<is_stale()> reports if the PID file names a process that is not
+alive now. In this condition, a daemon can take the file and does not
+refuse to start.
+
+=head2 error
+
+C<error()> returns the most recent failure as a message that a log can
+carry.
+
+=head1 RETURN VALUES
+
+C<new()> returns an object.
+
+C<write_pid()>, C<acquire()> and C<remove()> return 1 on success. They
+return C<undef> on failure and put the reason in C<error()>.
+
+C<read_pid()> and C<is_running()> return a process ID, or C<undef>
+when there is no process ID to report.
+
+C<is_stale()> returns 0 when the file holds no readable PID. Thus an
+absent PID file is not stale.
+
+=head1 EXAMPLES
+
+This example prevents a second start and holds the file for the life
+of the daemon:
+
+    my $pidfile = Fugu::Pidfile->new(path => '/var/run/mydaemon.pid');
+
+    if (my $pid = $pidfile->is_running) {
+        die "mydaemon already running as pid $pid\n";
+    }
+
+    Fugu::Daemon->daemonize(
+        pidfile => '/var/run/mydaemon.pid',
+    );
+
+=head1 ERRORS
+
+C<new()> dies when C<path> is absent or empty. That is a programming
+error.
+
+No other method dies. They report a failure to open, lock, write or
+unlink the file through the return value and C<error()>.
+
+=head1 SEE ALSO
+
+flock(2), unlink(2), L<Fugu::Daemon>, L<Fugu::Process>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+C<write_pid()> releases its lock when it closes the file, at the end
+of the call. The lock puts two concurrent writes in sequence. It does
+not hold the PID file for the life of the daemon. Use C<acquire()> for
+that. C<read_pid()> does not take a lock.
+
+A check with C<is_running()> and then an action on the answer is a
+race condition. In between, the process can exit, or a different
+process can claim the file. C<acquire()> has no such window.
+
+C<is_running()> has the same limits as the liveness check of
+L<Fugu::Process>. That check cannot show the difference between the
+initial process and a later process with the same ID.
+
+=cut

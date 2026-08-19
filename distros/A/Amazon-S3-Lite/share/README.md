@@ -16,6 +16,13 @@
   * [delete\_object](#delete\object)
   * [list\_buckets](#list\buckets)
   * [create\_bucket](#create\bucket)
+  * [delete\_bucket](#delete\bucket)
+  * [put\_public\_access\_block](#put\public\access\block)
+  * [put\_bucket\_website](#put\bucket\website)
+  * [get\_bucket\_website](#get\bucket\website)
+  * [delete\_bucket\_website](#delete\bucket\website)
+  * [put\_bucket\_policy](#put\bucket\policy)
+  * [get\_bucket\_policy](#get\bucket\policy)
   * [put\_bucket\_notification\_configuration](#put\bucket\notification\configuration)
   * [get\_bucket\_notification\_configuration](#get\bucket\notification\configuration)
   * [remove\_bucket\_notification\_configuration](#remove\bucket\notification\configuration)
@@ -26,7 +33,6 @@
 * [SEE ALSO](#see-also)
 * [AUTHOR](#author)
 * [LICENSE](#license)
-* [POD ERRORS](#pod-errors)
 # NAME
 
 Amazon::S3::Lite - A lightweight Amazon S3 client for common
@@ -517,6 +523,117 @@ Creates a new S3 bucket. Options:
 
 Returns true on success. Croaks on failure.
 
+## delete\_bucket
+
+    $s3->delete_bucket($bucket);
+    $s3->delete_bucket($bucket, region => 'us-west-2');
+
+Deletes an empty bucket. Returns a true value on success. S3 refuses
+to delete a bucket that still contains objects, so callers must empty
+the bucket first (for example by iterating ["list\_all\_objects\_v2"](#list_all_objects_v2) and
+calling ["delete\_object"](#delete_object) on each key).
+
+- region
+
+    Override the region the delete is signed against. Defaults to the
+    region the object was constructed with.
+
+## put\_public\_access\_block
+
+    $s3->put_public_access_block($bucket);
+    $s3->put_public_access_block(
+      $bucket,
+      block_public_acls       => 1,
+      ignore_public_acls      => 1,
+      block_public_policy      => 0,
+      restrict_public_buckets => 0,
+    );
+
+Sets the Block Public Access configuration on a bucket. Each of the
+four settings is a boolean; any setting not supplied **defaults to
+true** (fully locked down), so an argument-less call blocks all public
+access. Returns a true value on success.
+
+- block\_public\_acls
+- ignore\_public\_acls
+- block\_public\_policy
+- restrict\_public\_buckets
+
+    Each accepts a true/false value. Omitted settings default to true.
+    Note that hosting content publicly (for example a static website, or
+    a policy-scoped private bucket that grants anonymous `GetObject` from
+    a VPC endpoint) requires the relevant setting to be false so the
+    bucket policy is not rejected.
+
+## put\_bucket\_website
+
+    $s3->put_bucket_website($bucket);
+    $s3->put_bucket_website($bucket, index => 'index.html', error => 'error.html');
+
+Configures the bucket as an S3 static website endpoint. Returns a true
+value on success.
+
+- index
+
+    The index document suffix. Defaults to `index.html`.
+
+- error
+
+    The error document key. Optional; when omitted, no error document is
+    configured.
+
+## get\_bucket\_website
+
+    my $config = $s3->get_bucket_website($bucket);
+
+Returns the bucket's website configuration as a hashref, or `undef`
+if the bucket has no website configuration. The hashref contains
+whichever of the following are set:
+
+- index\_document
+
+    The index document suffix.
+
+- error\_document
+
+    The error document key.
+
+- redirect\_all\_requests\_to
+
+    The hostname all requests are redirected to, if the bucket is
+    configured as a redirect.
+
+## delete\_bucket\_website
+
+    $s3->delete_bucket_website($bucket);
+
+Removes the website configuration from a bucket. Returns a true value
+on success.
+
+## put\_bucket\_policy
+
+    $s3->put_bucket_policy($bucket, \%policy);
+    $s3->put_bucket_policy($bucket, $json_string);
+
+Attaches a bucket policy. The policy may be given either as a Perl
+data structure (a hashref, which is encoded to canonical JSON) or as a
+pre-encoded JSON string. Returns a true value on success.
+
+## get\_bucket\_policy
+
+    my $policy = $s3->get_bucket_policy($bucket);
+    my $json   = $s3->get_bucket_policy($bucket, raw => 1);
+
+Returns the bucket's policy, or `undef` if the bucket has no policy
+(S3 returns `NoSuchBucketPolicy`). By default the policy is decoded
+and returned as a hashref; pass `raw => 1` to get the raw JSON
+string instead.
+
+- raw
+
+    When true, return the policy as its raw JSON string rather than a
+    decoded hashref.
+
 ## put\_bucket\_notification\_configuration
 
     # Lambda trigger
@@ -712,15 +829,3 @@ Rob Lauer <rlauer@treasurersbriefcase.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 1473:
-
-    '=item' outside of any '=over'
-
-- Around line 1480:
-
-    You forgot a '=back' before '=head2'

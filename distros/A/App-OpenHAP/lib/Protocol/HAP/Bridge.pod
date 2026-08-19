@@ -1,0 +1,41 @@
+=head1 NAME
+
+Protocol::HAP::Bridge - HAP bridge accessory
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::Bridge;
+
+    my $bridge = Protocol::HAP::Bridge->new(
+        name => 'My Home Bridge',
+    );
+
+    $bridge->add_bridged_accessory($accessory);
+
+=head1 DESCRIPTION
+
+This module supplies the HAP bridge. The bridge can hold many bridged
+accessories. The bridge accessory holds the necessary
+AccessoryInformation and ProtocolInformation services. Bridged
+accessories hold only the AccessoryInformation service.
+
+The bridge forwards change notifications from bridged accessories to
+its own event callbacks. Each notification keeps the aid of the
+source accessory. Thus the server can send EVENT/1.0 notifications
+for changes on the device side.
+
+=head1 THE LOGGER ARGUMENT
+
+The constructor takes an optional C<logger> argument: an object with
+C<debug>, C<info>, C<warning>, and C<error> methods that take
+printf-style arguments. The default is the null logger of
+L<Protocol::HAP>. The bridge passes its logger to its own
+ProtocolInformation service. C<add_bridged_accessory> never touches
+the logger of an accessory it receives.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, L<Protocol::HAP::Accessory>, F<spec/HAP.md>,
+F<spec/HAP-Categories.md>
+
+=cut

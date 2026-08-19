@@ -1,0 +1,142 @@
+=head1 NAME
+
+Fugu::SSH - run a command on another machine over SSH
+
+=head1 SYNOPSIS
+
+    use Fugu::SSH;
+
+    my $ssh = Fugu::SSH->new(
+        host => '127.0.0.1',
+        port => 2222,
+        user => 'root',
+    );
+
+    $ssh->wait_available(120) or die "the host never answered\n";
+
+    my $result = $ssh->run_command('uname -a');
+    print $result->{stdout};
+
+=head1 DESCRIPTION
+
+Fugu::SSH wraps L<Net::SSH2> for the two things a provisioning tool
+does: run a command and capture its output, and write a file. An
+interactive session falls back to ssh(1), because L<Net::SSH2> does
+not give correct control of a terminal.
+
+L<Net::SSH2> loads at connect time and not at compile time. Thus the
+module keeps the core-Perl load contract of Fugu, and an installation
+without the library still loads it and fails with a clear message at
+the first connect.
+
+Authentication tries the SSH agent first, when C<SSH_AUTH_SOCK> is
+set, and falls back to the password when the caller gave one.
+
+=head2 new
+
+C<new(%args)> creates a connection object. The method opens nothing:
+every other method connects for itself and disconnects when it is
+done.
+
+These are the arguments:
+
+=over 4
+
+=item C<host>
+
+The host to reach. The default is C<127.0.0.1>.
+
+=item C<port>
+
+The port. The default is 22.
+
+=item C<user>
+
+The user to log in as. The default is C<root>.
+
+=item C<password>
+
+The password, for a host that has no key yet.
+
+=item C<timeout>
+
+The connection timeout in seconds. The default is 10.
+
+=back
+
+=head2 run_command
+
+C<run_command($command)> runs one command and returns a hash reference
+with C<stdout>, C<stderr> and C<exit_code>. A connection that fails
+reports exit code 1 and a message in C<stderr>.
+
+=head2 write_file
+
+C<write_file($remote_path, $content, $mode)> writes a file over SFTP.
+The default mode is 0644.
+
+The method checks the length that the write reported. A provisioning
+script that arrives half-written is worse than one that never arrived.
+
+=head2 is_available
+
+C<is_available()> reports if the host takes an authenticated
+connection now.
+
+=head2 wait_available
+
+C<wait_available($timeout)> polls until the host takes a connection,
+or until the timeout ends. The default timeout is 120 seconds.
+
+The wait stops early when a signal arrives, through L<Fugu::Timeout>.
+A poll loop must not outlive the interrupt that told the program to
+stop.
+
+=head2 interactive
+
+C<interactive()> runs ssh(1) with the terminal of the caller and
+returns its exit code.
+
+The code is a value between 0 and 255, and not a raw wait status. A
+caller that passed the raw status to C<exit> would turn a remote exit
+code of 1 into C<exit(256)>, which the kernel truncates to 0, and a
+failed remote command would read as a success.
+
+=head1 RETURN VALUES
+
+C<run_command()> returns a hash reference.
+
+C<write_file()> returns 0 on success and 1 on failure, like a command.
+
+C<is_available()> and C<wait_available()> return 1 or 0.
+C<interactive()> returns an exit code.
+
+=head1 ERRORS
+
+Every method dies when L<Net::SSH2> is not installed. The message
+names the module, because that failure is an installation problem and
+not a connection problem.
+
+No method dies for a connection that fails.
+
+=head1 SEE ALSO
+
+ssh(1), L<Fugu::Process>, L<Fugu::Timeout>, L<Net::SSH2>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+Every method opens its own connection and closes it at the end. A
+caller that runs many commands pays the handshake for each one.
+
+C<run_command()> holds the whole output of the command in memory.
+
+The module does not verify the host key. It is a provisioning tool
+for a machine that the caller just created, on a port on the loopback
+address. Do not use it to reach a host across a network you do not
+trust.
+
+=cut

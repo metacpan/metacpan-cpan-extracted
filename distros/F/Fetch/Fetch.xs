@@ -62,6 +62,12 @@ static int ft_obj_can(pTHX_ SV *obj, const char *meth) {
     return stash && gv_fetchmethod_autoload(stash, meth, FALSE) ? 1 : 0;
 }
 
+/* the v2 outbound observer registry - before ft_ua.h, which fires it, and
+ * long before ft_abi.h, which registers into it */
+#include "fetch/ft_obs.h"
+#include "fetch/ft_obs_perl.h"  /* ... and the Perl door onto it */
+
+
 /* the user agent - URL parsing, header merge, cookies, request build, and
  * redirect following (depends on the statics above, so included here) */
 #include "fetch/ft_ua.h"

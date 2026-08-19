@@ -3,7 +3,7 @@ package Fetch::Loop::Standalone;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.15';
 
 require Fetch;
 

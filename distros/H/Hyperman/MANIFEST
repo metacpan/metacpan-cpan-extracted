@@ -14,6 +14,8 @@ include/hyperman/hm_future.h
 include/hyperman/hm_http2.h
 include/hyperman/hm_parse.h
 include/hyperman/hm_ratelimit.h
+include/hyperman/hm_workerhook.h
+include/hyperman/hm_workerhook_perl.h
 include/hyperman/hm_tls.h
 include/hyperman/hm_win.h
 include/hyperman/hyperman.h
@@ -53,6 +55,8 @@ t/28-windows.t
 t/30-compress-accept.t
 t/31-compress.t
 t/32-max-body.t
+t/33-worker-start.t
+t/34-perl-arena.t
 t/lib/HMTest.pm
 t/manifest.t
 t/pod-coverage.t

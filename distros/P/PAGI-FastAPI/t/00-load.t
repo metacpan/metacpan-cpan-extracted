@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use v5.38;
-use Test::More tests => 12;
+use Test::More tests => 15;
 
 use_ok($_) for qw(
     PAGI::FastAPI
@@ -16,6 +16,9 @@ use_ok($_) for qw(
     PAGI::FastAPI::Response
     PAGI::FastAPI::Response::HTML
     PAGI::FastAPI::Response::SSE
+    PAGI::FastAPI::Queue
+    PAGI::FastAPI::Queue::Driver
+    PAGI::FastAPI::Queue::Driver::Memory
 );
 
 diag( "Testing PAGI::FastAPI $PAGI::FastAPI::VERSION, Perl $], $^X" );

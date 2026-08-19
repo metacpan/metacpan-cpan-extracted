@@ -19,3 +19,4 @@ t/047-ldap.t
 .git
 test.log
 MYMETA*
+^Mail-DWIM-.*\.tar\.gz$

@@ -33,7 +33,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='3.018';
+$VERSION='3.019';
 
 
 #  Get mod_perl version taking intio account legacy strings. Clear $@ after evals
@@ -425,6 +425,7 @@ my %constant_temp;
     #  Enable the API mode ?
     #
     WEBDYNE_API_ENABLE => 1,
+    WEBDYNE_API_STRIP_PREFIX => 1,
     
     
     #  Enable Alpine/Vue hack
@@ -1228,6 +1229,14 @@ The constants below are defined by `WebDyne::Constant`. Each definition includes
 
     Memory cache cleanup method. `0` removes entries by oldest last-use time; `1` removes least-used entries first.
 
+* **WEBDYNE_CACHE_STAT_TTL**
+
+    **Default:** `0`
+
+    Controls how often WebDyne rechecks disk cache file mtimes after a compiled page has been loaded into the current process.
+
+    `0` preserves the historical behavior and stats cache files on every request. A positive value reuses the last stat result for that many seconds. `-1` reuses the last stat result for the lifetime of the current process, so externally updated cache files are not detected until the process restarts or recompilation is forced.
+
 * **WEBDYNE_EVAL_SAFE**
 
     **Default:** `0`
@@ -1603,6 +1612,12 @@ The constants below are defined by `WebDyne::Constant`. Each definition includes
     **Default:** `1`
 
     Enable processing of `<api>` routes in PSGI request handling. Set to 0 to disable API route dispatch.
+
+* **WEBDYNE_API_STRIP_PREFIX**
+
+    **Default:** `1`
+
+    Strip accidental document-root prefixes from `<api pattern>` values when the pattern contains path segments before the current PSP filename stem. This keeps patterns such as `/api/user/:id` portable for `api.psp` files served from subdirectories. Set to 0 to require patterns to match the request path exactly.
 
 * **WEBDYNE_ALPINE_VUE_ATTRIBUTE_HACK_ENABLE**
 
@@ -2104,6 +2119,18 @@ B<WEBDYNE_CACHE_CLEAN_METHOD>
 B<Default:> C<1>
 
 Memory cache cleanup method. C<0> removes entries by oldest last-use time; C<1> removes least-used entries first.
+
+
+
+=item *
+
+B<WEBDYNE_CACHE_STAT_TTL>
+
+B<Default:> C<0>
+
+Controls how often WebDyne rechecks disk cache file mtimes after a compiled page has been loaded into the current process.
+
+C<0> preserves the historical behavior and stats cache files on every request. A positive value reuses the last stat result for that many seconds. C<-1> reuses the last stat result for the lifetime of the current process, so externally updated cache files are not detected until the process restarts or recompilation is forced.
 
 
 
@@ -2712,6 +2739,16 @@ B<WEBDYNE_API_ENABLE>
 B<Default:> C<1>
 
 Enable processing of C<<< <api> >>> routes in PSGI request handling. Set to 0 to disable API route dispatch.
+
+
+
+=item *
+
+B<WEBDYNE_API_STRIP_PREFIX>
+
+B<Default:> C<1>
+
+Strip accidental document-root prefixes from C<<< <api pattern> >>> values when the pattern contains path segments before the current PSP filename stem. This keeps patterns such as C</api/user/:id> portable for C<api.psp> files served from subdirectories. Set to 0 to require patterns to match the request path exactly.
 
 
 

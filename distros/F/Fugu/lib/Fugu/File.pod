@@ -1,0 +1,222 @@
+=head1 NAME
+
+Fugu::File - file operations for a daemon and its tools
+
+=head1 SYNOPSIS
+
+    use Fugu::File;
+
+    my $data = Fugu::File->read('/etc/mydaemon.conf');
+
+    Fugu::File->write_atomic('/var/db/myapp/key', $key, mode => 0600);
+    Fugu::File->write_json('/var/db/myapp/state.json', $state,
+        mode => 0600);
+
+    Fugu::File->ensure_dir('/var/db/myapp');
+
+=head1 DESCRIPTION
+
+B<Fugu::File> holds the file operations that a daemon and its tools
+repeat. Every method is a class method over a path. The module keeps
+no state.
+
+A recoverable failure returns C<undef> and reports through
+L<Fugu::Log>. A class-method module has no object to hold an error
+accessor, so the log is where the reason goes.
+
+The write methods set the mode at the open, before the first byte. A
+chmod(2) after the write leaves a window in which a secret is
+world-readable, and that window is the whole point of the mode.
+
+=head2 read
+
+C<read($path)> returns the whole content of the file, as bytes. The
+method returns C<undef> when the file does not open. An empty file
+reads as the empty string, which is not the same answer.
+
+=head2 write
+
+C<write($path, $data, %args)> writes the bytes to the file. An
+existing file goes away first, so the mode argument means what it
+says instead of yielding to the mode the old file had.
+
+This is the argument:
+
+=over 4
+
+=item C<mode>
+
+The file mode. The default is 0644.
+
+=back
+
+=head2 write_atomic
+
+C<write_atomic($path, $data, %args)> writes through a temporary file
+in the same directory, then renames over the target. A reader sees
+the old content or the new content, and never a half-written file.
+The argument is the same as for C<write>.
+
+The temporary file is a sibling of the target, because rename(2) is
+atomic only inside one filesystem.
+
+=head2 read_json
+
+C<read_json($path)> reads and decodes a JSON file. The method returns
+C<undef> when the file is absent, empty, or not valid JSON. A state
+file that a crash truncated is a recoverable condition: the caller
+starts over.
+
+=head2 write_json
+
+C<write_json($path, $ref, %args)> encodes and writes a JSON file with
+C<write_atomic>. The argument is the same.
+
+The encoding is canonical, so the same data always gives the same
+bytes. Thus a difference between two state files is a difference in
+the state.
+
+=head2 ensure_dir
+
+C<ensure_dir($path, %args)> makes sure the directory exists.
+
+The method refuses a symlink and refuses a path that exists as
+something else. Both are conditions that a daemon must not write
+through: a symlink puts the daemon's files where the owner of the
+link decided.
+
+This is the argument:
+
+=over 4
+
+=item C<mode>
+
+The mode for directories that the method creates. The default is
+0755.
+
+=back
+
+=head2 expand_tilde
+
+C<expand_tilde($path)> replaces a leading tilde with the home
+directory. The method leaves every other path unchanged, and leaves
+F<~user> alone: this module does not resolve other users.
+
+=head2 share_path
+
+C<share_path($relative, %args)> resolves a file that ships with a
+distribution. The search tries, in order: an explicit root, the
+checkout that holds the caller's module file, the working directory,
+and the installed share tree of the named distribution under C<@INC>.
+The method returns the first path that exists, or C<undef>.
+
+These are the arguments:
+
+=over 4
+
+=item C<root>
+
+A directory to search before the others.
+
+=item C<from>
+
+The caller's module file, normally C<__FILE__>. The directory above
+the deepest F<lib> component of its path is the root of the checkout
+that ships the data.
+
+=item C<dist>
+
+The distribution name. An installed distribution keeps its share
+files under F<auto/share/dist/E<lt>nameE<gt>>, with the leading
+F<share/> component of C<$relative> removed.
+
+=back
+
+=head2 atomic_dir
+
+C<atomic_dir($target, $code)> builds a directory tree beside
+C<$target> and publishes it with one rename(2). C<$code> receives the
+temporary directory and returns true when the tree is complete. A
+false return, a die, or a signal discards the tree.
+
+The method refuses to overwrite an existing target. A rename over a
+populated directory is not atomic, so a caller that wants a
+replacement removes the old tree itself.
+
+A build can run for minutes over a large file. The method therefore
+installs handlers for C<SIGINT> and C<SIGTERM> for the length of the
+call, and an C<END> block covers the rest.
+
+=head2 sweep_temp
+
+C<sweep_temp($parent)> removes the leftover build directories under
+C<$parent>. A kill that no handler can catch leaves them. The method
+returns the count it removed.
+
+=head2 valid_name
+
+C<valid_name($name)> reports if the string is safe as one path
+component.
+
+The check refuses an empty name, a name longer than 255 characters, a
+name that holds a path separator or a NUL byte, and the two directory
+entries F<.> and F<..>. Every one of them turns a name that came from
+a caller into a path that reaches outside the directory it was meant
+for.
+
+=head1 RETURN VALUES
+
+C<read> returns the content of the file. C<read_json> returns the
+decoded structure. Both return C<undef> on failure.
+
+C<write>, C<write_atomic>, C<write_json> and C<ensure_dir> return 1
+on success and C<undef> on failure.
+
+C<atomic_dir> returns C<$target> on success and C<undef> otherwise.
+C<sweep_temp> returns a count. C<valid_name> returns 1 or 0.
+C<expand_tilde> and C<share_path> return a path.
+
+=head1 EXAMPLES
+
+This example stores a key that only its owner may read:
+
+    Fugu::File->ensure_dir('/var/db/myapp', mode => 0700)
+        or die "cannot prepare the state directory\n";
+
+    Fugu::File->write_atomic('/var/db/myapp/ltsk', $secret,
+        mode => 0600)
+        or die "cannot store the key\n";
+
+This example builds a cache entry that is never half-published:
+
+    Fugu::File->atomic_dir("$cache/$key", sub ($tmp) {
+        convert($disk, "$tmp/base") or return 0;
+        Fugu::File->write_json("$tmp/meta.json", $meta, mode => 0600)
+            or return 0;
+        return 1;
+    });
+
+=head1 ERRORS
+
+No method dies. Each one reports a failure through its return value
+and a message in the log.
+
+=head1 SEE ALSO
+
+chmod(2), rename(2), L<Fugu::Log>, L<Fugu::StateFile>, L<JSON::PP>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+C<read> holds the whole file in memory. Do not use it for a file
+without a bound.
+
+C<write_atomic> is atomic against a reader, not against another
+writer. Two processes that write the same path at the same time both
+succeed, and the last rename wins. Use L<Fugu::Pidfile> or a lock of
+your own where that matters.
+
+=cut

@@ -1,0 +1,55 @@
+=head1 NAME
+
+Protocol::HAP::SRP - SRP-6a implementation for HAP pairing
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::SRP;
+
+    # Server side
+    my $srp = Protocol::HAP::SRP->new(password => $pin);
+    my $salt = $srp->generate_salt();
+    my $v = $srp->compute_verifier;
+    my $B = $srp->generate_server_public();
+    my $B_bytes = $srp->server_public_bytes();   # 384 bytes, for M2
+
+    # After receiving client's A
+    my $K = $srp->compute_session_key($A);
+    my $valid = $srp->verify_client_proof($M1);
+    my $M2 = $srp->generate_server_proof();
+
+=head1 DESCRIPTION
+
+This module implements the server (accessory) role of the SRP-6a
+exchange that HAP pair-setup uses. The module owns the RFC 5054
+3072-bit group parameters, because SRP is their only user. The modular
+arithmetic comes from L<Math::BigInt>.
+L<Math::BigInt> uses the GMP backend when that backend is installed.
+This is important: the pure-Perl backend takes seconds for each
+exponentiation at 3072 bits.
+
+The module also owns the wire encoding of the values it produces.
+C<server_public_bytes> returns B padded to the length of N, which is
+what M2 must carry and what both sides hash for u. About one B in 256
+is small enough that its natural encoding is one byte short, so a
+caller that packed the number itself would break one pairing in 256.
+
+=head1 THE CONTROLLER ROLE
+
+The same file holds C<Protocol::HAP::SRP::Client>: the controller
+side of the exchange, with the same group, hash, and padding rules.
+One module holds both roles, so the conformance vectors exercise them
+against each other.
+
+    my $srp = Protocol::HAP::SRP::Client->new(password => $pin);
+    my $A   = $srp->compute_public;
+    my $M1  = $srp->compute_proof($salt, $B);   # undef on bogus B
+    $srp->verify_server_proof($M2) or die 'server proof invalid';
+    my $K = $srp->session_key;
+
+=head1 SEE ALSO
+
+L<Protocol::HAP::Pairing>, L<Protocol::HAP::Controller>,
+F<spec/HAP-Pairing.md>
+
+=cut

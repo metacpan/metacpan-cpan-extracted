@@ -104,6 +104,7 @@ my %makefile_hash = (
   NAME => 'PDL',
   VERSION_FROM => 'lib/PDL.pm',
   EXE_FILES => \@exe_files,
+  PL_FILES => { 'lib/PDL/Index.pod.PL' => 'lib/PDL/Index.pod' },
   META_MERGE => {
      "meta-spec" => { version => 2 },
      resources => {
@@ -167,25 +168,6 @@ my @pd_srcs;
 sub postamble {
   my ($self) = @_;
   my $text = '';
-  $text .= <<'EOF';
-doctest :: pm_to_blib
-	$(NOECHO) $(ECHO) "doctest: Building PDL documentation database in blib ..."
-	$(NOECHO) $(PERLRUNINST) utils$(DFSEP)scantree.pl
-
-doc_site_install :: doc_pdldoc_install
-
-doc_pdldoc_install :: pure_install # needs installed .../PDL dir to exist
-	$(NOECHO) $(ECHO) "doc_site_install: Building PDL documentation database ..."
-	$(NOECHO) $(PERLRUNINST) utils$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLSITEARCH)"
-
-doc_vendor_install ::
-	$(NOECHO) $(ECHO) "doc_vendor_install: Building PDL documentation database ..."
-	$(NOECHO) $(PERLRUNINST) utils$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLVENDORARCH)"
-
-doc_perl_install ::
-	$(NOECHO) $(ECHO) "doc_perl_install: Building PDL documentation database ..."
-	$(NOECHO) $(PERLRUNINST) utils$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLARCHLIB)"
-EOF
   $text .= <<EOT if $^O !~ /MSWin/;
 $pdlroot$::Config{exe_ext} : $pdlroot.c
 \t\$(CC) \$(CCFLAGS) \$(CPPFLAGS) \$(OPTIMIZE) \$(LDFLAGS) \$(CCCDLFLAGS) $pdlroot.c -o \$\@

@@ -1,3 +1,264 @@
+Tue Aug 18 17:14:54 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.2.3]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.2.3.md: new
+	* VERSION: bump
+	* README.md: generated
+	* MANIFEST: +local.mk
+	* Makefile
+	(GIT_DIRTY): echo 'unknown'
+	(TEMPLATE_VARS): +MIN_PERL_VERSION
+	(buildspec.yml)
+	- call gen-vars
+	- rm buildspec.yml.tmpl.vars
+	- resolve-vars looks for buildspe.yml.tmpl.var by default now
+	* lib/CPAN/Maker/Bootstrapper/Role/Installer.pm.in
+	(cmd_install)
+	- add environment variable BUILD_MIRRORS to build-mirrors
+
+Fri Aug 14 04:36:51 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.2.2]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.2.2.md: new
+	* VERSION: bump
+	* README.md: generated
+	* .includes/local.mk
+	- --show-build-log-on-failure
+	* Makefile: removed annoying info message re: installer
+	* README.md: modified
+	* VERSION: modified
+	* lib/CPAN/Maker/Bootstrapper/Role/CreateDeps.pm.in
+	(find_modules)
+	- ignore temp files
+
+Tue Aug 11 12:58:05 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.2.1]:
+	* VERSION: bump
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- POD only updates
+
+Tue Aug 11 09:08:18 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.2.0]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.2.0.md: new
+	* README.md: generated
+	* VERSION: bump
+	* .gitignore
+	- +extra-files.mk, local/
+	- pattern rules now use resolve-vars instead of sed to replace tokens
+	* .includes/git.mk
+	(repo): new
+	* .includes/perl.mk
+	- true heremetic builds
+	(gen-vars-file): new
+	* .includes/update.mk: + local.mk
+	* .includes/version.mk
+	- make clean before bumping version
+	* Makefile
+	- use abbreviated name for bootstrapper (cmb)
+	(CPM): new
+	(CARTON): new
+	(GITHUB_ACTIONS): new
+	(CPAN_INSTALLER): new
+	(GIT_SHA): new
+	(GIT_DIRTY): new
+	(find-files): exclude temp files of all sorts
+	(SOURCE_FILES_IN): new
+	(DEPS): + local/
+	(TEMPLATE_VARS): new
+	(PACKAGE_VERSION): new
+	- pattern rules for .in files now use cmb resolve-vars
+	(UNIT_TEST_NAME): likewise
+	(module.pm.tmpl): removed
+	(MODULE_PATH): refactored to prevent unnecessary rebuilds
+	(*.raw): depends on $(SOURCE_FILES_IN) no $(SOURCE_FILES)
+	(requires): likewise
+	(suggests): likewise
+	(recommends): likewise
+	(buildspec.yml): uses cmb resolve-vars instead of sed
+	(CLEANFILES): +extra-files.mk
+	(INSTALLER): rename DOCKER_CPAN_INSTALLER
+	(build-ci): likewise
+	(deps.mk): prevent empty deps.mk
+	(extra-files.mk): refactored to prevent unnecessary builds
+	* builder
+	- only checkout if it is a git repo and we have a BRANCH_NAME
+	* buildspec.yml: +.includes/local.mk
+	* cpan-maker-bootstrapper.yml
+	- new command: resolve-vars
+	- new option: vars-file
+	* cpanfile: +Log::Log4perl
+	* requires: likewise
+	* gitignore: local/**, extra-files.mk
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- POD updates
+	* lib/CPAN/Maker/Bootstrapper/Role/CreateDeps.pm.in
+	(cmd_create_deps)
+	- update regexp so we properly write .pl targets
+	* .includes/local.mk: new
+	* lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm.in: new
+
+Mon Aug  3 14:42:15 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.1.0]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.1.0.md: new
+	* VERSION: bump
+	* README.md: generated
+	* MANIFEST: +bash-completion.mk, modulino.ml
+	* buildspec.yml
+	- likewise
+	* .includes/update.mk
+	- likewise
+	- don't rewrite Makefile until after all updates
+	* .includes/help.mk: run help text through a pager
+	* .includes/release-notes.mk
+	- fix comment
+	- support DRYRUN mode
+	* Makefile
+	- move modulino recipe to .icludes/modulino.mk
+	- include .includes/bash-completion.mk
+	* cpan-maker-bootstrapper.yml
+	- aliases
+	- formatting
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm.in
+	- _loadASCIITable -> _load_ASCIITable
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Models.pm.in: likewise
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm.in: likewise
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm.in
+	(cmd_release_notes)
+	- hook for adding custom release-notes prompt
+	- dryrun mode for just producing the artifacts that are fed to Claude
+	* project.mk
+	- remove recipes now in deps.mk
+	* .includes/bash-completion.mk: new
+	* .includes/modulino.mk: new
+	* requires: new versions pinned
+	* cpanfile: likewise
+
+Sun Aug  2 09:20:22 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.14]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.14.md: new
+	* VERSION: bump
+	* README.md: generated
+	* Makefile
+	- declare requires.raw recommends.raw suggests.raw test-requires.raw as .INTERMEDIATE
+	- declare cpanfile.requires cpanfile.suggests cpanfile.recommends as .INTERMEDIATE
+	- remove check-syntax, update-available from dependency list
+	(deps.mk): no need to translate file names
+
+Sat Jul 25 06:24:38 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.13]:
+	* README.md: generated
+	* VERSION: bump
+	* .gitignore: + *.raw
+	* .includes/perl.mk
+	- use env vars for perlcritic customization
+	- output findings to console and log
+	* .includes/release-notes.mk: cmd, not bootstrapper
+	* .includes/update.mk: update .gitignore (preserving existing)
+	* Makefile
+	(MD_UTILS): markdown-render
+	(SCANDEPS): scandeps-static
+	(MIN_PERL_VERSION_FLAG): read from buildspec
+	(DEPS): +suggests, recommends
+	(README.md): don't exit if no POD
+	(scan-deps): removed
+	(filter-requires): removed, functionality moved to scandeps-static
+	(requires.raw): new
+	(test-requires.raw): new
+	(suggests.raw): new
+	(recommends.raw): new
+	- + .raw pattern rule
+	(requires): depends on $(SOURCE_FILES)
+	(suggests): likewise
+	(build-ci)
+	- now builds from the project directory
+	(cpanfile): combine requires, suggest & recommends
+	* builder
+	- build from mounted directory
+	- use --no-prebuilt with cpm
+	- ignore bootstrapper version drift
+	- show all steps
+	* buildspec.yml.tmpl: + recommends, suggests
+	* cpan-maker-bootstrapper.yml
+	- +critique, filter commands
+	- +file-list option
+	* deps.mk
+	- (./lib/CPAN/Maker/Bootstrapper/Role/Init.pm): +ConfigReader
+	* gitignore: *.raw
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- use CLI::Simple color feature
+	(init_logger): no longer needed because of above
+	* lib/CPAN/Maker/Bootstrapper/Role/CreateDeps.pm.in
+	(find_deps): lazy load Module::ScanDeps::Static
+	* lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm.in
+	(cmd_extra_files): avoid duplicate entries
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm.in
+	- lazy load Term::ANSIColor, Text::ASCIITable
+	(cmd_annotate): likewise
+	(_show_annotations): likewise
+	(_load_ASCIITable): new
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Models.pm.in
+	(cmd_models): lazy load Text::ASCIITable
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm.in
+	(cmd_code_review): lazy load Text::ASCIITable
+	(cmd_pod_review): likewise
+	(cmd_code_finding): likewise
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm.in
+	(_check_llm): use or do {} pattern to trap error
+	(_pre_submission_report): lazy load Text::ASCITable
+	(_fmt_tokens): refactored
+	(_print_token_usage): lazy load Text::ASCIITable
+	* lib/Git/ReleaseDiffs.pm.in
+	(new): die if Git::Raw not installed
+	* lib/Text/ASCIITable/FixANSI.pm.in
+	(BEGIN): lazy load Text::ASCIITable
+	* recommends: moved to suggests
+	* suggests: new from requires
+	* requires
+	- bump version of CLI::Simple 2.1.1
+	- pin versions
+	* cpanfile: combine requires, suggests
+	* requires.skip: moved to suggests
+	* test-requires: CPAN::Maker::Bootstrapper
+	* lib/CPAN/Maker/Bootstrapper/Role/Critic.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/Filter.pm.in: new
+
+Tue Jul 21 08:15:45 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.12]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.11.md: new
+	* README.md: generated
+	* VERSION: bump
+	* config.mk: new
+	* .includes/perl.mk
+	- templating & syntax-checking are combined again
+	(check_syntax_pm): revert to checking syntax of built target
+	(check_syntax_pl): likewise
+	* Makefile
+	(scan-deps)
+	- uses new batch feature of scandeps-static.pl
+	(package)
+	- new target that does make clean, then make LINT=on and SCAN=on as recommen final step in packaging
+	* config.mk: modified
+	* lib/CPAN/Maker/Bootstrapper/Role/CreateDeps.pm.in
+	- find .pm.in and .pl.in files.
+	(cmd_create_deps)
+	- create dependency recipes for one or more files
+	* project.mk
+	(install): new
+	* requires: +Module::ScanDeps::Static 1.9.0
+	* cpanfile: likewise
+
 Mon Jul 20 13:13:47 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.11]:

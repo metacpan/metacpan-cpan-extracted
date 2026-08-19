@@ -372,13 +372,12 @@ subtest 'resolve_classification' => sub {
 	$m->add_evidence(category => 'return', signal => 'returns_constant', weight => 20);
 	is($m->resolve_classification, 'constant', 'constant return_type -> constant');
 
-	# No evidence -> unknown (alphabetical tie-break gives constant,
-	# but constant maps to 'constant' not 'unknown' -- need to test
-	# the actual unknown path which requires a non-matching return_type)
+	# An alien return_type (bypassing resolve_return_type) now confesses with
+	# an invariant-violation message rather than silently returning 'unknown'.
 	$m = _method();
 	$m->return_type('something_else');
-	is($m->resolve_classification, 'unknown',
-		'unrecognised return_type -> unknown');
+	throws_ok { $m->resolve_classification }
+		qr/invariant violation/, 'alien return_type -> confess (unreachable else branch)';
 
 	# resolve_classification calls resolve_return_type if return_type not set
 	$m = _method();

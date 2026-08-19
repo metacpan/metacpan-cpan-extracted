@@ -1,0 +1,74 @@
+=head1 NAME
+
+App::FuguVM::Disk - the qcow2 disk of a virtual machine
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::Disk;
+
+    my $disk = App::FuguVM::Disk->new($state_dir);
+
+    $disk->create('default', '8G');
+    $disk->create('default', undef, $base_image);   # an overlay
+
+    my $info = $disk->info('default');
+    my $base = $disk->backing_file('default');
+
+=head1 DESCRIPTION
+
+The module wraps L<qemu-img(1)>. Every invocation goes through
+L<Fugu::Process>, which runs a list and never a shell, so no path
+needs quoting.
+
+A disk lives at F<E<lt>state_dirE<gt>/E<lt>nameE<gt>/disk.qcow2>.
+
+=head1 METHODS
+
+=head2 new, path
+
+C<new> takes the directory that holds every VM's disk.
+
+=head2 create
+
+    $disk->create($name, $size, $backing_image)
+
+Create the disk. The size may be C<undef> for an overlay, which then
+inherits the virtual size of its backing image. Every backing image is
+a qcow2: a cached base image or a snapshot.
+
+The method returns the path unchanged when the file already exists.
+Thus a caller that replaces a disk with an overlay unlinks it first.
+
+=head2 info
+
+Return the L<qemu-img(1)> report as a hash reference, or C<undef>.
+
+The inspection asks for shared access. A running QEMU holds an
+exclusive lock, and without shared access the query would fail on
+exactly the VMs whose backing chain a caller most needs to resolve. If
+C<cache clear> could not see the backing file of a running VM, it
+would remove the base from under it.
+
+=head2 backing_file
+
+Return the absolute path of the image that backs the disk, or C<undef>
+when the disk is standalone.
+
+L<qemu-img(1)> reports the reference even when the file it names is
+gone. Thus a caller can diagnose a broken chain instead of meeting an
+opaque failure at boot.
+
+=head2 check, repair
+
+C<check> returns C<{ status, output, path }>, where the status is
+C<ok> or C<corrupted>. C<repair> runs the repair pass and returns 1 or
+0.
+
+=head1 SEE ALSO
+
+L<qemu-img(1)>, L<Fugu::Process>, L<App::FuguVM::DiskCache>,
+L<App::FuguVM::Guest>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

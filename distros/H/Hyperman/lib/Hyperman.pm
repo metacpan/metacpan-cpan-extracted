@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -416,10 +416,63 @@ counter, so it would leak looser, never tighter). N gateways behind a load
 balancer admit up to N times the limit, which is honest rather than a
 distributed count this does not implement.
 
-Applications reach all of this through the C ABI below - C<deny_check> /
+An XS module reaches all of this through the C ABI below - C<deny_check> /
 C<deny_add> / C<deny_remove> and C<ratelimit_hit> - which is how L<Punk>'s
-C<rate_limit> keyword and C<< $c->block_ip >> are built. Nothing here is a
-Perl-level method: the arena is C, on the hot path.
+C<rate_limit> keyword and C<< $c->block_ip >> are built, with no Perl on the
+hot path. The same four are also plain class methods, for an application that
+is not an XS module:
+
+    Hyperman->deny_add($ip, $ttl_seconds);   # 0 = until the server stops
+    Hyperman->deny_remove($ip);
+    my $blocked = Hyperman->deny_check($ip);
+
+    my ($allowed, $remaining, $reset)
+        = Hyperman->ratelimit_hit($key, $limit, $window);
+
+C<ratelimit_hit> counts one hit against C<$key> in the current window and says
+whether it is within C<$limit>; C<$reset> is the epoch second the window
+rolls, which is what an C<X-RateLimit-Reset> header wants. A C<$limit> of 0 is
+unlimited and reports a C<$remaining> of -1. C<$window> defaults to 60.
+
+Reach for these rather than a Perl equivalent, because a Perl equivalent is
+wrong in a way that is hard to see: a hash in the worker gives a B<different
+denylist per worker>, and a counter in the worker turns a limit of C<$n> into
+C<workers x $n>. The arena is the one copy all of them share.
+
+All four fail B<open> when there is no arena - outside a running server, or
+on a platform without the atomics it needs - so nothing is denied and nothing
+is limited. That is the same answer the accept path gives itself, and the safe
+one for a check that could not run. Note that a denylist entry added from
+inside a request is enforced at C<accept> from then on, so it takes effect on
+the B<next> connection, not the one that added it.
+
+=head2 on_worker_start
+
+    Hyperman->on_worker_start(sub {
+        $dbh = DBI->connect(...);          # this child's own handle
+        srand;                             # this child's own seed
+    });
+
+    Hyperman->run(app => $app, workers => 4);
+
+Registers a callback that runs once in every worker, B<after the fork> and
+before that worker's loop starts turning. Register before C<run>: the registry
+is read in the child, so a callback added afterwards will never reach the
+workers already running.
+
+A prefork server needs this and PSGI has no standard for it. Anything holding
+a file descriptor - a database handle, a cache connection - is wrong in a
+child that inherited it from the parent, and sharing one across workers
+corrupts it in ways that look like anything but the cause.
+
+Returns 1, or 0 when the table is full (8 callbacks). Croaks on a non-coderef,
+at registration. If the callback dies the death becomes a warning and the
+worker carries on serving: a worker that could not run your setup code is
+still a worker, and one that never starts is an outage - so check what you
+depend on rather than assuming it ran.
+
+The C ABI's C<on_worker_start> is the same registry, for a consumer that would
+rather register a C function than a coderef.
 
 =head1 C ABI
 
@@ -455,7 +508,7 @@ F<hm_abi.h>.
 
 =head2 The table
 
-    #define HM_ABI_VERSION 3
+    #define HM_ABI_VERSION 4
 
     #define HM_ABI_READ  0x1        /* io_watch masks     */
     #define HM_ABI_WRITE 0x2
@@ -470,6 +523,7 @@ F<hm_abi.h>.
     typedef void (*hm_abi_io_cb)(pTHX_ int fd, int mask, void *ud);
     typedef void (*hm_abi_timer_cb)(pTHX_ void *ud);
     typedef void (*hm_abi_ready_cb)(pTHX_ SV *future, void *ud);
+    typedef void (*hm_abi_worker_cb)(pTHX_ void *loop, void *ud);
 
     typedef struct hm_abi {
         int abi_version;                          /* == HM_ABI_VERSION */
@@ -515,7 +569,32 @@ F<hm_abi.h>.
         void (*deny_remove)(const char *ip);
         int  (*ratelimit_hit)(const void *key, STRLEN klen,
                               IV limit, IV window, IV *remaining, IV *reset);
+
+        /* v4: run cb once in every worker, AFTER the fork, in the child,
+         * with that child's own loop, before the loop starts turning.
+         * Register before run(). Fires in the single-worker case too.
+         * Returns 1, or 0 when the table is full. */
+        int (*on_worker_start)(pTHX_ hm_abi_worker_cb cb, void *ud);
     } hm_abi;
+
+C<on_worker_start> is the seam for anything a consumer owns that is bound to
+an event loop. A flush timer, a wakeup listener, a metrics reader: none of
+them can be created before C<run>, because the loop they would attach to is
+not the loop that ends up serving - a prefork server has forked by then, and
+on kqueue the child's copy of the descriptor is not even valid. This is the
+one moment where the loop exists, belongs to the process that will serve, and
+has not started turning.
+
+    static void on_worker(pTHX_ void *loop, void *ud) {
+        A->timer(aTHX_ loop, 5.0, flush, ud);      /* the child's own loop */
+    }
+    A->on_worker_start(aTHX_ on_worker, ud);       /* before run() */
+
+L</on_worker_start> is the same registry as a class method, for an
+application that wants to reopen a database handle rather than attach a
+watcher. A Perl callback is handed no loop - C<< Hyperman->loop >> is the
+worker's own once it is running - because the useful thing to do with the raw
+pointer is a C entry point.
 
 =head2 Hyperman::_abi_ptr
 
@@ -591,6 +670,11 @@ function of the clock, exactly as the arena describes.
 
 L<Punk> builds its C<rate_limit> keyword, C<< $c->block_ip >> and
 C<< $c->rate_hit >> on these four.
+
+The same four are class methods for a consumer that is not an XS module - see
+L</Denylist and rate limiting>. They are the same arena and interchangeable
+with these; what differs is a Perl call per invocation instead of none, which
+is why the framework-level keywords are built on the C entries.
 
 =head2 Contracts
 

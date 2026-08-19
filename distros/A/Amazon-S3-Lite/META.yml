@@ -25,19 +25,30 @@ no_index:
 provides:
   Amazon::S3::Lite:
     file: lib/Amazon/S3/Lite.pm
-    version: v1.2.2
+    version: v1.3.1
+  Amazon::S3::Lite::Constants:
+    file: lib/Amazon/S3/Lite/Constants.pm
+    version: '0'
   Amazon::S3::Lite::Credentials:
     file: lib/Amazon/S3/Lite/Credentials.pm
-    version: v1.2.2
+    version: v1.3.1
   Amazon::S3::Lite::Logger:
     file: lib/Amazon/S3/Lite/Logger.pm
-    version: v1.2.2
+    version: v1.3.1
+  Amazon::S3::Lite::Policies:
+    file: lib/Amazon/S3/Lite/Policies.pm
+    version: '0'
 requires:
   Amazon::Signature4::Lite: v1.0.0
+  Carp::Always: '0.16'
   HTTP::Tiny: '0.088'
   IO::Socket::SSL: '0'
+  JSON::PP: '4.16'
   List::Util: '0'
   Net::SSLeay: '0'
+  Readonly: '2.05'
+  Role::Tiny: '2.002004'
+  Role::Tiny::With: '2.002004'
   URI::Escape: '5.34'
   XML::Twig: '0'
   perl: '5.010'
@@ -45,5 +56,5 @@ resources:
   bugtracker: http://github.com/rlauer6/Amazon-S3-Lite/issues
   homepage: http://github.com/rlauer6/Amazon-S3-Lite.git
   repository: git://github.com/rlauer6/Amazon-S3-Lite.git
-version: v1.2.2
+version: v1.3.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,14 @@
 Revision history for Punk-OAuth2
 
+0.04    2026-08-18
+        - SECURITY fix CVE-2026-75866: the authorization server issued access tokens outside
+          a client's registration, reported by cpansec. 
+        - grant_types and scopes are now enforced, deny by default.
+        - SECURITY: client_credentials is refused to a public client with
+          invalid_client (RFC 6749 4.4). 
+        - COMPATIBILITY: a client registered without scopes now gets no
+          scope, and one registered without grant_types can use no grant.
+
 0.03    2026-08-18
         - SECURITY: fix an open redirect in same_origin_path
           (CVE-2026-75628) reported by cpansec. The guard rejected a leading "//" and any

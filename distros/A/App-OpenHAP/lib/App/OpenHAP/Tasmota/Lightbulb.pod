@@ -1,0 +1,83 @@
+=head1 NAME
+
+App::OpenHAP::Tasmota::Lightbulb - Tasmota light HAP accessory
+
+=head1 SYNOPSIS
+
+    use App::OpenHAP::Tasmota::Lightbulb;
+
+    my $light = App::OpenHAP::Tasmota::Lightbulb->new(
+        aid => 4,
+        name => 'Living Room Light',
+        mqtt_topic => 'tasmota_445566',
+        mqtt_client => $mqtt,
+        capabilities => App::OpenHAP::Tasmota::Lightbulb::CAP_DIMMER
+            | App::OpenHAP::Tasmota::Lightbulb::CAP_COLOR,
+    );
+
+=head1 DESCRIPTION
+
+This module implements a HAP Lightbulb accessory for a Tasmota light.
+It is an L<App::OpenHAP::Tasmota::Device>, so it inherits the MQTT
+subscriptions and the availability state.
+
+The accessory always publishes the C<On> characteristic. The other
+characteristics follow the capability flags, because a controller that
+sees a characteristic expects the device to answer it.
+
+=head1 CAPABILITY FLAGS
+
+C<capabilities> is a bit mask. The default is C<CAP_DIMMER>.
+
+=over 4
+
+=item C<CAP_DIMMER> (1)
+
+The light dims. The accessory adds C<Brightness>, and it drives the
+Tasmota C<Dimmer> command.
+
+=item C<CAP_COLOR> (2)
+
+The light has color. The accessory adds C<Hue> and C<Saturation>, and
+it drives the Tasmota C<HSBColor> command.
+
+=item C<CAP_CT> (4)
+
+The light has an adjustable white. The accessory adds
+C<ColorTemperature>, and it drives the Tasmota C<CT> command.
+
+=back
+
+=head1 CHARACTERISTICS
+
+=over 4
+
+=item C<On>
+
+The power state. It follows C<POWER> in the state messages, and a write
+publishes a power command.
+
+=item C<Brightness>
+
+A percentage from 0 to 100, which is also the Tasmota C<Dimmer> range.
+No conversion is necessary.
+
+=item C<Hue>
+
+Degrees from 0 to 360, and C<Saturation> is a percentage from 0 to 100.
+Both come from the Tasmota C<HSBColor> triple, and a write publishes the
+whole triple: Tasmota takes hue, saturation, and brightness together.
+
+=item C<ColorTemperature>
+
+Mireds from 153 to 500. That is the Tasmota C<CT> range as well, so the
+value passes through, clamped at both ends.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::OpenHAP::Tasmota::Device>, L<Protocol::HAP::Characteristic>,
+F<spec/HAP-Characteristics.md>, F<spec/MQTT-Control.md>
+
+=cut

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.20';
 
 sub new { bless {}, $_[0] }
 
@@ -28,7 +28,9 @@ Punk::Plugin - base class for Punk plugins
     sub register {
         my ($self, $app, $opts) = @_;
         $app->helper(rid => sub { my ($c) = @_; $c->stash->{rid} });
-        $app->hook(before_dispatch => sub {
+        # before_request, not before_dispatch: an id every request has,
+        # including the ones that 404 or never match a route at all
+        $app->hook(before_request => sub {
             my ($c) = @_;
             $c->stash->{rid} = ++$rid;
             return;

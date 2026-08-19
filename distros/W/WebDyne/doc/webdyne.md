@@ -185,9 +185,9 @@ modules via CPAN. Installation via Docker is also supported.
 When installing WebDyne there are two components which are required
 before you can begin serving PSP files:
 
--   The core WebDyne Perl modules
+- The core WebDyne Perl modules
 
--   A web server or application configured to use WebDyne.
+- A web server or application configured to use WebDyne.
 
 WebDyne will work with Apache mod_perl, PAGI or PSGI compatible web
 servers (such as Plack, Starman etc.).
@@ -788,48 +788,45 @@ entrypoint uses the following environment variables:
 
 `PORT`
 
-:   The TCP port the selected server listens on inside the container. If
-    omitted, the entrypoint uses `8080`. The docker `-p` mapping should
-    map the same container port, for example
-    `-e PORT=5002 -p 5002:5002`.
+: The TCP port the selected server listens on inside the container. If
+  omitted, the entrypoint uses `8080`. The docker `-p` mapping should
+  map the same container port, for example `-e PORT=5002 -p 5002:5002`.
 
 `WEBDYNE_SERVER`
 
-:   Selects the server used by the default container command. Supported
-    values are `psgi` and `pagi`. If omitted, `psgi` is used. `psgi`
-    runs `starman -MWebDyne` with `webdyne.psgi`. `pagi` runs
-    `pagi-server` with `webdyne.pagi`, enabling PAGI request handling
-    such as SSE and WebSocket support where the application uses those
-    features. Any other value causes the entrypoint to exit with an
-    error.
+: Selects the server used by the default container command. Supported
+  values are `psgi` and `pagi`. If omitted, `psgi` is used. `psgi` runs
+  `starman -MWebDyne` with `webdyne.psgi`. `pagi` runs `pagi-server`
+  with `webdyne.pagi`, enabling PAGI request handling such as SSE and
+  WebSocket support where the application uses those features. Any other
+  value causes the entrypoint to exit with an error.
 
 `DOCUMENT_ROOT`
 
-:   The WebDyne document root passed through to `webdyne.psgi` or
-    `webdyne.pagi`. The published images default this to `/app`.
-    Override it when mounting application files somewhere else in the
-    container.
+: The WebDyne document root passed through to `webdyne.psgi` or
+  `webdyne.pagi`. The published images default this to `/app`. Override
+  it when mounting application files somewhere else in the container.
 
 `DOCUMENT_DEFAULT`
 
-:   The default document to serve from `DOCUMENT_ROOT`. If omitted, the
-    command wrappers enable WebDyne's built-in default index behavior,
-    which uses `app.psp` in the published Docker images.
+: The default document to serve from `DOCUMENT_ROOT`. If omitted, the
+  command wrappers enable WebDyne's built-in default index behavior,
+  which uses `app.psp` in the published Docker images.
 
 `WEBDYNE_CACHE_DN`
 
-:   The WebDyne compile/cache directory. The published images set this
-    to `/opt/webdyne/cache` by default via the image's
-    `PERL_CARTON_PATH`. Override it if the cache should live on a
-    mounted volume or another writable directory.
+: The WebDyne compile/cache directory. The published images set this to
+  `/opt/webdyne/cache` by default via the image's `PERL_CARTON_PATH`.
+  Override it if the cache should live on a mounted volume or another
+  writable directory.
 
 `PERL_CARTON_PATH`
 
-:   The local Perl installation prefix inside the image. The published
-    images default this to `/opt/webdyne` and use it to set `PERL5LIB`,
-    `PATH`, the default `WEBDYNE_CACHE_DN`, and the path to the bundled
-    `webdyne.psgi` and `webdyne.pagi` wrappers. This is normally only
-    changed when building a custom image.
+: The local Perl installation prefix inside the image. The published
+  images default this to `/opt/webdyne` and use it to set `PERL5LIB`,
+  `PATH`, the default `WEBDYNE_CACHE_DN`, and the path to the bundled
+  `webdyne.psgi` and `webdyne.pagi` wrappers. This is normally only
+  changed when building a custom image.
 
 See the [Docker Runtime Server Tuning](#docker_runtime_server_tuning)
 reference section for server worker, timeout and connection limit
@@ -1866,17 +1863,17 @@ sub hello {
 
 Other variable types are available also, including:
 
--   `@{var,var,..}` for arrays, e.g. `@{'foo', 'bar'}`
+- `@{var,var,..}` for arrays, e.g. `@{'foo', 'bar'}`
 
--   `%{key=>value, key=>value, ..}` for hashes e.g.`%{ a=>1, b=>2 }`
+- `%{key=>value, key=>value, ..}` for hashes e.g.`%{ a=>1, b=>2 }`
 
--   `+{varname}` for CGI form parameters, e.g. `+{firstname}`
+- `+{varname}` for CGI form parameters, e.g. `+{firstname}`
 
--   `*{varname}`for environment variables, e.g. `*{HTTP_USER_AGENT}`
+- `*{varname}`for environment variables, e.g. `*{HTTP_USER_AGENT}`
 
--   `^{requestmethod}` for Apache request (`$r=Apache->request`) object
-    methods, e.g. `^{protocol}`. Only available for in Apache/mod_perl,
-    and only useful for request methods that return a scalar value.
+- `^{requestmethod}` for Apache request (`$r=Apache->request`) object
+  methods, e.g. `^{protocol}`. Only available for in Apache/mod_perl,
+  and only useful for request methods that return a scalar value.
 
 The following template uses techniques and tags discussed later, but
 should provide an example of potential variable usage:
@@ -2410,24 +2407,24 @@ Where:
 
 app.psp
 
-:   The main and default psp file
+: The main and default psp file
 
 app.pm
 
-:   Perl code used in the psp file
+: Perl code used in the psp file
 
 cpanfile
 
-:   A list of Perl modules to be installed in the docker container by
-    cpanm
+: A list of Perl modules to be installed in the docker container by
+  cpanm
 
 Dockerfile
 
-:   The docker build file
+: The docker build file
 
 webdyne.conf.pl
 
-:   Any variables to be set for the WebDyne environment
+: Any variables to be set for the WebDyne environment
 
 Constitute all the files needed to stand up a WebDyne based application
 in a Docker container. The contents of the Dockerfile are minimal:
@@ -3506,24 +3503,38 @@ using the &lt;api&gt; tag in conjunction with the Router::Simple CPAN
 module. Documents that utilise the &lt;api&gt; tag are somewhat unique in
 that:
 
--   There is no need for any other tags in the document besides the
-    &lt;api&gt; tag. All other tags are ignored - in fact they are
-    discarded.
+- There is no need for any other tags in the document besides the
+  &lt;api&gt; tag. All other tags are ignored - in fact they are discarded.
 
--   Any PSP file file an &lt;api&gt; tag will only emit JSON data with a
-    content type of "`application/json`"
+- Any PSP file file an &lt;api&gt; tag will only emit JSON data with a
+  content type of "`application/json`"
 
--   The REST api path must correspond to a PSP file at some path level,
-    e.g. if your path is `/api/user/42` you must have a file called
-    either "`api.psp`" or "`api/user.psp`" in your path.
+- The REST api path must correspond to a PSP file at some path level,
+  e.g. if your path is `/api/user/42` you must have a file called either
+  "`api.psp`" or "`api/user.psp`" in your path.
 
--   A PSP file can contain multiple &lt;api&gt; tags corresponding to
-    different `Router::Simple` routes
+- A PSP file can contain multiple &lt;api&gt; tags corresponding to
+  different `Router::Simple` routes
 
--   PSGI and PAGI maintain a basic in-process cache of discovered API
-    PSP filenames to avoid repeated filesystem checks. If API filenames
-    or API path structure are changed, a server restart may be required
-    for the changes to be discovered.
+- The pattern should start at the API PSP filename, not at the document
+  root. For example, a file called `api.psp` should normally use a
+  pattern such as `/api/user/:id`, even if the file is served from a
+  subdirectory such as `/example/api.psp`.
+
+- PSGI and PAGI maintain a basic in-process cache of discovered API PSP
+  filenames to avoid repeated filesystem checks. If API filenames or API
+  path structure are changed, a server restart may be required for the
+  changes to be discovered.
+
+!!! tip
+
+    API pattern paths are intended to be portable between document roots. If
+    `example/api.psp` is served as `/example/api/user/bob/42`, the &lt;api&gt;
+    pattern should still be `/api/user/{user}/:id`, not
+    `/example/api/user/{user}/:id`. WebDyne is forgiving by default and will
+    strip an accidental directory prefix before the PSP filename from the
+    pattern. Set `WEBDYNE_API_STRIP_PREFIX` to 0 if exact pattern matching
+    is preferred.
 
 Here is a very simple example. Note the format of the URL in the Run
 hyperlink:
@@ -4135,10 +4146,10 @@ with no collision.
 
 Errors (exceptions) can be generated within a WebDyne page in two ways:
 
--   By calling die() as shown in example above.
+- By calling die() as shown in example above.
 
--   By returning an error message via the err() method, exported by
-    default.
+- By returning an error message via the err() method, exported by
+  default.
 
 Examples
 
@@ -4234,82 +4245,80 @@ own help or manual output for detailed options.
 
 `wdapacheinit`
 
-:   Runs the WebDyne initialization routines, which create needed
-    directories, modify and create Apache .conf files etc.
+: Runs the WebDyne initialization routines, which create needed
+  directories, modify and create Apache .conf files etc.
 
-    [Full manual page](utilities/wdapacheinit.md){.manual-page-new-tab}
+  [Full manual page](utilities/wdapacheinit.md){target="_blank" rel="noopener"}
 
 `wdcompile`
 
-:   Usage: `wdcompile filename.psp`. Will compile a PSP file and use
-    Data::Dumper to display the WebDyne internal representation of the
-    page tree structure. Useful as a troubleshooting tool to see how
-    HTML::TreeBuilder has parsed your source file, and to show up any
-    misplaced tags etc.
+: Usage: `wdcompile filename.psp`. Will compile a PSP file and use
+  Data::Dumper to display the WebDyne internal representation of the
+  page tree structure. Useful as a troubleshooting tool to see how
+  HTML::TreeBuilder has parsed your source file, and to show up any
+  misplaced tags etc.
 
-    [Full manual page](utilities/wdcompile.md){.manual-page-new-tab}
+  [Full manual page](utilities/wdcompile.md){target="_blank" rel="noopener"}
 
 `wdrender`
 
-:   Usage: `wdrender filename.psp`. Will attempt to render the source
-    file to screen using WebDyne. It is useful for testing page output
-    from the command line and can exercise fake, PSGI, PAGI and mod_perl
-    style request backends for troubleshooting.
+: Usage: `wdrender filename.psp`. Will attempt to render the source file
+  to screen using WebDyne. It is useful for testing page output from the
+  command line and can exercise fake, PSGI, PAGI and mod_perl style
+  request backends for troubleshooting.
 
-    [Full manual page](utilities/wdrender.md){.manual-page-new-tab}
+  [Full manual page](utilities/wdrender.md){target="_blank" rel="noopener"}
 
 `wddump`
 
-:   Usage: `wddump filename`. Where filename is a compiled WebDyne
-    source file (usually in `/var/webdyne/cache`). Will dump out the
-    saved data structure of the compiled file.
+: Usage: `wddump filename`. Where filename is a compiled WebDyne source
+  file (usually in `/var/webdyne/cache`). Will dump out the saved data
+  structure of the compiled file.
 
-    [Full manual page](utilities/wddump.md){.manual-page-new-tab}
+  [Full manual page](utilities/wddump.md){target="_blank" rel="noopener"}
 
 `wddebug`
 
-:   Usage: `wddebug --status|--enable|--disable`. Enable/disable
-    debugging in the WebDyne code. This uses some pretty ugly methods to
-    enable debugging in already installed modules by editing the code
-    on-disk to re-enable debug calls - do not use in a production
-    environment !
+: Usage: `wddebug --status|--enable|--disable`. Enable/disable debugging
+  in the WebDyne code. This uses some pretty ugly methods to enable
+  debugging in already installed modules by editing the code on-disk to
+  re-enable debug calls - do not use in a production environment !
 
-    [Full manual page](utilities/wddebug.md){.manual-page-new-tab}
+  [Full manual page](utilities/wddebug.md){target="_blank" rel="noopener"}
 
 `webdyne.psgi`
 
-:   Used to run WebDyne as a PSGI process- usually invoked by Plack via
-    `plackup` or `starman`, but can be run directly for development
-    purposes.
+: Used to run WebDyne as a PSGI process- usually invoked by Plack via
+  `plackup` or `starman`, but can be run directly for development
+  purposes.
 
-    [Full manual page](utilities/webdyne.psgi.md){.manual-page-new-tab}
+  [Full manual page](utilities/webdyne.psgi.md){target="_blank" rel="noopener"}
 
 `webdyne.pagi`
 
-:   Used to run WebDyne as a PAGI application. It can be run directly
-    for development or used as a PAGI application entry point, including
-    PAGI HTTP, SSE and WebSocket request handling where supported by the
-    server.
+: Used to run WebDyne as a PAGI application. It can be run directly for
+  development or used as a PAGI application entry point, including PAGI
+  HTTP, SSE and WebSocket request handling where supported by the
+  server.
 
-    [Full manual page](utilities/webdyne.pagi.md){.manual-page-new-tab}
+  [Full manual page](utilities/webdyne.pagi.md){target="_blank" rel="noopener"}
 
 `webdyne.apache`
 
-:   Starts a temporary Apache mod_perl instance for local development
-    and troubleshooting. It can serve a directory or a single PSP file
-    without installing a full system Apache configuration.
+: Starts a temporary Apache mod_perl instance for local development and
+  troubleshooting. It can serve a directory or a single PSP file without
+  installing a full system Apache configuration.
 
-    [Full manual
-    page](utilities/webdyne.apache.md){.manual-page-new-tab}
+  [Full manual page](utilities/webdyne.apache.md){target="_blank" rel="noopener"}
 
 `wdlint`
 
-:   Run `perl -c -w` over code in \_\_PERL\_\_ sections on any PSP file
-    to check for syntax errors. Will automatically skip HTML code. It
-    only checks code in the \_\_PERL\_\_ area, and won't check syntax in
-    in-line perl, dynamic attributes etc.
+: Run `perl -c -w` over code in \_\_PERL\_\_ sections on any PSP file to
+  check for syntax errors. Will automatically skip HTML code. It only
+  checks code in the \_\_PERL\_\_ area, and won't check syntax in
+  in-line perl, dynamic attributes etc.
 
-    [Full manual page](utilities/wdlint.md){.manual-page-new-tab}
+  [Full manual page](utilities/wdlint.md){target="_blank" rel="noopener"}
 
 # Modules
 
@@ -4318,75 +4327,75 @@ files maintained beside the Perl modules in `lib`. They are copied into
 the MkDocs tree during documentation generation so the source module
 documentation only needs to be maintained in one place.
 
--   [`WebDyne`](modules/WebDyne.md){.manual-page-new-tab}
+- [`WebDyne`](modules/WebDyne.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::CGI`](modules/WebDyne_CGI.md){.manual-page-new-tab}
+- [`WebDyne::CGI`](modules/WebDyne_CGI.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::CGI::Simple`](modules/WebDyne_CGI_Simple.md){.manual-page-new-tab}
+- [`WebDyne::CGI::Simple`](modules/WebDyne_CGI_Simple.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Cache`](modules/WebDyne_Cache.md){.manual-page-new-tab}
+- [`WebDyne::Cache`](modules/WebDyne_Cache.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Chain`](modules/WebDyne_Chain.md){.manual-page-new-tab}
+- [`WebDyne::Chain`](modules/WebDyne_Chain.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Chain::Constant`](modules/WebDyne_Chain_Constant.md){.manual-page-new-tab}
+- [`WebDyne::Chain::Constant`](modules/WebDyne_Chain_Constant.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Compile`](modules/WebDyne_Compile.md){.manual-page-new-tab}
+- [`WebDyne::Compile`](modules/WebDyne_Compile.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Constant`](modules/WebDyne_Constant.md){.manual-page-new-tab}
+- [`WebDyne::Constant`](modules/WebDyne_Constant.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Err`](modules/WebDyne_Err.md){.manual-page-new-tab}
+- [`WebDyne::Err`](modules/WebDyne_Err.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Err::Constant`](modules/WebDyne_Err_Constant.md){.manual-page-new-tab}
+- [`WebDyne::Err::Constant`](modules/WebDyne_Err_Constant.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Filter`](modules/WebDyne_Filter.md){.manual-page-new-tab}
+- [`WebDyne::Filter`](modules/WebDyne_Filter.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Filter::Constant`](modules/WebDyne_Filter_Constant.md){.manual-page-new-tab}
+- [`WebDyne::Filter::Constant`](modules/WebDyne_Filter_Constant.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::HTML::Tiny`](modules/WebDyne_HTML_Tiny.md){.manual-page-new-tab}
+- [`WebDyne::HTML::Tiny`](modules/WebDyne_HTML_Tiny.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::HTML::TreeBuilder`](modules/WebDyne_HTML_TreeBuilder.md){.manual-page-new-tab}
+- [`WebDyne::HTML::TreeBuilder`](modules/WebDyne_HTML_TreeBuilder.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Handler`](modules/WebDyne_Handler.md){.manual-page-new-tab}
+- [`WebDyne::Handler`](modules/WebDyne_Handler.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Install`](modules/WebDyne_Install.md){.manual-page-new-tab}
+- [`WebDyne::Install`](modules/WebDyne_Install.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Install::Apache`](modules/WebDyne_Install_Apache.md){.manual-page-new-tab}
+- [`WebDyne::Install::Apache`](modules/WebDyne_Install_Apache.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Install::Apache::Constant`](modules/WebDyne_Install_Apache_Constant.md){.manual-page-new-tab}
+- [`WebDyne::Install::Apache::Constant`](modules/WebDyne_Install_Apache_Constant.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Install::Constant`](modules/WebDyne_Install_Constant.md){.manual-page-new-tab}
+- [`WebDyne::Install::Constant`](modules/WebDyne_Install_Constant.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::PAGI`](modules/WebDyne_PAGI.md){.manual-page-new-tab}
+- [`WebDyne::PAGI`](modules/WebDyne_PAGI.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::PAGI::Constant`](modules/WebDyne_PAGI_Constant.md){.manual-page-new-tab}
+- [`WebDyne::PAGI::Constant`](modules/WebDyne_PAGI_Constant.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::PSGI`](modules/WebDyne_PSGI.md){.manual-page-new-tab}
+- [`WebDyne::PSGI`](modules/WebDyne_PSGI.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::PSGI::Constant`](modules/WebDyne_PSGI_Constant.md){.manual-page-new-tab}
+- [`WebDyne::PSGI::Constant`](modules/WebDyne_PSGI_Constant.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Request::Apache`](modules/WebDyne_Request_Apache.md){.manual-page-new-tab}
+- [`WebDyne::Request::Apache`](modules/WebDyne_Request_Apache.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Request::Common`](modules/WebDyne_Request_Common.md){.manual-page-new-tab}
+- [`WebDyne::Request::Common`](modules/WebDyne_Request_Common.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Request::Fake`](modules/WebDyne_Request_Fake.md){.manual-page-new-tab}
+- [`WebDyne::Request::Fake`](modules/WebDyne_Request_Fake.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Request::PAGI`](modules/WebDyne_Request_PAGI.md){.manual-page-new-tab}
+- [`WebDyne::Request::PAGI`](modules/WebDyne_Request_PAGI.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Request::PSGI`](modules/WebDyne_Request_PSGI.md){.manual-page-new-tab}
+- [`WebDyne::Request::PSGI`](modules/WebDyne_Request_PSGI.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Request::PSGI::Constant`](modules/WebDyne_Request_PSGI_Constant.md){.manual-page-new-tab}
+- [`WebDyne::Request::PSGI::Constant`](modules/WebDyne_Request_PSGI_Constant.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Request::PSGI::Static`](modules/WebDyne_Request_PSGI_Static.md){.manual-page-new-tab}
+- [`WebDyne::Request::PSGI::Static`](modules/WebDyne_Request_PSGI_Static.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Session`](modules/WebDyne_Session.md){.manual-page-new-tab}
+- [`WebDyne::Session`](modules/WebDyne_Session.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Session::Constant`](modules/WebDyne_Session_Constant.md){.manual-page-new-tab}
+- [`WebDyne::Session::Constant`](modules/WebDyne_Session_Constant.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Static`](modules/WebDyne_Static.md){.manual-page-new-tab}
+- [`WebDyne::Static`](modules/WebDyne_Static.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Template`](modules/WebDyne_Template.md){.manual-page-new-tab}
+- [`WebDyne::Template`](modules/WebDyne_Template.md){target="_blank" rel="noopener"}
 
--   [`WebDyne::Util`](modules/WebDyne_Util.md){.manual-page-new-tab}
+- [`WebDyne::Util`](modules/WebDyne_Util.md){target="_blank" rel="noopener"}
 
 # Reference
 
@@ -4424,140 +4433,140 @@ within the handler.
 
 handler=METHOD
 
-:   Call an external Perl method from a module, or a subroutine in the
-    \_\_PERL\_\_ block at the end of the PSP file. If the handler is
-    specified as "fully qualified" module call (e.g.
-    `Digest::MD5::md5_hex()`) then a require will be made automatically
-    to load the module (`Digest::MD5` in this example)
+: Call an external Perl method from a module, or a subroutine in the
+  \_\_PERL\_\_ block at the end of the PSP file. If the handler is
+  specified as "fully qualified" module call (e.g.
+  `Digest::MD5::md5_hex()`) then a require will be made automatically to
+  load the module (`Digest::MD5` in this example)
 
-    ``` html
-    #  Call method in the same file
-    #
-    <perl handler="hello">
-    __PERL__
-    sub hello {
-    ...
-    }
+  ``` html
+  #  Call method in the same file
+  #
+  <perl handler="hello">
+  __PERL__
+  sub hello {
+  ...
+  }
 
-    #  Call method in another class
-    #
-    <perl handler="Digest::MD5::md5_hex()">
-    ```
+  #  Call method in another class
+  #
+  <perl handler="Digest::MD5::md5_hex()">
+  ```
 
 require=MODULE \| FILE
 
-:   Load a Perl module or file needed to support a method call. E.g.
-    &lt;perl require="Digest::MD5"/&gt; to load the `Digest::MD5` module.
-    Anything with a \[./\\\] character is treated as a file path to a
-    Perl file (e.g. "`/home/user/module.pm`"), otherwise it is treated
-    as module name ("`Digest::MD5`")
+: Load a Perl module or file needed to support a method call. E.g.
+  &lt;perl require="Digest::MD5"/&gt; to load the `Digest::MD5` module.
+  Anything with a \[./\\\] character is treated as a file path to a Perl
+  file (e.g. "`/home/user/module.pm`"), otherwise it is treated as
+  module name ("`Digest::MD5`")
 
-    ``` html
-    #  Load a module
-    #
-    <perl require="Digest::MD5">
+  ``` html
+  #  Load a module
+  #
+  <perl require="Digest::MD5">
 
-    #  Load a file
-    #
-    <perl require="module.pm">
-    ```
+  #  Load a file
+  #
+  <perl require="module.pm">
+  ```
 
 import=FUNCTION \[, FUNCTION …\]
 
-:   Import a single or multiple functions into the file namespace. Use a
-    single SCALAR for importing one function, or pass an ARRAY reference
-    for multiple functions.
+: Import a single or multiple functions into the file namespace. Use a
+  single SCALAR for importing one function, or pass an ARRAY reference
+  for multiple functions.
 
-    ``` html
-    # Import single function
-    #
-    <perl require="Digest::MD5" import="md5_hex">
+  ``` html
+  # Import single function
+  #
+  <perl require="Digest::MD5" import="md5_hex">
 
-    # Import multiple functions
-    #
-    <perl require="Digest::MD5" import="@{'md5_hex', 'md5_base64'}">
-    <perl require="Digest::MD5" import="@{qw(md5_hex md5_base64)}">
-    ```
+  # Import multiple functions
+  #
+  <perl require="Digest::MD5" import="@{'md5_hex', 'md5_base64'}">
+  <perl require="Digest::MD5" import="@{qw(md5_hex md5_base64)}">
+  ```
 
-    Imported methods available anywhere in the namespace of that page.
+  Imported methods available anywhere in the namespace of that page.
 
 param=SCALAR \| HASHREF
 
-:   Parameters to be supplied to perl routine, can be a single SCALAR
-    value (string, numeric etc.) or a HASH reference.
+: Parameters to be supplied to perl routine, can be a single SCALAR
+  value (string, numeric etc.) or a HASH reference.
 
-    ``` html
-    #  Pass parameters to a handler. Single parameter
-    #
-    <perl handler="hello" param="Bob">
+  ``` html
+  #  Pass parameters to a handler. Single parameter
+  #
+  <perl handler="hello" param="Bob">
 
-    #  Pass hash ref
-    #
-    <perl handler="hello" param="%{ name=> 'Bob', age => 42 }">
-    ```
+  #  Pass hash ref
+  #
+  <perl handler="hello" param="%{ name=> 'Bob', age => 42 }">
+  ```
 
 static
 
-:   Boolean flag. The Perl code is run once only and the output cached
-    for all subsequent requests. If omitted the code is not cached (i.e.
-    it is run each time).
+: Boolean flag. The Perl code is run once only and the output cached for
+  all subsequent requests. If omitted the code is not cached (i.e. it is
+  run each time).
 
 run
 
-:   Boolean flag. If evaluated to a true value exists the code is run,
-    if not the code is skipped. If omitted the code is run by default.
-    Useful for conditional running of code when a form has been
-    submitted or a particular logic threshold reached.
+: Boolean flag. If evaluated to a true value exists the code is run, if
+  not the code is skipped. If omitted the code is run by default. Useful
+  for conditional running of code when a form has been submitted or a
+  particular logic threshold reached.
 
-    ``` html
-    #  Run code only at 4am
-    #
-    <perl handler="banner" run="(localtime)[2] == 4">
+  ``` html
+  #  Run code only at 4am
+  #
+  <perl handler="banner" run="(localtime)[2] == 4">
 
-    #  Run code only if a "name" form parameter supplied, all below equivalent
-    #
-    <perl handler="hello" run="+{name}"> ...
-    <perl handler="hello" run="!{! exists $_{'name'} !}"> ...
-    <perl handler="hello" run="!{! defined shift()->CGI->param('name') !}
-    ```
+  #  Run code only if a "name" form parameter supplied, all below equivalent
+  #
+  <perl handler="hello" run="+{name}"> ...
+  <perl handler="hello" run="!{! exists $_{'name'} !}"> ...
+  <perl handler="hello" run="!{! defined shift()->CGI->param('name') !}
+  ```
 
 file
 
-:   Boolean flag. Force package\|require attribute value to be treated
-    as a file, even if it appears to "look like" a module name to the
-    loader. Rarely needed, use case would be a Perl module in the
-    current directory without an extension.
+: Boolean flag. Force package\|require attribute value to be treated as
+  a file, even if it appears to "look like" a module name to the loader.
+  Rarely needed, use case would be a Perl module in the current
+  directory without an extension.
 
 hidden
 
-:   Boolean flag. The output from the Perl module will be hidden and not
-    rendered to the page.
+: Boolean flag. The output from the Perl module will be hidden and not
+  rendered to the page.
 
 display=0
 
-:   Equivalent to setting hidden attribute.
+: Equivalent to setting hidden attribute.
 
 method=METHOD
 
-:   Compatibility alias for handler. Prefer handler in new documentation
-    and examples.
+: Compatibility alias for handler. Prefer handler in new documentation
+  and examples.
 
 package=PACKAGE
 
-:   Optional package component used when constructing a fully qualified
-    handler call. Prefer a fully qualified handler value unless
-    separating the package and method names is useful for compatibility
-    with older PSP files.
+: Optional package component used when constructing a fully qualified
+  handler call. Prefer a fully qualified handler value unless separating
+  the package and method names is useful for compatibility with older
+  PSP files.
 
 chomp
 
-:   Boolean flag. Any new lines at the end of the output will be
-    truncated.
+: Boolean flag. Any new lines at the end of the output will be
+  truncated.
 
 autonewline
 
-:   Boolean flag. A newline character will be inserted between each
-    print statement.
+: Boolean flag. A newline character will be inserted between each print
+  statement.
 
 #### &lt;json&gt; {#tag_json}
 
@@ -4582,33 +4591,32 @@ executed.
 
 id=NAME
 
-:   the DOM ID the &lt;script&gt; tag output from the tag will be given,
-    e.g.
-    `<script id="mydata" type="application/json">{"foo":1}</script>`
+: the DOM ID the &lt;script&gt; tag output from the tag will be given, e.g.
+  `<script id="mydata" type="application/json">{"foo":1}</script>`
 
 pretty
 
-:   Boolean flag. Use the JSON pretty() method to format the output data
-    into something more human readable. Not enabled by default. Enable
-    with pretty=1 attribute or globally via `$WEBDYNE_JSON_PRETTY=1`
-    configuration setting.
+: Boolean flag. Use the JSON pretty() method to format the output data
+  into something more human readable. Not enabled by default. Enable
+  with pretty=1 attribute or globally via `$WEBDYNE_JSON_PRETTY=1`
+  configuration setting.
 
 canonical
 
-:   Boolean flag. Use the JSON canonical() method to sort JSON data.
-    Enabled by default, disable using canonical=0 attribute value or via
-    `$WEBDYNE_JSON_CANONICAL=0` configuration setting.
+: Boolean flag. Use the JSON canonical() method to sort JSON data.
+  Enabled by default, disable using canonical=0 attribute value or via
+  `$WEBDYNE_JSON_CANONICAL=0` configuration setting.
 
 perl
 
-:   Interpret content between starting and ending &lt;json&gt; tag as perl
-    code and run it. The code should return a HASH, ARRAY or BOOLEAN
-    value which will then be encoded to JSON data.
+: Interpret content between starting and ending &lt;json&gt; tag as perl
+  code and run it. The code should return a HASH, ARRAY or BOOLEAN value
+  which will then be encoded to JSON data.
 
 handler=METHOD
 
-:   Call the perl method nominated. The code should return a HASH, ARRAY
-    or BOOLEAN value which will then be encoded to JSON data.
+: Call the perl method nominated. The code should return a HASH, ARRAY
+  or BOOLEAN value which will then be encoded to JSON data.
 
 !!! note
 
@@ -4641,31 +4649,30 @@ render_block() Webdyne method:
 
 name=NAME
 
-:   *Mandatory.* The name for this block of PSP or HTML. Referenced when
-    rendering a particular block within perl code, e.g.
-    `return $self->render_block("foo")`
+: *Mandatory.* The name for this block of PSP or HTML. Referenced when
+  rendering a particular block within perl code, e.g.
+  `return $self->render_block("foo")`
 
 display
 
-:   Boolean flag. Force display of this block even if not invoked by
-    render_block() method in handler. Useful for prototyping or
-    conditional display. Any true value will force display, so this can
-    be coupled with a form parameter to only show a block when a form
-    has been submitted in a similar form to the &lt;perl&gt; tag run
-    attribute.
+: Boolean flag. Force display of this block even if not invoked by
+  render_block() method in handler. Useful for prototyping or
+  conditional display. Any true value will force display, so this can be
+  coupled with a form parameter to only show a block when a form has
+  been submitted in a similar form to the &lt;perl&gt; tag run attribute.
 
-    ``` html
-    #  Only show a block if a name parameter has been supplied
-    #
-    <block name="showname" display="+{name}">
-    Thank you for registering +{name} !
-    </block>
-    ```
+  ``` html
+  #  Only show a block if a name parameter has been supplied
+  #
+  <block name="showname" display="+{name}">
+  Thank you for registering +{name} !
+  </block>
+  ```
 
 static
 
-:   Boolean flag. This block is rendered once only and the output cached
-    for all subsequent requests
+: Boolean flag. This block is rendered once only and the output cached
+  for all subsequent requests
 
 #### &lt;include&gt; {#tag_include}
 
@@ -4688,47 +4695,47 @@ context of the current page.
 
 file=PATH \| ARRAYREF
 
-:   *Mandatory*. Name of file or files we want to include. Can be
-    relative to current directory or absolute path.
+: *Mandatory*. Name of file or files we want to include. Can be relative
+  to current directory or absolute path.
 
 head
 
-:   Boolean flag. File is an HTML or PSP file and we want to include
-    just the &lt;head&gt; section
+: Boolean flag. File is an HTML or PSP file and we want to include just
+  the &lt;head&gt; section
 
 body
 
-:   Boolean flag/ File is an HTML or PSP file and we want to include
-    just the &lt;body&gt; section.
+: Boolean flag/ File is an HTML or PSP file and we want to include just
+  the &lt;body&gt; section.
 
 block=NAME
 
-:   File is a PSP file and we want to include a &lt;block&gt; section from
-    that file with the nominated name.
+: File is a PSP file and we want to include a &lt;block&gt; section from
+  that file with the nominated name.
 
 wrap=TAG
 
-:   Wrap the text from a plain file include in the nominated tag. Do not
-    use &lt;&gt; symbols, just the plain tag name. This option applies when
-    including a file directly, not when extracting head, body, or block
-    content from another HTML or PSP file.
+: Wrap the text from a plain file include in the nominated tag. Do not
+  use &lt;&gt; symbols, just the plain tag name. This option applies when
+  including a file directly, not when extracting head, body, or block
+  content from another HTML or PSP file.
 
-    ``` html
-    #  Include the protocols file and wrap in <pre>
-    #
-    <include="/etc/protocols" wrap="pre">
-    ```
+  ``` html
+  #  Include the protocols file and wrap in <pre>
+  #
+  <include="/etc/protocols" wrap="pre">
+  ```
 
 param=HASHREF
 
-:   Parameter hash supplied while rendering included PSP content. This
-    is used when extracting a head, body, or named block from another
-    PSP file.
+: Parameter hash supplied while rendering included PSP content. This is
+  used when extracting a head, body, or named block from another PSP
+  file.
 
 nocache
 
-:   Don't cache the results of the include, bring them in off disk each
-    time. Will incur performance penalty
+: Don't cache the results of the include, bring them in off disk each
+  time. Will incur performance penalty
 
 #### &lt;api&gt; {#tag_api}
 
@@ -4750,23 +4757,29 @@ from perl code are encoded as JSON and returned.
 
 pattern=ROUTE
 
-:   *Mandatory*. Name of `Router::Simple` pattern we want to serve, e.g.
-    /api/{user}/:id. The match attribute is accepted as an alias.
+: *Mandatory*. Name of `Router::Simple` pattern we want to serve, e.g.
+  /api/{user}/:id. The match attribute is accepted as an alias. The
+  route should begin with the PSP filename stem, so routes in `api.psp`
+  should begin with `/api/` regardless of whether the file is located at
+  the document root or in a subdirectory. By default WebDyne will strip
+  an accidental document-root prefix before that filename stem, e.g.
+  `/example/api/{user}/:id` is treated as `/api/{user}/:id`. Disable
+  this with `WEBDYNE_API_STRIP_PREFIX` if required.
 
 destination=HASHREF \| dest=HASHREF \| data=HASHREF
 
-:   Hash we want to supply to perl routine if match made. See
-    `Router::Simple`
+: Hash we want to supply to perl routine if match made. See
+  `Router::Simple`
 
 option=HASHREF \| options=HASHREF \| constraint=HASHREF \| constraints=HASHREF
 
-:   Match options, GET, PUT etc. `Router::Simple`
+: Match options, GET, PUT etc. `Router::Simple`
 
 canonical
 
-:   Boolean flag. Use the JSON canonical() method to sort JSON response
-    data. Enabled by default, disable using canonical=0 attribute value
-    or via `$WEBDYNE_JSON_CANONICAL=0` configuration setting.
+: Boolean flag. Use the JSON canonical() method to sort JSON response
+  data. Enabled by default, disable using canonical=0 attribute value or
+  via `$WEBDYNE_JSON_CANONICAL=0` configuration setting.
 
 #### &lt;htmx&gt; {#tag_htmx}
 
@@ -4787,50 +4800,50 @@ tags is treated as in-line perl code and executed.
 
 display
 
-:   Boolean. If evaluates to true then this &lt;htmx&gt; snippet fires. You
-    can have multiple htmx tag sections in a page, but only one can fire
-    at a time. Use this attribute in conjunction with dynamic evaluation
+: Boolean. If evaluates to true then this &lt;htmx&gt; snippet fires. You
+  can have multiple htmx tag sections in a page, but only one can fire
+  at a time. Use this attribute in conjunction with dynamic evaluation
 
-    ``` html
-    #  Fire htmx tag only if a name parameter matches
-    #
-    <htmx display="!{! $_{name} eq 'Bob' !}">
-    Hello Bob
-    </htmx>
+  ``` html
+  #  Fire htmx tag only if a name parameter matches
+  #
+  <htmx display="!{! $_{name} eq 'Bob' !}">
+  Hello Bob
+  </htmx>
 
 
-    #  Or Alice. Both tags can live in same document as only one will ever fire
-    #
-    <htmx display="!{! $_{name} eq 'Alice' !}">
-    Hello Alice
-    </htmx>
-    ```
+  #  Or Alice. Both tags can live in same document as only one will ever fire
+  #
+  <htmx display="!{! $_{name} eq 'Alice' !}">
+  Hello Alice
+  </htmx>
+  ```
 
 force
 
-:   Boolean. Force the code referenced by a &lt;htmx&gt; tag to run, and
-    content be returned/displayed even if the request is not triggered
-    by the htmx javascript module (which is determined by looking for a
-    `hx-request` HTTP header). Useful for troubleshooting/debugging
-    and/or showing what the generated HTML snippet will look like. Can
-    be dynamic and be triggered by GET parameter:
+: Boolean. Force the code referenced by a &lt;htmx&gt; tag to run, and
+  content be returned/displayed even if the request is not triggered by
+  the htmx javascript module (which is determined by looking for a
+  `hx-request` HTTP header). Useful for troubleshooting/debugging and/or
+  showing what the generated HTML snippet will look like. Can be dynamic
+  and be triggered by GET parameter:
 
-    ``` html
-    <htmx force="+{debug}">
-    This is my output
-    </htmx>
-    ```
+  ``` html
+  <htmx force="+{debug}">
+  This is my output
+  </htmx>
+  ```
 
 perl
 
-:   Boolean. Interpret content between starting and ending &lt;htmx&gt; tags
-    as perl code and run it. Anything returned by the perl code will be
-    sent as the HTML fragment.
+: Boolean. Interpret content between starting and ending &lt;htmx&gt; tags
+  as perl code and run it. Anything returned by the perl code will be
+  sent as the HTML fragment.
 
 handler=METHOD
 
-:   Call the perl method nominated. Whatever is returned or rendered by
-    the handler will be returned as the HTML fragment.
+: Call the perl method nominated. Whatever is returned or rendered by
+  the handler will be returned as the HTML fragment.
 
 #### &lt;dump&gt; {#tag_dump}
 
@@ -4855,37 +4868,37 @@ Useful while troubleshooting or debugging pages.
 
 display\|force
 
-:   Boolean. Force display even if `$WEBDYNE_DUMP_FLAG` global not set
+: Boolean. Force display even if `$WEBDYNE_DUMP_FLAG` global not set
 
 all
 
-:   Boolean. Display all diagnostic blocks
+: Boolean. Display all diagnostic blocks
 
 cgi
 
-:   CGI parameters and query strings are always displayed once dump
-    output is enabled.
+: CGI parameters and query strings are always displayed once dump output
+  is enabled.
 
 env
 
-:   Boolean. Display environment variables
+: Boolean. Display environment variables
 
 lib \| inc
 
-:   Boolean. Display the Perl include paths and loaded module table
-    (`@INC` and `%INC`).
+: Boolean. Display the Perl include paths and loaded module table
+  (`@INC` and `%INC`).
 
 constant
 
-:   Boolean. Display WebDyne configuration constants.
+: Boolean. Display WebDyne configuration constants.
 
 dir_config
 
-:   Boolean. Display WebDyne request directory configuration.
+: Boolean. Display WebDyne request directory configuration.
 
 version
 
-:   Version strings are always displayed once dump output is enabled.
+: Version strings are always displayed once dump output is enabled.
 
 #### &lt;start_html&gt; {#tag_start_html}
 
@@ -4943,264 +4956,262 @@ resources around configured defaults instead of replacing them.
 
 title=TEXT
 
-:   Content to be inserted into the &lt;title&gt; section tag.
+: Content to be inserted into the &lt;title&gt; section tag.
 
 meta=HASHREF
 
-:   Meta section content, supplied as a hash reference. Processing is
-    nuanced. Standard *key*=&gt;*value* hash pairs are displayed as &lt;meta
-    name=key content=value&gt; meta tags. Pairs of the type
-    *"property=name"=&gt;value* are displayed as &lt;meta property=name
-    content=value&gt;.
+: Meta section content, supplied as a hash reference. Processing is
+  nuanced. Standard *key*=&gt;*value* hash pairs are displayed as &lt;meta
+  name=key content=value&gt; meta tags. Pairs of the type
+  *"property=name"=&gt;value* are displayed as &lt;meta property=name
+  content=value&gt;.
 
-    ``` html
-    <start_html meta="%{ author => 'Bob Smith', 'http-equiv=refresh' => '5; url=https://www.example.com' }">
-    ```
+  ``` html
+  <start_html meta="%{ author => 'Bob Smith', 'http-equiv=refresh' => '5; url=https://www.example.com' }">
+  ```
 
-    Will produce:
+  Will produce:
 
-    ``` html
-    <meta name="author" content="Bob Smith">
-    <meta http-equiv="refresh" content="5; url=https://www.example.com" >
-    ```
+  ``` html
+  <meta name="author" content="Bob Smith">
+  <meta http-equiv="refresh" content="5; url=https://www.example.com" >
+  ```
 
 style=URL \| ARRAYREF
 
-:   Stylesheets to load. Values to this attribute will be output as href
-    attributes of type rel=stylesheet in a &lt;link&gt; tag.
+: Stylesheets to load. Values to this attribute will be output as href
+  attributes of type rel=stylesheet in a &lt;link&gt; tag.
 
-    ``` html
-    <start_html style="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4">
-    ```
+  ``` html
+  <start_html style="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4">
+  ```
 
-    Will produce:
+  Will produce:
 
-    ``` html
-    <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" rel="stylesheet">
-    ```
+  ``` html
+  <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" rel="stylesheet">
+  ```
 
-    Array types are supported as values to the style property to allow
-    multiple style sheet &lt;link&gt; tags to be created at once, e.g.
+  Array types are supported as values to the style property to allow
+  multiple style sheet &lt;link&gt; tags to be created at once, e.g.
 
-    ``` html
-    <start_html style="@{
-        'https://cdn.jsdelivr.net/npm/water.css@2/out/water.css',
-        'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'
-    }">
-    ```
+  ``` html
+  <start_html style="@{
+      'https://cdn.jsdelivr.net/npm/water.css@2/out/water.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'
+  }">
+  ```
 
-    Will produce:
+  Will produce:
 
-    ``` html
-    <link href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-    ```
+  ``` html
+  <link href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  ```
 
-    Linked stylesheets are emitted before include_style content.
+  Linked stylesheets are emitted before include_style content.
 
 style_prepend=URL \| ARRAYREF; style_append=URL \| ARRAYREF
 
-:   Stylesheets to add before or after the current style value. This is
-    useful when `WEBDYNE_START_HTML_PARAM` supplies default styles and a
-    page needs to add styles without replacing those defaults.
+: Stylesheets to add before or after the current style value. This is
+  useful when `WEBDYNE_START_HTML_PARAM` supplies default styles and a
+  page needs to add styles without replacing those defaults.
 
-    ``` html
-    <start_html style_append="app.css">
-    ```
+  ``` html
+  <start_html style_append="app.css">
+  ```
 
-    The existing style attribute keeps its current override behaviour.
-    If style is supplied with style_prepend or style_append, the prepend
-    and append values are added around the explicit style value.
+  The existing style attribute keeps its current override behaviour. If
+  style is supplied with style_prepend or style_append, the prepend and
+  append values are added around the explicit style value.
 
 script=URL \| ARRAYREF
 
-:   Similar facility to the style attribute. Any values supplied to this
-    attribute will be output as src attributes to a &lt;script&gt; tag.
+: Similar facility to the style attribute. Any values supplied to this
+  attribute will be output as src attributes to a &lt;script&gt; tag.
 
-    ``` html
-    <start_html script="https://cdn.jsdelivr.net/npm/chart.js">
-    ```
+  ``` html
+  <start_html script="https://cdn.jsdelivr.net/npm/chart.js">
+  ```
 
-    Will produce:
+  Will produce:
 
-    ``` html
-    <script src="https://cdn.jsdelivr.net/npm/chart.js">
-    ```
+  ``` html
+  <script src="https://cdn.jsdelivr.net/npm/chart.js">
+  ```
 
-    Anything supplied after the URL section as an anchor will be used in
-    the script tag as an attribute, e.g.
+  Anything supplied after the URL section as an anchor will be used in
+  the script tag as an attribute, e.g.
 
-    ``` html
-    <start_html script="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js#defer&integrity=sha..">
-    ```
+  ``` html
+  <start_html script="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js#defer&integrity=sha..">
+  ```
 
-    Will produce:
+  Will produce:
 
-    ``` html
-    <script defer integrity=sha.. src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js">
-    ```
+  ``` html
+  <script defer integrity=sha.. src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js">
+  ```
 
-    As per the style attribute you can supply an array of resources to
-    load using the same syntax.
+  As per the style attribute you can supply an array of resources to
+  load using the same syntax.
 
-    External scripts are emitted before include_script content.
+  External scripts are emitted before include_script content.
 
 script_prepend=URL \| ARRAYREF; script_append=URL \| ARRAYREF
 
-:   Scripts to add before or after the current script value. This is
-    useful when `WEBDYNE_START_HTML_PARAM` supplies default scripts and
-    a page needs to add scripts without replacing those defaults.
+: Scripts to add before or after the current script value. This is
+  useful when `WEBDYNE_START_HTML_PARAM` supplies default scripts and a
+  page needs to add scripts without replacing those defaults.
 
-    ``` html
-    <start_html script_append="app.js">
-    ```
+  ``` html
+  <start_html script_append="app.js">
+  ```
 
-    The existing script attribute keeps its current override behaviour.
-    If script is supplied with script_prepend or script_append, the
-    prepend and append values are added around the explicit script
-    value.
+  The existing script attribute keeps its current override behaviour. If
+  script is supplied with script_prepend or script_append, the prepend
+  and append values are added around the explicit script value.
 
 base, target = URL, TARGET
 
-:   Generate a &lt;base&gt; tag within the &lt;head&gt; section containing
-    attributes equivalent to href=value of the base attribute,
-    target=value of the target attribute
+: Generate a &lt;base&gt; tag within the &lt;head&gt; section containing
+  attributes equivalent to href=value of the base attribute,
+  target=value of the target attribute
 
-    ``` html
-    <start_html base="https://example.com" target="_blank">
-    ```
+  ``` html
+  <start_html base="https://example.com" target="_blank">
+  ```
 
-    Will produce:
+  Will produce:
 
-    ``` html
-    <base href="https://example.com/" target="_blank">
-    ```
+  ``` html
+  <base href="https://example.com/" target="_blank">
+  ```
 
 author=EMAIL
 
-:   Generate an author link in the &lt;head&gt; section. The supplied value
-    is URL encoded and emitted as a &lt;link rel="author"
-    href="mailto:..."&gt; tag.
+: Generate an author link in the &lt;head&gt; section. The supplied value is
+  URL encoded and emitted as a &lt;link rel="author" href="mailto:..."&gt;
+  tag.
 
 include=PATH \| ARRAYREF
 
-:   Will include the raw text from the nominated file (supplied as the
-    value) within the &lt;head&gt; section. No processing is done, the file
-    contents are inserted verbatim.
+: Will include the raw text from the nominated file (supplied as the
+  value) within the &lt;head&gt; section. No processing is done, the file
+  contents are inserted verbatim.
 
 include_script=PATH \| ARRAYREF
 
-:   As per above include attribute, raw text from the nominated file is
-    inserted into the &lt;head&gt; section, however it is wrapped in a
-    &lt;script&gt; tag. Included scripts are emitted after external scripts
-    from the script attribute.
+: As per above include attribute, raw text from the nominated file is
+  inserted into the &lt;head&gt; section, however it is wrapped in a
+  &lt;script&gt; tag. Included scripts are emitted after external scripts
+  from the script attribute.
 
 include_style=PATH \| ARRAYREF
 
-:   As per standard include attribute raw text from the nominated file
-    is inserted into the &lt;head&gt; section, however it is wrapped in a
-    &lt;style&gt; tag. Included styles are emitted after linked stylesheets
-    from the style attribute.
+: As per standard include attribute raw text from the nominated file is
+  inserted into the &lt;head&gt; section, however it is wrapped in a
+  &lt;style&gt; tag. Included styles are emitted after linked stylesheets
+  from the style attribute.
 
 static
 
-:   Boolean. If the static attribute is present in the &lt;start_html&gt;
-    tag the entire page is designated static. It will be compiled and
-    generated once (at first load) and the resulting HTML will be cached
-    and served on subsequent loads.
+: Boolean. If the static attribute is present in the &lt;start_html&gt; tag
+  the entire page is designated static. It will be compiled and
+  generated once (at first load) and the resulting HTML will be cached
+  and served on subsequent loads.
 
 cache=METHOD
 
-:   Use a cache handler to determine how often the page should be
-    recompiled. See the [Caching](#caching_section) section. Sample:
+: Use a cache handler to determine how often the page should be
+  recompiled. See the [Caching](#caching_section) section. Sample:
 
-    ``` html
-    <start_html cache="&cache">
-    ```
+  ``` html
+  <start_html cache="&cache">
+  ```
 
 handler=METHOD
 
-:   Store a page handler method in the compiled page metadata. This is
-    used by WebDyne's request dispatch path when a page needs to
-    nominate a handler from the &lt;start_html&gt; tag instead of relying on
-    surrounding server configuration.
+: Store a page handler method in the compiled page metadata. This is
+  used by WebDyne's request dispatch path when a page needs to nominate
+  a handler from the &lt;start_html&gt; tag instead of relying on
+  surrounding server configuration.
 
 h1 \| h2 \| h3 \| h4 \| h5 \| h6
 
-:   Boolean heading shortcut. If one of these attributes is present and
-    a title is available, WebDyne inserts a heading of the requested
-    level at the start of the generated &lt;body&gt; using the page title
-    text.
+: Boolean heading shortcut. If one of these attributes is present and a
+  title is available, WebDyne inserts a heading of the requested level
+  at the start of the generated &lt;body&gt; using the page title text.
 
-    ``` html
-    <start_html title="Hello World" h1>
-    ```
+  ``` html
+  <start_html title="Hello World" h1>
+  ```
 
 hr
 
-:   Boolean heading companion shortcut. When used with one of `h1`
-    through `h6`, WebDyne inserts an &lt;hr&gt; immediately after the
-    generated heading.
+: Boolean heading companion shortcut. When used with one of `h1` through
+  `h6`, WebDyne inserts an &lt;hr&gt; immediately after the generated
+  heading.
 
-    ``` html
-    <start_html title="Hello World" h1 hr>
-    ```
+  ``` html
+  <start_html title="Hello World" h1 hr>
+  ```
 
 sse=METHOD
 
-:   Mark the page as providing Server-Sent Events when run through the
-    PAGI request layer. The value is stored in WebDyne page metadata and
-    names the async subroutine to call for SSE requests. If used as a
-    bare boolean attribute, the method name defaults to `sse`.
+: Mark the page as providing Server-Sent Events when run through the
+  PAGI request layer. The value is stored in WebDyne page metadata and
+  names the async subroutine to call for SSE requests. If used as a bare
+  boolean attribute, the method name defaults to `sse`.
 
-    ``` html
-    <start_html sse>
-    ```
+  ``` html
+  <start_html sse>
+  ```
 
 ws=METHOD
 
-:   Mark the page as providing WebSocket handling when run through the
-    PAGI request layer. The value is stored in WebDyne page metadata and
-    names the async subroutine to call for WebSocket requests. If used
-    as a bare boolean attribute, the method name defaults to `ws`.
+: Mark the page as providing WebSocket handling when run through the
+  PAGI request layer. The value is stored in WebDyne page metadata and
+  names the async subroutine to call for WebSocket requests. If used as
+  a bare boolean attribute, the method name defaults to `ws`.
 
-    ``` html
-    <start_html ws>
-    ```
+  ``` html
+  <start_html ws>
+  ```
 
 pico
 
-:   Framework shortcut defined by `WEBDYNE_START_HTML_SHORTCUT_HR`. Adds
-    Pico CSS to the style list, using
-    `https://cdn.jsdelivr.net/npm/@picocss/pico@latest/css/pico.min.css`
-    by default.
+: Framework shortcut defined by `WEBDYNE_START_HTML_SHORTCUT_HR`. Adds
+  Pico CSS to the style list, using
+  `https://cdn.jsdelivr.net/npm/@picocss/pico@latest/css/pico.min.css`
+  by default.
 
-    ``` html
-    <start_html pico title="Pico Example">
-    ```
+  ``` html
+  <start_html pico title="Pico Example">
+  ```
 
 htmx
 
-:   Framework shortcut defined by `WEBDYNE_START_HTML_SHORTCUT_HR`. Adds
-    htmx to the script list, using
-    `https://cdn.jsdelivr.net/npm/htmx.org@latest/dist/htmx.min.js` by
-    default.
+: Framework shortcut defined by `WEBDYNE_START_HTML_SHORTCUT_HR`. Adds
+  htmx to the script list, using
+  `https://cdn.jsdelivr.net/npm/htmx.org@latest/dist/htmx.min.js` by
+  default.
 
-    ``` html
-    <start_html htmx>
-    ```
+  ``` html
+  <start_html htmx>
+  ```
 
 alpine
 
-:   Framework shortcut defined by `WEBDYNE_START_HTML_SHORTCUT_HR`. Adds
-    Alpine.js to the script list, using
-    `https://cdn.jsdelivr.net/npm/alpinejs@latest/dist/cdn.min.js#defer`
-    by default. The URL fragment is interpreted as script attributes, so
-    the generated &lt;script&gt; tag includes defer.
+: Framework shortcut defined by `WEBDYNE_START_HTML_SHORTCUT_HR`. Adds
+  Alpine.js to the script list, using
+  `https://cdn.jsdelivr.net/npm/alpinejs@latest/dist/cdn.min.js#defer`
+  by default. The URL fragment is interpreted as script attributes, so
+  the generated &lt;script&gt; tag includes defer.
 
-    ``` html
-    <start_html alpine>
-    ```
+  ``` html
+  <start_html alpine>
+  ```
 
 #### &lt;end_html&gt; {#tag_end_html}
 
@@ -5234,52 +5245,51 @@ element.
 
 name=NAME
 
-:   The name associated with this form component. This is the CGI
-    parameter to be interrogated for value(s) once the form is
-    submitted.
+: The name associated with this form component. This is the CGI
+  parameter to be interrogated for value(s) once the form is submitted.
 
 values=ARRAYREF \| HASHREF
 
-:   List of items to be presented in the drop down. If an array ref
-    labels will be the same as values. If a hash ref the value will be
-    the hash key, the label the hash label. If predictable display order
-    matters, use an array ref for values and a separate labels hash ref.
+: List of items to be presented in the drop down. If an array ref labels
+  will be the same as values. If a hash ref the value will be the hash
+  key, the label the hash label. If predictable display order matters,
+  use an array ref for values and a separate labels hash ref.
 
 labels=HASHREF
 
-:   If values is presented as an array ref, a hash ref of labels to be
-    associated with each value can be supplied.
+: If values is presented as an array ref, a hash ref of labels to be
+  associated with each value can be supplied.
 
 attributes=HASHREF
 
-:   Hash reference of additional attributes to apply to individual
-    &lt;option&gt; elements, keyed by option value.
+: Hash reference of additional attributes to apply to individual
+  &lt;option&gt; elements, keyed by option value.
 
 label=TEXT
 
-:   Wrap the generated &lt;select&gt; element in a &lt;label&gt; element using
-    the supplied text.
+: Wrap the generated &lt;select&gt; element in a &lt;label&gt; element using the
+  supplied text.
 
 multiple
 
-:   Boolean. If enabled allows multiple options to be selected. If not
-    present (disabled) only one option can be selected.
+: Boolean. If enabled allows multiple options to be selected. If not
+  present (disabled) only one option can be selected.
 
 disabled=VALUE \| ARRAYREF
 
-:   Single (string scalar) item or multiple (array ref) items which
-    should be greyed out (not selectable) in menu options.
+: Single (string scalar) item or multiple (array ref) items which should
+  be greyed out (not selectable) in menu options.
 
 selected \| defaults \| default=VALUE \| ARRAYREF
 
-:   Single (string scalar) item or multiple (array ref) items which
-    should be pre-selected in menu options.
+: Single (string scalar) item or multiple (array ref) items which should
+  be pre-selected in menu options.
 
 force
 
-:   By default selected values are stateful, and submitted values for
-    this field override the configured default or selected values.
-    Setting force always uses the configured default or selected values.
+: By default selected values are stateful, and submitted values for this
+  field override the configured default or selected values. Setting
+  force always uses the configured default or selected values.
 
 #### &lt;radio_group&gt; {#tag_radio_group}
 
@@ -5301,49 +5311,48 @@ one radio button item can be selected.
 
 name=NAME
 
-:   The name associated with this form component. This is the CGI
-    parameter to be interrogated for value(s) once the form is
-    submitted.
+: The name associated with this form component. This is the CGI
+  parameter to be interrogated for value(s) once the form is submitted.
 
 values=ARRAYREF \| HASHREF
 
-:   List of items to be presented. If an array reference, labels will be
-    the same as values. If a hash reference the value will be the hash
-    key, the label the hash value. If predictable display order matters,
-    use an array reference for values and a separate labels hash
-    reference.
+: List of items to be presented. If an array reference, labels will be
+  the same as values. If a hash reference the value will be the hash
+  key, the label the hash value. If predictable display order matters,
+  use an array reference for values and a separate labels hash
+  reference.
 
 labels=HASHREF
 
-:   If values is presented as an array ref a hash ref of labels to be
-    associated with each value can be supplied.
+: If values is presented as an array ref a hash ref of labels to be
+  associated with each value can be supplied.
 
 attributes=HASHREF
 
-:   Hash reference of additional attributes to apply to individual
-    &lt;input type="radio"&gt; elements, keyed by radio value.
+: Hash reference of additional attributes to apply to individual &lt;input
+  type="radio"&gt; elements, keyed by radio value.
 
 disabled=VALUE \| ARRAYREF
 
-:   Single (string) or multiple (array ref) of items which should be
-    greyed out (not selectable) in radio group items.
+: Single (string) or multiple (array ref) of items which should be
+  greyed out (not selectable) in radio group items.
 
 checked \| defaults \| default=VALUE \| ARRAYREF
 
-:   Single (string) or multiple (array ref) items which should be
-    pre-selected in radio group items. Radio groups can only select one
-    value; if multiple defaults are supplied, the first value in sorted
-    order is used.
+: Single (string) or multiple (array ref) items which should be
+  pre-selected in radio group items. Radio groups can only select one
+  value; if multiple defaults are supplied, the first value in sorted
+  order is used.
 
 linebreak
 
-:   Separate generated radio items with &lt;br&gt; tags.
+: Separate generated radio items with &lt;br&gt; tags.
 
 force
 
-:   By default checked values are stateful, and submitted values for
-    this field override the configured defaults. Setting force always
-    uses the configured defaults.
+: By default checked values are stateful, and submitted values for this
+  field override the configured defaults. Setting force always uses the
+  configured defaults.
 
 #### &lt;checkbox_group&gt; {#tag_checkbox_group}
 
@@ -5365,46 +5374,46 @@ Multiple checkboxes can be selected.
 
 name=NAME
 
-:   The name associated with this form component. This is the
-    `$self->CGI()` parameter to be interrogated for value(s) once the
-    form is submitted.
+: The name associated with this form component. This is the
+  `$self->CGI()` parameter to be interrogated for value(s) once the form
+  is submitted.
 
 values=ARRAYREF \| HASHREF
 
-:   List of items to be presented. If an array ref labels will be the
-    same as values. If a hash ref the value will be the hash key, the
-    label the hash label. If predictable display order matters, use an
-    array ref for values and a separate labels hash ref.
+: List of items to be presented. If an array ref labels will be the same
+  as values. If a hash ref the value will be the hash key, the label the
+  hash label. If predictable display order matters, use an array ref for
+  values and a separate labels hash ref.
 
 labels=HASHREF
 
-:   If values is presented as an array ref a hash ref of labels to be
-    associated with each value can be supplied.
+: If values is presented as an array ref a hash ref of labels to be
+  associated with each value can be supplied.
 
 attributes=HASHREF
 
-:   Hash reference of additional attributes to apply to individual
-    &lt;input type="checkbox"&gt; elements, keyed by checkbox value.
+: Hash reference of additional attributes to apply to individual &lt;input
+  type="checkbox"&gt; elements, keyed by checkbox value.
 
 disabled=VALUE \| ARRAYREF
 
-:   Single (string) or multiple (array ref) items which should be greyed
-    out (not selectable) in checkbox group items.
+: Single (string) or multiple (array ref) items which should be greyed
+  out (not selectable) in checkbox group items.
 
 checked \| defaults \| default=VALUE \| ARRAYREF
 
-:   Single (scalar) or multiple (array ref) items which should be
-    pre-selected in checkbox group items.
+: Single (scalar) or multiple (array ref) items which should be
+  pre-selected in checkbox group items.
 
 linebreak
 
-:   Separate generated checkbox items with &lt;br&gt; tags.
+: Separate generated checkbox items with &lt;br&gt; tags.
 
 force
 
-:   By default checked values are stateful, and submitted values for
-    this field override the configured defaults. Setting force always
-    uses the configured defaults.
+: By default checked values are stateful, and submitted values for this
+  field override the configured defaults. Setting force always uses the
+  configured defaults.
 
 #### &lt;checkbox&gt; {#tag_checkbox}
 
@@ -5423,29 +5432,28 @@ Single checkbox for a user to select or clear.
 
 name=NAME
 
-:   The name associated with this form component. This is the CGI
-    parameter to be interrogated for value(s) once the form is
-    submitted.
+: The name associated with this form component. This is the CGI
+  parameter to be interrogated for value(s) once the form is submitted.
 
 value=VALUE \| BOOLEAN
 
-:   The value to be returned in the CGI parameter if this checkbox is
-    ticked (selected). If not supplied defaults to 1.
+: The value to be returned in the CGI parameter if this checkbox is
+  ticked (selected). If not supplied defaults to 1.
 
 disabled
 
-:   If present the checkbox will be displayed but cannot be selected.
+: If present the checkbox will be displayed but cannot be selected.
 
 checked
 
-:   If present the checkbox is initially selected. For the default
-    boolean value path, submitted values for the field are stateful and
-    override this initial setting.
+: If present the checkbox is initially selected. For the default boolean
+  value path, submitted values for the field are stateful and override
+  this initial setting.
 
 label=TEXT
 
-:   Wrap the generated checkbox in a &lt;label&gt; element using the
-    supplied text.
+: Wrap the generated checkbox in a &lt;label&gt; element using the supplied
+  text.
 
 !!! note
 
@@ -5474,9 +5482,9 @@ attribute.
 
 size=ROWS
 
-:   Number of rows to make visible in the user interface for the
-    scrolling list. If omitted, WebDyne sets this to the number of
-    configured values.
+: Number of rows to make visible in the user interface for the scrolling
+  list. If omitted, WebDyne sets this to the number of configured
+  values.
 
 #### &lt;textarea&gt; {#tag_textarea}
 
@@ -5495,25 +5503,23 @@ HTML standard &lt;textarea&gt; tag with attributes:
 
 name=NAME
 
-:   The name associated with this form component. This is the CGI
-    parameter to be interrogated for value(s) once the form is
-    submitted.
+: The name associated with this form component. This is the CGI
+  parameter to be interrogated for value(s) once the form is submitted.
 
 default=TEXT
 
-:   The default content to be pre-filled out in the &lt;textarea&gt;
-    component
+: The default content to be pre-filled out in the &lt;textarea&gt; component
 
 label=TEXT
 
-:   Wrap the generated &lt;textarea&gt; element in a &lt;label&gt; element using
-    the supplied text.
+: Wrap the generated &lt;textarea&gt; element in a &lt;label&gt; element using
+  the supplied text.
 
 force
 
-:   By default the component is stateful, and user entered text will
-    persist after form submission. Setting the force attribute will
-    always present the default content regardless of user input.
+: By default the component is stateful, and user entered text will
+  persist after form submission. Setting the force attribute will always
+  present the default content regardless of user input.
 
 #### &lt;textfield&gt; {#tag_textfield}
 
@@ -5533,13 +5539,13 @@ to the generated element.
 
 label=TEXT
 
-:   Wrap the generated input in a &lt;label&gt; element using the supplied
-    text.
+: Wrap the generated input in a &lt;label&gt; element using the supplied
+  text.
 
 force
 
-:   By default the field is stateful, and submitted values override the
-    configured value. Setting force always uses the configured value.
+: By default the field is stateful, and submitted values override the
+  configured value. Setting force always uses the configured value.
 
 #### &lt;password_field&gt; {#tag_password_field}
 
@@ -5658,136 +5664,131 @@ following methods are available to any instance of the WebDyne object:
 
 CGI()
 
-:   Returns an instance of a CGI::Simple type object for the current
-    request.
+: Returns an instance of a CGI::Simple type object for the current
+  request.
 
 r(), request()
 
-:   Returns the current WebDyne request adapter. WebDyne provides a
-    common request interface across Apache, PSGI, PAGI and command-line
-    render contexts, with backend-specific details available where
-    supported.
+: Returns the current WebDyne request adapter. WebDyne provides a common
+  request interface across Apache, PSGI, PAGI and command-line render
+  contexts, with backend-specific details available where supported.
 
 html_tiny()
 
-:   Returns an instance of the HTML::Tiny object, can be used for
-    creating programmatic HTML output
+: Returns an instance of the HTML::Tiny object, can be used for creating
+  programmatic HTML output
 
 include()
 
-:   Returns HTML derived from a file, using the same parameters as the
-    &lt;include&gt; tag
+: Returns HTML derived from a file, using the same parameters as the
+  &lt;include&gt; tag
 
 render( &lt;key=&gt;value, key=&gt;value&gt;, .. )
 
-:   Called to render the text or HTML between &lt;perl&gt;..&lt;/perl&gt; tags.
-    Optional key and value pairs will be substituted into the output as
-    per the variable section. Returns a scalar ref of the resulting
-    HTML.
+: Called to render the text or HTML between &lt;perl&gt;..&lt;/perl&gt; tags.
+  Optional key and value pairs will be substituted into the output as
+  per the variable section. Returns a scalar ref of the resulting HTML.
 
 render_block( blockname, &lt;key=&gt;value, key=&gt;valufge, ..&gt;).
 
-:   Called to render a block of text or HTML between
-    &lt;block&gt;..&lt;/block&gt; tags. Optional key and value pairs will be
-    substituted into the output as per the variable section. Returns
-    scalar ref of resulting HTML if called with from &lt;perl&gt;..&lt;/perl&gt;
-    section containing the block to be rendered, or true (`\undef`) if
-    the block is not within the &lt;perl&gt;..&lt;/perl&gt; section (e.g.
-    further into the document, see the block section for an example).
-    Rendered blocks must be "published' if visibility required via
-    return as array, or return of `$self->render()`.
+: Called to render a block of text or HTML between &lt;block&gt;..&lt;/block&gt;
+  tags. Optional key and value pairs will be substituted into the output
+  as per the variable section. Returns scalar ref of resulting HTML if
+  called with from &lt;perl&gt;..&lt;/perl&gt; section containing the block to
+  be rendered, or true (`\undef`) if the block is not within the
+  &lt;perl&gt;..&lt;/perl&gt; section (e.g. further into the document, see the
+  block section for an example). Rendered blocks must be "published' if
+  visibility required via return as array, or return of
+  `$self->render()`.
 
 render_reset()
 
-:   Erase anything previously set to render - it will not be sent to the
-    browser. Limited use, may be helpful in error handling to "pull"
-    anything previously published and replace with error message.
+: Erase anything previously set to render - it will not be sent to the
+  browser. Limited use, may be helpful in error handling to "pull"
+  anything previously published and replace with error message.
 
 redirect( uri=&gt;uri \| file=&gt;filename \| html=&gt;\\html_text \| json=&gt;\\json_text \| text=&gt;\\plain_text)
 
-:   Will redirect to URI or file nominated, or display only nominated
-    text. Any rendering done to prior to this method is abandoned. If
-    supplying HTML text to be rendered supply as a SCALAR reference.
-    Content type header will be automatically adjusted to MIME type
-    appropriate for type if redirecting to html, json or plain text
-    content.
+: Will redirect to URI or file nominated, or display only nominated
+  text. Any rendering done to prior to this method is abandoned. If
+  supplying HTML text to be rendered supply as a SCALAR reference.
+  Content type header will be automatically adjusted to MIME type
+  appropriate for type if redirecting to html, json or plain text
+  content.
 
 inode( &lt;seed&gt;, &lt;seed&gt; )
 
-:   Returns the page unique ID (UID). Called inode for legacy reasons,
-    as that is what the UID used to be based on. If a seed value is
-    supplied a new UID will be generated based on an MD5 of the seed(s)
-    combined with other information (such as `$r->location`) to generate
-    a unique UUID. Seed only needs to be supplied if using cache
-    handlers, see the "[Caching](#caching_section)" section
+: Returns the page unique ID (UID). Called inode for legacy reasons, as
+  that is what the UID used to be based on. If a seed value is supplied
+  a new UID will be generated based on an MD5 of the seed(s) combined
+  with other information (such as `$r->location`) to generate a unique
+  UUID. Seed only needs to be supplied if using cache handlers, see the
+  "[Caching](#caching_section)" section
 
 cache_mtime( &lt;uid&gt; )
 
-:   Returns the mtime (modification time) of the cache file associated
-    with the optionally supplied UID. If no UID supplied the current one
-    will be used. Can be used to make cache compile decisions by
-    WebDyne::Cache code (e.g if page &gt; x minutes old, recompile).
+: Returns the mtime (modification time) of the cache file associated
+  with the optionally supplied UID. If no UID supplied the current one
+  will be used. Can be used to make cache compile decisions by
+  WebDyne::Cache code (e.g if page &gt; x minutes old, recompile).
 
 source_mtime()
 
-:   Returns the mtime (modification time) of the source PSP file
-    currently being rendered.
+: Returns the mtime (modification time) of the source PSP file currently
+  being rendered.
 
 cache_compile()
 
-:   Force recompilation of cache file. Can be used in cache code to
-    force recompilation of a page, even if it is flagged static. Returns
-    current value if no parameters supplied, or sets if parameter
-    supplied.
+: Force recompilation of cache file. Can be used in cache code to force
+  recompilation of a page, even if it is flagged static. Returns current
+  value if no parameters supplied, or sets if parameter supplied.
 
 filename()
 
-:   Return the full filename (including path) of the file being
-    rendered. Will only return the core (main) filename - any included
-    files, templates etc. are not reported.
+: Return the full filename (including path) of the file being rendered.
+  Will only return the core (main) filename - any included files,
+  templates etc. are not reported.
 
 cwd()
 
-:   Return the current working directory WebDyne is operating in.
+: Return the current working directory WebDyne is operating in.
 
 no_cache()
 
-:   Send headers indicating that the page is not be cached by the
-    browser or intermediate proxies. By default WebDyne pages
-    automatically set the no-cache headers, although this behaviour can
-    be modified by clearing the `$WEBDYNE_NO_CACHE` variable and using
-    this function
+: Send headers indicating that the page is not be cached by the browser
+  or intermediate proxies. By default WebDyne pages automatically set
+  the no-cache headers, although this behaviour can be modified by
+  clearing the `$WEBDYNE_NO_CACHE` variable and using this function
 
 meta()
 
-:   Return a hash ref containing the meta data for this page.
-    Alterations to meta data are persistent for this process, and carry
-    across Apache requests (although not across different Apache
-    processes)
+: Return a hash ref containing the meta data for this page. Alterations
+  to meta data are persistent for this process, and carry across Apache
+  requests (although not across different Apache processes)
 
 print( &lt;output&gt; ), printf( &lt;output&gt; ), say( &lt;output&gt; )
 
-:   Render the output of the print(), printf() or say() routines into
-    the current HTML stream. The print() and printf() methods emulate
-    their Perl functions in not appending a new line into the output
-    (unless autonewline() is set), where as say() does.
+: Render the output of the print(), printf() or say() routines into the
+  current HTML stream. The print() and printf() methods emulate their
+  Perl functions in not appending a new line into the output (unless
+  autonewline() is set), where as say() does.
 
 autonewline()
 
-:   Get or set the autonewline flag. If set will add a new line
-    automatically when using print() or `$self->print()`, essentially
-    emulating say(). Supply undef or 0 to clear.
+: Get or set the autonewline flag. If set will add a new line
+  automatically when using print() or `$self->print()`, essentially
+  emulating say(). Supply undef or 0 to clear.
 
 render_time()
 
-:   Return the elapsed time since the WebDyne hander started rendering
-    this page. Obviously only meaningful if called at the end of a page,
-    just before final output to browser.
+: Return the elapsed time since the WebDyne hander started rendering
+  this page. Obviously only meaningful if called at the end of a page,
+  just before final output to browser.
 
 err( &lt;message&gt; )
 
-:   Return and/or raise an error to the WebDyne handler. Supply the
-    actual error message as text.
+: Return and/or raise an error to the WebDyne handler. Supply the actual
+  error message as text.
 
 ## Configuration Reference {#configuration_reference}
 
@@ -5930,8 +5931,8 @@ is maintained with the module sidecar documentation and copied into the
 MkDocs module reference during documentation generation.
 
 See [`WebDyne::Constant` module
-reference](modules/WebDyne_Constant.md){.manual-page-new-tab} for the
-complete list of constants, defaults, and behaviour descriptions.
+reference](modules/WebDyne_Constant.md){target="_blank" rel="noopener"} for the complete list of constants,
+defaults, and behaviour descriptions.
 
 !!! tip
 
@@ -6025,51 +6026,51 @@ defaults are used.
 
 `WEBDYNE_SERVER_PSGI_WORKERS`
 
-:   Sets the `starman` `--workers` option.
+: Sets the `starman` `--workers` option.
 
 `WEBDYNE_SERVER_PSGI_MAX_REQUESTS`
 
-:   Sets the `starman` `--max-requests` option.
+: Sets the `starman` `--max-requests` option.
 
 `WEBDYNE_SERVER_PSGI_BACKLOG`
 
-:   Sets the `starman` `--backlog` option.
+: Sets the `starman` `--backlog` option.
 
 `WEBDYNE_SERVER_PSGI_KEEPALIVE_TIMEOUT`
 
-:   Sets the `starman` `--keepalive-timeout` option.
+: Sets the `starman` `--keepalive-timeout` option.
 
 `WEBDYNE_SERVER_PSGI_READ_TIMEOUT`
 
-:   Sets the `starman` `--read-timeout` option.
+: Sets the `starman` `--read-timeout` option.
 
 `WEBDYNE_SERVER_PAGI_WORKERS`
 
-:   Sets the `pagi-server` `--workers` option.
+: Sets the `pagi-server` `--workers` option.
 
 `WEBDYNE_SERVER_PAGI_MAX_REQUESTS`
 
-:   Sets the `pagi-server` `--max-requests` option.
+: Sets the `pagi-server` `--max-requests` option.
 
 `WEBDYNE_SERVER_PAGI_LISTENER_BACKLOG`
 
-:   Sets the `pagi-server` `--listener-backlog` option.
+: Sets the `pagi-server` `--listener-backlog` option.
 
 `WEBDYNE_SERVER_PAGI_TIMEOUT`
 
-:   Sets the `pagi-server` `--timeout` option.
+: Sets the `pagi-server` `--timeout` option.
 
 `WEBDYNE_SERVER_PAGI_REQUEST_TIMEOUT`
 
-:   Sets the `pagi-server` `--request-timeout` option.
+: Sets the `pagi-server` `--request-timeout` option.
 
 `WEBDYNE_SERVER_PAGI_MAX_CONNECTIONS`
 
-:   Sets the `pagi-server` `--max-connections` option.
+: Sets the `pagi-server` `--max-connections` option.
 
 `WEBDYNE_SERVER_PAGI_MAX_BODY_SIZE`
 
-:   Sets the `pagi-server` `--max-body-size` option.
+: Sets the `pagi-server` `--max-body-size` option.
 
 ### Directives {#webdyne_directives}
 
@@ -6080,9 +6081,9 @@ directive applies to the core WebDyne module:
 
 `WebDyneHandler`
 
-:   The name of the handler that WebDyne should invoke instead of
-    handling the page internally. The only other handler available today
-    is WebDyne::Chain.
+: The name of the handler that WebDyne should invoke instead of handling
+  the page internally. The only other handler available today is
+  WebDyne::Chain.
 
 This directive exists primarily to allow PSGI to invoke WebDyne::Chain
 as the primary handler. It can be used in Apache httpd.conf files, but
@@ -6108,8 +6109,8 @@ is not very efficient:
 
 `/etc/webdyne.conf.pl, ~/.webdyne.conf.pl, $DOCUMENT_ROOT/.webdyne.conf.pl`
 
-:   Used for storage of local constants that override WebDyne defaults.
-    See the [WebDyne::Constant](#webdyne_constants) section for details
+: Used for storage of local constants that override WebDyne defaults.
+  See the [WebDyne::Constant](#webdyne_constants) section for details
 
 # Extending WebDyne {#extending_webdyne}
 
@@ -6164,8 +6165,8 @@ start to a rudimentary CMS.
 
 WebDyneChain
 
-:   Directive. Supply a space separated string of WebDyne modules that
-    the request should be passed through.
+: Directive. Supply a space separated string of WebDyne modules that the
+  request should be passed through.
 
 ## WebDyne::Static
 
@@ -6232,15 +6233,15 @@ connection and stores it in a cookie. It has the following API:
 
 session_id()
 
-:   Function. Returns the unique session id assigned to the browser.
-    Call via `$self->session_id()` from perl code.
+: Function. Returns the unique session id assigned to the browser. Call
+  via `$self->session_id()` from perl code.
 
 `$WEBDYNE_SESSION_ID_COOKIE_NAME`
 
-:   Constant. Holds the name of the cookie that will be used to assign
-    the session id in the users browser. Defaults to "session". Set as
-    per [WebDyne::Constants](#webdyne_constants) section. Resides in the
-    `WebDyne::Session::Constant` package namespace.
+: Constant. Holds the name of the cookie that will be used to assign the
+  session id in the users browser. Defaults to "session". Set as per
+  [WebDyne::Constants](#webdyne_constants) section. Resides in the
+  `WebDyne::Session::Constant` package namespace.
 
 Example:
 
@@ -6295,15 +6296,14 @@ The API:
 
 template ( filename )
 
-:   Function. Set the file name of the template to be used. If no path
-    is specified file name will be relative to the current request
-    directory
+: Function. Set the file name of the template to be used. If no path is
+  specified file name will be relative to the current request directory
 
 WebDyneTemplate
 
-:   Directive. Can be used to supply the template file name in a Apache
-    Dir_Config section, or a the WEBDYNE_DIR_CONFIG section of a
-    webdyne.conf.pl file for PSGI
+: Directive. Can be used to supply the template file name in a Apache
+  Dir_Config section, or a the WEBDYNE_DIR_CONFIG section of a
+  webdyne.conf.pl file for PSGI
 
 Example:
 
@@ -6407,15 +6407,15 @@ file in the directory with the template directives as follows:
 At some stage a PSP file is not going to output what you expect. This
 could be for many reasons:
 
--   Incorrectly closed or matched HTML tags in the source
+- Incorrectly closed or matched HTML tags in the source
 
--   Mismatched quotation symbols for attributes
+- Mismatched quotation symbols for attributes
 
--   Incorrect syntax in WebDyne tags, code or attributes
+- Incorrect syntax in WebDyne tags, code or attributes
 
--   Failure by the HTML Parser to read complex or unusual HTML
+- Failure by the HTML Parser to read complex or unusual HTML
 
--   A bug in the WebDyne code at runtime
+- A bug in the WebDyne code at runtime
 
 There are several troubleshooting steps:
 

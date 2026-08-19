@@ -1,0 +1,197 @@
+=head1 NAME
+
+Fugu::Control, Fugu::Control::Client - a control socket for a running daemon
+
+=head1 SYNOPSIS
+
+    # In the daemon
+    use Fugu::Control;
+
+    my $control = Fugu::Control->new(path => '/var/run/myd/control.sock');
+    $control->register(status  => sub ($args) { { paired => 1 } });
+    $control->register(devices => sub ($args) { [ @devices ] });
+    $control->listen(loop => $loop) or die $control->error;
+
+    # and at shutdown
+    $control->shutdown(loop => $loop);
+
+    # In the tool
+    my $client = Fugu::Control::Client->new(
+        path => '/var/run/myd/control.sock');
+
+    my $status = $client->request('status');
+    unless ($status) {
+    	die "the daemon is not running\n" if $client->socket_absent;
+    	die $client->error . "\n";
+    }
+
+=head1 DESCRIPTION
+
+A tool that reports on a daemon has two ways to get its answer.
+It can guess from files on disk, or it can ask the daemon.
+The first way reads what the daemon wrote at some earlier time, and
+it is wrong whenever the two disagree.
+B<Fugu::Control> is the second way.
+
+The server registers with a L<Fugu::EventLoop> and answers commands
+from process state.
+The client connects, sends one request, and reads the reply.
+The payload is JSON, and the transport is the imsg(3) framing of
+L<Fugu::Imsg>.
+
+Everything that arrives on the socket is untrusted.
+An unknown command, a payload that is not JSON, and a frame over the
+limit all give an error reply.
+None of them ends the daemon.
+
+=head2 The server
+
+=over 4
+
+=item C<new(%args)>
+
+Make a server.
+The method opens nothing.
+
+C<path> is the socket, and it is necessary.
+C<log> is the logger, and it defaults to the process default of
+L<Fugu::Log>.
+
+=item C<register($command, $code)>
+
+Add a command.
+The code gets the decoded arguments hash reference and returns the
+reply, which must encode as JSON.
+A handler that dies gives the caller an error reply.
+
+=item C<listen(%args)>
+
+Bind the socket and start accepting.
+The listener and every accepted connection register with the event
+loop that C<loop> names.
+That argument is necessary, and the method dies without it.
+
+=item C<accept_one($loop)>
+
+Take one connection and register it as a read handler on the loop.
+
+=item C<shutdown(%args)>
+
+Close every connection, close the listener, and remove the socket.
+A socket left behind names a daemon that is not there.
+
+=item C<path()>
+
+The socket path.
+
+=item C<error()>
+
+The most recent failure.
+
+=back
+
+=head2 The client
+
+=over 4
+
+=item C<new(%args)>
+
+Make a client.
+C<path> is necessary; C<timeout> is the per-frame deadline and
+defaults to 5 seconds.
+
+=item C<request($command, $args)>
+
+Send one command and return the decoded reply, or C<undef> with the
+reason in C<error()>.
+The method connects if it is not connected.
+
+=item C<connect()>, C<disconnect()>
+
+Open and close the connection by hand.
+Both are idempotent.
+
+=item C<socket_absent()>
+
+Report if the most recent failure was an absent socket, and not a
+refusal.
+A tool says "the daemon is not running" for the first and "the daemon
+said no" for the second.
+A tool that cannot tell them apart reports the wrong thing to an
+operator half the time.
+
+A socket inside a directory that the caller may not search is not an
+absent socket.
+C<connect()> tells the two apart and reports the permission, because
+an operator who reads "not running" about a daemon that is running
+looks in the wrong place.
+
+=item C<error()>
+
+The most recent failure.
+
+=back
+
+=head1 RETURN VALUES
+
+C<listen()> returns the server object, or C<undef> with the reason in
+C<error()>.
+C<request()> returns the decoded reply, or C<undef>.
+C<socket_absent()> returns 1 or 0.
+Every other method returns its object.
+
+=head1 FILES
+
+The socket that the caller names.
+The server creates it mode 0600, under a umask(2) guard, so it is
+never world-reachable even for an instant.
+A chmod(2) after the bind would leave that window open.
+
+The mode of the socket is the inner boundary.
+The directory that holds it is the outer one, and the caller owns
+that.
+A daemon that drops privileges creates the directory while it is
+still root, mode 0700, owned by the daemon user.
+
+=head1 ERRORS
+
+C<new()> dies without a path, and C<register()> dies without a code
+reference.
+Those are programming errors.
+
+Nothing that arrives on the socket makes anything die.
+A malformed request, an unknown command, and a handler that died all
+give an error reply, and the connection stays usable.
+
+C<listen()> refuses to take a socket that another process answers on,
+and replaces one that nothing is behind.
+bind(2) fails on an existing name, and a daemon that will not start
+after a crash needs a hand at every reboot.
+
+=head1 SEE ALSO
+
+imsg(3), L<Fugu::EventLoop>, L<Fugu::Imsg>, L<Fugu::Log>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+The socket carries no secret.
+That is a rule for the caller, which writes the command handlers, and
+this module cannot enforce it.
+A daemon whose configuration holds a setup code and a broker password
+must not answer a command that echoes them back: the reply lands in
+the terminal of an operator who may not be alone.
+
+One imsg frame carries about 16 KB.
+A larger reply spans several frames and the client puts them back
+together, up to one megabyte in total.
+A command that would answer with more than that gets an error
+instead.
+
+A handler runs inside the event loop of the daemon.
+A handler that blocks blocks the daemon.
+
+=cut

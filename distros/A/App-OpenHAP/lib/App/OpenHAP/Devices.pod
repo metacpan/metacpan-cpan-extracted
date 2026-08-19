@@ -1,0 +1,147 @@
+=head1 NAME
+
+App::OpenHAP::Devices - the configured devices of the bridge
+
+=head1 SYNOPSIS
+
+    use App::OpenHAP::Devices;
+    use Fugu::Config;
+    use Fugu::MQTT;
+    use App::OpenHAP::Host;
+
+    my $config = Fugu::Config->new(file => '/etc/openhapd.conf');
+    $config->load();
+
+    my $hap = App::OpenHAP::Host->new(...);
+    my $mqtt = Fugu::MQTT->new(...);
+
+    my $devices = App::OpenHAP::Devices->new();
+    my $count = $devices->load_devices($config, $hap, $mqtt);
+
+    print "Loaded $count devices\n";
+
+    # The blocks alone, with no bridge and no MQTT client
+    my @devices = App::OpenHAP::Devices->devices($config);
+
+=head1 DESCRIPTION
+
+This module reads the device blocks from a L<Fugu::Config> and
+does a check of each block. It instantiates the device class that
+matches, and it registers each device with the HAP bridge.
+
+One table describes every supported device type. Each entry names the
+class that builds the device, and the extra arguments that the class
+needs. To add a type, add one entry.
+
+=head1 METHODS
+
+=head2 new
+
+    my $devices = App::OpenHAP::Devices->new()
+
+This method creates a new device collection. It keeps an internal
+counter that assigns the Accessory IDs (AIDs). The counter starts at 2,
+because AID 1 is reserved for the bridge itself.
+
+=head2 load_devices
+
+    my $count = $devices->load_devices($config, $hap, $mqtt)
+
+This method loads all devices from the configuration and adds them to
+the HAP bridge. It returns the number of devices that loaded
+correctly.
+
+The method does these steps:
+
+=over 4
+
+=item * Gets the device list from the configuration
+
+=item * Does a check of each device configuration
+
+=item * Instantiates the applicable device classes
+
+=item * Subscribes the devices to MQTT topics (if MQTT is connected)
+
+=item * Registers the devices with the HAP bridge
+
+=item * Logs the progress and the errors
+
+=back
+
+The method logs errors, but an error does not stop the load of the
+other devices.
+
+=head2 get_devices
+
+    my @devices = $devices->get_devices()
+
+This method returns a list of all device accessory objects that
+loaded correctly.
+
+=head2 devices
+
+    my @devices = App::OpenHAP::Devices->devices($config)
+
+This class method returns the device blocks of a L<Fugu::Config> as
+plain records. Each record holds the settings of the block, plus the
+C<type>, C<subtype> and C<id> from the block arguments.
+
+The method builds no accessory and loads no device class. A caller
+that only lists the configured devices, such as C<hapctl devices>,
+uses this method.
+
+=head1 DEVICE CHECKS
+
+Each device configuration must have these fields:
+
+=over 4
+
+=item * B<name> - The human-readable name of the device
+
+=item * B<type> - The device type (for example, 'tasmota')
+
+=item * B<subtype> - The device subtype (for example, 'thermostat')
+
+=item * B<topic> - The MQTT topic for communication
+
+=item * B<id> - The unique identifier. The default value is the topic.
+
+=back
+
+The module skips a device that does not have all the necessary fields.
+It logs an error for that device.
+
+=head1 SUPPORTED DEVICES
+
+The only device type is C<tasmota>. These are its subtypes:
+
+=over 4
+
+=item * B<thermostat> - L<App::OpenHAP::Tasmota::Thermostat>
+
+=item * B<heater>, B<switch> - L<App::OpenHAP::Tasmota::Heater>
+
+=item * B<sensor> - L<App::OpenHAP::Tasmota::Sensor>
+
+=item * B<lightbulb>, B<dimmer>, B<rgblight>, B<ctlight> -
+L<App::OpenHAP::Tasmota::Lightbulb>
+
+=back
+
+=head1 ERROR HANDLING
+
+The device instantiation and the MQTT subscription run inside
+C<eval>. Thus one misconfigured device does not stop the start of the
+daemon. The module logs that device and skips it.
+
+=head1 SEE ALSO
+
+L<Fugu::Config>, L<Fugu::MQTT>, L<App::OpenHAP::Host>,
+L<App::OpenHAP::Tasmota::Thermostat>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>
+
+=cut

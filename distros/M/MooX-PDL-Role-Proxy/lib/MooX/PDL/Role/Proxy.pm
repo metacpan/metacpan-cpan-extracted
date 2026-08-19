@@ -6,13 +6,14 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Types::Standard -types;
 
 use PDL::Primitive ();
 use Hash::Wrap;
 use Scalar::Util ();
+use List::Util 1.45 'uniqstr';
 
 use Moo::Role;
 use Lexical::Accessor;
@@ -72,7 +73,7 @@ lexical_has 'is_inplace' => (
     clearer => \( my $clear_inplace ),
     reader  => \( my $is_inplace ),
     writer  => \( my $set_inplace ),
-    default => 0
+    default => 0,
 );
 
 
@@ -83,7 +84,7 @@ my $clone = sub {
         $self->$func( $attrs, $self->$has_clone_args ? $self->$get_clone_args : () );
     }
     elsif ( $func = $self->$clone_v1 ) {
-        $self->$func( %$attrs );
+        $self->$func( %{$attrs} );
     }
     else {
         $croak->( "couldn't find clone method for class '@{[ ref $self ]}'" );
@@ -118,9 +119,9 @@ has _ndarrays => (
         # make backwards compatible with 'piddle'.  the returned hash
         # is locked, so only access keys known to exist
         [
-            map  { keys %{ $tags->{$_} } }
-            grep { /^ndarray|piddle$/ } keys %$tags
-        ];
+            uniqstr
+              map  { keys %{ $tags->{$_} } }
+              grep { /^ndarray|piddle$/ } keys %{$tags} ];
     },
 );
 
@@ -151,7 +152,7 @@ sub _apply_to_tagged_attrs {
 
     my $inplace = $self->$is_inplace;
 
-    my %attr = map {
+    my %attr = map {    ## no critic (ComplexMappings)
         my $field = $_;
         $field => $action->( $self->$field, $inplace );
     } @{ $self->_ndarrays };
@@ -204,7 +205,7 @@ sub _apply_to_tagged_attrs {
 
 sub inplace {
     $_[0]->$set_inplace( @_ > 1 ? $_[1] : INPLACE_SET );
-    $_[0];
+    return $_[0];
 }
 
 
@@ -227,7 +228,7 @@ sub inplace {
 
 sub inplace_store {
     $_[0]->$set_inplace( INPLACE_STORE );
-    $_[0];
+    return $_[0];
 }
 
 
@@ -250,7 +251,7 @@ sub inplace_store {
 
 sub inplace_set {
     $_[0]->$set_inplace( INPLACE_SET );
-    $_[0];
+    return $_[0];
 }
 
 
@@ -277,7 +278,7 @@ sub inplace_set {
 
 
 sub set_inplace {
-    2 == @_ or $croak->( "set_inplace requires two arguments" );
+    2 == @_ or $croak->( 'set_inplace requires two arguments' );
     $_[1] >= 0
       && $_[0]->$set_inplace( $_[1] );
     return;
@@ -340,7 +341,7 @@ sub sever {
 
 
 
-sub index {
+sub index {    ## no critic (Homonym)
     my ( $self, $index ) = @_;
     return $self->_apply_to_tagged_attrs( sub { $_[0]->index( $index ) } );
 }
@@ -431,8 +432,7 @@ sub _set_attr {
         my $sub = $subs->{$key};
 
         if ( !defined $sub ) {
-            Scalar::Util::weaken( $subs->{$key} = $self->can( "_set_${key}" )
-                  // $self->can( $key ) );
+            Scalar::Util::weaken( $subs->{$key} = $self->can( "_set_${key}" ) // $self->can( $key ) );
             $sub = $subs->{$key};
         }
 
@@ -567,7 +567,7 @@ MooX::PDL::Role::Proxy - treat a container of ndarrays (piddles) as if it were a
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -664,8 +664,11 @@ which should be operated on, rather than as a boolean).
 
 =head2 Results of Operations
 
-The results of operations may either be stored L</In Place> or returned
-in L</Cloned Objects>.  By default, operations return cloned objects.
+The results of operations may either be stored L</In Place> or
+returned in L</Cloned Objects>.  By default, operations return cloned
+objects.  Note that ndarrays in cloned objects are not necessarily
+independent of the original ndarrays, unless the operation included a
+C<copy> or a C<sever>.
 
 =head3 In Place
 
@@ -942,17 +945,17 @@ non-inplace operations can create copies of the original object.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to   or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-PDL-Role-Proxy
+Please report any bugs or feature requests to bug-moox-pdl-role-proxy@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-PDL-Role-Proxy>
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/moox-pdl-role-proxy
+  https://codeberg.com/djerius/moox-pdl-role-proxy
 
 and may be cloned from
 
-  https://gitlab.com/djerius/moox-pdl-role-proxy.git
+  https://codeberg.com/djerius/moox-pdl-role-proxy.git
 
 =head1 AUTHOR
 

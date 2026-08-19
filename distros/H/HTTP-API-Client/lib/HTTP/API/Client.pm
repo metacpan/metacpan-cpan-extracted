@@ -1,5 +1,5 @@
 package HTTP::API::Client;
-$HTTP::API::Client::VERSION = '1.10';
+$HTTP::API::Client::VERSION = '1.23';
 use Moo;
 
 =head1 NAME
@@ -141,17 +141,22 @@ Used to build the default JSON content-type header and to decide whether
 UTF-8 byte-encoding is applied to the request body. Default C<utf8>, from
 C<HTTP_CHARSET>. Must be a real L<JSON::XS> charset method name (C<utf8>,
 C<latin1>, C<ascii>, ...) - an invalid value dies immediately and clearly,
-naming the bad value, the first time JSON encoding is needed.
+naming the bad value, the next time C<kvp2json()> is called, whether or
+not C<json> has already been built.
 
 =item timeout
 
 Request timeout in seconds, passed to the underlying L<LWP::UserAgent>.
-Default C<60>, from C<HTTP_TIMEOUT>.
+Default C<60>, from C<HTTP_TIMEOUT>. Re-applied to C<ua> at the start of
+every C<send()> call, so changing it between calls takes effect on the
+next one, not just at construction.
 
 =item ssl_verify
 
 Passed through as C<verify_hostname> to L<LWP::UserAgent>'s C<ssl_opts>.
-Default off (C<0>), from C<SSL_VERIFY>.
+Default off (C<0>), from C<SSL_VERIFY>. Re-applied to C<ua> at the start
+of every C<send()> call, so changing it between calls takes effect on
+the next one, not just at construction.
 
 =item pre_defined_data / pre_defined_headers / pre_defined_events
 
@@ -179,9 +184,13 @@ L</json_response>/L</kvp_response>. C<undef> until the first request.
 
 Read-write. The underlying user-agent object C<send()> dispatches through
 - an L<LWP::UserAgent> by default, built lazily by C<_build_ua> on first
-use. Set this directly to inject a stand-in (a fake, a mock, a
-pre-configured instance) instead of the real one; this is how the test
-suite avoids making real network calls.
+use, then reused for every subsequent call. Set this directly to inject
+a stand-in (a fake, a mock, a pre-configured instance) instead of the
+real one; this is how the test suite avoids making real network calls.
+C<browser_id>/C<timeout>/C<ssl_verify> are re-applied to it (via
+C<< $ua->agent >>/C<< $ua->timeout >>/C<< $ua->ssl_opts >>, each only if
+C<ua> supports that method) at the start of every C<send()> call, not
+just when it's first built.
 
 =item browser_id
 
@@ -189,7 +198,9 @@ Read-write. The C<User-Agent> header value passed to the underlying
 C<ua>. Defaults to C<"HTTP API Client v$VERSION"> - C<$VERSION> is only
 set when running the installed CPAN release (Dist::Zilla's
 C<[PkgVersion]> plugin injects it at build time), so a development
-checkout reports C<"HTTP API Client vdev"> instead.
+checkout reports C<"HTTP API Client vdev"> instead. Re-applied to C<ua>
+at the start of every C<send()> call, so changing it between calls takes
+effect on the next one, not just at construction.
 
 =item retry_config
 
@@ -197,22 +208,31 @@ Read-write hashref C<< { fail_response => $n, fail_status => $csv, delay
 => $seconds } >>. The programmatic equivalent of
 C<RETRY_FAIL_RESPONSE>/C<RETRY_FAIL_STATUS>/C<RETRY_DELAY> - set this
 directly to configure retry behavior at construction without touching
-process environment variables. See L</"ENVIRONMENT VARIABLES"> for what
+process environment variables. A partial hashref is fine - any key you
+omit falls back to that same env var's default (C<0>/C<''>/C<5>), not to
+the environment variable itself. Re-applied at the start of every
+C<send()> call, so changing it between calls takes effect on the next
+one, not just at construction. See L</"ENVIRONMENT VARIABLES"> for what
 each key does.
 
 =item json
 
-Read-write. The L<JSON::XS> instance C<kvp2json()> encodes through,
-built lazily with C<->canonical->allow_nonref> and the C<charset>
-method applied. Set this directly to inject a differently-configured
-instance (e.g. one with C<->allow_blessed> enabled) instead of the
-default.
+Read-write. The L<JSON::XS> instance C<kvp2json()> encodes through and
+C<json_response()> decodes through, built lazily with
+C<->canonical->allow_nonref>. Set this directly to inject a
+differently-configured instance (e.g. one with C<->allow_blessed>
+enabled) instead of the default. C<charset> is re-applied to it (via its
+C<utf8>/C<latin1>/etc method) at the start of every C<kvp2json()>/
+C<json_response()> call, not just when C<json> is first built, so a
+C<charset> change takes effect on the next encode or decode even if
+C<json> was already in use - this also applies to an injected custom
+instance.
 
 =back
 
 =head1 ENVIRONMENT VARIABLES
 
-These enviornment variables expose the controls without changing the existing code.
+These environment variables expose the controls without changing the existing code.
 
 HTTP VARIABLES
 
@@ -239,6 +259,8 @@ RETRY VARIABLES
                         A negative value is clamped to 0 (no retry) rather than silently
                         making zero attempts.
  RETRY_FAIL_STATUS    - only retry if specified status code. e.g. 500,404
+                        An empty entry (a doubled comma, stray whitespace) is
+                        skipped rather than becoming a bogus always-false entry.
  RETRY_DELAY          - retry with wait time of 5 seconds in between, by default. A negative
                         value is clamped to 0 rather than reaching sleep() as-is.
 
@@ -258,6 +280,12 @@ and C<pre_defined_headers>. C<%events> are the per-call callbacks documented
 under C<new_request()> below. Sets and returns the C<last_response>
 attribute.
 
+None of C<\%data>/C<\%headers>/C<\%events> are mutated - C<send()> copies
+each before doing anything with it, so a hashref you pass in (and may
+reuse across other calls) comes back exactly as you passed it, with no
+merged-in C<pre_defined_*> keys or event-hook keys added by C<send()>'s
+own machinery.
+
 Passing C<< $events->{test_request_object} = 1 >> makes it return the built
 L<HTTP::Request> instead of sending it - the way this module's own test
 suite inspects what would have gone out.
@@ -266,13 +294,26 @@ suite inspects what would have gone out.
 
 Decode the C<last_response> body as JSON and return the resulting hashref.
 Never dies - a missing response or invalid JSON comes back as
-C<< { status => "error", error => $message } >> instead.
+C<< { status => "error", error => $message } >> instead. C<charset> is
+re-applied to C<json> at the start of every call, the same as
+C<kvp2json()> does on the encode side, so a C<charset> change takes
+effect on the next decode too.
 
 =head2 kvp_response
 
 Parse the C<last_response> body as a C<key=value&key=value> query string
 and return it as a hashref. Returns C<{}> if no request has been made yet,
-or the response body is empty.
+or the response body is empty. A key that repeats (the shape
+C<kvp2str_each> produces when encoding an array-valued field) decodes to
+an arrayref of every value seen, in order; a key seen once still decodes
+to a plain scalar. Decodes both percent-encoding and the
+C<application/x-www-form-urlencoded> convention of a literal C<+> meaning
+a space (a genuinely percent-encoded literal C<+>, i.e. C<%2B>, still
+decodes to C<+>) - this matters for a response body from any API, not
+just one built by this module's own C<kvp2str_each>, which never emits a
+raw C<+> itself. An empty C<&>-separated segment (a leading, trailing,
+or doubled C<&>) is skipped rather than decoded into a bogus
+C<< '' => undef >> entry.
 
 =head2 new_request(%options)
 
@@ -315,7 +356,10 @@ applies authentication: C<username>/C<password> take priority and are sent
 as HTTP Basic auth via C<basic_authenticator()>; C<auth_token> is used only
 if neither is set, and is sent as a raw C<Authorization> header value
 verbatim (no C<Bearer> prefix is added for you - include it in the token
-itself if the API expects one). Called by C<new_request()> - there is
+itself if the API expects one). C<auth_token> only supplies a I<default>
+C<Authorization> header - an explicit one already present in C<%headers>
+for this call (any casing: C<Authorization>, C<authorization>, ...) is
+left alone rather than overwritten. Called by C<new_request()> - there is
 normally no need to call this directly.
 
 =head2 basic_authenticator($request, $username, $password)
@@ -329,10 +373,21 @@ building.
 
 The two body encoders C<convert_data> dispatches to. C<kvp2json> walks
 C<%options>'s C<data> hashref and JSON::XS-encodes it, resolving any
-C<CODE> values by calling them and unwrapping L<HTTP::API::DataTypeMarker>
-markers (C<xCSV>/C<xBOOLEAN> and friends) into their JSON form. C<kvp2str>
-does the same but produces a C<key=value&key=value> query string instead,
+C<CODE> values by calling them and unwrapping L<HTTP::API::DataTypeMarker>'s
+C<xBOOLEAN>-family markers into their JSON form; an C<xCSV>-marked value
+has no special JSON handling and just JSON-encodes as an ordinary array
+(there's no C<key=value&key=value> repetition problem in JSON for it to
+solve). C<kvp2str> produces a C<key=value&key=value> query string instead,
 with C<xCSV>-marked values joined by commas instead of repeated per key.
+An empty arrayref value is omitted from C<kvp2str>'s output entirely (an
+empty array has no C<key=value> representation), the same as a key
+mapped to C<undef>/missing already is - including an empty array nested
+inside an C<xCSV(...)> list, which contributes nothing to the joined
+string rather than leaving a blank comma segment behind. An C<xCSV()>
+with no elements at all is different: it still emits C<key=> (present,
+empty value) rather than being omitted - there is no join-corruption
+risk to avoid the way there is for a nested empty array, and C<key=> is
+valid, parseable form data distinct from the key being absent.
 Both respect an C<< $events->{keys} >> callback to control which keys are
 included and in what order, and both accept a C<skip_key> hashref in
 C<%options> (same reachability caveat as C<new_request()>'s
@@ -341,15 +396,106 @@ callback recursively re-invoking C<kvp2str()>/C<kvp2json()> on itself to
 build its own value without infinite-looping on its own key; see
 F<t/04_callbacks.t>) to exclude a key from the encoded body.
 
+C<kvp2str> alone also fires C<< $events->{before_sorting_keys} >> and
+C<< $events->{after_sorting_keys} >>, each called with C<< keys => \@keys
+>> - an arrayref of the field names about to be (respectively, just
+were) sorted. Both are genuinely live: a callback that mutates
+C<@$keys> in place (push/splice/grep out an element) changes what
+C<kvp2str> actually encodes, as long as C<< $events->{keys} >> isn't
+also set (which replaces C<@keys> outright, discarding
+C<before_sorting_keys>' mutation). See F<t/21_before_events.t> and
+F<t/33_before_sorting_keys_mutation.t>. C<kvp2json> has no equivalent
+hook - its C<@keys> is either C<< $events->{keys} >>'s return value or
+an unsorted C<keys %$data>, with no separate sorting step to hook into.
+
+C<kvp2json> encodes a numeric-looking string value as a genuine JSON
+number rather than a quoted string - but only when doing so loses
+nothing (stringifying the number back reproduces the original value
+exactly). A value like C<"5"> becomes C<5>, but C<"00501"> (a US zip
+code) or C<"5.0"> stays a string, since numifying either would silently
+discard meaningful formatting. A value like C<"NaN">, C<"Inf">, or
+C<"-Inf"> also stays a string even though it round-trips losslessly as
+a Perl number - JSON has no valid representation for a non-finite
+number, and numifying it would make C<kvp2json> emit the bareword
+C<nan>/C<inf>/C<-inf>, which is not valid JSON and no parser (including
+this module's own JSON::XS) can decode. C<kvp2str> never numifies at
+all - a query string has no separate number/string type, so there was
+never a reason to risk altering the original representation.
+
 =head2 kvp2json_each(%options) / kvp2str_each(%options)
 
 The per-value helpers C<kvp2json()>/C<kvp2str()> recurse into for each key
-via C<%options>'s C<value>. Resolves a C<CODE> value by calling it,
+via C<%options>'s C<value> (and C<key> - the field's own key, available
+to a C<CODE> value's callback via C<%options>; C<kvp2json_each> passes it
+through at every level, including a nested hash value's own key, not
+just the top-level field's). Resolves a C<CODE> value by calling it,
 unwraps L<HTTP::API::DataTypeMarker> markers (C<xCSV>/C<xBOOLEAN> and
-friends), and recurses into plain array/hash values. There is normally
-no need to call these directly - they exist as public methods so a
+friends), and recurses into plain array values. There is normally no
+need to call these directly - they exist as public methods so a
 C<data>/C<value> callback can recursively re-invoke them on itself (see
 C<kvp2json()>/C<kvp2str()> above).
+
+These two are not symmetric on invalid input, in two ways. First,
+C<kvp2json_each> dies if a raw-bytes (non-UTF8-flagged) value is not
+valid UTF-8, rather than silently corrupting it into C<U+FFFD>
+replacement characters - JSON has no way to represent arbitrary bytes.
+C<kvp2str_each> has no such restriction; a query string can carry any
+byte sequence unescaped-safe via percent-encoding, so the same input
+that dies in the JSON path passes through the form-urlencoded path
+unchanged. Second, a plain hash value recurses in C<kvp2json_each> (JSON
+has a native object type for it) but dies in C<kvp2str_each> - a query
+string has no standard convention for representing a nested hash.
+
+Both die - with the same message, naming the offending ref type and
+pointing at C<xBOOLEAN()> - on any other reference type neither of them
+otherwise recognizes, most commonly a bare (not C<xBOOLEAN>-wrapped)
+scalar ref: a value like C<< \$flag >> passed directly, typically from
+forgetting to call C<xBOOLEAN(\$flag)> around it. Before this die was
+added, C<kvp2str_each> silently stringified such a value as
+C<SCALAR(0x...)>, and C<kvp2json_each> reached the same outcome only by
+accident of JSON::XS itself refusing to encode an arbitrary scalar ref
+- with a message that never mentioned this module's own vocabulary.
+
+C<kvp2str_each>'s C<%options> also accepts C<no_key>, set internally when
+recursing into an ARRAY or C<xCSV> element: when true, the returned
+fragment omits the leading C<key=> prefix (a plain scalar, C<xCSV>, and
+C<xBOOLEAN>-marked value all honor this identically) so a CSV/array
+element joins as a bare value rather than a spurious embedded
+C<key=value> pair.
+
+Both encoders unwrap an C<xBOOLEAN(\$flag)> live scalar ref to whatever
+C<$flag> currently holds, not just the C<0>/C<1> case C<xTRUE>/C<xFALSE>
+use - a live ref that currently holds exactly (C<eq>, not merely
+numerically C<==>) the string C<0> or C<1> still becomes a native JSON
+boolean in C<kvp2json_each> (matching C<xTRUE>/C<xFALSE>; JSON::XS's own
+convention only accepts that exact canonical form, not e.g. C<"01"> or
+C<"1.0">), but any other live value - including one that is numerically
+equal to C<0>/C<1> without being formatted exactly that way - encodes as
+its own actual contents in both encoders alike, the same way a plain
+(non-live) C<xBOOLEAN> value already did - including
+C<kvp2json_each>'s invalid-UTF-8 die documented above, which a live
+non-canonical value goes through exactly like the plain-scalar case
+does. A live value that currently holds C<undef> is treated as an
+empty string in both encoders, not C<undef> itself - it never reaches
+the invalid-UTF-8 check (an empty string is trivially valid UTF-8) and
+encodes as C<""> in JSON, matching how C<kvp2str_each> already handled
+this case.
+
+A plain (non-live) C<xBOOLEAN> value - anything other than the
+C<\1>/C<\0> shape C<xTRUE>/C<xFALSE> use, including a value passed to
+C<xBOOLEAN()> directly with no leading backslash - goes through the
+exact same invalid-UTF-8 die and lossless-numify treatment in
+C<kvp2json_each> as the plain scalar branch: C<xBOOLEAN("5")> encodes as
+the JSON number C<5>, and invalid UTF-8 bytes die with the same message
+rather than silently corrupting into JSON, just like a plain scalar
+value with the identical content would.
+
+C<xBOOLEAN()> only accepts a plain scalar or a scalar ref - wrapping
+anything else (an arrayref, a hashref) dies with a clear message naming
+the offending ref type in both encoders, rather than silently
+stringifying it (e.g. into C<"HASH(0x...)">) the way an unmarked
+reference of the wrong shape does elsewhere in this module (see
+C<kvp2str_each>'s nested-hash die, above).
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -397,6 +543,7 @@ use Try::Tiny;
 use URI;
 use URI::Escape qw( uri_escape uri_unescape );
 use Scalar::Util qw( looks_like_number );
+use POSIX qw( isnan isinf );
 use HTTP::API::DataTypeMarker;
 
 extends 'Exporter';
@@ -536,6 +683,12 @@ sub _build_ssl_verify {
     return _defor( $ENV{SSL_VERIFY}, 0 );
 }
 
+# send() does NOT read this attribute - since HAC-068 it calls
+# $self->_build_retry directly on every call, so retry_config changes
+# take effect live. This accessor is kept only for external callers who
+# already read $api->retry directly; it's a one-time snapshot at
+# whatever moment it's first accessed, not a live view of send()'s
+# actual behavior.
 has retry => (
     is      => "rw",
     lazy    => 1,
@@ -545,11 +698,14 @@ has retry => (
 sub _build_retry {
     my ($self) = @_;
     my %retry  = %{ _defor($self->retry_config, {}) };
-    my $count  = $retry{fail_response};
-    $count = 0 if defined $count && looks_like_number($count) && $count < 0;
-    my %status = map { s/^\s+|\s+$//g; $_ => 1 } split /,/, $retry{fail_status};
+    my $count  = _defor( $retry{fail_response}, 0 );
+    $count = 0 if looks_like_number($count) && $count < 0;
+    my %status = map { $_ => 1 }
+        grep { length }
+        map { s/^\s+|\s+$//g; $_ }
+        split /,/, _defor($retry{fail_status}, '');
 
-    my $delay = $retry{delay};
+    my $delay = _defor( $retry{delay}, 5 );
 
     return {
         count  => $count,
@@ -587,9 +743,12 @@ has json => (
 );
 
 sub _build_json {
-    my ($self)  = @_;
-    my $json    = JSON::XS->new->canonical->allow_nonref;
-    my $charset = $self->charset;
+    my ($self) = @_;
+    return _apply_charset( JSON::XS->new->canonical->allow_nonref, $self->charset );
+}
+
+sub _apply_charset {
+    my ($json, $charset) = @_;
     eval { $json->$charset; 1 } or die "Unsupported charset '$charset': $@";
     return $json;
 }
@@ -678,17 +837,21 @@ sub send {
 
     $method  = uc $method;
     $path    = _defor( $path,    '' );
-    $data    = _defor( $data,    {} );
-    $headers = _defor( $headers, {} );
-    $events  = _defor( $events,  {} );
+    $data    = { %{ _defor( $data,    {} ) } };
+    $headers = { %{ _defor( $headers, {} ) } };
+    $events  = { %{ _defor( $events,  {} ) } };
 
     my $base_url     = $self->base_url;
     my $url          = $base_url ? $base_url . $path : $path;
     my $ua           = $self->ua;
-    my $retry_count  = _defor( $self->retry->{count}, 1 );
-    my $retry_delay  = _defor( $self->retry->{delay}, 5 );
+    $ua->agent( $self->browser_id ) if $ua->can('agent');
+    $ua->timeout( $self->timeout ) if $ua->can('timeout');
+    $ua->ssl_opts( verify_hostname => $self->ssl_verify ) if $ua->can('ssl_opts');
+    my $retry_settings = $self->_build_retry;
+    my $retry_count  = _defor( $retry_settings->{count}, 1 );
+    my $retry_delay  = _defor( $retry_settings->{delay}, 5 );
     $retry_delay = 0 if looks_like_number($retry_delay) && $retry_delay < 0;
-    my %retry_status = %{ _defor($self->retry->{status}, {}) };
+    my %retry_status = %{ _defor($retry_settings->{status}, {}) };
     my %debug        = %{ _defor($self->debug_flags, {}) };
     my $eng          = $self->engine;
 
@@ -735,7 +898,9 @@ sub send {
             die "Unsupported engine: $eng - only LWP::UserAgent is currently wired up in send()";
         }
 
-        if ( $debug{in_out} || $debug{send_out} ) {
+        my $suppress_on_success = $debug{response_if_fail} && $response->is_success;
+
+        if ( $debug{send_out} || ( $debug{in_out} && !$suppress_on_success ) ) {
             print STDERR "-- REQUEST --\n";
             if ( $retry_count && $retry ) {
                 print STDERR "-- RETRY $retry of $retry_count\n";
@@ -747,7 +912,7 @@ sub send {
         my $debug_response = _defor($debug{in_out}, $debug{response});
 
         $debug_response = 0
-          if $debug{response_if_fail} && $response->is_success;
+          if $suppress_on_success;
 
         if ($debug_response) {
             my $used_time = time - $started_time;
@@ -789,7 +954,8 @@ sub json_response {
 
     my $response = try {
         my $content = _defor($self->last_response->decoded_content, '{}');
-        $self->json->decode($content);
+        my $json = _apply_charset( $self->json, $self->charset );
+        $json->decode($content);
     }
     catch {
         my $error = $_;
@@ -808,9 +974,18 @@ sub kvp_response {
     my $content = $response->decoded_content
         or return {};
 
-    my %data = map {
-        my ( $k, $v ) = map { uri_unescape($_) } split /=/, $_, 2;
-    } split /&/, $content;
+    my %data;
+    for my $pair ( split /&/, $content ) {
+        next if $pair eq '';
+        my ( $k, $v ) = map { ( my $s = $_ ) =~ tr/+/ /; uri_unescape($s) } split /=/, $pair, 2;
+        if ( exists $data{$k} ) {
+            $data{$k} = [ $data{$k} ] unless ref $data{$k} eq 'ARRAY';
+            push @{ $data{$k} }, $v;
+        }
+        else {
+            $data{$k} = $v;
+        }
+    }
 
     return \%data;
 }
@@ -920,7 +1095,8 @@ sub prepare_request {
             _encode_if_utf8_flagged($u), _encode_if_utf8_flagged($p) );
     }
     elsif ($at) {
-        $headers->{authorization} = $at;
+        $headers->{authorization} = $at
+            unless grep { lc($_) eq 'authorization' } keys %$headers;
     }
 
     return $request;
@@ -959,6 +1135,32 @@ sub _uri_escape_bytes_or_chars {
     return uri_escape( _encode_if_utf8_flagged($v) );
 }
 
+sub _json_validate_utf8 {
+    my ($v) = @_;
+    return $v if utf8::is_utf8($v);
+    my $decoded = eval { Encode::decode( utf8 => $v, Encode::FB_CROAK ) };
+    die sprintf(
+        "kvp2json_each: value is not valid UTF-8, refusing to silently corrupt it into JSON (raw bytes: %v02x)\n",
+        $v
+    ) if !defined $decoded;
+    return $decoded;
+}
+
+sub _numify_if_lossless {
+    my ($v) = @_;
+    return $v if !looks_like_number($v);
+    # NaN/Infinity have no valid JSON representation - JSON::XS's utf8-mode
+    # encoder emits them as the bareword nan/inf/-inf, which is not valid
+    # JSON. Leave the original string untouched rather than numifying into
+    # a token no JSON parser (including JSON::XS itself) can decode.
+    return $v if isnan($v + 0) || isinf($v + 0);
+    # Compare against a throwaway stringified copy, not $v+0 itself - comparing
+    # a number with eq caches a string form on that same scalar (SvPOK), and
+    # JSON::XS then encodes it as a JSON string instead of a JSON number.
+    my $stringified = ($v + 0) . '';
+    return $v eq $stringified ? $v + 0 : $v;
+}
+
 sub convert_data {
     my ($self, %o) = @_;
 
@@ -983,6 +1185,8 @@ sub kvp2json {
 
     my ($data, $events) = @o{qw(data events)};
 
+    my $json = _apply_charset( $self->json, $self->charset );
+
     my @keys;
 
     if (my $do = $events->{keys}) {
@@ -999,10 +1203,10 @@ sub kvp2json {
             next
         }
         next if _should_skip_key(%o, key => $key);
-        $data{$key} = $self->kvp2json_each(%o, value => $data->{$key});
+        $data{$key} = $self->kvp2json_each(%o, key => $key, value => $data->{$key});
     }
 
-    return $self->json->encode(\%data);
+    return $json->encode(\%data);
 }
 
 sub kvp2json_each {
@@ -1015,11 +1219,20 @@ sub kvp2json_each {
     }
 
     if (!ref $v) {
-        $v = Encode::decode( utf8 => $v ) if !utf8::is_utf8($v);
-        return looks_like_number($v) ? $v+0 : $v;
+        return _numify_if_lossless( _json_validate_utf8($v) );
     }
     elsif (ref $v eq 'BOOL') {
-        return $v->[0];
+        my $inner = $v->[0];
+        if ( ref $inner eq 'SCALAR' ) {
+            my $live_value = _defor( $$inner, '' );
+            if ( !( $live_value eq '0' || $live_value eq '1' ) ) {
+                return _numify_if_lossless( _json_validate_utf8($live_value) );
+            }
+            return $inner;
+        }
+        die "xBOOLEAN() only accepts a plain scalar or a scalar ref, not a "
+            . ref($inner) . " ref\n" if ref $inner;
+        return _numify_if_lossless( _json_validate_utf8( _defor( $inner, '' ) ) );
     }
     elsif (UNIVERSAL::isa($v, 'ARRAY')) {
         my @parts;
@@ -1034,13 +1247,15 @@ sub kvp2json_each {
         my %parts;
 
         foreach my $key(keys %$v) {
-            $parts{$key} = $self->kvp2json_each(%o, value => $v->{$key});
+            $parts{$key} = $self->kvp2json_each(%o, key => $key, value => $v->{$key});
         }
 
         return \%parts;
     }
 
-    return $v;
+    die "Unable to convert a " . ref($v) . " reference into JSON for key '"
+        . _defor( $o{key}, '' ) . "' - wrap it in xBOOLEAN() if you meant a "
+        . "live boolean/tracked value\n";
 }
 
 sub kvp2str {
@@ -1070,7 +1285,8 @@ sub kvp2str {
     foreach my $key(@keys) {
         next if $events->{not_include}{$key};
         next if _should_skip_key(%o, key => $key);
-        push @parts, $self->kvp2str_each(%o, key => $key, value => $data->{$key});
+        my $part = $self->kvp2str_each(%o, key => $key, value => $data->{$key});
+        push @parts, $part if length $part;
     }
 
     return join '&', @parts;
@@ -1079,9 +1295,9 @@ sub kvp2str {
 sub kvp2str_each {
     my ($self, %o) = @_;
 
-    my ($k, $v) = map { _defor($_, '') } @o{qw( key value )};
+    my ($raw_key, $v) = map { _defor($_, '') } @o{qw( key value )};
 
-    $k = _uri_escape_bytes_or_chars($k);
+    my $k = _uri_escape_bytes_or_chars($raw_key);
 
     if (UNIVERSAL::isa($v, 'CODE')) {
         $v = $self->$v(%o, key => $k);
@@ -1089,8 +1305,6 @@ sub kvp2str_each {
 
     if (!ref $v) {
         $v = _uri_escape_bytes_or_chars($v);
-
-        $v = $v + 0 if looks_like_number($v);
 
         if ($o{no_key}) {
             return $v;
@@ -1100,15 +1314,22 @@ sub kvp2str_each {
         }
     }
     elsif (ref $v eq 'BOOL') {
-        my $bool_value = ref $v->[0] eq 'SCALAR' ? ${$v->[0]} : $v->[0];
-        return "$k=" . _uri_escape_bytes_or_chars($bool_value);
+        my $inner = $v->[0];
+        die "xBOOLEAN() only accepts a plain scalar or a scalar ref, not a "
+            . ref($inner) . " ref\n" if ref $inner && ref $inner ne 'SCALAR';
+        my $bool_value = ref $inner eq 'SCALAR' ? $$inner : $inner;
+        my $escaped = _uri_escape_bytes_or_chars( _defor($bool_value, '') );
+        return $o{no_key} ? $escaped : "$k=$escaped";
     }
     elsif (ref $v eq 'ARRAY') {
         my @parts;
 
         foreach my $val(@$v) {
-            push @parts, $self->kvp2str_each(%o, key => $k, value => $val, no_key => 0);
+            my $part = $self->kvp2str_each(%o, key => $raw_key, value => $val, no_key => 0);
+            push @parts, $part if length $part;
         }
+
+        return '' if !@parts;
 
         return ($o{no_key} ? '&' : '') . join '&', @parts;
     }
@@ -1117,7 +1338,9 @@ sub kvp2str_each {
         my @parts;
 
         foreach my $val(@$v) {
-            my $part = $self->kvp2str_each(%o, key => $k, value => $val, no_key => 1);
+            next if ref $val eq 'ARRAY' && !@$val;
+
+            my $part = $self->kvp2str_each(%o, key => $raw_key, value => $val, no_key => 1);
 
             if ($part =~ m/&/) {
                 push @parts, $part;
@@ -1127,10 +1350,10 @@ sub kvp2str_each {
             }
         }
 
-        my $csv = "$k=".join( ',', @csv);
-        
+        my $csv = ($o{no_key} ? '' : "$k=") . join( ',', @csv);
+
         if (@parts) {
-            return join '&', $csv, @parts;
+            return join '&', $csv, map { s/^&//r } @parts;
         }
 
         return $csv;
@@ -1139,7 +1362,9 @@ sub kvp2str_each {
         die "Unable to convert nested hash value for key '$k' into a form-urlencoded query string";
     }
 
-    return $v;
+    die "Unable to convert a " . ref($v) . " reference into a form-urlencoded "
+        . "query string value for key '$k' - wrap it in xBOOLEAN() if you meant "
+        . "a live boolean/tracked value\n";
 }
 
 sub basic_authenticator {

@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "LWP::Protocol::https" => 0,
     "LWP::UserAgent" => 0,
     "Moo" => 0,
+    "POSIX" => 0,
     "Scalar::Util" => 0,
     "Try::Tiny" => 0,
     "URI" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "HTTP::Request" => 0,
     "HTTP::Response" => 0
   },
-  "VERSION" => "1.10",
+  "VERSION" => "1.23",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %FallbackPrereqs = (
   "LWP::Protocol::https" => 0,
   "LWP::UserAgent" => 0,
   "Moo" => 0,
+  "POSIX" => 0,
   "Scalar::Util" => 0,
   "Try::Tiny" => 0,
   "URI" => 0,

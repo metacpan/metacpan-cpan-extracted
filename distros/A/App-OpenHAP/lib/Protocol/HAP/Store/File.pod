@@ -1,0 +1,84 @@
+=head1 NAME
+
+Protocol::HAP::Store::File - the store contract over files
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::Store::File;
+
+    my $store = Protocol::HAP::Store::File->new(
+        path   => '/var/db/openhapd',
+        logger => $logger,
+    );
+
+    $store->save_pairing('controller-id', $ltpk, 1);
+    my $pairings = $store->load_pairings;
+
+=head1 DESCRIPTION
+
+This module is the durable implementation of the store contract that
+F<Protocol/HAP/Store.pod> documents. The state lives in one directory
+and survives a restart, which is what a paired accessory needs: a
+controller that sees C<c#> go backwards drops the accessory.
+
+The tier holds a sans-IO engine, and this module writes files. That is
+the point. Sans-IO describes L<Protocol::HAP::Server>, and the store is
+the injected seam that keeps the engine pure.
+
+=head1 CONSTRUCTOR
+
+=head2 new(%args)
+
+=over 4
+
+=item C<path>
+
+The state directory. The argument is required, and C<new> dies without
+it. The caller owns the location, because a default path is host
+policy. C<new> creates the directory with mode 0700 when it is absent.
+
+=item C<logger>
+
+A logger with C<debug>, C<info>, C<warning>, and C<error>. The default
+is C<< Protocol::HAP->null_logger >>, which drops every message.
+
+=back
+
+=head1 FILES
+
+Every write applies the mode at the open, before the first byte. A
+C<chmod> after the write leaves a window in which the identity of the
+accessory is world-readable.
+
+=over 4
+
+=item F<< <path>/accessory_ltsk >>
+
+The long-term secret key of the accessory, mode 0600.
+
+=item F<< <path>/accessory_ltpk >>
+
+The long-term public key of the accessory, mode 0644.
+
+=item F<< <path>/pairings.db >>
+
+One line for each paired controller, mode 0600. The format is
+C<controller_id:ltpk_hex:permissions>. One process owns the store, so
+a read takes no lock.
+
+=item F<< <path>/state.json >>
+
+The configuration number, the configuration digest, and the counter of
+pairing failures, mode 0600. The write goes through a sibling temporary
+file and a rename, so a reader sees the old content or the new content.
+A missing or corrupt file gives empty state, because a state file that
+a crash truncated must not stop the daemon that would rewrite it.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, L<Protocol::HAP::Store::Memory>,
+F<Protocol/HAP/Store.pod>, F<spec/HAP-Pairing.md>
+
+=cut

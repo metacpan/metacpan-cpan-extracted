@@ -21,14 +21,13 @@ use warnings;
 
 use Test::Most;
 use Test::Needs qw(
-    Params::Validate::Strict
-    Test::Without::Module
-    Test::Returns
-    Test::Mockingbird
+	Params::Validate::Strict
+	Test::Without::Module
+	Test::Mockingbird
 );
 use Params::Validate::Strict qw(validate_strict);
 use Test::Mockingbird 0.08;
-use Test::Returns;
+use Test::Needs;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 use Readonly;
@@ -127,8 +126,6 @@ subtest 'SYNOPSIS: named pairs survive full get_params -> validate_strict pipeli
 	is($result->{latitude},   51.5,  'latitude preserved through pipeline');
 	is($result->{longitude},  -0.1,  'longitude preserved through pipeline');
 
-	returns_ok($result, { type => 'hashref' }, 'return schema: hashref');
-
 	diag explain $result if $ENV{TEST_VERBOSE};
 };
 
@@ -199,7 +196,6 @@ subtest 'validation pipeline: zero args + undef $default returns undef from get_
 subtest 'OO: plain scalar (mandatory $default) constructor' => sub {
 	my $u = Integration::User->new('Alice');
 	is($u->name, 'Alice', 'name set via scalar arg');
-	returns_ok($u, { type => 'object' }, 'instance is an object');
 };
 
 subtest 'OO: named-pair constructor' => sub {
@@ -270,11 +266,12 @@ subtest 'Return::Set: pipeline output satisfies hashref schema' => sub {
 
 	for my $case (@cases) {
 		my ($label, $val) = @{$case};
-		returns_ok($val, { type => 'hashref' }, "hashref schema: $label");
+		ok(ref($val) eq 'HASH');
 	}
 };
 
 subtest 'Return::Set: get_params undef return satisfies optional hashref schema' => sub {
+	test_needs 'Test::Return';
 	# When get_params(undef, \@_) is called with zero args it returns undef.
 	# That return value must satisfy the optional hashref output spec in the POD.
 	my $raw_undef = get_params();

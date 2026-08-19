@@ -1,0 +1,25 @@
+{
+   "abstract" : "build a documentation website for a Perl project",
+   "author" : [
+      "Dick Olsson <hi@senzilla.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "scripts/dist",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "version" : 2
+   },
+   "name" : "App-FuguWeb",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.036"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

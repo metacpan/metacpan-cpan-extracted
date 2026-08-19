@@ -79,6 +79,7 @@ typedef struct
 #define	ARG_LOC(p)	(((struct regnode_1 *)p)->arg1.u32)
 
 #define GET_LITERAL(a) (((char *)((a)->rn + 1)) + (a)->spent)
+#define GET_LITERAL_UNSIGNED(a) (((unsigned char *)((a)->rn + 1)) + (a)->spent)
 
 #define GET_OFFSET(rn) (NEXT_OFF(rn) ? NEXT_OFF(rn) : get_synth_offset(rn))
 
@@ -171,29 +172,6 @@ static unsigned char word_posix_regclasses[CC_VERTSPACE_ + 1];
 static unsigned char non_word_posix_regclasses[CC_VERTSPACE_ + 1];
 
 static unsigned char newline_posix_regclasses[CC_VERTSPACE_ + 1];
-
-/* Simplified hierarchy of character classes; ignoring the difference
-   between classes (i.e. IsAlnum & IsWord), which we probably
-   shouldn't - it is a documented bug, though... */
-static char *regclass_names[] = { "Digit", "IsAlnum", "IsSpacePerl",
-                                  "IsHorizSpace", "IsVertSpace",
-                                  "IsWord", "IsXPosixAlnum", "IsXPosixXDigit",
-                                  "IsAlpha", "IsXPosixAlpha",
-                                  "IsDigit", "IsLower", "IsUpper",
-                                  "IsXDigit", "SpacePerl", "VertSpace",
-                                  "Word", "XPosixDigit",
-                                  "XPosixWord", "XPosixAlpha", "XPosixAlnum",
-                                  "XPosixXDigit" };
-
-static U32 regclass_blocks[] = { NUMBER_BLOCK, ALNUM_BLOCK, SPACE_BLOCK,
-                                 HORIZONTAL_SPACE_BLOCK,
-                                 VERTICAL_SPACE_BLOCK, ALNUM_BLOCK,
-                                 ALNUM_BLOCK, HEX_DIGIT_BLOCK, ALPHA_BLOCK,
-                                 ALPHA_BLOCK, NUMBER_BLOCK, LOWER_BLOCK,
-                                 UPPER_BLOCK, HEX_DIGIT_BLOCK, SPACE_BLOCK,
-                                 VERTICAL_SPACE_BLOCK, ALNUM_BLOCK,
-                                 NUMBER_BLOCK, ALNUM_BLOCK, ALPHA_BLOCK,
-                                 ALNUM_BLOCK, HEX_DIGIT_BLOCK};
 
 static U32 regclass_superset[] = { NOT_SPACE_BLOCK,
                                    NOT_ALPHA_BLOCK, NOT_NUMBER_BLOCK,
@@ -367,81 +345,6 @@ static U32 extend_mask(U32 mask)
     }
 
     return mask;
-}
-
-static int convert_desc_to_map(char *desc, int invert, U32 *map)
-{
-    int i;
-    U32 mask = 0;
-    char *p;
-
-    /* fprintf(stderr, "enter convert_desc_to_map(%s, %d\n", desc, invert); */
-
-    p = strstr(desc, "utf8::");
-    /* make sure *(p - 1) is valid */
-    if (p == desc)
-    {
-        rc_error = "no inversion flag before character class description";
-        return -1;
-    }
-
-    while (p)
-    {
-        char sign = *(p - 1);
-        for (i = 0; i < SIZEOF_ARRAY(regclass_names); ++i)
-        {
-            if (!strncmp(p + 6, regclass_names[i], strlen(regclass_names[i])))
-            {
-                if (sign == '+')
-                {
-                    if (mask & (regclass_blocks[i] << MIRROR_SHIFT))
-                    {
-                        *map = invert ? 0 : EVERY_BLOCK;
-                        return 1;
-                    }
-
-                    mask |= regclass_blocks[i];
-                }
-                else if (sign == '!')
-                {
-                    if (mask & regclass_blocks[i])
-                    {
-                        *map = invert ? 0 : EVERY_BLOCK;
-                        return 1;
-                    }
-
-                    mask |= (regclass_blocks[i] << MIRROR_SHIFT);
-                }
-                else
-                {
-                    rc_error = "unknown inversion flag before character class description";
-                    return -1;
-                }
-            }
-        }
-
-        p = strstr(p + 6, "utf8::");
-    }
-
-    /* fprintf(stderr, "parsed 0x%x\n", (unsigned)mask); */
-
-    if ((mask & ALPHA_BLOCK) && (mask & NUMBER_BLOCK))
-    {
-        mask |= ALNUM_BLOCK;
-    }
-
-    if (invert)
-    {
-        mask = MIRROR_BLOCK(mask);
-    }
-
-    if ((mask & ALPHA_BLOCK) && (mask & NUMBER_BLOCK))
-    {
-        mask |= ALNUM_BLOCK;
-    }
-
-    *map = extend_mask(mask);
-    return 1;
 }
 
 /* invlist methods are static inside regcomp.c, so we must copy them... */
@@ -1688,6 +1591,8 @@ static int compare_subexpressions(int anchored, Arrow *a1, Arrow *a2)
     int rv, sz1, sz2;
     Arrow left, right;
 
+    PERL_UNUSED_ARG(anchored);
+
     p1 = a1->rn;
     p2 = a2->rn;
     assert(OP(p1) == SUSPEND);
@@ -2059,6 +1964,12 @@ static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
             return -1;
         }
 
+        if (!cr1 || !cr2)
+        {
+            /* fprintf(stderr, "cr1 = %d, cr2 = %d\n", cr1, cr2); */
+            return compare_mismatch(anchored, a1, a2);
+        }
+
         /* clearly this hould happen at a lower level, but there it
            breaks other paths... */
         if (m2 & NOT_ALNUM_BLOCK)
@@ -2067,10 +1978,10 @@ static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
             m2 = extend_mask(m2);
         }
 
-        if (!cr1 || !cr2 || (m1 & ~m2))
+        if (m1 & ~m2)
         {
-            /* fprintf(stderr, "cr1 = %d, cr2 = %d, m1 = 0x%x, m2 = 0x%x\n",
-                cr1, cr2, (unsigned)m1, (unsigned)m2); */
+            /* fprintf(stderr, "m1 = 0x%x, m2 = 0x%x\n",
+                (unsigned)m1, (unsigned)m2); */
             return compare_mismatch(anchored, a1, a2);
         }
     }
@@ -2347,42 +2258,6 @@ static int compare_nanyofm_nanyofm(int anchored, Arrow *a1, Arrow *a2)
     return compare_negative_bitmaps(anchored, a1, a2, left, right);
 }
 
-/* compare_bitmaps could replace this method, but when a class
-   contains just a few characters, it seems more natural to compare
-   them explicitly */
-static int compare_short_byte_class(int anchored, Arrow *a1, Arrow *a2,
-    ByteClass *left)
-{
-    BitFlag bf;
-    int i;
-
-    for (i = 0; i < left->expl_size; ++i)
-    {
-        init_bit_flag(&bf, (unsigned char)left->expl[i]);
-        if (!(get_bitmap_byte(a2->rn, bf.offs) & bf.mask))
-        {
-            return compare_mismatch(anchored, a1, a2);
-        }
-    }
-
-    return compare_tails(anchored, a1, a2);
-}
-
-static int compare_right_full(int anchored, Arrow *a1, Arrow *a2)
-{
-    int i;
-
-    for (i = 0; i < 16; ++i)
-    {
-        if (!(get_bitmap_byte(a2->rn, i) & 0xff))
-        {
-            return compare_mismatch(anchored, a1, a2);
-        }
-    }
-
-    return compare_tails(anchored, a1, a2);
-}
-
 static int compare_posix_posix(int anchored, Arrow *a1, Arrow *a2)
 {
     U32 m1, m2;
@@ -2443,7 +2318,7 @@ static int compare_negative_posix_negative_posix(int anchored, Arrow *a1, Arrow 
 
     cr1 = convert_negative_class(a1, &m1);
     cr2 = convert_negative_class(a2, &m2);
-    if (!cr2 || !cr2 || (m1 & ~m2))
+    if (!cr1 || !cr2 || (m1 & ~m2))
     {
         return compare_mismatch(anchored, a1, a2);
     }
@@ -2711,7 +2586,7 @@ static int compare_exact_anyofr(int anchored, Arrow *a1, Arrow *a2)
     assert(OP(a1->rn) == EXACT);
     assert(OP(a2->rn) == ANYOFR);
 
-    seq = GET_LITERAL(a1);
+    seq = GET_LITERAL_UNSIGNED(a1);
     init_bit_flag(&bf, *seq);
 
     if (!convert_anyofr_to_bitmap(a2, right))
@@ -2771,7 +2646,7 @@ static int compare_exact_anyofm(int anchored, Arrow *a1, Arrow *a2)
     assert(OP(a1->rn) == EXACT);
     assert(OP(a2->rn) == ANYOFM);
 
-    seq = GET_LITERAL(a1);
+    seq = GET_LITERAL_UNSIGNED(a1);
     init_bit_flag(&bf, *seq);
 
     if (!convert_anyofm_to_bitmap(a2, right))
@@ -2917,7 +2792,6 @@ static int compare_posix_nanyofm(int anchored, Arrow *a1, Arrow *a2)
 
 static int compare_negative_posix_nanyofm(int anchored, Arrow *a1, Arrow *a2)
 {
-    int i;
     unsigned char *b;
     unsigned char right[ANYOF_BITMAP_SIZE];
 
@@ -3984,6 +3858,8 @@ static int compare_plus_plus(int anchored, Arrow *a1, Arrow *a2)
     Arrow left, right;
     int rv, offs;
 
+    PERL_UNUSED_ARG(anchored);
+
     p1 = a1->rn;
     assert(OP(p1) == PLUS);
     p2 = a2->rn;
@@ -4021,6 +3897,8 @@ static int compare_repeat_star(int anchored, Arrow *a1, Arrow *a2)
     regnode *p1, *p2;
     Arrow left, right;
     int rv, offs;
+
+    PERL_UNUSED_ARG(anchored);
 
     p1 = a1->rn;
     assert((OP(p1) == PLUS) || (OP(p1) == STAR));
@@ -4396,6 +4274,8 @@ static int compare_plus_curly(int anchored, Arrow *a1, Arrow *a2)
 
 static int compare_suspend_curly(int anchored, Arrow *a1, Arrow *a2)
 {
+    PERL_UNUSED_ARG(anchored);
+
     assert(OP(a1->rn) == SUSPEND);
     assert(!a1->spent);
 
@@ -5093,6 +4973,10 @@ static int compare_right_open(int anchored, Arrow *a1, Arrow *a2)
 
 static int success(int anchored, Arrow *a1, Arrow *a2)
 {
+    PERL_UNUSED_ARG(anchored);
+    PERL_UNUSED_ARG(a1);
+    PERL_UNUSED_ARG(a2);
+
     return 1;
 }
 
@@ -5270,8 +5154,7 @@ void rc_init()
 
     memset(non_alphanumeric_classes, 0,
         SIZEOF_ARRAY(non_alphanumeric_classes));
-    non_alphanumeric_classes[EOS] = non_alphanumeric_classes[EOL] =
-        non_alphanumeric_classes[SEOL] = 1;
+    non_alphanumeric_classes[EOS] = non_alphanumeric_classes[SEOL] = 1;
 
     memset(word_posix_regclasses, 0,
         SIZEOF_ARRAY(word_posix_regclasses));
@@ -5279,7 +5162,6 @@ void rc_init()
         word_posix_regclasses[CC_DIGIT_] =
         word_posix_regclasses[CC_ALPHA_] =
         word_posix_regclasses[CC_LOWER_] =
-        word_posix_regclasses[CC_UPPER_] =
         word_posix_regclasses[CC_UPPER_] =
         word_posix_regclasses[CC_ALPHANUMERIC_] =
         word_posix_regclasses[CC_CASED_] =
@@ -5378,7 +5260,6 @@ void rc_init()
 
     dispatch[SUCCEED][EOS] = compare_left_tail;
     dispatch[EOS][EOS] = compare_tails;
-    dispatch[EOL][EOS] = compare_mismatch;
     dispatch[SEOL][EOS] = compare_mismatch;
     dispatch[BRANCH][EOS] = compare_left_branch;
     dispatch[NOTHING][EOS] = compare_left_tail;
@@ -5398,31 +5279,8 @@ void rc_init()
     dispatch[LOOKBEHIND_END][EOS] = compare_left_tail;
     dispatch[OPTIMIZED][EOS] = compare_left_tail;
 
-    dispatch[SUCCEED][EOL] = compare_left_tail;
-    dispatch[EOS][EOL] = compare_tails;
-    dispatch[EOL][EOL] = compare_tails;
-    dispatch[SEOL][EOL] = compare_tails;
-    dispatch[BRANCH][EOL] = compare_left_branch;
-    dispatch[NOTHING][EOL] = compare_left_tail;
-    dispatch[TAIL][EOL] = compare_left_tail;
-    dispatch[STAR][EOL] = compare_mismatch;
-    dispatch[PLUS][EOL] = compare_left_plus;
-    dispatch[CURLY][EOL] = compare_left_curly;
-    dispatch[CURLYM][EOL] = compare_left_curly;
-    dispatch[CURLYX][EOL] = compare_left_curly;
-    dispatch[WHILEM][EOL] = compare_left_tail;
-    dispatch[OPEN][EOL] = compare_left_open;
-    dispatch[CLOSE][EOL] = compare_left_tail;
-    dispatch[IFMATCH][EOL] = compare_after_assertion;
-    dispatch[UNLESSM][EOL] = compare_after_assertion;
-    dispatch[OPFAIL][EOL] = compare_after_alt_assertion;
-    dispatch[MINMOD][EOL] = compare_left_tail;
-    dispatch[LOOKBEHIND_END][EOL] = compare_left_tail;
-    dispatch[OPTIMIZED][EOL] = compare_left_tail;
-
     dispatch[SUCCEED][MEOL] = compare_left_tail;
     dispatch[EOS][MEOL] = compare_tails;
-    dispatch[EOL][MEOL] = compare_tails;
     dispatch[MEOL][MEOL] = compare_tails;
     dispatch[SEOL][MEOL] = compare_tails;
     dispatch[REG_ANY][MEOL] = compare_mismatch;
@@ -5458,7 +5316,6 @@ void rc_init()
 
     dispatch[SUCCEED][SEOL] = compare_left_tail;
     dispatch[EOS][SEOL] = compare_tails;
-    dispatch[EOL][SEOL] = compare_tails;
     dispatch[SEOL][SEOL] = compare_tails;
     dispatch[BRANCH][SEOL] = compare_left_branch;
     dispatch[NOTHING][SEOL] = compare_left_tail;
@@ -5469,7 +5326,7 @@ void rc_init()
     dispatch[NPOSIXU][SEOL] = compare_mismatch;
     dispatch[NPOSIXA][SEOL] = compare_mismatch;
     dispatch[TAIL][SEOL] = compare_left_tail;
-    dispatch[STAR][SEOL] = 0;
+    dispatch[STAR][SEOL] = compare_mismatch;
     dispatch[PLUS][SEOL] = compare_left_plus;
     dispatch[CURLY][SEOL] = compare_left_curly;
     dispatch[CURLYM][SEOL] = compare_left_curly;
@@ -6243,7 +6100,6 @@ void rc_init()
 
     dispatch[SUCCEED][STAR] = compare_left_tail;
     dispatch[EOS][STAR] = compare_tails;
-    dispatch[EOL][STAR] = compare_tails;
     dispatch[MEOL][STAR] = compare_tails;
     dispatch[SEOL][STAR] = compare_tails;
     dispatch[NOTHING][STAR] = compare_left_tail;

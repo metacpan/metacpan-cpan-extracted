@@ -18,15 +18,15 @@ use File::Copy;
 use File::Temp qw(tempfile);
 use JSON;
 use List::Util qw(none);
+
 use Role::Tiny;
-use Term::ANSIColor qw(colored);
-use Text::ASCIITable;
-use Text::ASCIITable::FixANSI;
 
 ########################################################################
 sub cmd_update_annotations {
 ########################################################################
   my ($self) = @_;
+
+  $self->_load_ASCIITable;
 
   my ($file) = $self->get_args;
 
@@ -76,6 +76,8 @@ sub cmd_update_annotations {
 sub cmd_annotate {
 ########################################################################
   my ($self) = @_;
+
+  $self->_load_ASCIITable;
 
   my ( $file, $api_key ) = $self->get_args;
 
@@ -143,7 +145,13 @@ sub _show_annotations {
 ########################################################################
   my ( $self, $review, $review_file ) = @_;
 
-  my $color_on = $self->get_color;
+  my $color_on = eval {
+    require Term::ANSI::Color;
+    Term::ANSIColor->import('colored');
+    return 1;
+  };
+
+  $color_on = $color_on && $self->get_color;
 
   my $t = Text::ASCIITable->new( { headingText => "Annotations: $review_file", allowANSI => $color_on } );
 
@@ -389,6 +397,16 @@ sub _finalize_annotations {
   else {
     $self->_generate_annotate_file( $review, $final_review_file );
   }
+
+  return;
+}
+
+########################################################################
+sub _load_ASCIITable {
+########################################################################
+
+  require Text::ASCIITable;
+  require Text::ASCIITable::FixANSI;
 
   return;
 }

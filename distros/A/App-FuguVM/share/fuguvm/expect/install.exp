@@ -1,0 +1,228 @@
+#!/usr/bin/expect -f
+#
+# Automated OpenBSD installation over the serial console
+#
+# Usage: install.exp <host> <port> [root_password] [proxy_url]
+#
+
+# Use FUGUVM_TIMEOUT from the environment when it exceeds the
+# script default. Slow hosts need this, for example under TCG
+# emulation in CI.
+proc env_timeout {default} {
+    global env
+    if {[info exists env(FUGUVM_TIMEOUT)] && $env(FUGUVM_TIMEOUT) > $default} {
+        return $env(FUGUVM_TIMEOUT)
+    }
+    return $default
+}
+
+set timeout [env_timeout 300]
+
+if {[llength $argv] < 2} {
+    puts stderr "Usage: install.exp <host> <port> \[root_password\] \[proxy_url\]"
+    exit 1
+}
+
+set host [lindex $argv 0]
+set port [lindex $argv 1]
+set root_password [lindex $argv 2]
+set proxy_url [lindex $argv 3]
+
+if {$root_password eq ""} {
+    set root_password "openbsd"
+}
+
+if {$proxy_url eq ""} {
+    set proxy_url "none"
+}
+
+log_user 1
+
+# Helper proc to send a response after a match
+proc respond {response} {
+    sleep 0.5
+    send "$response\r"
+}
+
+# Connect to console
+spawn telnet $host $port
+
+# Wait for the console connection. telnet prints "Connected to <host>"
+# on success. Match on the host-independent prefix, because the host
+# can be an IP address. An eof means telnet could not connect at all,
+# because the console port does not listen. Fail fast rather than hang
+# to the full timeout.
+expect {
+    "Connected to" {
+        # Send an empty line to trigger the prompt if the console
+        # already shows the installer
+        sleep 0.5
+        send "\r"
+    }
+    "Escape character" {
+        sleep 0.5
+        send "\r"
+    }
+    eof {
+        send_user "\n==> ERROR: telnet could not connect to the VM console\n"
+        exit 1
+    }
+    timeout {
+        send_user "\n==> ERROR: Failed to connect to VM console\n"
+        exit 1
+    }
+}
+
+sleep 0.5
+
+expect {
+    "(I)nstall" {
+        send "i\r"
+    }
+    "Welcome to the OpenBSD" {
+        # Wait a bit more for the menu to appear
+        exp_continue
+    }
+    "boot>" {
+        send "\r"
+        exp_continue
+    }
+    timeout {
+        send_user "\n==> ERROR: Timeout waiting for installer\n"
+        exit 1
+    }
+}
+
+# Start installation
+sleep 0.5
+
+# Terminal type
+expect "Terminal type?" { respond "" }
+
+# System hostname
+expect "System hostname?" { respond "openbsd-test" }
+
+# Network interface
+expect "Network interface to configure?" { respond "" }
+
+# IPv4 address
+expect "IPv4 address" { respond "dhcp" }
+
+# IPv6 address
+expect "IPv6 address" { respond "none" }
+
+# Done with network interfaces
+expect "Network interface to configure?" { respond "done" }
+
+# Password for root. Wait for the actual prompt.
+expect "Password for root account?" 
+sleep 0.5
+send "$root_password\r"
+
+expect "Password for root account? (again)" 
+sleep 0.5
+send "$root_password\r"
+
+# Start sshd
+expect "Start sshd(8)" { respond "yes" }
+
+# Setup a user
+expect "Setup a user?" { respond "no" }
+
+# Allow root ssh login
+expect "Allow root ssh login?" { respond "yes" }
+
+# Timezone
+expect "What timezone are you in?" { respond "UTC" }
+
+# Root disk
+expect "Which disk is the root disk?" { respond "" }
+
+# Disk encryption: no
+expect "Encrypt the root disk" { respond "no" }
+
+# Use whole disk or GPT
+expect {
+    "Use (W)hole disk" { respond "w" }
+    "whole disk" { respond "w" }
+}
+
+# Auto layout
+expect {
+    "Use (A)uto layout" { respond "a" }
+    "Auto layout" { respond "a" }
+}
+
+# Additional disks to initialize: none
+expect "Which disk do you wish to initialize?" { respond "done" }
+
+# Location of sets
+expect "Location of sets?" { respond "http" }
+
+# HTTP proxy
+expect "HTTP proxy URL?" { respond $proxy_url }
+
+# HTTP server
+expect "HTTP Server?" { respond "cdn.openbsd.org" }
+
+# Server directory: accept the default
+expect "Server directory?" { respond "" }
+
+# Select the sets. Skip games and X.
+expect "Set name(s)?" {
+    sleep 0.5
+    send -- "-game* -x*\r"
+}
+
+# Confirm selection
+expect "Set name(s)?" { respond "done" }
+
+# Wait for the sets to install. Then answer the prompt for more sets.
+set timeout [env_timeout 900]
+expect {
+    "Continue without verification?" { 
+        respond "yes" 
+        exp_continue
+    }
+    "Location of sets?" { respond "done" }
+    timeout {
+        send_user "\n==> ERROR: Timeout during set installation\n"
+        exit 1
+    }
+}
+
+# The installer can ask to correct the clock before it finishes.
+# Answer yes if it does. The (R)eboot? prompt marks the end of the
+# install. Choose halt instead of reboot. Then fuguvm can restart
+# from the installed disk without the miniroot attached. A single
+# expect block matches both prompts. Thus a missing time prompt never
+# stalls to the timeout.
+set timeout [env_timeout 900]
+expect {
+    "Time appears wrong" {
+        respond "yes"
+        exp_continue
+    }
+    "(R)eboot?" {
+        respond "h"
+    }
+    timeout {
+        send_user "\n==> ERROR: Timeout waiting for install to finish\n"
+        exit 1
+    }
+}
+
+# The install is complete once the system halts. Do NOT wait for eof.
+# OpenBSD's halt stops at the "press any key to reboot" prompt and
+# does not close the console. Thus telnet stays connected and no eof
+# ever arrives. fuguvm stops QEMU through QMP once this script returns.
+# Then fuguvm restarts from the installed disk.
+set timeout [env_timeout 120]
+expect {
+    "The operating system has halted" { exit 0 }
+    "press any key to reboot" { exit 0 }
+    timeout {
+        send_user "\n==> ERROR: Timeout waiting for system halt\n"
+        exit 1
+    }
+}

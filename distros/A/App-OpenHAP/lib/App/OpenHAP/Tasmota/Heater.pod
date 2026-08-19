@@ -1,0 +1,25 @@
+=head1 NAME
+
+App::OpenHAP::Tasmota::Heater - Tasmota heater/switch HAP accessory
+
+=head1 SYNOPSIS
+
+    use App::OpenHAP::Tasmota::Heater;
+
+    my $heater = App::OpenHAP::Tasmota::Heater->new(
+        aid => 2,
+        name => 'Living Room Heater',
+        mqtt_topic => 'tasmota_AABBCC',
+        mqtt_client => $mqtt,
+    );
+
+=head1 DESCRIPTION
+
+This module implements a HAP switch accessory for Tasmota devices that
+have relay control (for example, heaters, switches, and outlets).
+
+=head1 SEE ALSO
+
+F<spec/MQTT-Control.md>, F<spec/MQTT-State.md>
+
+=cut

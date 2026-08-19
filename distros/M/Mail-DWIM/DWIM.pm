@@ -6,9 +6,9 @@ use strict;
 use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(mail);
-our $VERSION = "0.09";
+our $VERSION = "0.11";
 our @HTML_MODULES = qw(HTML::FormatText HTML::TreeBuilder MIME::Lite);
-our @ATTACH_MODULES = qw(File::MMagic MIME::Lite);
+our @ATTACH_MODULES = qw(MIME::Lite MIME::Types);
 
 use YAML qw(LoadFile);
 use Log::Log4perl qw(:easy);
@@ -109,6 +109,11 @@ sub send {
           "subj=" . snip($self->{subject}, 20) . " " .
           "text=" . snip($self->{text}, 20) .
           "";
+
+    if($self->{dryrun}) {
+        print "$msg\n";
+        return 1;
+    }
 
     my @options = ();
 
@@ -310,10 +315,12 @@ sub attach_msg {
                  Data     => $text,
                 );
 
+    my $mime_types = MIME::Types->new();
+
     for my $file (@files) {
-        my $mm = File::MMagic->new();
-        my $type = $mm->checktype_filename($file);
-        LOGDIE "Cannot determine mime type of $file" unless defined $type;
+        my $type = $mime_types->mimeTypeOf($file);
+          # MIME::Lite expects a string, not a MIME::Type object.
+        $type = defined $type ? $type->type : "application/octet-stream";
 
         $msg->attach(Type        => $type,
                      Path        => $file,
@@ -578,6 +585,18 @@ a false value:
 
 The detailed error message is available by calling Mail::DWIM::error().
 
+=head2 Dry Run
+
+Set the C<dryrun> option to a true value to print a summary of the message
+without opening a mail transport or sending anything:
+
+    mail(
+      dryrun  => 1,
+      to      => 'foo@bar.com',
+      subject => 'test message',
+      text    => 'test message text',
+    );
+
 =head2 Attaching files
 
 If you want to include an image, a PDF files or some other attachment
@@ -639,7 +658,7 @@ C<mail> command. Noboby has to read its documentation to use it:
 
 =head1 LEGALESE
 
-Copyright 2007 by Mike Schilli, all rights reserved.
+Copyright 2007-2026 by Mike Schilli, all rights reserved.
 This program is free software, you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
@@ -649,7 +668,6 @@ modify it under the same terms as Perl itself.
     
 =head1 LICENSE
 
-Copyright 2007-2014 by Mike Schilli, all rights reserved.
+Copyright 2007-2026 by Mike Schilli, all rights reserved.
 This program is free software, you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

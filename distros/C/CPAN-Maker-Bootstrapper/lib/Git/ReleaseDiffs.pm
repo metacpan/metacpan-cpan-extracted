@@ -39,7 +39,9 @@ sub new {
 ########################################################################
   my ( $class, @args ) = @_;
 
-  require Git::Raw;
+  eval { require Git::Raw; 1; } or do {
+    die "ERROR: Git::Raw is not installed.\n";
+  };
 
   my $options = ref $args[0] ? $args[0] : {@args};
 

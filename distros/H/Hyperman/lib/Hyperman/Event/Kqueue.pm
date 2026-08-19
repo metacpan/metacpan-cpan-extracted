@@ -3,7 +3,7 @@ package Hyperman::Event::Kqueue;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 require Hyperman;   # loads the shared XS (available())
 

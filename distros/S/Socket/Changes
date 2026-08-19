@@ -1,5 +1,9 @@
 Revision history for Socket
 
+2.043   2026-08-18
+        [BUGFIXES]
+         * Fix test skip count for `gai_strerror()` test (RT180884)
+
 2.042   2026-08-17
         [CHANGES]
          * Provide also a `gai_strerror` to go with `getaddrinfo` and

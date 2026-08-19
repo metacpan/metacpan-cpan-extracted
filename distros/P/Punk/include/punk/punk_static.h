@@ -150,7 +150,13 @@ static int ps_path_unsafe(const char *p, STRLEN len) {
     STRLEN i, seg = 0;
     if (memchr(p, '\0', len)) return 1;
     for (i = 0; i <= len; i++) {
-        if (i == len || p[i] == '/') {
+        /* A backslash ends a segment too. On this side of the world it is an
+         * ordinary filename byte and "..\.." traverses nothing, but Windows
+         * reads it as a separator, so a guard that only splits on '/' sees one
+         * harmless segment where the OS sees two levels up. Splitting on both
+         * costs a comparison and does not depend on which platform the build
+         * is for - the wrong place to find out is a port. */
+        if (i == len || p[i] == '/' || p[i] == '\\') {
             STRLEN n = i - seg;
             if (n == 2 && p[seg] == '.' && p[seg + 1] == '.') return 1;
             seg = i + 1;

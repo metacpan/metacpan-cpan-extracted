@@ -7,7 +7,7 @@ use open ':std', ':encoding(UTF-8)';
 
 use Archive::Tar;
 use CLI::Simple::Constants qw(:booleans);
-use CLI::Simple::Utils qw(slurp);
+use CLI::Simple::Utils qw(slurp choose);
 use CPAN::Maker::Bootstrapper::Constants qw(:all);
 use Data::Dumper;
 use English qw(-no_match_vars);
@@ -63,26 +63,35 @@ sub cmd_release_notes {
 
   my @prompt;
 
-  push @prompt, $llm->text('Produce release notes in markdown format for this Perl CPAN distribution release.');
+  my $prompt_text = choose {
+
+    return slurp('.prompts/release-notes.prompt')
+      if -f '.prompts/release-notes.prompt';
+
+    return 'Produce release notes in markdown format for this Perl CPAN distribution release.';
+  };
+
+  push @prompt, $llm->text($prompt_text)
+    if !$self->get_dryrun;
 
   push @prompt,
     $llm->document(
     data  => slurp("release-$version.diffs"),
     title => 'Diffs'
-    );
+    ) if !$self->get_dryrun;
 
   push @prompt,
     $llm->document(
     data  => slurp("release-$version.lst"),
     title => 'Changed Files Listing'
-    );
+    ) if !$self->get_dryrun;
 
   if ($changelog_excerpt) {
     push @prompt,
       $llm->document(
       data  => $changelog_excerpt,
       title => 'ChangeLog'
-      );
+      ) if !$self->get_dryrun;
   }
 
   # send updated files from tarball, stripping POD from Perl sources
@@ -113,10 +122,13 @@ sub cmd_release_notes {
       $llm->document(
       data  => $file_content,
       title => $file->name
-      );
+      ) if !$self->get_dryrun;
 
     $file_count++;
   }
+
+  return $SUCCESS
+    if $self->get_dryrun;
 
   my $llm_rsp = $self->_submit_prompt( $llm, \@prompt );
 

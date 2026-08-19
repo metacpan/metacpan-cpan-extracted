@@ -25,6 +25,10 @@ $store->client_put({
     client_id     => 'api-client',
     secret        => 's3cr3t',
     redirect_uris => ['https://client/cb'],
+    # every grant this test exercises has to be registered: the token
+    # endpoint dispatches on what the client asks for, and a grant that is
+    # not on the client's own row is refused
+    grant_types   => 'authorization_code refresh_token client_credentials',
     scopes        => 'read',
 });
 

@@ -25,23 +25,41 @@ package Test {
     }
 }
 
+package Test::BothTags {
+
+    use Moo;
+    use MooX::PDL::Role::Proxy;
+
+    has p1 => (
+        is      => 'rwp',
+        piddle  => 1,
+        ndarray => 1,
+    );
+
+    has p2 => (
+        is      => 'rwp',
+        piddle  => 1,
+        ndarray => 1,
+    );
+}
+
 
 Test->test(
-    "where",
+    'where',
     sub { $_[0]->where( $_[0]->p1 % 2 ) },
     p1 => [ 1, 3 ],
     p2 => [ 2, 4 ],
 );
 
 Test->test(
-    "index",
+    'index',
     sub { $_[0]->index( PDL->new( 0, 1, 3 ) ) },
     p1 => [ 0, 1, 3 ],
     p2 => [ 1, 2, 4 ],
 );
 
 Test->test(
-    "copy",
+    'copy',
     sub { $_[0]->copy },
     p1 => [ 0, 1, 2, 3, 4 ],
     p2 => [ 1, 2, 3, 4, 5 ],
@@ -52,6 +70,30 @@ subtest 'at' => sub {
     my $at = $o->at( 3 );
     is( $at->p1, 3, 'p1' );
     is( $at->p2, 4, 'p2' );
+};
+
+subtest '_ndarrays returns single entry for attribute tagged as both  piddle and ndarray' => sub {
+    my $o = Test::BothTags->new;
+
+    is(
+        $o->_ndarrays,
+        bag {
+            item 'p1';
+            item 'p2';
+            end;
+        },
+        'returns each tagged attribute once',
+    );
+
+    is(
+        $o->_piddles,
+        bag {
+            item 'p1';
+            item 'p2';
+            end;
+        },
+        '_piddles alias is also deduplicated',
+    );
 };
 
 
@@ -68,7 +110,7 @@ subtest 'sever' => sub {
     my $c = $n->sever;
     $n->p1->set( 0, 24 );
     is( $o->p1->at( 0 ), 22, 'severed' );
-    ref_is( $c, $n, "sever returns self" );
+    ref_is( $c, $n, 'sever returns self' );
 };
 
 subtest 'clone with args' => sub {
@@ -82,7 +124,7 @@ subtest 'clone with args' => sub {
         ok( $c->has_a1 && $c->a1 == 3 );
     }
     else {
-        ok( ! $c->has_a1 );
+        ok( !$c->has_a1 );
     }
 
 };

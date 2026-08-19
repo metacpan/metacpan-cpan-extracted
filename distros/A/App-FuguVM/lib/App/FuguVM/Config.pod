@@ -1,0 +1,100 @@
+=head1 NAME
+
+App::FuguVM::Config - the VM defaults over Fugu::Config
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::Config;
+
+    my $root   = App::FuguVM::Config->find_project_root
+        or die "not in a FuguVM project\n";
+    my $config = App::FuguVM::Config->new($root);
+
+    my $vm = $config->load_vm($config->default_vm);
+    printf "%s: OpenBSD %s, %s of memory\n",
+        $vm->{name}, $vm->{version}, $vm->{memory};
+
+=head1 DESCRIPTION
+
+FuguVM reads two files, both named F<.fuguvmrc>: one in the home
+directory and one in the project root. The project file wins.
+
+    cache_dir ~/.cache/fuguvm
+    state_dir .fuguvm/state
+    default_vm default
+
+    vm "default" {
+        version      7.8
+        memory       2048
+        disk_size    8G
+        ssh_port     2222
+        console_port 4444
+    }
+
+The grammar, the tilde expansion and the yes/no spellings come from
+L<Fugu::Config>. This module holds only what is true of FuguVM: the
+defaults for a machine, the merge of the two files, and the switch
+that turns the installed-image cache off.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguVM::Config->new($project_root)
+
+Read both files. An absent file is normal: a checkout has no global
+file, and a global-only setup has no project file.
+
+=head2 find_project_root
+
+    App::FuguVM::Config->find_project_root
+
+Walk up from the working directory to the first directory that holds
+F<.fuguvmrc>. The method returns C<undef> when the walk reaches the
+root without a match.
+
+=head2 load_vm
+
+    my $vm = $config->load_vm($name);
+
+Return the merged configuration of one VM as a hash reference, or
+C<undef> when no file declares it.
+
+The method applies the defaults for C<version>, C<memory>,
+C<disk_size>, C<ssh_port> and C<console_port>, and folds in
+C<ssh_pubkey> and C<cache_dir> from the enclosing configuration.
+
+C<cache_dir> is folded in on purpose. Without it, C<fuguvm up> would
+write its images under C<$HOME> while the cache subcommands worked on
+a different tree.
+
+=head2 cache_dir, state_dir, default_vm, ssh_pubkey
+
+The top-level settings. C<cache_dir> expands a leading tilde;
+C<state_dir> resolves a relative path against the project root.
+
+=head2 image_cache
+
+Whether C<fuguvm up> may use the installed-image cache. The default is
+on.
+
+=head1 ERRORS
+
+A file that exists but does not parse gives an error in the log that
+names the file and the line, and the caller gets empty settings rather
+than half of them. The parser never skips a line it did not
+understand: a typo that a parser ignores is a setting that silently
+does not apply, and the operator finds out weeks later from the
+behavior of the VM.
+
+A switch whose value is neither yes nor no gives a warning and falls
+back to its default. An unrecognized spelling must not silently mean
+the opposite.
+
+=head1 SEE ALSO
+
+L<Fugu::Config>, L<App::FuguVM::CLI>, L<App::FuguVM::Guest>, L<fuguvm(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

@@ -1,0 +1,169 @@
+=head1 NAME
+
+Fugu::MQTT - a subscribing MQTT client for a single-threaded daemon
+
+=head1 SYNOPSIS
+
+    use Fugu::MQTT;
+
+    my $mqtt = Fugu::MQTT->new(
+        host => '127.0.0.1',
+        port => 1883,
+    );
+    $mqtt->mqtt_connect(10) or die "no broker\n";
+
+    $mqtt->subscribe('stat/+/RESULT', sub ($topic, $payload) {
+        ...
+    });
+    $mqtt->publish('cmnd/lamp/POWER', 'ON');
+
+    # From the event loop, once each pass
+    $mqtt->tick;
+
+=head1 DESCRIPTION
+
+B<Fugu::MQTT> is a wrapper around L<Net::MQTT::Simple> for a daemon
+that has one process and one event loop. It never blocks the caller.
+C<tick> drains what arrived and returns, thus the loop keeps the MQTT
+connection beside its own descriptors.
+
+L<Net::MQTT::Simple> loads at connect time, not at compile time. Thus
+the module keeps the core-Perl load contract of Fugu, and a daemon
+whose broker is optional still starts without the library.
+
+Every message goes through a callback. The module holds the incoming
+messages in a queue and dispatches them in C<tick>, in the process
+that called it. A callback thus runs where the caller can reason
+about it, and never inside a signal handler.
+
+=head2 new
+
+C<new(%args)> creates a client. The method opens no socket. Call
+C<mqtt_connect>.
+
+These are the arguments:
+
+=over 4
+
+=item C<host>
+
+The broker. The default is 127.0.0.1.
+
+=item C<port>
+
+The broker port. The default is 1883.
+
+=item C<username>
+
+The login name. The client sends no credentials when this argument is
+absent.
+
+=item C<password>
+
+The login password.
+
+=back
+
+=head2 mqtt_connect
+
+C<mqtt_connect($timeout)> connects to the broker. The default timeout
+is 10 seconds.
+
+A connect can block in the resolver or in the handshake, and no poll
+loop can interrupt either. Thus the guard is the alarm of
+L<Fugu::Timeout>. A broker that does not answer costs the caller the
+timeout, not the run.
+
+The method returns true when the client is connected.
+
+=head2 subscribe
+
+C<subscribe($topic, $callback)> registers a topic and its callback.
+The callback gets C<($topic, $payload)>, where the topic is the one
+that arrived, not the pattern.
+
+The pattern accepts the MQTT wildcards: C<+> matches one level and
+C<#> matches the remaining levels. The module registers the
+subscription even when the client is not connected, so a caller can
+subscribe before the broker is up. C<resubscribe> sends the set again
+after a reconnection.
+
+=head2 publish
+
+C<publish($topic, $payload, $retain)> sends one message. A true
+C<$retain> makes the broker keep the message for the next subscriber.
+The method does nothing when the client is not connected.
+
+=head2 tick
+
+C<tick($timeout)> reads what arrived and runs the callbacks. The
+default timeout is 0, which does not block. The method returns the
+number of dispatched messages.
+
+The method reports a lost connection: it clears the connected state
+and returns 0. The caller then calls C<reconnect> on a schedule of
+its own.
+
+=head2 reconnect
+
+C<reconnect> disconnects, connects again, and subscribes again. The
+method returns 1 on success and 0 on failure.
+
+=head2 resubscribe
+
+C<resubscribe> sends every registered subscription to the broker
+again. C<reconnect> calls it. A caller needs it only when it connects
+by itself.
+
+=head2 disconnect
+
+C<disconnect> closes the connection and discards the queued messages.
+The registered subscriptions stay, thus a later C<reconnect> restores
+them.
+
+=head2 is_connected
+
+C<is_connected> reports if the client holds a connection.
+
+=head2 subscriptions
+
+C<subscriptions> returns the registered topic patterns.
+
+=head1 RETURN VALUES
+
+C<mqtt_connect> and C<is_connected> return true when the client is
+connected. C<reconnect> returns 1 or 0. C<tick> returns a count.
+C<subscriptions> returns a list.
+
+No method dies. A broker error, a bad callback, and a lost connection
+all go to the log of L<Fugu::Log>. A daemon must not exit because a
+broker went away.
+
+=head1 EXAMPLES
+
+This example reconnects when the broker goes away:
+
+    $loop->every(1, sub {
+        $mqtt->tick;
+        $mqtt->reconnect unless $mqtt->is_connected;
+    });
+
+=head1 SEE ALSO
+
+L<Fugu::Log>, L<Fugu::Timeout>, L<Net::MQTT::Simple>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=head1 CAVEATS
+
+A callback runs inside C<tick>. A callback that blocks blocks the
+loop. Keep the work in a callback short, or queue it.
+
+The module holds no quality of service beyond what
+L<Net::MQTT::Simple> gives, which is QoS 0. A message can be lost. A
+caller that must know a device answered reads the state topic of that
+device.
+
+=cut

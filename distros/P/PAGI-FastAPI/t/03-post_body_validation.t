@@ -27,7 +27,6 @@ $app->post('/users',
 
 my $pagi_app = $app->to_app;
 
-# Helper async function returns a Future object
 async sub run_pagi_request ($path, $body_payload, $method = 'POST') {
     my $response_status;
     my %response_headers;

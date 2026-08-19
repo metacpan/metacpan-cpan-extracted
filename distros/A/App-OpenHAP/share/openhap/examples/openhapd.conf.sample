@@ -1,0 +1,53 @@
+# OpenHAP Configuration File
+# /etc/openhapd.conf
+#
+# See openhapd.conf(5) for complete documentation.
+
+# HAP Settings
+hap_name = "Home Bridge"
+hap_port = 51827
+hap_pin = 1995-1018
+
+# Storage
+db_path = /var/db/openhapd
+
+# Control socket, where hapctl(8) asks the running daemon what it is
+# doing.  Set it to "off" to run with no local control channel.
+# control = /var/run/openhapd/control.sock
+
+# Logging
+log_level = info
+log_facility = daemon
+
+# MQTT Broker
+mqtt_host = 127.0.0.1
+mqtt_port = 1883
+# mqtt_user = username
+# mqtt_pass = password
+
+# Devices
+# Thermostat example
+device tasmota thermostat bedroom {
+    name = "Bedroom Thermostat"
+    topic = tasmota_AABBCC
+}
+
+# Another thermostat
+device tasmota thermostat living_room {
+    name = "Living Room Thermostat"
+    topic = tasmota_DDEEFF
+}
+
+# Dimmable lightbulb example
+device tasmota lightbulb kitchen {
+    name = "Kitchen Light"
+    topic = tasmota_LIGHT1
+}
+
+# Temperature sensor example.  Set has_humidity = 1 for a sensor
+# that also reports humidity, for example a DHT22.
+device tasmota sensor outdoor {
+    name = "Outdoor Sensor"
+    topic = tasmota_SENS01
+    has_humidity = 1
+}

@@ -1,0 +1,136 @@
+=head1 NAME
+
+Protocol::HAP - HomeKit Accessory Protocol library
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP;
+
+    my $logger = Protocol::HAP->null_logger;
+
+=head1 DESCRIPTION
+
+C<Protocol::HAP> is the HomeKit Accessory Protocol as a host-neutral
+library. It holds the complete protocol: the TLV8 codec, the setup-code
+rules, the crypto primitives, SRP-6a, the pairing and session state
+machines, the accessory data model, the sans-IO accessory-server
+engine, and a controller.
+
+The library is self-contained. It uses core Perl plus four declared
+CPAN modules: L<Crypt::Ed25519>, L<Crypt::Curve25519>,
+L<Crypt::KeyDerivation>, and L<Crypt::AuthEnc::ChaCha20Poly1305>. The
+crypto modules load lazily, on first use.
+
+The engine is sans-IO. It consumes bytes and emits bytes. The host owns
+sockets, timers, logging, and persistence. Three documented exceptions
+exist: C<Protocol::HAP::Crypto> reads F</dev/urandom>,
+C<Protocol::HAP::Controller> is a blocking convenience client that owns
+its socket, and C<Protocol::HAP::Store::File> writes the store contract
+to files. None of the three is the engine, which is the class the
+sans-IO rule describes.
+
+=head1 HOST CONTRACTS
+
+A host injects its environment through five constructor arguments.
+
+=over 4
+
+=item logger
+
+An object with C<debug>, C<info>, C<warning>, and C<error> methods that
+take printf-style arguments. The default is the null logger from this
+module. An object passes its logger to the objects it creates itself.
+
+=item store
+
+An object with the twelve persistence methods that
+F<Protocol/HAP/Store.pod> documents. C<Protocol::HAP::Store::Memory> is
+the reference implementation, and C<Protocol::HAP::Store::File> is the
+durable one.
+
+=item output
+
+A code reference C<sub ($session, $bytes)>. The engine sends every
+write through it: responses and EVENT notifications alike.
+
+=item after and cancel
+
+Code references for one-shot timers, used for event coalescing. They
+are optional: without them, the host calls C<flush_events> itself.
+
+=item on_pairing_changed
+
+An optional code reference C<sub ($paired)>. The engine calls it when
+the paired state flips, so the host can re-advertise its mDNS TXT
+record.
+
+=back
+
+=head1 METHODS
+
+=head2 Protocol::HAP->null_logger
+
+This method returns the shared null logger. The null logger answers the
+four logger methods and drops every message.
+
+=head1 FUNCTIONS
+
+=head2 uuid_to_short($uuid)
+
+This function converts a full UUID to the short form for JSON. It
+returns a short hex string for Apple-defined UUIDs and the full UUID
+for custom ones. The data model and the server share this one copy of
+the rule.
+
+=head2 device_id($ltpk)
+
+This function returns the MAC-format device id of an accessory: the
+first six bytes of the long-term public key, as uppercase
+colon-separated hex. The server advertises it and pair-setup signs
+over it.
+
+=head1 MODULES
+
+=over 4
+
+=item L<Protocol::HAP::TLV> - TLV8 codec
+
+=item L<Protocol::HAP::SetupCode> - setup-code normalization and rules
+
+=item L<Protocol::HAP::Crypto> - randomness and crypto primitives
+
+=item L<Protocol::HAP::SRP> - SRP-6a exchange
+
+=item L<Protocol::HAP::Accessory> - accessory data model
+
+=item L<Protocol::HAP::Service> - service data model
+
+=item L<Protocol::HAP::Characteristic> - characteristic data model
+
+=item L<Protocol::HAP::Bridge> - bridge accessory
+
+=item L<Protocol::HAP::Pairing> - pair-setup and pair-verify state machines
+
+=item L<Protocol::HAP::Session> - per-connection state and the AEAD frame codec
+
+=item L<Protocol::HAP::Store::Memory> - the reference store implementation
+
+=item L<Protocol::HAP::Store::File> - the durable store over files
+
+=item L<Protocol::HAP::HTTP> - the HTTP/1.1 subset codec, EVENT/1.0 builder
+
+=item L<Protocol::HAP::Server> - the sans-IO accessory-server engine
+
+=item L<Protocol::HAP::Controller> - the blocking controller client
+
+=back
+
+The store contract itself lives in F<Protocol/HAP/Store.pod>. The
+controller role of SRP lives beside the accessory role, as
+C<Protocol::HAP::SRP::Client> in the same file.
+
+=head1 SEE ALSO
+
+F<spec/HAP.md>
+
+=cut

@@ -1,3 +1,10 @@
+0.004   2026-05-28  Released-By: PERLANCAR; Urgency: medium
+
+        [Bug Fixes]
+
+        - Allow no key=value pairs in filename.
+
+
 0.003   2026-05-28  Released-By: PERLANCAR; Urgency: medium
 
         - Add functions: normalize_keyvalue_filename, modify_keyvalue_filename,

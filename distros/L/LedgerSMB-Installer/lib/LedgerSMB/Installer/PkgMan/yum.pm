@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::PkgMan::yum v0.999.13;
+package LedgerSMB::Installer::PkgMan::yum v0.999.14;
 
 use strict;
 use warnings;

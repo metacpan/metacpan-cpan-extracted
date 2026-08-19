@@ -494,6 +494,47 @@ static const fetch_abi FETCH_ABI = {
     ft_abi_tunnel_write_all,
     ft_abi_tunnel_pending,
     ft_abi_tunnel_close,
+    ft_obs_add,                  /* v2 */
 };
+
+/* ---- the v2 observer, driven from C (t/23-observer.t) -------------- *
+ * A Perl test cannot register a C callback, so the observable half lives
+ * here: the start callback adds a header the test server can echo back, and
+ * the done callback records how the hop ended. */
+static IV FT_OBS_ST_STARTS = 0;
+static IV FT_OBS_ST_DONES  = 0;
+static IV FT_OBS_ST_OK     = 0;
+static IV FT_OBS_ST_ERR    = 0;
+
+static void *ft_obs_st_start(pTHX_ const char *method, STRLEN mlen,
+                             const char *url, STRLEN ulen, AV *headers,
+                             void *ud) {
+    PERL_UNUSED_ARG(method); PERL_UNUSED_ARG(mlen);
+    PERL_UNUSED_ARG(url);    PERL_UNUSED_ARG(ulen);
+    PERL_UNUSED_ARG(ud);
+    FT_OBS_ST_STARTS++;
+    /* prove the list is still mutable and that what is pushed here reaches
+     * the wire - the entire point of firing before the request is built */
+    av_push(headers, newSVpvs("X-Fetch-Observer"));
+    av_push(headers, newSVpvf("hop%" IVdf, FT_OBS_ST_STARTS));
+    return INT2PTR(void *, FT_OBS_ST_STARTS);   /* the token: this hop's number */
+}
+
+static void ft_obs_st_done(pTHX_ void *token, SV *res, SV *err, void *ud) {
+    PERL_UNUSED_ARG(ud);
+    PERL_UNUSED_CONTEXT;
+    FT_OBS_ST_DONES++;
+    if (res) FT_OBS_ST_OK++;
+    if (err) FT_OBS_ST_ERR++;
+    /* the token is this hop's number, so a mismatch means correlation broke */
+    if (PTR2IV(token) < 1 || PTR2IV(token) > FT_OBS_ST_STARTS)
+        FT_OBS_ST_ERR = -1;
+}
+
+static int ft_obs_selftest_install(pTHX) {
+    const fetch_abi *A = INT2PTR(const fetch_abi *, PTR2IV(&FETCH_ABI));
+    if (!A || A->abi_version != FETCH_ABI_VERSION) return 0;
+    return A->on_request(aTHX_ ft_obs_st_start, ft_obs_st_done, NULL);
+}
 
 #endif /* FT_ABI_H */

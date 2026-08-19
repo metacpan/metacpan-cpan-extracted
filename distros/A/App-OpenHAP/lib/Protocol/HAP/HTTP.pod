@@ -1,0 +1,57 @@
+=head1 NAME
+
+Protocol::HAP::HTTP - the HTTP/1.1 subset codec of HAP
+
+=head1 SYNOPSIS
+
+    use Protocol::HAP::HTTP;
+
+    # Server side
+    my $length  = Protocol::HAP::HTTP::message_complete($buffer);
+    my $request = Protocol::HAP::HTTP::parse_request($message);
+    my $bytes   = Protocol::HAP::HTTP::build_response(
+        status  => 200,
+        headers => { 'Content-Type' => 'application/hap+json' },
+        body    => $json,
+    );
+
+    # Client side
+    my $bytes    = Protocol::HAP::HTTP::build_request(
+        method => 'GET',
+        path   => '/accessories',
+    );
+    my $response = Protocol::HAP::HTTP::parse_response($message);
+
+    # Notifications
+    my $event = Protocol::HAP::HTTP::build_event($json);
+
+=head1 DESCRIPTION
+
+This module is one HTTP/1.1 codec for both ends of a connection: a
+server parses requests and builds responses, a client does the
+reverse, and neither can drift from the other. It is functions over
+strings. It opens no socket, holds no connection state, and never
+logs.
+
+C<message_complete> is the framing. A stream socket gives a reader
+whatever arrived, which is not a message: a request can span two
+reads, and two requests can share one. The caller keeps a buffer and
+asks this function how much of it is a message. It returns the length
+of the message, 0 when more bytes are necessary, and C<undef> when the
+message is over the limit; a caller that gets C<undef> closes the
+connection.
+
+C<build_event> builds the EVENT/1.0 notification message of HAP. The
+message looks like a response, but its protocol name is EVENT, so a
+controller can tell an unsolicited notification from the answer to a
+request it sent.
+
+A status code that belongs to one application, and the header defaults
+that one application wants, are arguments: the codec knows RFC 9110,
+not HAP policy.
+
+=head1 SEE ALSO
+
+L<Protocol::HAP>, L<Protocol::HAP::Server>, F<spec/HAP-HTTP.md>
+
+=cut

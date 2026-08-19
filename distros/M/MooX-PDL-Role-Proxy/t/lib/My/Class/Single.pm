@@ -21,7 +21,7 @@ has '+p2' => (
 );
 
 has a1 => (
-    is      => 'ro',
+    is        => 'ro',
     predicate => 1,
 );
 

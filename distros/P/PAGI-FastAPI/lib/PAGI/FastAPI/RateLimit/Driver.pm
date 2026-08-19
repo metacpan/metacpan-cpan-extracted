@@ -4,7 +4,7 @@ use v5.38;
 use experimental 'class';
 use version;
 
-our $VERSION   = qv('v1.0.0');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 class PAGI::FastAPI::RateLimit::Driver {
@@ -30,7 +30,7 @@ PAGI::FastAPI::RateLimit::Driver - Abstract Base Class for Rate Limiting Storage
 
 =head1 VERSION
 
-Version v1.0.0
+Version v1.1.0
 
 =head1 SYNOPSIS
 
@@ -67,6 +67,15 @@ Custom storage drivers (e.g., Redis, Memcached, DynamoDB) must inherit from
 this class and implement its asynchronous methods, ensuring they return
 L<Future> instances to maintain non-blocking behavior inside the PAGI event
 loop.
+
+As of version C<v1.0.0>, we have built-in support for in memory rate limit by
+L<PAGI::FastAPI::RateLimit::Driver::Memory>.
+
+We even have demo app created for in memory rate limit: C<eg/rate_limit_demo.pl>
+
+If you are looking for more specialised options then you have the following
+choices as separate companion packages: L<PAGI::FastAPI::RateLimit::Driver::CHI>
+and L<PAGI::FastAPI::RateLimit::Driver::Redis>.
 
 =head1 REQUIRED METHODS
 

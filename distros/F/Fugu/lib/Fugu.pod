@@ -1,0 +1,83 @@
+=head1 NAME
+
+Fugu - OpenBSD-style daemon utilities for Perl
+
+=head1 SYNOPSIS
+
+    use Fugu::Daemon;
+    use Fugu::Log;
+    use Fugu::EventLoop;
+
+=head1 DESCRIPTION
+
+Fugu gives a Perl daemon the plumbing that OpenBSD daemons share. The
+utilities live in the C<Fugu::> modules, one concern each. This lead
+module holds no code: it names the distribution, and this document is
+the module index.
+
+The distribution also ships C<Protocol::Imsg>, a sans-IO codec for
+the imsg(3) frame.
+
+Fugu needs core Perl only (v5.36). Every CPAN module it can use is an
+optional feature, loaded lazily.
+
+=head1 MODULES
+
+=over 4
+
+=item L<Fugu::CLI> - subcommand dispatch for a command-line tool
+
+=item L<Fugu::Config> - the OpenBSD-style configuration grammar
+
+=item L<Fugu::Control> - a control socket for a running daemon
+
+=item L<Fugu::Daemon> - daemonization for Perl programs
+
+=item L<Fugu::EventLoop> - one select loop for a daemon with one process
+
+=item L<Fugu::File> - file operations for a daemon and its tools
+
+=item L<Fugu::Imsg> - imsg messages over a connected stream socket
+
+=item L<Fugu::JSONSocket> - newline-delimited JSON over a UNIX socket
+
+=item L<Fugu::Log> - logging to syslog, standard error, or nowhere
+
+=item L<Fugu::MQTT> - a subscribing MQTT client for a single-threaded daemon
+
+=item L<Fugu::Mdnsd> - control mdnsd over its control socket
+
+=item L<Fugu::Pidfile> - locked PID file
+
+=item L<Fugu::Privdrop> - permanent drop of root privileges
+
+=item L<Fugu::Process> - child process management
+
+=item L<Fugu::Proxy> - a caching HTTP proxy
+
+=item L<Fugu::Random> - random bytes and random passwords
+
+=item L<Fugu::SSH> - run a command on another machine over SSH
+
+=item L<Fugu::Sandbox> - pledge and unveil as a platform abstraction
+
+=item L<Fugu::Signal> - signal handlers for graceful shutdown
+
+=item L<Fugu::StateFile> - a small JSON state file
+
+=item L<Fugu::TestLog> - a quiet process default logger for a test file
+
+=item L<Fugu::Timeout> - run something under a time limit
+
+=item L<Protocol::Imsg> - the OpenBSD imsg(3) frame, as bytes
+
+=back
+
+=head1 SEE ALSO
+
+The development guide and the release flow live in the repository at
+L<https://github.com/FuguBSD/Fugu>.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>

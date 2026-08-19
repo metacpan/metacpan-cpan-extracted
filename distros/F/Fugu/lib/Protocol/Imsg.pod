@@ -1,0 +1,153 @@
+=head1 NAME
+
+Protocol::Imsg - the OpenBSD imsg(3) frame, as bytes
+
+=head1 SYNOPSIS
+
+    use Protocol::Imsg;
+
+    my $codec = Protocol::Imsg->new;
+
+    my $bytes = $codec->encode(type => 8, data => $payload);
+
+    $codec->append($received_bytes);
+    while (my $msg = $codec->next_message) {
+        # $msg->{type}, $msg->{peerid}, $msg->{pid}, $msg->{data}
+    }
+
+=head1 DESCRIPTION
+
+This module frames and unframes messages of the OpenBSD imsg(3)
+facility. It takes bytes and returns bytes: it performs no system call,
+it opens no file, and it names no socket. L<Fugu::Imsg> owns the socket
+and uses this module for the frame.
+
+State three limits before anything else, because each one bounds where
+this module is usable.
+
+=over 4
+
+=item The header is native-endian, and the format never crosses a host.
+
+Both ends of an imsg connection are the same machine, so imsg writes
+the header in the sender's own byte order. There is no byte-order
+negotiation and no network-order variant. Two hosts that disagree on
+byte order cannot exchange these frames.
+
+=item The module frames without descriptor passing.
+
+Native imsg can pass a file descriptor as C<SCM_RIGHTS> ancillary data,
+on a message whose C<len> carries C<IMSG_FD_MARK>. This module masks
+that mark off and never sets it, so it reads such a message as a plain
+frame and it can never send one. A caller that needs descriptor passing
+needs C<recvmsg> and C<sendmsg> as well, which this codec has no way to
+reach.
+
+=item C<encode> reads C<$$> on every call.
+
+Native imsg seeds the pid once, when the buffer is initialized. This
+module reads it per call instead. The two agree in one process and
+diverge in a forked child: the child's frames carry the child's pid
+where native imsg would still carry the parent's. Pass C<pid>
+explicitly when that matters.
+
+=back
+
+The wire format is in F<spec/MDNS-Imsg.md> in this repository.
+That document is a curated reference, not an installed manual.
+
+=head1 CONSTANTS
+
+=over 4
+
+=item C<HEADER_SIZE>
+
+16, the size of C<struct imsg_hdr>.
+
+=item C<HEADER_TEMPLATE>
+
+The C<pack> template of the header: C<L4>, four native C<uint32> fields
+in the order C<type>, C<len>, C<peerid>, C<pid>.
+
+=item C<MAX_IMSGSIZE>
+
+16384, the bound on the whole message.
+
+=item C<MAX_PAYLOAD>
+
+16368, which is C<MAX_IMSGSIZE> less the header.
+
+=item C<FD_MARK>
+
+C<0x80000000>, the reserved high bit of C<len>.
+
+=back
+
+=head1 METHODS
+
+=head2 new()
+
+Return a codec with an empty decode buffer.
+
+=head2 encode(%args)
+
+Return the framed bytes of one message.
+
+=over 4
+
+=item C<type>
+
+The message type. Required.
+
+=item C<data>
+
+The payload. The default is the empty string.
+
+=item C<peerid>
+
+A correlation value that is opaque to this module. The default is 0,
+which is what a protocol that does not correlate sends.
+
+=item C<pid>
+
+The sender pid. The default is C<$$>. A C<pid> of 0 also gives C<$$>,
+because imsg substitutes the sender's pid for a 0 the caller passes.
+
+=back
+
+The method returns C<undef>, with C<$!> set to C<EMSGSIZE>, for a
+payload above C<MAX_PAYLOAD>. An encoder must refuse a larger payload
+rather than truncate it.
+
+=head2 append($bytes)
+
+Add received bytes to the decode buffer and return the object. A
+partial header, a partial payload, and several whole messages at once
+are all normal.
+
+=head2 next_message()
+
+Pop one whole message off the buffer and return a hash reference with
+C<type>, C<peerid>, C<pid>, and C<data>. Return C<undef> when more
+bytes are necessary.
+
+An invalid C<len> sets C<$!> to C<EBADMSG> and makes the failure
+permanent: native imsg drops such a connection, and so must every
+reader. C<len> is invalid below C<HEADER_SIZE> and above
+C<MAX_IMSGSIZE>.
+
+=head2 is_failed()
+
+Report the permanent framing failure. Nothing clears it but C<reset>.
+
+=head2 reset()
+
+Empty the buffer, clear the failure, and return the object. A transport
+calls it when it closes a connection, so that a frame which arrived
+before the close cannot come out after it.
+
+=head1 SEE ALSO
+
+L<Fugu::Imsg>, F<spec/MDNS-Imsg.md>
+
+=cut

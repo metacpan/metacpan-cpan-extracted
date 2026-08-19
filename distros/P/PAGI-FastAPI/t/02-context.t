@@ -94,6 +94,37 @@ subtest 'Response Status & Response Headers Modification' => sub {
     is_deeply $res_headers->[1], ['Content-Type', 'application/json'], 'Second response header pair correct';
 };
 
+subtest 'set_header() replaces an existing header of the same name' => sub {
+    my $ctx = PAGI::FastAPI::Context->new();
+
+    $ctx->set_header('Content-Type' => 'text/html; charset=utf-8');
+    $ctx->set_header('content-type' => 'text/plain; charset=utf-8');
+
+    my $res_headers = $ctx->res_headers;
+    is scalar @$res_headers, 1,
+        'Second set_header() call replaces rather than duplicates (case-insensitive)';
+    is_deeply $res_headers->[0], ['content-type', 'text/plain; charset=utf-8'],
+        'Replacement value and casing are the ones from the second call';
+
+    $ctx->set_header('X-A' => '1');
+    $ctx->set_header('X-B' => '2');
+    $ctx->set_header('X-A' => '3');
+    is_deeply $ctx->res_headers,
+        [ ['content-type', 'text/plain; charset=utf-8'], ['X-A', '3'], ['X-B', '2'] ],
+        'Replacing a header updates it in place without disturbing header order';
+};
+
+subtest 'add_header() appends without touching existing headers of the same name' => sub {
+    my $ctx = PAGI::FastAPI::Context->new();
+
+    $ctx->add_header('Set-Cookie' => 'session=abc123; Path=/');
+    $ctx->add_header('Set-Cookie' => 'theme=dark; Path=/');
+
+    is_deeply $ctx->res_headers,
+        [ ['Set-Cookie', 'session=abc123; Path=/'], ['Set-Cookie', 'theme=dark; Path=/'] ],
+        'add_header() intentionally allows duplicate header names to accumulate';
+};
+
 subtest 'Stash Object Storage (Context Lifecycle Stash)' => sub {
     my $ctx = PAGI::FastAPI::Context->new();
 

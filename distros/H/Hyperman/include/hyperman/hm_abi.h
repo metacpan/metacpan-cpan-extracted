@@ -29,8 +29,9 @@
  * check `abi_version >= the version you need`):
  *   1 - loop handles, io watchers, timers, futures, run_until
  *   2 - conn_detach
- *   3 - deny_check/deny_add/deny_remove/ratelimit_hit (abuse controls) */
-#define HM_ABI_VERSION 3
+ *   3 - deny_check/deny_add/deny_remove/ratelimit_hit (abuse controls)
+ *   4 - on_worker_start (once per worker, after the fork, with its loop) */
+#define HM_ABI_VERSION 4
 
 /* io_watch masks (match Hyperman's internal HM_EV_READ/HM_EV_WRITE) */
 #define HM_ABI_READ  0x1
@@ -53,6 +54,9 @@ typedef void (*hm_abi_timer_cb)(pTHX_ void *ud);
 /* fires exactly once when the future settles - including cancellation
  * (future_state says which); this is the cancellation hook */
 typedef void (*hm_abi_ready_cb)(pTHX_ SV *future, void *ud);
+/* fires once in each worker, after any fork, with that worker's own loop and
+ * before the loop starts turning (v4) */
+typedef void (*hm_abi_worker_cb)(pTHX_ void *loop, void *ud);
 
 typedef struct hm_abi {
     int abi_version;                 /* == HM_ABI_VERSION */
@@ -97,17 +101,7 @@ typedef struct hm_abi {
     /* ---- await: pump the loop until f settles (re-entrant) -------------- */
     void (*run_until)(pTHX_ void *loop, SV *f);
 
-    /* ---- v2 ------------------------------------------------------------- *
-     * conn_detach: hand a live HTTP/1 connection to the application - the
-     * server stops watching the fd, forgets the connection and does NOT
-     * close it, so the consumer's own io_watch on that fd starts firing.
-     * The ticket (fd, id) comes from $env->{'psgix.hyperman.conn'}; the
-     * generation id makes a stale ticket fail rather than hit the wrong
-     * connection. Call it from inside the request's app frame or from a
-     * continuation of its response Future; whatever response the app then
-     * produces for that request is discarded, and the consumer owns the fd
-     * (including closing it). This is the WebSocket/upgrade seam.
-     *
+    /* ---- v2: conn_detach ------------------------------------------------
      * Returns 0 on success, or:
      *   -1 no such connection, or the ticket is stale
      *   -2 HTTP/2 (streams share one connection - not detachable)
@@ -116,29 +110,19 @@ typedef struct hm_abi {
      *   -5 already detached */
     int (*conn_detach)(pTHX_ void *loop, int fd, UV id);
 
-    /* ---- v3: abuse controls on a fork-shared arena --------------------- *
-     * An IP denylist and fixed-window rate counters live in one anonymous
-     * shared-memory arena the server mmaps BEFORE forking its workers, so
-     * every worker shares one denylist and one set of counts (a per-worker
-     * copy would multiply a limit by the worker count). These take no pTHX
-     * and touch no SV - they operate only on that process-global arena and
-     * are safe to call from any worker. They FAIL OPEN: with no arena
-     * (server not running one, or the build has no atomics) deny_check
-     * returns 0 and ratelimit_hit returns 1.
-     *
-     * deny_check(ip):   1 if ip is denylisted and unexpired, else 0. This is
-     *                   the accept-path check, and it is lock-free.
-     * deny_add(ip,ttl): add/refresh ip for ttl_secs (0 = permanent).
-     * deny_remove(ip):  drop ip.
-     * ratelimit_hit(key,klen,limit,window,rem,reset): count one hit against
-     *   the opaque key under `limit` per `window` seconds; returns 1 within
-     *   the limit, 0 over. *rem (requests left, >=0) and *reset (epoch the
-     *   window rolls) are filled when non-NULL. limit <= 0 is unlimited. */
+    /* ---- v3: abuse controls on a fork-shared arena --------------------- */
     int  (*deny_check)(const char *ip);
     void (*deny_add)(const char *ip, long ttl_secs);
     void (*deny_remove)(const char *ip);
     int  (*ratelimit_hit)(const void *key, STRLEN klen,
                           IV limit, IV window, IV *remaining, IV *reset);
+
+    /* ---- v4: worker-start callback ------------------------------------- */
+    int (*on_worker_start)(pTHX_ hm_abi_worker_cb cb, void *ud);
 } hm_abi;
+
+/* How many worker-start callbacks the server will hold. Fixed, so
+ * registration allocates nothing. */
+#define HM_ABI_MAX_WORKER_CB 8
 
 #endif /* HM_ABI_H */

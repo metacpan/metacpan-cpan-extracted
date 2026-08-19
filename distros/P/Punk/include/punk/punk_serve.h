@@ -52,6 +52,29 @@ static SV *ps_ctx(pTHX_ SV *ctx_class, HV *env, SV *app, SV *match) {
     return sv_bless(newRV_noinc((SV *)av), gv_stashsv(ctx_class, GV_ADD));
 }
 
+/* The request context, built once.
+ *
+ * When a before_request hook has already made one, the routed match is stored
+ * into its PCX_MATCH slot rather than a second context being built: a stash
+ * written before routing has to survive into the handler, and it does not if
+ * the handler is handed a different object. match is owned; *cp is the
+ * caller's context slot, NULL until there is one.
+ *
+ * Do NOT decrement the match being replaced. av_store already frees the
+ * element it overwrites, so a dec here is a double free - one that surfaces
+ * later in the request as unrelated corruption. The only manual dec is for
+ * the store that did not take. */
+static SV *ps_ctx_for(pTHX_ SV **cp, SV *ctx_class, HV *env, SV *app,
+                      SV *match) {
+    if (*cp) {
+        AV *av = (AV *)SvRV(*cp);
+        if (!av_store(av, PCX_MATCH, match)) SvREFCNT_dec(match);
+        return *cp;
+    }
+    *cp = sv_2mortal(ps_ctx(aTHX_ ctx_class, env, app, match));
+    return *cp;
+}
+
 /* $on_error->($c,$err) coerced, or the 500 default (+1). */
 static SV *punk_handle_error(pTHX_ SV *c, SV *err, SV *on_error) {
     HV *body, *m; AV *errs; SV *bytes; STRLEN l; const char *p;
@@ -162,6 +185,52 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
     int is_head = (mlen == 4 && memEQ(method, "HEAD", 4));
     SV *rec = NULL, *caps = NULL;
     AV *api_allow = NULL;
+    SV *c = NULL;                            /* the one context, once built */
+
+    {   /* before_request: the only phase that runs before routing, so the
+         * only one a 404, a 405 or a mount ever reaches. It runs here -
+         * after the proxy resolve, because a hook that logs or samples by
+         * client address must see the corrected REMOTE_ADDR the same way
+         * rate_limit and the access log do, and after the method/path reads,
+         * because a short-circuit needs them and they allocate nothing.
+         *
+         * Being first is also what it costs: this is ahead of the csrf
+         * check, ahead of rate_limit and ahead of the max_body ceiling, so
+         * the hook sees requests all three will refuse. For a span that is
+         * the point; for work done on the client's behalf, before_dispatch
+         * is still the right phase.
+         *
+         * compile omits the state key when the chain is empty, so an app
+         * with no such hook pays one hv_fetch and one branch. */
+        AV *before_req = ps_state_av(aTHX_ state, K_BEFORE_REQ);
+        int has_hooks = (before_req && av_len(before_req) >= 0);
+
+        /* The C ABI's observers register process-globally and run here, ahead
+         * of any Perl phase - a consumer measuring a request should start
+         * before the first frame this framework hands to an application.
+         * Registering either observer is what makes the context get built,
+         * which is the guarantee that the response side sees the same one. */
+        if (PK_OBS_ANY || has_hooks) {
+            HV *match = newHV();
+            /* a real hashref with empty captures, not undef, so $c->match and
+             * $c->param behave inside the hook instead of croaking */
+            (void)hv_stores(match, "captures", newRV_noinc((SV *)newHV()));
+            (void)ps_ctx_for(aTHX_ &c, ctxcls, env, app,
+                             newRV_noinc((SV *)match));
+        }
+        if (PK_OBS_WANT_REQ) pk_obs_fire_req(aTHX_ c);
+
+        if (has_hooks) {
+            SV *ret = &PL_sv_undef, *err = &PL_sv_undef;
+            if (pd_run_chain(aTHX_ before_req, c, &ret, &err)) {
+                SV *out = punk_finish_c(aTHX_ app, c, ret, err, on_err,
+                                        method, mlen, after, env);
+                if (ret != &PL_sv_undef) SvREFCNT_dec(ret);
+                if (err != &PL_sv_undef) SvREFCNT_dec(err);
+                return out;
+            }
+        }
+    }
 
     /* 1. static exact hit */
     if (rt) {
@@ -169,7 +238,15 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
         if (i >= 0) { SV **rp = av_fetch(recs, i, 0); if (rp && *rp) rec = *rp; }
     }
 
-    if (!rec && apims) {                     /* 2. API mounts */
+    /* 2. API mounts.
+     *
+     * The COUNT is checked, not just the array: api_mounts is always present
+     * in the compiled state, so an app that declared no `api` at all still
+     * arrives here with an empty one - and punk_oa croaks when Open::API's
+     * ABI does not match. That made Open::API an effective hard requirement
+     * of the dynamic-route path for every app in the world, and the failure
+     * it produced named the API path, which the app was not using. */
+    if (!rec && apims && av_len(apims) >= 0) {
         const oa_abi *A = punk_oa(aTHX);
         SSize_t ai, an = av_len(apims) + 1;
         for (ai = 0; ai < an; ai++) {
@@ -212,10 +289,11 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
             mon_err = (x && *x && SvOK(*x)) ? *x : on_err;
             {
                 HV *match = newHV();
-                SV *c, *ret = &PL_sv_undef, *err = &PL_sv_undef, *out;
+                SV *ret = &PL_sv_undef, *err = &PL_sv_undef, *out;
                 (void)hv_stores(match, "captures", newRV_inc((SV *)capsh));
                 (void)hv_stores(match, "operation", newSVsv(opid));
-                c = sv_2mortal(ps_ctx(aTHX_ ctxcls, env, app, newRV_noinc((SV *)match)));
+                (void)ps_ctx_for(aTHX_ &c, ctxcls, env, app,
+                                 newRV_noinc((SV *)match));
                 if (oprec && SvROK(oprec) && SvTYPE(SvRV(oprec)) == SVt_PVHV)
                     punk_oa_dispatch(aTHX_ c, before, (HV *)SvRV(oprec), api, opid,
                         sv_2mortal(newRV_inc((SV *)capsh)), maxb, &ret, &err);
@@ -260,6 +338,9 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
                 PUTBACK; FREETMPS; LEAVE;
                 (void)hv_stores(env, "SCRIPT_NAME", save_sn ? save_sn : newSV(0));
                 (void)hv_stores(env, "PATH_INFO",   save_pi ? save_pi : newSV(0));
+                /* a mounted app owns its answer and never comes through
+                 * punk_deliver, so the observers are fired here */
+                if (PK_OBS_WANT_RES) pk_obs_fire_res(aTHX_ c, r);
                 return r;
             }
         }
@@ -334,7 +415,13 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
             joined = newSVpvs("");
             for (k = 0; k < na; k++) { SV **a = av_fetch(sorted, k, 0);
                 if (k) sv_catpvs(joined, ", "); if (a && *a) sv_catsv(joined, *a); }
-            return ps_err_triplet(aTHX_ 405, PS_ERR_405, sizeof(PS_ERR_405) - 1, joined);
+            {   /* the house 405 runs no after-hooks and so never reaches
+                 * punk_deliver; the observers still get their one event */
+                SV *out = ps_err_triplet(aTHX_ 405, PS_ERR_405,
+                                         sizeof(PS_ERR_405) - 1, joined);
+                if (PK_OBS_WANT_RES) pk_obs_fire_res(aTHX_ c, out);
+                return out;
+            }
         }
         {   /* on_not_found: the app's own 404, the on_error contract - a
              * reference return becomes the response (after hooks run, a
@@ -344,11 +431,11 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
             SV *on_nf = ps_state(aTHX_ state, K_ON_NOT_FOUND);
             if (on_nf && SvOK(on_nf)) {
                 HV *match = newHV();
-                SV *c, *r = NULL;
+                SV *r = NULL;
                 int died;
                 (void)hv_stores(match, "captures", newRV_noinc((SV *)newHV()));
-                c = sv_2mortal(ps_ctx(aTHX_ ctxcls, env, app,
-                                      newRV_noinc((SV *)match)));
+                (void)ps_ctx_for(aTHX_ &c, ctxcls, env, app,
+                                 newRV_noinc((SV *)match));
                 {
                     dSP; int count;
                     ENTER; SAVETMPS;
@@ -377,21 +464,32 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
                 if (r) SvREFCNT_dec(r);   /* declined: the default stands */
             }
         }
-        return ps_err_triplet(aTHX_ 404, PS_ERR_404, sizeof(PS_ERR_404) - 1, NULL);
+        {   /* likewise the house 404 (on_not_found returning a response goes
+             * through punk_finish_c and is covered there instead) */
+            SV *out = ps_err_triplet(aTHX_ 404, PS_ERR_404,
+                                     sizeof(PS_ERR_404) - 1, NULL);
+            if (PK_OBS_WANT_RES) pk_obs_fire_res(aTHX_ c, out);
+            return out;
+        }
     }
 
     /* 5. web route: ctx, before + guards, controller/ws, finish */
     {
         HV *rech = (HV *)SvRV(rec);
         HV *match = newHV();
-        SV *c, *ret = &PL_sv_undef, *err = &PL_sv_undef, *out;
+        SV *ret = &PL_sv_undef, *err = &PL_sv_undef, *out;
         SV **guardsp, **codep, **wsp, **ssep;
         int shorted;
         if (caps && SvROK(caps) && SvTYPE(SvRV(caps)) == SVt_PVHV)
             (void)hv_stores(match, "captures", newRV_inc(SvRV(caps)));
         else
             (void)hv_stores(match, "captures", newRV_noinc((SV *)newHV()));
-        c = sv_2mortal(ps_ctx(aTHX_ ctxcls, env, app, newRV_noinc((SV *)match)));
+        /* the matched route record, which Punk::Context has always documented
+         * $c->match as carrying and which nothing actually put there. It is
+         * what names the route as DECLARED - "/users/:id" - for anything
+         * grouping by route rather than by path, the C ABI included. */
+        (void)hv_stores(match, "route", newSVsv(rec));
+        (void)ps_ctx_for(aTHX_ &c, ctxcls, env, app, newRV_noinc((SV *)match));
 
         {   /* The body ceiling, before the hook chain and before the guards:
              * an oversize request should cost no auth lookup, no validation,
@@ -404,7 +502,11 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
                      : 0;
             if (lim > 0) {
                 SV *over = pd_body_limit(aTHX_ env, lim);
-                if (over) return over;
+                if (over) {   /* the 413 refuses before the hook chain, so it
+                               * too skips punk_deliver */
+                    if (PK_OBS_WANT_RES) pk_obs_fire_res(aTHX_ c, over);
+                    return over;
+                }
             }
         }
 

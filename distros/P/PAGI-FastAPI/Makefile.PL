@@ -83,6 +83,18 @@ WriteMakefile(
                 file    => 'lib/PAGI/FastAPI/Response/SSE.pm',
                 version => MM->parse_version('lib/PAGI/FastAPI/Response/SSE.pm'),
             },
+            'PAGI::FastAPI::Queue' => {
+                file    => 'lib/PAGI/FastAPI/Queue.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/Queue.pm'),
+            },
+            'PAGI::FastAPI::Queue::Driver' => {
+                file    => 'lib/PAGI/FastAPI/Queue/Driver.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/Queue/Driver.pm'),
+            },
+            'PAGI::FastAPI::Queue::Driver::Memory' => {
+                file    => 'lib/PAGI/FastAPI/Queue/Driver/Memory.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/Queue/Driver/Memory.pm'),
+            },
         },
         resources   => {
             repository => {

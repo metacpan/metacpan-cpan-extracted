@@ -30,6 +30,24 @@ $store->client_put({
     client_id     => 'service',
     secret        => 'svcsecret',
     grant_types   => 'client_credentials',
+    scopes        => 'read',
+});
+# registered for nothing it can ask for: the grant it names and the scope it
+# names both have to be on its own row
+$store->client_put({
+    client_id     => 'narrow',
+    secret        => 'narrowsecret',
+    redirect_uris => ['https://narrow.test/cb'],
+    grant_types   => 'authorization_code',
+    scopes        => 'read',
+});
+# a public client (no secret) - client_credentials is not for it at all
+$store->client_put({
+    client_id     => 'browser',
+    redirect_uris => ['https://browser.test/cb'],
+    grant_types   => 'authorization_code client_credentials',
+    scopes        => 'read',
+    public        => 1,
 });
 
 my $user = 'user-42';
@@ -187,6 +205,60 @@ sub server_key {
     ok !$t->{refresh_token}, 'no refresh token for client_credentials';
     my $claims = jdec(verify($t->{access_token}, server_key(), algs=>['ES256']));
     is $claims->{sub}, 'service', 'sub is the client for client_credentials';
+}
+
+# --- the registration is what a client may ask for --------------------------
+#
+# The token endpoint dispatches on a grant_type out of the request body and
+# /authorize took its scope out of the query string, so before these checks a
+# client could name any grant and any scope it liked and have the server sign
+# the result into an at+jwt the resource server then honoured. Reported by
+# CPANSec alongside CVE-2026-75628.
+{
+    # a grant the client is not registered for
+    my ($s, undef, $body) = form_post('/oauth/token',
+        grant_type => 'client_credentials', scope => 'read',
+        client_id => 'narrow', client_secret => 'narrowsecret');
+    is $s, 400, 'an unregistered grant_type is refused';
+    is jdec($body)->{error}, 'unauthorized_client', 'unauthorized_client';
+
+    # the grant it IS registered for still works
+    my ($s2, $h2) = POTest::hit($app, GET =>
+        "/oauth/authorize?response_type=code&client_id=narrow"
+      . "&redirect_uri=https%3A%2F%2Fnarrow.test%2Fcb&scope=read"
+      . "&state=n&code_challenge=$challenge&code_challenge_method=S256");
+    is $s2, 302, 'the registered grant still authorizes';
+    like $h2->{location}, qr/[?&]code=/, 'with a code';
+
+    # a scope outside the registration, at /authorize
+    my (undef, $h3) = POTest::hit($app, GET =>
+        "/oauth/authorize?response_type=code&client_id=narrow"
+      . "&redirect_uri=https%3A%2F%2Fnarrow.test%2Fcb&scope=read+admin"
+      . "&state=n&code_challenge=$challenge&code_challenge_method=S256");
+    like $h3->{location}, qr/[?&]error=invalid_scope/,
+        'an unregistered scope is invalid_scope';
+    unlike $h3->{location}, qr/[?&]code=/, 'and mints no code';
+
+    # a scope outside the registration, at /token
+    my ($s4, undef, $b4) = form_post('/oauth/token',
+        grant_type => 'client_credentials', scope => 'read admin',
+        client_id => 'service', client_secret => 'svcsecret');
+    is $s4, 400, 'client_credentials cannot invent a scope either';
+    is jdec($b4)->{error}, 'invalid_scope', 'invalid_scope';
+
+    # asking for nothing is always allowed
+    my ($s5) = form_post('/oauth/token',
+        grant_type => 'client_credentials',
+        client_id => 'service', client_secret => 'svcsecret');
+    is $s5, 200, 'an empty scope is still fine';
+
+    # a public client authenticates on a client_id anyone can read, so
+    # client_credentials must not be available to it (RFC 6749 4.4)
+    my ($s6, undef, $b6) = form_post('/oauth/token',
+        grant_type => 'client_credentials', scope => 'read',
+        client_id => 'browser');
+    is $s6, 401, 'a public client cannot use client_credentials';
+    is jdec($b6)->{error}, 'invalid_client', 'invalid_client';
 }
 
 # --- introspect + revoke ----------------------------------------------------

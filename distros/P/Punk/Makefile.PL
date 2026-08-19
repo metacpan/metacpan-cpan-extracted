@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
+use File::Find ();
 use Config;
 
 my @PROVIDERS = (
@@ -16,20 +17,45 @@ my @PROVIDERS = (
     [ 'DBIx::Loop'        => '../DBIx-Loop/include'         ],  # dbil_abi.h
 );
 my $INC = '-Iinclude';
-{
-    my $dep;
-    if (eval { $dep = ExtUtils::Depends->new('Punk',
-                          map { $_->[0] } @PROVIDERS); 1 } && $dep) {
-        my %v = $dep->get_makefile_vars;
-        $INC .= ' ' . $v{INC} if $v{INC};
-    }
-    else {
-        my @missing = grep { !-d $_->[1] } @PROVIDERS;
-        die "Punk needs " . join(', ', map { $_->[0] } @missing)
-          . " installed, or present as sibling directories.\n" if @missing;
-        $INC .= join '', map { " -I$_->[1]" } @PROVIDERS;
-    }
+my $pkg;
+if (eval { $pkg = ExtUtils::Depends->new('Punk',
+                      map { $_->[0] } @PROVIDERS); 1 } && $pkg) {
+    # the consumer INC is merged below, together with the provider vars
 }
+else {
+    my @missing = grep { !-d $_->[1] } @PROVIDERS;
+    die "Punk needs " . join(', ', map { $_->[0] } @missing)
+      . " installed, or present as sibling directories.\n" if @missing;
+    $INC .= join '', map { " -I$_->[1]" } @PROVIDERS;
+    $pkg = ExtUtils::Depends->new('Punk');             # provider only
+}
+
+# ---- Punk as a PROVIDER --------------------------------------------------- *
+# Punk has consumed five C ABIs for a while and published none. pk_abi.h is
+# its own: the table a consumer XS module observes a request through, without
+# a Perl frame between the dispatcher and its code. Same mechanism Punk uses
+# to reach Open::API's - ExtUtils::Depends installs the header and records the
+# include path, Punk::_abi_ptr hands over the address at runtime.
+$pkg->install('include/pk_abi.h');
+mkdir 'Install' unless -d 'Install';
+$pkg->save_config('Install/Files.pm');
+my %dep = $pkg->get_makefile_vars;
+$INC .= ' ' . delete $dep{INC} if $dep{INC};
+# EU::Depends returns an empty LIBS/LDFROM that would otherwise clobber
+# MakeMaker's defaults; Punk links nothing extra, so drop them.
+delete $dep{LIBS};
+delete $dep{LDFROM};
+
+# EU::Depends' PM map (installing pk_abi.h + Files.pm) REPLACES MakeMaker's
+# auto-detected PM, so everything under lib/ has to be re-added by hand or it
+# silently stops being installed - and Punk ships 41 modules plus the `punk
+# new` skeleton templates, which are not .pm files and would go just as
+# quietly.
+File::Find::find(sub {
+    return unless -f;
+    (my $rel = $File::Find::name) =~ s{^lib/}{};
+    $dep{PM}{$File::Find::name} = "\$(INST_LIB)/$rel";
+}, 'lib');
 
 # getentropy(2) for CSRF token generation - macOS 10.12+, glibc 2.25+, the
 # BSDs. It is declared in <sys/random.h> on macOS and <unistd.h> on glibc, so
@@ -130,6 +156,7 @@ my %WriteMakefileArgs = (
         },
     },
     EXE_FILES => ['bin/punk'],   # the `punk new` scaffolder
+    %dep,   # ExtUtils::Depends: installs pk_abi.h + Files.pm, and the PM map
     INC    => $INC,
     DEFINE => join(' ', @DEFINE),
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },

@@ -1,0 +1,21 @@
+# Sample FuguVM VM configuration block
+#
+# Add VM definitions to the global ~/.fuguvmrc or the project .fuguvmrc
+#
+# The project config overrides the global config for the same VM name.
+
+vm "default" {
+	version      7.8
+	memory       2048
+	disk_size    8G
+	ssh_port     2222
+	console_port 4444
+}
+
+# Example: dedicated integration test VM
+#
+# vm "openhap-test" {
+#     version      7.8
+#     memory       4096
+#     provision    scripts/provision.sh
+# }

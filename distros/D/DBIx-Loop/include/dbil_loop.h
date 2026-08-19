@@ -142,28 +142,38 @@ static SV *dbil_exec(pTHX_ SV *self, int is_query, SV *sql, AV *bind) {
     SV *cap   = dbil_field(aTHX_ self, "capability", 10);
     SV *cargs = dbil_field(aTHX_ self, "connect_args", 12);
     SV *dbh, *fut, *err = NULL, *res;
+    /* v2 observers. Fired here, once, because this is the only place all
+     * three backends have in common - and attached to whatever comes back, so
+     * none of them has to know it is being watched. */
+    dbil_obs_tokens *obs = dbil_obs_start(aTHX_ is_query, sql, bind);
 
     if (cap && SvPOK(cap) && strEQ(SvPVX(cap), "native")) {
         dbil_native *nc = dbil_native_of(aTHX_ self);
-        return dbil_native_run(aTHX_ nc, is_query, sql, bind);
+        fut = dbil_native_run(aTHX_ nc, is_query, sql, bind);
+        dbil_obs_attach(aTHX_ fut, obs);
+        return fut;
     }
 
     if (cap && SvPOK(cap) && strEQ(SvPVX(cap), "pool")
         && cargs && SvROK(cargs)) {
         dbil_pool *p = dbil_pool_of(aTHX_ self, cargs);
-        return dbil_pool_run(aTHX_ p, is_query, sql, bind);
+        fut = dbil_pool_run(aTHX_ p, is_query, sql, bind);
+        dbil_obs_attach(aTHX_ fut, obs);
+        return fut;
     }
 
     dbh = dbil_field(aTHX_ self, "dbh", 3);
     fut = dbil_future_new(aTHX_ "DBIx::Loop::Future");
     if (!dbh || !SvROK(dbh)) {
         dbil_future_settle_fail(aTHX_ fut, sv_2mortal(newSVpvs("no database handle")));
+        dbil_obs_attach(aTHX_ fut, obs);
         return fut;
     }
     res = dbil_run_dbi(aTHX_ dbh, is_query, sql, bind, &err);
     if (res) dbil_future_settle_done1(aTHX_ fut, res);
     else     dbil_future_settle_fail(aTHX_ fut,
                  err ? err : sv_2mortal(newSVpvs("query failed")));
+    dbil_obs_attach(aTHX_ fut, obs);
     return fut;
 }
 

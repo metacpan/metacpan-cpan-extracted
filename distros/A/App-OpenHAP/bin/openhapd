@@ -1,0 +1,435 @@
+#!/usr/bin/env perl
+use v5.36;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+
+use Fugu::Config;
+use Fugu::Control;
+use Protocol::HAP::Crypto;
+use Fugu::Daemon;
+use Fugu::Log;
+use Fugu::Mdnsd;
+use Fugu::MQTT;
+use Fugu::Privdrop;
+use Fugu::Sandbox;
+use Fugu::Signal;
+use App::OpenHAP::Devices;
+use App::OpenHAP::Host;
+use Protocol::HAP::SetupCode qw(validate_setup_code);
+
+# Default configuration
+my $config_file  = '/etc/openhapd.conf';
+my $foreground   = 0;
+my $check_config = 0;
+my $verbose      = 0;
+
+GetOptions(
+	'c|config=s'   => \$config_file,
+	'f|foreground' => \$foreground,
+	'n|check'      => \$check_config,
+	'v|verbose+'   => \$verbose,
+	'h|help'       => \&usage,
+) or usage();
+
+# Load the configuration. A missing file is normal on a fresh
+# install; a file that exists but does not parse is not, and the
+# daemon must not run on defaults that the operator did not choose.
+my $config = Fugu::Config->new( file => $config_file );
+if ( -f $config_file && !$config->load ) {
+	print STDERR $config->error . "\n";
+	exit 1;
+}
+
+# Refuse an unusable setup code here, before the daemonize step. The
+# engine requires a valid code, and it must not fail with a raw die
+# after the process left the terminal. validate_setup_code also
+# rejects the trivial codes that the HAP specification disallows.
+my $hap_pin = $config->get( 'hap_pin', '1995-1018' );
+unless ( validate_setup_code($hap_pin) ) {
+	print STDERR "openhapd: hap_pin \"$hap_pin\" is not a valid"
+	    . " setup code: use 8 digits, not a trivial pattern, for"
+	    . " example 1995-1018\n";
+	exit 1;
+}
+
+# Refuse an unknown log level or facility the same way, and name the
+# value. openhapd.conf(5) lists exactly these spellings; a daemon
+# that silently mapped an unknown one to a default would serve a
+# level the operator did not choose.
+my $log_level    = $config->get( 'log_level',    'info' );
+my $log_facility = $config->get( 'log_facility', 'daemon' );
+unless ( $log_level =~ /^(?:debug|info|notice|warning|error)$/ ) {
+	print STDERR "openhapd: log_level \"$log_level\" is not one of"
+	    . " debug, info, notice, warning, error\n";
+	exit 1;
+}
+unless ( $log_facility =~ /^(?:daemon|user|local[0-7])$/ ) {
+	print STDERR "openhapd: log_facility \"$log_facility\" is not"
+	    . " daemon, user, or local0 through local7\n";
+	exit 1;
+}
+
+if ($check_config) {
+	print "Configuration file $config_file is valid\n";
+	exit 0;
+}
+
+# Daemonize first, before the log setup. This makes sure that the
+# child process opens the syslog connection.
+#
+# The child takes /var/run/openhapd.pid while it is still root and
+# holds the lock for life. The file is the trust anchor that hapctl and
+# rc.d read, so it stays root-owned: the dropped daemon must not be
+# able to rewrite it. Nothing removes it at exit, because an unlink in
+# root-owned /var/run needs a directory permission that the daemon
+# gives up. Fugu::Pidfile->is_stale covers the leftover.
+if ( !$foreground ) {
+	Fugu::Daemon->daemonize(
+		logfile => '/var/log/openhapd.log',
+		pidfile => '/var/run/openhapd.pid',
+	);
+}
+
+# Set up logging after the daemonize step
+my $log_mode = $foreground ? 'stderr' : 'syslog';
+
+# Create the logger and make it the process default. Library code
+# that gets no logger of its own reports through it.
+my $log = Fugu::Log->new(
+	mode     => $log_mode,
+	ident    => 'openhapd',
+	level    => $verbose ? 'debug' : $log_level,
+	facility => $log_facility,
+);
+Fugu::Log->set_default($log);
+
+$log->info('OpenHAP daemon initializing');
+
+# Get the HAP settings. hap_pin was read and validated above,
+# before the -n exit and the daemonize.
+my $hap_name = $config->get( 'hap_name', 'OpenHAP Bridge' );
+my $hap_port = $config->get( 'hap_port', 51827 );
+my $db_path  = $config->get( 'db_path',  '/var/db/openhapd' );
+
+# Where hapctl asks the running daemon what it is doing. The value
+# "off" turns the socket off, for an operator who wants no local
+# control channel at all.
+my $control_path = $config->get( 'control', '/var/run/openhapd/control.sock' );
+$control_path = undef if lc $control_path eq 'off';
+
+# A my declaration with a statement modifier has static-variable
+# semantics, thus the branch is written out
+my $control_dir;
+$control_dir = $control_path =~ s{/[^/]+$}{}r if defined $control_path;
+
+# Create the HAP server: the host of the Protocol::HAP engine
+my $hap = App::OpenHAP::Host->new(
+	port         => $hap_port,
+	pin          => $hap_pin,
+	name         => $hap_name,
+	storage_path => $db_path,
+);
+
+# Set up the MQTT client
+my $mqtt_host = $config->get( 'mqtt_host', '127.0.0.1' );
+my $mqtt_port = $config->get( 'mqtt_port', 1883 );
+my $mqtt_user = $config->get('mqtt_user');
+my $mqtt_pass = $config->get('mqtt_pass');
+
+my $mqtt = Fugu::MQTT->new(
+	host     => $mqtt_host,
+	port     => $mqtt_port,
+	username => $mqtt_user,
+	password => $mqtt_pass,
+);
+
+# Try to connect to MQTT with a timeout
+if ( $mqtt->mqtt_connect(5) ) {
+	$log->info( 'Connected to MQTT broker at %s:%d',
+		$mqtt_host, $mqtt_port );
+	$hap->set_mqtt_client($mqtt);
+}
+else {
+	$log->warning('MQTT broker not available, will retry in background');
+	$hap->set_mqtt_client($mqtt);    # Set it anyway for reconnection
+}
+
+# Load the devices from the configuration
+my $loader = App::OpenHAP::Devices->new();
+$loader->load_devices( $config, $hap, $mqtt );
+
+# Bump c# if the accessory database changed since the last run
+$hap->update_config_number();
+
+# Create the mDNS handle. The connect and publish steps happen after
+# the privilege drop. The HAP server advertises the TXT record again
+# on pairing changes.
+my $mdns = Fugu::Mdnsd->new;
+$hap->set_mdns($mdns);
+
+# Drop privileges before the daemon talks to mdnsd. Then the daemon
+# opens and holds the control socket as _openhap. The held socket is
+# the lifetime of the advertisement. It must not be a root fd.
+if ( $> == 0 ) {
+
+	# Make sure that _openhap owns db_path before the privilege
+	# drop. Then pairings and device state stay writable.
+	Fugu::Privdrop->prepare_statedir(
+		path    => $db_path,
+		user    => '_openhap',
+		mode    => 0700,
+		on_warn => sub ($msg) { $log->warning( '%s', $msg ) },
+	);
+
+	# The directory of the control socket needs the same
+	# treatment, and it needs it here: OpenBSD clears /var/run at
+	# boot, and the dropped daemon cannot create a directory
+	# there. Mode 0700 is the outer boundary. The socket mode
+	# alone would let any user reach the bind point.
+	Fugu::Privdrop->prepare_statedir(
+		path    => $control_dir,
+		user    => '_openhap',
+		mode    => 0700,
+		on_warn => sub ($msg) { $log->warning( '%s', $msg ) },
+	) if $control_dir;
+
+	# Keep root's supplementary groups. On OpenBSD that is how the
+	# daemon reaches the mdnsd control socket after the drop.
+	Fugu::Privdrop->drop_privileges(
+		user        => '_openhap',
+		keep_groups => 1,
+	);
+
+	# Open the log again after the privilege drop. The process
+	# opened the syslog connection as root. It must open the
+	# connection again as _openhap.
+	$log->reopen;
+
+	$log->info('Dropped privileges to _openhap');
+}
+
+# Publish the mDNS advertisement after the privilege drop. The daemon
+# uses the mdnsd control protocol directly (see Fugu::Mdnsd) and
+# keeps the socket open. A close of the socket withdraws the service.
+# A missing mdnsd degrades discovery. It never degrades HAP service.
+if (
+	$mdns->publish(
+		name  => $hap_name,
+		app   => 'hap',
+		proto => 'tcp',
+		port  => $hap_port,
+		txt   => $hap->mdns_txt_string,
+	) )
+{
+	$log->info( 'Registered mDNS service: %s._hap._tcp port %d',
+		$hap_name, $hap_port );
+}
+else {
+	$log->warning( 'mDNS registration failed: %s',
+		$mdns->error // 'unknown' );
+}
+
+# Serve the control socket, also as _openhap. The commands answer
+# from process state, thus hapctl reports what the daemon is doing
+# and not what it wrote to a file at some earlier time.
+#
+# No command echoes a configuration value. openhapd.conf carries the
+# setup code and the broker password, and a reply that carried either
+# would put it in the output of a command an operator runs in front
+# of other people.
+my $control;
+if ($control_path) {
+	$control = Fugu::Control->new( path => $control_path, log => $log );
+	$control->register( status  => sub ($) { $hap->control_status } );
+	$control->register( devices => sub ($) { $hap->control_devices } );
+
+	if ( $control->listen( loop => $hap->loop ) ) {
+		$log->info( 'Control socket at %s', $control_path );
+	}
+	else {
+		$log->warning(
+			'Control socket unavailable: %s',
+			$control->error // 'unknown'
+		);
+		$control = undef;
+	}
+}
+
+# Restrict the process for good. Fugu::Sandbox is a no-op off
+# OpenBSD. Four steps follow, and their order is load-bearing. All of
+# them come after the privilege drop. unveil only removes
+# reachability. Thus an unveil done as _openhap keeps the root-only
+# chown loop above working:
+#
+#	1. resolve the lazy load, which reads from the library tree
+#	2. unveil the filesystem view
+#	3. lock the view
+#	4. pledge the syscall surface
+#
+# Step 1: load every module that would otherwise load later.
+#
+# Protocol::HAP::Crypto opens a shared object for each Crypt::* library. The
+# promise set below has no prot_exec, so a load after the pledge kills
+# the process. The warm-up must therefore happen here, and it must not
+# be optional: a daemon that cannot sign cannot pair.
+Protocol::HAP::Crypto->preload;
+#
+# Net::MQTT::Simple is pure Perl, so this is not about prot_exec. The
+# step resolves the transitive dependencies of the module while @INC
+# is still fully reachable. Those dependencies are sockets, and
+# whatever getprotobyname touches. The module stays optional: it is
+# the only cpan runtime dependency, and openhapd keeps serving
+# HomeKit without it. Thus an unguarded require would turn a missing
+# optional dependency into a startup failure.
+eval { require Net::MQTT::Simple; 1 };
+
+# Steps 2 and 3: the inventory lives here, beside the pledge policy it
+# belongs with. Each entry is required or optional, and the difference
+# matters: a required entry that is absent means a broken install and
+# the daemon must fail and name the path, while an optional entry can
+# be legitimately absent on a working system. A fresh install has no
+# configuration file; the -f mode never creates the log file; mdnsd
+# does not always run; the resolver files matter only when mqtt_host
+# is a name. A wrong disposition turns a configuration that starts
+# today into a startup failure.
+#
+# The store's make_path already created $db_path through HAP->new.
+# Thus a $db_path that is still missing is a hard failure, and
+# correctly so.
+Fugu::Sandbox->unveil(
+	paths   => [ unveil_paths() ],
+	on_skip => sub ($path) {
+		$log->debug( 'unveil: optional %s absent, skipped', $path );
+	},
+);
+Fugu::Sandbox->unveil_lock;
+
+# Step 4: apply one promise set once, before the daemon reads any
+# network input:
+#
+#	stdio	always
+#	rpath	/dev/urandom (Crypto), store reads, lazy require
+#	wpath	store writes, the daemon log
+#	cpath	store file creation and removal, make_path
+#	fattr	chmod 0600 on stored key material (the store)
+#	inet	the HAP listener, MQTT connects and reconnects
+#	dns	resolving mqtt_host when it is a name
+#	unix	reconnecting to mdnsd. update_txt withdraws and
+#		publishes again over a fresh control socket. Thus
+#		socket(2) and connect(2) on the AF_UNIX path happen
+#		after this point (see Fugu::Mdnsd)
+#
+# proc, exec and prot_exec are deliberately absent. The daemon spawns
+# nothing, and step 1 loaded every shared object before this line.
+my $promises = 'stdio rpath wpath cpath fattr inet dns unix';
+Fugu::Sandbox->pledge( promises => $promises );
+$log->info( 'Pledged: %s', $promises )
+    if Fugu::Sandbox->is_supported;
+
+if ( !$hap->is_paired() ) {
+	$log->notice( 'Not paired - use Home app with PIN: %s', $hap_pin );
+}
+
+# INT and TERM end the loop. They set a flag and nothing more: the
+# loop sees the flag after the current pass, run returns, and the
+# shutdown happens below, in the daemon, where an operator can read
+# it. Before this, the handler called exit itself, so the daemon died
+# inside a signal handler with its connections open.
+my $sig = Fugu::Signal->new;
+$sig->setup_interrupt_flag( 'INT', 'TERM' );
+$hap->loop->signal($sig);
+
+# HUP means reload, and rc.d sends it for that. It used to exit the
+# daemon, which is the opposite of what the operator asked for. The
+# daemon now reopens the log and keeps serving. A separate manager
+# holds the flag, because the loop ends on the flag of the manager
+# above.
+my $hup = Fugu::Signal->new;
+$hup->setup_interrupt_flag('HUP');
+$hap->loop->every(
+	1,
+	sub {
+		return unless $hup->interrupted;
+		$hup->reset_interrupted;
+		$log->reopen;
+		$log->info('Reopened the log on SIGHUP');
+	} );
+
+# Run the server. The call returns when a signal ended the loop.
+$log->info('Starting OpenHAP server');
+$hap->run;
+
+$log->info('Shutting down');
+
+# A close of the mdnsd control socket withdraws the advertisement
+$mdns->withdraw;
+$control->shutdown( loop => $hap->loop ) if $control;
+$hap->shutdown;
+
+exit 0;
+
+# unveil_paths():
+#	The filesystem view of the daemon, as an ordered list of
+#	unveil entries. The order is load-bearing: unveil(2) replaces
+#	the permissions of a path rather than merging them, so a
+#	parent must come before its children.
+sub unveil_paths()
+{
+	my @paths = ( [ $db_path, 'rwc' ] );
+
+	# Unveil the perl library tree read-only for the lazy require
+	# on the MQTT reconnect path. The set comes from
+	# Fugu::Sandbox, which reads %Config and not the live @INC.
+	# Two reasons: this script prepends $RealBin/../lib, which on
+	# an installed layout is /usr/local/lib and holds every
+	# third-party library on the system; and Fugu::MQTT unshifts
+	# a directory onto @INC at connect time, so a derived set would
+	# depend on whether the startup connect has run.
+	my @perl_dirs = Fugu::Sandbox->perl_lib_dirs;
+
+	# Add the checkout's own lib directory, but only when it really
+	# is a checkout. The installed layout must not pick up
+	# /usr/local/lib here.
+	my $script_lib = "$RealBin/../lib";
+	push @perl_dirs, $script_lib if -d "$script_lib/App/OpenHAP";
+
+	my %seen;
+	push @paths, map { [ $_, 'r' ] } grep { !$seen{$_}++ } @perl_dirs;
+
+	push @paths,
+	    [ $config_file, 'r', { optional => 1 } ],
+	    [ '/var/log/openhapd.log', 'w',  { optional => 1 } ],
+	    [ '/var/run/mdnsd.sock',   'rw', { optional => 1 } ];
+
+	# The directory of the control socket, not the socket. bind(2)
+	# and unlink(2) both change a directory entry, thus the
+	# directory needs rwc. The row is optional because the
+	# operator can turn the socket off.
+	push @paths, [ $control_dir, 'rwc', { optional => 1 } ]
+	    if $control_dir;
+
+	# The resolver files, the service tables, the time zone and the
+	# random device are the same for every daemon
+	push @paths, Fugu::Sandbox->system_paths;
+
+	return @paths;
+}
+
+sub usage()
+{
+	print STDERR <<EOF;
+Usage: openhapd [options]
+
+Options:
+    -c, --config FILE    Configuration file (default: /etc/openhapd.conf)
+    -f, --foreground     Run in foreground (log to stderr)
+    -n, --check          Check configuration and exit
+    -v, --verbose        Increase verbosity (can be repeated)
+    -h, --help           Show this help
+
+See openhapd(8) for more information.
+
+EOF
+	exit 1;
+}

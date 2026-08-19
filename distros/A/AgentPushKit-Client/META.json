@@ -1,0 +1,60 @@
+{
+   "abstract" : "Official Perl client for Agent Push Kit",
+   "author" : [
+      "Justin Strong <JustinBStrong@users.noreply.github.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AgentPushKit-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "DateTime" : "0",
+            "JSON" : "2",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Any" : "0",
+            "Module::Find" : "0",
+            "Module::Runtime" : "0",
+            "Moose::Role" : "0",
+            "URI::Query" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://agentpushkit.com"
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

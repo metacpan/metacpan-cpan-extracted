@@ -209,6 +209,27 @@ static const char *ps_cfg_str(pTHX_ HV *cfg, const char *k, const char *def,
     return def;
 }
 
+static IV ps_cfg_iv(pTHX_ HV *cfg, const char *k, IV def) {
+    SV **e = hv_fetch(cfg, k, (I32)strlen(k), 0);
+    return (e && *e && SvOK(*e)) ? SvIV(*e) : def;
+}
+
+/* The absolute expiry stamped into the signed payload, under a reserved key
+ * the application never sees (the same trick flash plays with punk.flash).
+ *
+ * Without it `expires` was only the browser's Max-Age: a hint to a client
+ * that is free to ignore it. The signature carries no time, so a cookie
+ * captured once stayed valid for as long as the secret did, and session_expire
+ * only asked the browser to forget a value that still authenticated. Stamping
+ * the expiry inside the signature is what makes the lifetime the server's to
+ * decide.
+ *
+ * A session cookie with no `expires` is still bounded here, because "until the
+ * browser closes" is the client's promise and not a limit on the value. */
+#define PK_SESSION_EXP     "punk.exp"
+#define PK_SESSION_EXP_LEN 8
+#define PK_SESSION_MAX_LIFETIME (30 * 86400)
+
 static HV *ps_stash(pTHX_ AV *av) {
     SV *st = pcx_get(aTHX_ av, PCX_STASH);
     if (!st) { st = newRV_noinc((SV *)newHV()); (void)av_store(av, PCX_STASH, st); }
@@ -272,8 +293,24 @@ static SV *ps_load(pTHX_ SV *c) {
             decoded = punk_frj(aTHX)->decode(aTHX_ SvPVX(payload), SvCUR(payload), NULL);
             if (decoded) sv_2mortal(decoded);
             if (decoded && SvROK(decoded) && SvTYPE(SvRV(decoded)) == SVt_PVHV) {
-                sess = newHVhv((HV *)SvRV(decoded));       /* a fresh copy */
-                (void)hv_stores(stash, "punk.session.orig", ps_encode(aTHX_ decoded));
+                HV *dh = (HV *)SvRV(decoded);
+                SV **ep = hv_fetch(dh, PK_SESSION_EXP, PK_SESSION_EXP_LEN, 0);
+                /* A payload past its stamped expiry is not a session. It is
+                 * left to fall through to the empty one below, so an expired
+                 * cookie logs the user out rather than half-loading. */
+                if (!ep || !*ep || !SvOK(*ep) || SvIV(*ep) > (IV)time(NULL)) {
+                    SV *rvs;
+                    sess = newHVhv(dh);                    /* a fresh copy */
+                    /* the expiry is ours, not the application's: strip it
+                     * before anything sees the hash, and take the dirty-check
+                     * baseline from the stripped copy so it compares like
+                     * with like against what the write-back encodes */
+                    (void)hv_delete(sess, PK_SESSION_EXP, PK_SESSION_EXP_LEN,
+                                    G_DISCARD);
+                    rvs = sv_2mortal(newRV_inc((SV *)sess));
+                    (void)hv_stores(stash, "punk.session.orig",
+                                    ps_encode(aTHX_ rvs));
+                }
             }
         }
     }
@@ -326,7 +363,33 @@ static void ps_writeback(pTHX_ SV *c, SV *resp) {
                  "not saved - a server-side store is needed", (int)SvCUR(cur));
             return;
         }
+        /* Sign an expiry-stamped copy, not the hash itself: the application
+         * keeps the session it was handed, and the dirty check above stays on
+         * the stripped serialization, so a request that changed nothing still
+         * writes no cookie. The stamp refreshes every time the session is
+         * written, which is what makes `expires` a lifetime rather than a
+         * countdown from first login. */
+        {
+            HV *payload = newHVhv((HV *)SvRV(*sessp));
+            IV ttl = ps_cfg_iv(aTHX_ cfg, "max_age", 0);
+            SV *prv;
+            if (ttl <= 0) ttl = PK_SESSION_MAX_LIFETIME;
+            (void)hv_store(payload, PK_SESSION_EXP, PK_SESSION_EXP_LEN,
+                           newSViv((IV)time(NULL) + ttl), 0);
+            prv = sv_2mortal(newRV_noinc((SV *)payload));
+            cur = sv_2mortal(ps_encode(aTHX_ prv));
+        }
         key = ps_cfg_str(aTHX_ cfg, "secret", "", &kl);
+        if (!kl) {
+            /* the `session` keyword refuses an empty secret at boot, so this
+             * is only reachable by writing the config by hand. Signing with a
+             * zero-length key is a forgeable cookie, so drop it here too -
+             * same shape as the oversize case, since croaking in a trapped
+             * after-hook would vanish */
+            warn("Punk: session has no secret; not saved - a cookie signed "
+                 "with an empty key can be forged by anyone");
+            return;
+        }
         signed_val = sv_2mortal(pk_session_sign(aTHX_ cur, key, kl));
         setcookie = pk_build_cookie(aTHX_ cname, signed_val, cfg);
     }

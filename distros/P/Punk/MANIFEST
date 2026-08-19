@@ -50,6 +50,8 @@ example/Chat/root/templates/room.tmpl
 example/Chat/tls/server.crt
 example/Chat/tls/server.key
 ignore.txt
+include/pk_abi.h
+include/punk/pk_abi_impl.h
 include/punk/punk_accept.h
 include/punk/punk_app.h
 include/punk/punk_auth.h
@@ -73,6 +75,8 @@ include/punk/punk_markdown.h
 include/punk/punk_model.h
 include/punk/punk_multipart.h
 include/punk/punk_names.h
+include/punk/punk_obs.h
+include/punk/punk_obs_selftest.h
 include/punk/punk_oamount.h
 include/punk/punk_password.h
 include/punk/punk_proxy.h
@@ -223,6 +227,8 @@ t/64-static-precompressed.t
 t/65-compress-optout.t
 t/66-max-body.t
 t/67-route-spec.t
+t/68-before-request.t
+t/69-pk-abi.t
 t/lib/Kinds/Controller/Thing.pm
 t/lib/Punk/Command/Fakecmd.pm
 t/lib/PunkTest.pm
@@ -246,6 +252,7 @@ t/test/MyApp/openapi.json
 t/test/MyApp/root/templates/book/list.tmpl
 t/test/MyApp/root/templates/book/view.tmpl
 t/test/MyApp/root/templates/layout.tmpl
+xs/abi.xs
 xs/app.xs
 xs/auth.xs
 xs/compile.xs

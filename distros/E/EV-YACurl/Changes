@@ -1,0 +1,9 @@
+Revision history for EV::YACurl
+
+0.01  2026-08-18
+    - first release, forked from AnyEvent::YACurl 0.22
+    - libcurl's socket and timer callbacks drive ev_io and ev_timer watchers
+      from XS, so no Perl code runs per socket event
+    - priority() and default_priority() place a client's watchers, and the
+      callbacks libcurl invokes through them, in EV's priority order
+    - builds against Alien::curl; needs libcurl 7.64.0 or newer

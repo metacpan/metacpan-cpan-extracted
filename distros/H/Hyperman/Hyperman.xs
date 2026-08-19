@@ -53,6 +53,9 @@
 #include "hm_future.h"
 #include "hm_ratelimit.h"   /* fork-shared denylist + rate counters (arena) */
 #include "hm_compress.h"   /* gzip on the way out (zlib optional) */
+#include "hm_workerhook.h" /* the v4 on_worker_start registry; hm_core fires
+                            * it, hm_abi_impl registers into it */
+#include "hm_workerhook_perl.h" /* ... and the Perl door onto that registry */
 #include "hm_core.h"
 #include "hm_abi_impl.h"
 

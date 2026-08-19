@@ -52,8 +52,8 @@ sub cmd_create_modulino {
   $script =~ s/\A(.*)^=pod.*\z/$1/xsm;
 
   # customize
-  $script =~ s/[@]MODULINO_WRAPPER[@]/$alias/xsm;
-  $script =~ s/[@]PERL_MODULE_NAME[@]/$module_name/xsm;
+  $script =~ s/[@]modulino_wrapper[@]/$alias/xsm;
+  $script =~ s/[@]perl_module_name[@]/$module_name/xsm;
 
   my $modulino = sprintf '%s/%s', $installbindir, $alias;
 
@@ -102,8 +102,8 @@ __DATA__
 #-*- mode: sh; -*-
 # modulino invocation
 
-MODULINO_WRAPPER=@MODULINO_WRAPPER@
-MODULE_NAME=@PERL_MODULE_NAME@
+MODULINO_WRAPPER=@modulino_wrapper@
+MODULE_NAME=@perl_module_name@
 MODULE_PATH=$(MODULE_PATH="${MODULE_NAME//:://}.pm" perl -M$MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};')
 
 MODULINO_WRAPPER=$MODULINO_WRAPPER perl $MODULE_PATH "$@"

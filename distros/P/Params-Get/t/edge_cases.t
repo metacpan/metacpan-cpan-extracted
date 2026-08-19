@@ -23,7 +23,6 @@ use warnings;
 
 use Test::Most;
 use Test::Mockingbird 0.08;
-use Test::Returns;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 use Readonly;

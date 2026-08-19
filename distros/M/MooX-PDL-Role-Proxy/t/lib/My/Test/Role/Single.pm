@@ -22,13 +22,13 @@ sub test_class_new {
 }
 
 sub test_inplace {
-    my $class = shift;
+    my $class   = shift;
     my $context = context();
     my ( $sub, $expected ) = @_;
 
     subtest 'inplace' => sub {
         my $orig = $class->test_obj;
-        my $new = $sub->( $orig->inplace );
+        my $new  = $sub->( $orig->inplace );
         $class->test_inplace_flat_obj( $orig, $new, $expected );
     };
 
@@ -36,7 +36,7 @@ sub test_inplace {
 }
 
 sub test_not_inplace {
-    my $class = shift;
+    my $class   = shift;
     my $context = context();
 
     my ( $sub, $expected, $build_test_obj ) = @_;
@@ -61,7 +61,7 @@ sub test_not_inplace {
 
 sub build_expected {
     my $class = shift;
-    my %data = @_;
+    my %data  = @_;
 
     $class->test_class_new(
         p1 => PDL->new( $data{p1} ),

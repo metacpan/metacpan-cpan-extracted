@@ -34,13 +34,12 @@ sub test_inplace {
 
     subtest 'inplace' => sub {
         my $orig = $class->test_obj;
-        my $new = $sub->( $orig->inplace );
+        my $new  = $sub->( $orig->inplace );
 
         for my $c ( 'c1', 'c2' ) {
 
             subtest $c => sub {
-                $class->test_inplace_flat_obj( $orig->$c, $new->$c,
-                    $expected->$c );
+                $class->test_inplace_flat_obj( $orig->$c, $new->$c, $expected->$c );
             }
         }
     };
@@ -74,8 +73,7 @@ sub test_not_inplace {
         my $new = $sub->( $orig );
         for my $c ( 'c1', 'c2' ) {
             subtest $c => sub {
-                $class->test_not_inplace_flat_obj( $orig->$c, $new->$c,
-                    $expected->$c, %{ $data{$c} } );
+                $class->test_not_inplace_flat_obj( $orig->$c, $new->$c, $expected->$c, %{ $data{$c} } );
             };
         }
 
@@ -85,7 +83,7 @@ sub test_not_inplace {
 
 sub build_expected {
     my $class = shift;
-    my %data = @_;
+    my %data  = @_;
 
     $class->nested_test_class_new(
         c1 => $class->test_class_new(

@@ -1,0 +1,66 @@
+=head1 NAME
+
+App::FuguWeb::Page - the shared chrome around one body fragment
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Page;
+
+    my $page = App::FuguWeb::Page->new(config => $config);
+
+    $page->write("$out/install.html", 'Install', $fragment);
+
+=head1 DESCRIPTION
+
+Every source format is reduced to one HTML body fragment, and this
+class wraps it: the head, the header, the navigation, the fragment, and
+the footer. The layout is fixed. What a project decides is the site
+name, the language, the navigation, and the footer prose.
+
+The class builds the document with string operations, not with a
+substitution over a template. A title may therefore hold any character,
+including the slash and the ampersand that a C<sed> template could not
+take.
+
+Two separators are not ASCII: an em dash between the page title and the
+site name, and a middle dot between navigation entries. Both are byte
+constants. No file in the namespace carries C<use utf8>, and
+L<Fugu::File> reads and writes bytes, so those bytes reach the output
+unchanged.
+
+The title and every navigation label go through
+L<App::FuguWeb/escape_html>.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguWeb::Page->new(config => $config)
+
+C<config> is an L<App::FuguWeb::Config> and is required.
+
+=head2 write
+
+    $page->write($path, $title, $fragment)
+
+Write the whole page with L<Fugu::File>: the chrome around the
+fragment, as bytes. The fragment goes in unchanged: it is already
+HTML, from a renderer or from the project's own source directory. The
+method returns true on success, and C<undef> with a message in the log
+otherwise.
+
+=head1 THE OPTIONAL FOOTER
+
+A F<footer.body.html> in the configured source directory becomes the
+footer prose. It is project text, not tool text, so it is content and
+not a setting. A project without it gets no C<< <footer> >> element
+and no rule before one: an empty footer is a gap, not chrome.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Site>,
+L<Fugu::File>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>
