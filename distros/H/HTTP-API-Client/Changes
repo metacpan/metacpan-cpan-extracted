@@ -1,3 +1,107 @@
+2026-08-19 - v1.24
+    + docs: added POD ATTRIBUTES entries for "retry" and "debug_flags" -
+      both are public read-write constructor attributes that had no
+      documentation at all, the same gap class HAC-052 already fixed
+      for retry_config/json. retry's entry carries the same warning
+      already present in its in-code comment (it is a one-time snapshot,
+      not a live view of send()'s actual retry behavior, despite the
+      naming symmetry with retry_config). A new regression test
+      (t/79) cross-checks every declared attribute against the POD
+      ATTRIBUTES section so this can't silently recur (HAC-101)
+    + fix: kvp2str_each's CSV branch used the s///r non-destructive
+      substitution modifier, which requires Perl 5.14+ - cpanfile
+      declares a 5.010 minimum (and ships that floor to CPAN/
+      cpantesters via META.json), so any install/test on a genuinely
+      5.10-5.13.x Perl would hit a hard compile-time syntax error.
+      Rewritten to the same copy-then-substitute idiom using only
+      Perl-5.10-compatible syntax; output confirmed byte-identical
+      (HAC-102)
+    + cleanup: Client.pm's @EXPORT is now derived from
+      DataTypeMarker.pm's @EXPORT instead of being a hand-copied,
+      independently-maintained duplicate of it - DataTypeMarker.pm's
+      SYNOPSIS promises "use HTTP::API::Client" re-exports everything
+      it defines, but nothing previously enforced the two lists staying
+      in sync. Behavior-neutral (both lists were already identical); a
+      new regression test (t/80) guards against future drift (HAC-104)
+    + fix: convert_data() and new_request()'s GET-restriction check
+      required an EXACT match for a form-urlencoded content_type, while
+      the JSON branch already matched leniently (any content_type
+      containing "json", including a charset-qualified value - this
+      module's own default). A form-urlencoded content_type with a
+      trailing parameter, e.g. "application/x-www-form-urlencoded;
+      charset=utf-8" (a valid Content-Type value, and the same pattern
+      the JSON default uses), died instead of working. Both sites now
+      accept an anchored prefix match (HAC-107)
+    + fix: an xBOOLEAN()/xCSV() marker used as a header value (rather
+      than in body data) silently stringified to Perl's default
+      blessed-reference form ("BOOL=ARRAY(0x...)") instead of being
+      unwrapped or dying - the same silent-corruption failure class
+      HAC-020/HAC-093/HAC-096 already established this project must
+      never do. new_request()'s header-application loop now dies
+      naming the offending header key (HAC-109)
+    + fix: _execute_callbacks() resolved sibling CODE values within the
+      same %data (or %headers) hash in Perl's randomized hash key
+      order - a callback reading another key's already-resolved value
+      got either the resolved value or the raw, unresolved CODE ref,
+      purely depending on the process's hash seed. The identical
+      script, run repeatedly, produced two different outcomes with no
+      error either way. Now sorts keys before iterating, so the same
+      data structure resolves identically on every run; documented the
+      resulting order in send()'s POD (HAC-110)
+    + test: extracted the capture_stderr test helper (identically
+      duplicated across t/16, t/66, t/77) into t/lib/CaptureStderr.pm,
+      matching t/lib/FakeUA.pm's existing style. Test-only, zero
+      behavior change (HAC-111)
+    + test: added regression coverage for the documented
+      before_sorting_keys-mutation-discarded-by-events->{keys}
+      interaction - already correct, never previously exercised
+      together in one test (HAC-112)
+    + cleanup: 4 older die() messages ("Unsupported engine", "Unable to
+      create a get request", "Unable to convert data for content_type",
+      "Unable to convert nested hash value") now end with a trailing
+      newline, suppressing Perl's redundant "at FILE line N" suffix -
+      matching every other die() in the file. Message-text-only;
+      behavior-neutral for every existing test (HAC-114)
+    + meta: added [MetaResources] to dist.ini - META.json shipped with
+      no repository, bugtracker, or homepage URL at all, so MetaCPAN
+      had nothing to link back to this distribution's real GitHub repo
+      with. Metadata-only, no runtime code affected (HAC-115)
+    + fix: xBOOLEAN()/xCSV() blessed markers into bare, unqualified
+      package names "BOOL"/"CSV" instead of namespaced ones - a real
+      Perl class-name collision risk, since kvp2json_each/kvp2str_each
+      identify these markers purely by a ref() string check. Verified
+      live: an unrelated object merely blessed into a class also named
+      "BOOL" crashed kvp2json with a confusing "Not an ARRAY reference"
+      error instead of a clear diagnosis. Now bless into
+      HTTP::API::DataTypeMarker::BOOL/::CSV, eliminating the collision
+      risk - a deliberate, visible change to what ref() returns for
+      objects from xBOOLEAN()/xCSV() (HAC-108)
+    + docs: documented that kvp2json_each's undef handling differs by
+      nesting depth - a top-level undef value is omitted, but a nested
+      hash's undef sub-value stays as an empty JSON string. Already
+      correct, deliberately kept as-is; only the POD was missing (HAC-105)
+    + docs: narrowed send()'s POD claim that "none of %data/%headers/
+      %events are mutated" - it's a shallow copy (deliberately, so
+      xBOOLEAN(\$flag)'s live-tracking keeps working), so a callback that
+      mutates a nested value in one of these still mutates the caller's
+      original data structure. The POD now says so explicitly instead of
+      overclaiming (HAC-106)
+    + fix: prepare_request()'s username/password/auth_token checks used
+      plain Perl truthiness ("if ($u || $p)"), which silently treats the
+      valid, non-empty string "0" as unset - inconsistent with this
+      module's own established length()-based emptiness convention
+      (_defor). Verified live: username=>"0", password=>"0" (both
+      explicitly set) sent no Authorization header at all; auth_token=>
+      "0" had the identical bug. Both now check length() instead of
+      truthiness (HAC-118)
+    + meta: added MIME::Base64 to cpanfile's test-phase requires - used
+      by 4 test files (since t/02, predating this session) but never
+      declared (HAC-119)
+    + meta: also added Test::More (used by all 87 test files),
+      FindBin (10 files), and File::Temp (t/83) to cpanfile's
+      test-phase requires - a fuller follow-up check after HAC-119
+      caught only MIME::Base64 (HAC-120)
+
 2026-08-19 - v1.23
     + cleanup: removed the trailing "return $v" (and its now-redundant
       "if ref $v" guard) from kvp2json_each and kvp2str_each - a direct

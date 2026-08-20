@@ -936,7 +936,8 @@ tiff_load_ifd(imtiff *tiff, unsigned long offset) {
   tiff_clear_ifd(tiff);
 
   /* rough check count + 1 entry + next offset */
-  if (offset + (2+12+4) > tiff->size) {
+  if (offset >= tiff->size
+      || offset + (2+12+4) > tiff->size) {
     mm_log((2, "Exif: IFD start offset %lu beyond end of Exif block", offset));
     return 0;
   }
@@ -967,12 +968,21 @@ tiff_load_ifd(imtiff *tiff, unsigned long offset) {
 	mm_log((1, "Integer overflow calculating tag data size processing EXIF block\n"));
 	return 0;
       }
+      else if (entry->size >= tiff->size) {
+        mm_log((2, "EXIF: IFD entry size %lu (%lx) too big\n",
+                (unsigned long)entry->size, (unsigned long)entry->size));
+        myfree(entries);
+        return 0;
+      }
       else if (entry->size <= 4) {
 	entry->offset = base + 8;
       }
       else {
 	entry->offset = tiff_get32(tiff, base+8);
-	if (entry->offset + entry->size > tiff->size) {
+	if (entry->offset >= tiff->size
+            || entry->offset + entry->size > tiff->size
+            /* 32-bit: the addition might wrap */
+            || tiff->size - entry->offset <= entry->size) {
 	  mm_log((2, "Invalid data offset processing IFD\n"));
 	  myfree(entries);
 	  return 0;

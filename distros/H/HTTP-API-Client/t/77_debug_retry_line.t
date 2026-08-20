@@ -19,18 +19,7 @@ use lib "$FindBin::Bin/lib";
 use Test::More;
 use HTTP::API::Client;
 use FakeUA;
-
-sub capture_stderr {
-    my ($code) = @_;
-    my $captured = "";
-    open my $fh, ">", \$captured or die $!;
-    {
-        local *STDERR = $fh;
-        $code->();
-    }
-    close $fh;
-    return $captured;
-}
+use CaptureStderr;
 
 {
     local $ENV{DEBUG_SEND_OUT}      = 1;

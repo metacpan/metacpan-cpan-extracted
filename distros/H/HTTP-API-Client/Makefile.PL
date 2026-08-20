@@ -31,10 +31,14 @@ my %WriteMakefileArgs = (
     "URI::Escape" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Temp" => 0,
+    "FindBin" => 0,
     "HTTP::Request" => 0,
-    "HTTP::Response" => 0
+    "HTTP::Response" => 0,
+    "MIME::Base64" => 0,
+    "Test::More" => 0
   },
-  "VERSION" => "1.23",
+  "VERSION" => "1.24",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,15 +47,19 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Encode" => 0,
+  "File::Temp" => 0,
+  "FindBin" => 0,
   "HTTP::Headers" => 0,
   "HTTP::Request" => 0,
   "HTTP::Response" => 0,
   "JSON::XS" => 0,
   "LWP::Protocol::https" => 0,
   "LWP::UserAgent" => 0,
+  "MIME::Base64" => 0,
   "Moo" => 0,
   "POSIX" => 0,
   "Scalar::Util" => 0,
+  "Test::More" => 0,
   "Try::Tiny" => 0,
   "URI" => 0,
   "URI::Escape" => 0

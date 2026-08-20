@@ -1,5 +1,5 @@
 package HTTP::API::Client;
-$HTTP::API::Client::VERSION = '1.23';
+$HTTP::API::Client::VERSION = '1.24';
 use Moo;
 
 =head1 NAME
@@ -202,6 +202,17 @@ checkout reports C<"HTTP API Client vdev"> instead. Re-applied to C<ua>
 at the start of every C<send()> call, so changing it between calls takes
 effect on the next one, not just at construction.
 
+=item retry
+
+Read-write. B<Not> a live view of C<send()>'s actual retry behavior -
+despite the naming symmetry with C<retry_config>, C<send()> never reads
+this attribute. It's a lazily-built, one-time snapshot of C<retry_config>
+(and the C<RETRY_*> env vars) taken whichever moment it's first accessed,
+kept only for external callers who already read C<< $api->retry >>
+directly. Use C<retry_config> (or the C<RETRY_*> env vars) to actually
+configure or inspect retry behavior - those are re-applied fresh on every
+C<send()> call, this is not.
+
 =item retry_config
 
 Read-write hashref C<< { fail_response => $n, fail_status => $csv, delay
@@ -227,6 +238,17 @@ C<json_response()> call, not just when C<json> is first built, so a
 C<charset> change takes effect on the next encode or decode even if
 C<json> was already in use - this also applies to an injected custom
 instance.
+
+=item debug_flags
+
+Read-write hashref C<< { in_out => $bool, send_out => $bool, response =>
+$bool, response_header_only => $bool, response_if_fail => $bool } >>. The
+programmatic equivalent of the C<DEBUG_*> env vars - set this directly to
+enable debug output without touching process environment variables. Like
+C<retry_config> and C<json>, it's re-applied at the start of every
+C<send()> call, so changing it between calls takes effect on the next one,
+not just at construction. See L</"ENVIRONMENT VARIABLES"> for what each
+key does.
 
 =back
 
@@ -280,11 +302,32 @@ and C<pre_defined_headers>. C<%events> are the per-call callbacks documented
 under C<new_request()> below. Sets and returns the C<last_response>
 attribute.
 
-None of C<\%data>/C<\%headers>/C<\%events> are mutated - C<send()> copies
-each before doing anything with it, so a hashref you pass in (and may
-reuse across other calls) comes back exactly as you passed it, with no
-merged-in C<pre_defined_*> keys or event-hook keys added by C<send()>'s
-own machinery.
+Any C<CODE> value in C<%data> (and separately, C<%headers>) is resolved by
+calling it before the request is built - the mechanism the signed-request
+example above uses for C<api_secret>. All of C<%data> resolves before any
+of C<%headers> does, so a header callback reading an already-resolved data
+value (as C<APIKEY>/C<Signature> do above) is safe and reliable. Two
+C<CODE> values within the I<same> hash (two data keys, or two header keys)
+resolve in sorted key order - if one reads a sibling key's value, only
+rely on that if the sibling sorts first; there's no dependency-graph
+resolution, just a fixed, predictable order.
+
+C<send()> shallow-copies C<\%data>/C<\%headers>/C<\%events> before doing
+anything with them, so a hashref you pass in (and may reuse across other
+calls) always comes back with the same top-level keys it went in with -
+no merged-in C<pre_defined_*> keys or event-hook keys added by C<send()>'s
+own machinery, and no key silently autovivified into existence just
+because C<%events> mentioned it.
+
+This is a shallow copy, not a deep one, and deliberately so: a live
+C<xBOOLEAN(\$flag)> marker depends on the exact same scalar reference
+surviving unchanged, and deep-copying would clone it, breaking live
+tracking. The consequence is that a I<value> which is itself a reference
+- a nested hashref, an arrayref - is the same reference the caller
+passed in, not a copy of it. A callback that reaches into C<%o{data}>
+(or C<headers>/C<events>) and mutates a value at that depth mutates the
+caller's own original data structure, exactly as if C<send()> had never
+copied anything. Only the top level is protected.
 
 Passing C<< $events->{test_request_object} = 1 >> makes it return the built
 L<HTTP::Request> instead of sending it - the way this module's own test
@@ -332,6 +375,12 @@ never sets it, and setting it inside an C<%events> callback has no effect
 (a callback receives a snapshot copy of C<%options>, not the one
 C<new_request()> itself is iterating). See F<t/23_skip_headers.t>.
 
+L<HTTP::API::DataTypeMarker>'s C<xBOOLEAN()>/C<xCSV()> markers are only
+unwrapped in body data (via C<kvp2json()>/C<kvp2str()>) - a header value
+that's still a marker dies naming the offending header key, rather than
+silently setting the header to Perl's default blessed-reference
+stringification (C<"BOOL=ARRAY(0x...)">).
+
 =head2 get_content_type(%options)
 
 Resolves the effective content type for one call: the C<content_type>
@@ -344,10 +393,13 @@ C<new_request()> - there is normally no need to call this directly.
 
 Turn C<%options>'s C<data> hashref into the request body, according to
 content type: JSON via C<kvp2json()> if the content type contains C<json>,
-a query string via C<kvp2str()> if it is exactly
-C<application/x-www-form-urlencoded>. Any other content type returns an
-empty string for empty data, or dies naming the content type - there is no
-generic way to serialize arbitrary data into an arbitrary content type.
+a query string via C<kvp2str()> if it is C<application/x-www-form-urlencoded>
+optionally followed by a C<;>-separated parameter (e.g. C<< application/
+x-www-form-urlencoded; charset=utf-8 >> - the same charset-suffix pattern
+this module's own JSON default already uses). Any other content type
+returns an empty string for empty data, or dies naming the content type -
+there is no generic way to serialize arbitrary data into an arbitrary
+content type.
 
 =head2 prepare_request(%options)
 
@@ -445,6 +497,17 @@ that dies in the JSON path passes through the form-urlencoded path
 unchanged. Second, a plain hash value recurses in C<kvp2json_each> (JSON
 has a native object type for it) but dies in C<kvp2str_each> - a query
 string has no standard convention for representing a nested hash.
+
+C<undef> is also handled differently by nesting depth, deliberately left
+this way rather than made symmetric. C<kvp2json()>'s own top-level loop
+omits a key entirely when its value is C<undef> (see
+L</"kvp2json(%options)"> above). A nested hash value's own
+C<undef> sub-value is not: C<kvp2json_each>'s recursion into a hash value
+has no equivalent skip step, so an C<undef> sub-value becomes an empty
+JSON string (C<"">) rather than disappearing from the encoded object -
+C<< kvp2json(data => { a => { x => 1, y => undef } }) >> encodes as
+C<< {"a":{"x":1,"y":""}} >>, keeping C<y>, while the same C<undef> at the
+top level would have dropped the key outright.
 
 Both die - with the same message, naming the offending ref type and
 pointing at C<xBOOLEAN()> - on any other reference type neither of them
@@ -548,12 +611,7 @@ use HTTP::API::DataTypeMarker;
 
 extends 'Exporter';
 
-our @EXPORT = qw( xCSV xBOOLEAN
-    xTRUE xFALSE
-    xTrue xFalse
-    xtrue xfalse
-    xt__e xf___e
-);
+our @EXPORT = @HTTP::API::DataTypeMarker::EXPORT;
 
 has username => (
     is      => "rw",
@@ -823,7 +881,7 @@ sub _execute_callbacks {
 
     my $sth = $options{$type};
 
-    for my $key (keys %$sth) {
+    for my $key (sort keys %$sth) {
         my $callback = $sth->{$key};
         next if !defined $callback;
         next if !UNIVERSAL::isa($callback, 'CODE');
@@ -895,7 +953,7 @@ sub send {
             $response = $ua->request($req);
         }
         else {
-            die "Unsupported engine: $eng - only LWP::UserAgent is currently wired up in send()";
+            die "Unsupported engine: $eng - only LWP::UserAgent is currently wired up in send()\n";
         }
 
         my $suppress_on_success = $debug{response_if_fail} && $response->is_success;
@@ -1010,8 +1068,8 @@ sub new_request {
     my $request;
 
     if ($method eq 'GET') {
-        if ($content_type ne 'application/x-www-form-urlencoded') {
-            die "Unable to create a get request with content_type: $content_type";
+        if ($content_type !~ m{^application/x-www-form-urlencoded(?:;|$)}) {
+            die "Unable to create a get request with content_type: $content_type\n";
         }
         elsif ($content) {
             if ($url =~ m/\?/) {
@@ -1062,6 +1120,11 @@ sub new_request {
 
         next if $o{skip_headers}{$key} || !exists $headers->{$key} || !defined $headers->{$key};
 
+        die "Header '$key' is an xBOOLEAN()/xCSV() marker - those are only "
+            . "supported in body data (kvp2json/kvp2str), not headers\n"
+            if ref $headers->{$key} eq 'HTTP::API::DataTypeMarker::BOOL'
+            || ref $headers->{$key} eq 'HTTP::API::DataTypeMarker::CSV';
+
         $request->header( $key => _encode_if_utf8_flagged( $headers->{$key} ) );
 
         if (my $do = $events->{after_header}{$key}) {
@@ -1090,11 +1153,11 @@ sub prepare_request {
     my ($u, $p, $at) = map { _defor($self->$_, '') }
         qw(username password auth_token);
 
-    if ($u || $p) {
+    if (length($u) || length($p)) {
         $self->basic_authenticator( $request,
             _encode_if_utf8_flagged($u), _encode_if_utf8_flagged($p) );
     }
-    elsif ($at) {
+    elsif (length($at)) {
         $headers->{authorization} = $at
             unless grep { lc($_) eq 'authorization' } keys %$headers;
     }
@@ -1171,12 +1234,12 @@ sub convert_data {
     if ($content_type =~ m/json/) {
         return $self->kvp2json(%o);
     }
-    elsif ($content_type eq 'application/x-www-form-urlencoded') {
+    elsif ($content_type =~ m{^application/x-www-form-urlencoded(?:;|$)}) {
         return $self->kvp2str(%o);
     }
     else {
         return '' if !%$data;
-        die "Unable to convert data for content_type: $content_type";
+        die "Unable to convert data for content_type: $content_type\n";
     }
 }
 
@@ -1221,7 +1284,7 @@ sub kvp2json_each {
     if (!ref $v) {
         return _numify_if_lossless( _json_validate_utf8($v) );
     }
-    elsif (ref $v eq 'BOOL') {
+    elsif (ref $v eq 'HTTP::API::DataTypeMarker::BOOL') {
         my $inner = $v->[0];
         if ( ref $inner eq 'SCALAR' ) {
             my $live_value = _defor( $$inner, '' );
@@ -1313,7 +1376,7 @@ sub kvp2str_each {
             return "$k=$v";
         }
     }
-    elsif (ref $v eq 'BOOL') {
+    elsif (ref $v eq 'HTTP::API::DataTypeMarker::BOOL') {
         my $inner = $v->[0];
         die "xBOOLEAN() only accepts a plain scalar or a scalar ref, not a "
             . ref($inner) . " ref\n" if ref $inner && ref $inner ne 'SCALAR';
@@ -1333,7 +1396,7 @@ sub kvp2str_each {
 
         return ($o{no_key} ? '&' : '') . join '&', @parts;
     }
-    elsif (ref $v eq 'CSV') {
+    elsif (ref $v eq 'HTTP::API::DataTypeMarker::CSV') {
         my @csv;
         my @parts;
 
@@ -1353,13 +1416,13 @@ sub kvp2str_each {
         my $csv = ($o{no_key} ? '' : "$k=") . join( ',', @csv);
 
         if (@parts) {
-            return join '&', $csv, map { s/^&//r } @parts;
+            return join '&', $csv, map { ( my $c = $_ ) =~ s/^&//; $c } @parts;
         }
 
         return $csv;
     }
     elsif (UNIVERSAL::isa($v, 'HASH')) {
-        die "Unable to convert nested hash value for key '$k' into a form-urlencoded query string";
+        die "Unable to convert nested hash value for key '$k' into a form-urlencoded query string\n";
     }
 
     die "Unable to convert a " . ref($v) . " reference into a form-urlencoded "

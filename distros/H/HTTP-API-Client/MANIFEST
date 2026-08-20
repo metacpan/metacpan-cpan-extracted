@@ -89,4 +89,13 @@ t/75_bare_scalar_ref_data_value_dies.t
 t/76_get_query_string_already_has_question_mark.t
 t/77_debug_retry_line.t
 t/78_non_utf8_charset_skips_tune_utf8.t
+t/79_pod_attributes_completeness.t
+t/80_export_list_matches_datatypemarker.t
+t/81_form_urlencoded_content_type_with_params.t
+t/82_marker_as_header_value_dies.t
+t/83_execute_callbacks_deterministic_order.t
+t/84_before_sorting_keys_discarded_by_events_keys.t
+t/85_marker_namespace_no_collision.t
+t/86_zero_string_credentials_trigger_basic_auth.t
+t/lib/CaptureStderr.pm
 t/lib/FakeUA.pm

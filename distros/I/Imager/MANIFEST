@@ -262,8 +262,12 @@ PNG/testimg/palette.png
 PNG/testimg/palette_out.png
 PNG/testimg/paltrans.png
 PNG/testimg/rgb16.png
+PNG/testimg/rgb16trns.png
+PNG/testimg/rgb16trnsa.png
 PNG/testimg/rgb8.png
 PNG/testimg/rgb8i.png
+PNG/testimg/rgb8trns.png
+PNG/testimg/rgb8trnsa.png
 pnm.c
 polygon.c
 ppport.h
@@ -392,10 +396,14 @@ t/950-kwalitee/070-mymeta.t
 t/950-kwalitee/080-nousevars.t	Check various standards
 t/data/exifattack.bin		EXIF with zero length ASCII field (POC)
 t/data/exifbad0ascii.bin	EXIF with zero length ASCII field
+t/data/exif32overcnt.bin	EXIF with count beyond block size
+t/data/exif32oversz.bin		EXIF with size beyond block size
 t/data/exifbadascoff.bin	EXIF block with bad ASCII field offset
 t/data/exifbadderoff.bin	EXIF with (U32)-1 DE offset
 t/data/exifbadifdoff1.bin	EXIF with (U32)-1 DE offset
 t/data/exifbadifdoff2.bin	EXIF with (U32)-1 DE offset
+t/data/exifbadifdstart.bin
+t/data/exifbadifdstart2.bin
 t/data/exifbadoff.bin		EXIF with bad directory entry offset
 t/data/exifgood.bin		Good EXIF data block
 t/GoodTestFont.pm		A dummy (hardly implemented) font driver.

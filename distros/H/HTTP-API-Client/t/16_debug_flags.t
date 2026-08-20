@@ -8,10 +8,13 @@ showed a statement count of zero)
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Test::More;
 use HTTP::API::Client;
 use HTTP::Response;
 use HTTP::Request;
+use CaptureStderr;
 
 package FakeUA;
 sub new { bless { code => $_[1] // 200 }, $_[0] }
@@ -26,18 +29,6 @@ sub request {
 }
 
 package main;
-
-sub capture_stderr {
-    my ($code) = @_;
-    my $captured = "";
-    open my $fh, ">", \$captured or die $!;
-    {
-        local *STDERR = $fh;
-        $code->();
-    }
-    close $fh;
-    return $captured;
-}
 
 {
     local $ENV{DEBUG_IN_OUT} = 1;

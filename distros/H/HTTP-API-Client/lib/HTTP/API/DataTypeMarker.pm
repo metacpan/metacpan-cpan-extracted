@@ -1,5 +1,5 @@
 package HTTP::API::DataTypeMarker;
-$HTTP::API::DataTypeMarker::VERSION = '1.23';
+$HTTP::API::DataTypeMarker::VERSION = '1.24';
 =head1 NAME
 
 HTTP::API::DataTypeMarker - mark request data so it serializes as a specific
@@ -17,8 +17,14 @@ type, since Perl scalars have no native boolean and no native "comma list"
 
 =head1 DESCRIPTION
 
-Every value here is a blessed arrayref - either C<BOOL> (from L</"xBOOLEAN($value)">)
-or C<CSV> (from L</"xCSV(@values)">). C<BOOL> is recognized and unwrapped
+Every value here is a blessed arrayref - either C<HTTP::API::DataTypeMarker::BOOL>
+(from L</"xBOOLEAN($value)">) or C<HTTP::API::DataTypeMarker::CSV> (from
+L</"xCSV(@values)">), referred to below by their unqualified names, C<BOOL>
+and C<CSV>, for brevity - namespaced deliberately (not bare C<'BOOL'>/
+C<'CSV'>) so an unrelated class of the same short name elsewhere in a
+calling application can't collide with what C<kvp2json_each>/
+C<kvp2str_each>'s C<ref($v) eq ...> checks are actually looking for.
+C<BOOL> is recognized and unwrapped
 specially by both C<kvp2json_each> and C<kvp2str_each>, since a bare Perl
 scalar (C<1>, C<0>, C<"true">, ...) is always ambiguous about whether it
 means a JSON boolean, a string, or a number. C<CSV> is only special-cased
@@ -55,7 +61,7 @@ does not change what was already captured.
 =cut
 
 sub xCSV {
-    return bless [ @_ ], 'CSV';
+    return bless [ @_ ], 'HTTP::API::DataTypeMarker::CSV';
 }
 
 =head2 xBOOLEAN($value)
@@ -96,7 +102,7 @@ The single-character string C<"t"> / C<"f">.
 =cut
 
 sub xBOOLEAN {
-    return bless [ @_ ], 'BOOL';
+    return bless [ @_ ], 'HTTP::API::DataTypeMarker::BOOL';
 }
 
 sub xTRUE {

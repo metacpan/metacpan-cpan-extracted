@@ -43,13 +43,28 @@
       },
       "test" : {
          "requires" : {
+            "File::Temp" : "0",
+            "FindBin" : "0",
             "HTTP::Request" : "0",
-            "HTTP::Response" : "0"
+            "HTTP::Response" : "0",
+            "MIME::Base64" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.23",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mvu8912/perl5-http-api-client/issues"
+      },
+      "homepage" : "https://github.com/mvu8912/perl5-http-api-client",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mvu8912/perl5-http-api-client.git",
+         "web" : "https://github.com/mvu8912/perl5-http-api-client"
+      }
+   },
+   "version" : "1.24",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "MIT"
