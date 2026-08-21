@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Test::More q//;
+use Test::Exception q//;
 use Util::H2O::More qw/h2o o2h d2o o2d/;
 
 # for included module required for testing
@@ -246,4 +247,20 @@ is $HoAoH->doesntexist, undef, q{call to non-existing setter returns undef, perl
 
 is $HoAoH->ten->doesntexist, undef, q{call to non-existing setter returns undef, perl '-autoundef'};
 
+
+# The ARRAY virtual get()/i() methods return an in-range element and do not
+# grow the ARRAY. count() is the documented alias for scalar().
+is $HoAoH->ten->twentyone->get(0)->foo, 6, q{'get' ARRAY vmethod returns an in-range item};
+is $HoAoH->ten->twentyone->i(0)->foo,   6, q{'i' ARRAY vmethod aliases 'get'};
+is $HoAoH->ten->twentyone->count,       7, q{'count' ARRAY vmethod aliases 'scalar'};
+
+# "-autoundef" permits missing getters, but a missing setter is deliberately
+# rejected so typos cannot silently add new keys.
+dies_ok { $HoAoH->doesntexist(q{value}) } q{d2o '-autoundef' refuses to set a non-existing top-level key};
+dies_ok { $HoAoH->ten->doesntexist(q{value}) } q{d2o '-autoundef' refuses to set a non-existing nested key};
+
+# d2o with no data is a harmless no-op and returns undef.
+is d2o(), undef, q{d2o with no arguments returns undef};
+
 done_testing;
+

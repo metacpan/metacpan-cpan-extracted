@@ -1,5 +1,5 @@
 package Protocol::Tus::LocalDir;
-{ our $VERSION = '0.004' }
+{ our $VERSION = '0.006' }
 use Moo;
 use v5.24;
 use warnings;
@@ -25,6 +25,7 @@ use namespace::clean;
 
 extends 'Protocol::Tus::AbstractModel';
 
+has id_generator => (is => 'ro', default => undef);
 has root => (is => 'ro', required => 1, coerce => \&to_real_dir);
 
 sub cleanup ($self, $id) {
@@ -36,7 +37,21 @@ sub cleanup ($self, $id) {
 }
 
 sub create_upload ($self, $length, $metadata) {
-   my $path = $self->root->tempdir(template => ('X' x 11), CLEANUP => 0);
+   my ($id, $path);
+
+   # if there is an identifier generator use it, otherwise generate a
+   # temporary directory with a random name. Both will live inside the 
+   # root directory.
+   if (defined(my $idgen = $self->id_generator)) {
+      $id = $idgen->($self, $length, $metadata);
+      $path = $self->root->child($id);
+      $path->mkdir;
+   }
+   else {
+      $path = $self->root->tempdir(template => ('X' x 11), CLEANUP => 0);
+      $id = $path->basename;
+   }
+
    $path->child(DATA_FILE)->touch;
    $self->update_info($path,
       {
@@ -44,7 +59,7 @@ sub create_upload ($self, $length, $metadata) {
          metadata => $metadata,
       }
    );
-   return $self->upload_for($path->basename);
+   return $self->upload_for($id);
 }
 
 sub extensions ($self) {

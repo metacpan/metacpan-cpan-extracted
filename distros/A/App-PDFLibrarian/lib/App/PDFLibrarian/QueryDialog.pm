@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 package App::PDFLibrarian::QueryDialog;
-$App::PDFLibrarian::QueryDialog::VERSION = '6.2.0';
+$App::PDFLibrarian::QueryDialog::VERSION = '6.2.3';
 use parent 'Exporter';
 
 use Carp;

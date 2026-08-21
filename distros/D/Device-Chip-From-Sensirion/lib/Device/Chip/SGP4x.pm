@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2024-2026 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
@@ -9,9 +9,11 @@ use Object::Pad 0.800;
 
 use utf8;
 
-package Device::Chip::SGP4x 0.02;
+package Device::Chip::SGP4x 0.03;
 class Device::Chip::SGP4x
    :isa(Device::Chip::From::Sensirion);
+
+use Sublike::Extended 0.29 'method';
 
 use Future::AsyncAwait;
 
@@ -125,14 +127,32 @@ async method execute_self_test ()
 Performs a sampling cycle and returns the raw ADC values from the sensor
 elements.
 
+Optionally, compensation values for humidity and temperature can be passed as
+named parameters. If not supplied, the following defaults apply:
+
+   ( $adc_VOC, $adc_NOx ) = await $chip->measure_raw_signals(
+      humidity    => 50,  # in units of % RH
+      temperature => 25,  # in units of degrees C
+   );
+
 =cut
 
-async method measure_raw_signals ()
+my sub _clamp_u16 ( $val )
 {
-   # TODO: permit temp/humid compensation
+   return 0      if $val < 0;
+   return 0xFFFF if $val > 0xFFFF;
+   return int( $val + 0.5 );
+}
+
+async method measure_raw_signals (
+   :$humidity    = 50,
+   :$temperature = 25,
+) {
+   my $hword = _clamp_u16 $humidity * 0xFFFF / 100;
+   my $tword = _clamp_u16 +( $temperature + 45 ) * 0xFFFF / 175;
 
    my @words = await $self->_cmd( 0x2619,
-      words_out => [ 0x8000, 0x6666 ],
+      words_out => [ $hword, $tword ],
       delay     => 0.050,
       read      => 2,
    );

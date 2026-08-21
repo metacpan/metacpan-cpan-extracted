@@ -5,10 +5,9 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0402';
 
 use strictures 2;
-use List::SomeUtils qw(first_index);
 use MIDI::Drummer::Tiny ();
 use MIDI::RtMidi::ScorePlayer ();
 use Moo;
@@ -55,26 +54,18 @@ has common => (
 );
 
 
-sub _drum_part ($self, $note) {
-    my $part;
-    if (defined $self->trigger && $note == $self->trigger) {
-        $part = $self->phrase;
-    }
-    else {
-        $part = sub {
-            my (%args) = @_;
-            $args{drummer}->note($args{drummer}->sixtyfourth, $note);
-        };
-    }
-    return $part;
+sub _drum_part ($self) {
+    return $self->phrase;
 }
 sub drums ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
 
     return 0 unless $ev eq 'note_on'
-        || ($ev eq 'control_change' && defined $self->value && $val == $self->value);
+        || ($ev eq 'control_change' && defined $self->value && defined $val && $val == $self->value);
 
-    my $part = $self->_drum_part($note);
+    return 0 if $ev eq 'note_on' && defined $self->trigger && $note != $self->trigger;
+
+    my $part = $self->_drum_part;
 
     my $d = MIDI::Drummer::Tiny->new(
         bpm  => $self->bpm,
@@ -110,7 +101,7 @@ MIDI::RtController::Filter::Drums - Generic RtController drum filter
 
 =head1 VERSION
 
-version 0.0401
+version 0.0402
 
 =head1 SYNOPSIS
 
@@ -198,17 +189,16 @@ list when executing the B<phrase>.
 
 Default: C<{}> (no arguments)
 
-Default: C<120>
-
 =head1 METHODS
 
 =head2 drums
 
 Play the drums.
 
-If B<trigger> or B<value> is set, the filter checks those against the
-MIDI event C<note> or C<value>, respectively, to see if the filter
-should be applied.
+If B<trigger> is set, a C<note_on> event only fires this filter when
+its note matches B<trigger>. If B<value> is set, a C<control_change>
+event only fires this filter when its value matches B<value>. When
+the filter fires, the full B<phrase> is played.
 
 =head1 SEE ALSO
 
@@ -236,7 +226,7 @@ Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Gene Boggs.
+This software is copyright (c) 2025-2026 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

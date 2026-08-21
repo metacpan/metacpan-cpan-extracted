@@ -54,13 +54,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/jackdeguest/Locale-Unicode/issues"
+         "web" : "https://gitlab.com/deguest/Locale-Unicode/issues"
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://gitlab.com/jackdeguest/Locale-Unicode"
+         "web" : "https://gitlab.com/deguest/Locale-Unicode"
       }
    },
-   "version" : "v0.4.3",
+   "version" : "v0.4.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

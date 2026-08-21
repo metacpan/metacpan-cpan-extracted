@@ -1,6 +1,6 @@
-/* X11::GUITest ($Id: script_file.c 231 2014-01-11 14:26:57Z ctrondlp $)
+/* X11::GUITest ($Id: script_file.c 253 2026-08-19 22:37:51Z ctrondlp $)
  *  
- * Copyright (c) 2003-2014  Dennis K. Paulsen, All Rights Reserved.
+ * Copyright (c) 2003-2026  Dennis K. Paulsen, All Rights Reserved.
  * Email: ctrondlp@cpan.org
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <libintl.h>
 #include <sys/time.h>
 #include "Common.h"
 #include "script_file.h"
@@ -31,34 +30,34 @@ static FILE *sfp = NULL; // script output
 
 BOOL OpenScript(char *scriptFile)
 { 
-	sfp = fopen(scriptFile, "wt");
-	if (sfp == NULL) {
-		fprintf(stderr, _("Unable to open script file '%s'!\n"), scriptFile);	
-		return FALSE;	
-	}
-	return TRUE;
+    sfp = fopen(scriptFile, "wt");
+    if (sfp == NULL) {
+        fprintf(stderr, _("Unable to open script file '%s'!\n"), scriptFile);   
+        return FALSE;   
+    }
+    return TRUE;
 }
 
 void WriteScript(char *format, ...)
 {
-	if (sfp == NULL) {
-		fprintf(stderr, _("Unable to write to script file!\n"));	
-		return;
-	} 
+    if (sfp == NULL) {
+        fprintf(stderr, _("Unable to write to script file!\n"));    
+        return;
+    } 
 
-	char buffer[MAX_SCRIPT_BUFFER] = "\0";
-	va_list args;
-	va_start(args, format);
-	vsprintf(buffer, format, args);
-	fwrite(buffer, sizeof(char), strlen(buffer), sfp);
-	va_end(args);
+    char buffer[MAX_SCRIPT_BUFFER] = "\0";
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    fwrite(buffer, sizeof(char), strlen(buffer), sfp);
+    va_end(args);
 }
 
 void CloseScript(void)
 {
-	if (sfp != NULL) {
-		fflush(sfp);
-		fclose(sfp);
-	}
+    if (sfp != NULL) {
+        fflush(sfp);
+        fclose(sfp);
+    }
 }
 

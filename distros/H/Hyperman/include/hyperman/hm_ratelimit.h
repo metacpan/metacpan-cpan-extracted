@@ -34,48 +34,15 @@
 #  define MAP_ANONYMOUS MAP_ANON
 #endif
 
-/* Atomics. The __atomic builtins are the ones we want, but they only arrived
- * in GCC 4.7: __GNUC__ alone is not the question to ask, and asking it broke
- * the build on FreeBSD 9, whose base cc is gcc 4.2.1 ('__ATOMIC_ACQUIRE'
- * undeclared). That compiler does have the older __sync family (GCC 4.1), and
- * __sync says everything needed here: a lock test-and-set IS an acquire, a
- * lock release IS a release, and a full barrier either side of a plain
- * aligned word turns it into the acquire load / release store the denylist
- * publishes with. Only when neither family exists is the arena disabled and
- * the whole feature left to fail open. */
-#if defined(__has_builtin)
-#  if __has_builtin(__atomic_load_n)
-#    define HM_RL_ATOMIC_GNU 1
-#  endif
-#endif
-#if !defined(HM_RL_ATOMIC_GNU) && defined(__GNUC__) \
-    && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7))
-#  define HM_RL_ATOMIC_GNU 1
-#endif
+/* The atomics probe lives in hm_atomic.h, shared with the message bus. Two
+ * probes of the same feature would eventually disagree, and the disagreement
+ * would surface on the FreeBSD 9 smoker rather than here. */
+#include "hm_atomic.h"
 
-#if defined(_WIN32)
-/* No arena on Windows, and nothing to lose by it: the arena exists so a
- * limit is exact across a FORKED pool, and Windows runs a single worker
- * (there is no fork there), where the per-process
- * counters the fail-open path already keeps are exact by construction.
- * Every entry point below is written to fail open with no arena, so this
- * is the tested path, not a new one. CreateFileMapping only becomes
- * worth writing if a multi-process pool ever lands. */
-#  define HM_RL_HAVE_ATOMICS 0
-#elif defined(HM_RL_ATOMIC_GNU)
-#  define HM_RL_HAVE_ATOMICS 1
-#elif defined(__GNUC__) \
-    && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1))
-#  define HM_RL_HAVE_ATOMICS 1
-#  define HM_RL_ATOMIC_SYNC 1
-#else
-#  define HM_RL_HAVE_ATOMICS 0
-#endif
+#define HM_RL_HAVE_ATOMICS HM_HAVE_ATOMICS
 
 #define HM_RL_MAGIC     0x484D524Cu   /* "HMRL" */
 #define HM_RL_IPLEN     46            /* INET6_ADDRSTRLEN */
-#define HM_RL_LOCKS     64            /* spinlock stripes */
-#define HM_RL_SPIN_MAX  100000        /* bounded spin -> fail open */
 #define HM_RL_DENY_CAP  1024          /* default table sizes */
 #define HM_RL_RATE_CAP  4096
 
@@ -105,7 +72,7 @@ typedef struct hm_rl_arena {
     uint32_t magic;
     uint32_t deny_cap;
     uint32_t rate_cap;
-    volatile unsigned char locks[HM_RL_LOCKS];
+    volatile unsigned char locks[HM_LOCK_STRIPES];
     hm_rl_deny_slot *deny;   /* into the same mapping, valid across fork */
     hm_rl_rate_slot *rate;
 } hm_rl_arena;
@@ -123,63 +90,21 @@ static int hm_rl_arena_live(void) { return hm_rl != NULL; }
 
 /* ---- primitives ------------------------------------------------------------ */
 
-static uint64_t hm_rl_fnv(const void *data, size_t len) {
-    const unsigned char *p = (const unsigned char *)data;
-    uint64_t h = 1469598103934665603ULL;         /* FNV-1a 64 */
-    size_t i;
-    for (i = 0; i < len; i++) { h ^= p[i]; h *= 1099511628211ULL; }
-    return h;
-}
+#define hm_rl_fnv hm_at_fnv
 
 #if HM_RL_HAVE_ATOMICS
-/* The four operations the arena needs, over whichever builtin family exists.
- * Reads and writes of `state` are of one naturally aligned 32-bit word, which
- * no target this builds on can tear; the barrier is what orders them against
- * the slot's other fields, and that is all the __sync spelling has to add. */
-static int hm_rl_tas(volatile unsigned char *l) {
-#if defined(HM_RL_ATOMIC_SYNC)
-    return __sync_lock_test_and_set(l, (unsigned char)1) != 0;
-#else
-    return __atomic_test_and_set(l, __ATOMIC_ACQUIRE) != 0;
-#endif
-}
-static void hm_rl_clear(volatile unsigned char *l) {
-#if defined(HM_RL_ATOMIC_SYNC)
-    __sync_lock_release(l);
-#else
-    __atomic_clear(l, __ATOMIC_RELEASE);
-#endif
-}
-static uint32_t hm_rl_load_acq(volatile uint32_t *p) {
-#if defined(HM_RL_ATOMIC_SYNC)
-    uint32_t v = *p;
-    __sync_synchronize();          /* nothing below may be hoisted above it */
-    return v;
-#else
-    return __atomic_load_n(p, __ATOMIC_ACQUIRE);
-#endif
-}
-static void hm_rl_store_rel(volatile uint32_t *p, uint32_t v) {
-#if defined(HM_RL_ATOMIC_SYNC)
-    __sync_synchronize();          /* the slot's fields land before the state */
-    *p = v;
-#else
-    __atomic_store_n(p, v, __ATOMIC_RELEASE);
-#endif
-}
+/* The primitives are hm_atomic.h's. These aliases keep the use sites below
+ * reading as they always have. */
+#define hm_rl_tas        hm_at_tas
+#define hm_rl_clear      hm_at_clear
+#define hm_rl_load_acq   hm_at_load32_acq
+#define hm_rl_store_rel  hm_at_store32_rel
 
-/* Bounded acquire; returns 1 if the lock was taken, 0 if it gave up (a worker
- * that died holding it must not wedge the pool - the caller fails open). */
 static int hm_rl_lock(hm_rl_arena *a, uint64_t h) {
-    volatile unsigned char *l = &a->locks[h % HM_RL_LOCKS];
-    long spin = 0;
-    while (hm_rl_tas(l)) {
-        if (++spin >= HM_RL_SPIN_MAX) return 0;
-    }
-    return 1;
+    return hm_at_lock(a->locks, h);
 }
 static void hm_rl_unlock(hm_rl_arena *a, uint64_t h) {
-    hm_rl_clear(&a->locks[h % HM_RL_LOCKS]);
+    hm_at_unlock(a->locks, h);
 }
 #endif
 

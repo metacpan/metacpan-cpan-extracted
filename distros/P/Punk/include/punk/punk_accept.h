@@ -143,11 +143,18 @@ static int pa_fmt_mime(const char *name, STRLEN nl,
     return 0;
 }
 
-/* Add Accept to the response's Vary - creating the pair, or appending to an
- * existing value that does not already carry the token (a whole-token check:
- * `Vary: Accept-Encoding` does not contain Accept). A negotiated response
- * without this poisons every shared cache between here and the client. */
-static void pa_vary_accept(pTHX_ AV *headers) {
+/* Add a token to the response's Vary - creating the pair, or appending to an
+ * existing value that does not already carry it (a whole-token check:
+ * `Vary: Accept-Encoding` does not contain Accept). Merging rather than
+ * replacing is the whole point: an application that already said what it
+ * varies on knows something we do not, and a response that varies on
+ * something it did not declare poisons every shared cache between here and
+ * the client.
+ *
+ * Used for `Accept` by respond_to and for `Accept-Encoding` by
+ * Punk::Plugin::ConditionalGet, which must not grow a second copy of this
+ * walk. */
+static void pa_vary_add(pTHX_ AV *headers, const char *tok, STRLEN tl) {
     SSize_t i, n = av_len(headers) + 1;
     SV *first_vary = NULL;
     for (i = 0; i + 1 < n; i += 2) {
@@ -162,26 +169,33 @@ static void pa_vary_accept(pTHX_ AV *headers) {
             vp = SvPV_const(*v, vl);
             p = vp; vend = vp + vl;
             while (p < vend) {
-                const char *tok_end = p, *tok;
+                const char *tok_end = p, *t;
                 while (tok_end < vend && *tok_end != ',') tok_end++;
-                tok = p;
-                while (tok < tok_end && pa_ws(*tok)) tok++;
+                t = p;
+                while (t < tok_end && pa_ws(*t)) t++;
                 {
                     const char *te = tok_end;
-                    while (te > tok && pa_ws(te[-1])) te--;
-                    if ((STRLEN)(te - tok) == 6 && foldEQ(tok, "Accept", 6))
-                        return;                    /* already varies on it */
+                    while (te > t && pa_ws(te[-1])) te--;
+                    /* `Vary: *` says it varies on everything, so there is
+                     * nothing to add and nothing a cache may reuse */
+                    if ((te - t == 1 && *t == '*')
+                        || ((STRLEN)(te - t) == tl && foldEQ(t, tok, tl)))
+                        return;
                 }
                 p = tok_end + 1;
             }
             if (!first_vary) first_vary = *v;
         }
     }
-    if (first_vary) sv_catpvs(first_vary, ", Accept");
+    if (first_vary) { sv_catpvs(first_vary, ", "); sv_catpvn(first_vary, tok, tl); }
     else {
         av_push(headers, newSVpvs("Vary"));
-        av_push(headers, newSVpvs("Accept"));
+        av_push(headers, newSVpvn(tok, tl));
     }
+}
+
+static void pa_vary_accept(pTHX_ AV *headers) {
+    pa_vary_add(aTHX_ headers, "Accept", 6);
 }
 
 #endif /* PUNK_ACCEPT_H */

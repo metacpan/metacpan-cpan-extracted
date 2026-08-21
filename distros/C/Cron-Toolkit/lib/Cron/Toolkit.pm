@@ -1,7 +1,7 @@
 package Cron::Toolkit;
 
 # VERSION
-$VERSION = 1.02;
+$VERSION = 1.03;
 
 use strict;
 use warnings;

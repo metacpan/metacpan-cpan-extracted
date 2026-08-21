@@ -7,7 +7,7 @@ use Punk::OpenTelemetry ();
 use Punk::OpenTelemetry::Encode ();
 use Fetch ();          # the default user agent, constructed from C by name
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # All of it is C (include/otel_export.h + xs/exporter.xs). The `use` lines
 # above are load-bearing: the XS reaches Fetch and the encoders BY NAME.
@@ -70,8 +70,9 @@ next hour asking a collector that has already said no.
 Exponential from one second to a thirty second ceiling, with B<full jitter>.
 The jitter is not decoration: a fleet of workers that all failed at the same
 moment and all back off by the same amount retries in a thundering herd, which
-is how a collector that was briefly slow stays down. L</backoff> is pure, so
-the policy is tested directly rather than inferred from timings.
+is how a collector that was briefly slow stays down.
+L<backoff|/"backoff($attempt, $retry_after)"> is pure,
+so the policy is tested directly rather than inferred from timings.
 
 =head1 METHODS
 
@@ -97,6 +98,14 @@ outright.
 A copy of the counters: what was exported, rejected, dropped, retried, and how
 many attempts failed. A telemetry layer that cannot report its own losses is
 asking to be trusted for no reason.
+
+=head1 SEE ALSO
+
+L<Punk::OpenTelemetry::GRPC>, the same job over gRPC, and
+L<Punk::OpenTelemetry::Encode>, which renders what this sends.
+L<Punk::Plugin::OpenTelemetry> is what drives it, and
+L<Punk::OpenTelemetry::Config> documents the C<OTEL_EXPORTER_OTLP_*>
+variables that configure it.
 
 =head1 AUTHOR
 

@@ -11,7 +11,7 @@ use GraphQL::Houtou ();
 use GraphQL::Houtou::Promise::PromiseXS ();
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 GraphQL::Houtou::_bootstrap_xs();
 
@@ -31,6 +31,7 @@ sub new {
     max_batch_size => $args{max_batch_size} || 0,
     cache => exists $args{cache} ? ($args{cache} ? 1 : 0) : 1,
     cache_key => ref($args{cache_key}) eq 'CODE' ? $args{cache_key} : undef,
+    _batch_plan => $args{batch_plan} ? 1 : 0,
     _promises => {},
     _queue => [],
   }, $class;
@@ -249,6 +250,11 @@ inside the batch function fails every key in the batch.
 
 C<load($key)>, C<load_many(\@keys)>, C<prime($key, $value)>, C<clear($key)>,
 C<clear_all>, C<pending_count>, C<dispatch>.
+
+C<batch_plan =E<gt> 1> enables Houtou's executor-owned fast path for the
+narrow cacheless declarative object-list shape documented in
+L<GraphQL::Houtou/Declarative loader fields>. Other shapes fall back to the
+normal ticket-backed path.
 
 C<load_many> follows dataloader-js C<loadMany>: it takes an arrayref of
 keys and returns a single thenable that resolves with an arrayref of values

@@ -3,9 +3,11 @@ Build.PL
 Changes
 examples/sdc40.pl
 examples/sgp41.pl
+examples/sht40.pl
 lib/Device/Chip/From/Sensirion.pm
 lib/Device/Chip/SCD4x.pm
 lib/Device/Chip/SGP4x.pm
+lib/Device/Chip/SHT4x.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -13,8 +15,12 @@ META.yml
 README
 t/00use.t
 t/01get_serial_number.t
+t/02sht4x-serial.t
 t/10scd4x-config.t
+t/10sht4x-config.t
 t/11scd4x-read.t
 t/11sgp4x-read.t
+t/11sht4x-read.t
 t/70scd4x-sensors.t
+t/70sht4x-sensors.t
 t/99pod.t

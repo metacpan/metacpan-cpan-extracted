@@ -1,5 +1,5 @@
-<api handler=uppercase pattern="/api/uppercase/{user}/:id"/>
-<api handler=doublecase pattern="/api/doublecase/{user}/:id"/>
+<api handler=uppercase pattern="/uppercase/{user}/:id"/>
+<api handler=doublecase pattern="/doublecase/{user}/:id"/>
 __PERL__
 sub uppercase {
 
@@ -24,4 +24,3 @@ sub doublecase {
     return \%data
     
 }
-

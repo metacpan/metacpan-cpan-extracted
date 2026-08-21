@@ -135,7 +135,8 @@ _endpoint_for(self, signal)
     {
         HV *h = otel_hv_of(aTHX_ self);
         SV *u = h ? otel_exp_endpoint_for(aTHX_ h, signal) : NULL;
-        RETVAL = u ? newSVsv(u) : &PL_sv_undef;
+        if (!u) XSRETURN_UNDEF;
+        RETVAL = newSVsv(u);
     }
     OUTPUT:
         RETVAL
@@ -219,7 +220,8 @@ _retry_after(headers)
     CODE:
     {
         SV *v = otel_exp_retry_after(aTHX_ headers);
-        RETVAL = v ? newSVsv(v) : &PL_sv_undef;
+        if (!v) XSRETURN_UNDEF;
+        RETVAL = newSVsv(v);
     }
     OUTPUT:
         RETVAL
@@ -231,7 +233,8 @@ _parse_partial(body)
     CODE:
     {
         SV *p = otel_exp_parse_partial(aTHX_ body);
-        RETVAL = p ? newSVsv(p) : &PL_sv_undef;
+        if (!p) XSRETURN_UNDEF;
+        RETVAL = newSVsv(p);
     }
     OUTPUT:
         RETVAL
@@ -242,7 +245,8 @@ _parse_partial_json(body)
     CODE:
     {
         SV *p = otel_exp_parse_partial_json(aTHX_ body);
-        RETVAL = p ? newSVsv(p) : &PL_sv_undef;
+        if (!p) XSRETURN_UNDEF;
+        RETVAL = newSVsv(p);
     }
     OUTPUT:
         RETVAL
@@ -294,8 +298,8 @@ _attempt(self, signal, bytes)
         HV *extra;
         if (!h) croak("Punk::OpenTelemetry::Exporter::_attempt: not an exporter");
         url = otel_exp_endpoint_for(aTHX_ h, signal);
-        if (!url) { RETVAL = &PL_sv_undef; }
-        else {
+        if (!url) XSRETURN_UNDEF;
+        {
             hdrs = (AV *)sv_2mortal((SV *)newAV());
             {
                 SV *p = otel_h(aTHX_ h, "protocol");
@@ -339,7 +343,17 @@ _attempt(self, signal, bytes)
                         count = call_pv("IO::Compress::Gzip::gzip",
                                         G_SCALAR | G_EVAL);
                         SPAGAIN;
-                        if (!SvTRUE(ERRSV) && count > 0) ok = SvTRUE(POPs);
+                        /* POPs into a TEMPORARY, never straight into SvTRUE.
+                         * Before perl 5.30 SvTRUE is a macro that evaluates
+                         * its argument more than once, so SvTRUE(POPs) pops
+                         * the stack several times and corrupts it - the crash
+                         * lands later, wherever the damaged stack is next
+                         * used, which is why this showed up as a SEGV after
+                         * all 72 subtests had passed. */
+                        if (!SvTRUE(ERRSV) && count > 0) {
+                            SV *r = POPs;
+                            ok = SvTRUE(r);
+                        }
                         else if (count > 0) (void)POPs;
                         PUTBACK; FREETMPS; LEAVE;
                     }
@@ -372,7 +386,8 @@ _attempt(self, signal, bytes)
                 SPAGAIN;
                 if (count > 0) f = newSVsv(POPs);
                 PUTBACK; FREETMPS; LEAVE;
-                RETVAL = f ? f : &PL_sv_undef;
+                if (!f) XSRETURN_UNDEF;
+                RETVAL = f;
             }
         }
     }

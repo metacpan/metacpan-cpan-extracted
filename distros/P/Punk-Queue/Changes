@@ -1,5 +1,17 @@
 Revision history for Punk::Queue
 
+0.06    2026-08-20
+        - FIX: change abi version checks from == to <=
+
+0.05    2026-08-20
+        - fix Getopt::Long::Parser->getoptionsfromarray failures
+        - the admin list endpoints trimmed a died message with s///r,
+          which arrived in perl 5.14
+        - a %f in a perl format string reads an NV, and an NV is not a
+          double everywhere
+        - the supervisor's aligned scheduler boundary was computed with
+          integer arithmetic that can overflow a 32-bit IV.
+
 0.04    2026-08-16
         - `punk queue ...`: Punk::Command::Queue registers the queue CLI
           with Punk 0.13's command registry.

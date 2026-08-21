@@ -136,6 +136,51 @@ static int phd_seen_has(pTHX_ HV *seen, const char *k, STRLEN kl) {
  * name wins, and an undef mention drops the name entirely. Returns an RV
  * (+1) to the effective flat AV, or NULL when nothing applies. When no
  * scope matches this is one newSVsv of the frozen state entry. */
+/* Punk::Plugin::CSP's per-request policy, appended to whatever the `headers`
+ * keyword produced.
+ *
+ * HERE rather than in a hook, and that is the point of putting it here: this
+ * decoration runs OUTSIDE the routing branch, so the preflight 204, the house
+ * 404 and the house 405 all carry the policy too. An error page is exactly
+ * where an injection lands - it is the page most likely to render something
+ * from the request - so a policy that covers the 200s and misses the 404s is
+ * missing from the response that needed it most.
+ *
+ * Set-if-absent comes free with the rest: an application that set its own
+ * Content-Security-Policy on a particular response keeps it.
+ */
+static void phd_csp_pair(pTHX_ HV *state, HV *env, AV *into) {
+    SV *cfg = ps_state(aTHX_ state, K_CSP);
+    HV *ch;
+    SV **rop;
+    int report_only;
+    if (!(cfg && SvROK(cfg) && SvTYPE(SvRV(cfg)) == SVt_PVHV)) return;
+    ch = (HV *)SvRV(cfg);
+    rop = hv_fetchs(ch, "report_only", 0);
+    report_only = (rop && *rop && SvOK(*rop) && SvTRUE(*rop));
+
+    /* A HASHREF under report_only is a SECOND policy, reported alongside the
+     * first rather than instead of it.
+     *
+     * That combination is the one that gets a strict policy deployed: the
+     * loose one you already trust stays enforcing, and the strict one you are
+     * moving to reports what it would have broken. Treating the two as
+     * exclusive would mean choosing between protection now and knowing what
+     * breaks later, and nobody chooses the second. */
+    if (rop && *rop && SvROK(*rop) && SvTYPE(SvRV(*rop)) == SVt_PVHV) {
+        av_push(into, newSVpvs("Content-Security-Policy"));
+        av_push(into, pcsp_policy(aTHX_ ch, env));
+        av_push(into, newSVpvs("Content-Security-Policy-Report-Only"));
+        av_push(into, pcsp_policy(aTHX_ (HV *)SvRV(*rop), env));
+        return;
+    }
+
+    av_push(into, newSVpv(report_only
+                          ? "Content-Security-Policy-Report-Only"
+                          : "Content-Security-Policy", 0));
+    av_push(into, pcsp_policy(aTHX_ ch, env));
+}
+
 static SV *phd_effective(pTHX_ HV *state, HV *env) {
     SV *app_sv    = ps_state(aTHX_ state, K_HEADERS);
     SV *scoped_sv = ps_state(aTHX_ state, K_HEADERS_SCOPED);
@@ -149,8 +194,20 @@ static SV *phd_effective(pTHX_ HV *state, HV *env) {
     if (app_sv && !(SvROK(app_sv) && SvTYPE(SvRV(app_sv)) == SVt_PVAV))
         app_sv = NULL;
     if (!(scoped_sv && SvROK(scoped_sv)
-          && SvTYPE(SvRV(scoped_sv)) == SVt_PVAV))
-        return app_sv ? newSVsv(app_sv) : NULL;
+          && SvTYPE(SvRV(scoped_sv)) == SVt_PVAV)) {
+        AV *only = app_sv ? (AV *)SvRV(app_sv) : NULL;
+        AV *outv = newAV();
+        if (only) {
+            SSize_t k, kn = av_len(only) + 1;
+            for (k = 0; k < kn; k++) {
+                SV **x = av_fetch(only, k, 0);
+                av_push(outv, (x && *x) ? newSVsv(*x) : newSV(0));
+            }
+        }
+        phd_csp_pair(aTHX_ state, env, outv);
+        if (av_len(outv) < 0) { SvREFCNT_dec((SV *)outv); return NULL; }
+        return newRV_noinc((SV *)outv);
+    }
 
     scoped = (AV *)SvRV(scoped_sv);
     n = av_len(scoped) + 1;
@@ -193,8 +250,20 @@ static SV *phd_effective(pTHX_ HV *state, HV *env) {
             av_push(merged, newSVsv(*vp));
         }
     }
-    if (!hits)
-        return app_sv ? newSVsv(app_sv) : NULL;
+    if (!hits) {
+        AV *only = app_sv ? (AV *)SvRV(app_sv) : NULL;
+        AV *outv = newAV();
+        if (only) {
+            SSize_t k, kn = av_len(only) + 1;
+            for (k = 0; k < kn; k++) {
+                SV **x = av_fetch(only, k, 0);
+                av_push(outv, (x && *x) ? newSVsv(*x) : newSV(0));
+            }
+        }
+        phd_csp_pair(aTHX_ state, env, outv);
+        if (av_len(outv) < 0) { SvREFCNT_dec((SV *)outv); return NULL; }
+        return newRV_noinc((SV *)outv);
+    }
     if (app_sv) {
         AV *pairs = (AV *)SvRV(app_sv);
         SSize_t j, np = av_len(pairs) + 1;
@@ -210,6 +279,7 @@ static SV *phd_effective(pTHX_ HV *state, HV *env) {
             av_push(merged, newSVsv(*vp));
         }
     }
+    phd_csp_pair(aTHX_ state, env, merged);
     return newRV_noinc((SV *)merged);
 }
 

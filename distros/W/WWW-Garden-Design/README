@@ -1,0 +1,27 @@
+README file for WWW::Garden::Design.
+
+See also: CHANGES and Changelog.ini.
+
+Warning: WinZip 8.1 and 9.0 both contain an 'accidental' bug which stops
+them recognizing POSIX-style directory structures in valid tar files.
+You are better off using a reliable tool such as InfoZip:
+ftp://ftp.info-zip.org/pub/infozip/
+
+Installing
+----------
+shell>tar xzf WWW-Garden-Design-1.00.tgz
+
+Note: 'make' on MS Windows-like systems may be called 'nmake' or 'dmake'.
+
+shell> perl Makefile.PL
+shell> make
+shell> make test
+shell> su              (for Unix-like systems)
+shell> make install
+
+Generate documentation
+----------------------
+Note: This step assumes my directory structure.
+
+shell> scripts/pod2html.sh
+

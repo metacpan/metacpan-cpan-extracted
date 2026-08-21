@@ -10,7 +10,7 @@ use Device::Chip::Adapter;
 use Future::AsyncAwait;
 use Future::IO;
 
-use Getopt::Long;
+use Getopt::Long qw( :config no_ignore_case );
 
 STDOUT->binmode( ":encoding(UTF-8)" );
 

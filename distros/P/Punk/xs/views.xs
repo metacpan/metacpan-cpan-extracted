@@ -99,6 +99,10 @@ render(self, c, template, data = &PL_sv_undef, ...)
             dSP;
             int count;
             SV *d = SvOK(data) ? data : sv_2mortal(newRV_noinc((SV *)newHV()));
+            /* Punk::Plugin::CSP: this request's nonce, so `{% csp_nonce %}`
+             * resolves without the handler passing anything. A no-op unless
+             * the plugin is registered for this app. */
+            if (have_c) pcsp_bind_vars(aTHX_ c, d);
             ENTER; SAVETMPS;
             PUSHMARK(SP);
             EXTEND(SP, 3);
@@ -112,6 +116,11 @@ render(self, c, template, data = &PL_sv_undef, ...)
             PUTBACK;
             FREETMPS; LEAVE;
         }
+
+        /* Punk::Plugin::CSP's inline-handler check. Development only, and it
+         * never touches `bytes` - a checker with authority over the response
+         * is a checker that gets removed the first time it breaks a page. */
+        if (have_c) pcsp_scan(aTHX_ c, template, bytes);
 
         /* status: override, else the context's pending status, else 200 */
         if (o_status && SvOK(o_status)) status = SvIV(o_status);

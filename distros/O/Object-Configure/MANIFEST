@@ -10,8 +10,11 @@ t/00-load.t
 t/10-compile.t
 t/20-construct.t
 t/30-basics.t
+t/cgi_security.t
 t/coderef.t
 t/complex.t
+t/data-flow.t
+t/domain.t
 t/edge_cases.t
 t/env.t
 t/eof.t
@@ -24,6 +27,7 @@ t/integration.t
 t/locales.t
 t/manifest.t
 t/mutant_killer.t
+t/path.t
 t/pod-cm.t
 t/pod-synopsis.t
 t/pod.t
@@ -31,6 +35,7 @@ t/prereq.t
 t/reload.t
 t/simple.t
 t/strict.t
+t/transaction.t
 t/unit.t
 t/universal.t
 t/version.t

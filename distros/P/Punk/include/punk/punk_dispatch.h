@@ -48,7 +48,7 @@ static const oa_abi *punk_oa_try(pTHX) {
             if (p) {
                 const oa_abi *a = INT2PTR(const oa_abi *, p);
                 if (a && !getenv("PUNK_FAKE_OA_BAD")
-                    && a->abi_version == OA_ABI_VERSION)
+                    && a->abi_version >= OA_ABI_VERSION)
                     PUNK_OA = a;
             }
         }

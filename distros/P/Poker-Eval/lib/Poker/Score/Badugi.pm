@@ -1,4 +1,7 @@
 package Poker::Score::Badugi;
+
+our $VERSION = '0.11';
+
 use Moo;
 use Algorithm::Combinatorics qw(combinations);
 
@@ -8,11 +11,10 @@ Poker::Score::Badugi - Identify and score specific Badugi poker hand.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 

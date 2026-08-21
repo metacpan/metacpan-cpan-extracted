@@ -24,6 +24,7 @@ t/00-load.t
 t/11-options.t
 t/12-create.t
 t/13-session.t
+t/14-create-idgen.t
 t/Test/TusResponse.pm
 t/author-pod-syntax.t
 t/author-pod-version.t

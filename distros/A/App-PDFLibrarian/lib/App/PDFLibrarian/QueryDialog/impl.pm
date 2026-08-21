@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 package App::PDFLibrarian::QueryDialog::impl;
-$App::PDFLibrarian::QueryDialog::impl::VERSION = '6.2.0';
+$App::PDFLibrarian::QueryDialog::impl::VERSION = '6.2.3';
 use Wx qw(:dialog :statictext :combobox :textctrl :sizer :panel :window :id);
 use Wx::ArtProvider;
 use Wx::Event qw(EVT_BUTTON EVT_TEXT EVT_TEXT_ENTER);
@@ -38,7 +38,7 @@ sub new {
   my ($class, $pdffile, $query_db_name, $query_value, $query_values, $error_message) = @_;
 
   # create dialog
-  my $self = $class->SUPER::new(undef, -1, "Import $pdffile - App::PDFLibrarian", &Wx::wxDefaultPosition, &Wx::wxDefaultSize, wxDIALOG_NO_PARENT | wxDEFAULT_DIALOG_STYLE);
+  my $self = $class->SUPER::new(undef, -1, "Import - PDFLibrarian", &Wx::wxDefaultPosition, &Wx::wxDefaultSize, wxDIALOG_NO_PARENT | wxDEFAULT_DIALOG_STYLE);
 
   # set dialog icon
   my $icon = Wx::ArtProvider::GetIcon(Wx::ArtProvider::wxART_QUESTION, Wx::ArtProvider::wxART_CMN_DIALOG);
@@ -54,9 +54,9 @@ sub new {
   if ($error_message ne '') {
     $message = <<"EOM";
 App::PDFLibrarian has queries online database '$query_db_name' with the query value '$query_value'. Unfortunately the query returned the following errors:
-
+---
 $error_message
-
+---
 Please correct the query value and/or select a different online database, and try again.
 
 EOM

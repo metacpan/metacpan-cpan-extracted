@@ -1,5 +1,9 @@
 Revision history for Apophis
 
+0.05    2026-08-20
+        - ADDS: a public C ABI, ap_abi.h, reached through
+          ExtUtils::Depends and Apophis::_abi_ptr. 
+
 0.04	2026-07-11
 	- Remove pax headers
 

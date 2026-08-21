@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Punk::OpenTelemetry', $VERSION);
@@ -19,7 +19,7 @@ Punk::OpenTelemetry - OpenTelemetry for Punk: traces, metrics and logs over OTLP
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -98,8 +98,11 @@ trust.
 =over 4
 
 =item * L<Punk::Plugin::OpenTelemetry> - the plugin, the C<otel> keyword, the
-F<punk.yml> block, and the roughly thirty C<OTEL_*> environment variables.
-B<Read this one.>
+F<punk.yml> block, the boot diagnostic and the fork trap. B<Read this one.>
+
+=item * L<Punk::OpenTelemetry::Config> - every C<OTEL_*> variable with its
+default, and the precedence between the three places configuration comes from.
+B<Read this one too, before deploying.>
 
 =item * L<Punk::OpenTelemetry::Tracer> - spans, sampling and the batch queue.
 
@@ -126,10 +129,19 @@ other two signals.
 =item * L<Punk::OpenTelemetry::Schema> - converting a payload between
 semantic convention versions.
 
-=item * L<Punk::OpenTelemetry::Config> - the configuration surface, and the
-precedence between its layers.
-
 =back
+
+=head1 IF NOTHING ARRIVES
+
+There is B<no default endpoint>. With none configured the SDK builds,
+instruments the request path, records spans and drops them for want of
+anywhere to send them - it does not fall back to C<http://localhost:4318> the
+way some other SDKs do. That is the first thing to check, because everything
+else looks healthy when it happens.
+
+The boot diagnostic prints the endpoint it resolved, along with the service
+name, the protocol, the sampler and the propagators. Read that line before
+reading anything else.
 
 =head1 TURNING IT OFF
 

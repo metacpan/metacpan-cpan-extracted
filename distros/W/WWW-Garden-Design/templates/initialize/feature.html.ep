@@ -1,0 +1,181 @@
+<form name = 'feature_form_1' id = 'feature_form_1'>
+	%= csrf_field
+	<table align = 'center'>
+		<tr>
+			<td colspan = '3'><div class = 'blue_centered'>Features</div><br /></td>
+		</tr>
+		<tr>
+			<td class = 'centered' colspan = '3'>Feature menu</td>
+		</tr>
+		<tr>
+			<td align = 'center' colspan = '3'>
+				<span id = 'feature_menu_span'><%== $feature_menu %></span>
+			</td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+		<tr>
+			<td><br />Name: <span class = 'alert'>*</span> </td>
+			<td align = 'left' colspan = '2'><input id = 'feature_name' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Publish: </td>
+			<td align = 'left' colspan = '2'><input type = 'checkbox' value = '' id = 'feature_publish'/></td>
+		</tr>
+		<tr>
+			<td>Icon: </td>
+			<td align = 'left' colspan = '2'>
+				<table class = 'generic_border generic_padding'>
+					<tr>
+						<td><img id ='feature_icon' src = '' /></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan = '2'>o Choose any one of the next 3 to specify the color of the feature's tile.</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan = '2'>o For color field mis-matches, precedence is top-down.</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan = '2'>o Color codes are '#' + 6 hex digits.</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan = '2'>o Auto-complete does not work on this page.</td>
+		</tr>
+		<tr>
+			<td>Color code: </td>
+			<td colspan = '2'><input id = 'color_code' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Color name: </td>
+			<td colspan = '2'><input id = 'color_name' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan = '2'>o After clicking on a color, you <span class = 'alert'>must</span> click 'choose'.</td>
+		</tr>
+		<tr>
+			<td>Color spectrum: </td>
+			<td colspan = '2'><input type = 'text' class = 'color_spectrum' id = 'color_spectrum' /></div></td>
+		</tr>
+		<tr>
+			<td>Color chosen: <span class = 'alert'>*</span> </td>
+			<td colspan = '2'><div class = 'color_swatch_chosen' id = 'color_swatch_chosen'></div></td>
+		</tr>
+		<tr>
+			<td colspan = '3'>
+				<br />
+			</td>
+		</tr>
+		<tr>
+			<td colspan = '3'><span class = 'alert'>*</span> indicates a mandatory field</td>
+		</tr>
+		<tr>
+			<td colspan = '3'>
+				<br />
+			</td>
+		</tr>
+		<tr>
+			<td align = 'left' width = '33%'><input type = 'submit' value = 'Update' onclick = 'update_feature("update")'/></td>
+			<td align = 'center' width = '33%'><input type = 'submit' value = 'Delete' onclick = 'update_feature("delete")'/></td>
+			<td align = 'right' width = '33%'><input type = 'reset' value = 'Reset' /></td>
+		</tr>
+	</table>
+
+	<input id = 'color_chosen' type = 'hidden' />
+</form>
+<form name = 'feature_form_2' id = 'feature_form_2'>
+	%= csrf_field
+	<table align = 'center'>
+		<tr>
+			<td colspan = '3'><hr /></td>
+		</tr>
+		<tr>
+			<td width = '33%'></td>
+			<td align = 'center'><div class = 'blue_centered'>Add a New Feature</div></td>
+			<td width = '33%'></td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+		<tr>
+			<td><br />Name: <span class = 'alert'>*</span> </td>
+			<td align = 'left' colspan = '2'><input id = 'new_feature_name' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Publish: </td>
+			<td align = 'left' colspan = '2'><input type = 'checkbox' value = '' id = 'new_feature_publish'/></td>
+		</tr>
+		<tr>
+			<td>Icon: </td>
+			<td align = 'left' colspan = '2'>
+				<table class = 'generic_border generic_padding'>
+					<tr>
+						<td><img id ='new_feature_icon' src = '' /></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan = '2'>o Choose any one of the next 3 to specify the color of the feature's tile.</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan = '2'>o For color field mis-matches, precedence is top-down.</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan = '2'>o Color codes are '#' + 6 hex digits.</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan = '2'>o Auto-complete does not work on this page.</td>
+		</tr>
+		<tr>
+			<td>Color code: </td>
+			<td colspan = '2'><input id = 'new_color_code' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Color name: </td>
+			<td colspan = '2'><input id = 'new_color_name' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan = '2'>o After clicking on a color, you <span class = 'alert'>must</span> click 'choose'.</td>
+		</tr>
+		<tr>
+			<td>Color spectrum: </td>
+			<td colspan = '2'><input type = 'text' class = 'new_color_spectrum' id = 'new_color_spectrum' /></div></td>
+		</tr>
+		<tr>
+			<td>Color chosen: <span class = 'alert'>*</span> </td>
+			<td colspan = '2'><div class = 'new_color_swatch_chosen' id = 'new_color_swatch_chosen'></div></td>
+		</tr>
+		<tr>
+			<td colspan = '3'>
+				<br />
+			</td>
+		</tr>
+		<tr>
+			<td colspan = '3'><span class = 'alert'>*</span> indicates a mandatory field</td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+		<tr>
+			<td align = 'left' width = '33%'><input type = 'submit' value = 'Save' onclick = 'add_feature()'/></td>
+			<td width = '33%'></td>
+			<td align = 'right' width = '33%'><input type = 'reset' value = 'Reset' /></td>
+		</tr>
+	</table>
+
+	<input id = 'new_color_chosen' type = 'hidden' />
+</form>

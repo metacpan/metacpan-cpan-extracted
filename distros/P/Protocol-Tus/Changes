@@ -1,3 +1,8 @@
+0.006  2026-08-20 17:20:04 CEST
+   - Add id_generator in LocalDir, to drive sub-directory names from the
+     outside.
+   - Fix bugs in the docs.
+
 0.004  2026-05-31 18:12:03 CEST
    - Release after 83 PASSes in CPAN Testers (thanks!)
 

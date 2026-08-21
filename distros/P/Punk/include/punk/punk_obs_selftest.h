@@ -5,7 +5,7 @@
  * signature that drifted from the header, a version that was not bumped, are
  * all invisible until something goes through the function pointers. So this
  * registers with the table and reads the request back through it, exactly as
- * Punk::OpenTelemetry will, and t/69-pk-abi.t reads what it recorded.
+ * Punk::OpenTelemetry will, and t/0011-pk-abi.t reads what it recorded.
  *
  * Included by Punk.xs after pk_abi_impl.h (it needs the PK_ABI table).
  * Private; nothing here is part of any interface.
@@ -85,7 +85,7 @@ static void pk_selftest_res(pTHX_ SV *c, SV *response, void *ud) {
     av_push(pk_selftest_av(aTHX), newRV_noinc((SV *)e));
 }
 
-/* ---- v2 on_query, for t/69-pk-abi.t ------------------------------------- */
+/* ---- v2 on_query, for t/0011-pk-abi.t ------------------------------------- */
 static IV  PK_SELFTEST_Q_STARTS = 0;
 static IV  PK_SELFTEST_Q_DONES  = 0;
 static IV  PK_SELFTEST_Q_OK     = 0;

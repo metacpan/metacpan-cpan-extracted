@@ -1,8 +1,6 @@
 package Crypt::Age::Primitives;
-our $VERSION = '0.001';
-our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Low-level cryptographic primitives for age encryption
-
+our $VERSION = '0.002';
 use Moo;
 use Carp qw(croak);
 use Crypt::PK::X25519;
@@ -10,6 +8,9 @@ use Crypt::AuthEnc::ChaCha20Poly1305;
 use Crypt::KeyDerivation qw(hkdf);
 use Crypt::Mac::HMAC qw(hmac);
 use Crypt::PRNG qw(random_bytes);
+
+use constant READ_ATTEMPTS => 3;
+
 use namespace::clean;
 
 
@@ -51,7 +52,18 @@ sub x25519_shared_secret {
     my $their_pk = Crypt::PK::X25519->new;
     $their_pk->import_key_raw($their_public, 'public');
 
-    return $our_pk->shared_secret($their_pk);
+    my $shared_secret = $our_pk->shared_secret($their_pk);
+
+    # c2sp.org/age, X25519 recipient type: "If the shared secret is all 0x00
+    # bytes, the identity implementation MUST abort." That is the low-order
+    # point check. The peer key is public, so this comparison does not need to
+    # be constant time. Recent CryptX/libtomcrypt rejects such peer keys inside
+    # shared_secret() with its own error, but the cpanfile pins no minimum
+    # CryptX version and the spec puts the duty on us, so we check regardless.
+    croak "X25519 shared secret is all zero: peer key is a low-order point"
+        if $shared_secret !~ /[^\x00]/;
+
+    return $shared_secret;
 }
 
 
@@ -132,15 +144,28 @@ sub compute_header_mac {
 sub encrypt_payload {
     my ($class, $payload_key, $plaintext) = @_;
 
-    my @chunks;
-    my $offset = 0;
-    my $counter = 0;
-    my $remaining = length($plaintext);
+    open my $ifh, '<:raw', \$plaintext or croak "Cannot open input string: $!";
 
-    while ($remaining > 0 || $counter == 0) {
-        my $chunk_size = $remaining > CHUNK_SIZE ? CHUNK_SIZE : $remaining;
-        my $chunk = substr($plaintext, $offset, $chunk_size);
-        my $is_final = ($remaining <= CHUNK_SIZE);
+    my $output = '';
+    open my $ofh, '>:raw', \$output or croak "Cannot open output string: $!";
+
+    $class->encrypt_payload_fh($payload_key, $ifh, $ofh);
+
+    close $ofh or croak "Cannot close output string: $!";
+    close $ifh  or croak "Cannot close input string: $!";
+
+    return $output;
+}
+
+
+sub encrypt_payload_fh {
+    my ($class, $payload_key, $ifh, $ofh) = @_;
+
+    my $counter = 0;
+    my $is_final = 0;
+    while (! $is_final) {
+        my $chunk = $class->paranoid_read($ifh, CHUNK_SIZE);
+        $is_final = eof($ifh);
 
         my $nonce = $class->_make_nonce($counter, $is_final);
         my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($payload_key, $nonce);
@@ -148,69 +173,144 @@ sub encrypt_payload {
         my $ciphertext = $ae->encrypt_add($chunk);
         my $tag = $ae->encrypt_done;
 
-        push @chunks, $ciphertext . $tag;
+        print {$ofh} $ciphertext, $tag;
 
-        $offset += $chunk_size;
-        $remaining -= $chunk_size;
         $counter++;
-
-        last if $is_final;
     }
 
-    return join('', @chunks);
+    return;
 }
 
 
 sub decrypt_payload {
     my ($class, $payload_key, $ciphertext) = @_;
 
-    my @plaintext_chunks;
-    my $offset = 0;
-    my $counter = 0;
-    my $remaining = length($ciphertext);
+    open my $ifh, '<:raw', \$ciphertext or croak "Cannot open input string: $!";
 
-    while ($remaining > 0) {
-        # Each encrypted chunk is plaintext + 16 byte tag
-        my $max_encrypted_chunk = CHUNK_SIZE + TAG_SIZE;
-        my $chunk_size = $remaining > $max_encrypted_chunk ? $max_encrypted_chunk : $remaining;
+    my $output = '';
+    open my $ofh, '>:raw', \$output or croak "Cannot open output string: $!";
 
-        my $encrypted_chunk = substr($ciphertext, $offset, $chunk_size);
-        my $is_final = ($remaining <= $max_encrypted_chunk);
+    $class->decrypt_payload_fh($payload_key, $ifh, $ofh);
 
-        my $ct = substr($encrypted_chunk, 0, -TAG_SIZE);
-        my $tag = substr($encrypted_chunk, -TAG_SIZE);
+    close $ofh or croak "Cannot close output string: $!";
+    close $ifh  or croak "Cannot close input string: $!";
 
-        my $nonce = $class->_make_nonce($counter, $is_final);
-        my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($payload_key, $nonce);
-
-        my $plaintext = $ae->decrypt_add($ct);
-        croak "Payload authentication failed at chunk $counter"
-            unless $ae->decrypt_done($tag);
-
-        push @plaintext_chunks, $plaintext;
-
-        $offset += $chunk_size;
-        $remaining -= $chunk_size;
-        $counter++;
-    }
-
-    return join('', @plaintext_chunks);
+    return $output;
 }
 
+
+sub decrypt_payload_fh {
+    my ($class, $payload_key, $ifh, $ofh) = @_;
+
+    my $max_encrypted_chunk = CHUNK_SIZE + TAG_SIZE;
+    my $counter = 0;
+    while (1) {
+        # Each encrypted chunk is plaintext + 16 byte tag
+        my $ct = $class->paranoid_read($ifh, $max_encrypted_chunk);
+
+        # paranoid_read only comes back short at end of file, so a short read
+        # is how this loop learns the file ends here. A *full* read says
+        # nothing either way: more chunks may follow, or this may be the final
+        # chunk sitting flush against the end of the file.
+        my $short_read = length($ct) < $max_encrypted_chunk;
+
+        if ($short_read) {
+            # Spec: "Streaming decryption MUST signal an error if the end of
+            # file is reached without successfully decrypting a final chunk."
+            croak 'Payload authentication failed at chunk '.$counter
+                . ': end of file reached without a final chunk'
+                if length($ct) == 0;
+            croak 'Payload authentication failed at chunk '.$counter
+                . ': chunk is shorter than its authentication tag'
+                if length($ct) < TAG_SIZE;
+            # Spec: "The final chunk MAY be shorter than 64 KiB but MUST NOT
+            # be empty unless the whole payload is empty."
+            croak 'Payload authentication failed at chunk '.$counter
+                . ': final chunk is empty and is not the only chunk'
+                if length($ct) == TAG_SIZE && $counter > 0;
+        }
+
+        my $tag = substr($ct, -TAG_SIZE, TAG_SIZE, '');
+
+        # The final-chunk flag lives in the nonce, so the only way to learn
+        # which nonce the writer used is to authenticate under it -- the
+        # file's length cannot answer it. A short chunk can only be the final
+        # one. A full chunk is tried as non-final first and, failing that, as
+        # a full-length final chunk. No ciphertext can authenticate under both
+        # nonces, so the second attempt cannot accept a chunk the writer did
+        # not mark that way: it is a second verification, not a second chance.
+        my $is_final = $short_read ? 1 : 0;
+        my $plaintext = $class->_open_chunk($payload_key, $counter, $is_final, $ct, $tag);
+        if (! defined($plaintext) && ! $is_final) {
+            $is_final = 1;
+            $plaintext = $class->_open_chunk($payload_key, $counter, $is_final, $ct, $tag);
+        }
+        croak "Payload authentication failed at chunk $counter" unless defined $plaintext;
+
+        print {$ofh} $plaintext;
+
+        if ($is_final) {
+            # A final chunk ends the payload, so anything still in the file
+            # invalidates it -- trailing garbage as much as another
+            # well-formed chunk.
+            croak 'Payload authentication failed at chunk '.$counter
+                . ': trailing data after the final chunk'
+                if length($class->paranoid_read($ifh, 1));
+            return;
+        }
+
+        $counter++;
+    }
+}
+
+
+sub _open_chunk {
+    my ($class, $payload_key, $counter, $is_final, $ciphertext, $tag) = @_;
+
+    my $nonce = $class->_make_nonce($counter, $is_final);
+    my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($payload_key, $nonce);
+
+    # decrypt_add hands back unauthenticated plaintext, so it is only returned
+    # to the caller once decrypt_done has verified the tag over it.
+    my $plaintext = $ae->decrypt_add($ciphertext);
+    return unless $ae->decrypt_done($tag);
+
+    return $plaintext;
+}
 
 sub _make_nonce {
     my ($class, $counter, $is_final) = @_;
 
     # 11 bytes counter (big-endian) + 1 byte final flag
-    my $nonce = pack('x3 N N', ($counter >> 32) & 0xFFFFFFFF, $counter & 0xFFFFFFFF);
-    # Actually, the nonce is: 11-byte big-endian counter || 1-byte last-block flag
-    # Let's be more precise:
-    $nonce = "\x00" x 3;  # First 3 bytes zero
+    my $nonce = "\x00" x 3;  # First 3 bytes zero
     $nonce .= pack('N', ($counter >> 32) & 0xFFFFFFFF);  # Next 4 bytes
     $nonce .= pack('N', $counter & 0xFFFFFFFF);          # Next 4 bytes
     $nonce .= pack('C', $is_final ? 1 : 0);              # Last byte: final flag
 
     return $nonce;
+}
+
+sub paranoid_read {
+    my ($class, $fh, $length) = @_;
+    my $retval = '';
+    my $attempts = READ_ATTEMPTS;
+    while ($length > 0 && $attempts > 0) {
+        my $buffer = '';
+        my $n_read = read($fh, $buffer, $length);
+        croak "read(): $!" if ! defined($n_read);
+        if ($n_read == 0) {
+            last if eof($fh); # no more data, we're good
+            --$attempts;
+            next;
+        }
+
+        # reset attempts after successful read of *some* data
+        $attempts = READ_ATTEMPTS;
+        $retval .= $buffer;
+        $length -= $n_read;
+    }
+    return $retval if $attempts > 0;
+    croak "could not get requested data up to the end";
 }
 
 
@@ -228,7 +328,7 @@ Crypt::Age::Primitives - Low-level cryptographic primitives for age encryption
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -303,6 +403,17 @@ Performs X25519 key exchange to compute a shared secret.
 
 Parameters are raw 32-byte keys. Returns a 32-byte shared secret.
 
+Dies if the shared secret is all C<0x00> bytes, which the age specification
+requires ("If the shared secret is all 0x00 bytes, the identity implementation
+MUST abort"). Such a secret means the peer key is a low-order point: on the
+decrypt path an attacker-supplied ephemeral share, on the encrypt path a
+recipient key that would yield a wrapping key known to everyone. The error
+message carries no key or secret material.
+
+Note that this is a backstop: a sufficiently recent L<CryptX> refuses the same
+peer keys one layer down and dies with its own message before this check is
+reached.
+
 =head2 derive_wrap_key
 
     my $wrap_key = Crypt::Age::Primitives->derive_wrap_key(
@@ -367,13 +478,55 @@ The plaintext is split into 64 KiB chunks. Each chunk is encrypted with a unique
 nonce derived from a counter and a final-chunk flag. Returns the concatenated
 encrypted chunks.
 
+=head2 encrypt_payload_fh
+
+    my $ciphertext = Crypt::Age::Primitives->encrypt_payload_fh($payload_key, $ifh, $ofh);
+
+Encrypts the payload using ChaCha20-Poly1305 in chunked mode, using filehandles
+for both input and output.
+
+The plaintext is split into 64 KiB chunks. Each chunk is encrypted with a unique
+nonce derived from a counter and a final-chunk flag. Returns the concatenated
+encrypted chunks.
+
 =head2 decrypt_payload
 
     my $plaintext = Crypt::Age::Primitives->decrypt_payload($payload_key, $ciphertext);
 
 Decrypts a chunked payload encrypted with C<encrypt_payload>.
 
-Dies if any chunk fails authentication. Returns the decrypted plaintext.
+Returns the decrypted plaintext. Dies on everything L</decrypt_payload_fh>
+dies on -- a chunk that fails authentication, input ending without a final
+chunk, an empty final chunk that is not the whole payload, or data after the
+final chunk.
+
+Unlike L</decrypt_payload_fh> this method releases nothing on failure: the
+partial plaintext is written to an internal buffer that is discarded when the
+call dies, so a caller only ever sees plaintext from a payload that was
+decrypted to its final chunk. Callers that need the streaming behaviour, and
+can handle the partial release that comes with it, want the filehandle form.
+
+=head2 decrypt_payload_fh
+
+    Crypt::Age::Primitives->decrypt_payload_fh($payload_key, $ifh, $ofh);
+
+Decrypts a chunked payload encrypted with C<encrypt_payload>, reading the
+ciphertext from C<$ifh> and writing the plaintext to C<$ofh> one chunk at a
+time. Returns nothing.
+
+A chunk is final because it authenticates under the final-flag nonce, never
+because it happens to end the file. Dies if a chunk fails authentication under
+either nonce, if the input ends without a final chunk, if a final chunk other
+than the whole payload is empty, or if any byte follows the final chunk.
+
+B<On failure, plaintext already written to C<$ofh> stays there.> Decryption is
+streaming, so every chunk that authenticated before the error was released to
+the output handle: a truncated file yields its intact prefix and then dies. Each
+released chunk is individually authenticated, but the message as a whole is not
+-- its completeness is exactly what the error says was never established. A
+caller must therefore discard whatever reached C<$ofh> when this method dies,
+and must not treat it as an authenticated message merely because the individual
+bytes were authentic.
 
 =head1 SEE ALSO
 
@@ -397,10 +550,6 @@ Dies if any chunk fails authentication. Returns the decrypted plaintext.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-crypt-age/issues>.
-
-=head2 IRC
-
-You can reach Getty on C<irc.perl.org> for questions and support.
 
 =head1 CONTRIBUTING
 

@@ -1,0 +1,37 @@
+<table align = 'center'>
+	<tr>
+		<td colspan = '2'><div class = 'blue_centered'>Image Descriptions</div><br /></td>
+	</tr>
+	<tr>
+		<td align = 'center'>Common name: </td><td><span id = 'image_common_name'></span></td>
+	</tr>
+	<tr>
+		<td align = 'center'>Scientific name: </td><td><span id = 'image_scientific_name'></span></td>
+	</tr>
+	<tr>
+		<td colspan = '2'><hr></td>
+	</tr>
+</table>
+
+<div id = 'images_div'>
+	<table align = 'center'>
+		<thead>
+			<tr>
+				<th class = 'centered'>#</th>
+				<th>Image</th>
+				<th>File name</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			% for my $i (1 .. $$constants{max_image_count}) {
+			<tr>
+				<td class = 'centered'><%== $i %></td>
+				<td><span id = 'image_url_<%== $i %>'></span></td>
+				<td align = 'left'><input id = 'image_file_name_<%== $i %>' type = 'text' size = '30' maxlength = '255'></td>
+				<td align = 'left'><input id = 'image_description_<%== $i %>' type = 'text' size = '50' maxlength = '255'></td>
+			</tr>
+			% }
+		</tbody>
+	</table>
+</div>

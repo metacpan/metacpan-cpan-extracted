@@ -1,6 +1,6 @@
-# X11::GUITest ($Id: GUITest.pm 243 2014-03-17 12:09:14Z ctrondlp $)
+# X11::GUITest ($Id: GUITest.pm 253 2026-08-19 22:37:51Z ctrondlp $)
 #
-# Copyright (c) 2003-2014  Dennis K. Paulsen, All Rights Reserved.
+# Copyright (c) 2003-2026  Dennis K. Paulsen, All Rights Reserved.
 # Email: ctrondlp@cpan.org
 #
 # This program is free software; you can redistribute it and/or
@@ -14,24 +14,24 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, see <http://www.gnu.org/licenses>.
+# along with this program; if not, see <http\://www.gnu.org/licenses>.
 #
 #
 
 =head1 NAME
 
-B<X11::GUITest> - Provides GUI testing/interaction routines.
+X11::GUITest - Provides GUI testing/interaction routines.
 
 =head1 VERSION
 
-0.28
+0.29
 
 Updates are made available at the following sites:
 
-  http://sourceforge.net/projects/x11guitest
-  http://www.cpan.org
+  http\://sourceforge.net/projects/x11guitest
+  http\://www.cpan.org
 
-Please consult 'docs/Changes' for the list of changes between
+Please consult 'Changes' for the list of changes between
 module revisions.
 
 =head1 DESCRIPTION
@@ -50,20 +50,45 @@ An X server with the XTest extensions enabled.  This seems to be the
 norm.  If it is not enabled, it usually can be by modifying the X
 server configuration (i.e., XF86Config).
 
-The standard DISPLAY environment variable is utilized to determine
-the host, display, and screen to work with.  By default it is usually set
-to ":0.0" for the localhost.  However, by altering this variable one can
-interact with applications under a remote host's X server.  To change this
-from a terminal window, one can utilize the following basic syntax:
-export DISPLAY=<hostname-or-ipaddress>:<display>.<screen>  Please note that
-under most circumstances, xhost will need to be executed properly on the remote
-host as well.
+This module talks to the X server via the standard DISPLAY environment
+variable, exactly like any other X11 client.  By default DISPLAY is
+usually ":0.0" (the local machine).  To target a different X server --
+for example, one on a remote host -- set DISPLAY before running your
+script:
+
+  export DISPLAY=<hostname-or-ipaddress>:<display>.<screen>
+
+Under most circumstances, xhost will also need to be run on the remote
+host to permit the connection.
+
+DISPLAY only helps if there is an actual X11 server to point it at.  This
+module requires a real X11 server -- either a native X11 session, or
+XWayland running as an X11 compatibility layer inside a Wayland session.
+It cannot function under a pure Wayland session with no XWayland present.
+See WAYLAND NOTES below for how to diagnose and work around this on a
+Wayland desktop.
 
 There is a known incompatibility between the XTest and Xinerama extensions,
-which causes the XTestFakeMotionEvent() function to misbehave.  When the
-Xinerama (X server) extension is turned on, this (Perl) extension has been
-modified to allow one to invoke an alternative function.  See Makefile.PL for
-details.
+which causes the XTestFakeMotionEvent() function to misbehave when the
+Xinerama (X server) extension is active.  MoveMouseAbs() has an alternate,
+XWarpPointer()-based implementation for this case, but it is not enabled by
+default -- it requires rebuilding with the X11_GUITEST_USING_XINERAMA
+preprocessor macro defined *in addition to* this module's other defines (a
+DEFINE= override on the command line replaces the whole value, it does not
+add to it):
+
+  perl Makefile.PL DEFINE="-DNDEBUG -DX11_GUITEST_ALT_L_FALLBACK_META_L -DX11_GUITEST_USING_XINERAMA"
+  make
+  make install
+
+Only do this if Xinerama is actually active on the target X server;
+otherwise leave the module at its default build.
+
+The optional x11guirecord recorder utility (see 'recorder/' and
+INSTALLATION below) additionally requires the X server's RECORD extension.
+This is separate from XTest, and while common, isn't guaranteed to be
+present/enabled on every X server -- particularly minimal or older
+commercial X implementations.
 
 =head1 INSTALLATION
 
@@ -71,6 +96,9 @@ details.
   make
   make test
   make install
+
+  # If "make install" fails with a permissions error, see INSTALLATION
+  # NOTES below.
 
   # If the build has errors, you may need to install the following dependencies:
   #    libxt-dev, libxtst-dev
@@ -82,6 +110,34 @@ details.
   make
   make install
   x11guirecord --help
+
+  # See INSTALLATION NOTES below if this "make install" fails with a
+  # permissions error too.
+
+  # The recorder has its own build-time dependencies, separate from the
+  # above:
+  #    autoconf, automake     (needed to run autogen.sh)
+  #    popt development files (e.g. popt-devel, libpopt-dev)
+  #    libX11, libXtst development files, if not already installed
+  #      for the main module above
+  #
+  # GNU gettext (libintl.h) is optional -- if it isn't found, the recorder
+  # builds without translation support rather than failing.  This is
+  # relevant mainly on AIX and HP-UX, which don't provide GNU gettext
+  # natively.
+
+=head1 INSTALLATION NOTES
+
+C<make install> writes into your Perl's installation directories (e.g.
+C<site_perl> under F</usr/lib/perl5> or F</usr/local>).  If that location
+isn't writable by your user -- the common case for a system Perl -- rerun
+the last step as C<sudo make install>.  Perl setups that install to a
+user-writable location instead (C<local::lib>, perlbrew, plenv, etc.)
+normally don't need C<sudo>.  If you're not sure which applies, try plain
+C<make install> first and only add C<sudo> if it fails with a permissions
+error.
+
+The same applies to the recorder's C<make install> step.
 
 =head1 SYNOPSIS
 
@@ -95,10 +151,11 @@ sub-directory from the installation folder.
   /;
 
   # Start gedit application
+  # Note: The interface for this example application keeps changing.
   StartApp('gedit');
 
   # Wait for application window to come up and become viewable.
-  my ($GEditWinId) = WaitWindowViewable('gedit');
+  my ($GEditWinId) = WaitWindowViewable('Untitled Document 1');
   if (!$GEditWinId) {
     die("Couldn't find gedit window in time!");
   }
@@ -112,9 +169,62 @@ sub-directory from the installation folder.
   # Handle gedit's Question window if it comes up when closing.  Wait
   # at most 5 seconds for it.
   if (WaitWindowViewable('Question', undef, 5)) {
-    # DoN't Save (Alt-n)
+    # Don't Save (Alt-n)
     SendKeys('%(n)');
   }
+
+=head1 WAYLAND NOTES
+
+Even under XWayland, be aware that Wayland's per-application isolation
+model prevents synthetic input (sent via the XTest extension, which this
+module relies on) from reaching native Wayland clients -- only
+X11/XWayland-rooted windows will respond to it.  This is a deliberate
+security property of the Wayland protocol, not a bug, and there is no
+compile-time or runtime workaround.  See
+https://www.linuxteck.com/x11-vs-wayland/ for background on the X11 vs.
+Wayland input model.
+
+On a Wayland session (check with 'echo $XDG_SESSION_TYPE'), most
+applications default to running as native Wayland clients, invisible to
+this module no matter what DISPLAY is set to.  Forcing a specific
+application through XWayland instead is usually enough to fix that.
+Which environment variable to set depends on the GUI toolkit the target
+application is built with:
+
+  Toolkit             Variable to set       Example
+  -------             ---------------       -------
+  GTK (GNOME, etc.)   GDK_BACKEND=x11       GDK_BACKEND=x11 gedit &
+  Qt / KDE Plasma     QT_QPA_PLATFORM=xcb   QT_QPA_PLATFORM=xcb dolphin &
+
+Two gotchas that can make this appear not to work, regardless of toolkit:
+
+=over 8
+
+=item *
+
+Many apps use single-instance activation (GTK's GApplication or KDE's
+KDBusService, both implemented over D-Bus).  If the application is already
+running, a new invocation with the variable set just signals the existing
+(Wayland) process to open a window -- it does not start a new, X11-backed
+process.  Fully quit the application first (i.e., confirm no process is
+running), then relaunch it.
+
+=item *
+
+Flatpak-packaged applications (increasingly the default for some apps on
+Fedora) do not automatically inherit environment variables from the host
+shell.  Use 'flatpak run --env=GDK_BACKEND=x11 <app-id>' (substitute
+QT_QPA_PLATFORM=xcb for Qt/KDE apps) instead of GDK_BACKEND=x11 <app> &,
+and use 'flatpak list --app' to find the app id if it's not obvious from
+the command name.
+
+=back
+
+If neither works, or you need this reliably for many applications, the
+more robust fix is a session-level one: log out and choose an X11 session
+at the login screen, if your desktop still offers one -- e.g. "GNOME on
+Xorg" or "Plasma (X11)" (some recent GNOME/Fedora releases have deprecated
+or removed that option).
 
 =cut
 
@@ -137,67 +247,67 @@ require DynaLoader;
 );
 
 @EXPORT_OK = qw(
-	ClickMouseButton
-	ClickWindow
-	DefaultScreen
-	FindWindowLike
-	GetChildWindows
-	GetEventSendDelay
-	GetInputFocus
-	GetKeySendDelay
-	GetMousePos
-	GetParentWindow
-	GetRootWindow
-	GetScreenDepth
-	GetScreenRes
-	GetWindowFromPoint
-	GetWindowName
-	GetWindowPid
-	GetWindowPos
-	GetWindowsFromPid
-	IconifyWindow
-	IsChild
-	IsKeyPressed
-	IsMouseButtonPressed
-	IsWindow
-	IsWindowCursor
-	IsWindowViewable
-	LowerWindow
-	MoveMouseAbs
-	MoveWindow
-	PressKey
-	PressMouseButton
-	PressReleaseKey
-	QSfSK
-	QuoteStringForSendKeys
-	RaiseWindow
-	ReleaseKey
-	ReleaseMouseButton
-	ResizeWindow
-	RunApp
-	ScreenCount
-	SendKeys
-	SetEventSendDelay
-	SetInputFocus
-	SetKeySendDelay
-	SetWindowName
-	StartApp
-	UnIconifyWindow
-	WaitSeconds
-	WaitWindowClose
-	WaitWindowLike
-	WaitWindowViewable
+    ClickMouseButton
+    ClickWindow
+    DefaultScreen
+    FindWindowLike
+    GetChildWindows
+    GetEventSendDelay
+    GetInputFocus
+    GetKeySendDelay
+    GetMousePos
+    GetParentWindow
+    GetRootWindow
+    GetScreenDepth
+    GetScreenRes
+    GetWindowFromPoint
+    GetWindowName
+    GetWindowPid
+    GetWindowPos
+    GetWindowsFromPid
+    IconifyWindow
+    IsChild
+    IsKeyPressed
+    IsMouseButtonPressed
+    IsWindow
+    IsWindowCursor
+    IsWindowViewable
+    LowerWindow
+    MoveMouseAbs
+    MoveWindow
+    PressKey
+    PressMouseButton
+    PressReleaseKey
+    QSfSK
+    QuoteStringForSendKeys
+    RaiseWindow
+    ReleaseKey
+    ReleaseMouseButton
+    ResizeWindow
+    RunApp
+    ScreenCount
+    SendKeys
+    SetEventSendDelay
+    SetInputFocus
+    SetKeySendDelay
+    SetWindowName
+    StartApp
+    UnIconifyWindow
+    WaitSeconds
+    WaitWindowClose
+    WaitWindowLike
+    WaitWindowViewable
 );
 
-# Tags (:ALL, etc.)
+# Tags (\:ALL, etc.)
 %EXPORT_TAGS = (
-	'ALL' => \@EXPORT_OK,
-	'CONST' => [qw(DEF_WAIT M_LEFT M_MIDDLE M_RIGHT M_UP M_DOWN M_BTN1 M_BTN2 M_BTN3 M_BTN4 M_BTN5 XC_X_CURSOR XC_ARROW XC_BASED_ARROW_DOWN XC_BASED_ARROW_UP XC_BOAT XC_BOGOSITY XC_BOTTOM_LEFT_CORNER XC_BOTTOM_RIGHT_CORNER XC_BOTTOM_SIDE XC_BOTTOM_TEE XC_BOX_SPIRAL XC_CENTER_PTR XC_CIRCLE XC_CLOCK XC_COFFEE_MUG XC_CROSS XC_CROSS_REVERSE XC_CROSSHAIR XC_DIAMOND_CROSS XC_DOT XC_DOTBOX XC_DOUBLE_ARROW XC_DRAFT_LARGE XC_DRAFT_SMALL XC_DRAPED_BOX XC_EXCHANGE XC_FLEUR XC_GOBBLER XC_GUMBY XC_HAND1 XC_HAND2 XC_HEART XC_ICON XC_IRON_CROSS XC_LEFT_PTR XC_LEFT_SIDE XC_LEFT_TEE XC_LEFTBUTTON XC_LL_ANGLE XC_LR_ANGLE XC_MAN XC_MIDDLEBUTTON XC_MOUSE XC_PENCIL XC_PIRATE XC_PLUS XC_QUESTION_ARROW XC_RIGHT_PTR XC_RIGHT_SIDE XC_RIGHT_TEE XC_RIGHTBUTTON XC_RTL_LOGO XC_SAILBOAT XC_SB_DOWN_ARROW XC_SB_H_DOUBLE_ARROW XC_SB_LEFT_ARROW XC_SB_RIGHT_ARROW XC_SB_UP_ARROW XC_SB_V_DOUBLE_ARROW XC_SHUTTLE XC_SIZING XC_SPIDER XC_SPRAYCAN XC_STAR XC_TARGET XC_TCROSS XC_TOP_LEFT_ARROW XC_TOP_LEFT_CORNER XC_TOP_RIGHT_CORNER XC_TOP_SIDE XC_TOP_TEE XC_TREK XC_UL_ANGLE XC_UMBRELLA XC_UR_ANGLE XC_WATCH XC_XTERM)],
+    'ALL' => \@EXPORT_OK,
+    'CONST' => [qw(DEF_WAIT M_LEFT M_MIDDLE M_RIGHT M_UP M_DOWN M_BTN1 M_BTN2 M_BTN3 M_BTN4 M_BTN5 XC_X_CURSOR XC_ARROW XC_BASED_ARROW_DOWN XC_BASED_ARROW_UP XC_BOAT XC_BOGOSITY XC_BOTTOM_LEFT_CORNER XC_BOTTOM_RIGHT_CORNER XC_BOTTOM_SIDE XC_BOTTOM_TEE XC_BOX_SPIRAL XC_CENTER_PTR XC_CIRCLE XC_CLOCK XC_COFFEE_MUG XC_CROSS XC_CROSS_REVERSE XC_CROSSHAIR XC_DIAMOND_CROSS XC_DOT XC_DOTBOX XC_DOUBLE_ARROW XC_DRAFT_LARGE XC_DRAFT_SMALL XC_DRAPED_BOX XC_EXCHANGE XC_FLEUR XC_GOBBLER XC_GUMBY XC_HAND1 XC_HAND2 XC_HEART XC_ICON XC_IRON_CROSS XC_LEFT_PTR XC_LEFT_SIDE XC_LEFT_TEE XC_LEFTBUTTON XC_LL_ANGLE XC_LR_ANGLE XC_MAN XC_MIDDLEBUTTON XC_MOUSE XC_PENCIL XC_PIRATE XC_PLUS XC_QUESTION_ARROW XC_RIGHT_PTR XC_RIGHT_SIDE XC_RIGHT_TEE XC_RIGHTBUTTON XC_RTL_LOGO XC_SAILBOAT XC_SB_DOWN_ARROW XC_SB_H_DOUBLE_ARROW XC_SB_LEFT_ARROW XC_SB_RIGHT_ARROW XC_SB_UP_ARROW XC_SB_V_DOUBLE_ARROW XC_SHUTTLE XC_SIZING XC_SPIDER XC_SPRAYCAN XC_STAR XC_TARGET XC_TCROSS XC_TOP_LEFT_ARROW XC_TOP_LEFT_CORNER XC_TOP_RIGHT_CORNER XC_TOP_SIDE XC_TOP_TEE XC_TREK XC_UL_ANGLE XC_UMBRELLA XC_UR_ANGLE XC_WATCH XC_XTERM)],
 );
 
 Exporter::export_ok_tags(keys %EXPORT_TAGS);
 
-$VERSION = '0.28';
+$VERSION = '0.29';
 
 # Module Constants
 sub DEF_WAIT() { 10; }
@@ -330,42 +440,42 @@ array is returned if no matches were found.
 
 my $FindWindowLikeAux =
 sub {
-	my $titlerx = shift;
-	my $start = shift;
-	my $winname = '';
-	my @wins = ();
+    my $titlerx = shift;
+    my $start = shift;
+    my $winname = '';
+    my @wins = ();
 
-	# Match the starting window???
-	$winname = GetWindowName($start);
-	if (defined $winname && $winname =~ /$titlerx/i) {
-		push @wins, $start;
-	}
+    # Match the starting window???
+    $winname = GetWindowName($start);
+    if (defined $winname && $winname =~ /$titlerx/i) {
+        push @wins, $start;
+    }
 
-	# Match a child window?
-	foreach my $child (GetChildWindows($start)) {
-		$winname = GetWindowName($child);
-		if (defined $winname && $winname =~ /$titlerx/i) {
-			push @wins, $child;
-		}
-	}
-	return(@wins);
+    # Match a child window?
+    foreach my $child (GetChildWindows($start)) {
+        $winname = GetWindowName($child);
+        if (defined $winname && $winname =~ /$titlerx/i) {
+            push @wins, $child;
+        }
+    }
+    return(@wins);
 };
 
 sub FindWindowLike {
-	my $titlerx = shift;
-	my $start = shift;
+    my $titlerx = shift;
+    my $start = shift;
 
-	if (defined $start) {
-		return &$FindWindowLikeAux($titlerx, $start);
-	}
-	else {
-		my @wins = ();
-		for (my $i = ScreenCount() - 1; $i >= 0 ; --$i) {
-			push @wins, &$FindWindowLikeAux($titlerx,
-							GetRootWindow($i));
-		}
-		return(@wins);
-	}
+    if (defined $start) {
+        return &$FindWindowLikeAux($titlerx, $start);
+    }
+    else {
+        my @wins = ();
+        for (my $i = ScreenCount() - 1; $i >= 0 ; --$i) {
+            push @wins, &$FindWindowLikeAux($titlerx,
+                            GetRootWindow($i));
+        }
+        return(@wins);
+    }
 }
 
 
@@ -380,7 +490,7 @@ one to constrain the search to child windows of that window.
 One can optionally specify an alternative wait amount in seconds.  A
 window will keep being looked for that matches the specified title regex
 until this amount of time has been reached.  The default amount is defined
-in the DEF_WAIT constant available through the :CONST export tag.
+in the DEF_WAIT constant available through the \:CONST export tag.
 
 If a window is going to be manipulated by input, WaitWindowViewable is the
 more robust solution to utilize.
@@ -399,22 +509,31 @@ array is returned if no matches were found.
 =cut
 
 sub WaitWindowLike {
-	my $titlerx = shift;
-	my $start = shift;
-	my $wait = shift || DEF_WAIT;
-	my @wins = ();
+    my $titlerx = shift;
+    my $start   = shift;
+    my $wait    = shift;
+    $wait = DEF_WAIT unless defined $wait;
 
-	# For each second we $wait, look for window title once.
-	for (my $i = 0; $i < $wait; $i++) {
-		my @wins = FindWindowLike($titlerx, $start);
-		if (@wins) {
-			return(@wins);
-		}
-		# Wait 1 sec in order not to bog down the system
-		select(undef, undef, undef, 1);
-	}
-	# Nothing
-	return(@wins);
+    require Time::HiRes;
+    my $end_time = Time::HiRes::time() + $wait;
+
+    while (1) {
+        my @found = FindWindowLike($titlerx, $start);
+        if (@found) {
+            return @found;   # return actual matches
+        }
+
+        my $remaining = $end_time - Time::HiRes::time();
+        last if $remaining <= 0;
+
+        # Avoid bogging down the system, but don't oversleep the requested
+        # timeout (fractional seconds are supported).
+        my $delay = $remaining < 1 ? $remaining : 1;
+        select(undef, undef, undef, $delay);
+    }
+
+    # Nothing found
+    return ();
 }
 
 
@@ -435,27 +554,37 @@ found.
 =cut
 
 sub WaitWindowViewable {
-	my $titlerx = shift;
-	my $start = shift;
-	my $wait = shift || DEF_WAIT;
-	my @wins = ();
+    my $titlerx = shift;
+    my $start = shift;
+    my $wait = shift;
+    $wait = DEF_WAIT unless defined $wait;
+    my @wins = ();
 
-	# For each second we $wait, look for window title once.
-	for (my $i = 0; $i < $wait; $i++) {
-		# Find windows, but recognize only those that are viewable
-		foreach my $win (FindWindowLike($titlerx, $start)) {
-			if (IsWindowViewable($win)) {
-				push @wins, $win;
-			}
-		}
-		if (@wins) {
-			return(@wins);
-		}
-		# Wait 1 sec in order not to bog down the system.
-		select(undef, undef, undef, 1);
-	}
-	# Nothing
-	return(@wins);
+    require Time::HiRes;
+    my $end_time = Time::HiRes::time() + $wait;
+
+    while (1) {
+        # Find windows, but recognize only those that are viewable
+        foreach my $win (FindWindowLike($titlerx, $start)) {
+            if (IsWindowViewable($win)) {
+                push @wins, $win;
+            }
+        }
+        if (@wins) {
+            return(@wins);
+        }
+
+        my $remaining = $end_time - Time::HiRes::time();
+        last if $remaining <= 0;
+
+        # Avoid bogging down the system, but don't oversleep the requested
+        # timeout (fractional seconds are supported).
+        my $delay = $remaining < 1 ? $remaining : 1;
+        select(undef, undef, undef, $delay);
+    }
+
+    # Nothing
+    return(@wins);
 }
 
 
@@ -468,7 +597,7 @@ Waits for the specified window to close.
 One can optionally specify an alternative wait amount in seconds. The
 window will keep being checked to see if it has closed until this amount
 of time has been reached.  The default amount is defined in the DEF_WAIT
-constant available through the :CONST export tag.
+constant available through the \:CONST export tag.
 
 zero is returned if window is not gone, non-zero if it is gone.
 
@@ -477,23 +606,30 @@ zero is returned if window is not gone, non-zero if it is gone.
 =cut
 
 sub WaitWindowClose {
-	my $win = shift;
-	my $wait = shift || DEF_WAIT;
+    my $win = shift;
+    my $wait = shift;
+    $wait = DEF_WAIT unless defined $wait;
 
-	# For each second we $wait, check window Id
-	# twice (2 lookups * 500ms = ~1 second).
-	for (my $i = 0; $i < ($wait * 2); $i++) {
-		if (not IsWindow($win)) {
-			# Success, window isn't recognized
-			return(1);
-		}
-		# Wait 500 ms in order not to bog down the system.  If one
-		# changes this, the ($wait * 2) above will want to be changed
-		# in order to represent seconds correctly.
-		select(undef, undef, undef, 0.50);
-	}
-	# Failure
-	return(0);
+    require Time::HiRes;
+    my $end_time = Time::HiRes::time() + $wait;
+
+    while (1) {
+        if (not IsWindow($win)) {
+            # Success, window isn't recognized
+            return(1);
+        }
+
+        my $remaining = $end_time - Time::HiRes::time();
+        last if $remaining <= 0;
+
+        # Check approximately twice per second, without exceeding the
+        # requested timeout.
+        my $delay = $remaining < 0.50 ? $remaining : 0.50;
+        select(undef, undef, undef, $delay);
+    }
+
+    # Failure
+    return(0);
 }
 
 =over 8
@@ -510,7 +646,7 @@ Pauses execution for the specified amount of seconds.
 =cut
 
 sub WaitSeconds {
-	select(undef, undef, undef, shift);
+    select(undef, undef, undef, shift);
 }
 
 =over 8
@@ -526,7 +662,7 @@ parameters one can specify a different position to be clicked on.
 One can also specify an alternative button.  The default button is
 M_LEFT, but M_MIDDLE and M_RIGHT may be specified too.  Also,
 you could use the logical Id for the button: M_BTN1, M_BTN2, M_BTN3,
-M_BTN4, M_BTN5.  These are all available through the :CONST export
+M_BTN4, M_BTN5.  These are all available through the \:CONST export
 tag.
 
 zero is returned on failure, non-zero for success
@@ -536,28 +672,28 @@ zero is returned on failure, non-zero for success
 =cut
 
 sub ClickWindow {
-	my $win = shift;
-	my $x_offset = shift || 0;
-	my $y_offset = shift || 0;
-	my $button = shift || M_LEFT;
+    my $win = shift;
+    my $x_offset = shift || 0;
+    my $y_offset = shift || 0;
+    my $button = shift || M_LEFT;
 
-	my ($x, $y, $scr);
-	($x, $y, undef, undef, undef, $scr) = GetWindowPos($win);
-	if (!defined($x) or !defined($y)) {
-		return(0);
-	}
-	if (!MoveMouseAbs($x + $x_offset, $y + $y_offset, $scr)) {
-		return(0);
-	}
-	if (!ClickMouseButton($button)) {
-		return(0);
-	}
-	return(1);
+    my ($x, $y, $scr);
+    ($x, $y, undef, undef, undef, $scr) = GetWindowPos($win);
+    if (!defined($x) or !defined($y)) {
+        return(0);
+    }
+    if (!MoveMouseAbs($x + $x_offset, $y + $y_offset, $scr)) {
+        return(0);
+    }
+    if (!ClickMouseButton($button)) {
+        return(0);
+    }
+    return(1);
 }
 
 =over 8
 
-=item GetWindowsFromPid 
+=item GetWindowsFromPid PID
 
 Returns a list of window ids discovered for the specified process id (pid).
 
@@ -568,21 +704,21 @@ undef is returned on error.
 =cut
 
 sub GetWindowsFromPid {
-	my $pid = shift;
-	my @wins = ();
+    my $pid = shift;
+    my @wins = ();
 
-	if ($pid <= 0) {
-		return(undef);
-	}
+    if (!defined($pid) || $pid !~ /^\d+$/ || $pid <= 0) {
+        return(undef);
+    }
 
-	my @all_wins = FindWindowLike('.*');
-	foreach my $aw (@all_wins) {
-		my $aw_pid = GetWindowPid($aw);
-		if ($aw_pid == $pid) {
-			push @wins, $aw;
-		}
-	}
-	return(@wins);
+    my @all_wins = FindWindowLike('.*');
+    foreach my $aw (@all_wins) {
+        my $aw_pid = GetWindowPid($aw);
+        if ($aw_pid == $pid) {
+            push @wins, $aw;
+        }
+    }
+    return(@wins);
 }
 
 =over 8
@@ -599,31 +735,31 @@ zero is returned if there are no matches (i.e., off screen).
 =cut
 
 sub GetWindowFromPoint {
-	my $x = shift;
-	my $y = shift;
-	my $scr = shift;
-	my $lastmatch = 0;
+    my $x = shift;
+    my $y = shift;
+    my $scr = shift;
+    my $lastmatch = 0;
 
-	if ( ! defined $scr) {
-		$scr = DefaultScreen();
-	}
+    if ( ! defined $scr) {
+        $scr = DefaultScreen();
+    }
 
-	# Note: Windows are returned in current stacking order, therefore
-	# the last match should be the top-most window.
-	foreach my $win ( GetChildWindows(GetRootWindow($scr)) ) {
-		my ($w_x1, $w_y1, $w_w, $w_h, $w_b) = GetWindowPos($win);
-		# Is window position invalid?
-		if (!defined $w_x1) {
-			next;
-		}
-		my $w_x2 = ($w_x1 + $w_w + ($w_b << 1));
-		my $w_y2 = ($w_y1 + $w_h + ($w_b << 1));
-		# Does window match our point?
-		if ($x >= $w_x1 && $x < $w_x2 && $y >= $w_y1 && $y < $w_y2) {
-			$lastmatch = $win;
-		}
-	}
-	return($lastmatch);
+    # Note: Windows are returned in current stacking order, therefore
+    # the last match should be the top-most window.
+    foreach my $win ( GetChildWindows(GetRootWindow($scr)) ) {
+        my ($w_x1, $w_y1, $w_w, $w_h, $w_b) = GetWindowPos($win);
+        # Is window position invalid?
+        if (!defined $w_x1) {
+            next;
+        }
+        my $w_x2 = ($w_x1 + $w_w + ($w_b << 1));
+        my $w_y2 = ($w_y1 + $w_h + ($w_b << 1));
+        # Does window match our point?
+        if ($x >= $w_x1 && $x < $w_x2 && $y >= $w_y1 && $y < $w_y2) {
+            $lastmatch = $win;
+        }
+    }
+    return($lastmatch);
 }
 
 
@@ -641,15 +777,15 @@ zero is returned for false, non-zero for true.
 =cut
 
 sub IsChild {
-	my $parent = shift;
-	my $win = shift;
+    my $parent = shift;
+    my $win = shift;
 
-	foreach my $child ( GetChildWindows($parent) ) {
-		if ($child == $win && $child != $parent) {
-			return(1);
-		}
-	}
-	return(0);
+    foreach my $child ( GetChildWindows($parent) ) {
+        if ($child == $win && $child != $parent) {
+            return(1);
+        }
+    }
+    return(0);
 }
 
 
@@ -677,51 +813,60 @@ this function.  Escape this character manually ("{&}"), if used/needed.
 =cut
 
 sub QuoteStringForSendKeys {
-	my $str = shift;
-	if (!defined($str)) {
-		return(undef);
-	}
+    my $str = shift;
+    if (!defined($str)) {
+        return(undef);
+    }
 
-	# Quote {} special characters (^, %, (, {, etc.)
-	$str =~ s/(\^|\%|\+|\~|\(|\)|\{|\})/\{$1\}/gm;
+    # Quote {} special characters (^, %, (, {, etc.)
+    $str =~ s/(\^|\%|\+|\~|\(|\)|\{|\})/\{$1\}/gm;
 
-	return($str);
+    return($str);
 }
 
 sub QSfSK {
-	return QuoteStringForSendKeys(shift);
+    return QuoteStringForSendKeys(shift);
 }
 
 =over 8
 
 =item StartApp COMMANDLINE
 
-Uses the shell to execute a program.  This function returns as
-soon as the program is called.  Useful for starting GUI
+Starts a program directly using exec.  This function returns after
+checking that the child process remains running.  Useful for starting GUI
 /applications and then going on to work with them.
 
 zero is returned on failure, non-zero for success
 
   StartApp('gedit');
 
+Environment variable assignments (e.g. GDK_BACKEND=x11, may be needed to
+force a GTK application through XWayland instead of native Wayland -- see
+DEPENDENCIES above) can be prefixed onto COMMANDLINE, provided the whole
+thing is passed as a single string:
+
+  StartApp('GDK_BACKEND=x11 gedit');   # Works.
+  StartApp('GDK_BACKEND=x11', 'gedit'); # Does NOT work.
+
 =back
 
 =cut
 
 sub StartApp {
-	my @cmd = @_;
-	my $pid = fork;
-	if ($pid) {
-		use POSIX qw(WNOHANG);
-		sleep 1;
-		waitpid($pid, WNOHANG) != $pid
-			and kill(0, $pid) == 1
-			and return $pid;
-	} elsif (defined $pid) {
-		use POSIX qw(_exit);
-		exec @cmd or _exit(1);
-	}
-	return;
+    my @cmd = @_;
+    my $pid = fork;
+    if ($pid) {
+        use POSIX qw(WNOHANG);
+        sleep 1;
+        waitpid($pid, WNOHANG) != $pid
+            and kill(0, $pid) == 1
+            and return $pid;
+    } elsif (defined $pid) {
+        use POSIX qw(_exit);
+        # Execute the supplied argument list directly; no shell is invoked.
+        exec @cmd or _exit(1);
+    }
+    return;
 }
 
 
@@ -741,8 +886,8 @@ to indicate a failure in starting the program.
 =cut
 
 sub RunApp {
-	my $cmdline = shift;
-	return( system($cmdline) );
+    my $cmdline = shift;
+    return( system($cmdline) );
 }
 
 
@@ -753,7 +898,7 @@ sub RunApp {
 Clicks the specified mouse button.  Available mouse buttons
 are: M_LEFT, M_MIDDLE, M_RIGHT, M_DOWN, M_UP.  Also, you could
 use the logical Id for the button: M_BTN1, M_BTN2, M_BTN3,
-M_BTN4, M_BTN5.  These are all available through the :CONST
+M_BTN4, M_BTN5.  These are all available through the \:CONST
 export tag.
 
 zero is returned on failure, non-zero for success.
@@ -763,31 +908,31 @@ zero is returned on failure, non-zero for success.
 =cut
 
 sub ClickMouseButton {
-	my $button = shift;
+    my $button = shift;
 
-	if (!PressMouseButton($button) ||
-		!ReleaseMouseButton($button)) {
-		return(0);
-	}
-	return(1);
+    if (!PressMouseButton($button) ||
+        !ReleaseMouseButton($button)) {
+        return(0);
+    }
+    return(1);
 }
 
 # Subroutine: INIT
 # Description: Used to initialize the underlying mechanisms
-#			   that this package utilizes.
+#              that this package utilizes.
 # Note: Perl idiom not to return values for this subroutine.
 sub INIT {
-	if (!defined($ENV{'AUTOMATED_TESTING'}) || $ENV{'AUTOMATED_TESTING'} ne 1) {
-		InitGUITest();
-	}
+    if (!defined($ENV{'AUTOMATED_TESTING'}) || $ENV{'AUTOMATED_TESTING'} ne 1) {
+        InitGUITest();
+    }
 }
 
 # Subroutine: END
 # Description: Used to deinitialize the underlying mechanisms
-#			   that this package utilizes.
+#              that this package utilizes.
 # Note: Perl idiom not to return values for this subroutine.
 sub END {
-	DeInitGUITest();
+    DeInitGUITest();
 }
 
 =over 8
@@ -961,7 +1106,7 @@ cursor.
 Presses the specified mouse button.  Available mouse buttons
 are: M_LEFT, M_MIDDLE, M_RIGHT, M_DOWN, M_UP.  Also, you could
 use the logical Id for the button: M_BTN1, M_BTN2, M_BTN3, M_BTN4,
-M_BTN5.  These are all available through the :CONST export tag.
+M_BTN5.  These are all available through the \:CONST export tag.
 
 zero is returned on failure, non-zero for success.
 
@@ -976,7 +1121,7 @@ zero is returned on failure, non-zero for success.
 Releases the specified mouse button.  Available mouse buttons
 are: M_LEFT, M_MIDDLE, M_RIGHT, M_DOWN, M_UP.  Also, you could
 use the logical Id for the button: M_BTN1, M_BTN2, M_BTN3, M_BTN4,
-M_BTN5.  These are all available through the :CONST export tag.
+M_BTN5.  These are all available through the \:CONST export tag.
 
 zero is returned on failure, non-zero for success.
 
@@ -994,16 +1139,16 @@ The keystrokes to send are those specified in KEYS parameter.  Some characters
 have special meaning, they are:
 
         Modifier Keys:
-        ^    	CTRL
-        %    	ALT
-        +    	SHIFT
+        ^       CTRL
+        %       ALT
+        +       SHIFT
         #       META
         &       ALTGR
 
         Other Keys:
-        ~    	ENTER
-        \n   	ENTER
-        \t  	TAB
+        ~       ENTER
+        \n      ENTER
+        \t      TAB
         ( and ) MODIFIER GROUPING
         { and } QUOTE / ESCAPE CHARACTERS
 
@@ -1201,7 +1346,7 @@ Determines if the specified mouse button is currently being pressed.
 
 Available mouse buttons are: M_LEFT, M_MIDDLE, M_RIGHT.  Also, you
 could use the logical Id for the button: M_BTN1, M_BTN2, M_BTN3,
-M_BTN4, M_BTN5.  These are all available through the :CONST export
+M_BTN4, M_BTN5.  These are all available through the \:CONST export
 tag.
 
   if (IsMouseButtonPressed(M_LEFT)) { # Is left button pressed?
@@ -1237,94 +1382,94 @@ isn't viewable.  non-zero is returned if the window is viewable.
 
 =over 8
 
-=item IsWindowCursor WINDOWID CURSOR
+=item IsWindowCursor WINDOWID, CURSOR
 
 Determines if the specified window has the specified cursor.
 
 zero is returned for false, non-zero for true.
 
-The following cursors are available through the :CONST export tag.
+The following cursors are available through the \:CONST export tag.
 
     Name
     -------------------
-	XC_NUM_GLYPHS
-	XC_X_CURSOR
-	XC_ARROW
-	XC_BASED_ARROW_DOWN
-	XC_BASED_ARROW_UP
-	XC_BOAT
-	XC_BOGOSITY
-	XC_BOTTOM_LEFT_CORNER
-	XC_BOTTOM_RIGHT_CORNER
-	XC_BOTTOM_SIDE
-	XC_BOTTOM_TEE
-	XC_BOX_SPIRAL
-	XC_CENTER_PTR
-	XC_CIRCLE
-	XC_CLOCK
-	XC_COFFEE_MUG
-	XC_CROSS
-	XC_CROSS_REVERSE
-	XC_CROSSHAIR
-	XC_DIAMOND_CROSS
-	XC_DOT
-	XC_DOTBOX
-	XC_DOUBLE_ARROW
-	XC_DRAFT_LARGE
-	XC_DRAFT_SMALL
-	XC_DRAPED_BOX
-	XC_EXCHANGE
-	XC_FLEUR
-	XC_GOBBLER
-	XC_GUMBY
-	XC_HAND1
-	XC_HAND2
-	XC_HEART
-	XC_ICON
-	XC_IRON_CROSS
-	XC_LEFT_PTR
-	XC_LEFT_SIDE
-	XC_LEFT_TEE
-	XC_LEFTBUTTON
-	XC_LL_ANGLE
-	XC_LR_ANGLE
-	XC_MAN
-	XC_MIDDLEBUTTON
-	XC_MOUSE
-	XC_PENCIL
-	XC_PIRATE
-	XC_PLUS
-	XC_QUESTION_ARROW
-	XC_RIGHT_PTR
-	XC_RIGHT_SIDE
-	XC_RIGHT_TEE
-	XC_RIGHTBUTTON
-	XC_RTL_LOGO
-	XC_SAILBOAT
-	XC_SB_DOWN_ARROW
-	XC_SB_H_DOUBLE_ARROW
-	XC_SB_LEFT_ARROW
-	XC_SB_RIGHT_ARROW
-	XC_SB_UP_ARROW
-	XC_SB_V_DOUBLE_ARROW
-	XC_SHUTTLE
-	XC_SIZING
-	XC_SPIDER
-	XC_SPRAYCAN
-	XC_STAR
-	XC_TARGET
-	XC_TCROSS
-	XC_TOP_LEFT_ARROW
-	XC_TOP_LEFT_CORNER
-	XC_TOP_RIGHT_CORNER
-	XC_TOP_SIDE
-	XC_TOP_TEE
-	XC_TREK
-	XC_UL_ANGLE
-	XC_UMBRELLA
-	XC_UR_ANGLE
-	XC_WATCH
-	XC_XTERM
+    XC_NUM_GLYPHS
+    XC_X_CURSOR
+    XC_ARROW
+    XC_BASED_ARROW_DOWN
+    XC_BASED_ARROW_UP
+    XC_BOAT
+    XC_BOGOSITY
+    XC_BOTTOM_LEFT_CORNER
+    XC_BOTTOM_RIGHT_CORNER
+    XC_BOTTOM_SIDE
+    XC_BOTTOM_TEE
+    XC_BOX_SPIRAL
+    XC_CENTER_PTR
+    XC_CIRCLE
+    XC_CLOCK
+    XC_COFFEE_MUG
+    XC_CROSS
+    XC_CROSS_REVERSE
+    XC_CROSSHAIR
+    XC_DIAMOND_CROSS
+    XC_DOT
+    XC_DOTBOX
+    XC_DOUBLE_ARROW
+    XC_DRAFT_LARGE
+    XC_DRAFT_SMALL
+    XC_DRAPED_BOX
+    XC_EXCHANGE
+    XC_FLEUR
+    XC_GOBBLER
+    XC_GUMBY
+    XC_HAND1
+    XC_HAND2
+    XC_HEART
+    XC_ICON
+    XC_IRON_CROSS
+    XC_LEFT_PTR
+    XC_LEFT_SIDE
+    XC_LEFT_TEE
+    XC_LEFTBUTTON
+    XC_LL_ANGLE
+    XC_LR_ANGLE
+    XC_MAN
+    XC_MIDDLEBUTTON
+    XC_MOUSE
+    XC_PENCIL
+    XC_PIRATE
+    XC_PLUS
+    XC_QUESTION_ARROW
+    XC_RIGHT_PTR
+    XC_RIGHT_SIDE
+    XC_RIGHT_TEE
+    XC_RIGHTBUTTON
+    XC_RTL_LOGO
+    XC_SAILBOAT
+    XC_SB_DOWN_ARROW
+    XC_SB_H_DOUBLE_ARROW
+    XC_SB_LEFT_ARROW
+    XC_SB_RIGHT_ARROW
+    XC_SB_UP_ARROW
+    XC_SB_V_DOUBLE_ARROW
+    XC_SHUTTLE
+    XC_SIZING
+    XC_SPIDER
+    XC_SPRAYCAN
+    XC_STAR
+    XC_TARGET
+    XC_TCROSS
+    XC_TOP_LEFT_ARROW
+    XC_TOP_LEFT_CORNER
+    XC_TOP_RIGHT_CORNER
+    XC_TOP_SIDE
+    XC_TOP_TEE
+    XC_TREK
+    XC_UL_ANGLE
+    XC_UMBRELLA
+    XC_UR_ANGLE
+    XC_WATCH
+    XC_XTERM
 
 =back
 
@@ -1488,20 +1633,22 @@ returned list will be empty.
 
 =begin html
 
+<p>
 <a href='../Changes'>Module Changes</a><br>
 <a href='CodingStyle'>Coding-Style Guidelines</a><br>
 <a href='../ToDo'>ToDo List</a><br>
 <a href='Copying'>Copy of the GPL License</a><br>
+</p>
 
 =end html
 
 
 =begin text
- 
+
   Available under the docs sub-directory.
     CodingStyle (Coding-Style Guidelines)
     Copying (Copy of the GPL License)
- 
+
 =end text
 
 =begin man
@@ -1513,7 +1660,7 @@ Not installed.
 
 =head1 COPYRIGHT
 
-Copyright(c) 2003-2014 Dennis K. Paulsen, All Rights Reserved.  This
+Copyright(c) 2003-2026 Dennis K. Paulsen, All Rights Reserved.  This
 program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License.
 

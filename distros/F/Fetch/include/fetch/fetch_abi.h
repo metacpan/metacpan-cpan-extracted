@@ -8,6 +8,14 @@
  * header at a pinned FETCH_ABI_VERSION and checks abi_version at boot; a
  * mismatch means "fall back", never a crash.
  *
+ * The table only ever grows at the end; FETCH_ABI_VERSION bumps on any
+ * append, and a consumer requires abi_version >= the version it was written
+ * against. NOT ==. An equality check makes every release of this dist a
+ * breaking change for everything that consumes it: Reverse::Proxy 0.04 used
+ * one, and when 0.14 shipped ABI 2 - a single appended member, with every
+ * earlier field at its original offset - the dist stopped loading on every
+ * platform and perl it was tested on.
+ *
  * Perl headers (EXTERN.h / perl.h / XSUB.h) must be included before this file
  * so SV, AV, HV, STRLEN and pTHX are defined. */
 

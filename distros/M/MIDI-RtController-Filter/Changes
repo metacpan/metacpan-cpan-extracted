@@ -1,5 +1,8 @@
 Revision history for MIDI-RtController-Filter
 
+0.0104 2026-08-20 11:17:00
+  - Clean-up code a bit.
+
 0.0102 2025-04-27 13:45:32
   - Improve documentation.
 

@@ -1,0 +1,89 @@
+<html>
+  <head>
+	<title><: $title :></title>
+ 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <link rel = 'stylesheet' type = 'text/css' href = '/assets/css/local/website/default.css' />
+  </head>
+  <body>
+
+	<div class = 'page_title'><: $title :></div>
+	<h1 align = 'center'>Scientific name: <: $scientific_name :></h1>
+	<h1 align = 'center'>Common name: <: $common_name :></h1>
+	<h1 align = 'center'><: $aliases :></h1>
+
+	<h2 align = 'center'>Attributes</h1>
+	<table align = 'center' summary = 'Table for plant attributes'>
+	<tr><td>
+		<div class = 'simple_border'>
+			:include 'individual.table.tx' {row => $attributes, table_id => 'Attributes'};
+		</div>
+	</td></tr></table>
+
+	<br>
+
+	:if ($height != '-') && ($width != '-') {
+	<h2 align = 'center'>Size</h1>
+	<table align = 'center' summary = 'Table for plant sizes'>
+	<tr>
+		<td>
+			<div class = 'simple_border'>
+				Height x width: <: $height :> x <: $width :>
+			</div>
+		</td>
+	</tr></table>
+
+	<br>
+	: }
+
+	<table align = 'center' summary = 'Table for flower images'>
+	<h2 align = 'center'>Images</h1>
+	<tr><td>
+		<div class = 'simple_border'>
+			:include 'individual.table.tx' {row => $images, table_id => 'Images'};
+		</div>
+	</td></tr></table>
+
+	<br>
+
+	:if $link_count >= 1 {
+	<h2 align = 'center'>Flowers with similar scientific names</h1>
+	<table align = 'center' summary = 'Table for auto-linked flowers'>
+	<tr><td>
+		<div class = 'simple_border'>
+			:include 'individual.table.tx' {row => $links, table_id => 'Auto-linked flowers'};
+		</div>
+	</td></tr></table>
+
+	<br>
+	: }
+
+	: if $note_count >= 1 {
+	<h2 align = 'center'>Notes</h1>
+	<table align = 'center' summary = 'Table for flower notes'>
+	<tr><td>
+		<div class = 'simple_border'>
+			:include 'individual.table.tx' {row => $notes, table_id => 'Notes'};
+		</div>
+	</td></tr></table>
+
+	<br>
+	: }
+
+	: if $url_count >= 1 {
+	<h2 align = 'center'>URLs</h1>
+	<table align = 'center' summary = 'Table for flower urls'>
+	<tr><td>
+		<div class = 'simple_border'>
+			:include 'individual.table.tx' {row => $urls, table_id => 'URLs'};
+		</div>
+	</td></tr></table>
+
+	<br />
+	: }
+
+	<hr>
+	<p align = 'center'>Return to <a href = '/Flowers.html'>index page</a></p>
+
+  </body>
+</html>
+

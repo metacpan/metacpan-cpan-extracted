@@ -1,9 +1,9 @@
 This archive contains the distribution MIDI-RtController,
-version 0.0804:
+version 0.0806:
 
   Control your MIDI controller
 
-This software is copyright (c) 2025 by Gene Boggs.
+This software is copyright (c) 2025-2026 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

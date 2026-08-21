@@ -1,5 +1,8 @@
 Revision history for Punk-OAuth2
 
+0.05    2026-08-20
+        - FIX: change abi version checks from == to <=
+
 0.04    2026-08-18
         - SECURITY fix CVE-2026-75866: the authorization server issued access tokens outside
           a client's registration, reported by cpansec. 

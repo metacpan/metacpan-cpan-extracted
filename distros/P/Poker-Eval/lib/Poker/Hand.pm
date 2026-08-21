@@ -1,4 +1,7 @@
 package Poker::Hand;
+
+our $VERSION = '0.11';
+
 use Moo;
 
 =head1 NAME
@@ -7,15 +10,15 @@ Poker::Hand - Simple class to represent a poker hand.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
-This class is used internally by Poker::Eval.  You probably don't want to use it directly. 
+This class is used internally by Poker::Eval and Poker::Game.
+You probably don't want to use it directly. 
 
 =cut
 
@@ -60,7 +63,7 @@ has 'wins' => (
 
 =head2 score
 
-Numerical score of best combination 
+Numerical score of best combination (high direction)
 
 =cut
 
@@ -76,11 +79,25 @@ has 'temp_score' => (
 
 =head2 name
 
-english name of best combination 
+English name of best high combination 
 
 =cut
 
 has 'name' => ( is => 'rw', );
+
+=head2 low_score / low_name / low_combo
+
+Optional low-direction result for split-pot games (e.g. Omaha Hi-Lo).
+Undefined when the hand does not qualify for low.
+
+=cut
+
+has 'low_score' => ( is => 'rw' );
+has 'low_name'  => ( is => 'rw' );
+has 'low_combo' => (
+  is      => 'rw',
+  default => sub { [] },
+);
 
 =head2 ev
 

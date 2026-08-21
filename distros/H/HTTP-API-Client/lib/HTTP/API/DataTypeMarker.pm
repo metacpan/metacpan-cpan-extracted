@@ -1,5 +1,5 @@
 package HTTP::API::DataTypeMarker;
-$HTTP::API::DataTypeMarker::VERSION = '1.24';
+$HTTP::API::DataTypeMarker::VERSION = '1.26';
 =head1 NAME
 
 HTTP::API::DataTypeMarker - mark request data so it serializes as a specific

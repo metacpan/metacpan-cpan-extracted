@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
     "bin/pdf-lbr-remove-pdf",
     "bin/pdf-lbr-replace-pdf"
   ],
-  "LICENSE" => "gpl",
+  "LICENSE" => "open_source",
   "NAME" => "App::PDFLibrarian",
   "PREREQ_PM" => {
     "Capture::Tiny" => "0.48",
@@ -74,7 +74,7 @@ my %WriteMakefileArgs = (
     "XML::LibXML" => "2.0134",
     "XML::LibXSLT" => "2.002001"
   },
-  "VERSION" => "6.2.0",
+  "VERSION" => "6.2.3",
   "test" => {
     "TESTS" => ""
   }

@@ -4,7 +4,7 @@ use v5.38;
 use experimental qw/class try for_list/;
 use version;
 
-our $VERSION   = qv('v1.1.0');
+our $VERSION   = qv('v1.2.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Future::AsyncAwait;
@@ -672,7 +672,7 @@ PAGI::FastAPI - Asynchronous, Type-Safe Micro-Framework with Dependency Injectio
 
 =head1 VERSION
 
-Version v1.1.0
+Version v1.2.4
 
 =head1 SYNOPSIS
 
@@ -876,6 +876,36 @@ C<< $c->csrf_verify >>, for form and session-based CSRF defence.
 =item * B<Async Message Queue Facade:> L<PAGI::FastAPI::Queue> offers a
 pluggable, topic-based C<push>/C<pop>/C<size> queue for use as an ordinary
 dependency via C<< $queue->dep >>.
+
+=item * B<Typed Path Parameters:> C<TypedPath()> from
+L<PAGI::FastAPI::TypedPath> validates and (optionally) coerces path
+parameters via L<Type::Tiny>, the same way C<query>/C<body> already are,
+through the existing C<Depends()> mechanism, automatically returning
+C<HTTP 422> for a non-matching path segment instead of handing your handler
+an unchecked string.
+
+=item * B<Response Shape Filtering:> C<with_response_model()> from
+L<PAGI::FastAPI::ResponseModel> validates a handler's return value against
+a declared L<Type::Tiny> schema and, for a HashRef-of-fields schema, filters
+the output to just the declared fields, so an accidental extra column
+from a database row (e.g. a password hash) doesn't leak to the client.
+
+=item * B<Typed Exception Dispatch:> L<PAGI::FastAPI::Middleware::ExceptionHandler>
+routes a C<die>-thrown exception to a handler registered for its class,
+with a configurable fallback, for the case where an exception escapes a
+handler rather than following the C<< $c->status(...) >>-and-return
+convention described in L</ERROR HANDLING>.
+
+=item * B<Redirect & File Responses:> L<PAGI::FastAPI::Response::Redirect>
+(C<redirect_to()>) and L<PAGI::FastAPI::Response::File> (C<file_response()>)
+extend the base L<PAGI::FastAPI::Response> contract for HTTP redirects and
+file-download responses, with automatic content-type guessing and
+C<Content-Disposition> handling for the latter.
+
+=item * B<Cookie Parsing:> L<PAGI::FastAPI::Cookies> parses the request
+C<Cookie> header into a plain HashRef (C<parse_cookies()>, C<cookie()>).
+Setting response cookies needs no extra module, C<< $c->add_header('set-cookie' => ...) >>
+already works.
 
 =back
 
@@ -1230,6 +1260,15 @@ with a JSON body:
 
 Unmatched routes return C<HTTP 404 Not Found> with C<{"detail": "Not Found"}>.
 
+The two cases above, and a dependency's own C<< $c->status(...) >>-and-return
+convention (see L</AUTHENTICATION AND SECURITY>), cover I<expected> failure
+paths. For the separate case of an actual Perl exception (C<die>) escaping
+a handler or dependency, e.g. from a database layer or a third-party
+module you're calling into, see
+L<PAGI::FastAPI::Middleware::ExceptionHandler>, which lets you register a
+handler per exception class via C<add_middleware>, with a configurable
+fallback for anything unregistered.
+
 =head1 EVENT LOOPS: FUTURE::IO IS THE GOAL, IO::ASYNC IS AN IMPLEMENTATION DETAIL
 
 The PAGI protocol is deliberately silent on which event loop drives it,
@@ -1456,6 +1495,18 @@ the full documentation and an end-to-end JWT-verification example.
 
 =item * L<PAGI::FastAPI::Queue::Driver>, L<PAGI::FastAPI::Queue::Driver::Memory> - Pluggable queue storage drivers.
 
+=item * L<PAGI::FastAPI::TypedPath> - Path parameter validation/coercion via C<Depends()>.
+
+=item * L<PAGI::FastAPI::ResponseModel> - Response shape validation and field filtering.
+
+=item * L<PAGI::FastAPI::Middleware::ExceptionHandler> - Typed exception-to-handler dispatch.
+
+=item * L<PAGI::FastAPI::Response::Redirect> - HTTP redirect responses.
+
+=item * L<PAGI::FastAPI::Response::File> - File-download responses.
+
+=item * L<PAGI::FastAPI::Cookies> - Request cookie parsing.
+
 =back
 
 =head1 AUTHOR
@@ -1485,10 +1536,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/PAGI-FastAPI/issues>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/PAGI-FastAPI>
 
 =item * Search MetaCPAN
 

@@ -15,6 +15,7 @@ my @PROVIDERS = (
     [ 'Markdown::Simple'  => '../Markdown-Simple/include'   ],  # mds_abi.h
     [ 'Search::Trigram'   => '../Search-Trigram/include'    ],  # sg_abi.h
     [ 'DBIx::Loop'        => '../DBIx-Loop/include'         ],  # dbil_abi.h
+    [ 'Apophis'           => '../Apophis/include'           ],  # ap_abi.h
 );
 my $INC = '-Iinclude';
 my $pkg;
@@ -114,8 +115,9 @@ my %WriteMakefileArgs = (
         'File::Raw::JSON'     => '0.06',   # provides frj_abi.h
         'JSON::Schema::Fast'  => '0.05',   # provides jsf_abi.h
         'Open::API'           => '0.09',   # provides oa_abi.h
+        'Apophis'             => '0.05',   # provides ap_abi.h
         'Template::Stencil'   => '0.05',   # provides st_abi.h
-        'Hyperman'            => '0.18',   # provides hm_abi.h (v3: rate limit)
+        'Hyperman'            => '0.32',   # provides hm_abi.h (v3: rate limit)
         'Markdown::Simple'    => '0.21',   # provides mds_abi.h
         'Search::Trigram'     => '0.03',   # provides sg_abi.h
         'DBIx::Loop'          => '0.03',   # provides dbil_abi.h
@@ -131,7 +133,7 @@ my %WriteMakefileArgs = (
         'JSON::Schema::Fast'   => '0.05',   # schema field validation
         'YAML::XS'             => '0',      # Punk::Config; every scaffolded
                                             # app carries a config/punk.yml
-        'Hyperman'             => '0.18',   # the native server; hm_abi.h's
+        'Hyperman'             => '0.32',   # the native server; hm_abi.h's
                                             # detach ABI is what websocket
                                             # routes attach through, and v3
                                             # is the rate-limit / denylist arena
@@ -139,6 +141,12 @@ my %WriteMakefileArgs = (
                                             # whose heading anchors and TOC
                                             # the docs shell is built on
         'Search::Trigram'      => '0.03',   # markdown search; sg_abi.h
+        'Apophis'              => '0.05',   # Punk::Plugin::Blob's store:
+                                            # content-addressed uploads, so
+                                            # a user's filename never becomes
+                                            # a filesystem path. 0.05 is the
+                                            # first with ap_abi.h, which the
+                                            # plugin needs at boot
         'DBIx::Loop'           => '0.03',   # Punk::Model::DBIx::Loop, the
                                             # async model backend; dbil_abi.h
     },

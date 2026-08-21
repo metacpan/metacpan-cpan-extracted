@@ -6,7 +6,7 @@ use warnings;
 use Carp ();
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 my %STATE;
 
@@ -312,15 +312,15 @@ Punk::Plugin::OpenTelemetry - OpenTelemetry for a Punk application
     use Punk;
     use Punk::Plugin::OpenTelemetry;
 
-    plugin 'OpenTelemetry';
-
     otel service_name => 'checkout',
          endpoint     => 'http://collector:4318';
+
+    plugin 'OpenTelemetry';
 
     get '/orders/:id' => sub {
         my ($c) = @_;
         $c->otel;                     # the tracer
-        $c->render(json => { ok => 1 });
+        $c->json({ ok => 1 });
     };
 
 Or entirely from the environment, with no code at all:
@@ -365,6 +365,19 @@ would sit between the C<punk.yml> block and the environment.
       endpoint: http://collector:4318
       sampler: traceidratio
       sampler_arg: 0.05
+
+=head2 With no endpoint, nothing is exported
+
+There is B<no default endpoint>. Set none and the SDK builds, instruments the
+request path, records spans and then has nowhere to send them - so they are
+dropped. It does not fall back to C<http://localhost:4318>.
+
+This is worth stating plainly because other SDKs do default to that address,
+and because the failure is silent: the application works, the boot line says
+C<enabled>, and no telemetry ever arrives. If you have configured everything
+else and are seeing nothing, check the endpoint first.
+
+    OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318      # a local collector
 
 =head2 The environment
 
@@ -420,8 +433,14 @@ come out wrong by a factor of however many workers are running.
 =head2 otel %opt
 
 Records configuration. Declaring it more than once merges, so a base class can
-set the service name and a subclass add the endpoint. Called with no arguments
-after the plugin is registered, it returns the tracer.
+set the service name and a subclass add the endpoint. It may be called before
+or after C<plugin 'OpenTelemetry'>, since the keyword is installed by C<use>.
+
+Called with no arguments it returns the tracer - but only once the application
+has been built, because that is when the configuration is resolved and the
+tracer constructed. Before C<to_app> it returns C<undef>. In a route handler
+it is always there; at application-body scope it is not, and C<< $c->otel >>
+is the accessor to reach for anyway.
 
 =head1 HELPERS
 

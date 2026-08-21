@@ -142,7 +142,33 @@ broadcast(self, message, except = &PL_sv_undef)
         frame = count > 0 ? SvREFCNT_inc(POPs) : &PL_sv_undef;
         PUTBACK; FREETMPS; LEAVE;
         sv_2mortal(frame);
-        RETVAL = newSViv(pwr_fan(aTHX_ self, frame, except));
+
+        /* ACROSS THE POOL, when there is one.
+         *
+         * A room is per worker; under `workers => 4` a local-only broadcast
+         * reaches roughly a quarter of the people in it, succeeds, and returns
+         * a plausible number. So the frame goes on the bus instead, and every
+         * worker's subscriber - INCLUDING this one's - fans it to its members.
+         *
+         * ONE delivery path. Sending locally as well would send this worker's
+         * members the frame twice, and would leave two paths to drift apart,
+         * so a bug in the shared one would be invisible to anybody testing on
+         * a single worker.
+         *
+         * `except` is deliberately not honoured across the pool: it names a
+         * connection object, and a connection belongs to one worker. It still
+         * applies locally, which is where the sender actually is. */
+        {
+            SV **np = hv_fetchs(pwr_hv(aTHX_ self), "name", 0);
+            if (SvOK(except) || !np || !*np
+                || !punk_bus_room_publish(aTHX_ *np, frame))
+                RETVAL = newSViv(pwr_fan(aTHX_ self, frame, except));
+            else
+                /* what THIS worker delivered. The rest of the pool is served
+                 * from its own wakeup, and a total across processes is not
+                 * knowable here without waiting for it. */
+                RETVAL = newSViv(PUNK_BUS_LAST_FAN);
+        }
     }
     OUTPUT:
         RETVAL
@@ -185,3 +211,15 @@ clear(self)
         RETVAL = newSVsv(self);
     OUTPUT:
         RETVAL
+
+MODULE = Punk        PACKAGE = Punk
+
+# Register this process's bus subscriptions.
+#
+# compile() asks Hyperman to run this in every worker, which is where it
+# belongs. Exposed because a test - and anything driving Punk outside a real
+# server - has no worker hook to fire it. Idempotent.
+void
+_bus_attach()
+    CODE:
+        punk_bus_attach(aTHX);

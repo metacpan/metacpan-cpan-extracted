@@ -1,5 +1,25 @@
 Revision history for PAGI::FastAPI::Security
 
+v0.0.6  2026-08-20
+        [POD]
+        - Added pod for the method challenge_header() in PAGI::FastAPI::Security::Base.
+        - Fixed broken example in PAGI::FastAPI::Security::HTTPBearer.
+
+v0.0.5  2026-08-20
+        [IMPROVEMENTS]
+        - Added configurable 'realm' option to HTTPBearer and OAuth2::PasswordBearer
+          constructors (defaults to 'Restricted').
+        - Updated WWW-Authenticate header generation in HTTPBearer and HTTPBasic
+          to include the 'realm' parameter in compliance with RFC 9110 / RFC 6750.
+        - Updated test suite (t/01-http_bearer.t, t/04-oauth2_password_bearer.t)
+          to assert WWW-Authenticate realm headers.
+        - Added helper method challenge_header() in the following packages:
+          - PAGI::FastAPI::Security::Base
+          - PAGI::FastAPI::Security::HTTPBearer
+        - Updated requirement to PAGI::FastAPI v1.2.2.
+        [POD]
+        - Removed redundant CPAN Ratings link from the pod.
+
 0.0.4   2026-08-06
         [IMPROVEMENTS]
         - Upgraded requirement to PAGI::FastAPI v0.0.5.

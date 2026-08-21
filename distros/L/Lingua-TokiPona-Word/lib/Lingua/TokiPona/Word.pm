@@ -14,9 +14,10 @@ use warnings;
 use Carp;
 use Data::Identifier v0.34;
 use Data::Identifier::Generate;
-use Data::Displaycolour;
+use Data::Displaycolour v0.08;
+use Data::IconText v0.08;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 use parent qw(Data::Identifier::Interface::Known Lingua::Generic::Interface::Word);
 
@@ -52,6 +53,7 @@ __PACKAGE__->_new($_) foreach (
     qw(suke toma), # Typo
     qw(ete ewe kan ke kese kuntu likujo loka mulapisu neja pata peto polinpin pomotolo samu tuli umesu waleja), # nimi ku lili
     qw(ju lu nu u), # Reserved words
+    qw(kulu jaku), # others?
 );
 
 __PACKAGE__->new(string => $_)->{class}{stopword} = 1 foreach qw(a kin anu e en la li o pi seme);
@@ -62,17 +64,54 @@ my %_concepts = (
     laso    => 'abcbf48d-c302-4be1-8c5c-a8de4471bcbb', # cyan
     walo    => '1a2c23fa-2321-47ce-bf4f-5f08934502de', # white
     pimeja  => 'fade296d-c34f-4ded-abd5-d9adaf37c284', # black
+    esun    => '9799d7e4-7d10-4748-9e3a-103b524d1d02', # shop
+    wan     => 'bd27669b-201e-51ed-9eb8-774ba7fef7ad', # one
+    tu      => '73415b5a-31fb-5b5a-bb82-8ea5eb3b12f7', # two
+    tuli    => 'be6d8e00-a6c1-5c44-8ffc-f7393e14aa23', # three
+    po      => '79422b2c-b6f6-547f-949f-0cba44fa69b7', # four
+    san     => 'be6d8e00-a6c1-5c44-8ffc-f7393e14aa23', # three
+    neja    => '79422b2c-b6f6-547f-949f-0cba44fa69b7', # four
+    kulu    => '7b8a3c93-d28a-5747-b244-b50157b4d789', # six
+    likujo  => '96c2aa35-1f29-5360-996c-fab0956ad35d', # seven
+    jaku    => '14e0518a-488b-532c-9ac5-64900ff3d6ab', # hundred
+    telo    => '212419b2-af42-4eea-aac9-e923922672f4', # water
+    ma      => '3c2c155f-a4a0-49f3-bdaf-7f61d25c6b8c', # Earth
+    suno    => 'dd708015-0fdd-4543-9751-7da42d19bc6a', # Sun
+    mun     => '23026974-b92f-4820-80f6-c12f4dd22fca', # Luna
+    jan     => 'dcf8f4f0-c15e-44bd-ad76-0d483079db16', # human
+    waso    => '8c8ef3ab-4b45-46a1-ad9a-17e597ff5c85', # bird
+    kala    => '15aa3baf-d079-4fa3-9610-dc977b376ba4', # fish
+    soweli  => [
+        '025c3607-9904-4929-af3f-991a75ae5877', # pet
+        '0510390c-9604-4362-b603-ea09e48de7b7', # animal
+        '838eede5-3f93-46a9-8e10-75165d10caa1', # cat
+        '252314f9-1467-48bf-80fd-f8b74036189f', # dog
+    ],
+    pipi    => [
+        '8359d502-528d-4ffb-ad07-58535c9f739a', # insect
+        'aa4fe62f-9252-44e8-8496-26ae9adcc26f', # spider
+    ],
 );
 
 foreach my $str (keys %_concepts) {
     my __PACKAGE__ $word = __PACKAGE__->new(string => $str);
     my Data::Identifier $word_id = $word->as('Data::Identifier')->register;
-    my Data::Identifier $concept = Data::Identifier->new(uuid => $_concepts{$str})->register;
+    my Data::Identifier $concept;
 
-    $_concepts{$str} = $concept;
+    if (ref $_concepts{$str}) {
+        # Array
+        $_ = Data::Identifier->new(uuid => $_)->register foreach @{$_concepts{$str}};
+        $concept = $_concepts{$str}[0];
+    } else {
+        # Single value
+        $concept = Data::Identifier->new(uuid => $_concepts{$str})->register;
+        $_concepts{$str} = $concept;
+    }
 
     $word->Data::Displaycolour::mark(for => $concept);
     $word_id->Data::Displaycolour::mark(for => $concept);
+    $word->Data::IconText::mark(for => $concept);
+    $word_id->Data::IconText::mark(for => $concept);
 }
 
 {
@@ -331,7 +370,7 @@ sub ucsur {
     croak 'Stray options passed' if scalar keys %opts;
 
     unless (defined $ucsur) {
-        return $opts{default} if exists $opts{default};
+        return $default if $has_default;
         croak 'No value found';
     }
 
@@ -393,6 +432,7 @@ sub concepts {
     my $concept = $_concepts{$self->as_string};
     croak 'Stray options passed' if scalar @opts;
     return () unless defined $concept;
+    return @{$concept} if ref($concept) eq 'ARRAY';
     return ($concept);
 }
 
@@ -482,7 +522,7 @@ Lingua::TokiPona::Word - module to interact with the words of Toki Pona
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

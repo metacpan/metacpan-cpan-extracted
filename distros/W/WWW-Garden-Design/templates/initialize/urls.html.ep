@@ -1,0 +1,33 @@
+<table align = 'center'>
+	<tr>
+		<td colspan = '2'><div class = 'blue_centered'>URLs</div><br /></td>
+	</tr>
+	<tr>
+		<td align = 'center'>Common name: </td><td><span id = 'url_common_name'></span></td>
+	</tr>
+	<tr>
+		<td align = 'center'>Scientific name: </td><td><span id = 'url_scientific_name'></span></td>
+	</tr>
+	<tr>
+		<td colspan = '2'><hr></td>
+	</tr>
+</table>
+
+<div id = 'urls_div'>
+	<table align = 'center'>
+		<thead>
+			<tr>
+				<th class = 'centered'>#</th>
+				<th>URL</th>
+			</tr>
+		</thead>
+		<tbody>
+			% for my $i (1 .. $$constants{max_url_count}) {
+			<tr>
+				<td class = 'centered'><%== $i %></td>
+				<td align = 'left'><input id = 'url_url_<%== $i %>' type = 'text' size = '100' maxlength = '255'></td>
+			</tr>
+			% }
+		</tbody>
+	</table>
+</div>

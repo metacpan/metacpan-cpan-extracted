@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
+use strict;
+use warnings;
 
-use v5.36;
 use MIDI::RtController ();
 
 my $output_name = shift || 'Trinity';

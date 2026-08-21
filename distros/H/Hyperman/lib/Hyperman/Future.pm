@@ -3,7 +3,7 @@ package Hyperman::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.32';
 
 # An external event loop may install an awaiter here so ->get/->await on a
 # pending future pumps it; inside a running Hyperman loop it is not needed.

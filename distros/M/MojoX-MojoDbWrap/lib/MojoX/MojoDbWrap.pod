@@ -12,7 +12,7 @@ MojoX::MojoDbWrap - Light wrapper around Mojo::Pg/SQLite/...
 
 =head1 VERSION
 
-This document describes MojoX::MojoDbWrap version 0.004.
+This document describes MojoX::MojoDbWrap version 0.006.
 
 =begin html
 
@@ -165,6 +165,24 @@ method).
 If available via L</migrations_for>, runs the migrations based on the
 specific class. C<$name> defaults to the string C<migrations>.
 
+=head2 insert
+
+   my $id = $wrap->insert($tablish, $data); # OR
+   my $id = $wrap->insert($tablish, $data, $opts);
+
+Insert a new record based on C<$data>, returning the identifier of that
+new record.
+
+C<$opts> is an optional hash that can contain options associated to keys
+C<select> (for searching the identifier using L</id_of>) and C<insert>
+(in case we need to insert a new record using C<$default>).
+
+Parameter C<$tablish> is the same as in L</id_of>; in particular, the
+newly inserted record is supposed to have an C<id> column by default,
+but you can pass an array reference with the first parameter as the
+table name and the second parameter as the identifier column name to
+change this.
+
 =head2 mdb
 
    my $mdb = $wrap->mdb;
@@ -265,17 +283,27 @@ L<Mojo::SQLite> are tried last, in ths order.
 Wrapper around C<< $wrap->mdb->db->select(@args) >>.
 
 
-=begin comment
-
 =head2 upsert
 
-   $wrap->upsert($table, $data, $opts);
+   $wrap->upsert($tablish, $data, $opts);
 
-Insert a new record, or update it if already present. Implemented as:
+Insert a new record, or update it if already present.
 
-   $self->db->insert($table, $data, { $opts->%*, on_conflict => $data });
+C<$tablish> is the same as L</id_of>, i.e. either a column name or an
+array reference with the table name and the identifier column name.
 
-=end comment
+The assumption is that there is a single column where the conflict in
+insertion can arise and that column name is passed as the value of key
+C<conflicting> in C<$opts>, like this:
+
+   $wrap->upsert($tablish, $data, { conflicting => 'name', ... });
+
+This will generate an C<on_conflict> option passed to L</insert>,
+setting all values I<except> the conflicting one. If you need a more
+nuanced I<upsert>, generate the C<on_conflict> option yourself and pass
+it in the C<$opts> (it's still suggested to call this method instead of
+L<insert> directly, so that you're explicit about your goal).
+
 
 =head1 BUGS AND LIMITATIONS
 

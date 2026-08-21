@@ -1,0 +1,39 @@
+# Default CI for a pure-Perl [@Author::GETTY] distribution.
+# Goes to .github/workflows/ci.yml in the dist repo.
+#
+# The repetitive Dist::Zilla mechanics (install dzil, authordeps,
+# listdeps --author, dzil test) live ONCE in the shared composite action below
+# — including the `--author` flag that installs author-test deps like Test::Pod.
+# Do NOT fake Test::Pod into the cpanfile's `on test`; the bundle's
+# [PodSyntaxTests] registers it as a develop prereq and the action installs it.
+#
+# Alien / XS dists: add your `apt-get`/`brew` system-library step(s) before the
+# action, and a second `share-build` job passing `install-type: share`.
+# See p5-alien-libgit2 for the full pattern.
+name: ci
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.36'
+          - '5.38'
+          - '5.40'
+    container:
+      image: perl:${{ matrix.perl-version }}-bookworm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: perl -V
+        run: perl -V
+      - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main

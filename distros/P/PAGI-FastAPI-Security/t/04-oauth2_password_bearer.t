@@ -28,7 +28,10 @@ subtest 'metadata accessors' => sub {
 };
 
 subtest 'token extraction (same wire format as HTTPBearer)' => sub {
-    my $oauth2 = PAGI::FastAPI::Security::OAuth2::PasswordBearer->new(token_url => '/token');
+    my $oauth2 = PAGI::FastAPI::Security::OAuth2::PasswordBearer->new(
+        token_url => '/token',
+        realm     => 'TestRealm',
+    );
     my $app = PAGI::FastAPI->new(title => 'OAuth2 Test');
     $app->get('/items',
         dependencies => [ $oauth2->depends(key => 'token') ],
@@ -37,7 +40,8 @@ subtest 'token extraction (same wire format as HTTPBearer)' => sub {
     my $pagi_app = $app->to_app;
 
     my ($status, $data) = run_request($pagi_app,
-        method => 'GET', path => '/items',
+        method  => 'GET',
+        path    => '/items',
         headers => [['Authorization', 'Bearer real-token-123']],
     );
     is $status, 200, 'valid Bearer header succeeds';
@@ -46,7 +50,7 @@ subtest 'token extraction (same wire format as HTTPBearer)' => sub {
     my ($status2, $data2, undef, $headers2) = run_request($pagi_app, method => 'GET', path => '/items');
     is $status2, 401, 'missing token is rejected with 401';
     my ($challenge) = map { $_->[1] } grep { lc($_->[0]) eq 'www-authenticate' } @$headers2;
-    is $challenge, 'Bearer', 'a WWW-Authenticate: Bearer challenge is sent, same as HTTPBearer';
+    is $challenge, 'Bearer realm="TestRealm"', 'a WWW-Authenticate: Bearer challenge with realm is sent';
 };
 
 done_testing;

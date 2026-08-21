@@ -51,6 +51,10 @@ WriteMakefile(
                 file    => 'lib/PAGI/FastAPI/Context.pm',
                 version => MM->parse_version('lib/PAGI/FastAPI/Context.pm'),
             },
+            'PAGI::FastAPI::Cookies' => {
+                file    => 'lib/PAGI/FastAPI/Cookies.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/Cookies.pm'),
+            },
             'PAGI::FastAPI::Depends' => {
                 file    => 'lib/PAGI/FastAPI/Depends.pm',
                 version => MM->parse_version('lib/PAGI/FastAPI/Depends.pm'),
@@ -59,9 +63,25 @@ WriteMakefile(
                 file    => 'lib/PAGI/FastAPI/Middleware/BotProtection.pm',
                 version => MM->parse_version('lib/PAGI/FastAPI/Middleware/BotProtection.pm'),
             },
+            'PAGI::FastAPI::Middleware::ExceptionHandler' => {
+                file    => 'lib/PAGI/FastAPI/Middleware/ExceptionHandler.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/Middleware/ExceptionHandler.pm'),
+            },
             'PAGI::FastAPI::Middleware::RateLimit' => {
                 file    => 'lib/PAGI/FastAPI/Middleware/RateLimit.pm',
                 version => MM->parse_version('lib/PAGI/FastAPI/Middleware/RateLimit.pm'),
+            },
+            'PAGI::FastAPI::Queue' => {
+                file    => 'lib/PAGI/FastAPI/Queue.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/Queue.pm'),
+            },
+            'PAGI::FastAPI::Queue::Driver' => {
+                file    => 'lib/PAGI/FastAPI/Queue/Driver.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/Queue/Driver.pm'),
+            },
+            'PAGI::FastAPI::Queue::Driver::Memory' => {
+                file    => 'lib/PAGI/FastAPI/Queue/Driver/Memory.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/Queue/Driver/Memory.pm'),
             },
             'PAGI::FastAPI::RateLimit::Driver' => {
                 file    => 'lib/PAGI/FastAPI/RateLimit/Driver.pm',
@@ -75,25 +95,29 @@ WriteMakefile(
                 file    => 'lib/PAGI/FastAPI/Response.pm',
                 version => MM->parse_version('lib/PAGI/FastAPI/Response.pm'),
             },
+            'PAGI::FastAPI::Response::File' => {
+                file    => 'lib/PAGI/FastAPI/Response/File.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/Response/File.pm'),
+            },
             'PAGI::FastAPI::Response::HTML' => {
                 file    => 'lib/PAGI/FastAPI/Response/HTML.pm',
                 version => MM->parse_version('lib/PAGI/FastAPI/Response/HTML.pm'),
+            },
+            'PAGI::FastAPI::Response::Redirect' => {
+                file    => 'lib/PAGI/FastAPI/Response/Redirect.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/Response/Redirect.pm'),
             },
             'PAGI::FastAPI::Response::SSE' => {
                 file    => 'lib/PAGI/FastAPI/Response/SSE.pm',
                 version => MM->parse_version('lib/PAGI/FastAPI/Response/SSE.pm'),
             },
-            'PAGI::FastAPI::Queue' => {
-                file    => 'lib/PAGI/FastAPI/Queue.pm',
-                version => MM->parse_version('lib/PAGI/FastAPI/Queue.pm'),
+            'PAGI::FastAPI::ResponseModel' => {
+                file    => 'lib/PAGI/FastAPI/ResponseModel.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/ResponseModel.pm'),
             },
-            'PAGI::FastAPI::Queue::Driver' => {
-                file    => 'lib/PAGI/FastAPI/Queue/Driver.pm',
-                version => MM->parse_version('lib/PAGI/FastAPI/Queue/Driver.pm'),
-            },
-            'PAGI::FastAPI::Queue::Driver::Memory' => {
-                file    => 'lib/PAGI/FastAPI/Queue/Driver/Memory.pm',
-                version => MM->parse_version('lib/PAGI/FastAPI/Queue/Driver/Memory.pm'),
+            'PAGI::FastAPI::TypedPath' => {
+                file    => 'lib/PAGI/FastAPI/TypedPath.pm',
+                version => MM->parse_version('lib/PAGI/FastAPI/TypedPath.pm'),
             },
         },
         resources   => {

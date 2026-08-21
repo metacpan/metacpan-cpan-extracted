@@ -1,16 +1,16 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/m
-## Version v0.4.3
+## Version v0.4.4
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2026/05/19
+## Modified 2026/08/20
 ## All rights reserved
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package Locale::Unicode;
 BEGIN
 {
@@ -141,7 +141,7 @@ BEGIN
                 |
                 # BCP47, section 2.2.4.4: the UN Standard Country or Area Codes for Statistical Use
                 # We are careful not to catch a following variant starting with a digit.
-                (?:\d{3}\d{3}(?!\d))
+                (?:\d{3}(?!\d))
             )
         )?
         # "Optional variant subtags, separated by hyphens, each composed of five to eight letters, or of four characters starting with a digit"
@@ -407,7 +407,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.4.3';
+    our $VERSION = 'v0.4.4';
 };
 
 use strict;
@@ -1408,7 +1408,8 @@ sub parse
     {
         my $offset = length( $re->{locale_bcp47} );
         $offset++ if( substr( $this, $offset, 1 ) eq '-' );
-        substr( $this, 0, $offset, '' );
+        # substr( $this, 0, $offset, '' );
+        $this = substr( $this, $offset );
     }
 
     if( ( exists( $re->{ext_transform} ) &&
@@ -4006,7 +4007,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.4.3
+    v0.4.4
 
 =head1 DESCRIPTION
 

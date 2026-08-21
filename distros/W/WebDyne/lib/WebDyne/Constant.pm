@@ -33,7 +33,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='3.019';
+$VERSION='3.020';
 
 
 #  Get mod_perl version taking intio account legacy strings. Clear $@ after evals
@@ -425,7 +425,6 @@ my %constant_temp;
     #  Enable the API mode ?
     #
     WEBDYNE_API_ENABLE => 1,
-    WEBDYNE_API_STRIP_PREFIX => 1,
     
     
     #  Enable Alpine/Vue hack
@@ -989,14 +988,25 @@ sub import {
                 }
                 #debug("caller: $caller, set:$k value:$v");
                 #next if ref($v); # Not needed, stop Regexp conversion
+                my $sub_body;
                 if ($v=~/^\d+$/) {
                     #debug("using sub() ${caller}::${k}=$v");
-                    *{"${caller}::${k}"}=eval("sub () { $v }");
+                    $sub_body=$v;
                 }
                 else {
                     #debug("fall through, using sub() ${caller}::${k}=q($v)");
-                    *{"${caller}::${k}"}=eval("sub () { q($v) }");
+                    $sub_body="q($v)";
                 }
+
+                #  Perl 5.14 and earlier warn unconditionally when a foldable
+                #  constant sub is redefined. Keep foldable constants on newer
+                #  Perl, but use perlsub's documented non-inlined form there.
+                #
+                *{"${caller}::${k}"}=eval(
+                    ($] < 5.016)
+                    ? "sub () { $sub_body if \$] }"
+                    : "sub () { $sub_body }"
+                );
                     
             }
         }
@@ -1612,12 +1622,6 @@ The constants below are defined by `WebDyne::Constant`. Each definition includes
     **Default:** `1`
 
     Enable processing of `<api>` routes in PSGI request handling. Set to 0 to disable API route dispatch.
-
-* **WEBDYNE_API_STRIP_PREFIX**
-
-    **Default:** `1`
-
-    Strip accidental document-root prefixes from `<api pattern>` values when the pattern contains path segments before the current PSP filename stem. This keeps patterns such as `/api/user/:id` portable for `api.psp` files served from subdirectories. Set to 0 to require patterns to match the request path exactly.
 
 * **WEBDYNE_ALPINE_VUE_ATTRIBUTE_HACK_ENABLE**
 
@@ -2739,16 +2743,6 @@ B<WEBDYNE_API_ENABLE>
 B<Default:> C<1>
 
 Enable processing of C<<< <api> >>> routes in PSGI request handling. Set to 0 to disable API route dispatch.
-
-
-
-=item *
-
-B<WEBDYNE_API_STRIP_PREFIX>
-
-B<Default:> C<1>
-
-Strip accidental document-root prefixes from C<<< <api pattern> >>> values when the pattern contains path segments before the current PSP filename stem. This keeps patterns such as C</api/user/:id> portable for C<api.psp> files served from subdirectories. Set to 0 to require patterns to match the request path exactly.
 
 
 

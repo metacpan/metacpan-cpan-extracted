@@ -1,4 +1,7 @@
 package Poker::Eval::Omaha;
+
+our $VERSION = '0.11';
+
 use Algorithm::Combinatorics qw(combinations);
 use Moo;
 
@@ -8,11 +11,10 @@ Poker::Eval::Omaha - Evaluate and score Omaha poker hands.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 

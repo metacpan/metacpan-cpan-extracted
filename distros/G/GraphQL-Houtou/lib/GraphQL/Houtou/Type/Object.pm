@@ -240,6 +240,9 @@ is read; when that value is a coderef, it is called with the same arguments.
 Other hash values are returned directly. Resolvers may return
 L<Promise::XS> promises; see
 L<GraphQL::Houtou/Batching resolvers (DataLoader / the on_stall hook)>.
+For the common resolver shape that only calls a request-scoped loader, the
+C<loader> field option provides a declarative XS path; see
+L<GraphQL::Houtou/Declarative loader fields>.
 Method lookup follows normal Perl inheritance, so fields named C<can>, C<isa>,
 or C<DOES> should use explicit resolvers when the source is blessed.
 

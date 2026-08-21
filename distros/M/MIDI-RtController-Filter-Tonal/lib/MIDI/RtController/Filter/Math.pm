@@ -1,5 +1,5 @@
 package MIDI::RtController::Filter::Math;
-$MIDI::RtController::Filter::Math::VERSION = '0.0501';
+$MIDI::RtController::Filter::Math::VERSION = '0.0502';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Math based RtController filters
@@ -63,8 +63,8 @@ sub _stair_step_notes ($self, $note) {
 
 sub stair_step ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     my @notes = $self->_stair_step_notes($note);
     my $delay_time = 0;
@@ -89,7 +89,7 @@ MIDI::RtController::Filter::Math - Math based RtController filters
 
 =head1 VERSION
 
-version 0.0501
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -134,7 +134,7 @@ Default: C<0.1> seconds
 
 The amount of feedback.
 
-Default: C<3>
+Default: C<1>
 
 =head2 up
 

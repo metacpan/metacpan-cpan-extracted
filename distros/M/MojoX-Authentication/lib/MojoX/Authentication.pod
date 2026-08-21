@@ -13,7 +13,7 @@ authentication in Mojolicious applications (local and SAML2)
 
 =head1 VERSION
 
-This document describes MojoX::Authentication version 0.006.
+This document describes MojoX::Authentication version 0.008.
 
 =begin html
 
@@ -66,25 +66,14 @@ Used to I<massage> the input parameters before creating the instance.
 
 =end hidden
 
-=head2 B<< app >>
-
-   my $app = $ma->app;
-
-Retrieve the application object reference set at creation or later when
-calling L</app_startup> (if you decide to use it).
-
-It is mandatory if L</model> is missing.
-
 =head2 B<< app_startup >>
 
-   $ma->app_startup; # OR
    $ma->app_startup($app);
 
-Perform some startup over the application (either provided explicitly as
-C<$app>, or retrieved via L</app>), like adding and initializing plugin
-L<Mojolicious::Plugin::Authentication> and setting a C<before_render>
-hook to inject the user data in the stash, if present (see
-L</user_stash_key> for the key used in the stash).
+Perform some startup over the C<$app> application, like adding and
+initializing plugin L<Mojolicious::Plugin::Authentication> and setting a
+C<before_render> hook to inject the user data in the stash, if present
+(see L</user_stash_key> for the key used in the stash).
 
 =head2 B<< ctr_credentials_login >>
 
@@ -103,11 +92,15 @@ to C<protected_root> and C<public_root> respectively.
 
 =head2 B<< ctr_logout >>
 
+   $ma->ctr_logout($controller, $redirect_route); # OR
    $ma->ctr_logout($controller);
 
 Perform the logout. If the provider supports the C<logout> method, this
 totally delegates to it; otherwise, it calls the C<logout> method over
 the C<$controller>.
+
+If provided, C<$redirect_route> will also call the C<redirect_to> method
+over the C<$controller>.
 
 =head2 B<< ctr_saml2_login >>
 
@@ -123,7 +116,8 @@ Identity Provider.
 
 =head2 B<< ctr_saml2_sso_post >>
 
-   $ma->ctr_saml2_sso_post($controller, $route_for);
+   $ma->ctr_saml2_sso_post($controller, $route_for); # OR
+   $ma->ctr_saml2_sso_post($controller);
 
 Opinionated way of handling the login through credentials, practically
 acting as a wrapper around the C<$controller>. This is the final

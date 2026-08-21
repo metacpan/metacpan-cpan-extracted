@@ -4,11 +4,13 @@ author:
   - 'Joel Loudermilk <joel@loudermilk.org>'
 build_requires:
   File::Temp: '0'
+  HTTP::Response: '0'
+  Test::LWP::UserAgent: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,10 +31,10 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-GarminConnect
   homepage: https://github.com/jlouder/garmin-connect-perl
   repository: https://github.com/jlouder/garmin-connect-perl.git
-version: 1.1.2
+version: 1.1.3
 x_contributors:
   - 'Neil Bowers <neil@bowers.com>'
   - 'Raf D <noduck@gmail.com>'
-x_generated_by_perl: v5.38.2
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: GPL-3.0-only

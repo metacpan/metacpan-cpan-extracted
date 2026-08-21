@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # All of it is C (include/otel_log.h + xs/logger.xs). This file is
 # documentation.
@@ -105,6 +105,19 @@ C<resource>, C<scope_name>, C<scope_version>.
 
 =head2 emit($level, $body, \%attributes, $span)
 
+Queue one log record. C<$level> is mapped to an OTLP severity by
+L<severity|/"severity($level)">, C<$body> is the message, and
+C<\%attributes> is optional structured detail.
+
+C<$span> is optional and is the part worth passing: it is what stamps the
+record with the trace and span ids, and so what lets somebody click from a log
+line into the trace that produced it. It is the highest-value, lowest-cost
+part of this whole signal.
+
+Emitting while the SDK is exporting is ignored rather than queued, or the
+exporter's own diagnostics would come back round through here - see
+L</THE RECURSION TRAP>.
+
 =head2 drain($max)
 
 An OTLP logs payload ready for
@@ -118,6 +131,12 @@ The OTLP severity number for a Punk level.
 =head2 stats
 
 C<emitted>, C<dropped>, C<queued>.
+
+=head1 SEE ALSO
+
+L<Punk::OpenTelemetry::Tracer>, which supplies the ids these records are
+correlated by, and L<Punk::Plugin::OpenTelemetry>, which turns the signal on.
+L<Punk::OpenTelemetry> is the index.
 
 =head1 AUTHOR
 

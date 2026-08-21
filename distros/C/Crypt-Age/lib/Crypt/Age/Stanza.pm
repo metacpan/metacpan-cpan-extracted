@@ -1,8 +1,6 @@
 package Crypt::Age::Stanza;
-our $VERSION = '0.001';
-our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Base class for age recipient stanzas
-
+our $VERSION = '0.002';
 use Moo;
 use Carp qw(croak);
 use MIME::Base64 qw(encode_base64 decode_base64);
@@ -41,10 +39,30 @@ sub encode_base64_no_padding {
 
 sub decode_base64_no_padding {
     my ($encoded) = @_;
-    # Add padding back if needed
+
+    # "decoders MUST reject non-canonical encodings and encodings ending with
+    # '=' padding characters" -- c2sp.org/age. MIME::Base64 does neither: it
+    # silently skips characters outside the alphabet, drops a stray trailing
+    # character, and ignores the unused bits of the last group. Every check
+    # below is therefore ours, and none of them names $encoded in its message --
+    # a stanza body is wrapped key material.
+    croak "Invalid base64: '=' padding is not allowed in the age format"
+        if $encoded =~ m{=};
+    croak "Invalid base64: character outside the RFC 4648 section 4 alphabet"
+        if $encoded =~ m{[^A-Za-z0-9+/]};
+    croak "Invalid base64: length is not a valid unpadded encoding"
+        if length($encoded) % 4 == 1;
+
     my $pad = (4 - length($encoded) % 4) % 4;
-    $encoded .= '=' x $pad;
-    return decode_base64($encoded);
+    my $decoded = decode_base64($encoded . ('=' x $pad));
+
+    # Re-encode and compare. This is what catches non-canonical trailing bits:
+    # the unused low bits of the final group must be zero, so the canonical
+    # encoding of the decoded bytes has to be byte-identical to the input.
+    croak "Invalid base64: non-canonical encoding"
+        unless encode_base64_no_padding($decoded) eq $encoded;
+
+    return $decoded;
 }
 
 sub to_string {
@@ -55,12 +73,18 @@ sub to_string {
 
     my $body_b64 = encode_base64_no_padding($self->body);
 
-    # Split into 64-char lines
+    # Split into 64-char lines. The ABNF is
+    #   stanza = arg-line *full-line final-line
+    #   final-line = *63base64char LF
+    # so the final line is at most 63 characters and a body whose encoding is an
+    # exact multiple of 64 MUST be followed by an empty final line -- hence >=
+    # and not >. Header::parse's matching `last if $len < 64` depends on it, and
+    # so does the header MAC.
     my @lines = ($header_line);
-    while (length($body_b64) > 64) {
+    while (length($body_b64) >= 64) {
         push @lines, substr($body_b64, 0, 64, '');
     }
-    push @lines, $body_b64;  # Last line (may be empty for exact multiple of 64)
+    push @lines, $body_b64;  # final line, empty when the body ended flush at 64
 
     return join("\n", @lines);
 }
@@ -89,7 +113,7 @@ Crypt::Age::Stanza - Base class for age recipient stanzas
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -164,6 +188,10 @@ Serializes the stanza to age file format.
 Returns a multi-line string with the stanza header (C<-E<gt> type args...>) and
 base64-encoded body wrapped at 64 characters per line.
 
+The last body line is always shorter than 64 characters, as the format requires.
+A body whose base64 encoding is an exact multiple of 64 characters is therefore
+followed by an empty final line, and the returned string ends in a newline.
+
 =head1 FUNCTIONS
 
 =head2 encode_base64_no_padding
@@ -178,9 +206,27 @@ This is the encoding used for all base64 in the age format.
 
     my $bytes = Crypt::Age::Stanza::decode_base64_no_padding($encoded);
 
-Decodes base64 without padding.
+Decodes unpadded base64, strictly.
 
-Automatically adds back the padding before decoding.
+The age format specifies RFC 4648 section 4 base64 without padding, and requires
+that decoders reject anything else. This function therefore dies rather than
+repairing its input when:
+
+=over 4
+
+=item * the input contains C<=> padding characters
+
+=item * the input contains a character outside the standard base64 alphabet
+
+=item * the input length is congruent to 1 modulo 4, which no encoding produces
+
+=item * the encoding is non-canonical, i.e. the unused trailing bits of the final
+group are not zero, so that some other encoding of the same bytes exists
+
+=back
+
+The error messages name the reason and never the input, which may be key
+material.
 
 =head1 SEE ALSO
 
@@ -200,10 +246,6 @@ Automatically adds back the padding before decoding.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-crypt-age/issues>.
-
-=head2 IRC
-
-You can reach Getty on C<irc.perl.org> for questions and support.
 
 =head1 CONTRIBUTING
 

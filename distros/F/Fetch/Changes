@@ -1,5 +1,8 @@
 Revision history for Fetch
 
+0.16    2026-08-20
+        - FIX: change abi version checks from == to <=
+
 0.15    2026-08-19
         - HTTP/2 TRAILERS are captured and exposed as $res->trailers.
           They were being discarded.

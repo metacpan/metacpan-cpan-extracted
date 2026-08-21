@@ -107,6 +107,64 @@ static int  hm_abi_ratelimit_hit(const void *key, STRLEN klen,
     return ok;
 }
 
+/* ---- v5: the bus -------------------------------------------------------- */
+
+static int hm_abi_bus_publish(const char *topic, STRLEN tlen,
+                              const char *payload, STRLEN plen) {
+#if HM_BUS_HAVE_ATOMICS
+    int r = hm_bus_publish(topic, (uint32_t)tlen, payload, (uint32_t)plen);
+    return r == HM_BUS_OK ? 1 : r == HM_BUS_LOCAL ? 0 : -1;
+#else
+    (void)topic; (void)tlen; (void)payload; (void)plen;
+    return 0;
+#endif
+}
+
+/* The ABI's callback takes pTHX and no sequence; the ring's takes a sequence
+ * and no pTHX. This is the shim between them, so the ABI can stay a stable C
+ * surface while the ring's internals move. */
+typedef struct { hm_abi_bus_cb cb; void *ud; } hm_abi_bus_sub;
+static hm_abi_bus_sub hm_abi_bus_subs[HM_BUS_SUBS];
+
+static void hm_abi_bus_trampoline(void *ud, uint64_t seq, const char *topic,
+                                  uint32_t tlen, const char *payload,
+                                  uint32_t plen) {
+    dTHX;
+    hm_abi_bus_sub *s = (hm_abi_bus_sub *)ud;
+    (void)seq;
+    if (s && s->cb)
+        s->cb(aTHX_ topic, (STRLEN)tlen, payload, (STRLEN)plen, s->ud);
+}
+
+static int hm_abi_bus_subscribe(pTHX_ const char *topic, STRLEN tlen,
+                                const char *group, STRLEN glen,
+                                hm_abi_bus_cb cb, void *ud) {
+    int id;
+    PERL_UNUSED_CONTEXT;
+    if (!cb) return -1;
+    id = hm_bus_subscribe(topic, (uint32_t)tlen, group, (uint32_t)glen,
+                          hm_abi_bus_trampoline, NULL);
+    if (id < 0) return -1;
+    hm_abi_bus_subs[id].cb = cb;
+    hm_abi_bus_subs[id].ud = ud;
+    hm_bus_subs[id].ud     = &hm_abi_bus_subs[id];
+    return id;
+}
+
+static int hm_abi_bus_unsubscribe(pTHX_ int id) {
+    PERL_UNUSED_CONTEXT;
+    if (id >= 0 && id < HM_BUS_SUBS) {
+        hm_abi_bus_subs[id].cb = NULL;
+        hm_abi_bus_subs[id].ud = NULL;
+    }
+    return hm_bus_unsubscribe(id);
+}
+
+static int hm_abi_bus_dispatch(pTHX) {
+    PERL_UNUSED_CONTEXT;
+    return (int)hm_bus_dispatch();
+}
+
 static const hm_abi hm_abi_table = {
     HM_ABI_VERSION,
     hm_abi_cur_loop,
@@ -129,6 +187,10 @@ static const hm_abi hm_abi_table = {
     hm_abi_deny_remove,
     hm_abi_ratelimit_hit,
     hm_worker_hook_add,          /* v4 */
+    hm_abi_bus_publish,          /* v5 */
+    hm_abi_bus_subscribe,
+    hm_abi_bus_unsubscribe,
+    hm_abi_bus_dispatch,
 };
 
 /* ---- v4 on_worker_start, driven from C (t/33-worker-start.t) ------------ *

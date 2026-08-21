@@ -2,8 +2,8 @@ NAME
     Filename::KeyValue - Parse filename using the KeyValue naming scheme
 
 VERSION
-    This document describes version 0.004 of Filename::KeyValue (from Perl
-    distribution Filename-KeyValue), released on 2026-05-28.
+    This document describes version 0.006 of Filename::KeyValue (from Perl
+    distribution Filename-KeyValue), released on 2026-05-29.
 
 SYNOPSIS
      use Filename::KeyValue qw(
@@ -32,7 +32,7 @@ FUNCTIONS
 
         Result:
 
-         [200, "OK", "foo-bar--kw1=val1-kw2=val2.jpg", {}]
+         [200, "OK", "foo-bar-kw1=val1-kw2=val2.jpg", {}]
 
     This routine will:
 
@@ -55,6 +55,10 @@ FUNCTIONS
     *   filename* => *filename*
 
         (No description)
+
+    *   ignore => *bool*
+
+        If set, when filename already has the same key, do nothing.
 
     *   remove => *array[str]*
 
@@ -94,7 +98,7 @@ FUNCTIONS
 
         Result:
 
-         [200, "OK", "foo-bar--kw1=val1-kw2=val2.jpg", {}]
+         [200, "OK", "foo-bar-kw1=val1-kw2=val2.jpg", {}]
 
     This routine will:
 
@@ -392,6 +396,10 @@ FUNCTIONS
 
         (No description)
 
+    *   ignore => *bool*
+
+        If set, when filename already has the same key, do nothing.
+
     Returns an enveloped result (an array).
 
     First element ($status_code) is an integer containing HTTP-like status
@@ -430,6 +438,10 @@ FUNCTIONS
     *   filename* => *array[str]*
 
         (No description)
+
+    *   ignore => *bool*
+
+        If set, when filename already has the same key, do nothing.
 
     *   remove => *array[str]*
 

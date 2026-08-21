@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # All of it is C (include/otel_resource.h + xs/resource.xs).
 
@@ -87,6 +87,12 @@ other key is used as a literal attribute name.
 
 A fresh UUID-shaped instance id. Called by C<detect>; exposed so a worker can
 refresh it after a fork without rebuilding the whole resource.
+
+=head1 SEE ALSO
+
+L<Punk::Plugin::OpenTelemetry>, whose "THE FORK TRAP" section is where the
+instance id is refreshed, and L<Punk::OpenTelemetry::Config> for
+C<OTEL_SERVICE_NAME> and C<OTEL_RESOURCE_ATTRIBUTES>.
 
 =head1 AUTHOR
 

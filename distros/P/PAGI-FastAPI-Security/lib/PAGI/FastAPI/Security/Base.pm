@@ -6,7 +6,7 @@ use Carp qw(croak);
 use Future::AsyncAwait;
 use PAGI::FastAPI::Depends qw(Depends);
 
-our $VERSION   = qv('v0.0.4');
+our $VERSION   = qv('v0.0.6');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf-8
@@ -17,7 +17,7 @@ PAGI::FastAPI::Security::Base - Internal base class for PAGI::FastAPI::Security 
 
 =head1 VERSION
 
-Version v0.0.4
+Version v0.0.6
 
 =head1 DESCRIPTION
 
@@ -55,6 +55,37 @@ sub depends ($self, %opts) {
         async sub ($c) { return $self->_run($c) },
         %opts,
     );
+}
+
+=head2 challenge_header
+
+    my ($key, $value) = $security->challenge_header;
+    $c->set_header($security->challenge_header);
+
+Generates a key-value pair suitable for setting a C<WWW-Authenticate> HTTP header
+on authentication failure responses in accordance with RFC 9110.
+
+Returns a two-element array C<('WWW-Authenticate', $challenge_string)>.
+
+=over 4
+
+=item * C<%args> - (Optional) Additional parameters passed to format scheme-specific challenges.
+
+=back
+
+By default, this method constructs a basic challenge string using the class scheme
+and the configured C<realm> option:
+
+    WWW-Authenticate: <Scheme> realm="<realm>"
+
+=cut
+
+sub challenge_header ($self, %args) {
+    my $scheme = $self->{scheme} // 'Bearer';
+    my $realm  = $self->{realm}  // 'Restricted';
+    $realm =~ s/"/\\"/g;
+
+    return ('WWW-Authenticate' => qq{$scheme realm="$realm"});
 }
 
 # Shared execution wrapper: calls the subclass's _extract(), and on
@@ -107,10 +138,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/PAGI-FastAPI-Security/issues>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/PAGI-FastAPI-Security>
 
 =item * Search MetaCPAN
 

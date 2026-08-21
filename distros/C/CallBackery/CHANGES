@@ -1,3 +1,11 @@
+0.59.0 2026-08-20 08:58:50 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - New optional actionCfg property "noBusyIndicator" for download and
+   display actions. When set, the modal busy indicator ("Preparing
+   Download ...") is not shown while the download is being prepared, so
+   the gui stays usable for actions which take a long time to produce
+   their data. Default behaviour is unchanged.
+
 0.58.4 2026-07-31 16:15:51 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - Frontend ui.Login: a login could be lost outright. The credentials

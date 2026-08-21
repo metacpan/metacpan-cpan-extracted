@@ -1,4 +1,4 @@
-X11::GUITest ($Id: CodingStyle 203 2011-05-15 02:03:11Z ctrondlp $)
+X11::GUITest ($Id: CodingStyle 253 2026-08-19 22:37:51Z ctrondlp $)
 
 This is a short list of coding style guidelines to be used when
 developing for this project.
@@ -17,20 +17,20 @@ Indentation:
 
 Braces/Spacing:
 
-	int func(void)
-	{
-	}
+    int func(void)
+    {
+    }
 
-	if (var) {
-		printf("Hello\n");
-	}
+    if (var) {
+        printf("Hello\n");
+    }
 
-	while (true) {
-	}
+    while (true) {
+    }
 
 Variables:
 - Descriptive names for globals or ones that are file scoped.  Mixed
-  case is also prefered for these.
+  case is also preferred for these.
 - Shorter names can be used for locals.
 - Use static and const when appropriate.
 - Perl variables should be scoped appropriately.

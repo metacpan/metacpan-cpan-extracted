@@ -10,7 +10,7 @@ use Open::API;
 use Template::Stencil;
 use Markdown::Simple;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my @HEADERS = (
     'Content-Security-Policy' =>

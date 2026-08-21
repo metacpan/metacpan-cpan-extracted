@@ -73,7 +73,7 @@ static HE  *punk_real_hv_store_ent(pTHX_ HV *h, SV *k, SV *v, U32 hash)
 /* -DPUNK_OLD_AV_HOLES: make a modern perl account for array holes the way
  * every perl before 5.20 did.
  *
- *     make OPTIMIZE="-O0 -g -DPUNK_OLD_AV_HOLES" && prove -b t/42*.t
+ *     make OPTIMIZE="-O0 -g -DPUNK_OLD_AV_HOLES" && prove -b t/0012*.t
  *
  * Before 5.20, av_extend filled the slots it allocated with &PL_sv_undef
  * (perl5200delta: "Arrays now use NULL internally to represent unused slots,
@@ -81,7 +81,7 @@ static HE  *punk_real_hv_store_ent(pTHX_ HV *h, SV *k, SV *v, U32 hash)
  * slot up to the fill - fillers included. So on those perls a later av_store
  * past a gap drags the gap into the live range, and freeing the array spends
  * one immortal reference per hole. That is perl's own bookkeeping, not a
- * mistake in the XS, and it is why t/42 cannot hold its invariant there.
+ * mistake in the XS, and it is why t/0012 cannot hold its invariant there.
  *
  * This reproduces exactly that on a current perl, for the arrays punk itself
  * extends, so the arithmetic can be checked without an old perl to hand. */

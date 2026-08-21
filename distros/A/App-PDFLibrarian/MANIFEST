@@ -5,6 +5,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README.md
+RELEASE.md
 bin/pdf-lbr-edit-bib
 bin/pdf-lbr-import-pdf
 bin/pdf-lbr-iso4-abbr

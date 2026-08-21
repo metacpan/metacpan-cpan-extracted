@@ -1,5 +1,145 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
+0.24	Thu Aug 20 02:41:40 PM EDT 2026
+	[ Enhancements ]
+	- configure() now validates the class name against /\A[A-Za-z_]\w*(?:::\w+)*\z/
+	  and croaks on invalid input, preventing taint-mode failures and injection
+	  through malformed package names.
+	- Added $RE_PATH_TRAVERSAL guard in configure() and _reload_object_config():
+	  any config_file path containing ../ or /.. sequences is rejected with croak
+	  before any filesystem probe, preventing directory traversal attacks.
+	- disable_hot_reload() now checks PID > 1 && PID != $$ before sending SIGTERM,
+	  preventing accidental signalling of PID 1 (init) or the parent process itself.
+	- enable_hot_reload() and _run_config_watcher() now use defined-or (//) for the
+	  interval parameter and clamp negative/zero values to $DEFAULT_INTERVAL,
+	  preventing integer-wrap and busy-poll from a caller-supplied zero/negative value.
+	- Memoised _get_inheritance_chain() with %_chain_cache (keyed by class name):
+	  repeated calls for the same class return immediately, eliminating redundant
+	  mro::get_linear_isa traversals. Benchmarks show ~7× speedup on repeated calls.
+	- Memoised _find_class_config_file() with %_find_cache (keyed by NUL-joined
+	  class+base+dirs): eliminates repeated filesystem probes for the same ancestor
+	  class. Benchmarks show ~27× speedup on repeated calls.
+	- Replaced grep { $_ eq 'UNIVERSAL' } @mro with List::Util::any (XS,
+	  short-circuits on first match).
+	- _find_class_config_file() now copies $dir to a local scalar before stripping
+	  the trailing slash, avoiding aliased mutation of the caller's config_dirs array.
+	- Added t/cgi_security.t: 17-subtest security pen-test suite covering path
+	  traversal, null-byte injection, command injection, CRLF injection, env-prefix
+	  collision, XSS, config_dirs traversal, DoS, object injection, registry
+	  poisoning, signal safety, arbitrary file read, deep-merge DoS, and input
+	  validation guard clauses.
+	[ Bug Fixes ]
+	- Fixed instantiate(): 'class' key was read from %params but not deleted, causing
+	  it to propagate through configure() as a spurious config key and end up in the
+	  blessed object's hash, polluting its namespace. Changed $params->{'class'} to
+	  delete $params->{'class'} (D~ data-flow anomaly — dead store without delete).
+	- Fixed class-name validation regex: \w+ after :: permitted digit-first components
+	  (e.g. Bad::1Bad was accepted). Corrected to [A-Za-z_]\w* so each :: component
+	  must start with a letter or underscore, matching Perl's actual identifier rules.
+	- Fixed _reload_object_config(): the $RE_PATH_TRAVERSAL guard was positioned AFTER
+	  the -f filesystem test, meaning traversal paths for non-existent files were silently
+	  ignored rather than rejected. Guard now fires before the -f check.
+	- Config::Abstraction, Log::Abstraction, and Return::Set all use eval internally
+	  protect the caller's $@ from being clobbered by our internal eval blocks.
+	- Fix https://github.com/nigelhorne/Object-Configure/issues/7
+
+	- configure(): added $RE_PATH_TRAVERSAL guard for config_path (the env-only branch).
+	  Previously, a caller with env-var control could set ClassName__config_path=../../etc/shadow
+	  to force the hot-reload watcher to stat arbitrary system files (mtime side-channel via
+	  SIGUSR1) and cause fatal taint violations under -T. Now rejected with croak before any
+	  filesystem probe, matching the existing config_file guard.
+	- register_object(): added blessed($obj) guard. The POD has always required a blessed
+	  reference, but the code only checked defined(). An adversary or buggy caller could push
+	  thousands of unblessed entries, causing reload_config() to iterate them on every SIGUSR1
+	  and degrading throughput proportionally (DoS). Unblessed refs now croak immediately.
+
+	[ Tests ]
+	- Expanded t/edge_cases.t from 28 to 62 subtests: added destructive, pathological,
+	  boundary-condition, and security subtests across all public and private functions:
+	    * Param-type hostility: undef params defaults to {} (intentional); arrayref params
+	      surfaces Perl type error (documented hostile-input behaviour).
+	    * Global variable integrity: $@, $_, and alarm() are all verified not to be
+	      clobbered by configure() across its full code path.
+	    * Return-type contracts (Test::Returns): configure() satisfies { type => hashref }
+	      schema; reload_config() satisfies { type => integer } schema.
+	    * Security / injection: null byte, CR, LF, and shell metacharacters (space ; | $)
+	      in class name are rejected; _reload_object_config() traversal guard verified to
+	      fire before -f filesystem check even for non-existent traversal paths.
+	    * Filesystem hostility: directory as config_file (graceful), dangling symlink
+	      (croaks with locale-safe OS error), unreadable file / chmod 000 (locale-safe
+	      EACCES croak), config_dirs entry that is a plain file (ignored), empty-string
+	      config_dirs entry (no crash).
+	    * _deep_merge() boundary: (undef,undef)->undef, (undef,hashref)->overlay,
+	      (hashref,scalar)->scalar, (hashref,arrayref)->arrayref, 50-level nesting no stack
+	      overflow.
+	    * Registry/signal safety: register_object(undef,*) and register_object(*,undef)
+	      croak with usage; unblessed hashref now croaks (security fix S2);
+	      disable_hot_reload() idempotent; enable_hot_reload(0/-9999) clamped to default;
+	      double enable_hot_reload() is a no-op (no double-fork).
+	    * Upstream failure (Mockingbird): Config::Abstraction::new returning 0 causes
+	      carp and continues; configure() returns a valid hashref.
+	    * DoS resilience: 500-key params hash handled without crash.
+	    * Context safety: configure() in list context returns exactly one hashref.
+	    * Regressions: digit-first :: component still rejected; traversal guard fires
+	      before -f for non-existent paths; instantiate() with undef/missing class croaks;
+	      caller-supplied _config_file/_config_files keys preserved in result.
+	- Added t/data-flow.t: 24 Define-Use (DU) chain subtests covering %stashed_values
+	  stash-restore, $array_logger priority, %_find_cache memoization (both hit and
+	  undef sentinel), %_chain_cache copy semantics, @config_files_to_load sort order,
+	  _deep_merge non-mutation of inputs, carp_on_warn propagation, weak-ref GC
+	  lifecycle, reload_config() dead-ref pruning, caller params non-mutation,
+	  _config_file set-once semantics, %_config_file_stats synchronous population,
+	  env_prefix :: → __ conversion, %tracked_files duplicate-file guard, O~ file
+	  descriptor leak check (/proc/self/fd), $@/$_ non-pollution, _build_logger()
+	  paths (undef/NULL/passthrough), and instantiate() 'class' key non-leakage.
+	- Expanded t/integration.t from 19 to 27 subtests: added optional-deps subtest
+	  (Test::Without::Module), env-var precedence E2E, GC weak-ref pruning verification
+	  (exercises the reload_config() bug fix), arrayref logger capture, logger isolation
+	  between two concurrent objects, 3-level inheritance merge order, _config_file_stats
+	  population, and security E2E (traversal + invalid class in full constructor workflow).
+	  Key fixes applied during test writing:
+	    - Arrayref loggers must use ->warn() (not ->debug()): 'debug' has syslog priority 7,
+	      above the default Log::Abstraction threshold (warning = 4), so debug calls are
+	      silently dropped; hashref logger specs are also not stashed before the config
+	      merge, so a site-local UNIVERSAL logger config can override an explicit level.
+	    - _config_file_stats is only populated via the primary-file branch (-r $config_file);
+	      the fallback directory scan does not record stats.  Tests that verify stat tracking
+	      must supply an absolute config_file path.
+	- Expanded t/function.t from 35 to 55 subtests: added white-box coverage for the
+	  S2 class-name guard (8 invalid partitions + 2 valid boundary cases), S1 path-traversal
+	  guard, _reconfigure_logger() (2 subtests), _reload_object_config() (3 subtests
+	  including traversal and private-key filtering), register_object() weak-reference
+	  storage, restore_signal_handlers() after synthetic install, enable_hot_reload()
+	  early-return guard, _find_class_config_file() trailing-slash non-mutation,
+	  _get_inheritance_chain() memoisation cache, _deep_merge() arrayref replacement,
+	  configure() env-var merge flow, and Test::Memory::Cycle circular-reference check.
+	- Expanded t/unit.t from 35 to 48 subtests: added API message ledger (tracks all
+	  POD-documented error/warning messages; final subtest asserts ledger is empty),
+	  coverage for the new invalid-class and path-traversal croak messages, mocked
+	  Config::Abstraction::new to trigger the "Warning: Can't load configuration" carp,
+	  $@ preservation test, alarm() non-interference test, _config_files metadata,
+	  arrayref-logger priority over config-file logger, and instantiate() hot-reload
+	  registration side-effect.
+	- Added t/domain.t: 41 EP/BVA subtests covering all input domains for all public
+	  and private functions: class-name valid/invalid partitions, config_file/config_path
+	  traversal boundaries, logger spec types (undef/NULL/arrayref/hashref/blessed),
+	  register_object() unblessed-croak boundary (security fix S2), _deep_merge() type
+	  combinations, _build_logger() all spec types, and combinatorial edge cases.
+	- Added t/path.t: 52 CFG path-coverage subtests exhausting every branching path
+	  through configure(), register_object(), reload_config(), enable_hot_reload(),
+	  disable_hot_reload(), _build_logger(), _find_class_config_file(), _deep_merge(),
+	  _reload_object_config(), and _reconfigure_logger() — including signal-handler
+	  chaining, config_path env-only stat branch, and injected upstream failures.
+	- Added t/transaction.t: 14 multi-step lifecycle subtests verifying state
+	  consistency at every phase boundary and correct behaviour on mid-flight
+	  failures: configure() full pipeline (T1), C::A failure rollback (T2),
+	  env-override precedence chain file<env (T3), register→reload→update
+	  synchronous hot-reload flow (T4), GC weak-ref pruning on reload (T5),
+	  multi-object reload with partial GC (T6), same-class push semantics (T7),
+	  nonexistent-config resilience (T8), _reload_object_config exception isolation
+	  (T9), instantiate() lifecycle (T10-T11), and enable/disable watcher lifecycle
+	  including idempotency (T12-T14).
+
 0.23	Sun Jun 28 09:55:21 EDT 2026
 	[ Refactoring ]
 	- Replaced hand-rolled _walk_isa / _get_inheritance_chain with mro::get_linear_isa

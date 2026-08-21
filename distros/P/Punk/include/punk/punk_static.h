@@ -181,29 +181,58 @@ static int ps_path_unsafe(const char *p, STRLEN len) {
  * looks like. The path is used as given: the traversal guard belongs to
  * whoever built it out of untrusted input. */
 
+/* What a caller may say about freshness. Borrowed, never owned. */
+typedef struct ps_fopts {
+    SV *cache_control;         /* the header value, or NULL for none   */
+} ps_fopts;
+
+static SV *ps_serve_file_opt(pTHX_ HV *env, const char *file, STRLEN flen,
+                             int is_head, ps_fopts *fo);
+
+/* The same with nothing to say about freshness - what a caller that has no
+ * cache policy of its own (the markdown mount's assets) wants. */
 static SV *ps_serve_file(pTHX_ HV *env, const char *file, STRLEN flen,
                          int is_head);
 
 /* ---- the app ---------------------------------------------------------------
- * The PSGI coderef's body: a magic CV whose capture is [ $dir ]. Everything
- * a request needs happens here, with no Perl frame at all. */
+ * The PSGI coderef's body: a magic CV whose capture is the mount's whole
+ * configuration. Everything a request needs happens here, with no Perl
+ * frame at all. */
+
+enum {
+    PSC_DIR    = 0,   /* the directory served, no trailing slash          */
+    PSC_CC     = 1,   /* Cache-Control for a plain URL, or undef          */
+    PSC_CC_IMM = 2,   /* ... and for a URL whose digest checked out       */
+    PSC_CACHE  = 3,   /* the digest cache (hashref), or undef: no         */
+                      /* fingerprinting on this mount                    */
+    PSC_DEV    = 4    /* re-stat cached digests (development)             */
+};
+
+static SV *psc_cap(pTHX_ AV *cap, int slot) {
+    SV **s = av_fetch(cap, slot, 0);
+    return (s && *s && SvOK(*s)) ? *s : NULL;
+}
 
 XS_INTERNAL(punk_static_cb);
 XS_INTERNAL(punk_static_cb) {
     dXSARGS;
     AV *cap = punk_clos_cap(aTHX_ cv);
-    SV *dirsv;
+    SV *dirsv, *cachesv;
     HV *env;
     SV **e;
     const char *dir, *path, *method;
-    STRLEN dlen, plen, mlen = 3;
+    STRLEN dlen, plen, mlen = 3, flen;
     char file[MAXPATHLEN + 1];
     SV *resp;
+    ps_fopts fo;
     int is_head = 0;
 
     if (!cap || items < 1) XSRETURN_EMPTY;
     dirsv = *av_fetch(cap, 0, 0);
     dir   = SvPV_const(dirsv, dlen);
+    Zero(&fo, 1, ps_fopts);
+    fo.cache_control = psc_cap(aTHX_ cap, PSC_CC);
+    cachesv = psc_cap(aTHX_ cap, PSC_CACHE);
 
     if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVHV)
         croak("Punk::Static: the app takes a PSGI env hashref");
@@ -229,11 +258,152 @@ XS_INTERNAL(punk_static_cb) {
     memcpy(file, dir, dlen);
     memcpy(file + dlen, path, plen);
     file[dlen + plen] = '\0';
+    flen = dlen + plen;
 
-    resp = ps_serve_file(aTHX_ env, file, dlen + plen, is_head);
+    /* A content-addressed URL: `/app.9f3a1c2b0d4e5f60.css` is the file
+     * `/app.css`, and gets a year plus `immutable` when the digest it names
+     * is the digest that file now has.
+     *
+     * The literal path is tried first, so a file genuinely called
+     * `app.9f3a1c2b0d4e5f60.css` - a build tool's output, checked in under
+     * that name - still serves as itself. That costs one extra stat, and
+     * only on a request whose path parses as fingerprinted. */
+    if (cachesv && SvROK(cachesv) && SvTYPE(SvRV(cachesv)) == SVt_PVHV) {
+        char base[MAXPATHLEN + 1], digest[PA_DIGEST_LEN + 1];
+        STRLEN blen;
+        Stat_t st;
+        if ((blen = pa_defingerprint(file, flen, base, digest)) != 0
+            && (PerlLIO_stat(file, &st) < 0 || !S_ISREG(st.st_mode))) {
+            SV *have = pa_digest_cached(aTHX_ (HV *)SvRV(cachesv), base, blen,
+                                        psc_cap(aTHX_ cap, PSC_DEV) ? 1 : 0);
+            memcpy(file, base, blen + 1);
+            flen = blen;
+            /* A digest that does not match is a URL from an older deploy:
+             * the current bytes are still the right answer, but `immutable`
+             * would be a lie about a URL whose meaning has already changed
+             * once. It revalidates instead. */
+            if (have && SvCUR(have) == PA_DIGEST_LEN
+                && memEQ(SvPVX(have), digest, PA_DIGEST_LEN))
+                fo.cache_control = psc_cap(aTHX_ cap, PSC_CC_IMM);
+        }
+    }
+
+    resp = ps_serve_file_opt(aTHX_ env, file, flen, is_head, &fo);
     if (!resp) resp = ps_plain(aTHX_ 404, "Not Found", NULL, NULL);
     ST(0) = sv_2mortal(resp);
     XSRETURN(1);
+}
+
+/* ---- the other direction: naming a file ------------------------------------
+ * Given a static mount's coderef and a path within it, the content-addressed
+ * URL for that path: `/app.css` -> `/app.9f3a1c2b0d4e5f60.css`. NULL when
+ * this mount does not fingerprint, when the path has no extension to put a
+ * digest in front of, or when the file cannot be read - in every one of
+ * those the caller wants the URL it already had, which still works. */
+static SV *pa_asset_url(pTHX_ SV *appsv, SV *relsv) {
+    CV *appcv;
+    AV *cap;
+    SV *cachesv, *digest;
+    const char *dir, *rel;
+    STRLEN dlen, rlen;
+    char file[MAXPATHLEN + 1];
+
+    if (!(appsv && SvROK(appsv) && SvTYPE(SvRV(appsv)) == SVt_PVCV))
+        return NULL;
+    appcv = (CV *)SvRV(appsv);
+    cap   = punk_clos_cap(aTHX_ appcv);
+    if (!cap) return NULL;                    /* not one of our closures */
+    cachesv = psc_cap(aTHX_ cap, PSC_CACHE);
+    if (!(cachesv && SvROK(cachesv) && SvTYPE(SvRV(cachesv)) == SVt_PVHV))
+        return NULL;
+
+    dir = SvPV_const(*av_fetch(cap, PSC_DIR, 0), dlen);
+    rel = SvPV_const(relsv, rlen);
+    if (!rlen || rel[0] != '/') return NULL;
+    if (ps_path_unsafe(rel, rlen) || dlen + rlen > MAXPATHLEN) return NULL;
+    memcpy(file, dir, dlen);
+    memcpy(file + dlen, rel, rlen);
+    file[dlen + rlen] = '\0';
+
+    digest = pa_digest_cached(aTHX_ (HV *)SvRV(cachesv), file, dlen + rlen,
+                              psc_cap(aTHX_ cap, PSC_DEV) ? 1 : 0);
+    if (!digest || SvCUR(digest) != PA_DIGEST_LEN) return NULL;
+    return pa_fingerprint(aTHX_ rel, rlen, SvPVX(digest));
+}
+
+/* $c->asset's half: the compiled mount table, longest prefix first (compile
+ * sorted it), and the first static mount whose prefix this URL sits under
+ * gets to name it. A URL under no static mount, or under one that does not
+ * fingerprint, comes back unchanged. */
+static SV *pa_asset_for(pTHX_ AV *mounts, SV *url) {
+    SSize_t i, n;
+    STRLEN ulen;
+    const char *u = SvPV_const(url, ulen);
+    if (!mounts) return NULL;
+    n = av_len(mounts) + 1;
+    for (i = 0; i < n; i++) {
+        SV **mp = av_fetch(mounts, i, 0);
+        HV *m;
+        SV **pp, **ap;
+        STRLEN pl;
+        const char *p;
+        if (!(mp && *mp && SvROK(*mp))) continue;
+        m  = (HV *)SvRV(*mp);
+        pp = hv_fetchs(m, K_PREFIX, 0);
+        ap = hv_fetchs(m, K_APP, 0);
+        if (!(pp && *pp && ap && *ap)) continue;
+        p = SvPV_const(*pp, pl);
+        if (ulen <= pl || memNE(u, p, pl) || u[pl] != '/') continue;
+        {
+            /* the first prefix match decides, even when it declines: a
+             * shorter mount further down would resolve this path against a
+             * different directory, and dispatch would never send the
+             * request there anyway */
+            SV *rel = sv_2mortal(newSVpvn(u + pl, ulen - pl));
+            SV *fp  = pa_asset_url(aTHX_ *ap, rel);
+            SV *out;
+            if (!fp) return NULL;
+            out = newSVpvn(p, pl);
+            sv_catsv(out, fp);
+            SvREFCNT_dec(fp);
+            return out;
+        }
+    }
+    return NULL;
+}
+
+/* The same thing as a template filter - `{% "/static/app.css" | asset %}` -
+ * so a layout can name an asset without the handler having to pass the URL
+ * in. A magic CV over the application, registered on the shipped Stencil
+ * engine at boot; the mount table is read at call time, so it does not
+ * matter that the views are compiled before the mounts.
+ *
+ * The captured application is a WEAK reference: the app owns the view
+ * registry, which owns the engine, which owns this filter, and a strong
+ * one would close that loop and keep the whole application alive forever. */
+XS_INTERNAL(pa_asset_filter_cb);
+XS_INTERNAL(pa_asset_filter_cb) {
+    dXSARGS;
+    AV *cap = punk_clos_cap(aTHX_ cv);
+    SV *app, *out = NULL;
+
+    if (!cap || items < 1) XSRETURN_EMPTY;
+    app = *av_fetch(cap, 0, 0);
+    if (app && SvROK(app) && SvTYPE(SvRV(app)) == SVt_PVHV) {
+        SV *mp = app_get(aTHX_ (HV *)SvRV(app), K_MOUNTS_C);
+        if (mp && SvROK(mp) && SvTYPE(SvRV(mp)) == SVt_PVAV)
+            out = pa_asset_for(aTHX_ (AV *)SvRV(mp), ST(0));
+    }
+    if (out) ST(0) = sv_2mortal(out);
+    XSRETURN(1);
+}
+
+static SV *pa_asset_filter(pTHX_ SV *app) {
+    AV *cap = newAV();
+    SV *weak = newSVsv(app);
+    sv_rvweaken(weak);
+    av_push(cap, weak);
+    return punk_closure(aTHX_ pa_asset_filter_cb, cap);
 }
 
 #endif /* PUNK_STATIC_H */

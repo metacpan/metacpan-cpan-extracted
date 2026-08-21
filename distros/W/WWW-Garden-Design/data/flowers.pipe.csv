@@ -1,0 +1,183 @@
+id,aliases,common_name,height,max_height,max_width,min_height,min_width,pig_latin,publish,scientific_name,width
+1,"Ashleaf maple, Ash-leaved maple, Box elder, Boxelder maple, Maple ash, 'Variegatum'","Acer negundo",,,,,,Acer.negundo,Yes,"Acer negundo",
+2,"'Aloha Dark Red'","Aloha Dark Red",,,,,,Mandevilla.hybrid.1,Yes,"Mandevilla hybrid",
+3,"'Aloha Regal Ruby'","Aloha Regal Ruby",,,,,,Mandevilla.hybrid.2,Yes,"Mandevilla hybrid",
+4,'Angela',Angela,,,,,,Alstroemeria.1,Yes,Alstroemeria,
+5,"'Princess Lily Louise'","Princess Lily Louise",,,,,,Alstroemeria.2,Yes,Alstroemeria,
+6,,"Peruvian Lily",30cm,30,30,30,30,Alstroemeria.pulchella,Yes,"Alstroemeria pulchella",30cm
+7,,"Pine Golden Pippin",,,,,,Malus.domestica.pine.golden.pippin,Yes,"Malus domestica 'Pine Golden Pippin'",
+8,,"Pitmaston Pine",,,,,,Malus.domestica.pitmaston.pine,Yes,"Malus domestica 'Pitmaston Pine'",
+9,,"Apple 3",8m,800,700,800,700,Malus.domestica.3,Yes,"Malus domestica 3",7m
+10,,Pinkabelle®,2m,200,100,200,100,Malus.domestica.pinkabelle,Yes,"Malus domestica Pinkabelle®",1m
+11,,Leprechaun,2m,200,100,200,100,Malus.domestica.leprechaun,Yes,"Malus domestica Leprechaun",1m
+12,,Pompink,3m,300,60,300,60,Malus.domestica.pompink,Yes,"Malus domestica Pompink",60cm
+13,,Harmony,3m,300,60,300,60,Malus.domestica.harmony,Yes,"Malus domestica Harmony",60cm
+14,,Pom-for-You,3m,300,60,300,60,Malus.domestica.pom-for-you,Yes,"Malus domestica Pom-for-You",60cm
+15,,Columbine,,,,,,Aquilegia.mckana,Yes,"Aquilegia McKana",
+16,"Columbine, Granny's Bonnet","Granny's Bonnet",,,,,,Aquilegia.flabellata.var.pumila.alba,Yes,"Aquilegia flabellata var. pumila alba",
+17,"Italian arum, Italian lords-and-ladies","Arum italicum",46cm,46,46,46,46,Arum.italicum,Yes,"Arum italicum",46cm
+18,"Common Asparagus Fern, Climbing Asparagus, Ferny Asparagus, Lace Fern","Asparagus Fern",,,,,,Asparagus.setaceus,Yes,"Asparagus setaceus",
+19,,"Rosa Belton",,,,,,Azalea.1,Yes,Azalea,
+20,,"Azalea 2",,,,,,Azalea.2,Yes,Azalea,
+21,,"Azalea 3",,,,,,Azalea.3,Yes,Azalea,
+22,,"Cherry Candles",,,,,,Banksia.spinulosa,Yes,"Banksia spinulosa",
+23,,"Prostrate Banksia",50cm,50,50,50,50,Banksia.blechnifolia,Yes,"Banksia blechnifolia",50cm
+24,"Great Basil, king of herbs, royal herb, Saint-Joseph's-wort, Sweet Scented Basil","Genovese Basil",45cm,45,20,45,20,Ocimum.basilicum,Yes,"Ocimum basilicum",20cm
+25,"Holy Basil, Ocimum sp., perennial basil, tulasi, thulasi, tulsi","African Basil",1m,100,30,100,30,Ocimum.kilimandscharicum.x.basilicum.dark.opal,Yes,"Ocimum kilimandscharicum x basilicum 'Dark Opal'",30cm
+26,Dead-nettles,"Beacon Silver",,,,,,Lamium,Yes,Lamium,
+27,"Bearsfoot, Oyster plant, Sea dock","Bears breeches",,,,,,Acanthus.mollis,Yes,"Acanthus mollis",
+28,,"Adriatic bellflower",,,,,,Campanula.garganica,Yes,"Campanula garganica",
+29,,"Serbian bellflower",25cm,25,100,25,100,Campanula.poscharskyana,Yes,"Campanula poscharskyana",100cm
+30,,"Big Blue Lilyturf",,,,,,Liriope.muscari,Yes,"Liriope muscari",
+31,,"Black Coral Pea",,,,,,Kennedia.nigricans,Yes,"Kennedia nigricans",
+32,"'Prima Donna'","Blueberry Ash",5m,500,200,500,200,Elaeocarpus.reticulatus,Yes,"Elaeocarpus reticulatus",2m
+33,"'Little John'",Bottlebrush,,,,,,Callistemon.viminalis.hybrid,Yes,"Callistemon viminalis hybrid",
+34,"'Mohave Orange', Xerochrysum",Bracteantha,,,,,,Bracteantha,Yes,Bracteantha,
+35,"Matted bush-tree","Burnt Orange",,,,,,Pultenaea.pedunculata,Yes,"Pultenaea pedunculata",
+36,"Clerodendrum myricoides, Clerodendrum myricoides 'Ugandense'","Butterfly Bush",,,,,,Rotheca.myricoides,Yes,"Rotheca myricoides",
+37,"African iris, Butterfly iris, Fortnight lily, Japanese iris, Wood iris","Butterfly Iris",,,,,,Dietes,Yes,Dietes,
+38,,Camellia,,,,,,Camellia,Yes,Camellia,
+39,,Carnation,,,,,,Dianthus,Yes,Dianthus,
+40,"Plumed cockscomb, Silver cock's comb",Celosia,,,,,,Celosia,Yes,Celosia,
+41,,"Chilean Jasmine",,,,,,Mandevilla.laxa,Yes,"Mandevilla laxa",
+42,"Chinese witch hazel, 'China Pink'","Chinese fringe flower",,,,,,Loropetalum.chinense.var.rubrum,Yes,"Loropetalum chinense var. rubrum",
+43,"Indian mallow, Velvetleaf","Chinese Lantern",,,,,,Abutilon.hybridum,Yes,"Abutilon hybridum",
+44,"Chinese fringe flower, 'Purple Prince'","Chinese witch hazel",50cm,50,,50,,Loropetalum.chinense,Yes,"Loropetalum chinense",
+45,,"Chives 1",,,,,,Allium.schoenoprasum,Yes,"Allium schoenoprasum",
+46,"Asian chives, Chinese chives, Chinese leek, garlic chives, oriental garlic","Chives 2",60cm,60,,60,,Allium.tuberosum,Yes,"Allium tuberosum",
+47,"Arthropodium strictum, Chocolate lily","Chocolate Lily",,,,,,Dichopogon.strictus,Yes,"Dichopogon strictus",
+48,,Cumquat,,,,,,Citrus.japonica,Yes,"Citrus japonica",
+49,,"Lisbon lemon",,,,,,Citrus.limon,Yes,"Citrus limon",
+50,"Meyer 'Improved'","Meyer lemon",,,,,,Citrus.x.meyeri,Yes,"Citrus x meyeri",
+51,"Bearss lime, seedless lime","Tahiti Lime",,,,,,Citrus.x.latifolia,Yes,"Citrus x latifolia",
+52,,"Washington Navel Orange",,,,,,Citrus.x.sinensis,Yes,"Citrus x sinensis",
+53,"Silver Bush","Convolvulus 1",40cm,40,40,40,40,Convolvulus.cneorum,Yes,"Convolvulus cneorum",40cm
+54,"Trailing Convolvulus","Convolvulus 2",10cm,10,120,10,120,Convolvulus.sabatius,Yes,"Convolvulus sabatius",1.2m
+55,"Chinese parsley, cilantro, Coriander Slow Bolting",Coriander,20cm,20,25,20,25,Coriandrum.sativum,Yes,"Coriandrum sativum",25cm
+56,"Common cornsalad, doucette, feldsalat, fetticus, field salad, lamb's lettuce, mâche, nut lettuce, raiponce, rapunzel","Corn Salad",20cm,20,10,20,10,Valerianella.locusta,Yes,"Valerianella locusta",10cm
+57,"Autumn Blaze","Correa - Orange form",0.9m,90,30,90,30,Correa.pulchella,Yes,"Correa pulchella",0.3m
+58,"'Mini Orange'","Corymbia ficifolia",2m,200,200,200,200,Corymbia.ficifolia,Yes,"Corymbia ficifolia",2m
+59,'Tuscarora',"Crepe Myrtle",,,,,,Lagerstromeia.indica.x.l.fauriei,Yes,"Lagerstromeia indica x L. Fauriei",
+60,"Willow-leaved crowea",Crowea,,,,,,Crowea.saligna,Yes,"Crowea saligna",
+61,,"Dampiera trigona",,,,,,Dampiera.trigona,Yes,"Dampiera trigona",
+62,"Nepalese paper plant",Daphne,,,,,,Daphne.bholua,Yes,"Daphne bholua",
+63,"'Blue Sensation', Larkspur",Delphinium,80cm,80,20,80,20,Delphinium,Yes,Delphinium,20cm
+64,"Blue Purple Flax, Utopia","Dianella prunina",1m,100,50,100,50,Dianella.prunina.dp303,Yes,"Dianella prunina DP303",50cm
+65,,"Diplarrena latifolia",45cm,45,20,45,20,Diplarrena.latifolia,Yes,"Diplarrena latifolia",20cm
+66,,"Dwarf Crown of Thorns",30cm,30,30,30,30,Euphorbia.milii,Yes,"Euphorbia milii",30cm
+67,"Dwarf jade plant, Porkbush, Spekboom","Elephant bush",,,,,,Portulacaria.afra,Yes,"Portulacaria afra",
+68,"Chembu, Cocoyam, Dasheen, Eddoe, Karala ko ganu, Taro, Tarul",Elephant-ear,,,,,,Colocasia,Yes,Colocasia,
+69,"'Blue Velvet'","Eremorphila nivea",,,,,,Eremorphila.nivea,Yes,"Eremorphila nivea",
+70,"'Egg and Bacon Plant'",Eutaxia,,,,,,Eutaxia.obovata.nana,Yes,"Eutaxia obovata nana",
+71,"Happy wanderer, Lilac vine, 'Mini Haha', Native lilac, Purple coral pea, Vine lilac, Waraburra","False sarsaparilla",,,,,,Hardenbergia.violacea,Yes,"Hardenbergia violacea",
+72,"Common Fig",Fig,,,,,,Ficus.carica,Yes,"Ficus carica",
+73,Beardtongues,Firebird,60cm,60,40,60,40,Penstemon.cv,Yes,"Penstemon cv",40cm
+74,,"Heart-Leaf Flame Pea",1-2m,200,200,100,100,Chorizema.cordatum,Yes,"Chorizema cordatum",1-2m
+75,,"Flame Pea",75cm,75,100,75,100,Chorizema.varium,Yes,"Chorizema varium",1m
+76,"Eastern redbud","Forest Pansy",,,,,,Cercis.canadensis,Yes,"Cercis canadensis",
+77,"Crimson fountaingrass","Fountain Grass",,,,,,Pennisetum.setaceum,Yes,"Pennisetum setaceum",
+78,,Fuchsia,60cm,60,30,60,30,Fuchsia.1,Yes,Fuchsia,30cm
+79,,'Coralle',1m,100,,100,,Fuchsia.2,Yes,Fuchsia,
+80,"Cherry pie, Common heliotrope, 'Lord Roberts'","Garden heliotrope",50cm,50,90,50,90,Heliotropium.arborescens,Yes,"Heliotropium arborescens",90cm
+81,"'Sunseeker Mix'",Gazania,,,,,,Gazania,Yes,Gazania,
+82,"Glory trees","Glory Bush",,,,,,Tibouchina.urvilleana,Yes,"Tibouchina urvilleana",
+83,,"Goji Berry Plant",3m,300,100,300,100,Lycium.barbarum,Yes,"Lycium barbarum",1m
+84,"Calla Lily","Golden arum lily",,,,,,Zantedeschia.elliottiana,Yes,"Zantedeschia elliottiana",
+85,,Goldfussia,,,,,,Strobilanthes.anisophyllus,Yes,"Strobilanthes anisophyllus",
+86,,'Goldfever',,,,,,Grevillea.1,Yes,Grevillea,
+87,,"Lady 'O'",1-1.5m,150,200,100,150,Grevillea.2,Yes,Grevillea,1.5-2m
+88,,"'Lemon Daze'",,,,,,Grevillea.3,Yes,Grevillea,
+89,,'Fireworks',1m,100,75,100,75,Grevillea.4,Yes,Grevillea,75cm
+90,,"'Honeyeater Heaven'",,,,,,Grevillea.lanigera,Yes,"Grevillea lanigera",
+91,"Nandina, Sacred bamboo","Heavenly Bamboo",,,,,,Nandina.domestica,Yes,"Nandina domestica",
+92,"H. corsicus, Lenten rose, Winter Rose","Christmas rose",,,,,,Helleborus.argutifolius,Yes,"Helleborus argutifolius",
+93,"Bear's foot, dungwort, setterwort","Hellebore 2",60cm,60,60,60,60,Helleborus.foetidus,Yes,"Helleborus foetidus",60cm
+94,Alumroot,'Obsidian',,,,,,Heuchera.1,Yes,Heuchera,
+95,"Alumroot, 'Peach Flambé'","Coral bells",,,,,,Heuchera.2,Yes,Heuchera,
+96,"Golden Guinea Vine, Snake Vine","Climbing Guinea Flower",,,,,,Hibbertia.scandens,Yes,"Hibbertia scandens",
+97,,"Hoary Guinea Flower",,,,,,Hibbertia.obtusifolia,Yes,"Hibbertia obtusifolia",
+98,,Hibiscus,,,,,,Alyogyne.huegelii.1,Yes,"Alyogyne huegelii",
+99,,"West Coast Gem",,,,,,Alyogyne.huegelii.2,Yes,"Alyogyne huegelii",
+100,,"Rose mallow",,,,,,Hibiscus,Yes,Hibiscus,
+101,,"Himalayan Knotweed",,,,,,Persicaria.affinis,Yes,"Persicaria affinis",
+102,"Annual honesty",Honesty,,,,,,Lunaria.annua,Yes,"Lunaria annua",
+103,"Common honeysuckle, European honeysuckle, Woodbine",Honeysuckle,,,,,,Lonicera.periclymenum,Yes,"Lonicera periclymenum",
+104,"Uruguayan Firecracker Plant","Hummingbird Plant",50cm,50,50,50,50,Dicliptera.suberecta,Yes,"Dicliptera suberecta",50cm
+105,,Hydrangea,,,,,,Hydrangea,Yes,Hydrangea,
+106,"'Golden Nugget', Native frangipani",Hymenosporum,,,,,,Hymenosporum,Yes,Hymenosporum,
+107,,"Algerian Iris",,,,,,Iris.unguicularis,Yes,"Iris unguicularis",
+108,,Iris,,,,,,Iris.unknown,Yes,"Iris unknown",
+109,"Pink Coneflower","Isopogon latifolius",1-2m,200,50,100,50,Isopogon.latifolius,Yes,"Isopogon latifolius",50cm
+110,,Ivy,,,,,,Hedera,Yes,Hedera,
+111,,Jacaranda,,,,,,Jacaranda.mimosifolia,Yes,"Jacaranda mimosifolia",
+112,"Smooth Japanese maple, irohamomiji (イロハモミジ), or momiji (紅葉)","Japanese maple",,,,,,Acer.palmatum,Yes,"Acer palmatum",
+113,"Japanese meadowsweet","Japanese Spiraea",,,,,,Spiraea.japonica,Yes,"Spiraea japonica",
+114,,"Bush Bonanza",,,,,,Anigozanthos.hybrid.syn.rambubona.kangaroo.paw,Yes,"Anigozanthos hybrid syn. Rambubona Kangaroo Paw",
+115,,"Bush Crystal",60cm,60,45,60,45,Anigozanthos.hybrid.kangaroo.paw,Yes,"Anigozanthos hybrid Kangaroo Paw",45cm
+116,,"Bush Pearl",,,,,,Anigozanthos.hybrid,Yes,"Anigozanthos hybrid",
+117,,"Bush Diamond",,,,,,Anigozanthos.hybrid.syn.rambodiam,Yes,"Anigozanthos hybrid syn. Rambodiam",
+118,,"Green Kangaroo Paw",,,,,,Anigozanthos.viridis,Yes,"Anigozanthos viridis",
+119,"'Mandy's Surprise'",Kunzea,,,,,,Kunzea.baxterii.nana,Yes,"Kunzea baxterii nana",
+120,"American cress, bank cress, black wood cress, Belle Isle cress, Bermuda cress, creasy greens, early wintercress, early yellowrocket, scurvy cress and upland cress","Land cress",20cm,20,20,20,20,Barbarea.verna,Yes,"Barbarea verna",20cm
+121,"'Midnight Blue'",Lechenaultia,,,,,,Lechenaultia,Yes,Lechenaultia,
+122,"Asiatic Matisse Lily, Oriental Lily",Lily,,,,,,Lilium,Yes,Lilium,
+123,,"Long-leaf Wax Flower",,,,,,Philotheca.myoporoides,Yes,"Philotheca myoporoides",
+124,"Aztec marigold, 'Jezebel', Mexican marigold",Marigold,,,,,,Tagetes.erecta,Yes,"Tagetes erecta",
+125,"Orange Browallia","Marmalade Bush",,,,,,Streptosolen.jamesonii,Yes,"Streptosolen jamesonii",
+126,,"Mexican Mock Orange",,,,,,Philadelphus.mexicanus,Yes,"Philadelphus mexicanus",
+127,"Balazo, Ceriman",Monstera,,,,,,Monstera.deliciosa,Yes,"Monstera deliciosa",
+128,"Pitted morningglory, Whitestar potato","Morning Glory",,,,,,Ipomoea.lacunosa,Yes,"Ipomoea lacunosa",
+129,"Chrysanthemum weed, common wormwood, felon herb, naughty man, old man, old Uncle Henry, riverside wormwood, sailor's tobacco, St. John's plant",Mugwort,1.2m,120,150,120,150,Artemisia.vulgaris,Yes,"Artemisia vulgaris",1.5m
+130,Paperwhite,Narcissus,,,,,,Narcissus.papyraceus,Yes,"Narcissus papyraceus",
+131,"Nose-tweaker, Nose-twister",Nasturtium,1-2m,200,45,100,45,Tropaeolum.majus,Yes,"Tropaeolum majus",45cm
+132,"'Blue Wonder'",Nierembergia,30cm,30,30,30,30,Nierembergia,Yes,Nierembergia,30cm
+133,"Wild marjoram (not sweet marjoram)",Oregano,80cm,80,,80,,Origanum.vulgare,Yes,"Origanum vulgare",
+134,"Garden parsley",Parsley,,,,,,Petroselinum.crispum,Yes,"Petroselinum crispum",
+135,,"Passionfruit Daisy",1.5-2m,200,,150,,Tagetes.sp,Yes,"Tagetes sp",
+136,,Pelargonium,,,,,,Pelargonium,Yes,Pelargonium,
+137,"Arthritis Herb, Asiatic pennywort, centella, Gotu Kola, Indian pennywort",Pennywort,,,,,,Centella.asiatica,Yes,"Centella asiatica",
+138,"'Perennial Statice'","Perezii Blue",,,,,,Limonium.perezii,Yes,"Limonium perezii",
+139,"Coleus canina, Dogsbane","Plectranthus caninus",,,,,,Plectranthus.caninus,Yes,"Plectranthus caninus",
+140,,"Plectranthus ecklonii 1",1.5m,150,150,150,150,Plectranthus.ecklonii.1,Yes,"Plectranthus ecklonii",1.5m
+141,'Alba',"Plectranthus ecklonii 2",1m,100,100,100,100,Plectranthus.ecklonii.2,Yes,"Plectranthus ecklonii",1m
+142,,"Plectranthus saccatus",1.5m,150,200,150,200,Plectranthus.saccatus,Yes,"Plectranthus saccatus",2m
+143,"Red Komatsuma","Red Japanese Spinach",45cm,45,30,45,30,Brassica.rapa.var.perviridis.red,Yes,"Brassica rapa var. perviridis 'Red'",30cm
+144,,"Red Spinach",1.2m,120,30,120,30,Spinacia.oleracea,Yes,"Spinacia oleracea",30cm
+145,,"Rice Flower 'Cosmic'",,,,,,Ozothamnus,Yes,Ozothamnus,
+146,,"Pale Pink Rice Flower",60cm,60,30,60,30,Pimelea.rosea,Yes,"Pimelea rosea",30cm
+147,Rose,"Rose 1",5m,500,300,500,300,Rosa.1,Yes,Rosa,3m
+148,Rose,"Rose 2",5m,500,200,500,200,Rosa.2,Yes,Rosa,2m
+149,Rose,"Rose 3",1.2m,120,100,120,100,Rosa.3,Yes,Rosa,1m
+150,Rose,"Rose 4",,,,,,Rosa.4,Yes,Rosa,
+151,Anthos,Rosemary,,,,,,Rosmarinus.officinalis,Yes,"Rosmarinus officinalis",
+152,"Garden sage","Common sage",20cm,20,20,20,20,Salvia.officinalis,Yes,"Salvia officinalis",20cm
+153,"Rosy-leaf sage",Bethellii,1m,100,100,100,100,Salvia.involucrata.2,Yes,"Salvia involucrata",1m
+154,,Sage,1m,100,100,100,100,Salvia.involucrata.3,Yes,"Salvia involucrata",1m
+155,"Sacred sage, white sage","Bee sage",1m,100,100,100,100,Salvia.apiana,Yes,"Salvia apiana",1m
+156,,"Siegfredia darwinioides",,,,,,Siegfredia.darwinioides,Yes,"Siegfredia darwinioides",
+157,,"Silver lace bush",1m,100,50,100,50,Tanacetum.ptarmiciflorum,Yes,"Tanacetum ptarmiciflorum",50cm
+158,"Smoke bush","Smoke Tree",,,,,,Cotinus.coggygria,Yes,"Cotinus coggygria",
+159,"Asparagus bean, bodi, bora, Chinese long bean, long-podded cowpea, pea bean, yardlong bean","Snake bean",46cm,46,10,46,10,Vigna.unguiculata.subsp.sesquipedalis,Yes,"Vigna unguiculata subsp. sesquipedalis",10cm
+160,"Common mint, garden mint, lamb mint, mackerel mint, Mentha spicata 'Moroccan', Mentha spicata 'Nana', Mentha viridis",Spearmint,45cm,45,100,45,100,Mentha.spicata,Yes,"Mentha spicata",1m
+161,,"Spiked mint-bush",1.5m,150,100,150,100,Prostanthera.phylicifolia,Yes,"Prostanthera phylicifolia",1m
+162,"Perpetual Spinach","Spinach Beet",45cm,45,35,45,35,Beta.vulgaris,Yes,"Beta vulgaris",35cm
+163,,"Spring Snowflake",,,,,,Leucojum.vernum,Yes,"Leucojum vernum",
+164,"Hummingbird mints, Giant hyssops","Sweet Lilli",1.1m,110,70,110,70,Agastache.aurantiaca,Yes,"Agastache aurantiaca",70cm
+165,"Athel pine, Athel tamarisk, Athel tree and saltcedar","Tamarix aphylla",18m,1800,500,1800,500,Tamarix.aphylla,Yes,"Tamarix aphylla",5m
+166,"Bitter buttons, cow bitter, common tansy, golden buttons",Tansy,1m,100,100,100,100,Tanacetum.vulgare,Yes,"Tanacetum vulgare",1m
+167,"A type of myrtle","Tea Tree 1",,,,,,Leptospermum.obovatum.anisophyllea,Yes,"Leptospermum obovatum anisophyllea",
+168,"A type of myrtle, 'Rudolph'","Tea Tree 2",2-3m,300,200,200,150,Leptospermum,Yes,"Leptospermum ",1.5-2m
+169,"Stypandra caespitosa","Thelionema caespitosum",30-90cm,90,50,30,30,Thelionema.caespitosum,Yes,"Thelionema caespitosum",30-50cm
+170,"Part of the ginger family",Turmeric,0.5m,50,50,50,50,Curcuma.longa,Yes,"Curcuma longa",0.5m
+171,"Cambodian mint, hot mint, laksa leaf, praew leaf, Vietnamese cilantro, Vietnamese coriander","Vietnamese Mint",90cm,90,30,90,30,Persicaria.odarata,Yes,"Persicaria odarata",30cm
+172,"Come-and-cuddle-me, Heart's delight, Heartsease, Heart's ease, Jack-jump-up-and-kiss-me, Johnny jump up, Love-in-idleness, Three faces in a hood, Tickle-my-fancy, Wild pansy, Yellow Pansy","Viola 1",,,,,,Viola.tricolor,Yes,"Viola tricolor",
+173,"Garden pansy, Pansy","Viola 2",,,,,,Viola.x.wittrockiana,Yes,"Viola x wittrockiana",
+174,Violet,"Viola 3",,,,,,Viola,Yes,Viola,
+175,,"White Cane Begonia",,,,,,Begonia.hybrid,Yes,"Begonia hybrid",
+176,"Indian Feather, Lindheimer's Beeblossom, Lindheimer's Clockweed, Pink Gaura","White Gaura",,,,,,Oenothera.lindheimeri,Yes,"Oenothera lindheimeri",
+177,,Wisteria,,,,,,Wisteria,Yes,Wisteria,
+178,"'Silver Silk'","Woolly Bush",,,,,,Adenanthos.sericeus,Yes,"Adenanthos sericeus",
+179,"'Powis Castle'",Wormwood,70cm,70,70,70,70,Artemisia,Yes,Artemisia,70cm
+180,"Albanian spurge, Mediterranean Spurge","Wulfen Spurge",1m,100,100,100,100,Euphorbia.characias.subsp.wulfenii,Yes,"Euphorbia characias subsp. wulfenii",1m
+181,"Common yarrow",Yarrow,0.6m,60,60,60,60,Archillea.millifolium,Yes,"Archillea millifolium",0.6m
+182,"Blue-and-white daisy bush, Cape marguerite, Star of the veldt, Sundays river daisy, Van Staden's river daisy, White daisy bush","Zion Red",,,,,,Osteospermum.ecklonis,Yes,"Osteospermum ecklonis",

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More q//;
+use Test::Exception q//;
 use Util::H2O::More qw/h2o o2h/;
 
 # for included module required for testing
@@ -46,4 +47,10 @@ my $foo2 = o2h(Foo->new(%$_foo));
 
 is_deeply $foo2, $_foo, q{'o2h' does invere of a package built with 'baptise -recurse'};
 
+
+# Util::H2O::o2h returns non-H2O references unchanged. The wrapper in
+# Util::H2O::More intentionally requires the top-level result to be a HASH.
+dies_ok { o2h [] } q{'o2h' rejects a top-level reference that cannot be converted to a HASH};
+
 done_testing;
+

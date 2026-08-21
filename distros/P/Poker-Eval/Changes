@@ -1,4 +1,25 @@
 Revision history for Poker-Eval
 
-0.01    January 3, 2016 
+0.11    2026-08-20
+        - Restore $VERSION on all packages so PAUSE can reindex after 0.10
+        - (0.10 left previously indexed modules stuck at 0.09)
 
+0.10    2026-08-20
+        - Add Poker::Game named-variant API:
+            Community: Holdem, HoldemJokersWild, Pineapple, CrazyPineapple,
+                       Omaha, OmahaHiLo, Omaha5, Omaha5HiLo,
+                       Courcheval, CourchevalHiLo
+            Draw:      FiveCardDraw, Deuces/Jokers wild, 2-7 and A-5 draw
+            Stud:      SevenCardStud, SevenCardStudHiLo, Razz
+            Badugi:    Badugi, Badacey, Badeucy
+        - Only Poker::Eval defines $VERSION (cleaner CPAN index)
+        - Joker support via Poker::Deck/Dealer joker_count
+        - Fix equity: ties split 1/N; sims use residual (undealt) deck
+        - Reference equity tests vs known Hold'em matchups
+        - Document equity, score, and core methods in README / Game POD
+
+0.09    2016
+        - Prior CPAN release
+
+0.01    January 3, 2016
+        - Initial release

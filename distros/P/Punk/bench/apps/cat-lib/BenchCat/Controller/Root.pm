@@ -1,4 +1,5 @@
-package BenchCat::Controller::Root;
+package 
+    BenchCat::Controller::Root;
 
 use strict;
 use warnings;

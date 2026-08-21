@@ -96,7 +96,7 @@ static pdl* my_pdl_wrap(void *data, int datatype, PDL_Indx dims[],
 
 static pdl* matvar_to_pdl (matvar_t * matvar, int onedr) {
   int ndims = matvar->rank;
-  pdl * piddle;
+  pdl * ndarray;
   int i, pdl_data_type;
   PDL_Indx * dims;
   if ( matvar->isComplex )
@@ -118,11 +118,11 @@ static pdl* matvar_to_pdl (matvar_t * matvar, int onedr) {
   if ( 0 > (pdl_data_type = matvar_class_to_pdl_type[matvar->class_type] )) {
     fprintf(stderr, "matvar_to_pdl: matlab data class is '%s'\n",matvar_class_type_desc[matvar->class_type]);
     barf("matvar_to_pdl: No pdl data type corresponding to this class type.");}
-  piddle = my_pdl_wrap(matvar->data, pdl_data_type, dims, ndims,
+  ndarray = my_pdl_wrap(matvar->data, pdl_data_type, dims, ndims,
                        delete_matvar_to_pdl_data, 0);
   matvar->mem_conserve = 1; // prevent matio freeing memory for data
   free(dims);
-  return piddle;
+  return ndarray;
 }
 
 pdl * convert_next_matvar_to_pdl (mat_t * matfp,  matvar_t ** matvar, int onedr) {
@@ -136,15 +136,15 @@ pdl * convert_next_matvar_to_pdl (mat_t * matfp,  matvar_t ** matvar, int onedr)
  *  pdl to matvar
  *******************************************************/
 
-matvar_t * pdl_to_matvar (pdl * piddle, char *varname, int onedw) {
-  int ndims = piddle->ndims;
+matvar_t * pdl_to_matvar (pdl * ndarray, char *varname, int onedw) {
+  int ndims = ndarray->ndims;
   matvar_t *matvar;
   int i, matvar_class_type, matvar_data_type;
   int opt =  MAT_F_DONT_COPY_DATA;
   size_t * dims;
   int tmp;
   dims = (size_t *)malloc(sizeof(size_t) * (ndims+1));
-  for(i=0;i<ndims;i++) dims[i] = piddle->dims[i];
+  for(i=0;i<ndims;i++) dims[i] = ndarray->dims[i];
   if (ndims == 1 ) {
     if ( onedw == 1) {
       ndims = 2;
@@ -157,18 +157,18 @@ matvar_t * pdl_to_matvar (pdl * piddle, char *varname, int onedw) {
       dims[1] = tmp;
      }
   }
-  matvar_class_type = pdl_type_to_matvar_class[piddle->datatype];
-  matvar_data_type  = pdl_type_to_matvar_type[piddle->datatype];
+  matvar_class_type = pdl_type_to_matvar_class[ndarray->datatype];
+  matvar_data_type  = pdl_type_to_matvar_type[ndarray->datatype];
   matvar = Mat_VarCreate(varname,matvar_class_type, matvar_data_type,
-                         ndims, dims, piddle->data, opt);
+                         ndims, dims, ndarray->data, opt);
   free(dims);
   return matvar;
 }
 
-int write_pdl_to_matlab_file (mat_t *mat, pdl *piddle, char *varname, int onedw,
+int write_pdl_to_matlab_file (mat_t *mat, pdl *ndarray, char *varname, int onedw,
                               int compress) {
   matvar_t * matvar;
-  matvar = pdl_to_matvar(piddle,varname,onedw);
+  matvar = pdl_to_matvar(ndarray,varname,onedw);
   int retval;
   if ( compress == 1 ) retval =  Mat_VarWrite(mat, matvar, MAT_COMPRESSION_ZLIB);
   else retval =  Mat_VarWrite(mat, matvar, MAT_COMPRESSION_NONE);

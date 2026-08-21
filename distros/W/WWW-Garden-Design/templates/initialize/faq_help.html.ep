@@ -1,0 +1,41 @@
+<h1 align = 'center'>FAQ</h1>
+
+<table align = 'center' class = 'table_striped'>
+	<thead>
+		<tr>
+			<td class = 'generic_border generic_padding'>#</td>
+			<td class = 'generic_border generic_padding'>Q</td>
+			<td class = 'generic_border generic_padding'>A</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class = 'generic_border generic_padding'>1</td>
+			<td class = 'generic_border generic_padding'>On the Details/URLs tab, why don't you display clickable links?</td>
+			<td class = 'generic_border generic_padding'>Because the URL has to be editable.</td>
+		</tr>
+		<tr>
+			<td class = 'generic_border generic_padding'>2</td>
+			<td class = 'generic_border generic_padding'>Why is my data missing from the communal database (not yet implemented)?</td>
+			<td class = 'generic_border generic_padding'>In rare cases, we find strange characters in files.<br />Most likely they are single- and double-quotes, but are not ISO-8859-1 (ASCII) characters.<br />Typically the text has been copied from a word processor document containing,<br />unfortunately, 'smart' quotes.</td>
+		</tr>
+		<tr>
+			<td class = 'generic_border generic_padding'>3</td>
+			<td class = 'generic_border generic_padding'>What is CSRF?</td>
+			<td class = 'generic_border generic_padding'>Cross-site Request Forgery. See <a href = 'https://en.wikipedia.org/wiki/Cross-site_request_forgery'>CSRF on Wikipedia</a></td>
+		</tr>
+		<tr>
+			<td class = 'generic_border generic_padding'>4</td>
+			<td class = 'generic_border generic_padding'>Do you know any interesting flower-related web sites?</td>
+			<td class = 'generic_border generic_padding'>
+				<a href = 'http://www.flowersforums.com/forums/'>Flower Forums - A great place to ask for help</a><br />
+				<a href = 'http://www.gardenate.com/'>Gardenate</a><br />
+				<a href = 'http://nurseriesonline.com.au'>NurseriesOnLine</a><br />
+				<a href = 'http://www.plantnet.org/'>PlantNet - Identify plants via pix</a><br />
+				<a href = 'http://smartgardenwatering.com.au'>Smart Garden Watering</a><br />
+				<a href = 'http://www.theplantlist.org/'>The Plant List - A working list of all plant species</a><br />
+				<a href = 'http://wildflowerfinder.org.uk/Menu2/Miscellaneous/SmellsLike.htm'>What some plants smell like</a><br />
+			</td>
+		</tr>
+	</tbody>
+</table>

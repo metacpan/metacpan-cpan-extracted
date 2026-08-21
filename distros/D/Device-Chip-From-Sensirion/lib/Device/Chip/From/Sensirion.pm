@@ -9,7 +9,7 @@ use Object::Pad 0.800;
 
 use utf8;
 
-package Device::Chip::From::Sensirion 0.02;
+package Device::Chip::From::Sensirion 0.03;
 class Device::Chip::From::Sensirion
    :isa(Device::Chip);
 
@@ -59,12 +59,14 @@ sub _pack_with_crc ( $word )
 
 =cut
 
+use constant PACK_FORMAT_CMD => "S>";
+
 async method _cmd ( $cmd,
    :$words_out = undef,
    :$delay = undef,
    :$read = 0,
 ) {
-   my $bytes_out = pack( "S>", $cmd );
+   my $bytes_out = pack( $self->PACK_FORMAT_CMD, $cmd );
 
    if( $words_out and @$words_out ) {
       $bytes_out .= _pack_with_crc( $_ ) for @$words_out;

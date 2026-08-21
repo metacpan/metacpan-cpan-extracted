@@ -21,12 +21,30 @@
  * is the mistake Eshu spent three releases undoing. This file stays
  * dependency-free (tools/fuzz/ compiles it alone), so the shim lives here
  * and not in hm_win.h. */
-#ifdef _WIN32
-#  define hm_strncasecmp(a, b, n) _strnicmp((a), (b), (n))
-#else
-#  include <strings.h>
-#  define hm_strncasecmp(a, b, n) strncasecmp((a), (b), (n))
-#endif
+/* ASCII-only, and deliberately not the C library's.
+ *
+ * strncasecmp folds according to the CURRENT LOCALE, and every caller here is
+ * comparing an HTTP header name or token - which RFC 9110 defines as ASCII.
+ * Under a Turkish locale the library folds 'I' to the dotless form, so
+ * "CONTENT-LENGTH" stops matching "Content-Length" and the framing header
+ * goes unrecognised. A server's parse must not depend on the operator's
+ * LC_CTYPE.
+ *
+ * It is also faster: on glibc and on Darwin the call lands in strncasecmp_l,
+ * which resolves the thread's locale before it compares a byte. This is
+ * ~0.3% of the request path, so the reason to prefer it is the first
+ * paragraph and the speed is a bonus. */
+static int hm_strncasecmp(const char *a, const char *b, size_t n) {
+    size_t i;
+    for (i = 0; i < n; i++) {
+        unsigned char ca = (unsigned char)a[i], cb = (unsigned char)b[i];
+        if (ca >= 'A' && ca <= 'Z') ca |= 32;
+        if (cb >= 'A' && cb <= 'Z') cb |= 32;
+        if (ca != cb) return (int)ca - (int)cb;
+        if (!ca) break;                    /* both NUL: equal within n */
+    }
+    return 0;
+}
 
 /* One parsed header line: name at head+off (klen bytes), value at head+voff
  * (vlen bytes, leading OWS trimmed; trailing OWS kept, matching what the env

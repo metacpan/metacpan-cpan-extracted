@@ -11,6 +11,7 @@ requires 'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch', '0.014';
 requires 'Dist::Zilla::Plugin::GitHub::CreateRelease', '0.0012';
 requires 'Dist::Zilla::Plugin::GithubMeta', '0.58';
 requires 'Dist::Zilla::Plugin::InstallRelease', '0.008';
+requires 'Dist::Zilla::Plugin::LicenseFile';
 requires 'Dist::Zilla::Plugin::MakeMaker::Awesome', '0.49';
 requires 'Dist::Zilla::Plugin::MetaProvides::Package', '2.004003';
 requires 'Dist::Zilla::Plugin::MakeMaker::SkipInstall', '1.201';

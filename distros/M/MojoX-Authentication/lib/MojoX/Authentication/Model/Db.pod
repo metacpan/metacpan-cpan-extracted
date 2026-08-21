@@ -31,8 +31,7 @@ and inherits its methods.
 
 =head2 B<< create >>
 
-my $instance = MojoX::Authentication::Model::Db->new(
-      $config, %args);
+   my $instance = MojoX::Authentication::Model::Db->new($config, %args);
 
 Constructor. 
 

@@ -1,0 +1,3 @@
+: for $column -> $item {
+<td><: $item.td :></td>
+: }

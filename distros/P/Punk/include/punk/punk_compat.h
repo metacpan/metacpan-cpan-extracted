@@ -73,7 +73,7 @@ static MAGIC *Punk_mg_findext(SV *sv, int type, const MGVTBL *vtbl) {
  * off; before it the refcount really does walk down to zero and the next
  * thing to touch yes/no/undef segfaults. Taking the reference first costs
  * nothing - it is still the same singleton, with no allocation - and keeps
- * the books straight on every perl. See t/42-immortal-refcount.t. */
+ * the books straight on every perl. See t/0012-immortal-refcount.t. */
 #define PUNK_SET_TRUE SvREFCNT_inc_simple_NN(&PL_sv_yes)
 
 #endif /* PUNK_COMPAT_H */

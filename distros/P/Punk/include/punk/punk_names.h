@@ -35,7 +35,7 @@
  * before 5.20 the immortals' refcounts are small and unprotected, so a
  * path that re-requires per app build (the markdown mount did) drains
  * PL_sv_undef toward a segfault under `punk dev`'s rebuild loop. A CPAN
- * smoker on 5.20.0 caught it via t/42-immortal-refcount.t.
+ * smoker on 5.20.0 caught it via t/0012-immortal-refcount.t.
  *
  * The %INC check makes the already-loaded case - every call after the
  * first - eval-free. The one genuine first load still uses eval_pv so
@@ -96,6 +96,7 @@ static int pk_require_once(pTHX_ const char *mod, int fatal) {
 #define K_MODELS_C   "models_compiled"
 #define K_MODEL_CACHE "model_cache"
 #define K_VIEWS_C    "views_compiled"
+#define K_MOUNTS_C   "mounts_compiled"
 #define K_CTX_DEFINED "ctx_defined"
 #define K_UA         "ua"          /* the `ua` keyword's frozen config */
 #define K_UA_AGENT   "ua_agent"    /* { agent => $fetch, pid => $$ } */
@@ -138,5 +139,14 @@ static int pk_require_once(pTHX_ const char *mod, int fatal) {
 #define K_COMPRESS "compress"
 #define K_NOCOMPRESS_ROUTES "nocompress_routes"
 #define K_MAXBODY_ROUTES    "maxbody_routes"
+#define K_SITEMAP  "sitemap"
+#define K_SITEMAP_ROUTES    "sitemap_routes"
+#define K_ETAG     "etag"
+#define K_ETAG_ROUTES       "etag_routes"
+#define K_CGET     "conditional_get"   /* the plugin's on-switch */
+#define K_IDEMPOTENT "idempotent"
+#define K_IDEM_ROUTES "idempotent_routes"
+#define K_IDEM     "idempotency"       /* the plugin's config */
+#define K_CSP      "csp"                /* Punk::Plugin::CSP config  */
 
 #endif /* PUNK_NAMES_H */

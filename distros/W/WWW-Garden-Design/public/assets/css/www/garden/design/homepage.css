@@ -1,0 +1,220 @@
+.alert
+{
+	color:				red;
+	background-color:	yellow;
+}
+
+.black_on_reddish_title
+{
+	background-color:	#f08f8f; // Reddish.
+	border-color:		black;
+	border-style:		solid;
+	border-width:		2px;
+	color:				black;
+	font-family:		Verdana, Helvetica, Arial, sans-serif;
+	font-size:			30px;
+	text-align:			center;
+	width:				20em;
+}
+
+.blue_centered
+{
+	background-color:	#6293cd;
+	color:				#ffffff;
+	font-weight:		bold;
+	text-align:			center;
+}
+
+body
+{
+	border-collapse:	collapse;
+	font-size:			16px;
+	margin:				0;
+	padding:			0;
+}
+
+.bordered
+{
+	border-style:	solid;
+	border-width:	1px;
+}
+
+.centered
+{
+	text-align: center;
+}
+
+.color_swatch_chosen
+{
+	background-color:	white;
+	border-style:		solid;
+	border-width:		1px;
+	height:				20px;
+	width:				20px;
+}
+
+.error
+{
+	color:			red;
+	font-weight:	bold;
+}
+
+.hidden_div
+{
+	background-color:	#6293cd;
+	border-style:		solid;
+	border-width:		1px;
+	display:			none;
+	text-align:			center;
+}
+
+.hidden_span
+{
+	display: none;
+}
+
+.italic
+{
+	font-style: italic;
+}
+
+.left
+	text-align: left;
+}
+
+.purple_on_red_title
+{
+	background-color:	red;
+	border-color:		black;
+	border-style:		solid;
+	border-width:		2px;
+	color:				purple;
+	font-family:		Verdana, Helvetica, Arial, sans-serif;
+	font-size:			30px;
+	text-align:			center;
+	width:				20em;
+}
+
+.red_on_gold_title
+{
+	background-color:	gold;
+	border-color:		black;
+	border-style:		solid;
+	border-width:		2px;
+	color:				red;
+	font-family:		Verdana, Helvetica, Arial, sans-serif;
+	font-size:			30px;
+	text-align:			center;
+	width:				20em;
+}
+
+.right
+{
+	text-align: right;
+}
+
+.success
+{
+	color:			green;
+	font-weight:	bold;
+}
+
+table
+{
+	border-spacing: 0;
+}
+
+table.generic_border
+{
+	border:				1px solid #00aa00;
+	border-collapse:	collapse;
+}
+
+.table_margin_auto
+{
+	margin: 0 auto;
+}
+
+.table_striped>tbody>tr:nth-of-type(odd){background-color:#f9f9f9}
+
+td.generic_border
+{
+	border: 1px solid #00aa00;
+}
+
+td.generic_border_margin
+{
+	border:			1px solid #00aa00;
+	padding-left:	20px;
+	padding-right:	20px;
+	text-align:		center;
+}
+
+/* See also th.generic_padding below. */
+
+td.generic_padding
+{
+	padding: 4px 4px 4px 4px;
+}
+
+th.generic_border
+{
+	border: 1px solid #00aa00;
+}
+
+th.generic_border_margin
+{
+	border:			1px solid #00aa00;
+	padding-left:	20px;
+	padding-right:	20px;
+	text-align:		center;
+}
+
+/* See also td.generic_padding above. */
+
+th.generic_padding
+{
+	padding: 4px 4px 4px 4px;
+}
+
+tr.generic_border
+{
+	border: 1px solid #00aa00;
+}
+
+table.datatable
+{
+	border-width:		1px;
+	border-spacing:		0px;
+	border-style:		outset;
+	border-color:		gray;
+	border-collapse:	separate;
+	#background-color:	white;
+}
+
+table.datatable th
+{
+	border-width:		1px;
+	padding:			1px;
+	border-style:		inset;
+	border-color:		gray;
+	#background-color:	white;
+	-moz-border-radius: ;
+}
+
+table.datatable td
+{
+	border-width:		1px;
+	padding:			1px;
+	border-style:		inset;
+	border-color:		gray;
+	#background-color:	white;
+	-moz-border-radius:	;
+}
+
+.white_centered
+{
+	background-color:	#ffffff;
+	color:				#6293cd;
+	font-weight:		bold;
+}

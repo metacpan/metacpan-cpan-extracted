@@ -1,3 +1,8 @@
+0.068	- 2026-08-19,  H.Merijn Brand
+    * Add OpenSUSE 16.0
+    * Address two MacOS system_profiler issues (Thanks Sevan for your help)
+    * Catch "empty" CPU info in test
+
 0.067	- 2026-01-25,  H.Merijn Brand
     * Add Rockylinux-10.0
     * It's 2026

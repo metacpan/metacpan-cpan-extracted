@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.32';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -85,10 +85,19 @@ interfaces (F<xs/>).
         deny           => ['1.2.3.4'], # IPs dropped at accept (see below)
         deny_capacity  => 1024,        # denylist table size (0 = default)
         rate_capacity  => 4096,        # rate-counter table size (0 = default)
+        bus_slots      => 2048,        # message bus: ring depth
+        bus_slot_size  => 2048,        # ... and the largest message
+        bus_groups     => 64,          # ... and how many named queue groups
     );
 
 The event backend is chosen automatically (kqueue, io_uring, epoll, then poll) and can
 be forced with C<HYPERMAN_BACKEND>.
+
+C<bus_slots> and C<bus_slot_size> answer two different complaints and it is
+worth knowing which is which: raise C<bus_slots> when a burst is outrunning a
+reader (the symptom is a climbing C<gaps> count), and C<bus_slot_size> when a
+publish is refused for being too big. The default 2048 x 2KB costs four
+megabytes of shared memory for the whole pool. See L</The message bus>.
 
 =head2 Multiple listeners
 
@@ -138,12 +147,46 @@ full control; that path calls back into Perl for every response.
 
 =head2 max_body: the request ceiling
 
-C<max_body> is the largest request Hyperman will buffer - B<headers plus
-body> - before the application is called. Over it, the request is answered
-C<413 Payload Too Large> and the connection is closed. The default is
-B<16MB>, which is what it was as a hard-coded literal before 0.25.
+C<max_body> is the largest request Hyperman will accept - B<headers plus
+body>. Over it, the request is answered C<413 Payload Too Large> and the
+connection is closed. The default is B<16MB>.
 
     Hyperman->run(app => $app, max_body => 64 * 1024 * 1024);
+
+=head3 It is no longer a memory ceiling
+
+It used to be one, and the two are worth telling apart now that they are
+different numbers.
+
+A body larger than B<1MB> is written to a temp file as it arrives, and
+C<psgi.input> is a handle on that file rather than a second copy in memory.
+So the memory a request costs is bounded by that threshold, not by
+C<max_body> - a 128MB upload measured at about 15MB of worker RSS, against
+roughly 275MB before the change.
+
+Which means C<max_body> can be raised for large uploads without raising what
+a worker holds. It is a policy ceiling now: how large a request this service
+is willing to accept, and the thing standing between a form and a full
+filesystem.
+
+The temp file is unlinked the moment it is created, so the handle is its only
+reference. It goes away when the request ends, when a handler dies, or when
+the worker is killed - there is nothing to clean up and nothing on disk for
+another process to find. C<TMPDIR> chooses where it lives.
+
+Two limits, stated plainly:
+
+=over 4
+
+=item * The threshold is a build-time constant (C<HM_SPILL_BODY>), not yet a
+run-time option.
+
+=item * B<Chunked bodies are not spilled.> There is no C<Content-Length> to
+divert on and the decoder wants the octets contiguous, so a
+C<Transfer-Encoding: chunked> request still accumulates in memory and is still
+bounded by C<max_body>.
+
+=back
 
 =head2 Response compression
 
@@ -446,6 +489,197 @@ one for a check that could not run. Note that a denylist entry added from
 inside a request is enforced at C<accept> from then on, so it takes effect on
 the B<next> connection, not the one that added it.
 
+=head2 The message bus
+
+    # anywhere: a request handler, a timer, another worker
+    Hyperman->publish('room:lobby', $bytes);
+
+    # in a worker, usually from on_worker_start
+    Hyperman->subscribe('room:lobby' => sub {
+        my ($topic, $payload) = @_;
+        $_->send($payload) for $room->clients;
+    });
+
+A publish/subscribe bus across the whole worker pool, on a second
+fork-shared arena beside the one above. No Redis, no hub process, no new
+prerequisite.
+
+It exists because a prefork server makes anything held in a worker a lie
+about the pool. L<Punk::WebSocket::Room> says so in its own documentation: a
+room is per worker, so under C<< workers => 4 >> a broadcast reaches roughly a
+quarter of the people in it, the call succeeds, and nobody is told. The same
+shape applies to Server-Sent Events, to cache invalidation, and to anything
+else one worker learns and the others need.
+
+=head3 Two delivery modes, and where the cursor lives
+
+A message is published once. The whole difference is B<where the cursor
+lives>:
+
+=over 4
+
+=item * B<Fanout> - the default. Each subscriber keeps its cursor in its own
+process, so B<every> subscriber sees B<every> message. This is what a chat
+room wants.
+
+=item * B<A queue group> - C<< group => $name >>. One cursor lives in the
+arena and is advanced with an atomic compare-and-swap, so B<exactly one>
+member of the pool sees each message. This is load-balanced work
+distribution.
+
+=back
+
+The balancing is not implemented, it is a consequence. A worker that is busy
+is not in the claim, so it does not take anything, so the free workers take
+the traffic. There is no scheduler and nothing to tune.
+
+Both may be live on the same topic at once: a room can fan out to every
+worker's connections while a group of workers takes one copy each to write to
+a log. A group consumes only its own cursor, so the fanout readers still see
+everything.
+
+=head3 Which to use, and when NOT to use this at all
+
+B<Delivery is at-most-once.> A worker that claims a message and then dies
+loses it, and the loss is counted rather than retried. Nothing survives a
+restart: the ring is memory, and memory is what makes it fast.
+
+If losing the message matters, this is the wrong tool. L<Punk::Queue> is the
+right one.
+
+    .                     Punk::Queue        a bus queue group
+    delivery              at-least-once      at-most-once
+    survives a restart    yes                no
+    worker dies mid-work  retried            counted, and lost
+    latency               milliseconds       microseconds
+    storage               Postgres/SQLite    shared memory
+
+Sending an email, charging a card, resizing an upload somebody paid for: the
+queue. Telling the other workers a cache key changed, fanning a chat message
+out, nudging every worker to re-read a config: the bus.
+
+=head3 Overflow: bounded, drop-oldest, counted
+
+The ring is fixed. When a reader falls far enough behind, the ring wraps past
+what it has not read yet, and those messages are gone.
+
+Every part of that is deliberate. B<Bounded>, because an unbounded buffer in
+front of a stalled worker is a memory leak with a schedule - one wedged
+consumer would grow it until the server dies and takes the healthy workers
+with it. B<Drop-oldest>, because when a system is in trouble the recent
+messages are the ones anybody wants. B<Counted>, and the count reachable,
+because a silently short chat room is indistinguishable from a quiet one.
+
+    my %s = Hyperman->bus_stats('thumbs');
+    warn "bus dropped $s{gaps}"       if $s{gaps};
+    warn "group lost $s{group_gaps}"  if $s{group_gaps};
+
+A climbing count means the reader is too slow or C<bus_slots> is too small. In
+measurement, nothing is lost until a publisher is running at over a million
+messages a second - far past a rate any consumer can be scheduled at, which is
+exactly when dropping the oldest is the right answer.
+
+The ring B<cannot> grow to fit, and would not if it could. It is a shared
+mapping inherited by every worker at a fixed address and size, so growing it
+would mean every already-forked process mapping new pages in step, which there
+is no mechanism to do. Size it with C<bus_slots> instead.
+
+=head3 The wakeup
+
+A publish pokes every other worker through a descriptor it has been watching
+since it started, so the message arrives in microseconds rather than whenever
+that worker next happens to look. Measured publish-to-wake across processes is
+under a fifth of a millisecond.
+
+A burst does not become a storm: a worker with a poke already in flight is not
+poked again, so a thousand publishes in a loop produce a single wakeup rather
+than a thousand.
+
+=head3 Methods
+
+=over 4
+
+=item C<< Hyperman->publish($topic, $payload) >>
+
+C<1> on the ring, C<0> local-only (there is no arena, so nobody else will see
+it), C<-1> refused as too big for a slot. Three outcomes rather than true or
+false, because "sent to the pool" and "sent to myself" are different facts and
+a caller that cannot tell them apart cannot diagnose anything.
+
+An oversize message is refused, never truncated: a truncated WebSocket frame
+is a protocol violation delivered to every member of a room.
+
+=item C<< Hyperman->subscribe($topic, $cb, group => $name) >>
+
+Returns an id, or C<-1>. The callback is invoked as C<< $cb->($topic,
+$payload) >> from this worker's event loop. C<group> is the only difference
+between the two delivery modes.
+
+A subscriber that dies has its death turned into a warning. It runs from the
+event loop with nothing to unwind into, and one bad handler must not remove a
+worker from the pool.
+
+=item C<< Hyperman->unsubscribe($id) >>
+
+=item C<< Hyperman->receive >>
+
+Everything published since this process last asked, as C<< [$topic,
+$payload] >> pairs. The manual alternative to C<subscribe>, for a process that
+is not on a Hyperman loop.
+
+=item C<< Hyperman->claim($topic, $group) >>
+
+The same, load-balanced. C<$group> defaults to the topic.
+
+B<A subscription begins at "from now on".> Both a C<subscribe> and the first
+C<claim> on a group start at the current position, not at the oldest message
+still in the ring - so register before publishing, and expect nothing back
+from a claim on a group that did not exist when the message was sent.
+
+That is deliberate. The alternative is that a worker restarting at three in
+the morning replays every message still in the ring, all at once, to a process
+that has just come up - which is the moment it can least afford it.
+
+=item C<< Hyperman->dispatch >>
+
+Runs the subscriptions by hand and returns how many messages reached a
+subscriber. Under a worker the wakeup does this; outside one, this is the poll
+that stands in for it.
+
+=item C<< Hyperman->bus_reset >>
+
+Point this process's cursor at "from now on". A worker does this for itself;
+a process that forks by hand must, or the child replays what the parent
+already handled.
+
+=item C<< Hyperman->bus_stats($group) >>
+
+C<published>, C<gaps>, and C<group_gaps> when a group is named.
+
+C<gaps> is what this PROCESS missed - messages the ring wrapped past before
+it read them - counted across both of its readers, C<receive> and the
+dispatcher behind C<subscribe>. Nothing calls C<receive> under a server, so a
+count of only that one would read zero however much a busy worker's
+subscriptions dropped.
+
+=item C<< Hyperman->bus_live >>
+
+Whether there is a shared ring at all.
+
+=back
+
+Topics match B<exactly>. A hierarchy is a naming convention - C<room:lobby>,
+C<room:support> - dispatched by the caller, since C<receive> hands back the
+topic with every message.
+
+=head3 Where it is not there
+
+Local-only on Windows, and on a compiler without the atomics the arena needs.
+C<publish> returns C<0> and reaches this process's own subscribers; a queue
+group degrades to "this process is the only member", which is correct rather
+than convenient. That is the same answer C<deny_check> and C<ratelimit_hit>
+give, and it is the tested path rather than a fallback nobody exercises.
+
 =head2 on_worker_start
 
     Hyperman->on_worker_start(sub {
@@ -508,7 +742,7 @@ F<hm_abi.h>.
 
 =head2 The table
 
-    #define HM_ABI_VERSION 4
+    #define HM_ABI_VERSION 5
 
     #define HM_ABI_READ  0x1        /* io_watch masks     */
     #define HM_ABI_WRITE 0x2
@@ -575,6 +809,14 @@ F<hm_abi.h>.
          * Register before run(). Fires in the single-worker case too.
          * Returns 1, or 0 when the table is full. */
         int (*on_worker_start)(pTHX_ hm_abi_worker_cb cb, void *ud);
+
+        /* v5: the cross-worker message bus */
+        int (*bus_publish)(const char *topic, STRLEN tlen,
+                           const char *payload, STRLEN plen);
+        int (*bus_subscribe)(pTHX_ const char *topic, STRLEN tlen,
+                             const char *group, STRLEN glen,
+                             hm_abi_bus_cb cb, void *ud);
+        int (*bus_unsubscribe)(pTHX_ int id);
     } hm_abi;
 
 C<on_worker_start> is the seam for anything a consumer owns that is bound to
@@ -648,6 +890,34 @@ C<run_until> pumps the loop until the given future settles. It is
 re-entrant - calling it from inside a callback nests, exactly like
 C<< ->get >> inside a Hyperman worker - so a blocking-style C<await> can be
 built on it directly.
+
+=head2 The message bus (v5)
+
+    static void on_msg(pTHX_ const char *topic, STRLEN tl,
+                       const char *payload, STRLEN pl, void *ud) { ... }
+
+    A->bus_subscribe(aTHX_ "room:lobby", 10, NULL, 0, on_msg, ud);
+    A->bus_publish("room:lobby", 10, bytes, len);
+
+The C door onto L</The message bus>, so a consumer can fan a message across
+the worker pool without a Perl frame on either side.
+
+C<group> C<NULL> is fanout - this process sees every message on the topic. A
+group name makes it a queue group - exactly one member of the pool sees each
+message. One entry point, because they are one mechanism.
+
+C<bus_publish> returns 1 on the ring, 0 local-only (no arena), -1 refused as
+oversize. Like the v3 abuse controls it takes no C<pTHX>: the arena is
+process-global and the publish path touches no SV.
+
+The callback is subject to the same contract as every other in this table and
+one that matters more here: B<it must not croak>. It is reached from the event
+loop with no Perl frame to unwind into, so a death would take the worker down
+- and for a chat server that means one bad handler silently removing a worker
+from the pool.
+
+Delivery is at-most-once and drops oldest under pressure, counting what it
+dropped. A consumer that cannot lose the message wants L<Punk::Queue>.
 
 =head2 Abuse controls (v3)
 

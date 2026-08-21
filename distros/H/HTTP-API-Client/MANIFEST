@@ -97,5 +97,17 @@ t/83_execute_callbacks_deterministic_order.t
 t/84_before_sorting_keys_discarded_by_events_keys.t
 t/85_marker_namespace_no_collision.t
 t/86_zero_string_credentials_trigger_basic_auth.t
+t/87_debug_request_dump_survives_redirect.t
+t/88_negative_retry_delay_clamped_in_retry_attribute.t
+t/89_manifest_skip_backup_file_pattern.t
+t/90_debug_response_header_only.t
+t/91_kvp2str_nested_empty_array_filtered.t
+t/92_kvp_response_empty_content.t
+t/93_tune_utf8_non_matching_error_swallowed.t
+t/94_events_keys_duplicate_dedup.t
+t/95_headers_keys_duplicate_dedup.t
+t/96_retry_count_non_numeric_passthrough.t
+t/97_header_key_never_set_is_skipped.t
+t/98_basic_auth_empty_username_set_password.t
 t/lib/CaptureStderr.pm
 t/lib/FakeUA.pm

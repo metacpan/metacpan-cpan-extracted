@@ -1,0 +1,12 @@
+Revision history for Perl extension WWW::Garden::Design.
+
+0.97  2021-10-02T17:17:00
+	- Remove all usages of warnings.FATAL.
+	- Minor cleanup of Makefile.PL.
+
+0.96  2018-05-03T15:00:00
+	- Many patches to interaction between menus on different tabs.
+	- Move tile generating code from Export.pm to Database.pm so it's available on-line.
+
+0.95  2016-12-20T12:00:00
+	- Original version

@@ -1,0 +1,47 @@
+---
+abstract: 'Find or build libhisto fast C histogramming library'
+author:
+  - 'Steffen Mueller <cpan@steffen-mueller.net>'
+build_requires:
+  Alien::Build: '2.00'
+  Alien::Build::MM: '2.00'
+  Alien::Build::Plugin::Build::CMake: '0.01'
+  Alien::cmake3: '0.02'
+  Config: '0'
+  Test2::V0: '0.000060'
+  Test::Alien: '2.00'
+configure_requires:
+  Alien::Build: '2.00'
+  Alien::Build::MM: '2.00'
+  Alien::Build::Plugin::Build::CMake: '0.99'
+  Alien::Build::Plugin::Fetch::LocalDir: '0.72'
+  ExtUtils::MakeMaker: '6.52'
+  File::Path: '0'
+  File::Spec: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libhisto
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Base: '2.00'
+  Alien::Build: '0.25'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tsee/libhisto/issues
+  repository: https://github.com/tsee/libhisto.git
+version: v0.1.0
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.84'
+  requires:
+    share:
+      Alien::cmake3: '0.02'
+      Config: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

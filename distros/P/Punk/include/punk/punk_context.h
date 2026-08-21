@@ -25,7 +25,8 @@ enum {
     PCX_STASH   = 4,
     PCX_OPENAPI = 5,
     PCX_MATCH   = 6,
-    PCX_UA      = 7   /* memoised $c->ua; the agent itself lives on the app */
+    PCX_UA      = 7,  /* memoised $c->ua; the agent itself lives on the app */
+    PCX_REQID   = 8   /* Punk::Plugin::RequestId's id, when it is loaded     */
 };
 
 static AV *pcx_av(pTHX_ SV *self) {

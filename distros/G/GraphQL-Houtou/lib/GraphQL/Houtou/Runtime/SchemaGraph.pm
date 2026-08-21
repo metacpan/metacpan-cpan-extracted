@@ -225,6 +225,10 @@ sub to_native_exec_struct {
   my $struct = $self->to_native_compact_struct;
   $struct->{slot_catalog_exec} = [ map { $_->to_native_exec_struct } @{ $self->{slot_catalog} || [] } ];
   $struct->{slot_resolvers} = [ map { _slot_resolver($self, $_) } @{ $self->{slot_catalog} || [] } ];
+  $struct->{slot_loader_specs} = [
+    map { $_ && $_->loader ? $_->loader : undef }
+      @{ $self->{slot_catalog} || [] }
+  ];
   $struct->{runtime_cache} = $self->{runtime_cache};
   $struct->{schema} = $self->{schema};
   return $struct;
@@ -268,6 +272,9 @@ sub _slot_resolver {
   my $field = ($type->fields || {})->{$field_name};
   return undef if ref($field) ne 'HASH';
 
+  return _loader_resolver($field->{loader})
+    if $field->{loader};
+
   my $wrapped = slot_needs_runtime_wrapper(
     schema => $self->{schema},
     field => $field,
@@ -280,6 +287,53 @@ sub _slot_resolver {
     field => $field,
     resolver => $field->{resolve},
   );
+}
+
+sub _loader_value {
+  my ($spec, $source, $args) = @_;
+  if (exists $spec->{source_key}) {
+    return undef if ref($source) ne 'HASH';
+    return $source->{ $spec->{source_key} };
+  }
+  return undef if ref($args) ne 'HASH';
+  return $args->{ $spec->{argument} };
+}
+
+sub _loader_resolver {
+  my ($spec) = @_;
+  my $key_spec = $spec->{key};
+  if (exists $spec->{context_key}) {
+    my $context_key = $spec->{context_key};
+    return sub {
+      my ($source, $args, $context) = @_;
+      my $loader = ref($context) eq 'HASH' ? $context->{$context_key} : undef;
+      die "loader '$context_key' is not available in the request context\n"
+        if !$loader || !$loader->can('load');
+      my $key = _loader_value($key_spec, $source, $args);
+      die "loader key for '$context_key' is undefined\n" if !defined $key;
+      return $loader->load($key);
+    };
+  }
+
+  my $router_spec = $spec->{router};
+  my $router_context_key = $router_spec->{context_key};
+  my $route_key_spec = $router_spec->{route_key};
+  return sub {
+    my ($source, $args, $context) = @_;
+    my $router = ref($context) eq 'HASH'
+      ? $context->{$router_context_key} : undef;
+    die "loader router '$router_context_key' is not available in the request context\n"
+      if ref($router) ne 'HASH';
+    my $route_key = _loader_value($route_key_spec, $source, $args);
+    die "loader route key for '$router_context_key' is undefined\n"
+      if !defined $route_key;
+    my $loader = $router->{$route_key};
+    die "loader route '$route_key' is not registered in '$router_context_key'\n"
+      if !$loader || !$loader->can('load');
+    my $key = _loader_value($key_spec, $source, $args);
+    die "loader key for route '$route_key' is undefined\n" if !defined $key;
+    return $loader->load($key);
+  };
 }
 
 sub _type_kind_name_code {
@@ -408,6 +462,7 @@ sub _inflate_slot {
     field_name => $struct->{field_name},
     result_name => $struct->{result_name},
     accessor => $struct->{accessor},
+    loader => $struct->{loader},
     return_type_name => $struct->{return_type_name},
     resolver_shape => $struct->{resolver_shape},
     resolver_mode => $struct->{resolver_mode},
@@ -485,6 +540,17 @@ sub _build_slots_for_object {
       die "accessor and resolve cannot both be specified"
         . " (" . $type->name . ".$field_name)\n";
     }
+    if (defined $field->{loader} && ref($field->{loader}) ne 'HASH') {
+      die "loader requires a hash specification"
+        . " (" . $type->name . ".$field_name)\n";
+    }
+    if (defined $field->{loader}
+        && (defined($field->{accessor}) || $field->{resolve})) {
+      die "loader cannot be combined with accessor or resolve"
+        . " (" . $type->name . ".$field_name)\n";
+    }
+    _validate_loader_spec($field->{loader}, $type->name, $field_name)
+      if defined $field->{loader};
     if (defined $field->{accessor}
         && $field->{args}
         && keys %{ $field->{args} }) {
@@ -496,8 +562,10 @@ sub _build_slots_for_object {
       field_name => $field_name,
       result_name => $field_name,
       accessor => $field->{accessor},
+      loader => $field->{loader},
       return_type_name => _type_name($return_type),
-      resolver_shape => ($field->{resolve} || $wrapped) ? 'EXPLICIT' : 'DEFAULT',
+      resolver_shape => ($field->{resolve} || $wrapped || $field->{loader})
+        ? 'EXPLICIT' : 'DEFAULT',
       resolver_mode => $wrapped
         ? 'DEFAULT'
         : (($resolver_mode eq 'native_one_arg'
@@ -522,6 +590,43 @@ sub _build_slots_for_object {
   }
 
   return \@slots;
+}
+
+sub _validate_loader_value_spec {
+  my ($spec, $label, $coordinate) = @_;
+  die "$label requires a hash specification ($coordinate)\n"
+    if ref($spec) ne 'HASH';
+  my @keys = grep { exists $spec->{$_} } qw(source_key argument);
+  die "$label requires exactly one of source_key or argument ($coordinate)\n"
+    if @keys != 1;
+  my $value = $spec->{ $keys[0] };
+  die "$label requires a non-empty name ($coordinate)\n"
+    if ref($value) || !defined($value) || $value eq q();
+}
+
+sub _validate_loader_spec {
+  my ($spec, $type_name, $field_name) = @_;
+  my $coordinate = "$type_name.$field_name";
+  my $has_fixed = exists $spec->{context_key};
+  my $has_router = exists $spec->{router};
+  die "loader requires exactly one of context_key or router ($coordinate)\n"
+    if ($has_fixed ? 1 : 0) + ($has_router ? 1 : 0) != 1;
+  _validate_loader_value_spec($spec->{key}, 'loader key', $coordinate);
+  if ($has_fixed) {
+    die "loader context_key requires a non-empty name ($coordinate)\n"
+      if ref($spec->{context_key}) || !defined($spec->{context_key})
+        || $spec->{context_key} eq q();
+    return;
+  }
+  my $router = $spec->{router};
+  die "loader router requires a hash specification ($coordinate)\n"
+    if ref($router) ne 'HASH';
+  die "loader router context_key requires a non-empty name ($coordinate)\n"
+    if ref($router->{context_key}) || !defined($router->{context_key})
+      || $router->{context_key} eq q();
+  _validate_loader_value_spec(
+    $router->{route_key}, 'loader router route_key', $coordinate
+  );
 }
 
 # True when the field is list-typed and its item type is Non-Null

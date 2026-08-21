@@ -5,6 +5,7 @@ use Test::More;
 use FindBin qw($RealBin);
 use lib $RealBin;
 use lib "$RealBin/../lib";
+use pagi_compat_helper qw(pagi_skip_reason);
 
 use File::Spec;
 use HTTP::Headers::Fast;
@@ -93,7 +94,10 @@ SKIP: {
 
 
 SKIP: {
-    eval { require PAGI::Test::Client; 1 } || skip "Skipping PAGI 404 test: missing PAGI::Test::Client", 2;
+    my $pagi_skip=pagi_skip_reason(qw(PAGI::Request PAGI::Response PAGI::Test::Client PAGI::SSE PAGI::WebSocket Future::AsyncAwait));
+    skip "Skipping PAGI 404 test: $pagi_skip", 2
+        if $pagi_skip;
+    eval { require WebDyne::PAGI; require PAGI::Test::Client; 1 } || skip "Skipping PAGI 404 test: $@", 2;
     my ($pagi_status, $pagi_body)=pagi_not_found();
     is($pagi_status, 404, 'PAGI handler returns 404 for missing file');
     like($pagi_body, qr/Not Found|File not found/i, 'PAGI handler emits not found body');

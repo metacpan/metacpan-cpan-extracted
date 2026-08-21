@@ -2,7 +2,7 @@ local/
 tools/
 cover_db/
 .+\.swp
-\*\~
+~$
 \.prove/
 perltidy.LOG
 perltidy.ERR

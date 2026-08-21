@@ -58,7 +58,7 @@ ok($WebDyne::WEBDYNE_DUMP_FLAG == 3);
 #  Expect constrant folded WEBDYNE_DUMP_FLAG not to changed, but 
 #  subroutine evaluated one should
 #
-ok(WEBDYNE_DUMP_FLAG == 1);
+ok(WEBDYNE_DUMP_FLAG == (($] < 5.016) ? 3 : 1));
 ok(&WEBDYNE_DUMP_FLAG == 3);
 
 

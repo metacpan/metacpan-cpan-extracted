@@ -154,7 +154,7 @@ sub chart {
 Supports a lightweight API mode where JSON is returned in response to `Router::Simple` path matches
 
 ```html 
-<api handler="change_case" pattern="/release4/{user}"/>
+<api handler="change_case" pattern="/{user}"/>
 __PERL__
 sub change_case {
     my ($self, $api_hr)=@_;

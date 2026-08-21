@@ -93,6 +93,19 @@ has screenOpts => sub {
 
 Returns a list of action buttons to place at the top of the form.
 
+For C<download> and C<display> actions the gui is blocked by a modal busy
+indicator while the download is being prepared (for at most 3 seconds).
+Actions which take a long time to produce their data can switch this off by
+setting C<noBusyIndicator> to true, keeping the gui usable while they run:
+
+ {
+     label         => trm('Create Report'),
+     action        => 'download',
+     key           => 'createReport',
+     noBusyIndicator => true,
+     actionHandler => sub { ... },
+ }
+
 =cut
 
 has actionCfg => sub {

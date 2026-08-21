@@ -56,6 +56,16 @@ is_deeply o2d($HTTPTiny_response2->content), $HoAoH, q{Deep hash of arrays of ha
 
 is $HTTPTiny_response2->content->doesnotexist, undef, q{handles 'content' that points to undef setting it -autoundef};
 
+# "-autothrow" should also complete normally when the JSON is valid.
+my $autothrow_good = {
+  status  => 200,
+  content => encode_json({ answer => 42 }),
+};
+
+HTTPTiny2h2o -autothrow, $autothrow_good;
+
+is $autothrow_good->content->answer, 42, q{'-autothrow' decodes valid JSON and objectifies content};
+
 my $bad_json1 = {
   status  => 200,
   content => 'this is definitely not JSON',
@@ -72,6 +82,12 @@ HTTPTiny2h2o $bad_json2;
 is $bad_json2->content, q{this is definitely not JSON}, q{not using '-autothrow' on bad JSON returns original content via ->content accessor};
 like ref $bad_json2, qr/Util::H2O/, q{ref type of response reference is Util::H2O};
 is ref $bad_json2->content, "", q{ref type of ->content is empty string};
+
+# Exercise the remaining option/precondition short-circuit paths.
+dies_ok { HTTPTiny2h2o() } q{HTTPTiny2h2o without a response dies};
+dies_ok { HTTPTiny2h2o 0 } q{HTTPTiny2h2o with a false non-reference response dies};
+dies_ok { HTTPTiny2h2o q{not-an-option} } q{HTTPTiny2h2o does not mistake an arbitrary string for '-autothrow'};
+dies_ok { HTTPTiny2h2o [] } q{HTTPTiny2h2o rejects a non-HASH response reference};
 
 my $bad_resp = {
   status  => 200,
@@ -101,3 +117,4 @@ is $HTTPTiny_response4->content->get(1), undef, q{empty JSON array makes 'get' A
 is $HTTPTiny_response4->content->scalar, 0, q{empty JSON array makes 'scalar' AREF vmethod return undef };
 
 done_testing;
+

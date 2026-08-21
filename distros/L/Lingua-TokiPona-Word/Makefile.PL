@@ -18,7 +18,8 @@ my %WriteMakefileArgs = (
   "NAME" => "Lingua::TokiPona::Word",
   "PREREQ_PM" => {
     "Carp" => "1.35",
-    "Data::Displaycolour" => "0.7.0",
+    "Data::Displaycolour" => "0.8.0",
+    "Data::IconText" => "0.8.0",
     "Data::Identifier" => "0.35.0",
     "Lingua::Generic::Interface" => "0.2.0"
   },
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.04",
+  "VERSION" => "v0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +37,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => "1.35",
-  "Data::Displaycolour" => "0.7.0",
+  "Data::Displaycolour" => "0.8.0",
+  "Data::IconText" => "0.8.0",
   "Data::Identifier" => "0.35.0",
   "Lingua::Generic::Interface" => "0.2.0",
   "Test::Exception" => "0.30",

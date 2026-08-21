@@ -1,5 +1,11 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.1202 2026-08-20 12:15:04
+  - Fix the eg/continuous.pl program.
+
+0.1201 2026-08-20 10:14:30
+  - Cleaned up potential failures in the code.
+
 0.1200 2025-05-25 01:36:51
   - Add the clock_it filter.
   - Fiddle with the eg/control-change.pl program...

@@ -147,6 +147,7 @@ t/57_default_resolver_compat.t
 t/58_introspection_policy.t
 t/59_on_stall_native_drive.t
 t/60_utf8_multibyte.t
+t/61_declarative_loader.t
 t/kitchen-sink.graphql
 t/schema-kitchen-sink.graphql
 t/swapi-schema.graphql

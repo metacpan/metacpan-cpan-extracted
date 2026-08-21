@@ -7,13 +7,14 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.20';
+    $VERSION = '0.27';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
 
 use Punk::App;
 use Punk::RateLimit;   # adds Punk::App::rate_limit + the key strategies
+use Punk::Upload ();   # ->fh is Perl; the rest of the class is XS
 
 # The application registrars, one per class that says `use Punk`. The C
 # import (punk_import.h) keeps them here rather than anywhere private, so a
@@ -34,6 +35,8 @@ Punk - a MVC web framework
     package MyApp;
     use Punk;
 
+    plugin 'RequestId';
+
     get  '/'          => 'Web::Book#home';
     get  '/books/:id' => 'Web::Book#view';
     post '/books'     => 'Web::Book#create';
@@ -46,7 +49,6 @@ Punk - a MVC web framework
     $admin->get('/books' => 'Web::Book#admin_list');
 
     static '/static' => 'root/static';
-    plugin 'RequestId';
 
     1;
 
@@ -151,6 +153,22 @@ See below.
 this, overriding the application's L</max_body>. C<0> disables the check
 for this route.
 
+=item * C<sitemap> - C<0> keeps the route out of the generated
+C<sitemap.xml>; C<1> puts it in despite a guard the plugin would
+otherwise have excluded it for. Inert unless
+L<Punk::Plugin::Sitemap> is registered.
+
+=item * C<etag> - conditional GET. A coderef returns a validator the
+application knows cheaply, and an unchanged one answers C<304> B<without
+running the handler>; C<1> hashes the rendered body instead, which saves
+the wire but not the server. Inert unless
+L<Punk::Plugin::ConditionalGet> is registered.
+
+=item * C<idempotent> - honour an C<Idempotency-Key> on this route, so a
+client's retry replays the first response instead of doing the work
+twice. Unsafe methods only. Inert unless
+L<Punk::Plugin::Idempotency> is registered.
+
 =back
 
 C<< compress => 0 >> deserves its own note. Punk does not compress -
@@ -229,6 +247,97 @@ C<write_buffer_limit>, C<blocking>. See L<Punk::SSE>.
         $tick->();
     }
 
+=head2 cache
+
+    cache 'file', dir => '/var/cache/myapp', max_bytes => '512M';
+    cache sessions => { backend => 'memory', max_bytes => '64M' };
+
+    my $html = $c->cache->compute("profile:$id", 300, sub { ... });
+    $c->cache('sessions')->set($sid => $blob, 3600);
+
+A key/value cache with expiry and compute-if-missing. C<compute> is the method
+that matters: get, and on a miss run the code, store the result and return it.
+
+A name with a hashref declares a named store - a session cache and a page
+cache want different budgets, and sharing one means the big cold thing evicts
+the small hot thing.
+
+C<file> is the default backend, and the arithmetic is why: an in-memory store
+lives in one process, so C<< workers => 8 >> with a 512M cap is four gigabytes
+of RSS with every worker caching the same things separately. The filesystem is
+already shared, so a file store is one copy for the pool and survives a
+restart.
+
+Everything is validated at C<to_app> - an unknown backend, a C<max_bytes> that
+does not parse, an unwritable directory - because a cache that fails on its
+first miss fails at three in the morning.
+
+See L<Punk::Cache>.
+
+=head2 publish / subscribe
+
+    $c->publish('cache:bust' => $key);
+
+    # at boot, not per request
+    $app->subscribe('cache:bust' => sub {
+        my ($topic, $payload) = @_;
+        delete $CACHE{$payload};
+    });
+
+The cross-worker message bus, for the things one worker learns and the others
+need: a cache key changing, a config being re-read, a presence update, an
+event to push down every open stream.
+
+A prefork server makes anything held in a worker a lie about the pool. That is
+the fault L<Punk::WebSocket::Room> used to have - a broadcast reached the
+quarter of a room that happened to share a worker with the sender, succeeded,
+and returned a plausible number. Rooms go over this now, and so can anything
+else.
+
+=head3 Two delivery modes
+
+Without a C<group>, B<every> worker's subscriber sees B<every> message. That
+is fanout, and it is what pushing an event to every connected client wants.
+
+    $app->subscribe('news' => sub { $_->send($_[1]) for @streams });
+
+With C<< group => $name >>, B<exactly one> member of that group sees each
+message - work spread across the pool. There is no scheduler: a worker that is
+busy is not there to claim, so the free ones take the traffic.
+
+    $app->subscribe('thumbnails' => \&resize, group => 'workers');
+
+=head3 Register at boot, not per request
+
+A subscription made inside a request lands in one worker and lasts as long as
+that process - which is the same mistake the bus exists to fix. Register where
+the application is built, or from L<Hyperman>'s C<on_worker_start>.
+
+=head3 What publish tells you
+
+    1   on the ring: every worker in the pool will see it
+    0   local only - there is no pool, so nobody else will
+   -1   refused: too big for a bus slot
+
+Three outcomes rather than true or false, because "the pool got it" and "only
+I got it" are different facts, and an application that cannot tell them apart
+cannot work out why the other workers stayed quiet.
+
+C<0> is an ordinary answer, not a failure: under a server that is not
+L<Hyperman>, on Windows, or on a compiler without the atomics the shared ring
+needs, there is no pool and a message reaches this process alone. That is what
+the behaviour was before the bus existed.
+
+=head3 What it is not
+
+B<Delivery is at-most-once and nothing survives a restart.> A worker that
+takes a message and then dies loses it, and the loss is counted rather than
+retried. If losing it matters - an email, a payment, an upload somebody paid
+to have resized - this is the wrong tool and L<Punk::Queue> is the right one:
+durable, at-least-once, and still there after a restart.
+
+The bus is for what is worth microseconds and not worth a database.
+
 =head2 ua
 
     ua timeout => 10;                       # the default agent
@@ -251,13 +360,20 @@ request is forwarded automatically. See L<Punk::UA>.
 =head2 session
 
     session secret => secret('session_key'), expires => '7d', samesite => 'Lax';
+    session secret => secret('session_key'), store => 'cache';   # server-side
 
-Enable signed cookie sessions: C<< $c->session >> is then a hashref written
-back to a HMAC-SHA256-signed cookie when it changes. Source the key from the
-L</secret> system. Options: C<secret>, C<cookie> (default C<punk.sid>),
-C<expires>, C<path>, C<domain>, C<secure>, C<httponly> (default on),
-C<samesite> (default C<Lax>). Also configurable from C<punk.yml>. See
-L<Punk::Session>.
+Enable sessions: C<< $c->session >> is then a hashref written back when it
+changes - to a HMAC-SHA256-signed cookie, or to a store if you name one. Source
+the key from the L</secret> system. Options: C<secret>, C<cookie> (default
+C<punk.sid>), C<expires>, C<path>, C<domain>, C<secure>, C<httponly> (default
+on), C<samesite> (default C<Lax>), and C<store> with its C<sliding>, C<tier>
+and C<allow_unshared>. An option it does not understand is a boot croak. Also
+configurable from C<punk.yml>.
+
+C<store> puts the payload on any L<Punk::Cache> backend and leaves an opaque id
+in the cookie, which takes the ~4KB ceiling away and makes
+C<< $c->session_expire >> a revocation rather than a request to the browser.
+See L<Punk::Session>, and L<Punk::Session::Store> for the store half.
 
 =head2 csrf
 
@@ -296,6 +412,11 @@ handler already set wins. The bare form is C<X-Content-Type-Options>,
 C<X-Frame-Options> and C<Referrer-Policy>; CSP and HSTS are opt-in by
 spelling. An C<under> scope can carry its own policy for its prefix:
 C<< $scope->headers(...) >>. See L<Punk::Headers>.
+
+A B<static> C<Content-Security-Policy> belongs here. The policy that actually
+stops cross-site scripting is C<script-src 'nonce-...'>, and a nonce is per
+request - see L<Punk::Plugin::CSP>, which mints one, splices it into the
+policy, and threads it into your templates.
 
 =head2 proxy
 
@@ -432,8 +553,22 @@ ceiling by the time Punk runs.
 =head2 static
 
     static '/static' => 'root/static';
+    static '/static' => 'root/static', max_age => 3600;
+    static '/static' => 'root/static', fingerprint => 1;
 
 Serve files from a directory; see L<Punk::Static>.
+
+A static file carries C<ETag> and C<Last-Modified> but no freshness
+lifetime, so a browser revalidates it on every page load. C<max_age> (or a
+verbatim C<cache_control>) gives a plain URL one.
+
+C<fingerprint> asks for content-addressed URLs instead:
+C<< $c->asset('/static/app.css') >> returns
+C</static/app.9f3a1c2b0d4e5f60.css>, which serves with a year and
+C<immutable> - checked against the file's current digest first, so a URL
+from an older deploy revalidates rather than lying. It is opt-in because it
+changes what a path means. Templates on the shipped Stencil engine reach
+C<asset> as a filter: C<< {% "/static/app.css" | asset %} >>.
 
 If C<style.css.gz> (or C<.br>) sits next to C<style.css> and the client
 accepts that encoding, the sibling's bytes are served under the original's
@@ -496,7 +631,7 @@ register for real, so deployment configuration needs no code change:
       password: { $env: DB_PASSWORD }
     models:   [ Book ]           # -> model 'Book'
     plugins:                     # -> plugin 'RequestId' => {...}
-      RequestId: {}
+      RequestId: { header: X-Request-Id }
     static:                      # -> static '/static' => 'root/static'
       /static: root/static
 
@@ -669,6 +804,20 @@ C<404 {"errors":[...]}> byte-identical. A die inside it goes through
 L</on_error>. The 405 answer for a known path with the wrong method is
 deliberately not covered: its C<Allow> header semantics stay.
 
+=head2 upload_dir
+
+    upload_dir '/var/lib/myapp/incoming';
+
+Where a large C<multipart/form-data> part is written while the request runs.
+Defaults to C<TMPDIR>, else F</tmp>.
+
+Worth naming, for two reasons that are not obvious. It decides the
+B<filesystem>, and that decides whether C<< $upload->save >> is a rename or
+another whole copy of a large file. And it decides what shares a filesystem
+with attacker-controlled bytes.
+
+See L<Punk::Upload>.
+
 =head2 plugin
 
     plugin 'RequestId';
@@ -757,7 +906,7 @@ there is no deregistration. Registering nothing costs nothing.
 
 The table only grows at the end, C<PK_ABI_VERSION> bumps on any append, and a
 consumer checks C<abi_version> before use. Nothing in it mutates a request or a
-response: L</after_dispatch> already does that, in Perl, where a reader can see
+response: L</hook> already does that, in Perl, where a reader can see
 it.
 
 =head1 SEE ALSO

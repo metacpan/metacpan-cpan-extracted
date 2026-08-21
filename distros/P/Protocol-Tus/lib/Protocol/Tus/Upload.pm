@@ -1,5 +1,5 @@
 package Protocol::Tus::Upload;
-{ our $VERSION = '0.004' }
+{ our $VERSION = '0.006' }
 use Moo;
 use v5.24;
 use warnings;

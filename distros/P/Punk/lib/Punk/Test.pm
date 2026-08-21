@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.27';
 
 use Test::Builder ();
 use Scalar::Util ();
@@ -76,7 +76,11 @@ sub login_as {
     my $idf  = ($auth->{fields} || {})->{id} // 'id';
     my $id   = ref $user eq 'HASH' ? $user->{$idf} : $user;
     defined $id or die "Punk::Test: login_as needs a user row or id\n";
-    my ($name, $value) = Punk::Session::_seal($app, { $key => $id });
+    # _seal_session, not _seal: an application with `session store => ...`
+    # keeps the payload server-side, so a cookie with the session sealed into
+    # it is no session at all there. This writes it wherever the application
+    # will look.
+    my ($name, $value) = Punk::Session::_seal_session($app, { $key => $id });
     $self->{jar}{$name} = $value;
     return $self;
 }
@@ -570,7 +574,7 @@ sub sse_json_is {
 # ---- websockets --------------------------------------------------------------
 
 # Whether the live (forked Hyperman) transport can run here at all - tests
-# use this to SKIP, the same way t/21-ws-live.t does.
+# use this to SKIP, the same way t/1011-ws-live.t does.
 sub ws_live_available {
     return eval {
         require Hyperman;
@@ -687,7 +691,7 @@ sub _ws_inprocess {
 
 # Live transport: one forked Hyperman worker per client, started on first
 # use, speaking real TCP - fully interactive, and the same machinery as
-# t/21-ws-live.t.
+# t/1011-ws-live.t.
 sub _ws_live {
     my ($self, $path, %o) = @_;
     my $host = $self->_live_host or return (undef, 'live worker failed to start');

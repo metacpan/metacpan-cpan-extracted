@@ -104,8 +104,12 @@ SKIP: {
 }
 
 SKIP: {
+    require pagi_compat_helper;
+    my $pagi_skip=pagi_compat_helper::pagi_skip_reason(qw(PAGI::Request PAGI::Response PAGI::Test::Client PAGI::SSE PAGI::WebSocket Future::AsyncAwait));
+    skip "Skipping wdrender PAGI backend test: $pagi_skip", 3
+        if $pagi_skip;
     eval { require WebDyne::PAGI; require PAGI::Test::Client; 1 }
-        or skip 'Skipping wdrender PAGI backend test: missing PAGI dependencies', 3;
+        or skip "Skipping wdrender PAGI backend test: $@", 3;
 
     my ($pagi_out, $pagi_err, $pagi_rc)=run_cmd(
         $^X, '-Ilib', $script,

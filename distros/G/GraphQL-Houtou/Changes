@@ -1,5 +1,13 @@
 Revision history for Perl extension GraphQL-Houtou
 
+0.06 2026-08-21T03:31:47Z
+
+    - Add declarative DataLoader fields with native executor integration (#111)
+    - Compile declarative loader metadata into the execution program (#112)
+    - Optimize declarative loader argument binding and settled object handling (#113)
+    - Cache projection plans for plain hash loader results (#114)
+    - Add an executor-owned batch plan for cacheless declarative loaders (#115)
+
 0.05 2026-07-26T22:07:03Z
 
     - Fix boolean literal crash under JSON::MaybeXS 1.003009 / JSON::PP fallback (#110)

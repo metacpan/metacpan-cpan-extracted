@@ -1,0 +1,38 @@
+use alienfile;
+
+probe [ 'pkg-config --exists libhisto', 'pkgconf --exists libhisto' ];
+
+plugin 'PkgConfig' => (
+    pkg_name => 'libhisto',
+);
+
+share {
+    start_url 'bundled';
+    plugin 'Fetch::LocalDir';
+    plugin 'Extract::Directory';
+
+    plugin 'Build::CMake';
+
+    build [
+        [
+            '%{cmake}',
+            @{ meta->prop->{plugin_build_cmake}->{args} },
+            '-DCMAKE_BUILD_TYPE=Release',
+            '-DLIBHISTO_BUILD_TOOLS=ON',
+            '-DLIBHISTO_BUILD_TESTS=OFF',
+
+            '-DLIBHISTO_BUILD_BENCHMARKS=OFF',
+            '-DLIBHISTO_BUILD_EXAMPLES=OFF',
+            '-DLIBHISTO_BUILD_DOCS=OFF',
+            '%{.install.extract}',
+        ],
+        '%{make}',
+        '%{make} install',
+    ];
+
+    gather [
+        plugin 'PkgConfig' => (
+            pkg_name => 'libhisto',
+        ),
+    ];
+};

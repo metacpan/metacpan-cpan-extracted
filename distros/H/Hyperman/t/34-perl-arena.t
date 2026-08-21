@@ -109,16 +109,21 @@ sub http_get {
 
 # the callback ran in the worker, not in the process that registered it
 {
-    my %pids;
+    # Collect first, assert afterwards: asserting inside the loop emitted one
+    # test per DISTINCT worker that answered, so the plan moved with however
+    # the kernel spread twelve connections. A count that moves cannot be
+    # checked by count.
+    my %ran;
     for (1 .. 12) {
         my $res = http_get('/ran');
         last unless $res =~ /ran=(\d+) pid=(\d+)/;
-        my ($ran, $wpid) = ($1, $2);
-        is($ran, 1, "worker $wpid ran the Perl callback exactly once")
-            unless $pids{$wpid}++;
+        $ran{$2} = $1;
     }
-    ok(scalar(keys %pids) >= 1, 'at least one worker answered');
-    isnt((keys %pids)[0], $$, 'and it is not the process that registered');
+    my @pids = sort keys %ran;
+    ok(scalar(@pids) >= 1, 'at least one worker answered');
+    is_deeply([ grep { $ran{$_} != 1 } @pids ], [],
+        'every worker that answered ran the Perl callback exactly once');
+    isnt($pids[0], $$, 'and it is not the process that registered');
     is($RAN, 0, 'which never ran it here: this is a WORKER hook');
 }
 

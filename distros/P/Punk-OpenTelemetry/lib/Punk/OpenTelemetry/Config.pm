@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # All of it is C (include/otel_config.h + xs/config.xs).
 
@@ -83,36 +83,107 @@ it would under any looser rule.
 It carries credentials. Every value is percent-decoded (the spec carries these
 in the W3C Baggage encoding, so a token containing a comma or an equals sign
 arrives encoded, and one that survives the split but not the decode
-authenticates against nothing) - and then never printed. L</diagnostic> emits
-the header B<count>, never a value, not even truncated: a token with its first
-eight characters shown is a token in the log.
+authenticates against nothing) - and then never printed.
+L<diagnostic|/"diagnostic($config)">
+emits the header B<count>, never a value, not even truncated: a token with
+its first eight characters shown is a token in the log.
 
 =head1 WHAT IS PARSED
 
-Identity: C<OTEL_SERVICE_NAME>, C<OTEL_RESOURCE_ATTRIBUTES>.
+Every name in full, so that looking one up finds it.
 
-Propagation: C<OTEL_PROPAGATORS>, defaulting to C<tracecontext,baggage> - both
-of them, because a deployment that drops baggage loses it silently.
+=head2 Identity
 
-Sampling: C<OTEL_TRACES_SAMPLER>, C<OTEL_TRACES_SAMPLER_ARG>.
+    OTEL_SERVICE_NAME                     unknown_service, and a warning
+    OTEL_RESOURCE_ATTRIBUTES              -
 
-Transport: C<OTEL_EXPORTER_OTLP_ENDPOINT>, C<_PROTOCOL>, C<_HEADERS>,
-C<_TIMEOUT>, C<_COMPRESSION>, and the per-signal C<_TRACES_>, C<_METRICS_> and
-C<_LOGS_> forms of each. The general endpoint has the signal path appended; a
-per-signal endpoint is used exactly as given. That asymmetry is the spec's,
-and it is the most common thing to get wrong.
+An unnamed service is warned about at boot rather than left to be discovered
+on a dashboard, where it is indistinguishable from every other unnamed
+service.
 
-Batching: C<OTEL_BSP_*> for spans and C<OTEL_BLRP_*> for log records. Their
-schedule delays differ on purpose - 5s and 1s, the spec's numbers - because a
-log somebody is watching for is worth sending sooner than a span they will
-look at afterwards.
+=head2 Propagation and sampling
 
-Metrics: C<OTEL_METRIC_EXPORT_INTERVAL>, C<_TIMEOUT>,
-C<OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE>,
-C<OTEL_METRICS_EXEMPLAR_FILTER>.
+    OTEL_PROPAGATORS                      tracecontext,baggage
+    OTEL_TRACES_SAMPLER                   parentbased_always_on
+    OTEL_TRACES_SAMPLER_ARG               -
 
-Limits: C<OTEL_ATTRIBUTE_COUNT_LIMIT>, C<_VALUE_LENGTH_LIMIT>, and the
-C<OTEL_SPAN_*>, C<OTEL_EVENT_*> and C<OTEL_LINK_*> forms.
+Both propagators by default, because a deployment that drops baggage loses it
+silently.
+
+=head2 Transport
+
+    OTEL_EXPORTER_OTLP_ENDPOINT           -   NOTHING IS EXPORTED WITHOUT ONE
+    OTEL_EXPORTER_OTLP_PROTOCOL           http/protobuf
+    OTEL_EXPORTER_OTLP_COMPRESSION        none
+    OTEL_EXPORTER_OTLP_TIMEOUT            10000     ms
+    OTEL_EXPORTER_OTLP_HEADERS            -
+
+and the per-signal forms, each overriding the general one for that signal
+alone:
+
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT       _METRICS_        _LOGS_
+    OTEL_EXPORTER_OTLP_TRACES_PROTOCOL       _METRICS_        _LOGS_
+    OTEL_EXPORTER_OTLP_TRACES_COMPRESSION    _METRICS_        _LOGS_
+    OTEL_EXPORTER_OTLP_TRACES_HEADERS        _METRICS_        _LOGS_
+
+There is B<no default endpoint>, and this SDK does not fall back to
+C<http://localhost:4318> the way some others do. With none set the SDK still
+builds and still records, and the spans are dropped for want of anywhere to
+go. It is the first thing to check when everything looks configured and
+nothing arrives.
+
+The general endpoint has the signal path B<appended>; a per-signal endpoint is
+used B<exactly> as given. That asymmetry is the spec's, and it is the most
+common thing to get wrong - see L<Punk::OpenTelemetry::Exporter/Endpoints>.
+
+=head2 Batching
+
+    OTEL_BSP_SCHEDULE_DELAY               5000      ms
+    OTEL_BSP_EXPORT_TIMEOUT              30000      ms
+    OTEL_BSP_MAX_QUEUE_SIZE               2048
+    OTEL_BSP_MAX_EXPORT_BATCH_SIZE         512
+
+    OTEL_BLRP_SCHEDULE_DELAY              1000      ms
+    OTEL_BLRP_EXPORT_TIMEOUT             30000      ms
+    OTEL_BLRP_MAX_QUEUE_SIZE              2048
+    OTEL_BLRP_MAX_EXPORT_BATCH_SIZE        512
+
+C<BSP> is spans, C<BLRP> is log records. The schedule delays differ on purpose
+- 5s and 1s, the spec's numbers - because a log somebody is watching for is
+worth sending sooner than a span they will look at afterwards.
+
+=head2 Metrics
+
+    OTEL_METRIC_EXPORT_INTERVAL          60000      ms
+    OTEL_METRIC_EXPORT_TIMEOUT           30000      ms
+    OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE   cumulative
+    OTEL_METRICS_EXEMPLAR_FILTER         trace_based
+
+=head2 Limits
+
+    OTEL_ATTRIBUTE_COUNT_LIMIT             128
+    OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT        -      unlimited
+    OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT        128
+    OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT   -      unlimited
+    OTEL_SPAN_EVENT_COUNT_LIMIT            128
+    OTEL_SPAN_LINK_COUNT_LIMIT             128
+    OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT       128
+    OTEL_LINK_ATTRIBUTE_COUNT_LIMIT        128
+
+A length limit of 0 means unlimited, which is why the two length limits are
+absent by default rather than set to something enormous.
+
+=head2 The switch
+
+    OTEL_SDK_DISABLED                     unset
+
+See L</OTEL_SDK_DISABLED> above for why only the string C<true> counts.
+
+C<OTEL_EXPERIMENTAL_CONFIG_FILE> is B<not> read. Supporting the spec's
+declarative configuration format is separate work; see L</PRECEDENCE> for
+where it would sit if it were added.
+
+=head2 Two rules for every value above
 
 A value that is meant to be a number and is not is B<ignored> rather than
 taken as zero. C<OTEL_BSP_MAX_QUEUE_SIZE=lots> must not silently become a

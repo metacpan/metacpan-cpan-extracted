@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<title>Garden Features</title>
+		<meta http-equiv = "Content-Type" content = "text/html; charset=UTF-8" />
+	</head>
+	<body>
+
+		<h1 align = 'center'>Garden Features</h1>
+
+		<table align = 'center' border = '1' summary = 'List of garden features'>
+		: for $row -> $item {
+		: if $~item.is_first {
+		<thead>
+		: }
+		: if $~item.is_last {
+		<tfoot>
+		: }
+		<tr>
+				: include "basic.column.tx" { column => $item };
+		</tr>
+		: if $~item.is_first {
+		</thead>
+		: }
+		: if $~item.is_last {
+		</tfoot>
+		: }
+		: }
+		</table>
+
+	</body>
+</html>

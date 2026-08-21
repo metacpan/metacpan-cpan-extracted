@@ -203,6 +203,7 @@ PDFFILE: foreach my $pdffile (@pdffiles) {
     }
 
     # take action
+    $error_message = '';
     if ($query_action eq 'exit') {
 
       # cancel all imports and exit
@@ -220,10 +221,8 @@ PDFFILE: foreach my $pdffile (@pdffiles) {
     } elsif ($query_action eq 'manual') {
 
       # assume article BibTeX entry by default
-      if (!defined($manual_entry)) {
-        $manual_entry = 'article';
-      }
-      $bibstr = "\@${manual_entry}{key,\n";
+      my $entry_type = defined($manual_entry) ? $manual_entry : 'article';
+      $bibstr = "\@${entry_type}{key,\n";
 
       # add fields
       foreach my $bibfield (keys %manual_field) {
@@ -244,17 +243,18 @@ PDFFILE: foreach my $pdffile (@pdffiles) {
       ($bibstr, $error_message, $exit_status) = Capture::Tiny::capture {
         system($query_cmd);
         if ($? == -1) {
-          print STDERR "\n$query_cmd failed to execute: $!\n";
+          print STDERR "\nQuery failed to execute: $!.\n";
         } elsif ($? & 127) {
-          printf STDERR "\n$query_cmd died with signal %d, %s coredump\n", ($? & 127),  ($? & 128) ? 'with' : 'without';
+          printf STDERR "\nQuery died with signal %d, %s coredump.\n", ($? & 127),  ($? & 128) ? 'with' : 'without';
         } elsif ($? != 0) {
-          printf STDERR "\n$query_cmd exited with value %d\n", $? >> 8;
+          printf STDERR "\nQuery exited with value %d.\n", $? >> 8;
         }
       };
       $bibstr =~ s/^\s+//;
       $bibstr =~ s/\s+$//;
       $error_message =~ s/^\s+//;
       $error_message =~ s/\s+$//;
+      $error_message =~ s/\n+/\n/g;
 
     } else {
       croak "$Script: invalid action '$query_action'";

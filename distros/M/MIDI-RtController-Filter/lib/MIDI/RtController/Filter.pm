@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Parent class of RtController filters
 
-our $VERSION = '0.0102';
+our $VERSION = '0.0104';
 
 use Moo;
 use strictures 2;
@@ -21,21 +21,21 @@ has rtc => (
 has channel => (
     is      => 'rw',
     isa     => Channel,
-    default => sub { 0 },
+    default => 0,
 );
 
 
 has value => (
     is      => 'rw',
     isa     => Maybe[Velocity],
-    default => sub { undef },
+    default => undef,
 );
 
 
 has trigger => (
     is      => 'rw',
     isa     => Maybe[Velocity],
-    default => sub { undef },
+    default => undef,
 );
 
 
@@ -63,7 +63,7 @@ has continue => (
 has verbose => (
     is      => 'rw',
     isa     => Bool,
-    default => sub { 0 },
+    default => 0,
 );
 
 1;
@@ -80,7 +80,7 @@ MIDI::RtController::Filter - Parent class of RtController filters
 
 =head1 VERSION
 
-version 0.0102
+version 0.0104
 
 =head1 SYNOPSIS
 
@@ -212,7 +212,7 @@ Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Gene Boggs.
+This software is copyright (c) 2025-2026 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

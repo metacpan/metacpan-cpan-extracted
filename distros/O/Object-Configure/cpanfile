@@ -4,7 +4,7 @@ requires 'perl', '5.008';
 
 requires 'Carp';
 requires 'Config::Abstraction', '0.38';
-requires 'ExtUtils::MakeMaker', '6.64';
+requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
 requires 'File::Spec';
 requires 'Log::Abstraction', '0.26';
 requires 'Params::Get', '0.13';
@@ -14,7 +14,7 @@ requires 'Scalar::Util';
 requires 'mro';
 
 on 'configure' => sub {
-	requires 'ExtUtils::MakeMaker', '6.64';
+	requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
 };
 
 on 'test' => sub {
@@ -29,6 +29,8 @@ on 'test' => sub {
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::NoWarnings';
+	requires 'Test::Returns';
+	requires 'Test::Without::Module';
 	requires 'Time::HiRes';
 	requires 'YAML::XS';
 	requires 'autodie';

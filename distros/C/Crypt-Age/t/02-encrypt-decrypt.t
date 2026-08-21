@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempfile);
 use Crypt::Age;
+use Crypt::Age::Header;
 
 # Basic roundtrip
 {
@@ -155,6 +156,100 @@ use Crypt::Age;
     close $fh;
 
     is($decrypted, $plaintext, 'file roundtrip successful');
+}
+
+# Filehandle operations
+{
+    my ($public, $secret) = Crypt::Age->generate_keypair;
+    my $plaintext = "File content test\nWith newlines\n";
+
+    my ($in_fh, $in_file) = tempfile(UNLINK => 1);
+    print $in_fh $plaintext;
+    close $in_fh;
+
+    my $enc_data = '';
+    {
+        open my $in_fh, '<', $in_file or die "open($in_file): $!";
+        open my $out_fh, '>', \$enc_data or die "open() string for output: $!";
+        Crypt::Age->encrypt_filehandle(
+            input      => $in_fh,
+            output     => $out_fh,
+            recipients => [$public],
+        );
+    }
+    ok length($enc_data), 'encrypted data generated';
+
+    my $decrypted;
+    {
+        my ($enc_fh, $enc_file) = tempfile(UNLINK => 1);
+        print $enc_fh $enc_data;
+        close $enc_fh;
+        $enc_fh = undef;
+        open $enc_fh, '<', $enc_file or die "open($enc_file): $!";
+
+        my ($out_fh, $out_file) = tempfile(UNLINK => 1);
+        Crypt::Age->decrypt_filehandle(
+            input      => $enc_fh,
+            output     => $out_fh,
+            identities => [$secret],
+        );
+        close $out_fh;
+        close $enc_fh;
+
+        open my $fh, '<:raw', $out_file;
+        $decrypted = do { local $/; <$fh> };
+        close $fh;
+
+    }
+    is($decrypted, $plaintext, 'file roundtrip successful');
+
+}
+
+# Truncated files. On main (commit a830d60, before PR #3) a payload-less
+# file -- a valid header and nonce followed by zero payload bytes -- decrypted
+# silently to the empty string (karr #6): decrypt_payload's substr-arithmetic
+# loop never ran for zero remaining bytes. The spec requires signaling an
+# error when EOF is reached without a final chunk. PR #3's read()/eof()-based
+# payload path croaks instead, incidentally via AEAD tag verification on an
+# empty/short tag. The other two cases (short nonce, payload shorter than the
+# tag) are adjacent truncation shapes for the same read/eof path; both already
+# raised an error before PR #3 too, so they are safety-net coverage rather
+# than a red/green regression, but are cheap to pin down alongside karr #6.
+{
+    my ($public, $secret) = Crypt::Age->generate_keypair;
+    my $plaintext = "x" x 128;
+
+    my $full = Crypt::Age->encrypt(plaintext => $plaintext, recipients => [$public]);
+
+    my $offset = 0;
+    Crypt::Age::Header->parse(\$full, \$offset);   # locate the header/payload boundary
+    my $header = substr($full, 0, $offset);
+    my $nonce  = substr($full, $offset, 16);
+    is(length($nonce), 16, 'fixture: full nonce is 16 bytes');
+
+    # (a) header + full nonce, zero payload bytes at all (karr #6).
+    {
+        my $ct = $header . $nonce;
+        my $got = eval { Crypt::Age->decrypt(ciphertext => $ct, identities => [$secret]) };
+        ok(!defined $got, 'payload-less file does not silently decrypt');
+        ok($@, 'payload-less file raises an error');
+    }
+
+    # (b) nonce truncated to 8 bytes, nothing following.
+    {
+        my $ct = $header . substr($nonce, 0, 8);
+        my $got = eval { Crypt::Age->decrypt(ciphertext => $ct, identities => [$secret]) };
+        ok(!defined $got, 'truncated 8-byte nonce does not decrypt');
+        ok($@, 'truncated nonce raises an error');
+    }
+
+    # (c) payload present but shorter than the 16-byte AEAD tag.
+    {
+        my $ct = $header . $nonce . substr($full, $offset + 16, 5);
+        my $got = eval { Crypt::Age->decrypt(ciphertext => $ct, identities => [$secret]) };
+        ok(!defined $got, 'payload shorter than the tag size does not decrypt');
+        ok($@, 'short payload raises an error');
+    }
 }
 
 # Error handling

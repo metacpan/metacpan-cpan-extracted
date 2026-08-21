@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;
+use ExtUtils::MakeMaker;
 
 my $dist = {
 	COMPRESS => 'gzip -9f',
@@ -18,26 +18,33 @@ WriteMakefile(
 	ABSTRACT_FROM	 => 'lib/Lingua/Text.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-	  ? ('LICENSE'=> 'GPL')
+	  ? ('LICENSE'=> 'gpl_2')
 	  : ()),
 	'LIBS' => [''],	# e.g., '-lm'
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
 	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
-	TEST_REQUIRES => {
-		'Test::Carp' => 0,
-		'Test::DescribeMe' => 0,
-		'Test::Most' => 0,
-		'Test::Needs' => 0,
-		'Test::NoWarnings' => 0
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, PREREQ_PM => {
 		'Carp' => 0,
-		'Exporter' => 0,
-		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
 		'HTML::Entities' => 0,
 		'I18N::LangTags::Detect' => 0,
+		'Object::Configure' => 0,
 		'Params::Get' => 0,
-		'Scalar::Util' => 0
+		'Readonly' => 0,
+		'Scalar::Util' => 0,
+		'Sub::Private' => 0,
+	}, TEST_REQUIRES => {
+		'IPC::System::Simple' => 0,
+		'Test::Carp' => 0,
+		'Test::DescribeMe' => 0,
+		'Test::Memory::Cycle' => 0,
+		'Test::Mockingbird' => 0,
+		'Test::Most' => 0,
+		'Test::Needs' => 0,
+		'Test::NoWarnings' => 0,
+		'Test::Returns' => 0
 	}, dist => $dist,
 	clean		=> { FILES => 'Lingua-Text-*' },
 	# META_ADD => {
@@ -59,5 +66,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	MIN_PERL_VERSION	=> '5.010'	# use autodie and // (defined-or) require 5.010
 );

@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Unicode
 
+v0.4.4 2026-08-20T21:19:08+0900
+    - Corrected a typo in the $LOCALE_BCP47_NAMELESS_RE regular expression
+
 v0.4.3 2026-05-19T06:07:32+0900
     - Updating dependencies
 

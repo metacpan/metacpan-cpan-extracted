@@ -54,12 +54,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@gitlab.com:jackdeguest/Locale-Unicode.git',
-                web         => 'https://gitlab.com/jackdeguest/Locale-Unicode',
+                url         => 'git@gitlab.com:deguest/Locale-Unicode.git',
+                web         => 'https://gitlab.com/deguest/Locale-Unicode',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://gitlab.com/jackdeguest/Locale-Unicode/issues',
+                web         => 'https://gitlab.com/deguest/Locale-Unicode/issues',
             },
         },
     }) : ()),

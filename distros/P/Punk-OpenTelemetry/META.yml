@@ -29,5 +29,5 @@ requires:
   Hyperman: '0.26'
   Punk: '0.20'
   perl: '5.010000'
-version: '0.01'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0804';
+our $VERSION = '0.0806';
 
 use Moo;
 use strictures 2;
@@ -65,6 +65,10 @@ has midi_out => (
     default => sub { RtMidiOut->new },
 );
 
+has _midi_routine => (
+    is => 'rw',
+);
+
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -77,6 +81,7 @@ sub BUILD {
         func         => '_rtmidi_loop',
     );
     $self->loop->add($midi_rtn);
+    $self->_midi_routine($midi_rtn);
     $self->_midi_channel->configure(
         on_recv => sub ($channel, $event) {
             my $dt   = shift @$event;
@@ -171,6 +176,14 @@ sub run ($self) {
 }
 
 
+sub stop ($self) {
+    my $rtn = $self->_midi_routine or return;
+    $rtn->kill('TERM');
+    $self->loop->remove($rtn);
+    $self->_midi_routine(undef);
+}
+
+
 sub open_controllers ($inputs, $output, $verbose) {
     my %controllers;
     my $name = $inputs->[0];
@@ -205,7 +218,7 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0804
+version 0.0806
 
 =head1 SYNOPSIS
 
@@ -351,6 +364,16 @@ seconds) expires.
 
 Run the asynchronous B<loop>!
 
+=head2 stop
+
+  $rtc->stop;
+
+Stop this controller's internal MIDI-input worker process and remove
+it from the B<loop>. Call this before discarding a controller. Just
+letting it go out of scope does not terminate the worker, since it
+runs in a separate spawned process that isn't tied to Perl's garbage
+collection.
+
 =head1 UTILITIES
 
 =head2 open_controllers
@@ -402,7 +425,7 @@ Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Gene Boggs.
+This software is copyright (c) 2025-2026 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

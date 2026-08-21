@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: libhisto
+Description: High-performance, memory-safe ISO C99 histogramming and statistical analysis library
+Version: @PROJECT_VERSION@
+URL: https://github.com/tsee/libhisto
+Libs: -L${libdir} -lhisto -lm
+Cflags: -I${includedir}

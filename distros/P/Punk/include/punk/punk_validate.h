@@ -46,7 +46,7 @@ static const jsf_abi *punk_jsf_try(pTHX) {
             PUTBACK; FREETMPS; LEAVE;
             if (p) {
                 const jsf_abi *a = INT2PTR(const jsf_abi *, p);
-                if (a && a->abi_version == JSF_ABI_VERSION)
+                if (a && a->abi_version >= JSF_ABI_VERSION)
                     PUNK_JSF_TAB = a;
             }
         }

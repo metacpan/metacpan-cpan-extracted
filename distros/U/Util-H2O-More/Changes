@@ -212,3 +212,25 @@
 0.4.3 Fri Dec 19 03:27:00 2025
 	- POD updates only, added examples show where and how some
 	  of these provided keywords would be helpful
+
+0.4.4 Wed Aug 19 09:00:00 2026
+	- improving test coverage
+
+0.4.5 Wed Aug 19 11:00:00 2026
+	- expanded the test suite to cover all executable statements, branches,
+	  conditions, and subroutines in Util::H2O::More
+	- corrected the YAML file tests so they actually exercise YAML::LoadFile
+	- added unit tests for ddd and dddie
+	- added a testable modulino fixture and regression tests based on the
+	  Getopt::Long/Util::H2O::More pattern discussed by Mark Gardner; the
+	  example creates a fresh object for every parse so command-line state
+	  cannot leak between invocations in the same interpreter
+	- expanded Getopt2h2o POD to clarify that Getopt::Long's '=' modifier
+	  requires a value when an option is present but does not make the option
+	  itself mandatory; documented application-level required-option checks
+	- documented how to retain GetOptionsFromArray's parse result when an
+	  application needs explicit error or Pod::Usage handling, and noted
+	  Getopt::Long's auto_help integration
+	- added a complete tested-modulino recipe and clarified the intended scope
+	  relative to more declarative option frameworks such as MooX::Options
+	- documented the ini2o and o2ini backward-compatibility aliases explicitly

@@ -1,4 +1,7 @@
 package Poker::Eval::Wild;
+
+our $VERSION = '0.11';
+
 use Algorithm::Combinatorics qw(combinations combinations_with_repetition);
 use Moo;
 
@@ -8,11 +11,10 @@ Poker::Eval::Wild - Evaluate and score wildcard poker hands.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 

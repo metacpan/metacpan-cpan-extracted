@@ -1,0 +1,81 @@
+<form name = 'design_form' id = 'design_form'>
+	%= csrf_field
+
+	<table align = 'center'  width = '100%'>
+		<tr>
+			<td colspan = '4'><div class = 'blue_centered'>Design</div></td>
+		</tr>
+		<tr>
+			<td colspan = '4'><br /></td>
+		</tr>
+		<tr>
+			<td align = 'center' colspan = '4'>Operations affecting the whole virtual garden</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td align = 'center'>Properties with Gardens</td>
+			<td align = 'center'>Garden menu</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td align = 'center' colspan = '4'>
+				<div class = 'design_garden_toolbar'> <!-- Class not defined -->
+					<span id = 'design_property_menu_span'><%== $design_property_menu %></span>
+					<span id = 'design_garden_menu_span'><%== $design_garden_menu %></span>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan = '4'><br /></td>
+		</tr>
+		<tr>
+			<td width = '25%'><button type = 'button' onClick = 'return process_design_load()'>Load</button></td>
+			<td width = '25%'><button type = 'button' onClick = 'return confirm_design_save()'>Save</button></td>
+			<td width = '25%'><button type = 'button' onClick = 'return process_design_reset()'>Reset virtual garden</button></td>
+			<td width = '25%'><button type = 'button' onClick = 'return confirm_design_delete()'>Delete virtual garden</button></td>
+		</tr>
+		<tr>
+			<td colspan = '4'><hr /></td>
+		</td>
+		<tr>
+			<td align = 'center' colspan = '4'>Search fields for adding and deleting thumbnails<br /></td>
+		</tr>
+		<tr>
+			<td align = 'center' colspan = '4'> <!-- Why does class centered not work here? -->
+				<table class = 'bordered centered'>
+					<tr>
+						<td class = 'generic_border generic_padding' width = '35%'>Flower search</td>
+						<td class = 'generic_border generic_padding' width = '10%'>Flower thumbnail</td>
+						<td class = 'generic_border generic_padding' width = '35%'>Feature search</td>
+						<td class = 'generic_border generic_padding' width = '10%'>Feature thumbnail</td>
+						<td class = 'generic_border generic_padding' width = '10%'>Undo</td>
+					</tr>
+					<tr>
+						<td class = 'generic_border generic_padding' width = '35%'>
+							<input id = 'design_flower' type = 'text' size = '30' maxlength = '100' value = ''>
+						</td>
+						<td class = 'generic_border generic_padding' width = '10%'>
+							<div id = 'design_flower_thumbnail'></div>
+						</td>
+						<td class = 'generic_border generic_padding' width = '35%'>
+							<input id = 'design_feature' type = 'text' size = '30' maxlength = '100' value = ''>
+						</td>
+						<td class = 'generic_border generic_padding' width = '10%'>
+							<div id = 'design_feature_thumbnail'></div>
+						</td>
+						<td class = 'generic_border generic_padding' width = '10%'><input type = 'submit' value = 'Delete thumbnail' /></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<div id = 'design_result_div'></div>
+
+<br />
+<table align = 'center'>
+	<tr><td align = 'center'>Virtual Garden. It's dimensions are <%== $$constants{virtual_cell_count} %>x<%== $$constants{virtual_cell_count} %></td></tr>
+	<tr><td align = 'center'>Pretend the cells are 10cmx10cm or 2mx1.5m, or anything really. The program does not care</td></tr>
+	<tr><td><div class = 'overflow_scroll' id = 'virtual_garden'></div></td></tr>
+</table>

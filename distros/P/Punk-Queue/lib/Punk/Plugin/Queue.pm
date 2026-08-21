@@ -542,7 +542,11 @@ sub _register_admin {
             }
         }
         my $r = eval { $lister->($page, $limit, \%f, $sc, $sd) };
-        return $json_err->($c, 400, "$@" =~ s/ at .*//rs) if $@;
+        if ($@) {
+            my $why = "$@";
+            $why =~ s/ at .*//s;
+            return $json_err->($c, 400, $why);
+        }
         return $c->json({
             data  => $r->{$key},
             total => $r->{total},

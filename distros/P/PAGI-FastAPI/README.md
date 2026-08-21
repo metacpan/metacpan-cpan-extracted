@@ -112,9 +112,30 @@ FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** pro
         }
     );
 
+    # 9. Typed path parameters, response filtering, redirects, files, and
+    #    structured error handling
+    use PAGI::FastAPI::TypedPath qw(TypedPath);
+    use PAGI::FastAPI::ResponseModel qw(with_response_model);
+    use PAGI::FastAPI::Response::Redirect qw(redirect_to);
+    use PAGI::FastAPI::Response::File qw(file_response);
+    use Types::Standard qw(Int Str);
+
+    $app->get('/products/{item_id}',
+        dependencies => [ Depends(TypedPath('item_id', Int), key => 'item_id') ],
+        handler      => with_response_model(
+            { id => Int, name => Str },   # extra fields your handler returns
+            async sub ($c) {              # (e.g. an ORM row) are filtered out
+                return { id => $c->stash->{item_id}, name => 'Widget', internal_note => 'hidden' };
+            }
+        ),
+    );
+
+    $app->get('/old-url',    handler => async sub ($c) { return redirect_to('/new-url') });
+    $app->get('/report.pdf', handler => async sub ($c) { return file_response('/var/reports/latest.pdf') });
+
     my $pagi_app = $app->to_app;
 
-    # 9. Non-blocking WebSocket Endpoint
+    # 10. Non-blocking WebSocket Endpoint
     # $ws is a PAGI::WebSocket (from PAGI::Tools), so on_close/each_json/
     # on_close/each_json/try_send_json/keepalive and more are all built in.
     $app->websocket('/ws', handler => async sub ($ws, $deps) {
@@ -131,7 +152,7 @@ FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** pro
         });
     });
 
-    # 10. Authentication via the companion PAGI::FastAPI::Security distribution
+    # 11. Authentication via the companion PAGI::FastAPI::Security distribution
     #     (extraction only, you supply the verification logic)
     #
     #     use PAGI::FastAPI::Security::HTTPBearer;
@@ -145,6 +166,85 @@ FastAPI-inspired asynchronous micro-framework for Perl built on the **PAGI** pro
     #
     #     See PAGI::FastAPI::Security for HTTP Basic, API Key
     #     (header/query/cookie), and OAuth2 password-bearer schemes.
+
+## RESPONSE HELPERS, VALIDATION & ERROR HANDLING
+
+Six small modules, each built on an existing `PAGI::FastAPI` extension point
+(subclassing `PAGI::FastAPI::Response`, `Depends()`, or `add_middleware`) —
+no core routing or dispatch behavior changed to add them.
+
+* **`PAGI::FastAPI::TypedPath`** — `TypedPath($param_name, $type)` validates
+  (and, for a coercing `Type::Tiny` type, converts) a path parameter,
+  through the same `Depends()` mechanism `query`/`body` validation already
+  uses internally. An invalid path segment gets a `422` automatically,
+  before your handler runs.
+
+* **`PAGI::FastAPI::ResponseModel`** — `with_response_model($schema, $handler)`
+  wraps a handler so its return value is checked against a declared
+  `Type::Tiny` schema. Pass a HashRef of `field => Type` and it also
+  *filters* the output to just those fields — the common case of an ORM row
+  carrying extra internal columns (a password hash, say) doesn't leak to
+  the client. A mismatch is treated as a `500` (a server bug), not a client
+  error, mirroring Python FastAPI's `ResponseValidationError`.
+
+* **`PAGI::FastAPI::Middleware::ExceptionHandler`** — registers a handler
+  per exception class, dispatched by `blessed($err)`/`isa()`, with a
+  configurable fallback. For the case where a real Perl exception (`die`)
+  escapes a handler or dependency, rather than the `$c->status(...)`-and-
+  return convention described above.
+
+* **`PAGI::FastAPI::Response::Redirect`** — `redirect_to($location, %opts)`
+  (defaults to `302`) or construct directly for `301`/`303`/`307`/`308`.
+
+* **`PAGI::FastAPI::Response::File`** — `file_response($path, %opts)` reads
+  a file from disk and returns it with a guessed content-type and
+  `Content-Disposition`. Reads the whole file into memory — fine for
+  templates, generated reports, small-to-moderate assets; not intended for
+  very large files or video.
+
+* **`PAGI::FastAPI::Cookies`** — `parse_cookies($raw_header)` /
+  `cookie($c, $name)` parse the request `Cookie` header. Setting response
+  cookies needs no extra module: `$c->add_header('set-cookie' => '...')`
+  already works today.
+
+```perl
+use PAGI::FastAPI::TypedPath qw(TypedPath);
+use PAGI::FastAPI::ResponseModel qw(with_response_model);
+use PAGI::FastAPI::Middleware::ExceptionHandler;
+use PAGI::FastAPI::Response::Redirect qw(redirect_to);
+use PAGI::FastAPI::Response::File qw(file_response);
+use PAGI::FastAPI::Cookies qw(cookie);
+use Types::Standard qw(Int Str);
+
+# Typed path param + filtered response shape:
+$app->get('/products/{item_id}',
+    dependencies => [ Depends(TypedPath('item_id', Int), key => 'item_id') ],
+    handler      => with_response_model(
+        { id => Int, name => Str },
+        async sub ($c) { return My::DB->find_product($c->stash->{item_id}) },
+    ),
+);
+
+# Typed exception -> handler dispatch:
+my $exc_handler = PAGI::FastAPI::Middleware::ExceptionHandler->new(
+    handlers => {
+        'My::Errors::NotFound' => async sub ($err, $c) {
+            $c->status(404);
+            return { detail => $err->message };
+        },
+    },
+    default_handler => async sub ($err, $c) {
+        $c->status(500);
+        return { detail => 'Internal Server Error' };
+    },
+);
+$app->add_middleware(async sub ($c, $next) { return await $exc_handler->handle($c, $next) });
+
+# Redirects, file downloads, cookies:
+$app->get('/old-url', handler => async sub ($c) { return redirect_to('/new-url') });
+$app->get('/report.pdf', handler => async sub ($c) { return file_response('/var/reports/latest.pdf') });
+$app->get('/whoami', handler => async sub ($c) { return { session_id => cookie($c, 'session_id') } });
+```
 
 ## AUTHENTICATION AND SECURITY
 

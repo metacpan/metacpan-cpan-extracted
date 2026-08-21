@@ -11,8 +11,12 @@
  * mismatch means "do without", never a crash.
  *
  * The table only ever grows at the end; PK_ABI_VERSION bumps on any append,
- * and a consumer requires abi_version == the version it was written against
- * (or >=, treating later tables as a superset it uses a prefix of).
+ * and a consumer requires abi_version >= the version it was written
+ * against, treating a later table as a superset it uses a prefix of.
+ *
+ * NOT ==. This said "== (or >=)" and the ambiguity cost a release:
+ * Reverse::Proxy 0.04 chose equality against Fetch's ABI and stopped
+ * loading everywhere the moment Fetch appended one member.
  *
  * Perl headers (EXTERN.h / perl.h / XSUB.h) must be included before this file
  * so SV, AV, HV, IV and pTHX are defined.

@@ -1,5 +1,86 @@
 Revision history for PAGI::FastAPI
 
+1.2.4  2026-08-20
+       [IMPROVEMENT]
+       - Updated constant_time_eq() in the API Gateway demo app.
+
+1.2.3  2026-08-20
+       [IMPROVEMENT]
+       - Fixed API Gateway demo app w.r.t setting header, thanks John Napiorkowski.
+
+1.2.2  2026-08-20
+       [IMPROVEMENT]
+       - Fixed API Gateway demo app, thanks John Napiorkowski.
+
+1.2.1  2026-08-20
+       [POD]
+       - Removed redundant link to CPAN Ratings, thanks @davorg.
+
+1.2.0  2026-08-20
+       [FEATURE]
+       - Added PAGI::FastAPI::TypedPath, providing a Depends()-compatible
+         TypedPath($param_name, $type) helper that validates (and, for a
+         coercing Type::Tiny type, converts) a path parameter the same way
+         query/body validation already works, short-circuiting with
+         HTTP 422 for a non-matching value before the handler runs. Path
+         parameters have no coercion hook at the routing layer itself;
+         this is built entirely on the existing per-route dependencies
+         extension point.
+       - Added PAGI::FastAPI::ResponseModel's with_response_model($schema,
+         $handler) wrapper, which validates a handler's return value
+         against a declared Type::Tiny schema and, for a HashRef-of-fields
+         schema, filters the output to just the declared fields (dropping
+         e.g. an accidental password_hash column from an ORM row). A
+         schema mismatch is treated as HTTP 500 (a server bug), mirroring
+         Python FastAPI's ResponseValidationError, rather than leaking the
+         validation failure or the invalid data to the client.
+       - Added PAGI::FastAPI::Middleware::ExceptionHandler for typed
+         exception-to-handler dispatch (Python FastAPI's
+         @app.exception_handler equivalent): registers a coderef per
+         exception class, dispatched via blessed()/isa(), with a
+         configurable default_handler fallback and re-throw if nothing
+         matches. For the case of a real Perl exception (die) escaping a
+         handler or dependency, complementing (not replacing) the existing
+         $c->status(...)-and-return convention.
+       - Added PAGI::FastAPI::Response::Redirect, a PAGI::FastAPI::Response
+         subclass for HTTP redirects, plus a redirect_to($location, %opts)
+         convenience function defaulting to 302.
+       - Added PAGI::FastAPI::Response::File, a PAGI::FastAPI::Response
+         subclass for file-download responses, plus a file_response($path,
+         %opts) convenience function with content-type guessing by
+         extension and automatic Content-Disposition handling. Reads the
+         whole file into memory; not intended for very large files.
+       - Added PAGI::FastAPI::Cookies, providing parse_cookies($raw_header)
+         and cookie($c, $name) for parsing the request Cookie header. Pure
+         parsing on top of the existing $c->header('Cookie') accessor.
+
+       [DOCUMENTATION]
+       - Updated PAGI::FastAPI's POD: Key Features now documents all six
+         modules above; ERROR HANDLING cross-references
+         PAGI::FastAPI::Middleware::ExceptionHandler for the uncaught-
+         exception case it doesn't otherwise cover; SEE ALSO links all six.
+       - Added a "RESPONSE HELPERS, VALIDATION & ERROR HANDLING" section to
+         README.md covering the same six modules, plus a new SYNOPSIS step
+         demonstrating TypedPath + with_response_model together and the
+         Redirect/File responses.
+
+       [TESTS]
+       - Added t/26-response_redirect.t.
+       - Added t/27-response_file.t.
+       - Added t/28-cookies.t.
+       - Added t/29-response_model.t.
+       - Added t/30-typed_path.t (includes a skip-gracefully integration
+         subtest exercising TypedPath through a real Depends() + full app
+         dispatch, alongside direct unit tests of the validation/coercion
+         logic itself).
+       - Added t/31-middleware_exception_handler.t.
+
+       [DEMO]
+       - Added demo app for API Gateway linked to two microservices:
+         - eg/api_gateway.pl
+         - eg/user_microservice.pl
+         - eg/order_microservice.pl
+
 1.1.0  2026-08-18
        [FEATURE]
        - We have included PAGI::FastAPI::Queue which is an async-first

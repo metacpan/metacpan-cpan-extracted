@@ -1,5 +1,5 @@
 package HTTP::API::Client;
-$HTTP::API::Client::VERSION = '1.24';
+$HTTP::API::Client::VERSION = '1.26';
 use Moo;
 
 =head1 NAME
@@ -362,8 +362,11 @@ C<< '' => undef >> entry.
 
 Builds the L<HTTP::Request> for one call. This is where the C<%events>
 callbacks passed to C<send()> are read: C<before_headers>, C<headers_keys> /
-C<add_headers_keys> (which header keys to consider, in what order),
-C<before_header>/C<after_header> keyed by header name, and
+C<add_headers_keys> (which header keys to consider, in what order - both
+paths' return value is deduplicated, first occurrence wins, order
+otherwise preserved, not sorted; without that, a repeated key from either
+would fire C<before_header>/C<after_header> once per repeat instead of
+once, HAC-130), C<before_header>/C<after_header> keyed by header name, and
 C<after_header_keys> - the hooks used to compute things like a signature
 header from other data at build time. See F<t/04_callbacks.t> for a worked
 example (API key + signature).
@@ -441,7 +444,12 @@ empty value) rather than being omitted - there is no join-corruption
 risk to avoid the way there is for a nested empty array, and C<key=> is
 valid, parseable form data distinct from the key being absent.
 Both respect an C<< $events->{keys} >> callback to control which keys are
-included and in what order, and both accept a C<skip_key> hashref in
+included and in what order - its return value is deduplicated (first
+occurrence wins, order otherwise preserved, not sorted) before use, so a
+repeated key is processed once rather than once per occurrence; without
+that, a C<CODE> value at that key would fire once per repeat and
+C<kvp2str> would emit the same key twice with two different computed
+values (HAC-129). Both also accept a C<skip_key> hashref in
 C<%options> (same reachability caveat as C<new_request()>'s
 C<skip_headers> above - only useful from a direct call, e.g. a C<data>
 callback recursively re-invoking C<kvp2str()>/C<kvp2json()> on itself to
@@ -764,6 +772,7 @@ sub _build_retry {
         split /,/, _defor($retry{fail_status}, '');
 
     my $delay = _defor( $retry{delay}, 5 );
+    $delay = 0 if looks_like_number($delay) && $delay < 0;
 
     return {
         count  => $count,
@@ -908,7 +917,6 @@ sub send {
     my $retry_settings = $self->_build_retry;
     my $retry_count  = _defor( $retry_settings->{count}, 1 );
     my $retry_delay  = _defor( $retry_settings->{delay}, 5 );
-    $retry_delay = 0 if looks_like_number($retry_delay) && $retry_delay < 0;
     my %retry_status = %{ _defor($retry_settings->{status}, {}) };
     my %debug        = %{ _defor($self->debug_flags, {}) };
     my $eng          = $self->engine;
@@ -942,9 +950,10 @@ sub send {
   RETRY:
     foreach my $retry ( 0 .. $retry_count ) {
         my $started_time = time;
+        my $req;
 
         if ( $eng eq 'LWP::UserAgent' ) {
-            my $req = $self->new_request( %options );
+            $req = $self->new_request( %options );
 
             if ($events->{test_request_object}) {
                 return $req;
@@ -963,7 +972,11 @@ sub send {
             if ( $retry_count && $retry ) {
                 print STDERR "-- RETRY $retry of $retry_count\n";
             }
-            print STDERR $response->request->as_string;
+            ## $response->request is the LAST request LWP::UserAgent sent, which
+            ## after a redirect (default-on for GET/HEAD) is a different object
+            ## pointing at the redirected-to URL - not the request this call
+            ## actually issued. Use $req, the one we built and passed in.
+            print STDERR $req->as_string;
             print STDERR "\n";
         }
 
@@ -1103,7 +1116,8 @@ sub new_request {
     my @keys;
 
     if (my $keys = $events->{headers_keys}) {
-        @keys = $self->$keys(%o);
+        my %seen;
+        @keys = grep { !$seen{$_}++ } $self->$keys(%o);
     }
     elsif (my $add = $events->{add_headers_keys}) {
         my %seen;
@@ -1253,7 +1267,8 @@ sub kvp2json {
     my @keys;
 
     if (my $do = $events->{keys}) {
-        @keys = $self->$do(%o);
+        my %seen;
+        @keys = grep { !$seen{$_}++ } $self->$do(%o);
     }
     else {
         @keys = keys %$data;
@@ -1333,7 +1348,8 @@ sub kvp2str {
     }
 
     if (my $do = $events->{keys}) {
-        @keys = $self->$do(%o);
+        my %seen;
+        @keys = grep { !$seen{$_}++ } $self->$do(%o);
     }
     else {
         @keys = sort @keys;

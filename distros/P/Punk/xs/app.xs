@@ -98,7 +98,8 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
             while ((he = hv_iternext(oh))) {
                 STRLEN kl; const char *k = HePV(he, kl);
                 if (!strEQ(k, K_VALIDATE) && !strEQ(k, K_COMPRESS)
-                    && !strEQ(k, K_MAX_BODY))
+                    && !strEQ(k, K_MAX_BODY) && !strEQ(k, K_SITEMAP)
+                    && !strEQ(k, K_ETAG) && !strEQ(k, K_IDEMPOTENT))
                     croak("Punk: unknown route option '%s'", k);
             }
             /* max_body: this route's ceiling on CONTENT_LENGTH, overriding
@@ -128,6 +129,72 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
                 (void)hv_stores(rec, K_METHOD, newSVsv(method));
                 (void)hv_stores(rec, K_PATH,   newSVsv(path));
                 av_push(app_av(aTHX_ h, K_NOCOMPRESS_ROUTES),
+                        newRV_noinc((SV *)rec));
+            }
+            /* sitemap => 0 keeps this route out of Punk::Plugin::Sitemap's
+             * generated sitemap.xml, and disallows it in robots.txt.
+             *
+             * sitemap => 1 is the other direction and is NOT the opt-in half
+             * of a pair: inclusion is already the default for a route that
+             * says nothing. It overrides an exclusion the plugin inferred -
+             * in practice a guard, because a scope guard may be an
+             * authentication check or may be an ordinary filter, and Punk
+             * cannot read its intent. The plugin assumes the first, which is
+             * the safe direction, and this is how an application says the
+             * page is public anyway. */
+            vp = hv_fetchs(oh, K_SITEMAP, 0);
+            if (vp && *vp && SvOK(*vp)) {
+                HV *rec = newHV();
+                (void)hv_stores(rec, K_METHOD,  newSVsv(method));
+                (void)hv_stores(rec, K_PATH,    newSVsv(path));
+                (void)hv_stores(rec, K_SITEMAP, newSViv(SvTRUE(*vp) ? 1 : 0));
+                av_push(app_av(aTHX_ h, K_SITEMAP_ROUTES),
+                        newRV_noinc((SV *)rec));
+            }
+            /* etag: the conditional-GET validator for this route, inert
+             * unless Punk::Plugin::ConditionalGet is registered - the
+             * `sitemap` arrangement, and for the same reason: the option
+             * belongs to the route, and only the application knows whether
+             * it wants the behaviour at all.
+             *
+             * A coderef is the STRONG validator: it is called before the
+             * handler and what it returns identifies the entity, so an
+             * unchanged one answers 304 without the handler running. The
+             * body ETag (`etag => 1`) is phase 2 and croaks here rather
+             * than being accepted and quietly doing nothing - an option
+             * that looks like it worked is worse than one that failed. */
+            vp = hv_fetchs(oh, K_ETAG, 0);
+            if (vp && *vp && SvOK(*vp)) {
+                HV *rec;
+                int is_cv = (SvROK(*vp) && SvTYPE(SvRV(*vp)) == SVt_PVCV);
+                if (!is_cv && SvROK(*vp))
+                    croak("Punk: etag on %s %s takes a coderef (the strong "
+                          "validator) or 1 (the body ETag), not a %s",
+                          SvPV_nolen(method), SvPV_nolen(path),
+                          sv_reftype(SvRV(*vp), 0));
+                /* etag => 0 is "no", which is what a route says by saying
+                 * nothing: recorded as absent rather than as a third state */
+                if (!is_cv && !SvTRUE(*vp)) goto etag_done;
+                rec = newHV();
+                (void)hv_stores(rec, K_METHOD, newSVsv(method));
+                (void)hv_stores(rec, K_PATH,   newSVsv(path));
+                (void)hv_stores(rec, K_ETAG,
+                                is_cv ? newSVsv(*vp) : newSViv(1));
+                av_push(app_av(aTHX_ h, K_ETAG_ROUTES),
+                        newRV_noinc((SV *)rec));
+                etag_done: ;
+            }
+            /* idempotent: honour an Idempotency-Key on this route, inert
+             * unless Punk::Plugin::Idempotency is registered - the `sitemap`
+             * and `etag` arrangement. Opt in per route because a key
+             * honoured on every POST means a cache write on every POST, and
+             * most POSTs do not need one. */
+            vp = hv_fetchs(oh, K_IDEMPOTENT, 0);
+            if (vp && *vp && SvOK(*vp) && SvTRUE(*vp)) {
+                HV *rec = newHV();
+                (void)hv_stores(rec, K_METHOD, newSVsv(method));
+                (void)hv_stores(rec, K_PATH,   newSVsv(path));
+                av_push(app_av(aTHX_ h, K_IDEM_ROUTES),
                         newRV_noinc((SV *)rec));
             }
             vp = hv_fetchs(oh, K_VALIDATE, 0);
@@ -800,6 +867,7 @@ session(self, ...)
             hv_iterinit(given);
             while ((e = hv_iternext(given))) {
                 STRLEN kl; const char *k = HePV(e, kl); SV *v = hv_iterval(given, e);
+                ps_check_key(aTHX_ k, kl, cfg);
                 if (kl == 7 && memEQ(k, "expires", 7))
                     (void)hv_stores(cfg, "max_age", newSViv(ps_parse_duration(aTHX_ v)));
                 else
@@ -808,6 +876,7 @@ session(self, ...)
         }
         else for (i = 1; i + 1 < items; i += 2) {
             STRLEN kl; const char *k = SvPV_const(ST(i), kl);
+            ps_check_key(aTHX_ k, kl, cfg);
             if (kl == 7 && memEQ(k, "expires", 7))
                 (void)hv_stores(cfg, "max_age",
                                 newSViv(ps_parse_duration(aTHX_ ST(i + 1))));
@@ -924,9 +993,11 @@ docs(self, path, mount = &PL_sv_undef, opts = &PL_sv_undef)
     OUTPUT:
         RETVAL
 
-# static($prefix, $dir): serve files. Chains.
+# static($prefix, $dir, %opts): serve files. The options are the mount's
+# cache policy - max_age, cache_control, fingerprint - and reach
+# Punk::Static->app at compile. Chains.
 SV *
-static(self, prefix, dir)
+static(self, prefix, dir, ...)
         SV *self
         SV *prefix
         SV *dir
@@ -935,9 +1006,20 @@ static(self, prefix, dir)
         HV *h = app_hv(aTHX_ self);
         HV *rec = newHV();
         SV *pf = app_strip_slash(aTHX_ prefix);
+        HV *opts = newHV();
+        int i;
+        if ((items - 3) % 2)
+            croak("Punk: static takes a prefix, a directory and an "
+                  "even-sized option list");
+        for (i = 3; i + 1 < items; i += 2) {
+            STRLEN kl;
+            const char *kp = SvPV_const(ST(i), kl);
+            (void)hv_store(opts, kp, (I32)kl, newSVsv(ST(i + 1)), 0);
+        }
         (void)hv_stores(rec, K_PREFIX, pf);
         (void)hv_stores(rec, K_LEN,    newSViv((IV)SvCUR(pf)));
         (void)hv_stores(rec, K_DIR,    newSVsv(dir));
+        (void)hv_stores(rec, K_OPTS,   newRV_noinc((SV *)opts));
         av_push(app_av(aTHX_ h, K_MOUNTS), newRV_noinc((SV *)rec));
         RETVAL = newSVsv(self);
     }
@@ -1619,6 +1701,133 @@ _apply_config(self, cfg)
             }
         }
         RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
+# cache - the store, or stores, this application uses.
+#
+#     cache 'file', dir => '/var/cache/app';        # the default store
+#     cache sessions => { backend => 'memory', max_bytes => '64M' };
+#
+# A NAME with a hashref declares a named store, exactly as `ua` and `views`
+# do; anything else configures the default one. Named stores matter because a
+# session cache and a rendered-page cache want different budgets, different
+# backends and different lifetimes, and sharing one store means the big cold
+# thing evicts the small hot thing.
+#
+# Recorded here and built at to_app, where a bad backend name, an unparseable
+# max_bytes or an unwritable directory croak at BOOT. A cache that fails on
+# its first miss fails at three in the morning; one that fails at boot fails
+# in front of whoever deployed it.
+SV *
+cache(self, ...)
+        SV *self
+    CODE:
+    {
+        HV *h      = app_hv(aTHX_ self);
+        HV *stores = app_hash(aTHX_ h, "cache_spec");
+        AV *rec    = newAV();
+        HV *opt    = newHV();
+        const char *name = K_DEFAULT;
+        STRLEN nlen = sizeof(K_DEFAULT) - 1;
+        int i, first = 1;
+
+        if (items >= 3 && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVHV) {
+            /* cache $name => \%opts */
+            HV *given = (HV *)SvRV(ST(2));
+            HE *e;
+            name = SvPV_const(ST(1), nlen);
+            hv_iterinit(given);
+            while ((e = hv_iternext(given)))
+                (void)hv_store_ent(opt, hv_iterkeysv(e), newSVsv(HeVAL(e)), 0);
+            first = items;                      /* nothing left to scan */
+        }
+        else if (items >= 2) {
+            /* The backend: a name, or a ready-made object. Taking a ref here
+             * as well matters - the earlier form ignored one, so `cache
+             * $store` recorded no backend at all and quietly built a file
+             * cache instead of the object it was handed. */
+            av_push(rec, newSVsv(ST(1)));
+            first = 2;
+        }
+
+        for (i = first; i + 1 < items; i += 2) {
+            STRLEN kl;
+            const char *k = SvPV_const(ST(i), kl);
+            (void)hv_store(opt, k, (I32)kl, newSVsv(ST(i + 1)), 0);
+        }
+
+        if (av_len(rec) < 0) {          /* empty: av_len is -1, not 0 */
+            /* a named store names its backend inside the hashref */
+            SV **b = hv_fetchs(opt, "backend", 0);
+            av_push(rec, (b && *b && SvOK(*b)) ? newSVsv(*b)
+                                               : newSVpvs("file"));
+        }
+        av_push(rec, newRV_noinc((SV *)opt));
+        (void)hv_store(stores, name, (I32)nlen, newRV_noinc((SV *)rec), 0);
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
+# upload_dir($path): where a large multipart part is spilled while the request
+# runs.
+#
+# Worth naming rather than defaulting, for two reasons that are not obvious:
+# it decides the FILESYSTEM, which decides whether Punk::Upload::save is a
+# rename or another whole copy of a large file; and it decides what shares a
+# filesystem with attacker-controlled bytes.
+SV *
+upload_dir(self, path)
+        SV *self
+        SV *path
+    CODE:
+    {
+        HV *h = app_hv(aTHX_ self);
+        if (!SvOK(path) || !SvCUR(path))
+            croak("Punk: upload_dir needs a directory");
+        (void)hv_stores(h, "upload_dir", newSVsv(path));
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
+# ---- the cross-worker bus, at the application level -------------------------
+#
+# The same two calls the context has. They live here as well because the place
+# to REGISTER a subscription is where the application is built - at boot, in
+# the parent, before the server forks - and at that point there is no context
+# to hang them off. A subscription made inside a request would land in one
+# worker and last as long as that process, which is the fault the bus exists
+# to fix.
+
+IV
+publish(self, topic, payload)
+        SV *self
+        SV *topic
+        SV *payload
+    CODE:
+        PERL_UNUSED_VAR(self);
+        RETVAL = punk_bus_app_publish(aTHX_ topic, payload);
+    OUTPUT:
+        RETVAL
+
+IV
+subscribe(self, topic, cb, ...)
+        SV *self
+        SV *topic
+        SV *cb
+    CODE:
+    {
+        SV *group = &PL_sv_undef;
+        int i;
+        PERL_UNUSED_VAR(self);
+        for (i = 3; i + 1 < items; i += 2) {
+            const char *k = SvPV_nolen(ST(i));
+            if (strEQ(k, "group")) group = ST(i + 1);
+        }
+        RETVAL = punk_bus_app_subscribe(aTHX_ topic, cb, group);
     }
     OUTPUT:
         RETVAL

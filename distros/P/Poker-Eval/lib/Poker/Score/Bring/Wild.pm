@@ -1,4 +1,7 @@
 package Poker::Score::Bring::Wild;
+
+our $VERSION = '0.11';
+
 use Moo;
 use Algorithm::Combinatorics qw(combinations combinations_with_repetition);
 use List::Util qw(max);
@@ -9,11 +12,10 @@ Poker::Score::Bring::Wild - Scoring system used in highball Stud with wildcards 
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 

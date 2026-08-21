@@ -3,11 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.1200';
+our $VERSION = '0.1202';
 
 use v5.36;
 
 use strictures 2;
+use Carp qw(croak);
 use curry;
 use IO::Async::Timer::Countdown ();
 use IO::Async::Timer::Periodic ();
@@ -16,6 +17,10 @@ use Moo;
 use Types::MIDI qw(Velocity);
 use Types::Common::Numeric qw(PositiveNum);
 use namespace::clean;
+
+use constant KNOWN_FILTERS => qw(
+    single clock_it breathe scatter stair_step ramp_up ramp_down flicker
+);
 
 extends 'MIDI::RtController::Filter';
 
@@ -77,18 +82,21 @@ has step_down => (
 
 
 sub add_filters ($filters, $controllers) {
-    for my $params (@$filters) {
-        my $port = delete $params->{port};
+    for my $orig (@$filters) {
+        my %params = %$orig; # work on a copy
+        my $port = delete $params{port};
         # skip unnamed and unknown entries
         next if !$port || !exists $controllers->{$port};
-        my $type = delete $params->{type} || 'single';
-        my $event = delete $params->{event} || 'all';
+        my $type = delete $params{type} || 'single';
+        croak qq{Unknown filter type "$type" (must be one of: } . join(', ', KNOWN_FILTERS) . ')'
+            unless grep { $_ eq $type } KNOWN_FILTERS;
+        my $event = delete $params{event} || 'all';
         my $filter = __PACKAGE__->new(
             rtc => $controllers->{$port}
         );
         # assume all remaining key/values are module attributes
-        for my $param (keys %$params) {
-            $filter->$param($params->{$param});
+        for my $param (keys %params) {
+            $filter->$param( $params{$param} );
         }
         my $method = "curry::$type";
         $controllers->{$port}->add_filter($type, $event => $filter->$method);
@@ -98,7 +106,7 @@ sub add_filters ($filters, $controllers) {
 
 sub single ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
 
     my $value = $self->value // $val;
     my $cc = [ 'control_change', $self->channel, $self->control, $value ];
@@ -123,6 +131,7 @@ sub clock_it ($self, $device, $dt, $event) {
                 if ($self->halt) {
                     $self->rtc->send_it(['stop']);
                     $c->stop;
+                    $self->rtc->loop->remove($c);
                     $self->running(0);
                     $self->halt(0);
                 }
@@ -141,8 +150,8 @@ sub breathe ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     $self->running(1);
 
@@ -159,6 +168,7 @@ sub breathe ($self, $device, $dt, $event) {
                 my ($c) = @_;
                 if ($self->halt) {
                     $c->stop;
+                    $self->rtc->loop->remove($c);
                     $self->running(0);
                     $self->halt(0);
                 }
@@ -179,8 +189,8 @@ sub scatter ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     $self->running(1);
 
@@ -194,6 +204,7 @@ sub scatter ($self, $device, $dt, $event) {
                 my ($c) = @_;
                 if ($self->halt) {
                     $c->stop;
+                    $self->rtc->loop->remove($c);
                     $self->running(0);
                     $self->halt(0);
                 }
@@ -214,8 +225,8 @@ sub stair_step ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     $self->running(1);
 
@@ -234,6 +245,7 @@ sub stair_step ($self, $device, $dt, $event) {
                 my ($c) = @_;
                 if ($self->halt) {
                     $c->stop;
+                    $self->rtc->loop->remove($c);
                     $self->running(0);
                     $self->halt(0);
                 }
@@ -269,8 +281,8 @@ sub ramp_up ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     $self->running(1);
 
@@ -283,6 +295,7 @@ sub ramp_up ($self, $device, $dt, $event) {
                 my ($c) = @_;
                 if ($self->halt) {
                     $c->stop;
+                    $self->rtc->loop->remove($c);
                     $self->running(0);
                     $self->halt(0);
                 }
@@ -294,6 +307,7 @@ sub ramp_up ($self, $device, $dt, $event) {
 
                     if ($value > $self->range_top) {
                         $c->stop;
+                        $self->rtc->loop->remove($c);
                         $self->running(0);
                     }
                     else {
@@ -312,8 +326,8 @@ sub ramp_down ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     $self->running(1);
 
@@ -326,6 +340,7 @@ sub ramp_down ($self, $device, $dt, $event) {
                 my ($c) = @_;
                 if ($self->halt) {
                     $c->stop;
+                    $self->rtc->loop->remove($c);
                     $self->running(0);
                     $self->halt(0);
                 }
@@ -337,6 +352,7 @@ sub ramp_down ($self, $device, $dt, $event) {
 
                     if ($value < $self->range_bottom) {
                         $c->stop;
+                        $self->rtc->loop->remove($c);
                         $self->running(0);
                     }
                     else {
@@ -355,8 +371,8 @@ sub flicker ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     $self->running(1);
 
@@ -369,6 +385,7 @@ sub flicker ($self, $device, $dt, $event) {
                 my ($c) = @_;
                 if ($self->halt) {
                     $c->stop;
+                    $self->rtc->loop->remove($c);
                     $self->running(0);
                     $self->halt(0);
                 }
@@ -399,7 +416,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.1200
+version 0.1202
 
 =head1 SYNOPSIS
 
@@ -437,7 +454,8 @@ control-change based L<MIDI::RtController> filters.
   $control = $filter->control;
   $filter->control($number);
 
-Return or set the control change number between C<0> and C<127>.
+Return or set the control change number between C<0> and C<127> that
+is the parameter to be controlled.
 
 Default: C<1> (mod-wheel)
 
@@ -544,8 +562,6 @@ object attributes to set.
 The B<controllers> come from L<MIDI::RtController/open_controllers>
 and is a hash reference of C<MIDI::RtController> instances keyed by
 MIDI input device port names.
-
-=head1 FILTERS
 
 =head2 single
 
@@ -683,7 +699,7 @@ Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Gene Boggs.
+This software is copyright (c) 2025-2026 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

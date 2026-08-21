@@ -11,9 +11,9 @@ use Perinci::Sub::Util qw(gen_modified_sub);
 use URI::Escape qw();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-05-28'; # DATE
+our $DATE = '2026-05-29'; # DATE
 our $DIST = 'Filename-KeyValue'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our @EXPORT_OK = qw(
                        parse_keyvalue_filename
@@ -227,7 +227,7 @@ sub _normalize {
         join(
             "",
             $parse_res->[2]{prefix},
-            (@kv ? "-" : ""),
+            ($parse_res->[2]{prefix} =~ /-\z/ ? "" : "-"),
             join("-", @kv),
             (defined $parse_res->[2]{ext} ? "." : ""),
             $parse_res->[2]{ext},
@@ -300,6 +300,10 @@ MARKDOWN
             summary => 'List of key=>value pairs to add',
             schema => 'hash*',
         },
+        ignore => {
+            summary => 'If set, when filename already has the same key, do nothing',
+            schema => 'bool*',
+        },
         remove => {
             summary => 'List of keys to remove',
             schema => ['array*', of=>'str*'],
@@ -330,6 +334,7 @@ sub modify_keyvalue_filename {
 
     if ($args{add} && keys %{$args{add}}) {
         for my $key (sort keys %{ $args{add} }) {
+            next if $args{ignore} && exists($parse_res->[2]{kv}{$key});
             $parse_res->[2]{kv}{$key} //= [];
             push @{ $parse_res->[2]{kv}{$key} }, $args{add}{$key};
         }
@@ -437,7 +442,7 @@ Filename::KeyValue - Parse filename using the KeyValue naming scheme
 
 =head1 VERSION
 
-This document describes version 0.004 of Filename::KeyValue (from Perl distribution Filename-KeyValue), released on 2026-05-28.
+This document describes version 0.006 of Filename::KeyValue (from Perl distribution Filename-KeyValue), released on 2026-05-29.
 
 =head1 SYNOPSIS
 
@@ -472,7 +477,7 @@ Examples:
 
 Result:
 
- [200, "OK", "foo-bar--kw1=val1-kw2=val2.jpg", {}]
+ [200, "OK", "foo-bar-kw1=val1-kw2=val2.jpg", {}]
 
 =back
 
@@ -503,6 +508,10 @@ List of key=E<gt>value pairs to add.
 =item * B<filename>* => I<filename>
 
 (No description)
+
+=item * B<ignore> => I<bool>
+
+If set, when filename already has the same key, do nothing.
 
 =item * B<remove> => I<array[str]>
 
@@ -546,7 +555,7 @@ Examples:
 
 Result:
 
- [200, "OK", "foo-bar--kw1=val1-kw2=val2.jpg", {}]
+ [200, "OK", "foo-bar-kw1=val1-kw2=val2.jpg", {}]
 
 =back
 
@@ -870,6 +879,10 @@ List of key=E<gt>value pairs to add.
 
 (No description)
 
+=item * B<ignore> => I<bool>
+
+If set, when filename already has the same key, do nothing.
+
 
 =back
 
@@ -917,6 +930,10 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<array[str]>
 
 (No description)
+
+=item * B<ignore> => I<bool>
+
+If set, when filename already has the same key, do nothing.
 
 =item * B<remove> => I<array[str]>
 

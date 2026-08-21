@@ -93,7 +93,7 @@ static void pq_inserver_tick(pTHX_ void *ud) {
         if (dt > is->cap) {
             is->breaches++;
             warn("Punk::Queue in-server: a job ran %.1fs against a %.1fs "
-                 "cap (breach %d of 2)", dt, is->cap, is->breaches);
+                 "cap (breach %d of 2)", (NV)dt, (NV)is->cap, is->breaches);
             if (is->breaches >= 2) {
                 is->disabled = 1;
                 warn("Punk::Queue in-server: disabled in this process "

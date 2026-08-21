@@ -9,30 +9,59 @@ use Devel::CheckLib qw(check_lib);
 # These do clean and distclean in both module distribution
 # toplevel and in $matio_top_level.
 
-my ($matio_top_level, $inc, $libs, %object) = ('./matio-1.5.0', '', '');
+my ($matio_top_level, $inc, $libs, %object) = ('./matio-1.5.30', '', '');
+
+sub pkg_run {
+  my ($pkg, $flag) = @_;
+  return unless my $out = `pkg-config $pkg $flag`;
+  chomp $out;
+  $out;
+}
 
 if (check_lib(lib => 'hdf5')) {
   $libs .= ' -lhdf5';
   $inc .= ' -DHAVE_HDF5=1';
+  print "Found HDF5\n";
 } else {
   my $this_inc = (
     eval {require PkgConfig; join ' ', PkgConfig->find('hdf5')->get_cflags} ||
     eval {require ExtUtils::PkgConfig; ExtUtils::PkgConfig->cflags('hdf5')} ||
-    `pkg-config hdf5 --cflags` ||
+    pkg_run(qw(hdf5 --cflags)) ||
     ''
   );
   $inc .= ' '.$this_inc.' -DHAVE_HDF5=1' if $this_inc;
   $libs .= ' '.(
     eval {require PkgConfig; join ' ', PkgConfig->find('hdf5')->get_ldflags} ||
     eval {require ExtUtils::PkgConfig; ExtUtils::PkgConfig->libs('hdf5')} ||
-    `pkg-config hdf5 --libs` ||
+    pkg_run(qw(hdf5 --libs)) ||
     '-lhdf5'
   );
+  print "Not found HDF5; got inc=($inc) libs=($libs)\n";
 }
 
 if (check_lib(lib => 'matio')) {
   $libs .= ' -lmatio';
+  print "Found matio\n";
+} elsif (
+  my $this_inc = (
+    eval {require PkgConfig; join ' ', PkgConfig->find('matio')->get_cflags} ||
+    eval {require ExtUtils::PkgConfig; ExtUtils::PkgConfig->cflags('matio')} ||
+    pkg_run(qw(matio --cflags)) ||
+    ''
+  )
+) {
+  $inc .= ' '.$this_inc;
+  $libs .= ' '.(
+    eval {require PkgConfig; join ' ', PkgConfig->find('matio')->get_ldflags} ||
+    eval {require ExtUtils::PkgConfig; ExtUtils::PkgConfig->libs('matio')} ||
+    pkg_run(qw(matio --libs)) ||
+    '-lmatio'
+  );
+  print "Found matio with pkg; got inc=($inc) libs=($libs)\n";
 } else {
+  $inc .= " -DDISTRO_MATIO";
+  $libs .= ' -lmatio';
+  print "Not found matio; got inc=($inc) libs=($libs)\n";
   %object = (OBJECT  =>  ' Matlab$(OBJ_EXT) matio_obj$(OBJ_EXT) ');
   if ( not -e "$matio_top_level/src/matio_pubconf.h" ) {
     print "Makefile.PL: running configure in $matio_top_level\n";
@@ -55,6 +84,7 @@ my %more_items = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88', # done_testing
+        'Test::PDL' => '0.21',
     },
     PREREQ_PM => {
         'PDL' => '2.043',
@@ -70,7 +100,7 @@ $hash{LIBS}[0] .= $libs;
 sub MY::postamble {   qq{
 
 matio_obj\$(OBJ_EXT):
-	cd $matio_top_level; cd src; \$(MAKE)
+	cd $matio_top_level; \$(MAKE)
 	ld -r -o matio_obj\$(OBJ_EXT) $matio_top_level/src/.libs/*\$(OBJ_EXT)
 
 cleanall: clean
@@ -81,16 +111,24 @@ distcleanall: distclean
 
 }  . pdlpp_postamble($matlab_package)};
 
+$hash{META_MERGE} = {
+  "meta-spec" => { version => 2 },
+  resources => {
+    bugtracker  => {web=>'https://github.com/jlapeyre/PDL-IO-Matlab/issues'},
+    repository  => {
+       url => 'git://github.com/jlapeyre/PDL-IO-Matlab.git',
+       type => 'git',
+       web => 'https://github.com/jlapeyre/PDL-IO-Matlab',
+    },
+    x_IRC => 'irc://irc.perl.org/#pdl',
+  },
+};
 
 WriteMakefile( %hash );
 
-
-if(exists $ARGV[0] && $ARGV[0] eq 'README.pod')
-{
+if (exists $ARGV[0] && $ARGV[0] eq 'README.pod') {
   print STDERR "Writing README.pod\n";
-  open README, '>README.pod'  or die "Couldn't open README.pod";
-#  print README $POD_header;
-
+  open README, '>', 'README.pod'  or die "Couldn't open README.pod";
   foreach my $mod  ('Matlab.pm') {
       open MOD, $mod or die "Couldn't open main module";
       while (<MOD>)

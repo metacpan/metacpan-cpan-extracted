@@ -7,18 +7,18 @@ use warnings;
 #  Test Harness
 #
 use Test::More;
+use FindBin qw($RealBin);
+use lib $RealBin;
+use pagi_compat_helper qw(pagi_skip_reason);
 
 
 #  Skip test if missing modules
 #
 BEGIN {
-    my @missing;
-    for my $m (qw(PAGI::Test::Client PAGI::Request PAGI::Response PAGI::SSE PAGI::WebSocket Future::AsyncAwait)) {
-        eval "require $m; 1" or push @missing, $m;
-    }
-    if (@missing) {
-        plan skip_all => "Skipping PAGI WebSocket test: missing " . join(", ", @missing);
-    }
+    unshift @INC, 't';
+    require pagi_compat_helper;
+    my $skip=pagi_compat_helper::pagi_skip_reason(qw(PAGI::Test::Client PAGI::Request PAGI::Response PAGI::SSE PAGI::WebSocket Future::AsyncAwait));
+    plan skip_all => "Skipping PAGI WebSocket test: $skip" if $skip;
 }
 
 

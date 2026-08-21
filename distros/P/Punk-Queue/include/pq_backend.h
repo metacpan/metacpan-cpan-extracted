@@ -503,7 +503,8 @@ static IV pq_fail_job(pTHX_ SV *self, IV id, IV retries, SV *err) {
             pq_log_addf(aTHX_ self, id, "warn",
                         "attempt %ld of %ld failed: %s - retry due in %.1fs",
                         (long)(retries + 1), (long)attempts,
-                        pq_log_errpv(aTHX_ err, ebuf, sizeof ebuf), delay);
+                        pq_log_errpv(aTHX_ err, ebuf, sizeof ebuf),
+                        (NV)delay);
         }
     }
     else {
@@ -593,7 +594,7 @@ static IV pq_retry_job(pTHX_ SV *self, IV id, IV retries, HV *opts) {
         pq_log_addf(aTHX_ self, id, "info",
                     delay > 0 ? "retried from '%s' - due in %.1fs"
                               : "retried from '%s'",
-                    prestate, delay);
+                    prestate, (NV)delay);
     }
     pq_txn_commit(aTHX_ self);
     return took > 0 ? 1 : 0;

@@ -4,7 +4,7 @@
       "Vincent Pit <vpit@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -68,6 +68,6 @@
          "web" : "http://git.vpit.fr/?p=perl%2Fmodules%2FVariable-Magic.git"
       }
    },
-   "version" : "0.64",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.65",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

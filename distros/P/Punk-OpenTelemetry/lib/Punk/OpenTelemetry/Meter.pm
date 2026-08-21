@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # All of it is C (include/otel_expo.h, otel_metric.h, otel_meter.h +
 # xs/meter.xs). This file is documentation.
@@ -57,7 +57,7 @@ and the attribute most likely to do it is exactly the one somebody added to
 make a dashboard more useful.
 
 The cap is the backstop. The B<tool> is a view that keeps only the bounded
-keys; see L</view>.
+keys; see L<view|/"view(%spec)">.
 
 =head2 For the life of the process: identity, and forking
 
@@ -159,6 +159,13 @@ An OTLP metrics payload, or C<undef> when nothing has been recorded.
 C<stats> returns C<instruments>, C<series> and C<overflow> - the last being
 the number that says a metric stopped being useful, before memory says it more
 loudly.
+
+=head1 SEE ALSO
+
+L<Punk::OpenTelemetry::Tracer> for the other signal that shares this
+resource and exporter, L<Punk::OpenTelemetry::Resource> for why
+C<service.instance.id> matters more to metrics than to traces, and
+L<Punk::Plugin::OpenTelemetry> for the C<< ->otel_meter >> helper.
 
 =head1 AUTHOR
 

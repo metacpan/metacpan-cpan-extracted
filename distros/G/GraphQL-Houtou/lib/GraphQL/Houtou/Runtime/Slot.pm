@@ -16,6 +16,7 @@ sub new {
     field_name => $args{field_name},
     result_name => $args{result_name},
     accessor => $args{accessor},
+    loader => $args{loader},
     return_type_name => $args{return_type_name},
     return_type_kind_code => defined $args{return_type_kind_code} ? $args{return_type_kind_code} : 0,
     item_non_null => $args{item_non_null} ? 1 : 0,
@@ -34,6 +35,7 @@ sub schema_slot_index { return $_[0]{schema_slot_index} }
 sub field_name { return $_[0]{field_name} }
 sub result_name { return $_[0]{result_name} }
 sub accessor { return $_[0]{accessor} }
+sub loader { return $_[0]{loader} }
 sub return_type_name { return $_[0]{return_type_name} }
 sub return_type_kind_code { return $_[0]{return_type_kind_code} }
 sub item_non_null { return $_[0]{item_non_null} }
@@ -54,6 +56,7 @@ sub to_struct {
     field_name => $self->{field_name},
     result_name => $self->{result_name},
     accessor => $self->{accessor},
+    loader => _clone_value($self->{loader}),
     return_type_name => $self->{return_type_name},
     resolver_shape => $self->{resolver_shape},
     resolver_mode => $self->{resolver_mode},
@@ -76,6 +79,7 @@ sub to_native_struct {
     field_name => $self->{field_name},
     result_name => $self->{result_name},
     accessor => $self->{accessor},
+    loader => _clone_value($self->{loader}),
     return_type_name => $self->{return_type_name},
     return_type_kind_code => $self->{return_type_kind_code},
     item_non_null => $self->{item_non_null},

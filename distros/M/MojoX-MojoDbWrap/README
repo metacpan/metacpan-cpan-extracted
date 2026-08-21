@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes MojoX::MojoDbWrap version 0.004.
+    This document describes MojoX::MojoDbWrap version 0.006.
 
 SYNOPSIS
 
@@ -136,6 +136,23 @@ INTERFACE
     If available via "migrations_for", runs the migrations based on the
     specific class. $name defaults to the string migrations.
 
+ insert
+
+       my $id = $wrap->insert($tablish, $data); # OR
+       my $id = $wrap->insert($tablish, $data, $opts);
+
+    Insert a new record based on $data, returning the identifier of that
+    new record.
+
+    $opts is an optional hash that can contain options associated to keys
+    select (for searching the identifier using "id_of") and insert (in case
+    we need to insert a new record using $default).
+
+    Parameter $tablish is the same as in "id_of"; in particular, the newly
+    inserted record is supposed to have an id column by default, but you
+    can pass an array reference with the first parameter as the table name
+    and the second parameter as the identifier column name to change this.
+
  mdb
 
        my $mdb = $wrap->mdb;
@@ -231,6 +248,27 @@ INTERFACE
        my $x = $wrap->select(@args);
 
     Wrapper around $wrap->mdb->db->select(@args).
+
+ upsert
+
+       $wrap->upsert($tablish, $data, $opts);
+
+    Insert a new record, or update it if already present.
+
+    $tablish is the same as "id_of", i.e. either a column name or an array
+    reference with the table name and the identifier column name.
+
+    The assumption is that there is a single column where the conflict in
+    insertion can arise and that column name is passed as the value of key
+    conflicting in $opts, like this:
+
+       $wrap->upsert($tablish, $data, { conflicting => 'name', ... });
+
+    This will generate an on_conflict option passed to "insert", setting
+    all values except the conflicting one. If you need a more nuanced
+    upsert, generate the on_conflict option yourself and pass it in the
+    $opts (it's still suggested to call this method instead of insert
+    directly, so that you're explicit about your goal).
 
 BUGS AND LIMITATIONS
 

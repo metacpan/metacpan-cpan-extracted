@@ -11,19 +11,26 @@ use mro;
 use Params::Get 0.13;
 use Readonly;
 use Return::Set;
+use List::Util   qw(any);
 use Scalar::Util qw(blessed weaken);
-use Time::HiRes qw(time);
+use Time::HiRes  qw(time);
 use File::stat;
 use POSIX qw(WNOHANG);
 
 # Avoid magic literals scattered across hot paths and signal handlers.
 # Centralising here makes global search-replace safe and self-documents intent.
-Readonly my $OS_WINDOWS   => 'MSWin32';
-Readonly my $LOGGER_NULL  => 'NULL';
-Readonly my $SIG_DEFAULT  => 'DEFAULT';
-Readonly my $SIG_IGNORE   => 'IGNORE';
-Readonly my $POLL_SLEEP   => 0.1;   # seconds between waitpid polls in disable_hot_reload
-Readonly my $KILL_TIMEOUT => 5;     # seconds before SIGKILL escalation after SIGTERM
+Readonly my $OS_WINDOWS      => 'MSWin32';
+Readonly my $LOGGER_NULL     => 'NULL';
+Readonly my $SIG_DEFAULT     => 'DEFAULT';
+Readonly my $SIG_IGNORE      => 'IGNORE';
+Readonly my $POLL_SLEEP      => 0.1;   # seconds between waitpid polls in disable_hot_reload
+Readonly my $KILL_TIMEOUT    => 5;     # seconds before SIGKILL escalation after SIGTERM
+Readonly my $DEFAULT_INTERVAL => 10;   # default hot-reload poll interval in seconds
+
+# Matches any path segment that is exactly ".." (anchored start, slash, or end).
+# Catches: ../foo  foo/../bar  foo/..  and leading ../
+# Used in two places; kept as a constant so both guards are always in sync.
+Readonly my $RE_PATH_TRAVERSAL => qr{(?:\A|/)\.\.(?:/|\z)};
 
 # Global registry — intentionally package-level so that the END block and
 # signal handlers installed in one call site share state with all others.
@@ -31,6 +38,12 @@ Readonly my $KILL_TIMEOUT => 5;     # seconds before SIGKILL escalation after SI
 our %_object_registry   = ();
 our %_config_watchers   = ();
 our %_config_file_stats = ();
+
+# Memoization caches — keyed by inputs; valid for the process lifetime because
+# Perl @ISA hierarchies and filesystem layouts are stable after module load.
+# Both caches include undef sentinels (use exists, not defined, to check hits).
+our %_chain_cache = ();  # class         => [UNIVERSAL, ..., Class] (base-first)
+our %_find_cache  = ();  # "\0"-joined key => file path or undef
 
 # Saved before we install our SIGUSR1 handler so we can chain and restore it.
 our $_original_usr1_handler;
@@ -41,286 +54,424 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.23
+0.24
 
 =cut
 
-our $VERSION = 0.23;
+our $VERSION = 0.24;
+
+=head1 DESCRIPTION
+
+C<Object::Configure> injects runtime configuration and logging into Perl class
+constructors.  It is a thin layer on top of L<Config::Abstraction> (reads config
+files and environment variables) and L<Log::Abstraction> (logging).
+
+Call C<configure($class, \%params)> at the start of your C<new()> method.  It:
+
+=over 4
+
+=item 1. Walks C<@ISA> and finds config files for every class in the inheritance chain.
+
+=item 2. Merges those files, then overlays environment variables named C<ClassName__key>.
+
+=item 3. Creates a L<Log::Abstraction> logger and stores it in C<$params-E<gt>{logger}>.
+
+=item 4. Returns a hashref ready to pass to C<bless>.
+
+=back
+
+The module also provides optional hot-reload support: a background process watches
+config files and sends C<SIGUSR1> to trigger an in-place update of registered objects
+without restarting the application.
+
+B<Hot reload is not supported on Windows> (C<SIGUSR1> does not exist there).
 
 =head1 SYNOPSIS
 
-The C<Object::Configure> module is a lightweight utility designed to inject runtime parameters into other classes,
-primarily by layering configuration and logging support,
-when instatiating objects.
+=head2 Example 1: Add configurable logging to your own class
 
-L<Log::Abstraction> and L<Config::Abstraction> are modules developed to solve a specific need,
-runtime configurability without needing to rewrite or hardcode behaviours.
-The goal is to allow individual modules to enable or disable features on the fly,
-and to do it using whatever configuration system the user prefers.
+    package My::Module;
+    use Object::Configure;
 
-Although the initial aim was general configurability,
-the primary use case that's emerged has been fine-grained logging control,
-more flexible and easier to manage than what you'd typically do with L<Log::Log4perl>.
-For example,
-you might want one module to log verbosely while another stays quiet,
-and be able to toggle that dynamically - without making invasive changes to each module.
+    sub new {
+        my ($class, %args) = @_;
 
-To tie it all together,
-there is C<Object::Configure>.
-It sits on L<Log::Abstraction> and L<Config::Abstraction>,
-and with just a couple of extra lines in a class constructor,
-you can hook in this behaviour seamlessly.
-The intent is to keep things modular and reusable,
-especially across larger systems or in situations where you want user-selectable behaviour.
-
-Add this to your constructor:
-
-   package My::Module;
-
-   use Object::Configure;
-   use Params::Get;
-
-   sub new {
-        my $class = shift;
-        my $params = Object::Configure::configure($class, @_ ? \@_ : undef);	# Reads in the runtime configuration settings
-        # or my $params = Object::Configure::configure($class, { @_ });
+        # configure() reads config files + env vars, sets up a logger,
+        # and returns a hashref ready to bless.
+        my $params = Object::Configure::configure($class, \%args);
 
         return bless $params, $class;
     }
 
-Throughout your class, add code such as:
-
-    sub method
-    {
+    sub do_work {
         my $self = shift;
-
-        $self->{'logger'}->trace(ref($self), ': ', __LINE__, ' entering method');
+        $self->{logger}->info('Starting do_work');
+        # ...
     }
 
-=head3 CONFIGURATION INHERITANCE
+    # Usage -- reads ~/.conf/my-module.yml if it exists:
+    my $obj = My::Module->new(config_file => '/etc/myapp/my-module.yml');
+    $obj->do_work;
 
-C<Object::Configure> supports configuration inheritance, allowing child classes to inherit and override configuration settings from their parent classes.
-When a class is configured, the module automatically traverses the inheritance hierarchy (using C<@ISA>) and loads configuration files for each ancestor class in the chain.
+=head2 Example 2: Configure a third-party class you cannot modify
 
-Configuration files are loaded in order from the most general (base class) to the most specific (child class), with later files overriding earlier ones. For example, if C<My::Child::Class> inherits from C<My::Parent::Class>, which inherits from C<My::Base::Class>, the module will:
+    use Object::Configure;
 
-=over 4
+    # Wrap LWP::UserAgent so it reads its settings from a YAML file.
+    my $ua = Object::Configure::instantiate(
+        class       => 'LWP::UserAgent',
+        config_file => '/etc/myapp/lwp.yml',
+        timeout     => 30,      # fallback if the file has no timeout key
+    );
 
-=item 1. Load C<my-base-class.yml> (or .conf, .json, etc.) if it exists
+    $ua->get('https://example.com');
 
-=item 2. Load C<my-parent-class.yml> if it exists, overriding base settings
+=head2 Example 3: Multi-level inheritance -- config files merge automatically
 
-=item 3. Load C<my-child-class.yml>, overriding both parent and base settings
+    # ~/.conf/my-base-class.yml
+    # My__Base__Class:
+    #   timeout: 30
+    #   retries: 3
 
-=back
+    # ~/.conf/my-child-class.yml
+    # My__Child__Class:
+    #   timeout: 60   # overrides base; retries:3 is inherited
 
-The configuration files should be named using lowercase versions of the class name with C<::> replaced by hyphens (C<->).
-For example, C<My::Parent::Class> would use C<my-parent-class.yml>.
-
-This allows you to define common settings in a base class configuration file and selectively override them in child class configurations, promoting DRY (Don't Repeat Yourself) principles and making it easier to manage configuration across class hierarchies.
-
-Example:
-
-    # File: ~/.conf/my-base-class.yml
-    ---
-    My__Base__Class:
-      timeout: 30
-      retries: 3
-      log_level: info
-
-    # File: ~/.conf/my-child-class.yml
-    ---
-    My__Child__Class:
-      timeout: 60
-      # Inherits retries: 3 and log_level: info from parent
-
-    # Result: Child class gets timeout=60, retries=3, log_level=info
-
-Parent configuration files are optional.
-If a parent class's configuration file doesn't exist, the module simply skips it and continues up the inheritance chain.
-All discovered configuration files are tracked in the C<_config_files> array for hot reload support.
-
-=head3 UNIVERSAL CONFIGURATION
-
-All Perl classes implicitly inherit from C<UNIVERSAL>.
-C<Object::Configure> takes advantage of this to provide a mechanism for universal configuration settings
-that apply to all classes by default.
-
-If you create a configuration file named C<universal.yml> (or C<universal.conf>, C<universal.json>, etc.)
-in your configuration directory,
-the settings in its C<UNIVERSAL> section will be inherited by all classes that use C<Object::Configure>,
-unless explicitly overridden by class-specific configuration files.
-
-This is particularly useful for setting application-wide defaults such as logging levels,
-timeout values,
-or other common parameters that should apply across all modules.
-
-Example C<~/.conf/universal.yml>:
-
-    ---
-    UNIVERSAL:
-      timeout: 30
-      retries: 3
-      logger:
-        level: info
-
-With this universal configuration file in place,
-all classes will inherit these default values.
-Individual classes can override any of these settings in their own configuration files:
-
-Example C<~/.conf/my-special-class.yml>:
-
-    ---
-    My__Special__Class:
-      timeout: 120
-      # Inherits retries: 3 and logger.level: info from UNIVERSAL
-
-The universal configuration is loaded first in the inheritance chain,
-followed by parent class configurations,
-and finally the specific class configuration,
-with later configurations overriding earlier ones.
-
-=head2 CHANGING BEHAVIOUR AT RUN TIME
-
-=head3 USING A CONFIGURATION FILE
-
-To control behavior at runtime, C<Object::Configure> supports loading settings from a configuration file via L<Config::Abstraction>.
-
-A minimal example of a config file (C<~/.conf/local.conf>) might look like:
-
-   [My__Module]
-   logger.file = /var/log/mymodule.log
-
-The C<configure()> function will read this file,
-overlay it onto your default parameters,
-and initialize the logger accordingly.
-
-If the file is not readable and no config_dirs are provided,
-the module will throw an error.
-To be clear, in this case, inheritance is not followed.
-
-This mechanism allows dynamic tuning of logging behavior (or other parameters you expose) without modifying code.
-
-More details to be written.
-
-=head3 USING ENVIRONMENT VARIABLES
-
-C<Object::Configure> also supports runtime configuration via environment variables,
-without requiring a configuration file.
-
-Environment variables are read automatically when you use the C<configure()> function,
-thanks to its integration with L<Config::Abstraction>.
-These variables should be prefixed with your class name, followed by a double colon.
-
-For example, to enable syslog logging for your C<My::Module> class,
-you could set:
-
-    export My__Module__logger__file=/var/log/mymodule.log
-
-This would be equivalent to passing the following in your constructor:
-
-     My::Module->new(logger => Log::Abstraction->new({ file => '/var/log/mymodule.log' });
-
-All environment variables are read and merged into the default parameters under the section named after your class.
-This allows centralized and temporary control of settings (e.g., for production diagnostics or ad hoc testing) without modifying code or files.
-
-Note that environment variable settings take effect regardless of whether a configuration file is used,
-and are applied during the call to C<configure()>.
-
-More details to be written.
-
-=head2 HOT RELOAD
-
-Hot reload is not supported on Windows.
-
-=head3 Basic Hot Reload Setup
-
-    package My::App;
+    package My::Child::Class;
+    our @ISA = ('My::Base::Class');
     use Object::Configure;
 
     sub new {
-        my $class = shift;
-        my $params = Object::Configure::configure($class, @_ ? \@_ : undef);
-        my $self = bless $params, $class;
+        my ($class, %args) = @_;
+        # Walks @ISA, merges base config then child config.
+        # Result: timeout=60, retries=3
+        my $params = Object::Configure::configure($class, \%args);
+        return bless $params, $class;
+    }
 
-        # Register for hot reload
-        Object::Configure::register_object($class, $self) if $params->{_config_file};
+=head2 Example 4: Hot reload -- objects update when the config file changes
+
+    package My::Service;
+    use Object::Configure;
+
+    sub new {
+        my ($class, %args) = @_;
+        my $params = Object::Configure::configure($class, \%args);
+        my $self   = bless $params, $class;
+
+        # Register so reload_config() updates $self in-place on file change.
+        Object::Configure::register_object($class, $self)
+            if $params->{_config_file};
 
         return $self;
     }
 
-    # Optional: Define a reload hook
-    sub _on_config_reload {
-        my ($self, $new_config) = @_;
-        print "My::App config was reloaded!\n";
-        # Custom reload logic here
-    }
+    package main;
 
-=head3 Enable Hot Reload in Your Main Application
+    my $svc = My::Service->new(config_file => '/etc/myapp/service.yml');
 
-    # Enable hot reload with custom callback
+    # Fork a background watcher; it sends SIGUSR1 when the file changes.
     Object::Configure::enable_hot_reload(
-        interval => 5,  # Check every 5 seconds
-        callback => sub {
-            print "Configuration files have been reloaded!\n";
-        }
+        interval => 5,
+        callback => sub { print "Config reloaded at ", scalar localtime, "\n" },
     );
 
-    # Your application continues running...
-    # Config changes will be automatically detected and applied
+    while (1) { sleep 1 }          # event loop
 
-=head3 Manual Reload
+    Object::Configure::disable_hot_reload();    # clean shutdown
 
-    # Manually trigger a reload
-    my $count = Object::Configure::reload_config();
-    print "Reloaded configuration for $count objects\n";
+=head2 Example 5: Override settings with environment variables (no file needed)
 
-=encoding utf8
+    # Shell:
+    #   export My__Module__log_level=debug
+    #   export My__Module__timeout=120
 
-=head1 SUBROUTINES/METHODS
+    package My::Module;
+    use Object::Configure;
 
-=head2 configure
+    sub new {
+        my ($class, %args) = @_;
+        # configure() picks up My__Module__* env vars automatically.
+        my $params = Object::Configure::configure($class, \%args);
+        return bless $params, $class;
+    }
 
-Configure your class at runtime with hot reload support.
+    my $obj = My::Module->new;
+    # $obj->{log_level} eq 'debug'   $obj->{timeout} == 120
 
-Takes arguments:
+=head1 CONFIGURATION
+
+=head2 Config file naming
+
+The config file name is derived from the class name by lowercasing it and replacing
+C<::> with hyphens (C<->):
+
+    My::Parent::Class  =>  my-parent-class.yml
+
+The file is searched for in the directory of the C<config_file> argument, then in
+any directories listed in C<config_dirs>.
+
+=head2 Section key naming inside the config file
+
+Inside the YAML (or JSON or conf) file, the section key uses double underscores in
+place of C<::>:
+
+    # my-parent-class.yml
+    ---
+    My__Parent__Class:
+      timeout: 30
+      retries: 3
+
+=head2 Configuration resolution order
+
+The following sources are merged from I<lowest> to I<highest> priority.  A value
+from a higher-priority source always wins over a lower-priority one.
 
 =over 4
 
-=item * C<class>
+=item 1. B<Caller-supplied params> -- the hashref you pass to C<configure()>.  Despite
+the name "defaults", these are the I<lowest> priority and are overridden by everything
+else.
 
-=item * C<params>
+=item 2. B<UNIVERSAL section> -- the C<UNIVERSAL:> block in C<universal.yml> (or
+C<universal.conf>, C<universal.json>) in your config directories, if the file exists.
 
-A hashref containing default parameters to be used in the constructor.
+=item 3. B<Ancestor class config files> -- walked base-first through C<@ISA> using
+the class's Method Resolution Order (MRO).
 
-=item * C<carp_on_warn>
+=item 4. B<Primary config file> -- the file named by the C<config_file> argument.
 
-If set to 1, call C<Carp::carp> on C<warn()>.
-This value is also read from the configuration file,
-which will take precedence.
-The default is 0.
-
-=item * C<croak_on_error>
-
-If set to 1, call C<Carp::croak> on C<error()>.
-This value is also read from the configuration file,
-which will take precedence.
-The default is 1.
-
-=item * C<logger>
-
-The logger to use.
-If none is given, an instatiation of L<Log::Abstraction> will be created, unless the logger is set to NULL.
-
-=item * C<schema>
-
-A L<Params::Validate::Strict> compatible schema to validate the configuration file against.
+=item 5. B<Environment variables> -- named C<ClassName__key=value>, where C<::> in
+the class name is replaced by C<__>.  These are the I<highest> priority.
 
 =back
 
-Returns a hash ref containing the new values for the constructor.
+=head2 UNIVERSAL configuration
 
-Now you can set up a configuration file and environment variables to configure your object.
+If you create C<universal.yml> in your config directory with a C<UNIVERSAL:> section,
+those settings apply to every class that uses C<Object::Configure> unless a
+more-specific source overrides them:
+
+    # ~/.conf/universal.yml
+    ---
+    UNIVERSAL:
+      timeout: 30
+      logger:
+        level: warning
+
+=head2 Logging
+
+C<configure()> always sets C<$params-E<gt>{logger}> to a L<Log::Abstraction>
+instance.  You can control it by passing a C<logger> key:
+
+    # Arrayref: messages are captured into @log (protected from merge override)
+    configure($class, { logger => \@log });
+
+    # Hashref: options forwarded to Log::Abstraction::new()
+    configure($class, { logger => { level => 'debug', file => '/var/log/app.log' } });
+
+    # String 'NULL': disables all logging
+    configure($class, { logger => 'NULL' });
+
+    # Existing Log::Abstraction object: used as-is
+    configure($class, { logger => $my_logger });
+
+B<Note:> only arrayref loggers are stashed before the config merge and are guaranteed
+to survive it.  C<'NULL'> and blessed logger objects can be overridden by a
+C<UNIVERSAL:> section in C<universal.yml>.  See L</COMMON PITFALLS>.
+
+=head2 Environment variable format
+
+Environment variable names are constructed as:
+
+    ClassName__key
+
+where C<::> in the class name is replaced by two underscores.
+
+    export My__Module__timeout=60
+    export My__Module__logger__level=debug
+
+=head1 HOT RELOAD
+
+Hot reload lets you edit a config file and have all live objects update themselves
+without restarting the program.
+
+=head2 How it works
+
+=over 4
+
+=item 1. Your constructor calls C<register_object($class, $self)> to opt in.
+
+=item 2. Your main program calls C<enable_hot_reload()> to fork a background watcher.
+
+=item 3. The watcher polls config files every C<interval> seconds and sends
+C<SIGUSR1> to the parent when it detects a change.
+
+=item 4. The C<SIGUSR1> handler calls C<reload_config()>, which re-reads files and
+updates every registered object in-place.
+
+=item 5. Your main program calls C<disable_hot_reload()> on shutdown.
+
+=back
+
+Private keys (those whose names start with C<_>) are never overwritten during
+reload, so internal bookkeeping is safe.
+
+B<Hot reload is not supported on Windows.>
+
+=head1 COMMON PITFALLS
+
+=head2 Only arrayref loggers survive the config merge
+
+If you pass C<logger =E<gt> 'NULL'> or C<logger =E<gt> $existing_logger>, the
+C<UNIVERSAL:> section in C<universal.yml> (or a site-local config file) can
+silently override your logger during the config merge.
+
+Only arrayref loggers are stashed before the merge and are guaranteed to survive:
+
+    # Protected -- will NOT be overridden by universal.yml
+    configure($class, { logger => \@captured });
+
+    # NOT protected -- universal.yml can override these
+    configure($class, { logger => 'NULL' });
+    configure($class, { logger => $existing_obj });
+
+=head2 Caller-supplied keys are the LOWEST priority
+
+Despite being called "defaults", keys you pass directly to C<configure()> are
+overridden by config files and environment variables:
+
+    # My__Module__timeout=60 is set in the shell.
+    # $params->{timeout} will be 60, not 30.
+    configure('My::Module', { timeout => 30 });
+
+Use caller-supplied keys only as a last-resort fallback.
+
+=head2 register_object() pushes; it does not replace
+
+Calling C<register_object()> twice for the same class registers B<two> entries.
+Both objects receive updates on every reload.  The second call does not remove the
+first.
+
+    Object::Configure::register_object('My::Class', $obj_a);
+    Object::Configure::register_object('My::Class', $obj_b);
+    # reload_config() now updates BOTH $obj_a and $obj_b
+
+=head2 Private keys are never updated on hot reload
+
+Any key whose name begins with C<_> is skipped during C<reload_config()>.
+A config key named C<_my_setting> in your YAML file will be ignored at reload time.
+
+=head2 The 'class' key appears on objects created by instantiate()
+
+C<instantiate()> intentionally leaves the C<class> key in the hashref passed to
+C<$class-E<gt>new()> as a debugging aid.  Your object will have a C<class>
+attribute set to the class name:
+
+    my $obj = Object::Configure::instantiate(class => 'My::Thing', ...);
+    print $obj->{class};    # prints 'My::Thing'
+
+=head2 Memoization caches are not invalidated during a run
+
+C<_get_inheritance_chain()> and C<_find_class_config_file()> cache their results
+for the lifetime of the process.  If you alter C<@ISA> or add config files after
+the first C<configure()> call for a given class, the cache returns stale results.
+
+=head2 disable_hot_reload() blocks for up to five seconds
+
+It waits for the watcher process to exit (SIGTERM first, then SIGKILL).  Do not
+call it from inside a signal handler or a timing-sensitive loop.
+
+=head2 config_file must be developer-controlled
+
+The C<config_file> path is validated against directory traversal (C<../>) but is
+not otherwise restricted.  It must always be a developer-supplied path, never raw
+user input.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 configure($class, \%params)
+
+Merge configuration for C<$class> from all available sources and return a hashref
+ready to pass to C<bless>.  This is the core function; call it at the start of your
+C<new()> method.
+
+=head3 Arguments
+
+=over 4
+
+=item * C<$class> (Required, string)
+
+The fully-qualified Perl class name to configure (e.g., C<'My::Module'>).  Must
+start with a letter or underscore; each C<::>-separated component must also start
+with a letter or underscore.  Digits, newlines, and shell metacharacters are rejected.
+
+=item * C<\%params> (Optional, hashref; defaults to C<{}>)
+
+Caller-supplied values.  These have the I<lowest> priority and are overridden by
+config files and environment variables.  Recognized special keys:
+
+=over 4
+
+=item * C<config_file> (string, optional) -- path to the primary YAML/JSON/conf file.
+
+=item * C<config_dirs> (arrayref of strings, optional) -- additional directories to
+search when C<config_file> is a bare filename with no directory component.
+
+=item * C<logger> (various, optional) -- see L</Logging>.
+
+=item * C<carp_on_warn> (boolean, optional, default 0) -- if true, the logger uses
+C<Carp::carp> instead of C<warn>.
+
+=item * C<croak_on_error> (boolean, optional, default 1) -- if true, the logger uses
+C<Carp::croak> instead of C<die>.
+
+=back
+
+=back
+
+=head3 Returns
+
+A hashref containing all merged configuration keys plus:
+
+=over 4
+
+=item * C<logger> -- a L<Log::Abstraction> instance, or the string C<'NULL'>.
+
+=item * C<_config_file> -- path of the primary config file (only if one was loaded).
+
+=item * C<_config_files> -- arrayref of every config file that was loaded (only if
+at least one was loaded).
+
+=back
+
+=head3 Error messages
+
+=over 4
+
+=item * C<Object::Configure: configure: what class do you want to configure?> --
+C<$class> was C<undef> or an empty string.  Pass C<ref($self)> or C<__PACKAGE__>.
+
+=item * C<Object::Configure: configure: invalid class name (must be a valid Perl package name): CLASS> --
+C<$class> contains characters not allowed in a Perl package name (for example, a
+digit as the first character of a C<::>-component, a newline, or a semicolon).
+
+=item * C<CLASS: config_file contains path traversal sequences: FILE> --
+C<config_file> contains a C<..> segment (e.g., C<../../etc/passwd>).  The
+C<config_file> argument must always be a developer-controlled path.
+
+=item * C<CLASS: FILE: OS-ERROR> --
+C<config_file> is not readable and no C<config_dirs> were supplied.  Check file
+permissions or add C<config_dirs>.
+
+=item * C<Warning: Can't load configuration from FILE: DETAIL> --
+L<Config::Abstraction> rejected the file (typically a YAML/JSON syntax error).
+This is a warning, not fatal; C<configure()> continues with an empty config.
+
+=item * C<Object::Configure: config_path contains path traversal sequences: PATH> --
+An environment variable set a C<config_path> value containing C<..>.
+
+=back
 
 =head3 API Specification
 
@@ -328,106 +479,91 @@ Now you can set up a configuration file and environment variables to configure y
 
     schema => {
         class => {
-            type => 'string',
-            required => 1,
-            description => 'Fully-qualified class name'
+            type        => 'string',
+            required    => 1,
+            description => 'Fully-qualified Perl class name',
+            pattern     => qr/\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/,
         },
         params => {
-            type => 'hashref',
-            optional => 1,
-            default => {},
+            type        => 'hashref',
+            optional    => 1,
+            default     => {},
+            description => 'Caller-supplied defaults (lowest priority)',
             schema => {
                 config_file => {
-                    type => 'string',
-                    optional => 1,
-                    description => 'Configuration file basename'
-                }, config_dirs => {
-                    type => 'arrayref',
-                    optional => 1,
-                    description => 'Directories to search for config files'
-                }, logger => {
-                    type => [qw(hashref coderef object string arrayref)],
-                    optional => 1,
-                    description => 'Logger configuration or instance'
-                }, carp_on_warn => {
-                    type => 'boolean',
-                    optional => 1,
-                    default => 0,
-                    description => 'Use Carp::carp for warnings'
-                }, croak_on_error => {
-                    type => 'boolean',
-                    optional => 1,
-                    default => 1,
-                    description => 'Use Carp::croak for errors'
-                }
-            }
-        }
+                    type        => 'string',
+                    optional    => 1,
+                    description => 'Primary config file path',
+                },
+                config_dirs => {
+                    type        => 'arrayref',
+                    optional    => 1,
+                    description => 'Extra directories to search for config files',
+                },
+                logger => {
+                    type        => [qw(undef string arrayref hashref object)],
+                    optional    => 1,
+                    description => 'Logger spec -- see CONFIGURATION/Logging',
+                },
+                carp_on_warn => {
+                    type        => 'boolean',
+                    optional    => 1,
+                    default     => 0,
+                    description => 'Use Carp::carp for logger warnings',
+                },
+                croak_on_error => {
+                    type        => 'boolean',
+                    optional    => 1,
+                    default     => 1,
+                    description => 'Use Carp::croak for logger errors',
+                },
+            },
+        },
     }
 
 =head4 Output
 
-    type => 'hashref',
-    description => 'Merged configuration parameters',
+    type        => 'hashref',
+    description => 'Merged configuration hashref, ready to bless',
     schema => {
         logger => {
-            type => 'object',
-            isa => 'Log::Abstraction',
-            description => 'Initialized logger instance'
+            type        => [qw(object string)],
+            description => 'Log::Abstraction instance or the string "NULL"',
         },
         _config_file => {
-            type => 'string',
-            optional => 1,
-            description => 'Primary configuration file path'
+            type        => 'string',
+            optional    => 1,
+            description => 'Path of the primary config file that was loaded',
         },
         _config_files => {
-            type => 'arrayref',
-            optional => 1,
-            description => 'All loaded configuration file paths'
-        }
+            type        => 'arrayref',
+            optional    => 1,
+            description => 'All config file paths that were loaded, in load order',
+        },
     }
-
-=head3 MESSAGES
-
-=over 4
-
-=item * C<configure: what class do you want to configure?> -- class argument was undef or empty string. Pass the calling package name as the first argument.
-
-=item * C<CLASS: FILE: OS-error> -- the config_file is not readable and no config_dirs were supplied. Check file permissions or supply config_dirs.
-
-=item * C<Warning: Can't load configuration from FILE: DETAIL> -- Config::Abstraction rejected the file. Check YAML/JSON/conf syntax.
-
-=back
-
-=head3 PSEUDOCODE
-
-    configure(class, params):
-        croak if class is empty
-        stash coderefs/objects from params (Config::Abstraction cannot hold them)
-        if params.logger is arrayref: move to $array_logger
-        build inheritance chain via mro::get_linear_isa (base -> child, UNIVERSAL first)
-        if config_file given:
-            croak if not readable and no config_dirs
-            for each ancestor class (child -> base order): find & collect matching config file
-            add primary config file last (highest priority)
-            sort collected files base -> child
-            deep-merge each file's section into params
-        else if environment variables exist:
-            merge env vars for each ancestor then for the class itself
-        determine carp_on_warn / croak_on_error
-        build logger via _build_logger(spec, carp_on_warn)
-        store _config_file and _config_files for hot reload
-        restore stashed coderefs/objects
-        return params
 
 =cut
 
 sub configure {
 	my $class  = $_[0];
-	my $params = $_[1] || {};	# caller's defaults; config file values override them
+	my $params = $_[1] // {};	# caller's defaults; config file values override them
 	my $array_logger;		# stash for an arrayref logger spec (Config::Abstraction rejects refs)
 
 	croak(__PACKAGE__, ': configure: what class do you want to configure?')
 		if !defined($class) || $class eq '';
+
+	# SECURITY: validate $class is a syntactically valid Perl package name before
+	# it propagates into env_prefix, croak messages, and %_chain_cache keys.
+	# Exploit mechanism: a class name containing \n, ;, or shell metacharacters
+	# can poison log lines, carp output, and env-variable lookups if not rejected here.
+	# Under Perl taint mode (-T) an unvalidated external value would also fail the
+	# taint check inside Config::Abstraction when used as an env_prefix substring.
+	croak(__PACKAGE__, ': configure: invalid class name (must be a valid Perl package name): ', $class)
+		unless $class =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/;
+
+	# Config::Abstraction, Log::Abstraction, and Return::Set all use eval internally
+	# Protect the caller's $@ from being clobbered by our internal eval blocks.
+	local $@;
 
 	# Config::Abstraction treats unknown scalar values as config file paths and will
 	# attempt to read them, corrupting coderefs and object references.
@@ -450,6 +586,16 @@ sub configure {
 
 	my $config_file = $params->{'config_file'};
 	my $config_dirs = $params->{'config_dirs'};
+
+	# SECURITY (S1 — path traversal): reject config_file paths containing ".." segments
+	# before they reach Config::Abstraction.  The pen-test suite confirmed C::A parses
+	# /etc/passwd as a colon-delimited conf file, injecting every user account as a
+	# config key.  The ".." guard blocks the traversal vector; direct absolute paths to
+	# system files remain the caller's responsibility (document: config_file must be
+	# developer-controlled, never raw user input).
+	if(defined($config_file) && $config_file =~ $RE_PATH_TRAVERSAL) {
+		croak("$class: config_file contains path traversal sequences: $config_file");
+	}
 
 	# _get_inheritance_chain returns [UNIVERSAL, ..., Base, Child] (base-first).
 	# Reversing it below gives child-first for the discovery loop; the sort
@@ -484,7 +630,8 @@ sub configure {
 			}
 		}
 
-		if($config_file && !$tracked_files{$config_file} && -r $config_file) {
+		# Premise: $config_file is true (we are inside if($config_file) above).
+		if(!$tracked_files{$config_file} && -r $config_file) {
 			push @config_files_to_load, { file => $config_file, class => $original_class };
 			$tracked_files{$config_file} = 1;
 			$_config_file_stats{$config_file} = stat($config_file)
@@ -573,8 +720,19 @@ sub configure {
 
 		$params = _deep_merge($merged_config, $params);
 
-		if($params->{config_path} && -f $params->{config_path}) {
-			$_config_file_stats{ $params->{config_path} } = stat($params->{config_path});
+		# SECURITY (S1 extension — config_path traversal + taint):
+		# config_path arrives from Config::Abstraction, which reads %ENV.  Under
+		# taint mode (-T) the value is tainted; any syscall with a tainted argument
+		# is fatal.  Apply the same $RE_PATH_TRAVERSAL guard as config_file (line 491)
+		# before any filesystem probe, so the two guards stay in sync.
+		# Exploit: ClassName__config_path=../../etc/shadow causes the hot-reload watcher
+		# to stat() and track an arbitrary system file, leaking mtime changes via SIGUSR1.
+		if($params->{config_path}) {
+			croak(__PACKAGE__, ': config_path contains path traversal sequences: ',
+				$params->{config_path})
+				if $params->{config_path} =~ $RE_PATH_TRAVERSAL;
+			$_config_file_stats{ $params->{config_path} } = stat($params->{config_path})
+				if -f $params->{config_path};
 		}
 	}
 
@@ -602,64 +760,72 @@ sub configure {
 	return Return::Set::set_return($params, { 'type' => 'hashref' });
 }
 
-=head2 instantiate($class,...)
+=head2 instantiate(%params)
 
-Create and configure an object of a third-party class without modifying the class itself.
+Configure and instantiate a third-party class without modifying the class itself.
 
-=head3 Purpose
-
-Provides a convenient way to make third-party classes (those you cannot modify) configurable
-at runtime using Object::Configure. This is a wrapper that calls C<configure> and then
-instantiates the class.
+C<instantiate> is a convenience wrapper: it calls C<configure>, passes the merged
+hashref to C<$class-E<gt>new(...)>, and optionally registers the result for hot reload.
+Use it when you need runtime configuration for a class whose source you cannot change.
 
 =head3 Arguments
 
-Takes a hash or hashref with the following keys:
+Takes a flat hash (not a hashref).  Recognized keys:
 
 =over 4
 
-=item * C<class> (Required)
+=item * C<class> (Required, string)
 
-The fully-qualified class name to instantiate (e.g., C<'LWP::UserAgent'>).
+The fully-qualified class name to instantiate (e.g., C<'LWP::UserAgent'>).  The class
+must already be loaded and must have a C<new> method that accepts a hashref.
 
-=item * Additional keys
+=item * All other keys
 
-Any additional keys are passed through to C<configure> and then to the class constructor.
+Passed through to C<configure()> as C<\%params>.  See L</configure($class, \%params)>
+for the full list.
 
 =back
 
 =head3 Returns
 
-A blessed object of the specified class, configured according to the parameters and
-configuration files.
+A blessed object of type C<$class>.
+
+B<Note:> The returned object's hash will contain a C<class> key holding the class name.
+This is intentional -- it is left in the hash as a debugging aid so you can always
+see which class an object came from.  Do not depend on its absence.
 
 =head3 Side Effects
 
 =over 4
 
-=item * Calls C<configure> (see its side effects)
+=item * Calls C<configure($class, \%params)> -- see its side effects.
 
-=item * Calls the C<new> method on the specified class
+=item * Calls C<$class-E<gt>new(\%merged_params)>.
 
-=item * Registers the object for hot reload if a configuration file was used
+=item * If the config produced a C<_config_file>, calls C<register_object($class, $obj)>
+so the object participates in hot reload.
 
 =back
 
-=head3 Notes
+=head3 Error messages
 
-The specified class must have a C<new> method that accepts a hashref of parameters.
-This is a "quick and dirty" way to add configuration support to classes you don't control.
+Same as C<configure()>.  In addition:
+
+=over 4
+
+=item * Any exception thrown by C<$class-E<gt>new(...)> propagates unchanged.
+
+=back
 
 =head3 Usage Example
 
     use Object::Configure;
 
-    # Configure LWP::UserAgent from a config file
     my $ua = Object::Configure::instantiate(
-        class => 'LWP::UserAgent',
+        class       => 'LWP::UserAgent',
         config_file => 'lwp.yml',
         config_dirs => ['/etc/myapp'],
-        timeout => 30
+        timeout     => 30,
     );
 
 =head3 API Specification
@@ -668,17 +834,18 @@ This is a "quick and dirty" way to add configuration support to classes you don'
 
     schema => {
         class => {
-            type => 'string',
-            required => 1,
-            description => 'Class name to instantiate',
-            can => 'new'
-        }
+            type        => 'string',
+            required    => 1,
+            description => 'Fully-qualified class name; must respond to new(hashref)',
+        },
+        # all other keys forwarded to configure()
     }
 
 =head4 Output
 
-    type => 'object',
-    description => 'Instance of the specified class'
+    type        => 'object',
+    description => 'Blessed instance of $class, with class key present in hash',
+    notes       => 'class key intentionally left in hash as a debugging aid',
 
 =cut
 
@@ -686,6 +853,10 @@ sub instantiate
 {
 	my $params = Params::Get::get_params('class', @_);
 
+	# 'class' is read into $class then left in $params,
+	# 'class' propagates into configure() as a spurious config key and
+	# ends up in the blessed object's hash, allowing the caller to see
+	# that has come from what, helping debugging
 	my $class = $params->{'class'};
 	$params = configure($class, $params);
 
@@ -698,77 +869,68 @@ sub instantiate
 
 =head1 HOT RELOAD FEATURES
 
-=head2 enable_hot_reload
+=head2 enable_hot_reload(%opts)
 
-Enable automatic hot reloading of configuration files when they are modified.
+Fork a background watcher that sends SIGUSR1 to the parent whenever a tracked
+configuration file changes on disk.  Objects registered via C<register_object()>
+then have their configuration reloaded automatically.
 
-=head3 Purpose
-
-Starts a background process that monitors configuration files for changes and automatically
-reloads them into registered objects. This allows runtime configuration updates without
-restarting the application.
+B<Unix only.>  On Windows this function is a silent no-op (SIGUSR1 does not exist).
 
 =head3 Arguments
 
-Takes a hash with the following optional keys:
+Takes a flat hash.  All keys are optional.
 
 =over 4
 
-=item * C<interval> (Optional, default: 10)
+=item * C<interval> (integer E<gt>= 1, default: 10)
 
-Number of seconds between configuration file checks. Lower values provide faster
-response to changes but consume more CPU.
+Seconds between file-modification checks.  Lower values detect changes faster
+but use more CPU.  Zero or negative values are silently replaced with the default.
 
-=item * C<callback> (Optional)
+=item * C<callback> (coderef, optional)
 
-A coderef to execute after configuration files are reloaded. Useful for logging
-or triggering application-specific reload behavior.
+Called in the parent process after each successful config reload.  Useful for
+logging or flushing caches.
 
 =back
 
 =head3 Returns
 
-The process ID (PID) of the background watcher process on success.
-Returns immediately if hot reload is already enabled.
+The PID of the watcher child process (integer E<gt> 0), or C<undef>/empty if hot
+reload was already active (idempotent: a second call returns immediately without
+forking again).
 
 =head3 Side Effects
 
 =over 4
 
-=item * Forks a background process to monitor configuration files
+=item * Forks a child process.
 
-=item * The background process sends SIGUSR1 to the parent when changes are detected
+=item * The child polls C<%_config_file_stats> and sends C<SIGUSR1> to the parent
+on mtime change.
 
-=item * Stores the watcher PID in C<%_config_watchers>
-
-=item * May throw an exception (via C<croak>) if the fork fails
+=item * Stores C<{pid =E<gt> $pid, callback =E<gt> $cb}> in C<%_config_watchers>.
 
 =back
 
-=head3 Notes
+=head3 Error messages
 
-Hot reload is not supported on Windows due to lack of SIGUSR1 signal support.
-The background process runs indefinitely until C<disable_hot_reload> is called.
-Objects must be registered via C<register_object> to receive configuration updates.
+=over 4
+
+=item * C<Object::Configure: fork failed: OS-ERROR> -- C<fork()> returned C<undef>.
+Check system resource limits (C<ulimit -u>).
+
+=back
 
 =head3 Usage Example
 
-    use Object::Configure;
-
-    # Enable hot reload with 5-second check interval
     Object::Configure::enable_hot_reload(
         interval => 5,
-        callback => sub {
-            my $timestamp = localtime;
-            print "[$timestamp] Configuration reloaded\n";
-        }
+        callback => sub { warn "Config reloaded at " . localtime . "\n" },
     );
 
-    # Application continues running...
-    while (1) {
-        # Do work...
-        sleep(1);
-    }
+    while (1) { sleep 1 }  # watcher runs in the background
 
 =head3 API Specification
 
@@ -776,31 +938,48 @@ Objects must be registered via C<register_object> to receive configuration updat
 
     schema => {
         interval => {
-            type => 'integer',
-            optional => 1,
-            default => 10,
-            min => 1,
-            description => 'Check interval in seconds'
+            type        => 'integer',
+            optional    => 1,
+            default     => 10,
+            minimum     => 1,
+            description => 'Poll interval in seconds',
         },
         callback => {
-            type => 'coderef',
-            optional => 1,
-            description => 'Code to execute after reload'
-        }
+            type        => 'coderef',
+            optional    => 1,
+            description => 'Called in parent after each reload',
+        },
     }
 
 =head4 Output
 
-    type => 'integer',
-    description => 'PID of background watcher process',
-    condition => 'value > 0'
+    type        => [qw(integer undef)],
+    description => 'PID of watcher child; undef/empty if already active',
+    condition   => 'value > 0 when defined',
+
+    enable_hot_reload : Interval x Callback -> PID | empty
+
+    Pre:
+      interval >= 1   (enforced: negative/zero replaced with DEFAULT_INTERVAL)
+      _config_watchers = {}
+
+    Post:
+      _config_watchers.pid = result
+      _config_watchers.callback = callback
+      (forall t: t mod interval = 0 =>
+          (exists f in _config_file_stats: mtime(f) changed =>
+              send_signal(SIGUSR1, parent_pid)))
 
 =cut
 
 sub enable_hot_reload {
 	my %params = @_;
 
-	my $interval = $params{interval} || 10;
+	# SECURITY (S4): use defined-or (//) not truth-or (||) so that interval=>0
+	# is not silently replaced.  Then guard: a zero or negative interval would make
+	# the child busy-loop, consuming 100% CPU (internal DoS vector).
+	my $interval = $params{interval} // $DEFAULT_INTERVAL;
+	$interval    = $DEFAULT_INTERVAL unless $interval > 0;
 	my $callback = $params{callback};
 
 	return if %_config_watchers;	# already watching; avoid double-fork
@@ -818,14 +997,12 @@ sub enable_hot_reload {
 	}
 }
 
-=head2 disable_hot_reload
+=head2 disable_hot_reload()
 
-Disable hot reloading and terminate the background watcher process.
+Stop the background watcher and clear hot-reload state.
 
-=head3 Purpose
-
-Cleanly shuts down the hot reload system by terminating the background watcher
-process and clearing internal state.
+Safe to call when hot reload is not active (no-op).  After this call,
+configuration files are no longer monitored and C<%_config_watchers> is empty.
 
 =head3 Arguments
 
@@ -833,42 +1010,30 @@ None.
 
 =head3 Returns
 
-Nothing.
+Nothing (void).
 
 =head3 Side Effects
 
 =over 4
 
-=item * Sends SIGTERM to the background watcher process
+=item * Sends SIGTERM to the watcher child.
 
-=item * Waits for the watcher process to terminate
+=item * Polls for up to C<$KILL_TIMEOUT> seconds (default: 5); escalates to SIGKILL
+if the child has not exited by then.
 
-=item * Clears C<%_config_watchers> state
+=item * Calls C<waitpid> to reap the child.
+
+=item * Clears C<%_config_watchers>.
 
 =back
 
-=head3 Notes
-
-Safe to call even if hot reload is not currently enabled.
-The function blocks until the watcher process has fully terminated.
-
-=head3 Usage Example
-
-    use Object::Configure;
-
-    # Enable hot reload
-    Object::Configure::enable_hot_reload(interval => 5);
-
-    # ... application runs ...
-
-    # Clean shutdown
-    Object::Configure::disable_hot_reload();
+B<Blocking>: this function may take up to five seconds if the watcher ignores SIGTERM.
 
 =head3 API Specification
 
 =head4 Input
 
-    schema => {}
+    schema => {}   # no arguments
 
 =head4 Output
 
@@ -879,7 +1044,14 @@ The function blocks until the watcher process has fully terminated.
 sub disable_hot_reload {
 	## MUTANT_SKIP_BEGIN
 	if(my $pid = $_config_watchers{pid}) {
-		if($pid =~ /\A[0-9]+\z/ && $pid > 0) {
+		# SECURITY (S3 — PID safety):
+		#   $pid > 1  excludes PID 0 (sends SIGTERM to whole process group — DoS)
+		#             and PID 1 (init — catastrophic as root).
+		#   $pid != $$ prevents self-signaling if %_config_watchers is corrupted.
+		# Exploit mechanism: if global state is poisoned with pid=0 or pid=1,
+		# kill('TERM', 0) signals every process in the group; kill('TERM', 1) kills
+		# init as root.  Both are now rejected at the comparison level.
+		if($pid =~ /\A[0-9]+\z/ && $pid > 1 && $pid != $$) {
 			kill('TERM', $pid);
 
 			# Poll up to KILL_TIMEOUT seconds; escalate to SIGKILL if SIGTERM is ignored.
@@ -903,15 +1075,12 @@ sub disable_hot_reload {
 	## MUTANT_SKIP_END
 }
 
-=head2 reload_config
+=head2 reload_config()
 
-Manually trigger configuration reload for all registered objects.
+Immediately reload configuration from disk for every registered object.
 
-=head3 Purpose
-
-Forces an immediate reload of configuration from files for all objects that have been
-registered for hot reload. This is useful for testing or forcing a reload without
-waiting for the automatic file monitoring to detect changes.
+Normally called automatically by the SIGUSR1 handler.  You may call it manually
+to force a reload (e.g., in tests or on a custom signal).
 
 =head3 Arguments
 
@@ -919,54 +1088,36 @@ None.
 
 =head3 Returns
 
-An integer count of how many objects had their configuration successfully reloaded.
+An integer E<gt>= 0: the count of objects whose configuration was successfully
+reloaded.
 
 =head3 Side Effects
 
 =over 4
 
-=item * Reads configuration files from disk
+=item * Reads config files from disk for each registered object.
 
-=item * Updates object properties with new configuration values
+=item * Updates non-private keys (those not starting with C<_>) in-place on
+each live object.
 
-=item * Calls C<_on_config_reload> hook on objects that implement it
+=item * Prunes dead weak references from C<%_object_registry>.
 
-=item * Cleans up dead weak references from C<%_object_registry>
-
-=item * May emit warnings if configuration reload fails for any object
+=item * Emits a C<carp> warning (not a croak) if reload fails for any individual
+object; other objects are still processed.
 
 =back
-
-=head3 Notes
-
-Only objects registered via C<register_object> are reloaded.
-Objects are updated in-place; their identity does not change.
-Private properties (those starting with C<_>) are not updated during reload.
-
-=head3 Usage Example
-
-    use Object::Configure;
-
-    # Create and register objects
-    my $obj = My::Module->new(config_file => 'app.yml');
-
-    # Manually edit app.yml...
-
-    # Force immediate reload
-    my $count = Object::Configure::reload_config();
-    print "Reloaded configuration for $count objects\n";
 
 =head3 API Specification
 
 =head4 Input
 
-    schema => {}
+    schema => {}   # no arguments
 
 =head4 Output
 
-    type => 'integer',
-    description => 'Number of objects successfully reloaded',
-    condition => 'value >= 0'
+    type        => 'integer',
+    description => 'Count of objects successfully reloaded',
+    condition   => 'value >= 0',
 
 =cut
 
@@ -976,10 +1127,12 @@ sub reload_config {
 	foreach my $class_key (keys %_object_registry) {
 		my $objects = $_object_registry{$class_key};
 
-		@$objects = grep { defined $_ } @$objects;	# prune garbage-collected weak refs
+		@$objects = grep { defined $$_ } @$objects;	# prune garbage-collected weak refs (check referent, not the ref-to-scalar itself)
 
 		foreach my $obj_ref (@$objects) {
 			if(my $obj = $$obj_ref) {
+				# Protect the caller's $@ from being clobbered by our internal eval blocks.
+				local $@;
 				eval {
 					_reload_object_config($obj);
 					$reloaded_count++;
@@ -998,49 +1151,57 @@ sub reload_config {
 
 =head2 register_object($class, $obj)
 
-Register an object for hot reload monitoring.
+Register a blessed object so it receives configuration updates when files change.
 
-=head3 Purpose
-
-Adds an object to the hot reload registry so it will receive automatic configuration
-updates when files change. Uses weak references to prevent memory leaks.
+B<Push semantics>: each call I<appends> a new entry to the registry for C<$class>.
+It does not replace a previous entry.  Multiple objects of the same class are all
+tracked and all reloaded.
 
 =head3 Arguments
 
 =over 4
 
-=item * C<class> (Required)
+=item * C<$class> (Required, string)
 
-The class name of the object, used for organizing the registry.
+The class name used to organise the registry.  Typically C<ref($self)> or the
+calling package name.
 
-=item * C<obj> (Required)
+=item * C<$obj> (Required, blessed reference)
 
-The object instance to register. Must be a blessed reference.
+The object to register.  B<Must be a blessed reference.>  Passing an unblessed
+hashref or any other unblessed value causes an immediate C<croak>.
 
 =back
 
 =head3 Returns
 
-Nothing.
+Nothing (void).
 
 =head3 Side Effects
 
 =over 4
 
-=item * Adds a weak reference to the object in C<%_object_registry>
+=item * Pushes a weak reference to C<$obj> onto C<$_object_registry{$class}>.
 
-=item * Sets up SIGUSR1 signal handler on first call (Unix-like systems only)
-
-=item * Stores the original SIGUSR1 handler for later restoration
+=item * On the first call ever (for any class): saves the current C<$SIG{USR1}>
+and installs Object::Configure's handler.  On Unix, the handler calls
+C<reload_config()> then chains to the prior handler.  On Windows, signal
+installation is skipped but C<$_original_usr1_handler> is still set.
 
 =back
 
-=head3 Notes
+=head3 Error messages
 
-Objects are stored using weak references, so they will be automatically
-garbage collected when no other references exist.
-The SIGUSR1 handler chains to any existing handler that was installed.
-On Windows, the signal handler is not installed (SIGUSR1 does not exist).
+=over 4
+
+=item * C<Object::Configure::register_object: Usage ($class, $obj)> --
+either C<$class> or C<$obj> was C<undef>.
+
+=item * C<Object::Configure::register_object: $obj must be a blessed reference> --
+C<$obj> was defined but not blessed.  This guard prevents DoS via registry flooding
+(reloading thousands of unblessed entries on every SIGUSR1).
+
+=back
 
 =head3 Usage Example
 
@@ -1048,16 +1209,11 @@ On Windows, the signal handler is not installed (SIGUSR1 does not exist).
     use Object::Configure;
 
     sub new {
-        my $class = shift;
-        my $params = Object::Configure::configure($class, {
-            config_file => 'mymodule.yml',
-        });
-        my $self = bless $params, $class;
-
-        # Register for hot reload
+        my ($class, %args) = @_;
+        my $params = Object::Configure::configure($class, \%args);
+        my $self   = bless $params, $class;
         Object::Configure::register_object($class, $self)
-            if $params->{_config_file};
-
+            if $self->{_config_file};
         return $self;
     }
 
@@ -1067,15 +1223,16 @@ On Windows, the signal handler is not installed (SIGUSR1 does not exist).
 
     schema => {
         class => {
-            type => 'string',
-            required => 1,
-            description => 'Class name for registry organization'
+            type        => 'string',
+            required    => 1,
+            description => 'Class name for registry key',
         },
         obj => {
-            type => 'object',
-            required => 1,
-            description => 'Blessed object instance to register'
-        }
+            type        => 'object',
+            required    => 1,
+            description => 'Blessed object to register; unblessed refs are rejected',
+            blessed     => 1,
+        },
     }
 
 =head4 Output
@@ -1090,6 +1247,13 @@ sub register_object
 
 	croak(__PACKAGE__, '::register_object: Usage ($class, $obj)')
 		unless defined($class) && defined($obj);
+
+	# SECURITY: enforce the API contract (POD: "$obj must be a blessed reference").
+	# Accepting unblessed refs silently would allow DoS via registry flooding: an
+	# adversary or buggy caller can push thousands of unblessed entries; reload_config()
+	# iterates every entry on every SIGUSR1, degrading throughput proportionally.
+	croak(__PACKAGE__, '::register_object: $obj must be a blessed reference')
+		unless blessed($obj);
 
 	my $obj_ref = \$obj;
 	weaken($$obj_ref);
@@ -1122,15 +1286,14 @@ sub register_object
 	return;
 }
 
-=head2 restore_signal_handlers
+=head2 restore_signal_handlers()
 
-Restore original signal handlers and disable hot reload integration.
+Restore C<$SIG{USR1}> to the handler that was in place before
+C<register_object()> installed the hot-reload handler, and clear
+C<$_original_usr1_handler>.
 
-=head3 Purpose
-
-Restores the signal handler that was in place before Object::Configure installed
-its SIGUSR1 handler. This is useful for clean shutdown or when transferring
-control to another hot reload system.
+Safe to call even when Object::Configure never installed a handler (no-op).
+On Windows this function has no effect (SIGUSR1 does not exist there).
 
 =head3 Arguments
 
@@ -1138,38 +1301,23 @@ None.
 
 =head3 Returns
 
-Nothing.
+Nothing (void).
 
 =head3 Side Effects
 
 =over 4
 
-=item * Restores C<$SIG{USR1}> to its original value
+=item * Sets C<$SIG{USR1}> back to its saved value (Unix only).
 
-=item * Clears C<$_original_usr1_handler> internal state
+=item * Sets C<$_original_usr1_handler> to C<undef>.
 
 =back
-
-=head3 Notes
-
-Safe to call even if Object::Configure never installed a signal handler.
-On Windows, this function has no effect (SIGUSR1 does not exist).
-
-=head3 Usage Example
-
-    use Object::Configure;
-
-    # Objects are registered...
-
-    # Clean shutdown
-    Object::Configure::disable_hot_reload();
-    Object::Configure::restore_signal_handlers();
 
 =head3 API Specification
 
 =head4 Input
 
-    schema => {}
+    schema => {}   # no arguments
 
 =head4 Output
 
@@ -1187,14 +1335,10 @@ sub restore_signal_handlers
 	return;
 }
 
-=head2 get_signal_handler_info
+=head2 get_signal_handler_info()
 
-Get information about the current signal handler setup for debugging.
-
-=head3 Purpose
-
-Returns diagnostic information about the signal handler state, useful for
-debugging signal handler chains or verifying hot reload configuration.
+Return a snapshot of the current signal-handler and hot-reload state.
+This is a debugging aid; normal application code does not need to call it.
 
 =head3 Arguments
 
@@ -1202,32 +1346,23 @@ None.
 
 =head3 Returns
 
-A hashref containing the following keys:
+A hashref with these keys:
 
 =over 4
 
-=item * C<original_usr1>
+=item * C<original_usr1> -- the C<$SIG{USR1}> value that existed before
+Object::Configure installed its handler, or C<undef> if no handler was saved yet.
 
-The signal handler that was installed before Object::Configure's handler,
-or undef if no handler was present.
+=item * C<current_usr1> -- the currently installed C<$SIG{USR1}> handler (coderef,
+C<'DEFAULT'>, C<'IGNORE'>, or C<undef>).
 
-=item * C<current_usr1>
+=item * C<hot_reload_active> -- C<1> if C<$_original_usr1_handler> is defined,
+C<''> otherwise.
 
-The currently installed SIGUSR1 handler.
-
-=item * C<hot_reload_active>
-
-Boolean indicating whether Object::Configure's hot reload handler is active.
-
-=item * C<watcher_pid>
-
-The PID of the background watcher process, or undef if not running.
+=item * C<watcher_pid> -- the PID of the background watcher child, or C<undef>
+if C<enable_hot_reload()> has not been called (or the watcher has been stopped).
 
 =back
-
-=head3 Notes
-
-This is primarily a debugging aid and is not needed for normal operation.
 
 =head3 Usage Example
 
@@ -1235,42 +1370,29 @@ This is primarily a debugging aid and is not needed for normal operation.
     use Data::Dumper;
 
     Object::Configure::enable_hot_reload();
-
-    my $info = Object::Configure::get_signal_handler_info();
-    print Dumper($info);
-    # $VAR1 = {
-    #     'original_usr1' => 'DEFAULT',
-    #     'current_usr1' => CODE(0x...),
-    #     'hot_reload_active' => 1,
-    #     'watcher_pid' => 12345
-    # };
+    print Dumper(Object::Configure::get_signal_handler_info());
+    # {
+    #   original_usr1    => 'DEFAULT',
+    #   current_usr1     => sub { ... },
+    #   hot_reload_active => 1,
+    #   watcher_pid       => 12345,
+    # }
 
 =head3 API Specification
 
 =head4 Input
 
-    schema => {}
+    schema => {}   # no arguments
 
 =head4 Output
 
-    type => 'hashref',
+    type        => 'hashref',
+    description => 'Snapshot of signal-handler and watcher state',
     schema => {
-        original_usr1 => {
-            type => [qw(coderef string undef)],
-            description => 'Original SIGUSR1 handler'
-        },
-        current_usr1 => {
-            type => [qw(coderef string undef)],
-            description => 'Current SIGUSR1 handler'
-        },
-        hot_reload_active => {
-            type => 'boolean',
-            description => 'Whether hot reload is active'
-        },
-        watcher_pid => {
-            type => [qw(integer undef)],
-            description => 'Background watcher process PID'
-        }
+        original_usr1     => { type => [qw(coderef string undef)] },
+        current_usr1      => { type => [qw(coderef string undef)] },
+        hot_reload_active => { type => 'boolean'                  },
+        watcher_pid       => { type => [qw(integer undef)]        },
     }
 
 =cut
@@ -1331,17 +1453,27 @@ sub _build_logger {
 #            it unless it appears in @ISA, yet Object::Configure supports universal.yml.
 # Entry:     $class is a fully-qualified class name that has already been loaded.
 # Exit:      Returns a list in base-first order: (UNIVERSAL, ..., GrandParent, Parent, Class).
+#            Result is memoized in %_chain_cache; mro::get_linear_isa is not re-invoked
+#            for classes already seen in this process.  The cache is valid for the process
+#            lifetime because @ISA is stable after module load in normal Perl programs.
+#            Algorithmic cost: O(N) first call; O(1) amortised on subsequent calls.
 sub _get_inheritance_chain {
 	my ($class) = @_;
+
+	# Cache hit: return a copy of the stored list (caller may modify the returned list).
+	return @{ $_chain_cache{$class} } if $_chain_cache{$class};
 
 	my @mro = @{ mro::get_linear_isa($class) };
 
 	# mro::get_linear_isa returns child-first; reverse to get base-first.
 	# UNIVERSAL is implicit in Perl's type system but not always in the MRO list,
 	# so append it when absent to ensure universal.yml is picked up.
-	push @mro, 'UNIVERSAL' unless grep { $_ eq 'UNIVERSAL' } @mro;
+	# List::Util::any is XS and short-circuits on first match -- faster than grep.
+	push @mro, 'UNIVERSAL' unless any { $_ eq 'UNIVERSAL' } @mro;
 
-	return reverse @mro;
+	my @chain = reverse @mro;
+	$_chain_cache{$class} = \@chain;   # store arrayref; return list copy below
+	return @chain;
 }
 
 # Purpose:   Find a config file for a specific ancestor class using the same
@@ -1349,9 +1481,20 @@ sub _get_inheritance_chain {
 # Entry:     $class is a fully-qualified class name.
 #            $base_config_file is the primary config file path (provides dir and ext).
 #            $config_dirs is an optional arrayref of additional search directories.
+#            Does NOT modify elements of $config_dirs (trailing-slash removal uses a copy).
 # Exit:      Returns a readable file path, or undef if nothing found.
+#            Result (including undef for "not found") is memoized in %_find_cache, keyed
+#            by (class, base_config_file, config_dirs-elements) joined with NUL bytes.
+#            Subsequent calls with identical arguments skip all filesystem probes.
+#            Algorithmic cost: O(extensions) syscalls first call; O(1) amortised.
 sub _find_class_config_file {
 	my ($class, $base_config_file, $config_dirs) = @_;
+
+	# Build a NUL-separated cache key. NUL cannot appear in Linux file paths (the
+	# pen-test suite confirms this: Perl's -r warns and returns undef for NUL paths).
+	my $cache_key = join("\0", $class, $base_config_file,
+		$config_dirs ? @$config_dirs : ());
+	return $_find_cache{$cache_key} if exists $_find_cache{$cache_key};
 
 	my $class_file = lc($class);
 	$class_file =~ s/::/-/g;
@@ -1361,34 +1504,48 @@ sub _find_class_config_file {
 	$base_ext //= '';
 	my $base_dir = File::Spec->catpath($base_vol, $base_dir_part, '');
 
-	my @base_patterns = (
-		File::Spec->catfile($base_dir, "${class_file}${base_ext}"),
-		File::Spec->catfile($base_dir, "${class_file}.conf"),
-		File::Spec->catfile($base_dir, "${class_file}.yml"),
-		File::Spec->catfile($base_dir, "${class_file}.yaml"),
-		File::Spec->catfile($base_dir, "${class_file}.json"),
-	);
+	# Single-exit-point via labeled block so the cache write happens unconditionally.
+	my $found;
+	SEARCH: {
+		# Dedup: when $base_ext is already .yml/.conf/etc the first candidate would
+		# be a duplicate of a later one, causing a redundant filesystem probe.
+		my %_seen_pat;
+		foreach my $pattern (grep { !$_seen_pat{$_}++ } (
+			File::Spec->catfile($base_dir, "${class_file}${base_ext}"),
+			File::Spec->catfile($base_dir, "${class_file}.conf"),
+			File::Spec->catfile($base_dir, "${class_file}.yml"),
+			File::Spec->catfile($base_dir, "${class_file}.yaml"),
+			File::Spec->catfile($base_dir, "${class_file}.json"),
+		)) {
+			if(-r $pattern && -f $pattern) {
+				$found = $pattern;
+				last SEARCH;
+			}
+		}
 
-	foreach my $pattern (@base_patterns) {
-		return $pattern if -r $pattern && -f $pattern;
-	}
-
-	if($config_dirs && ref($config_dirs) eq 'ARRAY') {
-		foreach my $dir (@$config_dirs) {
-			$dir =~ s{/$}{};
-			foreach my $pattern (
-				"${dir}/${class_file}${base_ext}",
-				"${dir}/${class_file}.conf",
-				"${dir}/${class_file}.yml",
-				"${dir}/${class_file}.yaml",
-				"${dir}/${class_file}.json",
-			) {
-				return $pattern if -r $pattern && -f $pattern;
+		if($config_dirs && ref($config_dirs) eq 'ARRAY') {
+			foreach my $dir (@$config_dirs) {
+				# Use a copy so the caller's arrayref element is never mutated.
+				(my $clean_dir = $dir) =~ s{/$}{};
+				my %_seen_dir_pat;
+				foreach my $pattern (grep { !$_seen_dir_pat{$_}++ } (
+					"${clean_dir}/${class_file}${base_ext}",
+					"${clean_dir}/${class_file}.conf",
+					"${clean_dir}/${class_file}.yml",
+					"${clean_dir}/${class_file}.yaml",
+					"${clean_dir}/${class_file}.json",
+				)) {
+					if(-r $pattern && -f $pattern) {
+						$found = $pattern;
+						last SEARCH;
+					}
+				}
 			}
 		}
 	}
 
-	return undef;
+	# Cache stores undef for "not found"; callers must use exists, not defined.
+	return ($_find_cache{$cache_key} = $found);
 }
 
 # Purpose:   Run as the forked watcher child.  Polls %_config_file_stats and
@@ -1399,6 +1556,14 @@ sub _find_class_config_file {
 # Side:      Modifies %_config_file_stats entries in the child's address space only.
 sub _run_config_watcher {
 	my ($interval, $callback) = @_;
+
+	# SECURITY (S5): re-validate $interval in the child process.
+	# If the parent's fork() fires before enable_hot_reload() applies its own guard
+	# (race) or state is corrupted between fork and here, sleep(0) or sleep(-1) would
+	# cause a busy-loop that saturates the CPU.  int() also prevents floating-point
+	# values like 0.001 from reaching the kernel as a near-zero sleep.
+	$interval = int($interval // $DEFAULT_INTERVAL);
+	$interval = $DEFAULT_INTERVAL unless $interval > 0;
 
 	local $SIG{TERM} = sub { exit 0 };
 	local $SIG{INT}  = sub { exit 0 };
@@ -1454,6 +1619,17 @@ sub _reload_object_config {
 		$config_file = $obj->{_config_file} || $obj->{config_file};
 	}
 
+	# SECURITY (S1 — path traversal): an attacker who modifies $obj->{_config_file}
+	# (e.g., via a deserialization gadget or a malicious config merge) can redirect
+	# hot-reload to read arbitrary system files.  Reject paths with ".." segments here
+	# so that even a corrupted object cannot force a traversal read.
+	# Must come BEFORE the -f check so traversal paths for non-existent files are also rejected.
+	if($config_file && $config_file =~ $RE_PATH_TRAVERSAL) {
+		carp(__PACKAGE__, ': _reload_object_config: refusing path with traversal sequences: ',
+			$config_file);
+		return;
+	}
+
 	return unless $config_file && -f $config_file;
 
 	my $config = Config::Abstraction->new(
@@ -1475,11 +1651,14 @@ sub _reload_object_config {
 			if($key eq 'logger') {
 				# Only the exact 'logger' key triggers logger reconstruction.
 				# Keys like 'logger.file' are flat config values, not logger specs.
+				# Guard: assign directly for undef (no logger) or literal 'NULL'.
+				# Premise 1: _build_logger handles every other spec type.
+				# Premise 2: undef/NULL need no construction. Conclusion: rebuild only otherwise.
 				my $val = $new_params->{$key};
-				if(ref($val) || (defined($val) && $val ne $LOGGER_NULL)) {
-					_reconfigure_logger($obj, $key, $val);
-				} else {
+				if(!defined($val) || (!ref($val) && $val eq $LOGGER_NULL)) {
 					$obj->{$key} = $val;
+				} else {
+					_reconfigure_logger($obj, $key, $val);
 				}
 			} else {
 				$obj->{$key} = $new_params->{$key};
@@ -1766,7 +1945,7 @@ always discovered.  If a future Perl version changes this behaviour the guard
     $SIG{USR1}@post = _original_usr1_handler@pre
     _original_usr1_handler@post = empty
 
-=head2 get_sigal_handler_info
+=head2 get_signal_handler_info
 
     get_signal_handler_info: () -> InfoHash
 
@@ -1790,15 +1969,19 @@ always discovered.  If a future Perl version changes this behaviour the guard
 
 =head1 SUPPORT
 
-This module is provided as-is without any warranty.
+Please report bugs and feature requests at:
 
-Please report any bugs or feature requests to C<bug-object-configure at rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Object-Configure>.
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+=over 4
 
-You can find documentation for this module with the perldoc command.
+=item * RT (CPAN bug tracker): L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Object-Configure>
+
+or by e-mail: C<bug-object-configure at rt.cpan.org>
+
+=item * GitHub issues: L<https://github.com/nigelhorne/Object-Configure/issues>
+
+=back
+
+You will be notified automatically of progress on your report.
 
     perldoc Object::Configure
 
@@ -1807,8 +1990,7 @@ You can find documentation for this module with the perldoc command.
 Copyright 2025-2026 Nigel Horne.
 
 Usage is subject to GPL2 licence terms.
-If you use it,
-please let me know.
+If you use it, please let me know.
 
 =cut
 

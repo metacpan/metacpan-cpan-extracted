@@ -1,5 +1,5 @@
 package MojoX::Authentication;
-{ our $VERSION = '0.006' }
+{ our $VERSION = '0.008' }
 
 use v5.24;
 use Moo;
@@ -33,12 +33,15 @@ around BUILDARGS => sub ($orig, $class, @args) {
 };
 
 sub BUILD ($self, $hash) {
-   $self->_app_startup($hash->{'-startup'} // undef);
+   if (defined(my $app = $hash->{'-startup'})) {
+      $self->app_startup($app);
+   }
    return $self;
 };
 
-sub _app_startup ($self, $app) {
-   return unless $app;
+sub app_startup ($self, $app) {
+   ouch 400, 'undefined application' unless defined($app);
+
    my $authn = $self->model;
 
    # add Mojolicious::Plugin::Authentication with the "right" callbacks
@@ -62,22 +65,6 @@ sub _app_startup ($self, $app) {
    return $self;
 }
 
-sub ctr_logout ($self, $c, $redirect_route) {
-   return unless $c->is_user_authenticated;
-
-   my $user = $c->current_user;
-   $c->log->info("logout: ");
-
-   my $provider = $self->model->provider_named($user->{provider});
-   return $provider->logout($c, $user)
-      if $provider && $provider->can('logout');
-
-   $c->logout; # just make Mojolicious::Plugin::Authentication happy
-
-   $c->redirect_to($redirect_route) if defined($redirect_route);
-   return;
-}
-
 # convention over configuration
 sub ctr_credentials_login ($self, $c, $route_for = undef) {
    my $username = $c->param('username');
@@ -96,6 +83,22 @@ sub ctr_credentials_login ($self, $c, $route_for = undef) {
       $c->flash(message => [ error => 'Authentication error' ]);
       $c->redirect_to($self->_route_for($route_for, 'not_ok'));
    };
+   return;
+}
+
+sub ctr_logout ($self, $c, $redirect_route = undef) {
+   return unless $c->is_user_authenticated;
+
+   my $user = $c->current_user;
+   $c->log->info("logout: ");
+
+   my $provider = $self->model->provider_named($user->{provider});
+   return $provider->logout($c, $user)
+      if $provider && $provider->can('logout');
+
+   $c->logout; # just make Mojolicious::Plugin::Authentication happy
+
+   $c->redirect_to($redirect_route) if defined($redirect_route);
    return;
 }
 

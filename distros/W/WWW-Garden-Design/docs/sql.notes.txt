@@ -1,0 +1,7 @@
+Returns the # of flowers per property per garden. Columns:
+o property (name)
+o garden (name)
+o garden_id
+o count
+
+select p.name as property, g.name as garden, fl.garden_id, count(*) from properties p, gardens g, flower_locations fl where fl.garden_id = g.id and g.property_id = p.id group by p.name, g.name, fl.garden_id

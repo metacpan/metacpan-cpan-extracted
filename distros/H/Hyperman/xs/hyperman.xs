@@ -45,6 +45,13 @@ run(class, ...)
             else if (strEQ(key, "deny"))           { if (SvOK(val) && SvROK(val)) cfg.deny = val; }
             else if (strEQ(key, "deny_capacity"))  cfg.deny_cap = (unsigned)SvUV(val);
             else if (strEQ(key, "rate_capacity"))  cfg.rate_cap = (unsigned)SvUV(val);
+            /* The message bus. `bus_slots` is headroom before a slow worker
+             * is lapped; `bus_slot_size` is the largest message that will be
+             * accepted. Two knobs because they answer two different
+             * complaints. */
+            else if (strEQ(key, "bus_slots"))      cfg.bus_slots = (unsigned)SvUV(val);
+            else if (strEQ(key, "bus_slot_size"))  cfg.bus_slot_size = (unsigned)SvUV(val);
+            else if (strEQ(key, "bus_groups"))     cfg.bus_groups = (unsigned)SvUV(val);
             else if (strEQ(key, "access_log")) {
                 /* coderef -> per-request Perl callback (as before);
                  * a filehandle or a path -> fast C-side Combined-log writer. */

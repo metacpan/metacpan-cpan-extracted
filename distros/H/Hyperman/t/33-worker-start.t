@@ -66,21 +66,28 @@ sub http_get {
 }
 
 # ---- inside a worker --------------------------------------------------------
-my %pids;
-my $checked = 0;
+#
+# Collect first, assert afterwards. Asserting inside the loop emitted one test
+# per DISTINCT worker pid that happened to answer, so the plan varied with how
+# the kernel spread twelve connections across the pool - 7 tests on one run and
+# 8 on the next. A suite whose count moves cannot be checked by count, which is
+# the check the docker matrix relies on to catch a run that skipped everything.
+my (%fired, %loops);
 for (1 .. 12) {
     my $res = http_get('/');
     last unless $res =~ /fired=(\d+) loop=(\d+) pid=(\d+)/;
-    my ($fired, $loop_ok, $wpid) = ($1, $2, $3);
-
-    is($fired, 1, "worker $wpid fired on_worker_start exactly once")
-        unless $pids{$wpid}++;
-    is($loop_ok, 1, "worker $wpid was handed a real loop")
-        unless $checked++;
+    my ($f, $loop_ok, $wpid) = ($1, $2, $3);
+    $fired{$wpid} = $f;
+    $loops{$wpid} = $loop_ok;
 }
 
-ok(scalar(keys %pids) >= 1, 'at least one worker answered');
-isnt((keys %pids)[0], $$, 'the worker is not the process that registered');
+my @pids = sort keys %fired;
+ok(scalar(@pids) >= 1, 'at least one worker answered');
+is_deeply([ grep { $fired{$_} != 1 } @pids ], [],
+    'every worker that answered fired on_worker_start exactly once');
+is_deeply([ grep { $loops{$_} != 1 } @pids ], [],
+    'and every one of them was handed a real loop');
+isnt($pids[0], $$, 'the worker is not the process that registered');
 
 kill 'TERM', $pid;
 waitpid $pid, 0;

@@ -1,5 +1,11 @@
 Revision history for MIDI-RtController
 
+0.0806 2026-08-20 18:21:46
+    - Oops. ->is_running is not a thing.
+
+0.0805 2026-08-20 16:24:46
+    - Add a stop() method.
+
 0.0804 2026-06-03 17:31:05
     - Add the eg/simple.pl example program.
 

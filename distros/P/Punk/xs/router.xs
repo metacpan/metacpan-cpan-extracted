@@ -166,7 +166,7 @@ DESTROY(self)
             pp_free(aTHX_ (pp_policy *)INT2PTR(void *, SvIV(SvRV(self))));
     }
 
-# _client($xff, $peer, $trust): the hop walk alone, for t/61-proxy-parse.t.
+# _client($xff, $peer, $trust): the hop walk alone, for t/1210-proxy-parse.t.
 # $trust is a hop count, an arrayref of CIDRs, or 'all' - the same shapes the
 # keyword takes, compiled fresh per call. Author-facing, not documented.
 SV *

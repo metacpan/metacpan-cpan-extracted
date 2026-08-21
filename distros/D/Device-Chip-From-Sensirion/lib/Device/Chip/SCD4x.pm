@@ -9,7 +9,7 @@ use Object::Pad 0.800;
 
 use utf8;
 
-package Device::Chip::SCD4x 0.02;
+package Device::Chip::SCD4x 0.03;
 class Device::Chip::SCD4x
    :isa(Device::Chip::From::Sensirion);
 
@@ -150,6 +150,7 @@ async method read_measurement ()
       # Temperature
       -45 + 175 * ( $words[1] / 0xFFFF ),
       # Humidity
+      #   Note: different conversion formula as per SHT4x
       100 * ( $words[2] / 0xFFFF ),
    );
 }

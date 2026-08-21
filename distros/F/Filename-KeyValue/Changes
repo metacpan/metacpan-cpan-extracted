@@ -1,3 +1,13 @@
+0.006   2026-05-29  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix adding dash before key-value pairs.
+
+
+0.005   2026-05-29  Released-By: PERLANCAR; Urgency: medium
+
+        - [function modify_keyvalue_filename] Add argument 'ignore'.
+
+
 0.004   2026-05-28  Released-By: PERLANCAR; Urgency: medium
 
         [Bug Fixes]

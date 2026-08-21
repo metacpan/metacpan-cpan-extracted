@@ -584,12 +584,6 @@ The constants below are defined by `WebDyne::Constant`. Each definition includes
 
     Enable processing of `<api>` routes in PSGI request handling. Set to 0 to disable API route dispatch.
 
-* **WEBDYNE_API_STRIP_PREFIX**
-
-    **Default:** `1`
-
-    Strip accidental document-root prefixes from `<api pattern>` values when the pattern contains path segments before the current PSP filename stem. This keeps patterns such as `/api/user/:id` portable for `api.psp` files served from subdirectories. Set to 0 to require patterns to match the request path exactly.
-
 * **WEBDYNE_ALPINE_VUE_ATTRIBUTE_HACK_ENABLE**
 
     **Default:** `'x-on'`

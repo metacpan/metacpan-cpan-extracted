@@ -1,4 +1,4 @@
-<api perl pattern="/api/uppercase/{user}/:id">
+<api perl pattern="/uppercase/{user}/:id">
 my ($self, $data_hr)=@_;
 return $data_hr
 </api>

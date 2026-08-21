@@ -1,5 +1,5 @@
 package Protocol::Tus::AbstractModel;
-{ our $VERSION = '0.004' }
+{ our $VERSION = '0.006' }
 use Moo;
 use v5.24;
 use warnings;
@@ -8,7 +8,7 @@ use List::Util qw< any >;
 use Protocol::Tus::Upload;
 use namespace::clean;
 
-has max_size => (is => 'ro', default => undef);
+has max_size     => (is => 'ro', default => undef);
 
 sub cleanup ($self, $id)                     { ... }
 sub create_upload($self, $length, $metadata) { ... }

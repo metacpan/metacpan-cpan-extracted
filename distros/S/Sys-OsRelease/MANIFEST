@@ -15,6 +15,7 @@ t/001_module_load.t
 t/002_basic.t
 t/003_samples.t
 t/004_import.t
+t/005_pod_content.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/release-cpan-changes.t

@@ -48,7 +48,7 @@ use vars qw[$VERSION $PREFER_BIN $PROGRAMS $WARN $DEBUG
             $_ALLOW_BIN $_ALLOW_PURE_PERL $_ALLOW_TAR_ITER
          ];
 
-$VERSION            = '0.88';
+$VERSION            = '0.90';
 $PREFER_BIN         = 0;
 $WARN               = 1;
 $DEBUG              = 0;
@@ -1094,8 +1094,8 @@ sub _unzip_bin {
     {   ### on VMS, capital letter options have to be quoted. This is
         ### reported by John Malmberg on P5P Tue 21 Aug 2007 05:05:11
         ### Subject: [patch@31735]Archive Extract fix on VMS.
-        my $opt = ON_VMS ? '"-Z"' : '-Z';
-        my $cmd = [ $self->bin_unzip, $opt, '-1', $self->archive ];
+        my $opt = ON_VMS ? '"-Z1"' : '-Z1';
+        my $cmd = [ $self->bin_unzip, $opt, $self->archive ];
 
         my $buffer = '';
         unless( scalar run( command => $cmd,
@@ -1537,7 +1537,7 @@ sub _is_infozip_esque {
   }
   push @strings, $buf if $buf;
   foreach my $part ( @strings ) {
-    if ( $part =~ m!ZIPINFO! or $part =~ m!usage:.+?Z1! ) {
+    if ( $part =~ m!ZIPINFO! or $part =~ m!usage:.+?Z1!i ) {
       return $unzip;
     }
   }

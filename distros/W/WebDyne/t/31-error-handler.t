@@ -5,6 +5,7 @@ use Test::More;
 use FindBin qw($RealBin);
 use lib $RealBin;
 use lib "$RealBin/../lib";
+use pagi_compat_helper qw(pagi_skip_reason);
 
 use Cwd qw(fastcwd);
 use File::Basename qw(basename dirname);
@@ -192,7 +193,10 @@ SKIP: {
 
 
 SKIP: {
-    eval { require PAGI::Test::Client; 1 } || skip "Skipping PAGI error test: missing PAGI::Test::Client", 2;
+    my $pagi_skip=pagi_skip_reason(qw(PAGI::Request PAGI::Response PAGI::Test::Client PAGI::SSE PAGI::WebSocket Future::AsyncAwait));
+    skip "Skipping PAGI error test: $pagi_skip", 2
+        if $pagi_skip;
+    eval { require WebDyne::PAGI; require PAGI::Test::Client; 1 } || skip "Skipping PAGI error test: $@", 2;
     my $result=run_error_case(handler => 'pagi');
     skip $result->{'skip'}, 2 if $result->{'skip'};
     ok($result->{'status'} && $result->{'status'} >= 500, 'PAGI handler returns an error status');

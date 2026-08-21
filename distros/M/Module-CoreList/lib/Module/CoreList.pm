@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20260803';
+our $VERSION = '5.20260820';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -463,6 +463,7 @@ sub changes_between {
     5.045001 => '2026-07-21',
     5.040005 => '2026-08-02',
     5.042003 => '2026-08-02',
+    5.045002 => '2026-08-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -25112,6 +25113,54 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'Module::CoreList::Utils'=> '5.20260802_42',
             'Socket'                => '2.041',
             'Storable'              => '3.37_01',
+        },
+        removed => {
+        }
+    },
+    5.045002 => {
+        delta_from => 5.045001,
+        changed => {
+            'B'                     => '1.93',
+            'B::Deparse'            => '1.90',
+            'B::Op_private'         => '5.045002',
+            'Config'                => '5.045002',
+            'Config::Perl::V'       => '0.40',
+            'Devel::SelfStubber'    => '1.07',
+            'ExtUtils::ParseXS'     => '3.65',
+            'ExtUtils::ParseXS::Constants'=> '3.65',
+            'ExtUtils::ParseXS::CountLines'=> '3.65',
+            'ExtUtils::ParseXS::Eval'=> '3.65',
+            'ExtUtils::ParseXS::Node'=> '3.65',
+            'ExtUtils::ParseXS::Utilities'=> '3.65',
+            'ExtUtils::Typemaps'    => '3.65',
+            'ExtUtils::Typemaps::Cmd'=> '3.65',
+            'ExtUtils::Typemaps::InputMap'=> '3.65',
+            'ExtUtils::Typemaps::OutputMap'=> '3.65',
+            'ExtUtils::Typemaps::Type'=> '3.65',
+            'I18N::LangTags::List'  => '0.42',
+            'IO::Dir'               => '1.57',
+            'IO::File'              => '1.57',
+            'IO::Handle'            => '1.57',
+            'IO::Pipe'              => '1.57',
+            'IO::Poll'              => '1.57',
+            'IO::Seekable'          => '1.57',
+            'IO::Select'            => '1.57',
+            'IO::Socket'            => '1.57',
+            'IO::Socket::INET'      => '1.57',
+            'IO::Socket::UNIX'      => '1.57',
+            'Module::CoreList'      => '5.20260722',
+            'Module::CoreList::Utils'=> '5.20260722',
+            'Module::Metadata'      => '1.000040',
+            'Net::Ping'             => '2.78',
+            'Opcode'                => '1.72',
+            'PerlIO::encoding'      => '0.32',
+            'PerlIO::via'           => '0.22',
+            'Pod::Html'             => '1.37',
+            'Pod::Html::Util'       => '1.37',
+            'Socket'                => '2.043',
+            'Time::HiRes'           => '1.9781',
+            'Win32'                 => '0.64',
+            'XS::APItest'           => '1.52',
         },
         removed => {
         }

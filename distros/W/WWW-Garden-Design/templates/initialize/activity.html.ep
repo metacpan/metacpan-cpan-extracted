@@ -1,0 +1,19 @@
+<form name = 'activity_form_1' id = 'activity_form_1'>
+	%= csrf_field
+	<table align = 'center' class = 'bordered table_stripes' width = '50%'>
+		<tr>
+			<td align = 'center'><h3 class = 'blue_centered'>Activity</h3></td>
+		</tr>
+		<tr>
+			<td align = 'center'>Display the activity log, with most recent records at the top</td>
+		</tr>
+		<tr>
+			<td align = 'center'><br /></td>
+		</tr>
+		<tr>
+			<td align = 'center'><input type = 'submit' value = 'Activity' onclick = 'activity()'/></td>
+		</tr>
+	</table>
+</form>
+
+<div id = 'activity_result_div'></div>

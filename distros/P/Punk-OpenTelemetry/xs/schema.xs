@@ -261,8 +261,8 @@ file_for(class, version, ...)
     {
         AV *dirs;
         SSize_t di, dn;
+        SV *found = NULL;
         PERL_UNUSED_VAR(class);
-        RETVAL = &PL_sv_undef;
         if (!SvOK(version)) XSRETURN_UNDEF;
         {   /* \A[0-9][0-9.]*\z - a version, and nothing that could climb out
              * of the directory it is about to be joined to */
@@ -285,10 +285,16 @@ file_for(class, version, ...)
             sv_catpvs(path, ".yaml");
             if (PerlLIO_stat(SvPV_nolen(path), &st) == 0
                 && S_ISREG(st.st_mode)) {
-                RETVAL = newSVsv(path);
+                found = path;
                 break;
             }
         }
+        /* Nothing on the path is an ORDINARY answer, and it has to return
+         * here rather than fall through: RETVAL is uninitialised until
+         * something is found, and handing the typemap a stack pointer is
+         * how a missing schema file becomes a crash. */
+        if (!found) XSRETURN_UNDEF;
+        RETVAL = newSVsv(found);
     }
     OUTPUT:
         RETVAL
@@ -306,7 +312,8 @@ shipped_version(class = &PL_sv_undef)
         SV *v;
         PERL_UNUSED_VAR(class);
         v = otel_schema_url_version(aTHX_ url);
-        RETVAL = v ? newSVsv(v) : &PL_sv_undef;
+        if (!v) XSRETURN_UNDEF;
+        RETVAL = newSVsv(v);
     }
     OUTPUT:
         RETVAL
@@ -427,8 +434,8 @@ for_url(class, url, ...)
     {
         SV *v = otel_schema_url_version(aTHX_ url);
         SV *f = v ? otel_schema_file_for(aTHX_ v, &ST(2), items - 2) : NULL;
-        RETVAL = &PL_sv_undef;
-        if (f) {
+        if (!f) XSRETURN_UNDEF;
+        {
             dSP; int count; SV *obj = NULL;
             ENTER; SAVETMPS;
             PUSHMARK(SP); EXTEND(SP, 3);
@@ -455,7 +462,8 @@ schema_url(self)
     {
         HV *h = otel_hv_of(aTHX_ self);
         SV *u = h ? otel_h(aTHX_ h, "schema_url") : NULL;
-        RETVAL = u ? newSVsv(u) : &PL_sv_undef;
+        if (!u) XSRETURN_UNDEF;
+        RETVAL = newSVsv(u);
     }
     OUTPUT:
         RETVAL

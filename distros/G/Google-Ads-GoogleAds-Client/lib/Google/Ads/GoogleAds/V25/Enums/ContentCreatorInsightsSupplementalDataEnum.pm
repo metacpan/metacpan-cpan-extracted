@@ -18,9 +18,10 @@ use strict;
 use warnings;
 
 use Const::Exporter enums => [
-  UNSPECIFIED        => "UNSPECIFIED",
-  UNKNOWN            => "UNKNOWN",
-  LOCAL_CREATOR_DATA => "LOCAL_CREATOR_DATA"
+  UNSPECIFIED          => "UNSPECIFIED",
+  UNKNOWN              => "UNKNOWN",
+  BRAND_SENTIMENT_DATA => "BRAND_SENTIMENT_DATA",
+  LOCAL_CREATOR_DATA   => "LOCAL_CREATOR_DATA"
 ];
 
 1;

@@ -1,3 +1,74 @@
+2026-08-19 - v1.26
+    + fix: kvp2json's and kvp2str's events->{keys} callback had no
+      deduplication of its return value, unlike new_request()'s
+      add_headers_keys path (HAC-022). A duplicate key caused a CODE
+      value at that key to be invoked once per occurrence instead of
+      once - side effects fired multiple times, and kvp2str produced a
+      genuinely malformed doubled-key output ("a=computed-1&a=computed-2")
+      rather than an intentional multi-value array. Deduplicated
+      (first occurrence wins, order otherwise preserved, not sorted) in
+      both encoders (HAC-129, t/94)
+    + fix: same bug class as HAC-129, in new_request()'s headers_keys
+      callback (a full override of which header keys to consider,
+      similar to kvp2json's/kvp2str's events->{keys}) - a duplicate key
+      silently double-fired before_header/after_header for that key.
+      Deduplicated the same order-preserving way (HAC-130, t/95)
+    + test: coverage added for three untested condition-coverage rows on
+      already-correct behavior: _build_retry's non-numeric-count
+      passthrough (HAC-131, t/96), new_request's skip-header guard for a
+      headers_keys-listed key never present in %headers at all (HAC-132,
+      t/97), and prepare_request's Basic-auth guard for an empty username
+      with a non-empty password (HAC-133, t/98). Client.pm's condition
+      coverage reaches 100% as a result
+
+2026-08-19 - v1.25
+    + fix: send()'s DEBUG_IN_OUT/DEBUG_SEND_OUT "-- REQUEST --" dump printed
+      $response->request->as_string instead of the $req object it actually
+      built and passed to $ua->request($req). LWP::UserAgent follows
+      redirects automatically for GET/HEAD by default (max_redirect=7,
+      requests_redirectable=[GET,HEAD]); after a redirect $response->request
+      is the LAST request in the chain - a different object, pointing at the
+      redirected-to URL, not the request this call actually issued. So the
+      debug dump could silently show the wrong request (wrong URL, and for
+      a 303-redirected POST, even the wrong method) whenever a GET/HEAD hit
+      a redirect. Fixed by hoisting $req to be captured once built and using
+      it directly for the REQUEST dump; the RESPONSE dump is unaffected, it
+      correctly reflects the final response as received (HAC-121, t/87)
+    + fix: _build_retry() clamped a negative retry count to 0 but had no
+      equivalent clamp for a negative delay, so the public "retry"
+      attribute (kept specifically for external callers who read
+      $api->retry directly) exposed an unclamped negative delay even
+      though send() itself never actually sleeps a negative amount (it
+      re-clamps locally at its own point of use, per HAC-045/t/37).
+      $api->retry->{delay} is now clamped to 0 the same way
+      $api->retry->{count} already was (HAC-122, t/88)
+    + fix: MANIFEST.SKIP's backup-file line was '\*\~', a regex requiring
+      a literal '*' immediately before the '~' - it never matched an
+      ordinary editor backup filename like "Client.pm~" or "foo.pl~" (the
+      actual Emacs/vim convention), only the essentially impossible
+      "literal asterisk right before a tilde" case. Live-verified: a
+      planted lib/HTTP/API/Client.pm~ shipped straight into the dzil
+      build tarball, unfiltered. Changed the pattern to '~$', which
+      actually matches a trailing tilde (HAC-123, t/89)
+    + test: coverage added for DEBUG_RESPONSE_HEADER_ONLY (previously
+      untested anywhere - already correct, this closes the gap, HAC-124,
+      t/90) and for kvp2str_each's plain-ARRAY branch filtering out a
+      nested empty arrayref element (already correct, HAC-125, t/91)
+    + cleanup: send()'s local negative-retry-delay re-clamp became dead
+      code once HAC-122 added the same clamp to _build_retry() itself
+      (which send() always calls fresh) - removed the now-unreachable
+      line; t/37's end-to-end negative-RETRY_DELAY regression still
+      passes, now exercised via _build_retry's clamp alone (HAC-126)
+    + test: coverage added for kvp_response()'s empty-decoded_content
+      early return (a real response with an empty body, distinct from
+      t/09's earlier "no response at all" guard - already correct,
+      HAC-127, t/92)
+    + test: coverage added for _tune_utf8()'s silent-swallow-on-unrelated-
+      error path (only "content must be bytes" gets re-encoded; any other
+      error passes content through unchanged - already correct, tested
+      via the same monkeypatch/white-box approach t/26 already
+      established, HAC-128, t/93)
+
 2026-08-19 - v1.24
     + docs: added POD ATTRIBUTES entries for "retry" and "debug_flags" -
       both are public read-write constructor attributes that had no

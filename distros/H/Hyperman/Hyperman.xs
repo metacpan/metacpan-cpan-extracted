@@ -52,6 +52,8 @@
 
 #include "hm_future.h"
 #include "hm_ratelimit.h"   /* fork-shared denylist + rate counters (arena) */
+#include "hm_bus.h"         /* the cross-worker message bus (same arena idea) */
+#include "hm_bus_perl.h"    /* ... and its Perl-side cursor and collector    */
 #include "hm_compress.h"   /* gzip on the way out (zlib optional) */
 #include "hm_workerhook.h" /* the v4 on_worker_start registry; hm_core fires
                             * it, hm_abi_impl registers into it */
@@ -69,3 +71,4 @@ INCLUDE: xs/loop.xs
 INCLUDE: xs/writer.xs
 INCLUDE: xs/event.xs
 INCLUDE: xs/abi.xs
+INCLUDE: xs/bus.xs

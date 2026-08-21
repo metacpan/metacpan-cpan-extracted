@@ -1,6 +1,6 @@
-/* X11::GUITest ($Id: record_event.h 231 2014-01-11 14:26:57Z ctrondlp $)
+/* X11::GUITest ($Id: record_event.h 253 2026-08-19 22:37:51Z ctrondlp $)
  *  
- * Copyright (c) 2003-2014  Dennis K. Paulsen, All Rights Reserved.
+ * Copyright (c) 2003-2026  Dennis K. Paulsen, All Rights Reserved.
  * Email: ctrondlp@cpan.org
  *
  * This program is free software; you can redistribute it and/or
@@ -24,13 +24,15 @@ typedef enum {NOTYPE, MOUSEBUTTON, KEY, MOUSEMOVE} EventType;
 typedef enum {NOSTATE, UP, DOWN } EventState;
 
 struct record_event {
-	EventType type;
-	EventState state;
-	unsigned long delay;
-	const char *dataname;
-	int data;
-	int posX;
-	int posY;
+    EventType type;
+    EventState state;
+    unsigned long delay;
+    const char *dataname;
+    long data; /* Holds either a small mouse button index, or a KeySym
+                * (unsigned long); long matches KeySym's width on every
+                * platform without truncating it, unlike int. */
+    int posX;
+    int posY;
 };
 
 #endif /* #ifndef RECORD_EVENT_H */ 

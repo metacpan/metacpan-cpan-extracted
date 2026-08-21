@@ -6,7 +6,8 @@ use Test::Most;
 use Test::Mockingbird 0.10;
 use File::Temp qw(tempdir);
 use File::Spec;
-use Scalar::Util qw(blessed);
+use Log::Abstraction;
+use Scalar::Util qw(blessed isweak);
 
 # Load the module under test
 BEGIN { use_ok('Object::Configure') }
@@ -76,9 +77,15 @@ subtest 'configure() - preserves blessed objects automatically' => sub {
 };
 
 subtest 'configure() - throws on undefined class' => sub {
+	# Partition boundary: undef and empty string are the two terminal-invalid inputs.
+	# Premise: guard clause fires before any config work — prove both gates.
 	throws_ok {
 		Object::Configure::configure(undef, {});
 	} qr/configure: what class do you want to configure/, 'Croaks on undef class';
+
+	throws_ok {
+		Object::Configure::configure('', {});
+	} qr/configure: what class do you want to configure/, 'Croaks on empty-string class';
 
 	done_testing();
 };
@@ -253,36 +260,6 @@ subtest '_get_inheritance_chain() - class with parent' => sub {
 	done_testing();
 };
 
-subtest '_get_inheritance_chain() - processes class hierarchy' => sub {
-	{
-		package Test::Base;
-		sub new { bless {}, shift }
-	}
-	{
-		package Test::Derived;
-		use base 'Test::Base';
-		sub new { bless {}, shift }
-	}
-
-	my @chain = Object::Configure::_get_inheritance_chain('Test::Derived');
-
-	ok(scalar(@chain) > 0, 'Chain populated');
-	ok((grep { $_ eq 'Test::Derived' } @chain), 'Derived class in chain');
-	ok((grep { $_ eq 'Test::Base'    } @chain), 'Base class in chain');
-	ok((grep { $_ eq 'UNIVERSAL'     } @chain), 'UNIVERSAL in chain');
-
-	done_testing();
-};
-
-subtest '_get_inheritance_chain() - adds UNIVERSAL for classes with no parents' => sub {
-	my @chain = Object::Configure::_get_inheritance_chain('Test::Orphan');
-
-	ok((grep { $_ eq 'UNIVERSAL'    } @chain), 'UNIVERSAL added for orphan class');
-	ok((grep { $_ eq 'Test::Orphan' } @chain), 'Class itself in chain');
-
-	done_testing();
-};
-
 subtest '_get_inheritance_chain() - UNIVERSAL appears exactly once' => sub {
 	my @chain = Object::Configure::_get_inheritance_chain('Test::Solo');
 
@@ -416,32 +393,29 @@ subtest 'restore_signal_handlers() - safe to call when not set' => sub {
 	done_testing();
 };
 
-subtest 'configure() - handles carp_on_warn parameter' => sub {
-	my $class = 'Test::Class::CarpOnWarn';
-	my $params = {
+subtest 'configure() - carp_on_warn is forwarded to the logger' => sub {
+	# Premise 1: configure() extracts carp_on_warn from params.
+	# Premise 2: _build_logger receives it and passes it to Log::Abstraction.
+	# Conclusion: result->{logger}{carp_on_warn} == 1.
+	my $result = Object::Configure::configure('Test::Class::CarpOnWarn', {
 		carp_on_warn => 1,
-		timeout => 30
-	};
+		timeout      => 30,
+	});
 
-	my $result = Object::Configure::configure($class, $params);
-
-	ok(blessed($result->{logger}), 'Logger created');
-	# Note: can't easily test if logger uses carp without triggering warnings
+	isa_ok($result->{logger}, 'Log::Abstraction', 'Logger');
+	is($result->{logger}{carp_on_warn}, 1, 'carp_on_warn propagated to logger');
 
 	done_testing();
 };
 
-subtest 'configure() - handles croak_on_error parameter' => sub {
-	my $class = 'Test::Class::CroakOnError';
-	my $params = {
+subtest 'configure() - croak_on_error=0 is preserved in result' => sub {
+	# Prove the param survives the merge and is not reset by a default.
+	my $result = Object::Configure::configure('Test::Class::CroakOnError', {
 		croak_on_error => 0,
-		timeout => 30
-	};
+		timeout        => 30,
+	});
 
-	my $result = Object::Configure::configure($class, $params);
-
-	ok(defined($result), 'Configuration completed');
-	# Note: can't easily test croak_on_error without triggering errors
+	is($result->{croak_on_error}, 0, 'croak_on_error=0 preserved');
 
 	done_testing();
 };
@@ -494,4 +468,440 @@ subtest 'configure() - preserves multiple coderefs' => sub {
 	done_testing();
 };
 
+subtest '_build_logger() - undef spec yields default Log::Abstraction' => sub {
+	# Premise: undef means "no preference" — a default logger must be constructed.
+	my $logger = Object::Configure::_build_logger(undef, 0);
+	isa_ok($logger, 'Log::Abstraction', 'Default logger');
+
+	done_testing();
+};
+
+subtest '_build_logger() - NULL string yields the literal NULL sentinel' => sub {
+	# Premise: caller explicitly opts out of logging.
+	# Conclusion: return value is the string 'NULL', not a blessed object.
+	my $logger = Object::Configure::_build_logger('NULL', 0);
+	is($logger, 'NULL', 'NULL sentinel returned as-is');
+	ok(!blessed($logger), 'NULL sentinel is not blessed');
+
+	done_testing();
+};
+
+subtest '_build_logger() - arrayref spec yields logger with array stash' => sub {
+	my @buf;
+	my $logger = Object::Configure::_build_logger(\@buf, 0);
+	isa_ok($logger, 'Log::Abstraction', 'Logger from arrayref');
+	is($logger->{array}, \@buf, 'Buffer wired into logger');
+
+	done_testing();
+};
+
+subtest '_build_logger() - hashref spec merges options' => sub {
+	my $logger = Object::Configure::_build_logger({ level => 'debug' }, 0);
+	isa_ok($logger, 'Log::Abstraction', 'Logger from hashref');
+
+	done_testing();
+};
+
+subtest '_build_logger() - blessed Log::Abstraction passes through unchanged' => sub {
+	# Premise: caller already owns a logger instance — no reconstruction needed.
+	# Conclusion: identity preserved (same reference returned).
+	my $existing = Log::Abstraction->new();
+	my $logger   = Object::Configure::_build_logger($existing, 0);
+	is($logger, $existing, 'Pre-built logger returned by identity');
+
+	done_testing();
+};
+
+subtest '_build_logger() - carp_on_warn forwarded for every constructing spec type' => sub {
+	# Prove the flag reaches the object for the three constructing spec types.
+	for my $spec (undef, { level => 'info' }, []) {
+		my $label  = !defined($spec) ? 'undef' : (ref($spec) || $spec);
+		my $logger = Object::Configure::_build_logger($spec, 1);
+		is($logger->{carp_on_warn}, 1, "carp_on_warn=1 propagated for spec=$label");
+	}
+
+	done_testing();
+};
+
+subtest '_deep_merge() - three-level nesting: grandchild overrides grandparent' => sub {
+	# Boundary: prove recursion depth >= 3 is correct (not just 2).
+	my $base = { a => { b => { c => 1, d => 2 } } };
+	my $over = { a => { b => { c => 9 } } };
+	my $r    = Object::Configure::_deep_merge($base, $over);
+
+	is($r->{a}{b}{c}, 9, 'Grandchild key overridden');
+	is($r->{a}{b}{d}, 2, 'Sibling grandchild key preserved');
+
+	done_testing();
+};
+
+subtest '_find_class_config_file() - finds file in same dir as primary (no config_dirs)' => sub {
+	# Prove the base-dir probe works without config_dirs.
+	# Premise: primary file and ancestor file share the same directory.
+	my $temp_dir = tempdir(CLEANUP => 1);
+	my $primary  = File::Spec->catfile($temp_dir, 'child.yml');
+	open my $fh, '>', $primary or die $!;
+	print $fh "---\n";
+	close $fh;
+
+	my $ancestor = File::Spec->catfile($temp_dir, 'my-ancestor.yml');
+	open $fh, '>', $ancestor or die $!;
+	print $fh "---\n";
+	close $fh;
+
+	my $found = Object::Configure::_find_class_config_file(
+		'My::Ancestor',
+		$primary,
+		undef		# no config_dirs
+	);
+
+	ok(defined($found),                   'File found via primary dir');
+	like($found, qr/my-ancestor\.yml$/, 'Correct ancestor filename');
+
+	done_testing();
+};
+
+# =============================================================================
+# Security guard S2: configure() class-name validation
+# Premise: configure() rejects any $class that is not a syntactically legal Perl
+# package name before it propagates into env_prefix, croak messages, or the cache.
+# Each input below is a distinct equivalence partition with a unique failure mode.
+# =============================================================================
+subtest 'configure() - rejects invalid class names (S2 security guard)' => sub {
+	my @bad_classes = (
+		['1Bad',           'starts with digit'],
+		['Bad::1Bad',      'component starts with digit'],
+		['Bad|Class',      'shell pipe metachar'],
+		["Bad\nClass",     'newline injection'],
+		["Bad\0Class",     'null-byte injection'],
+		['::Bad',          'leading double-colon (empty first component)'],
+		['Bad@Class',      'at-sign'],
+		['Bad Class',      'space character'],
+	);
+
+	for my $pair (@bad_classes) {
+		my ($bad, $label) = @$pair;
+		throws_ok {
+			Object::Configure::configure($bad, {});
+		} qr/configure: invalid class name/,
+			"Croaks for $label";
+	}
+
+	# Boundary: the two smallest valid class names must NOT trigger the guard.
+	lives_ok { Object::Configure::configure('A',  {}) } 'Single letter class is valid';
+	lives_ok { Object::Configure::configure('_A', {}) } 'Underscore-prefixed class is valid';
+
+	done_testing();
+};
+
+# =============================================================================
+# Security guard S1: configure() path-traversal rejection in config_file
+# Exploit: Config::Abstraction parses any readable file as conf.  A path like
+# "../../etc/passwd" with $RE_PATH_TRAVERSAL sequences would reach the filesystem
+# before the guard fires.  The guard must croak BEFORE any -r probe.
+# =============================================================================
+subtest 'configure() - path traversal in config_file triggers croak (S1 security guard)' => sub {
+	my @traversal_paths = (
+		'../etc/passwd',
+		'../../etc/passwd',
+		'foo/../etc/passwd',
+		'/safe/../etc/passwd',
+	);
+
+	for my $path (@traversal_paths) {
+		throws_ok {
+			Object::Configure::configure('Test::PathTraversal::Guard', {
+				config_file => $path,
+			});
+		} qr/config_file contains path traversal sequences/,
+			"Croaks on traversal path: $path";
+	}
+
+	done_testing();
+};
+
+# =============================================================================
+# configure() with undef params
+# Premise: $_[1] // {} treats undef identically to an empty hashref.
+# Conclusion: the result must be a valid config with a logger, not a crash.
+# =============================================================================
+subtest 'configure() - undef params argument treated as empty hashref' => sub {
+	my $result = Object::Configure::configure('Test::UndefParams', undef);
+
+	ok(ref($result) eq 'HASH', 'Returns hashref');
+	ok(blessed($result->{logger}), 'Logger created from default');
+	isa_ok($result->{logger}, 'Log::Abstraction', 'Logger');
+
+	done_testing();
+};
+
+# =============================================================================
+# configure() with environment variables (no config file)
+# Premise: when no config_file is supplied, configure() merges env vars for the
+# class and its ancestors via Config::Abstraction.
+# =============================================================================
+subtest 'configure() - env vars are merged when no config_file given' => sub {
+	local %ENV;
+	$ENV{'Test__EnvMerge__timeout'} = '99';
+
+	my $result = Object::Configure::configure('Test::EnvMerge', {});
+
+	is($result->{timeout}, 99, 'Env var Test__EnvMerge__timeout merged into result');
+
+	done_testing();
+};
+
+# =============================================================================
+# _build_logger() - scalar spec (non-NULL, non-ref, non-blessed)
+# Premise: an arbitrary string is forwarded to Log::Abstraction as the 'logger' key.
+# =============================================================================
+subtest '_build_logger() - scalar spec forwarded to Log::Abstraction' => sub {
+	my $logger = Object::Configure::_build_logger('syslog', 0);
+	isa_ok($logger, 'Log::Abstraction', 'Logger created from scalar spec');
+
+	done_testing();
+};
+
+# =============================================================================
+# _reconfigure_logger()
+# This private helper replaces a live object's logger from a new config spec.
+# =============================================================================
+subtest '_reconfigure_logger() - replaces logger in-place using new spec' => sub {
+	my $obj = bless { carp_on_warn => 0, logger => Log::Abstraction->new() },
+		'Test::Reconfigure';
+	my $old_logger = $obj->{logger};
+
+	Object::Configure::_reconfigure_logger($obj, 'logger', { level => 'debug' });
+
+	ok(blessed($obj->{logger}), 'Logger key replaced with blessed object');
+	isa_ok($obj->{logger}, 'Log::Abstraction', 'Replacement logger');
+	isnt($obj->{logger}, $old_logger, 'A new instance was created, not the old one');
+
+	done_testing();
+};
+
+subtest '_reconfigure_logger() - propagates carp_on_warn from object to new logger' => sub {
+	# Premise 1: $obj->{carp_on_warn} = 1.
+	# Premise 2: _reconfigure_logger reads carp_on_warn from $obj.
+	# Conclusion: the new logger has carp_on_warn = 1.
+	my $obj = bless { carp_on_warn => 1 }, 'Test::Reconfigure::CarpOnWarn';
+	Object::Configure::_reconfigure_logger($obj, 'logger', {});
+
+	is($obj->{logger}{carp_on_warn}, 1, 'carp_on_warn propagated from object to new logger');
+
+	done_testing();
+};
+
+# =============================================================================
+# _reload_object_config()
+# Tests guard clauses and key-filtering logic of this private reload helper.
+# =============================================================================
+subtest '_reload_object_config() - returns early for an unblessed argument' => sub {
+	# Guard: blessed() check must fire before any filesystem access.
+	lives_ok {
+		Object::Configure::_reload_object_config({ _config_file => '/etc/passwd' });
+	} 'Silently ignores an unblessed hashref';
+
+	done_testing();
+};
+
+subtest '_reload_object_config() - rejects path traversal in _config_file (S1b)' => sub {
+	# Exploit: a deserialization gadget or malicious config merge could poison
+	# $obj->{_config_file} with a traversal path, redirecting hot-reload to read
+	# arbitrary system files.  The S1b guard must carp and return early.
+	my $obj = bless { _config_file => '../../etc/passwd' },
+		'Test::Reload::PathCheck';
+
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+
+	Object::Configure::_reload_object_config($obj);
+
+	ok(grep({ /traversal/i } @warnings),
+		'carp emitted for traversal path in _config_file');
+
+	done_testing();
+};
+
+subtest '_reload_object_config() - does not update private keys, does update public keys' => sub {
+	# Private keys (^_) are intentionally skipped to protect internal bookkeeping.
+	my $temp_dir = tempdir(CLEANUP => 1);
+	my $config_content = <<'YAML';
+---
+Test__Reload__Private:
+  public_key: updated_value
+YAML
+	my $config_file = create_test_config($temp_dir, 'test-reload-private.yml', $config_content);
+
+	my $obj = bless {
+		_config_file => $config_file,
+		public_key   => 'original',
+		_private_key => 'preserved',
+	}, 'Test::Reload::Private';
+
+	Object::Configure::_reload_object_config($obj);
+
+	is($obj->{public_key},   'updated_value', 'Public key updated from reloaded config file');
+	is($obj->{_private_key}, 'preserved',     'Private key not overwritten (skipped by ^_ guard)');
+
+	done_testing();
+};
+
+# =============================================================================
+# register_object() — weak-reference storage
+# Premise: Scalar::Util::weaken is applied so the registry does not keep objects alive.
+# =============================================================================
+subtest 'register_object() - stores a weak reference to the object' => sub {
+	my $obj = bless { value => 42 }, 'Test::WeakRefCheck';
+	Object::Configure::register_object('Test::WeakRefCheck', $obj);
+
+	my $stored_ref = $Object::Configure::_object_registry{'Test::WeakRefCheck'}[-1];
+
+	# $$stored_ref is the scalar that was weakened by weaken($$obj_ref) in register_object.
+	ok(isweak($$stored_ref), 'Registry entry holds a weak reference to the object');
+
+	# Cleanup so it does not interfere with reload_config() tests.
+	delete $Object::Configure::_object_registry{'Test::WeakRefCheck'};
+
+	done_testing();
+};
+
+# =============================================================================
+# get_signal_handler_info() — hot_reload_active reflects real state
+# =============================================================================
+subtest 'get_signal_handler_info() - hot_reload_active matches $_original_usr1_handler state' => sub {
+	my $info = Object::Configure::get_signal_handler_info();
+
+	is(
+		$info->{hot_reload_active},
+		defined($Object::Configure::_original_usr1_handler) ? 1 : 0,
+		'hot_reload_active is true IFF $_original_usr1_handler is defined'
+	);
+
+	done_testing();
+};
+
+# =============================================================================
+# restore_signal_handlers() — after synthetic handler installation
+# =============================================================================
+subtest 'restore_signal_handlers() - clears handler state and restores SIG{USR1}' => sub {
+	SKIP: {
+		skip 'SIGUSR1 not available on Windows', 2 if $^O eq 'MSWin32';
+
+		# Temporarily fake the installed-handler state so we can verify restoration.
+		local $Object::Configure::_original_usr1_handler;
+		local $SIG{USR1};
+
+		$Object::Configure::_original_usr1_handler = 'DEFAULT';
+		$SIG{USR1} = sub { };    # synthetic placeholder handler
+
+		Object::Configure::restore_signal_handlers();
+
+		ok(!defined($Object::Configure::_original_usr1_handler),
+			'$_original_usr1_handler cleared after restore');
+		is($SIG{USR1}, 'DEFAULT', 'SIG{USR1} restored to the saved value');
+	}
+
+	done_testing();
+};
+
+# =============================================================================
+# enable_hot_reload() — early-return guard when already watching
+# Premise: if %_config_watchers is non-empty, a second call must return immediately
+# without forking another child (which would leave an orphaned watcher process).
+# =============================================================================
+subtest 'enable_hot_reload() - returns early when watcher already active' => sub {
+	SKIP: {
+		skip 'SIGUSR1 not available on Windows', 1 if $^O eq 'MSWin32';
+
+		local %Object::Configure::_config_watchers;
+		$Object::Configure::_config_watchers{pid} = 99999;    # fake active watcher
+
+		my $ret = Object::Configure::enable_hot_reload(interval => 5);
+
+		ok(!defined($ret), 'Returns undef when watcher already active (no double-fork)');
+	}
+
+	done_testing();
+};
+
+# =============================================================================
+# _find_class_config_file() — config_dirs element with trailing slash
+# Premise: the trailing-slash strip uses a COPY of $dir, not an alias.
+# Conclusion: the caller's config_dirs array element must be unchanged after the call.
+# =============================================================================
+subtest '_find_class_config_file() - trailing slash in config_dirs is stripped without mutating caller' => sub {
+	my $temp_dir = tempdir(CLEANUP => 1);
+	create_test_config($temp_dir, 'my-trailing.yml', "---\ntest: 1\n");
+
+	my @dirs = ("$temp_dir/");    # intentional trailing slash
+	my $orig = $dirs[0];          # captured before the call
+
+	# Clear cache so this fresh temp_dir is not shadowed by a prior undef sentinel.
+	my $cache_key = join("\0", 'My::Trailing', 'base.yml', $dirs[0]);
+	delete $Object::Configure::_find_cache{$cache_key};
+
+	my $found = Object::Configure::_find_class_config_file(
+		'My::Trailing',
+		'base.yml',
+		\@dirs
+	);
+
+	ok(defined($found),             'File found despite trailing slash in config_dirs entry');
+	like($found, qr/my-trailing\.yml$/, 'Correct filename returned');
+	is($dirs[0], $orig,             'config_dirs element not mutated by the trailing-slash strip');
+
+	done_testing();
+};
+
+# =============================================================================
+# _get_inheritance_chain() — memoization cache populated on first call
+# Premise: %_chain_cache is populated after the first call; second call is O(1).
+# =============================================================================
+subtest '_get_inheritance_chain() - populates %_chain_cache on first call' => sub {
+	my $class = 'Test::Memo::Chain::New';
+	delete $Object::Configure::_chain_cache{$class};    # ensure cold start
+
+	my @chain1 = Object::Configure::_get_inheritance_chain($class);
+	ok(exists($Object::Configure::_chain_cache{$class}), 'Cache entry created after first call');
+
+	my @chain2 = Object::Configure::_get_inheritance_chain($class);
+	is_deeply(\@chain1, \@chain2, 'Second (memoized) call returns identical chain');
+
+	done_testing();
+};
+
+# =============================================================================
+# _deep_merge() — arrayref in overlay replaces base arrayref wholesale
+# Design invariant: arrays are NOT merged element-by-element; overlay wins entirely.
+# =============================================================================
+subtest '_deep_merge() - arrayref overlay replaces base arrayref wholesale' => sub {
+	my $base    = { list => [1, 2, 3], other => 'keep' };
+	my $overlay = { list => [4, 5] };
+
+	my $result = Object::Configure::_deep_merge($base, $overlay);
+
+	is_deeply($result->{list}, [4, 5], 'Overlay arrayref replaces base arrayref entirely');
+	is($result->{other}, 'keep',       'Unrelated base key preserved');
+
+	done_testing();
+};
+
+# =============================================================================
+# Memory cycle check — configure() result must be GC-friendly
+# =============================================================================
+subtest 'configure() result has no circular references (memory-cycle check)' => sub {
+	eval { require Test::Memory::Cycle; 1 } or do {
+		plan skip_all => 'Test::Memory::Cycle not installed';
+		return;
+	};
+
+	my $result = Object::Configure::configure('Test::MemCycle', { foo => 'bar' });
+
+	Test::Memory::Cycle::memory_cycle_ok($result, 'No circular refs in configure() output');
+
+	done_testing();
+};
+
 done_testing();
+

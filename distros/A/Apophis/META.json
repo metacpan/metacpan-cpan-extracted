@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0",
             "Horus" : "0.04"
          }
@@ -45,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

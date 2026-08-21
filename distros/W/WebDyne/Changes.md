@@ -1,5 +1,20 @@
 # Revision history for WebDyne
 
+## 3.020 - 2026-08-20
+
+- Changed `<api>` route pattern semantics so patterns are relative to the
+  discovered API PSP file path. For example, `api.psp` owning
+  `/api/user/42` now uses `pattern="/user/:id"` rather than
+  `pattern="/api/user/:id"`. This is a breaking change for existing
+  `<api>` pages.
+- Updated PSGI and PAGI API fallback dispatch to strip the full API PSP
+  mount path from `PATH_INFO` before passing requests to `Router::Simple`,
+  keeping API route declarations independent of document-root location.
+- Updated API examples, release examples, tests, and local authoring
+  guidance to use the new suffix-only `<api pattern>` convention.
+- Documented the WebDyne 3.020 `<api>` pattern breaking change in the XML
+  documentation and tag reference.
+
 ## 3.013 - 2026-08-16
 
 - Normalized generated `no_*` wrapper options to numeric booleans so

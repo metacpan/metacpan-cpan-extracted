@@ -26,7 +26,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.975000';
+$VERSION = '3.977000';
 
 =head1 NAME
 
@@ -34,7 +34,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.975000
+SNMP::Info - Version 3.977000
 
 =head1 AUTHOR
 
@@ -713,6 +713,12 @@ Subclass for Orinoco/Proxim wireless access points.
 
 See documentation in L<SNMP::Info::Layer2::Orinoco> for details.
 
+=item SNMP::Info::Layer2::TPLink
+
+SNMP Interface to TPLink devices
+
+See documentation in L<SNMP::Info::Layer2::TPLink> for details.
+
 =item SNMP::Info::Layer2::Trapeze
 
 SNMP Interface to Juniper (Trapeze) Wireless Controllers
@@ -829,6 +835,12 @@ Catalyst 2960, 2970, 3750 and 3850 series, including blade switches
 CBS30x0 and CBS31x0 series, all running IOS.
 
 See documentation in L<SNMP::Info::Layer3::C6500> for details.
+
+=item SNMP::Info::Layer3::C9800
+
+Subclass for Cisco Catalyst 9800 Wireless Controllers.
+
+See documentation in L<SNMP::Info::Layer3::C9800> for details.
 
 =item SNMP::Info::Layer3::Cambium
 
@@ -1895,6 +1907,7 @@ sub device_type {
         6486  => 'SNMP::Info::Layer3::AlcatelLucent',
         9303  => 'SNMP::Info::Layer3::PacketFront',
         10418 => 'SNMP::Info::Layer1::Cyclades',
+        11863 => 'SNMP::Info::Layer2::TPLink',
         11898 => 'SNMP::Info::Layer2::Orinoco',
         13458 => 'SNMP::Info::Layer2::Atmedia',
         14179 => 'SNMP::Info::Layer2::Airespace',
@@ -2062,6 +2075,10 @@ sub device_type {
         $objtype = 'SNMP::Info::Layer2::Airespace'
             if ( $desc =~ /^Cisco Controller$/ );
 
+        # Cisco Catalyst 9800 Wireless Controller
+        $objtype = 'SNMP::Info::Layer3::C9800'
+            if ( $desc =~ /^Cisco IOS Software.*\b(?:CW9800|C9800(?:-[A-Z0-9]+)?) Software\b/i );
+
         #Nortel 2270
         $objtype = 'SNMP::Info::Layer2::N2270'
             if (
@@ -2217,6 +2234,10 @@ sub device_type {
         # Airespace (WLC) Module
         $objtype = 'SNMP::Info::Layer2::Airespace'
             if ( $desc =~ /^Cisco Controller$/ );
+
+        # Cisco Catalyst 9800 Wireless Controller
+        $objtype = 'SNMP::Info::Layer3::C9800'
+            if ( $desc =~ /^Cisco IOS Software.*\b(?:CW9800|C9800(?:-[A-Z0-9]+)?) Software\b/i );
 
         #Nortel 2270
         $objtype = 'SNMP::Info::Layer2::N2270'

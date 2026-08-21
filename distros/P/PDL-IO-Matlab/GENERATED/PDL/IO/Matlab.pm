@@ -1,19 +1,17 @@
-
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from matlab.pd! Don't modify!
 #
 package PDL::IO::Matlab;
 
 our @EXPORT_OK = qw(matlab_read matlab_write matlab_print_info );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   our $VERSION = '0.006';
+   our $VERSION = '0.007';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::Matlab $VERSION;
@@ -21,6 +19,11 @@ use DynaLoader;
 
 
 
+
+
+
+
+#line 39 "matlab.pd"
 
 =head1 NAME
 
@@ -46,10 +49,10 @@ this module.
  # write two pdls in matlab 5 format
  matlab_write('file.dat', $x, $y);
 
- # read an array of piddles 
+ # read an array of ndarrays
  # from file in matlab 4, 5, or 7.3 format.
  my @pdls =  matlab_read('file.dat');
- 
+
  # write pdl in matlab 7.3 format.
  matlab_write('file.dat', 'MAT73', $x);
 
@@ -67,13 +70,7 @@ use PDL::NiceSlice;
 use PDL::Options;
 use Data::Dumper;
 
-
-
-
-
-
-
-
+#line 88 "matlab.pd"
 my %Format_list =  (
     MAT73 => 0,
     MAT5 => 1,
@@ -124,7 +121,6 @@ sub matlab_read {
     wantarray ? @res : $res[0];
 }
 
-
 =head2 B<matlab_write>
 
 =head3 Usage
@@ -132,7 +128,7 @@ sub matlab_read {
  matlab_write($filename,$x1,$x2,...);
  matlab_write($filename,$format,$x1,$x2,...);
 
-Automatically convert C<n> element, 1-d piddles to C<1xn> matlab
+Automatically convert C<n> element, 1-d ndarrays to C<1xn> matlab
 variables.
 
  matlab_write($filename,$x1,$x2,..., {onedw => 1} );
@@ -169,13 +165,14 @@ sub matlab_write {
             push @strings, $v;
         }
     }
-    barf 'matlab_write: ' . scalar(@strings) . 
+    barf 'matlab_write: ' . scalar(@strings) .
         ' string arguments given. One or two expected.'
         if @strings < 1 or @strings > 2 ;
     my $filename = $strings[0];
     my $format = $strings[1] || 'MAT5';
     my $opth = { format => $format };
     foreach (keys %{$hashes[0]}) { $opth->{$_} = $hashes[0]->{$_} }
+#line 192 "matlab.pd"
     my $mat = PDL::IO::Matlab->new($filename, '>', $opth);
     $mat->write(@refs) if @refs;
     $mat->close;
@@ -224,7 +221,7 @@ sub matlab_print_info {
  $mat = PDL::IO::Matlab->new('file.dat', '>', { header => 'some text'} );
 
  # read-write  with rw or <>
- $mat = PDL::IO::Matlab->new('file.dat', 'rw');  
+ $mat = PDL::IO::Matlab->new('file.dat', 'rw');
 
  # open for reading
  $mat = PDL::IO::Matlab->new('file.dat', '<');
@@ -248,14 +245,14 @@ A header (a string) to write into the file.
 =item namekey
 
 A hash key that will be used to store the matlab name
-for a variable read from a file in the header of a piddle.
+for a variable read from a file in the header of an ndarray.
 The default value is 'NAME'. Thus, the name can be accessed
 via C<< $pdl->hdr->{NAME} >>.
 
 =item varbasew
 
 The base of the default matlab variable name that will be
-written in the matlab file along with each piddle. An
+written in the matlab file along with each ndarray. An
 integer will be appended to the base name. This integer is
 initialized to zero and is incremented after writing each
 variable.
@@ -284,8 +281,8 @@ sub new {
 
     my $obj = $opt->options($iopts);
 
-    my %exobj = ( 
-        filename => undef, 
+    my %exobj = (
+        filename => undef,
         mode => undef,
         handle => undef,
         wvarnum => 0,
@@ -427,11 +424,11 @@ sub read_all {
 
 Append pdls to open file associated with C<$mat>.
 
-If a piddle has a matlab name stored in the header
+If an ndarray has a matlab name stored in the header
 it will be used as the matlab name written to the file
-with this piddle. The key is in C<< $pdl->{namekey} >>,
+with this ndarray. The key is in C<< $pdl->{namekey} >>,
 with default value C<'NAME'>. If the name is not in
-the piddle's header, then a default value will be used.
+the ndarray's header, then a default value will be used.
 
 =head3 Options
 
@@ -442,9 +439,9 @@ the piddle's header, then a default value will be used.
 In order to write a file that is compatible with Matlab and Octave,
 C<onedw> must be either C<1> or C<2>.  If C<onedw> is C<1> then a 1-d
 pdl of length n is written as a as an C<nx1> pdl (a C<1xn> matlab
-variable). If C<onedw> is C<2> then the output piddle is C<1xn> and
+variable). If C<onedw> is C<2> then the output ndarray is C<1xn> and
 the matlab variable C<nx1>.  If C<onedw> is zero (the default), then
-the 1-d pdl is written as a 1-d piddle. In the last case, Octave will
+the 1-d pdl is written as a 1-d ndarray. In the last case, Octave will
 print an error and fail to read the variable.
 
 =item compress
@@ -527,7 +524,7 @@ C<$mat>.
 
 sub get_header {
     my $self = shift;
-    return defined $self->{header} ? 
+    return defined $self->{header} ?
         $self->{header} : defined $self->{handle} ?
         _mat_get_header($self->{handle}) : undef;
 }
@@ -587,17 +584,14 @@ sub print_all_var_info {
     _extra_matio_print_all_var_info($handle,$printdata);
 }
 
-
-
-
-
+#line 650 "matlab.pd"
     sub get_handle {
         my $self = shift;
        barf 'PDL::IO::Matlab::get_handle: handle not defined.' unless
           defined $self->{handle};
             $self->{handle};
     }
-  
+
     sub set_handle {
        my $self = shift;
        $self->{handle} = shift;
@@ -610,7 +604,7 @@ sub print_all_var_info {
           defined $self->{mode};
             $self->{mode};
     }
-  
+
     sub set_mode {
        my $self = shift;
        $self->{mode} = shift;
@@ -623,7 +617,7 @@ sub print_all_var_info {
           defined $self->{filename};
             $self->{filename};
     }
-  
+
     sub set_filename {
        my $self = shift;
        $self->{filename} = shift;
@@ -634,7 +628,7 @@ sub print_all_var_info {
         my $self = shift;
             $self->{format};
     }
-  
+
     sub set_format {
        my $self = shift;
        $self->{format} = shift;
@@ -647,7 +641,7 @@ sub print_all_var_info {
           defined $self->{varbasew};
             $self->{varbasew};
     }
-  
+
     sub set_varbasew {
        my $self = shift;
        $self->{varbasew} = shift;
@@ -660,7 +654,7 @@ sub print_all_var_info {
           defined $self->{onedw};
             $self->{onedw};
     }
-  
+
     sub set_onedw {
        my $self = shift;
        $self->{onedw} = shift;
@@ -673,7 +667,7 @@ sub print_all_var_info {
           defined $self->{onedr};
             $self->{onedr};
     }
-  
+
     sub set_onedr {
        my $self = shift;
        $self->{onedr} = shift;
@@ -686,7 +680,7 @@ sub print_all_var_info {
           defined $self->{namekey};
             $self->{namekey};
     }
-  
+
     sub set_namekey {
        my $self = shift;
        $self->{namekey} = shift;
@@ -699,7 +693,7 @@ sub print_all_var_info {
           defined $self->{wvarnum};
             $self->{wvarnum};
     }
-  
+
     sub set_wvarnum {
        my $self = shift;
        $self->{wvarnum} = shift;
@@ -712,7 +706,7 @@ sub print_all_var_info {
           defined $self->{compress};
             $self->{compress};
     }
-  
+
     sub set_compress {
        my $self = shift;
        $self->{compress} = shift;
@@ -727,8 +721,7 @@ PDL::IO::Matlab.
 get_handle set_handle get_mode set_mode get_filename set_filename get_format set_format get_varbasew set_varbasew get_onedw set_onedw get_onedr set_onedr get_namekey set_namekey get_wvarnum set_wvarnum get_compress set_compress
 =cut
 
-
-
+#line 654 "matlab.pd"
 
 =head1 CAVEATS
 
@@ -798,7 +791,7 @@ by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
 
-The matio library included here is 
+The matio library included here is
 Copyright 2011 Christopher C. Hulbert. All rights reserved.
 See the file matio-1.5/COPYING in the source distribution
 of this module.
@@ -813,15 +806,8 @@ of this module.
 #}
 
 ###########################################################################
-
-
-
-;
-
-
+#line 810 "Matlab.pm"
 
 # Exit with OK status
 
 1;
-
-		   

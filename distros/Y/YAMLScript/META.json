@@ -56,6 +56,6 @@
          "web" : "https://github.com/yaml/yamlscript"
       }
    },
-   "version" : "v0.2.29",
+   "version" : "v0.2.30",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

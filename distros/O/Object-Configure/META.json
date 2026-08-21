@@ -58,6 +58,8 @@
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
+            "Test::Returns" : "0",
+            "Test::Without::Module" : "0",
             "Time::HiRes" : "0",
             "YAML::XS" : "0",
             "autodie" : "0"
@@ -79,6 +81,6 @@
          "x_repository" : "https://github.com/nigelhorne/Object-Configure"
       }
    },
-   "version" : 0.23,
+   "version" : 0.24,
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

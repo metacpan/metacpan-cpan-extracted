@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model;
-{ our $VERSION = '0.006' }
+{ our $VERSION = '0.008' }
 
 use v5.24;
 use Moo;

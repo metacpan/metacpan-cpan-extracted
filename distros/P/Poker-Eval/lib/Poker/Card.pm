@@ -1,4 +1,7 @@
 package Poker::Card;
+
+our $VERSION = '0.11';
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;
@@ -9,11 +12,10 @@ Poker::Card - Simple class to represent a poker card.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
 
 
 =head1 SYNOPSIS

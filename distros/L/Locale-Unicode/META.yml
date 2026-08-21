@@ -31,7 +31,7 @@ requires:
   warnings: '0'
   warnings::register: '0'
 resources:
-  bugtracker: https://gitlab.com/jackdeguest/Locale-Unicode/issues
-  repository: https://gitlab.com/jackdeguest/Locale-Unicode
-version: v0.4.3
+  bugtracker: https://gitlab.com/deguest/Locale-Unicode/issues
+  repository: https://gitlab.com/deguest/Locale-Unicode
+version: v0.4.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

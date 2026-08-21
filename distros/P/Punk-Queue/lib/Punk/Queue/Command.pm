@@ -121,11 +121,19 @@ EOU
 
 # ---- shared plumbing --------------------------------------------------------
 
+# Getopt::Long::Parser grew a getoptionsfromarray method in 2.39, so the
+# object form is out: perl 5.16 and older ship 2.38. Configure returns the
+# previous settings and takes them back, which is the same save/restore the
+# parser object does internally, and it works everywhere.
 sub _getopt {
     my ($argv, @spec) = @_;
-    my $p = Getopt::Long::Parser->new(
-        config => [qw(no_ignore_case bundling pass_through)]);
-    return $p->getoptionsfromarray($argv, @spec);
+    my $prev = Getopt::Long::Configure(
+        qw(default no_ignore_case bundling pass_through));
+    my $ok = eval { Getopt::Long::GetOptionsFromArray($argv, @spec) };
+    my $err = $@;
+    Getopt::Long::Configure($prev);
+    die $err if $err;
+    return $ok;
 }
 
 # The queue, from --dsn or --app. --app takes a class name (which must

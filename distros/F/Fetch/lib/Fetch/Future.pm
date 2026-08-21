@@ -3,7 +3,7 @@ package Fetch::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 # An external event loop may install an awaiter here so ->get/->await on a
 # pending future pumps it when we are not already inside a running loop.

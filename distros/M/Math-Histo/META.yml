@@ -1,0 +1,32 @@
+---
+abstract: 'Fast, memory-safe C histogramming and statistical computing for Perl'
+author:
+  - 'Steffen Mueller <cpan@steffen-mueller.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0.000060'
+configure_requires:
+  Alien::Base::Wrapper: '1.97'
+  Alien::libhisto: '0'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Histo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::libhisto: v0.1.0
+  Exporter: '5.57'
+  XSLoader: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tsee/libhisto/issues
+  repository: https://github.com/tsee/libhisto.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

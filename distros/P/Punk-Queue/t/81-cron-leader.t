@@ -145,9 +145,13 @@ EOF
     # its next aligned tick and fires the next due occurrence
     $q->dbh->do('UPDATE pq_crons SET next_run = ? WHERE name = ?',
                 undef, int(time) - 5, 'mark');
+    # the handback makes this quick, but it is an optimisation, not the
+    # guarantee: if the departing leader never got to release, the standby
+    # waits out the 30s lease and then its own aligned pass. Budget for
+    # the slow path, or the test only passes on the fast one.
     ok(wait_for(sub {
         $q->list_jobs(0, 0, { task => 'cron.mark' })->{total} >= 2;
-    }), 'the standby took over and fired the next occurrence');
+    }, 90), 'the standby took over and fired the next occurrence');
 
     my $l2 = $q->list_locks(0, 0, { name => 'pq.cron.leader' });
     is($l2->{total}, 1, 'one lease again');

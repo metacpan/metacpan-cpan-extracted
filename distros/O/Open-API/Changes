@@ -1,5 +1,8 @@
 Revision history for Open-API
 
+0.11	2026-08-20
+        - FIX: change abi version checks from == to <=
+
 0.10	2026-08-17
 	- Update min version of deps
 	- Remove PAX headers

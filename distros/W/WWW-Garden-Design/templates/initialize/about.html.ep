@@ -1,0 +1,20 @@
+<h1 align = 'center'>About</h1>
+
+<table align = 'center' class = 'table_striped'>
+	<tr>
+		<td class = 'generic_border generic_padding'>Author</td>
+		<td class = 'generic_border generic_padding'>Ron Savage</td>
+	</tr>
+	<tr>
+		<td class = 'generic_border generic_padding'>Program</td>
+		<td class = 'generic_border generic_padding'>WWW::Garden::Design</td>
+	</tr>
+	<tr>
+		<td class = 'generic_border generic_padding'>Version</td>
+		<td class = 'generic_border generic_padding'>V <%== $version %></td>
+	</tr>
+	<tr>
+		<td class = 'generic_border generic_padding'>Homepage</td>
+		<td class = 'generic_border generic_padding'><a href = 'https://savage.net.au/Flowers.html'>Flowers</a></td>
+	</tr>
+</table>

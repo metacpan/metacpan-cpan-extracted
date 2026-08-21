@@ -92,7 +92,7 @@ cast %Hlagh::, $wiz;
  };
 
  my @calls = qw<eat shoot leave roam yawn roam>;
- my (@fetch, @store);
+ my (@fetch, @store, @delete);
  if ("$]" >= 5.011_002 && "$]" < 5.021_004) {
   @fetch = @calls;
   @store = map { ($_) x 2 } @calls;
@@ -100,12 +100,18 @@ cast %Hlagh::, $wiz;
   @fetch = @calls;
   @store = @calls;
  }
-
- is $@, "ok\n", 'stash: function calls compiled fine';
- is_deeply \%mg, {
+ my %expected = (
   fetch => \@fetch,
   store => \@store,
- }, 'stash: function calls';
+ );
+ if ("$]" >= 5.012 && "$]" < 5.021_004) {
+  $expected{delete} = [qw<roam yawn yawn roam>];
+ } elsif ("$]" >= 5.021_004) {
+  $expected{delete} = [qw<yawn roam>];
+ }
+
+ is $@, "ok\n", 'stash: function calls compiled fine';
+ is_deeply \%mg, \%expected, 'stash: function calls';
 }
 
 {
@@ -307,7 +313,10 @@ $_ => sub {
 CB
 } qw<fetch store exists delete>);
 
-my $uo_exp = "$]" >= 5.011_002 && "$]" < 5.021_004 ? 3 : 2;
+my $uo_exp =
+ "$]" < 5.011_002 ? 2 :
+ "$]" >= 5.012 && "$]" < 5.021_004 ? 5 :
+ 3;
 
 $code .= ', data => sub { +{ guard => 0 } }';
 

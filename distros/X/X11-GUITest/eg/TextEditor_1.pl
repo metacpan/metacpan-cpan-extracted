@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #----------------------------------------------------------------------#
-# X11::GUITest ($Id: TextEditor_1.pl 203 2011-05-15 02:03:11Z ctrondlp $)
+# X11::GUITest ($Id: TextEditor_1.pl 249 2026-08-15 18:43:40Z ctrondlp $)
 # Notes: Example of interaction with gedit (Text Editor).  Tested with
 # 		 version 2.2.0 of the editor application using the English
 #		 language.
@@ -24,33 +24,34 @@ use X11::GUITest qw/
 
 ## Variables (my [SIGIL][VARIABLE] = [INITIALVALUE];) ##
 my $GEMainWin = 0;
-my $GEAboutWin = 0;
+#my $GEAboutWin = 0;
 
 
 ## Core ##
 print "$0 : Script Start\n";
 
 # Start the text editor
-StartApp('gedit');
+StartApp('GDK_BACKEND=x11 gedit');
 # Wait for it to appear within 120 seconds. RegEx: .* = zero or more of any character.
-( ($GEMainWin) = WaitWindowViewable('Un.*gedit', undef, 120) ) or die('Unable to find editor window!');
+($GEMainWin) = WaitWindowViewable('Un.*gedit|Untitled Document 1', undef, 120)
+    or die('Unable to find editor window!');
 
 # Send some text to the editor (TEXT x NUM TIMES)
 SendKeys("Hello, how are you today?\n" x 2) or die('Unable to send text to editor!');
 
 # Ensure the window changes its name to include the
 # 'modified' word since we sent it text above.
-(GetWindowName($GEMainWin) =~ /(modified|\*Unsaved)/i) or die('Editor did not switch its title as expected!');
+(GetWindowName($GEMainWin) =~ /(modified|\*Unsaved|\*Untitled Document 1)/i) or die('Editor did not switch its title as expected!');
 
 # Using shortcuts (Alt-h, a), open about box and wait for it
-SendKeys('%(h)a');
-( ($GEAboutWin) = WaitWindowViewable('About gedit') ) or die('Unable to find about box!');
+#SendKeys('%(h)a');
+#( ($GEAboutWin) = WaitWindowViewable('About gedit') ) or die('Unable to find about box!');
 
 # Close about box (Alt-o (old) and Alt-c (new)) using shortcut for OK button. 
-SendKeys('%(o)%(c)');
+#SendKeys('%(o)%(c)');
 
 # To be safe, ensure about box is closed before we continue
-WaitWindowClose($GEAboutWin);
+#WaitWindowClose($GEAboutWin);
 
 # Now close the editor using menu short-cuts
 SendKeys('%(f)q');

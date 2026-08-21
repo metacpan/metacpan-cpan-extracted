@@ -148,6 +148,19 @@ static SV *ps_err_triplet(pTHX_ IV status, const char *b, STRLEN bl, SV *allow) 
     return newRV_noinc((SV *)resp);
 }
 
+/* The conditional-GET check, run between a route's guards and its handler.
+ * Defined in punk_cget.h, which is included after punk_sendfile.h because it
+ * uses that file's If-None-Match comparison rather than a second copy of it -
+ * the same split ps_serve_file uses. */
+static int pcg_check(pTHX_ SV *c, HV *rech, HV *env, const char *method,
+                     STRLEN mlen, SV **out, SV **errp);
+
+/* The idempotency replay check, in the same slot. Defined in punk_idem.h,
+ * which is included after punk_cachefront.h because the store is where the
+ * keys live. */
+static int pi_check(pTHX_ SV *c, HV *rech, HV *env, const char *method,
+                    STRLEN mlen, SV *cfg, SV **out, SV **errp);
+
 /* does path (plen) start with prefix (pfl) on a segment boundary? */
 static int ps_under(const char *path, STRLEN plen, const char *pf, STRLEN pfl) {
     return plen >= pfl && memEQ(path, pf, pfl)
@@ -161,6 +174,14 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
     AV *mounts = ps_state_av(aTHX_ state, "mounts");
     SV *ctxcls = ps_state(aTHX_ state, "ctx");
     SV *app    = ps_state(aTHX_ state, "app");
+    {   /* Where a large multipart part spills. The parser has the request's
+         * env and nothing else - the env belongs to the server - so the one
+         * place this can be handed over is here, and only when an
+         * application named a directory. One hv_store for those that did,
+         * one hv_fetch for those that did not. */
+        SV *ud = ps_state(aTHX_ state, "upload_dir");
+        if (ud && SvOK(ud)) (void)hv_stores(env, "punk.upload_dir", newSVsv(ud));
+    }
     AV *before = ps_state_av(aTHX_ state, "before");
     AV *after  = ps_state_av(aTHX_ state, "after");
     SV *on_err = ps_state(aTHX_ state, "on_error");
@@ -516,6 +537,41 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
             if (guardsp && *guardsp && SvROK(*guardsp)
                 && SvTYPE(SvRV(*guardsp)) == SVt_PVAV)
                 shorted = pd_run_chain(aTHX_ (AV *)SvRV(*guardsp), c, &ret, &err);
+        }
+        if (!shorted) {
+            /* The conditional GET, after the guards and before the handler.
+             * Not earlier: before_dispatch runs ahead of the guards, and a
+             * 304 there would answer a request an authentication guard was
+             * about to refuse. Inert unless the plugin is registered, and
+             * one hv_fetch when it is not - the `sitemap` arrangement. */
+            SV *cg = ps_state(aTHX_ state, K_CGET);
+            if (cg && SvTRUE(cg)) {
+                SV *cgout = NULL, *cgerr = NULL;
+                if (pcg_check(aTHX_ c, rech, env, method, mlen,
+                              &cgout, &cgerr)) {
+                    if (cgerr) err = cgerr;      /* the app's 500 */
+                    else       ret = cgout;      /* the 304 */
+                    shorted = 1;
+                }
+            }
+        }
+        if (!shorted) {
+            /* Idempotency, in the same slot and for the same reason: a
+             * replay returns a stored response BODY, so answering it ahead
+             * of the guards would hand somebody else's order to a caller
+             * the guard was about to refuse. The two never both fire - one
+             * answers GET and HEAD, the other only unsafe methods. */
+            SV *ic = ps_state(aTHX_ state, K_IDEM);
+            SV **ir = ic ? hv_fetchs(rech, K_IDEMPOTENT, 0) : NULL;
+            if (ir && *ir && SvTRUE(*ir)) {
+                SV *iout = NULL, *ierr = NULL;
+                if (pi_check(aTHX_ c, rech, env, method, mlen, ic,
+                             &iout, &ierr)) {
+                    if (ierr) err = ierr;
+                    else      ret = iout;        /* the replay, 400 or 422 */
+                    shorted = 1;
+                }
+            }
         }
         if (!shorted) {
             int died = 0;

@@ -5,6 +5,7 @@ use Test::More;
 use FindBin qw($RealBin);
 use lib "$RealBin";
 use bin_helper qw(run_cmd write_file write_module);
+use pagi_compat_helper qw(pagi_skip_reason);
 use File::Temp qw(tempdir);
 use File::Spec;
 
@@ -12,11 +13,10 @@ my $script=File::Spec->catfile('bin', 'webdyne.pagi');
 ok(-f $script, 'webdyne.pagi script exists');
 
 BEGIN {
-    my @missing;
-    for my $m (qw(PAGI::Server PAGI::Tools PAGI::Middleware::Builder PAGI::Request PAGI::Response PAGI::SSE PAGI::WebSocket Future::AsyncAwait)) {
-        eval "require $m; 1" or push @missing, $m;
-    }
-    @missing and plan skip_all => 'Skipping webdyne.pagi script test: missing ' . join(', ', @missing);
+    unshift @INC, 't';
+    require pagi_compat_helper;
+    my $skip=pagi_compat_helper::pagi_skip_reason(qw(PAGI::Server PAGI::Tools PAGI::Middleware::Builder PAGI::Request PAGI::Response PAGI::SSE PAGI::WebSocket Future::AsyncAwait));
+    plan skip_all => "Skipping webdyne.pagi script test: $skip" if $skip;
 }
 
 my $stub_dn=tempdir(CLEANUP => 1);

@@ -2,11 +2,10 @@ Changes
 ignore.txt
 lib/PDL/DSP/Fir.pm
 lib/PDL/DSP/Fir/Simple.pm
-Makefile.PL
 LICENSE
+Makefile.PL
 MANIFEST			This list of files
 README.pod
-t/00-load.t
 t/0-simple.t
 t/1-fir.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

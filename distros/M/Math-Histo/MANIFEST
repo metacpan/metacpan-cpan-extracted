@@ -1,0 +1,27 @@
+bench/bench_fill.pl
+Changes
+Histo.xs
+lib/Math/Histo.pm
+lib/Math/Histo/2D.pm
+lib/Math/Histo/CLI.pm
+lib/Math/Histo/Constants.pm
+lib/Math/Histo/Fit.pm
+lib/Math/Histo/Sketch.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+script/phisto
+t/01_basic.t
+t/02_stats.t
+t/03_arithmetic.t
+t/04_serialization.t
+t/05_histo2d.t
+t/06_fit.t
+t/07_sketch.t
+t/08_edge_cases.t
+t/09_cli.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

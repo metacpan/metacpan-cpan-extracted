@@ -1,0 +1,88 @@
+<form name = 'property_form_1' id = 'property_form_1'>
+	%= csrf_field
+	<table align = 'center'>
+		<tr>
+			<td><div class = 'blue_centered'>Properties</div></td>
+		</tr>
+		<tr>
+			<td><br /></td>
+		</tr>
+		<tr>
+			<td align = 'center'>All Properties</td>
+		</tr>
+		<tr>
+			<td align = 'center'>
+				<div class = 'gardens_gardentoolbar'> <!-- Class not defined -->
+					<span id = 'properties_property_menu_span'><%== $properties_property_menu %></span>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<table align = 'center'>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+		<tr>
+			<td>Property name: <span class = 'alert'>*</span> </td>
+			<td align = 'left' colspan = '2'><input id = 'properties_property_name' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Description: </td>
+			<td align = 'left' colspan = '2'><input id = 'properties_property_description' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Publish property: </td>
+			<td align = 'left' colspan = '2'><input type = 'checkbox' value = '' id = 'properties_property_publish'/></td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+		<tr>
+			<td colspan = '3'><span class = 'alert'>*</span> indicates a mandatory field</td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+		<tr>
+			<td align = 'left' width = '33%'><input type = 'submit' value = 'Update' onclick = 'update_property("update")'/></td>
+			<td align = 'center' width = '33%'><input type = 'submit' value = 'Delete' onclick = 'update_property("delete")'/></td>
+			<td align = 'right' width = '33%'><input type = 'reset' value = 'Reset' /></td>
+		</tr>
+	</table>
+</form>
+<form name = 'property_form_2' id = 'property_form_2'>
+	%= csrf_field
+	<table align = 'center'>
+		<tr>
+			<td colspan = '3'><hr /></td>
+		</tr>
+		<tr>
+			<td width = '33%'></td>
+			<td align = 'center'><div class = 'blue_centered'>Add a New Property</div></td>
+			<td width = '33%'></td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+		<tr>
+			<td>Property name: <span class = 'alert'>*</span> </td>
+			<td align = 'left' colspan = '2'><input id = 'new_property_name' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Description: </td>
+			<td align = 'left' colspan = '2'><input id = 'new_property_description' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Publish property: </td>
+			<td align = 'left' colspan = '2'><input type = 'checkbox' value = '' id = 'new_property_publish'/></td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+			<td align = 'left' width = '33%'><input type = 'submit' value = 'Save' onclick = 'add_property()'/></td>
+			<td width = '33%'></td>
+			<td align = 'right' width = '33%'><input type = 'reset' value = 'Reset' /></td>
+		</tr>
+	</table>
+</form>
+

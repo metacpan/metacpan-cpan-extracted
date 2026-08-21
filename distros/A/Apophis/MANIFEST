@@ -18,6 +18,9 @@ t/08-bulk.t
 t/09-metadata.t
 t/10-edge-cases.t
 t/11-custom-ops.t
+include/ap_abi.h
+include/ap_abi_impl.h
+t/12-abi.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -1,0 +1,2495 @@
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01//EN'
+'http://www.w3.org/TR/html4/strict.dtd'>
+<html>
+
+<head>
+
+	<title>Garden Design</title>
+	<meta http-equiv = 'Content-Type' content = 'text/html; charset = utf-8' />
+
+	<link rel = 'stylesheet' href = 'http://127.0.0.1/assets/js/jQuery/jquery-ui-1.12.1.custom/jquery-ui.theme.min.css'>
+	<link rel = 'stylesheet' type = 'text/css' href='http://127.0.0.1/assets/js/jQuery/jquery-ui-1.12.1/jquery-ui.min.css'>
+	<link rel = 'stylesheet' type = 'text/css' href='http://127.0.0.1/assets/js/jQuery/datatables.min.css'>
+	<!-- Warning: The next line must not be put after the spectrum line, or the CSS in it fails to work. -->
+	<link rel = 'stylesheet' type = 'text/css' href = '/assets/css/www/garden/design/homepage.css'>
+	<link rel = 'stylesheet' type = 'text/css' href = '/assets/css/www/garden/design/humane-js/themes/boldlight.css'>
+	<link rel = 'stylesheet' type = 'text/css' href = 'http://127.0.0.1/assets/js/spectrum/spectrum.css'>
+	<style>
+		.overflow_scroll
+		{
+			border:		1px solid #00aa00;
+			height:		600px;
+			padding:	1em;
+			overflow:	scroll;
+			width:		1500px;
+		}
+	</style>
+
+</head>
+
+<body>
+
+<h3 class = 'blue_centered'>Garden Design</h3>
+
+<div id = 'global_tab_div'>
+	<ul>
+		<li><a href = '#global_search_tab'><span>Search</span></a></li>
+		<li><a href = '#global_details_tab'><span>Details</span></a></li>
+		<li><a href = '#global_property_tab'><span>Properties</span></a></li>
+		<li><a href = '#global_garden_tab'><span>Gardens</span></a></li>
+		<li><a href = '#global_feature_tab'><span>Features</span></a></li>
+		<li><a href = '#global_design_tab'><span>Design</span></a></li>
+		<li><a href = '#global_report_tab'><span>Reports</span></a></li>
+		<li><a href = '#global_help_tab'><span>Help</span></a></li>
+	</ul>
+	<div id = 'global_search_tab'>
+%= include 'initialize/search'
+	</div>
+	<div id = 'global_details_tab'>
+		<form id = 'details_form' name = 'details_form'>
+		    <ul>
+		        <li><a href = '#flower_tab'><span>Flower</span></a></li>
+		        <li><a href = '#attributes_tab'><span>Attributes</span></a></li>
+		        <li><a href = '#images_tab'><span>Images</span></a></li>
+		        <li><a href = '#notes_tab'><span>Notes</span></a></li>
+		        <li><a href = '#urls_tab'><span>URLs</span></a></li>
+		    </ul>
+		    <div id = 'flower_tab'>
+%= include 'initialize/flower'
+			</div>
+		    <div id = 'attributes_tab'>
+%= include 'initialize/attributes'
+			</div>
+		    <div id = 'images_tab'>
+%= include 'initialize/images', constants => $constants
+			</div>
+		    <div id = 'notes_tab'>
+%= include 'initialize/notes', constants => $constants
+			</div>
+		    <div id = 'urls_tab'>
+%= include 'initialize/urls'
+			</div>
+		</form>
+	</div>
+	<div id = 'global_property_tab'>
+%= include 'initialize/property', properties_property_menu => $properties_property_menu
+	</div>
+	<div id = 'global_garden_tab'>
+%= include 'initialize/garden', gardens_garden_menu => $gardens_garden_menu, gardens_property_menu_1 => $gardens_property_menu_1, gardens_property_menu_2 => $gardens_property_menu_2
+	</div>
+	<div id = 'global_feature_tab'>
+%= include 'initialize/feature', feature_menu => $feature_menu
+	</div>
+	<div id = 'global_design_tab'>
+%= include 'initialize/design', constants => $constants, design_garden_menu => $design_garden_menu, design_property_menu => $design_property_menu
+	</div>
+	<div id = 'global_report_tab'>
+		<div id = 'report_div'>
+		    <ul>
+		        <li><a href = '#activity_tab'><span>Activity</span></a></li>
+		        <li><a href = '#crosscheck_tab'><span>Crosscheck</span></a></li>
+		    </ul>
+		    <div id = 'activity_tab'>
+%= include 'initialize/activity'
+			</div>
+		    <div id = 'crosscheck_tab'>
+%= include 'initialize/crosscheck'
+			</div>
+		</div>
+	</div>
+	<div id = 'global_help_tab'>
+		<div id = 'help_div'>
+		    <ul>
+		        <li><a href = '#search_help_tab'><span>Searching</span></a></li>
+		        <li><a href = '#faq_help_tab'><span>FAQ</span></a></li>
+		        <li><a href = '#about_tab'><span>About</span></a></li>
+		    </ul>
+		    <div id = 'search_help_tab'>
+%= include 'initialize/search_help'
+			</div>
+		    <div id = 'faq_help_tab'>
+%= include 'initialize/faq_help'
+			</div>
+		    <div id = 'about_tab'>
+%= include 'initialize/about', version => $version
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+
+%= javascript 'http://127.0.0.1/assets/js/jQuery/jquery-3.2.1.min.js'
+%= javascript 'http://127.0.0.1/assets/js/jQuery/jquery-ui-1.12.1/jquery-ui.min.js'
+%= javascript 'http://127.0.0.1/assets/js/jQuery/datatables.min.js'
+%= javascript 'http://127.0.0.1/assets/js/spectrum/spectrum.js'
+%= javascript '/assets/templates/www/garden/design/humane-js/humane.min.js'
+
+<script type = 'text/javascript'>
+
+// Storage for info read in below from the database.
+
+var attribute_types_table			= [];
+var chosen_thing					= '';	// These 2 below are the current ids within each menu, for use in Ajax calls:
+var design_current_garden_id		= 0;	// o Garden menu id on the Design tab.
+var design_current_property_id		= 0;	// o Property menu id on the Design tab.
+var features_current_feature_id		= <%== $features_current_feature_id %>;		// o Feature menu id on the Features tab.
+var features_table					= [];
+var gardens_current_garden_id		= <%== $gardens_current_garden_id %>;		// o Update/delete garden menu id on the Gardens tab.
+var gardens_current_property_id_1	= <%== $gardens_current_property_id_1 %>;	// o Update/delete garden property menu id on the Gardens tab.
+var gardens_current_property_id_2	= <%== $properties_current_property_id %>;	// o New garden property menu id on the Gardens tab.
+var gardens_table					= [];	// Just gardens, with their corresponding properties and designs.
+var properties_current_property_id	= <%== $properties_current_property_id %>;	// o Property menu id on the Properties tab.
+var properties_table				= [];	// All properties, even if they don't have gardens.
+var window_width					= 0;
+var window_height					= 0;
+
+// -----------------------------------------------
+
+function activity(action)
+{
+	$.ajax
+	({
+		data:
+		{
+		},
+		dataType:	'text',
+		method:		'POST',
+		url:		'/Report/activity', // See routes at end of WWW::Garden::Design.startup().
+	})
+	.done(function(html)
+	{
+		$('#activity_result_div')
+		.empty()
+		.append(html);
+	});
+
+} // End of activity.
+
+// -----------------------------------------------
+
+function add_feature(action)
+{
+	var name			= $('#new_feature_name').val();
+	var color_chosen	= $('#new_color_chosen').val();
+
+	if ( (color_chosen == '') || (name == '') )
+	{
+		user_message('Error', 'Both the color name and feature name are mandatory');
+
+		return;
+	}
+
+	$.post
+	(
+		// See routes at end of WWW::Garden::Design.startup().
+
+		'/Feature',
+		{
+			action:			'add',
+			color_chosen:	color_chosen,
+			color_code:		$('#new_color_code').val(),
+			color_name:		$('#new_color_name').val(),
+			id:				0,
+			name:			name,
+			publish:		$('#new_feature_publish').prop('checked') ? 'Yes' : 'No'
+		},
+		function(packet)
+		{
+			if (packet.message.outcome != 'Error')
+			{
+				$('#new_feature_icon')
+				.attr('src', packet.tile_status.file_url);
+			}
+
+			// Update the feature menu on the Features tab.
+
+			features_current_feature_id	= packet.message.feature_id;
+			features_table				= packet.features_table;
+
+			build_feature_menu(features_current_feature_id, 'feature_menu', packet.feature_menu);
+
+			user_feedback(packet.message);
+		},
+		'json'
+	);
+
+} // End of add_feature.
+
+// -----------------------------------------------
+
+function add_garden()
+{
+	var name = $('#new_garden_name').val();
+
+	if (name == '')
+	{
+		user_message('Error', 'The garden name is mandatory');
+
+		return;
+	}
+
+	var index			= gardens_property_menu_2.selectedIndex;
+	var property_name	= gardens_property_menu_2.options[index].text;
+	var property_id		= gardens_property_menu_2.options[index].value; // Not used.
+
+	$.post
+	(
+		// See routes at end of WWW::Garden::Design.startup().
+
+		'/Garden',
+		{
+			action:			'add',
+			description:	$('#new_garden_description').val(),
+			id:				0,
+			name:			name,
+			property_id:	gardens_current_property_id_2,
+			property_name:	property_name,
+			publish:		$('#new_garden_publish').prop('checked') ? 'Yes' : 'No',
+		},
+		function(packet)
+		{
+			gardens_current_garden_id		= packet.message.garden_id;
+			gardens_table					= packet.gardens_table;
+			gardens_current_property_id_1	= gardens_current_property_id_2;
+
+			// Update the upper property menu on the Gardens tab.
+			// In particular, the new garden might be the first for this property.
+
+			build_property_menu(gardens_current_property_id_1, 'gardens_property_menu_1', packet.property_menu);
+
+			// Update the property menu on the Design tab.
+			// In particular, the new garden might be the first for this property.
+
+			var regexp			= /gardens_property_menu_1/g;
+			var new_menu_name	= 'design_property_menu';
+			var property_menu	= packet.property_menu.replace(regexp, new_menu_name);
+
+			build_property_menu(gardens_current_property_id_1, new_menu_name, property_menu);
+
+			// Reset the fields for the lower property on the Gardens tab.
+
+			set_garden_fields_2();
+
+			user_feedback(packet.message);
+		},
+		'json'
+	);
+
+} // End of add_garden.
+
+// -----------------------------------------------
+
+function add_property(action)
+{
+	var name = $('#new_property_name').val();
+
+	if (name == '')
+	{
+		user_message('Error', 'The property name is mandatory');
+
+		return;
+	}
+
+	$.post
+	(
+		// See routes at end of WWW::Garden::Design.startup().
+
+		'/Property',
+		{
+			action:			'add',
+			description:	$('#new_property_description').val(),
+			id:				0,
+			name:			name,
+			publish:		$('#new_property_publish').prop('checked') ? 'Yes' : 'No'
+		},
+		function(packet)
+		{
+			// Update the property menu on the Properties tab.
+
+			properties_current_property_id	= packet.message.property_id;	// On Properties tab.
+			gardens_current_property_id_2	= packet.message.property_id;	// Lower property menu on Gardens tab.
+			properties_table				= packet.properties_table;
+
+			build_property_menu(properties_current_property_id, 'properties_property_menu', packet.property_menu);
+
+			var index = find_index_of_property_id(properties_current_property_id);
+
+			set_properties_property_fields_1(index);
+			set_properties_property_fields_2();
+
+			// Update the lower property menu on the Gardens tab.
+			// A new property cannot have any gardens, so no other property menus need updating.
+
+			var regexp			= /properties_property_menu/g;
+			var new_menu_name	= 'gardens_property_menu_2';
+			var property_menu	= packet.property_menu.replace(regexp, new_menu_name);
+
+			build_property_menu(gardens_current_property_id_2, new_menu_name, property_menu);
+
+			user_feedback(packet.message);
+		},
+		'json'
+	);
+
+} // End of add_property.
+
+// -----------------------------------------------
+
+$(function()
+{
+	$('#design_flower')
+	.autocomplete
+	({
+		source:		'/AutoComplete?type=design_flower', // See routes at end of WWW::Garden::Design.startup().
+		minLength:	2,
+		select:		function(event, ui)
+		{
+			if (ui.item)
+			{
+				$('#design_flower')
+				.empty()
+				.append(ui.item.value);
+			}
+		}
+	});
+
+}); // End of autocomplete function.
+
+// -----------------------------------------------
+
+$(function()
+{
+	$('#design_feature')
+	.autocomplete
+	({
+		source:		'/AutoComplete?type=design_feature', // See routes at end of WWW::Garden::Design.startup().
+		minLength:	2,
+		select:		function(event, ui)
+		{
+			if (ui.item)
+			{
+				$('#design_feature')
+				.empty()
+				.append(ui.item.value);
+			}
+		}
+	});
+
+}); // End of autocomplete function.
+
+// -----------------------------------------------
+
+$(function()
+{
+	$('#feature_name')
+	.autocomplete
+	({
+		source:		'/AutoComplete?type=feature_name', // See routes at end of WWW::Garden::Design.startup().
+		minLength:	2,
+		select:		function(event, ui)
+		{
+			$('#feature_name')
+			.empty()
+			.append(ui.item ? ui.item.value : '-');
+		}
+	});
+
+}); // End of autocomplete function.
+
+// -----------------------------------------------
+
+$(function()
+{
+	$('#garden_name')
+	.autocomplete
+	({
+		source:		'/AutoComplete?type=garden_name', // See routes at end of WWW::Garden::Design.startup().
+		minLength:	2,
+		select:		function(event, ui)
+		{
+			if (ui.item)
+			{
+				$('#garden_name')
+				.empty()
+				.append(ui.item.value);
+			}
+		}
+	});
+
+}); // End of autocomplete function.
+
+// -----------------------------------------------
+
+$(function()
+{
+	$('#new_garden_name')
+	.autocomplete
+	({
+		source:		'/AutoComplete?type=garden_name', // See routes at end of WWW::Garden::Design.startup().
+		minLength:	2,
+		select:		function(event, ui)
+		{
+			if (ui.item)
+			{
+				$('#garden_name')
+				.empty()
+				.append(ui.item.value);
+			}
+		}
+	});
+
+}); // End of autocomplete function.
+
+// -----------------------------------------------
+
+$(function()
+{
+	$('#new_property_name')
+	.autocomplete
+	({
+		source:		'/AutoComplete?type=property_name', // See routes at end of WWW::Garden::Design.startup().
+		minLength:	2,
+		select:		function(event, ui)
+		{
+			if (ui.item)
+			{
+				$('#property_name')
+				.empty()
+				.append(ui.item.value);
+			}
+		}
+	});
+
+}); // End of autocomplete function.
+
+// -----------------------------------------------
+
+$(function()
+{
+	$('#properties_property_name')
+	.autocomplete
+	({
+		source:		'/AutoComplete?type=property_name', // See routes at end of WWW::Garden::Design.startup().
+		minLength:	2,
+		select:		function(event, ui)
+		{
+			if (ui.item)
+			{
+				$('#property_name')
+				.empty()
+				.append(ui.item.value);
+			}
+		}
+	});
+
+}); // End of autocomplete function.
+
+// -----------------------------------------------
+
+$(function()
+{
+	$("#search_text")
+	.autocomplete
+	({
+		source: "/AutoComplete?type=search",
+		minLength: 2,
+		select: function(event, ui)
+		{
+			$("#search_text")
+			.empty()
+			.append(ui.item ? ui.item.value : "-");
+		}
+	});
+
+}); // End of autocomplete function.
+
+// -----------------------------------------------
+
+function build_attribute_id(kind, name, value)
+{
+	// We must allow for:
+	// o Names like 'Sun tolerance'.
+	// o Range values like 'Full sun' and 'Semi-dwarf'.
+
+	name	= name.replace(/\s|-/g, '_');
+	value	= value.replace(/\s|-/g, '_');
+
+	return '#' + kind + '_' + name + '_' + value;
+
+} // End of build_attribute_id.
+
+// -----------------------------------------------
+
+function build_feature_menu(feature_id, jquery_id, feature_menu)
+{
+	var id = '#' + jquery_id;
+
+	$(id + '_span')
+	.empty()
+	.append(feature_menu);
+
+	var data		= new Object;
+	data.item		= new Object;
+	data.item.value	= feature_id;
+
+	$(id).selectmenu();
+
+	$(id)
+	.selectmenu
+	({
+		change: function(event, data)
+		{
+			feature_menu_changed(data);
+		}
+	});
+
+	feature_menu_changed(data);
+
+} // End of build_feature_menu.
+
+// -----------------------------------------------
+
+function build_garden_menu(property_id, garden_id, jquery_id)
+{
+	// Firstly, try to find the garden_id within the property.
+	// If not found, garden_id is obsolete, so update it.
+
+	var first_id	= -1;
+	var found		= false;
+
+	var id;
+
+	for (var i = 0; i < gardens_table.length; i++)
+	{
+		if (gardens_table[i]['property_id'] == property_id)
+		{
+			id = gardens_table[i]['id'];
+
+			if (first_id < 0)
+			{
+				first_id = id;
+			}
+
+			if (id == garden_id)
+			{
+				found = true;
+
+				break;
+			}
+		}
+	}
+
+	if (found == false)
+	{
+		garden_id = first_id;
+	}
+
+	// Now build the menu.
+
+	var html	= "<select id = '" + jquery_id + "'>";
+	var index	= -1;
+
+	var name;
+
+	for (var i = 0; i < gardens_table.length; i++)
+	{
+		if (gardens_table[i]['property_id'] == property_id)
+		{
+			id		= gardens_table[i]['id'];
+			name	= gardens_table[i]['name'];
+
+			if (id == garden_id)
+			{
+				html	+= "<option value = '" + id + "' selected>" + name + '</option>';
+				index	= i;
+			}
+			else
+			{
+				html += "<option value = '" + id + "'>" + name + '</option>';
+			}
+		}
+	}
+
+	// With a delete, garden_id is 0, so index remains as -1.
+	// In this case set it to the index of the 1st id in the table.
+
+	if (index < 0)
+	{
+		index = 0;
+	}
+
+	html	+= '</select>';
+	id		= '#' + jquery_id;
+
+	$(id + '_span')
+	.empty()
+	.append(html);
+
+	// Warning: These 2 calls to selectmenu() are mandatory.
+
+	if (jquery_id == 'gardens_garden_menu')
+	{
+		$(id)
+		.selectmenu
+		({
+			change: function(event, data)
+			{
+				gardens_garden_menu_changed(data);
+			}
+		});
+	}
+	else // design_garden_menu.
+	{
+		$(id)
+		.selectmenu();
+	}
+
+	return index;
+
+} // End of build_garden_menu.
+
+// -----------------------------------------------
+
+function build_property_menu(property_id, jquery_id, property_menu)
+{
+	var id = '#' + jquery_id;
+
+	$(id + '_span')
+	.empty()
+	.append(property_menu);
+
+	var data		= new Object;
+	data.item		= new Object;
+	data.item.value	= property_id;
+
+	$(id).selectmenu();
+
+	if (jquery_id == 'design_property_menu')
+	{
+		$(id)
+		.selectmenu
+		({
+			change: function(event, data)
+			{
+				design_property_menu_changed(data);
+			}
+		});
+
+		design_property_menu_changed(data); // Calls build_garden_menu().
+	}
+	else if (jquery_id == 'gardens_property_menu_1')
+	{
+		$(id)
+		.selectmenu
+		({
+			change: function(event, data)
+			{
+				gardens_property_menu_1_changed(data);
+			},
+		});
+
+		gardens_property_menu_1_changed(data); // Calls build_garden_menu().
+	}
+	else if (jquery_id == 'gardens_property_menu_2')
+	{
+		$(id)
+		.selectmenu
+		({
+			change: function(event, data)
+			{
+				gardens_property_menu_2_changed(data);
+			},
+		});
+
+		gardens_property_menu_2_changed(data); // Calls build_garden_menu().
+	}
+	else // properties_property_menu.
+	{
+		$(id)
+		.selectmenu
+		({
+			change: function(event, data)
+			{
+				properties_property_menu_changed(data);
+			},
+		});
+
+		properties_property_menu_changed(data); // Calls build_garden_menu().
+	}
+
+} // End of build_property_menu.
+
+// -----------------------------------------------
+
+function build_image_ids(sequence)
+{
+	// Names are in alphabetical order.
+
+	var ids =
+	[
+		'#image_description_' + sequence,	// 0.
+		'#image_file_name_' + sequence,		// 1.
+		'#image_url_' + sequence,			// 2.
+		'#image_sequence_' + sequence		// 3. Not used.
+	];
+
+	return ids;
+
+} // End of build_image_ids.
+
+// -----------------------------------------------
+
+function build_note_ids(sequence)
+{
+	// Names are in alphabetical order.
+
+	var ids	=
+	[
+		'#note_note_' + sequence,		// 0.
+		'#note_sequence_' + sequence	// 1. Not used.
+	];
+
+	return ids;
+
+} // End of build_note_ids.
+
+// -----------------------------------------------
+
+function build_url_ids(sequence)
+{
+	// Names are in alphabetical order.
+
+	var ids	=
+	[
+		'#url_sequence_' + sequence,	// 0. Not used.
+		'#url_url_' + sequence			// 1.
+	];
+
+	return ids;
+
+} // End of build_url_ids.
+
+// -----------------------------------------------
+
+function build_virtual_id(column, row)
+{
+	return 'id_' + row + '_' + column;
+
+} // End of build_virtual_id.
+
+// -----------------------------------------------
+
+function confirm_design_reset()
+{
+	return false;
+
+} // End of confirm_design_reset.
+
+// -----------------------------------------------
+
+function confirm_design_save()
+{
+	var flower_list			= [];
+	var joiner				= '<%== $joiner %>';
+	var match				= new Array();
+	var thing_count			= 0;
+	var virtual_cell_count	= <%== $$constants{virtual_cell_count} %>;
+	var img_regexp			= /<img.+?".+\/(.+?)&#.+?".+/;
+
+	var column;
+	var html;
+	var id;
+	var row;
+
+	for (row = 1; row <= virtual_cell_count; row++)
+	{
+		for (column = 1; column <= virtual_cell_count; column++)
+		{
+			id		= build_virtual_id(column, row)
+			html	= $('#' + id).html();
+			match	= img_regexp.exec(html);
+
+			if (match !== null)
+			{
+				thing_count++;
+
+				flower_list.push(row + joiner + column + joiner + match[1]);
+			}
+		}
+	}
+
+	if (thing_count == 0)
+	{
+		user_message('Error', 'No thumbnails planted in the virtual garden!');
+	}
+	else
+	{
+		var flowers			= flower_list.join(joiner);
+		var g_selectedIndex	= design_garden_menu.selectedIndex;
+		var garden_name		= design_garden_menu.options[g_selectedIndex].text; // Or, perhaps, '.value'.
+		var p_selectedIndex	= design_property_menu.selectedIndex;
+		var property_name	= design_property_menu.options[p_selectedIndex].text; // Or, perhaps, '.value'.
+		var ok				= confirm("Do you really want to overwrite garden '" + garden_name
+								+ "' at property '" + property_name + "'?");
+
+		if (ok !== false)
+		{
+			process_design_save(flowers, garden_name, property_name);
+		}
+	}
+
+	return false;
+
+} // End of confirm_design_save.
+
+// -----------------------------------------------
+
+function crosscheck(action)
+{
+	$.ajax
+	({
+		data:
+		{
+		},
+		dataType:	'text',
+		method:		'POST',
+		url:		'/Report/crosscheck', // See routes at end of WWW::Garden::Design.startup().
+	})
+	.done(function(html)
+	{
+		$('#crosscheck_result_div')
+		.empty()
+		.append(html);
+	});
+
+} // End of crosscheck.
+
+// -----------------------------------------------
+
+function find_index_of_property_id(property_id)
+{
+	var index = 0;
+
+	if (property_id > 0)
+	{
+		for (var i = 0; i < properties_table.length; i++)
+		{
+			if (properties_table[i]['id'] == property_id)
+			{
+				index = i;
+
+				break;
+			}
+		}
+	}
+
+	return index;
+
+} // End of find_index_of_property_id.
+
+// -----------------------------------------------
+// Note: Changed means the user changed the selected item.
+
+function design_property_menu_changed(data)
+{
+	//	for( key in data )
+	//	{
+	//		alert( "key is " + [ key ] + ", value is " + data[ key ] );
+	//	}
+
+	// Typical keys for data.item are:
+	//	o label => The property item's text (name column value).
+	//	o value => The property item's # (primary key column value).
+
+	design_current_property_id = data.item.value;
+
+	for (var i = 0; i < gardens_table.length; i++)
+	{
+		if (gardens_table[i]['property_id'] == design_current_property_id)
+		{
+			build_garden_menu(design_current_property_id, gardens_current_garden_id, 'design_garden_menu');
+
+			// set_garden_fields_1() is not called because the garden's fields are not used on the Design tab.
+
+			break;
+		}
+	}
+
+} // End of design_property_menu_changed.
+
+// -----------------------------------------------
+// Note: Changed means the user changed the selected item.
+
+function feature_menu_changed(data)
+{
+	//	for( key in data )
+	//	{
+	//		alert( "key is " + [ key ] + ", value is " + data[ key ] );
+	//	}
+
+	// Typical keys for data.item are:
+	//	o label => The feature item's text (name column value).
+	//	o value => The feature item's # (primary key column value).
+
+	features_current_feature_id = data.item.value;
+
+	for (var i = 0; i < features_table.length; i++)
+	{
+		if (features_table[i]['id'] == features_current_feature_id)
+		{
+			set_feature_fields(i);
+
+			break;
+		}
+	}
+
+} // End of feature_menu_changed.
+
+// -----------------------------------------------
+// Note: Changed means the user changed the selected item.
+
+function gardens_garden_menu_changed(data)
+{
+	//	for( key in data )
+	//	{
+	//		alert( "key is " + [ key ] + ", value is " + data[ key ] );
+	//	}
+
+	// Typical keys for data.item are:
+	//	o label => The garden item's text (name column value).
+	//	o value => The garden item's # (primary key column value).
+
+	gardens_current_garden_id = data.item.value;
+
+	for (var i = 0; i < gardens_table.length; i++)
+	{
+		if (gardens_table[i]['id'] == gardens_current_garden_id)
+		{
+			set_garden_fields_1(i);
+
+			break;
+		}
+	}
+
+} // End of gardens_garden_menu_changed.
+
+// -----------------------------------------------
+// Note: Changed means the user changed the selected item.
+
+function gardens_property_menu_1_changed(data)
+{
+	//	for( key in data )
+	//	{
+	//		alert( "key is " + [ key ] + ", value is " + data[ key ] );
+	//	}
+
+	// Typical keys for data.item are:
+	//	o label => The property item's text (name column value).
+	//	o value => The property item's id # (primary key column value).
+
+	gardens_current_property_id_1 = data.item.value;
+
+	for (var i = 0; i < gardens_table.length; i++)
+	{
+		if (gardens_table[i]['property_id'] == gardens_current_property_id_1)
+		{
+			index = build_garden_menu(gardens_current_property_id_1, gardens_current_garden_id, 'gardens_garden_menu');
+
+			set_garden_fields_1(index);
+
+			break;
+		}
+	}
+
+} // End of gardens_property_menu_1_changed.
+
+// -----------------------------------------------
+// Note: Changed means the user changed the selected item.
+
+function gardens_property_menu_2_changed(data)
+{
+	//	for( key in data )
+	//	{
+	//		alert( "key is " + [ key ] + ", value is " + data[ key ] );
+	//	}
+
+	// Typical keys for data.item are:
+	//	o label => The property item's text (name column value).
+	//	o value => The property item's id # (primary key column value).
+
+	gardens_current_property_id_2 = data.item.value;
+
+	set_garden_fields_2();
+
+} // End of gardens_property_menu_2_changed.
+
+// -----------------------------------------------
+
+function get_attribute_types()
+{
+	$.get
+	(
+		'/GetTable/attribute_types', // See routes at end of WWW::Garden::Design.startup().
+		null,
+		function(json)
+		{
+			attribute_types_table = json;
+		},
+		'json'
+	);
+
+} // End of get_attribute_types.
+
+// -----------------------------------------------
+
+function get_design_feature()
+{
+	$.ajax
+	({
+		data:
+		{
+			design_feature: $('#design_feature').val()
+		},
+		dataType:	'text',
+		method:		'POST',
+		url:		'/GetTable/design_feature', // See routes at end of WWW::Garden::Design.startup().
+	})
+	.done(function(image_path)
+	{
+		if (image_path.length > 0)
+		{
+			$('#design_feature_thumbnail')
+			.html("<img src = '" + image_path + "'>"); // + get_design_image_size_string() + '>');
+		}
+	});
+
+} // End of get_design_feature.
+
+// -----------------------------------------------
+
+function get_design_feature_icon()
+{
+	var html = $('#design_feature_thumbnail').html();
+
+	if (html.length > 0)
+	{
+		chosen_thing = html;
+	}
+
+} // End of get_design_feature_icon.
+
+// -----------------------------------------------
+
+function get_design_flower()
+{
+	$.ajax
+	({
+		data:
+		{
+			design_flower: $('#design_flower').val()
+		},
+		dataType:	'text',
+		method:		'POST',
+		url:		'/GetTable/design_flower', // See routes at end of WWW::Garden::Design.startup().
+	})
+	.done(function(image_path)
+	{
+		if (image_path.length > 0)
+		{
+			$('#design_flower_thumbnail')
+			.html("<img src = '" + image_path + "'>"); // + get_design_image_size_string() + '>');
+		}
+	});
+
+} // End of get_design_flower.
+
+// -----------------------------------------------
+
+function get_design_flower_icon()
+{
+	var html = $('#design_flower_thumbnail').html();
+
+	if (html.length > 0)
+	{
+		chosen_thing = html;
+	}
+
+} // End of get_design_flower_icon.
+
+// -----------------------------------------------
+
+function get_design_image_size_string()
+{
+	var thumbnail_size = <%== $$constants{virtual_cell_size} %>;
+
+	return "width = '" + thumbnail_size + "' height = '" + thumbnail_size + "'";
+
+} // End of get_design_image_size_string.
+
+// -----------------------------------------------
+
+function get_feature_image_size_string()
+{
+	var thumbnail_size = <%== $$constants{virtual_cell_size} %>;
+
+	return "width = '" + thumbnail_size + "' height = '" + thumbnail_size + "'";
+
+} // End of get_feature_image_size_string.
+
+// -----------------------------------------------
+// Warning: This function cannot be used to populate gardens_garden_menu_span
+// since that involves changing the DOM, but the function is called from within
+// the document ready context which assumes the DOM has stopped changing.
+
+function get_gardens_table()
+{
+	$.get
+	(
+		'/GetTable/gardens', // See routes at end of WWW::Garden::Design.startup().
+		null,
+		function(json)
+		{
+			gardens_table = json;
+
+			set_garden_fields_1(0);
+		},
+		'json'
+	);
+
+} // End of get_gardens_table.
+
+// -----------------------------------------------
+// Warning: This function cannot be used to populate feature_menu_span
+// since that involves changing the DOM, but the function is called from within
+// the document ready context which assumes the DOM has stopped changing.
+// Warning: See also comment within code.
+
+function get_features_table()
+{
+	$.get
+	(
+		'/GetTable/features', // See routes at end of WWW::Garden::Design.startup().
+		null,
+		function(json)
+		{
+			features_table = json;
+
+			set_feature_fields(0);
+
+			// Warning: get_gardens_table() is not called where get_features_table() is called,
+			// because when placed there it pauses for 15 seconds.
+
+			get_gardens_table();
+			get_properties_table();
+		},
+		'json'
+	);
+
+} // End of get_features_table.
+
+// -----------------------------------------------
+// Warning: This function cannot be used to populate gardens_garden_menu_span
+// since that involves changing the DOM, but the function is called from within
+// the document ready context which assumes the DOM has stopped changing.
+
+function get_properties_table()
+{
+	$.get
+	(
+		'/GetTable/properties', // See routes at end of WWW::Garden::Design.startup().
+		null,
+		function(json)
+		{
+			properties_table = json;
+
+			set_properties_property_fields_1(0);
+		},
+		'json'
+	);
+
+} // End of get_properties_table.
+
+// -----------------------------------------------
+
+function get_search_image_size_string()
+{
+	var thumbnail_size = <%== $$constants{search_thumbnail_size} %>;
+
+	return "width = '" + thumbnail_size + "' height = '" + thumbnail_size + "'";
+
+} // End of get_search_image_size_string.
+
+// -----------------------------------------------
+
+function plant_flower(id, row, column)
+{
+	if (chosen_thing.length > 0)
+	{
+		$(id).html(chosen_thing);
+	}
+
+} // End of plant_flower.
+
+// -----------------------------------------------
+
+function populate_details(flower_id)
+{
+	$.ajax
+	({
+		data:
+		{
+			flower_id: flower_id
+		},
+		dataType:	'json',
+		method:		'POST',
+		url:		'/GetFlowerDetails' // See routes at end of WWW::Garden::Design.startup().
+	})
+	.done(function(flower)
+	{
+		// Make the Details tab, tab 1, active.
+
+		$('#global_tab_div')
+		.tabs('option', 'active', 1);
+
+		// Copy flower data to the Details/Flower tab.
+
+		$('#flower_common_name')
+		.val(flower['common_name']);
+
+		$('#flower_scientific_name')
+		.val(flower['scientific_name']);
+
+		$('#flower_aliases')
+		.val(flower['aliases']);
+
+		$('#flower_height')
+		.val(flower['height']);
+
+		$('#flower_publish')
+		.prop('checked', (flower['publish'] == 'Yes') ? true : false);
+
+		$('#flower_width')
+		.val(flower['width']);
+
+		var homepage_url		= <%== $$constants{homepage_url4js} %>;
+		var image_url			= <%== $$constants{image_url4js} %>;
+		var image_path			= homepage_url + image_url + '/' + flower['pig_latin'] + '.0.jpg';
+		var thumbnail_html		= "<img src = '" + image_path + "' " + get_search_image_size_string() + '>';
+
+		$('#flower_thumbnail')
+		.html(thumbnail_html);
+
+		// Copy basic flower data to the Details/Flower's other sub-tabs.
+		// Warning: Don't include 'details' in the tabs array, because
+		// it's fields are input fields, while all others are spans.
+
+		var tabs = ['attribute', 'note', 'image', 'url'];
+		var vars = ['common_name', 'scientific_name'];
+
+		for (var i = 0; i < tabs.length; i++)
+		{
+			for (var j = 0; j < vars.length; j++)
+			{
+				id = '#' + tabs[i] + '_' + vars[j];
+
+				$(id)
+				.text(flower[vars[j] ]);
+			}
+		}
+
+		// Copy attributes to the Details/Attributes tab.
+
+		var range = [];
+
+		var attribute_name;
+		var value;
+
+		// Attributes: Copy attribute types to the Flower/Attributes tab.
+		// 1: Remove any existing attributes.
+
+		for (var i = 0; i < attribute_types_table.length; i++)
+		{
+			attribute_name	= attribute_types_table[i]['name'];
+			range			= attribute_types_table[i]['range'].split(', ');
+
+			for (var j = 0; j < range.length; j++)
+			{
+				value	= range[j];
+				id		= build_attribute_id('attribute', attribute_name, value);
+
+				$(id)
+				.prop('checked', false);
+			}
+		}
+
+		var attribute;
+		var attribute_type_name;
+
+		// 2: Loop over all attributes owned by this flower.
+
+		for (var i = 0; i < flower['attributes'].length; i++)
+		{
+			attribute		= flower['attributes'][i];
+			attribute_name	= attribute['name'];
+			range			= attribute['range'].split(', ');
+
+			// Loop over all attribute types.
+
+			for (var j = 0; j < attribute_types_table.length; j++)
+			{
+				attribute_type_name = attribute_types_table[j]['name'];
+
+				// Find the attribute type whose name matches the name of the flower's attribute.
+
+				if (attribute_name != attribute_type_name)
+				{
+					continue;
+				}
+
+				for (var k = 0; k < range.length; k++)
+				{
+					value	= range[k];
+					id		= build_attribute_id('attribute', attribute_name, value);
+
+					if (value != '')
+					{
+						$(id)
+						.prop('checked', true);
+					}
+				}
+			}
+		}
+
+		// Images: Copy images to the Details/Images tab.
+		// 1: Remove any existing images.
+
+		var ids			= [];
+		var image_count	= <%== $$constants{max_image_count} %>;
+
+		for (var i = 0; i < image_count; i++)
+		{
+			ids[i] = build_image_ids(i + 1); // Used in this loop and the next.
+
+			// For the HTML column order, see templates/initialize/images.html.ep.
+
+			$(ids[i][0])
+			.val('');	// Description.
+
+			$(ids[i][1])
+			.val('');	// File name.
+
+			$(ids[i][2])
+			.html('');	// Image.
+
+			//$(ids[i][3])
+			//.text('');	// Sequence. Not used.
+		}
+
+		// 2: Loop over all images owned by this flower.
+		// This code reuses var id = [].
+
+		image_count = (flower['images'].length > image_count) ? image_count : flower['images'].length;
+
+		var description;
+		var file_name;
+		var sequence;
+
+		for (var i = 0; i < image_count; i++)
+		{
+			description		= flower['images'][i]['description'];
+			file_name		= flower['images'][i]['file_name'];
+			sequence		= flower['images'][i]['sequence'];
+			image_path		= homepage_url + image_url + '/' + file_name;
+			thumbnail_html	= "<img src = '" + image_path + "' " + get_search_image_size_string() + '>';
+
+			// For the HTML column order, see templates/initialize/images.html.ep.
+
+			$(ids[i][0])
+			.val(description);
+
+			$(ids[i][1])
+			.val(file_name);
+
+			$(ids[i][2])
+			.html(thumbnail_html);
+
+			//$(ids[i][3])
+			//.text(sequence); Not used.
+		}
+
+		// Notes: Copy notes to the Details/Notes tab.
+		// 1: Remove any existing notes.
+		// This code reuses var id = [].
+
+		note_count = <%== $$constants{max_note_count} %>;
+
+		for (var i = 0; i < note_count; i++)
+		{
+			ids[i] = build_note_ids(i + 1); // Used in this loop and the next.
+
+			// For the HTML column order, see templates/initialize/notes.html.ep.
+
+			$(ids[i][0])
+			.val('');	// Note.
+
+			//$(ids[i][1])
+			//.val('');	// Sequence. Not used.
+		}
+
+		// 2: Loop over all notes owned by this flower.
+		// This code reuses var id = [].
+
+		note_count = (flower['notes'].length > note_count) ? note_count : flower['notes'].length;
+
+		var note;
+
+		for (var i = 0; i < note_count; i++)
+		{
+			note		= flower['notes'][i]['note'];
+			sequence	= flower['notes'][i]['sequence'];
+
+			// For the HTML column order, see templates/initialize/notes.html.ep.
+
+			$(ids[i][0])
+			.val(note);
+
+			//$(ids[i][1])
+			//.val(sequence); Not used.
+		}
+
+		// URLs: Copy urls to the Details/URLs tab.
+		// 1: Remove any existing URLs.
+		// This code reuses var id = [].
+
+		url_count = <%== $$constants{max_url_count} %>;
+
+		for (var i = 0; i < url_count; i++)
+		{
+			ids[i] = build_url_ids(i + 1); // Used in this loop and the next.
+
+			// For the HTML column order, see templates/initialize/urls.html.ep.
+
+			//$(ids[i][0])
+			//.val('');	// Sequence. Not used.
+
+			$(ids[i][1])
+			.val('');	// URL.
+		}
+
+		// 2: Loop over all URLs owned by this flower.
+		// This code reuses var id = [].
+
+		url_count = (flower['urls'].length > url_count) ? url_count : flower['urls'].length;
+
+		var url;
+
+		for (var i = 0; i < url_count; i++)
+		{
+			sequence	= flower['urls'][i]['sequence'];
+			url			= flower['urls'][i]['url'];
+
+			// For the HTML column order, see templates/initialize/urls.html.ep.
+
+			//$(ids[i][0])
+			//.val(sequence); Not used.
+
+			$(ids[i][1])
+			.val(url);
+		}
+	})
+	.fail(function(jqxhr, textStatus, error)
+	{
+		alert('Ajax status: ' + textStatus + ', ' + error);
+	});
+
+} // End of populate_details.
+
+// -----------------------------------------------
+
+function process_design_delete()
+{
+	alert('Delete');
+
+	return false;
+
+} // End of process_design_delete.
+
+// -----------------------------------------------
+
+function process_design_load()
+{
+	alert('Load');
+
+	return false;
+
+} // End of process_design_load.
+
+// -----------------------------------------------
+
+function process_design_reset()
+{
+	alert('Reset');
+
+	return false;
+
+} // End of process_design_reset.
+
+// -----------------------------------------------
+
+function process_design_save(flowers, garden_name, property_name)
+{
+	var garden_id	= '#design_garden_menu';
+	var property_id	= '#design_property_menu';
+
+	$.ajax
+	({
+		data:
+		{
+			flowers:		flowers,
+			garden_index:	$(garden_id).val(), // Primary key.
+			garden_name:	garden_name,
+			property_index:	$(property_id).val(), // Primary key.
+			property_name:	property_name
+		},
+		dataType:	'text',
+		method:		'POST',
+		url:		'/Design', // See routes at end of WWW::Garden::Design.startup().
+	})
+	.done(function(html)
+	{
+		$('#design_result_div')
+		.empty()
+		.append(html);
+	});
+
+} // End of process_design_save.
+
+// -----------------------------------------------
+// Note: Changed means the user changed the selected item.
+
+function properties_property_menu_changed(data)
+{
+	//	for( key in data )
+	//	{
+	//		alert( "key is " + [ key ] + ", value is " + data[ key ] );
+	//	}
+
+	// Typical keys for data.item are:
+	//	o label => The property item's text (name column value).
+	//	o value => The property item's # (primary key column value).
+
+	properties_current_property_id = data.item.value;
+
+	for (var i = 0; i < properties_table.length; i++)
+	{
+		if (properties_table[i]['id'] == properties_current_property_id)
+		{
+			set_properties_property_fields_1(i);
+
+			break;
+		}
+	}
+
+} // End of properties_property_menu_changed.
+
+// -----------------------------------------------
+
+function set_feature_fields(i)
+{
+	$('#color_code')
+	.val(features_table[i]['hex_color']);
+
+	$('#feature_name')
+	.val(features_table[i]['name'])
+	.focus();
+
+	$('#feature_icon')
+	.attr('src', features_table[i]['feature_url']);
+
+	$('#color_spectrum')
+	.spectrum('set', features_table[i]['hex_color']);
+
+	$('#color_swatch_chosen')
+	.css('background-color', features_table[i]['hex_color']);
+
+	$('#feature_publish')
+	.prop('checked', (features_table[i]['publish'] == 'Yes') ? true : false);
+
+	// Put color in hidden form field for submit.
+
+	$('#color_chosen')
+	.val(features_table[i]['hex_color']);
+
+} // End of set_feature_fields.
+
+// -----------------------------------------------
+
+function set_garden_fields_1(i)
+{
+	$('#garden_description')
+	.val(gardens_table[i]['description']);
+
+	$('#garden_name')
+	.val(gardens_table[i]['name']);
+
+	$('#garden_publish') // In gardens_table, do not use the 'garden_publish' (Yes/No) string!
+	.prop('checked', (gardens_table[i]['publish'] == 'Yes') ? true : false);
+
+} // End of set_garden_fields_1.
+
+// -----------------------------------------------
+
+function set_garden_fields_2()
+{
+	$('#new_garden_description')
+	.val('');
+
+	$('#new_garden_name')
+	.val('');
+
+	$('#new_garden_publish') // In gardens_table, do not use the 'garden_publish' (Yes/No) string!
+	.prop('checked', false);
+
+} // End of set_garden_fields_2.
+
+// -----------------------------------------------
+
+function set_properties_property_fields_1(i)
+{
+	properties_current_property_id = properties_table[i]['id'];
+
+	$('#properties_property_description')
+	.val(properties_table[i]['description']);
+
+	$('#properties_property_name')
+	.val(properties_table[i]['name']);
+
+	$('#properties_property_publish') // In properties_table, do not use the 'publish' (Yes/No) string!
+	.prop('checked', (properties_table[i]['publish'] == 'Yes') ? true : false);
+
+} // End of set_properties_property_fields_1.
+
+// -----------------------------------------------
+
+function set_properties_property_fields_2()
+{
+	$('#new_property_description')
+	.val('');
+
+	$('#new_property_name')
+	.val('');
+
+	$('#new_property_publish') // In properties_table, do not use the 'publish' (Yes/No) string!
+	.prop('checked', false);
+
+} // End of set_properties_property_fields_2.
+
+// -----------------------------------------------
+
+function set_virtual_parameters()
+{
+	// Initialize globals.
+
+	var virtual_cell_count	= <%== $$constants{virtual_cell_count} %>;
+	var table				= "<table align = 'center' class = 'bordered' width = '100%'>\n";
+
+	var column;
+	var id;
+	var row;
+
+	for (row = 1; row <= virtual_cell_count; row++)
+	{
+		table += "\t<tr>\n";
+
+		for (column = 1; column <= virtual_cell_count; column++)
+		{
+			id		= build_virtual_id(column, row)
+			table	+= "<td class = 'generic_border_margin'>" +
+						"<div id = '" + id + "'>(" + row + ',' + column + ')</div></td>';
+		}
+
+		table += "\n\t</tr>\n";
+	}
+
+	table += '</table>';
+
+	$('#virtual_garden').html(table);
+
+	$("#virtual_garden td").click(function()
+	{
+		column	= parseInt( $(this).index() ) + 1;
+		row		= parseInt( $(this).parent().index() )+1;
+		id		= '#id_' + row + '_' + column;
+
+		plant_flower(id, row, column);
+	});
+
+} // End of set_virtual_parameters.
+
+// -----------------------------------------------
+//		edible:				document.edible.value,
+//		habit:				document.habit.value,
+//		native:				document.native.value,
+//		sun_tolerance:		document.sun_tolerance.value
+
+function submit_details()
+{
+	// Bundle up the attributes.
+
+<%== $attribute_elements %>
+	var attribute_list = [];
+
+	var joiner = '<%== $joiner %>';
+
+	var id;
+	var key;
+	var value;
+
+	for (var kind in attributes)
+	{
+		for (var i = 0; i < attributes[kind].length; i++)
+		{
+			id		= build_attribute_id('attribute', kind, attributes[kind][i]);
+			value	= $(id).prop('checked');
+
+			if (value == true)
+			{
+				attribute_list.push(kind + joiner + attributes[kind][i]);
+			}
+		}
+	}
+
+	// Bundle up the images.
+	// We assume the displayed image numbers are the same as in the for loop,
+	// so we don't include them in the packet sent to the server.
+
+	var image_count	= <%== $$constants{max_image_count} %>;
+	var image_list	= [];
+
+	// Warning: This loop starts from 1 even though elsewhere image loops start from 0.
+
+	var file_name;
+
+	for (var i = 1; i <= image_count; i++)
+	{
+		id			= '#image_file_name_' + i;
+		file_name	= $(id).val() || '';
+		id			= '#image_description_' + i;
+
+		image_list.push('image_' + i, file_name, $(id).val() || '');
+	}
+
+	// Bundle up the notes.
+	// We assume the displayed note numbers are the same as in the for loop,
+	// so we don't include them in the packet sent to the server.
+
+	var note_count	= <%== $$constants{max_note_count} %>;
+	var note_list	= [];
+
+	// Warning: This loop starts from 1 even though elsewhere note loops start from 0.
+
+	for (var i = 1; i <= note_count; i++)
+	{
+		id = '#note_note_' + i;
+
+		note_list.push('note_' + i, $(id).val() );
+	}
+
+	// Bundle up the URLs.
+
+	var url_count	= <%== $$constants{max_url_count} %>;
+	var url_list	= [];
+
+	// Warning: This loop starts from 1 even though elsewhere URL loops start from 0.
+
+	for (var i = 1; i <= url_count; i++)
+	{
+		id = '#url_url_' + i;
+
+		url_list.push('url_' + i, $(id).val() );
+	}
+
+	$.ajax
+	({
+		data:
+		{
+			aliases:			$('#flower_aliases').val(),
+			attribute_list:		attribute_list.join(joiner),
+			common_name:		$('#flower_common_name').val(),
+			csrf_token:			$('#csrf_token').val(),
+			height:				$('#flower_height').val(),
+			publish:			$('#flower_publish').prop('checked') ? 'Yes' : 'No',
+			width:				$('#flower_width').val(),
+			image_list:			image_list.join(joiner),
+			note_list:			note_list.join(joiner),
+			scientific_name:	$('#flower_scientific_name').val(),
+			url_list:			url_list.join(joiner)
+		},
+		dataType:	'html',
+		method:		'POST',
+		url:		'/Flower' // See routes at end of WWW::Garden::Design.startup().
+	})
+	.done(function(html)
+	{
+		$('#flower_result_div')
+		.empty()
+		.append(html);
+	})
+	.fail(function(jqxhr, textStatus, error)
+	{
+		alert('Ajax status: ' + textStatus + ', ' + error);
+	});
+
+} // End of submit_details.
+
+// -----------------------------------------------
+
+function submit_search()
+{
+	var fields = new Object();
+
+	fields['csrf_token']	= $('#csrf_token').val();
+	fields['search_text']	= $('#search_text').val();
+
+	// Copy attributes from the search form.
+
+	var range = [];
+
+	var attribute_name;
+	var id;
+	var name;
+	var value;
+
+	for (var i = 0; i < attribute_types_table.length; i++)
+	{
+		attribute_name	= attribute_types_table[i]['name'];
+		range			= attribute_types_table[i]['range'].split(', ');
+
+		for (var j = 0; j < range.length; j++)
+		{
+			value			= range[j];
+			id				= build_attribute_id('search', attribute_name, value);
+			name			= id.substr(1); // Discard leading '#' to get the name to submit.
+			fields[name]	= $(id).prop('checked'); // Returns 'true' or 'false'.
+		}
+	}
+
+	$.ajax
+	({
+		data:		fields,
+		dataType:	'html',
+		type:		'POST',
+		url:		'/Search' // See routes at end of WWW::Garden::Design.startup().
+	})
+	.done(function(html)
+	{
+		$('#search_result_div')
+		.empty()
+		.append(html);
+
+		$('#search_text')
+		.focus();
+	})
+	.fail(function(jqxhr, textStatus, error)
+	{
+		alert('Ajax status: ' + textStatus + ', ' + error);
+	});
+
+} // End of submit_search.
+
+// -----------------------------------------------
+
+function update_feature(action)
+{
+	var color_chosen	= $('#color_chosen').val();
+	var name			= $('#feature_name').val();
+
+	if ( (color_chosen == '') || (name == '') )
+	{
+		user_message('Error', 'Both the color name and feature name are mandatory');
+
+		return;
+	}
+
+	if (action == 'delete')
+	{
+		var ok = confirm('Are you sure you wish to delete the feature ' + name + '?');
+
+		if (ok == false)
+		{
+			return;
+		}
+	}
+
+	$.post
+	(
+		// See routes at end of WWW::Garden::Design.startup().
+
+		'/Feature',
+		{
+			action:			action, // 'delete' or 'update'.
+			color_chosen:	color_chosen,
+			color_code:		$('#color_code').val(),
+			color_name:		$('#color_name').val(),
+			id:				features_current_feature_id,
+			name:			name,
+			publish:		$('#feature_publish').prop('checked') ? 'Yes' : 'No'
+		},
+		function(packet)
+		{
+			if (packet.message.outcome != 'Error')
+			{
+				$('#feature_icon')
+				.attr('src', packet.tile_status.file_url);
+
+				// Update the feature menu on the Features tab.
+
+				features_current_feature_id	= packet.message.feature_id;
+				features_table				= packet.features_table;
+
+				build_feature_menu(features_current_feature_id, 'feature_menu', packet.feature_menu);
+
+				set_feature_fields(0);
+			}
+
+			user_feedback(packet.message);
+		},
+		'json'
+	);
+
+} // End of update_feature.
+
+// -----------------------------------------------
+
+function update_garden(action)
+{
+	var name = $('#garden_name').val();
+
+	if (name == '')
+	{
+		user_message('Error', 'The garden name is mandatory');
+
+		return;
+	}
+
+	if (action == 'delete')
+	{
+		var ok = confirm('Are you sure you wish to delete the garden ' + name + '?');
+
+		if (ok == false)
+		{
+			return;
+		}
+	}
+
+	var index			= gardens_property_menu_1.selectedIndex;
+	var property_name	= gardens_property_menu_1.options[index].text;
+	var property_id		= gardens_property_menu_1.options[index].value; // Not used.
+
+	$.post
+	(
+		// See routes at end of WWW::Garden::Design.startup().
+
+		'/Garden',
+		{
+			action:			action, // 'delete' or 'update'.
+			description:	$('#garden_description').val(),
+			id:				gardens_current_garden_id,
+			name:			name,
+			property_id:	gardens_current_property_id_1,
+			property_name:	property_name,
+			publish:		$('#garden_publish').prop('checked') ? 'Yes' : 'No',
+		},
+		function(packet)
+		{
+			// Update the upper garden menu on the Gardens tab.
+
+			gardens_table				= packet.gardens_table;
+			index						= build_garden_menu(gardens_current_property_id_1, gardens_current_garden_id, 'gardens_garden_menu');
+			gardens_current_garden_id	= gardens_table[index]['id']; // Update because previous one might have been deleted.
+
+			set_garden_fields_1(index);
+
+			user_feedback(packet.message);
+		},
+		'json'
+	);
+
+} // End of update_garden.
+
+// -----------------------------------------------
+
+function update_property(action)
+{
+	var name = $('#properties_property_name').val();
+
+	if (name == '')
+	{
+		user_message('Error', 'The property name is mandatory');
+
+		return;
+	}
+
+	var has_gardens = false;
+
+	for (var i = 0; i < gardens_table.length; i++)
+	{
+		if (name == gardens_table[i]['property_name'])
+		{
+			has_gardens = true;
+
+			break;
+		}
+	}
+
+	if ( (action == 'delete') && (has_gardens == true) )
+	{
+		user_message('Error', 'You cannot delete a property which has gardens');
+
+		return;
+	}
+
+	if (action == 'delete')
+	{
+		var ok = confirm('Are you sure you wish to delete the property ' + name + '?');
+
+		if (ok == false)
+		{
+			return;
+		}
+	}
+
+	$.post
+	(
+		// See routes at end of WWW::Garden::Design.startup().
+
+		'/Property',
+		{
+			action:			action, // 'delete' or 'update'.
+			description:	$('#properties_property_description').val(),
+			id:				properties_current_property_id,
+			name:			name,
+			publish:		$('#properties_property_publish').prop('checked') ? 'Yes' : 'No'
+		},
+		function(packet)
+		{
+			// Update the property menu on the Properties tab.
+
+			properties_current_property_id	= packet.message.property_id;
+			properties_table				= packet.properties_table;
+
+			build_property_menu(properties_current_property_id, 'properties_property_menu', packet.property_menu);
+
+			var index = find_index_of_property_id(properties_current_property_id);
+
+			set_properties_property_fields_1(index);
+
+			// Update the upper property menu on the Gardens tab.
+			// We do this because an existing property may have been renamed.
+
+			var regexp			= /properties_property_menu/g;
+			var new_menu_name	= 'gardens_property_menu_1';
+			var property_menu	= packet.property_menu.replace(regexp, new_menu_name);
+
+			build_property_menu(gardens_current_property_id_1, new_menu_name, property_menu);
+
+			// Update the lower property menu on the Gardens tab.
+
+			regexp			= /gardens_property_menu_1/g;
+			new_menu_name	= 'design_property_menu';
+			property_menu	= packet.property_menu.replace(regexp, new_menu_name);
+
+			build_property_menu(gardens_current_property_id_2, new_menu_name, property_menu);
+
+			// The previously selected property may have been deleted.
+
+			gardens_current_property_id_2 = properties_current_property_id;
+
+			user_feedback(packet.message);
+		},
+		'json'
+	);
+
+} // End of update_property.
+
+// -----------------------------------------------
+
+function user_feedback(message)
+{
+	var boldlight = humane.create({baseCls: 'humane-boldlight', timeout: 3000})
+
+	if (message.outcome == 'Error')
+	{
+		boldlight.error = boldlight.spawn({addnCls: 'humane-boldlight-error'});
+
+		boldlight.error(message.raw);
+	}
+	else
+	{
+		boldlight.success = boldlight.spawn({addnCls: 'humane-boldlight-success'});
+
+		boldlight.success('Success: ' + message.raw);
+	}
+
+} // End of user_feedback.
+
+// -----------------------------------------------
+
+function user_message(outcome, raw)
+{
+	var obj		= new Object;
+	obj.outcome	= outcome;
+	obj.raw		= raw;
+
+	user_feedback(obj);
+
+} // End of user_message.
+
+// -----------------------------------------------
+
+$(function()
+{
+	$('.design_garden_toolbar').controlgroup();
+	$('.gardens_gardentoolbar').controlgroup();
+	$('.feature_toolbar').controlgroup();
+
+	window_width	= window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+	window_height	= window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+	set_virtual_parameters();
+	get_attribute_types();
+	get_features_table();	// This also gets the gardens and properties tables. Warning: See code for comment.
+
+	// Enable the tabs before trying to work with them.
+
+	$('global_tab_div')
+	.tabs
+	({
+		active: 1
+	});
+
+	$("#global_details_tab")
+	.tabs
+	({
+		active: 0
+	});
+
+	$("#global_help_tab")
+	.tabs
+	({
+		active: 0
+	});
+
+	$("#global_report_tab")
+	.tabs
+	({
+		active: 0
+	});
+
+	// If the Search tab is selected, give the focus to the search text.
+
+	$('#global_tab_div')
+	.tabs
+	({
+		activate: function(event, ui)
+		{
+			$('#search_text')
+			.focus();
+		}
+	});
+
+	// ======
+	// Colors
+	// ======
+
+	$('#color_spectrum')
+	.spectrum
+	({
+		change:				function(color)
+							{
+								$('#color_chosen')
+								.val(color.toHexString() ); // Put color in hidden form field for submit.
+
+								$('#color_swatch_chosen')
+								.css('background-color', color.toHexString() );
+							},
+		color:				'white',
+		preferredFormat:	'hex',
+		showInput:			true,
+		showPalette:		true
+	});
+
+	$('#new_color_spectrum')
+	.spectrum
+	({
+		change:				function(color)
+							{
+								$('#new_color_code')
+								.val(color.toHexString() ); // Make code visible to the user.
+
+								$('#new_color_chosen')
+								.val(color.toHexString() ); // Put color in hidden form field for submit.
+
+								$('#new_color_swatch_chosen')
+								.css('background-color', color.toHexString() );
+							},
+		color:				'white',
+		preferredFormat:	'hex',
+		showInput:			true,
+		showPalette:		true
+	});
+
+	// =======
+	// Designs
+	// =======
+
+	$('#design_feature')
+	.blur(function()
+	{
+		get_design_feature();
+	});
+
+	$('#design_feature_thumbnail')
+	.click(function()
+	{
+		get_design_feature_icon();
+	});
+
+	$('#design_flower')
+	.blur(function()
+	{
+		get_design_flower();
+	});
+
+	$('#design_flower_thumbnail')
+	.click(function()
+	{
+		get_design_flower_icon();
+	});
+
+	$('#design_form')
+	.keypress
+	(
+		function(event)
+		{
+			if (event.which == '13')
+			{
+				event.preventDefault();
+			}
+		}
+	);
+
+	$('#design_property_menu')
+	.selectmenu
+	({
+		change: function(event, data)
+		{
+			design_property_menu_changed(data);
+		}
+	});
+
+	// =======
+	// Details
+	// =======
+
+	$('#details_form')
+	.submit(function()
+	{
+		submit_details();
+
+		return false;
+	});
+
+	// ========
+	// Features
+	// ========
+
+	$('#feature_form_1')
+	.keypress
+	(
+		function(event)
+		{
+			if (event.which == '13')
+			{
+				event.preventDefault();
+			}
+		}
+	)
+	.submit(function()
+	{
+		return false;
+	});
+
+	$('#feature_form_2')
+	.keypress
+	(
+		function(event)
+		{
+			if (event.which == '13')
+			{
+				event.preventDefault();
+			}
+		}
+	)
+	.submit(function()
+	{
+		return false;
+	});
+
+	$('#feature_menu')
+	.selectmenu
+	({
+		change: function(event, data)
+		{
+			feature_menu_changed(data);
+		}
+	});
+
+	// =======
+	// Gardens
+	// =======
+
+	$('#garden_form_1')
+	.keypress
+	(
+		function(event)
+		{
+			if (event.which == '13')
+			{
+				event.preventDefault();
+			}
+		}
+	)
+	.submit(function()
+	{
+		return false;
+	});
+
+	$('#garden_form_2')
+	.keypress
+	(
+		function(event)
+		{
+			if (event.which == '13')
+			{
+				event.preventDefault();
+			}
+		}
+	)
+	.submit(function()
+	{
+		return false;
+	});
+
+	$('#gardens_garden_menu')
+	.selectmenu
+	({
+		change: function(event, data)
+		{
+			gardens_garden_menu_changed(data);
+		}
+	});
+
+	$('#gardens_property_menu_1')
+	.selectmenu
+	({
+		change: function(event, data)
+		{
+			gardens_property_menu_1_changed(data);
+		}
+	});
+
+	$('#gardens_property_menu_2')
+	.selectmenu
+	({
+		change: function(event, data)
+		{
+			gardens_property_menu_2_changed(data);
+		}
+	});
+
+	// ==========
+	// Properties
+	// ==========
+
+	$('#property_form_1')
+	.keypress
+	(
+		function(event)
+		{
+			if (event.which == '13')
+			{
+				event.preventDefault();
+			}
+		}
+	)
+	.submit(function()
+	{
+		return false;
+	});
+
+	$('#property_form_2')
+	.keypress
+	(
+		function(event)
+		{
+			if (event.which == '13')
+			{
+				event.preventDefault();
+			}
+		}
+	)
+	.submit(function()
+	{
+		return false;
+	});
+
+	$('#properties_property_menu')
+	.selectmenu
+	({
+		change: function(event, data)
+		{
+			properties_property_menu_changed(data);
+		}
+	});
+
+	$('#activity_form_1')
+	.submit(function()
+	{
+		return false;
+	});
+
+	$('#crosscheck_form_1')
+	.submit(function()
+	{
+		return false;
+	});
+
+	// ======
+	// Report
+	// ======
+
+	// ========
+	// Searches
+	// ========
+
+	$('#search_form')
+	.submit(function()
+	{
+		submit_search();
+
+		return false;
+	});
+
+	$('#search_text')
+	.focus();
+
+	// Warning: Do not use jQuery UI on checkboxes or radio buttons.
+	// There is a myriad of problems, especially related to timing of clicks.
+
+});
+
+</script>
+
+</html>

@@ -7,18 +7,18 @@ use warnings;
 #  Test Harness
 #
 use Test::More;
+use FindBin qw($RealBin $Script);
+use lib $RealBin;
+use pagi_compat_helper qw(pagi_skip_reason);
 
 
 #  Skip test if missing any modules or no mod_perl
 #
 BEGIN {
-    my @missing;
-    for my $m (qw(PAGI::Test::Client PAGI::Request PAGI::Response PAGI::SSE PAGI::WebSocket Future::AsyncAwait)) {
-        eval "require $m; 1" or push @missing, $m;
-    }
-    if (@missing) {
-        plan skip_all => "Skipping PAGI tests: missing " . join(", ", @missing);
-    }
+    unshift @INC, 't';
+    require pagi_compat_helper;
+    my $skip=pagi_compat_helper::pagi_skip_reason(qw(PAGI::Test::Client PAGI::Request PAGI::Response PAGI::SSE PAGI::WebSocket Future::AsyncAwait));
+    plan skip_all => "Skipping PAGI tests: $skip" if $skip;
     #plan skip_all => "AUTHOR_TEST not set, omitting PAGI test" unless $ENV{'AUTHOR_TEST'};
     
 }
@@ -35,8 +35,6 @@ BEGIN {
 
 #  Modules we need
 #
-use FindBin qw($RealBin $Script);
-use lib $RealBin;
 use test_diff_helper qw(eq_or_diff_text_test);
 use File::Find qw(find);
 use File::Basename;

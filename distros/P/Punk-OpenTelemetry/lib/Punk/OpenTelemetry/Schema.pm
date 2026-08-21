@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # All of it is C (include/otel_schema.h + xs/schema.xs). The one call back out
 # is the YAML parse: the format needs a parser, which parser is a runtime
@@ -112,6 +112,10 @@ the edge makes that a config change rather than a coordinated redeploy.
 
 =head2 load(path => $file) / load(text => $yaml)
 
+A schema file read from disk, or parsed from a string already in hand. The
+string form is what a test uses; the path form is for a schema this
+distribution does not ship.
+
 =head2 load() / load(version => $v, dir => $d)
 
 With no source, the shipped file for the version this dist emits. With a
@@ -139,6 +143,11 @@ C<$signal> is C<spans>, C<metrics> or C<logs>. The payload is modified in
 place and returned.
 
 =head2 schema_url / versions / knows($version)
+
+C<schema_url> is the URL this loaded schema describes. C<versions> is the
+version list in file order, and in scalar context their B<count> rather than
+the last of them. C<knows> is whether a given version appears in it, which is
+what to ask before handing C<convert> below a version a caller supplied.
 
 =head1 SEE ALSO
 

@@ -75,11 +75,7 @@
 # define VMG_COMPAT_ARRAY_UNDEF_CLEAR 0
 #endif
 
-#if XSH_HAS_PERL(5, 11, 0)
-# define VMG_COMPAT_HASH_DELETE_NOUVAR_VOID 1
-#else
-# define VMG_COMPAT_HASH_DELETE_NOUVAR_VOID 0
-#endif
+#define VMG_COMPAT_HASH_DELETE_NOUVAR_VOID 0
 
 #if XSH_HAS_PERL(5, 17, 0)
 # define VMG_COMPAT_CODE_COPY_CLONE 1
@@ -1731,6 +1727,7 @@ static I32 vmg_svt_val(pTHX_ IV action, SV *sv) {
                                 mg->mg_obj, key);
     break;
    case HV_DELETE:
+   case (HV_DELETE|G_DISCARD):
     if (w->cb_delete)
      vmg_cb_call2(w->cb_delete, w->opinfo | VMG_CB_CALL_GUARD, sv,
                                 mg->mg_obj, key);

@@ -32,7 +32,7 @@ static int oa_fetch_init(pTHX) {
     PUTBACK; FREETMPS; LEAVE;
     if (p) {
         const fetch_abi *f = INT2PTR(const fetch_abi *, p);
-        if (f && f->abi_version == FETCH_ABI_VERSION) OA_FETCH = f;
+        if (f && f->abi_version >= FETCH_ABI_VERSION) OA_FETCH = f;
     }
     return OA_FETCH != NULL;
 }

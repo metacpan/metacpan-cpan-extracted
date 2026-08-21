@@ -5,7 +5,7 @@ use version;
 use Carp qw(croak);
 use parent 'PAGI::FastAPI::Security::Base';
 
-our $VERSION   = qv('v0.0.4');
+our $VERSION   = qv('v0.0.6');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf-8
@@ -16,7 +16,7 @@ PAGI::FastAPI::Security::OAuth2::PasswordBearer - OAuth2 password-bearer scheme 
 
 =head1 VERSION
 
-Version v0.0.4
+Version v0.0.6
 
 =head1 SYNOPSIS
 
@@ -70,9 +70,11 @@ Default: true.
 =cut
 
 sub new ($class, %opts) {
-    croak "OAuth2::PasswordBearer requires a 'token_url' option"
+    die "PAGI::FastAPI::Security::OAuth2::PasswordBearer requires a 'token_url' option"
         unless defined $opts{token_url} && length $opts{token_url};
+
     $opts{scopes} //= {};
+    $opts{realm}  //= 'Restricted';
 
     return $class->SUPER::new(%opts);
 }
@@ -100,7 +102,9 @@ sub _extract ($self, $c) {
 }
 
 sub _failure ($self) {
-    return (401, 'Not authenticated', ['WWW-Authenticate' => 'Bearer']);
+    my $realm = $self->{realm};
+    $realm =~ s/"/\\"/g;
+    return (401, 'Not authenticated', ['WWW-Authenticate' => qq{Bearer realm="$realm"}]);
 }
 
 =head1 AUTHOR
@@ -130,10 +134,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/PAGI-FastAPI-Security/issues>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/PAGI-FastAPI-Security>
 
 =item * Search MetaCPAN
 

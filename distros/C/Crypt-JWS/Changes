@@ -1,5 +1,8 @@
 Revision history for Crypt-JWS
 
+0.03    2026-08-20
+        - FIX: change abi version checks from == to <=
+
 0.02    2026-08-16
         Fix load failure on LibreSSL (OpenBSD base): cjws_key_alloc no
         longer calls OPENSSL_zalloc, which LibreSSL does not provide -

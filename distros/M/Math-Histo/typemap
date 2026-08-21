@@ -1,0 +1,55 @@
+TYPEMAP
+histo_t *               T_HISTO
+histo2d_t *             T_HISTO2D
+histo_fit_result_t *    T_HISTOFIT
+histo_sketch_t *        T_HISTOSKETCH
+uint32_t                T_UV
+uint64_t                T_UV
+int32_t                 T_IV
+int64_t                 T_IV
+
+OUTPUT
+T_HISTO
+	sv_setref_pv($arg, \"Math::Histo\", (void*)$var);
+
+T_HISTO2D
+	sv_setref_pv($arg, \"Math::Histo::2D\", (void*)$var);
+
+T_HISTOFIT
+	sv_setref_pv($arg, \"Math::Histo::Fit::Result\", (void*)$var);
+
+T_HISTOSKETCH
+	sv_setref_pv($arg, \"Math::Histo::Sketch\", (void*)$var);
+
+INPUT
+T_HISTO
+	if (SvROK($arg) && sv_derived_from($arg, \"Math::Histo\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR(histo_t*, tmp);
+	} else {
+	    croak(\"${Package}::$func_name(): argument is not a blessed Math::Histo reference\");
+	}
+
+T_HISTO2D
+	if (SvROK($arg) && sv_derived_from($arg, \"Math::Histo::2D\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR(histo2d_t*, tmp);
+	} else {
+	    croak(\"${Package}::$func_name(): argument is not a blessed Math::Histo::2D reference\");
+	}
+
+T_HISTOFIT
+	if (SvROK($arg) && sv_derived_from($arg, \"Math::Histo::Fit::Result\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR(histo_fit_result_t*, tmp);
+	} else {
+	    croak(\"${Package}::$func_name(): argument is not a blessed Math::Histo::Fit::Result reference\");
+	}
+
+T_HISTOSKETCH
+	if (SvROK($arg) && sv_derived_from($arg, \"Math::Histo::Sketch\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR(histo_sketch_t*, tmp);
+	} else {
+	    croak(\"${Package}::$func_name(): argument is not a blessed Math::Histo::Sketch reference\");
+	}

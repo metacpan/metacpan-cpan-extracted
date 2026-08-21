@@ -19,8 +19,8 @@ my $tmp_dn=tempdir(CLEANUP => 1);
 my $api_fn=File::Spec->catfile($tmp_dn, 'api_route_isolation.psp');
 open(my $api_fh, '>', $api_fn) || die "unable to open '$api_fn' for write, $!";
 print {$api_fh} <<'END_API';
-<api handler=first pattern="/api/first">
-<api handler=second pattern="/api/second">
+<api handler=first pattern="/first">
+<api handler=second pattern="/second">
 __PERL__
 sub first {
     return { route => 'first' };
@@ -31,7 +31,7 @@ sub second {
 END_API
 close($api_fh) || die "unable to close '$api_fn', $!";
 
-local $ENV{'PATH_INFO'}='/api/second';
+local $ENV{'PATH_INFO'}='/second';
 
 my $json=html($api_fn);
 like($json, qr/"route"\s*:\s*"second"/, 'second API route dispatches to second handler');
@@ -39,6 +39,6 @@ like($json, qr/"route"\s*:\s*"second"/, 'second API route dispatches to second h
 $json=html($api_fn);
 like($json, qr/"route"\s*:\s*"second"/, 'second API route still dispatches correctly on repeated render');
 
-local $ENV{'PATH_INFO'}='/api/first';
+local $ENV{'PATH_INFO'}='/first';
 $json=html($api_fn);
 like($json, qr/"route"\s*:\s*"first"/, 'first API route dispatches to first handler after cache reuse');

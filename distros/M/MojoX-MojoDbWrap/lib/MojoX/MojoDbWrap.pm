@@ -1,6 +1,6 @@
 package MojoX::MojoDbWrap;
 use v5.24;
-{ our $VERSION = '0.004' }
+{ our $VERSION = '0.006' }
 
 use Moo;
 use warnings;
@@ -25,7 +25,6 @@ sub coerce_wrappers ($x) {
                ref($tablish) eq 'ARRAY' ? $tablish->@* : ($tablish, 'id');
             my $ext_opts = {
                ($opts // {})->%*,
-               on_conflict => undef,
                returning   => $idf,
             };
             return $self->db->insert($tbl, $data, $ext_opts)->hash->{id};
@@ -41,7 +40,6 @@ sub coerce_wrappers ($x) {
             my $tbl = ref($tablish) eq 'ARRAY' ? $tablish->[0] : $tablish;
             my $ext_opts = {
                ($opts // {})->%*,
-               on_conflict => undef,
             };
             return $self->db->insert($tbl, $data, $ext_opts)->last_insert_id;
          },
@@ -121,15 +119,26 @@ sub id_or_insert ($self, $tablish, $condition, $default, $opts = undef) {
       [ id_or_insert => $tablish, $condition, $default, $opts];
 }
 
+sub insert ($self, $tablish, $data, $opts = undef) {
+   return $self->_inserter->($self, $tablish, $data, $opts // {});
+}
+
 sub select ($self, @args) {
    return $self->mdb->db->select(@args);
 }
 
-#sub upsert ($self, $table, $data, $opts = undef) {
-#   $opts //= {};
-#   $self->db->insert($table, $data, { $opts->%*, on_conflict => $data });
-#   return $self;
-#}
+sub upsert ($self, $tablish, $data, $opts = undef) {
+   $opts = { ($opts // {})->%* }; # copy for fiddling
+   if (defined(my $conflicting = delete($opts->{conflicting}))) {
+      my %reduced_data = (
+         map { $_ => $data->{$_} }
+            grep { $_ ne $conflicting }
+            keys($data->%*)
+      );
+      $opts->{on_conflict} = [ $conflicting => \%reduced_data ];
+   }
+   return $self->insert($tablish, $data, $opts);
+}
 
 sub init ($self, $name = 'migrations') {
    my $migrations = $self->migrations_for // {};

@@ -1,9 +1,8 @@
 ---
-abstract: 'Deal, score, and calculate expected win rates of poker hands. Base class for specific game types. '
+abstract: 'Deal, score, and evaluate poker hands'
 author:
   - 'Nathaniel Graham <ngraham@cpan.org>'
-requires:
-  perl: '5.006'
+build_requires:
   Algorithm::Combinatorics: '0'
   List::Util: '0'
   Moo: '0'
@@ -12,7 +11,7 @@ requires:
   Tie::IxHash: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -23,5 +22,7 @@ no_index:
   directory:
     - t
     - inc
-version: '0.09'
+requires:
+  perl: '5.006'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

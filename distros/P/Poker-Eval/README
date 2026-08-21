@@ -1,82 +1,150 @@
 Poker-Eval
 
-VERSION 0.09
+VERSION 0.11
 
-Deal, score, and evaluate poker hands. All major scoring systems 
-are covered, including highball, lowball 8 or better, lowball 2-7, 
-lowball A-5, badugi, chinese, split-pot, and wildcard.  That covers 
-just about every poker variant I can think of, including weird split-pot 
-mashups like Badeucy and Badacey. See Poker::Score and Poker::Eval 
-for further details.
+Deal, score, and estimate equity for many poker variants through a named
+Poker::Game API (Hold'em, Omaha, draw, stud, Badugi, and more).
+
+
+SYNOPSIS
+
+    use Poker::Game::Holdem;
+    use feature qw(say);
+
+    my $game = Poker::Game::Holdem->new;
+
+    # Evaluate a made hand on a full board
+    my $hero = $game->deal_hole(['As', 'Kd']);
+    $game->flop(['Ah', '7c', '2d']);
+    $game->turn('9s');
+    $game->river('3c');
+    $game->evaluate($hero);
+    say $hero->name;              # Two Pair
+    say $hero->score;             # numerical strength
+    say $hero->best_combo_flat;   # e.g. AsAhKdKc9s
+
+    # Estimate preflop equity (Monte Carlo)
+    $game->reset;
+    $game->iterations(2000);
+    my $aa = $game->deal_hole(['As', 'Ad']);
+    my $kk = $game->deal_hole(['Ks', 'Kd']);
+    $game->equity([ $aa, $kk ]);
+    say "Hero    AA: ", $aa->ev, "%";
+    say "Villain KK: ", $kk->ev, "%";
+    # Typical result: AA ~82%, KK ~18%
+
+
+CARD NAMES
+
+    Rank:  2 3 4 5 6 7 8 9 T J Q K A
+    Suit:  c d h s     (e.g. As, Td, 2c)
+    Jokers: Jo1, Jo2   (when using a joker deck)
+
+
+WHAT IS EQUITY?
+
+Equity is the estimated share of the pot a hand wins if the remaining
+board is completed many times at random from the undealt cards.
+
+Each simulation awards 1.0 pot unit total:
+  - sole winner receives 1.0
+  - N tied winners each receive 1/N
+
+Results are a percentage of simulations, rounded to the nearest integer
+(ev values across hands sum to about 100). Known hole cards and any
+fixed board cards are dead and never re-dealt.
+
+    $game->iterations(5000);
+    $game->equity([ $hero, $villain ]);
+
+
+CORE METHODS (Poker::Game)
+
+    deal_hole       Random or specific hole cards; returns a Poker::Hand
+    deal_cards      Pull specific cards from the deck by name (e.g. 'As')
+    flop/turn/river Community board streets (Hold'em-style games)
+    runout          Deal all remaining board cards when legal
+    evaluate        Best hand under this game's rules; sets score, name
+    equity          Monte Carlo win share; sets hand->ev (alias: calc_ev)
+    discard / draw  Draw-game discard and refill
+                    (Crazy Pineapple: discard one hole card after the flop)
+    reset           New shuffled deck; clear board and draw state
+
+Stud games add street helpers (see Poker::Game::Stud):
+    third_street .. seventh_street, deal_to
+
+After evaluate, read the result from the hand:
+
+    $hand->name             # e.g. "Two Pair"
+    $hand->score            # numerical score for this ranking system
+                            # (higher is better within that system)
+    $hand->best_combo_flat  # cards used in the best five
+    $hand->low_name         # hi-lo games only, if low qualifies
+    $hand->low_score        # hi-lo games only, if low qualifies
+
+See: perldoc Poker::Game
+
+
+NAMED GAMES
+
+    Community
+      Holdem              Texas Hold'em (high)
+      HoldemJokersWild    Hold'em with two jokers wild
+      Pineapple           Three hole cards
+      CrazyPineapple      Three hole; discard one after the flop
+      Omaha / OmahaHiLo   Four hole; exactly two hole + three board
+      Omaha5 / Omaha5HiLo Five-card Omaha
+      Courcheval          Five-card Omaha; board dealt 1+2+1+1
+      CourchevalHiLo      Courchevel high/low
+
+    Draw
+      FiveCardDraw                Highball single draw
+      FiveCardDrawDeucesWild      Deuces wild
+      FiveCardDrawJokersWild      Two jokers wild
+      Low27SingleDraw/TripleDraw  2-7 lowball
+      LowA5SingleDraw/TripleDraw  A-5 lowball
+
+    Stud
+      SevenCardStud / SevenCardStudHiLo
+      Razz                        Seven-card stud A-5 low
+
+    Badugi family
+      Badugi                      Four cards, triple draw
+      Badacey                     Badugi + A-5 low split
+      Badeucy                     Badugi (aces high) + 2-7 low split
+
+Advanced users can still compose Poker::Eval::* rules with
+Poker::Score::* ranking systems directly.
+
+Only Poker::Eval defines $VERSION for the distribution so CPAN indexes
+a single package.
+
+Requires: Moo, Algorithm::Combinatorics, Tie::IxHash, List::Util, Storable
+
 
 INSTALLATION
 
-To install this module, run the following commands:
+    perl Makefile.PL
+    make
+    make test
+    make install
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+
+CHANGE LOG
+
+See the Changes file in the distribution.
+
 
 SUPPORT AND DOCUMENTATION
 
-After installing, you can find documentation for this module with the
-perldoc command.
-
-    perldoc Poker::Dealer, Poker::Score, Poker::Eval
-
-You can also look for information at:
-
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Poker-Eval
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Poker-Eval
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Poker-Eval
-
-    Search CPAN
-        http://search.cpan.org/dist/Poker-Eval/
+    perldoc Poker::Eval
+    perldoc Poker::Game
+    perldoc Poker::Game::Holdem
 
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Nathaniel Graham
+Copyright (C) 2016-2026 Nathaniel Graham
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+under the terms of the Artistic License (2.0).

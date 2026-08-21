@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # The protocol half is C (include/otel_grpc.h + xs/grpc.xs). This file is
 # documentation.
@@ -49,7 +49,9 @@ like it works: telemetry vanishes and every indicator stays green.
 
 For the same reason, a B<missing> C<grpc-status> is not success. It means the
 stream ended without the server saying how it went - a transport failure, and
-retryable. L</verdict> treats it that way.
+retryable.
+L<verdict|/"verdict($have_status, $code, $has_retry_info)">
+treats it that way.
 
 =head2 Retryable codes
 
@@ -70,8 +72,9 @@ produces a request the collector rejects with a confusing message.
 =head2 Ports
 
 C<4317> for gRPC, C<4318> for HTTP. Getting this wrong is the single most
-common OTLP misconfiguration, which is why L</default_port> states it rather
-than leaving it to a default somewhere else.
+common OTLP misconfiguration, which is why
+L<default_port|/"default_port($protocol) / headers($compressed)">
+states it rather than leaving it to a default somewhere else.
 
 =head1 WHERE THE STATUS IS FOUND
 
@@ -91,8 +94,9 @@ status on exactly the responses that failed fastest.
 
 =back
 
-L</classify> looks in the trailers first and then the headers, so a trailer
-wins over a stale header of the same name.
+L<classify|/"classify($res)">
+looks in the trailers first and then the headers, so a trailer wins over a
+stale header of the same name.
 
 =head1 REQUIREMENTS
 
@@ -130,6 +134,12 @@ arrived over a network.
 
 =head2 retryable($code, $has_retry_info)
 
+Whether a gRPC status code may be retried. C<RESOURCE_EXHAUSTED> is the odd
+one and needs the second argument: it is retryable only when the server sent
+C<RetryInfo> in the details. Without it the server is refusing a quota, and
+retrying a quota refusal on a timer is how a client turns its own rate limit
+into an outage.
+
 =head2 verdict($have_status, $code, $has_retry_info)
 
 C<0> ok, C<1> retry, C<2> permanent - the same verdicts the HTTP transport
@@ -143,6 +153,16 @@ knows when it will be ready and the client does not.
 
 =head2 default_port($protocol) / headers($compressed)
 
+C<default_port> is C<4317> for C<grpc> and C<4318> for anything else. Stated
+here rather than left implicit because pointing a gRPC exporter at the HTTP
+port is the most common OTLP misconfiguration there is.
+
+C<headers> is the header list a gRPC request must carry:
+C<content-type: application/grpc+proto> and C<te: trailers>, plus
+C<grpc-encoding: gzip> when compressed. C<te: trailers> is not optional - it
+is how a client tells the server it will read the trailing metadata, and
+L</THE STATUS IS IN THE TRAILERS> is where the status lives.
+
 =head2 classify($res)
 
 C<($verdict, $code, $message, $retry_after)> from a L<Fetch::Response>. See
@@ -153,6 +173,12 @@ L</WHERE THE STATUS IS FOUND>.
 Frame the payload and POST it to the signal's service path, returning the
 agent's future. C<$endpoint> is a scheme, host and port with B<no path> - the
 path is protocol, not configuration.
+
+=head1 SEE ALSO
+
+L<Punk::OpenTelemetry::Exporter>, the same job over HTTP, and
+L<Punk::OpenTelemetry::Config> for the C<OTEL_EXPORTER_OTLP_PROTOCOL> setting
+that chooses between them.
 
 =head1 AUTHOR
 

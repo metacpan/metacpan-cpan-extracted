@@ -27,7 +27,6 @@ use HTTP::Status qw(:constants is_success is_error);
 use IO::String;
 use Data::Dumper;
 use Cwd qw(fastcwd);
-use File::Basename;
 use File::Spec;
 
 
@@ -63,7 +62,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.019';
+$VERSION='3.020';
 
 
 #==================================================================================================
@@ -202,15 +201,15 @@ sub handler {
                 if (my $api_fn=$self->api_filename($r)) {
                     debug("status: $status, fn:$fn (%s), found API match, dispatching", $r->filename());
                     my %api_env=%{$env_hr};
-                    my $api_dn=dirname(File::Spec->abs2rel($api_fn, $r->document_root));
-                    if ($api_dn ne '.') {
-                        #  Treat the discovered API file as mounted at its
-                        #  containing directory. This keeps <api> patterns
-                        #  portable when the app is served from a parent dir,
-                        #  but means nested fallback APIs should use local
-                        #  patterns, not document-root relative patterns.
-                        $api_env{'PATH_INFO'}=~s{^/\Q$api_dn\E(?=/|$)}{}i;
-                    }
+                    my $api_path=File::Spec->abs2rel($api_fn, $r->document_root);
+                    $api_path=~s{\Q@{[WEBDYNE_PSP_EXT]}\E$}{};
+
+                    #  Treat the discovered API file path as the mount point.
+                    #  If /example/api.psp owns /example/api/foo, the route
+                    #  pattern inside the file is just /foo. This deliberately
+                    #  decouples the PSP filename from the Router::Simple path.
+                    #
+                    $api_env{'PATH_INFO'}=~s{^/\Q$api_path\E(?=/|$)}{}i;
                     return $self->handler(\%api_env, filename=>$api_fn);
                 }
                 

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.27';
 
 sub new { bless {}, $_[0] }
 
@@ -20,27 +20,29 @@ Punk::Plugin - base class for Punk plugins
 
 =head1 SYNOPSIS
 
-    package Punk::Plugin::RequestId;
+    package Punk::Plugin::Maintenance;
     use parent 'Punk::Plugin';
-
-    my $rid = 0;
 
     sub register {
         my ($self, $app, $opts) = @_;
-        $app->helper(rid => sub { my ($c) = @_; $c->stash->{rid} });
-        # before_request, not before_dispatch: an id every request has,
-        # including the ones that 404 or never match a route at all
-        $app->hook(before_request => sub {
+        my $flag = $opts->{file} || '/etc/myapp/maintenance';
+
+        $app->helper(in_maintenance => sub { -e $flag });
+
+        # before_dispatch: returning a reference short-circuits the
+        # request, so this answers before any guard or handler runs
+        $app->hook(before_dispatch => sub {
             my ($c) = @_;
-            $c->stash->{rid} = ++$rid;
-            return;
+            return unless -e $flag;
+            return $c->text('back shortly', 503);
         });
     }
 
     1;
 
     # in the app:
-    plugin 'RequestId';
+    plugin 'Maintenance';
+    plugin 'Maintenance' => { file => '/tmp/down' };
 
 =head1 DESCRIPTION
 
@@ -58,6 +60,38 @@ at boot, naming both owners.
 
 C<plugin 'Name'> resolves to C<Punk::Plugin::Name>; C<'+Full::Class'>
 uses the class as written.
+
+=head2 What the hook phases can and cannot see
+
+C<before_request> runs before routing, so it sees every request - including
+the ones that 404, 405, or are answered by a static mount.
+C<before_dispatch> runs after a route matches, which is the right phase for
+anything done on the client's behalf. C<after_dispatch> runs on the way out.
+
+B<C<after_dispatch> does not see every response.> Punk's dispatcher has exits
+that finish without reaching it - the house 404 and 405 among them - so a
+plugin that must touch B<every> response cannot be written with this surface
+alone. L<Punk::Plugin::RequestId>, which this distribution ships, needs
+exactly that and is built on an internal seam instead; if you find yourself
+wanting the same thing, read its source rather than assuming
+C<after_dispatch> will do.
+
+B<C<before_dispatch> runs ahead of a route's guards.> The order is
+C<before_dispatch>, then the guards a C<under> scope put on the route, then
+the handler - so a hook here sees requests an authentication guard is about
+to refuse. That is fine for anything advisory and wrong for anything that
+answers: a hook that short-circuits with a response has answered a request
+the guard would have rejected. L<Punk::Plugin::ConditionalGet> needed to run
+after the guards for exactly this reason - a C<304> issued before
+authentication is an authorisation check turned into a cache hit - and is on
+an internal seam too. There is currently no public phase between the guards
+and the handler.
+
+=head2 A shipped example
+
+L<Punk::Plugin::RequestId> is the plugin bundled with Punk. It registers a
+helper the ordinary way and is worth reading for the shape of a real one, with
+the caveat above about where it goes further than this API.
 
 =head2 KEYWORDS OF YOUR OWN
 

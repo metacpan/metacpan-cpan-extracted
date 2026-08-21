@@ -1,0 +1,36 @@
+<table align = 'center' summary = 'Table for various headings and navigation'>
+	<tr>
+		<td align = 'center'>
+			<span class = 'black_on_reddish_title'><a id = 'the_flower_catalog'>The Flower Catalog</a></span>
+		</td>
+	</tr>
+	<tr>
+		<td align = 'center'>
+			Click column headings to sort<br />
+		</td>
+	</tr>
+</table>
+
+<table align = 'center' class = 'datatable' id = 'result_table' summary = 'The Flower Catalog'>
+	<thead>
+		: for $thead -> $item {
+		<tr>
+		: include "basic.column.tx" { column => $item };
+		</tr>
+		: }
+	</thead>
+	<tbody>
+		: for $tbody-> $item {
+		<tr>
+		: include "basic.column.tx" { column => $item };
+		</tr>
+		: }
+	</tbody>
+	<tfoot>
+		: for $thead -> $item {
+		<tr>
+		: include "basic.column.tx" { column => $item };
+		</tr>
+		: }
+	</tfoot>
+</table>

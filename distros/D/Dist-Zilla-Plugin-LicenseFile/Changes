@@ -1,0 +1,18 @@
+Revision history for Dist-Zilla-Plugin-LicenseFile
+
+0.001     2026-08-19 17:02:08Z
+  - Initial release.
+  - New plugin `[LicenseFile]`: on every build, compare the `LICENSE`
+    gathered from the repository against the licence the distribution
+    declares, and abort when the file is missing or no longer matches.
+    The `required = 0` attribute downgrades both checks to a warning,
+    for migrating an existing distribution.
+  - New command `dzil genlicense`: write that text into `LICENSE` in the
+    repository root, so the file can be committed and the hosting
+    platform can detect the licence. Idempotent — writing the same text
+    twice reports `LICENSE is up to date` and touches nothing.
+  - Both write and expect the bare licence text rather than
+    Software::License's `fulltext`. The copyright notice `fulltext` puts
+    above the licence is enough to stop GitHub's detector: the same
+    repository reports NOASSERTION with `fulltext` and Artistic-2.0
+    with the bare text.

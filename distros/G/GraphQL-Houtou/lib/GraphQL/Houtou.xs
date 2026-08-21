@@ -16,6 +16,7 @@ static SV *gql_runtime_vm_global_identity_callback_sv = NULL;
 static HV *gql_runtime_vm_outcome_stash = NULL;
 static HV *gql_runtime_vm_promise_xs_stash = NULL;
 static HV *gql_runtime_vm_dataloader_ticket_stash = NULL;
+static HV *gql_runtime_vm_dataloader_stash = NULL;
 
 /* Recycled resolve/reject callback pairs for armed pending entries. Each
  * newXS + magic attach costs more than the entry bookkeeping it drives, so
@@ -146,6 +147,133 @@ gql_runtime_vm_new_dataloader_ticket_sv(pTHX_ IV state, SV *value)
       gv_stashpvs("GraphQL::Houtou::DataLoader::Ticket", GV_ADD);
   }
   return sv_bless(newRV_noinc((SV *)av), gql_runtime_vm_dataloader_ticket_stash);
+}
+
+/*
+ * Declarative fields know that the selected value is a loader, so the
+ * reference implementation can stay entirely in XS instead of entering
+ * DataLoader::load and then returning to _enqueue_load_miss. Exact-stash
+ * matching deliberately preserves overridden load() semantics for
+ * subclasses, which continue through the ordinary method call.
+ */
+static int
+gql_runtime_vm_is_exact_dataloader(pTHX_ SV *loader)
+{
+  SV *rv;
+  if (!loader || !SvROK(loader)) {
+    return 0;
+  }
+  rv = SvRV(loader);
+  if (!SvOBJECT(rv) || SvTYPE(rv) != SVt_PVHV) {
+    return 0;
+  }
+  if (!gql_runtime_vm_dataloader_stash) {
+    gql_runtime_vm_dataloader_stash =
+      gv_stashpvs("GraphQL::Houtou::DataLoader", GV_ADD);
+  }
+  return SvSTASH(rv) == gql_runtime_vm_dataloader_stash;
+}
+
+static SV *
+gql_runtime_vm_dataloader_load_exact_sv(
+  pTHX_ SV *loader, SV *key, SV **error_out
+)
+{
+  HV *loader_hv;
+  SV **cache_enabled_svp;
+  SV **cache_key_cb_svp;
+  SV **promises_rv;
+  SV **queue_rv;
+  HV *promises_hv = NULL;
+  AV *queue_av;
+  SV *cache_key_sv = NULL;
+  SV *ticket_sv;
+  AV *entry_av;
+  int cache_enabled;
+
+  if (!key || !SvOK(key)) {
+    if (error_out && !*error_out) {
+      *error_out =
+        newSVpvs("GraphQL::Houtou::DataLoader::load requires a defined key");
+    }
+    return NULL;
+  }
+  loader_hv = (HV *)SvRV(loader);
+  cache_enabled_svp = hv_fetch(loader_hv, "cache", 5, 0);
+  cache_key_cb_svp = hv_fetch(loader_hv, "cache_key", 9, 0);
+  cache_enabled = !cache_enabled_svp || SvTRUE(*cache_enabled_svp);
+
+  if (cache_enabled && cache_key_cb_svp && SvOK(*cache_key_cb_svp)) {
+    dSP;
+    I32 count;
+    ENTER;
+    SAVETMPS;
+    sv_setsv(ERRSV, &PL_sv_undef);
+    PUSHMARK(SP);
+    XPUSHs(key);
+    PUTBACK;
+    count = call_sv(*cache_key_cb_svp, G_SCALAR | G_EVAL);
+    SPAGAIN;
+    if (SvTRUE(ERRSV)) {
+      if (error_out && !*error_out) {
+        *error_out = newSVsv(ERRSV);
+      }
+      sv_setsv(ERRSV, &PL_sv_undef);
+    } else if (count == 1) {
+      cache_key_sv = newSVsv(POPs);
+    }
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    if (!cache_key_sv) {
+      return NULL;
+    }
+  } else if (cache_enabled) {
+    cache_key_sv = newSVsv(key);
+  }
+
+  if (cache_enabled) {
+    HE *cached_he;
+    promises_rv = hv_fetch(loader_hv, "_promises", 9, 0);
+    if (!promises_rv || !*promises_rv || !SvROK(*promises_rv)
+        || SvTYPE(SvRV(*promises_rv)) != SVt_PVHV) {
+      SvREFCNT_dec(cache_key_sv);
+      if (error_out && !*error_out) {
+        *error_out = newSVpvs("invalid DataLoader cache");
+      }
+      return NULL;
+    }
+    promises_hv = (HV *)SvRV(*promises_rv);
+    cached_he = hv_fetch_ent(promises_hv, cache_key_sv, 0, 0);
+    if (cached_he) {
+      SV *cached = newSVsv(HeVAL(cached_he));
+      SvREFCNT_dec(cache_key_sv);
+      return cached;
+    }
+  }
+
+  queue_rv = hv_fetch(loader_hv, "_queue", 6, 0);
+  if (!queue_rv || !*queue_rv || !SvROK(*queue_rv)
+      || SvTYPE(SvRV(*queue_rv)) != SVt_PVAV) {
+    SvREFCNT_dec(cache_key_sv);
+    if (error_out && !*error_out) {
+      *error_out = newSVpvs("invalid DataLoader storage");
+    }
+    return NULL;
+  }
+  queue_av = (AV *)SvRV(*queue_rv);
+  ticket_sv = gql_runtime_vm_new_dataloader_ticket_sv(
+    aTHX_ 0, &PL_sv_undef
+  );
+  entry_av = newAV();
+  av_push(entry_av, newSVsv(key));
+  av_push(entry_av, newSVsv(ticket_sv));
+  av_push(queue_av, newRV_noinc((SV *)entry_av));
+  if (cache_enabled) {
+    hv_store_ent(promises_hv, cache_key_sv, newSVsv(ticket_sv), 0);
+    SvREFCNT_dec(cache_key_sv);
+  }
+  return ticket_sv;
 }
 
 /* Defined later (after gql_runtime_vm_xs_pending_callback/_reject_callback
@@ -4608,35 +4736,55 @@ gql_runtime_vm_try_execute_plain_hash_block_fast_sv(
 
   block = &bundle->blocks[block_index];
   source_hv = (HV *)SvRV(source);
+  if (block->plain_hash_projection_state == 0) {
+    block->plain_hash_projection_state = 2;
+    for (i = 0; i < block->op_count; i++) {
+      const gql_runtime_vm_native_op_t *op = &block->ops[i];
+      const gql_runtime_vm_native_slot_t *slot;
+      IV leaf_kind = GQL_VM_LEAF_NONE;
+
+      if (op->slot_index < 0 || op->slot_index >= block->slot_count
+          || op->resolve_code != GQL_VM_RESOLVE_DEFAULT
+          || op->complete_code != GQL_VM_COMPLETE_GENERIC
+          || op->child_block_index >= 0 || op->abstract_child_count > 0
+          || op->has_directives || op->has_runtime_directives
+          || op->runtime_directives_sv) {
+        block->plain_hash_projection_state = 1;
+        break;
+      }
+      slot = gql_runtime_vm_effective_slot(
+        runtime, &block->slots[op->slot_index]
+      );
+      if (!slot || slot->resolver_shape_code != GQL_VM_RESOLVE_DEFAULT
+          || (slot->accessor_name && slot->accessor_name_len)
+          || gql_runtime_vm_slot_resolver_sv(runtime, slot)) {
+        block->plain_hash_projection_state = 1;
+        break;
+      }
+      if (runtime->callback_catalog
+          && runtime->callback_catalog->slot_leaf_kinds
+          && slot->schema_slot_index >= 0
+          && slot->schema_slot_index < runtime->runtime_slot_count) {
+        leaf_kind = runtime->callback_catalog
+          ->slot_leaf_kinds[slot->schema_slot_index];
+      }
+      if (leaf_kind == GQL_VM_LEAF_CUSTOM) {
+        block->plain_hash_projection_state = 1;
+        break;
+      }
+    }
+  }
+  if (block->plain_hash_projection_state != 2) {
+    return NULL;
+  }
+
   for (i = 0; i < block->op_count; i++) {
     const gql_runtime_vm_native_op_t *op = &block->ops[i];
-    const gql_runtime_vm_native_slot_t *slot;
+    const gql_runtime_vm_native_slot_t *slot =
+      gql_runtime_vm_effective_slot(
+        runtime, &block->slots[op->slot_index]
+      );
     SV **value_svp;
-    IV leaf_kind = GQL_VM_LEAF_NONE;
-
-    if (op->slot_index < 0 || op->slot_index >= block->slot_count
-        || op->resolve_code != GQL_VM_RESOLVE_DEFAULT
-        || op->complete_code != GQL_VM_COMPLETE_GENERIC
-        || op->child_block_index >= 0 || op->abstract_child_count > 0
-        || op->has_directives || op->has_runtime_directives
-        || op->runtime_directives_sv) {
-      return NULL;
-    }
-    slot = gql_runtime_vm_effective_slot(runtime, &block->slots[op->slot_index]);
-    if (!slot || slot->resolver_shape_code != GQL_VM_RESOLVE_DEFAULT
-        || (slot->accessor_name && slot->accessor_name_len)
-        || gql_runtime_vm_slot_resolver_sv(runtime, slot)) {
-      return NULL;
-    }
-    if (runtime->callback_catalog
-        && runtime->callback_catalog->slot_leaf_kinds
-        && slot->schema_slot_index >= 0
-        && slot->schema_slot_index < runtime->runtime_slot_count) {
-      leaf_kind = runtime->callback_catalog->slot_leaf_kinds[slot->schema_slot_index];
-    }
-    if (leaf_kind == GQL_VM_LEAF_CUSTOM) {
-      return NULL;
-    }
     value_svp = hv_fetch(
       source_hv,
       slot->field_name,
@@ -4762,6 +4910,22 @@ gql_runtime_vm_exec_state_complete_current_native_async_sv(
       }
       if (child_block_index < 0) {
         return gql_runtime_vm_sync_outcome_result_sv(aTHX_ GQL_VM_KIND_SCALAR, resolved_sv, outcome_out);
+      }
+
+      /*
+       * A loader commonly settles to a plain row hash whose selected
+       * children are only default scalar reads. The list-completion path
+       * already proves and executes that shape without a resumable child
+       * frame; apply the same narrow fast path when the pending value is
+       * the object field itself.
+       */
+      child_value = gql_runtime_vm_try_execute_plain_hash_block_fast_sv(
+        aTHX_ s, child_block_index, resolved_sv, path_frame
+      );
+      if (child_value) {
+        return gql_runtime_vm_outcome_result_from_handle_sv(
+          aTHX_ child_value, outcome_out
+        );
       }
 
       /* Mode 1: a synchronously completed child comes back as a native
@@ -7021,6 +7185,143 @@ gql_runtime_vm_runtime_schema_exec_struct_sv(pTHX_ SV *runtime_schema)
 static const char *
 gql_runtime_vm_type_name_from_sv(pTHX_ SV *type_sv);
 
+static char *
+gql_runtime_vm_copy_loader_name_sv(pTHX_ SV *name_sv, STRLEN *len_out)
+{
+  STRLEN len = 0;
+  const char *pv;
+  char *copy;
+  if (!name_sv || !SvOK(name_sv)) {
+    return NULL;
+  }
+  pv = SvPV(name_sv, len);
+  copy = savepvn(pv, len);
+  if (len_out) {
+    *len_out = len;
+  }
+  return copy;
+}
+
+static void
+gql_runtime_vm_compile_loader_key_spec(
+  pTHX_
+  HV *key_hv,
+  U8 *kind_out,
+  char **name_out,
+  STRLEN *name_len_out
+)
+{
+  SV *source_key_sv = gql_runtime_vm_fetch_hash_entry_sv(
+    aTHX_ key_hv, "source_key", 10
+  );
+  SV *argument_sv = gql_runtime_vm_fetch_hash_entry_sv(
+    aTHX_ key_hv, "argument", 8
+  );
+  if (source_key_sv && SvOK(source_key_sv)) {
+    *kind_out = 1;
+    *name_out = gql_runtime_vm_copy_loader_name_sv(
+      aTHX_ source_key_sv, name_len_out
+    );
+  } else if (argument_sv && SvOK(argument_sv)) {
+    *kind_out = 2;
+    *name_out = gql_runtime_vm_copy_loader_name_sv(
+      aTHX_ argument_sv, name_len_out
+    );
+  }
+}
+
+static gql_runtime_vm_native_loader_spec_t *
+gql_runtime_vm_compile_loader_spec(pTHX_ SV *loader_spec_sv)
+{
+  HV *spec_hv;
+  SV *context_key_sv;
+  SV *router_sv;
+  SV *key_sv;
+  gql_runtime_vm_native_loader_spec_t *compiled;
+
+  if (!loader_spec_sv || !SvOK(loader_spec_sv)) {
+    return NULL;
+  }
+  spec_hv = gql_runtime_vm_expect_hashref(
+    aTHX_ loader_spec_sv, "declarative loader specification"
+  );
+  context_key_sv = gql_runtime_vm_fetch_hash_entry_sv(
+    aTHX_ spec_hv, "context_key", 11
+  );
+  router_sv = gql_runtime_vm_fetch_hash_entry_sv(
+    aTHX_ spec_hv, "router", 6
+  );
+  key_sv = gql_runtime_vm_fetch_hash_entry_sv(aTHX_ spec_hv, "key", 3);
+
+  Newxz(compiled, 1, gql_runtime_vm_native_loader_spec_t);
+  compiled->key_arg_index = -1;
+  compiled->route_key_arg_index = -1;
+  if (context_key_sv && SvOK(context_key_sv)) {
+    compiled->context_key = gql_runtime_vm_copy_loader_name_sv(
+      aTHX_ context_key_sv, &compiled->context_key_len
+    );
+  } else if (router_sv && SvOK(router_sv)) {
+    HV *router_hv = gql_runtime_vm_expect_hashref(
+      aTHX_ router_sv, "declarative loader router specification"
+    );
+    SV *router_context_key_sv = gql_runtime_vm_fetch_hash_entry_sv(
+      aTHX_ router_hv, "context_key", 11
+    );
+    SV *route_key_sv = gql_runtime_vm_fetch_hash_entry_sv(
+      aTHX_ router_hv, "route_key", 9
+    );
+    compiled->uses_router = 1;
+    compiled->context_key = gql_runtime_vm_copy_loader_name_sv(
+      aTHX_ router_context_key_sv, &compiled->context_key_len
+    );
+    if (route_key_sv && SvOK(route_key_sv)) {
+      gql_runtime_vm_compile_loader_key_spec(
+        aTHX_
+        gql_runtime_vm_expect_hashref(
+          aTHX_ route_key_sv, "declarative loader route key"
+        ),
+        &compiled->route_key_kind,
+        &compiled->route_key_name,
+        &compiled->route_key_name_len
+      );
+    }
+  }
+  if (key_sv && SvOK(key_sv)) {
+    gql_runtime_vm_compile_loader_key_spec(
+      aTHX_
+      gql_runtime_vm_expect_hashref(
+        aTHX_ key_sv, "declarative loader key"
+      ),
+      &compiled->key_kind,
+      &compiled->key_name,
+      &compiled->key_name_len
+    );
+  }
+  return compiled;
+}
+
+static IV
+gql_runtime_vm_find_loader_arg_index(
+  const gql_runtime_vm_native_slot_t *slot,
+  const char *name,
+  STRLEN name_len
+)
+{
+  IV i;
+  if (!slot || !name) {
+    return -1;
+  }
+  for (i = 0; i < slot->arg_def_count; i++) {
+    const char *arg_name = slot->arg_defs[i].name;
+    if (arg_name
+        && strlen(arg_name) == name_len
+        && memEQ(arg_name, name, name_len)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 static gql_runtime_vm_native_runtime_t *
 gql_runtime_vm_native_runtime_from_runtime_schema_sv(pTHX_ SV *runtime_schema)
 {
@@ -7029,8 +7330,10 @@ gql_runtime_vm_native_runtime_from_runtime_schema_sv(pTHX_ SV *runtime_schema)
   SV *exec_struct_sv;
   SV *catalog_sv;
   SV *resolver_catalog_sv;
+  SV *loader_spec_catalog_sv;
   AV *catalog_av;
   AV *resolver_catalog_av;
+  AV *loader_spec_catalog_av;
   SV *runtime_cache_sv;
   IV i;
 
@@ -7053,6 +7356,14 @@ gql_runtime_vm_native_runtime_from_runtime_schema_sv(pTHX_ SV *runtime_schema)
   resolver_catalog_av = (resolver_catalog_sv && SvOK(resolver_catalog_sv))
     ? gql_runtime_vm_expect_arrayref(aTHX_ resolver_catalog_sv, "runtime schema slot_resolvers")
     : NULL;
+  loader_spec_catalog_sv = gql_runtime_vm_fetch_hash_entry_sv(
+    aTHX_ schema_hv, "slot_loader_specs", 17
+  );
+  loader_spec_catalog_av = (loader_spec_catalog_sv && SvOK(loader_spec_catalog_sv))
+    ? gql_runtime_vm_expect_arrayref(
+        aTHX_ loader_spec_catalog_sv, "runtime schema slot_loader_specs"
+      )
+    : NULL;
 
   Newxz(runtime, 1, gql_runtime_vm_native_runtime_t);
   Newxz(runtime->callback_catalog, 1, gql_runtime_vm_native_callback_catalog_t);
@@ -7062,6 +7373,8 @@ gql_runtime_vm_native_runtime_from_runtime_schema_sv(pTHX_ SV *runtime_schema)
     Newxz(runtime->runtime_slots, runtime->runtime_slot_count, gql_runtime_vm_native_slot_t);
     Newxz(runtime->callback_catalog->slot_field_names, runtime->runtime_slot_count, SV *);
     Newxz(runtime->callback_catalog->slot_resolvers, runtime->runtime_slot_count, SV *);
+    Newxz(runtime->callback_catalog->slot_loader_specs, runtime->runtime_slot_count, SV *);
+    Newxz(runtime->callback_catalog->slot_native_loader_specs, runtime->runtime_slot_count, gql_runtime_vm_native_loader_spec_t *);
     Newxz(runtime->callback_catalog->slot_type_objects, runtime->runtime_slot_count, SV *);
     Newxz(runtime->callback_catalog->slot_tag_resolvers, runtime->runtime_slot_count, SV *);
     Newxz(runtime->callback_catalog->slot_resolve_types, runtime->runtime_slot_count, SV *);
@@ -7102,6 +7415,40 @@ gql_runtime_vm_native_runtime_from_runtime_schema_sv(pTHX_ SV *runtime_schema)
       }
       if (resolver_sv) {
         runtime->callback_catalog->slot_resolvers[i] = newSVsv(resolver_sv);
+      }
+      if (loader_spec_catalog_av) {
+        SV **loader_spec_svp = av_fetch(loader_spec_catalog_av, i, 0);
+        if (loader_spec_svp && SvOK(*loader_spec_svp)) {
+          runtime->callback_catalog->slot_loader_specs[i] =
+            newSVsv(*loader_spec_svp);
+          runtime->callback_catalog->slot_native_loader_specs[i] =
+            gql_runtime_vm_compile_loader_spec(aTHX_ *loader_spec_svp);
+          if (runtime->callback_catalog->slot_native_loader_specs[i]) {
+            gql_runtime_vm_native_loader_spec_t *native_loader =
+              runtime->callback_catalog->slot_native_loader_specs[i];
+            /* Direct materialization deliberately stays on the one-argument
+             * shape. With multiple definitions, CoerceArgumentValues must
+             * still visit every argument (including custom scalars and
+             * missing Non-Null values), even when the loader only consumes
+             * one of them. That shape retains the full args-HV path. */
+            if (native_loader->key_kind == 2
+                && runtime->runtime_slots[i].arg_def_count == 1) {
+              native_loader->key_arg_index = gql_runtime_vm_find_loader_arg_index(
+                &runtime->runtime_slots[i],
+                native_loader->key_name,
+                native_loader->key_name_len
+              );
+            }
+            if (native_loader->route_key_kind == 2
+                && runtime->runtime_slots[i].arg_def_count == 1) {
+              native_loader->route_key_arg_index = gql_runtime_vm_find_loader_arg_index(
+                &runtime->runtime_slots[i],
+                native_loader->route_key_name,
+                native_loader->route_key_name_len
+              );
+            }
+          }
+        }
       }
       if (runtime->runtime_slots[i].field_name && *runtime->runtime_slots[i].field_name) {
         runtime->callback_catalog->slot_field_names[i] = newSVpv(runtime->runtime_slots[i].field_name, 0);
@@ -9308,9 +9655,188 @@ gql_runtime_vm_resolve_current_field_explicit_fast_sv(
   SV *return_type_sv = NULL;
   gql_runtime_vm_native_runtime_t *runtime = state->runtime;
   const gql_runtime_vm_native_slot_t *slot = state->slot;
+  gql_runtime_vm_native_loader_spec_t *loader_spec = NULL;
 
   if (!runtime || slot->schema_slot_index < 0 || slot->schema_slot_index >= runtime->runtime_slot_count) {
     croak("native VM schema slot index %ld is invalid", (long)slot->schema_slot_index);
+  }
+  if (runtime->callback_catalog
+      && runtime->callback_catalog->slot_native_loader_specs) {
+    loader_spec = runtime->callback_catalog
+      ->slot_native_loader_specs[slot->schema_slot_index];
+  }
+  if (loader_spec) {
+    SV *context_sv = state->callback_ctx
+      ? state->callback_ctx->context : &PL_sv_undef;
+    HV *context_hv = (context_sv && SvROK(context_sv)
+      && SvTYPE(SvRV(context_sv)) == SVt_PVHV)
+      ? (HV *)SvRV(context_sv) : NULL;
+    SV *loader_sv = NULL;
+    SV *key_sv = NULL;
+    SV *owned_key_sv = NULL;
+    SV *owned_route_key_sv = NULL;
+    SV *args_sv = NULL;
+    SV *ret = NULL;
+
+    if (!context_hv) {
+      if (error_out && !*error_out) {
+        *error_out = newSVpvs(
+          "declarative loader requires a hash reference request context"
+        );
+      }
+      return newSVsv(&PL_sv_undef);
+    }
+
+    if (!loader_spec->uses_router) {
+      SV **loader_svp = hv_fetch(
+        context_hv,
+        loader_spec->context_key,
+        (I32)loader_spec->context_key_len,
+        0
+      );
+      loader_sv = (loader_svp && SvOK(*loader_svp)) ? *loader_svp : NULL;
+      if (!loader_sv && error_out && !*error_out) {
+        *error_out = newSVpvf(
+          "loader '%.*s' is not available in the request context",
+          (int)loader_spec->context_key_len, loader_spec->context_key
+        );
+      }
+    } else {
+      SV *router_sv = NULL;
+      SV *route_key_sv = NULL;
+      {
+        SV **router_svp = hv_fetch(
+          context_hv,
+          loader_spec->context_key,
+          (I32)loader_spec->context_key_len,
+          0
+        );
+        router_sv = (router_svp && SvOK(*router_svp)) ? *router_svp : NULL;
+      }
+      if (loader_spec->route_key_kind == 1
+          && source && SvROK(source)
+            && SvTYPE(SvRV(source)) == SVt_PVHV) {
+        SV **svp = hv_fetch(
+          (HV *)SvRV(source),
+          loader_spec->route_key_name,
+          (I32)loader_spec->route_key_name_len,
+          0
+        );
+        route_key_sv = (svp && SvOK(*svp)) ? *svp : NULL;
+      } else if (loader_spec->route_key_kind == 2) {
+        if (loader_spec->route_key_arg_index >= 0) {
+          owned_route_key_sv =
+            gql_runtime_vm_build_current_one_arg_sv(aTHX_ state);
+          route_key_sv = (owned_route_key_sv && SvOK(owned_route_key_sv))
+            ? owned_route_key_sv : NULL;
+        } else {
+          args_sv = gql_runtime_vm_build_current_args_sv(aTHX_ state);
+          if (args_sv && SvROK(args_sv)
+              && SvTYPE(SvRV(args_sv)) == SVt_PVHV) {
+            SV **svp = hv_fetch(
+              (HV *)SvRV(args_sv),
+              loader_spec->route_key_name,
+              (I32)loader_spec->route_key_name_len,
+              0
+            );
+            route_key_sv = (svp && SvOK(*svp)) ? *svp : NULL;
+          }
+        }
+      }
+      if (router_sv && SvROK(router_sv)
+          && SvTYPE(SvRV(router_sv)) == SVt_PVHV
+          && route_key_sv && SvOK(route_key_sv)) {
+        STRLEN route_key_len;
+        const char *route_key = SvPV(route_key_sv, route_key_len);
+        SV **loader_svp = hv_fetch(
+          (HV *)SvRV(router_sv), route_key, (I32)route_key_len, 0
+        );
+        loader_sv = (loader_svp && SvOK(*loader_svp)) ? *loader_svp : NULL;
+      }
+      if (!loader_sv && error_out && !*error_out) {
+        *error_out = newSVpvs(
+          "declarative loader route is not registered"
+        );
+      }
+    }
+
+    if (loader_spec->key_kind == 1
+        && source && SvROK(source)
+          && SvTYPE(SvRV(source)) == SVt_PVHV) {
+      SV **svp = hv_fetch(
+        (HV *)SvRV(source),
+        loader_spec->key_name,
+        (I32)loader_spec->key_name_len,
+        0
+      );
+      key_sv = (svp && SvOK(*svp)) ? *svp : NULL;
+    } else if (loader_spec->key_kind == 2) {
+      if (loader_spec->key_arg_index >= 0) {
+        if (owned_route_key_sv
+            && loader_spec->key_arg_index == loader_spec->route_key_arg_index) {
+          key_sv = SvOK(owned_route_key_sv) ? owned_route_key_sv : NULL;
+        } else {
+          owned_key_sv = gql_runtime_vm_build_current_one_arg_sv(aTHX_ state);
+          key_sv = (owned_key_sv && SvOK(owned_key_sv))
+            ? owned_key_sv : NULL;
+        }
+      } else {
+        if (!args_sv) {
+          args_sv = gql_runtime_vm_build_current_args_sv(aTHX_ state);
+        }
+        if (args_sv && SvROK(args_sv)
+            && SvTYPE(SvRV(args_sv)) == SVt_PVHV) {
+          SV **svp = hv_fetch(
+            (HV *)SvRV(args_sv),
+            loader_spec->key_name,
+            (I32)loader_spec->key_name_len,
+            0
+          );
+          key_sv = (svp && SvOK(*svp)) ? *svp : NULL;
+        }
+      }
+    }
+
+    if (!key_sv && error_out && !*error_out) {
+      *error_out = newSVpvs("declarative loader key is undefined");
+    }
+    if (loader_sv && key_sv
+        && gql_runtime_vm_is_exact_dataloader(aTHX_ loader_sv)) {
+      ret = gql_runtime_vm_dataloader_load_exact_sv(
+        aTHX_ loader_sv, key_sv, error_out
+      );
+    } else if (loader_sv && key_sv) {
+      dSP;
+      int count;
+      ENTER;
+      SAVETMPS;
+      sv_setsv(ERRSV, &PL_sv_undef);
+      PUSHMARK(SP);
+      XPUSHs(loader_sv);
+      XPUSHs(key_sv);
+      PUTBACK;
+      count = call_method("load", G_SCALAR | G_EVAL);
+      SPAGAIN;
+      if (SvTRUE(ERRSV)) {
+        if (error_out && !*error_out) {
+          *error_out = newSVsv(ERRSV);
+        }
+        sv_setsv(ERRSV, &PL_sv_undef);
+      } else if (count > 0) {
+        ret = newSVsv(POPs);
+      }
+      PUTBACK;
+      FREETMPS;
+      LEAVE;
+    }
+    if (args_sv) {
+      SvREFCNT_dec(args_sv);
+    }
+    SvREFCNT_dec(owned_key_sv);
+    SvREFCNT_dec(owned_route_key_sv);
+    return gql_runtime_vm_fast_lane_guard_promise_sv(
+      aTHX_ state, ret ? ret : newSVsv(&PL_sv_undef), error_out
+    );
   }
   resolver_sv = (runtime->callback_catalog && runtime->callback_catalog->slot_resolvers)
     ? runtime->callback_catalog->slot_resolvers[slot->schema_slot_index]
@@ -9837,6 +10363,301 @@ gql_runtime_vm_execute_safe_child_block_fast_sv(
   return ret;
 }
 
+/* A deliberately narrow executor-owned DataLoader batch.  The ordinary
+ * declarative path still creates one Ticket and one resumable frame per
+ * row.  For a single root object-list whose item has exactly one nullable
+ * declarative loader field, all keys are already visible at once, so an
+ * opted-in cacheless loader can call its batch function directly and run
+ * the loaded object's scalar-only child block synchronously. */
+static SV *
+gql_runtime_vm_try_complete_declarative_batch_plan_list_fast_sv(
+  pTHX_ gql_runtime_vm_exec_state_t *state, AV *in_av, int *handled_out
+)
+{
+  gql_runtime_vm_native_block_t *item_block;
+  gql_runtime_vm_native_block_t *loaded_block;
+  const gql_runtime_vm_native_op_t *loader_op;
+  const gql_runtime_vm_native_slot_t *plan_slot;
+  const gql_runtime_vm_native_slot_t *loader_slot;
+  gql_runtime_vm_native_loader_spec_t *loader_spec;
+  HV *context_hv;
+  HV *loader_hv;
+  SV **svp;
+  SV *loader_sv;
+  SV *batch_sv;
+  AV *keys_av;
+  AV *values_av = NULL;
+  SV *batch_error = NULL;
+  AV *out_av;
+  gql_runtime_vm_path_frame_t *saved_path;
+  int saved_path_is_current;
+  gql_runtime_vm_path_frame_t *list_path;
+  IV count;
+  IV i;
+
+  *handled_out = 0;
+  if (!state || !state->runtime || !state->bundle || !state->callback_ctx
+      || state->block_index != state->fast_lane_root_block_index
+      || !state->block || state->block->op_count != 1
+      || !state->op || state->op->child_block_index < 0
+      || state->op->abstract_child_count > 0) {
+    return NULL;
+  }
+  item_block = &state->bundle->blocks[state->op->child_block_index];
+  if (item_block->op_count != 1) {
+    return NULL;
+  }
+  loader_op = &item_block->ops[0];
+  if (loader_op->slot_index < 0 || loader_op->slot_index >= item_block->slot_count
+      || loader_op->complete_code != GQL_VM_COMPLETE_OBJECT
+      || loader_op->child_block_index < 0
+      || loader_op->abstract_child_count > 0
+      || loader_op->has_directives || loader_op->has_runtime_directives
+      || loader_op->runtime_directives_sv) {
+    return NULL;
+  }
+  plan_slot = &item_block->slots[loader_op->slot_index];
+  loader_slot = gql_runtime_vm_effective_slot(state->runtime, plan_slot);
+  if (!loader_slot || loader_slot->return_type_kind_code == 8
+      || loader_slot->has_args || loader_slot->arg_def_count > 0
+      || !state->runtime->callback_catalog
+      || !state->runtime->callback_catalog->slot_native_loader_specs
+      || loader_slot->schema_slot_index < 0
+      || loader_slot->schema_slot_index >= state->runtime->runtime_slot_count) {
+    return NULL;
+  }
+  loader_spec = state->runtime->callback_catalog
+    ->slot_native_loader_specs[loader_slot->schema_slot_index];
+  if (!loader_spec || loader_spec->uses_router || loader_spec->key_kind != 1) {
+    return NULL;
+  }
+
+  loaded_block = &state->bundle->blocks[loader_op->child_block_index];
+  for (i = 0; i < loaded_block->op_count; i++) {
+    const gql_runtime_vm_native_op_t *op = &loaded_block->ops[i];
+    const gql_runtime_vm_native_slot_t *slot;
+    IV leaf_kind = GQL_VM_LEAF_NONE;
+    if (op->slot_index < 0 || op->slot_index >= loaded_block->slot_count
+        || op->resolve_code != GQL_VM_RESOLVE_DEFAULT
+        || op->complete_code != GQL_VM_COMPLETE_GENERIC
+        || op->child_block_index >= 0 || op->abstract_child_count > 0
+        || op->has_directives || op->has_runtime_directives
+        || op->runtime_directives_sv) {
+      return NULL;
+    }
+    slot = gql_runtime_vm_effective_slot(
+      state->runtime, &loaded_block->slots[op->slot_index]
+    );
+    if (!slot || slot->resolver_shape_code != GQL_VM_RESOLVE_DEFAULT
+        || (slot->accessor_name && slot->accessor_name_len)
+        || gql_runtime_vm_slot_resolver_sv(state->runtime, slot)) {
+      return NULL;
+    }
+    if (state->runtime->callback_catalog->slot_leaf_kinds
+        && slot->schema_slot_index >= 0
+        && slot->schema_slot_index < state->runtime->runtime_slot_count) {
+      leaf_kind = state->runtime->callback_catalog
+        ->slot_leaf_kinds[slot->schema_slot_index];
+    }
+    if (leaf_kind == GQL_VM_LEAF_CUSTOM) {
+      return NULL;
+    }
+  }
+
+  if (!state->callback_ctx->context
+      || !SvROK(state->callback_ctx->context)
+      || SvTYPE(SvRV(state->callback_ctx->context)) != SVt_PVHV) {
+    return NULL;
+  }
+  context_hv = (HV *)SvRV(state->callback_ctx->context);
+  svp = hv_fetch(
+    context_hv, loader_spec->context_key, (I32)loader_spec->context_key_len, 0
+  );
+  loader_sv = (svp && SvOK(*svp)) ? *svp : NULL;
+  if (!loader_sv || !gql_runtime_vm_is_exact_dataloader(aTHX_ loader_sv)) {
+    return NULL;
+  }
+  loader_hv = (HV *)SvRV(loader_sv);
+  svp = hv_fetch(loader_hv, "_batch_plan", 11, 0);
+  if (!svp || !SvTRUE(*svp)) {
+    return NULL;
+  }
+  svp = hv_fetch(loader_hv, "cache", 5, 0);
+  if (!svp || SvTRUE(*svp)) {
+    return NULL;
+  }
+  svp = hv_fetch(loader_hv, "max_batch_size", 14, 0);
+  if (svp && SvIV(*svp) > 0) {
+    return NULL;
+  }
+  svp = hv_fetch(loader_hv, "_queue", 6, 0);
+  if (!svp || !SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV
+      || av_count((AV *)SvRV(*svp)) != 0) {
+    return NULL;
+  }
+  svp = hv_fetch(loader_hv, "batch", 5, 0);
+  batch_sv = (svp && SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV)
+    ? *svp : NULL;
+  if (!batch_sv) {
+    return NULL;
+  }
+
+  count = (IV)av_count(in_av);
+  if (count == 0) {
+    *handled_out = 1;
+    return newRV_noinc((SV *)newAV());
+  }
+  keys_av = newAV();
+  av_extend(keys_av, count > 0 ? count - 1 : 0);
+  for (i = 0; i < count; i++) {
+    SV **item_svp = av_fetch(in_av, i, 0);
+    SV *item = (item_svp && *item_svp) ? *item_svp : NULL;
+    SV **key_svp;
+    if (!item || !SvOK(item) || !SvROK(item)
+        || SvTYPE(SvRV(item)) != SVt_PVHV || sv_isobject(item)) {
+      SvREFCNT_dec((SV *)keys_av);
+      return NULL;
+    }
+    key_svp = hv_fetch(
+      (HV *)SvRV(item), loader_spec->key_name, (I32)loader_spec->key_name_len, 0
+    );
+    if (!key_svp || !SvOK(*key_svp)) {
+      SvREFCNT_dec((SV *)keys_av);
+      return NULL;
+    }
+    av_push(keys_av, newSVsv(*key_svp));
+  }
+
+  {
+    dSP;
+    I32 callback_count;
+    ENTER;
+    SAVETMPS;
+    sv_setsv(ERRSV, &PL_sv_undef);
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newRV_noinc((SV *)keys_av)));
+    PUTBACK;
+    callback_count = call_sv(batch_sv, G_SCALAR | G_EVAL);
+    SPAGAIN;
+    if (SvTRUE(ERRSV)) {
+      batch_error = newSVsv(ERRSV);
+      sv_setsv(ERRSV, &PL_sv_undef);
+    } else if (callback_count == 1) {
+      SV *values_sv = POPs;
+      if (values_sv && SvROK(values_sv)
+          && SvTYPE(SvRV(values_sv)) == SVt_PVAV
+          && (IV)av_count((AV *)SvRV(values_sv)) == count) {
+        values_av = (AV *)SvREFCNT_inc(SvRV(values_sv));
+      } else {
+        batch_error = newSVpvs(
+          "DataLoader batch function must return an arrayref with one entry per key\n"
+        );
+      }
+    } else {
+      batch_error = newSVpvs(
+        "DataLoader batch function must return an arrayref with one entry per key\n"
+      );
+    }
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+  }
+
+  out_av = newAV();
+  av_extend(out_av, count > 0 ? count - 1 : 0);
+  saved_path = state->path_frame;
+  saved_path_is_current = state->path_frame_is_current_field;
+  list_path = saved_path_is_current
+    ? saved_path
+    : gql_runtime_vm_new_result_path_frame(aTHX_ saved_path, state->slot);
+
+  for (i = 0; i < count; i++) {
+    SV *item_key = newSViv(i);
+    gql_runtime_vm_path_frame_t *item_path =
+      gql_runtime_vm_new_path_frame_struct(aTHX_ list_path, item_key);
+    gql_runtime_vm_path_frame_t *loader_path =
+      gql_runtime_vm_new_result_path_frame(aTHX_ item_path, plan_slot);
+    HV *row_hv = newHV();
+    SV *completed = NULL;
+    SV *error_sv = batch_error;
+    SV *loaded_value = &PL_sv_undef;
+    SvREFCNT_dec(item_key);
+
+    if (!error_sv && values_av) {
+      SV **value_svp = av_fetch(values_av, i, 0);
+      loaded_value = (value_svp && *value_svp) ? *value_svp : &PL_sv_undef;
+      if (sv_isobject(loaded_value)
+          && sv_derived_from(loaded_value, "GraphQL::Houtou::DataLoader::Error")) {
+        SV **message_svp = SvROK(loaded_value)
+          && SvTYPE(SvRV(loaded_value)) == SVt_PVHV
+          ? hv_fetch((HV *)SvRV(loaded_value), "message", 7, 0) : NULL;
+        error_sv = (message_svp && *message_svp) ? *message_svp : &PL_sv_undef;
+      }
+    }
+    if (error_sv) {
+      gql_runtime_vm_fast_lane_record_error_for_path(
+        aTHX_ state, error_sv, loader_path
+      );
+      completed = newSVsv(&PL_sv_undef);
+    } else if (!loaded_value || !SvOK(loaded_value)) {
+      completed = newSVsv(&PL_sv_undef);
+    } else {
+      int plain = SvROK(loaded_value)
+        && SvTYPE(SvRV(loaded_value)) == SVt_PVHV
+        && !sv_isobject(loaded_value);
+      IV li;
+      for (li = 0; plain && li < loaded_block->op_count; li++) {
+        const gql_runtime_vm_native_slot_t *slot = gql_runtime_vm_effective_slot(
+          state->runtime,
+          &loaded_block->slots[loaded_block->ops[li].slot_index]
+        );
+        SV **value_svp = hv_fetch(
+          (HV *)SvRV(loaded_value), slot->field_name, (I32)slot->field_name_len, 0
+        );
+        if (value_svp && *value_svp && SvROK(*value_svp)) {
+          plain = 0;
+        }
+      }
+      if (!plain) {
+        SV *msg = newSVpvs(
+          "DataLoader batch_plan requires plain hash rows with scalar selected values"
+        );
+        gql_runtime_vm_fast_lane_record_error_for_path(aTHX_ state, msg, loader_path);
+        SvREFCNT_dec(msg);
+        completed = newSVsv(&PL_sv_undef);
+      } else {
+        state->path_frame = loader_path;
+        state->path_frame_is_current_field = 1;
+        completed = gql_runtime_vm_execute_block_fast_sv(
+          aTHX_ state, loader_op->child_block_index, loaded_value
+        );
+        state->path_frame = saved_path;
+        state->path_frame_is_current_field = saved_path_is_current;
+        if (!completed) {
+          completed = newSVsv(&PL_sv_undef);
+          state->null_carries_error = 0;
+        }
+      }
+    }
+    hv_store(
+      row_hv, plan_slot->result_name, (I32)plan_slot->result_name_len,
+      completed, 0
+    );
+    av_store(out_av, i, newRV_noinc((SV *)row_hv));
+    gql_runtime_vm_path_frame_decref(loader_path);
+    gql_runtime_vm_path_frame_decref(item_path);
+  }
+  state->path_frame = saved_path;
+  state->path_frame_is_current_field = saved_path_is_current;
+  if (!saved_path_is_current) {
+    gql_runtime_vm_path_frame_decref(list_path);
+  }
+  SvREFCNT_dec((SV *)values_av);
+  SvREFCNT_dec(batch_error);
+  *handled_out = 1;
+  return newRV_noinc((SV *)out_av);
+}
+
 static SV *
 gql_runtime_vm_complete_current_list_fast_sv(pTHX_ gql_runtime_vm_exec_state_t *state, SV *value)
 {
@@ -9868,6 +10689,16 @@ gql_runtime_vm_complete_current_list_fast_sv(pTHX_ gql_runtime_vm_exec_state_t *
       return newSVsv(&PL_sv_undef);
     }
     in_av = (AV *)SvRV(value);
+    if (state->fast_lane_can_suspend) {
+      int batch_plan_handled = 0;
+      SV *batch_plan_result =
+        gql_runtime_vm_try_complete_declarative_batch_plan_list_fast_sv(
+          aTHX_ state, in_av, &batch_plan_handled
+        );
+      if (batch_plan_handled) {
+        return batch_plan_result;
+      }
+    }
     if (state->fast_lane_can_suspend) {
       /* Field-level suspension (the resolver call itself pending) is
        * already handled by gql_runtime_vm_fast_lane_guard_promise_sv before

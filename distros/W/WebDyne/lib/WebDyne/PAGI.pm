@@ -65,7 +65,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.019';
+$VERSION='3.020';
 
 
 #==================================================================================================
@@ -318,16 +318,15 @@ sub handler_http {
             #  If the requested path is not a file, an API PSP may own a path
             #  prefix such as /api.psp or /example/api.psp. Resolve that prefix
             #  before constructing the request so the normal WebDyne handler can
-            #  process the PSP. If we find a nested API file, treat its
-            #  containing directory as the mount point so <api> patterns are
-            #  local to the PSP file name. The tradeoff is that nested API
-            #  files should not use document-root relative patterns.
+            #  process the PSP. The discovered API file path becomes the mount
+            #  point, so /example/api.psp owning /example/api/foo passes /foo to
+            #  Router::Simple.
             #
             my $api_fn=api_filename($self, $scope);
             if ($api_fn) {
-                my $api_dn=dirname(File::Spec->abs2rel($api_fn, File::Spec->rel2abs($self->{'root'})));
-                $ENV{'PATH_INFO'}=~s{^/\Q$api_dn\E(?=/|$)}{}i
-                    if $api_dn ne '.';
+                my $api_path=File::Spec->abs2rel($api_fn, File::Spec->rel2abs($self->{'root'}));
+                $api_path=~s{\Q@{[WEBDYNE_PSP_EXT]}\E$}{};
+                $ENV{'PATH_INFO'}=~s{^/\Q$api_path\E(?=/|$)}{}i;
             }
 
             #  Only need request and response helper objects

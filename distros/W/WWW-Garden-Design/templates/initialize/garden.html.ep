@@ -1,0 +1,103 @@
+<form name = 'garden_form_1' id = 'garden_form_1'>
+	%= csrf_field
+	<table align = 'center'>
+		<tr>
+			<td colspan = '4'><div class = 'blue_centered'>Gardens</div></td>
+		</tr>
+		<tr>
+			<td colspan = '4'><br /></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td align = 'left'>Properties with Gardens</td>
+			<td align = 'left'>Garden menu</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td align = 'center' colspan = '4'>
+				<div class = 'gardens_gardentoolbar'> <!-- Class not defined -->
+					<span id = 'gardens_property_menu_1_span'><%== $gardens_property_menu_1 %></span>
+					<span id = 'gardens_garden_menu_span'><%== $gardens_garden_menu %></span>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<table align = 'center'>
+		<tr>
+			<td colspan = '2'><br /></td>
+		</tr>
+		<tr>
+			<td>Garden name: <span class = 'alert'>*</span> </td>
+			<td align = 'left' colspan = '2'><input id = 'garden_name' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Description: </td>
+			<td align = 'left' colspan = '2'><input id = 'garden_description' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Publish garden: </td>
+			<td align = 'left' colspan = '2'><input type = 'checkbox' value = '' id = 'garden_publish'/></td>
+		</tr>
+		<tr>
+			<td colspan = '2'><br /></td>
+		</tr>
+		<tr>
+			<td colspan = '2'><span class = 'alert'>*</span> indicates a mandatory field</td>
+		</tr>
+		<tr>
+			<td colspan = '2'><br /></td>
+		</tr>
+		<tr>
+			<td align = 'left' width = '33%'><input type = 'submit' value = 'Update' onclick = 'update_garden("update")'/></td>
+			<td align = 'center' width = '33%'><input type = 'submit' value = 'Delete' onclick = 'update_garden("delete")'/></td>
+			<td align = 'right' width = '33%'><input type = 'reset' value = 'Reset' /></td>
+		</tr>
+	</table>
+</form>
+<form name = 'garden_form_2' id = 'garden_form_2'>
+	%= csrf_field
+	<table align = 'center'>
+		<tr>
+			<td colspan = '3'><hr /></td>
+		</tr>
+		<tr>
+			<td width = '33%'></td>
+			<td align = 'center'><div class = 'blue_centered'>Add a New Garden</div></td>
+			<td width = '33%'></td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+		<tr>
+			<td align = 'center' colspan = '3'>All Properties</td>
+		</tr>
+		<tr>
+			<td align = 'center' colspan = '3'>
+				<div class = 'gardens_gardentoolbar'> <!-- Class not defined -->
+					<span id = 'gardens_property_menu_2_span'><%== $gardens_property_menu_2 %></span>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+		<tr>
+			<td>Garden name: <span class = 'alert'>*</span> </td>
+			<td align = 'left' colspan = '2'><input id = 'new_garden_name' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Description: </td>
+			<td align = 'left' colspan = '2'><input id = 'new_garden_description' type = 'text' size = '50' maxlength = '100'></td>
+		</tr>
+		<tr>
+			<td>Publish garden: </td>
+			<td align = 'left' colspan = '2'><input type = 'checkbox' value = '' id = 'new_garden_publish'/></td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+			<td align = 'left' width = '33%'><input type = 'submit' value = 'Save' onclick = 'add_garden()'/></td>
+			<td width = '33%'></td>
+			<td align = 'right' width = '33%'><input type = 'reset' value = 'Reset' /></td>
+	</table>
+</form>

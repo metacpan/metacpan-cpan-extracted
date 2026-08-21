@@ -55,7 +55,7 @@ is_pdl $x->real,-$ref, 'value from real scalar - i';
 
 my $native = pdl('[1+2i 3+4i]');
 is $native.'', '[1+2i 3+4i]', 'immediate check of native and stringification'
-  or diag PDL::Core::pdump($native), "_ci:", PDL::Core::pdump(PDL::_ci);
+  or diag PDL::Core::pdump($native), "_ci:", PDL::Core::pdump(PDL::Core::i);
 my $fromn = eval { PDL::Complex->from_native($native) };
 $ref = pdl([1, 2], [3, 4]);
 is_pdl $fromn->real,$ref, 'from_native works'

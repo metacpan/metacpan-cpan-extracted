@@ -7,7 +7,7 @@ use Punk::Request;
 use Punk::Response;
 use Punk ();
 
-our $VERSION = '0.20';
+our $VERSION = '0.27';
 
 1;
 
@@ -186,11 +186,25 @@ C<filename> extension, else C<application/octet-stream>), C<filename>
 when it is not ASCII), C<inline> (disposition C<inline> instead),
 C<ranges =E<gt> 0> (ignore C<Range> and stop advertising
 C<Accept-Ranges>), C<mtime> / C<etag> (override the validators; C<mtime>
-is what gives a scalar source one), and C<missing =E<gt> 'not_found'>
-(answer the house 404 for an unreadable path instead of croaking).
+is what gives a scalar source one), C<cache_control> (a freshness
+lifetime, sent on the C<304> as well as the C<200> - a C<304> that
+omitted it would leave the stored copy with the lifetime that has just
+run out), and C<missing =E<gt> 'not_found'> (answer the house 404 for an
+unreadable path instead of croaking).
 
 The path is served as given - if any part of it came from the request,
 the traversal guard is yours.
+
+=head2 asset($url)
+
+The content-addressed URL for a file under a C<< static ... fingerprint
+=> 1 >> mount: C</static/app.css> becomes
+C</static/app.9f3a1c2b0d4e5f60.css>, which serves with a year and
+C<immutable> because that URL cannot come to mean anything else. A URL
+under no static mount, under one that has not opted in, or naming a file
+that cannot be read comes back exactly as it went in - so a template can
+be written against this before the mount asks for it. See
+L<Punk::Static/Freshness>.
 
 =head2 respond_to(%format_handlers)
 
@@ -227,13 +241,39 @@ chains.
 
 =head2 session
 
-The signed cookie-backed session hashref (see L<Punk::Session>); requires the
-C<session> keyword. Read and write it; it is written back to the cookie at the
-end of the request if it changed.
+The session hashref (see L<Punk::Session>); requires the C<session> keyword.
+Read and write it; it is written back at the end of the request if it changed -
+to the cookie, or to the store when one is configured.
 
 =head2 session_expire
 
-Log out: empty the session and delete its cookie. Chainable.
+Log out: empty the session and delete its cookie. With a store it also deletes
+the entry, so the session is revoked rather than merely dropped by the browser
+in front of you. Chainable.
+
+=head2 session_rotate
+
+    post '/login' => sub {
+        my ($c) = @_;
+        ...
+        $c->session_rotate;                 # a new id, the same session
+        $c->session->{user_id} = $user->id;
+        $c->redirect('/');
+    };
+
+Keep the session, give it a new id, and delete the entry under the old one.
+Chainable.
+
+Call it at the privilege boundary, which is a login or an elevation, and
+nowhere else. Session fixation is the attack it prevents: somebody plants a
+known id in a victim's browser and waits for them to log in, and if logging in
+writes the user into the session the attacker planted, the attacker's id is now
+an authenticated session.
+
+Without a store this is a no-op, and deliberately so rather than an error: a
+cookie session's value changes wholesale when its contents do, so there is
+nothing to rotate. Saying that out loud matters, because an application may be
+written against the cookie session and later given a store.
 
 =head2 flash
 

@@ -1,4 +1,7 @@
 package Poker::Deck;
+
+our $VERSION = '0.11';
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;
@@ -11,31 +14,23 @@ Poker::Deck - Simple class to represent a deck of poker cards.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
-
-our $VERSION = '0.09';
 
 
 =head1 SYNOPSIS
 
-This class is used internally by Poker::Dealer.  You probably don't want to use it directly. Attributes include cards, discards, and card_type.
+This class is used internally by Poker::Dealer. Attributes include
+cards, discards, card_type, and joker_count.
 
-=cut;
+    my $deck = Poker::Deck->new( joker_count => 2 );  # 54 cards
 
-has 'cards' => (
-  is => 'rw',
-  isa =>
-    sub { die "Not a Tie::IxHash!" unless $_[0]->isa( 'Tie::IxHash') },
-  builder => '_build_cards',
-);
+=cut
 
-has 'discards' => (
-  is => 'rw',
-  isa =>
-    sub { die "Not an array!" unless ref($_[0]) eq 'ARRAY' },
-  default => sub { [] },
+has 'joker_count' => (
+  is      => 'ro',
+  default => sub { 0 },
 );
 
 has 'card_type' => (
@@ -46,6 +41,19 @@ has 'card_type' => (
 sub _build_card_type {
   return 'Poker::Card';
 }
+
+has 'cards' => (
+  is      => 'rw',
+  lazy    => 1,
+  isa     => sub { die "Not a Tie::IxHash!" unless $_[0]->isa('Tie::IxHash') },
+  builder => '_build_cards',
+);
+
+has 'discards' => (
+  is      => 'rw',
+  isa     => sub { die "Not an array!" unless ref( $_[0] ) eq 'ARRAY' },
+  default => sub { [] },
+);
 
 sub _build_cards {
   my $self  = shift;
@@ -62,6 +70,18 @@ sub _build_cards {
       );
     }
   }
+  my $jokers = $self->joker_count // 0;
+  for my $i ( 1 .. $jokers ) {
+    my $name = "Jo$i";
+    $cards->Push(
+      $name => $self->card_type->new(
+        id        => $cards->Length,
+        rank      => 'Joker',
+        suit      => $i,
+        wild_flag => 1,
+      )
+    );
+  }
   return $cards;
 }
 
@@ -74,12 +94,6 @@ Nathaniel Graham, C<< <ngraham at cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2016 Nathaniel Graham.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
 
 =cut
 

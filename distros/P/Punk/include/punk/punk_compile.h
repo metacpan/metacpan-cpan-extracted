@@ -532,6 +532,20 @@ static I32 pc_cmp_len_desc(pTHX_ SV *a, SV *b) {
  * capture [ $c, $on_error, $method, \@after ]; the deliver/handle-error work
  * is punk_context.h / punk_serve.h C, exactly the blocking path's. */
 
+/* $app->env - the config's env, else PUNK_ENV, else production. Mortal. */
+static SV *pc_app_env(pTHX_ SV *self) {
+    dSP;
+    int count;
+    SV *out;
+    ENTER; SAVETMPS;
+    PUSHMARK(SP); EXTEND(SP, 1); PUSHs(self); PUTBACK;
+    count = call_method("env", G_SCALAR);
+    SPAGAIN;
+    out = count > 0 ? newSVsv(POPs) : newSVpvs("production");
+    PUTBACK; FREETMPS; LEAVE;
+    return sv_2mortal(out);
+}
+
 static int pc_is_head(pTHX_ SV *methsv) {
     STRLEN ml; const char *m = SvOK(methsv) ? SvPV_const(methsv, ml) : "GET";
     if (!SvOK(methsv)) ml = 3;

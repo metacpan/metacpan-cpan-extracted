@@ -4,7 +4,7 @@ use v5.38;
 use experimental 'class';
 use version;
 
-our $VERSION   = qv('v1.1.0');
+our $VERSION   = qv('v1.2.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Future::AsyncAwait;
@@ -42,7 +42,7 @@ PAGI::FastAPI::Response - Base HTTP Response Class for PAGI::FastAPI
 
 =head1 VERSION
 
-Version v1.1.0
+Version v1.2.4
 
 =head1 SYNOPSIS
 
@@ -90,10 +90,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/PAGI-FastAPI/issues>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/PAGI-FastAPI>
 
 =item * Search MetaCPAN
 

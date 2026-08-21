@@ -36,7 +36,7 @@ subtest 'missing Authorization header' => sub {
     is $status, 401, 'missing header is rejected with 401';
     is $data->{detail}, 'Not authenticated', 'a standard detail message is returned';
     my ($challenge) = map { $_->[1] } grep { lc($_->[0]) eq 'www-authenticate' } @$headers;
-    is $challenge, 'Bearer', 'a WWW-Authenticate: Bearer challenge header is sent';
+    is $challenge, 'Bearer realm="Restricted"', 'a WWW-Authenticate: Bearer challenge header is sent';
 };
 
 subtest 'malformed Authorization header' => sub {

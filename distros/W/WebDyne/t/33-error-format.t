@@ -5,6 +5,7 @@ use Test::More;
 use FindBin qw($RealBin);
 use lib $RealBin;
 use lib "$RealBin/../lib";
+use pagi_compat_helper qw(pagi_skip_reason);
 
 use File::Basename qw(basename dirname);
 use File::Spec;
@@ -164,8 +165,13 @@ for my $case (@case) {
     SKIP: {
         skip 'Skipping PSGI format test: missing Plack::Test', 3
             if ($handler eq 'psgi' && !eval { require WebDyne::PSGI; require Plack::Test; 1 });
-        skip 'Skipping PAGI format test: missing PAGI::Test::Client', 3
-            if ($handler eq 'pagi' && !eval { require WebDyne::PAGI; require PAGI::Test::Client; 1 });
+        if ($handler eq 'pagi') {
+            my $pagi_skip=pagi_skip_reason(qw(PAGI::Request PAGI::Response PAGI::Test::Client PAGI::SSE PAGI::WebSocket Future::AsyncAwait));
+            skip "Skipping PAGI format test: $pagi_skip", 3
+                if $pagi_skip;
+            skip "Skipping PAGI format test: $@", 3
+                if !eval { require WebDyne::PAGI; require PAGI::Test::Client; 1 };
+        }
 
         my $result=run_case(
             handler    => $handler,

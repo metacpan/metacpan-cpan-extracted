@@ -2,10 +2,10 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 pp_setversion("'$VERSION'");
 
-my $Matio_src = 'matio-1.5.0/src';
+my $Matio_src = 'matio-1.5.30/src';
 
 # This works nicely, but I am not using it for anything
 my ($MAT_FT_MAT73,$MAT_FT_MAT5,$MAT_FT_MAT4) = (0,1,2);
@@ -62,10 +62,10 @@ this module.
  # write two pdls in matlab 5 format
  matlab_write('file.dat', $x, $y);
 
- # read an array of piddles 
+ # read an array of ndarrays
  # from file in matlab 4, 5, or 7.3 format.
  my @pdls =  matlab_read('file.dat');
- 
+
  # write pdl in matlab 7.3 format.
  matlab_write('file.dat', 'MAT73', $x);
 
@@ -145,7 +145,7 @@ sub matlab_read {
  matlab_write($filename,$x1,$x2,...);
  matlab_write($filename,$format,$x1,$x2,...);
 
-Automatically convert C<n> element, 1-d piddles to C<1xn> matlab
+Automatically convert C<n> element, 1-d ndarrays to C<1xn> matlab
 variables.
 
  matlab_write($filename,$x1,$x2,..., {onedw => 1} );
@@ -182,7 +182,7 @@ sub matlab_write {
             push @strings, $v;
         }
     }
-    barf 'matlab_write: ' . scalar(@strings) . 
+    barf 'matlab_write: ' . scalar(@strings) .
         ' string arguments given. One or two expected.'
         if @strings < 1 or @strings > 2 ;
     my $filename = $strings[0];
@@ -237,7 +237,7 @@ sub matlab_print_info {
  $mat = PDL::IO::Matlab->new('file.dat', '>', { header => 'some text'} );
 
  # read-write  with rw or <>
- $mat = PDL::IO::Matlab->new('file.dat', 'rw');  
+ $mat = PDL::IO::Matlab->new('file.dat', 'rw');
 
  # open for reading
  $mat = PDL::IO::Matlab->new('file.dat', '<');
@@ -261,14 +261,14 @@ A header (a string) to write into the file.
 =item namekey
 
 A hash key that will be used to store the matlab name
-for a variable read from a file in the header of a piddle.
+for a variable read from a file in the header of an ndarray.
 The default value is 'NAME'. Thus, the name can be accessed
 via C<< $pdl->hdr->{NAME} >>.
 
 =item varbasew
 
 The base of the default matlab variable name that will be
-written in the matlab file along with each piddle. An
+written in the matlab file along with each ndarray. An
 integer will be appended to the base name. This integer is
 initialized to zero and is incremented after writing each
 variable.
@@ -297,8 +297,8 @@ sub new {
 
     my $obj = $opt->options($iopts);
 
-    my %exobj = ( 
-        filename => undef, 
+    my %exobj = (
+        filename => undef,
         mode => undef,
         handle => undef,
         wvarnum => 0,
@@ -440,11 +440,11 @@ sub read_all {
 
 Append pdls to open file associated with C<$mat>.
 
-If a piddle has a matlab name stored in the header
+If an ndarray has a matlab name stored in the header
 it will be used as the matlab name written to the file
-with this piddle. The key is in C<< $pdl->{namekey} >>,
+with this ndarray. The key is in C<< $pdl->{namekey} >>,
 with default value C<'NAME'>. If the name is not in
-the piddle's header, then a default value will be used.
+the ndarray's header, then a default value will be used.
 
 =head3 Options
 
@@ -455,9 +455,9 @@ the piddle's header, then a default value will be used.
 In order to write a file that is compatible with Matlab and Octave,
 C<onedw> must be either C<1> or C<2>.  If C<onedw> is C<1> then a 1-d
 pdl of length n is written as a as an C<nx1> pdl (a C<1xn> matlab
-variable). If C<onedw> is C<2> then the output piddle is C<1xn> and
+variable). If C<onedw> is C<2> then the output ndarray is C<1xn> and
 the matlab variable C<nx1>.  If C<onedw> is zero (the default), then
-the 1-d pdl is written as a 1-d piddle. In the last case, Octave will
+the 1-d pdl is written as a 1-d ndarray. In the last case, Octave will
 print an error and fail to read the variable.
 
 =item compress
@@ -540,7 +540,7 @@ C<$mat>.
 
 sub get_header {
     my $self = shift;
-    return defined $self->{header} ? 
+    return defined $self->{header} ?
         $self->{header} : defined $self->{handle} ?
         _mat_get_header($self->{handle}) : undef;
 }
@@ -611,7 +611,7 @@ sub write_accessors {
     my @accessors;
     my $errs;
     foreach (@funcs) {
-        $errs = s/!e// ? 
+        $errs = s/!e// ?
      "\n       barf 'PDL::IO::Matlab::get_$_: $_ not defined.' unless
           defined \$self->{$_};" : '';
     my $getter = "get_$_";
@@ -623,7 +623,7 @@ sub write_accessors {
         my \$self = shift;$errs
             \$self->{$_};
     }
-  
+
     sub $setter {
        my \$self = shift;
        \$self->{$_} = shift;
@@ -722,7 +722,7 @@ by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
 
-The matio library included here is 
+The matio library included here is
 Copyright 2011 Christopher C. Hulbert. All rights reserved.
 See the file matio-1.5/COPYING in the source distribution
 of this module.
@@ -795,7 +795,7 @@ _mat_close( handle )
 int
 _have_hdf5()
   CODE:
-#if defined(HAVE_HDF5) && HAVE_HDF5
+#if defined(HAVE_HDF5) && HAVE_HDF5 && defined(MAT73) && MAT73
   RETVAL = 1;
 #else
   RETVAL = 0;
@@ -806,7 +806,7 @@ _have_hdf5()
 ');
 
 
-pp_addxs ( '', "
+pp_addxs (<<EOF
 
 mat_t *
 _mat_create_ver( matname, hdr_str, mat_file_ver_in, header_flag)
@@ -819,11 +819,13 @@ _mat_create_ver( matname, hdr_str, mat_file_ver_in, header_flag)
  enum mat_ft mat_file_ver;
  switch (mat_file_ver_in)
     {
+#if defined(MAT73) && MAT73
      case $MAT_FT_MAT73:
               {
                 mat_file_ver = MAT_FT_MAT73;
                 break;
               }
+#endif
      case $MAT_FT_MAT5:
               {
                 mat_file_ver = MAT_FT_MAT5;
@@ -831,18 +833,18 @@ _mat_create_ver( matname, hdr_str, mat_file_ver_in, header_flag)
               }
      case $MAT_FT_MAT4:
               {
-               barf(\"PDL::IO::Matlab::open Writing in format version MAT4 not supported.\");
+               barf("PDL::IO::Matlab::open Writing in format version MAT4 not supported.");
               }
      default:
-          barf(\"PDL::IO::Matlab::open unknown file format.\");
+          barf("PDL::IO::Matlab::open unknown file format.");
     }
  if (header_flag)
      RETVAL = Mat_CreateVer(matname, hdr_str, mat_file_ver);
  else RETVAL = Mat_CreateVer(matname, (void *) NULL, mat_file_ver);
  OUTPUT:
  RETVAL
-
-");
+EOF
+);
 
 pp_addxs ( '',  "
 
@@ -970,14 +972,14 @@ XPUSHs(p);
 XPUSHs(s);
 
 int
-_write_pdl_to_matlab_file (mat, piddle, varname, oned, compress)
+_write_pdl_to_matlab_file (mat, ndarray, varname, oned, compress)
 mat_t * mat
-pdl * piddle
+pdl * ndarray
 char * varname
 int oned
 int compress
 CODE:
-RETVAL = write_pdl_to_matlab_file (mat, piddle, varname, oned, compress);
+RETVAL = write_pdl_to_matlab_file (mat, ndarray, varname, oned, compress);
 OUTPUT:
 RETVAL
 

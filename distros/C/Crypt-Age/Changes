@@ -1,5 +1,68 @@
 Revision history for Crypt-Age
 
+0.002     2026-08-19 22:50:05Z
+  - The distribution now carries the upstream age test kit: 143 vectors from
+    C2SP/CCTV, run by t/07-testkit.t. 68 of them exercise this implementation
+    and pass; the remaining 75 are skipped with a stated reason, since they
+    test ASCII armor and the scrypt and post-quantum recipient types, none of
+    which are implemented. Unlike t/04-interop.t this needs no age binary on
+    PATH, so a machine without one is no longer a machine without a
+    compatibility proof.
+  - STREAM payload decryption no longer decides a chunk's finality from
+    end-of-file. A chunk is final because it authenticates under the
+    final-flag nonce, and any data after the final chunk now invalidates the
+    payload. Files that previously decrypted as if they had ended cleanly --
+    a spurious empty final chunk, trailing garbage, a second final chunk --
+    are rejected, and a full-length chunk written with the non-final nonce
+    releases its plaintext before the error instead of nothing at all.
+  - Age headers whose stanza arguments contain anything outside printable
+    ASCII (0x21-0x7e) are now rejected, as the format's ABNF requires. This
+    applies to every stanza line regardless of recipient type -- a stray byte
+    invalidates the whole header rather than merely making that one stanza
+    ignorable. The error no longer quotes the offending line back.
+  - cpanfile now pins CryptX to 0.067, the release that introduced
+    Crypt::PK::X25519. It previously required CryptX with no minimum at all,
+    so an older one satisfied the declared prerequisites and then failed at
+    runtime.
+  - A malformed X25519 stanza is now rejected while the header is parsed, as
+    the format requires: one that does not carry exactly one argument after the
+    type, whose argument is not the canonical unpadded base64 encoding of a
+    32-byte value, or whose body is not exactly 32 bytes. These are header
+    failures and die from Crypt::Age::Header->parse. Previously an extra
+    argument was silently ignored, and a wrong-length body came back as "No
+    matching identity found". Stanzas of other recipient types are unaffected
+    and are still ignored rather than rejected.
+  - Stanza serialization now emits the empty final line the format requires
+    when a stanza body's base64 encoding is an exact multiple of 64
+    characters. Files this distribution writes are byte-identical to before,
+    since an X25519 body never reaches that boundary.
+  - Unpadded base64 in headers is now decoded strictly: padding characters,
+    characters outside the base64 alphabet, impossible lengths and
+    non-canonical encodings are rejected rather than repaired, as the format
+    requires. Malformed age files that previously decoded now die.
+  - Crypt::Age::Header->verify_mac now compares the header MAC with
+    Crypt::Misc::slow_eq instead of a plain string eq, so a wrong MAC is no
+    longer rejected at the first differing byte. It returns 1 or 0 instead of
+    1 or the empty string; a MAC of the wrong length, or none at all, is still
+    false, no longer warns, and is never fatal.
+  - X25519 key exchange now aborts when the shared secret is all zero, as
+    c2sp.org/age requires. This is the low-order point check: it affects
+    decryption of a file carrying a low-order ephemeral share and encryption
+    to a low-order recipient key, both of which would otherwise proceed with a
+    wrapping key an attacker can predict.
+  - Header MAC is now verified against the literal header bytes read from the
+    file instead of a re-serialization of the parsed stanzas. Files whose
+    stanza formatting differs from ours but is valid per the spec now verify
+    correctly; output is unchanged, the write path still serializes.
+  - Crypt::Age::Header->parse no longer warns "Use of uninitialized value in
+    seek" when the offset scalar it is handed is undef; it is treated as 0
+    again, as before the filehandle rewrite.
+  - Removed the unfinished Crypt::Age::Stanza::Scrypt, which was never usable
+    (it failed to compile) and had no public API. scrypt/passphrase recipients
+    remain unimplemented.
+  - Fixed the method names in the encrypt_filehandle/decrypt_filehandle POD
+    synopses, which showed encrypt_file/decrypt_file.
+
 0.001     2026-01-11 03:51:40Z
   - Initial release
   - X25519 recipient support

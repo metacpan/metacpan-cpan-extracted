@@ -1,0 +1,4 @@
+flowers.garden.csv: 197: common_name,scientific_name,aliases,height,width,publish
+flowers.pipe.csv:   182: id,aliases,common_name,height,max_height,max_width,min_height,min_width,pig_latin,publish,scientific_name,width
+flowers.web.csv:    203: kind,scientific_name,common_name,aliases,planted,thumbnail
+flowers.csv:        207: aliases,common_name,height,kind,max_height,max_width,min_height,min_width,pig_latin,planted,publish,scientific_name,thumbnail,width

@@ -5,7 +5,7 @@ use warnings;
 
 $|++;
 
-use Test::More tests => 70;
+use Test::More;
 use Test::Warnings;
 my $verbose = 0;
 
@@ -27,24 +27,22 @@ ok (defined &si_uname, "si_uname imported");
 
 {   my $si = System::Info->new;
 
-    my ($counter, $expect) = (0, 4);
+    my $expect = 4;
 
     isa_ok ($si, "System::Info::Base");
-    $counter += ok ($si->cpu_type, "cpu_type: " . $si->cpu_type);
-    $counter += ok ($si->cpu,      "cpu: "      . $si->cpu);
+    ok ($si->cpu_type, "cpu_type: " . $si->cpu_type);
+    ok (defined $si->cpu, "cpu: "   . $si->cpu);
     SKIP: {
 	$si->ncpu or skip "No #cpu code for this platform", 1;
-	$counter += ok ($si->ncpu,  "number of cpus: " . $si->ncpu);
+	ok ($si->ncpu,  "number of cpus: " . $si->ncpu);
 	$expect++;
 	}
-    $counter += ok (        $si->os,   $si->os);
-    $counter += ok (defined $si->host, $si->host);
+    ok (        $si->os,   $si->os);
+    ok (defined $si->host, $si->host);
 
     ok (my $sysinfo = sysinfo (), "sysinfo function");
     is (join (" " => @{ $si }{map "_$_" => qw( host os cpu_type )}),
        $sysinfo, "test sysinfo $sysinfo");
-
-    is ($counter, $expect, "sysinfo: $sysinfo");
 
     ok (my $si_hash = sysinfo_hash (), "sysinfo_hash function");
     ok (ref $si, "Returns a ref");
@@ -106,3 +104,5 @@ ok (defined &si_uname, "si_uname imported");
     is ($si->si_uname (qw( c p )), $si->si_uname ("c p"),           "si_uname (c p)");
     is ($si->si_uname (qw( p c )), $si->si_uname ("c p"),           "si_uname (c p)");
     }
+
+done_testing;

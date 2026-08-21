@@ -39,7 +39,7 @@ MR DUCKS
 EONOTYAML
 
 {
-    dies_ok { yaml2h2o $NOT_YAML_OR_FILE } q{yaml2h2o passed something this is not a file name nor clearly not YAML.};
+    dies_ok { yaml2h2o $NOT_YAML_OR_FILE } q{yaml2h2o rejects input that is neither a file name nor clearly YAML};
 
     my ( $dbconfig1, $devices1 ) = yaml2h2o $YAML;
 
@@ -48,16 +48,21 @@ EONOTYAML
 
     my ( $fh, $filename ) = tempfile( SUFFIX => '.yaml' );
 
-    print $fh $YAML;
+    print {$fh} $YAML;
+    close $fh or die qq{Could not close temporary YAML file '$filename': $!};
 
-    my ( $dbconfig2, $devices2 ) = yaml2h2o $YAML;
+    my ( $dbconfig2, $devices2 ) = yaml2h2o $filename;
 
     is $dbconfig2->database->host,        q{localhost}, q{YAML file parsed and objectified as expected};
     is $devices2->devices->copter1->port, 80,           q{YAML file parsed and objectified as expected};
+
+    my $missing_filename = $filename . q{.does-not-exist};
+
+    dies_ok { yaml2h2o $missing_filename } q{yaml2h2o rejects a one-line file name that does not exist};
 }
 
 {
-    dies_ok { yaml2o $NOT_YAML_OR_FILE } q{yaml2o passed something this is not a file name nor clearly not YAML.};
+    dies_ok { yaml2o $NOT_YAML_OR_FILE } q{yaml2o rejects input that is neither a file name nor clearly YAML};
 
     my ( $dbconfig1, $devices1 ) = yaml2o $YAML;
 
@@ -66,12 +71,14 @@ EONOTYAML
 
     my ( $fh, $filename ) = tempfile( SUFFIX => '.yaml' );
 
-    print $fh $YAML;
+    print {$fh} $YAML;
+    close $fh or die qq{Could not close temporary YAML file '$filename': $!};
 
-    my ( $dbconfig2, $devices2 ) = yaml2o $YAML;
+    my ( $dbconfig2, $devices2 ) = yaml2o $filename;
 
     is $dbconfig2->database->host,        q{localhost}, q{YAML file parsed and objectified as expected};
     is $devices2->devices->copter1->port, 80,           q{YAML file parsed and objectified as expected};
 }
 
 done_testing;
+

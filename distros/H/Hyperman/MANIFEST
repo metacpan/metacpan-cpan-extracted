@@ -1,5 +1,9 @@
 Changes
 Hyperman.xs
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
 include/hyperman/backend_epoll.c
 include/hyperman/backend_iouring.c
 include/hyperman/backend_kqueue.c
@@ -7,6 +11,9 @@ include/hyperman/backend_poll.c
 include/hyperman/backend_wsapoll.c
 include/hyperman/hm_abi.h
 include/hyperman/hm_abi_impl.h
+include/hyperman/hm_atomic.h
+include/hyperman/hm_bus.h
+include/hyperman/hm_bus_perl.h
 include/hyperman/hm_compat.h
 include/hyperman/hm_compress.h
 include/hyperman/hm_core.h
@@ -14,10 +21,10 @@ include/hyperman/hm_future.h
 include/hyperman/hm_http2.h
 include/hyperman/hm_parse.h
 include/hyperman/hm_ratelimit.h
-include/hyperman/hm_workerhook.h
-include/hyperman/hm_workerhook_perl.h
 include/hyperman/hm_tls.h
 include/hyperman/hm_win.h
+include/hyperman/hm_workerhook.h
+include/hyperman/hm_workerhook_perl.h
 include/hyperman/hyperman.h
 lib/Hyperman.pm
 lib/Hyperman/Event/Epoll.pm
@@ -27,10 +34,6 @@ lib/Hyperman/Event/Poll.pm
 lib/Hyperman/Future.pm
 lib/Hyperman/Loop.pm
 lib/Plack/Handler/Hyperman.pm
-Makefile.PL
-MANIFEST			This list of files
-MANIFEST.SKIP
-README
 t/00-load.t
 t/01-plack.t
 t/10-future.t
@@ -54,14 +57,18 @@ t/27-sendfile.t
 t/28-windows.t
 t/30-compress-accept.t
 t/31-compress.t
+t/32-body-spill.t
 t/32-max-body.t
 t/33-worker-start.t
 t/34-perl-arena.t
+t/35-bus.t
+t/36-bus-wakeup.t
 t/lib/HMTest.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xs/abi.xs
+xs/bus.xs
 xs/event.xs
 xs/future.xs
 xs/hyperman.xs

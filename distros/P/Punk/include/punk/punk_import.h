@@ -149,6 +149,7 @@ static const pki_kw PKI_KEYWORDS[] = {
     { "markdown",   "markdown",    PKW_FWD    },
     { "mount",      "mount",       PKW_FWD    },
     { "views",      "views",       PKW_FWD    },
+    { "cache",      "cache",       PKW_FWD    },
     { "config",     "config",      PKW_FWD    },
     { "secret",     "secret",      PKW_FWD    },
     { "database",   "database",    PKW_FWD    },
@@ -162,6 +163,7 @@ static const pki_kw PKI_KEYWORDS[] = {
 
     { "helper",     "helper",      PKW_HELPER },
     { "to_app",     "compile",     PKW_NOARG  },
+    { "upload_dir", "upload_dir",  PKW_FWD    },
     { "punk_app",   NULL,          PKW_SELF   },
     { NULL, NULL, 0 }
 };

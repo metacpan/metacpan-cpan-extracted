@@ -300,6 +300,31 @@ safe_path(self, path, fallback = &PL_sv_undef)
     OUTPUT:
         RETVAL
 
+# $c->asset('/static/app.css') - the content-addressed URL for a file under
+# a static mount: '/static/app.9f3a1c2b0d4e5f60.css', which serves with a
+# year and `immutable` because that URL cannot come to mean anything else.
+# A URL under no static mount, under one with fingerprinting off, or naming
+# a file that cannot be read comes back exactly as it went in - the page
+# still works, it just revalidates.
+SV *
+asset(self, url)
+        SV *self
+        SV *url
+    CODE:
+    {
+        AV *av  = pcx_av(aTHX_ self);
+        SV *app = pcx_get(aTHX_ av, PCX_APP);
+        SV *out = NULL;
+        if (app && SvROK(app) && SvTYPE(SvRV(app)) == SVt_PVHV) {
+            SV *mp = app_get(aTHX_ (HV *)SvRV(app), K_MOUNTS_C);
+            if (mp && SvROK(mp) && SvTYPE(SvRV(mp)) == SVt_PVAV)
+                out = pa_asset_for(aTHX_ (AV *)SvRV(mp), url);
+        }
+        RETVAL = out ? out : newSVsv(url);
+    }
+    OUTPUT:
+        RETVAL
+
 SV *
 redirect(self, url, status = &PL_sv_undef)
         SV *self
@@ -633,6 +658,47 @@ session_expire(self)
     OUTPUT:
         RETVAL
 
+# session_rotate: keep the session, give it a new name.
+#
+# Call it at the privilege boundary - a login, an elevation - and nowhere else.
+# Session fixation is the attack: somebody plants a known id in a victim's
+# browser and waits for them to log in. If logging in writes the user into the
+# session the attacker planted, the attacker's id is now an authenticated
+# session. The cookie session is immune by accident, because its value changes
+# wholesale when its contents do. A stored session is not: the id survives the
+# login unless something changes it.
+#
+# It cannot be automatic. "Privilege changed" is application knowledge, and
+# every candidate for guessing it is wrong - rotating whenever the session
+# gains a key rotates on a shopping basket, rotating on every POST is a store
+# write per form submission, and watching for a key named `user_id` is a
+# convention nobody agreed to.
+SV *
+session_rotate(self)
+        SV *self
+    CODE:
+    {
+        AV *av = pcx_av(aTHX_ self);
+        HV *stash = ps_stash(aTHX_ av);
+        SV **idp;
+        /* Load first: the contents have to survive the rotation, and a
+         * handler that rotates before touching $c->session would otherwise
+         * leave the write-back with no session to write. */
+        SV *sess = ps_load(aTHX_ self);
+        SvREFCNT_dec(sess);
+        idp = hv_fetch(stash, PK_SESSION_SID, PK_SESSION_SID_LEN, 0);
+        /* The old id to retire, or undef when this session is new - which is
+         * the ordinary case for a login, and still marks the write-back as
+         * rotating so an unchanged session is written under the new name. */
+        (void)hv_store(stash, PK_SESSION_ROT, PK_SESSION_ROT_LEN,
+                       (idp && *idp && SvOK(*idp)) ? newSVsv(*idp) : newSV(0),
+                       0);
+        (void)hv_delete(stash, PK_SESSION_SID, PK_SESSION_SID_LEN, G_DISCARD);
+        RETVAL = newSVsv(self);
+    }
+    OUTPUT:
+        RETVAL
+
 # flash: one-request messages over the session (punk_flash.h). Any flash call
 # rotates the inbound hash out of the session, so the consuming response's
 # cookie no longer carries it; writes fill a fresh outbound hash the NEXT
@@ -832,3 +898,91 @@ rate_hit(self, key, limit, window)
         XPUSHs(sv_2mortal(newSViv(rem)));
         XPUSHs(sv_2mortal(newSViv(reset)));
     }
+
+# ---- the cross-worker bus ---------------------------------------------------
+
+# publish($topic, $payload)
+#
+#    1  on the ring: every worker in the pool will see it
+#    0  local only - there is no pool (not under Hyperman, or a Hyperman
+#       without the bus), so nobody else will
+#   -1  refused: too big for a bus slot
+#
+# Three outcomes rather than true or false, because "the pool got it" and
+# "only I got it" are different facts, and an application that cannot tell
+# them apart cannot diagnose why the other workers stayed quiet.
+IV
+publish(self, topic, payload)
+        SV *self
+        SV *topic
+        SV *payload
+    CODE:
+        PERL_UNUSED_VAR(self);
+        RETVAL = punk_bus_app_publish(aTHX_ topic, payload);
+    OUTPUT:
+        RETVAL
+
+# subscribe($topic, $cb, %opt)
+#
+# $cb is called as $cb->($topic, $payload) in this worker.
+#
+# `group => $name` is the only difference between the two delivery modes:
+# without it every worker's subscriber sees every message (what a fanout
+# wants), with it exactly one member of the named group sees each (work spread
+# across the pool, with no scheduler - a busy worker simply is not there to
+# claim).
+#
+# Register at BOOT, not per request. A subscription made inside a request
+# lands in one worker and lasts as long as that process, which is the same
+# class of mistake the bus exists to fix.
+IV
+subscribe(self, topic, cb, ...)
+        SV *self
+        SV *topic
+        SV *cb
+    CODE:
+    {
+        SV *group = &PL_sv_undef;
+        int i;
+        PERL_UNUSED_VAR(self);
+        for (i = 3; i + 1 < items; i += 2) {
+            const char *k = SvPV_nolen(ST(i));
+            if (strEQ(k, "group")) group = ST(i + 1);
+        }
+        RETVAL = punk_bus_app_subscribe(aTHX_ topic, cb, group);
+    }
+    OUTPUT:
+        RETVAL
+
+# $c->cache / $c->cache($name) - a cache store.
+#
+# Built once, at to_app, and shared by every request on this worker: a store
+# constructed per request would be a cache that never hits.
+#
+# Named stores exist because a session cache and a rendered-page cache want
+# different budgets and different lifetimes, and sharing one means the big
+# cold thing evicts the small hot thing.
+SV *
+cache(self, name = NULL)
+        SV *self
+        SV *name
+    CODE:
+    {
+        AV  *av  = pcx_av(aTHX_ self);
+        SV  *app = pcx_get(aTHX_ av, PCX_APP);
+        STRLEN nl;
+        const char *n = (name && SvOK(name)) ? SvPV_const(name, nl)
+                                             : (nl = sizeof(K_DEFAULT) - 1,
+                                                K_DEFAULT);
+        SV **slot = NULL, **built = NULL;
+        if (app && SvROK(app) && SvTYPE(SvRV(app)) == SVt_PVHV)
+            built = hv_fetchs((HV *)SvRV(app), "cache", 0);
+        if (built && *built && SvROK(*built)
+            && SvTYPE(SvRV(*built)) == SVt_PVHV)
+            slot = hv_fetch((HV *)SvRV(*built), n, (I32)nl, 0);
+        if (!(slot && *slot && SvOK(*slot)))
+            croak("Punk: no cache named '%s' (add a `cache` keyword)", n);
+        RETVAL = newSVsv(*slot);
+    }
+    OUTPUT:
+        RETVAL

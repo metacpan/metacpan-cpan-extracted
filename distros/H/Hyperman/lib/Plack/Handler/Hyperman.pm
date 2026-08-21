@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Hyperman ();
 
-our $VERSION = '0.27';
+our $VERSION = '0.32';
 
 sub new {
     my ($class, %args) = @_;
@@ -35,6 +35,7 @@ sub run {
                idle_timeout header_timeout max_pipeline http2 redirect_https
                compress compress_min_length compress_level max_body
                access_log deny_capacity rate_capacity
+               bus_slots bus_slot_size bus_groups
                tls_cert tls_key tls_ca tls_verify tls_sni),
     );
 
@@ -82,7 +83,8 @@ identically to the same options passed to C<run> directly:
 C<reuseport>, C<max_requests_per_worker>, C<shutdown_grace>, C<affinity>,
 C<idle_timeout>, C<header_timeout>, C<max_pipeline>, C<http2>,
 C<redirect_https>, C<max_body>, C<access_log>, C<deny>,
-C<deny_capacity>, C<rate_capacity>, C<compress>, C<compress_min_length>,
+C<deny_capacity>, C<rate_capacity>, C<bus_slots>, C<bus_slot_size>,
+C<bus_groups>, C<compress>, C<compress_min_length>,
 C<compress_level>, and the C<tls_*> family. See L<Hyperman/run> for what
 each means; the two that most often want setting have their own sections
 below.

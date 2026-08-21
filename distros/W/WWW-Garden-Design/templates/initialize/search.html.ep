@@ -1,0 +1,36 @@
+<form name = 'search_form' id = 'search_form'>
+	<!-- We don't use Mojo's csrf_field because it does not generate an id, so jQuery has a problem -->
+	<input id = 'csrf_token' type = 'hidden' value = '<%= $csrf_token %>'>
+
+	<table align = 'center'>
+		<tr>
+			<td colspan = '2'><div class = 'blue_centered'>Search</div><br /></td>
+		</tr>
+		% for my $check_box (@$search_check_boxes) {
+		<tr>
+			<td><%== $$check_box[0] %>: </td>
+			<td>
+				<%== $$check_box[1] %>
+			</td>
+		</tr>
+		<tr>
+			<td colspan = '2'><hr></td>
+		</tr>
+		% }
+	</table>
+	<table align = 'center'>
+		<tr>
+			<td>Search text: </td>
+			<td align = 'left'><input id = 'search_text' type = 'text' size = '30' maxlength = '100' value = ''></td>
+		</tr>
+		<tr>
+			<td colspan = '2'><br /></td>
+		</tr>
+		<tr>
+			<td align = 'center'><input type = 'submit' value = 'Search' /></td>
+			<td align = 'center'><input type = 'reset'  value = 'Reset'  /></td>
+		</tr>
+	</table>
+</form>
+
+<div id = 'search_result_div'></div>

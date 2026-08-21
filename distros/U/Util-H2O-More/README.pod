@@ -1,3 +1,4 @@
+
 =encoding UTF-8
 
 =head1 NAME
@@ -358,8 +359,8 @@ handled upstream in Util::H2O (e.g., via a dedicated flag).
 
 =head2 C<Getopt2h2o [-autoundef], ARGV_REF, DEFAULTS_REF, LIST>
 
-Wrapper around the idiom enabled by C<opt2h2o>. It also C<require>s L<Getopt::Long>.
-Usage:
+Wrapper around the idiom enabled by C<opt2h2o>. It also C<require>s
+L<Getopt::Long> and calls C<GetOptionsFromArray> for you.
 
   use Util::H2O::More qw/Getopt2h2o/;
   my $opts = Getopt2h2o \@ARGV, { n => 10 }, qw/f=s n=i/;
@@ -383,8 +384,63 @@ Example:
 
   my $opts = Getopt2h2o -autoundef, \@ARGV, { n => 10 }, qw/f=s n=i verbose!/;
 
-Negative option syntax (e.g. C<verbose!> supporting both C<--verbose> and
-C<--no-verbose>) is supported.
+Negative option syntax (for example, C<verbose!> supporting both C<--verbose>
+and C<--no-verbose>) is supported because the option specifications are passed
+directly to L<Getopt::Long>.
+
+=head3 Option arguments are not required options
+
+An easy point of confusion in L<Getopt::Long> syntax is the meaning of C<=>.
+For example:
+
+  name=s
+
+means that I<if> C<--name> is present, it requires a string argument. It does
+B<not> mean that C<--name> itself must appear on the command line.
+
+Required-option validation therefore remains application logic. For example:
+
+  my $opts = Getopt2h2o \@ARGV, {}, qw/name=s water=s@/;
+
+  die qq{Missing --name\n} unless defined $opts->name;
+
+Use C<defined> rather than a simple truth test when false-looking values such as
+C<0> are legitimate option values.
+
+=head3 Parse failures and usage handling
+
+C<Getopt2h2o> is intended as the shortest path from a Getopt specification to
+an accessor-based object. At present it returns that object and does not
+separately expose the boolean return value from C<GetOptionsFromArray>.
+
+If an application needs to branch on option-parser failure, call C<opt2h2o>
+directly and retain the normal L<Getopt::Long> return value:
+
+  use Getopt::Long qw/GetOptionsFromArray/;
+  use Util::H2O::More qw/h2o opt2h2o/;
+
+  my @opt_spec = qw/name=s water=s@/;
+  my $opts = h2o {}, opt2h2o(@opt_spec);
+
+  GetOptionsFromArray(\@ARGV, $opts, @opt_spec)
+      or die qq{bad options\n};
+
+This is also the useful form when parse failure should invoke L<Pod::Usage>:
+
+  use Pod::Usage qw/pod2usage/;
+
+  GetOptionsFromArray(\@ARGV, $opts, @opt_spec)
+      or pod2usage(-exitval => 2);
+
+L<Getopt::Long> 2.32 and later also provide their own help integration. Programs
+that want the standard automatic help behavior may configure C<auto_help> before
+parsing:
+
+  use Getopt::Long qw/:config auto_help/;
+
+For custom C<--help> and C<--man> behavior, add those options to the normal
+option specification and call C<pod2usage> explicitly. See L</TESTABLE MODULINO
+RECIPE> for a complete example.
 
 =head2 C<opt2h2o LIST>
 
@@ -404,6 +460,170 @@ they can be passed to C<h2o> to create accessors without duplicating lists.
 Defaults may be provided via the initial hashref:
 
     my $o = h2o { option1 => q{foo} }, opt2h2o(@opts);
+
+=head1 TESTABLE MODULINO RECIPE
+
+A small command-line program can also be written as a I<modulino>: a file that
+runs as a script but can be loaded as a package by a test. C<Util::H2O::More>
+works well for this style without requiring a full object framework.
+
+For the very shortest scripts, C<Getopt2h2o> is convenient. For a modulino,
+using C<baptise> plus C<opt2h2o> directly has two advantages:
+
+=over 4
+
+=item *
+
+C<baptise> returns a fresh object that inherits from the modulino package, so
+normal package methods such as C<run> are available on the same object as the
+option accessors.
+
+=item *
+
+Calling C<GetOptionsFromArray> directly preserves its success/failure result,
+which makes it straightforward to invoke C<Pod::Usage> or another error handler.
+
+=back
+
+The important detail is to create a B<new object for every parse>. Do not keep a
+single lexical option object and repeatedly parse into it; a later invocation in
+the same interpreter could otherwise retain values from an earlier one.
+
+Here is a complete example in the style of a traditional testable command-line
+modulino:
+
+  #!/usr/bin/env perl
+  use strict;
+  use warnings;
+
+  package modulinh2o;
+
+  use Getopt::Long qw/GetOptionsFromArray/;
+  use Pod::Usage qw/pod2usage/;
+  use Util::H2O::More qw/baptise opt2h2o/;
+
+  my @opt_spec = qw/
+      name=s
+      water=s@
+      help
+      man
+  /;
+
+  sub new {
+      my $class = shift;
+      my %opts  = @_;
+
+      return baptise \%opts, $class, opt2h2o(@opt_spec);
+  }
+
+  sub new_with_options {
+      my ( $class, $argv ) = @_;
+      $argv = \@ARGV unless defined $argv;
+
+      # Always parse into a fresh object.
+      my $self = $class->new;
+
+      GetOptionsFromArray($argv, $self, @opt_spec)
+          or pod2usage(
+              -exitval => 2,
+              -message => q{Use --help to list options},
+          );
+
+      pod2usage(-exitval => 0, -verbose => 1) if $self->help;
+      pod2usage(-exitval => 0, -verbose => 2) if $self->man;
+
+      # "name=s" requires a value when --name is used; it does not
+      # make --name mandatory.  Validate mandatory options here.
+      pod2usage(
+          -exitval => 2,
+          -message => q{Missing --name},
+      ) unless defined $self->name;
+
+      # Application defaults can still be applied after parsing.
+      $self->water([qw/still sparkling tap/])
+          unless defined $self->water and @{ $self->water };
+
+      return $self;
+  }
+
+  sub time_of_day {
+      my %hours = (
+           5 => q{morning},
+          12 => q{afternoon},
+          17 => q{evening},
+          21 => q{night},
+      );
+
+      for (sort { $b <=> $a } keys %hours) {
+          return $hours{$_} if (localtime)[2] >= $_;
+      }
+
+      return q{night};
+  }
+
+  sub run {
+      my $self = shift;
+
+      printf qq{Good %s, %s!\n}, $self->time_of_day, $self->name;
+      print qq{What kind of water would you like?\n};
+      print qq{- $_\n} for @{ $self->water };
+
+      return;
+  }
+
+  package main;
+
+  sub main {
+      modulinh2o->new_with_options->run;
+      return;
+  }
+
+  main() unless caller;
+
+  __END__
+
+  =head1 NAME
+
+  modulinh2o - small testable Util::H2O::More command-line program
+
+  =head1 SYNOPSIS
+
+      modulinh2o --name Aquarius --water sparkling --water still
+      modulinh2o --help
+      modulinh2o --man
+
+  =head1 OPTIONS
+
+  =over 4
+
+  =item B<--name STRING>
+
+  Name used in the greeting. Required.
+
+  =item B<--water STRING>
+
+  Water choice. May be repeated. Defaults to still, sparkling, and tap.
+
+  =item B<--help>
+
+  Show brief usage.
+
+  =item B<--man>
+
+  Show the full manual.
+
+  =back
+
+The unit tests in this distribution include a smaller version of this pattern in
+C<t/lib/ModulinoH2O.pm> and exercise both programmatic construction and repeated
+command-line construction. In particular, they verify that a second parse does
+not inherit option values from the first.
+
+This recipe is deliberately small. If an application needs a declarative option
+framework where documentation, type constraints, coercions, and validation are
+all described as option metadata, a framework such as L<MooX::Options> may be a
+better fit. C<Util::H2O::More> intentionally keeps L<Getopt::Long>'s compact
+option-specification syntax rather than trying to replace such frameworks.
 
 =head2 C<HTTPTiny2h2o [-autothrow], REF>
 
@@ -517,6 +737,11 @@ You can do:
 
 C<ini2o> is provided as a backward-compat alias.
 
+=head2 C<ini2o FILENAME>
+
+Backward-compatible alias for C<ini2h2o>. New code may prefer the more explicit
+C<ini2h2o> name.
+
 =head2 C<h2o2ini REF, FILENAME>
 
 Takes an object created via C<ini2h2o> and writes it back to disk in INI format
@@ -527,6 +752,11 @@ using L<Config::Tiny>.
   h2o2ini $config, q{/path/to/other.ini};
 
 C<o2ini> is provided as a backward-compat alias.
+
+=head2 C<o2ini REF, FILENAME>
+
+Backward-compatible alias for C<h2o2ini>. New code may prefer the more explicit
+C<h2o2ini> name.
 
 =head2 C<o2h2o REF>
 
@@ -715,3 +945,4 @@ L<https://perladvent.org/2023/2023-12-22.html>.
 =head1 AUTHOR
 
 Oodler 577 L<< <oodler@cpan.org> >>
+

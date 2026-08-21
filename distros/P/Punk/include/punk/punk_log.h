@@ -183,7 +183,10 @@ static void pl_logfmt_key(pTHX_ SV *out, SV *k) {
     const char *s = SvPV_const(k, l);
     for (i = 0; i < l; i++) {
         unsigned char c = (unsigned char)s[i];
-        if (c <= ' ' || c == '=' || c == '"' || c == '\\') sv_catpvs(out, "_");
+        /* 0x7f as well as the C0 range: DEL is not printable and is not
+         * caught by `c <= ' '`. */
+        if (c <= ' ' || c == 0x7f || c == '=' || c == '"' || c == '\\')
+            sv_catpvs(out, "_");
         else sv_catpvn(out, s + i, 1);
     }
 }
@@ -210,7 +213,8 @@ static void pl_logfmt_val(pTHX_ SV *out, SV *v) {
     if (l == 0) quote = 1;
     for (i = 0; i < l && !quote; i++) {
         unsigned char c = (unsigned char)s[i];
-        if (c <= ' ' || c == '"' || c == '=' || c == '\\') quote = 1;
+        if (c <= ' ' || c == 0x7f || c == '"' || c == '=' || c == '\\')
+            quote = 1;
     }
     if (!quote) { sv_catpvn(out, s, l); return; }
     sv_catpvs(out, "\"");
@@ -222,7 +226,36 @@ static void pl_logfmt_val(pTHX_ SV *out, SV *v) {
             case '\n': sv_catpvs(out, "\\n");  break;
             case '\r': sv_catpvs(out, "\\r");  break;
             case '\t': sv_catpvs(out, "\\t");  break;
-            default:   sv_catpvn(out, &c, 1);  break;
+            default:
+                /* EVERY other control byte, as \xHH.
+                 *
+                 * The four escapes above stop a value forging a LINE. They do
+                 * not stop it forging what a line appears to SAY: an ESC in a
+                 * log file is a terminal escape sequence, and somebody who
+                 * tails that file has their cursor moved, their screen
+                 * cleared, or an earlier line overwritten with whatever the
+                 * value wanted it to read. A NUL truncates the line for any
+                 * reader that treats it as a C string, and a DEL is simply
+                 * invisible.
+                 *
+                 * Values reaching here are frequently request bytes - a
+                 * CSP violation report, a header, a form field - so this is
+                 * the same class as the escapes above and belongs beside
+                 * them.
+                 *
+                 * Bytes at or above 0x80 are left alone: they are UTF-8
+                 * continuation bytes, and escaping them would mangle every
+                 * non-ASCII value in the log to protect against nothing. */
+                if ((unsigned char)c < 0x20 || (unsigned char)c == 0x7f) {
+                    static const char HEX[] = "0123456789abcdef";
+                    char esc[4];
+                    esc[0] = '\\'; esc[1] = 'x';
+                    esc[2] = HEX[((unsigned char)c >> 4) & 0xf];
+                    esc[3] = HEX[(unsigned char)c & 0xf];
+                    sv_catpvn(out, esc, 4);
+                }
+                else sv_catpvn(out, &c, 1);
+                break;
         }
     }
     sv_catpvs(out, "\"");
@@ -357,8 +390,19 @@ static void pl_emit(pTHX_ SV *self, int lvl, SV *msg, HV *fields) {
             p = hv_fetchs(env, "PATH_INFO", 0);
             if (m && *m && SvOK(*m)) method = SvPV_const(*m, ml);
             if (p && *p && SvOK(*p)) path = SvPV_const(*p, pl2);
+            /* psgix.request_id ONLY.
+             *
+             * This used to fall back to HTTP_X_REQUEST_ID when the extension
+             * key was absent - that is, to whatever the client sent. A log
+             * field is the one place attacker-chosen bytes should never
+             * arrive by default, and "request_id" is a field a reader trusts
+             * to identify a request rather than to quote a stranger.
+             *
+             * Punk::Plugin::RequestId sets psgix.request_id, and adopting an
+             * inbound header is its `trust_header` option, which validates
+             * before it adopts. That is the supported way to get a client's
+             * id into a log line, and it is opt in. */
             r = hv_fetchs(env, "psgix.request_id", 0);
-            if (!(r && *r && SvOK(*r))) r = hv_fetchs(env, "HTTP_X_REQUEST_ID", 0);
             if (r && *r && SvOK(*r)) reqid = *r;
         }
     }
@@ -384,6 +428,24 @@ static void pl_emit(pTHX_ SV *self, int lvl, SV *msg, HV *fields) {
                 sv_catpvs(detail, " ");
             sv_catsv(detail, pairs);
         }
+    }
+
+    /* The request id, as one more logfmt pair.
+     *
+     * A FIELD rather than a new positional element, and that is the
+     * compatibility decision: the line keeps its shape,
+     * `[time] [level] METHOD /path - message`, so anything already splitting
+     * on that prefix still works, and the id joins the fields that were
+     * always allowed to appear after the message. Adding a seventh position
+     * would have broken every reader in exchange for nothing.
+     *
+     * Rendered through pl_logfmt_val like any other value, so a newline in an
+     * id cannot forge a line - the id reaching here has been validated by the
+     * plugin, but this code cannot know that another layer set the key. */
+    if (reqid) {
+        if (SvCUR(detail) && SvEND(detail)[-1] != ' ') sv_catpvs(detail, " ");
+        sv_catpvs(detail, "request_id=");
+        pl_logfmt_val(aTHX_ detail, reqid);
     }
 
     if (env) {                                          /* prefer psgix.logger */

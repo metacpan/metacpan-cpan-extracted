@@ -5,7 +5,7 @@ PROTOTYPES: DISABLE
 # $c->send_file($path_or_scalarref, %opts) - a finished download response
 # (punk_sendfile.h): validators, single-range 206/416, Content-Disposition,
 # HEAD. Returns the triplet, so the handler returns it. Options: type,
-# filename, inline, ranges, mtime, etag, missing.
+# filename, inline, ranges, mtime, etag, cache_control, missing.
 SV *
 send_file(self, src, ...)
         SV *self
@@ -44,6 +44,7 @@ send_file(self, src, ...)
             else if (strEQ(k, "ranges"))   o.ranges = SvTRUE(v) ? 1 : 0;
             else if (strEQ(k, "mtime"))    mtime_opt = v;
             else if (strEQ(k, "etag"))     o.etag = v;
+            else if (strEQ(k, "cache_control")) o.cache_control = v;
             else if (strEQ(k, "missing"))  missing = v;
             else croak("Punk::Context::send_file: unknown option '%s'", k);
         }

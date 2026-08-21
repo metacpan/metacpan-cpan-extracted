@@ -1,4 +1,5 @@
-package BenchCat;
+package
+    BenchCat;
 
 use strict;
 use warnings;

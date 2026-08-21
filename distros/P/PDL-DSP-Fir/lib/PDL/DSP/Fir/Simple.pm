@@ -99,26 +99,26 @@ Return the kernel used in the convolution.
 
 Apply a lowpass filter of order 20 with a tukey window with parameter I<alpha> = 0.5.
 
-  $xf = filter($x, {fc => 0.9 , 
+  $xf = filter($x, {fc => 0.9 ,
     window => { name => 'tukey', params => 0.5 } , N => 20 });
 
 =head3 OPTIONS
 
 =over
 
-=item N    
+=item N
 
 Order of filter. I.e. the number of points in the filter kernel.
 If this option is not given, or is undefined, or false, or less than
 zero, then the order of the filter is equal to the number of points
 in the data C<$x>.
- 
-=item  kern  
+
+=item  kern
 
 A kernel to use for convolution rather than calculating a kernel
 from other parameters.
 
-=item boundary   
+=item boundary
 
 Boundary condition passed to C<convolveND>. Must be one of
 'extend', 'truncate', 'periodic'. See L<PDL::ImageND>.
@@ -175,10 +175,10 @@ be between 0 and 1, with 1 representing the nyquist frequency.
 
 sub testdata {
     my ($M, $f, $amp) = @_;
-    my $x = zeroes($M); 
+    my $x = zeroes($M);
     my $n = sequence($M);
     foreach (@$f) {
-        $x = $x + (shift @$amp)*sin(PI*$n*($_)); 
+        $x = $x + (shift @$amp)*sin(PI*$n*($_));
     }
     return $x;
 }

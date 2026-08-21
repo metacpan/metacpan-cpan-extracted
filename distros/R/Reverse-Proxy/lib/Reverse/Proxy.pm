@@ -6,15 +6,27 @@ use warnings;
 use Carp ();
 use Fetch;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Reverse::Proxy', $VERSION);
 
-Carp::croak(
-	"Reverse::Proxy requires Fetch built with its C ABI (Fetch 0.05 or later); "
-	. "please upgrade or reinstall Fetch"
-) unless _abi_ok();
+unless (_abi_ok()) {
+	# Say which numbers disagreed. The message this replaced blamed an old
+	# Fetch and told people to upgrade, which was wrong in the only way that
+	# matters: every report of it came from an installation whose Fetch was
+	# NEWER than required, and upgrading could not have helped.
+	my ($seen, $want) = (_abi_seen(), _abi_want());
+	Carp::croak(
+		$seen
+		? "Reverse::Proxy $VERSION was built against Fetch C ABI version "
+		  . "$want, but the installed Fetch $Fetch::VERSION provides "
+		  . "version $seen - reinstall Reverse::Proxy against this Fetch"
+		: "Reverse::Proxy requires Fetch built with its C ABI (Fetch 0.05 "
+		  . "or later); the installed Fetch $Fetch::VERSION did not provide "
+		  . "one, so please upgrade or reinstall Fetch"
+	);
+}
 
 1;
 
@@ -26,7 +38,7 @@ Reverse::Proxy - a generic, non-blocking PSGI reverse proxy
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

@@ -8,6 +8,8 @@ use warnings;
 use Test::More;
 use FindBin qw($RealBin);
 use lib "$RealBin/../lib";
+use lib $RealBin;
+use pagi_compat_helper qw(pagi_skip_reason);
 
 use File::Temp qw(tempdir tempfile);
 use File::Path qw(make_path);
@@ -45,6 +47,9 @@ SKIP: {
 
 
 SKIP: {
+    my $pagi_skip=pagi_skip_reason(qw(PAGI::Request PAGI::Response PAGI::Test::Client PAGI::SSE PAGI::WebSocket Future::AsyncAwait));
+    skip "Skipping PAGI wrapper traversal test: $pagi_skip", 5
+        if $pagi_skip;
     eval { require WebDyne::PAGI; require PAGI::Test::Client; 1 } or skip("Skipping PAGI wrapper traversal test: $@", 5);
 
     my $app_cr=WebDyne::PAGI->new(root => $document_root, index => 'index.psp')->to_app();

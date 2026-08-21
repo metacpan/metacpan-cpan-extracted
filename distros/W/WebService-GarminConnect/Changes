@@ -1,5 +1,8 @@
 Revision history for WebService-GarminConnect
 
+1.1.3   2026-08-19
+        - Add _api_raw to allow for calls that return non-JSON
+
 1.1.2   2024-11-26
         - Change User-Agent header to keep up with Garmin
 

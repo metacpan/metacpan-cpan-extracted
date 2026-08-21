@@ -53,8 +53,20 @@ sub by_name {
     my $dp = by_name($m->collect, 'dur')->{data_points}[0];
     is($dp->{count}, 4, 'the histogram counted every observation');
     cmp_ok(abs($dp->{sum} - 30.431), '<', 1e-9, 'and summed them');
-    is($dp->{min}, 0.001, 'with the minimum');
-    is($dp->{max}, 30, 'and the maximum');
+    # A tolerance, not an exact match, and not fussiness.
+    #
+    # OTLP's histogram min/max are IEEE doubles on the wire, so a recorded
+    # value has legitimately round-tripped through one. On a perl built
+    # -Duselongdouble that round trip is VISIBLE: 0.001 comes back as
+    # 0.00100000000000000002, because the long double faithfully preserves
+    # the double's approximation while the Perl literal is the long double
+    # nearest 0.001. is() compares as strings, so an exact match here
+    # asserts the platform's NV width rather than anything about the metric.
+    #
+    # Reported by CPAN Testers against 0.03 on both 5.24.3 and 5.45.1, and
+    # the sum assertion two lines up already had it right.
+    cmp_ok(abs($dp->{min} - 0.001), '<', 1e-9, 'with the minimum');
+    cmp_ok(abs($dp->{max} - 30),    '<', 1e-9, 'and the maximum');
     is(scalar @{ $dp->{bucket_counts} },
        scalar(@{ $dp->{explicit_bounds} }) + 1,
        'there is one more bucket than there are boundaries');

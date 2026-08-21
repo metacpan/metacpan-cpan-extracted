@@ -42,7 +42,7 @@ static const frj_abi *punk_frj(pTHX) {
             PUTBACK; FREETMPS; LEAVE;
             if (p) {
                 const frj_abi *a = INT2PTR(const frj_abi *, p);
-                if (a && a->abi_version == FRJ_ABI_VERSION) PUNK_FRJ = a;
+                if (a && a->abi_version >= FRJ_ABI_VERSION) PUNK_FRJ = a;
             }
         }
     }
@@ -78,12 +78,18 @@ static const frj_abi *punk_frj(pTHX) {
 #include "punk/punk_serve.h"      /* the request dispatcher                 */
 #include "punk/punk_ws.h"         /* the RFC 6455 frame codec (phase 8)    */
 #include "punk/punk_config.h"      /* layered YAML config + resolved secrets */
+#include "punk/punk_asset.h"     /* content-addressed asset URLs (needs sha256) */
 #include "punk/punk_static.h"    /* the static-file app (a magic-CV closure) */
 #include "punk/punk_sendfile.h"  /* $c->send_file: validators + ranges     */
+#include "punk/punk_cget.h"      /* conditional GET (needs sendfile+context) */
 #include "punk/punk_oamount.h"   /* the `api` mount, boot half (needs static) */
 #include "punk/punk_dbi.h"       /* the shipped DBI model backend           */
 #include "punk/punk_model.h"     /* the model tier: DSL, metadata, contract */
 #include "punk/punk_csrf.h"      /* single-use tokens over the session */
+#include "punk/punk_entropy.h"   /* sliced, pid-guarded entropy (needs csrf) */
+#include "punk/punk_mpstream.h"  /* multipart, parsed as it arrives    */
+#include "punk/punk_csp.h"       /* CSP nonce + policy (needs entropy)      */
+#include "punk/punk_reqid.h"     /* an id per request (uuidv7, buffered) */
 #include "punk/punk_password.h"  /* PBKDF2 password hashing (needs session+csrf) */
 #include "punk/punk_auth.h"      /* the auth battery's guard + denial path */
 #include "punk/punk_validate.h"  /* collecting validation, on the jsf ABI */
@@ -96,12 +102,22 @@ static const frj_abi *punk_frj(pTHX) {
 #include "punk/punk_sse.h"         /* Server-Sent Events streams            */
 #include "punk/punk_ratelimit.h"  /* rate_limit: a C before_dispatch closure */
 #include "punk/punk_wsroom.h"      /* per-worker pub/sub rooms              */
+#include "punk/punk_cache.h"       /* the in-memory cache, bounded by BYTES  */
+#include "punk/punk_cachefile.h"   /* ... and the file store, one copy per pool */
+#include "punk/punk_bus.h"         /* ... and across the pool, on hm_abi v5  */
+#include "punk/punk_cachefront.h"  /* Punk::Cache: the tier over both stores */
+#include "punk/punk_sessionstore.h" /* where a server-side session lives     */
+#include "punk/punk_idem.h"       /* Idempotency-Key (needs cache+request) */
 #include "punk/punk_future.h"      /* async result: loop when live, else block */
 #include "punk/punk_dbil.h"        /* the async model backend, on DBIx::Loop's
                                       C ABI (needs punk_dbi.h + punk_future.h) */
 #include "punk/punk_import.h"     /* `use Punk` and the DSL table */
 #include "punk/punk_cors.h"       /* cross-origin: preflight + headers   */
 #include "punk/punk_headers.h"    /* security headers on every response  */
+#include "punk/punk_blob.h"      /* content-addressed uploads, on Apophis */
+#include "punk/punk_sitemap.h"   /* which routes are URLs (needs route+app) */
+#include "punk/punk_health.h"    /* /healthz and /readyz (needs response+app) */
+#include "punk/punk_metrics.h"   /* Prometheus /metrics (needs pk_abi_impl+obs) */
 #include "punk/punk_compile.h"    /* the boot compiler (needs static+serve) */
 
 /* Every Punk::Router is an IV-ref to a pr_router (new through compile through
@@ -133,6 +149,7 @@ INCLUDE: xs/serve.xs
 INCLUDE: xs/views.xs
 INCLUDE: xs/stencil.xs
 INCLUDE: xs/csrf.xs
+INCLUDE: xs/reqid.xs
 INCLUDE: xs/password.xs
 INCLUDE: xs/auth.xs
 INCLUDE: xs/validate.xs
@@ -151,4 +168,12 @@ INCLUDE: xs/model.xs
 INCLUDE: xs/oamount.xs
 INCLUDE: xs/dbi.xs
 INCLUDE: xs/dbil.xs
+INCLUDE: xs/cache.xs
+INCLUDE: xs/blob.xs
+INCLUDE: xs/sitemap.xs
+INCLUDE: xs/health.xs
+INCLUDE: xs/metrics.xs
+INCLUDE: xs/conditionalget.xs
+INCLUDE: xs/idempotency.xs
+INCLUDE: xs/csp.xs
 INCLUDE: xs/compile.xs

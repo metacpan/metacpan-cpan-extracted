@@ -1,0 +1,73 @@
+---
+abstract: 'Flower Database, Search Engine and Garden Design'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Pod: '1.48'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Garden-Design
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::Tiny: '2.2'
+  DBD::SQLite: '1.52'
+  DBI: '1.63'
+  DBIx::Admin::CreateTable: '2.07'
+  DBIx::Simple: '1.35'
+  Data::Dumper::Concise: '2.022'
+  Date::Simple: '3.03'
+  Encode: '2.55'
+  File::Copy: '0'
+  File::HomeDir: '0'
+  File::Slurper: '0.009'
+  File::Spec: '0'
+  FindBin: '1.49'
+  Getopt::Long: '2.42'
+  Imager: '1.005'
+  Imager::Fill: '1.012'
+  Lingua::EN::Inflect: '1.895'
+  Mojo::Base: '0'
+  Mojo::Collection: '0'
+  Mojo::Log: '0'
+  Mojo::Pg: '4.08'
+  MojoX::Validate::Util: '1'
+  Mojolicious: '7.33'
+  Moo: '2.003004'
+  Moo::Role: '2.003004'
+  Params::Classify: '0.013'
+  Path::Tiny: '0.044'
+  Pod::Usage: '1.63'
+  SVG::Grid: '1.05'
+  Sort::Naturally: '1.03'
+  Text::CSV: '1.33'
+  Text::CSV::Encoded: '0.22'
+  Text::Xslate: '1.0007'
+  Time::HiRes: '1.9741'
+  Try::Tiny: '0.3'
+  Types::Standard: '0.032'
+  URI::Find::Schemeless: '20160806'
+  Unicode::Collate: '1.04'
+  base: '0'
+  boolean: '0.46'
+  lib: '0'
+  open: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Garden-Design
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/WWW-Garden-Design.git
+version: '0.97'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

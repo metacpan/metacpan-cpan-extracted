@@ -533,6 +533,215 @@ sub lives_ok_or_skip {
 }
 
 # ---------------------------------------------------------------------------
+# COND_INV_456_2  line 456 (pre-edit: current ~561)  configure()
+# Source:  croak(...) unless $class =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/
+# Mutant:  croak(...) if $class =~ /.../ -- would croak for VALID names
+#
+# Kill strategy: the mutant inverts the unless→if so configure() croaks whenever
+# a class name IS valid.  We need both sides:
+#   (a) valid name  → no croak  (the mutant fails here: it would croak)
+#   (b) invalid names → croak  (both original and mutant agree, but worth having)
+# ---------------------------------------------------------------------------
+
+subtest 'COND_INV_456_2: valid class name does not croak (kills inverted unless)' => sub {
+	plan tests => 3;
+
+	# (a) Single-component valid name → must live.
+	# The mutant (if instead of unless) would croak here, killing the test.
+	lives_ok { Object::Configure::configure('ValidSingleName', {}) }
+		'COND_INV_456_2: single-word class name succeeds';
+
+	# (b) Multi-component valid name → must live.
+	lives_ok { Object::Configure::configure('Valid::Class::Name456', {}) }
+		'COND_INV_456_2: multi-component class name succeeds';
+
+	# (c) Underscore-led component → must live (underscores are allowed anywhere).
+	lives_ok { Object::Configure::configure('My::_Private::Impl', {}) }
+		'COND_INV_456_2: underscore-led component is valid';
+};
+
+subtest 'COND_INV_456_2: boundary invalids still croak under the mutant' => sub {
+	# These also croak with the mutant, but explicitly verifying the error message
+	# text anchors the regex so both the original and the mutant fail in distinct ways.
+	plan tests => 3;
+
+	# Digit as first character of a component → invalid
+	throws_ok { Object::Configure::configure('0BadClass', {}) }
+		qr/invalid class name/,
+		'COND_INV_456_2: digit-leading class name is rejected';
+
+	# Newline embedded in class name → invalid (security: prevents log injection)
+	throws_ok { Object::Configure::configure("Valid\nInjection", {}) }
+		qr/invalid class name/,
+		'COND_INV_456_2: newline in class name is rejected';
+
+	# Semicolon → invalid (security: prevents shell/code injection via env_prefix)
+	throws_ok { Object::Configure::configure('Bad;Class', {}) }
+		qr/invalid class name/,
+		'COND_INV_456_2: semicolon in class name is rejected';
+};
+
+# ---------------------------------------------------------------------------
+# COND_INV_589_3  line 589 (pre-edit: current ~703)  configure()
+# Source:  if($ancestor_env_config) { ... $merged_config = _deep_merge(...) }
+# Mutant:  unless($ancestor_env_config) { ... }
+#
+# Kill strategy: set an env var for a PARENT class, configure a child class
+# with no config_file.  Original code enters the if-block (ancestor_env_config
+# is truthy → block runs → env var merged).  Mutant skips the block (truthy
+# → unless-block does NOT run → env var is never merged → key absent from result).
+# ---------------------------------------------------------------------------
+
+subtest 'COND_INV_589_3: ancestor env vars are merged into child configure()' => sub {
+	plan tests => 2;
+
+	_reset_globals();
+	# Clear memoization caches so the test class chain is freshly computed.
+	%Object::Configure::_chain_cache = ();
+
+	# Build a parent ← child inheritance pair.
+	{
+		no strict 'refs';
+		@{'MK589::Child::ISA'} = ('MK589::Ancestor');
+	}
+
+	# The outer elsif gate at configure() line ~692 is:
+	#   elsif(my $config = Config::Abstraction->new(env_prefix => "MK589__Child__"))
+	# Config::Abstraction->new returns falsy when NO env vars match its prefix.
+	# We MUST set at least one MK589__Child__ var so the gate opens and the
+	# ancestor-loop code (the mutant target) is actually reached.
+	local $ENV{'MK589__Child__oc589gate'} = '1';
+
+	# This is the env var for the ANCESTOR class.  env_prefix for MK589::Ancestor is
+	# "MK589__Ancestor__", so Config::Abstraction strips the prefix and exposes
+	# mk589key as a top-level key when merge_defaults(section=>'MK589__Ancestor') runs.
+	local $ENV{'MK589__Ancestor__mk589key'} = 'from_ancestor_env';
+
+	my $params = Object::Configure::configure('MK589::Child', {});
+
+	# With original code: if($ancestor_env_config) is truthy → block runs →
+	# merge_defaults merges the ancestor's env vars → mk589key present in result.
+	# With mutant (unless): block is SKIPPED for truthy → mk589key absent.
+	ok(exists $params->{mk589key},
+		'COND_INV_589_3: ancestor env var key present in child configure() result');
+	is($params->{mk589key}, 'from_ancestor_env',
+		'COND_INV_589_3: ancestor env var value correctly merged');
+};
+
+# ---------------------------------------------------------------------------
+# COND_INV_1476_3  line 1476 (pre-edit: current ~1520)  _find_class_config_file()
+# Source:  if(-r $pattern && -f $pattern) { $found = $pattern; last SEARCH; }
+# Mutant:  unless(-r $pattern && -f $pattern) { $found = $pattern; last SEARCH; }
+#
+# Kill strategy A: create a real .yml file and verify _find_class_config_file
+# returns it.  Original: the if-block fires for readable+regular file → returns
+# it.  Mutant: the unless-block fires for UNreadable/non-file → first unreadable
+# candidate (.conf, etc.) is "found" instead.
+#
+# Kill strategy B: a class with no config file → returns undef.  Mutant would
+# return the first non-existent candidate instead of undef.  We check -f on the
+# returned value to expose the mutant.
+# ---------------------------------------------------------------------------
+
+subtest 'COND_INV_1476_3: existing readable file is found; non-existent returns undef' => sub {
+	plan tests => 4;
+
+	# Clear the _find_cache so no cached result pollutes this test.
+	%Object::Configure::_find_cache = ();
+
+	my $dir = _make_conf_dir(
+		'mk1476-find-test.yml' => "---\nMK1476__Find__Test:\n  mk1476: found\n"
+	);
+
+	my $base = File::Spec->catfile($dir, 'base.yml');
+
+	# A: existing file must be found and must be a real file.
+	my $found_path = Object::Configure::_find_class_config_file(
+		'MK1476::Find::Test', $base, [$dir]
+	);
+	my $expected = File::Spec->catfile($dir, 'mk1476-find-test.yml');
+
+	ok(defined $found_path,
+		'COND_INV_1476_3: _find_class_config_file returns a defined path for existing file');
+	is($found_path, $expected,
+		'COND_INV_1476_3: returned path matches the actual existing yml file');
+
+	# B: non-existent class → undef.
+	# Mutant would return the first non-readable candidate (e.g. mk1476-noexist.conf)
+	# which does not exist — expose via "defined" + -f check.
+	delete $Object::Configure::_find_cache{$_}
+		for grep { /MK1476.*noexist/i } keys %Object::Configure::_find_cache;
+
+	my $absent = Object::Configure::_find_class_config_file(
+		'MK1476::NoExist::Class', $base, [$dir]
+	);
+
+	ok(!defined $absent,
+		'COND_INV_1476_3: non-existent class returns undef');
+
+	# Guard: if something was returned, it must be a real file (kills mutant that
+	# returns a non-existent candidate path as "found").
+	ok(!defined($absent) || -f $absent,
+		'COND_INV_1476_3: any returned path must point to a real regular file');
+};
+
+# ---------------------------------------------------------------------------
+# COND_INV_1532_5  line 1532 (pre-edit: current ~1577)  _run_config_watcher()
+# Source:  if(-f $config_file) { stat compare ... } else { delete + signal }
+# Mutant:  unless(-f $config_file) — swaps the branches:
+#          existing file → else-branch (DELETE + changes_detected=1) → SIGUSR1
+#          missing  file → if-branch  (stat($missing)->mtime  → crash in child)
+#
+# Kill strategy: track a file in %_config_file_stats with its CURRENT stat (so
+# mtime matches — no genuine change).  Fork a child that calls _run_config_watcher
+# with interval=1.  Parent waits 2.5 s covering the first poll.
+#   Original:  file exists, stat matches → changes_detected=0 → NO signal.
+#   Mutant:    file exists → else-branch → changes_detected=1 → SIGUSR1 sent.
+# The parent counts SIGUSR1s; the mutant sends 1, the original sends 0.
+# ---------------------------------------------------------------------------
+
+subtest 'COND_INV_1532_5: unchanged file does not trigger SIGUSR1 in watcher' => sub {
+	SKIP: {
+		skip 'SIGUSR1 / fork not available on Windows', 1 if $^O eq 'MSWin32';
+		plan tests => 1;
+
+		_reset_globals();
+
+		my $dir = _make_conf_dir(
+			'cond1532-watcher.yml' => "---\nCOND1532__Watcher:\n  key: orig\n"
+		);
+		my $conf = File::Spec->catfile($dir, 'cond1532-watcher.yml');
+
+		# Seed %_config_file_stats with the CURRENT stat so mtime matches.
+		$Object::Configure::_config_file_stats{$conf} = stat($conf);
+
+		my $signals = 0;
+		local $SIG{USR1} = sub { $signals++ };
+
+		my $child = fork();
+		die "fork() failed: $!" unless defined $child;
+
+		if($child == 0) {
+			# Child: first thing _run_config_watcher does is sleep($interval),
+			# so the parent's SIGUSR1 handler is installed before any poll fires.
+			Object::Configure::_run_config_watcher(1, undef);
+			exit 0;  # unreachable (infinite loop), but tidy
+		}
+
+		# Parent: wait 2.5 s to cover the first poll at ~t=1 s.
+		# Original code: stat matches → no signal → $signals stays 0.
+		# Mutant:        else-branch fires (file exists) → SIGUSR1 → $signals = 1.
+		select undef, undef, undef, 2.5;
+
+		kill 'KILL', $child;
+		waitpid $child, 0;
+
+		is($signals, 0,
+			'COND_INV_1532_5: unchanged tracked file sends no SIGUSR1 (mutant sends 1)');
+	}
+};
+
+# ---------------------------------------------------------------------------
 
 END {
 	# Sanitise globals before Object::Configure's own END block runs

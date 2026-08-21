@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # All of it is C (include/otel_ctx.h, otel_w3c.h, otel_b3.h, otel_jaeger.h,
 # otel_baggage.h + xs/propagate.xs). This file is documentation.
@@ -162,6 +162,18 @@ A hashref of headers to add to an outbound request.
 The mutated C<tracestate> value.
 
 =head2 baggage_extract($header) / baggage_inject(\%baggage)
+
+C<baggage_extract> parses a C<baggage> header value into a hashref;
+C<baggage_inject> renders one back. Both are the W3C encoding, so a value
+carrying a comma or an equals sign survives the round trip.
+
+Baggage is B<not> attached to spans - see L</Baggage is not attached to spans>
+for why that is a deliberate refusal rather than an omission.
+
+=head1 SEE ALSO
+
+L<Punk::OpenTelemetry::Tracer>, which starts the spans this joins up, and
+L<Punk::OpenTelemetry::Config> for C<OTEL_PROPAGATORS>.
 
 =head1 AUTHOR
 

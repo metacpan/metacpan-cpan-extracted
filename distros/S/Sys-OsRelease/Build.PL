@@ -18,7 +18,7 @@ my %module_build_args = (
     "Ian Kluft <https://github.com/ikluft>"
   ],
   "dist_name" => "Sys-OsRelease",
-  "dist_version" => "0.4.7",
+  "dist_version" => "0.4.8",
   "license" => "artistic_2",
   "module_name" => "Sys::OsRelease",
   "recursive_test_files" => 1,
@@ -36,8 +36,10 @@ my %module_build_args = (
     "Cwd" => 0,
     "File::Basename" => 0,
     "File::Find" => 0,
+    "Pod::Simple::SimpleTree" => 0,
     "Test::More" => 0,
-    "YAML" => 0
+    "YAML" => 0,
+    "autodie" => 0
   }
 );
 
@@ -47,8 +49,10 @@ my %fallback_build_requires = (
   "File::Basename" => 0,
   "File::Find" => 0,
   "Module::Build" => "0.28",
+  "Pod::Simple::SimpleTree" => 0,
   "Test::More" => 0,
-  "YAML" => 0
+  "YAML" => 0,
+  "autodie" => 0
 );
 
 

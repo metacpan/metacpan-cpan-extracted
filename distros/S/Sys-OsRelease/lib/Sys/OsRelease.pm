@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsRelease;
-$Sys::OsRelease::VERSION = '0.4.7';
+$Sys::OsRelease::VERSION = '0.4.8';
 use if $] >= 5.016, "feature", "fc";  # retain even though 5.22 is minimum Perl, same code in ...::Lite
 use feature qw(say);
 use Config;
@@ -418,7 +418,7 @@ Sys::OsRelease - read operating system details from standard /etc/os-release fil
 
 =head1 VERSION
 
-version 0.4.7
+version 0.4.8
 
 =head1 SYNOPSIS
 
@@ -478,8 +478,8 @@ It can also be used for installing or configuring software that needs to know ab
 
 FreeDesktop.Org's os-release standard is at L<https://www.freedesktop.org/software/systemd/man/os-release.html>.
 
-Current attributes recognized by Sys::OsRelease are:
-    NAME ID ID_LIKE PRETTY_NAME CPE_NAME VARIANT VARIANT_ID VERSION VERSION_ID VERSION_CODENAME
+Current attributes recognized by Sys::OsRelease and Sys::OsRelease::Lite are:
+    NAME ID ID_LIKE PRETTY_NAME FANCY_NAME CPE_NAME VARIANT VARIANT_ID VERSION VERSION_ID VERSION_CODENAME
     BUILD_ID IMAGE_ID IMAGE_VERSION RELEASE_TYPE HOME_URL DOCUMENTATION_URL SUPPORT_URL BUG_REPORT_URL
     PRIVACY_POLICY_URL SUPPORT_END LOGO ANSI_COLOR ANSI_COLOR_REVERSE VENDOR_NAME VENDOR_URL EXPERIMENT
     EXPERIMENT_URL DEFAULT_HOSTNAME ARCHITECTURE SYSEXT_LEVEL CONFEXT_LEVEL SYSEXT_SCOPE CONFEXT_SCOPE

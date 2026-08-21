@@ -6,8 +6,14 @@ use Test::Most;
 use Test::Mockingbird 0.10;
 use File::Temp qw(tempdir);
 use File::Spec;
-use Scalar::Util qw(blessed);
+use Readonly;
+use Scalar::Util qw(blessed weaken);
 use Time::HiRes qw(sleep);
+
+# All runtime dependencies of Object::Configure are in 'requires' (not optional).
+# Test::Without::Module is imported to document that finding and to verify the module
+# remains functional when unrelated modules that calling code might use are absent.
+use Test::Without::Module qw(SomeHypothetical::OptionalModule);
 
 # Load required modules
 BEGIN {
@@ -871,6 +877,286 @@ EOF
 	# Verify other config still loaded
 	is($app->{timeout}, 45, 'Config timeout loaded');
 	is($app->{api_key}, 'test123', 'Config api_key loaded');
+
+	done_testing();
+};
+
+# =============================================================================
+# Optional dependencies: no optional runtime deps (Test::Without::Module finding)
+# All of Object::Configure's runtime deps are listed under 'requires' in cpanfile.
+# There are no 'recommends' or 'suggests' entries with fallback code paths.
+# This subtest verifies the module functions correctly even when unrelated optional
+# modules (that calling code might try to load) are unavailable.
+# =============================================================================
+subtest 'Optional deps: Object::Configure unaffected by unrelated missing modules' => sub {
+	# SomeHypothetical::OptionalModule was excluded at the top of this file via
+	# Test::Without::Module.  Object::Configure must not depend on it in any way.
+
+	my $result = Object::Configure::configure('Test::NoDeps', { key => 'val' });
+
+	ok(ref($result) eq 'HASH',    'configure() returns hashref without optional modules');
+	ok(blessed($result->{logger}), 'Logger created without optional modules');
+	is($result->{key}, 'val',     'Params preserved');
+
+	done_testing();
+};
+
+# =============================================================================
+# Env var precedence: env vars (level 4) override config file values (level 3)
+# Validates the POD-documented precedence table end-to-end through Config::Abstraction.
+# =============================================================================
+subtest 'End-to-end: env var wins over config file value for the same key' => sub {
+	my $temp_dir = tempdir(CLEANUP => 1);
+
+	create_test_config($temp_dir, 'envprio.yml', <<'YAML');
+---
+EnvPrio__Test:
+  timeout: 30
+  source: config_file
+YAML
+
+	# timeout via env var should override config file's timeout: 30
+	local %ENV;
+	$ENV{'EnvPrio__Test__timeout'} = 999;
+
+	my $result = Object::Configure::configure('EnvPrio::Test', {
+		config_file => 'envprio.yml',
+		config_dirs => [$temp_dir],
+	});
+
+	is($result->{timeout}, 999,         'Env var timeout overrides config-file timeout');
+	is($result->{source}, 'config_file','Config-file-only key unaffected by unrelated env var');
+
+	done_testing();
+};
+
+# =============================================================================
+# GC: dead weak refs must be pruned from the registry by reload_config()
+# Bug fix verified: grep { defined $_ } checked the ref-to-scalar (always truthy);
+# fixed to grep { defined $$_ } which checks the weakened referent.
+# =============================================================================
+subtest 'GC: dead weak references are pruned from the registry on reload_config()' => sub {
+	{
+		package GC::Prune::Test;
+		sub new { bless {}, shift }
+	}
+
+	my $temp_dir = tempdir(CLEANUP => 1);
+	create_test_config($temp_dir, 'gc.yml', "---\nGC__Prune__Test:\n  k: v\n");
+
+	# Create an object in a nested scope so it is eligible for GC when scope exits.
+	{
+		my $obj = bless {
+			_config_file => File::Spec->catfile($temp_dir, 'gc.yml'),
+		}, 'GC::Prune::Test';
+		Object::Configure::register_object('GC::Prune::Test', $obj);
+		# $obj goes out of scope here; the weakened registry ref becomes undef
+	}
+
+	# Trigger GC explicitly (Perl's ref-counting frees immediately in scalar scope).
+	# reload_config() should detect the dead ref and prune it.
+	Object::Configure::reload_config();
+
+	my $reg = $Object::Configure::_object_registry{'GC::Prune::Test'};
+	my $dead_pruned =
+		!defined($reg) ||
+		!@{ $reg } ||
+		!grep { defined($$_) } @{ $reg };
+
+	ok($dead_pruned, 'Dead weak refs pruned from registry after reload_config()');
+
+	delete $Object::Configure::_object_registry{'GC::Prune::Test'};
+
+	done_testing();
+};
+
+# =============================================================================
+# Logger arrayref: messages are captured end-to-end through configure() + logger
+# Verifies the full path: arrayref logger spec → Log::Abstraction → message captured.
+# =============================================================================
+subtest 'Integration: arrayref logger captures log output end-to-end' => sub {
+	my @captured;
+
+	# Arrayref logger: configure() stashes it before Config::Abstraction runs so no
+	# site-local UNIVERSAL logger config can override it.
+	# Use ->warn() rather than ->debug(): 'debug' has syslog-priority 7, which is above
+	# the Log::Abstraction default threshold (warning = 4), so it would be silently dropped.
+	my $result = Object::Configure::configure('Test::ArrayLogger', {
+		logger => \@captured,
+	});
+
+	$result->{logger}->warn('hello from test');
+
+	# Log::Abstraction stores { level => ..., message => ... } hashrefs in the array.
+	ok(scalar(@captured) > 0, 'At least one log message captured');
+	ok(
+		grep({ ref($_) eq 'HASH' ? $_->{message} =~ /hello from test/i : $_ =~ /hello from test/i } @captured),
+		'Correct message text captured in array'
+	);
+
+	done_testing();
+};
+
+# =============================================================================
+# Logger isolation: two objects with separate arrayref loggers must not share output.
+# Verifies that Log::Abstraction instances are independent (no singleton leakage).
+# =============================================================================
+subtest 'Concurrency: two objects with separate arrayref loggers do not share output' => sub {
+	my @log_a;
+	my @log_b;
+
+	# Use arrayref loggers (stashed before config merge) and ->warn() (syslog priority 4,
+	# always below the default threshold of 4) so messages are never filtered.
+	my $obj_a = Object::Configure::configure('Test::IsolatedLogger::A', {
+		logger => \@log_a,
+	});
+	my $obj_b = Object::Configure::configure('Test::IsolatedLogger::B', {
+		logger => \@log_b,
+	});
+
+	$obj_a->{logger}->warn('message for A');
+	$obj_b->{logger}->warn('message for B');
+
+	# Log::Abstraction stores { level => ..., message => ... } hashrefs in the array.
+	my $msg = sub { ref($_[0]) eq 'HASH' ? $_[0]->{message} : "$_[0]" };
+
+	ok(grep({ $msg->($_) =~ /message for A/i } @log_a), 'A logger captured A message');
+	ok(grep({ $msg->($_) =~ /message for B/i } @log_b), 'B logger captured B message');
+	ok(!grep({ $msg->($_) =~ /message for B/i } @log_a), 'A logger did not receive B message');
+	ok(!grep({ $msg->($_) =~ /message for A/i } @log_b), 'B logger did not receive A message');
+
+	done_testing();
+};
+
+# =============================================================================
+# 3-level deep inheritance merge order: UNIVERSAL < GrandParent < Parent < Child
+# Validates that the deepest (child-most) config wins for overlapping keys, while
+# unique keys from each level are preserved (no accidental overwrite).
+# =============================================================================
+subtest 'End-to-end: 3-level inheritance merge preserves correct priority order' => sub {
+	my $temp_dir = tempdir(CLEANUP => 1);
+
+	# UNIVERSAL: provides global_key and shared_key
+	create_test_config($temp_dir, 'universal.yml', <<'YAML');
+---
+UNIVERSAL:
+  global_key: from_universal
+  shared_key: universal
+YAML
+
+	# GrandParent: overrides shared_key, adds gp_key
+	create_test_config($temp_dir, 'my-gp.yml', <<'YAML');
+---
+My__GP:
+  shared_key: grandparent
+  gp_key: from_gp
+YAML
+
+	# Parent: overrides shared_key, adds parent_key
+	create_test_config($temp_dir, 'my-parent.yml', <<'YAML');
+---
+My__Parent:
+  shared_key: parent
+  parent_key: from_parent
+YAML
+
+	# Child: overrides shared_key, adds child_key
+	create_test_config($temp_dir, 'my-child.yml', <<'YAML');
+---
+My__Child:
+  shared_key: child
+  child_key: from_child
+YAML
+
+	{
+		package My::GP;
+		sub new { bless {}, shift }
+	}
+	{
+		package My::Parent;
+		use base 'My::GP';
+		sub new { bless {}, shift }
+	}
+	{
+		package My::Child;
+		use base 'My::Parent';
+		sub new { bless {}, shift }
+	}
+
+	my $result = Object::Configure::configure('My::Child', {
+		config_file => 'my-child.yml',
+		config_dirs => [$temp_dir],
+	});
+
+	# Child's shared_key wins over all ancestors
+	is($result->{shared_key}, 'child',        'Child overrides shared_key from all ancestors');
+	# Unique keys from each level are preserved
+	is($result->{global_key}, 'from_universal', 'global_key inherited from UNIVERSAL');
+	is($result->{gp_key},     'from_gp',       'gp_key inherited from GrandParent');
+	is($result->{parent_key}, 'from_parent',   'parent_key inherited from Parent');
+	is($result->{child_key},  'from_child',    'child_key from Child itself');
+
+	done_testing();
+};
+
+# =============================================================================
+# _config_file_stats tracking: after configure() loads a real file, the stats
+# hash must contain a File::stat entry for that path (used for hot-reload change
+# detection in _run_config_watcher).
+# =============================================================================
+subtest 'Integration: _config_file_stats populated after configure() with real file' => sub {
+	my $temp_dir = tempdir(CLEANUP => 1);
+	my $config_path = create_test_config($temp_dir, 'stats.yml',
+		"---\nStats__Test:\n  k: v\n");
+
+	# Clear any prior state from earlier subtests
+	%Object::Configure::_config_file_stats = ();
+
+	# Pass the absolute path directly so -r $config_file is true and configure()
+	# populates _config_file_stats via the primary-file branch (not the fallback
+	# directory scan, which does not update the stats hash).
+	Object::Configure::configure('Stats::Test', {
+		config_file => $config_path,
+	});
+
+	my $tracked = scalar keys %Object::Configure::_config_file_stats;
+	ok($tracked > 0, '_config_file_stats has at least one entry after configure()');
+
+	my ($tracked_path) = grep { /stats\.yml$/ } keys %Object::Configure::_config_file_stats;
+	ok(defined($tracked_path), 'stats.yml path is tracked in _config_file_stats');
+
+	done_testing();
+};
+
+# =============================================================================
+# Security E2E: path-traversal and invalid class name are rejected at the
+# constructor level — i.e., the full class-constructor → configure() call path.
+# =============================================================================
+subtest 'Security E2E: invalid class and traversal path rejected in constructor workflow' => sub {
+	{
+		package Security::E2E::Good;
+		use Object::Configure;
+		sub new {
+			my ($class, %args) = @_;
+			return bless Object::Configure::configure($class, \%args), $class;
+		}
+	}
+
+	# The class name passed to configure() is the Perl package name — it is always
+	# developer-controlled.  But instantiate() accepts a class name from params.
+	# Verify that a hostile class string is rejected before any config I/O.
+	throws_ok {
+		Object::Configure::instantiate(class => "Hostile\nInjection", timeout => 5);
+	} qr/configure: invalid class name/,
+		'instantiate() with newline in class name rejected by configure()';
+
+	# Path traversal in config_file must be rejected even inside a constructor.
+	throws_ok {
+		Object::Configure::configure('Security::E2E::Good', {
+			config_file => '../../etc/passwd',
+		});
+	} qr/config_file contains path traversal sequences/,
+		'configure() rejects traversal path in full constructor workflow';
 
 	done_testing();
 };

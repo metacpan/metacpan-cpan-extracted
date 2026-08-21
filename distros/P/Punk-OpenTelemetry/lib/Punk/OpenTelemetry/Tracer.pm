@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 1;
 
@@ -20,7 +20,7 @@ Punk::OpenTelemetry::Tracer - the trace SDK
     my $tracer = Punk::OpenTelemetry::Tracer->new(
         resource      => { 'service.name' => 'maat' },
         scope_name    => 'Punk::OpenTelemetry',
-        scope_version => '0.01',
+        scope_version => '0.02',
         ratio         => 0.1,
     );
 
@@ -156,6 +156,13 @@ C<span_id>, C<to_hash>, C<counts>.
 Only the application should set an C<OK> status. Instrumentation sets C<ERROR>
 or leaves the status B<unset>, because a layer with no opinion about whether an
 operation succeeded must not claim one.
+
+=head1 SEE ALSO
+
+L<Punk::OpenTelemetry::Instrument>, which is what starts most of these spans,
+L<Punk::OpenTelemetry::Propagate> for the ids that arrive from another
+service, and L<Punk::OpenTelemetry::Exporter> for where the drained batches
+go. L<Punk::OpenTelemetry> is the index.
 
 =head1 AUTHOR
 

@@ -235,6 +235,62 @@ compile(self)
         HV *h = app_hv(aTHX_ self);
         SV *caller = app_get(aTHX_ h, K_CALLER);
         AV *rcap = newAV();
+
+        /* Register the cross-worker bus subscription for every worker.
+         *
+         * HERE, at compile, because this runs in the PARENT before the server
+         * forks - which is the only place a registration can be made that
+         * every worker will inherit. The callback itself runs after the fork,
+         * on the process that will serve, which is the only place a
+         * subscription can usefully live.
+         *
+         * A no-op when there is no Hyperman, or one too old for the bus. */
+        punk_bus_register(aTHX);
+
+        /* The cache stores, built HERE so a bad backend name, an
+         * unparseable max_bytes or an unwritable directory croak at boot
+         * rather than on the first miss - and so every request on this
+         * worker shares one store per name, since a cache constructed per
+         * request never hits. */
+        {
+            SV **spec = hv_fetchs(h, "cache_spec", 0);
+            if (spec && *spec && SvROK(*spec)
+                && SvTYPE(SvRV(*spec)) == SVt_PVHV) {
+                HV *specs = (HV *)SvRV(*spec);
+                HV *built = newHV();
+                HE *e;
+                hv_iterinit(specs);
+                while ((e = hv_iternext(specs))) {
+                    AV *rec = (AV *)SvRV(HeVAL(e));
+                    SV **backend = av_fetch(rec, 0, 0);
+                    SV **opts    = av_fetch(rec, 1, 0);
+                    SV *argv[3], *store;
+                    argv[0] = backend && *backend ? *backend : &PL_sv_undef;
+                    argv[1] = opts    && *opts    ? *opts    : &PL_sv_undef;
+                    /* The NAME as well. Without it the store cannot address
+                     * its own invalidation topic, and cross-worker
+                     * invalidation is silently off in the only case that
+                     * matters - the one configured by the keyword. */
+                    argv[2] = sv_2mortal(newSVsv(hv_iterkeysv(e)));
+                    (void)pk_require_once(aTHX_ "Punk::Cache", TRUE);
+                    store = pcx_call_meth(aTHX_
+                                sv_2mortal(newSVpvs("Punk::Cache")),
+                                "_from_spec", argv, 3, 1);
+                    (void)hv_store_ent(built, hv_iterkeysv(e),
+                                       store ? store : newSV(0), 0);
+                }
+                (void)hv_stores(h, "cache", newRV_noinc((SV *)built));
+            }
+        }
+
+        /* A server-side session resolves HERE, after those stores exist,
+         * because `session store => 'sessions'` names one of them. Going
+         * first would find an empty hash and every declared store would look
+         * like a typo. A bad backend, an undeclared name or a store that is
+         * not shared between workers croak at boot, in front of whoever
+         * deployed it, rather than as a random logout later. */
+        ps_store_resolve(aTHX_ h);
+
         SV *resolve, *router, *xs_router, *all_recs, *ctx, *app_cv, *state_rv;
         HV *state;
         AV *api_src = app_av(aTHX_ h, K_API_MOUNTS);
@@ -386,6 +442,57 @@ compile(self)
             }
         }
 
+        {   /* etag routes: stamp the validator onto the compiled record, so
+             * the dispatcher finds it beside `guards` and `code` rather than
+             * looking anything up per request. Same walk as compress. */
+            SV **ec = hv_fetchs(h, K_ETAG_ROUTES, 0);
+            AV *recs = (all_recs && SvROK(all_recs)) ? (AV *)SvRV(all_recs) : NULL;
+            if (ec && *ec && SvROK(*ec) && SvTYPE(SvRV(*ec)) == SVt_PVAV) {
+                AV *ecr = (AV *)SvRV(*ec);
+                SSize_t ci, cn = av_len(ecr) + 1;
+                for (ci = 0; ci < cn; ci++) {
+                    HV *w = (HV *)SvRV(*av_fetch(ecr, ci, 0));
+                    SV **wm = hv_fetchs(w, K_METHOD, 0);
+                    SV **wp = hv_fetchs(w, K_PATH, 0);
+                    SV **wv = hv_fetchs(w, K_ETAG, 0);
+                    SSize_t ri, rn = recs ? av_len(recs) + 1 : 0;
+                    if (!(wm && *wm && wp && *wp && wv && *wv)) continue;
+                    for (ri = 0; ri < rn; ri++) {
+                        HV *rr = (HV *)SvRV(*av_fetch(recs, ri, 0));
+                        SV **rm = hv_fetchs(rr, K_METHOD, 0);
+                        SV **rp = hv_fetchs(rr, K_PATH, 0);
+                        if (rm && *rm && rp && *rp
+                            && sv_eq(*rm, *wm) && sv_eq(*rp, *wp))
+                            (void)hv_stores(rr, K_ETAG, newSVsv(*wv));
+                    }
+                }
+            }
+        }
+
+        {   /* idempotent routes: stamp the record, the same walk as etag */
+            SV **ic = hv_fetchs(h, K_IDEM_ROUTES, 0);
+            AV *recs = (all_recs && SvROK(all_recs)) ? (AV *)SvRV(all_recs) : NULL;
+            if (ic && *ic && SvROK(*ic) && SvTYPE(SvRV(*ic)) == SVt_PVAV) {
+                AV *icr = (AV *)SvRV(*ic);
+                SSize_t ci, cn = av_len(icr) + 1;
+                for (ci = 0; ci < cn; ci++) {
+                    HV *w = (HV *)SvRV(*av_fetch(icr, ci, 0));
+                    SV **wm = hv_fetchs(w, K_METHOD, 0);
+                    SV **wp = hv_fetchs(w, K_PATH, 0);
+                    SSize_t ri, rn = recs ? av_len(recs) + 1 : 0;
+                    if (!(wm && *wm && wp && *wp)) continue;
+                    for (ri = 0; ri < rn; ri++) {
+                        HV *rr = (HV *)SvRV(*av_fetch(recs, ri, 0));
+                        SV **rm = hv_fetchs(rr, K_METHOD, 0);
+                        SV **rp = hv_fetchs(rr, K_PATH, 0);
+                        if (rm && *rm && rp && *rp
+                            && sv_eq(*rm, *wm) && sv_eq(*rp, *wp))
+                            (void)hv_stores(rr, K_IDEMPOTENT, newSViv(1));
+                    }
+                }
+            }
+        }
+
         /* sse routes: mark the records; the transport is chosen per request
          * (detach / psgi.streaming / blocking), so no boot capability check */
         x = hv_fetchs(h, K_SSE_ROUTES, 0);
@@ -417,6 +524,50 @@ compile(self)
         /* views */
         {
             AV *views = app_av(aTHX_ h, K_VIEWS);
+            /* the `asset` filter on the shipped engine, so a template can
+             * write {% "/static/app.css" | asset %}. Only stencil, because
+             * `filters` is its option; only when the application has not
+             * registered a filter of its own by that name. */
+            {
+                SSize_t vi, vn = av_len(views) + 1;
+                for (vi = 0; vi < vn; vi++) {
+                    SV **pp = av_fetch(views, vi, 0);
+                    AV *pair;
+                    SV **nm, **op;
+                    HV *vopts, *filters;
+                    if (!(pp && *pp && SvROK(*pp))) continue;
+                    pair = (AV *)SvRV(*pp);
+                    nm = av_fetch(pair, 0, 0);
+                    op = av_fetch(pair, 1, 0);
+                    if (!(nm && *nm && SvOK(*nm))) continue;
+                    {   /* `views Stencil => {...}` names a class suffix, so
+                         * it is matched the way pv_load_engine resolves it -
+                         * including the +Punk::View::Stencil spelling */
+                        STRLEN nl;
+                        const char *nv = SvPV_const(*nm, nl);
+                        int ok = (nl == 7 && foldEQ(nv, "Stencil", 7))
+                              || (nl == 20 && memEQ(nv, "+Punk::View::Stencil", 20));
+                        if (!ok) continue;
+                    }
+                    if (!(op && *op && SvROK(*op)
+                          && SvTYPE(SvRV(*op)) == SVt_PVHV)) continue;
+                    vopts = (HV *)SvRV(*op);
+                    {
+                        SV **fp = hv_fetchs(vopts, "filters", 0);
+                        if (fp && *fp && SvROK(*fp)
+                            && SvTYPE(SvRV(*fp)) == SVt_PVHV)
+                            filters = (HV *)SvRV(*fp);
+                        else {
+                            filters = newHV();
+                            (void)hv_stores(vopts, "filters",
+                                            newRV_noinc((SV *)filters));
+                        }
+                    }
+                    if (!hv_exists(filters, "asset", 5))
+                        (void)hv_stores(filters, "asset",
+                                        pa_asset_filter(aTHX_ self));
+                }
+            }
             if (av_len(views) >= 0) {
                 SV *argv[1], *vobj;
                 (void)pk_require_once(aTHX_ PK_VIEWS, TRUE);
@@ -439,10 +590,25 @@ compile(self)
             SV **dir = hv_fetchs(m, K_DIR, 0);
             SV **mdir = hv_fetchs(m, K_MD_DIR, 0);
             if (dir && *dir && SvOK(*dir)) {
-                SV *argv[1], *sapp;
+                SV *argv[2], *sapp;
+                SV **sop = hv_fetchs(m, K_OPTS, 0);
+                HV *sopts = (sop && *sop && SvROK(*sop)
+                             && SvTYPE(SvRV(*sop)) == SVt_PVHV)
+                            ? newHVhv((HV *)SvRV(*sop)) : newHV();
+                /* whether a cached digest is re-checked against the file is
+                 * the app's environment, not the mount's - an app that says
+                 * nothing gets the answer $app->env gives, which reads the
+                 * config before it reads PUNK_ENV */
+                if (!hv_exists(sopts, "dev", 3)) {
+                    SV *envsv = pc_app_env(aTHX_ self);
+                    (void)hv_stores(sopts, "dev",
+                        newSViv(SvOK(envsv)
+                                && strEQ(SvPV_nolen(envsv), "development")));
+                }
                 argv[0] = *dir;
+                argv[1] = sv_2mortal(newRV_noinc((SV *)sopts));
                 sapp = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs(PK_STATIC)),
-                                     K_APP, argv, 1, 1);
+                                     K_APP, argv, 2, 1);
                 (void)hv_stores(m, K_APP, sapp ? sapp : newSV(0));
             }
             else if (mdir && *mdir && SvOK(*mdir)) {
@@ -466,6 +632,10 @@ compile(self)
         if (av_len(mounts_out) >= 0)
             sortsv(AvARRAY(mounts_out), (STRLEN)(av_len(mounts_out) + 1),
                    pc_cmp_len_desc);
+        /* the same table on the app, the way the compiled views already sit
+         * there: $c->asset walks it to find which mount owns a URL, and the
+         * request path's copy is not reachable from a context */
+        (void)hv_stores(h, K_MOUNTS_C, newRV_inc((SV *)mounts_out));
 
         /* before / after hooks and the app on_error, resolved to coderefs */
         {
@@ -530,6 +700,30 @@ compile(self)
             }
         }
 
+        {   /* the body ETag, last on the chain - after any application hook
+             * that might rewrite the body (or the tag would describe bytes
+             * nobody was sent) and after the session write-back (whose
+             * Set-Cookie the 304 then carries rather than drops) */
+            SV **cg = hv_fetchs(h, K_CGET, 0);
+            if (cg && *cg && SvTRUE(*cg))
+                av_push(after_out,
+                        punk_closure(aTHX_ pcg_after_cb, newAV()));
+        }
+
+        {   /* the idempotency recorder, also last: what is stored has to be
+             * what was actually sent, after every application hook has had
+             * its say. The TTL rides in the capture rather than being read
+             * from the state per response. */
+            SV **ic = hv_fetchs(h, K_IDEM, 0);
+            if (ic && *ic && SvROK(*ic) && SvTYPE(SvRV(*ic)) == SVt_PVHV) {
+                AV *cap = newAV();
+                SV **t = hv_fetchs((HV *)SvRV(*ic), "ttl", 0);
+                av_push(cap, (t && *t && SvOK(*t)) ? newSVnv(SvNV(*t))
+                                                   : newSVnv(86400));
+                av_push(after_out, punk_closure(aTHX_ pi_record_cb, cap));
+            }
+        }
+
         if (pcx_can(aTHX_ self, "compile_extras")) {
             SV *r = pcx_call_meth(aTHX_ self, "compile_extras", NULL, 0, 0);
             if (r) SvREFCNT_dec(r);
@@ -567,6 +761,53 @@ compile(self)
         (void)hv_stores(state, K_MOUNTS, newRV_noinc((SV *)mounts_out));
         (void)hv_stores(state, K_CTX,    newSVsv(ctx));
         (void)hv_stores(state, K_APP,    newSVsv(self));
+        {   /* upload_dir, so the multipart parser can reach it: it has the
+             * request's env and nothing else, and the env is the server's. */
+            SV **ud = hv_fetchs(h, "upload_dir", 0);
+            if (ud && *ud && SvOK(*ud))
+                (void)hv_stores(state, "upload_dir", newSVsv(*ud));
+        }
+
+        {   /* Punk::Plugin::CSP's policy, copied from the app hash so
+             * phd_effective can read it once per response without walking
+             * back to the registrar. Absent when the plugin was never
+             * registered, which is what keeps the header off. */
+            SV **cs = hv_fetchs(h, K_CSP, 0);
+            if (cs && *cs && SvROK(*cs)) {
+                (void)hv_stores(state, K_CSP, newSVsv(*cs));
+                /* Freeze whether this is development INTO the policy hash -
+                 * here rather than in register, because `plugin` is written
+                 * at the top of an application and `config` below it, so at
+                 * registration time the answer is not known yet.
+                 *
+                 * Both the state and the app hold the same HV, so writing it
+                 * once is visible from the view path (which has a context)
+                 * and the header path (which has the state), with no second
+                 * copy to drift. */
+                if (SvTYPE(SvRV(*cs)) == SVt_PVHV) {
+                    SV *e = pc_app_env(aTHX_ self);
+                    (void)hv_stores((HV *)SvRV(*cs), "dev",
+                        newSViv(SvOK(e) && strEQ(SvPV_nolen(e),
+                                                 "development")));
+                }
+            }
+        }
+
+        {   /* Punk::Plugin::ConditionalGet's on-switch, copied from the app
+             * hash where `register` put it. Absent when the plugin was never
+             * registered, which is what makes the `etag` route option inert
+             * without it - the `sitemap` arrangement. */
+            SV **cg = hv_fetchs(h, K_CGET, 0);
+            if (cg && *cg && SvTRUE(*cg))
+                (void)hv_stores(state, K_CGET, newSVsv(*cg));
+        }
+        {   /* Punk::Plugin::Idempotency's config, from where `register`
+             * put it. Absent when the plugin was never registered, which is
+             * what makes the `idempotent` route option inert without it. */
+            SV **ic = hv_fetchs(h, K_IDEM, 0);
+            if (ic && *ic && SvROK(*ic))
+                (void)hv_stores(state, K_IDEM, newSVsv(*ic));
+        }
         (void)hv_stores(state, K_BEFORE, newRV_noinc((SV *)before_out));
         (void)hv_stores(state, K_AFTER,  newRV_noinc((SV *)after_out));
         /* The before_request chain is stored only when there is one. punk_serve

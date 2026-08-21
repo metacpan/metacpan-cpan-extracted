@@ -7,7 +7,6 @@ build_requires:
   File::Spec: '0'
   File::Spec::Functions: '0'
   File::Temp: '0'
-  Test::Fatal: '0'
   Test::More: '0.96'
   Test::Needs: '0'
   Test::Warnings: '0'
@@ -28,175 +27,175 @@ no_index:
 provides:
   URI:
     file: lib/URI.pm
-    version: '5.35'
+    version: '5.36'
   URI::Escape:
     file: lib/URI/Escape.pm
-    version: '5.35'
+    version: '5.36'
   URI::Heuristic:
     file: lib/URI/Heuristic.pm
-    version: '5.35'
+    version: '5.36'
   URI::IRI:
     file: lib/URI/IRI.pm
-    version: '5.35'
+    version: '5.36'
   URI::QueryParam:
     file: lib/URI/QueryParam.pm
-    version: '5.35'
+    version: '5.36'
   URI::Split:
     file: lib/URI/Split.pm
-    version: '5.35'
+    version: '5.36'
   URI::URL:
     file: lib/URI/URL.pm
-    version: '5.35'
+    version: '5.36'
   URI::WithBase:
     file: lib/URI/WithBase.pm
-    version: '5.35'
+    version: '5.36'
   URI::data:
     file: lib/URI/data.pm
-    version: '5.35'
+    version: '5.36'
   URI::file:
     file: lib/URI/file.pm
-    version: '5.35'
+    version: '5.36'
   URI::file::Base:
     file: lib/URI/file/Base.pm
-    version: '5.35'
+    version: '5.36'
   URI::file::FAT:
     file: lib/URI/file/FAT.pm
-    version: '5.35'
+    version: '5.36'
   URI::file::Mac:
     file: lib/URI/file/Mac.pm
-    version: '5.35'
+    version: '5.36'
   URI::file::OS2:
     file: lib/URI/file/OS2.pm
-    version: '5.35'
+    version: '5.36'
   URI::file::QNX:
     file: lib/URI/file/QNX.pm
-    version: '5.35'
+    version: '5.36'
   URI::file::Unix:
     file: lib/URI/file/Unix.pm
-    version: '5.35'
+    version: '5.36'
   URI::file::Win32:
     file: lib/URI/file/Win32.pm
-    version: '5.35'
+    version: '5.36'
   URI::ftp:
     file: lib/URI/ftp.pm
-    version: '5.35'
+    version: '5.36'
   URI::ftpes:
     file: lib/URI/ftpes.pm
-    version: '5.35'
+    version: '5.36'
   URI::ftps:
     file: lib/URI/ftps.pm
-    version: '5.35'
+    version: '5.36'
   URI::geo:
     file: lib/URI/geo.pm
-    version: '5.35'
+    version: '5.36'
   URI::gopher:
     file: lib/URI/gopher.pm
-    version: '5.35'
+    version: '5.36'
   URI::http:
     file: lib/URI/http.pm
-    version: '5.35'
+    version: '5.36'
   URI::https:
     file: lib/URI/https.pm
-    version: '5.35'
+    version: '5.36'
   URI::icap:
     file: lib/URI/icap.pm
-    version: '5.35'
+    version: '5.36'
   URI::icaps:
     file: lib/URI/icaps.pm
-    version: '5.35'
+    version: '5.36'
   URI::irc:
     file: lib/URI/irc.pm
-    version: '5.35'
+    version: '5.36'
   URI::ircs:
     file: lib/URI/ircs.pm
-    version: '5.35'
+    version: '5.36'
   URI::ldap:
     file: lib/URI/ldap.pm
-    version: '5.35'
+    version: '5.36'
   URI::ldapi:
     file: lib/URI/ldapi.pm
-    version: '5.35'
+    version: '5.36'
   URI::ldaps:
     file: lib/URI/ldaps.pm
-    version: '5.35'
+    version: '5.36'
   URI::mailto:
     file: lib/URI/mailto.pm
-    version: '5.35'
+    version: '5.36'
   URI::mms:
     file: lib/URI/mms.pm
-    version: '5.35'
+    version: '5.36'
   URI::news:
     file: lib/URI/news.pm
-    version: '5.35'
+    version: '5.36'
   URI::nntp:
     file: lib/URI/nntp.pm
-    version: '5.35'
+    version: '5.36'
   URI::nntps:
     file: lib/URI/nntps.pm
-    version: '5.35'
+    version: '5.36'
   URI::otpauth:
     file: lib/URI/otpauth.pm
-    version: '5.35'
+    version: '5.36'
   URI::pop:
     file: lib/URI/pop.pm
-    version: '5.35'
+    version: '5.36'
   URI::rlogin:
     file: lib/URI/rlogin.pm
-    version: '5.35'
+    version: '5.36'
   URI::rsync:
     file: lib/URI/rsync.pm
-    version: '5.35'
+    version: '5.36'
   URI::rtsp:
     file: lib/URI/rtsp.pm
-    version: '5.35'
+    version: '5.36'
   URI::rtspu:
     file: lib/URI/rtspu.pm
-    version: '5.35'
+    version: '5.36'
   URI::scp:
     file: lib/URI/scp.pm
-    version: '5.35'
+    version: '5.36'
   URI::sftp:
     file: lib/URI/sftp.pm
-    version: '5.35'
+    version: '5.36'
   URI::sip:
     file: lib/URI/sip.pm
-    version: '5.35'
+    version: '5.36'
   URI::sips:
     file: lib/URI/sips.pm
-    version: '5.35'
+    version: '5.36'
   URI::smb:
     file: lib/URI/smb.pm
-    version: '5.35'
+    version: '5.36'
   URI::smtp:
     file: lib/URI/smtp.pm
-    version: '5.35'
+    version: '5.36'
   URI::snews:
     file: lib/URI/snews.pm
-    version: '5.35'
+    version: '5.36'
   URI::ssh:
     file: lib/URI/ssh.pm
-    version: '5.35'
+    version: '5.36'
   URI::telnet:
     file: lib/URI/telnet.pm
-    version: '5.35'
+    version: '5.36'
   URI::tn3270:
     file: lib/URI/tn3270.pm
-    version: '5.35'
+    version: '5.36'
   URI::urn:
     file: lib/URI/urn.pm
-    version: '5.35'
+    version: '5.36'
   URI::urn::isbn:
     file: lib/URI/urn/isbn.pm
-    version: '5.35'
+    version: '5.36'
   URI::urn::oid:
     file: lib/URI/urn/oid.pm
-    version: '5.35'
+    version: '5.36'
   URI::ws:
     file: lib/URI/ws.pm
-    version: '5.35'
+    version: '5.36'
   URI::wss:
     file: lib/URI/wss.pm
-    version: '5.35'
+    version: '5.36'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -207,6 +206,7 @@ requires:
   MIME::Base64: '2'
   Net::Domain: '0'
   Scalar::Util: '0'
+  Unicode::Normalize: '0'
   constant: '0'
   integer: '0'
   overload: '0'
@@ -221,7 +221,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/URI/issues
   homepage: https://github.com/libwww-perl/URI
   repository: https://github.com/libwww-perl/URI.git
-version: '5.35'
+version: '5.36'
 x_Dist_Zilla:
   perl:
     version: '5.042002'
@@ -231,9 +231,12 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .perltidyrc
             - LICENSE
             - README.md
+            - codecov.yml
             - draft-duerst-iri-bis.txt
+            - precious.toml
             - rfc2396.txt
             - rfc3986.txt
             - rfc3987.txt
@@ -316,6 +319,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: PruneFiles
       version: '6.037'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
@@ -555,7 +562,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.35
+          tag: v5.36
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

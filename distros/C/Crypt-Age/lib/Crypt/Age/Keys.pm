@@ -1,8 +1,6 @@
 package Crypt::Age::Keys;
-our $VERSION = '0.001';
-our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Key generation and Bech32 encoding for age encryption
-
+our $VERSION = '0.002';
 use Moo;
 use Carp qw(croak);
 use Crypt::PK::X25519;
@@ -213,7 +211,7 @@ Crypt::Age::Keys - Key generation and Bech32 encoding for age encryption
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -319,10 +317,6 @@ what public key it corresponds to.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-crypt-age/issues>.
-
-=head2 IRC
-
-You can reach Getty on C<irc.perl.org> for questions and support.
 
 =head1 CONTRIBUTING
 

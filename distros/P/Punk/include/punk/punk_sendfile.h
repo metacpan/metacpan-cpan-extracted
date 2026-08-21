@@ -264,6 +264,7 @@ typedef struct psf_opts {
     int has_disp;              /* emit Content-Disposition at all      */
     int ranges;                /* honour Range / advertise bytes       */
     SV *etag;                  /* override, quoted or bare, or NULL    */
+    SV *cache_control;         /* freshness lifetime, or NULL          */
     AV *extra;                 /* $c->header pairs (borrowed), or NULL */
 } psf_opts;
 
@@ -280,6 +281,15 @@ static void psf_hdr_extra(pTHX_ AV *h, AV *extra) {
         SV **e = av_fetch(extra, i, 0);
         av_push(h, e && *e ? newSVsv(*e) : newSV(0));
     }
+}
+
+/* Cache-Control, when one was asked for. It goes on the 304 as well as the
+ * 200: a 304 that omits it leaves the stored response with the freshness
+ * lifetime it already had, which has just run out - so the next load
+ * revalidates again, and the header buys nothing after the first hit. */
+static void psf_hdr_cc(pTHX_ AV *hdr, psf_opts *opt) {
+    if (opt->cache_control && SvOK(opt->cache_control))
+        psf_hdr(aTHX_ hdr, "Cache-Control", newSVsv(opt->cache_control));
 }
 
 static SV *psf_wrap(pTHX_ IV status, AV *hdr, SV *body) {
@@ -347,6 +357,7 @@ static SV *psf_respond(pTHX_ HV *env, psf_src *src, psf_opts *opt) {
         hdr = newAV();
         if (etag)  psf_hdr(aTHX_ hdr, "ETag", newSVpv(etag, elen));
         if (ldate) psf_hdr(aTHX_ hdr, "Last-Modified", newSVpv(ldate, 0));
+        psf_hdr_cc(aTHX_ hdr, opt);
         psf_hdr_extra(aTHX_ hdr, opt->extra);
         return psf_wrap(aTHX_ 304, hdr, NULL);
     }
@@ -410,6 +421,7 @@ static SV *psf_respond(pTHX_ HV *env, psf_src *src, psf_opts *opt) {
         if (opt->ranges) psf_hdr(aTHX_ hdr, "Accept-Ranges", newSVpvs("bytes"));
         if (etag)  psf_hdr(aTHX_ hdr, "ETag", newSVpv(etag, elen));
         if (ldate) psf_hdr(aTHX_ hdr, "Last-Modified", newSVpv(ldate, 0));
+        psf_hdr_cc(aTHX_ hdr, opt);
         if (opt->has_disp)
             psf_hdr(aTHX_ hdr, "Content-Disposition",
                     psf_disposition(aTHX_ opt->filename, opt->inline_));
@@ -521,10 +533,14 @@ static const char *psf_accept_encoding(pTHX_ HV *env, STRLEN *len) {
  * decision core with a fixed option block - no disposition, ranges on,
  * validators from the file itself. This is where a `static` mount's ETag,
  * If-None-Match 304 and 206/416 answers come from. The is_head flag the
- * callers computed is the same REQUEST_METHOD the core reads for itself. */
+ * callers computed is the same REQUEST_METHOD the core reads for itself.
+ *
+ * `fo` is the caller's freshness policy, or NULL: the mount decides what
+ * Cache-Control a file gets, because only the mount knows whether the URL
+ * that asked for it was content-addressed. */
 
-static SV *ps_serve_file(pTHX_ HV *env, const char *file, STRLEN flen,
-                         int is_head) {
+static SV *ps_serve_file_opt(pTHX_ HV *env, const char *file, STRLEN flen,
+                             int is_head, ps_fopts *fo) {
     Stat_t st, sst;
     psf_src  s;
     psf_opts o;
@@ -544,6 +560,7 @@ static SV *ps_serve_file(pTHX_ HV *env, const char *file, STRLEN flen,
     s.mtime     = (UV)st.st_mtime;
     s.has_mtime = 1;
     o.ranges    = 1;
+    if (fo) o.cache_control = fo->cache_control;
 
     /* Vary goes on EVERY response from here, compressed or not: a shared
      * cache that stored the identity bytes without it would hand them to a
@@ -597,6 +614,11 @@ static SV *ps_serve_file(pTHX_ HV *env, const char *file, STRLEN flen,
     }
     o.extra = extra;
     return psf_respond(aTHX_ env, &s, &o);
+}
+
+static SV *ps_serve_file(pTHX_ HV *env, const char *file, STRLEN flen,
+                         int is_head) {
+    return ps_serve_file_opt(aTHX_ env, file, flen, is_head, NULL);
 }
 
 #endif /* PUNK_SENDFILE_H */

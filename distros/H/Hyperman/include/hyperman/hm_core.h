@@ -106,6 +106,12 @@ struct hm_conn {
     int      peer_port;               /* REMOTE_PORT, filled at accept    */
     time_t   last_active;
     time_t   req_start;     /* first byte of an incomplete request  */
+    /* A body being drained to a temp file rather than accumulated in rbuf.
+     * -1 when not spilling. The fd becomes psgi.input and the handle owns it
+     * from that moment; the file is unlinked at creation, so nothing is left
+     * behind however the request ends. */
+    int      spill_fd;
+    long     spill_got;     /* body octets already written to it    */
     hm_conn *lru_prev, *lru_next;
     hm_conn *pool_next;
     hm_loop *loop;
@@ -319,11 +325,108 @@ static GV *hm_anon_glob(pTHX) {
     return gv;
 }
 
+/* A read handle over an already-open descriptor, rewound. The handle owns the
+ * descriptor from this point. */
+static SV *hm_input_from_fd(pTHX_ int fd) {
+    PerlIO *fp;
+    GV *gv;
+    IO *io;
+    if (PerlLIO_lseek(fd, 0, SEEK_SET) < 0) { PerlLIO_close(fd); return NULL; }
+    fp = PerlIO_fdopen(fd, "rb");
+    if (!fp) { PerlLIO_close(fd); return NULL; }
+    gv = hm_anon_glob(aTHX);
+    if (!gv) { PerlIO_close(fp); return NULL; }
+    io = GvIOn(gv);
+    IoIFP(io) = fp;
+    IoTYPE(io) = IoTYPE_RDONLY;
+    return newRV_noinc((SV *)gv);
+}
+
+/* A temp file for a body being drained out of the read buffer.
+ *
+ * Unlinked the instant it exists, so the descriptor is its only reference: it
+ * goes away when the request ends, when the handler dies, or when the worker
+ * is killed, and there is no cleanup path anywhere to forget. Nothing is
+ * inherited across a fork either, which is the failure this workspace keeps
+ * meeting from the other direction. */
+static int hm_body_tmpfile(void) {
+    const char *dir = getenv("TMPDIR");
+    char path[512];
+    int fd;
+    if (dir && *dir && strlen(dir) < sizeof(path) - 20) {
+        size_t dl = strlen(dir);
+        my_strlcpy(path, dir, sizeof path);
+        if (dl && dir[dl - 1] != '/') my_strlcat(path, "/", sizeof path);
+        my_strlcat(path, "hm-body-XXXXXX", sizeof path);
+    }
+    else my_strlcpy(path, "/tmp/hm-body-XXXXXX", sizeof path);
+    fd = mkstemp(path);
+    if (fd < 0) return -1;
+    (void)unlink(path);
+    return fd;
+}
+
+/* Above this, the body goes to a temp file instead of a second copy in
+ * memory. Below it, the copy is cheaper than an inode and three syscalls. */
+#ifndef HM_SPILL_BODY
+#  define HM_SPILL_BODY (1024 * 1024)
+#endif
+
+/* psgi.input over a temp file, for a body large enough that a second copy in
+ * memory is the wrong trade.
+ *
+ * The file is UNLINKED as soon as it is open, and the handle keeps it alive:
+ * it vanishes when the handle is closed, whether that is a normal response, a
+ * handler that died, or the worker being killed mid-request. There is no
+ * cleanup path to forget, nothing on disk for another process to find, and
+ * nothing inherited across a fork - which is the failure mode this workspace
+ * keeps meeting from the other direction.
+ *
+ * Returns NULL to fall back to the in-memory handle, because a server that
+ * cannot make a temp file should still serve the request.
+ */
+static SV *hm_new_input_file(pTHX_ const char *body, STRLEN len) {
+    char tmpl[] = "/tmp/hm-body-XXXXXX";
+    const char *dir = PerlEnv_getenv("TMPDIR");
+    char path[512];
+    int fd;
+    PerlIO *fp;
+    GV *gv;
+    IO *io;
+    STRLEN off = 0;
+
+    if (dir && *dir && strlen(dir) < sizeof(path) - 20) {
+        size_t dl = strlen(dir);
+        my_strlcpy(path, dir, sizeof path);
+        if (dl && dir[dl - 1] != '/') my_strlcat(path, "/", sizeof path);
+        my_strlcat(path, "hm-body-XXXXXX", sizeof path);
+    }
+    else my_strlcpy(path, tmpl, sizeof path);
+
+    fd = mkstemp(path);
+    if (fd < 0) return NULL;
+    (void)PerlLIO_unlink(path);          /* the handle is the only reference */
+
+    while (off < len) {
+        SSize_t n = PerlLIO_write(fd, body + off, len - off);
+        if (n <= 0) { PerlLIO_close(fd); return NULL; }
+        off += (STRLEN)n;
+    }
+    if (PerlLIO_lseek(fd, 0, SEEK_SET) < 0) { PerlLIO_close(fd); return NULL; }
+
+    return hm_input_from_fd(aTHX_ fd);
+}
+
 /* psgi.input: an in-memory read handle over the request body, via the
  * PerlIO :scalar layer - the C equivalent of open($fh,'<',\$body). */
 static SV *hm_new_input(pTHX_ const char *body, STRLEN len) {
     static int layer_loaded = 0;
-    SV *bufsv = newSVpvn(body, len);
+    SV *bufsv;
+    if (len > HM_SPILL_BODY) {
+        SV *f = hm_new_input_file(aTHX_ body, len);
+        if (f) return f;
+    }
+    bufsv = newSVpvn(body, len);
     SV *rv = sv_2mortal(newRV_noinc(bufsv));
     PerlIO *fp;
     GV *gv;
@@ -636,6 +739,11 @@ static void hm_lru_touch(hm_loop *loop, hm_conn *c) {
 }
 
 static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
+    if (c && c->spill_fd >= 0) {     /* a body was still draining */
+        PerlLIO_close(c->spill_fd);
+        c->spill_fd = -1;
+        c->spill_got = 0;
+    }
     int fd = c->fd;
     SV *pending = c->resp_f;      /* cancelled below, once state is consistent */
     c->resp_f = NULL;
@@ -776,6 +884,9 @@ static hm_conn *hm_new_conn(hm_loop *loop, int fd, hm_listener *lst) {
     }
     c->fd = fd;
     c->keepalive = 1;
+    c->spill_fd = -1;          /* 0 is a real fd; the zeroed struct is not
+                                * "not spilling" without this */
+    c->spill_got = 0;
     c->id = ++hm_id_counter;
     c->loop = loop;
     c->lst = lst;
@@ -1147,7 +1258,17 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
     if (!have_cl && clen > 0)
         hm_env_store(env, HMK_CONTENT_LENGTH, newSViv((IV)clen));
 
-    if (clen > 0)
+    if (c && c->spill_fd >= 0) {
+        /* The body was drained to a file as it arrived, so there is no body
+         * pointer to copy from: the descriptor IS psgi.input. The handle owns
+         * it from here, and the connection stops tracking it. */
+        SV *in = hm_input_from_fd(aTHX_ c->spill_fd);
+        c->spill_fd = -1;
+        c->spill_got = 0;
+        hm_env_store(env, HMK_PSGI_INPUT,
+                     in ? in : SvREFCNT_inc(hm_empty_input));
+    }
+    else if (clen > 0)
         hm_env_store(env, HMK_PSGI_INPUT, hm_new_input(aTHX_ body, (STRLEN)clen));
     else
         hm_env_store(env, HMK_PSGI_INPUT, SvREFCNT_inc(hm_empty_input));
@@ -2140,8 +2261,46 @@ static void hm_process(pTHX_ hm_conn *c) {
                 c->keepalive = 0;
                 break;
             }
+            /* A large body is drained to a temp file as it arrives rather
+             * than accumulated here. rbuf keeps the headers and whatever
+             * arrived after the body; the file gets the body.
+             *
+             * Identity framing only. A chunked body has no Content-Length to
+             * divert on and its decoder wants the octets contiguous, so those
+             * still accumulate - documented rather than hidden.
+             *
+             * Nothing about the loop changes: this still `break`s to wait for
+             * more, and is re-driven when the socket is readable again. What
+             * changes is that the waiting no longer costs the body. */
+            if ((long)clen > HM_SPILL_BODY) {
+                size_t have = c->rlen - bodystart;
+                if (c->spill_fd < 0 && (c->spill_fd = hm_body_tmpfile()) < 0)
+                    goto hm_no_spill;           /* cannot: behave as before */
+                if (have) {
+                    size_t want = have;
+                    size_t room = (size_t)(clen - c->spill_got);
+                    if (want > room) want = room;   /* the rest is the next
+                                                     * request, not this body */
+                    if (want) {
+                        ssize_t w = write(c->spill_fd, c->rbuf + bodystart, want);
+                        if (w <= 0) { hm_close(aTHX_ loop, c); return; }
+                        c->spill_got += w;
+                        memmove(c->rbuf + bodystart, c->rbuf + bodystart + w,
+                                c->rlen - bodystart - w);
+                        c->rlen -= (size_t)w;
+                    }
+                }
+                if (c->spill_got < (long)clen) break;      /* await more */
+                if (lseek(c->spill_fd, 0, SEEK_SET) < 0) {
+                    hm_close(aTHX_ loop, c); return;
+                }
+                body_consumed = 0;              /* none of it is in rbuf */
+                goto hm_have_body;
+            }
+        hm_no_spill:
             if (c->rlen - bodystart < (size_t)clen) break;   /* await full body */
             body_consumed = (size_t)clen;
+        hm_have_body: ;
         }
 
 #ifdef HM_HAVE_NGHTTP2
@@ -2298,9 +2457,37 @@ static void hm_readable(pTHX_ hm_conn *c) {
                 c->rcap = ncap;
             }
         }
-        ssize_t n = hm_cread(c, c->rbuf + c->rlen, c->rcap - c->rlen);
+        size_t want = c->rcap - c->rlen;
+        ssize_t n = hm_cread(c, c->rbuf + c->rlen, want);
         if (n > 0) {
             c->rlen += (size_t)n;
+            /* A SHORT read means the socket buffer is drained: the kernel
+             * handed over everything it had, so the confirming read that
+             * would follow can only return EAGAIN. Stopping here removes ONE
+             * SYSCALL FROM EVERY REQUEST - measured, an ordinary keep-alive
+             * request cost three (two reads and a writev) and the second read
+             * was always the empty one.
+             *
+             * Safe because the backends are LEVEL-triggered - no EV_CLEAR, no
+             * EPOLLET. Draining to EAGAIN is an edge-triggered obligation,
+             * and under level triggering anything that arrived between the
+             * read and this line simply reports the fd readable again on the
+             * next turn of the loop. Nothing is lost, and nothing stalls.
+             *
+             * NOT for TLS: a short SSL_read says nothing about the socket,
+             * because the engine may hold more plaintext than it just
+             * returned, and stopping on it would leave that sitting in the
+             * engine until the peer happened to send again. */
+            if (!c->ssl && (size_t)n < want) {
+                /* The disarm the EAGAIN branch below would have done. A write
+                 * watcher left armed over an empty write buffer re-fires
+                 * every turn and spins the worker at 100% CPU. */
+                if (c->writing && c->woff == c->wlen) {
+                    loop->be->remove_io(loop->be, c->fd, HM_EV_WRITE);
+                    c->writing = 0;
+                }
+                break;
+            }
         } else if (n == 0) {
             hm_close(aTHX_ loop, c);
             return;
@@ -2982,6 +3169,7 @@ typedef struct {
     const char *log_path;           /* access_log file to open (parent), or NULL */
     SV         *deny;               /* arrayref of IPs to denylist, or NULL */
     unsigned    deny_cap, rate_cap; /* arena table sizes, 0 = default        */
+    unsigned    bus_slots, bus_slot_size, bus_groups;  /* 0 = default        */
 } hm_worker_cfg;
 
 /* Populate the loop's listener array from the (already bound) specs. Under
@@ -3084,6 +3272,51 @@ static int hm_tls_reload(pTHX_ hm_loop *loop, SV *sni) {
     return done;
 }
 
+/* The bus wakeup, on this worker's loop.
+ *
+ * Lives here rather than in hm_bus.h because it is the one part that needs
+ * both halves: hm_bus.h deliberately knows nothing about the server, and the
+ * loop knows nothing about the ring.
+ *
+ * The callback MUST NOT CROAK. It is called from the event loop with no Perl
+ * frame around it, and a die from a subscriber would unwind through the loop
+ * and take the worker with it - so the dispatch below is the only thing here,
+ * and anything Perl-facing wraps itself in G_EVAL before it gets this far.
+ * The queue plan learned that the expensive way at its phase 5. */
+static void hm_bus_wake_cb(pTHX_ int fd, int mask, void *ud) {
+    PERL_UNUSED_ARG(fd);
+    PERL_UNUSED_ARG(mask);
+    PERL_UNUSED_ARG(ud);
+#if HM_BUS_HAVE_ATOMICS
+    /* Empty the pipe and clear the flag BEFORE dispatching, so a publish that
+     * lands while we are dispatching sets it again and pokes afresh, rather
+     * than being folded into a wakeup that has already been handled. The
+     * order inside hm_bus_waker_drained matters too - see it. */
+    hm_bus_waker_drained();
+    (void)hm_bus_dispatch();
+#endif
+}
+
+static void hm_bus_worker_attach(pTHX_ hm_loop *loop) {
+#if HM_BUS_HAVE_ATOMICS
+    int fd;
+    if (!hm_bus_arena_live()) return;
+    /* A worker inherited the parent's cursor along with everything else, and a
+     * cursor is a position in a stream this process has not been reading.
+     * Left alone it either replays what the parent already handled or skips
+     * what it has not. From now on. */
+    hm_bus_reset_cursors();
+    fd = hm_bus_waker_fd();
+    if (fd < 0) return;
+    hm_add_io_watch_c(aTHX_ loop, fd, HM_EV_READ, hm_bus_wake_cb, NULL);
+    /* Anything published between the fork and this attach is already on the
+     * ring with no poke coming, because nothing was watching to be poked. */
+    (void)hm_bus_dispatch();
+#else
+    PERL_UNUSED_ARG(loop);
+#endif
+}
+
 static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
     hm_loop *loop = hm_loop_new(aTHX_ NULL);
     if (!loop) croak("Hyperman: cannot create event loop");
@@ -3113,6 +3346,17 @@ static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
      * will actually serve. Fires here rather than at either call site so the
      * single-worker case, which never forks, gets it too. */
     hm_worker_hook_fire(aTHX_ (void *)loop);
+
+    /* The bus wakeup. The descriptors were made before the fork; this worker
+     * takes the one that is its own and puts it on the loop, so a publish from
+     * a sibling returns this loop from epoll with the message already on the
+     * ring rather than leaving it to be found whenever somebody next looks.
+     *
+     * After hm_worker_hook_fire, so an application's own on_worker_start has
+     * already run and anything it subscribed is registered before the first
+     * wakeup can arrive. */
+    hm_bus_worker_attach(aTHX_ loop);
+
     hm_loop_run(aTHX_ loop, NULL);
     hm_loop_free(aTHX_ loop);
 }
@@ -3166,6 +3410,10 @@ static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
                 if (fds[i] < 0) _exit(1);
             }
         }
+        /* This child's own waker slot, claimed before hm_worker so the
+         * attach below finds it. Index by worker number, so two workers never
+         * share a descriptor. */
+        (void)hm_bus_waker_take(widx);
         hm_worker(aTHX_ cfg, fds);
         _exit(0);
     }
@@ -3191,6 +3439,17 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
      * first accepted connection. Single-worker (dev) mode maps it too, so the
      * ABI behaves the same whether or not a supervisor forks. */
     hm_rl_arena_init(cfg->deny_cap, cfg->rate_cap);
+
+    /* The message bus, mapped in the same place and for the same reason: a
+     * ring created after the fork would be one ring per worker, which is a
+     * bus that delivers to nobody. Mapped even in single-worker mode, so the
+     * ABI behaves the same whether or not a supervisor forks. */
+    hm_bus_arena_init(cfg->bus_slots, cfg->bus_slot_size, cfg->bus_groups);
+    /* ... and the wakeup descriptors, HERE for the same reason as the ring
+     * and one more: a pipe created inside a worker is invisible to its
+     * siblings, so a bus built after the fork delivers to some workers and
+     * not others. One extra waker for the supervisor's own slot. */
+    hm_bus_wakers_init((uint32_t)(workers > 0 ? workers + 1 : 2));
     if (cfg->deny && SvROK(cfg->deny) && SvTYPE(SvRV(cfg->deny)) == SVt_PVAV) {
         AV *av = (AV *)SvRV(cfg->deny);
         SSize_t i, n = av_len(av) + 1;

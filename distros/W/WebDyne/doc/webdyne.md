@@ -3516,32 +3516,30 @@ that:
 - A PSP file can contain multiple &lt;api&gt; tags corresponding to
   different `Router::Simple` routes
 
-- The pattern should start at the API PSP filename, not at the document
-  root. For example, a file called `api.psp` should normally use a
-  pattern such as `/api/user/:id`, even if the file is served from a
-  subdirectory such as `/example/api.psp`.
+- The API PSP filename forms the route mount point and should not be
+  repeated in the pattern attribute. For example, a file called
+  `api.psp` serving `/api/user/42` should use a pattern such as
+  `/user/:id`.
 
 - PSGI and PAGI maintain a basic in-process cache of discovered API PSP
   filenames to avoid repeated filesystem checks. If API filenames or API
   path structure are changed, a server restart may be required for the
   changes to be discovered.
 
-!!! tip
+!!! warning
 
-    API pattern paths are intended to be portable between document roots. If
-    `example/api.psp` is served as `/example/api/user/bob/42`, the &lt;api&gt;
-    pattern should still be `/api/user/{user}/:id`, not
-    `/example/api/user/{user}/:id`. WebDyne is forgiving by default and will
-    strip an accidental directory prefix before the PSP filename from the
-    pattern. Set `WEBDYNE_API_STRIP_PREFIX` to 0 if exact pattern matching
-    is preferred.
+    From WebDyne 3.020 onwards &lt;api&gt; patterns are relative to the API PSP
+    file path. If `example/api.psp` is served as `/example/api/user/bob/42`,
+    the pattern should be `/user/{user}/:id`, not `/api/user/{user}/:id` or
+    `/example/api/user/{user}/:id`. The filename prefix in pattern is no
+    longer needed or supported.
 
 Here is a very simple example. Note the format of the URL in the Run
 hyperlink:
 
 ``` html
-<api handler=uppercase pattern="/api/uppercase/{user}/:id">
-<api handler=doublecase pattern="/api/doublecase/{user}/:id">
+<api handler=uppercase pattern="/uppercase/{user}/:id">
+<api handler=doublecase pattern="/doublecase/{user}/:id">
 __PERL__
 sub uppercase {
 
@@ -4758,13 +4756,11 @@ from perl code are encoded as JSON and returned.
 pattern=ROUTE
 
 : *Mandatory*. Name of `Router::Simple` pattern we want to serve, e.g.
-  /api/{user}/:id. The match attribute is accepted as an alias. The
-  route should begin with the PSP filename stem, so routes in `api.psp`
-  should begin with `/api/` regardless of whether the file is located at
-  the document root or in a subdirectory. By default WebDyne will strip
-  an accidental document-root prefix before that filename stem, e.g.
-  `/example/api/{user}/:id` is treated as `/api/{user}/:id`. Disable
-  this with `WEBDYNE_API_STRIP_PREFIX` if required.
+  /user/:id. The match attribute is accepted as an alias. The route is
+  relative to the API PSP file path: routes in `api.psp` serving URLs
+  under `/api/` should not include `/api` in the pattern. This is a
+  breaking change from WebDyne 3.020 onwards; older patterns such as
+  `/api/{user}/:id` should be changed to `/{user}/:id`.
 
 destination=HASHREF \| dest=HASHREF \| data=HASHREF
 

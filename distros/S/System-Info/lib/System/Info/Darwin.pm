@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::BSD";
 
-our $VERSION = "0.056";
+our $VERSION = "0.057";
 
 =head1 NAME
 
@@ -83,12 +83,25 @@ sub __get_system_profiler {
 	`/usr/sbin/system_profiler -detailLevel mini SPHardwareDataType SPSoftwareDataType 2>&1`;
 	} or return;
 
+    # From CPANTESTERS
+    $system_profiler_output =~ m/^\d{4}-\d\d-\d\d .+ system_profiler\[.+?\] Timed out waiting for the Activation Lock/ and return;
+
     # From RT#97441
     # In Yosemite the system_profiler started emitting these warnings:
     # 2015-07-24 06:54:06.842 system_profiler[59780:1318389] platformPluginDictionary: Can\'t get X86PlatformPlugin, return value 0
     # They seem to be harmless, but annoying.
     # Clean them out, but then warn about others from system_profiler.
     $system_profiler_output =~ s/^\d{4}-\d\d-\d\d .+ system_profiler\[.+?\] platformPluginDictionary: Can't get X86PlatformPlugin, return value 0$//mg;
+
+    # Sevan Janiyan found:
+    # I think I found the issue. On macOS 26.6.1 which is currently the latest patch release there's an artifact when `system_profiler` is invoked. That artifact is what's being picked up during the System::Info test.
+    # 
+    # Note the first line:
+    # ```
+    # 2026-08-17 12:42:20.121 system_profiler[911:9351] hw.cpufamily: 0x1b588bb3
+    # Hardware:
+    $system_profiler_output =~ s/^\d{4}-\d\d-\d\d .+ system_profiler\[.+?\] hw.cpufamily: 0x\w+\s*\r?\n//;
+
     warn "Unexpected warning from system_profiler:\n$1\n"
 	while $system_profiler_output =~ /^(.+system_profiler.+)/mg;
 

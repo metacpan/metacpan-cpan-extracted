@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Apophis', $VERSION);
@@ -21,7 +21,7 @@ Apophis - Content addressable storage with deterministic UUID v5 identifiers
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -159,6 +159,48 @@ Returns the subset of IDs that do not exist in the store.
     my $ns = $ca->namespace();
 
 Returns the namespace UUID string.
+
+=head1 C ABI
+
+Apophis publishes its content-addressing primitives as a C function-pointer
+table, so another XS module can identify, shard and write a blob without a
+Perl frame in between. The header is C<ap_abi.h>, installed through
+L<ExtUtils::Depends>, and C<Apophis::_abi_ptr> returns the address of the
+process-wide table as a UV.
+
+This is for XS authors. Nothing in it is reachable or useful from Perl, and
+the Perl API above remains the supported one.
+
+    use ExtUtils::Depends;
+    my $pkg = ExtUtils::Depends->new('My::Module', 'Apophis');
+
+    #include "ap_abi.h"
+
+    /* at boot, once */
+    if (call_pv("Apophis::_abi_ptr", G_SCALAR | G_EVAL) > 0) {
+        UV p = SvUV(POPs);
+        const ap_abi *A = INT2PTR(const ap_abi *, p);
+        if (A && A->abi_version >= AP_ABI_VERSION) ...
+    }
+
+The table is B<append only>: new members go at the end, C<AP_ABI_VERSION>
+bumps, and a consumer requires C<< abi_version >= >> the version it compiled
+against - never C<==>, which would make every release of this module a
+breaking change for everything that uses it.
+
+C<store_of> unpacks a blessed Apophis object into its namespace bytes and
+store directory, and is the only member that touches the object. It never
+croaks, so a consumer can probe with it before deciding whether the C path is
+available at all. Everything else takes those two values directly, which
+means there is still exactly one source of truth for what a store is.
+
+A consumer must not reimplement C<build_path>. The sharded layout is this
+module's to change, and a second copy of the rule means the day it changes,
+every blob already on disk becomes unreachable through the consumer while
+remaining perfectly findable here.
+
+C<ap_abi.h> documents each member; L<Punk::Plugin::Blob> is the reference
+consumer.
 
 =head1 DEPENDENCIES
 

@@ -5,12 +5,13 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.88'
+  Test::PDL: '0.21'
 configure_requires:
   Devel::CheckLib: '1.14'
   ExtUtils::MakeMaker: '6.64'
   PDL: '2.043'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,5 +23,9 @@ no_index:
     - inc
 requires:
   PDL: '2.043'
-version: '0.006'
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/jlapeyre/PDL-IO-Matlab/issues
+  repository: git://github.com/jlapeyre/PDL-IO-Matlab.git
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

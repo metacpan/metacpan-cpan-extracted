@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Protocol::Tus version 0.004.
+    This document describes Protocol::Tus version 0.006.
 
 SYNOPSIS
 
@@ -299,7 +299,7 @@ INTERFACE
 
     Supported arguments are method, headers, body, id, and cb_data.
 
-  HTTP_HEAD
+ HTTP_HEAD
 
        my $response = $tus->HTTP_HEAD($headers, $id);
 

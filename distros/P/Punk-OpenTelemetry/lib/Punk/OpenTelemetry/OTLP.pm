@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 1;
 
@@ -31,7 +31,7 @@ The encoders themselves are L<Punk::OpenTelemetry::Encode>.
         resource   => { attributes => { 'service.name' => 'maat' } },
         schema_url => 'https://opentelemetry.io/schemas/1.30.0',
         scope_spans => [ {
-          scope => { name => 'Punk::OpenTelemetry', version => '0.01' },
+          scope => { name => 'Punk::OpenTelemetry', version => '0.02' },
           spans => [ {
             trace_id             => '4bf92f3577b34da6a3ce929d0e0e4736',
             span_id              => '00f067aa0ba902b7',

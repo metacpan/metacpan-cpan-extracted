@@ -11,6 +11,31 @@ lib/Poker/Eval/Community.pm
 lib/Poker/Eval/HighSuit.pm
 lib/Poker/Eval/Omaha.pm
 lib/Poker/Eval/Wild.pm
+lib/Poker/Game.pm
+lib/Poker/Game/Badacey.pm
+lib/Poker/Game/Badeucy.pm
+lib/Poker/Game/Badugi.pm
+lib/Poker/Game/Courcheval.pm
+lib/Poker/Game/CourchevalHiLo.pm
+lib/Poker/Game/CrazyPineapple.pm
+lib/Poker/Game/FiveCardDraw.pm
+lib/Poker/Game/FiveCardDrawDeucesWild.pm
+lib/Poker/Game/FiveCardDrawJokersWild.pm
+lib/Poker/Game/Holdem.pm
+lib/Poker/Game/HoldemJokersWild.pm
+lib/Poker/Game/Low27SingleDraw.pm
+lib/Poker/Game/Low27TripleDraw.pm
+lib/Poker/Game/LowA5SingleDraw.pm
+lib/Poker/Game/LowA5TripleDraw.pm
+lib/Poker/Game/Omaha.pm
+lib/Poker/Game/Omaha5.pm
+lib/Poker/Game/Omaha5HiLo.pm
+lib/Poker/Game/OmahaHiLo.pm
+lib/Poker/Game/Pineapple.pm
+lib/Poker/Game/Razz.pm
+lib/Poker/Game/SevenCardStud.pm
+lib/Poker/Game/SevenCardStudHiLo.pm
+lib/Poker/Game/Stud.pm
 lib/Poker/Hand.pm
 lib/Poker/Score.pm
 lib/Poker/Score/Badugi.pm
@@ -25,11 +50,21 @@ lib/Poker/Score/Low27.pm
 lib/Poker/Score/Low8.pm
 lib/Poker/Score/LowA5.pm
 Makefile.PL
-MANIFEST			This list of files
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module YAML meta-data (added by MakeMaker)
+MANIFEST
 README
 t/00-load.t
+t/equity-reference.t
+t/equity-ties.t
+t/game-badugi.t
+t/game-fivecard.t
+t/game-holdem.t
+t/game-jokers.t
+t/game-omaha.t
+t/game-omaha5.t
+t/game-pineapple.t
+t/game-stud.t
 t/manifest.t
 t/pod.t
 t/score.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

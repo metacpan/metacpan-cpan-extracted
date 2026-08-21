@@ -401,12 +401,18 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 return;
                             }
                             var key = btCfg.key;
-                            if (btCfg.busyMessage) {
-                                busy.manifest(this.xtr(btCfg.busyMessage));
-                            } else {
-                                busy.manifest(this.tr('Preparing Download ...'));
+                            // actions which take a long time to produce their
+                            // data can opt out of the modal busy indicator so
+                            // that the gui stays usable while they run
+                            let showBusy = !btCfg.noBusyIndicator;
+                            if (showBusy) {
+                                if (btCfg.busyMessage) {
+                                    busy.manifest(this.xtr(btCfg.busyMessage));
+                                } else {
+                                    busy.manifest(this.tr('Preparing Download ...'));
+                                }
+                                setTimeout(() => { busy.vanish(); }, 3 * 1000); // hide the activity indicator after 3 seconds anyway
                             }
-                            setTimeout(() => { busy.vanish(); }, 3 * 1000); // hide the activity indicator after 3 seconds anyway
                             callbackery.data.Server.getInstance().callAsyncSmart(function (cookie) {
                                 let url = 'download'
                                     + '?name=' + cfg.name
@@ -422,7 +428,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                     height: 100
                                 });
                                 iframe.addListener('load', function (e) {
-                                    busy.vanish();
+                                    if (showBusy) {
+                                        busy.vanish();
+                                    }
                                     var response = {
                                         exception: {
                                             message: String(that.tr("No Data")),

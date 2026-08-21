@@ -1,4 +1,29 @@
 Revision history for Punk-OpenTelemetry
 
+0.04    2026-08-20
+        - FIX: change abi version checks from == to <=
+        - Fixed a SEGFAULT on perls before 5.32, POPs
+        - Fixed t/07-metrics.t failing on every perl built uselongdouble
+
+0.03    2026-08-20
+        - Fixed a SEGFAULT on perls before 5.20, reported by CPAN Testers
+          against 0.01 on 5.18.2 (FreeBSD 9.2, gcc 4.2.1) and 5.18.4
+          (Linux, gcc 12). Eleven XSUBs returned by assigning &PL_sv_undef to an
+          SV* RETVAL. The typemap mortalises RETVAL, so each of those
+          returns decremented the refcount of an IMMORTAL and before
+          5.20 immortals have no refcount protection, so the decrements
+          are real and the SV is eventually freed underneath the
+          interpreter. 
+
+0.02    2026-08-19
+        - Fixed a SEGFAULT on perls before 5.20, reported by CPAN Testers
+          against 0.01 on 5.18.2 (FreeBSD 9.2, gcc 4.2.1) and 5.18.4
+          (Linux, gcc 12). Eleven XSUBs returned by assigning &PL_sv_undef to an
+          SV* RETVAL. The typemap mortalises RETVAL, so each of those
+          returns decremented the refcount of an IMMORTAL and before
+          5.20 immortals have no refcount protection, so the decrements
+          are real and the SV is eventually freed underneath the
+          interpreter. 
+
 0.01    2026-08-19
 	First version

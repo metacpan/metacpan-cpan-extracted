@@ -1,17 +1,25 @@
 Change log for Sys::OsRelease
 
-0.4.7 2026-08-13T23:29:56-07:00 America/Los_Angeles
+0.4.8 2026-08-20T16:36:47-07:00 America/Los_Angeles
  [MAJOR]
  [API CHANGE]
  [MINOR]
  [ENHANCEMENTS]
  [SECURITY]
  [REVISION]
+ - add MANIFEST file since 'make manifest' misses README.pod and README
+ - add unit test to catch missing attributes in POD docs
+ - abandon +lite suffix on Sys::OsRelease::Lite versions (CPAN testing site
+   warnings)
+
+ [BUG FIXES]
+ [DOCS]
+ - fix: FANCY_NAME (added in 0.4.4) missing from POD docs
+
+0.4.7 2026-08-13T23:29:56-07:00 America/Los_Angeles
  [BUG FIXES]
  - fix Lite build breakage: remove MANIFEST.SKIP, build_tools still needed
    after dist generation
-
- [DOCS]
 
 0.4.6 2026-08-11T14:57:01-07:00 America/Los_Angeles
  [REVISION]

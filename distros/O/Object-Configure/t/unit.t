@@ -6,10 +6,29 @@ use Test::Most;
 use Test::Mockingbird 0.10;
 use File::Temp qw(tempdir);
 use File::Spec;
+use Readonly;
 use Scalar::Util qw(blessed);
 
 # Load the module under test
 BEGIN { use_ok('Object::Configure') }
+
+# ============================================================================
+# API MESSAGE LEDGER
+# All POD-documented error/warning messages are tracked here.  New subtests
+# below delete an entry once they prove the condition is properly triggered.
+# The final subtest asserts the ledger is empty; any remaining entry represents
+# a POD message that is untested.
+#
+# Pre-deleted (covered by existing subtests earlier in this file):
+#   msg_what_class      - 'configure() - API: requires class parameter'
+#   msg_unreadable_file - 'configure() - API: throws on unreadable config file'
+#   msg_register_usage  - 'register_object() - API: requires {class,object} parameter'
+# ============================================================================
+my %ledger = (
+	msg_invalid_class => 'configure: invalid class name (must be a valid Perl package name): CLASS',
+	msg_traversal     => 'CLASS: config_file contains path traversal sequences: FILE',
+	msg_load_warning  => "Warning: Can't load configuration from FILE: DETAIL",
+);
 
 # Mock helper: create temp config file
 sub create_test_config {
@@ -459,6 +478,200 @@ subtest 'get_signal_handler_info() - API: hot_reload_active is boolean' => sub {
 
 	ok($info->{hot_reload_active} == 0 || $info->{hot_reload_active} == 1,
 		'hot_reload_active is boolean');
+};
+
+# =============================================================================
+# NEW SUBTESTS — covers POD messages and invariants not addressed above
+# =============================================================================
+
+# --- LEDGER: msg_invalid_class ---
+# Security guard S2: class name must match /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/.
+# The test exercises two representative invalid-class partitions; t/function.t has
+# exhaustive per-case coverage.  Here we verify the documented message text.
+subtest 'configure() - API: croaks on invalid class name (S2 guard)' => sub {
+	plan tests => 3;
+
+	throws_ok {
+		Object::Configure::configure('1BadClass', {});
+	} qr/configure: invalid class name/, 'Class starting with digit is rejected';
+
+	throws_ok {
+		Object::Configure::configure("Foo\nBar", {});
+	} qr/configure: invalid class name/, 'Class with newline is rejected';
+
+	# Boundary: a valid class must NOT trigger this guard.
+	lives_ok {
+		Object::Configure::configure('Valid::Class', {});
+	} 'Valid class name is accepted';
+
+	delete $ledger{msg_invalid_class};
+};
+
+# --- LEDGER: msg_traversal ---
+# Security guard S1: config_file paths containing ".." are rejected before any
+# filesystem probe so Config::Abstraction cannot be redirected to /etc/passwd.
+subtest 'configure() - API: croaks on path traversal in config_file (S1 guard)' => sub {
+	plan tests => 2;
+
+	throws_ok {
+		Object::Configure::configure('Test::Traversal::Unit', {
+			config_file => '../../etc/passwd',
+		});
+	} qr/config_file contains path traversal sequences/,
+		'Traversal path rejected with documented message';
+
+	throws_ok {
+		Object::Configure::configure('Test::Traversal::Unit', {
+			config_file => 'foo/../bar.yml',
+		});
+	} qr/config_file contains path traversal sequences/,
+		'Embedded traversal segment rejected';
+
+	delete $ledger{msg_traversal};
+};
+
+# --- LEDGER: msg_load_warning ---
+# Forces the "Warning: Can't load configuration from FILE: DETAIL" carp by
+# monkey-patching Config::Abstraction::new to return a falsy value with $@ set.
+# This is the only condition that requires mocking — the real Config::Abstraction
+# always returns a truthy object when given a readable file.
+subtest "configure() - API: emits warning when Config::Abstraction fails to parse file" => sub {
+	plan tests => 1;
+
+	my $temp_dir = tempdir(CLEANUP => 1);
+	create_test_config($temp_dir, 'bad.yml', "---\nTest__ParseFail:\n  key: val\n");
+
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+
+	# Monkey-patch: simulate a Config::Abstraction parse failure.  The config_file
+	# path lands in @config_files_to_load (file is readable), then the mocked
+	# constructor returns 0 + sets $@ so the elsif($@) branch fires.
+	{
+		no warnings 'redefine';
+		local *Config::Abstraction::new = sub {
+			$@ = 'Mock YAML parse error at line 1';
+			return 0;
+		};
+
+		eval {
+			Object::Configure::configure('Test::ParseFail', {
+				config_file => 'bad.yml',
+				config_dirs => [$temp_dir],
+			});
+		};
+	}
+
+	ok(grep({ /Can't load configuration/i } @warnings),
+		"carp emitted with documented message when Config::Abstraction returns falsy");
+
+	delete $ledger{msg_load_warning};
+};
+
+# --- Global state: $@ must not be clobbered ---
+# configure() uses `local $@` so that internal eval blocks (in Config::Abstraction,
+# Log::Abstraction, Return::Set) cannot permanently corrupt the caller's $@.
+subtest 'configure() - API: does not clobber caller $@' => sub {
+	plan tests => 1;
+
+	$@ = 'caller_error_sentinel';
+	Object::Configure::configure('Test::DollarAt', {});
+
+	is($@, 'caller_error_sentinel', '$@ preserved across configure() call');
+};
+
+# --- Global state: alarm() must not be reset ---
+# None of the configure() paths call sleep() or set alarm(); the timer must survive.
+subtest 'configure() - API: does not clobber alarm()' => sub {
+	plan tests => 2;
+
+	alarm(120);
+	lives_ok { Object::Configure::configure('Test::AlarmCheck', {}) }
+		'configure() runs successfully while alarm is active';
+	my $remaining = alarm(0);    # cancel and capture remaining time
+
+	ok($remaining > 0, 'alarm() countdown not reset by configure()');
+};
+
+# --- _config_files arrayref metadata ---
+# The POD documents _config_files as an arrayref of all loaded config file paths.
+subtest 'configure() - API: _config_files is arrayref of loaded paths' => sub {
+	plan tests => 2;
+
+	my $temp_dir = tempdir(CLEANUP => 1);
+	create_test_config($temp_dir, 'cfg.yml', "---\nTest__CfgFiles:\n  k: v\n");
+
+	my $result = Object::Configure::configure('Test::CfgFiles', {
+		config_file => 'cfg.yml',
+		config_dirs => [$temp_dir],
+	});
+
+	ok(ref($result->{_config_files}) eq 'ARRAY', '_config_files is an arrayref');
+	ok(scalar(@{ $result->{_config_files} }) > 0,  '_config_files contains at least one path');
+};
+
+# --- Arrayref logger priority ---
+# The POD states: "A caller-supplied logger value (arrayref, ...) always overrides
+# any logger: key in the config file."
+subtest 'configure() - API: caller arrayref logger wins over config-file logger spec' => sub {
+	plan tests => 1;
+
+	my $temp_dir = tempdir(CLEANUP => 1);
+	create_test_config($temp_dir, 'lgr.yml',
+		"---\nTest__LogPriority:\n  logger:\n    level: debug\n");
+
+	my @capture;
+	my $result = Object::Configure::configure('Test::LogPriority', {
+		config_file => 'lgr.yml',
+		config_dirs => [$temp_dir],
+		logger      => \@capture,
+	});
+
+	is($result->{logger}{array}, \@capture,
+		'Caller arrayref logger wired into Log::Abstraction (not replaced by config-file spec)');
+};
+
+# --- instantiate() registers object when config_file is present ---
+# The POD side-effects say register_object is called when _config_file is set.
+subtest 'instantiate() - API: registers object for hot reload when config_file given' => sub {
+	plan tests => 2;
+
+	{
+		package Test::Instantiable::Reg;
+		sub new { my ($class, $params) = @_; bless $params, $class }
+	}
+
+	my $temp_dir = tempdir(CLEANUP => 1);
+	create_test_config($temp_dir, 'ireg.yml',
+		"---\nTest__Instantiable__Reg:\n  value: from_config\n");
+
+	my $obj = Object::Configure::instantiate(
+		class       => 'Test::Instantiable::Reg',
+		config_file => 'ireg.yml',
+		config_dirs => [$temp_dir],
+	);
+
+	ok(blessed($obj), 'Object is blessed');
+	ok(exists($Object::Configure::_object_registry{'Test::Instantiable::Reg'}),
+		'Object registered in _object_registry (hot reload side-effect documented in POD)');
+
+	# Cleanup so the registry does not leak into reload_config() tests.
+	delete $Object::Configure::_object_registry{'Test::Instantiable::Reg'};
+};
+
+# --- Ledger completion check ---
+# Any remaining ledger entry represents a POD-documented message that no subtest
+# above exercised.  fail() makes the omission visible and actionable.
+subtest 'API ledger: all documented messages were exercised' => sub {
+	if(%ledger) {
+		for my $key (sort keys %ledger) {
+			fail("Untested POD message '$key': $ledger{$key}");
+		}
+	} else {
+		pass('All documented messages were triggered by subtests');
+	}
+
+	done_testing();
 };
 
 done_testing();

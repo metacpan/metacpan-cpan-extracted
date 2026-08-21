@@ -1,0 +1,45 @@
+<html>
+<head>
+<title>All Flowers</title>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+<link rel='stylesheet' type='text/css' href='/assets/js/jQuery/jquery-ui-1.12.1/jquery-ui.min.css'>
+<link rel='stylesheet' type='text/css' href='/assets/js/jQuery/datatables.min.css'>
+<link rel='stylesheet' type='text/css' href='/assets/css/www/garden/design/homepage.css'>
+
+</head>
+<body>
+
+<h1 align='center'>All Flowers</h1>
+
+<table align='center' class='datatable' id='result_table' summary = 'Result table'>
+	<thead>
+		: for $thead -> $item {
+		<tr>
+		: include "basic.column.tx" { column => $item };
+		</tr>
+		: }
+	</thead>
+	<tbody>
+		: for $tbody-> $item {
+		<tr>
+		: include "basic.column.tx" { column => $item };
+		</tr>
+		: }
+	</tbody>
+	<tfoot>
+		: for $thead -> $item {
+		<tr>
+		: include "basic.column.tx" { column => $item };
+		</tr>
+		: }
+	</tfoot>
+</table>
+
+</body>
+<script type='text/javascript' src='/assets/js/jQuery/jquery-3.1.1.min.js'></script>
+<script type='text/javascript' src='/assets/js/jQuery/jquery-ui-1.12.1/jquery-ui.min.js'></script>
+<script type='text/javascript' src='/assets/js/jQuery/datatables.min.js'></script>
+<script type='text/javascript'>
+: $js4datatable
+</script>
+</html>

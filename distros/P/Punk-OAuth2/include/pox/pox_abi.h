@@ -50,7 +50,7 @@ static const frj_abi *pox_frj(pTHX) {
     IV p = pox_call_abi_ptr(aTHX_ "require File::Raw::JSON;",
                             "File::Raw::JSON::_abi_ptr");
     const frj_abi *a = p ? INT2PTR(const frj_abi *, p) : NULL;
-    if (a && a->abi_version == FRJ_ABI_VERSION) POX_FRJ = a;
+    if (a && a->abi_version >= FRJ_ABI_VERSION) POX_FRJ = a;
   }
   if (!POX_FRJ)
     croak("Punk::OAuth2: File::Raw::JSON with a compatible C ABI is "
@@ -62,7 +62,7 @@ static const fetch_abi *pox_fetch(pTHX) {
   if (!POX_FETCH) {
     IV p = pox_call_abi_ptr(aTHX_ "require Fetch;", "Fetch::_abi_ptr");
     const fetch_abi *a = p ? INT2PTR(const fetch_abi *, p) : NULL;
-    if (a && a->abi_version == FETCH_ABI_VERSION) POX_FETCH = a;
+    if (a && a->abi_version >= FETCH_ABI_VERSION) POX_FETCH = a;
   }
   if (!POX_FETCH)
     croak("Punk::OAuth2: Fetch with a compatible C ABI is required "

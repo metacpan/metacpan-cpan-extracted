@@ -5,9 +5,10 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0501';
+our $VERSION = '0.0502';
 
 use strictures 2;
+use Carp qw(croak);
 use curry;
 use Array::Circular ();
 use List::SomeUtils qw(first_index);
@@ -21,8 +22,12 @@ use Music::ToRoman ();
 use Music::VoiceGen ();
 use Types::Common::Numeric qw(NegativeInt PositiveInt PositiveNum);
 use Types::MIDI qw(Velocity);
-use Types::Standard qw(ArrayRef Num Maybe Str);
+use Types::Standard qw(ArrayRef InstanceOf Num Maybe Str);
 use namespace::clean;
+
+use constant KNOWN_FILTERS => qw(
+    pedal_tone chord_tone delay_tone offset_tone walk_tone arp_tone
+);
 
 extends 'MIDI::RtController::Filter';
 
@@ -99,8 +104,8 @@ has arp => (
 
 
 has arp_types => (
-    is  => 'rw',
-    isa => sub { die 'Invalid controller' unless ref($_[0]) eq 'Array::Circular' },
+    is      => 'rw',
+    isa     => InstanceOf['Array::Circular'],
     default => sub { Array::Circular->new(qw(up down random)) },
 );
 
@@ -113,18 +118,21 @@ has arp_type => (
 
 
 sub add_filters ($filters, $controllers) {
-    for my $params (@$filters) {
-        my $port = delete $params->{port};
+    for my $orig (@$filters) {
+        my %params = %$orig; # work on a copy, don't mutate the caller's hashref
+        my $port = delete $params{port};
         # skip unnamed and unknown entries
         next if !$port || !exists $controllers->{$port};
-        my $type   = delete $params->{type}  || 'delay_tone';
-        my $event  = delete $params->{event} || 'all';
+        my $type = delete $params{type} || 'delay_tone';
+        croak qq{Unknown filter type "$type" (must be one of: } . join(', ', KNOWN_FILTERS) . ')'
+            unless grep { $_ eq $type } KNOWN_FILTERS;
+        my $event = delete $params{event} || 'all';
         my $filter = __PACKAGE__->new(
             rtc => $controllers->{$port}
         );
         # assume all remaining key/values are module attributes
-        for my $param (keys %$params) {
-            $filter->$param($params->{$param});
+        for my $param (keys %params) {
+            $filter->$param($params{$param});
         }
         my $method = "curry::$type";
         $controllers->{$port}->add_filter($type, $event => $filter->$method);
@@ -137,8 +145,8 @@ sub _pedal_notes ($self, $note) {
 }
 sub pedal_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     my @notes = $self->_pedal_notes($note);
     my $delay_time = 0;
@@ -167,8 +175,8 @@ sub _chord_notes ($self, $note) {
 }
 sub chord_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     my @notes = $self->_chord_notes($note);
     $self->rtc->send_it([ $ev, $self->channel, $_, $val ]) for @notes;
@@ -181,8 +189,8 @@ sub _delay_notes ($self, $note) {
 }
 sub delay_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     my @notes = $self->_delay_notes($note);
     my $delay_time = 0;
@@ -203,8 +211,8 @@ sub _offset_notes ($self, $note) {
 }
 sub offset_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     my @notes = $self->_offset_notes($note);
     $self->rtc->send_it([ $ev, $self->channel, $_, $val ]) for @notes;
@@ -227,8 +235,8 @@ sub _walk_notes ($self, $note) {
 }
 sub walk_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     # make sure the note_on and note_off notes are the same
     my $notes = $self->arp;
@@ -273,8 +281,8 @@ sub _arp_notes ($self, $note) {
 }
 sub arp_tone ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
     my @notes = $self->_arp_notes($note);
     my $delay_time = 0;
@@ -300,7 +308,7 @@ MIDI::RtController::Filter::Tonal - Tonal RtController filters
 
 =head1 VERSION
 
-version 0.0501
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -460,21 +468,6 @@ example:
 In this list, C<port> is required, and C<event> is optional. These
 keys are metadata, and all others are assumed to be object attributes
 to set.
-
-=head1 FILTERS
-
-All filter methods must accept the object, a MIDI device name, a
-delta-time, and a MIDI event ARRAY reference, like:
-
-  sub pedal_tone ($self, $name, $delta, $event) {
-    my ($event_type, $chan, $note, $value) = $event->@*;
-    ...
-    return $boolean;
-  }
-
-A filter also must return a boolean value. This tells
-L<MIDI::RtController> to continue processing other known filters or
-not.
 
 =head2 pedal_tone
 

@@ -12,7 +12,7 @@ Protocol::Tus - Tus protocol handling
 
 =head1 VERSION
 
-This document describes Protocol::Tus version 0.004.
+This document describes Protocol::Tus version 0.006.
 
 =begin html
 
@@ -345,7 +345,7 @@ Supported arguments are C<method>, C<headers>, C<body>, C<id>, and
 C<cb_data>.
 
 
-=head3 B<< HTTP_HEAD >>
+=head2 B<< HTTP_HEAD >>
 
    my $response = $tus->HTTP_HEAD($headers, $id);
 

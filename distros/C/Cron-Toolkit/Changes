@@ -1,5 +1,12 @@
 # Changes — Revision history for Cron::Toolkit
 
+1.03  2026-08-20
+    - Fixed test data generator so it never emits both tz and utc_offset on the same case
+      (resolves seasonal ±3600s failures caused by conflicting timezone/offset data; see #2)
+    - Regenerated t/data/cron_tests.json under the new rules
+    - Added regression cases for the step-pattern hour-boundary fix from 1.02
+      (*/15 near 22:58:45 → 22:59:00, not midnight)
+
 1.02  2025-06-22
     - Fixed bug in next()/previous() for step expressions (e.g. */15) near hour boundaries
       (22:58:45 case now correctly returns 22:59:00 instead of 00:00:00)

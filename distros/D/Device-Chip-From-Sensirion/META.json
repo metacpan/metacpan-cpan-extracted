@@ -39,15 +39,19 @@
    "provides" : {
       "Device::Chip::From::Sensirion" : {
          "file" : "lib/Device/Chip/From/Sensirion.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Device::Chip::SCD4x" : {
          "file" : "lib/Device/Chip/SCD4x.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Device::Chip::SGP4x" : {
          "file" : "lib/Device/Chip/SGP4x.pm",
-         "version" : "0.02"
+         "version" : "0.03"
+      },
+      "Device::Chip::SHT4x" : {
+         "file" : "lib/Device/Chip/SHT4x.pm",
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -56,6 +60,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

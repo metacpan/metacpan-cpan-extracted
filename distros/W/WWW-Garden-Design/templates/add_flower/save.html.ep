@@ -1,0 +1,57 @@
+<br />
+
+% if (my $error = stash 'error') {
+
+<h2 align = 'center' class = 'error'><%= stash 'message' %></h2>
+
+<table align = 'center' class = 'table_striped'>
+	<thead>
+	<tr>
+		<th class = 'generic_border'>Name</th>
+		<th class = 'generic_border'>Value</th>
+		<th class = 'generic_border'>Test</th>
+		<th class = 'generic_border'>Parameters</th>
+	</tr>
+	</thead>
+	<tbody>
+	%== $error
+	</tbody>
+	<tfoot>
+	<tr>
+		<th class = 'generic_border'>Name</th>
+		<th class = 'generic_border'>Value</th>
+		<th class = 'generic_border'>Test</th>
+		<th class = 'generic_border'>Parameters</th>
+	</tr>
+	</tfoot>
+</table>
+
+% } else {
+
+<h2 align = 'center'>Details updated</h2>
+
+<table align = 'center' class = 'table_striped'>
+	<thead>
+	<tr>
+		<th class = 'generic_border'>Common name</th>
+		<th class = 'generic_border'>Scientific name</th>
+		<th class = 'generic_border'>Aliases</th>
+		<th class = 'generic_border'>Height</th>
+		<th class = 'generic_border'>Width</th>
+	</tr>
+	</thead>
+	<tbody>
+	%== $details
+	</tbody>
+	<tfoot>
+	<tr>
+		<th class = 'generic_border'>Common name</th>
+		<th class = 'generic_border'>Scientific name</th>
+		<th class = 'generic_border'>Aliases</th>
+		<th class = 'generic_border'>Height</th>
+		<th class = 'generic_border'>Width</th>
+	</tr>
+	</tfoot>
+</table>
+
+% }

@@ -22,12 +22,13 @@ BEGIN {
 
 
 
+
 #line 18 "complex.pd"
 
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '2.011';
+our $VERSION = '2.012';
 
 =encoding utf8
 
@@ -257,7 +258,7 @@ sub i { $i->copy + (@_ ? $_[0] : 0) };
 *tricpy = \&Ctricpy;
 *mstack = \&Cmstack;
 *augment = \&Caugment;
-#line 261 "Complex.pm"
+#line 262 "Complex.pm"
 
 
 =head1 FUNCTIONS
@@ -396,22 +397,35 @@ sub t {
     $m->dummy(1)->dummy(1);
   $conj ? $r->conj : $r;
 }
-#line 400 "Complex.pm"
+#line 401 "Complex.pm"
 
 
 =head2 r2C
 
 =for sig
 
-  Signature: (r(); [o]c(m=2))
+ Signature: (r(); [o]c(m=2))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = r2C($r);
+ r2C($r, $c);  # all arguments given
+ $c = $r->r2C; # method call
+ $r->r2C($c);
 
 =for ref
 
 convert real to complex, assuming an imaginary part of zero
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-r2C does not process bad values.
+C<r2C> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -442,15 +456,28 @@ BEGIN {*r2C = \&PDL::Complex::r2C;
 
 =for sig
 
-  Signature: (r(); [o]c(m=2))
+ Signature: (r(); [o]c(m=2))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = i2C($r);
+ i2C($r, $c);  # all arguments given
+ $c = $r->i2C; # method call
+ $r->i2C($c);
 
 =for ref
 
 convert imaginary to complex, assuming a real part of zero
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-i2C does not process bad values.
+C<i2C> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -472,15 +499,30 @@ BEGIN {*i2C = \&PDL::Complex::i2C;
 
 =for sig
 
-  Signature: (r(m=2); [o]p(m=2))
+ Signature: (r(m=2); [o]p(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = Cr2p($r);
+ Cr2p($r, $p);      # all arguments given
+ $p = $r->Cr2p;     # method call
+ $r->Cr2p($p);
+ $r->inplace->Cr2p; # can be used inplace
+ Cr2p($r->inplace);
 
 =for ref
 
 convert complex numbers in rectangular form to polar (mod,arg) form. Works inplace
 
+=pod
+
+Can operate inplace with C<r> as output C<p>.
+Broadcasts over its inputs.
+
 =for bad
 
-Cr2p does not process bad values.
+C<Cr2p> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -499,15 +541,30 @@ BEGIN {*Cr2p = \&PDL::Complex::Cr2p;
 
 =for sig
 
-  Signature: (r(m=2); [o]p(m=2))
+ Signature: (r(m=2); [o]p(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = Cp2r($r);
+ Cp2r($r, $p);      # all arguments given
+ $p = $r->Cp2r;     # method call
+ $r->Cp2r($p);
+ $r->inplace->Cp2r; # can be used inplace
+ Cp2r($r->inplace);
 
 =for ref
 
 convert complex numbers in polar (mod,arg) form to rectangular form. Works inplace
 
+=pod
+
+Can operate inplace with C<r> as output C<p>.
+Broadcasts over its inputs.
+
 =for bad
 
-Cp2r does not process bad values.
+C<Cp2r> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -536,15 +593,28 @@ BEGIN {*Csub = \&PDL::Complex::Csub;
 
 =for sig
 
-  Signature: (a(m=2); b(m=2); [o]c(m=2))
+ Signature: (a(m=2); b(m=2); [o]c(m=2))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = Cmul($a, $b);
+ Cmul($a, $b, $c);  # all arguments given
+ $c = $a->Cmul($b); # method call
+ $a->Cmul($b, $c);
 
 =for ref
 
 complex multiplication
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-Cmul does not process bad values.
+C<Cmul> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -563,15 +633,28 @@ BEGIN {*Cmul = \&PDL::Complex::Cmul;
 
 =for sig
 
-  Signature: (a(m=2,n); [o]c(m=2))
+ Signature: (a(m=2,n); [o]c(m=2))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = Cprodover($a);
+ Cprodover($a, $c);  # all arguments given
+ $c = $a->Cprodover; # method call
+ $a->Cprodover($c);
 
 =for ref
 
 Project via product to N-1 dimension
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-Cprodover does not process bad values.
+C<Cprodover> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -590,15 +673,28 @@ BEGIN {*Cprodover = \&PDL::Complex::Cprodover;
 
 =for sig
 
-  Signature: (a(m=2); b(); [o]c(m=2))
+ Signature: (a(m=2); b(); [o]c(m=2))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = Cscale($a, $b);
+ Cscale($a, $b, $c);  # all arguments given
+ $c = $a->Cscale($b); # method call
+ $a->Cscale($b, $c);
 
 =for ref
 
 mixed complex/real multiplication
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-Cscale does not process bad values.
+C<Cscale> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -617,15 +713,27 @@ BEGIN {*Cscale = \&PDL::Complex::Cscale;
 
 =for sig
 
-  Signature: (a(m=2); b(m=2); [o]c(m=2))
+ Signature: (a(m=2); b(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Cdiv($a, $b);
+ Cdiv($a, $b, $c);  # all arguments given
+ $c = $a->Cdiv($b); # method call
+ $a->Cdiv($b, $c);
 
 =for ref
 
 complex division
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-Cdiv does not process bad values.
+C<Cdiv> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -644,15 +752,27 @@ BEGIN {*Cdiv = \&PDL::Complex::Cdiv;
 
 =for sig
 
-  Signature: (a(m=2); b(m=2); [o]c())
+ Signature: (a(m=2); b(m=2); [o]c())
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Ceq($a, $b);
+ Ceq($a, $b, $c);  # all arguments given
+ $c = $a->Ceq($b); # method call
+ $a->Ceq($b, $c);
 
 =for ref
 
 Complex equality operator.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-Ceq does not process bad values.
+C<Ceq> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -680,15 +800,31 @@ BEGIN {*Ceq = \&PDL::Complex::Ceq;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = Cconj($a);
+ Cconj($a, $c);      # all arguments given
+ $c = $a->Cconj;     # method call
+ $a->Cconj($c);
+ $a->inplace->Cconj; # can be used inplace
+ Cconj($a->inplace);
 
 =for ref
 
 complex conjugation. Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Cconj does not process bad values.
+C<Cconj> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -707,15 +843,27 @@ BEGIN {*Cconj = \&PDL::Complex::Cconj;
 
 =for sig
 
-  Signature: (a(m=2); [o]c())
+ Signature: (a(m=2); [o]c())
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Cabs($a);
+ Cabs($a, $c);  # all arguments given
+ $c = $a->Cabs; # method call
+ $a->Cabs($c);
 
 =for ref
 
 complex C<abs()> (also known as I<modulus>)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-Cabs does not process bad values.
+C<Cabs> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -742,15 +890,28 @@ BEGIN {*Cabs = \&PDL::Complex::Cabs;
 
 =for sig
 
-  Signature: (a(m=2); [o]c())
+ Signature: (a(m=2); [o]c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = Cabs2($a);
+ Cabs2($a, $c);  # all arguments given
+ $c = $a->Cabs2; # method call
+ $a->Cabs2($c);
 
 =for ref
 
 complex squared C<abs()> (also known I<squared modulus>)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-Cabs2 does not process bad values.
+C<Cabs2> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -777,15 +938,27 @@ BEGIN {*Cabs2 = \&PDL::Complex::Cabs2;
 
 =for sig
 
-  Signature: (a(m=2); [o]c())
+ Signature: (a(m=2); [o]c())
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Carg($a);
+ Carg($a, $c);  # all arguments given
+ $c = $a->Carg; # method call
+ $a->Carg($c);
 
 =for ref
 
 complex argument function ("angle")
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-Carg does not process bad values.
+C<Carg> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -812,15 +985,30 @@ BEGIN {*Carg = \&PDL::Complex::Carg;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Csin($a);
+ Csin($a, $c);      # all arguments given
+ $c = $a->Csin;     # method call
+ $a->Csin($c);
+ $a->inplace->Csin; # can be used inplace
+ Csin($a->inplace);
 
 =for ref
 
   sin (a) = 1/(2*i) * (exp (a*i) - exp (-a*i)). Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Csin does not process bad values.
+C<Csin> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -839,15 +1027,30 @@ BEGIN {*Csin = \&PDL::Complex::Csin;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Ccos($a);
+ Ccos($a, $c);      # all arguments given
+ $c = $a->Ccos;     # method call
+ $a->Ccos($c);
+ $a->inplace->Ccos; # can be used inplace
+ Ccos($a->inplace);
 
 =for ref
 
   cos (a) = 1/2 * (exp (a*i) + exp (-a*i)). Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Ccos does not process bad values.
+C<Ccos> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -876,22 +1079,37 @@ Does not work inplace.
 =cut
 
 sub Ctan($) { Csin($_[0]) / Ccos($_[0]) }
-#line 880 "Complex.pm"
+#line 1083 "Complex.pm"
 
 
 =head2 Cexp
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Cexp($a);
+ Cexp($a, $c);      # all arguments given
+ $c = $a->Cexp;     # method call
+ $a->Cexp($c);
+ $a->inplace->Cexp; # can be used inplace
+ Cexp($a->inplace);
 
 =for ref
 
   exp (a) = exp (real (a)) * (cos (imag (a)) + i * sin (imag (a))). Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Cexp does not process bad values.
+C<Cexp> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -910,15 +1128,30 @@ BEGIN {*Cexp = \&PDL::Complex::Cexp;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Clog($a);
+ Clog($a, $c);      # all arguments given
+ $c = $a->Clog;     # method call
+ $a->Clog($c);
+ $a->inplace->Clog; # can be used inplace
+ Clog($a->inplace);
 
 =for ref
 
   log (a) = log (cabs (a)) + i * carg (a). Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Clog does not process bad values.
+C<Clog> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -937,15 +1170,30 @@ BEGIN {*Clog = \&PDL::Complex::Clog;
 
 =for sig
 
-  Signature: (a(m=2); b(m=2); [o]c(m=2))
+ Signature: (a(m=2); b(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Cpow($a, $b);
+ Cpow($a, $b, $c);      # all arguments given
+ $c = $a->Cpow($b);     # method call
+ $a->Cpow($b, $c);
+ $a->inplace->Cpow($b); # can be used inplace
+ Cpow($a->inplace, $b);
 
 =for ref
 
 complex C<pow()> (C<**>-operator)
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Cpow does not process bad values.
+C<Cpow> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -964,15 +1212,30 @@ BEGIN {*Cpow = \&PDL::Complex::Cpow;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Csqrt($a);
+ Csqrt($a, $c);      # all arguments given
+ $c = $a->Csqrt;     # method call
+ $a->Csqrt($c);
+ $a->inplace->Csqrt; # can be used inplace
+ Csqrt($a->inplace);
 
 =for ref
 
 Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Csqrt does not process bad values.
+C<Csqrt> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -991,15 +1254,30 @@ BEGIN {*Csqrt = \&PDL::Complex::Csqrt;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Casin($a);
+ Casin($a, $c);      # all arguments given
+ $c = $a->Casin;     # method call
+ $a->Casin($c);
+ $a->inplace->Casin; # can be used inplace
+ Casin($a->inplace);
 
 =for ref
 
 Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Casin does not process bad values.
+C<Casin> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1018,15 +1296,30 @@ BEGIN {*Casin = \&PDL::Complex::Casin;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Cacos($a);
+ Cacos($a, $c);      # all arguments given
+ $c = $a->Cacos;     # method call
+ $a->Cacos($c);
+ $a->inplace->Cacos; # can be used inplace
+ Cacos($a->inplace);
 
 =for ref
 
 Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Cacos does not process bad values.
+C<Cacos> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1056,22 +1349,37 @@ sub Catan($) {
    my $z = shift;
    Cmul Clog(Cdiv (PDL::Complex::i()+$z, PDL::Complex::i()-$z)), PDL->pdl(0, 0.5);
 }
-#line 1060 "Complex.pm"
+#line 1353 "Complex.pm"
 
 
 =head2 Csinh
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Csinh($a);
+ Csinh($a, $c);      # all arguments given
+ $c = $a->Csinh;     # method call
+ $a->Csinh($c);
+ $a->inplace->Csinh; # can be used inplace
+ Csinh($a->inplace);
 
 =for ref
 
   sinh (a) = (exp (a) - exp (-a)) / 2. Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Csinh does not process bad values.
+C<Csinh> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1090,15 +1398,30 @@ BEGIN {*Csinh = \&PDL::Complex::Csinh;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Ccosh($a);
+ Ccosh($a, $c);      # all arguments given
+ $c = $a->Ccosh;     # method call
+ $a->Ccosh($c);
+ $a->inplace->Ccosh; # can be used inplace
+ Ccosh($a->inplace);
 
 =for ref
 
   cosh (a) = (exp (a) + exp (-a)) / 2. Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Ccosh does not process bad values.
+C<Ccosh> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1117,15 +1440,30 @@ BEGIN {*Ccosh = \&PDL::Complex::Ccosh;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Ctanh($a);
+ Ctanh($a, $c);      # all arguments given
+ $c = $a->Ctanh;     # method call
+ $a->Ctanh($c);
+ $a->inplace->Ctanh; # can be used inplace
+ Ctanh($a->inplace);
 
 =for ref
 
 Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Ctanh does not process bad values.
+C<Ctanh> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1144,15 +1482,30 @@ BEGIN {*Ctanh = \&PDL::Complex::Ctanh;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Casinh($a);
+ Casinh($a, $c);      # all arguments given
+ $c = $a->Casinh;     # method call
+ $a->Casinh($c);
+ $a->inplace->Casinh; # can be used inplace
+ Casinh($a->inplace);
 
 =for ref
 
 Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Casinh does not process bad values.
+C<Casinh> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1171,15 +1524,30 @@ BEGIN {*Casinh = \&PDL::Complex::Casinh;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Cacosh($a);
+ Cacosh($a, $c);      # all arguments given
+ $c = $a->Cacosh;     # method call
+ $a->Cacosh($c);
+ $a->inplace->Cacosh; # can be used inplace
+ Cacosh($a->inplace);
 
 =for ref
 
 Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Cacosh does not process bad values.
+C<Cacosh> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1198,15 +1566,30 @@ BEGIN {*Cacosh = \&PDL::Complex::Cacosh;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Catanh($a);
+ Catanh($a, $c);      # all arguments given
+ $c = $a->Catanh;     # method call
+ $a->Catanh($c);
+ $a->inplace->Catanh; # can be used inplace
+ Catanh($a->inplace);
 
 =for ref
 
 Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Catanh does not process bad values.
+C<Catanh> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1225,15 +1608,30 @@ BEGIN {*Catanh = \&PDL::Complex::Catanh;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2))
+ Signature: (a(m=2); [o]c(m=2))
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Cproj($a);
+ Cproj($a, $c);      # all arguments given
+ $c = $a->Cproj;     # method call
+ $a->Cproj($c);
+ $a->inplace->Cproj; # can be used inplace
+ Cproj($a->inplace);
 
 =for ref
 
 compute the projection of a complex number to the riemann sphere. Works inplace
 
+=pod
+
+Can operate inplace with C<a> as output C<c>.
+Broadcasts over its inputs.
+
 =for bad
 
-Cproj does not process bad values.
+C<Cproj> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1252,15 +1650,27 @@ BEGIN {*Cproj = \&PDL::Complex::Cproj;
 
 =for sig
 
-  Signature: (a(m=2); [o]c(m=2,n); int n => n)
+ Signature: (a(m=2); [o]c(m=2,n); int n => n)
+ Types: (float double ldouble)
+
+=for usage
+
+ $c = Croots($a, $n);
+ Croots($a, $c, $n);  # all arguments given
+ $c = $a->Croots($n); # method call
+ $a->Croots($c, $n);
 
 =for ref
 
 Compute the C<n> roots of C<a>. C<n> must be a positive integer. The result will always be a complex type!
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-Croots does not process bad values.
+C<Croots> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1306,22 +1716,34 @@ sub slice :lvalue {
   $ret;
 }
 }
-#line 1310 "Complex.pm"
+#line 1720 "Complex.pm"
 
 
 =head2 rCpolynomial
 
 =for sig
 
-  Signature: (coeffs(n); x(c=2,m); [o]out(c=2,m))
+ Signature: (coeffs(n); x(c=2,m); [o]out(c=2,m))
+ Types: (float double ldouble)
+
+=for usage
+
+ $out = rCpolynomial($coeffs, $x);
+ rCpolynomial($coeffs, $x, $out);  # all arguments given
+ $out = $coeffs->rCpolynomial($x); # method call
+ $coeffs->rCpolynomial($x, $out);
 
 =for ref
 
 evaluate the polynomial with (real) coefficients C<coeffs> at the (complex) position(s) C<x>. C<coeffs[0]> is the constant term.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rCpolynomial does not process bad values.
+C<rCpolynomial> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1351,7 +1773,9 @@ BEGIN {*rCpolynomial = \&PDL::Complex::rCpolynomial;
 
 =for sig
 
-  Signature: (A(c=2,m,n);[o] C(c=2,m,n); int uplo)
+ Signature: (A(c=2,m,n);[o] C(c=2,m,n); int uplo)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for usage
 
@@ -1373,9 +1797,13 @@ part.
 
 Originally by Grégory Vanuxem.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-Ctricpy does not process bad values.
+C<Ctricpy> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1394,7 +1822,17 @@ BEGIN {*Ctricpy = \&PDL::Complex::Ctricpy;
 
 =for sig
 
-  Signature: (x(c=2,n,m);y(c,n,p);[o]out(c,n,q=CALC($SIZE(m)+$SIZE(p))))
+ Signature: (x(c=2,n,m);y(c,n,p);[o]out(c,n,q=CALC($SIZE(m)+$SIZE(p))))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $out = Cmstack($x, $y);
+ Cmstack($x, $y, $out);    # all arguments given
+ $out = $x->Cmstack($y);   # method call
+ $x->Cmstack($y, $out);
+ $x->Cmstack($y) .= $data; # usable as lvalue
 
 =for ref
 
@@ -1404,9 +1842,14 @@ This routine does backward and forward dataflow automatically.
 
 Originally by Grégory Vanuxem.
 
+=pod
+
+Broadcasts over its inputs.
+Creates data-flow back and forth by default.
+
 =for bad
 
-Cmstack does not process bad values.
+C<Cmstack> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1425,7 +1868,17 @@ BEGIN {*Cmstack = \&PDL::Complex::Cmstack;
 
 =for sig
 
-  Signature: (x(c=2,n);y(c,p);[o]out(c,q=CALC($SIZE(n)+$SIZE(p))))
+ Signature: (x(c=2,n);y(c,p);[o]out(c,q=CALC($SIZE(n)+$SIZE(p))))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $out = Caugment($x, $y);
+ Caugment($x, $y, $out);    # all arguments given
+ $out = $x->Caugment($y);   # method call
+ $x->Caugment($y, $out);
+ $x->Caugment($y) .= $data; # usable as lvalue
 
 =for ref
 
@@ -1434,9 +1887,14 @@ This routine does backward and forward dataflow automatically.
 
 Originally by Grégory Vanuxem.
 
+=pod
+
+Broadcasts over its inputs.
+Creates data-flow back and forth by default.
+
 =for bad
 
-Caugment does not process bad values.
+C<Caugment> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1548,7 +2006,7 @@ in the file COPYING in the PDL distribution.
 perl(1), L<PDL>.
 
 =cut
-#line 1552 "Complex.pm"
+#line 2010 "Complex.pm"
 
 # Exit with OK status
 

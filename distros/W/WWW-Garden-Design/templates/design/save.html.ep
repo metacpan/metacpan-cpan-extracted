@@ -1,0 +1,45 @@
+<br />
+
+% if (my $error = stash 'error') {
+
+<h2 align = 'center' class = 'error'><%= stash 'message' %></h2>
+
+<table align = 'center' class = 'table_striped'>
+	<thead>
+	<tr>
+		<th class = 'generic_border'>Name</th>
+		<th class = 'generic_border'>Value</th>
+		<th class = 'generic_border'>Test</th>
+		<th class = 'generic_border'>Parameters</th>
+	</tr>
+	</thead>
+	<tbody>
+	%== $error
+	</tbody>
+	<tfoot>
+	<tr>
+		<th class = 'generic_border'>Name</th>
+		<th class = 'generic_border'>Value</th>
+		<th class = 'generic_border'>Test</th>
+		<th class = 'generic_border'>Parameters</th>
+	</tr>
+	</tfoot>
+</table>
+
+% } else {
+
+<h3 align = 'center'>Design updated</h3>
+
+<table align = 'center' class = 'table_striped'>
+	<thead>
+	<tr>
+		<th class = 'generic_border'>Property name</th>
+		<th class = 'generic_border'>Garden name</th>
+	</tr>
+	</thead>
+	<tbody>
+	%== $details
+	</tbody>
+</table>
+
+% }

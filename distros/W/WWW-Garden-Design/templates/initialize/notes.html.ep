@@ -1,0 +1,33 @@
+<table align = 'center'>
+	<tr>
+		<td colspan = '2'><div class = 'blue_centered'>Notes</div><br /></td>
+	</tr>
+	<tr>
+		<td align = 'center'>Common name: </td><td><span id = 'note_common_name'></span></td>
+	</tr>
+	<tr>
+		<td align = 'center'>Scientific name: </td><td><span id = 'note_scientific_name'></span></td>
+	</tr>
+	<tr>
+		<td colspan = '2'><hr></td>
+	</tr>
+</table>
+
+<div id = 'notes_div'>
+	<table align = 'center'>
+		<thead>
+			<tr>
+				<th class = 'centered'>#</th>
+				<th>Note</th>
+			</tr>
+		</thead>
+		<tbody>
+			% for my $i (1 .. $$constants{max_note_count}) {
+			<tr>
+				<td class = 'centered'><%== $i %></td>
+				<td align = 'left'><input id = 'note_note_<%== $i %>' type = 'text' size = '100' maxlength = '255'></td>
+			</tr>
+			% }
+		</tbody>
+	</table>
+</div>

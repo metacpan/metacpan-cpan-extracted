@@ -1,0 +1,12 @@
+Revision history for Math-Histo
+
+0.1.0   2026-08-20
+        - Initial CPAN release of Math::Histo XS wrapper for libhisto.
+        - Support for 1D and 2D uniform and variable histograms.
+        - High-performance scalar, batch (fill_n), and packed binary ingestion.
+        - Complete statistical moments, robust statistics (IQR, MAD, trimmed/winsorized mean).
+        - Continuous mode, peak density, FWHM, and RMS estimation.
+        - Two-sample comparison metrics (Chi2, KS, Wasserstein, KL, Bhattacharyya).
+        - Non-linear curve fitting (Levenberg-Marquardt) via Math::Histo::Fit.
+        - Online dynamic quantile sketching via Math::Histo::Sketch (DDSketch).
+        - Binary wire format and JSON serialization roundtrips.

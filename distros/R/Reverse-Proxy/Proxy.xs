@@ -21,6 +21,7 @@
  * the running Fetch is too old to provide the ABI; Reverse::Proxy.pm treats
  * that as a hard load-time error (there is no pure-Perl fallback). */
 static const fetch_abi *FETCH = NULL;
+static int FETCH_SEEN = 0;   /* the provider's abi_version, 0 if unresolved */
 
 /* ---- a tiny closure: a coderef carrying captured SVs -------------------- *
  * Lets to_app and the psgi.streaming app be built in C rather than Perl. The
@@ -990,16 +991,49 @@ BOOT:
     }
     if (p) {
         const fetch_abi *a = INT2PTR(const fetch_abi *, p);
-        if (a && a->abi_version == FETCH_ABI_VERSION) FETCH = a;
+        if (a) {
+            FETCH_SEEN = a->abi_version;
+            /* >=, NOT ==.
+             *
+             * The table is APPEND-ONLY by rule, so every field this build
+             * knows about keeps its offset in a later version - which is the
+             * entire reason the version field exists. Requiring an exact
+             * match turns each provider release into a breaking change for
+             * every consumer of it, and that is not theoretical: Fetch 0.14
+             * shipped ABI 2 (one new member, appended) and every 0.04
+             * install refused to load against it, on every platform.
+             *
+             * A provider OLDER than this build is still refused - those
+             * fields genuinely are not there. */
+            if (a->abi_version >= FETCH_ABI_VERSION) FETCH = a;
+        }
     }
     sv_setiv(get_sv("Reverse::Proxy::_HAVE_XS", GV_ADD), FETCH ? 1 : 0);
 }
 
-# True when the Fetch C ABI resolved and matched our vendored version.
+# True when the Fetch C ABI resolved and is new enough for this build.
 int
 _abi_ok()
     CODE:
         RETVAL = FETCH ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+# What the installed Fetch actually offered: its abi_version, or 0 when the
+# ABI did not resolve at all. Only so the croak can name the numbers instead
+# of guessing at a cause.
+int
+_abi_seen()
+    CODE:
+        RETVAL = FETCH_SEEN;
+    OUTPUT:
+        RETVAL
+
+# What this build was compiled against.
+int
+_abi_want()
+    CODE:
+        RETVAL = FETCH_ABI_VERSION;
     OUTPUT:
         RETVAL
 

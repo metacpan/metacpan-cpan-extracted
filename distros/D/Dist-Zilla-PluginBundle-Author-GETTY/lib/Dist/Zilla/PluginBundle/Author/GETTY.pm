@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.319';
+our $VERSION = '0.320';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -248,6 +248,13 @@ has include_readme => (
   default => sub { $_[0]->payload->{include_readme} },
 );
 
+has generate_license => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{generate_license} },
+);
+
 has xs => (
   is      => 'ro',
   isa     => 'Bool',
@@ -445,10 +452,16 @@ sub configure {
     push @removes, 'UploadToCPAN' if $self->no_cpan;
     push @removes, 'MakeMaker' if $self->no_makemaker;
   }
+  # LICENSE is a committed repository file, gathered from git like any other
+  # source file, so that the hosting platform detects the licence. @Basic's
+  # License plugin would generate a second one and abort the build.
+  push @removes, 'License' unless $self->generate_license;
   $self->add_bundle('Filter' => {
     -bundle => '@Basic',
     -remove => [@removes],
   });
+
+  $self->add_plugins('LicenseFile') unless $self->generate_license;
 
   if ($self->no_install) {
     $self->add_plugins('MakeMaker::SkipInstall');
@@ -707,7 +720,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.319
+version 0.320
 
 =head1 SYNOPSIS
 
@@ -979,6 +992,23 @@ avoids awkward rendering on sites like MetaCPAN.
 
 Set this attribute to 1 if you explicitly want to ship F<README.md> in the
 distribution.
+
+=head2 generate_license
+
+By default this bundle expects F<LICENSE> to be a committed file in the
+repository. It removes L<Dist::Zilla::Plugin::License> from C<@Basic>, so the
+file is gathered from git like any other source file, and adds
+L<Dist::Zilla::Plugin::LicenseFile>, which aborts the build when that file is
+missing or no longer matches the distribution's C<license>,
+C<copyright_holder> and C<copyright_year>.
+
+The point is the repository, not the tarball: GitHub, Gitea and Forgejo detect
+and link a licence from a committed F<LICENSE>, and a generated one is never
+there to be found. Write the file with C<dzil genlicense> and commit it.
+
+Set this attribute to 1 to go back to the generated file — C<@Basic> keeps its
+License plugin and no check is added. Use it for distributions that
+deliberately ship no committed F<LICENSE>.
 
 =head2 xs
 

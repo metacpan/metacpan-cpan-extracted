@@ -701,6 +701,15 @@ apophis_make_custom_op(pTHX_ OP *(*pp_func)(pTHX))
 
 
 /* ================================================================== */
+/* The public C ABI                                                    */
+/* ================================================================== */
+
+/* Wraps the static core above into the table consumers reach through
+ * Apophis::_abi_ptr. Included here, after everything it wraps. */
+#include "ap_abi_impl.h"
+
+
+/* ================================================================== */
 /* XSUBs                                                               */
 /* ================================================================== */
 
@@ -1702,3 +1711,67 @@ _make_op(type)
         }
     OUTPUT:
         RETVAL
+
+
+# ------------------------------------------------------------------ #
+# The public C ABI (ap_abi.h)                                          #
+# ------------------------------------------------------------------ #
+
+# _abi_ptr() -> the address of the process-wide table, as a UV.
+#
+# Private. UV and PTR2UV rather than IV and PTR2IV because an address is
+# unsigned: PTR2IV hands back a NEGATIVE integer wherever the .so maps with
+# the top bit set - Solaris/illumos amd64 loads libraries high, and so does
+# any 32-bit build in the upper 2GB - which makes a consumer's `$ptr > 0`
+# sanity check fail on a perfectly usable pointer.
+
+UV
+_abi_ptr()
+    CODE:
+        RETVAL = PTR2UV(&AP_ABI);
+    OUTPUT:
+        RETVAL
+
+# _abi_selftest($store, \$content) -> ($id, $path)
+#
+# Drives the table through its own function pointers, so the suite exercises
+# the ABI the way a consumer does rather than the way the XSUBs do. Writes the
+# blob, exactly as store() would. The test compares both answers against the
+# Perl API - two implementations of one algorithm agreeing is the assertion,
+# not an assumption.
+
+void
+_abi_selftest(self, content_ref)
+        SV *self
+        SV *content_ref
+    PREINIT:
+        const ap_abi *A = &AP_ABI;
+        const unsigned char *ns = NULL;
+        const char *dir = NULL;
+        STRLEN dirlen = 0;
+        const char *content;
+        STRLEN content_len;
+        unsigned char id[16];
+        char id_str[HORUS_FMT_STR_LEN + 1];
+        char path[APOPHIS_PATH_MAX];
+        int path_len;
+    PPCODE:
+        if (!A->store_of(aTHX_ self, &ns, &dir, &dirlen))
+            croak("Apophis::_abi_selftest: not a store");
+        if (!SvROK(content_ref))
+            croak("Apophis::_abi_selftest: content must be a scalar reference");
+        content = SvPV(SvRV(content_ref), content_len);
+
+        A->identify(id, ns, content, content_len);
+        A->format_id(id_str, id);
+
+        path_len = A->build_path(path, sizeof(path), dir, dirlen,
+                                 id_str, HORUS_FMT_STR_LEN);
+        if (path_len < 0 || (size_t)path_len >= sizeof(path))
+            croak("Apophis::_abi_selftest: path too long");
+
+        A->write_atomic(aTHX_ path, content, content_len);
+
+        EXTEND(SP, 2);
+        PUSHs(sv_2mortal(newSVpvn(id_str, HORUS_FMT_STR_LEN)));
+        PUSHs(sv_2mortal(newSVpvn(path, path_len)));

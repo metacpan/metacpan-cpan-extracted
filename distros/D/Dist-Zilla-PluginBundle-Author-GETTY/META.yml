@@ -16,19 +16,19 @@ name: Dist-Zilla-PluginBundle-Author-GETTY
 provides:
   Dist::Zilla::Plugin::Author::GETTY::GiteaMeta:
     file: lib/Dist/Zilla/Plugin/Author/GETTY/GiteaMeta.pm
-    version: '0.319'
+    version: '0.320'
   Dist::Zilla::PluginBundle::Author::GETTY:
     file: lib/Dist/Zilla/PluginBundle/Author/GETTY.pm
-    version: '0.319'
+    version: '0.320'
   Dist::Zilla::PluginBundle::Author::GETTY::Docker:
     file: lib/Dist/Zilla/PluginBundle/Author/GETTY/Docker.pm
-    version: '0.319'
+    version: '0.320'
   Pod::Elemental::Transformer::Author::GETTY:
     file: lib/Pod/Elemental/Transformer/Author/GETTY.pm
-    version: '0.319'
+    version: '0.320'
   Pod::Weaver::PluginBundle::Author::GETTY:
     file: lib/Pod/Weaver/PluginBundle/Author/GETTY.pm
-    version: '0.319'
+    version: '0.320'
 requires:
   Alien::Build: '1.00'
   App::cpanminus: '1.7049'
@@ -42,6 +42,7 @@ requires:
   Dist::Zilla::Plugin::GitHub::CreateRelease: '0.0012'
   Dist::Zilla::Plugin::GithubMeta: '0.58'
   Dist::Zilla::Plugin::InstallRelease: '0.008'
+  Dist::Zilla::Plugin::LicenseFile: '0'
   Dist::Zilla::Plugin::MakeMaker::Awesome: '0.49'
   Dist::Zilla::Plugin::MakeMaker::SkipInstall: '1.201'
   Dist::Zilla::Plugin::MetaProvides::Package: '2.004003'
@@ -62,7 +63,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues
   homepage: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty
   repository: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty.git
-version: '0.319'
+version: '0.320'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -100,10 +101,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::GETTY/@Filter/MetaYAML'
-      version: '6.037'
-    -
-      class: Dist::Zilla::Plugin::License
-      name: '@Author::GETTY/@Filter/License'
       version: '6.037'
     -
       class: Dist::Zilla::Plugin::Readme
@@ -144,6 +141,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
       version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::LicenseFile
+      name: '@Author::GETTY/LicenseFile'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
@@ -348,7 +349,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.319'
+          tag: '0.320'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

@@ -1,4 +1,7 @@
 package Poker::Score::Low8;
+
+our $VERSION = '0.11';
+
 use Moo;
 use Algorithm::Combinatorics qw(combinations);
 
@@ -8,11 +11,10 @@ Poker::Score::Low8 - Identify and score lowball 8 or better poker hand.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
 
 =head1 INTRODUCTION
 

@@ -31,7 +31,7 @@
  *   2 - conn_detach
  *   3 - deny_check/deny_add/deny_remove/ratelimit_hit (abuse controls)
  *   4 - on_worker_start (once per worker, after the fork, with its loop) */
-#define HM_ABI_VERSION 4
+#define HM_ABI_VERSION 5
 
 /* io_watch masks (match Hyperman's internal HM_EV_READ/HM_EV_WRITE) */
 #define HM_ABI_READ  0x1
@@ -57,6 +57,13 @@ typedef void (*hm_abi_ready_cb)(pTHX_ SV *future, void *ud);
 /* fires once in each worker, after any fork, with that worker's own loop and
  * before the loop starts turning (v4) */
 typedef void (*hm_abi_worker_cb)(pTHX_ void *loop, void *ud);
+
+/* v5: one delivered message. Copied out of the ring before the call, so it
+ * stays valid for as long as the callback runs. Like every other callback in
+ * this table it MUST NOT CROAK: it is reached from the event loop with no
+ * Perl frame to unwind into. */
+typedef void (*hm_abi_bus_cb)(pTHX_ const char *topic, STRLEN tlen,
+                              const char *payload, STRLEN plen, void *ud);
 
 typedef struct hm_abi {
     int abi_version;                 /* == HM_ABI_VERSION */
@@ -119,6 +126,39 @@ typedef struct hm_abi {
 
     /* ---- v4: worker-start callback ------------------------------------- */
     int (*on_worker_start)(pTHX_ hm_abi_worker_cb cb, void *ud);
+
+    /* ---- v5: the cross-worker message bus ------------------------------
+     *
+     * One ring in shared memory, mapped before the fork. bus_publish puts a
+     * message on it and pokes every other worker; bus_subscribe registers a
+     * callback in THIS process.
+     *
+     * `group` NULL is FANOUT - this process sees every message on the topic.
+     * A group name makes it a QUEUE GROUP - exactly one member of the pool
+     * sees each message, and the balancing falls out of the claim rather than
+     * from a scheduler. One entry point, because they are one mechanism and a
+     * caller choosing between them should be choosing an argument.
+     *
+     * bus_publish returns 1 on the ring, 0 local-only (no arena: Windows, no
+     * atomics, or not under a Hyperman server), -1 refused as oversize.
+     * Oversize is never truncated.
+     *
+     * Delivery is AT-MOST-ONCE and drops OLDEST under pressure, counting what
+     * it dropped. A consumer that cannot lose the message wants Punk::Queue,
+     * which is durable and at-least-once. */
+    int (*bus_publish)(const char *topic, STRLEN tlen,
+                       const char *payload, STRLEN plen);
+    int (*bus_subscribe)(pTHX_ const char *topic, STRLEN tlen,
+                         const char *group, STRLEN glen,
+                         hm_abi_bus_cb cb, void *ud);
+    int (*bus_unsubscribe)(pTHX_ int id);
+
+    /* Run this process's subscriptions now, returning how many messages
+     * reached a subscriber. The wakeup calls this; a consumer calls it when
+     * it wants the local half of its own publish to have happened before it
+     * returns - which is the only way to answer "how many got it" without
+     * inventing a number. */
+    int (*bus_dispatch)(pTHX);
 } hm_abi;
 
 /* How many worker-start callbacks the server will hold. Fixed, so

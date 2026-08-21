@@ -33,7 +33,7 @@ static const frj_abi *pq_frj(pTHX) {
             PUTBACK; FREETMPS; LEAVE;
             if (p) {
                 const frj_abi *a = INT2PTR(const frj_abi *, p);
-                if (a && a->abi_version == FRJ_ABI_VERSION) PQ_FRJ = a;
+                if (a && a->abi_version >= FRJ_ABI_VERSION) PQ_FRJ = a;
             }
         }
     }

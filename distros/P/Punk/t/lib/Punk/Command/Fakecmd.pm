@@ -1,6 +1,6 @@
 package Punk::Command::Fakecmd;
 
-# t/57's plugin-seam fixture: bin/punk probes Punk::Command::<Ucfirst> on an
+# t/1311's plugin-seam fixture: bin/punk probes Punk::Command::<Ucfirst> on an
 # unknown command, and loading the module IS the registration.
 
 use strict;

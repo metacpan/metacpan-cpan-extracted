@@ -5,7 +5,7 @@ use version;
 use MIME::Base64 qw(decode_base64);
 use parent 'PAGI::FastAPI::Security::Base';
 
-our $VERSION   = qv('v0.0.4');
+our $VERSION   = qv('v0.0.6');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf-8
@@ -16,7 +16,7 @@ PAGI::FastAPI::Security::HTTPBasic - HTTP Basic authentication scheme for PAGI::
 
 =head1 VERSION
 
-Version v0.0.4
+Version v0.0.6
 
 =head1 SYNOPSIS
 
@@ -107,10 +107,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/PAGI-FastAPI-Security/issues>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/PAGI-FastAPI-Security>
 
 =item * Search MetaCPAN
 

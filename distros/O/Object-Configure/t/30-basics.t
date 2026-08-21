@@ -48,7 +48,7 @@ ok(open my $log_fh, '<', 'foo.log');
 my @log_lines = <$log_fh>;
 close $log_fh;
 
-like($log_lines[0], qr/DEBUG> t.30-basics.t/, 'Logged debug message to file, set from configuration file');
+like($log_lines[0], qr/DEBUG>.*t.30-basics\.t/, 'Logged debug message to file, set from configuration file');
 like($log_lines[0], qr/Hello, World/, 'Logged correct debug message to file, set from configuration file');
 
 unlink 'foo.log';
@@ -76,7 +76,7 @@ ok(open $log_fh, '<', $filename);
 @log_lines = <$log_fh>;
 close $log_fh;
 
-like($log_lines[0], qr/DEBUG> t.30-basics.t/, 'Logged debug message to file, set from the environment');
+like($log_lines[0], qr/DEBUG>.*t.30-basics\.t/, 'Logged debug message to file, set from the environment');
 like($log_lines[0], qr/xyzzy/, 'Logged correct debug message to file, set from the environment');
 
 unlink $filename;

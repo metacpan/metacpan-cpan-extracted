@@ -1,5 +1,9 @@
 Revision history for MIDI-RtController-Filter-Drums
 
+0.0402 2026-08-20 11:42:25
+  - Fix potentially failing code issues.
+  - Clean POD a bit.
+
 0.0401 2025-04-27 13:47:02
   - Improve documentation.
   - Actually use the continue attribute.

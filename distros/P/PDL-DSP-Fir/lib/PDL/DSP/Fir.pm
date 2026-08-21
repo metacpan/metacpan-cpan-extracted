@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use base 'Exporter';
 
@@ -29,7 +29,7 @@ PDL::DSP::Fir - Finite impulse response filter kernels.
   use PDL;
   use PDL::DSP::Fir qw( firwin );
 
-  # return a 10 sample lowpass filter kernel 
+  # return a 10 sample lowpass filter kernel
   # with a cutoff at 90% of the Nyquist frequency.
   $kernel = firwin( N => 10, fc => 0.9 );
 
@@ -67,7 +67,7 @@ No functions are exported be default.
 =for ref
 
 Returns a filter kernel (a finite impulse response function)
-to be convolved with data. 
+to be convolved with data.
 
 The kernel is built from windowed sinc functions. With the
 option C<type =E<gt> 'window'> no sinc is used, rather the
@@ -78,14 +78,14 @@ a list of key-value pairs, or as an anonymous hash.
 
 =over
 
-=item N 
+=item N
 
 order of filter. This is the number of elements in
 the returned kernel pdl.
 
 =item type
 
-Filter type. One of C<lowpass>, C<highpass>, C<bandpass>, 
+Filter type. One of C<lowpass>, C<highpass>, C<bandpass>,
 C<bandstop>, C<window>. Aliases for C<bandstop> are C<bandreject> and C<notch>.
 Default is C<lowpass>. For C<bandpass> and C<bandstop> the number of samples
 L</N> must be odd.
@@ -104,7 +104,7 @@ No default values.
 
 =back
 
-All other options to L</firwin> are passed to the function 
+All other options to L</firwin> are passed to the function
 L<PDL::DSP::Windows/window>.
 
 =cut
@@ -261,7 +261,7 @@ Return output kernel whose spectrum is the reverse of the spectrum
 of the input kernel.
 
 That is, the spectrum is mirrored about the center frequency.
- 
+
 =cut
 
 sub spectral_reverse {

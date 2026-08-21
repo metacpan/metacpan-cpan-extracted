@@ -1,5 +1,5 @@
 ---
-abstract: '[Put something meaningful here!]'
+abstract: 'Light wrapper around Mojo::Pg/SQLite/...'
 author:
   - 'Flavio Poletti (flavio@polettix.it)'
 build_requires:
@@ -27,7 +27,7 @@ requires:
   Ouch: '0.0501'
   namespace::clean: '0.27'
   perl: '5.024000'
-version: '0.004'
+version: '0.006'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
 x_generated_by_perl: v5.40.1

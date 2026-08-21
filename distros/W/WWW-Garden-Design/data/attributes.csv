@@ -1,0 +1,713 @@
+common_name,attribute_name,range
+"Acer negundo",Edible,No
+"Acer negundo",Habit,Unknown
+"Acer negundo",Native,No
+"Acer negundo","Sun tolerance",Unknown
+"Aloha Dark Red",Edible,No
+"Aloha Dark Red",Habit,Vine
+"Aloha Dark Red",Native,Yes
+"Aloha Dark Red","Sun tolerance",Unknown
+"Aloha Regal Ruby",Edible,No
+"Aloha Regal Ruby",Habit,Vine
+"Aloha Regal Ruby",Native,Yes
+"Aloha Regal Ruby","Sun tolerance",Unknown
+Angela,Edible,No
+Angela,Habit,Unknown
+Angela,Native,No
+Angela,"Sun tolerance",Unknown
+"Princess Lily Louise",Edible,No
+"Princess Lily Louise",Habit,Unknown
+"Princess Lily Louise",Native,No
+"Princess Lily Louise","Sun tolerance",Unknown
+"Peruvian Lily",Edible,No
+"Peruvian Lily",Habit,Unknown
+"Peruvian Lily",Native,No
+"Peruvian Lily","Sun tolerance",Unknown
+"Pine Golden Pippin",Edible,Fruit
+"Pine Golden Pippin",Habit,Semi-dwarf
+"Pine Golden Pippin",Native,No
+"Pine Golden Pippin","Sun tolerance",Unknown
+"Pitmaston Pine",Edible,Fruit
+"Pitmaston Pine",Habit,Semi-dwarf
+"Pitmaston Pine",Native,No
+"Pitmaston Pine","Sun tolerance",Unknown
+"Apple 3",Edible,Fruit
+"Apple 3",Habit,Tree
+"Apple 3",Native,No
+"Apple 3","Sun tolerance",Unknown
+Pinkabelle®,Edible,Fruit
+Pinkabelle®,Habit,Dwarf
+Pinkabelle®,Native,Yes
+Pinkabelle®,"Sun tolerance","Full sun"
+Leprechaun,Edible,Fruit
+Leprechaun,Habit,Dwarf
+Leprechaun,Native,Yes
+Leprechaun,"Sun tolerance","Full sun"
+Pompink,Edible,Fruit
+Pompink,Habit,Columnar
+Pompink,Native,Yes
+Pompink,"Sun tolerance","Full sun"
+Harmony,Edible,Fruit
+Harmony,Habit,Columnar
+Harmony,Native,Yes
+Harmony,"Sun tolerance","Full sun"
+Pom-for-You,Edible,Fruit
+Pom-for-You,Habit,Columnar
+Pom-for-You,Native,Yes
+Pom-for-You,"Sun tolerance","Full sun"
+Columbine,Edible,No
+Columbine,Habit,Unknown
+Columbine,Native,No
+Columbine,"Sun tolerance",Unknown
+"Granny's Bonnet",Edible,No
+"Granny's Bonnet",Habit,Unknown
+"Granny's Bonnet",Native,No
+"Granny's Bonnet","Sun tolerance",Unknown
+"Asparagus Fern",Edible,No
+"Asparagus Fern",Habit,Unknown
+"Asparagus Fern",Native,No
+"Asparagus Fern","Sun tolerance",Unknown
+"Rosa Belton",Edible,No
+"Rosa Belton",Habit,Unknown
+"Rosa Belton",Native,No
+"Rosa Belton","Sun tolerance",Unknown
+"Azalea 2",Edible,No
+"Azalea 2",Habit,Unknown
+"Azalea 2",Native,No
+"Azalea 2","Sun tolerance",Unknown
+"Azalea 3",Edible,No
+"Azalea 3",Habit,Unknown
+"Azalea 3",Native,No
+"Azalea 3","Sun tolerance",Unknown
+"Cherry Candles",Edible,No
+"Cherry Candles",Habit,Unknown
+"Cherry Candles",Native,Yes
+"Cherry Candles","Sun tolerance",Unknown
+"Prostrate Banksia",Edible,No
+"Prostrate Banksia",Habit,Unknown
+"Prostrate Banksia",Native,Yes
+"Prostrate Banksia","Sun tolerance",Unknown
+"Genovese Basil",Edible,"Leaf, Stem"
+"Genovese Basil",Habit,Shrub
+"Genovese Basil",Native,No
+"Genovese Basil","Sun tolerance","Full sun"
+"African Basil",Edible,"Leaf, Stem"
+"African Basil",Habit,Shrub
+"African Basil",Native,No
+"African Basil","Sun tolerance","Full sun"
+"Beacon Silver",Edible,No
+"Beacon Silver",Habit,Unknown
+"Beacon Silver",Native,No
+"Beacon Silver","Sun tolerance",Unknown
+"Bears breeches",Edible,No
+"Bears breeches",Habit,Unknown
+"Bears breeches",Native,No
+"Bears breeches","Sun tolerance",Unknown
+"Adriatic bellflower",Edible,No
+"Adriatic bellflower",Habit,Unknown
+"Adriatic bellflower",Native,No
+"Adriatic bellflower","Sun tolerance",Unknown
+"Serbian bellflower",Edible,No
+"Serbian bellflower",Habit,Unknown
+"Serbian bellflower",Native,No
+"Serbian bellflower","Sun tolerance",Unknown
+"Big Blue Lilyturf",Edible,No
+"Big Blue Lilyturf",Habit,Unknown
+"Big Blue Lilyturf",Native,No
+"Big Blue Lilyturf","Sun tolerance",Unknown
+"Black Coral Pea",Edible,No
+"Black Coral Pea",Habit,Vine
+"Black Coral Pea",Native,Yes
+"Black Coral Pea","Sun tolerance","Full sun, Part shade"
+"Blueberry Ash",Edible,No
+"Blueberry Ash",Habit,"Shrub, Tree"
+"Blueberry Ash",Native,Yes
+"Blueberry Ash","Sun tolerance","Full sun, Part shade"
+Bottlebrush,Edible,No
+Bottlebrush,Habit,Unknown
+Bottlebrush,Native,Yes
+Bottlebrush,"Sun tolerance",Unknown
+Bracteantha,Edible,No
+Bracteantha,Habit,Unknown
+Bracteantha,Native,Yes
+Bracteantha,"Sun tolerance",Unknown
+"Burnt Orange",Edible,No
+"Burnt Orange",Habit,Unknown
+"Burnt Orange",Native,Yes
+"Burnt Orange","Sun tolerance",Unknown
+"Butterfly Bush",Edible,No
+"Butterfly Bush",Habit,Unknown
+"Butterfly Bush",Native,No
+"Butterfly Bush","Sun tolerance",Unknown
+"Butterfly Iris",Edible,No
+"Butterfly Iris",Habit,Unknown
+"Butterfly Iris",Native,No
+"Butterfly Iris","Sun tolerance",Unknown
+Camellia,Edible,No
+Camellia,Habit,Unknown
+Camellia,Native,No
+Camellia,"Sun tolerance",Unknown
+Carnation,Edible,No
+Carnation,Habit,Unknown
+Carnation,Native,No
+Carnation,"Sun tolerance",Unknown
+Celosia,Edible,No
+Celosia,Habit,Unknown
+Celosia,Native,No
+Celosia,"Sun tolerance",Unknown
+"Chilean Jasmine",Edible,No
+"Chilean Jasmine",Habit,Vine
+"Chilean Jasmine",Native,No
+"Chilean Jasmine","Sun tolerance",Unknown
+"Chinese fringe flower",Edible,No
+"Chinese fringe flower",Habit,Unknown
+"Chinese fringe flower",Native,No
+"Chinese fringe flower","Sun tolerance",Unknown
+"Chinese Lantern",Edible,No
+"Chinese Lantern",Habit,Unknown
+"Chinese Lantern",Native,No
+"Chinese Lantern","Sun tolerance",Unknown
+"Chinese witch hazel",Edible,No
+"Chinese witch hazel",Habit,Unknown
+"Chinese witch hazel",Native,No
+"Chinese witch hazel","Sun tolerance",Unknown
+"Chives 1",Edible,Stem
+"Chives 1",Habit,Shrub
+"Chives 1",Native,No
+"Chives 1","Sun tolerance","Full sun"
+"Chives 2",Edible,Stem
+"Chives 2",Habit,Shrub
+"Chives 2",Native,No
+"Chives 2","Sun tolerance","Full sun"
+"Chocolate Lily",Edible,No
+"Chocolate Lily",Habit,Unknown
+"Chocolate Lily",Native,No
+"Chocolate Lily","Sun tolerance",Unknown
+Cumquat,Edible,Fruit
+Cumquat,Habit,Tree
+Cumquat,Native,No
+Cumquat,"Sun tolerance","Full sun"
+"Lisbon lemon",Edible,Fruit
+"Lisbon lemon",Habit,Tree
+"Lisbon lemon",Native,No
+"Lisbon lemon","Sun tolerance","Full sun"
+"Meyer lemon",Edible,Fruit
+"Meyer lemon",Habit,Tree
+"Meyer lemon",Native,No
+"Meyer lemon","Sun tolerance","Full sun"
+"Tahiti Lime",Edible,Fruit
+"Tahiti Lime",Habit,Tree
+"Tahiti Lime",Native,No
+"Tahiti Lime","Sun tolerance","Full sun"
+"Washington Navel Orange",Edible,Fruit
+"Washington Navel Orange",Habit,Tree
+"Washington Navel Orange",Native,No
+"Washington Navel Orange","Sun tolerance","Full sun"
+"Convolvulus 1",Edible,No
+"Convolvulus 1",Habit,Unknown
+"Convolvulus 1",Native,No
+"Convolvulus 1","Sun tolerance",Unknown
+"Convolvulus 2",Edible,No
+"Convolvulus 2",Habit,Unknown
+"Convolvulus 2",Native,No
+"Convolvulus 2","Sun tolerance",Unknown
+Coriander,Edible,Leaf
+Coriander,Habit,Shrub
+Coriander,Native,No
+Coriander,"Sun tolerance","Full sun, Part shade"
+"Corn Salad",Edible,Leaf
+"Corn Salad",Habit,Shrub
+"Corn Salad",Native,No
+"Corn Salad","Sun tolerance","Full sun"
+"Correa - Orange form",Edible,No
+"Correa - Orange form",Habit,Unknown
+"Correa - Orange form",Native,Yes
+"Correa - Orange form","Sun tolerance",Unknown
+"Corymbia ficifolia",Edible,No
+"Corymbia ficifolia",Habit,Tree
+"Corymbia ficifolia",Native,Yes
+"Corymbia ficifolia","Sun tolerance","Full sun"
+"Crepe Myrtle",Edible,No
+"Crepe Myrtle",Habit,Unknown
+"Crepe Myrtle",Native,No
+"Crepe Myrtle","Sun tolerance",Unknown
+Crowea,Edible,No
+Crowea,Habit,Unknown
+Crowea,Native,Yes
+Crowea,"Sun tolerance",Unknown
+"Dampiera trigona",Edible,No
+"Dampiera trigona",Habit,Unknown
+"Dampiera trigona",Native,Yes
+"Dampiera trigona","Sun tolerance",Unknown
+Daphne,Edible,No
+Daphne,Habit,Unknown
+Daphne,Native,No
+Daphne,"Sun tolerance",Unknown
+Delphinium,Edible,No
+Delphinium,Habit,Unknown
+Delphinium,Native,No
+Delphinium,"Sun tolerance",Unknown
+"Dianella prunina",Edible,No
+"Dianella prunina",Habit,Unknown
+"Dianella prunina",Native,Yes
+"Dianella prunina","Sun tolerance",Unknown
+"Diplarrena latifolia",Edible,No
+"Diplarrena latifolia",Habit,Unknown
+"Diplarrena latifolia",Native,Yes
+"Diplarrena latifolia","Sun tolerance",Unknown
+"Dwarf Crown of Thorns",Edible,No
+"Dwarf Crown of Thorns",Habit,Unknown
+"Dwarf Crown of Thorns",Native,No
+"Dwarf Crown of Thorns","Sun tolerance",Unknown
+"Elephant bush",Edible,No
+"Elephant bush",Habit,Unknown
+"Elephant bush",Native,No
+"Elephant bush","Sun tolerance",Unknown
+Elephant-ear,Edible,Rhizome
+Elephant-ear,Habit,Shrub
+Elephant-ear,Native,No
+Elephant-ear,"Sun tolerance",Unknown
+"Eremorphila nivea",Edible,No
+"Eremorphila nivea",Habit,Unknown
+"Eremorphila nivea",Native,Yes
+"Eremorphila nivea","Sun tolerance",Unknown
+Eutaxia,Edible,No
+Eutaxia,Habit,Unknown
+Eutaxia,Native,Yes
+Eutaxia,"Sun tolerance",Unknown
+"False sarsaparilla",Edible,No
+"False sarsaparilla",Habit,Unknown
+"False sarsaparilla",Native,Yes
+"False sarsaparilla","Sun tolerance",Unknown
+Fig,Edible,Fruit
+Fig,Habit,Tree
+Fig,Native,No
+Fig,"Sun tolerance","Full sun, Part shade"
+Firebird,Edible,No
+Firebird,Habit,Unknown
+Firebird,Native,No
+Firebird,"Sun tolerance",Unknown
+"Heart-Leaf Flame Pea",Edible,No
+"Heart-Leaf Flame Pea",Habit,Shrub
+"Heart-Leaf Flame Pea",Native,Yes
+"Heart-Leaf Flame Pea","Sun tolerance","Part shade, Shade"
+"Flame Pea",Edible,No
+"Flame Pea",Habit,Shrub
+"Flame Pea",Native,Yes
+"Flame Pea","Sun tolerance","Full sun, Part shade"
+"Forest Pansy",Edible,No
+"Forest Pansy",Habit,Unknown
+"Forest Pansy",Native,No
+"Forest Pansy","Sun tolerance",Unknown
+"Fountain Grass",Edible,No
+"Fountain Grass",Habit,Unknown
+"Fountain Grass",Native,No
+"Fountain Grass","Sun tolerance",Unknown
+'Coralle',Edible,No
+'Coralle',Habit,Shrub
+'Coralle',Native,No
+'Coralle',"Sun tolerance","Full sun"
+"Garden heliotrope",Edible,No
+"Garden heliotrope",Habit,Unknown
+"Garden heliotrope",Native,No
+"Garden heliotrope","Sun tolerance",Unknown
+Gazania,Edible,No
+Gazania,Habit,Unknown
+Gazania,Native,No
+Gazania,"Sun tolerance",Unknown
+"Glory Bush",Edible,No
+"Glory Bush",Habit,Unknown
+"Glory Bush",Native,No
+"Glory Bush","Sun tolerance",Unknown
+"Goji Berry Plant",Edible,Fruit
+"Goji Berry Plant",Habit,Shrub
+"Goji Berry Plant",Native,No
+"Goji Berry Plant","Sun tolerance","Full sun, Part shade"
+"Golden arum lily",Edible,No
+"Golden arum lily",Habit,Unknown
+"Golden arum lily",Native,No
+"Golden arum lily","Sun tolerance",Unknown
+Goldfussia,Edible,No
+Goldfussia,Habit,Unknown
+Goldfussia,Native,No
+Goldfussia,"Sun tolerance",Unknown
+'Goldfever',Edible,No
+'Goldfever',Habit,Unknown
+'Goldfever',Native,Yes
+'Goldfever',"Sun tolerance",Unknown
+"Lady 'O'",Edible,No
+"Lady 'O'",Habit,Unknown
+"Lady 'O'",Native,Yes
+"Lady 'O'","Sun tolerance",Unknown
+"'Lemon Daze'",Edible,No
+"'Lemon Daze'",Habit,Unknown
+"'Lemon Daze'",Native,Yes
+"'Lemon Daze'","Sun tolerance",Unknown
+'Fireworks',Edible,No
+'Fireworks',Habit,Unknown
+'Fireworks',Native,Yes
+'Fireworks',"Sun tolerance",Unknown
+"'Honeyeater Heaven'",Edible,No
+"'Honeyeater Heaven'",Habit,Unknown
+"'Honeyeater Heaven'",Native,Yes
+"'Honeyeater Heaven'","Sun tolerance",Unknown
+"Heavenly Bamboo",Edible,No
+"Heavenly Bamboo",Habit,Unknown
+"Heavenly Bamboo",Native,No
+"Heavenly Bamboo","Sun tolerance",Unknown
+"Christmas rose",Edible,No
+"Christmas rose",Habit,Unknown
+"Christmas rose",Native,No
+"Christmas rose","Sun tolerance",Unknown
+"Hellebore 2",Edible,No
+"Hellebore 2",Habit,Unknown
+"Hellebore 2",Native,No
+"Hellebore 2","Sun tolerance",Unknown
+'Obsidian',Edible,No
+'Obsidian',Habit,Unknown
+'Obsidian',Native,No
+'Obsidian',"Sun tolerance",Unknown
+"Coral bells",Edible,No
+"Coral bells",Habit,Unknown
+"Coral bells",Native,No
+"Coral bells","Sun tolerance",Unknown
+"Climbing Guinea Flower",Edible,No
+"Climbing Guinea Flower",Habit,Vine
+"Climbing Guinea Flower",Native,Yes
+"Climbing Guinea Flower","Sun tolerance",Unknown
+"Hoary Guinea Flower",Edible,No
+"Hoary Guinea Flower",Habit,Prostrate
+"Hoary Guinea Flower",Native,Yes
+"Hoary Guinea Flower","Sun tolerance",Unknown
+Hibiscus,Edible,No
+Hibiscus,Habit,Unknown
+Hibiscus,Native,Yes
+Hibiscus,"Sun tolerance",Unknown
+"West Coast Gem",Edible,No
+"West Coast Gem",Habit,Unknown
+"West Coast Gem",Native,Yes
+"West Coast Gem","Sun tolerance",Unknown
+"Rose mallow",Edible,No
+"Rose mallow",Habit,Unknown
+"Rose mallow",Native,No
+"Rose mallow","Sun tolerance",Unknown
+"Himalayan Knotweed",Edible,No
+"Himalayan Knotweed",Habit,Unknown
+"Himalayan Knotweed",Native,No
+"Himalayan Knotweed","Sun tolerance",Unknown
+Honesty,Edible,No
+Honesty,Habit,Unknown
+Honesty,Native,No
+Honesty,"Sun tolerance",Unknown
+Honeysuckle,Edible,No
+Honeysuckle,Habit,Unknown
+Honeysuckle,Native,No
+Honeysuckle,"Sun tolerance",Unknown
+"Hummingbird Plant",Edible,No
+"Hummingbird Plant",Habit,Unknown
+"Hummingbird Plant",Native,No
+"Hummingbird Plant","Sun tolerance","Full sun"
+Hydrangea,Edible,No
+Hydrangea,Habit,Unknown
+Hydrangea,Native,No
+Hydrangea,"Sun tolerance",Unknown
+"'Golden Nugget'",Edible,No
+"'Golden Nugget'",Habit,Dwarf
+"'Golden Nugget'",Native,Yes
+"'Golden Nugget'","Sun tolerance","Full sun, Part shade, Shade"
+"Algerian Iris",Edible,No
+"Algerian Iris",Habit,Unknown
+"Algerian Iris",Native,No
+"Algerian Iris","Sun tolerance",Unknown
+Iris,Edible,No
+Iris,Habit,Unknown
+Iris,Native,No
+Iris,"Sun tolerance",Unknown
+"Isopogon latifolius",Edible,No
+"Isopogon latifolius",Habit,Unknown
+"Isopogon latifolius",Native,Yes
+"Isopogon latifolius","Sun tolerance",Unknown
+Ivy,Edible,No
+Ivy,Habit,Unknown
+Ivy,Native,No
+Ivy,"Sun tolerance",Unknown
+Jacaranda,Edible,No
+Jacaranda,Habit,Unknown
+Jacaranda,Native,No
+Jacaranda,"Sun tolerance",Unknown
+"Japanese maple",Edible,No
+"Japanese maple",Habit,Unknown
+"Japanese maple",Native,No
+"Japanese maple","Sun tolerance",Unknown
+"Japanese Spiraea",Edible,No
+"Japanese Spiraea",Habit,Unknown
+"Japanese Spiraea",Native,No
+"Japanese Spiraea","Sun tolerance",Unknown
+"Bush Bonanza",Edible,No
+"Bush Bonanza",Habit,Unknown
+"Bush Bonanza",Native,Yes
+"Bush Bonanza","Sun tolerance",Unknown
+"Bush Crystal",Edible,No
+"Bush Crystal",Habit,Unknown
+"Bush Crystal",Native,Yes
+"Bush Crystal","Sun tolerance",Unknown
+"Bush Pearl",Edible,No
+"Bush Pearl",Habit,Unknown
+"Bush Pearl",Native,Yes
+"Bush Pearl","Sun tolerance",Unknown
+"Bush Diamond",Edible,No
+"Bush Diamond",Habit,Unknown
+"Bush Diamond",Native,Yes
+"Bush Diamond","Sun tolerance",Unknown
+"Green Kangaroo Paw",Edible,No
+"Green Kangaroo Paw",Habit,Unknown
+"Green Kangaroo Paw",Native,Yes
+"Green Kangaroo Paw","Sun tolerance",Unknown
+Kunzea,Edible,No
+Kunzea,Habit,Unknown
+Kunzea,Native,Yes
+Kunzea,"Sun tolerance",Unknown
+"Land cress",Edible,Leaf
+"Land cress",Habit,Shrub
+"Land cress",Native,No
+"Land cress","Sun tolerance","Full sun"
+Lechenaultia,Edible,No
+Lechenaultia,Habit,Unknown
+Lechenaultia,Native,Yes
+Lechenaultia,"Sun tolerance",Unknown
+Lily,Edible,No
+Lily,Habit,Unknown
+Lily,Native,No
+Lily,"Sun tolerance",Unknown
+"Long-leaf Wax Flower",Edible,No
+"Long-leaf Wax Flower",Habit,Unknown
+"Long-leaf Wax Flower",Native,Yes
+"Long-leaf Wax Flower","Sun tolerance",Unknown
+Marigold,Edible,No
+Marigold,Habit,Unknown
+Marigold,Native,No
+Marigold,"Sun tolerance",Unknown
+"Marmalade Bush",Edible,No
+"Marmalade Bush",Habit,Unknown
+"Marmalade Bush",Native,No
+"Marmalade Bush","Sun tolerance",Unknown
+"Mexican Mock Orange",Edible,No
+"Mexican Mock Orange",Habit,Unknown
+"Mexican Mock Orange",Native,No
+"Mexican Mock Orange","Sun tolerance",Unknown
+Monstera,Edible,No
+Monstera,Habit,Unknown
+Monstera,Native,No
+Monstera,"Sun tolerance",Unknown
+"Morning Glory",Edible,No
+"Morning Glory",Habit,Unknown
+"Morning Glory",Native,No
+"Morning Glory","Sun tolerance",Unknown
+Mugwort,Edible,Leaf
+Mugwort,Habit,Shrub
+Mugwort,Native,No
+Mugwort,"Sun tolerance","Full sun"
+Narcissus,Edible,No
+Narcissus,Habit,Unknown
+Narcissus,Native,No
+Narcissus,"Sun tolerance",Unknown
+Nasturtium,Edible,"Flower, Leaf, Stem, Rhizome"
+Nasturtium,Habit,Prostrate
+Nasturtium,Native,No
+Nasturtium,"Sun tolerance","Full sun"
+Nierembergia,Edible,No
+Nierembergia,Habit,Unknown
+Nierembergia,Native,No
+Nierembergia,"Sun tolerance",Unknown
+Parsley,Edible,"Leaf, Stem"
+Parsley,Habit,Shrub
+Parsley,Native,No
+Parsley,"Sun tolerance","Full sun"
+"Passionfruit Daisy",Edible,No
+"Passionfruit Daisy",Habit,Shrub
+"Passionfruit Daisy",Native,No
+"Passionfruit Daisy","Sun tolerance","Full sun"
+Pelargonium,Edible,No
+Pelargonium,Habit,Unknown
+Pelargonium,Native,No
+Pelargonium,"Sun tolerance",Unknown
+Pennywort,Edible,Leaf
+Pennywort,Habit,Prostrate
+Pennywort,Native,No
+Pennywort,"Sun tolerance",Shade
+"Perezii Blue",Edible,No
+"Perezii Blue",Habit,Unknown
+"Perezii Blue",Native,No
+"Perezii Blue","Sun tolerance",Unknown
+"Dogsbane",Edible,No
+"Dogsbane",Habit,Shrub
+"Dogsbane",Native,No
+"Dogsbane","Sun tolerance","Full sun"
+"Plectranthus ecklonii 1",Edible,No
+"Plectranthus ecklonii 1",Habit,Shrub
+"Plectranthus ecklonii 1",Native,No
+"Plectranthus ecklonii 1","Sun tolerance",Shade
+"Plectranthus ecklonii 2",Edible,No
+"Plectranthus ecklonii 2",Habit,Shrub
+"Plectranthus ecklonii 2",Native,No
+"Plectranthus ecklonii 2","Sun tolerance","Part shade"
+"Plectranthus saccatus",Edible,No
+"Plectranthus saccatus",Habit,Shrub
+"Plectranthus saccatus",Native,No
+"Plectranthus saccatus","Sun tolerance","Part shade, Shade"
+"Red Japanese Spinach",Edible,Leaf
+"Red Japanese Spinach",Habit,Shrub
+"Red Japanese Spinach",Native,No
+"Red Japanese Spinach","Sun tolerance","Full sun"
+"Red Spinach",Edible,Leaf
+"Red Spinach",Habit,Shrub
+"Red Spinach",Native,No
+"Red Spinach","Sun tolerance","Full sun"
+"Rice Flower 'Cosmic'",Edible,No
+"Rice Flower 'Cosmic'",Habit,Unknown
+"Rice Flower 'Cosmic'",Native,Yes
+"Rice Flower 'Cosmic'","Sun tolerance",Unknown
+"Pale Pink Rice Flower",Edible,No
+"Pale Pink Rice Flower",Habit,Unknown
+"Pale Pink Rice Flower",Native,Yes
+"Pale Pink Rice Flower","Sun tolerance",Unknown
+"Rose 1",Edible,No
+"Rose 1",Habit,Shrub
+"Rose 1",Native,No
+"Rose 1","Sun tolerance","Full sun"
+"Rose 2",Edible,No
+"Rose 2",Habit,Shrub
+"Rose 2",Native,No
+"Rose 2","Sun tolerance","Full sun"
+"Rose 3",Edible,No
+"Rose 3",Habit,Shrub
+"Rose 3",Native,No
+"Rose 3","Sun tolerance","Full sun"
+"Rose 4",Edible,No
+"Rose 4",Habit,Shrub
+"Rose 4",Native,No
+"Rose 4","Sun tolerance","Full sun"
+Rosemary,Edible,Leaf
+Rosemary,Habit,Shrub
+Rosemary,Native,No
+Rosemary,"Sun tolerance","Full sun"
+"Common sage",Edible,Leaf
+"Common sage",Habit,Shrub
+"Common sage",Native,No
+"Common sage","Sun tolerance","Full sun"
+Bethellii,Edible,No
+Bethellii,Habit,Shrub
+Bethellii,Native,No
+Bethellii,"Sun tolerance","Full sun"
+Sage,Edible,No
+Sage,Habit,Shrub
+Sage,Native,No
+Sage,"Sun tolerance","Full sun"
+"Bee sage",Edible,Leaf
+"Bee sage",Habit,Shrub
+"Bee sage",Native,No
+"Bee sage","Sun tolerance","Full sun"
+"Siegfredia darwinioides",Edible,No
+"Siegfredia darwinioides",Habit,Unknown
+"Siegfredia darwinioides",Native,Yes
+"Siegfredia darwinioides","Sun tolerance",Unknown
+"Silver lace bush",Edible,No
+"Silver lace bush",Habit,Shrub
+"Silver lace bush",Native,No
+"Silver lace bush","Sun tolerance","Full sun"
+"Smoke Tree",Edible,No
+"Smoke Tree",Habit,Tree
+"Smoke Tree",Native,No
+"Smoke Tree","Sun tolerance",Unknown
+"Snake bean",Edible,Leaf
+"Snake bean",Habit,Shrub
+"Snake bean",Native,No
+"Snake bean","Sun tolerance",Unknown
+Spearmint,Edible,Leaf
+Spearmint,Habit,Shrub
+Spearmint,Native,No
+Spearmint,"Sun tolerance","Part shade, Full sun"
+"Spiked mint-bush",Edible,No
+"Spiked mint-bush",Habit,Shrub
+"Spiked mint-bush",Native,Yes
+"Spiked mint-bush","Sun tolerance","Full sun, Part shade"
+"Spinach Beet",Edible,Leaf
+"Spinach Beet",Habit,Shrub
+"Spinach Beet",Native,No
+"Spinach Beet","Sun tolerance","Full sun"
+"Spring Snowflake",Edible,No
+"Spring Snowflake",Habit,Unknown
+"Spring Snowflake",Native,No
+"Spring Snowflake","Sun tolerance",Unknown
+"Sweet Lilli",Edible,No
+"Sweet Lilli",Habit,Shrub
+"Sweet Lilli",Native,No
+"Sweet Lilli","Sun tolerance","Full sun"
+"Tamarix aphylla",Edible,No
+"Tamarix aphylla",Habit,Unknown
+"Tamarix aphylla",Native,No
+"Tamarix aphylla","Sun tolerance",Unknown
+Tansy,Edible,No
+Tansy,Habit,Shrub
+Tansy,Native,No
+Tansy,"Sun tolerance","Full sun"
+"Tea Tree 1",Edible,No
+"Tea Tree 1",Habit,Unknown
+"Tea Tree 1",Native,Yes
+"Tea Tree 1","Sun tolerance",Unknown
+"Tea Tree 2",Edible,No
+"Tea Tree 2",Habit,Tree
+"Tea Tree 2",Native,Yes
+"Tea Tree 2","Sun tolerance","Part shade"
+"Thelionema caespitosum",Edible,No
+"Thelionema caespitosum",Habit,Shrub
+"Thelionema caespitosum",Native,No
+"Thelionema caespitosum","Sun tolerance",Unknown
+"Vietnamese Mint",Edible,Leaf
+"Vietnamese Mint",Habit,Shrub
+"Vietnamese Mint",Native,No
+"Vietnamese Mint","Sun tolerance","Part shade"
+"Viola 1",Edible,No
+"Viola 1",Habit,Unknown
+"Viola 1",Native,No
+"Viola 1","Sun tolerance",Unknown
+"Viola 2",Edible,No
+"Viola 2",Habit,Unknown
+"Viola 2",Native,No
+"Viola 2","Sun tolerance",Unknown
+"Viola 3",Edible,No
+"Viola 3",Habit,Unknown
+"Viola 3",Native,No
+"Viola 3","Sun tolerance",Unknown
+"White Cane Begonia",Edible,No
+"White Cane Begonia",Habit,Unknown
+"White Cane Begonia",Native,No
+"White Cane Begonia","Sun tolerance",Unknown
+"White Gaura",Edible,No
+"White Gaura",Habit,Unknown
+"White Gaura",Native,No
+"White Gaura","Sun tolerance",Unknown
+Wisteria,Edible,No
+Wisteria,Habit,Unknown
+Wisteria,Native,No
+Wisteria,"Sun tolerance",Unknown
+"Woolly Bush",Edible,No
+"Woolly Bush",Habit,Unknown
+"Woolly Bush",Native,Yes
+"Woolly Bush","Sun tolerance",Unknown
+Wormwood,Edible,No
+Wormwood,Habit,Shrub
+Wormwood,Native,No
+Wormwood,"Sun tolerance",Unknown
+"Wulfen Spurge",Edible,No
+"Wulfen Spurge",Habit,Unknown
+"Wulfen Spurge",Native,No
+"Wulfen Spurge","Sun tolerance",Unknown
+Yarrow,Edible,Leaf
+Yarrow,Habit,Shrub
+Yarrow,Native,No
+Yarrow,"Sun tolerance","Full sun"
+"Zion Red",Edible,No
+"Zion Red",Habit,Shrub
+"Zion Red",Native,No
+"Zion Red","Sun tolerance","Full sun"

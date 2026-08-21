@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.20';
+our $VERSION = '0.27';
 
 
 1;
@@ -105,6 +105,45 @@ Whether the stream is still open - test it before pushing from a timer.
 
 C<< $cb->($stream) >> once, when the stream ends: the client disconnecting, a
 C<close>, or a write error. Chainable.
+
+=head1 FANNING OUT ACROSS WORKERS
+
+A stream belongs to the worker that accepted it. Under a prefork server that
+means an application pushing an event reaches only the fraction of its
+subscribers that happen to be on the worker doing the pushing - the same trap
+L<Punk::WebSocket::Room> had, and with the same silence about it.
+
+There is no C<Punk::SSE::Room>, because holding the streams is usually the
+application's business: a stream is often per user rather than per group. What
+it needs is a way to reach the other workers, and that is
+L<Punk/publish / subscribe>.
+
+    package MyApp;
+    use Punk;
+
+    our @STREAMS;
+
+    sse '/events' => sub {
+        my ($c, $stream) = @_;
+        push @STREAMS, $stream;
+    };
+
+    # AT BOOT, in the parent, before the server forks - the only moment a
+    # subscription reaches every worker
+    __PACKAGE__->punk_app->subscribe('news' => sub {
+        my ($topic, $payload) = @_;
+        @STREAMS = grep { $_->is_open } @STREAMS;   # prune as you go
+        $_->event(news => $payload) for @STREAMS;
+    });
+
+Anything may then push to every stream in the pool, from any worker:
+
+    $c->publish('news' => $headline);
+
+Two things to keep in mind. B<Prune the closed streams> - nothing else holds
+them, and an array that only grows is a leak with a client list attached.
+And B<register at boot>: a subscription made inside a request lands in one
+worker and lasts as long as that process, which is the fault this avoids.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,9 @@
 Revision history for Reverse-Proxy
 
+0.05    2026-08-20
+        - FIX: Reverse::Proxy would not load at all against Fetch 0.14 or
+          later based on == abi version checks these have changed to <=
+
 0.04    2026-08-18
         - SECURITY: request smuggling through the forwarded request
           target. PATH_INFO reaches a PSGI app percent-DECODED, so a

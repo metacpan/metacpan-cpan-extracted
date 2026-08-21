@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # All of it is C (include/otel_semconv.h, otel_instr.h, otel_consume.h +
 # xs/instrument.xs). This file is documentation.
@@ -94,8 +94,10 @@ export would produce a client span, which is queued, and exported, and...
 
 The first collector outage would become an infinite loop of telemetry about
 failing to send telemetry. Everything the SDK does on its own behalf runs
-inside L</suppress_begin> / L</suppress_end>, which nest, and every
-instrumentation point checks the flag.
+inside
+L<suppress_begin|/"suppress_begin / suppress_end / suppressed"> /
+L<suppress_end|/"suppress_begin / suppress_end / suppressed">,
+which nest, and every instrumentation point checks the flag.
 
 =head1 FUNCTIONS
 

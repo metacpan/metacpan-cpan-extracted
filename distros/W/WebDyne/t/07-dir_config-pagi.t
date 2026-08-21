@@ -3,17 +3,17 @@ use warnings;
 use Test::More;
 use Test::Deep qw(eq_deeply);
 use Data::Dumper;
+use FindBin qw($RealBin);
+use lib $RealBin;
+use pagi_compat_helper qw(pagi_skip_reason);
 $Data::Dumper::Sortkeys=1;
 $Data::Dumper::Indent=1;
 
 BEGIN {
-    my @missing;
-    for my $m (qw(PAGI::Request)) {
-        eval "require $m; 1" or push @missing, $m;
-    }
-    if (@missing) {
-        plan skip_all => "Skipping PAGI tests: missing " . join(", ", @missing);
-    }
+    unshift @INC, 't';
+    require pagi_compat_helper;
+    my $skip=pagi_compat_helper::pagi_skip_reason(qw(PAGI::Request));
+    plan skip_all => "Skipping PAGI tests: $skip" if $skip;
 }
 
 #  Use specific webdyne.conf setup ENV vars for using different meta file

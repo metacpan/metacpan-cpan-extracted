@@ -5,7 +5,7 @@
  * records for dynamic ones (:param / *splat, held in one malloc'd arena and
  * walked with memcmp - no regex engine), and the 405 Allow computation on a
  * miss. lib/Punk/Router.pm is the pure-Perl reference tier (PUNK_PURE_PERL);
- * t/17 proves the two agree on every case.
+ * t/0111 proves the two agree on every case.
  *
  * Every record carries `idx`, its position in the one Perl array of compiled
  * records (code + guards) the dispatcher indexes into; a static hit, a

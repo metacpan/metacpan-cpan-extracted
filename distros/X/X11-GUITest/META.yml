@@ -1,23 +1,23 @@
 ---
-abstract: 'Collection of functions for X11 GUI testing/interaction.'
+abstract: 'Provides GUI testing/interaction routines.'
 author:
   - 'Dennis K. Paulsen <ctrondlp@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: X11-GUITest
 no_index:
   directory:
     - t
     - inc
-requires: {}
 resources:
-  repository: https://x11guitest.svn.sourceforge.net/svnroot/x11guitest
-version: 0.28
+  homepage: https://sourceforge.net/projects/x11guitest/
+version: '0.29'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

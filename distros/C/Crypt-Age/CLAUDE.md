@@ -1,139 +1,78 @@
 # Crypt::Age
 
-Perl implementation of the age encryption format (age-encryption.org/v1).
+Pure Perl implementation of the age file encryption format
+([age-encryption.org/v1](https://age-encryption.org)), compatible with the reference Go
+implementation (`filippo.io/age`) and the Rust implementation (`rage`).
 
-## Project Goal
-
-Pure Perl implementation of the age file encryption format, compatible with the reference Go implementation (filippo.io/age) and Rust implementation (rage).
+Released to CPAN as `Crypt-Age`. Built and released with `Dist::Zilla` via
+`[@Author::GETTY]`.
 
 ## Specification
 
-- Format spec: https://github.com/C2SP/C2SP/blob/main/age.md
-- Reference: https://age-encryption.org
+- Format spec: <https://github.com/C2SP/C2SP/blob/main/age.md> (`c2sp.org/age`)
+- Test vectors: <https://age-encryption.org/testkit> (authoritative; vendored under
+  `t/testkit/` and run by `t/07-testkit.t`)
 
-## File Format Overview
+The spec is normative and short. Read the relevant section before changing any constant
+— every size, label and offset in this distribution is dictated by it.
 
-An age file has two parts:
-1. **Header** (text) - Contains encrypted file key and MAC
-2. **Payload** (binary) - File content encrypted with ChaCha20-Poly1305
+## Status
 
-### Header Structure
-```
-age-encryption.org/v1
--> X25519 <ephemeral-public-key>
-<encrypted-file-key>
---- <base64-MAC>
-<binary payload>
-```
+X25519 recipients are implemented end to end: keypair generation, header creation and
+parsing, the header MAC, and the STREAM-chunked payload. Verified in both directions
+against `age` 1.2.1 and `rage` 0.12.1, and on every push against the 143 upstream test
+vectors — 68 of which exercise this implementation, the rest covering features it does
+not have.
 
-## Cryptographic Primitives Needed
+Not implemented: scrypt/passphrase recipients, SSH recipients, the post-quantum and
+tagged recipient types, and ASCII armor. The file and filehandle API does stream;
+only the string API `encrypt` / `decrypt` holds the whole message in memory.
 
-All available in CryptX on CPAN:
+The architecture, the full wire-constant table and the measured deviations from the spec
+live in skill `crypt-age-core` — they are not repeated here.
 
-| Primitive | Use | CPAN Module |
-|-----------|-----|-------------|
-| X25519 | Key exchange | `Crypt::PK::X25519` (CryptX) |
-| ChaCha20-Poly1305 | AEAD encryption | `Crypt::AuthEnc::ChaCha20Poly1305` (CryptX) |
-| HKDF-SHA256 | Key derivation | `Crypt::KeyDerivation` (CryptX) |
-| HMAC-SHA256 | Header MAC | `Crypt::Mac::HMAC` (CryptX) |
+## Build and test
 
-## Recipient Types (Phase 1)
-
-Start with X25519 recipients only:
-- `age1...` public keys (Bech32 encoded)
-- `-r` recipient flag compatible
-
-Later phases:
-- Passphrase recipients (scrypt)
-- SSH key recipients (ssh-ed25519, ssh-rsa)
-
-## API Design
-
-```perl
-use Crypt::Age;
-
-# Generate keypair
-my ($public, $private) = Crypt::Age->generate_keypair();
-# $public  = "age1..."
-# $private = "AGE-SECRET-KEY-1..."
-
-# Encrypt
-my $encrypted = Crypt::Age->encrypt(
-    plaintext  => $data,
-    recipients => ['age1abc...', 'age1def...'],
-);
-
-# Decrypt
-my $decrypted = Crypt::Age->decrypt(
-    ciphertext => $encrypted,
-    identities => ['AGE-SECRET-KEY-1...'],
-);
-
-# File-based
-Crypt::Age->encrypt_file(
-    input      => 'secret.txt',
-    output     => 'secret.txt.age',
-    recipients => \@recipients,
-);
-
-Crypt::Age->decrypt_file(
-    input      => 'secret.txt.age',
-    output     => 'secret.txt',
-    identities => \@identities,
-);
+```bash
+dzil build          # build the distribution
+dzil test           # recursive test run
+dzil clean          # clean build artifacts
+prove -lr t/        # everything — note -r, plain `prove -l t/` is not recursive
+prove -lv t/07-testkit.t   # 143 upstream vectors; needs no age binary
+prove -lv t/04-interop.t   # the real binary; skips without one
 ```
 
-## Key Format
+`t/04-interop.t` calls `plan skip_all` when neither `age` nor `rage` is on PATH, and
+then asserts nothing about compatibility. `t/07-testkit.t` needs no binary and prints
+what it ran and what it skipped. Always say which of the runs you did.
 
-### Public Key (Bech32)
-- HRP: `age`
-- 32 bytes X25519 public key
-- Example: `age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p`
+## Delegation
 
-### Secret Key (Bech32)
-- HRP: `AGE-SECRET-KEY-`
-- 32 bytes X25519 secret key
-- Example: `AGE-SECRET-KEY-1QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ3290DG`
+Delegate behavior-relevant code to the right agent instead of touching it yourself — the
+principle and the lane boundaries are in `.claude/rules/crypt-age-rules.md`.
 
-## Dependencies
+| Task | Agent |
+|---|---|
+| Implement / refactor / debug anything under `lib/` | `crypt-age-worker` (default) |
+| Write/extend tests, reproduce interop failures | `crypt-age-test-writer` |
+| Pre-release audit | `crypt-age-release-checker` |
+| POD | `crypt-age-doc-writer` |
 
-```perl
-# cpanfile
-requires 'CryptX';           # All crypto primitives
-requires 'Crypt::Misc';      # Base64, Bech32 helpers
-```
+The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main
+agent delegates rather than loading them. Skill sources live under `.claude/skills/` —
+`getty-perl-core`, `getty-perl-moo` and `getty-perl-release-author-getty` are hardlinked
+from `~/dev/skills/perl/`, `kanban-issues-karr-cli` from `~/dev/karr/`; `crypt-age-core`
+is owned by this repo.
 
-## Testing
+Work is coordinated on the repo's `karr` board (`karr board`).
 
-- Test vectors from age specification
-- Interoperability tests with `age` CLI
-- Round-trip tests (encrypt/decrypt)
+`.claude/` and this file ship inside the CPAN tarball on purpose — the distribution
+discloses how it was built. There is deliberately no `gather_exclude_match` in
+`dist.ini`; `.gitignore` is what keeps credentials, session state and machine-local
+overrides out, since `Git::GatherDir` ships tracked files only.
 
-## Files to Create
+## Downstream
 
-```
-lib/
-├── Crypt/
-│   ├── Age.pm                 # Main interface
-│   └── Age/
-│       ├── Header.pm          # Header parsing/generation
-│       ├── Recipient.pm       # Recipient handling
-│       ├── Recipient/
-│       │   └── X25519.pm      # X25519 recipient type
-│       ├── Identity.pm        # Identity (private key) handling
-│       ├── Keys.pm            # Key generation, Bech32 encoding
-│       └── Primitives.pm      # Low-level crypto operations
-t/
-├── 00-load.t
-├── 01-keys.t
-├── 02-encrypt-decrypt.t
-├── 03-header.t
-└── 04-interop.t              # Test with age CLI
-```
-
-## References
-
-- https://github.com/FiloSottile/age
-- https://github.com/C2SP/C2SP/blob/main/age.md
-- https://pkg.go.dev/filippo.io/age
-- https://docs.rs/age/latest/age/
+`File::SOPS` and `kubernetes-ocp` pin `Crypt::Age` in their `cpanfile`s. A release here
+leaves those pins stale — file that as a ticket on the other repo's board, never as an
+edit from here.

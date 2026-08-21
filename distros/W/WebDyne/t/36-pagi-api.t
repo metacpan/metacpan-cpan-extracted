@@ -7,17 +7,18 @@ use warnings;
 #  Test Harness
 #
 use Test::More;
+use FindBin qw($RealBin);
+use lib $RealBin;
+use pagi_compat_helper qw(pagi_skip_reason);
 
 
 #  Skip test if PAGI dependencies are unavailable
 #
 BEGIN {
-    my @missing;
-    for my $m (qw(PAGI::Test::Client PAGI::Request PAGI::Response Future::AsyncAwait)) {
-        eval "require $m; 1" or push @missing, $m;
-    }
-    plan skip_all => "Skipping PAGI API test: missing " . join(", ", @missing)
-        if @missing;
+    unshift @INC, 't';
+    require pagi_compat_helper;
+    my $skip=pagi_compat_helper::pagi_skip_reason(qw(PAGI::Test::Client PAGI::Request PAGI::Response Future::AsyncAwait));
+    plan skip_all => "Skipping PAGI API test: $skip" if $skip;
 }
 
 
@@ -58,7 +59,7 @@ sub main {
 
     my %page=(
         'api.psp' => <<'EOF',
-<api handler=uppercase pattern="/api/uppercase/{user}/:id">
+<api handler=uppercase pattern="/uppercase/{user}/:id">
 __PERL__
 sub uppercase {
     my ($self, $match)=@_;
@@ -66,7 +67,7 @@ sub uppercase {
 }
 EOF
         'example/route.psp' => <<'EOF',
-<api handler=route pattern="/example/route/{user}">
+<api handler=route pattern="/{user}">
 __PERL__
 sub route {
     my ($self, $match)=@_;
@@ -74,8 +75,8 @@ sub route {
 }
 EOF
         'example/api.psp' => <<'EOF',
-<api handler=uppercase pattern="/api/uppercase/{user}/:id">
-<api handler=lowercase pattern="/example/api/lowercase/{user}/:id">
+<api handler=uppercase pattern="/uppercase/{user}/:id">
+<api handler=lowercase pattern="/lowercase/{user}/:id">
 __PERL__
 sub uppercase {
     my ($self, $match)=@_;
@@ -126,9 +127,9 @@ EOF
         'subdirectory API PSP local route receives id');
 
     $res=$test_or->get('/example/api/lowercase/BOB/42');
-    is($res->{'status'}, 200, 'subdirectory API PSP with prefixed pattern returns HTTP 200');
+    is($res->{'status'}, 200, 'subdirectory API PSP second local route returns HTTP 200');
     like($res->{'body'} || '', qr/"user"\s*:\s*"bob"/,
-        'subdirectory API PSP prefixed pattern is normalised');
+        'subdirectory API PSP second local route receives user');
 
     $res=$test_or->get('/normal.psp');
     is($res->{'status'}, 200, 'normal PSP request remains available');

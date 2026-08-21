@@ -247,8 +247,11 @@ static void pqs_hard_kill(pTHX_ pq_super *sup, int i) {
     SV *info, *r;
     SV *argv[3];
 
+    /* %f in a perl format reads an NV, which is not a double everywhere:
+     * the quadmath perls take 16 bytes off the varargs where a double put
+     * 8. Every float handed to a perl formatter is cast. */
     warn("punk-queue: job %ld exceeded its timeout (%.1fs) - killing "
-         "worker pid %ld", jid, s->job_timeout, (long)s->pid);
+         "worker pid %ld", jid, (NV)s->job_timeout, (long)s->pid);
     kill(s->pid, SIGKILL);
     s->current_job = 0;             /* one kill per job */
     s->job_timeout = 0;
@@ -313,7 +316,10 @@ static void pqs_sched_pass(pTHX_ pq_super *sup) {
     int died = 0;
 
     if (now < sup->next_sched) return;
-    sup->next_sched = (double)(((IV)(now / 10) + 1) * 10);
+    /* in floating point throughout: an IV multiply here is a 2038 overflow
+     * on the 32-bit-IV perls, where the aligned boundary would come back
+     * negative and the pass would run flat out */
+    sup->next_sched = Perl_floor(now / 10.0) * 10.0 + 10.0;
 
     backend = pq_backend_of(aTHX_ sup->queue);
 

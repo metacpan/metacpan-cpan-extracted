@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use v5.36;
-use Test::More;
+use Test::More tests => 6;
 
 use_ok($_) for qw(
     PAGI::FastAPI::Security
@@ -13,5 +13,3 @@ use_ok($_) for qw(
 );
 
 diag("Testing PAGI::FastAPI::Security $PAGI::FastAPI::Security::VERSION, Perl $], $^X");
-
-done_testing;

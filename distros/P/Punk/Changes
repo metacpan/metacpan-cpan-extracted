@@ -1,5 +1,122 @@
 Revision history for Punk
 
+0.27    2026-08-21
+        - Fix SEGV/BUS on every request carrying a session cookie
+        - t/0914-session-pool.t now names the signal when a forked
+          worker dies, instead of reporting four uninitialized values
+          and hiding the crash that caused them.
+
+0.26    2026-08-21
+        - `session store => ...` keeps the session server-side and the
+          cookie carries a signed 128-bit id.
+        - `$c->session_expire` now REVOKES a stored session: it deletes
+          the entry, so a cookie somebody copied is dead on its next
+          request. Without a store it is unchanged, and still can only
+          ask the browser in front of it to forget.
+        - `$c->session_rotate` keeps the session and gives it a new id,
+          deleting the old entry.
+        - `session sliding => 1` extends a stored session while it is
+          being used
+        - `session tier => $seconds` lets a stored session be read
+          through the cache's memory tier, which it otherwise goes
+          round. The number is how long a revoked session may keep
+          working on a worker that missed the invalidation, so it is
+          capped and checked against the store's own memory_ttl.
+
+0.25    2026-08-21
+        - Punk::Cache::stats no longer panics on a tiered store. The
+          XSUB asked the value stack for four fewer slots than it
+          pushes, which a DEBUGGING perl catches and turns into
+          "failed to extend arg stack",
+        - Punk::Plugin::Blob accepts a CODEREF `namespace` again. The
+          required-option check read the length of a scalar that has
+          no string body, which aborts a DEBUGGING perl outright.
+        - Punk::Plugin::Blob resolves Apophis on every perl. The ABI
+          pointer was popped with a macro that mentions its argument
+          twice, so it came off the wrong stack slot and the plugin
+          refused to load 
+        - Punk::Plugin::Metrics reports its numbers on a long double or
+          quadmath perl. 
+
+0.24    2026-08-20
+        - Large uploads no longer cost what they weigh. A
+          multipart part over 64KB is written to a temp file as it
+          arrives rather than copied into memory, and Punk::Upload
+          carries a `path` and an `fh` to it. Measured end to end
+          through a socket into a handler holding the upload, a 128MB
+          upload costs a worker 15.5MB of RSS against roughly 275MB
+          before.
+        - ADDS: the `upload_dir` keyword, naming where a large part is
+          spilled. It decides the filesystem, which decides whether
+          save() is a rename, and it decides what shares a filesystem
+          with attacker controlled bytes. Temp file names owe nothing
+          to the client's filename, and every file is removed when its
+          request ends.
+        - ADDS: Punk::Plugin::Blob stores an on-disk upload without reading
+          it into memory: hashed where it lies through Apophis's
+          identify_fh, then moved into the store.
+        - ADDS: Punk::Plugin::Idempotency - Idempotency-Key on unsafe
+          methods, replaying the stored response. 
+        - ADDS: Punk::Plugin::Metrics - a Prometheus /metrics endpoint
+        - ADDS: Punk::Plugin::Health - /healthz and /readyz, 
+        - ADDS: Punk::Plugin::CSP - Content-Security-Policy with a
+          per request nonce.
+        - ADDS: Punk::Plugin::ConditionalGet - ETags and 304s for
+          dynamic responses. 
+        - ADDS: Punk::Plugin::Blob, content addressed uploads on
+          Apophis. $c->blob_put stores by contents, so a user's filename
+          never becomes a filesystem path. $c->blob_send serves through
+          send_file as a download.
+        - ADDS: Apophis to the prerequisites.
+
+0.23    2026-08-20
+        - ADDS: Punk::Plugin::Sitemap sitemap.xml/robots.txt
+        - ADDS: static mounts can say how fresh a file is. `max_age`
+          and `cache_control` set Cache-Control on a plain URL, and
+          $c->send_file takes cache_control too.
+        - ADDS: content-addressed asset URLs. $c->asset('/static/app.css')
+          returns /static/app.9f3a1c2b0d4e5f60.css. The digest - the first 8
+          bytes of SHA-256 over the contents. 
+        - ADDS: Punk::Plugin::RequestId per request identifier
+
+0.22    2026-08-20
+        - ADDS: Punk::Plugin::Sitemap, phase 1 - which of an
+          application's routes are actually URLs. Punk compiles every
+          route at boot, so the application already holds a complete
+          list of what it serves, and a sitemap is that list with a
+          filter over it. A route is listed only when it is a GET, its
+          path holds no capture, it carries no guard, and it did not opt
+          out. Out is the safe direction: a page missing from a sitemap
+          is still crawled if anything links to it, while a page wrongly
+          present is a crawler fetching a 404 or a login redirect on a
+          schedule.
+          The part a hand-written sitemap cannot do: a page behind a
+          guard is excluded WITHOUT anyone maintaining a list, because
+          `under($prefix, $guard)` copies its guard chain into every
+          route declared inside it and the plugin reads it off the
+          record.
+          `base` is required and is configuration. The protocol wants
+          absolute URLs, and taking the host from the request would let
+          `Host: evil.example` produce a sitemap naming that host for
+          every page on the site - delivered to search engines, and
+          invisible to the owner, whose own request produces a correct
+          file.
+          New route option: `sitemap => 0` keeps a route out, and
+          `sitemap => 1` puts one in despite a guard, because a scope
+          guard may be an authentication check or an ordinary filter and
+          Punk cannot read which. The method and the shape are not
+          overridable - sitemap => 1 on a POST or on /users/:id is a
+          mistake rather than an instruction.
+          Rendering, dynamic sections and robots.txt are phases 2 to 4;
+          the plan is in plan_punk_sitemap/.
+        - FIX: change abi version checks from == to <=
+        - Adds: Punk::Cache, Punk::Cache::Memory and Punk::Cache::File
+
+0.21    2026-08-20
+        - FIX: A Punk::WebSocket::Room now reaches the whole pool.
+        - FIX: SSE also now works correctly accross workers.
+        - ADDS: $c->publish and $c->subscribe hyperman event bus hooks
+
 0.20    2026-08-19
         - The dynamic-route path no longer requires Open::API. It
           checked that api_mounts EXISTED rather than that it held
@@ -48,7 +165,6 @@ Revision history for Punk
 
             $c->log->info({ message => 'listing books',
                             books => 12, user => $id });
-
 
 0.18    2026-08-18
         A security release. issue reported by CPANSec.

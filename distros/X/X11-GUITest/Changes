@@ -1,7 +1,55 @@
-X11::GUITest ($Id: Changes 241 2014-03-16 11:39:42Z ctrondlp $)
+X11::GUITest ($Id: Changes 249 2026-08-15 18:43:40Z ctrondlp $)
 
 This is the list of module changes between revisions.
 --------------------------------------------------------------------
+
+0.29 Sat Aug 15 2026
+
+  - Fix MoveMouseAbs() always reporting success regardless of whether the
+    underlying XTestFakeMotionEvent() call actually succeeded.
+
+  - Portability: Makefile.PL now locates X11/XTest via pkg-config or a real
+    compile+link probe instead of guessing from a fixed directory list;
+    extended fallback paths for Solaris, HP-UX, AIX, and NetBSD.
+
+  - Portability: <strings.h> is now included for strcasecmp(), which isn't
+    guaranteed to be declared by <string.h> outside of glibc.
+
+  - Portability: guard against a NULL _NET_WM_NAME property value in
+    GetWindowName().
+
+  - Portability (x11guirecord): GCC-only warning flags no longer break the
+    build on Solaris/AIX/HP-UX vendor compilers; X11 is now located via
+    AC_PATH_XTRA instead of hardcoded paths; popt is now probed for with a
+    clear configure-time error if missing; GNU gettext (not native on
+    AIX/HP-UX) is now an optional dependency instead of a hard requirement.
+
+  - Fix a latent buffer-overflow risk in x11guirecord's script_file.c
+    (vsprintf -> vsnprintf).
+
+  - Fix a latent buffer-overflow risk in x11guirecord's ProcessEvent(),
+    where a long keysym name (e.g. an XF86 media key) could in principle
+    grow the key-accumulation buffer past its fixed size; key/modifier
+    text is now assembled as one unit and the buffer is flushed first if
+    it wouldn't otherwise fit, rather than appended to unconditionally.
+
+  - Fix several signed/unsigned comparison mismatches in x11guirecord;
+    record_event.h's "data" field was declared int, too narrow to safely
+    hold a KeySym on any platform without risking truncation.
+
+  - Fix the recorder's locale directory being hardcoded to /usr/share/locale
+    regardless of --prefix.
+
+  - Removed an unused <X11/Xlocale.h> include.
+
+  - Documentation: noted the recorder's XRECORD extension and build-time
+    dependencies (autoconf, automake, popt, X11 dev headers); documented how
+    to opt into the X11_GUITEST_USING_XINERAMA build; added a note on
+    XWayland/Wayland compatibility; fixed a stale 'docs/Changes' reference.
+
+  - Updated copyright years.
+
+  - Documentation updates.
 
 0.28 Mon Mar 17 2014 07:15
 

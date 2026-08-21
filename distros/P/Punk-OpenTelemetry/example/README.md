@@ -40,7 +40,7 @@ Within a second or so the collector prints what it received:
 
 ```
 === punk-otel-example  instance=c89d9f58  schema=https://opentelemetry.io/schemas/1.30.0
-  scope: Punk::OpenTelemetry 0.01
+  scope: Punk::OpenTelemetry 0.02
     GET /hello/:name             server      4.17ms  trace=0726f412 span=52eb67ff
         client.address = 127.0.0.1
         http.request.method = GET

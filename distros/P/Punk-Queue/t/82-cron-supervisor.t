@@ -42,11 +42,17 @@ EOF
     my $h = pq_start(['worker', '--app', $app, '-j', 1,
                       '--interval', '0.2']);
 
-    my $job = wait_for(sub {
+    # two waits, not one: firing costs a process start plus the wait for
+    # the next aligned scheduler pass, and on a loaded smoker that alone
+    # can eat a single budget, leaving nothing for the claim it is really
+    # asking about.
+    my $fired = wait_for(sub {
         my $r = $q->list_jobs(0, 0, { task => 'cron.mark' });
-        return undef unless $r->{total};
-        my $j = $q->job_info($r->{jobs}[0]{id});
-        $j->{state} eq 'finished' ? $j : undef;
+        $r->{total} ? $r->{jobs}[0]{id} : undef;
+    });
+    my $job = $fired && wait_for(sub {
+        my $j = $q->job_info($fired);
+        $j && $j->{state} eq 'finished' ? $j : undef;
     });
     ok($job, 'the supervisor fired the due occurrence and its own pool '
            . 'finished the job') or diag explain $q->list_jobs;

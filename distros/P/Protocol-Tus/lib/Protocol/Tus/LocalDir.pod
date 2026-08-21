@@ -32,8 +32,6 @@ Protocol::Tus::LocalDir
 
 Model implementation for storing uploads in a local file system.
 
-It 
-
 =head1 INTERFACE
 
 Protocol::Tus::LocalDir extends base class
@@ -63,6 +61,15 @@ inheriting the other ones.
 =end silence
 
 In addition, the following methods are available:
+
+=head2 B<< id_generator >>
+
+   my $idgen = $model->id_generator;
+   my $id = $idgen->($model, $length, $metadata) if defined($idgen);
+
+Accessor for a generator (C<CODE> reference) for the identifiers of new
+uploads when L<create_upload> is invoked. If undefined, the identifier
+will be generated randomly.
 
 =head2 B<< new >>
 

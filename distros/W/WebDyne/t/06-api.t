@@ -12,7 +12,7 @@ ok(-e $script, 'wdrender script found');
 
 #  String to test
 #
-$ENV{'PATH_INFO'}='/api/uppercase/bob/42';
+$ENV{'PATH_INFO'}='/uppercase/bob/42';
 
 
 # Capture STDOUT and STDERR

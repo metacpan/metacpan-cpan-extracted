@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.20';
+our $VERSION = '0.27';
 
 1;
 
@@ -51,9 +51,11 @@ session comes up empty.
 "Cannot forge them" is exactly as true as the secret is, which is why there is
 no default for it and no way to start without one. See L</"THE KEYWORD">.
 
-There is no server-side store in this cut: the whole session lives in the
-cookie. A session that serializes over ~4KB croaks, pointing at where a
-server-side store would go.
+The whole session lives in the cookie, which is why it is capped: one that
+serializes over ~4KB croaks. Both of those are the cookie's properties rather
+than the session's - C<< store => ... >> moves the payload to a server-side
+store, leaves an opaque id in the cookie, and takes the ceiling with it. See
+L<Punk::Session::Store>, and L</store> below.
 
 =head1 THE KEYWORD
 
@@ -87,9 +89,43 @@ expire out from under someone.
 =item * C<path> (default C</>), C<domain>, C<secure>, C<httponly> (default on),
 C<samesite> (default C<Lax>) - the cookie attributes.
 
+=item * C<store> - keep the session server-side, with only an id in the cookie.
+See L</store>.
+
+=item * C<sliding>, C<tier>, C<allow_unshared> - the store's options, and
+meaningless without it. See L<Punk::Session::Store>.
+
 =back
 
+An option the keyword does not understand is a boot croak naming it. It used to
+be copied into the config verbatim, so a misspelt C<httponly> looked configured
+and was not - survivable while every option was a cookie attribute with a safe
+default, and not survivable for C<store>, where the typo's failure is
+"everything works and the store stays empty".
+
 It also reads from C<config/punk.yml> under a C<session:> block.
+
+=head2 store
+
+    cache 'file', dir => '/var/cache/app';
+    session secret => secret('session_key'), expires => '7d', store => 'cache';
+
+Moves the payload off the client. The cookie carries a signed 128-bit id and
+the session lives in a L<Punk::Cache> store - the default one, a store C<cache>
+declared, a hashref describing one, or a store object. Any backend that
+satisfies that contract will do, including one from outside this distribution,
+so sessions in Redis or in your database are a store somebody writes once.
+
+C<< $c->session >> does not change. What changes is that the ~4KB ceiling goes,
+the client can no longer read the contents, and C<< $c->session_expire >>
+revokes rather than merely asking the browser to forget.
+
+The store is resolved at boot, and one that is not shared between workers is
+refused there - it would be a logout at random, once per request that landed on
+another worker.
+
+L<Punk::Session::Store> is the whole of it: the four forms, what it costs, the
+pool, rotation, and the sliding expiry.
 
 =head1 CONTEXT METHODS
 
@@ -102,14 +138,25 @@ end of the request if it changed.
 
 Log out: empty the session and delete the cookie.
 
-Be clear about what that can and cannot do. It tells the browser in front of
-you to drop the value; it cannot reach a copy someone already took, because
-there is no server-side record of the session to mark dead - the cookie B<is>
-the session. A stolen cookie therefore stays good until its stamped expiry
-runs out, which is the ceiling C<expires> sets and the reason it is enforced
-server-side rather than left to C<Max-Age>. If you need logout to revoke
-immediately, the session has to have server-side state to revoke: keep a
-per-user token or a session id in your own table and check it in a guard.
+B<Without a store, be clear about what that can and cannot do.> It tells the
+browser in front of you to drop the value; it cannot reach a copy someone
+already took, because there is no server-side record of the session to mark
+dead - the cookie B<is> the session. A stolen cookie therefore stays good until
+its stamped expiry runs out, which is the ceiling C<expires> sets and the
+reason it is enforced server-side rather than left to C<Max-Age>.
+
+B<With a store it deletes the entry>, and a copy someone took is dead on its
+next request. That is the difference L</store> buys, and the reason it exists.
+
+Neither revokes every session a user has - a second browser, a phone. That
+needs to enumerate them, which the store contract deliberately cannot do: keep
+a per-user token or counter in your own table and check it in a guard.
+
+=head2 session_rotate
+
+Give the session a new id and delete the entry under the old one. Call it when
+privilege changes, which means a login. Without a store it is a no-op. See
+L<Punk::Context/session_rotate> for the fixation attack it prevents.
 
 =head2 flash
 
@@ -152,7 +199,8 @@ feed the next one's.
 
 =head1 SEE ALSO
 
-L<Punk>, L<Punk::Context/cookie>, L<Punk/secret>.
+L<Punk::Session::Store> for keeping the session server-side. L<Punk>,
+L<Punk::Context/cookie>, L<Punk/secret>.
 
 =head1 AUTHOR
 

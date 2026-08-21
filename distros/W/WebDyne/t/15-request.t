@@ -15,6 +15,9 @@ use File::Basename qw(dirname basename);
 use HTTP::Request::Common qw(GET);
 use HTTP::Headers::Fast;
 use IO::String;
+use FindBin qw($RealBin);
+use lib $RealBin;
+use pagi_compat_helper qw(pagi_skip_reason);
 
 
 #  WebDyne modules
@@ -50,7 +53,10 @@ if (eval { require WebDyne::PSGI; 1 }) {
 
 #  PAGI
 #
-if (eval { require WebDyne::PAGI; 1 }) {
+if (my $pagi_skip=pagi_skip_reason(qw(PAGI::Request PAGI::Response PAGI::Test::Client PAGI::SSE PAGI::WebSocket Future::AsyncAwait))) {
+    note("Skipping WebDyne::PAGI test: $pagi_skip");
+}
+elsif (eval { require WebDyne::PAGI; 1 }) {
     note('WebDyne::PAGI test starting');
     require PAGI::Test::Client;
     WebDyne->init();

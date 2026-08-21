@@ -2,6 +2,8 @@ use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
+use File::Find ();
 
 my $has_xsmulti = eval { ExtUtils::MakeMaker->VERSION('7.12'); 1 };
 
@@ -32,6 +34,7 @@ my %WriteMakefileArgs = (
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::Depends'   => '0.404',
         'Horus'               => '0.04',
     },
     BUILD_REQUIRES => {
@@ -45,11 +48,17 @@ my %WriteMakefileArgs = (
         'Horus' => '0.04',
     },
 
-    # Horus UUID library headers (resolved above)
-    INC      => "-I$horus_inc",
+    # Horus UUID library headers (resolved above), plus our own include/ for
+    # ap_abi.h and ap_abi_impl.h
+    INC      => "-Iinclude -I$horus_inc",
+
+    # MakeMaker does not scan XS #includes, so an edit to include/*.h would
+    # otherwise rebuild nothing and the change would silently not happen.
+    depend   => { 'lib/Apophis$(OBJ_EXT)' =>
+                  'include/ap_abi.h include/ap_abi_impl.h' },
 
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Apophis-* lib/*.o lib/*.c lib/*.bs' },
+    clean => { FILES => 'Apophis-* lib/*.o lib/*.c lib/*.bs Install' },
 );
 
 if ($has_xsmulti) {
@@ -78,6 +87,33 @@ delete $WriteMakefileArgs{MIN_PERL_VERSION}
     unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
 delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
+
+# ---- Apophis as an ABI PROVIDER ------------------------------------------ *
+# ap_abi.h publishes the content-addressing primitives so a consumer's XS can
+# identify, shard and write a blob without a Perl frame. ExtUtils::Depends
+# installs the header and records the include path; Apophis::_abi_ptr hands
+# over the table's address at runtime.
+my $pkg = ExtUtils::Depends->new('Apophis');
+$pkg->install('include/ap_abi.h');
+mkdir 'Install' unless -d 'Install';
+$pkg->save_config('Install/Files.pm');
+my %dep = $pkg->get_makefile_vars;
+
+# EU::Depends returns an empty LIBS/LDFROM that would otherwise clobber
+# MakeMaker's defaults; Apophis links nothing extra, so drop them.
+delete $dep{LIBS};
+delete $dep{LDFROM};
+delete $dep{INC};              # ours is already correct, and more specific
+
+# Its PM map REPLACES MakeMaker's auto-detected one, so lib/Apophis.pm has to
+# be re-added by hand or it silently stops being installed.
+File::Find::find(sub {
+    return unless -f && /\.pm\z/;
+    (my $rel = $File::Find::name) =~ s{^lib/}{};
+    $dep{PM}{$File::Find::name} = "\$(INST_LIB)/$rel";
+}, 'lib');
+
+%WriteMakefileArgs = (%WriteMakefileArgs, %dep);
 
 WriteMakefile(%WriteMakefileArgs);
 

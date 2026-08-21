@@ -15,7 +15,7 @@
  * model tier is one C frame calling DBI rather than two Perl frames.
  *
  * The object stays a blessed hash with the same slots the Perl used
- * (opts/table/primary/columns/col/returning): t/12-model-dbi.t reaches
+ * (opts/table/primary/columns/col/returning): t/0510-model-dbi.t reaches
  * through ->backend->dbh, and keeping the shape means a hand-written backend
  * can still subclass this one.
  *
@@ -237,7 +237,7 @@ static SV *pdbi_qi_pv(pTHX_ SV *self, const char *name) {
 
 /* prepare_cached: one statement handle per distinct SQL string on the
  * connection, which is what keeps repeated queries off the parser (and what
- * t/12 checks through $dbh->{CachedKids}). Mortal. */
+ * t/0510 checks through $dbh->{CachedKids}). Mortal. */
 static SV *pdbi_sth_dbh(pTHX_ SV *dbh, SV *sql) {
     SV *argv[3], *sth;
     argv[0] = sql;
@@ -528,7 +528,7 @@ static AV *pdbi_key_args(pTHX_ SV **st, I32 items, HV **out,
 /* The backend object both shipped backends bless: the same slots the Perl
  * used (opts/table/primary/columns/col/returning), parsed from the
  * database/table/primary/columns pairs _instantiate passes. Shared so a
- * second backend cannot drift from the shape t/12 reaches through. */
+ * second backend cannot drift from the shape t/0510 reaches through. */
 static SV *pdbi_build_self(pTHX_ SV *class, SV **st, I32 items,
                            const char *cls) {
     HV *h = newHV();

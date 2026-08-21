@@ -10,12 +10,22 @@ t/00-load.t
 t/10-new.t
 t/30-basics.t
 t/carp.t
+t/cgi_security.t
+t/changes.t
 t/comment-spelling.t
+t/data-flow.t
+t/domain.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
+t/function.t
+t/integration.t
 t/links.t
+t/locales.t
+t/logic.t
 t/manifest.t
 t/no404s.t
+t/path.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-snippets.t
@@ -25,6 +35,8 @@ t/pod.t
 t/port.t
 t/strict.t
 t/text.t
+t/transaction.t
+t/unit.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

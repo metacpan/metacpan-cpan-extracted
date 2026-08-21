@@ -1,3 +1,15 @@
+0.320     2026-08-19 17:31:57Z
+
+  - LICENSE is now expected as a committed file in the repository.
+    Dist::Zilla::Plugin::License is removed from @Basic and
+    Dist::Zilla::Plugin::LicenseFile is added in its place, which aborts the
+    build when the committed file is missing or no longer matches the dist's
+    license, copyright_holder and copyright_year. Hosting platforms only
+    detect a licence they can see in the repository, and a generated LICENSE
+    never gets there. Write the file with "dzil genlicense" and commit it.
+  - New "generate_license" attribute restores the previous behaviour for
+    dists that deliberately ship no committed LICENSE.
+
 0.319     2026-08-17 02:38:51Z
 
   - The commit that records the $VERSION bump after a release now picks up

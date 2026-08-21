@@ -110,7 +110,7 @@ static const frj_abi *oa_frj(pTHX) {
             PUTBACK; FREETMPS; LEAVE;
             if (p) {
                 const frj_abi *a = INT2PTR(const frj_abi *, p);
-                if (a && a->abi_version == FRJ_ABI_VERSION) OA_FRJ = a;
+                if (a && a->abi_version >= FRJ_ABI_VERSION) OA_FRJ = a;
             }
         }
     }
@@ -352,7 +352,7 @@ BOOT:
     }
     if (p) {
         const jsf_abi *a = INT2PTR(const jsf_abi *, p);
-        if (a && a->abi_version == JSF_ABI_VERSION) JSF = a;
+        if (a && a->abi_version >= JSF_ABI_VERSION) JSF = a;
     }
     /* cache the frj trampoline CVs: the request path invokes them via
      * call_sv + G_EVAL (no name lookup, croaks contained) */

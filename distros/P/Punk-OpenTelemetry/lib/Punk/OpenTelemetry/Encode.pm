@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 1;
 
@@ -47,8 +47,10 @@ arithmetic into a buffer being filled from the end is quicker to run and much
 harder to prove, and the failure it produces - a length prefix that lies - is
 one a collector rejects with nothing useful to say about why.
 
-The two halves are held together three ways: L</traces_protobuf_size> exposes
-the measuring pass so a test can assert the agreement directly; an author
+The two halves are held together three ways:
+L<traces_protobuf_size|/"traces_protobuf_size($payload)">
+exposes the measuring pass so a test can assert the agreement directly; an
+author
 build (C<-DOTEL_PB_ASSERT>) checks every embedded message as it is written;
 and the golden vectors in F<t/01-protobuf.t> compare the output against a
 reader written from the wire spec alone, which shares no code with the encoder

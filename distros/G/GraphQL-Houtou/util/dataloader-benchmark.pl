@@ -25,13 +25,15 @@ my $count = -3;
 my $width = 10;
 my $scenario = 'loader';
 my $access = 'unique';
+my $case = '';
 
 GetOptions(
   'count=s' => \$count,
   'width=i' => \$width,
   'scenario=s' => \$scenario,
   'access=s' => \$access,
-) or die "Usage: $0 [--count Benchmark-count] [--width key-count] [--scenario loader|execution] [--access unique|cold|repeated|primed]\n";
+  'case=s' => \$case,
+) or die "Usage: $0 [--count Benchmark-count] [--width key-count] [--scenario loader|execution] [--access unique|cold|repeated|primed] [--case name]\n";
 
 die "--width must be positive\n" unless $width > 0;
 die "--scenario must be loader or execution\n"
@@ -59,34 +61,44 @@ sub run_request {
 }
 
 sub build_execution_runner {
-  my ($fast) = @_;
+  my ($mode) = @_;
+  my $fast = $mode eq 'fast';
+  my $declarative = $mode eq 'declarative' || $mode eq 'batch_plan';
+  my $batch_plan = $mode eq 'batch_plan';
   my $Loaded = GraphQL::Houtou::Type::Object->new(
-    name => $fast ? 'FastLoadedValue' : 'GenericLoadedValue',
+    name => ucfirst($mode) . 'LoadedValue',
     fields => {
       value => { type => $String },
     },
   );
   my $Row = GraphQL::Houtou::Type::Object->new(
-    name => $fast ? 'FastLoaderRow' : 'GenericLoaderRow',
+    name => ucfirst($mode) . 'LoaderRow',
     fields => {
       loaded => {
         type => $Loaded,
-        ($fast ? (resolver_mode => 'fast_resolve_no_args') : ()),
-        resolve => $fast
-          ? sub {
-              my ($source, $context) = @_;
-              return $context->{loader}->load($source->{id});
-            }
-          : sub {
-              my ($source, undef, $context) = @_;
-              return $context->{loader}->load($source->{id});
-            },
+        ($declarative
+          ? (loader => {
+              context_key => 'loader',
+              key => { source_key => 'id' },
+            })
+          : (
+              ($fast ? (resolver_mode => 'fast_resolve_no_args') : ()),
+              resolve => $fast
+                ? sub {
+                    my ($source, $context) = @_;
+                    return $context->{loader}->load($source->{id});
+                  }
+                : sub {
+                    my ($source, undef, $context) = @_;
+                    return $context->{loader}->load($source->{id});
+                  },
+            )),
       },
     },
   );
   my $schema = GraphQL::Houtou::Schema->new(
     query => GraphQL::Houtou::Type::Object->new(
-      name => $fast ? 'FastLoaderQuery' : 'GenericLoaderQuery',
+      name => ucfirst($mode) . 'LoaderQuery',
       fields => {
         rows => {
           type => $Row->list,
@@ -105,6 +117,7 @@ sub build_execution_runner {
   return sub {
     my $loader = GraphQL::Houtou::DataLoader->new(
       cache => $access eq 'unique' ? 0 : 1,
+      batch_plan => $batch_plan,
       batch => sub {
         my ($batch_keys) = @_;
         return [ map { +{ value => "value:$_" } } @$batch_keys ];
@@ -121,17 +134,63 @@ sub build_execution_runner {
   };
 }
 
+sub build_argument_execution_runner {
+  my $schema = GraphQL::Houtou::Schema->new(
+    query => GraphQL::Houtou::Type::Object->new(
+      name => 'ArgumentLoaderBenchmarkQuery',
+      fields => {
+        loaded => {
+          type => $String,
+          args => { key => { type => $String } },
+          loader => {
+            context_key => 'loader',
+            key => { argument => 'key' },
+          },
+        },
+      },
+    ),
+  );
+  my $runtime = build_native_runtime($schema, async => 1);
+  my $query = '{ ' . join(' ', map {
+    "loaded$_: loaded(key: \"$_\")"
+  } @request_keys) . ' }';
+  my $program = $runtime->compile_program($query);
+
+  return sub {
+    my $loader = GraphQL::Houtou::DataLoader->new(
+      cache => $access eq 'unique' ? 0 : 1,
+      batch => sub {
+        my ($batch_keys) = @_;
+        return [ map { "value:$_" } @$batch_keys ];
+      },
+    );
+    return $runtime->execute_program(
+      $program,
+      context => { loader => $loader },
+      on_stall => GraphQL::Houtou::DataLoader->on_stall_for($loader),
+    );
+  };
+}
+
 my $cases;
 my $label;
 if ($scenario eq 'execution') {
   $cases = {
-    generic_resolver => build_execution_runner(0),
-    fast_resolver => build_execution_runner(1),
+    generic_resolver => build_execution_runner('generic'),
+    fast_resolver => build_execution_runner('fast'),
+    declarative_loader => build_execution_runner('declarative'),
+    declarative_batch_plan => build_execution_runner('batch_plan'),
+    declarative_argument_loader => build_argument_execution_runner(),
   };
   $label = "$width $access accesses through GraphQL execution";
 } else {
   $cases = { load_and_dispatch => \&run_request };
   $label = "$width $access accesses in one batch";
+}
+
+if ($case ne '') {
+  die "unknown benchmark case '$case'\n" if !exists $cases->{$case};
+  $cases = { $case => $cases->{$case} };
 }
 
 for my $runner (values %$cases) {

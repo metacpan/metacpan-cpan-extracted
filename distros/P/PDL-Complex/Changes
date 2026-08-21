@@ -1,3 +1,6 @@
+2.012 2026-08-20
+- update test to not use PDL::_ci
+
 2.011 2024-12-27
 - fix Cr2p having Inplace but a type-spec (https://github.com/PDLPorters/pdl/issues/511)
 

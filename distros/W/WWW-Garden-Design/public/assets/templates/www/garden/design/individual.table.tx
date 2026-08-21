@@ -1,0 +1,7 @@
+<table align = 'center' class = 'datatable' id = 'result_table' summary = 'Result table'>
+: for $row -> $item {
+<tr>
+		: include "basic.column.tx" { column => $item };
+</tr>
+: }
+</table>

@@ -1,0 +1,68 @@
+<div id = 'flower_div'>
+	%= csrf_field
+	<table align = 'center'>
+		<tr>
+			<td colspan = '3'><div class = 'blue_centered'>Flower</div><br /></td>
+		</tr>
+		<tr>
+			<td colspan = '3'>Note: These 5 sub-tabs are populated by clicking on search result thumbnails</td>
+		</tr>
+		<tr>
+			<td colspan = '3'><br /></td>
+		</tr>
+		<tr>
+			<td rowspan = '7'>
+				<table class = 'table_margin_auto'>
+					<tr>
+						<td><span id = 'flower_thumbnail'></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+					</tr>
+				</table>
+			</td>
+			<td>
+				<table class = 'table_margin_auto'>
+					<tr>
+						<td>Common name: <span class = 'alert'>*</span> </td>
+						<td align = 'left'><input id = 'flower_common_name' name = 'flower_common_name' type = 'text' size = '50' maxlength = '100'></td>
+					</tr>
+					<tr>
+						<td>Scientific name: <span class = 'alert'>* </span></td>
+						<td align = 'left'><input id = 'flower_scientific_name' name = 'flower_scientific_name' type = 'text' size = '50' maxlength = '100'></td>
+					</tr>
+					<tr>
+						<td>Aliases: </td>
+						<td align = 'left'><input id = 'flower_aliases' name = 'flower_aliases' type = 'text' size = '50' maxlength = '255'></td>
+					</tr>
+					<tr>
+						<td>Height: </td>
+						<td align = 'left'><input id = 'flower_height' name = 'flower_height' type = 'text' size = '10'></td>
+					</tr>
+					<tr>
+						<td>Width: </td>
+						<td align = 'left'><input id = 'flower_width' name = 'flower_width' type = 'text' size = '10'></td>
+					</tr>
+					<tr>
+						<td>Publish: </td>
+						<td align = 'left'><input type = 'checkbox' value = '' id = 'flower_publish'/></td>
+					</tr>
+					<tr>
+						<td colspan = '2'><br /></td>
+					</tr>
+					<tr>
+						<td colspan = '2'><span class = 'alert'>*</span> indicates a mandatory field</td>
+					</tr>
+					<tr>
+						<td colspan = '2'>
+							<br />
+						</td>
+					</tr>
+					<tr>
+						<td align = 'center'><%= submit_button 'Save' %></td>
+						<td align = 'center'><input type = 'reset'  value = 'Reset'  /></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<div id = 'flower_result_div'></div>

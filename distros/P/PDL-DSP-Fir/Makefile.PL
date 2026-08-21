@@ -15,6 +15,7 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88', # done_testing
+        'Test::PDL' => '0.22',
     },
     PREREQ_PM => {
         'PDL' => 0,

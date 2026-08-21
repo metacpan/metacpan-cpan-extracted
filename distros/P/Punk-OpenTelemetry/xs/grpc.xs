@@ -236,7 +236,8 @@ send(ua, endpoint, signal, bytes, timeout = 10)
             SPAGAIN;
             if (count > 0) f = newSVsv(POPs);
             PUTBACK; FREETMPS; LEAVE;
-            RETVAL = f ? f : &PL_sv_undef;
+            if (!f) XSRETURN_UNDEF;
+            RETVAL = f;
         }
     }
     OUTPUT:

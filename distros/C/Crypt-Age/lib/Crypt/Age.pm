@@ -1,5 +1,4 @@
 package Crypt::Age;
-our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Perl implementation of age encryption (age-encryption.org)
 
 use Moo;
@@ -10,7 +9,7 @@ use Crypt::Age::Header;
 use namespace::clean;
 
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub generate_keypair {
     my ($class) = @_;
@@ -20,8 +19,42 @@ sub generate_keypair {
 
 sub encrypt {
     my ($class, %args) = @_;
+
     my $plaintext  = $args{plaintext}  // croak "plaintext required";
     my $recipients = $args{recipients} // croak "recipients required";
+
+    open my $ifh, '<:raw', \$plaintext or die "open on input string: $!";
+
+    my $output = '';
+    open my $ofh, '>:raw', \$output or die "open on output string: $!";
+
+    $class->_encrypt_fh($ifh, $ofh, $recipients);
+
+    return $output;
+}
+
+
+sub decrypt {
+    my ($class, %args) = @_;
+
+    my $ciphertext = $args{ciphertext} // croak "ciphertext required";
+    my $identities = $args{identities} // croak "identities required";
+
+    open my $ifh, '<:raw', \$ciphertext or die "open on input string: $!";
+
+    my $output = '';
+    open my $ofh, '>:raw', \$output or die "open on output string: $!";
+
+    $class->_decrypt_fh($ifh, $ofh, $identities);
+
+    return $output;
+}
+
+
+sub _encrypt_fh {
+    my ($class, $ifh, $ofh, $recipients) = @_;
+    binmode($ifh, ':raw') or croak "cannot binmode input filehandle: $!";
+    binmode($ofh, ':raw') or croak "cannot binmode output filehandle: $!";
 
     croak "recipients must be an array ref" unless ref($recipients) eq 'ARRAY';
     croak "at least one recipient required" unless @$recipients;
@@ -30,43 +63,15 @@ sub encrypt {
     my $file_key = Crypt::Age::Primitives->generate_file_key;
 
     # Create header with wrapped file key for each recipient
-    my $header = Crypt::Age::Header->create($file_key, $recipients);
+    print {$ofh} Crypt::Age::Header->create($file_key, $recipients)->to_string;
 
     # Generate payload nonce and derive payload key
     my $nonce = Crypt::Age::Primitives->generate_payload_nonce;
+    print {$ofh} $nonce;
+
     my $payload_key = Crypt::Age::Primitives->derive_payload_key($file_key, $nonce);
-    my $encrypted_payload = Crypt::Age::Primitives->encrypt_payload($payload_key, $plaintext);
-
-    # Output: header + nonce + encrypted_payload
-    return $header->to_string . $nonce . $encrypted_payload;
+    return Crypt::Age::Primitives->encrypt_payload_fh($payload_key, $ifh, $ofh);
 }
-
-
-sub decrypt {
-    my ($class, %args) = @_;
-    my $ciphertext = $args{ciphertext} // croak "ciphertext required";
-    my $identities = $args{identities} // croak "identities required";
-
-    croak "identities must be an array ref" unless ref($identities) eq 'ARRAY';
-    croak "at least one identity required" unless @$identities;
-
-    # Parse header
-    my $offset = 0;
-    my $header = Crypt::Age::Header->parse(\$ciphertext, \$offset);
-
-    # Unwrap file key using identities
-    my $file_key = $header->unwrap_file_key($identities);
-
-    # Extract nonce (first 16 bytes after header) and encrypted payload
-    my $nonce = substr($ciphertext, $offset, 16);
-    my $encrypted_payload = substr($ciphertext, $offset + 16);
-
-    # Derive payload key using nonce
-    my $payload_key = Crypt::Age::Primitives->derive_payload_key($file_key, $nonce);
-
-    return Crypt::Age::Primitives->decrypt_payload($payload_key, $encrypted_payload);
-}
-
 
 sub encrypt_file {
     my ($class, %args) = @_;
@@ -76,22 +81,54 @@ sub encrypt_file {
 
     open my $in_fh, '<:raw', $input
         or croak "Cannot open input file '$input': $!";
-    my $plaintext = do { local $/; <$in_fh> };
-    close $in_fh;
-
-    my $ciphertext = $class->encrypt(
-        plaintext  => $plaintext,
-        recipients => $recipients,
-    );
-
     open my $out_fh, '>:raw', $output
         or croak "Cannot open output file '$output': $!";
-    print $out_fh $ciphertext;
-    close $out_fh;
+
+    $class->_encrypt_fh($in_fh, $out_fh, $recipients);
+
+    close $out_fh or croak "Cannot close output file '$output': $!";
+    close $in_fh  or croak "Cannot close input file '$input': $!";
 
     return 1;
 }
 
+
+sub encrypt_filehandle {
+    my ($class, %args) = @_;
+    my $in_fh      = $args{input}      // croak "input required";
+    my $out_fh     = $args{output}     // croak "output required";
+    my $recipients = $args{recipients} // croak "recipients required";
+
+    $class->_encrypt_fh($in_fh, $out_fh, $recipients);
+
+    return 1;
+
+}
+
+
+sub _decrypt_fh {
+    my ($class, $ifh, $ofh, $identities) = @_;
+    binmode($ifh, ':raw') or croak "cannot binmode input filehandle: $!";
+    binmode($ofh, ':raw') or croak "cannot binmode output filehandle: $!";
+
+    croak "identities must be an array ref" unless ref($identities) eq 'ARRAY';
+    croak "at least one identity required" unless @$identities;
+
+    # Parse header
+    my $header = Crypt::Age::Header->parse_from_fh($ifh);
+
+    # Unwrap file key using identities
+    my $file_key = $header->unwrap_file_key($identities);
+
+    # Extract nonce (first 16 bytes after header) and encrypted payload
+    my $nonce = Crypt::Age::Primitives->paranoid_read($ifh, 16);
+    croak 'end of file reached before getting nonce' if length($nonce) != 16;
+
+    # Derive payload key using nonce
+    my $payload_key = Crypt::Age::Primitives->derive_payload_key($file_key, $nonce);
+
+    return Crypt::Age::Primitives->decrypt_payload_fh($payload_key, $ifh, $ofh);
+}
 
 sub decrypt_file {
     my ($class, %args) = @_;
@@ -101,18 +138,25 @@ sub decrypt_file {
 
     open my $in_fh, '<:raw', $input
         or croak "Cannot open input file '$input': $!";
-    my $ciphertext = do { local $/; <$in_fh> };
-    close $in_fh;
-
-    my $plaintext = $class->decrypt(
-        ciphertext => $ciphertext,
-        identities => $identities,
-    );
-
     open my $out_fh, '>:raw', $output
         or croak "Cannot open output file '$output': $!";
-    print $out_fh $plaintext;
-    close $out_fh;
+
+    $class->_decrypt_fh($in_fh, $out_fh, $identities);
+
+    close $out_fh or croak "Cannot close output file '$output': $!";
+    close $in_fh  or croak "Cannot close input file '$input': $!";
+
+    return 1;
+}
+
+
+sub decrypt_filehandle {
+    my ($class, %args) = @_;
+    my $in_fh      = $args{input}      // croak "input required";
+    my $out_fh     = $args{output}     // croak "output required";
+    my $identities = $args{identities} // croak "identities required";
+
+    $class->_decrypt_fh($in_fh, $out_fh, $identities);
 
     return 1;
 }
@@ -133,7 +177,7 @@ Crypt::Age - Perl implementation of age encryption (age-encryption.org)
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -283,6 +327,36 @@ C<rage> command-line tools.
 
 Returns C<1> on success. Dies on error (file not found, permission denied, etc).
 
+=head2 encrypt_filehandle
+
+    Crypt::Age->encrypt_filehandle(
+        input      => \*STDIN,
+        output     => \*STDOUT,
+        recipients => \@public_keys,
+    );
+
+Encrypts for one or more recipients, based on filehandles for both input and
+output.
+
+Parameters:
+
+=over 4
+
+=item * C<input> - Input filehandle (required)
+
+=item * C<output> - Output filehandle (required)
+
+=item * C<recipients> - ArrayRef of Bech32-encoded public keys (required)
+
+=back
+
+Both filehandles will be forced to be C<:raw> using C<binmode>.
+
+The output stream will be in age format and can be decrypted with the C<age> or
+C<rage> command-line tools.
+
+Returns C<1> on success. Dies on error (file not found, permission denied, etc).
+
 =head2 decrypt_file
 
     Crypt::Age->decrypt_file(
@@ -307,6 +381,32 @@ Parameters:
 
 Returns C<1> on success. Dies if no matching identity is found, if the MAC
 verification fails, or on file I/O errors.
+
+=head2 decrypt_filehandle
+
+    Crypt::Age->decrypt_filehandle(
+        input      => \*STDIN,
+        output     => \*STDOUT,
+        identities => \@secret_keys,
+    );
+
+Decrypts age-encrypted data from a filehandle using one or more identities.
+Output is sent to a filehandle too.
+
+Parameters:
+
+=over 4
+
+=item * C<input> - Encrypted input filehandle (required)
+
+=item * C<output> - Decrypted output filehandle (required)
+
+=item * C<identities> - ArrayRef of Bech32-encoded secret keys (required)
+
+=back
+
+Returns C<1> on success. Dies if no matching identity is found, if the MAC
+verification fails, or on I/O errors.
 
 =head1 KEY FORMAT
 
@@ -378,10 +478,6 @@ final-chunk flag.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-crypt-age/issues>.
-
-=head2 IRC
-
-You can reach Getty on C<irc.perl.org> for questions and support.
 
 =head1 CONTRIBUTING
 

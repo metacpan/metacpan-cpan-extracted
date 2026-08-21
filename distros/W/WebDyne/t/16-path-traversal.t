@@ -8,6 +8,8 @@ use warnings;
 use Test::More;
 use FindBin qw($RealBin);
 use lib "$RealBin/../lib";
+use lib $RealBin;
+use pagi_compat_helper qw(pagi_skip_reason);
 
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
@@ -58,7 +60,10 @@ SKIP: {
 }
 
 SKIP: {
-    skip 'Skipping PAGI traversal adapter test: missing PAGI modules', 4
+    my $pagi_skip=pagi_skip_reason(qw(PAGI::Request));
+    skip "Skipping PAGI traversal adapter test: $pagi_skip", 4
+        if $pagi_skip;
+    skip "Skipping PAGI traversal adapter test: $@", 4
         unless eval { require WebDyne::Request::PAGI; 1 };
 
     require_ok('WebDyne::Request::PAGI');

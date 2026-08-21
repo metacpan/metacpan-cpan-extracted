@@ -1,5 +1,5 @@
 This archive contains the distribution Util-H2O-More,
-version 0.4.3:
+version 0.4.5:
 
   Convenience utilities built on Util::H2O (baptise, d2o, INI/YAML/HTTP helpers, Getopt helpers)
 

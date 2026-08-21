@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    This document describes MojoX::Authentication version 0.006.
+    This document describes MojoX::Authentication version 0.008.
 
 SYNOPSIS
 
@@ -23,25 +23,14 @@ DESCRIPTION
 
 INTERFACE
 
- app
-
-       my $app = $ma->app;
-
-    Retrieve the application object reference set at creation or later when
-    calling "app_startup" (if you decide to use it).
-
-    It is mandatory if "model" is missing.
-
  app_startup
 
-       $ma->app_startup; # OR
        $ma->app_startup($app);
 
-    Perform some startup over the application (either provided explicitly
-    as $app, or retrieved via "app"), like adding and initializing plugin
-    Mojolicious::Plugin::Authentication and setting a before_render hook to
-    inject the user data in the stash, if present (see "user_stash_key" for
-    the key used in the stash).
+    Perform some startup over the $app application, like adding and
+    initializing plugin Mojolicious::Plugin::Authentication and setting a
+    before_render hook to inject the user data in the stash, if present
+    (see "user_stash_key" for the key used in the stash).
 
  ctr_credentials_login
 
@@ -60,11 +49,15 @@ INTERFACE
 
  ctr_logout
 
+       $ma->ctr_logout($controller, $redirect_route); # OR
        $ma->ctr_logout($controller);
 
     Perform the logout. If the provider supports the logout method, this
     totally delegates to it; otherwise, it calls the logout method over the
     $controller.
+
+    If provided, $redirect_route will also call the redirect_to method over
+    the $controller.
 
  ctr_saml2_login
 
@@ -80,7 +73,8 @@ INTERFACE
 
  ctr_saml2_sso_post
 
-       $ma->ctr_saml2_sso_post($controller, $route_for);
+       $ma->ctr_saml2_sso_post($controller, $route_for); # OR
+       $ma->ctr_saml2_sso_post($controller);
 
     Opinionated way of handling the login through credentials, practically
     acting as a wrapper around the $controller. This is the final request

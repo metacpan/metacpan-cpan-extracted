@@ -1,6 +1,6 @@
-/* X11::GUITest ($Id: KeyUtil.h 231 2014-01-11 14:26:57Z ctrondlp $)
+/* X11::GUITest ($Id: KeyUtil.h 253 2026-08-19 22:37:51Z ctrondlp $)
  *  
- * Copyright (c) 2003-2014  Dennis K. Paulsen, All Rights Reserved.
+ * Copyright (c) 2003-2026  Dennis K. Paulsen, All Rights Reserved.
  * Email: ctrondlp@cpan.org
  *
  * This program is free software; you can redistribute it and/or
@@ -27,8 +27,8 @@ const char *GetKeyName(KeySym sym);
 const char *GetModifierCode(KeySym sym);
 
 typedef struct KeyNameSymTable {
-	char *Name; 
-	KeySym Sym;
+    char *Name; 
+    KeySym Sym;
 } KeyNameSymTable;
 
 #endif /* #ifndef KEYUTIL_H */

@@ -1,5 +1,43 @@
 Revision history for Hyperman
 
+0.32    2026-08-21
+        - A worker no longer goes permanently deaf to the bus. The
+          wakeup's coalescing flag was cleared before its pipe was
+          emptied.
+        - bus_gaps reports what the DISPATCHER dropped as well as what
+          receive() did. 
+
+0.31    2026-08-21
+        - A queue group no longer drops a message because the worker
+          that claimed it looked too early.
+
+0.30    2026-08-20
+        - A request body over 1MB is written to a temp file as it
+          arrives instead of being held in memory, and psgi.input is a
+          handle on that file. Measured end to end through a socket, a
+          128MB upload costs a worker about 15MB of RSS against roughly
+          275MB before.
+        - Make one fewer syscall per request. The read loop drained to
+          EAGAIN, so an ordinary keep-alive request cost three syscalls -
+          a read that returned the request.
+        - Header name comparison no longer depends on the operator's
+          locale. hm_strncasecmp was the C library's, which folds case
+          by LC_CTYPE, and every caller compares an HTTP header name or
+          token - ASCII by RFC 9110. Under a Turkish locale the library
+          folds 'I' to the dotless form, so "CONTENT-LENGTH" would stop
+          matching "Content-Length" and the framing header would go
+          unrecognised. 
+    
+0.29	2026-08-20
+        - The Plack handler passes the bus params through. bus_slots,
+          bus_slot_size and bus_groups.
+        - A queue group registered before the server starts now works.
+
+0.28    2026-08-20
+        - A cross worker message bus. One ring in shared memory, mapped
+          before the fork, so every worker publishes into and reads from
+          the same copy. 
+
 0.27    2026-08-18
         - Hyperman->on_worker_start(sub { ... }): run code in every
           worker, after the fork, before its loop starts turning.

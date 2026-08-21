@@ -1,0 +1,66 @@
+<h1 align = 'center'>Searching</h1>
+
+<table align = 'center' class = 'table_striped'>
+	<thead>
+		<tr>
+			<td class = 'generic_border generic_padding'>#</td>
+			<td class = 'generic_border generic_padding'>Q</td>
+			<td class = 'generic_border generic_padding'>A</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class = 'generic_border generic_padding'>1</td>
+			<td class = 'generic_border generic_padding'>How are search terms written?</td>
+			<td class = 'generic_border generic_padding'>
+				<table>
+					<tr>
+						<td>Do not type the double-quotes ...</td>
+						<td>... They are used here just for clarity.</td>
+					</tr>
+					<tr>
+						<td>o Contiguous spaces are reduced to a single space: </td>
+						<td>(a) "Smoke&nbsp;&nbsp;&nbsp;Tree" is the same as "Smoke Tree".</td>
+					</tr>
+					<tr>
+						<td>o A word or phrase can be written in any case: </td>
+						<td>(a) "cordatum", (b) "Sweet Scented Basil".</td>
+					</tr>
+					<tr>
+						<td>o A search by size. Spaces around '<', '=' and '>' are optional. If cm and m absent, m is assumed: </td>
+						<td>(a) "width<90cm", (b) "height = 1.1m", (c) "h > 2".</td>
+					</tr>
+					<tr>
+						<td>o A size of >= 100cm is converted into m: </td>
+						<td>(a) "width < 200cm" is the same as "width < 2m".</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td class = 'generic_border generic_padding'>2</td>
+			<td class = 'generic_border generic_padding'>How are search terms combined?</td>
+			<td class = 'generic_border generic_padding'>
+				Atrributes and search text are joined by 'and', so 'Yes' (from the Native checkbox) and 'black' typed in as Search text means 'Native = Yes <span class = 'italic'>and</span> black'. Result: Kennedia nigricans!
+				<br />Note: This <span class = 'italic'>only</span> applies to Attributes and search text. Multiple words in the search text field are used verbatim.
+			</td>
+		</tr>
+		<tr>
+			<td class = 'generic_border generic_padding'>3</td>
+			<td class = 'generic_border generic_padding'>Can I search just by attributes?</td>
+			<td class = 'generic_border generic_padding'>Yes. Just click the checkbox(es) and click Search. There is no need to type anything.</td>
+		</tr>
+		<tr>
+			<td class = 'generic_border generic_padding'>4</td>
+			<td class = 'generic_border generic_padding'>Can I search for words like climber instead of the attribute vine?</td>
+			<td class = 'generic_border generic_padding'>Yes, but you'll have to do 2 searches. The program does not auto-convert climber into the attribute vine.</td>
+		</tr>
+		<tr>
+			<td class = 'generic_border generic_padding'>5</td>
+			<td class = 'generic_border generic_padding'>Can I search for any word?</td>
+			<td class = 'generic_border generic_padding'>Yes. The program searches many parts of the database attempting to find your search key.<br ?>
+				Typical words are birds, bloom, chocolate, coast, color, container, evergreen, <br />
+				foliage, frost, hardy, hedging, masses, mint, mulch, screen, scent, velvet. Try something!</td>
+		</tr>
+	</tbody>
+</table>

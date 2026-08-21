@@ -36,7 +36,7 @@ static int jsf_fetch_init(pTHX) {
 
     if (p) {
         const fetch_abi *a = INT2PTR(const fetch_abi *, p);
-        if (a && a->abi_version == FETCH_ABI_VERSION) JSF_FETCH = a;
+        if (a && a->abi_version >= FETCH_ABI_VERSION) JSF_FETCH = a;
     }
     return JSF_FETCH != NULL;
 }
