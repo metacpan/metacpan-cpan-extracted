@@ -7,6 +7,7 @@ use lib "$FindBin::Bin/lib";
 use Test::More;
 use File::Temp ();
 use Punk::Test;
+use Scalar::Util ();
 
 # $c->send_file end to end: the whole download story - validators, ranges,
 # disposition, HEAD, both sources - through the compiled dispatcher.
@@ -222,5 +223,48 @@ $t->get_ok('/extra')->status_is(200)
   ->header_is('X-Download' => 'yes');
 $t->get_ok('/extra', headers => { Range => 'bytes=0-9' })->status_is(206)
   ->header_is('X-Download' => 'yes');
+
+# ---- the reader's fileno, which is a contract with the server ---------------
+# Everything above reads a ranged body through getline. Hyperman 0.20+ does
+# not: it takes `fileno` and the Content-Length and sends the window straight
+# from the file, never calling getline at all. So the load-bearing claim is
+# that the descriptor's CURRENT POSITION is the start of the range - and
+# nothing checked it, because the test client always consumes the body the
+# other way.
+#
+# It has to go through a raw PSGI call rather than the client above: the test
+# client consumes a getline body to give you a string, so by the time it has a
+# response there is no unconsumed reader left to ask.
+{
+    my $app = $t->{app};          # already compiled by the client above
+    my $r = $app->({ REQUEST_METHOD => 'GET', PATH_INFO => '/file',
+                     QUERY_STRING => '', SERVER_NAME => 'l', SERVER_PORT => 80,
+                     'psgi.url_scheme' => 'http', 'psgi.input' => undef,
+                     'psgi.errors' => \*STDERR,
+                     HTTP_RANGE => 'bytes=70000-70009' });
+    is($r->[0], 206, 'a ranged request answers 206');
+    my $body = $r->[2];
+
+    SKIP: {
+        skip 'this ranged body is not a Reader', 4
+            unless Scalar::Util::blessed($body)
+               && $body->isa('Punk::SendFile::Reader');
+
+        my $fd = $body->fileno;
+        cmp_ok($fd, '>=', 0, 'a ranged body hands the server a real descriptor');
+
+        # read from the fd itself, the way a server sending natively would
+        open my $dup, '<&=', $fd or die "dup: $!";
+        binmode $dup;
+        read $dup, my $window, 10;
+        is($window, substr($bytes, 70000, 10),
+            'and its position is already at the START of the range - a server '
+          . 'that trusted this and seeked nowhere sends the right bytes');
+
+        $body->close;
+        is($body->fileno, -1, 'fileno is -1 once closed');
+        is($body->getline, undef, 'and getline is spent');
+    }
+}
 
 done_testing;

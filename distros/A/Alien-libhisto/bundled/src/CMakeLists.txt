@@ -2,6 +2,7 @@ add_library(histo
     histo.c
     histo2d.c
     fit.c
+    kde.c
     simd.c
     sketch.c
     serialize.c

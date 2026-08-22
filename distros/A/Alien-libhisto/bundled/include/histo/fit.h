@@ -1,3 +1,8 @@
+/**
+ * @file fit.h
+ * @brief Non-linear regression, curve fitting engine, and parametric models.
+ */
+
 #ifndef LIBHISTO_FIT_H
 #define LIBHISTO_FIT_H
 
@@ -85,9 +90,70 @@ typedef enum histo_fit_model {
     HISTO_FIT_MODEL_POWER_LAW = 4,
 
     /**
+     * @brief Log-Normal distribution.
+     * f(x; A, mu, sigma) = (A / (x * sigma * sqrt(2*pi))) * exp(-(ln(x) - mu)^2 / (2 * sigma^2))  for x > 0
+     * Parameters (3):
+     *   params[0] = A     (scale / total area)
+     *   params[1] = mu    (log-scale location / mean of ln(x))
+     *   params[2] = sigma (log-scale scale / std dev of ln(x), > 0)
+     */
+    HISTO_FIT_MODEL_LOG_NORMAL = 5,
+
+    /**
+     * @brief Gaussian peak with linear baseline background.
+     * f(x; A, mu, sigma, c0, c1) = A * exp(-(x - mu)^2 / (2 * sigma^2)) + c0 + c1 * x
+     * Parameters (5):
+     *   params[0] = A     (peak amplitude)
+     *   params[1] = mu    (peak mean / center)
+     *   params[2] = sigma (peak standard deviation, > 0)
+     *   params[3] = c0    (background intercept)
+     *   params[4] = c1    (background slope)
+     */
+    HISTO_FIT_MODEL_GAUSSIAN_PLUS_LINEAR = 6,
+
+    /**
+     * @brief Weibull distribution.
+     * f(x; A, k, lambda) = A * (k / lambda) * (x / lambda)^(k - 1) * exp(-(x / lambda)^k)  for x > 0
+     * Parameters (3):
+     *   params[0] = A      (scale / total area)
+     *   params[1] = k      (shape parameter, > 0)
+     *   params[2] = lambda (scale parameter, > 0)
+     */
+    HISTO_FIT_MODEL_WEIBULL = 7,
+
+    /**
+     * @brief Gamma / Erlang distribution.
+     * f(x; A, k, theta) = A * (x^(k - 1) * exp(-x / theta)) / (Gamma(k) * theta^k)  for x > 0
+     * Parameters (3):
+     *   params[0] = A     (scale / total area)
+     *   params[1] = k     (shape parameter, > 0)
+     *   params[2] = theta (scale parameter, > 0)
+     */
+    HISTO_FIT_MODEL_GAMMA = 8,
+
+    /**
+     * @brief Poisson distribution (continuous Gamma formulation).
+     * f(x; A, lambda) = A * (lambda^x * exp(-lambda)) / Gamma(x + 1)  for x >= 0
+     * Parameters (2):
+     *   params[0] = A      (scale / amplitude)
+     *   params[1] = lambda (rate / expected count, > 0)
+     */
+    HISTO_FIT_MODEL_POISSON = 9,
+
+    /**
+     * @brief Laplace / Double Exponential distribution.
+     * f(x; A, mu, b) = (A / (2 * b)) * exp(-|x - mu| / b)
+     * Parameters (3):
+     *   params[0] = A  (scale / amplitude)
+     *   params[1] = mu (location / median)
+     *   params[2] = b  (scale / diversity, > 0)
+     */
+    HISTO_FIT_MODEL_LAPLACE = 10,
+
+    /**
      * @brief Custom user-defined callback function.
      */
-    HISTO_FIT_MODEL_CUSTOM = 5
+    HISTO_FIT_MODEL_CUSTOM = 11
 } histo_fit_model_t;
 
 /**
@@ -307,6 +373,24 @@ double histo_fit_eval(
     const double     *params,
     size_t            num_params,
     double            x
+);
+
+/**
+ * @brief Evaluate the analytical parameter gradient of a built-in parametric model at coordinate x.
+ *
+ * @param model Built-in model type.
+ * @param params Array of model parameters.
+ * @param num_params Number of parameters.
+ * @param x Coordinate value.
+ * @param grad Output array to receive partial derivatives [df/dp0, df/dp1, ...]. Must hold num_params doubles.
+ * @return HISTO_OK on success, or error code.
+ */
+histo_status_t histo_fit_eval_gradient(
+    histo_fit_model_t model,
+    const double     *params,
+    size_t            num_params,
+    double            x,
+    double           *grad
 );
 
 /**

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::CSRF;
-$Mojolicious::Plugin::Fondation::CSRF::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::CSRF::VERSION = '0.02';
 # ABSTRACT: CSRF protection plugin for Fondation — route condition, OpenAPI integration, JS injection
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -38,7 +38,9 @@ sub register ($self, $app, $config) {
             return 1;
         }
 
-        $c->problem(status => 403, title => 'CSRF token missing or invalid');
+        $c->res->code(403);
+        $c->stash('fondation.denied' => { status => 403, title => 'CSRF token missing or invalid' })
+            unless $c->stash('fondation.denied');
         return undef;
     });
 
@@ -109,7 +111,7 @@ Mojolicious::Plugin::Fondation::CSRF - CSRF protection plugin for Fondation — 
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

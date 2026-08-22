@@ -793,6 +793,22 @@ compile(self)
             }
         }
 
+        {   /* Punk::Plugin::I18n, the same arrangement as CSP above and for
+             * the same reason: whether this is development decides whether a
+             * missing key warns, and `plugin` is written above `config`, so
+             * registration is too early to ask. */
+            SV **is = hv_fetchs(h, K_I18N, 0);
+            if (is && *is && SvROK(*is)) {
+                (void)hv_stores(state, K_I18N, newSVsv(*is));
+                if (SvTYPE(SvRV(*is)) == SVt_PVHV) {
+                    SV *e = pc_app_env(aTHX_ self);
+                    (void)hv_stores((HV *)SvRV(*is), "dev",
+                        newSViv(SvOK(e) && strEQ(SvPV_nolen(e),
+                                                 "development")));
+                }
+            }
+        }
+
         {   /* Punk::Plugin::ConditionalGet's on-switch, copied from the app
              * hash where `register` put it. Absent when the plugin was never
              * registered, which is what makes the `etag` route option inert

@@ -1,0 +1,43 @@
+.gitignore
+Changes
+cpanfile
+examples/etch_aluminum_silicide.pl
+examples/etch_chamber_geometry.pl
+examples/etch_copper.pl
+examples/etch_gdsii_simulation.pl
+examples/etch_loading_effect.pl
+examples/etch_photoresist_ash.pl
+examples/etch_photoresist_strip.pl
+examples/etch_polyimide.pl
+examples/etch_silicon_nitride.pl
+examples/etch_tantalum.pl
+examples/etch_titanium.pl
+examples/make_sample_mask.pl
+examples/sample_mask.gds
+lib/Physics/Etch.pm
+lib/Physics/Etch/Chamber.pm
+lib/Physics/Etch/DryEtch.pm
+lib/Physics/Etch/Etchant.pm
+lib/Physics/Etch/GDSII.pm
+lib/Physics/Etch/Layout.pm
+lib/Physics/Etch/Loading.pm
+lib/Physics/Etch/Material.pm
+lib/Physics/Etch/Process.pm
+lib/Physics/Etch/Simulation.pm
+lib/Physics/Etch/WetEtch.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/10-wet.t
+t/20-dry.t
+t/30-facade.t
+t/40-gdsii.t
+t/50-layout.t
+t/60-chamber.t
+t/70-loading.t
+t/80-simulation.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

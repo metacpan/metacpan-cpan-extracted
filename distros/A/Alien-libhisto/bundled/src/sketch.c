@@ -1,3 +1,6 @@
+/*
+ * DDSketch logarithmic bucket quantile sketch with relative error bounds.
+ */
 
 #include "histo/sketch.h"
 #include <stdlib.h>
@@ -30,6 +33,13 @@ struct histo_sketch {
     double max_val;
 };
 
+static inline size_t store_idx(int32_t k, uint32_t max_bins) {
+    int32_t m = (int32_t)max_bins;
+    int32_t idx = k % m;
+    if (idx < 0) idx += m;
+    return (size_t)idx;
+}
+
 static void store_init(sketch_store_t *s, uint32_t max_bins) {
     s->counts = NULL;
     s->min_k = 0;
@@ -46,7 +56,7 @@ static void store_add(sketch_store_t *s, int32_t k, double weight) {
         s->counts = (double*)calloc(s->max_bins, sizeof(double));
         s->min_k = k;
         s->max_k = k;
-        s->counts[0] = weight;
+        s->counts[store_idx(k, s->max_bins)] = weight;
         return;
     }
 
@@ -67,12 +77,12 @@ static void store_add(sketch_store_t *s, int32_t k, double weight) {
             int32_t new_min_k = k - s->max_bins + 1;
             double collapse_weight = 0;
             for (int32_t i = s->min_k; i < new_min_k && i <= s->max_k; i++) {
-                collapse_weight += s->counts[(i % s->max_bins + s->max_bins) % s->max_bins];
-                s->counts[(i % s->max_bins + s->max_bins) % s->max_bins] = 0.0;
+                collapse_weight += s->counts[store_idx(i, s->max_bins)];
+                s->counts[store_idx(i, s->max_bins)] = 0.0;
             }
             s->min_k = new_min_k;
             // The collapsed weight is placed in the new min_k
-            s->counts[(s->min_k % s->max_bins + s->max_bins) % s->max_bins] += collapse_weight;
+            s->counts[store_idx(s->min_k, s->max_bins)] += collapse_weight;
         }
         s->max_k = k;
     }
@@ -81,13 +91,13 @@ static void store_add(sketch_store_t *s, int32_t k, double weight) {
         s->min_k = k;
     }
     
-    s->counts[(k % s->max_bins + s->max_bins) % s->max_bins] += weight;
+    s->counts[store_idx(k, s->max_bins)] += weight;
 }
 
 static void store_merge(sketch_store_t *dest, const sketch_store_t *src) {
     if (!src->counts) return;
     for (int32_t k = src->min_k; k <= src->max_k; k++) {
-        double w = src->counts[(k % src->max_bins + src->max_bins) % src->max_bins];
+        double w = src->counts[store_idx(k, src->max_bins)];
         if (w > 0.0) {
             store_add(dest, k, w);
         }
@@ -159,26 +169,36 @@ histo_status_t histo_sketch_insert_n(histo_sketch_t *s, size_t n, const double *
 
 histo_status_t histo_sketch_quantile(const histo_sketch_t *s, double q, double *out_val) {
     if (!s || !out_val) return HISTO_ERR_INVALID_ARG;
-    if (q < 0.0 || q > 1.0) return HISTO_ERR_INVALID_ARG;
-    if (s->num_entries == 0) {
+    if (!isfinite(q) || q < 0.0 || q > 1.0) return HISTO_ERR_INVALID_ARG;
+    if (s->num_entries == 0 || s->total_weight <= 0.0) {
         *out_val = NAN;
         return HISTO_ERR_EMPTY;
     }
 
-    double rank = q * (s->total_weight - 1.0);
+    if (q == 0.0) {
+        *out_val = s->min_val;
+        return HISTO_OK;
+    }
+    if (q == 1.0) {
+        *out_val = s->max_val;
+        return HISTO_OK;
+    }
+
+    double target = q * s->total_weight;
     double cumulative = 0.0;
 
-    // Negatives (iterated backwards from max_k down to min_k)
+    // Negatives (iterated backwards from max_k down to min_k, most negative to least negative)
     if (s->neg.counts) {
         for (int32_t k = s->neg.max_k; k >= s->neg.min_k; k--) {
-            double w = s->neg.counts[(k % s->neg.max_bins + s->neg.max_bins) % s->neg.max_bins];
+            double w = s->neg.counts[store_idx(k, s->neg.max_bins)];
             if (w > 0.0) {
                 cumulative += w;
-                if (cumulative > rank) {
-                    *out_val = -pow(s->gamma, k);
-                    // bound check
-                    if (*out_val < s->min_val) *out_val = s->min_val;
-                    if (*out_val > s->max_val) *out_val = s->max_val;
+                if (cumulative >= target) {
+                    double val = -pow(s->gamma, k);
+                    val = 2.0 * val / (1.0 + s->gamma);
+                    if (val < s->min_val) val = s->min_val;
+                    if (val > s->max_val) val = s->max_val;
+                    *out_val = val;
                     return HISTO_OK;
                 }
             }
@@ -188,24 +208,24 @@ histo_status_t histo_sketch_quantile(const histo_sketch_t *s, double q, double *
     // Zero
     if (s->zero_count > 0.0) {
         cumulative += s->zero_count;
-        if (cumulative > rank) {
+        if (cumulative >= target) {
             *out_val = 0.0;
             return HISTO_OK;
         }
     }
 
-    // Positives (iterated forwards from min_k to max_k)
+    // Positives (iterated forwards from min_k to max_k, least positive to most positive)
     if (s->pos.counts) {
         for (int32_t k = s->pos.min_k; k <= s->pos.max_k; k++) {
-            double w = s->pos.counts[(k % s->pos.max_bins + s->pos.max_bins) % s->pos.max_bins];
+            double w = s->pos.counts[store_idx(k, s->pos.max_bins)];
             if (w > 0.0) {
                 cumulative += w;
-                if (cumulative > rank) {
-                    *out_val = pow(s->gamma, k); // approximation logic
-                    *out_val = 2.0 * *out_val / (1.0 + s->gamma); // typical representative value for bin
-                    // bound check
-                    if (*out_val < s->min_val) *out_val = s->min_val;
-                    if (*out_val > s->max_val) *out_val = s->max_val;
+                if (cumulative >= target) {
+                    double val = pow(s->gamma, k);
+                    val = 2.0 * val / (1.0 + s->gamma);
+                    if (val < s->min_val) val = s->min_val;
+                    if (val > s->max_val) val = s->max_val;
+                    *out_val = val;
                     return HISTO_OK;
                 }
             }

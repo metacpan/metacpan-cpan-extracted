@@ -1,0 +1,59 @@
+{
+   "abstract" : "model wet and dry semiconductor etch processes",
+   "author" : [
+      "Jovan Trujillo <jtrujil43@users.noreply.github.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Physics-Etch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0",
+            "parent" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jtrujil43/Physics-Etch/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jtrujil43/Physics-Etch.git",
+         "web" : "https://github.com/jtrujil43/Physics-Etch"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

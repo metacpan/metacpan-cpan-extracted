@@ -1,3 +1,7 @@
+/*
+ * Binary wire format and JSON serialization/deserialization for 1D histograms.
+ */
+
 #include "internal.h"
 #include "cJSON.h"
 #include <stdio.h>

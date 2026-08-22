@@ -1,3 +1,8 @@
+/**
+ * @file histo.h
+ * @brief Public C API for 1D histograms, moments, and statistical operations.
+ */
+
 #ifndef LIBHISTO_HISTO_H
 #define LIBHISTO_HISTO_H
 
@@ -416,6 +421,9 @@ histo_status_t histo_iqr(const histo_t *h, double *out_iqr);
 /**
  * @brief Computes the Median Absolute Deviation (MAD = median(|x - median|)).
  *
+ * Implemented using an optimal two-pointer monotonic merge over pre-sorted histogram
+ * bins in O(N) deterministic time and O(1) auxiliary space without heap allocations.
+ *
  * @param[in]  h       Histogram handle.
  * @param[out] out_mad Output pointer for calculated MAD.
  * @return HISTO_OK on success, or HISTO_ERR_EMPTY if histogram has zero weight.
@@ -692,6 +700,109 @@ void histo_free_buffer(void *buf);
  * @return HISTO_OK on success, or appropriate error code.
  */
 histo_status_t histo_migrate_binary(const void *in_buf, size_t in_size, void **out_buf, size_t *out_size);
+
+/* ========================================================================= */
+/* Automated Optimal Bin Width Heuristics                                    */
+/* ========================================================================= */
+
+/**
+ * @brief Binning estimation heuristic rules.
+ */
+typedef enum histo_bin_rule {
+    HISTO_BIN_RULE_AUTO    = 0,  /**< Automatic selection: Freedman-Diaconis with fallback to Scott [Default] */
+    HISTO_BIN_RULE_FD      = 1,  /**< Freedman-Diaconis: h = 2 * IQR * n^(-1/3) */
+    HISTO_BIN_RULE_SCOTT   = 2,  /**< Scott's normal reference: h = 3.49 * std * n^(-1/3) */
+    HISTO_BIN_RULE_STURGES = 3,  /**< Sturges' rule: k = ceil(log2(n) + 1) */
+    HISTO_BIN_RULE_DOANE   = 4,  /**< Doane's rule: Sturges adjusted for skewness */
+    HISTO_BIN_RULE_KNUTH   = 5   /**< Knuth's Bayesian optimal binning rule */
+} histo_bin_rule_t;
+
+/**
+ * @brief Estimates optimal uniform bin parameters using the Freedman-Diaconis rule.
+ *
+ * @param[in]  n         Number of samples (n >= 1).
+ * @param[in]  values    Array of sample coordinates.
+ * @param[out] out_nbins Pointer to store computed number of bins.
+ * @param[out] out_min   Pointer to store lower boundary coordinate.
+ * @param[out] out_max   Pointer to store upper boundary coordinate.
+ * @return HISTO_OK on success, or error status code.
+ */
+histo_status_t histo_estimate_bins_fd(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max);
+
+/**
+ * @brief Estimates optimal uniform bin parameters using Scott's normal reference rule.
+ *
+ * @param[in]  n         Number of samples (n >= 1).
+ * @param[in]  values    Array of sample coordinates.
+ * @param[out] out_nbins Pointer to store computed number of bins.
+ * @param[out] out_min   Pointer to store lower boundary coordinate.
+ * @param[out] out_max   Pointer to store upper boundary coordinate.
+ * @return HISTO_OK on success, or error status code.
+ */
+histo_status_t histo_estimate_bins_scott(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max);
+
+/**
+ * @brief Estimates optimal uniform bin parameters using Sturges' rule.
+ *
+ * @param[in]  n         Number of samples (n >= 1).
+ * @param[in]  values    Array of sample coordinates.
+ * @param[out] out_nbins Pointer to store computed number of bins.
+ * @param[out] out_min   Pointer to store lower boundary coordinate.
+ * @param[out] out_max   Pointer to store upper boundary coordinate.
+ * @return HISTO_OK on success, or error status code.
+ */
+histo_status_t histo_estimate_bins_sturges(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max);
+
+/**
+ * @brief Estimates optimal uniform bin parameters using Doane's skewness-adjusted rule.
+ *
+ * @param[in]  n         Number of samples (n >= 1).
+ * @param[in]  values    Array of sample coordinates.
+ * @param[out] out_nbins Pointer to store computed number of bins.
+ * @param[out] out_min   Pointer to store lower boundary coordinate.
+ * @param[out] out_max   Pointer to store upper boundary coordinate.
+ * @return HISTO_OK on success, or error status code.
+ */
+histo_status_t histo_estimate_bins_doane(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max);
+
+/**
+ * @brief Estimates optimal uniform bin parameters using Knuth's Bayesian rule.
+ *
+ * @param[in]  n         Number of samples (n >= 1).
+ * @param[in]  values    Array of sample coordinates.
+ * @param[out] out_nbins Pointer to store computed number of bins.
+ * @param[out] out_min   Pointer to store lower boundary coordinate.
+ * @param[out] out_max   Pointer to store upper boundary coordinate.
+ * @return HISTO_OK on success, or error status code.
+ */
+histo_status_t histo_estimate_bins_knuth(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max);
+
+/**
+ * @brief Estimates optimal uniform bin parameters using the specified heuristic rule.
+ *
+ * @param[in]  n         Number of samples (n >= 1).
+ * @param[in]  values    Array of sample coordinates.
+ * @param[in]  rule      Bin width estimation heuristic.
+ * @param[out] out_nbins Pointer to store computed number of bins.
+ * @param[out] out_min   Pointer to store lower boundary coordinate.
+ * @param[out] out_max   Pointer to store upper boundary coordinate.
+ * @return HISTO_OK on success, or error status code.
+ */
+histo_status_t histo_estimate_bins(size_t n, const double *values, histo_bin_rule_t rule, uint32_t *out_nbins, double *out_min, double *out_max);
+
+/**
+ * @brief Constructs a new uniform histogram automatically configured and populated from sample data.
+ *
+ * Computes optimal bin count and range from the samples using the chosen rule,
+ * initializes a uniform histogram, and fills all samples in a single step.
+ *
+ * @param[in] n      Number of samples (n >= 1).
+ * @param[in] values Array of sample coordinates.
+ * @param[in] rule   Bin width estimation heuristic (default: HISTO_BIN_RULE_AUTO).
+ * @param[in] flags  Bitwise OR of feature flags.
+ * @return Pointer to newly allocated, filled histogram handle, or NULL on error.
+ */
+histo_t* histo_create_auto(size_t n, const double *values, histo_bin_rule_t rule, uint32_t flags);
 
 #ifdef __cplusplus
 }

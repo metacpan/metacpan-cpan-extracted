@@ -3,14 +3,14 @@
 require 5.010;
 use strict;
 package Stats::LikeR;
-our $VERSION = 0.298;
+our $VERSION = 0.301;
 require XSLoader;
 use autodie ':default';
 use warnings FATAL => 'all';
 use Exporter 'import';
 use Scalar::Util qw(reftype looks_like_number);
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test kurtosis Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test skew smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table);
+our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort density bw_nrd0 bw_nrd bw_ucv bw_bcv bw_sj dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test kurtosis Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test skew smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table);
 our @EXPORT = @EXPORT_OK;
 
 # ===========================================================================
@@ -42,6 +42,11 @@ our @EXPORT = @EXPORT_OK;
 # the internal engine behind a documented front end.
 my %HELP_ALIAS = (
 	rbind             => 'concat',
+	bw_nrd0           => 'density',
+	bw_nrd            => 'density',
+	bw_ucv            => 'density',
+	bw_bcv            => 'density',
+	bw_sj             => 'density',
 	map_cell          => 'assign',
 	col               => 'filter',
 	_rename_inplace   => 'rename_cols',
@@ -5008,7 +5013,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.298
+version 0.301
 
 =head1 Synopsis
 
@@ -7678,6 +7683,237 @@ default, overridable with a fourth argument:
  my $s = csort($hoh, 'score', 'aoh');           # row name in 'row.name'
  my $s = csort($hoh, 'score', 'aoh', 'sample'); # ... named 'sample' instead
 
+=head2 density
+
+Kernel density estimation — a smooth curve through a sample, the continuous
+answer to what C<hist> answers in bars. This is a port of R's C<density()>, down
+to the algorithm: the mass of the sample is dispersed over a regular grid of at
+least 512 points, that grid is convolved with a discretised kernel using the
+fast Fourier transform, and the result is interpolated back onto the points you
+asked for. It returns the same grid, the same bandwidth and the same estimate R
+would.
+
+ my $d = density(\@x);
+ printf "%g\t%g\n", $d->{x}[$_], $d->{y}[$_] for 0 .. $#{ $d->{x} };
+
+What that computes is one kernel — a little bump of area C<1/n> — centred on
+every observation, added together. On the left below, seven observations and
+their seven gaussian kernels; the blue curve through them is what C<density>
+returns. On the right, the same thing over R's C<faithful$eruptions>, against
+the histogram of the same sample: the two answer the same question, one in
+bars and one as a curve.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/density.what.png" alt="density() is the sum of one kernel per observation, and the smooth counterpart of a histogram" width="100%" /></p>
+
+Arguments may be given positionally (the sample first) or by name, and R's
+dotted argument names are accepted alongside the underscored ones
+(C<na.rm> as well as C<na_rm>, C<old.coords> as well as C<old_coords>,
+C<give.Rkern> as well as C<give_rkern>, C<warnWbw> as well as C<warn_wbw>).
+
+ my $d = density(x => \@x, bw => 'SJ', kernel => 'epanechnikov', n => 1024);
+
+=head3 Arguments
+
+=over
+
+=item * B<< C<x> >> — the sample, an array reference. Required (except with
+C<give_rkern>). A missing value (C<undef> or C<NaN>) is an error unless
+C<na_rm> is set; anything else non-numeric is always an error. An infinite
+observation is treated as a point mass at ±∞, so it is counted in C<n> and
+takes its share of the mass with it, leaving a sub-density on (−∞, ∞).
+
+=item * B<< C<bw> >> — the smoothing bandwidth, which is the standard deviation of the
+kernel. Either a positive number, or the name of a rule to choose one:
+C<'nrd0'> (the default), C<'nrd'>, C<'ucv'>, C<'bcv'>, C<'SJ'> / C<'SJ-ste'>, or
+C<'SJ-dpi'>. Rule names are case-insensitive. The five rules are also
+available on their own as C<bw_nrd0>, C<bw_nrd>, C<bw_ucv>, C<bw_bcv> and
+C<bw_sj>, described below.
+
+=item * B<< C<adjust> >> — the bandwidth actually used is C<adjust * bw>, so
+C<< adjust =E<gt> 0.5 >> asks for half the default smoothing. Defaults to 1.
+
+=item * B<< C<kernel> >> — one of C<'gaussian'> (the default), C<'epanechnikov'>,
+C<'rectangular'>, C<'triangular'>, C<'biweight'>, C<'cosine'> or C<'optcosine'>.
+Any unambiguous abbreviation will do, so a single letter is enough for every
+one of them, and the match is case-insensitive. All seven are scaled so that
+C<bw> is the kernel's standard deviation, which is why changing the kernel
+barely changes the estimate.
+
+=item * B<< C<window> >> — an alias for C<kernel>, for compatibility with S. An explicit
+C<kernel> wins.
+
+=item * B<< C<width> >> — also for compatibility with S, where the argument is the
+I<length of the kernel's support> rather than a multiple of its standard
+deviation (for the gaussian, four standard deviations). Consulted only when
+C<bw> is not given. A string names a rule, exactly as C<bw> does.
+
+=item * B<< C<weights> >> — an array reference of non-negative observation weights, one
+per element of C<x> — including the missing ones, so it is always the same
+length as C<x> was to begin with. The default is C<1/nx> each. Weights that do
+not sum to 1 give a I<sub>-density and draw a warning; pass C<< subdensity =E<gt> 1 >>
+if that is what you meant. If C<na_rm> removes observations and the original
+weights summed to one, the survivors are rescaled so they still do.
+Bandwidth I<rules> ignore the weights, and say so; C<< warn_wbw =E<gt> 0 >> silences
+that, and it is silent anyway when the weights do not vary.
+
+=item * B<< C<n> >> — the number of equally spaced points at which to estimate. Defaults
+to 512. Values above 512 are rounded up to a power of two internally (that
+is what makes the FFT cheap) and the result is interpolated back to exactly
+the C<n> you asked for, so a power of two is the efficient choice.
+
+=item * B<< C<from>, C<to> >> — the ends of the output grid. The defaults are C<cut>
+bandwidths outside the range of the data.
+
+=item * B<< C<cut> >> — how many bandwidths past the extremes of the data the default
+C<from> and C<to> reach, so that the estimate has room to fall to about zero.
+Defaults to 3.
+
+=item * B<< C<ext> >> — how many further bandwidths the internal FFT grid extends beyond
+C<from> and C<to>. Defaults to 4. Do not change it unless you know why you are
+changing it; it does not move the output grid, only the accuracy of the
+values on it.
+
+=item * B<< C<na_rm> >> — drop missing values instead of failing on them. Defaults to
+off, which is R's default too.
+
+=item * B<< C<subdensity> >> — suppress the "weights do not sum to one" warning, because
+a sub-density is what was wanted.
+
+=item * B<< C<warn_wbw> >> — whether to warn that an automatic bandwidth ignored the
+weights. Defaults on when the weights vary.
+
+=item * B<< C<old_coords> >> — reproduce the pre-R-4.4.0 grid, whose values are too
+large by a factor of about C<1 + 1/(2n-2)>. For reproducing old results only.
+
+=item * B<< C<give_rkern> >> — return R(K), the kernel's I<canonical bandwidth>, and no
+density at all. See below.
+
+=item * B<< C<nb> >> — the number of bins the C<'ucv'>, C<'bcv'> and C<'SJ'> rules use for
+their pair counts. Defaults to 1000, as in R.
+
+=back
+
+=head3 What the arguments do
+
+C<bw> is the whole ballgame. It is the standard deviation of the kernel, so it
+sets how wide each bump is, and C<adjust> multiplies it: C<< adjust =E<gt> 0.5 >> is half
+the default smoothing. Too little and the estimate follows the individual
+observations (the ticks along the bottom are the sample); too much and the two
+modes of C<eruptions> melt into one. C<bw> is reported back in the return value,
+so the number in each label below is C<< $d-E<gt>{bw} >>.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/density.bandwidth.png" alt="the same sample at four bandwidths, from far too small to far too large" width="100%" /></p>
+
+C<kernel> chooses the shape of the bump. All seven are scaled so that C<bw> is
+the kernel's standard deviation, which is why they are interchangeable in
+practice. Each panel below is one kernel on a common scale, drawn by asking for
+the density of a single observation at zero — C<< density([0], bw =E<gt> 1) >> I<is> the
+kernel — and titled with the R(K) that C<give_rkern> returns. The last panel
+puts all seven over one sample at one bandwidth, where they are hard to tell
+apart.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/density.kernels.png" alt="the seven kernels on a common scale, and the near-identical estimates they give" width="100%" /></p>
+
+C<from>, C<to> and C<cut> decide only where the grid stops: C<cut> bandwidths past
+the extremes of the data, three by default. Changing it moves the ends of
+C<< $d-E<gt>{x} >> (marked below) and nothing else — the estimate itself is the same
+function. C<weights>, on the other hand, changes the estimate: each observation
+takes its own share of the mass rather than C<1/n>, which is how a sample that
+was collected with unequal probabilities gets its population back.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/density.grid.weights.png" alt="cut moves only the ends of the grid, while weights change the estimate itself" width="100%" /></p>
+
+=head3 Return value
+
+A hash reference:
+
+=over
+
+=item * B<< C<x> >> — the C<n> grid points at which the density was estimated, an array
+reference, strictly increasing from C<from> to C<to>.
+
+=item * B<< C<y> >> — the estimated density there, an array reference of the same
+length. Never negative, though it can be zero.
+
+=item * B<< C<bw> >> — the bandwidth actually used, i.e. C<adjust> times whatever C<bw>
+resolved to. Worth reading back when a rule chose it.
+
+=item * B<< C<n> >> — the sample size after missing values were removed. Infinite
+observations still count.
+
+=item * B<< C<kernel> >> — the kernel that was used, spelled out in full, so an
+abbreviation comes back resolved.
+
+=item * B<< C<old_coords> >>, B<< C<has_na> >> — echoes of the corresponding R fields;
+C<has_na> is always 0.
+
+=back
+
+ my $d = density(\@x, bw => 'SJ');
+ printf "bandwidth %.4f over %d observations\n", $d->{bw}, $d->{n};
+
+With C<< give_rkern =E<gt> 1 >> the return is instead a plain number: R(K) = ∫K²(t)dt
+for the chosen kernel, the scale-invariant quantity that says how efficient
+that kernel is. No data is needed, and any that is given is ignored.
+
+ my $rk = density(kernel => 'epanechnikov', give_rkern => 1);   # 0.2683283
+
+Bandwidths that are "exactly equivalent" across kernels are then
+C<(R(K_gaussian)/R(K))**0.2> times each other — the adjustment is within about
+1% either way, which is why the choice of kernel rarely matters.
+
+=head3 The bandwidth rules: C<bw_nrd0>, C<bw_nrd>, C<bw_ucv>, C<bw_bcv>, C<bw_sj>
+
+The five rules C<density>'s C<< bw =E<gt> >> string can name are also callable in their
+own right, and are ports of R's C<bw.nrd0>, C<bw.nrd>, C<bw.ucv>, C<bw.bcv> and
+C<bw.SJ>. Each takes the sample the same two ways C<density> does and returns a
+plain number.
+
+ my $h = bw_nrd0(\@x);
+ my $h = bw_sj(x => \@x, method => 'dpi');
+
+They disagree, and on a bimodal sample they disagree by a factor of four. Each
+panel below is C<eruptions> at the bandwidth that rule chose, over the same
+histogram: C<nrd0> and C<nrd> assume one mode and oversmooth this sample, C<ucv>
+goes the other way, and the two C<SJ> variants land in between.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/density.bw.rules.png" alt="the same sample under each of the six bandwidth rules" width="100%" /></p>
+
+=over
+
+=item * B<< C<bw_nrd0> >> — Silverman's rule of thumb, C<0.9 * min(sd, IQR/1.34) *
+n**-0.2>, and C<density>'s default. It is the default for historical reasons
+rather than because it is the best choice.
+
+=item * B<< C<bw_nrd> >> — Scott's variation on the same rule, with 1.06 in place of 0.9.
+
+=item * B<< C<bw_ucv> >>, B<< C<bw_bcv> >> — unbiased (least-squares) and biased
+cross-validation. Both minimise a criterion over a range of bandwidths and
+warn, as R does, if the minimum turned up at one end of that range.
+
+=item * B<< C<bw_sj> >> — the Sheather & Jones (1991) selector, usually the one to
+reach for. C<< method =E<gt> 'ste' >> (the default) solves the equation;
+C<< method =E<gt> 'dpi' >> plugs in directly. These are what C<< bw =E<gt> 'SJ' >> and
+C<< bw =E<gt> 'SJ-dpi' >> select.
+
+=back
+
+The three that search also accept C<nb> (the number of bins for the pair
+counts, 1000 by default), C<lower> and C<upper> (the range searched) and C<tol>
+(where the search stops, C<0.1 * lower> by default). Unlike C<density>, these
+five want a clean numeric sample: a missing or infinite value is an error, not
+something to drop.
+
+Validated against R 4.6.1 — its own regression suite, the examples in
+C<?density> and C<?bw.nrd>, and their pinned output — by C<t/density.R.scipy.t>,
+which also cross-checks the whole binning/FFT/interpolation pipeline against
+SciPy's exact C<gaussian_kde>.
+
+The figures above are drawn by C<density.plots.pl> in the repository, from the
+same C<eruptions> and C<precip> samples that test file uses. It is an author-only
+script — it is not installed, and it needs C<Matplotlib::Simple>, C<python3> and
+C<matplotlib> — so re-run it only when a figure needs to change.
+
 =head2 dnorm
 
 gives the density of the normal distribution, with the specified mean and standard deviation.
@@ -9553,6 +9789,30 @@ I feel that this is better, and more easily read, than what you get in R:
  );
  my $kt = kruskal_test(\@x, \@g);
 
+=head3 missing values, and groups with no data
+
+Non-numeric, undefined and C<NaN> elements are silently dropped before the test
+runs, matching R's C<complete.cases(x, g)> — C<NaN> is C<NA> to R, so it goes too.
+C<+Inf> and C<-Inf> are neither, and a rank test has no trouble with them, so
+they are kept and ranked.
+
+A group left with no usable observation is refused rather than guessed at, as
+R's list interface does: C<kruskal_test> croaks C<all groups must contain data>.
+That covers an empty array reference and one whose every element was dropped.
+Counting such a group would inflate the degrees of freedom, and testing only
+the groups that do have data under a C<df> that counts one that does not is not
+a test of anything. (SciPy takes the other side of this and returns C<NaN>.)
+
+A sample with no variation at all gives a tie correction of exactly zero, so
+the statistic is C<0/0>: like R, C<statistic> and C<p_value> come back as C<NaN>.
+
+=head3 returned fields
+
+C<statistic>, C<parameter> (the degrees of freedom) and C<method> are R's C<htest>
+fields; the p-value is available as both C<p_value> and C<p.value>. On top of
+those, C<group_stats> holds C<size> and C<mean> sub-hashes keyed by your own group
+labels, computed over the same observations the statistic used.
+
 =head2 ks_test
 
 The Kolmogorov–Smirnov test checks whether two samples are drawn from the
@@ -9653,6 +9913,18 @@ or bimodal one a negative number. Add C<3> if you want the plain fourth
 standardized moment. Validated numerically against R.
 
  kurtosis(2, 4, 4, 4, 5, 5, 7, 9);        # 0.940625
+
+Kurtosis is the fourth moment, so what it describes is the tails. Below, three
+samples standardized to mean C<0> and standard deviation C<1> — a uniform sample,
+which has no mass at all left for the extremes; a normal sample; and a scale
+mixture of two normals, one observation in ten drawn with three times the spread
+— each against the same C<N(0, 1)> curve in grey, so that the only thing that
+differs between the panels is shape. On a linear axis (the top row) the
+heavy-tailed sample looks like little more than a sharper peak; the bottom row
+is the same three estimates on a logarithmic density, where the tail that the
+positive number is reporting is visible over three decades.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/kurtosis.what.png" alt="a flat-shouldered, a normal and a heavy-tailed sample, and the tails behind the kurtosis of each" width="100%" /></p>
 
 Arguments work as they do for L</"sd"> and L</"var">: plain numbers, array
 references, or any mixture of the two, all flattened into one sample.
@@ -11574,6 +11846,11 @@ Calculates sample quantiles using R's continuous Type 7 interpolation.
 
 If the C<probs> parameter is omitted, it behaves identically to R by defaulting to the 0, 25, 50, 75, and 100 percentiles (C<c(0, .25, .5, .75, 1)>). The returned hash keys match R's standardized naming convention (e.g., C<"25%">, C<"33.3%">).
 
+A probability that lands a hair outside C<[0, 1]> — the usual result of computing
+one rather than writing it down — is clamped to the endpoint rather than
+refused, within the same C<100 * eps> that R allows; anything further out is an
+error. C<undef> values in C<x> are dropped.
+
 =head2 rank
 
 Rank values like R's C<rank()>. Takes flat scalars and/or array refs (like C<min>), with optional trailing C<ties.method> / C<na.last> options. Returns the list of ranks in input order.
@@ -12078,11 +12355,15 @@ tests to see if an array reference is normally distributed, returns a p-value an
 and returns the hash reference:
 
  {
- p.value     0.589650577093106,
- p_value     0.589650577093106,
- statistic   0.960870680168535,
- W           0.960870680168535
+ p.value     0.96717393596804,
+ p_value     0.96717393596804,
+ statistic   0.986762155447719,
+ W           0.986762155447719
  }
+
+matching R's C<shapiro.test(1:5)> to the last digit it prints. Values that are
+C<undef> or C<NaN> are dropped first, exactly as R's C<complete.cases()> drops
+them, and the remaining sample must hold between 3 and 5000 values.
 
 =head2 skew
 
@@ -12092,6 +12373,15 @@ lengths of stay), negative a long left tail, and about zero a symmetric sample.
 Validated numerically against R.
 
  skew(2, 4, 4, 4, 5, 5, 7, 9);        # 0.8184875533568
+
+Below, three samples standardized to mean C<0> and standard deviation C<1>, each
+against the same C<N(0, 1)> curve in grey: a log-normal sample mirrored into a
+long left tail, a normal sample, and the log-normal itself. The sign of C<skew>
+is which side of the median the mean has ended up on — the long tail pulls the
+mean towards itself and leaves the median behind, which is why a skewed lab
+value is usually better summarized by its median than by its mean.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/skew.what.png" alt="a left-tailed, a symmetric and a right-tailed sample, with the mean and median of each" width="100%" /></p>
 
 Arguments work as they do for L</"sd"> and L</"var">: plain numbers, array
 references, or any mixture of the two, all flattened into one sample.
@@ -12143,9 +12433,9 @@ divided by C<n>):
  b1 = g1 * ((n - 1) / n)**1.5          # type 3
 
  my @x = (1, 2, 4);
- skew(\@x, type => 1);   # 0.3818017742   plain moment ratio
- skew(\@x);              # 0.9352195296   G1, the default
- skew(\@x, type => 3);   # 0.2078265621   b1
+ skew(\@x, type => 1); # 0.3818017742   plain moment ratio
+ skew(\@x);            # 0.9352195296   G1, the default
+ skew(\@x, type => 3); # 0.2078265621   b1
 
 C<< type =E<gt> 2 >> is the estimator that is unbiased for a normal sample, which is why
 it is the default and why it is what every general-purpose statistics package
@@ -12331,6 +12621,26 @@ the two groups compared can be specified, though not necessarily, as C<x> and C<
      paired => 1
  );
 
+=head3 What the test is asking
+
+Every t-test is the same three numbers. C<estimate> is what the data say — a
+mean, or a difference of means. C<mu> is what the null hypothesis says. The
+standard error is how far apart those two would ordinarily drift by chance
+alone, and C<statistic> is the distance from C<mu> to C<estimate> measured in
+standard errors:
+
+ statistic = (estimate - mu) / SE
+
+C<df> says which t distribution that statistic would follow if the null were
+true, and C<p_value> is the area of that distribution further out than the
+statistic — the chance of landing this far from C<mu>, or further, when C<mu> is
+right. Below, R's C<sleep> data as a paired test: ten patients, each measured on
+two drugs, so the ten paired differences are one sample and C<mu = 0> is "the two
+drugs are the same". The middle panel is the whole p-value; the right panel is
+one of its two tails, magnified until it can be seen.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.what.png" alt="the estimate, mu and the standard error, and the null distribution the p-value is an area under" width="100%" /></p>
+
 =head3 Parameters
 
 =for html <table>
@@ -12387,6 +12697,92 @@ the two groups compared can be specified, though not necessarily, as C<x> and C<
 </tr>
 </tbody>
 </table>
+
+=head3 C<conf_int>
+
+C<conf_int> is the estimate plus and minus a multiple of the same standard error
+the statistic divides by, and C<conf_level> picks the multiple — the t quantile
+at that level and C<df>. Nothing else goes into it. On the left below, the whole
+interval taken apart: for the paired C<sleep> test, C<2.26216 * 0.38896 = 0.87989>
+either side of C<-1.58>. On the right, the same interval at six confidence
+levels. A wider C<conf_level> needs a bigger quantile and so gives a wider
+interval, and the level at which the interval first reaches C<mu> is exactly
+C<1 - p_value> — the second panel from the bottom, whose upper bound lands on
+zero.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.conf.int.png" alt="conf_int is the estimate plus or minus a t quantile times the standard error, and conf_level sets the quantile" width="100%" /></p>
+
+=head3 C<alternative>
+
+C<alternative> decides which part of the null distribution counts against the
+null, and therefore both C<p_value> and C<conf_int>. C<"two.sided"> counts both
+tails beyond C<|statistic|>, C<"less"> counts only what lies below the statistic,
+and C<"greater"> only what lies above; the two one-sided p-values always add to
+1, and each is half the two-sided one when it is the smaller. The interval
+follows: a one-sided alternative gives a one-sided interval, with the other
+bound infinite. The example is C<t_test($drug1, $drug2)> on C<sleep> — the same
+twenty numbers as above, but unpaired.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.alternative.png" alt="the three alternatives, the region of the null distribution each one counts, and the interval that goes with it" width="100%" /></p>
+
+=head3 C<mu>, C<p_value> and C<conf_int> say one thing
+
+C<conf_int> is the set of C<mu> the test would not reject. Sweep C<mu> across the
+line and re-run the test at each value: the p-value peaks at 1 where C<mu> equals
+the estimate, and falls through C<1 - conf_level> at precisely the two bounds of
+C<conf_int>. That is what "the interval excludes zero" and "p is below 0.05" both
+mean — they are one statement, not two pieces of evidence.
+
+Which is also why C<mu> never moves C<conf_int>. Changing C<mu> changes which
+hypothesis is being tested, so C<statistic> and C<p_value> move with it; the
+interval is built around the estimate and stays where it is.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.duality.png" alt="p_value as a function of mu, crossing 1 - conf_level exactly at the two bounds of conf_int" width="100%" /></p>
+
+=head3 What a falling p-value looks like
+
+The same thing seen from the data's side: two samples drawn from two different
+distributions, pulled steadily apart. Each column below is one C<t_test> of the
+C<sleep> groups with drug 1 shifted — the top panel is the two distributions, by
+this module's own L<C<density>|/"density">, and the bottom panel is the C<conf_int>
+that comes back. The columns are four p-values five orders of magnitude apart.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.p.and.ci.png" alt="two distributions separating, and the conf_int retreating from mu as the p-value falls" width="100%" /></p>
+
+Only one thing about the interval changes: where it sits. C<df> stays at
+C<17.7765> and its width stays at C<3.5710> down the whole row, because shifting a
+sample changes neither the spread nor C<n>, and those are all the standard error
+is made of. What moves is the distance from C<mu> — and the second column is the
+hinge: at C<p_value = 0.05> the interval's upper bound is C<0.0000>, sitting
+exactly on C<mu>, because "p below 0.05" and "the 95% interval clear of C<mu>" are
+the same event.
+
+Reading the two together is the point. C<p_value> reports the distance from C<mu>
+in standard errors and nothing else, so it says how surely the difference is not
+zero, never how big it is; C<conf_int> reports the difference itself, in hours of
+sleep. The other route to a small p is a smaller standard error — more
+observations, or less spread — and that one drives C<p_value> down by narrowing
+the interval around an estimate that has not moved at all.
+
+=head3 C<paired> and C<var_equal>
+
+The same twenty numbers give three different answers depending on what is
+assumed about them. C<< paired =E<gt> 1 >> says the two vectors are two measurements of
+the same ten subjects and tests the ten differences, which removes the
+subject-to-subject variation and here turns C<p = 0.079> into C<p = 0.0028>.
+Unpaired, C<< var_equal =E<gt> 1 >> pools the two variances into one and spends
+C<n(x) + n(y) - 2> degrees of freedom; the default Welch test does not pool, and
+buys that safety with a fractional C<df> from the Welch–Satterthwaite equation.
+
+Welch's C<df> is at most C<n(x) + n(y) - 2>, reaching it only when the two spreads
+match, and falls toward C<n - 1> of whichever sample dominates the standard error
+as they separate. The middle and right panels sweep C<t.test(1:10, 7:20)> — the
+other example in R's C<?t.test> — scaling the spread of C<y> about its own mean:
+C<var_equal> keeps claiming 22 degrees of freedom throughout, and pays for the
+claim with a p-value that is wrong by three orders of magnitude at the left-hand
+edge.
+
+=for html <p><img src="https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.designs.png" alt="paired, var_equal and Welch on the same data, and the Welch degrees of freedom as the two spreads separate" width="100%" /></p>
 
 =head3 Extreme C<conf_level>
 
@@ -12481,6 +12877,19 @@ Dies if:
 </tr>
 </tbody>
 </table>
+
+Validated against R 4.x's C<stats::t.test> and against C<scipy.stats> — cases
+lifted from R's own regression suite and from SciPy's C<TestTTest_1samp>,
+C<TestTTest_ind> and confidence-interval tests — by C<t/t_test.t>.
+
+The figures above are drawn by C<t.test.plots.pl> in the repository, from the
+two examples in R's C<?t.test>: the C<sleep> data (C<t = -1.8608>, C<df = 17.776>,
+C<p-value = 0.07939> unpaired, C<t = -4.0621>, C<df = 9>, C<p-value = 0.002833>
+paired) and C<t.test(1:10, y = c(7:20))>. Every number annotated on them comes
+back out of C<t_test> itself, so a figure cannot drift away from the module. It
+is an author-only script — it is not installed, and it needs
+C<Matplotlib::Simple>, C<python3> and C<matplotlib> — so re-run it only when a
+figure needs to change.
 
 =head2 transpose
 
@@ -13478,6 +13887,530 @@ C<t/model_pvalue_tails.t> and C<t/oneway_test.R.scipy.t>.
 
 =head1 Changes
 
+=head2 0.301 2026-08-21 CDT
+
+there are numerous additions of C<restrict> keywords, which may or may not improve speed
+
+=head3 kruskal_test
+
+C<kruskal_test> cross-validated against R 4.6.1's C<stats::kruskal.test()> and
+SciPy 1.18.0's C<TestKruskal>, driven by those suites' own cases rather than by
+cases invented here. Six bugs are fixed: five in how the arguments and the data
+are read before any ranking happens, and one in the chi-squared tail, which
+reaches every function that uses it. The test now needs a third of the memory
+and runs in under half the time, and it returns the same answer twice in a row,
+which it did not before.
+
+Everything below is checked in the new C<t/kruskal_test.R.scipy.t> (870 tests),
+whose expected values are frozen literals with their provenance recorded in the
+file header; it needs no R and no Python to run. The generator that produced
+them, C<t/kruskal_test.R.scipy.R>, is committed beside it. There had been no
+C<t/kruskal_test.t> at all — the only coverage was six assertions in C<t/01.t> on
+the single Hollander & Wolfe example, and none of the six bugs would have shown
+up in it. The full suite is 125 files and 25,951 tests, and
+C<./test.all.perls.pl> passes on all five local perls — C<5.10.1>, C<5.12.5>
+(long double), C<5.42.3>, C<5.44.0> and C<5.44.0-quadmath> — with no warnings on
+any of them.
+
+=head4 NaN was ranked instead of dropped
+
+C<looks_like_number> is true for C<NaN>, so a C<NaN> went into the ranking. R
+treats C<NaN> as C<NA> and C<complete.cases(x, g)> removes it before C<rank()> ever
+sees it:
+
+=for html <table>
+<thead>
+<tr>
+  <th>data</th>
+  <th>was</th>
+  <th>R 4.6.1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>c(1,2,3,4,5,6)</code> with one <code>NaN</code>, n = 7</td>
+  <td><code>H = 4.5</code></td>
+  <td><code>H = 3.8571428571428577</code></td>
+</tr>
+<tr>
+  <td><code>1:24</code> with one <code>NaN</code></td>
+  <td><code>H = 17.28</code></td>
+  <td><code>H = 16.5</code></td>
+</tr>
+</tbody>
+</table>
+
+It also handed C<cmp_nv3> a comparison that is never true for any pair
+involving the C<NaN>, which leaves C<qsort> without the strict weak ordering it is
+entitled to — the same defect C<wilcox_test> had fixed in 0.298, where the
+comment describing it is still in the file. C<+Inf> and C<-Inf> are neither C<NA>
+nor C<NaN> to R and a rank test has no trouble with them, so they are still kept
+and ranked; that is now pinned rather than incidental.
+
+The bad value propagated: C<table_one>'s C<_t1_cont_p> hands its groups straight
+to C<kruskal_test>, so a single C<NaN> among nine observations was reported at
+C<p = 0.0273> where dropping it gives C<0.0439>.
+
+=head4 A group with no data inflated the degrees of freedom
+
+The hash-of-arrays form counted every key in C<k>, including a key whose array
+was empty or whose every element had been dropped. On
+C<< {a =E<gt> [1,1,1], b =E<gt> [2,2,2], c =E<gt> []} >> that gave C<df = 2> and
+C<p = 0.0820849986238988> for what is a two-group problem with
+C<df = 1, p = 0.025347318677468304>. Such a group was already skipped when
+forming the statistic and when building C<group_stats>; only C<df> still counted
+it.
+
+R refuses this case outright — C<all groups must contain data> — and so does
+C<kruskal_test> now, because the alternative is to test the groups that do have
+data under a C<df> that counts one that does not. R's order of checks came with
+it: it filters each group, refuses an empty one, and only then counts what is
+left, so C<< {a =E<gt> [], b =E<gt> []} >> is C<all groups must contain data> and not
+C<not enough observations>. SciPy takes the other side of this and returns C<NaN>
+with a C<SmallSampleWarning>; the divergence is recorded in the test file rather
+than papered over. The C<x>/C<g> form cannot reach any of this — it mints a group
+id the first time an observation survives the filter — so nothing changes there.
+
+=head4 Group labels were truncated at a NUL and lost their UTF-8 flag
+
+The C<x>/C<g> path read the label with C<SvPV_nolen> and then took C<strlen> of it.
+Perl strings are counted, not NUL-terminated, so C<"a\0X"> and C<"a\0Y">
+collapsed into one group: C<kruskal_test([1..6], ["a\0X","a\0X","a\0Y","a\0Y","b","b"])>
+came back as two groups with C<df = 1, H = 2.4> instead of three with
+C<df = 2, H = 4.571428571428573>. Both paths also copied the label's bytes while
+dropping perl's UTF-8 flag when storing it into C<group_stats>, so a label
+outside latin-1 came back as mojibake and the two input paths disagreed with
+each other about labels inside it. The length now travels with the string and
+carries the flag in its sign, which is C<hv_store>'s own convention, so a label
+comes back C<eq> to what went in. Dropping the C<strlen> also drops a pass over
+every label.
+
+=head4 A trailing named argument read past the argument stack
+
+The named-argument loop took C<ST(arg_idx + 1)> without checking that there was
+one, so an odd argument list read one slot past the top of the stack — and what
+it found there changed which branch ran: C<kruskal_test(\%h, 'x')> came back
+complaining that C<'h'> cannot be mixed with C<'x'>/C<'g'>, because C<x_sv> had been
+assigned whatever was past the end. C<binom_test>, C<chisq_test>, C<fisher_test>,
+C<wilcox_test>, C<var_test> and C<prcomp> all guard this; C<kruskal_test> was the
+one that did not. It now croaks C<odd number of named arguments>.
+
+=head4 An infinite chi-squared statistic gave no p-value
+
+C<get_p_value> short-circuits a statistic at or below zero and otherwise goes to
+C<igamc>. C<+Inf> is neither, so it reached the continued fraction, where the
+first C<1/d> is C<1/Inf = 0> and then C<del = 0 * Inf> is C<NaN> — an overwhelmingly
+significant result reported as no result at all. R's
+C<pchisq(Inf, df, lower.tail = FALSE)> is C<0>, and so is this now. C<NaN> in gives
+C<NaN> out, as R does, rather than running the continued fraction to its full
+10,000-iteration safety bound first.
+
+This is reachable from C<kruskal_test>. When a sample has no variation at all
+the tie correction is C<(n^3 - n)/(n^3 - n)>, and once C<n^3> is past C<2^53> the
+subtraction of C<n> is lost from one side or the other, so an inexact zero is
+divided by an exact zero. R has the same problem and returns C<+Inf>, C<-Inf> or
+C<NaN> depending on which way C<n> rounded: C<NaN> at C<n = 250000>, C<-Inf> at
+C<300000>, C<NaN> at C<400000>, C<+Inf> at C<500000>, C<NaN> at C<750000>, C<+Inf> at
+C<1000000>, C<NaN> at C<1500000> and C<+Inf> at C<2000000>. C<kruskal_test> now agrees
+with it on all eight. Below that the correction is exact and both give C<NaN>,
+which the corpus pins. C<get_p_value> is shared, so C<chisq_test>, C<prop_test>,
+C<mcnemar_test>, C<friedman_test>, C<cmh_test>, C<logrank_test> and C<coxph> get the
+same fix.
+
+=head4 Three times less memory, twice the speed
+
+The ranking no longer goes through C<RankInfo> and C<rank_and_count_ties>.
+C<kruskal_test> wants per-group rank sums, not the ranks themselves, so it sorts
+a 16-byte C<(value, group)> pair and adds each tie block's averaged rank straight
+into the group sums, instead of storing an C<NV> rank per observation for a
+second pass to read.
+
+It also no longer calls C<qsort>. glibc's C<qsort> is a mergesort that allocates a
+scratch buffer the size of the whole array — measured on glibc 2.39 as a
+C<VmHWM> of 116 MB going to 230 MB across one sort of a 114 MB array — which was
+half of the function's peak memory, and its comparison goes through a function
+pointer that cannot be inlined. In its place is a median-of-three introsort that
+recurses on the smaller partition and loops on the larger, so the stack stays
+C<O(log n)>, with a heapsort fallback past a depth of C<2*floor(log2(n))> so an
+adversarial input cannot drive it to C<O(n^2)>, and insertion sort for short
+runs. Sorting the same five-million-element array takes 0.375s against C<qsort>'s
+1.01s and allocates nothing. The third change is the group-label array on the
+C<x>/C<g> path, which was sized at one pointer per I<observation> to hold one per
+I<group> — 40 MB at C<n = 5e6> to hold three pointers — and now grows on demand.
+
+At C<n = 5,000,000> over three groups, measured as C<VmHWM> either side of the
+call:
+
+=for html <table>
+<thead>
+<tr>
+  <th></th>
+  <th>0.3</th>
+  <th>0.301</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>peak memory</td>
+  <td>228 MB (47.8 B/obs)</td>
+  <td>76 MB (15.9 B/obs)</td>
+</tr>
+<tr>
+  <td><code>kruskal_test(\@x, \@g)</code></td>
+  <td>1.20 s</td>
+  <td>0.557 s</td>
+</tr>
+<tr>
+  <td><code>kruskal_test(\%h)</code></td>
+  <td>1.11 s</td>
+  <td>0.467 s</td>
+</tr>
+</tbody>
+</table>
+
+Sorted, reversed, all-equal, organ-pipe and median-of-three-killer inputs all
+stay under 0.32s at C<n = 2e6>, which is what the depth limit is there for. The
+sort is checked against an independent pure-Perl implementation of the whole
+test over 748 structured cases — those shapes at every n either side of the
+insertion-sort threshold — and 49,712 random ones.
+
+=head4 The same input now gives the same answer
+
+C<H> moved by up to C<1.2e-14> between runs on identical data. Nothing was random:
+the sum of C<R_i^2 / n_i> walked the groups by group id, and on the
+hash-of-arrays path an id is minted in C<hv_iternext> order, which is perl's
+per-process hash order. Equal values were also left in whatever relative order
+the sort happened to leave them, which came from the same place.
+
+The sort now orders by value and then by group, which makes it a total order,
+and the C<k> terms of the sum are ordered before they are added — smallest first,
+which is the better-conditioned direction as well as a canonical one. C<k> is the
+number of groups, not the number of observations, so it costs nothing next to
+the ranking. C<H> is now bit-identical to R on all 37 corpus cases in all four
+call forms, and stays so across 60 runs under C<PERL_PERTURB_KEYS=1>.
+
+=head3 Documentation
+
+C<kruskal_test> gains two sections: what happens to non-numeric, undefined,
+C<NaN> and infinite elements and to a group left with no data, and what the
+returned fields are — C<statistic>, C<parameter>, C<method> and the p-value under
+both C<p_value> and C<p.value> from R's C<htest>, plus the C<size> and C<mean>
+sub-hashes of C<group_stats>, which are computed over the same observations the
+statistic used.
+
+=head2 0.3 2026-08-16 CDT
+
+=head3 shapiro_test
+
+C<shapiro_test> rebuilt against R 4.6.1's C<src/library/stats/src/swilk.c> — AS R94,
+Royston (1995) — driven by R's and SciPy's own test suites rather than by cases
+invented here. Four bugs are fixed, one of them a case R's regression suite
+tests for by name, and the statistic is now more accurate than R's own on a
+sample whose values dwarf its spread.
+
+Everything below is checked in the new C<t/shapiro_test.R.scipy.t> (146 tests),
+whose expected values are frozen literals with their provenance recorded in the
+file header; it needs no R and no Python to run. The generators that produced
+them, C<t/shapiro_test.R.scipy.R> and C<t/shapiro_test.R.scipy.py>, are committed
+beside it. The full suite is 124 files and 25,081 tests, and
+C<./test.all.perls.pl> passes on all five local perls — C<5.10.1>, C<5.12.5>
+(long double), C<5.42.3>, C<5.44.0> and C<5.44.0-quadmath> — with no warnings on
+any of them.
+
+=head4 The p-value could come back negative
+
+R's C<tests/reg-tests-1b.R> contains exactly one C<shapiro.test> assertion, and it
+is this:
+
+ stopifnot(shapiro.test(c(0,0,1))$p.value >= 0)
+
+C<shapiro_test([0,0,1])> returned C<-4.6648135328131477e-15>. At C<n = 3> the
+p-value is C<6/pi * (asin(sqrt(W)) - asin(sqrt(3/4)))> and C<W> has an exact floor
+of C<3/4> that C<c(0,0,1)> sits on, so the subtraction lands on zero from
+whichever side the constants round to; R clamps the result at 0 and this module
+did not. It is the same defect SciPy fixed as gh-18322. The clamp is in, and
+C<asin(sqrt(3/4)) = pi/3> is now carried to NV width rather than R's 15 digits,
+so the same case comes out at C<+4.2e-16> before clamping instead of below zero.
+
+=head4 W and the p-value were only good to nine digits
+
+The expected normal order statistics that AS R94 weights the sample with came
+from C<inverse_normal_cdf()>, which is Moro's approximation and good to about
+C<1e-9>. They go straight into C<W>, so nine digits there is nine digits in the
+answer — where R reports sixteen. Against the values SciPy pins in
+C<TestShapiro>, every one of them annotated upstream as I<"reference values
+generated using R shapiro.test">:
+
+=for html <table>
+<thead>
+<tr>
+  <th>SciPy case</th>
+  <th>W was</th>
+  <th>W is</th>
+  <th>R 4.6.1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>test_basic</code> x1</td>
+  <td><code>0.900472879324135</code></td>
+  <td><code>0.900472879317561</code></td>
+  <td><code>0.90047287931756</code></td>
+</tr>
+<tr>
+  <td><code>test_basic</code> x2</td>
+  <td><code>0.959026945965277</code></td>
+  <td><code>0.959026946032345</code></td>
+  <td><code>0.95902694603234</code></td>
+</tr>
+<tr>
+  <td><code>test_basic2</code> x4</td>
+  <td><code>0.834666275331324</code></td>
+  <td><code>0.834666275318169</code></td>
+  <td><code>0.83466627531817</code></td>
+</tr>
+</tbody>
+</table>
+
+and the p-values with them:
+
+=for html <table>
+<thead>
+<tr>
+  <th>SciPy case</th>
+  <th>p was</th>
+  <th>p is</th>
+  <th>R 4.6.1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>test_basic</code> x1</td>
+  <td><code>0.0420895752342124</code></td>
+  <td><code>0.0420895752222577</code></td>
+  <td><code>0.04208957522226</code></td>
+</tr>
+<tr>
+  <td><code>test_basic</code> x2</td>
+  <td><code>0.524597929157127</code></td>
+  <td><code>0.524597930470668</code></td>
+  <td><code>0.5245979304707</code></td>
+</tr>
+<tr>
+  <td><code>test_basic2</code> x4</td>
+  <td><code>0.000913490482316994</code></td>
+  <td><code>0.000913490481812984</code></td>
+  <td><code>0.000913490481813</code></td>
+</tr>
+</tbody>
+</table>
+
+Moro's value is still the starting point, but Newton against the C<erfc>-based
+normal CDF finishes it. The loop stops as soon as another pass could not move
+the answer, so a C<double> build pays for one refinement and only the wider NVs
+pay for a second. Across a 180-sample sweep over normal, uniform, exponential,
+log-normal, Cauchy, tied, tiny-scale and grid data at every n from 3 to 5000,
+the worst remaining disagreement with R is C<2.0e-15> in C<W> and C<2.6e-12> in the
+p-value — the latter is not sloppier arithmetic but the same last bit amplified,
+since the p-value is a function of C<log(1 - W)> over a sigma of about C<0.6>.
+
+=head4 1 - W was formed by subtracting from 1
+
+The p-value depends on C<log(1 - W)>, and C<W> runs to within C<1e-5> of 1 on a
+large normal sample, so computing C<W = b^2/ssq> and then C<1 - W> throws away
+exactly the digits the p-value is made of. R does not do this — its C<swilk.c>
+forms C<w1 = (ssassx - sax) * (ssassx + sax) / (ssa * ssx)> directly and says so
+in a comment — and now neither does this module.
+
+=head4 More accurate than R when the values dwarf their own spread
+
+R's C<swilk.c> divides the sample by its range but never centres it, so C<1e9 +
+noise> loses most of its significant digits before C<W> is ever formed. SciPy
+filed the same complaint from the other end as gh-14462 and works around it by
+subtracting the median; this module now does that too, which costs one
+subtraction per value.
+
+Measured against a 60-digit C<mpmath> evaluation of AS R94 on the identical
+doubles, over C<1e6 + noise> and C<1e9 + noise> at every n from 3 to 5000:
+
+=for html <table>
+<thead>
+<tr>
+  <th></th>
+  <th>worst relative error in W</th>
+  <th>worst in the p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>R 4.6.1</td>
+  <td><code>1.9e-8</code></td>
+  <td><code>2.6e-7</code></td>
+</tr>
+<tr>
+  <td><code>shapiro_test</code></td>
+  <td><code>1.0e-15</code></td>
+  <td><code>1.4e-13</code></td>
+</tr>
+</tbody>
+</table>
+
+On well-conditioned samples the two still agree to the last few ulp, so this is
+a divergence only where R has already lost the digits. C<t/shapiro_test.R.scipy.t>
+asserts the invariance rather than R's number there, and records why at that
+section.
+
+=head4 Faster as well
+
+The sort now goes through the module's own introsort rather than C<qsort()>,
+whose comparator the compiler cannot inline; the order statistics are generated
+for half the sample and mirrored, since the weights are antisymmetric; and ten
+C<pow()> calls became Horner evaluations. C<pow()> is a C<__float128> call on a
+quadmath perl.
+
+=for html <table>
+<thead>
+<tr>
+  <th>n</th>
+  <th>was</th>
+  <th>is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>10</td>
+  <td>0.83 µs</td>
+  <td>0.78 µs</td>
+</tr>
+<tr>
+  <td>100</td>
+  <td>4.78 µs</td>
+  <td>5.05 µs</td>
+</tr>
+<tr>
+  <td>1000</td>
+  <td>79.3 µs</td>
+  <td>49.8 µs</td>
+</tr>
+<tr>
+  <td>5000</td>
+  <td>578 µs</td>
+  <td>459 µs</td>
+</tr>
+</tbody>
+</table>
+
+C<n = 100> is the one size that got slower: at that length the accurate
+quantiles are most of the work and there is not enough sorting to pay for them.
+That trade was taken deliberately.
+
+=head4 One documented value was wrong
+
+The hash printed under C<shapiro_test> in this README, in C<read.me.pod> and in
+the module's own POD showed C<statistic 0.960870680168535> and C<p.value
+0.589650577093106> — the pre-fix numbers, and for C<[1..19]> while the example
+above them calls C<shapiro_test([1..5])>. It now shows what C<[1..5]> actually
+returns, C<0.986762155447719> and C<0.96717393596804>, which is R's
+C<shapiro.test(1:5)> to the last digit R prints.
+
+=head3 quantile
+
+=head4 Interpolation ran between order statistics that were equal
+
+R's type 7 interpolates only when the index falls strictly between two order
+statistics I<that differ> — C<< index E<gt> lo & x[hi] != qs >> in C<quantile.default>.
+This module always evaluated C<(1 - g) * x[j] + g * x[j+1]>, which does not
+return C<v> when both sides are C<v>. On a two-valued sample at C<n = 999> it
+reported C<0.99999999999994> for C<1>, and on the 602 identical values R's
+PR#16672 was filed about it failed to return that value at every prob — which
+is the monotonicity failure the PR is about. Both now match R exactly.
+
+=head4 Probabilities a hair outside [0, 1] were refused
+
+A probability arrived at by arithmetic rather than written down can land just
+outside the interval. R allows C<100 * .Machine$double.eps> of overshoot and
+clamps to the endpoint — its PR#17891, C<quantile(0:1, 1+1e-14) == 1> — where
+this module raised an error. It now clamps within the same allowance and still
+errors on anything further out. R's constant is used rather than C<NV_EPSILON>
+on purpose: it is part of what the function I<accepts>, so a long-double or
+C<__float128> build must not reject a C<probs> vector R takes.
+
+=head4 Faster
+
+The sort was C<qsort()> with a function-pointer comparator; it is now the same
+introsort C<shapiro_test> uses. Ordering 5000 NVs costs about 61,000
+comparisons, and paying for an indirect call on every one of them is most of
+what a sort of that size costs.
+
+=for html <table>
+<thead>
+<tr>
+  <th>n</th>
+  <th>was</th>
+  <th>is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>100</td>
+  <td>3.2 µs</td>
+  <td>2.7 µs</td>
+</tr>
+<tr>
+  <td>1000</td>
+  <td>52.5 µs</td>
+  <td>22.8 µs</td>
+</tr>
+<tr>
+  <td>10,000</td>
+  <td>1.07 ms</td>
+  <td>0.72 ms</td>
+</tr>
+<tr>
+  <td>100,000</td>
+  <td>13.7 ms</td>
+  <td>8.8 ms</td>
+</tr>
+</tbody>
+</table>
+
+Both fixes and the sort are covered by the new C<t/quantile.R.t> (197 tests, or
+205 under C<EXTENDED_TESTING>), built on the two assertions R's own suite makes
+about C<quantile> — that C<quantile(x, ((1:n)-1)/(n-1))> recovers C<sort(x)>, and
+that it equals the type-7 interpolation computed by hand off the sorted sample
+— run over seven input shapes chosen to break a quicksort (sorted, reversed,
+organ pipe, two-valued, tie ladder, sawtooth) at every n either side of the
+insertion-sort threshold and the recursion depth limit, plus PR#16672 and
+PR#17891 verbatim and 79 frozen R value tables. Its generator,
+C<t/quantile.R.R>, is committed beside it.
+
+=head3 Documentation
+
+Illustrations for three more functions, drawn by C<t.test.plots.pl> and
+C<skew.kurtosis.plots.pl>, both committed:
+
+=over
+
+=item * B<< C<t_test> >> gains six: what the estimate, the standard error and the null
+distribution are and which area of it the p-value is; how C<conf_int> is the
+estimate plus or minus a t quantile and how C<conf_level> sets that quantile;
+the three C<alternative>s side by side with the region each counts and the
+interval that goes with it; C<p_value> as a function of C<mu>, crossing
+C<1 - conf_level> exactly at the two bounds of C<conf_int>; paired,
+C<var_equal> and Welch on the same data, with the Welch degrees of freedom as
+the two spreads separate; and two distributions separating with the interval
+retreating from C<mu> as the p-value falls.
+
+=item * B<< C<skew> >> gains a left-tailed, a symmetric and a right-tailed sample against
+the same C<N(0, 1)> curve, with the mean and median of each, which is what the
+sign of the statistic is reporting.
+
+=item * B<< C<kurtosis> >> gains a flat-shouldered, a normal and a heavy-tailed sample
+with the tails behind each drawn out, since it is the tails and not the peak
+that the statistic is measuring.
+
+=back
+
 =head2 0.298 2026-08-12 CDT
 
 =head3 wilcox_test
@@ -13962,11 +14895,19 @@ answers were simply less accurate than the perl running them. On perl-5.12.5
 
 All 412 of those calls now go through C<nv_*> macros that paste on the suffix for
 the width C<NV> actually is: none for C<double>, C<l> for C<long double>, C<q> for
-C<__float128>. The 80 C<isnan>/C<isinf>/C<isfinite> calls became
-C<Perl_isnan>/C<Perl_isinf>/C<Perl_isfinite>, which matters most where the C99
-type-generic macros are absent: there C<isfinite()> is a plain C<double> function,
-and narrowing a large-but-finite long double into it reports the value as
-infinite rather than merely rounding it.
+C<__float128>. The 80 C<isnan>/C<isinf>/C<isfinite> calls became C<nv_isnan>,
+C<nv_isinf> and C<nv_isfinite>, which classify by comparing against C<NV_MAX> — the
+largest finite C<NV> — rather than calling libm at all. The C99 macros could not
+be kept: where a platform does not provide the type-generic versions,
+C<isfinite()> is a plain C<double> function, and narrowing a large-but-finite long
+double into it reports the value as infinite rather than merely rounding it.
+Perl's own C<Perl_isnan>/C<Perl_isinf>/C<Perl_isfinite> were used up to 0.298 and
+could not be kept either: on every perl before 5.22 those route through a
+C<Perl_fp_class()> block in C<perl.h> that has never compiled — the macro is
+written with an empty parameter list and compares against C<FP_CLASS_*> names no
+C<< E<lt>ieeefp.hE<gt> >> defines. That block is dead code wherever Configure finds
+C<isinf()>, so it is invisible on Linux and glibc, and live on illumos/Solaris,
+where it broke the 0.298 build outright.
 
 The long-double row is conditional. The C<l> variants are C99 but some libms —
 the thinner BSD ones especially — do not ship the whole set, so C<Makefile.PL>

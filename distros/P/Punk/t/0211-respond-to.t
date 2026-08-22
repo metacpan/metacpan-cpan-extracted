@@ -122,4 +122,52 @@ $t->get_ok('/bad', headers => { Accept => 'application/json' })
   ->status_is(500, 'an unknown format name croaks (and the dispatcher '
                  . 'turns the die into the 500)');
 
+# The other three refusals. respond_to reads its arguments as pairs off the
+# stack, so a caller who gets the shape wrong is a caller whose formats and
+# callbacks are off by one - which would otherwise show up as the wrong body
+# for the right Accept, rather than as an error.
+{
+    package MisuseApp;
+    use Punk;
+
+    get '/odd' => sub {
+        my ($c) = @_;
+        $c->respond_to(json => sub { $_[0]->json({}) }, 'html');
+    };
+    get '/none'    => sub { $_[0]->respond_to };
+    get '/notcode' => sub {
+        my ($c) = @_;
+        $c->respond_to(json => 'Web::Thing#method');   # a target, not a coderef
+    };
+    get '/toomany' => sub {
+        my ($c) = @_;
+        # 17 formats, one past PRT_MAX. Full media types, because the
+        # unknown-format check fires before the count and `x1` is not one.
+        $c->respond_to(map { ("application/x-$_" => sub { $_[0]->text('x') }) }
+                       1 .. 17);
+    };
+    package main;
+
+    my $m = Punk::Test->new('MisuseApp');
+
+    $m->get_ok('/odd')->status_is(500);
+    $m->json_like('/errors/0/message' => qr/format => coderef pairs/,
+        'an odd number of arguments is refused - the pair after it would '
+      . 'have been read off the end of the stack');
+
+    $m->get_ok('/none')->status_is(500);
+    $m->json_like('/errors/0/message' => qr/format => coderef pairs/,
+        'and so is respond_to with nothing to respond with');
+
+    $m->get_ok('/notcode')->status_is(500);
+    $m->json_like('/errors/0/message' => qr/'json' needs a coderef/,
+        'a format whose handler is not a coderef names the format - '
+      . 'respond_to does not resolve controller targets the way a route does');
+
+    $m->get_ok('/toomany')->status_is(500);
+    $m->json_like('/errors/0/message' => qr/at most 16 formats/,
+        'and the fixed table has a stated ceiling rather than a buffer to '
+      . 'run off the end of');
+}
+
 done_testing;

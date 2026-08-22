@@ -1,3 +1,7 @@
+/*
+ * CLI subcommand histo stats: statistical moments, quantiles, and summaries.
+ */
+
 #include "cli_common.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +14,7 @@ static void print_stats_usage(FILE *out) {
     if (!out) out = stdout;
     fprintf(out, "Usage: histo-stats [OPTIONS] [HISTOGRAM_FILE...]\n");
     fprintf(out, "       histo stats [OPTIONS] [HISTOGRAM_FILE...]\n\n");
-    fprintf(out, "Displays comprehensive statistical summary, moments, and robust metrics.\n\n");
+    fprintf(out, "Displays comprehensive statistical summary, moments, and robust metrics for 1D and 2D histograms.\n\n");
     fprintf(out, "Options:\n");
     fprintf(out, "  -f, --format=<FMT>       Output format: table (default), json, tsv\n");
     fprintf(out, "  -a, --all                Compute all extended higher moments and peak metrics\n");

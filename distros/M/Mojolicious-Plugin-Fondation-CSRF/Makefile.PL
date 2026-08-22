@@ -25,15 +25,17 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::Fondation::CSRF",
   "PREREQ_PM" => {
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => "0.07",
+    "Mojolicious::Plugin::Fondation" => "0.08",
     "Mojolicious::Plugin::Fondation::Problem" => "0.03"
   },
   "TEST_REQUIRES" => {
     "File::Temp" => "0.01",
+    "Mojolicious::Plugin::Fondation::SessionStore" => 0,
+    "Mojolicious::Plugin::OpenAPI" => 0,
     "Test::Mojo" => 0,
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,8 +45,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "File::Temp" => "0.01",
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => "0.07",
+  "Mojolicious::Plugin::Fondation" => "0.08",
   "Mojolicious::Plugin::Fondation::Problem" => "0.03",
+  "Mojolicious::Plugin::Fondation::SessionStore" => 0,
+  "Mojolicious::Plugin::OpenAPI" => 0,
   "Test::Mojo" => 0,
   "Test::More" => "1.00"
 );

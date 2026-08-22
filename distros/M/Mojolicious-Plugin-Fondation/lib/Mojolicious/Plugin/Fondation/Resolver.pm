@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Resolver;
-$Mojolicious::Plugin::Fondation::Resolver::VERSION = '0.07';
+$Mojolicious::Plugin::Fondation::Resolver::VERSION = '0.08';
 # ABSTRACT: Dependency graph resolver with cycle detection and topological sort
 
 use Mojo::Base -base, -signatures;
@@ -200,7 +200,7 @@ Mojolicious::Plugin::Fondation::Resolver - Dependency graph resolver with cycle 
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 AUTHOR
 

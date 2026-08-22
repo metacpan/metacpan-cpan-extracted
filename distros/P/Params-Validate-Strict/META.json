@@ -79,6 +79,6 @@
          "x_repository" : "https://github.com/nigelhorne/Params-Validate-Strict"
       }
    },
-   "version" : "0.38",
+   "version" : "0.39",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

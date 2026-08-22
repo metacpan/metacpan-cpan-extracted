@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-Fondation
 
+0.08      2026-08-21 19:57:38+02:00 Europe/Paris
+    - fix: route conditions must not render — deferred denial via fondation.denied marker
+
 0.07      2026-08-06 23:37:57+02:00 Europe/Paris
     - many_to_many_async relationships discovered via _many_to_many metadata
     - Add issues = 1 to GithubMeta to point bugtracker to GitHub issues

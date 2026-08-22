@@ -1,0 +1,10 @@
+#!include_default
+
+# Project-specific: generated simulation outputs (see .gitignore)
+\.xyz$
+\.data$
+\.lammpstrj$
+(^|/)log\.lammps$
+
+# Build/dist directory created by `make dist`
+^Physics-PVD-[0-9]

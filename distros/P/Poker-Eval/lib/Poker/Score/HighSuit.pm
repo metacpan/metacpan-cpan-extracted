@@ -1,6 +1,6 @@
 package Poker::Score::HighSuit;
+our $VERSION = '0.12';
 
-our $VERSION = '0.11';
 
 use Moo;
 
@@ -10,7 +10,7 @@ Poker::Score::HighSuit - Score highest card of a specific suit.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Auth::Token;
-$Mojolicious::Plugin::Fondation::Auth::Token::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Auth::Token::VERSION = '0.03';
 # ABSTRACT: Personal Access Token authentication for Fondation
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -108,21 +108,23 @@ sub register ($self, $app, $config) {
         return 1 unless $route->pattern->match($c->req->url->path->to_string);
 
         if ($c->stash('fondation.bearer_invalid')) {
-            $c->problem(
+            $c->res->code(403);
+            $c->stash('fondation.denied' => {
                 status => 403,
                 title  => 'Access denied',
                 detail => 'Invalid bearer token',
-            ) if !$c->res->code || $c->res->code == 200;
+            }) unless $c->stash('fondation.denied');
             return undef;
         }
 
         return 1 if $c->is_user_authenticated;
 
-        $c->problem(
+        $c->res->code(401);
+        $c->stash('fondation.denied' => {
             status => 401,
             title  => 'Access denied',
             detail => 'Authentication required',
-        ) if !$c->res->code || $c->res->code == 200;
+        }) unless $c->stash('fondation.denied');
         return undef;
     });
 
@@ -197,7 +199,7 @@ Mojolicious::Plugin::Fondation::Auth::Token - Personal Access Token authenticati
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

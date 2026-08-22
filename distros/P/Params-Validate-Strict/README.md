@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.38
+Version 0.39
 
 # SYNOPSIS
 
@@ -38,7 +38,9 @@ and I have a couple of other reasons for writing it.
 
 - WAF
 
-    The schema can be plumbed into a WAF to protect from random user input.
+    The schema can be plumbed into a WAF,
+    e.g., [VWF](https://github.com/nigelhorne/VWF/),
+    to protect from random user input.
 
 - Improved API Documentation
 
@@ -47,7 +49,7 @@ and I have a couple of other reasons for writing it.
 
 - I like it
 
-    I find it fun to write this,
+    I found it fun to write this,
     even if nobody else finds it useful,
     though I hope you will.
 

@@ -1,7 +1,14 @@
 Revision history for Math-Histo
 
+0.2.0   2026-08-21
+        - Add 6 new parametric curve fitting models (Log-Normal, Gauss+Linear, Weibull, Gamma, Poisson, Laplace).
+        - Add Math::Histo::Fit->eval and eval_grad for direct model & analytical Jacobian evaluation.
+        - Add Math::Histo->create_auto automated bin estimation (FD, Scott, Sturges, Doane, Knuth).
+        - Document all models in POD and synchronize C API constants.
+
 0.1.0   2026-08-20
         - Initial CPAN release of Math::Histo XS wrapper for libhisto.
+
         - Support for 1D and 2D uniform and variable histograms.
         - High-performance scalar, batch (fill_n), and packed binary ingestion.
         - Complete statistical moments, robust statistics (IQR, MAD, trimmed/winsorized mean).

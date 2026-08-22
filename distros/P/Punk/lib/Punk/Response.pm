@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 1;
 
@@ -62,8 +62,8 @@ The live header pair arrayref.
 
 The PSGI triplet: a reference body is JSON-encoded
 (C<application/json>) through the File::Raw::JSON C ABI, a string is
-C<text/html> unless L</type> says otherwise, no body is a
-C<text/plain> empty 200; Content-Length always set.
+C<text/html; charset=utf-8> unless L</type> says otherwise, no body is an empty
+C<text/plain; charset=utf-8> 200; Content-Length always set.
 
 =head1 AUTHOR
 

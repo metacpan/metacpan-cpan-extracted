@@ -1,6 +1,6 @@
 package Poker::Game;
+our $VERSION = '0.12';
 
-our $VERSION = '0.11';
 
 use strict;
 use warnings FATAL => 'all';
@@ -17,44 +17,58 @@ Poker::Game - Base class for named poker variants
     use Poker::Game::Holdem;
     use feature qw(say);
 
-    my $game = Poker::Game::Holdem->new( iterations => 2000 );
+    # choose a game
+    my $game = Poker::Game::Holdem->new( iterations => 1000 );
 
-    # Made hand on a full board
-    my $hero = $game->deal_hole(['As', 'Kd']);
-    $game->flop(['Ah', '7c', '2d']);
-    $game->turn('9s');
-    $game->river('3c');
+    # deal hole cards
+    my $hero    = $game->deal_hole(['As', 'Kd']);
+    my $villain = $game->deal_hole(['7h', '7c']);
+    # or $game->deal_hole() for random cards;
+
+    # calculate equity for each player
+    $game->equity([ $hero, $villain ]);
+
+    # hero has ~45 percent equity 
+    say $hero->ev;
+
+    # villain has ~55 percent equity
+    say $villain->ev;
+
+    # here comes the flop
+    $game->flop(['Ah', 'Kc', '2d']);
+    # or $game->flop() for random cards;
+
+    # calculate equity again after the flop
+    $game->equity([ $hero, $villain ]);
+
+    # hero now has ~93 percent equity after making two pair
+    say $hero->ev;
+
+    # turn and river
+    $game->turn('9s'); # deal specific card
+    $game->river();    # deal random card
+
+    # see who won and why
     $game->evaluate($hero);
-    say $hero->name;               # e.g. Two Pair
-    say $hero->score;              # numerical strength
-    say $hero->best_combo_flat;
+    say $game->board_string;    # AsKdAhKc9d
+    say $hero->name;            # Two Pair
+    say $hero->score;           # numerical strength
+    say $hero->best_combo_flat; # show cards in human readable form
 
-    # Preflop equity
+    # reset board and shuffle deck for the next game
     $game->reset;
-    my $aa = $game->deal_hole(['As', 'Ad']);
-    my $kk = $game->deal_hole(['Ks', 'Kd']);
-    $game->equity([ $aa, $kk ]);
-    say "AA: ", $aa->ev, "%";     # integer percent, ~82
-    say "KK: ", $kk->ev, "%";
 
 =head1 DESCRIPTION
 
-C<Poker::Game> is the product-facing layer over C<Poker::Eval> and
-C<Poker::Score>. Concrete subclasses (C<Poker::Game::Holdem>,
-C<Poker::Game::Omaha>, ...) set hole/board counts and wire the correct
-eval and scoring engines.
-
-Prefer a named subclass over constructing C<Poker::Game> directly.
-
-Card names use rank C<2..9TJQKA> plus suit C<c d h s> (e.g. C<As>, C<Td>).
-Jokers are C<Jo1>, C<Jo2> when the dealer was built with jokers.
+For a full list of games, eval engines, and scorers, see
+L<Poker::Eval/AVAILABLE COMPONENTS>.
 
 =head1 EQUITY
 
 B<Equity> is the estimated share of the pot a hand wins if the remaining
-board is completed many times at random from the B<undealt> cards.
+board is completed many times at random from the undealt cards.
 
-Each simulation awards B<1.0> pot unit in total:
+Each simulation awards 1.0 pot unit in total:
 
 =over 4
 
@@ -63,18 +77,6 @@ Each simulation awards B<1.0> pot unit in total:
 =item * N hands tied for best: each receives 1/N
 
 =back
-
-C<< $hand->ev >> is that share as a B<rounded integer percentage> of
-simulations (so the C<ev> values across the hands in a call sum to about
-100). Sample size is controlled by C<iterations> (default 1000).
-
-Known hole cards and any fixed board cards are already removed from the
-dealer's deck; each simulation clones and shuffles that residual pack.
-
-    $game->iterations(5000);
-    $game->equity([ $hero, $villain ]);
-
-C<calc_ev> is a backward-compatible alias for C<equity>.
 
 =head1 ATTRIBUTES
 
@@ -503,7 +505,7 @@ sub calc_ev { shift->equity(@_) }
 
 =head2 reset
 
-Shuffle a fresh deck; clear board and draw/discard state.
+Reset board and shuffle a fresh deck
 
 =cut
 
@@ -517,18 +519,6 @@ sub reset {
   $self->dealer->shuffle_deck;
   return $self;
 }
-
-=head1 STUD GAMES
-
-Seven-card stud variants extend C<Poker::Game::Stud>, which adds
-C<third_street>, C<fourth_street>, C<fifth_street>, C<sixth_street>,
-C<seventh_street> (alias C<river>), and C<deal_to>. See
-L<Poker::Game::Stud>, L<Poker::Game::SevenCardStud>, L<Poker::Game::Razz>.
-
-=head1 SEE ALSO
-
-L<Poker::Game::Holdem>, L<Poker::Game::Stud>, L<Poker::Eval>,
-L<Poker::Score>, L<Poker::Hand>
 
 =head1 AUTHOR
 

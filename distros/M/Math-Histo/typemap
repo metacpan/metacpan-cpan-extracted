@@ -3,6 +3,7 @@ histo_t *               T_HISTO
 histo2d_t *             T_HISTO2D
 histo_fit_result_t *    T_HISTOFIT
 histo_sketch_t *        T_HISTOSKETCH
+histo_kde_t *           T_HISTOKDE
 uint32_t                T_UV
 uint64_t                T_UV
 int32_t                 T_IV
@@ -20,6 +21,9 @@ T_HISTOFIT
 
 T_HISTOSKETCH
 	sv_setref_pv($arg, \"Math::Histo::Sketch\", (void*)$var);
+
+T_HISTOKDE
+	sv_setref_pv($arg, \"Math::Histo::KDE\", (void*)$var);
 
 INPUT
 T_HISTO
@@ -52,4 +56,12 @@ T_HISTOSKETCH
 	    $var = INT2PTR(histo_sketch_t*, tmp);
 	} else {
 	    croak(\"${Package}::$func_name(): argument is not a blessed Math::Histo::Sketch reference\");
+	}
+
+T_HISTOKDE
+	if (SvROK($arg) && sv_derived_from($arg, \"Math::Histo::KDE\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR(histo_kde_t*, tmp);
+	} else {
+	    croak(\"${Package}::$func_name(): argument is not a blessed Math::Histo::KDE reference\");
 	}

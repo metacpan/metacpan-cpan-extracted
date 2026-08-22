@@ -185,4 +185,63 @@ is(file_json_decode(hit($app, path => '/stash')->[2][0])->{x}, 5, 'stash');
     is($go->('/ok', '/bare'), '/ok', 'and a good path still comes back');
 }
 
+# ---- the raw slots behind stash and openapi ---------------------------------
+# stash_hv and openapi_params are the accessor pair the class is built from -
+# documented, and used by the framework and by code that wants the slot
+# untouched. Nothing exercised either, so nothing said whether they really are
+# the same storage the lazy accessors build into, or a second one beside it.
+{
+    package SlotApp;
+    use Punk;
+
+    get '/same' => sub {
+        my ($c) = @_;
+        $c->stash->{via_accessor} = 1;             # builds the slot lazily
+        my $raw = $c->stash_hv;                    # ...and this reads it
+        $raw->{via_raw} = 1;
+        $c->json({
+            raw_saw_accessor => $raw->{via_accessor} ? 1 : 0,
+            accessor_saw_raw => $c->stash->{via_raw} ? 1 : 0,
+            one_hash         => $c->stash == $raw ? 1 : 0,
+        });
+    };
+
+    # the raw slot is EMPTY until something builds it, which is the whole
+    # reason to prefer stash: the lazy accessor is what makes it a hashref
+    get '/untouched' => sub {
+        my ($c) = @_;
+        my $raw = $c->stash_hv;
+        $c->json({ defined_before => defined $raw ? 1 : 0 });
+    };
+
+    # openapi_params on a route that is not an API mount: undef, not an
+    # accidental empty hash somebody could mistake for validated input
+    get '/no-api' => sub {
+        my ($c) = @_;
+        $c->json({ params  => defined $c->openapi_params ? 1 : 0,
+                   openapi => defined $c->openapi        ? 1 : 0 });
+    };
+
+    package main;
+    my $sapp = SlotApp->to_app;
+
+    my $d = file_json_decode(hit($sapp, path => '/same')->[2][0]);
+    is($d->{raw_saw_accessor}, 1,
+        'stash_hv reads the hash stash built - one slot, not two');
+    is($d->{accessor_saw_raw}, 1, 'and a write through the raw slot is visible '
+                                . 'through the accessor');
+    is($d->{one_hash}, 1, 'because they are the same hashref');
+
+    my $u = file_json_decode(hit($sapp, path => '/untouched')->[2][0]);
+    is($u->{defined_before}, 0,
+        'the raw slot is undef until the lazy accessor builds it - which is '
+      . 'why the documentation says to prefer stash');
+
+    my $n = file_json_decode(hit($sapp, path => '/no-api')->[2][0]);
+    is($n->{params}, 0,
+        'openapi_params is undef off an API mount, rather than an empty hash '
+      . 'that would read as "validated, nothing in it"');
+    is($n->{openapi}, 0, 'and so is the accessor over it');
+}
+
 done_testing();

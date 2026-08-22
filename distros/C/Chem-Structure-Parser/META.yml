@@ -1,0 +1,33 @@
+---
+abstract: 'Read a molecular structure file into a hash of hashes, sequences and all, using XS for the coordinate section'
+author:
+  - 'David E. Condon <dec986@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chem-Structure-Parser
+provides:
+  Chem::Structure::Parser:
+    file: lib/Chem/Structure/Parser.pm
+    version: '0.01'
+requires:
+  Exporter: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  XSLoader: '0'
+  autodie: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/hhg7/Chem-Structure-Parser/issues
+  repository: https://github.com/hhg7/Chem-Structure-Parser.git
+version: '0.01'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

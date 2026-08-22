@@ -20,11 +20,11 @@ my $build = Module::Build->new(
                 resources => {
                         repository => {
                                type => 'git',
-                               url  => 'git://github.com/davorg/tie-hash-regex.git',
-                               web  => 'https://github.com/davorg/tie-hash-regex',
+                               url  => 'git://github.com/davorg-cpan/tie-hash-regex.git',
+                               web  => 'https://github.com/davorg-cpan/tie-hash-regex',
                         },
                         bugtracker => {
-                               web  => 'https://github.com/davorg/tie-hash-regex/issues',
+                               web  => 'https://github.com/davorg-cpan/tie-hash-regex/issues',
                         },
                 },
         },

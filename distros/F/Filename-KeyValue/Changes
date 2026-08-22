@@ -1,3 +1,8 @@
+0.007   2026-05-29  Released-By: PERLANCAR; Urgency: medium
+
+        - Add functions: rename_{modify,replace}_keyvalue_filenames.
+
+
 0.006   2026-05-29  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Fix adding dash before key-value pairs.

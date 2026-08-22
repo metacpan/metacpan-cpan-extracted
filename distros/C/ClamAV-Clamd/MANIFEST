@@ -1,0 +1,38 @@
+Changes
+Clamd.xs
+dev/concurrency_probe.pl
+dev/drain_clamd.c
+dev/fake_clamd.c
+dev/fildes_probe.c
+dev/instream_probe.pl
+dev/probe.pl
+include/clamav/clamd_abi.h
+include/clamav/clamd_abi_impl.h
+include/clamav/clamd_async.h
+include/clamav/clamd_compat.h
+include/clamav/clamd_conn.h
+include/clamav/clamd_scan.h
+include/clamav/clamd_stream.h
+include/clamav/clamd_verdict.h
+lib/ClamAV/Clamd.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/10-new.t
+t/20-transport.t
+t/30-live.t
+t/40-scan.t
+t/50-stream.t
+t/60-verdict.t
+t/70-async.t
+t/80-abi.t
+t/abi_consumer/Consumer.xs
+t/abi_consumer/lib/TestConsumer.pm
+t/abi_consumer/Makefile.PL
+t/lib/FakeClamd.pm
+t/manifest.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

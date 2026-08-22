@@ -1,3 +1,7 @@
+/*
+ * Executable main entrypoint dispatching to the libhistocli command runner.
+ */
+
 #include "histo/cli.h"
 #include <stdio.h>
 

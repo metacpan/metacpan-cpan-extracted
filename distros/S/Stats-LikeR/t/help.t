@@ -44,7 +44,8 @@ sub call_named {
 my @FUNCS = qw(
 	add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc
 	auroc bedroc bfill binom_test cfilter chisq_test chunk cmh_test cohen_d col
-	col2col colnames concat cor cor_test cov coxph cramers_v csort dnorm
+	bw_bcv bw_nrd bw_nrd0 bw_sj bw_ucv
+	col2col colnames concat cor cor_test cov coxph cramers_v csort density dnorm
 	drop_cols drop_duplicates dropna dunn_test epi_2x2 eta_squared ffill
 	fillna filter fisher_test friedman_test get_union glm group_by h h2aoh hist
 	hoa2aoh hoa2hoh hoh2hoa hosmer_lemeshow interpolate intersection

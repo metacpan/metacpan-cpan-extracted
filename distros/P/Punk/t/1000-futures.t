@@ -6,6 +6,8 @@ use FindBin ();
 use lib "$FindBin::Bin/lib";
 use Test::More;
 use Scalar::Util ();
+use Time::HiRes ();
+use Punk::Future ();
 use PunkTest;
 use File::Raw::JSON qw(file_json_decode);
 
@@ -131,5 +133,86 @@ my $app = FutureApp->to_app;
     is($rr->[0], 500, '...answering 500 for the failed future');
 }
 
+# ---- $c->promise, and $c->after ---------------------------------------------
+# The context's own async surface. Punk::Context documents `promise` with a
+# worked handler - make a pending future, return it, settle it later - and
+# `after` as the second name for `timer`. Neither was executed anywhere.
+{
+    package PromiseApp;
+    use Punk;
+
+    # The documented shape: hand back a promise and settle it from elsewhere.
+    get '/deferred' => sub {
+        my ($c) = @_;
+        my $p = $c->promise;
+        $p->done($c->json({ settled => 1 }));      # already settled here
+        return $p;
+    };
+
+    # Settled AFTER the handler returns, which is the case the pattern exists
+    # for: the response is not ready when the route finishes.
+    our $PENDING;
+    get '/pending' => sub {
+        my ($c) = @_;
+        $PENDING = $c->promise;
+        return $PENDING;
+    };
+
+    get '/settle' => sub {
+        my ($c) = @_;
+        $PENDING->done($c->json({ late => 1 })) if $PENDING;
+        $c->text('settled');
+    };
+
+    package main;
+
+    my $papp = PromiseApp->to_app;
+
+    my $r = hit($papp, path => '/deferred');
+    is($r->[0], 200, 'a returned promise is answered');
+    is(file_json_decode($r->[2][0])->{settled}, 1, 'with what it was settled with');
+
+    my $f = hit($papp, path => '/pending', env => { 'psgi.nonblocking' => 1 });
+    ok(Scalar::Util::blessed($f) && $f->can('get'),
+        'a promise still pending when the handler returns comes back as a '
+      . 'future rather than a response');
+    ok(!$PromiseApp::PENDING->is_ready, 'and it really is unsettled');
+
+    hit($papp, path => '/settle');
+    ok($PromiseApp::PENDING->is_ready,
+        'settling it from a later request completes it - which is the whole '
+      . 'point of handing one out');
+    is($f->get->[0], 200, 'and the deferred response finalizes');
+}
+
+# `$c->after` is `$c->timer` under a second name, through an XS ALIAS on the
+# CONTEXT (Punk::Future has the class-method `timer`, and no `after` at all).
+# Both settle a future when the interval passes; off a Hyperman worker there is
+# no loop, so it sleeps. A tiny interval keeps that honest without making the
+# suite wait.
+{
+    package AfterApp;
+    use Punk;
+    get '/after' => sub {
+        my ($c) = @_;
+        my $t0 = Time::HiRes::time();
+        my $f  = $c->after(0.01);
+        my $isa = ref $f;
+        $c->await($f);
+        $c->json({ isa   => $isa,
+                   ready => $f->is_ready ? 1 : 0,
+                   waited => (Time::HiRes::time() - $t0) >= 0.005 ? 1 : 0 });
+    };
+    package main;
+
+    my $r = hit(AfterApp->to_app, path => '/after');
+    my $d = file_json_decode($r->[2][0]);
+    is($d->{isa}, 'Punk::Future', '$c->after($secs) returns a future');
+    is($d->{ready}, 1, 'which settles');
+    is($d->{waited}, 1,
+        'not before the interval - after and timer are one XSUB under an '
+      . 'ALIAS, so this is the assertion that the alias still points where '
+      . 'it says');
+}
 
 done_testing;

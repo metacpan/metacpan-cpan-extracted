@@ -50,6 +50,34 @@ if (!$pid) {
         $ws->on(close   => sub { $room->leave($_[0]) });
     };
 
+    # The two room methods nothing exercised: a binary broadcast, and closing
+    # every member at once. A text broadcast is covered above, and these two
+    # are the ones where "it returned a plausible number" is indistinguishable
+    # from working.
+    websocket '/room2' => sub {
+        my ($c, $ws) = @_;
+        my $room = Punk::WebSocket::Room->named('room2');
+        $ws->on(open => sub { $room->join($_[0]) });
+        $ws->on(message => sub {
+            my ($conn, $msg) = @_;
+            if ($msg eq 'bin') {
+                my $n = $room->broadcast_binary("\x00\x01\xfe\xff");
+                $conn->send("sent:$n");
+            }
+            elsif ($msg eq 'bin-except') {
+                my $n = $room->broadcast_binary("\x00\x01\xfe\xff", $conn);
+                $conn->send("sent:$n");
+            }
+            elsif ($msg eq 'shut') {
+                $room->close_all(4001, 'closing time');
+            }
+            elsif ($msg eq 'size') { $conn->send("size:" . $room->count) }
+            # fd: the descriptor underneath, which is what a server writes to
+            elsif ($msg eq 'fd')   { $conn->send('fd:' . ($conn->fd // 'undef')) }
+        });
+        $ws->on(close => sub { $room->leave($_[0]) });
+    };
+
     websocket '/proto' => sub {
         my ($c, $ws) = @_;
         $ws->on(message => sub { $_[0]->send('proto:' . ($_[0]->protocol // '-')) });
@@ -224,6 +252,65 @@ sub http_get {
     is($to_b->{payload}, 'said:hey', 'the other member sees it too');
     close $a;
     close $b;
+}
+
+# ---- broadcast_binary, and close_all ---------------------------------------
+# Both documented, neither executed until now. They are the pair where a
+# plausible return value hides a wrong result: broadcast_binary reports how
+# many it sent whether or not the frames were binary, and close_all reports
+# nothing at all.
+{
+    my ($a) = ws_connect(path => '/room2');
+    my ($b) = ws_connect(path => '/room2');
+    Time::HiRes::sleep(0.2);
+
+    syswrite $a, encode_client(opcode => 1, payload => 'bin');
+    my $fa = read_frame($a);
+    my $fb = read_frame($b);
+
+    is($fa->{opcode}, 2, 'broadcast_binary sends a BINARY frame, not text');
+    is($fa->{payload}, "\x00\x01\xfe\xff",
+        'carrying bytes that are not valid utf8 - which a text frame could '
+      . 'not have delivered at all');
+    is($fb->{opcode}, 2, 'to every member');
+    is($fb->{payload}, "\x00\x01\xfe\xff", 'with the same bytes');
+
+    my $count = read_frame($a);
+    is($count->{payload}, 'sent:2', 'and reports how many it sent');
+
+    # the `except` argument, usually the sender
+    syswrite $a, encode_client(opcode => 1, payload => 'bin-except');
+    my $skip = read_frame($a);
+    is($skip->{payload}, 'sent:1',
+        'the except argument drops one recipient from the count');
+    is(read_frame($b)->{opcode}, 2, 'and the other member still got it');
+
+    # close_all: every member gets a close frame carrying the code and reason
+    syswrite $a, encode_client(opcode => 1, payload => 'shut');
+    my $ca = read_frame($a);
+    my $cb = read_frame($b);
+    is($ca->{opcode}, 8, 'close_all closes the sender');
+    is(unpack('n', substr $ca->{payload}, 0, 2), 4001, 'with the given code');
+    is(substr($ca->{payload}, 2), 'closing time', 'and the given reason');
+    is($cb->{opcode}, 8, 'and every other member too');
+    close $a;
+    close $b;
+
+    # and the room is empty afterwards, which is what separates close_all
+    # from closing each connection by hand
+    my ($cc) = ws_connect(path => '/room2');
+    Time::HiRes::sleep(0.2);
+    syswrite $cc, encode_client(opcode => 1, payload => 'size');
+    is(read_frame($cc)->{payload}, 'size:1',
+        'the room is empty after close_all - a fresh member is the only one');
+
+    # fd: the descriptor underneath a live connection. Documented, never read.
+    syswrite $cc, encode_client(opcode => 1, payload => 'fd');
+    my $fd = read_frame($cc)->{payload};
+    like($fd, qr/^fd:\d+$/,
+        'a live connection reports the descriptor a server would write to');
+    cmp_ok((split /:/, $fd)[1], '>=', 0, 'which is a real one');
+    close $cc;
 }
 
 # ---- subprotocol negotiation ------------------------------------------------

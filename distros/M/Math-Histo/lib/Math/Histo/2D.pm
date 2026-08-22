@@ -5,7 +5,8 @@ use warnings;
 use Math::Histo ();
 use Math::Histo::Constants qw(:flags);
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
+
 
 sub new {
     my ($class, %args) = @_;
@@ -41,6 +42,51 @@ sub from_json {
     my ($class, $json_str) = @_;
     return $class->_deserialize_json($json_str);
 }
+
+sub plot {
+    my ($self, %opts) = @_;
+    require Math::Histo::CLI;
+    require File::Temp;
+
+    my @cmd = ('plot');
+    push @cmd, "--style=$opts{style}" if defined $opts{style};
+    if (exists $opts{color}) {
+        push @cmd, $opts{color} ? '--color=always' : '--color=never';
+    }
+    push @cmd, "--palette=$opts{palette}" if defined $opts{palette};
+    push @cmd, "-w=$opts{width}" if defined $opts{width};
+    push @cmd, "-H=$opts{height}" if defined $opts{height};
+    push @cmd, '-l' if $opts{log};
+
+    my $tf = File::Temp->new(SUFFIX => '.json', UNLINK => 1);
+    print $tf $self->serialize_json;
+    close $tf;
+    push @cmd, $tf->filename;
+
+    my ($code, $out, $err) = Math::Histo::CLI->capture(@cmd);
+    die "Math::Histo::2D::plot failed: $err" if $code != 0 && $err;
+    print $out if !defined $opts{show} || $opts{show};
+    return $out;
+}
+
+use overload
+    '+'  => sub { my ($a, $b) = @_; my $c = $a->clone; $c->add($b); $c },
+    '-'  => sub { my ($a, $b) = @_; my $c = $a->clone; $c->subtract($b); $c },
+    '*'  => sub {
+        my ($a, $b, $swap) = @_;
+        my $c = $a->clone;
+        if (ref($b)) { $c->multiply($b); }
+        else { $c->scale($b); }
+        $c;
+    },
+    '/'  => sub {
+        my ($a, $b, $swap) = @_;
+        my $c = $a->clone;
+        if (ref($b)) { $c->divide($b); }
+        else { die "Division by zero" if $b == 0; $c->scale(1.0 / $b); }
+        $c;
+    },
+    fallback => 1;
 
 *fill_packed = \&fill_packed_f64;
 

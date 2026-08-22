@@ -73,4 +73,19 @@ subtest 'Scale, normalize and rebin' => sub {
     is $rebinned->nbins, 5, 'rebinned to 5 bins';
 };
 
+subtest 'Plot and sparkline' => sub {
+    use Math::Histo::Constants qw(@PALETTES);
+    is scalar(@PALETTES), 8, '8 palettes exported';
+    is $PALETTES[0], 'viridis', 'first palette is viridis';
+
+    my $h = Math::Histo->new(bins => 10, min => 0.0, max => 100.0);
+    $h->fill_n([10, 20, 20, 30, 40, 50, 60, 70, 80, 90]);
+
+    my $spk = $h->sparkline(show => 0);
+    ok length($spk) > 0, 'sparkline produced';
+
+    my $plot = $h->plot(style => 'ascii', color => 0, show => 0);
+    ok length($plot) > 0, 'plot produced';
+};
+
 done_testing;

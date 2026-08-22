@@ -1,3 +1,7 @@
+/*
+ * CLI subcommand histo cmp: two-sample statistical distance computations.
+ */
+
 #include "cli_common.h"
 #include <stdio.h>
 #include <stdlib.h>

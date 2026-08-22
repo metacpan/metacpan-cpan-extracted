@@ -1,3 +1,7 @@
+/*
+ * Internal struct layouts, indexing math, and private macros for 2D histograms.
+ */
+
 #ifndef LIBHISTO_INTERNAL_2D_H
 #define LIBHISTO_INTERNAL_2D_H
 

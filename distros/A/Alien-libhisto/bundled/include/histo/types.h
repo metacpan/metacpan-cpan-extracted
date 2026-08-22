@@ -1,3 +1,8 @@
+/**
+ * @file types.h
+ * @brief Core types, status codes, flags, and enumerations for libhisto.
+ */
+
 #ifndef LIBHISTO_TYPES_H
 #define LIBHISTO_TYPES_H
 

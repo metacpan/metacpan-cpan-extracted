@@ -1,3 +1,7 @@
+/*
+ * Shared CLI stream readers, file parsers, and string formatting helpers.
+ */
+
 #ifndef HISTO_CLI_COMMON_H
 #define HISTO_CLI_COMMON_H
 
@@ -23,6 +27,7 @@ int cmd_plot_main(int argc, char **argv);
 int cmd_stats_main(int argc, char **argv);
 int cmd_fit_main(int argc, char **argv);
 int cmd_cmp_main(int argc, char **argv);
+int cmd_top_main(int argc, char **argv);
 
 /* Terminal utilities */
 int cli_get_terminal_width(int default_width);

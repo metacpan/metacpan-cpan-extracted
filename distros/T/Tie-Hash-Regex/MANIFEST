@@ -6,6 +6,7 @@ lib/Tie/Hash/Regex.pm
 t/test.t
 t/pod.t
 t/pod_coverage.t
+t/cvs-2026-77781.t
 README
 META.yml                                 Module meta-data (added by MakeMaker)
 META.json

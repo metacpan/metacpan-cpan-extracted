@@ -45,6 +45,10 @@ t/csort.HoH.t
 t/csort.cmp.undef.t
 t/csort.rowname.t
 t/csort.t
+t/density.R.scipy.R
+t/density.R.scipy.py
+t/density.R.scipy.t
+t/density.t
 t/drop_duplicates.t
 t/dropna.t
 t/dunn_test.t
@@ -70,6 +74,8 @@ t/interpolate.t
 t/interpolate_methods.t
 t/intersection.t
 t/is_equivalent.t
+t/kruskal_test.R.scipy.R
+t/kruskal_test.R.scipy.t
 t/ks_test.R.scipy.R
 t/ks_test.R.scipy.py
 t/ks_test.R.scipy.t
@@ -100,6 +106,8 @@ t/predict.t
 t/predict2.t
 t/prop_test.t
 t/qcut.t
+t/quantile.R.R
+t/quantile.R.t
 t/rank.t
 t/read_filter.20260706.t
 t/read_table.2.t
@@ -110,6 +118,9 @@ t/roc.t
 t/scale.keywords.t
 t/select_drop_rename_cols.t
 t/set_ops.t
+t/shapiro_test.R.scipy.R
+t/shapiro_test.R.scipy.py
+t/shapiro_test.R.scipy.t
 t/skew_kurtosis.t
 t/summary.t
 t/survival.t

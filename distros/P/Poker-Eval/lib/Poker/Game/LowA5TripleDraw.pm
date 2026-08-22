@@ -1,6 +1,6 @@
 package Poker::Game::LowA5TripleDraw;
+our $VERSION = '0.12';
 
-our $VERSION = '0.11';
 
 use strict;
 use warnings FATAL => 'all';
@@ -14,7 +14,7 @@ Poker::Game::LowA5TripleDraw - A-5 triple draw
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

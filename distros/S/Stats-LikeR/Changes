@@ -1,6 +1,369 @@
 Revision history for Stats-LikeR
 
 
+0.301 2026-08-21 CDT
+
+ - there are numerous additions of `restrict` keywords, which may or may not improve speed
+
+ [kruskal_test]
+
+ - `kruskal_test` cross-validated against R 4.6.1's `stats::kruskal.test()` and
+   SciPy 1.18.0's `TestKruskal`, driven by those suites' own cases rather than by
+   cases invented here. Six bugs are fixed: five in how the arguments and the data
+   are read before any ranking happens, and one in the chi-squared tail, which
+   reaches every function that uses it. The test now needs a third of the memory
+   and runs in under half the time, and it returns the same answer twice in a row,
+   which it did not before.
+
+ - Everything below is checked in the new `t/kruskal_test.R.scipy.t` (870 tests),
+   whose expected values are frozen literals with their provenance recorded in the
+   file header; it needs no R and no Python to run. The generator that produced
+   them, `t/kruskal_test.R.scipy.R`, is committed beside it. There had been no
+   `t/kruskal_test.t` at all — the only coverage was six assertions in `t/01.t` on
+   the single Hollander & Wolfe example, and none of the six bugs would have shown
+   up in it. The full suite is 125 files and 25,951 tests, and
+   `./test.all.perls.pl` passes on all five local perls — `5.10.1`, `5.12.5`
+   (long double), `5.42.3`, `5.44.0` and `5.44.0-quadmath` — with no warnings on
+   any of them.
+
+ - NaN was ranked instead of dropped:
+
+ - `looks_like_number` is true for `NaN`, so a `NaN` went into the ranking. R
+   treats `NaN` as `NA` and `complete.cases(x, g)` removes it before `rank()` ever
+   sees it:
+
+ - | data | was | R 4.6.1 |
+   |---|---|---|
+   | `c(1,2,3,4,5,6)` with one `NaN`, n = 7 | `H = 4.5` | `H = 3.8571428571428577` |
+   | `1:24` with one `NaN` | `H = 17.28` | `H = 16.5` |
+
+ - It also handed `cmp_nv3` a comparison that is never true for any pair
+   involving the `NaN`, which leaves `qsort` without the strict weak ordering it is
+   entitled to — the same defect `wilcox_test` had fixed in 0.298, where the
+   comment describing it is still in the file. `+Inf` and `-Inf` are neither `NA`
+   nor `NaN` to R and a rank test has no trouble with them, so they are still kept
+   and ranked; that is now pinned rather than incidental.
+
+ - The bad value propagated: `table_one`'s `_t1_cont_p` hands its groups straight
+   to `kruskal_test`, so a single `NaN` among nine observations was reported at
+   `p = 0.0273` where dropping it gives `0.0439`.
+
+ - A group with no data inflated the degrees of freedom:
+
+ - The hash-of-arrays form counted every key in `k`, including a key whose array
+   was empty or whose every element had been dropped. On
+   `{a => [1,1,1], b => [2,2,2], c => []}` that gave `df = 2` and
+   `p = 0.0820849986238988` for what is a two-group problem with
+   `df = 1, p = 0.025347318677468304`. Such a group was already skipped when
+   forming the statistic and when building `group_stats`; only `df` still counted
+   it.
+
+ - R refuses this case outright — `all groups must contain data` — and so does
+   `kruskal_test` now, because the alternative is to test the groups that do have
+   data under a `df` that counts one that does not. R's order of checks came with
+   it: it filters each group, refuses an empty one, and only then counts what is
+   left, so `{a => [], b => []}` is `all groups must contain data` and not
+   `not enough observations`. SciPy takes the other side of this and returns `NaN`
+   with a `SmallSampleWarning`; the divergence is recorded in the test file rather
+   than papered over. The `x`/`g` form cannot reach any of this — it mints a group
+   id the first time an observation survives the filter — so nothing changes there.
+
+ - Group labels were truncated at a NUL and lost their UTF-8 flag:
+
+ - The `x`/`g` path read the label with `SvPV_nolen` and then took `strlen` of it.
+   Perl strings are counted, not NUL-terminated, so `"a\0X"` and `"a\0Y"`
+   collapsed into one group: `kruskal_test([1..6], ["a\0X","a\0X","a\0Y","a\0Y","b","b"])`
+   came back as two groups with `df = 1, H = 2.4` instead of three with
+   `df = 2, H = 4.571428571428573`. Both paths also copied the label's bytes while
+   dropping perl's UTF-8 flag when storing it into `group_stats`, so a label
+   outside latin-1 came back as mojibake and the two input paths disagreed with
+   each other about labels inside it. The length now travels with the string and
+   carries the flag in its sign, which is `hv_store`'s own convention, so a label
+   comes back `eq` to what went in. Dropping the `strlen` also drops a pass over
+   every label.
+
+ - A trailing named argument read past the argument stack:
+
+ - The named-argument loop took `ST(arg_idx + 1)` without checking that there was
+   one, so an odd argument list read one slot past the top of the stack — and what
+   it found there changed which branch ran: `kruskal_test(\%h, 'x')` came back
+   complaining that `'h'` cannot be mixed with `'x'`/`'g'`, because `x_sv` had been
+   assigned whatever was past the end. `binom_test`, `chisq_test`, `fisher_test`,
+   `wilcox_test`, `var_test` and `prcomp` all guard this; `kruskal_test` was the
+   one that did not. It now croaks `odd number of named arguments`.
+
+ - An infinite chi-squared statistic gave no p-value:
+
+ - `get_p_value` short-circuits a statistic at or below zero and otherwise goes to
+   `igamc`. `+Inf` is neither, so it reached the continued fraction, where the
+   first `1/d` is `1/Inf = 0` and then `del = 0 * Inf` is `NaN` — an overwhelmingly
+   significant result reported as no result at all. R's
+   `pchisq(Inf, df, lower.tail = FALSE)` is `0`, and so is this now. `NaN` in gives
+   `NaN` out, as R does, rather than running the continued fraction to its full
+   10,000-iteration safety bound first.
+
+ - This is reachable from `kruskal_test`. When a sample has no variation at all
+   the tie correction is `(n^3 - n)/(n^3 - n)`, and once `n^3` is past `2^53` the
+   subtraction of `n` is lost from one side or the other, so an inexact zero is
+   divided by an exact zero. R has the same problem and returns `+Inf`, `-Inf` or
+   `NaN` depending on which way `n` rounded: `NaN` at `n = 250000`, `-Inf` at
+   `300000`, `NaN` at `400000`, `+Inf` at `500000`, `NaN` at `750000`, `+Inf` at
+   `1000000`, `NaN` at `1500000` and `+Inf` at `2000000`. `kruskal_test` now agrees
+   with it on all eight. Below that the correction is exact and both give `NaN`,
+   which the corpus pins. `get_p_value` is shared, so `chisq_test`, `prop_test`,
+   `mcnemar_test`, `friedman_test`, `cmh_test`, `logrank_test` and `coxph` get the
+   same fix.
+
+ - Three times less memory, twice the speed:
+
+ - The ranking no longer goes through `RankInfo` and `rank_and_count_ties`.
+   `kruskal_test` wants per-group rank sums, not the ranks themselves, so it sorts
+   a 16-byte `(value, group)` pair and adds each tie block's averaged rank straight
+   into the group sums, instead of storing an `NV` rank per observation for a
+   second pass to read.
+
+ - It also no longer calls `qsort`. glibc's `qsort` is a mergesort that allocates a
+   scratch buffer the size of the whole array — measured on glibc 2.39 as a
+   `VmHWM` of 116 MB going to 230 MB across one sort of a 114 MB array — which was
+   half of the function's peak memory, and its comparison goes through a function
+   pointer that cannot be inlined. In its place is a median-of-three introsort that
+   recurses on the smaller partition and loops on the larger, so the stack stays
+   `O(log n)`, with a heapsort fallback past a depth of `2*floor(log2(n))` so an
+   adversarial input cannot drive it to `O(n^2)`, and insertion sort for short
+   runs. Sorting the same five-million-element array takes 0.375s against `qsort`'s
+   1.01s and allocates nothing. The third change is the group-label array on the
+   `x`/`g` path, which was sized at one pointer per *observation* to hold one per
+   *group* — 40 MB at `n = 5e6` to hold three pointers — and now grows on demand.
+
+ - At `n = 5,000,000` over three groups, measured as `VmHWM` either side of the
+   call:
+
+ - | | 0.3 | 0.301 |
+   |---|---|---|
+   | peak memory | 228 MB (47.8 B/obs) | 76 MB (15.9 B/obs) |
+   | `kruskal_test(\@x, \@g)` | 1.20 s | 0.557 s |
+   | `kruskal_test(\%h)` | 1.11 s | 0.467 s |
+
+ - Sorted, reversed, all-equal, organ-pipe and median-of-three-killer inputs all
+   stay under 0.32s at `n = 2e6`, which is what the depth limit is there for. The
+   sort is checked against an independent pure-Perl implementation of the whole
+   test over 748 structured cases — those shapes at every n either side of the
+   insertion-sort threshold — and 49,712 random ones.
+
+ - The same input now gives the same answer:
+
+ - `H` moved by up to `1.2e-14` between runs on identical data. Nothing was random:
+   the sum of `R_i^2 / n_i` walked the groups by group id, and on the
+   hash-of-arrays path an id is minted in `hv_iternext` order, which is perl's
+   per-process hash order. Equal values were also left in whatever relative order
+   the sort happened to leave them, which came from the same place.
+
+ - The sort now orders by value and then by group, which makes it a total order,
+   and the `k` terms of the sum are ordered before they are added — smallest first,
+   which is the better-conditioned direction as well as a canonical one. `k` is the
+   number of groups, not the number of observations, so it costs nothing next to
+   the ranking. `H` is now bit-identical to R on all 37 corpus cases in all four
+   call forms, and stays so across 60 runs under `PERL_PERTURB_KEYS=1`.
+
+ [Documentation]
+
+ - `kruskal_test` gains two sections: what happens to non-numeric, undefined,
+   `NaN` and infinite elements and to a group left with no data, and what the
+   returned fields are — `statistic`, `parameter`, `method` and the p-value under
+   both `p_value` and `p.value` from R's `htest`, plus the `size` and `mean`
+   sub-hashes of `group_stats`, which are computed over the same observations the
+   statistic used.
+
+0.3 2026-08-16 CDT
+
+ [shapiro_test]
+
+ - `shapiro_test` rebuilt against R 4.6.1's `src/library/stats/src/swilk.c` — AS R94,
+   Royston (1995) — driven by R's and SciPy's own test suites rather than by cases
+   invented here. Four bugs are fixed, one of them a case R's regression suite
+   tests for by name, and the statistic is now more accurate than R's own on a
+   sample whose values dwarf its spread.
+
+ - Everything below is checked in the new `t/shapiro_test.R.scipy.t` (146 tests),
+   whose expected values are frozen literals with their provenance recorded in the
+   file header; it needs no R and no Python to run. The generators that produced
+   them, `t/shapiro_test.R.scipy.R` and `t/shapiro_test.R.scipy.py`, are committed
+   beside it. The full suite is 124 files and 25,081 tests, and
+   `./test.all.perls.pl` passes on all five local perls — `5.10.1`, `5.12.5`
+   (long double), `5.42.3`, `5.44.0` and `5.44.0-quadmath` — with no warnings on
+   any of them.
+
+ - The p-value could come back negative:
+
+ - R's `tests/reg-tests-1b.R` contains exactly one `shapiro.test` assertion, and it
+   is this:
+
+     stopifnot(shapiro.test(c(0,0,1))$p.value >= 0)
+
+ - `shapiro_test([0,0,1])` returned `-4.6648135328131477e-15`. At `n = 3` the
+   p-value is `6/pi * (asin(sqrt(W)) - asin(sqrt(3/4)))` and `W` has an exact floor
+   of `3/4` that `c(0,0,1)` sits on, so the subtraction lands on zero from
+   whichever side the constants round to; R clamps the result at 0 and this module
+   did not. It is the same defect SciPy fixed as gh-18322. The clamp is in, and
+   `asin(sqrt(3/4)) = pi/3` is now carried to NV width rather than R's 15 digits,
+   so the same case comes out at `+4.2e-16` before clamping instead of below zero.
+
+ - W and the p-value were only good to nine digits:
+
+ - The expected normal order statistics that AS R94 weights the sample with came
+   from `inverse_normal_cdf()`, which is Moro's approximation and good to about
+   `1e-9`. They go straight into `W`, so nine digits there is nine digits in the
+   answer — where R reports sixteen. Against the values SciPy pins in
+   `TestShapiro`, every one of them annotated upstream as *"reference values
+   generated using R shapiro.test"*:
+
+ - | SciPy case | W was | W is | R 4.6.1 |
+   |---|---|---|---|
+   | `test_basic` x1 | `0.900472879324135` | `0.900472879317561` | `0.90047287931756` |
+   | `test_basic` x2 | `0.959026945965277` | `0.959026946032345` | `0.95902694603234` |
+   | `test_basic2` x4 | `0.834666275331324` | `0.834666275318169` | `0.83466627531817` |
+
+ - and the p-values with them:
+
+ - | SciPy case | p was | p is | R 4.6.1 |
+   |---|---|---|---|
+   | `test_basic` x1 | `0.0420895752342124` | `0.0420895752222577` | `0.04208957522226` |
+   | `test_basic` x2 | `0.524597929157127` | `0.524597930470668` | `0.5245979304707` |
+   | `test_basic2` x4 | `0.000913490482316994` | `0.000913490481812984` | `0.000913490481813` |
+
+ - Moro's value is still the starting point, but Newton against the `erfc`-based
+   normal CDF finishes it. The loop stops as soon as another pass could not move
+   the answer, so a `double` build pays for one refinement and only the wider NVs
+   pay for a second. Across a 180-sample sweep over normal, uniform, exponential,
+   log-normal, Cauchy, tied, tiny-scale and grid data at every n from 3 to 5000,
+   the worst remaining disagreement with R is `2.0e-15` in `W` and `2.6e-12` in the
+   p-value — the latter is not sloppier arithmetic but the same last bit amplified,
+   since the p-value is a function of `log(1 - W)` over a sigma of about `0.6`.
+
+ - 1 - W was formed by subtracting from 1:
+
+ - The p-value depends on `log(1 - W)`, and `W` runs to within `1e-5` of 1 on a
+   large normal sample, so computing `W = b^2/ssq` and then `1 - W` throws away
+   exactly the digits the p-value is made of. R does not do this — its `swilk.c`
+   forms `w1 = (ssassx - sax) * (ssassx + sax) / (ssa * ssx)` directly and says so
+   in a comment — and now neither does this module.
+
+ - More accurate than R when the values dwarf their own spread:
+
+ - R's `swilk.c` divides the sample by its range but never centres it, so `1e9 +
+   noise` loses most of its significant digits before `W` is ever formed. SciPy
+   filed the same complaint from the other end as gh-14462 and works around it by
+   subtracting the median; this module now does that too, which costs one
+   subtraction per value.
+
+ - Measured against a 60-digit `mpmath` evaluation of AS R94 on the identical
+   doubles, over `1e6 + noise` and `1e9 + noise` at every n from 3 to 5000:
+
+ - | | worst relative error in W | worst in the p-value |
+   |---|---|---|
+   | R 4.6.1 | `1.9e-8` | `2.6e-7` |
+   | `shapiro_test` | `1.0e-15` | `1.4e-13` |
+
+ - On well-conditioned samples the two still agree to the last few ulp, so this is
+   a divergence only where R has already lost the digits. `t/shapiro_test.R.scipy.t`
+   asserts the invariance rather than R's number there, and records why at that
+   section.
+
+ - Faster as well:
+
+ - The sort now goes through the module's own introsort rather than `qsort()`,
+   whose comparator the compiler cannot inline; the order statistics are generated
+   for half the sample and mirrored, since the weights are antisymmetric; and ten
+   `pow()` calls became Horner evaluations. `pow()` is a `__float128` call on a
+   quadmath perl.
+
+ - | n | was | is |
+   |---|---|---|
+   | 10 | 0.83 µs | 0.78 µs |
+   | 100 | 4.78 µs | 5.05 µs |
+   | 1000 | 79.3 µs | 49.8 µs |
+   | 5000 | 578 µs | 459 µs |
+
+ - `n = 100` is the one size that got slower: at that length the accurate
+   quantiles are most of the work and there is not enough sorting to pay for them.
+   That trade was taken deliberately.
+
+ - One documented value was wrong:
+
+ - The hash printed under `shapiro_test` in this README, in `read.me.pod` and in
+   the module's own POD showed `statistic 0.960870680168535` and `p.value
+   0.589650577093106` — the pre-fix numbers, and for `[1..19]` while the example
+   above them calls `shapiro_test([1..5])`. It now shows what `[1..5]` actually
+   returns, `0.986762155447719` and `0.96717393596804`, which is R's
+   `shapiro.test(1:5)` to the last digit R prints.
+
+ [quantile]
+
+ - Interpolation ran between order statistics that were equal:
+
+ - R's type 7 interpolates only when the index falls strictly between two order
+   statistics *that differ* — `index > lo & x[hi] != qs` in `quantile.default`.
+   This module always evaluated `(1 - g) * x[j] + g * x[j+1]`, which does not
+   return `v` when both sides are `v`. On a two-valued sample at `n = 999` it
+   reported `0.99999999999994` for `1`, and on the 602 identical values R's
+   PR#16672 was filed about it failed to return that value at every prob — which
+   is the monotonicity failure the PR is about. Both now match R exactly.
+
+ - Probabilities a hair outside [0, 1] were refused:
+
+ - A probability arrived at by arithmetic rather than written down can land just
+   outside the interval. R allows `100 * .Machine$double.eps` of overshoot and
+   clamps to the endpoint — its PR#17891, `quantile(0:1, 1+1e-14) == 1` — where
+   this module raised an error. It now clamps within the same allowance and still
+   errors on anything further out. R's constant is used rather than `NV_EPSILON`
+   on purpose: it is part of what the function *accepts*, so a long-double or
+   `__float128` build must not reject a `probs` vector R takes.
+
+ - Faster:
+
+ - The sort was `qsort()` with a function-pointer comparator; it is now the same
+   introsort `shapiro_test` uses. Ordering 5000 NVs costs about 61,000
+   comparisons, and paying for an indirect call on every one of them is most of
+   what a sort of that size costs.
+
+ - | n | was | is |
+   |---|---|---|
+   | 100 | 3.2 µs | 2.7 µs |
+   | 1000 | 52.5 µs | 22.8 µs |
+   | 10,000 | 1.07 ms | 0.72 ms |
+   | 100,000 | 13.7 ms | 8.8 ms |
+
+ - Both fixes and the sort are covered by the new `t/quantile.R.t` (197 tests, or
+   205 under `EXTENDED_TESTING`), built on the two assertions R's own suite makes
+   about `quantile` — that `quantile(x, ((1:n)-1)/(n-1))` recovers `sort(x)`, and
+   that it equals the type-7 interpolation computed by hand off the sorted sample
+   — run over seven input shapes chosen to break a quicksort (sorted, reversed,
+   organ pipe, two-valued, tie ladder, sawtooth) at every n either side of the
+   insertion-sort threshold and the recursion depth limit, plus PR#16672 and
+   PR#17891 verbatim and 79 frozen R value tables. Its generator,
+   `t/quantile.R.R`, is committed beside it.
+
+ [Documentation]
+
+ - Illustrations for three more functions, drawn by `t.test.plots.pl` and
+   `skew.kurtosis.plots.pl`, both committed:
+
+ - **`t_test`** gains six: what the estimate, the standard error and the null
+     distribution are and which area of it the p-value is; how `conf_int` is the
+     estimate plus or minus a t quantile and how `conf_level` sets that quantile;
+     the three `alternative`s side by side with the region each counts and the
+     interval that goes with it; `p_value` as a function of `mu`, crossing
+     `1 - conf_level` exactly at the two bounds of `conf_int`; paired,
+     `var_equal` and Welch on the same data, with the Welch degrees of freedom as
+     the two spreads separate; and two distributions separating with the interval
+     retreating from `mu` as the p-value falls.
+ - **`skew`** gains a left-tailed, a symmetric and a right-tailed sample against
+     the same `N(0, 1)` curve, with the mean and median of each, which is what the
+     sign of the statistic is reporting.
+ - **`kurtosis`** gains a flat-shouldered, a normal and a heavy-tailed sample
+     with the tails behind each drawn out, since it is the tails and not the peak
+     that the statistic is measuring.
+
 
 0.298 2026-08-12 CDT
 
@@ -380,11 +743,19 @@ Revision history for Stats-LikeR
 
  - All 412 of those calls now go through `nv_*` macros that paste on the suffix for
    the width `NV` actually is: none for `double`, `l` for `long double`, `q` for
-   `__float128`. The 80 `isnan`/`isinf`/`isfinite` calls became
-   `Perl_isnan`/`Perl_isinf`/`Perl_isfinite`, which matters most where the C99
-   type-generic macros are absent: there `isfinite()` is a plain `double` function,
-   and narrowing a large-but-finite long double into it reports the value as
-   infinite rather than merely rounding it.
+   `__float128`. The 80 `isnan`/`isinf`/`isfinite` calls became `nv_isnan`,
+   `nv_isinf` and `nv_isfinite`, which classify by comparing against `NV_MAX` — the
+   largest finite `NV` — rather than calling libm at all. The C99 macros could not
+   be kept: where a platform does not provide the type-generic versions,
+   `isfinite()` is a plain `double` function, and narrowing a large-but-finite long
+   double into it reports the value as infinite rather than merely rounding it.
+   Perl's own `Perl_isnan`/`Perl_isinf`/`Perl_isfinite` were used up to 0.298 and
+   could not be kept either: on every perl before 5.22 those route through a
+   `Perl_fp_class()` block in `perl.h` that has never compiled — the macro is
+   written with an empty parameter list and compares against `FP_CLASS_*` names no
+   `<ieeefp.h>` defines. That block is dead code wherever Configure finds
+   `isinf()`, so it is invisible on Linux and glibc, and live on illumos/Solaris,
+   where it broke the 0.298 build outright.
 
  - The long-double row is conditional. The `l` variants are C99 but some libms —
    the thinner BSD ones especially — do not ship the whole set, so `Makefile.PL`

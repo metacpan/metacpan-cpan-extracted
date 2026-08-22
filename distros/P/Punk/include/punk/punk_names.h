@@ -148,5 +148,6 @@ static int pk_require_once(pTHX_ const char *mod, int fatal) {
 #define K_IDEM_ROUTES "idempotent_routes"
 #define K_IDEM     "idempotency"       /* the plugin's config */
 #define K_CSP      "csp"                /* Punk::Plugin::CSP config  */
+#define K_I18N     "i18n"               /* Punk::Plugin::I18n config */
 
 #endif /* PUNK_NAMES_H */

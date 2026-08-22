@@ -1,6 +1,6 @@
 package Poker::Game::OmahaHiLo;
+our $VERSION = '0.12';
 
-our $VERSION = '0.11';
 
 use strict;
 use warnings FATAL => 'all';
@@ -15,7 +15,7 @@ Poker::Game::OmahaHiLo - Omaha Hold'em high/low 8-or-better
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

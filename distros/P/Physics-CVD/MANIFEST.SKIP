@@ -1,0 +1,28 @@
+
+# Start with the default MANIFEST.SKIP patterns shipped with ExtUtils::Manifest.
+#!include_default
+
+# Version control
+\B\.git\b
+\B\.gitignore\b
+
+# Build artifacts
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+^MYMETA\.
+^_build/
+^Build$
+
+# Generated man pages emitted under none/ by the build
+^none/
+
+# The unpacked distribution directory produced by `make dist`
+^Physics-CVD-[0-9]
+
+# Editor / tooling cruft
+\B\.aider
+~$
+\.bak$
+\.swp$

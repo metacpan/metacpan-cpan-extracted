@@ -54,87 +54,87 @@
    "provides" : {
       "PAGI::FastAPI" : {
          "file" : "lib/PAGI/FastAPI.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::BotProtection" : {
          "file" : "lib/PAGI/FastAPI/BotProtection.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::BotProtection::ProofOfWork" : {
          "file" : "lib/PAGI/FastAPI/BotProtection/ProofOfWork.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Context" : {
          "file" : "lib/PAGI/FastAPI/Context.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Cookies" : {
          "file" : "lib/PAGI/FastAPI/Cookies.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Depends" : {
          "file" : "lib/PAGI/FastAPI/Depends.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Middleware::BotProtection" : {
          "file" : "lib/PAGI/FastAPI/Middleware/BotProtection.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Middleware::ExceptionHandler" : {
          "file" : "lib/PAGI/FastAPI/Middleware/ExceptionHandler.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Middleware::RateLimit" : {
          "file" : "lib/PAGI/FastAPI/Middleware/RateLimit.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Queue" : {
          "file" : "lib/PAGI/FastAPI/Queue.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Queue::Driver" : {
          "file" : "lib/PAGI/FastAPI/Queue/Driver.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Queue::Driver::Memory" : {
          "file" : "lib/PAGI/FastAPI/Queue/Driver/Memory.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::RateLimit::Driver" : {
          "file" : "lib/PAGI/FastAPI/RateLimit/Driver.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::RateLimit::Driver::Memory" : {
          "file" : "lib/PAGI/FastAPI/RateLimit/Driver/Memory.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Response" : {
          "file" : "lib/PAGI/FastAPI/Response.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Response::File" : {
          "file" : "lib/PAGI/FastAPI/Response/File.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Response::HTML" : {
          "file" : "lib/PAGI/FastAPI/Response/HTML.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Response::Redirect" : {
          "file" : "lib/PAGI/FastAPI/Response/Redirect.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::Response::SSE" : {
          "file" : "lib/PAGI/FastAPI/Response/SSE.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::ResponseModel" : {
          "file" : "lib/PAGI/FastAPI/ResponseModel.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       },
       "PAGI::FastAPI::TypedPath" : {
          "file" : "lib/PAGI/FastAPI/TypedPath.pm",
-         "version" : "v1.2.4"
+         "version" : "v1.2.5"
       }
    },
    "release_status" : "stable",
@@ -148,6 +148,6 @@
          "web" : "https://github.com/manwar/PAGI-FastAPI"
       }
    },
-   "version" : "v1.2.4",
+   "version" : "v1.2.5",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -393,4 +393,92 @@ $t->get_ok('/verified/v', headers => { Accept => 'application/json' })
         '$c->login is the primitive an on_login body ends in');
 }
 
+# ---- the helpers without the keyword -----------------------------------------
+#
+# Every one of these reads a config the `auth` keyword froze. Without it there
+# is nothing to read, and the difference between saying so and going ahead is
+# the difference between a 500 naming the missing keyword and a handler
+# dereferencing whatever was there instead.
+#
+# Nothing had ever called them on an app with no `auth`, so nothing said which
+# it was. They are each one line here because the point is the guard, not the
+# feature - and because eight guards written once are eight guards somebody
+# will eventually copy a ninth from.
+{
+    package NoAuthApp;
+    use Punk;
+    session secret => 'k';           # a session, deliberately, but no auth
+
+    get '/login'      => sub { $_[0]->login(1);            $_[0]->text('x') };
+    get '/auth_id'    => sub { $_[0]->auth_id;             $_[0]->text('x') };
+    get '/current'    => sub { $_[0]->current_user;        $_[0]->text('x') };
+    get '/check'      => sub { $_[0]->check_password('u', 'p'); $_[0]->text('x') };
+    get '/issue'      => sub { $_[0]->issue_token(1, 'reset', 60); $_[0]->text('x') };
+    get '/take'       => sub { $_[0]->take_token('tok');   $_[0]->text('x') };
+    package main;
+
+    my $n = Punk::Test->new('NoAuthApp');
+    for my $case (
+        [ '/login',   'login'         ],
+        [ '/auth_id', 'auth_id'       ],
+        [ '/current', 'current_user'  ],
+        [ '/check',   'check_password'],
+        [ '/issue',   'issue_token'   ],
+        [ '/take',    'take_token'    ],
+    ) {
+        my ($path, $what) = @$case;
+        $n->get_ok($path)->status_is(500, "\$c->$what without `auth` is refused");
+        $n->json_like('/errors/0/message' => qr/\Q$what\E needs the auth keyword/,
+            "...naming $what and the keyword it needs");
+    }
+}
+
+# `logout` is the one that does NOT need it: it goes through session_expire,
+# which is the session's, so an app with a session and no auth can still log
+# somebody out of it. Worth pinning, because it looks like an oversight next to
+# the six above and is not.
+{
+    package LogoutOnlyApp;
+    use Punk;
+    session secret => 'k';
+    get '/out' => sub { $_[0]->logout; $_[0]->text('out') };
+    package main;
+
+    Punk::Test->new('LogoutOnlyApp')->get_ok('/out')->status_is(200)
+      ->content_is('out', 'logout works without `auth` - it is the session\'s');
+}
+
+# ---- what login refuses ------------------------------------------------------
+{
+    package LoginArgApp;
+    use Punk;
+    session secret => 'k';
+    auth model => 'User', fields => { id => 'user_pk' };
+
+    get '/no-field' => sub { $_[0]->login({ email => 'a@b.co' }); $_[0]->text('x') };
+    get '/undef'    => sub { $_[0]->login(undef);                 $_[0]->text('x') };
+    get '/by-id'    => sub { $_[0]->login(7);                     $_[0]->text('ok') };
+    get '/by-row'   => sub { $_[0]->login({ user_pk => 9 });      $_[0]->text('ok') };
+    get '/id'       => sub { $_[0]->text($_[0]->auth_id // 'none') };
+    package main;
+
+    my $l = Punk::Test->new('LoginArgApp');
+
+    $l->get_ok('/no-field')->status_is(500);
+    $l->json_like('/errors/0/message' => qr/no 'user_pk'/,
+        'a user row without the CONFIGURED id field is refused, naming the '
+      . 'field it looked for rather than the default');
+
+    $l->get_ok('/undef')->status_is(500);
+    $l->json_like('/errors/0/message' => qr/needs a user row or id/,
+        'and so is undef, which is what a failed lookup hands over');
+
+    # the two shapes that do work, so the refusals above are not just "login
+    # never works here"
+    $l->get_ok('/by-id')->status_is(200);
+    $l->get_ok('/id')->content_is('7', 'a bare id logs in');
+    $l->get_ok('/by-row')->status_is(200);
+    $l->get_ok('/id')->content_is('9', 'and so does a row carrying that field');
+}
+
 done_testing;

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::OpenAPI;
-$Mojolicious::Plugin::Fondation::OpenAPI::VERSION = '0.04';
+$Mojolicious::Plugin::Fondation::OpenAPI::VERSION = '0.05';
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
 
@@ -94,11 +94,12 @@ sub fondation_finalyze ($self, $app, $long_name) {
 
                 my $label = $cond eq 'fondation.perm'
                     ? 'Permission' : 'Group';
-                $c->problem(
+                $c->res->code(403);
+                $c->stash('fondation.denied' => {
                     status => 403,
                     title  => 'Forbidden',
                     detail => "$label '$value' required",
-                );
+                }) unless $c->stash('fondation.denied');
                 return undef;
             });
         }
@@ -155,7 +156,7 @@ Mojolicious::Plugin::Fondation::OpenAPI - OpenAPI specification generator and ru
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

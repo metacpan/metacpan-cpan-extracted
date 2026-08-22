@@ -2016,6 +2016,201 @@ default, overridable with a fourth argument:
     my $s = csort($hoh, 'score', 'aoh');           # row name in 'row.name'
     my $s = csort($hoh, 'score', 'aoh', 'sample'); # ... named 'sample' instead
 
+## density
+
+Kernel density estimation — a smooth curve through a sample, the continuous
+answer to what `hist` answers in bars. This is a port of R's `density()`, down
+to the algorithm: the mass of the sample is dispersed over a regular grid of at
+least 512 points, that grid is convolved with a discretised kernel using the
+fast Fourier transform, and the result is interpolated back onto the points you
+asked for. It returns the same grid, the same bandwidth and the same estimate R
+would.
+
+    my $d = density(\@x);
+    printf "%g\t%g\n", $d->{x}[$_], $d->{y}[$_] for 0 .. $#{ $d->{x} };
+
+What that computes is one kernel — a little bump of area `1/n` — centred on
+every observation, added together. On the left below, seven observations and
+their seven gaussian kernels; the blue curve through them is what `density`
+returns. On the right, the same thing over R's `faithful$eruptions`, against
+the histogram of the same sample: the two answer the same question, one in
+bars and one as a curve.
+
+![density() is the sum of one kernel per observation, and the smooth counterpart of a histogram](https://raw.githubusercontent.com/hhg7/stats/main/img/density.what.png)
+
+Arguments may be given positionally (the sample first) or by name, and R's
+dotted argument names are accepted alongside the underscored ones
+(`na.rm` as well as `na_rm`, `old.coords` as well as `old_coords`,
+`give.Rkern` as well as `give_rkern`, `warnWbw` as well as `warn_wbw`).
+
+    my $d = density(x => \@x, bw => 'SJ', kernel => 'epanechnikov', n => 1024);
+
+### Arguments
+
+- **`x`** — the sample, an array reference. Required (except with
+  `give_rkern`). A missing value (`undef` or `NaN`) is an error unless
+  `na_rm` is set; anything else non-numeric is always an error. An infinite
+  observation is treated as a point mass at ±∞, so it is counted in `n` and
+  takes its share of the mass with it, leaving a sub-density on (−∞, ∞).
+- **`bw`** — the smoothing bandwidth, which is the standard deviation of the
+  kernel. Either a positive number, or the name of a rule to choose one:
+  `'nrd0'` (the default), `'nrd'`, `'ucv'`, `'bcv'`, `'SJ'` / `'SJ-ste'`, or
+  `'SJ-dpi'`. Rule names are case-insensitive. The five rules are also
+  available on their own as `bw_nrd0`, `bw_nrd`, `bw_ucv`, `bw_bcv` and
+  `bw_sj`, described below.
+- **`adjust`** — the bandwidth actually used is `adjust * bw`, so
+  `adjust => 0.5` asks for half the default smoothing. Defaults to 1.
+- **`kernel`** — one of `'gaussian'` (the default), `'epanechnikov'`,
+  `'rectangular'`, `'triangular'`, `'biweight'`, `'cosine'` or `'optcosine'`.
+  Any unambiguous abbreviation will do, so a single letter is enough for every
+  one of them, and the match is case-insensitive. All seven are scaled so that
+  `bw` is the kernel's standard deviation, which is why changing the kernel
+  barely changes the estimate.
+- **`window`** — an alias for `kernel`, for compatibility with S. An explicit
+  `kernel` wins.
+- **`width`** — also for compatibility with S, where the argument is the
+  *length of the kernel's support* rather than a multiple of its standard
+  deviation (for the gaussian, four standard deviations). Consulted only when
+  `bw` is not given. A string names a rule, exactly as `bw` does.
+- **`weights`** — an array reference of non-negative observation weights, one
+  per element of `x` — including the missing ones, so it is always the same
+  length as `x` was to begin with. The default is `1/nx` each. Weights that do
+  not sum to 1 give a *sub*-density and draw a warning; pass `subdensity => 1`
+  if that is what you meant. If `na_rm` removes observations and the original
+  weights summed to one, the survivors are rescaled so they still do.
+  Bandwidth *rules* ignore the weights, and say so; `warn_wbw => 0` silences
+  that, and it is silent anyway when the weights do not vary.
+- **`n`** — the number of equally spaced points at which to estimate. Defaults
+  to 512. Values above 512 are rounded up to a power of two internally (that
+  is what makes the FFT cheap) and the result is interpolated back to exactly
+  the `n` you asked for, so a power of two is the efficient choice.
+- **`from`, `to`** — the ends of the output grid. The defaults are `cut`
+  bandwidths outside the range of the data.
+- **`cut`** — how many bandwidths past the extremes of the data the default
+  `from` and `to` reach, so that the estimate has room to fall to about zero.
+  Defaults to 3.
+- **`ext`** — how many further bandwidths the internal FFT grid extends beyond
+  `from` and `to`. Defaults to 4. Do not change it unless you know why you are
+  changing it; it does not move the output grid, only the accuracy of the
+  values on it.
+- **`na_rm`** — drop missing values instead of failing on them. Defaults to
+  off, which is R's default too.
+- **`subdensity`** — suppress the "weights do not sum to one" warning, because
+  a sub-density is what was wanted.
+- **`warn_wbw`** — whether to warn that an automatic bandwidth ignored the
+  weights. Defaults on when the weights vary.
+- **`old_coords`** — reproduce the pre-R-4.4.0 grid, whose values are too
+  large by a factor of about `1 + 1/(2n-2)`. For reproducing old results only.
+- **`give_rkern`** — return R(K), the kernel's *canonical bandwidth*, and no
+  density at all. See below.
+- **`nb`** — the number of bins the `'ucv'`, `'bcv'` and `'SJ'` rules use for
+  their pair counts. Defaults to 1000, as in R.
+
+### What the arguments do
+
+`bw` is the whole ballgame. It is the standard deviation of the kernel, so it
+sets how wide each bump is, and `adjust` multiplies it: `adjust => 0.5` is half
+the default smoothing. Too little and the estimate follows the individual
+observations (the ticks along the bottom are the sample); too much and the two
+modes of `eruptions` melt into one. `bw` is reported back in the return value,
+so the number in each label below is `$d->{bw}`.
+
+![the same sample at four bandwidths, from far too small to far too large](https://raw.githubusercontent.com/hhg7/stats/main/img/density.bandwidth.png)
+
+`kernel` chooses the shape of the bump. All seven are scaled so that `bw` is
+the kernel's standard deviation, which is why they are interchangeable in
+practice. Each panel below is one kernel on a common scale, drawn by asking for
+the density of a single observation at zero — `density([0], bw => 1)` *is* the
+kernel — and titled with the R(K) that `give_rkern` returns. The last panel
+puts all seven over one sample at one bandwidth, where they are hard to tell
+apart.
+
+![the seven kernels on a common scale, and the near-identical estimates they give](https://raw.githubusercontent.com/hhg7/stats/main/img/density.kernels.png)
+
+`from`, `to` and `cut` decide only where the grid stops: `cut` bandwidths past
+the extremes of the data, three by default. Changing it moves the ends of
+`$d->{x}` (marked below) and nothing else — the estimate itself is the same
+function. `weights`, on the other hand, changes the estimate: each observation
+takes its own share of the mass rather than `1/n`, which is how a sample that
+was collected with unequal probabilities gets its population back.
+
+![cut moves only the ends of the grid, while weights change the estimate itself](https://raw.githubusercontent.com/hhg7/stats/main/img/density.grid.weights.png)
+
+### Return value
+
+A hash reference:
+
+- **`x`** — the `n` grid points at which the density was estimated, an array
+  reference, strictly increasing from `from` to `to`.
+- **`y`** — the estimated density there, an array reference of the same
+  length. Never negative, though it can be zero.
+- **`bw`** — the bandwidth actually used, i.e. `adjust` times whatever `bw`
+  resolved to. Worth reading back when a rule chose it.
+- **`n`** — the sample size after missing values were removed. Infinite
+  observations still count.
+- **`kernel`** — the kernel that was used, spelled out in full, so an
+  abbreviation comes back resolved.
+- **`old_coords`**, **`has_na`** — echoes of the corresponding R fields;
+  `has_na` is always 0.
+
+    my $d = density(\@x, bw => 'SJ');
+    printf "bandwidth %.4f over %d observations\n", $d->{bw}, $d->{n};
+
+With `give_rkern => 1` the return is instead a plain number: R(K) = ∫K²(t)dt
+for the chosen kernel, the scale-invariant quantity that says how efficient
+that kernel is. No data is needed, and any that is given is ignored.
+
+    my $rk = density(kernel => 'epanechnikov', give_rkern => 1);   # 0.2683283
+
+Bandwidths that are "exactly equivalent" across kernels are then
+`(R(K_gaussian)/R(K))**0.2` times each other — the adjustment is within about
+1% either way, which is why the choice of kernel rarely matters.
+
+### The bandwidth rules: `bw_nrd0`, `bw_nrd`, `bw_ucv`, `bw_bcv`, `bw_sj`
+
+The five rules `density`'s `bw =>` string can name are also callable in their
+own right, and are ports of R's `bw.nrd0`, `bw.nrd`, `bw.ucv`, `bw.bcv` and
+`bw.SJ`. Each takes the sample the same two ways `density` does and returns a
+plain number.
+
+    my $h = bw_nrd0(\@x);
+    my $h = bw_sj(x => \@x, method => 'dpi');
+
+They disagree, and on a bimodal sample they disagree by a factor of four. Each
+panel below is `eruptions` at the bandwidth that rule chose, over the same
+histogram: `nrd0` and `nrd` assume one mode and oversmooth this sample, `ucv`
+goes the other way, and the two `SJ` variants land in between.
+
+![the same sample under each of the six bandwidth rules](https://raw.githubusercontent.com/hhg7/stats/main/img/density.bw.rules.png)
+
+- **`bw_nrd0`** — Silverman's rule of thumb, `0.9 * min(sd, IQR/1.34) *
+  n**-0.2`, and `density`'s default. It is the default for historical reasons
+  rather than because it is the best choice.
+- **`bw_nrd`** — Scott's variation on the same rule, with 1.06 in place of 0.9.
+- **`bw_ucv`**, **`bw_bcv`** — unbiased (least-squares) and biased
+  cross-validation. Both minimise a criterion over a range of bandwidths and
+  warn, as R does, if the minimum turned up at one end of that range.
+- **`bw_sj`** — the Sheather & Jones (1991) selector, usually the one to
+  reach for. `method => 'ste'` (the default) solves the equation;
+  `method => 'dpi'` plugs in directly. These are what `bw => 'SJ'` and
+  `bw => 'SJ-dpi'` select.
+
+The three that search also accept `nb` (the number of bins for the pair
+counts, 1000 by default), `lower` and `upper` (the range searched) and `tol`
+(where the search stops, `0.1 * lower` by default). Unlike `density`, these
+five want a clean numeric sample: a missing or infinite value is an error, not
+something to drop.
+
+Validated against R 4.6.1 — its own regression suite, the examples in
+`?density` and `?bw.nrd`, and their pinned output — by `t/density.R.scipy.t`,
+which also cross-checks the whole binning/FFT/interpolation pipeline against
+SciPy's exact `gaussian_kde`.
+
+The figures above are drawn by `density.plots.pl` in the repository, from the
+same `eruptions` and `precip` samples that test file uses. It is an author-only
+script — it is not installed, and it needs `Matplotlib::Simple`, `python3` and
+`matplotlib` — so re-run it only when a figure needs to change.
+
 ## dnorm
 
 gives the density of the normal distribution, with the specified mean and standard deviation.
@@ -3293,6 +3488,30 @@ I feel that this is better, and more easily read, than what you get in R:
     );
     my $kt = kruskal_test(\@x, \@g);
 
+### missing values, and groups with no data
+
+Non-numeric, undefined and `NaN` elements are silently dropped before the test
+runs, matching R's `complete.cases(x, g)` — `NaN` is `NA` to R, so it goes too.
+`+Inf` and `-Inf` are neither, and a rank test has no trouble with them, so
+they are kept and ranked.
+
+A group left with no usable observation is refused rather than guessed at, as
+R's list interface does: `kruskal_test` croaks `all groups must contain data`.
+That covers an empty array reference and one whose every element was dropped.
+Counting such a group would inflate the degrees of freedom, and testing only
+the groups that do have data under a `df` that counts one that does not is not
+a test of anything. (SciPy takes the other side of this and returns `NaN`.)
+
+A sample with no variation at all gives a tie correction of exactly zero, so
+the statistic is `0/0`: like R, `statistic` and `p_value` come back as `NaN`.
+
+### returned fields
+
+`statistic`, `parameter` (the degrees of freedom) and `method` are R's `htest`
+fields; the p-value is available as both `p_value` and `p.value`. On top of
+those, `group_stats` holds `size` and `mean` sub-hashes keyed by your own group
+labels, computed over the same observations the statistic used.
+
 ## ks_test
 
 The Kolmogorov–Smirnov test checks whether two samples are drawn from the
@@ -3380,6 +3599,18 @@ or bimodal one a negative number. Add `3` if you want the plain fourth
 standardized moment. Validated numerically against R.
 
     kurtosis(2, 4, 4, 4, 5, 5, 7, 9);        # 0.940625
+
+Kurtosis is the fourth moment, so what it describes is the tails. Below, three
+samples standardized to mean `0` and standard deviation `1` — a uniform sample,
+which has no mass at all left for the extremes; a normal sample; and a scale
+mixture of two normals, one observation in ten drawn with three times the spread
+— each against the same `N(0, 1)` curve in grey, so that the only thing that
+differs between the panels is shape. On a linear axis (the top row) the
+heavy-tailed sample looks like little more than a sharper peak; the bottom row
+is the same three estimates on a logarithmic density, where the tail that the
+positive number is reporting is visible over three decades.
+
+![a flat-shouldered, a normal and a heavy-tailed sample, and the tails behind the kurtosis of each](https://raw.githubusercontent.com/hhg7/stats/main/img/kurtosis.what.png)
 
 Arguments work as they do for [sd](#sd) and [var](#var): plain numbers, array
 references, or any mixture of the two, all flattened into one sample.
@@ -4746,6 +4977,11 @@ Calculates sample quantiles using R's continuous Type 7 interpolation.
 
 If the `probs` parameter is omitted, it behaves identically to R by defaulting to the 0, 25, 50, 75, and 100 percentiles (`c(0, .25, .5, .75, 1)`). The returned hash keys match R's standardized naming convention (e.g., `"25%"`, `"33.3%"`).
 
+A probability that lands a hair outside `[0, 1]` — the usual result of computing
+one rather than writing it down — is clamped to the endpoint rather than
+refused, within the same `100 * eps` that R allows; anything further out is an
+error. `undef` values in `x` are dropped.
+
 ## rank
 
 Rank values like R's `rank()`. Takes flat scalars and/or array refs (like `min`), with optional trailing `ties.method` / `na.last` options. Returns the list of ranks in input order.
@@ -5128,11 +5364,15 @@ tests to see if an array reference is normally distributed, returns a p-value an
 and returns the hash reference:
 
     {
-    p.value     0.589650577093106,
-    p_value     0.589650577093106,
-    statistic   0.960870680168535,
-    W           0.960870680168535
+    p.value     0.96717393596804,
+    p_value     0.96717393596804,
+    statistic   0.986762155447719,
+    W           0.986762155447719
     }
+
+matching R's `shapiro.test(1:5)` to the last digit it prints. Values that are
+`undef` or `NaN` are dropped first, exactly as R's `complete.cases()` drops
+them, and the remaining sample must hold between 3 and 5000 values.
 
 ## skew
 
@@ -5142,6 +5382,15 @@ lengths of stay), negative a long left tail, and about zero a symmetric sample.
 Validated numerically against R.
 
     skew(2, 4, 4, 4, 5, 5, 7, 9);        # 0.8184875533568
+
+Below, three samples standardized to mean `0` and standard deviation `1`, each
+against the same `N(0, 1)` curve in grey: a log-normal sample mirrored into a
+long left tail, a normal sample, and the log-normal itself. The sign of `skew`
+is which side of the median the mean has ended up on — the long tail pulls the
+mean towards itself and leaves the median behind, which is why a skewed lab
+value is usually better summarized by its median than by its mean.
+
+![a left-tailed, a symmetric and a right-tailed sample, with the mean and median of each](https://raw.githubusercontent.com/hhg7/stats/main/img/skew.what.png)
 
 Arguments work as they do for [sd](#sd) and [var](#var): plain numbers, array
 references, or any mixture of the two, all flattened into one sample.
@@ -5172,9 +5421,9 @@ divided by `n`):
     b1 = g1 * ((n - 1) / n)**1.5          # type 3
 
     my @x = (1, 2, 4);
-    skew(\@x, type => 1);   # 0.3818017742   plain moment ratio
-    skew(\@x);              # 0.9352195296   G1, the default
-    skew(\@x, type => 3);   # 0.2078265621   b1
+    skew(\@x, type => 1); # 0.3818017742   plain moment ratio
+    skew(\@x);            # 0.9352195296   G1, the default
+    skew(\@x, type => 3); # 0.2078265621   b1
 
 `type => 2` is the estimator that is unbiased for a normal sample, which is why
 it is the default and why it is what every general-purpose statistics package
@@ -5335,6 +5584,26 @@ the two groups compared can be specified, though not necessarily, as `x` and `y`
 	    paired => 1
     );
 
+### What the test is asking
+
+Every t-test is the same three numbers. `estimate` is what the data say — a
+mean, or a difference of means. `mu` is what the null hypothesis says. The
+standard error is how far apart those two would ordinarily drift by chance
+alone, and `statistic` is the distance from `mu` to `estimate` measured in
+standard errors:
+
+    statistic = (estimate - mu) / SE
+
+`df` says which t distribution that statistic would follow if the null were
+true, and `p_value` is the area of that distribution further out than the
+statistic — the chance of landing this far from `mu`, or further, when `mu` is
+right. Below, R's `sleep` data as a paired test: ten patients, each measured on
+two drugs, so the ten paired differences are one sample and `mu = 0` is "the two
+drugs are the same". The middle panel is the whole p-value; the right panel is
+one of its two tails, magnified until it can be seen.
+
+![the estimate, mu and the standard error, and the null distribution the p-value is an area under](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.what.png)
+
 ### Parameters
 
 | Parameter | Type | Default | Description |
@@ -5346,6 +5615,92 @@ the two groups compared can be specified, though not necessarily, as `x` and `y`
 | `var_equal` | Boolean | `FALSE` | If true, assumes equal variances (standard two-sample). If false, performs Welch's t-test with unequal variances. |
 | `conf_level` | Float | 0.95 | Confidence level for the returned confidence interval. Must be strictly between 0 and 1 (R also accepts the degenerate 0 and 1). See [Extreme `conf_level`](#extreme-conf_level) for the precision limit past about `0.9999`. |
 | `alternative` | String | `"two.sided"` | Direction of the alternative hypothesis: `"two.sided"`, `"less"`, or `"greater"`. `"two-sided"` and `"two_sided"` are accepted as `scipy`'s spelling of the same thing. Anything else is a fatal error — an unrecognised value must not quietly become a two-sided test. |
+
+### `conf_int`
+
+`conf_int` is the estimate plus and minus a multiple of the same standard error
+the statistic divides by, and `conf_level` picks the multiple — the t quantile
+at that level and `df`. Nothing else goes into it. On the left below, the whole
+interval taken apart: for the paired `sleep` test, `2.26216 * 0.38896 = 0.87989`
+either side of `-1.58`. On the right, the same interval at six confidence
+levels. A wider `conf_level` needs a bigger quantile and so gives a wider
+interval, and the level at which the interval first reaches `mu` is exactly
+`1 - p_value` — the second panel from the bottom, whose upper bound lands on
+zero.
+
+![conf_int is the estimate plus or minus a t quantile times the standard error, and conf_level sets the quantile](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.conf.int.png)
+
+### `alternative`
+
+`alternative` decides which part of the null distribution counts against the
+null, and therefore both `p_value` and `conf_int`. `"two.sided"` counts both
+tails beyond `|statistic|`, `"less"` counts only what lies below the statistic,
+and `"greater"` only what lies above; the two one-sided p-values always add to
+1, and each is half the two-sided one when it is the smaller. The interval
+follows: a one-sided alternative gives a one-sided interval, with the other
+bound infinite. The example is `t_test($drug1, $drug2)` on `sleep` — the same
+twenty numbers as above, but unpaired.
+
+![the three alternatives, the region of the null distribution each one counts, and the interval that goes with it](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.alternative.png)
+
+### `mu`, `p_value` and `conf_int` say one thing
+
+`conf_int` is the set of `mu` the test would not reject. Sweep `mu` across the
+line and re-run the test at each value: the p-value peaks at 1 where `mu` equals
+the estimate, and falls through `1 - conf_level` at precisely the two bounds of
+`conf_int`. That is what "the interval excludes zero" and "p is below 0.05" both
+mean — they are one statement, not two pieces of evidence.
+
+Which is also why `mu` never moves `conf_int`. Changing `mu` changes which
+hypothesis is being tested, so `statistic` and `p_value` move with it; the
+interval is built around the estimate and stays where it is.
+
+![p_value as a function of mu, crossing 1 - conf_level exactly at the two bounds of conf_int](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.duality.png)
+
+### What a falling p-value looks like
+
+The same thing seen from the data's side: two samples drawn from two different
+distributions, pulled steadily apart. Each column below is one `t_test` of the
+`sleep` groups with drug 1 shifted — the top panel is the two distributions, by
+this module's own [`density`](#density), and the bottom panel is the `conf_int`
+that comes back. The columns are four p-values five orders of magnitude apart.
+
+![two distributions separating, and the conf_int retreating from mu as the p-value falls](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.p.and.ci.png)
+
+Only one thing about the interval changes: where it sits. `df` stays at
+`17.7765` and its width stays at `3.5710` down the whole row, because shifting a
+sample changes neither the spread nor `n`, and those are all the standard error
+is made of. What moves is the distance from `mu` — and the second column is the
+hinge: at `p_value = 0.05` the interval's upper bound is `0.0000`, sitting
+exactly on `mu`, because "p below 0.05" and "the 95% interval clear of `mu`" are
+the same event.
+
+Reading the two together is the point. `p_value` reports the distance from `mu`
+in standard errors and nothing else, so it says how surely the difference is not
+zero, never how big it is; `conf_int` reports the difference itself, in hours of
+sleep. The other route to a small p is a smaller standard error — more
+observations, or less spread — and that one drives `p_value` down by narrowing
+the interval around an estimate that has not moved at all.
+
+### `paired` and `var_equal`
+
+The same twenty numbers give three different answers depending on what is
+assumed about them. `paired => 1` says the two vectors are two measurements of
+the same ten subjects and tests the ten differences, which removes the
+subject-to-subject variation and here turns `p = 0.079` into `p = 0.0028`.
+Unpaired, `var_equal => 1` pools the two variances into one and spends
+`n(x) + n(y) - 2` degrees of freedom; the default Welch test does not pool, and
+buys that safety with a fractional `df` from the Welch–Satterthwaite equation.
+
+Welch's `df` is at most `n(x) + n(y) - 2`, reaching it only when the two spreads
+match, and falls toward `n - 1` of whichever sample dominates the standard error
+as they separate. The middle and right panels sweep `t.test(1:10, 7:20)` — the
+other example in R's `?t.test` — scaling the spread of `y` about its own mean:
+`var_equal` keeps claiming 22 degrees of freedom throughout, and pays for the
+claim with a p-value that is wrong by three orders of magnitude at the left-hand
+edge.
+
+![paired, var_equal and Welch on the same data, and the Welch degrees of freedom as the two spreads separate](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.designs.png)
 
 ### Extreme `conf_level`
 
@@ -5411,6 +5766,19 @@ Dies if:
 | `estimate` | The estimated mean of `x` (one-sample) OR the mean of the differences (paired). |
 | `estimate_x` | The estimated mean of the `x` vector (only returned in two-sample tests). |
 | `estimate_y` | The estimated mean of the `y` vector (only returned in two-sample tests). |
+
+Validated against R 4.x's `stats::t.test` and against `scipy.stats` — cases
+lifted from R's own regression suite and from SciPy's `TestTTest_1samp`,
+`TestTTest_ind` and confidence-interval tests — by `t/t_test.t`.
+
+The figures above are drawn by `t.test.plots.pl` in the repository, from the
+two examples in R's `?t.test`: the `sleep` data (`t = -1.8608`, `df = 17.776`,
+`p-value = 0.07939` unpaired, `t = -4.0621`, `df = 9`, `p-value = 0.002833`
+paired) and `t.test(1:10, y = c(7:20))`. Every number annotated on them comes
+back out of `t_test` itself, so a figure cannot drift away from the module. It
+is an author-only script — it is not installed, and it needs
+`Matplotlib::Simple`, `python3` and `matplotlib` — so re-run it only when a
+figure needs to change.
 
 ## transpose
 
@@ -6031,6 +6399,369 @@ Verified against R 4.6.1 (`oneway.test`, `anova(aov())`, `anova(lm())`,
 
 # Changes
 
+## 0.301 2026-08-21 CDT
+
+there are numerous additions of `restrict` keywords, which may or may not improve speed
+
+### kruskal_test
+
+`kruskal_test` cross-validated against R 4.6.1's `stats::kruskal.test()` and
+SciPy 1.18.0's `TestKruskal`, driven by those suites' own cases rather than by
+cases invented here. Six bugs are fixed: five in how the arguments and the data
+are read before any ranking happens, and one in the chi-squared tail, which
+reaches every function that uses it. The test now needs a third of the memory
+and runs in under half the time, and it returns the same answer twice in a row,
+which it did not before.
+
+Everything below is checked in the new `t/kruskal_test.R.scipy.t` (870 tests),
+whose expected values are frozen literals with their provenance recorded in the
+file header; it needs no R and no Python to run. The generator that produced
+them, `t/kruskal_test.R.scipy.R`, is committed beside it. There had been no
+`t/kruskal_test.t` at all — the only coverage was six assertions in `t/01.t` on
+the single Hollander & Wolfe example, and none of the six bugs would have shown
+up in it. The full suite is 125 files and 25,951 tests, and
+`./test.all.perls.pl` passes on all five local perls — `5.10.1`, `5.12.5`
+(long double), `5.42.3`, `5.44.0` and `5.44.0-quadmath` — with no warnings on
+any of them.
+
+#### NaN was ranked instead of dropped
+
+`looks_like_number` is true for `NaN`, so a `NaN` went into the ranking. R
+treats `NaN` as `NA` and `complete.cases(x, g)` removes it before `rank()` ever
+sees it:
+
+| data | was | R 4.6.1 |
+|---|---|---|
+| `c(1,2,3,4,5,6)` with one `NaN`, n = 7 | `H = 4.5` | `H = 3.8571428571428577` |
+| `1:24` with one `NaN` | `H = 17.28` | `H = 16.5` |
+
+It also handed `cmp_nv3` a comparison that is never true for any pair
+involving the `NaN`, which leaves `qsort` without the strict weak ordering it is
+entitled to — the same defect `wilcox_test` had fixed in 0.298, where the
+comment describing it is still in the file. `+Inf` and `-Inf` are neither `NA`
+nor `NaN` to R and a rank test has no trouble with them, so they are still kept
+and ranked; that is now pinned rather than incidental.
+
+The bad value propagated: `table_one`'s `_t1_cont_p` hands its groups straight
+to `kruskal_test`, so a single `NaN` among nine observations was reported at
+`p = 0.0273` where dropping it gives `0.0439`.
+
+#### A group with no data inflated the degrees of freedom
+
+The hash-of-arrays form counted every key in `k`, including a key whose array
+was empty or whose every element had been dropped. On
+`{a => [1,1,1], b => [2,2,2], c => []}` that gave `df = 2` and
+`p = 0.0820849986238988` for what is a two-group problem with
+`df = 1, p = 0.025347318677468304`. Such a group was already skipped when
+forming the statistic and when building `group_stats`; only `df` still counted
+it.
+
+R refuses this case outright — `all groups must contain data` — and so does
+`kruskal_test` now, because the alternative is to test the groups that do have
+data under a `df` that counts one that does not. R's order of checks came with
+it: it filters each group, refuses an empty one, and only then counts what is
+left, so `{a => [], b => []}` is `all groups must contain data` and not
+`not enough observations`. SciPy takes the other side of this and returns `NaN`
+with a `SmallSampleWarning`; the divergence is recorded in the test file rather
+than papered over. The `x`/`g` form cannot reach any of this — it mints a group
+id the first time an observation survives the filter — so nothing changes there.
+
+#### Group labels were truncated at a NUL and lost their UTF-8 flag
+
+The `x`/`g` path read the label with `SvPV_nolen` and then took `strlen` of it.
+Perl strings are counted, not NUL-terminated, so `"a\0X"` and `"a\0Y"`
+collapsed into one group: `kruskal_test([1..6], ["a\0X","a\0X","a\0Y","a\0Y","b","b"])`
+came back as two groups with `df = 1, H = 2.4` instead of three with
+`df = 2, H = 4.571428571428573`. Both paths also copied the label's bytes while
+dropping perl's UTF-8 flag when storing it into `group_stats`, so a label
+outside latin-1 came back as mojibake and the two input paths disagreed with
+each other about labels inside it. The length now travels with the string and
+carries the flag in its sign, which is `hv_store`'s own convention, so a label
+comes back `eq` to what went in. Dropping the `strlen` also drops a pass over
+every label.
+
+#### A trailing named argument read past the argument stack
+
+The named-argument loop took `ST(arg_idx + 1)` without checking that there was
+one, so an odd argument list read one slot past the top of the stack — and what
+it found there changed which branch ran: `kruskal_test(\%h, 'x')` came back
+complaining that `'h'` cannot be mixed with `'x'`/`'g'`, because `x_sv` had been
+assigned whatever was past the end. `binom_test`, `chisq_test`, `fisher_test`,
+`wilcox_test`, `var_test` and `prcomp` all guard this; `kruskal_test` was the
+one that did not. It now croaks `odd number of named arguments`.
+
+#### An infinite chi-squared statistic gave no p-value
+
+`get_p_value` short-circuits a statistic at or below zero and otherwise goes to
+`igamc`. `+Inf` is neither, so it reached the continued fraction, where the
+first `1/d` is `1/Inf = 0` and then `del = 0 * Inf` is `NaN` — an overwhelmingly
+significant result reported as no result at all. R's
+`pchisq(Inf, df, lower.tail = FALSE)` is `0`, and so is this now. `NaN` in gives
+`NaN` out, as R does, rather than running the continued fraction to its full
+10,000-iteration safety bound first.
+
+This is reachable from `kruskal_test`. When a sample has no variation at all
+the tie correction is `(n^3 - n)/(n^3 - n)`, and once `n^3` is past `2^53` the
+subtraction of `n` is lost from one side or the other, so an inexact zero is
+divided by an exact zero. R has the same problem and returns `+Inf`, `-Inf` or
+`NaN` depending on which way `n` rounded: `NaN` at `n = 250000`, `-Inf` at
+`300000`, `NaN` at `400000`, `+Inf` at `500000`, `NaN` at `750000`, `+Inf` at
+`1000000`, `NaN` at `1500000` and `+Inf` at `2000000`. `kruskal_test` now agrees
+with it on all eight. Below that the correction is exact and both give `NaN`,
+which the corpus pins. `get_p_value` is shared, so `chisq_test`, `prop_test`,
+`mcnemar_test`, `friedman_test`, `cmh_test`, `logrank_test` and `coxph` get the
+same fix.
+
+#### Three times less memory, twice the speed
+
+The ranking no longer goes through `RankInfo` and `rank_and_count_ties`.
+`kruskal_test` wants per-group rank sums, not the ranks themselves, so it sorts
+a 16-byte `(value, group)` pair and adds each tie block's averaged rank straight
+into the group sums, instead of storing an `NV` rank per observation for a
+second pass to read.
+
+It also no longer calls `qsort`. glibc's `qsort` is a mergesort that allocates a
+scratch buffer the size of the whole array — measured on glibc 2.39 as a
+`VmHWM` of 116 MB going to 230 MB across one sort of a 114 MB array — which was
+half of the function's peak memory, and its comparison goes through a function
+pointer that cannot be inlined. In its place is a median-of-three introsort that
+recurses on the smaller partition and loops on the larger, so the stack stays
+`O(log n)`, with a heapsort fallback past a depth of `2*floor(log2(n))` so an
+adversarial input cannot drive it to `O(n^2)`, and insertion sort for short
+runs. Sorting the same five-million-element array takes 0.375s against `qsort`'s
+1.01s and allocates nothing. The third change is the group-label array on the
+`x`/`g` path, which was sized at one pointer per *observation* to hold one per
+*group* — 40 MB at `n = 5e6` to hold three pointers — and now grows on demand.
+
+At `n = 5,000,000` over three groups, measured as `VmHWM` either side of the
+call:
+
+| | 0.3 | 0.301 |
+|---|---|---|
+| peak memory | 228 MB (47.8 B/obs) | 76 MB (15.9 B/obs) |
+| `kruskal_test(\@x, \@g)` | 1.20 s | 0.557 s |
+| `kruskal_test(\%h)` | 1.11 s | 0.467 s |
+
+Sorted, reversed, all-equal, organ-pipe and median-of-three-killer inputs all
+stay under 0.32s at `n = 2e6`, which is what the depth limit is there for. The
+sort is checked against an independent pure-Perl implementation of the whole
+test over 748 structured cases — those shapes at every n either side of the
+insertion-sort threshold — and 49,712 random ones.
+
+#### The same input now gives the same answer
+
+`H` moved by up to `1.2e-14` between runs on identical data. Nothing was random:
+the sum of `R_i^2 / n_i` walked the groups by group id, and on the
+hash-of-arrays path an id is minted in `hv_iternext` order, which is perl's
+per-process hash order. Equal values were also left in whatever relative order
+the sort happened to leave them, which came from the same place.
+
+The sort now orders by value and then by group, which makes it a total order,
+and the `k` terms of the sum are ordered before they are added — smallest first,
+which is the better-conditioned direction as well as a canonical one. `k` is the
+number of groups, not the number of observations, so it costs nothing next to
+the ranking. `H` is now bit-identical to R on all 37 corpus cases in all four
+call forms, and stays so across 60 runs under `PERL_PERTURB_KEYS=1`.
+
+### Documentation
+
+`kruskal_test` gains two sections: what happens to non-numeric, undefined,
+`NaN` and infinite elements and to a group left with no data, and what the
+returned fields are — `statistic`, `parameter`, `method` and the p-value under
+both `p_value` and `p.value` from R's `htest`, plus the `size` and `mean`
+sub-hashes of `group_stats`, which are computed over the same observations the
+statistic used.
+
+## 0.3 2026-08-16 CDT
+
+### shapiro_test
+
+`shapiro_test` rebuilt against R 4.6.1's `src/library/stats/src/swilk.c` — AS R94,
+Royston (1995) — driven by R's and SciPy's own test suites rather than by cases
+invented here. Four bugs are fixed, one of them a case R's regression suite
+tests for by name, and the statistic is now more accurate than R's own on a
+sample whose values dwarf its spread.
+
+Everything below is checked in the new `t/shapiro_test.R.scipy.t` (146 tests),
+whose expected values are frozen literals with their provenance recorded in the
+file header; it needs no R and no Python to run. The generators that produced
+them, `t/shapiro_test.R.scipy.R` and `t/shapiro_test.R.scipy.py`, are committed
+beside it. The full suite is 124 files and 25,081 tests, and
+`./test.all.perls.pl` passes on all five local perls — `5.10.1`, `5.12.5`
+(long double), `5.42.3`, `5.44.0` and `5.44.0-quadmath` — with no warnings on
+any of them.
+
+#### The p-value could come back negative
+
+R's `tests/reg-tests-1b.R` contains exactly one `shapiro.test` assertion, and it
+is this:
+
+    stopifnot(shapiro.test(c(0,0,1))$p.value >= 0)
+
+`shapiro_test([0,0,1])` returned `-4.6648135328131477e-15`. At `n = 3` the
+p-value is `6/pi * (asin(sqrt(W)) - asin(sqrt(3/4)))` and `W` has an exact floor
+of `3/4` that `c(0,0,1)` sits on, so the subtraction lands on zero from
+whichever side the constants round to; R clamps the result at 0 and this module
+did not. It is the same defect SciPy fixed as gh-18322. The clamp is in, and
+`asin(sqrt(3/4)) = pi/3` is now carried to NV width rather than R's 15 digits,
+so the same case comes out at `+4.2e-16` before clamping instead of below zero.
+
+#### W and the p-value were only good to nine digits
+
+The expected normal order statistics that AS R94 weights the sample with came
+from `inverse_normal_cdf()`, which is Moro's approximation and good to about
+`1e-9`. They go straight into `W`, so nine digits there is nine digits in the
+answer — where R reports sixteen. Against the values SciPy pins in
+`TestShapiro`, every one of them annotated upstream as *"reference values
+generated using R shapiro.test"*:
+
+| SciPy case | W was | W is | R 4.6.1 |
+|---|---|---|---|
+| `test_basic` x1 | `0.900472879324135` | `0.900472879317561` | `0.90047287931756` |
+| `test_basic` x2 | `0.959026945965277` | `0.959026946032345` | `0.95902694603234` |
+| `test_basic2` x4 | `0.834666275331324` | `0.834666275318169` | `0.83466627531817` |
+
+and the p-values with them:
+
+| SciPy case | p was | p is | R 4.6.1 |
+|---|---|---|---|
+| `test_basic` x1 | `0.0420895752342124` | `0.0420895752222577` | `0.04208957522226` |
+| `test_basic` x2 | `0.524597929157127` | `0.524597930470668` | `0.5245979304707` |
+| `test_basic2` x4 | `0.000913490482316994` | `0.000913490481812984` | `0.000913490481813` |
+
+Moro's value is still the starting point, but Newton against the `erfc`-based
+normal CDF finishes it. The loop stops as soon as another pass could not move
+the answer, so a `double` build pays for one refinement and only the wider NVs
+pay for a second. Across a 180-sample sweep over normal, uniform, exponential,
+log-normal, Cauchy, tied, tiny-scale and grid data at every n from 3 to 5000,
+the worst remaining disagreement with R is `2.0e-15` in `W` and `2.6e-12` in the
+p-value — the latter is not sloppier arithmetic but the same last bit amplified,
+since the p-value is a function of `log(1 - W)` over a sigma of about `0.6`.
+
+#### 1 - W was formed by subtracting from 1
+
+The p-value depends on `log(1 - W)`, and `W` runs to within `1e-5` of 1 on a
+large normal sample, so computing `W = b^2/ssq` and then `1 - W` throws away
+exactly the digits the p-value is made of. R does not do this — its `swilk.c`
+forms `w1 = (ssassx - sax) * (ssassx + sax) / (ssa * ssx)` directly and says so
+in a comment — and now neither does this module.
+
+#### More accurate than R when the values dwarf their own spread
+
+R's `swilk.c` divides the sample by its range but never centres it, so `1e9 +
+noise` loses most of its significant digits before `W` is ever formed. SciPy
+filed the same complaint from the other end as gh-14462 and works around it by
+subtracting the median; this module now does that too, which costs one
+subtraction per value.
+
+Measured against a 60-digit `mpmath` evaluation of AS R94 on the identical
+doubles, over `1e6 + noise` and `1e9 + noise` at every n from 3 to 5000:
+
+| | worst relative error in W | worst in the p-value |
+|---|---|---|
+| R 4.6.1 | `1.9e-8` | `2.6e-7` |
+| `shapiro_test` | `1.0e-15` | `1.4e-13` |
+
+On well-conditioned samples the two still agree to the last few ulp, so this is
+a divergence only where R has already lost the digits. `t/shapiro_test.R.scipy.t`
+asserts the invariance rather than R's number there, and records why at that
+section.
+
+#### Faster as well
+
+The sort now goes through the module's own introsort rather than `qsort()`,
+whose comparator the compiler cannot inline; the order statistics are generated
+for half the sample and mirrored, since the weights are antisymmetric; and ten
+`pow()` calls became Horner evaluations. `pow()` is a `__float128` call on a
+quadmath perl.
+
+| n | was | is |
+|---|---|---|
+| 10 | 0.83 µs | 0.78 µs |
+| 100 | 4.78 µs | 5.05 µs |
+| 1000 | 79.3 µs | 49.8 µs |
+| 5000 | 578 µs | 459 µs |
+
+`n = 100` is the one size that got slower: at that length the accurate
+quantiles are most of the work and there is not enough sorting to pay for them.
+That trade was taken deliberately.
+
+#### One documented value was wrong
+
+The hash printed under `shapiro_test` in this README, in `read.me.pod` and in
+the module's own POD showed `statistic 0.960870680168535` and `p.value
+0.589650577093106` — the pre-fix numbers, and for `[1..19]` while the example
+above them calls `shapiro_test([1..5])`. It now shows what `[1..5]` actually
+returns, `0.986762155447719` and `0.96717393596804`, which is R's
+`shapiro.test(1:5)` to the last digit R prints.
+
+### quantile
+
+#### Interpolation ran between order statistics that were equal
+
+R's type 7 interpolates only when the index falls strictly between two order
+statistics *that differ* — `index > lo & x[hi] != qs` in `quantile.default`.
+This module always evaluated `(1 - g) * x[j] + g * x[j+1]`, which does not
+return `v` when both sides are `v`. On a two-valued sample at `n = 999` it
+reported `0.99999999999994` for `1`, and on the 602 identical values R's
+PR#16672 was filed about it failed to return that value at every prob — which
+is the monotonicity failure the PR is about. Both now match R exactly.
+
+#### Probabilities a hair outside [0, 1] were refused
+
+A probability arrived at by arithmetic rather than written down can land just
+outside the interval. R allows `100 * .Machine$double.eps` of overshoot and
+clamps to the endpoint — its PR#17891, `quantile(0:1, 1+1e-14) == 1` — where
+this module raised an error. It now clamps within the same allowance and still
+errors on anything further out. R's constant is used rather than `NV_EPSILON`
+on purpose: it is part of what the function *accepts*, so a long-double or
+`__float128` build must not reject a `probs` vector R takes.
+
+#### Faster
+
+The sort was `qsort()` with a function-pointer comparator; it is now the same
+introsort `shapiro_test` uses. Ordering 5000 NVs costs about 61,000
+comparisons, and paying for an indirect call on every one of them is most of
+what a sort of that size costs.
+
+| n | was | is |
+|---|---|---|
+| 100 | 3.2 µs | 2.7 µs |
+| 1000 | 52.5 µs | 22.8 µs |
+| 10,000 | 1.07 ms | 0.72 ms |
+| 100,000 | 13.7 ms | 8.8 ms |
+
+Both fixes and the sort are covered by the new `t/quantile.R.t` (197 tests, or
+205 under `EXTENDED_TESTING`), built on the two assertions R's own suite makes
+about `quantile` — that `quantile(x, ((1:n)-1)/(n-1))` recovers `sort(x)`, and
+that it equals the type-7 interpolation computed by hand off the sorted sample
+— run over seven input shapes chosen to break a quicksort (sorted, reversed,
+organ pipe, two-valued, tie ladder, sawtooth) at every n either side of the
+insertion-sort threshold and the recursion depth limit, plus PR#16672 and
+PR#17891 verbatim and 79 frozen R value tables. Its generator,
+`t/quantile.R.R`, is committed beside it.
+
+### Documentation
+
+Illustrations for three more functions, drawn by `t.test.plots.pl` and
+`skew.kurtosis.plots.pl`, both committed:
+
+- **`t_test`** gains six: what the estimate, the standard error and the null
+  distribution are and which area of it the p-value is; how `conf_int` is the
+  estimate plus or minus a t quantile and how `conf_level` sets that quantile;
+  the three `alternative`s side by side with the region each counts and the
+  interval that goes with it; `p_value` as a function of `mu`, crossing
+  `1 - conf_level` exactly at the two bounds of `conf_int`; paired,
+  `var_equal` and Welch on the same data, with the Welch degrees of freedom as
+  the two spreads separate; and two distributions separating with the interval
+  retreating from `mu` as the p-value falls.
+- **`skew`** gains a left-tailed, a symmetric and a right-tailed sample against
+  the same `N(0, 1)` curve, with the mean and median of each, which is what the
+  sign of the statistic is reporting.
+- **`kurtosis`** gains a flat-shouldered, a normal and a heavy-tailed sample
+  with the tails behind each drawn out, since it is the tails and not the peak
+  that the statistic is measuring.
+
 
 ## 0.298 2026-08-12 CDT
 
@@ -6414,11 +7145,19 @@ answers were simply less accurate than the perl running them. On perl-5.12.5
 
 All 412 of those calls now go through `nv_*` macros that paste on the suffix for
 the width `NV` actually is: none for `double`, `l` for `long double`, `q` for
-`__float128`. The 80 `isnan`/`isinf`/`isfinite` calls became
-`Perl_isnan`/`Perl_isinf`/`Perl_isfinite`, which matters most where the C99
-type-generic macros are absent: there `isfinite()` is a plain `double` function,
-and narrowing a large-but-finite long double into it reports the value as
-infinite rather than merely rounding it.
+`__float128`. The 80 `isnan`/`isinf`/`isfinite` calls became `nv_isnan`,
+`nv_isinf` and `nv_isfinite`, which classify by comparing against `NV_MAX` — the
+largest finite `NV` — rather than calling libm at all. The C99 macros could not
+be kept: where a platform does not provide the type-generic versions,
+`isfinite()` is a plain `double` function, and narrowing a large-but-finite long
+double into it reports the value as infinite rather than merely rounding it.
+Perl's own `Perl_isnan`/`Perl_isinf`/`Perl_isfinite` were used up to 0.298 and
+could not be kept either: on every perl before 5.22 those route through a
+`Perl_fp_class()` block in `perl.h` that has never compiled — the macro is
+written with an empty parameter list and compares against `FP_CLASS_*` names no
+`<ieeefp.h>` defines. That block is dead code wherever Configure finds
+`isinf()`, so it is invisible on Linux and glibc, and live on illumos/Solaris,
+where it broke the 0.298 build outright.
 
 The long-double row is conditional. The `l` variants are C99 but some libms —
 the thinner BSD ones especially — do not ship the whole set, so `Makefile.PL`

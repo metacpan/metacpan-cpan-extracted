@@ -4,7 +4,7 @@ requires 'perl' => '5.026';
 
 # Runtime
 requires 'Mojolicious' => '9.46';
-requires 'Mojolicious::Plugin::Fondation' => '0.07';
+requires 'Mojolicious::Plugin::Fondation' => '0.08';
 requires 'Mojolicious::Plugin::Fondation::Problem' => '0.03';
 
 # Testing
@@ -12,6 +12,8 @@ on test => sub {
     requires 'Test::More' => '1.00';
     requires 'File::Temp' => '0.01';
     requires 'Test::Mojo';
+    requires 'Mojolicious::Plugin::OpenAPI';
+    requires 'Mojolicious::Plugin::Fondation::SessionStore';
 };
 
 # Development

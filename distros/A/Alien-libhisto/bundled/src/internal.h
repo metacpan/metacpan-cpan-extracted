@@ -1,3 +1,7 @@
+/*
+ * Internal struct layouts and private macros for 1D histograms.
+ */
+
 #ifndef LIBHISTO_INTERNAL_H
 #define LIBHISTO_INTERNAL_H
 

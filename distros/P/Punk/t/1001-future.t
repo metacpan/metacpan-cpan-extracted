@@ -115,6 +115,43 @@ ok(Punk::Future->fail_future("x\n")->is_failed, 'fail_future');
 
     ok(Punk::Future->all()->is_done,   'empty needs_all is done');
     ok(Punk::Future->any()->is_failed, 'empty needs_any is failed');
+
+    # wait_any: done as soon as ANY has settled, whatever the outcome. The one
+    # combinator with no test until now, and the one where getting it wrong
+    # looks most like getting it right - a failure settles it, where needs_any
+    # would keep waiting for a success.
+    my ($a1, $a2) = map { Punk::Future->new } 1 .. 2;
+    my $first;
+    Punk::Future->wait_any($a1, $a2)->on_done(sub { $first = scalar @_ });
+    $a1->fail("e");
+    is($first, 1,
+        'wait_any settles on the FIRST settled future even when it failed - '
+      . 'which is what makes it wait_any and not needs_any');
+    ok(!$a2->is_ready, 'and does not wait for the other');
+
+    # The six entry points are one XSUB with an ALIAS list, and the alias
+    # index is mapped to the mode by arithmetic: ix 0-3 pass through, 4 and 5
+    # remap onto NEEDS_ALL and NEEDS_ANY. Reorder either list and every name
+    # still exists while two of them quietly do somebody else's job. Only the
+    # empty-list case pinned that down before, which is the one case where the
+    # mode barely matters.
+    {
+        my ($b1, $b2) = map { Punk::Future->new } 1 .. 2;
+        my $all;
+        Punk::Future->all($b1, $b2)->on_done(sub { $all = "@_" });
+        $b1->done("one");
+        ok(!defined $all, 'all() waits for every input, like needs_all');
+        $b2->done("two");
+        is($all, "one two", 'and combines them in input order');
+
+        my ($c1, $c2) = map { Punk::Future->new } 1 .. 2;
+        my $any2;
+        Punk::Future->any($c1, $c2)->on_done(sub { $any2 = "@_" });
+        $c1->fail("no");
+        ok(!defined $any2, 'any() is not satisfied by a failure, like needs_any');
+        $c2->done("yes");
+        is($any2, "yes", 'and is done on the first success');
+    }
 }
 
 # ---- timer / defer / cancel (block mode: a timer sleeps) --------------------

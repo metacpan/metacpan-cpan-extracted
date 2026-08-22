@@ -84,10 +84,12 @@ is(mean(1 .. 5), 3, 'mean(1..5) is exactly 3');
 }
 
 # ---------------------------------------------------------------------------
-# 3. Float classification.  Perl_isnan/Perl_isinf/Perl_isfinite know how wide
-#    an NV is; the bare C99 macros are type-generic on glibc but are plain
-#    double functions where a platform does not provide them, and narrowing a
-#    large-but-finite long double into one of those reports it as infinite.
+# 3. Float classification.  nv_isnan/nv_isinf/nv_isfinite compare against
+#    NV_MAX and so know how wide an NV is; the bare C99 macros are type-generic
+#    on glibc but are plain double functions where a platform does not provide
+#    them, and narrowing a large-but-finite long double into one of those
+#    reports it as infinite.  (perl's own Perl_isnan/Perl_isinf/Perl_isfinite
+#    are not usable here either: see the comment above nv_isnan in LikeR.xs.)
 #    Only a wide build can express such a value, so this section is skipped on
 #    a double perl -- and on glibc it passes either way, which is why the
 #    section is a guard for other platforms rather than a local detector.

@@ -13,7 +13,7 @@ use URI::Escape qw();
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2026-05-29'; # DATE
 our $DIST = 'Filename-KeyValue'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our @EXPORT_OK = qw(
                        parse_keyvalue_filename
@@ -427,6 +427,43 @@ gen_modified_sub(
     wrap_code => $wrap_code,
 );
 
+gen_modified_sub(
+    die => 1,
+    output_name => 'rename_replace_keyvalue_filenames',
+    base_name => 'modify_keyvalue_filename',
+    remove_args => [qw/add remove/],
+    modify_args => {
+        filename => sub {
+            $_[0]{schema} = ["array*", of=>"str*"],
+            $_[0]{slurpy} = 1;
+        },
+    },
+    modify_meta => sub {
+        my $meta = shift;
+        delete $meta->{examples};
+    },
+    summary => 'Rename file by replacing keys',
+    wrap_code => $wrap_code,
+);
+
+gen_modified_sub(
+    die => 1,
+    output_name => 'rename_modify_keyvalue_filenames',
+    base_name => 'modify_keyvalue_filename',
+    modify_args => {
+        filename => sub {
+            $_[0]{schema} = ["array*", of=>"str*"],
+            $_[0]{slurpy} = 1;
+        },
+    },
+    modify_meta => sub {
+        my $meta = shift;
+        delete $meta->{examples};
+    },
+    summary => 'Rename file by adding/replacing/removing keys',
+    wrap_code => $wrap_code,
+);
+
 1;
 # ABSTRACT: Parse filename using the KeyValue naming scheme
 
@@ -442,7 +479,7 @@ Filename::KeyValue - Parse filename using the KeyValue naming scheme
 
 =head1 VERSION
 
-This document describes version 0.006 of Filename::KeyValue (from Perl distribution Filename-KeyValue), released on 2026-05-29.
+This document describes version 0.007 of Filename::KeyValue (from Perl distribution Filename-KeyValue), released on 2026-05-29.
 
 =head1 SYNOPSIS
 
@@ -452,6 +489,8 @@ This document describes version 0.006 of Filename::KeyValue (from Perl distribut
      modify_keyvalue_filename
      rename_add_keyvalue_filenames
      rename_remove_keyvalue_filenames
+     rename_replace_keyvalue_filenames
+     rename_modify_keyvalue_filenames
  );
 
 =head1 DESCRIPTION
@@ -899,6 +938,70 @@ Return value:  (any)
 
 
 
+=head2 rename_modify_keyvalue_filenames
+
+Usage:
+
+ rename_modify_keyvalue_filenames(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Rename file by addingE<sol>replacingE<sol>removing keys.
+
+This routine will:
+
+=over
+
+=item * sort the key-value using keys asciibetically;
+
+=item * (NOT YET IMPLEMENTED) optionally sort the values asciibetically;
+
+=item * (NOT YET IMPLEMENTED) customize key sorting using SortKey.
+
+=item * (NOT YET IMPLEMENTED) customize value sorting using SortKey.
+
+=back
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<add> => I<hash>
+
+List of key=E<gt>value pairs to add.
+
+=item * B<filename>* => I<array[str]>
+
+(No description)
+
+=item * B<ignore> => I<bool>
+
+If set, when filename already has the same key, do nothing.
+
+=item * B<remove> => I<array[str]>
+
+List of keys to remove.
+
+=item * B<replace> => I<hash>
+
+List of key=E<gt>value pairs to replace.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
 =head2 rename_remove_keyvalue_filenames
 
 Usage:
@@ -938,6 +1041,62 @@ If set, when filename already has the same key, do nothing.
 =item * B<remove> => I<array[str]>
 
 List of keys to remove.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 rename_replace_keyvalue_filenames
+
+Usage:
+
+ rename_replace_keyvalue_filenames(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Rename file by replacing keys.
+
+This routine will:
+
+=over
+
+=item * sort the key-value using keys asciibetically;
+
+=item * (NOT YET IMPLEMENTED) optionally sort the values asciibetically;
+
+=item * (NOT YET IMPLEMENTED) customize key sorting using SortKey.
+
+=item * (NOT YET IMPLEMENTED) customize value sorting using SortKey.
+
+=back
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<filename>* => I<array[str]>
+
+(No description)
+
+=item * B<ignore> => I<bool>
+
+If set, when filename already has the same key, do nothing.
+
+=item * B<replace> => I<hash>
+
+List of key=E<gt>value pairs to replace.
 
 
 =back

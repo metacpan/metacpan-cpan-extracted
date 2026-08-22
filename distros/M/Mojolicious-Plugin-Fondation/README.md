@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration p
 
 # VERSION
 
-version 0.07
+version 0.08
 
 # SYNOPSIS
 
@@ -370,6 +370,43 @@ the raw content instead of rendering through the template engine.
 
     %= render_zone 'header'
     %= render_zone_js 'footer'
+
+# ROUTE CONDITIONS
+
+Fondation provides route conditions (`fondation.perm`, `fondation.group`,
+`fondation.authenticated`, `fondation.csrf`, `fondation.bearer`)
+registered by the core and by the Auth / CSRF / Auth::Token / OpenAPI
+plugins.
+
+## Conditions must NOT render a response
+
+Mojo evaluates route conditions DURING the route tree walk, before knowing
+whether the route fully matches: patterns are anchored at the start only,
+so a list route like `/foo` also prefix-matches `/foo/:id` and its
+condition is evaluated for that request. A condition that renders a
+response can therefore be evaluated twice in a single request — the second
+render dies with `"A response has already been rendered"` and kills the
+worker (2026-08-21, fixed).
+
+The rule: a failing condition must **not** render. It sets the response
+code (so Mojo's `not_found` is skipped) plus the `fondation.denied`
+stash marker, then returns undef:
+
+    $c->res->code(403);
+    $c->stash('fondation.denied' => { status => 403, title => 'Forbidden' })
+        unless $c->stash('fondation.denied');
+    return undef;
+
+Fondation registers an `around_dispatch` hook (LAST in the chain, so it
+also wraps async dispatch continuations such as the Bearer lookup of
+Fondation::Auth::Token) that renders the marker ONCE, after the walk
+completed — via `$c->problem()` when the Problem plugin is loaded,
+otherwise as plain text.
+
+- The marker hash accepts the same keys as `problem()`: `status`,
+`title`, `detail`.
+- First failure wins: subsequent failing conditions keep the first
+marker (`unless $c->stash('fondation.denied')`).
 
 # ABOUT THIS PROJECT
 

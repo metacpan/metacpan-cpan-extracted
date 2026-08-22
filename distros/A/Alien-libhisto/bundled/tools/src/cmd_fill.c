@@ -1,8 +1,13 @@
+/*
+ * CLI subcommand histo fill: ingest data streams and serialize histograms.
+ */
+
 #include "cli_common.h"
 #include "histo/histo2d.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <stdbool.h>
 #include <ctype.h>
 #include <math.h>
@@ -19,7 +24,8 @@ static void print_fill_usage(FILE *out) {
     fprintf(out, "      --min=<X>            Lower boundary (required unless --auto-range)\n");
     fprintf(out, "      --max=<X>            Upper boundary (required unless --auto-range)\n");
     fprintf(out, "      --edges=<E0,E1,...>  Variable bin edges (comma-separated)\n");
-    fprintf(out, "      --auto-range         Buffer input to determine min/max automatically\n\n");
+    fprintf(out, "      --auto-range         Buffer input to determine min/max automatically\n");
+    fprintf(out, "  -a, --auto-bins[=RULE]   Buffer input and estimate optimal bins (fd, scott, sturges, doane, knuth)\n\n");
     fprintf(out, "2D Geometry Options:\n");
     fprintf(out, "      --2d                 Enable 2D bivariate histogramming mode\n");
     fprintf(out, "      --xbins=<N>          Number of bins along X axis (default: 50)\n");
@@ -203,6 +209,7 @@ int histo_cli_fill(int argc, char **argv, FILE *out, FILE *err) {
     double range_min = 0.0, range_max = 0.0;
     bool has_min = false, has_max = false;
     bool auto_range = false;
+    int auto_bins_rule = -1;
 
     uint32_t xbins = 50, ybins = 50;
     double xmin = 0.0, xmax = 0.0, ymin = 0.0, ymax = 0.0;
@@ -272,6 +279,19 @@ int histo_cli_fill(int argc, char **argv, FILE *out, FILE *err) {
             if (val) { range_max = atof(val); has_max = true; }
         } else if (strcmp(arg, "--auto-range") == 0) {
             auto_range = true;
+        } else if (strncmp(arg, "--auto-bins=", 12) == 0 || strcmp(arg, "--auto-bins") == 0 || strcmp(arg, "-a") == 0) {
+            auto_range = true;
+            const char *val = (strncmp(arg, "--auto-bins=", 12) == 0) ? arg + 12 :
+                              (strcmp(arg, "--auto-bins") == 0 || strcmp(arg, "-a") == 0) ?
+                              ((i + 1 < argc && argv[i + 1][0] != '-') ? argv[++i] : "auto") : "auto";
+            if (val) {
+                if (strcasecmp(val, "fd") == 0) auto_bins_rule = HISTO_BIN_RULE_FD;
+                else if (strcasecmp(val, "scott") == 0) auto_bins_rule = HISTO_BIN_RULE_SCOTT;
+                else if (strcasecmp(val, "sturges") == 0) auto_bins_rule = HISTO_BIN_RULE_STURGES;
+                else if (strcasecmp(val, "doane") == 0) auto_bins_rule = HISTO_BIN_RULE_DOANE;
+                else if (strcasecmp(val, "knuth") == 0) auto_bins_rule = HISTO_BIN_RULE_KNUTH;
+                else auto_bins_rule = HISTO_BIN_RULE_AUTO;
+            }
         } else if (strcmp(arg, "-w") == 0 || strcmp(arg, "--weights") == 0) {
             has_weights = true;
         } else if (strncmp(arg, "--value-col=", 12) == 0 || strcmp(arg, "--value-col") == 0) {
@@ -662,6 +682,18 @@ int histo_cli_fill(int argc, char **argv, FILE *out, FILE *err) {
         if (auto_count == 0) {
             range_min = 0.0;
             range_max = 100.0;
+        } else if (auto_bins_rule >= 0) {
+            uint32_t opt_nbins = 0;
+            double opt_min = 0.0, opt_max = 0.0;
+            histo_status_t st = histo_estimate_bins(auto_count, auto_samples, (histo_bin_rule_t)auto_bins_rule, &opt_nbins, &opt_min, &opt_max);
+            if (st == HISTO_OK && opt_nbins > 0) {
+                nbins = opt_nbins;
+                range_min = opt_min;
+                range_max = opt_max;
+            }
+            double pad = ((range_max - range_min) / (double)nbins) * 1e-6;
+            if (pad <= 0.0) pad = 1e-6;
+            range_max += pad;
         } else {
             range_min = auto_samples[0];
             range_max = auto_samples[0];

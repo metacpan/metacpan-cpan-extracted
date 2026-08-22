@@ -1,6 +1,6 @@
 package Poker::Eval::Badugi27;
+our $VERSION = '0.12';
 
-our $VERSION = '0.11';
 
 use Moo;
 
@@ -10,7 +10,7 @@ Poker::Eval::Badugi27 - Evaluate and score Badeucy poker hands.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

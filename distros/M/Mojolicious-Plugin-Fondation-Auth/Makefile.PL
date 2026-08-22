@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Crypt::Passphrase::Argon2" => 0,
     "Mojolicious" => "9.46",
     "Mojolicious::Plugin::Authentication" => 0,
-    "Mojolicious::Plugin::Fondation" => "0.07",
+    "Mojolicious::Plugin::Fondation" => "0.08",
     "Mojolicious::Plugin::Fondation::Problem" => "0.03",
     "Mojolicious::Plugin::Fondation::User" => "0.03"
   },
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "FindBin" => "1.00",
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %FallbackPrereqs = (
   "FindBin" => "1.00",
   "Mojolicious" => "9.46",
   "Mojolicious::Plugin::Authentication" => 0,
-  "Mojolicious::Plugin::Fondation" => "0.07",
+  "Mojolicious::Plugin::Fondation" => "0.08",
   "Mojolicious::Plugin::Fondation::Problem" => "0.03",
   "Mojolicious::Plugin::Fondation::User" => "0.03",
   "Test::More" => "1.00"

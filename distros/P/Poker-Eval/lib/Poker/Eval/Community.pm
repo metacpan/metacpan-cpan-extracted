@@ -1,6 +1,6 @@
 package Poker::Eval::Community;
+our $VERSION = '0.12';
 
-our $VERSION = '0.11';
 
 use Algorithm::Combinatorics qw(combinations);
 use Moo;
@@ -11,7 +11,7 @@ Poker::Eval::Community - Evaluate and score hand using any combination of hole a
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

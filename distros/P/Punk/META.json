@@ -37,7 +37,7 @@
             "Markdown::Simple" : "0.21",
             "Open::API" : "0.09",
             "Search::Trigram" : "0.03",
-            "Template::Stencil" : "0.05"
+            "Template::Stencil" : "0.10"
          }
       },
       "runtime" : {
@@ -56,7 +56,7 @@
             "Markdown::Simple" : "0.21",
             "Open::API" : "0.09",
             "Search::Trigram" : "0.03",
-            "Template::Stencil" : "0.05",
+            "Template::Stencil" : "0.10",
             "YAML::XS" : "0",
             "perl" : "5.010000"
          }
@@ -68,6 +68,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.27",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,6 +1,6 @@
 Poker-Eval
 
-VERSION 0.11
+VERSION 0.12
 
 Deal, score, and estimate equity for many poker variants through a named
 Poker::Game API (Hold'em, Omaha, draw, stud, Badugi, and more).
@@ -116,9 +116,6 @@ NAMED GAMES
 Advanced users can still compose Poker::Eval::* rules with
 Poker::Score::* ranking systems directly.
 
-Only Poker::Eval defines $VERSION for the distribution so CPAN indexes
-a single package.
-
 Requires: Moo, Algorithm::Combinatorics, Tie::IxHash, List::Util, Storable
 
 
@@ -139,7 +136,7 @@ SUPPORT AND DOCUMENTATION
 
     perldoc Poker::Eval
     perldoc Poker::Game
-    perldoc Poker::Game::Holdem
+    perldoc Poker::Score
 
 
 LICENSE AND COPYRIGHT

@@ -6,7 +6,7 @@ use warnings;
 use Carp ();
 use Punk ();
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 # A read handle on a spilled part, or undef when the bytes are in memory.
 # Perl rather than XS because making a filehandle in XS is a glob dance for

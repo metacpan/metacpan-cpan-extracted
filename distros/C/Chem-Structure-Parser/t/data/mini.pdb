@@ -1,0 +1,128 @@
+HEADER    HYDROLASE/PEPTIDE INHIBITOR             01-JAN-20   9XYZ              
+TITLE     A SMALL TEST STRUCTURE WITH A GAP, AN INSERTION CODE, AN              
+TITLE    2 ALTERNATE CONFORMER AND A LIGAND                                     
+COMPND    MOL_ID: 1;                                                            
+COMPND   2 MOLECULE: TEST PROTEIN;                                              
+COMPND   3 CHAIN: A;                                                            
+COMPND   4 EC: 3.4.21.5;                                                        
+COMPND   5 ENGINEERED: YES;                                                     
+COMPND   6 MOL_ID: 2;                                                           
+COMPND   7 MOLECULE: TEST DNA;                                                  
+COMPND   8 CHAIN: B                                                             
+SOURCE    MOL_ID: 1;                                                            
+SOURCE   2 ORGANISM_SCIENTIFIC: HOMO SAPIENS;                                   
+SOURCE   3 ORGANISM_COMMON: HUMAN;                                              
+SOURCE   4 ORGANISM_TAXID: 9606;                                                
+SOURCE   5 EXPRESSION_SYSTEM: ESCHERICHIA COLI;                                 
+SOURCE   6 MOL_ID: 2;                                                           
+SOURCE   7 SYNTHETIC: YES                                                       
+KEYWDS    HYDROLASE, TEST STRUCTURE, COMPLEX (HYDROLASE-                        
+KEYWDS   2 PEPTIDE)                                                             
+EXPDTA    X-RAY DIFFRACTION                                                     
+NUMMDL    1                                                                     
+AUTHOR    D.E.CONDON,A.N.OTHER                                                  
+REVDAT   1   01-JAN-20 9XYZ    0                                                
+JRNL        AUTH   D.E.CONDON,A.N.OTHER                                         
+JRNL        TITL   A STRUCTURE MADE UP FOR A TEST SUITE, AND WHAT IT            
+JRNL        TITL 2 CONTAINS                                                     
+JRNL        REF    J.INVENTED.RES.               V.  10    42 2020              
+JRNL        PMID   12345678                                                     
+JRNL        DOI    10.1000/INVENTED.2020.42                                     
+REMARK   2                                                                      
+REMARK   2 RESOLUTION.    1.85 ANGSTROMS.                                       
+REMARK   3                                                                      
+REMARK   3   R VALUE            (WORKING SET) : 0.174                           
+REMARK   3   FREE R VALUE                     : 0.219                           
+REMARK   3   BIN FREE R VALUE                    : 0.999                        
+REMARK 200   TEMPERATURE           (KELVIN) : 100.0                             
+REMARK 200   PH                             : 7.5                               
+REMARK 465   MISSING RESIDUES                                                   
+DBREF  9XYZ A    1    11  UNP    P12345   TEST_HUMAN       1     11
+SEQADV 9XYZ MSE A    7  UNP  P12345    MET     7 MODIFIED RESIDUE
+SEQRES   1 A   11  MET ALA GLY LEU LYS CYS MSE HIS HIS SER CYS
+SEQRES   1 B    4   DA  DC  DG  DT
+MODRES 9XYZ MSE A    7  MET  SELENOMETHIONINE
+HET    NAG  A 201      14
+HET     ZN  A 202       1
+HETNAM     NAG 2-ACETAMIDO-2-DEOXY-BETA-D-GLUCOPYRANOSE
+HETNAM      ZN ZINC ION
+FORMUL   3  NAG    C8 H15 N O6
+FORMUL   4   ZN    ZN 2+
+FORMUL   5  HOH   *2(H2 O)
+HELIX    1 AA1 MET A    1  GLY A    3  1                                   3
+SHEET    1 AA1 2 CYS A   6  HIS A   8  0
+SSBOND   1 CYS A    6    CYS A   10                        1555   1555    2.03
+LINK        ZN    ZN A 202                 SG  CYS A   6                  2.31
+CISPEP   1 GLY A    3    CYS A    6          0        -0.42
+CRYST1   40.100   50.200   60.300  90.00  95.50  90.00 P 1 21 1      4
+ATOM      1  N   MET A   1      10.000  10.000  10.000  1.00 15.00           N  
+ATOM      2  CA  MET A   1      11.500  11.000  10.500  1.00 16.00           C  
+ATOM      3  C   MET A   1      13.000  12.000  11.000  1.00 17.00           C  
+ATOM      4  O   MET A   1      14.500  13.000  11.500  1.00 18.00           O  
+ATOM      5  CB  MET A   1      16.000  14.000  12.000  1.00 19.00           C  
+ATOM      6  N   ALA A   2      13.000  11.000  11.000  1.00 15.00           N  
+ATOM      7  CA  ALA A   2      14.500  12.000  11.500  1.00 16.00           C  
+ATOM      8  C   ALA A   2      16.000  13.000  12.000  1.00 17.00           C  
+ATOM      9  O   ALA A   2      17.500  14.000  12.500  1.00 18.00           O  
+ATOM     10  CB AALA A   2      19.000  15.000  13.000  0.40 22.00           C  
+ATOM     11  CB BALA A   2      19.500  15.500  13.500  0.60 25.00           C  
+ATOM     12  N   GLY A   3      16.000  12.000  12.000  1.00 15.00           N  
+ATOM     13  CA  GLY A   3      17.500  13.000  12.500  1.00 16.00           C  
+ATOM     14  C   GLY A   3      19.000  14.000  13.000  1.00 17.00           C  
+ATOM     15  O   GLY A   3      20.500  15.000  13.500  1.00 18.00           O  
+ATOM     16  N   CYS A   6      19.000  13.000  13.000  1.00 15.00           N  
+ATOM     17  CA  CYS A   6      20.500  14.000  13.500  1.00 16.00           C  
+ATOM     18  C   CYS A   6      22.000  15.000  14.000  1.00 17.00           C  
+ATOM     19  O   CYS A   6      23.500  16.000  14.500  1.00 18.00           O  
+ATOM     20  SG  CYS A   6      25.000  17.000  15.000  1.00 19.00           S  
+HETATM   21  N   MSE A   7      22.000  14.000  14.000  1.00 15.00           N  
+HETATM   22  CA  MSE A   7      23.500  15.000  14.500  1.00 16.00           C  
+HETATM   23  C   MSE A   7      25.000  16.000  15.000  1.00 17.00           C  
+HETATM   24  O   MSE A   7      26.500  17.000  15.500  1.00 18.00           O  
+HETATM   25  CB  MSE A   7      28.000  18.000  16.000  1.00 19.00           C  
+HETATM   26 SE   MSE A   7      29.500  19.000  16.500  1.00 20.00          SE  
+ATOM     27  N   HIS A   8      25.000  15.000  15.000  1.00 15.00           N  
+ATOM     28  CA  HIS A   8      26.500  16.000  15.500  1.00 16.00           C  
+ATOM     29  C   HIS A   8      28.000  17.000  16.000  1.00 17.00           C  
+ATOM     30  O   HIS A   8      29.500  18.000  16.500  1.00 18.00           O  
+ATOM     31  CB  HIS A   8      31.000  19.000  17.000  1.00 19.00           C  
+ATOM     32  N   HIS A   8A     28.000  16.000  16.000  1.00 15.00           N  
+ATOM     33  CA  HIS A   8A     29.500  17.000  16.500  1.00 16.00           C  
+ATOM     34  C   HIS A   8A     31.000  18.000  17.000  1.00 17.00           C  
+ATOM     35  O   HIS A   8A     32.500  19.000  17.500  1.00 18.00           O  
+ATOM     36  CB  HIS A   8A     34.000  20.000  18.000  1.00 19.00           C  
+ATOM     37  N   SER A   9      31.000  17.000  17.000  1.00 15.00           N  
+ATOM     38  CA  SER A   9      32.500  18.000  17.500  1.00 16.00           C  
+ATOM     39  C   SER A   9      34.000  19.000  18.000  1.00 17.00           C  
+ATOM     40  O   SER A   9      35.500  20.000  18.500  1.00 18.00           O  
+ATOM     41  CB  SER A   9      37.000  21.000  19.000  1.00 19.00           C  
+ATOM     42  HB2 SER A   9      38.500  22.000  19.500  1.00 20.00           H  
+ATOM     43  N   CYS A  10      34.000  18.000  18.000  1.00 15.00           N  
+ATOM     44  CA  CYS A  10      35.500  19.000  18.500  1.00 16.00           C  
+ATOM     45  C   CYS A  10      37.000  20.000  19.000  1.00 17.00           C  
+ATOM     46  O   CYS A  10      38.500  21.000  19.500  1.00 18.00           O  
+ATOM     47  SG  CYS A  10      40.000  22.000  20.000  1.00 19.00           S  
+TER      48      CYS A  10 
+HETATM   49  C1  NAG A 201      40.000  20.000  20.000  1.00 15.00           C  
+HETATM   50  C2  NAG A 201      41.500  21.000  20.500  1.00 16.00           C  
+HETATM   51  O5  NAG A 201      43.000  22.000  21.000  1.00 17.00           O  
+HETATM   52  N2  NAG A 201      44.500  23.000  21.500  1.00 18.00           N  
+HETATM   53 ZN    ZN A 202      45.000  22.000  22.000  1.00 15.00          ZN  
+HETATM   54  O   HOH A 301      50.000  24.000  24.000  1.00 15.00           O  
+HETATM   55  O   HOH A 302      52.000  25.000  25.000  1.00 15.00           O  
+ATOM     56  P    DA B   1      60.000  30.000  30.000  1.00 15.00           P  
+ATOM     57  OP1  DA B   1      61.500  31.000  30.500  1.00 16.00           O  
+ATOM     58  C1'  DA B   1      63.000  32.000  31.000  1.00 17.00           C  
+ATOM     59  P    DC B   2      63.000  30.000  30.000  1.00 15.00           P  
+ATOM     60  OP1  DC B   2      64.500  31.000  30.500  1.00 16.00           O  
+ATOM     61  C1'  DC B   2      66.000  32.000  31.000  1.00 17.00           C  
+ATOM     62  P    DG B   3      66.000  30.000  30.000  1.00 15.00           P  
+ATOM     63  OP1  DG B   3      67.500  31.000  30.500  1.00 16.00           O  
+ATOM     64  C1'  DG B   3      69.000  32.000  31.000  1.00 17.00           C  
+ATOM     65  P    DT B   4      69.000  30.000  30.000  1.00 15.00           P  
+ATOM     66  OP1  DT B   4      70.500  31.000  30.500  1.00 16.00           O  
+ATOM     67  C1'  DT B   4      72.000  32.000  31.000  1.00 17.00           C  
+TER      68       DT B   4 
+CONECT   57   58   59
+MASTER      000    0    0    1    1    0    0    6   66    2    0    2          
+END

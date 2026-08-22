@@ -1,5 +1,10 @@
 Revision history for PAGI::FastAPI
 
+1.2.5  2026-08-21
+       [IMPROVEMENT]
+       - Updated demo app and capture job_id when adding task.
+         eg/memory_queue_demo.pl
+
 1.2.4  2026-08-20
        [IMPROVEMENT]
        - Updated constant_time_eq() in the API Gateway demo app.

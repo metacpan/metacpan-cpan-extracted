@@ -194,4 +194,34 @@ is_deeply(\@GUARD_LOG, [qw(auth handler)], 'the full chain in order');
         'extra route arguments croak instead of vanishing');
 }
 
+# ---- schema/source/on_invalid are the LONGHAND's keys, not route options -----
+#
+# Punk.pm listed all three beside `validate` in its route-options list, so
+# copying the documentation gave you an application that would not boot:
+#
+#     get '/x' => sub {...}, { schema => \%BOOK };   # unknown route option
+#
+# They only exist inside `validate => { ... }`. The list of options a route
+# actually takes is short and closed, so it is asserted here as a list - a
+# seventh appearing without a line in the POD is the drift this catches.
+{
+    for my $key (qw(schema source on_invalid)) {
+        my $err = '';
+        eval "package RO_$key; use Punk;"
+           . " get '/x' => sub { 1 }, { $key => 1 }; 1" or $err = $@;
+        like($err, qr/unknown route option '\Q$key\E'/,
+            "`$key` is not a route option - it is a key of the validate "
+          . 'longhand, and saying so at boot beats a route that silently '
+          . 'validated nothing');
+    }
+
+    for my $key (qw(validate compress max_body sitemap etag idempotent)) {
+        my $val = $key eq 'validate' ? '{ type => q(object) }' : '1';
+        my $err = '';
+        eval "package RY_$key; use Punk;"
+           . " get '/x' => sub { 1 }, { $key => $val }; 1" or $err = $@;
+        is($err, '', "`$key` IS a route option");
+    }
+}
+
 done_testing();

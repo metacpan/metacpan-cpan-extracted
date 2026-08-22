@@ -1,5 +1,10 @@
-bench/compare.pl
 Changes
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
+Stencil.xs
+bench/compare.pl
 examples/hyperman.pl
 examples/plack.psgi
 examples/templates/header.tmpl
@@ -18,11 +23,7 @@ include/stencil_render.h
 include/stencil_types.h
 lib/Template/Stencil.pm
 lib/Template/Stencil/PSGI.pm
-Makefile.PL
-MANIFEST			This list of files
-MANIFEST.SKIP
 ppport.h
-README
 src/stencil_arena.c
 src/stencil_boot.c
 src/stencil_buf.c
@@ -32,7 +33,6 @@ src/stencil_escape.c
 src/stencil_filters.c
 src/stencil_render.c
 src/stencil_vm.inc
-Stencil.xs
 t/00-load.t
 t/01-variables.t
 t/02-arena.t
@@ -43,6 +43,7 @@ t/11-bytecode-shape.t
 t/12-paths.t
 t/13-expressions.t
 t/14-parse-errors.t
+t/15-tied.t
 t/20-output.t
 t/21-if.t
 t/22-for.t

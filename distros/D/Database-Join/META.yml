@@ -1,0 +1,49 @@
+---
+abstract: 'Read-only combined view across two or more Database::Abstraction objects'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  DBD::CSV: '0'
+  DBD::SQLite: '1.70'
+  DBI: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  IPC::System::Simple: '0'
+  Test::Exception: '0'
+  Test::Memory::Cycle: '0'
+  Test::Mockingbird: '0.13'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+  Test::Returns: '0.04'
+  Test::Without::Module: '0'
+  Text::xSV::Slurp: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Database-Join
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Database::Abstraction: '0.37'
+  List::Util: '1.33'
+  Object::Configure: '0'
+  Params::Get: '0.13'
+  Params::Validate::Strict: '0.38'
+  Readonly: '2.00'
+  Scalar::Util: '0'
+  Sub::Protected: '0'
+  autodie: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Join
+  repository: https://github.com/nigelhorne/Database-Join.git
+version: v0.001.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

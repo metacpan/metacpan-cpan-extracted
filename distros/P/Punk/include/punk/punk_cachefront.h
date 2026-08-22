@@ -967,6 +967,7 @@ static SV *pkc_compute(pTHX_ punk_cachefront *f, SV *key, NV ttl, SV *code,
                        int json) {
     STRLEN kl;
     SV *raw, *val = NULL, *err = NULL, *store;
+    int won = 0;
 
     if (!(code && SvROK(code) && SvTYPE(SvRV(code)) == SVt_PVCV))
         croak("Punk::Cache::compute: need a code reference");
@@ -991,16 +992,33 @@ static SV *pkc_compute(pTHX_ punk_cachefront *f, SV *key, NV ttl, SV *code,
      *   - a stale lock is stolen by the backend rather than obeyed, or one
      *     crash poisons a key until somebody notices;
      *   - the lock covers one compute and nothing unbounded. */
-    if ((f->caps & PKC_CAN_LOCK) && !pkc_be_lock(aTHX_ f, key)) {
-        double deadline = pc_now(aTHX) + pkc_be_lock_wait(aTHX_ f);
-        while (pc_now(aTHX) < deadline) {
-            SV *ready;
-            pkc_sleep(0.002);
-            ready = pkc_read(aTHX_ f, key);
-            if (ready) return pkc_ready(aTHX_ ready, json);
-            if (pkc_be_lock(aTHX_ f, key)) break;        /* the holder gave up */
+    if (f->caps & PKC_CAN_LOCK) {
+        won = pkc_be_lock(aTHX_ f, key);
+        if (!won) {
+            double deadline = pc_now(aTHX) + pkc_be_lock_wait(aTHX_ f);
+            while (pc_now(aTHX) < deadline) {
+                SV *ready;
+                pkc_sleep(0.002);
+                ready = pkc_read(aTHX_ f, key);
+                if (ready) return pkc_ready(aTHX_ ready, json);
+                if (pkc_be_lock(aTHX_ f, key)) {
+                    /* The holder finished or died between our read and
+                     * this acquisition - and a winner WRITES before it
+                     * unlocks, so if it finished, its value is visible
+                     * to a re-read made while holding the lock. Look
+                     * again or a herd of two computes twice. */
+                    SV *again = pkc_read(aTHX_ f, key);
+                    if (again) {
+                        if (f->caps & PKC_CAN_UNLOCK)
+                            pkc_be_unlock(aTHX_ f, key);
+                        return pkc_ready(aTHX_ again, json);
+                    }
+                    won = 1;
+                    break;
+                }
+            }
+            /* waited it out: compute rather than hang */
         }
-        /* waited it out: compute rather than hang */
     }
 
     /* dSP HERE and not at the top: every call above can have grown - and so
@@ -1038,8 +1056,11 @@ static SV *pkc_compute(pTHX_ punk_cachefront *f, SV *key, NV ttl, SV *code,
 
     /* The lock is released whether the compute worked or not: holding it
      * after a failure would make one bad call block every other worker for
-     * the whole wait budget. */
-    if (f->caps & PKC_CAN_UNLOCK) pkc_be_unlock(aTHX_ f, key);
+     * the whole wait budget. Only the holder releases it - a loser that
+     * waited out its budget and computed anyway does NOT own the lock,
+     * and unlinking it here would free the real winner's lock early and
+     * hand a third worker the same computation. */
+    if (won && (f->caps & PKC_CAN_UNLOCK)) pkc_be_unlock(aTHX_ f, key);
 
     if (err) {
         if (val) SvREFCNT_dec(val);

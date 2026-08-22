@@ -4,6 +4,31 @@ package Params::Validate::Strict;
 # TODO: better use of the description parameter in error messages
 # FIXME: ensure paramaters such as min => 1 length constraint applies to all values. In this case, undef should not pass through without a croak.
 # TODO: As well as type => [ 'string', 'arrayref' ], allow type => 'string|arrayref'
+# TODO: Allow a BNF definition of a string
+# e.g.
+#	schema => {
+#		na_tel_no => {
+#			type => 'string',
+#			bnf => [
+#				'<telephone-number> ::= <country-code-opt> <area-code> <separator-opt>',
+#				'<central-office-code> <separator-opt> <station-code>',
+#
+#				'<country-code-opt> ::= "" | "+1" | "1"',
+#
+#				'<separator-opt> ::= "" | "-" | " " | "."',
+#
+#				'<area-code> ::= <digit2-9> <digit0-9> <digit0-9>',
+#
+#				'<central-office-code> ::= <digit2-9> <digit0-9> <digit0-9>',
+#
+#				'<station-code> ::= <digit0-9> <digit0-9> <digit0-9> <digit0-9>',
+#
+#				'<digit0-9> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"',
+#
+#				'<digit2-9> ::= "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"',
+#			]
+#		}
+#	}
 
 use strict;
 use warnings;
@@ -25,11 +50,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =cut
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 SYNOPSIS
 
@@ -65,7 +90,9 @@ The schema can be plumbed into L<App::Test::Generator> to automatically create a
 
 =item * WAF
 
-The schema can be plumbed into a WAF to protect from random user input.
+The schema can be plumbed into a WAF,
+e.g., L<VWF|https://github.com/nigelhorne/VWF/>,
+to protect from random user input.
 
 =item * Improved API Documentation
 
@@ -74,7 +101,7 @@ the specification syntax can help with documentation.
 
 =item * I like it
 
-I find it fun to write this,
+I found it fun to write this,
 even if nobody else finds it useful,
 though I hope you will.
 
@@ -1634,6 +1661,11 @@ sub validate_strict
 							} elsif(($type eq 'number') || ($rule_value eq 'float')) {
 								if(ref($member) || ($member !~ /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)$/)) {
 									_rule_error($logger, $rules, "$key can only contain numbers (found $member)");
+									$invalid_args{$key} = 1;
+								}
+							} elsif($type eq 'object') {
+								if(!Scalar::Util::blessed($member)) {
+									_rule_error($logger, $rules, "$key can only contain objects (found $member)");
 									$invalid_args{$key} = 1;
 								}
 							} else {

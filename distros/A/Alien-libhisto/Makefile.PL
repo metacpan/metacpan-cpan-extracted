@@ -45,6 +45,8 @@ if (-f $repo_cmake) {
             copy($src_file, File::Spec->catfile($bundled_dir, $file));
         }
     }
+    # Clean stale Alien::Build cache so it rebuilds with fresh headers
+    File::Path::remove_tree('_alien', 'blib');
     require ExtUtils::Manifest;
     ExtUtils::Manifest::mkmanifest();
 }

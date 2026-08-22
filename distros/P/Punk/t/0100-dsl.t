@@ -111,4 +111,63 @@ use PunkTest;
     like($err, qr/unknown hook 'nope'/, 'unknown hook croaks');
 }
 
+# ---- keywords that refuse the wrong shape ------------------------------------
+#
+# Each of these reads its arguments off the stack by position, so a caller who
+# passes the wrong shape does not get a wrong value - they get whatever was in
+# the next slot. The croaks are the difference, and none of them had ever been
+# reached: every existing test calls these keywords correctly, which is exactly
+# why the refusals needed their own.
+{
+    my $try = sub {
+        my ($pkg, $code) = @_;
+        my $err = '';
+        eval "package $pkg; use Punk; $code; 1" or $err = $@;
+        return $err;
+    };
+
+    like($try->('UD2', "upload_dir('')"), qr/upload_dir needs a directory/,
+        'upload_dir refuses an empty path - which is what an unset config '
+      . 'value gives you, and it decides which filesystem attacker-controlled '
+      . 'bytes land on');
+
+    like($try->('UA1', "ua('name', 'timeout', 5)"),
+        qr/ua takes a hashref, a list of pairs/,
+        'ua with an argument list that is not pairs is refused rather than '
+      . 'dropping the odd one out');
+
+    # headers_scoped is the registrar method behind $scope->headers. The scope
+    # builds the hashref itself, so this guard only answers a direct call -
+    # which is what a plugin adding scoped headers would make.
+    {
+        package HS1;
+        use Punk;
+        package main;
+        my $err = '';
+        eval { HS1::punk_app()->headers_scoped('/api', 'X-Thing') } or $err = $@;
+        like($err, qr/headers_scoped takes a prefix and a hashref/,
+            'headers_scoped refuses anything but a hashref, so a plugin '
+          . 'calling it with pairs is told rather than storing a string as '
+          . 'a whole header policy');
+    }
+}
+
+# ---- $c->secret without the config keyword -----------------------------------
+# The secrets system fails closed everywhere else, and this is the same rule at
+# the other end: asking for a secret when nothing was loaded is an error, not
+# an undef that ends up signing something.
+{
+    package NoConfigApp;
+    use Punk;
+    get '/s' => sub { $_[0]->text($_[0]->app->secret('session_key') // 'undef') };
+    package main;
+
+    my $r = hit(NoConfigApp->to_app, path => '/s');
+    is($r->[0], 500,
+        'asking for a secret with no config loaded is refused, rather than '
+      . 'handing back undef for something about to be used as a key');
+    like($r->[2][0], qr/no configuration loaded/,
+        'and the message names the keyword that is missing');
+}
+
 done_testing();

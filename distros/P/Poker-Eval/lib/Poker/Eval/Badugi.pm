@@ -1,6 +1,6 @@
 package Poker::Eval::Badugi;
+our $VERSION = '0.12';
 
-our $VERSION = '0.11';
 
 use Algorithm::Combinatorics qw(combinations);
 use Moo;
@@ -12,7 +12,7 @@ Poker::Eval::Badugi - Evaluate and score Badugi poker hands.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

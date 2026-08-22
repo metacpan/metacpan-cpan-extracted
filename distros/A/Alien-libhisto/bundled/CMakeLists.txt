@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(libhisto
-    VERSION 0.1.0
-    DESCRIPTION "Fast, portable, memory-safe 1D histogramming C library"
+    VERSION 0.2.0
+    DESCRIPTION "Fast, portable, memory-safe 1D and 2D histogramming and statistical computing C library"
     LANGUAGES C
 )
 
@@ -53,6 +53,9 @@ find_package(Doxygen)
 if(DOXYGEN_FOUND)
     set(LIBHISTO_BUILD_DOCS ON CACHE BOOL "Build Doxygen documentation" FORCE)
 endif()
+
+# Threading support
+find_package(Threads REQUIRED)
 
 # Configure common warning flags
 add_library(histo_compiler_flags INTERFACE)

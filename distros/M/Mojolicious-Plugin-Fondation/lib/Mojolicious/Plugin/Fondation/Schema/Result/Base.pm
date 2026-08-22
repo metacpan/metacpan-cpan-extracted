@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Schema::Result::Base;
-$Mojolicious::Plugin::Fondation::Schema::Result::Base::VERSION = '0.07';
+$Mojolicious::Plugin::Fondation::Schema::Result::Base::VERSION = '0.08';
 # ABSTRACT: Base class for all Fondation DBIx::Class Result classes
 
 use strict;
@@ -77,7 +77,7 @@ Mojolicious::Plugin::Fondation::Schema::Result::Base - Base class for all Fondat
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 AUTHOR
 

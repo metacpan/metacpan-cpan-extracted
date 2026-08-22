@@ -55,7 +55,7 @@ is_deeply(hit($app, path => '/triplet'),
 {
     my $r = hit($app, path => '/data');
     my %h = @{ $r->[1] };
-    is($h{'Content-Type'}, 'application/json', 'auto-JSON content type');
+    like($h{'Content-Type'}, qr{^application/json}, 'auto-JSON content type');
     is($h{'Content-Length'}, length $r->[2][0], 'auto-JSON content length');
     is(file_json_decode($r->[2][0])->{pets}[0]{id}, 1, 'auto-JSON body');
 }
@@ -133,6 +133,40 @@ is(hit($app, path => '/ctx-notfound')->[0], 404, '$c->not_found');
     my $r = hit(MwApp->to_app, path => '/nope');
     my %h = @{ $r->[1] };
     is($h{'X-Wrapped'}, 1, 'middleware sees even 404s (outermost wrap)');
+}
+
+# ---- finalize, called directly ----------------------------------------------
+# Every test above reaches the triplet through a handler. `finalize` is the
+# documented method that produces it, and its three defaulting rules - a
+# reference becomes JSON, a string becomes text/html, nothing becomes an empty
+# text/plain 200 - are only ever observed through helpers that set the type
+# themselves, so nothing pinned the defaults down.
+{
+    my $res = Punk::Response->new;
+    my $t = $res->body({ ok => 1 })->finalize;
+    is($t->[0], 200, 'a bare response finalizes as 200');
+    my %h = @{ $t->[1] };
+    is($h{'Content-Type'}, 'application/json',
+        'a REFERENCE body is JSON - the rule that decides it is the body, not '
+      . 'a type somebody remembered to set');
+    like($t->[2][0], qr/"ok"\s*:\s*1/, 'encoded through the JSON ABI');
+    is($h{'Content-Length'}, length $t->[2][0], 'Content-Length always set');
+
+    my $s = Punk::Response->new->body('<p>hi</p>')->finalize;
+    my %sh = @{ $s->[1] };
+    like($sh{'Content-Type'}, qr{^text/html; charset=utf-8},
+        'a STRING body defaults to text/html, charset included');
+    is($sh{'Content-Length'}, 9, 'with its length');
+
+    my $e = Punk::Response->new->finalize;
+    my %eh = @{ $e->[1] };
+    is($e->[0], 200, 'no body at all is still a 200');
+    like($eh{'Content-Type'}, qr{^text/plain; charset=utf-8}, 'as empty text/plain');
+    is($eh{'Content-Length'}, 0, 'with a zero length rather than none');
+
+    my $x = Punk::Response->new->type('text/csv')->body('a,b')->finalize;
+    my %xh = @{ $x->[1] };
+    is($xh{'Content-Type'}, 'text/csv', 'an explicit type wins over the default');
 }
 
 done_testing();

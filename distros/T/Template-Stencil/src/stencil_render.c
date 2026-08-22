@@ -339,6 +339,53 @@ static SV *loop_snapshot(pTHX_ const stencil_rframe *f)
 
 /* ---- path resolution -------------------------------------------------- */
 
+/* One key out of a hash, honouring magic.
+ *
+ * The fast path is hv_common with the hash this engine precomputed at
+ * compile time, and that is what every ordinary hash gets: no key SV, no
+ * rehash, one probe.
+ *
+ * It does not go through tie magic, though, and the way it fails is the
+ * problem. A tied hash read that way comes back EMPTY - not an error, not a
+ * wrong value, nothing - so a template handed one renders blanks and says
+ * nothing about why. That is a trap for any tied hash a caller passes in,
+ * and tied hashes are how a caller hands a template something it should not
+ * have to materialise up front: a big catalogue, a lazy record, a database
+ * row.
+ *
+ * So: anything magical takes hv_fetch_ent instead, which is the call perl's
+ * own $h{k} makes. The cost to everything else is one bit test.
+ */
+static SV *stencil_hv_get(pTHX_ HV *hv, const char *pv, STRLEN len,
+                          U32 hash, int kflags)
+{
+    if (UNLIKELY(SvRMAGICAL((const SV *)hv))) {
+        SV *k = sv_2mortal(newSVpvn(pv, len));
+        HE *he;
+        SV *v;
+        if (kflags & HVhek_UTF8)
+            SvUTF8_on(k);
+        he = hv_fetch_ent(hv, k, 0, 0);
+        if (!he)
+            return NULL;
+        v = HeVAL(he);
+        /* What comes back from a tied hash is a PVLV carrying GET MAGIC, not
+         * the value: the tie's FETCH runs when the magic is read. Everything
+         * downstream here asks SvOK and SvPV, neither of which fires it, so
+         * without this the value reads as undef and the tag renders empty -
+         * which is the bug this branch exists to fix, arrived at one level
+         * further in. */
+        if (v)
+            SvGETMAGIC(v);
+        return v;
+    }
+    {
+        SV **svp = (SV **)hv_common(hv, NULL, pv, len, kflags,
+                                    HV_FETCH_JUST_SV, NULL, hash);
+        return svp ? *svp : NULL;
+    }
+}
+
 static SV *resolve_path(pTHX_ stencil_rstate *r, uint32_t pid, int *owned)
 {
     const stencil_cpath *path = &r->paths[pid];
@@ -407,11 +454,8 @@ static SV *resolve_path(pTHX_ stencil_rstate *r, uint32_t pid, int *owned)
         if (found) {
             cur = best;
         } else {
-            SV **svp = (SV **)hv_common(r->data, NULL, seg0.pv,
-                                        seg0.len, kflags,
-                                        HV_FETCH_JUST_SV, NULL,
-                                        seg0.hash);
-            cur = svp ? *svp : NULL;
+            cur = stencil_hv_get(aTHX_ r->data, seg0.pv, seg0.len,
+                                 seg0.hash, kflags);
         }
         if (!cur)
             return NULL;
@@ -442,13 +486,10 @@ static SV *resolve_path(pTHX_ stencil_rstate *r, uint32_t pid, int *owned)
             cur = svp ? *svp : NULL;
         } else {
             const stencil_cname *nm = &r->names[segs[i].name_id];
-            SV **svp;
             if (SvTYPE(rv) != SVt_PVHV)
                 return NULL;
-            svp = (SV **)hv_common((HV *)rv, NULL, r->pool + nm->off,
-                                   nm->len, kflags, HV_FETCH_JUST_SV,
-                                   NULL, nm->hash);
-            cur = svp ? *svp : NULL;
+            cur = stencil_hv_get(aTHX_ (HV *)rv, r->pool + nm->off,
+                                 nm->len, nm->hash, kflags);
         }
         if (!cur)
             return NULL;

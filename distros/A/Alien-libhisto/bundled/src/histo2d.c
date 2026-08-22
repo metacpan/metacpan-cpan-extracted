@@ -1,6 +1,5 @@
-/**
- * @file histo2d.c
- * @brief Core 2-Dimensional Histogram implementation for libhisto.
+/*
+ * 2D histogram implementation: creation, filling, projections, and 2D moments.
  */
 
 #include "histo/histo2d.h"

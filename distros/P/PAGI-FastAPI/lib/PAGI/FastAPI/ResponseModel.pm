@@ -3,7 +3,7 @@ package PAGI::FastAPI::ResponseModel;
 use v5.38;
 use version;
 
-our $VERSION   = qv('v1.2.4');
+our $VERSION   = qv('v1.2.5');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Exporter 'import';
@@ -93,7 +93,7 @@ PAGI::FastAPI::ResponseModel - Response Shape Validation and Filtering for PAGI:
 
 =head1 VERSION
 
-Version v1.2.4
+Version v1.2.5
 
 =head1 SYNOPSIS
 

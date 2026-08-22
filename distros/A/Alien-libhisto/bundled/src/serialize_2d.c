@@ -1,6 +1,5 @@
-/**
- * @file serialize_2d.c
- * @brief Canonical Little-Endian V3 and JSON serialization for 2D histograms.
+/*
+ * Binary wire format and JSON serialization/deserialization for 2D histograms.
  */
 
 #include "histo/histo2d.h"
@@ -480,6 +479,7 @@ histo_status_t histo2d_serialize_json_alloc(const histo2d_t *h, char **out_str,
 
     cJSON_AddNumberToObject(root, "flags", h->flags);
     cJSON_AddNumberToObject(root, "nan_count", (double)h->n_nan);
+    cJSON_AddNumberToObject(root, "entries", (double)h->n_fills);
 
     /* Guard Regions */
     static const char *region_names[HISTO2D_REGION_COUNT] = {
@@ -637,6 +637,9 @@ histo_status_t histo2d_deserialize_json(const char *json_str, histo2d_t **out_h)
 
     cJSON *nan_obj = cJSON_GetObjectItemCaseSensitive(root, "nan_count");
     if (nan_obj) h->n_nan = (uint64_t)nan_obj->valuedouble;
+
+    cJSON *entries_obj = cJSON_GetObjectItemCaseSensitive(root, "entries");
+    if (entries_obj) h->n_fills = (uint64_t)entries_obj->valuedouble;
 
     /* Populate Bins */
     cJSON *bins_matrix = cJSON_GetObjectItemCaseSensitive(root, "bins_row_major");

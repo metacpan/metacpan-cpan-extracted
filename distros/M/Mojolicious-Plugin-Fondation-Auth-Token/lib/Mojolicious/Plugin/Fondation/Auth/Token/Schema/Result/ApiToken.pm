@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Auth::Token::Schema::Result::ApiToken;
-$Mojolicious::Plugin::Fondation::Auth::Token::Schema::Result::ApiToken::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Auth::Token::Schema::Result::ApiToken::VERSION = '0.03';
 # ABSTRACT: DBIx::Class Result class for api_tokens table
 
 use strict;
@@ -94,7 +94,7 @@ Mojolicious::Plugin::Fondation::Auth::Token::Schema::Result::ApiToken - DBIx::Cl
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

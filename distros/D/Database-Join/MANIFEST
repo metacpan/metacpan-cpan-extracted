@@ -1,0 +1,39 @@
+Changes
+cpanfile
+lib/Database/Join.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/01-new.t
+t/10-select.t
+t/20-remove-column.t
+t/30-add-database.t
+t/40-filters.t
+t/50-logic-proofs.t
+t/cgi_security.t
+t/cities.t
+t/data-flow.t
+t/data/cities.csv
+t/data/states.csv
+t/domain.t
+t/edge_cases.t
+t/function.t
+t/integration.t
+t/lib/Database/cities.pm
+t/lib/Database/djcust.pm
+t/lib/Database/djloyalty.pm
+t/lib/Database/djscore.pm
+t/lib/Database/lp_a.pm
+t/lib/Database/lp_b.pm
+t/lib/Database/states.pm
+t/lib/Database/test1.pm
+t/lib/Database/test2.pm
+t/path.t
+t/test1_2.t
+t/transaction.t
+t/unit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

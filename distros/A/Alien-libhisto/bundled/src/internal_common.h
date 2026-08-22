@@ -1,6 +1,6 @@
 /**
  * @file internal_common.h
- * @brief Common internal primitives, aligned allocators, endianness, and bin lookup math.
+ * @brief Common internal primitives, aligned allocators, and bin lookup math.
  */
 
 #ifndef LIBHISTO_INTERNAL_COMMON_H

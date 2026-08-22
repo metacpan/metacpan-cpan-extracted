@@ -1,4 +1,8 @@
 Revision history for Mojolicious-Plugin-Fondation
 
+0.02      2026-08-21 19:58:27+02:00 Europe/Paris
+    - fix: csrf condition sets fondation.denied marker instead of rendering
+    - add missing test deps
+
 0.01      2026-08-16 19:59:32+02:00 Europe/Paris
     - Initial release

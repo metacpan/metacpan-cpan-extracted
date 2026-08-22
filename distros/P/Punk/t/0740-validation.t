@@ -157,4 +157,40 @@ $t->get_ok('/nothing')
       ->json_like('/errors/0/message' => qr/hashref or a/);
 }
 
+# ---- the Result's own JSON shape --------------------------------------------
+# TO_JSON is what makes a Result the 400 body. Every test above reads that body
+# after the framework has encoded it, so what was never checked is that the
+# Result encodes to that shape when anything ELSE encodes it - an application
+# putting one in its own response, a log line, a nested field.
+{
+    package ResultApp;
+    use Punk;
+    post '/check' => sub {
+        my ($c) = @_;
+        my $r = $c->validate({ type => 'object',
+                               required => ['name'],
+                               properties => { name => { type => 'string' } } });
+        # the Result inside a structure of the application's own making
+        return $c->json({ wrapped => $r, ok => $r->has_errors ? 0 : 1 });
+    };
+    package main;
+
+    my $t = Punk::Test->new('ResultApp');
+
+    $t->post_ok('/check', json => {});
+    $t->json_is('/ok' => 0, 'an invalid body has errors');
+    $t->json_has('/wrapped/errors',
+        'and the Result nested in the application\'s own JSON encodes as '
+      . '{ errors => [...] } - which is the documented shape, and the reason '
+      . 'a 400 body looks the way it does');
+    $t->json_like('/wrapped/errors/0/name' => qr/name/,
+        'carrying the field that failed');
+
+    $t->post_ok('/check', json => { name => 'ok' });
+    $t->json_is('/ok' => 1, 'a valid body has none');
+    $t->json_is('/wrapped/errors' => [],
+        'and encodes as an EMPTY errors list rather than as null or a bare '
+      . 'object - a consumer can read it the same way either way');
+}
+
 done_testing();

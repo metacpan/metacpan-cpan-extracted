@@ -4,7 +4,7 @@ use v5.38;
 use experimental 'class';
 use version;
 
-our $VERSION   = qv('v1.2.4');
+our $VERSION   = qv('v1.2.5');
 our $AUTHORITY = 'cpan:MANWAR';
 
 class PAGI::FastAPI::Context {
@@ -145,7 +145,7 @@ PAGI::FastAPI::Context - Request and Response Lifecycle Context for PAGI::FastAP
 
 =head1 VERSION
 
-Version v1.2.4
+Version v1.2.5
 
 =head1 SYNOPSIS
 

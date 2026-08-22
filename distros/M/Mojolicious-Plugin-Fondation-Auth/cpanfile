@@ -7,7 +7,7 @@ requires 'perl' => '5.026';
 # Runtime dependencies
 requires 'Mojolicious' => '9.46';
 requires 'Mojolicious::Plugin::Authentication';
-requires 'Mojolicious::Plugin::Fondation' => '0.07';
+requires 'Mojolicious::Plugin::Fondation' => '0.08';
 requires 'Mojolicious::Plugin::Fondation::User' => '0.03';
 requires 'Crypt::Passphrase';
 requires 'Crypt::Passphrase::Argon2';

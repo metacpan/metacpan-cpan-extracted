@@ -1,6 +1,6 @@
 package Poker::Eval;
+our $VERSION = '0.12';
 
-our $VERSION = '0.11';
 use strict;
 use Moo;
 use Poker::Hand;
@@ -14,65 +14,116 @@ Poker::Eval - Deal, score, and evaluate poker hands
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut
 
-
 =head1 SYNOPSIS
-
-Preferred interface -- named games:
 
     use Poker::Game::Holdem;
     use feature qw(say);
 
+    # choose a game
     my $game = Poker::Game::Holdem->new( iterations => 1000 );
+
+    # deal hole cards
     my $hero    = $game->deal_hole(['As', 'Kd']);
     my $villain = $game->deal_hole(['7h', '7c']);
+    # OR $game->deal_hole() for random cards;
 
-    $game->flop(['Ah', 'Kc', '2d']);
-    $game->turn('9s');
-    $game->river('3c');
-
-    $game->evaluate($hero);
-    say $hero->name;          # Two Pair
-    say $hero->score;         # numerical strength
-    say $hero->best_combo_flat;
-
-    $game->reset;
-    $hero    = $game->deal_hole(['As', 'Kd']);
-    $villain = $game->deal_hole(['7h', '7c']);
+    # calculate equity for each player
     $game->equity([ $hero, $villain ]);
+
+    # hero has ~45 percent equity 
     say $hero->ev;
 
-Advanced -- compose rules and scoring yourself:
+    # villain has ~55 percent equity
+    say $villain->ev;
 
-    use Poker::Eval::Omaha;
-    use Poker::Score::High;
+    # here comes the flop
+    $game->flop(['Ah', 'Kc', '2d']);
+    # or $game->flop() for random cards;
 
-    my $ev = Poker::Eval::Omaha->new(
-      scorer => Poker::Score::High->new,
-      community_remaining => 2,
-    );
+    # calculate equity again after the flop
+    $game->equity([ $hero, $villain ]);
 
-=head1 DESCRIPTION
+    # hero now has ~93 percent equity after making two pair
+    say $hero->ev;
 
-B<Poker::Game::*> modules are the primary API (Hold'em, Omaha, draw,
-stud, Badugi, etc.). They wire hole/board counts to the correct
-C<Poker::Eval> and C<Poker::Score> engines.
+    # turn and river
+    $game->turn('9s'); # deal specific card
+    $game->river();    # deal random card
 
-C<Poker::Eval> remains the rules engine base class (how hole and
-community cards combine). C<Poker::Score> defines ranking systems
-(highball, lowball, Badugi, ...).
+    # see who won and why
+    $game->evaluate($hero);
+    say $game->board_string;    # Community Cards
+    say $hero->name;            # Two Pair
+    say $hero->score;           # numerical strength
+    say $hero->best_combo_flat; # show cards in human readable form
 
-Only this module defines C<$VERSION> for the distribution; other
-packages intentionally omit it so PAUSE indexes a single release.
+    # reset board and shuffle deck for the next game
+    $game->reset;
+
+=head1 AVAILABLE COMPONENTS
+
+=head2 Games (C<Poker::Game::*>)
+
+   Community  Poker::Game::Holdem
+              Poker::Game::HoldemJokersWild
+              Poker::Game::Pineapple
+              Poker::Game::CrazyPineapple
+              Poker::Game::Omaha
+              Poker::Game::OmahaHiLo
+              Poker::Game::Omaha5
+              Poker::Game::Omaha5HiLo
+              Poker::Game::Courcheval
+              Poker::Game::CourchevalHiLo
+
+   Draw       Poker::Game::FiveCardDraw
+              Poker::Game::FiveCardDrawDeucesWild
+              Poker::Game::FiveCardDrawJokersWild
+              Poker::Game::Low27SingleDraw
+              Poker::Game::Low27TripleDraw
+              Poker::Game::LowA5SingleDraw
+              Poker::Game::LowA5TripleDraw
+
+   Stud       Poker::Game::SevenCardStud
+              Poker::Game::SevenCardStudHiLo
+              Poker::Game::Razz
+              Poker::Game::Stud          (base class)
+
+   Badugi     Poker::Game::Badugi
+              Poker::Game::Badacey
+              Poker::Game::Badeucy
+
+=head2 Evaluation engines (C<Poker::Eval::*>)
+
+   Poker::Eval::Community   any hole + community (Hold'em-style)
+   Poker::Eval::Omaha       exactly 2 hole + 3 community
+   Poker::Eval::Wild        wild cards (jokers / deuces, etc.)
+   Poker::Eval::Badugi      Badugi selection
+   Poker::Eval::Badugi27    Badugi with aces high / 2-7 flavor
+   Poker::Eval::HighSuit    high-suit style
+   Poker::Eval::BlackMariah Black Mariah
+
+=head2 Scoring systems (C<Poker::Score::*>)
+
+   Poker::Score::High       standard highball
+   Poker::Score::Low8       8-or-better low
+   Poker::Score::Low27      deuce-to-seven low
+   Poker::Score::LowA5      ace-to-five low
+   Poker::Score::Badugi     Badugi rank
+   Poker::Score::Badugi27   Badugi 2-7 variant
+   Poker::Score::HighSuit   high suit
+
+   Poker::Score::Bring::*   bring-in helpers (High, Low, Wild)
+
+C<Poker::Game::*> subclasses wire a specific Eval + Scorer for you.
+Advanced use: pair an Eval engine with a Score object yourself.
 
 =head1 SEE ALSO
 
-Poker::Game::Holdem, Poker::Game::Omaha, Poker::Game::FiveCardDraw,
-Poker::Game::SevenCardStud, Poker::Game::Badugi, Poker::Score,
-Poker::Dealer
+Poker::Game, Poker::Score 
 
 =head1 ATTRIBUTES
 
@@ -177,7 +228,7 @@ Monte-Carlo expected win rate for an array ref of hands. Prefer
 C<Poker::Game>'s C<equity> method for the named-game API.
 
 Each simulation awards 1.0 pot unit total. If N hands tie for the best
-score, each receives C<1/N>. Equity is reported as a percentage of
+score, each receives 1/N. Equity is reported as a percentage of
 simulations (so the C<ev> values across hands sum to approximately 100).
 
 The dealer's current deck (already missing dealt hole and board cards)
@@ -226,6 +277,9 @@ sub calc_ev {
   }
 
   $self->community_cards($community_orig);
+
+  # Restore undealt pack
+  $self->dealer->deck( dclone($residual) );
 
   my $sims = $self->simulations || 1;
   for my $hand (@$hands) {

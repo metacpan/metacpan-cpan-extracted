@@ -1,5 +1,5 @@
 This archive contains the distribution Mojolicious-Plugin-Fondation-CSRF,
-version 0.01:
+version 0.02:
 
   CSRF protection plugin for Fondation — route condition, OpenAPI integration, JS injection
 

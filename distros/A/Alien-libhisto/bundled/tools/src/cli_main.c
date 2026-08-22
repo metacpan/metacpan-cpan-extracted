@@ -1,3 +1,7 @@
+/*
+ * Top-level multi-call CLI dispatcher routing to histo subcommands.
+ */
+
 #include "cli_common.h"
 #include "histo/cli.h"
 #include "histo/version.h"
@@ -13,13 +17,15 @@ static void print_usage(const char *prog, FILE *out) {
     fprintf(out, "  histo-plot [options] [arguments...]\n");
     fprintf(out, "  histo-stats [options] [arguments...]\n");
     fprintf(out, "  histo-fit [options] [arguments...]\n");
-    fprintf(out, "  histo-cmp [options] [arguments...]\n\n");
+    fprintf(out, "  histo-cmp [options] [arguments...]\n");
+    fprintf(out, "  histo-top [options] [arguments...]\n\n");
     fprintf(out, "Commands:\n");
     fprintf(out, "  fill     Stream data in, aggregate into histogram, and emit binary/JSON/text\n");
     fprintf(out, "  plot     Render histogram as ASCII / Unicode terminal bar chart\n");
     fprintf(out, "  stats    Display detailed statistical metrics and moment analysis\n");
     fprintf(out, "  fit      Fit parametric models (Gaussian, Exponential, Polynomial, Breit-Wigner)\n");
-    fprintf(out, "  cmp      Compare two histograms and compute statistical distance metrics\n\n");
+    fprintf(out, "  cmp      Compare two histograms and compute statistical distance metrics\n");
+    fprintf(out, "  top      Interactive terminal monitor for live 1D/2D data streams\n\n");
     fprintf(out, "Flags:\n");
     fprintf(out, "  -h, --help       Show this help message\n");
     fprintf(out, "  -v, --version    Show version information\n\n");
@@ -55,6 +61,10 @@ int histo_cli_main(int argc, char **argv, FILE *out, FILE *err) {
     if (strcmp(prog_name, "histo-fit") == 0 || strcmp(prog_name, "histo_fit") == 0 ||
         strcmp(prog_name, "phisto-fit") == 0) {
         return histo_cli_fit(argc, argv, out, err);
+    }
+    if (strcmp(prog_name, "histo-top") == 0 || strcmp(prog_name, "histo_top") == 0 ||
+        strcmp(prog_name, "phisto-top") == 0) {
+        return histo_cli_top(argc, argv, out, err);
     }
 
     /* Multi-call dispatcher */
@@ -92,9 +102,18 @@ int histo_cli_main(int argc, char **argv, FILE *out, FILE *err) {
     if (strcmp(cmd, "cmp") == 0 || strcmp(cmd, "compare") == 0 || strcmp(cmd, "diff") == 0) {
         return histo_cli_cmp(sub_argc, sub_argv, out, err);
     }
+    if (strcmp(cmd, "top") == 0 || strcmp(cmd, "monitor") == 0 || strcmp(cmd, "tui") == 0) {
+        return histo_cli_top(sub_argc, sub_argv, out, err);
+    }
 
     fprintf(err, "Error: Unknown command '%s'. Run '%s --help' for usage.\n", cmd, prog_name);
     return 1;
+}
+
+int histo_cli_top(int argc, char **argv, FILE *out, FILE *err) {
+    (void)out;
+    (void)err;
+    return cmd_top_main(argc, argv);
 }
 
 /* Backward-compatible wrappers */

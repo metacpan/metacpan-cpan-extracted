@@ -1,0 +1,10 @@
+^Punk-ClamAV-
+\bMakefile$
+\bMakefile\.old$
+\bMYMETA\.
+\bblib/
+\bpm_to_blib$
+\.tar\.gz$
+~$
+^\.git
+^ignore\.txt$

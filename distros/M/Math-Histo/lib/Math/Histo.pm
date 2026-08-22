@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use 5.008001;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
+
 
 use XSLoader;
 XSLoader::load('Math::Histo', $VERSION);
@@ -39,6 +40,32 @@ sub new {
     } else {
         die "Math::Histo->new: specify 'bins', 'min', 'max' for uniform binning, or 'edges' => [...] for variable binning";
     }
+}
+
+my %RULE_MAP = (
+    auto    => 0,
+    fd      => 1,
+    scott   => 2,
+    sturges => 3,
+    doane   => 4,
+    knuth   => 5,
+);
+
+sub create_auto {
+    my ($class, $samples, %args) = @_;
+    my $rule_str = lc($args{rule} // 'auto');
+    my $rule = exists $RULE_MAP{$rule_str} ? $RULE_MAP{$rule_str} : int($rule_str);
+    my $flags = $args{flags} // 0;
+    $flags |= 1 if $args{sumw2} || $args{track_sumw2};
+    $flags |= 2 if $args{exact_moments};
+    return $class->_create_auto($samples, $rule, $flags);
+}
+
+sub estimate_bins {
+    my ($class, $samples, $rule_arg) = @_;
+    my $rule_str = lc($rule_arg // 'auto');
+    my $rule = exists $RULE_MAP{$rule_str} ? $RULE_MAP{$rule_str} : int($rule_str);
+    return $class->_estimate_bins($samples, $rule);
 }
 
 sub clone {
@@ -80,6 +107,48 @@ sub write_file {
     return 1;
 }
 
+sub plot {
+    my ($self, %opts) = @_;
+    require Math::Histo::CLI;
+    require File::Temp;
+
+    my @cmd = ('plot');
+    push @cmd, "--style=$opts{style}" if defined $opts{style};
+    if (exists $opts{color}) {
+        push @cmd, $opts{color} ? '--color=always' : '--color=never';
+    }
+    push @cmd, "--palette=$opts{palette}" if defined $opts{palette};
+    push @cmd, '-S' if $opts{sparkline};
+    push @cmd, "-w=$opts{width}" if defined $opts{width};
+    push @cmd, "-H=$opts{height}" if defined $opts{height};
+    push @cmd, '-l' if $opts{log};
+    push @cmd, '-e' if $opts{errors};
+    push @cmd, "--fit=$opts{fit}" if defined $opts{fit};
+    push @cmd, '--kde' if $opts{kde};
+    push @cmd, '--cdf' if $opts{cdf};
+
+    my $tf = File::Temp->new(SUFFIX => '.json', UNLINK => 1);
+    print $tf $self->serialize_json;
+    close $tf;
+    push @cmd, $tf->filename;
+
+    my ($code, $out, $err) = Math::Histo::CLI->capture(@cmd);
+    die "Math::Histo::plot failed: $err" if $code != 0 && $err;
+    print $out if !defined $opts{show} || $opts{show};
+    return $out;
+}
+
+sub sparkline {
+    my ($self, %opts) = @_;
+    return $self->plot(%opts, sparkline => 1);
+}
+
+sub top {
+    my ($self, @args) = @_;
+    require Math::Histo::CLI;
+    return Math::Histo::CLI->run('top', @args);
+}
+
 sub fit {
     my ($self, %args) = @_;
     my $model_str = lc($args{model} // 'gaussian');
@@ -94,6 +163,15 @@ sub fit {
         cauchy       => HISTO_FIT_BREIT_WIGNER,
         power_law    => HISTO_FIT_POWER_LAW,
         powerlaw     => HISTO_FIT_POWER_LAW,
+        lognormal    => HISTO_FIT_LOG_NORMAL,
+        log_normal   => HISTO_FIT_LOG_NORMAL,
+        gauss_linear => HISTO_FIT_GAUSSIAN_PLUS_LINEAR,
+        gauss_poly1  => HISTO_FIT_GAUSSIAN_PLUS_LINEAR,
+        weibull      => HISTO_FIT_WEIBULL,
+        gamma        => HISTO_FIT_GAMMA,
+        erlang       => HISTO_FIT_GAMMA,
+        poisson      => HISTO_FIT_POISSON,
+        laplace      => HISTO_FIT_LAPLACE,
     );
 
     die "Math::Histo::fit: unknown model '$model_str'" unless exists $model_map{$model_str};

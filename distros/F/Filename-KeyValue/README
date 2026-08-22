@@ -2,7 +2,7 @@ NAME
     Filename::KeyValue - Parse filename using the KeyValue naming scheme
 
 VERSION
-    This document describes version 0.006 of Filename::KeyValue (from Perl
+    This document describes version 0.007 of Filename::KeyValue (from Perl
     distribution Filename-KeyValue), released on 2026-05-29.
 
 SYNOPSIS
@@ -12,6 +12,8 @@ SYNOPSIS
          modify_keyvalue_filename
          rename_add_keyvalue_filenames
          rename_remove_keyvalue_filenames
+         rename_replace_keyvalue_filenames
+         rename_modify_keyvalue_filenames
      );
 
 DESCRIPTION
@@ -414,6 +416,61 @@ FUNCTIONS
 
     Return value: (any)
 
+  rename_modify_keyvalue_filenames
+    Usage:
+
+     rename_modify_keyvalue_filenames(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Rename file by adding/replacing/removing keys.
+
+    This routine will:
+
+    *   sort the key-value using keys asciibetically;
+
+    *   (NOT YET IMPLEMENTED) optionally sort the values asciibetically;
+
+    *   (NOT YET IMPLEMENTED) customize key sorting using SortKey.
+
+    *   (NOT YET IMPLEMENTED) customize value sorting using SortKey.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   add => *hash*
+
+        List of key=>value pairs to add.
+
+    *   filename* => *array[str]*
+
+        (No description)
+
+    *   ignore => *bool*
+
+        If set, when filename already has the same key, do nothing.
+
+    *   remove => *array[str]*
+
+        List of keys to remove.
+
+    *   replace => *hash*
+
+        List of key=>value pairs to replace.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   rename_remove_keyvalue_filenames
     Usage:
 
@@ -446,6 +503,53 @@ FUNCTIONS
     *   remove => *array[str]*
 
         List of keys to remove.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  rename_replace_keyvalue_filenames
+    Usage:
+
+     rename_replace_keyvalue_filenames(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Rename file by replacing keys.
+
+    This routine will:
+
+    *   sort the key-value using keys asciibetically;
+
+    *   (NOT YET IMPLEMENTED) optionally sort the values asciibetically;
+
+    *   (NOT YET IMPLEMENTED) customize key sorting using SortKey.
+
+    *   (NOT YET IMPLEMENTED) customize value sorting using SortKey.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *array[str]*
+
+        (No description)
+
+    *   ignore => *bool*
+
+        If set, when filename already has the same key, do nothing.
+
+    *   replace => *hash*
+
+        List of key=>value pairs to replace.
 
     Returns an enveloped result (an array).
 

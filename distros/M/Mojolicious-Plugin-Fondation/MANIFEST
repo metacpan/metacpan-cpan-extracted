@@ -43,6 +43,7 @@ t/08-static.t
 t/09-resolver.t
 t/10-api.t
 t/11-cycle-integration.t
+t/11-denied-condition.t
 t/12-context-log.t
 t/13-fondation-command.t
 t/13-merge.t

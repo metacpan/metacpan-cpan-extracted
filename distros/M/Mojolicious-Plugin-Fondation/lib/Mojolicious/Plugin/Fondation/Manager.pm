@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Manager;
-$Mojolicious::Plugin::Fondation::Manager::VERSION = '0.07';
+$Mojolicious::Plugin::Fondation::Manager::VERSION = '0.08';
 # ABSTRACT: Plugin registry, post-load actions, and finalyze initialization
 
 use Mojo::Base -base, -signatures;
@@ -215,7 +215,7 @@ Mojolicious::Plugin::Fondation::Manager - Plugin registry, post-load actions, an
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 AUTHOR
 

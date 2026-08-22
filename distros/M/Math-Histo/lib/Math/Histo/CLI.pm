@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use Math::Histo ();
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
+
 
 # Handled by XS: Math::Histo::CLI::run and Math::Histo::CLI::run_raw
 
@@ -42,6 +43,7 @@ Available Subcommands:
   - C<stats>: Display comprehensive statistical summary, moments, and quantiles.
   - C<fit>: Fit parametric models (Gaussian, Exponential, Polynomial, Breit-Wigner).
   - C<cmp>: Compare two histograms and compute statistical distance metrics.
+  - C<top>: Real-time interactive terminal monitor for streaming 1D/2D metrics.
 
 =head1 METHODS
 

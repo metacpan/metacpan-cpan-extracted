@@ -1,3 +1,7 @@
+/*
+ * SIMD CPU feature detection, runtime dispatcher, and scalar fallback loops.
+ */
+
 #include "simd.h"
 
 bool histo_simd_has_avx2(void) {

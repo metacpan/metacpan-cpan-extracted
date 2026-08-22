@@ -1,5 +1,10 @@
 Revision history for Params-Validate-Strict
 
+0.39	Fri Aug 21 11:43:35 AM EDT 2026
+	[ Bug Fixes ]
+	- Added "object" to element_type, when checking if an argument an
+	  arrayref of objects
+
 0.38	Tue Aug 11 09:36:18 PM EDT 2026
 	[Enhancements]
 	- Reduce dependancies

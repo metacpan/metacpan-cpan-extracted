@@ -1,3 +1,7 @@
+/*
+ * SSE2NEON and portable intrinsics bridging header for ARM NEON acceleration.
+ */
+
 #ifndef HISTO_SIMD_NEON_BRIDGE_H
 #define HISTO_SIMD_NEON_BRIDGE_H
 

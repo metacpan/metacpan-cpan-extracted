@@ -32,7 +32,7 @@ requires:
 resources:
   bugtracker: https://github.com/ikluft/Sys-OsRelease/issues
   repository: git://github.com/ikluft/Sys-OsRelease.git
-version: 0.4.8
+version: 0.4.9
 x_generated_by_perl: v5.42.3
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

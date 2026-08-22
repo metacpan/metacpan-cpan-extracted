@@ -1,3 +1,8 @@
+/**
+ * @file histo2d.h
+ * @brief Public C API for 2D bivariate histograms, projections, and 2D stats.
+ */
+
 #ifndef LIBHISTO_HISTO2D_H
 #define LIBHISTO_HISTO2D_H
 

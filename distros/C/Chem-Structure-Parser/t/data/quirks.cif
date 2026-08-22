@@ -1,0 +1,49 @@
+# a comment before anything at all
+data_QRK    # and one after the block name
+#
+_entry.id   QRK
+_struct.title     "A file that leans on the syntax"
+_struct_keywords.text    'one, two, three'
+_exptl.method
+;SOLUTION NMR
+;
+#
+loop_
+_atom_site.auth_atom_id
+_atom_site.pdbx_formal_charge
+_atom_site.auth_comp_id
+_atom_site.group_PDB
+_atom_site.auth_asym_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+_atom_site.auth_seq_id
+_atom_site.type_symbol
+_atom_site.id
+_atom_site.label_alt_id
+_atom_site.occupancy
+_atom_site.B_iso_or_equiv
+_atom_site.pdbx_PDB_ins_code
+P     ?   G  ATOM   B  1.000 2.000 3.000 1 P  1 . 1.00 10.00 ?
+OP1   -1  G  ATOM   B  2.000 3.000 4.000 1 O  2 . 1.00 11.00 ?
+"O5'" 0   G  ATOM   B  3.000 4.000 5.000 1 O  3 . 1.00 12.00 ?
+"C1'" 3   G  ATOM   B  4.000 5.000 6.000 1 C  4 . 1.00 13.00 ?
+# the ion is a HETATM, is charged, and has an insertion code
+ZN    2   ZN HETATM B  9.000 9.000 9.000 40 ZN 5 . 1.00 14.00 A
+#
+# a category that is usually a loop, written as plain tags because it has
+# one row -- which the format allows and a reader has to accept
+_chem_comp.id        ZN
+_chem_comp.name      'ZINC ION'
+_chem_comp.formula   'ZN 2+'
+#
+loop_
+_citation.id
+_citation.title
+_citation.year
+primary  'A paper with a full stop.  And two sentences.'  2021
+#
+_cell.length_a    .
+_cell.length_b    ?
+_pdbx_database_status.recvd_initial_deposition_date  '.'
+#

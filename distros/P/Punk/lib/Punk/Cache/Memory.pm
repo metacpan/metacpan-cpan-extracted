@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 # This store lives in ONE process, so a write here is invisible to every
 # other worker. Punk::Cache invalidates across the pool on its behalf.

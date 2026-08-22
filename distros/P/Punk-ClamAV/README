@@ -1,0 +1,54 @@
+Punk-ClamAV
+===========
+
+Virus scanning for Punk uploads, through clamd.
+
+    plugin 'ClamAV' => { socket => '/run/clamav/clamd.ctl' };
+
+    post '/avatar' => sub {
+        my ($c) = @_;
+        my $up = $c->upload('file') or return $c->text('no file', 400);
+        return $c->text('no thanks', 422) unless $c->upload_ok($up);
+        $up->save("/var/lib/app/avatars/" . $c->auth_id);   # not $up->filename
+        $c->json({ ok => 1 });
+    };
+
+BEFORE YOU RELY ON IT
+---------------------
+
+clamd answers "OK" for files it DECLINED to scan. Punk accepts 128 MiB
+uploads and clamd's MaxFileSize defaults to 100 MiB, so out of the box
+your largest uploads come back clean without having been looked at. The
+same is true of a password-protected archive at any size.
+
+Set these in clamd.conf:
+
+    AlertExceedsMax       yes
+    AlertEncryptedArchive yes
+    AlertEncryptedDoc     yes
+
+With them a skipped scan arrives as an "unscannable" verdict, which this
+plugin treats as a rejection rather than a pass.
+
+INSTALLATION
+------------
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Requires Punk and ClamAV::Clamd. A running clamd is not needed to build
+or test - the suite runs against an internal fake, and the tests that
+want a real clamd skip cleanly without one.
+
+DOCUMENTATION
+-------------
+
+    perldoc Punk::Plugin::ClamAV
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under the Artistic License 2.0.

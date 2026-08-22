@@ -1,3 +1,7 @@
+/*
+ * Perl XS extension module bridging libhisto C APIs to Perl Math::Histo.
+ */
+
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -6,6 +10,7 @@
 #include <histo/histo.h>
 #include <histo/histo2d.h>
 #include <histo/fit.h>
+#include <histo/kde.h>
 #include <histo/sketch.h>
 #include <histo/cli.h>
 #include <histo/types.h>
@@ -63,6 +68,68 @@ _create_variable(CLASS, SV *edges_ref, uint32_t flags=0)
         }
     OUTPUT:
         RETVAL
+
+histo_t *
+_create_auto(CLASS, SV *samples_ref, int rule=0, uint32_t flags=0)
+    char *CLASS
+    CODE:
+        (void)CLASS;
+        if (!SvROK(samples_ref) || SvTYPE(SvRV(samples_ref)) != SVt_PVAV) {
+            croak("Math::Histo: samples must be an array reference of numbers");
+        }
+        AV *av = (AV*)SvRV(samples_ref);
+        SSize_t n = av_top_index(av) + 1;
+        if (n < 1) {
+            croak("Math::Histo: auto binning requires at least 1 sample");
+        }
+        double *vals = (double*)malloc((size_t)n * sizeof(double));
+        if (!vals) {
+            croak("Math::Histo: memory allocation failure");
+        }
+        for (SSize_t i = 0; i < n; i++) {
+            SV **item = av_fetch(av, i, 0);
+            vals[i] = (item && SvOK(*item)) ? SvNV(*item) : 0.0;
+        }
+        RETVAL = histo_create_auto((size_t)n, vals, (histo_bin_rule_t)rule, flags);
+        free(vals);
+        if (!RETVAL) {
+            croak("Math::Histo: failed to create auto histogram");
+        }
+    OUTPUT:
+        RETVAL
+
+void
+_estimate_bins(CLASS, SV *samples_ref, int rule=0)
+    char *CLASS
+    PPCODE:
+        (void)CLASS;
+        if (!SvROK(samples_ref) || SvTYPE(SvRV(samples_ref)) != SVt_PVAV) {
+            croak("Math::Histo: samples must be an array reference of numbers");
+        }
+        AV *av = (AV*)SvRV(samples_ref);
+        SSize_t n = av_top_index(av) + 1;
+        if (n < 1) {
+            croak("Math::Histo: auto binning requires at least 1 sample");
+        }
+        double *vals = (double*)malloc((size_t)n * sizeof(double));
+        if (!vals) {
+            croak("Math::Histo: memory allocation failure");
+        }
+        for (SSize_t i = 0; i < n; i++) {
+            SV **item = av_fetch(av, i, 0);
+            vals[i] = (item && SvOK(*item)) ? SvNV(*item) : 0.0;
+        }
+        uint32_t nbins = 0;
+        double min_v = 0.0, max_v = 0.0;
+        histo_status_t st = histo_estimate_bins((size_t)n, vals, (histo_bin_rule_t)rule, &nbins, &min_v, &max_v);
+        free(vals);
+        if (st != HISTO_OK) {
+            croak("Math::Histo: estimate_bins failed");
+        }
+        EXTEND(SP, 3);
+        PUSHs(sv_2mortal(newSVuv(nbins)));
+        PUSHs(sv_2mortal(newSVnv(min_v)));
+        PUSHs(sv_2mortal(newSVnv(max_v)));
 
 histo_t *
 _clone(histo_t *self)
@@ -1194,6 +1261,168 @@ serialize_json(histo2d_t *self, int pretty=0)
     OUTPUT:
         RETVAL
 
+double
+std_dev_x(histo2d_t *self)
+    CODE:
+        double out = 0.0;
+        if (histo2d_std_dev_x(self, &out) != HISTO_OK) XSRETURN_UNDEF;
+        RETVAL = out;
+    OUTPUT:
+        RETVAL
+
+double
+std_dev_y(histo2d_t *self)
+    CODE:
+        double out = 0.0;
+        if (histo2d_std_dev_y(self, &out) != HISTO_OK) XSRETURN_UNDEF;
+        RETVAL = out;
+    OUTPUT:
+        RETVAL
+
+void
+bin_bounds(histo2d_t *self, int ix, int iy)
+    PPCODE:
+        if (!self) XSRETURN_EMPTY;
+        double xmin = 0, xmax = 0, ymin = 0, ymax = 0;
+        if (histo2d_bin_bounds(self, (uint32_t)ix, (uint32_t)iy, &xmin, &xmax, &ymin, &ymax) != HISTO_OK) {
+            XSRETURN_EMPTY;
+        }
+        EXTEND(SP, 4);
+        PUSHs(sv_2mortal(newSVnv(xmin)));
+        PUSHs(sv_2mortal(newSVnv(xmax)));
+        PUSHs(sv_2mortal(newSVnv(ymin)));
+        PUSHs(sv_2mortal(newSVnv(ymax)));
+
+void
+bin_center(histo2d_t *self, int ix, int iy)
+    PPCODE:
+        if (!self) XSRETURN_EMPTY;
+        double cx = 0, cy = 0;
+        if (histo2d_bin_center(self, (uint32_t)ix, (uint32_t)iy, &cx, &cy) != HISTO_OK) {
+            XSRETURN_EMPTY;
+        }
+        EXTEND(SP, 2);
+        PUSHs(sv_2mortal(newSVnv(cx)));
+        PUSHs(sv_2mortal(newSVnv(cy)));
+
+void
+find_bin(histo2d_t *self, double x, double y)
+    PPCODE:
+        if (!self) XSRETURN_EMPTY;
+        int64_t ix = 0, iy = 0;
+        if (histo2d_find_bin(self, x, y, &ix, &iy) != HISTO_OK) {
+            XSRETURN_EMPTY;
+        }
+        EXTEND(SP, 2);
+        PUSHs(sv_2mortal(newSViv((IV)ix)));
+        PUSHs(sv_2mortal(newSViv((IV)iy)));
+
+int
+find_region(histo2d_t *self, double x, double y)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        histo2d_region_t reg = HISTO2D_REGION_CENTER;
+        if (histo2d_find_region(self, x, y, &reg) != HISTO_OK) XSRETURN_UNDEF;
+        RETVAL = (int)reg;
+    OUTPUT:
+        RETVAL
+
+double
+integral(histo2d_t *self)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        double out = 0.0;
+        if (histo2d_integral(self, &out) != HISTO_OK) XSRETURN_UNDEF;
+        RETVAL = out;
+    OUTPUT:
+        RETVAL
+
+double
+integral_range(histo2d_t *self, int ix_min, int ix_max, int iy_min, int iy_max)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        double out = 0.0;
+        if (histo2d_integral_range(self, (uint32_t)ix_min, (uint32_t)ix_max, (uint32_t)iy_min, (uint32_t)iy_max, &out) != HISTO_OK) XSRETURN_UNDEF;
+        RETVAL = out;
+    OUTPUT:
+        RETVAL
+
+int
+scale(histo2d_t *self, double factor)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        histo_status_t st = histo2d_scale(self, factor);
+        RETVAL = (st == HISTO_OK) ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+int
+normalize(histo2d_t *self, double target=1.0)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        histo_status_t st = histo2d_normalize(self, target);
+        RETVAL = (st == HISTO_OK) ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+histo2d_t *
+rebin(histo2d_t *self, int fx, int fy)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        histo2d_t *rebinned = NULL;
+        histo_status_t st = histo2d_rebin(self, (uint32_t)fx, (uint32_t)fy, &rebinned);
+        if (st != HISTO_OK || !rebinned) {
+            croak("Math::Histo::2D::rebin failed");
+        }
+        RETVAL = rebinned;
+    OUTPUT:
+        RETVAL
+
+int
+add(histo2d_t *self, histo2d_t *other, double scale=1.0)
+    CODE:
+        if (!self || !other) XSRETURN_UNDEF;
+        histo_status_t st = histo2d_add(self, other, scale);
+        RETVAL = (st == HISTO_OK) ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+int
+subtract(histo2d_t *self, histo2d_t *other)
+    CODE:
+        if (!self || !other) XSRETURN_UNDEF;
+        histo_status_t st = histo2d_subtract(self, other);
+        RETVAL = (st == HISTO_OK) ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+int
+multiply(histo2d_t *self, histo2d_t *other)
+    CODE:
+        if (!self || !other) XSRETURN_UNDEF;
+        histo_status_t st = histo2d_multiply(self, other);
+        RETVAL = (st == HISTO_OK) ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+int
+divide(histo2d_t *self, histo2d_t *other)
+    CODE:
+        if (!self || !other) XSRETURN_UNDEF;
+        histo_status_t st = histo2d_divide(self, other);
+        RETVAL = (st == HISTO_OK) ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+int
+reset(histo2d_t *self)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        histo_status_t st = histo2d_reset(self);
+        RETVAL = (st == HISTO_OK) ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
 
 MODULE = Math::Histo    PACKAGE = Math::Histo::Fit    PREFIX = histo_fit_xs_
 
@@ -1275,6 +1504,72 @@ _fit_builtin(CLASS, histo_t *h, int model_type, SV *init_ref, SV *lower_ref=NULL
             croak("Math::Histo::Fit::fit failed (numerical error or optimization diverged)");
         }
         RETVAL = res;
+    OUTPUT:
+        RETVAL
+
+double
+eval_model(CLASS, int model_type, SV *params_ref, double x)
+    char *CLASS
+    CODE:
+        (void)CLASS;
+        if (!params_ref || !SvOK(params_ref) || !SvROK(params_ref) || SvTYPE(SvRV(params_ref)) != SVt_PVAV) {
+            croak("Math::Histo::Fit::eval_model: params must be an arrayref");
+        }
+        AV *av = (AV*)SvRV(params_ref);
+        SSize_t n = av_top_index(av) + 1;
+        double stack_p[16];
+        double *p = stack_p;
+        if (n > 16) {
+            p = (double*)malloc((size_t)n * sizeof(double));
+            if (!p) croak("Out of memory");
+        }
+        for (SSize_t i = 0; i < n; i++) {
+            SV **v = av_fetch(av, i, 0);
+            p[i] = (v && SvOK(*v)) ? SvNV(*v) : 0.0;
+        }
+        RETVAL = histo_fit_eval((histo_fit_model_t)model_type, p, (size_t)n, x);
+        if (p != stack_p) free(p);
+    OUTPUT:
+        RETVAL
+
+SV *
+eval_gradient(CLASS, int model_type, SV *params_ref, double x)
+    char *CLASS
+    CODE:
+        (void)CLASS;
+        if (!params_ref || !SvOK(params_ref) || !SvROK(params_ref) || SvTYPE(SvRV(params_ref)) != SVt_PVAV) {
+            croak("Math::Histo::Fit::eval_gradient: params must be an arrayref");
+        }
+        AV *av = (AV*)SvRV(params_ref);
+        SSize_t n = av_top_index(av) + 1;
+        double stack_p[16];
+        double *p = stack_p;
+        if (n > 16) {
+            p = (double*)malloc((size_t)n * sizeof(double));
+            if (!p) croak("Out of memory");
+        }
+        for (SSize_t i = 0; i < n; i++) {
+            SV **v = av_fetch(av, i, 0);
+            p[i] = (v && SvOK(*v)) ? SvNV(*v) : 0.0;
+        }
+        double *grad = (double*)malloc((size_t)n * sizeof(double));
+        if (!grad) {
+            if (p != stack_p) free(p);
+            croak("Out of memory");
+        }
+        histo_status_t st = histo_fit_eval_gradient((histo_fit_model_t)model_type, p, (size_t)n, x, grad);
+        if (p != stack_p) free(p);
+        if (st != HISTO_OK) {
+            free(grad);
+            croak("Math::Histo::Fit::eval_gradient failed");
+        }
+        AV *res_av = newAV();
+        av_extend(res_av, n - 1);
+        for (SSize_t i = 0; i < n; i++) {
+            av_push(res_av, newSVnv(grad[i]));
+        }
+        free(grad);
+        RETVAL = newRV_noinc((SV*)res_av);
     OUTPUT:
         RETVAL
 
@@ -1598,6 +1893,147 @@ serialize_binary(histo_sketch_t *self)
     OUTPUT:
         RETVAL
 
+MODULE = Math::Histo    PACKAGE = Math::Histo::KDE    PREFIX = histo_kde_xs_
+
+histo_kde_t *
+_create(CLASS, SV *samples_ref, SV *weights_ref=NULL, int kernel=0, int bw_method=0, double bandwidth=0.0, double bw_adjust=1.0)
+    char *CLASS
+    CODE:
+        (void)CLASS;
+        if (!SvROK(samples_ref) || SvTYPE(SvRV(samples_ref)) != SVt_PVAV) {
+            croak("Math::Histo::KDE: samples must be an array reference of numbers");
+        }
+        AV *av_s = (AV*)SvRV(samples_ref);
+        SSize_t n = av_top_index(av_s) + 1;
+        if (n < 1) {
+            croak("Math::Histo::KDE: samples array cannot be empty");
+        }
+        double *samples = (double*)malloc((size_t)n * sizeof(double));
+        double *weights = NULL;
+        if (weights_ref && SvOK(weights_ref) && SvROK(weights_ref) && SvTYPE(SvRV(weights_ref)) == SVt_PVAV) {
+            AV *av_w = (AV*)SvRV(weights_ref);
+            weights = (double*)malloc((size_t)n * sizeof(double));
+            for (SSize_t i = 0; i < n; i++) {
+                SV **item_w = av_fetch(av_w, i, 0);
+                weights[i] = (item_w && SvOK(*item_w)) ? SvNV(*item_w) : 1.0;
+            }
+        }
+        for (SSize_t i = 0; i < n; i++) {
+            SV **item_s = av_fetch(av_s, i, 0);
+            samples[i] = (item_s && SvOK(*item_s)) ? SvNV(*item_s) : 0.0;
+        }
+
+        histo_kde_options_t opts;
+        opts.kernel = (histo_kde_kernel_t)kernel;
+        opts.bw_method = (histo_kde_bandwidth_method_t)bw_method;
+        opts.bandwidth = bandwidth;
+        opts.bw_adjust = bw_adjust;
+
+        RETVAL = histo_kde_create((size_t)n, samples, weights, &opts);
+        free(samples);
+        if (weights) free(weights);
+        if (!RETVAL) {
+            croak("Math::Histo::KDE: failed to create KDE model");
+        }
+    OUTPUT:
+        RETVAL
+
+histo_kde_t *
+_create_from_histo(CLASS, histo_t *h, int kernel=0, int bw_method=0, double bandwidth=0.0, double bw_adjust=1.0)
+    char *CLASS
+    CODE:
+        (void)CLASS;
+        if (!h) croak("Math::Histo::KDE: NULL histogram handle");
+        histo_kde_options_t opts;
+        opts.kernel = (histo_kde_kernel_t)kernel;
+        opts.bw_method = (histo_kde_bandwidth_method_t)bw_method;
+        opts.bandwidth = bandwidth;
+        opts.bw_adjust = bw_adjust;
+        RETVAL = histo_kde_create_from_histo(h, &opts);
+        if (!RETVAL) {
+            croak("Math::Histo::KDE: failed to create KDE from histogram");
+        }
+    OUTPUT:
+        RETVAL
+
+void
+DESTROY(histo_kde_t *self)
+    CODE:
+        if (self) {
+            histo_kde_destroy(self);
+        }
+
+double
+eval(histo_kde_t *self, double x)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        RETVAL = histo_kde_eval(self, x);
+    OUTPUT:
+        RETVAL
+
+double
+cdf(histo_kde_t *self, double x)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        RETVAL = histo_kde_cdf(self, x);
+    OUTPUT:
+        RETVAL
+
+double
+quantile(histo_kde_t *self, double q)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        double out_val = 0.0;
+        histo_status_t st = histo_kde_quantile(self, q, &out_val);
+        if (st != HISTO_OK) {
+            croak("Math::Histo::KDE: quantile calculation failed");
+        }
+        RETVAL = out_val;
+    OUTPUT:
+        RETVAL
+
+void
+sample(histo_kde_t *self, size_t n=1, uint64_t seed=0)
+    PPCODE:
+        if (!self) XSRETURN_EMPTY;
+        if (n == 0) XSRETURN_EMPTY;
+        double *buf = (double*)malloc(n * sizeof(double));
+        if (!buf) croak("Math::Histo::KDE::sample: out of memory");
+        histo_status_t st = histo_kde_sample(self, n, buf, seed);
+        if (st != HISTO_OK) {
+            free(buf);
+            croak("Math::Histo::KDE::sample failed");
+        }
+        EXTEND(SP, (SSize_t)n);
+        for (size_t i = 0; i < n; i++) {
+            PUSHs(sv_2mortal(newSVnv(buf[i])));
+        }
+        free(buf);
+
+double
+bandwidth(histo_kde_t *self)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        RETVAL = histo_kde_get_bandwidth(self);
+    OUTPUT:
+        RETVAL
+
+int
+kernel(histo_kde_t *self)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        RETVAL = (int)histo_kde_get_kernel(self);
+    OUTPUT:
+        RETVAL
+
+size_t
+n_points(histo_kde_t *self)
+    CODE:
+        if (!self) XSRETURN_UNDEF;
+        RETVAL = histo_kde_num_points(self);
+    OUTPUT:
+        RETVAL
+
 MODULE = Math::Histo    PACKAGE = Math::Histo::CLI    PREFIX = histo_cli_xs_
 
 int
@@ -1627,6 +2063,57 @@ run(...)
         }
     OUTPUT:
         RETVAL
+
+void
+capture(...)
+    PROTOTYPE: @
+    PPCODE:
+        int start = 0;
+        if (items > 0 && SvPOK(ST(0)) && strcmp(SvPV_nolen(ST(0)), "Math::Histo::CLI") == 0) {
+            start = 1;
+        }
+        int argc = items - start;
+        char *out_buf = NULL;
+        size_t out_sz = 0;
+        char *err_buf = NULL;
+        size_t err_sz = 0;
+        FILE *out_f = open_memstream(&out_buf, &out_sz);
+        FILE *err_f = open_memstream(&err_buf, &err_sz);
+
+        if (!out_f || !err_f) {
+            if (out_f) fclose(out_f);
+            if (err_f) fclose(err_f);
+            croak("Math::Histo::CLI::capture: open_memstream failed");
+        }
+
+        int code = 0;
+        if (argc == 0) {
+            char *default_argv[] = { "phisto", NULL };
+            code = histo_cli_main(1, default_argv, out_f, err_f);
+        } else {
+            char **argv = (char **)malloc(((size_t)argc + 2) * sizeof(char *));
+            if (!argv) {
+                fclose(out_f); fclose(err_f);
+                free(out_buf); free(err_buf);
+                croak("Math::Histo::CLI::capture: out of memory");
+            }
+            argv[0] = (char *)"phisto";
+            for (int i = 0; i < argc; ++i) {
+                argv[i + 1] = SvPV_nolen(ST(start + i));
+            }
+            argv[argc + 1] = NULL;
+            code = histo_cli_main(argc + 1, argv, out_f, err_f);
+            free(argv);
+        }
+        fclose(out_f);
+        fclose(err_f);
+
+        EXTEND(SP, 3);
+        PUSHs(sv_2mortal(newSViv(code)));
+        PUSHs(sv_2mortal(out_buf ? newSVpvn(out_buf, out_sz) : newSVpvn("", 0)));
+        PUSHs(sv_2mortal(err_buf ? newSVpvn(err_buf, err_sz) : newSVpvn("", 0)));
+        free(out_buf);
+        free(err_buf);
 
 
 int

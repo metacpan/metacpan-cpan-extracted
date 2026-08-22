@@ -1,0 +1,5 @@
+Revision history for Physics-Etch
+
+0.01  2026-08-18
+    - Initial release of Physics::Etch and related model/toolkit modules.
+    - Added CPAN distribution scaffolding (Makefile.PL, metadata, manifest).

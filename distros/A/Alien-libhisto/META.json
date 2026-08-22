@@ -65,7 +65,7 @@
          "web" : "https://github.com/tsee/libhisto"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.2.0",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {

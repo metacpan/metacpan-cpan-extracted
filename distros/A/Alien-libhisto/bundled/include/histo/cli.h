@@ -1,6 +1,6 @@
 /**
  * @file cli.h
- * @brief Public interface for the libhistocli modular command-line and terminal formatting library.
+ * @brief Public interface for the libhistocli command-line formatting library.
  */
 
 #ifndef HISTO_CLI_H
@@ -80,6 +80,17 @@ int histo_cli_fit(int argc, char **argv, FILE *out, FILE *err);
  * @return 0 on success, non-zero exit status code on error.
  */
 int histo_cli_cmp(int argc, char **argv, FILE *out, FILE *err);
+
+/**
+ * @brief CLI real-time interactive terminal monitoring tool (histo-top).
+ *
+ * @param argc Argument count.
+ * @param argv Argument vector.
+ * @param out Output stream.
+ * @param err Error stream for diagnostics.
+ * @return 0 on success, non-zero exit status code on error.
+ */
+int histo_cli_top(int argc, char **argv, FILE *out, FILE *err);
 
 #ifdef __cplusplus
 }

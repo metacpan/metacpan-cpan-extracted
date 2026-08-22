@@ -1,0 +1,13 @@
+Revision history for Database::Join
+
+0.001.0	Fri Aug 21 08:54:30 PM EDT 2026
+    - Initial CPAN release.
+    - Read-only combined view across two or more Database::Abstraction objects
+      joined on a shared key column.
+    - Supports left, inner, and outer join types.
+    - Per-database base filters with AND-merge semantics for compound criteria.
+    - join_map for cross-name join-key column support.
+    - add_database for runtime extension of the logical view.
+    - remove_column / remove_columns for hiding columns from callers.
+    - set_logger for logger propagation to all component databases.
+    - AUTOLOAD column-shortcut delegation.

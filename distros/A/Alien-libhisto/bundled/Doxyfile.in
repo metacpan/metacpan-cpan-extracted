@@ -2,7 +2,12 @@ PROJECT_NAME           = "@PROJECT_NAME@"
 PROJECT_NUMBER         = "@PROJECT_VERSION@"
 PROJECT_BRIEF          = "@PROJECT_DESCRIPTION@"
 OUTPUT_DIRECTORY       = "@CMAKE_CURRENT_SOURCE_DIR@/docs"
-INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/include/histo" "@CMAKE_CURRENT_SOURCE_DIR@/docs/manual.md" "@CMAKE_CURRENT_SOURCE_DIR@/docs/curve_fitting_guide.md" "@CMAKE_CURRENT_SOURCE_DIR@/docs/histo2d_guide.md"
+INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/include/histo" \
+                         "@CMAKE_CURRENT_SOURCE_DIR@/docs/manual.md" \
+                         "@CMAKE_CURRENT_SOURCE_DIR@/docs/top_manual.md" \
+                         "@CMAKE_CURRENT_SOURCE_DIR@/docs/curve_fitting_guide.md" \
+                         "@CMAKE_CURRENT_SOURCE_DIR@/docs/histo2d_guide.md" \
+                         "@CMAKE_CURRENT_SOURCE_DIR@/docs/kde_guide.md"
 USE_MDFILE_AS_MAINPAGE = "@CMAKE_CURRENT_SOURCE_DIR@/docs/manual.md"
 RECURSIVE              = YES
 GENERATE_HTML          = YES

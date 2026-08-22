@@ -1,5 +1,8 @@
 Revision history for Template-Stencil
 
+0.10    2026-08-21
+        - Add support for tied hashes in data passed to the template
+
 0.09    2026-08-17
         - Fix the fmt filter on quadmath and long-double perls. Perl's
           my_snprintf hands any format that is one bare float spec

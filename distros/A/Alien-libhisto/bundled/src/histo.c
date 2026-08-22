@@ -1,5 +1,10 @@
+/*
+ * 1D histogram implementation: creation, weighted filling, moments, and stats.
+ */
+
 #include "internal.h"
 #include "simd.h"
+#include <float.h>
 
 /* ========================================================================= */
 /* Status & Error Strings                                                    */
@@ -1128,19 +1133,6 @@ histo_status_t histo_iqr(const histo_t *h, double *out_iqr) {
     return HISTO_OK;
 }
 
-typedef struct {
-    double dev;
-    double weight;
-} histo_dev_pair_t;
-
-static int histo_dev_pair_cmp(const void *a, const void *b) {
-    const histo_dev_pair_t *pa = (const histo_dev_pair_t *)a;
-    const histo_dev_pair_t *pb = (const histo_dev_pair_t *)b;
-    if (pa->dev < pb->dev) return -1;
-    if (pa->dev > pb->dev) return 1;
-    return 0;
-}
-
 histo_status_t histo_mad(const histo_t *h, double *out_mad) {
     if (!h || !out_mad) {
         return HISTO_ERR_INVALID_ARG;
@@ -1153,47 +1145,52 @@ histo_status_t histo_mad(const histo_t *h, double *out_mad) {
     histo_status_t st = histo_median(h, &med);
     if (st != HISTO_OK) return st;
 
-    histo_dev_pair_t stack_buf[256];
-    histo_dev_pair_t *pairs = stack_buf;
-    if (h->nbins > 256) {
-        pairs = (histo_dev_pair_t *)malloc((size_t)h->nbins * sizeof(histo_dev_pair_t));
-        if (!pairs) {
-            return HISTO_ERR_NOMEM;
+    /* Locate the bin index containing the median */
+    int64_t med_bin = 0;
+    if (histo_find_bin(h, med, &med_bin) != HISTO_OK || med_bin < 0) {
+        med_bin = 0;
+    } else if ((uint32_t)med_bin >= h->nbins) {
+        med_bin = (int64_t)h->nbins - 1;
+    }
+
+    /* Two-pointer merge over pre-sorted histogram bins:
+     * Deviations |center - med| are monotonically increasing to the left and right of med_bin.
+     * We merge both halves in O(N) time using O(1) auxiliary space without comparisons/sort. */
+    int64_t left = med_bin - 1;
+    int64_t right = med_bin;
+    double cum_weight = 0.0;
+    double target_weight = 0.5 * h->total_weight;
+    double result = 0.0;
+
+    while (left >= 0 || right < (int64_t)h->nbins) {
+        double d_left = INFINITY;
+        double d_right = INFINITY;
+
+        if (left >= 0) {
+            double c_left = 0.0;
+            histo_bin_center(h, (uint32_t)left, &c_left);
+            d_left = fabs(c_left - med);
         }
-    }
-
-    size_t count = 0;
-    for (uint32_t i = 0; i < h->nbins; ++i) {
-        double w = h->bins[i];
-        if (w <= 0.0) continue;
-        double center = 0.0;
-        histo_bin_center(h, i, &center);
-        pairs[count].dev = fabs(center - med);
-        pairs[count].weight = w;
-        count++;
-    }
-
-    if (count == 0) {
-        if (pairs != stack_buf) free(pairs);
-        return HISTO_ERR_EMPTY;
-    }
-
-    qsort(pairs, count, sizeof(histo_dev_pair_t), histo_dev_pair_cmp);
-
-    double target = 0.5 * h->total_weight;
-    double cum = 0.0;
-    double result = pairs[count - 1].dev;
-
-    for (size_t i = 0; i < count; ++i) {
-        cum += pairs[i].weight;
-        if (cum >= target) {
-            result = pairs[i].dev;
-            break;
+        if (right < (int64_t)h->nbins) {
+            double c_right = 0.0;
+            histo_bin_center(h, (uint32_t)right, &c_right);
+            d_right = fabs(c_right - med);
         }
-    }
 
-    if (pairs != stack_buf) {
-        free(pairs);
+        if (d_left <= d_right) {
+            cum_weight += h->bins[left];
+            result = d_left;
+            left--;
+        } else {
+            cum_weight += h->bins[right];
+            result = d_right;
+            right++;
+        }
+
+        if (cum_weight >= target_weight) {
+            *out_mad = result;
+            return HISTO_OK;
+        }
     }
 
     *out_mad = result;
@@ -1907,5 +1904,353 @@ void histo_free_buffer(void *buf) {
         free(buf);
     }
 }
+
+/* ========================================================================= */
+/* Automated Optimal Bin Width Heuristics                                    */
+/* ========================================================================= */
+
+static int compare_doubles(const void *a, const void *b) {
+    double da = *(const double*)a;
+    double db = *(const double*)b;
+    if (da < db) return -1;
+    if (da > db) return 1;
+    return 0;
+}
+
+static histo_status_t compute_sample_stats_sorted(
+    size_t n, const double *values,
+    double **out_sorted, size_t *out_valid_n,
+    double *out_min, double *out_max,
+    double *out_mean, double *out_std,
+    double *out_skew, double *out_iqr
+) {
+    if (n == 0 || !values || !out_sorted || !out_valid_n || !out_min || !out_max) {
+        return HISTO_ERR_INVALID_ARG;
+    }
+
+    double *sorted = (double*)malloc(n * sizeof(double));
+    if (!sorted) return HISTO_ERR_NOMEM;
+
+    size_t valid_n = 0;
+    double min_v = DBL_MAX;
+    double max_v = -DBL_MAX;
+    double sum = 0.0;
+
+    for (size_t i = 0; i < n; i++) {
+        double v = values[i];
+        if (isfinite(v)) {
+            sorted[valid_n++] = v;
+            sum += v;
+            if (v < min_v) min_v = v;
+            if (v > max_v) max_v = v;
+        }
+    }
+
+    if (valid_n == 0) {
+        free(sorted);
+        return HISTO_ERR_EMPTY;
+    }
+
+    qsort(sorted, valid_n, sizeof(double), compare_doubles);
+
+    double mean = sum / (double)valid_n;
+    double sum_sq = 0.0;
+    double sum_cub = 0.0;
+
+    for (size_t i = 0; i < valid_n; i++) {
+        double diff = sorted[i] - mean;
+        sum_sq += diff * diff;
+        sum_cub += diff * diff * diff;
+    }
+
+    double variance = (valid_n > 1) ? (sum_sq / (double)(valid_n - 1)) : 0.0;
+    double std_dev = sqrt(variance);
+    double skewness = 0.0;
+    if (valid_n >= 3 && std_dev > 1e-12) {
+        double m3 = sum_cub / (double)valid_n;
+        skewness = m3 / (std_dev * std_dev * std_dev);
+    }
+
+    /* Compute IQR: Q75 - Q25 */
+    double q25 = sorted[0];
+    double q75 = sorted[valid_n - 1];
+    if (valid_n >= 4) {
+        size_t idx25 = (size_t)(0.25 * (double)(valid_n - 1));
+        size_t idx75 = (size_t)(0.75 * (double)(valid_n - 1));
+        q25 = sorted[idx25];
+        q75 = sorted[idx75];
+    }
+    double iqr = (q75 >= q25) ? (q75 - q25) : 0.0;
+
+    *out_sorted = sorted;
+    *out_valid_n = valid_n;
+    *out_min = min_v;
+    *out_max = max_v;
+    if (out_mean) *out_mean = mean;
+    if (out_std) *out_std = std_dev;
+    if (out_skew) *out_skew = skewness;
+    if (out_iqr) *out_iqr = iqr;
+
+    return HISTO_OK;
+}
+
+histo_status_t histo_estimate_bins_fd(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max) {
+    if (!out_nbins || !out_min || !out_max) return HISTO_ERR_INVALID_ARG;
+
+    double *sorted = NULL;
+    size_t valid_n = 0;
+    double min_v = 0.0, max_v = 0.0, mean = 0.0, std_dev = 0.0, skewness = 0.0, iqr = 0.0;
+
+    histo_status_t st = compute_sample_stats_sorted(n, values, &sorted, &valid_n, &min_v, &max_v, &mean, &std_dev, &skewness, &iqr);
+    if (st != HISTO_OK) return st;
+    free(sorted);
+
+    double range = max_v - min_v;
+    if (range <= 0.0) {
+        *out_nbins = 1;
+        *out_min = min_v - 0.5;
+        *out_max = max_v + 0.5;
+        return HISTO_OK;
+    }
+
+    double n_pow = pow((double)valid_n, -1.0 / 3.0);
+    double h = 2.0 * iqr * n_pow;
+
+    /* Fallback to Scott if IQR is 0 (e.g. large median cluster) */
+    if (h <= 0.0 && std_dev > 0.0) {
+        h = 3.49 * std_dev * n_pow;
+    }
+
+    uint32_t nbins = 10;
+    if (h > 0.0) {
+        double calc = ceil(range / h);
+        nbins = (calc >= 1.0) ? (uint32_t)calc : 1;
+    } else {
+        /* Fallback to Sturges */
+        double calc = ceil(log2((double)valid_n) + 1.0);
+        nbins = (calc >= 1.0) ? (uint32_t)calc : 1;
+    }
+
+    if (nbins > 100000) nbins = 100000;
+    if (nbins < 1) nbins = 1;
+
+    *out_nbins = nbins;
+    *out_min = min_v;
+    *out_max = max_v;
+    return HISTO_OK;
+}
+
+histo_status_t histo_estimate_bins_scott(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max) {
+    if (!out_nbins || !out_min || !out_max) return HISTO_ERR_INVALID_ARG;
+
+    double *sorted = NULL;
+    size_t valid_n = 0;
+    double min_v = 0.0, max_v = 0.0, mean = 0.0, std_dev = 0.0, skewness = 0.0, iqr = 0.0;
+
+    histo_status_t st = compute_sample_stats_sorted(n, values, &sorted, &valid_n, &min_v, &max_v, &mean, &std_dev, &skewness, &iqr);
+    if (st != HISTO_OK) return st;
+    free(sorted);
+
+    double range = max_v - min_v;
+    if (range <= 0.0) {
+        *out_nbins = 1;
+        *out_min = min_v - 0.5;
+        *out_max = max_v + 0.5;
+        return HISTO_OK;
+    }
+
+    double n_pow = pow((double)valid_n, -1.0 / 3.0);
+    double h = 3.49 * std_dev * n_pow;
+
+    uint32_t nbins = 10;
+    if (h > 0.0) {
+        double calc = ceil(range / h);
+        nbins = (calc >= 1.0) ? (uint32_t)calc : 1;
+    } else {
+        double calc = ceil(log2((double)valid_n) + 1.0);
+        nbins = (calc >= 1.0) ? (uint32_t)calc : 1;
+    }
+
+    if (nbins > 100000) nbins = 100000;
+    if (nbins < 1) nbins = 1;
+
+    *out_nbins = nbins;
+    *out_min = min_v;
+    *out_max = max_v;
+    return HISTO_OK;
+}
+
+histo_status_t histo_estimate_bins_sturges(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max) {
+    if (!out_nbins || !out_min || !out_max) return HISTO_ERR_INVALID_ARG;
+
+    double *sorted = NULL;
+    size_t valid_n = 0;
+    double min_v = 0.0, max_v = 0.0;
+
+    histo_status_t st = compute_sample_stats_sorted(n, values, &sorted, &valid_n, &min_v, &max_v, NULL, NULL, NULL, NULL);
+    if (st != HISTO_OK) return st;
+    free(sorted);
+
+    double range = max_v - min_v;
+    if (range <= 0.0) {
+        *out_nbins = 1;
+        *out_min = min_v - 0.5;
+        *out_max = max_v + 0.5;
+        return HISTO_OK;
+    }
+
+    double calc = ceil(log2((double)valid_n) + 1.0);
+    uint32_t nbins = (calc >= 1.0) ? (uint32_t)calc : 1;
+
+    *out_nbins = nbins;
+    *out_min = min_v;
+    *out_max = max_v;
+    return HISTO_OK;
+}
+
+histo_status_t histo_estimate_bins_doane(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max) {
+    if (!out_nbins || !out_min || !out_max) return HISTO_ERR_INVALID_ARG;
+
+    double *sorted = NULL;
+    size_t valid_n = 0;
+    double min_v = 0.0, max_v = 0.0, mean = 0.0, std_dev = 0.0, skewness = 0.0, iqr = 0.0;
+
+    histo_status_t st = compute_sample_stats_sorted(n, values, &sorted, &valid_n, &min_v, &max_v, &mean, &std_dev, &skewness, &iqr);
+    if (st != HISTO_OK) return st;
+    free(sorted);
+
+    double range = max_v - min_v;
+    if (range <= 0.0) {
+        *out_nbins = 1;
+        *out_min = min_v - 0.5;
+        *out_max = max_v + 0.5;
+        return HISTO_OK;
+    }
+
+    uint32_t nbins = 10;
+    if (valid_n >= 3) {
+        double nv = (double)valid_n;
+        double sigma_g1 = sqrt((6.0 * (nv - 2.0)) / ((nv + 1.0) * (nv + 3.0)));
+        double arg = 1.0 + fabs(skewness) / sigma_g1;
+        double calc = ceil(1.0 + log2(nv) + log2(arg > 1.0 ? arg : 1.0));
+        nbins = (calc >= 1.0) ? (uint32_t)calc : 1;
+    } else {
+        nbins = 1;
+    }
+
+    if (nbins > 100000) nbins = 100000;
+    *out_nbins = nbins;
+    *out_min = min_v;
+    *out_max = max_v;
+    return HISTO_OK;
+}
+
+histo_status_t histo_estimate_bins_knuth(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max) {
+    if (!out_nbins || !out_min || !out_max) return HISTO_ERR_INVALID_ARG;
+
+    double *sorted = NULL;
+    size_t valid_n = 0;
+    double min_v = 0.0, max_v = 0.0;
+
+    histo_status_t st = compute_sample_stats_sorted(n, values, &sorted, &valid_n, &min_v, &max_v, NULL, NULL, NULL, NULL);
+    if (st != HISTO_OK) return st;
+
+    double range = max_v - min_v;
+    if (range <= 0.0) {
+        free(sorted);
+        *out_nbins = 1;
+        *out_min = min_v - 0.5;
+        *out_max = max_v + 0.5;
+        return HISTO_OK;
+    }
+
+    /* Max candidate bins to evaluate */
+    size_t max_m = 500;
+    if (max_m > valid_n) max_m = valid_n;
+    if (max_m < 1) max_m = 1;
+
+    uint32_t best_m = 1;
+    double best_log_p = -DBL_MAX;
+
+    uint32_t *counts = (uint32_t*)calloc(max_m, sizeof(uint32_t));
+    if (!counts) {
+        free(sorted);
+        return HISTO_ERR_NOMEM;
+    }
+
+    double log_gamma_half = lgamma(0.5);
+    double nv = (double)valid_n;
+
+    for (size_t m = 1; m <= max_m; m++) {
+        memset(counts, 0, m * sizeof(uint32_t));
+        double inv_dx = (double)m / range;
+
+        for (size_t i = 0; i < valid_n; i++) {
+            size_t idx = (size_t)((sorted[i] - min_v) * inv_dx);
+            if (idx >= m) idx = m - 1;
+            counts[idx]++;
+        }
+
+        double sum_lg = 0.0;
+        for (size_t k = 0; k < m; k++) {
+            sum_lg += lgamma((double)counts[k] + 0.5);
+        }
+
+        double half_m = 0.5 * (double)m;
+        double log_p = nv * log((double)m) + lgamma(half_m) - (double)m * log_gamma_half - lgamma(nv + half_m) + sum_lg;
+
+        if (log_p > best_log_p) {
+            best_log_p = log_p;
+            best_m = (uint32_t)m;
+        }
+    }
+
+    free(counts);
+    free(sorted);
+
+    *out_nbins = best_m;
+    *out_min = min_v;
+    *out_max = max_v;
+    return HISTO_OK;
+}
+
+histo_status_t histo_estimate_bins(size_t n, const double *values, histo_bin_rule_t rule, uint32_t *out_nbins, double *out_min, double *out_max) {
+    switch (rule) {
+        case HISTO_BIN_RULE_AUTO:
+        case HISTO_BIN_RULE_FD:
+            return histo_estimate_bins_fd(n, values, out_nbins, out_min, out_max);
+        case HISTO_BIN_RULE_SCOTT:
+            return histo_estimate_bins_scott(n, values, out_nbins, out_min, out_max);
+        case HISTO_BIN_RULE_STURGES:
+            return histo_estimate_bins_sturges(n, values, out_nbins, out_min, out_max);
+        case HISTO_BIN_RULE_DOANE:
+            return histo_estimate_bins_doane(n, values, out_nbins, out_min, out_max);
+        case HISTO_BIN_RULE_KNUTH:
+            return histo_estimate_bins_knuth(n, values, out_nbins, out_min, out_max);
+        default:
+            return histo_estimate_bins_fd(n, values, out_nbins, out_min, out_max);
+    }
+}
+
+histo_t* histo_create_auto(size_t n, const double *values, histo_bin_rule_t rule, uint32_t flags) {
+    if (n == 0 || !values) return NULL;
+
+    uint32_t nbins = 0;
+    double min_v = 0.0;
+    double max_v = 0.0;
+
+    histo_status_t st = histo_estimate_bins(n, values, rule, &nbins, &min_v, &max_v);
+    if (st != HISTO_OK || nbins == 0) return NULL;
+
+    double range = max_v - min_v;
+    double eps = (range > 0.0) ? ((range / (double)nbins) * 1e-6) : 1e-6;
+
+    histo_t *h = histo_create_uniform(nbins, min_v, max_v + eps, flags);
+    if (!h) return NULL;
+
+    histo_fill_n(h, n, values, NULL);
+    return h;
+}
+
 
 

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Auth;
-$Mojolicious::Plugin::Fondation::Auth::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Auth::VERSION = '0.04';
 # ABSTRACT: Fondation authentication plugin — DBIx-backed login/logout
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -106,7 +106,9 @@ sub register ($self, $app, $config) {
         my $auth = $c->is_user_authenticated;
         my $pass = $required ? $auth : !$auth;
         return 1 if $pass;
-        $c->problem(status => 403, title => 'Forbidden');
+        $c->res->code(403);
+        $c->stash('fondation.denied' => { status => 403, title => 'Forbidden' })
+            unless $c->stash('fondation.denied');
         return undef;
     });
 
@@ -162,7 +164,7 @@ Mojolicious::Plugin::Fondation::Auth - Fondation authentication plugin — DBIx-
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

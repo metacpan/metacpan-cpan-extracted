@@ -81,7 +81,7 @@ use Attribute::Handlers autotie => { "__CALLER__::Regex" => __PACKAGE__ };
 @EXPORT = qw();
 @EXPORT_OK =();
 
-$VERSION = 1.14;
+$VERSION = '2.0.0';
 
 =head1 METHODS
 
@@ -100,7 +100,8 @@ sub FETCH {
 
   return $self->{$key} if !$is_re && exists $self->{$key};
 
-  $key = qr/$key/ unless $is_re;
+  $key = _compile($key) unless $is_re;
+  return unless defined $key;
 
   # NOTE: wantarray will _never_ be true when FETCH is called
   #       using the standard hash semantics. I've put that piece
@@ -130,7 +131,8 @@ sub EXISTS {
 
   return 1 if !$is_re && exists $self->{$key};
 
-  $key = qr/$key/ unless $is_re;
+  $key = _compile($key) unless $is_re;
+  return unless defined $key;
 
   /$key/ && return 1 for keys %$self;
 
@@ -152,13 +154,23 @@ sub DELETE {
 
   return delete $self->{$key} if !$is_re && exists $self->{$key};
 
-  $key = qr/$key/ unless $is_re;
+  $key = _compile($key) unless $is_re;
+  return unless defined $key;
 
   for (keys %$self) {
     if (/$key/) {
       delete $self->{$_};
     }
   }
+}
+
+sub _compile {
+  my ($key) = @_;
+
+  my $re = eval { qr/$key/ };
+
+  # This will be undef if the "eval" failed
+  return $re;
 }
 
 1;

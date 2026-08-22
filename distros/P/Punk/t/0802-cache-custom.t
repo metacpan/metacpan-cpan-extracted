@@ -143,6 +143,81 @@ use Punk::Cache;
     is($s{max_bytes}, 2 * 1024 * 1024, 'and its options reached it');
 }
 
+# ---- single-flight, with the interleaving scripted ---------------------------
+# The fork herd in t/0801 catches the lost-race bug statistically; a smoker
+# box caught it for real. Here the exact interleaving is forced: a loser
+# reads (miss), the winner writes and unlocks, the loser then acquires the
+# lock. The loser MUST look again while holding the lock - the winner wrote
+# before it unlocked, so the value is guaranteed visible - and must not
+# compute a second time.
+{
+    package Flight::Script;
+    sub new { my $c = shift; bless { @_, log => [] }, $c }
+    sub log_of { $_[0]{log} }
+    sub get {
+        my ($self, $k) = @_;
+        push @{ $self->{log} }, 'get';
+        my $n = ++$self->{gets};
+        # read 1: the initial miss. read 2: the loop's miss, after which
+        # the scripted winner "writes and unlocks". read 3 on: the value.
+        return $n >= 3 ? 'winner-value' : undef;
+    }
+    sub set    { my $self = shift; push @{ $self->{log} }, 'set'; return }
+    sub delete { }
+    sub clear  { }
+    sub stats  { return () }
+    sub _lock {
+        my ($self) = @_;
+        push @{ $self->{log} }, 'lock';
+        return ++$self->{locks} >= 2 ? 1 : 0;   # winner holds it once
+    }
+    sub _unlock { push @{ $_[0]{log} }, 'unlock'; return }
+    sub _lock_wait { 5 }
+
+    package main;
+
+    my $c = Punk::Cache->new('Flight::Script');
+    my $computed = 0;
+    my $v = $c->compute('expensive', 60, sub { $computed++; 'recomputed' });
+
+    is($v, 'winner-value',
+        'a loser that takes the lock after the winner finishes returns the '
+      . 'winner\'s value');
+    is($computed, 0, 'and never runs the computation again');
+    my @unlocks = grep { $_ eq 'unlock' } @{ $c->backend->log_of };
+    is(scalar @unlocks, 1, 'and releases the lock it briefly held');
+}
+
+# A loser that waits out its budget computes anyway - but it does NOT own the
+# lock, so it must not release it: unlinking the real winner's lock hands a
+# third worker the same computation.
+{
+    package Flight::NeverWins;
+    sub new { my $c = shift; bless { @_, log => [] }, $c }
+    sub log_of { $_[0]{log} }
+    sub get    { return undef }
+    sub set    { push @{ $_[0]{log} }, 'set'; return }
+    sub delete { }
+    sub clear  { }
+    sub stats  { return () }
+    sub _lock      { push @{ $_[0]{log} }, 'lock'; return 0 }
+    sub _unlock    { push @{ $_[0]{log} }, 'unlock'; return }
+    sub _lock_wait { 0.05 }
+
+    package main;
+
+    my $c = Punk::Cache->new('Flight::NeverWins');
+    my $computed = 0;
+    my $v = $c->compute('expensive', 60, sub { $computed++; 'mine' });
+
+    is($v, 'mine', 'a loser that waits out its budget computes anyway');
+    is($computed, 1, 'exactly once');
+    my @unlocks = grep { $_ eq 'unlock' } @{ $c->backend->log_of };
+    is(scalar @unlocks, 0,
+        'and never releases a lock it does not hold - that would free the '
+      . 'winner\'s lock early and hand a third worker the same computation');
+}
+
 # ---- the battery -------------------------------------------------------------
 # The same assertions the shipped stores answer. A third-party backend passing
 # them unmodified is what makes the contract a contract: it was written down,

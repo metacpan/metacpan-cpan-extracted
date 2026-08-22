@@ -1,0 +1,56 @@
+ClamAV-Clamd
+============
+
+A Perl client for the clamd daemon's socket protocol.
+
+It does not link libclamav and has no runtime dependencies. clamd holds
+the signature engine - around 1.6 GB of it once loaded - and this module
+asks it questions over a UNIX or TCP socket.
+
+BEFORE YOU RELY ON IT
+---------------------
+
+clamd answers "OK" for files it DECLINED to scan. A file over
+MaxFileSize, an archive nested past MaxRecursion, or a password-protected
+zip all come back indistinguishable from clean unless clamd is configured
+to say otherwise.
+
+This is not about huge files: on a stock clamd a 2 KB nested zip
+containing a known signature reports OK.
+
+Set these in clamd.conf:
+
+    AlertExceedsMax       yes
+    AlertEncryptedArchive yes
+    AlertEncryptedDoc     yes
+
+With them, a skipped scan arrives as a detection this module reports as
+an "unscannable" verdict naming the cause, rather than as a clean file.
+
+INSTALLATION
+------------
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+A C compiler is required. ClamAV itself is not required to build or test
+- the suite runs in full against an internal fake, and the tests that
+need a real clamd skip cleanly when there is not one.
+
+ExtUtils::Depends is optional and configure-time only. Without it the
+module builds and works normally; only the C ABI wiring for other XS
+distributions is skipped.
+
+DOCUMENTATION
+-------------
+
+    perldoc ClamAV::Clamd
+
+LICENSE AND COPYRIGHT
+---------------------
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under the Artistic License 2.0.

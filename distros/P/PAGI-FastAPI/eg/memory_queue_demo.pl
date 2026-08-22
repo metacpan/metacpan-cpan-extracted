@@ -33,10 +33,13 @@ $app->post('/tasks',
     handler => async sub ($c) {
         my $item = $c->query_params->{item} // 'default_item';
 
-        my $job_id = await $queue->push('default', {
+        my $job_data = {
             task => 'process_payload',
             data => $item,
-        });
+        };
+
+        my $job_id = await $queue->push('default', $job_data);
+        $job_data->{id} = $job_id;
 
         return {
             status => 'queued',

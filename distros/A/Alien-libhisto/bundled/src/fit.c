@@ -1,6 +1,5 @@
-/**
- * @file fit.c
- * @brief Curve Fitting & Non-Linear Regression implementation for libhisto.
+/*
+ * Non-linear least squares, Poisson MLE, and parametric curve fitting models.
  */
 
 #include "histo/fit.h"
@@ -130,6 +129,18 @@ size_t histo_fit_model_num_params(histo_fit_model_t model, uint32_t poly_degree)
             return 3;
         case HISTO_FIT_MODEL_POWER_LAW:
             return 3;
+        case HISTO_FIT_MODEL_LOG_NORMAL:
+            return 3;
+        case HISTO_FIT_MODEL_GAUSSIAN_PLUS_LINEAR:
+            return 5;
+        case HISTO_FIT_MODEL_WEIBULL:
+            return 3;
+        case HISTO_FIT_MODEL_GAMMA:
+            return 3;
+        case HISTO_FIT_MODEL_POISSON:
+            return 2;
+        case HISTO_FIT_MODEL_LAPLACE:
+            return 3;
         case HISTO_FIT_MODEL_CUSTOM:
         default:
             return 0;
@@ -148,6 +159,21 @@ void histo_fit_result_destroy(histo_fit_result_t *res) {
 /* -------------------------------------------------------------------------
  * Parametric Model Evaluation & Analytical Gradients
  * ------------------------------------------------------------------------- */
+
+static double digamma_eval(double x) {
+    if (x <= 0.0) {
+        return digamma_eval(1.0 - x) - M_PI / tan(M_PI * x);
+    }
+    double result = 0.0;
+    while (x < 6.0) {
+        result -= 1.0 / x;
+        x += 1.0;
+    }
+    double inv_x = 1.0 / x;
+    double inv_x2 = inv_x * inv_x;
+    result += log(x) - 0.5 * inv_x - inv_x2 * (1.0 / 12.0 - inv_x2 * (1.0 / 120.0 - inv_x2 * (1.0 / 252.0)));
+    return result;
+}
 
 double histo_fit_eval(
     histo_fit_model_t model,
@@ -214,6 +240,72 @@ double histo_fit_eval(
             if (dx <= 1.0e-15) return 0.0;
             double val = A * pow(dx, k);
             return isfinite(val) ? val : 0.0;
+        }
+        case HISTO_FIT_MODEL_LOG_NORMAL: {
+            if (num_params < 3) return 0.0;
+            double A     = params[0];
+            double mu    = params[1];
+            double sigma = params[2];
+            if (x <= 0.0 || sigma <= 1.0e-15 || !isfinite(A) || !isfinite(mu) || !isfinite(sigma)) return 0.0;
+            double lx = log(x);
+            double z = (lx - mu) / sigma;
+            if (fabs(z) > 40.0) return 0.0;
+            return (A / (x * sigma * sqrt(2.0 * M_PI))) * exp(-0.5 * z * z);
+        }
+        case HISTO_FIT_MODEL_GAUSSIAN_PLUS_LINEAR: {
+            if (num_params < 5) return 0.0;
+            double A     = params[0];
+            double mu    = params[1];
+            double sigma = params[2];
+            double c0    = params[3];
+            double c1    = params[4];
+            if (fabs(sigma) < 1.0e-15 || !isfinite(sigma) || !isfinite(A) || !isfinite(mu) || !isfinite(c0) || !isfinite(c1)) return 0.0;
+            double z = (x - mu) / sigma;
+            double g = (fabs(z) <= 40.0) ? A * exp(-0.5 * z * z) : 0.0;
+            return g + c0 + c1 * x;
+        }
+        case HISTO_FIT_MODEL_WEIBULL: {
+            if (num_params < 3) return 0.0;
+            double A      = params[0];
+            double k      = params[1];
+            double lambda = params[2];
+            if (x <= 0.0 || k <= 1.0e-15 || lambda <= 1.0e-15 || !isfinite(A) || !isfinite(k) || !isfinite(lambda)) return 0.0;
+            double u = x / lambda;
+            double u_k = pow(u, k);
+            if (u_k > 700.0) return 0.0;
+            double val = A * (k / lambda) * pow(u, k - 1.0) * exp(-u_k);
+            return isfinite(val) ? val : 0.0;
+        }
+        case HISTO_FIT_MODEL_GAMMA: {
+            if (num_params < 3) return 0.0;
+            double A     = params[0];
+            double k     = params[1];
+            double theta = params[2];
+            if (x <= 0.0 || k <= 1.0e-15 || theta <= 1.0e-15 || !isfinite(A) || !isfinite(k) || !isfinite(theta)) return 0.0;
+            double ln_val = (k - 1.0) * log(x) - (x / theta) - k * log(theta) - lgamma(k);
+            if (ln_val < -700.0) return 0.0;
+            if (ln_val > 700.0) return A > 0 ? DBL_MAX : -DBL_MAX;
+            return A * exp(ln_val);
+        }
+        case HISTO_FIT_MODEL_POISSON: {
+            if (num_params < 2) return 0.0;
+            double A      = params[0];
+            double lambda = params[1];
+            if (x < 0.0 || lambda <= 1.0e-15 || !isfinite(A) || !isfinite(lambda)) return 0.0;
+            double ln_val = x * log(lambda) - lambda - lgamma(x + 1.0);
+            if (ln_val < -700.0) return 0.0;
+            if (ln_val > 700.0) return A > 0 ? DBL_MAX : -DBL_MAX;
+            return A * exp(ln_val);
+        }
+        case HISTO_FIT_MODEL_LAPLACE: {
+            if (num_params < 3) return 0.0;
+            double A  = params[0];
+            double mu = params[1];
+            double b  = params[2];
+            if (b <= 1.0e-15 || !isfinite(A) || !isfinite(mu) || !isfinite(b)) return 0.0;
+            double arg = -fabs(x - mu) / b;
+            if (arg < -700.0) return 0.0;
+            return (A / (2.0 * b)) * exp(arg);
         }
         default:
             return 0.0;
@@ -337,9 +429,146 @@ static bool model_eval_analytical_grad(
             grad[2] = (dx > 1.0e-15) ? -A * k * pow(dx, k - 1.0) : 0.0;
             return true;
         }
+        case HISTO_FIT_MODEL_LOG_NORMAL: {
+            double A     = params[0];
+            double mu    = params[1];
+            double sigma = params[2];
+            if (x <= 0.0 || sigma <= 1.0e-15) {
+                grad[0] = grad[1] = grad[2] = 0.0;
+                return true;
+            }
+            double lx = log(x);
+            double z = (lx - mu) / sigma;
+            if (fabs(z) > 40.0) {
+                grad[0] = grad[1] = grad[2] = 0.0;
+                return true;
+            }
+            double f = (A / (x * sigma * sqrt(2.0 * M_PI))) * exp(-0.5 * z * z);
+            grad[0] = (1.0 / (x * sigma * sqrt(2.0 * M_PI))) * exp(-0.5 * z * z);
+            grad[1] = f * (z / sigma);
+            grad[2] = f * ((z * z - 1.0) / sigma);
+            return true;
+        }
+        case HISTO_FIT_MODEL_GAUSSIAN_PLUS_LINEAR: {
+            double A     = params[0];
+            double mu    = params[1];
+            double sigma = params[2];
+            if (fabs(sigma) < 1.0e-15) {
+                grad[0] = grad[1] = grad[2] = 0.0;
+                grad[3] = 1.0;
+                grad[4] = x;
+                return true;
+            }
+            double z = (x - mu) / sigma;
+            double exp_val = (fabs(z) <= 40.0) ? exp(-0.5 * z * z) : 0.0;
+            double g = A * exp_val;
+            grad[0] = exp_val;
+            grad[1] = g * (z / sigma);
+            grad[2] = g * (z * z / sigma);
+            grad[3] = 1.0;
+            grad[4] = x;
+            return true;
+        }
+        case HISTO_FIT_MODEL_WEIBULL: {
+            double A      = params[0];
+            double k      = params[1];
+            double lambda = params[2];
+            if (x <= 0.0 || k <= 1.0e-15 || lambda <= 1.0e-15) {
+                grad[0] = grad[1] = grad[2] = 0.0;
+                return true;
+            }
+            double u = x / lambda;
+            double u_k = pow(u, k);
+            if (u_k > 700.0) {
+                grad[0] = grad[1] = grad[2] = 0.0;
+                return true;
+            }
+            double f = A * (k / lambda) * pow(u, k - 1.0) * exp(-u_k);
+            grad[0] = (k / lambda) * pow(u, k - 1.0) * exp(-u_k);
+            grad[1] = f * (1.0 / k + (1.0 - u_k) * log(u));
+            grad[2] = (f / lambda) * k * (u_k - 1.0);
+            return true;
+        }
+        case HISTO_FIT_MODEL_GAMMA: {
+            double A     = params[0];
+            double k     = params[1];
+            double theta = params[2];
+            if (x <= 0.0 || k <= 1.0e-15 || theta <= 1.0e-15) {
+                grad[0] = grad[1] = grad[2] = 0.0;
+                return true;
+            }
+            double ln_val = (k - 1.0) * log(x) - (x / theta) - k * log(theta) - lgamma(k);
+            if (ln_val < -700.0 || ln_val > 700.0) {
+                grad[0] = grad[1] = grad[2] = 0.0;
+                return true;
+            }
+            double f = A * exp(ln_val);
+            grad[0] = exp(ln_val);
+            grad[1] = f * (log(x) - log(theta) - digamma_eval(k));
+            grad[2] = f * (x / (theta * theta) - k / theta);
+            return true;
+        }
+        case HISTO_FIT_MODEL_POISSON: {
+            double A      = params[0];
+            double lambda = params[1];
+            if (x < 0.0 || lambda <= 1.0e-15) {
+                grad[0] = grad[1] = 0.0;
+                return true;
+            }
+            double ln_val = x * log(lambda) - lambda - lgamma(x + 1.0);
+            if (ln_val < -700.0 || ln_val > 700.0) {
+                grad[0] = grad[1] = 0.0;
+                return true;
+            }
+            double f = A * exp(ln_val);
+            grad[0] = exp(ln_val);
+            grad[1] = f * (x / lambda - 1.0);
+            return true;
+        }
+        case HISTO_FIT_MODEL_LAPLACE: {
+            double A  = params[0];
+            double mu = params[1];
+            double b  = params[2];
+            if (b <= 1.0e-15) {
+                grad[0] = grad[1] = grad[2] = 0.0;
+                return true;
+            }
+            double diff = x - mu;
+            double abs_diff = fabs(diff);
+            double arg = -abs_diff / b;
+            if (arg < -700.0) {
+                grad[0] = grad[1] = grad[2] = 0.0;
+                return true;
+            }
+            double f = (A / (2.0 * b)) * exp(arg);
+            grad[0] = (1.0 / (2.0 * b)) * exp(arg);
+            grad[1] = (abs_diff > 1.0e-15) ? (f / b) * ((diff > 0.0) ? 1.0 : -1.0) : 0.0;
+            grad[2] = f * (abs_diff / (b * b) - 1.0 / b);
+            return true;
+        }
         default:
             return false;
     }
+}
+
+histo_status_t histo_fit_eval_gradient(
+    histo_fit_model_t model,
+    const double     *params,
+    size_t            num_params,
+    double            x,
+    double           *grad
+) {
+    if (!params || !grad || !isfinite(x)) {
+        return HISTO_ERR_INVALID_ARG;
+    }
+    size_t expected_params = histo_fit_model_num_params(model, (model == HISTO_FIT_MODEL_POLYNOMIAL && num_params > 0) ? (uint32_t)(num_params - 1) : 0);
+    if (num_params < expected_params || num_params == 0) {
+        return HISTO_ERR_INVALID_ARG;
+    }
+    if (model_eval_analytical_grad(model, params, num_params, x, grad)) {
+        return HISTO_OK;
+    }
+    return HISTO_ERR_INVALID_ARG;
 }
 
 /**
@@ -517,6 +746,83 @@ histo_status_t histo_fit_estimate_initial_params(
             initial_params[0] = (max_y > 0.0) ? max_y : 1.0; /* Amplitude */
             initial_params[1] = -1.0; /* Exponent */
             initial_params[2] = r_min - 0.1 * (r_max - r_min); /* x0 */
+            return HISTO_OK;
+        }
+        case HISTO_FIT_MODEL_LOG_NORMAL: {
+            double log_sum_w = 0.0, log_sum_wx = 0.0, log_sum_wx2 = 0.0;
+            for (uint32_t i = 0; i < nbins; ++i) {
+                double xc = 0.0, y = 0.0;
+                if (histo_bin_center(h, i, &xc) != HISTO_OK || xc <= 0.0) continue;
+                if (xc < r_min || xc > r_max) continue;
+                if (histo_bin_content(h, i, &y) != HISTO_OK || y <= 0.0) continue;
+                double lx = log(xc);
+                log_sum_w += y;
+                log_sum_wx += y * lx;
+                log_sum_wx2 += y * lx * lx;
+            }
+            double mu_log = (log_sum_w > 0.0) ? (log_sum_wx / log_sum_w) : log(x_at_max > 0.0 ? x_at_max : 1.0);
+            double var_log = (log_sum_w > 0.0) ? (log_sum_wx2 / log_sum_w - mu_log * mu_log) : 0.25;
+            if (var_log <= 1.0e-6) var_log = 0.25;
+            double bin_w = (r_max - r_min) / (valid_bins > 0 ? valid_bins : 1);
+            initial_params[0] = (sum_w > 0.0) ? sum_w * bin_w : 1.0; /* Area */
+            initial_params[1] = mu_log;
+            initial_params[2] = sqrt(var_log);
+            return HISTO_OK;
+        }
+        case HISTO_FIT_MODEL_GAUSSIAN_PLUS_LINEAR: {
+            double bg_start = (min_y >= 0.0) ? min_y : 0.0;
+            double bg_end = bg_start;
+            double c1 = (r_max > r_min) ? (bg_end - bg_start) / (r_max - r_min) : 0.0;
+            double c0 = bg_start - c1 * r_min;
+            double amp = (max_y > bg_start) ? (max_y - bg_start) : 1.0;
+            initial_params[0] = amp;
+            initial_params[1] = (sum_w > 0.0) ? mean : x_at_max;
+            initial_params[2] = sigma;
+            initial_params[3] = c0;
+            initial_params[4] = c1;
+            return HISTO_OK;
+        }
+        case HISTO_FIT_MODEL_WEIBULL: {
+            double m = (mean > 0.0) ? mean : 1.0;
+            double s = (sigma > 0.0) ? sigma : 1.0;
+            double k_est = pow(m / s, 1.086);
+            if (k_est < 0.2) k_est = 0.2;
+            if (k_est > 10.0) k_est = 10.0;
+            double lambda_est = m / tgamma(1.0 + 1.0 / k_est);
+            if (lambda_est <= 0.0) lambda_est = m;
+            double bin_w = (r_max - r_min) / (valid_bins > 0 ? valid_bins : 1);
+            initial_params[0] = (sum_w > 0.0) ? sum_w * bin_w : 1.0; /* Area */
+            initial_params[1] = k_est;
+            initial_params[2] = lambda_est;
+            return HISTO_OK;
+        }
+        case HISTO_FIT_MODEL_GAMMA: {
+            double m = (mean > 0.0) ? mean : 1.0;
+            double v = (variance > 0.0) ? variance : 1.0;
+            double theta_est = v / m;
+            double k_est = m / theta_est;
+            if (k_est < 0.1) k_est = 0.1;
+            if (theta_est < 1.0e-4) theta_est = 1.0e-4;
+            double bin_w = (r_max - r_min) / (valid_bins > 0 ? valid_bins : 1);
+            initial_params[0] = (sum_w > 0.0) ? sum_w * bin_w : 1.0; /* Area */
+            initial_params[1] = k_est;
+            initial_params[2] = theta_est;
+            return HISTO_OK;
+        }
+        case HISTO_FIT_MODEL_POISSON: {
+            double lam = (mean >= 0.1) ? mean : 1.0;
+            double bin_w = (r_max - r_min) / (valid_bins > 0 ? valid_bins : 1);
+            initial_params[0] = (sum_w > 0.0) ? sum_w * bin_w : 1.0; /* Area */
+            initial_params[1] = lam;
+            return HISTO_OK;
+        }
+        case HISTO_FIT_MODEL_LAPLACE: {
+            double b_est = sigma / sqrt(2.0);
+            if (b_est < 1.0e-4) b_est = (r_max - r_min) / 6.0;
+            double bin_w = (r_max - r_min) / (valid_bins > 0 ? valid_bins : 1);
+            initial_params[0] = (sum_w > 0.0) ? sum_w * bin_w : 1.0; /* Area */
+            initial_params[1] = (sum_w > 0.0) ? mean : x_at_max;
+            initial_params[2] = b_est;
             return HISTO_OK;
         }
         case HISTO_FIT_MODEL_CUSTOM:

@@ -1,0 +1,12 @@
+Revision history for Perl extension Math::Histo::PDL.
+
+0.2.0   2026-08-21
+        - Initial release of Math::Histo::PDL distribution.
+        - Zero-copy 1D and 2D piddle ingestion via get_dataref into libhisto fill_packed_f64.
+        - Transparent coercion for non-double data types and non-contiguous piddle slices.
+        - Full weighted histogram ingestion support.
+        - 2D ingestion from pairs of 1D piddles and (2, N) / (N, 2) coordinate matrices.
+        - Export 1D histograms to PDL counts, bin edges, bin centers, and Poisson/weighted errors.
+        - Export 2D histograms to PDL (nx, ny) matrices, X/Y bin edges, X/Y bin centers, and 2D error matrices.
+        - High-level builders (hist1d, hist2d, pdl_to_histo, histo_to_pdl).
+        - Direct OO method injection onto Math::Histo and Math::Histo::2D ($h->to_pdl, $h->fill_pdl, $h2d->to_pdl, $h2d->fill_pdl).

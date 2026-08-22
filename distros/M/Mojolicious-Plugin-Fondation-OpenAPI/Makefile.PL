@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::Fondation::OpenAPI",
   "PREREQ_PM" => {
     "Mojolicious" => "9.46",
-    "Mojolicious::Plugin::Fondation" => "0.07",
+    "Mojolicious::Plugin::Fondation" => "0.08",
     "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.06",
     "Mojolicious::Plugin::Fondation::Problem" => "0.03",
     "Mojolicious::Plugin::OpenAPI" => "5.12"
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Mojolicious" => "9.46",
-  "Mojolicious::Plugin::Fondation" => "0.07",
+  "Mojolicious::Plugin::Fondation" => "0.08",
   "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.06",
   "Mojolicious::Plugin::Fondation::Problem" => "0.03",
   "Mojolicious::Plugin::OpenAPI" => "5.12",

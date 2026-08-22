@@ -116,7 +116,7 @@ my %WriteMakefileArgs = (
         'JSON::Schema::Fast'  => '0.05',   # provides jsf_abi.h
         'Open::API'           => '0.09',   # provides oa_abi.h
         'Apophis'             => '0.05',   # provides ap_abi.h
-        'Template::Stencil'   => '0.05',   # provides st_abi.h
+        'Template::Stencil'   => '0.10',   # provides st_abi.h
         'Hyperman'            => '0.32',   # provides hm_abi.h (v3: rate limit)
         'Markdown::Simple'    => '0.21',   # provides mds_abi.h
         'Search::Trigram'     => '0.03',   # provides sg_abi.h
@@ -127,7 +127,11 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Open::API'            => '0.09',   # spec-first routing + validation; oa_abi.h
-        'Template::Stencil'    => '0.05',   # Punk::View::Stencil; st_abi.h
+        'Template::Stencil'    => '0.10',   # Punk::View::Stencil; st_abi.h.
+                                            # 0.10 for tied hashes in a path,
+                                            # which is what Punk::Plugin::I18n
+                                            # binds as `locale` - before it a
+                                            # tied hash resolved to nothing
         'File::Raw::JSON'      => '0.06',   # body decode / auto-JSON encode
         'Fetch'                => '0.12',   # $c->ua, on the worker's own loop
         'JSON::Schema::Fast'   => '0.05',   # schema field validation

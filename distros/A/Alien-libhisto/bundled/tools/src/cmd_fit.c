@@ -1,3 +1,7 @@
+/*
+ * CLI subcommand histo fit: parametric curve fitting and ASCII plot overlay.
+ */
+
 #include "cli_common.h"
 #include "histo/fit.h"
 #include <stdio.h>
@@ -14,7 +18,8 @@ static void print_fit_usage(FILE *out) {
     fprintf(out, "       histo fit [OPTIONS] [HISTOGRAM_FILE...]\n\n");
     fprintf(out, "Fits parametric models to 1D histograms using non-linear least squares / Poisson MLE.\n\n");
     fprintf(out, "Model & Optimization Options:\n");
-    fprintf(out, "  -m, --model=<TYPE>       Model: gaussian (default), exponential, polynomial, breit-wigner, power-law\n");
+    fprintf(out, "  -m, --model=<TYPE>       Model: gaussian (default), exponential, polynomial, breit-wigner,\n");
+    fprintf(out, "                           power-law, lognormal, gauss+linear, weibull, gamma, poisson, laplace\n");
     fprintf(out, "  -d, --degree=<N>         Degree for polynomial model (default: 1, range: 0..10)\n");
     fprintf(out, "      --mle                Use Poisson Maximum Likelihood Estimation (-2 ln L) instead of Chi-Square\n");
     fprintf(out, "      --unweighted         Use Unweighted Least Squares\n");
@@ -58,6 +63,37 @@ static const char *get_param_name(histo_fit_model_t model, size_t idx, uint32_t 
             if (idx == 1) return "Exponent (k)";
             if (idx == 2) return "Origin Shift (x0)";
             break;
+        case HISTO_FIT_MODEL_LOG_NORMAL:
+            if (idx == 0) return "Scale (A)";
+            if (idx == 1) return "Log-Mean (\xce\xbc)";
+            if (idx == 2) return "Log-Std (\xcf\x83)";
+            break;
+        case HISTO_FIT_MODEL_GAUSSIAN_PLUS_LINEAR:
+            if (idx == 0) return "Amplitude (A)";
+            if (idx == 1) return "Mean (\xce\xbc)";
+            if (idx == 2) return "Std Dev (\xcf\x83)";
+            if (idx == 3) return "Intercept (c0)";
+            if (idx == 4) return "Slope (c1)";
+            break;
+        case HISTO_FIT_MODEL_WEIBULL:
+            if (idx == 0) return "Scale (A)";
+            if (idx == 1) return "Shape (k)";
+            if (idx == 2) return "Scale (\xce\xbb)";
+            break;
+        case HISTO_FIT_MODEL_GAMMA:
+            if (idx == 0) return "Scale (A)";
+            if (idx == 1) return "Shape (k)";
+            if (idx == 2) return "Scale (\xce\xb8)";
+            break;
+        case HISTO_FIT_MODEL_POISSON:
+            if (idx == 0) return "Scale (A)";
+            if (idx == 1) return "Rate (\xce\xbb)";
+            break;
+        case HISTO_FIT_MODEL_LAPLACE:
+            if (idx == 0) return "Scale (A)";
+            if (idx == 1) return "Location (\xce\xbc)";
+            if (idx == 2) return "Diversity (b)";
+            break;
         default:
             break;
     }
@@ -78,39 +114,26 @@ static const char *get_model_title_and_formula(histo_fit_model_t model, uint32_t
             return "Breit-Wigner / Cauchy-Lorentz [ f(x) = (A/\xcf\x80) \xc2\xb7 (\xce\x93/2) / ((x-M)\xc2\xb2 + (\xce\x93/2)\xc2\xb2) ]";
         case HISTO_FIT_MODEL_POWER_LAW:
             return "Power Law [ f(x) = A \xc2\xb7 (x - x0)^k ]";
+        case HISTO_FIT_MODEL_LOG_NORMAL:
+            return "Log-Normal [ f(x) = (A / (x\xc2\xb7\xcf\x83\xe2\x88\x9a(2\xcf\x80))) \xc2\xb7 exp(-(ln(x)-\xce\xbc)\xc2\xb2 / (2\xcf\x83\xc2\xb2)) ]";
+        case HISTO_FIT_MODEL_GAUSSIAN_PLUS_LINEAR:
+            return "Gaussian Peak + Linear Background [ f(x) = A \xc2\xb7 exp(-(x - \xce\xbc)\xc2\xb2 / (2\xcf\x83\xc2\xb2)) + c0 + c1\xc2\xb7x ]";
+        case HISTO_FIT_MODEL_WEIBULL:
+            return "Weibull [ f(x) = A \xc2\xb7 (k/\xce\xbb) \xc2\xb7 (x/\xce\xbb)^(k-1) \xc2\xb7 exp(-(x/\xce\xbb)^k) ]";
+        case HISTO_FIT_MODEL_GAMMA:
+            return "Gamma / Erlang [ f(x) = A \xc2\xb7 (x^(k-1) \xc2\xb7 exp(-x/\xce\xb8)) / (\xce\x93(k)\xc2\xb7\xce\xb8^k) ]";
+        case HISTO_FIT_MODEL_POISSON:
+            return "Poisson [ f(x) = A \xc2\xb7 (\xce\xbb^x \xc2\xb7 exp(-\xce\xbb)) / \xce\x93(x+1) ]";
+        case HISTO_FIT_MODEL_LAPLACE:
+            return "Laplace [ f(x) = (A / (2b)) \xc2\xb7 exp(-|x - \xce\xbc| / b) ]";
         default:
             return "Custom Model";
     }
 }
 
 static double eval_model_point(histo_fit_model_t model, uint32_t poly_degree, const double *p, double x) {
-    switch (model) {
-        case HISTO_FIT_MODEL_GAUSSIAN: {
-            double diff = (x - p[1]) / p[2];
-            return p[0] * exp(-0.5 * diff * diff);
-        }
-        case HISTO_FIT_MODEL_EXPONENTIAL:
-            return p[0] * exp(-p[1] * x) + p[2];
-        case HISTO_FIT_MODEL_POLYNOMIAL: {
-            double val = 0.0;
-            double x_pow = 1.0;
-            for (uint32_t i = 0; i <= poly_degree; ++i) {
-                val += p[i] * x_pow;
-                x_pow *= x;
-            }
-            return val;
-        }
-        case HISTO_FIT_MODEL_BREIT_WIGNER: {
-            double gamma_half = p[2] * 0.5;
-            double diff = x - p[1];
-            return (p[0] / 3.14159265358979323846) * gamma_half / (diff * diff + gamma_half * gamma_half);
-        }
-        case HISTO_FIT_MODEL_POWER_LAW:
-            if (x <= p[2]) return 0.0;
-            return p[0] * pow(x - p[2], p[1]);
-        default:
-            return 0.0;
-    }
+    size_t num_params = histo_fit_model_num_params(model, poly_degree);
+    return histo_fit_eval(model, p, num_params, x);
 }
 
 static void print_fit_plot(const histo_t *h, histo_fit_model_t model, uint32_t poly_degree, const histo_fit_result_t *res, FILE *out) {
@@ -329,6 +352,12 @@ int histo_cli_fit(int argc, char **argv, FILE *out, FILE *err) {
                 else if (strcmp(val, "polynomial") == 0 || strcmp(val, "poly") == 0) model = HISTO_FIT_MODEL_POLYNOMIAL;
                 else if (strcmp(val, "breit-wigner") == 0 || strcmp(val, "bw") == 0 || strcmp(val, "cauchy") == 0) model = HISTO_FIT_MODEL_BREIT_WIGNER;
                 else if (strcmp(val, "power-law") == 0 || strcmp(val, "power") == 0) model = HISTO_FIT_MODEL_POWER_LAW;
+                else if (strcmp(val, "lognormal") == 0 || strcmp(val, "log-normal") == 0 || strcmp(val, "log_normal") == 0) model = HISTO_FIT_MODEL_LOG_NORMAL;
+                else if (strcmp(val, "gauss+linear") == 0 || strcmp(val, "gauss_linear") == 0 || strcmp(val, "gauss+poly1") == 0) model = HISTO_FIT_MODEL_GAUSSIAN_PLUS_LINEAR;
+                else if (strcmp(val, "weibull") == 0) model = HISTO_FIT_MODEL_WEIBULL;
+                else if (strcmp(val, "gamma") == 0 || strcmp(val, "erlang") == 0) model = HISTO_FIT_MODEL_GAMMA;
+                else if (strcmp(val, "poisson") == 0) model = HISTO_FIT_MODEL_POISSON;
+                else if (strcmp(val, "laplace") == 0 || strcmp(val, "double-exponential") == 0) model = HISTO_FIT_MODEL_LAPLACE;
                 else {
                     fprintf(err, "Error: Unknown model '%s'\n", val);
                     return 1;

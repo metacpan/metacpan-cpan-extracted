@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Auth::Token::Controller::ApiToken;
-$Mojolicious::Plugin::Fondation::Auth::Token::Controller::ApiToken::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Auth::Token::Controller::ApiToken::VERSION = '0.03';
 use Mojo::Base 'Mojolicious::Controller', -signatures;
 
 # ABSTRACT: REST controller for personal access token management
@@ -131,7 +131,7 @@ Mojolicious::Plugin::Fondation::Auth::Token::Controller::ApiToken - REST control
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

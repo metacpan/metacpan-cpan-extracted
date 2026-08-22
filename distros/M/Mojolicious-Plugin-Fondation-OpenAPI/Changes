@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-Fondation-OpenAPI
 
+0.05      2026-08-21 19:59:33+02:00 Europe/Paris
+  - fix: perm/group condition override sets fondation.denied marker + regression test
+
 0.04      2026-08-16 19:52:28+02:00 Europe/Paris
   - requires Fondation::Model::DBIx::Async 0.06
   - update README.md

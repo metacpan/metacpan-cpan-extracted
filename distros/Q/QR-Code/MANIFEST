@@ -1,0 +1,29 @@
+Changes
+Code.xs
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+include/qr/qr_bits.h
+include/qr/qr_encode.h
+include/qr/qr_gf.h
+include/qr/qr_img.h
+include/qr/qr_mask.h
+include/qr/qr_svg.h
+include/qr_abi.h
+lib/QR/Code.pm
+t/00-load.t
+t/01-encode.t
+t/01-structure.t
+t/02-capacity.t
+t/02-svg.t
+t/03-format.t
+t/03-pbm.t
+t/04-decode.t
+t/04-logo.t
+t/05-style.t
+t/05-svg.t
+t/06-colour.t
+t/07-abi.t
+xt/zbar.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

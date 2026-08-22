@@ -1,0 +1,15 @@
+^\.git/
+^\.copilot/
+^blib/
+^_build/
+^Build$
+^Build\.bat$
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^MYMETA\.
+^cover_db/
+^nytprof
+^\.DS_Store$
+^\.vscode/
+^\.idea/

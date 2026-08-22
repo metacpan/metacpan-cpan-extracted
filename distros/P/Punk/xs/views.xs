@@ -103,6 +103,10 @@ render(self, c, template, data = &PL_sv_undef, ...)
              * resolves without the handler passing anything. A no-op unless
              * the plugin is registered for this app. */
             if (have_c) pcsp_bind_vars(aTHX_ c, d);
+            /* Punk::Plugin::I18n: this request's catalogue, so
+             * `{% locale.welcome %}` resolves without the handler passing
+             * anything. A no-op unless the plugin is registered. */
+            if (have_c) pi_bind_vars(aTHX_ c, d);
             ENTER; SAVETMPS;
             PUSHMARK(SP);
             EXTEND(SP, 3);

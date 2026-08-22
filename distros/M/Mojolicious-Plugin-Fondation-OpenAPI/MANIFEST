@@ -20,6 +20,7 @@ t/03-config-override.t
 t/04-validators-js.t
 t/05-runtime.t
 t/06-exclude-source.t
+t/07-denied-route.t
 t/lib/Mojolicious/Plugin/Fondation/TestOpenAPI.pm
 t/lib/Mojolicious/Plugin/Fondation/TestOpenAPI/Schema/Result/Bar.pm
 t/lib/Mojolicious/Plugin/Fondation/TestOpenAPI/Schema/Result/Baz.pm

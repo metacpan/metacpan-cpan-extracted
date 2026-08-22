@@ -1,3 +1,7 @@
+/*
+ * Internal declarations for SIMD vectorized batch ingestion routines.
+ */
+
 #ifndef HISTO_SIMD_H
 #define HISTO_SIMD_H
 

@@ -1,5 +1,9 @@
 Revision history for Poker-Eval
 
+0.12    2026-08-21
+        - Fix equity: restore residual dealer deck after Monte Carlo
+        - Document residual-deck restore
+
 0.11    2026-08-20
         - Restore $VERSION on all packages so PAUSE can reindex after 0.10
         - (0.10 left previously indexed modules stuck at 0.09)

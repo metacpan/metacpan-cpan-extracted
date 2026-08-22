@@ -1,6 +1,6 @@
 ## MCE::Shared for Perl
 
-This document describes MCE::Shared version 1.893.
+This document describes MCE::Shared version 1.894.
 
 ### Description
 
@@ -155,12 +155,6 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
 the GNU General Public License or the Artistic License for more details.
 
-You should have received a copy of the Artistic License with this
-Kit, in the file named "LICENSE".  If not, I'll be glad to provide one.
-
-You should also have received a copy of the GNU General Public License
-along with this program in the file named "Copying". If not, write to the
-Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-Boston, MA 02110-1301, USA or visit their web page on the internet at
-https://www.gnu.org/copyleft/gpl.html.
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <https://www.gnu.org/licenses/>.
 

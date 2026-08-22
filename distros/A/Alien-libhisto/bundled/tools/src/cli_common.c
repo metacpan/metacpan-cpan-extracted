@@ -1,3 +1,7 @@
+/*
+ * Implementation of CLI stream readers, file format decoders, and formatting.
+ */
+
 #include "cli_common.h"
 #include <unistd.h>
 #include <sys/ioctl.h>

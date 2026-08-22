@@ -56,7 +56,8 @@ my $ld = "#include <math.h>\n"
 . "  volatile long double r = lgammal(x) + sqrtl(x) + logl(x) + log1pl(x)\n"
 . "    + log2l(x) + log10l(x) + expl(x) + powl(x, x) + floorl(x) + ceill(x) + roundl(x)\n"
 . "    + rintl(x) + truncl(x) + fmaxl(x, x) + erfcl(x) + asinl(x) + sinhl(x) + coshl(x)\n"
-. "    + tanhl(x) + fabsl(x) + ldexpl(x, 2) + frexpl(x, &e);\n"
+. "    + tanhl(x) + fabsl(x) + ldexpl(x, 2) + frexpl(x, &e)\n"
+. "    + acosl(x) + cosl(x) + sinl(x);\n"
 . "  return (int)r * 0; }\n";
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 my $src = File::Spec->catfile($dir, 'ldmath.c');
@@ -70,6 +71,14 @@ if system("$Config{cc}$std -o $bin $src -lm > $quiet 2> $quiet") == 0;
 }
 warn "Stats::LikeR: this libm is missing some long double math functions;\n"
 . "  falling back to double precision internals.\n" unless $define;
+}
+{
+package MY;
+sub libscan {
+my ($self, $path) = @_;
+return '' if $path =~ /\.pl\z/ && $path !~ m{/};
+return $self->SUPER::libscan($path);
+}
 }
 
 my %WriteMakefileArgs = (
@@ -90,7 +99,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.298",
+  "VERSION" => "0.301",
   "test" => {
     "TESTS" => "t/*.t"
   }

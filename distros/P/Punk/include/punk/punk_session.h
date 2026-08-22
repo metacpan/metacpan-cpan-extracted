@@ -408,7 +408,7 @@ static SV *ps_req_id(pTHX_ SV *c, HV *cfg) {
      * on every non-threaded smoker, and on nothing here. */
     {
         const char *cv = SvPV_const(cval, cvl);
-    return ps_id_unseal(aTHX_ cv, cvl, key, kl);
+        return ps_id_unseal(aTHX_ cv, cvl, key, kl);
     }
 }
 

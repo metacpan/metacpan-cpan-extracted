@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::Fondation::Helpers;
 # ABSTRACT: All Fondation helpers in one place -- keeps Fondation.pm minimal
-$Mojolicious::Plugin::Fondation::Helpers::VERSION = '0.07';
+$Mojolicious::Plugin::Fondation::Helpers::VERSION = '0.08';
 use Mojo::Base -base, -signatures;
 use Mojo::ByteStream 'b';
 
@@ -57,14 +57,18 @@ sub register ($class, $app, $manager) {
     $app->routes->add_condition('fondation.perm' => sub {
         my ($route, $c, $captures, $perm) = @_;
         return 1 if $c->check_perm($perm);
-        $c->render(text => 'Forbidden', status => 403);
+        $c->res->code(403);
+        $c->stash('fondation.denied' => { status => 403, title => 'Forbidden' })
+            unless $c->stash('fondation.denied');
         return undef;
     }) unless $app->routes->conditions->{'fondation.perm'};
 
     $app->routes->add_condition('fondation.group' => sub {
         my ($route, $c, $captures, $group) = @_;
         return 1 if $c->check_group($group);
-        $c->render(text => 'Forbidden', status => 403);
+        $c->res->code(403);
+        $c->stash('fondation.denied' => { status => 403, title => 'Forbidden' })
+            unless $c->stash('fondation.denied');
         return undef;
     }) unless $app->routes->conditions->{'fondation.group'};
 
@@ -72,7 +76,9 @@ sub register ($class, $app, $manager) {
         my ($route, $c, $captures, $required) = @_;
         # Default: nobody is authenticated (overridden by Fondation::Auth)
         return 1 unless $required;
-        $c->render(text => 'Forbidden', status => 403);
+        $c->res->code(403);
+        $c->stash('fondation.denied' => { status => 403, title => 'Forbidden' })
+            unless $c->stash('fondation.denied');
         return undef;
     }) unless $app->routes->conditions->{'fondation.authenticated'};
 
@@ -146,7 +152,7 @@ Mojolicious::Plugin::Fondation::Helpers - All Fondation helpers in one place -- 
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 AUTHOR
 

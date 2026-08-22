@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.27';
+    $VERSION = '0.28';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -140,11 +140,10 @@ Errors collect into a Result that a bare C<< $c->validate >> reads;
 failure answers C<< 400 { errors => [...] } >>, or the C<on_invalid>
 target. See L<Punk::Validate>.
 
-=item * C<schema> - the schema half of C<validate>, spelled separately.
-
-=item * C<source> - what C<validate> reads (the request body by default).
-
-=item * C<on_invalid> - a target to run instead of the house C<400>.
+C<schema>, C<source> and C<on_invalid> are keys of that longhand hashref, not
+route options in their own right - C<< { validate => { schema => ..., source
+=> 'params' } } >>, never C<< { schema => ..., source => 'params' } >>. A
+route option the list below does not name croaks at boot.
 
 =item * C<compress> - C<0> opts the route out of response compression.
 See below.

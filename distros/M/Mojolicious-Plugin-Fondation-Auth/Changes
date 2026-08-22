@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-Fondation-Auth
 
+0.04      2026-08-21 19:58:48+02:00 Europe/Paris
+    - fix: authenticated condition sets fondation.denied marker instead of rendering
+
 0.03      2026-08-16 20:00:02+02:00 Europe/Paris
     - requires Fondation::Model::DBIx::Async 0.06
 

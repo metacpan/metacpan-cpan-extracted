@@ -1,0 +1,81 @@
+{
+   "abstract" : "Read-only combined view across two or more Database::Abstraction objects",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Database-Join",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Database::Abstraction" : "0.37",
+            "List::Util" : "1.33",
+            "Object::Configure" : "0",
+            "Params::Get" : "0.13",
+            "Params::Validate::Strict" : "0.38",
+            "Readonly" : "2.00",
+            "Scalar::Util" : "0",
+            "Sub::Protected" : "0",
+            "autodie" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::CSV" : "0",
+            "DBD::SQLite" : "1.70",
+            "DBI" : "0",
+            "File::Temp" : "0",
+            "IPC::System::Simple" : "0",
+            "Test::Exception" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0.13",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Returns" : "0.04",
+            "Test::Without::Module" : "0",
+            "Text::xSV::Slurp" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Database-Join@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Join",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Join"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nigelhorne/Database-Join.git",
+         "web" : "https://github.com/nigelhorne/Database-Join"
+      }
+   },
+   "version" : "v0.001.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

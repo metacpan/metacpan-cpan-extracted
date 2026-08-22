@@ -130,6 +130,54 @@ sub hdr { my %h = @{ $_[0][1] }; return \%h }
     ok(Punk::Plugin::Blob->_id_ok($r->[2][0]), 'and returns an id');
 }
 
+# ---- blob_exists / blob_path / blob_remove ----------------------------------
+# The three helpers the sweep tests never reach. blob_remove is the documented
+# escape hatch for an application that knows a blob has one reference, so what
+# matters is that it is IMMEDIATE and that the other two agree with it before
+# and after - a "removed" that left the bytes readable would be the worst of
+# the three outcomes.
+{
+    package BlobHelpers;
+    use Punk;
+    plugin 'Blob' => { root => $root, namespace => 'punk-blob-test' };
+    get '/exists/:id' => sub { $_[0]->text($_[0]->blob_exists($_[0]->param('id')) ? 'y' : 'n') };
+    get '/path/:id'   => sub { $_[0]->text($_[0]->blob_path($_[0]->param('id')) // '') };
+    get '/rm/:id'     => sub { $_[0]->text($_[0]->blob_remove($_[0]->param('id')) ? 'gone' : 'no') };
+    package main;
+
+    my $happ = BlobHelpers->to_app;
+    my $h = sub {
+        my ($p) = @_;
+        $happ->({ REQUEST_METHOD => 'GET', PATH_INFO => $p, SCRIPT_NAME => '',
+                  QUERY_STRING => '', SERVER_NAME => 'l', SERVER_PORT => 80,
+                  'psgi.url_scheme' => 'http', 'psgi.input' => undef,
+                  'psgi.errors' => \*STDERR })->[2][0];
+    };
+
+    my $id = Punk::Plugin::Blob->_store($ca, \'removable bytes');
+    is($h->("/exists/$id"), 'y', 'blob_exists finds a stored blob');
+    my $path = $h->("/path/$id");
+    ok(length $path && -f $path, 'blob_path names the file on disk');
+
+    is($h->("/rm/$id"), 'gone', 'blob_remove reports the unlink');
+    ok(!-f $path,
+        'and the bytes are gone immediately - no grace period, which is what '
+      . 'separates it from the sweep');
+    is($h->("/exists/$id"), 'n', 'blob_exists agrees afterwards');
+    is($h->("/rm/$id"), 'no', 'and removing it twice is not a second success');
+
+    # blob_path croaks for a bad id where blob_send answers 404, because a
+    # program calls it deliberately - the POD says so, and nothing checked.
+    my $r = $happ->({ REQUEST_METHOD => 'GET', PATH_INFO => '/path/not-an-id',
+                      SCRIPT_NAME => '', QUERY_STRING => '',
+                      SERVER_NAME => 'l', SERVER_PORT => 80,
+                      'psgi.url_scheme' => 'http', 'psgi.input' => undef,
+                      'psgi.errors' => \*STDERR });
+    is($r->[0], 500,
+        'a bad id croaks out of blob_path rather than handing back a path '
+      . 'built from it');
+}
+
 # ---- GATE 2: a blob cannot be served as HTML by accident ---------------------
 my $xid = Punk::Plugin::Blob->_store($ca, \$XSS);
 {
@@ -322,6 +370,10 @@ my $xid = Punk::Plugin::Blob->_store($ca, \$XSS);
                        namespace => sub { "tenant-$TENANT" } };
     post '/up'        => sub { $_[0]->text($_[0]->blob_put('one secret file')) };
     get  '/get/:id'   => sub { $_[0]->blob_send($_[0]->param('id')) };
+    get  '/ns'        => sub {
+        my ($c) = @_;
+        $c->text(join '|', $c->blob_store->namespace, $c->blob_root);
+    };
 
     package main;
     my $tapp = TenantApp->to_app;
@@ -353,6 +405,34 @@ my $xid = Punk::Plugin::Blob->_store($ca, \$XSS);
     is(scalar(grep { -f } glob "$troot/*/*/*"), 2,
         'and the file is stored once PER TENANT - that is the cost of the '
       . 'namespace, and it is the trade being made deliberately');
+
+    # blob_store and blob_root: documented as "the store this request resolved
+    # to, not a single application-wide object" when the namespace is a
+    # coderef. Nothing checked that, and a store memoised once at boot would
+    # pass every other test on this page while quietly serving one tenant's
+    # namespace to all of them.
+    {
+        $TenantApp::TENANT = 'acme';
+        my ($ns_a, $root_a) = split /\|/, $call->(path => '/ns')->[2][0];
+        $TenantApp::TENANT = 'globex';
+        my ($ns_g, $root_g) = split /\|/, $call->(path => '/ns')->[2][0];
+
+        # Apophis derives a UUID from the namespace string, so compare the
+        # stores rather than the spelling: what matters is that two requests
+        # under two tenants did not get one object.
+        isnt($ns_a, $ns_g,
+            'blob_store is the store THIS request resolved - two tenants, two '
+          . 'stores, not one object memoised at boot with the first tenant '
+          . 'baked into it');
+
+        $TenantApp::TENANT = 'acme';
+        my ($again) = split /\|/, $call->(path => '/ns')->[2][0];
+        is($again, $ns_a,
+            'and the same tenant resolves the same store again, so this is '
+          . 'resolution rather than something fresh every time');
+
+        is($root_a, $root_g, 'while blob_root is the same store root for both');
+    }
 
     # both are independently servable, from whichever tenant is current
     $TenantApp::TENANT = 'acme';

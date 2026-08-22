@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use Math::Histo ();
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
+
 
 sub new {
     my ($class, %args) = @_;

@@ -1,4 +1,9 @@
 Revision history for Alien-libhisto
 
+0.2.0   2026-08-21
+        - Synchronize bundled libhisto C library to v0.2.0.
+        - Automatic cleaning of stale build caches on in-tree builds.
+
 0.1.0   2026-08-20
         - Initial CPAN release of Alien::libhisto packaging libhisto C library.
+
