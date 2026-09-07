@@ -9,9 +9,9 @@ use Exporter::Rinci qw(import);
 use IPC::System::Options 'system', 'readpipe', 'run', -log=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-06-16'; # DATE
+our $DATE = '2026-06-17'; # DATE
 our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $known_clipboard_managers = [qw/klipper parcellite clipit xclip/];
 our $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
@@ -42,25 +42,6 @@ MARKDOWN
 );
 
 our %SPEC;
-
-sub _find_qdbus {
-    require File::Which;
-
-    my @paths;
-    if (my $path = File::Which::which("qdbus")) {
-        log_trace "qdbus found in PATH: $path";
-        push @paths, $path;
-    } else {
-        for my $dir ("/usr/lib/qt6/bin", "/usr/lib/qt5/bin") {
-            if ((-d $dir) && (-x "$dir/qdbus")) {
-                log_trace "qdbus found in $dir";
-                push @paths, "$dir/qdbus";
-            }
-        }
-    }
-
-    @paths;
-}
 
 $SPEC{':package'} = {
     v => 1.1,
@@ -113,14 +94,15 @@ sub detect_clipboard_manager {
             log_trace "Checking whether clipboard manager klipper is running ...";
 
           METHOD1: {
-                my @paths = _find_qdbus();
+                require Desktop::KDE::Util;
+                my $paths = Desktop::KDE::Util::which_qdbus();
 
-                unless (@paths) {
+                unless (@$paths) {
                     log_trace "qdbus not found, checking using qdbus";
                     last;
                 }
 
-                for my $path (@paths) {
+                for my $path (@$paths) {
                     my $out;
                     system({capture_merged=>\$out}, $path, "org.kde.klipper", "/klipper");
                     unless ($? == 0) {
@@ -189,7 +171,8 @@ sub detect_clipboard_manager {
             $info->{xclip_path} = $path;
         } # DETECT_XCLIP
 
-        log_trace "No known clipboard manager is detected";
+        log_trace "No known clipboard manager is detected"
+            unless $info->{manager};
     } # DETECT
 
     if ($args{detail}) {
@@ -285,13 +268,19 @@ sub clear_clipboard_content {
     } elsif ($clipboard_manager eq 'clipit') {
         return [501, "Not yet implemented"];
     } elsif ($clipboard_manager eq 'xclip') {
-        # implemented by setting primary to empty string
+        # implemented by setting both primary and clipboard to empty string
 
-        open my $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
+        my $fh;
+        open $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
             or return [500, "xclip -i -selection primary failed (1): $!"];
         print $fh '';
         close $fh
             or return [500, "xclip -i -selection primary failed (2): $!"];
+        open $fh, "| xclip -i -selection clipboard" ## no critic: InputOutput::ProhibitTwoArgOpen
+            or return [500, "xclip -i -selection clipboard failed (1): $!"];
+        print $fh '';
+        close $fh
+            or return [500, "xclip -i -selection clipboard failed (2): $!"];
 
         return [200, "OK"];
     }
@@ -577,11 +566,18 @@ sub add_clipboard_content {
         # not as the current one
         return [501, "Not yet implemented"];
     } elsif ($clipboard_manager eq 'xclip') {
-        open my $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
+        my $fh;
+
+        open $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
             or return [500, "xclip -i -selection primary failed (1): $!"];
         print $fh $content;
         close $fh
             or return [500, "xclip -i -selection primary failed (2): $!"];
+        open $fh, "| xclip -i -selection clipboard" ## no critic: InputOutput::ProhibitTwoArgOpen
+            or return [500, "xclip -i -selection clipboard failed (1): $!"];
+        print $fh $content;
+        close $fh
+            or return [500, "xclip -i -selection clipboard failed (2): $!"];
         print $content0 if $args{tee};
         return [200, "OK"];
     }
@@ -604,7 +600,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.015 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2025-06-16.
+This document describes version 0.016 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2026-06-17.
 
 =head1 DESCRIPTION
 
@@ -946,6 +942,12 @@ Source repository is at L<https://github.com/perlancar/perl-Clipboard-Any>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 =head1 CONTRIBUTING
 
 
@@ -966,7 +968,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

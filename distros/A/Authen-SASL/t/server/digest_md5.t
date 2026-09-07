@@ -8,7 +8,7 @@ BEGIN {
     eval { require Digest::HMAC_MD5 } or Test::More->import(skip_all => 'Need Digest::HMAC_MD5');
 }
 
-use Test::More (tests => 33);
+use Test::More (tests => 38);
 
 use Authen::SASL qw(Perl);
 use_ok 'Authen::SASL::Perl::DIGEST_MD5';
@@ -232,4 +232,37 @@ is($server->mechanism, 'DIGEST-MD5', 'conn mechanism');
         ok !$server->is_success, "replay attack";
         like $server->error, qr/nonce-count.*match/i, $server->error;
     }
+}
+
+## a response captured from another session (replayed nonce)
+{
+    ## valid for the nonce md5_hex("foobaz") issued above
+    my $captured = join ",", qw(
+        charset=utf-8
+        cnonce="3858f62230ac3c915f300c664312c63f"
+        digest-uri="ldap/elwood.innosoft.com"
+        nc=00000001
+        nonce="80338e79d2ca9b9c090ebaaa2ef293c7"
+        qop=auth
+        realm="elwood.innosoft.com"
+        response=39ab7388b1f52492b1b87cda55177d04
+        username="gbarr"
+    );
+
+    ## control: this server issues that nonce, so it must be accepted
+    $server = $sasl->server_new("ldap","elwood.innosoft.com");
+    $server->server_start('');
+    $server->server_step($captured);
+    ok  $server->is_success, "response for the nonce we issued";
+    ok !$server->error, "no error" or diag $server->error;
+
+    ## the same response against a server that issued a different nonce
+    local $Authen::SASL::Perl::DIGEST_MD5::NONCE = "barquux";
+    $server = $sasl->server_new("ldap","elwood.innosoft.com");
+    my $ss;
+    $server->server_start('', sub { $ss = shift });
+    like $ss, qr/nonce="0e3bc3eed574191aefba34601d78f5c7"/, "a different nonce was issued";
+    $server->server_step($captured);
+    ok !$server->is_success, "replayed response rejected";
+    like $server->error, qr/nonce does not match/i, $server->error;
 }

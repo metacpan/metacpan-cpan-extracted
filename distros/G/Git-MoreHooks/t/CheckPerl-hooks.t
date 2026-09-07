@@ -7,10 +7,9 @@ use Test2::Require::Module 'Perl::Critic';
 use Log::Any::Adapter ( 'Stderr', log_level => 'trace' );
 use Git::Hooks::Test ':all';
 use Path::Tiny;
-use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.16 and earlier
+use English qw( -no_match_vars );  # Avoids regex performance penalty in perl 5.16 and earlier
 
 my ( $repo, $clone, $T );
-
 # Eliminate the effects of system wide and global configuration.
 # https://metacpan.org/dist/Git-Repository/view/lib/Git/Repository/Tutorial.pod#Ignore-the-system-and-global-configuration-files
 my %git_test_env = (
@@ -31,7 +30,7 @@ sub setup_repos {
 sub modify_file {
     my ( $testname, $filepath, $action, $data ) = @_;
 
-    if ( !defined $data ) {
+    if( ! defined $data ) {
         fail($testname);
         diag("[TEST FRAMEWORK INTERNAL ERROR] No data\n");
     }
@@ -46,7 +45,7 @@ sub modify_file {
     }
 
     if ( $action eq 'append' ) {
-        if ( $file->append($data) ) {
+        if ( $file->append( $data ) ) {
             $repo->run( add => $file );
         }
         else {

@@ -1,5 +1,28 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.8.2    2026-09-06 14:12:23+01:00 Europe/London
+  [Security]
+  - Updated the minimum recommended version of Net::IP::LPM.
+
+  [Documentation]
+  - Updated author email address.
+
+  - Added security policy.
+
+  - Updated copyright year.
+
+  - Generate README with the UsefulReadme plugin.
+
+  [Tests]
+  - Added more author tests.
+
+  - Moved author tests into xt.
+
+  [Toolchain]
+  - Improved dist.ini.
+
+  - Use sigstore instead of Module::Signature, with is deprecated.
+
 v0.8.1    2024-07-15 13:23:22+01:00 Europe/London
   [Bug Fixes]
   - Specified a minimum version of Cache::FastMmap.

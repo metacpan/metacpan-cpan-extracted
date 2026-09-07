@@ -1,9 +1,10 @@
 
-use v5.14;
+use v5.10;
+use strict;
 use warnings;
 
-package Test::Load::Helper v1.0.2 {
-
+package Test::Load::Helper v2.0.0;
+{
 	use Carp qw (croak);
 	use Path::Tiny qw ();
 
@@ -38,6 +39,7 @@ END_OF_EVAL
 			;
 
 		$INC{$key} = "$file";
+
 		return 1;
 	}
 
@@ -47,13 +49,17 @@ END_OF_EVAL
 		my $level = 0;
 		while (my @info = caller ($level++)) {
 			my $file = $info[1];
-			next if $file eq __FILE__;
+
+			next
+				if $file eq __FILE__
+				;
+
 			return Path::Tiny::->new ($file)
 				if -f $file
 				;
 		}
 
-		return path ('.');
+		return;
 	}
 
 	sub identify_caller_package {
@@ -66,7 +72,11 @@ END_OF_EVAL
 		my $level = 0;
 		while (my @info = caller ($level++)) {
 			my $package = $info[0];
-			next if $package eq __PACKAGE__;
+
+			next
+				if $package eq __PACKAGE__
+				;
+
 			return $package;
 		}
 
@@ -77,9 +87,10 @@ END_OF_EVAL
 		my ($class, %args) = @_;
 		my $file = $args{file} // $DEFAULT_FILENAME;
 
-		my $caller_file = exists $args{caller_file}
-			? Path::Tiny::->new ($args{caller_file})
-			: $class->identify_caller_file (%args)
+		return
+			unless my $caller_file = exists $args{caller_file}
+				? Path::Tiny::->new ($args{caller_file})
+				: $class->identify_caller_file (%args)
 			;
 
 		my $caller_dir  = $caller_file->parent->absolute;

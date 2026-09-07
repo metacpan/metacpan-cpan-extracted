@@ -1,0 +1,8 @@
+Revision history for Punk-Push
+
+0.02    2026-09-07
+        Validate `subject` in the plugin instead of relying on VAPID's croak.
+        Fix a perl 5.16 parse failure in t/00-load.t.
+
+0.01    2026-09-06
+        First version.

@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
         'JSON::Schema::Fast'  => '0.09',   # provides jsf_abi.h
-        'Fetch'               => '0.13',   # provides fetch_abi.h
+        'Fetch'               => '0.23',   # provides fetch_abi.h; 0.23 = fork-safe loop
         'File::Raw::JSON'     => '0.07',   # provides frj_abi.h
     },
     TEST_REQUIRES => {

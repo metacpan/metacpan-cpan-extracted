@@ -1,0 +1,12 @@
+<header class="masthead">
+  <h1>Hello, {% name %}</h1>
+  <p class="lede">Signed in. The challenge had nothing to do with who you
+  are; it only cared that you paid.</p>
+</header>
+
+<section>
+  <form method="post" action="/logout">
+    {% raw csrf %}
+    <button>Sign out</button>
+  </form>
+</section>

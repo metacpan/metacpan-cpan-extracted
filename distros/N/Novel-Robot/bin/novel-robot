@@ -7,7 +7,6 @@ use Encode::Locale;
 use Encode;
 use Getopt::Long qw(:config no_ignore_case);
 use Novel::Robot;
-#use Data::Dumper;
 
 $| = 1;
 binmode( STDIN,  ":encoding(console_in)" );
@@ -34,10 +33,7 @@ GetOptions(
     'content_path=s',  'writer_path=s',  'book_path=s', 'item_list_path=s',
     'content_regex=s', 'writer_regex=s', 'book_regex=s',
 
-    'query_type|q=s', 'query_keyword|k=s', 'board|B=s', 
-
-    # remote ansible host
-    #'remote|R=s',
+    'board|B=s',
 
     # mail
     'mail_msg|m=s',
@@ -46,7 +42,7 @@ GetOptions(
     'mail_usr|U=s',
     'mail_pwd|P=s',
     'mail_from|F=s', 'mail_to|T=s',
-);
+) or exit 2;
 
 %opt = read_option( %opt );
 
@@ -76,13 +72,8 @@ if ( $opt{file} ) {
     }
 } elsif ( $opt{site} and $opt{writer} and $opt{book} ) {
     ( $outf, $bookr ) = $xs->get_novel( "$opt{writer}:$opt{book}", %opt );
-} elsif ( defined $opt{query_keyword} or defined $opt{board}) {
-    my $info_ref;
-    if(defined $opt{query_keyword}){
-        $info_ref  = $xs->{parser}->get_query_ref( $opt{query_keyword}, %opt );
-    }else{
-        $info_ref = $xs->{parser}->get_board_ref($opt{board}, %opt);
-    }
+} elsif ( defined $opt{board} ) {
+    my $info_ref = $xs->get_board_ref( $opt{board}, %opt );
 
     my $items_ref = $info_ref->{item_list};
 
@@ -130,16 +121,15 @@ sub read_option {
     $opt{max_process_num} //= 1;
     $opt{verbose}         //= 0;
 
-#    for my $k (
-#        qw/writer writer_path writer_regex book book_path book_regex content_path content_regex item_list_path
-#        chapter_regex
-#        grep_content filter_content
-#        query_keyword query_type
-#        /
-#    ) {
-#        next unless ( exists $opt{$k} );
-#	$opt{$k} = decode( locale => $opt{$k} );
-#    }
+    for my $k (
+        qw/writer writer_path writer_regex book book_path book_regex content_path content_regex item_list_path
+        chapter_regex
+        grep_content filter_content
+        /
+    ) {
+        next unless ( exists $opt{$k} );
+        $opt{$k} = decode( locale => $opt{$k} ) unless utf8::is_utf8( $opt{$k} );
+    }
 
 
     if ( $opt{page} ) {
@@ -151,11 +141,13 @@ sub read_option {
     }
 
     if ( $opt{file} ) {
-        my $tf = $opt{file};
+        # Command-line arguments are already encoded for the local filesystem.
+        # Decode a copy only for the writer/book metadata; re-encoding the path
+        # itself corrupts non-ASCII filenames (for example UTF-8 Chinese names).
+        my $tf = decode( locale => $opt{file} );
         my ( $tw, $tb, $suffix ) = $tf =~ m#([^\/\\]+)-([^\/\\]+)\.([^.]+)$#;
         $opt{writer} = $tw unless ( defined $opt{writer} );
         $opt{book}   = $tb unless ( defined $opt{book} );
-	$opt{file} = encode( locale => $opt{file} );
     }
 
     return %opt;
@@ -227,8 +219,6 @@ Usage: novel-robot [options]
 --writer_regex    : regex to extract writer, 提取writer的正则
 --book_regex      : regex to extract book, 提取book的正则
 
--q : query type, 查询类型
--k : query keyword, 查询关键字
 -B : board_url / board_id  版块url，或版块编号
 
 -m, --mail_msg : 消息

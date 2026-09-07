@@ -21,14 +21,14 @@ no_index:
 provides:
   BarefootJS::Backend::Xslate:
     file: lib/BarefootJS/Backend/Xslate.pm
-    version: v0.34.0
+    version: v0.35.0
 requires:
-  BarefootJS: v0.34.0
+  BarefootJS: v0.35.0
   Text::Xslate: v3.4.0
   perl: '5.020'
 resources:
   bugtracker: https://github.com/piconic-ai/barefootjs/issues
   homepage: https://barefootjs.dev
   repository: https://github.com/piconic-ai/barefootjs.git
-version: v0.34.0
+version: v0.35.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

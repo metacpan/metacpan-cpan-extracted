@@ -48,58 +48,58 @@
    "provides" : {
       "Authen::SASL" : {
          "file" : "lib/Authen/SASL.pm",
-         "version" : "2.2000"
+         "version" : "2.2100"
       },
       "Authen::SASL::CRAM_MD5" : {
          "file" : "lib/Authen/SASL/CRAM_MD5.pm",
-         "version" : "2.2000",
+         "version" : "2.2100",
          "x_deprecated" : 1
       },
       "Authen::SASL::EXTERNAL" : {
          "file" : "lib/Authen/SASL/EXTERNAL.pm",
-         "version" : "2.2000"
+         "version" : "2.2100"
       },
       "Authen::SASL::Perl" : {
          "file" : "lib/Authen/SASL/Perl.pm",
-         "version" : "2.2000"
+         "version" : "2.2100"
       },
       "Authen::SASL::Perl::ANONYMOUS" : {
          "file" : "lib/Authen/SASL/Perl/ANONYMOUS.pm",
-         "version" : "2.2000"
+         "version" : "2.2100"
       },
       "Authen::SASL::Perl::CRAM_MD5" : {
          "file" : "lib/Authen/SASL/Perl/CRAM_MD5.pm",
-         "version" : "2.2000",
+         "version" : "2.2100",
          "x_deprecated" : 1
       },
       "Authen::SASL::Perl::DIGEST_MD5" : {
          "file" : "lib/Authen/SASL/Perl/DIGEST_MD5.pm",
-         "version" : "2.2000",
+         "version" : "2.2100",
          "x_deprecated" : 1
       },
       "Authen::SASL::Perl::EXTERNAL" : {
          "file" : "lib/Authen/SASL/Perl/EXTERNAL.pm",
-         "version" : "2.2000"
+         "version" : "2.2100"
       },
       "Authen::SASL::Perl::GSSAPI" : {
          "file" : "lib/Authen/SASL/Perl/GSSAPI.pm",
-         "version" : "2.2000"
+         "version" : "2.2100"
       },
       "Authen::SASL::Perl::LOGIN" : {
          "file" : "lib/Authen/SASL/Perl/LOGIN.pm",
-         "version" : "2.2000"
+         "version" : "2.2100"
       },
       "Authen::SASL::Perl::OAUTHBEARER" : {
          "file" : "lib/Authen/SASL/Perl/OAUTHBEARER.pm",
-         "version" : "2.2000"
+         "version" : "2.2100"
       },
       "Authen::SASL::Perl::PLAIN" : {
          "file" : "lib/Authen/SASL/Perl/PLAIN.pm",
-         "version" : "2.2000"
+         "version" : "2.2100"
       },
       "Authen::SASL::Perl::XOAUTH2" : {
          "file" : "lib/Authen/SASL/Perl/XOAUTH2.pm",
-         "version" : "2.2000"
+         "version" : "2.2100"
       }
    },
    "release_status" : "stable",
@@ -114,7 +114,7 @@
          "web" : "https://github.com/perl-authen-sasl/perl-authen-sasl/"
       }
    },
-   "version" : "2.2000",
+   "version" : "2.2100",
    "x_contributors" : [
       "Aditya Garg <gargaditya08@live.com>",
       "Chris Ridd <chris.ridd@isode.com>",

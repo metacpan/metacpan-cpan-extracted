@@ -1,6 +1,20 @@
 Revision history for Fetch
 
+0.23    2026-09-06
+        - A Fetch::Loop::Standalone inherited across a fork no longer
+          touches the parent's backend, whose kernel object is shared
+          rather than copied. A child exiting with an inherited Fetch
+          deregistered the parent's sockets on epoll and, on io_uring,
+          left the parent submitting stale entries forever.
+        - A backend inherited across a fork closes no descriptor at
+          destroy: on macOS the dead kqueue's number is already the
+          child's own new kqueue.
+        - t/28-fork.t.
+
 0.22    2026-09-02
+        - A future failed with a blessed error raised it as a plain string
+          on perls before 5.14. The croak_sv shim had no branch for a
+          reference.
         - t/26-awaitable.t asserts cancellation across an await only on
           perl 5.24+, which is where Future::AsyncAwait chains the awaited
           future rather than registering a code block that reaches nothing.

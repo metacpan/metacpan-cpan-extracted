@@ -17,11 +17,22 @@ typedef struct ft_timer {
     SV               *cb;
     int               oneshot;
     UV                id;        /* the token the backend holds; never reused */
+    double            secs;      /* as requested, for re-arming an interval */
+    double            due;       /* monotonic deadline, for re-arming a oneshot */
     struct ft_timer  *next;
 } ft_timer;
 
+/* the monotonic clock the deadline backends already keep */
+#ifdef _WIN32
+#define ft_loop_now() hm_sel_now()
+#else
+#define ft_loop_now() hm_poll_now()
+#endif
+
 struct hm_loop {                 /* name matches ft_future.h's forward decl */
-    hm_backend *be;
+    hm_backend *be;              /* NULL between a fork and the child's first need */
+    const char *be_name;         /* the backend to rebuild with (a static string) */
+    IV          pid;             /* the process whose kernel object `be` is */
     SV        **rcb;             /* [HM_MAXFD] read-ready callbacks  */
     SV        **wcb;             /* [HM_MAXFD] write-ready callbacks */
     ft_timer   *timers;          /* live timers, for dispatch + cleanup */
@@ -55,20 +66,93 @@ static ft_loop *ft_loop_new(pTHX_ const char *name) {
     if (!l) croak("Fetch::Loop: out of memory");
     l->be = hm_backend_create(name && *name ? name : NULL);
     if (!l->be) { free(l); croak("Fetch::Loop: no event backend available"); }
+    l->be_name = l->be->name;
+    l->pid     = (IV)PerlProc_getpid();
     l->rcb = (SV **)calloc(HM_MAXFD, sizeof(SV *));
     l->wcb = (SV **)calloc(HM_MAXFD, sizeof(SV *));
     if (!l->rcb || !l->wcb) croak("Fetch::Loop: out of memory");
     return l;
 }
 
+/* A loop inherited across a fork must never reach its backend again.
+ *
+ * The backend's kernel object is SHARED with the parent, not copied. An epoll
+ * instance is one interest list for both processes, so a child "cleaning up"
+ * its inherited watchers deregisters the parent's sockets and the parent
+ * waits on an empty set forever. An io_uring is worse: the submission ring is
+ * shared memory, while liburing's cursors are per-process copies that stop
+ * agreeing the moment the parent submits again. The child's first
+ * io_uring_submit then hands the kernel a wrapped-negative count, the kernel
+ * pushes a full ring of stale entries, and the parent - now equally out of
+ * step - loops on io_uring_enter submitting 1024 dead requests per call
+ * until the machine runs out of memory. That is exactly what a forked test
+ * server did at exit, through global destruction of a Fetch it never used.
+ *
+ * So the first call that finds the pid changed disowns the loop: the
+ * inherited backend is released with `foreign` set (memory only, no
+ * descriptor, no ring) and a fresh one is built only if this process goes
+ * on to need one. A child that merely exits, running DESTROY on the way,
+ * never creates a ring just to tear it down. The watcher and timer tables
+ * are KEPT and mirrored onto the new backend when it is built: they are
+ * the child's copies of live connections, and a parked connection revived
+ * from the pool sends without re-arming, trusting that it is still
+ * READ-armed exactly as it was parked. */
+#define FT_LOOP_INHERITED(l) ((l)->pid != (IV)PerlProc_getpid())
+
+static void ft_loop_disown(pTHX_ ft_loop *l) {
+    l->pid = (IV)PerlProc_getpid();
+    if (l->be) { l->be->foreign = 1; l->be->destroy(l->be); l->be = NULL; }
+}
+
+/* Called on every entry that can reach the backend: hands back a backend
+ * this process owns, building one after a fork the first time it is needed.
+ * NULL only when nothing is needed (need == 0) and there is none. */
+static hm_backend *ft_loop_be(pTHX_ ft_loop *l, int need) {
+    if (FT_LOOP_INHERITED(l)) ft_loop_disown(aTHX_ l);
+    if (!l->be && need) {
+        int       fd;
+        ft_timer *t;
+        double    now;
+        l->be = hm_backend_create(l->be_name);
+        if (!l->be) l->be = hm_backend_create(NULL);
+        if (!l->be) croak("Fetch::Loop: no event backend available");
+        for (fd = 0; fd < HM_MAXFD; fd++) {
+            int mask = (l->rcb[fd] ? HM_EV_READ : 0) | (l->wcb[fd] ? HM_EV_WRITE : 0);
+            if (mask) l->be->add_io(l->be, fd, mask, 0);
+        }
+        now = ft_loop_now();
+        for (t = l->timers; t; t = t->next) {
+            double left = t->oneshot ? t->due - now : t->secs;
+            if (left < 0) left = 0;
+            l->be->add_timer(l->be, left, t->oneshot, ft_timer_token(t->id));
+        }
+    }
+    return l->be;
+}
+
 static void ft_loop_free(pTHX_ ft_loop *l) {
     int fd;
     ft_timer *t;
     if (!l) return;
-    if (l->rcb) { for (fd = 0; fd < HM_MAXFD; fd++) if (l->rcb[fd]) SvREFCNT_dec(l->rcb[fd]); free(l->rcb); }
-    if (l->wcb) { for (fd = 0; fd < HM_MAXFD; fd++) if (l->wcb[fd]) SvREFCNT_dec(l->wcb[fd]); free(l->wcb); }
-    for (t = l->timers; t; ) { ft_timer *n = t->next; if (t->cb) SvREFCNT_dec(t->cb); free(t); t = n; }
+    if (FT_LOOP_INHERITED(l)) ft_loop_disown(aTHX_ l);
+    if (l->rcb) {
+        for (fd = 0; fd < HM_MAXFD; fd++) {
+            SV *cb = l->rcb[fd];
+            if (cb) { l->rcb[fd] = NULL; SvREFCNT_dec(cb); }
+        }
+    }
+    if (l->wcb) {
+        for (fd = 0; fd < HM_MAXFD; fd++) {
+            SV *cb = l->wcb[fd];
+            if (cb) { l->wcb[fd] = NULL; SvREFCNT_dec(cb); }
+        }
+    }
+    t = l->timers;
+    l->timers = NULL;
+    while (t) { ft_timer *n = t->next; if (t->cb) SvREFCNT_dec(t->cb); free(t); t = n; }
     if (l->be) l->be->destroy(l->be);
+    free(l->rcb);
+    free(l->wcb);
     free(l);
 }
 
@@ -100,28 +184,33 @@ static void ft_call0(pTHX_ SV *cb) {
 }
 
 static void ft_watch_io(pTHX_ ft_loop *l, int fd, int mask, SV *cb) {
+    hm_backend *be = ft_loop_be(aTHX_ l, 1);
     if (fd < 0 || fd >= HM_MAXFD) croak("watch_io: fd %d out of range", fd);
     if (mask & HM_EV_READ)  { if (l->rcb[fd]) SvREFCNT_dec(l->rcb[fd]); else l->nio++; l->rcb[fd] = SvREFCNT_inc(cb); }
     if (mask & HM_EV_WRITE) { if (l->wcb[fd]) SvREFCNT_dec(l->wcb[fd]); else l->nio++; l->wcb[fd] = SvREFCNT_inc(cb); }
-    l->be->add_io(l->be, fd, mask, 0);
+    be->add_io(be, fd, mask, 0);
 }
 
 static void ft_unwatch_io(pTHX_ ft_loop *l, int fd, int mask) {
+    hm_backend *be = ft_loop_be(aTHX_ l, 0);
     if (fd < 0 || fd >= HM_MAXFD) return;
     if (mask & HM_EV_READ)  { if (l->rcb[fd]) { SvREFCNT_dec(l->rcb[fd]); l->rcb[fd] = NULL; l->nio--; } }
     if (mask & HM_EV_WRITE) { if (l->wcb[fd]) { SvREFCNT_dec(l->wcb[fd]); l->wcb[fd] = NULL; l->nio--; } }
-    l->be->remove_io(l->be, fd, mask);
+    if (be) be->remove_io(be, fd, mask);
 }
 
 static ft_timer *ft_add_timer(pTHX_ ft_loop *l, double secs, SV *cb, int oneshot) {
+    hm_backend *be = ft_loop_be(aTHX_ l, 1);
     ft_timer *t = (ft_timer *)calloc(1, sizeof(ft_timer));
     if (!t) croak("Fetch: out of memory");
     t->cb      = SvREFCNT_inc(cb);
     t->oneshot = oneshot ? 1 : 0;
+    t->secs    = secs;
+    t->due     = ft_loop_now() + secs;
     t->id      = ++l->last_timer_id;
     t->next    = l->timers;
     l->timers  = t;
-    l->be->add_timer(l->be, secs, oneshot, ft_timer_token(t->id));
+    be->add_timer(be, secs, oneshot, ft_timer_token(t->id));
     return t;
 }
 
@@ -142,8 +231,14 @@ static void ft_timer_unlink(pTHX_ ft_loop *l, ft_timer *dead) {
  * then unlink+free. (The fire path in hm_loop_run unlinks without del_timer,
  * since a oneshot the backend has already dropped.) */
 static void ft_del_timer(pTHX_ ft_loop *l, ft_timer *t) {
+    hm_backend *be = ft_loop_be(aTHX_ l, 0);
+    ft_timer   *p;
     if (!t) return;
-    l->be->del_timer(l->be, ft_timer_token(t->id));
+    /* Only a timer still linked is ours to read: a connection copied into a
+     * forked child still points at a timer the disown above has freed. */
+    for (p = l->timers; p && p != t; p = p->next) ;
+    if (!p) return;
+    if (be) be->del_timer(be, ft_timer_token(t->id));
     ft_timer_unlink(aTHX_ l, t);
 }
 
@@ -156,8 +251,13 @@ static void hm_loop_run(pTHX_ struct hm_loop *l, SV *until) {
     l->stop = 0;
 
     while (!l->stop) {
-        hm_event evs[HM_MAXEV];
+        hm_event    evs[HM_MAXEV];
+        hm_backend *be;
         int n, i;
+
+        /* Per turn, not per call: a callback may fork, and the child that
+         * carries on from inside it must not pump the parent's backend. */
+        be = ft_loop_be(aTHX_ l, 1);
 
         hmf_pump(aTHX);                       /* drain future continuations */
         if (until && hmf_state(aTHX_ until) != HMF_PENDING) break;
@@ -174,7 +274,7 @@ static void hm_loop_run(pTHX_ struct hm_loop *l, SV *until) {
                   "future belongs to a different loop");
         }
 
-        n = l->be->wait_ev(l->be, evs, HM_MAXEV, -1.0);
+        n = be->wait_ev(be, evs, HM_MAXEV, -1.0);
         if (n < 0) { if (errno == EINTR) continue; break; }
 
         for (i = 0; i < n && !l->stop; i++) {

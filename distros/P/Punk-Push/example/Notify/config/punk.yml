@@ -1,0 +1,22 @@
+# Notify configuration.
+
+views:
+  Stencil:
+    template_dir: root/templates
+    wrapper: layout.tmpl
+
+static:
+  /static: root/static
+
+# The origin the feed of absolute URLs is built on, and what a browser must be
+# served over for the Push API to work at all: HTTPS, or localhost.
+host: http://localhost:5000
+
+database:
+  dsn: dbi:SQLite:dbname=var/notify.db
+
+# `auth` needs a session. In a real deployment the secret comes from the
+# environment; the demo falls back so `plackup app.psgi` works out of the box.
+session:
+  secret: { $env: NOTIFY_SESSION_KEY, default: demo-only-not-a-secret }
+  expires: 7d

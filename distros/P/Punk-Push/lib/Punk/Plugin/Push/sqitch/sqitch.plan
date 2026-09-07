@@ -1,0 +1,5 @@
+%syntax-version=1.0.0
+%project=punk_push
+%uri=https://metacpan.org/pod/Punk::Plugin::Push
+
+push_subscriptions 2026-09-05T12:00:00Z LNATION <email@lnation.org> # the Web Push subscriptions table

@@ -1,12 +1,30 @@
 Revision history for Perl extension Net::IP::LPM.
 
+1.12 Sun Sep 6, 2026
+  [Bug Fixes]
+  - fixed CVE-2026-86287 with improved validation of prefixes
+
+  - added missing META.json to the MANIFEST
+
+  [Documentation]
+  - updated README
+
+  - added AI_POLICY.md
+
+1.11 Sun Sep 6, 2026
+        - Fix CVE-2026-56015 by bounding prefix_length
+	- Fix CVE-2025-40910 by reverting back to inet_pton
+	- updated documentation with new maintainer
+	- updated metadata with git repository
+	- added Net::Patricia to SEE ALSO
+
 1.10 Mon Aug 3 2015
 	- Socket6 module is not required starting with perl 5.14.0
 	- removed bug #106168, thanks to jmaslak@antelope.net
 	- buggy implementation of inet_pton in Ubuntu
-	
+
 1.09 Mon Dec 1 2014
-	- buffer bug removed 
+	- buffer bug removed
 
 1.07 Fri Nov 21 2014
 	- added more tests
@@ -18,31 +36,30 @@ Revision history for Perl extension Net::IP::LPM.
 	- crashes on emty database
 
 1.04 Mon Sept 26 2013
-	- language corrections 
-	- doc updated 
+	- language corrections
+	- doc updated
 
 1.03 Tue Sept 20 2013
-	- code update to work on Windows platform 
-	- removed dependencu on DBFile package 
+	- code update to work on Windows platform
+	- removed dependencu on DBFile package
 	- little performance increased (4-5%)
 
 1.02 Fri Sept 16 2013
 	- critical part of code moved to C (thanks to Martin Ministr)
-	- algo changed from prefix search to Trie 
+	- algo changed from prefix search to Trie
 	- significant performance increase (5-10 times faaster)
-	- methos ->info added 
+	- methos ->info added
 
 0.03  Fri Mar 15 2013
 	- byte order buf fix (bug appear when mathcing x.y.z.a/4 mask)
-    - non existing prefix returns undef instead of empty string 
+    - non existing prefix returns undef instead of empty string
 
 0.02  Sat Jan 12 2013
 	- code updated to be compatible with perl 6.2.2
-	- first stable version 
+	- first stable version
 
 0.01_02  Mon Jan 7 2013
-	- tests updated to be platform independend 
+	- tests updated to be platform independend
 
 0.01_01  Sun Dec 16 2012
 	- initial version  - pre release
-

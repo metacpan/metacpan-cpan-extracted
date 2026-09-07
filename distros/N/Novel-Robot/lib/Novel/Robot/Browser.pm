@@ -7,19 +7,13 @@ use utf8;
 
 our $VERSION = 0.23;
 
-#use Data::Dumper;
-#use Parallel::ForkManager;
-#use Smart::Comments;
-
 use Encode::Detect::CJK qw/detect/;
 use Encode;
 use File::Slurp qw/slurp/;
 use HTTP::CookieJar;
 use HTTP::Tiny;
 use IO::Uncompress::Gunzip qw(gunzip);
-use Term::ProgressBar;
 use URI::Escape;
-use URI;
 use Firefox::Marionette();
 
 

@@ -2,10 +2,6 @@
 use lib '../lib';
 use Novel::Robot;
 use Test::More;
-#use Data::Dumper;
-use Encode::Locale;
-use Encode;
-use Smart::Comments;
 
 $| = 1;
 binmode( STDIN,  ":encoding(console_in)" );

@@ -15,9 +15,6 @@ use utf8;
 use base 'Novel::Robot::Parser';
 
 use Web::Scraper;
-use Encode;
-#use Data::Dumper;
-#use Smart::Comments;
 
 sub base_url { 'https://www.jjwxc.net' }
 
@@ -68,9 +65,13 @@ sub parse_board {
   my ( $self, $h ) = @_;
 
   my $parse_writer = scraper {
-    process_first '//tr[@valign="bottom"]//b', writer => 'TEXT';
+    process_first '//*[@itemprop="name"]', writer => 'TEXT';
   };
   my $ref = $parse_writer->scrape( $h );
+
+  if ( !$ref->{writer} ) {
+    ( $ref->{writer} ) = $$h =~ m#<meta\s+name="Description"\s+content="([^,]+),#i;
+  }
 
   $self->tidy_string( $ref, 'writer' );
   return { writer => $ref->{writer} };
@@ -114,86 +115,26 @@ sub parse_writer_series_name {
 sub parse_writer_book_info {
   my ( $self, $tr, $series ) = @_;
 
-  my $book = $tr->look_down( '_tag', 'a' );
+  my $book = $tr->look_down(
+    '_tag', 'a',
+    sub { ( $_[0]->attr( 'href' ) || '' ) =~ m#(?:^|/)onebook\.php\?novelid=\d+# }
+  );
   return unless ( $book );
 
   my $book_url = $book->attr( 'href' );
 
   my $bookname = $book->as_trimmed_text;
-  substr( $bookname, 0, 1 ) = '';
-  $bookname .= '[锁]' if ( $tr->look_down( 'color', 'gray' ) );
+  return unless ( $bookname );
 
-  my $status = ( $tr->look_down( '_tag', 'td' ) )[4]->as_trimmed_text;
+  my @cells = $tr->look_down( '_tag', 'td' );
+  return unless ( @cells >= 3 );
+  my $status = $cells[2]->as_trimmed_text;
   return {
     series => $series,
     book   => "$bookname($status)",
-    url    => $self->base_url() . "/$book_url",
+    url    => $book_url,
   };
 
 } ## end sub parse_writer_book_info
-
-sub make_query_request {
-
-  my ( $self, $keyword, %opt ) = @_;
-  $opt{query_type} ||= '作品';
-
-  my %qt = (
-    '作品' => '1',
-    '作者' => '2',
-    '主角' => '4',
-    '配角' => '5',
-    '其他' => '6',
-  );
-
-  $keyword = $self->encode_cjk_for_url($keyword);
-  my $url = $self->base_url() . qq[/search.php?kw=$keyword&t=$qt{$opt{query_type}}];
-  #$url = encode( $self->charset(), $url );
-
-  return $url;
-} ## end sub make_query_request
-
-sub parse_query_list {
-  my ( $self, $h ) = @_;
-  my $parse_query = scraper {
-    process '//div[@class="page"]/a', 'urls[]' => sub {
-      return unless ( $_[0]->as_text =~ /^\[\d*\]$/ );
-      my $url = $self->base_url() . ( $_[0]->attr( 'href' ) );
-      $url = encode( $self->charset(), $url );
-      return $url;
-    };
-  };
-  my $r = $parse_query->scrape( $h );
-  return $r->{urls} || [];
-} ##
-
-sub parse_query_item {
-  my ( $self, $h ) = @_;
-
-  my $parse_query = scraper {
-    process '//h3[@class="title"]/a',
-      'books[]' => {
-      'book' => 'TEXT',
-      'url'  => '@href',
-      };
-
-    process '//div[@class="info"]', 'writers[]' => sub {
-      my ( $writer, $status ) = $_[0]->as_text =~ /作者：(.+?) \┃ 进度：(\S+)/s;
-      return { writer => $writer, status => $status };
-    };
-  };
-  my $ref = $parse_query->scrape( $h );
-
-  my @result;
-  foreach my $i ( 0 .. $#{ $ref->{books} } ) {
-    my $r = $ref->{books}[$i];
-    next unless ( $r->{url} );
-
-    my $w = $ref->{writers}[$i];
-    $r->{title} .= "($w->{status})";
-    push @result, { %$w, %$r };
-  }
-
-  return \@result;
-} ## end sub parse_query_item
 
 1;

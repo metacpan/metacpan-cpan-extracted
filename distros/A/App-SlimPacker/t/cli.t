@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use FindBin;
+use Cwd ();
 use File::Temp qw(tempdir);
 use File::Path qw(mkpath);
 
@@ -72,15 +73,30 @@ my ($td, $out, $rc);
     is $rc, 0, 'trace subcommand exits 0';
     like $out, qr/App\/MyMod\.pm/, 'trace lists the bundled module';
 
-    # -- packlists-for subcommand (core module: loadable, no packlist
-    #    → empty output, still exit 0; both bare and path-form args work)
-    ($out, $rc) = run('packlists-for', 'Carp');
-    is $rc, 0, 'packlists-for exits 0 (bare module name)';
-    unlike $out, qr/Failed to load/, 'bare module name normalised, no load failure';
-    is $out, '', 'packlists-for prints nothing when no packlist exists';
-    ($out, $rc) = run('packlists-for', 'Carp.pm');
-    is $rc, 0, 'packlists-for exits 0 (path form)';
-    is $out, '', 'packlists-for path form prints nothing too';
+    # -- packlists-for subcommand
+    #    FatPacker's packlists_containing requires each target module, then maps
+    #    the loaded file's @INC path back to the .packlist(s) that list it. Use
+    #    fixture modules we control so nothing depends on how a tester's perl is
+    #    laid out (a core module like Carp can carry a site_perl .packlist).
+    my $fixture = Cwd::abs_path("$td/inc");
+    mkpath("$fixture/Fake");
+    mkpath("$fixture/auto/Fake/Mod");
+    write_fixture("$fixture/Fake/Mod.pm", "package Fake::Mod;\nsub ok { 1 }\n1;\n");
+    write_fixture("$fixture/auto/Fake/Mod/.packlist", "$fixture/Fake/Mod.pm\n");
+    write_fixture("$fixture/Fake/None.pm", "package Fake::None;\n1;\n");
+    {
+        local $ENV{PERL5LIB} = join(':', $fixture, ($ENV{PERL5LIB} // ()));
+        ($out, $rc) = run('packlists-for', 'Fake::Mod');
+        is $rc, 0, 'packlists-for exits 0 (bare module name)';
+        unlike $out, qr/Failed to load/, 'bare module name normalised, no load failure';
+        like $out, qr{auto/Fake/Mod/\.packlist\s*$}, 'prints the packlist for a module that has one';
+        ($out, $rc) = run('packlists-for', 'Fake/Mod.pm');
+        is $rc, 0, 'packlists-for exits 0 (path form)';
+        like $out, qr{auto/Fake/Mod/\.packlist\s*$}, 'path form finds the same packlist';
+        ($out, $rc) = run('packlists-for', 'Fake::None');
+        is $rc, 0, 'packlists-for exits 0 for a module without a packlist';
+        is $out, '', 'packlists-for prints nothing when no packlist exists';
+    }
 
     # -- tree subcommand (no packlists → empty fatlib, still 0)
     ($out, $rc) = run('tree');

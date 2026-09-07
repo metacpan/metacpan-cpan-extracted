@@ -29,7 +29,7 @@ const char *
 backend(self)
     SV *self
     CODE:
-        RETVAL = ft_loop_from_sv(aTHX_ self)->be->name;
+        RETVAL = ft_loop_from_sv(aTHX_ self)->be_name;
     OUTPUT:
         RETVAL
 

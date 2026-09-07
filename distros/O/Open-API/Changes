@@ -1,5 +1,12 @@
 Revision history for Open-API
 
+0.12	2026-09-06
+        - t/16-security.t forked its second server after the Fetch client
+          existed; the child's exit tore down the inherited event loop,
+          which hung the parent on epoll and ran the machine out of memory
+          on io_uring. Every server is now forked before the first Fetch.
+        - Fetch floor 0.23, whose loop survives a fork either way.
+
 0.11	2026-08-20
         - FIX: change abi version checks from == to <=
 

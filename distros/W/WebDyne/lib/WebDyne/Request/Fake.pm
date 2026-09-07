@@ -33,7 +33,6 @@ use HTTP::Headers::Fast;
 use HTTP::Negotiate qw(choose);
 use HTTP::AcceptLanguage;
 use HTTP::Headers::Util qw(split_header_words);
-use CGI::Simple::Cookie;
 use File::stat;
 use File::Spec;
 use File::Spec::Unix;
@@ -45,7 +44,7 @@ use URI;
 
 #  Version information
 #
-$VERSION='3.026';
+$VERSION='3.027';
 
 
 #  Debug load
@@ -285,6 +284,7 @@ sub body {
 sub cookies {
 
     my $r=shift();
+    require CGI::Simple::Cookie;
     my %cookies=CGI::Simple::Cookie->parse(
         $r->headers_in('cookie'));
     if (@_) {

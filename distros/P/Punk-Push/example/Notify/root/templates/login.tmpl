@@ -1,0 +1,15 @@
+<header class="masthead">
+  <p class="wordmark" aria-label="Punk"><b>P</b><b>U</b><b>N</b><b>K</b></p>
+  <h1>Sign in</h1>
+  <p class="lede">A subscription belongs to a user, so /push/subscribe is
+  guarded. The seed script made one account.</p>
+</header>
+
+<section>
+{% if error %}  <p class="sticker">that did not match</p>
+{% end %}  <form method="post" action="/login">
+    <p><input name="email" value="demo@example.com" placeholder="email"></p>
+    <p><input name="password" type="password" value="demo" placeholder="password"></p>
+    <p><button>Sign in</button></p>
+  </form>
+</section>

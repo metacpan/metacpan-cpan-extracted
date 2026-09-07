@@ -1,0 +1,32 @@
+<header class="masthead">
+  <h1>Gate</h1>
+  <p class="lede">A form behind a proof-of-work challenge. No third party,
+  no image, nothing a human has to look at.</p>
+</header>
+
+<section>
+  <h2>What this shows</h2>
+  <ul class="next">
+    <li><strong>The login form is behind <code>always</code>.</strong>
+      <a href="/login">Sign in</a> and the first thing you see is "One
+      moment": the browser solves a sixteen-bit puzzle in a Worker, posts
+      the solution, and arrives at the form with a clearance cookie that
+      holds for an hour. You will not see the puzzle again until then.</li>
+    <li><strong>The API is behind <code>after</code>.</strong>
+      <code>/api/time</code> is free for thirty requests a minute per /24.
+      Past that, a program gets a <code>403</code> naming the puzzle in
+      <code>X-Challenge</code>, and pays once. Under any server but
+      Hyperman there is no shared counter and the rule is inert; run it
+      with <code>plackup -s Hyperman</code> to see it fire.</li>
+    <li><strong>From a shell.</strong>
+      <pre>curl -si http://localhost:5000/login | grep X-Challenge
+punk challenge solve &lt;the puzzle&gt;
+curl -si -H 'X-Challenge-Response: &lt;the solution&gt;' http://localhost:5000/login</pre></li>
+  </ul>
+</section>
+
+<section>
+  <h2>This request</h2>
+  <p>Cleared: <code>{% cleared %}</code>. Signed in as:
+  <code>{% name | default('nobody') %}</code>.</p>
+</section>

@@ -6,9 +6,7 @@ use utf8;
 
 use base 'Novel::Robot::Parser';
 
-use Encode;
 use Web::Scraper;
-use URI::Escape;
 
 sub base_url { 'http://bbs.jjwxc.net' }
 
@@ -123,76 +121,5 @@ sub parse_board_list {
     map { $self->base_url()."/$u$_" } ( 2 .. $n );
   return \@board_urls;
 }
-
-sub make_query_request {
-
-  my ( $self, $keyword, %opt ) = @_;
-  $opt{query_type} ||= '贴子主题';
-
-  my %qt = (
-    '主题贴内容'    => 1,
-    '跟贴内容'       => 2,
-    '贴子主题'       => 3,
-    '主题贴发贴人' => 4,
-    '跟贴发贴人'    => 5,
-  );
-  my $type = $qt{ $opt{query_type} };
-
-  my $url = $self->base_url() . '/search.php?act=search';
-
-  #my $kw = uri_escape(encode($self->charset(),$keyword));
-  my $post = {
-    'board' => $opt{board} +0,
-
-    #'keyword' => $kw,
-    'topic' => $type,
-
-    #'submit' => uri_escape(encode($self->charset(),'查询')),
-    'keyword' => encode( $self->charset(), $keyword ),
-    'submit'  => encode( $self->charset(), '查询' ),
-  };
-  my $post_str = $self->{browser}->format_post_content( $post );
-
-  my $u = "$url&$post_str";
-  return $u;
-
-} ## end sub make_query_request
-
-sub parse_query_list {
-  my ( $self, $h ) = @_;
-  my ( $page_num ) = $$h =~ m[var phpCount = (\d+);]si;
-  my ( $url )      = $$h =~ m[id="selectpage" onChange="location.href='(.+?)'\+this.value">]si;
-  my @urls = map { encode( $self->charset(), $self->base_url()."$url$_" ) } ( 2 .. $page_num );
-
-  return \@urls;
-}
-
-sub parse_query_item {
-  my ( $self, $h ) = @_;
-  my $parse_query = scraper {
-    process '//table[@cellpadding="2"]//tr', 'tzs[]' => scraper {
-      process_first '//a', 'url'    => '@href';
-      process '//td',      'info[]' => 'TEXT';
-    };
-    result 'tzs';
-  };
-  my $ref  = $parse_query->scrape( $h );
-  my @data = map {
-    my $r = $_->{info};
-    s/^\s+|\s+$//g for @$r;
-    $_->{url} =~ s/keyword=[^&]+&//;
-    { url    => $self->base_url()."/$_->{url}",
-      title  => $r->[1],
-      writer => $r->[2],
-      time_s => $r->[3],
-      time_e => $r->[4],
-      reply  => $r->[5] +0,
-    }
-    }
-    grep {
-    $_->{url}
-    } @$ref;
-  return \@data;
-} ## end sub parse_query_item
 
 1;

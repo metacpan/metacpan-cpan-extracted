@@ -10,13 +10,15 @@ use lib "$FindBin::Bin/../lib";
 #
 # Thin front-end for App::SlimPacker::minify_file: reads each file, runs it
 # through the PPI minifier and prints the result to STDOUT (or -o FILE). The
-# default renames my variables to short names; --no-rename keeps them.
+# default renames my variables to short names; --no-rename keeps them and
+# --rewrite enables the optional keyword/operator shortening pass.
 
-my ($output, $no_rename);
+my ($output, $no_rename, $rewrite);
 Getopt::Long::Configure('no_ignorecase');
 Getopt::Long::GetOptionsFromArray(\@ARGV,
     'o|output=s' => \$output,
     'no-rename'  => \$no_rename,
+    'rewrite'    => \$rewrite,
     'help'       => \my $help,
 ) or exit 2;
 
@@ -29,6 +31,9 @@ Usage: minify [OPTIONS] FILE...
   -o, --output FILE  write minified FILE to FILE (needs exactly one input;
                      default: print to STDOUT)
   --no-rename        minify but leave variable names untouched
+  --rewrite          also rewrite keywords/operators into shorter equivalent
+                     forms (foreach->for, m/->/, drop ; before }, +=1->++,
+                     $x=$x+$y->$x+=$y, print($x)->print $x); experimental
   -h, --help         this help
 
 The default renames my variables to short names (a, b, ...). See
@@ -44,7 +49,8 @@ die "minify: missing source file\n" unless @ARGV;
 die "minify: -o needs exactly one source file\n" if $output && @ARGV > 1;
 
 my @out = map {
-    my $m = minify_file($_, rename => $no_rename ? 0 : 1);
+    my $m = minify_file($_, rename => $no_rename ? 0 : 1,
+                           rewrite => $rewrite ? 1 : 0);
     $m .= "\n" unless $m =~ /\n\z/;
     $m;
 } @ARGV;

@@ -5,10 +5,6 @@ use strict;
 use warnings;
 use utf8;
 
-#use Data::Dumper;
-#use Novel::Robot::Browser;
-#use Smart::Comments;
-
 use Encode;
 use HTML::TreeBuilder;
 use URI;
@@ -102,6 +98,22 @@ sub base_url  { }
 sub generate_novel_url {
 	my ( $self, $index_url, @args ) = @_;
 	return ( $index_url, @args );
+}
+
+sub generate_next_page_url {
+	my ( $self, $current_url, $page_num, $h ) = @_;
+	return unless ( $h and $$h );
+
+	my $next_url = $self->scrape_element(
+		$h,
+		[
+			{ path => '//a[normalize-space(.)="下一页"]', extract => '@href' },
+			{ path => '//a[contains(@class,"next")]', extract => '@href' },
+		],
+	);
+	return unless ( defined $next_url and $next_url =~ /\S/ );
+
+	return $self->generate_abs_url( $next_url, $current_url );
 }
 
 sub parse_novel {
@@ -609,5 +621,3 @@ sub encode_cjk_for_url {
 
 
 1;
-
-

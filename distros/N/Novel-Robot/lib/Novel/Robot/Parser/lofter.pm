@@ -6,7 +6,6 @@ use utf8;
 
 use base 'Novel::Robot::Parser';
 
-#use HTML::Entities;
 use Encode;
 use Web::Scraper;
 use JSON;

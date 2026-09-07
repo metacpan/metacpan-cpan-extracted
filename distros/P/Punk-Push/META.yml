@@ -1,0 +1,33 @@
+---
+abstract: 'Web Push notifications for Punk'
+author:
+  - 'LNATION <email@lnation.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.7702, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Punk-Push
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Punk::Queue: '0.07'
+  Punk::Sqitch: '0.01'
+requires:
+  Fetch: '0.20'
+  File::Raw::JSON: '0.08'
+  Punk: '0.43'
+  VAPID: '2.00'
+  perl: '5.010'
+resources:
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

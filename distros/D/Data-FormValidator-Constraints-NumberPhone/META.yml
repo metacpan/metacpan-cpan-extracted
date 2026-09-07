@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,10 +29,10 @@ requires:
   perl: '5.010'
 resources:
   bugtracker: https://github.com/bleargh45/Data-FormValidator-Constraints-NumberPhone/issues
-  homepage: http://metacpan.org/release/Data-FormValidator-Constraints-NumberPhone/
+  homepage: https://metacpan.org/release/Data-FormValidator-Constraints-NumberPhone/
   repository: git://github.com/bleargh45/Data-FormValidator-Constraints-NumberPhone.git
-version: '0.05'
-x_generated_by_perl: v5.32.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.06'
+x_generated_by_perl: v5.42.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0
 x_static_install: 1

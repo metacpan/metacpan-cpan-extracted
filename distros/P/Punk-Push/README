@@ -1,0 +1,49 @@
+Punk-Push
+
+Web Push notifications for Punk.
+
+An application that wants to reach a user who has closed the tab has one
+standard way to do it: the Push API, delivered through the browser vendor's
+push service. The message is encrypted end to end, so the push service relays
+bytes it cannot read.
+
+VAPID does the cryptography - RFC 8291 message encryption over the RFC 8188
+aes128gcm content encoding, and RFC 8292 identification. Punk::Plugin::Push
+supplies the routes, the subscription storage, the delivery and the pruning
+around it.
+
+This distribution needs VAPID 2.00 or newer. Earlier versions send
+Content-Encoding: aesgcm, which is the superseded draft, and spell the
+authorization scheme "vapit", which a conformant push service refuses.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Punk::Push
+    perldoc Punk::Plugin::Push
+
+You can also look for information at:
+
+    Search CPAN
+        https://metacpan.org/release/Punk-Push
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

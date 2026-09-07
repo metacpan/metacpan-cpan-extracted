@@ -1,0 +1,59 @@
+Punk-Challenge
+
+Punk::RateLimit has two answers for a caller it does not like: a 429, and
+block_ip. Both refuse. This is the third answer: prove you are a browser
+before anything is spent on you. The browser solves a proof-of-work puzzle
+in JavaScript and is handed a signed clearance cookie that says it did. No
+outbound call, no script from a foreign origin, no hole in a CSP policy,
+nothing a privacy page has to explain.
+
+Proof of work is a cost, not a wall. A puzzle that takes a phone half a
+second takes a GPU farm nothing. What it changes is the economics: a
+scraper that was making ten thousand requests a minute for free now pays a
+CPU-second for every clearance, and a clearance is bound to a network
+prefix so it cannot be solved once and shared with a botnet. A program that
+solves the puzzle is cleared exactly as a person is. Combined with
+rate_limit, which sets the ceiling per clearance, it turns "free" into
+"expensive". It does not turn "possible" into "impossible".
+
+Nothing here asks a human to read distorted text or find the traffic
+lights. A screen reader user and a sighted one pass the same way, by
+waiting a moment.
+
+    plugin 'Challenge' => { secret => secret('challenge.key') };
+    challenge for => '/login', always => 1;
+    challenge for => '/', after => { limit => 60, window => 60 };
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+A C compiler is required. Punk 0.45 or newer is required at runtime.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Punk::Plugin::Challenge
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Punk-Challenge
+
+    Search CPAN
+        https://metacpan.org/release/Punk-Challenge
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

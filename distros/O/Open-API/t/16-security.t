@@ -88,6 +88,45 @@ for (1 .. 50) {
     select undef, undef, undef, 0.1;
 }
 
+# The second server, whose checker dies, is forked here rather than beside
+# its test: every server must be forked BEFORE the first Fetch exists. A
+# child forked after it inherits the agent and its event loop, whose kernel
+# object (epoll set, io_uring) is shared with the parent, and the child's
+# global destruction at exit then tore the parent's loop down with it. That
+# hung the parent, and on io_uring ate the machine, on the Linux smokers.
+# Fetch 0.23 makes an inherited loop harmless; the ordering keeps this test
+# from depending on it.
+my $sspec = {
+    openapi => '3.1.0', info => { title => 'die', version => '1' },
+    components => { securitySchemes => {
+        Boom => { type => 'http', scheme => 'bearer' } } },
+    paths => { '/boom' => { get => { operationId => 'boomOp',
+        security => [ { Boom => [] } ],
+        responses => { 200 => { description => 'ok' } } } } },
+};
+my $sport = do {
+    my $s = IO::Socket::INET->new(LocalHost => '127.0.0.1', LocalPort => 0,
+        Listen => 1, ReuseAddr => 1) or die $!;
+    my $p = $s->sockport; close $s; $p;
+};
+my $spid = fork // die "fork: $!";
+if (!$spid) {
+    $pid = 0;   # do not let this child's END reap the main server
+    open STDERR, '>', '/dev/null';
+    my $api = Open::API->new(spec => $sspec);
+    my $app = Open::API::Plack->new(api => $api,
+        handlers => { boomOp => sub { [200, [], ['']] } },
+        security => { Boom => sub { die "checker exploded\n" } },
+    )->to_app;
+    Hyperman->run(app => $app, host => '127.0.0.1', port => $sport, workers => 1);
+    exit 0;
+}
+END { local $?; if ($spid) { kill 'TERM', $spid; waitpid $spid, 0 } }
+for (1 .. 50) {
+    last if IO::Socket::INET->new(PeerAddr => "127.0.0.1:$sport");
+    select undef, undef, undef, 0.1;
+}
+
 my $base = "http://127.0.0.1:$port";
 my $ua   = Fetch->new;
 
@@ -130,41 +169,10 @@ is($ua->get("$base/both", headers => { 'X-API-Key' => 'secret-key' })->get->stat
 is($ua->get("$base/open")->get->status, 200, 'empty security disables auth');
 
 # ---- checker die -> 500 ---------------------------------------------------------
-{
-    my $sspec = {
-        openapi => '3.1.0', info => { title => 'die', version => '1' },
-        components => { securitySchemes => {
-            Boom => { type => 'http', scheme => 'bearer' } } },
-        paths => { '/boom' => { get => { operationId => 'boomOp',
-            security => [ { Boom => [] } ],
-            responses => { 200 => { description => 'ok' } } } } },
-    };
-    my $sport = do {
-        my $s = IO::Socket::INET->new(LocalHost => '127.0.0.1', LocalPort => 0,
-            Listen => 1, ReuseAddr => 1) or die $!;
-        my $p = $s->sockport; close $s; $p;
-    };
-    my $spid = fork // die "fork: $!";
-    if (!$spid) {
-        $pid = 0;   # do not let this child's END reap the main server
-        open STDERR, '>', '/dev/null';
-        my $api = Open::API->new(spec => $sspec);
-        my $app = Open::API::Plack->new(api => $api,
-            handlers => { boomOp => sub { [200, [], ['']] } },
-            security => { Boom => sub { die "checker exploded\n" } },
-        )->to_app;
-        Hyperman->run(app => $app, host => '127.0.0.1', port => $sport, workers => 1);
-        exit 0;
-    }
-    for (1 .. 50) {
-        last if IO::Socket::INET->new(PeerAddr => "127.0.0.1:$sport");
-        select undef, undef, undef, 0.1;
-    }
-    is($ua->get("http://127.0.0.1:$sport/boom",
-        headers => { Authorization => 'Bearer x' })->get->status,
-       500, 'a dying checker becomes a 500, not a crash');
-    kill 'TERM', $spid; waitpid $spid, 0;
-}
+is($ua->get("http://127.0.0.1:$sport/boom",
+    headers => { Authorization => 'Bearer x' })->get->status,
+   500, 'a dying checker becomes a 500, not a crash');
+kill 'TERM', $spid; waitpid $spid, 0; $spid = 0;
 
 # ---- client auto-attaches credentials -------------------------------------------
 {

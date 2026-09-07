@@ -71,7 +71,7 @@ been installed, this will work:
 
 ## COPYRIGHT AND LICENCE
 
-Copyright (C) 2021, 2022, 2023, 2024, 2025 JJ Merelo
+Copyright (C) 2021-26 JJ Merelo
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

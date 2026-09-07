@@ -37,8 +37,6 @@ use File::Spec;
 #
 use PAGI::Request;
 use PAGI::Response;
-use PAGI::SSE;
-use PAGI::WebSocket;
 
 
 #  WebDyne Modules
@@ -65,7 +63,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.026';
+$VERSION='3.027';
 
 
 #==================================================================================================
@@ -314,6 +312,7 @@ sub handler_sse {
             #
             local *ENV=\%ENV_BASE;
             my $res_or=PAGI::Response->new($scope);
+            require PAGI::SSE;
             my $sse_or=PAGI::SSE->new($scope, $receive, $send);
             my $r=WebDyne::Request::PAGI->new(
                 document_root => $self->{'root'}, document_default => $self->{'index'},
@@ -361,6 +360,7 @@ sub handler_sse_error {
 
         #  Create helper objects
         #
+        require PAGI::SSE;
         my $sse_or=PAGI::SSE->new($scope, $receive, $send) ||
             return err('unable to get PAGI::SSE object');
         debug("sse_or: $sse_or");
@@ -395,6 +395,7 @@ sub handler_ws {
         return err('unable to get PAGI::Request object');
     my $res_or=PAGI::Response->new($scope) ||
         return err('unable to get PAGI::Response object');
+    require PAGI::WebSocket;
     my $ws_or=PAGI::WebSocket->new($scope, $receive, $send) ||
         return err('unable to get PAGI::WebSocket object');
     debug("req_or: $req_or, res_or: $res_or, ws_or: $ws_or");

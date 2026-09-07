@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>One moment</title>
+</head>
+<body data-puzzle="{{puzzle}}" data-bits="{{bits}}" data-verify="{{verify}}" data-to="{{to}}">
+  <main>
+    <h1>One moment</h1>
+    <p>Checking your browser before continuing. This takes a second or two.</p>
+    <noscript>
+      <p>This check needs JavaScript. Enable it, or ask the site for another
+         way in.</p>
+    </noscript>
+    <form method="post" action="{{verify}}">
+      <input type="hidden" name="solution">
+      <input type="hidden" name="to" value="{{to}}">
+    </form>
+  </main>
+  <script src="{{script}}"></script>
+</body>
+</html>

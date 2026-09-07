@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => 0,
     "Test::Pod::Coverage" => 0
   },
-  "VERSION" => "2.2000",
+  "VERSION" => "2.2100",
   "test" => {
     "TESTS" => "t/*.t t/negotiations/*.t t/server/*.t"
   }

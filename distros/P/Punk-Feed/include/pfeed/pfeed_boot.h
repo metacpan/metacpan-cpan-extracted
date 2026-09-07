@@ -188,7 +188,7 @@ static void pfeed_resolve_base(pTHX_ SV *app)
 
 static NV pfeed_now(pTHX)
 {
-    PERL_UNUSED_ARG(my_perl);
+    PERL_UNUSED_CONTEXT;
     return (NV)time(NULL);
 }
 

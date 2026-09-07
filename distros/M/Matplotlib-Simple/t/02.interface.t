@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 use File::Temp qw(tempdir);
 use File::Spec;
 use Capture::Tiny 'capture';
-use Test::Exception;                 # lives_ok / throws_ok
+use Test::Exception;                 # lives_ok
 use Matplotlib::Simple;
 use Test::More;
 #
@@ -166,23 +166,37 @@ sub H {
 # ----------------------------------------------------------------------------
 # 6. Error paths: bad "p" shapes and forbidden combinations must die clearly.
 # ----------------------------------------------------------------------------
-throws_ok { plt({ p => { A => 1 },        show => 1 }) }
+# Test::Exception's throws_ok cannot be used here.  The module loads
+# Devel::Confess, which appends a stack trace in which every frame prints its
+# own arguments -- and the regex is one of throws_ok's arguments, so the
+# exception always contains a copy of the pattern and every such assertion
+# passes whatever the code does.  Match the message alone; the trace begins at
+# the first tab-indented line.
+sub throws_msg_like (&$;$) {
+	my ( $code, $re, $name ) = @_;
+	my $lived = eval { $code->(); 1 };
+	return ok( 0, "$name (did not die)" ) if $lived;
+	my $message = "$@";
+	$message =~ s/\n\t.*\z//s;
+	return like( $message, $re, $name );
+}
+throws_msg_like { plt({ p => { A => 1 },        show => 1 }) }
 	qr/must be an ARRAY reference/,        'p as a HASH ref dies';
-throws_ok { plt({ p => [],                show => 1 }) }
+throws_msg_like { plt({ p => [],                show => 1 }) }
 	qr/is empty/,                          'empty p dies';
-throws_ok { plt({ p => [ [] ],            show => 1 }) }
+throws_msg_like { plt({ p => [ [] ],            show => 1 }) }
 	qr/empty array/,                       'empty inner subplot array dies';
-throws_ok { plt({ p => [ 42 ],            show => 1 }) }
+throws_msg_like { plt({ p => [ 42 ],            show => 1 }) }
 	qr/must be a HASH reference/,          'scalar subplot element dies';
-throws_ok { plt({ p => [ [ 42 ] ],        show => 1 }) }
+throws_msg_like { plt({ p => [ [ 42 ] ],        show => 1 }) }
 	qr/every plot must be a HASH/,         'non-hash inside an inner array dies';
-throws_ok { plt({ p => [ H('A',1) ], data => { X => [1] },     show => 1 }) }
+throws_msg_like { plt({ p => [ H('A',1) ], data => { X => [1] },     show => 1 }) }
 	qr/cannot be combined with/,           '"data" combined with "p" dies';
-throws_ok { plt({ p => [ H('A',1) ], 'plot.type' => 'hist',    show => 1 }) }
+throws_msg_like { plt({ p => [ H('A',1) ], 'plot.type' => 'hist',    show => 1 }) }
 	qr/cannot be combined with/,           '"plot.type" combined with "p" dies';
-throws_ok { plt({ p => [ H('A',1) ], plots => [ H('A',1) ],    show => 1 }) }
+throws_msg_like { plt({ p => [ H('A',1) ], plots => [ H('A',1) ],    show => 1 }) }
 	qr/cannot be combined with/,           '"plots" combined with "p" dies';
-throws_ok { plt({ p => [ H('A',1) ], add => [ H('A',1) ],      show => 1 }) }
+throws_msg_like { plt({ p => [ H('A',1) ], add => [ H('A',1) ],      show => 1 }) }
 	qr/cannot be combined with/,           '"add" combined with "p" dies';
 
 # ----------------------------------------------------------------------------

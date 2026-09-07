@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use File::Raw::JSON ();   # JSON encode/decode via its C ABI (ft_json.h / _abi_ptr)
 
@@ -100,6 +100,14 @@ L<Fetch::Loop::Standalone> per process, rebuilt automatically in a child after
 a fork. Agents therefore multiplex: awaiting a request on one drives whatever
 the others have in flight rather than stalling them. Pass an explicit loop to
 opt out and get an isolated one.
+
+A standalone loop is safe to carry across a fork either way. Its kernel
+object belongs to the process that created it, so a child that inherits one
+gets a backend of its own the first time it uses the loop, with the same
+watchers and timers, and a child that merely exits never touches the
+parent's. Connections parked in an agent's pool are still shared sockets:
+create the agent in the child, or after the fork, when both sides will be
+making requests.
 
 =item C<headers>
 

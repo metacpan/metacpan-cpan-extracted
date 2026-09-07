@@ -2,10 +2,6 @@
 
 Plack::Middleware::Greylist - throttle requests with different rates based on net blocks
 
-# VERSION
-
-version v0.8.1
-
 # SYNOPSIS
 
 ```perl
@@ -50,220 +46,81 @@ Note that the `$netblock` for the default rate is simply "default", e.g.
 Rate limiting 192.168.0.12 after 101/100 for default
 ```
 
-This will allow you to use something like [fail2ban](https://metacpan.org/pod/fail2ban) to block repeat offenders, since bad
+This will allow you to use something like [fail2ban](https://github.com/fail2ban/fail2ban) to block repeat offenders, since bad
 robots are like houseflies that repeatedly bump against closed windows.
 
 Note, if a ["callback"](#callback) is specified, then nothing will be logged, but the log message will be sent to the callback.
 
-# ATTRIBUTES
-
-## default\_rate
-
-This is the default maximum number of hits per minute before requests are rejected, for any request not in the ["greylist"](#greylist).
-
-Omitting it will disable the global rate.
-
-## retry\_after
-
-This sets the `Retry-After` header value, in seconds. It defaults to 1 + `expiry_time` (61) seconds, which is the
-minimum allowed value.
-
-Note that this does not enforce that a client has waited that amount of time before making a new request, as long as the
-number of hits per minute is within the allowed rate.
-
-This option was added in v0.2.0
-
-## greylist
-
-This is a hash reference to the greylist configuration.
-
-The keys are network blocks, and the values are an array reference of rates and the tracking type. (A string of space-
-separated values can be used instead, to make it easier to directly use the configuration from something like
-[Config::General](https://metacpan.org/pod/Config%3A%3AGeneral).)
-
-The rates are either the maximum number of requests per minute, or "whitelist" or "allowed" to not limit the network
-block, or "blacklist" or "rejected" to always forbid a network block.
-
-(The rate "-1" corresponds to "allowed", and the rate "0" corresponds to "rejected".)
-
-A special rate code of "norobots" will reject all requests except for `/robots.txt`, which is allowed at a rate of 60
-per minute.  This will allow you to block a robot but still allow the robot to access the robot rules that say it is
-disallowed.
-
-The tracking type defaults to "ip", which applies limits to individual ips. You can also use "netblock" to apply the
-limits to all hosts in that network block, or use a name so that limits are applied to all hosts in network blocks
-with that name.
-
-For example:
-
-```perl
-{
-    '127.0.0.1/32' => 'whitelist',
-
-    '192.168.1.0/24' => 'blacklist',
-
-    '192.168.2.0/24' => [ 100, 'ip' ],
-
-    '192.168.3.0/24' => [  60, 'netblock' ],
-
-    # All requests from these blocks will limited collectively
-
-    '10.0.0.0/16'    => [  60, 'group1' ],
-    '172.16.0.0/16'  => [  60, 'group1' ],
-}
-```
-
-Note: the network blocks shown above are examples only.
-
-The limit may be larger than ["default\_rate"](#default_rate), to allow hosts to exceed the default limit.
-
-## file
-
-This is the path of the throttle count file used by the ["cache"](#cache).
-
-It is required unless you are defining your own ["cache"](#cache) or you have specified a `share_file` in ["cache\_config"](#cache_config).
-
-## cache\_config
-
-This is a hash reference for configuring [Cache::FastMmap](https://metacpan.org/pod/Cache%3A%3AFastMmap).  If it's omitted, defaults will be used.
-
-The following options can be configured:
-
-- `init_file`
-
-    This is boolean that configures whether ["file"](#file) will be re-initialised in startup. Unless you are preloading the
-    application before forking, this should be false (default).
-
-- `unlink_on_exit`
-
-    When true, the cache file will be deleted on exit. This defaults the negation of `init_file`.
-
-- `expire_time`
-
-    This sets the expiration time, which defaults to 60 seconds.
-
-    The ["retry\_after"](#retry_after) attribute will default to 1 + `expiry_time`.
-
-Note that the ["file"](#file) attribute will be used to set the `share_file`.
-
-See ["new" in Cache::FastMmap](https://metacpan.org/pod/Cache%3A%3AFastMmap#new) for more information.
-
-This option was added in v0.5.5.
-
-## cache
-
-This is a code reference to a function that increments the cache counter for a key (usually the IP address or net
-block).
-
-If you customise this, then you need to ensure that the counter resets or expires counts after a set period of time,
-e.g. one minute.  If you use a different time interval, then you may need to adjust the ["retry\_after"](#retry_after) time.
-
-You also need to ensure that the cache is shared between processes.
-
-## callback
-
-This is a code reference for a function that is called when rate limits are exceeded. The function is called with a hash
-reference containing the following keys:
-
-- `env`
-
-    The [Plack](https://metacpan.org/pod/Plack) environment.
-
-- `ip`
-
-    The IP address being blocked, generally `$env-`{REMOTE\_ADDR}>.
-
-- `hits`
-
-    This is the number of hits.
-
-- `rate`
-
-    This is the rate limit.
-
-- `block`
-
-    This is the network block that the `rate` applies to, or "default".
-
-- `message`
-
-    This is the message that would be logged.
-
-If a callback is defined, it will be used instead of logging.
-
-The callback must return a true value to indicate that the request should be blocked. Otherwise it will still be
-allowed. (Note that the hit count will still be incremented, even if the request is allowed.)
-
-A sample callback might look something like
-
-```perl
-callback => sub {
-    my ($info) = @_;
-
-    my $env = $info->{env};
-
-    my $log = $env->{'psgix.logger'};
-    $log->({
-        level   => "warn",
-        message => $info->{message},
-    });
-
-    # See Plack::Middleware::Statsd
-    my $statsd = $env->{'psgix.monitor.statsd'};
-    $statsd->increment( "myapp.psgi.greylist.blocked" );
-    $statsd->set_add( "myapp.psgi.greplist.ips", $ip );
-
-    return 1;
-};
-```
-
-The callback attribute was added in v0.6.1.
-
-# KNOWN ISSUES
-
-This does not try and enforce any consistency or block overlapping netblocks.  It trusts [Net::IP::LPM](https://metacpan.org/pod/Net%3A%3AIP%3A%3ALPM) to
-handle any overlapping or conflicting network ranges, or to specify exceptions for larger blocks.
-
-When configuring the ["greylist"](#greylist) netblocks from a configuration file using [Config::General](https://metacpan.org/pod/Config%3A%3AGeneral), duplicate netblocks may
-be merged in unexpected ways, for example
+# RECENT CHANGES
+
+Changes for version v0.8.2 (2026-09-06)
+
+- Security
+    - Updated the minimum recommended version of Net::IP::LPM.
+- Documentation
+    - Updated author email address.
+    - Added security policy.
+    - Updated copyright year.
+    - Generate README with the UsefulReadme plugin.
+- Tests
+    - Added more author tests.
+    - Moved author tests into xt.
+- Toolchain
+    - Improved dist.ini.
+    - Use sigstore instead of Module::Signature, with is deprecated.
+
+See the `Changes` file for more details.
+
+# REQUIREMENTS
+
+This module lists the following modules as runtime dependencies:
+
+- [HTTP::Status](https://metacpan.org/pod/HTTP%3A%3AStatus)
+- [List::Util](https://metacpan.org/pod/List%3A%3AUtil) version 1.29 or later
+- [Module::Load](https://metacpan.org/pod/Module%3A%3ALoad)
+- [Net::IP::LPM](https://metacpan.org/pod/Net%3A%3AIP%3A%3ALPM)
+- [Plack::Middleware](https://metacpan.org/pod/Plack%3A%3AMiddleware)
+- [Ref::Util](https://metacpan.org/pod/Ref%3A%3AUtil)
+- [Time::Seconds](https://metacpan.org/pod/Time%3A%3ASeconds)
+- [experimental](https://metacpan.org/pod/experimental)
+- [parent](https://metacpan.org/pod/parent)
+- [perl](https://metacpan.org/pod/perl) version v5.20.0 or later
+- [warnings](https://metacpan.org/pod/warnings)
+
+See the `cpanfile` file for the full list of prerequisites.
+
+# INSTALLATION
+
+The latest version of this module (along with any dependencies) can be installed from [CPAN](https://www.cpan.org) with the `cpan` tool that is included with Perl:
 
 ```
-10.0.0.0/16   60 group-1
-
-...
-
-10.0.0.0/16  120 group-2
+cpan Plack::Middleware::Greylist
 ```
 
-may be merged as something like
+You can also extract the distribution archive and install this module (along with any dependencies):
 
-```perl
-'10.0.0.0/16' => [ '60 group-1', '120 group-2' ],
+```
+cpan .
 ```
 
-Some search engine robots may not respect HTTP 429 responses, and will treat these as errors. You may want to make an
-exception for trusted networks that gives them a higher rate than the default.
+You can also install this module manually using the following commands:
 
-This does not enforce consistent rates for named blocks. For example, if you specified
-
-```perl
-'10.0.0.0/16'    => [  60, 'named-group' ],
-'172.16.0.0/16'  => [ 100, 'named-group' ],
+```
+perl Makefile.PL
+make
+make test
+make install
 ```
 
-Requests from both netblocks would be counted together, but requests from 10./16 netblock would be rejected after 60
-requests. This is probably not something that you want.
+If you are working with the source repository, then it may not have a `Makefile.PL` file.  But you can use the [Dist::Zilla](https://dzil.org/) tool in anger to build and install this module:
 
-# SUPPORT FOR OLDER PERL VERSIONS
+```
+dzil build
+dzil test
+dzil install --install-command="cpan ."
+```
 
-This module requires Perl v5.20 or later.
-
-Future releases may only support Perl versions released in the last ten years.
-
-# SOURCE
-
-The development version is on github at [https://github.com/robrwo/Plack-Middleware-Greylist](https://github.com/robrwo/Plack-Middleware-Greylist)
-and may be cloned from [git://github.com/robrwo/Plack-Middleware-Greylist.git](git://github.com/robrwo/Plack-Middleware-Greylist.git)
+For more information, see [How to install CPAN modules](https://www.cpan.org/modules/INSTALL.html).
 
 # BUGS
 
@@ -274,9 +131,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
+
+# SOURCE
+
+The development version is on github at [https://github.com/robrwo/Plack-Middleware-Greylist](https://github.com/robrwo/Plack-Middleware-Greylist)
+and may be cloned from [https://github.com/robrwo/Plack-Middleware-Greylist.git](https://github.com/robrwo/Plack-Middleware-Greylist.git)
+
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 The initial development of this module was sponsored by Science Photo
 Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
@@ -287,7 +154,7 @@ Gabor Szabo <gabor@szabgab.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022-2024 by Robert Rothenberg.
+This software is Copyright (c) 2022-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

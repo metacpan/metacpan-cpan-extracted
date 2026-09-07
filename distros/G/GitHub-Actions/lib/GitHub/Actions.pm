@@ -14,7 +14,7 @@ our $EXIT_CODE = 0;
 our @EXPORT = qw(
                   %github $EXIT_CODE set_output set_env debug error warning
                   set_failed error_on_file warning_on_file
-                  start_group end_group exit_action
+                  start_group end_group exit_action add_to_job_summary
                );
 
 BEGIN {
@@ -36,11 +36,11 @@ GitHub::Actions - Work in GitHub Actions using native Perl
 
 =head1 VERSION
 
-This document describes GitHub::Actions version 0.2.2
+This document describes GitHub::Actions version 0.3.0
 
 =cut
 
-use version; our $VERSION = qv('0.2.2');
+use version; our $VERSION = qv('0.3.0');
 
 sub _write_to_github_file {
   my ($github_var, $content) = @_;
@@ -122,6 +122,11 @@ sub exit_action {
   exit( $EXIT_CODE );
 }
 
+sub add_to_job_summary {
+  my $message = shift;
+  _write_to_github_file( 'STEP_SUMMARY', "$message" );
+}
+
 "Action!"; # Magic true value required at end of module
 __END__
 
@@ -166,6 +171,11 @@ this code for instructions.
     start_group( "Foo" );
     # do stuff
     end_group;
+
+    # Write to job summary
+    add_to_job_summary( "All's well" );
+    # Remember this is markdown
+    add_to_job_summary( "# Job summary\n\nAll went **well**");
 
     # Exits with error if that's the case
     exit_action();
@@ -268,6 +278,11 @@ Ends current log grouping.
 
 Exits with the exit code generated during run, that is, 1 if there's been any
 error reported.
+
+=head2 add_to_job_summary
+
+Adds a single line to the job summary. Job (or step) summaries use Markdown to show information on the workflow page that is easier to find and understand.
+Please remember that job summaries are composed of consecutive step summaries, which are all collated together when the workflow finishes. This introduces blank lines in steps with not step summary, which might break some markdown like tables.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 

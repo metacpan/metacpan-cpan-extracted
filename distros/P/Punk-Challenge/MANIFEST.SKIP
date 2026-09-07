@@ -1,0 +1,13 @@
+^Punk-Challenge-
+\bMakefile$
+\bMakefile\.old$
+\bMYMETA\.
+\bMETA\.
+\bblib/
+\bpm_to_blib$
+\.tar\.gz$
+^\.git
+^ignore\.txt$
+# Challenge.c is generated from Challenge.xs; shipping a stale one is a
+# distribution that builds from the wrong source.
+\.(c|o|obj|bs)$

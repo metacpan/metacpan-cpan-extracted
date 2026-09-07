@@ -27,3 +27,6 @@ feature 'mailmap', 'Hook CheckCommitAuthorFromMailmap' => sub {
 feature 'check_perl', 'Hook CheckPerl' => sub {
     requires 'Perl::Critic';
 };
+feature 'scan_ctags', 'Hook ScanCtags' => sub {
+    requires 'Perl::Tags';
+};

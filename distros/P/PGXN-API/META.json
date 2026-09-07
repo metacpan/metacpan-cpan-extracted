@@ -72,25 +72,25 @@
    "provides" : {
       "PGXN::API" : {
          "file" : "lib/PGXN/API.pm",
-         "version" : "v0.21.0"
+         "version" : "v0.21.1"
       },
       "PGXN::API::Indexer" : {
          "file" : "lib/PGXN/API/Indexer.pm",
-         "version" : "v0.21.0"
+         "version" : "v0.21.1"
       },
       "PGXN::API::Router" : {
          "file" : "lib/PGXN/API/Router.pm",
-         "version" : "v0.21.0"
+         "version" : "v0.21.1"
       },
       "PGXN::API::Sync" : {
          "file" : "lib/PGXN/API/Sync.pm",
-         "version" : "v0.21.0"
+         "version" : "v0.21.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://api.pgxn.org/"
    },
-   "version" : "v0.21.0",
+   "version" : "v0.21.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

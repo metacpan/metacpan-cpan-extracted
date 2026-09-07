@@ -1,5 +1,6 @@
 
-use v5.14;
+use v5.10;
+use strict;
 use warnings;
 
 use Carp::Always;
@@ -21,6 +22,8 @@ use Test::Warnings v0.38 qw[
 ];
 
 use Path::Tiny 0.018;
+
+use lib do { Path::Tiny::->new (__FILE__)->parent (2)->child (q (lib))->stringify };
 
 our $counter;
 

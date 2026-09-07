@@ -6,7 +6,7 @@ use autodie ':all';
 
 package Matplotlib::Simple;
 require 5.010;
-our $VERSION = 0.311;
+our $VERSION = 0.312;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use Cwd 'getcwd';
@@ -287,6 +287,23 @@ my %opt = (
 	  'show.legend',  # be default on; should be 0 if off
 	],
 );
+sub py_str {
+	# Render a Perl string as a Python single-quoted string literal.
+	#
+	# Legend labels, colorbar labels and the like are user data (data keys,
+	# group names), so a name such as "Farmer's" would otherwise close the
+	# literal early and emit unparseable Python. Backslashes are doubled
+	# first, which also makes a mathtext label like '$\alpha$' survive as
+	# written instead of being read as a Python escape.
+	my ($str) = @_;
+	$str = $str // '';
+	$str =~ s/\\/\\\\/g;	# backslash first, or the escapes below get doubled
+	$str =~ s/'/\\'/g;
+	$str =~ s/\n/\\n/g;
+	$str =~ s/\r/\\r/g;
+	$str =~ s/\t/\\t/g;
+	return "'$str'";
+}
 sub write_data {
 	my ($args) = @_;
 	my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1];
@@ -797,7 +814,7 @@ sub colored_table_helper {
 	}
 	$plot->{'colorbar.on'} = $plot->{'colorbar.on'} // 1;
 	if (defined $plot->{cblabel}) {
-		say {$args->{fh}} "fig.colorbar(img, label = '$plot->{cblabel}')";
+		say {$args->{fh}} 'fig.colorbar(img, label = ' . py_str($plot->{cblabel}) . ')';
 	} else {
 		say {$args->{fh}} "fig.colorbar(img)" if $plot->{'colorbar.on'};
 	}
@@ -887,8 +904,11 @@ sub hexbin_helper {
 		 . " points.";
 	  die 'The length of both keys must be equal.';
 	}
-	$plot->{xlabel} = $plot->{xlabel} // $keys[0];
-	$plot->{ylabel} = $plot->{ylabel} // $keys[1];
+	# quoted here because the key is data: the pass-through path that title and
+	# label text otherwise take cannot tell an apostrophe from Python of the
+	# user's own, and leaves it bare. See py_str.
+	$plot->{xlabel} = $plot->{xlabel} // py_str($keys[0]);
+	$plot->{ylabel} = $plot->{ylabel} // py_str($keys[1]);
 	$plot->{cmap}   = $plot->{cmap}   // 'gist_rainbow';
 	my $options =
 	", gridsize = ($plot->{xbins}, $plot->{ybins}), cmap = '$plot->{cmap}'"
@@ -1040,7 +1060,7 @@ sub hist_helper {
 		}
 		say {$args->{fh}} 'd = [' . join (',', @{ $plot->{data}{$set} }) . ']';
 		if ($plot->{'show.legend'}) {
-			say { $args->{fh} } "ax$args->{ax}.hist(d, alpha = $plot->{alpha}, label = '$set' $options $set_options)";
+			say { $args->{fh} } "ax$args->{ax}.hist(d, alpha = $plot->{alpha}, label = " . py_str($set) . " $options $set_options)";
 		} else {
 			say { $args->{fh} } "ax$args->{ax}.hist(d, alpha = $plot->{alpha} $options $set_options)";
 		}
@@ -1100,8 +1120,11 @@ sub hist2d_helper {
 		 . " points.";
 	  die 'The length of both keys must be equal.';
 	}
-	$plot->{xlabel} = $plot->{xlabel} // $keys[0];
-	$plot->{ylabel} = $plot->{ylabel} // $keys[1];
+	# quoted here because the key is data: the pass-through path that title and
+	# label text otherwise take cannot tell an apostrophe from Python of the
+	# user's own, and leaves it bare. See py_str.
+	$plot->{xlabel} = $plot->{xlabel} // py_str($keys[0]);
+	$plot->{ylabel} = $plot->{ylabel} // py_str($keys[1]);
 	$plot->{cmap}   = $plot->{cmap}   // 'gist_rainbow';
 	my $options = ", cmap = '$plot->{cmap}'"; # these args go to the plt.hist call
 	if ( $plot->{cb_logscale} ) {
@@ -1203,7 +1226,7 @@ sub hist2d_helper {
 	}
 #	say { $args->{fh} } "cbar = fig.colorbar(im$ax $opts)" if $plot->{'colorbar.on'};
 	if ( defined $plot->{cblabel} ) {
-	  say { $args->{fh} } "plt.colorbar(im$ax, label = '$plot->{cblabel}' $opts)";
+	  say { $args->{fh} } "plt.colorbar(im$ax, label = " . py_str($plot->{cblabel}) . " $opts)";
 	} else {
 	  say { $args->{fh} } "plt.colorbar(im$ax, label = 'Density' $opts)";
 	}
@@ -1613,7 +1636,7 @@ sub plot_helper {
 		}
 		my $label = '';
 		if ( $plot->{'show.legend'} ) {
-			$label = ",label = '$set'";
+			$label = ',label = ' . py_str($set);
 		}
 		my $ax = "ax$args->{ax}";
 		if (grep {$set eq $_} @twinx) { # this set has
@@ -1734,12 +1757,13 @@ sub scatter_helper {
 			say { $args->{fh} } 'z = [' . join( ',', @{ $plot->{data}{$color_key} } ) . ']';
 			say { $args->{fh} }
 			  "im = ax$ax.scatter(x, y, c = z, cmap = '$plot->{cmap}' $options)";
-			say { $args->{fh} } "fig.colorbar(im, label = '$color_key' $cb_opts)";
+			say { $args->{fh} } "fig.colorbar(im, label = " . py_str($color_key) . " $cb_opts)";
 		} else {
 			say { $args->{fh} } "ax$ax.scatter(x, y $options)";
 		}
-		$plot->{xlabel} = $plot->{xlabel} // $keys[0];
-		$plot->{ylabel} = $plot->{ylabel} // $keys[1];
+		# quoted here because the key is data; see py_str above
+		$plot->{xlabel} = $plot->{xlabel} // py_str($keys[0]);
+		$plot->{ylabel} = $plot->{ylabel} // py_str($keys[1]);
 	} elsif ( $plot_type eq 'multiple' ) { # multiple sets
 		my @undefined_opts;
 		foreach my $set ( sort keys %{ $plot->{'set.options'} } ) {
@@ -1794,17 +1818,18 @@ sub scatter_helper {
 				}
 				say { $args->{fh} } 'z = [' . join( ',', @{ $plot->{data}{$set}{$color_key} } ) . ']';
 				unless ( $options =~ m/label\s*=/ ) {
-					$options .= ", label = '$set'";
+					$options .= ', label = ' . py_str($set);
 				}
 				say { $args->{fh} }
 				"im = ax$ax.scatter(x, y, c = z, cmap = '$plot->{cmap}' $options)";
 			} else {
-				say { $args->{fh} }	"ax$ax.scatter(x, y, label = '$set' $options)";
+				say { $args->{fh} }	"ax$ax.scatter(x, y, label = " . py_str($set) . " $options)";
 			}
-			$plot->{xlabel} = $plot->{xlabel} // $keys[0];
-			$plot->{ylabel} = $plot->{ylabel} // $keys[1];
+			# quoted here because the key is data; see py_str above
+			$plot->{xlabel} = $plot->{xlabel} // py_str($keys[0]);
+			$plot->{ylabel} = $plot->{ylabel} // py_str($keys[1]);
 	  }
-	  say { $args->{fh} } "plt.colorbar(im, label = '$color_key')"  if defined $color_key;
+	  say { $args->{fh} } 'plt.colorbar(im, label = ' . py_str($color_key) . ')'  if defined $color_key;
 	}
 }
 
@@ -1957,6 +1982,98 @@ sub violin_helper {
 	}
 }
 
+sub check_wide_runs {
+	# Validate one group's runs for "wide", naming the offending run.
+	#
+	# A group is an ARRAY of [ \@x, \@y ] pairs. Getting that shape wrong --
+	# passing "plot"'s single [ \@x, \@y ] pair, say -- otherwise dies deep
+	# inside the writer with "Can't use string ("0") as an ARRAY ref", which
+	# says nothing about which group was malformed.
+	my ( $runs, $where, $current_sub ) = @_;
+	if ( ref $runs ne 'ARRAY' ) {
+		my $got = ref $runs ? ( ref $runs ) . ' reference' : 'a scalar';
+		die "$current_sub: $where must be an ARRAY of [ \\\@x, \\\@y ] pairs, not $got";
+	}
+	if ( scalar @{$runs} == 0 ) {
+		die "$current_sub: $where holds no runs";
+	}
+	foreach my $i ( 0 .. $#{$runs} ) {
+		my $run = $runs->[$i];
+		unless (( ref $run eq 'ARRAY' )
+			&& ( scalar @{$run} == 2 )
+			&& ( ref $run->[0] eq 'ARRAY' )
+			&& ( ref $run->[1] eq 'ARRAY' ) ) {
+			die "$current_sub: run $i of $where must be [ \\\@x, \\\@y ]; a group is an ARRAY of such pairs, so a lone pair needs one more ARRAY around it";
+		}
+		my $n_x = scalar @{ $run->[0] };
+		my $n_y = scalar @{ $run->[1] };
+		if ( $n_x != $n_y ) {
+			die "$current_sub: run $i of $where has $n_x x values but $n_y y values";
+		}
+		if ( $n_x == 0 ) {
+			die "$current_sub: run $i of $where is empty";
+		}
+		foreach my $axis ( 0, 1 ) {    # 0 = x, 1 = y
+			my @bad = grep { !looks_like_number($_) } @{ $run->[$axis] };
+			next if scalar @bad == 0;
+			my $name = $axis == 0 ? 'x' : 'y';
+			# only the first few, so a wholly non-numeric run does not print itself
+			my $shown = join '", "', @bad[ 0 .. min( $#bad, 4 ) ];
+			die "$current_sub: run $i of $where has non-numeric $name value(s): \"$shown\"";
+		}
+	}
+}
+sub write_wide_group {
+	# Emit the Python drawing one group of runs: every run faint, the mean of
+	# the runs solid, and mean +/- 1 standard deviation as a ribbon.
+	#
+	# The runs need not share an x grid, so they are interpolated onto 101
+	# evenly spaced points (the number the documentation promises) spanning
+	# the group's own x range. Two properties of np.interp drive the code
+	# below: it needs its sample points ascending, and by default it holds the
+	# end values flat outside them. Left alone, the first silently returns a
+	# flat line for a run whose x descends, and the second folds an invented
+	# horizontal line into the mean and the s.d. wherever a run stops short of
+	# the group's range. So each run is sorted by x first, and asked for NaN
+	# outside its own range; the summary below then averages, at each point,
+	# only the runs that actually reach it.
+	my ($args) = @_;
+	my ( $fh, $ax, $runs, $color, $label ) =
+	  @{$args}{qw(fh ax runs color label)};
+	my ( $min_x, $max_x ) = ( 'inf', '-inf' );
+	foreach my $run ( @{$runs} ) {
+		$min_x = min( $min_x, @{ $run->[0] } );
+		$max_x = max( $max_x, @{ $run->[0] } );
+	}
+	my $py_color = py_str($color);
+	say {$fh} 'ys = []';
+	say {$fh} "base_x = np.linspace($min_x, $max_x, 101)";
+	foreach my $run ( @{$runs} ) {
+		say {$fh} 'x = [' . join( ',', @{ $run->[0] } ) . ']';
+		say {$fh} 'y = [' . join( ',', @{ $run->[1] } ) . ']';
+		say {$fh} "order = np.argsort(x, kind = 'stable')";
+		say {$fh} 'x = np.asarray(x)[order]';
+		say {$fh} 'y = np.asarray(y)[order]';
+		say {$fh} "ax$ax.plot(x, y, $py_color, alpha=0.15)";
+		say {$fh} 'ys.append(np.interp(base_x, x, y, left = np.nan, right = np.nan))';
+	}
+	say {$fh} 'ys = np.array(ys)';
+	say {$fh} 'covered = ~np.isnan(ys)';    # which runs reach each point of base_x
+	say {$fh} 'n_runs = covered.sum(axis = 0)';
+	say {$fh} 'divisor = np.maximum(n_runs, 1)';    # a point no run reaches would divide by 0
+	say {$fh} 'mean_ys = np.where(covered, ys, 0.0).sum(axis = 0) / divisor';
+	say {$fh} 'var_ys = np.where(covered, (ys - mean_ys) ** 2, 0.0).sum(axis = 0) / divisor';
+	say {$fh} 'std = np.where(n_runs > 0, np.sqrt(var_ys), np.nan)';
+	say {$fh} 'mean_ys = np.where(n_runs > 0, mean_ys, np.nan)';    # after var_ys, which needs the unmasked mean
+	say {$fh} 'ys_upper = mean_ys + std';
+	say {$fh} 'ys_lower = mean_ys - std';
+	if ( defined $label ) {
+		say {$fh} "ax$ax.plot(base_x, mean_ys, $py_color, label = " . py_str($label) . ')';
+	} else {
+		say {$fh} "ax$ax.plot(base_x, mean_ys, $py_color)";
+	}
+	say {$fh} "ax$ax.fill_between(base_x, ys_lower, ys_upper, color=$py_color, alpha=0.3)";
+}
 sub wide_helper {
 	my ($args) = @_;
 	my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1]
@@ -1988,64 +2105,32 @@ sub wide_helper {
 	say { $args->{fh} } 'import numpy as np';
 	my $ax       = $args->{ax} // '';
 	my $ref_type = ref $plot->{data};
-	if ( $ref_type eq 'HASH' ) {    # multiple groups, no label
+	if ( $ref_type eq 'HASH' ) {    # one labelled group per key
+		if ( ( defined $plot->{color} ) && ( ref $plot->{color} ne 'HASH' ) ) {
+			die "$current_sub: \"data\" is a HASH of groups, so \"color\" must be a HASH of one color per group";
+		}
 		foreach my $group ( keys %{ $plot->{data} } ) {
-			my $color = $plot->{color}{$group} // 'b';
-			say { $args->{fh} } 'ys = []';
-			my ( $min_x, $max_x ) = ( 'inf', '-inf' );
-			foreach my $run ( 0 .. scalar @{ $plot->{data}{$group} } - 1 ) {
-				$min_x = min( $min_x, @{ $plot->{data}{$group}[$run][0] } );
-				$max_x = max( $max_x, @{ $plot->{data}{$group}[$run][0] } );
-			}
-			say { $args->{fh} } "base_y = np.linspace($max_x, $min_x, 101)";
-			foreach my $run ( 0 .. scalar @{ $plot->{data}{$group} } - 1 ) {
-				say { $args->{fh} } 'x = ['
-				. join( ',', @{ $plot->{data}{$group}[$run][0] } ) . ']';
-				say { $args->{fh} } 'y = ['
-				. join( ',', @{ $plot->{data}{$group}[$run][1] } ) . ']';
-				say { $args->{fh} } "ax$ax.plot(x, y, '$color', alpha=0.15)";
-				say { $args->{fh} } 'y = np.interp(base_y, x, y)';
-				say { $args->{fh} } 'ys.append(y)';
-			}
-			say { $args->{fh} } 'ys = np.array(ys)';
-			say { $args->{fh} } 'mean_ys = ys.mean(axis=0)';
-			say { $args->{fh} } 'std = ys.std(axis=0)';
-			say { $args->{fh} } 'ys_upper = mean_ys + std';
-			say { $args->{fh} } 'ys_lower = mean_ys - std';
-			if ( $plot->{'show.legend'} > 0 ) {
-				say { $args->{fh} } "ax$ax.plot(base_y, mean_ys, '$color', label = '$group')";
-			} else {
-				say { $args->{fh} } "ax$ax.plot(base_y, mean_ys, '$color')";
-			}
-			say { $args->{fh} }
-		"ax$ax.fill_between(base_y, ys_lower, ys_upper, color='$color', alpha=0.3)";
+			check_wide_runs( $plot->{data}{$group}, "group \"$group\"", $current_sub );
+			write_wide_group({
+				fh    => $args->{fh},
+				ax    => $ax,
+				runs  => $plot->{data}{$group},
+				color => $plot->{color}{$group} // 'b',
+				label => $plot->{'show.legend'} ? $group : undef
+			});
 		}
-	} elsif ( $ref_type eq 'ARRAY' ) {
-		my $color = $plot->{color} // 'b';
-		say { $args->{fh} } 'ys = []';
-		my ( $min_x, $max_x ) = ( 'inf', '-inf' );
-		foreach my $run ( 0 .. scalar @{ $plot->{data} } - 1 ) {
-			$min_x = min( $min_x, @{ $plot->{data}[$run][0] } );
-			$max_x = max( $max_x, @{ $plot->{data}[$run][0] } );
+	} elsif ( $ref_type eq 'ARRAY' ) {    # one unlabelled group
+		if ( ref $plot->{color} ) {
+			die "$current_sub: \"data\" is one unlabelled group, so \"color\" must be a single color, not a " . ( ref $plot->{color} ) . ' reference';
 		}
-		say { $args->{fh} } "base_y = np.linspace($max_x, $min_x, 101)";
-		foreach my $run ( 0 .. scalar @{ $plot->{data} } - 1 ) {
-			say { $args->{fh} } 'x = ['
-			  . join( ',', @{ $plot->{data}[$run][0] } ) . ']';
-			say { $args->{fh} } 'y = ['
-			  . join( ',', @{ $plot->{data}[$run][1] } ) . ']';
-			say { $args->{fh} } "ax$ax.plot(x, y, '$color', alpha=0.15)";
-			say { $args->{fh} } 'y = np.interp(base_y, x, y)';
-			say { $args->{fh} } 'ys.append(y)';
-		}
-		say { $args->{fh} } 'ys = np.array(ys)';
-		say { $args->{fh} } 'mean_ys = ys.mean(axis=0)';
-		say { $args->{fh} } 'std = ys.std(axis=0)';
-		say { $args->{fh} } 'ys_upper = mean_ys + std';
-		say { $args->{fh} } 'ys_lower = mean_ys - std';
-		say { $args->{fh} } "ax$ax.plot(base_y, mean_ys, '$color')";
-		say { $args->{fh} }
-		"ax$ax.fill_between(base_y, ys_lower, ys_upper, color='$color', alpha=0.3)";
+		check_wide_runs( $plot->{data}, '"data"', $current_sub );
+		write_wide_group({
+			fh    => $args->{fh},
+			ax    => $ax,
+			runs  => $plot->{data},
+			color => $plot->{color} // 'b',
+			label => undef    # the array form carries no group name to label
+		});
 	} else {
 	  die "$current_sub cannot take ref type \"$ref_type\" for \"data\"";
 	}
@@ -5516,7 +5601,11 @@ C<plot> of the mean alone would hide how much the runs disagree.
 The runs do not have to share an x grid: each group's runs are interpolated onto
 101 evenly spaced points spanning that group's own x range before the mean and
 the standard deviation are taken, so runs of different lengths, or sampled at
-different x values, can be summarised together.
+different x values, can be summarised together.  A run is first sorted by x, so
+it may be entered in any order; and it counts towards the mean and the ribbon
+only between its own first and last x, so a run that stops early narrows the
+summary to the runs that continue rather than being held flat at its last
+value.
 
 =head3 Entering data
 
@@ -5546,6 +5635,15 @@ pair L<#plot> uses:
      xlabel        => 'time',
      ylabel        => 'signal',
  );
+
+which makes the image:
+
+
+=for html
+<p>
+<img width="651" height="491" alt="wide single" src="output.images/single.wide.png" />
+<p>
+
 
 B<2. One unlabelled group (array).> Drop the enclosing hash and pass one group's
 array of runs directly; C<color> is then a single color rather than a hash:
@@ -5618,6 +5716,13 @@ labelled groups sit beside one group on its own:
      ],
  );
 
+
+=for html
+<p>
+<img width="651" height="491" alt="wide subplots" src="output.images/wide.png" />
+<p>
+
+
 Because a C<wide> panel collapses many lines into one summary, it also composes
 well with a plot type that shows the same data another way.  Here the runs are
 summarised on the left and the distribution of their final values is drawn beside
@@ -5645,6 +5750,17 @@ them:
          },
      ],
  );
+
+
+=for html
+<p>
+<img width="651" height="491" alt="wide and violin" src="output.images/wide.and.violin.png" />
+<p>
+
+
+The three images above are written by C<wide.example.pl> in the git repository
+(it is not shipped in the CPAN distribution); re-run it from the repository root
+with C<perl -Ilib wide.example.pl> to regenerate them.
 
 =head1 Advanced
 
@@ -5709,206 +5825,6 @@ all files will be written to C<< $fh-E<gt>filename >>; be sure to put C<< execut
      fh                => $fh,
      execute           => 1,
  );
-
-=head1 Changes
-
-=head2 0.311 2026-07-27 CDT
-
-Improved README and testing, bug fixes
-
-Back-compatible to Perl-5.10, which the 0.31 broke
-
-=head2 0.31 2026-07-25 CDT
-
-Removed C<Term::ANSIColor> as dependency
-
-added C<venn_proportional_area> as a plot helper
-
-=head2 0.301
-
-Fixes for changes introduced in 0.30 for CPAN testers: https://www.cpantesters.org/cpan/report/143e86c6-77fa-11f1-b73a-21df6d8775ea
-
-Removed files from build directory to shrink tarball
-
-=head2 0.30
-
-non-ASCII key names (e.g. C<ρ>, C<τ>) no longer crash the writer. The generated-Python filehandle is now given a UTF-8 encoding layer, fixing a fatal "Wide character in say" that occurred under the module's strict-fatal warnings; the layer is added only when not already present, so a caller-supplied filehandle is never double-encoded.
-
-C<p> option: a flat array of subplots where B<one element is one subplot> — a hash is a single-plot subplot, and an array of hashes is one subplot with the plots overlaid on the same axes (first hash is the base plot, the rest are additions). The two forms may be mixed in the same C<p>. When no grid is given the subplots are laid out on an auto-sized near-square grid; giving only C<ncol>/C<nrow> (or C<ncols>/C<nrows>) derives the other dimension.
-
-=head2 0.29
-
-addition of the C<p> option
-
-removal of SHA testing; changes in Matplotlib version 3.11 mean that SHA sums aren't compatible across different versions of Matplotlib
-
-arguments can now be given as a flat hash
-
-=head2 0.28
-
-colorbar options now work better in C<scatter>.
-
-Better warning when color key isn't defined for C<scatter>
-
-When giving two hash of hashes for a barplot, if one second key is defined in one subplot, but not the other, that subkey is initialized to 0.
-
-=head3 Cross-platform support
-
-The module now should run on Windows in addition to Linux and macOS.
-
-The generated Python script is written to the system temporary directory (via C<< File::Spec-E<gt>tmpdir() >>) instead of a hard-coded C</tmp>, which does not exist on Windows.
-
-The Python interpreter is now discovered automatically by probing, in order, C<python3>, C<python>, and the Windows C<py> launcher, accepting the first that reports Python 3. This fixes Windows, where the interpreter is typically named C<python> (not C<python3>), and correctly rejects the Microsoft Store C<python3> stub and any Python 2. Set the C<MPLS_PYTHON> (or C<PYTHON>) environment variable to override the interpreter with a specific name or full path.
-
-The Python script is now executed with the list form of C<system> rather than a single shell string, so script paths containing spaces (common on Windows, e.g. C<C:\Users\First Last\AppData\Local\Temp>) no longer break execution.
-
-The C<Creator> metadata embedded in the output file is now passed through C<write_data> (base64), so Windows paths containing backslashes no longer produce invalid escape sequences (e.g. C<\U> in C<C:\Users>) in the generated Python string literal.
-
-On Windows, C<Win32::Console::ANSI> is loaded if available (it is optional, not a hard dependency) so colored status messages render on legacy consoles.
-
-=head3 Crashes / generated-code fixes
-
-C<violinplot> is now a callable wrapper; it was exported and dispatched but never defined, so calling it died with "Undefined subroutine".
-
-C<hist> with an array of C<bins> no longer emits a stray double-quote (e.g. C<[0,2,4"]>) that caused a Python C<SyntaxError>.
-
-C<hexbin> and C<hist2d> no longer pass C<cblabel> twice (once inside the option string and again as C<< label =E<gt> ... >>), which previously caused a duplicate-keyword C<SyntaxError>.
-
-C<scatter> with a scalar C<set.options> no longer emits a doubled comma (C<scatter(x, y, , ...)>), which was a C<SyntaxError>.
-
-Stacked C<barh> now uses the C<left> keyword for stacking instead of C<bottom>, which collided with C<barh>'s own C<bottom> (y-position) parameter and raised "got multiple values for keyword argument 'bottom'".
-
-C<colored_table> with C<cb_logscale> together with C<cb_min>/C<cb_max> no longer emits C<LogNorm(, vmin=...)> with a leading comma (a C<SyntaxError>).
-
-C<plot> with a hash of data and a scalar C<set.options> no longer crashes by dereferencing a string as a hash under C<strict refs>.
-
-C<plot> with a hash of data now accepts a scalar C<twinx> naming a data key (e.g. C<< twinx =E<gt> 'pressure' >>); previously the value was wrongly required to be a digit string, making key-named C<twinx> impossible.
-
-Grouped bar plots with a single scalar C<color> (e.g. C<< color =E<gt> 'green' >>) no longer crash trying to dereference the string as an array; the color is applied to all series.
-
-=head3 Incorrect-output fixes
-
-C<colored_table> no longer clobbers asymmetric data: filling undefined cells with C<np.nan> previously also overwrote the mirror cell, destroying defined values (if C<< A-E<gt>B >> was defined but C<< B-E<gt>A >> was not, both became C<NaN>).
-
-C<colored_table> now honors C<cb_min> and C<cb_max>; they were read from the wrong hash (C<$args> instead of the plot options) and so were silently ignored.
-
-C<colored_table> now honors the C<cmap> option; the color map and C<set_bad> color were hard-coded to C<gist_rainbow> regardless of the C<cmap> given. The colormap is copied before calling C<set_bad>, as registered colormaps are immutable in current matplotlib.
-
-C<colored_table> default row labels now mirror the column labels, matching the matrix that is actually built; with asymmetric data the old default could produce a row-label count mismatch ("'rowLabels' must be of length N").
-
-C<scatter> (single set, three keys) now honors the C<cmap> option instead of always using C<gist_rainbow>.
-
-C<scatter> now validates undefined values in I<both> coordinate keys; the undefined-data check previously inspected only the first key.
-
-Grouped, non-stacked bar widths are now divided by the number of bar series (plus one), not by a constant; the old divisor came from a hash that always held exactly one key, so groups with more than a few series overlapped their neighbors.
-
-The C<wide> plot no longer clamps the upper standard-deviation band at C<1>; that clamp assumed data in the range C<[0, 1]> and clipped ordinary data (the documented example reaches roughly C<1.9>).
-
-Numeric arguments to C<plt> methods (e.g. C<< margins =E<gt> 0.2 >>) are no longer quoted into strings; C<print_type> now recognizes numbers.
-
-C<plt.show()> is now emitted after C<plt.savefig()> (and only once), so using C<show> no longer writes the file only after the interactive window is closed; C<output.file> is no longer required when C<show> is requested.
-
-The C<add> overlay's C<plot.type> now correctly falls back to the parent plot's type when omitted, in both single- and multi-plot calls; the fallback was previously unreachable dead code, and an undefined type could be dispatched on.
-
-=head3 Cleanups
-
-Removed corrupted entries from the method whitelists (C<'set_mouseover( '> and a leading-space C<' FixedFormatter'>) that made those options unusable.
-
-Removed a stray default applied to the wrong hash in C<violin>, two empty dead C<if> blocks, and a duplicated C<die>.
-
-=head2 0.27
-
-Better warnings for undefined data in C<scatter>
-
-C<color_key> didn't work properly for multiple sets of data in C<scatter>, which has now been fixed
-
-=head2 0.26
-
-C<ncol> & C<nrow> are synonymous with C<ncols> and C<nrows> respectively; testing now reflects these two specifically numeric options
-
-no longer exports Data::Printer and Devel::Confess with the module, but is still used inside the module
-
-'show.legend' option added to "hist", which is automatically turned off if there is only 1 group
-
-"add" group is no longer deleted
-
-"boxplot", "hist", and "violin" can take a single array, simplifying calls without requiring useless single keys when calling a single distribution
-
-C<cb_min> and C<cb_max> now work for colored_table
-
-"write_data" is no longer used in hist, as it prints numbers as strings (python3's types are a headache)
-
-Instead, all values are checked in hist for being numeric before being sent to "write_data"
-
-re-use undefined error array in hist_helper (slightly less RAM use)
-
-=head2 0.25
-
-re-used error array in scatter_helper
-
-better warnings for undefined values in multiple-set scatterplots
-
-fixed bug in scatterplot, where different sets would have the same label
-
-"logscale" now available with "boxplot, "hist", "plot", "scatter"
-
-$VERSION now prints with metadata for SVG output files, which required minor changes to testing
-
-slightly better warnings in plot_helper
-
-removed duplicate check from hist2d_helper
-
-better warnings if wrong data types are given to "add"
-
-Fixed bug in scatterplot, where color key could repeat on axes
-
-=head2 colorbar can now be in logscale for colored_table
-
-=head2 ## 0.24
-
-Newlines are now possible in key names for barplot and pie; other characters may be fixed too
-
-@prop_cycle is only now taking RAM/valid where it's needed
-
-new dependencies in JSON::MaybeXS and MIME::Base64 to prevent errors in key names
-
-slight improvement in violinplot: "print" changed to "say" (1 less concatenation)
-
-dynamic method wrappers are used, which save ~120 lines of code
-
-re-used error array in "plt" to save RAM
-
-better warning for non-File::Temp objects
-
-more tests for wrapper subroutines
-
-duplicate check removed from hexbin_helper
-
-removed whiskers option from boxplot_helper, which didn't work the way that I thought that it did
-
-removed shebang, which isn't necessary in .pm files
-
-=head2 hist2d was missing an option for logscale on the axes, which it now has
-
-=head2 ## 0.23
-
-=head2 colors for bar plots can be defined by hashes; e.g. colors => {A => 'red', B => 'green'}, etc
-
-=head2 ## 0.22
-
-=head2 minor under-the-hood changes; "execute" subroutine, which was only called once, is now built into "plt" to save a function call; execution should be slightly faster/more efficient
-
-=head2 ## 0.21
-
-=head2 "show" now works; files are still output if specified
-
-=head2 ## 0.20
-
-better warnings for incomplete data in "plot"
-"plot" can plot with "twinx" when data is given in array or hash form
-"tick_params" is removed from plt methods
-fewer "my" for error arrays, using empty arrays from earlier; should increase efficiency slightly
-added tests for twinx in plot for both array and hash variants
 
 =head1 COPYRIGHT AND LICENSE
 

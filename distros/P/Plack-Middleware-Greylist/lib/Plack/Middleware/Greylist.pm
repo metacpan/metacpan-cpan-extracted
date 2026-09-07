@@ -21,7 +21,7 @@ use Time::Seconds         qw/ ONE_MINUTE /;
 
 use experimental qw/ postderef signatures /;
 
-our $VERSION = 'v0.8.1';
+our $VERSION = 'v0.8.2';
 
 
 sub prepare_app($self) {
@@ -195,13 +195,15 @@ __END__
 
 =encoding UTF-8
 
+=for stopwords greylist ip ips netblock netblocks norobots preloading requestor
+
 =head1 NAME
 
 Plack::Middleware::Greylist - throttle requests with different rates based on net blocks
 
 =head1 VERSION
 
-version v0.8.1
+version v0.8.2
 
 =head1 SYNOPSIS
 
@@ -239,7 +241,7 @@ Note that the C<$netblock> for the default rate is simply "default", e.g.
 
     Rate limiting 192.168.0.12 after 101/100 for default
 
-This will allow you to use something like L<fail2ban> to block repeat offenders, since bad
+This will allow you to use something like L<fail2ban|https://github.com/fail2ban/fail2ban> to block repeat offenders, since bad
 robots are like houseflies that repeatedly bump against closed windows.
 
 Note, if a L</callback> is specified, then nothing will be logged, but the log message will be sent to the callback.
@@ -468,7 +470,7 @@ Future releases may only support Perl versions released in the last ten years.
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/Plack-Middleware-Greylist>
-and may be cloned from L<git://github.com/robrwo/Plack-Middleware-Greylist.git>
+and may be cloned from L<https://github.com/robrwo/Plack-Middleware-Greylist.git>
 
 =head1 BUGS
 
@@ -479,9 +481,14 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
@@ -494,7 +501,7 @@ Gabor Szabo <gabor@szabgab.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022-2024 by Robert Rothenberg.
+This software is Copyright (c) 2022-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

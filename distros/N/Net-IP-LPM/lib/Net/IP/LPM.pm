@@ -10,9 +10,9 @@ require Exporter;
 
 #use Socket qw( AF_INET );
 #use Socket6 qw( inet_ntop inet_pton AF_INET6 );
-use if $] <  5.014000, Socket  => qw(inet_aton AF_INET);
+use if $] <  5.014000, Socket  => qw(AF_INET);
 use if $] <  5.014000, Socket6 => qw(inet_ntop inet_pton AF_INET6);
-use if $] >= 5.014000, Socket  => qw(inet_ntop inet_pton inet_aton AF_INET6 AF_INET);
+use if $] >= 5.014000, Socket  => qw(inet_ntop inet_pton AF_INET6 AF_INET);
 #use Data::Dumper;
 
 #our @ISA = qw(DB_File);
@@ -26,20 +26,20 @@ our @ISA = qw();
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	
+
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
-	
+
 );
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 sub AUTOLOAD {
 	# This AUTOLOAD is used to 'autoload' constants from the constant()
 	# XS function.
-	
+
     my $constname;
     our $AUTOLOAD;
     ($constname = $AUTOLOAD) =~ s/.*:://;
@@ -79,7 +79,7 @@ Net::IP::LPM - Perl implementation of Longest Prefix Match algorithm
 
   my $lpm = Net::IP::LPM->new();
 
-  # add prefixes 
+  # add prefixes
   $lpm->add('0.0.0.0/0', 'default');
   $lpm->add('::/0', 'defaultv6');
   $lpm->add('147.229.0.0/16', 'net1');
@@ -95,17 +95,17 @@ Net::IP::LPM - Perl implementation of Longest Prefix Match algorithm
   printf $lpm->lookup('147.229.100.100'); # returns net1
   printf $lpm->lookup('147.229.3.10');    # returns host3
   printf $lpm->lookup('2001:67c:1220::1');# returns net16
-  
+
 
 =head1 DESCRIPTION
 
-The module Net::IP::LPM implements the Longest Prefix Match algorithm 
-to both protocols, IPv4 and IPv6.  The module uses Trie algo. 
+The module Net::IP::LPM implements the Longest Prefix Match algorithm
+to both protocols, IPv4 and IPv6.  The module uses Trie algo.
 
 =head1 PERFORMANCE
 
-The module is able to match  ~ 1 mln. lookups  
-per second to a complete Internet BGP table (approx. 500,000 prefixes) using a common 
+The module is able to match  ~ 1 mln. lookups
+per second to a complete Internet BGP table (approx. 500,000 prefixes) using a common
 hardware (2.4GHz Xeon CPU). For more detail, make a test on the module source
 to check its performance on your system. Module supports both, IPv4 and IPv6 protocols.
 
@@ -117,21 +117,21 @@ to check its performance on your system. Module supports both, IPv4 and IPv6 pro
 
   $lpm = Net::IP::LPM->new( );
 
-Constructs a new Net::IP::LPM object. 
+Constructs a new Net::IP::LPM object.
 
-=cut 
+=cut
 sub new {
 	my ($class, $dbfile) = @_;
 	my %h;
 	my $self = {};
-	
+
 	$self->{handle} = lpm_init();
 
 	bless $self, $class;
 	return $self;
 }
 
-# converts IPv4 and IPv6 address into common format 
+# converts IPv4 and IPv6 address into common format
 sub format_addr {
 	my ($addr) = @_;
 
@@ -139,7 +139,7 @@ sub format_addr {
 		return undef;
 	}
 
-	if ((my $addr_bin = inet_aton($addr))) {
+	if ((my $addr_bin = inet_pton(AF_INET, $addr))) {
 		return $addr_bin;
 	} else {
 		return inet_pton(AF_INET6, $addr);
@@ -153,21 +153,23 @@ sub format_addr {
 
    $code = $lpm->add( $prefix, $value );
 
-Adds a prefix B<$prefix> into the database with value B<$value>. Returns 1 if 
+Adds a prefix B<$prefix> into the database with value B<$value>. Returns 1 if
 the prefix was added successfully. Returns 0 when an error occurs (typically the wrong address formating).
 
-=cut 
+=cut
 sub add {
 	my ($self, $prefix, $value) = @_;
 
 #	printf "PPP: %s %s %s\n", $self->{handle}, $prefix, $value;
 	my ($prefix_bin, $prefix_len);
 
-	($prefix, $prefix_len) = split('/', $prefix);	
+	($prefix, $prefix_len) = split('/', $prefix);
 
-	if (! ($prefix_bin = inet_aton($prefix)) ) {
+	if (! ($prefix_bin = inet_pton(AF_INET, $prefix)) ) {
 		$prefix_bin = inet_pton(AF_INET6, $prefix);
 	}
+
+        croak "invalid prefix address '${prefix}'" unless defined $prefix_bin;
 
 	if (!defined($prefix_len)) {
 		if (length($prefix_bin) == 4) {
@@ -176,6 +178,8 @@ sub add {
 			$prefix_len = 128;
 		}
 	}
+
+        croak "prefix length must be a decimal integer" unless $prefix_len =~ /^[0-9]+$/;
 
 	return lpm_add_raw($self->{handle}, $prefix_bin, $prefix_len, $value);
 }
@@ -186,21 +190,21 @@ sub rebuild {
 
 =head2  lookup - Lookup Address
 
- 
+
   $value = $lpm->$lookup( $address );
 
 Looks up the prefix in the database and returns the value. If the prefix is
-not found or an error occured, the undef value is returned. 
+not found or an error occured, the undef value is returned.
 
-Before lookups are performed the database has to be rebuilt by C<$lpm-E<gt>rebuild()> operation. 
+Before lookups are performed the database has to be rebuilt by C<$lpm-E<gt>rebuild()> operation.
 
-=cut 
+=cut
 
 sub lookup {
 	my ($self, $addr) = @_;
 	my $addr_bin;
 
-	if (! ($addr_bin = inet_aton($addr)) ) {
+	if (! ($addr_bin = inet_pton(AF_INET, $addr)) ) {
 		$addr_bin = inet_pton(AF_INET6, $addr);
 	}
 
@@ -210,14 +214,14 @@ sub lookup {
 
 =head2  lookup_raw - Lookup Address in raw format
 
- 
+
   $value = $lpm->lookup_raw( $address );
 
-The same case as C<$lpm-E<gt>lookup> but it takes $address in raw format (result of the inet_ntop function). It is 
-more effective than C<$lpm-E<gt>lookup>, because the conversion from text format is not 
-necessary. 
+The same case as C<$lpm-E<gt>lookup> but it takes $address in raw format (result of the inet_ntop function). It is
+more effective than C<$lpm-E<gt>lookup>, because the conversion from text format is not
+necessary.
 
-=cut 
+=cut
 
 sub lookup_raw {
 #	my ($self, $addr_bin) = @_;
@@ -234,60 +238,60 @@ sub lookup_cache_raw {
 
 }
 
-=head2  info - Returns information about the built trie 
+=head2  info - Returns information about the built trie
 
   $ref = $lpm->info();
 
-Returns following items 
+Returns following items
 
   ipv4_nodes_total - total number of allocated nodes in trie
-  ipv4_nodes_value - number of allocated nodes in trie that have stored some value 
+  ipv4_nodes_value - number of allocated nodes in trie that have stored some value
   ipv4_trie_bytes - number of bytes allocated for trie nodes (without data)
-  ipv6_ - the same for IPv6 
+  ipv6_ - the same for IPv6
 
-=cut 
+=cut
 
 sub info {
 	my ($self) = @_;
 
 	return lpm_info($self->{handle});
-}	
+}
 
 =head2  dump - Return hash array reference containg all stored prefixes in the trie
- 
+
   $ref = $lpm->dump();
 
-=cut 
+=cut
 
 sub dump {
 	my ($self) = @_;
 
 	return lpm_dump($self->{handle});
-}	
+}
 
 =head2  finish - Release all data in object
 
- 
+
   $lpm->finish();
 
-=cut 
+=cut
 sub finish {
 	my ($self) = @_;
 
 	lpm_finish($self->{handle});
-}	
+}
 
 sub DESTROY {
 	my ($self) = @_;
 
 	lpm_destroy($self->{handle});
-}	
+}
 
 =head1 SEE ALSO
 
-There are also other implementations of the Longest Prefix Match in Perl. However, 
+There are also other implementations of the Longest Prefix Match in Perl. However,
 most of them have some disadvantages (poor performance, lack of support for IPv6
-or require a lot of time for initial database building). However, in some cases 
+or require a lot of time for initial database building). However, in some cases
 it might be usefull:
 
 L<Net::IPTrie>
@@ -302,13 +306,17 @@ L<Net::CIDR::Lookup>
 
 L<Net::CIDR::Compare>
 
+L<Net::Patricia>
+
 =head1 AUTHOR
 
-Tomas Podermanski E<lt>tpoder@cis.vutbr.czE<gt>, Martin Ministr E<lt>leadersmash@email.czE<gt>, Brno University of Technology
+Tomas Podermanski <tpoder@cis.vutbr.cz>, Martin Ministr <leadersmash@email.cz>, Brno University of Technology
+
+Currently maintained by Robert Rothenberg <perl@rhizomnic.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012, Brno University of Technology
+Copyright (C) 2012, 2026 Brno University of Technology
 
 This library is a free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

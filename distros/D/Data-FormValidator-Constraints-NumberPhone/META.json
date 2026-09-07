@@ -4,7 +4,7 @@
       "Graham TerMarsch <cpan@howlingfrog.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "artistic_2"
    ],
@@ -42,8 +42,9 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Spelling" : "0.12",
-            "Test::Synopsis" : "0"
+            "Test::Spelling" : "0.17",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -73,16 +74,16 @@
       "bugtracker" : {
          "web" : "https://github.com/bleargh45/Data-FormValidator-Constraints-NumberPhone/issues"
       },
-      "homepage" : "http://metacpan.org/release/Data-FormValidator-Constraints-NumberPhone/",
+      "homepage" : "https://metacpan.org/release/Data-FormValidator-Constraints-NumberPhone/",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/bleargh45/Data-FormValidator-Constraints-NumberPhone.git",
          "web" : "https://github.com/bleargh45/Data-FormValidator-Constraints-NumberPhone"
       }
    },
-   "version" : "0.05",
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.41",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }

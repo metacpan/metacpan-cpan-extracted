@@ -5,7 +5,7 @@ use Test::More;
 use FindBin;
 
 use lib "$FindBin::Bin/../lib";
-use App::SlimPacker qw(process name_gen needs_space);
+use App::SlimPacker qw(process name_gen needs_space pack_string);
 
 # ── name_gen ──────────────────────────────────────────────────────────────
 is name_gen(0),  'a',  'name_gen(0) = a';
@@ -166,6 +166,76 @@ sub nt { my ($c, $s) = @_; my $cl = "PPI::Token::$c"; no strict 'refs'; return $
     is needs_space(nt('Symbol','$fh'), nt('Cast','$')), 1, 'sym+cast($) → space (prevents $$merge)';
     is needs_space(nt('Symbol','$fh'), nt('Cast','@')), 1, 'sym+cast(@) → space (prevents @$merge)';
     is needs_space(nt('Cast','$'), nt('Symbol','$src')), 0, 'cast+sym → no double-space (cast-sym stays glued)';
+}
+
+# ── pack_string: shortest exact Perl literal for arbitrary bytes ───────────
+# The bundler embeds whole module sources this way.  Every produced literal
+# must eval back to the exact original string; the form chosen must be the
+# cheapest that round-trips (single-quote when possible, then q<delim>).
+{
+    sub rt { my ($s) = @_; my $lit = pack_string($s); my $got = eval $lit; ok (defined $got && $got eq $s, "round-trip " . (length($s) > 28 ? substr($s,0,28).'...' : "`$s`")); return $lit }
+
+    is pack_string(''), "''", 'empty string → empty literal';
+    is pack_string('abc'),            "'abc'",            'plain → single-quoted';
+    is pack_string('my$x="hi";'),     q{'my$x="hi";'},    'sigils + double quotes → single-quoted, no escaping';
+
+    # contains a quote → q<delim> with an absent delimiter
+    my $quote_content = q{say 'x';
+print "$_";};
+    my $lit = pack_string($quote_content);
+    like $lit, qr/^q[\^~|?]/, 'string with quote → q<delim> form';
+    is eval $lit, $quote_content, 'q<delim> form round-trips exactly';
+
+    # backslashes are escaped in place, never handed to perlstring
+    my $bs = pack_string('print "a\nb\nc";');
+    like $bs, qr/'print "a\\\\nb\\\\nc";'/, 'backslash content → singleton quote, backslashes doubled';
+    is eval $bs, 'print "a\nb\nc";', 'escaped single-quote round-trips exactly';
+    like pack_string("ab\\"), qr/'ab\\\\'/, 'trailing backslash → terminator-safe doubled backslash';
+    is eval(pack_string("ab\\")), "ab\\", 'trailing-backslash literal round-trips exactly';
+
+    # quote AND backslash together → escaped q<delim> (quotes stay raw)
+    my $qw = pack_string('q^ twice? "a\\b" \'it\'');
+    like $qw, qr/^q[\^~|?]/, 'quote + backslash → q<delim> with escaped backslashes';
+    is eval $qw, 'q^ twice? "a\\b" \'it\'', 'escaped q<delim> round-trips exactly';
+
+    # every candidate delimiter present AND a quote → escaped q<delim> (rarest
+    # delimiter chosen), never per-quote escaping
+    my $nasty = "'a^~|?,;!#&-=+*/%:<>'";
+    my $fallback = pack_string($nasty);
+    like $fallback, qr/^q/, 'every delimiter present → q<delim> with escaped delimiter';
+    like $fallback, qr/\\\^/, 'the single ^ occurrence is escaped';
+    unlike $fallback, qr/^"/, 'no double-quoted perlstring output';
+    is eval $fallback, $nasty, 'every-delimiter fallback round-trips exactly';
+
+    # quote-heavy module source (like the saisons UI): must stay q<delim>,
+    # not inflate every ' into \'
+    my $heavy = "'^~|?,;!#&-=+*/%:<>" .
+        q{use constant RESET=>color('reset');color('yellow');color('cyan');color('bold green');};
+    my $heavy_lit = pack_string($heavy);
+    like $heavy_lit, qr/^q/, 'quote-heavy + all-delimiter source → q<delim>';
+    unlike $heavy_lit, qr/\\'/, 'quotes stay unescaped inside q<delim>';
+    is eval $heavy_lit, $heavy, 'quote-heavy source round-trips exactly';
+
+    # binary-ish / multiline / backslash runs
+    rt("multi\nline\ttab");
+    rt('trailing\\');
+    rt('a\\b' . '\\' . '\\');    # contains `\\` two-backslash run
+    rt("\x00\x01\xff");
+
+    # seeded differential corpus: pack_string must round-trip any byte string,
+    # however it is composed (delimiters, quotes and backslashes included)
+    srand 20260907;
+    my $alpha = join('', "aZ09.'~^\" ", "\t\n", '\\$@%(){}[]=,;:/_-.!#&*+?<>|');
+    my $diff_fail = 0;
+    for (1 .. 1000) {
+        my $len = int(rand 90);
+        my $s = join('', map { substr($alpha, int(rand length $alpha), 1) } 1 .. $len);
+        $s .= '\\' if rand() < 0.2;
+        my $lit = pack_string($s);
+        my $v = eval $lit;
+        $diff_fail++ if !defined $v || $v ne $s;
+    }
+    is $diff_fail, 0, '1000-string differential corpus round-trips through pack_string';
 }
 
 # ── process: empty source short-circuits ──────────────────────────────────

@@ -1,6 +1,30 @@
 Revision history for Matplotlib-Simple
 
 
+0.312 2026-09-04 CDT
+
+ [`wide` summaries]
+
+ - `wide` now sorts each run by x before interpolating it. `np.interp` requires its sample points in ascending order, and nothing enforced that, so a run whose x descended (or was otherwise unordered) was summarised as a flat line while the faint raw run underneath drew correctly — a wrong picture that looked authoritative.
+
+ - A run now counts towards the mean and the ribbon only between its own first and last x. `np.interp` holds the end values flat outside the sample points, so a run that stopped short of the group's x range used to contribute an invented horizontal line to both the mean and the standard deviation; a run ending halfway could double the apparent spread over the second half. The summary at each point is now taken over the runs that actually reach it, which is what the documented support for "runs of different lengths, or sampled at different x values" always promised.
+
+ - `wide` now rejects malformed `data` with a message naming the group and the run, instead of dying inside the writer with `Can't use string ("0") as an ARRAY ref`. Passing `plot`'s single `[ \@x, \@y ]` pair where a group of runs belongs, an empty group, mismatched x and y lengths, and non-numeric values are each reported. Giving `color` as a hash for array data, or as a single color for hash data, is also caught rather than dying on a bad dereference.
+
+ [Labels taken from data keys]
+
+ - Text that comes from the data — legend labels, colorbar labels, and the `xlabel`/`ylabel` that `scatter`, `hexbin` and `hist2d` default from their keys — is now written as a properly escaped Python string literal. A key containing an apostrophe, such as `Farmer's`, previously closed the literal early and the generated script would not parse. Because backslashes are escaped too, a mathtext label such as `$\alpha$` now reaches matplotlib as written instead of being read as a Python escape. Title and label text passed by the caller is unchanged: it is still Python syntax, so a comma or a quote in it must still be quoted by the caller.
+
+ [Testing]
+
+ - The error-path assertions in the test suite were passing regardless of what the code did. `Devel::Confess` appends a stack trace in which every frame prints its own arguments, one of which is the regular expression handed to `throws_ok`/`dies_like`, so the exception always contained a copy of the pattern it was being matched against. Both helpers now match the exception's message alone. All the assertions they guard still pass, so the module's messages were correct — only the harness was blind.
+
+ - Regression tests were added for the fixes above: the `wide` summary is checked numerically (three runs of the same straight line, entered ascending, descending, and covering only half the range, must summarise to that line with a zero-width ribbon), along with the six `wide` error paths and the two guards in the generated Python; and the generated-Python parser gate now covers an apostrophe in a data key for `wide`, `plot`, `hist`, `scatter` and `hist2d`.
+
+ [Documentation]
+
+ - The `wide` section of the README now shows the three figures its examples produce. They are written by `wide.example.pl` in the git repository, which runs the documented code with a fixed seed so the committed images can be regenerated.
+
 0.311 2026-07-27 CDT
 
  - Improved README and testing, bug fixes

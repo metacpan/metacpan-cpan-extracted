@@ -38,20 +38,26 @@ subtest 'Internal sub _current_version' => sub {
 # Inadequate testing.
 subtest 'Hook function check_affected_refs_client_side' => sub {
     my ( $repo, undef, $clone, $tempdir ) = new_repos();
-    my $repodir         = $tempdir->child('repo');
+    my $repodir = $tempdir->child('repo');
     my $is_squash_merge = 0;
-    my $git             = Git::Repository->new( work_tree => $repodir );
-    like( dies { Git::MoreHooks::GitRepoAdmin::check_affected_refs_client_side( $git, $is_squash_merge ) },
-        qr//msx, 'Dies because repo does not have dir .git-repo-admin' );
+    my $git = Git::Repository->new(work_tree => $repodir);
+    like(
+        dies { Git::MoreHooks::GitRepoAdmin::check_affected_refs_client_side($git, $is_squash_merge) },
+        qr//msx,
+        'Dies because repo does not have dir .git-repo-admin'
+    );
     done_testing;
 };
 
 subtest 'Hook function check_affected_refs_server_side' => sub {
     my ( $repo, undef, $clone, $tempdir ) = new_repos();
     my $repodir = $tempdir->child('repo');
-    my $git     = Git::Repository->new( work_tree => $repodir );
-    like( dies { Git::MoreHooks::GitRepoAdmin::check_affected_refs_client_side($git) },
-        qr//msx, 'Dies because repo does not have dir .git-repo-admin' );
+    my $git = Git::Repository->new(work_tree => $repodir);
+    like(
+        dies { Git::MoreHooks::GitRepoAdmin::check_affected_refs_client_side($git) },
+        qr//msx,
+        'Dies because repo does not have dir .git-repo-admin'
+    );
     done_testing;
 };
 

@@ -1,3 +1,13 @@
+0.016   2026-06-17  Released-By: PERLANCAR; Urgency: medium
+
+        - When adding clipboard content using xclip, set both primary and
+          clipboard instead of just primary.
+
+        - Use Desktop::KDE::Util.
+
+        - [bugfix] Only emit log message when under appropriate condition.
+
+
 0.015   2025-06-16  Released-By: PERLANCAR; Urgency: medium
 
         [func add_clipboard_content]

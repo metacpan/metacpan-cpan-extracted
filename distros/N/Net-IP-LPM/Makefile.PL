@@ -14,8 +14,25 @@ WriteMakefile(
     PREREQ_PM         => { Socket6 => 0.15 }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Net/IP/LPM.pm', # retrieve abstract from module
-       AUTHOR         => 'Tomas Podermanski <tpoder@cis.vutbr.cz>') : ()),
+       AUTHOR         => [
+           'Tomas Podermanski <tpoder@cis.vutbr.cz>',
+           'Martin Ministr <leadersmash@email.cz>',
+           'Robert Rothenberg <perl@rhizomnic.com>',
 
+       ],
+       META_MERGE        => {
+           'meta-spec' => { version => 2 },
+            resources => {
+            repository => {
+                type => 'git',
+                url => 'git@github.com:robrwo/perl-Net-IP-LPM.git',
+                web => 'https://github.com/robrwo/perl-Net-IP-LPM',
+            },
+            bugtracker => {
+                web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Net-IP-LPM'
+            },
+        },
+      } ) : ()),
     LIBS              => [ ], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
@@ -50,4 +67,3 @@ else {
     copy ($fallback, $file) or die "Can't copy $fallback to $file: $!";
   }
 }
-

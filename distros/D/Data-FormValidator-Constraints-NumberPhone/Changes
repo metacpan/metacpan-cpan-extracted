@@ -1,5 +1,9 @@
 Revision history for Data::FormValidator::Constraints::NumberPhone;
 
+0.06      2026-09-06 10:59:46-07:00 America/Vancouver
+    - removed "not a valid number" test; Number::Phone previously returned undef
+      for this condition, but throws a fatal exception as of v4.0012.
+
 0.05      2021-06-21 12:03:27-07:00 America/Vancouver
     - minor POD cleanups
 

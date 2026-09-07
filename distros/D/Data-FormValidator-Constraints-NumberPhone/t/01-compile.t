@@ -1,8 +1,7 @@
-use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.059
 
 use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More 0.94;
 
@@ -35,7 +34,7 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'}.$str.q{'} }
             $^X, @switches, '-e', "require q[$lib]"))
         if $ENV{PERL_COMPILE_TEST_DEBUG};
 
@@ -57,7 +56,6 @@ for my $lib (@module_files)
 
 
 
-is(scalar(@warnings), 0, 'no warnings found')
-    or diag 'got warnings: ', explain(\@warnings) if $ENV{AUTHOR_TESTING};
+is(scalar(@warnings), 0, 'no warnings found') or diag 'got warnings: ', explain(\@warnings) if $ENV{AUTHOR_TESTING};
 
 BAIL_OUT("Compilation problems") if !Test::More->builder->is_passing;

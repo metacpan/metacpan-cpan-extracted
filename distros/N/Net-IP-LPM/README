@@ -1,29 +1,40 @@
-Net-IP-LPM version 0.02
-==========================
+NAME
+    Net::IP::LPM - Perl implementation of Longest Prefix Match algorithm
 
-Perl implementation of Longest Prefix Match algorithm. 
+SYNOPSIS
+      use Net::IP::LPM;
 
-INSTALLATION
+      my $lpm = Net::IP::LPM->new();
 
-To install this module type the following:
-
-   perl Makefile.PL
-   make
-   make test
-   make install
-
-DEPENDENCIES
-
-This module do not requires fllowing modules:
- 
-   Socket6
-   DB_File
-
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2012 by Tomas Podermanski, Brno University of Technology
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+      # add prefixes
+      $lpm->add('0.0.0.0/0', 'default');
+      $lpm->add('::/0', 'defaultv6');
+      $lpm->add('147.229.0.0/16', 'net1');
+      $lpm->add('147.229.3.0/24', 'net2');
+      $lpm->add('147.229.3.10/32', 'host3');
+      $lpm->add('147.229.3.11', 'host4');
+      $lpm->add('2001:67c:1220::/32', 'net16');
+      $lpm->add('2001:67c:1220:f565::/64', 'net26');
+      $lpm->add('2001:67c:1220:f565::1235/128', 'host36');
+      $lpm->add('2001:67c:1220:f565::1236', 'host46');
 
 
+      printf $lpm->lookup('147.229.100.100'); # returns net1
+      printf $lpm->lookup('147.229.3.10');    # returns host3
+      printf $lpm->lookup('2001:67c:1220::1');# returns net16
+
+DESCRIPTION
+    The module Net::IP::LPM implements the Longest Prefix Match algorithm to
+    both protocols, IPv4 and IPv6. The module uses Trie algo.
+
+AUTHOR
+    Tomas Podermanski <tpoder@cis.vutbr.cz>, Martin Ministr
+    <leadersmash@email.cz>, Brno University of Technology
+
+    Currently maintained by Robert Rothenberg <perl@rhizomnic.com>.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012, 2026 Brno University of Technology
+
+    This library is a free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

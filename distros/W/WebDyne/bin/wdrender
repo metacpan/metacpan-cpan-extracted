@@ -74,7 +74,7 @@ local $Data::Dumper::Sortkeys=1;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='3.026';
+$VERSION='3.027';
 
 
 #  Run main
@@ -322,7 +322,7 @@ sub main {
     else {
         #$req_or=HTTP::Request->new(uc($method), $uri_or, $headers_in_or, \@query_string);
         my $method_uc=uc($method);
-        use HTTP::Request::Common;
+        require HTTP::Request::Common;
         $req_or=&{"HTTP::Request::Common::${method_uc}"}($uri_or, \@query_string, $headers_in_or->flatten );
     }
     

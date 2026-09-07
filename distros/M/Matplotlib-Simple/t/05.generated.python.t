@@ -291,6 +291,26 @@ parses_ok( gen( 'plot.type' => 'imshow', data => [ [ ' ', 'G' ], [ 'S', 'H' ] ],
 		stringmap => { ' ' => 'loop', G => '3-helix', S => 'bend', H => 'helix' } ),
 	'imshow: a space as a stringmap key parses' );
 
+# An apostrophe in a key is the sharpest case of this: a key becomes a legend
+# label, a colorbar label or an axis label, each of which used to be pasted
+# straight between single quotes, so "Farmer's" closed the literal early and
+# the script would not parse.
+parses_ok( gen( 'plot.type' => 'wide',
+		data => { "Farmer's" => [ map { my $n = $_; [ [@xs], [ map { $_ + $n } @xs ] ] } 1 .. 3 ] } ),
+	"wide: an apostrophe in a group name parses" );
+parses_ok( gen( 'plot.type' => 'plot', data => { "Farmer's" => [ [@xs], [@xs] ] } ),
+	"plot: an apostrophe in a data key parses" );
+parses_ok( gen( 'plot.type' => 'hist', data => { "O'Brien" => [@g1], "O'Neill" => [@g2] } ),
+	"hist: an apostrophe in a data key parses" );    # 2 keys, so a legend is drawn
+parses_ok( gen( 'plot.type' => 'scatter', data => { "Bob's x" => [@cx], "Bob's y" => [@cy] } ),
+	"scatter: an apostrophe in the keys that become axis labels parses" );
+parses_ok( gen( 'plot.type' => 'scatter',
+		data => { "d'x" => [@cx], "d'y" => [@cy], "d'z" => [@cy] }, color_key => "d'z" ),
+	"scatter: an apostrophe in the colorbar key parses" );
+parses_ok( gen( 'plot.type' => 'hist2d', data => { "a'x" => [@cx], "a'y" => [@cy] },
+		cblabel => "count's" ),
+	"hist2d: an apostrophe in a cblabel parses" );
+
 # ============================================================================
 # 7. Numbers that are not plain integers.
 # ============================================================================

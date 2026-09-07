@@ -9,11 +9,9 @@ use Novel::Robot::Packer;
 use Novel::Robot::Browser;
 use Encode::Locale;
 use Encode;
+use Term::ProgressBar;
 
-#use File::Copy;
-use Smart::Comments;
-
-our $VERSION = 0.47;
+our $VERSION = 0.48;
 
 sub new {
 	my ( $self, %opt ) = @_;
@@ -67,11 +65,14 @@ sub get_novel {
 	my  $novel_ref = $self->can("get_${class}_ref")->( $self, $index_url, %o );
 	return unless ( $novel_ref );
 
-	while( ! $novel_ref->{item_list}[-1]{content}){
-		pop @{$novel_ref->{item_list}};
+	my $item_list = $novel_ref->{item_list};
+	return unless ( ref($item_list) eq 'ARRAY' and @$item_list );
+
+	while ( @$item_list and ! $item_list->[-1]{content} ) {
+		pop @$item_list;
 	}
 
-	return unless ( @{ $novel_ref->{item_list} } );
+	return unless ( @$item_list );
 
 	my $last_item_num = $novel_ref->{item_list}[-1]{id} ||  $novel_ref->{item_num} || scalar( @{ $novel_ref->{item_list} } ) ;
 
@@ -98,10 +99,11 @@ sub get_novel_ref {
 		$r = $self->get_novel_items(
 			$index_url,
 			url_sub  => $self->{parser}->can( "generate_novel_url" ),
-			info_sub  => $self->{parser}->can( "parse_novel" ),
-			item_list_sub =>  $self->{parser}->can( "parse_item_list" ),
-			item_sub      => $self->{parser}->can( "parse_novel_item" ),
-			%o,
+				info_sub  => $self->{parser}->can( "parse_novel" ),
+				item_list_sub =>  $self->{parser}->can( "parse_item_list" ),
+				item_sub      => $self->{parser}->can( "parse_novel_item" ),
+				next_page_sub => $self->{parser}->can( "generate_next_page_url" ),
+				%o,
 		);
 
 		#$r->{item_num}  = $max_item_num || undef;
@@ -127,6 +129,7 @@ sub get_novel_items {
 	}
 
 	my $html = $self->{browser}->request_url( $url, $o{post_data} );
+	my $current_page_url = $url;
 
 	my $info      = $o{info_sub}->( $self->{parser}, \$html )     || {};
 	my $item_list = $o{item_list} || $o{item_list_sub}->( $self->{parser}, \$html ) || [];
@@ -135,18 +138,24 @@ sub get_novel_items {
 	unless ( $o{stop_sub} and $o{stop_sub}->( $self->{parser}, $info, $item_list, $i, %o ) or defined $o{item_list}) {
 		$item_list = [] if ( $o{min_page_num} and $o{min_page_num} > 1 );
 		my $page_list = exists $o{page_list_sub} ? $o{page_list_sub}->( \$html ) : undef;
+		my %seen_page = ( $current_page_url => 1 );
 		while ( 1 ) {
 			$i++;
 			my $u = 
 			$page_list ?  $page_list->[ $i - 2 ] : 
-			( exists $o{next_page_sub} ? $o{next_page_sub}->( $self->{parser}, $url, $i, \$html ) : undef );
+			( exists $o{next_page_sub} ? $o{next_page_sub}->( $self->{parser}, $current_page_url, $i, \$html ) : undef );
 			last unless ( $u );
-			next if ( $o{min_page_num} and $i < $o{min_page_num} );
 			last if ( $o{max_page_num} and $i > $o{max_page_num} );
 
 
 			my ( $u_url, $u_post_data ) = ref( $u ) eq 'HASH' ? @{$u}{qw/url post_data/} : ( $u, undef );
+			$u_url = $self->{parser}->generate_abs_url( $u_url, $current_page_url );
+			last if ( !$u_url or $seen_page{$u_url}++ );
 			my $c = $self->{browser}->request_url( $u_url, $u_post_data );
+			last unless ( $c );
+			$current_page_url = $u_url;
+			$html = $c;
+			next if ( $o{min_page_num} and $i < $o{min_page_num} );
 			my $fs = $o{item_list_sub}->( $self->{parser}, \$c );
 			last unless ( $fs );
 
@@ -166,14 +175,25 @@ sub get_novel_items {
 	$info->{item_num} = ( $#$item_list >= 0 and exists $item_list->[-1]{id} ) ? $item_list->[-1]{id} : ( scalar( @$item_list ) || $i );
 
 	if ( $o{item_sub} ) {
-		my $item_id = 0;
-		print "\n\n" if ( $o{progress} );
+		my @download_indexes = grep {
+			my $id = $item_list->[$_]{id} // ( $_ + 1 );
+			$self->{parser}->is_item_in_range( $id, $o{min_item_num}, $o{max_item_num} )
+				and ( !exists $o{back_index} or $_ + $o{back_index} <= $#$item_list );
+		} ( 0 .. $#$item_list );
+		my $download_total = scalar @download_indexes;
+		my $progress_done = 0;
 		my $progress;
-		$progress = Term::ProgressBar->new( { count => scalar(@$item_list) } ) if ( $o{progress} );
+		if ( $o{progress} ) {
+			my $writer = $info->{writer} // '';
+			my $book = $info->{book} // $info->{title} // '';
+			print "writer: $writer\nbook: $book\nnum: $download_total\n";
+			$progress = Term::ProgressBar->new( { count => $download_total } )
+				if ( $download_total );
+		}
 
 		for my $i ( 0 .. $#$item_list ) {
 			my $r = $item_list->[$i];
-			$r->{id} //= ++$item_id;
+			$r->{id} //= $i + 1;
 
 			#$r->{url} = URI->new_abs( $r->{url}, $url )->as_string;
 			$r->{url} = $self->{parser}->generate_abs_url( $r->{url}, $url );
@@ -207,10 +227,9 @@ sub get_novel_items {
 				}
 			}
 
-			$progress->update( $item_id ) if ( $o{progress} );
+			$progress->update( ++$progress_done ) if ( $progress );
 		}
 
-		$progress->update( scalar(@$item_list) ) if ( $o{progress} ); 
 	}
 
 	$info->{url} = $url;
@@ -267,37 +286,44 @@ sub get_page_ref {
 	return $page;
 }
 
-sub get_query_ref {
-	my ( $self, $keyword, %o ) = @_;
-	my ($url, $post_data) = $self->make_query_request($keyword, %o);
-	my $r = $self->get_iterate_ref($url, 
-		post_data => $post_data, 
-		info_sub => sub { return { title => "query: $keyword" } }, 
-		page_list_sub => sub { $self->can( "parse_query_list" )->( $self, @_ ) },
-		item_list_sub => sub { $self->can( "parse_query_item" )->( $self, @_ ) },
-		stop_sub => sub {
-			my ( $info, $data_list, $i ) = @_;
-			$self->{parser}->is_list_overflow( $data_list, $o{"max_item_num"} );
-		},
-		%o,
-	);
-	$r->{item_list} = $self->{parser}->update_item_list( $r->{item_list}, $url );
-	return $r;
-}
-
 sub get_board_ref {
 	my ( $self, $board_url, %o ) = @_;
-	my $r = $self->get_iterate_ref(
-		$board_url, 
-		info_sub => $self->{parser}->can( "parse_board" ), 
-		item_list_sub => $self->{parser}->can( "parse_board_item" ),
-		stop_sub => sub {
-			my ( $info, $data_list, $i ) = @_;
-			$self->{parser}->is_list_overflow( $data_list, $o{"max_item_num"} );
-		},
-		%o,
-	);
-	return $r;
+
+	my $html = $self->{browser}->request_url( $board_url );
+	return unless ( $html );
+
+	my $info = $self->{parser}->parse_board( \$html ) || {};
+	my @items;
+	push @items, @{ $self->{parser}->parse_board_item( \$html ) || [] }
+		unless ( $o{min_page_num} and $o{min_page_num} > 1 );
+
+	if ( my $parse_board_list = $self->{parser}->can( "parse_board_list" ) ) {
+		my $page_urls = $parse_board_list->( $self->{parser}, \$html ) || [];
+		my $page_num = 1;
+		for my $page_url ( @$page_urls ) {
+			$page_num++;
+			next if ( $o{min_page_num} and $page_num < $o{min_page_num} );
+			last if ( $o{max_page_num} and $page_num > $o{max_page_num} );
+
+			my $page_html = $self->{browser}->request_url( $page_url );
+			last unless ( $page_html );
+			push @items, @{ $self->{parser}->parse_board_item( \$page_html ) || [] };
+			last if ( $self->{parser}->is_list_overflow( \@items, $o{max_item_num} ) );
+		}
+	}
+
+	my ( $item_list, $item_num ) = $self->{parser}->update_item_list( \@items, $board_url );
+	$item_list = [ grep {
+		$self->{parser}->is_item_in_range( $_->{id}, $o{min_item_num}, $o{max_item_num} )
+	} @$item_list ];
+	$_->{writer} //= $info->{writer} for @$item_list;
+
+	return {
+		%$info,
+		url       => $board_url,
+		item_num  => $item_num,
+		item_list => $item_list,
+	};
 }
 
 
@@ -314,4 +340,3 @@ sub get_board_ref {
 #}
 
 1;
-

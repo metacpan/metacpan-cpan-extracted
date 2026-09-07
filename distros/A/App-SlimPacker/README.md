@@ -39,7 +39,7 @@ make test
 make install        # installs bin/slimpack and bin/minify to your perl's bin dir
 ```
 
-Requires `PPI`, `App::FatPacker` and `Module::CoreList` (none are core modules).
+Requires `PPI` and `App::FatPacker` (neither is a core module); `Module::CoreList` ships with perl.
 
 ## Usage
 
@@ -73,6 +73,10 @@ slimpack bundle       [OPTIONS] script          # minify+bundle only (--lib/--fa
   --fatlib DIR         fatpacked core-module tree  (default fatlib; pack uses a temp one)
   --no-minify          bundle modules and boot program verbatim
   --no-rename          minify but leave variable names untouched
+  --rewrite            additionally shorten keywords/operators (opt-in,
+                       experimental; see "The minifier" below)
+  --no-compress        embed module sources verbatim (compression with core
+                       deflate + base64 is ON by default; see "Smaller bundles")
   --no-inline-plugins  keep Module::Pluggable as a runtime dependency
   --bundle-lib-all     include every .pm under --lib, even if not referenced
                        from the boot program (default: only statically-reachable
@@ -107,13 +111,14 @@ slimpack minify script.pl            # minified script to STDOUT
 slimpack --minify script.pl          # same, as a flag
 slimpack minify -o out.pl script.pl  # write to a file
 slimpack minify --no-rename script.pl
+slimpack minify --rewrite script.pl  # also shorten keywords/operators (opt-in)
 ```
 
 A standalone `minify` script with the same options is installed alongside
 `slimpack`:
 
 ```sh
-minify [ -o out.pl ] [ --no-rename ] script.pl ...
+minify [ -o out.pl ] [ --no-rename ] [ --rewrite ] script.pl ...
 ```
 
 Each file is read, run through `App::SlimPacker::process()`, and printed; the
@@ -142,9 +147,51 @@ This is on by default; disable with `--no-inline-plugins`. Boot scripts without
   to disable renaming via the API, or `--no-rename` on the CLI; pass
   `--no-minify` to skip the whole pass.
 
+An additional, experimental pass (`rewrite => 1` in the API, `--rewrite` on the
+CLI, off by default) shortens code into provably equivalent forms:
+`foreach` -> `for`; `m/.../` -> `/.../` right after `=~`/`!~`; trailing `;`
+before `}`; `$x += 1;` -> `$x++;` (only mid-block, where the value is
+discarded); `$x = $x OP $y;` -> `$x OP= $y;` for `. + - * / %`; and parens
+around statement-terminal builtin calls (`print($x)` -> `print $x`). The pass
+is a single self-contained method with one call site, so it can be switched
+off or deleted wholesale if it ever misbehaves.
+
 Because variable renaming can silently break code, the test suite pinpoints
 every edge case. Bundlers typically run `slimpack` with `rename` disabled for
 `fatlib/` (core modules must not be touched) and enabled for `lib/`.
+
+## Smaller bundles
+
+Three techniques keep `slimpack bundle` output compact:
+
+- Each bundled module source, and the boot program itself, is
+  deflate-compressed (best level) with the core `Compress::Raw::Zlib` module,
+  `MIME::Base64`-encoded, and embedded as a literal. The embedded loader (also
+  core-only: `Compress::Raw::Zlib::Inflate` + `MIME::Base64::decode_base64`)
+  decompresses a module lazily exactly when it is `require`d, and `eval`s the
+  boot program right after the loader. This is on by default; pass
+  `--no-compress` to embed the minified sources and boot program verbatim
+  instead.
+* Embedded module sources are emitted with the exported
+  `App::SlimPacker::pack_string` instead of B::perlstring's always-double-quoted
+  form. `pack_string` never perlstrings: it returns `'single-quoted'` literals
+  with the content's backslashes escaped in place (`\\`), so `$ @ % "` stay raw
+  — a `q<delim>` literal when that is cheaper (2 + quote-count vs 3 + delimiter
+  occurrences, `q` preferred on ties). The delimiter is the rarest occurrence in
+  the text among `^ ~ | ? , ; ! # & - + * / % :`, escaping its occurrences; `=`
+  and `<` `>` are excluded (they break `q=...=`/`q<...>` when the text contains
+  `>=`/`=>`/`<<` etc.). Even modules with `\\` sequences embed without any sigil
+  escaping, whereas perlstring would have escaped every `$`, `"` and `\`.
+* The tracer/injector prologue is a single-quoted heredoc template: its own
+  sigils are never escaped, and the module table is spliced in at a
+  `__SLPACK_ENTRIES__` placeholder. The old string-built prologue had to be
+  written with `\$` everywhere; the template saves tens of bytes.
+
+A boot program containing a `__DATA__`/`__END__` section cannot be string-eval'd
+(a data section survives only in real files), so `slimpack` keeps that boot
+program verbatim and warns that it was left uncompressed — modules are still
+compressed. This also means a bundle's `__DATA__` stays at a line start in the
+output so `<DATA>` keeps reading the bundled data.
 
 ## Fatpack vs SlimPacker
 

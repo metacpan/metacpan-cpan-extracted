@@ -37,7 +37,22 @@ static MAGIC *Fetch_mg_findext(SV *sv, int type, const MGVTBL *vtbl) {
 }
 #  define mg_findext(sv, type, vtbl) Fetch_mg_findext((sv), (type), (vtbl))
 
-#  define croak_sv(sv) Perl_croak(aTHX_ "%" SVf, SVfARG(sv))
+/* croak_sv takes two routes and needs both. A reference goes through $@ and
+ * croak(NULL), which raises ERRSV as it stands - the only spelling that keeps
+ * a blessed error blessed, and a Fetch::Future may well be failed with one.
+ * Anything else is handed to croak as an argument, so croak appends
+ * " at FILE line N.\n" when the message has no trailing newline, exactly as
+ * the core croak_sv does. Raising a string through croak(NULL) instead would
+ * lose that location, because on the perls that select this shim croak(NULL)
+ * takes ERRSV verbatim rather than passing it through mess_sv. */
+static void Fetch_croak_sv(pTHX_ SV *sv) {
+    if (SvROK(sv)) {
+        sv_setsv(ERRSV, sv);
+        Perl_croak(aTHX_ NULL);
+    }
+    Perl_croak(aTHX_ "%" SVf, SVfARG(sv));
+}
+#  define croak_sv(sv) Fetch_croak_sv(aTHX_ (sv))
 
 #endif
 

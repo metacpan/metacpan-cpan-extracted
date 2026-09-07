@@ -1,0 +1,14 @@
+<header class="masthead">
+  <h1>Sign in</h1>
+  <p class="lede">You paid to see this form. The clearance cookie that got
+  you here holds for an hour.</p>
+</header>
+
+<section>
+  <form method="post" action="/login">
+    {% raw csrf %}
+    <label>Your name <input name="name" autofocus autocomplete="name" maxlength="40"></label>
+    <p class="error">{% error %}</p>
+    <button>Sign in</button>
+  </form>
+</section>

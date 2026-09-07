@@ -1,6 +1,30 @@
 Revision history for App-SlimPacker
 
-0.03  2026-09-05
+0.04  2026-09-07
+    - Compression is ON by default: each bundled module source — and the boot
+      program itself — is deflate-compressed (best level) with core
+      Compress::Raw::Zlib, MIME::Base64-encoded, and decompressed lazily by the
+      embedded loader (also core-only) when require'd (modules) or eval'd (boot
+      program).  A boot program with a __DATA__/__END__ section cannot be
+      string-eval'd, so it is kept verbatim with a warning while modules stay
+      compressed.  Disable with --no-compress to keep the (still minified,
+      pack_string-quoted) sources and boot program visible and readable.
+      Compressed and plain bundles are behaviourally identical and covered side
+      by side in t/bundle.t.
+    - Fix: the whitespace collapser re-merged the line before a __END__/
+      __DATA__ marker into it (`;__DATA__`), silently killing the data section
+      (a mid-line marker is no marker).  The newline before the marker is now
+      frozen too, so the marker keeps its own line in minified output.
+
+0.03  2026-09-06
+    - New opt-in minifier pass (rewrite => 1) that shortens code into
+      value-preserving equivalent forms: foreach -> for, m/.../ -> /.../ after
+      =~ / !~, drops trailing `;` before `}`, $x += 1 -> $x++ (non-final
+      statements only), $x = $x OP $y -> $x OP= $y, and drops parens from
+      statement-terminal builtin calls (print($x) -> print $x). Disabled by
+      default; implemented as a self-contained method so it can be removed
+      wholesale if it proves unsafe. --rewrite flag on slimpack and minify.
+      Tested in t/rewrite.t against the parser and by running minified code.
     - New minify-only mode: slimpack minify FILE... (or slimpack --minify FILE...)
       runs just the PPI minification pass, no tracing or bundling
     - New standalone minify script installed alongside slimpack
@@ -10,6 +34,24 @@ Revision history for App-SlimPacker
       resolution in a single parse; the bundler uses it so each bundled module
       is parsed exactly once instead of twice (measurably faster pack/bundle)
     - Documented in README, POD and the new t/minify-cli.t
+    - Fix: whitespace collapser no longer merges the __END__ / __DATA__
+      marker into the following data on the same line. Previously
+      `__DATA__` + newline + data collapsed to `__DATA__ <data>`
+      (changing what <DATA> yields) or worse `__DATA__{...}` when the
+      data started with punctuation. The marker now keeps its own line.
+    - New t/syntax.t regression suite: minified output must compile and
+      behave identically to the source for __DATA__/__END__ sections,
+      heredocs, block/statement terminators and a differential corpus
+    - Smaller bundles: bundled module sources are now emitted with the new
+      exported pack_string() instead of B::perlstring's always-double-quoted
+      form, and the injector/tracer prologue is emitted from a single-quoted
+      heredoc template (no escaping needed).  pack_string never perlstrings:
+      backslashes in the content are escaped in place inside single or q<delim>
+      literals (keeping $ @ % " raw), so embedded sources shrink even when the
+      module contains \\ sequences — previously those fell through to
+      perlstring's full sigil escaping.  Round-trip validated against a 5000-
+      string differential corpus; embedded modules run byte-for-byte
+      identically.
 
 0.02  2026-09-05
     - Minifier: never rename local/our globals (only my) so fully-qualified

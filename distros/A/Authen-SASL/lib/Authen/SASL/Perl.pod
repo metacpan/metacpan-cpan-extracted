@@ -10,7 +10,7 @@ Authen::SASL::Perl -- Perl implementation of the SASL Authentication framework
 
 =head1 VERSION
 
-version 2.2000
+version 2.2100
 
 =head1 SYNOPSIS
 

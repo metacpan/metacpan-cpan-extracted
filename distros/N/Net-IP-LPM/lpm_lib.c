@@ -6,7 +6,7 @@
 #define LPM_MAX_INSTANCES 1024
 
 
-#include <stdio.h>  
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -17,7 +17,7 @@
 
 #define HV_STORE_NV(r,k,v) (void)hv_store(r, k, strlen(k), newSVnv(v), 0)
 
-const int lastAlocIndex = ALOCSIZE - 1;  
+const int lastAlocIndex = ALOCSIZE - 1;
 
 /// Structure of Node in Trie
 typedef struct TrieNode{
@@ -61,7 +61,7 @@ void addPrefixToTrie(unsigned char *prefix, unsigned char prefixLen, SV * Value,
 TTrieNode *createTrieNode();
 void freeAlocTrieNodes(TAlocTrieNodes *pATN);
 TTrieNode *lookupAddress(unsigned char *address, int addrLen, TTrieNode *pTN);
-TTrieNode **lookupInTrie(unsigned char *prefix, unsigned char *byte, unsigned char *bit, unsigned char *makeMatches, TTrieNode **ppTN, bool *root); 
+TTrieNode **lookupInTrie(unsigned char *prefix, unsigned char *byte, unsigned char *bit, unsigned char *makeMatches, TTrieNode **ppTN, bool *root);
 TTrieNode *myMalloc();
 int listTrieNode(TTrieNode *pTN, TTrieNodeList **plTN, const int AfType, int *depth, unsigned char *prefix);
 
@@ -128,7 +128,7 @@ int listTrieNode(TTrieNode *pTN, TTrieNodeList **plTN, const int AfType, int *de
 				return 0;
 			}
 			memcpy(ptmp->Prefix, prefix, allocsize);
-			
+
 			*plTN = ptmp;
 		}
 		(*depth)++;
@@ -155,8 +155,8 @@ int listTrieNode(TTrieNode *pTN, TTrieNodeList **plTN, const int AfType, int *de
  */
 void addPrefixToTrie(unsigned char *prefix, unsigned char prefixLen, SV * Value, TTrieNode **ppTrie){
   unsigned char byte = 0;
-  unsigned char bit = 128; 
-  
+  unsigned char bit = 128;
+
   unsigned char makeMatches = prefixLen;
   bool root = false;
   TTrieNode *pFound = (*ppTrie);
@@ -168,14 +168,14 @@ void addPrefixToTrie(unsigned char *prefix, unsigned char prefixLen, SV * Value,
     while(makeMatches){
       (*ppTN) = createTrieNode();
       unsigned char unmasked = (prefix[byte] & bit);
-      
+
       if(unmasked){
-        ppTN = &((*ppTN)->pTN1);        
+        ppTN = &((*ppTN)->pTN1);
       }
       else{
         ppTN = &((*ppTN)->pTN0);
       }
-      
+
       makeMatches--;
       bit = (bit >> 1);
       if(!bit){
@@ -183,14 +183,14 @@ void addPrefixToTrie(unsigned char *prefix, unsigned char prefixLen, SV * Value,
         bit = 128;
       }
     }
-    
+
     (*ppTN) = createTrieNode();
     (*ppTN)->Value = Value;
     (*ppTN)->hasValue = true;
 	SvREFCNT_inc(Value);
   }
   else{
-    if(!pFound->hasValue){      
+    if(!pFound->hasValue){
       pFound->Value = Value;
       pFound->hasValue = true;
 	  SvREFCNT_inc(Value);
@@ -209,64 +209,64 @@ TTrieNode *createTrieNode(){
     fprintf(stderr, "pTN malloc error.");
     return NULL;
   }
-  
+
   // initialize
   pTN->pTN0 = NULL;
   pTN->pTN1 = NULL;
   pTN->hasValue = false;
-  
+
   return pTN;
 }
 
 
 /**
  *  freeAlocTrieNodes
- *  pATN - pointer at structure to be freed  
- */ 
+ *  pATN - pointer at structure to be freed
+ */
 void freeAlocTrieNodes(TAlocTrieNodes *pATN){
   if(pATN->pNextATN != NULL){
-    freeAlocTrieNodes(pATN->pNextATN);  
-  }  
+    freeAlocTrieNodes(pATN->pNextATN);
+  }
   free(pATN);
 }
 
-/** 
+/**
  * lookupAddressIPv6
  * address - field with address
  * addrLen - length of IP adress in bits (32 for IPv4, 128 for IPv6)
  * returns NULL when NOT match adress to any prefix in Trie
  */
-TTrieNode *lookupAddress(unsigned char *address, int addrLen, TTrieNode *pTN){ 
+TTrieNode *lookupAddress(unsigned char *address, int addrLen, TTrieNode *pTN){
   unsigned char byte = 0;
-  unsigned char bit = 128; // most significant bit 
+  unsigned char bit = 128; // most significant bit
 //  TTrieNode *pTN = pTrieIPV6;
-  TTrieNode *pTNValue = NULL; 
+  TTrieNode *pTNValue = NULL;
 
   if (pTN == NULL) {
   	return NULL;
   }
-  
+
   unsigned char addrPassed = 0;
   while(addrPassed++ <= addrLen){
     unsigned char unmasked = (address[byte] & bit);
-    bit = (bit >> 1);    
+    bit = (bit >> 1);
     if(!bit){
       byte++;
       bit = 128;
     }
-    
+
     // pTN with ASNum is desired
     if(pTN->hasValue){
       pTNValue = pTN;
     }
-    
+
     if(unmasked){
       if(pTN->pTN1 != NULL){
         pTN = pTN->pTN1;
       }
       else{
         return pTNValue;
-      }                   
+      }
     }
     else{
       if(pTN->pTN0 != NULL){
@@ -274,19 +274,19 @@ TTrieNode *lookupAddress(unsigned char *address, int addrLen, TTrieNode *pTN){
       }
       else{
         return pTNValue;
-      }       
-    }           
-  }       
+      }
+    }
+  }
   return pTNValue;
 }
 
-/** 
+/**
  * lookupInTrie
  * prefix - holds the prefix that is searched during Trie building
  * byte - byte of prefix
  * bit - bit of prefix byte
  * makeMatches - input and output,indicates prefixLen that can be used
- * ppTN - input and output, determines which Node of Trie was examined last during function proccess, at start holds the root of Trie  
+ * ppTN - input and output, determines which Node of Trie was examined last during function proccess, at start holds the root of Trie
  * root - return flag, true if root of Trie must be build first
  * returns NULL when match current prefix during Trie building
  */
@@ -295,8 +295,8 @@ TTrieNode **lookupInTrie(unsigned char *prefix, unsigned char *byte, unsigned ch
     (*root) = true;
     return ppTN;
   }
-  
-  while((*makeMatches)){    
+
+  while((*makeMatches)){
     unsigned char unmasked = (prefix[(*byte)] & (*bit));
     (*makeMatches)--;
     (*bit) = ((*bit) >> 1);
@@ -304,14 +304,14 @@ TTrieNode **lookupInTrie(unsigned char *prefix, unsigned char *byte, unsigned ch
       (*byte)++;
       (*bit) = 128;
     }
-    
+
     if(unmasked){
       if((*ppTN)->pTN1 != NULL){
         (*ppTN) = (*ppTN)->pTN1;
       }
       else{
         return &((*ppTN)->pTN1);
-      }                      
+      }
     }
     else{
       if((*ppTN)->pTN0 != NULL){
@@ -319,42 +319,42 @@ TTrieNode **lookupInTrie(unsigned char *prefix, unsigned char *byte, unsigned ch
       }
       else{
         return &((*ppTN)->pTN0);
-      }    
-    }           
+      }
+    }
   }
-  
+
   (*root) = false;
   return NULL;
 }
 
 /**
  * myMalloc
- * encapsulates real malloc function but call it less times 
+ * encapsulates real malloc function but call it less times
  * and that is why it could save some presious time
- */ 
+ */
 TTrieNode *myMalloc(){
   if(pAlocated == NULL){
     pAlocated = malloc(sizeof(struct AlocTrieNodes));
     if(pAlocated == NULL){
       return NULL;
     }
-    
+
     pAlocated->pNextATN = NULL;
     pActual = pAlocated;
     pActualTN = &pActual->TrieNodes[0];
-    pLastTN = &pActual->TrieNodes[lastAlocIndex]; 
+    pLastTN = &pActual->TrieNodes[lastAlocIndex];
   }
-  
+
   // Save to return it later
   TTrieNode *pReturn = pActualTN;
-  
+
   if(pActualTN == pLastTN){
     pActual->pNextATN = malloc(sizeof(struct AlocTrieNodes));
     pActual = pActual->pNextATN;
     if(pActual == NULL){
       return NULL;
     }
-    
+
     pActual->pNextATN = NULL;
     pActualTN = &pActual->TrieNodes[0];
     pLastTN = &pActual->TrieNodes[lastAlocIndex];
@@ -362,8 +362,8 @@ TTrieNode *myMalloc(){
   else{
     pActualTN++;
   }
-  
-  return pReturn;  
+
+  return pReturn;
 }
 
 
@@ -397,11 +397,11 @@ lpm_instance_t *instance;
 	instance->pTrieIPV6 = NULL;
 
     lpm_instances[handle] = instance;
-	
+
 	return handle;
 }
 
-int lpm_add_raw(int handle, SV * svprefix, int prefix_len, SV *value) {
+int lpm_add_raw(int handle, SV * svprefix, IV prefix_len, SV *value) {
 lpm_instance_t *instance = lpm_instances[handle];
 STRLEN len;
 char * prefix;
@@ -413,17 +413,24 @@ char * prefix;
 
 	prefix = SvPV(svprefix, len);
 
+	if ((len == 4 || len == 16)
+	    && (prefix_len < 0 || (STRLEN)prefix_len > len * 8)) {
+		croak("Net::IP::LPM: prefix length /%d out of range (max /%d)",
+		      prefix_len, (int)(len * 8));
+		return 0;
+	}
+
 	if (len == 4){
-		addPrefixToTrie((void *)prefix, prefix_len, value, &instance->pTrieIPV4);
-	} 
+          addPrefixToTrie((void *)prefix, (int) prefix_len, value, &instance->pTrieIPV4);
+	}
 	else if (len == 16) {
-		addPrefixToTrie((void *)prefix, prefix_len, value, &instance->pTrieIPV6);
+          addPrefixToTrie((void *)prefix, (int) prefix_len, value, &instance->pTrieIPV6);
 	}
 	else{ // Corrupted input file
 		croak("Cannot add prefix %s", prefix);
 		return 0;
 	}
-	
+
 	/* included code */
 	return 1;
 }
@@ -443,13 +450,13 @@ STRLEN len;
 
 	TTrieNode *pTN = NULL;
 	addr = SvPV(svaddr, len);
-	 
+
     if(len == 4){
       pTN = lookupAddress((void *)addr, 32, instance->pTrieIPV4);
     }
     else if(len == 16){ // IPV6
       pTN = lookupAddress((void *)addr, 128, instance->pTrieIPV6);
-    } 
+    }
 
     if ( pTN == NULL ){
 		return &PL_sv_undef;
@@ -532,7 +539,7 @@ int depth;
 		allocsize = ((plist->Depth - 1) / 8) + 1;
 
 		memset(prefix, 0x0, BUFFSIZE - 1);
-		memcpy(prefix, plist->Prefix, allocsize); 
+		memcpy(prefix, plist->Prefix, allocsize);
 
 		inet_ntop(plist->AfType, prefix, buf, BUFFSIZE);
 
@@ -587,5 +594,3 @@ lpm_instance_t *instance = lpm_instances[handle];
 
 	return;
 }
-
-

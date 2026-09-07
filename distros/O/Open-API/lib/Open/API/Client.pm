@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Open::API;   # loads the shared XS
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 1;
 

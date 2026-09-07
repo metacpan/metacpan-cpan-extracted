@@ -38,12 +38,11 @@ use WebDyne::Util;
 #
 #use Digest::MD5 qw(md5_hex);
 use Crypt::URandom qw( urandom );
-use CGI::Simple;
 
 
 #  Version information
 #
-$VERSION='3.026';
+$VERSION='3.027';
 
 
 #  Shortcut error handler.

@@ -305,8 +305,13 @@ static void ur_destroy(hm_backend *be) {
             st->timers = t->next;
             free(t);
         }
-        if (st->sfd >= 0) close(st->sfd);
-        io_uring_queue_exit(&st->ring);
+        /* be->foreign: inherited across a fork. The signalfd and the ring's
+         * own descriptor are the parent's; io_uring_queue_exit would close
+         * the ring fd and unmap rings this process never set up. */
+        if (!be->foreign) {
+            if (st->sfd >= 0) close(st->sfd);
+            io_uring_queue_exit(&st->ring);
+        }
         free(st);
     }
     free(be);

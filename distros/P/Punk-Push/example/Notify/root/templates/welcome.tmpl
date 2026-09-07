@@ -1,0 +1,94 @@
+<header class="masthead">
+  <p class="wordmark" aria-label="Punk"><b>P</b><b>U</b><b>N</b><b>K</b></p>
+  <h1>Notify</h1>
+  <p class="sticker">web push</p>
+</header>
+
+{% if user %}
+<section>
+  <h2>Signed in as user {% user %}</h2>
+  <p><button id="enable">Enable notifications</button>
+     <button id="disable">Disable</button></p>
+  <p id="status" class="lede"></p>
+
+{% if sent %}  <h2>Last send</h2>
+{% if asked %}  <p class="lede"><code>{% asked %}</code></p>
+{% end %}
+  <div class="routes">
+  <table>
+    <tr><th>Endpoint</th><th>Status</th><th>Outcome</th></tr>
+{% for r in sent %}    <tr><td><code>{% r.endpoint %}</code></td><td>{% r.status | default('-') %}</td><td>{% if r.delivered %}delivered{% else %}{% if r.pruned %}gone - row deleted{% else %}{% r.error | default('not delivered') %}{% end %}{% end %}</td></tr>
+{% end %}  </table>
+  </div>
+
+{% end %}  <h2>Subscriptions</h2>
+  <div class="routes">
+  <table>
+    <tr><th>Endpoint</th><th>Agent</th><th>Last status</th></tr>
+{% for s in subs %}    <tr><td><code>{% s.endpoint %}</code></td><td>{% s.user_agent %}</td><td>{% s.last_status %}</td></tr>
+{% end %}  </table>
+  </div>
+
+  <h2>Send one</h2>
+  <p class="lede">Everything a payload and a send can carry. Blank fields are
+  left out rather than sent empty.</p>
+  <form method="post" action="/notify">
+    <fieldset>
+      <legend>Payload - whatever your service worker reads</legend>
+      <p><label>title <input name="title" value="Notify"></label></p>
+      <p><label>body <input name="body" value="Hello from Punk::Push." size="40"></label></p>
+      <p><label>url <input name="url" value="/" placeholder="where a click goes"></label></p>
+      <p><label>icon <input name="icon" value="/static/icon.png"></label>
+         <br><small>Shipped with this demo, so it resolves.</small></p>
+      <p><label>badge <input name="badge" value="/static/badge.png"></label>
+         <br><small>Android draws this as a silhouette; other platforms ignore it.</small></p>
+      <p><label>tag <input name="tag" placeholder="replaces an on-screen notification with the same tag"></label></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Delivery - what the push service is told</legend>
+      <p><label>ttl <input name="ttl" type="number" min="0"
+             placeholder="seconds it may be held (default 2419200)"></label>
+         <br><small>0 means deliver now or discard.</small></p>
+      <p><label>urgency
+        <select name="urgency">
+{% for u in urgencies %}          <option value="{% u.name %}"{% if u.selected %} selected{% end %}>{% u.name %}</option>
+{% end %}        </select></label>
+        <br><small>Only sent when it is not normal.</small></p>
+      <p><label>topic <input name="topic" placeholder="an undelivered message with the same topic is REPLACED"></label></p>
+    </fieldset>
+
+    <p><button>Send to every device</button></p>
+  </form>
+
+  <form method="post" action="/logout"><p><button>Sign out</button></p></form>
+</section>
+
+<script type="module">
+import { subscribe, unsubscribe, current } from '/push/push.js';
+
+const status = document.querySelector('#status');
+const show = (m) => { status.textContent = m; };
+
+// Permission cannot be re-requested once denied, so it is asked from a click
+// and never on load.
+document.querySelector('#enable').addEventListener('click', async () => {
+    try { await subscribe(); show('subscribed - reload to see it listed'); }
+    catch (e) { show('failed: ' + e.message); }
+});
+
+document.querySelector('#disable').addEventListener('click', async () => {
+    try { await unsubscribe(); show('unsubscribed - reload'); }
+    catch (e) { show('failed: ' + e.message); }
+});
+
+current().then((s) => show(s ? 'this browser is subscribed'
+                             : 'this browser is not subscribed yet'));
+</script>
+{% else %}
+<section>
+  <p class="lede">You need to be signed in: a push subscription belongs to a
+  user, so the plugin guards the routes that write one.</p>
+  <p><a href="/login">Sign in</a></p>
+</section>
+{% end %}

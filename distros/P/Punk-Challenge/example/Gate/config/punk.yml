@@ -1,0 +1,34 @@
+# Gate configuration. Safe to commit: secrets are referenced here, never
+# written here.
+#
+# Layered - this file, then punk.$PUNK_ENV.yml, then punk.local.yml, each
+# merged over the last. Put deployment differences in the environment file
+# and machine-local ones in punk.local.yml, which is gitignored.
+
+views:
+  Stencil:
+    template_dir: root/templates
+    wrapper: layout.tmpl
+
+static:
+  /static: root/static
+
+# The challenge secret. Resolved at boot from the environment and reached in
+# lib/Gate.pm as secret('challenge.key'). It is never generated for you: a
+# pool of workers would each mint their own, and a clearance one worker
+# issued would be refused by every other. Mint one with:
+#
+#     punk challenge key
+#
+challenge:
+  key: { $env: GATE_CHALLENGE_KEY }
+
+# Signed cookie sessions, for the demo's sign-in, and single-use CSRF tokens
+# over them. The verify route the challenge plugin adds is exempt from the
+# csrf check on its own; nothing here has to say so.
+session:
+  secret:   { $env: GATE_SESSION_KEY }
+  expires:  1d
+  samesite: Lax
+
+csrf: true

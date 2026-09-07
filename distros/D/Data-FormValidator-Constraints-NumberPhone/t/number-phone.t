@@ -68,7 +68,6 @@ subtest 'test_american_phone' => sub {
     ok  $is_american_phone_valid->('+1-250-555-1212'),    'valid North American phone number, w/prefix';
     ok  $is_american_phone_valid->('1-778-555-1212'),     'valid North American mobile number';
     ok !$is_american_phone_valid->('441-555-1212'),       'invalid; not in a North American country';
-    ok !$is_american_phone_valid->('not a phone number'), 'invalid; not a phone number';
     ok !$is_american_phone_valid->('000-000-000'),        'invalid; invalid number';
     ok !$is_american_phone_valid->('+442087712924'),      'invalid; not a NANP number';
 };

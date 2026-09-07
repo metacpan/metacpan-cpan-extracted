@@ -1,5 +1,9 @@
 Revision history for Test::Load::Helper
 
+v2.0.0     2026-09-06 03:09 UTC
+
+	Lower required Perl version to 5.10
+
 v1.0.2     2026-08-18 04:59 UTC
 
 	Break dependency circle with Test::YAFT

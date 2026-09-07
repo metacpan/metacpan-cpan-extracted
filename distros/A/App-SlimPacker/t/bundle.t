@@ -94,9 +94,22 @@ my $fat_long_name = 1;
 sub fat { return $fat_long_name + 1 }
 1;
 FAT
+    # pack_string stress fixtures: one module whose minified source contains a
+    # quote and a q{...}-with-backslash, both still load and run byte-identically
+    # through deflate+base64 round-trip.  
+    write_fixture("$td/lib/App/QuOt.pm", "package App::QuOt;\nsub once { return \"he said 'hi'\" }\n1;\n");
+    write_fixture("$td/lib/App/Back.pm", "package App::Back;\nsub twice { return \"a\\\\b\" }\n1;\n");
+    write_fixture("$td/bin/quback", <<'QBOOT');
+#!/usr/bin/perl
+use lib 'lib';
+use App::QuOt;
+use App::Back;
+print App::QuOt::once(), "\n";
+print App::Back::twice(), "\n";
+QBOOT
     my ($out, $rc, $c);
 
-    # -- plain bundle
+    # -- plain bundle (compression is ON by default)
     ($out, $rc) = run_cli('-o', "$td/myapp_bundled", '--lib', "$td/lib", "$td/bin/myapp");
     is $rc, 0, 'build script exits 0';
     ok -f "$td/myapp_bundled", 'output file created';
@@ -110,7 +123,91 @@ FAT
     unlike $c, qr/# boot comment/, 'program comments minified (default)';
     unlike $c, qr/\$who/, 'short variable renamed (strings with it would block, fixture avoids that)';
     unlike $c, qr/use lib/, 'use lib stripped from program';
+    like $c, qr/BEGIN\{my%sl=\(/, 'compact loader: single BEGIN{my%sl=(...) block';
+    like $c, qr/bless\\%sl,\$class;/, 'compact loader: bless+unshift {$class} fragment';
+    unlike $c, qr/__SLPACK_ENTRIES__/, 'loader placeholder spliced away';
+    like $c, qr/use Compress::Raw::Zlib \(\);/, 'compressed loader: core zlib loaded';
+    like $c, qr/use MIME::Base64 qw\(decode_base64\);/, 'compressed loader: core base64 loaded';
+    my ($table) = $c =~ /BEGIN\{my%sl=\((.*?)\);my\$class=/s
+        or die "cannot locate module table in bundle";
+    unlike $table, qr/\\\$/, 'module table has no escaped sigils (all single-quoted)';
+    like $table, qr/"App\/MyMod\.pm" => '[A-Za-z0-9+\/=]+'/, 'module source deflate+base64 in table (default)';
+    unlike $table, qr/package App::MyMod;/, 'compressed source not embedded verbatim';
+    like $table, qr/"__MAIN__" => '[A-Za-z0-9+\/=]+'/, 'boot program deflate+base64 in table (default)';
+    unlike $c, qr/print App::MyMod::greet\('cli'\),/, 'boot program text not embedded verbatim (compressed)';
     is `"$td/myapp_bundled"`, "hi cli\n", 'bundled script runs standalone';
+    {
+        local $ENV{PERL5LIB};
+        is `"$td/myapp_bundled"`, "hi cli\n", 'compressed bundle runs with @INC pruned';
+    }
+
+    # -- no-compress: identical behavior from visible, readable source literals
+    ($out, $rc) = run_cli('-o', "$td/myapp_plain", '--no-compress', '--lib', "$td/lib", "$td/bin/myapp");
+    is $rc, 0, '--no-compress build exits 0';
+    $c = file_content("$td/myapp_plain");
+    unlike $c, qr/use Compress::Raw::Zlib/, '--no-compress omits zlib loader';
+    my ($table3) = $c =~ /BEGIN\{my%sl=\((.*?)\);my\$class=/s
+        or die "cannot locate module table in plain bundle";
+    like $table3, qr/"App\/MyMod\.pm" => 'package App::MyMod;/, 'plain: module code embedded as single-quoted literal (pack_string)';
+    is `"$td/myapp_plain"`, "hi cli\n", 'plain bundle runs standalone';
+    is `"$td/myapp_plain"`, `"$td/myapp_bundled"`, 'compressed and plain bundles behave identically';
+
+    # -- explicit --compress flag (default, but the switch must work)
+    ($out, $rc) = run_cli('-o', "$td/myapp_comp", '--compress', '--lib', "$td/lib", "$td/bin/myapp");
+    is $rc, 0, '--compress flag build exits 0';
+    like file_content("$td/myapp_comp"), qr/use Compress::Raw::Zlib \(\);/, '--compress embeds compressed loader';
+    is `"$td/myapp_comp"`, "hi cli\n", '--compress bundle runs';
+
+    # -- a boot program with __DATA__/__END__ cannot be string-eval'd, so it is
+    #    left uncompressed (with a warning) while modules stay compressed
+    write_fixture("$td/bin/dataapp", <<'DL');
+#!/usr/bin/perl
+use lib 'lib';
+use App::MyMod;
+print App::MyMod::greet('d'), "\n" . <DATA>;
+__DATA__
+data line
+DL
+    ($out, $rc) = run_cli('-o', "$td/dataapp_bundled", '--lib', "$td/lib", "$td/bin/dataapp");
+    is $rc, 0, 'data-section boot build exits 0';
+    like $out, qr/leaving the boot program uncompressed/, 'warns that boot program left uncompressed';
+    my $dc = file_content("$td/dataapp_bundled");
+    like $dc, qr/^__DATA__$/m, 'compressed build keeps __DATA__ at a line start';
+    like $dc, qr/print App::MyMod::greet\('d'\),"\\n"\.<DATA>;\n__DATA__\n/, 'boot program embedded verbatim despite --compress';
+    my ($dt) = $dc =~ /BEGIN\{my%sl=\((.*?)\);my\$class=/s
+        or die "cannot locate module table in data bundle";
+    like $dt, qr/"App\/MyMod\.pm" => '[A-Za-z0-9+\/=]+'/, 'modules still compressed when boot program is not';
+    unlike $dt, qr/__MAIN__/, 'no __MAIN__ entry when boot program left raw';
+    is `"$td/dataapp_bundled"`, "hi d\ndata line\n", 'data-section bundle runs (module + <DATA>)';
+    is `"$td/dataapp_bundled"`, `perl -I"$td/lib" "$td/bin/dataapp"`, 'data-section bundle matches running the raw script';
+
+    # -- pack_string endings under a real bundle: quote-rich module must land
+    #    in a q<delim> literal, backslash module in an escaped single-quote,
+    #    and both must still run against the embedded copies.
+    ($out, $rc) = run_cli('-o', "$td/quback_plain", '--no-compress', '--lib', "$td/lib", "$td/bin/quback");
+    is $rc, 0, 'quback --no-compress build exits 0';
+    $c = file_content("$td/quback_plain");
+    like $c, qr/"App\/QuOt\.pm" => q\^/, 'quote-rich module embedded via q<delim> literal';
+    like $c, qr/"App\/Back\.pm" => '/, 'backslash module embedded as escaped single-quote (no perlstring)';
+    my ($table2) = $c =~ /BEGIN\{my%sl=\((.*?)\);my\$class=/s
+        or die "cannot locate module table in quback bundle";
+    unlike $table2, qr/\\\$/ , 'quback table has no perlstring sigil escapes';
+    is `"$td/quback_plain"`, "he said 'hi'\na\\b\n", 'q-delim and fallback modules run standalone';
+    {
+        local $ENV{PERL5LIB};
+        is `"$td/quback_plain"`, "he said 'hi'\na\\b\n", 'plain stress bundle runs with @INC pruned';
+    }
+
+    # -- compressed equivalents of the same fixtures, incl. binary-clean
+    #    round-trip of the backslash module through deflate/inflate
+    ($out, $rc) = run_cli('-o', "$td/quback_bundled", '--lib', "$td/lib", "$td/bin/quback");
+    is $rc, 0, 'quback build exits 0';
+    $c = file_content("$td/quback_bundled");
+    my ($tableq) = $c =~ /BEGIN\{my%sl=\((.*?)\);my\$class=/s
+        or die "cannot locate module table in quback bundle";
+    like $tableq, qr/"App\/QuOt\.pm" => '[A-Za-z0-9+\/=]+'/, 'quote-rich module deflate+base64 compressed';
+    is `"$td/quback_bundled"`, "he said 'hi'\na\\b\n", 'compressed backslash/quotes round-trip byte-identically';
+    is `"$td/quback_bundled"`, `"$td/quback_plain"`, 'compressed and plain quback behave identically';
 
     # -- unpacklisted (no .packlist) module pulled from @INC via $INC fallback
     #    A module installed into a dir on @INC with no .packlist (Debian /
@@ -119,15 +216,19 @@ FAT
     mkpath("$xp/App/Extra");
     write_fixture("$xp/App/Extra/NoPacklist.pm", "package App::Extra::NoPacklist;\nsub msg { 'extra' }\n1;\n");
     write_fixture("$td/bin/eed", "use App::Extra::NoPacklist;\nprint App::Extra::NoPacklist->msg, \"\\n\";\n");
-    my $old_p5l = $ENV{PERL5LIB};
-    local $ENV{PERL5LIB} = join(':', $xp, ($old_p5l // ()));
-    ($out, $rc) = run_cli('--lib', "$td/lib", '--fatlib', "$td/fatlib", '-o', "$td/eed_bundled", "$td/bin/eed");
-    is $rc, 0, 'unpacklisted-module build exits 0';
-    $c = file_content("$td/eed_bundled");
-    like $c, qr/"App\/Extra\/NoPacklist\.pm" =>/, 'no-packlist module bundled from @INC';
-    is `"$td/eed_bundled"`, "extra\n", 'unpacklisted-module bundle runs standalone';
-    local $ENV{PERL5LIB};
-    is `"$td/eed_bundled"`, "extra\n", 'unpacklisted-module bundle runs with @INC pruned';
+    {
+        my $old_p5l = $ENV{PERL5LIB};
+        local $ENV{PERL5LIB} = join(':', $xp, ($old_p5l // ()));
+        ($out, $rc) = run_cli('--lib', "$td/lib", '--fatlib', "$td/fatlib", '-o', "$td/eed_bundled", "$td/bin/eed");
+        is $rc, 0, 'unpacklisted-module build exits 0';
+        $c = file_content("$td/eed_bundled");
+        like $c, qr/"App\/Extra\/NoPacklist\.pm" =>/, 'no-packlist module bundled from @INC';
+        is `"$td/eed_bundled"`, "extra\n", 'unpacklisted-module bundle runs standalone';
+        {
+            local $ENV{PERL5LIB};
+            is `"$td/eed_bundled"`, "extra\n", 'unpacklisted-module bundle runs with @INC pruned';
+        }
+    }
 
     # -- core modules are never bundled, even when a bundled dep uses them
     #    A lib module that `use Carp` (core) must not drag Carp into the bundle.
@@ -156,11 +257,14 @@ FAT
     local $ENV{PERL5LIB} = join(':', "$td/deepinc", ($old_p5l3 // ()));
     ($out, $rc) = run_cli('--lib', "$td/lib", '--fatlib', "$td/fatlib", '-o', "$td/deep_bundled", "$td/bin/deepboot");
     is $rc, 0, 'deep-nested build exits 0';
+    diag $out if $rc;
     $c = file_content("$td/deep_bundled");
     like $c, qr/"Deep\/Pkg\.pm" =>/, 'deep module bundled (path normalised)';
     like $c, qr/"Deep\/Pkg\/Sub\.pm" =>/, 'deep submodule bundled (path normalised)';
-    local $ENV{PERL5LIB};
-    is `"$td/deep_bundled"`, "deep nested\n", 'deep-nested bundle runs standalone';
+    {
+        local $ENV{PERL5LIB};
+        is `"$td/deep_bundled"`, "deep nested\n", 'deep-nested bundle runs standalone';
+    }
 
     # -- output to stdout
     ($out, $rc) = run_cli('-o', '-', '--lib', "$td/lib", "$td/bin/myapp");
@@ -177,7 +281,7 @@ FAT
     unlink "$td/a.out";
 
     # -- no-minify
-    ($out, $rc) = run_cli('-o', "$td/nm", '--no-minify', '--lib', "$td/lib", "$td/bin/myapp");
+    ($out, $rc) = run_cli('-o', "$td/nm", '--no-minify', '--no-compress', '--lib', "$td/lib", "$td/bin/myapp");
     is $rc, 0, '--no-minify build exits 0';
     $c = file_content("$td/nm");
     like $c, qr/# keep me/, '--no-minify keeps module comments';
@@ -185,7 +289,7 @@ FAT
     like $c, qr/\$who/, '--no-minify keeps variable names';
 
     # -- no-rename: minify (drop comments) but leave variable names untouched
-    ($out, $rc) = run_cli('-o', "$td/nr", '--no-rename', '--lib', "$td/lib", "$td/bin/myapp");
+    ($out, $rc) = run_cli('-o', "$td/nr", '--no-rename', '--no-compress', '--lib', "$td/lib", "$td/bin/myapp");
     is $rc, 0, '--no-rename build exits 0';
     $c = file_content("$td/nr");
     unlike $c, qr/# keep me/, '--no-rename minifies module comments';
@@ -193,7 +297,7 @@ FAT
     is `"$td/nr"`, "hi cli\n", '--no-rename bundle runs standalone';
 
     # -- plugin inlining (default on)
-    ($out, $rc) = run_cli('-o', "$td/lab_bundled", '--lib', "$td/lib", "$td/bin/lab");
+    ($out, $rc) = run_cli('-o', "$td/lab_bundled", '--no-compress', '--lib', "$td/lib", "$td/bin/lab");
     is $rc, 0, 'inline-plugins build exits 0';
 $c = file_content("$td/lab_bundled");
 like $c, qr/"App::Lab::Adapter::A","App::Lab::Adapter::B"/, 'plugin classes inlined, sorted, one level';
@@ -203,14 +307,14 @@ unlike $c, qr/\Quse Module::Pluggable\E/, 'Module::Pluggable removed from bundle
 is `"$td/lab_bundled"`, "App::Lab::Adapter::A,App::Lab::Adapter::B\n", 'inlined script runs without Module::Pluggable';
 
     # -- no-inline-plugins
-    ($out, $rc) = run_cli('-o', "$td/nip", '--no-inline-plugins', '--lib', "$td/lib", "$td/bin/lab");
+    ($out, $rc) = run_cli('-o', "$td/nip", '--no-inline-plugins', '--no-compress', '--lib', "$td/lib", "$td/bin/lab");
     is $rc, 0, '--no-inline-plugins build exits 0';
     $c = file_content("$td/nip");
     like $c, qr/Module::Pluggable/, '--no-inline-plugins keeps Module::Pluggable';
     like $c, qr/plugins\(\)/, '--no-inline-plugins keeps plugins() call';
 
     # -- fatlib bundled verbatim; lib minified
-    ($out, $rc) = run_cli('-o', "$td/mix", '--lib', "$td/lib", "$td/bin/myapp");
+    ($out, $rc) = run_cli('-o', "$td/mix", '--no-compress', '--lib', "$td/lib", "$td/bin/myapp");
     is $rc, 0, 'build with fatlib exits 0';
     $c = file_content("$td/mix");
     like $c, qr/package Std;/, 'fatlib module bundled';
@@ -225,26 +329,26 @@ is `"$td/lab_bundled"`, "App::Lab::Adapter::A,App::Lab::Adapter::B\n", 'inlined 
     is `"$td/ovr"`, 'override ', '-e snippet wins over script';
 
     # -- -M module prepended to script
-    ($out, $rc) = run_cli('-o', "$td/strict", '-M', 'strict', '--lib', "$td/lib", "$td/bin/myapp");
+    ($out, $rc) = run_cli('-o', "$td/strict", '-M', 'strict', '--no-compress', '--lib', "$td/lib", "$td/bin/myapp");
     is $rc, 0, '-M build exits 0';
     is `"$td/strict"`, "hi cli\n", '-M script runs';
     like file_content("$td/strict"), qr/use strict;\s*use App::MyMod;\s*print App::MyMod::greet\('cli'\),\s*/, '-M line prepended before boot script';
 
     # -- -M list + -e program
-    ($out, $rc) = run_cli('-o', "$td/ul", '-M', 'List::Util=sum', '-e', 'print sum(1..100)');
+    ($out, $rc) = run_cli('-o', "$td/ul", '--no-compress', '-M', 'List::Util=sum', '-e', 'print sum(1..100)');
     is $rc, 0, '-M/-e program builds';
 my $ulc = file_content("$td/ul");
 like $ulc, qr/use List::Util qw\(sum\);\s*print sum\(1\.\.100\)/, '-M/-e both honored';
 is `"$td/ul"`, '5050', '-M List::Util=sum -e program runs';
 
     # -- -E enables features
-    ($out, $rc) = run_cli('-o', "$td/sayb", '-E', 'say "bye";');
+    ($out, $rc) = run_cli('-o', "$td/sayb", '--no-compress', '-E', 'say "bye";');
     is $rc, 0, '-E program builds';
     like file_content("$td/sayb"), qr/use feature qw\(:all\);\s*say "bye";/, '-E prepends feature pragma';
     is `"$td/sayb"`, "bye\n", '-E program runs';
 
     # -- multiple -m
-    ($out, $rc) = run_cli('-o', "$td/multi_m", '-m', 'Carp', '-m', 'strict', '-e', 'print qq(ok)');
+    ($out, $rc) = run_cli('-o', "$td/multi_m", '--no-compress', '-m', 'Carp', '-m', 'strict', '-e', 'print qq(ok)');
     is $rc, 0, 'multiple -m builds';
     my $mc = file_content("$td/multi_m");
     like $mc, qr/use Carp\(\);\s*use strict\(\);\s*print qq\(ok\)/, 'first -m as use X (); followed by second -m';
@@ -292,7 +396,7 @@ is `"$td/ul"`, '5050', '-M List::Util=sum -e program runs';
         write_fixture("$td3/lib/App/Unused.pm",        "package App::Unused; sub y { 99 }\n1;\n");
         mkpath("$td3/bin");
         write_fixture("$td3/bin/prog", "use App::Reachable::Sub; print App::Reachable::x(), \"\n\";");
-        ($out, $rc) = run_cli('-o', "$td3/out", '--lib', "$td3/lib", '--fatlib', "$td/fatlib", "$td3/bin/prog");
+        ($out, $rc) = run_cli('-o', "$td3/out", '--no-compress', '--lib', "$td3/lib", '--fatlib', "$td/fatlib", "$td3/bin/prog");
         is $rc, 0, 'reachable-only build exits 0';
         $c = file_content("$td3/out");
         like $c, qr/package App::Reachable::Sub;/, 'directly-used module bundled';
@@ -309,7 +413,7 @@ is `"$td/ul"`, '5050', '-M List::Util=sum -e program runs';
         write_fixture("$td4/lib/App/Unused.pm", "package App::Unused; 1;\n");
         mkpath("$td4/bin");
         write_fixture("$td4/bin/prog", "use App::Used;");
-        ($out, $rc) = run_cli('-o', "$td4/out", '--bundle-lib-all', '--lib', "$td4/lib", '--fatlib', "$td4/fatlib", "$td4/bin/prog");
+        ($out, $rc) = run_cli('-o', "$td4/out", '--no-compress', '--bundle-lib-all', '--lib', "$td4/lib", '--fatlib', "$td4/fatlib", "$td4/bin/prog");
         is $rc, 0, '--bundle-lib-all build exits 0';
         $c = file_content("$td4/out");
         like $c, qr/package App::Used;/,   'used module bundled';
@@ -326,7 +430,7 @@ is `"$td/ul"`, '5050', '-M List::Util=sum -e program runs';
         write_fixture("$td5/lib/App/Plug/Deep/Gamma.pm", "package App::Plug::Deep::Gamma; 1;\n");
         mkpath("$td5/bin");
         write_fixture("$td5/bin/prog", 'use Module::Pluggable (search_path => "App::Plug"); my @p = plugins();');
-        ($out, $rc) = run_cli('-o', "$td5/out", '--lib', "$td5/lib", '--fatlib', "$td5/fatlib", "$td5/bin/prog");
+        ($out, $rc) = run_cli('-o', "$td5/out", '--no-compress', '--lib', "$td5/lib", '--fatlib', "$td5/fatlib", "$td5/bin/prog");
         is $rc, 0, 'plugin search_path build exits 0';
         $c = file_content("$td5/out");
         like $c, qr/package App::Plug::Alpha;/,  'plugin Alpha force-included';

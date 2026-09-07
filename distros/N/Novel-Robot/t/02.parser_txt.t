@@ -2,7 +2,6 @@
 use lib '../lib';
 use Novel::Robot;
 use Test::More;
-#use Data::Dumper;
 use FindBin;
 use utf8;
 

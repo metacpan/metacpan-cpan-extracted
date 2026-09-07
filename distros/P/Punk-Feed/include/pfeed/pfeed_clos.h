@@ -205,7 +205,7 @@ static int pfeed_is_code(SV *sv)
  * so SvTYPE matching it is the point rather than the trap it usually is. */
 static HV *pfeed_app_hv(pTHX_ SV *app)
 {
-    PERL_UNUSED_ARG(my_perl);
+    PERL_UNUSED_CONTEXT;
     return pfeed_is_hash(app) ? (HV *)SvRV(app) : NULL;
 }
 

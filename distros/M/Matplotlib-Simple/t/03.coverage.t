@@ -111,10 +111,19 @@ sub count_matches {
 }
 
 sub dies_like {
+	# Match the exception's message, not the whole exception.
+	#
+	# The module loads Devel::Confess, which appends a stack trace in which
+	# every frame prints its own arguments -- and one of this frame's arguments
+	# is $re itself.  Matching "$@" therefore matches the pattern against a copy
+	# of the pattern, and every assertion here passes whatever the code does.
+	# The trace begins at the first tab-indented line.
 	my ( $code, $re, $name ) = @_;
 	my $lived = eval { $code->(); 1 };
 	return ok( 0, "$name (did not die)" ) if $lived;
-	return like( $@, $re, $name );
+	my $message = "$@";
+	$message =~ s/\n\t.*\z//s;
+	return like( $message, $re, $name );
 }
 
 sub lives_ok_t {
@@ -166,7 +175,7 @@ my @type_cases = (
 	[ 'scatter',    qr/\.scatter\(/,    'plot.type' => 'scatter',  data => { A => [@xw], B => [@yv], Z => [@cx] }, color_key => 'Z' ],
 	[ 'imshow',     qr/\.imshow\(/,     'plot.type' => 'imshow',   data => [ [ 1, 2, 3 ], [ 4, 5, 6 ] ] ],
 	[ 'colored_table', qr/table_cmap/,  'plot.type' => 'colored_table', data => { %matrix } ],
-	[ 'wide',       qr/mean_ys = ys\.mean/, 'plot.type' => 'wide', data => wide_lines(), color => 'red' ],
+	[ 'wide',       qr/base_x = np\.linspace/, 'plot.type' => 'wide', data => wide_lines(), color => 'red' ],
 );
 for my $case (@type_cases) {
 	my ( $name, $re, @args ) = @{$case};
@@ -577,6 +586,98 @@ SKIP: {
 		my $why = svg_problem($svg);
 		is( $why, '', "render '$name' produced a good SVG" . ( $why eq '' ? '' : " ($why)" ) );
 	}
+}
+
+# ============================================================================
+# 12. "wide": the summary must describe the runs it was given.
+#
+#     Two properties of np.interp used to be taken on trust.  It needs its
+#     sample points ascending, so a run whose x descends silently summarised to
+#     a flat line; and it holds the end values flat outside them, so a run that
+#     stopped short of the group's x range contributed an invented horizontal
+#     line to the mean and the standard deviation.  The three runs below are
+#     the same straight line y = 2x + 1 entered three ways -- ascending,
+#     descending, and covering only the first half of the range -- so a correct
+#     summary is that line with a zero-width ribbon, and either bug moves the
+#     mean away from it.
+# ============================================================================
+{
+	my @asc  = 0 .. 10;
+	my @desc = reverse 0 .. 10;
+	my @half = 0 .. 5;
+	my $line = sub { [ map { 2 * $_ + 1 } @{ $_[0] } ] };
+	my @runs = (
+		[ [@asc],  $line->( \@asc ) ],
+		[ [@desc], $line->( \@desc ) ],
+		[ [@half], $line->( \@half ) ],
+	);
+
+	my $py = gen_py( 'plot.type' => 'wide', data => [@runs], color => 'red',
+		'output.file' => outfile('wide.guards.svg') );
+	like( $py, qr/np\.argsort\(x, kind = 'stable'\)/,
+		'wide: each run is sorted by x before it is interpolated' );
+	like( $py, qr/np\.interp\(base_x, x, y, left = np\.nan, right = np\.nan\)/,
+		'wide: a run contributes nothing outside its own x range' );
+
+	SKIP: {
+		skip 'matplotlib >= 3.10 not available; skipping the wide summary check', 2
+			unless $mpl_available;
+		# Run the generated script and read the summary back out of it: the
+		# arrays are module-level names, so exec'ing the file exposes them.
+		my $check = <<'CHECK_PY';
+import sys, numpy as np
+g = {}
+exec(open(sys.argv[1], encoding='utf-8').read(), g)
+bx, mean, sd = g['base_x'], g['mean_ys'], g['std']
+print('%.6e %.6e' % (np.max(np.abs(mean - (2 * bx + 1))), np.max(np.abs(sd))))
+CHECK_PY
+		my ( $cfh, $cname ) = tempfile( SUFFIX => '.py', UNLINK => 1 );
+		print {$cfh} $check;
+		close $cfh;
+		my $pyfile = plt( 'plot.type' => 'wide', data => [@runs], color => 'red',
+			execute => 0, 'output.file' => outfile('wide.summary.svg') );
+		my $said = qx/python3 "$cname" "$pyfile" 2>&1/;
+		my ( $mean_err, $sd_max ) = $said =~ m/^([\d.e+-]+)\s+([\d.e+-]+)/;
+		$mean_err = defined $mean_err ? $mean_err : 'nan';
+		$sd_max   = defined $sd_max   ? $sd_max   : 'nan';
+		# 1e-9 is far above the ~1e-15 double rounding of a linear interpolation
+		# and far below the ~1 unit error either bug produced
+		cmp_ok( $mean_err, '<', 1e-9, 'wide: the mean tracks the line the runs describe' )
+			or diag("python said: $said");
+		cmp_ok( $sd_max, '<', 1e-9, 'wide: identical runs give a zero-width ribbon' )
+			or diag("python said: $said");
+	}
+}
+
+# ============================================================================
+# 13. "wide": malformed runs die naming the group, not deep inside the writer.
+# ============================================================================
+{
+	my $wide = sub {
+		my (%args) = @_;
+		return sub {
+			plt( 'plot.type' => 'wide', %args,
+				execute => 0, 'output.file' => outfile('wide.dies.svg') );
+		};
+	};
+	dies_like( $wide->( data => { A => [ [@xw], [@yv] ] } ),
+		qr/run 0 of group "A" must be/,
+		'wide: a lone [x,y] pair where a group belongs dies naming the group' );
+	dies_like( $wide->( data => { A => [] } ),
+		qr/group "A" holds no runs/,
+		'wide: an empty group dies naming the group' );
+	dies_like( $wide->( data => [ [ [ 1, 2, 3 ], [ 1, 2 ] ] ] ),
+		qr/3 x values but 2 y values/,
+		'wide: mismatched x and y lengths die with both counts' );
+	dies_like( $wide->( data => [ [ [ 1, 2 ], [ 'a', 'b' ] ] ] ),
+		qr/non-numeric y value/,
+		'wide: non-numeric data dies before it reaches python' );
+	dies_like( $wide->( data => { A => wide_lines() }, color => 'red' ),
+		qr/"color" must be a HASH/,
+		'wide: hash data with a single color dies clearly' );
+	dies_like( $wide->( data => wide_lines(), color => { A => 'red' } ),
+		qr/"color" must be a single color/,
+		'wide: array data with a color hash dies clearly' );
 }
 
 done_testing();

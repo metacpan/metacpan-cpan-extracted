@@ -10,9 +10,9 @@ BEGIN { use_ok('Net::IP::LPM') };
 
 #use Socket qw( AF_INET );
 #use Socket6 qw( inet_ntop inet_pton AF_INET6 );
-use if $] <  5.014000, Socket  => qw(inet_aton AF_INET);
+use if $] <  5.014000, Socket  => qw(AF_INET);
 use if $] <  5.014000, Socket6 => qw(inet_ntop inet_pton AF_INET6);
-use if $] >= 5.014000, Socket  => qw(inet_ntop inet_pton inet_aton AF_INET6 AF_INET);
+use if $] >= 5.014000, Socket  => qw(inet_ntop inet_pton AF_INET6 AF_INET);
 
 #########################
 

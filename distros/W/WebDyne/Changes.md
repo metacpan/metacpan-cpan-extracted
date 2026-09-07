@@ -1,5 +1,10 @@
 # Revision history for WebDyne
 
+## 3.027 - 2026-09-07
+
+- Use lazy load ("require") for modules only required at certain decision paths
+
+
 ## 3.026 - 2026-09-05
 
 - Required Carp 1.50 or newer so Devel::Confess preserves the original PAGI

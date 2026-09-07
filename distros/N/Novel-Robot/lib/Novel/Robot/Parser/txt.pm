@@ -24,8 +24,6 @@ use warnings;
 use base 'Novel::Robot::Parser';
 
 use File::Find::Rule;
-use Encode;
-use Encode::Locale;
 use Encode::Detect::CJK qw/detect/;
 use utf8;
 
@@ -43,7 +41,6 @@ sub parse_novel {
         my @txts = sort File::Find::Rule->file()->in($p);
         for my $txt (@txts){
             my $txt_data_ref = $self->read_single_txt($txt, %opt);
-            my $txt_file = decode(locale => $txt);
             for my $t (@$txt_data_ref){
                 #$t->{url} = $txt_file;
                 push @{$data{item_list}}, $t;
