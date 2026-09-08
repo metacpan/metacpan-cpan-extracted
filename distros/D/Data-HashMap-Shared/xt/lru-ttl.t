@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 
 plan skip_all => "AUTHOR_TESTING not set" unless $ENV{AUTHOR_TESTING};
 use File::Temp ();
@@ -60,7 +61,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is(shm_ii_get $map, 1, 10, 'get before expiry');
     ok(shm_ii_exists $map, 1, 'exists before expiry');
 
-    sleep 4;  # wait for TTL
+    Time::HiRes::sleep(2.2);  # wait for TTL
 
     ok(!defined(shm_ii_get $map, 1), 'expired after TTL');
     ok(!shm_ii_exists $map, 1, 'exists returns false after TTL');
@@ -76,7 +77,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_put $map, 1, 10;                       # gets default 1h TTL
     ok(shm_ii_put_ttl $map, 2, 20, 1, 'put_ttl');  # 1 sec TTL override
 
-    sleep 4;
+    Time::HiRes::sleep(1.2);
 
     is(shm_ii_get $map, 1, 10, 'long-TTL key survives');
     ok(!defined(shm_ii_get $map, 2), 'per-key TTL expired');
@@ -87,14 +88,14 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # LRU + TTL combined
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 5, 2);  # max_size=5, ttl=1
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 5, 2);  # max_size=5, ttl=2
 
     for my $i (1..5) {
         shm_ii_put $map, $i, $i * 10;
     }
     is(shm_ii_size $map, 5, 'full with LRU+TTL');
 
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     # All should be expired
     ok(!defined(shm_ii_get $map, 1), 'expired entry');
@@ -129,7 +130,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(shm_ss_put_ttl $map, "k", "v", 1, 'SS put_ttl');
     is(shm_ss_get $map, "k", "v", 'SS get before expiry');
 
-    sleep 4;
+    Time::HiRes::sleep(1.2);
     ok(!defined(shm_ss_get $map, "k"), 'SS expired');
 
     unlink $path;
@@ -206,7 +207,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_put $map, 1, 10;
     shm_ii_put_ttl $map, 2, 20, 100;  # long TTL
 
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     my @k = shm_ii_keys $map;
     # key 1 should be expired during iteration, key 2 should survive
@@ -300,7 +301,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_put $map, 1, 100;
     is(shm_ii_get $map, 1, 100, 'before expiry');
 
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     # incr on expired key should create fresh entry (value=1)
     is(shm_ii_incr $map, 1, 1, 'incr on expired key starts fresh');
@@ -317,7 +318,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_put $map, 1, 42;
     is(shm_ii_get_or_set $map, 1, 99, 42, 'get_or_set returns existing before expiry');
 
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     # After expiry, get_or_set should insert the default
     is(shm_ii_get_or_set $map, 1, 99, 99, 'get_or_set inserts default after expiry');
@@ -328,12 +329,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # put_ttl with ttl_sec=0 creates a permanent entry on TTL-enabled map
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);  # default TTL=1s
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);  # default TTL=2s
 
     shm_ii_put_ttl $map, 1, 10, 0;   # explicit no-TTL override
-    shm_ii_put $map, 2, 20;           # gets default 1s TTL
+    shm_ii_put $map, 2, 20;           # gets default 2s TTL
 
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     is(shm_ii_get $map, 1, 10, 'put_ttl(0) creates permanent entry');
     ok(!defined(shm_ii_get $map, 2), 'default TTL entry expired');
@@ -358,7 +359,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
 
     shm_ii_put $map, 1, 100;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     # incr_by on expired key should insert with value=delta, not 0+delta
     is(shm_ii_incr_by $map, 1, 5, 5, 'incr_by on expired key inserts delta');
@@ -371,9 +372,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
-    shm_ii_put_ttl $map, 1, 0, 0;    # permanent entry on ttl=1s map
+    shm_ii_put_ttl $map, 1, 0, 0;    # permanent entry on a ttl=2s map
     shm_ii_incr $map, 1;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     ok(defined(shm_ii_get $map, 1), 'permanent entry survives incr past default_ttl');
     is(shm_ii_get $map, 1, 1, 'permanent entry value correct after incr');
     unlink $path;
@@ -385,7 +386,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
     shm_ii_put_ttl $map, 1, 42, 0;   # permanent
     shm_ii_get_or_set $map, 1, 99;    # should not alter TTL
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     ok(defined(shm_ii_get $map, 1), 'permanent entry survives get_or_set past default_ttl');
     is(shm_ii_get $map, 1, 42, 'permanent entry value unchanged');
     unlink $path;

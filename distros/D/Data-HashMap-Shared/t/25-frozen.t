@@ -6,6 +6,11 @@ use POSIX ();
 use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::SS;
 
+# Anchored on the message: croak appends " at t/25-frozen.t line N" to
+# everything raised here, so a bare /frozen|read-only/ matches any exception
+# this file provokes, from any check.
+my $FROZEN = qr/is frozen \(read-only\)|cannot freeze a read-only handle/;
+
 # Frozen (read-only) mode: freeze() seals a file-backed map immutable; a consumer
 # opens it with new_readonly (O_RDONLY / PROT_READ) and queries it lock-free.
 # The critical property under test is that NOTHING writes the PROT_READ mapping
@@ -40,35 +45,6 @@ my $path = "$dir/ii.hm";
     ok $m->readonly, 'freezing handle becomes read-only';
     is $m->size, $N + 2, 'size unchanged by freeze';
     is $m->capacity, $cap, 'capacity unchanged by freeze';
-
-    # Every mutator croaks on the (now frozen) producer handle.
-    my %mut = (
-        put          => sub { $m->put(1, 1) },
-        add          => sub { $m->add(77, 77) },
-        update       => sub { $m->update(1, 2) },
-        remove       => sub { $m->remove(1) },
-        clear        => sub { $m->clear },
-        incr         => sub { $m->incr(1) },
-        decr         => sub { $m->decr(1) },
-        incr_by      => sub { $m->incr_by(1, 5) },
-        max          => sub { $m->max(1, 1e9) },
-        min          => sub { $m->min(1, -1e9) },
-        swap         => sub { $m->swap(1, 3) },
-        cas          => sub { $m->cas(1, 7, 8) },
-        cas_take     => sub { $m->cas_take(1, 7) },
-        get_or_set   => sub { $m->get_or_set(1, 0) },
-        take         => sub { $m->take(1) },
-        pop          => sub { $m->pop },
-        shift        => sub { $m->shift },
-        drain        => sub { $m->drain(3) },
-        set_multi    => sub { $m->set_multi(5, 5) },
-        remove_multi => sub { $m->remove_multi(1, 2) },
-        reserve      => sub { $m->reserve(1 << 20) },
-        flush_expired=> sub { $m->flush_expired },
-        freeze       => sub { $m->freeze },
-    );
-    like exception($mut{$_}), qr/frozen|read-only/, "mutator '$_' croaks on a frozen handle"
-        for sort keys %mut;
 }
 
 # ---------------------------------------------------------------------------
@@ -137,17 +113,17 @@ my $path = "$dir/ii.hm";
     # Mutators croak on the read-only view. incr/incr_by/max/min write under the
     # READ lock (atomic RMW), so this guard is the only thing preventing a
     # PROT_READ fault for them -- exercise them explicitly.
-    like exception(sub { $ro->put(1, 1) }),      qr/frozen|read-only/, 'put croaks on read-only view';
-    like exception(sub { $ro->add(5, 5) }),      qr/frozen|read-only/, 'add croaks on read-only view';
-    like exception(sub { $ro->incr(1) }),        qr/frozen|read-only/, 'incr croaks on read-only view';
-    like exception(sub { $ro->decr(1) }),        qr/frozen|read-only/, 'decr croaks on read-only view';
-    like exception(sub { $ro->incr_by(1, 3) }),  qr/frozen|read-only/, 'incr_by croaks on read-only view';
-    like exception(sub { $ro->max(1, 9) }),      qr/frozen|read-only/, 'max croaks on read-only view';
-    like exception(sub { $ro->min(1, -9) }),     qr/frozen|read-only/, 'min croaks on read-only view';
-    like exception(sub { $ro->remove(1) }),      qr/frozen|read-only/, 'remove croaks on read-only view';
-    like exception(sub { $ro->clear }),          qr/frozen|read-only/, 'clear croaks on read-only view';
-    like exception(sub { $ro->get_or_set(1,0) }),qr/frozen|read-only/, 'get_or_set croaks on read-only view';
-    like exception(sub { $ro->freeze }),         qr/read-only/,        'freeze croaks on read-only view';
+    like exception(sub { $ro->put(1, 1) }),      $FROZEN, 'put croaks on read-only view';
+    like exception(sub { $ro->add(5, 5) }),      $FROZEN, 'add croaks on read-only view';
+    like exception(sub { $ro->incr(1) }),        $FROZEN, 'incr croaks on read-only view';
+    like exception(sub { $ro->decr(1) }),        $FROZEN, 'decr croaks on read-only view';
+    like exception(sub { $ro->incr_by(1, 3) }),  $FROZEN, 'incr_by croaks on read-only view';
+    like exception(sub { $ro->max(1, 9) }),      $FROZEN, 'max croaks on read-only view';
+    like exception(sub { $ro->min(1, -9) }),     $FROZEN, 'min croaks on read-only view';
+    like exception(sub { $ro->remove(1) }),      $FROZEN, 'remove croaks on read-only view';
+    like exception(sub { $ro->clear }),          $FROZEN, 'clear croaks on read-only view';
+    like exception(sub { $ro->get_or_set(1,0) }),$FROZEN, 'get_or_set croaks on read-only view';
+    like exception(sub { $ro->freeze }),         $FROZEN, 'freeze croaks on read-only view';
 }
 
 # ---------------------------------------------------------------------------
@@ -188,11 +164,11 @@ my $path = "$dir/ii.hm";
 # Refuse a read-write reopen of a sealed file -- both open paths
 # ---------------------------------------------------------------------------
 like exception(sub { Data::HashMap::Shared::II->new($path, 100000) }),
-     qr/frozen|read-only/, 'read-write reopen of a sealed file is refused (create path)';
+     $FROZEN, 'read-write reopen of a sealed file is refused (create path)';
 {
     open my $fh, '+<', $path or die "open $path: $!";
     like exception(sub { Data::HashMap::Shared::II->new_from_fd(fileno $fh) }),
-         qr/frozen|read-only/, 'new_from_fd of a sealed file is refused (open_fd path)';
+         $FROZEN, 'new_from_fd of a sealed file is refused (open_fd path)';
     close $fh;
 }
 
@@ -240,9 +216,9 @@ like exception(sub { Data::HashMap::Shared::SS->new_readonly($path) }),
 
     is_deeply [sort keys %cseen], [sort keys %eseen], 'SS cursor and each agree on the key set';
 
-    like exception(sub { $ro->put("x", "y") }),    qr/frozen|read-only/, 'SS put croaks on read-only view';
-    like exception(sub { $ro->remove("key-1") }),  qr/frozen|read-only/, 'SS remove croaks on read-only view';
-    like exception(sub { $ro->clear }),            qr/frozen|read-only/, 'SS clear croaks on read-only view';
+    like exception(sub { $ro->put("x", "y") }),    $FROZEN, 'SS put croaks on read-only view';
+    like exception(sub { $ro->remove("key-1") }),  $FROZEN, 'SS remove croaks on read-only view';
+    like exception(sub { $ro->clear }),            $FROZEN, 'SS clear croaks on read-only view';
 }
 
 # Regression (0.19): a sealed file has no writers, so an odd seq or a held lock
@@ -325,6 +301,84 @@ like exception(sub { Data::HashMap::Shared::SS->new_readonly($path) }),
             "$label: sealed file keeps its capacity";
         is $after->{table_gen}, $before->{table_gen},
             "$label: sealed file is not resized when the iterator ends";
+    }
+}
+
+
+# Every mutator croaks, in every one of the ten separately compiled variants,
+# through both kinds of handle: the one that froze the map (readonly == 1) and
+# one opened BEFORE the freeze, which has readonly == 0 with sealed == 1 -- so a
+# guard that consults only `readonly` lets that handle write into a sealed file.
+{
+    my %by_variant = (
+        II   => { key => 1,       val => 1,       counters => 1 },
+        SI   => { key => 'k',     val => 1,       counters => 1 },
+        I16  => { key => 1,       val => 1,       counters => 1 },
+        I32  => { key => 1,       val => 1,       counters => 1 },
+        SI16 => { key => 'k',     val => 1,       counters => 1 },
+        SI32 => { key => 'k',     val => 1,       counters => 1 },
+        IS   => { key => 1,       val => 'v',     counters => 0 },
+        SS   => { key => 'k',     val => 'v',     counters => 0 },
+        I16S => { key => 1,       val => 'v',     counters => 0 },
+        I32S => { key => 1,       val => 'v',     counters => 0 },
+    );
+
+    for my $v (sort keys %by_variant) {
+        my $class = "Data::HashMap::Shared::$v";
+        unless (eval "require $class; 1") { fail("load $class: $@"); next }
+        my ($k, $val, $counters) = @{ $by_variant{$v} }{qw(key val counters)};
+
+        # a TTL map, so put_ttl/add_ttl/update_ttl exercise the frozen guard on a
+        # map where the operation is otherwise legal (REQUIRE_TTL sits after the
+        # guard, so $FROZEN would catch a lost guard on a non-TTL map too)
+        my $path = "$dir/prefreeze-$v.hm";
+        my $writer = $class->new($path, 1024, 0, 3600);   # opened before the freeze
+        $writer->put($k, $val);
+        my $freezer = $class->new($path, 1024, 0, 3600);
+        $freezer->freeze;
+
+        ok !$writer->readonly, "$v: the pre-freeze handle is not marked read-only";
+        ok $freezer->readonly,  "$v: the freezing handle is";
+
+        for my $which ([$freezer, 'the frozen handle'], [$writer, 'a pre-freeze handle']) {
+            my ($m, $how) = @$which;
+            my %mut = (
+                put          => sub { $m->put($k, $val) },
+                add          => sub { $m->add($k, $val) },
+                update       => sub { $m->update($k, $val) },
+                remove       => sub { $m->remove($k) },
+                clear        => sub { $m->clear },
+                swap         => sub { $m->swap($k, $val) },
+                cas          => sub { $m->cas($k, $val, $val) },
+                cas_take     => sub { $m->cas_take($k, $val) },
+                get_or_set   => sub { $m->get_or_set($k, $val) },
+                take         => sub { $m->take($k) },
+                pop          => sub { $m->pop },
+                shift        => sub { $m->shift },
+                drain        => sub { $m->drain(3) },
+                set_multi    => sub { $m->set_multi($k, $val) },
+                remove_multi => sub { $m->remove_multi($k) },
+                reserve      => sub { $m->reserve(1 << 20) },
+                flush_expired         => sub { $m->flush_expired },
+                flush_expired_partial => sub { $m->flush_expired_partial(8) },
+                freeze       => sub { $m->freeze },
+                persist      => sub { $m->persist($k) },
+                touch        => sub { $m->touch($k) },
+                set_ttl      => sub { $m->set_ttl($k, 1) },
+                put_ttl      => sub { $m->put_ttl($k, $val, 1) },
+                add_ttl      => sub { $m->add_ttl($k, $val, 1) },
+                update_ttl   => sub { $m->update_ttl($k, $val, 1) },
+            );
+            if ($counters) {
+                $mut{incr}    = sub { $m->incr($k) };
+                $mut{decr}    = sub { $m->decr($k) };
+                $mut{incr_by} = sub { $m->incr_by($k, 5) };
+                $mut{max}     = sub { $m->max($k, 1) };
+                $mut{min}     = sub { $m->min($k, -1) };
+            }
+            like exception($mut{$_}), $FROZEN, "$v: '$_' croaks through $how"
+                for sort keys %mut;
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Password;
 # ABSTRACT: password field
-$HTML::FormHandler::Field::Password::VERSION = '0.410001';
+$HTML::FormHandler::Field::Password::VERSION = '0.410002';
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Field::Text';
 
@@ -68,7 +68,7 @@ HTML::FormHandler::Field::Password - password field
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

@@ -22,6 +22,8 @@ my @files = (
     't/15-forward-lookup-limit.t',
     't/16-resolver-failure.t',
     't/17-empty-domains-config.t',
+    't/20-basic-algorithm-ahocorasick.t',
+    't/20-basic-toml-tiny.t',
     't/21-cache_failure-default.t'
 );
 

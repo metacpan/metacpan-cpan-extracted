@@ -1,6 +1,6 @@
 package HTML::FormHandler::Result::Role;
 # ABSTRACT: role with common code for form & field results
-$HTML::FormHandler::Result::Role::VERSION = '0.410001';
+$HTML::FormHandler::Result::Role::VERSION = '0.410002';
 use Moose::Role;
 
 
@@ -136,7 +136,7 @@ HTML::FormHandler::Result::Role - role with common code for form & field results
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

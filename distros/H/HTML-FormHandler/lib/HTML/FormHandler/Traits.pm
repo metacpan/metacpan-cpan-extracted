@@ -1,6 +1,6 @@
 package HTML::FormHandler::Traits;
 # ABSTRACT: customized replacement for MooseX::Traits
-$HTML::FormHandler::Traits::VERSION = '0.410001';
+$HTML::FormHandler::Traits::VERSION = '0.410002';
 use Moose::Role;
 use Class::Load qw/ load_class /;
 use namespace::autoclean;
@@ -121,7 +121,7 @@ HTML::FormHandler::Traits - customized replacement for MooseX::Traits
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

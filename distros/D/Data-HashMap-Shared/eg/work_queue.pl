@@ -30,10 +30,13 @@ if (@ARGV && $ARGV[0] eq 'reset') { $queue->unlink; exit }
     my $njobs = 20;
     enqueue("job-$_", "payload-$_") for 1..$njobs;
 
+    pipe(my $start_r, my $start_w) or die "pipe: $!";
     my @pids;
     for my $w (1..4) {
         my $pid = fork // die "fork: $!";
         if ($pid == 0) {
+            close $start_w;
+            <$start_r>;   # start together, or worker 1 finishes before 2 forks
             my $wins = 0;
             for my $j (1..$njobs) {
                 my $got = claim("job-$j", "payload-$j");
@@ -44,6 +47,14 @@ if (@ARGV && $ARGV[0] eq 'reset') { $queue->unlink; exit }
         }
         push @pids, $pid;
     }
+    close $start_r;
+    close $start_w;
     waitpid($_, 0) for @pids;
-    print "remaining unclaimed: ", $queue->size, "\n";
+    # Which worker wins is scheduler-dependent: twenty claims finish before four
+    # woken processes are dispatched, so one worker often sweeps the queue.  The
+    # invariant is exclusivity, and the totals show it: every job claimed, none
+    # claimed twice.
+    print "claimed: ", $njobs - $queue->size, "/$njobs, remaining unclaimed: ",
+          $queue->size, "\n";
+    $queue->unlink;
 }

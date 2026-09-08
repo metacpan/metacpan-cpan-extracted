@@ -7,9 +7,9 @@ Data::HashMap::Shared::Cookbook - Practical recipes for shared-memory maps
 =head1 DESCRIPTION
 
 Copy-paste patterns for common cross-process tasks with
-L<Data::HashMap::Shared>: counters, caches, rate limiting, liveness, work
-queues, and atomic state. Each recipe is a complete, self-contained sketch;
-runnable versions of several live under C<eg/> in the distribution.
+L<Data::HashMap::Shared>: counters, caches, rate limiting, liveness, dedup,
+and atomic state. Runnable versions of several live under C<eg/> in the
+distribution.
 
 Pick a variant by key/value type (see L</CHOOSING A VARIANT>) and replace the
 C<shm_xx_*> keyword prefix accordingly (C<shm_ii_>, C<shm_ss_>, C<shm_si_>, ...).
@@ -19,8 +19,7 @@ C<shm_xx_*> keyword prefix accordingly (C<shm_ii_>, C<shm_ss_>, C<shm_si_>, ...)
 =head2 Shared request/error counters
 
 Pre-forked workers tallying into one map. C<incr>/C<incr_by> are atomic, so no
-update is lost. On a map with neither LRU nor TTL they run under the shared read
-lock; with either enabled they take the write lock -- still atomic, just serialised.
+update is lost.
 
     use Data::HashMap::Shared::SI;   # string metric name -> int64 count
     my $stats = Data::HashMap::Shared::SI->new('/tmp/stats.shm', 1000);
@@ -38,9 +37,9 @@ F<eg/sharded_counter.pl>).
 
 =head2 High-water marks and leaderboards
 
-C<max>/C<min> store C<max($current, $desired)> / C<min(...)> atomically under a
-single lock, so concurrent updates never clobber each other or lose a higher
-score. A missing key is inserted as the given value.
+C<max>/C<min> store C<max($current, $desired)> / C<min(...)> atomically, so
+concurrent updates never clobber each other or lose a higher score. A missing
+key is inserted as the given value.
 
     use Data::HashMap::Shared::SI;   # player -> high score
     my $board = Data::HashMap::Shared::SI->new('/tmp/board.shm', 10_000);
@@ -49,7 +48,8 @@ score. A missing key is inserted as the given value.
     # keep unrelated metrics in their own map -- anything in $board is a player
 
     my $scores = $board->to_hash;
-    my @top = (sort { $scores->{$b} <=> $scores->{$a} } keys %$scores)[0 .. 9];
+    my @top = sort { $scores->{$b} <=> $scores->{$a} } keys %$scores;
+    @top = @top[0 .. 9] if @top > 10;   # a slice would pad a short board with undef
 
 Full example: F<eg/leaderboard.pl>.
 
@@ -71,17 +71,16 @@ stored value, so an expensive computation is shared across the fleet.
     }
 
 C<get_or_set> returns undef when the entry could not be stored at all -- the
-table is full, or (string variants) the arena is exhausted -- so returning its
-result directly hands the caller undef for a value that was just computed
-successfully.  Fall back to the computed value as above, and give a long-lived
-cache a C<$max_size> so eviction keeps slots free.
+table is full, or (string variants) the arena is exhausted.  Fall back to the
+computed value as above, and give a long-lived cache a C<$max_size> so eviction
+keeps slots free.
 
 Full example: F<eg/memoize.pl>.
 
 =head2 LRU cache with bounded memory
 
 Pass C<$max_size> to cap live entries; the least-recently-used entry is evicted
-on insert (clock/second-chance; reads stay lock-free).
+on insert.
 
     use Data::HashMap::Shared::SS;
     # max_entries=1_000_000 table, evict once 100_000 entries are live:
@@ -92,13 +91,11 @@ on insert (clock/second-chance; reads stay lock-free).
     my $evicted = $cache->stats->{evictions};
 
 For large values on a small table, size the string arena explicitly so a few
-big entries do not starve it: C<< ->new($path, $max_entries, 0, 0, 0, $arena_cap) >>.
-Eviction is driven by the entry count alone, so an undersized arena stops the
-cache dead: once it is full every C<put> needing arena space returns false, no
-eviction happens, and the cache keeps its B<oldest> keys forever.  (Keys and
-values of 7 bytes or fewer are stored inline and keep working, so the cache can
-look alive while it takes nothing real.)  Check C<put>'s return value, and watch
-C<< stats->{arena_used} >> against C<< stats->{arena_cap} >>.
+big entries do not starve it: C<< ->new($path, $max_entries, $max_size, 0, 0, $arena_cap) >>.
+An insert that cannot fit evicts one entry and retries, so size the arena for
+the working set: one that only just holds it evicts on nearly every insert, so
+the hit rate collapses while C<< stats->{evictions} >> climbs, and an entry
+needing a size class none of the oldest entries holds still fails.
 
 =head2 Per-key TTL and dedup / idempotency
 
@@ -113,23 +110,24 @@ Together they make a "process each id once within a window" guard.
     } # else: already processed recently, skip
 
 C<add> is false both when the id was already seen B<and> when the entry could
-not be stored, and the two are indistinguishable.  Event ids never repeat, so a
-TTL map with no LRU fills with expired ids that nothing reclaims (see the rate
-limiter below), and from then on every new event reads as "already processed"
-and is silently dropped.  Reclaim on a timer, or give the map a C<$max_size>:
+not be stored, and the two are indistinguishable.  Event ids never repeat, so
+the table fills with expired ids; a timer keeps the dead weight from lengthening
+every probe.  Size its slice as under L</Sliding-window rate limiting>, or give
+the map a C<$max_size>:
 
-    my ($flushed, $done) = $seen->flush_expired_partial(1000);
+    # once a second: the 2097152 slots this map can grow to, over a 300s TTL
+    my ($flushed, $done) = $seen->flush_expired_partial(7000);
 
 C<put_ttl>/C<set_ttl> set a per-key TTL; C<persist> makes a key permanent;
-C<ttl_remaining> reports seconds left. TTL is measured on a monotonic clock.
+C<ttl_remaining> reports seconds left.
 
 =head2 Worker heartbeat / liveness registry
 
 Each worker refreshes a TTL'd heartbeat; a dead worker stops refreshing and its
 entry expires, so a supervisor sees only live workers.
 
-    use Data::HashMap::Shared::IS;   # pid -> status, 2s TTL
-    my $reg = Data::HashMap::Shared::IS->new('/tmp/live.shm', 4096, 0, 2);
+    use Data::HashMap::Shared::IS;   # pid -> status, 3s TTL for a 1s refresh
+    my $reg = Data::HashMap::Shared::IS->new('/tmp/live.shm', 4096, 0, 3);
 
     # worker loop:
     shm_is_put $reg, $$, 'ok';        # every second; resets the TTL
@@ -140,10 +138,10 @@ entry expires, so a supervisor sees only live workers.
 
 Full example: F<eg/heartbeat.pl>.
 
-=head2 Token-bucket rate limiting
+=head2 Sliding-window rate limiting
 
 A counter per subject with a TTL window; the first hit creates it (TTL applies)
-and subsequent hits increment it.  Note that each C<incr> refreshes the entry's
+and subsequent hits increment it.  Each C<incr> refreshes the entry's
 TTL, so the window slides: it resets only once a subject stops hitting it for a
 full window, and a client that keeps retrying stays limited until it backs off.
 
@@ -156,15 +154,19 @@ full window, and a client that keeps retrying stays limited until it backs off.
         return $n <= 100;                # cap per window
     }
 
-Subjects that never come back leave expired entries holding their slots: a TTL
-map with no LRU does not reclaim them until something asks for that key, so the
-table eventually fills and C<incr> starts dying for every B<new> subject while
-C<keys> reports none.  Reclaim on a timer -- a bounded slice per tick is enough:
+Subjects that never come back leave expired entries holding their slots until
+an insert needs one: an insert that finds the table full flushes every dead
+subject at once, which keeps the limiter working.  Reclaim on a timer as well,
+to keep C<size> honest and the probes short between those flushes; the slice
+counts slots scanned, not entries freed, so size it to cycle the whole table
+inside one window, the slots the map can grow to over the window in ticks.
+C<size> climbing while C<keys> stays flat means the slice is losing ground:
 
-    # e.g. once a second from your event loop
-    my ($flushed, $done) = $rl->flush_expired_partial(1000);
+    # once a second: the 262144 slots this map can grow to, over the 60s window
+    my ($flushed, $done) = $rl->flush_expired_partial(5000);
 
-Giving the map a C<$max_size> instead makes eviction reclaim the slots for you.
+Giving the map a C<$max_size> instead makes eviction reclaim the slots for you
+and needs no timer at all.
 
 Full example: F<eg/rate_limiter.pl>.
 
@@ -175,6 +177,7 @@ state machine without a lock.
 
     use Data::HashMap::Shared::SI;   # job -> state code (0=idle 1=running 2=done)
     my $jobs = Data::HashMap::Shared::SI->new('/tmp/jobs.shm', 100_000);
+    shm_si_add $jobs, $_, 0 for @job_ids;   # cas needs the key to exist first
 
     # claim a job: idle(0) -> running(1), exactly one winner
     if (shm_si_cas $jobs, $job, 0, 1) {
@@ -234,10 +237,9 @@ not the raw byte total.
 
 =item * B<shards> (C<new_sharded($prefix, $shards, ...)>) -- independent maps with
 independent locks for write-heavy workloads; per-key ops route automatically,
-and the sizing args above are B<per shard>. Pick the smallest count that relieves
-contention: lookups get slower as the count rises (see
-L<Data::HashMap::Shared/Sharding>), and the count is not stored in the files, so
-every process must pass the same one.
+and the sizing args above are B<per shard>. A set created by 0.20 or later
+records its count and croaks if opened with a different one; an older set does
+not, so every process must pass the same one.
 
 =back
 

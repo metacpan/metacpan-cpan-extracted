@@ -1,0 +1,176 @@
+=head1 NAME
+
+App::FuguWeb::Rotate - write the key directory of a site
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Rotate;
+
+    my $rotate = App::FuguWeb::Rotate->new(
+        config => $config,
+        org    => 'fugubsd',
+        url    => 'https://www.fugubsd.org/keys',
+    );
+
+    my $facts = $rotate->mint(
+        purpose => 'release',
+        secret  => '/tmp/new.sec',
+        signer  => '/tmp/current.sec',
+    ) or die $rotate->error;
+
+    my $facts = $rotate->promote(
+        purpose => 'release',
+        secret  => '/tmp/next.sec',
+    ) or die $rotate->error;
+
+=head1 DESCRIPTION
+
+L<App::FuguWeb::Keys> reads the key directory, and this class writes
+it. One class holds both steps of a rotation, so the reader and the
+writer share one implementation of the name pattern, the status
+vocabulary and the manifest.
+
+A consumer verifies a release against the copy of the public key that
+it holds. A release that a new key signs therefore fails in each
+consumer that holds the old copy. One rotation runs in two steps, and
+the trust order carries the gap.
+
+C<mint> makes the next key of a purpose. The current key of that
+purpose signs the manifest that names the new one. A consumer with the
+old copy can therefore still verify. C<promote> makes the new key
+current and retires the old one.
+
+The first mint of a purpose finds no current key. That key is current
+at once, and it signs its own manifest.
+
+This class signs, and a site build does not. It is the one part of
+FuguWeb that needs C<signify(1)>.
+
+=head1 THE TRUST RULES
+
+Each rule below answers a way to publish a key directory that no
+consumer can use.
+
+=over 4
+
+=item The description holds the status
+
+The status of a key comes from its C<key> block, and no step assumes
+one. A key file with no block, and a block with no file, each fail the
+step. A step that read the first key of a purpose would take a retired
+key for the current one.
+
+=item The current key signs
+
+A mint of a purpose that holds a current key takes the private half of
+that key as C<signer>. It never signs with the key that it generated.
+A manifest that the new key signed would fail in every consumer.
+
+=item The signature verifies before it lands
+
+Each step stages the manifest and the signature in a temporary
+directory, and it verifies the signature against the published public
+key of the signer. Only a verified pair reaches the key directory.
+
+=item One mint waits for the promote
+
+A mint refuses a purpose that holds a C<next> key already, and it
+refuses before it generates a pair. A caller holds one place for the
+private half of a mint, so a second key would lose the private half of
+the first.
+
+=item A step lands whole, or not at all
+
+Every byte of a step is ready before the first write. Each file lands
+through a temporary file in the same directory, so a reader sees the
+old bytes or the new ones. A write that fails, and a check that fails
+after the writes, both put every file back.
+
+The private half of a new key lands last, after the check passes. A
+step that fails therefore leaves no key that the site does not
+publish.
+
+A process that dies inside a step leaves the checkout dirty. A caller
+runs a step and commits after it, so it commits nothing then.
+
+=item One directory holds one purpose
+
+One manifest covers the whole directory, and one key signs it. A
+second purpose would leave the current key of the first unable to
+verify the pair, and no check would report it. A mint of another
+purpose therefore fails.
+
+=item The reader decides
+
+Each step ends with L<App::FuguWeb::Keys>. A directory that the reader
+rejects is a directory that C<fuguweb check> rejects, so the step
+fails and the caller commits nothing.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item App::FuguWeb::Rotate->new(config => $config, ...)
+
+The rotation over one description. C<config> is an
+L<App::FuguWeb::Config>.
+
+A site that publishes its first key holds no C<keys> block, because
+such a block cannot load until a C<key> block stands beside it. The
+caller then names C<org>, and it can name C<dir> and C<url>. One
+commit carries the C<keys> block, the first C<key> block and the key
+itself.
+
+=item $rotate->mint(purpose => $word, secret => $path, signer => $path)
+
+Generate the next key of the purpose. The public half goes into the
+key directory, and the private half goes to C<secret> with no group
+mode and no other mode. C<signer> is the private half of the current
+key of the purpose, and a first mint takes none.
+
+C<secret> must name no file that stands, and it must not name
+C<signer>. The private half of a key is the one thing that a rotation
+cannot make again, and a caller holds each one in one place.
+
+The method answers a hash reference with C<name>, C<stem>, C<serial>
+and C<status>, or undef with a reason in C<error>.
+
+=item $rotate->promote(purpose => $word, secret => $path)
+
+Make the C<next> key of the purpose current, and retire the key that
+was current with an C<until> date. C<secret> is the private half of
+the key that this step makes current, and that key signs the manifest.
+
+The retired key keeps its file and its published URL, so a release
+that it signed still verifies.
+
+The method answers a hash reference with C<name>, C<stem>, C<serial>,
+C<status> and C<retired>, or undef with a reason in C<error>.
+
+=item $rotate->config
+
+The description. A step loads it again after it writes, so a caller
+that holds this object reads the current state.
+
+=item $rotate->error
+
+The reason of the most recent failure, or undef.
+
+=back
+
+=head1 WHAT THIS CLASS DOES NOT DO
+
+It writes no secret store and it opens no pull request. It reaches no
+network and it holds no token. A caller stores the private key and
+declares the public one.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb::Keys>, L<Fugu::KeyDir>, L<Fugu::Signify>,
+L<App::FuguWeb::Config>, C<signify(1)>
+
+=head1 AUTHORS
+
+Dick Olsson <hi@senzilla.io>

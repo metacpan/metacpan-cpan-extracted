@@ -13,7 +13,7 @@ HTML::FormHandler::Manual::FromFF - converting from HTML::FormFu
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,871 @@
+#!/usr/bin/env perl
+
+package local::bin::overleaf;
+
+use v5.10;
+use strict;
+use warnings;
+
+binmode(STDOUT, ':encoding(UTF-8)');
+binmode(STDERR, ':encoding(UTF-8)');
+
+use Carp qw/croak/;
+use HTML::Entities qw/encode_entities/;
+use Pod::Text;
+
+use Dispatch::Fu;
+use Util::H2O::More qw/Getopt2h2o o2h/;
+use Webservice::Overleaf::API qw//;
+
+our $VERSION = $Webservice::Overleaf::API::VERSION;
+
+use constant {
+    EXIT_SUCCESS => 0,
+    EXIT_ERROR   => 1,
+    EXIT_USAGE   => 2,
+};
+
+sub _options {
+    my $ARGV = shift;
+
+    return Getopt2h2o $ARGV,
+        {
+            help          => 0,
+            version       => 0,
+            experimental  => 0,
+            session       => undef,
+            session_file  => undef,
+            csrf          => undef,
+            base_url      => undef,
+            git_base_url  => undef,
+            cookie_name   => undef,
+            timeout       => undef,
+            engine        => undef,
+            main_document => undef,
+            visual_editor => undef,
+            name          => undef,
+            mime          => undef,
+            output        => undef,
+            resource_path => undef,
+            remote        => undef,
+        },
+        qw/
+            help|h
+            version|v
+            experimental!
+            session=s
+            session_file|session-file=s
+            csrf=s
+            base_url|base-url=s
+            git_base_url|git-base-url=s
+            cookie_name|cookie-name=s
+            timeout=i
+            engine=s
+            main_document|main-document=s
+            visual_editor|visual-editor!
+            name=s@
+            mime=s
+            output|o=s
+            resource_path|resource-path=s
+            remote=s
+        /;
+}
+
+sub _slurp_raw {
+    my $filename = shift;
+    croak 'a filename is required' if !defined($filename) || $filename eq q{};
+
+    open my $fh, '<:raw', $filename
+        or croak "could not read '$filename': $!";
+    local $/;
+    my $content = <$fh>;
+    close $fh
+        or croak "could not close '$filename': $!";
+
+    return $content;
+}
+
+sub _session_from_file {
+    my $filename = shift;
+    return if !defined($filename) || $filename eq q{};
+
+    my $session = _slurp_raw($filename);
+    $session =~ s/\r?\n\z//;
+    return $session;
+}
+
+sub _client_from_options {
+    my $o = shift;
+    my %opts;
+
+    for my $name (qw/base_url git_base_url cookie_name timeout csrf/) {
+        my $value = $o->$name;
+        $opts{$name} = $value if defined $value;
+    }
+
+    my $session = $o->session;
+    if (!defined($session) && defined($o->session_file)) {
+        $session = _session_from_file($o->session_file);
+    }
+    $opts{session} = $session if defined $session;
+
+    $opts{experimental} = $o->experimental ? 1 : 0;
+
+    return Webservice::Overleaf::API->new(%opts);
+}
+
+sub _open_options {
+    my $o = shift;
+    my %opts;
+
+    $opts{engine} = $o->engine
+        if defined $o->engine;
+
+    $opts{main_document} = $o->main_document
+        if defined $o->main_document;
+
+    $opts{visual_editor} = $o->visual_editor
+        if defined $o->visual_editor;
+
+    return %opts;
+}
+
+sub _compile_options {
+    my $o = shift;
+    my %opts;
+
+    $opts{resource_path} = $o->resource_path
+        if defined $o->resource_path;
+
+    return %opts;
+}
+
+sub _route {
+    my $command = shift;
+    return 'help' if !defined($command) || $command eq q{};
+
+    $command = lc $command;
+
+    my %route = (
+        help           => 'help',
+        'project-url'  => 'project_url',
+        project_url    => 'project_url',
+        'git-url'      => 'git_url',
+        git_url        => 'git_url',
+        'open-uri'     => 'open_uri',
+        open_uri       => 'open_uri',
+        open           => 'open_uri',
+        'open-data'    => 'open_data',
+        open_data      => 'open_data',
+        'snippet-form' => 'snippet_form',
+        snippet_form   => 'snippet_form',
+        form           => 'snippet_form',
+        clone          => 'git_clone',
+        'git-clone'    => 'git_clone',
+        pull           => 'git_pull',
+        'git-pull'     => 'git_pull',
+        push           => 'git_push',
+        'git-push'     => 'git_push',
+        'remote-add'   => 'git_remote_add',
+        git_remote_add => 'git_remote_add',
+        bootstrap      => 'bootstrap',
+        projects       => 'projects',
+        list           => 'projects',
+        ls             => 'projects',
+        zip            => 'project_zip',
+        'project-zip'  => 'project_zip',
+        compile        => 'compile',
+        pdf            => 'download_pdf',
+        output         => 'download_output',
+    );
+
+    return $route{$command} || 'usage';
+}
+
+sub _require_arg {
+    my ($ARGV, $what) = @_;
+    my $value = shift @$ARGV;
+    croak "$what is required" if !defined($value) || $value eq q{};
+    return $value;
+}
+
+sub _leaf {
+    my $path = shift;
+    $path =~ s{.*[\\/]}{};
+    return $path;
+}
+
+sub _text {
+    my $value = shift;
+    return defined($value) ? $value : q{};
+}
+
+sub _html_attr {
+    return encode_entities(_text(shift), q{<>&"'});
+}
+
+sub _print_usage {
+    my $fh = shift;
+    print {$fh} <<"USAGE";
+Usage:
+  overleaf [global-options] COMMAND [command-arguments]
+  overleaf --help
+  overleaf --version
+
+Try 'overleaf --help' for the full manual.
+USAGE
+    return;
+}
+
+sub do_help {
+    my $parser = Pod::Text->new(
+        sentence => 0,
+        width    => 78,
+    );
+    $parser->parse_from_file(__FILE__, \*STDOUT);
+    return EXIT_SUCCESS;
+}
+
+sub do_usage {
+    my ($Client, $command) = xshift_and_deref @_;
+    print STDERR "overleaf: unknown command '" . _text($command) . "'\n";
+    _print_usage(\*STDERR);
+    return EXIT_USAGE;
+}
+
+sub do_project_url {
+    my ($Client, $command, $ARGV) = xshift_and_deref @_;
+    my $project_id = _require_arg($ARGV, 'project id');
+    say $Client->project_url($project_id);
+    return EXIT_SUCCESS;
+}
+
+sub do_git_url {
+    my ($Client, $command, $ARGV) = xshift_and_deref @_;
+    my $project_id = _require_arg($ARGV, 'project id');
+    say $Client->git_url($project_id);
+    return EXIT_SUCCESS;
+}
+
+sub do_open_uri {
+    my ($Client, $command, $ARGV, $o) = xshift_and_deref @_;
+    croak 'at least one URI is required' if !@$ARGV;
+
+    my @uris = @$ARGV;
+    my %opts = _open_options($o);
+
+    $opts{names} = $o->name if defined $o->name;
+
+    my $url = @uris == 1
+        ? $Client->open_uri(uri => $uris[0], %opts)
+        : $Client->open_uri(uris => \@uris, %opts);
+
+    say $url;
+    return EXIT_SUCCESS;
+}
+
+sub do_open_data {
+    my ($Client, $command, $ARGV, $o) = xshift_and_deref @_;
+    my $filename = _require_arg($ARGV, 'filename');
+    my $content  = _slurp_raw($filename);
+    my %opts     = _open_options($o);
+
+    $opts{mime}  = $o->mime if defined $o->mime;
+    $opts{names} = $o->name if defined $o->name;
+
+    say $Client->open_data($content, %opts);
+    return EXIT_SUCCESS;
+}
+
+sub do_snippet_form {
+    my ($Client, $command, $ARGV, $o) = xshift_and_deref @_;
+    my $filename = _require_arg($ARGV, 'filename');
+    my $snippet  = _slurp_raw($filename);
+    my %opts     = _open_options($o);
+
+    my $form   = $Client->open_snippet_form($snippet, %opts);
+    my $fields = o2h($form->fields);
+
+    say '<form action="' . _html_attr($form->action)
+        . '" method="' . _html_attr($form->method)
+        . '" target="_blank">';
+
+    for my $name (sort keys %$fields) {
+        say '  <input type="hidden" name="' . _html_attr($name)
+            . '" value="' . _html_attr($fields->{$name}) . '">';
+    }
+
+    say '  <button type="submit">Open in Overleaf</button>';
+    say '</form>';
+
+    return EXIT_SUCCESS;
+}
+
+sub do_git_clone {
+    my ($Client, $command, $ARGV) = xshift_and_deref @_;
+    my $project_id = _require_arg($ARGV, 'project id');
+    my $directory  = _require_arg($ARGV, 'destination directory');
+    $Client->git_clone($project_id, $directory);
+    return EXIT_SUCCESS;
+}
+
+sub do_git_pull {
+    my ($Client, $command, $ARGV) = xshift_and_deref @_;
+    my $directory = _require_arg($ARGV, 'repository directory');
+    $Client->git_pull($directory);
+    return EXIT_SUCCESS;
+}
+
+sub do_git_push {
+    my ($Client, $command, $ARGV) = xshift_and_deref @_;
+    my $directory = _require_arg($ARGV, 'repository directory');
+    $Client->git_push($directory);
+    return EXIT_SUCCESS;
+}
+
+sub do_git_remote_add {
+    my ($Client, $command, $ARGV, $o) = xshift_and_deref @_;
+    my $directory  = _require_arg($ARGV, 'repository directory');
+    my $project_id = _require_arg($ARGV, 'project id');
+    my $remote     = shift(@$ARGV);
+    $remote = $o->remote if !defined($remote) && defined($o->remote);
+    $Client->git_remote_add($directory, $project_id, $remote);
+    return EXIT_SUCCESS;
+}
+
+sub do_bootstrap {
+    my ($Client) = xshift_and_deref @_;
+    $Client->bootstrap;
+    say 'authenticated';
+    return EXIT_SUCCESS;
+}
+
+sub do_projects {
+    my ($Client) = xshift_and_deref @_;
+
+    for my $project ($Client->projects->all) {
+        say join "\t",
+            _text($project->id),
+            _text($project->name),
+            _text($project->last_updated);
+    }
+
+    return EXIT_SUCCESS;
+}
+
+sub do_project_zip {
+    my ($Client, $command, $ARGV, $o) = xshift_and_deref @_;
+    my $project_id = _require_arg($ARGV, 'project id');
+    my $to = defined($o->output) ? $o->output : $project_id . '.zip';
+
+    my $saved = $Client->project_zip($project_id, to => $to);
+    say $saved;
+    return EXIT_SUCCESS;
+}
+
+sub do_compile {
+    my ($Client, $command, $ARGV, $o) = xshift_and_deref @_;
+    my $project_id = _require_arg($ARGV, 'project id');
+    my %opts = _compile_options($o);
+
+    my $result = $Client->compile($project_id, %opts);
+
+    say join "\t", 'status', _text($result->status);
+    say join "\t", 'pdf',    _text($result->pdf_url);
+
+    for my $file ($result->output_files->all) {
+        say join "\t",
+            'output',
+            _text($file->path),
+            _text($file->type),
+            _text($file->url);
+    }
+
+    return EXIT_SUCCESS;
+}
+
+sub do_download_pdf {
+    my ($Client, $command, $ARGV, $o) = xshift_and_deref @_;
+    my $project_id = _require_arg($ARGV, 'project id');
+    my $to = defined($o->output) ? $o->output : $project_id . '.pdf';
+    my %opts = _compile_options($o);
+
+    my $saved = $Client->download_pdf(
+        $project_id,
+        %opts,
+        to => $to,
+    );
+
+    say $saved;
+    return EXIT_SUCCESS;
+}
+
+sub do_download_output {
+    my ($Client, $command, $ARGV, $o) = xshift_and_deref @_;
+    my $project_id = _require_arg($ARGV, 'project id');
+    my $path       = _require_arg($ARGV, 'compile output path');
+    my %opts       = _compile_options($o);
+
+    my $compile = $Client->compile($project_id, %opts);
+    my $to = defined($o->output) ? $o->output : _leaf($path);
+
+    my $saved = $Client->download_output(
+        $compile,
+        $path,
+        to => $to,
+    );
+
+    say $saved;
+    return EXIT_SUCCESS;
+}
+
+sub main {
+    my @argv = @_;
+    my $ARGV = \@argv;
+    my $o = _options($ARGV);
+
+    if ($o->version) {
+        say "overleaf $VERSION";
+        return EXIT_SUCCESS;
+    }
+
+    if ($o->help) {
+        return do_help();
+    }
+
+    my $command = shift @$ARGV;
+
+    if (!defined($command) || $command eq q{}) {
+        return do_help();
+    }
+
+    if (lc($command) eq 'help') {
+        return do_help();
+    }
+
+    my $Client = _client_from_options($o);
+    my $status;
+
+    my $ok = eval {
+        $status = dispatch {
+            my ($Client, $command) = xshift_and_deref @_;
+            return _route($command);
+        } [ $Client, $command, $ARGV, $o ],
+            project_url    => \&do_project_url,
+            git_url        => \&do_git_url,
+            open_uri       => \&do_open_uri,
+            open_data      => \&do_open_data,
+            snippet_form   => \&do_snippet_form,
+            git_clone      => \&do_git_clone,
+            git_pull       => \&do_git_pull,
+            git_push       => \&do_git_push,
+            git_remote_add => \&do_git_remote_add,
+            bootstrap      => \&do_bootstrap,
+            projects       => \&do_projects,
+            project_zip    => \&do_project_zip,
+            compile        => \&do_compile,
+            download_pdf   => \&do_download_pdf,
+            download_output => \&do_download_output,
+            help           => \&do_help,
+            usage          => \&do_usage,
+        ;
+        1;
+    };
+
+    if (!$ok) {
+        my $error = $@ || 'unknown error';
+        chomp $error;
+        warn "overleaf: $error\n";
+        return EXIT_ERROR;
+    }
+
+    return defined($status) ? $status : EXIT_SUCCESS;
+}
+
+exit main(@ARGV) unless caller;
+
+1;
+
+__END__
+
+=head1 NAME
+
+overleaf - command-line client for Webservice::Overleaf::API
+
+=head1 SYNOPSIS
+
+  overleaf [global-options] COMMAND [command-arguments]
+
+  overleaf --help
+  overleaf --version
+
+  overleaf project-url PROJECT_ID
+  overleaf git-url PROJECT_ID
+
+  overleaf open-uri URL
+  overleaf open-uri --engine lualatex --main-document main.tex URL
+  overleaf open-data paper.tex
+  overleaf snippet-form paper.tex
+
+  overleaf clone PROJECT_ID DIRECTORY
+  overleaf pull DIRECTORY
+  overleaf push DIRECTORY
+  overleaf remote-add DIRECTORY PROJECT_ID [REMOTE]
+
+  overleaf --experimental projects
+  overleaf --experimental bootstrap
+  overleaf --experimental zip PROJECT_ID
+  overleaf --experimental compile PROJECT_ID
+  overleaf --experimental pdf PROJECT_ID
+  overleaf --experimental output PROJECT_ID output.log
+
+=head1 DESCRIPTION
+
+C<overleaf> is the command-line companion to L<Webservice::Overleaf::API>.
+
+It exposes the supported Overleaf import and Git integration surfaces as well
+as the module's explicitly opt-in experimental browser-session operations.
+
+The program is implemented as a modulino.  Loading C<bin/overleaf> from a test
+or another Perl program does not invoke C<main()> automatically.
+
+The official/supported operations are URL generation, Open in Overleaf import
+helpers, and the Overleaf Git bridge.  Project listing, ZIP download, remote
+compilation, PDF retrieval, and compile-output retrieval use undocumented
+Overleaf web-application interfaces and therefore require C<--experimental>.
+
+=head1 COMMANDS
+
+=head2 project-url PROJECT_ID
+
+Print the normal browser/editor URL for an Overleaf project.
+
+=head2 git-url PROJECT_ID
+
+Print the Overleaf Git bridge remote URL for a project.
+
+=head2 open-uri URL [URL ...]
+
+Generate an Open in Overleaf URL for one or more remote TeX or ZIP resources.
+
+Relevant options are C<--engine>, C<--main-document>,
+C<--visual-editor>/C<--no-visual-editor>, and repeatable C<--name>.
+
+=head2 open-data FILE
+
+Read FILE and generate an Open in Overleaf data URI.
+
+C<--mime> defaults in the API to C<application/x-tex>.  Use an appropriate MIME
+type when importing other content, such as a ZIP archive.
+
+=head2 snippet-form FILE
+
+Read FILE as a TeX snippet and print a complete HTML form that POSTs the
+snippet to Overleaf.  The generated form includes an C<Open in Overleaf>
+submit button.
+
+=head2 clone PROJECT_ID DIRECTORY
+
+Clone the project's official Overleaf Git remote into DIRECTORY.
+
+Authentication is handled by Git itself.  The client does not place Git
+credentials or tokens in the remote URL.
+
+=head2 pull DIRECTORY
+
+Run C<git -C DIRECTORY pull> through the API client's Git runner.
+
+=head2 push DIRECTORY
+
+Run C<git -C DIRECTORY push> through the API client's Git runner.
+
+=head2 remote-add DIRECTORY PROJECT_ID [REMOTE]
+
+Add an Overleaf Git remote to an existing repository.
+
+REMOTE defaults to C<overleaf>.  C<--remote NAME> is an alternative to the
+optional positional REMOTE argument.
+
+=head2 bootstrap
+
+Validate the configured browser session and obtain the CSRF state required by
+experimental web-application calls.
+
+For safety, the CSRF token is not printed.  A successful bootstrap prints:
+
+  authenticated
+
+Requires C<--experimental> and a browser-session credential.
+
+=head2 projects
+
+List active projects as tab-separated records:
+
+  PROJECT_ID    NAME    LAST_UPDATED
+
+Archived and trashed projects are omitted by the API client.
+
+Requires C<--experimental> and a browser-session credential.
+
+=head2 zip PROJECT_ID
+
+Download the full project ZIP.
+
+The default output filename is C<PROJECT_ID.zip>.  Override it with C<--output>.
+
+Requires C<--experimental> and a browser-session credential.
+
+=head2 compile PROJECT_ID
+
+Trigger an Overleaf compile and print the resulting status, PDF URL, and
+reported compile outputs as tab-separated records.
+
+Use C<--resource-path FILE> to request a specific root resource.
+
+Requires C<--experimental> and a browser-session credential.
+
+=head2 pdf PROJECT_ID
+
+Compile the project and download the generated PDF.
+
+The default output filename is C<PROJECT_ID.pdf>.  Override it with C<--output>.
+
+Use C<--resource-path FILE> to request a specific root resource.
+
+Requires C<--experimental> and a browser-session credential.
+
+=head2 output PROJECT_ID PATH
+
+Compile the project and download one named compile artifact, for example:
+
+  overleaf --experimental output PROJECT_ID output.log
+  overleaf --experimental output PROJECT_ID output.bbl
+  overleaf --experimental output PROJECT_ID output.aux
+
+The default local filename is the basename of PATH.  Override it with
+C<--output>.
+
+Requires C<--experimental> and a browser-session credential.
+
+=head2 help
+
+Display the full manual.
+
+=head1 OPTIONS
+
+=head2 -h, --help
+
+Display the full manual and exit successfully.
+
+=head2 -v, --version
+
+Print the command name and the installed L<Webservice::Overleaf::API> version.
+
+=head2 --experimental
+
+Enable methods backed by Overleaf's undocumented browser web-application
+interface.
+
+This option is required for C<bootstrap>, C<projects>, C<zip>, C<compile>,
+C<pdf>, and C<output>.
+
+=head2 --session VALUE
+
+Supply the Overleaf browser-session cookie value directly.
+
+Using C<OVERLEAF_SESSION> or C<--session-file> is preferable because command
+arguments may be visible to other users on the same machine.
+
+=head2 --session-file FILE
+
+Read the Overleaf browser-session cookie value from FILE.
+
+A single trailing newline is removed.
+
+=head2 --csrf VALUE
+
+Supply a previously obtained CSRF token.  Normally the client bootstraps one
+from the Overleaf project page when needed.
+
+=head2 --base-url URL
+
+Override the Overleaf base URL.  The default is:
+
+  https://www.overleaf.com
+
+This is useful with self-hosted Overleaf installations.
+
+=head2 --git-base-url URL
+
+Override the Git bridge base URL.
+
+For Overleaf Cloud the default is:
+
+  https://git.overleaf.com
+
+=head2 --cookie-name NAME
+
+Override the browser-session cookie name.
+
+The default is C<overleaf_session2>.
+
+=head2 --timeout SECONDS
+
+Set the HTTP timeout.
+
+=head2 --engine ENGINE
+
+Set the TeX engine for Open in Overleaf imports.
+
+Supported values are:
+
+  latex_dvipdf
+  pdflatex
+  xelatex
+  lualatex
+
+=head2 --main-document FILE
+
+Specify the main document for Open in Overleaf imports.
+
+=head2 --visual-editor, --no-visual-editor
+
+Request or disable the Overleaf Visual Editor for Open in Overleaf imports.
+
+=head2 --name NAME
+
+Specify an imported filename for C<open-uri> or C<open-data>.
+
+The option may be repeated when importing multiple URIs.
+
+=head2 --mime TYPE
+
+Set the MIME type used by C<open-data>.
+
+=head2 -o FILE, --output FILE
+
+Set the local output filename for C<zip>, C<pdf>, or C<output>.
+
+=head2 --resource-path FILE
+
+Request a specific root resource for C<compile>, C<pdf>, or C<output>.
+
+=head2 --remote NAME
+
+Set the remote name used by C<remote-add>.
+
+=head1 AUTHENTICATION
+
+=head2 Git bridge
+
+Git operations use Git's own authentication facilities.
+
+For Overleaf Cloud, a Git authentication token can be used by Git as the
+password for the C<git> user.  Store that credential using an appropriate Git
+credential helper rather than embedding it in a repository URL or command
+line.
+
+=head2 Experimental browser-session operations
+
+Experimental project and compile operations use the Overleaf browser session.
+
+The preferred non-interactive form is:
+
+  export OVERLEAF_SESSION='...'
+  overleaf --experimental projects
+
+Alternatively:
+
+  overleaf --experimental --session-file ~/.config/overleaf/session projects
+
+C<--session> is supported for completeness but is less desirable because
+process arguments may be observable.
+
+=head1 ENVIRONMENT
+
+=head2 OVERLEAF_SESSION
+
+Browser-session cookie value used by experimental web-application operations
+when no explicit session is supplied.
+
+=head1 EXAMPLES
+
+List projects:
+
+  OVERLEAF_SESSION='...' overleaf --experimental projects
+
+Clone a paper through the official Git bridge:
+
+  overleaf clone 0123456789abcdef paper
+
+Add an Overleaf remote to an existing local repository:
+
+  overleaf remote-add . 0123456789abcdef overleaf
+
+Generate an Open in Overleaf URL:
+
+  overleaf open-uri \
+      --engine lualatex \
+      --main-document AUTHOR-paper.tex \
+      https://example.org/paper.zip
+
+Compile a specific root document:
+
+  OVERLEAF_SESSION='...' \
+      overleaf --experimental \
+      --resource-path AUTHOR-paper.tex \
+      compile 0123456789abcdef
+
+Compile and retrieve the resulting PDF:
+
+  OVERLEAF_SESSION='...' \
+      overleaf --experimental \
+      --resource-path AUTHOR-paper.tex \
+      --output AUTHOR-paper.pdf \
+      pdf 0123456789abcdef
+
+Retrieve the compilation log:
+
+  OVERLEAF_SESSION='...' \
+      overleaf --experimental \
+      --output AUTHOR-paper.log \
+      output 0123456789abcdef output.log
+
+=head1 EXIT STATUS
+
+C<0> indicates success.
+
+C<1> indicates an operational error, including invalid API arguments,
+authentication failures, HTTP failures, Git failures, and file I/O failures.
+
+C<2> indicates command-line usage failure, such as an unknown command.
+
+=head1 SECURITY
+
+C<OVERLEAF_SESSION> is an authentication credential.  Treat it like a
+password.  Do not commit it, log it, include it in bug reports, or expose it
+in shell history.
+
+The C<--session> option is less private than C<OVERLEAF_SESSION> or
+C<--session-file> because command-line arguments may be visible in process
+listings.
+
+Git authentication tokens are intentionally left to Git's credential handling
+and are not added to Git URLs by this program.
+
+=head1 IMPLEMENTATION
+
+Command-line options are parsed with C<Getopt2h2o> from
+L<Util::H2O::More>.  Commands are routed with L<Dispatch::Fu>.  The executable
+is a modulino whose package is C<local::bin::overleaf>.
+
+=head1 AUTHOR
+
+Brett Estrade <oodler@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

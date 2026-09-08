@@ -100,6 +100,7 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
         @{$settings{META_MERGE}{prereqs}{runtime}{suggests}}{keys %$sug} = values %$sug;
     }
 
+    my $default_bugtracker;
     if (my $repo = delete $settings{REPOSITORY}) {
         if (ref($repo) eq 'ARRAY') {
             my ($type, @args) = @$repo;
@@ -119,6 +120,7 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
                     $1 ? lc($x) : $x
                 }seg;
                 my $addr = "$site/$account/$project";
+                $default_bugtracker = "https://$addr/issues";
                 $repo = {
                     type => 'git',
                     url  => "https://$addr.git",
@@ -132,7 +134,7 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
         @{$settings{META_MERGE}{resources}{repository}}{keys %$repo} = values %$repo;
     }
 
-    if (my $bugtracker = delete $settings{BUGTRACKER}) {
+    if (my $bugtracker = delete $settings{BUGTRACKER} || $default_bugtracker) {
         $settings{META_MERGE}{resources}{bugtracker}{web} = $bugtracker;
     }
 

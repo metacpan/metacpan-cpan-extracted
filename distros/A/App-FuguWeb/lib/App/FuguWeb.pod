@@ -110,6 +110,9 @@ in the source directory that the build does not render is an asset, and
 the build copies it; L<App::FuguWeb::Site/ASSETS> says exactly which
 those are.
 
+A C<keys> block and its C<key> blocks describe the published key
+directory of an organization. L<App::FuguWeb::Keys> documents them.
+
 L<App::FuguWeb::Config> documents every setting and every default.
 
 =head1 FUNCTIONS
@@ -143,6 +146,26 @@ read.
 The sort compares bytes and never reads the locale of the builder: a
 site must not depend on the machine that built it.
 
+=head2 list_tree
+
+    my $paths = App::FuguWeb::list_tree($dir) or die "cannot read: $!";
+
+Every leaf below the directory, as paths relative to it: each file,
+each symlink, and each directory that holds nothing. The function
+returns an array reference, or C<undef> with the reason in C<$!>.
+
+The function recurses into a plain directory, and never through a
+symlink. A symlinked directory is one entry: the build owns neither the
+target of the link nor what sits under it.
+
+An empty directory is a leaf, so a caller sees it. A walk that answered
+with files alone would hide a stray directory from the checks, and the
+clean refuses one.
+
+A site is one flat directory of files, and the key directory is the
+one part below it. The output therefore needs a walk of the tree
+wherever a walk of one level served before.
+
 =head2 path_below
 
     App::FuguWeb::path_below($path, $root)
@@ -157,6 +180,16 @@ kind: both absolute, or both relative to the same directory.
 
 The name of the configuration file, F<.fuguwebrc>. The name and the
 discovery match F<.fuguvmrc>.
+
+=head2 STAGING_DIR
+
+The staging directory for the mdoc sources, inside the output
+directory. The build makes it, uses it, and removes it again.
+
+The name lives here because two modules need it.
+L<App::FuguWeb::Site> owns the directory, and
+L<App::FuguWeb::Config> must refuse a key directory of the same name:
+the build would remove the published keys with the staging.
 
 =head2 STYLESHEET
 

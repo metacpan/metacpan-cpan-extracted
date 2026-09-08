@@ -12,7 +12,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/mauke/Pod-Markdown-Githubert/issues
   repository: https://codeberg.org/mauke/Pod-Markdown-Githubert.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

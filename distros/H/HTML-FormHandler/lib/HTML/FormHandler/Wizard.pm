@@ -1,6 +1,6 @@
 package HTML::FormHandler::Wizard;
 # ABSTRACT: create a multi-page form
-$HTML::FormHandler::Wizard::VERSION = '0.410001';
+$HTML::FormHandler::Wizard::VERSION = '0.410002';
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler';
 with ('HTML::FormHandler::BuildPages', 'HTML::FormHandler::Pages' );
@@ -113,7 +113,7 @@ HTML::FormHandler::Wizard - create a multi-page form
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

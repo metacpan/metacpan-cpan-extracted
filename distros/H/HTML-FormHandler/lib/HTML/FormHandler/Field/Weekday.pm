@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Weekday;
 # ABSTRACT: select list day of week strings
-$HTML::FormHandler::Field::Weekday::VERSION = '0.410001';
+$HTML::FormHandler::Field::Weekday::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field::Select';
 
@@ -35,7 +35,7 @@ HTML::FormHandler::Field::Weekday - select list day of week strings
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

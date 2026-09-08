@@ -1,5 +1,5 @@
 package DBIx::Lite::ResultSet;
-$DBIx::Lite::ResultSet::VERSION = '0.39';
+$DBIx::Lite::ResultSet::VERSION = '0.40';
 use strict;
 use warnings;
 
@@ -345,6 +345,10 @@ sub insert_sql {
     if (@{$self->{joins}}) {
         warn "Attempt to call ->insert() after joining other tables\n";
     }
+
+    if ($self->{from} && !%$insert_cols) {
+        croak "insert() with from() requires a non-empty hashref";
+    }
     
     my ($sql, @bind);
     if (!%$insert_cols && $self->{dbix_lite}->driver_name eq 'Pg') {
@@ -355,6 +359,13 @@ sub insert_sql {
         ($sql, @bind) = $self->{dbix_lite}->{abstract}->insert(
             $self->{table}{name}, $insert_cols,
         );
+        if ($self->{from}) {
+            my $from_sql = join ', ', map {
+                ref($_) ? $$_ : $_
+            } @{$self->{from}};
+            $sql =~ s/\s+VALUES\s+\(\s*(.*?)\s*\)\s*\z/ SELECT $1 FROM $from_sql/s
+                or croak "Failed to rewrite INSERT for from()";
+        }
     }
     
     return $self->_apply_with($sql, @bind);
@@ -791,7 +802,7 @@ DBIx::Lite::ResultSet
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 OVERVIEW
 
@@ -1007,6 +1018,20 @@ CTEs are prepended to C<SELECT>, C<INSERT>, C<UPDATE> and C<DELETE> statements.
     # WITH t AS (SELECT 1 AS id, 'Larry' AS name)
     # INSERT INTO authors (id, name) VALUES (?, ?)
 
+    # When expressions need to correlate to a CTE, combine with() and from()
+    # so INSERT uses SELECT ... FROM instead of VALUES:
+    my ($sql, @bind) = $dbix->table('authors')
+        ->with(target => \["SELECT * FROM authors WHERE id = ?", $id])
+        ->from('target')
+        ->insert_sql({
+            name  => \["(SELECT me.name FROM authors AS me WHERE me.id = target.id)"],
+            email => 'copy@example.com',
+        });
+    # WITH target AS (SELECT * FROM authors WHERE id = ?)
+    # INSERT INTO authors ( email, name )
+    # SELECT ?, (SELECT me.name FROM authors AS me WHERE me.id = target.id)
+    # FROM target
+
 Subsequent calls to this method will replace the entire with block.
 
 =head2 with_also
@@ -1024,6 +1049,10 @@ subqueries or CTEs.
         ->from('t');
 
 If you supply a scalarref, it will be treated like literal SQL.
+
+When used with L<insert> or L<insert_sql>, C<from> switches the statement from
+C<INSERT ... VALUES> to C<INSERT ... SELECT ... FROM>, so expressions in the
+insert hashref can correlate to a CTE named by C<from> (see L<with>).
 
 Usage of L<from> is not currently compatible with joins.
 
@@ -1121,6 +1150,11 @@ accordingly.
         ->table('books')
         ->insert({ name => 'Camel Tales', year => 2012 });
 
+If L<from> was set on the resultset, the statement becomes
+C<INSERT INTO ... SELECT ... FROM ...> instead of C<INSERT ... VALUES>, so
+column values can be SQL expressions that correlate to that C<FROM> source
+(typically a CTE from L<with>). An empty hashref with C<from> is not supported.
+
 Note that joins have no effect on C<INSERT> commands and DBIx::Lite will throw a warning.
 
 =head2 find_or_insert
@@ -1171,6 +1205,9 @@ also works when no C<$dbh> or connection data is supplied to L<DBIx::Lite>.
     my ($sql, @bind) = $dbix
         ->table('books')
         ->insert_sql({ name => 'Camel Tales', year => 2012 });
+
+Without L<from>, this produces C<INSERT ... VALUES>. With L<from> set, it produces
+C<INSERT ... SELECT ... FROM> (see L<with> and L<from>).
 
 =head2 insert_sth
 

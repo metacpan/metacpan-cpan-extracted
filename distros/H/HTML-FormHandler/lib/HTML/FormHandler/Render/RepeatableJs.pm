@@ -1,6 +1,6 @@
 package HTML::FormHandler::Render::RepeatableJs;
 # ABSTRACT: role providing method to construct repeatable javascript
-$HTML::FormHandler::Render::RepeatableJs::VERSION = '0.410001';
+$HTML::FormHandler::Render::RepeatableJs::VERSION = '0.410002';
 use Moose::Role;
 
 use JSON::MaybeXS ('encode_json');
@@ -80,7 +80,7 @@ HTML::FormHandler::Render::RepeatableJs - role providing method to construct rep
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

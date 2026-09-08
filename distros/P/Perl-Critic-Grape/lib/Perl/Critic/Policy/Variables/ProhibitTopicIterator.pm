@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw/:severities :classification/;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.0.9';
+our $VERSION = '0.1.0';
 
 Readonly::Scalar my $DESC  => q{Always use named loop control variables};
 Readonly::Scalar my $EXPL  => undef; # [ ];

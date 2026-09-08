@@ -26,8 +26,18 @@ typedef struct {
     int            ntimers, tcap;
 } hm_sel_state;
 
+/* Monotonic seconds. GetTickCount64 is hidden by the Windows SDK headers
+ * unless _WIN32_WINNT >= 0x0600, which perl's build does not set: cl then just
+ * warns C4013 and assumes it returns int, truncating the tick count to 24 days
+ * and making every timer deadline nonsense. QueryPerformanceCounter is
+ * declared unconditionally, is monotonic, and has better resolution. */
 static double hm_sel_now(void) {
-    return (double)GetTickCount64() / 1000.0;
+    static LARGE_INTEGER freq;   /* idempotent: a race just recomputes it */
+    LARGE_INTEGER now;
+    if (freq.QuadPart == 0 && !QueryPerformanceFrequency(&freq))
+        freq.QuadPart = 1;
+    QueryPerformanceCounter(&now);
+    return (double)now.QuadPart / (double)freq.QuadPart;
 }
 
 static int sl_add_io(hm_backend *be, int fd, int mask, int oneshot) {

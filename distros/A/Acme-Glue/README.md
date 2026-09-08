@@ -4,7 +4,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 # VERSION
 
-2025.11
+2026.09
 
 # DESCRIPTION
 
@@ -13,13 +13,19 @@ for the photo project is to have each photo include a small snippet of code.
 The code does not have to be Perl, it just has to be something you're quite
 fond of for whatever reason.
 
-"Glue" is a series of photos shot at Perl conferences and workshops in Europe
-and America. Perl was one of the programming languages that bootstrapped a
-lot of internet based companies in the mid/late 1990s and early 2000s. Perl
-was considered a “glue” language by some, but has fallen out of favour as
-newer languages have taken its place. The title is a metaphor not just for
-the language but also for shrinking of the community at the events the photos
-are shot at.
+"Glue" is a series of photos shot at Perl conferences and workshops in
+Europe and America between 2015 and 2025. Perl was one of the programming
+languages that bootstrapped a lot of internet based companies in the mid/late
+1990s and early 2000s, sometimes sticking together disparate systems.
+
+Perl has fallen out of favour as newer languages have taken its place;
+however, it can still be found in many places and often running critical
+infrastructure. The title is a metaphor not just for the language but also
+for the shrinking of the community at the events the photos are shot at.
+
+The full project edit (70 photos picked from approx 1,000) touches on the
+aforementioned themes but also on the loss of books as learning material,
+and the raise of AI.
 
 # SNIPPETS
 

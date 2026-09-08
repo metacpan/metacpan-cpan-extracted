@@ -1,0 +1,150 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Alien::Build::Plugin::Build::Xrepo - Build and Gather xrepo Packages in an alienfile
+
+=head1 SYNOPSIS
+
+    use alienfile;
+
+    plugin 'Build::Xrepo' => (
+        packages => [ 'zstd' ]
+    );
+
+    # or, multiple packages at once with per-package options and FFI:
+
+    plugin 'Build::Xrepo' => (
+        packages => [
+            'zstd',
+            { name => 'libsdl3', version => '3.4.12', kind => 'shared' }
+        ],
+        ffi  => 1
+    );
+
+=head1 DESCRIPTION
+
+This plugin lets an L<alienfile>-based L<Alien> distribution install its packages through
+L<xrepo|https://packages.xmake.io/>, L<vcpkg|https://vcpkg.io/en/packages>, L<conan|https://conan.io/center>,
+L<brew|https://brew.sh/> (homebrew/linuxbrew), L<conda|https://anaconda.org/>, L<dub|https://dub.pm/> (Dlang libs),
+L<apt|https://www.debian.org/distrib/packages> on Debian,
+L<pacman|https://wiki.archlinux.org/title/Pacman#Installing_packages> (if you use arch, btw),
+L<clib|https://github.com/clibs/clib/>, L<Cargo|https://crates.io/> for Rust crates,
+L<Portage|https://packages.gentoo.org/> on Gentoo, L<Nimble|https://nimpackages.com/> for nimlang,
+L<NuGet|https://www.nuget.org/> for .NET,
+L<Zypper|https://documentation.suse.com/smart/systems-management/html/concept-zypper/index.html> on openSUSE, instead
+of downloading, extracting and compiling source archives. It is the L<Alien::Build> mirror of the
+L<Alien::Xrepo::Build> engine: the C<download> stage asks xrepo for the packages (through L<Alien::Xrepo>), the
+C<build> stage assembles the exported package trees into the staging prefix, and the C<gather> stages translate them
+into the standard L<Alien::Build> runtime properties (C<cflags>, C<libs>, C<version>, C<bin_dir>, plus C<alt> for
+multi-package recipes).
+
+The C<download> stage writes the exported package trees and a C<xrepo.manifest> into its working directory (a fresh
+L<Alien::Build> temp dir), so C<download_detail> records that local tree as a C<file>-protocol source. The C<extract>
+stage then copies that tree into the current working directory, which is exactly the staging scaffold L<Alien::Build>
+prepares for every extract hook (see L<Alien::Build::Manual::PluginAuthor/"extract hook">): unlike the built-in archive
+extractors the C<dest> argument is the download location, not a destination, so content lands correctly in the cwd
+scaffold and the following C<build>/C<gather> phases see it.
+
+The plugin always returns C<share> from the C<probe> stage: xrepo is the installer. Constructing the engine during
+probe fails fast with a clear error (so a broken engine is reported at probe, not as a confusing later failure). The
+xrepo executable is located during the C<download> stage and a missing executable aborts that stage with a clear error
+instead of guessing.
+
+A failed package never sinks its siblings: per-package install/export failures are isolated, the surviving packages
+still build, and the expected output of the C<download> stage is a partial success - but it is never silent. Failures
+are recorded in C<< install_prop->{xrepo}{errors} >> and mirrored into C<< runtime_prop->{errors} >> (keyed by package
+name), a C<xrepo.manifest> is written listing only the packages that actually installed and exported, and a warning is
+emitted naming the failed packages. Consumers can check C<< runtime_prop->{errors} >> to see exactly what is missing.
+The build only aborts when no package installed at all.
+
+=head1 PROPERTIES
+
+=head2 C<packages>
+
+The packages to install, in recipe order. Each entry is a package name or a hashref of per-package options, the same
+keys the L<Alien::Xrepo::Build::Recipe> understands (name, version, kind, plat, arch, toolchain, configs, etc.). The
+first entry is the primary package.
+
+=head2 C<version>
+
+An ambient version constraint (e.g. C<1.5.6>) folded into every package that does not pin its own C<version>.
+
+=head2 C<kind>
+
+An ambient package kind (C<shared> or C<static>) folded into every package that does not pin its own C<kind>.
+
+=head2 C<root>
+
+An optional xrepo store root (C<XMAKE_PKG_INSTALLDIR>). Defaults to whatever the system xrepo configuration uses.
+
+=head2 C<ffi>
+
+When true, a C<gather_ffi> hook is registered that populates C<%{.runtime.ffi_name}> and C<%{.runtime.dynamic_libs}>
+from the installed packages, for use by C<build_ffi> consumers.
+
+=head2 C<verbose>
+
+Echo xrepo commands as they run (passed through to L<Alien::Xrepo>).
+
+=head2 C<repo>
+
+An optional L<Alien::Xrepo>-compatible engine (an object, a class name, or a code ref that returns one). Mainly useful
+for testing the plugin against a spy without a real xrepo install. When unset, the plugin builds an L<Alien::Xrepo>
+with C<root> and C<verbose>.
+
+=head2 C<local_repos>
+
+An optional arrayref of directory paths pointing to local xmake-repo trees (each containing a C<packages/>
+subdirectory). These are registered with the engine before installation, allowing patched or private package recipes to
+override the upstream xrepo store.
+
+=head1 HELPERS
+
+=over
+
+=item C<%{xrepo}>
+
+The resolved path to the C<xrepo> executable.
+
+=item C<%{xmake}>
+
+The resolved path to the C<xmake> executable.
+
+=item C<%{xrepo_cflags}>
+
+The gathered include flags for the primary package.
+
+=item C<%{xrepo_libs}>
+
+The gathered link flags for the primary package.
+
+=item C<%{xrepo_version}>
+
+The gathered version of the primary package.
+
+=item C<%{xrepo_dynamic_libs}>
+
+The gathered dynamic library paths (when the C<ffi> property is enabled).
+
+=back
+
+=head1 SEE ALSO
+
+L<Alien::Build>, L<alienfile>, L<Alien::Build::Plugin>, L<Alien::Build::Manual::PluginAuthor>, L<Alien::Xrepo>,
+L<Alien::Xrepo::Build>, L<Alien::Xrepo::Build::Recipe>, L<Alien::Xrepo::Runtime>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2. Other copyrights, terms, and conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=cut

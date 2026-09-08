@@ -11,7 +11,7 @@ use base 'Perl::Critic::Policy';
 use PPI::Document;
 use PPIx::QuoteLike;
 
-our $VERSION = '0.0.9';
+our $VERSION = '0.1.0';
 
 Readonly::Scalar my $DESC  => q{Only use arrows for methods};
 Readonly::Scalar my $EXPL  => undef;
@@ -35,17 +35,33 @@ sub supported_parameters {
 	);
 }
 
-sub applies_to           { return qw/PPI::Token::Operator PPI::Token::Quote::Double/ }
+sub applies_to           { return qw/PPI::Token::Cast PPI::Token::Operator PPI::Token::Quote::Double/ }
 sub default_severity     { return $SEVERITY_LOW }
 sub default_themes       { return qw/cosmetic/ }
 
 #-----------------------------------------------------------------------------
 
 sub invalid {
-	my ($self,$elem,$note)=@_;
+	my ($self,$elem,$note,$desc)=@_;
 	$note//='';
+	$desc//=$DESC;
 	if($note) { $note=" ($note)" }
-	return $self->violation(sprintf("%s%s",$DESC,$note),$EXPL,$elem);
+	return $self->violation(sprintf("%s%s",$desc,$note),$EXPL,$elem);
+}
+
+sub castViolates {
+	my ($self,$elem)=@_;
+	my $next=$elem->snext_sibling();
+	if($next->isa('PPI::Token::Symbol')) { return }
+	if($next->isa('PPI::Structure::Block')) {
+		my @children=$next->schildren();
+		if($#children>0) { return }
+		if(!$children[0]->isa('PPI::Statement')) { return } # cases?
+		@children=$children[0]->schildren();
+		if($#children>0) { return }
+		if($children[0]->isa('PPI::Token::Symbol')) { return $self->invalid($elem,'',"Do not block cast single symbols") }
+	}
+	return;
 }
 
 sub operatorViolates {
@@ -62,9 +78,8 @@ sub operatorViolates {
 
 sub violates {
 	my ($self,$elem,undef)=@_;
-
-	if($elem->isa('PPI::Token::Operator')) { return $self->operatorViolates($elem) }
-
+	if($$self{_directcast} && $elem->isa('PPI::Token::Cast')) { return $self->castViolates($elem) }
+	if($elem->isa('PPI::Token::Operator'))                    { return $self->operatorViolates($elem) }
 	if($elem->isa('PPI::Token::Quote')) {
 		if(!$$self{_interpolation}) { return }
 		my $content=$elem->content();
@@ -78,11 +93,14 @@ sub violates {
 				foreach my $inner (@{$doc->find('PPI::Token::Operator')||[]}) {
 					if(my $violation=$self->operatorViolates($inner)) { return $violation }
 				}
+				if($$self{_directcast}) {
+				foreach my $inner (@{$doc->find('PPI::Token::Cast')||[]}) {
+					if(my $violation=$self->castViolates($inner)) { return $violation }
+				} }
 			}
 		}
 		return;
 	}
-
 	return;
 }
 
@@ -110,6 +128,8 @@ Post-conditional and post-fix operators are harder to read and maintain, especia
 
 	my @A=$x->@*;                # no
 	my @A=@$x;                   # yes
+	my @A=@{$x};                 # no (see Configuration)
+	my @A=@{$x{$k}};             # yes
 
 	my $y=$x->method();          # yes
 	print "$x->method();"        # invalid code (not checked)
@@ -127,17 +147,22 @@ Violations within interpolated strings can be disabled by setting C<interpolatio
   [References::RequireSigils]
   interpolation = 0
 
+Unnecessary blockwise casting of the form C<@{$thing}> is a violation and should be written as C<@$thing>.  To disable this, set C<directcast>:
+
+  [References::RequireSigils]
+  directcast = 0
+
 =head1 NOTES
 
 Not presently well-tested.  There may be some false violations.
 
 Inside Quote/QuoteLike expressions, L<String::InterpolatedVariables> will be used in the future to establish consistency.
 
-Proposed:  Because C<@$x> is a direct casting operation, whereas C<@{ $x }> is a block operator, performance goals may suggest that the latter is a violation of the expected pattern for sigils.  In particular it signals "there is a complicated expansion here", when it fact it is just meant as a direct casting operator.  Future configuration may support enabling required double sigils where possible.
-
 =head1 BUGS
 
-This implementation is primarily "Prohibit non-method arrows" at this time.
+This implementation is mostly "Only use arrows for methods", except for "Do not block cast single symbols".
+
+Nested blockwise casting is not considered a violation, eg C<@{${x}}>.
 
 =head1 SEE ALSO
 

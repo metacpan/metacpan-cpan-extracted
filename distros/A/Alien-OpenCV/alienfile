@@ -3,9 +3,7 @@ use alienfile;
 plugin PkgConfig => 'opencv4';
 
 share {
-  meta->before_hook( build => sub {
-          die "Share install not yet supported on MSWin32" if $^O eq 'MSWin32';
-  });
+  requires 'Path::Tiny';
 
   plugin 'Download::GitHub' => (
     github_user => 'opencv',
@@ -23,12 +21,42 @@ share {
     }
   );
   plugin 'Build::CMake';
+
+  patch sub {
+    Path::Tiny->new("cmake/OpenCVGenPkgconfig.cmake")->edit_utf8(sub {
+      s<
+        \Qif((UNIX AND NOT ANDROID) OR MINGW)\E
+        (
+          \s* [^\n]* \$\{OPENCV_PC_FILE_NAME\} [^\n]*
+        )
+      ><
+      # Always generate the C<.pc> file.
+      'if(OPENCV_GENERATE_PKGCONFIG OR (UNIX AND NOT ANDROID) OR MINGW)'
+      . $1
+      . "\n"
+      # Install the C<pkg-config> C<.pc> file to location that isn't specific to
+      # that of C<< cmake/OpenCVInstallLayout.cmake >>.
+      . 'install(FILES ${CMAKE_BINARY_DIR}/unix-install/${OPENCV_PC_FILE_NAME} DESTINATION share/pkgconfig COMPONENT dev)'
+      >exs
+        or die 'Could not patch OpenCVGenPkgconfig.cmake: pkg-config install rule not found'
+      ;
+    });
+  };
+
+  my @cmake_opencv_opts = qw(
+    -DBUILD_TESTS=OFF
+    -DOPENCV_GENERATE_PKGCONFIG=ON
+
+    -DBUILD_opencv_java=OFF
+    -DBUILD_opencv_js=OFF
+    -DBUILD_opencv_python2=OFF
+    -DBUILD_opencv_python3=OFF
+    -DBUILD_opencv_python=OFF
+  );
   build [
     ['%{cmake}',
       @{ meta->prop->{plugin_build_cmake}->{args} },
-      qw(
-        -DBUILD_TESTS=OFF
-      ),
+      @cmake_opencv_opts,
       # macOS currently has problems during build with zlib
       ( $^O eq 'darwin' ?  qw(-DBUILD_ZLIB=OFF) : () ),
       qw(-S), '%{.install.extract}',

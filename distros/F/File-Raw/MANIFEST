@@ -1,4 +1,5 @@
 bench/bench.pl
+bench/chunks.pl
 bench/lines.pl
 bench/mmap.pl
 bench/path.pl
@@ -8,6 +9,7 @@ bench/stat.pl
 Changes
 file.c
 ignore.txt
+include/file_chunk.h
 include/file_compat.h
 include/file_plugin.h
 include/ppport.h
@@ -40,6 +42,7 @@ t/023-plugin-stream.t
 t/024-plugin-predicate.t
 t/025-plugin-lines-iter.t
 t/026-range-lines.t
+t/027-chunk-iter.t
 t/050-chain-noop.t
 t/051-chain-pass-through.t
 t/054-chain-options-routing.t

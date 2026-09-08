@@ -6,10 +6,11 @@ use autodie ':all';
 
 package Matplotlib::Simple;
 require 5.010;
-our $VERSION = 0.312;
+our $VERSION = 0.3121;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use Cwd 'getcwd';
+use File::Spec;
 use File::Temp;
 use DDP { output => 'STDOUT', array_max => 10, show_memsize => 1 };
 use Devel::Confess 'color';
@@ -2420,7 +2421,10 @@ sub plt {
 		}
 		$fh = $args->{fh};# open $fh, '>>', $args->{fh};
 	} else {
-		$fh = File::Temp->new(DIR => '/tmp', SUFFIX => '.py', UNLINK => 0);
+		# File::Spec->tmpdir(), not a literal "/tmp": on MSWin32 there is no
+		# /tmp, and File::Temp dies with "Parent directory (\tmp\) does not
+		# exist" (CPAN Testers FAIL for 0.312 on Strawberry perl 5.42.2).
+		$fh = File::Temp->new(DIR => File::Spec->tmpdir, SUFFIX => '.py', UNLINK => 0);
 	}
 	# Non-ASCII key names (e.g. Greek letters like ρ, τ) arrive as wide
 	# characters when the caller has "use utf8", so give the output filehandle
@@ -2630,9 +2634,14 @@ sub plt {
 			fh   => $fh,
 			name => 'output_file'
 		});
-		say $fh "plt.savefig(output_file, bbox_inches = 'tight', metadata={'Creator': 'made/written by "
-		. getcwd()
-		. "/$RealScript called using \"$current_sub\" in " . __FILE__ . " version $VERSION'})";
+		# py_str, not interpolation: on MSWin32 getcwd() and __FILE__ are
+		# backslash paths, so "C:\build\..." pasted into a Python literal
+		# reads "\b" as a backspace and "\c" as an invalid escape
+		# (SyntaxWarning in 3.12, SyntaxError from 3.15). An apostrophe
+		# anywhere in the path would close the literal early.
+		my $creator = py_str( getcwd() . "/$RealScript called using \"$current_sub\" in "
+		 . __FILE__ . " version $VERSION" );
+		say $fh "plt.savefig(output_file, bbox_inches = 'tight', metadata={'Creator': $creator})";
 	}
 	say $fh 'plt.show()' if $args->{show}; # after savefig, so the file is written even if the window is never closed
 	$args->{execute} = $args->{execute} // 1;

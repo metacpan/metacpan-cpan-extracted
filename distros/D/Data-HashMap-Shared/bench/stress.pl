@@ -79,9 +79,7 @@ print "  CPUs: $NCPU  Workers: $workers  Duration: ${duration}s\n";
 print "  Entries: $entries  Key range: $key_range  Val length: $val_len\n";
 print "=" x 78, "\n";
 
-# =====================================================================
 # Test 1: II — Pure write contention (all writers)
-# =====================================================================
 print "\n", "-" x 78, "\n";
 print "II: Pure write contention ($workers writers)\n";
 print "-" x 78, "\n";
@@ -112,9 +110,7 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# =====================================================================
 # Test 2: II — Mixed read/write (readers >> writers)
-# =====================================================================
 print "\n", "-" x 78, "\n";
 printf "II: Mixed read/write (1 writer, %d readers)\n", $workers - 1;
 print "-" x 78, "\n";
@@ -156,9 +152,7 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# =====================================================================
 # Test 3: II — Atomic counter contention
-# =====================================================================
 print "\n", "-" x 78, "\n";
 print "II: Atomic counter contention ($workers incrementers)\n";
 print "-" x 78, "\n";
@@ -192,9 +186,7 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# =====================================================================
 # Test 4: SS — String read/write contention
-# =====================================================================
 print "\n", "-" x 78, "\n";
 print "SS: String read/write contention ($workers mixed)\n";
 print "-" x 78, "\n";
@@ -232,9 +224,7 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# =====================================================================
 # Test 5: SI — Atomic counters with string keys
-# =====================================================================
 print "\n", "-" x 78, "\n";
 print "SI: String-key atomic counters ($workers incrementers)\n";
 print "-" x 78, "\n";
@@ -267,9 +257,7 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# =====================================================================
 # Test 6: II — Insert + delete churn (high tombstone pressure)
-# =====================================================================
 print "\n", "-" x 78, "\n";
 print "II: Insert/delete churn ($workers workers, high tombstone pressure)\n";
 print "-" x 78, "\n";
@@ -304,9 +292,7 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# =====================================================================
 # Test 7: II — LRU eviction under contention
-# =====================================================================
 print "\n", "-" x 78, "\n";
 print "II: LRU eviction under contention ($workers writers, max_size=$key_range)\n";
 print "-" x 78, "\n";
@@ -340,9 +326,7 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# =====================================================================
 # Test 8: Scaling — throughput vs worker count
-# =====================================================================
 print "\n", "-" x 78, "\n";
 print "Scaling: II read throughput vs worker count\n";
 print "-" x 78, "\n";

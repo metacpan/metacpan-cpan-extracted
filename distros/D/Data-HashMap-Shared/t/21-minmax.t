@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 use File::Temp ();
 use File::Spec ();
 use POSIX ();
@@ -106,7 +107,7 @@ for my $v (@variants) {
     my $m = Data::HashMap::Shared::SI->new($path, 1000, 0, 60);
     $m->put_ttl("k", 5, 1);
     is($m->get("k"), 5, 'TTL map: value stored before expiry');
-    sleep 2;                                # let "k" expire (its own ttl=1s)
+    Time::HiRes::sleep(1.2);                                # let "k" expire (its own ttl=1s)
     is($m->min("k", 100), 100,
         'min on expired key re-inserts desired (expired treated as absent)');
     is($m->get("k"), 100, '  ...stored value is the re-inserted desired');

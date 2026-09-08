@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Text;
 # ABSTRACT: text field
-$HTML::FormHandler::Field::Text::VERSION = '0.410001';
+$HTML::FormHandler::Field::Text::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field';
 
@@ -83,7 +83,7 @@ HTML::FormHandler::Field::Text - text field
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

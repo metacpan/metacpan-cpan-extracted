@@ -1,3 +1,4 @@
+# vi:set ft=perl:
 use strict;
 use warnings;
 
@@ -22,7 +23,4 @@ return {
     },
 
     REPOSITORY => [ codeberg => 'mauke' ],
-    BUGTRACKER => 'https://codeberg.org/mauke/Pod-Markdown-Githubert/issues',
-
-    #HARNESS_OPTIONS => ['j4'],
 };

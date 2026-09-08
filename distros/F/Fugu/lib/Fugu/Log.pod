@@ -49,14 +49,15 @@ The destination for messages. The value is one of:
 
 =item C<syslog>
 
-Messages go through syslog(3). The logger pins the transport to the
-C<native> mechanism with C<setlogsock> from L<Sys::Syslog>, and then
-calls openlog(3) immediately with the C<ndelay> and C<pid> options.
+Messages go through syslog(3). The logger pins the transport that
+C<syslog_method> names with C<setlogsock> from L<Sys::Syslog>, and
+then calls openlog(3) immediately with the C<ndelay> and C<pid>
+options.
 
-The pin keeps a pledged daemon alive. On OpenBSD the C<native>
-mechanism delivers with sendsyslog(2), which sits inside the C<stdio>
-promise. Every other mechanism opens a socket, and a daemon that
-pledges C<stdio> dies at that call.
+The pin keeps a pledged daemon alive. On OpenBSD the default
+C<native> mechanism delivers with sendsyslog(2), which sits inside
+the C<stdio> promise. Every other mechanism opens a socket, and a
+daemon that pledges C<stdio> dies at that call.
 
 =item C<stderr>
 
@@ -88,6 +89,22 @@ The syslog facility. The value is a L<Sys::Syslog> constant, or one
 of the names C<daemon>, C<user> or C<local0> through C<local7>. The
 default is C<LOG_DAEMON>.
 
+=item C<syslog_method>
+
+The syslog transport. The value is one mechanism name, or an array
+reference of names in the order to try. The default is C<native>,
+which serves the pledged OpenBSD daemon. An empty array reference
+means no pin: the logger then never calls C<setlogsock>, and
+L<Sys::Syslog> keeps its own order.
+
+These are the names the logger accepts: C<console>, C<inet>,
+C<native>, C<pipe>, C<stream>, C<tcp>, C<udp> and C<unix>. They are
+the mechanism names of L<Sys::Syslog>. The C<eventlog> mechanism is
+not in the set, because it needs the Win32 API.
+
+The logger stores the value in every mode, and it uses the value in
+syslog mode alone. C<ident> and C<facility> behave the same way.
+
 =back
 
 =head2 debug, info, notice, warning, error
@@ -117,6 +134,18 @@ C<mode> returns the destination, one of the C<MODE_SYSLOG>,
 C<MODE_STDERR> and C<MODE_QUIET> constants. The constants hold the
 strings C<syslog>, C<stderr> and C<quiet>.
 
+=head2 syslog_method
+
+C<syslog_method> returns the syslog transport as an array reference.
+The reference holds the mechanism names in the order the logger gives
+to C<setlogsock>, so a caller can audit the choice. An empty
+reference reports that the logger pins nothing.
+
+The accessor takes no argument. A caller must not change the
+transport of a logger that is already open: C<new> and C<reopen> are
+the two calls that talk to L<Sys::Syslog>, and both read the stored
+value.
+
 =head2 reopen
 
 C<reopen> closes and opens the log again with the same settings. A
@@ -124,9 +153,9 @@ daemon calls this after it drops privileges: the syslog(3) connection
 belongs to the user that opened it. In the other modes the method
 does nothing.
 
-In syslog mode the method pins the C<native> transport again before
-it opens the connection. The transport list of L<Sys::Syslog> is
-process-wide state, so a pin from the first open does not last.
+In syslog mode the method pins the C<syslog_method> transport again
+before it opens the connection. The transport list of L<Sys::Syslog>
+is process-wide state, so a pin from the first open does not last.
 
 This replaces the older pattern of discarding the logger and building
 an identical one. That pattern needed every call site to learn the
@@ -150,8 +179,9 @@ the new default. A program calls this once at startup.
 =head1 RETURN VALUES
 
 C<new>, C<default> and C<set_default> return a logger object.
-C<reopen> returns the object. C<level> and C<mode> return a name. The
-logging methods and C<set_level> have no useful return value.
+C<reopen> returns the object. C<level> and C<mode> return a name.
+C<syslog_method> returns an array reference. The logging methods and
+C<set_level> have no useful return value.
 
 =head1 EXAMPLES
 
@@ -173,7 +203,9 @@ user:
 
 =head1 ERRORS
 
-C<new> dies if C<mode> is not one of the three names above. An
+C<new> dies if C<mode> is not one of the three names above. It also
+dies for a C<syslog_method> name outside the set above, in every
+mode: the logger validates the value once, at the boundary. An
 unknown C<level> or C<facility> is not an error. The level becomes
 C<info>, and the facility becomes C<LOG_DAEMON>.
 
@@ -207,6 +239,7 @@ second one.
 The C<native> mechanism reports success in every case. The C library
 drops a message that it cannot deliver, and no error reaches the
 caller. A host with no working native transport therefore loses every
-log line, and the module cannot detect the loss.
+log line, and the module cannot detect the loss. The C<syslog_method>
+argument is the answer for such a host.
 
 =cut

@@ -3,6 +3,9 @@
 [Subroutines::ProhibitExplicitReturnUndef]
 severity = 1
 
+[Modules::RequireBarewordIncludes]
+severity = 1
+
 [BuiltinFunctions::ProhibitBooleanGrep]
 [BuiltinFunctions::ProhibitStringyEval]
 [BuiltinFunctions::ProhibitStringySplit]

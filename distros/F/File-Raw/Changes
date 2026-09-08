@@ -1,5 +1,10 @@
 Revision history for File-Raw
 
+0.17    2026-09-07
+        - chunk_iter: pull reads, the counterpart to each_line's push.
+        - next($buffer) reads into the caller's scalar, as core read does.
+        - include/file_chunk.h: the same reads from C, without a copy.
+
 0.16    2026-08-31
         - Report a real dev and ino on Windows, which stat() leaves at 0.
 

@@ -9,7 +9,7 @@ use Data::HashMap::Shared::IS;   # pid -> status string, with a TTL
 # the supervisor sees only live workers with no explicit death notification.
 
 my $path = "/tmp/dhms_heartbeat_$$.shm";
-my $TTL  = 2;                                   # a heartbeat is "live" for 2s
+my $TTL  = 3;                                   # a 1s refresh needs more than 1s of margin
 my $reg  = Data::HashMap::Shared::IS->new($path, 1000, 0, $TTL);
 
 my @pids;

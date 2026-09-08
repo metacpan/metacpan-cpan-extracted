@@ -1,4 +1,6 @@
+Artistic
 Changes
+GPLv1
 lib/Pod/Markdown/Githubert.pm
 Makefile.PL
 Makefile_PL_settings.plx

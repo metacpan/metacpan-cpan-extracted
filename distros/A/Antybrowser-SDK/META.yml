@@ -1,0 +1,29 @@
+---
+abstract: 'Official Antybrowser SDK for Perl'
+author:
+  - 'Antybrowser.com <support@antybrowser.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Antybrowser-SDK
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: '0'
+  LWP::UserAgent: '0'
+  perl: '5.010'
+resources:
+  homepage: https://antybrowser.com
+  license: https://opensource.org/licenses/MIT
+  repository: https://github.com/antybrowser/SDK
+version: v1.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

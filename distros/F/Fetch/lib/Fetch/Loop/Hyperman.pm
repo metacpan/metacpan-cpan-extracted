@@ -3,7 +3,7 @@ package Fetch::Loop::Hyperman;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use parent -norequire, 'Fetch::Loop';
 use Fetch::Loop ();

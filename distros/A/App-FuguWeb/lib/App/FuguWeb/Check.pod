@@ -32,7 +32,14 @@ reports them, because the build and its checks touch no network.
         out    => $dir,         # required: the built site
     )
 
-=head2 pages
+=head2 pages, generated_pages
+
+C<pages> names the pages of the description and one page for each
+manual. C<generated_pages> names each page that the build writes
+itself, which today is the human page of the key directory.
+
+A generated page takes the checks of a page. It takes no reachability
+check: a site links the key directory when it chooses to.
 
 Every page that the site must hold, in a stable order: the pages of
 the description, then one page for each manual of each group. The full
@@ -77,6 +84,11 @@ cross-reference included;
 
 =item *
 
+a reference of a page below the root resolves against the directory of
+that page;
+
+=item *
+
 every fragment resolves to an C<id> on the target page;
 
 =item *
@@ -91,10 +103,16 @@ description marks C<unlinked>;
 
 =item *
 
-the output holds the site and nothing else: no staging directory, no
-editor backup, no stray source.
+the output holds the site and nothing else, at any depth: no staging
+directory, no editor backup, no stray source, and no empty
+directory.
 
 =back
+
+A description with a C<keys> block adds the checks of
+L<App::FuguWeb::Keys/THE CHECKS>. They read the source key directory
+and not the output. A stray key file and a stale digest are therefore
+found whether or not a build has run.
 
 =head2 external
 
@@ -102,8 +120,8 @@ The external links that the last C<run> collected, sorted.
 
 =head1 SEE ALSO
 
-L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Site>,
-L<fuguweb(1)>
+L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Keys>,
+L<App::FuguWeb::Site>, L<fuguweb(1)>
 
 =head1 AUTHOR
 

@@ -16,13 +16,15 @@ sub check_rate_limit {
     return $count <= $max_requests ? 1 : 0;
 }
 
-# Subjects that stop calling leave expired entries holding their slots, and a
-# TTL map with no LRU only reclaims a slot when that same key is touched --
-# so without this the table fills and new clients start failing.  A bounded
-# slice per tick keeps up.
-sub reclaim_expired { my ($n, $done) = $limits->flush_expired_partial(1000); $n }
+# Subjects that stop calling leave expired entries holding their slots.  A
+# slice that cycles the table inside the window keeps the probes short: the
+# 262144 slots this map can grow to, over 60 ticks of a second.
+sub reclaim_expired { my ($n, $done) = $limits->flush_expired_partial(5000); $n }
 
 reclaim_expired();
+
+# The file outlives the process: an interrupted run would leave the count hot.
+shm_si_put $limits, "192.168.1.1", 0;
 
 # simulate requests
 for my $i (1 .. 105) {

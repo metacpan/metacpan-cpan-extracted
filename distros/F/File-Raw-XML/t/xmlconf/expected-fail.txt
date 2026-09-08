@@ -1,0 +1,27 @@
+# t/xmlconf/expected-fail.txt: conformance cases this build is known to fail,
+# one id per line with the reason. A case listed here that passes is a test
+# failure too, so the list only ever shrinks. Decision F: empty at release, or
+# every line names the spec sentence that justifies the disagreement.
+#
+# One line, and it is here because two partitions of the suite contradict each
+# other. Both cases are the same construct: a character reference to a
+# restricted character inside an INTERNAL entity's literal, referenced in
+# element content.
+#
+#   eduni rmt-054   TYPE="valid",  and its own comment says the CR grammar made
+#                   it illegal, that "this is probably not intended", and that
+#                   it "will be fixed in the PR version".
+#   ibm02n13        TYPE="not-wf", written against that same earlier draft.
+#
+# The Recommendation settles it. Exactly two productions subtract restricted
+# characters, and neither reaches an internal entity's replacement text:
+#
+#   [1]  document     ::= ( prolog element Misc* ) - ( Char* RestrictedChar Char* )
+#   [78] extParsedEnt ::= ( TextDecl? content )   - ( Char* RestrictedChar Char* )
+#
+# So this build follows the grammar and eduni: the document entity and every
+# EXTERNAL parsed entity are held to it, an internal one is not. Passing
+# ibm02n13 would mean failing rmt-054, and the two cannot both be satisfied.
+# See frx_lex.h at frx_lex_char for the rule as implemented.
+
+ibm-1-1-not-wf-P02-ibm02n13.xml  XML 1.1 productions [1] and [78] subtract RestrictedChar from the document entity and external parsed entities only, never an internal entity's replacement text; eduni rmt-054 is the same construct marked valid and this build follows the Recommendation

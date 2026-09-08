@@ -2,8 +2,8 @@ NAME
     Clipboard::Any - Common interface to clipboard manager functions
 
 VERSION
-    This document describes version 0.016 of Clipboard::Any (from Perl
-    distribution Clipboard-Any), released on 2026-06-17.
+    This document describes version 0.017 of Clipboard::Any (from Perl
+    distribution Clipboard-Any), released on 2026-07-07.
 
 DESCRIPTION
     This module provides a common interface to interact with clipboard.
@@ -31,9 +31,10 @@ DESCRIPTION
    parcellite
    xclip
     This is not a "real" clipboard manager, but just an interface to the X
-    selections. With "xclip", the history is viewed as having two items. The
-    first/recent is the primary selection and the second one is the
-    secondary.
+    selections. It has a history of just one item, either the "primary"
+    selection or the "clipboard" selection. You can choose which selection
+    to use via environment variable "PERL_CLIPBOARD_ANY_XCLIP_SELECTION".
+    The default is the "primary" selection.
 
     This module provides common functions related to clipboard manager.
 
@@ -292,6 +293,11 @@ FUNCTIONS
     metadata.
 
     Return value: (any)
+
+ENVIRONMENT
+  PERL_CLIPBOARD_ANY_XCLIP_SELECTION
+    Choose which X selection to use. Default if unspecified is "primary".
+    Can be set also to: "clipboard".
 
 HOMEPAGE
     Please visit the project's homepage at

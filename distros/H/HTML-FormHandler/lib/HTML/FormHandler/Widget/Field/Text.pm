@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Field::Text;
 # ABSTRACT: text field rendering widget
-$HTML::FormHandler::Widget::Field::Text::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Field::Text::VERSION = '0.410002';
 use Moose::Role;
 use namespace::autoclean;
 use HTML::FormHandler::Render::Util ('process_attrs');
@@ -44,7 +44,7 @@ HTML::FormHandler::Widget::Field::Text - text field rendering widget
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

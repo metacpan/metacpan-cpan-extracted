@@ -1,9 +1,10 @@
 package HTML::FormHandler::Widget::Wrapper::Bootstrap;
 # ABSTRACT: Twitter Bootstrap 2.0 field wrapper
-$HTML::FormHandler::Widget::Wrapper::Bootstrap::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Wrapper::Bootstrap::VERSION = '0.410002';
 use Moose::Role;
 use namespace::autoclean;
 use HTML::FormHandler::Render::Util ('process_attrs');
+use HTML::Entities qw( encode_entities );
 
 with 'HTML::FormHandler::Widget::Wrapper::Base';
 
@@ -49,7 +50,7 @@ sub wrap_field {
     # various 'help-inline' bits: errors, warnings
     unless( $self->get_tag('no_errors') ) {
         $output .= qq{\n<span class="help-inline">$_</span>}
-            for $result->all_errors;
+            for map { encode_entities($_) } $result->all_errors;
         $output .= qq{\n<span class="help-inline">$_</span>} for $result->all_warnings;
     }
     # extra after element stuff
@@ -105,7 +106,7 @@ HTML::FormHandler::Widget::Wrapper::Bootstrap - Twitter Bootstrap 2.0 field wrap
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

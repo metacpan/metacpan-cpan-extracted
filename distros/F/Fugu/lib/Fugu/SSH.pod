@@ -62,6 +62,28 @@ The password, for a host that has no key yet.
 
 The connection timeout in seconds. The default is 10.
 
+=item C<known_hosts>
+
+The path of the known_hosts file that the strict mode reads. The
+default is absent: each back end then reads F<~/.ssh/known_hosts>,
+which is its own default. The value has no effect when C<strict> is
+false, and the module never writes the file.
+
+=item C<strict>
+
+Verify the host key of every connection. The default is 0.
+
+The policy belongs to the object, and no method takes a per-call
+override, because one object reaches one host. With C<strict> set,
+every connecting method verifies the key against the known_hosts
+file before it authenticates, and C<interactive> runs ssh(1) with
+C<StrictHostKeyChecking=yes>. The name selects
+C<LIBSSH2_HOSTKEY_POLICY_STRICT> for the library and
+C<StrictHostKeyChecking=yes> for ssh(1).
+
+The strict mode needs L<Net::SSH2> 0.60 or later, which fixed the
+argument order of C<check_hostkey>.
+
 =back
 
 =head2 run_command
@@ -124,6 +146,19 @@ caller that passed the raw status to C<exit> would turn a remote exit
 code of 1 into C<exit(256)>, which the kernel truncates to 0, and a
 failed remote command would read as a success.
 
+The method carries the host-key policy as ssh(1) options. In the
+strict mode it sets C<StrictHostKeyChecking=yes>, and it names the
+known_hosts file with C<UserKnownHostsFile> when the caller gave one.
+The method does not die for a host key that does not verify: ssh(1)
+refuses the session itself and returns 255. In the permissive mode
+the method sets C<StrictHostKeyChecking=no>, sends the known hosts to
+F</dev/null>, and lowers the log level to hide the new-key report.
+
+One difference between the back ends stays. ssh(1) also reads
+F</etc/ssh/ssh_known_hosts>, and the library reads the named file
+only. The method does not set C<GlobalKnownHostsFile>: an entry that
+an administrator wrote there is a local trust decision.
+
 =head1 RETURN VALUES
 
 C<run_command()> returns a hash reference.
@@ -140,9 +175,19 @@ C<interactive()> returns an exit code.
 
 Every method dies when L<Net::SSH2> is not installed. The message
 names the module, because that failure is an installation problem and
-not a connection problem.
+not a connection problem. In the strict mode, every connecting method
+dies when L<Net::SSH2> is older than 0.60, and the message names the
+version.
 
-No method dies for a connection that fails.
+No method dies for a connection that fails. One exception exists: in
+the strict mode, a host key that does not verify makes the connecting
+method die. The one-line message names the host, the port, the file,
+and the reason of the back end, which tells a wrong key from a file
+that holds no key for the host. A wrong key is permanent, a retry
+cannot repair it, and a caller that asked for verification must not
+lose the answer to a missing return-value test. C<interactive()> is
+the other shape of the same fault: it does not die, and ssh(1)
+returns 255.
 
 =head1 SEE ALSO
 
@@ -161,9 +206,11 @@ C<run_command()> holds the whole output of the command in memory, and
 C<read_file()> holds the whole file. The C<MAX_READ_SIZE> cap of
 C<read_file()> bounds the second one at 64 MiB.
 
-The module does not verify the host key. It is a provisioning tool
-for a machine that the caller just created, on a port on the loopback
-address. Do not use it to reach a host across a network you do not
-trust.
+The module verifies the host key only in the strict mode, through the
+C<strict> argument of C<new>. The default verifies nothing. The
+module is a provisioning tool for a machine that the caller just
+created, on a port on the loopback address, and such a machine holds
+a new key after each install. Set C<strict> to reach a host across a
+network you do not trust.
 
 =cut

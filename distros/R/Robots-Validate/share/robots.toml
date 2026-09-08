@@ -6366,6 +6366,12 @@ network=[
 agents="PipericBot"
 domain=".piperic.com"
 
+[poweredbybot]
+## About: https://poweredby.keywordseverywhere.com/bot
+agents="PoweredByBot"
+domain=".poweredby.keywordseverywhere.com"
+network=["50.116.52.253","173.255.228.181","173.255.228.202"]
+
 [qualified]
 ## Date: 2026-08-14
 ## About: https://www.qualified.com/legal/qualified-crawler-user-agent
@@ -7275,6 +7281,12 @@ network=[
 agents="Sogou"
 domain=".crawl.sogou.com"
 
+[speroll]
+## About: https://crawler.speroll.com/crawler
+
+agents="Speroll-AdsTxt-Crawler"
+network=["15.204.142.87"]
+
 [stractbot]
 agents="StractBot"
 domain=".stract.com"
@@ -7356,6 +7368,11 @@ network=[
   "100.49.117.77",
   "100.50.17.159",
 ]
+
+[webmcpindex]
+## About: https://webmcpshield.com/bot
+agents="WebMCPIndexBot"
+network=["139.162.75.45"]
 
 [wrtnbot]
 ## Date: 2026-08-26

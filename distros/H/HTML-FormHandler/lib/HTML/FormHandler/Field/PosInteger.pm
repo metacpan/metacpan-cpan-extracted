@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::PosInteger;
 # ABSTRACT: positive integer field
-$HTML::FormHandler::Field::PosInteger::VERSION = '0.410001';
+$HTML::FormHandler::Field::PosInteger::VERSION = '0.410002';
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Field::Integer';
 
@@ -45,7 +45,7 @@ HTML::FormHandler::Field::PosInteger - positive integer field
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

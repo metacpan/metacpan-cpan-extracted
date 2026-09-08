@@ -16,7 +16,7 @@ HTML::FormHandler::Manual - index of the manual
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

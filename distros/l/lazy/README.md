@@ -4,7 +4,7 @@ lazy - Lazily install missing Perl modules
 
 # VERSION
 
-version 1.000002
+version 1.000003
 
 # SYNOPSIS
 
@@ -107,6 +107,25 @@ Note that `PERL5OPT` uses commas to separate import arguments (per
 # CAVEATS
 
 \* Remove `lazy` before you put your work into production.
+
+\* `lazy` only installs modules that are **missing**, not modules that are
+present but too old.  It works by pushing a code-ref hook onto `@INC`, which
+Perl consults only when `require` cannot find a module's `.pm` file on disk.
+A version-too-low failure is not a `require` failure:
+
+    use lazy;
+    use Test::Most 0.42;   # dies if only 0.30 is installed
+
+desugars roughly to
+
+    require Test::Most;             # consults @INC - succeeds, the file is on disk
+    Test::Most->VERSION('0.42');   # throws *after* require returns
+
+By the time `VERSION` throws, `@INC` is no longer being walked, so the hook
+never runs.  To upgrade a module that is installed but too old, run [App::cpm](https://metacpan.org/pod/App%3A%3Acpm)
+directly with a version range:
+
+    cpm install -g 'Test::Most~">=0.42"'
 
 # SEE ALSO
 

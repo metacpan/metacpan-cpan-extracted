@@ -1,5 +1,22 @@
 # Revision history for WebDyne
 
+## 3.028 - 2026-09-08
+
+- Add optional startup and shutdown coderefs to WebDyne::PAGI. Callbacks
+  receive the application object and lifespan scope; returned Futures are
+  awaited before acknowledgement. Exceptions and failed Futures produce the
+  corresponding lifespan failure event. Missing callbacks preserve existing
+  behaviour; shutdown callbacks run only when the server delivers shutdown.
+
+- Clear shared PAGI diagnostics before synchronous HTTP, SSE and WebSocket
+  page setup, after request body buffering. Recovered errors no longer leak
+  into later requests, while errors from the current request remain available
+  to its error handler.
+
+- Add regression coverage for synchronous and asynchronous lifespan callbacks,
+  callback and transport failures, and diagnostic isolation across sequential
+  requests and interleaved HTTP/SSE body reads.
+
 ## 3.027 - 2026-09-07
 
 - Use lazy load ("require") for modules only required at certain decision paths

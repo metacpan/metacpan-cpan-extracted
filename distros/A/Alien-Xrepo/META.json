@@ -1,0 +1,137 @@
+{
+   "X_No_Archive" : "Yes",
+   "abstract" : "Interface with xrepo's package management",
+   "author" : [
+      "Sanko Robinson"
+   ],
+   "description" : "The engine, consumer, and author layers of the xrepo package manager: install, query, and export packages from the xmake registry and consume them from Perl, built on top of Alien::Xmake.",
+   "dynamic_config" : 0,
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Xrepo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Xmake" : "v1.0.0",
+            "Module::Build::Tiny" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Code::TidyAll" : "0",
+            "Code::TidyAll::Plugin::PodTidy" : "0",
+            "IO::Socket::SSL" : "0",
+            "Perl::Tidy" : "0",
+            "Pod::Markdown::Github" : "0",
+            "Pod::Tidy" : "0",
+            "Software::License::Artistic_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Xmake" : "v1.0.0",
+            "Capture::Tiny" : "0",
+            "File::ShareDir" : "0",
+            "JSON::PP" : "0",
+            "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Affix" : "0",
+            "FFI::Platypus" : "0"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Temp" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Xrepo" : {
+         "file" : "lib/Alien/Xrepo.pm",
+         "version" : "v1.0.0"
+      },
+      "Alien::Xrepo::Build" : {
+         "file" : "lib/Alien/Xrepo/Build.pm",
+         "version" : "v1.0.0"
+      },
+      "Alien::Xrepo::Build::Recipe" : {
+         "file" : "lib/Alien/Xrepo/Build/Recipe.pm",
+         "version" : "v1.0.0"
+      },
+      "Alien::Xrepo::PackageInfo" : {
+         "file" : "lib/Alien/Xrepo.pm",
+         "version" : "v1.0.0"
+      },
+      "Alien::Xrepo::Runtime" : {
+         "file" : "lib/Alien/Xrepo/Runtime.pm",
+         "version" : "v1.0.0"
+      },
+      "Alien::Xrepo::Runtime::Alt" : {
+         "file" : "lib/Alien/Xrepo/Runtime.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/Alien-Xrepo/issues"
+      },
+      "homepage" : "https://github.com/sanko/Alien-Xrepo",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sanko/Alien-Xrepo.git",
+         "web" : "https://github.com/sanko/Alien-Xrepo"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_authority" : "cpan:SANKO",
+   "x_ignore" : [
+      ".tidyallrc",
+      ".gitignore",
+      ".clang-format",
+      ".github/**"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

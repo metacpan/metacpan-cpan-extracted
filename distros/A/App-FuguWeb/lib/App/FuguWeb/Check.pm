@@ -18,9 +18,10 @@
 use v5.36;
 
 package App::FuguWeb::Check;
-our $VERSION = '0.2.0';
+our $VERSION = '0.4.0';
 
 use App::FuguWeb;
+use App::FuguWeb::Keys;
 use Fugu::File;
 
 # App::FuguWeb::Check - what a built site must be true of.
@@ -59,6 +60,20 @@ sub pages ($self)
 	    ( map { $_->page } map { $_->manuals } $self->{config}->groups );
 }
 
+# $self->generated_pages:
+#	Every page that the build writes itself, and that no
+#	description block names. Today that is the human page of the
+#	key directory.
+#
+#	The page gets the checks of a page, so a broken link of the
+#	chrome fails the check. It gets no reachability check: the
+#	site links the key directory when it wants to, and a site that
+#	does not is not broken.
+sub generated_pages ($self)
+{
+	return grep { m{\.html\z} } $self->{config}->key_paths;
+}
+
 # $self->external:
 #	The external links that the last run collected, sorted. The
 #	class never fetches one.
@@ -78,11 +93,30 @@ sub run ($self)
 
 	my @problems = $self->_check_inventory;
 
-	for my $page ( $self->pages ) {
+	for my $page ( $self->pages, $self->generated_pages ) {
 		next unless -f $self->{out} . "/$page";
 		push @problems, $self->_check_page($page);
 	}
 	push @problems, $self->_check_reachable;
+	push @problems, $self->_check_keys;
+
+	return @problems;
+}
+
+# $self->_check_keys:
+#	Hold the key directory to the design. A description with no
+#	keys block has no key directory, and the checks then find
+#	nothing to say.
+#
+#	The rules read the source directory and not the output, so the
+#	answer does not depend on a build having run. A stray key file
+#	and a stale digest are faults of the checkout.
+sub _check_keys ($self)
+{
+	my @problems =
+	    defined $self->{config}->keys_dir
+	    ? App::FuguWeb::Keys->new( config => $self->{config} )->problems
+	    : ();
 
 	return @problems;
 }
@@ -107,7 +141,10 @@ sub _check_inventory ($self)
 		push @problems, "$name: empty" if -e $path && !-s $path;
 	}
 
-	my $entries = App::FuguWeb::list_dir( $self->{out} )
+	# The walk reads the whole tree. A site is one flat directory,
+	# and the key directory is the one part below it. A walk of one
+	# level would take every published key for a stray file.
+	my $entries = App::FuguWeb::list_tree( $self->{out} )
 	    or return "$self->{out}: cannot read the output directory: $!";
 
 	my %expected = map { $_ => 1 } @expected;
@@ -132,8 +169,13 @@ sub _check_page ( $self, $page )
 		my $href = $entry->{href};
 
 		# The chrome escapes an attribute on its way out, so the
-		# search has to escape it the same way.
+		# search has to escape it the same way. A page below the
+		# root also carries the step back, so the search reads
+		# the same form that App::FuguWeb::Page writes.
 		my $written = App::FuguWeb::escape_attr($href);
+		$written = _base_of($page) . $written
+		    unless $href =~ m{\A(?:[A-Za-z][A-Za-z0-9.+-]*:|/|\#)};
+
 		push @problems,
 		    "$page: does not carry the navigation" . " entry $href"
 		    unless index( $html, qq{href="$written"} ) >= 0;
@@ -180,8 +222,17 @@ sub _check_references ( $self, $page, $html )
 		}
 
 		my ( $path, $fragment ) = split /#/, $ref, 2;
-		$path = $page unless defined $path && length $path;
-		$path =~ s{^\./}{};
+		if ( defined $path && length $path ) {
+			$path = _resolve( $page, $path );
+			unless ( defined $path ) {
+				push @problems,
+				    "$page: $ref names no page of the site";
+				next;
+			}
+		}
+		else {
+			$path = $page;
+		}
 
 		unless ( -e $self->{out} . "/$path" ) {
 			push @problems, "$page: $ref leads nowhere";
@@ -195,6 +246,52 @@ sub _check_references ( $self, $page, $html )
 	}
 
 	return @problems;
+}
+
+# _base_of($page):
+#	The step back from a page to the site root. It is the empty
+#	string for a page of the root, and one '../' for each
+#	directory below it. App::FuguWeb::Page writes the same step in
+#	front of every relative link of the chrome.
+sub _base_of ($page)
+{
+	my $depth = () = $page =~ m{/}g;
+
+	return '../' x $depth;
+}
+
+# _resolve($page, $ref):
+#	One relative reference of a page, as a path below the output
+#	directory. A site is one flat directory, so most references
+#	resolve to themselves. The key directory sits below the root,
+#	and a reference there is relative to its own page.
+sub _resolve ( $page, $ref )
+{
+	my @parts = split m{/}, $page;
+	pop @parts;
+
+	for my $step ( split m{/}, $ref, -1 ) {
+		next if $step eq '' || $step eq '.';
+		if ( $step eq '..' ) {
+
+			# A step above the site root names no file of
+			# the output. A pop of an empty list does
+			# nothing, so the reference would clamp to the
+			# root and read like a link that resolves.
+			return unless @parts;
+			pop @parts;
+			next;
+		}
+		push @parts, $step;
+	}
+
+	# A reference of './' names the directory of its own page, and
+	# a directory is no page of a site. An empty answer also reads
+	# as false in the walk of the reachability check. The walk
+	# would then stop at the first page that holds one.
+	return unless @parts;
+
+	return join '/', @parts;
 }
 
 # _unescape($text):
@@ -236,7 +333,8 @@ sub _check_reachable ($self)
 
 			my ($path) = split /#/, $ref, 2;
 			next unless defined $path && length $path;
-			$path =~ s{^\./}{};
+			$path = _resolve( $page, $path );
+			next unless defined $path;
 
 			next if $seen{$path}++;
 			push @queue, $path;

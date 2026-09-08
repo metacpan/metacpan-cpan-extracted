@@ -1,3 +1,8 @@
+0.017   2026-07-07  Released-By: PERLANCAR; Urgency: high
+
+        - [bufix] Forgot to change old code to use Desktop::KDE::Util.
+
+
 0.016   2026-06-17  Released-By: PERLANCAR; Urgency: medium
 
         - When adding clipboard content using xclip, set both primary and

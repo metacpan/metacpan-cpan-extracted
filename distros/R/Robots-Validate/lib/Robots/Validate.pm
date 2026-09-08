@@ -6,18 +6,18 @@ use v5.24;
 
 use Moo 1;
 
-use Algorithm::AhoCorasick::XS;
+use Algorithm::AhoCorasick::SearchMachine;
 use File::ShareDir qw( dist_file );
 use File::Slurper  qw( read_binary );
-use List::Util     1.45 qw( all any none uniqstr );
+use List::Util     1.33 qw( all any none );
 use Net::DNS::Resolver;
 use Net::IP qw( ip_expand_address ip_is_ipv4 ip_is_ipv6 ip_splitprefix );
-use Net::Patricia;
+use Net::IP::LPM;
 use PerlX::Maybe qw( maybe );
 use Ref::Util qw( is_plain_arrayref is_plain_hashref is_regexpref );
 use Scalar::Util 1.18 qw( refaddr );
 use Sub::Util 1.40 qw( set_subname );
-use TOML::XS;
+use TOML::Tiny 0.20 ();
 use Try::Tiny;
 use Types::Common qw( ArrayRef Bool ConsumerOf Enum HashRef InstanceOf Maybe PositiveInt );
 
@@ -29,7 +29,7 @@ use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.3';
 
 
 has resolver => (
@@ -56,16 +56,16 @@ has max_forward_lookups => (
 
 has networks => (
     is      => 'bare',
-    isa     => InstanceOf ['Net::Patricia'],
+    isa     => InstanceOf ['Net::IP::LPM'],
     builder => 1,
     handles => {
-        _add_string   => 'add_string',
-        _match_string => 'match_string',
+        _add_string   => 'add',
+        _match_string => 'lookup',
     },
 );
 
 sub _build_networks($self) {
-    return Net::Patricia->new(AF_INET6);
+    return Net::IP::LPM->new;
 }
 
 has _validators => (
@@ -77,10 +77,9 @@ has _validators => (
 
 has _agents => (
     is       => 'lazy',
-    isa      => InstanceOf [qw/ Algorithm::AhoCorasick::XS /],
+    isa      => InstanceOf [qw/ Algorithm::AhoCorasick::SearchMachine Algorithm::AhoCorasick::XS /],
     init_arg => undef,
     builder  => \&_build_agents,
-    handles  => { _first_match => 'first_match' },
 );
 
 sub _build_agents($self) {
@@ -88,7 +87,40 @@ sub _build_agents($self) {
     $self->_init_validators_from_config;
 
     my @names = keys $self->_validators->%*;
-    return Algorithm::AhoCorasick::XS->new(\@names);
+
+
+    if ( eval { require "Algorithm::AhoCorasick::XS" } ) {
+
+        *_first_match = set_subname "_first_match", sub( $self, $str ) {
+            return $self->_agents->first_match($str)
+        };
+
+        *_all_matches = set_subname "_all_matches", sub( $self, $str ) {
+            return $self->_agents->matches($str)
+        };
+
+        return Algorithm::AhoCorasick::XS->new(\@names);
+
+    }
+    else {
+
+        *_first_match = set_subname "_first_match", sub( $self, $str ) {
+            my $match;
+            $self->_agents->feed($str, sub( $, $name ) { $match //= $name }  );
+            return $match;
+        };
+
+        *_all_matches = set_subname "_all_matches", sub( $self, $str ) {
+            my @matches;
+            $self->_agents->feed($str, sub( $, $name ) { push @matches, $name; return undef } );
+            return @matches;
+        };
+
+        return Algorithm::AhoCorasick::SearchMachine->new(@names);
+
+    }
+
+
 }
 
 
@@ -241,7 +273,7 @@ sub _first_revalidate( $self, $ip, $agent ) {
 
         $self->_agents; # ensure agents are instantiated
 
-        if ( my $str = $self->_agents->first_match( lc $agent ) ) {
+        if ( my $str = $self->_first_match( lc $agent ) ) {
             my $res = $self->_validators->{$str}->($ip);
             my $rule = $res && $self->index->{$res};
             if ( $rule && $rule->{ignore} ) {
@@ -271,7 +303,7 @@ sub _relaxed_revalidate( $self, $ip, $agent ) {
         my %seen;
         my $fails = 0;
 
-        my @matches = uniqstr $self->_agents->matches( lc $agent );
+        my @matches = $self->_all_matches( lc $agent );
         splice @matches, $self->max_matches;
         for my $str (@matches) {
             my $fn = $self->_validators->{$str};
@@ -311,7 +343,7 @@ sub _strict_revalidate( $self, $ip, $agent ) {
         my %seen;
         my @checks;
 
-        my @matches = uniqstr $self->_agents->matches( lc $agent );
+        my @matches = $self->_all_matches( lc $agent );
         splice @matches, $self->max_matches;
         for my $str (@matches) {
             my $fn = $self->_validators->{$str};
@@ -446,14 +478,6 @@ sub _add_rule( $self, $rule ) {
 }
 
 sub _add_network( $self, $cidr, $name ) {
-    my ( $prefix, $len ) = ip_splitprefix($cidr);
-    $prefix //= $cidr;
-
-    if ( ip_is_ipv4($prefix) ) {
-        $len //= 32;
-        $cidr = _normalise_ip($prefix) . '/' . ( $len + 96 );
-    }
-
     try {
         $self->_add_string( $cidr, $name );
     }
@@ -463,7 +487,7 @@ sub _add_network( $self, $cidr, $name ) {
 }
 
 sub _match_ip( $self, $ip ) {
-    return $self->_match_string( _normalise_ip($ip) );
+    return $self->_match_string( $ip );
 }
 
 sub _check_ip( $self, $name, $ip ) {
@@ -550,8 +574,14 @@ sub _init_validators_from_config($self) {
     $self->_set_locked(1);
 }
 
-sub _from_toml($toml) {
-    return TOML::XS::from_toml($toml)->get();
+BEGIN {
+
+    if ( eval { require "TOML::XS" } ) {
+        *_from_toml = sub($toml) { TOML::XS::from_toml($toml)->get() };
+    }
+    else {
+        *_from_toml = \&TOML::Tiny::from_toml;
+    }
 }
 
 
@@ -571,7 +601,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.4.2
+version v0.4.3
 
 =head1 SYNOPSIS
 
@@ -896,6 +926,8 @@ The TOML specification can be found at L<https://toml.io>.
 =head1 append:REQUIREMENTS
 
 L<CHI> is required to use the caching features.
+
+L<Algorithm::AhoCorasick::XS> and L<TOML::XS> will be used if they are available.
 
 =end :readme
 

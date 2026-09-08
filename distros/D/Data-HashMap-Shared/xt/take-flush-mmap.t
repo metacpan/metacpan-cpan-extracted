@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 
 plan skip_all => "AUTHOR_TESTING not set" unless $ENV{AUTHOR_TESTING};
 use File::Temp ();
@@ -91,7 +92,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
 
     shm_ii_put $map, 1, 10;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     ok(!defined(shm_ii_take $map, 1), 'II take undef for expired key');
 
     unlink $path;
@@ -110,7 +111,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is(shm_ii_flush_expired $map, 0, 'flush_expired returns 0 when nothing expired');
     is(shm_ii_size $map, 10, 'size unchanged after flush with no expired');
 
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     my $flushed = shm_ii_flush_expired $map;
     is($flushed, 10, 'flush_expired returns count of flushed entries');
@@ -118,7 +119,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
     # method API
     shm_ii_put $map, 1, 10;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     is($map->flush_expired(), 1, 'method flush_expired');
 
     unlink $path;
@@ -139,11 +140,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
 
-    shm_ii_put $map, 1, 10;          # default 1s TTL
+    shm_ii_put $map, 1, 10;          # default 2s TTL
     shm_ii_put_ttl $map, 2, 20, 0;   # permanent
     shm_ii_put_ttl $map, 3, 30, 60;  # 60s TTL
 
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     my $flushed = shm_ii_flush_expired $map;
     is($flushed, 1, 'only short-TTL entry flushed');
@@ -162,7 +163,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
     shm_ss_put $map, "a", "1";
     shm_ss_put $map, "b", "2";
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     my $flushed = shm_ss_flush_expired $map;
     is($flushed, 2, 'SS flush_expired count');
@@ -179,7 +180,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
 
     shm_ii_put $map, $_, $_ * 10 for 1..50;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     # scan only 10 slots at a time
     my $total_flushed = 0;
@@ -230,7 +231,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
 
     shm_ii_put $map, $_, $_ for 1..100;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
 
     # first pass: scan 30 slots
     my ($f1, $d1) = shm_ii_flush_expired_partial $map, 30;
@@ -254,7 +255,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
     shm_ii_put $map, 1, 10;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     my ($f, $d) = $map->flush_expired_partial(100);
     is($f, 1, 'method flush_expired_partial flushed');
     is($d, 1, 'method flush_expired_partial done');
@@ -266,7 +267,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $prefix = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($prefix, 4, 1000, 0, 1);  # ttl=1s
     $map->put($_, $_) for 1 .. 40;
-    sleep 2;   # let every entry expire
+    Time::HiRes::sleep(1.2);   # let every entry expire
     my ($total, $done, $calls) = (0, 0, 0);
     while (!$done) {
         my ($n, $d) = $map->flush_expired_partial(8);   # 8 slots per shard per call

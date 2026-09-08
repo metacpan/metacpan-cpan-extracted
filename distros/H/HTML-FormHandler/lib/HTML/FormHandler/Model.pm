@@ -1,6 +1,6 @@
 package HTML::FormHandler::Model;
 # ABSTRACT: default model base class
-$HTML::FormHandler::Model::VERSION = '0.410001';
+$HTML::FormHandler::Model::VERSION = '0.410002';
 use Moose::Role;
 use Carp;
 
@@ -66,7 +66,7 @@ HTML::FormHandler::Model - default model base class
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

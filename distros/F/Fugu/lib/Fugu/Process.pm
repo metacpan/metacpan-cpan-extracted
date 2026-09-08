@@ -18,20 +18,22 @@
 use v5.36;
 
 package Fugu::Process;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use Config;
-use Fcntl     qw(F_SETFD FD_CLOEXEC);
+use Fcntl     qw(F_DUPFD F_SETFD FD_CLOEXEC);
 use Fugu::CLI qw(EXIT_ERROR);
 use IO::Select;
 use POSIX       qw(setsid WNOHANG);
+use Socket      qw(AF_UNIX PF_UNSPEC SOCK_STREAM);
 use Time::HiRes qw(time);
 
 # Fugu::Process - fork, exec, liveness and reaping.
 #
-# The module keeps no state and has only class methods. Two calls
-# start a child: spawn_command leaves it running, and run waits for it
-# and captures its output. Both report an exec failure exactly, over a
+# The module keeps no state and has only class methods. Three calls
+# start a child: spawn_command leaves it running, run waits for it
+# and captures its output, and spawn_peer connects it over a
+# socketpair. Each one reports an exec failure exactly, over a
 # close-on-exec pipe, and never by a wait-and-guess sleep.
 
 # How often terminate looks again while it waits for a child to go.
@@ -65,6 +67,7 @@ BEGIN {
 #		stderr    => $path|undef # Optional: redirect stderr (default: /dev/null)
 #		stdin     => $path|undef # Optional: redirect stdin (default: /dev/null)
 #		env       => \%vars     # Optional: the exact child environment
+#		inherit   => \@handles  # Optional: descriptors the child keeps
 #
 #	The method always waits for the exec to resolve, so a command
 #	that does not exist reports its own error message.
@@ -74,6 +77,11 @@ BEGIN {
 #	change. Without the option the child inherits the parent
 #	environment. An empty hashref gives the child an empty
 #	environment. The .pod sidecar states the full contract.
+#
+#	The inherit option names the open handles that survive the
+#	exec, each at its own descriptor number. The child clears
+#	FD_CLOEXEC on each one, and then closes every other descriptor
+#	from 3 upward. The .pod sidecar states the full contract.
 sub spawn_command ( $class, %args )
 {
 	my $cmd       = $args{cmd};
@@ -88,6 +96,9 @@ sub spawn_command ( $class, %args )
 			error   => 'Command must be non-empty arrayref'
 		};
 	}
+
+	my $inherit = $args{inherit} // [];
+	_check_inherit($inherit);
 
 	my $env;
 	if ( exists $args{env} ) {
@@ -111,10 +122,89 @@ sub spawn_command ( $class, %args )
 			    or _fail( $exec_w, "Cannot redirect stdout: $!" );
 			open STDERR, '>', $stderr
 			    or _fail( $exec_w, "Cannot redirect stderr: $!" );
+
+			# After the redirect, before the chdir of
+			# _fork_exec.
+			_child_fds( $exec_w, $inherit );
 		} );
 	return { success => 0, error => $error } if $error;
 
 	return { success => 1, pid => $pid };
+}
+
+# $class->spawn_peer(%args):
+#	Start a peer child over a socketpair, for the OpenBSD pattern
+#	of a privileged parent with unprivileged children.
+#
+#	%args:
+#		cmd     => \@command  # Required: the command to execute
+#		fd      => $number    # The child end lands here (default: 3)
+#		inherit => \@handles  # Optional: extra descriptors, as above
+#		env     => \%vars     # Optional: the exact child environment
+#
+#	The method returns {success => 1, pid => $pid, socket => $fh}
+#	with the parent end, or {success => 0, error => $msg}. The
+#	child opens its end with open($peer, '+<&=', $fd), so it needs
+#	no descriptor argument. The caller wraps the parent end when it
+#	wants framing; the module holds no transport. The method makes
+#	no session and no process group: a peer child stays in the
+#	group of the parent, so one signal reaches the whole set.
+sub spawn_peer ( $class, %args )
+{
+	my $cmd = $args{cmd};
+	unless ( ref $cmd eq 'ARRAY' && @$cmd > 0 ) {
+		return {
+			success => 0,
+			error   => 'Command must be non-empty arrayref'
+		};
+	}
+
+	my $fd      = $args{fd}      // 3;
+	my $inherit = $args{inherit} // [];
+	_check_inherit($inherit);
+
+	# The standard descriptors end at 2, so a peer number below 3
+	# is a programming error, as is a collision with an inherit
+	# member.
+	die "fd must be a number of 3 or above, not $fd"
+	    unless $fd =~ /^\d+$/ && $fd >= 3;
+	for my $fh (@$inherit) {
+		die "fd $fd collides with an inherit descriptor"
+		    if fileno($fh) == $fd;
+	}
+
+	my $env;
+	if ( exists $args{env} ) {
+		my $env_error = _check_env( $args{env} );
+		return { success => 0, error => $env_error } if $env_error;
+		$env = $args{env};
+	}
+
+	socketpair(
+		my $parent_end,
+		my $child_end,
+		AF_UNIX, SOCK_STREAM, PF_UNSPEC
+	    )
+	    or return {
+		success => 0,
+		error   => "Cannot create socketpair: $!"
+	    };
+
+	my ( $pid, $error ) = _fork_exec(
+		$cmd, undef, $env,
+		sub ($exec_w) {
+			close $parent_end;
+			_occupy_fd( $exec_w, $child_end, $fd );
+			_child_fds( $exec_w, $inherit, $fd );
+		} );
+
+	close $child_end;
+	if ($error) {
+		close $parent_end;
+		return { success => 0, error => $error };
+	}
+
+	return { success => 1, pid => $pid, socket => $parent_end };
 }
 
 # $class->run(%args):
@@ -531,6 +621,137 @@ sub spawn_perl ( $class, %args )
 	return $class->spawn_command(%args);
 }
 
+# _check_inherit($inherit):
+#	Validate the inherit argument of a public method, before any
+#	pipe and before the fork. A value that is not an array
+#	reference, and a member with no descriptor, are programming
+#	errors, so both die.
+sub _check_inherit ($inherit)
+{
+	die 'inherit must be an array reference'
+	    unless ref $inherit eq 'ARRAY';
+
+	for my $fh (@$inherit) {
+		my $fd = ref $fh ? fileno $fh : undef;
+		die 'an inherit member has no descriptor'
+		    unless defined $fd && $fd >= 0;
+	}
+
+	return;
+}
+
+# _occupy_fd($exec_w, $fh, $fd):
+#	Put the descriptor of $fh on the number $fd, in the child. The
+#	exec-failure pipe can already sit on that number, because the
+#	parent can hold descriptor holes; the pipe then moves up
+#	first. F_DUPFD clears the close-on-exec flag on the dup, and
+#	the F_SETFD after the reopen sets it again.
+sub _occupy_fd ( $exec_w, $fh, $fd )
+{
+	if ( fileno($exec_w) == $fd ) {
+		my $moved = fcntl( $exec_w, F_DUPFD, $fd + 1 );
+		defined $moved
+		    or _fail( $exec_w, "Cannot move the exec pipe: $!" );
+
+		# '&=' takes the number without a dup, so this open
+		# cannot run out of descriptors. The reopen closes the
+		# old number first, which frees $fd. A reopen that
+		# fails must not leave an EOF that the parent reads as
+		# a success, so the failure goes out over the moved
+		# dup.
+		unless ( open $exec_w, '>&=', $moved + 0 ) {
+			my $message = "Cannot reopen the exec pipe: $!";
+			POSIX::write( $moved, $message, length $message );
+			POSIX::_exit(127);
+		}
+		fcntl( $exec_w, F_SETFD, FD_CLOEXEC )
+		    or _fail( $exec_w, "Cannot flag the exec pipe: $!" );
+	}
+
+	if ( fileno($fh) == $fd ) {
+
+		# The descriptor already sits on $fd, and perl set
+		# FD_CLOEXEC on it, so clear the flag on the live
+		# handle. The handle lives in the caller until the
+		# exec, so nothing closes the descriptor early.
+		fcntl( $fh, F_SETFD, 0 )
+		    or _fail( $exec_w, "Cannot clear close-on-exec: $!" );
+		return;
+	}
+
+	# dup2(2) puts the descriptor on $fd with FD_CLOEXEC clear,
+	# and no perl handle owns the new number, so nothing closes it
+	# before the exec.
+	my $duped = POSIX::dup2( fileno($fh), $fd );
+	unless ( defined $duped && $duped >= 0 ) {
+		_fail( $exec_w, "Cannot dup2 to fd $fd: $!" );
+	}
+	close $fh;
+
+	return;
+}
+
+# _child_fds($exec_w, $inherit, @keep):
+#	The descriptor step of the child, between the fork and the
+#	exec. Clear FD_CLOEXEC on each inherit member, so the
+#	descriptor survives the exec: perl sets the flag on each
+#	descriptor above $^F. Then close every other descriptor from 3
+#	upward, and keep the standard three, the inherit members, the
+#	extra @keep numbers, and the exec-failure pipe. A swept pipe
+#	would read as a successful exec in the parent.
+#
+#	The open-descriptor list of /proc/self/fd or /dev/fd bounds
+#	the sweep on Linux and Darwin, where a container can raise
+#	_SC_OPEN_MAX to two to the twenty. OpenBSD keeps the range
+#	loop: a /dev/fd read needs the rpath promise, the child holds
+#	the pledge of the parent, and the OpenBSD soft limit is small.
+#	An OpenBSD 7.8 guest measured 128 for the limit, and the full
+#	loop under 3 ms. Core Perl wraps neither closefrom(3) nor
+#	close_range(2), so the loop is the portable fallback, and it
+#	ignores each EBADF: almost every number in the range names
+#	nothing.
+sub _child_fds ( $exec_w, $inherit, @keep )
+{
+	my %keep = map { $_ => 1 } fileno($exec_w), @keep;
+
+	for my $fh (@$inherit) {
+		fcntl( $fh, F_SETFD, 0 )
+		    or _fail( $exec_w, "Cannot clear close-on-exec: $!" );
+		$keep{ fileno $fh } = 1;
+	}
+
+	if ( $^O ne 'openbsd' ) {
+		for my $dir ( '/proc/self/fd', '/dev/fd' ) {
+			opendir my $dh, $dir or next;
+			my @fds = grep { !/\D/ } readdir $dh;
+			closedir $dh;
+
+			for my $fd (@fds) {
+				next if $fd < 3 || $keep{$fd};
+				POSIX::close($fd);
+			}
+
+			return;
+		}
+	}
+
+	my $max = POSIX::sysconf( POSIX::_SC_OPEN_MAX() );
+	unless ( defined $max && $max > 0 ) {
+
+		# A guessed bound would leave a higher descriptor open
+		# behind the contract of LIB-PROCESS-3, so the child
+		# fails instead.
+		_fail( $exec_w, "Cannot read _SC_OPEN_MAX: $!" );
+	}
+
+	for my $fd ( 3 .. $max - 1 ) {
+		next if $keep{$fd};
+		POSIX::close($fd);
+	}
+
+	return;
+}
+
 # _fork_exec($cmd, $cwd, $env, $redirect):
 #	The shared fork-and-exec step. Fork the child and run
 #	$redirect in it to set up the standard handles; failures go
@@ -567,7 +788,11 @@ sub _fork_exec ( $cmd, $cwd, $env, $redirect )
 		%ENV = %$env if defined $env;
 
 		# The pipe is close-on-exec, so a successful exec closes
-		# it and the parent reads EOF.
+		# it and the parent reads EOF. The pipe carries the
+		# exact reason, so the perl warning of a failed exec
+		# would only repeat it on a stderr that a peer child
+		# shares with the parent.
+		local $SIG{__WARN__} = sub { };
 		exec { $cmd->[0] } @$cmd
 		    or _fail( $exec_w, "Cannot exec $cmd->[0]: $!" );
 	}

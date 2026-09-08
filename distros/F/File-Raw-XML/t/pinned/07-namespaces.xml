@@ -1,0 +1,6 @@
+<r xmlns="urn:d" xmlns:p="urn:1" xmlns:q="urn:1" xml:lang="en">
+  <p:a xmlns:p="urn:2" xml:space="preserve"><p:b/><q:c p:x="1" q:y="2" z="3"/></p:a>
+  <p:c/>
+  <d xmlns=""><e xml:lang="fr"/><f xmlns="urn:d"/></d>
+  <g xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:id="g1"/>
+</r>

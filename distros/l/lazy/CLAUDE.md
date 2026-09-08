@@ -16,7 +16,7 @@ This is a Dist::Zilla distribution managed by the `[@Author::OALDERS]` plugin bu
 - Author / release tests: `dzil xtest` or `RELEASE_TESTING=1 AUTHOR_TESTING=1 dzil test`
 - Install dev deps: `dzil authordeps --missing | cpm install -g -` then `dzil listdeps --develop --missing | cpm install -g -`
 - Regenerate cpanfile / Makefile.PL after editing `dist.ini`: `dzil regenerate`
-- Lint / tidy: `precious lint --all` (check), `precious tidy --all` (auto-fix). Configs live in `perltidyrc`, `perlcriticrc`, `perlimports.toml`; rule wiring is in `precious.toml`. `precious` itself plus `omegasort` (used to sort `.gitignore`) are Rust binaries — install via `ubi` or `cargo install`.
+- Lint / tidy: `precious lint --all` (check), `precious tidy --all` (auto-fix). Configs live in `.perltidyrc`, `.perlcriticrc`, `perlimports.toml`; rule wiring is in `precious.toml`. `precious` itself plus `omegasort` (used to sort `.gitignore`) are Rust binaries — install via `ubi` or `cargo install`.
 - Release: `dzil release`
 
 `t/local-install-via-args.t` performs a live install against `cpan.metacpan.org` and `cpanmetadb.plackperl.org` — it needs internet and may be slow. `t/load.t` is the fast smoke test.
@@ -45,12 +45,12 @@ Two non-obvious constraints worth preserving:
 
 ## CI
 
-`.github/workflows/test.yml` runs three jobs in `perldocker/perl-tester:5.42`:
+`.github/workflows/test.yml` runs three jobs; `build-job` and `coverage-job` run in `perldocker/perl-tester:5.44`:
 
 1. `build-job` — `auto-build-and-test-dist` with all author/release env vars on, uploads `build_dir` artifact.
 2. `coverage-job` — installs deps from the built tarball and runs `test-dist` with `CODECOV_TOKEN`.
-3. `test-job` — matrix of Perl 5.24 → 5.42 on `ubuntu-latest`, installs from `cpanfile` via `perl-actions/install-with-cpm`, runs `prove -lr t` with `AUTHOR_TESTING=0 RELEASE_TESTING=0`.
+3. `test-job` — matrix of Perl 5.24 → 5.42 on `ubuntu-latest`, installs from `cpanfile` via `perl-actions/install-with-cpm`, runs `prove -lr t` with `AUTHOR_TESTING=0 RELEASE_TESTING=0`. The floor is 5.24 because `App::cpm` (a hard runtime dep of `lazy`) and its whole toolchain family now require Perl 5.24+; older Perls can no longer install the dependency at all.
 
-The matrix step deliberately runs only end-user tests, so author-only failures (POD, spelling, precious) won't block PRs across old Perls — they're caught in `build-job` and `lint-job` instead.
+The matrix step deliberately runs only end-user tests, so author-only failures (POD, spelling, precious) won't block PRs across old Perls — they're caught in `build-job` and the `lint` workflow instead.
 
-A standalone `lint-job` runs `precious lint --all` against the working tree on `ubuntu-latest` inside `perldocker/perl-tester:5.42`. It uses `oalders/install-ubi-action` to install `ubi`, `omegasort`, and `precious` from GitHub releases, then `cpm install` for the Perl-side tools (`App::perlimports`, `Perl::Critic`, `Perl::Tidy`). It does not depend on `build-job` and runs in parallel.
+`.github/workflows/lint.yml` is a standalone workflow whose `precious` job runs `precious lint` on `ubuntu-latest`. It uses `shogo82148/actions-setup-perl` for Perl, `oalders/install-ubi-action` to install `omegasort` and `precious` from GitHub releases, and `perl-actions/install-with-cpm` for the Perl-side tools (`App::perlimports`, `App::perlvars`, `Perl::Critic`, `Perl::Tidy`). It lints incrementally on pull requests (`precious lint --git-diff-from` the PR base) and `--all` on every other event (`push`, `merge_group`, `workflow_dispatch`). It does not depend on `build-job` and runs in parallel.

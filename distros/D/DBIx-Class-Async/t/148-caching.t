@@ -319,4 +319,189 @@ subtest 'Cache statistics' => sub {
     $schema->disconnect;
 };
 
+subtest 'update() invalidates the query cache (CPANSec regression)' => sub {
+    my $db_file = create_test_db();
+
+    my $schema = DBIx::Class::Async::Schema->connect(
+        "dbi:SQLite:dbname=$db_file", undef, undef, {},
+        {
+            workers      => 2,
+            schema_class => 'TestSchema',
+            async_loop   => $loop,
+            cache_ttl    => 60,
+        }
+    );
+
+    $schema->await($schema->deploy({ add_drop_table => 1 }));
+
+    if ($schema && $schema->{_async_db}{_cache}) {
+        $schema->{_async_db}{_cache}->clear;
+    }
+
+    # Create a user
+    $schema->await($schema->resultset('User')->create({
+        name   => 'Update Cache User',
+        email  => 'updatecache@example.com',
+        age    => 25,
+        active => 1,
+    }));
+
+    # First query, populates the cache with age=25
+    my $result1 = $schema->await(
+        $schema->resultset('User')
+               ->search({ id => 1 })
+               ->all
+    );
+    is($result1->[0]->age, 25, 'First query returned age=25 and is now cached');
+
+    # Update via a ResultSet with a plain (non-PK) condition, followed
+    # immediately by a query using a different (PK) condition, this
+    # combination is what the discarded single-row cache key would have
+    # missed even if it had been passed to clear_cache.
+    $schema->await(
+        $schema->resultset('User')
+               ->search({ email => 'updatecache@example.com' })
+               ->update({ age   => 99 })
+    );
+
+    # Same identical query as before the update, must NOT return stale
+    # cached data. Prior to the fix, update() computed a cache key and
+    # discarded it, so this would incorrectly return age=25 for the rest
+    # of the TTL.
+    my $result2 = $schema->await(
+        $schema->resultset('User')
+               ->search({ id => 1 })
+               ->all
+    );
+    is($result2->[0]->age, 99, 'Query after update() sees fresh data, not the stale cached row');
+
+    $schema->disconnect;
+};
+
+subtest 'cache key does not collapse to primary key alone (CPANSec CWE-639)' => sub {
+    my $db_file = create_test_db();
+
+    my $schema = DBIx::Class::Async::Schema->connect(
+        "dbi:SQLite:dbname=$db_file", undef, undef, {},
+        {
+            workers      => 2,
+            schema_class => 'TestSchema',
+            async_loop   => $loop,
+            cache_ttl    => 60,
+        }
+    );
+
+    $schema->await($schema->deploy({ add_drop_table => 1 }));
+
+    if ($schema && $schema->{_async_db}{_cache}) {
+        $schema->{_async_db}{_cache}->clear;
+    }
+
+    # A single row, id => 1, "owned" by alice (using 'name' to stand in
+    # for an owner/tenant predicate, as the test schema has no dedicated
+    # owner column).
+    $schema->await(
+        $schema->resultset('User')
+               ->create({
+                    name   => 'alice',
+                    email  => 'alice@example.com',
+                    age    => 30,
+                    active => 1,
+                })
+    );
+
+    # alice queries for her own row scoped by id AND name, this populates
+    # the cache.
+    my $alice_result = $schema->await(
+        $schema->resultset('User')
+               ->search({ id => 1, name => 'alice' })
+               ->all
+    );
+    is(scalar @$alice_result, 1, "alice's own scoped query returns her row");
+
+    # bob queries for the SAME id but a DIFFERENT name/owner predicate.
+    # The real database correctly returns nothing (no row matches
+    # id => 1 AND name => 'bob'). Before the fix, the cache key was
+    # collapsed to just { id => 1 } as soon as a primary key appeared in
+    # the condition, so this would incorrectly be served alice's cached
+    # row.
+    my $bob_result = $schema->await(
+        $schema->resultset('User')
+               ->search({ id => 1, name => 'bob' })
+               ->all
+    );
+    is(scalar @$bob_result, 0,
+        "a different owner's identically-id-scoped query does not receive alice's cached row");
+
+    $schema->disconnect;
+};
+
+subtest 'query cache is isolated per connection (CPANSec CWE-639)' => sub {
+    my $db_file_1 = create_test_db();
+    my $db_file_2 = create_test_db();
+
+    my $schema1 = DBIx::Class::Async::Schema->connect(
+        "dbi:SQLite:dbname=$db_file_1", undef, undef, {},
+        {
+            workers      => 2,
+            schema_class => 'TestSchema',
+            async_loop   => $loop,
+            cache_ttl    => 60,
+        }
+    );
+    $schema1->await($schema1->deploy({ add_drop_table => 1 }));
+    $schema1->{_async_db}{_cache}->clear if $schema1->{_async_db}{_cache};
+
+    my $schema2 = DBIx::Class::Async::Schema->connect(
+        "dbi:SQLite:dbname=$db_file_2", undef, undef, {},
+        {
+            workers      => 2,
+            schema_class => 'TestSchema',
+            async_loop   => $loop,
+            cache_ttl    => 60,
+        }
+    );
+    $schema2->await($schema2->deploy({ add_drop_table => 1 }));
+    $schema2->{_async_db}{_cache}->clear if $schema2->{_async_db}{_cache};
+
+    # Same primary key (id => 1) in both databases, but different data,
+    # e.g. two tenants, each with their own database, whose row 1 belongs
+    # to a different person.
+    $schema1->await($schema1->resultset('User')->create({
+        name   => 'db1-user',
+        email  => 'db1@example.com',
+        age    => 41,
+        active => 1,
+    }));
+    $schema2->await($schema2->resultset('User')->create({
+        name   => 'db2-user',
+        email  => 'db2@example.com',
+        age    => 42,
+        active => 1,
+    }));
+
+    # Populate schema1's cache for id => 1.
+    my $r1 = $schema1->await(
+        $schema1->resultset('User')
+                ->search({ id => 1 })
+                ->all
+    );
+    is($r1->[0]->name, 'db1-user', "schema1's own row is returned");
+
+    # schema2 queries the identical condition against a completely
+    # different database connection. Before the fix, both connections'
+    # caches were backed by one process-global CHI::Driver::Memory
+    # datastore, so this could incorrectly return schema1's cached row.
+    my $r2 = $schema2->await(
+        $schema2->resultset('User')
+                ->search({ id => 1 })
+                ->all
+    );
+    is($r2->[0]->name, 'db2-user',
+        "schema2 sees its own database's row, not schema1's cached row");
+
+    $schema1->disconnect;
+    $schema2->disconnect;
+};
+
 done_testing;

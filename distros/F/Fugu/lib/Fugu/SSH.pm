@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::SSH;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use Fcntl     qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
 use Fugu::CLI qw(EXIT_SUCCESS EXIT_ERROR);
@@ -52,30 +52,67 @@ use constant {
 sub new ( $class, %args )
 {
 	my $self = bless {
-		host     => $args{host} // '127.0.0.1',
-		port     => $args{port} // 22,
-		user     => $args{user} // 'root',
-		password => $args{password},
-		timeout  => $args{timeout} // DEFAULT_TIMEOUT,
+		host        => $args{host} // '127.0.0.1',
+		port        => $args{port} // 22,
+		user        => $args{user} // 'root',
+		password    => $args{password},
+		timeout     => $args{timeout} // DEFAULT_TIMEOUT,
+		known_hosts => $args{known_hosts},
+		strict      => $args{strict} // 0,
 	}, $class;
 
 	return $self;
 }
 
 # $self->_connect:
-#	Open the SSH connection. Authenticate with the SSH agent first,
-#	then with the password as a fallback. The method returns a
-#	Net::SSH2 object on success.
+#	Open the SSH connection. In the strict mode, verify the host
+#	key between the connect and the authentication: the fallback
+#	sends the password, and a password that reaches the wrong host
+#	is a lost password. Authenticate with the SSH agent first, then
+#	with the password as a fallback. The method returns a Net::SSH2
+#	object on success.
 sub _connect ($self)
 {
 	eval { require Net::SSH2; 1 }
 	    or die "Fugu::SSH needs Net::SSH2: $@";
+
+	# Net::SSH2 0.60 renamed the check method, and it fixed the
+	# argument order to (policy, known_hosts_path). The test is
+	# static, so it runs before the connect.
+	if ( $self->{strict} && !Net::SSH2->can('check_hostkey') ) {
+		die "The strict mode needs Net::SSH2 0.60 or later\n";
+	}
 
 	my $ssh2 = Net::SSH2->new;
 	$ssh2->timeout( $self->{timeout} * 1000 );    # milliseconds
 
 	if ( !$ssh2->connect( $self->{host}, $self->{port} ) ) {
 		return;
+	}
+
+	if ( $self->{strict} ) {
+
+		# The known hosts file of the back end when the caller
+		# names none.
+		my $file = $self->{known_hosts} // '~/.ssh/known_hosts';
+
+		my @check = ( Net::SSH2::LIBSSH2_HOSTKEY_POLICY_STRICT() );
+		push @check, $self->{known_hosts}
+		    if defined $self->{known_hosts};
+
+		unless ( $ssh2->check_hostkey(@check) ) {
+
+			# The error of the back end tells a wrong key
+			# from a file that holds no key for the host.
+			my $reason = ( $ssh2->error )[2];
+			$reason = 'no verified key'
+			    unless defined $reason && length $reason;
+
+			$ssh2->disconnect;
+			die sprintf "Cannot verify the host key of %s"
+			    . " port %d against %s: %s\n",
+			    $self->{host}, $self->{port}, $file, $reason;
+		}
 	}
 
 	# Try the SSH agent authentication first when SSH_AUTH_SOCK is set
@@ -180,31 +217,48 @@ sub run_command ( $self, $command )
 	};
 }
 
+# $self->_ssh_argv:
+#	The ssh(1) argument list of interactive. The list always holds
+#	more than one element, so perl runs no shell. The permissive
+#	mode lowers the log level to hide the line that reports a new
+#	key. The strict mode must show the host-key diagnosis, so it
+#	keeps the level. ssh(1) also reads /etc/ssh/ssh_known_hosts: an
+#	entry that an administrator wrote is a local trust decision, so
+#	the list never sets GlobalKnownHostsFile.
+sub _ssh_argv ($self)
+{
+	my @options;
+	if ( $self->{strict} ) {
+		push @options, '-o', 'StrictHostKeyChecking=yes';
+		push @options, '-o', "UserKnownHostsFile=$self->{known_hosts}"
+		    if defined $self->{known_hosts};
+	}
+	else {
+		push @options,
+		    '-o', 'StrictHostKeyChecking=no',
+		    '-o', 'UserKnownHostsFile=/dev/null',
+		    '-o', 'LogLevel=ERROR';
+	}
+
+	return ( 'ssh', @options, '-p', $self->{port},
+		"$self->{user}\@$self->{host}",
+	);
+}
+
 sub interactive ($self)
 {
 	# For interactive sessions, fall back to the system ssh command.
 	# Net::SSH2 does not give correct TTY control for interactive
-	# use.
-	my @cmd = (
-		'ssh',
-		'-o',
-		'StrictHostKeyChecking=no',
-		'-o',
-		'UserKnownHostsFile=/dev/null',
-		'-o',
-		'LogLevel=ERROR',
-		'-p',
-		$self->{port},
-		"$self->{user}\@$self->{host}",
-	);
-
+	# use. ssh(1) itself refuses the session for a host key that
+	# does not verify, and returns 255.
+	#
 	# Return the child's exit code, not the raw wait status. The
 	# callers, and finally the fuguvm exit status, expect a 0-255
 	# code. A raw status of 256 for a remote exit code of 1 would
 	# become exit(256) -> 0. That result silently turns a failed
 	# remote command into success, for example a failed `prove` run
 	# driven over stdin.
-	return Fugu::Process->exit_code( system(@cmd) );
+	return Fugu::Process->exit_code( system( $self->_ssh_argv ) );
 }
 
 # $self->write_file($remote_path, $content, $mode):

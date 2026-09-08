@@ -18,9 +18,7 @@
  *   SHM_HAS_COUNTERS  -- generate incr/decr/incr_by, max/min, and integer cas (integer values only)
  */
 
-/* ================================================================
- * Part 1: Shared definitions (included once)
- * ================================================================ */
+/* ---- Part 1: shared definitions (included once) ---- */
 
 #ifndef SHM_DEFS_H
 #define SHM_DEFS_H
@@ -57,17 +55,15 @@
 
 #define SHM_MAGIC       0x53484D31U  /* "SHM1" */
 #define SHM_VERSION     10U  /* 10: added the occupancy bitmap region (layout change) */
-/* Ceiling on new_sharded's shard count.  Each shard is a whole map with its own
- * 1024-slot reader table, so this is already far past anything useful; the hard
- * requirement is only that the power-of-two round-up cannot overflow. */
+/* Ceiling on new_sharded's shard count: the power-of-two round-up must not
+ * overflow. */
 #define SHM_MAX_SHARDS  4096U
 
 #ifndef SHM_READER_SLOTS
 #define SHM_READER_SLOTS 1024  /* max concurrent reader processes for dead-process recovery */
 #endif
-/* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
- * cleared on clean release.  A writer scans these SHM_OCC_WORDS words to visit
- * only OCCUPIED slots (O(words + live readers)) instead of all SHM_READER_SLOTS. */
+/* One bit per reader slot, set on claim and cleared on clean release, so a
+ * writer's drain scan visits only occupied slots. */
 #define SHM_OCC_WORDS   (((SHM_READER_SLOTS) + 63) / 64)   /* 16 for 1024 slots */
 #define SHM_OCC_BYTES   ((uint64_t)SHM_OCC_WORDS * 8)      /* 128 bytes */
 #define SHM_INITIAL_CAP 16
@@ -76,6 +72,11 @@
 
 /* UINT32_MAX = use default TTL; 0 = no TTL; other = per-key TTL */
 #define SHM_TTL_USE_DEFAULT UINT32_MAX
+
+/* Which half of the 64-bit hash picks the shard.  A set keeps the scheme it was
+ * written under: re-routing would move keys between shard files. */
+#define SHM_ROUTING_LEGACY 0  /* low half, the half the in-shard probe uses */
+#define SHM_ROUTING_SPLIT  1  /* high half, which the slot index ignores */
 
 #define SHM_IS_EXPIRED(h, i, now) \
     ((h)->expires_at && (h)->expires_at[(i)] && \
@@ -89,7 +90,6 @@ static inline uint32_t shm_now(void) {
     return (uint32_t)ts.tv_sec;
 }
 
-/* Compute expiry timestamp with overflow protection */
 static inline uint32_t shm_expiry_ts(uint32_t ttl) {
     uint64_t sum = (uint64_t)shm_now() + ttl;
     return (sum > UINT32_MAX) ? UINT32_MAX : (uint32_t)sum;
@@ -104,16 +104,13 @@ static inline uint32_t shm_expiry_ts(uint32_t ttl) {
  * Compile-time check via negative-size array trick: */
 typedef char shm_tag_invariant_check[(SHM_TOMBSTONE < SHM_TAG_MIN) ? 1 : -1];
 
-/* SIMD helper: find next LIVE slot (state >= SHM_TAG_MIN) in states[],
- * starting at position *pos. Returns 1 if found (updates *pos), 0 if
- * no live slot found before cap. */
+/* Find the next live slot at or after *pos; 1 and *pos updated, or 0. */
 static inline int shm_find_next_live(const uint8_t *states, uint32_t cap, uint32_t *pos) {
     uint32_t i = *pos;
 #ifdef __SSE2__
-    /* Check if byte is NOT empty(0) and NOT tombstone(1) using unsigned
-     * saturation: sub_sat(byte, 1) > 0 iff byte >= 2 = SHM_TAG_MIN */
+    /* Live is neither empty(0) nor tombstone(1), by unsigned saturation:
+     * sub_sat(byte, 1) > 0 iff byte >= 2 = SHM_TAG_MIN */
     __m128i ones = _mm_set1_epi8(1);
-    /* Align to 16-byte boundary first (scalar) */
     uint32_t align_end = (i + 15) & ~(uint32_t)15;
     if (align_end > cap) align_end = cap;
     for (; i < align_end; i++) {
@@ -128,17 +125,14 @@ static inline int shm_find_next_live(const uint8_t *states, uint32_t cap, uint32
         if (mask) { *pos = i + __builtin_ctz(mask); return 1; }
     }
 #endif
-    /* Scalar fallback */
     for (; i < cap; i++) {
         if (states[i] >= SHM_TAG_MIN) { *pos = i; return 1; }
     }
     return 0;
 }
 
-/* SIMD probe helper: scan up to 16 state bytes from a given position
- * for tag matches or EMPTY slots. Returns via *match_mask (tag hits)
- * and *empty_mask (empty slots). Caller uses bitmasks to iterate.
- * Works on contiguous memory -- caller must handle table wrap. */
+/* Scan 16 state bytes for tag hits and empty slots, returned as bitmasks.
+ * Contiguous memory only: the caller handles table wrap. */
 #ifdef __SSE2__
 static inline void shm_probe_group(const uint8_t *states, uint32_t pos,
                                     uint8_t tag, uint16_t *match_mask,
@@ -152,58 +146,42 @@ static inline void shm_probe_group(const uint8_t *states, uint32_t pos,
 #endif
 
 #define SHM_ARENA_NUM_CLASSES 16  /* 2^4..2^19 = 16..524288 */
+#define SHM_EVICT_SEARCH 32       /* oldest entries searched for a block of the request's class */
 #define SHM_ARENA_MIN_ALLOC   16
 
-/* ---- UTF-8 and inline-string flag packing ---- */
-/*
- * key_len / val_len layout (uint32_t):
- *   bit 31       = UTF-8 flag
- *   bit 30       = INLINE flag (string <= 7 bytes stored in off+len fields)
- *   bits 0-29    = length (max ~1GB)
- *
- * When INLINE is set:
- *   The associated _off field (4 bytes) + bits 0-23 of _len (3 bytes) hold
- *   up to 7 bytes of string data.  Length is in bits 24-26 of _len (0-7).
- *   bits 27-29 are reserved (0).
- *
- * When INLINE is NOT set (arena mode):
- *   _off = arena offset, _len bits 0-29 = length.
- */
+/* ---- UTF-8 and inline-string flag packing ----
+ * key_len / val_len (uint32_t): bit 31 = UTF-8, bit 30 = inline, bits 0-29 =
+ * length.  Inline: _off plus bits 0-23 of _len hold up to 7 bytes of data,
+ * bits 24-26 its length.  Arena: _off is the offset, bits 0-29 the length. */
 
 #define SHM_UTF8_FLAG    ((uint32_t)0x80000000U)
 #define SHM_INLINE_FLAG  ((uint32_t)0x40000000U)
 #define SHM_LEN_MASK     ((uint32_t)0x3FFFFFFFU)
 #define SHM_INLINE_MAX   7  /* max bytes that fit inline */
 
-/* Arena-mode packing (unchanged for <=1GB strings) */
 #define SHM_PACK_LEN(len, utf8)   ((uint32_t)(len) | ((utf8) ? SHM_UTF8_FLAG : 0))
 #define SHM_UNPACK_LEN(packed)    ((uint32_t)((packed) & SHM_LEN_MASK))
 #define SHM_UNPACK_UTF8(packed)   (((packed) & SHM_UTF8_FLAG) != 0)
 #define SHM_IS_INLINE(packed)     (((packed) & SHM_INLINE_FLAG) != 0)
 
-/* Get string length for either inline or arena mode */
 #define SHM_STR_LEN(packed) \
     (SHM_IS_INLINE(packed) ? shm_inline_len(packed) : SHM_UNPACK_LEN(packed))
 
-/* Inline packing: store len in bits 24-26, data in _off (4B) + _len bits 0-23 (3B) */
 static inline void shm_inline_pack(uint32_t *off, uint32_t *len_field,
                                     const char *str, uint32_t slen, bool utf8) {
     uint32_t lf = SHM_INLINE_FLAG | ((uint32_t)slen << 24);
     if (utf8) lf |= SHM_UTF8_FLAG;
     uint32_t o = 0;
-    /* copy first 4 bytes into off, next 3 into lower 24 bits of len_field */
     memcpy(&o, str, slen > 4 ? 4 : slen);
     if (slen > 4) {
         uint32_t rest = 0;
         memcpy(&rest, str + 4, slen - 4);
         lf |= rest;
     }
-    /* Publish through the inline-empty state (SHM_INLINE_FLAG with length 0).
-     * shm_str_free is a no-op on an inline field, so a writer killed between
-     * these stores can never leave (off,len) describing a block the free list
-     * would misclassify -- or, here, leave inline data bytes being read as an
-     * arena offset.  The stores must be atomic: a plain interim store is dead
-     * (overwritten with no intervening read) and would be optimised away. */
+    /* Publish through the inline-empty state: shm_str_free is a no-op on an
+     * inline field, so a writer killed between these stores leaves no (off,len)
+     * the free list would misclassify.  Atomic, or the dead interim store is
+     * optimised away. */
     __atomic_store_n(len_field, SHM_INLINE_FLAG, __ATOMIC_RELEASE);
     __atomic_store_n(off, o, __ATOMIC_RELEASE);
     __atomic_store_n(len_field, lf, __ATOMIC_RELEASE);
@@ -213,7 +191,6 @@ static inline uint32_t shm_inline_len(uint32_t len_field) {
     return (len_field >> 24) & 0x7;
 }
 
-/* Read inline string into caller buffer. Returns pointer to data (buf). */
 static inline const char *shm_inline_read(uint32_t off, uint32_t len_field,
                                            char *buf) {
     uint32_t slen = shm_inline_len(len_field);
@@ -237,10 +214,8 @@ static inline const char *shm_str_ptr(uint32_t off, uint32_t len_field,
     }
     uint32_t len = SHM_UNPACK_LEN(len_field);
     if ((uint64_t)off + len > arena_cap) {
-        /* off/len come from the mmap'd node and a local peer can corrupt the
-         * backing file.  Returning arena+off here would hand an out-of-bounds
-         * pointer straight to newSVpvn (CWE-125); deliver an empty string, the
-         * pointer form of what shm_str_copy does with zeros. */
+        /* off/len come from a peer-writable node: an out-of-bounds pointer
+         * would reach newSVpvn (CWE-125).  Deliver an empty string. */
         *out_len = 0;
         return inline_buf;
     }
@@ -284,7 +259,18 @@ typedef struct {
                                  Carved from the reserved pad -- struct size is unchanged
                                  (see the _Static_assert below) so there is NO on-disk
                                  version bump; a pre-freeze file has this byte 0 (zeroed pad). */
-    uint8_t  _reserved1[31];  /* 97-127 */
+    uint8_t  routing;         /* 97: SHM_ROUTING_*; carved from the pad like `sealed`,
+                                 so a file written before 0.20 reads 0 (legacy). */
+    uint8_t  shard_log2;      /* 98: log2(shards)+1 for a set written by 0.20+; 0 =
+                                 a single map, a set predating the stamp, a shard
+                                 the creator had not stamped when it died, or one
+                                 created by an open that was then refused */
+    uint8_t  _reserved1a;     /* 99 */
+    uint32_t pop_cursor;      /* 100: next slot a non-LRU pop or drain examines (wraps);
+                                 carved from the pad, so a file written before it reads 0 */
+    uint32_t shift_cursor;    /* 104: the slot above the next one a non-LRU shift examines,
+                                 0 meaning the top of the table */
+    uint8_t  _reserved1[20];  /* 108-127 */
 
     /* ---- Cache line 2 (128-191): rwlock + write-hot fields ---- */
     uint32_t wlock;           /* 128: WRITER word ONLY: 0 (free) or 0x80000000|pid.  NOT a reader count. */
@@ -306,15 +292,16 @@ typedef struct {
 } ShmHeader;
 
 SHM_STATIC_ASSERT(sizeof(ShmHeader) == 256, "ShmHeader must be exactly 256 bytes (4 cache lines)");
+/* shm_create_sharded claims the shard count by CASing shard_log2 across
+ * processes: libatomic's fallback lock table is per process, so both creators
+ * would believe they won. */
+SHM_STATIC_ASSERT(__atomic_always_lock_free(sizeof(((ShmHeader *)0)->shard_log2), 0),
+                  "cross-process CAS on shard_log2 needs a lock-free byte atomic");
 
-/* Per-process slot for dead-process recovery.  In the reader-slots-only rwlock a
- * reader's ENTIRE contribution to the shared lock is `rdepth` in its OWN slot --
- * there is no separate shared reader counter to fall out of sync with it -- so a
- * dead reader's contribution is exactly this one word, which a draining writer
- * neutralises by clearing the slot's pid (the scan then ignores the slot).  No
- * orphaned counter can exist, so there is no quiescent force-reset and sustained
- * readers cannot starve a writer.  _rsv1/_rsv2 are kept only to preserve the
- * 16-byte slot size across the already-released builds. */
+/* Per-process slot for dead-process recovery.  A reader's entire contribution
+ * to the lock is `rdepth` in its own slot, so a draining writer neutralises a
+ * dead reader by clearing the slot's pid.  _rsv1/_rsv2 preserve the 16-byte
+ * slot size of the released builds. */
 typedef struct {
     uint32_t pid;      /* 0 = unclaimed */
     uint32_t rdepth;   /* read-locks THIS process currently holds (recursion-safe) */
@@ -358,6 +345,7 @@ typedef struct ShmHandle_s {
     struct ShmHandle_s **shard_handles; /* NULL for single map */
     uint32_t   num_shards;
     uint32_t   shard_mask;     /* num_shards - 1 (power of 2) */
+    uint8_t    route_high;     /* shard on the high hash half (see SHM_ROUTING_*) */
     uint32_t   shard_iter;     /* current shard for each()/cursor iteration */
     uint32_t   shard_rr;       /* round-robin start for pop/shift/drain: separate
                                   from shard_iter so draining a sharded map during
@@ -433,11 +421,10 @@ static inline void shm_rwlock_spin_pause(void) {
 #define SHM_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define SHM_RWLOCK_WR(pid)    (SHM_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & SHM_RWLOCK_PID_MASK))
 
-/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
- * process that crashed while holding the lock and lingers unreaped would never
- * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
- * this module); if /proc is unreadable we fall back to "alive" (safe: we never
- * force-recover a possibly-live holder). */
+/* A zombie still answers kill(pid,0) as alive, so a crashed lock holder that
+ * lingers unreaped would never be recovered: treat /proc/<pid>/stat state 'Z'
+ * as dead.  An unreadable /proc falls back to alive, never force-recovering a
+ * possibly-live holder. */
 static inline int shm_pid_is_zombie(uint32_t pid) {
     char path[32], buf[256];
     snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
@@ -452,9 +439,8 @@ static inline int shm_pid_is_zombie(uint32_t pid) {
     if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
     return rp[1] == ' ' && rp[2] == 'Z';
 }
-/* 1 if alive or unknown, 0 if definitely dead.  Cannot detect PID reuse: a
- * recycled PID reports "alive" and the slot is not reclaimed until that
- * process exits.  See "Crash Safety" in the POD. */
+/* 1 if alive or unknown, 0 if definitely dead.  A recycled pid reports alive
+ * and its slot is not reclaimed until that process exits. */
 static inline int shm_pid_alive(uint32_t pid) {
     if (pid == 0) return 0; /* no owner recorded: not a live holder.  kill(0,0)
                                signals our own process group, so it could never
@@ -463,14 +449,11 @@ static inline int shm_pid_alive(uint32_t pid) {
     return !shm_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Forward declaration -- defined later in the LRU helpers section. */
 static void shm_lru_rebuild_if_corrupt(ShmHandle *h);
 static void shm_recount_counters(ShmHandle *h);
 
-/* Force-recover a stale write lock left by a dead process.
- * CAS to OUR pid to hold the lock while fixing seqlock, then release.
- * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent
- * recovering process can detect and re-recover if we crash mid-recovery. */
+/* Force-recover a stale write lock left by a dead process: CAS to our own pid,
+ * so a later recoverer can re-recover if we crash mid-repair. */
 static inline void shm_recover_stale_lock(ShmHandle *h, uint32_t observed_wlock) {
     ShmHeader *hdr = h->hdr;
     uint32_t mypid = SHM_RWLOCK_WR((uint32_t)getpid());
@@ -478,8 +461,8 @@ static inline void shm_recover_stale_lock(ShmHandle *h, uint32_t observed_wlock)
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
     /* Clear the dead writer's odd seq first so spinning readers proceed: the
-     * repair below touches only the LRU arrays and the counters, neither of
-     * which a lock-free reader reads. */
+     * repair below touches only the LRU arrays and counters, which no lock-free
+     * reader reads. */
     uint32_t seq = __atomic_load_n(&hdr->seq, __ATOMIC_RELAXED);
     if (seq & 1)
         __atomic_store_n(&hdr->seq, seq + 1, __ATOMIC_RELEASE);
@@ -494,9 +477,8 @@ static inline void shm_recover_stale_lock(ShmHandle *h, uint32_t observed_wlock)
 
 static const struct timespec shm_lock_timeout = { SHM_LOCK_TIMEOUT_SEC, 0 };
 
-/* Process-global fork-generation counter.  Incremented in the pthread_atfork
- * child callback so every open handle detects a fork transition on the next
- * lock call without paying a getpid() syscall on the hot path. */
+/* Bumped in the pthread_atfork child callback so a handle detects a fork on
+ * its next lock call without a getpid() on the hot path. */
 static uint32_t shm_fork_gen = 1;
 static pthread_once_t shm_atfork_once = PTHREAD_ONCE_INIT;
 static void shm_on_fork_child(void) {
@@ -506,14 +488,10 @@ static void shm_atfork_init(void) {
     pthread_atfork(NULL, NULL, shm_on_fork_child);
 }
 
-/* Ensure this process owns a reader slot.  Called from the lock helpers so
- * that fork()'d children pick up their own slot lazily instead of sharing
- * the parent's.  Hot-path is a single relaxed load + compare; only on a
- * fork-generation mismatch do we touch getpid() and scan slots. */
-/* Occupancy bitmap: set a slot's bit when it is claimed, clear it on clean
- * release.  SEQ_CST so a set bit is ordered before the slot's rdepth can go
- * non-zero (bit set in claim, which precedes any rdlock), letting a writer's
- * SEQ_CST bitmap scan never miss a slot a committed reader holds. */
+/* Set a slot's bit on claim, clear it on a clean release: a crash leaves the
+ * bit set and a later writer scan or re-claim reclaims it, as it does the pid.
+ * SEQ_CST: the bit-set is ordered before the slot's rdepth can go non-zero, so
+ * a writer's bitmap scan never misses a committed reader. */
 static inline void shm_occ_set(ShmHandle *h, uint32_t s) {
     __atomic_fetch_or(&h->occ[s >> 6], (uint64_t)1 << (s & 63), __ATOMIC_SEQ_CST);
 }
@@ -521,6 +499,8 @@ static inline void shm_occ_clear(ShmHandle *h, uint32_t s) {
     __atomic_fetch_and(&h->occ[s >> 6], ~((uint64_t)1 << (s & 63)), __ATOMIC_SEQ_CST);
 }
 
+/* Ensure this process owns a reader slot, so a forked child takes its own
+ * rather than sharing the parent's.  The hot path is one relaxed load. */
 static inline void shm_claim_reader_slot(ShmHandle *h) {
     uint32_t cur_gen = __atomic_load_n(&shm_fork_gen, __ATOMIC_RELAXED);
     if (__builtin_expect(cur_gen == h->cached_fork_gen && h->my_slot_idx != UINT32_MAX, 1))
@@ -550,10 +530,8 @@ static inline void shm_claim_reader_slot(ShmHandle *h) {
             return;
         }
     }
-    /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
-     * if its rdepth>0: clearing pid drops the dead reader's entire contribution
-     * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
-     * claim it. */
+    /* Pass 2: no free slot, so reclaim one whose owner is dead.  Safe even at
+     * rdepth>0: a writer scan ignores rdepth when pid==0. */
     for (uint32_t i = 0; i < SHM_READER_SLOTS; i++) {
         uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
         if (dpid == 0 || dpid == now_pid || shm_pid_alive(dpid)) continue;
@@ -566,16 +544,12 @@ static inline void shm_claim_reader_slot(ShmHandle *h) {
             return;
         }
     }
-    /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
-     * slotless path (lock still works; recovery of THIS reader's death is the
-     * documented slotless limitation). */
+    /* Table full: my_slot_idx stays UINT32_MAX and the handle runs slotless.
+     * The lock still works; this reader's death is not recoverable. */
 }
 
-/* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
- * it, force-recover the lock (which also rebuilds the LRU list if it was left
- * half-linked, all under the recovered write lock).  Dead READERS need no action
- * here: only a writer that owns wlock drains readers, and it clears dead readers
- * inline in its own scan. */
+/* After a futex-wait timeout, force-recover the lock if a dead writer holds it.
+ * Dead readers need nothing here: the draining writer clears them in its scan. */
 static inline void shm_recover_after_timeout(ShmHandle *h) {
     ShmHeader *hdr = h->hdr;
     uint32_t val = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
@@ -586,11 +560,9 @@ static inline void shm_recover_after_timeout(ShmHandle *h) {
     }
 }
 
-/* Bump/drop the parked-waiter hint.  Both readers (blocked at the gate) and
- * writers (blocked acquiring wlock) wait on the wlock futex and use this, so
- * wrunlock/recover know whether a FUTEX_WAKE is worth a syscall.  A waiter
- * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
- * (harmless); it can never under-count, so no wakeup is lost. */
+/* Parked-waiter hint, so wrunlock knows whether a FUTEX_WAKE is worth a
+ * syscall.  A waiter SIGKILLed while parked over-counts, costing at most a
+ * spurious wake; it can never under-count, so no wakeup is lost. */
 static inline void shm_park(ShmHandle *h) {
     __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
@@ -598,12 +570,10 @@ static inline void shm_unpark(ShmHandle *h) {
     __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
 
-/* Publish (inc) / retract (dec) this reader's presence -- its ENTIRE
- * contribution to the lock.  A slotted reader uses its slot's rdepth; a reader
- * that could not claim a slot uses the global slotless_rdepth.  inc() is SEQ_CST
- * so the wlock re-check that follows it in rdlock forms a Dekker handshake with
- * the writer's SEQ_CST wlock-store + rdepth-scan.  dec() peels slotless first so
- * a slot claimed mid-hold cannot misattribute the decrement. */
+/* Publish or retract this reader's presence.  inc() is SEQ_CST so the wlock
+ * re-check after it in rdlock forms a Dekker handshake with the writer's
+ * wlock-store and rdepth-scan.  dec() peels slotless first, so a slot claimed
+ * mid-hold cannot misattribute the decrement. */
 static inline void shm_rdepth_inc(ShmHandle *h) {
     if (h->my_slot_idx != UINT32_MAX) {
         __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
@@ -621,9 +591,8 @@ static inline void shm_rdepth_dec(ShmHandle *h) {
     }
 }
 
-/* Wake a writer that may be draining readers (it waits on drain_seq).  Called
- * after every rdepth decrement so a released read lock lets the writer re-scan
- * promptly instead of waiting out its timeout. */
+/* Wake a writer draining readers, so a released read lock lets it re-scan
+ * instead of waiting out its timeout. */
 static inline void shm_reader_wake_drain(ShmHandle *h) {
     if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
         __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
@@ -632,21 +601,17 @@ static inline void shm_reader_wake_drain(ShmHandle *h) {
 }
 
 static inline void shm_rwlock_rdlock(ShmHandle *h) {
-    /* Frozen (read-only) view: the file is sealed and immutable, so no writer can
-     * ever exist (mutators croak, a read-write reopen of a sealed file is refused).
-     * There is nothing to exclude -- and the mapping is PROT_READ, so publishing
-     * rdepth into a reader slot would fault.  Skip the lock entirely. */
+    /* Frozen view: no writer can exist, and the PROT_READ mapping would fault
+     * on the rdepth publish.  Skip the lock entirely. */
     if (h->readonly) return;
     shm_claim_reader_slot(h);
     ShmHeader *hdr = h->hdr;
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_ACQUIRE);
         if (cur == 0) {
-            /* Optimistically take the read: publish rdepth, then re-check wlock.
-             * SEQ_CST inc + SEQ_CST load vs the writer's SEQ_CST wlock CAS +
-             * SEQ_CST rdepth scan: by the single total order of SEQ_CST ops the
-             * two sides cannot both miss each other, so we never hold
-             * concurrently with a writer. */
+            /* Publish rdepth, then re-check wlock: against the writer's CAS and
+             * rdepth scan, the SEQ_CST total order forbids both sides missing
+             * each other. */
             shm_rdepth_inc(h);
             if (__atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST) == 0)
                 return;                       /* no writer after our publish -> we hold the read lock */
@@ -691,11 +656,9 @@ static inline void shm_rwlock_rdunlock(ShmHandle *h) {
 }
 
 static inline void shm_rwlock_wrlock(ShmHandle *h) {
-    /* A frozen (read-only) handle never reaches here: every mutator XSUB croaks
-     * on h->readonly BEFORE taking any lock (including the counter fast paths
-     * that write under the READ lock).  This function stays pure C with no Perl
-     * API -- xt/slotless_reader_recovery.t compiles it standalone (plain cc, no
-     * perl.h), so a Perl_croak here would break that harness. */
+    /* Keep this pure C with no Perl API: xt/slotless_reader_recovery.t compiles
+     * it standalone with plain cc, so a Perl_croak here breaks that harness.
+     * A frozen handle never arrives: every mutator croaks before locking. */
     shm_claim_reader_slot(h);  /* refresh cached_pid across fork */
     ShmHeader *hdr = h->hdr;
     /* Encode PID in the wlock word itself (0x80000000 | pid) to eliminate any
@@ -733,17 +696,14 @@ static inline void shm_rwlock_wrlock(ShmHandle *h) {
         shm_unpark(h);
         spin = 0;
     }
-    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
-     * yield).  Drain the readers that were already holding when we won the CAS.
-     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
-     * of the Dekker handshake. */
+    /* Phase 2: we own wlock, so no new reader joins.  Drain those already
+     * holding; the CAS above and the loads below are the writer side of the
+     * Dekker handshake. */
     for (;;) {
         uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_RELAXED);  /* snapshot BEFORE scan */
         int busy = 0;
-        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
-         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
-         * this scan, so no held slot is skipped).  O(SHM_OCC_WORDS + live readers)
-         * instead of O(SHM_READER_SLOTS). */
+        /* Occupied slots only: a committed reader's bit is set in its claim,
+         * before its rdepth++, so this SEQ_CST scan skips no held slot. */
         for (uint32_t w = 0; w < SHM_OCC_WORDS; w++) {
             uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
             while (word) {
@@ -754,9 +714,8 @@ static inline void shm_rwlock_wrlock(ShmHandle *h) {
                 uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
                 if (pid == 0) continue;                     /* stale rdepth on a freed slot */
                 if (!shm_pid_alive(pid)) {
-                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
-                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
-                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    /* Dead reader: drop its pid so the slot stops counting.  The
+                     * occ bit stays set, so as not to race a claimant. */
                     uint32_t ep = pid;
                     __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
                             0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
@@ -812,7 +771,6 @@ static inline uint32_t shm_seqlock_read_begin(ShmHandle *h) {
         } else if (h->readonly) {
             return s;   /* odd seq with no holder: nothing will ever republish */
         }
-        /* Writer is alive, yield CPU */
         struct timespec ts = {0, 1000000}; /* 1ms */
         nanosleep(&ts, NULL);
         spin = 0;
@@ -826,9 +784,9 @@ static inline int shm_seqlock_read_retry(uint32_t *seq, uint32_t start) {
 
 static inline void shm_seqlock_write_begin(uint32_t *seq) {
     __atomic_add_fetch(seq, 1, __ATOMIC_RELEASE);  /* seq becomes odd */
-    /* StoreStore (Linux write_seqcount_begin's smp_wmb): the odd seq must be
-     * visible before the entry writes that follow, or an ARM64 reader could
-     * load an even seq yet observe half-written data and pass read_retry. */
+    /* StoreStore: the odd seq must be visible before the writes that follow, or
+     * an ARM64 reader loads an even seq over half-written data and passes
+     * read_retry. */
     __atomic_thread_fence(__ATOMIC_RELEASE);
 }
 
@@ -857,10 +815,8 @@ static inline uint32_t shm_arena_alloc(ShmHeader *hdr, char *arena, uint32_t len
 
     if (cls >= 0 && hdr->arena_free[cls] != 0) {
         uint32_t head = hdr->arena_free[cls];
-        /* Free-list heads are peer-writable: a wild head would send both the
-         * pop read below and the caller's string store out of bounds.  Gate
-         * against arena_cap (read-path clamp discipline); on corruption treat
-         * the class as empty and fall back to bump allocation. */
+        /* Free-list heads are peer-writable: a wild head sends the pop read and
+         * the caller's store out of bounds.  Treat as an empty class. */
         if ((uint64_t)head + asize <= hdr->arena_cap) {
             uint32_t next;
             memcpy(&next, arena + head, sizeof(uint32_t));
@@ -873,15 +829,13 @@ static inline uint32_t shm_arena_alloc(ShmHeader *hdr, char *arena, uint32_t len
         uint32_t prev = 0, cur = hdr->arena_large_free;
         while (cur != 0) {
             uint32_t next, blk;
-            /* cur is peer-writable: never dereference a wild offset; abandon
-             * the walk and fall back to bump allocation.  Gating cur+asize
-             * also covers the 8-byte [next][size] read (asize > 2^19 here). */
+            /* cur is peer-writable: abandon the walk rather than dereference a
+             * wild offset.  cur+asize also covers the [next][size] read. */
             if ((uint64_t)cur + asize > hdr->arena_cap) break;
             memcpy(&next, arena + cur, sizeof(uint32_t));
             memcpy(&blk, arena + cur + sizeof(uint32_t), sizeof(uint32_t));
-            /* Exact class match only: every arena size is a power of two, so a
-             * larger block handed to a smaller request would be refiled at the
-             * smaller size on free and its surplus lost for good. */
+            /* Exact class only: a larger block handed to a smaller request is
+             * refiled at the smaller size on free, losing the surplus. */
             if (blk == asize) {
                 if (prev == 0) hdr->arena_large_free = next;
                 else memcpy(arena + prev, &next, sizeof(uint32_t));
@@ -907,9 +861,8 @@ static inline void shm_arena_free_block(ShmHeader *hdr, char *arena,
      * free-list link write below out of bounds.  Leak the block instead. */
     if ((uint64_t)off + asize > hdr->arena_cap) return;
     if (cls < 0) {
-        /* Large block (> 2^19): single first-fit free list keyed by size, so
-         * churn of >512 KiB values recycles instead of leaking to bump-only.
-         * The block (>= 2^20 bytes) has ample room for the [next][size] head. */
+        /* Large block: one first-fit list keyed by size, so churn recycles
+         * instead of leaking to bump-only. */
         uint32_t old_head = hdr->arena_large_free;
         memcpy(arena + off, &old_head, sizeof(uint32_t));                  /* next */
         memcpy(arena + off + sizeof(uint32_t), &asize, sizeof(uint32_t));  /* size */
@@ -930,7 +883,7 @@ static inline int shm_str_store(ShmHeader *hdr, char *arena,
         return 1;
     }
     uint32_t aoff = shm_arena_alloc(hdr, arena, slen);
-    if (aoff == 0 && slen > 0) return 0;
+    if (aoff == 0) return 0;
     memcpy(arena + aoff, str, slen);
     /* Interim inline-empty state -- see shm_inline_pack. */
     __atomic_store_n(len_field, SHM_INLINE_FLAG, __ATOMIC_RELEASE);
@@ -946,7 +899,6 @@ static inline void shm_str_free(ShmHeader *hdr, char *arena,
         shm_arena_free_block(hdr, arena, off, SHM_UNPACK_LEN(len_field));
 }
 
-/* Copy string data (inline or arena) into a destination buffer */
 static inline void shm_str_copy(char *dst, uint32_t off, uint32_t len_field,
                                  const char *arena, uint32_t arena_cap, uint32_t len) {
     if (SHM_IS_INLINE(len_field)) {
@@ -954,11 +906,9 @@ static inline void shm_str_copy(char *dst, uint32_t off, uint32_t len_field,
     } else if ((uint64_t)off + len <= arena_cap) {
         memcpy(dst, arena + off, len);
     } else {
-        /* off/len come from the mmap'd node and a local peer
-         * can corrupt the backing file. A poisoned record delivers zeros here
-         * rather than reading out of bounds (CWE-125). The get path already
-         * bounded this; centralizing it covers every other caller
-         * (each/keys/values/pop/shift/take/swap/drain/cursor). */
+        /* A poisoned record delivers zeros rather than reading out of bounds
+         * (CWE-125).  Every reader that takes an arena pointer instead of
+         * copying bounds off+len against arena_cap itself: grep arena_cap. */
         memset(dst, 0, len);
     }
 }
@@ -973,19 +923,40 @@ static inline uint32_t shm_next_pow2(uint32_t v) {
     return v + 1;
 }
 
-/* Largest power-of-2 table capacity for a given max_entries.
- * Cap at 2^31 (largest power-of-2 table the design supports) before
- * next_pow2: a huge max_entries would otherwise overflow the uint32
- * cast or make next_pow2 return 0, silently yielding a tiny table. */
+/* Largest power-of-2 table capacity for max_entries.  The 2^31 cap comes
+ * before next_pow2: otherwise a huge max_entries overflows the uint32 cast or
+ * makes next_pow2 return 0, silently yielding a tiny table. */
 static inline uint32_t shm_max_tcap_from_entries(uint32_t max_entries) {
     uint64_t want = (uint64_t)max_entries * 4 / 3 + 1;
     uint32_t cap = (want > 0x80000000ULL) ? 0x80000000U : shm_next_pow2((uint32_t)want);
     return cap < SHM_INITIAL_CAP ? SHM_INITIAL_CAP : cap;
 }
 
-/* Convert lru_skip percentage (0-99) to power-of-2 mask used by lru_promote.
- * skip=50->mask=1 (every 2nd), 75->3 (every 4th), 90->15 (every 16th),
- * 95->31 (every 32nd).  Values outside 1..99 disable skipping (mask=0). */
+/* Over the 75% design load: live entries plus tombstones. */
+static inline int shm_over_load(uint32_t size, uint32_t tomb, uint32_t cap) {
+    return (uint64_t)(size + tomb) * 4 > (uint64_t)cap * 3;
+}
+
+/* Enough tombstones to be worth a rehash even under the load factor. */
+static inline int shm_needs_compaction(uint32_t size, uint32_t tomb, uint32_t cap) {
+    return tomb > size || tomb > cap / 4;
+}
+
+/* Under the 25% shrink threshold, and not already at the floor. */
+static inline int shm_under_load(uint32_t size, uint32_t cap) {
+    return cap > SHM_INITIAL_CAP && (uint64_t)size * 4 < cap;
+}
+
+/* The capacity a table holding `size` entries shrinks to -- all the way, in one
+ * call, because the batch removers reach it once per batch, not per entry. */
+static inline uint32_t shm_shrink_target(uint32_t size, uint32_t cap) {
+    while (shm_under_load(size, cap)) cap /= 2;
+    if (cap < SHM_INITIAL_CAP) cap = SHM_INITIAL_CAP;
+    return cap;
+}
+
+/* lru_skip percentage to the promotion mask: 50 -> 1 (every 2nd), 90 -> 15,
+ * 95 -> 31.  Outside 1..99 skipping is off. */
 static inline uint32_t shm_lru_skip_to_mask(uint32_t lru_skip) {
     if (lru_skip == 0 || lru_skip >= 100) return 0;
     uint32_t interval = 100 / (100 - lru_skip);
@@ -1024,9 +995,8 @@ static inline void shm_lru_push_front(ShmHandle *h, uint32_t idx) {
 static inline void shm_lru_promote(ShmHandle *h, uint32_t idx) {
     ShmHeader *hdr = h->hdr;
     if (hdr->lru_head == idx) return;
-    /* Counter-based promotion skip: promote every (mask+1)th access.
-     * Branch-predictor friendly -- the skip branch is nearly always taken.
-     * Tail entry is never skipped to preserve eviction correctness. */
+    /* Promote every (mask+1)th access; the tail is never skipped, or eviction
+     * would take a hot entry. */
     if (hdr->lru_skip > 0 && idx != hdr->lru_tail) {
         static __thread uint32_t promote_ctr = 0;
         if ((++promote_ctr & hdr->lru_skip) != 0)
@@ -1036,20 +1006,9 @@ static inline void shm_lru_promote(ShmHandle *h, uint32_t idx) {
     shm_lru_push_front(h, idx);
 }
 
-/* Validate the LRU doubly-linked list and rebuild it from `states[]` if
- * inconsistent.  Called from the writer-lock recovery path because a dead
- * writer killed mid-`lru_unlink`/`push_front`/`promote` leaves the list in
- * a one-way-broken state that could infinite-loop the next `lru_evict_one`.
- *
- * Rebuild semantics: the list is reconstructed in slot-index order (which
- * is meaningless for LRU correctness -- the clock-eviction algorithm
- * re-establishes locality on the next few promotes).  Loses ordering, not
- * correctness.  Variant-agnostic -- uses only the byte-array `states` and
- * the typeless lru_prev/lru_next arrays. */
-/* Recount size/tombstones from states[].  A writer killed between publishing
- * states[idx] and bumping the counters leaves hdr->size behind the true live
- * count, which makes resize() truncate its save loop and silently drop live
- * entries.  The LRU rebuild below reconciles too, but only when LRU is on. */
+/* Recount size/tombstones from states[]: a writer killed between publishing
+ * states[idx] and bumping the counters leaves size behind the live count, and
+ * resize() then truncates its save loop and drops live entries. */
 static void shm_recount_counters(ShmHandle *h) {
     ShmHeader *hdr = h->hdr;
     uint32_t cap = hdr->table_cap, live = 0, tomb = 0;
@@ -1058,13 +1017,13 @@ static void shm_recount_counters(ShmHandle *h) {
         if (st == SHM_TOMBSTONE) tomb++;
         else if (SHM_IS_LIVE(st)) live++;
     }
-    /* Bracket the stores only: an attach validates size + tombstones together
-     * and would see them torn, but holding the seqlock across the scan above
-     * would stall every reader for O(table_cap). */
+    /* Bracket the stores only: an attach validates size and tombstones
+     * together, but holding the seqlock across the scan above would stall
+     * readers for O(table_cap). */
     shm_seqlock_write_begin(&hdr->seq);
     /* Publish the decreasing counter first: an increase can transiently exceed
-     * table_cap, and a crash there is unrepairable.  Atomic, not plain -- with
-     * plain stores gcc merged both arms into one unconditional sequence. */
+     * table_cap, and a crash there is unrepairable.  Atomic, or gcc merges the
+     * arms into one unconditional sequence. */
     if (tomb <= hdr->tombstones) {
         __atomic_store_n(&hdr->tombstones, tomb, __ATOMIC_RELEASE);
         __atomic_store_n(&hdr->size, live, __ATOMIC_RELEASE);
@@ -1075,6 +1034,10 @@ static void shm_recount_counters(ShmHandle *h) {
     shm_seqlock_write_end(&hdr->seq);
 }
 
+/* Validate the LRU list and rebuild it from states[] if inconsistent: a writer
+ * killed mid-unlink/push_front/promote leaves a one-way break that would
+ * infinite-loop the next eviction.  The rebuild is in slot order, losing
+ * recency but not correctness. */
 static void shm_lru_rebuild_if_corrupt(ShmHandle *h) {
     if (!h->lru_prev) return;  /* LRU disabled */
     ShmHeader *hdr = h->hdr;
@@ -1099,12 +1062,9 @@ static void shm_lru_rebuild_if_corrupt(ShmHandle *h) {
         }
         if (!corrupt && prev_idx != tail) corrupt = 1;
     }
-    /* Orphan check: a dead writer killed between any of states[i]=LIVE,
-     * size++, and shm_lru_push_front leaves a slot in an inconsistent
-     * subset of {states[], chain, hdr->size}.  Counting actual LIVE
-     * entries and comparing against chain_len catches every window
-     * (including the one where size is itself behind LIVE -- comparing
-     * chain_len to hdr->size alone misses that case). */
+    /* Orphan check against the counted live entries, not hdr->size: a writer
+     * killed between states[i]=LIVE, size++ and push_front can leave size
+     * itself behind, which chain_len vs hdr->size would miss. */
     uint32_t live_count = 0;
     if (!corrupt) {
         for (uint32_t i = 0; i < cap; i++)
@@ -1118,16 +1078,12 @@ static void shm_lru_rebuild_if_corrupt(ShmHandle *h) {
     if (h->lru_accessed) memset(h->lru_accessed, 0, cap);
     uint32_t prev = SHM_LRU_NONE;
     uint32_t new_head = SHM_LRU_NONE;
-    uint32_t rebuilt_count = 0;
     for (uint32_t i = 0; i < cap; i++) {
-        uint8_t st = h->states[i];
-        if (st == SHM_TOMBSTONE) continue;
-        if (!SHM_IS_LIVE(st)) continue;
+        if (!SHM_IS_LIVE(h->states[i])) continue;
         h->lru_prev[i] = prev;
         if (prev != SHM_LRU_NONE) h->lru_next[prev] = i;
         else new_head = i;
         prev = i;
-        rebuilt_count++;
     }
     hdr->lru_head = new_head;
     hdr->lru_tail = prev;
@@ -1137,12 +1093,9 @@ static void shm_lru_rebuild_if_corrupt(ShmHandle *h) {
 
 /* ---- Create / Open / Close ---- */
 
-/* Error buffer for shm_create_map diagnostics */
 #define SHM_ERR_BUFLEN 256
 
-/* Computed layout -- sizes and offsets of all variable-length regions
- * following the header. Filled by shm_compute_layout and used by both
- * create and reopen paths. */
+/* Sizes and offsets of the variable-length regions after the header. */
 typedef struct {
     uint64_t nodes_off, states_off;
     uint64_t lru_prev_off, lru_next_off, lru_accessed_off;
@@ -1154,24 +1107,18 @@ typedef struct {
     uint64_t end_off;  /* end of LRU/TTL region -- caller verifies file is at least this large */
 } ShmLayout;
 
-/* Clamp a requested arena capacity to the usable range: a 4096-byte floor so
- * the arena is always functional, and a UINT32_MAX ceiling because arena
- * offsets are uint32. */
+/* 4096-byte floor so the arena is always functional, UINT32_MAX ceiling
+ * because arena offsets are uint32. */
 static inline uint64_t shm_clamp_arena_cap(uint64_t want) {
     if (want < 4096) return 4096;
     if (want > UINT32_MAX) return UINT32_MAX;
     return want;
 }
 
-/* Compute region offsets after the header.
- *   max_tcap, node_size: table dimensions
- *   has_lru, has_ttl, has_arena: which optional regions are present
- *   max_entries, arena_cap_override: only used when has_arena. arena_cap is
- *     arena_cap_override (bytes) when nonzero, else the ~128 B/entry default
- *     max(max_entries*128, 4096); both clamped via shm_clamp_arena_cap.
- * On create, the caller maps `lo->total_size` bytes; on reopen, the caller
- * verifies the file is at least `lo->end_off` bytes (reader_slots_off and
- * total_size are taken from the stored header). */
+/* Compute the region offsets after the header.  arena_cap is
+ * arena_cap_override when nonzero, else max(max_entries*128, 4096), both
+ * clamped.  Create maps lo->total_size bytes; reopen checks the file against
+ * lo->end_off and takes reader_slots_off and total_size from the header. */
 static inline void shm_compute_layout(ShmLayout *lo, uint32_t max_tcap,
                                        uint32_t node_size, int has_lru,
                                        int has_ttl, int has_arena,
@@ -1231,6 +1178,7 @@ static inline void shm_init_header(ShmHeader *hdr, void *base,
     hdr->arena_cap     = lo->arena_cap;
     hdr->reader_slots_off = lo->reader_slots_off;
     hdr->arena_bump    = SHM_ARENA_MIN_ALLOC;  /* reserve offset 0 */
+    hdr->routing       = SHM_ROUTING_SPLIT;
     hdr->max_size      = max_size;
     hdr->default_ttl   = default_ttl;
     hdr->lru_skip      = shm_lru_skip_to_mask(lru_skip);
@@ -1256,9 +1204,8 @@ static inline void shm_init_header(ShmHeader *hdr, void *base,
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
-/* Validate a header read from disk/fd. Returns 1 if valid, 0 otherwise.
- * Caller must already have verified file is at least sizeof(ShmHeader) bytes
- * and that hdr->total_size matches the file size. */
+/* Validate a header read from disk or fd.  The caller must already have
+ * checked the file against sizeof(ShmHeader) and hdr->total_size. */
 static inline int shm_validate_header(const ShmHeader *hdr,
                                        uint32_t variant_id, uint32_t node_size) {
     return (hdr->magic == SHM_MAGIC &&
@@ -1298,28 +1245,29 @@ static inline int shm_validate_header_live(const ShmHeader *hdr,
         uint32_t s2 = __atomic_load_n(&hdr->seq, __ATOMIC_RELAXED);
         if (ok) return 1;
         /* Only a live holder can still republish, and a repair scan runs with
-         * seq even -- so seq stability alone proves nothing.  With no live
-         * holder, stalling would just serialise every opener behind the flock. */
+         * seq even, so seq stability alone proves nothing. */
         uint32_t w = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
-        /* Our own pid in the lock word means a dead writer whose pid was
-         * recycled to us: we cannot be mid-write and calling attach at the
-         * same time, so waiting for ourselves can never change the verdict. */
+        /* Our own pid in the lock word is a dead writer whose pid we recycled:
+         * we cannot be mid-write and attaching at once. */
         uint32_t wpid = w & SHM_RWLOCK_PID_MASK;
         int live_holder = (w >= SHM_RWLOCK_WRITER_BIT) && wpid != 0 &&
                           wpid != (uint32_t)getpid() &&
                           shm_pid_alive(wpid);
-        if (!live_holder)
-            return (!(s1 & 1) && s1 == s2)
-                 ? 0 : shm_validate_header(hdr, variant_id, node_size);
+        if (!live_holder) {
+            /* Nothing moved: an even seq is a stable violation, refuse now; an
+             * odd one is a dead writer's leftover, so one more read decides.  A
+             * moved seq proves the read was torn, not corrupt: retry rather
+             * than decide on a single re-read. */
+            if (s1 == s2)
+                return (s1 & 1) ? shm_validate_header(hdr, variant_id, node_size) : 0;
+        }
         if (attempt >= 8) { struct timespec ts = { 0, 500000 }; nanosleep(&ts, NULL); }
     }
     return shm_validate_header(hdr, variant_id, node_size);
 }
 
-/* Format a header-validation error message into errbuf.  `prefix` is the
- * caller-supplied identifier (a path on the file-based create/reopen path,
- * the literal "fd" on the fd-reopen path).  Picks the first failing field
- * for clearer diagnostics; falls back to a generic "corrupt header". */
+/* Format a header-validation error, naming the first failing field.  `prefix`
+ * is the path, or the literal "fd" on the fd-reopen path. */
 static inline void shm_format_header_error(char *errbuf, const char *prefix,
                                             const ShmHeader *hdr,
                                             uint32_t variant_id) {
@@ -1336,9 +1284,10 @@ static inline void shm_format_header_error(char *errbuf, const char *prefix,
         snprintf(errbuf, SHM_ERR_BUFLEN, "%s: corrupt header", prefix);
 }
 
-/* Recompute layout from a validated header and verify both the LRU/TTL
- * region and the reader_slots region fit inside `mapped_size`.  Returns
- * 1 on success (lo filled with disk-recorded reader_slots_off); 0 on
+/* Recompute layout from a validated header and verify that the LRU/TTL
+ * region, the reader_slots table and the occupancy bitmap after it all fit
+ * inside `mapped_size`.  Returns 1 on success, with lo holding the locally
+ * computed layout (the stored reader_slots_off is only sanity-checked); 0 on
  * failure (errbuf populated). */
 static inline int shm_validate_layout_regions(ShmLayout *lo, const ShmHeader *hdr,
                                                 int has_arena, uint64_t mapped_size,
@@ -1352,15 +1301,13 @@ static inline int shm_validate_layout_regions(ShmLayout *lo, const ShmHeader *hd
                              "%s: file too small for LRU/TTL arrays", prefix);
         return 0;
     }
-    /* Locate reader_slots from the trusted, locally-computed layout, NOT the
-     * peer-writable hdr->reader_slots_off: a peer sharing the backing file that
-     * corrupts the stored offset must not be able to misdirect our reader_slots
-     * pointer.  We still sanity-gate the stored offset (rejects grossly corrupt
-     * files) but bounds-check the locally-computed region against the real
-     * mapping and keep lo->reader_slots_off as shm_compute_layout produced it. */
+    /* Locate reader_slots from the locally computed layout, never the
+     * peer-writable hdr->reader_slots_off, which is only sanity-gated here: a
+     * peer corrupting it must not misdirect our pointer. */
     uint64_t rs_off = hdr->reader_slots_off;
     if (!rs_off || rs_off < lo->end_off ||
-        lo->reader_slots_off + SHM_READER_SLOTS * sizeof(ShmReaderSlot) > mapped_size) {
+        lo->reader_slots_off + SHM_READER_SLOTS * sizeof(ShmReaderSlot) > mapped_size ||
+        lo->occ_off + SHM_OCC_BYTES > mapped_size) {
         if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN,
                              "%s: reader_slots region missing or out of bounds", prefix);
         return 0;
@@ -1368,9 +1315,8 @@ static inline int shm_validate_layout_regions(ShmLayout *lo, const ShmHeader *hd
     return 1;
 }
 
-/* Allocate the process-local ShmHandle given an already-mmap'd base and
- * a computed layout. Shared by shm_create_map, shm_create_memfd and
- * shm_open_fd_map; all three differ only in how they acquire `base`. */
+/* Build the process-local handle over an already-mmap'd base: the create,
+ * memfd and fd-reopen paths differ only in how they acquire `base`. */
 static ShmHandle *shm_alloc_handle(void *base, uint64_t total_size,
                                     int has_arena, int has_lru, int has_ttl,
                                     const ShmLayout *lo,
@@ -1400,9 +1346,7 @@ static ShmHandle *shm_alloc_handle(void *base, uint64_t total_size,
     h->max_mask  = hdr->max_table_cap - 1;
     h->iter_pos  = 0;
     h->backing_fd = backing_fd;
-    /* Hash lookups are random-access: hint the kernel to skip
-     * read-ahead. Best-effort -- failure (e.g., MADV_RANDOM not
-     * supported) is harmless. */
+    /* Lookups are random-access: skip read-ahead.  Best-effort. */
     (void)madvise(base, (size_t)total_size, MADV_RANDOM);
     if (path) {
         h->path = strdup(path);
@@ -1422,10 +1366,9 @@ static ShmHandle *shm_alloc_handle(void *base, uint64_t total_size,
     return h;
 }
 
-/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at
- * file_mode, default 0600 = owner-only), or attach an existing file
- * (O_RDWR|O_NOFOLLOW, no O_CREAT). Blocks a symlink swap or a pre-seeded/
- * hard-linked backing file; cross-user sharing is opt-in via a wider file_mode. */
+/* Create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW) or attach an existing file
+ * (O_RDWR|O_NOFOLLOW), blocking a symlink swap or a pre-seeded backing file.
+ * Cross-user sharing is opt-in through a wider file_mode. */
 static int shm_secure_open(const char *path, mode_t file_mode, char *errbuf) {
     for (int attempt = 0; attempt < 100; attempt++) {
         int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, file_mode);
@@ -1536,11 +1479,10 @@ static ShmHandle *shm_create_map(const char *path, uint32_t max_entries,
         } else if (hdr->magic == 0 && (uint64_t)st.st_size == lo.total_size
                    && st.st_uid == geteuid()
                    && shm_region_is_zero(base, (size_t)st.st_size)) {
-            /* Recover an abandoned mid-init file: a creator killed between
-             * the ftruncate and the header init leaves a full-size, all-zero
-             * (magic==0) file that would brick every future open of this
-             * path.  Re-initialize ONLY when it is exactly our size, still
-             * uninitialized, and owned by us; anything else still errors. */
+            /* A creator killed between the ftruncate and the header init
+             * leaves a full-size all-zero file that would brick every future
+             * open.  Re-initialize only when it is exactly our size, still
+             * uninitialized, and owned by us. */
             if (fchmod(fd, file_mode) < 0) {
                 SHM_ERR("%s: fchmod: %s", path, strerror(errno));
                 munmap(base, (size_t)st.st_size); flock(fd, LOCK_UN); close(fd); return NULL;
@@ -1550,9 +1492,9 @@ static ShmHandle *shm_create_map(const char *path, uint32_t max_entries,
             ok = 1;   /* recovered -> valid; fall through to shm_alloc_handle */
         } else if (hdr->magic == 0 && (uint64_t)st.st_size == lo.total_size
                    && st.st_uid == geteuid()) {
-            /* Provably our own uninitialized full-size file, but not all-zero: a
-             * creator died between the header field stores and the magic commit,
-             * so it holds no data and is safe for the caller to remove. */
+            /* Our own full-size file, uninitialized but not all-zero: a creator
+             * died between the field stores and the magic commit, so it holds
+             * no data and is safe to remove. */
             SHM_ERR("%s: incomplete map file left by an interrupted create; remove it and retry", path);
         } else {
             shm_format_header_error(errbuf, path, hdr, variant_id);
@@ -1642,9 +1584,10 @@ static ShmHandle *shm_open_fd_map(int fd, uint32_t variant_id, uint32_t node_siz
         munmap(base, ms);
         return NULL;
     }
-    if (hdr->sealed) {   /* frozen file: refuse a read-write attach (open it with new_readonly) */
+    if (hdr->sealed) {   /* frozen: refuse a read-write attach (new_readonly needs a path; a memfd has none) */
         if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN,
-                             "this map is frozen (read-only); open it with new_readonly");
+                             "this map is frozen (read-only); open a file with new_readonly; "
+                             "a frozen memfd cannot be reopened");
         munmap(base, ms);
         return NULL;
     }
@@ -1668,14 +1611,10 @@ static ShmHandle *shm_open_fd_map(int fd, uint32_t variant_id, uint32_t node_siz
                              &lo, NULL, myfd, errbuf);
 }
 
-/* Open a FROZEN (sealed) map read-only: O_RDONLY + PROT_READ, no lock ever.
- * The table / arena and geometry are immutable in a sealed file, so every query
- * reads directly with no reader-slot / rwlock traffic -- the mapping is never
- * written, so it works from a read-only fd / read-only filesystem and can be
- * shared PROT_READ across processes (same architecture; the native magic +
- * variant id reject a wrong-endian or wrong-variant file at validation).
- * Requires ->freeze on the producer first; a non-frozen file is refused (its
- * lock-free readers would race a live writer). Single-file only (not sharded). */
+/* Open a sealed map read-only: O_RDONLY + PROT_READ, no lock ever, so it works
+ * from a read-only filesystem and any number of processes can share it.  A
+ * non-frozen file is refused, its lock-free readers would race a live writer.
+ * Single-file only. */
 static ShmHandle *shm_open_readonly_map(const char *path, uint32_t variant_id,
                                         uint32_t node_size, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
@@ -1715,10 +1654,9 @@ static ShmHandle *shm_open_readonly_map(const char *path, uint32_t variant_id,
         return NULL;
     }
 
-    /* A write in flight on a sealed file can never be repaired -- a read-write
-     * attach refuses a sealed file -- so refuse either way, but say which:
-     * freeze() seals while still holding the lock, so a live holder means the
-     * write will finish, not that anything crashed. */
+    /* A write in flight on a sealed file can never be repaired, since a
+     * read-write attach refuses one.  Refuse either way, but say which: freeze
+     * seals while still holding the lock, so a live holder will finish. */
     if ((hdr->seq & 1) || hdr->wlock != 0) {
         uint32_t holder = hdr->wlock & SHM_RWLOCK_PID_MASK;
         if (errbuf) {
@@ -1768,13 +1706,10 @@ static inline int shm_msync(ShmHandle *h) {
     return rc;
 }
 
-/* Seal a map: make it permanently immutable so it can be shipped and opened
- * read-only.  Takes the write lock so no mutation is in flight, publishes the
- * seal, then flushes it (file/memfd-backed).  Afterwards every mutator croaks
- * and a read-write reopen is refused.  For a sharded map every shard file is
- * sealed.  Returns 0 on success, non-zero (errno set) on a failed msync.
- * The handle is still writable here (h->readonly is set by shm_mark_readonly
- * only after this returns), so shm_rwlock_wrlock / shm_msync run normally. */
+/* Seal a map permanently immutable, under the write lock so no mutation is in
+ * flight; every shard of a sharded map is sealed.  Returns 0, or non-zero with
+ * errno on a failed msync.  The handle is still writable here: shm_mark_readonly
+ * runs only after this returns. */
 static int shm_freeze(ShmHandle *h) {
     if (!h) return 0;
     if (h->shard_handles) {
@@ -1801,15 +1736,10 @@ static void shm_mark_readonly(ShmHandle *h) {
             if (h->shard_handles[i]) h->shard_handles[i]->readonly = 1;
 }
 
-/* Is the underlying FILE sealed?  h->readonly is process-local and is only set
- * on handles that opened the file after the freeze, or that performed it: a
- * handle opened read-write BEFORE the freeze never saw the transition and would
- * otherwise keep writing into a map the POD calls permanently immutable.  The
- * seal itself lives in the shared header, so consult that.  One relaxed load of
- * an already-hot cache line per mutation.
- *
- * Sharded: shm_freeze seals shard 0 first and returns at the first failure, so
- * shard 0 is sealed whenever any shard is -- no need to walk them all. */
+/* Is the underlying FILE sealed?  h->readonly is process-local and misses a
+ * handle opened read-write before the freeze, which would then keep writing to
+ * an immutable map, so consult the shared header.  Sharded: freeze seals shard
+ * 0 first and stops at the first failure, so shard 0 answers for the set. */
 static inline int shm_is_sealed(const ShmHandle *h) {
     if (!h) return 0;
     if (h->shard_handles) {
@@ -1821,14 +1751,11 @@ static inline int shm_is_sealed(const ShmHandle *h) {
 
 static void shm_close_map_now(ShmHandle *h);
 
-/* Destroying a handle while THIS process holds one of its locks would leave the
- * save-stack lock cleanup (shm_rdunlock_cleanup / shm_wrseq_unlock_cleanup)
- * dereferencing freed memory on unwind -- the guards capture the raw handle
- * pointer. Argument magic can call $obj->DESTROY from inside a guarded region,
- * so defer the free until the last lock is released.
- * lock_depth lives in the process-local handle, not the shared segment: no
- * on-disk format change, and no atomics (a handle is never shared between
- * threads -- CLONE_SKIP forbids cloning it). */
+/* Destroying a handle this process holds a lock on would leave the save-stack
+ * cleanup dereferencing freed memory on unwind, and argument magic can call
+ * DESTROY from inside a guarded region: defer the free to the last unlock.
+ * lock_depth is process-local and needs no atomics, since CLONE_SKIP forbids
+ * sharing a handle between threads. */
 static void shm_close_map(ShmHandle *h) {
     if (!h) return;
     if (h->lock_depth) { h->pending_close = 1; return; }
@@ -1838,7 +1765,6 @@ static void shm_close_map(ShmHandle *h) {
 static void shm_close_map_now(ShmHandle *h) {
     if (!h) return;
     if (h->shard_handles) {
-        /* Sharded: close all sub-handles */
         for (uint32_t i = 0; i < h->num_shards; i++)
             shm_close_map(h->shard_handles[i]);
         free(h->shard_handles);
@@ -1846,26 +1772,20 @@ static void shm_close_map_now(ShmHandle *h) {
         free(h);
         return;
     }
-    /* Release our reader slot -- only if we still own it AND no fork has
-     * happened since we claimed it.  A forked child that inherits the
-     * handle but never acquired the lock itself must NOT clear the
-     * parent's slot via the inherited cached_pid (parent is still using
-     * it).  The fork-generation check distinguishes the original owner
-     * from a fork descendant that's about to exit. */
+    /* Release our slot only if we still own it and no fork has intervened: a
+     * child that inherited the handle without locking must not clear the
+     * parent's slot through the inherited cached_pid. */
     if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
         h->cached_fork_gen == __atomic_load_n(&shm_fork_gen, __ATOMIC_RELAXED) &&
         __atomic_load_n(&h->reader_slots[h->my_slot_idx].rdepth, __ATOMIC_ACQUIRE) == 0) {
         /* rdepth==0: a still-held read lock's slot must survive for recovery */
-        /* Clear our occ bit BEFORE freeing the slot: we still own the pid so no
-         * claimant can take the slot mid-clear, and rdepth==0 so no writer needs
-         * to see us.  (A crash skips this -> the bit is reclaimed lazily by a
-         * writer scan / re-claim, same as the pid.) */
+        /* Clear the occ bit before freeing the slot: we still own the pid, so
+         * no claimant can take it mid-clear. */
         shm_occ_clear(h, h->my_slot_idx);
         uint32_t expected = h->cached_pid;
-        /* Just CAS pid -> 0; do NOT clear rdepth here -- between the CAS
-         * and the store, a new process could claim the slot and start
-         * incrementing rdepth, which our store would clobber.  The
-         * next claimant's shm_claim_reader_slot zeros it. */
+        /* CAS pid to 0 and leave rdepth alone: a new claimant between the CAS
+         * and a store would have its increments clobbered.  The next claim
+         * zeroes it. */
         __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
                 &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
     }
@@ -1874,6 +1794,16 @@ static void shm_close_map_now(ShmHandle *h) {
     free(h->copy_buf);
     free(h->path);
     free(h);
+}
+
+/* Unwind a partially built sharded dispatcher: `created` shards are open. */
+static ShmHandle *shm_sharded_fail(ShmHandle *h, uint32_t created) {
+    for (uint32_t j = 0; j < created; j++)
+        shm_close_map(h->shard_handles[j]);
+    free(h->shard_handles);
+    free(h->path);
+    free(h);
+    return NULL;
 }
 
 /* Create a sharded map: N independent maps behind one handle */
@@ -1897,14 +1827,15 @@ static ShmHandle *shm_create_sharded(const char *path_prefix, uint32_t num_shard
         return NULL;
     }
     uint32_t ns = 1;
-    while (ns < num_shards) ns <<= 1;
+    uint8_t want_log2 = 1;
+    while (ns < num_shards) { ns <<= 1; want_log2++; }
     num_shards = ns;
 
     ShmHandle *h = (ShmHandle *)calloc(1, sizeof(ShmHandle));
     if (!h) { if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "calloc: out of memory"); return NULL; }
 
     h->shard_handles = (ShmHandle **)calloc(num_shards, sizeof(ShmHandle *));
-    if (!h->shard_handles) { free(h); if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "calloc: out of memory"); return NULL; }
+    if (!h->shard_handles) { if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "calloc: out of memory"); return shm_sharded_fail(h, 0); }
 
     h->num_shards = num_shards;
     h->shard_mask = num_shards - 1;
@@ -1912,9 +1843,7 @@ static ShmHandle *shm_create_sharded(const char *path_prefix, uint32_t num_shard
     h->path = strdup(path_prefix);
     if (!h->path) {
         if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "strdup: out of memory");
-        free(h->shard_handles);
-        free(h);
-        return NULL;
+        return shm_sharded_fail(h, 0);
     }
 
     for (uint32_t i = 0; i < num_shards; i++) {
@@ -1922,26 +1851,73 @@ static ShmHandle *shm_create_sharded(const char *path_prefix, uint32_t num_shard
         int sn = snprintf(shard_path, sizeof(shard_path), "%s.%u", path_prefix, i);
         if (sn < 0 || sn >= (int)sizeof(shard_path)) {
             if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "shard path too long");
-            for (uint32_t j = 0; j < i; j++)
-                shm_close_map(h->shard_handles[j]);
-            free(h->shard_handles);
-            free(h->path);
-            free(h);
-            return NULL;
+            return shm_sharded_fail(h, i);
         }
         h->shard_handles[i] = shm_create_map(shard_path, max_entries, node_size,
                                                variant_id, has_arena, max_size,
                                                default_ttl, lru_skip, arena_cap_override, file_mode, errbuf);
-        if (!h->shard_handles[i]) {
-            /* Clean up already-created shards */
-            for (uint32_t j = 0; j < i; j++)
-                shm_close_map(h->shard_handles[j]);
-            free(h->shard_handles);
-            free(h->path);
-            free(h);
-            return NULL;
+        if (!h->shard_handles[i]) return shm_sharded_fail(h, i);
+        /* A recorded count must match whichever shard carries it: opening a set
+         * with the wrong one hides every key that routes elsewhere.  A shard
+         * carrying 0 was never stamped and agrees with any count. */
+        const ShmHeader *sh = h->shard_handles[i]->hdr;
+        if (sh->routing != SHM_ROUTING_LEGACY && sh->shard_log2 &&
+            sh->shard_log2 != want_log2) {
+            unsigned recorded = 1u << ((sh->shard_log2 - 1) & 31);
+            if (errbuf && i == 0)
+                snprintf(errbuf, SHM_ERR_BUFLEN,
+                    "%s was created with %u shards, not %u",
+                    path_prefix, recorded, num_shards);
+            else if (errbuf)
+                snprintf(errbuf, SHM_ERR_BUFLEN,
+                    "%s.%u records %u shards, not %u",
+                    path_prefix, i, recorded, num_shards);
+            return shm_sharded_fail(h, i + 1);
+        }
+        if (i > 0) {
+            /* Every shard must carry the same configuration, or a stray file
+             * from an earlier run is adopted into the set.  Shard 0 is the
+             * reference, so a stray there is reported against the first shard
+             * that differs from it.  The count is checked per shard above. */
+            const ShmHeader *a = h->shard_handles[0]->hdr;
+            const ShmHeader *b = sh;
+            const char *what =
+                b->max_table_cap != a->max_table_cap ? "max_entries" :
+                b->max_size      != a->max_size      ? "max_size"    :
+                b->default_ttl   != a->default_ttl   ? "ttl"         :
+                b->lru_skip      != a->lru_skip      ? "lru_skip"    :
+                b->arena_cap     != a->arena_cap     ? "arena_cap"   :
+                b->routing       != a->routing       ? "routing"     : NULL;
+            if (what) {
+                if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN,
+                    "%s.%u disagrees with %s.0 on %s; the shards were not created "
+                    "together", path_prefix, i, path_prefix, what);
+                return shm_sharded_fail(h, i + 1);
+            }
         }
     }
+    /* Stamp only once every shard has agreed, or a refused open cements this
+     * caller's count into a shard the next opener would trust.  Shard 0 is the
+     * serialisation point: a second creator with a different count loses the
+     * CAS and is refused, its shard files left behind. */
+    ShmHeader *s0 = h->shard_handles[0]->hdr;
+    if (s0->routing != SHM_ROUTING_LEGACY) {
+        uint8_t seen = 0;
+        if (!__atomic_compare_exchange_n(&s0->shard_log2, &seen, want_log2, 0,
+                                         __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE) &&
+            seen != want_log2) {
+            if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN,
+                "%s was created with %u shards, not %u",
+                path_prefix, 1u << ((seen - 1) & 31), num_shards);
+            return shm_sharded_fail(h, num_shards);
+        }
+        for (uint32_t i = 1; i < num_shards; i++) {
+            ShmHeader *s = h->shard_handles[i]->hdr;
+            if (s->shard_log2 == 0) s->shard_log2 = want_log2;
+        }
+    }
+
+    h->route_high = (s0->routing != SHM_ROUTING_LEGACY);
     return h;
 }
 
@@ -1982,6 +1958,11 @@ static inline ShmCursor *shm_cursor_create(ShmHandle *h) {
     return c;
 }
 
+static inline uint32_t shm_shard_index(const ShmHandle *h, uint64_t hash64) {
+    uint32_t bits = h->route_high ? (uint32_t)(hash64 >> 32) : (uint32_t)hash64;
+    return bits & h->shard_mask;
+}
+
 static inline void shm_cursor_destroy(ShmCursor *c) {
     if (!c) return;
     ShmHandle *cur = c->current;
@@ -1994,9 +1975,7 @@ static inline void shm_cursor_destroy(ShmCursor *c) {
 #endif /* SHM_DEFS_H */
 
 
-/* ================================================================
- * Part 2: Template (included per variant)
- * ================================================================ */
+/* ---- Part 2: template (included once per variant) ---- */
 
 #define SHM_PASTE2(a, b) a##_##b
 #define SHM_PASTE(a, b)  SHM_PASTE2(a, b)
@@ -2024,14 +2003,12 @@ typedef struct {
 #ifdef SHM_KEY_IS_INT
   #define SHM_SHARD_DISPATCH(h, key_arg) \
       if ((h)->shard_handles) { \
-          uint32_t _sh_hash = SHM_HASH_KEY(key_arg); \
-          h = (h)->shard_handles[_sh_hash & (h)->shard_mask]; \
+          h = (h)->shard_handles[shm_shard_index((h), SHM_HASH_KEY64(key_arg))]; \
       }
 #else
   #define SHM_SHARD_DISPATCH(h, key_str_arg, key_len_arg) \
       if ((h)->shard_handles) { \
-          uint32_t _sh_hash = SHM_HASH_KEY_STR(key_str_arg, key_len_arg); \
-          h = (h)->shard_handles[_sh_hash & (h)->shard_mask]; \
+          h = (h)->shard_handles[shm_shard_index((h), SHM_HASH_KEY_STR64(key_str_arg, key_len_arg))]; \
       }
 #endif
 
@@ -2039,16 +2016,17 @@ typedef struct {
 
 #ifdef SHM_KEY_IS_INT
   #define SHM_HASH_KEY(k) ((uint32_t)(shm_hash_int64((int64_t)(k))))
+  #define SHM_HASH_KEY64(k) (shm_hash_int64((int64_t)(k)))
   #define SHM_KEY_EQ(node_ptr, k) ((node_ptr)->key == (k))
 #else
   #define SHM_HASH_KEY_STR(str, len) ((uint32_t)shm_hash_string((str), (len)))
-  /* Keys are compared by bytes only. The stored UTF8 flag is metadata for
-   * flag-restoration on retrieval; it must not affect lookup equality,
-   * otherwise ASCII strings with toggled flag (easy to produce in Perl via
-   * utf8::upgrade/downgrade, `use utf8`, or source literal encoding) would
-   * miss their stored value. */
+  #define SHM_HASH_KEY_STR64(str, len) (shm_hash_string((str), (len)))
+  /* Keys compare by bytes only: the stored UTF8 flag is metadata for
+   * restoration on retrieval, and letting it affect equality would make an
+   * ASCII key miss its own value after a utf8::upgrade. */
   static inline int SHM_PASTE(SHM_PREFIX, _key_eq_str)(
-      const SHM_NODE_TYPE *np, const char *arena, const char *str, uint32_t len, bool utf8) {
+      const SHM_NODE_TYPE *np, const char *arena, uint64_t arena_cap,
+      const char *str, uint32_t len, bool utf8) {
       (void)utf8;
       uint32_t kl_packed = np->key_len;
       if (SHM_IS_INLINE(kl_packed)) {
@@ -2058,10 +2036,16 @@ typedef struct {
           return memcmp(buf, str, len) == 0;
       }
       if (SHM_UNPACK_LEN(kl_packed) != len) return 0;
+      /* A corrupt key_off must never reach memcmp (CWE-125); treat it as a miss
+       * so the probe continues.  get() and exists() bound their own inlined
+       * compare but end the probe there, so a poisoned slot hides later keys
+       * from them. */
+      if ((uint64_t)np->key_off + len > arena_cap) return 0;
       return memcmp(arena + np->key_off, str, len) == 0;
   }
-  #define SHM_KEY_EQ_STR(node_ptr, arena, str, len, utf8) \
-      SHM_PASTE(SHM_PREFIX, _key_eq_str)((node_ptr), (arena), (str), (len), (utf8))
+  #define SHM_KEY_EQ_STR(node_ptr, arena, arena_cap, str, len, utf8) \
+      SHM_PASTE(SHM_PREFIX, _key_eq_str)((node_ptr), (arena), (arena_cap), \
+                                         (str), (len), (utf8))
 #endif
 
 /* ---- Create / Open ---- */
@@ -2150,9 +2134,9 @@ static void SHM_FN(tombstone_at)(ShmHandle *h, uint32_t idx) {
 #if !defined(SHM_KEY_IS_INT) || defined(SHM_VAL_IS_STR)
     SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
 #endif
-    /* Retire the slot BEFORE releasing its arena blocks: a writer killed
-     * between the two would otherwise leave a LIVE node pointing at a block
-     * the free list has already clobbered with its next pointer. */
+    /* Retire the slot before releasing its arena blocks: a writer killed
+     * between the two would leave a live node pointing at a block the free
+     * list has clobbered with its next pointer. */
     h->states[idx] = SHM_TOMBSTONE;
     hdr->size--;
     hdr->tombstones++;
@@ -2164,10 +2148,9 @@ static void SHM_FN(tombstone_at)(ShmHandle *h, uint32_t idx) {
 #endif
 }
 
-/* Standard "remove a live entry": detach from LRU, clear TTL, tombstone.
- * Used by remove/take/cas_take/pop/shift/drain -- anywhere a caller-located
- * entry is being deleted. Distinct from expire_at (bumps stat_expired) and
- * lru_evict_one (picks the victim by clock-walking the LRU). */
+/* Remove a caller-located entry: detach from LRU, clear TTL, tombstone.
+ * Distinct from expire_at, which bills stat_expired, and from lru_evict_one,
+ * which picks its own victim. */
 static inline void SHM_FN(remove_at)(ShmHandle *h, uint32_t idx) {
     if (h->lru_prev) shm_lru_unlink(h, idx);
     if (h->expires_at) h->expires_at[idx] = 0;
@@ -2176,33 +2159,43 @@ static inline void SHM_FN(remove_at)(ShmHandle *h, uint32_t idx) {
 
 /* ---- LRU eviction ---- */
 
-static void SHM_FN(lru_evict_one)(ShmHandle *h) {
+/* Retire `idx` under capacity pressure.  A victim already past its TTL is
+ * billed to expiration, so stat_evictions reflects true pressure. */
+static void SHM_FN(lru_evict_at)(ShmHandle *h, uint32_t idx) {
+    int was_expired = SHM_IS_EXPIRED(h, idx, shm_now());
+    SHM_FN(remove_at)(h, idx);
+    __atomic_add_fetch(was_expired ? &h->hdr->stat_expired
+                                   : &h->hdr->stat_evictions, 1, __ATOMIC_RELAXED);
+}
+
+/* Second-chance clock from the tail: an accessed entry is promoted instead
+ * and the first unaccessed one is evicted.  `keep` is never the victim: it is
+ * the entry an overwrite is replacing (SHM_LRU_NONE for an insert). */
+static void SHM_FN(lru_evict_one_keep)(ShmHandle *h, uint32_t keep) {
     ShmHeader *hdr = h->hdr;
-    /* Second-chance clock: walk from tail, if accessed -> clear and
-     * promote (give second chance), else -> evict. */
     uint32_t victim = hdr->lru_tail;
     while (victim != SHM_LRU_NONE) {
+        if (victim == keep) {
+            victim = h->lru_prev[victim];
+            continue;
+        }
         if (h->lru_accessed && __atomic_load_n(&h->lru_accessed[victim], __ATOMIC_RELAXED)) {
             __atomic_store_n(&h->lru_accessed[victim], 0, __ATOMIC_RELAXED);
-            /* Promote: give second chance */
             uint32_t prev = h->lru_prev[victim];
             shm_lru_unlink(h, victim);
             shm_lru_push_front(h, victim);
-            victim = prev;  /* continue from where we were */
+            victim = prev;
             if (victim == SHM_LRU_NONE) victim = hdr->lru_tail;
             continue;
         }
         break;
     }
     if (victim == SHM_LRU_NONE) return;
-    /* If the victim is already past its TTL, attribute the removal to
-     * expiration rather than eviction so stat_evictions reflects true
-     * capacity pressure (not TTL-driven removals that happened to hit
-     * the LRU tail). */
-    int was_expired = SHM_IS_EXPIRED(h, victim, shm_now());
-    SHM_FN(remove_at)(h, victim);
-    __atomic_add_fetch(was_expired ? &hdr->stat_expired
-                                   : &hdr->stat_evictions, 1, __ATOMIC_RELAXED);
+    SHM_FN(lru_evict_at)(h, victim);
+}
+
+static void SHM_FN(lru_evict_one)(ShmHandle *h) {
+    SHM_FN(lru_evict_one_keep)(h, SHM_LRU_NONE);
 }
 
 /* ---- TTL expiration ---- */
@@ -2210,6 +2203,79 @@ static void SHM_FN(lru_evict_one)(ShmHandle *h) {
 static void SHM_FN(expire_at)(ShmHandle *h, uint32_t idx) {
     SHM_FN(remove_at)(h, idx);
     __atomic_add_fetch(&h->hdr->stat_expired, 1, __ATOMIC_RELAXED);
+}
+
+#if SHM_HAS_ARENA
+/* Whether a stored string's block is exactly `asize`: classes are never split
+ * or merged, so only the request's own class can serve it. */
+static inline int SHM_FN(block_is)(uint32_t len_field, uint32_t asize) {
+    return !SHM_IS_INLINE(len_field) && shm_arena_round_up(SHM_UNPACK_LEN(len_field)) == asize;
+}
+
+/* Make room for `slen`: evict the oldest of the SHM_EVICT_SEARCH oldest
+ * entries holding a block of the request's class, else the clock victim, whose
+ * block may be the wrong size.  Returns 1 if an entry was evicted. */
+static int SHM_FN(lru_evict_for)(ShmHandle *h, uint32_t slen, uint32_t keep) {
+    ShmHeader *hdr = h->hdr;
+    SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
+    uint32_t asize = shm_arena_round_up(slen);
+    uint32_t pos = hdr->lru_tail;
+    for (uint32_t n = 0; n < SHM_EVICT_SEARCH && pos != SHM_LRU_NONE; n++) {
+        if (pos != keep && (
+#ifndef SHM_KEY_IS_INT
+                SHM_FN(block_is)(nodes[pos].key_len, asize) ||
+#endif
+#ifdef SHM_VAL_IS_STR
+                SHM_FN(block_is)(nodes[pos].val_len, asize) ||
+#endif
+                0)) {
+            SHM_FN(lru_evict_at)(h, pos);
+            return 1;
+        }
+        pos = h->lru_prev[pos];
+    }
+    uint32_t before = hdr->size;
+    SHM_FN(lru_evict_one_keep)(h, keep);
+    return hdr->size < before;
+}
+
+/* Store a string, evicting once when the arena is exhausted on an LRU map:
+ * otherwise the map would refuse every insert and keep its oldest entries.
+ * `keep` is the entry an overwrite is replacing, never the victim. */
+static int SHM_FN(store_or_evict)(ShmHandle *h, uint32_t *off, uint32_t *len,
+                                  const char *str, uint32_t slen, bool utf8, uint32_t keep) {
+    if (shm_str_store(h->hdr, h->arena, off, len, str, slen, utf8)) return 1;
+    if (!h->lru_prev) return 0;
+    /* Offset 0 is reserved, so a block of exactly arena_cap never fits either. */
+    if (slen > SHM_INLINE_MAX &&
+        (uint64_t)SHM_ARENA_MIN_ALLOC + shm_arena_round_up(slen) > h->hdr->arena_cap)
+        return 0;
+    /* One eviction only: if the store still fails, the freed block was the
+     * wrong size and further evictions are equally blind. */
+    if (!SHM_FN(lru_evict_for)(h, slen, keep)) return 0;
+    return shm_str_store(h->hdr, h->arena, off, len, str, slen, utf8);
+}
+#endif
+
+/* Called only when the insert probe found no slot, so every slot is live:
+ * flush every expired entry at once, then return the first freed slot on this
+ * key's own probe path, or UINT32_MAX when nothing had expired. */
+static uint32_t SHM_FN(reclaim_expired_slot)(ShmHandle *h, uint32_t pos, uint32_t mask) {
+    if (!h->expires_at) return UINT32_MAX;
+    uint32_t now = shm_now();
+    uint32_t freed = 0;
+    for (uint32_t i = 0; i <= mask; i++) {
+        if (SHM_IS_LIVE(h->states[i]) && SHM_IS_EXPIRED(h, i, now)) {
+            SHM_FN(expire_at)(h, i);
+            freed++;
+        }
+    }
+    if (!freed) return UINT32_MAX;
+    for (uint32_t i = 0; i <= mask; i++) {
+        uint32_t idx = (pos + i) & mask;
+        if (h->states[idx] == SHM_TOMBSTONE) return idx;
+    }
+    return UINT32_MAX;
 }
 
 /* ---- Resize (elastic grow/shrink) ---- */
@@ -2279,13 +2345,12 @@ static int SHM_FN(resize)(ShmHandle *h, uint32_t new_cap) {
     }
 
     memset(states, SHM_EMPTY, new_cap);
-    /* tombstones first: capacity first leaves size + tombstones > table_cap on
-     * a shrink, and a crash there is unrepairable.  Atomic, not plain -- gcc
-     * reordered these in the string-key, string-value variants. */
+    /* tombstones before capacity: the other order leaves
+     * size + tombstones > table_cap on a shrink, and a crash there is
+     * unrepairable.  Atomic, or gcc reorders them. */
     __atomic_store_n(&hdr->tombstones, 0, __ATOMIC_RELEASE);
     __atomic_store_n(&hdr->table_cap, new_cap, __ATOMIC_RELEASE);
 
-    /* Reset LRU arrays */
     if (h->lru_prev) {
         memset(h->lru_prev, 0xFF, new_cap * sizeof(uint32_t));
         memset(h->lru_next, 0xFF, new_cap * sizeof(uint32_t));
@@ -2312,7 +2377,6 @@ static int SHM_FN(resize)(ShmHandle *h, uint32_t new_cap) {
         }
     }
 
-    /* Restore expires_at */
     if (h->expires_at && saved_exp) {
         for (uint32_t k = 0; k < live; k++) {
             uint32_t new_idx = old_to_new[saved_indices[k]];
@@ -2341,17 +2405,15 @@ static int SHM_FN(resize)(ShmHandle *h, uint32_t new_cap) {
 static inline void SHM_FN(maybe_grow)(ShmHandle *h) {
     ShmHeader *hdr = h->hdr;
     uint32_t size = hdr->size, tomb = hdr->tombstones, cap = hdr->table_cap;
-    if (__builtin_expect((uint64_t)(size + tomb) * 4 > (uint64_t)cap * 3, 0)) {
-        /* Grow even while iterating: a load-driven insert must never silently
-         * fail below max_entries.  Both iterators auto-reset on the resulting
-         * table_gen bump (built-in each via iter_gen, cursors via c->gen), so
-         * an abandoned each or long-lived cursor can no longer wedge the table
-         * at capacity.  (Tombstone compaction below and shrink stay deferred.) */
+    if (__builtin_expect(shm_over_load(size, tomb, cap), 0)) {
+        /* Grow even while iterating, or an abandoned each wedges the table at
+         * capacity: both iterators auto-reset on the table_gen bump.
+         * Compaction and shrink stay deferred. */
         if (cap < hdr->max_table_cap)  /* cap is pow2; cap*2 can't overflow here */
             SHM_FN(resize)(h, cap * 2);
-        else if (tomb > size || tomb > cap / 4)
+        else if (shm_needs_compaction(size, tomb, cap))
             SHM_FN(resize)(h, cap);  /* at max capacity: compact tombstones in place */
-    } else if (__builtin_expect(tomb > size || tomb > cap / 4, 0)) {
+    } else if (__builtin_expect(shm_needs_compaction(size, tomb, cap), 0)) {
         if (h->iterating > 0) { h->deferred = 1; return; }
         SHM_FN(resize)(h, cap);
     }
@@ -2359,40 +2421,35 @@ static inline void SHM_FN(maybe_grow)(ShmHandle *h) {
 
 static inline void SHM_FN(maybe_shrink)(ShmHandle *h) {
     ShmHeader *hdr = h->hdr;
-    if (hdr->table_cap <= SHM_INITIAL_CAP) return;
-    if (__builtin_expect((uint64_t)hdr->size * 4 < hdr->table_cap, 0)) {
+    if (__builtin_expect(shm_under_load(hdr->size, hdr->table_cap), 0)) {
         if (h->iterating > 0) { h->deferred = 1; return; }
-        uint32_t new_cap = hdr->table_cap / 2;
-        if (new_cap < SHM_INITIAL_CAP) new_cap = SHM_INITIAL_CAP;
-        SHM_FN(resize)(h, new_cap);
+        SHM_FN(resize)(h, shm_shrink_target(hdr->size, hdr->table_cap));
     }
 }
 
 static inline void SHM_FN(flush_deferred)(ShmHandle *h) {
     if (!h || !h->deferred || h->iterating > 0) return;
     h->deferred = 0;
-    /* A resize deferred while an iterator was live outlives freeze(), and
-     * this is the one write-lock path with no frozen check -- without this
-     * the iterator ending would resize a sealed file. */
+    /* A resize deferred while an iterator was live outlives freeze(), and the
+     * paths that reach here are not mutators and carry no frozen guard: an
+     * each() ending, iter_reset, and a cursor's next, reset, seek and
+     * teardown. */
     if (h->readonly || shm_is_sealed(h)) return;
     ShmHeader *hdr = h->hdr;
     shm_rwlock_wrlock(h);
     /* Re-test under the lock: freeze() seals under this same lock, so a call
-     * parked here would resize a map sealed meanwhile.  Nothing to report, so
-     * drop the deferred work. */
+     * parked here would resize a map sealed meanwhile. */
     if (shm_is_sealed(h)) { shm_rwlock_wrunlock(h); return; }
     shm_seqlock_write_begin(&hdr->seq);
     uint32_t size = hdr->size, tomb = hdr->tombstones, cap = hdr->table_cap;
-    if ((uint64_t)(size + tomb) * 4 > (uint64_t)cap * 3) {
+    if (shm_over_load(size, tomb, cap)) {
         if (cap < hdr->max_table_cap)  /* cap is pow2; cap*2 can't overflow here */
             SHM_FN(resize)(h, cap * 2);
-        else if (tomb > size || tomb > cap / 4)
+        else if (shm_needs_compaction(size, tomb, cap))
             SHM_FN(resize)(h, cap);  /* at max capacity: compact tombstones in place */
-    } else if (cap > SHM_INITIAL_CAP && (uint64_t)size * 4 < cap) {
-        uint32_t new_cap = cap / 2;
-        if (new_cap < SHM_INITIAL_CAP) new_cap = SHM_INITIAL_CAP;
-        SHM_FN(resize)(h, new_cap);
-    } else if (tomb > size || tomb > cap / 4) {
+    } else if (shm_under_load(size, cap)) {
+        SHM_FN(resize)(h, shm_shrink_target(size, cap));
+    } else if (shm_needs_compaction(size, tomb, cap)) {
         SHM_FN(resize)(h, cap);
     }
     shm_seqlock_write_end(&hdr->seq);
@@ -2430,7 +2487,6 @@ static int SHM_FN(put_inner)(ShmHandle *h,
     uint32_t pos = hash & mask;
     uint32_t insert_pos = UINT32_MAX;
 
-    /* Resolve effective expiry timestamp */
     uint32_t exp_ts = 0;
     if (h->expires_at) {
         uint32_t ttl = (ttl_sec == SHM_TTL_USE_DEFAULT) ? hdr->default_ttl : ttl_sec;
@@ -2453,19 +2509,17 @@ static int SHM_FN(put_inner)(ShmHandle *h,
             if (insert_pos == UINT32_MAX) insert_pos = idx;
             continue;
         }
-        /* SHM_IS_LIVE -- check tag then key match */
         if (st != tag) continue;
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
-            /* update existing value */
 #ifdef SHM_VAL_IS_STR
             {
                 uint32_t old_off = nodes[idx].val_off;
                 uint32_t old_lf = nodes[idx].val_len;
-                if (!shm_str_store(hdr, h->arena, &nodes[idx].val_off, &nodes[idx].val_len, val_str, val_len, val_utf8))
+                if (!SHM_FN(store_or_evict)(h, &nodes[idx].val_off, &nodes[idx].val_len, val_str, val_len, val_utf8, idx))
                     return 0;
                 shm_str_free(hdr, h->arena, old_off, old_lf);
             }
@@ -2481,24 +2535,25 @@ static int SHM_FN(put_inner)(ShmHandle *h,
         }
     }
 
-    if (insert_pos == UINT32_MAX) return 0;
+    if (insert_pos == UINT32_MAX &&
+        (insert_pos = SHM_FN(reclaim_expired_slot)(h, pos, mask)) == UINT32_MAX)
+        return 0;
 
     /* LRU eviction only when actually inserting */
     if (hdr->max_size > 0 && hdr->size >= hdr->max_size)
         SHM_FN(lru_evict_one)(h);
 
-    /* insert new entry */
     int was_tombstone = (states[insert_pos] == SHM_TOMBSTONE);
 
 #ifdef SHM_KEY_IS_INT
     nodes[insert_pos].key = key;
 #else
-    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8))
+    if (!SHM_FN(store_or_evict)(h, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8, SHM_LRU_NONE))
         return 0;
 #endif
 
 #ifdef SHM_VAL_IS_STR
-    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].val_off, &nodes[insert_pos].val_len, val_str, val_len, val_utf8)) {
+    if (!SHM_FN(store_or_evict)(h, &nodes[insert_pos].val_off, &nodes[insert_pos].val_len, val_str, val_len, val_utf8, SHM_LRU_NONE)) {
 #ifndef SHM_KEY_IS_INT
         shm_str_free(hdr, h->arena, nodes[insert_pos].key_off, nodes[insert_pos].key_len);
 #endif
@@ -2509,10 +2564,9 @@ static int SHM_FN(put_inner)(ShmHandle *h,
 #endif
 
     states[insert_pos] = SHM_MAKE_TAG(hash);
-    /* Retire the tombstone BEFORE counting the new entry.  Incrementing size
-     * first briefly makes size + tombstones == table_cap + 1, which is exactly
-     * what validate_header rejects -- a concurrent open in that window fails
-     * with "corrupt header" on a perfectly healthy saturated map. */
+    /* tombstones-- before size++: the other order briefly makes
+     * size + tombstones == table_cap + 1, and a concurrent open in that window
+     * refuses a healthy saturated map as corrupt. */
     if (was_tombstone) hdr->tombstones--;
     hdr->size++;
 
@@ -2632,9 +2686,8 @@ static int SHM_FN(get)(ShmHandle *h,
 #else
     SHM_SHARD_DISPATCH(h, key_str, key_len);
 #endif
-    /* Unified seqlock path -- lock-free for ALL maps including LRU/TTL.
-     * LRU uses clock/second-chance: just set accessed bit, no wrlock.
-     * TTL check is done under seqlock retry protection. */
+    /* Lock-free for every map: LRU sets the clock bit rather than taking the
+     * write lock, and the TTL check runs under seqlock retry. */
     ShmHeader *hdr = h->hdr;
     SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
     uint8_t *states = h->states;
@@ -2656,7 +2709,6 @@ static int SHM_FN(get)(ShmHandle *h,
         int found = 0;
         uint32_t local_idx = 0;
 
-        /* local copies of result data */
 #ifdef SHM_VAL_IS_STR
         uint32_t local_vl = 0, local_voff = 0, local_vlen_packed = 0;
 #else
@@ -2667,10 +2719,9 @@ static int SHM_FN(get)(ShmHandle *h,
         uint32_t probe_start = 0;  /* scalar loop starts here */
 
 #ifdef __SSE2__
-        /* SIMD fast path: check first 16 states in one shot.
-         * Bound by the clamped extent (mask+1), NOT a live re-read of
-         * hdr->table_cap: a peer corrupting table_cap past max_table_cap
-         * must not let this group load run off the states[] array. */
+        /* Bound by the clamped mask+1, never a live re-read of table_cap: a
+         * peer corrupting it past max_table_cap must not let this group load
+         * run off states[]. */
         if (pos + 16 <= mask + 1) {
             uint16_t mmask, emask;
             shm_probe_group(states, pos, tag, &mmask, &emask);
@@ -2723,47 +2774,47 @@ static int SHM_FN(get)(ShmHandle *h,
 simd_done:
 #endif
         if (!found) {
-        for (uint32_t i = probe_start; i <= mask; i++) {
-            uint32_t idx = (pos + i) & mask;
-            uint8_t st = states[idx];
-            __builtin_prefetch(&nodes[idx], 0, 1);
-            __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
+            for (uint32_t i = probe_start; i <= mask; i++) {
+                uint32_t idx = (pos + i) & mask;
+                uint8_t st = states[idx];
+                __builtin_prefetch(&nodes[idx], 0, 1);
+                __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
 
-            if (st == SHM_EMPTY) break;
-            if (st != tag) continue;
+                if (st == SHM_EMPTY) break;
+                if (st != tag) continue;
 
 #ifdef SHM_KEY_IS_INT
-            if (SHM_KEY_EQ(&nodes[idx], key)) {
+                if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-            {
-                uint32_t kl_packed = nodes[idx].key_len;
-                uint32_t koff = nodes[idx].key_off;
-                uint32_t kl = SHM_STR_LEN(kl_packed);
-                if (kl != key_len) continue;
-                /* key_utf8 is metadata for retrieval, not part of identity */
-                if (SHM_IS_INLINE(kl_packed)) {
-                    char ibuf[SHM_INLINE_MAX];
-                    shm_inline_read(koff, kl_packed, ibuf);
-                    if (memcmp(ibuf, key_str, kl) != 0) continue;
-                } else {
-                    if ((uint64_t)koff + kl > arena_cap) break;
-                    if (memcmp(h->arena + koff, key_str, kl) != 0) continue;
+                {
+                    uint32_t kl_packed = nodes[idx].key_len;
+                    uint32_t koff = nodes[idx].key_off;
+                    uint32_t kl = SHM_STR_LEN(kl_packed);
+                    if (kl != key_len) continue;
+                    /* key_utf8 is metadata for retrieval, not part of identity */
+                    if (SHM_IS_INLINE(kl_packed)) {
+                        char ibuf[SHM_INLINE_MAX];
+                        shm_inline_read(koff, kl_packed, ibuf);
+                        if (memcmp(ibuf, key_str, kl) != 0) continue;
+                    } else {
+                        if ((uint64_t)koff + kl > arena_cap) break;
+                        if (memcmp(h->arena + koff, key_str, kl) != 0) continue;
+                    }
                 }
-            }
-            {
+                {
 #endif
 #ifdef SHM_VAL_IS_STR
-                local_vlen_packed = nodes[idx].val_len;
-                local_vl = SHM_STR_LEN(local_vlen_packed);
-                local_voff = nodes[idx].val_off;
+                    local_vlen_packed = nodes[idx].val_len;
+                    local_vl = SHM_STR_LEN(local_vlen_packed);
+                    local_voff = nodes[idx].val_off;
 #else
-                local_value = __atomic_load_n(&nodes[idx].value, __ATOMIC_RELAXED);
+                    local_value = __atomic_load_n(&nodes[idx].value, __ATOMIC_RELAXED);
 #endif
-                local_idx = idx;
-                found = 1;
-                break;
+                    local_idx = idx;
+                    found = 1;
+                    break;
+                }
             }
-        }
         }
 
         if (found) {
@@ -2779,7 +2830,6 @@ simd_done:
         if (found) {
 #ifdef SHM_VAL_IS_STR
             if (SHM_IS_INLINE(local_vlen_packed)) {
-                /* Inline value -- data is in local_voff + local_vlen_packed, no arena access */
                 if (local_vl > h->copy_buf_size || !h->copy_buf) {
                     if (!shm_ensure_copy_buf(h, local_vl > 0 ? local_vl : 1)) return 0;
                     continue;
@@ -2788,12 +2838,10 @@ simd_done:
             } else {
                 /* Arena value -- bounds check before copy */
                 if ((uint64_t)local_voff + local_vl > arena_cap) {
-                    /* Retry only if the sequence moved: that means we caught a
-                     * torn record mid-write and the next pass reads consistent
-                     * values.  An unchanged sequence means the record is stably
-                     * corrupt, and looping here would spin at 100% CPU forever.
-                     * Deliver zeros instead, matching shm_str_copy's handling of
-                     * the same poisoned-record case (CWE-125). */
+                    /* Retry only if the sequence moved, which means a torn
+                     * record the next pass reads consistently.  An unchanged
+                     * sequence is stable corruption, and looping would spin
+                     * forever: deliver zeros, as shm_str_copy does. */
                     if (shm_seqlock_read_retry(&hdr->seq, seq)) continue;
                     if (local_vl > h->copy_buf_size || !h->copy_buf) {
                         if (!shm_ensure_copy_buf(h, local_vl > 0 ? local_vl : 1)) return 0;
@@ -2811,9 +2859,8 @@ simd_done:
 #endif
             if (shm_seqlock_read_retry(&hdr->seq, seq)) continue;
 
-            /* validated -- set clock accessed bit and commit results.
-             * A frozen (read-only) view maps PROT_READ: skip the clock-bit store
-             * (the only write on this read path) so a lookup cannot fault. */
+            /* A frozen view maps PROT_READ: skip the clock-bit store, the only
+             * write on this read path, so a lookup cannot fault. */
             if (h->lru_accessed && !h->readonly)
                 __atomic_store_n(&h->lru_accessed[local_idx], 1, __ATOMIC_RELAXED);
 #ifdef SHM_VAL_IS_STR
@@ -2866,12 +2913,12 @@ static int SHM_FN(exists_ttl)(ShmHandle *h,
         uint8_t st = states[idx];
         __builtin_prefetch(&nodes[idx], 0, 1);
         __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
-            if (st == SHM_EMPTY) break;
-            if (st != tag) continue;  /* tombstone or tag mismatch */
+        if (st == SHM_EMPTY) break;
+        if (st != tag) continue;  /* tombstone or tag mismatch */
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             int found = !SHM_IS_EXPIRED(h, idx, now);
             shm_rwlock_rdunlock(h);
@@ -2928,8 +2975,8 @@ static int SHM_FN(exists)(ShmHandle *h,
         for (uint32_t i = 0; i <= mask; i++) {
             uint32_t idx = (pos + i) & mask;
             uint8_t st = states[idx];
-        __builtin_prefetch(&nodes[idx], 0, 1);
-        __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
+            __builtin_prefetch(&nodes[idx], 0, 1);
+            __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
             if (st == SHM_EMPTY) break;
             if (st != tag) continue;  /* tombstone or tag mismatch */
 #ifdef SHM_KEY_IS_INT
@@ -2996,7 +3043,7 @@ static int SHM_FN(remove_inner)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             /* Expired is absent, as every other operation reports it. */
             if (SHM_IS_EXPIRED(h, idx, now)) {
@@ -3094,7 +3141,7 @@ static int SHM_FN(add_impl)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             /* Live key blocks add; expired entries are reclaimed */
             if (SHM_IS_EXPIRED(h, idx, now)) {
@@ -3108,7 +3155,8 @@ static int SHM_FN(add_impl)(ShmHandle *h,
         }
     }
 
-    if (insert_pos == UINT32_MAX) {
+    if (insert_pos == UINT32_MAX &&
+        (insert_pos = SHM_FN(reclaim_expired_slot)(h, pos, mask)) == UINT32_MAX) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
         return 0;
@@ -3121,14 +3169,14 @@ static int SHM_FN(add_impl)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     nodes[insert_pos].key = key;
 #else
-    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8)) {
+    if (!SHM_FN(store_or_evict)(h, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8, SHM_LRU_NONE)) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
         return 0;
     }
 #endif
 #ifdef SHM_VAL_IS_STR
-    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].val_off, &nodes[insert_pos].val_len, val_str, val_len, val_utf8)) {
+    if (!SHM_FN(store_or_evict)(h, &nodes[insert_pos].val_off, &nodes[insert_pos].val_len, val_str, val_len, val_utf8, SHM_LRU_NONE)) {
 #ifndef SHM_KEY_IS_INT
         shm_str_free(hdr, h->arena, nodes[insert_pos].key_off, nodes[insert_pos].key_len);
 #endif
@@ -3140,10 +3188,9 @@ static int SHM_FN(add_impl)(ShmHandle *h,
     __atomic_store_n(&nodes[insert_pos].value, value, __ATOMIC_RELAXED);
 #endif
     states[insert_pos] = SHM_MAKE_TAG(hash);
-    /* Retire the tombstone BEFORE counting the new entry.  Incrementing size
-     * first briefly makes size + tombstones == table_cap + 1, which is exactly
-     * what validate_header rejects -- a concurrent open in that window fails
-     * with "corrupt header" on a perfectly healthy saturated map. */
+    /* tombstones-- before size++: the other order briefly makes
+     * size + tombstones == table_cap + 1, and a concurrent open in that window
+     * refuses a healthy saturated map as corrupt. */
     if (was_tombstone) hdr->tombstones--;
     hdr->size++;
 
@@ -3259,7 +3306,7 @@ static int SHM_FN(update_impl)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, idx, now)) {
                 SHM_FN(expire_at)(h, idx);
@@ -3272,7 +3319,7 @@ static int SHM_FN(update_impl)(ShmHandle *h,
             {
                 uint32_t old_off = nodes[idx].val_off;
                 uint32_t old_lf = nodes[idx].val_len;
-                if (!shm_str_store(hdr, h->arena, &nodes[idx].val_off, &nodes[idx].val_len, val_str, val_len, val_utf8)) {
+                if (!SHM_FN(store_or_evict)(h, &nodes[idx].val_off, &nodes[idx].val_len, val_str, val_len, val_utf8, idx)) {
                     shm_seqlock_write_end(&hdr->seq);
                     shm_rwlock_wrunlock(h);
                     return 0;
@@ -3414,14 +3461,13 @@ static int SHM_FN(swap)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, idx, now)) {
                 SHM_FN(expire_at)(h, idx);
                 if (insert_pos == UINT32_MAX) insert_pos = idx;
                 break;
             }
-            /* Copy old value out, then overwrite */
 #ifdef SHM_VAL_IS_STR
             {
                 uint32_t old_vl = SHM_STR_LEN(nodes[idx].val_len);
@@ -3438,7 +3484,7 @@ static int SHM_FN(swap)(ShmHandle *h,
                 {
                     uint32_t old_off = nodes[idx].val_off;
                     uint32_t old_lf = nodes[idx].val_len;
-                    if (!shm_str_store(hdr, h->arena, &nodes[idx].val_off, &nodes[idx].val_len, val_str, val_len, val_utf8)) {
+                    if (!SHM_FN(store_or_evict)(h, &nodes[idx].val_off, &nodes[idx].val_len, val_str, val_len, val_utf8, idx)) {
                         shm_seqlock_write_end(&hdr->seq);
                         shm_rwlock_wrunlock(h);
                         return 0;
@@ -3460,14 +3506,13 @@ static int SHM_FN(swap)(ShmHandle *h,
         }
     }
 
-    /* Key not found -- insert new */
-    if (insert_pos == UINT32_MAX) {
+    if (insert_pos == UINT32_MAX &&
+        (insert_pos = SHM_FN(reclaim_expired_slot)(h, pos, mask)) == UINT32_MAX) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
         return 0;
     }
 
-    /* LRU eviction if at capacity */
     if (hdr->max_size > 0 && hdr->size >= hdr->max_size)
         SHM_FN(lru_evict_one)(h);
 
@@ -3475,14 +3520,14 @@ static int SHM_FN(swap)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     nodes[insert_pos].key = key;
 #else
-    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8)) {
+    if (!SHM_FN(store_or_evict)(h, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8, SHM_LRU_NONE)) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
         return 0;
     }
 #endif
 #ifdef SHM_VAL_IS_STR
-    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].val_off, &nodes[insert_pos].val_len, val_str, val_len, val_utf8)) {
+    if (!SHM_FN(store_or_evict)(h, &nodes[insert_pos].val_off, &nodes[insert_pos].val_len, val_str, val_len, val_utf8, SHM_LRU_NONE)) {
 #ifndef SHM_KEY_IS_INT
         shm_str_free(hdr, h->arena, nodes[insert_pos].key_off, nodes[insert_pos].key_len);
 #endif
@@ -3494,10 +3539,9 @@ static int SHM_FN(swap)(ShmHandle *h,
     __atomic_store_n(&nodes[insert_pos].value, value, __ATOMIC_RELAXED);
 #endif
     states[insert_pos] = SHM_MAKE_TAG(hash);
-    /* Retire the tombstone BEFORE counting the new entry.  Incrementing size
-     * first briefly makes size + tombstones == table_cap + 1, which is exactly
-     * what validate_header rejects -- a concurrent open in that window fails
-     * with "corrupt header" on a perfectly healthy saturated map. */
+    /* tombstones-- before size++: the other order briefly makes
+     * size + tombstones == table_cap + 1, and a concurrent open in that window
+     * refuses a healthy saturated map as corrupt. */
     if (was_tombstone) hdr->tombstones--;
     hdr->size++;
 
@@ -3553,13 +3597,13 @@ static int SHM_FN(take)(ShmHandle *h,
         uint8_t st = states[idx];
         __builtin_prefetch(&nodes[idx], 0, 1);
         __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
-            if (st == SHM_EMPTY) break;
-            if (st != tag) continue;  /* tombstone or tag mismatch */
+        if (st == SHM_EMPTY) break;
+        if (st != tag) continue;  /* tombstone or tag mismatch */
 
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             /* check TTL */
             if (SHM_IS_EXPIRED(h, idx, now)) {
@@ -3601,10 +3645,9 @@ static int SHM_FN(take)(ShmHandle *h,
     return 0;
 }
 
-/* ---- Compare-and-take (atomic remove if value matches expected) ----
- * Returns 1 if matched and removed (old value copied out); 0 if key missing,
- * expired, or value did not match. Integer variants compare by integer
- * equality; string-value variants compare bytes only. */
+/* ---- Compare-and-take (atomic remove if the value matches) ----
+ * 1 if matched and removed, the old value copied out; 0 if the key is missing
+ * or expired or the value differs.  String values compare by bytes only. */
 static int SHM_FN(cas_take)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     SHM_KEY_INT_TYPE key,
@@ -3650,7 +3693,7 @@ static int SHM_FN(cas_take)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, idx, now)) {
                 SHM_FN(expire_at)(h, idx);
@@ -3743,7 +3786,6 @@ static int SHM_FN(pop)(ShmHandle *h,
     /* Find victim: LRU tail if available, else linear scan */
     uint32_t idx = UINT32_MAX;
     if (h->lru_prev && hdr->lru_tail != SHM_LRU_NONE) {
-        /* Walk from tail, skipping expired */
         uint32_t pos = hdr->lru_tail;
         while (pos != SHM_LRU_NONE) {
             if (!SHM_IS_EXPIRED(h, pos, now)) { idx = pos; break; }
@@ -3752,14 +3794,20 @@ static int SHM_FN(pop)(ShmHandle *h,
             pos = prev;
         }
     } else {
-        /* No LRU: scan from slot 0, expire stale entries along the way */
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
+        /* No LRU: sweep forward from where the last pop or drain stopped,
+         * expiring stale entries along the way */
+        uint32_t cap = hdr->table_cap;
+        uint32_t start = hdr->pop_cursor < cap ? hdr->pop_cursor : 0;
+        for (uint32_t n = 0; n < cap; n++) {
+            uint32_t i = (start + n) % cap;
             if (!SHM_IS_LIVE(states[i])) continue;
             if (SHM_IS_EXPIRED(h, i, now)) {
                 SHM_FN(expire_at)(h, i);
                 continue;
             }
-            idx = i; break;
+            idx = i;
+            hdr->pop_cursor = (i + 1) % cap;
+            break;
         }
     }
 
@@ -3769,7 +3817,6 @@ static int SHM_FN(pop)(ShmHandle *h,
         return 0;
     }
 
-    /* Copy key+value out */
 #ifdef SHM_KEY_IS_INT
     *out_key = nodes[idx].key;
 #else
@@ -3869,7 +3916,6 @@ static int SHM_FN(shift)(ShmHandle *h,
     /* Find victim: LRU head if available, else scan backward */
     uint32_t idx = UINT32_MAX;
     if (h->lru_prev && hdr->lru_head != SHM_LRU_NONE) {
-        /* Walk from head, skipping expired */
         uint32_t pos = hdr->lru_head;
         while (pos != SHM_LRU_NONE) {
             if (!SHM_IS_EXPIRED(h, pos, now)) { idx = pos; break; }
@@ -3878,14 +3924,20 @@ static int SHM_FN(shift)(ShmHandle *h,
             pos = nxt;
         }
     } else {
-        /* No LRU: scan backward from last slot, expire stale entries */
-        for (uint32_t i = hdr->table_cap; i > 0; i--) {
-            if (!SHM_IS_LIVE(states[i - 1])) continue;
-            if (SHM_IS_EXPIRED(h, i - 1, now)) {
-                SHM_FN(expire_at)(h, i - 1);
+        /* No LRU: sweep backward from where the last shift stopped, expiring
+         * stale entries along the way */
+        uint32_t cap = hdr->table_cap;
+        uint32_t start = (hdr->shift_cursor == 0 || hdr->shift_cursor > cap) ? cap : hdr->shift_cursor;
+        for (uint32_t n = 0; n < cap; n++) {
+            uint32_t i = (start + cap - 1 - n) % cap;
+            if (!SHM_IS_LIVE(states[i])) continue;
+            if (SHM_IS_EXPIRED(h, i, now)) {
+                SHM_FN(expire_at)(h, i);
                 continue;
             }
-            idx = i - 1; break;
+            idx = i;
+            hdr->shift_cursor = i;
+            break;
         }
     }
 
@@ -3895,7 +3947,6 @@ static int SHM_FN(shift)(ShmHandle *h,
         return 0;
     }
 
-    /* Copy key+value out */
 #ifdef SHM_KEY_IS_INT
     *out_key = nodes[idx].key;
 #else
@@ -3985,7 +4036,11 @@ static uint32_t SHM_FN(drain_inner)(ShmHandle *h, uint32_t limit,
     shm_rwlock_wrlock(h);
     shm_seqlock_write_begin(&hdr->seq);
 
-    uint32_t scan_pos = 0;  /* non-LRU scan cursor to avoid O(N^2) rescan */
+    /* non-LRU: sweep forward from where the last pop or drain stopped, at
+     * most once around the table */
+    uint32_t cap = hdr->table_cap;
+    uint32_t cur = hdr->pop_cursor < cap ? hdr->pop_cursor : 0;
+    uint32_t scanned = 0;
     while (count < limit) {
         uint32_t idx = UINT32_MAX;
 
@@ -3998,13 +4053,16 @@ static uint32_t SHM_FN(drain_inner)(ShmHandle *h, uint32_t limit,
                 pos = prev;
             }
         } else {
-            for (; scan_pos < hdr->table_cap; scan_pos++) {
-                if (!SHM_IS_LIVE(states[scan_pos])) continue;
-                if (SHM_IS_EXPIRED(h, scan_pos, now)) {
-                    SHM_FN(expire_at)(h, scan_pos);
+            while (scanned < cap) {
+                uint32_t i = cur;
+                cur = (cur + 1) % cap;
+                scanned++;
+                if (!SHM_IS_LIVE(states[i])) continue;
+                if (SHM_IS_EXPIRED(h, i, now)) {
+                    SHM_FN(expire_at)(h, i);
                     continue;
                 }
-                idx = scan_pos++;
+                idx = i;
                 break;
             }
         }
@@ -4046,6 +4104,7 @@ static uint32_t SHM_FN(drain_inner)(ShmHandle *h, uint32_t limit,
         count++;
     }
 
+    if (!h->lru_prev) hdr->pop_cursor = cur;
     if (count > 0) SHM_FN(maybe_shrink)(h);
 
     shm_seqlock_write_end(&hdr->seq);
@@ -4107,7 +4166,7 @@ static inline int SHM_FN(find_slot)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
             if (SHM_KEY_EQ(&nodes[idx], key)) { *out_idx = idx; return 1; }
 #else
-            if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) { *out_idx = idx; return 1; }
+            if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) { *out_idx = idx; return 1; }
 #endif
             relevant &= relevant - 1;
         }
@@ -4126,7 +4185,7 @@ static inline int SHM_FN(find_slot)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             *out_idx = idx;
             return 1;
@@ -4151,12 +4210,10 @@ static SHM_VAL_INT_TYPE SHM_FN(incr_by)(ShmHandle *h,
     SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
     uint32_t now = h->expires_at ? shm_now() : 0;
 
-    /* fast path: existing key under read lock + atomic add (no LRU/TTL).
-     * No seqlock bump is needed here: only the single `value` word changes, and
-     * a concurrent get() reads it with one atomic load, so per-location coherence
-     * hands it old-or-new (never torn) on every arch including aarch64. The
-     * seqlock exists to guard multi-field snapshots against structural writers
-     * (resize / key-replace / expire); this path touches neither key nor state. */
+    /* Fast path, no LRU or TTL: only the `value` word changes and a concurrent
+     * get() reads it with one atomic load, so per-location coherence hands it
+     * old-or-new.  The seqlock guards multi-field snapshots against structural
+     * writers; this path touches neither key nor state. */
     if (!h->lru_prev && !h->expires_at) {
         shm_rwlock_rdlock(h);
         uint32_t idx;
@@ -4206,7 +4263,7 @@ static SHM_VAL_INT_TYPE SHM_FN(incr_by)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[slot], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[slot], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[slot], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             /* TTL check */
             if (SHM_IS_EXPIRED(h, slot, now)) {
@@ -4228,7 +4285,8 @@ static SHM_VAL_INT_TYPE SHM_FN(incr_by)(ShmHandle *h,
         }
     }
 
-    if (insert_pos == UINT32_MAX) {
+    if (insert_pos == UINT32_MAX &&
+        (insert_pos = SHM_FN(reclaim_expired_slot)(h, pos, mask)) == UINT32_MAX) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
         *ok = 0;
@@ -4243,7 +4301,7 @@ static SHM_VAL_INT_TYPE SHM_FN(incr_by)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     nodes[insert_pos].key = key;
 #else
-    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8)) {
+    if (!SHM_FN(store_or_evict)(h, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8, SHM_LRU_NONE)) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
         *ok = 0;
@@ -4265,11 +4323,10 @@ static SHM_VAL_INT_TYPE SHM_FN(incr_by)(ShmHandle *h,
     return delta;
 }
 
-/* ---- Atomic max / min (monotonic raise/lower; insert-if-absent) ---- */
-/* want_max != 0: store max(current, desired); else min(current, desired).
- * Returns the resulting stored value; an absent key inserts `desired`. The
- * compare-and-set happens under a single lock acquisition, so there is no
- * read->modify gap for a concurrent incr_by / cas / max / min to slip into. */
+/* ---- Atomic max / min (monotonic raise/lower; insert-if-absent) ----
+ * want_max stores max(current, desired), else min; returns the stored value
+ * and inserts `desired` for an absent key.  One lock acquisition covers the
+ * compare and the set, leaving no gap for a concurrent counter operation. */
 static SHM_VAL_INT_TYPE SHM_FN(set_minmax)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     SHM_KEY_INT_TYPE key,
@@ -4347,7 +4404,7 @@ static SHM_VAL_INT_TYPE SHM_FN(set_minmax)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[slot], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[slot], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[slot], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, slot, now)) {
                 SHM_FN(expire_at)(h, slot);
@@ -4371,7 +4428,8 @@ static SHM_VAL_INT_TYPE SHM_FN(set_minmax)(ShmHandle *h,
         }
     }
 
-    if (insert_pos == UINT32_MAX) {
+    if (insert_pos == UINT32_MAX &&
+        (insert_pos = SHM_FN(reclaim_expired_slot)(h, pos, mask)) == UINT32_MAX) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
         *ok = 0;
@@ -4386,7 +4444,7 @@ static SHM_VAL_INT_TYPE SHM_FN(set_minmax)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     nodes[insert_pos].key = key;
 #else
-    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8)) {
+    if (!SHM_FN(store_or_evict)(h, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8, SHM_LRU_NONE)) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
         *ok = 0;
@@ -4450,7 +4508,7 @@ static int SHM_FN(cas)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, idx, now)) {
                 SHM_FN(expire_at)(h, idx);
@@ -4525,7 +4583,7 @@ static int SHM_FN(cas)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, idx, now)) {
                 SHM_FN(expire_at)(h, idx);
@@ -4545,8 +4603,8 @@ static int SHM_FN(cas)(ShmHandle *h,
             }
             uint32_t old_off = nodes[idx].val_off;
             uint32_t old_lf = nodes[idx].val_len;
-            if (!shm_str_store(hdr, h->arena, &nodes[idx].val_off, &nodes[idx].val_len,
-                               desired_str, desired_len, desired_utf8)) {
+            if (!SHM_FN(store_or_evict)(h, &nodes[idx].val_off, &nodes[idx].val_len,
+                               desired_str, desired_len, desired_utf8, idx)) {
                 shm_seqlock_write_end(&hdr->seq);
                 shm_rwlock_wrunlock(h);
                 return 0;
@@ -4610,13 +4668,9 @@ static inline uint32_t SHM_FN(ttl)(ShmHandle *h) {
 }
 
 /* ---- Get value with TTL remaining (atomic snapshot) ----
- * Returns 1 if key found and live (output args filled); 0 if missing/expired.
- * *out_ttl_remaining encodes the entry's TTL state on a return of 1:
- *   -1 = map has no TTL enabled
- *    0 = entry is permanent
- *   >0 = seconds remaining until expiry
- * Caller may pass NULL out_ttl_remaining if only the value is wanted.
- */
+ * 1 if the key is live, 0 if missing or expired.  *out_ttl_remaining is -1
+ * without TTL, 0 for a permanent entry, else the seconds left; NULL if only
+ * the value is wanted. */
 static int SHM_FN(get_with_ttl)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     SHM_KEY_INT_TYPE key,
@@ -4661,7 +4715,7 @@ static int SHM_FN(get_with_ttl)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, idx, now_ts)) {
                 shm_rwlock_rdunlock(h);
@@ -4736,12 +4790,12 @@ static int64_t SHM_FN(ttl_remaining)(ShmHandle *h,
         uint8_t st = states[idx];
         __builtin_prefetch(&nodes[idx], 0, 1);
         __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
-            if (st == SHM_EMPTY) break;
-            if (st != tag) continue;  /* tombstone or tag mismatch */
+        if (st == SHM_EMPTY) break;
+        if (st != tag) continue;  /* tombstone or tag mismatch */
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             uint32_t exp = h->expires_at[idx];
             if (exp == 0) {
@@ -4806,7 +4860,7 @@ static int SHM_FN(persist)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, idx, now)) {
                 shm_seqlock_write_begin(&hdr->seq);
@@ -4871,7 +4925,7 @@ static int SHM_FN(set_ttl)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, idx, now)) {
                 shm_seqlock_write_begin(&hdr->seq);
@@ -4930,10 +4984,9 @@ static inline size_t SHM_FN(mmap_size)(ShmHandle *h) {
 
 /* ---- Flush expired entries (partial / gradual) ---- */
 
-/* Scan up to `limit` slots starting from the shared flush_cursor.
- * Returns the number of entries actually expired.
- * Sets *done_out to 1 if the cursor wrapped around (full cycle complete).
- * The wrlock is held only for `limit` slots, not the entire table. */
+/* Scan up to `limit` slots from the shared flush_cursor, returning the number
+ * expired and setting *done_out when the cursor completes a cycle.  The write
+ * lock is held for those slots only, not the whole table. */
 static uint32_t SHM_FN(flush_expired_partial)(ShmHandle *h, uint32_t limit, int *done_out) {
     if (h->shard_handles) {
         uint32_t total = 0;
@@ -5041,12 +5094,12 @@ static int SHM_FN(touch)(ShmHandle *h,
         uint8_t st = states[idx];
         __builtin_prefetch(&nodes[idx], 0, 1);
         __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
-            if (st == SHM_EMPTY) break;
-            if (st != tag) continue;  /* tombstone or tag mismatch */
+        if (st == SHM_EMPTY) break;
+        if (st != tag) continue;  /* tombstone or tag mismatch */
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, idx, now)) {
                 shm_seqlock_write_begin(&hdr->seq);
@@ -5081,15 +5134,13 @@ static int SHM_FN(reserve)(ShmHandle *h, uint32_t target) {
         return ok;
     }
     ShmHeader *hdr = h->hdr;
-    /* The ceiling is what max_entries() reports -- the 75% design load -- not
-     * the raw slot count, so the two agree: reserve() accepts exactly the
-     * values that accessor names. */
+    /* The ceiling is what max_entries() reports, the 75% design load, so
+     * reserve() accepts exactly the values that accessor names. */
     if (target > (uint32_t)((uint64_t)hdr->max_table_cap * 3 / 4)) return 0;
     /* compute min capacity for target entries at <75% load */
     uint32_t needed = shm_next_pow2(target + target / 3 + 1);
-    /* At the very top of the range that lands one power of two ABOVE
-     * max_table_cap; the target still fits, so grow to the maximum rather than
-     * refusing the ceiling we just accepted. */
+    /* The top of the range rounds one power of two above max_table_cap; the
+     * target still fits, so grow to the maximum rather than refuse it. */
     if (needed == 0 || needed > hdr->max_table_cap) needed = hdr->max_table_cap;
     if (needed < SHM_INITIAL_CAP) needed = SHM_INITIAL_CAP;
     if (needed <= hdr->table_cap) return 1;  /* already big enough */
@@ -5162,9 +5213,9 @@ static void SHM_FN(clear)(ShmHandle *h) {
     if (h->shard_handles) {
         for (uint32_t i = 0; i < h->num_shards; i++)
             SHM_FN(clear)(h->shard_handles[i]);
-        /* Clearing invalidates any iteration in progress: without this a
-         * later each() resumes at the shard it had reached and skips the
-         * ones below it. */
+        /* Clearing invalidates this handle's iteration, or a later each()
+         * resumes at the shard it had reached and skips the ones below.
+         * shard_iter is per handle: another process's pass is still cut short. */
         h->shard_iter = 0;
         return;
     }
@@ -5209,6 +5260,8 @@ static void SHM_FN(clear)(ShmHandle *h) {
         memset(h->expires_at, 0, hdr->max_table_cap * sizeof(uint32_t));
         hdr->flush_cursor = 0;
     }
+    hdr->pop_cursor = 0;
+    hdr->shift_cursor = 0;
 
     hdr->table_gen++;
 
@@ -5301,7 +5354,7 @@ static int SHM_FN(get_or_set)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             /* TTL check */
             if (SHM_IS_EXPIRED(h, idx, now)) {
@@ -5336,7 +5389,8 @@ static int SHM_FN(get_or_set)(ShmHandle *h,
     }
 
     /* not found -- insert default value */
-    if (insert_pos == UINT32_MAX) {
+    if (insert_pos == UINT32_MAX &&
+        (insert_pos = SHM_FN(reclaim_expired_slot)(h, pos, mask)) == UINT32_MAX) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
         return 0;
@@ -5351,7 +5405,7 @@ static int SHM_FN(get_or_set)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     nodes[insert_pos].key = key;
 #else
-    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8)) {
+    if (!SHM_FN(store_or_evict)(h, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8, SHM_LRU_NONE)) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
         return 0;
@@ -5367,7 +5421,7 @@ static int SHM_FN(get_or_set)(ShmHandle *h,
         shm_rwlock_wrunlock(h);
         return 0;
     }
-    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].val_off, &nodes[insert_pos].val_len, def_str, def_len, def_utf8)) {
+    if (!SHM_FN(store_or_evict)(h, &nodes[insert_pos].val_off, &nodes[insert_pos].val_len, def_str, def_len, def_utf8, SHM_LRU_NONE)) {
 #ifndef SHM_KEY_IS_INT
         shm_str_free(hdr, h->arena, nodes[insert_pos].key_off, nodes[insert_pos].key_len);
 #endif
@@ -5380,10 +5434,9 @@ static int SHM_FN(get_or_set)(ShmHandle *h,
 #endif
 
     states[insert_pos] = SHM_MAKE_TAG(hash);
-    /* Retire the tombstone BEFORE counting the new entry.  Incrementing size
-     * first briefly makes size + tombstones == table_cap + 1, which is exactly
-     * what validate_header rejects -- a concurrent open in that window fails
-     * with "corrupt header" on a perfectly healthy saturated map. */
+    /* tombstones-- before size++: the other order briefly makes
+     * size + tombstones == table_cap + 1, and a concurrent open in that window
+     * refuses a healthy saturated map as corrupt. */
     if (was_tombstone) hdr->tombstones--;
     hdr->size++;
 
@@ -5635,9 +5688,8 @@ static int SHM_FN(cursor_next)(ShmCursor *c,
             c->iter_pos = 0;
             c->gen = c->current->hdr->table_gen;
         } else {
-            /* All shards exhausted: clear c->current so cursor_destroy /
-             * cursor_reset / cursor_seek don't double-decrement the last
-             * shard's `iterating` counter (we already did at line above). */
+            /* Clear c->current, or cursor_destroy, reset and seek
+             * double-decrement the last shard's `iterating` counter. */
             c->current = NULL;
         }
     }
@@ -5671,39 +5723,26 @@ static int SHM_FN(cursor_seek)(ShmCursor *c,
     const char *key_str, uint32_t key_len, bool key_utf8
 #endif
 ) {
-    /* For sharded maps, route to the correct shard based on key hash */
+    /* For sharded maps, route to the correct shard based on key hash. */
 #ifdef SHM_KEY_IS_INT
-    uint32_t hash = SHM_HASH_KEY(key);
+    uint64_t hash64 = SHM_HASH_KEY64(key);
 #else
-    uint32_t hash = SHM_HASH_KEY_STR(key_str, key_len);
+    uint64_t hash64 = SHM_HASH_KEY_STR64(key_str, key_len);
 #endif
+    uint32_t hash = (uint32_t)hash64;
     ShmHandle *parent = c->handle;
     ShmHandle *target;
     uint32_t target_shard = 0;
     if (parent->shard_handles) {
-        target_shard = hash & parent->shard_mask;
+        target_shard = shm_shard_index(parent, hash64);
         target = parent->shard_handles[target_shard];
     } else {
         target = parent;
     }
 
-    /* Switch cursor to the target shard */
-    if (target != c->current) {
-        if (c->current && c->current->iterating > 0)
-            c->current->iterating--;
-        SHM_FN(flush_deferred)(c->current);
-        c->current = target;
-        c->current->iterating++;
-        c->shard_idx = target_shard;
-        /* Stale iter_pos/gen from the previous shard would corrupt a
-         * subsequent cursor_next on the new shard (which uses the
-         * gen-mismatch check as its only reset trigger, and two fresh
-         * shards can coincidentally share table_gen=0). */
-        c->iter_pos = 0;
-        c->gen = target->hdr->table_gen;
-    }
-
-    ShmHandle *h = c->current;
+    /* Probe before moving the cursor: a seek that finds nothing must leave the
+     * iteration where it was. */
+    ShmHandle *h = target;
     ShmHeader *hdr = h->hdr;
     SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
     uint8_t *states = h->states;
@@ -5725,15 +5764,27 @@ static int SHM_FN(cursor_seek)(ShmCursor *c,
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
 #else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, h->hdr->arena_cap, key_str, key_len, key_utf8)) {
 #endif
             if (SHM_IS_EXPIRED(h, idx, now)) {
                 shm_rwlock_rdunlock(h);
                 return 0;
             }
-            c->iter_pos = idx;
-            c->gen = hdr->table_gen;
+            uint32_t found_gen = hdr->table_gen;
             shm_rwlock_rdunlock(h);
+            /* Committed: the key is there, so move the cursor.  gen is the one
+             * read under the lock, so a resize in this window leaves a stale
+             * gen and cursor_next resets rather than trusting iter_pos. */
+            if (target != c->current) {
+                if (c->current && c->current->iterating > 0)
+                    c->current->iterating--;
+                SHM_FN(flush_deferred)(c->current);
+                c->current = target;
+                c->current->iterating++;
+                c->shard_idx = target_shard;
+            }
+            c->iter_pos = idx;
+            c->gen = found_gen;
             return 1;
         }
     }
@@ -5756,9 +5807,11 @@ static int SHM_FN(cursor_seek)(ShmCursor *c,
   #undef SHM_KEY_IS_INT
   #undef SHM_KEY_INT_TYPE
   #undef SHM_HASH_KEY
+  #undef SHM_HASH_KEY64
   #undef SHM_KEY_EQ
 #else
   #undef SHM_HASH_KEY_STR
+  #undef SHM_HASH_KEY_STR64
   #undef SHM_KEY_EQ_STR
 #endif
 

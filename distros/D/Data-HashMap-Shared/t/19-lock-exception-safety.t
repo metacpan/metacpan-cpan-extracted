@@ -4,13 +4,12 @@ use Test::More;
 use POSIX ':sys_wait_h';
 use File::Temp ();
 
-# Regression: batch write ops (set_multi/remove_multi) call SvIV/SvPV on
-# caller SVs while holding the write lock + seqlock. A tied or overloaded
-# argument can die() inside that loop. Before WRSEQ_GUARD the longjmp
-# abandoned the lock with the seqlock left odd, self-deadlocking the
-# process on its next op (recovery never fires for a live PID). Each case
-# below runs in a child with a wall-clock deadline: a real leak hangs in a
-# futex syscall that Perl's alarm cannot interrupt, so we fork + kill.
+# Batch writes call SvIV/SvPV on caller SVs while holding the write lock and
+# seqlock, and a tied or overloaded argument can die() inside that loop: the
+# longjmp must not abandon the lock with the seqlock left odd, which
+# self-deadlocks the process on its next op, recovery never firing for a live
+# pid.  Each case runs in a child with a wall-clock deadline -- a real leak
+# hangs in a futex syscall that Perl's alarm cannot interrupt.
 
 # Overloaded object whose numification AND stringification die — exercises
 # both the SvIV (integer-key/value) and SvPV (string-key/value) paths.

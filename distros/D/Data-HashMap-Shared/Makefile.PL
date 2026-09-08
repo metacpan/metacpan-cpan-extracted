@@ -24,6 +24,13 @@ eval {
 };
 warn "XS::Parse::Keyword::Builder not found; build will likely fail\n" if $@;
 
+my %provides;
+for my $file ('lib/Data/HashMap/Shared.pm', sort glob 'lib/Data/HashMap/Shared/*.pm') {
+    (my $module = $file) =~ s{^lib/|\.pm$}{}g;
+    $module =~ s{/}{::}g;
+    $provides{$module} = { file => $file, version => MM->parse_version($file) };
+}
+
 WriteMakefile(
     NAME              => 'Data::HashMap::Shared',
     VERSION_FROM      => 'lib/Data/HashMap/Shared.pm',
@@ -48,15 +55,15 @@ WriteMakefile(
     XS                => { 'Shared.xs' => 'Shared.c' },
     OBJECT            => 'Shared$(OBJ_EXT)',
     TYPEMAPS         => ['typemap'],
-    # Shared.xs pulls in the per-variant xs/*.xs via INCLUDE:, and the object
-    # #includes the C templates; track both so plain `make` regenerates after
-    # editing them (otherwise a stale Shared.c/.o is silently reused).
+    # Track the INCLUDE:d xs/*.xs and the #included C templates, or `make`
+    # silently reuses a stale Shared.c after editing one.
     depend            => {
         'Shared.c'         => join(' ', sort glob 'xs/*.xs'),
         'Shared$(OBJ_EXT)' => join(' ', 'xxhash.h', sort glob 'shm_*.h'),
     },
     META_MERGE        => {
         'meta-spec' => { version => 2 },
+        provides    => \%provides,
         resources   => {
             repository => {
                 type => 'git',

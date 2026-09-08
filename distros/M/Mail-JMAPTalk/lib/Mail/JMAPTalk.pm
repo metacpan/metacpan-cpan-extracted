@@ -11,7 +11,7 @@ use MIME::Base64;
 use Carp qw(confess);
 use Data::Dumper;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 our $CLIENT = "Mail-JMAPTalk";
 our $AGENT = "$CLIENT/$VERSION";
@@ -107,6 +107,11 @@ Other Options:
 Request Defaults:
 
  * using => \@urns (default ['urn:ietf:params:jmap:core', 'urn:ietf:params:jmap:mail'])
+ * accountId => $id: added as the "accountId" argument of every method call
+   that does not give one (and as "fromAccountId" too for the /copy methods),
+   since RFC 8620 requires it on every method except Core/echo.  Also the
+   account Upload() posts to when none is passed.  No default: nothing is
+   added, and a call without accountId is sent as written.
 
 =cut
 
@@ -119,6 +124,47 @@ sub new {
   $Self->{using} ||= ['urn:ietf:params:jmap:core', 'urn:ietf:params:jmap:mail'];
 
   return $Self;
+}
+
+=head2 my $accountId = $Self->accountId();
+
+=head2 $Self->accountId($accountId);
+
+Returns or replaces the default accountId (see new()).  Pass undef to clear
+it, after which calls are sent exactly as written.
+
+=cut
+
+sub accountId {
+  my $Self = shift;
+  $Self->{accountId} = shift if @_;
+  return $Self->{accountId};
+}
+
+# The account-scoped arguments a method call may carry.  RFC 8620 section 3.6.1:
+# every standard method except Core/echo takes accountId; the /copy methods
+# (section 5.4) take fromAccountId as well.
+sub _with_default_account {
+  my ($Self, $MethodCalls) = @_;
+  my $default = $Self->{accountId};
+  return $MethodCalls unless defined $default;
+
+  my @out;
+  for my $call (@$MethodCalls) {
+    my ($name, $args, $tag) = @$call;
+    if (ref($args) ne 'HASH' or ($name // '') eq 'Core/echo') {
+      push @out, $call;
+      next;
+    }
+    my %args = %$args;   # never modify the caller's structure
+    my @fields = ('accountId', ($name // '') =~ m{/copy\z} ? ('fromAccountId') : ());
+    for my $field (@fields) {
+      next if exists $args{$field} or exists $args{"#$field"};
+      $args{$field} = $default;
+    }
+    push @out, [$name, \%args, @{$call}[2 .. $#$call]];
+  }
+  return \@out;
 }
 
 =head2 my $ua = $Self->ua();
@@ -469,7 +515,7 @@ sub CallMethods {
 
   my $Request = {
     using => $Using,
-    methodCalls => $MethodCalls,
+    methodCalls => $Self->_with_default_account($MethodCalls),
     createdIds => $Self->{CreatedIds} || {},
   };
 
@@ -586,7 +632,7 @@ sub Upload {
   my ($data, $type, $accountId) = @_;
 
   $Headers{'Content-Type'} = $type || _get_type($data);
-  $accountId = $accountId || $Self->{user};
+  $accountId = $accountId // $Self->{accountId} // $Self->{user};
 
   if ($Self->{user}) {
     $Headers{'Authorization'} = $Self->auth_header();

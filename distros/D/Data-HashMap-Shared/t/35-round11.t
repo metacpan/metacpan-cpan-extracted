@@ -78,28 +78,32 @@ for my $v (@VARIANTS) {
 # ---------------------------------------------------------------------------
 {
     my $cls = 'Data::HashMap::Shared::II';
-    like  warning(sub { $cls->new("$dir/ms1.shm", 100, 1000) }),
-          qr/max_size 1000 needs all 256 slots/, 'max_size beyond capacity warns';
-    like  warning(sub { $cls->new("$dir/ms2.shm", 100, 257) }),
-          qr/max_size 257 needs all/, 'one slot beyond capacity warns';
+    my $w = warning(sub { $cls->new("$dir/ms1.shm", 100, 1000) });
+    like  $w, qr/max_size 1000 needs all \d+ slots/, 'max_size beyond capacity warns';
+    # the one sizing pin; everything below is relative to it
+    my ($slots) = $w =~ /needs all (\d+) slots/;
+    is    $slots, 256, 'max_entries 100 sizes the table to 256 slots';
+    like  warning(sub { $cls->new("$dir/ms2.shm", 100, $slots + 1) }),
+          qr/max_size @{[ $slots + 1 ]} needs all/, 'one slot beyond capacity warns';
     # A max_size EQUAL to the slot count is unreachable too: the insert probes
     # for a free slot and fails before it ever reaches the eviction check.
-    like  warning(sub { $cls->new("$dir/ms3.shm", 100, 256) }),
-          qr/max_size 256 needs all/, 'max_size exactly at capacity warns';
-    is    warning(sub { $cls->new("$dir/ms3b.shm", 100, 255) }),
+    like  warning(sub { $cls->new("$dir/ms3.shm", 100, $slots) }),
+          qr/max_size $slots needs all/, 'max_size exactly at capacity warns';
+    is    warning(sub { $cls->new("$dir/ms3b.shm", 100, $slots - 1) }),
           '', 'one slot below capacity is silent';
     is    warning(sub { $cls->new("$dir/ms4.shm", 100, 50) }),
           '', 'max_size below capacity is silent';
 
-    # ... and the warning tracks the behaviour: 255 evicts, 256 never does
+    # ... and the warning tracks the behaviour: one slot below capacity evicts,
+    # at capacity never does
     my %ev;
-    for my $ms (255, 256) {
+    for my $ms ($slots - 1, $slots) {
         my $m = do { no warnings 'misc'; $cls->new("$dir/ev$ms.shm", 100, $ms) };
         $m->put($_, $_) for 1 .. 400;
         $ev{$ms} = $m->stats->{evictions};
     }
-    ok  $ev{255} > 0, 'max_size below capacity really evicts';
-    is  $ev{256}, 0,  'max_size at capacity really never evicts';
+    ok  $ev{$slots - 1} > 0, 'max_size below capacity really evicts';
+    is  $ev{$slots}, 0,      'max_size at capacity really never evicts';
     is    warning(sub { $cls->new("$dir/ms5.shm", 100) }),
           '', 'no LRU bound is silent';
     like  warning(sub { $cls->new_sharded("$dir/ms6", 4, 100, 1000) }),

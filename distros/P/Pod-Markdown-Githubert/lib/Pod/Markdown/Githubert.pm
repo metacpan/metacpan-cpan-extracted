@@ -5,7 +5,7 @@ use warnings;
 use Pod::Markdown ();
 our @ISA = 'Pod::Markdown';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub new {
     my $class = shift;
@@ -269,6 +269,8 @@ Gets (with no arguments) or sets (with one argument) the current language for
 syntax highlighting. You can use this to set the initial language for code
 blocks that have no preceding C<=for highlighter language=...> paragraph:
 
+=for highlighter language=perl
+
     my $p = Pod::Markdown::Githubert->new;
     $p->hl_language('perl');
     # or alternatively:
@@ -316,9 +318,11 @@ Lukas Mai, C<< <lmai at web.de> >>
 Copyright 2023-2024 Lukas Mai.
 
 This module is free software; you can redistribute it and/or modify it under
-the terms of either: the GNU General Public License as published by the Free
-Software Foundation; or the Artistic License.
+the same terms as the Perl 5 programming language system itself, i.e. either
+the L<GNU General Public License|perlgpl> as published by the Free Software
+Foundation (version 1 or later) or the L<Artistic License|perlartistic>.
 
-See L<https://dev.perl.org/licenses/> for more information.
+For your convenience, the GNU GPL (version 1) and Artistic License are included
+in this distribution as F<GPLv1> and F<Artistic>, respectively.
 
 =cut

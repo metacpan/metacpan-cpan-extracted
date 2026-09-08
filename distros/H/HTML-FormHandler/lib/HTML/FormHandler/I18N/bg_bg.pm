@@ -1,6 +1,6 @@
 package HTML::FormHandler::I18N::bg_bg;
 # ABSTRACT: Bulgarian message file
-$HTML::FormHandler::I18N::bg_bg::VERSION = '0.410001';
+$HTML::FormHandler::I18N::bg_bg::VERSION = '0.410002';
 use strict;
 use warnings;
 use utf8;
@@ -110,7 +110,7 @@ HTML::FormHandler::I18N::bg_bg - Bulgarian message file
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 NAME
 

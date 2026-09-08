@@ -1,6 +1,6 @@
 package HTML::FormHandler::Render::Table;
 # ABSTRACT: render a form with a table layout
-$HTML::FormHandler::Render::Table::VERSION = '0.410001';
+$HTML::FormHandler::Render::Table::VERSION = '0.410002';
 use Moose::Role;
 
 with 'HTML::FormHandler::Render::Simple' =>
@@ -85,7 +85,7 @@ HTML::FormHandler::Render::Table - render a form with a table layout
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

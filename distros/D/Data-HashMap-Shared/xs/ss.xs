@@ -131,15 +131,11 @@ set_multi(SV* self_sv, ...)
         uint32_t count = 0;
         if (h->shard_handles) {
             for (int i = 1; i < items; i += 2) {
-                /* Both key and value are PV args, so only one of them can be
-                 * captured last. Resolve the VALUE first and capture the KEY
-                 * last: SvPV must be used (not SvPV_nomg) because _nomg skips
-                 * overload dispatch, which would silently stringify an
-                 * overloaded argument as "Class=ARRAY(0x...)".
-                 * Residual, documented rather than papered over: a key whose
-                 * own overload mutates the VALUE scalar can still dangle _vs.
-                 * Closing that without copying is not possible when either
-                 * side may mutate the other. */
+                /* Both key and value are PV args and only one can be captured
+                 * last: resolve the value first, capture the key last, and use
+                 * SvPV (not SvPV_nomg) so overload dispatch still runs.  A key
+                 * whose own overload mutates the value scalar can still dangle
+                 * _vs; closing that would need a copy. */
                 STRLEN _vl; const char *_vs = SvPV(ST(i+1), _vl);
                 bool _vu = SvUTF8(ST(i+1)) ? 1 : 0;
                 REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
@@ -153,10 +149,6 @@ set_multi(SV* self_sv, ...)
         } else {
             WRSEQ_GUARD(h);
             for (int i = 1; i < items; i += 2) {
-                /* Same ordering as the sharded branch above: value resolved
-                 * first, key captured last, SvPV (not _nomg) so overload
-                 * dispatch still happens, and the handle re-read after each
-                 * magic-capable step. */
                 STRLEN _vl; const char *_vs = SvPV(ST(i+1), _vl);
                 bool _vu = SvUTF8(ST(i+1)) ? 1 : 0;
                 if (_vl > SHM_MAX_STR_LEN) croak("value too long (max 1GB)");
@@ -212,6 +204,7 @@ get_multi(SV* self_sv, ...)
             for (int i = 0; i < nkeys; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i + 1), _kl);
                 bool _ku = SvUTF8(ST(i + 1)) ? 1 : 0;
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
                 const char *out_s; uint32_t out_l; bool out_u;
                 REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
                 if (shm_ss_get(h, _ks, (uint32_t)_kl, _ku, &out_s, &out_l, &out_u)) {
@@ -225,12 +218,17 @@ get_multi(SV* self_sv, ...)
             ShmNodeSS *nodes = (ShmNodeSS *)h->nodes;
             uint8_t *states = h->states;
             char *arena = h->arena;
+            uint64_t arena_cap = h->hdr->arena_cap;
             uint32_t now = h->expires_at ? shm_now() : 0;
             RDLOCK_GUARD(h);
             uint32_t mask = hdr->table_cap - 1;
             for (int i = 0; i < nkeys; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i + 1), _kl);
                 bool _ku = SvUTF8(ST(i + 1)) ? 1 : 0;
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
+                /* The hoisted hdr/nodes/states/arena survive this magic:
+                 * RDLOCK_GUARD holds a lock and shm_close_map defers the free
+                 * while lock_depth > 0. */
                 REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
                 uint32_t hash = shm_hash_string(_ks, (uint32_t)_kl);
                 uint32_t pos = hash & mask;
@@ -242,7 +240,7 @@ get_multi(SV* self_sv, ...)
                     uint8_t st = states[idx];
                     if (st == SHM_EMPTY) break;
                     if (st != tag) continue;
-                    if (shm_ss__key_eq_str(&nodes[idx], arena, _ks, (uint32_t)_kl, _ku)) {
+                    if (shm_ss__key_eq_str(&nodes[idx], arena, arena_cap, _ks, (uint32_t)_kl, _ku)) {
                         if (h->expires_at && h->expires_at[idx] && now >= h->expires_at[idx]) break;
                         vidx = idx; found = 1; break;
                     }
@@ -544,6 +542,7 @@ to_hash(SV* self_sv)
                 }
             }
         }
+
         RETVAL = newRV_noinc((SV*)hv);
     OUTPUT:
         RETVAL

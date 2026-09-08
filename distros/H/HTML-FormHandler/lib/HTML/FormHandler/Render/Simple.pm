@@ -1,6 +1,6 @@
 package HTML::FormHandler::Render::Simple;
 # ABSTRACT: simple rendering role
-$HTML::FormHandler::Render::Simple::VERSION = '0.410001';
+$HTML::FormHandler::Render::Simple::VERSION = '0.410002';
 use Moose::Role;
 
 requires( 'sorted_fields', 'field' );
@@ -299,7 +299,7 @@ HTML::FormHandler::Render::Simple - simple rendering role
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

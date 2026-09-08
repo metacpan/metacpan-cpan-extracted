@@ -1,0 +1,241 @@
+=head1 NAME
+
+Fugu::OpenPGP - read an armored OpenPGP public key as bytes
+
+=head1 SYNOPSIS
+
+    use Fugu::OpenPGP;
+
+    my ($binary, $reason) = Fugu::OpenPGP->decode_armor($armored_text);
+    die $reason unless defined $binary;
+
+    my $fingerprint = Fugu::OpenPGP->fingerprint($binary)
+        or die 'not a version 4 public key packet';
+
+    my $hash = Fugu::OpenPGP->wkd_hash('security');
+    # .well-known/openpgpkey/hu/$hash
+
+=head1 DESCRIPTION
+
+Fugu::OpenPGP decodes the armor of RFC 4880. It computes the version 4
+fingerprint of a public key packet. It also computes the Web Key
+Directory hash of a local part.
+
+The module runs no command, so a caller needs no gpg(1). It holds
+class methods only, because it holds no state. It uses core
+L<Digest::SHA> and core L<MIME::Base64>, so it adds no dependency.
+
+The module reads a public key only. It holds no private key, it
+decrypts nothing, and it verifies no signature. gpg(1) owns those
+acts.
+
+Every recoverable failure returns C<undef>. In list context the second
+value holds the reason. The module never dies for bad input: a key
+file comes from outside, so bad bytes are data and not a programming
+error. The module never logs. The caller decides what to report.
+
+=head2 decode_armor
+
+C<decode_armor($text)> returns the binary form of an armored block.
+
+The method reads the two delimiter lines, it skips the armor headers,
+it decodes the base64 body, and it compares the CRC-24 checksum line
+against the decoded bytes.
+
+The checksum comparison is not decoration. A decoder that skips it
+accepts a truncated key, and a truncated key gives a fingerprint of
+its own. A caller would then publish a fingerprint that no key
+matches.
+
+The padding of base64 ends the data, so it may sit at the end of the
+last body line only. A line with interior padding decodes to a
+truncated key, and a crafted checksum line would still agree with the
+truncation. gpg(1) rejects such a block, and so does this method.
+
+The method reads the first block of the text. A text with several
+blocks therefore gives the first key, and the rest stay unread.
+C<Fugu::KeyDir::keys_file> writes such a text, so a caller that wants
+every key of a C<KEYS> file must split the text itself.
+
+Armor is text, so the method reads either line ending. A block that
+travelled through email holds CRLF, and it decodes to the same bytes.
+The method also trims the whitespace of each body line, because a
+mailer can pad one.
+
+The method never changes the string of the caller.
+
+Each of these is a failure:
+
+=over 4
+
+=item * a missing delimiter line
+
+=item * two delimiter lines that name two block types
+
+=item * an absent blank line after the armor headers
+
+=item * an armor header with a value and no space after the colon
+
+=item * a body line that is not base64
+
+=item * a base64 body that is not a whole number of groups
+
+=item * an absent checksum line, or more than one
+
+=item * a body line after the checksum line
+
+=item * a checksum mismatch
+
+=back
+
+The blank line after the armor headers is necessary. RFC 4880 states
+it, and gpg(1) rejects a block without it. This method must not
+accept a block that gpg(1) rejects, because a site would then publish
+a key that no consumer can import.
+
+The method trims the two ends of each body line, so a mailer that
+padded a line changes nothing.
+
+The rule runs one way only. The method never accepts a block that
+gpg(1) rejects, so a key that this method validated always imports.
+The method can reject a block that gpg(1) reads, and it does so for
+each of these:
+
+=over 4
+
+=item * a body line with interior whitespace
+
+=item * a second checksum line
+
+=item * a body line after the checksum line
+
+=item * two delimiter lines that name two block types
+
+=item * a text above C<MAX_ARMOR_SIZE>
+
+=back The bound C<MAX_ARMOR_SIZE> applies to the whole text, and not to one
+block. A text above 1 MiB is a failure, whatever the size of its
+first block.
+
+=head2 fingerprint
+
+C<fingerprint($binary)> returns the version 4 fingerprint of the first
+packet, in upper-case hexadecimal with no separator.
+
+The fingerprint is the SHA-1 of the byte C<0x99>, the two-byte length
+of the public key packet body, and that body, per RFC 4880 section
+12.2. The method reads the length from the packet header and writes
+the length again, so the same key gives the same answer in the old
+packet format and in the new one.
+
+The method reads both header formats. It reads every length form that
+carries a whole packet. The old format has a one-byte, a two-byte and
+a four-byte form, and the new format has a one-byte, a two-byte and a
+five-byte form.
+
+Two forms carry no whole packet, and the method rejects each one: the
+indeterminate length of the old format, and a partial body length of
+the new one. A public key packet never uses either.
+
+The digest writes the body length in two octets. A body above
+C<MAX_PACKET_BODY> therefore has no version 4 fingerprint, and it is
+a failure. C<pack> would wrap the length with no warning, and the
+method would then answer with a confident wrong fingerprint.
+
+A first packet that is not a public key packet, a packet version other
+than 4, and a truncated packet body are each a failure.
+
+=head2 wkd_hash
+
+C<wkd_hash($local)> returns the Web Key Directory hash of an email
+local part.
+
+The hash is the z-base-32 form of the SHA-1 of the local part in lower
+case. C<gpg --locate-keys> asks for
+C<.well-known/openpgpkey/hu/E<lt>hashE<gt>>, so the answer decides the
+publication path.
+
+The method folds the ASCII letters of the part itself, so the case of
+an ASCII local part never changes the path. It leaves every byte above
+127 alone, because gpg(1) does: a lowercase step that reads such a
+byte as Latin-1 would rewrite the bytes of a UTF-8 local part.
+
+An undef local part and an empty one are each a failure.
+
+=head2 zbase32
+
+C<zbase32($bytes)> encodes bytes in z-base-32. C<wkd_hash> calls it,
+and a caller can call it for another purpose.
+
+The alphabet is C<ybndrfg8ejkmcpqxot1uwisza345h769>, and it is not the
+RFC 4648 alphabet. The order differs, so the same digest gives a
+different string. A caller that swaps the alphabet publishes a key at
+a URL that gpg(1) never asks for.
+
+The encoding writes no padding, and it emits one character for each
+five bits. A byte count that is not a multiple of five therefore ends
+on a partial group, and the low bits of that group are zero. An undef
+input and an empty one each give the empty string.
+
+=head1 CONSTANTS
+
+=over 4
+
+=item C<MAX_PACKET_BODY>
+
+The largest public key packet body that a version 4 fingerprint can
+hold, 65535 bytes, per RFC 4880 section 12.2.
+
+=item C<MAX_ARMOR_SIZE>
+
+The size bound of the whole text, 1 MiB. A public key of a person
+holds a few kilobytes. A caller that names a disk image by mistake
+gets a clean failure, not a decode of 500 MB.
+
+=item C<PACKET_PUBLIC_KEY>
+
+The tag of a public key packet, 6, per RFC 4880 section 4.3.
+
+=item C<ZBASE32_ALPHABET>
+
+The z-base-32 alphabet of the Web Key Directory.
+
+=item C<CRC24_INIT>, C<CRC24_POLY>
+
+The initial value and the generator polynomial of the armor checksum,
+per RFC 4880 section 6.1.
+
+=back
+
+=head1 RETURN VALUES
+
+Each public method returns its answer in scalar context, or C<undef>
+on a failure. In list context each one returns the answer and
+C<undef>, or C<undef> and the reason.
+
+Each method takes bytes. A string that holds a code point above 255
+is a failure, and never an answer. L<Digest::SHA> dies on such a
+string, and a byte unpack takes the low byte of each character. A
+caller that holds text must encode it first.
+
+=head1 CAVEATS
+
+The module reads the first packet of a block only. An armored key
+holds a public key packet first, then the user id packets, the
+signature packets and the subkey packets. A caller that needs a
+subkey fingerprint needs a full packet walk, which this module does
+not hold.
+
+The module verifies no signature and no key expiry. A fingerprint
+proves which bytes the block holds. It proves nothing about who made
+them, or whether the key is still valid.
+
+=head1 SEE ALSO
+
+gpg(1), L<Digest::SHA>, L<MIME::Base64>, L<Fugu::KeyDir>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

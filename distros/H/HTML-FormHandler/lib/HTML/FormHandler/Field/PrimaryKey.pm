@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::PrimaryKey;
 # ABSTRACT: primary key field
-$HTML::FormHandler::Field::PrimaryKey::VERSION = '0.410001';
+$HTML::FormHandler::Field::PrimaryKey::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field';
 
@@ -38,7 +38,7 @@ HTML::FormHandler::Field::PrimaryKey - primary key field
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

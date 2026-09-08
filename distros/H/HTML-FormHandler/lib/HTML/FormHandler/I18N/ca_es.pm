@@ -1,6 +1,6 @@
 package HTML::FormHandler::I18N::ca_es;
 # ABSTRACT: Catalan message translations - traducion catalana  dels missatges
-$HTML::FormHandler::I18N::ca_es::VERSION = '0.410001';
+$HTML::FormHandler::I18N::ca_es::VERSION = '0.410002';
 use strict;
 use warnings;
 use base 'HTML::FormHandler::I18N';
@@ -115,7 +115,7 @@ HTML::FormHandler::I18N::ca_es - Catalan message translations - traducion catala
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 NAME
 

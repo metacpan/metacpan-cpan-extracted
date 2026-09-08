@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Field::ButtonTag;
 # ABSTRACT: button field rendering widget, using button tag
-$HTML::FormHandler::Widget::Field::ButtonTag::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Field::ButtonTag::VERSION = '0.410002';
 use Moose::Role;
 use namespace::autoclean;
 use HTML::FormHandler::Render::Util ('process_attrs');
@@ -43,7 +43,7 @@ HTML::FormHandler::Widget::Field::ButtonTag - button field rendering widget, usi
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

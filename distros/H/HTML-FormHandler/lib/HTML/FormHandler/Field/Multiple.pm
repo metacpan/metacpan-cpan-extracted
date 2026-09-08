@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Multiple;
 # ABSTRACT: multiple select list
-$HTML::FormHandler::Field::Multiple::VERSION = '0.410001';
+$HTML::FormHandler::Field::Multiple::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field::Select';
 
@@ -39,7 +39,7 @@ HTML::FormHandler::Field::Multiple - multiple select list
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

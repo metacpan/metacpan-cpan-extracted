@@ -1,6 +1,6 @@
 package HTML::FormHandler::I18N::en_us;
 # ABSTRACT: base message file
-$HTML::FormHandler::I18N::en_us::VERSION = '0.410001';
+$HTML::FormHandler::I18N::en_us::VERSION = '0.410002';
 use strict;
 use warnings;
 use base 'HTML::FormHandler::I18N';
@@ -24,7 +24,7 @@ HTML::FormHandler::I18N::en_us - base message file
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

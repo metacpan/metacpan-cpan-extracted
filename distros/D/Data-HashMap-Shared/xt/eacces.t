@@ -22,7 +22,8 @@ chmod 0444, $path or die "chmod: $!";
 my $m = eval { Data::HashMap::Shared::II->new($path, 64) };
 my $err = $@;
 ok !defined($m), 'open on read-only path fails';
-like $err, qr/(open|permission|EACCES)/i, "error mentions permission: $err";
+# anchored on the message: croak's " at xt/eacces.t line N" suffix would match /EACCES/i
+like $err, qr/Permission denied/, "error mentions permission: $err";
 
 chmod 0644, $path;
 done_testing;

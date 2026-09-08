@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Field::Button;
 # ABSTRACT: button field rendering widget
-$HTML::FormHandler::Widget::Field::Button::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Field::Button::VERSION = '0.410002';
 use Moose::Role;
 use HTML::FormHandler::Render::Util ('process_attrs');
 use namespace::autoclean;
@@ -41,7 +41,7 @@ HTML::FormHandler::Widget::Field::Button - button field rendering widget
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

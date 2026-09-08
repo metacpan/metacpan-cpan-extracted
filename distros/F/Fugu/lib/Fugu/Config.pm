@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::Config;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use File::Basename qw(dirname);
 use File::Spec;

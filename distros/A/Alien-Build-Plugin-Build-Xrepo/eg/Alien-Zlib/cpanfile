@@ -1,0 +1,24 @@
+requires 'perl', '5.40.0';
+
+on 'configure' => sub {
+    requires 'ExtUtils::MakeMaker';
+    requires 'Alien::Build', '2.84';
+    requires 'Alien::Build::MM', '2.84';
+    requires 'Alien::Xrepo', 'v0.9.5';
+    requires 'Alien::Xmake', 'v0.9.5';
+};
+
+on 'build' => sub {
+    requires 'Alien::Build', '2.84';
+    requires 'Alien::Xrepo', 'v0.9.5';
+    requires 'Alien::Xmake', 'v0.9.5';
+};
+
+on 'test' => sub {
+    requires 'Test2::V0', '0';
+    requires 'Test::Alien', '2.84';
+};
+
+on 'runtime' => sub {
+    requires 'Alien::Base', '2.84';
+};

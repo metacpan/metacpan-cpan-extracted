@@ -1,5 +1,5 @@
 package DBIx::Lite;
-$DBIx::Lite::VERSION = '0.39';
+$DBIx::Lite::VERSION = '0.40';
 # ABSTRACT: Chained and minimal ORM
 use strict;
 use warnings;
@@ -92,7 +92,7 @@ sub dbh_do {
     if ($self->{connector}) {
         return $self->{connector}->run($code);
     } else {
-        $_ = $self->dbh;
+        local $_ = $self->dbh;
         return $code->();
     }
 }
@@ -161,7 +161,7 @@ DBIx::Lite - Chained and minimal ORM
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 

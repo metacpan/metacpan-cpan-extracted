@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 
 plan skip_all => "AUTHOR_TESTING not set" unless $ENV{AUTHOR_TESTING};
 use File::Temp ();
@@ -20,19 +21,15 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
     shm_ii_put $map, $_, $_ * 10 for 1..20;
 
-    # start iterating
     my ($k, $v) = shm_ii_each $map;
     ok(defined $k, 'each returns entry before clear');
 
-    # clear mid-iteration
     shm_ii_clear $map;
     is(shm_ii_size $map, 0, 'size is 0 after clear');
 
-    # each should return nothing (iterator was reset by clear)
     ($k, $v) = shm_ii_each $map;
     ok(!defined $k, 'each returns nothing after clear on empty map');
 
-    # re-populate and iterate from beginning
     shm_ii_put $map, 100, 200;
     ($k, $v) = shm_ii_each $map;
     ok(defined $k, 'each works after clear + re-populate');
@@ -55,13 +52,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_clear $map;
     is(shm_ii_size $map, 0, 'size 0 after clear with live cursor');
 
-    undef $cur;  # destroy cursor — must not underflow iterating count
+    undef $cur;  # must not underflow the iterating count
 
-    # map should still function properly (grow/shrink not permanently deferred)
     shm_ii_put $map, $_, $_ for 1..100;
     is(shm_ii_size $map, 100, 'map functional after clear-with-cursor + destroy');
-
-    # capacity should have grown (not stuck at initial due to deferred)
     ok(shm_ii_capacity($map) > 16, 'table grew after cursor destroy');
 
     unlink $path;
@@ -103,15 +97,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $got = shm_ss_get_or_set $map, "key1", $default;
     is($got, "hello", 'get_or_set returns default on insert');
 
-    # mutate the returned value
     $got .= " world";
     is($got, "hello world", 'local mutation works');
 
-    # shared value should be unchanged
     my $stored = shm_ss_get $map, "key1";
     is($stored, "hello", 'shared value unchanged after mutating returned SV');
 
-    # second call should return existing value (also a copy)
     my $got2 = shm_ss_get_or_set $map, "key1", "other";
     is($got2, "hello", 'get_or_set returns existing value on second call');
 
@@ -132,13 +123,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $rem2 = shm_ii_ttl_remaining $map, 2;
     ok(defined $rem2 && $rem2 > 0, 'ttl_remaining > 0 for TTL entry');
 
-    sleep 3;
+    Time::HiRes::sleep(2.2);
 
-    # permanent entry survives
     my $v1 = shm_ii_get $map, 1;
     is($v1, 100, 'permanent entry (ttl=0) survives past default TTL');
 
-    # TTL entry expired
     my $v2 = shm_ii_get $map, 2;
     ok(!defined $v2, 'default TTL entry expired');
 
@@ -151,35 +140,27 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 1000);
     shm_ii_put $map, 1, 42;
 
-    # Simulate a stale lock by forking a child that sets the lock and dies
     my $pid = fork();
     if ($pid == 0) {
         my $child_map = Data::HashMap::Shared::II->new($path, 1000);
-        # Do a normal put to prove the child can access the map
         shm_ii_put $child_map, 2, 99;
         POSIX::_exit(0);
     }
     waitpid($pid, 0);
 
-    # Now manually corrupt the lock to simulate the child dying while holding it.
-    # The header is at the start of the mmap file. rwlock is at offset 128
-    # and encodes 0x80000000 | pid when write-locked. seq is at offset 64.
+    # Leave the lock as the reaped child would have: wlock at offset 128 holds
+    # 0x80000000 | pid, seq at offset 64 is odd while a writer is active.
     open my $fh, '+<:raw', $path or die "Cannot open $path: $!";
-    # Set rwlock = 0x80000000 | $pid (write-locked by dead child)
     seek($fh, 128, 0);
     print $fh pack('V', 0x80000000 | $pid);
-    # Set seq to odd (writer active)
     seek($fh, 64, 0);
     print $fh pack('V', 1);
     close $fh;
 
-    # Re-open the map — the stale lock is now in the mmap
     undef $map;
     $map = Data::HashMap::Shared::II->new($path, 1000);
 
-    # This should recover after SHM_LOCK_TIMEOUT_SEC (2s) since $pid is dead
-    my $val = shm_ii_get $map, 1;
-    # The data written before corruption should still be readable
+    my $val = shm_ii_get $map, 1;   # recovers after the 2s lock timeout
     is($val, 42, 'recovered from stale lock without deadlock');
     ok(shm_ii_stat_recoveries($map) > 0, 'stat_recoveries incremented after recovery');
 
@@ -293,7 +274,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is($v, $k * 10, 'pop value matches key');
     is(shm_ii_size $map, 2, 'pop decrements size');
 
-    # pop until empty
     shm_ii_pop $map;
     shm_ii_pop $map;
     my ($ek, $ev) = shm_ii_pop $map;
@@ -327,12 +307,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is(scalar @got, 4, 'drain 2 returns 4 elements (2 pairs)');
     is(shm_ii_size $map, 3, 'drain 2 leaves 3 entries');
 
-    # drain more than remaining
     @got = shm_ii_drain $map, 100;
     is(scalar @got, 6, 'drain rest returns 6 elements (3 pairs)');
     is(shm_ii_size $map, 0, 'drain empties map');
 
-    # drain empty
     @got = shm_ii_drain $map, 5;
     is(scalar @got, 0, 'drain empty returns nothing');
 
@@ -400,7 +378,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is($sv, $sk * 10, 'shift value matches');
     is(shm_ii_size $map, 2, 'shift decrements size');
 
-    # shift until empty
     shm_ii_shift $map;
     shm_ii_shift $map;
     my ($ek) = shm_ii_shift $map;
@@ -468,7 +445,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
     shm_ii_put $map, 1, 100;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     my $r = shm_ii_add $map, 1, 200;
     ok($r, 'add succeeds after TTL expiry');
     my $v = shm_ii_get $map, 1;
@@ -598,7 +575,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $v = shm_ii_get $map, 1;
     is($v, 100, 'value unchanged after set_ttl');
 
-    # set_ttl 0 = make permanent
     shm_ii_set_ttl $map, 1, 0;
     $rem = shm_ii_ttl_remaining $map, 1;
     is($rem, 0, 'set_ttl 0 makes key permanent');
@@ -655,7 +631,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $v = shm_ii_get $map, 2;
     is($v, 20, 'set_multi values correct');
 
-    # overwrite existing + insert new
     $n = $map->set_multi(2, 222, 4, 40);
     is($n, 2, 'set_multi overwrite+insert returns 2');
     $v = shm_ii_get $map, 2;
@@ -699,7 +674,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_put $map, 99, 99;
     my $sz = shm_ii_size $map;
     is($sz, 10, 'clock: map stays at max_size after overflow');
-    # key 1 should survive (accessed bit gave it second chance)
     my $v = shm_ii_get $map, 1;
     ok(defined $v, 'clock: accessed key survives single eviction (second chance)');
     unlink $path;
@@ -710,7 +684,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 5);
     shm_ii_put $map, $_, $_ for 1..5;
-    # swap a new key — should evict to make room
     my $old = shm_ii_swap $map, 99, 999;
     ok(!defined $old, 'swap on LRU: new key returns undef');
     my $v = shm_ii_get $map, 99;
@@ -741,7 +714,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     $map->set_multi(1, 10, 2, 20, 3, 30);
     my $rem = shm_ii_ttl_remaining $map, 1;
     ok(defined $rem && $rem > 0, 'set_multi with TTL: entries have TTL');
-    sleep 3;
+    Time::HiRes::sleep(2.2);
     my $v = shm_ii_get $map, 1;
     ok(!defined $v, 'set_multi with TTL: entries expire');
     unlink $path;
@@ -754,8 +727,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_put $map, 1, 100;
     # persist before TTL expires
     shm_ii_persist $map, 1;
-    sleep 4;
-    # should still be readable (persisted = permanent)
+    Time::HiRes::sleep(2.2);
     my $v = shm_ii_get $map, 1;
     is($v, 100, 'persist then get: entry survives past original TTL');
     unlink $path;
@@ -771,7 +743,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_set_ttl $map, 1, 2;  # re-add 2s TTL
     $rem = shm_ii_ttl_remaining $map, 1;
     ok($rem > 0 && $rem <= 2, 'set_ttl re-adds TTL to permanent entry');
-    sleep 3;
+    Time::HiRes::sleep(2.2);
     my $v = shm_ii_get $map, 1;
     ok(!defined $v, 'entry expires after set_ttl re-added TTL');
     unlink $path;
@@ -783,7 +755,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, $_, $_ * 10 for 1..5;
     shm_ii_put_ttl $map, 99, 990, 0;  # permanent entry
-    sleep 6;  # 3x TTL — robust against smoker clock jitter
+    Time::HiRes::sleep(2.2);
     # keys 1-5 expired, key 99 still live
     my ($k, $v) = shm_ii_pop $map;
     is($k, 99, 'pop on TTL map skips expired, returns live entry');
@@ -798,7 +770,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, 1, 100;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     my $r = shm_ii_cas $map, 1, 100, 200;
     ok(!$r, 'cas on expired key returns false');
     unlink $path;
@@ -810,7 +782,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, $_, $_ for 1..3;
     shm_ii_put_ttl $map, 99, 99, 0;  # permanent
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     my @got = shm_ii_drain $map, 10;
     is(scalar @got, 2, 'drain on TTL map returns only live entries (1 pair)');
     is($got[0], 99, 'drain on TTL map: live key is 99');
@@ -829,7 +801,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(defined $v1, 'empty string value: defined (not undef)');
     my $v2 = shm_ss_get $map, "key2";
     is($v2, "hello", 'non-empty value: unchanged');
-    # overwrite with empty
     shm_ss_put $map, "key2", "";
     $v2 = shm_ss_get $map, "key2";
     is($v2, "", 'overwrite with empty string works');
@@ -847,7 +818,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_remove $map, $_ for 1..90;
     my $sz = shm_ii_size $map;
     is($sz, 10, 'sparse: 10 entries remain after bulk delete');
-    # iterate — should find exactly 10
     my $count = 0;
     while (my ($k, $v) = shm_ii_each $map) {
         ok($k >= 91 && $k <= 100, "sparse: each returns key $k in range 91-100");
@@ -855,7 +825,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
         $count++;
     }
     is($count, 10, 'sparse: each returns exactly 10 entries');
-    # cursor too
     my $cur = shm_ii_cursor $map;
     $count = 0;
     while (my ($k, $v) = shm_ii_cursor_next $cur) { $count++ }
@@ -912,7 +881,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, 1, 100;
 
-    # child persists key 1
     my $pid = fork();
     if ($pid == 0) {
         my $child = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
@@ -921,8 +889,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     }
     waitpid($pid, 0);
 
-    sleep 3;
-    # parent should see the persist (key survives past TTL)
+    Time::HiRes::sleep(2.2);
     my $v = shm_ii_get $map, 1;
     is($v, 100, 'cross-process persist: key survives past TTL');
     unlink $path;
@@ -934,7 +901,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 100);  # small max
     my $r = shm_ii_reserve $map, 10000;  # way beyond max
     ok(!$r, 'reserve beyond max_table_cap returns false');
-    # map still functional
     shm_ii_put $map, 1, 1;
     my $rv = shm_ii_get $map, 1;
     is($rv, 1, 'map functional after failed reserve');
@@ -945,7 +911,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 50);  # small arena
-    # fill with medium strings
     my $filled = 0;
     for my $i (1..50) {
         my $r = shm_ss_put $map, "k$i", "x" x 100;
@@ -1509,7 +1474,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_put $map, 1, 10;
     shm_ii_put $map, 2, 20;
     shm_ii_put_ttl $map, 3, 30, 2;  # expires in 2s
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     my @vals = $map->get_multi(1, 2, 3);
     is($vals[0], 10, 'get_multi TTL: non-expired key 1');
     is($vals[1], 20, 'get_multi TTL: non-expired key 2');
@@ -1640,9 +1605,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # --- flush_expired with actual expired entries ---
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);  # TTL=1s
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);  # TTL=2s
     shm_ii_put $map, $_, $_ for 1..50;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     my $flushed = shm_ii_flush_expired $map;
     is($flushed, 50, 'flush_expired: all 50 entries flushed');
     my $sz = shm_ii_size $map;
@@ -1657,7 +1622,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
     shm_ii_put $map, $_, $_ for 1..30;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     my $total = 0;
     my $rounds = 0;
     my $done = 0;

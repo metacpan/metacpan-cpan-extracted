@@ -1,6 +1,6 @@
 package HTML::FormHandler::I18N::de_de;
 # ABSTRACT: German message translations
-$HTML::FormHandler::I18N::de_de::VERSION = '0.410001';
+$HTML::FormHandler::I18N::de_de::VERSION = '0.410002';
 use strict;
 use warnings;
 use base 'HTML::FormHandler::I18N';
@@ -108,7 +108,7 @@ HTML::FormHandler::I18N::de_de - German message translations
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

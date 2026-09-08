@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.6');
+our $VERSION   = qv('v1.0.8');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ DBIx::Class::Async::Row - Asynchronous Row object representing a single database
 
 =head1 VERSION
 
-Version v1.0.6
+Version v1.0.8
 
 =head1 SYNOPSIS
 
@@ -777,14 +777,19 @@ sub update {
             async_db        => $self->{_async_db},
         );
 
-        # 3. Construct the PK condition
-        my @pk_cols = $source->primary_columns;
-        my %pk_cond = map { $_ => $self->get_column($_) } @pk_cols;
-
-        # 4. Now we can safely call _generate_cache_key
-        my $cache_key = $rs->_generate_cache_key(0, \%pk_cond);
-
-        $rs->clear_cache($cache_key);
+        # 3. Cache Invalidation
+        #
+        # It is impossible to invalidate the cache key by reconstructing it
+        # from the primary key of the row because cache keys are generated
+        # by using the complete criteria from a search query (as explained
+        # in CPANSec CWE-639 fix through ResultSet::_generate_cache_key
+        # method).
+        # Therefore, a read, such as search({ id => $id, owner => $user }),
+        # is cached using a key that is impossible to reconstruct from an
+        # update that is row-level. Instead of invalidating individual cache
+        # keys, one should invalidate the source completely, analogous to
+        # the writing operation of the ResultSet class.
+        $rs->clear_cache;
         return $self->_update_internal_state($rs);
     });
 }

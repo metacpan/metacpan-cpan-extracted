@@ -3,18 +3,16 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 
-# Regression (0.18): tombstone_at released the entry's arena blocks BEFORE
-# retiring the slot.  A writer killed in that window left states[idx] LIVE
-# while the key's block was already on the free list, whose push overwrites
-# the block's first 4 bytes with the previous list head -- so the key read
-# back mangled and the entry became unreachable by ANY key string, while the
-# same block stayed available for reuse.
+# tombstone_at must retire the slot before releasing the entry's arena blocks.
+# The other order leaves a writer killed in that window with states[idx] live
+# while the key's block is already on the free list, whose push overwrites its
+# first 4 bytes -- the key reads back mangled, the entry is unreachable by any
+# key string, and the block stays available for reuse.
 #
-# Both orderings produce the same final state, so only a crash mid-call can
-# tell them apart: we stop the process on the line that publishes the
-# tombstone and SIGKILL it there.  Pre-fix the frees have already run at that
-# point; post-fix they have not.  The invariant asserted is the one the bug
-# breaks: every key the cursor yields must round-trip through exists().
+# Both orders reach the same final state, so only a crash mid-call tells them
+# apart: stop the process on the line that publishes the tombstone and SIGKILL
+# it there.  The invariant asserted is the one the bug breaks: every key the
+# cursor yields must round-trip through exists().
 
 plan skip_all => 'set CRASH_GDB=1 to run' unless $ENV{CRASH_GDB};
 my $gdb = `which gdb 2>/dev/null`; chomp $gdb;
@@ -38,11 +36,16 @@ ok($line, "located the tombstone publish in shm_generic.h (line $line)")
 # Restore the default build even if we die partway: a stale -O0 tree would
 # persist silently, since a later bare `make` sees the objects as up to date.
 my $restore = 0;
-END { `make clean 2>/dev/null; $^X Makefile.PL 2>&1 && make 2>&1` if $restore }
+END {
+    if ($restore) {
+        `make clean 2>/dev/null; $^X Makefile.PL 2>&1 && make 2>&1`;
+        warn "the plain rebuild failed: blib still holds the debug build\n" if $?;
+    }
+}
 
 my $build = `make clean 2>/dev/null; $^X Makefile.PL 2>&1 && make OPTIMIZE='-g3 -O0' 2>&1`;
 $restore = 1;
-like $build, qr/Shared\.o/, 'debug build succeeded'
+is $?, 0, 'debug build succeeded'
     or BAIL_OUT("debug build failed:\n$build");
 
 my $dir = tempdir(CLEANUP => 1);

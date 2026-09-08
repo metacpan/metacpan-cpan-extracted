@@ -1,0 +1,336 @@
+=head1 NAME
+
+Fugu::KeyDir - the names, the order and the generated text of a published key directory
+
+=head1 SYNOPSIS
+
+    use Fugu::KeyDir;
+
+    my $dir = Fugu::KeyDir->new(org => 'fugubsd');
+
+    my $parts = $dir->parse_name('fugubsd-1-release.pub')
+        or die $dir->error;
+    # { stem => 'fugubsd-1-release', org => 'fugubsd',
+    #   serial => 1, purpose => 'release', type => 'signify' }
+
+    my $serial = $dir->next_serial(\@names, 'release');
+    my $name   = $dir->name_for(
+        serial  => $serial,
+        purpose => 'release',
+        type    => 'signify',
+    );
+
+    my @keys = (
+        { name => 'fugubsd-1-release.pub', status => 'retired' },
+        { name => 'fugubsd-2-release.pub', status => 'current',
+          since => '2026-09-06' },
+    );
+
+    $dir->check_statuses(\@keys) or die $dir->error;
+    my $rows = $dir->index_data(\@keys);
+    my $text = $dir->keys_file(\@keys);
+
+=head1 DESCRIPTION
+
+An organization publishes its public keys under one prefix.
+Fugu::KeyDir holds the generic parts of that key directory. It holds
+the file name pattern, the type of a key, and the status vocabulary.
+It also holds the order of a key set, and the text of the Apache
+C<KEYS> file, of the human index, and of C<security.txt>.
+
+The module holds no policy. The organization word, each purpose, the
+contact and each date are arguments, so one tested implementation
+serves every site.
+
+The module runs no command. It needs neither gpg(1) nor signify(1),
+and it renders no HTML: the site owns the template. Every recoverable
+failure returns C<undef>, and C<error> holds the reason.
+
+=head2 The key name
+
+A key file is C<E<lt>orgE<gt>-E<lt>serialE<gt>-E<lt>purposeE<gt>.E<lt>extE<gt>>,
+for example C<fugubsd-1-release.pub>.
+
+The organization word holds lower-case letters and digits, and it
+starts on a letter. The serial is an integer with no padding, above
+zero, so a reader sorts it as a number. The purpose names what the key
+signs, and it holds lower-case letters, digits and hyphens. The
+extension names the type: C<pub> is a signify key, and C<asc> is an
+armored OpenPGP key.
+
+The serial starts at 1 for each purpose, and each rotation of that
+purpose adds one. A new purpose therefore starts at 1, and a
+compromise of one purpose leaves the others in force.
+
+A serial holds at most C<MAX_SERIAL_DIGITS> digits. A serial counts
+the rotations of one purpose, so the bound is far above any real key
+set.
+
+The bound also keeps every serial inside the exact integer range of
+each Perl build. A long run of digits becomes a float, and the
+threshold is the value and not the digit count.
+
+C<parse_name> stores the serial as a number, so a float would reach
+C<next_serial> and then C<name_for>, which rejects it. The rotation
+would stall. Nine digits sit far below the threshold of every build.
+
+C<parse_name> and C<name_for> hold the same bound, so the two stay
+inverses.
+
+The stem, such as C<fugubsd-1-release>, is the key name in a
+description block and in a trust file. The name of a key never
+changes, and a retired key stays published at its URL, so a release
+that it signed still verifies.
+
+=head2 The key set
+
+Each method that reads a set takes an array reference of hash
+references. Each one must hold a C<name> and a C<status>. The module
+parses the name, so the serial and the purpose need no second source
+of truth.
+
+A key can hold these optional fields, and each method passes them
+through:
+
+=over 4
+
+=item C<armor>
+
+The armored body of an OpenPGP key. C<keys_file> needs it.
+
+=item C<fingerprint>
+
+The fingerprint of the key, from L<Fugu::OpenPGP>.
+
+=item C<since>, C<until>
+
+The dates of the key.
+
+=item C<email>
+
+The email address of an OpenPGP key.
+
+=back
+
+The module never mutates a key that a caller passes. Each method
+returns new data.
+
+=head2 new
+
+C<new(org =E<gt> $word)> builds a key directory. The organization word
+is necessary.
+
+C<new> dies without the word, and for a word that the name pattern
+cannot hold. Each one is a programming error: a site build reads the
+word from its own description block.
+
+=head2 org
+
+C<org()> returns the organization word of the directory.
+
+=head2 error
+
+C<error()> returns the reason of the most recent failure. It returns
+C<undef> after a success. Each method clears the reason before it
+starts.
+
+=head2 parse_name
+
+C<parse_name($filename)> returns the parts of a key file name, as a
+hash reference with C<stem>, C<org>, C<serial>, C<purpose> and
+C<type>.
+
+The organization word must equal the word of the object. A name that
+names another organization is a failure, and the reason names both
+words.
+
+Each of these is a failure:
+
+=over 4
+
+=item * an empty name, or a name with a solidus
+
+=item * a name with no extension
+
+=item * an upper-case extension, or an unknown one
+
+=item * a serial of zero, or a padded serial
+
+=item * a serial above the digit bound
+
+=item * a name that does not match the pattern
+
+=back
+
+A name with a solidus is a path. A caller that passes a path would
+publish a key outside the directory.
+
+=head2 name_for
+
+C<name_for(serial =E<gt> $n, purpose =E<gt> $word, type =E<gt> $type)>
+returns the file name of a key. The method is the inverse of
+C<parse_name>, so a caller never builds a name by hand.
+
+A serial that is not an integer above zero, a purpose outside the
+pattern, and an unknown type are each a failure.
+
+=head2 next_serial
+
+C<next_serial(\@names, $purpose)> returns the serial that a rotation of
+that purpose must take: one above the highest serial of the purpose.
+The answer is 1 when no key of the purpose exists.
+
+C<@names> holds key file names. A name that C<parse_name> rejects is a
+failure, because a directory with an unreadable name has no highest
+serial. The method dies when C<@names> is not an array reference.
+
+=head2 order
+
+C<order(\@keys)> returns the keys in publication order, as a new array
+reference. Each entry holds the fields of the input key and the parts
+of its name.
+
+The order is C<current>, then C<next>, then C<retired>. Inside one
+status the serial descends, so the newest key of that status leads.
+The purpose then breaks a tie, and the name breaks the last one.
+
+The order is total, so two runs write one byte sequence. A site build
+writes the index page on every build, so an unstable order would make
+a diff on each run.
+
+An empty set, a status outside the vocabulary, and one name twice are
+each a failure. The method dies when the set is not an array
+reference, and when a key is not a hash reference.
+
+=head2 check_statuses
+
+C<check_statuses(\@keys)> holds a key set to the status rule: each
+purpose must hold exactly one C<current> key, and at most one C<next>
+key.
+
+The method returns 1 on a pass. On a failure it returns C<undef>, and
+the reason names the purpose and the count. A purpose with two
+C<current> keys is the dangerous case: a reader cannot tell which key
+signs a release today.
+
+=head2 keys_file
+
+C<keys_file(\@keys)> returns the text of the Apache C<KEYS> file.
+
+The file holds each OpenPGP key of the set, in publication order, with
+a comment block in front of each armored body. C<gpg --import> reads
+the file, and it skips a comment block.
+
+The method skips a signify key: gpg(1) cannot read one, and a signify
+key file already publishes at its own URL. A set with no OpenPGP key
+therefore gives the empty string, and not a failure.
+
+The empty string is false, so a caller must test C<defined> and never
+truth. C<keys_file(...) or die $dir-E<gt>error> dies on a
+signify-only set, and C<error> is C<undef> there:
+
+    my $text = $dir->keys_file(\@keys);
+    die $dir->error unless defined $text;
+
+The method writes one blank line after each armored body, whatever
+trailing newline the C<armor> field held. Two runs therefore write one
+byte sequence.
+
+C<gpg --import> reads this file, so no caller field may forge a field
+or a block. Each of these is a failure:
+
+=over 4
+
+=item * an OpenPGP key with no C<armor> field
+
+=item * a C<fingerprint>, C<since> or C<until> value that holds a
+newline, because one line holds one field
+
+=item * an C<armor> field that holds more than one block, which would
+publish a second key under one name
+
+=item * an C<armor> field with text before its begin line or after its
+end line, which a reader takes for a comment block
+
+=back
+
+=head2 index_data
+
+C<index_data(\@keys)> returns the data of the human page, as an array
+reference of hash references in publication order.
+
+Each row holds C<name>, C<stem>, C<serial>, C<purpose>, C<type>,
+C<status>, C<fingerprint>, C<since>, C<until> and C<email>. An absent
+optional field is present and C<undef>, so a template tests one thing
+and never two.
+
+The method renders no HTML, because the site owns the template.
+
+=head2 security_txt
+
+C<security_txt(contact =E<gt> $value, expires =E<gt> $stamp,
+encryption =E<gt> $url, languages =E<gt> \@list)> returns the text of
+C<security.txt>, per RFC 9116.
+
+C<contact> and C<expires> are necessary, and each one is a failure
+when absent. C<contact>, C<encryption> and C<languages> each take one
+value or an array reference of values.
+
+The RFC gives no order to the field types. It states only that the
+order of two C<Contact> values carries the preference of the operator.
+This method therefore fixes one order of its own: C<Contact>,
+C<Expires>, each C<Encryption> field, then C<Preferred-Languages>. A
+fixed order makes two runs write one byte sequence, and it keeps the
+contact first for a human reader. Each list keeps the order that the
+caller named.
+
+A field value that holds a newline is a failure. One line holds one
+field, so an embedded newline would forge a second field. A
+C<languages> value that holds a comma is a failure for the same
+reason: the field joins its values on a comma.
+
+An argument of the wrong reference type is a programming error, and
+the method dies. Without that test a reference would stringify into
+the file.
+
+=head1 CONSTANTS
+
+=over 4
+
+=item C<STATUSES>
+
+The status vocabulary, as the list C<current>, C<next>, C<retired>.
+
+=item C<MAX_SERIAL_DIGITS>
+
+The digit bound of a serial, 9.
+
+=back
+
+=head1 RETURN VALUES
+
+Each method returns its answer, or C<undef> on a recoverable failure
+with the reason in C<error>. C<check_statuses> returns 1 on a pass.
+
+A method dies for a programming error only: an argument of the wrong
+reference type, and an organization word that the pattern cannot hold.
+
+=head1 CAVEATS
+
+The module holds no key bytes. It never reads a key file, it computes
+no fingerprint, and it verifies nothing. L<Fugu::OpenPGP> computes a
+fingerprint, and L<Fugu::Signify> verifies a signature.
+
+C<security_txt> writes the fields that a caller names. It does not
+check that C<expires> is a valid RFC 3339 stamp, and it does not check
+that the stamp is in the future.
+
+=head1 SEE ALSO
+
+gpg(1), signify(1), L<Fugu::OpenPGP>, L<Fugu::Signify>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

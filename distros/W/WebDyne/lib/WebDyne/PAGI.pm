@@ -31,6 +31,7 @@ use Future::AsyncAwait;
 use Sub::Util qw(set_subname);
 use File::Basename;
 use File::Spec;
+use Scalar::Util qw(blessed reftype);
 
 
 #  PAGI modules
@@ -63,7 +64,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.027';
+$VERSION='3.028';
 
 
 #==================================================================================================
@@ -74,6 +75,11 @@ sub new {
     #  Get options
     #
     my ($class, %opt)=@_;
+
+    foreach my $phase (qw(startup shutdown)) {
+        die "PAGI $phase callback must be a coderef\n"
+            if (defined($opt{$phase})&&((reftype($opt{$phase}) || '') ne 'CODE'));
+    }
     
     
     #  Test ?
@@ -307,6 +313,10 @@ sub handler_sse {
 
         my ($sse_cr, $status);
         {
+            #  Start page setup with clean diagnostics after body buffering.
+            #
+            errclr();
+
             #  Confine localized process state to synchronous page setup.
             #  POST fields are buffered before CGI builds the parameter hash.
             #
@@ -382,6 +392,11 @@ sub handler_ws {
     #
     my ($self, $scope, $receive, $send)=@_;
     debug('in handler_ws, scope:%s receive:%s, send:%s', Dumper($scope, $receive, $send));
+
+
+    #  Start synchronous WebSocket setup with clean diagnostics.
+    #
+    errclr();
 
 
     #  Setup %ENV
@@ -525,6 +540,10 @@ sub handler_http {
         return if $body_disconnected;
 
         {
+            #  Start page setup with clean diagnostics after body buffering.
+            #
+            errclr();
+
             #  Keep the request environment localized only while WebDyne is
             #  constructing and executing the request. Do not retain a
             #  localized global %ENV across an asynchronous response await.
@@ -736,21 +755,44 @@ sub handler_lifespan {
     
     return set_subname('handler_lifespan_anon', async sub {
 
-        my ($scope, $receive, $send) = @_;
+        my ($scope_hr, $receive_cr, $send_cr)=@_;
         while (1) {
-            my $event_hr = await $receive->();
-            if ($event_hr->{'type'} eq 'lifespan.startup') {
-                printf STDERR "[lifespan] WebDyne PAGI handler startup. DOCUMENT_ROOT: %s, DOCUMENT_DEFAULT: %s\n", $self->{'root'}, basename($self->{'index'} || $DOCUMENT_DEFAULT);
-                await $send->({ type => 'lifespan.startup.complete' });
-                
-            }
-            elsif ($event_hr->{'type'} eq 'lifespan.shutdown') {
-                print STDERR "[lifespan] WebDyne PAGI handler shutdown.\n";
-                await $send->({ type => 'lifespan.shutdown.complete' });
+            my $event_hr=await $receive_cr->();
+            my $phase=$event_hr->{'type'} eq 'lifespan.startup' ? 'startup'
+                : $event_hr->{'type'} eq 'lifespan.shutdown' ? 'shutdown' : undef;
+            next unless defined($phase);
+
+            #  Own the protocol acknowledgement; callbacks only perform work.
+            #  Keep send failures outside the callback exception boundary.
+            #
+            my $ok=eval { await $self->lifespan_callback($phase, $scope_hr); 1 };
+            unless ($ok) {
+                my $error=$@;
+                await $send_cr->({type => "lifespan.$phase.failed", message => "$error"});
                 last;
             }
+            if ($phase eq 'startup') {
+                printf STDERR "[lifespan] WebDyne PAGI handler startup. DOCUMENT_ROOT: %s, DOCUMENT_DEFAULT: %s\n", $self->{'root'}, basename($self->{'index'} || $DOCUMENT_DEFAULT);
+            }
+            else {
+                print STDERR "[lifespan] WebDyne PAGI handler shutdown.\n";
+            }
+            await $send_cr->({type => "lifespan.$phase.complete"});
+            last if $phase eq 'shutdown';
         }
     })
+}
+
+
+async sub lifespan_callback {
+
+    my ($self, $phase, $scope_hr)=@_;
+    die "Unknown PAGI lifespan phase\n" unless (($phase eq 'startup')||($phase eq 'shutdown'));
+    my $callback_cr=$self->{$phase};
+    return unless defined($callback_cr);
+    my $result_ref=$callback_cr->($self, $scope_hr);
+    await $result_ref if (blessed($result_ref)&&$result_ref->isa('Future'));
+    return;
 }
 
 
@@ -816,15 +858,15 @@ my $single_file_app = WebDyne::PAGI->new(
 
 * **handler_http()**
 
-    Handle normal HTTP requests.
+    Handle normal HTTP requests. Outgoing response header names are normalized to lowercase for PAGI, preserving values, order, and duplicates without changing the stored header collections.
 
 * **handler_sse()**
 
-    Handle server-sent event requests.
+    Handle server-sent event requests. URL-encoded form bodies are buffered before CGI parameter setup, subject to `WEBDYNE_CGI_POST_MAX`. Oversized forms receive status 413 through SSE HTTP denial events; disconnects during buffering skip page execution. Normal EventSource GETs do not wait for body data. Multipart SSE form submissions are outside this handler's supported scope. When page setup returns an HTTP error status instead of a stream callback, send a plain-text SSE HTTP denial response with that status. Other results without a valid callback produce status 500. Custom error headers and redirects are not forwarded by this fallback.
 
 * **handler_ws()**
 
-    Handle WebSocket requests.
+    Handle WebSocket requests. If page setup does not provide a valid WebSocket callback, reject the handshake with `websocket.close`. This uses the standard HTTP 403 rejection without requiring the optional HTTP denial-response extension.
 
 * **handler_lifespan()**
 
@@ -835,6 +877,10 @@ my $single_file_app = WebDyne::PAGI->new(
     Helper for reporting SSE-side failures.
 
 # NOTES #
+
+HTTP, SSE and WebSocket handlers clear WebDyne's shared diagnostic stack before synchronous page setup. HTTP and SSE body buffering completes before this reset, so errors from another request processed during buffering do not contaminate the resumed render. Diagnostics raised during page setup remain available to its error-response handling.
+
+This is a synchronous request boundary, not per-session diagnostic storage. Asynchronous callbacks must not rely on `errstr()` or `errdump()` retaining their diagnostics across an `await`; use exceptions or Future failures to propagate asynchronous errors. Caught exceptions within one render can still populate the shared stack.
 
 The module relies on `WebDyne::Request::PAGI` for normalized request handling and on `WebDyne::PAGI::Constant` for middleware and environment defaults.
 
@@ -919,7 +965,7 @@ Return the PAGI application code reference, wrapped in configured PAGI middlewar
 
 B<handler_http()>
 
-Handle normal HTTP requests.
+Handle normal HTTP requests. Outgoing response header names are normalized to lowercase for PAGI, preserving values, order, and duplicates without changing the stored header collections.
 
 
 
@@ -927,7 +973,7 @@ Handle normal HTTP requests.
 
 B<handler_sse()>
 
-Handle server-sent event requests.
+Handle server-sent event requests. URL-encoded form bodies are buffered before CGI parameter setup, subject to C<WEBDYNE_CGI_POST_MAX>. Oversized forms receive status 413 through SSE HTTP denial events; disconnects during buffering skip page execution. Normal EventSource GETs do not wait for body data. Multipart SSE form submissions are outside this handler's supported scope. When page setup returns an HTTP error status instead of a stream callback, send a plain-text SSE HTTP denial response with that status. Other results without a valid callback produce status 500. Custom error headers and redirects are not forwarded by this fallback.
 
 
 
@@ -935,7 +981,7 @@ Handle server-sent event requests.
 
 B<handler_ws()>
 
-Handle WebSocket requests.
+Handle WebSocket requests. If page setup does not provide a valid WebSocket callback, reject the handshake with C<websocket.close>. This uses the standard HTTP 403 rejection without requiring the optional HTTP denial-response extension.
 
 
 
@@ -959,6 +1005,10 @@ Helper for reporting SSE-side failures.
 
 
 =head1 NOTES
+
+HTTP, SSE and WebSocket handlers clear WebDyne's shared diagnostic stack before synchronous page setup. HTTP and SSE body buffering completes before this reset, so errors from another request processed during buffering do not contaminate the resumed render. Diagnostics raised during page setup remain available to its error-response handling.
+
+This is a synchronous request boundary, not per-session diagnostic storage. Asynchronous callbacks must not rely on C<errstr()> or C<errdump()> retaining their diagnostics across an C<await>; use exceptions or Future failures to propagate asynchronous errors. Caught exceptions within one render can still populate the shared stack.
 
 The module relies on C<WebDyne::Request::PAGI> for normalized request handling and on C<WebDyne::PAGI::Constant> for middleware and environment defaults.
 

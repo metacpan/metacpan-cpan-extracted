@@ -1,5 +1,57 @@
 Revision history for DBIx::Class::Async
 
+v1.0.8   2026-09-08
+         [SECURITY]
+         - An authorisation bypass was corrected using a cache key
+           controlled by the user (CWE-639). This instance was detected by
+           CPANsec. There were two different defects that together allowed
+           one user's query to be fulfilled by other user's (or another
+           database's) stored results.
+           * The first of these issues is _generate_cache_key (ResultSet.pm)
+             which reduced the cache key to primary key fields every time
+             primary key was present in search condition ignoring all other
+             conditions. Because of this, a search like
+             search({ id => $id, owner => $user }) was saved as
+             { id => $id }, so that in the future query with the same id
+             regardless of who the owner is, could return the result from
+             this cache.
+             Actually the condition was applied correctly to the database
+             but the cache key merged different queries in the cache. The
+             cache key is generated now using the full search condition.
+           * The CHI cache was created using global => 1 by
+             _build_default_cache (Async.pm). As a result, all the instances
+             of CHI::Driver::Memory in the given process are present in the
+             same store. Because the cache key does not include connection
+             identity, two Schemas that are connected to different databases
+             have the possibility to read/write the entries of the cache of
+             each other. The cache is isolated per connection now:
+             global => 0, but, because each connection owns its own cache
+             object, there is no need to add any connection identity to the
+             key.
+           * Because of this, it is impossible to guarantee that the cache
+             key for Row::update's invalidation-by-primary-key would match
+             the (now condition-aware) cache entry that has to be
+             invalidated.
+         - Added regression tests to t/148-caching.t reproducing both
+           the predicate-collapse and the cross-connection cache
+           leakage, and confirming the fix.
+
+v1.0.7   2026-09-08
+         [SECURITY]
+         - The issue with ResultSet::update() not working properly when
+           invalidating the query cache has been resolved. While update()
+           was able to create a key for invalidating the cache, it was not
+           able to call clear_cache afterwards. Because cache_ttl was on,
+           any read action conducted after the update would not return any
+           new values. This meant that any changes made to the database
+           would not be reflected in the read statements as it kept
+           returning information that had already been updated long ago.
+           In order to fix the issue with update(), it was made that
+           update() should always call clear_cache just the same way as
+           create() and delete() do.
+         - Added a regression test (t/148-caching.t) reproducing the
+           stale read and verifying update() now invalidates the cache.
+
 v1.0.6   2026-09-05
          [TEST SUITE]
          - Fixed t/135-single.t to cover the issue #12 reported by @eserte.

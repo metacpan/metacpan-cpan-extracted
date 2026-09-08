@@ -1,0 +1,13 @@
+use alienfile;
+
+# Shared-library example for the Build::Xrepo Alien::Build plugin. The plugin owns the whole build:
+# its probe hook checks the xrepo store, the download hook installs and exports the package, build
+# assembles it into the staging prefix, and gather_share/ gather_ffi map the results onto
+# Alien::Base runtime props (cflags/ libs/ version/ bin_dir/ dynamic_libs).
+#
+# With ffi => 1 a gather_ffi hook is registered so dynamic_libs points at the real shared library
+# for Affix or FFI::Platypus consumers.
+plugin 'Build::Xrepo' => (
+    packages => [{ name => 'zlib', kind => 'shared' }],
+    ffi      => 1
+);

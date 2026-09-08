@@ -1,0 +1,60 @@
+{
+   "abstract" : "Build & install zlib (shared) via the Build::Xrepo Alien::Build plugin",
+   "author" : [
+      "Sanko Robinson"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Alien-Xmake example",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Zlib",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "2.84",
+            "Alien::Xmake" : "v0.9.5",
+            "Alien::Xrepo" : "v0.9.5"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "2.84",
+            "Alien::Build::MM" : "2.84",
+            "Alien::Xmake" : "v0.9.5",
+            "Alien::Xrepo" : "v0.9.5",
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "2.84"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Alien" : "2.84",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Zlib" : {
+         "file" : "lib/Alien/Zlib.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001"
+}

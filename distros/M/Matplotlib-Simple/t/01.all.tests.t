@@ -5,6 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use autodie ':all';
 use feature 'say';
+use File::Spec;
 use File::Temp 'tempfile';
 use Matplotlib::Simple;
 use Test::Exception; # die_ok
@@ -89,6 +90,11 @@ diag("  Python 3 Version: $python_version");
 diag("  Matplotlib Version: $mpl_version");
 diag($venn_available ? '  matplotlib_venn: found'
 	: '  matplotlib_venn: NOT found (venn_proportional_area test skipped; install with "pip install matplotlib-venn")');
+# File::Spec->tmpdir(), not a literal "/tmp": MSWin32 has no /tmp, so
+# File::Temp dies with "Parent directory (\tmp\) does not exist" there.
+# On unix this still resolves to /tmp, so the files land where they always did.
+my $tmpdir = File::Spec->tmpdir;
+
 sub is_valid_svg { # mostly written by Gemini
 	my ($filepath) = @_;
 	my $expected_namespace = 'http://www.w3.org/2000/svg';
@@ -126,14 +132,14 @@ dies_ok {
 			A => 1
 		},
 		'plot.type'   => 'bar',
-		'output.file' => '/tmp/dies_ok.svg',
+		'output.file' => "$tmpdir/dies_ok.svg",
 		orientation   => 'blah' # should cause failure
 	});
 } '"plt" barplot dies when bar gets undefined options';
 dies_ok {
 	plt({
 		'plot.type' => 'bar',
-		'output.file' => '/tmp/dies_ok.svg',
+		'output.file' => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" barplot dies when no data is defined';
 dies_ok {
@@ -141,7 +147,7 @@ dies_ok {
 		data => {
 			A => 1
 		},
-		'output.file' => '/tmp/dies_ok.svg',
+		'output.file' => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" barplot dies when no "plot.type" is defined';
 dies_ok {
@@ -151,7 +157,7 @@ dies_ok {
 		},
 		'plot.type'   => 'hist',
 		vmax          => 1,
-		'output.file' => '/tmp/dies_ok.svg',
+		'output.file' => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" hist dies when undefined option is used';
 dies_ok {
@@ -179,7 +185,7 @@ dies_ok {
 				'plot.type'   => 'violinplot',
 			},
 		],
-		'output.file' => '/tmp/dies_ok.svg',
+		'output.file' => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" dies when given a subplot that is missing {data}';
 dies_ok {
@@ -190,14 +196,14 @@ dies_ok {
 				'plot.type'   => 'violinplot',
 			},
 		],
-		'output.file' => '/tmp/dies_ok.svg',
+		'output.file' => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" dies when a subplot is given an empty data hash';
 dies_ok {
 	plt({
 		data => {},
 		'plot.type' => 'violinplot',
-		'output.file' => '/tmp/dies_ok.svg',
+		'output.file' => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" dies when a single plot is given an empty data hash';
 dies_ok {
@@ -209,16 +215,16 @@ dies_ok {
 			]
 		],
 		'plot.type' => 'plot',
-		'output.file' => '/tmp/dies_ok.svg'
+		'output.file' => "$tmpdir/dies_ok.svg"
 	});
 } '"plt" dies when non-numeric values are given to "plot"';
-my ($tfh, $tfname) = tempfile(DIR => '/tmp', UNLINK => 1);
+my ($tfh, $tfname) = tempfile(DIR => $tmpdir, UNLINK => 1);
 dies_ok {
 	plt({
 		data => {A => 1},
 		fh          => $tfh,
 		'plot.type' => 'bar',
-		'output.file' => '/tmp/dies_ok.svg',
+		'output.file' => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" dies when given a non-File::Temp object';
 foreach my $numeric_arg ('cbpad', 'ncols', 'nrows', 'scale', 'scalex', 'scaley', 'ncol', 'nrow') {
@@ -227,7 +233,7 @@ foreach my $numeric_arg ('cbpad', 'ncols', 'nrows', 'scale', 'scalex', 'scaley',
 			$numeric_arg  => 'A',
 			data          => [[0,1], [0,3]],
 			'plot.type'   => 'imshow', # this plot.type actually has all of these options
-			'output.file' => '/tmp/dies_ok.svg',
+			'output.file' => "$tmpdir/dies_ok.svg",
 		});
 	} '"plt" dies when "' . $numeric_arg . '" is non-numeric';
 }
@@ -235,7 +241,7 @@ dies_ok {
 	plt({
 		data          => {A => [0,1], B => [0,3]},
 		'plot.type'   => 'imshow', # this plot.type actually has all of these options
-		'output.file' => '/tmp/dies_ok.svg',
+		'output.file' => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" dies when "imshow" gets something besides an array (dies with better error)';
 # Λέγω οὖν, μὴ ἀπώσατο ὁ θεὸς
@@ -2159,8 +2165,8 @@ foreach my $file (@output_files) {
 # --- venn_proportional_area (requires the optional matplotlib_venn library) ---
 SKIP: {
 	skip 'matplotlib_venn not installed (pip install matplotlib-venn)', 3 unless $venn_available;
-	my $venn2_file = '/tmp/venn2.svg';
-	my $venn3_file = '/tmp/venn3.svg';
+	my $venn2_file = "$tmpdir/venn2.svg";
+	my $venn3_file = "$tmpdir/venn3.svg";
 	lives_ok {
 		venn_proportional_area({
 			'output.file' => $venn2_file,

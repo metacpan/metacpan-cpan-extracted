@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::TextArea;
 # ABSTRACT: textarea input
-$HTML::FormHandler::Field::TextArea::VERSION = '0.410001';
+$HTML::FormHandler::Field::TextArea::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field::Text';
 
@@ -26,7 +26,7 @@ HTML::FormHandler::Field::TextArea - textarea input
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 Summary
 

@@ -6,13 +6,11 @@ use POSIX qw(_exit);
 
 use Data::HashMap::Shared::SI;
 
-# Regression: a writer killed between publishing states[insert_pos] and
-# bumping hdr->size leaves the counter BEHIND the true live count.  resize()
-# bounds its save loop with hdr->size, so every live entry past that bound is
-# silently dropped by the following memset.  Stale-lock recovery recounts the
-# counters from states[], but before 0.18 that recount lived inside
-# shm_lru_rebuild_if_corrupt, which returns immediately when LRU is disabled --
-# so a map created with max_size 0 never got it.
+# A writer killed between publishing states[insert_pos] and bumping hdr->size
+# leaves the counter behind the true live count, and resize() bounds its save
+# loop with hdr->size, so the entries past it are dropped by the following
+# memset.  Stale-lock recovery must therefore recount from states[] even with
+# LRU disabled, not only inside the LRU rebuild.
 
 use constant {
     OFF_WLOCK  => 128,          # ShmHeader.wlock

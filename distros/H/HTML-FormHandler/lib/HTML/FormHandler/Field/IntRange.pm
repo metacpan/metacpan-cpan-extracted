@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::IntRange;
 # ABSTRACT: integer range in select list
-$HTML::FormHandler::Field::IntRange::VERSION = '0.410001';
+$HTML::FormHandler::Field::IntRange::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field::Select';
 
@@ -44,7 +44,7 @@ HTML::FormHandler::Field::IntRange - integer range in select list
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

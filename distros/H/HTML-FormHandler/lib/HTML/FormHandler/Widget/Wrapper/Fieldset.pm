@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Wrapper::Fieldset;
 # ABSTRACT: fieldset field wrapper
-$HTML::FormHandler::Widget::Wrapper::Fieldset::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Wrapper::Fieldset::VERSION = '0.410002';
 use Moose::Role;
 use HTML::Entities qw( encode_entities );
 use namespace::autoclean;
@@ -39,7 +39,7 @@ HTML::FormHandler::Widget::Wrapper::Fieldset - fieldset field wrapper
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

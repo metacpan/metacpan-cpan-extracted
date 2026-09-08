@@ -34,6 +34,7 @@
             "IO::Socket::SSL" : "0"
          },
          "requires" : {
+            "Capture::Tiny" : "0",
             "Exporter" : "5.57",
             "ExtUtils::Helpers" : "0.028",
             "ExtUtils::Install" : "0",
@@ -54,6 +55,7 @@
          "requires" : {
             "Archive::Tar" : "0",
             "CPAN::Meta" : "0",
+            "Capture::Tiny" : "0",
             "Data::Dumper" : "0",
             "Exporter" : "5.57",
             "ExtUtils::Helpers" : "0.028",
@@ -101,10 +103,6 @@
          }
       },
       "test" : {
-         "recommends" : {
-            "Affix" : "0",
-            "FFI::Platypus" : "0"
-         },
          "requires" : {
             "Capture::Tiny" : "0",
             "File::Temp" : "0",
@@ -115,15 +113,7 @@
    "provides" : {
       "Alien::Xmake" : {
          "file" : "lib/Alien/Xmake.pm",
-         "version" : "v0.9.4"
-      },
-      "Alien::Xrepo" : {
-         "file" : "lib/Alien/Xrepo.pm",
-         "version" : "v0.9.4"
-      },
-      "Alien::Xrepo::Base" : {
-         "file" : "lib/Alien/Xrepo/Base.pm",
-         "version" : "v0.9.4"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
@@ -141,7 +131,7 @@
          "web" : "https://github.com/sanko/Alien-Xmake"
       }
    },
-   "version" : "v0.9.4",
+   "version" : "v1.0.0",
    "x_authority" : "cpan:SANKO",
    "x_ignore" : [
       ".tidyallrc",

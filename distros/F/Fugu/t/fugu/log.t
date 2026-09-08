@@ -167,7 +167,7 @@ use_ok('Fugu::Log');
 	is( scalar @calls, 2, 'new makes two syslog calls' );
 	is_deeply(
 		$calls[0],
-		[ 'setlogsock', 'native' ],
+		[ 'setlogsock', ['native'] ],
 		'the first call pins the native transport'
 	);
 	is( $calls[1][0], 'openlog', 'openlog comes after the pin' );
@@ -178,7 +178,7 @@ use_ok('Fugu::Log');
 	$log->reopen;
 	is_deeply(
 		$calls[0],
-		[ 'setlogsock', 'native' ],
+		[ 'setlogsock', ['native'] ],
 		'reopen pins the native transport again'
 	);
 	is( $calls[-1][0], 'openlog', 'and openlog comes after the pin' );
@@ -232,6 +232,92 @@ use_ok('Fugu::Log');
 	);
 
 	undef $log;
+}
+
+# Test 16: syslog_method names the transport list of the pin
+{
+	my @calls;
+	no warnings 'redefine';
+	local *Fugu::Log::setlogsock =
+	    sub { push @calls, [ 'setlogsock', @_ ]; 1 };
+	local *Fugu::Log::openlog  = sub { push @calls, [ 'openlog', @_ ]; 1 };
+	local *Fugu::Log::closelog = sub { 1 };
+
+	my $log = Fugu::Log->new(
+		mode          => 'syslog',
+		syslog_method => [ 'native', 'unix' ],
+	);
+	is_deeply(
+		$calls[0],
+		[ 'setlogsock', [ 'native', 'unix' ] ],
+		'the pin carries both names, in order'
+	);
+	is_deeply( $log->syslog_method, [ 'native', 'unix' ],
+		'and the accessor reports the same list' );
+
+	# An empty list means no pin, and openlog still runs
+	@calls = ();
+	my $unpinned =
+	    Fugu::Log->new( mode => 'syslog', syslog_method => [] );
+	is( scalar @calls,   1,         'an empty list makes one call' );
+	is( $calls[0][0],    'openlog', 'and that call is openlog' );
+	is_deeply( $unpinned->syslog_method, [],
+		'the accessor reports that nothing is pinned' );
+
+	# reopen pins the named list again, because the transport list
+	# is process-wide state
+	@calls = ();
+	$log->reopen;
+	is_deeply(
+		$calls[0],
+		[ 'setlogsock', [ 'native', 'unix' ] ],
+		'reopen pins the named list again'
+	);
+	is( $calls[-1][0], 'openlog', 'and openlog comes after the pin' );
+
+	# and an empty list stays unpinned on reopen
+	@calls = ();
+	$unpinned->reopen;
+	is( scalar @calls, 1, 'reopen with an empty list makes one call' );
+	is( $calls[0][0], 'openlog', 'and that call is openlog' );
+
+	undef $log;
+	undef $unpinned;
+}
+
+# Test 17: an unknown mechanism name dies at the boundary
+{
+	ok( !eval { Fugu::Log->new( syslog_method => 'nonsense' ); 1 },
+		'new dies for an unknown name' );
+	like( $@, qr/Invalid syslog method: nonsense/,
+		'and the message names it' );
+
+	ok( !eval {
+		Fugu::Log->new( syslog_method => [ 'native', 'bogus' ] );
+		1;
+	    },
+		'new dies for an unknown name inside a list' );
+	like( $@, qr/Invalid syslog method: bogus/,
+		'and the message names the bad member' );
+}
+
+# Test 18: the accessor and the default
+{
+	my $log = Fugu::Log->new( mode => 'quiet' );
+	is_deeply( $log->syslog_method, ['native'],
+		'the default transport is native' );
+
+	# The mode decides the use, not the store
+	my @calls;
+	no warnings 'redefine';
+	local *Fugu::Log::setlogsock =
+	    sub { push @calls, [ 'setlogsock', @_ ]; 1 };
+
+	my $quiet =
+	    Fugu::Log->new( mode => 'quiet', syslog_method => ['unix'] );
+	is_deeply( $quiet->syslog_method, ['unix'],
+		'a quiet logger stores the transport' );
+	is_deeply( \@calls, [], 'and never pins it' );
 }
 
 done_testing();

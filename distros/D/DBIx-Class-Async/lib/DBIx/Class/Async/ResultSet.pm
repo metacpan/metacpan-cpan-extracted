@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.6');
+our $VERSION   = qv('v1.0.8');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ DBIx::Class::Async::ResultSet - Non-blocking resultset proxy with Future-based e
 
 =head1 VERSION
 
-Version v1.0.6
+Version v1.0.8
 
 =head1 SYNOPSIS
 
@@ -3154,22 +3154,24 @@ sub update {
         $cond    = $self->{_cond};
     }
 
-    my @pk_cols = $self->result_source->primary_columns;
-    my $cache_key;
-
-    if (ref($cond) eq 'HASH' && @pk_cols) {
-        my %pk_cond = map {
-            $_ => $cond->{$_}
-        } grep {
-            exists $cond->{$_}
-        } @pk_cols;
-
-        if (%pk_cond) {
-            $cache_key = $self->_generate_cache_key(0, \%pk_cond);
-        }
-    }
-
-    $cache_key ||= $self->_generate_cache_key(0, $cond);
+    # Cache Invalidation
+    #
+    # The update() function follows a set-based logic. Since the conditional
+    # operator can match none, one, or several rows, any per-row caching
+    # using the primary key as a cache key is insufficient for correctness
+    # as it may not cover other caches that include rows affected by this
+    # update operation in their result set. To avoid stale reads, perform
+    # invalidation at the source level, as it is done in other sibling write
+    # operations such as create() and delete(), which always invoke the
+    # clear_cache() function.The update() function follows a set-based
+    # logic. Since the conditional operator can match none, one, or several
+    # rows, any per-row caching using the primary key as a cache key is
+    # insufficient for correctness as it may not cover other caches that
+    # include rows affected by this update operation in their result set.
+    # To avoid stale reads, perform invalidation at the source level, as it
+    # is done in other sibling write operations such as create() and
+    # delete(), which always invoke the clear_cache() function.
+    $self->clear_cache;
 
     my $db = $self->{_async_db};
     my $inflators = $db->{_custom_inflators}{ $self->{_source_name} } || {};
@@ -3557,7 +3559,7 @@ sub _new_prefetched_dataset {
 }
 
 sub _generate_cache_key {
-    my ($self, $is_count_op, $specific_cond) = @_;
+    my ($self, $is_count_op) = @_;
 
     # Don't cache if there's dynamic SQL
     if ($self->_has_dynamic_sql) {
@@ -3582,14 +3584,26 @@ sub _generate_cache_key {
          $clean_attrs{is_subquery} //= 1;
     }
 
-    # Use specific condition if provided (for updates), otherwise fall back to internal
-    my $cond = $specific_cond // $self->{_cond} // {};
-
-    # Ensure key is based on Primary Key if possible
-    my @pk_cols = $self->result_source->primary_columns;
-    if (ref($cond) eq 'HASH' && @pk_cols && exists $cond->{$pk_cols[0]}) {
-        $cond = { map { $_ => $cond->{$_} } @pk_cols };
-    }
+    # CPAN Security CWE-639: the key has to come from the whole predicate,
+    # not only the primary key columns. A search like
+    #
+    #      search({ id => $id, owner => $user })
+    #
+    # should return a key different from
+    #
+    #      search({ id => $id })
+    #
+    # or any other call with
+    #
+    #     search({ id => $id, owner => $other_user });
+    #
+    # if collapsed to
+    #
+    #     { id => $id }
+    #
+    # then the cache will respond with the results of one owner's row
+    # to the requests of other owners.
+    my $cond = $self->{_cond} // {};
 
     # Format Dumper output cleanly
     my $dumped_cond  = Data::Dumper->new([$cond])->Dump;

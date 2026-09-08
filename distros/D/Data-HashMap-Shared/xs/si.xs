@@ -128,14 +128,10 @@ set_multi(SV* self_sv, ...)
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SI: map is frozen (read-only)");
         if ((items - 1) % 2 != 0) croak("set_multi requires even number of arguments (key, value pairs)");
         uint32_t count = 0;
-        /* Per pair: resolve the VALUE first, because its get-magic runs Perl
-         * that can realloc or free the key's PV; capture the key LAST so the
-         * pointer we pass cannot have been invalidated. That same magic can
-         * also destroy self, so re-read the handle after each magic-capable
-         * step -- and note the value must land in a local rather than being
-         * written inline as a call argument, since C leaves argument
-         * evaluation order unspecified and `h` could otherwise be read
-         * before the magic instead of after it. */
+        /* Resolve the value first: its get-magic can realloc or free the key's
+         * PV, so capture the key last.  The value must land in a local, since
+         * argument evaluation order would otherwise let `h` be read before the
+         * magic rather than after it. */
         if (h->shard_handles) {
             for (int i = 1; i < items; i += 2) {
                 int64_t _val = (int64_t)SvIV(ST(i + 1));
@@ -168,10 +164,6 @@ remove_multi(SV* self_sv, ...)
         EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SI: map is frozen (read-only)");
         uint32_t count = 0;
-        /* One PV per iteration, so no reordering is needed -- but SvPV runs
-         * magic that can destroy self, so re-read the handle before using it.
-         * The key pointer itself stays valid: nothing runs Perl between its
-         * capture and the call. */
         if (h->shard_handles) {
             for (int i = 1; i < items; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
@@ -206,6 +198,7 @@ get_multi(SV* self_sv, ...)
             for (int i = 0; i < nkeys; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i + 1), _kl);
                 bool _ku = SvUTF8(ST(i + 1)) ? 1 : 0;
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
                 int64_t val;
                 REEXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
                 if (shm_si_get(h, _ks, (uint32_t)_kl, _ku, &val))
@@ -218,17 +211,17 @@ get_multi(SV* self_sv, ...)
             ShmNodeSI *nodes = (ShmNodeSI *)h->nodes;
             uint8_t *states = h->states;
             char *arena = h->arena;
+            uint64_t arena_cap = h->hdr->arena_cap;
             uint32_t now = h->expires_at ? shm_now() : 0;
             RDLOCK_GUARD(h);
             uint32_t mask = hdr->table_cap - 1;
             for (int i = 0; i < nkeys; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i + 1), _kl);
                 bool _ku = SvUTF8(ST(i + 1)) ? 1 : 0;
-                /* The hoisted hdr/nodes/states/arena stay valid across this
-                 * magic because RDLOCK_GUARD holds a lock, and shm_close_map
-                 * defers the free while lock_depth > 0. Still re-read the
-                 * handle so a destroyed object croaks rather than continuing
-                 * to be read through. */
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
+                /* The hoisted hdr/nodes/states/arena survive this magic:
+                 * RDLOCK_GUARD holds a lock and shm_close_map defers the free
+                 * while lock_depth > 0. */
                 REEXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
                 uint32_t hash = shm_hash_string(_ks, (uint32_t)_kl);
                 uint32_t pos = hash & mask;
@@ -241,7 +234,7 @@ get_multi(SV* self_sv, ...)
                     uint8_t st = states[idx];
                     if (st == SHM_EMPTY) break;
                     if (st != tag) continue;
-                    if (shm_si__key_eq_str(&nodes[idx], arena, _ks, (uint32_t)_kl, _ku)) {
+                    if (shm_si__key_eq_str(&nodes[idx], arena, arena_cap, _ks, (uint32_t)_kl, _ku)) {
                         if (h->expires_at && h->expires_at[idx] && now >= h->expires_at[idx]) break;
                         val = __atomic_load_n(&nodes[idx].value, __ATOMIC_RELAXED);
                         fidx = idx;

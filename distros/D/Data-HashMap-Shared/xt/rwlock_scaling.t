@@ -10,6 +10,29 @@ use POSIX qw(_exit);
 
 use Data::HashMap::Shared::II;
 
+# The ratio below compares four reader processes against one, so its ceiling
+# is the number of CPUs they can occupy: on two it cannot exceed 2.0 and lands
+# at 1.4-1.5 under any competing load.
+sub ncpu {
+    return $ENV{TEST_NCPU} if $ENV{TEST_NCPU};
+    if (open my $fh, '<', '/proc/self/status') {
+        while (<$fh>) {
+            next unless /^Cpus_allowed_list:\s*(\S+)/;
+            my $n = 0;
+            for my $r (split /,/, $1) { $n += $r =~ /^(\d+)-(\d+)$/ ? $2 - $1 + 1 : 1 }
+            return $n if $n;
+        }
+    }
+    if (open my $fh, '<', '/proc/cpuinfo') {
+        my $c = grep { /^processor\s*:/ } <$fh>;
+        return $c if $c;
+    }
+    return 0;                       # unknown: run anyway
+}
+my $ncpu = ncpu();
+plan skip_all => 'needs 4+ usable CPUs: the 4-reader ratio is bounded by the core count'
+    if $ncpu && $ncpu < 4;
+
 my $m = Data::HashMap::Shared::II->new_memfd("rwlock", 4096);
 $m->put($_, $_ * 100) for 0..999;
 

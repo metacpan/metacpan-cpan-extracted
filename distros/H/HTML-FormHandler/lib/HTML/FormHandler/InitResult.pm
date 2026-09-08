@@ -1,6 +1,6 @@
 package HTML::FormHandler::InitResult;
 # ABSTRACT: internal code
-$HTML::FormHandler::InitResult::VERSION = '0.410001';
+$HTML::FormHandler::InitResult::VERSION = '0.410002';
 use Moose::Role;
 
 
@@ -183,7 +183,7 @@ HTML::FormHandler::InitResult - internal code
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

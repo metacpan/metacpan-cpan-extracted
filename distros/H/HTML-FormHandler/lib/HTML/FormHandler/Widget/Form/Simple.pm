@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Form::Simple;
 # ABSTRACT: widget to render a form with divs
-$HTML::FormHandler::Widget::Form::Simple::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Form::Simple::VERSION = '0.410002';
 use Moose::Role;
 use HTML::FormHandler::Render::Util ('process_attrs');
 use HTML::Entities qw( encode_entities );
@@ -166,7 +166,7 @@ HTML::FormHandler::Widget::Form::Simple - widget to render a form with divs
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

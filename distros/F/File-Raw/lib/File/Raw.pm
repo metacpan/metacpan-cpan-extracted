@@ -3,7 +3,7 @@ package File::Raw;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use DynaLoader;
 
@@ -137,7 +137,9 @@ Returns arrayref of all lines (without newlines).
     });
 
 Process each line with a callback. Memory efficient - doesn't load
-entire file into memory.
+entire file into memory. This is the B<push> half of the streaming
+surface: File::Raw owns the loop. For the pull half, where your own
+loop asks for bytes when it wants them, see C<chunk_iter>.
 
 =head2 lines_iter
 
@@ -158,6 +160,76 @@ streaming through a plugin use C<each_line> instead.
 B<Note:> For maximum performance, prefer C<each_line()> which uses
 MULTICALL optimization and is significantly faster. Use C<lines_iter()>
 when you need iterator control (e.g., early exit, multiple iterators).
+
+For bytes rather than lines - a file that has no lines, or a parser
+that wants a fixed block - use C<chunk_iter>.
+
+=head2 chunk_iter
+
+    my $iter = File::Raw::chunk_iter($path);                 # 64 KiB
+    my $iter = File::Raw::chunk_iter($path, size => 4096);
+
+    while (defined(my $chunk = $iter->next)) {
+        $parser->feed($chunk);
+    }
+    $iter->close;
+
+Returns a C<File::Raw::chunks> iterator that hands out the file's bytes
+a block at a time, as the caller asks for them. Where C<each_line>
+drives the loop and pushes at a callback, this is the pull shape: your
+own parser, decoder or state machine owns the loop and takes bytes when
+it wants them.
+
+The file is opened at once, C<O_RDONLY> and C<O_BINARY> where that
+applies, so a caller does not have to remember C<:raw>. Returns C<undef>
+with C<$!> set if the file cannot be opened.
+
+=head3 Options
+
+C<size> is the number of bytes a chunk holds, default 65536, maximum
+16777216. It must be a positive integer; anything else is an error, as
+is a C<size> above the maximum, because the size is a buffer this module
+allocates and holds.
+
+There is no C<plugin> tail, and passing one is an error. Transforming
+chunks as they stream is the C<stream> phase's work and belongs in a C
+plugin driven by C<each_line>; the message says so.
+
+=head3 File::Raw::chunks methods
+
+=over 4
+
+=item next() - The next chunk, as a byte string, or C<undef> at end of
+file. A chunk is filled to C<size> across short reads and comes back
+short only at the end of the file, so a caller splitting a file into
+fixed blocks gets fixed blocks. The empty string is never a chunk. A
+read error is a C<croak>, not an C<undef>, so it cannot be mistaken for
+the end of the file.
+
+=item next($buffer) - The same read, into the caller's scalar: C<$buffer>
+is set to the chunk and the byte count is returned, 0 at end of file.
+This is the shape of core C<read>, and it exists for the same reason -
+at small chunk sizes, allocating a new scalar per chunk costs more than
+the read does.
+
+=item eof() - True once the end of the file has been reached. Like
+C<lines_iter>, this becomes true when a read finds the end, so a file
+whose length is an exact multiple of C<size> reports false until the
+C<next> that returns C<undef>.
+
+=item close() - Close the file and release the handle. Safe to call
+twice; an iterator that goes out of scope closes itself.
+
+=back
+
+The returned bytes carry no UTF-8 flag. Decoding, if there is any to do,
+belongs to the caller.
+
+XS consumers can pull the same way from C without a Perl round trip:
+C<include/file_chunk.h> declares C<file_chunk_open>, C<file_chunk_read>
+and C<file_chunk_close>, reached through L<ExtUtils::Depends> the same
+way as C<file_plugin.h>. C<file_chunk_read> hands back a pointer into
+the handle's own buffer, so a C consumer copies nothing.
 
 =head2 mmap_open
 
@@ -306,6 +378,22 @@ Create an empty file or update timestamps. Returns true on success.
     my $ok = File::Raw::mkdir($path, $mode);
 
 Create a directory. Default mode is 0755. Returns true on success.
+
+=head2 mkpath
+
+    File::Raw::mkpath('/path/to/a/deep/dir');
+
+Create a directory and every missing parent of it, mode 0755. Returns
+true if the directory exists when it is done, whether this call created
+it or it was already there. Paths are limited to 4095 bytes.
+
+=head2 rm_rf
+
+    File::Raw::rm_rf('/path/to/tree');
+
+Remove a path and everything under it. A file is unlinked, a directory
+is emptied depth first and then removed. Always returns true; check with
+C<exists> if it matters.
 
 =head2 rmdir
 
@@ -627,7 +715,9 @@ cause a clear error if the user requests them.
 The C<stream> phase is intentionally not exposed from Perl - per-chunk
 C<call_sv> overhead defeats the purpose of streaming. Plugins that need
 record-by-record callbacks should implement C<record>; File::Raw drives
-the iteration itself. Streaming plugins must be written in C.
+the iteration itself. Streaming plugins must be written in C. Perl code
+that wants the chunks for itself, rather than a plugin to transform
+them, wants C<chunk_iter>.
 
 Re-registering a name without C<$override> croaks; pass a true
 C<$override> to replace.
@@ -705,6 +795,11 @@ use C<File::Raw::stat()> instead of calling individual functions:
     my ($size, $mtime, $is_file) = @{$st}{qw(size mtime is_file)};
 
 =head1 XS API
+
+File::Raw exposes two C APIs to downstream XS modules: the plugin
+registry in C<include/file_plugin.h>, described below, and pull reads in
+C<include/file_chunk.h>, described under L</Pull reads from C>. Both are
+reached through L<ExtUtils::Depends>.
 
 File::Raw exposes a plugin C API via C<include/file_plugin.h>. Downstream
 XS modules can register C-level plugins that File::Raw's read / write /
@@ -835,6 +930,60 @@ directly.
 After C<use MyModule>, callers can write
 C<File::Raw::slurp($path, plugin =E<gt> 'upper')> and File::Raw routes
 the slurped bytes through C<upper_read>.
+
+=head2 Pull reads from C
+
+C<include/file_chunk.h> is the C form of C<chunk_iter>, for a consumer
+whose own C loop wants the bytes. It is what to use when the plugin
+stream phase is the wrong shape: the stream phase means File::Raw drives
+and calls you, this means you drive and call File::Raw.
+
+=over 4
+
+=item B<file_chunk_open>
+
+    IV file_chunk_open(pTHX_ const char *path, size_t size);
+
+Open C<path> for chunked reading, filling to C<size> bytes per read.
+Returns a handle, or -1 with C<errno> set from C<open(2)>.
+
+=item B<file_chunk_read>
+
+    IV file_chunk_read(pTHX_ IV handle, const char **buf);
+
+The next chunk. Returns the byte count with C<*buf> pointing into the
+handle's own buffer - nothing is copied, and the bytes are valid until
+the next call on that handle - or 0 at end of file, or -1 with C<errno>
+set on a read error. It never croaks: a consumer in the middle of its
+own parse wants the C<errno>, not a longjmp past its state.
+
+=item B<file_chunk_close>
+
+    void file_chunk_close(pTHX_ IV handle);
+
+Close the handle and release its slot. Safe on -1 and on an already
+closed handle; the slot is reused afterwards, so discard the handle.
+
+=back
+
+A handle is an index into a process-global registry that is reallocated
+as it grows, which is why it is an C<IV> and not a pointer: nothing may
+hold a pointer into the registry across calls. Handles are not shared
+between interpreter threads.
+
+    #include <file_chunk.h>
+
+    IV h = file_chunk_open(aTHX_ path, 65536);
+    if (h < 0) croak("cannot open %s: %s", path, Strerror(errno));
+    for (;;) {
+        const char *buf;
+        IV n = file_chunk_read(aTHX_ h, &buf);
+        if (n < 0) { int e = errno; file_chunk_close(aTHX_ h);
+                     croak("read failed: %s", Strerror(e)); }
+        my_parser_feed(p, buf, (size_t)n, n == 0);
+        if (n == 0) break;
+    }
+    file_chunk_close(aTHX_ h);
 
 =head1 AUTHOR
 

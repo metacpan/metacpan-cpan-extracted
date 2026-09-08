@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 use File::Temp ();
 use File::Spec ();
 
@@ -66,6 +67,31 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_resize') . '.shm' }
     ok($map->reserve(10_000), "reserve: succeeds for 10k entries");
     ok($map->capacity > $cap_initial, "reserve: capacity grew");
     is($map->size, 0, "reserve: no entries actually inserted");
+    unlink $path;
+}
+
+
+# A batch removal reaches maybe_shrink ONCE for the whole batch, so a shrink
+# that steps one halving per call leaves the table oversized.  Removing keys
+# singly (above) converges either way and cannot tell the two apart.
+for my $how (['drain',         sub { $_[0]->drain($_[1]) }],
+             ['remove_multi',  sub { $_[0]->remove_multi(1 .. $_[1]) }],
+             ['flush_expired', sub { $_[0]->flush_expired }]) {
+    my ($name, $empty) = @$how;
+    my $path = tmpfile();
+    my $ttl  = $name eq 'flush_expired' ? 1 : 0;
+    my $map  = Data::HashMap::Shared::II->new($path, 100_000, 0, $ttl);
+    my $cap0 = $map->capacity;
+    my $N    = 20_000;
+    $map->put($_, $_) for 1 .. $N;
+    my $grown = $map->capacity;
+    cmp_ok($grown, '>', $cap0, "$name: table grew to $grown");
+
+    Time::HiRes::sleep(1.2) if $ttl;                       # let every entry expire
+    $empty->($map, $N);
+    is($map->size, 0, "$name: emptied in one call");
+    is($map->capacity, $cap0,
+       "$name: capacity returned to $cap0, not part-way (was $grown)");
     unlink $path;
 }
 

@@ -15,6 +15,7 @@
 #include "XSUB.h"
 #include "include/file_compat.h"
 #include "include/file_plugin.h"
+#include "include/file_chunk.h"
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -1504,6 +1505,13 @@ typedef struct {
      * AoA instead of reading bytes from fd. */
     AV *records;
     SSize_t records_idx;
+    /* Chunk-iterator mode (set by chunk_iter). Non-zero is the size the
+     * caller asked for: next fills the buffer to it rather than looking
+     * for a newline, and the buffer never grows past it. Zero is line
+     * mode. The three modes share this registry and its free list, so
+     * every field an open path does not set has to be cleared on the
+     * way out - see free_iter_slot and ensure_iters_capacity. */
+    size_t chunk_size;
 } LineIterEntry;
 
 static LineIterEntry *g_iters = NULL;
@@ -2167,6 +2175,13 @@ static void ensure_iters_capacity(IV needed) {
             g_iters[i].eof = 0;
             g_iters[i].refcount = 0;
             g_iters[i].path = NULL;
+            /* Renew does not zero what it grows into, so the mode fields
+             * have to be cleared here too: an open path that forgets one
+             * would inherit the garbage rather than a previous owner's
+             * value, which is the harder version of the same bug. */
+            g_iters[i].records = NULL;
+            g_iters[i].records_idx = 0;
+            g_iters[i].chunk_size = 0;
         }
         g_iters_size = new_size;
     }
@@ -2214,6 +2229,7 @@ static void free_iter_slot(IV idx) {
     entry->path = NULL;
     entry->records = NULL;
     entry->records_idx = 0;
+    entry->chunk_size = 0;
 
     if (g_free_iters_count >= g_free_iters_size) {
         g_free_iters_size *= 2;
@@ -2259,8 +2275,125 @@ static IV file_lines_open(pTHX_ const char *path) {
      * - this was overlooked before the field was added). */
     entry->records      = NULL;
     entry->records_idx  = 0;
+    entry->chunk_size   = 0;
 
     return idx;
+}
+
+/* ============================================
+   Chunk iterator: the pull half of the streaming surface.
+
+   These three are the public C API declared in include/file_chunk.h, so
+   an XS consumer can hold the fd and pull bytes into its own loop
+   without a Perl round trip. The Perl surface (chunk_iter) is a thin
+   XSUB over the same functions - there is one implementation, and the
+   header does not promise a second.
+   ============================================ */
+
+static void file_lines_close(IV idx);   /* defined below; the free path
+                                         * is shared with the line and
+                                         * record iterators */
+
+/* The same open as file_lines_open: the same flags, the same registry.
+ * The buffer is the size the caller asked for and never grows, because
+ * that bound is the whole point of asking. */
+IV file_chunk_open(pTHX_ const char *path, size_t size) {
+    int fd;
+    IV idx;
+    LineIterEntry *entry;
+    size_t path_len;
+#ifdef _WIN32
+    int open_flags = O_RDONLY | O_BINARY;
+#else
+    int open_flags = O_RDONLY;
+#endif
+
+    fd = open(path, open_flags);
+    if (fd < 0) {
+        return -1;
+    }
+
+    idx = alloc_iter_slot();
+    entry = &g_iters[idx];
+
+    entry->fd = fd;
+    entry->buf_size = size;
+    Newx(entry->buffer, entry->buf_size, char);
+    entry->buf_pos = 0;
+    entry->buf_len = 0;
+    entry->eof = 0;
+    entry->refcount = 1;
+
+    path_len = strlen(path);
+    Newx(entry->path, path_len + 1, char);
+    memcpy(entry->path, path, path_len + 1);
+
+    entry->records      = NULL;
+    entry->records_idx  = 0;
+    entry->chunk_size   = size;
+
+    return idx;
+}
+
+/* Fill to chunk_size or to end of file, whichever comes first, so a
+ * caller splitting a file into fixed blocks gets fixed blocks: a short
+ * read is retried rather than handed on. Returns the byte count with
+ * *buf pointing into the iterator's own buffer (valid until the next
+ * call on this handle), 0 at end of file, -1 with errno set on a read
+ * error. It does not croak: a C consumer wants the errno, and the Perl
+ * surface is where a refusal is worded. */
+IV file_chunk_read(pTHX_ IV handle, const char **buf) {
+    LineIterEntry *entry;
+    ssize_t n;
+
+    PERL_UNUSED_CONTEXT;
+
+    if (buf) *buf = NULL;
+    if (handle < 0 || handle >= g_iters_count) {
+        errno = EBADF;
+        return -1;
+    }
+
+    entry = &g_iters[handle];
+    if (entry->fd < 0 || entry->chunk_size == 0) {
+        errno = EBADF;
+        return -1;
+    }
+
+    entry->buf_pos = 0;
+    entry->buf_len = 0;
+
+    while (entry->buf_len < entry->chunk_size && !entry->eof) {
+        n = read(entry->fd, entry->buffer + entry->buf_len,
+                 entry->chunk_size - entry->buf_len);
+        if (n < 0) {
+            if (errno == EINTR) continue;
+            return -1;
+        }
+        if (n == 0) {
+            entry->eof = 1;
+            break;
+        }
+        entry->buf_len += (size_t)n;
+    }
+
+    entry->buf_pos = entry->buf_len;
+    if (buf) *buf = entry->buffer;
+    return (IV)entry->buf_len;
+}
+
+/* Close is by handle and is safe to call once. A slot whose refcount has
+ * already reached zero is left alone rather than pushed onto the free
+ * list twice, which would hand the same slot out to two owners. */
+void file_chunk_close(pTHX_ IV handle) {
+    LineIterEntry *entry;
+
+    PERL_UNUSED_CONTEXT;
+
+    if (handle < 0 || handle >= g_iters_count) return;
+    entry = &g_iters[handle];
+    if (entry->refcount <= 0) return;
+    file_lines_close(handle);
 }
 
 static SV* file_lines_next(pTHX_ IV idx) {
@@ -3919,6 +4052,138 @@ XS_INTERNAL(xs_lines_iter_DESTROY) {
         file_lines_close(idx);
     }
     XSRETURN_EMPTY;
+}
+
+/* ============================================
+   Chunk iterator XSUBs
+
+   next is its own function; eof, close and DESTROY are the line
+   iterator's, which read the same fields and free the same slot.
+   ============================================ */
+
+/* The largest chunk we will allocate on a caller's say-so. A size is a
+ * buffer this module allocates and holds, so an unchecked one is an
+ * allocation of whatever arrived from a config file. */
+#define FILE_CHUNK_MAX_SIZE ((UV)16 * 1024 * 1024)
+
+XS_INTERNAL(xs_chunk_iter) {
+    dXSARGS;
+    const char *path;
+    IV idx;
+    UV size = (UV)FILE_BUFFER_SIZE;
+    SV *idx_sv;
+    int i;
+
+    if (items < 1)
+        croak("Usage: file::chunk_iter(path [, size => $bytes])");
+
+    path = SvPV_nolen(ST(0));
+
+    if (((items - 1) % 2) != 0)
+        croak("File::Raw::chunk_iter: odd number of options (expected key => value pairs)");
+
+    for (i = 1; i < items; i += 2) {
+        STRLEN klen;
+        const char *key;
+        SV *val;
+
+        if (!SvOK(ST(i)))
+            croak("File::Raw::chunk_iter: option key at position %d is undef", i);
+
+        key = SvPV(ST(i), klen);
+        val = ST(i + 1);
+
+        if (klen == 4 && strEQ(key, "size")) {
+            IV iv;
+            if (!SvOK(val) || !looks_like_number(val))
+                croak("File::Raw::chunk_iter: 'size' must be a positive integer");
+            iv = SvIV(val);
+            /* IV to NV is always defined; NV to IV is not, so compare in
+             * the direction that cannot trap. A value too large for an IV
+             * fails the equality and lands on the same message. */
+            if ((NV)iv != SvNV(val) || iv < 1)
+                croak("File::Raw::chunk_iter: 'size' must be a positive integer");
+            if ((UV)iv > FILE_CHUNK_MAX_SIZE)
+                croak("File::Raw::chunk_iter: 'size' of %" IVdf
+                      " exceeds the %" UVuf " byte maximum", iv,
+                      FILE_CHUNK_MAX_SIZE);
+            size = (UV)iv;
+        }
+        else if (klen == 6 && strEQ(key, "plugin")) {
+            croak("File::Raw::chunk_iter: a plugin tail is not accepted; "
+                  "transforming chunks is the stream phase's work, so pass "
+                  "plugin => ... to each_line instead");
+        }
+        else {
+            croak("File::Raw::chunk_iter: unknown option '%s'", key);
+        }
+    }
+
+    idx = file_chunk_open(aTHX_ path, (size_t)size);
+    if (idx < 0) {
+        ST(0) = &PL_sv_undef;   /* errno is the caller's to read */
+        XSRETURN(1);
+    }
+
+    idx_sv = newSViv(idx);
+    ST(0) = sv_2mortal(sv_bless(newRV_noinc(idx_sv),
+                                gv_stashpv("File::Raw::chunks", GV_ADD)));
+    XSRETURN(1);
+}
+
+/* $iter->next            - the chunk, or undef at end of file
+ * $iter->next($buffer)   - fills $buffer, returns the byte count, 0 at
+ *                          end of file: the shape of core read(), which
+ *                          is what it replaces
+ *
+ * The two-argument form exists because a fresh SV per chunk is the one
+ * place this loses to PerlIO: at 4 KiB chunks the allocation dominates
+ * and reusing the caller's scalar removes it. At 64 KiB and above it
+ * makes little difference, so the one-argument form stays the readable
+ * default. See bench/chunks.pl. */
+XS_INTERNAL(xs_chunk_iter_next) {
+    dXSARGS;
+    SV *rv;
+    IV idx, n;
+    const char *buf;
+
+    if (items < 1 || items > 2) croak("Usage: $iter->next([$buffer])");
+
+    rv = ST(0);
+    if (UNLIKELY(!SvROK(rv))) {
+        croak("Invalid chunk iterator object");
+    }
+
+    idx = SvIV(SvRV(rv));
+    if (UNLIKELY(idx < 0)) {   /* closed */
+        if (items == 2) {
+            sv_setpvn(ST(1), "", 0);
+            SvUTF8_off(ST(1));
+            SvSETMAGIC(ST(1));
+            ST(0) = sv_2mortal(newSViv(0));
+        }
+        else {
+            ST(0) = &PL_sv_undef;
+        }
+        XSRETURN(1);
+    }
+
+    n = file_chunk_read(aTHX_ idx, &buf);
+    if (n < 0)
+        croak("File::Raw::chunk_iter: read failed: %s", Strerror(errno));
+
+    if (items == 2) {
+        SV *dst = ST(1);
+        sv_setpvn(dst, n ? buf : "", (STRLEN)n);
+        SvUTF8_off(dst);          /* bytes, whatever the scalar held before */
+        SvSETMAGIC(dst);
+        ST(0) = sv_2mortal(newSViv(n));
+        XSRETURN(1);
+    }
+
+    /* 0 is end of file, and the empty string is never a chunk */
+    ST(0) = n ? sv_2mortal(newSVpvn(buf, (STRLEN)n)) : &PL_sv_undef;
+    XSRETURN(1);
 }
 
 /* ============================================
@@ -6448,6 +6713,14 @@ XS_EXTERNAL(boot_File__Raw) {
     newXS("File::Raw::lines::eof", xs_lines_iter_eof, __FILE__);
     newXS("File::Raw::lines::close", xs_lines_iter_close, __FILE__);
     newXS("File::Raw::lines::DESTROY", xs_lines_iter_DESTROY, __FILE__);
+
+    /* Chunk iterators: pull reads. eof, close and DESTROY are the line
+     * iterator's - same fields, same slot, same free path. */
+    newXS("File::Raw::chunk_iter", xs_chunk_iter, __FILE__);
+    newXS("File::Raw::chunks::next", xs_chunk_iter_next, __FILE__);
+    newXS("File::Raw::chunks::eof", xs_lines_iter_eof, __FILE__);
+    newXS("File::Raw::chunks::close", xs_lines_iter_close, __FILE__);
+    newXS("File::Raw::chunks::DESTROY", xs_lines_iter_DESTROY, __FILE__);
 
     /* Register cleanup for global destruction */
     Perl_call_atexit(aTHX_ file_cleanup_callback_registry, NULL);

@@ -1,6 +1,6 @@
 package HTML::FormHandler::BuildPages;
 # ABSTRACT: used in Wizard
-$HTML::FormHandler::BuildPages::VERSION = '0.410001';
+$HTML::FormHandler::BuildPages::VERSION = '0.410002';
 use Moose::Role;
 use Try::Tiny;
 use Class::Load qw/ load_optional_class /;
@@ -234,7 +234,7 @@ HTML::FormHandler::BuildPages - used in Wizard
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

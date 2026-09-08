@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::Log;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use IO::Handle;
 use Sys::Syslog qw(:standard :extended :macros);
@@ -101,18 +101,46 @@ sub _parse_facility ($facility)
 	return $facility_map{$facility} // LOG_DAEMON;
 }
 
-# _pin_native():
-#	Pin the syslog transport to the native mechanism. OpenBSD
-#	syslog(3) delivers with sendsyslog(2), so a daemon that
-#	pledges "stdio" keeps its log after the pin. A failed pin
-#	restores the default transport list, and that list holds
-#	mechanisms that open a socket. The module must not continue
-#	with that list, so a failure dies here, at the open, and not
-#	at the first log line inside a pledged process.
-sub _pin_native ()
+# The mechanism names of Sys::Syslog that syslog_method accepts.
+# eventlog is not in the set: it needs the Win32 API, and Fugu
+# supports OpenBSD, Linux and Darwin.
+my %method_set =
+    map { $_ => 1 } qw(console inet native pipe stream tcp udp unix);
+
+# _parse_methods($value):
+#	The syslog_method value as an array reference of mechanism
+#	names, in the order to give to setlogsock. The module validates
+#	the value here, at the boundary, and never again. An unknown
+#	name dies: a logger must not open a transport that the caller
+#	never named.
+sub _parse_methods ($value)
 {
-	unless ( setlogsock('native') ) {
-		die 'Cannot pin the syslog method to native';
+	my @names = ref $value eq 'ARRAY' ? @$value : ($value);
+
+	for my $name (@names) {
+		next if defined $name && $method_set{$name};
+		die 'Invalid syslog method: ' . ( $name // 'undef' );
+	}
+
+	return \@names;
+}
+
+# _pin_method($methods):
+#	Pin the syslog transport to the named mechanism list. The
+#	default list holds native alone: OpenBSD syslog(3) delivers
+#	with sendsyslog(2), so a daemon that pledges "stdio" keeps its
+#	log after the pin. A failed pin restores the default transport
+#	list of Sys::Syslog, and that list holds mechanisms that open a
+#	socket. The module must not continue with that list, so a
+#	failure dies here, at the open, and not at the first log line
+#	inside a pledged process. An empty list pins nothing, and
+#	Sys::Syslog keeps its own order.
+sub _pin_method ($methods)
+{
+	return unless @$methods;
+
+	unless ( setlogsock( [@$methods] ) ) {
+		die 'Cannot pin the syslog method to ' . join ' ', @$methods;
 	}
 }
 
@@ -127,6 +155,10 @@ sub new ( $class, %args )
 		die "Invalid log mode: $mode";
 	}
 
+	# Validate the transport in every mode; syslog mode alone uses
+	# it. ident and facility behave the same way.
+	my $methods = _parse_methods( $args{syslog_method} // 'native' );
+
 	# Convert the facility string to a constant if necessary
 	my $facility = $args{facility} // LOG_DAEMON;
 	if ( ref($facility) eq '' && $facility =~ /^\w+$/ ) {
@@ -136,16 +168,17 @@ sub new ( $class, %args )
 	my $name = _parse_level($level);
 
 	my $self = bless {
-		mode       => $mode,
-		level      => $level_map{$name},
-		level_name => $name,
-		ident      => $ident,
-		facility   => $facility,
-		opened     => 0,
+		mode          => $mode,
+		level         => $level_map{$name},
+		level_name    => $name,
+		ident         => $ident,
+		facility      => $facility,
+		syslog_method => $methods,
+		opened        => 0,
 	}, $class;
 
 	if ( $mode eq MODE_SYSLOG ) {
-		_pin_native();
+		_pin_method($methods);
 		openlog( $ident, 'ndelay,pid', $self->{facility} );
 		$self->{opened} = 1;
 	}
@@ -239,6 +272,17 @@ sub mode ($self)
 	return $self->{mode};
 }
 
+# $self->syslog_method:
+#	Return the syslog transport as an array reference, in the
+#	order the module gives to setlogsock. An empty reference
+#	reports that the module pins nothing. The accessor takes no
+#	argument: new and reopen are the two calls that talk to
+#	Sys::Syslog, and both read the stored value.
+sub syslog_method ($self)
+{
+	return [ @{ $self->{syslog_method} } ];
+}
+
 # $self->reopen:
 #	Close and open the log again with the same settings. A daemon
 #	calls this after it drops privileges: the syslog connection
@@ -251,7 +295,7 @@ sub reopen ($self)
 
 		# The transport list is process-wide state, so a pin
 		# from the first open does not last. Pin it again.
-		_pin_native();
+		_pin_method( $self->{syslog_method} );
 		openlog( $self->{ident}, 'ndelay,pid', $self->{facility} );
 		$self->{opened} = 1;
 	}

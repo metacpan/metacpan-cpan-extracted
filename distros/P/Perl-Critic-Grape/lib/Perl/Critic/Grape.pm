@@ -3,7 +3,7 @@ package Perl::Critic::Grape;
 use strict;
 use warnings;
 
-our $VERSION='0.0.9';
+our $VERSION='0.1.0';
 
 1;
 
@@ -36,6 +36,10 @@ Do not perform manual ref checks.
 =item L<References::RequireSigils|Perl::Critic::Policy::References::RequireSigils>
 
 Use sigils to signal type.  Only use dereferencing arrows for method calls.
+
+=item L<Subroutines::RequireConsistentReturn|Perl::Critic::Policy::Subroutines::RequireConsistentReturn>
+
+Don't use an implicit return in a subroutine with explicit returns.
 
 =item L<Subroutines::RequireSubOrder|Perl::Critic::Policy::Subroutines::RequireSubOrder>
 

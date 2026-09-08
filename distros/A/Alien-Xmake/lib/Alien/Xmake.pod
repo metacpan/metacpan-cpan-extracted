@@ -572,10 +572,20 @@ Returns the full path to the L<xrepo|https://github.com/xmake-io/xmake-repo> exe
 Returns the directory containing the Xmake executable; push it onto your C<PATH>. For a 'system' install this step will
 not be required.
 
-=head2 C<cflags( )>, C<libs( )>, C<dynamic_libs( )>
+=head2 C<cflags( )>
 
-Stubs returning empty values. Provided for compatibility with consumers that expect the standard Alien API surface; use
-C<pkg_config( )> or L<Alien::Xrepo> for real flags.
+A stub returning an empty value, provided for compatibility with consumers that expect the standard Alien API surface.
+Use C<pkg_config( )> or L<Alien::Xrepo> for real flags.
+
+=head2 C<libs( )>
+
+A stub returning an empty value, provided for compatibility with consumers that expect the standard Alien API surface.
+Use C<pkg_config( )> or L<Alien::Xrepo> for real flags.
+
+=head2 C<dynamic_libs( )>
+
+A stub returning an empty list, provided for compatibility with consumers that expect the standard Alien API surface.
+Use C<pkg_config( )> or L<Alien::Xrepo> for real flags.
 
 =head2 C<alien_helper( )>
 

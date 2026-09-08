@@ -10,6 +10,7 @@ my @files = (
     'lib/lazy.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/cpm-prereq.t',
     't/load.t',
     't/local-install-via-args.t',
     't/pass-through-args.t',

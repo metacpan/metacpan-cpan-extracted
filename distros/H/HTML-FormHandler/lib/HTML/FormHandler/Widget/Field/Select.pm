@@ -1,8 +1,9 @@
 package HTML::FormHandler::Widget::Field::Select;
 # ABSTRACT: select field rendering widget
-$HTML::FormHandler::Widget::Field::Select::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Field::Select::VERSION = '0.410002';
 
 use Moose::Role;
+use HTML::Entities qw( encode_entities );
 use namespace::autoclean;
 use HTML::FormHandler::Render::Util ('process_attrs');
 
@@ -30,7 +31,7 @@ sub render_element {
     foreach my $option ( @{ $self->{options} } ) {
         if ( my $label = $option->{group} ) {
             $label = $self->_localize( $label ) if $self->localize_labels;
-            $output .= qq{\n<optgroup label="$label">};
+            $output .= qq{\n<optgroup label="} . encode_entities($label, '"&') . qq{">};
             foreach my $group_opt ( @{ $option->{options} } ) {
                 $output .= $self->render_option( $group_opt, $result );
             }
@@ -100,7 +101,7 @@ sub render_option {
     # handle label
     my $label = $option->{label};
     $label = $self->_localize($label) if $self->localize_labels;
-    $output .= '>' . ( $self->html_filter($label) ) . '</option>';
+    $output .= '>' . encode_entities($label, '<>&') . '</option>';
     $self->inc_options_index;
     return $output;
 }
@@ -119,7 +120,7 @@ HTML::FormHandler::Widget::Field::Select - select field rendering widget
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

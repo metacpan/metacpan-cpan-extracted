@@ -13,7 +13,7 @@ HTML::FormHandler::Manual::RenderingCookbook - rendering recipes
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 
@@ -56,13 +56,14 @@ Create a custom widget wrapper:
     package MyApp::Form::Widget::Wrapper::CustomLabel;
 
     use Moose::Role;
+    use HTML::Entities qw( encode_entities );
     with 'HTML::FormHandler::Widget::Wrapper::Simple';
 
     sub render_label {
         my ($self) = @_;
         return '<label class="label' . ($self->required ?
             ' required' : '') .  '" for="' . $self->id . '">' .
-                 $self->html_filter($self->loc_label) . ':
+                 encode_entities($self->loc_label, '<>&') . ':
             </label>';
     }
 

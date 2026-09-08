@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::NonEditable;
 # ABSTRACT: reset field
-$HTML::FormHandler::Field::NonEditable::VERSION = '0.410001';
+$HTML::FormHandler::Field::NonEditable::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field::NoValue';
 
@@ -23,7 +23,7 @@ HTML::FormHandler::Field::NonEditable - reset field
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

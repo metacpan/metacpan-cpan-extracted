@@ -7,11 +7,10 @@ use Time::HiRes ();
 
 use Data::HashMap::Shared::II;
 
-# Regression (0.19): shm_validate_header reads hdr->size and hdr->tombstones at
-# different instants, so on a saturated map a concurrent writer could make the
-# cross-field invariant (size + tombstones <= table_cap) look violated and a
-# perfectly healthy file was rejected with "corrupt header".  Attach validation
-# now re-checks under the seqlock and rejects only a STABLE violation.
+# size and tombstones are read at different instants, so on a saturated map a
+# concurrent writer can make the invariant size + tombstones <= table_cap look
+# violated.  Attach validation re-checks under the seqlock and refuses only a
+# stable violation, never a torn read of a healthy file.
 
 use constant { OFF_TABLE_CAP => 20, OFF_SIZE => 136, OFF_TOMBSTONES => 140 };
 
@@ -64,6 +63,11 @@ my $dir = tempdir(CLEANUP => 1);
 
 
 # --- attaching to a saturated map under concurrent writes must not croak ----
+# A probabilistic detector: against a build with the validation retry removed
+# it failed 1 run in 45 under one load and 6 in 65 under another, so a single
+# green run proves nothing; at those rates fifty runs catch a revert with
+# two-thirds to near-certain probability.  The failing interleaving needs the
+# writer to tear two consecutive reads, which nothing in the test can force.
 {
     my $p = "$dir/race.hm";
     my $m = Data::HashMap::Shared::II->new($p, 8);   # pinned at table_cap 16

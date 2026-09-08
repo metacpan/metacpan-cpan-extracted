@@ -1,0 +1,664 @@
+#!/usr/bin/env perl
+
+# PODNAME: pplquery
+# ABSTRACT: Run OpenSearch Piped Processing Language queries from the command line
+#
+# User documentation lives in PPLQuery.pod at the distribution root and is
+# injected at the '## POD ##' placeholder below when the distribution is built.
+# Keep usage() and that file in step: usage() is the terse reminder, the POD is
+# the reference, and both must describe the same options.
+
+use v5.36;
+use utf8;
+
+use Cpanel::JSON::XS ();
+use Getopt::Long qw(GetOptionsFromArray);
+use OpenSearch::PPLQuery ();
+use OpenSearch::PPLQuery::Config ();
+
+binmode STDOUT, ':encoding(UTF-8)' or die "Cannot configure stdout as UTF-8: $!\n";
+binmode STDERR, ':encoding(UTF-8)' or die "Cannot configure stderr as UTF-8: $!\n";
+binmode STDIN, ':encoding(UTF-8)' or die "Cannot configure stdin as UTF-8: $!\n";
+
+my $exit_status = eval { main(\@ARGV) };
+if ($@ ne '') {
+    my $message = OpenSearch::PPLQuery::exception_text($@);
+    $message =~ s/\s+\z//;
+    print STDERR "pplquery: $message\n";
+    exit 1;
+}
+exit $exit_status;
+
+sub main {
+    my ($argv) = @_;
+    @$argv = map { OpenSearch::PPLQuery::decode_utf8($_, 'command-line argument') } @$argv;
+    my %options = (format => 'table', max_width => 0);
+    my %cli;
+    my $parsed = GetOptionsFromArray(
+        $argv, 'config=s' => \$cli{config}, 'connection=s' => \$cli{connection}, 'list-connections' => \$cli{list_connections},
+        'url=s' => \$cli{url}, 'user=s' => \$cli{user}, 'password-file=s' => \$cli{password_file},
+        'ca-file=s' => \$cli{ca_file}, 'insecure' => \$cli{insecure},
+        'format=s' => \$options{format}, 'max-width=i' => \$options{max_width},
+        'timeout=i' => \$cli{timeout}, 'help' => \$options{help},
+    );
+    die usage() if !$parsed;
+    if ($options{help}) { print usage(); return 0; }
+    die "--format must be 'table', 'json', or 'csv'\n" if $options{format} !~ /\A(?:table|json|csv)\z/;
+    die "--max-width must not be negative\n" if $options{max_width} < 0;
+    die "--timeout must be greater than zero\n" if defined($cli{timeout}) && $cli{timeout} <= 0;
+
+    if ($cli{list_connections}) {
+        die "--list-connections does not accept a query file\n" if @$argv;
+        die "--list-connections supports only table or json format\n" if $options{format} eq 'csv';
+        die "--list-connections cannot be combined with connection or password options\n"
+            if defined($cli{connection}) || grep { defined $cli{$_} } qw(url user password_file ca_file insecure);
+        my $config = load_config(\%cli, 1);
+        print_connection_list($config, $options{format});
+        return 0;
+    }
+
+    die usage() if @$argv != 1;
+    my @direct_options = grep { defined $cli{$_} } qw(url user ca_file insecure);
+    die "--connection cannot be combined with direct connection options\n" if defined($cli{connection}) && @direct_options;
+    my $environment_connection = environment_text('PPLQUERY_CONNECTION');
+    my ($connection_name, $config);
+    if (defined $cli{connection}) {
+        $connection_name = $cli{connection};
+    } elsif (!@direct_options && defined $environment_connection) {
+        $connection_name = $environment_connection;
+    } elsif (!@direct_options) {
+        my $configured_path = $cli{config} // environment_text('PPLQUERY_CONFIG');
+        my $path = $configured_path;
+        $path //= OpenSearch::PPLQuery::Config->default_path if !defined(environment_text('OPENSEARCH_URL'));
+        if (defined($path) && (defined($configured_path) || -f $path)) {
+            $config = OpenSearch::PPLQuery::Config->load($path);
+            $connection_name = $config->default_name;
+            die "Connection configuration $path has no default connection; use --connection\n" if !defined $connection_name;
+        }
+    }
+
+    if (defined $connection_name) {
+        $config //= load_config(\%cli, 1);
+        my $connection = $config->connection($connection_name);
+        my $auth_type = delete $connection->{auth_type};
+        if ($auth_type eq 'basic') {
+            $connection->{password} = connection_password($connection, \%cli, $connection_name);
+        }
+        delete $connection->{password_environment};
+        delete $connection->{password_file};
+        %options = (%options, %$connection);
+    } else {
+        %options = (
+            %options,
+            url => environment_text('OPENSEARCH_URL') // 'http://127.0.0.1:9200',
+            user => environment_text('OPENSEARCH_USERNAME'), password => direct_password(\%cli),
+            timeout => 60,
+            map { defined($cli{$_}) ? ($_ => $cli{$_}) : () } qw(url user ca_file insecure),
+        );
+    }
+    $options{timeout} = $cli{timeout} if defined $cli{timeout};
+
+    my $query = read_query($argv->[0]);
+    $query =~ s/^#[^\r\n]*(?:\r\n|\r|\n|\z)//mg;
+    die "Query is empty\n" if $query !~ /\S/;
+    my $client = OpenSearch::PPLQuery->new(%options);
+    my ($result, $error_status) = $client->execute($query);
+    if ($options{format} eq 'json') {
+        print OpenSearch::PPLQuery::render_json($result);
+        return defined($error_status) ? 1 : 0;
+    }
+    die OpenSearch::PPLQuery::format_error($error_status, $result) if defined $error_status;
+    print $options{format} eq 'csv' ? OpenSearch::PPLQuery::render_csv($result) : OpenSearch::PPLQuery::render_table($result, %options);
+    return 0;
+}
+
+sub usage {
+    return <<'USAGE';
+Usage: pplquery [options] FILE|-
+
+Execute one PPL query read from a UTF-8 file or stdin.
+
+Options:
+  --config FILE      Connection configuration (default: PPLQUERY_CONFIG or platform config directory)
+  --connection NAME  Named connection (default: PPLQUERY_CONNECTION or configured default)
+  --list-connections List configured connections; use --format json for machine-readable output
+  --url URL          OpenSearch base URL (default: OPENSEARCH_URL or http://127.0.0.1:9200)
+  --user USER        Basic-auth username (default: OPENSEARCH_USERNAME)
+  --password-file FILE
+                     Read the Basic-auth password from a UTF-8 file
+  --ca-file FILE     CA certificate for HTTPS verification
+  --insecure         Disable HTTPS certificate and hostname verification
+  --format FORMAT    Output format: table, json, or csv (default: table)
+  --max-width N      Truncate table cells to N characters (default: 0, no limit)
+  --timeout SECONDS  HTTP timeout (default: 60)
+  --help             Show this help
+
+Set OPENSEARCH_PASSWORD when Basic authentication has no configured password source. Passwords are not accepted on the command line.
+
+Run 'perldoc pplquery' for the full manual, covering named connections, password sources, output formats, and troubleshooting.
+USAGE
+}
+
+sub read_query {
+    my ($path) = @_;
+    return read_text_handle(\*STDIN) if $path eq '-';
+    open my $handle, '<:encoding(UTF-8)', $path or die "Cannot open $path: $!\n";
+    my $query = read_text_handle($handle);
+    close $handle or die "Cannot close $path: $!\n";
+    return $query;
+}
+
+sub read_text_handle {
+    my ($handle) = @_;
+    local $/;
+    return <$handle> // '';
+}
+
+sub config_path {
+    my ($cli) = @_;
+    return $cli->{config} // environment_text('PPLQUERY_CONFIG') // OpenSearch::PPLQuery::Config->default_path;
+}
+
+sub load_config {
+    my ($cli, $required) = @_;
+    my $path = config_path($cli);
+    die "Connection configuration $path does not exist\n" if $required && !-f $path;
+    return OpenSearch::PPLQuery::Config->load($path);
+}
+
+sub print_connection_list {
+    my ($config, $format) = @_;
+    my $descriptions = $config->descriptions;
+    if ($format eq 'json') {
+        print Cpanel::JSON::XS->new->utf8(0)->canonical(1)->pretty(1)->encode({
+            config => $config->path, default => $config->default_name, connections => $descriptions,
+        });
+        return;
+    }
+    my $default = $config->default_name;
+    for my $connection (@$descriptions) {
+        my $marker = defined($default) && $connection->{name} eq $default ? '*' : ' ';
+        print "$marker $connection->{name}\t$connection->{url}\t$connection->{authentication}{type}\n";
+    }
+}
+
+sub connection_password {
+    my ($connection, $cli, $name) = @_;
+    my $override_file = $cli->{password_file} // environment_text('PPLQUERY_PASSWORD_FILE');
+    return read_password_file($override_file) if defined $override_file;
+    if (defined $connection->{password_environment}) {
+        my $password = environment_text($connection->{password_environment});
+        die "Connection '$name' requires environment variable $connection->{password_environment}\n" if !defined $password;
+        return $password;
+    }
+    return read_password_file($connection->{password_file}) if defined $connection->{password_file};
+    return environment_text('OPENSEARCH_PASSWORD');
+}
+
+sub direct_password {
+    my ($cli) = @_;
+    my $file = $cli->{password_file} // environment_text('PPLQUERY_PASSWORD_FILE');
+    return defined($file) ? read_password_file($file) : environment_text('OPENSEARCH_PASSWORD');
+}
+
+sub read_password_file {
+    my ($path) = @_;
+    open my $handle, '<:encoding(UTF-8)', $path or die "Cannot open password file $path: $!\n";
+    local $/;
+    my $password = <$handle> // '';
+    close $handle or die "Cannot close password file $path: $!\n";
+    $password =~ s/\r?\n\z//;
+    return $password;
+}
+
+sub environment_text {
+    my ($name) = @_;
+    return undef if !exists $ENV{$name};
+    return OpenSearch::PPLQuery::decode_utf8($ENV{$name}, "environment variable $name");
+}
+
+__END__
+
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+pplquery
+
+OpenSearch::PPLQuery
+
+=head1 SYNOPSIS
+
+  # Run a query saved in a file
+  pplquery query.ppl
+
+  # Run a query from standard input
+  echo 'source=logs | head 10' | pplquery -
+
+  # Pick an output format
+  pplquery --format csv query.ppl > results.csv
+  pplquery --format json query.ppl | jq .
+
+  # Use a named connection from the connection file
+  pplquery --connection staging query.ppl
+
+  # Point at a cluster directly
+  pplquery --url https://search.example.com --user reader query.ppl
+
+  # See which connections are configured
+  pplquery --list-connections
+
+=head1 DESCRIPTION
+
+C<pplquery> reads an OpenSearch Pipe Processing Language (PPL) query from a file or standard input, and prints the result as a table, as JSON, or as CSV. Its companion L</VS CODE EXTENSION> transforms your IDE into a PPL Query Studio.
+
+=head1 INSTALLATION
+
+=head2 Step 1: Install Perl and a compiler
+
+B<Debian, Ubuntu, and derivatives>
+
+  sudo apt install perl cpanminus build-essential libssl-dev zlib1g-dev
+
+B<Fedora, RHEL, and derivatives>
+
+  sudo dnf install perl perl-App-cpanminus gcc openssl-devel zlib-devel
+
+B<macOS>
+
+  brew install perl cpanminus openssl
+
+B<Windows>
+
+Install Strawberry Perl from L<https://strawberryperl.com>, which bundles a compiler and C<cpanm>. Run the commands below from a Strawberry Perl shell.
+
+B<Put it on your path>
+
+If you installed to an alternate location you may need to locate and put pplquery into your path.
+
+=head1 RUNNING A QUERY
+
+C<pplquery> executes a query from a file or standard input:
+
+  pplquery errors-by-host.ppl
+  echo 'source=logs | stats count() by host' | pplquery -
+
+Query files are UTF-8 text. The specification does not allow for comments, Grafana's Explorer uses # for comments and pplquery also removes lines beginning with '#' before submitting the query.
+
+  # Failed requests in the last hour, busiest hosts first.
+  source=access_logs
+  | where status >= 500
+  | stats count() as failures by host
+  | sort - failures
+  | head 20
+
+Only whole-line comments are recognised; a C<#> partway through a line is sent as part of the query. A query that is empty, or nothing but comments, is an error.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--config> I<FILE>
+
+Connection configuration file to read. Defaults to C<PPLQUERY_CONFIG>, then to the location in L</Where the file goes>.
+
+=item B<--connection> I<NAME>
+
+Use the named connection I<NAME>. Defaults to C<PPLQUERY_CONNECTION>, then to the file's declared default. Cannot be combined with B<--url>, B<--user>, B<--ca-file>, or B<--insecure>.
+
+=item B<--list-connections>
+
+List the configured connections and exit, marking the default with C<*>. Accepts B<--format json>; C<csv> is not supported. Takes no query file, and cannot be combined with connection or password options.
+
+=item B<--url> I<URL>
+
+OpenSearch base URL, such as C<https://search.example.com>. Defaults to C<OPENSEARCH_URL>, then to C<http://127.0.0.1:9200>. It must be a base URL: C<http> or C<https>, a host, no path, and no embedded credentials, query string, or fragment.
+
+=item B<--user> I<USER>
+
+Basic-authentication username. Defaults to C<OPENSEARCH_USERNAME>. Requires an HTTPS URL. See L</PASSWORDS> for the password.
+
+=item B<--password-file> I<FILE>
+
+Read the password from a UTF-8 file, one trailing line ending removed. Overrides the password source of a selected connection. Defaults to C<PPLQUERY_PASSWORD_FILE>.
+
+=item B<--ca-file> I<FILE>
+
+Certificate authority file used to verify the server's certificate, for a cluster with a private or internal CA. Requires HTTPS, and cannot be combined with B<--insecure>.
+
+=item B<--insecure>
+
+Disable certificate and hostname verification. Requires HTTPS. This forfeits the protection HTTPS gives against an impersonated server, so prefer B<--ca-file> wherever the certificate can be verified.
+
+=item B<--format> I<FORMAT>
+
+Output format: C<table> (default), C<json>, or C<csv>. See L</OUTPUT FORMATS>.
+
+=item B<--max-width> I<N>
+
+Truncate table cells to I<N> characters, marking shortened values with an ellipsis. C<0>, the default, means no limit. Affects C<table> only.
+
+=item B<--timeout> I<SECONDS>
+
+HTTP timeout. Defaults to C<60>, or to a selected connection's C<timeoutSeconds>, and overrides either. Must be greater than zero.
+
+=item B<--help>
+
+Print a usage summary and exit successfully.
+
+=back
+
+=head1 OUTPUT FORMATS
+
+The default output is a table, the maximum cell width can be controlled with the --max-width switch, output may also be in either CSV or JSON, json output gets the full error messages.
+
+=head1 CONNECTING TO A CLUSTER
+
+B<Direct options> name the endpoint on the command line or in the environment: B<--url>, B<--user>, B<--ca-file>, and B<--insecure>, backed by C<OPENSEARCH_URL>, for authenticated clusters C<OPENSEARCH_USERNAME> C<OPENSEARCH_PASSWORD> are required . This suits a single cluster, and is the shortest path when trying the tool for the first time.
+
+B<Named connections> store each cluster's endpoint, username, TLS policy, and password source together under a name, selected with B<--connection>.
+
+When using B<--connection> any with other direct parameters is an error, and environment variables other than C<OPENSEARCH_PASSWORD> are ignored.
+
+=head2 Which cluster is chosen
+
+When several sources could apply, C<pplquery> resolves them in this order:
+
+=over 4
+
+=item 1.
+
+B<--connection> I<NAME>, if given.
+
+=item 2.
+
+C<PPLQUERY_CONNECTION>, if set and no direct option was given.
+
+=item 3.
+
+The configuration file's default connection, if the file was named by B<--config> or C<PPLQUERY_CONFIG>, or if it exists and C<OPENSEARCH_URL> is not set.
+
+=item 4.
+
+Direct configuration: C<OPENSEARCH_URL> or C<http://127.0.0.1:9200>, with any direct options applied on top.
+
+=back
+
+The third rule is what keeps C<OPENSEARCH_URL> working as it always did: setting it outranks a configuration file's default, so adding a connection file does not change an existing environment-based setup. Naming a file explicitly overrides that.
+
+=head1 NAMED CONNECTIONS
+
+A named connection records everything needed to reach one cluster — URL, username, TLS policy, timeout, and where to find its password — under a short name, turning this:
+
+  pplquery --url https://search-staging.example.com --user ppl-reader \
+           --ca-file ~/certificates/staging-ca.pem query.ppl
+
+into this:
+
+  pplquery --connection staging query.ppl
+
+Connections live in a JSON file. B<There is no default file and no command that creates one> — if you have never made one, you do not have one, and C<pplquery> uses direct configuration instead. Creating the file is the whole of the setup.
+
+=head2 Where the file goes
+
+=over 4
+
+=item * Unix and macOS: C<$XDG_CONFIG_HOME/pplquery/connections.json>, or C<~/.config/pplquery/connections.json> when C<XDG_CONFIG_HOME> is not set
+
+=item * Windows: C<%APPDATA%\pplquery\connections.json>
+
+=back
+
+B<--config> I<FILE> or C<PPLQUERY_CONFIG> reads a different file, which suits a connection file checked into a project alongside the queries and certificates it belongs with.
+
+=head2 Creating your first connection
+
+Make the directory and the file:
+
+  mkdir -p ~/.config/pplquery
+  install -m 600 /dev/null ~/.config/pplquery/connections.json
+
+Mode C<600> makes it readable only by you. It holds no passwords, but it does describe your clusters and usernames.
+
+Put this in it — the smallest file that does something useful:
+
+  {
+    "default": "local",
+    "connections": {
+      "local": {
+        "url": "http://127.0.0.1:9200",
+        "authentication": {"type": "none"} } }
+  }
+
+C<connections> holds one entry per cluster, keyed by the name you will use with B<--connection>.
+
+  pplquery --list-connections
+
+  * local	http://127.0.0.1:9200	none
+
+The C<*> marks the default. Adding B<--format json> prints the same thing machine-readably, including each connection's password source and TLS settings.
+
+=head2 Adding a cluster that needs a password
+
+A real cluster usually wants credentials. Add a second entry beside C<local> in C<connections>:
+
+  "staging": {
+    "url": "https://search-staging.example.com",
+    "authentication": {"type": "basic", "username": "ppl-reader",
+                       "passwordEnvironment": "STAGING_PPL_PASSWORD"} }
+
+C<"type": "basic"> turns on HTTP Basic authentication and requires a C<username> and an C<https> URL. C<passwordEnvironment> says I<where the password comes from>, not what it is; the password itself never appears in this file. Before querying C<staging>, put it in that variable:
+
+  read -rs STAGING_PPL_PASSWORD && export STAGING_PPL_PASSWORD
+  pplquery --connection staging query.ppl
+
+Swap C<passwordEnvironment> for C<passwordFile> to read from a file instead, which suits unattended jobs. A connection may name one of these, never both; with neither, the password falls back to C<OPENSEARCH_PASSWORD>. See L</PASSWORDS>.
+
+=head2 Adding a private certificate authority
+
+An internal cluster's certificate is often signed by a CA your system does not trust, which shows up as C<certificate verify failed>. Name the CA certificate rather than switching verification off, by adding to the C<staging> entry:
+
+  "tls": {"verify": true, "caFile": "certificates/staging-ca.pem"}
+
+C<caFile> is relative to the directory holding the configuration file, so C<~/.config/pplquery/certificates/staging-ca.pem> is what gets read; C<passwordFile> resolves the same way. That is deliberate: a connection file, its certificates, and its password files can be moved, backed up, or checked into a project as one unit.
+
+=head2 Property reference
+
+At the top level, C<connections> is required and C<default> is optional. C<default> is a sibling of C<connections>, not a member of it — putting it inside produces the confusing complaint that a connection named C<default> is not an object.
+
+Connection names must start with a letter or digit, and may then contain letters, digits, dots, underscores, and hyphens.
+
+Each connection accepts exactly these properties:
+
+=over 4
+
+=item C<url>
+
+B<Required.> The cluster's base URL: C<http> or C<https>, a host, optionally a port. No path, credentials, query string, or fragment — C<https://search.example.com:9200> is fine, C<https://search.example.com/_plugins/_ppl> is not, because the endpoint path is appended for you.
+
+=item C<authentication>
+
+B<Required>, even when there is none to do — write C<{"type": "none"}>. C<type> is C<"none"> or C<"basic">.
+
+C<"basic"> also requires C<username> (ASCII only) and an C<https> URL, and accepts at most one of C<passwordEnvironment> (the name of an environment variable) or C<passwordFile> (a path). Neither C<username> nor a password source may appear under C<"none">.
+
+=item C<tls>
+
+I<Optional>, and permitted only on C<https> URLs — present but empty (C<{}>) still counts as present, and is rejected on C<http>.
+
+C<verify> is a JSON boolean, defaulting to true; C<false> disables certificate and hostname checking and is incompatible with C<caFile>. C<caFile> is a path to a certificate authority file.
+
+=item C<timeoutSeconds>
+
+I<Optional> positive integer, defaulting to C<60>. It must be a JSON integer: C<60> is accepted, C<"60"> and C<60.0> are not.
+
+=back
+
+Unknown properties are rejected rather than ignored, at every level. A setting quietly discarded because of a typo could leave you believing TLS verification or a password source had been applied when it had not.
+
+=head2 Several connections, one cluster
+
+Nothing requires connection names to map one-to-one onto clusters. Multiple entries may share a URL with different usernames and password sources:
+
+  "logs-reader":  {"url": "https://search.example.com",
+                   "authentication": {"type": "basic", "username": "logs-ro",
+                                      "passwordEnvironment": "LOGS_RO_PASSWORD"}},
+  "metrics-admin": {"url": "https://search.example.com",
+                    "authentication": {"type": "basic", "username": "metrics-rw",
+                                       "passwordEnvironment": "METRICS_RW_PASSWORD"}}
+
+This is how to work with a cluster whose index-level security grants different principals access to different indices: choose the identity by name at the point of use, rather than by remembering to change an environment variable.
+
+=head2 When the file is wrong
+
+The whole file is parsed and validated before any network call, so a mistake is reported as a specific complaint rather than a puzzling failure later. Errors name the connection and the property:
+
+  Connection 'staging' contains unknown property 'timeout'
+  Connection 'staging' basic authentication requires an https URL
+  Connection 'staging' url must be a base URL without a path
+
+Three situations are not errors at all:
+
+=over 4
+
+=item *
+
+B<The file does not exist.> At the default location it is skipped silently and direct configuration applies. Only a file named by B<--config> or C<PPLQUERY_CONFIG> must exist.
+
+=item *
+
+B<The file has no C<default>.> Valid, but every run must then select a connection with B<--connection> or C<PPLQUERY_CONNECTION>; one that does not is told C<has no default connection; use --connection>.
+
+=item *
+
+B<C<OPENSEARCH_URL> is set.> It outranks the configuration file, unless the file was named explicitly; see L</Which cluster is chosen>.
+
+=back
+
+=head1 PASSWORDS
+
+A password is never accepted as a command-line argument, because arguments are visible to every other process on the machine and are recorded in shell history. It is never read from the connection file either; that file describes where the password comes from, not what it is. Basic authentication is refused over plain HTTP, so credentials are never sent in the clear.
+
+For a connection with C<"type": "basic">, the password is found in this order:
+
+=over 4
+
+=item 1.
+
+The file named by B<--password-file> or C<PPLQUERY_PASSWORD_FILE>. This per-invocation override beats the connection's own setting.
+
+=item 2.
+
+The environment variable named by the connection's C<passwordEnvironment>. If it is unset the run fails rather than falling back — a connection that names its own variable is taken at its word.
+
+=item 3.
+
+The file named by the connection's C<passwordFile>.
+
+=item 4.
+
+C<OPENSEARCH_PASSWORD>.
+
+=back
+
+Without a named connection, only steps 1 and 4 apply.
+
+Password files are UTF-8, and one trailing line ending is removed. Restrict their permissions:
+
+  install -m 600 /dev/null ~/.config/pplquery/staging.password
+  printf '%s' 'the-password' > ~/.config/pplquery/staging.password
+
+=head1 ENVIRONMENT
+
+The C<PPLQUERY_*> variables stand in for the corresponding options: C<PPLQUERY_CONFIG> for B<--config>, C<PPLQUERY_CONNECTION> for B<--connection>, C<PPLQUERY_PASSWORD_FILE> for B<--password-file>.
+
+The C<OPENSEARCH_*> variables configure one cluster directly, and apply whenever no named connection does: C<OPENSEARCH_URL> (default C<http://127.0.0.1:9200>), C<OPENSEARCH_USERNAME>, and C<OPENSEARCH_PASSWORD>. For a single local cluster these three are the entire setup — no configuration file is needed, and C<OPENSEARCH_URL> alone is enough for an unauthenticated one. See L</Which cluster is chosen> and L</PASSWORDS> for how they rank against a connection file.
+
+=head1 EXIT STATUS
+
+C<pplquery> exits C<0> when the query succeeds and C<1> otherwise — a rejected query, an authentication or TLS failure, an unreachable cluster, a malformed connection file, or invalid options.
+
+Errors go to standard error prefixed with C<pplquery:>, so they stay out of piped or redirected results. B<--format json> is the exception: an error response from OpenSearch is printed to standard output as JSON, with exit status still C<1>, keeping the cluster's full error available to scripts.
+
+=head1 VS CODE EXTENSION
+
+An extension for Visual Studio Code and compatible editors runs C<.ppl> files from the editor, providing syntax highlighting, snippets, field-name completion, and a results panel. It executes queries by invoking the C<pplquery> command described here.
+
+Install C<pplquery> first. The extension expects it on C<PATH>; if it is elsewhere, set C<pplquery.path> to the executable's full path.
+
+=head2 From the Visual Studio Marketplace
+
+Open the Extensions view, search for B<OpenSearch PPL Query>, and install the entry published by B<brainbuz>. From a shell:
+
+  code --install-extension brainbuz.pplquery
+
+=head2 From the Codeberg repository
+
+Editors that do not use the Visual Studio Marketplace can install the packaged extension directly. Download the C<.vsix> from L<https://codeberg.org/brainbuz/pplquery/releases>:
+
+  code --install-extension pplquery-1.0.0.vsix
+
+Substitute the version you downloaded, and your editor's own command for C<code>. The same file installs from the Extensions view through the C<...> menu, B<Install from VSIX>. To build it from a checkout, run C<vsce package> in the C<vscode> directory.
+
+=head2 Settings
+
+The extension does not create or modify connection files. Set C<pplquery.config> and C<pplquery.connection> to use a named connection, or leave them unset and let the CLI's own configuration apply. Passwords are never stored in editor settings: when direct Basic authentication needs one, the extension prompts for it and keeps it in memory for the session only.
+
+=head1 TROUBLESHOOTING
+
+=over 4
+
+=item C<Basic authentication requires an https URL>
+
+A username was supplied for an C<http://> endpoint. Use the cluster's HTTPS URL.
+
+=item C<certificate verify failed>
+
+The cluster's certificate was not signed by a certificate authority your system trusts, which is usual for an internal cluster. Point B<--ca-file>, or the connection's C<caFile>, at the issuing CA certificate. B<--insecure> also silences it, but disables the check that detects an impersonated server.
+
+=item C<OpenSearch URL must be a base URL without a path>
+
+The URL includes a path, such as a trailing C</_plugins/_ppl>. Give only the scheme, host, and port.
+
+=item C<Connection configuration ... contains unknown property>
+
+A property name is misspelled, or belongs at a different level of the file. Compare it against L</Property reference>.
+
+=back
+
+=head1 CLOUD AND MANAGED OPENSEARCH
+
+Many Organizations that use Amazon OpenSearch Service likely require IAM, AWS Signature Version 4 request signing is not currently implemented. Other providers have their own schemes — API keys, bearer tokens, mutual TLS — and none are implemented either.
+
+If you use OpenSearch through AWS or another managed provider and would like C<pplquery> to work there, please open a pull request or an issue at L<https://codeberg.org/brainbuz/pplquery>. Provider implementations should include mock tests that were developed from live tests against the target environment.
+
+=head1 SEE ALSO
+
+OpenSearch PPL reference: L<https://opensearch.org/docs/latest/search-plugins/sql/ppl/index/>
+
+Project repository and issue tracker: L<https://codeberg.org/brainbuz/pplquery>
+
+This distribution provides a client for one purpose: running PPL queries. Here are some modules that aim to be more complete:
+
+=over 4
+
+=item * L<OpenSearch> — an unofficial client built on Moo and Mojo::UserAgent, supporting synchronous and asynchronous requests across a subset of the API.
+
+=item * L<OpenSearch::Client> — an unofficial client derived from L<Search::Elasticsearch>, tracking OpenSearch's divergence from it.
+
+=back
+
+=head1 AUTHOR
+
+John Karr <brainbuz@brainbuz.org>
+
+=head1 LICENSE
+
+Copyright 2026 John Karr.
+
+This is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3 or later.
+
+=cut

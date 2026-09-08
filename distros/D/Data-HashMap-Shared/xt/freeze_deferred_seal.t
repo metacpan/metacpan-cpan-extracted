@@ -4,17 +4,15 @@ use Test::More;
 use File::Temp qw(tempdir);
 use Time::HiRes qw(sleep time);
 
-# Regression (0.19): flush_deferred tested the seal and only then took the write
-# lock, so a call parked on that lock passed the test before freeze() sealed the
-# map and resized it afterwards -- a sealed file is supposed to be immutable,
-# and new_readonly serves it with no lock at all precisely because of that.
-#
-# It is reachable without writing: flush_deferred runs when an each() loop is
-# exhausted, when a cursor is reset or destroyed (including at process exit),
-# and when a sharded cursor advances.  "Quiesce your writers" does not cover it.
+# flush_deferred must re-test the seal under the write lock: testing it first
+# lets a call parked on that lock resize a map freeze() sealed meanwhile, and a
+# sealed file is served by new_readonly with no lock at all precisely because it
+# cannot change.  It is reachable without writing -- an exhausted each(), a
+# cursor reset or destroyed (including at process exit), a sharded cursor
+# advancing -- so "quiesce your writers" does not cover it.
 #
 # The window is two adjacent statements, so only stopping the process inside it
-# can tell the orderings apart: gdb parks the victim on the lock, this process
+# tells the orderings apart: gdb parks the victim on the lock, this process
 # freezes, then the victim is released.  The invariant asserted is the one the
 # bug breaks: the sealed table's capacity must not change afterwards.
 
@@ -38,11 +36,16 @@ ok($line, "located flush_deferred's write lock in shm_generic.h (line $line)")
     or BAIL_OUT('cannot anchor the breakpoint');
 
 my $restore = 0;
-END { `make clean 2>/dev/null; $^X Makefile.PL 2>&1 && make 2>&1` if $restore }
+END {
+    if ($restore) {
+        `make clean 2>/dev/null; $^X Makefile.PL 2>&1 && make 2>&1`;
+        warn "the plain rebuild failed: blib still holds the debug build\n" if $?;
+    }
+}
 
 my $build = `make clean 2>/dev/null; $^X Makefile.PL 2>&1 && make OPTIMIZE='-g3 -O0' 2>&1`;
 $restore = 1;
-like $build, qr/Shared\.o/, 'debug build succeeded'
+is $?, 0, 'debug build succeeded'
     or BAIL_OUT("debug build failed:\n$build");
 
 my $dir  = tempdir(CLEANUP => 1);

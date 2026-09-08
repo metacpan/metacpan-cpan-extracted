@@ -611,10 +611,20 @@ unshift @PATH, $xmake->bin_dir;
 Returns the directory containing the Xmake executable; push it onto your `PATH`. For a 'system' install this step will
 not be required.
 
-## `cflags( )`, `libs( )`, `dynamic_libs( )`
+## `cflags( )`
 
-Stubs returning empty values. Provided for compatibility with consumers that expect the standard Alien API surface; use
-`pkg_config( )` or [Alien::Xrepo](https://metacpan.org/pod/Alien%3A%3AXrepo) for real flags.
+A stub returning an empty value, provided for compatibility with consumers that expect the standard Alien API surface.
+Use `pkg_config( )` or [Alien::Xrepo](https://metacpan.org/pod/Alien%3A%3AXrepo) for real flags.
+
+## `libs( )`
+
+A stub returning an empty value, provided for compatibility with consumers that expect the standard Alien API surface.
+Use `pkg_config( )` or [Alien::Xrepo](https://metacpan.org/pod/Alien%3A%3AXrepo) for real flags.
+
+## `dynamic_libs( )`
+
+A stub returning an empty list, provided for compatibility with consumers that expect the standard Alien API surface.
+Use `pkg_config( )` or [Alien::Xrepo](https://metacpan.org/pod/Alien%3A%3AXrepo) for real flags.
 
 ## `alien_helper( )`
 

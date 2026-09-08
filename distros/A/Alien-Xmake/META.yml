@@ -24,6 +24,7 @@ build_requires:
 configure_requires:
   Archive::Tar: '0'
   CPAN::Meta: '0'
+  Capture::Tiny: '0'
   Data::Dumper: '0'
   Exporter: '5.57'
   ExtUtils::Helpers: '0.028'
@@ -60,13 +61,7 @@ no_index:
 provides:
   Alien::Xmake:
     file: lib/Alien/Xmake.pm
-    version: v0.9.4
-  Alien::Xrepo:
-    file: lib/Alien/Xrepo.pm
-    version: v0.9.4
-  Alien::Xrepo::Base:
-    file: lib/Alien/Xrepo/Base.pm
-    version: v0.9.4
+    version: v1.0.0
 requires:
   Capture::Tiny: '0'
   ExtUtils::Helpers: '0.028'
@@ -78,7 +73,7 @@ resources:
   homepage: https://github.com/sanko/Alien-Xmake
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/sanko/Alien-Xmake.git
-version: v0.9.4
+version: v1.0.0
 x_authority: cpan:SANKO
 x_ignore:
   - .tidyallrc

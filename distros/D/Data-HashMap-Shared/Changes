@@ -1,5 +1,17 @@
 Revision history for Data-HashMap-Shared
 
+0.20      2026-09-07
+          - Inserts now reclaim expired slots and evict on a full arena,
+            overwrites included; pop, shift and drain without an LRU sweep the
+            whole table instead of one end.
+          - Incompatible: new sharded sets route on a different half of the
+            hash and record their shard count; upgrade every process sharing a
+            sharded set together.
+          - Fix a corrupt key offset crashing lookups, get_multi's missing 1 GB
+            check, a spurious "corrupt header" on attach, cursor_seek on a miss
+            and the shrink after a sparse removal.
+          - Correct the documentation and re-measure the benchmarks.
+
 0.19      2026-09-03
           - Fix LRU accounting, reserve()'s ceiling, sharded iteration, writes
             to frozen maps and NUL bytes in paths; remove the v9 upgrader.

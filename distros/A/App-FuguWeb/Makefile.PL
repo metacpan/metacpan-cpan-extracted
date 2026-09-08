@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME             => 'App::FuguWeb',
-	VERSION          => '0.2.0',
+	VERSION          => '0.4.0',
 	ABSTRACT         => 'build a documentation website for a Perl project',
 	LICENSE          => 'open_source',
 	MIN_PERL_VERSION => '5.036',
@@ -25,12 +25,16 @@ WriteMakefile(
 		'lib/App/FuguWeb/Config.pod' => '$(INST_LIB)/App/FuguWeb/Config.pod',
 		'lib/App/FuguWeb/Index.pm' => '$(INST_LIB)/App/FuguWeb/Index.pm',
 		'lib/App/FuguWeb/Index.pod' => '$(INST_LIB)/App/FuguWeb/Index.pod',
+		'lib/App/FuguWeb/Keys.pm' => '$(INST_LIB)/App/FuguWeb/Keys.pm',
+		'lib/App/FuguWeb/Keys.pod' => '$(INST_LIB)/App/FuguWeb/Keys.pod',
 		'lib/App/FuguWeb/Manual.pm' => '$(INST_LIB)/App/FuguWeb/Manual.pm',
 		'lib/App/FuguWeb/Manual.pod' => '$(INST_LIB)/App/FuguWeb/Manual.pod',
 		'lib/App/FuguWeb/Page.pm' => '$(INST_LIB)/App/FuguWeb/Page.pm',
 		'lib/App/FuguWeb/Page.pod' => '$(INST_LIB)/App/FuguWeb/Page.pod',
 		'lib/App/FuguWeb/Render.pm' => '$(INST_LIB)/App/FuguWeb/Render.pm',
 		'lib/App/FuguWeb/Render.pod' => '$(INST_LIB)/App/FuguWeb/Render.pod',
+		'lib/App/FuguWeb/Rotate.pm' => '$(INST_LIB)/App/FuguWeb/Rotate.pm',
+		'lib/App/FuguWeb/Rotate.pod' => '$(INST_LIB)/App/FuguWeb/Rotate.pod',
 		'lib/App/FuguWeb/Site.pm' => '$(INST_LIB)/App/FuguWeb/Site.pm',
 		'lib/App/FuguWeb/Site.pod' => '$(INST_LIB)/App/FuguWeb/Site.pod',
 		'share/fuguweb/style.css' => '$(INST_LIB)/auto/share/dist/App-FuguWeb/fuguweb/style.css'

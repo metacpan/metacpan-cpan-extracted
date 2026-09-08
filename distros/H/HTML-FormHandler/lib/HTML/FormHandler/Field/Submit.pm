@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Submit;
 # ABSTRACT: submit field
-$HTML::FormHandler::Field::Submit::VERSION = '0.410001';
+$HTML::FormHandler::Field::Submit::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field::NoValue';
 
@@ -35,7 +35,7 @@ HTML::FormHandler::Field::Submit - submit field
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

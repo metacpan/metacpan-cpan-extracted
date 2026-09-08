@@ -1,0 +1,31 @@
+Revision history for Webservice::Overleaf::API.
+
+0.01 Mon Sep 7 15:01:00 2026
+     - initial upload
+
+0.02 Mon Sep 7 15:01:00 2026
+     - render CLI --help directly from embedded POD with core Pod::Text,
+       avoiding a newer Pod::Usage dependency that breaks installation on
+       Perl 5.10
+     - added the `overleaf` command-line modulino using Util::H2O::More
+       Getopt2h2o and Dispatch::Fu, with full POD, --help/-h, and
+       --version/-v
+     - added CLI commands for project/Git URLs, Open in Overleaf imports,
+       Git clone/pull/push/remote management, project listing, ZIP download,
+       compile, PDF download, and named compile-output download
+     - comprehensive mocked test suite with GitHub CI across supported Perl
+       versions; CI intentionally does not invoke Dist::Zilla
+     - initial CPAN-compatible release
+     - added official "Open in Overleaf" URI/data/form helpers with engine,
+       main-document, filename, and Visual Editor options
+     - added official Overleaf Git bridge URL, clone, pull, push, and remote
+       helpers without exposing authentication tokens on command lines
+     - added explicitly opt-in experimental browser-session support for
+       project listing, project ZIP download, remote compile, PDF download,
+       and named compile-output download
+     - added current and legacy project metadata parsing for Overleaf Cloud
+       and older/self-hosted instances
+     - added Dispatch::Fu operation and HTTP-status dispatching
+     - added Util::H2O::More objectification for projects and compile results
+     - added fully mocked HTTP/Git tests; the test suite makes no live
+       Overleaf requests

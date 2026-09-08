@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => 'v5.10.0'
+                                        'perl' => '5.024'
                                       }
                       },
        'develop' => {
@@ -11,6 +11,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'App::perlimports' => '0.000058',
+                                      'App::perlvars' => '0',
                                       'Perl::Critic' => '1.132',
                                       'Perl::Tidy' => '20180220',
                                       'Pod::Coverage::TrustPod' => '0',
@@ -27,7 +28,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'App::cpm' => '0.997017',
+                                      'App::cpm' => '1',
                                       'App::cpm::CLI' => '0',
                                       'Carp' => '0',
                                       'Getopt::Long' => '0',
@@ -36,7 +37,7 @@ do { my $x = {
                                       'Try::Tiny' => '0',
                                       'feature' => '0',
                                       'local::lib' => '2.000024',
-                                      'perl' => '5.010',
+                                      'perl' => '5.024',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -54,7 +55,7 @@ do { my $x = {
                                    'Path::Tiny' => '0',
                                    'Test::More' => '0',
                                    'Test::RequiresInternet' => '0',
-                                   'perl' => '5.010',
+                                   'perl' => '5.024',
                                    'version' => '0'
                                  }
                  }

@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::RequestToken;
 # ABSTRACT: Hidden text field which contains a unique time-stamped token
-$HTML::FormHandler::Field::RequestToken::VERSION = '0.410001';
+$HTML::FormHandler::Field::RequestToken::VERSION = '0.410002';
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Field::Hidden';
 
@@ -122,7 +122,7 @@ HTML::FormHandler::Field::RequestToken - Hidden text field which contains a uniq
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

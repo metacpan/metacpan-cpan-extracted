@@ -45,6 +45,18 @@ C<build> and C<clean> take C<--out> I<dir>, which overrides the
 C<out_dir> setting. C<init> writes a starter description and is the one
 command that runs without one.
 
+C<rotate-key> writes the key directory, and L<App::FuguWeb::Rotate>
+holds the work. It takes C<--step> C<mint> or C<promote>, a
+C<--purpose> word, and a C<--secret> path. A mint of a purpose that
+holds a current key also takes C<--signer>, the private half of that
+key. It is the one command that signs, so it is the one command that
+needs C<signify(1)>, and it exits C<EXIT_TOOL_MISSING> without it.
+
+A site that publishes its first key holds no C<keys> block, because
+such a block cannot load until a C<key> block stands beside it. The
+first mint therefore takes C<--org>, and it can take C<--dir> and
+C<--url>. One commit carries the block and the key.
+
 =head1 EXIT CODES
 
 The first five come from L<Fugu::CLI> and mean the same in every Fugu

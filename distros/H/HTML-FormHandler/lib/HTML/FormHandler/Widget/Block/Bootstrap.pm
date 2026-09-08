@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Block::Bootstrap;
 # ABSTRACT: block to format bare form element like bootstrap
-$HTML::FormHandler::Widget::Block::Bootstrap::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Block::Bootstrap::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Widget::Block';
 
@@ -35,7 +35,7 @@ HTML::FormHandler::Widget::Block::Bootstrap - block to format bare form element 
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

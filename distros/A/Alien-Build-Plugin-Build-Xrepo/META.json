@@ -1,0 +1,118 @@
+{
+   "X_No_Archive" : "Yes",
+   "abstract" : "alienfile plugin that installs and consumes xrepo packages",
+   "author" : [
+      "Sanko Robinson"
+   ],
+   "description" : "An Alien::Build / Alien::Base alienfile plugin that drives the xrepo package manager: installs packages from the xmake registry during the build and maps them onto cflags, libs, version, bin_dir, alt, ffi_name, and dynamic_libs runtime props.",
+   "dynamic_config" : 0,
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Build-Plugin-Build-Xrepo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "2.84",
+            "Alien::Xrepo" : "v1.0.0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Xrepo" : "v1.0.0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Code::TidyAll" : "0",
+            "Code::TidyAll::Plugin::PodTidy" : "0",
+            "IO::Socket::SSL" : "0",
+            "Minilla" : "0",
+            "Perl::Tidy" : "0",
+            "Pod::Markdown::Github" : "0",
+            "Pod::Tidy" : "0",
+            "Software::License::Artistic_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Build" : "2.84",
+            "Alien::Xmake" : "v1.0.0",
+            "Alien::Xrepo" : "v1.0.0",
+            "Path::Tiny" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Affix" : "0",
+            "FFI::Platypus" : "0"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Temp" : "0",
+            "Test2::V0" : "0",
+            "Test::Alien" : "0",
+            "Test::Alien::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Build::Plugin::Build::Xrepo" : {
+         "file" : "lib/Alien/Build/Plugin/Build/Xrepo.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/Alien-Build-Plugin-Build-Xrepo/issues"
+      },
+      "homepage" : "https://github.com/sanko/Alien-Build-Plugin-Build-Xrepo",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sanko/Alien-Build-Plugin-Build-Xrepo.git",
+         "web" : "https://github.com/sanko/Alien-Build-Plugin-Build-Xrepo"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_authority" : "cpan:SANKO",
+   "x_ignore" : [
+      ".tidyallrc",
+      ".gitignore",
+      ".clang-format",
+      ".github/**"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

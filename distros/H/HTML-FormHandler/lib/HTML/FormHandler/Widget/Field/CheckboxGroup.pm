@@ -1,9 +1,10 @@
 package HTML::FormHandler::Widget::Field::CheckboxGroup;
 # ABSTRACT: checkbox group field role
-$HTML::FormHandler::Widget::Field::CheckboxGroup::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Field::CheckboxGroup::VERSION = '0.410002';
 use Moose::Role;
 use namespace::autoclean;
 use HTML::FormHandler::Render::Util ('process_attrs');
+use HTML::Entities qw( encode_entities );
 
 
 sub render {
@@ -28,7 +29,7 @@ sub render_element {
             my $attr_str = process_attrs($attr);
             my $lattr = $option->{label_attributes} || {};
             my $lattr_str= process_attrs($lattr);
-            $output .= qq{\n<div$attr_str><label$lattr_str>$label</label>};
+            $output .= qq{\n<div$attr_str><label$lattr_str>} . encode_entities($label, '<>&') . qq{</label>};
             foreach my $group_opt ( @{ $option->{options} } ) {
                 $output .= $self->render_option( $group_opt, $result );
             }
@@ -84,7 +85,7 @@ sub render_option {
     # handle label
     my $label = $option->{label};
     $label = $self->_localize($label) if $self->localize_labels;
-    $output .= $self->html_filter($label);
+    $output .= encode_entities($label, '<>&');
     $output .= "\n</label>";
     $self->inc_options_index;
 
@@ -108,7 +109,7 @@ HTML::FormHandler::Widget::Field::CheckboxGroup - checkbox group field role
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

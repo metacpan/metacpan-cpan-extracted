@@ -1,5 +1,12 @@
 Revision history for Matplotlib-Simple
 
+0.3121 2026-09-07 CDT
+
+ [Portability]
+
+ - The generated Python script is now written to `File::Spec->tmpdir` rather than a hard-coded `/tmp`. MSWin32 has no `/tmp`, so every call to `plt` died there with "Error in tempfile() using template \tmp\XXXXXXXXXX.py: Parent directory (\tmp\) does not exist", taking 129 of 163 subtests in `t/04.options.t` with it (CPAN Testers FAIL for 0.312, perl 5.42.2 on Strawberry/Win10). On unix the file still lands in `/tmp`, as before. `t/01.all.tests.t` writes its output images to the same directory for the same reason.
+
+ - The `Creator` metadata written into each image is now emitted as a properly escaped Python string literal. It embeds `getcwd()` and the module's own path, which are backslash paths on MSWin32: pasted raw into the literal, `C:\build\...` read `\b` as a backspace and `\c` as an invalid escape (a SyntaxWarning in Python 3.12, a SyntaxError from 3.15), and an apostrophe anywhere in the path closed the literal early.
 
 0.312 2026-09-04 CDT
 

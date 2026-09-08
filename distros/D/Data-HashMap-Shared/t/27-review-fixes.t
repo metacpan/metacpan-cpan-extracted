@@ -21,7 +21,7 @@ my $dir = tempdir( CLEANUP => 1 );
 
     ok $f->frozen, 'map reports frozen';
     ok !eval { $w->put( 2, 200 ); 1 }, 'a handle opened before the freeze cannot write';
-    like $@, qr/frozen|read-only/i, '  ... and says why';
+    like $@, qr/is frozen \(read-only\)/, '  ... and says why';
 
     my $ro = Data::HashMap::Shared::II->new_readonly($p);
     is $ro->get(2), undef, 'the sealed map never saw the write';

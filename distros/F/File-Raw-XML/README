@@ -1,0 +1,51 @@
+File-Raw-XML
+
+An XML 1.0 and Namespaces 1.0 parser producing a read-only tree, and a
+canonicaliser for it in the three algorithms a signature names: Exclusive
+XML Canonicalization 1.0, Canonical XML 1.0 and Canonical XML 1.1. It is
+written for consumers that verify signatures over the canonical form,
+where one wrong byte is a signature that never verifies, and it is small
+enough to own rather than fence: the safe subset of XML is not large.
+
+It is not a full XML processor. It refuses every document with a DOCTYPE,
+accepts UTF-8 only, has no XPath, and writes nothing but the canonical
+form. Three surfaces reach the same tree: a File::Raw plugin
+(file_slurp($path, plugin => 'xml')), a direct codec for bytes already in
+memory (file_xml_decode), and a C ABI (frx_abi.h) for XS consumers,
+published through ExtUtils::Depends.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+A C compiler and File::Raw 0.15 or newer are required.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::Raw::XML
+    perldoc File::Raw::XML::Document
+    perldoc File::Raw::XML::Node
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Raw-XML
+
+    Search CPAN
+        https://metacpan.org/release/File-Raw-XML
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

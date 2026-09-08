@@ -26,6 +26,7 @@ elsif (($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys')
 my $pkg = ExtUtils::Depends->new('File::Raw');
 $pkg->set_inc('-I. -Iinclude');
 $pkg->install('include/file_plugin.h');
+$pkg->install('include/file_chunk.h');
 
 if ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
     my $arch = $Config{installsitearch};

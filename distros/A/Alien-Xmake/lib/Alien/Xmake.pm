@@ -1,7 +1,9 @@
 use v5.40;
 use experimental 'class';
+use builtin 'is_bool';
+no warnings 'experimental::builtin';
 #
-class Alien::Xmake v0.9.4 {
+class Alien::Xmake v1.0.0 {
     use File::Spec;
     use File::Basename qw[dirname];
     use File::Temp     qw[tempdir];
@@ -63,25 +65,27 @@ class Alien::Xmake v0.9.4 {
         return dirname($exe);
     }
 
-    method exe () {        # Return a potentially quoted path for execution
-        my $path = $self->_resolve_path;
-        return $self->_quote_path($path);
-    }
+    # Return the bare executable path. NEVER embed quote characters here: every
+    # LIST-form spawn (`system @cmd`, Capture::Tiny around it) treats the path as
+    # the literal image name, so quotes make CreateProcess fail even for paths
+    # with spaces. Only single-string/`qx` call sites quote, and they do it
+    # themselves (see _getver_build and pkg_config).
+    method exe () { $self->_resolve_path }
 
-    method xrepo () {      # xrepo is usually in the same folder as Xmake
+    method xrepo () {    # xrepo is usually in the same folder as Xmake; bare path, see exe()
         my $exe_path   = $self->_resolve_path;
         my $parent     = dirname($exe_path);
         my $xrepo_name = 'xrepo' . ( $windows ? '.bat' : '' );
 
         # Check sibling
         my $try = File::Spec->catfile( $parent, $xrepo_name );
-        return $self->_quote_path($try) if -e $try;
+        return $try if -e $try;
 
         # Fallback to config path calculation if the sibling check failed
         if ( $config->{bin} ) {
             my $conf_parent = dirname( $config->{bin} );
             my $target      = File::Spec->catfile( $conf_parent, $xrepo_name );
-            return $self->_quote_path($target);
+            return $target;
         }
 
         # Last resort: return bare command
@@ -91,11 +95,15 @@ class Alien::Xmake v0.9.4 {
     method pkg_config ($package) {
         my $xrepo = $self->xrepo;
         system( $xrepo, 'install', '-y', $package ) == 0 || die "Alien::Xmake: Could not install package '$package'\n";
-        my $cflags = qx|$xrepo fetch --cflags "$package"|;
+        my ( $cflags, undef, undef ) = capture_cmd( $xrepo, 'fetch', '--cflags', $package );
         chomp $cflags;
-        my $libs = qx|$xrepo fetch --ldflags "$package"|;
+        my ( $libs, undef, undef ) = capture_cmd( $xrepo, 'fetch', '--ldflags', $package );
         chomp $libs;
         return { cflags => $cflags, libs => $libs };
+    }
+
+    sub capture_cmd (@cmd) {
+        return capture { system @cmd }
     }
     method version ()             { $self->install_type eq 'system' ? $self->_getver : $config->{version} }
     method buildid ()             { $self->_getbuild }
@@ -142,7 +150,12 @@ class Alien::Xmake v0.9.4 {
     # Format a scalar or arrayref as a comma/separator joined flag value.
     method _join ( $value, $sep //= ',' ) {
         return () unless defined $value;
-        ref $value eq 'ARRAY' ? join( $sep, @$value ) : $value;
+        ref $value eq 'ARRAY' ? join( $sep, map { _bool_str($_) } @$value ) : _bool_str($value);
+    }
+
+    sub _bool_str ($value) {
+        return $value ? 'true' : 'false' if is_bool($value);
+        return $value;
     }
 
     # Generic escape hatch: run any task/plugin by name.
@@ -610,7 +623,10 @@ class Alien::Xmake v0.9.4 {
 
     method _getver_build() {
         my $cmd = $self->exe;
-        state $out //= qx[$cmd --version];
+        state $out //= do {
+            my ( $stdout, undef, $exit ) = capture_cmd( $cmd, '--version' );
+            $exit == 0 ? $stdout : '';
+        };
         return ( $1, $2 ) if $out =~ /xmake\s+v?(\d+\.\d+\.\d+)(?:\+(.+),)?/i;
         ( '0.0.0', () );
     }
@@ -635,9 +651,9 @@ class Alien::Xmake v0.9.4 {
 
     # Safely quote arguments for Windows cmd.exe
     method _escape_args (@args) { return @args }
-    }
-    #
-    1;
+};
+#
+1;
 __END__
 Copyright (C) Sanko Robinson.
 

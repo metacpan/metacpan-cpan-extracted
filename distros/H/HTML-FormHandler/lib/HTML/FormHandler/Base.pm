@@ -1,6 +1,6 @@
 package HTML::FormHandler::Base;
 # ABSTRACT: stub
-$HTML::FormHandler::Base::VERSION = '0.410001';
+$HTML::FormHandler::Base::VERSION = '0.410002';
 use Moose;
 
 with 'HTML::FormHandler::Widget::Form::Simple';
@@ -26,7 +26,7 @@ HTML::FormHandler::Base - stub
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

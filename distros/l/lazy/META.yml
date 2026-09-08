@@ -11,12 +11,12 @@ build_requires:
   Path::Tiny: '0'
   Test::More: '0'
   Test::RequiresInternet: '0'
-  perl: '5.010'
+  perl: '5.024'
   version: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: v5.10.0
-dynamic_config: 1
+  perl: '5.024'
+dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
 license: artistic_2
 meta-spec:
@@ -29,7 +29,7 @@ no_index:
     - t
     - xt
 requires:
-  App::cpm: '0.997017'
+  App::cpm: '1'
   App::cpm::CLI: '0'
   Carp: '0'
   Getopt::Long: '0'
@@ -38,14 +38,14 @@ requires:
   Try::Tiny: '0'
   feature: '0'
   local::lib: '2.000024'
-  perl: '5.010'
+  perl: '5.024'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/oalders/lazy/issues
   homepage: https://github.com/oalders/lazy
   repository: https://github.com/oalders/lazy.git
-version: '1.000002'
+version: '1.000003'
 x_Dist_Zilla:
   perl:
     version: '5.042002'
@@ -464,7 +464,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.000002
+          tag: v1.000003
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -533,14 +533,6 @@ x_Dist_Zilla:
       name: Prereqs
       version: '6.037'
     -
-      class: Dist::Zilla::Plugin::DynamicPrereqs
-      config:
-        Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
-          version: '0.006'
-      name: DynamicPrereqs
-      version: '0.040'
-    -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
@@ -581,6 +573,10 @@ x_Dist_Zilla:
           mode: auto
       name: StaticInstall
       version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: PruneFiles
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -629,9 +625,8 @@ x_Dist_Zilla:
 x_contributors:
   - 'dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>'
   - 'E. Choroba <choroba@matfyz.cz>'
-  - 'Olaf Alders <olaf.alders@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
 x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0
-x_static_install: 0
+x_static_install: 1

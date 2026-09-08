@@ -10,8 +10,9 @@ on 'test' => sub {
 	requires 'Perl::Critic';
 	requires 'Perl::Tidy';
 
-	# Fugu::SSH drives libssh2 through this binding
-	requires 'Net::SSH2';
+	# Fugu::SSH drives libssh2 through this binding. The strict
+	# mode needs check_hostkey with the 0.60 argument order.
+	requires 'Net::SSH2', '0.60';
 
 	# The Fugu::Proxy cache maps a URL to a path with URI
 	requires 'URI';

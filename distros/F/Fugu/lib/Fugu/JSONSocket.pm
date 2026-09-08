@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::JSONSocket;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use IO::Select;
 use IO::Socket::UNIX;

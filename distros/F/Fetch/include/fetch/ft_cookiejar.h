@@ -9,7 +9,7 @@
  * blessed IV; xs/cookiejar.xs is a thin layer over these helpers. */
 
 #include <string.h>
-#include <strings.h>   /* strncasecmp */
+#include "ft_win.h"    /* strncasecmp: <strings.h>, or the CRT name under MSVC */
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>

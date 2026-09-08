@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Handy Utilities for Real-time MIDI
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0400';
 
 use v5.36;
 use feature 'try';
@@ -12,6 +12,7 @@ use feature 'try';
 use MIDI::RtMidi::FFI::Device ();
 use Exporter 'import';
 our @EXPORT = qw(
+    in_port
     out_port
     stop_device
     input_ports
@@ -20,6 +21,14 @@ our @EXPORT = qw(
 
 no warnings 'experimental::try';
 
+
+
+sub in_port ($name) {
+    my $midi_in = RtMidiIn->new;
+    try { $midi_in->open_port_by_name(qr/\Q$name/i) }
+    catch ($e) { die "Can't open MIDI port: $name\n" }
+    return $midi_in;
+}
 
 
 sub out_port ($name) {
@@ -76,7 +85,7 @@ MIDI::RtMidi::Util - Handy Utilities for Real-time MIDI
 
 =head1 VERSION
 
-version 0.0301
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -85,6 +94,7 @@ version 0.0301
   my $ports = input_ports(); # e.g. ['USB MIDI Interface', ...]
   $ports = output_ports();
 
+  my $midi_in  = in_port('keyboard');
   my $midi_out = out_port('usb');
   # Do something cool ...
 
@@ -97,6 +107,14 @@ version 0.0301
 C<MIDI::RtMidi::Util> is a junk drawer for Real-time MIDI utilities.
 
 =head1 FUNCTIONS
+
+=head2 in_port
+
+  $in_port = in_port($name);
+
+Open and return a named L<MIDI::RtMidi::FFI::Device> C<RtMidiIn> device.
+
+This function takes a unique part of an open port name as its argument.
 
 =head2 out_port
 

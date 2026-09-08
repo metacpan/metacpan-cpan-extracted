@@ -6,6 +6,7 @@ use FindBin qw($RealBin);
 use lib "$RealBin/../../lib";
 
 use Cwd        ();
+use Fcntl      qw(F_SETFD);
 use File::Temp qw(tempdir);
 use Fugu::CLI  qw(EXIT_ERROR);
 
@@ -598,6 +599,291 @@ subtest 'terminate without group signals the one pid' => sub {
 
 	# Clean up the grandchild
 	kill 'KILL', $grandchild;
+};
+
+subtest 'spawn_peer starts a peer child over a socketpair' => sub {
+
+	# The child needs no descriptor argument: the number is part
+	# of the contract, so it opens fd 3 itself.
+	my $r = Fugu::Process->spawn_peer(
+		cmd => [
+			$^X, '-e',
+			'open my $peer, q{+<&=}, 3 or die "open: $!"; '
+			    . 'my $line = <$peer>; '
+			    . 'print {$peer} "echo: $line"; '
+			    . 'close $peer'
+		],
+	);
+	ok( $r->{success}, 'the peer spawned' ) or diag $r->{error};
+	ok( defined $r->{pid},    'the result carries the pid' );
+	ok( defined $r->{socket}, 'and the parent end' );
+
+	my $sock = $r->{socket};
+	syswrite $sock, "ping\n";
+	is( readline($sock), "echo: ping\n", 'the child echoed over fd 3' );
+
+	close $sock;
+	ok( Fugu::Process->wait_exit( $r->{pid}, 5 ), 'the peer exited' );
+};
+
+subtest 'spawn_peer puts the child end on the named number' => sub {
+	my $r = Fugu::Process->spawn_peer(
+		cmd => [
+			$^X, '-e',
+			'open my $peer, q{+<&=}, 9 or die "open: $!"; '
+			    . 'print {$peer} "on 9"; close $peer'
+		],
+		fd => 9,
+	);
+	ok( $r->{success}, 'the peer spawned' ) or diag $r->{error};
+
+	is( readline( $r->{socket} ), 'on 9', 'the child end sits on fd 9' );
+
+	close $r->{socket};
+	Fugu::Process->wait_exit( $r->{pid}, 5 );
+};
+
+subtest 'spawn_peer reports an exec failure with the reason' => sub {
+	my $r = Fugu::Process->spawn_peer(
+		cmd => ['/nonexistent/definitely-not-a-command'] );
+
+	ok( !$r->{success}, 'an exec failure is a failure' );
+	like(
+		$r->{error},
+		qr/Cannot exec .*definitely-not-a-command/,
+		'and the error names the command'
+	);
+	ok( !exists $r->{socket}, 'no socket comes back' );
+};
+
+subtest 'spawn_peer dies on a bad fd' => sub {
+	ok( !eval { Fugu::Process->spawn_peer( cmd => ['true'], fd => 2 ); 1 },
+		'an fd below 3 dies' );
+	like( $@, qr/fd must be a number of 3 or above/, 'and says why' );
+
+	open my $null, '<', '/dev/null' or die "open: $!";
+	ok( !eval {
+		Fugu::Process->spawn_peer(
+			cmd     => ['true'],
+			fd      => fileno($null),
+			inherit => [$null],
+		);
+		1;
+	    },
+		'a collision with an inherit descriptor dies' );
+	like( $@, qr/collides with an inherit descriptor/, 'and says why' );
+	close $null;
+};
+
+subtest 'a descriptor in inherit reaches the child' => sub {
+	my $dir = tempdir( CLEANUP => 1 );
+
+	open my $out, '>>', "$dir/inherit.txt" or die "open: $!";
+	$out->autoflush(1);
+
+	# The caller reads fileno before the call and puts the number
+	# in cmd. That is the contract.
+	my $result = Fugu::Process->spawn_command(
+		cmd => [
+			$^X, '-e',
+			'open my $fh, q{>>&=}, $ARGV[0] or die "open: $!"; '
+			    . 'print {$fh} "from the child"; close $fh',
+			fileno($out),
+		],
+		inherit => [$out],
+	);
+	ok( $result->{success}, 'the child spawned' ) or diag $result->{error};
+	Fugu::Process->wait_exit( $result->{pid}, 5 );
+	close $out;
+
+	open my $fh, '<', "$dir/inherit.txt" or die "read: $!";
+	my $content = do { local $/; <$fh> };
+	close $fh;
+	is( $content, 'from the child', 'the descriptor survived the exec' );
+};
+
+subtest 'a descriptor outside inherit does not reach the child' => sub {
+
+	# A write end that the caller made inheritable itself. The
+	# sweep must close it anyway, because inherit does not name it.
+	pipe my $r_end, my $w_end or die "pipe: $!";
+	fcntl( $w_end, F_SETFD, 0 ) or die "fcntl: $!";
+	my $fd = fileno $w_end;
+
+	# The child end of spawn_peer lands on fd 3, so the probe must
+	# sit above it, or the child would probe its own socket.
+	plan skip_all => 'the pipe landed on fd 3' if $fd <= 3;
+
+	my $r = Fugu::Process->spawn_peer(
+		cmd => [
+			$^X, '-e',
+			'my $ok = open( my $fh, q{>>&=}, $ARGV[0] ) '
+			    . '? q{open} : q{closed}; '
+			    . 'open my $peer, q{+<&=}, 3 or die "open: $!"; '
+			    . 'print {$peer} $ok; close $peer',
+			$fd,
+		],
+	);
+	ok( $r->{success}, 'the child spawned' ) or diag $r->{error};
+
+	is( readline( $r->{socket} ), 'closed', 'the sweep closed the pipe' );
+
+	close $r->{socket};
+	close $r_end;
+	close $w_end;
+	Fugu::Process->wait_exit( $r->{pid}, 5 );
+};
+
+subtest 'a descriptor in inherit reaches a spawn_peer child' => sub {
+	my $dir = tempdir( CLEANUP => 1 );
+
+	open my $out, '>>', "$dir/peer-inherit.txt" or die "open: $!";
+	$out->autoflush(1);
+
+	# The inherit member rides beside the occupied peer number, so
+	# the peer number must differ from the member.
+	my $peerfd = fileno($out) == 3 ? 4 : 3;
+
+	my $r = Fugu::Process->spawn_peer(
+		cmd => [
+			$^X, '-e',
+			'open my $fh, q{>>&=}, $ARGV[0] or die "open: $!"; '
+			    . 'print {$fh} "beside the peer"; close $fh; '
+			    . 'open my $peer, q{+<&=}, $ARGV[1] '
+			    . 'or die "open: $!"; '
+			    . 'print {$peer} "done"; close $peer',
+			fileno($out),
+			$peerfd,
+		],
+		fd      => $peerfd,
+		inherit => [$out],
+	);
+	ok( $r->{success}, 'the peer spawned' ) or diag $r->{error};
+
+	is( readline( $r->{socket} ), 'done', 'the child answered' );
+	close $r->{socket};
+	Fugu::Process->wait_exit( $r->{pid}, 5 );
+	close $out;
+
+	open my $fh, '<', "$dir/peer-inherit.txt" or die "read: $!";
+	my $content = do { local $/; <$fh> };
+	close $fh;
+	is( $content, 'beside the peer',
+		'the inherit descriptor survived the exec' );
+};
+
+subtest 'a descriptor outside inherit does not reach spawn_command' => sub {
+	my $dir = tempdir( CLEANUP => 1 );
+	my $out = "$dir/probe.txt";
+
+	pipe my $r_end, my $w_end or die "pipe: $!";
+	fcntl( $w_end, F_SETFD, 0 ) or die "fcntl: $!";
+	my $fd = fileno $w_end;
+
+	my $result = Fugu::Process->spawn_command(
+		cmd => [
+			$^X, '-e',
+			'print( open( my $fh, q{>>&=}, $ARGV[0] ) '
+			    . '? q{open} : q{closed} )',
+			$fd,
+		],
+		stdout => $out,
+	);
+	ok( $result->{success}, 'the child spawned' ) or diag $result->{error};
+	Fugu::Process->wait_exit( $result->{pid}, 5 );
+	close $r_end;
+	close $w_end;
+
+	open my $fh, '<', $out or die "read: $!";
+	my $content = do { local $/; <$fh> };
+	close $fh;
+	is( $content, 'closed', 'the sweep closed the pipe' );
+};
+
+subtest 'spawn_peer carries env to the child' => sub {
+	my $r = Fugu::Process->spawn_peer(
+		cmd => [
+			$^X, '-e',
+			'open my $peer, q{+<&=}, 3 or die "open: $!"; '
+			    . 'print {$peer} join( q{,}, '
+			    . 'map { "$_=$ENV{$_}" } sort keys %ENV ); '
+			    . 'close $peer'
+		],
+		env => { ONE => '1', TWO => '2' },
+	);
+	ok( $r->{success}, 'the peer spawned' ) or diag $r->{error};
+	is( readline( $r->{socket} ), 'ONE=1,TWO=2',
+		'the child holds the named variables and nothing else' );
+	close $r->{socket};
+	Fugu::Process->wait_exit( $r->{pid}, 5 );
+
+	my $bad = Fugu::Process->spawn_peer(
+		cmd => [ $^X, '-e', '1' ],
+		env => 'not-a-hashref',
+	);
+	ok( !$bad->{success},    'a bad env starts nothing' );
+	ok( !exists $bad->{pid}, 'and carries no pid' );
+};
+
+subtest 'spawn_peer survives an exec pipe on the requested number' => sub {
+
+	# Predict the numbers: the socketpair takes the two lowest
+	# free descriptors, and the exec pipe takes the next two. The
+	# write end of the pipe is the fourth, so ask for exactly that
+	# number, and the pipe must move out of the way. A missed
+	# prediction still passes, and then only skips the branch.
+	open my $probe, '<', '/dev/null' or die "open: $!";
+	my $base = fileno $probe;
+	close $probe;
+	my $fd = $base + 3;
+
+	my $r = Fugu::Process->spawn_peer(
+		cmd => [
+			$^X, '-e',
+			'open my $peer, q{+<&=}, $ARGV[0] or die "open: $!"; '
+			    . 'print {$peer} "collision"; close $peer',
+			$fd,
+		],
+		fd => $fd,
+	);
+	ok( $r->{success}, 'the peer spawned' ) or diag $r->{error};
+	is( readline( $r->{socket} ), 'collision',
+		'the child end took the number' );
+	close $r->{socket};
+	Fugu::Process->wait_exit( $r->{pid}, 5 );
+
+	# The moved pipe still reports an exec failure exactly.
+	my $bad = Fugu::Process->spawn_peer(
+		cmd => ['/nonexistent/definitely-not-a-command'],
+		fd  => $fd,
+	);
+	ok( !$bad->{success}, 'an exec failure still reports' );
+	like( $bad->{error}, qr/Cannot exec/, 'with the reason' );
+};
+
+subtest 'a bad inherit dies and starts nothing' => sub {
+	for my $method (qw(spawn_command spawn_peer)) {
+		ok( !eval {
+			Fugu::Process->$method(
+				cmd     => ['true'],
+				inherit => 'not-an-arrayref',
+			);
+			1;
+		    },
+			"$method dies on a value that is not an arrayref" );
+		like( $@, qr/inherit must be an array reference/,
+			'and says why' );
+
+		ok( !eval {
+			Fugu::Process->$method(
+				cmd     => ['true'],
+				inherit => ['not-a-handle'],
+			);
+			1;
+		    },
+			"$method dies on a member with no descriptor" );
+		like( $@, qr/no descriptor/, 'and says why' );
+	}
 };
 
 subtest 'the module reads the Perl configuration at compile time' => sub {

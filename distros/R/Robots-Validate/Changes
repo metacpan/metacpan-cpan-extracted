@@ -1,5 +1,20 @@
 Revision history for Robots-Validate:
 
+v0.4.3    2026-09-07 14:17:08+01:00 Europe/London
+  [Enhancements]
+  - Removed uniqstr filter since this already skips duplicate checks.
+
+  - Switched to Net::IP::LPM.
+
+  - Added robot rules for WebMCPIndexBot, PoweredByBot and Speroll-AdsTxt-Crawler.
+
+  - Requires TOML::Tiny instead of TOML::XS, but the latter will be used if it can be loaded.
+
+  - Requires Algorithm::Corasick instead of Algorithm::Corasick::XS, but the latter will be used if it can be loaded.
+
+  [Tests]
+  - Renamed test script that referred to a renamed attribute.
+
 v0.4.2    2026-09-05 16:56:14+01:00 Europe/London
   [Enhancements]
   - Skip duplicate checks for relaxed and strict validation.

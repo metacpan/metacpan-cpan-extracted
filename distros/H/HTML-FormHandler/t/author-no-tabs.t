@@ -331,6 +331,8 @@ my @files = (
     't/result/errors.t',
     't/result/repeatable.t',
     't/security/CVE-2026-19872.t',
+    't/security/CVE-2026-85484.t',
+    't/security/CVE-2026-86630.t',
     't/structured.t',
     't/template.t',
     't/validation/apply.t',

@@ -1,6 +1,6 @@
 package HTML::FormHandler::Render::WithTT;
 # ABSTRACT: tt rendering
-$HTML::FormHandler::Render::WithTT::VERSION = '0.410001';
+$HTML::FormHandler::Render::WithTT::VERSION = '0.410002';
 use Moose::Role;
 use File::ShareDir;
 use Template;
@@ -100,7 +100,7 @@ HTML::FormHandler::Render::WithTT - tt rendering
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

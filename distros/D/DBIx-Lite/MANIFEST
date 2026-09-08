@@ -15,5 +15,6 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/class.t
 t/custom_resultset.t
+t/dbh_do_local.t
 t/disconnected.t
 t/sqlite.t

@@ -1,5 +1,11 @@
 Revision history for Alien-OpenCV
 
+0.003     2026-09-07 16:22:09-04:00 America/New_York
+  - Improve support for `pkg-config` on MSWin32 so that the 'share' install
+    correctly gathers the build flags.
+    See <https://github.com/EntropyOrg/perl-Alien-OpenCV/pull/8>,
+    <https://github.com/EntropyOrg/perl-Alien-OpenCV/pull/9>.
+
 0.002     2022-12-24 11:25:40-05:00 America/New_York
   - Fix missing $VERSION. Thanks for the report mohawk2++!
     See <https://github.com/EntropyOrg/perl-Alien-OpenCV/issues/2>.

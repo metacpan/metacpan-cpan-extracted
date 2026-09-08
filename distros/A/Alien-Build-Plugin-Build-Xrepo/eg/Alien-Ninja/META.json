@@ -1,0 +1,59 @@
+{
+   "abstract" : "Build & install ninja (binary) via the Build::Xrepo Alien::Build plugin",
+   "author" : [
+      "Sanko Robinson"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Alien-Xmake example",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Ninja",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "2.84",
+            "Alien::Build::Plugin::Build::Xrepo" : "v1.0.0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "2.84",
+            "Alien::Build::MB" : "0",
+            "Alien::Build::Plugin::Build::Xrepo" : "v1.0.0",
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "2.84",
+            "Alien::Build::Plugin::Build::Xrepo" : "v1.0.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Ninja" : {
+         "file" : "lib/Alien/Ninja.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001"
+}

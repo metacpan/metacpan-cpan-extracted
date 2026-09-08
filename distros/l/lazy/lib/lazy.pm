@@ -2,16 +2,17 @@ package lazy;
 
 use strict;
 use warnings;
+use 5.024;    # App::cpm and its toolchain family require Perl 5.24+
 use feature qw( state );
 
-our $VERSION = '1.000002';
+our $VERSION = '1.000003';
 
-use App::cpm 0.997017 ();                # CLI has no $VERSION
-use App::cpm::CLI     ();
-use Carp              qw( longmess );
-use Sub::Name         qw( subname );
-use Sub::Identify     qw( sub_name );
-use Try::Tiny         qw( catch try );
+use App::cpm 1 ();    # CLI has no $VERSION; v0.998xxx range is broken (GH#38)
+use App::cpm::CLI ();
+use Carp          qw( longmess );
+use Sub::Name     qw( subname );
+use Sub::Identify qw( sub_name );
+use Try::Tiny     qw( catch try );
 
 # Cargo-culted from App::cpm::CLI
 # Adding pass_through so that we don't have to keep up with all possible options
@@ -85,18 +86,14 @@ sub import {
         $name =~ s{/}{::}g;
         $name =~ s{\.pm\z}{};
 
-        if ( $name =~ qr{\Aauto::.*\.al\z} ) {
-            warn "skipping autoloader file $name";
-            return;
-        }
-        if ( $name =~ qr{\ANet::DNS::Resolver::} ) {
-            warn "skipping $name";
-            return;
-        }
-        if ( $name eq 'Encode::ConfigLocal' ) {
-            warn "skipping $name";
-            return;
-        }
+        # Silently skip probes we never want to install: autoloader split
+        # files, Net::DNS::Resolver's per-OS subclasses, and
+        # Encode::ConfigLocal.  These fire constantly during normal @INC
+        # searching, so warning about them is pure noise.
+        return
+               if $name =~ qr{\Aauto::.*\.al\z}
+            || $name =~ qr{\ANet::DNS::Resolver::}
+            || $name eq 'Encode::ConfigLocal';
 
         warn "lazy: installing $name ...\n";
         try {
@@ -129,7 +126,7 @@ lazy - Lazily install missing Perl modules
 
 =head1 VERSION
 
-version 1.000002
+version 1.000003
 
 =head1 SYNOPSIS
 
@@ -188,6 +185,8 @@ C<lazy> will try to install any missing modules automatically, making your day
 just a little less long.  C<lazy> uses L<App::cpm> to perform this magic in the
 background.
 
+=for stopwords desugars
+
 =head1 USAGE
 
     perl -Mlazy foo.pl
@@ -232,6 +231,25 @@ L<perlrun>), where C<-M> on the command line uses spaces.
 =head1 CAVEATS
 
 * Remove C<lazy> before you put your work into production.
+
+* C<lazy> only installs modules that are B<missing>, not modules that are
+present but too old.  It works by pushing a code-ref hook onto C<@INC>, which
+Perl consults only when C<require> cannot find a module's F<.pm> file on disk.
+A version-too-low failure is not a C<require> failure:
+
+    use lazy;
+    use Test::Most 0.42;   # dies if only 0.30 is installed
+
+desugars roughly to
+
+    require Test::Most;             # consults @INC - succeeds, the file is on disk
+    Test::Most->VERSION('0.42');   # throws *after* require returns
+
+By the time C<VERSION> throws, C<@INC> is no longer being walked, so the hook
+never runs.  To upgrade a module that is installed but too old, run L<App::cpm>
+directly with a version range:
+
+    cpm install -g 'Test::Most~">=0.42"'
 
 =head1 SEE ALSO
 

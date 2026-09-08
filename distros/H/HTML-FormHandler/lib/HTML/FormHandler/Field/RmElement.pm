@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::RmElement;
 # ABSTRACT: field to support repeatable javascript remove
-$HTML::FormHandler::Field::RmElement::VERSION = '0.410001';
+$HTML::FormHandler::Field::RmElement::VERSION = '0.410002';
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Field::Display';
 use HTML::FormHandler::Render::Util ('process_attrs');
@@ -42,7 +42,7 @@ HTML::FormHandler::Field::RmElement - field to support repeatable javascript rem
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

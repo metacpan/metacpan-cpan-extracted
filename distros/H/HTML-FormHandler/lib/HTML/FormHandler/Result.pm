@@ -1,6 +1,6 @@
 package HTML::FormHandler::Result;
 # ABSTRACT: form result object
-$HTML::FormHandler::Result::VERSION = '0.410001';
+$HTML::FormHandler::Result::VERSION = '0.410002';
 use Moose;
 # following is to allow the form to return an empty
 # hashref when value is undefined, without messing
@@ -82,7 +82,7 @@ HTML::FormHandler::Result - form result object
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

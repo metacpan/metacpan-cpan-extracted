@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Block;
 # ABSTRACT: base block renderer
-$HTML::FormHandler::Widget::Block::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Block::VERSION = '0.410002';
 
 use Moose;
 with 'HTML::FormHandler::TraitFor::Types';
@@ -180,7 +180,7 @@ HTML::FormHandler::Widget::Block - base block renderer
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

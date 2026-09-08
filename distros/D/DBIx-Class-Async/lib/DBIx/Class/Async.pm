@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.6');
+our $VERSION   = qv('v1.0.8');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
@@ -15,7 +15,7 @@ DBIx::Class::Async - Non-blocking, multi-worker asynchronous wrapper for DBIx::C
 
 =head1 VERSION
 
-Version v1.0.6
+Version v1.0.8
 
 =head1 DISCLAIMER
 
@@ -1254,9 +1254,18 @@ sub _build_default_cache {
     # depending on how CHI handles undef (never expire) vs 0 (expire immediately)
     return undef if !defined $ttl || $ttl == 0;
 
+    # CPANSec CWE-639: this caches object is created once per connect() call
+    # and stored on the $async_db hashref of that connection, hence every
+    # ResultSet of that connection shares it via that one reference, no need
+    # for global => 1 and the only thing it achieves is to cause
+    # CHI::Driver::Memory to back all instances in process with the same
+    # store, regardless of namespace. That is to say that two Schemas
+    # connected to two different databases (two calls of this sub) would be
+    # able to read and write to the same cache entries silently. Each
+    # connection has to have its own separate store.
     my %params = (
         driver => 'Memory',
-        global => 1,
+        global => 0,
     );
 
     # Add expires_in only if ttl is defined (undef means never expire in CHI)

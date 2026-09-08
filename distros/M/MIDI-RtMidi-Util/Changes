@@ -1,5 +1,8 @@
 Revision history for MIDI-RtMidi-Util
 
+0.0400 2026-09-07 14:59:30
+    - Add the missing `in_port()` function.
+
 0.0301 2026-09-01 13:36:39
     - Improve documentation.
 

@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet href="s.xsl" type="text/xsl"?>
+<!-- before -->
+<r a="&lt;&amp;&gt;&quot;&apos;" b="&#x9;&#xA;&#xD;" c="  spaced  ">
+  text &amp; refs &#65;&#x42;<![CDATA[ <cdata> & ]]]]><![CDATA[> ]]>more
+  <?pi data?><?pi2?><!-- inner -->
+  <empty/><e></e>
+</r>
+<!-- after -->
+<?trailing pi?>

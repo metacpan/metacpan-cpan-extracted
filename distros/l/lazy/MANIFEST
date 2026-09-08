@@ -18,12 +18,10 @@ examples/lazy.pl
 git/hooks/pre-commit
 git/setup.sh
 lib/lazy.pm
-perlcriticrc
 perlimports.toml
-perltidyrc
-precious.toml
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/cpm-prereq.t
 t/load.t
 t/local-install-via-args.t
 t/pass-through-args.t

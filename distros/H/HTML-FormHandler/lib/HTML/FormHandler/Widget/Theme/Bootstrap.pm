@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Theme::Bootstrap;
 # ABSTRACT: sample bootstrap theme
-$HTML::FormHandler::Widget::Theme::Bootstrap::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Theme::Bootstrap::VERSION = '0.410002';
 
 use Moose::Role;
 with 'HTML::FormHandler::Widget::Theme::BootstrapFormMessages';
@@ -27,7 +27,7 @@ HTML::FormHandler::Widget::Theme::Bootstrap - sample bootstrap theme
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

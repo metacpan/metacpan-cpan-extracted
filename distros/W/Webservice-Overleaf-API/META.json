@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl client helpers for Overleaf import, Git, and experimental project operations",
+   "author" : [
+      "Brett Estrade <oodler@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Webservice-Overleaf-API",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dispatch::Fu" : "1.07",
+            "HTML::Entities" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::PP" : "0",
+            "MIME::Base64" : "0",
+            "Pod::Text" : "0",
+            "URI::Escape" : "0",
+            "Util::H2O::More" : "v0.4.6",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oodler577/p5-Webservice-Overleaf-API/issues"
+      },
+      "homepage" : "https://github.com/oodler577/p5-Webservice-Overleaf-API",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oodler577/p5-Webservice-Overleaf-API.git",
+         "web" : "https://github.com/oodler577/p5-Webservice-Overleaf-API"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

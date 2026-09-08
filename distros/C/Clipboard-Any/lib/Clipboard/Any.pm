@@ -9,9 +9,15 @@ use Exporter::Rinci qw(import);
 use IPC::System::Options 'system', 'readpipe', 'run', -log=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-06-17'; # DATE
+our $DATE = '2026-07-07'; # DATE
 our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
+
+sub _x_selection {
+    my $sel = $ENV{PERL_CLIPBOARD_ANY_XCLIP_SELECTION} // 'primary';
+    $sel =~ s/\W+/_/g;
+    $sel;
+}
 
 our $known_clipboard_managers = [qw/klipper parcellite clipit xclip/];
 our $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
@@ -200,12 +206,13 @@ sub clear_clipboard_history {
         unless $clipboard_manager;
 
     if ($clipboard_manager eq 'klipper') {
-        my @paths = _find_qdbus();
-        die "Can't find qdbus" unless @paths;
+        require Desktop::KDE::Util;
+        my $paths = Desktop::KDE::Util::which_qdbus();
+        die "Can't find qdbus" unless @$paths;
         my ($stdout, $stderr);
         # qdbus likes to emit an empty line
         system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-               $paths[0], "org.kde.klipper", "/klipper", "clearClipboardHistory");
+               $paths->[0], "org.kde.klipper", "/klipper", "clearClipboardHistory");
         my $exit_code = $? < 0 ? $? : $?>>8;
         return [500, "/klipper's clearClipboardHistory failed: $exit_code"] if $exit_code;
         return [200, "OK"];
@@ -214,21 +221,14 @@ sub clear_clipboard_history {
     } elsif ($clipboard_manager eq 'clipit') {
         return [501, "Not yet implemented"];
     } elsif ($clipboard_manager eq 'xclip') {
-        # implemented by setting both primary and clipboard to empty string
-
         my $fh;
 
-        open $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
-            or return [500, "xclip -i -selection primary failed (1): $!"];
+        my $sel = _x_selection();
+        open $fh, "| xclip -i -selection $sel" ## no critic: InputOutput::ProhibitTwoArgOpen
+            or return [500, "xclip -i -selection $sel failed (1): $!"];
         print $fh '';
         close $fh
-            or return [500, "xclip -i -selection primary failed (2): $!"];
-
-        open $fh, "| xclip -i -selection clipboard" ## no critic: InputOutput::ProhibitTwoArgOpen
-            or return [500, "xclip -i -selection clipboard failed (1): $!"];
-        print $fh '';
-        close $fh
-            or return [500, "xclip -i -selection clipboard failed (2): $!"];
+            or return [500, "xclip -i -selection $sel failed (2): $!"];
 
         return [200, "OK"];
     }
@@ -254,12 +254,13 @@ sub clear_clipboard_content {
         unless $clipboard_manager;
 
     if ($clipboard_manager eq 'klipper') {
-        my @paths = _find_qdbus();
-        die "Can't find qdbus" unless @paths;
+        require Desktop::KDE::Util;
+        my $paths = Desktop::KDE::Util::which_qdbus();
+        die "Can't find qdbus" unless @$paths;
         my ($stdout, $stderr);
         # qdbus likes to emit an empty line
         system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-               $paths[0], "org.kde.klipper", "/klipper", "clearClipboardContents");
+               $paths->[0], "org.kde.klipper", "/klipper", "clearClipboardContents");
         my $exit_code = $? < 0 ? $? : $?>>8;
         return [500, "/klipper's clearClipboardContents failed: $exit_code"] if $exit_code;
         return [200, "OK"];
@@ -268,20 +269,13 @@ sub clear_clipboard_content {
     } elsif ($clipboard_manager eq 'clipit') {
         return [501, "Not yet implemented"];
     } elsif ($clipboard_manager eq 'xclip') {
-        # implemented by setting both primary and clipboard to empty string
-
         my $fh;
-        open $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
-            or return [500, "xclip -i -selection primary failed (1): $!"];
+        my $sel = _x_selection();
+        open $fh, "| xclip -i -selection $sel" ## no critic: InputOutput::ProhibitTwoArgOpen
+            or return [500, "xclip -i -selection $sel failed (1): $!"];
         print $fh '';
         close $fh
-            or return [500, "xclip -i -selection primary failed (2): $!"];
-        open $fh, "| xclip -i -selection clipboard" ## no critic: InputOutput::ProhibitTwoArgOpen
-            or return [500, "xclip -i -selection clipboard failed (1): $!"];
-        print $fh '';
-        close $fh
-            or return [500, "xclip -i -selection clipboard failed (2): $!"];
-
+            or return [500, "xclip -i -selection $sel failed (2): $!"];
         return [200, "OK"];
     }
 
@@ -319,11 +313,12 @@ sub get_clipboard_content {
         unless $clipboard_manager;
 
     if ($clipboard_manager eq 'klipper') {
-        my @paths = _find_qdbus();
-        die "Can't find qdbus" unless @paths;
+        require Desktop::KDE::Util;
+        my $paths = Desktop::KDE::Util::which_qdbus();
+        die "Can't find qdbus" unless @$paths;
         my ($stdout, $stderr);
         system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-               $paths[0], "org.kde.klipper", "/klipper", "getClipboardContents");
+               $paths->[0], "org.kde.klipper", "/klipper", "getClipboardContents");
         my $exit_code = $? < 0 ? $? : $?>>8;
         return [500, "/klipper's getClipboardContents failed: $exit_code"] if $exit_code;
         chomp $stdout;
@@ -344,10 +339,11 @@ sub get_clipboard_content {
         return [200, "OK", $stdout];
     } elsif ($clipboard_manager eq 'xclip') {
         my ($stdout, $stderr);
+        my $sel = _x_selection();
         system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-               "xclip", "-o", "-selection", "primary");
+               "xclip", "-o", "-selection", $sel);
         my $exit_code = $? < 0 ? $? : $?>>8;
-        return [500, "xclip -o failed with exit code $exit_code"] if $exit_code;
+        return [500, "xclip -o -selection $sel failed (exit code: $exit_code"] if $exit_code;
         return [200, "OK", $stdout];
     }
 
@@ -380,15 +376,16 @@ sub list_clipboard_history {
         unless $clipboard_manager;
 
     if ($clipboard_manager eq 'klipper') {
-        my @paths = _find_qdbus();
-        die "Can't find qdbus" unless @paths;
+        require Desktop::KDE::Util;
+        my $paths = Desktop::KDE::Util::which_qdbus();
+        die "Can't find qdbus" unless @$paths;
         my @rows;
         my $i = 0;
         my $got_empty;
         while (1) {
             my ($stdout, $stderr);
             system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-               $paths[0], "org.kde.klipper", "/klipper", "getClipboardHistoryItem", $i);
+               $paths->[0], "org.kde.klipper", "/klipper", "getClipboardHistoryItem", $i);
             my $exit_code = $? < 0 ? $? : $?>>8;
             return [500, "/klipper's getClipboardHistoryItem($i) failed: $exit_code"] if $exit_code;
             chomp $stdout;
@@ -415,22 +412,15 @@ sub list_clipboard_history {
         # clipit -c usually just prints the same result as -p (primary)
         return [501, "Not yet implemented"];
     } elsif ($clipboard_manager eq 'xclip') {
-        my ($stdout, $stderr, $exit_code);
-        my @rows;
+        my ($stdout, $stderr);
 
+        my $sel = _x_selection();
         system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-               "xclip", "-o", "-selection", "primary");
-        $exit_code = $? < 0 ? $? : $?>>8;
-        return [500, "xclip -o (primary) failed with exit code $exit_code"] if $exit_code;
-        push @rows, $stdout;
+               "xclip", "-o", "-selection", $sel);
+        my $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "xclip -o -selection $sel failed (exit code: $exit_code"] if $exit_code;
 
-        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-               "xclip", "-o", "-selection", "clipboard");
-        $exit_code = $? < 0 ? $? : $?>>8;
-        return [500, "xclip -o (clipboard) failed with exit code $exit_code"] if $exit_code;
-        push @rows, $stdout;
-
-        return [200, "OK", \@rows];
+        return [200, "OK", [$stdout]];
     }
 
     [412, "Cannot list clipboard history (clipboard manager=$clipboard_manager)"];
@@ -456,11 +446,12 @@ sub get_clipboard_history_item {
         unless $clipboard_manager;
 
     if ($clipboard_manager eq 'klipper') {
-        my @paths = _find_qdbus();
-        die "Can't find qdbus" unless @paths;
+        require Desktop::KDE::Util;
+        my $paths = Desktop::KDE::Util::which_qdbus();
+        die "Can't find qdbus" unless @$paths;
         my ($stdout, $stderr);
         system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-               $paths[0], "org.kde.klipper", "/klipper", "getClipboardHistoryItem", $index);
+               $paths->[0], "org.kde.klipper", "/klipper", "getClipboardHistoryItem", $index);
         my $exit_code = $? < 0 ? $? : $?>>8;
         return [500, "/klipper's getClipboardHistoryItem($index) failed: $exit_code"] if $exit_code;
         chomp $stdout;
@@ -473,19 +464,13 @@ sub get_clipboard_history_item {
         return [501, "Not yet implemented"];
     } elsif ($clipboard_manager eq 'xclip') {
         my ($stdout, $stderr, $exit_code);
-        my @rows;
 
         if ($index == 0) {
+            my $sel = _x_selection();
             system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-                   "xclip", "-o", "-selection", "primary");
-            $exit_code = $? < 0 ? $? : $?>>8;
-            return [500, "xclip -o (primary) failed with exit code $exit_code"] if $exit_code;
-            return [200, "OK", $stdout];
-        } elsif ($index == 0) {
-            system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-                   "xclip", "-o", "-selection", "clipboard");
-            $exit_code = $? < 0 ? $? : $?>>8;
-            return [500, "xclip -o (clipboard) failed with exit code $exit_code"] if $exit_code;
+                   "xclip", "-o", "-selection", $sel);
+            my $exit_code = $? < 0 ? $? : $?>>8;
+            return [500, "xclip -o -selection $sel failed (exit code: $exit_code"] if $exit_code;
             return [200, "OK", $stdout];
         } else {
             return [200, "OK", undef];
@@ -547,12 +532,13 @@ sub add_clipboard_content {
     $content =~ s/\R+\z// if $args{chomp_newline};
 
     if ($clipboard_manager eq 'klipper') {
-        my @paths = _find_qdbus();
-        die "Can't find qdbus" unless @paths;
+        require Desktop::KDE::Util;
+        my $paths = Desktop::KDE::Util::which_qdbus();
+        die "Can't find qdbus" unless @$paths;
         my ($stdout, $stderr);
         # qdbus likes to emit an empty line
         system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-               $paths[0], "org.kde.klipper", "/klipper", "setClipboardContents", $content);
+               $paths->[0], "org.kde.klipper", "/klipper", "setClipboardContents", $content);
         my $exit_code = $? < 0 ? $? : $?>>8;
         return [500, "/klipper's setClipboardContents failed: $exit_code"] if $exit_code;
         print $content0 if $args{tee};
@@ -568,17 +554,12 @@ sub add_clipboard_content {
     } elsif ($clipboard_manager eq 'xclip') {
         my $fh;
 
-        open $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
-            or return [500, "xclip -i -selection primary failed (1): $!"];
+        my $sel = _x_selection();
+        open $fh, "| xclip -i -selection $sel" ## no critic: InputOutput::ProhibitTwoArgOpen
+            or return [500, "xclip -i -selection $sel failed (1): $!"];
         print $fh $content;
         close $fh
-            or return [500, "xclip -i -selection primary failed (2): $!"];
-        open $fh, "| xclip -i -selection clipboard" ## no critic: InputOutput::ProhibitTwoArgOpen
-            or return [500, "xclip -i -selection clipboard failed (1): $!"];
-        print $fh $content;
-        close $fh
-            or return [500, "xclip -i -selection clipboard failed (2): $!"];
-        print $content0 if $args{tee};
+            or return [500, "xclip -i -selection $sel failed (2): $!"];
         return [200, "OK"];
     }
 
@@ -600,7 +581,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.016 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2026-06-17.
+This document describes version 0.017 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2026-07-07.
 
 =head1 DESCRIPTION
 
@@ -637,8 +618,10 @@ The default clipboard manager on KDE Plasma.
 =head3 xclip
 
 This is not a "real" clipboard manager, but just an interface to the X
-selections. With C<xclip>, the history is viewed as having two items. The
-first/recent is the primary selection and the second one is the secondary.
+selections. It has a history of just one item, either the C<primary> selection
+or the C<clipboard> selection. You can choose which selection to use via
+environment variable C<PERL_CLIPBOARD_ANY_XCLIP_SELECTION>. The default is the
+C<primary> selection.
 
 
 This module provides common functions related to clipboard manager.
@@ -929,6 +912,13 @@ element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
+=head1 ENVIRONMENT
+
+=head2 PERL_CLIPBOARD_ANY_XCLIP_SELECTION
+
+Choose which X selection to use. Default if unspecified is C<primary>. Can be
+set also to: C<clipboard>.
 
 =head1 HOMEPAGE
 

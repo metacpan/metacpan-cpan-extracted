@@ -1,6 +1,6 @@
 package HTML::FormHandler::Types;
 # ABSTRACT: Moose type constraints
-$HTML::FormHandler::Types::VERSION = '0.410001';
+$HTML::FormHandler::Types::VERSION = '0.410002';
 use strict;
 use warnings;
 
@@ -177,7 +177,7 @@ HTML::FormHandler::Types - Moose type constraints
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

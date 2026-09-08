@@ -1,13 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw(tempfile);
+use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::II;
-
-my $SHM_MAGIC   = 0x53484D31;   # SHM1
-my $SHM_VERSION = 9;
-my $SHM_VAR_II  = 3;            # shm_ii.h SHM_VARIANT_ID
 
 # 1. /dev/null rejection
 SKIP: {
@@ -17,25 +13,47 @@ SKIP: {
     like $@, qr/(too small|invalid|fstat|corrupt|bad magic|mismatch)/i, 'meaningful error';
 }
 
-# 2. Valid magic but bogus nodes_off/states_off
+# 2. A genuine file whose section offsets were corrupted at rest.  Built by the
+# module, so nothing but the three offsets under test is pinned.
 {
-    my ($fh, $path) = tempfile(UNLINK => 1, SUFFIX => '.shm');
-    my $size = 8192;
-    # ShmHeader cache line 0 (first 64 bytes):
-    # magic(u32) version(u32) variant_id(u32) node_size(u32)
-    # max_table_cap(u32) table_cap(u32) max_size(u32) default_ttl(u32)
-    # total_size(u64) nodes_off(u64) states_off(u64) arena_off(u64)
-    my $bad = ~0;
-    print $fh pack('V V V V V V V V Q< Q< Q< Q<',
-        $SHM_MAGIC, $SHM_VERSION, $SHM_VAR_II, 24,
-        64, 64, 0, 0,
-        $size, $bad, $bad, $bad);
-    print $fh "\0" x ($size - tell($fh));
+    my $dir  = tempdir(CLEANUP => 1);
+    my $path = "$dir/good.shm";
+    { my $m = Data::HashMap::Shared::II->new($path, 64); $m->put(1, 100); $m->sync }
+    open my $fh, '<:raw', $path or die "open: $!";
+    my $good = do { local $/; <$fh> };
     close $fh;
-    open(my $rfh, '+<', $path) or die "open: $!";
-    my $r = eval { Data::HashMap::Shared::II->new_from_fd(fileno($rfh)) };
-    ok !defined($r), 'corrupted offsets rejected';
-    close $rfh;
+
+    my %off = (nodes_off => 40, states_off => 48, arena_off => 56);
+    for my $field (sort keys %off) {
+        my $bad = $good;
+        substr($bad, $off{$field}, 8) = pack('Q<', ~0);
+        my $p = "$dir/$field.shm";
+        open my $out, '>:raw', $p or die "open: $!";
+        print $out $bad;
+        close $out or die "close: $!";
+        open my $rfh, '+<', $p or die "open: $!";
+        my $r = eval { Data::HashMap::Shared::II->new_from_fd(fileno($rfh)) };
+        ok !defined($r), "$field outside the file is rejected";
+        like $@, qr/corrupt/, "  ...as corrupt";
+        close $rfh;
+    }
+
+    # The occupancy bitmap follows the reader-slot table and is bounded on its
+    # own: a file short by up to its 128 bytes, total_size corrected to match,
+    # keeps the reader slots inside the mapping and only the bitmap outside.
+    for my $cut (1, 128) {
+        my $bad = substr($good, 0, length($good) - $cut);
+        substr($bad, 32, 8) = pack('Q<', length $bad);
+        my $p = "$dir/occ$cut.shm";
+        open my $out, '>:raw', $p or die "open: $!";
+        print $out $bad;
+        close $out or die "close: $!";
+        open my $rfh, '+<', $p or die "open: $!";
+        my $r = eval { Data::HashMap::Shared::II->new_from_fd(fileno($rfh)) };
+        ok !defined($r), "a file $cut byte(s) short of the occupancy bitmap is rejected";
+        like $@, qr/out of bounds/, "  ...as out of bounds";
+        close $rfh;
+    }
 }
 
 # 3. Roundtrip

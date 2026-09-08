@@ -1,6 +1,6 @@
 package HTML::FormHandler::Pages;
 # ABSTRACT: used in Wizard
-$HTML::FormHandler::Pages::VERSION = '0.410001';
+$HTML::FormHandler::Pages::VERSION = '0.410002';
 use Moose::Role;
 
 has 'pages' => (
@@ -79,7 +79,7 @@ HTML::FormHandler::Pages - used in Wizard
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

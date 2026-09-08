@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Button;
 # ABSTRACT: button field
-$HTML::FormHandler::Field::Button::VERSION = '0.410001';
+$HTML::FormHandler::Field::Button::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field::NoValue';
 
@@ -25,7 +25,7 @@ HTML::FormHandler::Field::Button - button field
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,24 @@
 Revision history for lazy
 
+1.000003  2026-09-08 01:26:16Z
+    - Raise the minimum Perl to 5.24 (use 5.024). App::cpm, a hard runtime
+      dependency, and its toolchain now require 5.24+, so older Perls can
+      no longer install lazy's dependencies
+    - Require App::cpm 1, which excludes the broken 0.998000–0.999.x range;
+      a consumer with a broken cpm preinstalled is now forced to upgrade at
+      install time (GH#38)
+    - Document in CAVEATS that lazy does not upgrade modules that are
+      already installed but too old — the @INC hook only fires when require
+      can't find the module at all (GH#35)
+    - Make t/load.t fully offline: it stubbed nothing before and could
+      silently install a cascade of TLS modules (IO::Socket::SSL,
+      Net::SSLeay, ...) into the user's global perl as a side effect of
+      `make test` (GH#39)
+    - Stop warning on internal @INC skip branches (auto::*.al,
+      Net::DNS::Resolver::*, Encode::ConfigLocal); these fire constantly
+      during normal @INC searching and the warnings were pure noise
+
+
 1.000002  2026-05-09 18:42:49Z
     - Cap App::cpm at 0.997017 on Perl < 5.24 via DynamicPrereqs, since
       App::cpm v0.999.0+ raised its minimum to 5.24 and otherwise won't

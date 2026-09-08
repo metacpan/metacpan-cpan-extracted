@@ -1,0 +1,9 @@
+use alienfile;
+
+# Binary example for the Build::Xrepo Alien::Build plugin. Kind 'binary' means xrepo installs the
+# tool's executables (not a library); the plugin's build stage merges the package's bin/ dir into
+# the staging prefix and its gather_share hook surfaces bin_dir, which Alien::Base exposes so
+# consumers can locate and run the installed tool (see lib/Alien/Ninja.pm -> exe()).
+plugin 'Build::Xrepo' => (
+    packages => [{ name => 'ninja', kind => 'binary' }]
+);

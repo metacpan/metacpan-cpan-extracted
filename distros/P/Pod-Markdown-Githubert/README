@@ -26,8 +26,10 @@ COPYRIGHT & LICENSE
     Copyright 2023-2024 Lukas Mai.
 
     This module is free software; you can redistribute it and/or modify it
-    under the terms of either: the GNU General Public License as published
-    by the Free Software Foundation; or the Artistic License.
+    under the same terms as the Perl 5 programming language system itself,
+    i.e. either the GNU General Public License as published by the Free
+    Software Foundation (version 1 or later) or the Artistic License.
 
-    See <https://dev.perl.org/licenses/> for more information.
+    For your convenience, the GNU GPL (version 1) and Artistic License are
+    included in this distribution as GPLv1 and Artistic, respectively.
 

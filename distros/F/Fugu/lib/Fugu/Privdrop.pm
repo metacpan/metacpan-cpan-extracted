@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::Privdrop;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 # The English names below keep the group assignments parseable for
 # the lint: PPI pairs a literal "$(" with the next "$)".

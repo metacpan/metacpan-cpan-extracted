@@ -62,7 +62,8 @@ not;
 
 =item 2.
 
-refuse an output directory that no build may own;
+refuse an output directory that no build may own, and refuse a symlink
+on a path that the build writes;
 
 =item 3.
 
@@ -82,23 +83,44 @@ copy the base stylesheet and every asset;
 
 =item 7.
 
-render each C<page> block;
+write the key directory, when the description names one;
 
 =item 8.
 
-render one page for each manual in each group;
+render each C<page> block;
 
 =item 9.
 
-remove the staging directory, and every file the site no longer holds.
+render one page for each manual in each group;
+
+=item 10.
+
+remove the staging directory, every file that the site dropped, and
+every directory that is then empty.
 
 =back
 
 The last step is what makes a second build over the same directory
 right. A manual that was renamed leaves its old page behind, and a site
 that carried both would fail its own check. The build owns the output
-directory, so it owns the removal too; it removes a plain file and
-never a tree.
+directory, so it owns the removal too.
+
+The build owns a plain file at the top level of the output. Below the
+root it owns a file that the site names, and one that takes a shape of
+the key directory. It keeps every other entry and reports it. An
+operator directory in the output therefore survives a build, empty or
+not.
+
+A description with no C<keys> block owns no shape of the key directory
+and no directory of the key tree. A site of another maker holds
+F<.well-known/security.txt> too, and the clean must not delete that
+site.
+
+The build removes an empty directory that it owns: one that the site
+holds a name below, and one of the key tree. The output directory
+itself always stays. The clean reads the same two tests, so a build can
+never remove a directory that the clean refuses. C<rmdir> refuses a
+directory that still holds a name, so the walk needs no second test.
 
 The method returns true on success, and C<undef> with a message in the
 log otherwise.
@@ -114,17 +136,65 @@ is gone, whether or not it was there to begin with.
 
 C<clean> removes a built site and refuses anything else. It deletes a
 tree without asking, so the one thing it must never do is delete a tree
-that no build made. A build writes one flat directory of files, plus
-the staging directory while it runs; a target that holds anything else
-is refused by name.
+that no build made.
+
+A plain file of the top level is one that a build writes, whatever the
+description names today. A renamed manual leaves its old page there. A
+file below the root must be one that the site names, or one of the
+shapes that the key directory takes. A directory must hold a name of
+the site, or be a directory of the key tree. A symlink is never a thing
+that a build wrote. The clean refuses every other entry, and it names
+it.
+
+The clean and the prune read one predicate, so a build can never remove
+a file that the clean refuses.
+
+The staging directory is a build detail, and the build writes one flat
+directory of sources into it. A tree below it belongs to whoever made
+it.
+
+With C<--out> the description still names the key directory, so
+C<clean> reads it when it can. A description that does not load names
+nothing, and one flat directory of files is then the whole site that
+C<clean> knows.
+
+That fallback is weak, so C<clean> asks for one more thing: the target
+must hold the stylesheet. Every build writes it, so a target without it
+is the output of no build. The target guard is the first line, and this
+is the second.
+
+A description that does not load still names three things: the source
+directory, the output directory, and the name and org of its C<keys>
+block. L<Fugu::Config> keeps every setting and block that it read
+before the fault, so each guard answers for the real directories of
+that project. A fault above the C<keys> block hides it, and C<clean>
+then refuses the key tree of its own output. Remove that tree by hand.
+
+A description that drops its C<keys> block strands the published tree.
+The site names nothing there any more, so the build keeps it, C<clean>
+refuses it and the checks report it. Remove the directory, or name the
+block again.
 
 =head2 THE OUTPUT DIRECTORY
 
-Both C<build> and C<clean> refuse a target that no build may own: the
-root of the filesystem, the home directory, the project root, and any
-directory that holds the project. C<--out> reaches them both, and the
-C<out_dir> setting it overrides is checked in the description, so the
-guard has to sit here as well.
+Both C<build> and C<clean> refuse a target that no build may own. They
+refuse the root of the filesystem, the home directory, the project
+root, and any directory that holds the project. They refuse the source
+directory, and every directory of it. C<--out> reaches both commands,
+and the C<out_dir> setting it overrides is checked in the description,
+so the guard has to sit here as well.
+
+A description that names neither directory takes the two defaults.
+
+The source directory needs the rule because it reads like a built site:
+a flat directory of files. The key directory is the worst case. Each
+key file sits at its top level, where the clean takes a plain file, so
+a clean of it would take the trust anchor of every release.
+
+The output directory is the one exception below the source, and it
+needs to be: the default output directory is F<web/build>, and it sits
+inside the default source directory F<web>. The description names that
+path, so a build owns it. Nothing else below the source is a build's.
 
 The rule is deliberately not "inside the project". The tests and the CI
 both build into a temporary directory outside it.
@@ -151,6 +221,21 @@ The directory lives inside the output directory, under F<.man>, and the
 build removes it. Staging is a build detail: a published tree that
 carried it would serve the mdoc sources beside the pages made from them.
 
+=head1 THE KEY DIRECTORY
+
+A description with a C<keys> block publishes the public keys of an
+organization. The build copies each key file and the manifest pair as
+they stand. It generates the C<KEYS> file, the human page, the Web Key
+Directory tree and F<security.txt>. L<App::FuguWeb::Keys> holds the
+wiring, and the Fugu modules hold every generic part.
+
+The site build cannot sign, so the manifest pair is a source file. A
+build that signed would prove that the builder holds the key, and
+never that the release does.
+
+A description with no C<keys> block writes no key directory, so every
+site that predates it keeps its output.
+
 =head1 ASSETS
 
 An asset is any file directly in the source directory that the build
@@ -174,7 +259,7 @@ site with no stylesheet must not look like a success.
 
 =head1 SEE ALSO
 
-L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Render>,
+L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Keys>, L<App::FuguWeb::Render>,
 L<App::FuguWeb::Page>, L<App::FuguWeb::Index>, L<Fugu::File>
 
 =head1 AUTHOR

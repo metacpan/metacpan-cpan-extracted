@@ -1,6 +1,6 @@
 package HTML::FormHandler::Test;
 # ABSTRACT: provides is_html method used in tests
-$HTML::FormHandler::Test::VERSION = '0.410001';
+$HTML::FormHandler::Test::VERSION = '0.410002';
 use strict;
 use warnings;
 use base 'Test::Builder::Module';
@@ -43,7 +43,7 @@ HTML::FormHandler::Test - provides is_html method used in tests
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

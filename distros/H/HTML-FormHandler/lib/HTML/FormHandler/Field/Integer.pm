@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Integer;
 # ABSTRACT: validate an integer value
-$HTML::FormHandler::Field::Integer::VERSION = '0.410001';
+$HTML::FormHandler::Field::Integer::VERSION = '0.410002';
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Field::Text';
 
@@ -56,7 +56,7 @@ HTML::FormHandler::Field::Integer - validate an integer value
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

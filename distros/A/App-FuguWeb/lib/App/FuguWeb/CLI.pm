@@ -18,11 +18,12 @@
 use v5.36;
 
 package App::FuguWeb::CLI;
-our $VERSION = '0.2.0';
+our $VERSION = '0.4.0';
 
 use App::FuguWeb;
 use App::FuguWeb::Check;
 use App::FuguWeb::Config;
+use App::FuguWeb::Rotate;
 use App::FuguWeb::Site;
 use File::Spec;
 use Fugu::File;
@@ -79,6 +80,24 @@ my %COMMANDS = (
 			'verbose|v' => 'also note every external link',
 		},
 		method => 'cmd_check',
+	},
+	'rotate-key' => {
+		summary => 'Mint or promote a release key',
+		usage   => '--step <mint|promote> --purpose <word>'
+		    . ' --secret <path> [--signer <path>]'
+		    . ' [--org <word> [--dir <name>] [--url <prefix>]]',
+		options => {
+			'step=s' =>
+			    'mint makes a key, promote makes it current',
+			'purpose=s' =>
+			    'what the key signs, for example release',
+			'secret=s' => 'the private key file to write or read',
+			'signer=s' => 'the private half of the current key',
+			'org=s'    => 'bootstrap the keys block with this org',
+			'dir=s'    => 'the key directory name (default: keys)',
+			'url=s'    => 'the published prefix of the directory',
+		},
+		method => 'cmd_rotate_key',
 	},
 	init => {
 		summary => 'Write a starter .fuguwebrc',
@@ -226,6 +245,16 @@ sub cmd_clean ( $self, $cli, @args )
 		return $failure if defined $failure;
 	}
 
+	# With --out the description still names the key directory,
+	# and the clean refuses a directory that it cannot account
+	# for. The load is therefore tried here. A failure is not an
+	# error: clean is the command an operator reaches for when a
+	# description is broken.
+	$self->{config} //= App::FuguWeb::Config->load(
+		root  => $self->{project},
+		error => \my $ignored,
+	);
+
 	$self->{config} //= App::FuguWeb::Config->anonymous( $self->{project}
 		    // File::Spec->curdir );
 
@@ -273,6 +302,67 @@ sub cmd_init ( $self, $cli, @args )
 
 	Fugu::File->write( $path, $STARTER ) or return EXIT_ERROR;
 	$self->{log}->info( 'Wrote %s', $path );
+
+	return EXIT_SUCCESS;
+}
+
+# Mint a release key, or promote the one that a mint made
+#
+# The command writes the key directory and the description, per
+# WEB-ROTATE. It stores no secret and it reaches no network: the
+# caller holds the credential, stores the private key, and declares
+# the public one.
+sub cmd_rotate_key ( $self, $cli, @args )
+{
+	my $step    = $cli->option('step');
+	my $purpose = $cli->option('purpose');
+	my $secret  = $cli->option('secret');
+
+	for my $need (qw(step purpose secret)) {
+		next
+		    if defined $cli->option($need)
+		    && length $cli->option($need);
+		$self->{log}->error( '--%s is a necessary option', $need );
+		return EXIT_INVALID_ARGS;
+	}
+
+	unless ( $step eq 'mint' || $step eq 'promote' ) {
+		$self->{log}
+		    ->error( 'The step is mint or promote, not %s', $step );
+		return EXIT_INVALID_ARGS;
+	}
+
+	# The first key of a site arrives with the block that
+	# describes it, per WEB-ROTATE-15, so the words that describe
+	# the directory reach the rotation and not a separate step.
+	my $rotate = App::FuguWeb::Rotate->new(
+		config => $self->{config},
+		org    => $cli->option('org'),
+		dir    => $cli->option('dir'),
+		url    => $cli->option('url'),
+	);
+	my $facts =
+	    $step eq 'mint'
+	    ? $rotate->mint(
+		purpose => $purpose,
+		secret  => $secret,
+		signer  => $cli->option('signer'),
+	    )
+	    : $rotate->promote( purpose => $purpose, secret => $secret );
+
+	unless ($facts) {
+		$self->{log}->error( '%s', $rotate->error );
+
+		# A script tells an absent signify(1) from a rotation
+		# that failed, as it does for an absent renderer.
+		return $rotate->tool_missing
+		    ? EXIT_TOOL_MISSING
+		    : EXIT_ERROR;
+	}
+
+	# WEB-ROTATE-13. One name=value line for each fact, so a
+	# caller appends the output to a file that its own steps read.
+	say "$_=$facts->{$_}" for sort keys %$facts;
 
 	return EXIT_SUCCESS;
 }

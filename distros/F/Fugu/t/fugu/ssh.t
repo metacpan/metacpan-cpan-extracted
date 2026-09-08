@@ -189,6 +189,237 @@ package Test::Writer {
     ok(!defined $result, 'read_file returns undef for a closed port');
 }
 
+# The host-key policy of new: the strict argument and the known_hosts
+# argument.
+{
+    my $ssh = Fugu::SSH->new(host => 'example.com');
+    is($ssh->{strict}, 0, 'strict defaults to 0');
+    ok(!defined $ssh->{known_hosts}, 'known_hosts defaults to absent');
+
+    $ssh = Fugu::SSH->new(
+	host        => 'example.com',
+	strict      => 1,
+	known_hosts => '/tmp/hosts',
+    );
+    is($ssh->{strict}, 1, 'new stores strict');
+    is($ssh->{known_hosts}, '/tmp/hosts', 'new stores known_hosts');
+}
+
+# _ssh_argv builds the ssh(1) argument list of interactive, and it
+# carries the host-key policy of the object.
+{
+    my $ssh = Fugu::SSH->new(host => 'guest', port => 2222, user => 'op');
+    my @argv = $ssh->_ssh_argv;
+
+    cmp_ok(scalar @argv, '>', 1,
+	'_ssh_argv holds more than one element, so perl runs no shell');
+    is($argv[0], 'ssh', '_ssh_argv starts with ssh');
+
+    my $joined = join ' ', @argv;
+    like($joined, qr/StrictHostKeyChecking=no/,
+	'the default mode does not check the key');
+    like($joined, qr{UserKnownHostsFile=/dev/null},
+	'the default mode records no key');
+    like($joined, qr/LogLevel=ERROR/,
+	'the default mode hides the new-key report');
+    like($joined, qr/-p 2222/, 'the list holds the port');
+    is($argv[-1], 'op@guest', 'the list ends with user@host');
+}
+
+{
+    my $ssh = Fugu::SSH->new(
+	host   => 'guest',
+	port   => 2222,
+	user   => 'op',
+	strict => 1,
+    );
+    my $joined = join ' ', $ssh->_ssh_argv;
+
+    like($joined, qr/StrictHostKeyChecking=yes/,
+	'the strict mode checks the key');
+    unlike($joined, qr{UserKnownHostsFile},
+	'the strict mode without a path names no file');
+    unlike($joined, qr/LogLevel/,
+	'the strict mode shows the host-key diagnosis');
+    like($joined, qr/-p 2222/, 'the strict list holds the port');
+    like($joined, qr/op\@guest$/, 'and ends with user@host');
+}
+
+{
+    my $ssh = Fugu::SSH->new(
+	host        => 'guest',
+	strict      => 1,
+	known_hosts => '/etc/fugu/hosts',
+    );
+    my $joined = join ' ', $ssh->_ssh_argv;
+
+    like($joined, qr{UserKnownHostsFile=/etc/fugu/hosts},
+	'the strict mode names the known_hosts file');
+    unlike($joined, qr{GlobalKnownHostsFile},
+	'the list never sets GlobalKnownHostsFile');
+}
+
+# A stand-in Net::SSH2 connection. _connect creates the object through
+# Net::SSH2->new, so the test rebinds that constructor and records
+# every call in order. The stand-in proves the policy without a
+# server: the order of the steps, the check arguments, and both
+# outcomes of the check.
+package Test::SSH2 {
+
+    sub new
+    {
+	my ($class, %args) = @_;
+	return bless { %args, calls => [] }, $class;
+    }
+
+    sub timeout
+    {
+	my $self = shift;
+	push @{ $self->{calls} }, 'timeout';
+	return 1;
+    }
+
+    sub connect
+    {
+	my $self = shift;
+	push @{ $self->{calls} }, 'connect';
+	return 1;
+    }
+
+    sub check_hostkey
+    {
+	my ($self, @args) = @_;
+	push @{ $self->{calls} }, 'check_hostkey';
+	$self->{check_args} = [@args];
+	return $self->{check_ok};
+    }
+
+    sub auth_password
+    {
+	my $self = shift;
+	push @{ $self->{calls} }, 'auth_password';
+	return 1;
+    }
+
+    sub disconnect
+    {
+	my $self = shift;
+	push @{ $self->{calls} }, 'disconnect';
+	return 1;
+    }
+
+    sub error
+    {
+	my $self = shift;
+	return (-1, 'KNOWN_HOSTS',
+	    $self->{error_string} // 'the file holds no key for the host');
+    }
+}
+
+SKIP: {
+    skip 'Net::SSH2 is older than 0.60', 11
+	unless Net::SSH2->can('check_hostkey');
+
+    # The agent branch reads SSH_AUTH_SOCK, so the stand-in runs
+    # without one and authenticates with the password.
+    local $ENV{SSH_AUTH_SOCK};
+    delete $ENV{SSH_AUTH_SOCK};
+
+    my $standin;
+    no warnings 'redefine';
+    local *Net::SSH2::new = sub { return $standin };
+
+    # The strict mode verifies between the connect and the
+    # authentication.
+    {
+	$standin = Test::SSH2->new(check_ok => 1);
+	my $ssh = Fugu::SSH->new(
+	    host        => 'guest',
+	    port        => 2222,
+	    password    => 'secret',
+	    strict      => 1,
+	    known_hosts => '/tmp/hosts',
+	);
+
+	is($ssh->_connect, $standin, 'a verified connection authenticates');
+	is_deeply(
+	    $standin->{calls},
+	    [ 'timeout', 'connect', 'check_hostkey', 'auth_password' ],
+	    'the order is connect, verify, authenticate');
+	is($standin->{check_args}[0],
+	    Net::SSH2::LIBSSH2_HOSTKEY_POLICY_STRICT(),
+	    'the check uses the strict policy');
+	is($standin->{check_args}[1], '/tmp/hosts',
+	    'and the named known_hosts file');
+    }
+
+    # Without a path the check omits the second argument, so the
+    # back end reads its own default file.
+    {
+	$standin = Test::SSH2->new(check_ok => 1);
+	my $ssh = Fugu::SSH->new(
+	    host     => 'guest',
+	    password => 'secret',
+	    strict   => 1,
+	);
+	$ssh->_connect;
+	is(scalar @{ $standin->{check_args} }, 1,
+	    'no path reaches the check when the caller gave none');
+    }
+
+    # A key that does not verify dies before any authentication.
+    {
+	$standin = Test::SSH2->new(check_ok => 0);
+	my $ssh = Fugu::SSH->new(
+	    host        => 'guest',
+	    port        => 2222,
+	    password    => 'secret',
+	    strict      => 1,
+	    known_hosts => '/tmp/hosts',
+	);
+
+	ok(!eval { $ssh->_connect; 1 }, 'a wrong key dies');
+	like($@,
+	    qr{^Cannot verify the host key of guest port 2222 against /tmp/hosts: .+\n\z},
+	    'the one-line message names the host, the port, the file'
+		. ' and the reason');
+	is_deeply(
+	    $standin->{calls},
+	    [ 'timeout', 'connect', 'check_hostkey', 'disconnect' ],
+	    'no credential went out, and the connection closed');
+    }
+
+    # The permissive mode never calls the check, so every caller of
+    # today keeps its behavior exactly.
+    {
+	$standin = Test::SSH2->new(check_ok => 0);
+	my $ssh = Fugu::SSH->new(
+	    host     => 'guest',
+	    password => 'secret',
+	);
+
+	is($ssh->_connect, $standin, 'the permissive mode connects');
+	is_deeply(
+	    $standin->{calls},
+	    [ 'timeout', 'connect', 'auth_password' ],
+	    'and it never calls check_hostkey');
+	ok(!defined $standin->{check_args}, 'no check arguments exist');
+    }
+}
+
+# The strict mode needs Net::SSH2 0.60, and the static test runs
+# before any connect, so an old library dies without a network step.
+{
+    no warnings 'redefine';
+    local *Net::SSH2::can = sub { return 0 };
+
+    my $ssh = Fugu::SSH->new(host => 'guest', strict => 1);
+    ok(!eval { $ssh->_connect; 1 },
+	'an old Net::SSH2 dies in the strict mode');
+    like($@, qr/needs Net::SSH2 0\.60 or later/,
+	'and the message names the version');
+}
+
 # interactive maps a raw wait status to a 0-255 exit code through
 # Fugu::Process->exit_code. This lets `fuguvm ssh`, when it runs a
 # script over stdin, propagate a failing remote command (for example a

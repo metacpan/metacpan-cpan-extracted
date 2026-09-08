@@ -1,0 +1,20 @@
+requires 'perl', '5.036';
+requires 'Cpanel::JSON::XS', '4.37';
+requires 'HTTP::Request';
+requires 'Scalar::Util';
+requires 'LWP::UserAgent';
+# Basic authentication is refused over plain HTTP, so any authenticated cluster
+# needs the https protocol handler. It ships separately from LWP::UserAgent.
+requires 'LWP::Protocol::https';
+requires 'URI';
+
+on 'test' => sub {
+    requires 'Test::More';
+    # The mock OpenSearch server in t/lib. HTTP::Daemon is no longer core.
+    requires 'HTTP::Daemon';
+    requires 'HTTP::Response';
+};
+
+on 'develop' => sub {
+    requires 'Test::Pod', '1.41';
+};

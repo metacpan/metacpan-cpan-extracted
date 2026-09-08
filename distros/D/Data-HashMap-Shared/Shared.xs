@@ -20,10 +20,9 @@
 
 /* ---- Exception-safe lock guard for rdlock held across Perl API calls ---- */
 
-/* Release the lock, then drop the depth taken by the guard. If a $obj->DESTROY
- * arrived from argument magic while we held the lock, shm_close_map deferred
- * the free precisely so this cleanup could still run on a live handle; perform
- * it now that the last lock is gone. */
+/* Release the lock, then drop the guard's depth.  A $obj->DESTROY from argument
+ * magic during the hold left the free deferred so this could still run on a
+ * live handle; perform it now the last lock is gone. */
 static void shm_guard_leave(ShmHandle *h) {
     if (--h->lock_depth == 0 && h->pending_close) shm_close_map_now(h);
 }
@@ -40,12 +39,9 @@ static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
     SAVEDESTRUCTOR_X(shm_rdunlock_cleanup, (void*)(handle))
 
 /* ---- Exception-safe guard for a wrlock + seqlock write section ----
- * Mirrors RDLOCK_GUARD for batch write ops (set_multi/remove_multi) that
- * call SvIV/SvPV on caller SVs while the lock is held: a die() from a tied
- * or overloaded argument must not abandon the write lock with the seqlock
- * left odd (which would self-deadlock this process and stall others until
- * stale-lock recovery). The cleanup runs on XSUB scope exit, whether normal
- * or via croak unwind. */
+ * For batch writes that call SvIV/SvPV on caller SVs under the lock: a die()
+ * from a tied or overloaded argument must not abandon the write lock with the
+ * seqlock left odd, which self-deadlocks until stale-lock recovery. */
 static void shm_wrseq_unlock_cleanup(pTHX_ void *ptr) {
     ShmHandle *h = (ShmHandle *)ptr;
     shm_seqlock_write_end(&h->hdr->seq);
@@ -59,10 +55,9 @@ static void shm_wrseq_unlock_cleanup(pTHX_ void *ptr) {
     (handle)->lock_depth++; \
     SAVEDESTRUCTOR_X(shm_wrseq_unlock_cleanup, (void*)(handle))
 
-/* Exception-safe free() for malloc'd scratch buffers (e.g. drain's value
- * buffer) held across newSVpvn() in a result-build loop: an OOM croak there
- * must not leak the buffer. free() (not Safefree) -- the buffer comes from the
- * C realloc() in shm_grow_buf, a different pool than the Perl allocator. */
+/* Exception-safe free() for a scratch buffer held across newSVpvn(), so an OOM
+ * croak cannot leak it.  free(), not Safefree: the buffer comes from the C
+ * realloc() in shm_grow_buf, a different pool. */
 static void shm_free_cleanup(pTHX_ void *ptr) {
     free(ptr);
 }
@@ -80,10 +75,8 @@ static const char *shm_path_arg(pTHX_ SV *sv, const char *what, const char *clas
 
 /* ---- Helper macros ---- */
 
-/* Constructor sizes arrive as UV and are handed to the C layer as uint32_t.
- * Without this, new($path, 2**32+100) silently truncates to a 100-entry map --
- * the caller asks for four billion entries and gets a hundred, with no error.
- * Croak instead, matching how the 1GB string limits are enforced. */
+/* Constructor sizes arrive as UV and reach the C layer as uint32_t: without
+ * this, new($path, 2**32+100) silently builds a 100-entry map. */
 #define CK_U32(val, what, classname) \
     do { if ((UV)(val) > (UV)0xFFFFFFFF) \
             croak("%s: %s %" UVuf " exceeds the maximum of %u", \
@@ -93,7 +86,8 @@ static const char *shm_path_arg(pTHX_ SV *sv, const char *what, const char *clas
     (SvGETMAGIC(sv), SvOK(sv) ? shm_path_arg(aTHX_ (sv), (what), (classname)) : NULL)
 
 /* An unreachable LRU bound never evicts: the map fills and then refuses every
- * insert.  Read it off the map, not the arguments -- attaching ignores those. */
+ * insert, or with a TTL reclaims expired slots instead.  Read it off the map,
+ * not the arguments -- attaching ignores those. */
 #define CK_MAX_SIZE(map, classname) \
     do { ShmHeader *_mh = (map)->shard_handles ? (map)->shard_handles[0]->hdr : (map)->hdr; \
          if (_mh->max_size >= _mh->max_table_cap) \
@@ -110,12 +104,11 @@ static const char *shm_path_arg(pTHX_ SV *sv, const char *what, const char *clas
     ShmHandle *h0 = h; PERL_UNUSED_VAR(h0); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
-/* Re-read the handle after a call that can run Perl code (tied/overloaded
- * argument magic).  That code may call $obj->DESTROY explicitly, which frees
- * the handle and zeroes the IV; EXTRACT_MAP's mortal pins the referent only
- * against refcount-driven destruction, not an explicit DESTROY, so the local
- * h would dangle.  Used only where magic can actually intervene between
- * EXTRACT_MAP and the first use of h. */
+/* Re-read the handle after a call that can run Perl code: argument magic may
+ * call $obj->DESTROY explicitly, which frees the handle and zeroes the IV, and
+ * EXTRACT_MAP's mortal pins the referent only against refcount destruction.
+ * Belongs wherever magic can intervene between EXTRACT_MAP and the first use
+ * of h, and nowhere else. */
 #define REEXTRACT_MAP(classname, sv) \
     if (!SvROK(sv)) \
         croak("%s object was replaced during the call", classname); \
@@ -190,6 +183,9 @@ static int build_kw_1arg(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nar
     OP *map_op = args[0]->op;
     OP *cvref = newCVREF(0, newGVOP(OP_GV, 0, gv_fetchpv(func, GV_ADD, SVt_PVCV)));
     OP *arglist = op_append_elem(OP_LIST, map_op, cvref);
+    /* Plain OPf_STACKED: pre-setting OPf_WANT makes Perl_scalar() skip the op,
+     * so the call stayed in list context even in scalar context and spilled its
+     * extra return values into the enclosing list. */
     *out = op_convert_list(OP_ENTERSUB, OPf_STACKED, arglist);
     return KEYWORD_PLUGIN_EXPR;
 }
@@ -236,19 +232,6 @@ static int build_kw_4arg(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nar
     return KEYWORD_PLUGIN_EXPR;
 }
 
-static int build_kw_1arg_list(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata) {
-    (void)nargs;
-    const char *func = (const char *)hookdata;
-    OP *map_op = args[0]->op;
-    OP *cvref = newCVREF(0, newGVOP(OP_GV, 0, gv_fetchpv(func, GV_ADD, SVt_PVCV)));
-    OP *arglist = op_append_elem(OP_LIST, map_op, cvref);
-    /* Plain OPf_STACKED: pre-setting OPf_WANT makes Perl_scalar() skip the op,
-     * so the call stayed in list context even in scalar context and spilled its
-     * extra return values into the enclosing list. */
-    *out = op_convert_list(OP_ENTERSUB, OPf_STACKED, arglist);
-    return KEYWORD_PLUGIN_EXPR;
-}
-
 /* ---- Keyword pieces ---- */
 
 static const struct XSParseKeywordPieceType pieces_1expr[] = {
@@ -288,10 +271,10 @@ DEFINE_KW_HOOK(i16, "I16", incr_by,     3, build_kw_3arg)
 DEFINE_KW_HOOK(i16, "I16", max,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i16, "I16", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i16, "I16", size,        1, build_kw_1arg)
-DEFINE_KW_HOOK(i16, "I16", keys,        1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i16, "I16", values,      1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i16, "I16", items,       1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i16, "I16", each,        1, build_kw_1arg_list)
+DEFINE_KW_HOOK(i16, "I16", keys,        1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", values,      1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", items,       1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", each,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", iter_reset,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", clear,       1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", to_hash,     1, build_kw_1arg)
@@ -301,7 +284,7 @@ DEFINE_KW_HOOK(i16, "I16", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(i16, "I16", max_size,   1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", ttl,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", cursor,       1, build_kw_1arg)
-DEFINE_KW_HOOK(i16, "I16", cursor_next,  1, build_kw_1arg_list)
+DEFINE_KW_HOOK(i16, "I16", cursor_next,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", cursor_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", cursor_seek,  2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", ttl_remaining, 2, build_kw_2arg)
@@ -342,10 +325,10 @@ DEFINE_KW_HOOK(i32, "I32", incr_by,     3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", max,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", size,        1, build_kw_1arg)
-DEFINE_KW_HOOK(i32, "I32", keys,        1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i32, "I32", values,      1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i32, "I32", items,       1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i32, "I32", each,        1, build_kw_1arg_list)
+DEFINE_KW_HOOK(i32, "I32", keys,        1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", values,      1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", items,       1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", each,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", iter_reset,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", clear,       1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", to_hash,     1, build_kw_1arg)
@@ -355,7 +338,7 @@ DEFINE_KW_HOOK(i32, "I32", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(i32, "I32", max_size,   1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", ttl,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", cursor,       1, build_kw_1arg)
-DEFINE_KW_HOOK(i32, "I32", cursor_next,  1, build_kw_1arg_list)
+DEFINE_KW_HOOK(i32, "I32", cursor_next,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", cursor_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", cursor_seek,  2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", ttl_remaining, 2, build_kw_2arg)
@@ -396,10 +379,10 @@ DEFINE_KW_HOOK(ii, "II", incr_by,     3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", max,         3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", size,        1, build_kw_1arg)
-DEFINE_KW_HOOK(ii, "II", keys,        1, build_kw_1arg_list)
-DEFINE_KW_HOOK(ii, "II", values,      1, build_kw_1arg_list)
-DEFINE_KW_HOOK(ii, "II", items,       1, build_kw_1arg_list)
-DEFINE_KW_HOOK(ii, "II", each,        1, build_kw_1arg_list)
+DEFINE_KW_HOOK(ii, "II", keys,        1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", values,      1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", items,       1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", each,        1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", iter_reset,  1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", clear,       1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", to_hash,     1, build_kw_1arg)
@@ -409,7 +392,7 @@ DEFINE_KW_HOOK(ii, "II", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(ii, "II", max_size,   1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", ttl,        1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", cursor,       1, build_kw_1arg)
-DEFINE_KW_HOOK(ii, "II", cursor_next,  1, build_kw_1arg_list)
+DEFINE_KW_HOOK(ii, "II", cursor_next,  1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", cursor_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", cursor_seek,  2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", ttl_remaining, 2, build_kw_2arg)
@@ -445,10 +428,10 @@ DEFINE_KW_HOOK(i16s, "I16S", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", remove,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", exists,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", size,        1, build_kw_1arg)
-DEFINE_KW_HOOK(i16s, "I16S", keys,        1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i16s, "I16S", values,      1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i16s, "I16S", items,       1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i16s, "I16S", each,        1, build_kw_1arg_list)
+DEFINE_KW_HOOK(i16s, "I16S", keys,        1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", values,      1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", items,       1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", each,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", iter_reset,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", clear,       1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", to_hash,     1, build_kw_1arg)
@@ -458,7 +441,7 @@ DEFINE_KW_HOOK(i16s, "I16S", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(i16s, "I16S", max_size,   1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", ttl,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", cursor,       1, build_kw_1arg)
-DEFINE_KW_HOOK(i16s, "I16S", cursor_next,  1, build_kw_1arg_list)
+DEFINE_KW_HOOK(i16s, "I16S", cursor_next,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", cursor_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", cursor_seek,  2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", ttl_remaining, 2, build_kw_2arg)
@@ -494,10 +477,10 @@ DEFINE_KW_HOOK(i32s, "I32S", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", remove,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", exists,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", size,        1, build_kw_1arg)
-DEFINE_KW_HOOK(i32s, "I32S", keys,        1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i32s, "I32S", values,      1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i32s, "I32S", items,       1, build_kw_1arg_list)
-DEFINE_KW_HOOK(i32s, "I32S", each,        1, build_kw_1arg_list)
+DEFINE_KW_HOOK(i32s, "I32S", keys,        1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", values,      1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", items,       1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", each,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", iter_reset,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", clear,       1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", to_hash,     1, build_kw_1arg)
@@ -507,7 +490,7 @@ DEFINE_KW_HOOK(i32s, "I32S", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(i32s, "I32S", max_size,   1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", ttl,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", cursor,       1, build_kw_1arg)
-DEFINE_KW_HOOK(i32s, "I32S", cursor_next,  1, build_kw_1arg_list)
+DEFINE_KW_HOOK(i32s, "I32S", cursor_next,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", cursor_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", cursor_seek,  2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", ttl_remaining, 2, build_kw_2arg)
@@ -543,10 +526,10 @@ DEFINE_KW_HOOK(is, "IS", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", remove,      2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", exists,      2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", size,        1, build_kw_1arg)
-DEFINE_KW_HOOK(is, "IS", keys,        1, build_kw_1arg_list)
-DEFINE_KW_HOOK(is, "IS", values,      1, build_kw_1arg_list)
-DEFINE_KW_HOOK(is, "IS", items,       1, build_kw_1arg_list)
-DEFINE_KW_HOOK(is, "IS", each,        1, build_kw_1arg_list)
+DEFINE_KW_HOOK(is, "IS", keys,        1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", values,      1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", items,       1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", each,        1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", iter_reset,  1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", clear,       1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", to_hash,     1, build_kw_1arg)
@@ -556,7 +539,7 @@ DEFINE_KW_HOOK(is, "IS", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(is, "IS", max_size,   1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", ttl,        1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", cursor,       1, build_kw_1arg)
-DEFINE_KW_HOOK(is, "IS", cursor_next,  1, build_kw_1arg_list)
+DEFINE_KW_HOOK(is, "IS", cursor_next,  1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", cursor_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", cursor_seek,  2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", ttl_remaining, 2, build_kw_2arg)
@@ -597,10 +580,10 @@ DEFINE_KW_HOOK(si16, "SI16", incr_by,     3, build_kw_3arg)
 DEFINE_KW_HOOK(si16, "SI16", max,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si16, "SI16", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si16, "SI16", size,        1, build_kw_1arg)
-DEFINE_KW_HOOK(si16, "SI16", keys,        1, build_kw_1arg_list)
-DEFINE_KW_HOOK(si16, "SI16", values,      1, build_kw_1arg_list)
-DEFINE_KW_HOOK(si16, "SI16", items,       1, build_kw_1arg_list)
-DEFINE_KW_HOOK(si16, "SI16", each,        1, build_kw_1arg_list)
+DEFINE_KW_HOOK(si16, "SI16", keys,        1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", values,      1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", items,       1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", each,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", iter_reset,  1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", clear,       1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", to_hash,     1, build_kw_1arg)
@@ -610,7 +593,7 @@ DEFINE_KW_HOOK(si16, "SI16", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(si16, "SI16", max_size,   1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", ttl,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", cursor,       1, build_kw_1arg)
-DEFINE_KW_HOOK(si16, "SI16", cursor_next,  1, build_kw_1arg_list)
+DEFINE_KW_HOOK(si16, "SI16", cursor_next,  1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", cursor_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", cursor_seek,  2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", ttl_remaining, 2, build_kw_2arg)
@@ -651,10 +634,10 @@ DEFINE_KW_HOOK(si32, "SI32", incr_by,     3, build_kw_3arg)
 DEFINE_KW_HOOK(si32, "SI32", max,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si32, "SI32", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si32, "SI32", size,        1, build_kw_1arg)
-DEFINE_KW_HOOK(si32, "SI32", keys,        1, build_kw_1arg_list)
-DEFINE_KW_HOOK(si32, "SI32", values,      1, build_kw_1arg_list)
-DEFINE_KW_HOOK(si32, "SI32", items,       1, build_kw_1arg_list)
-DEFINE_KW_HOOK(si32, "SI32", each,        1, build_kw_1arg_list)
+DEFINE_KW_HOOK(si32, "SI32", keys,        1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", values,      1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", items,       1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", each,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", iter_reset,  1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", clear,       1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", to_hash,     1, build_kw_1arg)
@@ -664,7 +647,7 @@ DEFINE_KW_HOOK(si32, "SI32", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(si32, "SI32", max_size,   1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", ttl,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", cursor,       1, build_kw_1arg)
-DEFINE_KW_HOOK(si32, "SI32", cursor_next,  1, build_kw_1arg_list)
+DEFINE_KW_HOOK(si32, "SI32", cursor_next,  1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", cursor_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", cursor_seek,  2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", ttl_remaining, 2, build_kw_2arg)
@@ -705,10 +688,10 @@ DEFINE_KW_HOOK(si, "SI", incr_by,     3, build_kw_3arg)
 DEFINE_KW_HOOK(si, "SI", max,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si, "SI", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si, "SI", size,        1, build_kw_1arg)
-DEFINE_KW_HOOK(si, "SI", keys,        1, build_kw_1arg_list)
-DEFINE_KW_HOOK(si, "SI", values,      1, build_kw_1arg_list)
-DEFINE_KW_HOOK(si, "SI", items,       1, build_kw_1arg_list)
-DEFINE_KW_HOOK(si, "SI", each,        1, build_kw_1arg_list)
+DEFINE_KW_HOOK(si, "SI", keys,        1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", values,      1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", items,       1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", each,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", iter_reset,  1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", clear,       1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", to_hash,     1, build_kw_1arg)
@@ -718,7 +701,7 @@ DEFINE_KW_HOOK(si, "SI", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(si, "SI", max_size,   1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", ttl,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", cursor,       1, build_kw_1arg)
-DEFINE_KW_HOOK(si, "SI", cursor_next,  1, build_kw_1arg_list)
+DEFINE_KW_HOOK(si, "SI", cursor_next,  1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", cursor_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", cursor_seek,  2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", ttl_remaining, 2, build_kw_2arg)
@@ -754,10 +737,10 @@ DEFINE_KW_HOOK(ss, "SS", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", remove,      2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", exists,      2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", size,        1, build_kw_1arg)
-DEFINE_KW_HOOK(ss, "SS", keys,        1, build_kw_1arg_list)
-DEFINE_KW_HOOK(ss, "SS", values,      1, build_kw_1arg_list)
-DEFINE_KW_HOOK(ss, "SS", items,       1, build_kw_1arg_list)
-DEFINE_KW_HOOK(ss, "SS", each,        1, build_kw_1arg_list)
+DEFINE_KW_HOOK(ss, "SS", keys,        1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", values,      1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", items,       1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", each,        1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", iter_reset,  1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", clear,       1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", to_hash,     1, build_kw_1arg)
@@ -767,7 +750,7 @@ DEFINE_KW_HOOK(ss, "SS", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(ss, "SS", max_size,   1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", ttl,        1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", cursor,       1, build_kw_1arg)
-DEFINE_KW_HOOK(ss, "SS", cursor_next,  1, build_kw_1arg_list)
+DEFINE_KW_HOOK(ss, "SS", cursor_next,  1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", cursor_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", cursor_seek,  2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", ttl_remaining, 2, build_kw_2arg)
@@ -804,9 +787,7 @@ DEFINE_KW_HOOK(ss, "SS", set_ttl,         3, build_kw_3arg)
         &hooks_shm_##variant##_##kw, (void*)func_name)
 
 
-/* ============================================================
- * MODULE/PACKAGE sections
- * ============================================================ */
+/* ---- MODULE/PACKAGE sections ---- */
 
 
 MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::I16

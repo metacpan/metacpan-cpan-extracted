@@ -1,10 +1,10 @@
 package MIDI::Drummer::Tiny::Grooves;
-$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7015';
+$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7016';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
 use strictures 2;
-# use Data::Dumper::Compact qw(ddc);
+use Data::Dumper::Compact qw(ddc);
 use File::ShareDir qw(dist_dir);
 use Path::Tiny;
 use MIDI::Drummer::Tiny ();
@@ -330,7 +330,7 @@ sub search {
 
 #pod =head2 groove
 #pod
-#pod   $self->groove(\%patterns);
+#pod   $grooves->groove(\%patterns);
 #pod
 #pod Add the patterns to the score. If the B<return_patterns> attribute is
 #pod on, the patterns are just returned.
@@ -350,6 +350,21 @@ sub groove {
     }
 }
 
+#pod =head2 swap_pat
+#pod
+#pod   $pat = $grooves->swap_pat($pattern, 'crash', 'closed');
+#pod
+#pod =cut
+
+sub swap_pat {
+    my ($self, $pat, $source, $dest) = @_;
+    if (!exists $pat->{$dest} && exists $pat->{$source}) {
+        my $x = delete $pat->{$source};
+        $pat->{$dest} = { num => $self->$dest, pat => $x->{pat} };
+    }
+    return $pat;
+}
+
 1;
 
 __END__
@@ -364,7 +379,7 @@ MIDI::Drummer::Tiny::Grooves
 
 =head1 VERSION
 
-version 0.7015
+version 0.7016
 
 =head1 SYNOPSIS
 
@@ -505,10 +520,14 @@ strings and given an optional set of grooves to search in.
 
 =head2 groove
 
-  $self->groove(\%patterns);
+  $grooves->groove(\%patterns);
 
 Add the patterns to the score. If the B<return_patterns> attribute is
 on, the patterns are just returned.
+
+=head2 swap_pat
+
+  $pat = $grooves->swap_pat($pattern, 'crash', 'closed');
 
 =head1 SEE ALSO
 

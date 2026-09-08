@@ -1,5 +1,5 @@
 package DBIx::Lite::Schema::Table;
-$DBIx::Lite::Schema::Table::VERSION = '0.39';
+$DBIx::Lite::Schema::Table::VERSION = '0.40';
 use strict;
 use warnings;
 
@@ -127,7 +127,7 @@ DBIx::Lite::Schema::Table
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 OVERVIEW
 

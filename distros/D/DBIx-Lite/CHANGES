@@ -1,10 +1,38 @@
 ==================================================
-Changes from 2025-09-04 00:00:00 +0000 to present.
+Changes from 2025-09-07 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.39 at 2026-09-04 15:08:36 +0000
+version 0.40 at 2026-09-07 10:42:26 +0000
 -----------------------------------------
+
+  Change: 94d37080e893dac07116bc3cb73c67a145b49441
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2026-09-07 10:39:35 +0000
+
+    Support INSERT ... SELECT FROM when from() is set 
+
+  Change: a9eacb8b65b16f8a41da70f98650ba7338fc6bc4
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2026-09-04 17:48:19 +0000
+
+    Localize $_ in dbh_do to avoid clobbering foreach aliases.
+
+    When constructed with new(dbh => ...), assigning the handle to $_
+    without local overwrote the current loop element. Matches
+    DBIx::Connector behavior and adds a regression test for #32.
+
+    Co-authored-by: Cursor <cursoragent@cursor.com> 
+
+-----------------------------------------
+version 0.39 at 2026-09-04 15:09:58 +0000
+-----------------------------------------
+
+  Change: 0907bf8a44eaeac7e94cc5cf35e6de39cf21b090
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2026-09-04 17:09:58 +0000
+
+    0.39 
 
   Change: 8ae8c5dbd618c0752ae942f5441429fc2822ea05
   Author: Alessandro Ranellucci <alessandro@pintle.it>
@@ -165,5 +193,5 @@ version 0.37 at 2026-05-05 08:01:10 +0000
     Add test for default functionality 
 
 =================================================
-Plus 27 releases after 2025-09-04 00:00:00 +0000.
+Plus 27 releases after 2025-09-07 00:00:00 +0000.
 =================================================

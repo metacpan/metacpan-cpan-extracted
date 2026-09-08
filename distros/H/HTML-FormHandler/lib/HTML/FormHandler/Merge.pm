@@ -1,6 +1,6 @@
 package HTML::FormHandler::Merge;
 # ABSTRACT: internal hash merging
-$HTML::FormHandler::Merge::VERSION = '0.410001';
+$HTML::FormHandler::Merge::VERSION = '0.410002';
 use warnings;
 use Data::Clone;
 use base 'Exporter';
@@ -74,7 +74,7 @@ HTML::FormHandler::Merge - internal hash merging
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

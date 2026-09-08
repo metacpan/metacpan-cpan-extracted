@@ -41,11 +41,15 @@ optional feature, loaded lazily.
 
 =item L<Fugu::JSONSocket> - newline-delimited JSON over a UNIX socket
 
+=item L<Fugu::KeyDir> - the names, the order and the generated text of a published key directory
+
 =item L<Fugu::Log> - logging to syslog, standard error, or nowhere
 
 =item L<Fugu::MQTT> - a subscribing MQTT client for a single-threaded daemon
 
 =item L<Fugu::Mdnsd> - control mdnsd over its control socket
+
+=item L<Fugu::OpenPGP> - read an armored OpenPGP public key as bytes
 
 =item L<Fugu::Pidfile> - locked PID file
 
@@ -65,7 +69,7 @@ optional feature, loaded lazily.
 
 =item L<Fugu::Signal> - signal handlers for graceful shutdown
 
-=item L<Fugu::Signify> - verify a signify(1) signature and a SHA256 manifest
+=item L<Fugu::Signify> - verify a signify(1) signature, and read and write a SHA256 manifest
 
 =item L<Fugu::StateFile> - a small JSON state file
 

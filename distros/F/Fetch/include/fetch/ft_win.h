@@ -30,11 +30,36 @@
 #include <errno.h>
 #include <stdlib.h>
 
+/* Which POSIX socket errno names <errno.h> carries varies by toolchain: MSVC
+ * and current mingw-w64 have the full set, while the mingw shipped with older
+ * Strawberry perls (gcc 4.4 - 4.6) stops short of ECONNREFUSED/ETIMEDOUT. Any
+ * name that is missing gets its Winsock number, which is consistent because
+ * ft_win_seterrno is the only thing that ever sets these and every test in the
+ * core compares against the same macro. */
 #ifndef EINPROGRESS
 #define EINPROGRESS WSAEINPROGRESS
 #endif
 #ifndef EWOULDBLOCK
 #define EWOULDBLOCK WSAEWOULDBLOCK
+#endif
+#ifndef ECONNRESET
+#define ECONNRESET WSAECONNRESET
+#endif
+#ifndef ECONNREFUSED
+#define ECONNREFUSED WSAECONNREFUSED
+#endif
+#ifndef ETIMEDOUT
+#define ETIMEDOUT WSAETIMEDOUT
+#endif
+
+/* MSVC's CRT has no ssize_t at all (mingw's <sys/types.h> does), and the core
+ * returns one from every read/write wrapper. SSIZE_T is the same pointer-width
+ * signed type. _SSIZE_T_DEFINED is the guard the CRT headers themselves test,
+ * so setting it keeps a later toolchain typedef from colliding. */
+#if defined(_MSC_VER) && !defined(ssize_t) && !defined(_SSIZE_T_DEFINED)
+#include <basetsd.h>
+typedef SSIZE_T ssize_t;
+#define _SSIZE_T_DEFINED
 #endif
 
 /* one-time Winsock startup, run lazily from the first socket() */
@@ -80,9 +105,15 @@ static void ft_os_set_nonblock(int fd) {
     ioctlsocket(FT_SOCK(fd), FIONBIO, &on);
 }
 
+/* Winsock reports a non-blocking connect still in flight as WSAEWOULDBLOCK
+ * where POSIX reports EINPROGRESS, and the dial loops in ft_http.h / ft_abi.h
+ * test EINPROGRESS to decide whether to keep the fd. Translate here so those
+ * callers stay platform-neutral; without it every connect looks like a hard
+ * failure and the socket is closed before it ever finishes. */
 static int ft_os_connect(int fd, const struct sockaddr *a, int alen) {
     if (connect(FT_SOCK(fd), a, alen) == 0) return 0;
     ft_win_seterrno();
+    if (errno == EWOULDBLOCK) errno = EINPROGRESS;
     return -1;
 }
 
@@ -187,6 +218,18 @@ static void *ft_memmem(const void *hay, size_t hlen, const void *ndl, size_t nle
 }
 #else
 #define ft_memmem memmem
+#endif
+
+/* strcasecmp/strncasecmp are POSIX, declared by <strings.h>. mingw has both
+ * the header and the names; MSVC has neither, only the underscore-prefixed CRT
+ * spellings out of <string.h>. Header parsing (ft_http.h, ft_cookiejar.h,
+ * ft_ua.h) leans on these, and under cl an undeclared function is only warning
+ * C4013 - it compiles, then fails at link - so the mapping has to be here. */
+#if defined(_MSC_VER)
+#define strcasecmp  _stricmp
+#define strncasecmp _strnicmp
+#else
+#include <strings.h>
 #endif
 
 #endif /* FT_WIN_H */

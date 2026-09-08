@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.024;
 
 use ExtUtils::MakeMaker;
 
@@ -14,10 +14,10 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "lazy",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.024",
   "NAME" => "lazy",
   "PREREQ_PM" => {
-    "App::cpm" => "0.997017",
+    "App::cpm" => 1,
     "App::cpm::CLI" => 0,
     "Carp" => 0,
     "Getopt::Long" => 0,
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::RequiresInternet" => 0,
     "version" => 0
   },
-  "VERSION" => "1.000002",
+  "VERSION" => "1.000003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::cpm" => "0.997017",
+  "App::cpm" => 1,
   "App::cpm::CLI" => 0,
   "Capture::Tiny" => 0,
   "Carp" => 0,
@@ -70,12 +70,6 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
-if ("$]" < 5.024) {
-requires('App::cpm', '<= 0.997017');
-}
-
-
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
   delete $WriteMakefileArgs{TEST_REQUIRES};
@@ -87,25 +81,3 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
-
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
-sub _add_prereq {
-  my ($mm_key, $module, $version_or_range) = @_;
-  $version_or_range ||= 0;
-  warn "$module already exists in $mm_key (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
-    if exists $WriteMakefileArgs{$mm_key}{$module}
-      and $WriteMakefileArgs{$mm_key}{$module} ne '0'
-      and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
-  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$module}) -- need to do a sane metamerge!"
-    if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
-        and $FallbackPrereqs{$module} ne $version_or_range;
-  $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;
-  return;
-}
-
-sub requires { goto &runtime_requires }
-
-sub runtime_requires {
-  my ($module, $version_or_range) = @_;
-  _add_prereq(PREREQ_PM => $module, $version_or_range);
-}

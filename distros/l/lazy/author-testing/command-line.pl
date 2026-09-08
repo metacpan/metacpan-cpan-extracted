@@ -11,7 +11,7 @@ use feature qw( say );
 # Local install
 # cpanm -U Acme::Urinal || true && rm -rf foo_local && perl -Ilib -Mlocal::lib=foo_local -Mlazy author-testing/command-line.pl
 
-use Acme::Urinal;
+use Acme::Urinal ();
 
 my $urinals = Acme::Urinal->new( [ 0 .. 7 ] );
 

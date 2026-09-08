@@ -1,6 +1,6 @@
 package HTML::FormHandler::Model::Object;
 # ABSTRACT: stub for Object model
-$HTML::FormHandler::Model::Object::VERSION = '0.410001';
+$HTML::FormHandler::Model::Object::VERSION = '0.410002';
 use Moose::Role;
 
 sub update_model {
@@ -30,7 +30,7 @@ HTML::FormHandler::Model::Object - stub for Object model
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

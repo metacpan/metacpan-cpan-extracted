@@ -1,5 +1,8 @@
 Revision history for MIDI-RtController
 
+0.0808 2026-09-07 17:43:18
+    - Add the `silent` attribute.
+
 0.0807 2026-08-22 10:56:12
     - Close the midi_output port in stop().
 

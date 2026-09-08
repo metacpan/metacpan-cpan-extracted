@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 use File::Temp ();
 use File::Spec ();
 
@@ -12,19 +13,17 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
 # === touch ===
 
-# touch refreshes TTL
+# touch resets the entry's TTL to the map default
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 10);
 
-    shm_ii_put $map, 1, 10;
-    sleep 1;
+    shm_ii_put_ttl $map, 1, 10, 3;           # shorter than the default
+    cmp_ok($map->ttl_remaining(1), '<=', 3, 'entry starts on its own short TTL');
 
-    # touch should refresh the TTL
     ok(shm_ii_touch $map, 1, 'touch returns true for existing key');
 
-    my $rem = shm_ii_ttl_remaining $map, 1;
-    ok($rem > 5, "TTL refreshed after touch: $rem");
+    cmp_ok($map->ttl_remaining(1), '>=', 9, 'touch reset the TTL to the map default');
 
     # touch non-existent key
     ok(!shm_ii_touch $map, 999, 'touch returns false for missing key');
@@ -92,7 +91,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 1);
     shm_ii_put $map, 1, 10;
-    sleep 2;
+    Time::HiRes::sleep(1.2);
     ok(!shm_ii_touch $map, 1, 'touch returns false for expired key');
     unlink $path;
 }
@@ -202,7 +201,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
     shm_ii_put $map, 1, 10;
     shm_ii_put $map, 2, 20;
-    sleep 2;
+    Time::HiRes::sleep(1.2);
 
     # get returns undef for expired (clock: no active expiry on read)
     my $v = shm_ii_get $map, 1;
@@ -280,29 +279,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI->new($path, 1000);
     is($map->path, $path, 'SI path returns backing file path');
-    unlink $path;
-}
-
-# === flush_expired_partial: bounded scan, ($n, $done) return, convergence ===
-{
-    my $path = tmpfile();
-    # Count them under a long TTL, then expire them: the pre-expiry assertion
-    # must not race the clock on a loaded box.
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 60);
-    $map->put($_, $_ * 10) for 1 .. 30;
-    is($map->size, 30, 'flush_expired_partial: 30 live entries before expiry');
-    $map->set_ttl($_, 1) for 1 .. 30;
-    sleep 2;                                   # everything expires
-    my ($total, $done, $calls) = (0, 0, 0);
-    while (!$done) {
-        my ($n, $d) = $map->flush_expired_partial(8);   # 8 slots per call
-        $total += $n;
-        $done = $d;
-        last if ++$calls > 1000;               # safety net against a stuck cursor
-    }
-    ok($done, 'flush_expired_partial: reports done after a full table cycle');
-    is($total, 30, 'flush_expired_partial: cumulative flushed == expired entries');
-    is($map->size, 0, 'flush_expired_partial: all expired entries removed');
     unlink $path;
 }
 

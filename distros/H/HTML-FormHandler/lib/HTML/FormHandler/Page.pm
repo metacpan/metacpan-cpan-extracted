@@ -1,6 +1,6 @@
 package HTML::FormHandler::Page;
 # ABSTRACT: used in Wizard
-$HTML::FormHandler::Page::VERSION = '0.410001';
+$HTML::FormHandler::Page::VERSION = '0.410002';
 use Moose;
 with 'HTML::FormHandler::Pages';
 
@@ -49,7 +49,7 @@ HTML::FormHandler::Page - used in Wizard
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

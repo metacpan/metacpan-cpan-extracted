@@ -4,6 +4,7 @@ author:
   - 'Robert Rothenberg <perl@rhizomnic.com>'
 build_requires:
   CHI: '0'
+  Devel::Hide: '0'
   File::Spec: '0'
   File::Temp: '0'
   IO::Handle: '0'
@@ -13,6 +14,7 @@ build_requires:
   Net::DNS::Resolver::Mock: '0'
   Path::Tiny: '0'
   Test2::Require::Module: '0'
+  Test2::Tools::Exception: '0'
   Test2::V0: '0'
   Test::File::ShareDir: '0'
   Test::More: '0'
@@ -37,29 +39,30 @@ name: Robots-Validate
 provides:
   Robots::Validate:
     file: lib/Robots/Validate.pm
-    version: v0.4.2
+    version: v0.4.3
 recommends:
   Algorithm::AhoCorasick::XS: '0.04'
   CHI: '0.40'
   Net::DNS: '1.57'
+  Net::IP::LPM: '1.12'
   Ref::Util::XS: '0'
   Scalar::Util: '1.64'
   TOML::XS: '0.06'
   Type::Tiny::XS: '0'
 requires:
-  Algorithm::AhoCorasick::XS: '0'
+  Algorithm::AhoCorasick::SearchMachine: '0'
   File::ShareDir: '0'
   File::Slurper: '0'
-  List::Util: '1.45'
+  List::Util: '1.33'
   Moo: '1'
   Net::DNS::Resolver: '0'
   Net::IP: '0'
-  Net::Patricia: '0'
+  Net::IP::LPM: '0'
   PerlX::Maybe: '0'
   Ref::Util: '0'
   Scalar::Util: '1.18'
   Sub::Util: '1.40'
-  TOML::XS: '0'
+  TOML::Tiny: '0.20'
   Try::Tiny: '0'
   Types::Common: '0'
   constant: '0'
@@ -69,7 +72,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Robots-Validate/issues
   repository: git://github.com/robrwo/Robots-Validate.git
-version: v0.4.2
+version: v0.4.3
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'

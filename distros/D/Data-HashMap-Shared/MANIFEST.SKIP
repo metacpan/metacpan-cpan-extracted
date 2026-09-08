@@ -12,6 +12,7 @@
 \.swp$
 ~$
 ^\.git/
+^\.gitignore$
 ^\.github/
 ^\.claude/
 \.bak$
@@ -19,7 +20,6 @@
 \.tar\.gz$
 ^MANIFEST\.bak$
 
-# local tool artifacts / built dists (not shipped)
 (^|/)\.pcg($|/)
 (^|/)\.claude($|/)
 ^Data-HashMap-Shared-[0-9][0-9.]*/

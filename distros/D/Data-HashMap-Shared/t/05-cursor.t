@@ -259,4 +259,79 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
+# A seek that finds nothing must leave the iteration alone.  It used to switch
+# shard (and reset iter_pos) before probing, so a failed seek cost a sharded
+# pass its position, and rewound an exhausted cursor to a whole second pass.
+{
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    my $prefix = File::Spec->catfile($dir, 'seekshard');
+    my $map = Data::HashMap::Shared::II->new_sharded($prefix, 8, 40_000);
+    $map->put($_, $_) for 1 .. 40;
+
+    my $missing = 1;
+    $missing++ while defined $map->get($missing);
+
+    my $cur = shm_ii_cursor $map;
+    my (%seen, $yields);
+    $yields = 0;
+    while (my ($k) = shm_ii_cursor_next $cur) {
+        $yields++;
+        $seen{$k}++;
+        last if $yields > 200;          # a repositioning seek used to loop here
+        ok !(shm_ii_cursor_seek $cur, $missing), 'seek of a missing key is false'
+            if $yields == 1;
+        shm_ii_cursor_seek $cur, $missing;
+    }
+    is($yields, 40, 'a failed seek leaves a sharded iteration intact');
+    is(scalar(keys %seen), 40, '  ... visiting every key exactly once');
+    is(scalar(grep { $seen{$_} > 1 } keys %seen), 0, '  ... with no repeats');
+}
+
+{
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    my $path = File::Spec->catfile($dir, 'seekplain.shm');
+    my $map = Data::HashMap::Shared::II->new($path, 64);
+    $map->put($_, $_) for 1 .. 10;
+
+    my $cur = shm_ii_cursor $map;
+    my $first = 0;
+    $first++ while (shm_ii_cursor_next $cur)[0];
+    is($first, 10, 'first pass visits every key');
+
+    ok !(shm_ii_cursor_seek $cur, 999_999), 'seek of a missing key is false';
+    my $second = 0;
+    $second++ while (shm_ii_cursor_next $cur)[0];
+    is($second, 0, 'a failed seek does not rewind an exhausted cursor');
+}
+
+# keys/values/items walk states[] directly; each and the cursor go through the
+# SIMD live-slot scan.  Two implementations of the same traversal, and nothing
+# compared them -- so a scan that skipped one slot per group was invisible to
+# keys() while each() silently lost entries.  A sparse table is what exposes it:
+# in a dense one a neighbour lands in the skipped position and masks the gap.
+{
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    my $path = File::Spec->catfile($dir, 'sparse.shm');
+    my $map = Data::HashMap::Shared::II->new($path, 100_000);
+    $map->reserve(50_000);                    # many slots, few entries
+    my $N = 300;
+    $map->put($_, $_ * 3) for 1 .. $N;
+    cmp_ok($map->capacity, '>=', 8 * $N, 'sparse table: far more slots than entries');
+
+    my @by_keys = sort { $a <=> $b } $map->keys;
+    my @by_each;
+    while (my ($k, $v) = shm_ii_each $map) { push @by_each, $k }
+    @by_each = sort { $a <=> $b } @by_each;
+    my $cur = shm_ii_cursor $map;
+    my @by_cursor;
+    while (my ($k, $v) = shm_ii_cursor_next $cur) { push @by_cursor, $k }
+    @by_cursor = sort { $a <=> $b } @by_cursor;
+
+    is(scalar(@by_keys),   $N, 'keys() sees every entry');
+    is(scalar(@by_each),   $N, 'each() sees every entry');
+    is(scalar(@by_cursor), $N, 'the cursor sees every entry');
+    is_deeply(\@by_each,   \@by_keys, 'each() agrees with keys()');
+    is_deeply(\@by_cursor, \@by_keys, 'the cursor agrees with keys()');
+}
+
 done_testing;

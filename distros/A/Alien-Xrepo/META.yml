@@ -1,0 +1,74 @@
+---
+X_No_Archive: Yes
+abstract: "Interface with xrepo's package management"
+author:
+  - 'Sanko Robinson'
+build_requires:
+  Alien::Xmake: v1.0.0
+  Capture::Tiny: '0'
+  File::Temp: '0'
+  Module::Build::Tiny: '0'
+  Test2::V0: '0'
+  perl: v5.40.0
+configure_requires:
+  Module::Build::Tiny: '0'
+  perl: v5.40.0
+dynamic_config: 0
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
+keywords: []
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Xrepo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Alien::Xrepo:
+    file: lib/Alien/Xrepo.pm
+    version: v1.0.0
+  Alien::Xrepo::Build:
+    file: lib/Alien/Xrepo/Build.pm
+    version: v1.0.0
+  Alien::Xrepo::Build::Recipe:
+    file: lib/Alien/Xrepo/Build/Recipe.pm
+    version: v1.0.0
+  Alien::Xrepo::PackageInfo:
+    file: lib/Alien/Xrepo.pm
+    version: v1.0.0
+  Alien::Xrepo::Runtime:
+    file: lib/Alien/Xrepo/Runtime.pm
+    version: v1.0.0
+  Alien::Xrepo::Runtime::Alt:
+    file: lib/Alien/Xrepo/Runtime.pm
+    version: v1.0.0
+requires:
+  Alien::Xmake: v1.0.0
+  Capture::Tiny: '0'
+  File::ShareDir: '0'
+  JSON::PP: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  perl: v5.40.0
+resources:
+  bugtracker: https://github.com/sanko/Alien-Xrepo/issues
+  homepage: https://github.com/sanko/Alien-Xrepo
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: https://github.com/sanko/Alien-Xrepo.git
+version: v1.0.0
+x_authority: cpan:SANKO
+x_ignore:
+  - .tidyallrc
+  - .gitignore
+  - .clang-format
+  - .github/**
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 0

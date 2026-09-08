@@ -1,3 +1,9 @@
+0.06 2026-09-07
+    - Fix declared language of code block in documentation (affects some POD
+      renderers).
+    - Include GPLv1/Artistic license files in distribution. [codeberg #1]
+    - No functional changes.
+
 0.05 2026-01-25
     - Add hl_language method/constructor parameter. [github #1]
 

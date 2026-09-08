@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 use File::Temp ();
 use File::Spec ();
 
@@ -180,7 +181,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
     shm_ii_put $map, 1, 10;
-    sleep 4;
+    Time::HiRes::sleep(2.2);
     my $cur = shm_ii_cursor $map;
     ok(!shm_ii_cursor_seek $cur, 1, 'seek expired key returns false');
     unlink $path;

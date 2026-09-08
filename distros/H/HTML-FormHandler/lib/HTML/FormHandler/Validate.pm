@@ -1,6 +1,6 @@
 package HTML::FormHandler::Validate;
 # ABSTRACT: validation role (internal)
-$HTML::FormHandler::Validate::VERSION = '0.410001';
+$HTML::FormHandler::Validate::VERSION = '0.410002';
 
 use Moose::Role;
 use Carp;
@@ -381,7 +381,7 @@ HTML::FormHandler::Validate - validation role (internal)
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

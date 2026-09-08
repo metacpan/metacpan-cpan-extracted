@@ -1,6 +1,6 @@
 package HTML::FormHandler::I18N;
 # ABSTRACT: internationalization
-$HTML::FormHandler::I18N::VERSION = '0.410001';
+$HTML::FormHandler::I18N::VERSION = '0.410002';
 use strict;
 use warnings;
 use base ('Locale::Maketext');
@@ -35,7 +35,7 @@ HTML::FormHandler::I18N - internationalization
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

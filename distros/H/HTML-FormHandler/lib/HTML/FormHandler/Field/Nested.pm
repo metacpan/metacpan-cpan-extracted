@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Nested;
 # ABSTRACT: for nested elements of compound fields
-$HTML::FormHandler::Field::Nested::VERSION = '0.410001';
+$HTML::FormHandler::Field::Nested::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field::Text';
 
@@ -23,7 +23,7 @@ HTML::FormHandler::Field::Nested - for nested elements of compound fields
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

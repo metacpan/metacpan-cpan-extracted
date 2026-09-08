@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Wrapper::None;
 # ABSTRACT: wrapper that doesn't wrap
-$HTML::FormHandler::Widget::Wrapper::None::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Wrapper::None::VERSION = '0.410002';
 
 use Moose::Role;
 
@@ -21,7 +21,7 @@ HTML::FormHandler::Widget::Wrapper::None - wrapper that doesn't wrap
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

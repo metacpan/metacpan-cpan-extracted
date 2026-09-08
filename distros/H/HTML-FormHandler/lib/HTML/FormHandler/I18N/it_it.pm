@@ -1,6 +1,6 @@
 package HTML::FormHandler::I18N::it_it;
 # ABSTRACT: Italian message translations - traduzione italiana dei messaggi
-$HTML::FormHandler::I18N::it_it::VERSION = '0.410001';
+$HTML::FormHandler::I18N::it_it::VERSION = '0.410002';
 use strict;
 use warnings;
 use base 'HTML::FormHandler::I18N';
@@ -115,7 +115,7 @@ HTML::FormHandler::I18N::it_it - Italian message translations - traduzione itali
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 NAME
 

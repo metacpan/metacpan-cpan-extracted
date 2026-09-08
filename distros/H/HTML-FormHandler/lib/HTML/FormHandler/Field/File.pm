@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::File;
 # ABSTRACT: simple file field; does no processing
-$HTML::FormHandler::Field::File::VERSION = '0.410001';
+$HTML::FormHandler::Field::File::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field';
 
@@ -24,7 +24,7 @@ HTML::FormHandler::Field::File - simple file field; does no processing
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

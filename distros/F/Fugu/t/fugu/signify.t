@@ -131,9 +131,25 @@ subtest '_parse_manifest reads the sha256(1) line form' => sub {
 		$sig->_parse_manifest( "SHA256 (one.img) = $hex_a\n"
 			    . "SHA256 (one.img) = $hex_b\n" ),
 		undef,
-		'a duplicate name fails'
+		'a duplicate key fails'
 	);
 	like( $sig->error, qr/duplicate/, 'the reason names the duplicate' );
+
+	# A key is opaque text. A file path and a download URL each
+	# hold a solidus, and a URL holds a colon and a dot as well.
+	my $mixed = $sig->_parse_manifest(
+		    "SHA256 (dist/one.img) = $hex_a\n"
+		    . "SHA256 (https://example.org/dl/two.img) = $hex_b\n"
+		    . "SHA256 (three.img) = $hex_c\n" );
+	is_deeply(
+		$mixed,
+		{
+			'dist/one.img'                    => $hex_a,
+			'https://example.org/dl/two.img'  => $hex_b,
+			'three.img'                       => $hex_c,
+		},
+		'a path key and a URL key parse whole'
+	);
 
 	my $upper = $sig->_parse_manifest(
 		'SHA256 (one.img) = ' . ( 'A' x 64 ) . "\n" );
@@ -184,17 +200,22 @@ sub sign ( $seckey, $file, $sigfile = undef )
 	return $sigfile;
 }
 
-# manifest_line($name, $path):
-#	One sha256(1) line for a local file.
-sub manifest_line ( $name, $path )
+# manifest_line($key, $path):
+#	One sha256(1) line. The key is the text between the
+#	parentheses, and it needs no relation to $path.
+sub manifest_line ( $key, $path )
 {
 	my $hex = Fugu::Signify::_digest($path)
 	    or die "Cannot digest $path";
-	return "SHA256 ($name) = $hex\n";
+	return "SHA256 ($key) = $hex\n";
 }
 
 my ( $pub_a, $sec_a, $pub_b, $sec_b );
 my ( $message, $sigfile, $manifest );
+
+# A download URL as a manifest key. It holds a colon, a solidus and a
+# dot, and the parser must take it whole.
+my $URL_KEY = 'https://example.org/dl/two.img';
 
 if ( defined $signify ) {
 
@@ -217,9 +238,14 @@ if ( defined $signify ) {
 
 	write_file( "$dir/one.img", 'payload one' );
 	write_file( "$dir/two.img", 'payload two' );
+
+	# A key is opaque, so the fixture holds a bare name, a path
+	# and a URL. Each one must reach the same comparison.
 	$manifest = write_file( "$dir/SHA256",
 		    manifest_line( 'one.img', "$dir/one.img" )
-		    . manifest_line( 'two.img', "$dir/two.img" ) );
+		    . manifest_line( 'two.img', "$dir/two.img" )
+		    . manifest_line( 'dist/two.img', "$dir/two.img" )
+		    . manifest_line( $URL_KEY, "$dir/two.img" ) );
 	sign( $sec_a, $manifest );
 }
 
@@ -395,7 +421,7 @@ subtest 'verify_manifest digests no file behind a broken signature' => sub {
 		'the reason is the signature, not a digest' );
 };
 
-subtest 'verify_manifest accepts a name that differs from the path' => sub {
+subtest 'verify_manifest accepts a key that differs from the path' => sub {
 	plan skip_all => 'signify(1) not available' unless defined $signify;
 
 	my $moved = write_file( "$dir/moved.tmp",
@@ -407,7 +433,203 @@ subtest 'verify_manifest accepts a name that differs from the path' => sub {
 			files    => { 'two.img' => $moved },
 		),
 		$pub_a,
-		'the manifest name maps to the local path'
+		'the manifest key maps to the local path'
+	);
+};
+
+subtest 'verify_manifest takes a path key and a URL key' => sub {
+	plan skip_all => 'signify(1) not available' unless defined $signify;
+
+	# The caller decides where the bytes sit, so neither key needs
+	# to name a path that exists.
+	my $sig = Fugu::Signify->new( keys => [$pub_a] );
+	is(
+		$sig->verify_manifest(
+			manifest => $manifest,
+			files    => {
+				'dist/two.img' => "$dir/two.img",
+				$URL_KEY       => "$dir/two.img",
+			},
+		),
+		$pub_a,
+		'both keys verify against one local file'
+	);
+
+	my $tampered = write_file( "$dir/tampered.img", 'payload three' );
+	is(
+		$sig->verify_manifest(
+			manifest => $manifest,
+			files    => { $URL_KEY => $tampered },
+		),
+		undef,
+		'and a URL key still catches a digest mismatch'
+	);
+	like( $sig->error, qr/\Q$URL_KEY\E: digest mismatch/,
+		'the reason names the URL key' );
+
+	is(
+		$sig->verify_manifest(
+			manifest => $manifest,
+			files => { 'https://other.example/x' => "$dir/two.img" },
+		),
+		undef,
+		'a key that the manifest does not hold fails'
+	);
+	like( $sig->error, qr/does not hold/, 'and the reason says so' );
+};
+
+subtest 'parse_manifest is the public form of the parser' => sub {
+	my $sig = Fugu::Signify->new( keys => ["$dir/absent.pub"] );
+
+	my $text = "SHA256 (a.img) = " . ( 'a' x 64 ) . "\n"
+	    . 'SHA256 (dist/b.img) = ' . ( 'B' x 64 ) . "\n"
+	    . 'SHA256 (https://example.org/c.img) = ' . ( 'c' x 64 ) . "\n";
+
+	my $digests = $sig->parse_manifest($text);
+	is_deeply(
+		$digests,
+		{
+			'a.img'                       => 'a' x 64,
+			'dist/b.img'                  => 'b' x 64,
+			'https://example.org/c.img'   => 'c' x 64,
+		},
+		'a name, a path and a URL each read as one key'
+	);
+	is( $sig->error, undef, 'and the parser reports no reason' );
+
+	# The parser needs no signify(1): a rotation reads the file it
+	# wrote, and a site build cannot sign. An object with a
+	# command that does not exist must still parse.
+	my $no_command = Fugu::Signify->new(
+		keys    => ["$dir/absent.pub"],
+		command => "$dir/no-such-signify",
+	);
+	ok( !$no_command->is_available, 'the object resolved no command' );
+	is_deeply( $no_command->parse_manifest($text), $digests,
+		'and the parser still answered' );
+
+	is( $sig->parse_manifest(''), undef, 'an empty manifest fails' );
+	like( $sig->error, qr/empty/, 'and the reason says so' );
+
+	is( $sig->parse_manifest(undef), undef, 'undef fails' );
+	like( $sig->error, qr/undef/, 'and the reason says so' );
+
+	is( $sig->parse_manifest("nonsense\n"), undef, 'a bad line fails' );
+	like( $sig->error, qr/cannot parse manifest line/,
+		'and the reason quotes the line' );
+
+	is( $sig->parse_manifest("SHA256 (a.img) = abc\n"),
+		undef, 'a short digest fails' );
+	like( $sig->error, qr/not 64 hexadecimal/, 'and the reason says so' );
+
+	my $twice = "SHA256 (a.img) = " . ( 'a' x 64 ) . "\n"
+	    . 'SHA256 (a.img) = ' . ( 'b' x 64 ) . "\n";
+	is( $sig->parse_manifest($twice), undef, 'a duplicate key fails' );
+	like( $sig->error, qr/duplicate manifest key/, 'and the reason says so' );
+};
+
+subtest 'write_manifest writes the line form' => sub {
+	my $sig = Fugu::Signify->new( keys => ["$dir/absent.pub"] );
+
+	# The keys sort in ascending order, so two runs of a rotation
+	# write one byte sequence.
+	my $text = $sig->write_manifest(
+		{
+			'c.img' => 'C' x 64,
+			'a.img' => 'a' x 64,
+			'b.img' => 'b' x 64,
+		}
+	);
+	is(
+		$text,
+		"SHA256 (a.img) = " . ( 'a' x 64 ) . "\n"
+		    . 'SHA256 (b.img) = ' . ( 'b' x 64 ) . "\n"
+		    . 'SHA256 (c.img) = ' . ( 'c' x 64 ) . "\n",
+		'the output sorts by key, and it lowercases each digest'
+	);
+
+	# The round trip is the contract that the rotation needs: the
+	# writer and the parser must agree on the line form.
+	my %digests = (
+		'a.img'                     => 'a' x 64,
+		'dist/b.img'                => 'b' x 64,
+		'https://example.org/c.img' => 'c' x 64,
+	);
+	is_deeply( $sig->parse_manifest( $sig->write_manifest( \%digests ) ),
+		\%digests, 'write_manifest then parse_manifest round trips' );
+
+	is( $sig->write_manifest( {} ), undef, 'an empty digest set fails' );
+	like( $sig->error, qr/empty/, 'and the reason says so' );
+
+	# parse_manifest reads a key with a parenthesis back without a
+	# change, because it takes the text up to the last one. The
+	# writer rejects such a key for a stricter reader: sha256(1)
+	# and scripts/deps both read a manifest.
+	is( $sig->write_manifest( { 'a(1).img' => 'a' x 64 } ),
+		undef, 'a key with a parenthesis fails' );
+	like( $sig->error, qr/parenthesis/, 'and the reason says so' );
+
+	is( $sig->write_manifest( { 'a b.img' => 'a' x 64 } ),
+		undef, 'a key with a space fails' );
+	like( $sig->error, qr/whitespace/, 'and the reason says so' );
+
+	# The whitespace class must name the ASCII whitespace only.
+	# \s reads a byte above 127 as Latin-1 under the feature set
+	# of the module, so it matches U+0085 and U+00A0. A release
+	# asset whose name holds a letter such as a-ogonek is valid,
+	# and a rotation must not stall on it.
+	my $utf8      = "w\xc4\x85z.tar.gz";
+	my $utf8_text = $sig->write_manifest( { $utf8 => 'a' x 64 } );
+	ok( defined $utf8_text, 'a UTF-8 key with no ASCII space passes' )
+	    or diag( $sig->error );
+	is_deeply( $sig->parse_manifest($utf8_text), { $utf8 => 'a' x 64 },
+		'and it round trips' );
+
+	# The bytes that only Latin-1 reads as whitespace must pass.
+	for my $byte ( "\x85", "\xA0" ) {
+		ok(
+			defined $sig->write_manifest(
+				{ "a${byte}b.img" => 'a' x 64 }
+			),
+			sprintf 'a key with the byte %02x passes', ord $byte
+		);
+	}
+
+	is( $sig->write_manifest( { '' => 'a' x 64 } ),
+		undef, 'an empty key fails' );
+
+	is( $sig->write_manifest( { 'a.img' => 'abc' } ),
+		undef, 'a short digest fails' );
+	like( $sig->error, qr/not 64 hexadecimal/, 'and the reason says so' );
+
+	is( $sig->write_manifest( { 'a.img' => 'z' x 64 } ),
+		undef, 'a non-hexadecimal digest fails' );
+
+	is( $sig->write_manifest( { 'a.img' => undef } ),
+		undef, 'an undef digest fails' );
+
+	ok( !eval { $sig->write_manifest('not a reference'); 1 },
+		'a non-reference dies' );
+
+	# A manifest is bytes. A key in character form would reach the
+	# file as its UTF-8 form, so the bytes on disk would differ
+	# from the key that the caller passed, and the manifest would
+	# name a file that no reader finds. Perl also warns on the
+	# print.
+	is( $sig->write_manifest( { "w\x{105}.tar.gz" => 'a' x 64 } ),
+		undef, 'a key with a character above 255 fails' );
+	like( $sig->error, qr/above 255/, 'and the reason says so' );
+
+	is( $sig->parse_manifest("SHA256 (w\x{105}) = " . ( 'a' x 64 )),
+		undef, 'a manifest in character form fails' );
+	like( $sig->error, qr/above 255/, 'and the reason says so' );
+
+	# The byte form of the same name still passes.
+	ok(
+		defined $sig->write_manifest(
+			{ "w\xc4\x85z.tar.gz" => 'a' x 64 }
+		),
+		'the byte form of the same name passes'
 	);
 };
 

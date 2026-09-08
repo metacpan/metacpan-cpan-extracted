@@ -3,7 +3,7 @@
  use strict;
  use warnings;
 
- use Test::More tests => 14;
+ use Test::More tests => 19;
  use DBIx::Lite;
 
  my $dbix = DBIx::Lite->new(driver_name => 'Pg');
@@ -57,6 +57,42 @@
     is $sql, q{WITH t AS (SELECT 1 AS id, 'Larry' AS name) INSERT INTO authors ( id, name) VALUES ( ?, ? )},
         'insert with CTE';
     is_deeply \@bind, [1, 'Larry'], 'insert with CTE bind values';
+}
+
+{
+    my ($sql, @bind) = $dbix->table('authors')
+        ->with(target => \["SELECT * FROM authors WHERE id = ?", 42])
+        ->from('target')
+        ->insert_sql({
+            name  => \["(SELECT me.name FROM authors AS me WHERE me.id = target.id)"],
+            email => 'copy@example.com',
+        });
+    is $sql,
+        q{WITH target AS (SELECT * FROM authors WHERE id = ?) INSERT INTO authors ( email, name) SELECT ?, (SELECT me.name FROM authors AS me WHERE me.id = target.id) FROM target},
+        'insert with CTE and from uses SELECT';
+    is_deeply \@bind, [42, 'copy@example.com'],
+        'insert with CTE and from bind order';
+}
+
+{
+    my ($sql, @bind) = $dbix->table('authors')
+        ->from('target')
+        ->insert_sql({
+            id   => 1,
+            name => \"target.name",
+        });
+    is $sql,
+        q{INSERT INTO authors ( id, name) SELECT ?, target.name FROM target},
+        'insert from without CTE';
+    is_deeply \@bind, [1], 'insert from without CTE binds';
+}
+
+{
+    eval {
+        $dbix->table('authors')->from('target')->insert_sql({});
+    };
+    like $@, qr/insert\(\) with from\(\) requires a non-empty hashref/,
+        'insert with from and empty hash croaks';
 }
 
 {

@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::SelectCSV;
 # ABSTRACT: Multiple select field from CSV value
-$HTML::FormHandler::Field::SelectCSV::VERSION = '0.410001';
+$HTML::FormHandler::Field::SelectCSV::VERSION = '0.410002';
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Field::Select';
 
@@ -49,7 +49,7 @@ HTML::FormHandler::Field::SelectCSV - Multiple select field from CSV value
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

@@ -22,10 +22,8 @@ sub memoized {
     my ($c, $n) = @_;
     my $hit = shm_is_get $c, $n;
     return $hit if defined $hit;                  # fast path: already cached
-    # miss: compute, then get_or_set so the first writer wins any race and
-    # every caller observes the same value.  get_or_set is undef when the entry
-    # could not be stored (full table, or an exhausted arena), so fall back to
-    # the value we just computed rather than handing back undef.
+    # get_or_set is undef when the entry could not be stored at all, so fall
+    # back to the value just computed rather than handing back undef.
     my $fresh  = expensive($n);
     my $stored = shm_is_get_or_set $c, $n, $fresh;
     return defined $stored ? $stored : $fresh;

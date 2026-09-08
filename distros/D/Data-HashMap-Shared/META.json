@@ -44,6 +44,52 @@
          }
       }
    },
+   "provides" : {
+      "Data::HashMap::Shared" : {
+         "file" : "lib/Data/HashMap/Shared.pm",
+         "version" : "0.20"
+      },
+      "Data::HashMap::Shared::I16" : {
+         "file" : "lib/Data/HashMap/Shared/I16.pm",
+         "version" : "0.20"
+      },
+      "Data::HashMap::Shared::I16S" : {
+         "file" : "lib/Data/HashMap/Shared/I16S.pm",
+         "version" : "0.20"
+      },
+      "Data::HashMap::Shared::I32" : {
+         "file" : "lib/Data/HashMap/Shared/I32.pm",
+         "version" : "0.20"
+      },
+      "Data::HashMap::Shared::I32S" : {
+         "file" : "lib/Data/HashMap/Shared/I32S.pm",
+         "version" : "0.20"
+      },
+      "Data::HashMap::Shared::II" : {
+         "file" : "lib/Data/HashMap/Shared/II.pm",
+         "version" : "0.20"
+      },
+      "Data::HashMap::Shared::IS" : {
+         "file" : "lib/Data/HashMap/Shared/IS.pm",
+         "version" : "0.20"
+      },
+      "Data::HashMap::Shared::SI" : {
+         "file" : "lib/Data/HashMap/Shared/SI.pm",
+         "version" : "0.20"
+      },
+      "Data::HashMap::Shared::SI16" : {
+         "file" : "lib/Data/HashMap/Shared/SI16.pm",
+         "version" : "0.20"
+      },
+      "Data::HashMap::Shared::SI32" : {
+         "file" : "lib/Data/HashMap/Shared/SI32.pm",
+         "version" : "0.20"
+      },
+      "Data::HashMap::Shared::SS" : {
+         "file" : "lib/Data/HashMap/Shared/SS.pm",
+         "version" : "0.20"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -55,6 +101,6 @@
          "web" : "https://github.com/vividsnow/perl5-data-hashmap-shared"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

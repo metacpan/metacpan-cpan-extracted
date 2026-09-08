@@ -18,11 +18,11 @@
 use v5.36;
 
 package Fugu::Control;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use IO::Socket::UNIX;
 use JSON::PP ();
-use Socket   qw(SOCK_STREAM);
+use Socket   qw(SOCK_STREAM SOL_SOCKET);
 
 use Fugu::Imsg;
 use Fugu::Log;
@@ -67,6 +67,14 @@ use constant MAX_REPLY => 1048576;
 # How long a client waits for one frame.
 use constant DEFAULT_TIMEOUT => 5;
 
+# The platform predicate of peer. Only OpenBSD reports the peer
+# credentials in the struct sockpeercred order: the user id, then the
+# group id, then the process id. The Linux struct ucred holds the
+# process id first, and one module must not carry two field orders.
+# The base perl of OpenBSD exports Socket::SO_PEERCRED (0x1022), so
+# no compiled module is necessary.
+use constant PEER_SUPPORTED => $^O eq 'openbsd';
+
 my $JSON = JSON::PP->new->utf8->canonical;
 
 # Fugu::Control->new(%args):
@@ -86,6 +94,7 @@ sub new ( $class, %args )
 		commands => {},
 		listener => undef,
 		clients  => {},
+		peers    => {},
 		error    => undef,
 	}, $class;
 }
@@ -122,10 +131,24 @@ sub error ($self)
 #	Bind the socket and start accepting. The method returns the
 #	object on success, or undef with the reason in error.
 #
-#	The socket is mode 0600 from birth, through a umask guard. A
-#	chmod after the bind leaves a window in which any user on the
-#	machine can connect. The directory that holds the socket is
-#	the outer boundary, and the caller owns its mode.
+#	%args:
+#		loop  => $loop	the event loop (required)
+#		mode  => $mode	the socket mode (default: 0600)
+#		group => $name	the socket group, a name or a group id
+#
+#	The socket holds its mode from birth, through a umask guard. A
+#	chmod after the bind toward a wider mode leaves a window in
+#	which any user on the machine can connect. The directory that
+#	holds the socket is the outer boundary, and the caller owns its
+#	mode.
+#
+#	bind(2) takes no group. The group form binds under the owner
+#	bits of the final mode. It chowns the path to the group, and
+#	it chmods to the mode last. The order narrows first and
+#	widens last: at every instant the users that can connect are a
+#	subset of the final set. A daemon drops privileges first, and
+#	it calls listen after. A process can chgrp its own file to a
+#	group that it belongs to, so the chgrp needs no root.
 #
 #	A stale socket from a daemon that did not shut down cleanly is
 #	removed first. bind(2) fails on an existing name, and a daemon
@@ -133,13 +156,39 @@ sub error ($self)
 #	that needs a hand at every reboot.
 sub listen ( $self, %args )
 {
-	my $loop = $args{loop} // die 'loop parameter required';
+	my $loop  = $args{loop} // die 'loop parameter required';
+	my $mode  = $args{mode} // 0600;
+	my $group = $args{group};
+
+	# A mode outside the permission bits is a programming error.
+	die "Invalid socket mode: $mode"
+	    unless ref($mode) eq '' && $mode =~ /^\d+$/ && $mode <= 0777;
 
 	$self->{error} = undef;
 
+	my $gid;
+	if ( defined $group ) {
+
+		# A numeric group must exist too: a chown to a group
+		# id that no group holds would report success, and the
+		# socket would carry a meaningless owner.
+		if ( $group =~ /^\d+$/ ) {
+			$gid = defined getgrgid($group) ? $group : undef;
+		}
+		else {
+			$gid = getgrnam($group);
+		}
+		unless ( defined $gid ) {
+			$self->{error} = "Cannot resolve group $group";
+			return;
+		}
+	}
+
 	$self->_remove_stale or return;
 
-	my $old      = umask 0177;
+	my $guard =
+	    defined $gid ? ( 0777 & ~( $mode & 0700 ) ) : ( 0777 & ~$mode );
+	my $old      = umask $guard;
 	my $listener = IO::Socket::UNIX->new(
 		Type   => SOCK_STREAM,
 		Local  => $self->{path},
@@ -152,6 +201,18 @@ sub listen ( $self, %args )
 		return;
 	}
 
+	if ( defined $gid ) {
+		unless ( chown -1, $gid, $self->{path} ) {
+			return $self->_unbind( $listener,
+				"Cannot chown $self->{path} to group $gid: $!"
+			);
+		}
+		unless ( chmod $mode, $self->{path} ) {
+			return $self->_unbind( $listener,
+				"Cannot chmod $self->{path}: $!" );
+		}
+	}
+
 	$self->{listener} = $listener;
 	$self->_log->debug( 'Control socket listening on %s', $self->{path} );
 
@@ -161,15 +222,55 @@ sub listen ( $self, %args )
 	return $self;
 }
 
+# $self->_unbind($listener, $reason):
+#	Take a half-built socket down. A half-built socket must never
+#	accept a connection, so the listener closes and the path goes.
+sub _unbind ( $self, $listener, $reason )
+{
+	$self->{error} = $reason;
+
+	unless ( CORE::close $listener ) {
+		$self->_log->error( 'Cannot close the listener on %s: %s',
+			$self->{path}, $! );
+	}
+	unless ( unlink $self->{path} ) {
+
+		# A socket that stays behind reads as a stale socket at
+		# the next start, and _remove_stale takes it then.
+		$self->_log->error( 'Cannot remove %s: %s', $self->{path}, $! );
+	}
+
+	return;
+}
+
 # $self->accept_one($loop):
 #	Take one connection and register it as a read handler on the
-#	loop.
+#	loop. The peer of an open connection cannot change, so one
+#	getsockopt(2) per connection is enough, and this is the place
+#	for it.
 sub accept_one ( $self, $loop )
 {
 	my $client = $self->{listener}->accept or return;
 
+	my ( $peer, $fault );
+	if (PEER_SUPPORTED) {
+		( $peer, $fault ) = _read_peer($client);
+
+		# The read cannot fail on a healthy UNIX socket, so a
+		# failure names a broken assumption. A control socket
+		# that cannot name its peer must not answer.
+		unless ($peer) {
+			$self->_log->error(
+				'Cannot read the peer credentials on %s: %s',
+				$self->{path}, $fault );
+			CORE::close $client;
+			return;
+		}
+	}
+
 	my $imsg = Fugu::Imsg->new( fh => $client );
 	$self->{clients}{ fileno $client } = $imsg;
+	$self->{peers}{ fileno $client }   = $peer;
 
 	# The loop already knows the socket is readable, thus the read
 	# takes what arrived and returns. A request that spans two
@@ -193,6 +294,7 @@ sub shutdown ( $self, %args )
 
 	for my $key ( keys %{ $self->{clients} } ) {
 		my $imsg = delete $self->{clients}{$key};
+		delete $self->{peers}{$key};
 		$loop->remove_fd( $imsg->{fh} ) if $loop && $imsg->{fh};
 		$imsg->close;
 	}
@@ -247,7 +349,14 @@ sub _serve_one ( $self, $imsg )
 			"unknown command: $command" );
 	}
 
-	my $reply = eval { $handler->( $request->{args} // {} ) };
+	# The credentials belong to the connection. peer answers only
+	# while the handler runs, so the local scope ends with the
+	# call.
+	my $reply = do {
+		local $self->{current_peer} =
+		    $self->{peers}{ fileno $imsg->{fh} };
+		eval { $handler->( $request->{args} // {} ) };
+	};
 	if ($@) {
 		my $reason = $@;
 		chomp $reason;
@@ -310,6 +419,65 @@ sub _send_error ( $self, $imsg, $peerid, $reason )
 	return 1;
 }
 
+# Fugu::Control->peer_supported:
+#	Report if the platform gives peer credentials in the struct
+#	sockpeercred order. A caller or a test uses this, not a log
+#	line, to tell "not supported" from "the read failed".
+sub peer_supported ($)
+{
+	return PEER_SUPPORTED ? 1 : 0;
+}
+
+# $self->peer:
+#	The credentials of the connection that the server answers now,
+#	as a hash reference with uid, gid and pid. The method returns
+#	undef outside a handler call, and undef where peer_supported is
+#	false. It holds no policy: the group of the socket is the
+#	coarse gate, and the handler is the fine gate.
+sub peer ($self)
+{
+	return $self->{current_peer};
+}
+
+# _read_peer($client):
+#	The peer credentials of one connection, as ($peer, $fault).
+#	One of the two is defined. getsockopt(2) with SO_PEERCRED
+#	returns a struct sockpeercred, and the length check guards the
+#	unpack.
+sub _read_peer ($client)
+{
+	# The constant probe fails closed. The base perl of OpenBSD
+	# 7.8 exports Socket::SO_PEERCRED, and a real guest verified
+	# the read. Socket still croaks at call time for a constant
+	# that a platform does not define, and the server must log and
+	# close instead.
+	my $option = eval { Socket::SO_PEERCRED() };
+	return ( undef, 'Socket defines no SO_PEERCRED' )
+	    unless defined $option;
+
+	my $cred = getsockopt( $client, SOL_SOCKET, $option );
+	return ( undef, "getsockopt: $!" ) unless defined $cred;
+
+	# A size other than 12 names an other struct layout, so the
+	# read fails closed instead of unpacking a guess.
+	return ( undef, length($cred) . ' credential bytes, not 12' )
+	    unless length($cred) == 12;
+
+	my ( $uid, $gid, $pid ) = _unpack_peer($cred);
+
+	return ( { uid => $uid, gid => $gid, pid => $pid }, undef );
+}
+
+# _unpack_peer($cred):
+#	The three fields of a struct sockpeercred: the user id, the
+#	group id, and the process id. The id fields are unsigned, so a
+#	uid at or above 2**31 stays positive. The process id is
+#	signed, per pid_t.
+sub _unpack_peer ($cred)
+{
+	return unpack 'L2l', $cred;
+}
+
 # $self->_drop_client($fh, $loop):
 #	Forget a connection that ended.
 sub _drop_client ( $self, $fh, $loop )
@@ -317,6 +485,7 @@ sub _drop_client ( $self, $fh, $loop )
 	# The handle is still open here: recv marks {dead} without
 	# closing, so fileno answers and the client entry is there.
 	my $imsg = delete $self->{clients}{ fileno $fh };
+	delete $self->{peers}{ fileno $fh };
 
 	$loop->remove_fd($fh);
 	$imsg->close;
@@ -359,7 +528,7 @@ sub _log ($self)
 }
 
 package Fugu::Control::Client;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use Errno qw(EACCES ENOENT);
 use IO::Socket::UNIX;

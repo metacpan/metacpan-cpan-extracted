@@ -258,7 +258,6 @@ values(SV* self_sv)
             }
         }
 
-
 void
 items(SV* self_sv)
     PPCODE:

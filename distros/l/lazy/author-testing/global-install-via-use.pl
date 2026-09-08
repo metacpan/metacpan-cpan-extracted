@@ -10,7 +10,7 @@ use feature qw( say );
 
 use lazy;
 
-use Acme::Urinal;
+use Acme::Urinal ();
 
 my $urinals = Acme::Urinal->new( [ 0 .. 7 ] );
 

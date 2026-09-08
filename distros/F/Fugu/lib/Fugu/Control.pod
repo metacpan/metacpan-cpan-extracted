@@ -71,9 +71,62 @@ The listener and every accepted connection register with the event
 loop that C<loop> names.
 That argument is necessary, and the method dies without it.
 
+C<mode> is the socket mode, as an integer, with the default C<0600>.
+C<group> is the socket group, as a name or as a numeric group id,
+with no default.
+A group name resolves with C<getgrnam>.
+An unresolvable name, a failed chown(2) and a failed chmod(2) are
+each a recoverable failure: the method takes the socket down, sets
+C<error()>, and returns C<undef>, so a half-built socket never
+accepts a connection.
+
+The socket never accepts a wider set of users than the final set.
+With no C<group> the mode holds from birth, through a umask(2) guard.
+With a C<group> the socket binds under the owner bits of the final
+mode, takes the group with chown(2), and widens to C<mode> with
+chmod(2) last.
+A daemon drops privileges first, and it calls C<listen> after.
+A process can chgrp its own file to a group that it belongs to, so
+the group form needs no root.
+
 =item C<accept_one($loop)>
 
 Take one connection and register it as a read handler on the loop.
+Where C<peer_supported()> is true, the method reads the peer
+credentials of the connection once, with getsockopt(2) and
+C<SO_PEERCRED>.
+A credential read that fails closes the connection at once, and the
+server logs the reason at the error level: a control socket that
+cannot name its peer must not answer.
+
+=item C<peer()>
+
+The credentials of the connection that the server is answering now,
+as a hash reference with C<uid>, C<gid> and C<pid>: the effective
+user id, the effective group id, and the process id of the peer.
+A handler that needs the operator identity calls it, and a handler
+that does not need it ignores it.
+
+The method returns C<undef> outside a handler call, and C<undef>
+where C<peer_supported()> is false.
+It holds no policy and reports three numbers.
+The group of the socket is the coarse gate, and the handler is the
+fine gate.
+
+On OpenBSD the read returns a C<struct sockpeercred>, which holds the
+user id, then the group id, then the process id.
+The field order differs from the Linux C<struct ucred>, which holds
+the process id first, and one module must not carry two field orders.
+The method therefore reads the credentials on OpenBSD only, and it
+reports "not supported" everywhere else, through C<peer_supported()>.
+
+=item C<peer_supported()>
+
+A class method.
+It returns true only where the platform reports peer credentials in
+the C<struct sockpeercred> order.
+A caller or a test uses it to tell "not supported" from "the read
+failed".
 
 =item C<shutdown(%args)>
 
@@ -137,15 +190,17 @@ The most recent failure.
 C<listen()> returns the server object, or C<undef> with the reason in
 C<error()>.
 C<request()> returns the decoded reply, or C<undef>.
-C<socket_absent()> returns 1 or 0.
+C<socket_absent()> and C<peer_supported()> return 1 or 0.
+C<peer()> returns a hash reference, or C<undef>.
 Every other method returns its object.
 
 =head1 FILES
 
 The socket that the caller names.
-The server creates it mode 0600, under a umask(2) guard, so it is
-never world-reachable even for an instant.
-A chmod(2) after the bind would leave that window open.
+The server creates it mode 0600 by default, under a umask(2) guard,
+so it is never world-reachable even for an instant.
+The C<mode> and C<group> arguments of C<listen()> widen it, and the
+socket still never accepts a wider set of users than the final set.
 
 The mode of the socket is the inner boundary.
 The directory that holds it is the outer one, and the caller owns
@@ -157,6 +212,8 @@ still root, mode 0700, owned by the daemon user.
 
 C<new()> dies without a path, and C<register()> dies without a code
 reference.
+C<listen()> dies for a C<mode> that is not an integer from 0 to
+C<0777>.
 Those are programming errors.
 
 Nothing that arrives on the socket makes anything die.

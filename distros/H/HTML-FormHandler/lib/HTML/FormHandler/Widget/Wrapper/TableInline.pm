@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Wrapper::TableInline;
 # ABSTRACT: wrapper class for table layout that doesn't wrap compound fields
-$HTML::FormHandler::Widget::Wrapper::TableInline::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Wrapper::TableInline::VERSION = '0.410002';
 use Moose::Role;
 with 'HTML::FormHandler::Widget::Wrapper::Base';
 use HTML::FormHandler::Render::Util ('process_attrs');
@@ -39,7 +39,7 @@ HTML::FormHandler::Widget::Wrapper::TableInline - wrapper class for table layout
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

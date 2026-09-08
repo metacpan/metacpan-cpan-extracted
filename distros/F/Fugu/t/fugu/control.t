@@ -360,4 +360,278 @@ subtest 'the socket is 0600 from birth' => sub {
 	$control->shutdown;
 };
 
+subtest 'listen with mode gives the named mode' => sub {
+	my $path = "$dir/mode0660.sock";
+
+	# A wide umask must not widen the socket, and the named mode
+	# must hold anyway: the guard derives from the mode.
+	my $old     = umask 0;
+	my $control = Fugu::Control->new( path => $path );
+	ok( $control->listen( loop => Fugu::EventLoop->new, mode => 0660 ),
+		'the server bound' )
+	    or diag( $control->error // 'no error recorded' );
+	umask $old;
+
+	is( ( stat $path )[2] & 07777, 0660, 'the socket is 0660' );
+
+	$control->shutdown;
+};
+
+# _other_group():
+#	A supplementary group id of the test process that differs from
+#	the effective group. The socket carries the effective group at
+#	birth, so only an other group can prove the chown.
+sub _other_group ()
+{
+	my ( $egid, @rest ) = split ' ', $);
+	my ($other) = grep { $_ != $egid } @rest;
+
+	return $other;
+}
+
+subtest 'listen with group sets the socket group' => sub {
+	my $path = "$dir/group.sock";
+
+	# A supplementary group: a process can chgrp its own file to a
+	# group that it belongs to, so the call needs no root. The
+	# effective group would prove nothing, because the socket
+	# carries it already.
+	my $gid = _other_group();
+	plan skip_all => 'the test process has one group alone'
+	    unless defined $gid;
+
+	my $control = Fugu::Control->new( path => $path );
+	ok(
+		$control->listen(
+			loop  => Fugu::EventLoop->new,
+			mode  => 0660,
+			group => $gid,
+		),
+		'the server bound'
+	    )
+	    or diag( $control->error // 'no error recorded' );
+
+	is( ( stat $path )[5], $gid, 'the socket carries the group' );
+	is( ( stat $path )[2] & 07777, 0660, 'and the mode' );
+
+	$control->shutdown;
+};
+
+subtest 'listen resolves a group name with getgrnam' => sub {
+	my $gid = _other_group();
+	plan skip_all => 'the test process has one group alone'
+	    unless defined $gid;
+
+	my $name = getgrgid($gid);
+	plan skip_all => 'the supplementary group has no name'
+	    unless defined $name && length $name;
+
+	my $path    = "$dir/groupname.sock";
+	my $control = Fugu::Control->new( path => $path );
+	ok(
+		$control->listen(
+			loop  => Fugu::EventLoop->new,
+			mode  => 0660,
+			group => $name,
+		),
+		'the server bound with a group name'
+	    )
+	    or diag( $control->error // 'no error recorded' );
+
+	is( ( stat $path )[5], $gid, 'the name resolved to the group id' );
+
+	$control->shutdown;
+};
+
+subtest 'an unresolvable group is a recoverable failure' => sub {
+	my $path = "$dir/nogroup.sock";
+
+	my $control = Fugu::Control->new( path => $path );
+	is(
+		$control->listen(
+			loop  => Fugu::EventLoop->new,
+			group => 'fugu-no-such-group',
+		),
+		undef,
+		'listen returns undef'
+	);
+	like( $control->error, qr/fugu-no-such-group/,
+		'the reason names the group' );
+	ok( !-e $path, 'and no file stays at the path' );
+};
+
+subtest 'a numeric group without a group entry is refused too' => sub {
+
+	# A chown to a group id that no group holds reports success,
+	# so the boundary must catch the number like it catches a
+	# name.
+	my $bogus;
+	for my $candidate ( 61000 .. 61050 ) {
+		next if defined getgrgid($candidate);
+		$bogus = $candidate;
+		last;
+	}
+	plan skip_all => 'every probed group id exists'
+	    unless defined $bogus;
+
+	my $path    = "$dir/bogusgid.sock";
+	my $control = Fugu::Control->new( path => $path );
+	is(
+		$control->listen(
+			loop  => Fugu::EventLoop->new,
+			group => $bogus,
+		),
+		undef,
+		'listen returns undef'
+	);
+	like( $control->error, qr/\Q$bogus\E/,
+		'the reason names the group id' );
+	ok( !-e $path, 'and no file stays at the path' );
+};
+
+subtest 'a failed chown takes the socket down' => sub {
+	plan skip_all => 'root can chgrp to any group' if $> == 0;
+
+	# A non-root process cannot chgrp to a group outside its own
+	# set, so group 0 forces the chown failure after the bind.
+	my %mine = map { $_ => 1 } split ' ', $);
+	plan skip_all => 'the test process is in group 0' if $mine{0};
+
+	my $path    = "$dir/chownfail.sock";
+	my $control = Fugu::Control->new( path => $path );
+
+	is(
+		$control->listen(
+			loop  => Fugu::EventLoop->new,
+			mode  => 0660,
+			group => 0,
+		),
+		undef,
+		'listen returns undef'
+	);
+	like( $control->error, qr/chown/, 'the reason names the chown' );
+	ok( !-e $path, 'and the half-built socket is gone' );
+};
+
+subtest 'a mode outside the permission bits dies' => sub {
+	my $control = Fugu::Control->new( path => "$dir/badmode.sock" );
+
+	ok( !eval {
+		$control->listen( loop => Fugu::EventLoop->new,
+			mode => 07777 );
+		1;
+	    },
+		'a mode above 0777 dies' );
+	like( $@, qr/Invalid socket mode/, 'and says so' );
+};
+
+subtest 'the credential read answers or fails closed' => sub {
+
+	# The read guards the constant, so a perl whose Socket module
+	# defines no SO_PEERCRED gets a reason, never a croak. The
+	# platform decides which branch this proves.
+	socketpair( my $a_end, my $b_end, Socket::AF_UNIX(),
+		SOCK_STREAM, Socket::PF_UNSPEC() )
+	    or die "socketpair: $!";
+
+	my ( $peer, $fault ) = Fugu::Control::_read_peer($a_end);
+
+	if ( Fugu::Control->peer_supported ) {
+
+		# The peer of a socketpair is this process, and the
+		# field order is the sockpeercred order, so the values
+		# must match exactly.
+		is( $fault, undef, 'the read reports no fault' );
+		is( $peer->{uid}, $>, 'the uid is the effective uid' );
+		is( $peer->{gid}, ( split ' ', $) )[0],
+			'the gid is the effective gid' );
+		is( $peer->{pid}, $$, 'the pid is this process' );
+	}
+	elsif ( defined eval { Socket::SO_PEERCRED() } ) {
+
+		# The platform defines the constant with an other
+		# field order, so only the fail-closed shape holds
+		# here. The fabricated-bytes subtest below locks the
+		# unpack itself.
+		ok( defined $peer || defined $fault, 'one of the two answers' );
+	}
+	else {
+		is( $peer, undef, 'no credentials come back' );
+		like( $fault, qr/SO_PEERCRED/,
+			'and the reason names the constant' );
+	}
+
+	close $a_end;
+	close $b_end;
+};
+
+subtest 'the credential unpack keeps a large id positive' => sub {
+
+	# The id fields of a struct sockpeercred are unsigned, and the
+	# process id is signed. A signed read would turn a uid at or
+	# above 2**31 negative, and a gate would then compare the
+	# wrong number.
+	my @fields = Fugu::Control::_unpack_peer(
+		pack 'L2l', 4026531840, 4026531841, 1234 );
+	is_deeply(
+		\@fields,
+		[ 4026531840, 4026531841, 1234 ],
+		'a uid and a gid at or above 2**31 stay positive'
+	);
+};
+
+subtest 'peer answers only inside a handler' => sub {
+	my $control = Fugu::Control->new( path => "$dir/peer.sock" );
+	is( $control->peer, undef, 'peer is undef outside a handler' );
+
+	is( Fugu::Control->peer_supported,
+		$^O eq 'openbsd' ? 1 : 0,
+		'peer_supported is true on OpenBSD alone' );
+};
+
+subtest 'peer is undef where the platform is not supported' => sub {
+	plan skip_all => 'the platform reports peer credentials'
+	    if Fugu::Control->peer_supported;
+
+	my ( $path, $pid ) = start_server(
+		sub ($control) {
+			$control->register(
+				has_peer => sub ($) {
+					return { seen => $control->peer
+						    ? 1 : 0 };
+				} );
+		} );
+
+	my $client = Fugu::Control::Client->new( path => $path );
+	is_deeply( $client->request('has_peer'), { seen => 0 },
+		'a handler sees undef off OpenBSD' );
+
+	$client->disconnect;
+	stop_server( $pid, $path );
+};
+
+subtest 'peer names the connected peer on OpenBSD' => sub {
+	plan skip_all => 'peer credentials need OpenBSD'
+	    unless Fugu::Control->peer_supported;
+
+	my ( $path, $pid ) = start_server(
+		sub ($control) {
+			$control->register(
+				whoami => sub ($) { $control->peer } );
+		} );
+
+	my $client = Fugu::Control::Client->new( path => $path );
+	my $peer   = $client->request('whoami');
+
+	ok( defined $peer, 'the handler read the credentials' )
+	    or diag( $client->error // 'no error recorded' );
+	is( $peer->{uid}, $>, 'the uid is the effective uid of the client' );
+	is( $peer->{gid}, ( split ' ', $) )[0],
+		'the gid is the effective gid of the client' );
+	is( $peer->{pid}, $$, 'the pid is the pid of the client' );
+
+	$client->disconnect;
+	stop_server( $pid, $path );
+};
+
 done_testing();

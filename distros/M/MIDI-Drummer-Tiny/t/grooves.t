@@ -1,5 +1,8 @@
-#!perl
+#!/usr/bin/env perl
+use strict;
+
 use Test::More;
+# use Data::Dumper::Compact 'ddc';
 
 use_ok 'MIDI::Drummer::Tiny::Grooves';
 
@@ -41,6 +44,17 @@ subtest groove => sub {
     is $got->{$n}{name}, 'ROCK 2', 'named';
     my %got = $grooves->groove($got->{$n}{groove});
     is_deeply $got{kick}, [qw(1 0 0 0 0 0 0 1 1 0 1 0 0 0 0 0)], 'kick';
+};
+
+subtest swap => sub {
+    my $grooves = new_ok 'MIDI::Drummer::Tiny::Grooves' => [
+        share_file => './share/drum-pattern-bit-strings.txt',
+    ];
+    my $got = $grooves->get_groove(100);
+    isa_ok $got, 'HASH', 'get_groove';
+    $got = $grooves->swap_pat($got->{groove}, 'crash', 'closed');
+    ok !exists $got->{crash}, 'swap_pat';
+    ok exists $got->{closed}, 'swap_pat';
 };
 
 done_testing();

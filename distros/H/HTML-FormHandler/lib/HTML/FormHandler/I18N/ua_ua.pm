@@ -1,6 +1,6 @@
 package HTML::FormHandler::I18N::ua_ua;
 # ABSTRACT: Ukrainian message file
-$HTML::FormHandler::I18N::ua_ua::VERSION = '0.410001';
+$HTML::FormHandler::I18N::ua_ua::VERSION = '0.410002';
 use strict;
 use warnings;
 use utf8;
@@ -111,7 +111,7 @@ HTML::FormHandler::I18N::ua_ua - Ukrainian message file
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 AUTHOR
 

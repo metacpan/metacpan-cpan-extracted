@@ -1,6 +1,6 @@
 package HTML::FormHandler;
 # ABSTRACT: HTML forms using Moose
-$HTML::FormHandler::VERSION = '0.410001';
+$HTML::FormHandler::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Base'; # to make some methods overridable by roles
 with 'HTML::FormHandler::Model', 'HTML::FormHandler::Fields',
@@ -817,7 +817,7 @@ HTML::FormHandler - HTML forms using Moose
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension Mail::JMAPTalk.
 
+0.19    Mon Sep  7 2026
+    - new "accountId" option and accessor: a default accountId added to
+      every method call that does not give one (fromAccountId as well for
+      the /copy methods), and used by Upload() when no account is passed.
+      RFC 8620 requires accountId on every method except Core/echo, and
+      servers are starting to reject calls without it
+
 0.18    Mon Aug 31 2026
     - clarify licensing: same terms as Perl itself (Artistic License 1.0
       or GPL version 1 or later)

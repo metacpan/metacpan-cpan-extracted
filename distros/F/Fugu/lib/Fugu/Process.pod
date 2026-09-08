@@ -24,12 +24,14 @@ get wrong. It shows the difference between a child that runs and a
 child that exits immediately. It sends C<SIGTERM> first and sends
 C<SIGKILL> after a delay. It reaps zombies and does not block.
 
-Two methods start a child. C<spawn_command()> leaves it running.
-C<run()> waits for it and captures what it wrote. Both report a failed
-execve(2) exactly, over a close-on-exec pipe, and never by a
-wait-and-guess sleep(3). Neither one runs a shell: the command is a
-list, so no argument needs quoting and no argument can become a shell
-operator.
+Three methods start a child. C<spawn_command()> leaves it running.
+C<run()> waits for it and captures what it wrote. C<spawn_peer()>
+connects it to the caller over a socketpair(2), for the OpenBSD
+pattern of a privileged parent with unprivileged children. Each one
+reports a failed execve(2) exactly, over a close-on-exec pipe, and
+never by a wait-and-guess sleep(3). None of them runs a shell: the
+command is a list, so no argument needs quoting and no argument can
+become a shell operator.
 
 The module keeps no state. Every method is a class method.
 
@@ -113,6 +115,36 @@ absolute path, or name C<PATH> in C<env>. C<HOME>, C<TERM>, C<TZ>
 and C<LC_ALL> can matter to a given child, and the module adds none
 of them.
 
+=item C<inherit>
+
+An array reference of open handles that the child keeps across the
+execve(2). The default is the empty list.
+
+Perl sets C<FD_CLOEXEC> on each descriptor above C<$^F>, which is 2,
+so a descriptor that the parent opened does not survive an exec on
+its own. The child clears the flag on each named descriptor. It then
+closes every other descriptor from 3 upward, and it keeps a named
+descriptor, a standard descriptor, and the pipe that reports an exec
+failure. The sweep runs on every call. Perl already closes each
+flagged descriptor at the exec. The sweep therefore changes the
+outcome only for a descriptor that stayed inheritable. A library can
+leave one open, and a caller can clear the flag itself. Name such a
+descriptor in C<inherit> when the child must keep it.
+
+On Linux and Darwin the sweep walks the open-descriptor list of the
+process, from F</proc/self/fd> or F</dev/fd>, so a large descriptor
+limit costs nothing. Where neither list opens, and on OpenBSD, the
+sweep is a loop to C<_SC_OPEN_MAX>. The OpenBSD limit is small, and
+the loop reads no file, so it needs no pledge(2) promise beyond what
+the caller holds.
+
+The method keeps each named descriptor at its own number. A caller
+that must tell the child a number reads C<fileno> before the call,
+and puts the number in C<cmd>.
+
+The method dies when the value is not an array reference, and when a
+member has no descriptor. Both are programming errors.
+
 =back
 
 The parent always waits for the execve(2) to resolve. The child holds
@@ -120,6 +152,61 @@ the write end of a close-on-exec pipe. A successful execve(2) closes
 that end, and the parent reads end-of-file. A failure leaves a message
 in the pipe, and the parent returns it in C<error>. Thus a command
 that does not exist reports its own reason at once.
+
+=head2 spawn_peer
+
+C<spawn_peer(%args)> starts a peer child over a socketpair(2). A
+daemon that follows the OpenBSD parent-and-children pattern uses it:
+the parent creates the pair, forks, and execs its own program with a
+role flag, and the child inherits its end of the pair.
+
+These are the arguments:
+
+=over 4
+
+=item C<cmd>
+
+An array reference that holds the command and its arguments. This
+argument is necessary and must not be empty. The method has no
+default command: a program can rewrite C<$0>, and a relative C<$0>
+breaks after a chdir(2), so the caller names its own program and its
+own role flag.
+
+=item C<fd>
+
+The descriptor number that the child receives. The default is 3. The
+method dies when the number is below 3, and when it collides with an
+C<inherit> descriptor. Both are programming errors.
+
+=item C<inherit>
+
+Extra handles for the child, exactly as on C<spawn_command()>.
+
+=item C<env>
+
+The environment of the child, exactly as on C<spawn_command()>. A
+peer child of the privilege-separation pattern holds no secret of
+the parent environment when the caller names an exact one.
+
+=back
+
+The method creates the pair with C<socketpair(AF_UNIX, SOCK_STREAM,
+PF_UNSPEC)>, forks, and execs. In the child it closes the parent end,
+puts the child end on C<fd> with C<FD_CLOEXEC> clear, and sweeps
+every other descriptor from 3 upward, as under C<inherit> above. In
+the parent it closes the child end and returns the parent end.
+
+The child opens its end with C<open($peer, '+E<lt>&=', $fd)>, so it
+needs no descriptor argument. The parent end comes back as a plain
+handle, and the caller wraps it when it wants framing, for example
+with C<Fugu::Imsg-E<gt>new(fh =E<gt> $handle)>. The module holds no
+transport.
+
+The method makes no session and no process group. A peer child stays
+in the group of the parent, so one signal can reach the whole set.
+The child holds the privileges of the parent at the exec: the
+privilege drop and the pledge(2) belong to L<Fugu::Privdrop> and
+L<Fugu::Sandbox>, and the child calls them after the exec.
 
 =head2 run
 
@@ -269,6 +356,9 @@ C<spawn_command()> and C<spawn_perl()> return a hash reference. On
 success, the hash holds C<success> set to 1 and C<pid>. On failure,
 C<success> is 0 and C<error> gives the cause.
 
+C<spawn_peer()> returns the same shape, and the success hash also
+holds C<socket>, the parent end of the pair.
+
 C<run()> returns a hash reference that holds C<success>, C<stdout>,
 C<stderr>, C<exit_code> and C<timed_out>. On a failure to start the
 child, it also holds C<error>. C<success> is 1 only when the child
@@ -299,13 +389,19 @@ This example runs a helper and then stops it:
 
 =head1 ERRORS
 
-No method dies. The methods report failures through the hash reference
-or the boolean value that they return.
+No method dies for a failure of the system: the methods report such a
+failure through the hash reference or the boolean value that they
+return.
+
+A programming error dies. These are the cases: an C<inherit> value
+that is not an array reference, an C<inherit> member with no
+descriptor, an C<fd> below 3, and an C<fd> that collides with an
+C<inherit> descriptor.
 
 =head1 SEE ALSO
 
-execve(2), kill(2), setsid(2), waitpid(2), L<Fugu::Log>,
-L<Fugu::Pidfile>
+execve(2), kill(2), setsid(2), socketpair(2), waitpid(2),
+L<Fugu::Imsg>, L<Fugu::Log>, L<Fugu::Pidfile>
 
 =head1 AUTHORS
 

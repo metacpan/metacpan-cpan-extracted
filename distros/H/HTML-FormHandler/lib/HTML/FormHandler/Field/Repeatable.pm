@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Repeatable;
 # ABSTRACT: repeatable (array) field
-$HTML::FormHandler::Field::Repeatable::VERSION = '0.410001';
+$HTML::FormHandler::Field::Repeatable::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field::Compound';
 
@@ -300,7 +300,7 @@ HTML::FormHandler::Field::Repeatable - repeatable (array) field
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

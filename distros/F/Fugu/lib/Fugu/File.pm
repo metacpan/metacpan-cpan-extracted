@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::File;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use Fcntl          qw(O_CREAT O_EXCL O_TRUNC O_WRONLY);
 use File::Basename qw(dirname);

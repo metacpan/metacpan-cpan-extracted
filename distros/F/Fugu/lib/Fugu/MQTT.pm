@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::MQTT;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use Fugu::Log;
 use Fugu::Timeout;

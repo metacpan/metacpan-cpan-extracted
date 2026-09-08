@@ -1,5 +1,17 @@
 Revision history for Fetch
 
+0.24    2026-09-07
+        - ft_win.h defines ECONNRESET, ECONNREFUSED and ETIMEDOUT when
+          <errno.h> lacks them.
+        - ssize_t under MSVC, whose CRT has none.
+        - strcasecmp/strncasecmp map to the CRT names under MSVC, which
+          has neither <strings.h> nor the POSIX spellings.
+        - The select backend reads the clock with
+          QueryPerformanceCounter; GetTickCount64 is hidden unless
+          _WIN32_WINNT >= 0x0600 and cl silently truncated it to an int.
+        - A non-blocking connect on Winsock reports WSAEWOULDBLOCK, not
+          EINPROGRESS
+
 0.23    2026-09-06
         - A Fetch::Loop::Standalone inherited across a fork no longer
           touches the parent's backend, whose kernel object is shared

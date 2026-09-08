@@ -1,6 +1,6 @@
 =head1 NAME
 
-Fugu::Signify - verify a signify(1) signature and a SHA256 manifest
+Fugu::Signify - verify a signify(1) signature, and read and write a SHA256 manifest
 
 =head1 SYNOPSIS
 
@@ -27,7 +27,8 @@ Fugu::Signify - verify a signify(1) signature and a SHA256 manifest
 
 Fugu::Signify verifies a file against a signify(1) public key and a
 signature file. It also verifies each named file of a signed SHA256
-manifest against its digest. The module runs signify(1) through
+manifest against its digest. It reads and writes the manifest form
+itself, so a producer and a checker share one implementation. The module runs signify(1) through
 L<Fugu::Process>, with an argument list and never a shell. It computes
 each manifest digest with core L<Digest::SHA>, and the digest streams
 from a file handle, so a large file never enters memory whole.
@@ -138,11 +139,74 @@ verifies a file before it moves the file into place:
         files    => { 'miniroot78.img' => $tmp_path },
     );
 
+=head2 parse_manifest
+
+C<parse_manifest($bytes)> is the public form of the parser that
+C<verify_manifest> uses. It returns a hash reference of manifest key to
+lower-case digest.
+
+Two callers read a manifest without a signature at that moment. A
+rotation writes a manifest, and it must read the file that it wrote. A
+site check compares a manifest against the files beside it, and a site
+build cannot sign. A private parser would make each one write the line
+form again.
+
+The method verifies nothing. A caller that needs the signature calls
+C<verify_manifest>, which verifies the signature before it digests one
+file.
+
+An undef input, an empty manifest, a line that the method cannot
+parse, a digest that is not 64 hexadecimal characters, and a duplicate
+key are each a failure.
+
+=head2 write_manifest
+
+C<write_manifest(\%digests)> returns the text of a C<SHA256> manifest.
+Each line holds C<SHA256 (key) = digest>.
+
+The keys sort in ascending order, so two runs of a rotation write one
+byte sequence. A diff of two manifests then shows the change only. The
+method lowercases each digest.
+
+The key of a line is a file name, a file path, or a download URL,
+whichever the producer writes. The method therefore rejects only a key
+that another reader cannot carry.
+
+C<parse_manifest> takes the text up to the last parenthesis. It
+therefore reads a key with a parenthesis back without a change. A
+stricter reader does not.
+
+A parenthesis ends the key in a reader that stops at the first one.
+Whitespace breaks a reader that splits a line on space. A manifest
+travels to sha256(1) and to C<scripts/deps>, so the writer holds a
+key to the strict form.
+
+The whitespace test names the ASCII whitespace alone. A file name that
+holds a byte above 127 therefore passes.
+
+Each of these is a failure: an empty hash, an empty key, a key with a
+parenthesis, a key with whitespace, and a digest that is not 64
+hexadecimal characters.
+
+The method dies when the argument is not a hash reference.
+
+Neither method needs signify(1). An object whose command did not
+resolve still parses and still writes.
+
+C<new> still needs a non-empty C<keys>, because the verification
+methods need a key set. A caller that only parses or writes names any
+path, and it never reads C<error> from the construction:
+
+    my $manifest = Fugu::Signify->new(keys => ['/nonexistent']);
+    my $text     = $manifest->write_manifest(\%digests);
+
 =head1 RETURN VALUES
 
 C<verify()> and C<verify_manifest()> return the public key file that
-verified the signature, or C<undef>. C<error()> returns the reason of
-the most recent failure, or C<undef>.
+verified the signature, or C<undef>. C<parse_manifest()> returns a
+hash reference, and C<write_manifest()> returns text; each one returns
+C<undef> on a failure. C<error()> returns the reason of the most
+recent failure, or C<undef>.
 
 =head1 CAVEATS
 
@@ -164,7 +228,8 @@ command. The pledge belongs to the program, not to a library method.
 
 =head1 SEE ALSO
 
-signify(1), sha256(1), L<Digest::SHA>, L<Fugu::File>, L<Fugu::Process>
+signify(1), sha256(1), L<Digest::SHA>, L<Fugu::File>,
+L<Fugu::KeyDir>, L<Fugu::Process>
 
 =head1 AUTHORS
 

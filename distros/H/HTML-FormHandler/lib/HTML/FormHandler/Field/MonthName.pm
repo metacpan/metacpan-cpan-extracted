@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::MonthName;
 # ABSTRACT: select list with month names
-$HTML::FormHandler::Field::MonthName::VERSION = '0.410001';
+$HTML::FormHandler::Field::MonthName::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field::Select';
 
@@ -40,7 +40,7 @@ HTML::FormHandler::Field::MonthName - select list with month names
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

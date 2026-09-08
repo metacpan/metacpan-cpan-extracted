@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb;
-our $VERSION = '0.2.0';
+our $VERSION = '0.4.0';
 
 # App::FuguWeb - a static documentation site for a Perl project.
 #
@@ -43,6 +43,15 @@ use constant CONFIG_FILE => '.fuguwebrc';
 # links it. The site is served from one flat directory, so the name
 # is a file name there.
 use constant STYLESHEET => 'style.css';
+
+# The staging directory for the mdoc sources, inside the output
+# directory. The build makes it, uses it, and removes it again.
+#
+# The name lives here because two modules need it. The build owns the
+# directory. The description must refuse a key directory of the same
+# name, because the build would remove the published keys with the
+# staging.
+use constant STAGING_DIR => '.man';
 
 # escape_html($text):
 #	Escape the three characters that change the meaning of HTML
@@ -92,6 +101,45 @@ sub list_dir ($dir)
 	closedir $dh;
 
 	return \@names;
+}
+
+# list_tree($dir, $prefix):
+#	Every leaf below the directory, as paths relative to it: each
+#	file, each symlink, and each directory that holds nothing. The
+#	function returns an array reference, or undef with the reason
+#	in $!.
+#
+#	The function recurses into a plain directory, and never
+#	through a symlink. A symlinked directory is one entry: the
+#	build owns neither the target of the link nor what sits under
+#	it.
+#
+#	An empty directory is a leaf, so a caller sees it. A walk that
+#	answered with files alone would hide a stray directory from
+#	the checks, and the clean refuses one.
+#
+#	A site is one flat directory of files, and the key directory
+#	is the one part below it. The output therefore needs a walk of
+#	the tree wherever a walk of one level served before.
+sub list_tree ( $dir, $prefix = '' )
+{
+	my $names = list_dir($dir) or return;
+
+	my @paths;
+	for my $name (@$names) {
+		my $path     = "$dir/$name";
+		my $relative = "$prefix$name";
+
+		if ( -d $path && !-l $path ) {
+			my $below = list_tree( $path, "$relative/" ) or return;
+			push @paths, @$below ? @$below : $relative;
+			next;
+		}
+
+		push @paths, $relative;
+	}
+
+	return \@paths;
 }
 
 # path_below($path, $root):

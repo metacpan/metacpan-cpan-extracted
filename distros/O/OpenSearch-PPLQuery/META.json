@@ -1,0 +1,62 @@
+{
+   "abstract" : "Run OpenSearch Piped Processing Language queries from the command line",
+   "author" : [
+      "John Karr <brainbuz@brainbuz.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.038, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OpenSearch-PPLQuery",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cpanel::JSON::XS" : "4.37",
+            "HTTP::Request" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Scalar::Util" : "0",
+            "URI" : "0",
+            "perl" : "5.036"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Daemon" : "0",
+            "HTTP::Response" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/brainbuz/pplquery/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/brainbuz/pplquery",
+         "web" : "https://codeberg.org/brainbuz/pplquery"
+      }
+   },
+   "version" : "1.0.0",
+   "x_generated_by_perl" : "v5.44.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.44",
+   "x_spdx_expression" : "GPL-3.0-only"
+}
+

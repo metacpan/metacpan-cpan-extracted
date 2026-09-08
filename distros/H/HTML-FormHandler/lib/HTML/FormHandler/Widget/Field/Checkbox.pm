@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Field::Checkbox;
 # ABSTRACT: HTML attributes field role
-$HTML::FormHandler::Widget::Field::Checkbox::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Field::Checkbox::VERSION = '0.410002';
 use Moose::Role;
 use namespace::autoclean;
 use HTML::FormHandler::Render::Util ('process_attrs');
@@ -43,7 +43,7 @@ HTML::FormHandler::Widget::Field::Checkbox - HTML attributes field role
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

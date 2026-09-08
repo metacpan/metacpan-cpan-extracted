@@ -1,6 +1,6 @@
 package HTML::FormHandler::Moose::Role;
 # ABSTRACT: to add sugar to roles
-$HTML::FormHandler::Moose::Role::VERSION = '0.410001';
+$HTML::FormHandler::Moose::Role::VERSION = '0.410002';
 use Moose::Role;
 use Moose::Exporter;
 
@@ -54,7 +54,7 @@ HTML::FormHandler::Moose::Role - to add sugar to roles
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

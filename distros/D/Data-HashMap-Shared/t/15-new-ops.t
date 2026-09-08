@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 use File::Temp ();
 use File::Spec ();
 
@@ -154,7 +155,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100, 0, 30);
     $map->put_ttl(1, 100, 1);
-    sleep 2;
+    Time::HiRes::sleep(1.2);
     my @r = $map->get_with_ttl(1);
     is_deeply(\@r, [], 'get_with_ttl: empty on expired');
     unlink $path;
@@ -213,9 +214,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     ok($n > 0 && $n < 10_000, "map filled to capacity at $n entries");
     is($m->incr(0), 1, 'incr on an existing key works at capacity (no insert needed)');
     ok(!eval { $m->incr(999_999); 1 }, 'incr on a new key croaks when the map is full');
-    like($@, qr/increment failed/, '  ...with the documented message');
+    like($@, qr/increment failed/, '  ...naming the failed operation');
     ok(!eval { $m->incr_by(888_888, 5); 1 }, 'incr_by on a new key croaks when full');
-    like($@, qr/incr_by failed/, '  ...with the documented message');
+    like($@, qr/incr_by failed/, '  ...naming the failed operation');
     unlink $path;
 }
 
@@ -227,7 +228,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     $m->put(1, 100);
     my @live = $m->get_with_ttl(1);
     is($live[0], 100, 'get_with_ttl: value present before expiry');
-    sleep 2;                                                    # key 1 expires
+    Time::HiRes::sleep(1.2);                                                    # key 1 expires
     my @expired = $m->get_with_ttl(1);
     is_deeply(\@expired, [], 'get_with_ttl on an expired key returns empty list');
     unlink $path;

@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0807';
+our $VERSION = '0.0808';
 
 use Moo;
 use strictures 2;
@@ -67,6 +67,12 @@ has midi_out => (
 
 has _midi_routine => (
     is => 'rw',
+);
+
+
+has silent => (
+    is      => 'ro',
+    default => 0,
 );
 
 
@@ -140,7 +146,7 @@ sub _filter_and_forward ($self, $port, $dt, $event) {
         return if $filter->($port, $dt, $event);
     }
 
-    $self->send_it($event);
+    $self->send_it($event) unless $self->silent;
 }
 
 
@@ -219,7 +225,7 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0807
+version 0.0808
 
 =head1 SYNOPSIS
 
@@ -319,6 +325,12 @@ Return or set the B<filters>.
   $midi_out = $rtc->midi_out;
 
 Return the B<midi_out> port.
+
+=head2 silent
+
+  $silent = $rtc->silent;
+
+Don't send an event to the midi out port.
 
 =head1 METHODS
 

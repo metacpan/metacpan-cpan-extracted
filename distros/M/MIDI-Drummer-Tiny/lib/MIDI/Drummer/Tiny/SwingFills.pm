@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::SwingFills;
-$MIDI::Drummer::Tiny::SwingFills::VERSION = '0.7015';
+$MIDI::Drummer::Tiny::SwingFills::VERSION = '0.7016';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
@@ -391,7 +391,7 @@ MIDI::Drummer::Tiny::SwingFills
 
 =head1 VERSION
 
-version 0.7015
+version 0.7016
 
 =head1 SYNOPSIS
 

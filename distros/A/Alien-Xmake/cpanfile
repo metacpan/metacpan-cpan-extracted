@@ -6,6 +6,7 @@ requires 'perl', 'v5.40.0';
 on configure => sub {
     requires 'Archive::Tar';
     requires 'CPAN::Meta';
+    requires 'Capture::Tiny';
     requires 'Data::Dumper';
     requires 'Exporter',          '5.57';
     requires 'ExtUtils::Helpers', '0.028';
@@ -23,6 +24,7 @@ on configure => sub {
     requires 'perl', 'v5.40.0';
 };
 on build => sub {
+    requires 'Capture::Tiny';
     requires 'Exporter',          '5.57';
     requires 'ExtUtils::Helpers', '0.028';
     requires 'ExtUtils::Install';
@@ -43,8 +45,6 @@ on test => sub {
     requires 'Capture::Tiny';
     requires 'File::Temp';
     requires 'Test2::V0';
-    recommends 'Affix';
-    recommends 'FFI::Platypus';
 };
 on develop => sub {
     requires 'CPAN::Uploader';

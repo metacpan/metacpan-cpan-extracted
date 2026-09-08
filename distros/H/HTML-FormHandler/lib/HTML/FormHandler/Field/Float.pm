@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Float;
 # ABSTRACT: validate a float value
-$HTML::FormHandler::Field::Float::VERSION = '0.410001';
+$HTML::FormHandler::Field::Float::VERSION = '0.410002';
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Field::Text';
 
@@ -94,7 +94,7 @@ HTML::FormHandler::Field::Float - validate a float value
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

@@ -1,8 +1,11 @@
 package HTML::FormHandler::Render::Util;
 # ABSTRACT: rendering utility
-$HTML::FormHandler::Render::Util::VERSION = '0.410001';
+$HTML::FormHandler::Render::Util::VERSION = '0.410002';
+use strict;
+use warnings;
 use Sub::Exporter;
 Sub::Exporter::setup_exporter({ exports => [ 'process_attrs', 'cc_widget', 'ucc_widget' ] } );
+use HTML::Entities qw( encode_entities );
 
 
 # this is a function for processing various attribute flavors
@@ -23,7 +26,11 @@ sub process_attrs {
                 $value = $attrs->{$attr};
             }
         }
-        push @use_attrs, sprintf( '%s="%s"', $attr, $value );
+        # we use double quotes as the delimiter so only html encode those
+        # HTML attribute context
+        # as we use double quotes we need to encode those
+        # & is the html encoding character and therefore needs encoding as well
+        push @use_attrs, sprintf( '%s="%s"', $attr, encode_entities($value, '"&') );
     }
     my $output = join( ' ', @use_attrs );
     $output = " $output" if length $output;
@@ -68,7 +75,7 @@ HTML::FormHandler::Render::Util - rendering utility
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 

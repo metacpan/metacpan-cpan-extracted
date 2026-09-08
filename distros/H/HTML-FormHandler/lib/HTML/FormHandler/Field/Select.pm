@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Select;
 # ABSTRACT: select fields
-$HTML::FormHandler::Field::Select::VERSION = '0.410001';
+$HTML::FormHandler::Field::Select::VERSION = '0.410002';
 use Moose;
 extends 'HTML::FormHandler::Field';
 use Carp;
@@ -361,7 +361,7 @@ HTML::FormHandler::Field::Select - select fields
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 DESCRIPTION
 

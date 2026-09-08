@@ -3,19 +3,17 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 
-# Regression (0.18): shm_str_store / shm_inline_pack published a string's
-# (off, len_field) pair as two independent stores.  Updating a LIVE entry's
-# value therefore had a window where the node held the NEW offset with the OLD
-# length.  The entry stays LIVE (the update path never touches states[idx]) and
-# recovery cannot detect it, so a later shm_str_free derived the arena size
-# class from the stale length and filed the block on the WRONG free list --
-# after which an allocation from that class hands out an undersized block and
-# the next value written overruns into a neighbouring entry.
+# A string's (off, len_field) pair must never be observable as the new offset
+# with the old length: the update path never touches states[idx], so the entry
+# stays live and recovery cannot detect it, and a later shm_str_free would take
+# the size class from the stale length and file the block on the wrong free
+# list -- after which that class hands out an undersized block and the next
+# value written overruns a neighbouring entry.
 #
-# Both stores now go through an interim inline-empty state, which shm_str_free
+# Both stores go through an interim inline-empty state, which shm_str_free
 # treats as a no-op, so every observable pair is fully-old, fully-new, or safe.
 # Built at -O2 on purpose: the interim store is dead by ordinary dataflow and
-# is only preserved because it is an __atomic_store_n.
+# survives only because it is an __atomic_store_n.
 
 plan skip_all => 'set CRASH_GDB=1 to run' unless $ENV{CRASH_GDB};
 my $gdb = `which gdb 2>/dev/null`; chomp $gdb;
@@ -37,11 +35,16 @@ ok($line, "located the value publish in shm_str_store (line $line)")
 
 # Restore the default build even if we die partway.
 my $restore = 0;
-END { `make clean 2>/dev/null; $^X Makefile.PL 2>&1 && make 2>&1` if $restore }
+END {
+    if ($restore) {
+        `make clean 2>/dev/null; $^X Makefile.PL 2>&1 && make 2>&1`;
+        warn "the plain rebuild failed: blib still holds the debug build\n" if $?;
+    }
+}
 
 my $build = `make clean 2>/dev/null; $^X Makefile.PL 2>&1 && make OPTIMIZE='-O2 -g' 2>&1`;
 $restore = 1;
-like $build, qr/Shared\.o/, '-O2 -g build succeeded'
+is $?, 0, '-O2 -g build succeeded'
     or BAIL_OUT("build failed:\n$build");
 
 my $dir = tempdir(CLEANUP => 1);

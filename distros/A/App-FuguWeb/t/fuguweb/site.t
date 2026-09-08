@@ -338,16 +338,45 @@ subtest 'a page the site no longer holds is removed' => sub {
 subtest 'the build refuses an output directory it must not own' => sub {
 	my $root = project();
 
-	# --out reaches build and clean alike, and the setting it
-	# overrides is checked in the description.
-	for my $bad ( $root, '/', "$root/..", File::Spec->rootdir ) {
+	# Every refused target, and the home directory through a HOME
+	# of this test alone. --out reaches build and clean alike, and
+	# the setting it overrides is checked in the description.
+	my $home = tempdir( CLEANUP => 1 );
+	local $ENV{HOME} = $home;
+
+	my @bad = (
+		$root, '/', "$root/..", File::Spec->rootdir,
+		$home, "$root/web",
+	);
+
+	for my $bad (@bad) {
 		ok( !site( $root, $bad )->build,
 			"the build refuses $bad" );
 		ok( !site( $root, $bad )->clean,
 			"and the clean refuses it too" );
 	}
 
-	ok( -e "$root/.fuguwebrc", 'the project is untouched' );
+	ok( -e "$root/.fuguwebrc",           'the project is untouched' );
+	ok( -e "$root/web/index.body.html",  'and the source with it' );
+	ok( -d $home,                        'and the home directory' );
+
+	# A directory that no rule names still builds. The guard is
+	# not "inside the project": the tests and the CI both build
+	# into a temporary directory outside it.
+	my $good = tempdir( CLEANUP => 1 ) . '/out';
+	ok( site( $root, $good )->build, "the build takes $good" );
+
+	# The output directory that the description names is the one
+	# exception below the source. This description names out, so
+	# web/build is a directory of the source like any other.
+	ok( !site( $root, "$root/web/build" )->build,
+		'the build refuses a source directory that it does not own' );
+	ok( !site( $root, "$root/web/build" )->clean,
+		'and the clean refuses it too' );
+	ok( -e "$root/web/index.body.html", 'the source is untouched' );
+
+	# t/web/site.t builds the description of this repository, which
+	# names neither setting and therefore takes web/build.
 };
 
 subtest 'clean refuses a directory that no build made' => sub {

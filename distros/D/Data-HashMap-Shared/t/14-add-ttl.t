@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 use File::Temp ();
 use File::Spec ();
 
@@ -150,7 +151,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_addttl') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100, 0, 30);
     shm_ii_put_ttl $map, 1, 100, 1;   # expires in 1s
-    sleep 2;
+    Time::HiRes::sleep(1.2);
     ok(shm_ii_add_ttl $map, 1, 200, 60, 'II add_ttl: succeeds when prior entry expired');
     is($map->get(1), 200, 'II add_ttl: re-added value visible');
     unlink $path;
@@ -180,6 +181,80 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_addttl') . '.shm' }
     cmp_ok $map->ttl_remaining(3), '>=', 119, '  ...and is stored (allowing one coarse-clock tick)';
     cmp_ok $map->ttl_remaining(3), '<=', 120, '  ...and not rounded up';
     unlink $path;
+}
+
+
+# Expiry is compared in five independent places -- the SHM_IS_EXPIRED macro,
+# get()'s inline check, ttl_remaining's, flush_expired_partial's, and the copy
+# get_multi inlines in each of the ten xs/*.xs files -- so they can drift apart
+# by a second and leave two accessors disagreeing about the same key.  Sample
+# every one of them across the whole boundary rather than at one instant,
+# whatever second the entry dies in.
+{
+    my $dir  = File::Temp::tempdir(CLEANUP => 1);
+    my $path = File::Spec->catfile($dir, 'boundary.shm');
+    my $map  = Data::HashMap::Shared::II->new($path, 64, 0, 1);   # 1s default TTL
+    # get_multi inlines its own copy of the check in every variant file, and it
+    # is the XSUB with the drift history, so watch a string-key one too
+    my $spath = File::Spec->catfile($dir, 'boundary-ss.shm');
+    my $smap  = Data::HashMap::Shared::SS->new($spath, 64, 0, 1);
+    # flush_expired_partial removes what IT calls expired; a full sweep followed
+    # by size() is its verdict, and it must match get()'s on the same map
+    # ... and its verdict is destructive, so the entry a disagreement is about is
+    # gone by the next reading and a re-read of the same map can never confirm
+    # it: give every reading its own map.
+    my @fmaps = map {
+        my $m = Data::HashMap::Shared::II->new(
+            File::Spec->catfile($dir, "boundary-flush-$_.shm"), 64, 0, 1);
+        $m->put(7, 70);
+        $m;
+    } 1 .. 200;
+
+    # The watched entries go in last: building 200 maps takes milliseconds, and
+    # an entry that dies before the first sample fails 'saw it alive'.
+    $map->put(7, 70);
+    $smap->put('seven', 'seventy');
+
+    # The readings in one sample are taken one after another, so the entry can
+    # die between two of them; a lone disagreement is that, not drift.  Re-read
+    # at once and count only what persists.
+    my $sample = sub {
+        my $by_get = defined($map->get(7)) ? 1 : 0;
+        my ($wv)   = $map->get_with_ttl(7);
+        my ($mv)   = $map->get_multi(7);
+        my $n = grep { $_ != $by_get }
+            (($map->exists(7) ? 1 : 0),
+             ((grep { $_ == 7 } $map->keys) ? 1 : 0),
+             (defined($map->ttl_remaining(7)) ? 1 : 0),
+             (defined($wv) ? 1 : 0),
+             (defined($mv) ? 1 : 0));
+        my $s_get  = defined($smap->get('seven')) ? 1 : 0;
+        my ($s_mv) = $smap->get_multi('seven');
+        $n++ if $s_get != (defined($s_mv) ? 1 : 0);
+        if (my $fmap = shift @fmaps) {
+            my $f_get = defined($fmap->get(7)) ? 1 : 0;
+            $fmap->flush_expired_partial($fmap->capacity);
+            $n++ if $f_get != ($fmap->size ? 1 : 0);
+        }
+        return ($by_get, $n);
+    };
+
+    my ($disagreements, $samples, $saw_live, $saw_dead) = (0, 0, 0, 0);
+    my $deadline = Time::HiRes::time() + 2.2;
+    while (Time::HiRes::time() < $deadline) {
+        my ($by_get, $n) = $sample->();
+        $n = ($sample->())[1] if $n;
+        $disagreements++ if $n;
+        $saw_live++ if $by_get;
+        $saw_dead++ unless $by_get;
+        $samples++;
+        select undef, undef, undef, 0.05;
+    }
+    cmp_ok($samples, '>', 20, 'sampled the expiry boundary repeatedly');
+    ok($saw_live,  '  ... saw the entry alive');
+    ok($saw_dead,  '  ... and saw it expire');
+    is($disagreements, 0,
+       'every accessor agrees about liveness at every instant');
 }
 
 done_testing;

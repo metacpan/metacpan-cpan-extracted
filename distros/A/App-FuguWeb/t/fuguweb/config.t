@@ -312,6 +312,22 @@ page "/etc/passwd" {
 RC
 	is( $config, undef, 'an absolute page name fails the load' );
 	like( $reason, qr/is an absolute path/, 'and says why' );
+
+	# A site is one flat directory of pages, and the key directory
+	# tree below it. A name with a solidus writes into that tree,
+	# or into the staging directory, and the build would fail at
+	# the write with a reason that names neither.
+	for my $name ( 'keys/index.html', '.man/tool.1.html', 'a/b.html' ) {
+		( $config, $reason ) = load_rc( <<"RC" );
+site = Example
+
+page "$name" {
+	body = index.body.html
+}
+RC
+		is( $config, undef, "the page name $name fails the load" );
+		like( $reason, qr/holds a solidus/, "and says why for $name" );
+	}
 };
 
 subtest 'an unlinked value that does not parse is a typo' => sub {

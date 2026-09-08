@@ -42,7 +42,7 @@ use Crypt::URandom qw( urandom );
 
 #  Version information
 #
-$VERSION='3.027';
+$VERSION='3.028';
 
 
 #  Shortcut error handler.

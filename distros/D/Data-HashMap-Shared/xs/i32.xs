@@ -849,7 +849,7 @@ void
 next(SV* self_sv)
     PPCODE:
         EXTRACT_CURSOR("Data::HashMap::Shared::I32::Cursor", self_sv);
-        int32_t out_key; int32_t out_value;
+        int32_t out_key, out_value;
         if (shm_i32_cursor_next(c, &out_key, &out_value)) {
             EXTEND(SP, 2);
             mXPUSHi(out_key);

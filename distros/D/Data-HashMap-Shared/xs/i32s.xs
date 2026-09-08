@@ -270,7 +270,7 @@ SV*
 stats(SV* self_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-                HV *hv = newHV();
+        HV *hv = newHV();
         hv_store(hv, "size", 4, newSVuv(shm_i32s_size(h)), 0);
         hv_store(hv, "capacity", 8, newSVuv(shm_i32s_capacity(h)), 0);
         hv_store(hv, "max_entries", 11, newSVuv(shm_i32s_max_entries(h)), 0);

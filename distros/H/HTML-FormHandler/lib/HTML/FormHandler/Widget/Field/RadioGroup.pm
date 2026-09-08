@@ -1,9 +1,10 @@
 package HTML::FormHandler::Widget::Field::RadioGroup;
 # ABSTRACT: radio group rendering widget
-$HTML::FormHandler::Widget::Field::RadioGroup::VERSION = '0.410001';
+$HTML::FormHandler::Widget::Field::RadioGroup::VERSION = '0.410002';
 use Moose::Role;
 use namespace::autoclean;
 use HTML::FormHandler::Render::Util ('process_attrs');
+use HTML::Entities qw( encode_entities );
 
 
 sub type_attr { 'radio' }
@@ -30,7 +31,7 @@ sub render_element {
             my $attr_str = process_attrs($attr);
             my $lattr = $option->{label_attributes} || {};
             my $lattr_str= process_attrs($lattr);
-            $output .= qq{\n<div$attr_str><label$lattr_str>$label</label>};
+            $output .= qq{\n<div$attr_str><label$lattr_str>} . encode_entities($label, '<>&') . qq{</label>};
             foreach my $group_opt ( @{ $option->{options} } ) {
                 $output .= $self->render_option( $group_opt, $result );
             }
@@ -95,7 +96,7 @@ sub wrap_radio {
     my $lattrs = process_attrs( { class => \@label_class } );
 
     # return wrapped radio, either on left or right
-    my $label = $self->_localize($option_label);
+    my $label = encode_entities( $self->_localize($option_label), '<>&' );
     my $output = '';
     if ( $self->get_tag('label_left') ) {
         $output = qq{<label$lattrs$for>\n$label\n$rendered_widget</label>};
@@ -123,7 +124,7 @@ HTML::FormHandler::Widget::Field::RadioGroup - radio group rendering widget
 
 =head1 VERSION
 
-version 0.410001
+version 0.410002
 
 =head1 SYNOPSIS
 
