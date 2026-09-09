@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Project;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Time::Elapsed qw/elapsed/;
 use List::Util qw/sum/;
@@ -72,7 +72,7 @@ sub handle {
     if (my $uuid = uuid_inflate($it)) {
         $project //= $schema->resultset('Project')->single({project_id => $uuid});
     }
-    error(404 => 'Invalid Project') unless $project;
+    die error(404 => 'Invalid Project') unless $project;
 
     return $self->html($req, $project, $n)
         unless $stats;
@@ -127,7 +127,8 @@ sub stats {
         },
 
         fetch => sub {
-            my $data = $self->build_stat($project => shift(@$stats));
+            my $s = shift(@$stats) or return;
+            my $data = $self->build_stat($project => $s);
             return encode_json($data) . "\n";
         },
     );

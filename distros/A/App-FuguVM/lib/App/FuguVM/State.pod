@@ -19,10 +19,11 @@ App::FuguVM::State - what FuguVM remembers about one VM between runs
 
 Each VM has a directory under the state directory:
 
-    <state_dir>/<vm>/status        the JSON state, mode 0600
-    <state_dir>/<vm>/vm.pid        the QEMU process
-    <state_dir>/<vm>/proxy.pid     the proxy child
-    <state_dir>/<vm>/disk.qcow2    the working disk
+    <state_dir>/<vm>/status           the JSON state, mode 0600
+    <state_dir>/<vm>/vm.pid           the QEMU process
+    <state_dir>/<vm>/proxy.pid        the proxy child
+    <state_dir>/<vm>/autoinstall.pid  the responder child
+    <state_dir>/<vm>/disk.qcow2       the working disk
 
 The JSON blob rides on L<Fugu::StateFile>. The two process IDs ride on
 L<Fugu::Pidfile>, which takes its lock before it truncates and
@@ -62,10 +63,13 @@ C<state_dir> returns the directory that holds every VM's state, and
 C<vm_state_dir> the one that holds this VM's. C<data> returns the
 state hash reference for a caller that changes several keys at once.
 
-=head2 vm_pidfile, proxy_pidfile
+=head2 vm_pidfile, proxy_pidfile, autoinstall_pidfile
 
 Return the L<Fugu::Pidfile> objects. QEMU writes the first itself,
-through its C<-pidfile> option; the proxy supervisor owns the second.
+through its C<-pidfile> option; the proxy supervisor owns the second,
+and the autoinstall responder supervisor owns the third. Each file
+lives in the state directory of the guest, so an interrupted run
+leaves no child that nothing owns.
 
 =head2 get_vm_pid, clear_vm_pid, is_vm_running
 
@@ -76,10 +80,28 @@ C<-pidfile> option, so there is no setter.
 
 The working disk of the VM.
 
-=head2 is_installed, mark_installed
+=head2 set_runtime, get_runtime, clear_runtime
+
+The runtime record: the facts of one run of one guest. The record
+holds C<accel> and the resolved C<ssh_port> and C<console_port>.
+L<App::FuguVM::Guest> writes it before it spawns QEMU, and reads it
+back for C<status> and for the guest connections.
+
+C<get_runtime> returns the facts as a hash reference, and an empty
+hash reference when the guest never ran. The stop verbs call
+C<clear_runtime> beside C<clear_vm_pid>, so the record dies with the
+run. C<destroy> needs no call, because it empties the whole store.
+
+=head2 is_installed, mark_installed, get_installed_arch
 
 Whether OpenBSD is installed on the disk. An installed system boots
 its own disk and never attaches the miniroot again.
+
+C<mark_installed> takes the architecture of the installed disk. The
+argument is required, so no path can forget it. C<get_installed_arch>
+returns the recorded architecture, or C<undef>. L<App::FuguVM::Guest>
+compares it with the configured value before it boots an existing
+disk.
 
 =head2 set_root_password, get_root_password
 

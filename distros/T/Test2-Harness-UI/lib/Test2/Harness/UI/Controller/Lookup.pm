@@ -2,13 +2,14 @@ package Test2::Harness::UI::Controller::Lookup;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Data::GUID;
 use Scalar::Util qw/blessed/;
 use Test2::Harness::UI::Response qw/resp error/;
 use Test2::Harness::UI::Util qw/share_dir find_job/;
 use Test2::Harness::Util::JSON qw/encode_json/;
+use Test2::Harness::UI::UUID qw/uuid_inflate/;
 
 use parent 'Test2::Harness::UI::Controller';
 use Test2::Harness::UI::Util::HashBase qw/-title/;

@@ -3,7 +3,14 @@ Revision history for Webservice::Overleaf::API.
 0.01 Mon Sep 7 15:01:00 2026
      - initial upload
 
-0.02 Mon Sep 7 15:01:00 2026
+0.02 Tue Sep 8 08:56:00 2026
+
+0.03 Tue Sep 8 08:56:00 2026
+     - documented the overleaf command-line client from
+       Webservice::Overleaf::API, including current Git and browser-session
+       authentication procedures
+     - documented overleaf_session2 session-file creation and Overleaf's
+       current five-day cookie retention period, with invalidation caveats
      - render CLI --help directly from embedded POD with core Pod::Text,
        avoiding a newer Pod::Usage dependency that breaks installation on
        Perl 5.10
@@ -29,3 +36,43 @@ Revision history for Webservice::Overleaf::API.
      - added Util::H2O::More objectification for projects and compile results
      - added fully mocked HTTP/Git tests; the test suite makes no live
        Overleaf requests
+
+0.04 Tue Sep 8 08:56:00 2026
+     - working on pre-reqs
+     - fixed deps install on MSYS2 (SSL/TLS stack for HTTP::Tiny)
+
+0.05 Tue Sep 8 09:56:00 2026
+     - documentation-focused release with a practical end-to-end overleaf
+       command-line walkthrough from browser-session setup through project
+       listing, source ZIP inspection, remote compilation, PDF retrieval and
+       viewing, build-artifact inspection, and Git workflows
+     - documented ~/.ol-session.txt usage, overleaf_session2 browser-cookie
+       acquisition, the current five-day session retention period, and the
+       distinction between browser-session and Git-token authentication
+     - documented how to distinguish project source files from compile
+       artifacts, find .tex files in the downloaded ZIP, and identify the
+       configured root TeX document from output.log
+     - expanded Webservice::Overleaf::API POD with the major CLI workflow
+       highlights and rebuilt README.md as a practical combined guide to the
+       module API and overleaf client
+
+0.06 Tue Sep 8 19:31:00 2026
+     - documented the Git bridge as the source synchronization interface, the
+       ZIP as an exported project snapshot, and the tool's use in Science Perl
+       Journal author/editor workflows
+     - added a high-level local `overleaf compile [ROOT.tex]` workflow that
+       infers the Overleaf project and branch from Git, pushes the committed
+       project, compiles remotely, and downloads the resulting PDF
+     - retained `compile PROJECT_ID` as the low-level remote-only operation and
+       added --no-push, --remote, --remote-branch, and --output support
+     - standardized credentials under ~/.overleaf/session and
+       ~/.overleaf/git-token, with OVERLEAF_SESSION and OVERLEAF_GIT_TOKEN
+       environment overrides and secure Git authentication via GIT_ASKPASS
+     - added portable credential-permission checks for POSIX and MSYS2/Windows
+       environments and documented Overleaf's separate browser-session and Git
+       token authentication workflows
+     - improved Git workflow safety with dirty-worktree protection, automatic
+       branch discovery, documented `git` username handling, and exclusion of
+       the generated output PDF from cleanliness checks
+     - expanded tests for Git/project inference, authentication, branch
+       discovery, compile/download behavior, and dirty-worktree handling

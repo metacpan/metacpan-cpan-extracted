@@ -17,12 +17,8 @@ WriteMakefile(
 
   CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => '7.12'},
   PREREQ_PM          => {
-    'Mojolicious'      => '9.34',
-    'Mojo::SQLite'     => '3.000',
-    'Cpanel::JSON::XS' => '4.09',
-    'IO::Socket::SSL'  => '2.009',
-    'Text::Glob'       => '0.11',
-    'Cavil::Matcher'   => '1.03'
+    'Mojolicious'     => '9.34',
+    'IO::Socket::SSL' => '2.009'
   },
   TEST_REQUIRES => {'Test::More' => '0.98'},
 

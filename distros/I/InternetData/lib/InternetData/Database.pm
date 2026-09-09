@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.1.1';
+our $VERSION = '1.2.3';
 
 # Every database this organization may see, with where each one stands.
 #

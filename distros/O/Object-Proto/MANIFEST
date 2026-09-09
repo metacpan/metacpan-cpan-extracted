@@ -71,6 +71,7 @@ t/053-import-accessor-collision.t
 t/054-import-accessors-prefix.t
 t/055-lazy-reader-func-accessor.t
 t/056-private-accessor.t
+t/057-simple-custom-op.t
 t/099-bugs.t
 t/fix_subtests.pl
 t/lib/NeuralNet/Activation.pm

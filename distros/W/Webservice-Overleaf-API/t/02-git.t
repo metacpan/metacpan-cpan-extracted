@@ -12,11 +12,11 @@ my $runner = sub {
 
 my $ol = Webservice::Overleaf::API->new(git_runner => $runner);
 
-is $ol->git_url('abc123'), 'https://git.overleaf.com/abc123', 'cloud git URL';
+is $ol->git_url('abc123'), 'https://git@git.overleaf.com/abc123', 'cloud git URL';
 is $ol->project_url('abc123'), 'https://www.overleaf.com/project/abc123', 'project URL';
 
 ok $ol->git_clone('abc123', 'paper'), 'clone succeeds';
-is_deeply $commands[-1], ['git', 'clone', 'https://git.overleaf.com/abc123', 'paper'], 'clone command is list-form';
+is_deeply $commands[-1], ['git', 'clone', 'https://git@git.overleaf.com/abc123', 'paper'], 'clone command is list-form';
 
 ok $ol->git_pull('paper'), 'pull succeeds';
 is_deeply $commands[-1], [qw/git -C paper pull/], 'pull command';
@@ -24,8 +24,12 @@ is_deeply $commands[-1], [qw/git -C paper pull/], 'pull command';
 ok $ol->git_push('paper'), 'push succeeds';
 is_deeply $commands[-1], [qw/git -C paper push/], 'push command';
 
+ok $ol->git_push('paper', 'overleaf', 'HEAD:master'), 'explicit push succeeds';
+is_deeply $commands[-1], [qw/git -C paper push overleaf HEAD:master/],
+    'push accepts explicit remote and refspec';
+
 ok $ol->git_remote_add('paper', 'abc123'), 'remote add succeeds';
-is_deeply $commands[-1], ['git', '-C', 'paper', 'remote', 'add', 'overleaf', 'https://git.overleaf.com/abc123'], 'remote add command';
+is_deeply $commands[-1], ['git', '-C', 'paper', 'remote', 'add', 'overleaf', 'https://git@git.overleaf.com/abc123'], 'remote add command';
 
 my $server = Webservice::Overleaf::API->new(
     base_url   => 'https://latex.example.edu',

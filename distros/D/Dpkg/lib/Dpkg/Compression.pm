@@ -27,14 +27,13 @@ interact with the set of supported compression methods.
 
 =cut
 
-package Dpkg::Compression 2.01;
+package Dpkg::Compression 3.00;
 
 use v5.36;
 
 our @EXPORT = qw(
     compression_is_supported
     compression_get_list
-    compression_get_property
     compression_guess_from_filename
     compression_get_file_extension_regex
     compression_get_file_extension
@@ -85,20 +84,6 @@ my %COMP = (
     },
 );
 
-# The gzip --rsyncable option is not universally supported, so we need to
-# conditionally use it. Ideally we would invoke 'gzip --help' and check
-# whether the option is supported, but that would imply forking and executing
-# that process for any module that ends up loading this one, which is not
-# acceptable performance-wise. Instead we will approximate it by osname, which
-# is not ideal, but better than nothing.
-#
-# Requires GNU gzip >= 1.7 for the --rsyncable option. On AIX GNU gzip is
-# too old. On the BSDs they use their own implementation based on zlib,
-# which does not currently support the --rsyncable option.
-if (any { $Config{osname} eq $_ } qw(linux gnu solaris)) {
-    push @{$COMP{gzip}{comp_prog}}, '--rsyncable';
-}
-
 my $default_compression = 'xz';
 my $default_compression_level = undef;
 my $default_compression_threads = 0;
@@ -118,7 +103,7 @@ sub compression_get_list {
     return @list;
 }
 
-=item compression_is_supported($comp)
+=item $bool = compression_is_supported($comp)
 
 Returns a boolean indicating whether the give compression method is
 known and supported.
@@ -131,32 +116,7 @@ sub compression_is_supported {
     return exists $COMP{$comp};
 }
 
-=item compression_get_property($comp, $property)
-
-Returns the requested property of the compression method. Returns undef if
-either the property or the compression method doesn't exist. Valid
-properties currently include "file_ext" for the file extension,
-"default_level" for the default compression level,
-"comp_prog" for the name of the compression program and "decomp_prog" for
-the name of the decompression program.
-
-B<Note>: This function is deprecated, please switch to one of the new
-specialized getters instead.
-
-=cut
-
-sub compression_get_property {
-    my ($comp, $property) = @_;
-
-    warnings::warnif('deprecated',
-        'Dpkg::Compression::compression_get_property() is deprecated, ' .
-        'use one of the specialized getters instead');
-    return unless compression_is_supported($comp);
-    return $COMP{$comp}{$property} if exists $COMP{$comp}{$property};
-    return;
-}
-
-=item compression_guess_from_filename($filename)
+=item $comp = compression_guess_from_filename($filename)
 
 Returns the compression method that is likely used on the indicated
 filename based on its file extension.
@@ -300,7 +260,7 @@ sub compression_set_level {
     $COMP{$comp}{level} = $level;
 }
 
-=item compression_is_valid_level($level)
+=item $bool = compression_is_valid_level($level)
 
 Returns a boolean indicating whether $level is a valid compression level
 (it must be either a number between 1 and 9 or "fast" or "best")
@@ -377,7 +337,22 @@ sub compression_get_cmdline_compress {
         # non-reproducible output we pass -T+1 (supported with xz >= 5.4.0)
         # to request multi-threaded mode with a single thread.
         push @prog, $threads == 1 ? '-T+1' : "-T$threads";
+    } elsif ($comp eq 'gzip') {
+        # The gzip --rsyncable option is not universally supported, so we need
+        # to conditionally use it. Ideally we would invoke 'gzip --help' and
+        # check whether the option is supported, but that would imply forking
+        # and executing that process for any caller, which is not ideal
+        # performance-wise. Instead we will approximate it by osname, which is
+        # not ideal either, but better than nothing.
+        #
+        # Requires GNU gzip >= 1.7 for the --rsyncable option. On AIX GNU gzip
+        # is too old. On the BSDs they use their own implementation based on
+        # zlib, which does not currently support the --rsyncable option.
+        if (any { $Config{osname} eq $_ } qw(linux gnu solaris)) {
+            push @prog, '--rsyncable';
+        }
     }
+
     return @prog;
 }
 
@@ -411,6 +386,10 @@ sub compression_get_cmdline_decompress {
 =back
 
 =head1 CHANGES
+
+=head2 Version 3.00 (dpkg 1.23.6)
+
+Remove function: compression_get_property().
 
 =head2 Version 2.01 (dpkg 1.21.14)
 

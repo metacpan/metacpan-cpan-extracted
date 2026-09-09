@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::WriteQIF;
 # ABSTRACT: Write transactions to QIF format
-$Finance::Tiller2QIF::WriteQIF::VERSION = '1.08';
+$Finance::Tiller2QIF::WriteQIF::VERSION = '1.09';
 =head1 DESCRIPTION
 
 Exports transactions from the SQLite database to QIF (Quicken Interchange Format) for import into financial software. Transactions are grouped by account and sorted by date. Skipped transactions and those without effective categories are handled appropriately.
@@ -33,7 +33,7 @@ use v5.34;
 
 use Path::Tiny;
 use Text::CSV;
-use Mojo::SQLite;
+use Finance::Tiller2QIF::DB qw( connect_db );
 use utf8;
 use warnings FATAL => 'utf8';
 use open ':std', ':encoding(UTF-8)';
@@ -41,13 +41,13 @@ use feature qw/signatures postderef/;
 # use Data::Printer;
 
 sub _init($db_path) {
-  my $sql      = Mojo::SQLite->new($db_path)->options({ sqlite_unicode => 1 });
-  my @accounts =
-    map { $_->[0] }
-    $sql->db->query(
-    q{SELECT distinct(account) FROM transactions WHERE exported = 0 AND skipped = 0;})
-    ->arrays->@*;
-  return ( $sql, \@accounts );
+  my $dbh = connect_db($db_path);
+  my $sth = $dbh->prepare(
+    q{SELECT distinct(account) FROM transactions WHERE exported = 0 AND skipped = 0;}
+  );
+  $sth->execute;
+  my @accounts = map { $_->[0] } $sth->fetchall_arrayref->@*;
+  return ( $dbh, \@accounts );
 }
 
 my %_date_fmt = (
@@ -62,21 +62,22 @@ sub _format_date ( $iso_date, $fmt ) {
 }
 
 sub Emit ( $db_path, $outfile, $verbose=0, $qifdate='ymd' ) {
-  my ( $sql, $accounts ) = _init($db_path);
+  my ( $dbh, $accounts ) = _init($db_path);
   my @qif;
   my $emitted = 0;
   for my $account (@$accounts) {
     my $header = join( "\n", "!Account", "N$account", "^", "!Type:Bank" );
-    my @tx     = $sql->db->query(
+    my $sth = $dbh->prepare(
       q{ SELECT *,
               COALESCE(mapped_category, category) AS effective_category
           FROM transactions
           WHERE exported = 0
           AND skipped = 0
           AND account = ?
-          ORDER BY date, payee; },
-      $account
-    )->hashes()->@*;
+          ORDER BY date, payee; }
+    );
+    $sth->execute($account);
+    my @tx = $sth->fetchall_arrayref({})->@*;
     my @qif_tx = map {
       my $date = _format_date( $_->{date}, $qifdate );
       join( "\n",
@@ -94,24 +95,26 @@ sub Emit ( $db_path, $outfile, $verbose=0, $qifdate='ymd' ) {
 
   path($outfile)->spew_utf8( join( "\n", @qif ) . "\n" );
 
-  $sql->db->query('UPDATE transactions SET exported = 1 WHERE exported = 0');
+  $dbh->do('UPDATE transactions SET exported = 1 WHERE exported = 0');
+  $dbh->disconnect;
   return $emitted;
 }
 
 sub _trunc ( $str, $max ) { length($str) > $max ? substr( $str, 0, $max ) : $str }
 
 sub Preview ( $db_path, $verbose=0 ) {
-  my ( $sql, $accounts ) = _init($db_path);
+  my ( $dbh, $accounts ) = _init($db_path);
 
   my @rows;
 
   for my $account (@$accounts) {
-    my @tx = $sql->db->query(
+    my $sth = $dbh->prepare(
       q{ SELECT * FROM transactions
           WHERE exported = 0 AND skipped = 0 AND account = ?
-          ORDER BY date, payee; },
-      $account
-    )->hashes()->@*;
+          ORDER BY date, payee; }
+    );
+    $sth->execute($account);
+    my @tx = $sth->fetchall_arrayref({})->@*;
 
     for my $tx (@tx) {
       my $orig   = $tx->{category};
@@ -145,6 +148,7 @@ sub Preview ( $db_path, $verbose=0 ) {
     printf $L2, $row->{cat}, $row->{memo};
   }
 
+  $dbh->disconnect;
   return scalar @rows;
 }
 

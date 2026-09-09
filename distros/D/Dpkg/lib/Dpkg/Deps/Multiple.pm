@@ -6,12 +6,12 @@
 # Copyright © 2007-2009 Raphaël Hertzog <hertzog@debian.org>
 # Copyright © 2008-2009, 2012-2014 Guillem Jover <guillem@debian.org>
 #
-# This program is free software; you may redistribute it and/or modify
+# This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 #
-# This is distributed in the hope that it will be useful,
+# This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -86,7 +86,7 @@ sub add {
     push @{$self->{list}}, @deps;
 }
 
-=item $dep->get_deps()
+=item @dep_list = $dep->get_deps()
 
 Returns a list of sub-dependencies.
 
@@ -112,7 +112,7 @@ sub sort {
     $self->{list} = [ @res ];
 }
 
-=item $dep->arch_is_concerned($arch)
+=item $bool = $dep->arch_is_concerned($arch)
 
 Returns true if at least one of the sub-dependencies apply to this
 architecture.
@@ -132,7 +132,7 @@ sub arch_is_concerned {
 =item $dep->reduce_arch($arch)
 
 Simplifies the dependencies to contain only information relevant to the
-given architecture. The non-relevant sub-dependencies are simply removed.
+given architecture. The non-relevant sub-dependencies are removed.
 
 This trims off the architecture restriction list of L<Dpkg::Deps::Simple>
 objects.
@@ -150,7 +150,7 @@ sub reduce_arch {
     $self->{list} = [ @new ];
 }
 
-=item $dep->has_arch_restriction()
+=item @pkgname_list = $dep->has_arch_restriction()
 
 Returns the list of package names that have such a restriction.
 
@@ -166,7 +166,7 @@ sub has_arch_restriction {
     return @res;
 }
 
-=item $dep->profile_is_concerned()
+=item $bool = $dep->profile_is_concerned()
 
 Returns true if at least one of the sub-dependencies apply to this profile.
 
@@ -185,7 +185,7 @@ sub profile_is_concerned {
 =item $dep->reduce_profiles()
 
 Simplifies the dependencies to contain only information relevant to the
-given profile. The non-relevant sub-dependencies are simply removed.
+given profile. The non-relevant sub-dependencies are removed.
 
 This trims off the profile restriction list of L<Dpkg::Deps::Simple> objects.
 
@@ -202,7 +202,7 @@ sub reduce_profiles {
     $self->{list} = [ @new ];
 }
 
-=item $dep->is_empty()
+=item $bool = $dep->is_empty()
 
 Returns true if the dependency is empty and doesn't contain any useful
 information. This is true when a (descendant of) L<Dpkg::Deps::Multiple>
@@ -216,7 +216,7 @@ sub is_empty {
     return scalar @{$self->{list}} == 0;
 }
 
-=item $dep->merge_union($other_dep)
+=item $bool = $dep->merge_union($other_dep)
 
 This method is not meaningful for this object, and will always croak.
 

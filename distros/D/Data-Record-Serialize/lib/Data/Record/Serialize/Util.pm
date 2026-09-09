@@ -5,9 +5,11 @@ package Data::Record::Serialize::Util;
 use v5.12;
 use strict;
 use warnings;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 use parent 'Exporter::Tiny';
+
+use Hash::Ordered;
 
 my @TYPE_CATEGORY_NAMES;
 my %TYPES;
@@ -43,7 +45,7 @@ our @TYPE_CATEGORIES = map {
 our %EXPORT_TAGS = (
     types      => [ keys %TYPES ],
     categories => \@TYPE_CATEGORY_NAMES,
-    subs       => [qw( is_type index_types )],
+    subs       => [qw( is_type index_types populate_set )],
 );
 
 our @EXPORT_OK = map { @{$_} } values %EXPORT_TAGS;
@@ -77,6 +79,99 @@ sub index_types {
     return \@type_index;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub populate_set {
+    my ( $values, $input ) = @_;
+
+    return [] unless @{$input};
+
+    my $output = Hash::Ordered->new;
+
+    # if first element is a deletion, preload all possible values
+    if ( substr( $input->[0], 0, 1 ) eq q{-} ) {
+        $output->push( $_ ) for @{$values};
+    }
+
+    for my $elem ( @{$input} ) {
+        if ( $elem eq q{-} ) {
+            $output->clear;
+            next;
+        }
+
+        if ( $elem eq q{+} ) {
+            $output->clear;
+            $output->push( $_ ) for @{$values};
+            next;
+        }
+
+        my $op = substr( $elem, 0, 1 );
+            $op eq q{-} ? $output->delete( substr( $elem, 1 ) )
+          : $op eq q{+} ? $output->push( substr( $elem, 1 ) )
+          :               $output->push( $elem );
+    }
+    return [ $output->keys ];
+}
+
+
+
+
 1;
 
 #
@@ -101,7 +196,64 @@ Data::Record::Serialize::Util - Useful things
 
 =head1 VERSION
 
-version 2.03
+version 2.04
+
+=head1 SUBROUTINES
+
+=head2 populate_set
+
+  \@list = populate_set( \@values, \@input );
+
+Apply set-operations to a sequence of input values and
+return the resulting array reference.
+
+C<@input> must be drawn from the following set of values:
+
+=over
+
+=item *
+
+elements of C<@values>
+
+=item *
+
+The C<+> or C<->  characters
+
+=item *
+
+Elements of C<@values> prefixed with C<+> or C<->.
+
+=back
+
+C<@input> is processed in order:
+
+=over
+
+=item *
+
+If the first value is C<-> or begins with C<->, the output set is
+initialized with the contents of C<@values>
+
+=item *
+
+A bare C<+> replaces the current contents with the contents of C<@values>, in order.
+
+=item *
+
+A bare C<-> clears the output set.
+
+=item *
+
+A bare value or a value prefixed with C<+> is appended.
+
+=item *
+
+A value prefixed with C<-> is removed from the output set.
+
+=back
+
+The result preserves insertion order and removes leading
+duplicates.
 
 =for Pod::Coverage index_types
 is_type

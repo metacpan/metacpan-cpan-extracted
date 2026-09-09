@@ -50,7 +50,9 @@ use Dpkg::Source::Functions qw(erasedir);
 
 use parent qw(Dpkg::Source::Package);
 
-our $CURRENT_MINOR_VERSION = '0';
+sub CURRENT_MINOR_VERSION {
+    '0';
+}
 
 sub prerequisites {
     return 1 if find_command('bzr');
@@ -69,13 +71,13 @@ sub _check_workdir {
     # Symlinks from .bzr to outside could cause unpack failures, or point to
     # files they should not, so check for and do not allow.
     if (-l "$srcdir/.bzr") {
-        error(g_('%s is a symlink'), "$srcdir/.bzr");
+        error(g_('%s is a symbolic link'), "$srcdir/.bzr");
     }
     my $abs_srcdir = Cwd::abs_path($srcdir);
     find(sub {
         if (-l) {
             if (Cwd::abs_path(readlink) !~ /^\Q$abs_srcdir\E(?:\/|$)/) {
-                error(g_('%s is a symlink to outside %s'),
+                error(g_('%s is a symbolic link to outside %s'),
                       $File::Find::name, $srcdir);
             }
         }
@@ -113,7 +115,7 @@ sub do_build {
     _check_workdir($dir);
 
     my $old_cwd = getcwd();
-    chdir $dir or syserr(g_("unable to chdir to '%s'"), $dir);
+    chdir $dir or syserr(g_("cannot change directory to '%s'"), $dir);
 
     local $_;
 
@@ -131,13 +133,13 @@ sub do_build {
             push @files, $_;
         }
     }
-    close($bzr_status_fh) or syserr(g_('bzr status exited nonzero'));
+    close($bzr_status_fh) or subprocerr('bzr status');
     if (@files) {
         error(g_('uncommitted, not-ignored changes in working directory: %s'),
               join(' ', @files));
     }
 
-    chdir $old_cwd or syserr(g_("unable to chdir to '%s'"), $old_cwd);
+    chdir $old_cwd or syserr(g_("cannot change directory to '%s'"), $old_cwd);
 
     my $tmpdir = File::Temp->newdir(
         TEMPLATE => "$dirname.bzr.XXXXXX",
@@ -159,7 +161,7 @@ sub do_build {
            "$tardir/.bzr/branch/parent");
 
     # Create the tar file.
-    my $debianfile = "$basenamerev.bzr.tar." . $self->{options}{comp_ext};
+    my $debianfile = File::Spec->catfile($self->{basedir}, "$basenamerev.bzr.tar." . $self->{options}{comp_ext});
     info(g_('building %s in %s'),
          $sourcepackage, $debianfile);
     my $tar = Dpkg::Source::Archive->new(
@@ -212,13 +214,13 @@ sub do_extract {
 
     my $old_cwd = getcwd();
     chdir($newdirectory)
-        or syserr(g_("unable to chdir to '%s'"), $newdirectory);
+        or syserr(g_("cannot change directory to '%s'"), $newdirectory);
 
     # Reconstitute the working tree.
     system('bzr', 'checkout');
     subprocerr('bzr checkout') if $?;
 
-    chdir $old_cwd or syserr(g_("unable to chdir to '%s'"), $old_cwd);
+    chdir $old_cwd or syserr(g_("cannot change directory to '%s'"), $old_cwd);
 }
 
 =head1 CHANGES

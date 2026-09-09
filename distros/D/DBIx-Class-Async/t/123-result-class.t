@@ -89,6 +89,36 @@ subtest "Schema class() method Integration" => sub {
     like($@, qr/No such source/, "class() croaks correctly on invalid source");
 };
 
+subtest "Malicious result_class is rejected, not executed (CPANSec CWE-94)" => sub {
+    # SECURITY: The class name was utilised here to evaluate "require $target_class,"
+    # so the text was run as Perl code. The exploit involved crafting a
+    # string composed of a class name followed by Perl commands separated by
+    # semicolons. Thus, code execution would occur when loading the records.
+    # The specific instance was guarded by an unrelated always-true
+    # condition, however, the risk was present at other possible points in
+    # the code. A fix has been implemented that checks result_class for a
+    # valid Perl package format beforehand and uses a secure method for
+    # loading.
+    my $marker = "/tmp/cpansec-cwe94-marker-$$";
+    unlink $marker;
+
+    my $payload = qq{1;system('touch $marker');package Evil};
+
+    my $rs = $schema->resultset('User')->result_class($payload);
+
+    my $result = eval {
+        $schema->await($rs->create({ name => 'x', email => 'cwe94@test.com' }));
+    };
+    my $err = $@;
+
+    ok($err, "Malicious result_class string is rejected with an error");
+    like($err, qr/Invalid (?:result_class|class) name/,
+        "Rejected specifically for looking like an invalid class name");
+    ok(!-e $marker, "No injected code executed as a side effect");
+
+    unlink $marker;
+};
+
 $schema->disconnect;
 
 done_testing;

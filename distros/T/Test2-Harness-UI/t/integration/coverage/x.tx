@@ -15,6 +15,9 @@ print "INPUT ${ \__FILE__ }: " . encode_json({
 }) . "\n";
 
 require Bx;
+require Deps::Dx;
+
+is(Deps::Dx->d, 'd', "Got d");
 
 ok(1);
 

@@ -73,7 +73,7 @@ function FieldTable(spec) {
         else {
             return me._render_item(item, id, params);
         }
-    },
+    };
 
     me._render_item = function(item, id, params) {
         var row = me.render_row(item, id, params);
@@ -185,7 +185,7 @@ function FieldTable(spec) {
                         row.columns[row.columns.length - 1].after(col);
                     }
                     else {
-                        row.prepend(col);
+                        row.html.prepend(col);
                     }
 
                     row.dynamic_columns.push(col);
@@ -377,10 +377,9 @@ function FieldTable(spec) {
         else {
             me.header.prepend(col);
 
-            var row;
             Object.values(me.rows).forEach(function(row) {
                 var td = $('<td class="' + cclass + '"></td>');
-                row.append(td);
+                row.html.append(td);
                 row.dynamic_columns.push(td);
             });
         }

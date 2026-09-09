@@ -147,6 +147,31 @@ INLINE:
 
     use Test2::Plugin::Cover no_event => 1;
 
+## EXCLUDE DIRECTORIES
+
+A directory under the root, such as a dependency tree installed inside the
+workspace, can be kept out of the coverage data entirely:
+
+CLI:
+
+    HARNESS_PERL_SWITCHES=-MTest2::Plugin::Cover=exclude,deps prove ...
+
+INLINE:
+
+    use Test2::Plugin::Cover exclude => 'deps';
+
+    # Or several at once
+    use Test2::Plugin::Cover exclude => ['deps', 'vendor'];
+
+An excluded path and everything under it, at any depth, is dropped before the
+coverage event is sent, so excluded files never reach tools consuming that
+event. Paths are compared component by component, so excluding `lib` does not
+exclude a sibling `library`. Relative paths are resolved against the current
+directory.
+
+Wildcards are not supported, an exclusion is a literal path. Excluding a whole
+tree needs only the top of it.
+
 # KNOWING WHAT CALLED WHAT
 
 If you use a system like [Test::Class](https://metacpan.org/pod/Test%3A%3AClass), [Test::Class::Moose](https://metacpan.org/pod/Test%3A%3AClass%3A%3AMoose), or
@@ -287,6 +312,7 @@ Please see the `set_from()` documentation for details on values.
 
 - $arrayref = $class->files()
 - $arrayref = $class->files(root => $path)
+- $arrayref = $class->files(exclude => $path\_or\_arrayref)
 
     This will return an arrayref of all files touched so far.
 
@@ -297,11 +323,16 @@ Please see the `set_from()` documentation for details on values.
     string. This path will be used to filter out any files not under the root
     directory.
 
+    If an exclude path is provided, that path and everything under it is left out
+    of the results. It may be a single path or an arrayref of them, each a
+    [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance or a plain string.
+
     The running test file (`$0`) and this plugin's own file are always excluded
     from the results.
 
 - $hashref = $class->data()
 - $hashref = $class->data(root => $path)
+- $hashref = $class->data(exclude => $path\_or\_arrayref)
 
     This returns the processed coverage data that goes into the report event:
 
@@ -320,8 +351,8 @@ Please see the `set_from()` documentation for details on values.
         }
 
     Duplicate 'from' values are removed (compared by content, not reference), and
-    each list is sorted deterministically. The `root` parameter behaves as it
-    does in `files()`.
+    each list is sorted deterministically. The `root` and `exclude` parameters
+    behave as they do in `files()`.
 
 - $event = $class->report(%options)
 
@@ -335,6 +366,16 @@ Please see the `set_from()` documentation for details on values.
         Normally this is set to the current directory at module load-time. This is used
         to filter out any source files that do not live under the current directory.
         This may be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance or a plain string.
+
+    - exclude => $path\_or\_arrayref
+
+        Paths to leave out of the report entirely, along with everything under them.
+        May be a single path or an arrayref of them, each a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance or
+        a plain string. Relative paths are resolved against the current directory, and
+        wildcards are not supported.
+
+        When passed at import time this option may be given more than once instead of
+        using an arrayref, which is how it survives the `-M` command line form.
 
     - verbose => $BOOL
 
@@ -362,6 +403,7 @@ Please see the `set_from()` documentation for details on values.
 
 - $file\_or\_undef = $class->filter($file)
 - $file\_or\_undef = $class->filter($file, root => Path::Tiny->new('...'))
+- $file\_or\_undef = $class->filter($file, exclude => \['...'\])
 
     This method is used as a callback when getting the final list of covered source
     files. The default implementation removes any files that are not under the
@@ -371,6 +413,10 @@ Please see the `set_from()` documentation for details on values.
 
     If you provide a custom `root` parameter, it may be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance
     or a plain string.
+
+    Exclusions are applied here, so a subclass that replaces this method is
+    responsible for honoring the `exclude` parameter if it needs exclusions to
+    keep working.
 
     A custom filter callback should look something like this:
 

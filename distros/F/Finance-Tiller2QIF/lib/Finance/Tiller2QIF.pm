@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF;
 # ABSTRACT: Convert Tiller CSV exports to QIF format
-$Finance::Tiller2QIF::VERSION = '1.08';
+$Finance::Tiller2QIF::VERSION = '1.09';
 use v5.34;
 use strict;
 use warnings;
@@ -208,6 +208,8 @@ useful if you want to undo changes made during ingest or mapping.
 =item B<--verbose> Print detailed progress information during each phase.  Also
 runs C<checkconfig> automatically before any operations begin.
 
+=item B<--version> Print the installed version number and exit.
+
 =back
 
 =head1 MAPPING FILE
@@ -249,6 +251,22 @@ pattern in forward slashes:
 
 To match a literal pipe character in the data, escape it with a backslash:
 
+  payee | Cash\|App Payment | Expenses:Transfers
+
+Patterns are Perl regular expressions, so escape other regex metacharacters
+when they should be literal (C<.>, C<*>, C<+>, the question mark, C<(>, C<)>,
+C<[>, C<]>, C<$>, C<^>, C<\>, or C</> in a slash-delimited pattern). Apostrophes
+have no special meaning and do not need escaping:
+
+  payee | /^kaplan's new model$/ | Expenses:Food
+
+More complex regular expressions are supported when a simple pattern is not
+enough. For example, this matches Kaplan, Kaplan's, or Kaplans followed by
+“New” and an optional “Model”:
+
+  payee | /kaplan(?:'s|s)? new(?: model)?/ | Expenses:Bakeries
+
+Test complex patterns carefully, to make sure they are interpreted as expected.
 
 =item C<source> — keep the original Tiller category unchanged.
 
@@ -392,6 +410,14 @@ sub _clean_checkpoints($file) {
   return scalar @checkpoints;
 }
 
+sub _version_text {
+  # dzil is in charge of the $VERSION variable which means it is undefined during development
+  # uncoverable branch true
+  # uncoverable branch false
+  my $v = do { no strict 'vars'; $VERSION // 'unversioned' };
+  return "Tiller2QIF VERSION: ${v}";
+}
+
 sub _confirm ( %options ) {
   # uncoverable branch true
   # uncoverable branch false
@@ -469,6 +495,7 @@ sub run_cli {
       [ 'qifdate=s',   "QIF date format: ymd (default), mdy, or dmy" ],
       [ 'confirm',     "run preview before emit and confirm export"],
       [ 'verbose|v',   "Print detailed progress information" ],
+      [ 'version',     "Print the installed version and exit", { shortcircuit => 1 } ],
       [],
       [ 'help|h', "Print usage and exit", { shortcircuit => 1 } ],
     );
@@ -478,6 +505,11 @@ sub run_cli {
 
   if ( $opt->help ) {
     say $usage;
+    return;
+  }
+
+  if ( $opt->version ) {
+    say _version_text();
     return;
   }
 
@@ -493,16 +525,13 @@ sub run_cli {
     unless $cmd =~ /^(?:$VALID_COMMANDS)$/;
 
   if ( $cmd eq 'version' ) {
-    # dzil is in charge of the $VERSION variable which means it is undefined during development
-    # uncoverable branch true
-    # uncoverable branch false
-    my $v = do { no strict 'vars'; $VERSION // 'unversioned' };
-    say "Tiller2QIF VERSION: ${v}";
+    say _version_text();
     return;
   }
 
   if ( $cmd eq 'newconfig' ) {
     die "newconfig requires --config\n" unless $opt->config;
+    vPrint( $opt->verbose, _version_text() );
     # say "Creating config file: " . $opt->config if $opt->verbose;
     vPrint( $opt->verbose, "Creating config file: " . $opt->config );
     Finance::Tiller2QIF::Util::InitConfig( $opt->config );
@@ -537,6 +566,8 @@ sub run_cli {
     $options{$key} = $val if defined $val;
   }
   $options{checkpoint} = 1 if $cmd eq 'run';
+
+  vPrint( $options{verbose}, _version_text() );
 
   $options{db_path} = delete $options{db} if defined $options{db};
 

@@ -55,32 +55,69 @@ subtest 'Dependent Cross-Table Transaction' => sub {
     is($orders->[0]{user_id}, $users->[0]{id}, "Order linked to correct User ID via register");
 };
 
-subtest 'Raw SQL String Interpolation' => sub {
-    # 1. Create a user to get an ID
-    # 2. Use that ID inside a raw SQL update string
-    my $txn_f = $schema->txn_do([
+subtest 'Raw SQL: values must go through bind, not string interpolation (CPANSec CWE-89)' => sub {
+    # SECURITY: prior to the fix, '$name.id'-style tokens were substituted
+    # directly into the 'sql' text of a raw step via unescaped string
+    # interpolation, before being handed to $dbh->do(). Because register
+    # values are not always safe integers (e.g. a string/UUID primary
+    # key an attacker can influence at create() time), this allowed SQL
+    # injection through the module's own documented variable-chaining
+    # feature. The fix stops substituting into 'sql' entirely: chained
+    # values must be referenced via the 'bind' arrayref with a '?'
+    # placeholder in the SQL, which the DB driver binds as a genuine,
+    # injection-safe parameter.
+
+    # 1. The SAFE, documented pattern: placeholder in SQL, value in bind.
+    my $safe_txn_f = $schema->txn_do([
         {
-            name      => 'target_user',
+            name      => 'safe_user',
             action    => 'create',
             resultset => 'User',
-            data      => { name => 'Original Name', email => 'raw@test.com' }
+            data      => { name => 'Original Name', email => 'safe-raw@test.com' }
         },
         {
             action    => 'raw',
-            # We are testing if '$target_user.id' is swapped inside the SQL string
-            sql       => "UPDATE users SET name = 'Modified for ID \$target_user.id' WHERE id = \$target_user.id",
+            sql       => 'UPDATE users SET name = ? WHERE id = ?',
+            bind      => [ 'Modified via bind', '$safe_user.id' ],
         }
     ]);
 
-    my $res = $schema->await($txn_f);
-    ok($res->{success}, "Transaction with Raw SQL interpolation succeeded");
+    my $safe_res = $schema->await($safe_txn_f);
+    ok($safe_res->{success}, 'Transaction using bind-parameter chaining succeeded');
 
-    my $search_f      = $schema->resultset('User')->search_future({ email => 'raw@test.com' });
-    my $users         = $schema->await($search_f);
-    my $user_id       = $users->[0]{id};
-    my $expected_name = "Modified for ID $user_id";
+    my $safe_users = $schema->await(
+        $schema->resultset('User')->search_future({ email => 'safe-raw@test.com' })
+    );
+    is($safe_users->[0]{name}, 'Modified via bind',
+        'Chained id correctly reached the query as a bound parameter');
 
-    is($users->[0]{name}, $expected_name, "Raw SQL string was interpolated correctly with the real ID");
+    # 2. SECURITY REGRESSION: a '$name.id' token left inside the 'sql'
+    # text itself must NOT be silently substituted. Attempting to use it
+    # that way should surface as a query error (invalid syntax) rather
+    # than silently succeeding with spliced-in text, proving the
+    # substitution path is closed, not just quietly wrong.
+    my $unsafe_txn_f = $schema->txn_do([
+        {
+            name      => 'unsafe_user',
+            action    => 'create',
+            resultset => 'User',
+            data      => { name => 'Another Name', email => 'unsafe-raw@test.com' }
+        },
+        {
+            action    => 'raw',
+            sql       => 'UPDATE users SET name = \'should not interpolate\' WHERE id = $unsafe_user.id',
+        }
+    ]);
+
+    my $unsafe_res = eval { $schema->await($unsafe_txn_f) };
+    my $unsafe_err = $@;
+    ok($unsafe_err, "A literal \$name.id left in raw SQL text is NOT interpolated (fails loudly instead of injecting)");
+
+    my $unsafe_users = $schema->await(
+        $schema->resultset('User')->search_future({ email => 'unsafe-raw@test.com' })
+    );
+    is(scalar @$unsafe_users, 0,
+        'Whole transaction rolled back atomically, no partial write occurred, and no SQL injection happened');
 };
 
 $schema->disconnect;

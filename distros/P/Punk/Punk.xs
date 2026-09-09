@@ -15,6 +15,7 @@
 #include "punk/punk_compat.h"     /* pre-5.16 perl shims; must precede punk/ */
 
 #include "frj_abi.h"
+#include "frx_abi.h"
 
 /* ---- the File::Raw::JSON C ABI (JSON response fast path) ------------------ *
  * Resolved lazily on first use from File::Raw::JSON::_abi_ptr, exactly the
@@ -52,7 +53,42 @@ static const frj_abi *punk_frj(pTHX) {
     return PUNK_FRJ;
 }
 
+/* ---- the File::Raw::XML C ABI (the XML body path) ------------------------- *
+ * The frj twin. The XML path needs frx_abi's SV bridge - doc_to_sv,
+ * doc_from_sv, node_from_sv, node_to_sv - which is what lets a document cross
+ * between C and Perl without a method call; File::Raw::XML 0.03 is the first
+ * with it and is a hard PREREQ, so a failure here is a startup-environment
+ * error rather than something to fall back from. */
+static const frx_abi *PUNK_FRX = NULL;
+static int PUNK_FRX_TRIED = 0;
+
+static const frx_abi *punk_frx(pTHX) {
+    if (!PUNK_FRX && !PUNK_FRX_TRIED) {
+        dSP; int count; IV p = 0;
+        PUNK_FRX_TRIED = 1;
+        eval_pv("require File::Raw::XML;", FALSE);
+        SPAGAIN;                      /* the require may have moved the stack */
+        if (!SvTRUE(ERRSV)) {
+            ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
+            count = call_pv("File::Raw::XML::_abi_ptr", G_SCALAR | G_EVAL);
+            SPAGAIN;
+            if (!SvTRUE(ERRSV) && count > 0) p = POPi;
+            else if (count > 0)             (void)POPs;
+            PUTBACK; FREETMPS; LEAVE;
+            if (p) {
+                const frx_abi *a = INT2PTR(const frx_abi *, p);
+                if (a && a->abi_version >= FRX_ABI_VERSION) PUNK_FRX = a;
+            }
+        }
+    }
+    if (!PUNK_FRX)
+        croak("Punk: the XML path needs File::Raw::XML with a compatible "
+              "C ABI (FRX_ABI_VERSION %d)", FRX_ABI_VERSION);
+    return PUNK_FRX;
+}
+
 #include "punk/punk_names.h"      /* fixed module/slot/key strings, named once */
+#include "punk/punk_xml.h"        /* the XML body path, on frx_abi's SV bridge */
 #include "punk/punk_obs.h"        /* the C ABI's observer registry - early,
                                    * because punk_context.h and punk_serve.h
                                    * both fire from it (pk_abi_impl.h, which

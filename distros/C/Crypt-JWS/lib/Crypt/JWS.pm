@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Crypt::JWS', $VERSION);
@@ -29,7 +29,7 @@ Crypt::JWS - JSON Web Signatures over OpenSSL's libcrypto
 
 =head1 VERSION
 
-Version 0.03
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -86,6 +86,14 @@ routing decisions only; never trust its contents.
 
 =head2 hmac_sha256 / hmac_sha384 / hmac_sha512 ($key, $bytes)
 
+=head2 sha1 ($bytes)
+
+=head2 hmac_sha1 ($key, $bytes)
+
+Present for protocols whose interoperable default is SHA-1, RFC 6238
+TOTP above all. No JWS algorithm reaches either of them, and none will:
+there is no C<RS1>.
+
 =head2 b64url ($bytes) / b64url_decode ($str)
 
 Unpadded base64url (RFC 4648 section 5); decode tolerates padding and
@@ -125,7 +133,7 @@ API. Perl callers should use L</FUNCTIONS> and L<Crypt::JWS::Key>.
 The contract lives in F<include/jws_abi.h> (installed via
 ExtUtils::Depends):
 
-    #define JWS_ABI_VERSION 2
+    #define JWS_ABI_VERSION 3
 
     typedef struct jws_abi {
         int version;                     /* >= what the consumer needs */
@@ -152,6 +160,19 @@ ExtUtils::Depends):
         int  (*ct_eq)(pTHX_ const unsigned char *a, STRLEN alen,
                       const unsigned char *b, STRLEN blen);
         SV  *(*random_bytes)(pTHX_ STRLEN n);
+
+        /* version 2: SHA-1 for protocols whose interop default is SHA-1,
+         * RFC 6238 TOTP above all. No JWS algorithm reaches these. */
+        SV  *(*sha1)(pTHX_ const unsigned char *in, STRLEN len);
+        SV  *(*hmac_sha1)(pTHX_ const unsigned char *key, STRLEN keylen,
+                          const unsigned char *in, STRLEN len);
+        SV  *(*hmac_sha512)(pTHX_ const unsigned char *key, STRLEN keylen,
+                            const unsigned char *in, STRLEN len);
+
+        /* version 3: the public key from a DER X.509 certificate, which
+         * XML-DSig carries and key_from_pem does not read. Not validated;
+         * trailing bytes refused. Freed with key_free. */
+        void *(*key_from_x509_der)(pTHX_ const unsigned char *der, STRLEN len);
     } jws_abi;
 
 The table is B<append-only>: new entries go at the end, JWS_ABI_VERSION

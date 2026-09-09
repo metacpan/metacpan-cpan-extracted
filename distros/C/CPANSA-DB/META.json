@@ -32,7 +32,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "perl" : "5.022"
+            "perl" : "5.020"
          }
       },
       "test" : {
@@ -54,6 +54,6 @@
          "web" : "https://github.com/briandfoy/cpan-security-advisory"
       }
    },
-   "version" : "20260906.002",
+   "version" : "20260908.001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

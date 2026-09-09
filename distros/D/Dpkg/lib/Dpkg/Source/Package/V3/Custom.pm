@@ -37,12 +37,14 @@ use Dpkg::ErrorHandling;
 
 use parent qw(Dpkg::Source::Package);
 
-our $CURRENT_MINOR_VERSION = '0';
+sub CURRENT_MINOR_VERSION {
+    '0';
+}
 
 my @module_cmdline = (
     {
         name => '--target-format=<value>',
-        help => N_('define the format of the generated source package'),
+        help => N_('Define the format of the generated source package.'),
         when => 'build',
     }
 );

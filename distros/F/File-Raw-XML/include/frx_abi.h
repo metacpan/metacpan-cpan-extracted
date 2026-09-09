@@ -10,9 +10,8 @@
  * abi_version at boot with >=, never ==: the table is append-only from
  * the first release onwards, so a provider newer than the consumer is
  * always safe, and an equality check would turn every append into a
- * breaking change. Nothing has been released yet, so the whole of this
- * table is version 1 and every entry in it is still free to move; the
- * append-only rule begins to bind the day it ships.
+ * breaking change. Version 2 appends the SV bridge at the end of the
+ * table; everything a version 1 consumer resolved is where it was.
  *
  * Perl headers (EXTERN.h / perl.h / XSUB.h) must be included before this
  * file so SV, STRLEN and pTHX are defined. Only the entries that touch an
@@ -37,6 +36,11 @@
  * document: a consumer that holds a node holds the document. Every SV the
  * table returns has a reference count of one owned by the caller.
  *
+ * One entry departs from that, and only one: `doc_to_sv` takes ownership of
+ * the document it is given, because the point of it is to put the document
+ * under the blessed SV's magic. It is called out again where it is
+ * declared.
+ *
  * Two lifetimes are shorter than that, and both are the reader's. A
  * string from `reader_str` or `reader_attr` lives in the arena the reader
  * releases at the end of each record, so it is valid until the next
@@ -49,7 +53,7 @@
  * and read after the free is a use-after-free whose only symptom is a
  * wrong message, which is the hardest kind to notice. */
 
-#define FRX_ABI_VERSION 1
+#define FRX_ABI_VERSION 2
 
 typedef struct frx_doc  frx_doc;      /* opaque; owns every node and string */
 typedef struct frx_node frx_node;     /* opaque; borrowed from its doc */
@@ -333,6 +337,15 @@ typedef struct frx_abi {
      *          the requested encoding with no character flag, or NULL
      *          with *err filled. */
     void (*write_opts_init)(frx_write_opts *o);
+    /* CALL THIS ONE AS `(A->write)(...)`, with the member parenthesised.
+     * On Windows a perl built with PERL_IMPLICIT_SYS - which Strawberry
+     * is - has iperlsys.h turn `write` into a function-like macro
+     * (PerlLIO_write, three arguments), so `A->write(aTHX_ ...)` expands
+     * and does not compile. `(A->write)` leaves the name followed by `)`
+     * where a function-like macro cannot fire. The declaration below is
+     * safe for the same reason. Defining NO_XSLOCKS before XSUB.h is the
+     * other way out, but that is the consumer's whole translation unit to
+     * decide about, and this is one pair of parentheses. */
     SV  *(*write)(pTHX_ const frx_node *apex, const frx_doc *d,
                   const frx_write_opts *o, frx_err *err);
 
@@ -422,6 +435,44 @@ typedef struct frx_abi {
      * selects the attribute or the namespace node. */
     const frx_node *(*xpath_result_node)(const frx_xp_result *r, int i,
                                          int *kind, int *index);
+
+    /* ---- version 2: the SV bridge ---------------------------------------
+     *
+     * Everything above hands a consumer handles. These four cross between a
+     * handle and the blessed object the Perl surface uses, so a consumer can
+     * parse in C and hand the result to Perl code, or take a document back
+     * from Perl code and serialise it in C without a method call. Without
+     * them a consumer that wants both sides has to go through
+     * File::Raw::XML's Perl surface, because the blessing lives in a header
+     * this dist does not install.
+     *
+     * The two `_from_sv` entries are the type test as well as the unwrap:
+     * they return NULL for anything that is not the object they name,
+     * including a plain reference, an unblessed one and a different class.
+     * They never croak, as nothing in this table does. */
+
+    /* the document, +1, blessed as File::Raw::XML::Document.
+     *
+     * THIS ENTRY TAKES OWNERSHIP, and it is the only one that does. The
+     * SV's magic frees the document when the last reference goes; a caller
+     * that also calls doc_free has freed it twice. On failure the document
+     * is still consumed, so there is nothing to clean up on either path. */
+    SV *(*doc_to_sv)(pTHX_ frx_doc *d);
+
+    /* the frx_doc behind a blessed Document, or NULL if it is not one.
+     * Borrowed: the SV owns it, and it lives while the SV does. */
+    frx_doc *(*doc_from_sv)(pTHX_ SV *sv);
+
+    /* the frx_node behind a blessed Node, or NULL if it is not one. When
+     * *owner is wanted it gets the node's document, which the node borrows
+     * from and which outlives it. Both are borrowed from the SV. */
+    const frx_node *(*node_from_sv)(pTHX_ SV *sv, frx_doc **owner);
+
+    /* a node of an already-blessed document, +1, blessed as
+     * File::Raw::XML::Node. doc_sv must be the blessed Document the node
+     * belongs to: the returned node keeps it alive, which is what makes the
+     * borrow above safe. NULL if doc_sv is not a Document or n is NULL. */
+    SV *(*node_to_sv)(pTHX_ SV *doc_sv, const frx_node *n);
 } frx_abi;
 
 #endif /* FRX_ABI_H */

@@ -2,9 +2,15 @@
  * TUI state machine: background ingestion, viewport math, and rendering loop.
  */
 
+#ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
-#define _DEFAULT_SOURCE
+#endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#endif
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700
+#endif
 
 #include "tui_engine.h"
 #include "cli_common.h"
@@ -18,9 +24,12 @@
 #include <time.h>
 
 #if defined(_WIN32) || defined(_WIN64)
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 #else
+#include <sys/types.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -47,8 +56,18 @@ bool histo_shm_create(histo_shm_t *shm, const char *path, size_t capacity, uint3
     shm->size = total_size;
 
 #if defined(_WIN32) || defined(_WIN64)
+    const char *win_name = path;
+    while (*win_name == '/' || *win_name == '\\') win_name++;
+    char clean_name[256];
+    size_t ki = 0;
+    for (size_t i = 0; win_name[i] && ki < sizeof(clean_name) - 1; i++) {
+        clean_name[ki++] = (win_name[i] == '/' || win_name[i] == '\\') ? '_' : win_name[i];
+    }
+    clean_name[ki] = '\0';
+    const char *target_name = clean_name[0] ? clean_name : "histo_shm_default";
+
     HANDLE hMap = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
-                                     (DWORD)(total_size >> 32), (DWORD)(total_size & 0xFFFFFFFF), path);
+                                     (DWORD)(total_size >> 32), (DWORD)(total_size & 0xFFFFFFFF), target_name);
     if (!hMap) return false;
     shm->os_handle = (void *)hMap;
     shm->ring = (histo_shm_ring_t *)MapViewOfFile(hMap, FILE_MAP_ALL_ACCESS, 0, 0, total_size);
@@ -105,7 +124,17 @@ bool histo_shm_open(histo_shm_t *shm, const char *path) {
     shm->is_creator = false;
 
 #if defined(_WIN32) || defined(_WIN64)
-    HANDLE hMap = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, path);
+    const char *win_name = path;
+    while (*win_name == '/' || *win_name == '\\') win_name++;
+    char clean_name[256];
+    size_t ki = 0;
+    for (size_t i = 0; win_name[i] && ki < sizeof(clean_name) - 1; i++) {
+        clean_name[ki++] = (win_name[i] == '/' || win_name[i] == '\\') ? '_' : win_name[i];
+    }
+    clean_name[ki] = '\0';
+    const char *target_name = clean_name[0] ? clean_name : "histo_shm_default";
+
+    HANDLE hMap = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, target_name);
     if (!hMap) return false;
     shm->os_handle = (void *)hMap;
     histo_shm_ring_t *hdr = (histo_shm_ring_t *)MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, sizeof(histo_shm_ring_t));
@@ -241,9 +270,21 @@ size_t histo_shm_pop_batch(histo_shm_ring_t *ring, void *out_entries, size_t max
 /* ========================================================================= */
 
 static double get_time_now_sec(void) {
+#if defined(_WIN32)
+    static LARGE_INTEGER freq;
+    static int has_freq = 0;
+    if (!has_freq) {
+        QueryPerformanceFrequency(&freq);
+        has_freq = 1;
+    }
+    LARGE_INTEGER count;
+    QueryPerformanceCounter(&count);
+    return (double)count.QuadPart / (double)freq.QuadPart;
+#else
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9;
+#endif
 }
 
 static void reservoir_init(tui_reservoir_t *r, size_t cap, bool is_2d, bool has_weights) {
@@ -372,7 +413,7 @@ static void *ingest_worker_thread(void *arg) {
         while (is_engine_running(eng)) {
             size_t n = histo_shm_pop_batch(eng->shm.ring, raw_batch, max_b);
             if (n == 0) {
-                usleep(500);
+                histo_sleep_us(500);
                 double now = get_time_now_sec();
                 if (now - last_calc_time >= 0.25) {
                     histo_mutex_lock(&eng->mutex);
@@ -519,10 +560,10 @@ static void *ingest_worker_thread(void *arg) {
                     }
                     eng->finished_reading = true;
                     histo_mutex_unlock(&eng->mutex);
-                    usleep(20000);
+                    histo_sleep_us(20000);
                     continue;
                 }
-                usleep(500);
+                histo_sleep_us(500);
             } else {
                 double scale = (eng->scale_input > 0.0) ? eng->scale_input : 1.0;
                 for (size_t i = 0; i < n_read; ++i) {
@@ -596,7 +637,7 @@ static void *ingest_worker_thread(void *arg) {
                 }
                 eng->finished_reading = true;
                 histo_mutex_unlock(&eng->mutex);
-                usleep(20000);
+                histo_sleep_us(20000);
                 continue;
             }
 

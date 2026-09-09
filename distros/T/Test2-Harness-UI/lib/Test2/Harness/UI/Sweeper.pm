@@ -4,7 +4,7 @@ use warnings;
 use Time::HiRes qw/time/;
 use Test2::Harness::UI::UUID qw/gen_uuid/;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Test2::Harness::UI::Util::HashBase qw{
     <config
@@ -84,7 +84,10 @@ sub sweep {
 
         while (my $run = $runs->next()) {
             my $id = $counter++;
-            $runner->run(sub { $self->sweep_run($run, %params, id => $id) });
+            $runner->run(sub {
+                $self->config->schema->storage->disconnect;
+                $self->sweep_run($run, %params, id => $id);
+            });
         }
 
         $runner->finish;
@@ -119,7 +122,10 @@ sub sweep_run {
 
         while (my $job = $jobs->next()) {
             $counter++;
-            $runner->run(sub { $self->sweep_job($run, $job, %params) });
+            $runner->run(sub {
+                $self->config->schema->storage->disconnect;
+                $self->sweep_job($run, $job, %params);
+            });
         }
 
         $runner->finish;

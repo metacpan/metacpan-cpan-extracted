@@ -1,3 +1,8 @@
+0.000029  2026-09-08 14:21:19-07:00 America/Los_Angeles
+
+    - Add an 'exclude' parameter that drops a directory, and everything under it, from the coverage data before the report event is sent.
+    - Warn and name the unpaired key when an import parameter list has an odd number of elements, instead of storing it with an undefined value.
+
 0.000028  2026-07-15 09:41:25-07:00 America/Los_Angeles
 
     - touch_source_file() and touch_data_file() now respect disable(),

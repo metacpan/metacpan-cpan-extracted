@@ -11,7 +11,7 @@ use warnings::register qw( Encode::dbi::queue );
 
 use Data::Record::Serialize::Error -all;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 use Package::Variant
   importing => [
@@ -318,7 +318,7 @@ Data::Record::Serialize - Flexible serialization of a record
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 
@@ -568,6 +568,62 @@ output for subsequent records.
     N     Y        X         Fields in <types> are output.
                              Types are specified by <types>.
 
+=head2 Field Selection Specifications
+
+Some options to the constructor (L</nullify>, L</numify>,
+L</stringify>), accept a list of field select specifications, using it
+to apply set operations to the available fields, which may be
+explicitly ordered or unordered depending upon how it is specified;
+see L</types>, L</fields>.
+
+A specification may be drawn from this set of values:
+
+=over
+
+=item *
+
+elements of the available @fields.
+
+=item *
+
+The C<+> or C<->  characters
+
+=item *
+
+Elements of C<@fields> prefixed with C<+> or C<->.
+
+=back
+
+The array of specifications is processed in order:
+
+=over
+
+=item *
+
+If the first value is C<-> or begins with C<->, the output set is
+initialized with the available fields.
+
+=item *
+
+A bare C<+> clears the output set, and loads it with the available fields.
+
+=item *
+
+A bare C<-> clears the output set.
+
+=item *
+
+A field name, or a field name prefixed with C<+> is appended.
+
+=item *
+
+A field name prefixed with C<-> is removed from the output set.
+
+=back
+
+The output list of fields preserves insertion order and removes
+leading duplicates.
+
 =head2 Errors
 
 Most errors result in exception objects being thrown, typically in the
@@ -659,7 +715,7 @@ B<nullify> may be passed:
 
 =over
 
-=item * an arrayref of input field names
+=item * an arrayref of field selection specifications (see L</Field Selection Specifications> )
 
 =item * a coderef
 
@@ -691,7 +747,7 @@ B<numify> may be passed:
 
 =over
 
-=item * an arrayref of input field names
+=item * an arrayref of field selection specifications (see L</Field Selection Specifications> )
 
 =item * a coderef
 
@@ -723,7 +779,7 @@ B<stringify> may be passed:
 
 =over
 
-=item * an arrayref of input field names
+=item * an arrayref of field selection specifications (see L</Field Selection Specifications> )
 
 =item * a coderef
 

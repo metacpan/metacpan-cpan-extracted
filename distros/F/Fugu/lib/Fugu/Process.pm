@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::Process;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 use Config;
 use Fcntl     qw(F_DUPFD F_SETFD FD_CLOEXEC);

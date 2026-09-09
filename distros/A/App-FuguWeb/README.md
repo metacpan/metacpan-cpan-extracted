@@ -26,6 +26,17 @@ bin/fuguweb check --out web/build
 `make deps` installs the latest Fugu release and the renderers. See
 [INSTALL.md](INSTALL.md) for full instructions.
 
+`make deps` verifies every download. The Fugu release carries a signed `SHA256`
+manifest, and `deps/KEYS.txt` declares the release key of the organization by
+URL and digest. `scripts/deps` fetches that key, holds it to the digest, and
+verifies the manifest with signify(1). `deps/SHA256.txt` records the digest of
+each other download.
+
+`make deps` also installs gitleaks, the tool of the secret gate. It installs the
+`tool` environment before every other environment, so the gate tool is present
+for each chain. The CI gate installs gitleaks with `make deps`, so one pin
+serves the operator gate and the CI gate.
+
 ## Documentation
 
 `man fuguweb` — or `mandoc man/fuguweb/fuguweb.1 | less` from a checkout — holds

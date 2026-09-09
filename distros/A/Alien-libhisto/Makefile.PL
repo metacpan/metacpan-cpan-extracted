@@ -68,6 +68,7 @@ WriteMakefile($abmm->mm_args(
         'Alien::Build'                       => '2.00',
         'Alien::Build::MM'                   => '2.00',
         'Alien::Build::Plugin::Build::CMake' => '0.01',
+        'Alien::cmake3'                      => '0.02',
         'File::Spec'                         => '0',
         'File::Path'                         => '0',
     },
@@ -75,6 +76,7 @@ WriteMakefile($abmm->mm_args(
         'Alien::Build'                       => '2.00',
         'Alien::Build::MM'                   => '2.00',
         'Alien::Build::Plugin::Build::CMake' => '0.01',
+        'Alien::cmake3'                      => '0.02',
     },
     PREREQ_PM => {
         'Alien::Base'                        => '2.00',

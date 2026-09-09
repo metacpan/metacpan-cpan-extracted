@@ -354,6 +354,7 @@ use %s;
     }
 
     method _get_xmake_version ($cmd) {
+        local @ENV{qw[XMAKE_PROGRAM_DIR XMAKE_PROGRAM_FILE XMAKE_ROOTDIR]};
         my ( $out, undef, $exit ) = capture { system $cmd, '--version' };
         return "v$1" if $exit == 0 && $out =~ /xmake\s+v?(\d+\.\d+\.\d+)/i;
         return 'v0.0.0';

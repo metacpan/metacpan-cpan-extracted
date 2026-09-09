@@ -1,5 +1,10 @@
 Revision history for Alien-libhisto
 
+0.4.0   2026-09-08
+        - Synchronize bundled libhisto C library to v0.4.0.
+        - Bundle new C++17 modern headers (include/histo/*.hpp).
+        - Purge editor swap files and update MANIFEST.SKIP patterns.
+
 0.3.0   2026-08-29
         - Synchronize bundled libhisto C library to v0.3.0.
         - Fix Windows MSVC / Strawberry Perl build failure with cross-platform console and header shims.

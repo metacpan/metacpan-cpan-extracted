@@ -76,15 +76,6 @@ struct histo2d {
     double                   stats_C_xy;     /**< Running sum of co-deviations for (X, Y) */
 };
 
-/* 64-byte aligned memory allocation helpers */
-static inline void* histo2d_alloc_aligned(size_t size) {
-    return histo_alloc_aligned(size);
-}
-
-static inline void histo2d_free_aligned(void *ptr) {
-    histo_free_aligned(ptr);
-}
-
 /**
  * @brief Linear row-major index mapping: i = ix * ny + iy.
  */

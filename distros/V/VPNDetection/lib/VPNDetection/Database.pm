@@ -7,7 +7,7 @@ use Carp ();
 
 use VPNDetection::Error;
 
-our $VERSION = '1.2.1';
+our $VERSION = '1.4.0';
 
 # The dataset FAMILIES your organization is licensed to download. A license
 # covers a family, while a download names one of its versions, so the ids the

@@ -12,6 +12,10 @@ dist.ini
 examples/list-projects.pl
 lib/Webservice/Overleaf/API.pm
 releases/Webservice-Overleaf-API-0.02.tar.gz
+releases/Webservice-Overleaf-API-0.03.tar.gz
+releases/Webservice-Overleaf-API-0.04.tar.gz
+releases/Webservice-Overleaf-API-0.05.tar.gz
+releases/Webservice-Overleaf-API-0.06.tar.gz
 t/00-load.t
 t/01-open-in-overleaf.t
 t/02-git.t
@@ -19,4 +23,6 @@ t/03-experimental-mock.t
 t/04-http-errors.t
 t/05-dispatch.t
 t/06-cli.t
+t/07-local-compile.t
+t/08-credentials.t
 t/lib/Local/MockUA.pm

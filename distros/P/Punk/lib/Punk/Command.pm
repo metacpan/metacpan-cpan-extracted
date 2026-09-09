@@ -541,7 +541,7 @@ sub doctor {
     _line('perl', sprintf('%vd', $^V), 'ok');
 
     print "\nprerequisites\n";
-    for my $mod (qw(Open::API Template::Stencil File::Raw::JSON
+    for my $mod (qw(Open::API Template::Stencil File::Raw::JSON File::Raw::XML
                     JSON::Schema::Fast YAML::XS Hyperman)) {
         my $v = _module_version($mod);
         $bad++ unless defined $v;
@@ -1264,6 +1264,14 @@ sub _abi_report {
         my $p = eval { require File::Raw::JSON; File::Raw::JSON::_abi_ptr() };
         { name => 'File::Raw::JSON (frj_abi)',
           detail => $p ? 'resolved' : 'not resolved',
+          state  => $p ? 'ok' : 'NOT RESOLVED' };
+    };
+
+    push @out, do {
+        my $p = eval { require File::Raw::XML; File::Raw::XML::_abi_ptr() };
+        my $v = eval { File::Raw::XML::_abi_version() };
+        { name   => 'File::Raw::XML (frx_abi)',
+          detail => $p ? "v" . ($v // '?') . ", resolved" : 'not resolved',
           state  => $p ? 'ok' : 'NOT RESOLVED' };
     };
 

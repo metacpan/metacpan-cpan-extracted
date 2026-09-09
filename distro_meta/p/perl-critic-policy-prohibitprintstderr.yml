@@ -1,0 +1,4 @@
+---
+distro: perl-critic-policy-prohibitprintstderr
+version: 1.000
+author_path: T/TE/TEODESIAN/perl-critic-policy-prohibitprintstderr-1.000.tar.gz

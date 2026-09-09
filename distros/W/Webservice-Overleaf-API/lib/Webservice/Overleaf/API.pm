@@ -4,7 +4,11 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
+
+# General-purpose Overleaf tooling, also informed by practical Science Perl
+# Journal author/editor work.  The author is a Science Perl Committee member
+# and a Co-Editor of the Journal; see the POD for context and links.
 
 use Carp qw/croak/;
 use Dispatch::Fu qw/dispatch on xdefault xshift_and_deref/;
@@ -71,7 +75,15 @@ sub project_url {
 sub git_url {
     my ($self, $project_id) = @_;
     $project_id = _project_id($project_id);
-    return $self->git_base_url . '/' . $project_id;
+
+    my $base = $self->git_base_url;
+
+    # Overleaf Cloud documents the public Git username as "git".  Keep the
+    # token out of the URL, but include that non-secret username so ordinary
+    # Git does not guess an account email address when it needs credentials.
+    $base =~ s{\Ahttps://git\.overleaf\.com(?=/|\z)}{https://git\@git.overleaf.com};
+
+    return $base . '/' . $project_id;
 }
 
 sub open_uri {
@@ -153,11 +165,16 @@ sub git_pull {
 }
 
 sub git_push {
-    my ($self, $directory) = @_;
+    my ($self, $directory, @args) = @_;
     croak 'git_push requires a repository directory'
       if !defined($directory) || $directory eq q{};
 
-    return $self->_run_git('git', '-C', $directory, 'push');
+    # Optional arguments deliberately map directly to `git push` arguments.
+    # The high-level CLI compile workflow uses this to push the complete
+    # committed project to the branch discovered from the Overleaf Git remote.
+    # It does not upload selected .tex/.bib files or use the ZIP export as a
+    # work tree.
+    return $self->_run_git('git', '-C', $directory, 'push', @args);
 }
 
 sub git_remote_add {
@@ -751,15 +768,131 @@ Returns the Git bridge URL for a project.
 
 =head2 git_clone, git_pull, git_push, git_remote_add
 
-Run Git using list-form C<system>, avoiding shell interpolation.  Authentication
-is intentionally left to Git's credential mechanism; this module does not put
-Overleaf Git authentication tokens on the command line or in remote URLs.
+Run Git using list-form C<system>, avoiding shell interpolation.  Direct module
+use leaves authentication to Git or to a caller-supplied C<git_runner>; the
+module does not put Overleaf Git authentication tokens on the command line or
+in remote URLs.  The bundled C<overleaf> CLI can supply its standardized token
+through a temporary C<GIT_ASKPASS> helper.
+
+C<git_push($directory)> retains the ordinary C<git push> behavior.  Additional
+arguments are passed to C<git push>, which lets the command-line client use an
+explicit Overleaf remote and the remote's discovered default/tracking branch
+for its higher-level local compile workflow.
+
+=head1 AUTHENTICATION
+
+Overleaf divides the functionality used by this distribution across two
+separate authentication systems.  They are not interchangeable:
+
+=over 4
+
+=item *
+
+The official Git bridge uses a B<Git authentication token>.  The username is
+C<git> and the token is the password.  Create tokens in Overleaf Account
+Settings under B<Git authentication tokens>; Overleaf also offers token
+generation from a project's B<Integrations -> Git> dialog.
+
+=item *
+
+The experimental project-listing, ZIP, compile, PDF, and build-output methods
+use the B<C<overleaf_session2>> cookie from an already authenticated browser
+session.
+
+=back
+
+The bundled C<overleaf> CLI standardizes these credentials as:
+
+  ~/.overleaf/session
+  ~/.overleaf/git-token
+
+and also supports C<OVERLEAF_SESSION> and C<OVERLEAF_GIT_TOKEN>.  Run:
+
+  overleaf --help
+
+for the complete step-by-step setup, credential precedence, permission rules,
+independent authentication tests, and the combined Git-push -> Overleaf-compile
+-> PDF-download workflow.
+
+=head2 Official Git bridge
+
+For Overleaf Cloud, create a Git authentication token at:
+
+L<https://www.overleaf.com/user/settings>
+
+under B<Git authentication tokens>, then choose B<Generate token> and copy the
+complete value when it is displayed.  Overleaf does not display the whole token
+again later; generate a new one if the original value is lost.  The first use
+of a project's B<Integrations -> Git> dialog can also offer B<Generate token>.
+
+Git uses C<git> as the username and the token as the password.  The same token
+can be used across the projects accessible to that account; Overleaf currently
+documents a one-year expiration period.  Each collaborator should use their
+own token.
+
+Direct module use leaves credential storage to Git or to the caller's
+C<git_runner>.  The bundled CLI additionally supports F<~/.overleaf/git-token>
+and C<OVERLEAF_GIT_TOKEN>, passed to Git through C<GIT_ASKPASS> so the token is
+not embedded in Git URLs or process arguments.
+
+See Overleaf's current token documentation:
+
+L<https://docs.overleaf.com/integrations-and-add-ons/git-integration-and-github-synchronization/git-integration/git-integration-authentication-tokens>
+
+=head2 Experimental browser-session operations
+
+The experimental project-listing, ZIP, compile, PDF, and compile-output methods
+use the same authenticated browser session as the Overleaf web application.
+The practical authentication method is to copy the value of the
+C<overleaf_session2> cookie from a browser in which you are already logged in.
+
+For Firefox, press F12 and open B<Storage -> Cookies ->
+https://www.overleaf.com>.  For Chrome, Edge, and other Chromium-family
+browsers, open B<Application -> Storage -> Cookies ->
+https://www.overleaf.com>.  Find C<overleaf_session2> and copy only its
+B<Value>, not the C<overleaf_session2=> prefix.
+
+The copied value can be supplied directly:
+
+    my $ol = Webservice::Overleaf::API->new(
+        experimental => 1,
+        session      => $session_value,
+    );
+
+or through the environment:
+
+    $ENV{OVERLEAF_SESSION} = $session_value;
+
+    my $ol = Webservice::Overleaf::API->new(
+        experimental => 1,
+    );
+
+The CLI's default F<~/.overleaf/session> file contains that value on exactly one
+line.  Treat it like a password.  It grants access as the logged-in Overleaf
+user and must not be committed, logged, pasted into bug reports, or otherwise
+disclosed.
+
+=head2 Session lifetime
+
+As of the Overleaf Cookie Policy last modified 5 August 2026,
+C<overleaf_session2> is an authentication cookie with a documented retention
+period of B<5 days>.  A copied session value should therefore be treated as a
+short-lived credential and refreshed from the browser when authentication
+stops working.
+
+The five-day retention period is not a guarantee that a particular copied
+session will remain valid for exactly five days.  Logging out, revocation,
+rotation, security changes, or other server-side invalidation may make it stop
+working earlier.
+
+See L<https://www.overleaf.com/legal> for Overleaf's current cookie policy.
 
 =head1 EXPERIMENTAL WEB APPLICATION INTERFACE
 
 These methods require both C<< experimental => 1 >> and an Overleaf session
 cookie.  C<OVERLEAF_SESSION> is used when C<session> is not passed directly.
-Treat this cookie like a password and do not commit or log it.
+See L</AUTHENTICATION> for the current browser-cookie procedure and session
+lifetime.  Treat this cookie like a password and do not commit or log it.
 
 =head2 bootstrap
 
@@ -796,6 +929,172 @@ C<< compile => $result >>.  With C<< to => $filename >> it writes the PDF.
 
 Downloads a named compile artifact from a previous C<compile> result.
 
+=head1 COMMAND-LINE CLIENT
+
+The distribution includes C<overleaf>, a command-line companion implemented as
+a modulino in F<bin/overleaf>.  It uses C<Util::H2O::More::Getopt2h2o> for
+option handling and C<Dispatch::Fu> for command routing.
+
+The CLI exposes the same two broad integration surfaces as the module:
+
+=over 4
+
+=item *
+
+The documented Open in Overleaf interface and Git bridge.
+
+=item *
+
+The explicitly opt-in browser-session interface used for project listing,
+project ZIP download, remote compilation, PDF retrieval, and build artifacts.
+
+=back
+
+For day-to-day work, the CLI standardizes its two private credentials under
+F<~/.overleaf/>.  Create the directory and files once:
+
+    mkdir -p ~/.overleaf
+    chmod 700 ~/.overleaf
+
+    # Copy only the value of the overleaf_session2 browser cookie.
+    read -rsp 'Paste overleaf_session2 value: ' OL_SESSION; printf '\n'
+    printf '%s\n' "$OL_SESSION" > ~/.overleaf/session
+    unset OL_SESSION
+    chmod 600 ~/.overleaf/session
+
+    # Copy only the Overleaf Git authentication token.
+    read -rsp 'Paste Overleaf Git token: ' OL_GIT_TOKEN; printf '\n'
+    printf '%s\n' "$OL_GIT_TOKEN" > ~/.overleaf/git-token
+    unset OL_GIT_TOKEN
+    chmod 600 ~/.overleaf/git-token
+
+Both files are discovered automatically.  Credential files must live below
+F<~/.overleaf/> and should be created with mode C<0600>; the CLI verifies exact
+mode where POSIX permissions are enforceable and handles MSYS2/Windows
+C<noacl> filesystems specially.  C<OVERLEAF_SESSION> and C<OVERLEAF_GIT_TOKEN>
+are supported as environment-variable alternatives.
+
+    overleaf --experimental bootstrap
+
+A successful bootstrap prints:
+
+    authenticated
+
+List projects and choose the project ID you want to work with:
+
+    overleaf --experimental projects
+
+    ID=0123456789abcdef
+
+A project ZIP is the easiest way to inspect the source tree:
+
+    overleaf --experimental \
+        --output project.zip \
+        zip "$ID"
+
+    unzip -l project.zip
+    unzip -l project.zip | grep -Ei '\.tex$'
+
+There are two useful C<compile> forms.  The low-level remote form compiles
+whatever is already present in an Overleaf project and lists B<build
+artifacts>, not source files:
+
+    overleaf --experimental compile "$ID"
+
+The higher-level local form is intended for ordinary work in an Overleaf Git
+checkout.  It discovers the project ID from the Git remote, requires a clean
+work tree, pushes the complete committed project to Overleaf, compiles the
+requested root document, and downloads the resulting PDF:
+
+    cd my-paper
+    git add .
+    git commit -m 'revise paper'
+
+    overleaf --experimental compile main.tex
+
+The local workflow discovers the Overleaf remote branch from the current
+branch's upstream or the remote C<HEAD>; it does not hard-code C<master> or
+C<main>.  The complete committed project is pushed as C<HEAD:E<lt>branchE<gt>>.
+
+This writes F<main.pdf> by default.  Omitting C<main.tex> uses Overleaf's
+configured root and names the PDF from the repository directory.  C<--output>
+selects a different local filename, and C<--no-push> deliberately compiles the
+existing remote project without synchronizing the local checkout.
+
+The local form treats the Git repository as the working project.  It does not
+try to select only C<.tex> or C<.bib> files: LaTeX builds may depend on style
+files, classes, images, generated sources, or other tracked resources.  The
+project ZIP remains an export/snapshot used for inspection and backup, not an
+editable staging mechanism.
+
+The low-level C<compile PROJECT_ID> form prints the compilation status, PDF
+URL, and generated files such as C<output.log>, C<output.bbl>,
+C<output.chktex>, and C<output.pdf>.
+
+A useful way to discover the root TeX document used by Overleaf is to retrieve
+the compilation log and inspect its initial C<**filename.tex> line:
+
+    overleaf --experimental \
+        --output output.log \
+        output "$ID" output.log
+
+    grep -m1 '^\*\*[^*]' output.log
+
+Once the root is known, it can be requested explicitly:
+
+    ROOT_TEX=user_guide.tex
+
+    overleaf --experimental \
+        --resource-path "$ROOT_TEX" \
+        compile "$ID"
+
+Download the resulting PDF:
+
+    overleaf --experimental \
+        --resource-path "$ROOT_TEX" \
+        --output document.pdf \
+        pdf "$ID"
+
+On a Linux desktop:
+
+    xdg-open document.pdf >/dev/null 2>&1 &
+
+From MSYS2/Git Bash on Windows:
+
+    start document.pdf
+
+The Git bridge is separate from the browser-session credential.  Git uses
+Overleaf's token-based Git authentication and its normal credential handling.
+For a project with Git integration enabled:
+
+    overleaf git-url "$ID"
+    overleaf clone "$ID" my-paper
+    overleaf pull my-paper
+
+After editing and committing locally, a clone whose branch already tracks the
+Overleaf remote can normally be pushed with:
+
+    overleaf push my-paper
+
+For an existing local Git repository, add Overleaf as a named remote:
+
+    overleaf remote-add . "$ID" overleaf
+    git remote -v
+
+Overleaf's Git bridge represents a single linear project history.  The CLI
+discovers the branch tracked/advertised by the selected remote rather than
+hard-coding C<master> or C<main>; C<--remote-branch NAME> is available when
+local Git metadata is insufficient.
+
+The CLI's standard private credentials are F<~/.overleaf/session> for the
+browser session and F<~/.overleaf/git-token> for the Git authentication token.
+Both should be created with mode C<0600>.  C<OVERLEAF_SESSION> and
+C<OVERLEAF_GIT_TOKEN> are also supported.  See C<overleaf --help> for the
+complete setup, MSYS2/Windows permission note, and precedence rules.
+
+C<overleaf --help> contains the complete command reference and a more detailed
+start-to-finish walkthrough.
+
 =head1 DISPATCH INTERFACE
 
 =head2 call
@@ -826,11 +1125,44 @@ endpoint changes in practice.
 L<Dispatch::Fu>, L<Util::H2O::More>, L<HTTP::Tiny>,
 L<https://www.overleaf.com/devs>,
 L<https://www.overleaf.com/learn/how-to/Git_integration>,
+L<https://www.overleaf.com/legal>,
 L<https://github.com/aloth/olcli>
+
+=head1 SCIENCE PERL CONTEXT
+
+This distribution is general-purpose, but part of its development grew out of
+a practical publishing need.  The author is a member of the Perl Community's
+Science Perl Committee and a Co-Editor of the Science Perl Journal, and the
+Git/Overleaf workflow supported here is useful for some of the ordinary work
+of preparing, reviewing, and editing LaTeX submissions.
+
+Nothing in this module is required in order to write for the Journal; it is
+simply tooling that may make an existing Overleaf and Git workflow more
+convenient.  Perl programmers doing scientific, engineering, or other
+technical work are welcome to learn more about the Science Perl Committee at:
+
+L<https://perlcommunity.org/science/>
+
+The Science Perl Journal can be read online at:
+
+L<https://science.perlcommunity.org/spj>
+
+Prospective authors can find the Journal's submission information at:
+
+L<https://science.perlcommunity.org/spj/about/submissions>
+
+Readers interested in a printed issue can follow the Journal's announcements
+for current purchase information:
+
+L<https://science.perlcommunity.org/spj/announcement>
 
 =head1 AUTHOR
 
 Brett Estrade L<< <oodler@cpan.org> >>
+
+Member, Perl Community's Science Perl Committee.
+
+Co-Editor, The Science Perl Journal.
 
 =head1 LICENSE AND COPYRIGHT
 

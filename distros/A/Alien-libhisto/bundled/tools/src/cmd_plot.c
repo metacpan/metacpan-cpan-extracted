@@ -497,15 +497,15 @@ int histo_cli_plot(int argc, char **argv, FILE *out, FILE *err) {
                     }
                 }
             } else {
-                histo_t *h = NULL;
-                histo2d_t *h2d = NULL;
-                if (cli_read_any_histogram_from_stream(in_fp, &h, &h2d) == HISTO_OK) {
-                    if (h2d) {
-                        render_histo2d_heatmap(h2d, term_width, use_color, palette, title, out);
-                        histo2d_destroy(h2d);
-                    } else if (h) {
-                        render_histogram_dispatch(h, term_width, style, use_color, palette, log_scale, show_errors, show_stats, title, sparkline, out);
-                        histo_destroy(h);
+                histo_t *in_h = NULL;
+                histo2d_t *in_h2d = NULL;
+                if (cli_read_any_histogram_from_stream(in_fp, &in_h, &in_h2d) == HISTO_OK) {
+                    if (in_h2d) {
+                        render_histo2d_heatmap(in_h2d, term_width, use_color, palette, title, out);
+                        histo2d_destroy(in_h2d);
+                    } else if (in_h) {
+                        render_histogram_dispatch(in_h, term_width, style, use_color, palette, log_scale, show_errors, show_stats, title, sparkline, out);
+                        histo_destroy(in_h);
                     }
                 } else {
                     fprintf(err, "Error: Failed to deserialize histogram from '%s'\n", files[f]);

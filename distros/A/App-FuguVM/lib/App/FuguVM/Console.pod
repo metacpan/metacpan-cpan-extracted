@@ -14,6 +14,8 @@ App::FuguVM::Console - drive the serial console of a guest
     $console->run_install({
         root_password => $password,
         proxy_url     => $proxy->guest_url,
+        arch          => 'arm64',
+        verify        => 'yes',
     }) or die "installation failed\n";
 
     $console->run_script('reboot.exp');
@@ -40,6 +42,25 @@ The host and port name the serial console. Each script reads its
 timeout from C<FUGUVM_TIMEOUT> in the environment and carries its own
 default.
 
+=head2 attach
+
+    $console->attach
+
+Attach the terminal of the caller to this console, with L<telnet(1)>.
+The method returns the exit code of telnet(1).
+
+The guest never closes the console, so no end of file ends the
+attachment. The operator ends it with the telnet escape key,
+C<Ctrl-]>, and then C<quit>. The method saves the terminal attributes
+of standard input first, and it restores them on every exit path, the
+signal path included, because telnet(1) leaves the terminal raw when
+a signal kills it. A signal that kills the tool also ends telnet(1),
+so no raw orphan keeps the terminal.
+
+The console takes one client. An installation and C<fuguvm expect>
+each hold the same port, so an operator must not attach while one
+runs.
+
 =head2 script_path
 
     App::FuguVM::Console->script_path($name)
@@ -54,7 +75,33 @@ C<run_install> does.
     $console->run_install(\%config)
 
 Drive a complete installation. The configuration gives the root
-password and the proxy URL that the guest fetches its sets through.
+password, the proxy URL that the guest fetches its sets through, the
+architecture, and the verify word (C<yes> or C<no>, default C<yes>).
+The method passes them to F<install.exp> in that order, after the
+host and the port. The script reads its arguments by position, so the
+tool and the script land in one commit.
+
+With C<verify> set to C<yes>, the script does not answer the
+"Continue without verification?" prompt of the installer: the
+installer of a numbered release verifies each set by itself, so the
+prompt reports a broken mirror, and the script exits 1. With C<no>,
+the script answers yes and writes a warning that the guest installs
+unverified sets.
+
+=head2 run_autoinstall
+
+    $console->run_autoinstall(\%config)
+
+Start an autoinstall(8) over the console. The configuration gives
+C<autoinstall_url>, the URL that the guest fetches the response file
+from, and the architecture. The method passes them to
+F<autoinstall.exp> in that order, after the host and the port. The
+script answers the install prompt and the response-file prompt, and
+the response file answers every other installer question.
+
+The method calls C<_expect> directly, like C<run_install>, and it
+must not use C<run_script>: C<run_script> needs the execute bit, and
+an installed share tree does not keep it.
 
 =head2 run_script
 

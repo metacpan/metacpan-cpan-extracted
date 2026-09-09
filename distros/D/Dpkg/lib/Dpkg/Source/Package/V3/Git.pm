@@ -46,7 +46,9 @@ use Dpkg::Source::Functions qw(erasedir);
 
 use parent qw(Dpkg::Source::Package);
 
-our $CURRENT_MINOR_VERSION = '0';
+sub CURRENT_MINOR_VERSION {
+    '0';
+}
 
 # Remove variables from the environment that might cause git to do
 # something unexpected.
@@ -103,11 +105,11 @@ sub _parse_vcs_git {
 my @module_cmdline = (
     {
         name => '--git-ref=<ref>',
-        help => N_('specify a git <ref> to include in the git bundle'),
+        help => N_('Specify a git <ref> to include in the git bundle.'),
         when => 'build',
     }, {
         name => '--git-depth=<number>',
-        help => N_('create a shallow clone with <number> depth'),
+        help => N_('Create a shallow clone with <number> depth.'),
         when => 'build',
     }
 );
@@ -155,7 +157,7 @@ sub do_build {
     _check_workdir($dir);
 
     my $old_cwd = getcwd();
-    chdir $dir or syserr(g_("unable to chdir to '%s'"), $dir);
+    chdir $dir or syserr(g_("cannot change directory to '%s'"), $dir);
 
     # Check for uncommitted files.
     # To support «dpkg-source -i», get a list of files equivalent to the ones
@@ -182,7 +184,7 @@ sub do_build {
             }
         }
     }
-    close($git_ls_files_fh) or syserr(g_('git ls-files exited nonzero'));
+    close($git_ls_files_fh) or subprocerr('git ls-files');
     if (@files) {
         error(g_('uncommitted, not-ignored changes in working directory: %s'),
               join(' ', @files));
@@ -192,7 +194,8 @@ sub do_build {
     my $tmpdir;
     my $shallowfile;
     if ($self->{options}{git_depth}) {
-        chdir $old_cwd or syserr(g_("unable to chdir to '%s'"), $old_cwd);
+        chdir $old_cwd
+            or syserr(g_("cannot change directory to '%s'"), $old_cwd);
         $tmpdir = File::Temp->newdir(
             TEMPLATE => "$dirname.git.XXXXXX",
             DIR => $updir,
@@ -204,14 +207,20 @@ sub do_build {
         # create a shallow clone.
         info(g_('creating shallow clone with depth %s'),
                 $self->{options}{git_depth});
-        system('git', 'clone', '--depth=' . $self->{options}{git_depth},
-               '--quiet', '--bare', 'file://' . abs_path($dir), $clone_dir);
+        system(
+            'git', 'clone',
+            '--depth=' . $self->{options}{git_depth},
+            '--quiet',
+            '--bare',
+            '--end-of-options',
+            'file://' . abs_path($dir), $clone_dir
+        );
         subprocerr('git clone') if $?;
         chdir($clone_dir)
-            or syserr(g_("unable to chdir to '%s'"), $clone_dir);
+            or syserr(g_("cannot change directory to '%s'"), $clone_dir);
         $shallowfile = "$basenamerev.gitshallow";
         system('cp', '-f', 'shallow', "$old_cwd/$shallowfile");
-        subprocerr('cp shallow') if $?;
+        subprocerr("cp shallow $old_cwd/$shallowfile") if $?;
     }
 
     # Create the git bundle.
@@ -227,9 +236,9 @@ sub do_build {
            # branch.
            '--',
     );
-    subprocerr('git bundle') if $?;
+    subprocerr("git bundle create $old_cwd/$bundlefile") if $?;
 
-    chdir $old_cwd or syserr(g_("unable to chdir to '%s'"), $old_cwd);
+    chdir $old_cwd or syserr(g_("cannot change directory to '%s'"), $old_cwd);
 
     if (defined $tmpdir) {
         erasedir($tmpdir);
@@ -280,7 +289,13 @@ sub do_extract {
     # Extract git bundle.
     info(g_('cloning %s'), $bundle);
     my $bundle_path = File::Spec->catfile($self->{basedir}, $bundle);
-    system('git', 'clone', '--quiet', '--origin=bundle', $bundle_path, $newdirectory);
+    system(
+        'git', 'clone',
+        '--quiet',
+        '--origin=bundle',
+        '--end-of-options',
+        $bundle_path, $newdirectory
+    );
     subprocerr('git bundle') if $?;
 
     if (defined $shallow) {

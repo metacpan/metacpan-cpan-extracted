@@ -1,5 +1,79 @@
 Revision history for DBIx::Class::Async
 
+v1.1.0   2026-09-08
+         [SECURITY]
+         - All dynamic class loading locations were secured to prevent code
+           injection (CWE-94). The schema_class, result_class and similar
+           specifications used to go through the eval "require $class"
+           method which means that the code got executed in Perl and not
+           only loaded as a module at 8 locations in the code. Any string
+           that could be recognised as a class name combined with any number
+           of ';' separated Perl instructions could cause arbitrary code
+           execution while being loaded.
+         - One of the paths of the 'result_class' resultset attribute in
+           ResultSet::new_result was looked at in a proof of concept
+           together with its unique accidental protection because of its
+           protection clause, unless $target_class->can('can'), which gets
+           true for any string that has ever existed (all classes inherit
+           UNIVERSAL::can), therefore making the problematic line executing
+           any code. The other call points are protected with different
+           protection clauses (for example, ->can('connect')) and were
+           confirmed to be affected.
+         - The following new function has been added:
+              DBIx::Class::Async::_safe_require_class.
+           It checks the validity of the name of the class and then loads it
+           using function require($file), providing a similar mechanism as
+           Class::C3::Componentised::ensure_class_loaded. All calls to
+           eval "require $class" and the double-interpolated
+           eval "package main; ... " VERSION fallback function have now been
+           changed to use this method. The previously ambiguous ->can('can')
+           check has also been replaced by an actual check that the class
+           was loaded before.
+
+         [TEST SUITE]
+         - A new test file t/157-safe-class-loading.t has been created, and
+           a regression check has been added to t/123-result-class.t file to
+           make sure that any malicious schema_class/result_class strings
+           are rejected and no code is being run when real classes are being
+           processed.
+
+v1.0.9   2026-09-08
+         [SECURITY]
+         - Fixed a SQL injection (CWE-89) in txn_do's variable-chaining
+           feature. _resolve_placeholders/_interpolate_string substituted
+           register values (e.g. "$stepname.id", populated from a prior
+           step's row primary key) directly into arbitrary strings via
+           unescaped text replacement, including the 'sql' field of a
+           { action => 'raw', sql => ..., bind => [...] } step, which is
+           executed as literal SQL text via $dbh->do(). If a table's
+           primary key value can be influenced by the caller (e.g. a
+           client-supplied slug/username used as a string primary key,
+           not an uncommon pattern, and not something the auto-increment
+           happy path guards against), that value flowed unescaped into
+           the SQL text, bypassing WHERE-clause scoping and any other
+           part of the statement. This is a real, demonstrated
+           injection, not merely a theoretical concern: it matched the
+           library's own previously-shipped SYNOPSIS example and its own
+           t/139-txn-do.t test, which exercised exactly this
+           substitution as intended, documented behaviour.
+         - _resolve_placeholders no longer touches the 'sql' key of a
+           step under any circumstance. Chained values reaching a raw
+           step now MUST go through the 'bind' arrayref with a '?'
+           placeholder in 'sql', substitution into 'bind' array
+           elements was already safe (it becomes a genuine DBI bind
+           parameter) and is unchanged. Documentation in
+           DBIx::Class::Async::Storage::DBI updated to show the safe
+           pattern and warn against the unsafe one.
+
+         [TEST SUITE]
+         - Rewrote t/139-txn-do.t's "Raw SQL String Interpolation" test,
+           which previously asserted the vulnerable behaviour as
+           correct. It now verifies the safe bind-parameter pattern
+           works, and that a literal "$name.id" left in raw SQL text is
+           no longer silently substituted (it now surfaces as a query
+           error and the whole transaction rolls back atomically,
+           rather than injecting).
+
 v1.0.8   2026-09-08
          [SECURITY]
          - An authorisation bypass was corrected using a cache key
@@ -32,6 +106,8 @@ v1.0.8   2026-09-08
              key for Row::update's invalidation-by-primary-key would match
              the (now condition-aware) cache entry that has to be
              invalidated.
+
+         [TEST SUITE]
          - Added regression tests to t/148-caching.t reproducing both
            the predicate-collapse and the cross-connection cache
            leakage, and confirming the fix.

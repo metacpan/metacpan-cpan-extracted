@@ -1,0 +1,23 @@
+Test material for t/02-key.t and t/06-abi.t. Public by construction: these
+are throwaway self-signed certificates and their private keys, generated
+once on 2026-09-08 and committed so the suite is deterministic. They are
+not credentials, they guard nothing, and they must never be regenerated -
+a test that regenerates its own vectors proves only that the generator
+agrees with itself.
+
+The certificates expire in 2126. Nothing in Crypt::JWS reads a validity
+date, so an expired one would not fail the suite, but a long life keeps
+that true if a caller ever starts checking.
+
+Generated with:
+
+  openssl req -x509 -newkey rsa:2048 \
+      -keyout test-rsa-key.pem -out test-rsa-cert.pem \
+      -days 36500 -nodes -subj "/CN=Crypt-JWS test RSA"
+
+  openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 \
+      -keyout test-ec-key.pem -out test-ec-cert.pem \
+      -days 36500 -nodes -subj "/CN=Crypt-JWS test EC"
+
+Both key types are here because cjws_key_classify branches on RSA and EC
+and a certificate of one type exercises only one of them.

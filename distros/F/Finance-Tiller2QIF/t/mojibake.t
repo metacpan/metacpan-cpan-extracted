@@ -6,7 +6,6 @@ use open ':std', ':encoding(UTF-8)';
 use Test2::V0;
 use Test2::Bundle::More;
 use Path::Tiny;
-use Mojo::SQLite;
 use Finance::Tiller2QIF::ReadCSV;
 use Finance::Tiller2QIF::Map;
 use Finance::Tiller2QIF::WriteQIF;

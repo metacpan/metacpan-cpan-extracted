@@ -2,7 +2,7 @@ package Test2::Harness::UI::RunProcessor;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use DateTime;
 use Data::GUID;
@@ -82,6 +82,7 @@ sub retry_on_disconnect {
         # Try to fix the connection
         for (1 .. 10) {
             $self->schema->storage->disconnect;
+            eval { $self->schema->storage->ensure_connected };
             last if $self->schema->storage->connected;
             sleep 1;
         }
@@ -344,10 +345,12 @@ sub flush_reporting {
             );
 
             if (my $duration = $job->{duration}) {
-                my $fail  = $job->{result}->fail // 0;
+                my $raw_fail  = $job->{result}->fail;
+                my $raw_retry = $job->{result}->retry;
+                my $abort = (defined($raw_fail) || defined($raw_retry)) ? 0 : 1;
+                my $fail  = $raw_fail  // 0;
                 my $pass  = $fail ? 0 : 1;
-                my $retry = $job->{result}->retry // 0;
-                my $abort = (defined($fail) || defined($retry)) ? 0 : 1;
+                my $retry = $raw_retry // 0;
 
                 push @write => {
                     reporting_id => gen_uuid(),
@@ -395,7 +398,7 @@ sub user {
     my $user_id = $self->{+USER_ID} // confess "No user or user_id specified";
 
     my $schema = $self->schema;
-    my $user = $schema->resultset('Run')->search({user_id => $user_id})->first;
+    my $user = $schema->resultset('User')->search({user_id => $user_id})->first;
     return $user if $user;
     confess "Invalid user_id: $user_id";
 }
@@ -760,7 +763,7 @@ sub add_subtest_duration {
 
     my $start    = $parent->{start_stamp} // return;
     my $stop     = $parent->{stop_stamp}  // return;
-    my $duration = $stop - $start         // return;
+    my $duration = $stop - $start;
 
     push @{$job->{reporting}} => {
         duration => $duration,

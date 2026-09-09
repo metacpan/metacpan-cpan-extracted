@@ -16,3 +16,6 @@
 \bMYMETA\.
 \.tar\.gz$
 \.bak$
+\.sw[po]$
+\#$
+~$

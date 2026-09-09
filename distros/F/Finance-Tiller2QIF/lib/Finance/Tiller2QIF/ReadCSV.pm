@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::ReadCSV;
 # ABSTRACT: Read and parse Tiller CSV export files
-$Finance::Tiller2QIF::ReadCSV::VERSION = '1.08';
+$Finance::Tiller2QIF::ReadCSV::VERSION = '1.09';
 =head1 DESCRIPTION
 
 Ingests Tiller CSV exports into a SQLite database.
@@ -27,7 +27,7 @@ use v5.34;
 
 use Path::Tiny;
 use Text::CSV;
-use DBI;
+use Finance::Tiller2QIF::DB qw( connect_db );
 use utf8;
 use warnings FATAL => 'utf8';
 use feature qw/signatures postderef/;
@@ -135,16 +135,7 @@ sub _insert_row ( $insert, $columns, $row, $verbose ) {
 }
 
 sub Ingest ( $csv_file, $db_path, $verbose=0 ) {
-  my $dbdbi = DBI->connect(
-    "dbi:SQLite:dbname=$db_path",
-    "", "",
-    {
-      RaiseError      => 1,
-      PrintError      => 0,
-      AutoCommit      => 1,
-      sqlite_unicode  => 1,
-    }
-  );
+  my $dbdbi = connect_db($db_path);
   my $csv = Text::CSV->new({ binary => 1 });
   my $fh  = path($csv_file)->openr_utf8 or die "File not found: $csv_file\n";
   my $header = $csv->getline($fh)

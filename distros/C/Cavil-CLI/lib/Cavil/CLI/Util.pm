@@ -5,15 +5,16 @@ package Cavil::CLI::Util;
 use Mojo::Base -strict, -signatures;
 
 use Exporter        qw(import);
+use Digest::MD5     ();
+use Mojo::File      qw(path);
 use Mojo::JSON      qw(to_json);
-use Mojo::URL       ();
 use Term::ANSIColor ();
 
-our @EXPORT_OK = qw(parse_diff provenance summarize gate render_text render_json);
+our @EXPORT_OK = qw(have_tool md5_file gate render_text render_json);
 
 # Cavil's authoritative risk scale (see the cavil-review-note skill): 1-2 are obligation-free, 3 is file-level
-# copyleft, 4 is strong copyleft (the default gate, where a copy makes the work a derivative), 5 and up
-# escalate, and 6-7 are reject-lean. Shown next to the number so a bare "risk 4" is not left to interpretation.
+# copyleft, 4 is strong copyleft, 5 and up escalate, 6-7 are reject-lean, 9 is unresolved/unknown. Shown next to
+# the number so a bare "risk 4" is not left to interpretation.
 my %RISK_LABEL = (
   1 => 'public domain',
   2 => 'permissive',
@@ -22,222 +23,88 @@ my %RISK_LABEL = (
   5 => 'managed obligations',
   6 => 'restrictive obligations',
   7 => 'non-commercial',
-  9 => 'unknown license'
+  9 => 'unresolved'
 );
 
-# The report is a per-file checklist in human states, not the engine's exact/partial/unknown vocabulary. "Known
-# code" is any code Cavil recognizes and its license, open source or commercial:
-#   clean   - no known code found; the user's own code (the reassuring green tick)
-#   safe    - known code, but only permissive/public-domain (risk <= 2); no obligations to speak of
-#   note    - known code with obligations (risk 3 up to the gate); acceptable, but worth knowing
-#   problem - known code at or above the gate; this is what needs action (the only red)
-#   skipped - not scanned (too short, or too large, to fingerprint); the per-file reason says which
-# A wall of green ticks is deliberate: it shows every file was looked at. Colour tracks the risk scale above.
-my %STATUS_GLYPH
-  = (clean => "\x{2713}", safe => "\x{2022}", note => "\x{2022}", problem => "\x{2717}", skipped => "\x{00b7}");
-my %STATUS_COLOR = (clean   => 'green', safe => undef, note => 'yellow', problem => 'red', skipped => 'bright_black');
-my %STATUS_RANK  = (problem => 0,       note => 1,     safe => 2,        clean   => 3,     skipped => 4);
-
-sub _status ($f, $threshold) {
-  return 'skipped' if $f->{verdict} eq 'skipped';
-  return 'clean'   if $f->{verdict} eq 'unknown';
-
-  # A match is recognized code, so it is always shown. Only permissive/public-domain (risk <= 2) is truly safe;
-  # a match whose license we could not determine is not safe either (it could be anything), so it lands in note.
-  my $risk = $f->{risk};
-  return 'problem' if defined $risk && $risk >= $threshold;
-  return 'safe'    if defined $risk && $risk <= 2;
-  return 'note';
+# Whether an external command is on PATH, so a missing one is a clear "please install X" up front rather than a
+# cryptic non-zero exit after the fact.
+sub have_tool ($cmd) {
+  return -x $cmd ? 1 : 0 if $cmd =~ m{/};
+  -x "$_/$cmd" and return 1 for split /:/, ($ENV{PATH} // '');
+  return 0;
 }
 
-# Parse a `git diff --unified=0` into the added regions: one per hunk, with the file, its first added line, and
-# the added text. Removed and context lines are ignored; this is the new code a check looks at.
-sub parse_diff ($diff) {
-  my @regions;
-  my ($file, $start, @lines);
-
-  my $flush = sub {
-    push @regions, {file => $file, start => $start, end => $start + $#lines, text => join("\n", @lines) . "\n"}
-      if defined $file && @lines;
-    @lines = ();
-  };
-
-  for my $line (split /\n/, $diff) {
-    if ($line =~ m!^\+\+\+ (?:b/)?(.*)$!)                 { $flush->(); $file = $1 eq '/dev/null' ? undef : $1; next; }
-    if ($line =~ /^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/) { $flush->(); $start = $1;                            next; }
-    if ($line =~ /^\+(.*)$/) { push @lines, $1; next; }
-    $flush->();    # any other line ends the current added run
-  }
-  $flush->();
-
-  return \@regions;
+# MD5 of a file, streamed so a large vendored archive is never slurped into memory. Matches the hash Cavil
+# computes server-side, so it doubles as the upload's integrity checksum.
+sub md5_file ($file) {
+  my $md5 = Digest::MD5->new;
+  $md5->addfile(path($file)->open('r'));
+  return $md5->hexdigest;
 }
 
-# Roll findings up into counts by verdict, a license distribution, and the highest risk seen.
-sub summarize ($findings) {
-  my (%counts, %licenses, $max_risk);
-  for my $f (@$findings) {
-    $counts{$f->{verdict}}++;
-    $licenses{$_}++ for @{$f->{licenses} || []};
-    $max_risk = $f->{risk} if defined $f->{risk} && (!defined $max_risk || $f->{risk} > $max_risk);
-  }
-  return {counts => \%counts, licenses => \%licenses, max_risk => $max_risk, total => scalar @$findings};
+# The CI gate: fail at or above the risk threshold, matching the report's own acceptable/unacceptable line.
+sub gate ($risk, $threshold) {
+  return {failed => (defined $risk && $risk >= $threshold) ? 1 : 0};
 }
 
-# Decide the CI gate: fail on any finding at or above the risk threshold, and (when asked) on any unknown.
-sub gate ($findings, $opts) {
-  my @risky   = grep { defined $_->{risk} && $_->{risk} >= $opts->{fail_on_risk} } @$findings;
-  my @unknown = $opts->{fail_on_unknown} ? (grep { $_->{verdict} eq 'unknown' } @$findings) : ();
-  return {failed => (@risky || @unknown) ? 1 : 0, risky => \@risky, unknown => \@unknown};
+sub _label ($risk) { return $RISK_LABEL{$risk} // 'unclassified' }
+
+sub _glyph ($risk, $threshold) {
+  return "\x{2717}" if defined $risk && $risk >= $threshold;    # at or above the gate
+  return "\x{2713}" if !defined $risk || $risk <= 2;            # obligation-free
+  return "\x{2022}";                                            # obligations, but below the gate
+}
+
+sub _color ($risk, $threshold) {
+  return 'red'   if defined $risk && $risk >= $threshold;
+  return 'green' if !defined $risk || $risk <= 2;
+  return 'yellow';
 }
 
 sub _paint ($on, $color, $text) { return $on && $color ? Term::ANSIColor::colored($text, $color) : $text }
 
-# What a finding is a copy of, in one phrase. Shared by the report and the baseline file, so an accepted entry
-# reads in review exactly as the line the user accepted did.
-sub provenance ($f) {
-  my $from = $f->{match} ? "$f->{match}{name} $f->{match}{filename}" : 'a known source';
-  return $f->{verdict} eq 'partial' && $f->{total}
-    ? sprintf('modified %d%% of %s', int(100 * $f->{aligned} / $f->{total} + 0.5), $from)
-    : "identical to $from";
-}
-
-# The packaging-declared license is only a useful hint when it is short: a single license or a simple OR/AND
-# choice. Production has declared licenses with 20+ SPDX identifiers (whole license catalogs) that say nothing
-# about the file, so above this many identifiers we drop it. Returns the expression if short, else undef.
-use constant DECLARED_LICENSE_MAX => 3;
-
-sub _short_declared ($expr) {
-  return undef unless defined $expr && length $expr;
-  my @ids = grep { length && !/\A(?:OR|AND|WITH)\z/i } split /[()\s]+/, $expr;
-  return @ids >= 1 && @ids <= DECLARED_LICENSE_MAX ? $expr : undef;
-}
-
-# The machine format: a flat summary plus every finding, for a CI step to police or store.
-sub render_json ($report) {
-  my $s = summarize($report->{findings});
+# The machine format: the verdict plus the license list, for a CI step to police or store.
+sub render_json ($info) {
   return to_json(
     {
-      scope   => $report->{scope},
-      target  => $report->{target},
-      summary => {
-        checked  => $report->{checked},
-        counts   => $s->{counts},
-        licenses => $s->{licenses},
-        max_risk => $s->{max_risk},
-
-        # Skipped-by-policy counts, so a machine sees the coverage the text footer states.
-        skipped  => {map { $_ => $report->{$_} // 0 } qw(hidden licensedoc excluded)},
-        accepted => $report->{accepted} // 0
-      },
-      findings => $report->{findings}
+      map  { $_ => $info->{$_} }
+      grep { defined $info->{$_} }
+        qw(id name risk acceptable_risk threshold state unresolved gate licenses report_url sbom notice)
     }
   ) . "\n";
 }
 
-# The human format: a gate verdict, a one-line tally, then a per-file checklist. Every file is shown (capped
-# for very large trees), problems first so they are never truncated away, then the reassuring wall of green.
-sub render_text ($report, %opts) {
+# The human format: a headline tied to the gate, a one-line tally, then the licenses, highest risk first.
+sub render_text ($info, %opts) {
   my $color     = $opts{color};
-  my $findings  = $report->{findings};
-  my $threshold = $opts{fail_on_risk} // 4;
-  my $limit     = $opts{limit}        // 100;
+  my $threshold = $info->{threshold};
+  my $risk      = $info->{risk};
+  my $failed    = defined $risk && $risk >= $threshold;
 
-  # Nothing was checked (an explicit diff with no changes, or an empty tree): say so plainly rather than
-  # claim "all clear", which would imply we looked and found nothing.
-  if (!@$findings) {
-    my $hint = $report->{scope} eq 'diff' ? ' (no changes; use --all to scan the whole tree)' : '';
-    return _paint($opts{color}, 'green', "\x{2713} nothing to check") . "$hint\n";
-  }
-
-  my %count;
-  $count{_status($_, $threshold)}++ for @$findings;
-  my $matched = ($count{safe} // 0) + ($count{note} // 0) + ($count{problem} // 0);
-
-  # A diff answers "what known code did this change introduce"; a tree answers "what known code is in here".
-  # Frame the headline for that question, staying license-neutral ("known code" covers commercial, not just OSS).
-  my $diff = $report->{scope} eq 'diff';
-  my $unit = $diff ? 'region' : 'file';
-
-  # Headline verdict, tied to the gate.
-  my $headline = $count{problem}
-    ? _paint(
-    $color, 'red',
-    sprintf(
-      "\x{2717} %d %s at or above risk %d",
-      $count{problem}, ($count{problem} == 1 ? $unit : "${unit}s"), $threshold
+  my $headline = defined $risk
+    ? sprintf(
+    '%s %s - risk %d (%s) %s threshold %d',
+    _glyph($risk, $threshold),
+    $info->{name}, $risk, _label($risk), $failed ? "\x{2265}" : 'within', $threshold
     )
-    )
-    : $matched ? _paint(
-    $color,
-    'green',
-    $diff
-    ? "\x{2713} new known code introduced, nothing at or above risk $threshold"
-    : "\x{2713} known code found, nothing at or above risk $threshold"
-    )
-    : _paint(
-    $color, 'green',
-    $diff
-    ? "\x{2713} all clear, no new known code introduced"
-    : $report->{accepted} ? "\x{2713} all clear, nothing new"           # known code was found, but all of it accepted
-    :                       "\x{2713} all clear, no known code found"
-    );
-  my $out = "$headline\n";
+    : sprintf('%s %s - no license risk detected', "\x{2713}", $info->{name});
+  my $out = _paint($color, $failed ? 'red' : 'green', $headline) . "\n";
 
-  # One plain-language tally. Baseline-accepted matches are counted here rather than only in a footer, so the
-  # parts still add up to what was checked and nothing looks quietly missing.
-  my $scope = $diff ? 'changed regions' : 'files';
-  $out .= sprintf "  %d %s \x{b7} %d clean \x{b7} %d with known code%s \x{b7} %d skipped\n\n", $report->{checked},
-    $scope, ($count{clean} // 0), $matched, ($report->{accepted} ? " \x{b7} $report->{accepted} accepted" : ''),
-    ($count{skipped} // 0);
+  my @licenses = @{$info->{licenses} || []};
+  $out .= sprintf "  %d %s \x{b7} %d unresolved \x{b7} review state: %s\n", scalar(@licenses),
+    (@licenses == 1 ? 'license' : 'licenses'), ($info->{unresolved} // 0), $info->{state} // '?';
 
-  # The checklist, problems first (so a cap never hides them), then clean files, then skipped; path order within.
-  my @ordered = sort {
-    $STATUS_RANK{_status($a, $threshold)} <=> $STATUS_RANK{_status($b, $threshold)} || $a->{location} cmp $b->{location}
-  } @$findings;
-
-  my $shown = @ordered > $limit ? $limit : scalar @ordered;
-  for my $f (@ordered[0 .. $shown - 1]) {
-    my $status = _status($f, $threshold);
-    my @cols   = (_paint($color, $STATUS_COLOR{$status}, $STATUS_GLYPH{$status}), $f->{location});
-
-    if ($status eq 'safe' || $status eq 'note' || $status eq 'problem') {
-
-      # No per-file license detected: fall back to the carrier's declared license when it is short enough to be a
-      # useful hint (a single license or a simple OR/AND). It carries no risk of its own, so this stays a note.
-      my $declared = _short_declared($f->{declared_license});
-      my $desc
-        = defined $f->{risk}
-        ? sprintf('%s  risk %d (%s)', join(',', @{$f->{licenses}}), $f->{risk},
-        $RISK_LABEL{$f->{risk}} // 'unclassified')
-        : defined $declared ? "declared $declared"
-        :                     'license unknown';
-      push @cols, _paint($color, $STATUS_COLOR{$status}, $desc), provenance($f);
+  if (@licenses) {
+    $out .= "\n";
+    for my $l (@licenses) {
+      my $g = _paint($color, _color($l->{risk}, $threshold), _glyph($l->{risk}, $threshold));
+      $out .= sprintf "  %s  %-30s risk %d (%s)\n", $g, $l->{name}, $l->{risk}, _label($l->{risk});
     }
-    elsif ($status eq 'skipped') { push @cols, $f->{reason} // 'skipped' }
-
-    $out .= '  ' . join('  ', grep {length} @cols) . "\n";
   }
-  my $more = @ordered - $shown;
-  $out .= "  ...and $more more ${unit}s (use --format json)\n" if $more > 0;
 
-  # Skipped-by-policy counts, kept visible so "all clear" never hides files we chose not to look at.
-  my @notes;
-  push @notes,
-    ($report->{hidden} == 1 ? '1 hidden file' : "$report->{hidden} hidden files")
-    . ' not scanned (--hidden to include)'
-    if $report->{hidden};
-  push @notes,
-    ($report->{licensedoc} == 1 ? '1 license file' : "$report->{licensedoc} license files")
-    . ' not scanned (a copy of a licence is not a finding)'
-    if $report->{licensedoc};
-  push @notes, ($report->{excluded} == 1 ? '1 file' : "$report->{excluded} files") . ' excluded (--exclude-path)'
-    if $report->{excluded};
-  push @notes,
-    ($report->{accepted} == 1 ? '1 match' : "$report->{accepted} matches")
-    . " already accepted in $report->{baseline_file}"
-    if $report->{accepted};
-  $out .= "\n" . join('', map {"  $_\n"} @notes) if @notes;
+  $out .= "\n  Report: $info->{report_url}\n" if $info->{report_url};
+  $out .= "  SBOM:   $info->{sbom}\n"         if $info->{sbom};
+  $out .= "  NOTICE: $info->{notice}\n"       if $info->{notice};
 
   return $out;
 }

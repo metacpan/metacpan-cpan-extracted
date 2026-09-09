@@ -98,6 +98,23 @@ my $ok = eval {
 is($@, "stop\n", 'a die in the callback ends the stream and comes out of each_line');
 is($seen, 1000, 'after a thousand records of warm-up');
 
+# and the file is closed on the way out: a leaked descriptor is a leak on
+# every platform, and on Windows it keeps the file locked, so the
+# temporary directory cannot be removed
+{
+    open my $probe, '<', $path or die "$path: $!";
+    my $fd = fileno $probe;
+    close $probe;
+    for (1 .. 20) {
+        eval { File::Raw::each_line($path, sub { die "stop\n" },
+                                    plugin => 'xml', record => ['urn:log', 'Record']); 1 };
+    }
+    open $probe, '<', $path or die "$path: $!";
+    my $again = fileno $probe;
+    close $probe;
+    is($again, $fd, 'a die in the callback closes the file: twenty of them leak no descriptor');
+}
+
 $seen = 0; $bad = 0;
 my $before = rss_kb() // 0;
 eval {

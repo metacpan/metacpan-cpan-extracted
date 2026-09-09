@@ -12,7 +12,7 @@ MIDI::Drummer::Tiny::Tutorial::Quickstart
 
 =head1 VERSION
 
-version 0.7016
+version 0.7020
 
 =head1 Import the Module
 
@@ -32,12 +32,11 @@ version 0.7016
       volume     => 120,
       signature  => '5/4', # OR:
       #beats     => 5,
-      #divisions => 4,
+      #divisions => 4,  # the default
       bars       => 8,
-      reverb     => 0,
+      reverb     => 0,  # very dry!
       kick       => 36, # Override default patch
       snare      => 40, # "
-      soundfont  => '/Users/you/Music/FluidR3_GM.sf2',
       verbose    => 1,
   );
 
@@ -51,32 +50,30 @@ Bass drums ("kicks"):
 
 Snare-like things:
 
-  acoustic_snare & electric_snare (Generic: snare), side_stick, clap
+  acoustic_snare & electric_snare (Generic: snare),
+  side_stick, clap
 
 =head2 Cymbals
 
   open_hh, closed_hh, pedal_hh
-
   crash1, crash2, splash, china
-
   ride1, ride2, ride_bell
 
 =head2 Toms
 
-  hi_tom, hi_mid_tom, low_mid_tom, low_tom, hi_floor_tom, low_floor_tom
+  hi_tom, hi_mid_tom, low_mid_tom,
+  low_tom, hi_floor_tom, low_floor_tom
 
 =head2 Miscellaneous
 
-  click & bell (i.e. the metronome sounds), tambourine, cowbell, vibraslap, etc.
+  click & bell (i.e. the metronome sounds),
+  tambourine, cowbell, vibraslap, etc.
 
 =head1 Handy Duration Aliases
 
   whole, triplet_whole, dotted_whole, double_dotted_whole
-
   half, triplet_half, dotted_half, double_dotted_half
-
   quarter, triplet_quarter, dotted_quarter, double_dotted_quarter
-
   eighth, triplet_eighth, dotted_eighth, double_dotted_eighth, ...
 
 etc. down to double-dotted 128th notes!
@@ -91,7 +88,7 @@ etc. down to double-dotted 128th notes!
   $d->metronome6;
   $d->metronome7;
   # OR
-  $d->metronome44($d->bars, 1); # nb: 1 is an optional flag
+  $d->metronome44($d->bars, 1); # 1 flag for alternating 1/8th-note kicks
 
 =head2 Swing
 
@@ -107,15 +104,15 @@ etc. down to double-dotted 128th notes!
 
 =head2 Disco
 
-  for my $n ( 0 .. $d->bars - 1 ) {
-      $d->note( $d->sixteenth, $d->closed_hh, $d->kick );
-      $d->note( $d->sixteenth, $d->closed_hh );
-      $d->note( $d->sixteenth, $d->closed_hh );
-      $d->note( $d->sixteenth, $d->open_hh );
-      $d->note( $d->sixteenth, $d->pedal_hh, $d->kick, $d->snare );
-      $d->note( $d->sixteenth, $d->closed_hh );
-      $d->note( $d->sixteenth, $d->closed_hh );
-      $d->note( $d->sixteenth, $d->closed_hh );
+  for my $n (0 .. $d->bars - 1 ) {
+      $d->note($d->sixteenth, $d->closed_hh, $d->kick);
+      $d->note($d->sixteenth, $d->closed_hh);
+      $d->note($d->sixteenth, $d->closed_hh);
+      $d->note($d->sixteenth, $d->open_hh);
+      $d->note($d->sixteenth, $d->pedal_hh, $d->kick, $d->snare);
+      $d->note($d->sixteenth, $d->closed_hh);
+      $d->note($d->sixteenth, $d->closed_hh);
+      $d->note($d->sixteenth, $d->closed_hh);
   }
 
 This beat is extra-cheesy.
@@ -131,13 +128,15 @@ Write-out the score to a MIDI file:
   # ...
   $d->write;
 
-And then play the score with timidity (where the C<cfg> file specifies
+Then play the score with timidity (where the C<cfg> file specifies
 the soundfont to be used):
 
   > timidity -c ~/timidity.cfg -Od drums.mid
 
 You can also use the excellent fludisynth or
 L<VLC|https://www.videolan.org/vlc/|> programs.
+
+  > fluidsynth -i ~/Music/soundfont/FluidR3_GM.sf2 drums.mid
 
 =head1 AUTHOR
 

@@ -27,6 +27,7 @@ lib/Dpkg/Changelog/Entry.pm
 lib/Dpkg/Changelog/Entry/Debian.pm
 lib/Dpkg/Changelog/Parse.pm
 lib/Dpkg/Checksums.pm
+lib/Dpkg/Color.pm
 lib/Dpkg/Compression.pm
 lib/Dpkg/Compression/FileHandle.pm
 lib/Dpkg/Compression/Process.pm
@@ -268,6 +269,7 @@ t/shellcheck.t
 t/strict.t
 t/synopsis.t
 t/syntax.t
+t/taint.t
 META.yml
 META.json
 SIGNATURE    Added here by Module::Build

@@ -22,13 +22,16 @@ directory and one in the project root. The project file wins.
     cache_dir ~/.cache/fuguvm
     state_dir .fuguvm/state
     default_vm default
+    qemu_version 9.0
 
     vm "default" {
+        arch         arm64
         version      7.8
         memory       2048
         disk_size    8G
         ssh_port     2222
         console_port 4444
+        bind_address 127.0.0.1
     }
 
 The grammar, the tilde expansion and the yes/no spellings come from
@@ -57,21 +60,134 @@ root without a match.
 
     my $vm = $config->load_vm($name);
 
-Return the merged configuration of one VM as a hash reference, or
-C<undef> when no file declares it.
+Return the merged configuration of one VM as a hash reference. Return
+C<undef> when no file declares it, or when a value does not validate.
+In the second case, C<error> reports the reason.
 
-The method applies the defaults for C<version>, C<memory>,
+The method applies the defaults for C<arch>, C<version>, C<memory>,
 C<disk_size>, C<ssh_port> and C<console_port>, and folds in
-C<ssh_pubkey> and C<cache_dir> from the enclosing configuration.
+C<ssh_pubkey>, C<cache_dir>, C<verify>, C<signify_dir> and
+C<distfile_cache> from the enclosing configuration.
+
+C<verify> arrives normalized to 1 or 0, like C<image_cache>.
+C<signify_dir> arrives resolved, and a value that is not a directory
+makes C<load_vm> return C<undef> with the reason in C<error>.
+C<distfile_cache> arrives as the byte count of the project setting;
+the distfile tree is one tree under C<cache_dir> and each guest of a
+project shares it, so a per-guest cap would have no meaning. A
+C<distfile_cache> line in a C<vm> block does not apply, and the
+loader gives one warning for it.
+
+C<arch> selects the guest architecture: C<amd64> or C<arm64>. The
+default is C<arm64>. The comparison is case sensitive, so C<AMD64> is
+an unknown value. This loader is the boundary of the directive: it
+validates the value one time, and no module downstream repeats the
+check. The same rule applies to C<bind_address>, C<ssh_port>,
+C<console_port> and C<qemu_version>.
+
+C<ssh_port> and C<console_port> take a decimal number from 1 to
+65535, or the word C<auto>. The defaults are 2222 and 4444. With
+C<auto>, L<App::FuguVM::Guest> takes a free host port from a fixed
+range and records it.
+
+C<bind_address> names the host address of every forwarded port, as
+one IPv4 address in dotted-decimal form. The default is
+C<127.0.0.1>. A host name is invalid: a name resolves once for QEMU
+and once for the tool, and the two answers can differ. The directive
+lives in a C<vm> block, in the project F<.fuguvmrc>, or in the
+global F<~/.fuguvmrc>, with that precedence.
+
+C<qemu_version> pins the version of the QEMU system binary. The value
+is one or more dot-separated decimal numbers, for example C<9.0>. The
+match runs over the components that the value names, so C<9> pins the
+major version alone. The directive lives
+in the project F<.fuguvmrc> or in the global F<~/.fuguvmrc>. A
+C<qemu_version> line inside a VM declaration is an error: such a pin
+would silently not apply. With no directive the tool checks nothing.
 
 C<cache_dir> is folded in on purpose. Without it, C<fuguvm up> would
 write its images under C<$HOME> while the cache subcommands worked on
 a different tree.
 
-=head2 cache_dir, state_dir, default_vm, ssh_pubkey
+=head2 The install modes
+
+The loader derives C<install_mode> from the directives, and there is
+no C<install_mode> directive. Every module downstream reads that one
+field, and no module compares the directives again.
+
+    neither directive     expect       install with install.exp
+    autoinstall <file>    autoinstall  install from the response file
+    base_disk <path>      import       overlay an existing image
+
+C<autoinstall> names an autoinstall(8) response file. C<base_disk>
+names an existing full-disk image; C<qemu-img> reads a qcow2 file and
+a raw file. C<root_password_file> names a file whose first line is
+the root password of the image. Each of the three values is a path: a
+leading tilde expands, and a relative path resolves against the
+project root. The loader validates each path one time, and the file
+must be readable.
+
+The loader refuses these configurations, and C<error> names the
+cause:
+
+=over 4
+
+=item * An absent or unreadable C<autoinstall>, C<base_disk> or
+C<root_password_file> file. The message names the resolved path.
+
+=item * C<autoinstall> together with C<base_disk>. One guest has one
+origin.
+
+=item * C<base_disk> with C<image_cache no>. An imported base lives
+in the cache.
+
+=item * C<ssh_pubkey> without C<root_password_file>, outside the
+expect mode. The tool cannot install a key without a password, and
+the message names both remedies: add C<root_password_file>, or unset
+C<ssh_pubkey> and bake the key into the image.
+
+=back
+
+=head2 error
+
+Return the reason of the last failed C<load_vm>, or C<undef>.
+
+=head2 cache_dir, state_dir, default_vm, ssh_pubkey, bind_address, qemu_version
 
 The top-level settings. C<cache_dir> expands a leading tilde;
 C<state_dir> resolves a relative path against the project root.
+C<bind_address> returns the setting of the enclosing files, or
+C<127.0.0.1>. C<qemu_version> returns the setting, or C<undef>.
+
+=head2 verify
+
+Return 1 or 0. The directive switches the mirror verification of
+L<App::FuguVM::Mirror>, and the default is 1. A value that is neither
+yes nor no gives a warning and the default, like C<image_cache>.
+
+=head2 signify_dir
+
+Return the resolved directory of the signify public keys, or C<undef>
+without the directive. The value expands a leading tilde, and a
+relative path resolves against the project root.
+
+=head2 distfile_cache
+
+Return the distfile cap in bytes. The value of the directive is a
+size: a bare number of bytes, or a number with a C<K>, C<M> or C<G>
+suffix. The suffix is 1024-based, and the letter case does not
+matter. The default is 0, and 0 turns the distfile cache off. An
+unparsable value gives one warning and the value 0: an unrecognized
+spelling must not silently mean its opposite, and off is the closed
+state for a cache.
+
+=head2 declared_ports
+
+Return the fixed ports of every VM declaration of the project, as a
+hash reference keyed by port. A declaration that omits a port
+directive holds the default port of that directive. C<load_vm> folds
+the set into the per-VM configuration, and the port probe of
+L<App::FuguVM::Guest> skips each port of the set.
 
 =head2 image_cache
 

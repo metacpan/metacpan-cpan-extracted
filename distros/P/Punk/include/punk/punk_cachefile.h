@@ -85,6 +85,10 @@ typedef struct {
     size_t  written_since_sweep;
 
     uint64_t hits, misses, evictions, refused, expired;
+    /* single-flight locks that could not be attempted - a path that would
+     * not form. Every caller is then told to compute, so a non-zero count
+     * is the herd running unprotected and is worth seeing in the stats. */
+    uint64_t lock_errors;
     IV       owner_pid;
 } punk_cachefile;
 
@@ -93,6 +97,30 @@ static double pcf_now(void) {
     gettimeofday(&tv, NULL);
     return (double)tv.tv_sec + (double)tv.tv_usec / 1e6;
 }
+
+/* A file's mtime as epoch seconds, to the best resolution this platform
+ * spells - and PCF_MTIME_SLACK, how wrong that can be.
+ *
+ * The lock below judges its holder dead by the age of the lock file. With
+ * whole-second st_mtime a file written at 100.9 reports 100, so at 101.0 its
+ * age reads as 1.0 when it is really 0.1: an age that is too LARGE by up to
+ * a second, which steals a live lock and lets two callers compute at once.
+ * The slack is added to the budget rather than subtracted from the age,
+ * because erring the other way only delays a steal by a second, and a
+ * request that waits a second longer is cheaper than work done twice. */
+#if defined(PUNK_STAT_MTIM)
+#  define PCF_MTIME(st)    ((double)(st).st_mtime + (double)(st).st_mtim.tv_nsec / 1e9)
+#  define PCF_MTIME_SLACK  0.0
+#elif defined(PUNK_STAT_MTIMESPEC)
+#  define PCF_MTIME(st)    ((double)(st).st_mtime + (double)(st).st_mtimespec.tv_nsec / 1e9)
+#  define PCF_MTIME_SLACK  0.0
+#elif defined(PUNK_STAT_MTIMENSEC)
+#  define PCF_MTIME(st)    ((double)(st).st_mtime + (double)(st).st_mtimensec / 1e9)
+#  define PCF_MTIME_SLACK  0.0
+#else
+#  define PCF_MTIME(st)    ((double)(st).st_mtime)
+#  define PCF_MTIME_SLACK  1.0
+#endif
 
 /* ---- paths --------------------------------------------------------------- */
 
@@ -154,6 +182,7 @@ static void punk_cachefile_check_fork(pTHX_ punk_cachefile *c) {
     IV me = (IV)PerlProc_getpid();
     if (c->owner_pid == me) return;
     c->hits = c->misses = c->evictions = c->refused = c->expired = 0;
+    c->lock_errors = 0;
     c->written_since_sweep = 0;
     c->owner_pid = me;
 }
@@ -471,23 +500,40 @@ static void punk_cachefile_usage(punk_cachefile *c, uint64_t *bytes,
  * to today's behaviour in every unusual one.
  */
 
-/* 1 if this caller won and should compute; 0 if it should look again. */
+/* 1 if this caller won and should compute; 0 if it should look again;
+ * PCF_LOCK_UNAVAILABLE if no lock could be attempted at all.
+ *
+ * The third answer used to be spelled 1, which reads as "you won" and is a
+ * lie: a path that cannot be formed means EVERY caller is told it won, so
+ * the herd this exists to collapse all computes at once, silently. It is
+ * still the caller's business to decide what to do about it - the store is
+ * unusable for this key either way, so computing is the right degradation -
+ * but it is counted now, and it is no longer indistinguishable from
+ * actually holding the lock. */
+#define PCF_LOCK_UNAVAILABLE (-1)
+
 static int punk_cachefile_lock(pTHX_ punk_cachefile *c, const char *key,
                                uint32_t klen) {
     char path[PCF_PATHMAX], lock[PCF_PATHMAX];
     struct stat st;
     int fd;
 
-    if (pcf_path(c, key, klen, path, sizeof path, 1) != 0) return 1;
-    if (snprintf(lock, sizeof lock, "%s.lock", path) < 0) return 1;
+    if (pcf_path(c, key, klen, path, sizeof path, 1) != 0
+        || snprintf(lock, sizeof lock, "%s.lock", path) < 0) {
+        c->lock_errors++;
+        return PCF_LOCK_UNAVAILABLE;
+    }
 
     fd = open(lock, O_WRONLY | O_CREAT | O_EXCL, 0600);
     if (fd >= 0) { close(fd); return 1; }        /* won */
 
     /* Somebody holds it. If it is older than the wait budget its holder is
-     * not coming back - steal it rather than obey it. */
+     * not coming back - steal it rather than obey it. PCF_MTIME_SLACK is
+     * what this platform's mtime resolution can overstate the age by; see
+     * PCF_MTIME above for why it is added here rather than taken off the
+     * age. */
     if (stat(lock, &st) == 0
-        && pcf_now() - (double)st.st_mtime > c->lock_wait) {
+        && pcf_now() - PCF_MTIME(st) > c->lock_wait + PCF_MTIME_SLACK) {
         unlink(lock);
         fd = open(lock, O_WRONLY | O_CREAT | O_EXCL, 0600);
         if (fd >= 0) { close(fd); return 1; }

@@ -8,7 +8,7 @@ use Data::Record::Serialize;
 use Test::Lib;
 
 
-subtest "unspecified" => sub {
+subtest 'unspecified' => sub {
 
     my $s;
     my $buf;
@@ -40,13 +40,13 @@ subtest "unspecified" => sub {
 
     my $VAR1;
 
-    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;    ## no critic (ProhibitStringyEval)
 
     is( $VAR1, { long_a => 1, long_b => 2 }, 'both long_a & long_b' );
 
 };
 
-subtest "fields" => sub {
+subtest 'fields' => sub {
 
     my $s;
     my $buf;
@@ -78,13 +78,13 @@ subtest "fields" => sub {
 
     my $VAR1;
 
-    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;    ## no critic (ProhibitStringyEval)
 
     is( $VAR1, { long_a => 1, long_b => 2 }, 'both long_a & long_b' );
 
 };
 
-subtest "fields, subset" => sub {
+subtest 'fields, subset' => sub {
 
     my $s;
     my $buf;
@@ -111,14 +111,14 @@ subtest "fields, subset" => sub {
 
     my $VAR1;
 
-    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;    ## no critic (ProhibitStringyEval)
 
     is( $VAR1, { long_b => 2 }, 'only long_b' );
 
 };
 
 
-subtest "rename" => sub {
+subtest 'rename' => sub {
 
     my $s;
     my $buf;
@@ -162,7 +162,7 @@ subtest "rename" => sub {
 
     my $VAR1;
 
-    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;    ## no critic (ProhibitStringyEval)
 
     is( $VAR1, { short_a => 1, long_b => 2 }, 'field name long_a renamed to short_a' );
 

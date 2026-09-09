@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.8');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
@@ -15,7 +15,7 @@ DBIx::Class::Async::Schema - Non-blocking, worker-pool based Proxy for DBIx::Cla
 
 =head1 VERSION
 
-Version v1.0.8
+Version v1.1.0
 
 =head1 SYNOPSIS
 
@@ -102,14 +102,33 @@ sub connect {
     my $schema_class = $async_options->{schema_class}
        or croak "schema_class is required in async options";
 
+    # CPANSec CWE-94 hardening: validate the class name looks like a legal
+    # Perl package name before any loading attempt below. Every branch
+    # here used to hand $schema_class straight to eval STRING (either via
+    # "require $schema_class" or, worse, an interpolated
+    # "package main; \$${schema_class}::VERSION ..." assignment), both
+    # execute the interpolated text as Perl source, so an unvalidated
+    # $schema_class is a code-injection vector for any caller that ever
+    # builds this value from anything other than trusted, hardcoded
+    # configuration.
+    croak "Invalid schema_class name: '$schema_class'"
+        unless $schema_class =~ /\A\w+(?:::\w+)*\z/;
+
     my $schema_loaded = 0;
     if (eval { $schema_class->can('connect') }) {
         $schema_loaded = 1;
     }
-    elsif (eval "require $schema_class") {
+    elsif (eval { DBIx::Class::Async::_safe_require_class($schema_class) }) {
         $schema_loaded = 1;
     }
-    elsif (eval "package main; \$${schema_class}::VERSION ||= '0.01'; 1") {
+    else {
+        # Fallback for schema classes defined inline in the caller's own
+        # script (no separate .pm file to require): fake a VERSION so it's
+        # considered loaded. $schema_class is already validated above, so
+        # this symbolic-reference assignment cannot execute injected code
+        # the way the previous eval-string form could.
+        no strict 'refs';
+        ${"${schema_class}::VERSION"} ||= '0.01';
         $schema_loaded = 1;
     }
 
@@ -428,7 +447,7 @@ sub register_class {
     # 1. Load the class in the Parent process
     # We do this to extract metadata (columns, relationships)
     unless ($result_class->can('result_source_instance')) {
-        eval "require $result_class";
+        eval { DBIx::Class::Async::_safe_require_class($result_class) };
         if ($@) {
             croak("Failed to load Result class '$result_class': $@");
         }
@@ -586,7 +605,8 @@ sub source {
         # 3. Use the persistent provider to keep ResultSource objects alive
         $self->{_metadata_provider} ||= do {
             my $class = $self->{_async_db}->{_schema_class};
-            eval "require $class" or die "Could not load schema class $class: $@";
+            eval { DBIx::Class::Async::_safe_require_class($class) }
+                or die "Could not load schema class $class: $@";
             $class->connect(@{$self->{_async_db}->{_connect_info}});
         };
 

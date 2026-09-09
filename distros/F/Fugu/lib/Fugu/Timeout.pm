@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::Timeout;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 use Fugu::Signal;
 use Time::HiRes qw(time);

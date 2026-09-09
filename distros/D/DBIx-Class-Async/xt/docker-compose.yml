@@ -1,0 +1,10 @@
+services:
+  oracle:
+    image: gvenzl/oracle-free:latest
+    container_name: oracle-test
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PASSWORD=dbictest123
+      - APP_USER=dbictest
+      - APP_USER_PASSWORD=dbictest123

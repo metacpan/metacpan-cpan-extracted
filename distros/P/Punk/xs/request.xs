@@ -59,6 +59,41 @@ json(self)
     OUTPUT:
         RETVAL
 
+# The body parsed through File::Raw::XML's C ABI, strict: a document type
+# declaration is refused wherever it stands, so nothing here expands an entity
+# or reaches outside the document. Takes no options, and must not grow any -
+# a profile or a resolver reachable from a request is the switch that would
+# give XXE back.
+#
+# Unlike ->json, which decodes afresh every call, the document is kept for the
+# rest of the request: an XML parse costs far more than a JSON decode, node
+# identity has to hold (a node's ->doc and a by_id result must name one
+# document), and every other derived view of the request - query, form,
+# cookies, body - is already cached. The tree it hands back is editable, so
+# two callers share one document, the way ->body hands back the one cached SV.
+SV *
+xml(self)
+        SV *self
+    CODE:
+    {
+        AV *req = punk_req_av(aTHX_ self);
+        SV **c  = av_fetch(req, PQ_XML, 0);
+        if (c && *c) RETVAL = SvREFCNT_inc_simple_NN(*c);
+        else {
+            SV *body = pq_body(aTHX_ req);
+            SV *doc  = (SvOK(body) && SvCUR(body))
+                     ? punk_xml_parse(aTHX_ body)
+                     : newSV(0);
+            /* stored even when it is undef: the slot's presence is what says
+             * the body has been parsed, so an empty body is not re-parsed on
+             * every call */
+            (void)av_store(req, PQ_XML, doc);
+            RETVAL = SvREFCNT_inc_simple_NN(doc);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
 SV *
 method(self)
         SV *self

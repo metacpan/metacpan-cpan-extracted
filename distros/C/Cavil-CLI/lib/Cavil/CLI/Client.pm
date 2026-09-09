@@ -7,14 +7,6 @@ use Mojo::Base -base, -signatures;
 use Mojo::URL;
 use Mojo::UserAgent;
 
-# Per-request batch sizes. Hash lookups are cheap indexed queries, so they go in large chunks; each fingerprint
-# search is a real index scan, so it goes in small chunks. Both are sized short enough to stay well under the
-# request timeout on a large tree, and frequent enough that the remaining-count visibly drops instead of sitting
-# on a big static number. The server caps at 1000 hashes and 100 queries.
-use constant KNOWN_CHUNK  => 500;
-use constant SEARCH_CHUNK => 10;
-
-has 'log';
 has 'on_wait';    # optional coderef, called ~10x/sec while a request is in flight (drives the spinner)
 has token => sub { die "A Cavil API token is required (run 'cavil-cli config', or set CAVIL_API_KEY)\n" };
 has ua    => sub { Mojo::UserAgent->new->connect_timeout(30)->inactivity_timeout(120) };
@@ -25,51 +17,43 @@ sub whoami ($self) {
   return $self->_request('GET', '/api/v1/whoami')->json;
 }
 
-# The winnowing parameters this instance's index uses; the client must fingerprint with the same values.
-sub config ($self) {
-  return $self->_request('GET', '/api/v1/code/config')->json;
+# Submit a source archive for a standard legal review. Returns {saved => {...}, duplicate => bool}; the same
+# archive under the same name is idempotent (duplicate true). A 403 (key may not submit), 400 (checksum
+# mismatch) and 413 (archive over the server limit) are the user's to fix, so they surface as friendly messages.
+sub upload ($self, $tarball, $meta) {
+
+  # ephemeral asks for a one-off report with no lasting side effects (no open review left in the legal backlog),
+  # which is all this client ever wants. Servers without the planned ad-hoc mode ignore it, so it is always sent.
+  my $form = {
+    name      => $meta->{name},
+    priority  => $meta->{priority},
+    checksum  => $meta->{checksum},
+    ephemeral => 1,
+    tarball   => {file => $tarball},
+    (defined $meta->{external_link} ? (external_link => $meta->{external_link}) : ())
+  };
+  my $res = $self->_request('POST', '/api/v1/packages/upload', {form => $form, ok_codes => [400, 403, 413]});
+  die "This Cavil key may not submit packages (needs a read-write key with admin access)\n" if $res->code == 403;
+  die "The archive is too large for this Cavil instance; trim it with a .cavilignore file or --exclude-path\n"
+    if $res->code == 413;
+  die "Upload rejected: @{[$res->json->{error} // 'bad request']}\n" if $res->code == 400;
+  return $res->json;
 }
 
-# Batch content-hash recognition. Returns {hash => {licenses => [...], risk => N, ...}} for the hashes Cavil
-# knows; unknown hashes are absent. Chunked so one huge tree stays within the per-request cap. opts{on_chunk} is
-# called after each chunk with the running count of hashes asked about and that chunk's recognized hashes, so
-# the caller can run a remaining-count down and persist incrementally (an interrupted recognize then resumes).
-sub known ($self, $hashes, %opts) {
-  my $exclude = $opts{exclude_packages};
-  my %known;
-  my $done = 0;
-  for (my $i = 0; $i < @$hashes; $i += KNOWN_CHUNK) {
-    my $end = $i + KNOWN_CHUNK - 1;
-    $end = $#$hashes if $end > $#$hashes;
-    my $chunk = [@{$hashes}[$i .. $end]];
-    my $body  = {hashes => $chunk, ($exclude && @$exclude ? (exclude_packages => $exclude) : ())};
-    my $res   = $self->_request('POST', '/api/v1/code/known', {json => $body})->json;
-    %known = (%known, %$res);
-    $done += @$chunk;
-    $opts{on_chunk}->($done, $res) if $opts{on_chunk};
-  }
-  return \%known;
+# Fetch a report. Returns {ready => 1, data => ...} when it exists, or {ready => 0, stage => ...} while it is
+# still being built (the endpoint answers 408 with the pipeline stage until the package is analyzed).
+sub report ($self, $id, $format = 'json') {
+  my $res = $self->_request('GET', "/api/v1/report/$id.$format", {ok_codes => [408]});
+  return {ready => 1, data  => ($format eq 'json' ? $res->json : $res->text)} if $res->code == 200;
+  return {ready => 0, stage => eval { $res->json->{stage} }};
 }
 
-# Batch fingerprint search. Each query is {id, fingerprints => [decimal strings], span => N}; returns the
-# per-query results in request order. Chunked to keep each request within the server cap; opts{on_chunk} is
-# called after each chunk with the running completed count and that chunk's results, so the caller can show
-# progress and persist incrementally (an interrupted scan then resumes where it left off).
-sub search_batch ($self, $queries, %opts) {
-  my $limit   = $opts{limit} // 10;
-  my $exclude = $opts{exclude_packages};
-  my @results;
-  for (my $i = 0; $i < @$queries; $i += SEARCH_CHUNK) {
-    my $end = $i + SEARCH_CHUNK - 1;
-    $end = $#$queries if $end > $#$queries;
-    my $chunk = [@{$queries}[$i .. $end]];
-    my $body  = {queries => $chunk, limit => $limit, ($exclude && @$exclude ? (exclude_packages => $exclude) : ())};
-    my $res   = $self->_request('POST', '/api/v1/code/search-batch', {json => $body})->json;
-    my $got   = $res->{results} // [];
-    push @results, @$got;
-    $opts{on_chunk}->(scalar @results, $got) if $opts{on_chunk};
-  }
-  return \@results;
+# Fetch a generated document (spdx or notice), or undef while it is still being generated (408). Bytes are
+# returned ready to write; the user agent transparently decompresses the server's gzip.
+sub document ($self, $id, $key) {
+  my $res = $self->_request('GET', "/api/v1/documents/$id/$key", {ok_codes => [408]});
+  return undef if $res->code == 408;
+  return $res->body;
 }
 
 sub _headers ($self) {
@@ -77,9 +61,9 @@ sub _headers ($self) {
 }
 
 sub _request ($self, $method, $path, $options = {}) {
-  my $ua = $self->ua;
-  my $tx = $ua->build_tx($method => $self->_url($path) => $self->_headers,
-    $options->{json} ? (json => $options->{json}) : ());
+  my $ua   = $self->ua;
+  my @body = $options->{json} ? (json => $options->{json}) : $options->{form} ? (form => $options->{form}) : ();
+  my $tx   = $ua->build_tx($method => $self->_url($path) => $self->_headers, @body);
 
   # A recurring timer on the UA's own loop fires during the blocking request (that loop is what start() runs),
   # so the caller's spinner keeps moving while we wait on the server.
@@ -88,13 +72,14 @@ sub _request ($self, $method, $path, $options = {}) {
   $tx = $ua->start($tx);
   $ua->ioloop->remove($tid) if defined $tid;
 
-  return $tx->result if $options->{ignore_errors} || !(my $err = $tx->error);
+  return $tx->result unless my $err = $tx->error;
 
-  # These are expected operational errors the caller turns into a friendly message, not bugs, so die with a
-  # newline-terminated string (no Carp file/line suffix leaking to the user). Code search off is a clean 404.
-  die "code_search_disabled\n"                                              if $err->{code} && $err->{code} == 404;
-  die "$err->{code} response from Cavil ($method $path): $err->{message}\n" if $err->{code};
-  die "Connection error from Cavil ($method $path): $err->{message}\n";
+  # No status code means the request never reached the server: always fatal. An expected status (ok_codes, e.g.
+  # 408 while a report builds) is handed back for the caller to act on; anything else is a friendly die with no
+  # Carp file/line suffix leaking to the user.
+  die "Connection error from Cavil ($method $path): $err->{message}\n" unless $err->{code};
+  return $tx->result if grep { $_ == $err->{code} } @{$options->{ok_codes} // []};
+  die "$err->{code} response from Cavil ($method $path): $err->{message}\n";
 }
 
 sub _url ($self, $path) {

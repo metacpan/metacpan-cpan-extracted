@@ -71,6 +71,7 @@ do { my $x = {
                       'requires' => {
                                       'Data::Dumper' => '2.160',
                                       'Exporter::Tiny' => '1.002',
+                                      'Hash::Ordered' => '0',
                                       'JSON::PP' => '0',
                                       'List::Util' => '1.33',
                                       'Module::Version' => '0.201',

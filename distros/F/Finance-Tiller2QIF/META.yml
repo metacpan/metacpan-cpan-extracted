@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.038, CPAN::Meta::Converter version 2.150013'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,17 +18,17 @@ meta-spec:
 name: Finance-Tiller2QIF
 requires:
   Cpanel::JSON::XS: '0'
+  DBD::SQLite: '0'
   DBI: '0'
   DateTime::Format::Flexible: '0'
   Getopt::Long::Descriptive: '0'
-  Mojo::SQLite: '0'
   Path::Tiny: '0'
   Text::CSV: '0'
-  perl: '5.034'
+  perl: '5.036'
 resources:
   bugtracker: https://github.com/brainbuz/tiller2qif/issues
   repository: https://github.com/brainbuz/tiller2qif
-version: '1.08'
-x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '1.09'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: GPL-3.0-only

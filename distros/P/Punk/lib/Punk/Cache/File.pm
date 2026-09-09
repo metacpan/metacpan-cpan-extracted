@@ -99,6 +99,13 @@ C<stats>.
 C<stats> walks the cache to report C<bytes> and C<entries>, so it is an
 operator action rather than something to call per request.
 
+It also reports C<lock_errors>, which the in-memory store has no equivalent
+of: the count of single-flight locks that could not be attempted at all,
+because a path would not form. Every caller of such a lock is told to
+compute, so a non-zero count means the herd C<< Punk::Cache->compute >> and
+L<Punk::Plugin::Idempotency> rely on that lock to collapse has been running
+unprotected - duplicated work rather than wrong answers, but worth an alert.
+
 =head1 SEE ALSO
 
 L<Punk::Cache>, L<Punk::Cache::Memory>.

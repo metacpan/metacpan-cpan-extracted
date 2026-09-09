@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.8');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ DBIx::Class::Async::Row - Asynchronous Row object representing a single database
 
 =head1 VERSION
 
-Version v1.0.8
+Version v1.1.0
 
 =head1 SYNOPSIS
 
@@ -533,7 +533,7 @@ sub insert_query {
     my $schema_class = $bridge->{_schema_class};
 
     unless ($schema_class->can('resultset')) {
-        eval "require $schema_class" or die "insert_query: $@";
+        eval { DBIx::Class::Async::_safe_require_class($schema_class) } or die "insert_query: $@";
     }
 
     # Silence warnings

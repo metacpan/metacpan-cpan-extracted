@@ -30,9 +30,10 @@ they return data, a finished triplet, or use the L<Punk::Context>
 builders - but C<< $c->res >> gives full control when needed, and a
 returned Punk::Response is finalized by the dispatcher.
 
-The object is a plain blessed array with an all-C implementation;
-reference bodies JSON-encode through File::Raw::JSON's C ABI at
-finalize. Load through L<Punk>, which loads the compiled core first.
+The object is a plain blessed array with an all-C implementation; reference
+bodies JSON-encode through File::Raw::JSON's C ABI at finalize, except an
+XML document, which writes through File::Raw::XML's. Load through L<Punk>,
+which loads the compiled core first.
 
 =head1 METHODS
 
@@ -60,7 +61,9 @@ The live header pair arrayref.
 
 =head2 finalize
 
-The PSGI triplet: a reference body is JSON-encoded
+The PSGI triplet: a L<File::Raw::XML::Document> or L<File::Raw::XML::Node>
+body is written as markup (C<application/xml; charset=utf-8>) through the
+File::Raw::XML C ABI, any other reference body is JSON-encoded
 (C<application/json>) through the File::Raw::JSON C ABI, a string is
 C<text/html; charset=utf-8> unless L</type> says otherwise, no body is an empty
 C<text/plain; charset=utf-8> 200; Content-Length always set.

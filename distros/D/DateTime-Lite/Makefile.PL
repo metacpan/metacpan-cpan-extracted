@@ -140,6 +140,8 @@ my %WriteMakefileArgs = (
         'Test::Pod'     => '1.52',
         # Core module
         'Time::Local'   => '0',
+        # Bundled with Perl 5.10.1 (Time::HiRes 1.9719, released 2009-01-04).
+        'Time::HiRes'   => '1.9719',
     },
     ( $has_cc
         ? (

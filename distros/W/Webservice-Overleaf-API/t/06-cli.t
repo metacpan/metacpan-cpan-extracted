@@ -53,7 +53,7 @@ sub run_cli {
 {
     my ($status, $out, $err) = run_cli('git-url', 'abc-123');
     is $status, 0, 'git-url succeeds';
-    is $out, "https://git.overleaf.com/abc-123\n",
+    is $out, "https://git\@git.overleaf.com/abc-123\n",
         'git-url output';
     is $err, q{}, 'git-url is quiet on stderr';
 }

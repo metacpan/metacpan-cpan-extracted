@@ -123,7 +123,7 @@ sub addrlist($self)
 
 Parses $string into the current object replacing the current address list.
 
-Returns true if an email could be parsed, otherwise false.
+Will die on parse errors.
 
 =cut
 
@@ -132,8 +132,7 @@ sub parse($self, $str)
     my @addrlist;
 
     if ($str !~ m{$addrlist_regex}) {
-        error(g_("'%s' is not a valid email address list"), $str);
-        return 0;
+        error(g_("invalid email address list '%s'"), $str);
     }
 
     while ($str =~ m{$addrlist_elem_regex}g) {
@@ -144,9 +143,13 @@ sub parse($self, $str)
         push @addrlist, $addr;
     }
 
+    if (@addrlist == 0) {
+        error(g_("invalid email address list '%s'"), $str);
+    }
+
     $self->{addrlist} = \@addrlist;
 
-    return @addrlist > 0;
+    return;
 }
 
 =item $bool = $addrlist->contains($addr)

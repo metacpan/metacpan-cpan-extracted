@@ -123,10 +123,19 @@ SKIP: {
     my $cwd = Cwd::getcwd();
     chdir $dir or die $!;
     my $out = `$sqitch deploy --target db:sqlite:$tmp/auth.db 2>&1`;
+    my $rc  = $?;
     chdir $cwd;
     $out = '' unless defined $out;
-    like($out, qr/\+ users \.+ ok.*\+ auth_tokens \.+ ok/s, 'deploys on SQLite') or diag $out;
-    my $dbh = DBI->connect("dbi:SQLite:dbname=$tmp/auth.db", '', '', { RaiseError => 1 });
+    # The exit status, not the output. Sqitch speaks the smoker's language:
+    # under LC_ALL=de_DE it reports "+ users ........ OK", and a pattern
+    # written against the English "ok" fails on a deploy that worked. What
+    # the deploy actually did is asserted below, against the database.
+    is($rc, 0, 'deploys on SQLite') or diag $out;
+    # PrintError off: the last assertion provokes a constraint violation on
+    # purpose, and with it on DBI also writes the failure to stderr, which
+    # reads like a broken test in a smoker report of a passing run.
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$tmp/auth.db", '', '',
+                           { RaiseError => 1, PrintError => 0 });
     my $cols = $dbh->selectcol_arrayref('PRAGMA table_info(users)', { Columns => [2] });
     is_deeply($cols, [qw(id email password_hash verified)], 'users has the columns Punk::Auth\'s defaults expect');
     $cols = $dbh->selectcol_arrayref('PRAGMA table_info(auth_tokens)', { Columns => [2] });

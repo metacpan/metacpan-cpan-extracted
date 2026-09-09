@@ -11,7 +11,6 @@ use Path::Tiny;
 use Finance::Tiller2QIF::ReadCSV;
 use Finance::Tiller2QIF::WriteQIF;
 use Finance::Tiller2QIF::Util;
-use Mojo::SQLite;
 use Capture::Tiny qw( capture_stdout );
 use DBI;
 use feature qw/signatures postderef/;
@@ -74,7 +73,7 @@ subtest extra_columns => sub {
   path($csvfile)->spew_utf8( join( "\n", @lines ) );
   is( Finance::Tiller2QIF::ReadCSV::Ingest( $csvfile, $dbfile ), 2, 'Transaction written even with extra columns');
   Finance::Tiller2QIF::ReadCSV::Ingest( $csvfile, $dbfile );
-  my $db      = Mojo::SQLite->new($dbfile)->options({ sqlite_unicode => 1 })->db;
+  my $db      = dbi_connect($dbfile);
   my $results = $db->select( 'transactions', '*' )->arrays;
   $db->disconnect;
 };

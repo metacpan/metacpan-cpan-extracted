@@ -34,6 +34,8 @@ use v5.36;
 
 use Carp;
 use Errno qw(ENOENT);
+use Fcntl qw(:mode);
+use File::stat ();
 use File::Temp;
 use File::Basename qw(basename);
 use File::Spec;
@@ -92,7 +94,7 @@ sub _add_entry {
         $file = $1;
     }
     print({ *$self->{tar_input} } "$file\0")
-        or syserr(g_('write on tar input'));
+        or syserr(g_('cannot write into tar input'));
 }
 
 sub add_file {
@@ -120,7 +122,7 @@ sub add_directory {
 sub finish {
     my $self = shift;
 
-    close(*$self->{tar_input}) or syserr(g_('close on tar input'));
+    close(*$self->{tar_input}) or syserr(g_('cannot close tar input'));
     wait_child(*$self->{pid}, cmdline => "$Dpkg::PROGTAR -cf -");
     delete *$self->{pid};
     delete *$self->{tar_input};
@@ -192,7 +194,7 @@ sub extract {
             if (not defined $canon_pathname) {
                 return if $! == ENOENT;
 
-                syserr(g_("pathname '%s' cannot be canonicalized"), $pathname);
+                syserr(g_("cannot canonicalize pathname '%s'"), $pathname);
             }
             return if $canon_pathname eq $canon_devnull;
             return if $canon_pathname eq $canon_basedir;
@@ -205,33 +207,25 @@ sub extract {
             my $relpath = File::Spec->abs2rel($File::Find::name, $tmpdir);
             my $destpath = File::Spec->catfile($dest, $relpath);
 
-            my ($mode, $atime, $mtime);
-            lstat $File::Find::name
+            my $src_st = File::stat::lstat($File::Find::name)
                 or syserr(g_('cannot get source pathname %s metadata'), $File::Find::name);
-            ((undef) x 2, $mode, (undef) x 5, $atime, $mtime) = lstat _;
-            my $src_is_dir = -d _;
-
-            my $dest_exists = 1;
-            if (not lstat $destpath) {
-                if ($! == ENOENT) {
-                    $dest_exists = 0;
-                } else {
-                    syserr(g_('cannot get target pathname %s metadata'), $destpath);
-                }
+            my $dst_st = File::stat::lstat($destpath);
+            if (! $dst_st && $! != ENOENT) {
+                syserr(g_('cannot get target pathname %s metadata'), $destpath);
             }
-            my $dest_is_dir = -d _;
-            if ($dest_exists) {
-                if ($dest_is_dir && $src_is_dir) {
+
+            if (defined $dst_st) {
+                if (-d $dst_st && -d $src_st) {
                     # Refresh the destination directory attributes with the
                     # ones from the tarball.
-                    chmod $mode, $destpath
+                    chmod S_IMODE($src_st->mode), $destpath
                         or syserr(g_('cannot change directory %s mode'), $File::Find::name);
-                    utime $atime, $mtime, $destpath
+                    utime $src_st->atime, $src_st->mtime, $destpath
                         or syserr(g_('cannot change directory %s times'), $File::Find::name);
 
                     # We should do nothing, and just walk further tree.
                     return;
-                } elsif ($dest_is_dir) {
+                } elsif (-d $dst_st) {
                     rmdir $destpath
                         or syserr(g_('cannot remove destination directory %s'), $destpath);
                 } else {
@@ -241,7 +235,7 @@ sub extract {
                 }
             }
             # If we are moving a directory, we do not need to walk it.
-            if ($src_is_dir) {
+            if (-d $src_st) {
                 $File::Find::prune = 1;
             }
             rename $File::Find::name, $destpath
@@ -257,7 +251,7 @@ sub extract {
     } else {
         # Rename extracted directory.
         opendir my $dir_dh, $tmpdir
-            or syserr(g_('cannot opendir %s'), $tmpdir);
+            or syserr(g_('cannot open directory %s'), $tmpdir);
         my @entries = grep { $_ ne '.' && $_ ne '..' } readdir($dir_dh);
         closedir($dir_dh);
 
@@ -265,11 +259,11 @@ sub extract {
 
         if (scalar(@entries) == 1 && ! -l "$tmpdir/$entries[0]" && -d _) {
             rename "$tmpdir/$entries[0]", $dest
-                or syserr(g_('unable to rename %s to %s'),
+                or syserr(g_('cannot rename %s to %s'),
                           "$tmpdir/$entries[0]", $dest);
         } else {
             rename $tmpdir, $dest
-                or syserr(g_('unable to rename %s to %s'), $tmpdir, $dest);
+                or syserr(g_('cannot rename %s to %s'), $tmpdir, $dest);
         }
     }
     erasedir($tmpdir);

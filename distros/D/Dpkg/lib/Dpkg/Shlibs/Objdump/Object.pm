@@ -99,7 +99,7 @@ sub analyze {
     state $OBJDUMP = _select_objdump();
     local $ENV{LC_ALL} = 'C';
     open(my $objdump, '-|', $OBJDUMP, '-w', '-f', '-p', '-T', '-R', $file)
-        or syserr(g_('cannot fork for %s'), $OBJDUMP);
+        or syserr(g_('cannot create child process for %s'), $OBJDUMP);
     my $ret = $self->parse_objdump_output($objdump);
     close($objdump);
     return $ret;
@@ -337,7 +337,7 @@ sub add_verneed_symbol($self, $solib, $name)
         defined => 0,
     };
 
-    # Register artificial symbol.
+    # Register synthetic symbol.
     $self->add_dynamic_symbol($symbol);
 
     return;

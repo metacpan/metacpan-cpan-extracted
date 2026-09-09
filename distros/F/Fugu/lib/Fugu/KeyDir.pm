@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::KeyDir;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 # Fugu::KeyDir - the names, the order and the generated text of a
 # published key directory.

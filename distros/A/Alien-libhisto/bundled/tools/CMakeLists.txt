@@ -34,9 +34,6 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     endif()
 endif()
 
-# Alias for backwards compatibility with tests
-add_library(histo_tools_lib ALIAS histocli)
-
 add_executable(histo-cli
     src/main.c
 )
@@ -50,15 +47,24 @@ target_include_directories(histo-cli PRIVATE
 
 target_link_libraries(histo-cli PRIVATE histocli)
 
-# Create symlink aliases in build directory
+# Create aliases in build directory
 set(TOOL_ALIASES histo-fill histo-plot histo-stats histo-fit histo-cmp histo-top)
 
-foreach(alias ${TOOL_ALIASES})
-    add_custom_command(TARGET histo-cli POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_NAME:histo-cli> ${CMAKE_CURRENT_BINARY_DIR}/${alias}
-        COMMENT "Creating CLI alias symlink ${alias} -> histo"
-    )
-endforeach()
+if(WIN32)
+    foreach(alias ${TOOL_ALIASES})
+        add_custom_command(TARGET histo-cli POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:histo-cli> $<TARGET_FILE_DIR:histo-cli>/${alias}.exe
+            COMMENT "Creating CLI alias copy ${alias}.exe -> histo.exe"
+        )
+    endforeach()
+else()
+    foreach(alias ${TOOL_ALIASES})
+        add_custom_command(TARGET histo-cli POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_NAME:histo-cli> ${CMAKE_CURRENT_BINARY_DIR}/${alias}
+            COMMENT "Creating CLI alias symlink ${alias} -> histo"
+        )
+    endforeach()
+endif()
 
 install(TARGETS histocli histo-cli
     EXPORT libhistoTargets
@@ -67,10 +73,19 @@ install(TARGETS histocli histo-cli
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-foreach(alias ${TOOL_ALIASES})
-    install(CODE "
-        execute_process(
-            COMMAND \${CMAKE_COMMAND} -E create_symlink histo \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${alias}\"
+if(WIN32)
+    foreach(alias ${TOOL_ALIASES})
+        install(FILES $<TARGET_FILE:histo-cli>
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            RENAME ${alias}.exe
         )
-    ")
-endforeach()
+    endforeach()
+else()
+    foreach(alias ${TOOL_ALIASES})
+        install(CODE "
+            execute_process(
+                COMMAND \${CMAKE_COMMAND} -E create_symlink histo \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/${alias}\"
+            )
+        ")
+    endforeach()
+endif()

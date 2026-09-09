@@ -1,0 +1,17 @@
+<header class="masthead">
+  <p class="wordmark" aria-label="Punk"><b>P</b><b>U</b><b>N</b><b>K</b></p>
+  <h1><a href="{% url.home %}">{% app %}</a></h1>
+  <p class="sticker">no entry</p>
+</header>
+
+<section>
+  <h2>Sign-in failed</h2>
+  <p><a href="{% url.home %}">Try again</a></p>
+  <p class="note">
+    No reason is shown here, and that is deliberate: a verifier that
+    tells the far side which check it failed is telling an attacker which
+    one to work on next. The code is in the application log, and
+    <code>punk saml verify</code> will say the same thing about a saved
+    response.
+  </p>
+</section>

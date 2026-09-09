@@ -1,0 +1,169 @@
+#!/usr/bin/expect -f
+#
+# Start an autoinstall(8) over the serial console
+#
+# Usage: autoinstall.exp <host> <port> <url> <arch>
+#
+# The script answers two installer prompts only: the install prompt
+# gets "a", and the response-file prompt gets the URL. The response
+# file answers every other installer question. fuguvm starts QEMU with
+# -no-reboot for this run, so the reboot at the end of the install
+# makes QEMU exit and the console then closes.
+#
+
+# Use FUGUVM_TIMEOUT from the environment when it exceeds the
+# script default. Slow hosts need this, for example under TCG
+# emulation in CI.
+proc env_timeout {default} {
+    global env
+    if {[info exists env(FUGUVM_TIMEOUT)] && $env(FUGUVM_TIMEOUT) > $default} {
+        return $env(FUGUVM_TIMEOUT)
+    }
+    return $default
+}
+
+set timeout [env_timeout 300]
+
+set usage "Usage: autoinstall.exp <host> <port> <url> <arch>"
+
+if {[llength $argv] != 4} {
+    puts stderr $usage
+    exit 1
+}
+
+set host [lindex $argv 0]
+set port [lindex $argv 1]
+set url [lindex $argv 2]
+set arch [lindex $argv 3]
+
+if {$url eq ""} {
+    puts stderr $usage
+    exit 1
+}
+
+# The configuration loader of fuguvm validates the value, so this
+# exit guards a manual run only.
+if {$arch ne "amd64" && $arch ne "arm64"} {
+    puts stderr $usage
+    exit 1
+}
+
+log_user 1
+
+# Helper proc to send a response after a match
+proc respond {response} {
+    sleep 0.5
+    send "$response\r"
+}
+
+# Connect to console
+spawn telnet $host $port
+
+# Wait for the console connection. telnet prints "Connected to <host>"
+# on success. Match on the host-independent prefix, because the host
+# can be an IP address. An eof means telnet could not connect at all,
+# because the console port does not listen. Fail fast rather than hang
+# to the full timeout.
+expect {
+    "Connected to" {
+        # Send an empty line to trigger the prompt if the console
+        # already shows the installer
+        sleep 0.5
+        send "\r"
+    }
+    "Escape character" {
+        sleep 0.5
+        send "\r"
+    }
+    eof {
+        send_user "\n==> ERROR: telnet could not connect to the VM console\n"
+        exit 1
+    }
+    timeout {
+        send_user "\n==> ERROR: Failed to connect to VM console\n"
+        exit 1
+    }
+}
+
+sleep 0.5
+
+# The install prompt offers "(I)nstall, (U)pgrade, (A)utoinstall or
+# (S)hell?". Match on the prefix that install.exp already matches,
+# and answer "a".
+expect {
+    "(I)nstall" {
+        send "a\r"
+    }
+    "Welcome to the OpenBSD" {
+        # Wait a bit more for the menu to appear
+        exp_continue
+    }
+    "boot>" {
+        # The arm64 machine has no display adapter, so its loader
+        # already writes to the serial port. The amd64 machine has
+        # one, so its loader must move the console to com0 before it
+        # boots the kernel.
+        if {$arch eq "amd64"} {
+            send "stty com0 115200\r"
+            expect "boot>"
+            send "set tty com0\r"
+            expect "boot>"
+            send "boot\r"
+        } else {
+            send "\r"
+        }
+        exp_continue
+    }
+    timeout {
+        send_user "\n==> ERROR: Timeout waiting for installer\n"
+        exit 1
+    }
+}
+
+# The response-file location prompt
+expect {
+    "Response file location?" {
+        respond $url
+    }
+    timeout {
+        send_user "\n==> ERROR: Timeout waiting for the response file prompt\n"
+        exit 1
+    }
+    eof {
+        send_user "\n==> ERROR: Console closed before the response file prompt\n"
+        exit 1
+    }
+}
+
+# The response file answers everything from here. Wait for the
+# completion line of the installer. The set installation holds long
+# silences, so this wait carries the long timeout.
+set timeout [env_timeout 900]
+expect {
+    "CONGRATULATIONS!" {
+        send_user "\n==> Install complete\n"
+    }
+    timeout {
+        send_user "\n==> ERROR: Timeout waiting for the install to finish\n"
+        exit 1
+    }
+    eof {
+        send_user "\n==> ERROR: Console closed before the install finished\n"
+        exit 1
+    }
+}
+
+# The guest now syncs its disks and reboots itself. -no-reboot makes
+# QEMU exit instead, and the console then closes with an eof. The
+# disk is consistent only after that exit, so the script must not
+# return before it.
+set timeout [env_timeout 300]
+expect {
+    eof {
+        exit 0
+    }
+    timeout {
+        send_user "\n==> ERROR: Timeout waiting for QEMU to exit\n"
+        exit 1
+    }
+}

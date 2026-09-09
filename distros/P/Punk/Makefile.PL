@@ -8,6 +8,7 @@ use Config;
 
 my @PROVIDERS = (
     [ 'File::Raw::JSON'   => '../File-Raw-JSON/include'     ],  # frj_abi.h
+    [ 'File::Raw::XML'    => '../File-Raw-XML/include'      ],  # frx_abi.h
     [ 'JSON::Schema::Fast'=> '../JSON-Schema-Fast/include'  ],  # jsf_abi.h
     [ 'Open::API'         => '../Open-API/include'          ],  # oa_abi.h
     [ 'Template::Stencil' => '../Template-Stencil/include'  ],  # st_abi.h
@@ -92,6 +93,41 @@ my @DEFINE;
         }
         rmdir $dir;
     }
+}
+
+# Sub-second mtime from stat(2), for the file cache's single-flight lock.
+#
+# The lock's holder is judged dead by the age of its lock file, and with
+# whole-second st_mtime that age carries up to a full second of error - so a
+# `lock_wait` under a second means the lock is stolen almost at once and at
+# random, and two callers compute the same thing. The field is spelled three
+# ways: st_mtim.tv_nsec is POSIX 2008 (Linux, Solaris, modern BSD),
+# st_mtimespec.tv_nsec is the older BSD/macOS spelling, and st_mtimensec is
+# NetBSD's. Where none is there punk_cachefile.h keeps second resolution and
+# widens the budget by a second rather than stealing early.
+{
+    my $dir = "punk_probe_mtime_$$";
+    if (mkdir $dir) {
+        for my $try ( [ 'st_mtim.tv_nsec',      '-DPUNK_STAT_MTIM'      ],
+                      [ 'st_mtimespec.tv_nsec', '-DPUNK_STAT_MTIMESPEC' ],
+                      [ 'st_mtimensec',         '-DPUNK_STAT_MTIMENSEC' ] ) {
+            my ($field, $define) = @$try;
+            my $src = "$dir/probe.c";
+            open my $fh, '>', $src or next;
+            print $fh "#include <sys/types.h>\n#include <sys/stat.h>\n"
+                . "int main(void) { struct stat s; s.$field = 0;\n"
+                . "return (int)s.$field; }\n";
+            close $fh;
+            my $cc = $Config{cc} || 'cc';
+            if (system("$cc $src -o $dir/probe >/dev/null 2>&1") == 0) {
+                push @DEFINE, $define;
+                unlink $src, "$dir/probe";
+                last;
+            }
+            unlink $src, "$dir/probe";
+        }
+        rmdir $dir;
+    }
     print "DEFINE:   @DEFINE\n" if @DEFINE;
 }
 
@@ -113,6 +149,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
         'File::Raw::JSON'     => '0.06',   # provides frj_abi.h
+        'File::Raw::XML'      => '0.03',   # provides frx_abi.h (v2: the SV bridge)
         'JSON::Schema::Fast'  => '0.05',   # provides jsf_abi.h
         'Open::API'           => '0.09',   # provides oa_abi.h
         'Apophis'             => '0.05',   # provides ap_abi.h
@@ -133,6 +170,10 @@ my %WriteMakefileArgs = (
                                             # binds as `locale` - before it a
                                             # tied hash resolved to nothing
         'File::Raw::JSON'      => '0.06',   # body decode / auto-JSON encode
+        'File::Raw::XML'       => '0.03',   # $c->req->xml, XML response
+                                            # bodies; 0.03 is the first with
+                                            # the SV bridge, which is what
+                                            # lets the whole path stay in C
         'Fetch'                => '0.12',   # $c->ua, on the worker's own loop
         'JSON::Schema::Fast'   => '0.05',   # schema field validation
         'YAML::XS'             => '0',      # Punk::Config; every scaffolded

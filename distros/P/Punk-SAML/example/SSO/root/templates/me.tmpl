@@ -1,0 +1,25 @@
+<header class="masthead">
+  <p class="wordmark" aria-label="Punk"><b>P</b><b>U</b><b>N</b><b>K</b></p>
+  <h1><a href="{% url.home %}">{% app %}</a></h1>
+  <p class="sticker">signed in</p>
+  <p class="lede">Everything below came out of a verified assertion.</p>
+</header>
+
+<section>
+  <h2>Identity</h2>
+  <table>
+    <tr><th>email</th><td><code>{% email %}</code></td></tr>
+    <tr><th>NameID</th><td><code>{% nameid %}</code></td></tr>
+    <tr><th>groups</th><td>{% for g in groups %}<code>{% g %}</code> {% end %}</td></tr>
+  </table>
+  <p class="note">
+    Nothing here was read before the signature over it was checked. The
+    element whose child the signature is, is the element it covers, is
+    the element this was read from.
+  </p>
+</section>
+
+<p class="foot">
+  <span class="tape">Punk {% version | default('') %}</span>
+  <span><a href="{% url.home %}">back</a></span>
+</p>

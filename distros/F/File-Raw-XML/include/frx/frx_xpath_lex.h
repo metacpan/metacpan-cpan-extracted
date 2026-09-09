@@ -177,20 +177,20 @@ frx_xp_decimal_point(void)
 static double
 frx_xp_atod(const char *p, size_t n)
 {
-    char   small[64];
-    char  *buf = small;
+    char   stackbuf[64];       /* not `small`: rpcndr.h defines it to char */
+    char  *buf = stackbuf;
     char   sep = frx_xp_decimal_point();
     double v;
     size_t i;
 
-    if (n + 1 > sizeof small) {
+    if (n + 1 > sizeof stackbuf) {
         buf = (char *)malloc(n + 1);
         if (!buf) return 0.0;
     }
     for (i = 0; i < n; i++) buf[i] = p[i] == '.' ? sep : p[i];
     buf[n] = '\0';
     v = strtod(buf, NULL);
-    if (buf != small) free(buf);
+    if (buf != stackbuf) free(buf);
     return v;
 }
 

@@ -105,8 +105,9 @@ header(self, ...)
     OUTPUT:
         RETVAL
 
-# The PSGI triplet: a reference body JSON-encodes through the frj ABI,
-# a string is html unless type says otherwise, no body is text/plain.
+# The PSGI triplet: an XML document or node serialises through the frx ABI,
+# any other reference body JSON-encodes through the frj ABI, a string is html
+# unless type says otherwise, no body is text/plain.
 SV *
 finalize(self)
         SV *self
@@ -124,6 +125,15 @@ finalize(self)
             bytes = newSVpvs("");
             ct = type ? type
                       : sv_2mortal(newSVpvs("text/plain; charset=utf-8"));
+        }
+        else if (punk_xml_is(aTHX_ *b)) {
+            /* before the reference arm below, which would otherwise hand a
+             * document - a blessed reference like any other - to the JSON
+             * encoder */
+            SV *err = NULL;
+            bytes = punk_xml_bytes(aTHX_ *b, &err);
+            if (!bytes) croak("%s", err ? SvPV_nolen(err) : "Punk: xml");
+            ct = type ? type : sv_2mortal(newSVpvs(PK_XML_CT));
         }
         else if (SvROK(*b)) {
             const frj_abi *J = punk_frj(aTHX);

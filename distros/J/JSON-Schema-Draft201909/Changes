@@ -1,5 +1,9 @@
 Revision history for JSON-Schema-Draft201909
 
+0.131     2026-09-08 16:41:23Z
+          - add a one-time deprecation warning when a
+            JSON::Schema::Draft201909 object is instantiated
+
 0.130     2021-10-07 03:19:57Z
           - most tests have been removed, as version inconsistencies between
             Test::JSON::Schema::Acceptance and JSON::Schema::Modern can cause

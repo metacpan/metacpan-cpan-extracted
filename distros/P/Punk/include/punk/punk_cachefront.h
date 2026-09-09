@@ -360,7 +360,13 @@ static int pkc_be_lock(pTHX_ punk_cachefront *f, SV *key) {
     if (f->kind == PKC_K_FILE) {
         STRLEN kl;
         const char *k = SvPV_const(key, kl);
-        return punk_cachefile_lock(aTHX_ pkc_file(aTHX_ f), k, (uint32_t)kl);
+        int r = punk_cachefile_lock(aTHX_ pkc_file(aTHX_ f), k, (uint32_t)kl);
+        /* A lock that could not be attempted becomes "compute": the store is
+         * unusable for this key, so waiting for a holder that can never
+         * appear would be an outage in exchange for nothing. The backend has
+         * counted it; this layer's contract stays 1 or 0 so no caller has to
+         * know there is a third answer. */
+        return (r == PCF_LOCK_UNAVAILABLE) ? 1 : r;
     }
     {
         SV *r = pcx_call_meth(aTHX_ f->backend, "_lock", &key, 1, 1);

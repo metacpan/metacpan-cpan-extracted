@@ -2,8 +2,11 @@
 #define CJWS_KEY_H
 
 #include <string.h>
+#include <limits.h>
 #include <openssl/pem.h>
 #include <openssl/bio.h>
+#include <openssl/x509.h>
+#include <openssl/err.h>
 #include "cjws_compat.h"
 #include "cjws_digest.h"
 #include "cjws_b64.h"
@@ -86,6 +89,62 @@ static cjws_key *cjws_key_from_pem(const char *pem, STRLEN len) {
   if (!k || !cjws_key_classify(k, pkey, is_private)) {
     EVP_PKEY_free(pkey);
     OPENSSL_free(k);
+    return NULL;
+  }
+  return k;
+}
+
+/* ---- X.509 ------------------------------------------------------------ */
+
+/* The public key carried by a DER-encoded certificate.
+ *
+ * PEM_read_bio_PUBKEY above reads a PUBLIC KEY block and nothing else, so
+ * a certificate has to be parsed and its SubjectPublicKeyInfo taken out.
+ * XML-DSig's <ds:X509Certificate> is base64 of exactly these bytes.
+ *
+ * Nothing here validates the certificate: not the chain, not the validity
+ * dates, not its signature. A relying party pins the certificate it was
+ * handed out of band and asks only which key it carries, so a validity
+ * judgement made in this function would be a judgement made with none of
+ * the information needed to make it. The caller owns that decision.
+ *
+ * The error queue is cleared on failure because, unlike from_pem, this is
+ * called on input an attacker supplies and may be called on it often. */
+static cjws_key *cjws_key_from_x509_der(const unsigned char *der, STRLEN len) {
+  const unsigned char *p = der;
+  X509 *cert;
+  EVP_PKEY *pkey;
+  cjws_key *k;
+  if (!der || !len || len > (STRLEN)LONG_MAX) return NULL;
+  cert = d2i_X509(NULL, &p, (long)len);
+  if (!cert) {
+    ERR_clear_error();
+    return NULL;
+  }
+  /* d2i_X509 stops at the end of the structure and does not care what
+   * follows, so a caller could hand in a certificate with any number of
+   * bytes appended and get a key back. Refuse it: the fingerprint of a
+   * certificate is a digest over these bytes, so trailing bytes give two
+   * inputs that agree on the key and disagree on the fingerprint, and a
+   * relying party that pins one and checks the other would be pinning
+   * something an attacker can vary. */
+  if ((STRLEN)(p - der) != len) {
+    X509_free(cert);
+    return NULL;
+  }
+  pkey = X509_get_pubkey(cert);        /* +1 reference; ours to free */
+  X509_free(cert);
+  if (!pkey) {
+    ERR_clear_error();
+    return NULL;
+  }
+  /* is_private is 0 and stays 0: a certificate carries a public key by
+   * definition, and there is no path here that could produce another. */
+  k = cjws_key_alloc();
+  if (!k || !cjws_key_classify(k, pkey, 0)) {
+    EVP_PKEY_free(pkey);
+    OPENSSL_free(k);
+    ERR_clear_error();
     return NULL;
   }
   return k;

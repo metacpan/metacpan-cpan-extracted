@@ -1,0 +1,210 @@
+=head1 NAME
+
+App::FuguVM::Mirror - the OpenBSD mirror of one guest
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::Mirror;
+
+    my $mirror = App::FuguVM::Mirror->new(
+        cache   => App::FuguVM::Proxy::Cache->new($cache_dir),
+        version => '7.8',
+        arch    => 'arm64',
+    );
+
+    my $path = $mirror->ensure('source', 'ports.tar.gz')
+        or die $mirror->error, "\n";
+
+=head1 DESCRIPTION
+
+The module is the one home of the mirror facts: the host, the URLs of
+one version and one architecture, the download helper, the release
+key, and the verification. L<Fugu::Signify> proves a signed SHA256
+manifest, and this module decides which manifest signs which file.
+
+A file must verify before it enters the cache, because the cache is
+what a later run reads. A verification failure therefore leaves no
+file in the cache.
+
+=head1 THE TWO SCOPES
+
+Each method that takes a C<$scope> takes C<release> or C<source>.
+The C<release> scope is the architecture directory,
+F<< /pub/OpenBSD/<version>/<arch>/ >>: the file sets, the kernels and
+the miniroot. The C<source> scope is the version directory,
+F<< /pub/OpenBSD/<version>/ >>: F<ports.tar.gz>, F<src.tar.gz>,
+F<sys.tar.gz> and F<xenocara.tar.gz>. Each scope holds one F<SHA256>
+manifest with one F<SHA256.sig> signature, and the base key of the
+release signs both manifests.
+
+=head1 THE RELEASE KEY
+
+The version names the key file: 7.8 gives F<openbsd-78-base.pub>.
+C<key_path> resolves the file in this order:
+
+=over 4
+
+=item 1. The C<keys_dir> argument, which carries the C<signify_dir>
+directive.
+
+=item 2. F</etc/signify/>. An OpenBSD host holds the authentic key
+from its own installation, which is a better anchor than a copy in a
+repository.
+
+=item 3. F<share/fuguvm/signify/>, through
+C<< Fugu::File->share_path >>, so a checkout and an installed
+distribution both work.
+
+=back
+
+The share tree holds one key file for each release that the tool
+supports. Today that is the default release, 7.8. A guest of an older
+release needs F</etc/signify/> or the C<signify_dir> directive. A key
+in a repository is a trust anchor, so a human adds each file, and the
+commit that adds one states the comparison against F</etc/signify/>
+on a real OpenBSD host of that release.
+
+The verifier holds one key. The release directory of a numbered
+release carries one signature, under the base key of that release. A
+second key would accept a file that the version does not own. A
+snapshot release carries the key of the next release, so this module
+does not serve C<-current>.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguVM::Mirror->new(%args)
+
+C<cache>, C<version> and C<arch> are necessary, and the method dies
+without one of them. C<keys_dir> names the directory of the public
+keys; the default is the resolution order above. C<verify> is 1 or 0,
+and the default is 1.
+
+=head2 version, url, source_url
+
+C<version> returns the OpenBSD version of the mirror, so a consumer
+holds no copy of it. C<url($file)> returns the URL of a file of the
+release scope, and C<source_url($file)> returns the URL of a file of
+the source scope. Both scopes live on C<cdn.openbsd.org>, and this
+module is the one home of that host. The distfile tree is not a scope
+of this module: the guest fetches a distfile itself, from a mirror
+host that carries the tree, and C<cdn.openbsd.org> does not.
+
+=head2 key_path
+
+Return the resolved public key file, or C<undef>. On a miss, C<error>
+names the key file and each directory that the method tried.
+
+=head2 fetch
+
+    my $tmp = $mirror->fetch($url);
+
+Download the URL to a temporary file with the F<scripts/ftp> helper,
+which falls back through C<curl>, C<wget> and C<ftp>. The method
+returns the C<File::Temp> object, or C<undef>. The run is a
+passthrough, because a download of a hundred megabytes is a wait that
+an operator wants to see. This method is the one home of the helper
+call.
+
+=head2 manifest
+
+    my $path = $mirror->manifest($scope);
+
+Make sure that the F<SHA256> and the F<SHA256.sig> of the scope are
+cached, and prove the signature under the release key. The method
+returns the cached manifest path, or C<undef>. The module keeps the
+proven path for the length of the object. With C<verify> set to 0 the
+method returns C<undef> with a reason, because a method must not
+report a proof that it did not make.
+
+The manifest pair enters the cache before the proof. That store is
+safe: the signature proves the manifest on every read, and a tampered
+manifest fails that proof.
+
+=head2 manifest_names
+
+    my $names = $mirror->manifest_names($scope);
+
+Return the file names that the manifest of the scope holds, as a
+sorted array reference, or C<undef>. With verification on, the names
+come from the proven manifest. With verification off, the manifest is
+a routing table only, and the method reads it without a proof.
+
+=head2 verify_file
+
+    $mirror->verify_file($scope, $name, $path);
+
+Verify one local file against the proven manifest of the scope, under
+its manifest name. The method returns 1, or C<undef>. The manifest
+name can differ from the local path, so a temporary download verifies
+under the name that the mirror serves.
+
+The manifest proof runs the signature check, through
+L<Fugu::Signify>. The digest check runs in this module, with core
+C<Digest::SHA>, because a real OpenBSD release manifest repeats the
+install image lines: L<Fugu::Signify> refuses a manifest with a
+duplicate name, and a repeated identical fact changes nothing. The
+parser here accepts a duplicate line whose digest is identical, and
+it refuses a duplicate name with two digests, like a line that does
+not parse.
+
+=head2 ensure
+
+    my $path = $mirror->ensure($scope, $file);
+
+Return the cached path of a file. On a cache miss the method works in
+this order: prove the manifest of the scope, fetch the file, verify
+the temporary file, and store it. The order matters: the file
+verifies before it enters the cache. The manifest proof runs before
+the fetch, so a bad key and a bad signature fail before any download.
+
+With C<verify> set to 0 the method skips the proof and the file
+check, and it logs one warning.
+
+=head2 verify_cache
+
+    my $report = $mirror->verify_cache;
+
+Verify every cached file of the two scopes. The method returns
+C<{ ok, failed, unknown }>, each one a list of C<{ scope, name }>
+entries sorted by name, or C<undef>. A cached file that the proven
+manifest of its scope names is C<ok> or C<failed>. A cached file that
+no proven manifest names is C<unknown>: F<index.txt>, a package, and
+every file of a scope whose manifest is absent or unproven, are all
+in that class. The method never skips a cached file. The F<SHA256>
+and F<SHA256.sig> pairs stay out of the three lists while their proof
+holds, because that proof covers them.
+
+A cached manifest pair that fails its own proof is a failure: the
+method removes the pair and reports its F<SHA256> under C<failed>, so
+a poisoned pair cannot pin every later run. A pair that the method
+cannot fetch leaves the files of its scope C<unknown>.
+
+The manifest proof makes one signify(1) run for each scope, and each
+digest check runs in this module, so a tree of a hundred files costs
+one signify(1) run for each scope.
+
+=head2 cached_path
+
+    my $path = $mirror->cached_path($scope, $file);
+
+Return the cache path of a file of the scope, cached or not. The
+C<mirror verify> verb of the tool removes a failed file through this
+answer.
+
+=head2 error
+
+Return the reason of the most recent failure, or C<undef>. Every
+public method clears the reason before it starts. When signify(1) is
+absent, the reason names the command and the packages:
+C<signify-openbsd> on Linux and C<signify-osx> on Darwin.
+
+=head1 SEE ALSO
+
+L<Fugu::Signify>, L<App::FuguVM::Proxy>, L<App::FuguVM::Miniroot>,
+L<fuguvm(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

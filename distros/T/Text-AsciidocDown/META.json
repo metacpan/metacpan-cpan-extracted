@@ -63,7 +63,7 @@
          "web" : "https://github.com/spatocs/asciidoc-down"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.2",
    "x_contributors" : [
       "Sandor Patocs"
    ],

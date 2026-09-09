@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::OpenPGP;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 use Digest::SHA  ();
 use MIME::Base64 qw(decode_base64);

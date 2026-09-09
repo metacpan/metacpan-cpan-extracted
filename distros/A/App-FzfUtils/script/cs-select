@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-09'; # DATE
+our $DATE = '2026-08-27'; # DATE
 our $DIST = 'App-FzfUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FzfUtils/cs_select",
@@ -40,7 +40,7 @@ cs-select - Select entries from template to clipboard
 
 =head1 VERSION
 
-This document describes version 0.003 of cs-select (from Perl distribution App-FzfUtils), released on 2026-04-09.
+This document describes version 0.004 of cs-select (from Perl distribution App-FzfUtils), released on 2026-08-27.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<cs-select> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<
 
 B<cs-select> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<cs-select> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--wrap|/"--wrap=s, -w">>=I<L<posint|Sah::Schema::posint>>|B<L<-w|/"--wrap=s, -w">>=I<L<posint|Sah::Schema::posint>>] -- [I<L<template|/"--template=s">>]
+B<cs-select> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-hscroll|/"--no-hscroll">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--wrap|/"--wrap=s, -w">>=I<L<posint|Sah::Schema::posint>>|B<L<-w|/"--wrap=s, -w">>=I<L<posint|Sah::Schema::posint>>] -- [I<L<template|/"--template=s">>]
 
 =head1 DESCRIPTION
 
@@ -102,7 +102,9 @@ B<Tags>
 Some Org tags are used to customize how the entry is displayed or copied to
 clipboard.
 
-B<no_copy_title>. Do not copy the title to clipboard.
+B<no_copy_title>. Do not copy the title to clipboard, only the content.
+
+B<exclude>. Do not include this entry (or any child entries).
 
 =head1 OPTIONS
 
@@ -111,6 +113,10 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--no-hscroll>
+
+Will pass --no-hscroll to fzf.
 
 =item B<--template>=I<s>
 

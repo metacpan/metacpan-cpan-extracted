@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.8');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ DBIx::Class::Async::ResultSet - Non-blocking resultset proxy with Future-based e
 
 =head1 VERSION
 
-Version v1.0.8
+Version v1.1.0
 
 =head1 SYNOPSIS
 
@@ -258,15 +258,29 @@ sub new_result {
     my $base_row_class = ref($new_row);
 
     if ($target_class && $target_class ne $base_row_class) {
+        # CPANSec CWE-94 hardening: $target_class comes from the
+        # caller-settable 'result_class' resultset attribute. It is used
+        # below both as a symbolic package name (@ISA, bless) and,
+        # previously, in an eval-STRING "require" call. Validate its shape
+        # up front so neither use can be abused, regardless of how the
+        # loading guard below is written.
+        die "Invalid result_class name: '$target_class'"
+            unless $target_class =~ /\A\w+(?:::\w+)*\z/;
+
         # Create anonymous class name
         my $safe_target = $target_class =~ s/::/_/gr;
         my $anon_class = "DBIx::Class::Async::Anon::${safe_target}";
 
         no strict 'refs';
         unless (@{"${anon_class}::ISA"}) {
-            # Load the custom class if not already loaded
-            unless ($target_class->can('can')) {
-                eval "require $target_class" or die "Could not load $target_class: $@";
+            # Load the custom class if not already loaded. (NOTE: a prior
+            # version of this guard used $target_class->can('can'), which
+            # is true for *any* string, 'can' is a UNIVERSAL method every
+            # class inherits, so the load below never actually ran. This
+            # checks for real prior loading instead.)
+            unless ($target_class->can('new') || $target_class->can('result_source_instance')) {
+                eval { DBIx::Class::Async::_safe_require_class($target_class) }
+                    or die "Could not load $target_class: $@";
             }
 
             # Set up inheritance: Anon -> AsyncRow -> CustomClass
@@ -647,7 +661,7 @@ sub as_query {
     my $schema_class = $bridge->{_schema_class};
 
     unless ($schema_class->can('resultset')) {
-        eval "require $schema_class" or die "as_query: $@";
+        eval { DBIx::Class::Async::_safe_require_class($schema_class) } or die "as_query: $@";
     }
 
     # Silence the "Generic Driver" warnings for the duration of this method
@@ -1474,7 +1488,7 @@ sub delete_query {
     my $schema_class = $bridge->{_schema_class};
 
     unless ($schema_class->can('resultset')) {
-        eval "require $schema_class" or die "delete_query: $@";
+        eval { DBIx::Class::Async::_safe_require_class($schema_class) } or die "delete_query: $@";
     }
 
     # Silence warnings
@@ -3462,7 +3476,7 @@ sub update_query {
     my $schema_class = $bridge->{_schema_class};
 
     unless ($schema_class->can('resultset')) {
-        eval "require $schema_class" or die "update_query: $@";
+        eval { DBIx::Class::Async::_safe_require_class($schema_class) } or die "update_query: $@";
     }
 
     # Silence warnings

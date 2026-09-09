@@ -105,7 +105,8 @@ my $FIXTURE = qq{<?xml version="1.0"?>\n<!DOCTYPE r [\n<!ENTITY e "E">\n<!ATTLIS
     if (-f "$root/xmlconf.xml") {
         for my $cat (qw(xmltest/xmltest.xml ibm/ibm_oasis_valid.xml sun/sun-valid.xml oasis/oasis.xml eduni/xml-1.1/xml11.xml)) {
             my $text = do { open my $fh, '<:raw', "$root/$cat" or next; local $/; <$fh> };
-            my $dir  = $cat =~ s{/[^/]+$}{}r;
+            my $dir  = $cat;
+            $dir =~ s{/[^/]+$}{};
             while ($text =~ m{<TEST\b([^>]*)>}g) {
                 my $attrs = $1;
                 my %a;

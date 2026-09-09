@@ -46,7 +46,9 @@ use Dpkg::Exit;
 # Based on wig&pen implementation.
 use parent qw(Dpkg::Source::Package::V2);
 
-our $CURRENT_MINOR_VERSION = '0';
+sub CURRENT_MINOR_VERSION {
+    '0';
+}
 
 sub init_options {
     my $self = shift;
@@ -59,11 +61,11 @@ sub init_options {
 my @module_cmdline = (
     {
         name => '--single-debian-patch',
-        help => N_('use a single debianization patch'),
+        help => N_('Use a single debianization patch.'),
         when => 'build',
     }, {
         name => '--allow-version-of-quilt-db=<version>',
-        help => N_('accept quilt metadata <version> even if unknown'),
+        help => N_('Accept quilt metadata <version> even if unknown.'),
         when => 'build',
     }
 );
@@ -148,7 +150,7 @@ sub apply_patches {
         # Do not overwrite real files.
         unless (-f _) {
             symlink($basename, $dest)
-                or syserr(g_('cannot create symlink %s'), $dest);
+                or syserr(g_('cannot create symbolic link %s'), $dest);
         }
     }
 
@@ -263,9 +265,9 @@ sub register_patch {
 
     if (-s $tmpdiff) {
         copy($tmpdiff, $patch)
-            or syserr(g_('failed to copy %s to %s'), $tmpdiff, $patch);
+            or syserr(g_('cannot copy %s to %s'), $tmpdiff, $patch);
         chmod_if_needed(0o666 & ~ umask(), $patch)
-            or syserr(g_("unable to change permission of '%s'"), $patch);
+            or syserr(g_("cannot change permission of '%s'"), $patch);
     } elsif (-e $patch) {
         unlink($patch) or syserr(g_('cannot remove %s'), $patch);
     }

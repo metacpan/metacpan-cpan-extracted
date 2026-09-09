@@ -39,7 +39,9 @@
  * Needs frx_parse.h (and through it everything the core has), frx_enc.h. */
 
 /* FRX_START, FRX_END and FRX_DOCTYPE are frx_abi.h's, since a consumer
- * reading events compares against them. */
+ * reading events compares against them. frx_reader is opaque in
+ * frx_abi.h and defined here: the typedef is written once, there, since
+ * repeating it is a C11 feature and a C89 compiler refuses it. */
 
 typedef struct frx_event {
     int               kind;
@@ -63,7 +65,7 @@ typedef struct frx_event {
 #define FRX_READER_QUEUE   8
 #define FRX_READER_COMPACT (64u * 1024u)
 
-typedef struct frx_reader {
+struct frx_reader {
     frx_opts_ex   oe;
     int           profile;
     frx_arena     arena;            /* persistent */
@@ -92,7 +94,7 @@ typedef struct frx_reader {
     int           cap_depth;        /* the captured element's own depth */
     frx_doc      *cap_doc;
     frx_tree_sink cap_sink;
-} frx_reader;
+};
 
 #define FRX_READER_FAIL(r, c, off, what) \
     (frx_err_set(&(r)->err, (c), (off), (what)), (r)->failed = 1, 0)

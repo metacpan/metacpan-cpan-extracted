@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Test2::Harness::UI::Config;
 use Test2::Harness::UI::Sweeper;
@@ -12,11 +12,9 @@ if (grep { m/^-+(h(?:elp)?|\?)$/ } @ARGV) {
 }
 
 my $dsn      = shift @ARGV // die "Must provide a DSN as the first command line argument";
-my $interval = pop @ARGV   // die "Must provide an sql interval value (Example: '2 day') as the final command line argument";
+my $interval = pop @ARGV   // "10 day";
 
 my ($user, $pass) = @ARGV;
-
-$interval //= "10 day";
 
 my $config = Test2::Harness::UI::Config->new(
     dbi_dsn     => $dsn,

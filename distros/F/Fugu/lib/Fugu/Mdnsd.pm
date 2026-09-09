@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::Mdnsd;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 use Fugu::Imsg;
 use IO::Socket::UNIX;

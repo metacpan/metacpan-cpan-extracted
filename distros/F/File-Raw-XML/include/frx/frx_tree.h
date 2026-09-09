@@ -177,6 +177,15 @@ frx_doc_new(void)
 {
     frx_doc *d = (frx_doc *)malloc(sizeof *d);
     if (!d) return NULL;
+    /* Zero FIRST, then set what is not zero. This function used to name
+     * every field and nothing else, which made adding a field to frx_doc a
+     * trap: 0.02's `undeclared_refs` was added, missed here, and shipped
+     * reading malloc's leavings - two CPAN smokers segfaulted and a third
+     * reported a validity error at a garbage offset, none of it
+     * reproducible on the author's machine. The memset costs one pass over
+     * a struct allocated once per document. Note the ORDER: the arena is
+     * initialised after it, never before, or its head pointer is wiped. */
+    memset(d, 0, sizeof *d);
     frx_arena_init(&d->arena);
     d->document   = NULL;
     d->root       = NULL;
@@ -199,6 +208,8 @@ frx_doc_new(void)
     d->renumber   = 0;
     d->errors     = NULL;
     d->n_errors   = 0;
+    d->undeclared_refs   = NULL;
+    d->n_undeclared_refs = 0;
     return d;
 }
 

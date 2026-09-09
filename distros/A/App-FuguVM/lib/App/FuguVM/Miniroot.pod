@@ -5,16 +5,28 @@ App::FuguVM::Miniroot - the OpenBSD miniroot image
 =head1 SYNOPSIS
 
     use App::FuguVM::Miniroot;
+    use App::FuguVM::Mirror;
 
-    my $image = App::FuguVM::Miniroot->new($cache_dir, $proxy);
-    my $path  = $image->ensure('7.8')
-        or die "cannot get the miniroot for 7.8\n";
+    my $mirror = App::FuguVM::Mirror->new(
+        cache   => $proxy->cache,
+        version => '7.8',
+        arch    => 'arm64',
+    );
+    my $image = App::FuguVM::Miniroot->new($cache_dir, $proxy, $mirror);
+    my $path  = $image->ensure
+        or die $mirror->error, "\n";
 
 =head1 DESCRIPTION
 
 An installation boots the miniroot image of its OpenBSD release. The
-module finds that image in the proxy cache, and downloads it through
-the proxy when it is absent.
+module finds that image in the proxy cache. On a miss the mirror
+downloads and verifies it, because the miniroot is the boot medium
+and no code in the guest inspects it before it runs.
+
+The concern of this module is the install media: the file name of a
+version, and the cached copy. The mirror facts live in
+L<App::FuguVM::Mirror>: the host, the URL, the download helper, the
+release key and the verification.
 
 The module does not hold a copy of the cache layout. It asks the cache
 where a URL lands. A cache that changed that answer would otherwise
@@ -25,27 +37,33 @@ download the image again.
 
 =head2 new
 
-    App::FuguVM::Miniroot->new($cache_dir, $proxy)
+    App::FuguVM::Miniroot->new($cache_dir, $proxy, $mirror)
 
-The proxy is optional. Without one the module can find a cached image
-but cannot download a missing one.
+The proxy can be C<undef>. The mirror is necessary: it carries the
+version, the architecture and the verification switch, and a call
+without it is a programming error.
 
-=head2 path, ensure, download
+=head2 path, ensure
 
-C<path> returns the cached image, or C<undef>. C<ensure> returns it and
-downloads it first when it is absent. C<download> always downloads.
-
-The download runs the F<scripts/ftp> helper, which falls back through
-C<curl>, C<wget> and C<ftp>. It is a passthrough, because an image is
-a hundred megabytes and an operator who waits needs to see it move.
+C<path> returns the cached image, or C<undef>. C<ensure> returns it,
+and on a miss it calls C<< $mirror->ensure >>: the mirror proves the
+release manifest, fetches the image, verifies it, and stores it. On a
+failure C<ensure> returns C<undef>, the cache holds no image, and the
+mirror C<error> holds the reason. The mirror is the one home of the
+version and the architecture, so the methods take no argument.
 
 =head2 url
 
-C<url> is the mirror URL of a version.
+C<url> returns the mirror URL of the image, through
+C<< $mirror->url >>, so the mirror host has one home. The path holds
+the version and the architecture of the mirror:
+F<< /pub/OpenBSD/<version>/<arch>/miniroot<version>.img >>. The file
+name is the same for both architectures; only the path segment
+differs.
 
 =head1 SEE ALSO
 
-L<App::FuguVM::Proxy>, L<App::FuguVM::Guest>
+L<App::FuguVM::Mirror>, L<App::FuguVM::Proxy>, L<App::FuguVM::Guest>
 
 =head1 AUTHOR
 

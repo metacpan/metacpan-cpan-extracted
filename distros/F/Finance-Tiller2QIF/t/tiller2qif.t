@@ -9,7 +9,6 @@ use Test2::Tools::Exception qw/dies lives/;
 use Path::Tiny;
 use Finance::Tiller2QIF;
 use Finance::Tiller2QIF::Util;
-use Mojo::SQLite;
 use feature qw/signatures postderef/;
 
 no warnings 'experimental::try';
@@ -24,23 +23,23 @@ require './t/TestHelper.pm';
 subtest api_ingest => sub {
   my $db_path = uniqfile( 'ingest', 'sqlite3' );
   my $csvfile = uniqfile( 'ingest', 'csv' );
-  my $dbmojo  = freshdb($db_path);
+  my $DB  = freshdb($db_path);
   freshcsv( $csvfile,
     '04/25/2026,1,Checking,100.00,Deposit,Paycheck,Income',
     '04/25/2026,2,Checking,-50.00,Coffee,Cafe,Food',
   );
   ok( lives { Finance::Tiller2QIF::_ingest( input => $csvfile, db_path => $db_path ) },
     '_ingest() lives' );
-  is( $dbmojo->select( 'transactions', ['id'] )->arrays->@*, 2,
+  is( $DB->select( 'transactions', ['id'] )->arrays->@*, 2,
     '_ingest() loaded two rows' );
-  $dbmojo->disconnect;
+  $DB->disconnect;
 };
 
 subtest api_apply_map => sub {
   my $db_path = uniqfile( 'map', 'sqlite3' );
   my $csvfile = uniqfile( 'map', 'csv' );
   my $mapfile = uniqfile( 'map', 'map' );
-  my $dbmojo  = freshdb($db_path);
+  my $DB  = freshdb($db_path);
   freshcsv( $csvfile, '04/25/2026,1,Checking,100.00,Deposit,Paycheck,Income' );
   freshmap( $mapfile,
     'category | Income | Income:Salary',
@@ -49,23 +48,23 @@ subtest api_apply_map => sub {
   Finance::Tiller2QIF::_ingest( input => $csvfile, db_path => $db_path );
   ok( lives { Finance::Tiller2QIF::_apply_map( db_path => $db_path, mapfile => $mapfile ) },
     '_apply_map() lives' );
-  is( $dbmojo->select( 'transactions', ['mapped_category'], { id => 1 } )->hash->{mapped_category},
+  is( $DB->select( 'transactions', ['mapped_category'], { id => 1 } )->hash->{mapped_category},
     'Income:Salary', '_apply_map() wrote mapped_category' );
-  $dbmojo->disconnect;
+  $DB->disconnect;
 };
 
 subtest api_emit => sub {
   my $db_path = uniqfile( 'emit', 'sqlite3' );
   my $csvfile = uniqfile( 'emit', 'csv' );
   my $qiffile = uniqfile( 'emit', 'qif' );
-  my $dbmojo  = freshdb($db_path);
+  my $DB  = freshdb($db_path);
   freshcsv( $csvfile, '04/25/2026,1,Checking,100.00,Deposit,Paycheck,Income' );
   Finance::Tiller2QIF::_ingest( input => $csvfile, db_path => $db_path );
   ok( lives { Finance::Tiller2QIF::_emit( db_path => $db_path, output => $qiffile, qifdate => 'ymd' ) },
     '_emit() lives' );
   ok( -e $qiffile, '_emit() created QIF file' );
   like( path($qiffile)->slurp_utf8, qr/PDeposit/, 'emitted QIF contains payee' );
-  $dbmojo->disconnect;
+  $DB->disconnect;
 };
 
 subtest api_run => sub {
@@ -173,11 +172,11 @@ subtest cli_run_beforeafter => sub {
     '--aftermap',  't/testcase/aftermap.sql',
   );
   ok( lives { Finance::Tiller2QIF::run_cli() }, 'cli run with beforemap and aftermap lives' );
-  my $dbmojo = Mojo::SQLite->new($db_path)->options({ sqlite_unicode => 1 })->db;
-  my $tx = $dbmojo->select( 'transactions', [qw(mapped_category check_number)], { id => 1 } )->hash;
+  my $DB = dbi_connect($db_path);
+  my $tx = $DB->select( 'transactions', [qw(mapped_category check_number)], { id => 1 } )->hash;
   is( $tx->{mapped_category}, 'Expenses:Dining', 'beforemap+map fired via account rename' );
   is( $tx->{check_number},    'after_ran',       'aftermap ran after map via CLI' );
-  $dbmojo->disconnect;
+  $DB->disconnect;
 };
 
 subtest cli_ingest_then_emit => sub {
@@ -212,6 +211,7 @@ subtest cli_run_verbose => sub {
   ok( lives { open( local *STDOUT, '>', \$out ); Finance::Tiller2QIF::run_cli() },
     'cli run --verbose returns normally' );
   ok( -e $qiffile, 'cli run --verbose produced QIF file' );
+  like( $out, qr/Tiller2QIF VERSION:/, 'verbose output includes the version' );
   like( $out, qr/Ingesting CSV/,    'verbose output mentions ingesting' );
   like( $out, qr/Applying mapping/, 'verbose output mentions mapping' );
   like( $out, qr/Writing QIF/,      'verbose output mentions writing' );
@@ -327,6 +327,14 @@ subtest cli_version => sub {
   like( $out, qr/VERSION/, 'version command prints VERSION' );
 };
 
+subtest cli_version_option => sub {
+  local @ARGV = ('--version');
+  my $out = '';
+  ok( lives { open( local *STDOUT, '>', \$out ); Finance::Tiller2QIF::run_cli() },
+    '--version returns normally' );
+  like( $out, qr/Tiller2QIF VERSION:/, '--version prints the installed version' );
+};
+
 subtest cli_help => sub {
   local @ARGV = ('--help');
   my $out = '';
@@ -346,7 +354,7 @@ subtest cli_config => sub {
   path($cfgfile)->spew_utf8( qq|{ "db": "$db_path", "input": "$csvfile", "output": "$qiffile" }| );
   local @ARGV = ( 'ingest', '--config', $cfgfile );
   ok( lives { Finance::Tiller2QIF::run_cli() }, '--config loads options from file' );
-  my $db = Mojo::SQLite->new($db_path)->options({ sqlite_unicode => 1 })->db;
+  my $db = dbi_connect($db_path);
   is( $db->select('transactions', ['id'])->arrays->@*, 1, '--config ingest loaded a row' );
   $db->disconnect;
 };
@@ -424,7 +432,7 @@ subtest cli_confirm_revert_to_checkpoint => sub {
     '--confirm with "r" returns without error' );
   ok( !-e $qiffile, '--confirm "r" did not produce QIF file' );
 
-  my $db_after_revert = Mojo::SQLite->new($db_path)->options({ sqlite_unicode => 1 })->db;
+  my $db_after_revert = dbi_connect($db_path);
   my $count_after = $db_after_revert->select('transactions', ['id'])->arrays->@*;
   $db_after_revert->disconnect;
   is( $count_after, 1, 'revert to checkpoint restored original state (1 transaction)' );

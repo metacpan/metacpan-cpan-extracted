@@ -42,21 +42,21 @@ my $addr_name_regex = qr{
     # Composed of possibly multiple quoted and not-quoted parts.
     (?:
         # Either non-quoted name, without comma.
-        [^<>"\cK,]+
+        [^<>"[:cntrl:],]+
     |
         # Or quoted name, with optional comma.
-        " [^<>"\cK]+ "
+        " [^<>"[:cntrl:]]+ "
     )*
-}x;
+}xa;
 
 my $addr_email_regex = qr{
     # Local part.
-    [^@<>"\s\cK]+
+    [^@<>"\s[:cntrl:],]+
     # Separator.
     @
     # Domain part.
-    [^@<>"\s\cK]+
-}x;
+    [^@<>"\s[:cntrl:],]+
+}xa;
 
 my $addr_regex = qr{
     \s*
@@ -115,17 +115,6 @@ sub new($this, $str = undef)
     return $self;
 }
 
-=item $bool = $addr->is_valid()
-
-Check whether the current object contains a valid email address.
-
-=cut
-
-sub is_valid($self)
-{
-    return defined $self->{name} && defined $self->{email};
-}
-
 =item $name = $addr->name([$name])
 
 Get and optionally set the email address name.
@@ -158,7 +147,7 @@ sub email($self, $email = undef)
 
 Parses $string into the current object replacing the current address.
 
-Returns true if an email could be parsed, otherwise false.
+Will die on parse errors.
 
 =cut
 
@@ -167,10 +156,15 @@ sub parse($self, $str)
     if ($str =~ m{^$addr_regex$}) {
         $self->{name} = $1;
         $self->{email} = $2;
-        return 1;
+
+        if ($self->{email} !~ m{@.*\.}) {
+            warning(g_("email address '%s' with single label domain"), $str);
+        }
+
+        return;
     }
-    warning("cannot parse email address '$str'");
-    return 0;
+
+    error(g_("invalid email address '%s'"), $str);
 }
 
 =item $string = $addr->as_string()

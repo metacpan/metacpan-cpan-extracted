@@ -405,10 +405,13 @@ frx_c14n_collect_attrs(frx_c14n_ctx *x, const frx_node *e)
         static const char *const simple[] = { "lang", "space" };
         size_t k;
         for (k = 0; k < sizeof simple / sizeof simple[0]; k++) {
-            const frx_attr *near;
+            /* not `near`: windows.h defines it, and the whole file stops
+             * compiling there (tools/mingw/win_macros.h holds the set) */
+            const frx_attr *inherited;
             if (frx_c14n_own_xml(e, simple[k])) continue;
-            near = frx_c14n_nearest_xml(e, simple[k]);
-            if (near && !frx_c14n_push_attr(x, &near->ns, &near->local, &near->qname, &near->value)) return 0;
+            inherited = frx_c14n_nearest_xml(e, simple[k]);
+            if (inherited && !frx_c14n_push_attr(x, &inherited->ns, &inherited->local,
+                                                 &inherited->qname, &inherited->value)) return 0;
         }
         {
             /* the ancestors' xml:base values, outermost first, then e's own */

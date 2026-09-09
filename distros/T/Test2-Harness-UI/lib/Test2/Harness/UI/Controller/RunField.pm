@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::RunField;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -31,6 +31,7 @@ sub handle {
     my $field = $schema->resultset('RunField')->search({run_field_id => $it})->first or die error(404 => 'Invalid Field');
 
     if (my $act = $route->{action}) {
+        die error(401 => 'Login required') unless $user;
         if ($act eq 'delete') {
             $field->delete;
         }

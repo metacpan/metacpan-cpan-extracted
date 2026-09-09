@@ -32,6 +32,8 @@ package Dpkg::Source::Quilt 0.02;
 use v5.36;
 
 use List::Util qw(any none);
+use Fcntl qw(:mode);
+use File::stat ();
 use File::Spec;
 use File::Copy;
 use File::Find;
@@ -64,7 +66,7 @@ sub setup_db {
     my $self = shift;
     my $db_dir = $self->get_db_dir();
     if (not -d $db_dir) {
-        mkdir $db_dir or syserr(g_('cannot mkdir %s'), $db_dir);
+        mkdir $db_dir or syserr(g_('cannot create directory %s'), $db_dir);
     }
     my $file = $self->get_db_file('.version');
     if (not -e $file) {
@@ -399,17 +401,19 @@ sub restore_quilt_backup_files {
     my $scan_quilt = {
         no_chdir => 1,
         wanted => sub {
-            return if -d;
+            my $st = File::stat::stat($_)
+                or syserr(g_('cannot stat %s'), $_);
+            return if -d $st;
             my $relpath_in_srcpkg = File::Spec->abs2rel($_, $patch_dir);
             my $target = File::Spec->catfile($self->{dir}, $relpath_in_srcpkg);
-            if (-s) {
+            if (-s $st) {
                 unlink($target);
                 make_path(dirname($target));
                 unless (link($_, $target)) {
                     copy($_, $target)
-                        or syserr(g_('failed to copy %s to %s'), $_, $target);
-                    chmod_if_needed((stat _)[2], $target)
-                        or syserr(g_("unable to change permission of '%s'"), $target);
+                        or syserr(g_('cannot copy %s to %s'), $_, $target);
+                    chmod_if_needed(S_IMODE($st->mode), $target)
+                        or syserr(g_("cannot change permission of '%s'"), $target);
                 }
             } else {
                 # Empty files are "backups" for new files that patch created.

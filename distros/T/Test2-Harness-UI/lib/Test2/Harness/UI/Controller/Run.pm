@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -39,6 +39,8 @@ sub handle {
     }
 
     if (my $act = $route->{action}) {
+        die error(401 => 'Login required') unless $user;
+
         if ($act eq 'pin_toggle') {
             $run->update({pinned => $run->pinned ? 0 : 1});
         }
@@ -67,7 +69,7 @@ sub handle {
             while (my $job = $jobs->next()) {
                 my $has_binary = $job->events->search({has_binary => 1});
                 while (my $e = $has_binary->next()) {
-                    $has_binary->binaries->delete;
+                    $e->binaries->delete;
                     $e->delete;
                 }
 

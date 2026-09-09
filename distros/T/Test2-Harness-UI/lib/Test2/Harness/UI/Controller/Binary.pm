@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Binary;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Test2::Harness::UI::Response qw/resp error/;
 
@@ -22,22 +22,25 @@ sub handle {
     die error(404 => 'Missing route') unless $route;
     my $binary_id = uuid_inflate($route->{binary_id}) or die error(404 => "Invalid Route");
 
-    error(404 => 'No id') unless $binary_id;
+    die error(404 => 'No id') unless $binary_id;
 
     my $schema = $self->{+CONFIG}->schema;
     my $binary = $schema->resultset('Binary')->find({binary_id => $binary_id});
 
-    error(404 => 'No such binary file') unless $binary_id;
+    die error(404 => 'No such binary file') unless $binary;
 
     my $filename = $binary->filename;
 
     $res->content_type('application/x-binary');
 
+    my $safe_filename = $filename;
+    $safe_filename =~ s/[\r\n]//g;
+
     if ($binary->is_image) {
-        $res->header('Content-Disposition' => "inline; filename=" . $filename);
+        $res->header('Content-Disposition' => "inline; filename=\"" . $safe_filename . "\"");
     }
     else {
-        $res->header('Content-Disposition' => "attachment; filename=" . $filename);
+        $res->header('Content-Disposition' => "attachment; filename=\"" . $safe_filename . "\"");
     }
 
     $res->body($binary->data);

@@ -1,3 +1,8 @@
+0.004   2026-08-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli cs-select] Add option --no-hscroll.
+
+
 0.003   2026-04-09  Released-By: PERLANCAR; Urgency: medium
 
         - Observe tag: no_copy_title.

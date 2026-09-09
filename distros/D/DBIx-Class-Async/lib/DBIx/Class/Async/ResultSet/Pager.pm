@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.8');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Carp;
@@ -17,7 +17,7 @@ DBIx::Class::Async::ResultSet::Pager - Asynchronous pagination handling for Asyn
 
 =head1 VERSION
 
-Version v1.0.8
+Version v1.1.0
 
 =cut
 

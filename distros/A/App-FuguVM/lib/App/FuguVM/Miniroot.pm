@@ -18,166 +18,90 @@
 use v5.36;
 
 package App::FuguVM::Miniroot;
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
 use Fugu::File;
-use Fugu::Log;
-use Fugu::Process;
 
 # App::FuguVM::Miniroot - the OpenBSD miniroot install media.
 #
-# The miniroot is what the installer boots from. This module downloads
-# it when necessary and keeps it in the proxy cache for reuse. The
-# download uses the scripts/ftp helper, which falls back through curl,
-# wget, and ftp.
+# The miniroot is what the installer boots from. Its concern here is
+# the install media: the file name of a version, and the cached copy.
+# The mirror object holds the mirror facts: the host, the URL, the
+# download and the verification. The miniroot is the boot medium, so
+# no code in the guest inspects it before it runs. The host must
+# therefore verify it, and the mirror does.
 #
 # The module caches the install media. App::FuguVM::DiskCache caches
 # the disk that the installer produced. Neither is a cache of the
 # other.
 
-use constant {
-	CDN_HOST => 'cdn.openbsd.org',
-	ARCH     => 'arm64',
-};
-
-sub new ( $class, $cache_dir, $proxy = undef )
+# $class->new($cache_dir, $proxy, $mirror):
+#	The proxy can be undef. The mirror is required: it carries the
+#	version, the architecture and the verification switch.
+sub new ( $class, $cache_dir, $proxy, $mirror )
 {
+	die "App::FuguVM::Miniroot needs a mirror\n"
+	    if !defined $mirror;
+
 	my $self = bless {
 		cache_dir => Fugu::File->expand_tilde($cache_dir),
 		proxy     => $proxy,
+		mirror    => $mirror,
 	}, $class;
 
 	return $self;
 }
 
-# $self->path($version):
-#	Return the path to the cached miniroot image for the given
+# $self->path:
+#	Return the path to the cached miniroot image of the mirror
 #	version. Return undef if the image is not cached.
-sub path ( $self, $version )
+sub path ($self)
 {
-	my $path = $self->_image_path($version);
+	my $path = $self->_image_path;
 	return -f $path ? $path : undef;
 }
 
-# $self->ensure($version):
-#	Make sure that the image is available. Download it if
-#	necessary. Return the path on success, or undef on failure.
-sub ensure ( $self, $version )
+# $self->ensure:
+#	Make sure that the image is available. The mirror downloads
+#	and verifies it when the cache misses. Return the path on
+#	success, or undef on failure with the reason in the mirror
+#	error.
+sub ensure ($self)
 {
-	# Check if the image is already cached
-	my $path = $self->path($version);
+	my $path = $self->path;
 	return $path if defined $path;
 
-	# Download through the proxy if one is available
-	return $self->download($version);
+	return $self->{mirror}->ensure( 'release', $self->_image_filename );
 }
 
-# _ftp_script():
-#	Return the path to the scripts/ftp helper, or undef.
-#	Fugu::File->share_path resolves it: from a checkout through this
-#	module's location, from an installed distribution through the
-#	share tree of App-FuguVM. The code factors this function out of
-#	download. Thus a test can make sure that the path still
-#	resolves. download only warns when the path does not resolve.
-#	Thus a rename would otherwise degrade silently to "no download"
-#	and would not fail.
-sub _ftp_script ()
+# $self->url:
+#	Return the mirror URL of the miniroot image. The mirror builds
+#	it, so the host has one home.
+sub url ($self)
 {
-	return Fugu::File->share_path(
-		'scripts/ftp',
-		from => __FILE__,
-		dist => 'App-FuguVM'
-	);
+	return $self->{mirror}->url( $self->_image_filename );
 }
 
-# $self->download($version):
-#	Download the miniroot image for the version through the proxy
-#	cache. Return the path on success, or undef on failure.
-sub download ( $self, $version )
+# $self->_image_filename:
+#	Make the miniroot filename of the mirror version, for example
+#	"miniroot78.img". The mirror is the one home of the version,
+#	so this module holds no copy.
+sub _image_filename ($self)
 {
-	if ( !defined $self->{proxy} ) {
-		warn "No proxy available for download\n";
-		return;
-	}
-
-	my $url = $self->url($version);
-
-	# Download with the scripts/ftp helper, which uses curl, wget,
-	# or ftp. Then store the file in the proxy cache.
-	require File::Temp;
-	my $tmp      = File::Temp->new( SUFFIX => '.img' );
-	my $tmp_path = $tmp->filename;
-
-	my $ftp = _ftp_script();
-
-	if ( !defined $ftp ) {
-		warn "Cannot find the ftp helper\n";
-		return;
-	}
-
-	# Download to the temp file. The helper writes its progress as
-	# it goes, and a download of a hundred megabytes is a wait that
-	# an operator wants to see. sh runs the helper: an installed
-	# share tree does not keep the exec bit.
-	my $result = Fugu::Process->run(
-		cmd         => [ 'sh', $ftp, $tmp_path, $url ],
-		passthrough => 1,
-	);
-	unless ( $result->{success} ) {
-		Fugu::Log->default->error( 'Download failed: %s',
-			$result->{error} // "exit $result->{exit_code}" );
-		return;
-	}
-
-	# Make sure that the download wrote a file
-	if ( !-f $tmp_path || -z $tmp_path ) {
-		warn "Download succeeded but file is empty\n";
-		return;
-	}
-
-	# Store the file in the proxy cache
-	my $cache       = $self->{proxy}->cache;
-	my $cached_path = $cache->store_from_file( $url, $tmp_path );
-	if ( !defined $cached_path ) {
-		warn "Failed to store in cache\n";
-		return;
-	}
-
-	return $cached_path;
-}
-
-# $self->url($version):
-#	Return the CDN URL for a miniroot image
-sub url ( $self, $version )
-{
-	my $filename = $self->_image_filename($version);
-	return
-	      "https://"
-	    . CDN_HOST
-	    . "/pub/OpenBSD/$version/"
-	    . ARCH
-	    . "/$filename";
-}
-
-# $self->_image_filename($version):
-#	Make the miniroot filename for the version, for example
-#	"miniroot78.img".
-sub _image_filename ( $self, $version )
-{
-	( my $ver = $version ) =~ s/\.//g;
+	( my $ver = $self->{mirror}->version ) =~ s/\.//g;
 	return "miniroot$ver.img";
 }
 
-# $self->_image_path($version):
-#	Return the file that the miniroot of a version lands in.
+# $self->_image_path:
+#	Return the file that the miniroot lands in.
 #
 #	The answer comes from the cache, not from a copy of its layout
 #	here. A cache that changed where it puts a URL would otherwise
 #	leave this module looking in the old place, and every run would
 #	download the image again.
-sub _image_path ( $self, $version )
+sub _image_path ($self)
 {
-	return $self->_cache->cache_path( $self->url($version) );
+	return $self->_cache->cache_path( $self->url );
 }
 
 # $self->_cache:

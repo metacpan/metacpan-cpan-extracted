@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: (DEPRECATED) Internal utilities for JSON::Schema::Draft201909
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -35,11 +35,22 @@ JSON::Schema::Draft201909::Utilities - (DEPRECATED) Internal utilities for JSON:
 
 =head1 VERSION
 
-version 0.130
+version 0.131
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 DESCRIPTION
 
 This module is deprecated in favour of L<JSON::Schema::Modern::Utilities>.
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Draft201909>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Draft201909>.
 
 =head1 SUPPORT
 

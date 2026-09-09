@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Download;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -43,7 +43,9 @@ sub handle {
     my $type = $log->name =~ m/\.bz2/ ? 'application/x-bzip2' : 'application/gzip';
 
     $res->content_type($type);
-    $res->header('Content-Disposition' => "attachment; filename=" . $log->name);
+    my $safe_name = $log->name;
+    $safe_name =~ s/[\r\n]//g;
+    $res->header('Content-Disposition' => "attachment; filename=\"" . $safe_name . "\"");
     $res->body($log->data);
     return $res;
 }

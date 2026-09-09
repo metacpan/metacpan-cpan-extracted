@@ -15,12 +15,12 @@
 #define HISTO_VERSION_MAJOR 0
 
 /** @brief Minor version number */
-#define HISTO_VERSION_MINOR 3
+#define HISTO_VERSION_MINOR 4
 
 /** @brief Patch version number */
 #define HISTO_VERSION_PATCH 0
 
 /** @brief String representation of the version */
-#define HISTO_VERSION_STRING "0.3.0"
+#define HISTO_VERSION_STRING "0.4.0"
 
 #endif /* LIBHISTO_VERSION_H */

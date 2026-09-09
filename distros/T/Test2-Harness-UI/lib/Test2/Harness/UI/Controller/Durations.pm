@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Durations;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Data::GUID;
 use Test2::Harness::UI::Response qw/resp error/;
@@ -43,10 +43,11 @@ sub handle {
         );
     }
 
-    my $ct ||= lc($req->headers->{'content-type'} || $req->parameters->{'Content-Type'} || $req->parameters->{'content-type'} || 'text/html; charset=utf-8');
-    $res->content_type($ct);
+    my $ct = lc($req->parameters->{'content-type'} || $req->parameters->{'Content-Type'} || '');
+    my $wants_json = $ct eq 'application/json';
+    $res->content_type($wants_json ? 'application/json' : 'text/html; charset=utf-8');
 
-    if ($ct eq 'application/json') {
+    if ($wants_json) {
         $res->raw_body($data);
     }
     else {

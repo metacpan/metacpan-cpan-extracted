@@ -45,19 +45,207 @@ the disk, start QEMU, install OpenBSD, and install the SSH key.
 The method is idempotent. A VM that already runs, and whose SSH key is
 current, returns success and changes nothing.
 
+=head1 INSTALL MODES
+
+C<install_mode> of the configuration selects the origin of the disk.
+L<App::FuguVM::Config> derives the value from the directives.
+
+In the C<expect> mode, C<up> installs with F<install.exp> over the
+serial console. A failed install script gives exit code 9.
+
+In the C<autoinstall> mode, C<up> starts the mirror proxy, starts the
+L<App::FuguVM::Autoinstall> responder, and starts QEMU with the
+miniroot attached and with C<-no-reboot>. F<autoinstall.exp> then
+answers the install prompt with C<a> and types the response-file URL.
+The guest fetches the file through the QEMU gateway, applies every
+answer, and reboots itself; C<-no-reboot> makes QEMU exit instead, so
+the guest cannot install a second time, and the exit leaves a
+consistent disk. C<up> publishes the disk as a cache entry, exactly
+as after an expect install, and it stops the responder on every path
+out of the install. C<down> and C<destroy> also stop it. A failed
+autoinstall script gives exit code 9.
+
+In the C<import> mode, C<up> installs nothing. On the first run it
+publishes the C<base_disk> file as the cache entry of the derived
+key, with C<qemu-img convert>, and then overlays the working disk on
+the published entry. A later C<up> reads the file no more. The tool
+never writes to the source file. Every guest of the project derives
+the same key, and the population lock of the cache serializes the
+publication, so a parallel fleet publishes one time. Every cache verb
+and snapshot verb works on the imported entry. A cache miss with an
+absent source gives exit code 1, and the message names the path and
+the key.
+
+=head1 THE VERIFICATION OF AN INSTALL
+
+Before the first boot, C<up> builds an L<App::FuguVM::Mirror> over
+the version, the architecture, the C<verify> switch and the
+C<signify_dir> directive of the configuration, and
+L<App::FuguVM::Miniroot> downloads the install media through it. The
+mirror proves the C<SHA256> manifest of the release under the release
+key, and it verifies the miniroot before the image enters the cache.
+The host must verify the miniroot, because the miniroot is the boot
+medium and no code in the guest inspects it before it runs. A
+verification failure stops the run with exit code 1, leaves no file
+in the cache, and the diagnostic holds the mirror reason. When
+signify(1) is absent on the host, the reason names the command and
+the packages.
+
+The guest verifies its own sets: the installer of a numbered release
+carries the release key in F<bsd.rd>, and the proxy serves
+F<SHA256.sig> beside each set. C<up> passes the C<verify> switch to
+F<install.exp>, and with C<verify yes> the script stops on the
+"Continue without verification?" prompt instead of answering it, with
+exit code 9. With C<verify no> the tool downloads without a proof,
+logs one warning, and the script waives the installer check with a
+warning of its own.
+
+C<up> also exports the C<distfile_cache> byte count as
+C<FUGUVM_DISTFILE_LIMIT> before it starts the proxy, so the proxy
+child holds the distfile tree under the cap.
+
+=head1 CREDENTIALS
+
+The tool generates a root password only in the C<expect> mode. In the
+C<autoinstall> mode the response file owns every credential, and in
+the C<import> mode the publisher of the image owns them. Outside the
+C<expect> mode, C<up> therefore behaves by configuration:
+
+=over 4
+
+=item * With C<ssh_pubkey> and C<root_password_file>: read the
+password from the first line of the file, store it in the state, and
+install the key over a password login, exactly as after an expect
+install. The tool warns when the file mode lets the group or another
+user read the file.
+
+=item * With no C<ssh_pubkey>: wait for SSH with the key of the
+operator. The image must trust that key already.
+
+=item * With C<ssh_pubkey> and no C<root_password_file>: the
+configuration loader refuses with exit code 3.
+
+=back
+
+A published image and a consuming host share one credential: the
+response file of the build sets the root password, the stack keeps
+the password in a file, and each consuming host names that file with
+C<root_password_file>. The metadata of an imported cache entry holds
+no root password, because the tool must not invent a credential for
+an image that it did not install.
+
 =head2 down, destroy, start, stop, status
 
 C<down> stops the proxy and then the VM, gracefully, and records a
 clean shutdown. C<destroy> stops it and deletes the disk. C<start> and
 C<stop> are the narrow forms that do not touch the proxy. C<status>
-reports the state.
+reports the state, with C<proxy_url> from
+C<< App::FuguVM::Proxy->guest_url >>: the proxy URL as the guest
+reaches it, or C<undef> while the proxy does not run. The port
+changes between runs, so a consumer reads the value from C<status>
+and must not write it in a file.
 
-=head2 wait_ssh, ssh_port, console_port, is_running
+=head2 wait_ssh, is_running
 
 C<wait_ssh> polls until the guest takes an authenticated connection;
 with a password argument it authenticates with that password instead
-of the SSH agent. C<console_port> is the port that C<telnet> reaches
-the serial console on.
+of the SSH agent.
+
+=head2 accel, bind_address, connect_address, ssh_port, console_port
+
+The facts of the guest that C<status> reports and that the guest
+connections use.
+
+C<accel> returns C<kvm>, C<hvf> or C<tcg>. While the guest runs, the
+answer is the recorded value: a guest that started under
+C<--emulate> runs TCG whatever the host can do now. In every other
+case the answer is the accelerator that the tool selects now.
+
+C<bind_address> returns the configured host address of the forwarded
+ports. C<connect_address> returns the address that the tool connects
+to: the bind address, or C<127.0.0.1> when the bind address is
+C<0.0.0.0>, because C<0.0.0.0> is not a destination.
+
+C<ssh_port> and C<console_port> return the recorded port while the
+guest runs, and fall back to the configured number. They return
+C<undef> for C<auto> in every other case: the record describes one
+run, so a stopped guest has no port. Thus a record that a crash left
+behind cannot read as a live port.
+
+=head1 ADDRESSES AND PORTS
+
+QEMU binds the forwarded SSH port and the serial console to
+C<bind_address>. The default is C<127.0.0.1>, so no other machine
+reaches a guest. C<bind_address 0.0.0.0> restores the wider reach.
+Every connection that the tool makes to its own guest uses
+C<connect_address>.
+
+C<up> and C<start> resolve both ports one time for each invocation,
+before the first spawn, and record them with the accelerator in
+L<App::FuguVM::State>. A directive of C<auto> takes the first free
+port of a fixed range: 100 ports from the default port of the
+directive. The probe binds a listening socket on the bind address
+and the candidate port. It skips every port that the record of a
+sibling guest of the project holds. It also skips every fixed port
+that a VM declaration of the project holds, stopped or not. An
+exhausted range stops the run with exit code 1.
+
+An exclusive C<flock(2)> on F<ports.lock> in the cache directory
+covers the probe and the record of both ports, with a deadline of 30
+seconds. Every project that shares the cache directory shares the
+lock, so the probes serialize while every holder is inside its
+deadline. The record exclusion covers the guests of one project
+only. One window stays open: a
+foreign process, a guest of an other project included, can take a
+probed port before QEMU binds it. QEMU then fails to start, and the
+tool reports that failure with the QEMU log. On the deadline the
+tool logs a warning and probes without the lock. The stop verbs
+clear the record, so a later C<start> resolves again. C<stop> on a
+guest that does not run also clears the record that a crash left
+behind.
+
+=head1 VERSION GATE
+
+The optional C<qemu_version> directive pins the version of the QEMU
+system binary. C<up> and C<start> enforce it one time for each
+invocation, before the first spawn. The tool runs the binary that
+the architecture selects with C<--version>, under a deadline of 10
+seconds, and parses the first dotted-decimal token of the first
+output line.
+
+The match runs component by component, over the components that the
+directive names: C<9.0> accepts C<9.0.4> and refuses C<9.1.0>, and
+C<9.0.4> accepts C<9.0.4> only. A mismatch gives exit code 3, with a
+message that names both versions. A pinned version that the tool
+cannot verify fails closed with the same code: an absent binary, and
+output with no version in it, both refuse the start. With no
+directive the tool checks nothing, and it does not run the binary.
+
+=head1 ARCHITECTURE
+
+The C<arch> value of the configuration selects the QEMU binary, the
+machine type, the firmware, and the TCG CPU model, through
+L<App::FuguVM::Arch>. C<up> and C<start> exit with code 3 when the
+QEMU binary of the architecture is not on C<PATH>.
+
+An arm64 guest boots its firmware code file with C<-bios>. An amd64
+guest boots through two pflash devices: the code file read-only, and
+a fresh copy of its variable-store template in the state directory.
+The copy is throwaway state, and every start makes it again. A guest
+does not start without a firmware file, and the message names the
+architecture.
+
+The accelerator follows the host. KVM and HVF need a host machine
+that runs the instruction set of the guest. KVM serves Linux with a
+writable F</dev/kvm>, and HVF serves Darwin. Every other case, an
+OpenBSD host included, uses TCG software emulation. C<host> CPU
+passthrough pairs with hardware acceleration, and the TCG model of
+the architecture pairs with TCG.
+
+A disk belongs to one architecture for its whole life. C<up> and
+C<start> stop with an error when the state records an other
+architecture for the existing disk, and the message names
+C<fuguvm destroy>.
 
 =head1 SHUTDOWN
 
@@ -72,7 +260,7 @@ leaves a filesystem that the next boot has to repair.
 =head1 SEE ALSO
 
 L<Fugu::Process>, L<Fugu::SSH>, L<Fugu::Timeout>,
-L<App::FuguVM::Disk>, L<App::FuguVM::DiskCache>,
+L<App::FuguVM::Arch>, L<App::FuguVM::Disk>, L<App::FuguVM::DiskCache>,
 L<App::FuguVM::QMP>, L<App::FuguVM::State>, L<fuguvm(1)>
 
 =head1 AUTHOR

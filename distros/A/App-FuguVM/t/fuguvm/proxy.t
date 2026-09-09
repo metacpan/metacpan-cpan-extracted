@@ -33,6 +33,12 @@ Fugu::Log->set_default( Fugu::Log->new( mode => 'quiet' ) );
 	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/arm64/bsd.rd',
 	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/arm64/BUILDINFO',
 	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/arm64/index.txt',
+	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/ports.tar.gz',
+	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/src.tar.gz',
+	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/sys.tar.gz',
+	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/xenocara.tar.gz',
+	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/SHA256',
+	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/SHA256.sig',
 	);
 	ok( $cache->is_cacheable($_), "cacheable: $_" ) for @cacheable;
 
@@ -43,6 +49,36 @@ Fugu::Log->set_default( Fugu::Log->new( mode => 'quiet' ) );
 	ok( !$cache->is_cacheable(
 	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/arm64/base78.tgz', 404),
 	    'and a 404 never is' );
+	ok( !$cache->is_cacheable(
+	    'http://cdn.openbsd.org/pub/OpenBSD/7.8/other.tar.gz'),
+	    'the source tarballs are named, so an other tarball is not' );
+}
+
+# The distfile pattern is conditional on the cap: a cache that grows
+# with no bound in a home directory is the failure that the default
+# of 0 avoids.
+{
+	my $distfile =
+	    'http://cdn.openbsd.org/pub/OpenBSD/distfiles/gmake-4.4.1.tar.gz';
+	my $nested =
+	    'http://cdn.openbsd.org/pub/OpenBSD/distfiles/by_cipher/'
+	    . 'sha256/aa/gmake.tar.gz';
+
+	my $off = App::FuguVM::Proxy::Cache->new( tempdir( CLEANUP => 1 ) );
+	ok( !$off->is_cacheable($distfile),
+	    'a distfile is not cacheable with a cap of 0' );
+	is( $off->distfile_limit, 0, 'and the default cap is 0' );
+
+	my $on =
+	    App::FuguVM::Proxy::Cache->new( tempdir( CLEANUP => 1 ), 4096 );
+	ok( $on->is_cacheable($distfile),
+	    'a distfile is cacheable with a cap above 0' );
+	ok( $on->is_cacheable($nested),
+	    'a distfile in a subdirectory is cacheable' );
+	ok( !$on->is_cacheable(
+		'http://cdn.openbsd.org/pub/OpenBSD/distfiles/'),
+	    'a directory listing with a trailing solidus is not' );
+	is( $on->distfile_limit, 4096, 'the cap is on the object' );
 }
 
 # A kernel has no extension, so the generic content-type table cannot
@@ -59,20 +95,28 @@ Fugu::Log->set_default( Fugu::Log->new( mode => 'quiet' ) );
 # The guest reaches the host through the QEMU gateway, and no other
 # address gets out of the SLIRP network.
 {
-	my $dir   = tempdir( CLEANUP => 1 );
-	my $store = Fugu::StateFile->new( path => "$dir/state.json" )->load;
+	my $dir     = tempdir( CLEANUP => 1 );
+	my $store   = Fugu::StateFile->new( path => "$dir/state.json" )->load;
+	my $pidfile = Fugu::Pidfile->new( path => "$dir/proxy.pid" );
 
 	my $proxy = App::FuguVM::Proxy->new(
 	    cache   => App::FuguVM::Proxy::Cache->new($dir),
-	    pidfile => Fugu::Pidfile->new( path => "$dir/proxy.pid" ),
+	    pidfile => $pidfile,
 	    store   => $store,
 	);
 
 	is( $proxy->guest_url, undef, 'no URL before the proxy runs' );
 
+	# A recorded port without a live child is not a reachable
+	# proxy, so the URL stays absent.
 	$store->set( proxy_port => 8080 );
+	is( $proxy->guest_url, undef,
+	    'a stale port without a live child gives no URL' );
+
+	# This test process stands in for the live child.
+	$pidfile->write_pid($$);
 	is( $proxy->guest_url, 'http://10.0.2.2:8080',
-	    'the guest URL names the gateway' );
+	    'the guest URL names the gateway while the proxy runs' );
 }
 
 
@@ -181,6 +225,112 @@ my $MIRROR = 'cdn.openbsd.org/pub/OpenBSD';
 
 	is_deeply($cache->prune('7.8'), [],
 	    'prune on an empty cache is a no-op');
+}
+
+# prune and the source tarballs: the tarball sits inside the version
+# directory, so a version bump takes it. The distfile tree carries no
+# version, so prune leaves every byte of it.
+{
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $cache = App::FuguVM::Proxy::Cache->new($tmpdir, 4096);
+
+	_seed($tmpdir, "$MIRROR/7.7/ports.tar.gz", 100);
+	_seed($tmpdir, "$MIRROR/distfiles/gmake-4.4.1.tar.gz", 30);
+	_seed($tmpdir, "$MIRROR/distfiles/by_dir/curl/curl-8.tar.gz", 20);
+
+	my $removed = $cache->prune('7.8');
+	is(scalar @$removed, 1, 'prune removes the stale version tree');
+	ok(!-e "$tmpdir/proxy/$MIRROR/7.7",
+	    'and ports.tar.gz went with it');
+
+	ok(-d "$tmpdir/proxy/$MIRROR/distfiles", 'prune leaves the distfiles');
+	is($cache->distfile_size, 50, 'and the tree keeps every byte');
+}
+
+# The eviction: oldest first by modification time, stop at the cap,
+# report each removed file, and leave the release tree alone.
+{
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $cache = App::FuguVM::Proxy::Cache->new($tmpdir, 45);
+
+	my $old = _seed($tmpdir, "$MIRROR/distfiles/old.tar.gz", 30);
+	my $mid = _seed($tmpdir, "$MIRROR/distfiles/mid.tar.gz", 20);
+	my $new = _seed($tmpdir, "$MIRROR/distfiles/new.tar.gz", 10);
+	my $set = _seed($tmpdir, "$MIRROR/7.8/arm64/base78.tgz", 500);
+
+	# The store times decide the order, so the test sets them.
+	utime 1000, 1000, $old;
+	utime 2000, 2000, $mid;
+	utime 3000, 3000, $new;
+
+	my $removed = $cache->trim_distfiles;
+	is_deeply($removed, [ { path => $old, size => 30 } ],
+	    'trim removes the oldest file first and reports it');
+	is($cache->distfile_size, 30, 'and stops when the tree fits');
+	ok(-f $set, 'the release tree keeps its bytes');
+
+	is_deeply($cache->trim_distfiles, [],
+	    'a tree under the cap loses nothing');
+
+	# A cap of 0 means the operator turned the cache off
+	my $off = App::FuguVM::Proxy::Cache->new($tmpdir);
+	my $emptied = $off->trim_distfiles;
+	is(scalar @$emptied, 2, 'a cap of 0 empties the tree');
+	is($off->distfile_size, 0, 'and no distfile byte stays');
+	ok(-f $set, 'while the release tree still keeps its bytes');
+}
+
+# store trims after a distfile store, and only then: a set store must
+# not walk the distfile tree.
+{
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $cache = App::FuguVM::Proxy::Cache->new($tmpdir, 25);
+
+	my $old = _seed($tmpdir, "$MIRROR/distfiles/old.tar.gz", 20);
+	utime 1000, 1000, $old;
+
+	my $stored = $cache->store(
+	    "http://$MIRROR/distfiles/new.tar.gz", 'x' x 10);
+	ok(defined $stored, 'store admits a distfile under a cap');
+	ok(!-f $old, 'and the store evicts the oldest file over the cap');
+	is($cache->distfile_size, 10, 'the tree fits the cap');
+
+	# Refill over the cap, then store a file set: the set store
+	# leaves the over-cap tree alone.
+	my $again = _seed($tmpdir, "$MIRROR/distfiles/again.tar.gz", 40);
+	ok(defined $cache->store(
+		"http://$MIRROR/7.8/arm64/base78.tgz", 'x' x 100),
+	    'a set store succeeds beside an over-cap tree');
+	ok(-f $again, 'and it walks no distfile');
+}
+
+# distfile_size counts the tree over every cached host
+{
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $cache = App::FuguVM::Proxy::Cache->new($tmpdir, 4096);
+
+	_seed($tmpdir, "$MIRROR/distfiles/one.tar.gz", 10);
+	_seed($tmpdir, 'mirror.example.org/pub/OpenBSD/distfiles/two.tar.gz',
+	    15);
+
+	is($cache->distfile_size, 25, 'the size covers every cached host');
+}
+
+# A metadata entry of an evicted file reads as absent, so an eviction
+# in the child needs no invalidation.
+{
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $cache = App::FuguVM::Proxy::Cache->new($tmpdir, 25);
+	my $meta = Fugu::Proxy::Meta->new;
+
+	my $old = _seed($tmpdir, "$MIRROR/distfiles/old.tar.gz", 20);
+	utime 1000, 1000, $old;
+	my $url = "http://$MIRROR/distfiles/old.tar.gz";
+	ok(defined $meta->store($url, $old, $cache), 'the entry exists');
+
+	$cache->store("http://$MIRROR/distfiles/new.tar.gz", 'x' x 10);
+	is($meta->lookup($url), undef,
+	    'the entry of the evicted file reads as absent');
 }
 
 done_testing();

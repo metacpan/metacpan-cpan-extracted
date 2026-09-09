@@ -6,12 +6,12 @@
 # Copyright © 2007-2009 Raphaël Hertzog <hertzog@debian.org>
 # Copyright © 2008-2009,2012-2014 Guillem Jover <guillem@debian.org>
 #
-# This program is free software; you may redistribute it and/or modify
+# This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 #
-# This is distributed in the hope that it will be useful,
+# This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -67,7 +67,7 @@ All the deps_* functions are exported by default.
 
 =over 4
 
-=item deps_eval_implication($rel_p, $v_p, $rel_q, $v_q)
+=item $tribool = deps_eval_implication($rel_p, $v_p, $rel_q, $v_q)
 
 ($rel_p, $v_p) and ($rel_q, $v_q) express two dependencies as (relation,
 version). The relation variable can have the following values that are
@@ -391,7 +391,7 @@ sub deps_iterate {
     return $visitor_func->($deps);
 }
 
-=item deps_compare($a, $b)
+=item $cmp = deps_compare($a, $b)
 
 Implements a comparison operator between two dependency objects.
 This function is mainly used to implement the sort() method.
@@ -409,7 +409,8 @@ my %relation_ordering = (
     REL_LE() => 5,
 );
 
-sub deps_compare {
+sub deps_compare :prototype($$)
+{
     my ($aref, $bref) = @_;
 
     my (@as, @bs);

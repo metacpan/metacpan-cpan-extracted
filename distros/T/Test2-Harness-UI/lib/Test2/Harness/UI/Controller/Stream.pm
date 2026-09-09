@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -268,7 +268,13 @@ sub stream_single {
             return if $unchanged;
 
             my $data = $method ? $it->$method : $it->TO_JSON;
-            return encode_json({type => $type, update => $update, data => $data}) . "\n";
+            my $json;
+            local $@;
+            unless (eval { $json = encode_json({type => $type, update => $update, data => $data}); 1 }) {
+                warn "Failed to encode $type: $@";
+                return;
+            }
+            return "$json\n";
         },
     ];
 }
@@ -337,6 +343,7 @@ sub stream_set {
                 );
             }
 
+            my @batch;
             while (my $item = $items->next()) {
                 $ord = $item->$ord_field;
 
@@ -358,8 +365,17 @@ sub stream_set {
                 }
 
                 my $data = $method ? $item->$method : $item->TO_JSON;
-                return encode_json({type => $type, update => $update, data => $data}) . "\n";
+                my $json;
+                local $@;
+                unless (eval { $json = encode_json({type => $type, update => $update, data => $data}); 1 }) {
+                    warn "Failed to encode $type: $@";
+                    next;
+                }
+                push @batch => "$json\n";
+                last if @batch >= 50;
             }
+
+            return join('', @batch) if @batch;
 
             $items = undef;
             return;

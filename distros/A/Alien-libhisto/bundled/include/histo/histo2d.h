@@ -370,6 +370,23 @@ histo_status_t histo2d_region_content(const histo2d_t *h, histo2d_region_t regio
                                       double *out_weight, uint64_t *out_count);
 
 /**
+ * @brief Retrieves accumulated squared weights (sum of w^2) for a specific guard region.
+ *
+ * @param[in] h      2D histogram handle.
+ * @param[in] region Target region enum.
+ * @return Region sum_w2, or 0.0 if h is NULL, region is invalid, or sum_w2 is not tracked.
+ */
+double histo2d_region_sum_w2(const histo2d_t *h, histo2d_region_t region);
+
+/**
+ * @brief Retrieves the feature configuration flags bitmask for this 2D histogram.
+ *
+ * @param[in] h 2D histogram handle.
+ * @return Bitmask of HISTO_FLAG_* flags, or 0 if h is NULL.
+ */
+uint32_t histo2d_flags(const histo2d_t *h);
+
+/**
  * @brief Retrieves total number of rejected non-finite (NaN/Inf) fill samples.
  *
  * @param[in] h 2D histogram handle.

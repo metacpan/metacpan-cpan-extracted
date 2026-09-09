@@ -32,7 +32,7 @@ perlimports - A command line utility for cleaning up imports in your Perl code
 
 =head1 VERSION
 
-version 0.000061
+version 0.000063
 
 =head1 SYNOPSIS
 
@@ -532,6 +532,12 @@ for more information on how to set up an integration with your editor.
 If this option is enabled, then C<--inplace-edit|-i> is not available.
 
     --read-stdin
+
+=head2 --[no-]sort
+
+(Experimental). Sort contiguous include statements into a deterministic order.
+Defaults to false. As this feature is still experimental, the exact sorting
+behaviour may change in a subsequent release.
 
 =head2 --log-level|-l
 

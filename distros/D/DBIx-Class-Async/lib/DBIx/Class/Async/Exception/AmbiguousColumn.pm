@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.8');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use parent 'DBIx::Class::Async::Exception';
@@ -16,7 +16,7 @@ that are ambiguous across joined tables
 
 =head1 VERSION
 
-Version v1.0.8
+Version v1.1.0
 
 =head1 SYNOPSIS
 

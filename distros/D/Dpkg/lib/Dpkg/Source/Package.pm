@@ -160,7 +160,7 @@ sub get_default_tar_ignore_pattern {
 
 =over 4
 
-=item $p = Dpkg::Source::Package->new(%opts, options => {})
+=item $src_pkg = Dpkg::Source::Package->new(%opts, options => {})
 
 Creates a new object corresponding to a source package.
 
@@ -248,6 +248,7 @@ sub new {
         $self->init_options();
     } elsif ($opts{format}) {
         $self->{fields}{Format} = $opts{format};
+        $self->{basedir} = $opts{basedir} // '.';
         $self->upgrade_object_type(0);
         $self->init_options();
     }
@@ -302,7 +303,7 @@ sub initialize {
     my ($self, $filename) = @_;
     my ($fn, $dir) = fileparse($filename);
     error(g_('%s is not the name of a file'), $filename) unless $fn;
-    $self->{basedir} = $dir || './';
+    $self->{basedir} = $dir || '.';
     $self->{filename} = $fn;
 
     # Read the fields.
@@ -332,13 +333,13 @@ sub upgrade_object_type {
     $module .= '::' . ucfirst $variant if defined $variant;
     eval qq{
         require $module;
-        \$minor = \$${module}::CURRENT_MINOR_VERSION;
     };
     if ($@) {
         error(g_("source package format '%s' is not supported: %s"),
               $format, $@);
     }
     if ($update_format) {
+        $minor = $module->CURRENT_MINOR_VERSION();
         $self->{format}->set_from_parts($major, $minor, $variant);
         $self->{fields}{'Format'} = $self->{format}->get();
     }
@@ -347,7 +348,7 @@ sub upgrade_object_type {
     bless $self, $module;
 }
 
-=item $p->get_filename()
+=item $filename = $src_pkg->get_filename()
 
 Returns the filename of the DSC file.
 
@@ -358,7 +359,7 @@ sub get_filename {
     return File::Spec->catfile($self->{basedir}, $self->{filename});
 }
 
-=item $p->get_files()
+=item @files_list = $src_pkg->get_files()
 
 Returns the list of files referenced by the source package. The filenames
 usually do not have any path information.
@@ -370,7 +371,7 @@ sub get_files {
     return $self->{checksums}->get_files();
 }
 
-=item $p->check_checksums()
+=item $src_pkg->check_checksums()
 
 Verify the checksums embedded in the DSC file. It requires the presence of
 the other files constituting the source package. If any inconsistency is
@@ -418,7 +419,7 @@ sub get_basename {
     return $f->{'Source'} . '_' . $vs;
 }
 
-=item $p->get_basedirname()
+=item $pathname = $src_pkg->get_basedirname()
 
 Returns the default base directory name for the package.
 
@@ -440,9 +441,10 @@ sub find_original_tarballs {
     $opts{include_supplementary} //= 1;
     my $basename = $self->get_basename();
     my @tar;
-    foreach my $dir ('.', $self->{basedir}, $self->{options}{origtardir}) {
+    foreach my $dir ($self->{basedir}, $self->{options}{origtardir}) {
         next unless defined($dir) and -d $dir;
-        opendir(my $dir_dh, $dir) or syserr(g_('cannot opendir %s'), $dir);
+        opendir(my $dir_dh, $dir)
+            or syserr(g_('cannot open directory %s'), $dir);
         push @tar, map { File::Spec->catfile($dir, $_) } grep {
                 ($opts{include_main} and
                  /^\Q$basename\E\.orig\.tar\.$opts{extension}$/) or
@@ -454,7 +456,7 @@ sub find_original_tarballs {
     return @tar;
 }
 
-=item $p->get_upstream_signing_key($dir)
+=item $pathname = $src_pkg->get_upstream_signing_key($dir)
 
 Get the filename for the upstream key.
 
@@ -466,11 +468,11 @@ sub get_upstream_signing_key {
     return "$dir/debian/upstream/signing-key.asc";
 }
 
-=item $p->armor_original_tarball_signature($bin, $asc)
+=item $src_pkg->armor_original_tarball_signature($bin, $asc)
 
 Convert a signature from binary to ASCII armored form. If the signature file
 does not exist, it is a no-op. If the signature file is already ASCII armored
-then simply copy it, otherwise convert it from binary to ASCII armored form.
+then copy it, otherwise convert it from binary to ASCII armored form.
 
 =cut
 
@@ -484,7 +486,7 @@ sub armor_original_tarball_signature {
     return;
 }
 
-=item $p->check_original_tarball_signature($dir, @asc)
+=item $src_pkg->check_original_tarball_signature($dir, @asc)
 
 Verify the original upstream tarball signatures @asc using the upstream
 public keys. It requires the origin upstream tarballs, their signatures
@@ -514,7 +516,7 @@ sub check_original_tarball_signature {
     }
 }
 
-=item $bool = $p->is_signed()
+=item $bool = $src_pkg->is_signed()
 
 Returns 1 if the DSC files contains an embedded OpenPGP signature.
 Otherwise returns 0.
@@ -526,7 +528,7 @@ sub is_signed {
     return $self->{is_signed};
 }
 
-=item $p->check_signature()
+=item $src_pkg->check_signature()
 
 Implement the same OpenPGP signature check that dpkg-source does.
 In case of problems, it prints a warning or errors out.
@@ -591,7 +593,7 @@ sub parse_cmdline_option {
     return 0;
 }
 
-=item $p->extract($targetdir)
+=item $src_pkg->extract($targetdir)
 
 Extracts the source package in the target directory $targetdir. Beware
 that if $targetdir already exists, it will be erased (as long as the
@@ -615,7 +617,7 @@ sub extract {
     if ($self->{options}{copy_orig_tarballs}) {
         my $basename = $self->get_basename();
         my ($dirname, $destdir) = fileparse($newdirectory);
-        $destdir ||= './';
+        $destdir ||= '.';
         my $ext = compression_get_file_extension_regex();
         foreach my $orig (grep { /^\Q$basename\E\.orig(-[[:alnum:]-]+)?\.tar\.$ext$/ }
                           $self->get_files())
@@ -734,7 +736,7 @@ sub write_dsc {
     }
 
     my $filename = $opts{filename};
-    $filename //= $self->get_basename(1) . '.dsc';
+    $filename //= File::Spec->catfile($self->{basedir}, $self->get_basename(1) . '.dsc');
     open(my $dsc_fh, '>', $filename)
         or syserr(g_('cannot write %s'), $filename);
     $fields->apply_substvars($opts{substvars});

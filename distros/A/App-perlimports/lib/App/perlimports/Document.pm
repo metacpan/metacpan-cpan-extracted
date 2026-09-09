@@ -3,12 +3,13 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000061';
+our $VERSION = '0.000063';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
 use App::perlimports::Include         ();
 use App::perlimports::Sandbox         ();
+use App::perlimports::Sorter          ();
 use File::Basename                    qw( fileparse );
 use List::Util                        qw( any uniq );
 use Module::Runtime                   qw( module_notional_filename );
@@ -213,6 +214,13 @@ has _padding => (
     isa      => Bool,
     init_arg => 'padding',
     default  => 1,
+);
+
+has _sort => (
+    is       => 'ro',
+    isa      => Bool,
+    init_arg => 'sort',
+    default  => 0,
 );
 
 has ppi_document => (
@@ -1110,6 +1118,8 @@ sub _lint_or_tidy_document {
     my $self = shift;
 
     my $linter_error = 0;
+    $linter_error = 1 if $self->_sort_lint_error;
+
     my %processed;    # modules we changed/confirmed the use statement
 
 INCLUDE:
@@ -1239,7 +1249,42 @@ INCLUDE:
 
     # We need to do serialize in order to preserve HEREDOCs.
     # See https://metacpan.org/pod/PPI::Document#serialize
-    return $self->lint ? !$linter_error : $self->_ppi_selection->serialize;
+    return !$linter_error if $self->lint;
+
+    return $self->_tidied_and_sorted;
+}
+
+# Returns 1 (and warns via the linter) if we're linting with --sort enabled
+# and the current includes are not in sorted order; returns 0 otherwise.
+sub _sort_lint_error {
+    my $self = shift;
+
+    return 0 unless $self->lint && $self->_sort;
+
+    my $before = $self->_ppi_selection->serialize;
+    my $after  = App::perlimports::Sorter->new(
+        logger => $self->logger,
+        source => $before,
+    )->sorted_document;
+
+    return 0 if $before eq $after;
+
+    $self->_warn_unsorted_includes( $before, $after );
+    return 1;
+}
+
+# Serializes the tidied document and, when --sort is enabled, reorders its
+# include statements.
+sub _tidied_and_sorted {
+    my $self = shift;
+
+    my $tidied = $self->_ppi_selection->serialize;
+    return $tidied unless $self->_sort;
+
+    return App::perlimports::Sorter->new(
+        logger => $self->logger,
+        source => $tidied,
+    )->sorted_document;
 }
 
 # given PPI:Element, returns hashref describing location, e.g.:
@@ -1247,15 +1292,34 @@ INCLUDE:
 sub _elem_loc {
     my ($elem) = @_;
 
-    my $loc     = { start => { line => $elem->line_number } };
+    my $line   = $elem->line_number;
+    my $column = $elem->column_number;
+
     my $content = $elem->content;
     my @lines   = split( m{\n}, $content );
 
-    if ( $lines[0] =~ m{[^\s]} ) {
-        $loc->{start}->{column} = @-;
+    my $loc = { start => { line => $line, column => $column } };
+
+    if ( @lines <= 1 ) {
+
+        # A single-line statement's own indentation is not part of its
+        # content, so the (inclusive) end column is measured from the start
+        # column rather than from column 1.
+        $loc->{end} = {
+            line   => $line,
+            column => $column + length( $lines[0] // q{} ) - 1,
+        };
     }
-    $loc->{end}->{line}   = $elem->line_number + @lines - 1;
-    $loc->{end}->{column} = length( $lines[-1] );
+    else {
+
+        # Continuation lines begin at column 1 and their leading whitespace is
+        # part of the statement content, so the final line's length is already
+        # the absolute end column.
+        $loc->{end} = {
+            line   => $line + @lines - 1,
+            column => length( $lines[-1] ),
+        };
+    }
 
     return $loc;
 }
@@ -1308,6 +1372,92 @@ sub _warn_diff_for_linter {
         $self->logger->error($justification);
         $self->logger->error($diff);
     }
+}
+
+sub _warn_unsorted_includes {
+    my ( $self, $before, $after ) = @_;
+
+    my $reason = 'includes are not sorted';
+
+    # Use CONTEXT => 0 for parity with the per-include diagnostic
+    # (_warn_diff_for_linter): the before/after are full-document
+    # serializations whose line numbers already align, so surrounding context
+    # lines would only bloat the output and diverge from the other shape.
+    my $diff = Text::Diff::diff(
+        \$before, \$after,
+        {
+            CONTEXT => 0,
+            STYLE   => 'Unified',
+        }
+    );
+
+    if ( $self->json ) {
+
+        # Unlike a per-include diagnostic, this reports a reordering rather
+        # than a single include, so there's no module to attach and we omit
+        # "module" entirely. The location spans the lines that actually
+        # changed rather than every include in the file: a `require` buried in
+        # a sub far below never participates in a top-of-file reordering.
+        my $json = {
+            filename => $self->_filename,
+            reason   => $reason,
+            diff     => $diff,
+        };
+
+        my $location = _changed_line_span( $before, $diff );
+        $json->{location} = $location if $location;
+
+        $self->logger->error( $self->_json_encoder->encode($json) );
+        return;
+    }
+
+    $self->logger->error(
+        sprintf( '❌ %s (%s)', $self->_filename, $reason ) );
+    $self->logger->error($diff);
+
+    return;
+}
+
+# Given the original document ($before) and the unified diff describing the
+# reordering, return the 1-indexed line/column span of the original lines the
+# diff touches. This keeps a document-wide sort diagnostic pointed at the
+# reordered includes rather than at unrelated includes elsewhere in the file
+# (a `require` buried in a sub far below never participates in a top-of-file
+# reordering). Deriving the span from the diff -- rather than comparing lines
+# positionally -- is important because the Sorter can insert a blank line
+# after the hoisted pragmas, which shifts every following line and would make
+# a positional comparison flag the whole tail of the file. Columns are
+# 1-indexed and inclusive. When the change touches multiple non-contiguous
+# blocks the span covers the first changed line through the last. Returns
+# undef when the diff has no hunks (the caller only reaches here when the
+# versions differ).
+sub _changed_line_span {
+    my ( $before, $diff ) = @_;
+
+    # Unified hunk headers look like "@@ -L,S +l,s @@". A missing S means 1;
+    # S == 0 marks a pure insertion positioned after original line L. We take
+    # the union of the original-file ranges the hunks touch.
+    my ( $first_elem, $last_elem );
+    while ( $diff =~ m{^\@\@ \s+ [-](\d+) (?: [,](\d+) )? \s}gmx ) {
+        my ( $start, $size ) = ( $1, defined $2 ? $2 : 1 );
+        my $end = $size > 0 ? $start + $size - 1 : $start;
+        $first_elem = $start if !defined $first_elem || $start < $first_elem;
+        $last_elem  = $end   if !defined $last_elem  || $end > $last_elem;
+    }
+    return unless defined $first_elem;
+
+    my @before     = split( m{\n}, $before, -1 );
+    my $start_line = $before[ $first_elem - 1 ];
+    my $start_column
+        = ( defined $start_line && $start_line =~ m{\S} ) ? $-[0] + 1 : 1;
+
+    return {
+        start => { line => $first_elem, column => $start_column },
+        end   => {
+            line   => $last_elem,
+            column => length( $before[ $last_elem - 1 ] // q{} ) || 1,
+        },
+    };
 }
 
 sub _remove_with_trailing_characters {
@@ -1414,7 +1564,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000061
+version 0.000063
 
 =head1 MOTIVATION
 

@@ -12,6 +12,7 @@ use Test2::API qw/context/;
 use Test2::Tools::QuickDB;
 use Test2::Tools::Basic qw/note/;
 
+use POSIX ();
 use Carp qw/croak/;
 use Time::HiRes qw/sleep/;
 use Test2::Util qw/pkg_to_file/;
@@ -78,7 +79,7 @@ sub init {
     unless ($pid) {
         my $guard = guard {
             warn "Scope Leak in starman";
-            posix::_exit(255);
+            POSIX::_exit(255);
         };
 
         local $ENV{HARNESS_UI_DSN} = $dsn;
@@ -88,7 +89,8 @@ sub init {
         my $user = $config->schema->resultset('User')->create({username => 'root', password => 'root', realname => 'root', user_id => gen_uuid()});
         my $project = $config->schema->resultset('Project')->create({name => 'test', project_id => gen_uuid()});
 
-        exec('starman', '-Ilib', '--listen' => ($self->{+PORT} ? ":$self->{+PORT}" : $self->{+SOCKET}), '--workers', 5, share_file('psgi/test.psgi')),
+        exec('starman', '-Ilib', '--listen' => ($self->{+PORT} ? ":$self->{+PORT}" : $self->{+SOCKET}), '--workers', 5, share_file('psgi/test.psgi'))
+            or die "exec failed: $!";
     }
 
     $self->{+_STARMAN_PID} = $pid;

@@ -1,9 +1,8 @@
-use 5.034;
+use 5.036;
 use strict;
 use warnings;
 use Test2::V0;
 use Test2::Bundle::More;
-use Mojo::SQLite;
 use Finance::Tiller2QIF::Util qw( vPrint );
 use Path::Tiny;
 use Capture::Tiny qw( capture_stdout );
@@ -21,7 +20,7 @@ Finance::Tiller2QIF::Util::InitDB($test_db);
 
 ok( -s $test_db, "Database ${test_db} created and has non-zero size" );
 
-my $db = Mojo::SQLite->new($test_db)->options( { sqlite_unicode => 1 } )->db;
+my $db = dbi_connect($test_db);
 my $tables =
   $db->query("SELECT name FROM sqlite_master WHERE type='table'")->arrays;
 my @table_names = map { $_->[0] } @$tables;
@@ -125,4 +124,3 @@ subtest 'vPrint verbose false' => sub {
 
 done_testing();
 unlink glob "t/tmp/*" if test_pass();
-

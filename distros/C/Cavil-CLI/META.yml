@@ -1,5 +1,5 @@
 ---
-abstract: 'Check code against known open source and commercial code indexed by Cavil'
+abstract: 'Submit a project to Cavil for a legal review and gate CI on the result'
 author:
   - 'Sebastian Riedel <sriedel@suse.com>'
 build_requires:
@@ -19,16 +19,12 @@ no_index:
     - t
     - inc
 requires:
-  Cavil::Matcher: '1.03'
-  Cpanel::JSON::XS: '4.09'
   IO::Socket::SSL: '2.009'
-  Mojo::SQLite: '3.000'
   Mojolicious: '9.34'
-  Text::Glob: '0.11'
   perl: '5.020'
 resources:
   bugtracker: https://github.com/openSUSE/cavil-cli/issues
   license: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
   repository: https://github.com/openSUSE/cavil-cli.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

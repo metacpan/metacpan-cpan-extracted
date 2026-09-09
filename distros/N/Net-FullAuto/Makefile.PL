@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000834';
+our $VERSION='1.0000835';
 
 #print `env`,"\n\n\n";
 
@@ -2713,6 +2713,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Sub::Exporter::Progressive','install','Makefile');
    &fa_install_module('MRO::Compat','install','Makefile');
    &fa_install_module('Sub::Install','install','Makefile');
+   &fa_install_module('Params::SomeUtil','install','Makefile');
    &fa_install_module('Data::OptList','install','Makefile');
    &fa_install_module('B::Hooks::OP::Check','install','Makefile');
    &fa_install_module('Lexical::SealRequireHints','install','Build');
@@ -2756,7 +2757,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('namespace::clean','install','Makefile');
    &fa_install_module('namespace::autoclean','install','Makefile'); 
    &fa_install_module('Digest::SHA3','install','Makefile');
-   &fa_install_module('Crypt::PBKDF2','install','Makefile');
+   &fa_install_module('Crypt::PBKDF2','install','Build');
    &fa_install_module('Crypt::URandom','install','Makefile');
    &fa_install_module('Crypt::CBC','install','Makefile');
    &fa_install_module('Crypt::DES','install','Makefile');

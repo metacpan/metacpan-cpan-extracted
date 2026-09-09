@@ -14,16 +14,23 @@
 #define inline __inline
 #endif
 
-#if defined(__aarch64__) || defined(_M_ARM64) || defined(__ARM_NEON)
+#if defined(__aarch64__) || defined(_M_ARM64)
 
 #include <arm_neon.h>
+
+#if !defined(vmvnq_u64)
+static inline uint64x2_t histo_vmvnq_u64(uint64x2_t v) {
+    return vreinterpretq_u64_u32(vmvnq_u32(vreinterpretq_u32_u64(v)));
+}
+#define vmvnq_u64(v) histo_vmvnq_u64(v)
+#endif
 
 #else
 /* NEON bridge / emulation layer for x86_64 / other host targets */
 
 #if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
 #include <emmintrin.h>
-#if defined(__SSE4_1__) || defined(__AVX__) || defined(__AVX2__)
+#if defined(__SSE4_1__) || defined(__AVX__) || defined(__AVX2__) || defined(_M_X64)
 #include <smmintrin.h>
 #endif
 #endif
@@ -65,7 +72,7 @@ static inline float64x2_t vminq_f64(float64x2_t a, float64x2_t b) {
 }
 
 static inline float64x2_t vrndmq_f64(float64x2_t a) {
-#if defined(__SSE4_1__) || defined(__AVX__) || defined(__AVX2__)
+#if defined(__SSE4_1__) || defined(__AVX__) || defined(__AVX2__) || defined(_M_X64)
     return _mm_floor_pd(a);
 #else
     double arr[2];

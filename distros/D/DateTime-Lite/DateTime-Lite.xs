@@ -1,10 +1,10 @@
 /*---------------------------------------------------------------------------
  * DateTime::Lite - DateTime-Lite.xs
- * Version v0.1.0
+ * Version v0.1.1
  * Copyright(c) 2026 DEGUEST Pte. Ltd.
  * Author: Jacques Deguest <jack@deguest.jp>
  * Created  2026/04/03
- * Modified 2026/04/09
+ * Modified 2026/09/08
  *
  * XS implementations of keys functions for DateTime-Lite.
  *
@@ -363,29 +363,80 @@ _normalize_leap_seconds(self, days, secs)
     PPCODE:
         if( dtl_isfinite(SvNV(days)) && dtl_isfinite(SvNV(secs)) )
         {
-            IV d = SvIV(days);
-            IV s = SvIV(secs);
+            IV d          = SvIV(days);
+            IV s          = SvIV(secs);
+            IV old_d      = d;
             IV day_length;
+            IV adj;
+            IV new_leaps;
+            IV old_leaps;
+            IV leap_delta;
 
+            /* Step 1: fast constant-time normalisation, ignoring leap seconds.
+             * This handles large |s| values in O(1) via integer division, mirroring what
+             * _normalize_tai_seconds does. Previously, this method was looping one day at a
+             * time, which allowed a caller who controls s (for example using
+             * $dt->add(seconds => N) on a non-floating timezone) to hold a worker
+             * process for O(|N|/86400) iterations. This is an inefficient-algorithmic-
+             * complexity issue (CWE-407).
+             *
+             * For negative values, subtracting 86399 before dividing floors the quotient
+             * toward negative infinity under C99 truncation-toward-zero division.
+             */
+            if( s < 0 )
+            {
+                adj = ( s - 86399 ) / 86400;
+                d += adj;
+                s -= adj * 86400;
+            }
+            else if( s >= 86400 )
+            {
+                adj = s / 86400;
+                d += adj;
+                s -= adj * 86400;
+            }
+
+            /* Step 2: correct for leap seconds in the crossed interval.
+             * SET_LEAP_SECONDS returns cumulative leap seconds up to utc_rd, so the
+             * difference gives leap seconds in the interval in O(1).
+             */
+            if( d > old_d )
+            {
+                SET_LEAP_SECONDS( d     - 1, new_leaps );
+                SET_LEAP_SECONDS( old_d - 1, old_leaps );
+                leap_delta = new_leaps - old_leaps;
+                s -= leap_delta;
+            }
+            else if( d < old_d )
+            {
+                SET_LEAP_SECONDS( old_d - 1, new_leaps );
+                SET_LEAP_SECONDS( d     - 1, old_leaps );
+                leap_delta = new_leaps - old_leaps;
+                s += leap_delta;
+            }
+
+            /* Step 3: residual normalisation. Bounded by the total leap seconds in the
+             * crossed interval (at most 27 across all IANA history), in practice a
+             * handful of iterations.
+             */
             while( s < 0 )
             {
-                SET_DAY_LENGTH(d - 1, day_length);
-
+                SET_DAY_LENGTH( d - 1, day_length );
                 s += day_length;
                 d--;
             }
 
-            SET_DAY_LENGTH(d, day_length);
+            SET_DAY_LENGTH( d, day_length );
 
             while( s > day_length - 1 )
             {
                 s -= day_length;
                 d++;
-                SET_DAY_LENGTH(d, day_length);
+                SET_DAY_LENGTH( d, day_length );
             }
 
-            sv_setiv(days, (IV) d);
-            sv_setiv(secs, (IV) s);
+            sv_setiv( days, (IV) d );
+            sv_setiv( secs, (IV) s );
         }
 
 # Additional XS functions (not in original DateTime)

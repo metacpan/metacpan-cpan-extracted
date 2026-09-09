@@ -128,7 +128,7 @@ t2hui.runtable.tool_builder = function(item, tools, data) {
         var url = base_uri + 'run/' + item.run_id + '/parameters';
         $.ajax(url, {
             'data': { 'content-type': 'application/json' },
-            'error': function(a, b, c) { alert("Failed to load run paramaters") },
+            'error': function(a, b, c) { alert("Failed to load run parameters") },
             'success': function(data) {
                 var formatter = new JSONFormatter(data, 2);
                 $('#modal_body').html(formatter.render());

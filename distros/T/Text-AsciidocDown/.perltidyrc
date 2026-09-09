@@ -1,0 +1,22 @@
+-i=3     # indent 3 spaces
+#-et=4   # expand 4 spaces to one tab
+-l=132   # line max length =132
+-sbl     # subroutine open brace on left (under 'sub')
+-lp      # line up parentheses
+-icp     # same as cti=2
+-pt=2    # horizontal tightness (no extra spaces inside parens)
+-nsfs    # no space after semicolon in for loop
+-nolq    # no outdenting of lonq, quoted strings
+-sbt=2   # no spaces inside brackets (around array index)
+-bt=2    # no spaces inside braces (around hash key)
+-bl      # opening brace on left (under 'if')
+-vt=0    # break line after opening token (open brace on next line)
+-vtc=0   # break line before closing token (closing brace on next line)
+#-boc   # break at old commas
+-bbs     # blank line before sub (line between subs) (-blbp=1 and -blbs=1)
+-bbc     # blank line before comment
+-mbl=1  # max consecutive blank lines
+-baao    # break after all operators (leave && and || at end of line)
+-nbl     # next line for brace
+-bl
+-bext=perlbak

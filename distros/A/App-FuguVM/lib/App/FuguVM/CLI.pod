@@ -26,23 +26,175 @@ which writes to standard error. Thus C<fuguvm snapshot list --names>
 stays readable in a pipeline when the tool has something to warn
 about.
 
+=head1 THE STATUS REPORT
+
+C<fuguvm status> writes one C<key: value> line for each key to
+standard output, in sorted key order. It writes the lines whatever
+C<--quiet> says, because the lines are data. The key set is stable:
+every key appears on every run. A value can be empty, and an empty
+value means "not now". A line with an empty value ends with the
+colon and one space, so every line has one shape.
+
+The keys are C<accel>, C<arch>, C<bind_address>, C<console_port>,
+C<disk_exists>, C<installed>, C<name>, C<pid>, C<proxy_url>,
+C<ssh_port> and C<state>. C<pid> and the two ports of an C<auto>
+directive are empty for a stopped guest, and C<proxy_url> is empty
+while the proxy does not run.
+
+C<fuguvm status E<lt>keyE<gt>> writes the bare value of one key,
+with no key name and no colon. Thus a make target reads one port
+without a text filter. An unknown key gives exit code 2, and the
+diagnostic names every valid key.
+
+C<fuguvm disk info> shares the printer, so its report follows the
+same C<key: value> contract on standard output.
+
+=head1 THE FOUR CONNECTION VERBS
+
+C<ssh>, C<put>, C<get> and C<console> each need a running guest. Each
+one checks first, and a guest that does not run gives exit code 1
+with a message that names the VM. L<App::FuguVM::Remote> holds the
+transport of the first three, and L<App::FuguVM::Console> holds the
+attachment.
+
+C<fuguvm ssh> with no argument opens an interactive session, and it
+returns the exit code of L<ssh(1)>. With arguments it runs one remote
+command. Each argument is one word of the argument vector: the tool
+quotes every word, so the remote shell performs no splitting, no
+expansion, and no globbing. Write C<--> before any word that starts
+with a hyphen, because the option parser reads such a word as an
+option of the tool and exits with code 2. A caller that wants a
+remote shell asks for one:
+
+    fuguvm ssh -- sh -c 'cd /src && make regress'
+
+The remote command gets no terminal and no standard input, and its
+output arrives when the command ends. The verb returns the exit code
+of the remote command. A connect failure reads as exit code 1, with a
+diagnostic on standard error.
+
+C<fuguvm put [--mode=E<lt>octalE<gt>] E<lt>localE<gt>
+E<lt>remoteE<gt>> copies a local file or a local directory into the
+guest, and C<fuguvm get E<lt>remoteE<gt> E<lt>localE<gt>> copies one
+guest file to the host. Each C<E<lt>remoteE<gt>> must be an absolute
+path. A bad argument count, a relative remote path, a C<--mode> value
+that is not 3 or 4 octal digits, a C<put> source that is neither a
+regular file nor a directory, and a C<get> destination that is an
+existing directory each give exit code 2. A failed transfer gives
+exit code 1. L<fuguvm(1)> holds the full transfer rules.
+
+C<fuguvm get> needs C<< Fugu::SSH->read_file >>. When the installed
+Fugu release has no such method, the verb logs the needed release and
+gives exit code 1.
+
+C<fuguvm console> attaches the terminal of the operator to the serial
+console of the guest, and it returns the exit code of L<telnet(1)>.
+
+=head1 THE MIRROR COMMAND
+
+C<fuguvm mirror fetch E<lt>fileE<gt>> downloads one file of the
+release of the invoked guest, verifies it through
+L<App::FuguVM::Mirror>, stores it in the proxy cache, and writes the
+cached path to standard output, where a script can read it. The
+scope comes from the manifests: the tool uses the release scope when
+the manifest of the architecture directory names the file, and the
+source scope when the manifest of the version directory does. Both
+manifests are authoritative lists, so the tool guesses nothing, and
+it refuses a name that neither manifest holds with exit code 1.
+
+C<fuguvm mirror fetch ports.tar.gz> is the call that a consumer
+makes. The guest then reads a verified ports tree from the cache,
+over http, through the proxy.
+
+C<fuguvm mirror verify> verifies every cached file of the version and
+the architecture of the invoked guest. It logs one
+C<scope/name> line for each file that failed, and one summary line
+with the three counts. It removes each file that failed, in its own
+scope only, because a file that fails a digest must not stay in a
+cache that a later run reads. A cached manifest pair that fails its
+own proof counts as failed too, and the removal covers it. The verb
+does not remove an C<unknown> file: a name that no manifest holds is
+not a failure, and F<index.txt> is such a name on every mirror. The
+verb exits 1 when one file failed, and 0 otherwise. It is idempotent:
+a second run over a clean cache removes nothing and exits 0. The verb
+always proves, whatever the C<verify> directive says.
+
+C<mirror> with no action, with an unknown action, C<mirror fetch>
+with no file, and C<mirror verify> with an argument, each exit 2. An
+absent public key for the version, and a C<signify_dir> that is not
+a directory, each exit 3. A failed download, a failed signature, and
+a failed digest each exit 1.
+
+=head1 THE IMAGE EXPORT
+
+C<fuguvm image export E<lt>pathE<gt> [--format=qcow2|raw]> writes the
+installed base image of the invoked VM as a full-disk image. The
+source is the base image of the cache entry that backs the working
+disk; a snapshot layer resolves to the same entry. A standalone disk,
+from C<--no-cache> or C<image_cache no>, exports the working disk
+itself. The default format is C<qcow2>, and C<raw> writes the sparse
+raw form.
+
+The write goes through one temporary sibling,
+C<E<lt>pathE<gt>.tmp.E<lt>pidE<gt>>, and one rename, so a failure
+leaves no partial file behind. The command refuses a running guest
+with exit code 5, because a live overlay is not consistent. It
+refuses an existing target with exit code 1, because it must not
+overwrite an image that an operator published, and it creates no
+directory for the operator.
+
+The report follows the C<key: value> contract of C<status>: C<bytes>,
+C<format>, C<key> (empty for a standalone disk), C<path> and
+C<source>, with the two paths absolute.
+
 =head1 EXIT CODES
 
 The generic codes come from L<Fugu::CLI>: 0 success, 1 error, 2
 invalid arguments, 3 configuration error, 7 timeout.
 
+Code 1 also reports an C<image export> whose target exists, whose
+parent directory is absent, or whose guest has no installed disk, and
+an import whose C<base_disk> file is absent at a cache miss. The four
+connection verbs give it for a guest that does not run, and C<put>
+and C<get> give it for a failed transfer. A failed download, a failed
+signature, a failed digest, a C<mirror verify> that found one bad
+file, and C<verify yes> with no signify(1) on the host, each give it
+too.
+
+Code 2 also reports an unknown C<status> key, an C<image> call
+with no action, no path, or an unknown C<--format> value, a
+C<mirror> call with no action, an unknown action, or no file, and
+each argument refusal of C<put> and C<get> that the section above
+lists.
+
+Code 3 also reports an C<arch> value that is neither C<amd64> nor
+C<arm64>, and a QEMU binary of the architecture that is not on
+C<PATH>. An invalid C<bind_address>, C<ssh_port>, C<console_port> or
+C<qemu_version> value gives the same code. So does a QEMU version
+that does not match the pinned C<qemu_version>, a C<signify_dir>
+that is not a directory, an absent public key for the version on a
+C<mirror> call, and each refusal of the image-lifecycle directives
+that L<App::FuguVM::Config> lists. An absent key on C<up> reads as a
+failed image, with code 1.
+
 These are the codes that mean something to a VM:
 
     4   the named VM is not in the configuration
     5   the VM runs and the command needs it stopped
-    9   an expect script failed
+    9   an expect script failed, the install and autoinstall
+        scripts included
     11  the named snapshot does not exist
+
+Code 9 also reports the installer prompt "Continue without
+verification?" under C<verify yes>: the script stops on it, because
+the prompt means that the mirror data is wrong.
 
 Code 11 is scriptable: a script that runs C<snapshot restore ||
 provision-from-scratch> can tell a missing layer from a real failure.
 
-L<App::FuguVM::Guest> uses these constants from here rather than defining the
-same numbers a second time.
+L<App::FuguVM::Guest> defines the codes that it returns, because
+this module loads L<App::FuguVM::Guest> and the reverse import would
+be a cycle.
 
 =head1 METHODS
 

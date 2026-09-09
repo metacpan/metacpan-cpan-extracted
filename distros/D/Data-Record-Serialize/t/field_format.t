@@ -6,7 +6,7 @@ use Test::Lib;
 
 use Data::Record::Serialize;
 
-subtest "format fields" => sub {
+subtest 'format fields' => sub {
 
     my ( $s, $buf );
 
@@ -22,14 +22,14 @@ subtest "format fields" => sub {
                 },
             );
         },
-        "constructor"
+        'constructor'
     ) or diag $@;
 
     $s->send( { a => 1, b => 2, c => 'nyuck nyuck', d => 'niagara falls' } );
 
     my $VAR1;
 
-    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;    ## no critic (ProhibitStringyEval)
 
     is(
         $VAR1,
@@ -44,7 +44,7 @@ subtest "format fields" => sub {
 
 };
 
-subtest "format types" => sub {
+subtest 'format types' => sub {
 
     my ( $s, $buf );
 
@@ -65,14 +65,14 @@ subtest "format types" => sub {
                 },
             );
         },
-        "constructor"
+        'constructor'
     ) or diag $@;
 
     $s->send( { a => 1, b => 2, c => 3 } );
 
     my $VAR1;
 
-    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;    ## no critic (ProhibitStringyEval)
 
     is(
         $VAR1,
@@ -86,7 +86,7 @@ subtest "format types" => sub {
 
 };
 
-subtest "format types w/o specifying them" => sub {
+subtest 'format types w/o specifying them' => sub {
 
     my ( $s, $buf );
 
@@ -102,14 +102,14 @@ subtest "format types w/o specifying them" => sub {
                 },
             );
         },
-        "constructor"
+        'constructor'
     ) or diag $@;
 
     $s->send( { a => 1.1, b => 2, c => 'nyuck' } );
 
     my $VAR1;
 
-    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;    ## no critic (ProhibitStringyEval)
 
     is(
         $VAR1,
@@ -123,7 +123,7 @@ subtest "format types w/o specifying them" => sub {
 
 };
 
-subtest "format fields overrides types" => sub {
+subtest 'format fields overrides types' => sub {
 
     my ( $s, $buf );
 
@@ -150,14 +150,14 @@ subtest "format fields overrides types" => sub {
                 },
             );
         },
-        "constructor"
+        'constructor'
     ) or diag $@;
 
     $s->send( { a => 1, b => 2, c => 3, d => 4 } );
 
     my $VAR1;
 
-    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;    ## no critic (ProhibitStringyEval)
 
     is(
         $VAR1,

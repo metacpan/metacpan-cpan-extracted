@@ -1,0 +1,57 @@
+clock_t   T_IV
+clockid_t T_IV
+dev_t     T_UV
+gid_t     T_UV
+pid_t     T_IV
+uid_t     T_UV
+id_t      T_UV
+mode_t    T_UV
+nl_catd   T_PTR
+Off_t     T_PSX_OFF_T
+Time_t    T_PSX_TIME_T
+timer_t   T_PTR
+SysRet0   T_SYSRET0
+SysRetTrue  T_SYSRET_TRUE
+psx_fd_t  T_PSX_FD
+psx_safepath_t__fail_undef  T_PSX_SAFEPATH_T__FAIL_UNDEF
+psx_safepath_t__fail_false_or_empty  T_PSX_SAFEPATH_T__FAIL_FALSE_OR_EMPTY
+
+#
+# PUSHs/PUTBACK/return saves come code compared to XSRETURN*.
+#
+INPUT
+T_PSX_OFF_T
+	$var = SvOFFt($arg);
+T_PSX_TIME_T
+	$var = SvTIMEt($arg);
+T_PSX_FD
+	$var = _psx_fileno(aTHX_ $arg, NULL);
+
+T_PSX_SAFEPATH_T__FAIL_UNDEF
+	{
+		STRLEN len;
+		$var = SvPV_const($arg, len);
+		if (!IS_SAFE_PATHNAME($var, len, cv)) {
+			PUSHs(&PL_sv_undef);
+			PUTBACK;
+			return;
+		}
+	}
+
+T_PSX_SAFEPATH_T__FAIL_FALSE_OR_EMPTY
+	{
+		STRLEN len;
+		$var = SvPV_const($arg, len);
+		if (!IS_SAFE_PATHNAME($var, len, cv)) {
+			if (GIMME_V == G_SCALAR)
+				PUSHs(&PL_sv_no);
+			PUTBACK;
+			return;
+		}
+	}
+
+OUTPUT
+T_SYSRET0
+	$arg = LIKELY($var != -1) ? newSViv((IV)$var) : &PL_sv_undef;
+T_SYSRET_TRUE
+	$arg = LIKELY($var == 0) ? newSVpvn("0 but true", 10) : &PL_sv_undef;

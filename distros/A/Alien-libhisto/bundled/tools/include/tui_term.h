@@ -73,7 +73,6 @@ void tui_frame_flush(tui_frame_t *f, FILE *out_fp);
 void tui_frame_free(tui_frame_t *f);
 
 /* Color & style helpers */
-void tui_term_get_color(double fraction, bool monochrome, char *out_ansi, size_t max_len);
 int  tui_visual_width(const char *str);
 void tui_render_row(tui_frame_t *f, const char *content, int width, bool newline);
 

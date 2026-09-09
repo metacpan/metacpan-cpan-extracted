@@ -5,7 +5,7 @@ use warnings;
 use Math::Histo ();
 use Math::Histo::Constants qw(:fit);
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 my %MODEL_STR_MAP = (
     gaussian     => HISTO_FIT_GAUSSIAN,
@@ -46,7 +46,7 @@ package Math::Histo::Fit::Result;
 use strict;
 use warnings;
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 
 sub status_str {

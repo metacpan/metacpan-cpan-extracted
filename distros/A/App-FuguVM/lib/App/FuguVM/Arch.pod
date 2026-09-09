@@ -1,0 +1,79 @@
+=head1 NAME
+
+App::FuguVM::Arch - the architecture table of the supported guests
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::Arch;
+
+    my $arch = App::FuguVM::Arch->new('amd64')
+        or die "unknown architecture\n";
+
+    my @cmd = ($arch->qemu_binary, '-M', $arch->machine);
+    my $accel = $arch->accelerator($^O, $host_machine, $kvm);
+
+=head1 DESCRIPTION
+
+The module holds the architecture table and nothing else. Each entry
+maps one OpenBSD architecture name, C<amd64> or C<arm64>, to the QEMU
+binary, the machine type, the TCG CPU model, the host machine names,
+and the firmware paths. The QEMU spellings, C<x86_64> and C<aarch64>,
+stay inside the table.
+
+The module uses core Perl only, and it loads no other module of the
+distribution.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguVM::Arch->new($name)
+
+Return the architecture object for C<amd64> or C<arm64>. Return
+C<undef> for every other name. The comparison is case sensitive, so
+C<AMD64> is an unknown value.
+
+=head2 names
+
+    App::FuguVM::Arch->names
+
+Return the supported names, sorted. A diagnostic names them, so the
+message and the table cannot disagree.
+
+=head2 name, qemu_binary, machine, tcg_cpu
+
+C<name> is the OpenBSD name of the architecture. C<qemu_binary> is
+the QEMU binary name. C<machine> is the C<-M> machine string.
+C<tcg_cpu> is the C<-cpu> model for software emulation.
+
+=head2 firmware_paths, firmware_glob
+
+C<firmware_paths> is the ordered list of absolute firmware code
+paths. C<firmware_glob> is one glob pattern for the versioned
+Homebrew paths.
+
+=head2 firmware_vars_path
+
+Return the variable-store template beside a firmware code file.
+Return C<undef> when the architecture boots the code file with
+C<-bios> alone. The x86 code files are split flash images, and
+C<-bios> cannot load them. Each amd64 code file therefore pairs with
+the template in its directory, and both boot as pflash devices.
+
+=head2 accelerator
+
+    $arch->accelerator($os, $host_machine, $kvm)
+
+Return C<kvm>, C<hvf> or C<tcg> for one host. QEMU cannot accelerate
+a guest whose instruction set is not the host's, so a host machine of
+an other architecture always gives C<tcg>. The caller gives C<$^O>,
+the uname machine, and whether F</dev/kvm> is writable. The method
+calls no syscall, so a test proves every branch on any host.
+
+=head1 SEE ALSO
+
+L<App::FuguVM::Config>, L<App::FuguVM::Guest>, L<fuguvm(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

@@ -41,6 +41,29 @@ is(File::Raw::XML::_abi_selftest_full(), 0,
     ok($doc, 'the strict surface still parses, which is what parse means and all it means');
 }
 
+# A consumer resolves the table and compares abi_version with the constant
+# in the header it compiled against. Those are two different files, and
+# nothing else notices when an append moves one without the other: the
+# table would answer 1 while the header promised 2, and every consumer
+# built against 2 would refuse a provider that in fact has what it wants.
+{
+    my $table = File::Raw::XML::_abi_version();
+    is($table, 2, 'the table reports the version the SV bridge shipped in');
+
+    require File::Raw::XML::Install::Files;
+    no warnings 'once';
+    my $core = $File::Raw::XML::Install::Files::CORE;
+    my $header;
+    if (defined $core && open my $fh, '<', "$core/frx_abi.h") {
+        local $/;
+        ($header) = (<$fh> =~ /^\#define\s+FRX_ABI_VERSION\s+(\d+)/m);
+        close $fh;
+    }
+    is($header, $table,
+       'and the installed header says the same, which is what a consumer '
+     . 'compiles against');
+}
+
 # the provider config
 ok(eval { require File::Raw::XML::Install::Files; 1 }, 'File::Raw::XML::Install::Files loads') or diag $@;
 {

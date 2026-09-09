@@ -40,7 +40,21 @@ SKIP: {
   $rv = eval { openat('xyz', $tmpname, O_RDWR|O_CREAT|O_TRUNC) };
   is($rv, undef, 'openat with invalid fd');
 
+  # Redirect STDERR to /dev/null temporarily so that the "embedded null
+  # character" warning from openat() doesn't clutter up the test output.
+  my $olderr;
+  my $restore_stderr = 0;
+  if (! open $olderr, '>&', *STDERR) {
+    warn "Can't save STDERR";
+  }
+  elsif (! open STDERR, '>', File::Spec->devnull()) {
+    warn "Can't redirect STDERR to devnull";
+  }
+  else {
+    $restore_stderr = 1;
+  }
   $rv = openat($dot, "\0", O_RDWR|O_CREAT|O_TRUNC);
+  open STDERR, '>&', $olderr if $restore_stderr;
   is($rv, undef, 'openat with invalid path');
 
   # Use AT_FDCWD() as a function instead of a bareword

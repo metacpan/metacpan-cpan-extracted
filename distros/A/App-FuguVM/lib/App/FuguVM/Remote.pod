@@ -1,0 +1,118 @@
+=head1 NAME
+
+App::FuguVM::Remote - the remote side of one running guest
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::Remote;
+
+    my $remote = App::FuguVM::Remote->new(
+        host => $vm->connect_address,
+        port => $ssh_port,
+    );
+
+    my $result = $remote->run('uname', '-m');
+
+    $remote->put('lib', '/root/lib', mode => 0644)
+        or die "put failed\n";
+
+    $remote->get('/root/report.txt', 'report.txt')
+        or die "get failed\n";
+
+=head1 DESCRIPTION
+
+The module holds the remote side of one running guest: the
+L<Fugu::SSH> object, the argument quoting, the local walk, and the
+publish order. Thus L<App::FuguVM::CLI> keeps thin command bodies,
+and one module holds the session timeout.
+
+Three constants carry the numbers. C<SSH_TIMEOUT> is 3600 seconds:
+L<Fugu::SSH> bounds the connect and the channel read with one value,
+and the value must hold a guest build and a large transfer.
+C<MAX_TRANSFER_SIZE> is 64 MiB for one file, because C<write_file>
+and C<read_file> each hold a file in memory. C<BATCH_PATHS> is 100
+paths for each batched remote command, so no command line grows too
+long.
+
+C<new> and C<run> die on a missing argument, because each one is a
+programming error. Every other failure is a return value, and the
+module reports each reason through C<< Fugu::Log->default >>.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguVM::Remote->new(host => $host, port => $port)
+
+Build the object. It opens nothing. C<host> is the connect address of
+the guest, and the user is C<root>. The method dies when the caller
+gives no host, and it dies when the caller gives no port.
+
+=head2 quote_argv
+
+    App::FuguVM::Remote->quote_argv(@argv)
+
+Return one remote command string. A class method. The method wraps
+each word in single quotes, and it replaces each single quote inside
+a word with the C<'\''> form. An empty word becomes C<''>. The words
+join with one space. So the remote shell splits the string at the
+word boundaries only: it expands nothing, and it globs nothing.
+
+=head2 run
+
+    $remote->run(@argv)
+
+Run one argument vector on the guest. The method returns the hash of
+C<< Fugu::SSH->run_command >>: C<stdout>, C<stderr> and C<exit_code>.
+It dies on an empty vector. A connect failure reads as exit code 1,
+with the reason in C<stderr>.
+
+=head2 interactive
+
+    $remote->interactive
+
+Open an interactive session. The method returns the exit code of
+L<ssh(1)>.
+
+=head2 put
+
+    $remote->put($local, $remote_path, mode => 0600)
+
+Copy a local file or a local directory to C<$remote_path> in the
+guest. The destination is never a container: the content of a
+directory arrives under C<$remote_path>, with no component for the
+source directory name. C<mode> sets the mode of each file that the
+method writes. Without it each file keeps its local permission bits,
+masked with C<0777>, so no setuid bit and no setgid bit arrives. A
+directory gets the mode that the remote umask allows.
+
+The method walks the source first, and a symbolic link, a device
+node, a socket, a fifo, and a file above C<MAX_TRANSFER_SIZE> each
+fail the whole call before one byte moves. It creates every remote
+directory with batched C<mkdir -p> calls, writes each file to a
+temporary name beside its destination, and publishes every temporary
+file with batched C<mv -f> calls. A failure removes every temporary
+file, so a failed run leaves no partial destination file. A directory
+copy is not atomic as a whole.
+
+The method returns 1, or C<undef>.
+
+=head2 get
+
+    $remote->get($remote_path, $local)
+
+Copy one regular guest file to C<$local> on the host. The method
+reads the whole file, with C<MAX_TRANSFER_SIZE> as the cap. It
+creates the parent directory of C<$local>, and it writes the bytes
+atomically, mode 0644. So a failure leaves no partial local file. A
+C<$local> that is an existing directory fails the call.
+
+The method returns 1, or C<undef>.
+
+=head1 SEE ALSO
+
+L<Fugu::SSH>, L<Fugu::File>, L<App::FuguVM::CLI>, L<fuguvm(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

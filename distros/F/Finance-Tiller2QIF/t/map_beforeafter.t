@@ -11,7 +11,6 @@ use Path::Tiny;
 use Finance::Tiller2QIF::Map;
 use Finance::Tiller2QIF::ReadCSV;
 use Finance::Tiller2QIF::Util;
-use Mojo::SQLite;
 use feature qw/signatures postderef/;
 
 require './t/TestHelper.pm';
@@ -27,7 +26,7 @@ subtest beforemap => sub {
   my $db_path = uniqfile( 'beforemap', 'sqlite3' );
   my $csvfile = uniqfile( 'beforemap', 'csv' );
   my $mapfile = uniqfile( 'beforemap', 'map' );
-  my $dbmojo  = freshdb($db_path);
+  my $DB  = freshdb($db_path);
   freshcsv( $csvfile,
     '04/25/2026,1,Checking,10.00,Coffee,Cafe,Food',
     '04/25/2026,2,Savings,20.00,Coffee,Cafe,Food',
@@ -44,7 +43,7 @@ subtest beforemap => sub {
     mapfile   => $mapfile,
     beforemap => 't/testcase/beforemap.sql',
   });
-  my @rows = $dbmojo->select( 'transactions', [qw(id account mapped_category)],
+  my @rows = $DB->select( 'transactions', [qw(id account mapped_category)],
     {}, { order_by => 'id' } )->hashes->@*;
   is( $rows[0]{account},         'Checking-VIP',    'beforemap stmt 1: Checking renamed' );
   is( $rows[1]{account},         'Savings-VIP',     'beforemap stmt 2: Savings renamed' );
@@ -52,14 +51,14 @@ subtest beforemap => sub {
   is( $rows[0]{mapped_category}, 'Expenses:Dining', 'map rule fired on Checking-VIP' );
   is( $rows[1]{mapped_category}, 'Expenses:Dining', 'map rule fired on Savings-VIP' );
   is( $rows[2]{mapped_category}, undef,             'map rule did not fire on unmatched account' );
-  $dbmojo->disconnect;
+  $DB->disconnect;
 };
 
 subtest aftermap => sub {
   my $db_path = uniqfile( 'aftermap', 'sqlite3' );
   my $csvfile = uniqfile( 'aftermap', 'csv' );
   my $mapfile = uniqfile( 'aftermap', 'map' );
-  my $dbmojo  = freshdb($db_path);
+  my $DB  = freshdb($db_path);
   freshcsv( $csvfile,
     '04/25/2026,1,Checking,10.00,Coffee,Cafe,Food',
     '04/25/2026,2,Savings,20.00,Coffee,Cafe,Food',
@@ -76,7 +75,7 @@ subtest aftermap => sub {
     mapfile  => $mapfile,
     aftermap => 't/testcase/aftermap.sql',
   });
-  my @rows = $dbmojo->select( 'transactions', [qw(id mapped_category check_number)],
+  my @rows = $DB->select( 'transactions', [qw(id mapped_category check_number)],
     {}, { order_by => 'id' } )->hashes->@*;
   # Without beforemap no rules fire, so aftermap finds nothing to update.
   is( $rows[0]{mapped_category}, undef, 'map rule did not fire without beforemap' );
@@ -84,14 +83,14 @@ subtest aftermap => sub {
   is( $rows[1]{mapped_category}, undef, 'map rule did not fire without beforemap' );
   is( $rows[1]{check_number},    undef, 'aftermap stmt 2 found no matching rows' );
   is( $rows[2]{check_number},    undef, 'aftermap did not touch unmatched row' );
-  $dbmojo->disconnect;
+  $DB->disconnect;
 };
 
 subtest beforemap_and_aftermap => sub {
   my $db_path = uniqfile( 'both', 'sqlite3' );
   my $csvfile = uniqfile( 'both', 'csv' );
   my $mapfile = uniqfile( 'both', 'map' );
-  my $dbmojo  = freshdb($db_path);
+  my $DB  = freshdb($db_path);
   freshcsv( $csvfile,
     '04/25/2026,1,Checking,10.00,Coffee,Cafe,Food',
     '04/25/2026,2,Savings,20.00,Coffee,Cafe,Food',
@@ -109,7 +108,7 @@ subtest beforemap_and_aftermap => sub {
     beforemap => 't/testcase/beforemap.sql',
     aftermap  => 't/testcase/aftermap.sql',
   });
-  my @rows = $dbmojo->select( 'transactions', [qw(id account mapped_category check_number)],
+  my @rows = $DB->select( 'transactions', [qw(id account mapped_category check_number)],
     {}, { order_by => 'id' } )->hashes->@*;
   is( $rows[0]{mapped_category}, 'Expenses:Dining', 'map rule fired on Checking-VIP' );
   is( $rows[1]{mapped_category}, 'Expenses:Dining', 'map rule fired on Savings-VIP' );
@@ -118,14 +117,14 @@ subtest beforemap_and_aftermap => sub {
   is( $rows[2]{account},         'Brokerage',       'beforemap did not rename unmatched account' );
   is( $rows[2]{mapped_category}, undef,             'map rule did not fire on unmatched account' );
   is( $rows[2]{check_number},    undef,             'aftermap did not touch unmatched row' );
-  $dbmojo->disconnect;
+  $DB->disconnect;
 };
 
 subtest sql_semicolon_edgecases => sub {
   my $db_path = uniqfile( 'edge', 'sqlite3' );
   my $csvfile = uniqfile( 'edge', 'csv' );
   my $mapfile = uniqfile( 'edge', 'map' );
-  my $dbmojo  = freshdb($db_path);
+  my $DB  = freshdb($db_path);
   freshcsv( $csvfile,
     '04/25/2026,1,Checking,10.00,Coffee,Cafe,Food',
     '04/25/2026,2,Savings,20.00,Coffee,Cafe,Food',
@@ -140,19 +139,19 @@ subtest sql_semicolon_edgecases => sub {
       beforemap => 't/testcase/edgecase.sql',
     })
   }, 'edgecase sql file executed without error' );
-  my @rows = $dbmojo->select( 'transactions', [qw(id account memo)],
+  my @rows = $DB->select( 'transactions', [qw(id account memo)],
     {}, { order_by => 'id' } )->hashes->@*;
   is( $rows[0]{account}, 'Checking-VIP', 'stmt after -- comment with semicolon executed' );
   is( $rows[1]{account}, 'Savings-VIP',  'stmt after /* */ comment with semicolon executed' );
   is( $rows[2]{memo},    'foo; bar',     'semicolon inside string literal preserved correctly' );
-  $dbmojo->disconnect;
+  $DB->disconnect;
 };
 
 subtest verbose_output => sub {
   my $db_path = uniqfile( 'verbose', 'sqlite3' );
   my $csvfile = uniqfile( 'verbose', 'csv' );
   my $mapfile = uniqfile( 'verbose', 'map' );
-  my $dbmojo  = freshdb($db_path);
+  my $DB  = freshdb($db_path);
   freshcsv( $csvfile,
     '04/25/2026,1,Checking,10.00,Coffee,Cafe,Food',
     '04/25/2026,2,Brokerage,30.00,Stocks,Vanguard,Investment',
@@ -177,7 +176,7 @@ subtest verbose_output => sub {
   like( $out, qr/aftermap completed successfully/,  'verbose reports aftermap success' );
   like( $out, qr/1 row\(s\) affected/,            'verbose reports positive rows affected' );
   like( $out, qr/0 row\(s\) affected/,            'verbose reports zero rows affected' );
-  $dbmojo->disconnect;
+  $DB->disconnect;
 };
 
 done_testing();

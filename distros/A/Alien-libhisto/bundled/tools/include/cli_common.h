@@ -5,6 +5,21 @@
 #ifndef HISTO_CLI_COMMON_H
 #define HISTO_CLI_COMMON_H
 
+#if !defined(_WIN32)
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#endif
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+#ifndef __BSD_VISIBLE
+#define __BSD_VISIBLE 1
+#endif
+#endif
+
 #include "histo/histo.h"
 #include "histo/histo2d.h"
 #include "histo/cli.h"
@@ -15,7 +30,9 @@
 #include <string.h>
 
 #if defined(_WIN32)
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 #include <io.h>
 #include <process.h>
@@ -34,12 +51,29 @@
 #ifndef fileno
 #define fileno _fileno
 #endif
-#ifndef usleep
-#define usleep(us) Sleep((DWORD)((us) / 1000 > 0 ? (us) / 1000 : 1))
+#ifndef strcasecmp
+#define strcasecmp _stricmp
+#endif
+#ifndef strncasecmp
+#define strncasecmp _strnicmp
 #endif
 #else
+#include <strings.h>
+#include <sys/types.h>
 #include <unistd.h>
 #endif
+#include <time.h>
+
+static inline void histo_sleep_us(unsigned long us) {
+#if defined(_WIN32)
+    Sleep((DWORD)((us + 999) / 1000));
+#else
+    struct timespec req;
+    req.tv_sec = (time_t)(us / 1000000UL);
+    req.tv_nsec = (long)((us % 1000000UL) * 1000UL);
+    nanosleep(&req, NULL);
+#endif
+}
 
 #include "cli_opt.h"
 
@@ -47,14 +81,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* Command entry points (backwards-compatible internal signatures) */
-int cmd_fill_main(int argc, char **argv);
-int cmd_plot_main(int argc, char **argv);
-int cmd_stats_main(int argc, char **argv);
-int cmd_fit_main(int argc, char **argv);
-int cmd_cmp_main(int argc, char **argv);
-int cmd_top_main(int argc, char **argv);
 
 /* Terminal utilities */
 int cli_get_terminal_width(int default_width);
@@ -67,8 +93,7 @@ typedef enum {
     CLI_INPUT_BINARY_HISTO,
     CLI_INPUT_JSON_HISTO,
     CLI_INPUT_BPFTRACE_HISTO,
-    CLI_INPUT_TEXT_NUMBERS,
-    CLI_INPUT_RAW_DOUBLES
+    CLI_INPUT_TEXT_NUMBERS
 } cli_input_format_t;
 
 cli_input_format_t cli_detect_stream_format(FILE *fp);

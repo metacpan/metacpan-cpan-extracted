@@ -3,7 +3,7 @@ package App::perlimports::Config;
 use Moo;
 use MooX::StrictConstructor;
 
-our $VERSION = '0.000061';
+our $VERSION = '0.000063';
 
 use List::Util             qw( uniq );
 use Path::Tiny             qw( path );
@@ -158,6 +158,13 @@ has preserve_unused => (
     default => 1,
 );
 
+has sort => (
+    is      => 'ro',
+    isa     => Bool,
+    lazy    => 1,
+    default => 0,
+);
+
 has tidy_whitespace => (
     is      => 'ro',
     isa     => Bool,
@@ -234,7 +241,7 @@ App::perlimports::Config - Generic configuration options for C<perlimports>
 
 =head1 VERSION
 
-version 0.000061
+version 0.000063
 
 =head1 DESCRIPTION
 
@@ -285,4 +292,5 @@ pad_brackets                    = false
 padding                         = true
 preserve_duplicates             = false
 preserve_unused                 = false
+sort                            = false
 tidy_whitespace                 = true

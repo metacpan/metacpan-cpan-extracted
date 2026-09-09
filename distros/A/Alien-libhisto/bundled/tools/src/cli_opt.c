@@ -331,7 +331,7 @@ int cli_opt_parse(cli_opt_parser_t *parser, int argc, char **argv, int start_idx
                         (argv[i + 1][1] >= '0' && argv[i + 1][1] <= '9'))) {
                         val = argv[++i];
                     } else {
-                        val = NULL;
+                        val = matched_spec->def_val_desc ? matched_spec->def_val_desc : "";
                     }
                 } else {
                     if (i + 1 < argc) {
@@ -407,7 +407,7 @@ int cli_opt_parse(cli_opt_parser_t *parser, int argc, char **argv, int start_idx
                             (argv[i + 1][1] >= '0' && argv[i + 1][1] <= '9'))) {
                             val = argv[++i];
                         } else {
-                            val = NULL;
+                            val = matched_spec->def_val_desc ? matched_spec->def_val_desc : "";
                         }
                     } else {
                         if (i + 1 < argc) {

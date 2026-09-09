@@ -16,6 +16,22 @@ from_pem(class, pem)
         RETVAL
 
 SV *
+from_x509_der(class, der)
+        SV *class
+        SV *der
+    CODE:
+        STRLEN len;
+        const char *p = SvPVbyte(der, len);
+        cjws_key *k = cjws_key_from_x509_der((const unsigned char *)p, len);
+        PERL_UNUSED_VAR(class);
+        if (!k)
+            croak("Crypt::JWS::Key: cannot parse X.509 certificate "
+                  "(DER, with an RSA or EC key)");
+        RETVAL = cjws_bless_key(aTHX_ k);
+    OUTPUT:
+        RETVAL
+
+SV *
 from_secret(class, secret)
         SV *class
         SV *secret

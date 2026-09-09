@@ -211,25 +211,25 @@ t2hui.eventtable.message_inner_builder = function(item, dest, data) {
         return;
     }
 
-    var data = item.extra;
+    var extra = item.extra;
 
     var table = $('<table class="testtable"></table>');
     var header = $('<tr></tr>');
     table.append(header);
 
-    for (var x = 0; x < data.header.length; x++) {
+    for (var x = 0; x < extra.header.length; x++) {
         var th = $('<th class="header"></th>');
-        th.text(data.header[x]);
+        th.text(extra.header[x]);
         header.append(th);
     }
 
-    for (var x = 0; x < data.rows.length; x++) {
-        var row_data = data.rows[x];
+    for (var x = 0; x < extra.rows.length; x++) {
+        var row_data = extra.rows[x];
         var row = $('<tr></tr>');
         table.append(row);
 
         for (var y = 0; y < row_data.length; y++) {
-            var col = $('<td class="' + data.header[y].toLowerCase() + '"></td>');
+            var col = $('<td class="' + extra.header[y].toLowerCase() + '"></td>');
             col.text(row_data[y]);
             row.append(col);
         }

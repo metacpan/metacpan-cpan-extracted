@@ -18,7 +18,7 @@ use Test2::Harness::UI::UUID qw/gen_uuid uuid_inflate/;
 
 use Test2::Harness::Util qw/mod2file/;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use parent 'Test2::Harness::Renderer';
 use Test2::Harness::Util::HashBase qw{
@@ -192,7 +192,9 @@ sub render_event {
 
     my $out;
     eval { $out = $self->_render_event(@args); 1 } and return $out;
-    warn "YathUI-DB Renderer error:\n====\n$@\n====\n";
+    my $err = $@;
+    warn "YathUI-DB Renderer error:\n====\n$err\n====\n";
+    die $err unless $self->{+RUN};
 }
 
 sub _render_event {

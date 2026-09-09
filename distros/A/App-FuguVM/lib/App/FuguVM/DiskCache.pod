@@ -49,27 +49,40 @@ because the root password does not open the image.
 =head2 Cache keys
 
 C<key> returns C<< <version>-<arch>-<hash8> >>. C<hash8> is a
-truncated SHA-256 over each input that shapes an installed disk. These
-inputs are:
+truncated SHA-256 over each input that shapes an installed disk, and
+the record follows the C<install_mode> of the configuration, because
+each mode shapes the disk with different inputs:
 
 =over 4
 
-=item * the OpenBSD version
+=item expect
 
-=item * the architecture
+The OpenBSD version, the architecture, the disk size, the mode, the
+contents of the F<install.exp> script that L<App::FuguVM::Console>
+resolves, and the contents of F<share/fuguvm/cache-generation>.
 
-=item * the disk size
+=item autoinstall
 
-=item * the contents of the F<install.exp> script that
-L<App::FuguVM::Console> resolves
+The same inputs, with two differences: the script is
+F<autoinstall.exp>, and the contents of the response file join the
+record. The response file answers every installer question, so it
+shapes the disk as much as an expect script does. Two response files
+give two keys, two entry directories and two immutable base images.
 
-=item * the contents of F<share/fuguvm/cache-generation>
+=item import
+
+The OpenBSD version, the architecture, the mode, and the generation
+file. No script installed an imported image, so the record holds no
+script digest, and an imported entry survives a change to a shipped
+expect script. An overlay inherits the virtual size of its base, so
+the record holds no disk size either, and each host of a fleet
+derives one key.
 
 =back
 
-The last file is a generation counter. Increase the number in this
-file when the install driver changes in a way that the F<install.exp>
-hash cannot see. One example is a change in how L<App::FuguVM::Guest> or
+The generation file is a counter. Increase the number in this file
+when the install driver changes in a way that the script hash cannot
+see. One example is a change in how L<App::FuguVM::Guest> or
 L<App::FuguVM::Console> drives the installer.
 
 The counter is a data file, not a constant in this module. Thus a
@@ -133,8 +146,13 @@ These methods return locations. The paths do not have to exist.
 =item key($vm_config)
 
 The method derives the cache key for a VM configuration hash. It
-returns C<undef> when it cannot read an input. The caller then has no
-key, and thus no cache.
+returns C<undef> when it cannot read an input, and when the
+configuration carries no architecture. The caller then has no key,
+and thus no cache.
+
+Two architectures give two key strings and two entry directories.
+Thus one cache holds a base image for each architecture, and neither
+entry can overwrite the other.
 
 =item lookup($key)
 
@@ -150,6 +168,28 @@ C<root_password> in C<$meta>. The method returns the path of the base
 image. It returns C<undef> on a failure, and a try to overwrite a
 populated key is one such failure. The caller then degrades to a
 standalone disk.
+
+=item lock_entry($key, $timeout)
+
+The method returns an open handle with an exclusive C<flock(2)> on
+the lock file of C<$key>:
+C<< <cache_dir>/installed/.lock.<key> >>. The wait blocks, with a
+deadline of C<$timeout> seconds (default 3600). The method returns
+C<undef> on the deadline, and C<undef> when the file cannot open.
+
+The lock releases when the handle closes, or when the process exits.
+Thus a stale lock file blocks nothing.
+
+The lock serializes the first population of one entry. The caller
+takes the lock, looks the key up a second time, and installs only on
+a second miss. Every project that shares the cache directory shares
+the lock. The lock does not replace the write-once rule of C<store>:
+a run that lost the lock to its deadline still cannot publish a
+second entry.
+
+The file name starts with a dot. Thus it cannot collide with an
+entry: C<list> reads only a directory whose name has no leading dot,
+and C<sweep_temp> removes only a C<.tmp.> directory.
 
 =item list
 
@@ -229,9 +269,11 @@ password, the same secret that the VM state directory keeps. The cache
 makes the life of this secret longer: the password stays after
 C<fuguvm destroy>, and it changes only when the base key changes.
 
-The guest permits root login with a password. QEMU forwards the SSH
-port and the serial console port of the guest on each host interface.
-Thus the password is not a localhost-only secret. See L<fuguvm(1)>.
+The guest permits root login with a password. QEMU binds the
+forwarded SSH port and the serial console port of the guest to the
+configured C<bind_address>. The default is C<127.0.0.1>. With
+C<bind_address 0.0.0.0>, the password is not a localhost-only secret.
+See L<fuguvm(1)>.
 
 =head1 SEE ALSO
 

@@ -1,8 +1,8 @@
 CREATE TABLE users (
     user_id         BINARY(16)      NOT NULL PRIMARY KEY,
     username        VARCHAR(64)     NOT NULL,
-    pw_hash         VARCHAR(31)     DEFAULT NULL,
-    pw_salt         VARCHAR(22)     DEFAULT NULL,
+    pw_hash         VARCHAR(128)    DEFAULT NULL,
+    pw_salt         VARCHAR(64)     DEFAULT NULL,
     realname        VARCHAR(64)     DEFAULT NULL,
     role ENUM(
         'admin',    -- Can add users and set permissions
@@ -42,6 +42,7 @@ CREATE TABLE hosts (
 CREATE TABLE email_verification_codes (
     evcode_id       BINARY(16)      NOT NULL PRIMARY KEY,
     email_id        BINARY(16)      NOT NULL,
+    created         TIMESTAMP       NOT NULL DEFAULT now(),
 
     FOREIGN KEY (email_id) REFERENCES email(email_id),
 
@@ -50,7 +51,8 @@ CREATE TABLE email_verification_codes (
 
 CREATE TABLE sessions (
     session_id      BINARY(16)  NOT NULL PRIMARY KEY,
-    active          BOOL        DEFAULT TRUE
+    active          BOOL        DEFAULT TRUE,
+    created         TIMESTAMP   NOT NULL DEFAULT now()
 ) ROW_FORMAT=COMPRESSED;
 
 CREATE TABLE session_hosts (
@@ -160,7 +162,7 @@ CREATE TABLE sweeps (
     run_id          BINARY(16)      NOT NULL,
     name            VARCHAR(255)    NOT NULL,
 
-    FOREIGN KEY (run_id) REFERENCES runs(run_id),
+    FOREIGN KEY (run_id) REFERENCES runs(run_id) ON DELETE CASCADE,
 
     UNIQUE(run_id, name)
 ) ROW_FORMAT=COMPRESSED;
@@ -175,7 +177,7 @@ CREATE TABLE run_fields (
     raw             TEXT            DEFAULT NULL,
     link            TEXT            DEFAULT NULL,
 
-    FOREIGN KEY (run_id) REFERENCES runs(run_id),
+    FOREIGN KEY (run_id) REFERENCES runs(run_id) ON DELETE CASCADE,
 
     UNIQUE(run_id, name)
 ) ROW_FORMAT=COMPRESSED;
@@ -243,7 +245,7 @@ CREATE TABLE job_fields (
     raw             TEXT            DEFAULT NULL,
     link            TEXT            DEFAULT NULL,
 
-    FOREIGN KEY (job_key) REFERENCES jobs(job_key),
+    FOREIGN KEY (job_key) REFERENCES jobs(job_key) ON DELETE CASCADE,
 
     UNIQUE(job_key, name)
 ) ROW_FORMAT=COMPRESSED;
@@ -276,7 +278,7 @@ CREATE TABLE events (
     orphan_line     BIGINT      DEFAULT NULL,
 
     UNIQUE(insert_ord, job_key),
-    FOREIGN KEY (job_key) REFERENCES jobs(job_key)
+    FOREIGN KEY (job_key) REFERENCES jobs(job_key) ON DELETE CASCADE
 ) ROW_FORMAT=COMPRESSED;
 CREATE INDEX event_job    ON events(job_key);
 CREATE INDEX event_trace  ON events(trace_id);
@@ -291,8 +293,9 @@ CREATE TABLE binaries (
     is_image        BOOL            NOT NULL DEFAULT FALSE,
     data            LONGBLOB        NOT NULL,
 
-    FOREIGN KEY (event_id)        REFERENCES events(event_id)
+    FOREIGN KEY (event_id)        REFERENCES events(event_id) ON DELETE CASCADE
 );
+CREATE INDEX binaries_event ON binaries(event_id);
 
 CREATE TABLE source_files (
     source_file_id  BINARY(16)                                          NOT NULL PRIMARY KEY,
@@ -364,14 +367,15 @@ CREATE TABLE reporting (
     FOREIGN KEY (user_id)         REFERENCES users(user_id),
     FOREIGN KEY (job_key)         REFERENCES jobs(job_key),
     FOREIGN KEY (test_file_id)    REFERENCES test_files(test_file_id),
-    FOREIGN KEY (event_id)        REFERENCES events(event_id)
+    FOREIGN KEY (event_id)        REFERENCES events(event_id) ON DELETE SET NULL
 );
 CREATE INDEX reporting_user ON reporting(user_id);
-CREATE INDEX reporting_a    ON reporting(project_id);
 CREATE INDEX reporting_b    ON reporting(project_id, user_id);
 CREATE INDEX reporting_c    ON reporting(project_id, test_file_id, subtest);
 CREATE INDEX reporting_d    ON reporting(project_id, test_file_id, subtest, user_id);
 CREATE INDEX reporting_e    ON reporting(project_id, test_file_id, subtest, user_id, run_ord);
+CREATE INDEX reporting_run  ON reporting(run_id);
+CREATE INDEX reporting_job  ON reporting(job_key);
 
 CREATE TABLE resource_batch (
     resource_batch_id   BINARY(16)      NOT NULL PRIMARY KEY,
@@ -382,6 +386,7 @@ CREATE TABLE resource_batch (
     FOREIGN KEY (run_id)  REFERENCES runs(run_id),
     FOREIGN KEY (host_id) REFERENCES hosts(host_id)
 ) ROW_FORMAT=COMPRESSED;
+CREATE INDEX resource_batch_run ON resource_batch(run_id);
 
 CREATE TABLE resources (
     resource_id         BINARY(16)      NOT NULL PRIMARY KEY,
@@ -390,6 +395,6 @@ CREATE TABLE resources (
     module              VARCHAR(512)    NOT NULL,
     data                JSON            NOT NULL,
 
-    FOREIGN KEY (resource_batch_id) REFERENCES resource_batch(resource_batch_id),
+    FOREIGN KEY (resource_batch_id) REFERENCES resource_batch(resource_batch_id) ON DELETE CASCADE,
     UNIQUE(resource_batch_id, batch_ord)
 ) ROW_FORMAT=COMPRESSED;

@@ -20,7 +20,8 @@ enum {
     PQ_BODY    = 4,
     PQ_READ    = 5,
     PQ_UPLOADS = 6,
-    PQ_TEMPFILES = 7   /* spilled upload paths, removed when the request ends */
+    PQ_TEMPFILES = 7,  /* spilled upload paths, removed when the request ends */
+    PQ_XML     = 8     /* the body parsed as XML, once per request */
 };
 
 static AV *punk_req_av(pTHX_ SV *self) {

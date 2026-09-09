@@ -23,7 +23,7 @@ BEGIN {
 require YAML::PP;
 require JSON::PP;
 
-my ( $s, $buf );
+my $s;
 
 my @output;
 ok(
@@ -37,7 +37,7 @@ ok(
             types   => { bool => 'B' },
         );
     },
-    "constructor"
+    'constructor'
 ) or diag $@;
 
 my $yaml = YAML::PP->new( boolean => 'JSON::PP' );
@@ -73,7 +73,7 @@ subtest 'record does not require transformation' => sub {
 
   SKIP: {
         skip 'Need Convert::Scalar' unless $have_Convert_Scalar;
-        subtest "output field values properly retained" => sub {
+        subtest 'output field values properly retained' => sub {
             ok( is_number( $got->{number} ),  'number' );
             ok( is_number( $got->{integer} ), 'integer' );
             ok( is_string( $got->{string1} ), 'string1' );
@@ -119,7 +119,7 @@ subtest 'record requires transformation' => sub {
 
   SKIP: {
         skip 'Need Convert::Scalar' unless $have_Convert_Scalar;
-        subtest "output field values properly converted" => sub {
+        subtest 'output field values properly converted' => sub {
             ok( is_number( $got->{number} ),  'number' );
             ok( is_number( $got->{integer} ), 'integer' );
             ok( is_string( $got->{string1} ), 'string1' );

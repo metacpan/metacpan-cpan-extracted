@@ -1,0 +1,29 @@
+Revision history for Perl extension JQ::XS.
+
+1.01
+	- Packaging only; no changes to the module itself
+	- Version the Debian packages +debNuM rather than ~debNuM, matching
+	  Debian's convention for stable updates.  GitHub rewrites "~" to "."
+	  in release asset filenames, so the download name no longer disagreed
+	  with the version recorded inside the package.
+
+1.00
+	- Relicensed under the MIT license to match libjq
+	- Set author/copyright to James Rouzier <rouzier@gmail.com>
+	- Ship LICENSE file in the distribution
+
+0.02
+	- Boolean results are returned as JSON::PP::Boolean objects
+	- Accept JSON::PP::Boolean, Types::Serialiser::Boolean and boolean
+	  objects as JSON booleans on input
+	- Accept unblessed scalar references (\1, \0) as JSON booleans
+	- Accept Perl's native booleans (PL_sv_yes/PL_sv_no, and SvIsBOOL
+	  copies on perl >= 5.36) as JSON booleans
+
+0.01  Sat Jul 18 17:21:45 2026
+	- Clean object-oriented Perl wrapper for libjq
+	- Removed h2xs-generated stdio boilerplate
+	- Implemented jv <-> Perl data structure conversion
+	- Added process() and process_json() methods
+	- Error handling via Perl exceptions (croak)
+	- Support for UTF-8 strings and complex nested data structures

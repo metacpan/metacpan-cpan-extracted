@@ -262,12 +262,36 @@ uint64_t histo_num_entries(const histo_t *h);
 double histo_underflow(const histo_t *h);
 
 /**
+ * @brief Retrieves total accumulated underflow squared weights (sum of w^2).
+ *
+ * @param[in] h Histogram handle.
+ * @return Underflow sum_w2, or 0.0 if h is NULL or sum_w2 tracking is disabled.
+ */
+double histo_underflow_sum_w2(const histo_t *h);
+
+/**
  * @brief Retrieves total accumulated overflow weight.
  *
  * @param[in] h Histogram handle.
  * @return Overflow weight sum, or 0.0 if h is NULL.
  */
 double histo_overflow(const histo_t *h);
+
+/**
+ * @brief Retrieves total accumulated overflow squared weights (sum of w^2).
+ *
+ * @param[in] h Histogram handle.
+ * @return Overflow sum_w2, or 0.0 if h is NULL or sum_w2 tracking is disabled.
+ */
+double histo_overflow_sum_w2(const histo_t *h);
+
+/**
+ * @brief Retrieves the feature configuration flags bitmask for this histogram.
+ *
+ * @param[in] h Histogram handle.
+ * @return Bitmask of HISTO_FLAG_* flags, or 0 if h is NULL.
+ */
+uint32_t histo_flags(const histo_t *h);
 
 /**
  * @brief Retrieves total number of non-finite (NaN / Inf) rejected samples.

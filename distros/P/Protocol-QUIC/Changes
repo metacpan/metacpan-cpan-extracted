@@ -1,0 +1,4 @@
+Revision history for Protocol::QUIC
+
+0.0.1   2026-09-09
+        - Release to reserve the namespace.

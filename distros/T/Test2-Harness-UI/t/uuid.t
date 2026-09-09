@@ -97,6 +97,8 @@ for my $schema_name (qw/MySQL PostgreSQL/) {
         $sth->execute();
         my $out = $sth->fetchall_arrayref;
 
+        # uuid_to_bin() is MySQL 8.0+ only, not available in MariaDB
+        return if $out->[0]->[0] =~ m/mariadb/i;
         return unless $out->[0]->[0] =~ m/^(\d+)/;
         return unless int($1) >= 8;
 

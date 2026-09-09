@@ -23,7 +23,8 @@ my @files = (
     't/process_reverse.t',
     't/remove_escapes.t',
     't/synopsis.t',
-    't/term-ansicolor.t'
+    't/term-ansicolor.t',
+    't/truecolor.t'
 );
 
 notabs_ok($_) foreach @files;

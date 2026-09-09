@@ -1,0 +1,25 @@
+Changes
+bench/confold.pl
+Confold.xs
+MANIFEST			This list of files
+Makefile.PL
+README
+include/confold_compat.h
+include/xop_compat.h
+lib/Confold.pm
+ppport.h
+t/00-load.t
+t/01-fold.t
+t/02-runtime.t
+t/03-glyph.t
+t/04-lexical.t
+t/05-strings.t
+t/06-precedence.t
+t/07-infix.t
+t/08-compile-time-vars.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -34,7 +34,7 @@ subtest 'test role' => sub {
 
     $s->send( { foo => 1 } );
 
-    is( \%dest, { foo => 1 }, "role works" );
+    is( \%dest, { foo => 1 }, 'role works' );
 };
 
 
@@ -49,7 +49,7 @@ subtest 'rename field to something else' => sub {
 
     $s->send( { foo => 1 } );
 
-    is( \%dest, { bar => 1 }, "rename foo to bar" );
+    is( \%dest, { bar => 1 }, 'rename foo to bar' );
 };
 
 subtest 'rename field to itself' => sub {
@@ -63,7 +63,7 @@ subtest 'rename field to itself' => sub {
 
     $s->send( { foo => 1 } );
 
-    is( \%dest, { foo => 1 }, "rename foo to foo" );
+    is( \%dest, { foo => 1 }, 'rename foo to foo' );
 };
 
 

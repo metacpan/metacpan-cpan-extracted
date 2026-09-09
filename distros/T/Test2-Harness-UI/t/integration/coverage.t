@@ -1,6 +1,7 @@
 use Test2::V0;
 use Test2::Harness::Util::JSON qw/encode_json decode_json/;
-use Test2::Require::Module 'Test2::Plugin::Cover' => '0.000022';
+use Test2::Require::Module 'Test2::Plugin::Cover' => '0.000029';
+use Test2::Require::Module 'Test2::Harness' => '1.000179';
 use HTTP::Tiny::UNIX;
 
 use App::Yath::Tester qw/yath/;
@@ -38,7 +39,8 @@ for (1 .. 2) {
             @yathdb_args,
             '--cover-files',
             '--cover-metrics',
-            '--retry' => 1,
+            '--cover-exclude-dirs' => "$dir/lib/Deps",
+            '--retry'              => 1,
         ],
         test => sub {
             my $out = shift;
@@ -113,6 +115,11 @@ $server->subtest(
         my $run     = $project->last_covered_run;
 
         is( [$run->coverage_data], $coverage_data, "Got predicted coverage data via DB",);
+
+        # Guarantee protected here: excluded files never reach this database.
+        # The UI has no exclusion logic; producer-side assertions live elsewhere.
+        my @sources = map { $_->filename } $schema->resultset('SourceFile')->all;
+        is([grep { m{(?:^|/)Deps/} } @sources], [], "Excluded dependency tree is absent from the database");
 
 #        my $res = HTTP::Tiny::UNIX->new->get('http:' . $server->socket . '//coverage/test');
 #        is($res->{status}, 200, "Connected ok");

@@ -46,10 +46,10 @@ my %args = Alien::Base::Wrapper->mm_args2(
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'  => '6.52',
         'Alien::Base::Wrapper' => '0',
-        'Alien::libhisto'      => '0.3.0',
+        'Alien::libhisto'      => '0.4.0',
     },
     PREREQ_PM => {
-        'Alien::libhisto'      => '0.3.0',
+        'Alien::libhisto'      => '0.4.0',
         'Exporter'             => '5.57',
         'XSLoader'             => '0',
     },

@@ -34,14 +34,14 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "5.57",
-            "Math::Histo" : "v0.3.0",
+            "Math::Histo" : "v0.4.0",
             "PDL" : "2.000",
             "perl" : "5.010000"
          }
       },
       "test" : {
          "requires" : {
-            "Math::Histo" : "v0.2.1",
+            "Math::Histo" : "v0.4.0",
             "PDL" : "2.000",
             "Test2::V0" : "0.000060"
          }
@@ -58,6 +58,6 @@
          "web" : "https://github.com/tsee/libhisto"
       }
    },
-   "version" : "v0.3.0",
+   "version" : "v0.4.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

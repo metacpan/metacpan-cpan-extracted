@@ -16,6 +16,7 @@
  * "undefined symbol: caller_cx".
  */
 #define NEED_caller_cx
+#define NEED_ck_warner
 #define NEED_croak_xs_usage
 #include "ppport.h"
 #include "2008.h"
@@ -125,6 +126,9 @@
 #ifdef I_SYS_RESOURCE
 #include <sys/resource.h>
 #endif
+#ifdef PSX2008_HAS_ACCEPT4
+#include <sys/socket.h>
+#endif
 #ifdef I_SYS_STAT
 #include <sys/stat.h>
 #endif
@@ -170,27 +174,42 @@
 #define GETENTROPY_MAX 256
 #endif
 
+/* __builtin_darn() returns -1 (64-bit) to indicate an error and therefore -1
+ * never occurs as a random number. To work around this we only use the lower
+ * 32 bits. As a result, the chance of getting -1 (32-bit) is a tiny little
+ * bit smaller than for all other numbers. */
 #if !defined(PSX2008_HAS_GETENTROPY) &&         \
   !defined(PSX2008_HAS_GETRANDOM) &&            \
   !defined(PSX2008_HAS_GETRANDOM_SYS) &&        \
   !defined(PSX2008_HAS_ARC4RANDOM_BUF) &&       \
   !defined(PSX2008_HAS_BCRYPTGENRANDOM)
-# if defined(PSX2008_HAS_RNDR)
-#  define _psx_cpu_rand_step_ok(buf) (__rndr(buf) == 0)
-#  include <arm_acle.h>
+# if defined(PSX2008_HAS_DARN)
+#  define _psx_cpu_rand_step_ok(buf) ((*(buf) = __builtin_darn()) != -1)
 #  include <stdint.h>
-   typedef uint64_t _psx_cpu_rand_t;
+   typedef uint64_t _psx_cpu_rand_raw_t;
+   typedef uint32_t _psx_cpu_rand_ret_t;
+# elif defined(PSX2008_HAS_RNDR)
+#  define _psx_cpu_rand_step_ok(buf) (__rndr(buf) == 0)
+#  include <stdint.h>
+#  ifndef _MSC_VER
+#   include <arm_acle.h>
+#  endif
+   typedef uint64_t _psx_cpu_rand_raw_t;
+   typedef uint64_t _psx_cpu_rand_ret_t;
 # elif defined(PSX2008_HAS_RDRAND64)
 #  define _psx_cpu_rand_step_ok(buf) (_rdrand64_step(buf) != 0)
 #  ifdef __INTEL_COMPILER  /* https://stackoverflow.com/a/72265912 */
 #   include <stdint.h>
-    typedef uint64_t _psx_cpu_rand_t;
+    typedef uint64_t _psx_cpu_rand_raw_t;
+    typedef uint64_t _psx_cpu_rand_ret_t;
 #  else
-    typedef unsigned long long _psx_cpu_rand_t;
+    typedef unsigned long long _psx_cpu_rand_raw_t;
+    typedef unsigned long long _psx_cpu_rand_ret_t;
 #  endif
 # elif defined(PSX2008_HAS_RDRAND32)
 #  define _psx_cpu_rand_step_ok(buf) (_rdrand32_step(buf) != 0)
-   typedef unsigned int _psx_cpu_rand_t;
+   typedef unsigned int _psx_cpu_rand_raw_t;
+   typedef unsigned int _psx_cpu_rand_ret_t;
 # endif
 # if defined(PSX2008_HAS_RDRAND64) || defined(PSX2008_HAS_RDRAND32)
 #  include <immintrin.h>
@@ -322,6 +341,8 @@
 #endif
 
 #if defined(AT_FDCWD) ||                   \
+  defined(PSX2008_HAS_ACCEPT4) ||          \
+  defined(PSX2008_HAS_DUP3) ||             \
   defined(PSX2008_HAS_FCHDIR) ||           \
   defined(PSX2008_HAS_FCHMOD) ||           \
   defined(PSX2008_HAS_FCHOWN) ||           \
@@ -364,6 +385,9 @@
 #define SvOFFt(sv) ((Off_t)SvIV(sv))
 #endif
 
+/* SvTIMEt is used by the typemap. */
+#define SvTIMEt(sv) ((IVSIZE < sizeof(Time_t)) ? (Time_t)SvNV(sv) : (Time_t)SvIV(sv))
+
 #if IVSIZE < Size_t_size
 #define SvSIZEt(sv) ((Size_t)SvNV(sv))
 #define SvSTRLEN(sv) ((STRLEN)SvNV(sv))
@@ -379,23 +403,7 @@
 # define SvTRULYREADONLY(sv) (SvREADONLY(sv) && !SvIsCOW(sv))
 #endif
 
-typedef IV SysRet; /* returns -1 as undef, 0 as "0 but true", other unchanged */
-typedef IV SysRet0; /* returns -1 as undef, other unchanged */
-typedef IV SysRetTrue; /* returns 0 as "0 but true", undef otherwise */
-typedef int psx_fd_t; /* checks for file handle or descriptor via typemap */
-
-/* https://sourceforge.net/p/mingw-w64/feature-requests/68/ */
-#if defined(__MINGW32__) && defined(__STRICT_ANSI__) && !defined(USE_QUADMATH)
-double __cdecl j0(double);
-double __cdecl j1(double);
-double __cdecl jn(int, double);
-double __cdecl y0(double);
-double __cdecl y1(double);
-double __cdecl yn(int, double);
-#endif
-
 #define SvIsARRAY(sv) (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV)
-#define SvIsNEGATIVE(sv) _psx_SvIsNEGATIVE(aTHX_ sv)
 
 /* Treat omitted and explicitly undef arguments as if intended by the caller
  * to avoid annoying "uninitialized" warnings. */
@@ -407,31 +415,87 @@ double __cdecl yn(int, double);
 #define TopUpLEN(l) \
   ((l)+1 < (l) ? (croak_memory_wrap(),0) : PERL_STRLEN_ROUNDUP((l)+1))
 
+typedef int SysRet; /* returns -1 as undef, 0 as "0 but true", other unchanged */
+typedef int SysRet0; /* returns -1 as undef, other unchanged */
+typedef int SysRetTrue; /* returns 0 as "0 but true", undef otherwise */
+typedef int psx_fd_t; /* checks for file handle or descriptor via typemap */
+typedef const char* psx_safepath_t__fail_undef;
+typedef const char* psx_safepath_t__fail_false_or_empty;
+
+/* https://sourceforge.net/p/mingw-w64/feature-requests/68/ */
+#if defined(__MINGW32__) && defined(__STRICT_ANSI__) && !defined(USE_QUADMATH)
+double __cdecl j0(double);
+double __cdecl j1(double);
+double __cdecl jn(int, double);
+double __cdecl y0(double);
+double __cdecl y1(double);
+double __cdecl yn(int, double);
+#endif
+
 #include "const-c.inc"
 
 #ifdef _psx_cpu_rand_step_ok
-# ifdef PSX2008_HAS_RNDR
+# if defined(__clang__) || (defined(__GNUC__) && !defined(__INTEL_COMPILER))
+#  if defined(PSX2008_HAS_RDRND32) || defined(PSX2008_HAS_RDRND64)
+__attribute__((target("rdrnd")))
+#  elif defined(PSX2008_HAS_RNDR)
 __attribute__((target("+rng")))
+#  elif defined(PSX2008_HAS_DARN)
+#   if defined(__clang__)
+__attribute__((target("isa-v30-instructions")))
+#   else
+__attribute__((target("cpu=power9")))
+#   endif
+#  endif
 # endif
 PERL_STATIC_INLINE void
 _cpu_rand50c(void *buf, Size_t len)
 {
-  /* Crypto++ says rdrand_step doesn't need a retry limit. So be it. */
+  /* Crypto++ says rdrand doesn't need a retry limit. So be it. */
   if (LIKELY(buf)) {
-    _psx_cpu_rand_t *ubuf = (_psx_cpu_rand_t *)buf;
-    Size_t rest = len % sizeof(_psx_cpu_rand_t);
-#pragma GCC unroll 0  /* https://github.com/llvm/llvm-project/issues/42332 */
-    for (len /= sizeof(_psx_cpu_rand_t); len; len--, ubuf++)
-      while (! _psx_cpu_rand_step_ok(ubuf)) ;
+    _psx_cpu_rand_raw_t rand_val;
+    _psx_cpu_rand_ret_t *ubuf = (_psx_cpu_rand_ret_t *)buf;
+    Size_t rest = len % sizeof(_psx_cpu_rand_ret_t);
+#pragma GCC unroll 1  /* https://github.com/llvm/llvm-project/issues/42332 */
+    for (len /= sizeof(_psx_cpu_rand_ret_t); len; len--, ubuf++) {
+      while (! _psx_cpu_rand_step_ok(&rand_val)) ;
+      *ubuf = (_psx_cpu_rand_ret_t)rand_val;
+    }
     if (rest) {
-      _psx_cpu_rand_t u;
-      while (! _psx_cpu_rand_step_ok(&u)) ;
+      _psx_cpu_rand_ret_t u;
+      while (! _psx_cpu_rand_step_ok(&rand_val)) ;
+      u = (_psx_cpu_rand_ret_t)rand_val;
       memcpy(ubuf, &u, rest);
     }
   }
 }
-#endif
+#endif  /* _psx_cpu_rand_step_ok */
 
+/* Unlike Perl's original IS_SAFE_PATHNAME, this rejects a trailing \0 just
+ * like Python does, and escapes non-ASCII characters in the warning. Takes a
+ * CV instead of a string because getting the non-aliased function name via
+ * the typemap for psx_safepath_t would produce unnecessary overhead *before*
+ * calling _psx_warn_null_char(). */
+#undef IS_SAFE_PATHNAME
+#define IS_SAFE_PATHNAME(pv, len, cv) ((len) && UNLIKELY(!!memchr((pv), 0, (len))) ? (_psx_warn_null_char(aTHX_ (pv), (len), (cv)), 0) : 1)
+#ifdef WARN_SYSCALLS
+#  define PSX_WARNCAT packWARN(WARN_SYSCALLS)
+#else
+#  define PSX_WARNCAT packWARN(WARN_MISC)
+#endif
+static void
+_psx_warn_null_char(pTHX_ const char *const pv, const STRLEN len, \
+                    const CV *const cv)
+{
+  const char *mesg = "%s: embedded null character in path: %s";
+  const char *func = GvNAME(CvGV(cv)); /* Can this contain an embedded \0? */
+  SV *dsv = sv_newmortal();
+  const char *escaped = pv_escape(dsv, pv, len, PERL_INT_MAX, NULL, 0);
+  Perl_ck_warner(aTHX_ PSX_WARNCAT, mesg, func, escaped);
+  SETERRNO(ENOENT, LIB_INVARG); /* ENOENT feels wrong, but we follow Perl. */
+}
+
+#define SvIsNEGATIVE(sv) _psx_SvIsNEGATIVE(aTHX_ sv)
 static unsigned
 _psx_SvIsNEGATIVE(pTHX_ SV *sv)
 {
@@ -505,7 +569,7 @@ _fmt_neg_int(char *dest, INT_MAX_TYPE i)
 static SV*
 _fmt_uint_2sv(pTHX_ UINT_MAX_TYPE u)
 {
-  char dest[24];
+  char dest[40];
   unsigned len = _fmt_uint(dest, u);
   return newSVpvn(dest, len);
 }
@@ -513,7 +577,7 @@ _fmt_uint_2sv(pTHX_ UINT_MAX_TYPE u)
 static SV*
 _fmt_neg_int_2sv(pTHX_ INT_MAX_TYPE i)
 {
-  char dest[24];
+  char dest[40];
   unsigned len = _fmt_neg_int(dest, i);
   return newSVpvn(dest, len);
 }
@@ -598,17 +662,18 @@ _push_stat_buf(pTHX_ SV **SP, struct stat *st)
   return SP;
 }
 
-#define RETURN_STAT_BUF(rv, buf) STMT_START {   \
-    switch (GIMME_V) {                          \
-      case G_SCALAR:                            \
-        PUSHs(boolSV((rv) == 0));               \
-        break;                                  \
-      case G_LIST:                              \
-        if ((rv) == 0) {                        \
-          EXTEND(SP, 16);                       \
-          SP = _push_stat_buf(aTHX_ SP, &buf);  \
-        }                                       \
-    }                                           \
+#define RETURN_STAT_BUF(rv, buf) STMT_START {     \
+    switch (GIMME_V) {                            \
+      case G_LIST:                                \
+        if ((rv) == 0) {                          \
+          EXTEND(SP, 16);                         \
+          SP = _push_stat_buf(aTHX_ SP, &(buf));  \
+        }                                         \
+        break;                                    \
+      default:                                    \
+        PUSHs(boolSV((rv) == 0));                 \
+        break;                                    \
+    }                                             \
 } STMT_END
 #endif
 
@@ -633,31 +698,40 @@ _push_statvfs_buf(pTHX_ SV **SP, struct statvfs *st)
 
 #define RETURN_STATVFS_BUF(rv, buf) STMT_START {        \
     switch (GIMME_V) {                                  \
-      case G_SCALAR:                                    \
-        PUSHs(boolSV(rv == 0));                         \
-        break;                                          \
       case G_LIST:                                      \
         if (rv == 0) {                                  \
           EXTEND(SP, 11);                               \
-          SP = _push_statvfs_buf(aTHX_ SP, &buf);       \
+          SP = _push_statvfs_buf(aTHX_ SP, &(buf));     \
         }                                               \
+        break;                                          \
+      default:                                          \
+        PUSHs(boolSV(rv == 0));                         \
+        break;                                          \
     }                                                   \
 } STMT_END
 #endif
 
 #ifdef PSX2008_NEED_PSX_FILENO
+/* _nomg only means we save one SvGETMAGIC(sv) at the beginning. */
 static int
-_psx_fileno_nomg(pTHX_ SV *sv)
+_psx_fileno_nomg(pTHX_ SV *sv, int *sv_is_fd)
 {
-  IO *io;
   int fn = -1;
 
   /* On Solaris, AT_FDCWD is 0xffd19553 (4291925331), so don't do any integer
    * range checks, just cast the SvIV to int and may the --force be with you.
    * https://github.com/python/cpython/issues/60169
    */
-  if (SvOK(sv)) {
-    if (_psx_looks_like_number(aTHX_ sv))
+  if (!SvOK(sv)) {
+    if (sv_is_fd)
+      *sv_is_fd = 0;
+  }
+  else {
+    IO *io;
+    const int lln = _psx_looks_like_number(aTHX_ sv);
+    if (sv_is_fd)
+      *sv_is_fd = lln;
+    if (lln)
       fn = (int)SvIV(sv);
     else if ((io = sv_2io(sv))) {
       /* Magic part taken from Perl 5.8.9's pp_fileno. */
@@ -688,10 +762,10 @@ _psx_fileno_nomg(pTHX_ SV *sv)
 }
 
 PERL_STATIC_INLINE int
-_psx_fileno(pTHX_ SV *sv)
+_psx_fileno(pTHX_ SV *sv, int *sv_is_fd)
 {
   SvGETMAGIC(sv);
-  return _psx_fileno_nomg(aTHX_ sv);
+  return _psx_fileno_nomg(aTHX_ sv, sv_is_fd);
 }
 #endif
 
@@ -874,18 +948,17 @@ _poll50c(pTHX_ SV *pollfds, int timeout, const struct psx_ppollspec *ppspec)
     }
   }
 
-  /* poll() expects nfds_t, av_count() returns Size_t, av_fetch() expects
-   * SSize_t, so we'll accept only the smallest of these. */
-  if (UNLIKELY((nfds_t)nfds != nfds || nfds > SSIZE_MAX)) {
-    SETERRNO(EINVAL, LIB_INVARG);
-    return -1;
-  }
-  if (UNLIKELY((nfds*sizeof(*fds))/sizeof(*fds) != nfds)) {
-    SETERRNO(EINVAL, LIB_INVARG);
-    return -1;
-  }
-  if (LIKELY(nfds)) {
-    SV **pollfd;
+  if (nfds) {
+    /* poll() expects nfds_t, av_count() returns Size_t, av_fetch() expects
+     * SSize_t, so we'll accept only the smallest of these. */
+    if (UNLIKELY((nfds_t)nfds != nfds || nfds > SSIZE_MAX)) {
+      SETERRNO(EINVAL, LIB_INVARG);
+      return -1;
+    }
+    if (UNLIKELY((nfds*sizeof(*fds))/sizeof(*fds) != nfds)) {
+      SETERRNO(EINVAL, LIB_INVARG);
+      return -1;
+    }
     fds = (struct pollfd *)safemalloc(nfds*sizeof(*fds));
     if (!fds) {
       SETERRNO(ENOMEM, SS$_INSFMEM);
@@ -893,6 +966,7 @@ _poll50c(pTHX_ SV *pollfds, int timeout, const struct psx_ppollspec *ppspec)
     }
     SAVEFREEPV(fds);
     for (i = 0; i < nfds; i++) {
+      SV **pollfd;
       /* No-op defaults for undef and placeholders. */
       const struct pollfd initfd = {.fd=-1, .events=0, .revents=0};
       fds[i] = initfd;
@@ -912,7 +986,7 @@ _poll50c(pTHX_ SV *pollfds, int timeout, const struct psx_ppollspec *ppspec)
         AV *pollfd_av = (AV*)SvRV(*pollfd);
         SV **pollfd_fd = av_fetch(pollfd_av, 0, 0);
         if (pollfd_fd) {
-          fds[i].fd = _psx_fileno(aTHX_ *pollfd_fd);
+          fds[i].fd = _psx_fileno(aTHX_ *pollfd_fd, NULL);
           if (fds[i].fd >= 0) {
             SV **pollfd_events = av_fetch(pollfd_av, 1, 0);
             if (pollfd_events)
@@ -1445,18 +1519,12 @@ _openat50c(pTHX_ SV *dirfdsv,
   SvGETMAGIC(dirfdsv);
   if (!SvOK(dirfdsv))
     dir_fd = -1;
-  else if (SvROK(dirfdsv) && SvTYPE(SvRV(dirfdsv)) <= SVt_PVMG) {
+  else if (SvROK(dirfdsv) && SvTYPE(SvRV(dirfdsv)) <= SVt_PVMG)
     /* Allow dirfdsv to be a reference to a scalar holding AT_FDCWD (IV/NV/PV)
      * to get a file handle instead of a file descriptor. */
-    if (SvIV(SvRV(dirfdsv)) == (IV)AT_FDCWD)
-      dir_fd = (int)AT_FDCWD;
-    else
-      dir_fd = -1;
-  }
-  else {
-    got_fd = _psx_looks_like_number(aTHX_ dirfdsv);
-    dir_fd = _psx_fileno_nomg(aTHX_ dirfdsv);
-  }
+    dir_fd = (SvIV(SvRV(dirfdsv)) == (IV)AT_FDCWD) ? (int)AT_FDCWD : -1;
+  else
+    dir_fd = _psx_fileno_nomg(aTHX_ dirfdsv, &got_fd);
 
   if (dir_fd == -1) {
     SETERRNO(EBADF, RMS_IFI);
@@ -1518,6 +1586,17 @@ PROTOTYPES: ENABLE
 
 INCLUDE: const-xs.inc
 
+BOOT:
+{
+}
+
+ ## DESTROY is called when a file handle we created (e.g. in openat)
+ ## is cleaned up. This is just a dummy to silence AUTOLOAD. We leave
+ ## it up to Perl to take the necessary steps.
+void
+DESTROY(...);
+PPCODE:
+
 #ifdef PSX2008_HAS_ABORT
 void
 abort();
@@ -1571,8 +1650,33 @@ atoi(const char *str);
 #endif
 
 #ifdef PSX2008_HAS_BASENAME
-char *
-basename(char *path);
+void
+basename(SV *path);
+  ALIAS:
+    dirname = 1
+  PPCODE:
+  {
+    SV *retval;
+    STRLEN svpv_len;
+    const char *cpath = SvPV_const(path, svpv_len);
+    const STRLEN len = svpv_len;
+    if (!IS_SAFE_PATHNAME(cpath, len, cv))
+      retval = &PL_sv_undef;
+    else {
+      char *cpathcopy, *name;
+      ASSUME(!!cpath);
+      cpathcopy = savepvn(cpath, len);
+      SAVEFREEPV(cpathcopy);
+      name = (ix == 0) ? basename(cpathcopy) : dirname(cpathcopy);
+      if (!name)
+        retval = &PL_sv_undef;
+      else {
+        Size_t namelen = _strnlen(name, len);
+        retval = sv_2mortal(newSVpvn(name, namelen));
+      }
+    }
+    PUSHs(retval);
+  }
 
 #endif
 
@@ -1589,8 +1693,16 @@ catgets(nl_catd catd, int set_id, int msg_id, const char *dflt);
 #endif
 
 #ifdef PSX2008_HAS_CATOPEN
-nl_catd
-catopen(const char *name, int oflag);
+void
+catopen(psx_safepath_t__fail_undef name, int flag);
+  PPCODE:
+  {
+    nl_catd rv = catopen(name, flag);
+    if (rv == (nl_catd)-1)
+      PUSHs(&PL_sv_undef);
+    else
+      mPUSHs(newSViv(PTR2IV(rv)));
+  }
 
 #endif
 
@@ -1603,17 +1715,17 @@ clock();
 #ifdef PSX2008_HAS_CLOCK_GETCPUCLOCKID
 void
 clock_getcpuclockid(pid_t pid=0);
-  INIT:
-    int rv;
-    clockid_t clock_id;
   PPCODE:
-    rv = clock_getcpuclockid(pid, &clock_id);
+  {
+    clockid_t clock_id;
+    int rv = clock_getcpuclockid(pid, &clock_id);
     if (LIKELY(rv == 0))
       PUSH_INT_OR_PV(clock_id);
     else {
       SETERRNO(rv, rv);
       PUSHs(&PL_sv_undef);
     }
+  }
 
 #endif
 
@@ -1634,12 +1746,10 @@ void
 clock_getres(clockid_t clock_id=CLOCK_REALTIME);
   ALIAS:
     clock_gettime = 1
-  INIT:
-    int rv;
-    struct timespec res;
   PPCODE:
   {
-    rv = (ix == 0)
+    struct timespec res;
+    int rv = (ix == 0)
       ? clock_getres(clock_id, &res)
       : clock_gettime(clock_id, &res);
     if (rv == 0)
@@ -1661,13 +1771,13 @@ clock_getres(clockid_t clock_id=CLOCK_REALTIME);
 )
 
 #define TIMESPEC_FROM_IV_nomg(_tspec, sec_sv, nsec_long) STMT_START {   \
-    _tspec.tv_sec = (time_t)SvIV_nomg(sec_sv);                          \
+    _tspec.tv_sec = (Time_t)SvIV_nomg(sec_sv);                          \
     _tspec.tv_nsec = nsec_long;                                         \
 } STMT_END
 
 #define TIMESPEC_FROM_NV_nomg(_tspec, sec_sv) STMT_START {      \
     const NV sec_nv = SvNV_nomg(sec_sv);                        \
-    _tspec.tv_sec = (time_t)sec_nv;                             \
+    _tspec.tv_sec = (Time_t)sec_nv;                             \
     _tspec.tv_nsec = (sec_nv - _tspec.tv_sec)*1e9;              \
 } STMT_END
 
@@ -1697,16 +1807,15 @@ clock_nanosleep(clockid_t clock_id, int flags, SV *sec, long nsec=0);
 void
 clock_settime(clockid_t clock_id, SV *sec, long nsec=0);
   PROTOTYPE: $@
-  INIT:
-    struct timespec tp;
   PPCODE:
   {
+    struct timespec tp;
     SvGETMAGIC(sec);
     if (items == 2 && LOOKS_LIKE_NV(sec))
       TIMESPEC_FROM_NV_nomg(tp, sec);
     else
       TIMESPEC_FROM_IV_nomg(tp, sec, nsec);
-    if (clock_settime(clock_id, &tp) == 0)
+    if (LIKELY(clock_settime(clock_id, &tp) == 0))
       mPUSHp("0 but true", 10);
     else
       PUSHs(&PL_sv_undef);
@@ -1734,12 +1843,6 @@ nanosleep(SV *sec, long nsec=0);
 
 #endif
 
-#ifdef PSX2008_HAS_DIRNAME
-char *
-dirname(char *path);
-
-#endif
-
 #ifdef PSX2008_HAS_DLCLOSE
 SysRetTrue
 dlclose(void *handle);
@@ -1753,14 +1856,30 @@ dlerror();
 #endif
 
 #ifdef PSX2008_HAS_DLOPEN
-void *
-dlopen(const char *file, int mode);
+void
+dlopen(psx_safepath_t__fail_undef filename, int flags);
+  PPCODE:
+  {
+    void *rv = dlopen(filename, flags);
+    if (!rv)
+      PUSHs(&PL_sv_undef);
+    else
+      mPUSHs(newSViv(PTR2IV(rv)));
+  }
 
 #endif
 
 #ifdef PSX2008_HAS_DLSYM
-void *
+void
 dlsym(void *handle, const char *name);
+  PPCODE:
+  {
+    void *rv = dlsym(handle, name);
+    if (!rv)
+      PUSHs(&PL_sv_undef);
+    else
+      mPUSHs(newSViv(PTR2IV(rv)));
+  }
 
 #endif
 
@@ -1807,14 +1926,14 @@ ffs(IV i);
 #ifdef PSX2008_HAS_FNMATCH
 void
 fnmatch(const char *pattern, const char *string, int flags);
-  INIT:
-    int rv;
   PPCODE:
-    rv = fnmatch(pattern, string, flags);
+  {
+    int rv = fnmatch(pattern, string, flags);
     if (LIKELY(rv == 0 || rv == FNM_NOMATCH))
       mPUSHs(newSViv(rv));
     else
       PUSHs(&PL_sv_undef);
+  }
 
 #endif
 
@@ -1833,21 +1952,22 @@ raise(int sig);
 #ifdef PSX2008_HAS_GETDATE
 void
 getdate(const char *string);
-    INIT:
-        struct tm *tm = getdate(string);
-    PPCODE:
-        if (tm) {
-            EXTEND(SP, 9);
-            mPUSHs(newSViv(tm->tm_sec));
-            mPUSHs(newSViv(tm->tm_min));
-            mPUSHs(newSViv(tm->tm_hour));
-            mPUSHs(newSViv(tm->tm_mday));
-            mPUSHs(newSViv(tm->tm_mon));
-            mPUSHs(newSViv(tm->tm_year));
-            mPUSHs(newSViv(tm->tm_wday));
-            mPUSHs(newSViv(tm->tm_yday));
-            mPUSHs(newSViv(tm->tm_isdst));
-        }
+  PPCODE:
+  {
+    struct tm *tm = getdate(string);
+    if (tm) {
+      EXTEND(SP, 9);
+      mPUSHs(newSViv(tm->tm_sec));
+      mPUSHs(newSViv(tm->tm_min));
+      mPUSHs(newSViv(tm->tm_hour));
+      mPUSHs(newSViv(tm->tm_mday));
+      mPUSHs(newSViv(tm->tm_mon));
+      mPUSHs(newSViv(tm->tm_year));
+      mPUSHs(newSViv(tm->tm_wday));
+      mPUSHs(newSViv(tm->tm_yday));
+      mPUSHs(newSViv(tm->tm_isdst));
+    }
+  }
 
 #endif
 
@@ -1960,7 +2080,7 @@ strptime(const char *s, const char *format, ...);
       };
       SV *sv_ary[TM_COUNT_MAX];
       if (LIKELY(tm_av || gimme == G_LIST)) {
-#pragma GCC unroll 0  /* https://github.com/llvm/llvm-project/issues/42332 */
+#pragma GCC unroll 1  /* https://github.com/llvm/llvm-project/issues/42332 */
         for (i = 0; i < TM_COUNT_MAX; i++) {
           sv_ary[i] = sv_newmortal();
           if (tm_ary[i] != PERL_INT_MIN)
@@ -2015,34 +2135,39 @@ gethostname();
     char name[256];
 #endif
   PPCODE:
-    if (LIKELY(gethostname(name, sizeof(name)) == 0))
-      mPUSHp(name, _strnlen(name, sizeof(name)));
+  {
+    if (LIKELY(gethostname(name, sizeof(name)) == 0)) {
+      Size_t namelen = _strnlen(name, sizeof(name));
+      mPUSHp(name, namelen);
+    }
     else
       PUSHs(&PL_sv_undef);
+  }
 
 #endif
 
 #ifdef PSX2008_HAS_GETITIMER
 void
 getitimer(int which);
-    INIT:
-        struct itimerval value;
-    PPCODE:
-        if (getitimer(which, &value) == 0) {
-            EXTEND(SP, 2); /* Stack already has room for 2 items. */
-            mPUSHs(newSViv(value.it_interval.tv_sec));
-            mPUSHs(newSViv(value.it_interval.tv_usec));
-            mPUSHs(newSViv(value.it_value.tv_sec));
-            mPUSHs(newSViv(value.it_value.tv_usec));
-        }
+  PPCODE:
+  {
+    struct itimerval value;
+    if (getitimer(which, &value) == 0) {
+      EXTEND(SP, 2); /* Stack already has room for 2 items. */
+      mPUSHs(newSViv(value.it_interval.tv_sec));
+      mPUSHs(newSViv(value.it_interval.tv_usec));
+      mPUSHs(newSViv(value.it_value.tv_sec));
+      mPUSHs(newSViv(value.it_value.tv_usec));
+    }
+  }
 
 #endif
 
 #ifdef PSX2008_HAS_SETITIMER
 void
 setitimer(int which,                      \
-          time_t int_sec, long int_usec,  \
-          time_t val_sec, long val_usec);
+          Time_t int_sec, long int_usec,  \
+          Time_t val_sec, long val_usec);
     PROTOTYPE: $@
     INIT:
         struct itimerval value = { {int_sec, int_usec}, {val_sec, val_usec} };
@@ -2098,14 +2223,18 @@ setpriority(int prio, int which=PRIO_PROCESS, id_t who=0);
 
 #define RETURN_UTXENT {                                                 \
     if (utxent) {                                                       \
+      Size_t len;                                                       \
       EXTEND(SP, 7);                                                    \
-      mPUSHp(utxent->ut_user, _strnlen(utxent->ut_user, sizeof(utxent->ut_user))); \
-      mPUSHp(utxent->ut_id,   _strnlen(utxent->ut_id,   sizeof(utxent->ut_id  ))); \
-      mPUSHp(utxent->ut_line, _strnlen(utxent->ut_line, sizeof(utxent->ut_line))); \
-      mPUSHs(newSViv(utxent->ut_pid));                                           \
-      mPUSHs(newSViv(utxent->ut_type));                                          \
-      mPUSHs(newSViv(utxent->ut_tv.tv_sec));                                     \
-      mPUSHs(newSViv(utxent->ut_tv.tv_usec));                                    \
+      len = _strnlen(utxent->ut_user, sizeof(utxent->ut_user));         \
+      mPUSHp(utxent->ut_user, len);                                     \
+      len = _strnlen(utxent->ut_id, sizeof(utxent->ut_id));             \
+      mPUSHp(utxent->ut_id, len);                                       \
+      len = _strnlen(utxent->ut_line, sizeof(utxent->ut_line));         \
+      mPUSHp(utxent->ut_line, len);                                     \
+      mPUSHs(newSViv(utxent->ut_pid));                                  \
+      mPUSHs(newSViv(utxent->ut_type));                                 \
+      mPUSHs(newSViv(utxent->ut_tv.tv_sec));                            \
+      mPUSHs(newSViv(utxent->ut_tv.tv_usec));                           \
     }                                                                   \
 }
 
@@ -2280,11 +2409,11 @@ srandom(unsigned seed);
 
 #if defined(_psx_getentropy) || defined(_psx_getrandom)
 # ifdef _psx_cpu_rand_step_ok
-#  define _PSX_CPURAND_SIZE sizeof(_psx_cpu_rand_t)
-#  define _PSX_GETENTROPY_SVLEN_ROUNDUP(l) \
-   ((l) + (_PSX_CPURAND_SIZE - ((l) % _PSX_CPURAND_SIZE)) % _PSX_CPURAND_SIZE)
+#  define PSX_CPURAND_SIZE sizeof(_psx_cpu_rand_ret_t)
+#  define PSX_GETENTROPY_SVLEN_ROUNDUP(l) \
+   ((l) + (PSX_CPURAND_SIZE - ((l) % PSX_CPURAND_SIZE)) % PSX_CPURAND_SIZE)
 # else
-#  define _PSX_GETENTROPY_SVLEN_ROUNDUP(l) (l)
+#  define PSX_GETENTROPY_SVLEN_ROUNDUP(l) (l)
 # endif
 void
 getentropy(IV length);
@@ -2296,20 +2425,22 @@ getentropy(IV length);
       PUSHs(&PL_sv_undef);
     }
     else {
-      STRLEN sv_len = _PSX_GETENTROPY_SVLEN_ROUNDUP(length);
+      STRLEN sv_len = PSX_GETENTROPY_SVLEN_ROUNDUP(length);
       SV *bufsv = sv_2mortal(newSV(sv_len + !sv_len));
       char *cbuf = SvPVX(bufsv);
 # if defined(_psx_getentropy)
       int rv = _psx_getentropy(cbuf, sv_len);
       cbuf[length] = '\0';
+      if (rv < 0)
+        goto MakeUndefGreatAgain;
 # else
-      SSize_t rv = 0;
+      SSize_t rv;
       Size_t grlen = length;
       while (grlen) {
         while ((rv = _psx_getrandom(cbuf, grlen)) < 0)
           if (errno != EINTR)
             goto MakeUndefGreatAgain;
-        if (rv == 0 || rv > grlen) {
+        if (rv == 0 || (Size_t)rv > grlen) {
           SETERRNO(EIO, SS$_ABORT);
           goto MakeUndefGreatAgain;
         }
@@ -2318,14 +2449,10 @@ getentropy(IV length);
       }
       *cbuf = '\0';
 # endif
-      if (rv < 0)
-        goto MakeUndefGreatAgain;
-      else {
-        SvCUR_set(bufsv, length);
-        SvPOK_only(bufsv);
-        SvTAINTED_on(bufsv);
-        PUSHs(bufsv);
-      }
+      SvCUR_set(bufsv, length);
+      SvPOK_only(bufsv);
+      SvTAINTED_on(bufsv);
+      PUSHs(bufsv);
     }
   }
 
@@ -2485,6 +2612,72 @@ pause();
 
 #endif
 
+#ifdef PSX2008_HAS_ACCEPT4
+void
+accept4(SV *sock, int flags);
+  PPCODE:
+  {
+    SV *retval;
+    int got_fd;
+    int skt_fd = _psx_fileno(aTHX_ sock, &got_fd);
+    int rv = accept4(skt_fd, NULL, NULL, flags);
+    if (rv < 0)
+      retval = &PL_sv_undef;
+    else if (got_fd)
+      retval = sv_2mortal(newSViv((IV)rv));
+    else if ((retval = _psx_fd_to_handle(aTHX_ rv, "r+" SOCKET_OPEN_MODE)))
+      ;  /* OK. */
+    else
+      retval = &PL_sv_undef;
+    PUSHs(retval);
+  }
+
+#endif
+
+#ifdef PSX2008_HAS_DUP3
+void
+dup3(psx_fd_t oldfd, psx_fd_t newfd, int flags);
+  PPCODE:
+  {
+    int rv = dup3(oldfd, newfd, flags);
+    SV *retval = UNLIKELY(rv < 0) ? &PL_sv_undef : sv_2mortal(newSViv((IV)rv));
+    PUSHs(retval);
+  }
+
+#endif
+
+#ifdef PSX2008_HAS_PIPE2
+void
+pipe2(SV *flags);
+  PPCODE:
+  {
+    int pipefd[2], rv, ret_fd = 0;
+    SvGETMAGIC(flags);
+    if (SvROK(flags) && SvTYPE(SvRV(flags)) <= SVt_PVMG) {
+      flags = SvRV(flags);
+      SvGETMAGIC(flags);
+    }
+    else
+      ret_fd = 1;
+    rv = pipe2(pipefd, (int)SvIV_nomg(flags));
+    if (rv == 0) {
+      if (ret_fd) {
+        mPUSHs(newSViv((IV)pipefd[0]));
+        mPUSHs(newSViv((IV)pipefd[1]));
+      }
+      else {
+        SV *rdfh = _psx_fd_to_handle(aTHX_ pipefd[0], "r" PIPE_OPEN_MODE);
+        SV *wrfh = _psx_fd_to_handle(aTHX_ pipefd[1], "w" PIPE_OPEN_MODE);
+        if (rdfh && wrfh) {
+          PUSHs(rdfh);
+          PUSHs(wrfh);
+        }
+      }
+    }
+  }
+
+#endif
+
 #ifdef PSX2008_HAS_PSIGNAL
 void
 psignal(int sig, const char *msg);
@@ -2540,12 +2733,10 @@ timer_getoverrun(timer_t timerid);
 #ifdef PSX2008_HAS_TIMER_GETTIME
 void
 timer_gettime(timer_t timerid);
-  PREINIT:
-    struct itimerspec curr_value;
-    int rv;
   PPCODE:
   {
-    rv = timer_gettime(timerid, &curr_value);
+    struct itimerspec curr_value;
+    int rv = timer_gettime(timerid, &curr_value);
     if (rv == 0) {
       EXTEND(SP, 2);
       mPUSHs(newSViv(curr_value.it_interval.tv_sec));
@@ -2560,8 +2751,8 @@ timer_gettime(timer_t timerid);
 #ifdef PSX2008_HAS_TIMER_SETTIME
 void
 timer_settime(timer_t timerid, int flags,                               \
-              time_t interval_sec, long interval_nsec,                  \
-              time_t initial_sec=-1, long initial_nsec=-1);
+              Time_t interval_sec, long interval_nsec,                  \
+              Time_t initial_sec=-1, long initial_nsec=-1);
   PROTOTYPE: $$@
   PREINIT:
     struct itimerspec new_value, old_value;
@@ -2595,24 +2786,27 @@ timer_settime(timer_t timerid, int flags,                               \
 SysRetTrue
 chdir(SV *what);
   CODE:
+  {
     SvGETMAGIC(what);
     if (!SvOK(what)) {
       SETERRNO(ENOENT, RMS$_DNF);
       RETVAL = -1;
     }
     else if (SvPOK(what)) {
-      const char *path = SvPV_nomg_const_nolen(what);
-      RETVAL = chdir(path);
+      STRLEN len;
+      const char *path = SvPV_nomg_const(what, len);
+      RETVAL = IS_SAFE_PATHNAME(path, len, cv) ? chdir(path) : -1;
     }
     else {
 #ifdef PSX2008_HAS_FCHDIR
-      int fd = _psx_fileno_nomg(aTHX_ what);
+      int fd = _psx_fileno_nomg(aTHX_ what, NULL);
       RETVAL = fchdir(fd);
 #else
       SETERRNO(ENOSYS, SS$_UNSUPPORTED);
       RETVAL = -1;
 #endif
     }
+  }
   OUTPUT:
     RETVAL
 
@@ -2622,24 +2816,27 @@ chdir(SV *what);
 SysRetTrue
 chmod(SV *what, mode_t mode);
   CODE:
+  {
     SvGETMAGIC(what);
     if (!SvOK(what)) {
       SETERRNO(ENOENT, RMS$_FNF);
       RETVAL = -1;
     }
     else if (SvPOK(what)) {
-      const char *path = SvPV_nomg_const_nolen(what);
-      RETVAL = chmod(path, mode);
+      STRLEN len;
+      const char *path = SvPV_nomg_const(what, len);
+      RETVAL = IS_SAFE_PATHNAME(path, len, cv) ? chmod(path, mode) : -1;
     }
     else {
 #ifdef PSX2008_HAS_FCHMOD
-      int fd = _psx_fileno_nomg(aTHX_ what);
+      int fd = _psx_fileno_nomg(aTHX_ what, NULL);
       RETVAL = fchmod(fd, mode);
 #else
       SETERRNO(ENOSYS, SS$_UNSUPPORTED);
       RETVAL = -1;
 #endif
     }
+  }
   OUTPUT:
     RETVAL
 
@@ -2649,24 +2846,29 @@ chmod(SV *what, mode_t mode);
 SysRetTrue
 chown(SV *what, uid_t owner, gid_t group);
   CODE:
+  {
     SvGETMAGIC(what);
     if (!SvOK(what)) {
       SETERRNO(ENOENT, RMS$_FNF);
       RETVAL = -1;
     }
     else if (SvPOK(what)) {
-      const char *path = SvPV_nomg_const_nolen(what);
-      RETVAL = chown(path, owner, group);
+      STRLEN len;
+      const char *path = SvPV_nomg_const(what, len);
+      RETVAL = IS_SAFE_PATHNAME(path, len, cv)
+        ? chown(path, owner, group)
+        : -1;
     }
     else {
 #ifdef PSX2008_HAS_FCHOWN
-      int fd = _psx_fileno_nomg(aTHX_ what);
+      int fd = _psx_fileno_nomg(aTHX_ what, NULL);
       RETVAL = fchown(fd, owner, group);
 #else
       SETERRNO(ENOSYS, SS$_UNSUPPORTED);
       RETVAL = -1;
 #endif
     }
+  }
   OUTPUT:
     RETVAL
 
@@ -2709,12 +2911,13 @@ pathconf(SV *what, int name);
     if (UNLIKELY(!SvOK(what)))
       SETERRNO(ENOENT, RMS_FNF);
     else if (SvPOK(what)) {
-      const char *path = SvPV_nomg_const_nolen(what);
-      rv = pathconf(path, name);
+      STRLEN len;
+      const char *path = SvPV_nomg_const(what, len);
+      rv = IS_SAFE_PATHNAME(path, len, cv) ? pathconf(path, name) : -1;
     }
     else {
 #ifdef PSX2008_HAS_FPATHCONF
-      int fd = _psx_fileno_nomg(aTHX_ what);
+      int fd = _psx_fileno_nomg(aTHX_ what, NULL);
       SETERRNO(0, 0); /* _psx_fileno() might have set errno. */
       rv = fpathconf(fd, name);
 #else
@@ -2749,24 +2952,29 @@ sysconf(int name);
 SysRetTrue
 truncate(SV *what, Off_t length);
   CODE:
+  {
     SvGETMAGIC(what);
-    if (!SvOK(what)) {
+    if (UNLIKELY(!SvOK(what))) {
       SETERRNO(ENOENT, RMS_FNF);
       RETVAL = -1;
     }
     else if (SvPOK(what)) {
-      const char *path = SvPV_nomg_const_nolen(what);
-      RETVAL = truncate(path, length);
+      STRLEN len;
+      const char *path = SvPV_nomg_const(what, len);
+      RETVAL = IS_SAFE_PATHNAME(path, len, cv)
+        ? truncate(path, length)
+        : -1;
     }
     else {
 #ifdef PSX2008_HAS_FTRUNCATE
-      int fd = _psx_fileno_nomg(aTHX_ what);
+      int fd = _psx_fileno_nomg(aTHX_ what, NULL);
       RETVAL = ftruncate(fd, length);
 #else
       SETERRNO(ENOSYS, SS$_UNSUPPORTED);
       RETVAL = -1;
 #endif
     }
+  }
   OUTPUT:
     RETVAL
 
@@ -2774,13 +2982,13 @@ truncate(SV *what, Off_t length);
 
 #ifdef PSX2008_HAS_LCHOWN
 SysRetTrue
-lchown(const char *path, uid_t owner, gid_t group);
+lchown(psx_safepath_t__fail_undef path, uid_t owner, gid_t group);
 
 #endif
 
 #ifdef PSX2008_HAS_ACCESS
 SysRetTrue
-access(const char *path, int mode);
+access(psx_safepath_t__fail_undef path, int mode);
 
 #endif
 
@@ -2803,34 +3011,37 @@ stat(SV *what);
     int rv = -1;
     struct stat buf;
   PPCODE:
+  {
     SvGETMAGIC(what);
-    if (!SvOK(what))
+    if (UNLIKELY(!SvOK(what)))
       SETERRNO(ENOENT, RMS_FNF);
     else if (SvPOK(what)) {
-      const char *path = SvPV_nomg_const_nolen(what);
-      rv = stat(path, &buf);
+      STRLEN len;
+      const char *path = SvPV_nomg_const(what, len);
+      rv = IS_SAFE_PATHNAME(path, len, cv) ? stat(path, &buf) : -1;
     }
     else {
 #ifdef PSX2008_HAS_FSTAT
-      int fd = _psx_fileno_nomg(aTHX_ what);
+      int fd = _psx_fileno_nomg(aTHX_ what, NULL);
       rv = fstat(fd, &buf);
 #else
       SETERRNO(ENOSYS, SS$_UNSUPPORTED);
 #endif
     }
     RETURN_STAT_BUF(rv, buf);
+  }
 
 #endif
 
 #ifdef PSX2008_HAS_LSTAT
 void
-lstat(const char *path);
-  INIT:
-    int rv;
-    struct stat buf;
+lstat(psx_safepath_t__fail_false_or_empty path);
   PPCODE:
-    rv = lstat(path, &buf);
+  {
+    struct stat buf;
+    int rv = lstat(path, &buf);
     RETURN_STAT_BUF(rv, buf);
+  }
 
 #endif
 
@@ -2841,22 +3052,26 @@ statvfs(SV *what);
     int rv = -1;
     struct statvfs buf;
   PPCODE:
+  {
     SvGETMAGIC(what);
-    if (!SvOK(what))
+    if (!SvOK(what)) {
       SETERRNO(ENOENT, RMS_FNF);
+    }
     else if (SvPOK(what)) {
-      const char *path = SvPV_nomg_const_nolen(what);
-      rv = statvfs(path, &buf);
+      STRLEN len;
+      const char *path = SvPV_nomg_const(what, len);
+      rv = IS_SAFE_PATHNAME(path, len, cv) ? statvfs(path, &buf) : -1;
     }
     else {
 #ifdef PSX2008_HAS_FSTATVFS
-      int fd = _psx_fileno_nomg(aTHX_ what);
+      int fd = _psx_fileno_nomg(aTHX_ what, NULL);
       rv = fstatvfs(fd, &buf);
 #else
       SETERRNO(ENOSYS, SS$_UNSUPPORTED);
 #endif
     }
     RETURN_STATVFS_BUF(rv, buf);
+  }
 
 #endif
 
@@ -2996,36 +3211,6 @@ isxdigit(SV *charstring);
 
 #endif
 
-#ifdef PSX2008_HAS_LINK
-SysRetTrue
-link(const char *oldpath, const char *newpath);
-
-#endif
-
-#ifdef PSX2008_HAS_SYMLINK
-SysRetTrue
-symlink(const char *target, const char *linkpath);
-
-#endif
-
-#ifdef PSX2008_HAS_MKDIR
-SysRetTrue
-mkdir(const char *path, mode_t mode=0777);
-
-#endif
-
-#ifdef PSX2008_HAS_MKFIFO
-SysRetTrue
-mkfifo(const char *path, mode_t mode);
-
-#endif
-
-#ifdef PSX2008_HAS_MKNOD
-SysRetTrue
-mknod(const char *path, mode_t mode, dev_t dev);
-
-#endif
-
 #ifdef PSX2008_HAS_MKDTEMP
 void
 mkdtemp(SV *template_sv);
@@ -3033,10 +3218,14 @@ mkdtemp(SV *template_sv);
   {
     STRLEN len;
     const char *ctmp = SvPV_const(template_sv, len);
-    /* Copy the original template to avoid overwriting it. */
-    SV *tmpsv = newSVpvn_flags(ctmp, len, SVs_TEMP);
-    char *dtemp = mkdtemp(SvPVX(tmpsv));
-    PUSHs(LIKELY(!!dtemp) ? tmpsv : &PL_sv_undef);
+    if (!IS_SAFE_PATHNAME(ctmp, len, cv))
+      PUSHs(&PL_sv_undef);
+    else {
+      /* Copy the original template to avoid overwriting it. */
+      SV *tmpsv = newSVpvn_flags(ctmp, len, SVs_TEMP);
+      char *dtemp = mkdtemp(SvPVX(tmpsv));
+      PUSHs(LIKELY(!!dtemp) ? tmpsv : &PL_sv_undef);
+    }
   }
 
 #endif
@@ -3048,12 +3237,14 @@ mkstemp(SV *template_sv);
   {
     STRLEN len;
     const char *ctmp = SvPV_const(template_sv, len);
-    /* Copy the original template to avoid overwriting it. */
-    SV *tmpsv = newSVpvn_flags(ctmp, len, SVs_TEMP);
-    int fd = mkstemp(SvPVX(tmpsv));
-    if (LIKELY(fd >= 0)) {
-      mPUSHs(newSViv(fd));
-      PUSHs(tmpsv);
+    if (IS_SAFE_PATHNAME(ctmp, len, cv)) {
+      /* Copy the original template to avoid overwriting it. */
+      SV *tmpsv = newSVpvn_flags(ctmp, len, SVs_TEMP);
+      int fd = mkstemp(SvPVX(tmpsv));
+      if (LIKELY(fd >= 0)) {
+        mPUSHs(newSViv(fd));
+        PUSHs(tmpsv);
+      }
     }
   }
 
@@ -3066,12 +3257,14 @@ mkostemp(SV *template_sv, int flags);
   {
     STRLEN len;
     const char *ctmp = SvPV_const(template_sv, len);
-    /* Copy the original template to avoid overwriting it. */
-    SV *tmpsv = newSVpvn_flags(ctmp, len, SVs_TEMP);
-    int fd = mkostemp(SvPVX(tmpsv), flags);
-    if (LIKELY(fd >= 0)) {
-      mPUSHs(newSViv(fd));
-      PUSHs(tmpsv);
+    if (IS_SAFE_PATHNAME(ctmp, len, cv)) {
+      /* Copy the original template to avoid overwriting it. */
+      SV *tmpsv = newSVpvn_flags(ctmp, len, SVs_TEMP);
+      int fd = mkostemp(SvPVX(tmpsv), flags);
+      if (LIKELY(fd >= 0)) {
+        mPUSHs(newSViv(fd));
+        PUSHs(tmpsv);
+      }
     }
   }
 
@@ -3117,13 +3310,36 @@ fdopendir(IV fd);
 
 #ifdef PSX2008_HAS_CREAT
 SysRet0
-creat(const char *path, mode_t mode=0666)
+creat(psx_safepath_t__fail_undef path, mode_t mode=0666)
 
 #endif
 
 #ifdef PSX2008_HAS_OPEN
 SysRet0
-open(const char *path, int oflag=O_RDONLY, mode_t mode=0666);
+open(psx_safepath_t__fail_undef path, int oflag=O_RDONLY, mode_t mode=0666);
+
+#endif
+
+#ifdef PSX2008_HAS_OPENAT
+void
+openat(SV *dirfdsv, psx_safepath_t__fail_undef path, int flags=O_RDONLY, \
+       mode_t mode=0666);
+  PPCODE:
+  {
+    SV *rv = _openat50c(aTHX_ dirfdsv, path, flags, mode, NULL);
+    PUSHs(rv ? rv : &PL_sv_undef);
+  }
+
+#endif
+
+#ifdef PSX2008_HAS_OPENAT2
+void
+openat2(SV *dirfdsv, psx_safepath_t__fail_undef path, HV *how);
+  PPCODE:
+  {
+    SV *rv = _openat50c(aTHX_ dirfdsv, path, 0, 0, how);
+    PUSHs(rv ? rv : &PL_sv_undef);
+  }
 
 #endif
 
@@ -3139,85 +3355,89 @@ close(SV *fd);
 
 #ifdef PSX2008_HAS_FACCESSAT
 SysRetTrue
-faccessat(psx_fd_t dirfd, const char *path, int amode, int flags=0);
+faccessat(psx_fd_t dirfd, psx_safepath_t__fail_undef path, int amode, \
+          int flags=0);
 
 #endif
 
 #ifdef PSX2008_HAS_FCHMODAT
 SysRetTrue
-fchmodat(psx_fd_t dirfd, const char *path, mode_t mode, int flags=0);
+fchmodat(psx_fd_t dirfd, psx_safepath_t__fail_undef path, mode_t mode, \
+         int flags=0);
 
 #endif
 
 #ifdef PSX2008_HAS_FCHOWNAT
 SysRetTrue
-fchownat(psx_fd_t dirfd,                                                \
-         const char *path, uid_t owner, gid_t group, int flags=0);
+fchownat(psx_fd_t dirfd, psx_safepath_t__fail_undef path, uid_t owner, \
+         gid_t group, int flags=0);
 
 #endif
 
 #ifdef PSX2008_HAS_FSTATAT
 void
-fstatat(psx_fd_t dirfd, const char *path, int flags=0);
-  INIT:
-    int rv;
-    struct stat buf;
+fstatat(psx_fd_t dirfd, psx_safepath_t__fail_false_or_empty path, int flags=0);
   PPCODE:
-    rv = fstatat(dirfd, path, &buf, flags);
+  {
+    struct stat buf;
+    int rv = fstatat(dirfd, path, &buf, flags);
     RETURN_STAT_BUF(rv, buf);
+  }
+
+#endif
+
+#ifdef PSX2008_HAS_LINK
+SysRetTrue
+link(psx_safepath_t__fail_undef oldpath, psx_safepath_t__fail_undef newpath);
 
 #endif
 
 #ifdef PSX2008_HAS_LINKAT
 SysRetTrue
-linkat(psx_fd_t olddirfd, const char *oldpath,                  \
-       psx_fd_t newdirfd, const char *newpath, int flags=0);
+linkat(psx_fd_t olddirfd, psx_safepath_t__fail_undef oldpath,           \
+       psx_fd_t newdirfd, psx_safepath_t__fail_undef newpath, int flags=0);
+
+#endif
+
+#ifdef PSX2008_HAS_MKDIR
+SysRetTrue
+mkdir(psx_safepath_t__fail_undef path, mode_t mode=0777);
 
 #endif
 
 #ifdef PSX2008_HAS_MKDIRAT
 SysRetTrue
-mkdirat(psx_fd_t dirfd, const char *path, mode_t mode);
+mkdirat(psx_fd_t dirfd, psx_safepath_t__fail_undef path, mode_t mode);
+
+#endif
+
+#ifdef PSX2008_HAS_MKFIFO
+SysRetTrue
+mkfifo(psx_safepath_t__fail_undef path, mode_t mode);
 
 #endif
 
 #ifdef PSX2008_HAS_MKFIFOAT
 SysRetTrue
-mkfifoat(psx_fd_t dirfd, const char *path, mode_t mode);
+mkfifoat(psx_fd_t dirfd, psx_safepath_t__fail_undef path, mode_t mode);
+
+#endif
+
+#ifdef PSX2008_HAS_MKNOD
+SysRetTrue
+mknod(psx_safepath_t__fail_undef path, mode_t mode, dev_t dev);
 
 #endif
 
 #ifdef PSX2008_HAS_MKNODAT
 SysRetTrue
-mknodat(psx_fd_t dirfd, const char *path, mode_t mode, dev_t dev);
-
-#endif
-
-#ifdef PSX2008_HAS_OPENAT
-void
-openat(SV *dirfdsv, const char *path, int flags=O_RDONLY, mode_t mode=0666);
-  PPCODE:
-  {
-    SV *rv = _openat50c(aTHX_ dirfdsv, path, flags, mode, NULL);
-    PUSHs(rv ? rv : &PL_sv_undef);
-  }
-
-#endif
-
-#ifdef PSX2008_HAS_OPENAT2
-void
-openat2(SV *dirfdsv, const char *path, HV *how);
-  PPCODE:
-  {
-    SV *rv = _openat50c(aTHX_ dirfdsv, path, 0, 0, how);
-    PUSHs(rv ? rv : &PL_sv_undef);
-  }
+mknodat(psx_fd_t dirfd, psx_safepath_t__fail_undef path, mode_t mode, dev_t dev);
 
 #endif
 
 #ifdef PSX2008_HAS_READLINK
 void
-readlink(const char *path);
+readlink(psx_safepath_t__fail_undef path);
   PPCODE:
   {
     SV *rv = _readlink50c(aTHX_ path, NULL);
@@ -3228,7 +3448,7 @@ readlink(const char *path);
 
 #ifdef PSX2008_HAS_READLINKAT
 void
-readlinkat(psx_fd_t dirfd, const char *path);
+readlinkat(psx_fd_t dirfd, psx_safepath_t__fail_undef path);
   PPCODE:
   {
     SV *rv = _readlink50c(aTHX_ path, &dirfd);
@@ -3239,7 +3459,7 @@ readlinkat(psx_fd_t dirfd, const char *path);
 
 #ifdef PSX2008_HAS_REALPATH
 char *
-realpath(const char *path);
+realpath(psx_safepath_t__fail_undef path);
   CODE:
     RETVAL = realpath(path, NULL);
   OUTPUT:
@@ -3249,37 +3469,24 @@ realpath(const char *path);
 
 #endif
 
-#ifdef PSX2008_HAS_RENAMEAT
+#ifdef PSX2008_HAS_SYMLINK
 SysRetTrue
-renameat(psx_fd_t olddirfd, const char *oldpath,        \
-         psx_fd_t newdirfd, const char *newpath);
-
-#endif
-
-#ifdef PSX2008_HAS_RENAMEAT2
-SysRetTrue
-renameat2(psx_fd_t olddirfd, const char *oldpath,                       \
-          psx_fd_t newdirfd, const char *newpath, unsigned int flags=0);
+symlink(psx_safepath_t__fail_undef target, psx_safepath_t__fail_undef linkpath);
 
 #endif
 
 #ifdef PSX2008_HAS_SYMLINKAT
 SysRetTrue
-symlinkat(const char *target, psx_fd_t newdirfd, const char *linkpath);
-
-#endif
-
-#ifdef PSX2008_HAS_UNLINKAT
-SysRetTrue
-unlinkat(psx_fd_t dirfd, const char *path, int flags=0);
+symlinkat(psx_safepath_t__fail_undef target, psx_fd_t newdirfd, \
+          psx_safepath_t__fail_undef linkpath);
 
 #endif
 
 #ifdef PSX2008_HAS_UTIMENSAT
 SysRetTrue
-utimensat(psx_fd_t dirfd, const char *path, int flags = 0,      \
-          time_t atime_sec = 0, long atime_nsec = UTIME_NOW,    \
-          time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
+utimensat(psx_fd_t dirfd, psx_safepath_t__fail_undef path, int flags = 0, \
+          Time_t atime_sec = 0, long atime_nsec = UTIME_NOW,              \
+          Time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
     PROTOTYPE: $$;$@
     INIT:
         const struct timespec times[2] = { { atime_sec, atime_nsec },
@@ -3337,6 +3544,7 @@ read(psx_fd_t fd, SV *buf, SV *count);
 #ifdef PSX2008_HAS_WRITE
 void
 write(psx_fd_t fd, SV *buf, SV *count=NULL);
+  PROTOTYPE: DISABLE
   PPCODE:
   {
     if (UNLIKELY(SvIsNEGATIVE(count))) /* Performs 'get' magic. */
@@ -3656,8 +3864,10 @@ ptsname(psx_fd_t fd);
 # ifdef PSX2008_HAS_PTSNAME_R
     char name[MAXPATHLEN];
     int rv = ptsname_r(fd, name, sizeof(name));
-    if (LIKELY(rv == 0))
-      mPUSHp(name, _strnlen(name, sizeof(name)));
+    if (LIKELY(rv == 0)) {
+      Size_t namelen = _strnlen(name, sizeof(name));
+      mPUSHp(name, namelen);
+    }
     else {
       /* Some implementations return -1 on error and set errno. */
       if (rv > 0) SETERRNO(rv, rv);
@@ -3665,8 +3875,10 @@ ptsname(psx_fd_t fd);
     }
 # else
     char *name = ptsname(fd);
-    if (LIKELY(!!name))
-      mPUSHp(name, _strnlen(name, MAXPATHLEN));
+    if (LIKELY(!!name)) {
+      Size_t namelen = _strnlen(name, MAXPATHLEN);
+      mPUSHp(name, namelen);
+    }
     else
       PUSHs(&PL_sv_undef);
 # endif
@@ -3682,16 +3894,20 @@ ttyname(psx_fd_t fd);
 # ifdef PSX2008_HAS_TTYNAME_R
     char name[MAXPATHLEN];
     int rv = ttyname_r(fd, name, sizeof(name));
-    if (LIKELY(rv == 0))
-      mPUSHp(name, _strnlen(name, sizeof(name)));
+    if (LIKELY(rv == 0)) {
+      Size_t namelen = _strnlen(name, sizeof(name));
+      mPUSHp(name, namelen);
+    }
     else {
       SETERRNO(rv, rv);
       PUSHs(&PL_sv_undef);
     }
 # else
     char *name = ttyname(fd);
-    if (LIKELY(!!name))
-      mPUSHp(name, _strnlen(name, MAXPATHLEN));
+    if (LIKELY(!!name)) {
+      Size_t namelen = _strnlen(name, MAXPATHLEN);
+      mPUSHp(name, namelen);
+    }
     else
       PUSHs(&PL_sv_undef);
 # endif
@@ -3724,7 +3940,7 @@ ttyname(psx_fd_t fd);
 #if !defined(PSX2008_HAS_REMOVE) || (defined(_WIN32) && !defined(__CYGWIN__))
 # if defined(PSX2008_HAS_UNLINK) && defined(PSX2008_HAS_RMDIR)
 void
-remove(const char *path);
+remove(psx_safepath_t__fail_undef path);
   PPCODE:
     if (unlink(path) == 0 || (UNLINK_ISDIR_ERRNO && rmdir(path) == 0))
       mPUSHp("0 but true", 10);
@@ -3736,13 +3952,13 @@ remove(const char *path);
 # endif
 #else
 SysRetTrue
-remove(const char *path);
+remove(psx_safepath_t__fail_undef path);
 
 #endif
 
 #ifdef PSX2008_HAS_UNLINKAT
 void
-removeat(psx_fd_t dirfd, const char *path);
+removeat(psx_fd_t dirfd, psx_safepath_t__fail_undef path);
   PPCODE:
     if (unlinkat(dirfd, path, 0) == 0
         || (UNLINK_ISDIR_ERRNO && unlinkat(dirfd, path, AT_REMOVEDIR) == 0))
@@ -3754,27 +3970,48 @@ removeat(psx_fd_t dirfd, const char *path);
 
 #ifdef PSX2008_HAS_RENAME
 SysRetTrue
-rename(const char *oldpath, const char *newpath);
+rename(psx_safepath_t__fail_undef oldpath, psx_safepath_t__fail_undef newpath);
+
+#endif
+
+#ifdef PSX2008_HAS_RENAMEAT
+SysRetTrue
+renameat(psx_fd_t olddirfd, psx_safepath_t__fail_undef oldpath,        \
+         psx_fd_t newdirfd, psx_safepath_t__fail_undef newpath);
+
+#endif
+
+#ifdef PSX2008_HAS_RENAMEAT2
+SysRetTrue
+renameat2(psx_fd_t olddirfd, psx_safepath_t__fail_undef oldpath,        \
+          psx_fd_t newdirfd, psx_safepath_t__fail_undef newpath,        \
+          unsigned int flags=0);
 
 #endif
 
 #ifdef PSX2008_HAS_RMDIR
 SysRetTrue
-rmdir(const char *path);
+rmdir(psx_safepath_t__fail_undef path);
 
 #endif
 
 #ifdef PSX2008_HAS_UNLINK
 SysRetTrue
-unlink(const char *path);
+unlink(psx_safepath_t__fail_undef path);
+
+#endif
+
+#ifdef PSX2008_HAS_UNLINKAT
+SysRetTrue
+unlinkat(psx_fd_t dirfd, psx_safepath_t__fail_undef path, int flags=0);
 
 #endif
 
 #ifdef PSX2008_HAS_FUTIMENS
 SysRetTrue
 futimens(psx_fd_t fd,                                           \
-         time_t atime_sec = 0, long atime_nsec = UTIME_NOW,     \
-         time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
+         Time_t atime_sec = 0, long atime_nsec = UTIME_NOW,     \
+         Time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
   PROTOTYPE: $@
   INIT:
     const struct timespec times[2] = { { atime_sec, atime_nsec },
@@ -3788,7 +4025,7 @@ futimens(psx_fd_t fd,                                           \
 
 #ifdef PSX2008_HAS_EXECVEAT
 void
-execveat(psx_fd_t dirfd, const char *path,              \
+execveat(psx_fd_t dirfd, psx_safepath_t__fail_undef path,  \
          AV *args, SV *env=NULL, int flags=0);
   PPCODE:
   {
@@ -5385,14 +5622,3 @@ ctanh(NV re, NV im);
     RETURN_COMPLEX(result);
 
 #endif
-
- ## DESTROY is called when a file handle we created (e.g. in openat)
- ## is cleaned up. This is just a dummy to silence AUTOLOAD. We leave
- ## it up to Perl to take the necessary steps.
-void
-DESTROY(...);
-PPCODE:
-
-BOOT:
-{
-}

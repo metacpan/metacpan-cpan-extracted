@@ -58,7 +58,9 @@ use Dpkg::Changelog::Parse;
 
 use parent qw(Dpkg::Source::Package);
 
-our $CURRENT_MINOR_VERSION = '0';
+sub CURRENT_MINOR_VERSION {
+    '0';
+}
 
 sub init_options {
     my $self = shift;
@@ -78,47 +80,47 @@ sub init_options {
 my @module_cmdline = (
     {
         name => '--include-removal',
-        help => N_('include removed files in the patch'),
+        help => N_('Include removed files in the patch.'),
         when => 'build',
     }, {
         name => '--include-timestamp',
-        help => N_('include timestamp in the patch'),
+        help => N_('Include timestamp in the patch.'),
         when => 'build',
     }, {
         name => '--include-binaries',
-        help => N_('include binary files in the tarball'),
+        help => N_('Include binary files in the tarball.'),
         when => 'build',
     }, {
         name => '--no-preparation',
-        help => N_('do not prepare build tree by applying patches'),
+        help => N_('Do not prepare build tree by applying patches.'),
         when => 'build',
     }, {
         name => '--no-unapply-patches',
-        help => N_('do not unapply patches if previously applied'),
+        help => N_('Do not unapply patches if previously applied.'),
         when => 'build',
     }, {
         name => '--unapply-patches',
-        help => N_('unapply patches if previously applied (default)'),
+        help => N_('Unapply patches if previously applied (default).'),
         when => 'build',
     }, {
         name => '--create-empty-orig',
-        help => N_('create an empty original tarball if missing'),
+        help => N_('Create an empty original tarball if missing.'),
         when => 'build',
     }, {
         name => '--abort-on-upstream-changes',
-        help => N_('abort if generated diff has upstream files changes'),
+        help => N_('Abort if generated diff has upstream files changes.'),
         when => 'build',
     }, {
         name => '--auto-commit',
-        help => N_('record generated patches, instead of aborting'),
+        help => N_('Record generated patches, instead of aborting.'),
         when => 'build',
     }, {
         name => '--skip-debianization',
-        help => N_('do not extract debian tarball into upstream sources'),
+        help => N_('Do not extract debian tarball into upstream sources.'),
         when => 'extract',
     }, {
         name => '--skip-patches',
-        help => N_('do not apply patches at the end of the extraction'),
+        help => N_('Do not apply patches at the end of the extraction.'),
         when => 'extract',
     }
 );
@@ -296,7 +298,8 @@ sub _get_patches {
     my $pd = "$dir/debian/patches";
     my $auto_patch = $self->get_autopatch_name();
     if (-d $pd) {
-        opendir(my $dir_dh, $pd) or syserr(g_('cannot opendir %s'), $pd);
+        opendir(my $dir_dh, $pd)
+            or syserr(g_('cannot open directory %s'), $pd);
         foreach my $patch (sort readdir($dir_dh)) {
             # The «patches» directory matches the same rules as run-parts.
             next unless $patch =~ /^[\w-]+$/ and -f "$pd/$patch";
@@ -363,7 +366,7 @@ sub _upstream_tarball_template {
         sort map {
             compression_get_file_extension($_)
         } compression_get_list()) . '}';
-    return File::Spec->catfile('..', $self->get_basename() . ".orig.tar.$ext");
+    return File::Spec->catfile($self->{basedir}, $self->get_basename() . ".orig.tar.$ext");
 }
 
 sub can_build {
@@ -514,7 +517,7 @@ sub _generate_patch {
     # Copy over the debian directory.
     erasedir("$tmpdir/debian");
     system('cp', '-RPp', '--', "$dir/debian", "$tmpdir/");
-    subprocerr(g_('copy of the debian directory')) if $?;
+    subprocerr("cp $dir/debian $tmpdir/") if $?;
 
     # Apply all patches except the last automatic one.
     $opts{skip_auto} //= 0;
@@ -554,17 +557,20 @@ sub _generate_patch {
         handle_binary_func => $opts{handle_binary},
         order_from => $opts{order_from},
     );
-    error(g_('unrepresentable changes to source')) if not $diff->finish();
+    $diff->finish();
 
     if (-s $tmpdiff) {
         info(g_('local changes detected, the modified files are:'));
         my $analysis = $diff->analyze($dir,
             verbose => 0,
         );
-        foreach my $fn (sort keys %{$analysis->{filepatched}}) {
+        foreach my $fullfn (sort keys %{$analysis->{filepatched}}) {
+            my $fn = ($fullfn =~ s{^\Q$dir\E/+}{}r);
             print " $fn\n";
         }
     }
+
+    error(g_('unrepresentable changes to source')) if $diff->has_errors();
 
     # Remove the temporary directory.
     erasedir($tmpdir);
@@ -604,7 +610,7 @@ sub do_build {
         my $file = $opts{filename};
         $binaryfiles->new_binary_found($file);
         unless ($include_binaries or $binaryfiles->binary_is_allowed($file)) {
-            errormsg(g_('cannot represent change to %s: %s'), $file,
+            errormsg(g_('cannot represent changes to %s: %s'), $file,
                      g_('binary file contents changed'));
             errormsg(g_('add %s in debian/source/include-binaries if you want ' .
                         'to store the modified binary in the debian tarball'),
@@ -648,7 +654,7 @@ sub do_build {
     pop_exit_handler();
 
     # Create the "debian.tar".
-    my $debianfile = "$basenamerev.debian.tar." . $self->{options}{comp_ext};
+    my $debianfile = File::Spec->catfile($self->{basedir}, "$basenamerev.debian.tar." . $self->{options}{comp_ext});
     info(g_('building %s in %s'), $sourcepackage, $debianfile);
     my $tar = Dpkg::Source::Archive->new(
         filename => $debianfile,
@@ -716,8 +722,8 @@ HEADER
 
     $text .= <<'TRAILER';
 ---
-The information above should follow the Patch Tagging Guidelines, please
-checkout https://dep.debian.net/deps/dep3/ to learn about the format. Here
+The information above should follow the Patch Tagging Guidelines,
+see https://dep.debian.net/deps/dep3/ to learn about the format. Here
 are templates for supplementary fields that you might want to add:
 
 Origin: (upstream|backport|vendor|other), (<patch-url>|commit:<commit-id>)
@@ -737,9 +743,9 @@ sub register_patch {
     my $patch = File::Spec->catfile($dir, 'debian', 'patches', $patch_name);
     if (-s $patch_file) {
         copy($patch_file, $patch)
-            or syserr(g_('failed to copy %s to %s'), $patch_file, $patch);
+            or syserr(g_('cannot copy %s to %s'), $patch_file, $patch);
         chmod_if_needed(0o666 & ~ umask(), $patch)
-            or syserr(g_("unable to change permission of '%s'"), $patch);
+            or syserr(g_("cannot change permission of '%s'"), $patch);
         my $applied = File::Spec->catfile($dir, 'debian', 'patches', '.dpkg-source-applied');
         open(my $applied_fh, '>>', $applied)
             or syserr(g_('cannot write %s'), $applied);

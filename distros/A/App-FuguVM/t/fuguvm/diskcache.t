@@ -22,6 +22,7 @@ my $HAS_QEMU_IMG = defined qx{sh -c 'command -v qemu-img 2>/dev/null'}
 
 my %CONFIG = (
 	name         => 'default',
+	arch         => 'arm64',
 	version      => '7.8',
 	disk_size    => '8G',
 	memory       => 2048,
@@ -65,11 +66,108 @@ my %CONFIG = (
 	is( $cache->key( \%same ), $key,
 		'memory and ports do not shape the disk, so the key holds' );
 
+	my %bound = ( %CONFIG, bind_address => '0.0.0.0' );
+	is( $cache->key( \%bound ), $key,
+		'bind_address does not shape the disk either' );
+
 	my %bigger = ( %CONFIG, disk_size => '16G' );
 	isnt( $cache->key( \%bigger ), $key, 'disk_size rotates the key' );
 
 	my %older = ( %CONFIG, version => '7.7' );
 	isnt( $cache->key( \%older ), $key, 'version rotates the key' );
+
+	# The verify switch shapes the install: the installer reads it,
+	# and the miniroot of the run was fetched under it.
+	my %unproven = ( %CONFIG, verify => 0 );
+	isnt( $cache->key( \%unproven ), $key, 'verify rotates the key' );
+	is( $cache->key( { %CONFIG, verify => 1 } ),
+		$key, 'and an explicit verify yes reads as the default' );
+}
+
+# The record of each install mode. A configuration without an
+# install_mode reads as the expect mode, so a hand-built test
+# configuration behaves like a loaded one.
+{
+	my $tmp   = tempdir( CLEANUP => 1 );
+	my $cache = App::FuguVM::DiskCache->new($tmp);
+
+	_spit( "$tmp/install.conf", "System hostname = image\n" );
+
+	my $expect_key = $cache->key( \%CONFIG );
+	is( $cache->key( { %CONFIG, install_mode => 'expect' } ),
+		$expect_key, 'an absent install_mode reads as expect' );
+
+	my %auto = (
+		%CONFIG,
+		install_mode => 'autoinstall',
+		autoinstall  => "$tmp/install.conf",
+	);
+	my $auto_key = $cache->key( \%auto );
+	ok( defined $auto_key, 'an autoinstall configuration derives a key' );
+	isnt( $auto_key, $expect_key,
+		'and its key differs from the equal expect key' );
+
+	_spit( "$tmp/install.conf", "System hostname = other\n" );
+	isnt( $cache->key( \%auto ), $auto_key,
+		'one changed byte of the response file rotates the key' );
+
+	unlink "$tmp/install.conf";
+	my $missing = do {
+		local $SIG{__WARN__} = sub { };
+		$cache->key( \%auto );
+	};
+	is( $missing, undef, 'an unreadable response file yields no key' );
+
+	my %import     = ( %CONFIG, install_mode => 'import' );
+	my $import_key = $cache->key( \%import );
+	ok( defined $import_key, 'an import configuration derives a key' );
+	isnt( $import_key, $expect_key,
+		'and its key differs from the expect key' );
+
+	my %bigger = ( %import, disk_size => '16G' );
+	is( $cache->key( \%bigger ),
+		$import_key,
+		'disk_size does not shape an imported entry, so the key holds'
+	);
+
+	my %older = ( %import, version => '7.7' );
+	isnt( $cache->key( \%older ), $import_key,
+		'the version rotates the import key' );
+
+	my %unproven = ( %import, verify => 0 );
+	is( $cache->key( \%unproven ),
+		$import_key,
+		'verify does not shape an imported entry: no install ran' );
+}
+
+# The architecture comes from the VM configuration, and it separates
+# the entries of the two architectures.
+{
+	my $tmp   = tempdir( CLEANUP => 1 );
+	my $cache = App::FuguVM::DiskCache->new($tmp);
+
+	my %amd64 = ( %CONFIG, arch => 'amd64' );
+	my $amd64_key = $cache->key( \%amd64 );
+	like( $amd64_key, qr/^7\.8-amd64-[0-9a-f]{8}$/,
+		'the amd64 key is <version>-amd64-<hash8>' );
+
+	my $arm64_key = $cache->key( \%CONFIG );
+	isnt( $amd64_key, $arm64_key,
+		'the keys of the two architectures differ' );
+	isnt(
+		$cache->entry_dir($amd64_key),
+		$cache->entry_dir($arm64_key),
+		'so neither entry can overwrite the other'
+	);
+
+	my %bare = %CONFIG;
+	delete $bare{arch};
+	my $missing = do {
+		local $SIG{__WARN__} = sub { };
+		$cache->key( \%bare );
+	};
+	is( $missing, undef,
+		'a configuration without an architecture yields no key' );
 }
 
 # The installer script and the generation counter rotate the key.
@@ -92,9 +190,20 @@ my %CONFIG = (
 	is( $cache->key( \%CONFIG ), $key,
 		'restoring the installer restores the key' );
 
+	# No script installed an imported entry, so no script change
+	# can rotate its key
+	my %import     = ( %CONFIG, install_mode => 'import' );
+	my $import_key = $cache->key( \%import );
+	_spit( "$tmp/install.exp", "#!/usr/bin/expect\n# one more step\n" );
+	is( $cache->key( \%import ), $import_key,
+		'an imported entry survives a change to a shipped script' );
+	_spit( "$tmp/install.exp", "#!/usr/bin/expect\n" );
+
 	_spit( "$tmp/cache-generation", "2\n" );
 	isnt( $cache->key( \%CONFIG ), $key,
 		'a bumped generation counter rotates the key' );
+	isnt( $cache->key( \%import ), $import_key,
+		'and it rotates the import key too' );
 
 	# An unreadable input means no key at all, and therefore no
 	# caching. The code never derives a key from partial inputs.
@@ -106,13 +215,15 @@ my %CONFIG = (
 	is( $missing, undef, 'a missing generation file yields no key' );
 }
 
-# The real checkout resolves both key inputs
+# The real checkout resolves every file-backed key input
 {
 	my $tmp   = tempdir( CLEANUP => 1 );
 	my $cache = App::FuguVM::DiskCache->new($tmp);
 
-	ok( defined $cache->_install_script,
+	ok( defined $cache->_driver_script('install.exp'),
 		'install.exp resolves in this checkout' );
+	ok( defined $cache->_driver_script('autoinstall.exp'),
+		'autoinstall.exp resolves in this checkout' );
 	ok( defined $cache->_generation_file,
 		'cache-generation resolves in this checkout' );
 }
@@ -140,6 +251,51 @@ my %CONFIG = (
 		undef, 'unparseable metadata is a miss, not a crash' );
 
 	is_deeply( $cache->list, [], 'list skips incomplete entries' );
+}
+
+# The entry lock: exclusive across processes, bounded, gone with its
+# holder, and invisible to the listing
+{
+	my $tmp   = tempdir( CLEANUP => 1 );
+	my $cache = App::FuguVM::DiskCache->new($tmp);
+	my $key   = '7.8-arm64-feedface';
+
+	my $lock = $cache->lock_entry( $key, 5 );
+	ok( defined $lock, 'lock_entry returns a handle' );
+	ok( -f $cache->installed_dir . "/.lock.$key",
+		'the lock file exists' );
+
+	# A second holder in a child process waits, and its deadline
+	# elapses while the first holder stays
+	my $started = time;
+	is( _lock_in_child( $tmp, $key, 1 ), 0,
+		'a second lock_entry waits, and the deadline gives undef' );
+	ok( time - $started < 30, 'and the wait does not hang' );
+
+	# The lock releases when the handle closes. The child takes it,
+	# and its own exit releases it again.
+	close $lock;
+	is( _lock_in_child( $tmp, $key, 5 ), 1,
+		'the lock is free once the handle closes' );
+
+	my $again = $cache->lock_entry( $key, 5 );
+	ok( defined $again, 'the lock releases when the holder exits' );
+	close $again;
+
+	# A dot file cannot collide with an entry
+	is_deeply( $cache->list, [],
+		'the lock file does not appear in list' );
+	is( $cache->sweep_temp, 0, 'sweep_temp leaves the lock file alone' );
+	ok( -f $cache->installed_dir . "/.lock.$key",
+		'and the lock file is still there' );
+
+	is( $cache->lock_entry(undef), undef, 'an undef key takes no lock' );
+
+	# remove takes the lock file with the entry, so removed keys
+	# leave no lock files behind
+	ok( $cache->remove($key), 'remove succeeds' );
+	ok( !-e $cache->installed_dir . "/.lock.$key",
+		'and the lock file of the key is gone' );
 }
 
 # sweep_temp removes temporary trees, whatever left them behind
@@ -373,6 +529,38 @@ SKIP: {
 		undef, 'the snapshot is gone' );
 }
 
+# An imported entry: the metadata holds no root password, and the
+# snapshot verbs still work over it
+SKIP: {
+	skip 'qemu-img not installed', 6 if !$HAS_QEMU_IMG;
+
+	my $tmp   = tempdir( CLEANUP => 1 );
+	my $cache = App::FuguVM::DiskCache->new("$tmp/cache");
+	my $key   = '7.8-amd64-0a0a0a0a';
+
+	my $outside = "$tmp/openbsd.qcow2";
+	system( 'qemu-img', 'create', '-f', 'qcow2', $outside, '64M' ) == 0
+	    or skip 'cannot create a test disk image', 6;
+
+	my $base = $cache->store( $key, $outside,
+		{ imported_from => $outside, install_mode => 'import' } );
+	ok( defined $base, 'store publishes an outside image as an entry' );
+
+	my $hit = $cache->lookup($key);
+	ok( defined $hit, 'and lookup finds it' );
+	is( $hit->{meta}{imported_from},
+		$outside, 'the metadata records the source' );
+	ok( !defined $hit->{meta}{root_password},
+		'and it holds no root password' );
+
+	is( $cache->key_for_path($base),
+		$key, 'key_for_path resolves the imported base' );
+
+	my $path = $cache->snapshot_store( $key, 'base', $outside, {} );
+	ok( defined $path && defined $cache->snapshot_lookup( $key, 'base' ),
+		'the snapshot verbs work over an imported entry' );
+}
+
 # A snapshot whose base is gone reads as a miss. Thus callers can
 # fall back to provisioning instead of a hard failure.
 SKIP: {
@@ -410,6 +598,25 @@ sub _backing ($path)
 	return $info->{'full-backing-filename'} // $info->{'backing-filename'};
 }
 
+# _lock_in_child($dir, $key, $timeout):
+#	Try the entry lock from a child process. Return 1 when the
+#	child took the lock, and 0 when its deadline elapsed. The
+#	child exits through POSIX::_exit, so it runs no END block of
+#	the test harness.
+sub _lock_in_child ( $dir, $key, $timeout )
+{
+	my $pid = fork // die "Cannot fork: $!";
+	if ( $pid == 0 ) {
+		my $cache = App::FuguVM::DiskCache->new($dir);
+		my $lock  = $cache->lock_entry( $key, $timeout );
+		require POSIX;
+		POSIX::_exit( defined $lock ? 1 : 0 );
+	}
+
+	waitpid $pid, 0;
+	return $? >> 8;
+}
+
 sub _spit ( $path, $content )
 {
 	open my $fh, '>', $path or die "Cannot write $path: $!";
@@ -442,9 +649,9 @@ sub new ( $class, $cache_dir, $input_dir )
 	return $self;
 }
 
-sub _install_script ($self)
+sub _driver_script ( $self, $name )
 {
-	my $path = "$self->{input_dir}/install.exp";
+	my $path = "$self->{input_dir}/$name";
 	return -f $path ? $path : undef;
 }
 

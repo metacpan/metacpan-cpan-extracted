@@ -1,18 +1,26 @@
 #!/bin/sh
+# The org pack of FuguBSD/Tooling owns this file. Do not edit a
+# synced copy. Edit the canonical copy in FuguBSD/Tooling.
+#
 # Cross-platform file downloader
 # Usage: ftp output_file url
+#
+# A failed download must leave no file (SYNC-DOWNLOAD-9). Each
+# downloader writes the output file before it reads the response, so
+# each branch removes it on a failure. curl also needs -f: without it
+# an HTTP error exits 0 and writes the error page.
 
 OS=$(uname)
 
 case "$OS" in
 	OpenBSD)
-		ftp -o "$1" "$2"
+		ftp -o "$1" "$2" || { rm -f "$1"; exit 1; }
 		;;
 	Linux)
-		wget -O "$1" "$2"
+		wget -O "$1" "$2" || { rm -f "$1"; exit 1; }
 		;;
 	Darwin)
-		curl -L -o "$1" "$2"
+		curl -fL -o "$1" "$2" || { rm -f "$1"; exit 1; }
 		;;
 	*)
 		echo "ERROR: Unknown OS: $OS" >&2

@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::Util;
 # ABSTRACT: Utility functions for Tiller2QIF processing
-$Finance::Tiller2QIF::Util::VERSION = '1.08';
+$Finance::Tiller2QIF::Util::VERSION = '1.09';
 =head1 DESCRIPTION
 
 Provides utility functions for initializing the SQLite database and configuration files.
@@ -51,7 +51,7 @@ our @EXPORT_OK = qw( vPrint );
 
 use Path::Tiny;
 use Text::CSV;
-use Mojo::SQLite;
+use Finance::Tiller2QIF::DB qw( connect_db );
 use utf8;
 use warnings FATAL => 'utf8';
 use open ':std', ':encoding(UTF-8)';
@@ -74,9 +74,10 @@ CREATE TABLE IF NOT EXISTS transactions (
 /;
 
 sub InitDB ($db_path) {
-  my $dbmojo = Mojo::SQLite->new($db_path)->options( { sqlite_unicode => 1 } );
+  my $dbh = connect_db($db_path);
   # uncoverable branch true
-  $dbmojo->db->query($newDB) || die "unable to initialize database $!\n";
+  $dbh->do($newDB) || die "unable to initialize database $!\n";
+  $dbh->disconnect;
   say "Database $db_path created";
 }
 

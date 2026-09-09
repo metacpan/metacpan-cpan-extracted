@@ -10,7 +10,6 @@ use Finance::Tiller2QIF::Map;
 use Finance::Tiller2QIF::ReadCSV;
 use Finance::Tiller2QIF::WriteQIF;
 use Finance::Tiller2QIF::Util;
-use Mojo::SQLite;
 use feature qw/signatures postderef/;
 
 require './t/TestHelper.pm';

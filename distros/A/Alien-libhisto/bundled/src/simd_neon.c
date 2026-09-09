@@ -5,10 +5,14 @@
 #include "simd.h"
 #include "internal.h"
 #include "internal_2d.h"
-#include "simd_neon_bridge.h"
-#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 #ifdef LIBHISTO_ENABLE_NEON
+#if defined(__aarch64__) || defined(_M_ARM64) || defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || defined(__SSE4_1__)
+
+#include "simd_neon_bridge.h"
+#include <math.h>
 
 bool histo_fill_uniform_neon(histo_t *h, const double *x, size_t n) {
     size_t i = 0;
@@ -687,4 +691,5 @@ bool histo2d_fill_uniform_w2_neon(histo2d_t *h, const double *x, const double *y
     return had_non_finite;
 }
 
+#endif /* Vector arch support */
 #endif /* LIBHISTO_ENABLE_NEON */

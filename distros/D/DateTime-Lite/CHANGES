@@ -1,5 +1,16 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.8.1 2026-09-08T13:52:50+0900
+    [Security]
+    - Fix denial-of-service in _normalize_leap_seconds (CWE-407).
+      Thanks to CPANSec for reporting this.
+      This routine iterated one day at a time to normalise the seconds count,
+      so an attacker who could influence the seconds argument of $dt->add(seconds => $N)
+      on a non-floating timezone could occupy a worker process for O(|N|/86400) iterations.
+      Both the pure-Perl fallback and the XS path have been corrected to use constant-time
+      integer division and a bounded leap-second correction, matching the existing
+      _normalize_tai_seconds implementation.
+
 v0.8.0 2026-07-09T06:34:38+0900
     [Maintenance]
     - SQLite database updated with the newly released IANA data version 2026c.

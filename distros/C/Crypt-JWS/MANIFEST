@@ -25,6 +25,11 @@ t/04-sign-verify.t
 t/05-negatives.t
 t/06-abi.t
 t/07-openssl-cli.t
+t/data/README
+t/data/test-ec-cert.pem
+t/data/test-ec-key.pem
+t/data/test-rsa-cert.pem
+t/data/test-rsa-key.pem
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

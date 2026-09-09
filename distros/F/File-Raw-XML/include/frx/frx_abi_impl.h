@@ -16,10 +16,20 @@
  *
  * `parse` points at the strict form and always will; `parse_ex` is the
  * full profile's entry, and everything after it in the table is the rest
- * of what the full profile built. Nothing has been released, so the whole
- * table is version 1; the append-only rule begins the day it ships.
+ * of what the full profile built.
+ *
+ * The four version 2 entries are the exception to "needs only core
+ * headers": the SV bridge is the blessing layer, which lives in frx_obj.h,
+ * and frx_obj.h is included after this file because it is written against
+ * the writer and the reader. They are declared here and defined there.
  *
  * Needs frx_abi.h and every core header the entries name. */
+
+/* the SV bridge; defined in frx_obj.h, which comes after this file */
+static SV             *frx_abi_doc_to_sv(pTHX_ frx_doc *d);
+static frx_doc        *frx_abi_doc_from_sv(pTHX_ SV *sv);
+static const frx_node *frx_abi_node_from_sv(pTHX_ SV *sv, frx_doc **owner);
+static SV             *frx_abi_node_to_sv(pTHX_ SV *doc_sv, const frx_node *n);
 
 static void
 frx_abi_opts_init(frx_opts *o)
@@ -469,7 +479,13 @@ static const frx_abi FRX_ABI = {
     frx_abi_xpath_number,
     frx_abi_xpath_string,
     frx_abi_xpath_count,
-    frx_abi_xpath_node
+    frx_abi_xpath_node,
+
+    /* the SV bridge */
+    frx_abi_doc_to_sv,
+    frx_abi_doc_from_sv,
+    frx_abi_node_from_sv,
+    frx_abi_node_to_sv
 };
 
 /* The selftest: a fixed document through every entry, in C, with every
@@ -691,7 +707,13 @@ frx_abi_selftest_full(pTHX)
         frx_write_opts w;
         A->write_opts_init(&w);
         FRX_STEP(15);
-        out = A->write(aTHX_ A->document(d), d, &w, &err);
+        /* (A->write), never A->write(: under PERL_IMPLICIT_SYS iperlsys.h
+         * makes `write` a function-like macro (PerlLIO_write), and a
+         * member call written the usual way expands it and fails to
+         * compile. The parentheses leave `write` followed by `)` so the
+         * macro cannot fire. Every consumer of the table has to do the
+         * same; frx_abi.h says so beside the entry. */
+        out = (A->write)(aTHX_ A->document(d), d, &w, &err);
         if (!out || !SvCUR(out)) goto fail;
         FRX_STEP(16);
         d2 = A->parse_ex(SvPVX(out), SvCUR(out), &oe, &err);
@@ -935,6 +957,69 @@ frx_abi_selftest_full(pTHX)
         FRX_STEP(68);
         if (!xerr || !xat) goto fail;
     }
+
+    /* the SV bridge. The document here is handed to doc_to_sv, which takes
+     * it, so it is a third one and the SV frees it - the two above are
+     * still the caller's. */
+    {
+        frx_doc *owned = NULL;
+        frx_doc *back  = NULL;
+        SV      *dsv   = NULL, *nsv = NULL;
+        SV      *perr  = NULL;   /* mortal: parse owns it, never dec it */
+
+        /* the four entries below are version 2; walking them through a
+         * table that predates them would read past its end */
+        if (A->abi_version < 2) goto fail;
+
+        FRX_STEP(69);
+        owned = A->parse(aTHX_ "<b id='1'><c/></b>", 18, NULL, &perr);
+        if (!owned) goto fail;
+
+        FRX_STEP(70);
+        dsv = A->doc_to_sv(aTHX_ owned);        /* owned belongs to dsv now */
+        if (!dsv) { A->doc_free(aTHX_ owned); goto fail; }
+
+        FRX_STEP(71);
+        if (A->doc_from_sv(aTHX_ dsv) != owned) goto fail_sv;
+
+        FRX_STEP(72);
+        nsv = A->node_to_sv(aTHX_ dsv, A->root(owned));
+        if (!nsv) goto fail_sv;
+
+        FRX_STEP(73);
+        back = NULL;
+        if (A->node_from_sv(aTHX_ nsv, &back) != A->root(owned)) goto fail_sv;
+        FRX_STEP(74);
+        if (back != owned) goto fail_sv;
+
+        /* each unwrap answers NULL for the other's object, and for a
+         * reference that is not one of ours: this is the type test */
+        FRX_STEP(75);
+        if (A->doc_from_sv(aTHX_ nsv) != NULL) goto fail_sv;
+        FRX_STEP(76);
+        if (A->node_from_sv(aTHX_ dsv, NULL) != NULL) goto fail_sv;
+        FRX_STEP(77);
+        if (A->doc_from_sv(aTHX_ sv_2mortal(newRV_noinc(newSViv(0)))) != NULL)
+            goto fail_sv;
+        FRX_STEP(78);
+        if (A->node_from_sv(aTHX_ &PL_sv_undef, &back) != NULL || back != NULL)
+            goto fail_sv;
+
+        /* the node holds the document up: dropping dsv first must leave
+         * nsv usable, which is the borrow the header promises */
+        FRX_STEP(79);
+        SvREFCNT_dec(dsv);
+        dsv = NULL;
+        if (A->node_from_sv(aTHX_ nsv, &back) != A->root(owned)) goto fail_sv;
+
+        SvREFCNT_dec(nsv);                      /* frees the document */
+        goto bridged;
+    fail_sv:
+        if (nsv) SvREFCNT_dec(nsv);
+        if (dsv) SvREFCNT_dec(dsv);
+        goto fail;
+    }
+bridged:
 
     A->doc_free(aTHX_ built);
     A->doc_free(aTHX_ d);

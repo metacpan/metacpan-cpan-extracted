@@ -120,6 +120,32 @@ rewound.
 
 The body decoded as JSON through File::Raw::JSON's C ABI.
 
+=head2 xml
+
+The body parsed as XML through File::Raw::XML's C ABI, as a
+L<File::Raw::XML::Document>; C<undef> when there is no body. Walk it with
+C<< ->root >> and the node methods, or query it with C<< ->xpath >>.
+
+Punk maps nothing between XML and Perl data. JSON's model is Perl's, so a
+hash reference has one obvious encoding; XML's is not, and every convention
+for elements against attributes, ordering, mixed content and repeated
+elements is wrong for some schema. What you get is the document.
+
+The parse is strict: a document type declaration is refused wherever it
+stands, which is what removes external entities, parameter entities, the
+external DTD fetch, XXE and the billion laughs - not as a setting that could
+be turned off, but as a shape the parser will not accept. There are no
+options, and there will not be: a profile or a resolver reachable from a
+request is the switch that would give all of that back. A body that is not
+well-formed dies, as a malformed JSON body does; the size ceiling is
+C<max_body>, which refuses an oversized body before it is read at all.
+
+The document is parsed once and kept for the rest of the request, so two
+calls answer with the same object rather than two copies - which is what
+makes a node's C<< ->doc >> and a C<by_id> result name one document. That
+tree is editable, so a change one caller makes is a change the next one
+sees, the way C<body> hands back the one cached scalar.
+
 =head2 body_each($code, %options)
 
     my $bytes = $c->req->body_each(sub {

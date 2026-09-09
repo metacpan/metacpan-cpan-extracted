@@ -6,7 +6,7 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 use Data::Record::Serialize::Error { errors => [qw( internal  )] }, -all;
 
@@ -57,7 +57,7 @@ Data::Record::Serialize::Role::EncodeAndSink - Both an Encode and Sink. handle u
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =for Pod::Coverage say
 print

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.129-5-g0e1dd16
+package JSON::Schema::Draft201909; # git description: v0.130-3-g7e1449a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: (DEPRECATED) Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -17,8 +17,12 @@ use namespace::clean;
 
 extends 'JSON::Schema::Modern';
 
+my $warned;
+
 around BUILDARGS => sub {
   my ($orig, $class, @args) = @_;
+
+  Carp::carp 'JSON::Schema::Draft201909 is deprecated; use JSON::Schema::Modern' if not $warned++;
 
   return $class->$orig(
     @args == 1 && ref $args[0] eq 'HASH' ? %{$args[0]} : @args,
@@ -40,7 +44,10 @@ JSON::Schema::Draft201909 - (DEPRECATED) Validate data against a schema
 
 =head1 VERSION
 
-version 0.130
+version 0.131
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 DESCRIPTION
 
@@ -87,6 +94,14 @@ L<https://json-schema.org/draft/2019-09/release-notes.html>
 L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: tutorial-focused documentation
 
 =back
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Draft201909>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Draft201909>.
 
 =head1 SUPPORT
 

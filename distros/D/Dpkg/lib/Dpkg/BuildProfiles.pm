@@ -48,6 +48,40 @@ use Dpkg::BuildEnv;
 my $cache_profiles;
 my @build_profiles;
 
+my $profile_name_regex = qr{
+    # Be lenient for now. Accept operators for extensibility, uppercase,
+    # and package name characters.
+    [
+        ?/;:=@%*~_
+        A-Z
+        a-z0-9+.\-
+    ]+
+}x;
+
+my $restriction_list_regex = qr{
+    <
+    \s*
+    (
+        !? $profile_name_regex
+        (?:
+            \s+
+            !? $profile_name_regex
+        )*
+    )
+    \s*
+    >
+}x;
+
+my $restriction_formula_regex = qr{
+    ^
+    (?:
+        \s*
+        $restriction_list_regex
+    )*
+    \s*
+    $
+}x;
+
 =head1 FUNCTIONS
 
 =over 4
@@ -63,7 +97,15 @@ sub get_build_profiles {
     return @build_profiles if $cache_profiles;
 
     if (Dpkg::BuildEnv::has('DEB_BUILD_PROFILES')) {
-        @build_profiles = split ' ', Dpkg::BuildEnv::get('DEB_BUILD_PROFILES');
+        @build_profiles = map {
+            if (m{^$profile_name_regex$}) {
+                $_
+            } else {
+                warning(g_('invalid profile name %s ' .
+                           'in environment variable %s; ignoring it for now'),
+                        $_, 'DEB_BUILD_PROFILES');
+            }
+        } split ' ', Dpkg::BuildEnv::get('DEB_BUILD_PROFILES');
     }
     $cache_profiles = 1;
 
@@ -81,7 +123,13 @@ sub set_build_profiles {
     my (@profiles) = @_;
 
     $cache_profiles = 1;
-    @build_profiles = @profiles;
+    @build_profiles = map {
+        if (m{^$profile_name_regex$}) {
+            $_
+        } else {
+            warning(g_('invalid profile name %s; ignoring it for now'), $_);
+        }
+    } @profiles;
     Dpkg::BuildEnv::set('DEB_BUILD_PROFILES', join ' ', @profiles);
 }
 
@@ -90,42 +138,6 @@ sub set_build_profiles {
 Validate a build profile formula.
 
 =cut
-
-my $profile_name_regex = qr{
-    !?
-    # Be lenient for now. Accept operators for extensibility, uppercase,
-    # and package name characters.
-    [
-        ?/;:=@%*~_
-        A-Z
-        a-z0-9+.\-
-    ]+
-}x;
-
-my $restriction_list_regex = qr{
-    <
-    \s*
-    (
-        $profile_name_regex
-        (?:
-            \s+
-            $profile_name_regex
-        )*
-    )
-    \s*
-    >
-}x;
-
-my $restriction_formula_regex = qr{
-    ^
-    (?:
-        \s*
-        $restriction_list_regex
-    )*
-    \s*
-    $
-}x;
-
 
 sub build_profile_is_invalid($string)
 {
@@ -152,7 +164,7 @@ sub parse_build_profiles($string)
     return map { [ split ' ' ] } @restrictions;
 }
 
-=item evaluate_restriction_formula(\@formula, \@profiles)
+=item $bool = evaluate_restriction_formula(\@formula, \@profiles)
 
 Evaluate whether a restriction formula of the form "<foo bar> <baz>", given as
 a nested array, is true or false, given the array of enabled build profiles.

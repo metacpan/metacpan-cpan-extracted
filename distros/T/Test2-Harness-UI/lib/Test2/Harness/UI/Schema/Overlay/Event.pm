@@ -10,7 +10,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 __PACKAGE__->parent_column('parent_id');
 
@@ -67,9 +67,9 @@ sub line_data {
     my $has_orphan = ($cols{has_orphan} || $cols{orphan}) ? 1 : 0;
     my $has_binary = $cols{has_binary} ? 1 : 0;
 
-    $cols{facets} = $self->facets if $has_facets;
+    my $facets = $has_facets ? $cols{facets} : undef;
 
-    $out{lines} = Test2::Formatter::Test2::Composer->render_super_verbose($has_facets ? $self->facets : $self->orphan);
+    $out{lines} = Test2::Formatter::Test2::Composer->render_super_verbose($facets // $cols{orphan});
 
     if ($has_binary) {
         for my $binary ($self->binaries) {
@@ -92,8 +92,8 @@ sub line_data {
 
     $out{event_id} = $cols{event_id};
 
-    $out{is_parent} = ($has_facets && $cols{facets}{parent}) ? 1 : 0;
-    $out{is_fail}   = ($has_facets && $cols{facets}{assert}) ? $cols{facets}{assert}{pass} ? 0 : 1 : undef;
+    $out{is_parent} = ($facets && $facets->{parent}) ? 1 : 0;
+    $out{is_fail}   = ($facets && $facets->{assert}) ? $facets->{assert}{pass} ? 0 : 1 : undef;
 
     return \%out;
 }

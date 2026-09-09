@@ -1,5 +1,17 @@
 #!/usr/bin/env perl
 
+# Start the Oracle instance using the docker configuration.
+#
+#   xt/docker-compose.yml
+#
+# with command like:
+#
+#   docker compose up -d
+#
+# once done, stop the service:
+#
+#   docker compose stop
+
 use strict;
 use warnings;
 use Test::More;

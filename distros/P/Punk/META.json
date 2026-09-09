@@ -32,6 +32,7 @@
             "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0",
             "File::Raw::JSON" : "0.06",
+            "File::Raw::XML" : "0.03",
             "Hyperman" : "0.32",
             "JSON::Schema::Fast" : "0.05",
             "Markdown::Simple" : "0.21",
@@ -52,6 +53,7 @@
             "DBIx::Loop" : "0.07",
             "Fetch" : "0.12",
             "File::Raw::JSON" : "0.06",
+            "File::Raw::XML" : "0.03",
             "Hyperman" : "0.32",
             "JSON::Schema::Fast" : "0.05",
             "Markdown::Simple" : "0.21",
@@ -69,6 +71,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.45",
+   "version" : "0.46",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

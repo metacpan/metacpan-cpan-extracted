@@ -1,0 +1,92 @@
+# SSODemo configuration. Safe to commit: secrets are referenced here,
+# never written here.
+#
+# Layered - this file, then punk.$PUNK_ENV.yml, then punk.local.yml, each
+# merged over the last. Put deployment differences in the environment file
+# and machine-local ones in punk.local.yml, which is gitignored.
+
+views:
+  Stencil:
+    template_dir: root/templates
+    wrapper: layout.tmpl
+
+static:
+  /static: root/static
+
+# The application's canonical origin, declared once. Never taken from a
+# request's Host header, which is attacker-supplied.
+#
+# REQUIRED by Punk::Plugin::SAML, and it must be https. The identity
+# provider answers with a cross-site POST; the cookie carrying the login
+# state must therefore be SameSite=None, and browsers drop such a cookie
+# unless it is also Secure. The assertion consumer URL is derived from
+# this and the provider compares it character for character, so it cannot
+# be guessed from a request.
+#
+# Over plain http nothing fails at startup and every login fails at the
+# assertion consumer. The plugin refuses to boot instead.
+host: https://localhost:5000
+
+# GET /favicon.ico, from bytes frozen at boot: browsers and search engines
+# ask at the site root, where the /static mount does not answer.
+#
+# favicon: root/static/favicon.ico
+
+# A database, and the shape a secret takes. The value of `password` is
+# resolved at boot from outside this file and kept out of $app->config, which
+# reads [redacted] in its place - so the configuration can be logged or
+# serialised without leaking it. Reach the real value with
+# $app->secret('database.password').
+#
+# database:
+#   dsn:      dbi:Pg:dbname=ssodemo;host=localhost
+#   user:     ssodemo
+#   password: { $env: SSODEMO_DB_PASSWORD }
+#
+# Other forms: { $file: /run/secrets/db } (how Docker and Kubernetes deliver
+# one), { $exec: [vault, read, -field=password, secret/db] }, and
+# { $literal: ... } when you really do mean the value inline.
+
+# Signed cookie sessions. $c->login writes here, and auth_guard reads it.
+#
+# The secret belongs outside this file in a real deployment:
+#   secret: { $env: SSODEMO_SESSION_KEY }
+# It is inline here so the example runs with no setup. Change it.
+session:
+  secret:   { $literal: change-me-session-secret-at-least-32-bytes }
+  expires:  7d
+  secure:   true
+  samesite: Lax
+
+# csrf: true
+#   # Safe to turn on with SAML: the plugin adds its own assertion
+#   # consumer path to the exempt list at boot. That POST arrives from
+#   # the provider's origin with no session and no token - it is the one
+#   # request in the application that is supposed to look exactly like a
+#   # forgery, and what protects it is the assertion checking, not a
+#   # token. See perldoc Punk::Plugin::SAML.
+#   # every POST/PUT/PATCH/DELETE then needs a live token; put
+#   # {% raw csrf %} in the form and pass csrf => $c->csrf_field when
+#   # you render it. See perldoc Punk::CSRF.
+
+# Cross-origin access, if a browser on another origin calls this. A bare
+# `cors: true` is Allow-Origin: * with no credentials - right for a public
+# API. Cookies need the origins named; see perldoc Punk::CORS.
+#
+# cors:
+#   origins:     [ https://app.example.com ]
+#   credentials: true
+#   paths:       [ /api ]
+
+# The SAML plugin's own settings. `secret` signs the flow cookie that
+# carries a login across the redirect to the provider and back.
+#
+# Generate one with `punk saml key`. In a real deployment it is
+# { $env: SSODEMO_SAML_KEY }; it is inline here so the example runs.
+# A secret minted per worker fails one login in four.
+plugins:
+  SAML:
+    secret: { $literal: change-me-saml-flow-secret-32-bytes-ok }
+
+# plugins:
+#   RequestId: {}

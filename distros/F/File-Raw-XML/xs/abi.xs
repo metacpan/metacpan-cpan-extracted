@@ -11,6 +11,15 @@ _abi_ptr()
     OUTPUT:
         RETVAL
 
+IV
+_abi_version()
+    CODE:
+        /* the table's own version, for a consumer's build-time guard to
+         * assert against without resolving the table itself */
+        RETVAL = FRX_ABI.abi_version;
+    OUTPUT:
+        RETVAL
+
 void
 _abi_selftest()
     PREINIT:

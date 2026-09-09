@@ -165,8 +165,7 @@ sub initialize {
         $type = 'alias-c++';
     }
 
-    # Support old style wildcard syntax. That is basically a symver with an
-    # optional tag.
+    # Support old style wildcard syntax. That is a symver with an optional tag.
     if ($self->get_symbolname() =~ /^\*@(.*)$/) {
         warning(g_('deprecated wildcard syntax in "%s"; use "%s" instead'),
                 $self->get_symbolname(), "(symver|optional)$1");
@@ -184,7 +183,7 @@ sub initialize {
                     $self->get_symbolspec(1));
         }
         if ($self->get_symbolname() eq 'Base') {
-            error(g_('you can not use symver tag to catch unversioned symbols: %s'),
+            error(g_('cannot use symver tag to match unversioned symbols: %s'),
                   $self->get_symbolspec(1));
         }
     }

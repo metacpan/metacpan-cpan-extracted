@@ -686,8 +686,20 @@ double histo_underflow(const histo_t *h) {
     return h ? h->underflow_weight : 0.0;
 }
 
+double histo_underflow_sum_w2(const histo_t *h) {
+    return h ? h->underflow_sum_w2 : 0.0;
+}
+
 double histo_overflow(const histo_t *h) {
     return h ? h->overflow_weight : 0.0;
+}
+
+double histo_overflow_sum_w2(const histo_t *h) {
+    return h ? h->overflow_sum_w2 : 0.0;
+}
+
+uint32_t histo_flags(const histo_t *h) {
+    return h ? h->flags : 0;
 }
 
 uint64_t histo_nan_count(const histo_t *h) {
@@ -1917,6 +1929,50 @@ static int compare_doubles(const void *a, const void *b) {
     return 0;
 }
 
+static histo_status_t compute_sample_bounds_and_variance(
+    size_t n, const double *values,
+    size_t *out_valid_n,
+    double *out_min, double *out_max,
+    double *out_mean, double *out_std
+) {
+    if (n == 0 || !values || !out_valid_n || !out_min || !out_max) {
+        return HISTO_ERR_INVALID_ARG;
+    }
+
+    size_t valid_n = 0;
+    double min_v = DBL_MAX;
+    double max_v = -DBL_MAX;
+    double mean = 0.0;
+    double M2 = 0.0;
+
+    for (size_t i = 0; i < n; i++) {
+        double v = values[i];
+        if (isfinite(v)) {
+            valid_n++;
+            if (v < min_v) min_v = v;
+            if (v > max_v) max_v = v;
+            double delta = v - mean;
+            mean += delta / (double)valid_n;
+            double delta2 = v - mean;
+            M2 += delta * delta2;
+        }
+    }
+
+    if (valid_n == 0) {
+        return HISTO_ERR_EMPTY;
+    }
+
+    *out_valid_n = valid_n;
+    *out_min = min_v;
+    *out_max = max_v;
+    if (out_mean) *out_mean = mean;
+    if (out_std) {
+        double variance = (valid_n > 1) ? (M2 / (double)(valid_n - 1)) : 0.0;
+        *out_std = sqrt(variance);
+    }
+    return HISTO_OK;
+}
+
 static histo_status_t compute_sample_stats_sorted(
     size_t n, const double *values,
     double **out_sorted, size_t *out_valid_n,
@@ -2043,13 +2099,11 @@ histo_status_t histo_estimate_bins_fd(size_t n, const double *values, uint32_t *
 histo_status_t histo_estimate_bins_scott(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max) {
     if (!out_nbins || !out_min || !out_max) return HISTO_ERR_INVALID_ARG;
 
-    double *sorted = NULL;
     size_t valid_n = 0;
-    double min_v = 0.0, max_v = 0.0, mean = 0.0, std_dev = 0.0, skewness = 0.0, iqr = 0.0;
+    double min_v = 0.0, max_v = 0.0, std_dev = 0.0;
 
-    histo_status_t st = compute_sample_stats_sorted(n, values, &sorted, &valid_n, &min_v, &max_v, &mean, &std_dev, &skewness, &iqr);
+    histo_status_t st = compute_sample_bounds_and_variance(n, values, &valid_n, &min_v, &max_v, NULL, &std_dev);
     if (st != HISTO_OK) return st;
-    free(sorted);
 
     double range = max_v - min_v;
     if (range <= 0.0) {
@@ -2083,13 +2137,11 @@ histo_status_t histo_estimate_bins_scott(size_t n, const double *values, uint32_
 histo_status_t histo_estimate_bins_sturges(size_t n, const double *values, uint32_t *out_nbins, double *out_min, double *out_max) {
     if (!out_nbins || !out_min || !out_max) return HISTO_ERR_INVALID_ARG;
 
-    double *sorted = NULL;
     size_t valid_n = 0;
     double min_v = 0.0, max_v = 0.0;
 
-    histo_status_t st = compute_sample_stats_sorted(n, values, &sorted, &valid_n, &min_v, &max_v, NULL, NULL, NULL, NULL);
+    histo_status_t st = compute_sample_bounds_and_variance(n, values, &valid_n, &min_v, &max_v, NULL, NULL);
     if (st != HISTO_OK) return st;
-    free(sorted);
 
     double range = max_v - min_v;
     if (range <= 0.0) {

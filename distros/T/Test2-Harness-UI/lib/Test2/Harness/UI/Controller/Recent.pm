@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Recent;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Data::GUID;
 use Test2::Harness::UI::Response qw/resp error/;
@@ -30,7 +30,7 @@ sub handle {
         username     => $user_name,
         project_name => $project_name,
         query        => {},
-        attrs        => {order_by => {'-desc' => 'added'}, rows => $count},
+        attrs        => {order_by => {'-desc' => 'run_ord'}, rows => $count},
         list         => 1,
     );
 

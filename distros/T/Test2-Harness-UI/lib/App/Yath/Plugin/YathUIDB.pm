@@ -2,7 +2,7 @@ package App::Yath::Plugin::YathUIDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Test2::Harness::UI::Util qw/config_from_settings/;
 use Test2::Harness::Util::JSON qw/decode_json/;
@@ -21,7 +21,7 @@ option_group {prefix => 'yathui', category => "YathUI Options"} => sub {
     option schema => (
         type => 's',
         default => 'PostgreSQL',
-        long_examples => [' PostgreSQL', ' MySQL', ' MySQL56'],
+        long_examples => [' PostgreSQL', ' MySQL'],
         description => "What type of DB/schema to use when using a temporary database",
     );
 

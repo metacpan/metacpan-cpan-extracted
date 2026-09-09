@@ -1,5 +1,36 @@
 Revision history for Punk
 
+0.46    2026-09-08
+        - ADDS: $c->req->xml - the request body parsed as XML through
+          File::Raw::XML's C ABI, as a File::Raw::XML::Document. The parse
+          is strict and takes no options: a DOCTYPE is refused wherever it
+          stands, so external entities, XXE and the billion laughs are not
+          reachable from a request. Parsed once per request.
+        - ADDS: $c->xml($doc, $status?) - a Document, a Node or a string of
+          markup as an application/xml response.
+        - FIXES: a File::Raw::XML::Document returned from a handler, or set
+          as a Punk::Response body, was JSON-encoded - it is a blessed
+          reference like any other. It is now written as markup, which is
+          also what makes respond_to(xml => sub { $doc }) answer
+          application/xml.
+        - Punk::Test takes `xml => $doc_or_string` as a request body and
+          answers ->xml with the parsed response.
+        - NOTE: $c->validate's `auto` source recognises only
+          application/json, so a schema on an XML POST validates the query
+          string rather than the body. Name the source to be sure of it.
+        - File::Raw::XML 0.03 is a new prerequisite.
+        - FIXES: the file cache's single-flight lock judged its holder's age
+          from whole-second st_mtime, so an age could read a second too high
+          and a `lock_wait` under a second was spent before it began 
+        - FIXES: a single-flight lock that could not be attempted at all - a
+          path that would not form - answered "you won", so every caller
+          computed and the herd ran unprotected with nothing said. It is
+          counted now and reported as `lock_errors` from the file store's
+          stats.
+        - t/0733-auth-sqitch.t asserted Sqitch's own deploy output, which is
+          translated - under LC_ALL=de_DE a successful deploy reports
+          "+ users ........ OK" and the test failed.
+
 0.45    2026-09-06
         - A model class may now be subclassed: `package MyApp::Model::Thing;
           our @ISA = ('Punk::Model::Thing');` inherits the parent's table and

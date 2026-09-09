@@ -21,12 +21,12 @@ ok(
           ),
           ;
     },
-    "constructor"
+    'constructor'
 ) or diag $@;
 
 $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 $s->send( { a => 1, b => 2 } );
-$s->send( { a => 1, b => 2, c => '' } );
+$s->send( { a => 1, b => 2, c => q{} } );
 
 is( $buf, read_text( catfile( qw[ t data encoders data.rdb ] ) ), 'properly formatted' );
 

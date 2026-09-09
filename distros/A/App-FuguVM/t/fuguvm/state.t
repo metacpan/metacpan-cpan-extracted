@@ -112,19 +112,45 @@ use_ok('App::FuguVM::State');
     ok(!-f "$tmpdir/test/proxy.pid", 'proxy.pid removed');
 }
 
+# The autoinstall responder rides on its own pid file too
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $state = App::FuguVM::State->new($tmpdir, 'test');
+
+    isa_ok($state->autoinstall_pidfile, 'Fugu::Pidfile',
+	'autoinstall_pidfile');
+    like($state->autoinstall_pidfile->path, qr{\Q$tmpdir\E/test/},
+	'the pid file lives under the state directory of the guest');
+    isnt($state->autoinstall_pidfile->path, $state->proxy_pidfile->path,
+	'and its path differs from the proxy pid file');
+
+    $state->autoinstall_pidfile->write_pid(33333);
+    is($state->autoinstall_pidfile->read_pid, 33333,
+	'the responder pid file stores its own PID');
+    ok(-f "$tmpdir/test/autoinstall.pid", 'autoinstall.pid is its own file');
+    $state->autoinstall_pidfile->remove;
+    ok(!-f "$tmpdir/test/autoinstall.pid", 'autoinstall.pid removed');
+}
+
 # Test installation state
 {
     my $tmpdir = tempdir(CLEANUP => 1);
     my $state = App::FuguVM::State->new($tmpdir, 'test');
-    
+
     ok(!$state->is_installed, 'Not installed initially');
-    
-    $state->mark_installed;
+    is($state->get_installed_arch, undef,
+	'a fresh state records no architecture');
+
+    $state->mark_installed('arm64');
     ok($state->is_installed, 'Installed after mark_installed');
-    
+    is($state->get_installed_arch, 'arm64',
+	'mark_installed records the architecture');
+
     # Reload the state and make sure that the value persists
     my $state2 = App::FuguVM::State->new($tmpdir, 'test');
     ok($state2->is_installed, 'Installation state persisted');
+    is($state2->get_installed_arch, 'arm64',
+	'the architecture persists across a reload');
 }
 
 # Test disk paths
@@ -165,6 +191,39 @@ use_ok('App::FuguVM::State');
     # Reload the state and make sure that the value persists
     my $state2 = App::FuguVM::State->new($tmpdir, 'test');
     is($state2->get_installed_ssh_pubkey, $test_pubkey, 'Pubkey persisted correctly');
+}
+
+# The runtime record: the facts of one run of one guest
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $state = App::FuguVM::State->new($tmpdir, 'test');
+
+    is_deeply($state->get_runtime, {},
+	'get_runtime returns an empty hash reference for a fresh state');
+
+    $state->set_runtime(
+	accel        => 'kvm',
+	ssh_port     => 2223,
+	console_port => 4445,
+    );
+    is_deeply($state->get_runtime,
+	{ accel => 'kvm', ssh_port => 2223, console_port => 4445 },
+	'set_runtime and get_runtime round-trip the three facts');
+
+    # The record persists across a reload
+    my $state2 = App::FuguVM::State->new($tmpdir, 'test');
+    is($state2->get_runtime->{ssh_port}, 2223,
+	'the record survives a reload');
+
+    # clear_runtime empties the record, and the store survives
+    $state2->set_root_password('sentinel');
+    $state2->clear_runtime;
+    is_deeply($state2->get_runtime, {}, 'clear_runtime empties the record');
+
+    my $state3 = App::FuguVM::State->new($tmpdir, 'test');
+    is_deeply($state3->get_runtime, {}, 'and the clearing persists');
+    is($state3->get_root_password, 'sentinel',
+	'the rest of the store survives the clearing');
 }
 
 # ============================================================

@@ -18,23 +18,27 @@
 use v5.36;
 
 package App::FuguVM::CLI;
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
+use File::Basename;
+use File::Spec ();
 use Fugu::CLI;
 use Fugu::File;
 use Fugu::Log;
-use Fugu::SSH;
 use App::FuguVM::Config;
 use App::FuguVM::Disk;
 use App::FuguVM::Console;
 use App::FuguVM::DiskCache;
+use App::FuguVM::Mirror;
 use App::FuguVM::Proxy;
+use App::FuguVM::Remote;
 use App::FuguVM::State;
 use App::FuguVM::Guest;
 
 # The generic exit codes come from Fugu::CLI. Only the codes that
-# mean something to a VM are defined here, and App::FuguVM::Guest uses them
-# from here rather than defining the same numbers again.
+# mean something to a VM are defined here. App::FuguVM::Guest defines
+# the codes that it returns itself: this module loads it, and the
+# reverse import would be a cycle.
 use constant {
 	EXIT_SUCCESS      => Fugu::CLI::EXIT_SUCCESS,
 	EXIT_ERROR        => Fugu::CLI::EXIT_ERROR,
@@ -74,6 +78,7 @@ my %COMMANDS = (
 	},
 	status => {
 		summary => 'Show VM status',
+		usage   => '[key]',
 		method  => 'cmd_status',
 	},
 	start => {
@@ -88,11 +93,22 @@ my %COMMANDS = (
 	},
 	ssh => {
 		summary => 'Open SSH session or run command',
-		usage   => '[command]',
+		usage   => '[--] [command [argument ...]]',
 		method  => 'cmd_ssh',
 	},
+	put => {
+		summary => 'Copy a local file or directory into the VM',
+		usage   => '[--mode=<octal>] <local> <remote>',
+		options => { 'mode=s' => 'the mode of each written file' },
+		method  => 'cmd_put',
+	},
+	get => {
+		summary => 'Copy one guest file to the host',
+		usage   => '<remote> <local>',
+		method  => 'cmd_get',
+	},
 	console => {
-		summary => 'Show console connection info',
+		summary => 'Attach to the VM serial console',
 		method  => 'cmd_console',
 	},
 	expect => {
@@ -112,11 +128,22 @@ my %COMMANDS = (
 		options => { 'stale' => 'keep the entry the current VM uses' },
 		method  => 'cmd_cache',
 	},
+	mirror => {
+		summary => 'Fetch and verify OpenBSD mirror files',
+		usage   => '<fetch <file>|verify>',
+		method  => 'cmd_mirror',
+	},
 	snapshot => {
 		summary => 'Manage snapshots (save, restore, rm, list)',
 		usage   => '<save|restore|rm|list> [name] [--names]',
 		options => { 'names' => 'print names only' },
 		method  => 'cmd_snapshot',
+	},
+	image => {
+		summary => 'Export the installed base image',
+		usage   => 'export <path> [--format=qcow2|raw]',
+		options => { 'format=s' => 'the output format: qcow2 or raw' },
+		method  => 'cmd_image',
 	},
 	disk => {
 		summary => 'Manage disk (check, repair, info)',
@@ -178,7 +205,7 @@ sub run ( $class, @argv )
 				my $vm = $self->_load_vm(
 					no_cache => $cli->option('no-cache')
 					    // 0 )
-				    or return EXIT_VM_NOT_FOUND;
+				    or return $self->{load_exit};
 				my @verb_args =
 				    $method eq 'stop'
 				    ? ( $cli->option('force') // 0 )
@@ -208,7 +235,7 @@ sub run ( $class, @argv )
 Examples:
   fuguvm init
   fuguvm up
-  fuguvm ssh "uname -a"
+  fuguvm ssh -- uname -a
   fuguvm wait --timeout=300
   fuguvm --vm minimal up
 EOF
@@ -268,11 +295,20 @@ sub _prepare ( $self, $cli, $entry )
 	return;
 }
 
+# $self->_load_vm(%opts):
+#	Load the invoked VM, or return undef with the exit code in
+#	$self->{load_exit}. An unknown configuration value gives
+#	EXIT_CONFIG_ERROR. A VM that no file declares gives
+#	EXIT_VM_NOT_FOUND.
 sub _load_vm ( $self, %opts )
 {
 	my $vm_config = $self->{config}->load_vm( $self->{vm_name} );
 	if ( !defined $vm_config ) {
-		$self->{log}->error("VM '$self->{vm_name}' not found");
+		my $reason = $self->{config}->error;
+		$self->{load_exit} =
+		    defined $reason ? EXIT_CONFIG_ERROR : EXIT_VM_NOT_FOUND;
+		$self->{log}
+		    ->error( $reason // "VM '$self->{vm_name}' not found" );
 		return;
 	}
 
@@ -285,63 +321,224 @@ sub _load_vm ( $self, %opts )
 	);
 }
 
-# Show the VM status
+# Show the VM status. The report is data, so it goes to standard
+# output whatever --quiet says. An optional key argument selects one
+# bare value, so a make target reads one port without a text filter.
 sub cmd_status ( $self, $cli, @args )
 {
-	my $vm = $self->_load_vm or return EXIT_VM_NOT_FOUND;
+	my ( $key, @extra ) = @args;
+	if (@extra) {
+		$self->{log}->error('Usage: fuguvm status [key]');
+		return EXIT_INVALID_ARGS;
+	}
 
-	$self->_dump_sorted( $vm->status );
+	my $vm     = $self->_load_vm or return $self->{load_exit};
+	my $status = $vm->status;
+
+	if ( defined $key ) {
+		if ( !exists $status->{$key} ) {
+			$self->{log}->error(
+				sprintf(
+					"Unknown status key '%s' (valid keys:"
+					    . ' %s)',
+					$key, join( ', ', sort keys %$status ) )
+			);
+			return EXIT_INVALID_ARGS;
+		}
+
+		say $status->{$key} // '';
+		return EXIT_SUCCESS;
+	}
+
+	$self->_dump_sorted($status);
 	return EXIT_SUCCESS;
 }
 
 # $self->_dump_sorted($hash):
-#	Log the hash as sorted "key: value" lines.
+#	Write the hash as sorted "key: value" lines to standard
+#	output, where a shell can read them. A line with an empty
+#	value ends with the colon and one space, so every line has one
+#	shape.
 sub _dump_sorted ( $self, $hash )
 {
 	for my $key ( sort keys %$hash ) {
 		my $value = $hash->{$key} // '';
-		$self->{log}->info("$key: $value");
+		say "$key: $value";
 	}
 
 	return;
 }
 
-# Open an SSH session into the VM, or run a command
-sub cmd_ssh ( $self, $cli, @args )
+# $self->_require_port($vm, $directive):
+#	Return the resolved port of the guest, or undef with a
+#	diagnostic. A stopped guest with a directive of 'auto' has no
+#	port, and a connection with an undef port would reach the
+#	default port of the protocol on the host itself.
+sub _require_port ( $self, $vm, $directive )
 {
-	my $vm = $self->_load_vm or return EXIT_VM_NOT_FOUND;
+	my $port = $directive eq 'ssh_port' ? $vm->ssh_port : $vm->console_port;
+	return $port if defined $port;
+
+	$self->{log}->error( "VM '$self->{vm_name}' has no $directive now."
+		    . " Run 'fuguvm up' first." );
+	return;
+}
+
+# $self->_require_running($vm):
+#	Return 1 while the guest runs. Log one line and return 0
+#	otherwise, because a clear message beats a "Failed to connect"
+#	from libssh2.
+sub _require_running ( $self, $vm )
+{
+	return 1 if $vm->is_running;
+
+	$self->{log}->error( "VM '$self->{vm_name}' does not run."
+		    . " Run 'fuguvm up' first." );
+	return 0;
+}
+
+# $self->_require_remote($vm, $directive):
+#	Return the App::FuguVM::Remote object of the guest, or undef.
+#	The guest must run, and the port of $directive must resolve.
+#	_require_running and _require_port each log the reason.
+sub _require_remote ( $self, $vm, $directive )
+{
+	return if !$self->_require_running($vm);
+
+	my $port = $self->_require_port( $vm, $directive );
+	return if !defined $port;
 
 	# The connection uses the SSH agent for authentication. Connect
-	# over IPv4: QEMU forwards the guest SSH port on 127.0.0.1 only.
-	# On dual-stack hosts, for example CI runners, 'localhost'
-	# resolves to ::1 first.
-	my $ssh = Fugu::SSH->new(
-		host => '127.0.0.1',
-		port => $vm->ssh_port,
-		user => 'root',
+	# to the IPv4 address that the forwarded port binds to. A name
+	# such as 'localhost' resolves to ::1 first on a dual-stack
+	# host, and QEMU does not listen there.
+	return App::FuguVM::Remote->new(
+		host => $vm->connect_address,
+		port => $port,
 	);
+}
+
+# Open an SSH session into the VM, or run one argument vector on it
+sub cmd_ssh ( $self, $cli, @args )
+{
+	my $vm = $self->_load_vm or return $self->{load_exit};
+
+	my $remote = $self->_require_remote( $vm, 'ssh_port' );
+	return EXIT_ERROR if !defined $remote;
 
 	if (@args) {
-		my $result = $ssh->run_command( join( ' ', @args ) );
+		my $result = $remote->run(@args);
 		print $result->{stdout}        if $result->{stdout};
 		print STDERR $result->{stderr} if $result->{stderr};
 		return $result->{exit_code};
 	}
 	else {
-		return $ssh->interactive;
+		return $remote->interactive;
 	}
 }
 
-# Show the console connection info
+# Copy a local file or a local directory into the guest
+sub cmd_put ( $self, $cli, @args )
+{
+	my ( $local, $remote_path, @extra ) = @args;
+	if ( !defined $local || !defined $remote_path || @extra ) {
+		$self->{log}->error(
+			'Usage: fuguvm put [--mode=<octal>] <local> <remote>');
+		return EXIT_INVALID_ARGS;
+	}
+	if ( index( $remote_path, '/' ) != 0 ) {
+		$self->{log}
+		    ->error("The remote path is not absolute: $remote_path");
+		return EXIT_INVALID_ARGS;
+	}
+
+	my $mode = $cli->option('mode');
+	if ( defined $mode && $mode !~ /^[0-7]{3,4}$/ ) {
+		$self->{log}->error(
+			"Invalid --mode value: $mode (3 or 4 octal digits)");
+		return EXIT_INVALID_ARGS;
+	}
+	if ( -l $local || ( !-f $local && !-d $local ) ) {
+		$self->{log}
+		    ->error("Not a regular file or a directory: $local");
+		return EXIT_INVALID_ARGS;
+	}
+
+	my $vm = $self->_load_vm or return $self->{load_exit};
+
+	my $remote = $self->_require_remote( $vm, 'ssh_port' );
+	return EXIT_ERROR if !defined $remote;
+
+	return EXIT_ERROR
+	    if !$remote->put( $local, $remote_path,
+		defined $mode ? ( mode => oct($mode) ) : () );
+
+	return EXIT_SUCCESS;
+}
+
+# Copy one guest file to the host
+sub cmd_get ( $self, $cli, @args )
+{
+	my ( $remote_path, $local, @extra ) = @args;
+	if ( !defined $remote_path || !defined $local || @extra ) {
+		$self->{log}->error('Usage: fuguvm get <remote> <local>');
+		return EXIT_INVALID_ARGS;
+	}
+	if ( index( $remote_path, '/' ) != 0 ) {
+		$self->{log}
+		    ->error("The remote path is not absolute: $remote_path");
+		return EXIT_INVALID_ARGS;
+	}
+	if ( -d $local ) {
+		$self->{log}
+		    ->error("The local destination is a directory: $local");
+		return EXIT_INVALID_ARGS;
+	}
+
+	my $vm = $self->_load_vm or return $self->{load_exit};
+
+	my $remote = $self->_require_remote( $vm, 'ssh_port' );
+	return EXIT_ERROR if !defined $remote;
+
+	# The installed Fugu can come from a release that has no
+	# read_file yet: the manifests fetch the unversioned latest
+	# asset. A missing method must read as a diagnosis, not as a
+	# stack trace.
+	if ( !Fugu::SSH->can('read_file') ) {
+		$self->{log}->error(
+			      'The installed Fugu has no Fugu::SSH->read_file.'
+			    . ' Install Fugu 0.2.0 or later.' );
+		return EXIT_ERROR;
+	}
+
+	return EXIT_ERROR if !$remote->get( $remote_path, $local );
+
+	return EXIT_SUCCESS;
+}
+
+# Attach the terminal of the operator to the serial console
 sub cmd_console ( $self, $cli, @args )
 {
-	my $vm   = $self->_load_vm or return EXIT_VM_NOT_FOUND;
-	my $port = $vm->console_port;
-	$self->{log}->info("Connect with: telnet localhost $port");
-	$self->{log}->info("type: telnet");
-	$self->{log}->info("host: localhost");
-	$self->{log}->info("port: $port");
-	return EXIT_SUCCESS;
+	my $vm = $self->_load_vm or return $self->{load_exit};
+
+	return EXIT_ERROR if !$self->_require_running($vm);
+
+	my $port = $self->_require_port( $vm, 'console_port' );
+	return EXIT_ERROR if !defined $port;
+
+	my $host = $vm->connect_address;
+
+	# The line goes through the logger, so --quiet drops it and
+	# the attachment still happens.
+	$self->{log}
+	    ->info("Attaching to $host:$port. Leave with Ctrl-], then 'quit'.");
+
+	my $console = App::FuguVM::Console->new(
+		host => $host,
+		port => $port,
+	);
+
+	return $console->attach;
 }
 
 # Run an expect script
@@ -353,10 +550,14 @@ sub cmd_expect ( $self, $cli, @args )
 		return EXIT_INVALID_ARGS;
 	}
 
-	my $vm     = $self->_load_vm or return EXIT_VM_NOT_FOUND;
+	my $vm = $self->_load_vm or return $self->{load_exit};
+
+	my $port = $self->_require_port( $vm, 'console_port' );
+	return EXIT_ERROR if !defined $port;
+
 	my $expect = App::FuguVM::Console->new(
-		host => 'localhost',
-		port => $vm->console_port,
+		host => $vm->connect_address,
+		port => $port,
 	);
 
 	my $result = $expect->run_script( $script, @args );
@@ -374,7 +575,10 @@ sub cmd_wait ( $self, $cli, @args )
 		return EXIT_INVALID_ARGS;
 	}
 
-	my $vm = $self->_load_vm or return EXIT_VM_NOT_FOUND;
+	my $vm = $self->_load_vm or return $self->{load_exit};
+
+	my $port = $self->_require_port( $vm, 'ssh_port' );
+	return EXIT_ERROR if !defined $port;
 
 	if ( !$vm->wait_ssh($timeout) ) {
 		$self->{log}->error("Timeout waiting for SSH");
@@ -439,14 +643,13 @@ sub _cache_list ( $self, $cache )
 
 # $self->_proxy_list:
 #	Show what the download cache of the proxy holds, one line for
-#	each OpenBSD version. 'cache list' reports it because it shares
-#	cache_dir with the images, and the same 'cache clear' prunes
-#	it. A half of the directory that nothing printed was a half
-#	nobody knew to bound.
+#	each OpenBSD version, and one line for the distfile tree.
+#	'cache list' reports it because it shares cache_dir with the
+#	images, and the same 'cache clear' prunes it. A half of the
+#	directory that nothing printed was a half nobody knew to bound.
 sub _proxy_list ($self)
 {
-	my $cache =
-	    App::FuguVM::Proxy::Cache->new( $self->{config}->cache_dir );
+	my $cache = $self->_proxy_cache;
 	my $files = $cache->list;
 
 	if ( !@$files ) {
@@ -456,11 +659,13 @@ sub _proxy_list ($self)
 
 	# Group the sizes per version, because 'clear --stale' prunes
 	# at that granularity. The code counts a URL that names no
-	# version under '-' and does not drop it. is_cacheable() admits
-	# no such URL today. Thus an entry that cannot be pruned is
-	# still visible as one.
+	# version under '-' and does not drop it. Thus an entry that
+	# cannot be pruned is still visible as one. A distfile carries
+	# no version, so the grouping excludes the distfile tree: its
+	# own line below reports it against the cap.
 	my %bytes;
 	for my $file (@$files) {
+		next if $file->{url} =~ m{/pub/OpenBSD/distfiles/};
 		my ($version) =
 		    $file->{url} =~ m{/pub/OpenBSD/(?:syspatch/)?([0-9.]+)/};
 		$bytes{ $version // '-' } += $file->{size};
@@ -475,7 +680,32 @@ sub _proxy_list ($self)
 			$version, _format_size( $bytes{$version} ) );
 	}
 
+	# The distfile line: the size against the cap, or the size with
+	# a note that nothing bounds new content. The line stays absent
+	# while the tree is empty.
+	my $distfiles = $cache->distfile_size;
+	my $limit     = $cache->distfile_limit;
+	if ( $distfiles > 0 ) {
+		$self->{log}->info(
+			$limit > 0
+			? sprintf(
+				'Distfiles: %s of %s',
+				_format_size($distfiles),
+				_format_size($limit) )
+			: sprintf( 'Distfiles: %s, caching off',
+				_format_size($distfiles) ) );
+	}
+
 	return EXIT_SUCCESS;
+}
+
+# $self->_proxy_cache:
+#	Build the proxy cache of the project, with the distfile cap of
+#	the configuration.
+sub _proxy_cache ($self)
+{
+	return App::FuguVM::Proxy::Cache->new( $self->{config}->cache_dir,
+		$self->{config}->distfile_cache );
 }
 
 # $self->_cache_clear($cli, $cache, @args):
@@ -551,8 +781,7 @@ sub _cache_clear ( $self, $cli, $cache, @args )
 #	need.
 sub _proxy_clear ( $self, $stale )
 {
-	my $cache =
-	    App::FuguVM::Proxy::Cache->new( $self->{config}->cache_dir );
+	my $cache = $self->_proxy_cache;
 
 	if ( !$stale ) {
 		my $size = $cache->size;
@@ -579,7 +808,150 @@ sub _proxy_clear ( $self, $stale )
 	}
 	$self->{log}->info('No proxy downloads removed') if !@$removed;
 
+	# A distfile carries no version, so the version rule above
+	# cannot decide about the distfile tree. --stale keeps the
+	# tree, because a refill is expensive, and re-applies the cap.
+	# With a cap of 0 no cap applies here, and the flag keeps the
+	# whole tree.
+	if ( $cache->distfile_limit > 0 ) {
+		my $trimmed = $cache->trim_distfiles;
+		if (@$trimmed) {
+			my $bytes = 0;
+			$bytes += $_->{size} for @$trimmed;
+			$self->{log}->info( sprintf 'Removed %s of distfiles',
+				_format_size($bytes) );
+		}
+	}
+
 	return EXIT_SUCCESS;
+}
+
+# The mirror subcommand: fetch one verified file of the release, or
+# verify the cached files of the version and the architecture of the
+# invoked guest.
+sub cmd_mirror ( $self, $cli, @args )
+{
+	my $action = shift @args;
+	if ( !defined $action || $action !~ /^(fetch|verify)$/ ) {
+		$self->{log}
+		    ->error('Usage: fuguvm mirror <fetch <file>|verify>');
+		return EXIT_INVALID_ARGS;
+	}
+
+	my $vm_config = $self->{config}->load_vm( $self->{vm_name} );
+	if ( !defined $vm_config ) {
+		my $reason = $self->{config}->error;
+		$self->{log}
+		    ->error( $reason // "VM '$self->{vm_name}' not found" );
+		return defined $reason ? EXIT_CONFIG_ERROR : EXIT_VM_NOT_FOUND;
+	}
+
+	# The verify verb proves; a 'verify no' directive must not turn
+	# it into a walk that proves nothing.
+	my $verifies = $action eq 'verify' ? 1 : $vm_config->{verify} // 1;
+	my $mirror   = App::FuguVM::Mirror->new(
+		cache   => $self->_proxy_cache,
+		version => $vm_config->{version},
+		arch    => $vm_config->{arch},
+		verify  => $verifies,
+		(
+			defined $vm_config->{signify_dir}
+			? ( keys_dir => $vm_config->{signify_dir} )
+			: ()
+		),
+	);
+
+	# An absent public key for the version is a configuration
+	# error, apart from a failed download or a failed signature.
+	if ( $verifies && !defined $mirror->key_path ) {
+		$self->{log}->error( $mirror->error );
+		return EXIT_CONFIG_ERROR;
+	}
+
+	if ( $action eq 'verify' ) {
+		if (@args) {
+			$self->{log}->error('Usage: fuguvm mirror verify');
+			return EXIT_INVALID_ARGS;
+		}
+		return $self->_mirror_verify($mirror);
+	}
+	return $self->_mirror_fetch( $mirror, @args );
+}
+
+# $self->_mirror_fetch($mirror, @args):
+#	Fetch, verify and cache one file of the release, and write the
+#	cached path to standard output, where a script can read it.
+#	The scope comes from the manifests: the release scope when the
+#	manifest of the architecture directory names the file, and the
+#	source scope otherwise. Both manifests are authoritative
+#	lists, so the tool guesses nothing.
+sub _mirror_fetch ( $self, $mirror, @args )
+{
+	my ( $file, @extra ) = @args;
+	if ( !defined $file || @extra ) {
+		$self->{log}->error('Usage: fuguvm mirror fetch <file>');
+		return EXIT_INVALID_ARGS;
+	}
+
+	my $scope;
+	for my $candidate (qw(release source)) {
+		my $names = $mirror->manifest_names($candidate);
+		if ( !defined $names ) {
+			$self->{log}->error( $mirror->error );
+			return EXIT_ERROR;
+		}
+		if ( grep { $_ eq $file } @$names ) {
+			$scope = $candidate;
+			last;
+		}
+	}
+	if ( !defined $scope ) {
+		$self->{log}->error("No manifest of the release names '$file'");
+		return EXIT_ERROR;
+	}
+
+	my $path = $mirror->ensure( $scope, $file );
+	if ( !defined $path ) {
+		$self->{log}->error( $mirror->error );
+		return EXIT_ERROR;
+	}
+
+	say $path;
+	return EXIT_SUCCESS;
+}
+
+# $self->_mirror_verify($mirror):
+#	Verify every cached file of the two scopes. The verb removes
+#	each file that failed, in its own scope only, because a file
+#	that fails a digest must not stay in a cache that a later run
+#	reads and a same-named file of the other scope failed nothing.
+#	It must not remove an unknown file: a name that no manifest
+#	holds is not a failure, and index.txt is such a name on every
+#	mirror. The verb is idempotent: a second run over a clean
+#	cache removes nothing and exits 0.
+sub _mirror_verify ( $self, $mirror )
+{
+	my $report = $mirror->verify_cache;
+	if ( !defined $report ) {
+		$self->{log}->error( $mirror->error );
+		return EXIT_ERROR;
+	}
+
+	for my $entry ( @{ $report->{failed} } ) {
+		$self->{log}->error( sprintf 'Verification failed: %s/%s',
+			$entry->{scope}, $entry->{name} );
+		my $path =
+		    $mirror->cached_path( $entry->{scope}, $entry->{name} );
+		unlink $path if defined $path && -f $path;
+	}
+
+	$self->{log}->info(
+		sprintf 'Verified: %d ok, %d failed, %d unknown',
+		scalar @{ $report->{ok} },
+		scalar @{ $report->{failed} },
+		scalar @{ $report->{unknown} } );
+
+	return @{ $report->{failed} } ? EXIT_ERROR : EXIT_SUCCESS;
 }
 
 # $self->_current_cache_key($cache):
@@ -667,7 +1039,7 @@ sub cmd_snapshot ( $self, $cli, @args )
 #	command refuses a running VM and does not copy it.
 sub _snapshot_save ( $self, $cache, $name )
 {
-	my $vm = $self->_load_vm or return EXIT_VM_NOT_FOUND;
+	my $vm = $self->_load_vm or return $self->{load_exit};
 
 	if ( $vm->is_running ) {
 		$self->{log}->error("Stop the VM before saving a snapshot");
@@ -725,7 +1097,7 @@ sub _snapshot_save ( $self, $cache, $name )
 #	before its first 'up'.
 sub _snapshot_restore ( $self, $cache, $name )
 {
-	my $vm    = $self->_load_vm or return EXIT_VM_NOT_FOUND;
+	my $vm    = $self->_load_vm or return $self->{load_exit};
 	my $state = $self->{state};
 
 	if ( $vm->is_running ) {
@@ -761,7 +1133,7 @@ sub _snapshot_restore ( $self, $cache, $name )
 	# Reseed what the disk embodies. The next 'fuguvm up' reconciles
 	# a checkout whose SSH key differs from the saved one.
 	my $meta = $found->{meta};
-	$state->mark_installed;
+	$state->mark_installed( $vm_config->{arch} );
 	$state->set_root_password( $meta->{root_password} )
 	    if defined $meta->{root_password};
 	$state->mark_ssh_key_installed( $meta->{installed_ssh_pubkey} )
@@ -853,6 +1225,109 @@ sub _disk_cache_key ( $self, $cache )
 	my $backing = $disk->backing_file( $vm_config->{name} );
 
 	return $cache->key_for_path($backing);
+}
+
+# The image export, beside the snapshot verbs. Those verbs already
+# resolve a cache key from a working disk, and the export needs the
+# same resolution.
+sub cmd_image ( $self, $cli, @args )
+{
+	my $action = shift @args;
+	if ( !defined $action || $action ne 'export' ) {
+		$self->{log}->error( 'Usage: fuguvm image export <path>'
+			    . ' [--format=qcow2|raw]' );
+		return EXIT_INVALID_ARGS;
+	}
+
+	return $self->_image_export( $cli, @args );
+}
+
+# $self->_image_export($cli, @args):
+#	Write the base image of the invoked VM as a full-disk image.
+#	The source is the base image of the cache entry that backs the
+#	working disk, or the working disk itself when the disk is
+#	standalone. The write goes through one temporary sibling and
+#	one rename, so a failure leaves no partial file behind.
+sub _image_export ( $self, $cli, @args )
+{
+	my ( $target, @extra ) = @args;
+	if ( !defined $target || @extra ) {
+		$self->{log}->error( 'Usage: fuguvm image export <path>'
+			    . ' [--format=qcow2|raw]' );
+		return EXIT_INVALID_ARGS;
+	}
+
+	my $format = $cli->option('format') // 'qcow2';
+	if ( $format ne 'qcow2' && $format ne 'raw' ) {
+		$self->{log}->error(
+			"Unknown format '$format' (accepted values: qcow2, raw)"
+		);
+		return EXIT_INVALID_ARGS;
+	}
+
+	my $vm = $self->_load_vm or return $self->{load_exit};
+
+	# A live overlay is not consistent, and a running QEMU holds
+	# an exclusive lock on the working disk. snapshot save refuses
+	# a running guest for the same reason.
+	if ( $vm->is_running ) {
+		$self->{log}->error("Stop the VM before exporting its image");
+		return EXIT_VM_RUNNING;
+	}
+
+	if ( !$self->{state}->disk_exists ) {
+		$self->{log}->error("No disk image. Run 'fuguvm up' first.");
+		return EXIT_ERROR;
+	}
+
+	if ( !$self->{state}->is_installed ) {
+		$self->{log}->error("VM is not installed yet");
+		return EXIT_ERROR;
+	}
+
+	# The tool must not overwrite an image that an operator
+	# published.
+	if ( -e $target ) {
+		$self->{log}->error("The target exists: $target");
+		return EXIT_ERROR;
+	}
+
+	# The tool creates no directory for the operator
+	my $parent = dirname($target);
+	if ( !-d $parent ) {
+		$self->{log}->error("The parent directory is absent: $parent");
+		return EXIT_ERROR;
+	}
+
+	# The source. A standalone disk comes from --no-cache or from
+	# 'image_cache no', and the export then reads the disk itself.
+	my $cache = App::FuguVM::DiskCache->new( $self->{config}->cache_dir );
+	my $key   = $self->_disk_cache_key($cache);
+	my $source =
+	    defined $key ? $cache->base_path($key) : $self->{state}->disk_path;
+
+	my $tmp = "$target.tmp.$$";
+	if ( !App::FuguVM::Disk->convert( $source, $tmp, format => $format ) ) {
+		unlink $tmp;
+		$self->{log}->error("Export failed");
+		return EXIT_ERROR;
+	}
+	if ( !rename $tmp, $target ) {
+		$self->{log}->error("Cannot publish $target: $!");
+		unlink $tmp;
+		return EXIT_ERROR;
+	}
+
+	my $path = File::Spec->rel2abs($target);
+	$self->_dump_sorted( {
+		bytes  => -s $path,
+		format => $format,
+		key    => $key // '',
+		path   => $path,
+		source => File::Spec->rel2abs($source),
+	} );
+
+	return EXIT_SUCCESS;
 }
 
 # Disk management
@@ -955,6 +1430,7 @@ EOF
 # Default OpenBSD VM
 
 name = openbsd-default
+arch = arm64
 version = 7.8
 memory = 2048
 disk_size = 8G

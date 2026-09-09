@@ -68,6 +68,47 @@ SKIP: {
 	'and the caller can see that it is gone');
 }
 
+# convert: the one home of 'qemu-img convert'
+SKIP: {
+    my $has_qemu = `which qemu-img 2>/dev/null`;
+    skip 'qemu-img not installed', 10 unless $has_qemu;
+
+    use Fugu::Log;
+    Fugu::Log->set_default(Fugu::Log->new(mode => 'quiet'));
+
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $disk = App::FuguVM::Disk->new($tmpdir);
+    my $source = $disk->create('source', '64M');
+    ok(defined $source, 'a source disk exists');
+
+    my $qcow2 = App::FuguVM::Disk->convert($source, "$tmpdir/out.qcow2");
+    is($qcow2, "$tmpdir/out.qcow2", 'convert returns the target path');
+    like(`qemu-img info "$qcow2"`, qr/file format: qcow2/,
+	'and the default format is qcow2');
+
+    my $raw = App::FuguVM::Disk->convert($source, "$tmpdir/out.raw",
+	format => 'raw');
+    ok(defined $raw, 'convert with format raw succeeds');
+    like(`qemu-img info "$raw"`, qr/file format: raw/, 'and writes raw');
+
+    # backing records the parent, in the layout that backing_file
+    # reads
+    mkdir "$tmpdir/child";
+    my $child = App::FuguVM::Disk->convert($source, $disk->path('child'),
+	backing => $source);
+    ok(defined $child, 'convert with backing succeeds');
+    is($disk->backing_file('child'), $source,
+	'and backing_file reads the parent back');
+    is($disk->info('child')->{'backing-filename-format'}, 'qcow2',
+	'the backing format is qcow2');
+
+    # An absent source is a diagnosed failure that writes no target
+    my $absent = App::FuguVM::Disk->convert("$tmpdir/absent.qcow2",
+	"$tmpdir/never.qcow2");
+    is($absent, undef, 'convert returns undef for an absent source');
+    ok(!-e "$tmpdir/never.qcow2", 'and it writes no target');
+}
+
 # A running QEMU holds an exclusive lock on its disk. Thus inspection
 # must ask for shared access. Without it, info() fails on exactly the
 # VMs whose chain callers most need. 'cache clear' then sees no backing

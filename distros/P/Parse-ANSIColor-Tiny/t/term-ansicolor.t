@@ -60,4 +60,26 @@ eq_or_diff
   ],
   'parse return of simple colored() call';
 
+SKIP: {
+  skip 'Term::ANSIColor 5.01 required for true color', 2
+    unless eval { Term::ANSIColor->VERSION('5.01'); 1 };
+
+  my @attr = qw(bold r255g136b0 on_r0g10b20);
+  my $true = Term::ANSIColor::colored( [@attr], 'true' );
+
+  note $true;
+
+  eq_or_diff
+    $p->parse($true),
+    [
+      [ [@attr], 'true' ],
+    ],
+    'parsed the true color output of colored()';
+
+  eq_or_diff
+    join('', map { Term::ANSIColor::colored(@$_) } @{ $p->parse($true) }),
+    $true,
+    'true color round-trip through Term::ANSIColor produced identical output';
+}
+
 done_testing;

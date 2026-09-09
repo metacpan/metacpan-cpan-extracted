@@ -12,9 +12,12 @@ MIDI::Drummer::Tiny::Tutorial::Advanced
 
 =head1 VERSION
 
-version 0.7016
+version 0.7020
 
 =head1 Advanced Grooves
+
+You can construct your own, custom grooves as below. Or you can play
+a common groove with L<MIDI::Drummer::Tiny::Grooves>.
 
 =head2 Cold Sweat (Clyde Stubblefield)
 

@@ -55,6 +55,7 @@
          "requires" : {
             "Test::More" : "1.302120",
             "Test::Pod" : "1.52",
+            "Time::HiRes" : "1.9719",
             "Time::Local" : "0",
             "lib" : "0"
          }
@@ -70,7 +71,7 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Lite"
       }
    },
-   "version" : "v0.8.0",
+   "version" : "v0.8.1",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -113,7 +113,7 @@
    "provides" : {
       "Alien::Xmake" : {
          "file" : "lib/Alien/Xmake.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -131,7 +131,7 @@
          "web" : "https://github.com/sanko/Alien-Xmake"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_authority" : "cpan:SANKO",
    "x_ignore" : [
       ".tidyallrc",

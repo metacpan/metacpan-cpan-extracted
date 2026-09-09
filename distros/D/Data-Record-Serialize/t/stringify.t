@@ -8,7 +8,7 @@ use Data::Record::Serialize;
 
 use My::Test::Util -all;
 
-subtest "default behavior" => sub {
+subtest 'default behavior' => sub {
 
     my $drs;
     ok(
@@ -18,18 +18,18 @@ subtest "default behavior" => sub {
         'construct object'
     ) or note $@;
 
-    is( $drs->stringified, [], "no stringified fields prior to sending first record" );
+    is( $drs->stringified, [], 'no stringified fields prior to sending first record' );
 
     # prime @fields to get the correct types
     $drs->send( { number => 1.1, string => 'string', integer => 1 } );
 
-    is( $drs->stringified, [], "no stringified fields after sending first record" );
+    is( $drs->stringified, [], 'no stringified fields after sending first record' );
 
     $drs->send( { number => 1.1, string => 3, integer => 1 } );
 
   SKIP: {
         skip 'Need Convert::Scalar' unless $have_Convert_Scalar;
-        subtest "no output fields stringified" => sub {
+        subtest 'no output fields stringified' => sub {
             my $output = $drs->output->[-1];
             ok( is_number( $output->{number} ),  'number' );
             ok( is_number( $output->{integer} ), 'integer' );
@@ -40,7 +40,7 @@ subtest "default behavior" => sub {
 };
 
 
-subtest "stringify boolean" => sub {
+subtest 'stringify boolean' => sub {
 
     my $drs;
     ok(
@@ -63,7 +63,7 @@ subtest "stringify boolean" => sub {
             item 'string';
             end;
         },
-        "correct fields stringified"
+        'correct fields stringified'
     );
 
     # these will be stringified
@@ -71,7 +71,7 @@ subtest "stringify boolean" => sub {
 
   SKIP: {
         skip 'Need Convert::Scalar' unless $have_Convert_Scalar;
-        subtest "proper output fields stringified" => sub {
+        subtest 'proper output fields stringified' => sub {
             my $output = $drs->output->[-1];
             ok( is_number( $output->{number} ),  'number' );
             ok( is_number( $output->{integer} ), 'integer' );
@@ -83,19 +83,19 @@ subtest "stringify boolean" => sub {
         $drs->output->[-1],
         hash {
             field integer => 1;
-            field string  => "3";
+            field string  => '3';
             field number  => 2.2;
             end;
         },
-        "output fields survived"
+        'output fields survived'
     );
 
-    ok( lives { $drs->stringify( 0 ) }, "reset stringify" );
-    is( $drs->stringified, [], "no fields stringified" );
+    ok( lives { $drs->stringify( 0 ) }, 'reset stringify' );
+    is( $drs->stringified, [], 'no fields stringified' );
 
 };
 
-subtest "bad field name" => sub {
+subtest 'bad field name' => sub {
 
     my $drs;
     ok(
@@ -110,12 +110,12 @@ subtest "bad field name" => sub {
     my $error;
 
     $error
-      = dies { $drs->send( { integer => 1, string => "", number => "" } ); };
+      = dies { $drs->send( { integer => 1, string => q{}, number => q{} } ); };
 
     isa_ok(
         $error,
         ['Data::Record::Serialize::Error::Role::Base::fields'],
-        "send: caught bad stringification field error"
+        'send: caught bad stringification field error'
     );
     like( $error, qr/foobar/, 'identified bad field name' );
 
@@ -123,14 +123,14 @@ subtest "bad field name" => sub {
     isa_ok(
         $error,
         ['Data::Record::Serialize::Error::Role::Base::fields'],
-        "stringified: caught bad stringification field error"
+        'stringified: caught bad stringification field error'
     );
     like( $error, qr/foobar/, 'identified bad field name' );
 
 
 };
 
-subtest "stringify sub" => sub {
+subtest 'stringify sub' => sub {
 
     my $drs;
     ok(
@@ -146,13 +146,13 @@ subtest "stringify sub" => sub {
     # prime @fields to get the correct types
     $drs->send( { number => 1.1, string => 'string', integer => 1 } );
 
-    is( $drs->stringified, ['string'], "correct fields stringified" );
+    is( $drs->stringified, ['string'], 'correct fields stringified' );
 
     $drs->send( { integer => 1, string => 3, number => 2.2 } );
 
   SKIP: {
         skip 'Need Convert::Scalar' unless $have_Convert_Scalar;
-        subtest "proper output fields stringified" => sub {
+        subtest 'proper output fields stringified' => sub {
             my $output = $drs->output->[-1];
             ok( is_number( $output->{number} ),  'number' );
             ok( is_number( $output->{integer} ), 'integer' );
@@ -164,13 +164,38 @@ subtest "stringify sub" => sub {
         $drs->output->[-1],
         hash {
             field integer => 1;
-            field string  => "3";
+            field string  => '3';
             field number  => 2.2;
             end;
         },
-        "output fields survived"
+        'output fields survived'
     );
 
+};
+
+subtest 'stringify field selection specification' => sub {
+
+    my $drs = Data::Record::Serialize->new(
+        encode    => '+My::Test::Encode::store',
+        fields    => [qw( integer string1 string2 number )],
+        types     => { integer => 'I', string1 => 'S', string2 => 'S', number => 'N' },
+        stringify => [qw( - +string1 )],
+    );
+
+    is( $drs->stringified, ['string1'], 'clear and add select one string field' );
+
+    $drs->send( { integer => 1, string1 => 2, string2 => 3, number => 4.5 } );
+
+    is(
+        $drs->output->[-1],
+        {
+            integer => 1,
+            string1 => '2',
+            string2 => 3,
+            number  => 4.5,
+        },
+        'only selected field is stringified',
+    );
 };
 
 done_testing;

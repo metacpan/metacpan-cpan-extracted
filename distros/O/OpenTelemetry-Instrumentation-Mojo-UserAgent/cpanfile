@@ -1,0 +1,12 @@
+requires 'perl', '5.012';
+
+# requires 'Some::Module', 'VERSION';
+requires 'Mojolicious';
+requires 'OpenTelemetry';
+requires 'OpenTelemetry::SDK';
+requires 'Syntax::Keyword::Dynamically';
+requires 'Test2::V0';
+
+on test => sub {
+    requires 'Test::More', '0.96';
+};

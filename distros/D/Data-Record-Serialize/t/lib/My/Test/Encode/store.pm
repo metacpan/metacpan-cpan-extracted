@@ -6,12 +6,12 @@ has output => (
     is      => 'ro',
     default => sub { [] } );
 
-sub send {
+sub send {    ## no critic (ProhibitBuiltinHomonyms)
     my $self = shift;
     push @{ $self->output }, @_;
 }
 
-sub close { }
+sub close { }    ## no critic (ProhibitBuiltinHomonyms, ProhibitAmbiguousNames)
 
 with 'Data::Record::Serialize::Role::EncodeAndSink';
 

@@ -29,6 +29,7 @@ t/docs.t
 t/htmlin/basic.html
 t/htmlin/bulkload.html
 t/htmlin/headers.html
+t/htmlin/links.html
 t/htmlin/omnipitr.html
 t/htmlin/shiftjis.html
 t/htmlin/unwanted.html
@@ -36,6 +37,7 @@ t/htmlin/utf8.html
 t/htmlout/basic.html
 t/htmlout/bulkload.html
 t/htmlout/headers.html
+t/htmlout/links.html
 t/htmlout/omnipitr.html
 t/htmlout/shiftjis.html
 t/htmlout/unwanted.html
@@ -47,6 +49,7 @@ t/root/dist/pair/0.1.0/pair-0.1.0.zip
 t/root/dist/pair/0.1.1/META.json
 t/root/dist/pair/0.1.1/pair-0.1.1.zip
 t/root/dist/pair/0.1.1/README.txt
+t/root/dist/pair/0.1.2/icon.svg
 t/root/dist/pair/0.1.2/META.json
 t/root/dist/pair/0.1.2/pair-0.1.2.zip
 t/root/dist/pgTAP.json

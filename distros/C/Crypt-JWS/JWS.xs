@@ -163,6 +163,12 @@ static SV *cjws_abi_hmac_sha512(pTHX_ const unsigned char *key, STRLEN keylen,
   return n ? cjws_new_bytes_sv(aTHX_ out, n) : NULL;
 }
 
+/* v3 */
+static void *cjws_abi_key_from_x509_der(pTHX_ const unsigned char *der,
+                                        STRLEN len) {
+  return (void *)cjws_key_from_x509_der(der, len);
+}
+
 static const jws_abi CJWS_ABI = {
   JWS_ABI_VERSION,
   cjws_abi_key_from_pem,
@@ -181,6 +187,8 @@ static const jws_abi CJWS_ABI = {
   cjws_abi_sha1,
   cjws_abi_hmac_sha1,
   cjws_abi_hmac_sha512,
+  /* v3 */
+  cjws_abi_key_from_x509_der,
 };
 
 MODULE = Crypt::JWS  PACKAGE = Crypt::JWS

@@ -1,4 +1,26 @@
 Revision history for File-Raw-XML
 
+0.04    2026-09-09
+        - fix the build on a C89 compiler: frx_reader and frx_xpath were
+          each typedef'd twice, which gcc 4.2.1 refuses
+        - t/38-writer.t: s///r needs perl 5.14, and the floor is 5.10
+
+0.03    2026-09-08
+        - ADDS: the C ABI's SV bridge - doc_to_sv, doc_from_sv,
+          node_from_sv and node_to_sv, so a consumer can cross between a
+          handle and a blessed Document or Node
+        - ADDS: File::Raw::XML::_abi_version, the table's own version
+        - t/20-abi.t asserts the table and the installed header name the
+          same ABI version
+        - Windows: resolve => 'file' reads the document's own directory
+          again; a drive letter is not a URI scheme
+        - Windows: a file: identifier may name a drive
+        - requires File::Raw 0.18
+
+0.02    2026-09-08
+        - fix the linux crash: frx_doc_new left two new fields uninitialised, so validate read malloc's leavings
+        - Windows: rename `near` and `small`, which windows.h and rpcndr.h take
+        - Windows: call the ABI write entry as (A->write), which PERL_IMPLICIT_SYS does not expand
+
 0.01    2026-09-08
 	First version

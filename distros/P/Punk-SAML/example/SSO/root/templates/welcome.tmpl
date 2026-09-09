@@ -1,0 +1,76 @@
+<header class="masthead">
+  <p class="wordmark" aria-label="Punk"><b>P</b><b>U</b><b>N</b><b>K</b></p>
+  <h1><a href="{% url.home %}">{% app %}</a></h1>
+  <p class="sticker">it&rsquo;s alive</p>
+  <p class="lede">Compiled at boot. Signed in with SAML.</p>
+</header>
+
+<section>
+  <h2>Sign in</h2>
+{% for i in idps %}  <p><a class="signin" href="/saml/login/{% i %}?to=/me">Sign in with {% i %}</a></p>
+{% end %}  <p class="note">
+    The link goes to the provider. It comes back as a cross-site
+    <code>POST</code> to <code>/saml/acs</code>, which is why this
+    application declares an <code>https</code> host: the cookie that
+    remembers the login has to be <code>SameSite=None</code>, and a
+    browser drops one of those unless it is also <code>Secure</code>.
+  </p>
+</section>
+
+<section>
+  <h2>Routes</h2>
+  <div class="routes">
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Target</th></tr>
+{% for r in routes %}    <tr><td><span class="verb">{% r.method %}</span></td><td><code>{% r.path %}</code></td><td><code>{% r.target %}</code></td></tr>
+{% end %}  </table>
+  </div>
+</section>
+
+<section>
+  <h2>Now wreck it</h2>
+  <ul class="next">
+    <li>
+      <strong>This page</strong> is <code>root/templates/welcome.tmpl</code>,
+      rendered by <code>lib/{% app %}/Controller/Web/Root.pm</code>.
+      Delete both when you have something better.
+    </li>
+    <li>
+      <strong>Routes</strong> live in <code>lib/{% app %}.pm</code>:
+      <pre>get '/hello/:name' =&gt; sub {
+    my ($c) = @_;
+    return $c-&gt;text('oi ' . $c-&gt;param('name'));
+};</pre>
+    </li>
+    <li>
+      <strong>Links</strong> come from route names, not from paths typed
+      twice. The title above is <code>&#123;% url.home %&#125;</code>, and a
+      route that captures takes the filter:
+      <pre>get '/hello/:name' =&gt; ..., { name =&gt; 'hello' };
+&lt;a href="&#123;% row | url_for('hello') %&#125;"&gt;</pre>
+    </li>
+    <li>
+      <strong>Views, database and plugins</strong> are configured in
+      <code>config/punk.yml</code>. Secrets go in as
+      <code>{ $env: NAME }</code> - a reference, never the value. The two
+      in this example are inline so it runs with no setup; change them.
+    </li>
+    <li>
+      <strong>The provider</strong> is <code>idp-metadata.xml</code>
+      beside this application. Point <code>saml_idp</code> at a real
+      metadata URL instead, and check it first:
+      <pre>punk saml idp https://example.okta.com/.../metadata</pre>
+    </li>
+    <li>
+      <strong>This application&rsquo;s own metadata</strong>, which is
+      what the provider needs, is at
+      <a href="/saml/metadata"><code>/saml/metadata</code></a> or from
+      <pre>punk saml metadata</pre>
+    </li>
+  </ul>
+</section>
+
+<p class="foot">
+  <span class="tape">Punk {% version %}</span>
+  <span></span>
+</p>

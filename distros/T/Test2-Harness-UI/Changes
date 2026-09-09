@@ -1,3 +1,11 @@
+0.000147  2026-09-08 14:40:17-07:00 America/Los_Angeles
+
+    - Add [PruneCruft] to dist.ini so build artifacts (blib/,
+      pm_to_blib, MYMETA.*) no longer leak into release tarballs.
+    - Assert excluded coverage directories never reach the database
+
+0.000146  2026-04-05 11:11:54-07:00 America/Los_Angeles (TRIAL RELEASE)
+
 0.000145  2026-03-31 22:03:37-07:00 America/Los_Angeles
 
     - Remove MySQL5.6 test

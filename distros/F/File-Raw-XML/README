@@ -23,7 +23,7 @@ To install this module, run the following commands:
 	make test
 	make install
 
-A C compiler and File::Raw 0.15 or newer are required.
+A C compiler and File::Raw 0.18 or newer are required.
 
 SUPPORT AND DOCUMENTATION
 

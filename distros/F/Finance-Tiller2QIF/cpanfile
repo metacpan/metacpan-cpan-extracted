@@ -1,8 +1,8 @@
-requires 'perl', '5.034';
+requires 'perl', '5.036';
 requires 'DBI';
+requires 'DBD::SQLite';
 requires 'Path::Tiny';
 requires 'Text::CSV';
-requires 'Mojo::SQLite';
 requires 'DateTime::Format::Flexible';
 requires 'Cpanel::JSON::XS';
 requires 'Getopt::Long::Descriptive';

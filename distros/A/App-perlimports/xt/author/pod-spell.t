@@ -44,6 +44,7 @@ Raspass
 Rodríguez
 Role
 Sandbox
+Sorter
 choroba
 dependabot
 dump

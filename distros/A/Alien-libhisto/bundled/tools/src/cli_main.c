@@ -109,30 +109,3 @@ int histo_cli_main(int argc, char **argv, FILE *out, FILE *err) {
     fprintf(err, "Error: Unknown command '%s'. Run '%s --help' for usage.\n", cmd, prog_name);
     return 1;
 }
-
-int histo_cli_top(int argc, char **argv, FILE *out, FILE *err) {
-    (void)out;
-    (void)err;
-    return cmd_top_main(argc, argv);
-}
-
-/* Backward-compatible wrappers */
-int cmd_fill_main(int argc, char **argv) {
-    return histo_cli_fill(argc, argv, stdout, stderr);
-}
-
-int cmd_plot_main(int argc, char **argv) {
-    return histo_cli_plot(argc, argv, stdout, stderr);
-}
-
-int cmd_stats_main(int argc, char **argv) {
-    return histo_cli_stats(argc, argv, stdout, stderr);
-}
-
-int cmd_fit_main(int argc, char **argv) {
-    return histo_cli_fit(argc, argv, stdout, stderr);
-}
-
-int cmd_cmp_main(int argc, char **argv) {
-    return histo_cli_cmp(argc, argv, stdout, stderr);
-}

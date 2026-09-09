@@ -51,8 +51,18 @@ make dist           # build the release tarball
 ```
 
 `make check` runs the Markdown format gate, and prettier runs through bunx. The
-operator installs bun and gitleaks, for example from Homebrew. No deps manifest
-provides them.
+operator installs bun, for example from Homebrew. The manifest does not provide
+it, because the format gate needs `bunx` before a target can run.
+
+`make deps` installs gitleaks, the tool of the secret gate. It installs the
+`tool` environment before every other environment, so the gate tool is present
+for each chain. `deps/SHA256.txt` records the sha256 digest of each versioned
+download, and `make deps` compares the downloaded bytes against it. The CI gate
+installs gitleaks with `make deps`, so one pin serves the operator gate and the
+CI gate.
+
+gitleaks publishes no OpenBSD build, and the ports tree holds no port for it. An
+operator on OpenBSD installs it by hand.
 
 ## Releases
 

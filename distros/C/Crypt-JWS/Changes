@@ -1,5 +1,9 @@
 Revision history for Crypt-JWS
 
+0.07    2026-09-08
+        - Adds Key->from_x509_der: the public key from a DER X.509 certificate
+        - jws_abi version 3 appends key_from_x509_der.
+
 0.06    2026-08-23
         - Lower the min perl from 5.16 to 5.10
         - verify() returns undef through XSRETURN_UNDEF rather than an

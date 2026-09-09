@@ -47,7 +47,9 @@ use Dpkg::Vendor qw(run_vendor_hook);
 
 use parent qw(Dpkg::Source::Package);
 
-our $CURRENT_MINOR_VERSION = '0';
+sub CURRENT_MINOR_VERSION {
+    '0';
+}
 
 sub do_extract {
     my ($self, $newdirectory) = @_;
@@ -115,7 +117,7 @@ sub do_build {
 
     my $sourcepackage = $self->{fields}{'Source'};
     my $basenamerev = $self->get_basename(1);
-    my $tarname = "$basenamerev.tar." . $self->{options}{comp_ext};
+    my $tarname = File::Spec->catfile($self->{basedir}, "$basenamerev.tar." . $self->{options}{comp_ext});
 
     info(g_('building %s in %s'), $sourcepackage, $tarname);
 
@@ -139,11 +141,11 @@ sub do_build {
     $tar->add_directory($dirname);
     $tar->finish();
     rename($newtar, $tarname)
-        or syserr(g_("unable to rename '%s' (newly created) to '%s'"),
+        or syserr(g_("cannot rename '%s' (newly created) to '%s'"),
                   $newtar, $tarname);
     pop_exit_handler();
     chmod(0o666 &~ umask(), $tarname)
-        or syserr(g_("unable to change permission of '%s'"), $tarname);
+        or syserr(g_("cannot change permission of '%s'"), $tarname);
 
     $self->add_file($tarname);
 }

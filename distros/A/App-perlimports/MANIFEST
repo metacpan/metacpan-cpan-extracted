@@ -23,6 +23,7 @@ lib/App/perlimports/ExportInspector.pm
 lib/App/perlimports/Include.pm
 lib/App/perlimports/Role/Logger.pm
 lib/App/perlimports/Sandbox.pm
+lib/App/perlimports/Sorter.pm
 perlcriticrc
 perlimports.toml
 perltidyrc
@@ -109,6 +110,8 @@ t/signatures.t
 t/skip-all.t
 t/socket.t
 t/sort-imports.t
+t/sort-includes.t
+t/sorter.t
 t/switches-in-import.t
 t/symbol-as-method-call.t
 t/symbol-in-export.t
@@ -196,6 +199,7 @@ test-data/lib/Local/ViaSubExporter/Exception.pm
 test-data/lib/Local/WithInnerPkg.pm
 test-data/lint-failure-duplicate-import.pl
 test-data/lint-failure-import-args.pl
+test-data/lint-failure-indented-duplicate.pl
 test-data/lint-failure-unused-import.pl
 test-data/lint-success.pl
 test-data/long-list.pl
@@ -227,6 +231,11 @@ test-data/same-import.pl
 test-data/signatures.pl
 test-data/skip-all.t
 test-data/socket.pl
+test-data/sort-includes-comments.pl
+test-data/sort-includes-multi.pl
+test-data/sort-includes-noncontiguous.pl
+test-data/sort-includes-sorted.pl
+test-data/sort-includes.pl
 test-data/sort.pl
 test-data/stdout.pl
 test-data/switches-in-import.pl

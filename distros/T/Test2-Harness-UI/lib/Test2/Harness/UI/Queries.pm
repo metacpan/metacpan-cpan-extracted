@@ -2,7 +2,7 @@ package Test2::Harness::UI::Queries;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Carp qw/croak/;
 
@@ -39,6 +39,9 @@ sub _from_project {
 
     croak "project_name is required"
         unless defined $project_name;
+
+    my %VALID_FIELDS = map { $_ => 1 } qw/version category tier build/;
+    croak "Invalid field: $field" unless $VALID_FIELDS{$field};
 
     my $dbh = $self->{+CONFIG}->connect;
 

@@ -6,325 +6,152 @@ concepts, not functions or line numbers.
 
 ## Why this exists
 
-Cavil reviews the licensing of software on a server, as part of a formal legal workflow. That workflow is
-thorough and deliberately slow: a package is submitted, unpacked, scanned, and eventually signed off by a
-lawyer. It answers the question "is this package acceptable to ship".
+Cavil reviews the licensing of software on a server, as part of a formal legal workflow: a package is
+submitted, unpacked, scanned, its licenses and risk are determined, and it is either auto-accepted or signed
+off by a reviewer. That workflow is thorough, and it is the authoritative answer to "is this safe to ship".
 
-The CLI answers a different, smaller, faster question: "does the code in front of me right now contain known
-code, open source or commercial, that I should worry about". It is aimed at the moment *before* a formal
-review, on a developer's laptop or in a CI pipeline, where the cost of asking must be near zero and the answer
-must arrive in seconds. Cavil indexes more than open source, so the CLI stays license-neutral throughout: a
-matched commercial or proprietary license is exactly the kind of thing it should surface, not just copyleft.
-
-The reason this is worth building now is AI-assisted development. When an engineer writes code with an
-assistant, they cannot always tell whether a suggestion was reproduced verbatim from a copyleft project. A
-backported fix produced with an assistant carries the same uncertainty. And increasingly a whole project is
-scaffolded by an agent, and nobody has read every line. In all three cases the useful check is the same: take
-the code, and find where it already exists in what Cavil has indexed, with its license and its risk. That is a
-provenance check, and it is what the CLI does.
+Until now that workflow was driven only by bots wiring Cavil to a build service or a git forge. A developer
+working on a project, or a CI pipeline gating a merge, had no easy way in. The CLI is that way in: it takes the
+project in front of you, submits it for the standard review, and brings back the verdict. It does not invent a
+second, lesser kind of analysis; it reuses the real one, so what a developer sees locally is what the legal
+workflow sees.
 
 ## What it does, and what it does not
 
-It finds known provenance for code. Point it at a change or a directory and it reports, per region of code,
-whether that region is already known to Cavil, what it is a copy of, under what license, and at what risk on
-Cavil's one-to-nine scale. In a CI pipeline it turns that into a pass or fail.
+`check` uploads the working tree, waits for Cavil to review it, and reports the licensing risk, turning it into
+a pass or fail for CI. It is the whole product; `whoami` and `config` only exist to make it usable.
 
-It does not request a formal legal review, and it does not clear anything. Whether a piece of code is
-*acceptable* is a per-package decision that depends on license compatibility with everything else in that
-package, and that decision does not transfer between packages, so the CLI never makes it. It reports facts
-about the code's content and provenance, and leaves the acceptability judgement to the review workflow. The
-ability to submit for a full review will come later, and the design leaves room for it.
+It does not do its own license detection, and it does not clear or sign off anything. Acceptability is a
+decision the review workflow owns; the CLI reports the risk the review found and gates on it, and leaves the
+human judgement where it belongs.
+
+Two things are deliberately out of scope for now. There is no lighter, backlog-free "just tell me about this
+throwaway code" path yet; a submission today is a real review that enters the real queue, which is why it is
+gated to high access (below). A separate sandbox namespace for ordinary users is planned for that, and the
+client is shaped so it can grow one without changing how `check` looks.
 
 ## The commands
 
-The work is one command. There is no separate step to scan, then convert, then inspect. You run the check, you
-read the report, and in CI you look at the exit code. Keeping it to a single command with a built-in gate is a
-deliberate reaction to the friction of multi-tool provenance pipelines, where the scan produces a raw data file
-that a second and third tool must render and police before it means anything.
+The work is one command. You run the check, you read the report, and in CI you look at the exit code. Keeping
+it to a single command with a built-in gate is a deliberate reaction to the friction of provenance pipelines
+where a scan produces a raw file that further tools must render and police before it means anything.
 
 Two small helpers stand beside it. `whoami` asks the server who the token belongs to and times the round trip,
 so a user can confirm the URL and token work and the instance is reachable before running a real check, and CI
 can use it as a preflight. `config` saves the server URL and API token so they need not be passed every run;
 the token is read from a hidden prompt (or piped in), never taken as a command-line flag where it would linger
-in shell history and process listings, and it is stored under `~/.config/cavil-cli`, not with the disposable
-cache. Credentials are resolved from flags, then the environment (for CI), then that saved config.
-
-The scope follows the shape of the command, not any guessing about the working directory. With no path, it
-checks the current repository's change set, the difference between the branch and the point it was made from,
-because that is what a developer just wrote and what a merge request introduces. Given a path, it scans that
-whole tree, because pointing at a directory means "look at this project." That is the whole rule; there is no
-probing of whether something is a repository to decide the scope. Two flags override it when needed: `--all`
-forces a whole-tree scan of the current directory, and `--staged` or `--since` force a diff. Git is still used
-inside a whole-tree scan, but only to enumerate files so the repository's own ignore rules are honoured.
+in shell history and process listings, and it is stored under `~/.config/cavil-cli`. Credentials are resolved
+from the environment (for CI) or that saved config, always as a pair from one source, never mixed: taking the
+URL from one place and the token from another is how a token saved for one instance ends up sent to another.
 
 ## How a check works
 
-A check has three stages, arranged so that the cheapest possible answer is always tried first and the
-expensive work only ever runs on what is left.
+A check is four steps: package the tree, upload it, wait for the review, and print the verdict.
 
-### Choosing what to check
+### Packaging the working tree
 
-The unit of work is a region of code. For a change set, the regions are the added parts of the diff, merged
-where they are adjacent. For a whole directory, every file is a region, or a series of regions. Regions too
-small to be distinctive are dropped, because a handful of lines matches everything and means nothing; the same
-floor that the server's code search uses applies here.
+The archive is the working tree *as it sits on disk*. This is the central design decision, and it is not the
+obvious one. A first instinct is to honour `.gitignore`, but a full legal review must see the vendored
+dependencies a project actually ships or builds against - the `node_modules`, `vendor` and bundled trees that
+`.gitignore` almost always hides. A CI job that runs `npm install` and then `check` is exactly the case that
+matters, and dropping the installed packages would review the one part nobody wrote and skip everything the
+project pulled in. So the default is: include everything, dropping only `.git` and whatever the project lists
+in a `.cavilignore` file or passes with `--exclude-path`. `--respect-gitignore` is offered for the leaner case,
+and because a `.gitignore` says nothing tar can be trusted to interpret, that mode honours it through git
+itself rather than approximating it.
 
-### Recognizing what is already known
+The archive is a gzip tarball built by shelling out to `tar`, chosen over an in-process library because a
+vendored tree can be hundreds of megabytes and should stream to disk rather than sit in memory. Its MD5 is
+computed as it is written and sent with the upload, so a truncated transfer is rejected rather than reviewed as
+incomplete sources.
 
-Most files, in most real trees, are byte-for-byte identical to something Cavil has already seen. The kernel
-sources are the extreme case: nearly every file is already indexed. So before doing any matching, the CLI
-computes a content hash for each file and asks the server, in one batched question, which of those hashes it
-knows and what licenses and risk they carry. The same answer names one package and path that carry the content,
-so a recognized file reads as a copy of something concrete rather than "a known source"; and when the content
-is a package's own, non-vendored source, it also carries the license declared in that package's metadata (the
-main license shown at the top of its report), a curated hint that is more useful than the per-file patterns when
-those come back empty.
+Before uploading, the client checks the archive against the server's upload limit (the Cavil default, or
+`CAVIL_MAX_UPLOAD_MB` for an instance configured to accept more) and refuses with guidance if it is over, so an
+accidental large file fails fast rather than after a slow doomed upload. The server enforces the same limit, so
+a client whose limit is set too high still gets a clear rejection rather than a raw error.
 
-This stage is cheap for a reason that is worth stating plainly: the licenses and risk of a piece of content
-are a fixed property of its bytes. They never change once known. That means the answer can be cached on the
-client forever, keyed by the hash, and a second run over an overlapping tree asks the server almost nothing.
-It also means a hash, which is a handful of bytes, stands in for a whole file, so the question is tiny to ask
-and trivial for the server to answer from an index. Sending hashes instead of file contents is not about
-privacy here; it is simply the least work for the most answer.
+### Uploading and waiting
 
-The cache is deliberately aggressive, because a user will interrupt a scan of a few hundred files and re-run
-it a minute later, and that should cost the server nothing for the work already done. Two things are cached,
-both keyed by content hash. Recognition (a hash's licenses and risk) is immutable and kept indefinitely. The
-provenance of a residual file, described next, is not immutable: what the server can match depends on what it
-has indexed, so those results are tagged with the server's index generation and dropped when it changes, so a
-reindex never leaves a stale "no match" hiding a real one. Both are written incrementally, as each batch
-completes, so an interrupted scan resumes exactly where it stopped: a re-run asks the server only about the
-content it has not resolved yet, and a wholly unchanged tree asks nothing at all.
+The archive is posted to Cavil, which starts the same unpack, index and analyze pipeline any other package
+goes through. Submitting the same archive under the same name again is idempotent on the server, so a re-run of
+an unchanged tree does not pile up duplicate reviews.
 
-### Finding provenance for the rest
+The review is not instant, so the client polls the report endpoint, which answers "not ready" until the
+analysis finishes and then returns the report. Its "not ready" reply names the pipeline stage (queued,
+unpacking, indexing, analyzing, finalizing), which the client shows on the progress line so the wait names what
+is happening rather than sitting on a bare "Reviewing". The line is on standard error so it never pollutes the
+report or a pipe, and only on a real terminal so CI logs stay clean. A timeout bounds the wait.
 
-Whatever is not recognized exactly is either a modified copy of known code or genuinely new. To tell these
-apart, the CLI fingerprints the leftover regions and asks the server's code search where else those
-fingerprints occur. This is the same winnowing-based matching that powers Cavil's interactive code search: it
-survives reformatting and small edits, and it reports how much of the region lines up as one contiguous copy,
-which distinguishes a faithful copy from a coincidental scattering of common lines.
+### The verdict
 
-The fingerprinting is done on the client. The server only performs an indexed lookup. This split matters for
-the whole design: the heavy, parallel, per-file work happens on the machine running the check, and the server
-does the one thing only it can do, which is to search its index.
-
-### The three verdicts
-
-Every region ends up as one of three things:
-
-- **Exact**, when its content hash is known. The license and risk are known precisely, and the answer came
-  from the cheap first stage.
-- **Partial**, when it is not identical but its fingerprints line up strongly with a known content. The report
-  names what it is a modified copy of and how much of it aligned, with that content's detected licenses and the
-  highest risk any of them carries, so a small high-risk copy embedded in a mostly-permissive file cannot hide
-  the risk from the gate. Where the content is a package's own source and no per-file license was detected, the
-  package's short declared license is shown as a hint. For a backported fix this is the common and reassuring
-  case: the code lines up with the project's own upstream.
-- **Unknown**, when little or nothing lines up. This is the reassuring result, not an alarm: it is code Cavil
-  does not recognize, most often the author's own, and the report shows it as a clean tick rather than a
-  warning. Turning an unknown region into a real license determination needs the full analysis pipeline, which
-  is the server's job and the future review feature, not something the CLI attempts on its own.
-
-## What fingerprinting can and cannot see
-
-The provenance check is honest about its limits, and the report is worded to reflect them. Fingerprinting
-samples the code rather than reading every token, so a small edit that happens to miss every sampled point is
-invisible: renaming a single function, for instance, can leave a copy indistinguishable from its original.
-This is a property of the matching, not a defect to be worked around at the client.
-
-The practical consequence is a rule the report keeps: the tool never claims code is original. It can tell you
-where code came from when it recognizes it; it cannot prove that code came from nowhere. So an unknown region
-is presented as unrecognized, shown as a clean tick meaning "no known code here, your own as far as Cavil can
-see", rather than as a guarantee of originality. That distinction matters most in exactly the situation that
-will become common, when someone scans an entirely AI-written project and wants to be told it is clean: the
-honest answer is "nothing known here", which is what the tick means.
-
-## Where the work happens, and why
-
-The guiding constraint is that the production Cavil instance must not feel this, no matter how many engineers
-point the CLI at how many large trees. Every design choice about work placement follows from that.
-
-The client walks the tree, hashes files, fingerprints regions, deduplicates identical regions before asking
-about them, caches every immutable answer, and renders the report. The server answers two kinds of indexed,
-read-only question and nothing more. Neither question touches the analysis or review pipeline that does the
-real day-to-day work.
-
-Two situations need more care than the rest. A freshly scaffolded project prefilters poorly, because its files
-are new, so most regions reach the fingerprint stage; and a tree that is a near-copy of something indexed at
-the wrong version misses the exact prefilter on every changed file. Both are handled by batching and pacing the
-requests and caching every immutable answer, so even a poorly-prefiltering tree asks in bounded chunks rather
-than one request per file. Two heavier measures are designed for but not yet built, to be added when real load
-calls for them: matching whole files before regions so a version delta reports as one line ("these thousands of
-files are modified copies of that version") instead of thousands of findings, and moving the whole-tree check
-to a low-priority background job the CLI submits once and polls, which is also the shape the future review
-submission will take.
-
-## The report
-
-The report is a per-file (or per-region) checklist, deliberately in human terms rather than the engine's
-exact/partial/unknown vocabulary. Each file is graded by risk into a state: a clean tick for code with no known
-provenance, a plain mark for known code that is permissive or carries only ordinary obligations, a red cross
-for anything at or above the gate, and a dim mark for what was not scanned. It opens with a headline tied to
-the gate and a one-line tally, then lists the files with problems first so a cap can never hide them; a very
-large tree is capped with a note pointing at the JSON form for the rest. Files skipped by policy are reported
-as counts in a footer, so "all clear" never quietly narrows its own coverage. A change-set check frames the
-same thing as what the change *introduced* ("new known code"), because that is the question a diff answers.
-
-By default the report is written for a person: aligned columns, colour and status marks on a terminal, plain
-text when the output is not a terminal or colour is turned off. For machines there is a flat structured form,
-one record per finding, carrying the fields a pipeline needs and none of the bookkeeping a human does not.
-Human-first output is the default precisely because the common complaint about provenance tools is that their
-default output is an unreadable data dump.
+The report carries the maximum license risk Cavil found, on its one-to-nine scale, and the instance's own
+acceptable-risk threshold. The client turns those into a headline, a short tally, the licenses found ordered by
+risk, and a link to the full web report, in colour on a terminal and plain text otherwise. For CI there is a
+flat JSON form with the same facts.
 
 ## The gate
 
-In CI the report is a gate. The check fails when a finding crosses a risk threshold, and passes otherwise. It
-gates on risk rather than on the mere presence of a match, because a match is often benign: a backported fix
-that lines up with its own compatible upstream is expected, and failing on it would be noise. Gating on risk
-keeps the failures meaningful. The exit code is conventional: zero when clean, one when the gate fails, and a
-distinct code for a usage or server problem, so any non-zero code is the simple signal CI acts on while the
-highest risk is shown in the report itself. A stricter project can also choose to fail on unrecognized code.
+In CI the report is a gate: the check fails when the risk is at or above a threshold, and passes otherwise.
+The threshold defaults to the instance's own `acceptable_risk` plus one, so "would Cavil consider this
+acceptable" and "does the CLI pass" line up by default and no project needs to configure a number to match its
+Cavil. `--fail-on-risk` overrides it for a project with a stricter or looser bar.
 
-The threshold follows Cavil's own risk scale rather than an invented one: risk 1 and 2 (public domain,
-permissive) are obligation-free, 3 is weak copyleft whose reciprocity stops at the file, 4 is strong copyleft,
-5 and up escalate, and 6 and 7 are reject-lean. The default gate is 4, because that is where a copy stops being
-a fact about one file and starts being a fact about the whole work: strong copyleft applies reciprocity at the
-derivative-work level, so absorbing such code obliges the codebase around it. That is the decision the tool
-exists to put in front of a human, and it is exactly the case an AI assistant produces when it reproduces a
-function it was trained on.
+Gating on risk rather than on the presence of any license is the point: every project has licenses, and most
+are fine. Cavil's scale captures more than copyleft (obligations, non-commercial and unknown all have their
+place on it), so a single threshold expresses a real policy. The exit code is conventional: zero when within
+the threshold, one when the gate fails, two for a usage or configuration problem, and three for a server or
+connection error, so any non-zero code is the simple signal CI acts on while the risk itself is in the report.
 
-Note this is a stricter line than Cavil's own `acceptable_risk`, which sits at 4 meaning "4 and below is fine".
-The two are answering different questions, and the difference is the point: a distribution deliberately ships
-copyleft software, so for a package under review strong copyleft is unremarkable. Here the question is whether
-*your* code absorbed someone else's, where the same license is the thing you most need to be told about. A
-project that does ship copyleft raises the threshold; one that cannot take in any lowers it to 3. The report
-colours a finding red only once it meets the gate and shows the notable band in between, and the number next to
-each finding carries its plain-language meaning so the choice is informed.
+## Access, and why it is high for now
 
-## The baseline: deciding once
-
-Most real projects contain some matches that are entirely fine and are never going away - a test file copied
-from the author's own other project, a vendored helper, a snippet with a compatible licence. Reporting those on
-every run is how a tool loses its audience: three lines you have already thought about, forever, until someone
-stops reading the output or drops the gate from CI. The baseline exists to keep the report about *new* code,
-which is the same question the change-set scope answers over time, applied to a whole tree's state instead.
-
-A baseline is a committed `.cavil-baseline.json` listing accepted matches. It is committed on purpose: the
-decision belongs to the project rather than to one developer's machine or a CI variable, and each entry carries
-a human-readable note ("identical to perl-Mojolicious t/pod.t") so that a diff adding an entry reads in review
-as *we now accept this file matching Mojolicious*. That review moment is most of the value; a suppression list
-nobody reads would be worse than the noise it removes.
-
-Three rules keep it a record of decisions rather than a way to silence the tool:
-
-* **Pinned to content, not path.** An entry names the file, the hash of its bytes, and the hash of what it
-  matched. Edit the file, or start matching something else, and the entry no longer applies. Path-keyed
-  suppression is the dangerous shape, because a file could be replaced with entirely different copied code and
-  stay quiet.
-* **Never hides an escalation.** The entry records the risk that was accepted. The corpus grows constantly, so
-  the same bytes can later be found in a riskier project; if the risk exceeds what was recorded, the finding is
-  reported regardless of the baseline.
-* **Never silent.** Accepted matches are counted in the tally and named in a footer pointing at the file, on
-  the same principle as the hidden, licence and excluded counts: the report never quietly narrows its own
-  coverage.
-
-It applies to whole-tree scans only. A change-set check is already scoped to what is new, and its regions are
-fragments of a diff with no stable identity worth recording.
-
-## What is and is not scanned
-
-The scan honours the repository's own ignore rules silently, because those exclusions are the user's explicit
-intent. On top of that it skips hidden files (dotfiles and dot-directories) by default, since they are
-usually configuration and editor state rather than shipped source. That skip is a policy the tool chose, not
-the user, so unlike the ignore rules it is never silent: the report states how many hidden files were passed
-over and how to include them, because a hidden file could still be real copied source and a legal check must
-not quietly narrow its own coverage.
-
-Two more skips are about what can be usefully fingerprinted, and both are reported per file (verdict "skipped"
-with a reason), never dropped in silence. A file that winnows to too few fingerprints is **too short** to locate
-reliably and is resolved locally without troubling the server. A file that is **too large** - either past a byte
-ceiling, so it is not even read, or winnowing to more fingerprints than the cap the server advertises - is a data,
-generated or minified blob rather than function-sized source; searching it would make the server gather most of
-the corpus for nothing, so it is skipped and reported instead. Binary files are the one silent exception, as
-there is nothing to fingerprint in them at all.
-
-Legal documents are skipped the same visible way. A repository's own LICENSE, COPYING or NOTICE matching some
-other project's copy of the same licence text is noise, not a finding, so those files are recognised by name
-(using the server's own definition of a legal document) and passed over with a footer count. Two explicit
-filters let a user cut more. `--exclude-path` drops whole subtrees, most often test fixtures that deliberately
-contain other projects' code, using the same glob rules as Cavil's ignore globs; it is a pure client-side
-scope choice and never changes what the server would answer for a given file. `--exclude-package` is different:
-it tells the server to ignore matches carried only by named packages, so an engineer scanning a checkout of
-their own open source project does not see it match its own indexed package. Because that filter is applied
-where every carrier of a content is known, a file that is *also* shipped by another package still surfaces,
-attributed to that other package, rather than vanishing.
+Submitting a package runs the full pipeline and puts a review in the legal backlog, so it is gated exactly like
+Cavil's own web upload form: it needs a read-write API key whose user has admin (`infra`) access. That is a
+high bar on purpose for a first version - it keeps random submissions out of the production queue while the
+workflow is proven. The planned sandbox namespace is what will open ad-hoc checks to ordinary users without
+that cost; until it exists, `check` is for admins and for CI configured with an appropriately privileged key.
+The client preflights with `whoami` so a key that cannot submit is reported clearly before a large tree is
+packaged, rather than as an opaque rejection afterwards.
 
 ## The service contract
 
 The CLI depends on a small, stable contract with the Cavil server, deliberately narrow so it can be reasoned
-about and mocked. It is a handful of read-only questions, all answered from an index. A configuration endpoint
-returns the winnowing parameters the client must fingerprint with and the index generation, so the client
-computes matching fingerprints and knows when to drop cached results. A recognition endpoint takes a batch of
-content hashes and returns, for those it knows, their licenses and risk, one package and path that carry each,
-and the declared license where the content is a package's own source. A batch fingerprint search takes
-fingerprint sets and returns, for each, where that code is found, with the same containment and alignment
-information the interactive code search reports. Both the recognition and the search accept a list of packages
-to exclude, applied at the carrier level as described above. A small identity endpoint backs `whoami`.
+about and mocked. An identity endpoint backs `whoami`. An upload endpoint takes the archive and its checksum
+and starts a review, returning the new package's id. A report endpoint returns the report for that id, or "not
+ready" while it builds, with the risk and acceptable-risk fields the gate needs. A documents endpoint serves
+the generated SPDX SBOM and NOTICE files, likewise "not ready" until generated. That is all; the CLI needs no
+knowledge of Cavil's internals beyond these questions and their answers.
 
-Keeping the contract this small is what lets the server stay unaffected and lets the CLI be tested without a
-server at all. It also means the CLI needs no knowledge of Cavil's internals, only of these two questions and
-their answers.
-
-## Running the matcher on the client
-
-The client hashes and fingerprints with the same released matcher library the server uses. This is not an
-optimization but a correctness requirement: a file must hash to the same value on the laptop as it did when
-Cavil indexed it, or the recognition stage would never match, and fingerprints must be computed the same way
-on both sides for the code search to find anything. Reusing the one implementation removes any chance of the
-two drifting apart.
+The upload also carries an `ephemeral` flag, asking for a one-off report with no lasting side effects, no open
+review left in the legal backlog. That is what a developer or CI check always wants, so it is always sent. It
+is the forward edge of the planned sandbox mode: today's servers do not act on it (which is why submission is
+still gated to high access), but a server that gains the ad-hoc mode can honour it without any client change,
+and the access gate can then relax for ephemeral requests.
 
 ## Testing
 
 The CLI is tested against a mock of the Cavil server, not a real one. Each scenario stands up a small
-in-process web service that answers those endpoints with canned data and records exactly what the CLI asked
-it. The requests to the server go through the real HTTP machinery, so the tests exercise the true wire
-behaviour, but there is no database, no network, and no port to bind.
+in-process web service that answers those endpoints with canned data and records what the CLI asked it. The
+requests go through the real HTTP machinery, so the tests exercise the true wire behaviour, but there is no
+database, no network, and no port to bind. A field problem becomes a test with almost no translation: the
+responses that triggered it become the mock's answers, and the requests that led to it become the assertions.
 
-This choice is deliberate and it pays off in two ways. The recorded requests let a test assert the behaviours
-that are the whole point of the design, that hashes were deduplicated, that questions were batched rather than
-asked one file at a time, that a second run asked only about what the cache had missed. And because the
-exchange is plain captured HTTP, a real problem seen in the field becomes a test with almost no translation:
-the responses that triggered it become the mock's answers, and the requests that led to it become the
-assertions. A field bug turns into a reproducer without needing a Cavil instance to recreate it.
-
-Two layers sit on top of the mock. The parts of the CLI that never talk to the server, the report renderer,
-the risk gate, the exit codes, and the logic that decides which regions to check, are written as plain
-functions of their inputs and tested directly, by feeding them a fixed result and checking what they produce.
-And small throwaway directories and git repositories serve as fixtures for the end-to-end scenarios, with
-hashing being deterministic so the mock's canned answers stay stable.
-
-The one real weakness of testing against a mock is that the mock can drift from the real server. The planned
-guard is to share a single example exchange between the two projects, so the server's own suite proves it
-produces that exchange and the CLI's mock serves it, and neither side can quietly change the contract without
-the other noticing; until that is in place the two suites are kept aligned by hand, and the server's own tests
-cover the endpoints it exposes.
+The parts that never talk to the server - the archive builder, the report renderer, the risk gate and the exit
+codes - are plain functions of their inputs and tested directly, with small throwaway directories and git
+repositories as fixtures.
 
 ## Design choices and their reasons
 
 A few decisions are worth stating on their own, because they are the ones a reader is most likely to question.
 
-- **One command with a gate, not a pipeline of tools.** Provenance tools commonly separate scanning,
-  format conversion, and policy checking into distinct steps, which leaves the default experience as a raw
-  data file that means nothing until two more tools have run. Folding all of it into one command with a
-  human-readable default and a built-in gate is the main thing that makes the CLI pleasant to reach for.
-- **Risk over a copyleft flag.** A simple copyleft yes-or-no is a coarse gate. Cavil already computes a
-  one-to-nine risk that captures more than copyleft, so the CLI uses it, which lets a project set a threshold
-  that matches its own tolerance instead of an all-or-nothing rule.
-- **Recognition before matching.** The exact-hash prefilter exists because it is the cheapest possible answer
-  and it resolves the large majority of files in any real tree. Doing it first is what makes scanning
-  something as large as the kernel sources fast and gentle on the server, and what makes repeat runs in CI
-  nearly free.
-- **Honesty as a feature.** Never claiming code is original (an unrecognized file reads as "nothing known
-  here", a clean tick, not a guarantee), keeping the gate on the per-file licenses so a declared-license hint
-  can never lower it, and showing a declared license as a hint rather than a determination, are deliberate. The
-  tool is most valuable when it is trusted, and it earns that by never claiming more than the matching supports.
+- **Reuse the real review, do not reinvent it.** The value is that the local answer is the authoritative one.
+  A separate client-side approximation would drift from what the legal workflow decides, which is the one thing
+  it must not do.
+- **Include vendored code by default.** Honouring `.gitignore` would be the tidy choice and the wrong one: the
+  installed dependencies are most of what a legal review is for. The default optimises for a correct review,
+  and `--respect-gitignore` is there for the rare case that wants the lean tree.
+- **Gate on risk, defaulted to the instance.** A copyleft yes-or-no is too coarse, and a hardcoded number would
+  fight each instance's own policy. Defaulting the threshold to the instance's acceptable risk makes the common
+  case need no configuration at all.
+- **High access first, sandbox later.** Rather than invent a weaker analysis to make submission safe for
+  everyone, the first version reuses the real pipeline behind the real access gate, and leaves room for a
+  backlog-free sandbox to open it up properly.

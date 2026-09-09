@@ -41,7 +41,10 @@ These are the additions.
     App::FuguVM::Proxy->run_child($port, $cache_dir)
 
 The entry point of the spawned child. The child builds its own cache,
-warms the metadata table, and serves until a C<SIGTERM> arrives.
+warms the metadata table, and serves until a C<SIGTERM> arrives. The
+spawn passes a fixed argument list, so the child reads the distfile
+cap from C<FUGUVM_DISTFILE_LIMIT> in its environment, which it
+inherits from C<fuguvm>. An absent variable means 0.
 
 =head2 guest_url
 
@@ -52,7 +55,17 @@ networking puts the host at 10.0.2.2, and no other address gets out of
 the SLIRP network. The loopback address serves the same proxy, but the
 guest cannot reach it.
 
-The method returns C<undef> while the proxy does not run.
+The method returns C<undef> while the proxy does not run: a recorded
+port that a crash left behind is not a reachable proxy.
+
+=head2 new
+
+    App::FuguVM::Proxy::Cache->new($cache_dir, $limit)
+
+Build the cache over the directory. The optional C<$limit> is the
+distfile cap in bytes. The default is 0, and 0 turns the distfile
+cache off: the distfile pattern then admits nothing, and
+C<trim_distfiles> empties the tree.
 
 =head2 prune
 
@@ -74,18 +87,54 @@ The method removes whole directories and not matching files. Removal
 of the files alone leaves the empty version tree behind, and a
 continuous-integration cache walks that tree.
 
-The method does not touch a directory whose name is not a version. In
-practice there are none: every pattern puts its content under
-F<pub/OpenBSD/E<lt>versionE<gt>/> or
-F<pub/OpenBSD/syspatch/E<lt>versionE<gt>/>. A cache under C<$HOME> is
-the wrong place to delete on a guess.
+The method does not touch a directory whose name is not a version.
+F<distfiles> is not a version name, so the method leaves the distfile
+tree: a distfile belongs to a port and not to a release, and a port
+keeps its distfile across releases. A cache under C<$HOME> is the
+wrong place to delete on a guess.
+
+=head2 trim_distfiles
+
+    my $removed = $cache->trim_distfiles;
+
+Hold the distfile tree under the cap. The eviction removes the oldest
+file first, by modification time, and stops when the tree fits. The
+modification time is the store time of the file, because C<store>
+writes each file one time; the access time is not usable, because a
+host can mount its home directory with C<noatime>. A cap of 0 removes
+the whole tree, because the operator turned the cache off. The method
+removes files and leaves the directories, because a later fetch
+refills them. It returns the removed files as
+C<[ { path, size } ]>.
+
+C<store> calls the method after each distfile store, and the child of
+the proxy is the only writer. The cap is therefore true between two
+requests, and not only after a run. A
+L<Fugu::Proxy::Meta> entry of an evicted file reads as absent, so an
+eviction needs no invalidation.
+
+=head2 distfile_size, distfile_limit
+
+C<distfile_size> returns the bytes of the distfile tree, over every
+cached host. C<distfile_limit> returns the cap in bytes.
 
 =head1 CACHEABLE CONTENT
 
 The cache keeps the release file sets, the packages, the syspatch
 sets, the checksums and their signatures, the miniroot images, the
-kernels, the build info and the index files. Every pattern names a
-version, and that is what makes C<prune> safe.
+kernels, the build info, the index files, the four source tarballs of
+a release (F<ports.tar.gz>, F<src.tar.gz>, F<sys.tar.gz> and
+F<xenocara.tar.gz>), and the manifest pair of the version directory
+that signs them. Every pattern names a version, and that is what makes
+C<prune> safe.
+
+The distfile tree, under F</pub/OpenBSD/distfiles/>, is the one
+unversioned admission, and it is conditional: a distfile URL is
+cacheable only while the cap is above zero. The pattern requires a
+file name at the end, so a directory listing with a trailing solidus
+stays outside the cache, and it filters no extension, because a
+distfile carries every extension and sometimes none. The cap of
+C<trim_distfiles> bounds the tree, because no version prune can.
 
 Everything else is not cacheable, and neither is any response whose
 status is not 200. A cached 404 is a mirror that stays broken after

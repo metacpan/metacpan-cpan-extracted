@@ -41,7 +41,7 @@ package Dpkg::Vendor::Default 0.01;
 
 use v5.36;
 
-# If you use this file as template to create a new vendor class, please
+# If you use this file as template to create a new vendor class,
 # uncomment the following lines:
 #use parent qw(Dpkg::Vendor::Default);
 
@@ -49,7 +49,7 @@ use v5.36;
 
 =over 4
 
-=item $vendor_obj = Dpkg::Vendor::Default->new()
+=item $vendor = Dpkg::Vendor::Default->new()
 
 Creates the default vendor object. Can be inherited by all vendor objects
 if they don't need any specific initialization at object creation time.
@@ -64,7 +64,7 @@ sub new {
     return $self;
 }
 
-=item $vendor_obj->run_hook($id, @params)
+=item $vendor->run_hook($id, @params)
 
 Run the corresponding hook. The parameters are hook-specific. The
 supported hooks are:

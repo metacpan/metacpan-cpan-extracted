@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Resources;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use DateTime;
 use Scalar::Util qw/blessed/;
@@ -260,7 +260,7 @@ sub render_resource {
         }
     }
 
-    return {resource => $r->module, groups => $r->data};
+    return {resource => $r->module, groups => $data};
 }
 
 

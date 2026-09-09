@@ -2,7 +2,7 @@ package Test2::Harness::UI::Request;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Test2::Harness::UI::UUID qw/gen_uuid uuid_inflate/;
 use Data::GUID;
@@ -60,24 +60,24 @@ sub session_host {
 
     my $schema = $self->schema;
 
-    $schema->txn_begin;
+    my $host = $schema->txn_do(sub {
+        my $h = $schema->resultset('SessionHost')->find(
+            {
+                session_id => $session->session_id,
+                address    => $self->address // 'SOCKET',
+                agent      => $self->user_agent,
+            }
+        );
 
-    my $host = $schema->resultset('SessionHost')->find(
-        {
-            session_id => $session->session_id,
-            address    => $self->address // 'SOCKET',
-            agent      => $self->user_agent,
-        }
-    );
+        $h //= $schema->resultset('SessionHost')->create({
+            session_host_id => gen_uuid,
+            session_id      => $session->session_id,
+            address         => $self->address // 'SOCKET',
+            agent           => $self->user_agent,
+        });
 
-    $host //= $schema->resultset('SessionHost')->create({
-        session_host_id => gen_uuid,
-        session_id      => $session->session_id,
-        address         => $self->address // 'SOCKET',
-        agent           => $self->user_agent,
+        return $h;
     });
-
-    $schema->txn_commit;
 
     return $self->{session_host} = $host;
 }

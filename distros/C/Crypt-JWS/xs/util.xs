@@ -53,7 +53,7 @@ _abi_ptr()
         RETVAL
 
 int
-_abi_selftest()
+_abi_selftest(...)
     CODE:
         /* Exercise the table the way a C consumer would: resolve, version
          * check, then call through the pointers. */
@@ -100,6 +100,35 @@ _abi_selftest()
         if (rand) SvREFCNT_dec(rand);
         ok = ok && J->key_is_private(aTHX_ key);
         J->key_free(aTHX_ key);
+        if (items >= 2 && SvOK(ST(0)) && SvOK(ST(1))) {
+            STRLEN derlen, pemlen;
+            const char *der = SvPVbyte(ST(0), derlen);
+            const char *pem = SvPVbyte(ST(1), pemlen);
+            void *priv = J->key_from_pem(aTHX_ pem, pemlen);
+            void *pub  = J->key_from_x509_der(aTHX_
+                             (const unsigned char *)der, derlen);
+            int v3 = 0;
+            if (priv && pub) {
+                SV *s = J->sign(aTHX_ priv, "RS256", 5,
+                                (const unsigned char *)"input", 5);
+                if (s) {
+                    STRLEN slen;
+                    const char *sp = SvPVbyte(s, slen);
+                    v3 = J->verify(aTHX_ pub, "RS256", 5,
+                                   (const unsigned char *)"input", 5,
+                                   (const unsigned char *)sp, slen);
+                    SvREFCNT_dec(s);
+                }
+                v3 = v3 && J->key_is_private(aTHX_ priv)
+                        && !J->key_is_private(aTHX_ pub);
+            }
+            if (priv) J->key_free(aTHX_ priv);
+            if (pub)  J->key_free(aTHX_ pub);
+            /* garbage is NULL, not a crash and not a key */
+            v3 = v3 && !J->key_from_x509_der(aTHX_
+                           (const unsigned char *)"not a certificate", 17);
+            ok = ok && v3;
+        }
         RETVAL = ok;
     OUTPUT:
         RETVAL

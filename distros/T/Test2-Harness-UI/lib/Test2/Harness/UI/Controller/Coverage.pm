@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Coverage;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -48,6 +48,7 @@ sub handle {
     die error(404) unless $run;
 
     if ($delete) {
+        die error(401 => 'Login required') unless $req->user;
         $run->coverages->delete;
         $run->update({has_coverage => 0});
     }

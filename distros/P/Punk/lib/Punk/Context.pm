@@ -159,6 +159,8 @@ of your own.
 
 =head2 json($data, $status?)
 
+=head2 xml($doc, $status?)
+
 =head2 text($body, $status?)
 
 =head2 html($body, $status?)
@@ -169,6 +171,14 @@ of your own.
 
 Finished responses. Status and headers previously set through
 L</status> and L</header> are folded in.
+
+C<xml> takes a L<File::Raw::XML::Document>, a L<File::Raw::XML::Node> or a
+string of markup you built yourself, and answers C<application/xml;
+charset=utf-8>. A document is written with its XML declaration, a node
+without one, because a node is a fragment. Any other reference is refused
+rather than stringified. Returning a document from a handler does the same
+thing without the call, and so does returning one from a
+L</respond_to> branch.
 
 C<redirect> sends where it is told. When the destination came out of the
 request, put it through L</safe_path> first.
@@ -456,6 +466,14 @@ schema, runs: C<$data> defaults to the decoded JSON body for a JSON
 request, the merged params otherwise; returns a L<Punk::Validate>
 Result. With no arguments, reads: the last Result this request produced
 (a route-level C<validate> option ran before the handler), or undef.
+
+"A JSON request" means one whose Content-Type is C<application/json>, and
+nothing else is treated as a body. A schema on a route that receives XML
+therefore validates the merged params - the query string - and reports
+success over a body it never looked at. JSON Schema describes Perl data,
+which a document tree is not, so there is no C<xml> source to name; pass
+C<$data> yourself, built from the tree, when a route takes XML and must be
+validated.
 
 =head2 login($user_or_id)
 

@@ -16,7 +16,7 @@ subtest 'empty args' => sub {
         'error class',
     );
 
-    like( $error->msg, qr/<encode>/, "error mesage" );
+    like( $error->msg, qr/<encode>/, 'error mesage' );
 
 };
 
@@ -35,7 +35,7 @@ subtest 'bad types' => sub {
             my $error = dies { Data::Record::Serialize->new( encode => 'null', types => $type ) };
             isa_ok( $error, ['Error::TypeTiny::Assertion'], 'error class' );
 
-            is( $error->attribute_name, 'types', "attribute name" );
+            is( $error->attribute_name, 'types', 'attribute name' );
         };
 
     }
@@ -43,7 +43,7 @@ subtest 'bad types' => sub {
 
 
 
-subtest "encode includes sink ; don't specify sink" => sub {
+subtest q{encode includes sink ; don't specify sink} => sub {
 
     my $error;
 
@@ -59,7 +59,7 @@ subtest "encode includes sink ; don't specify sink" => sub {
         'error class',
     );
 
-    like( $error, qr/don't specify a sink/, "error message" );
+    like( $error, qr/don't specify a sink/, 'error message' );
 };
 
 

@@ -5,7 +5,7 @@ package Data::Record::Serialize::Role::Base;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
 
@@ -176,7 +176,6 @@ has _can_bool => (
 
 
 
-
 sub _build_field_list_with_type {
     my ( $self, $list_spec, $type, $error_label ) = @_;
 
@@ -186,7 +185,7 @@ sub _build_field_list_with_type {
             ( ArrayRef [Str] )->assert_return( $list_spec->( $self ) );
         }
         elsif ( is_arrayref( $list_spec ) ) {
-            [@$list_spec];
+            populate_set( $self->type_index->[$type], $list_spec );
         }
         else {
             # want all of the fields. actually just want the ones that will be output,
@@ -742,7 +741,7 @@ Data::Record::Serialize::Role::Base - Base Role for Data::Record::Serialize
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 

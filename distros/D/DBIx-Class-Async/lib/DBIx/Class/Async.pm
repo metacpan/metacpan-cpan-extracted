@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.8');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
@@ -15,7 +15,7 @@ DBIx::Class::Async - Non-blocking, multi-worker asynchronous wrapper for DBIx::C
 
 =head1 VERSION
 
-Version v1.0.8
+Version v1.1.0
 
 =head1 DISCLAIMER
 
@@ -335,7 +335,7 @@ sub create_async_db {
     my $connect_info = $args{connect_info} or croak "connect_info required";
     my $workers      = $args{workers} || DEFAULT_WORKERS;
 
-    unless (eval { $schema_class->can('connect') } || eval "require $schema_class") {
+    unless (eval { $schema_class->can('connect') } || eval { DBIx::Class::Async::_safe_require_class($schema_class) }) {
         croak "Cannot load schema class $schema_class: $@";
     }
 
@@ -700,7 +700,7 @@ sub _init_workers {
 
 
                     # Load schema class in worker process
-                    my $require_result = eval "require $schema_class; 1";
+                    my $require_result = eval { _safe_require_class($schema_class); 1 };
                     if (!$require_result || $@) {
                         my $err = $@ || 'Unknown error';
                         warn "[PID $$] FAILED to load schema class: $err"
@@ -1206,6 +1206,17 @@ sub _resolve_placeholders {
 
     if (ref $item eq 'HASH') {
         for my $key (keys %$item) {
+            # CPANSec CWE-89: never substitute register values into the
+            # 'sql' key of a txn_do/txn_batch step. That string is handed
+            # to $dbh->do($step->{sql}, ...) as literal SQL text, so any
+            # substitution here, even the "exact match" swap, would splice
+            # a value directly into a query instead of passing it as a
+            # genuine DBI bind parameter. Chained values that need to reach
+            # a 'raw' step's query MUST go through the 'bind' arrayref
+            # (still safely resolved below) with a placeholder (?) in 'sql',
+            # never through inline text substitution.
+            next if $key eq 'sql';
+
             if (ref $item->{$key}) {
                 # Dive deeper into nested structures
                 _resolve_placeholders($item->{$key}, $reg);
@@ -1230,6 +1241,30 @@ sub _resolve_placeholders {
             }
         }
     }
+}
+
+sub _safe_require_class {
+    my ($class) = @_;
+
+    die "Invalid class name: '$class'\n"
+        unless defined $class && $class =~ /\A\w+(?:::\w+)*\z/;
+
+    no strict 'refs';
+    # Cheap pre-checks (mirrors Class::C3::Componentised::ensure_class_loaded):
+    # avoid re-requiring a class that's already loaded or already has some
+    # symbol table presence.
+    return 1 if ${"${class}::VERSION"};
+    return 1 if @{"${class}::ISA"};
+
+    my $file = join('/', split(/::/, $class)) . '.pm';
+    return 1 if $INC{$file};
+
+    for (keys %{"${class}::"}) {
+        return 1 if *{"${class}::$_"}{CODE};
+    }
+
+    require $file;
+    return 1;
 }
 
 sub _interpolate_string {

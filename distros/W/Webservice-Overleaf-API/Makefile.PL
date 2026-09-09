@@ -20,21 +20,26 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Webservice::Overleaf::API",
   "PREREQ_PM" => {
+    "Cwd" => 0,
     "Dispatch::Fu" => "1.07",
+    "File::Basename" => 0,
+    "File::Spec" => 0,
+    "File::Temp" => 0,
     "HTML::Entities" => 0,
     "HTTP::Tiny" => 0,
+    "IO::Socket::SSL" => "1.56",
     "JSON::PP" => 0,
     "MIME::Base64" => 0,
+    "Mozilla::CA" => 0,
+    "Net::SSLeay" => "1.49",
     "Pod::Text" => 0,
     "URI::Escape" => 0,
     "Util::H2O::More" => "0.4.6"
   },
   "TEST_REQUIRES" => {
-    "File::Spec" => 0,
-    "File::Temp" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,13 +47,18 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Cwd" => 0,
   "Dispatch::Fu" => "1.07",
+  "File::Basename" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "HTML::Entities" => 0,
   "HTTP::Tiny" => 0,
+  "IO::Socket::SSL" => "1.56",
   "JSON::PP" => 0,
   "MIME::Base64" => 0,
+  "Mozilla::CA" => 0,
+  "Net::SSLeay" => "1.49",
   "Pod::Text" => 0,
   "Test::More" => 0,
   "URI::Escape" => 0,

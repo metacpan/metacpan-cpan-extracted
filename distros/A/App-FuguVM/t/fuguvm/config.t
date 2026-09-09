@@ -107,6 +107,49 @@ is(App::FuguVM::Config::DEFAULT_VERSION(), '7.8', 'DEFAULT_VERSION is 7.8');
     my $config = App::FuguVM::Config->new($tmpdir);
     my $vm = $config->load_vm('nonexistent');
     is($vm, undef, 'load_vm returns undef for missing VM');
+    is($config->error, undef, 'a missing VM is not a validation error');
+}
+
+# The arch directive: the default, both values, both spellings, and
+# the validation at the configuration boundary
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    make_path("$tmpdir/.fuguvm/vms");
+
+    open my $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "vm \"plain\" {\n";
+    print $fh "    memory 2048\n";
+    print $fh "}\n";
+    print $fh "vm \"intel\" {\n";
+    print $fh "    arch amd64\n";
+    print $fh "}\n";
+    print $fh "vm \"arm\" {\n";
+    print $fh "    arch = arm64\n";
+    print $fh "}\n";
+    print $fh "vm \"broken\" {\n";
+    print $fh "    arch riscv64\n";
+    print $fh "}\n";
+    close $fh;
+
+    my $config = App::FuguVM::Config->new($tmpdir);
+
+    is(App::FuguVM::Config::DEFAULT_ARCH(), 'arm64',
+	'DEFAULT_ARCH is arm64');
+    is($config->load_vm('plain')->{arch}, 'arm64',
+	'arch defaults to arm64 when the block omits it');
+    is($config->load_vm('intel')->{arch}, 'amd64',
+	'arch amd64 loads in the key value form');
+    is($config->load_vm('arm')->{arch}, 'arm64',
+	'arch arm64 loads in the key = value form');
+
+    is($config->load_vm('broken'), undef,
+	'an unknown arch value makes load_vm return undef');
+    like($config->error, qr/riscv64/, 'error names the value');
+    like($config->error, qr/amd64.*arm64/,
+	'error names the two accepted values');
+
+    ok(defined $config->load_vm('plain'), 'a later load succeeds');
+    is($config->error, undef, 'and error returns undef after it');
 }
 
 # The resolved cache_dir reaches the per-VM config. Thus `fuguvm up`
@@ -194,6 +237,168 @@ is(App::FuguVM::Config::DEFAULT_VERSION(), '7.8', 'DEFAULT_VERSION is 7.8');
     is($result, 1, 'an unparseable image_cache falls back to the default');
     like($diagnostic, qr/not a yes\/no value: maybe/,
 	'and it says so instead of meaning the opposite');
+}
+
+# The distfile_cache directive: the size grammar, the default, the
+# refusal, and the merge
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $homedir = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $homedir;
+    make_path("$tmpdir/.fuguvm/vms");
+
+    my $write = sub ($body) {
+	open my $fh, '>', "$tmpdir/.fuguvmrc" or die $!;
+	print $fh $body;
+	close $fh;
+	return App::FuguVM::Config->new($tmpdir);
+    };
+
+    my %sizes = (
+	'4G'   => 4 * 1024**3,
+	'512M' => 512 * 1024**2,
+	'64K'  => 64 * 1024,
+	'1024' => 1024,
+	'2g'   => 2 * 1024**3,
+	'8m'   => 8 * 1024**2,
+    );
+    for my $value (sort keys %sizes) {
+	is($write->("distfile_cache $value\n")->distfile_cache,
+	    $sizes{$value}, "distfile_cache parses $value");
+    }
+
+    is($write->("distfile_cache 0\n")->distfile_cache, 0,
+	'distfile_cache 0 is off');
+    is($write->("cache_dir /tmp\n")->distfile_cache, 0,
+	'an absent directive is off');
+
+    # An unparsable value warns and reads as off: an unrecognized
+    # spelling must not silently mean its opposite, and off is the
+    # closed state for a cache.
+    my $diagnostic = '';
+    my $result;
+    {
+	local *STDERR;
+	open STDERR, '>', \$diagnostic or die "capture stderr: $!";
+	$result = $write->("distfile_cache lots\n")->distfile_cache;
+    }
+    is($result, 0, 'an unparsable distfile_cache is off');
+    like($diagnostic, qr/lots/, 'and the warning names the value');
+
+    # The project file wins over the global file, for each of the
+    # three directives of the mirror work
+    open my $gh, '>', "$homedir/.fuguvmrc" or die $!;
+    print $gh "distfile_cache 1K\n";
+    print $gh "verify yes\n";
+    print $gh "signify_dir /global/keys\n";
+    close $gh;
+
+    my $config = $write->("distfile_cache 2K\n"
+	. "verify no\n"
+	. "signify_dir /project/keys\n");
+    is($config->distfile_cache, 2048,
+	'the project distfile_cache wins over the global one');
+    is($config->verify, 0, 'the project verify wins over the global one');
+    is($config->signify_dir, '/project/keys',
+	'the project signify_dir wins over the global one');
+
+    # The global file serves without a project value
+    $config = $write->("cache_dir /tmp\n");
+    is($config->distfile_cache, 1024, 'the global distfile_cache serves');
+    is($config->verify, 1, 'the global verify serves');
+    is($config->signify_dir, '/global/keys', 'the global signify_dir serves');
+}
+
+# The verify directive: the default is on, and it reads the yes/no
+# spellings like image_cache
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $homedir = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $homedir;
+    make_path("$tmpdir/.fuguvm/vms");
+
+    open my $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "vm test {\n}\n";
+    close $fh;
+    my $config = App::FuguVM::Config->new($tmpdir);
+    is($config->verify, 1, 'verify defaults to 1');
+    is($config->load_vm('test')->{verify}, 1,
+	'and the default reaches the VM hash');
+
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "verify no\n";
+    print $fh "vm test {\n}\n";
+    close $fh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    is($config->verify, 0, 'verify no reads as 0');
+    is($config->load_vm('test')->{verify}, 0, 'and reaches the VM hash');
+}
+
+# The signify_dir directive: the tilde, the project-relative path,
+# the VM hash, and the refusal of a value that is not a directory
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $homedir = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $homedir;
+    make_path("$tmpdir/.fuguvm/vms", "$tmpdir/keys", "$homedir/keys");
+
+    open my $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "signify_dir ~/keys\n";
+    print $fh "vm test {\n}\n";
+    close $fh;
+    my $config = App::FuguVM::Config->new($tmpdir);
+    is($config->signify_dir, "$homedir/keys", 'signify_dir expands a tilde');
+    is($config->load_vm('test')->{signify_dir}, "$homedir/keys",
+	'and load_vm carries it into the VM hash');
+
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "signify_dir keys\n";
+    print $fh "vm test {\n}\n";
+    close $fh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    like($config->signify_dir, qr{\Q/keys\E$},
+	'a relative path resolves against the project root');
+    like($config->signify_dir, qr{^/}, 'and the result is absolute');
+
+    # A value that is not a directory is a refusal at the boundary
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "vm test {\n";
+    print $fh "    signify_dir absent-keys\n";
+    print $fh "}\n";
+    close $fh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    is($config->load_vm('test'), undef,
+	'an absent signify_dir makes load_vm return undef');
+    like($config->error, qr/absent-keys/, 'and error names the path');
+
+    # The distfile cap is a project fact, and load_vm injects it
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "distfile_cache 4G\n";
+    print $fh "vm test {\n}\n";
+    close $fh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    is($config->load_vm('test')->{distfile_cache}, 4 * 1024**3,
+	'load_vm injects the distfile cap of the project');
+
+    # A cap in a VM block does not apply, and the operator hears
+    # about it
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "distfile_cache 4G\n";
+    print $fh "vm test {\n";
+    print $fh "    distfile_cache 8G\n";
+    print $fh "}\n";
+    close $fh;
+    my $warning = '';
+    my $loaded;
+    {
+	local *STDERR;
+	open STDERR, '>', \$warning or die "capture stderr: $!";
+	$loaded = App::FuguVM::Config->new($tmpdir)->load_vm('test');
+    }
+    is($loaded->{distfile_cache}, 4 * 1024**3,
+	'the project cap wins over a cap in a VM block');
+    like($warning, qr/distfile_cache/,
+	'and the loader warns about the block value');
 }
 
 # The parser normalizes image_cache inside a vm block like the global
@@ -453,6 +658,325 @@ is(App::FuguVM::Config::DEFAULT_VERSION(), '7.8', 'DEFAULT_VERSION is 7.8');
     my $vm = $config->load_vm('test');
     
     is($vm->{memory}, 4096, 'project VM config overrides global');
+}
+
+# The bind_address directive: the merge, the fallback chain, the
+# default, and the validation at the configuration boundary
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $homedir = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $homedir;
+    make_path("$tmpdir/.fuguvm/vms");
+
+    open my $gh, '>', "$homedir/.fuguvmrc";
+    print $gh "bind_address 10.0.0.1\n";
+    close $gh;
+
+    open my $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "vm \"plain\" {\n}\n";
+    print $fh "vm \"pinned\" {\n";
+    print $fh "    bind_address 0.0.0.0\n";
+    print $fh "}\n";
+    close $fh;
+
+    my $config = App::FuguVM::Config->new($tmpdir);
+
+    is(App::FuguVM::Config::DEFAULT_BIND_ADDRESS(), '127.0.0.1',
+	'DEFAULT_BIND_ADDRESS is 127.0.0.1');
+    is($config->load_vm('pinned')->{bind_address}, '0.0.0.0',
+	'bind_address in a vm block reaches the merged configuration');
+    is($config->load_vm('plain')->{bind_address}, '10.0.0.1',
+	'the enclosing file serves a vm block that omits it');
+
+    # The project file wins over the global file
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "bind_address 192.168.1.1\n";
+    print $fh "vm \"plain\" {\n}\n";
+    close $fh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    is($config->load_vm('plain')->{bind_address}, '192.168.1.1',
+	'the project file wins over the global file');
+
+    # The default is loopback
+    open $gh, '>', "$homedir/.fuguvmrc";
+    close $gh;
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "vm \"plain\" {\n}\n";
+    close $fh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    is($config->load_vm('plain')->{bind_address}, '127.0.0.1',
+	'the default is 127.0.0.1');
+
+    # An invalid value fails, and error names the value. A component
+    # with a leading zero reads as octal in inet_aton, so it fails
+    # too.
+    for my $bad ('10.0.0.256', 'vm.example.org', '1.2.3', '1.2.3.4.5',
+	'010.0.0.1') {
+	open $fh, '>', "$tmpdir/.fuguvmrc";
+	print $fh "vm \"plain\" {\n";
+	print $fh "    bind_address $bad\n";
+	print $fh "}\n";
+	close $fh;
+	$config = App::FuguVM::Config->new($tmpdir);
+	is($config->load_vm('plain'), undef,
+	    "bind_address $bad makes load_vm return undef");
+	like($config->error, qr/\Q$bad\E/, 'and error names the value');
+    }
+}
+
+# The two port directives: the word auto survives the merge, and an
+# other value fails with a message that names the directive
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $homedir = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $homedir;
+    make_path("$tmpdir/.fuguvm/vms");
+
+    open my $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "vm \"fleet\" {\n";
+    print $fh "    ssh_port     auto\n";
+    print $fh "    console_port auto\n";
+    print $fh "}\n";
+    close $fh;
+
+    my $config = App::FuguVM::Config->new($tmpdir);
+    my $vm = $config->load_vm('fleet');
+
+    is(App::FuguVM::Config::AUTO_PORT(), 'auto', 'AUTO_PORT is auto');
+    is(App::FuguVM::Config::AUTO_PORT_COUNT(), 100,
+	'AUTO_PORT_COUNT is 100');
+    is($vm->{ssh_port}, 'auto', 'ssh_port auto survives the merge');
+    is($vm->{console_port}, 'auto', 'console_port auto survives the merge');
+
+    for my $bad (0, 65536, 'yes', '02222') {
+	open $fh, '>', "$tmpdir/.fuguvmrc";
+	print $fh "vm \"fleet\" {\n";
+	print $fh "    ssh_port $bad\n";
+	print $fh "}\n";
+	close $fh;
+	$config = App::FuguVM::Config->new($tmpdir);
+	is($config->load_vm('fleet'), undef,
+	    "ssh_port $bad makes load_vm return undef");
+	like($config->error, qr/ssh_port/, 'and error names the directive');
+    }
+
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "vm \"fleet\" {\n";
+    print $fh "    console_port never\n";
+    print $fh "}\n";
+    close $fh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    is($config->load_vm('fleet'), undef,
+	'an invalid console_port makes load_vm return undef');
+    like($config->error, qr/console_port/, 'and error names the directive');
+}
+
+# The qemu_version directive: the project value, the global value,
+# undef, and the validation of the value
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $homedir = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $homedir;
+    make_path("$tmpdir/.fuguvm/vms");
+
+    open my $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "vm \"plain\" {\n}\n";
+    close $fh;
+
+    my $config = App::FuguVM::Config->new($tmpdir);
+    is($config->qemu_version, undef,
+	'qemu_version returns undef with no directive');
+    is($config->load_vm('plain')->{qemu_version}, undef,
+	'and the per-VM config carries no value');
+
+    open my $gh, '>', "$homedir/.fuguvmrc";
+    print $gh "qemu_version 8.2\n";
+    close $gh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    is($config->qemu_version, '8.2', 'the global value serves');
+
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "qemu_version 9.0.4\n";
+    print $fh "vm \"plain\" {\n}\n";
+    close $fh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    is($config->qemu_version, '9.0.4', 'the project value wins');
+    is($config->load_vm('plain')->{qemu_version}, '9.0.4',
+	'and it reaches the per-VM config');
+
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "qemu_version banana\n";
+    print $fh "vm \"plain\" {\n}\n";
+    close $fh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    is($config->load_vm('plain'), undef,
+	'an invalid qemu_version makes load_vm return undef');
+    like($config->error, qr/banana/, 'and error names the value');
+
+    # A pin inside a VM declaration would silently not apply, so it
+    # is an error and not a merge
+    open $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "vm \"plain\" {\n";
+    print $fh "    qemu_version 9.0\n";
+    print $fh "}\n";
+    close $fh;
+    $config = App::FuguVM::Config->new($tmpdir);
+    is($config->load_vm('plain'), undef,
+	'qemu_version in a vm block makes load_vm return undef');
+    like($config->error, qr/qemu_version/, 'and error names the directive');
+}
+
+# The fixed ports of every VM declaration, for the port probe
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $homedir = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $homedir;
+    make_path("$tmpdir/.fuguvm/vms");
+
+    open my $gh, '>', "$homedir/.fuguvmrc";
+    print $gh "vm \"global\" {\n";
+    print $gh "    ssh_port     2400\n";
+    print $gh "    console_port 4600\n";
+    print $gh "}\n";
+    close $gh;
+
+    open my $fh, '>', "$tmpdir/.fuguvmrc";
+    print $fh "vm \"pinned\" {\n";
+    print $fh "    ssh_port     2300\n";
+    print $fh "    console_port 4500\n";
+    print $fh "}\n";
+    print $fh "vm \"bare\" {\n}\n";
+    print $fh "vm \"fleet\" {\n";
+    print $fh "    ssh_port     auto\n";
+    print $fh "    console_port auto\n";
+    print $fh "}\n";
+    close $fh;
+
+    open my $vh, '>', "$tmpdir/.fuguvm/vms/filed.conf";
+    print $vh "ssh_port = 2500\n";
+    close $vh;
+
+    my $config = App::FuguVM::Config->new($tmpdir);
+    my $ports = $config->declared_ports;
+
+    ok($ports->{2300} && $ports->{4500},
+	'declared_ports holds the fixed ports of a project block');
+    ok($ports->{2400} && $ports->{4600},
+	'and the fixed ports of a global block');
+    ok($ports->{2222} && $ports->{4444},
+	'a declaration that omits a directive holds the default port');
+    ok($ports->{2500}, 'a vms/ file counts too');
+    ok(!$ports->{auto}, 'the word auto is not a port');
+
+    is_deeply($config->load_vm('fleet')->{declared_ports}, $ports,
+	'load_vm folds the set into the per-VM configuration');
+}
+
+# The three image-lifecycle directives: the resolution, the derived
+# install_mode, and each refusal at the configuration boundary
+{
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $homedir = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $homedir;
+    make_path("$tmpdir/.fuguvm/vms");
+
+    # The files that the directives point at
+    for my $seed (["$tmpdir/install.conf", "System hostname = image\n"],
+	["$tmpdir/base.qcow2", 'not a real image'],
+	["$homedir/password", "secret\n"]) {
+	open my $fh, '>', $seed->[0] or die $!;
+	print $fh $seed->[1];
+	close $fh;
+    }
+
+    my $write = sub ($body) {
+	open my $fh, '>', "$tmpdir/.fuguvmrc" or die $!;
+	print $fh $body;
+	close $fh;
+	return App::FuguVM::Config->new($tmpdir);
+    };
+
+    # install_mode derives from the directives; there is no
+    # install_mode directive
+    my $config = $write->("vm \"plain\" {\n}\n");
+    is($config->load_vm('plain')->{install_mode}, 'expect',
+	'no directive derives the expect mode');
+
+    $config = $write->("vm \"auto\" {\n    autoinstall install.conf\n}\n");
+    my $vm = $config->load_vm('auto');
+    is($vm->{install_mode}, 'autoinstall',
+	'autoinstall derives the autoinstall mode');
+    is($vm->{autoinstall}, "$tmpdir/install.conf",
+	'a relative path resolves against the project root');
+
+    $config = $write->("vm \"import\" {\n    base_disk base.qcow2\n}\n");
+    $vm = $config->load_vm('import');
+    is($vm->{install_mode}, 'import', 'base_disk derives the import mode');
+    is($vm->{base_disk}, "$tmpdir/base.qcow2",
+	'and its path resolves the same way');
+
+    $config = $write->(
+	"vm \"tilde\" {\n    root_password_file ~/password\n}\n");
+    is($config->load_vm('tilde')->{root_password_file},
+	"$homedir/password", 'a leading tilde expands');
+
+    # An absent file is a refusal that names the resolved path
+    $config = $write->("vm \"gone\" {\n    autoinstall absent.conf\n}\n");
+    is($config->load_vm('gone'), undef,
+	'an absent autoinstall file makes load_vm return undef');
+    like($config->error, qr{\Q$tmpdir/absent.conf\E},
+	'and error names the resolved path');
+
+    $config = $write->("vm \"gone\" {\n    base_disk absent.qcow2\n}\n");
+    is($config->load_vm('gone'), undef,
+	'an absent base_disk file behaves the same way');
+    like($config->error, qr{\Q$tmpdir/absent.qcow2\E},
+	'and error names the resolved path');
+
+    # Two origins contradict each other
+    $config = $write->("vm \"both\" {\n"
+	. "    autoinstall install.conf\n"
+	. "    base_disk base.qcow2\n"
+	. "}\n");
+    is($config->load_vm('both'), undef,
+	'autoinstall with base_disk makes load_vm return undef');
+    like($config->error, qr/autoinstall/, 'error names one directive');
+    like($config->error, qr/base_disk/, 'and the other');
+
+    # An imported base lives in the cache, so the cache must be on
+    $config = $write->("vm \"import\" {\n"
+	. "    base_disk base.qcow2\n"
+	. "    image_cache no\n"
+	. "}\n");
+    is($config->load_vm('import'), undef,
+	'base_disk with image_cache no makes load_vm return undef');
+    like($config->error, qr/image cache/, 'and error names the cause');
+
+    # ssh_pubkey without root_password_file refuses outside the
+    # expect mode, because the tool cannot authenticate
+    for my $origin ('autoinstall install.conf', 'base_disk base.qcow2') {
+	$config = $write->("ssh_pubkey ssh-ed25519 KEY test\@host\n"
+	    . "vm \"keyed\" {\n    $origin\n}\n");
+	is($config->load_vm('keyed'), undef,
+	    "ssh_pubkey with no root_password_file refuses ($origin)");
+	like($config->error, qr/root_password_file/,
+	    'and error names one remedy');
+	like($config->error, qr/ssh_pubkey/, 'and the other');
+    }
+
+    $config = $write->("ssh_pubkey ssh-ed25519 KEY test\@host\n"
+	. "vm \"keyed\" {\n"
+	. "    autoinstall install.conf\n"
+	. "    root_password_file ~/password\n"
+	. "}\n");
+    ok(defined $config->load_vm('keyed'),
+	'root_password_file satisfies the refusal');
+
+    $config = $write->("ssh_pubkey ssh-ed25519 KEY test\@host\n"
+	. "vm \"keyed\" {\n}\n");
+    ok(defined $config->load_vm('keyed'),
+	'the expect mode needs no password file');
+    is($config->error, undef, 'and error returns undef after it');
 }
 
 # Test VM block with unquoted name

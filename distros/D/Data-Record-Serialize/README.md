@@ -4,7 +4,7 @@ Data::Record::Serialize - Flexible serialization of a record
 
 # VERSION
 
-version 2.03
+version 2.04
 
 # SYNOPSIS
 
@@ -190,6 +190,32 @@ output for subsequent records.
       N     Y        X         Fields in <types> are output.
                                Types are specified by <types>.
 
+## Field Selection Specifications
+
+Some options to the constructor (["nullify"](#nullify), ["numify"](#numify),
+["stringify"](#stringify)), accept a list of field select specifications, using it
+to apply set operations to the available fields, which may be
+explicitly ordered or unordered depending upon how it is specified;
+see ["types"](#types), ["fields"](#fields).
+
+A specification may be drawn from this set of values:
+
+- elements of the available @fields.
+- The `+` or `-`  characters
+- Elements of `@fields` prefixed with `+` or `-`.
+
+The array of specifications is processed in order:
+
+- If the first value is `-` or begins with `-`, the output set is
+initialized with the available fields.
+- A bare `+` clears the output set, and loads it with the available fields.
+- A bare `-` clears the output set.
+- A field name, or a field name prefixed with `+` is appended.
+- A field name prefixed with `-` is removed from the output set.
+
+The output list of fields preserves insertion order and removes
+leading duplicates.
+
 ## Errors
 
 Most errors result in exception objects being thrown, typically in the
@@ -277,7 +303,7 @@ by the specified encoders and sinks, the following arguments are recognized:
 
     **nullify** may be passed:
 
-    - an arrayref of input field names
+    - an arrayref of field selection specifications (see ["Field Selection Specifications"](#field-selection-specifications) )
     - a coderef
 
         The coderef is called as
@@ -304,7 +330,7 @@ by the specified encoders and sinks, the following arguments are recognized:
 
     **numify** may be passed:
 
-    - an arrayref of input field names
+    - an arrayref of field selection specifications (see ["Field Selection Specifications"](#field-selection-specifications) )
     - a coderef
 
         The coderef is called as
@@ -331,7 +357,7 @@ by the specified encoders and sinks, the following arguments are recognized:
 
     **stringify** may be passed:
 
-    - an arrayref of input field names
+    - an arrayref of field selection specifications (see ["Field Selection Specifications"](#field-selection-specifications) )
     - a coderef
 
         The coderef is called as

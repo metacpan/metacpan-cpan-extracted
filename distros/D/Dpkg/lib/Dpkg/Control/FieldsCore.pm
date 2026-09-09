@@ -1045,7 +1045,7 @@ our %FIELD_ORDER = (
 
 =over 4
 
-=item $f = field_capitalize($field_name)
+=item $field = field_capitalize($field_name)
 
 Returns the field name properly capitalized. All characters are lowercase,
 except the first of each word (words are separated by a hyphen in field names).
@@ -1214,7 +1214,12 @@ sub field_parse_maintainer($ctrl)
     }
 
     require Dpkg::Email::Address;
-    return Dpkg::Email::Address->new($maint);
+    eval {
+        return Dpkg::Email::Address->new($maint);
+    } or do {
+        error(g_('cannot parse %s field value "%s"'),
+              'Maintainer', $maint);
+    };
 }
 
 =item $email_list = field_parse_uploaders($ctrl)
@@ -1230,7 +1235,12 @@ sub field_parse_uploaders($ctrl)
     my $uploaders = $ctrl->{'Uploaders'};
 
     require Dpkg::Email::AddressList;
-    return Dpkg::Email::AddressList->new($uploaders);
+    eval {
+        return Dpkg::Email::AddressList->new($uploaders);
+    } or do {
+        error(g_('cannot parse %s field value "%s"'),
+              'Uploaders', $uploaders);
+    };
 }
 
 =item ($source, $version) = field_parse_binary_source($ctrl)

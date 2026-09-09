@@ -8,7 +8,7 @@ use Socket qw(AF_INET AF_INET6 inet_pton);
 use VPNDetection::Bogons;
 use VPNDetection::Result;
 
-our $VERSION = '1.2.1';
+our $VERSION = '1.4.0';
 
 # Whether an address is private, loopback, link-local, documentation, multicast
 # or otherwise not routable on the public internet, including the IPv6

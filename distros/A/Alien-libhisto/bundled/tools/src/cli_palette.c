@@ -7,6 +7,10 @@
 #include <string.h>
 #if !defined(_WIN32)
 #include <strings.h>
+#else
+#ifndef strcasecmp
+#define strcasecmp _stricmp
+#endif
 #endif
 #include <math.h>
 

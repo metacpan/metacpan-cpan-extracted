@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The demo identity provider in ../IdP, saved, so this application
+     can boot with nothing else running. Identical to what
+     http://127.0.0.1:5001/idp/metadata serves. -->
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    entityID="http://127.0.0.1:5001/idp/metadata">
+  <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <md:KeyDescriptor use="signing"><ds:KeyInfo><ds:X509Data>
+      <ds:X509Certificate>MIIDBzCCAe+gAwIBAgIUWnM+zAGCQLAW7BYFvYhF12x8BKkwDQYJKoZIhvcNAQELBQAwEzERMA8GA1UEAwwIZGVtby1pZHAwHhcNMjYwOTA5MDY1NTIzWhcNMzYwOTA2MDY1NTIzWjATMREwDwYDVQQDDAhkZW1vLWlkcDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJWewd7gx+p+ElxZmAa+SR2ZYNBWDx9AdDPPtAmmH2AzRiNeIgJKDgj4yTCokVLv94/UW0kmhM61P6bYfmD+tUo75i5cKpeac3QChYSSsYT53xscvCeD8wt1w9WSYWKPoHBe5Mf9An7ZVPRMeF/Uv2uUFiPdM+stdk8i3woSlV0Z/cStoeQaqVFVwS3yEQIsiLGmbk9Sl+mOMm9VxPYug1J1GbwO4G6jSXYF2vydLCbhxonZx3XqYg5r3nK5H5F4C/O65YraMBHFa7PnBE6/ivQZS3OIRYdzZcjezgpAJpZPswwkcSuw3cs71elqeyl1JJ5u3WHS6cjdDc4ctfGDNzECAwEAAaNTMFEwHQYDVR0OBBYEFBx2tJPCOceWEpsNxHckal/zdDBBMB8GA1UdIwQYMBaAFBx2tJPCOceWEpsNxHckal/zdDBBMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAAbSZp7FEOmBSMRQbWHqpBXAImaSzBGvN+Zg3UTE3M/J4ZMe/NSSEQavMEzMX/NHDLaV1wlGjrP902DgcLdJaiku1ON7DjA/l/Ls/GR2Y5aM5LtenTjboQMYtxzqK2L2lwNJ/6BVXf2vQHbcZcU1DZq//WBwDiYcU3UwhRi6hRcVssg01bsPAicmVfDP6ZAwTlES8c+ug8iHeetiJe7NU9PW1P3nbR++7sXmONB8ZL4Ii0YgyWvDIMz/U3u81xqJ8FmH+WDiRxxwCnosCS83A34lU6CbPOcqfroicaoZNbwo7GFbBFH1Q721a45T6WmENF7gFoTkmRgpvDNpLINGtIs=</ds:X509Certificate>
+    </ds:X509Data></ds:KeyInfo></md:KeyDescriptor>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
+    <md:SingleSignOnService
+        Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        Location="http://127.0.0.1:5001/idp/sso"/>
+  </md:IDPSSODescriptor>
+</md:EntityDescriptor>

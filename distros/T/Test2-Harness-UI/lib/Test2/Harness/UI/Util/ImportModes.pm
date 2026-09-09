@@ -46,6 +46,8 @@ sub _get_mode {
 
     croak "must specify either 'mode' or 'run'" unless $run || $mode;
 
+    $mode //= $run->mode if $run;
+
     # Normalize
     $mode = $MODES{$mode} // $mode;
     croak "Invalid mode: $mode" unless $mode =~ m/^\d+$/;

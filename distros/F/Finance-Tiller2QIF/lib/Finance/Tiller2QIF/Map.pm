@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::Map;
 # ABSTRACT: Apply mapping rules to categorize transactions
-$Finance::Tiller2QIF::Map::VERSION = '1.08';
+$Finance::Tiller2QIF::Map::VERSION = '1.09';
 =head1 DESCRIPTION
 
 Applies user-defined mapping rules to transactions in the SQLite database. Rules can filter by account, match transaction fields (category, payee, memo, date, amount), and set or suppress categories. Rules are evaluated in order; the first match wins.
@@ -33,7 +33,7 @@ GPL version 3 or later.
 
 use v5.34;
 
-use Mojo::SQLite;
+use Finance::Tiller2QIF::DB qw( connect_db );
 use Path::Tiny;
 use utf8;
 use warnings FATAL => 'utf8';
@@ -134,7 +134,7 @@ sub _parse_mapping_file ($file) {
   return ( \@rules, $default, $default_skip );
 }
 
-sub _run_sql_file ( $dbmojo, $file, $verbose ) {
+sub _run_sql_file ( $dbh, $file, $verbose ) {
   my $sql = path($file)->slurp_utf8;
   my @statements;
   my $current = '';
@@ -147,7 +147,7 @@ sub _run_sql_file ( $dbmojo, $file, $verbose ) {
   }
   push @statements, $current if $current =~ /\S/;
   for my $stmt (@statements) {
-    my $rows = $dbmojo->dbh->do($stmt);
+    my $rows = $dbh->do($stmt);
     if ( $verbose ) {
       ( my $summary = $stmt ) =~ s/\s+/ /g;
       $summary =~ s/^\s+|\s+$//g;
@@ -167,18 +167,23 @@ sub Map ( $options ) {
   my $aftermap  = $options->{aftermap}  // undef;
   my ( $rules, $default, $default_skip ) = _parse_mapping_file($mapfile);
 
-  my $dbmojo = Mojo::SQLite->new($db_path)->options({ sqlite_unicode => 1 })->db;
+  my $dbh = connect_db($db_path);
 
   if ( defined $beforemap ) {
     say "Running beforemap: $beforemap" if $verbose;
     try {
-      _run_sql_file( $dbmojo, $beforemap, $verbose );
+      _run_sql_file( $dbh, $beforemap, $verbose );
       say "beforemap completed successfully" if $verbose;
     }
     catch ($e) { warn "beforemap error: $e" }
   }
 
-  my @transactions = $dbmojo->select( 'transactions', '*', { exported => 0 } )->hashes->@*;
+  my $select = $dbh->prepare('SELECT * FROM transactions WHERE exported = 0');
+  $select->execute;
+  my @transactions = $select->fetchall_arrayref({})->@*;
+  my $update = $dbh->prepare(
+    'UPDATE transactions SET mapped_category = ?, skipped = ?, exported = ? WHERE id = ?'
+  );
 
   for my $tx (@transactions) {
     my $mc   = $default;       # reset each tx; overwritten if a rule matches
@@ -204,21 +209,19 @@ sub Map ( $options ) {
       say "TX $tx->{id} ($tx->{payee}): $result";
     }
 
-    $dbmojo->update( 'transactions',
-      { mapped_category => $mc, skipped => $skip, exported => $skip },
-      { id => $tx->{id} } );
+    $update->execute( $mc, $skip, $skip, $tx->{id} );
   }
 
   if ( defined $aftermap ) {
     say "Running aftermap: $aftermap" if $verbose;
     try {
-      _run_sql_file( $dbmojo, $aftermap, $verbose );
+      _run_sql_file( $dbh, $aftermap, $verbose );
       say "aftermap completed successfully" if $verbose;
     }
     catch ($e) { warn "aftermap error: $e" }
   }
 
-  $dbmojo->disconnect;
+  $dbh->disconnect;
 }
 
 1;

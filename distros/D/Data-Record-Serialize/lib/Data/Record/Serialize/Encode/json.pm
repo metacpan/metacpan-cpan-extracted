@@ -7,11 +7,12 @@ use strict;
 use warnings;
 
 use Data::Record::Serialize::Error { errors => ['json_backend'] }, -all;
+use Module::Version;
 
 use Moo::Role;
 
-our $VERSION = '2.03';
-
+our $VERSION = '2.04';
+our $JSON;
 
 BEGIN {
     my $Cpanel_JSON_XS_VERSION = 3.0236;
@@ -22,23 +23,41 @@ BEGIN {
     # too old. Symbol::delete_package could be used to remove
     # Cpanel::JSON::XS's version, but it's better not to load it in
     # the first place.
-    require Module::Version;
-    if ( Module::Version::get_version( 'Cpanel::JSON::XS' ) >= $Cpanel_JSON_XS_VERSION ) {
-        require Cpanel::JSON::XS;
-        *encode_json = \&Cpanel::JSON::XS::encode_json;
-    }
-    elsif ( eval { require JSON::PP } ) {
-        *encode_json = \&JSON::PP::encode_json;
-    }
-    else {
-        error(
-            'json_backend',
-            q{can't find either Cpanel::JSON::XS (>= $Cpanel_JSON_XS_VERSION) or JSON::PP. Please install one of them.},
-        );
-    }
+    $JSON = do {
+        if ( Module::Version::get_version( 'Cpanel::JSON::XS' ) >= $Cpanel_JSON_XS_VERSION ) {
+            require Cpanel::JSON::XS;
+            'Cpanel::JSON::XS';
+        }
+        elsif ( eval { require JSON::PP; 1; } ) {
+            'JSON::PP';
+        }
+        else {
+            error(
+                'json_backend',
+                q{can't find either Cpanel::JSON::XS (>= $Cpanel_JSON_XS_VERSION) or JSON::PP. Please install one of them.},
+            );
+        }
+    };
+
 }
 
+use constant ENCODER_OPTIONS => qw(
+  ascii latin1 utf8 pretty indent space_before space_after canonical
+  allow_blessed convert_blessed
+);
+
 use namespace::clean;
+
+
+has [ grep { $_ ne 'utf8' } ENCODER_OPTIONS ] => ( is => 'ro', default => !!0 );
+has utf8                                      => ( is => 'ro', default => !!1 );
+
+has _encoder => (
+    is        => 'rwp',
+    init_arg  => undef,
+    clearer   => 1,
+    predicate => 1,
+);
 
 has '+numify'    => ( is => 'ro', default => 1 );
 has '+stringify' => ( is => 'ro', default => 1 );
@@ -60,7 +79,28 @@ sub to_bool { $_[1] ? \1 : \0 }
 
 
 
-sub encode { encode_json( $_[1] ) }
+sub setup {
+
+    my $self = shift;
+    return if $self->_has_encoder;
+
+    my $json = $JSON->new;
+
+    for my $option ( ENCODER_OPTIONS ) {
+        next unless $self->$option;
+        $json = $json->$option( $self->$option );
+    }
+
+    $self->_set__encoder( $json );
+}
+
+
+
+
+
+
+
+sub encode { $_[0]->_encoder->encode( $_[1] ) }
 
 with 'Data::Record::Serialize::Role::Encode';
 
@@ -80,7 +120,8 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory truthy JSONL
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory truthy JSONL ascii latin1
+numification
 
 =head1 NAME
 
@@ -88,13 +129,13 @@ Data::Record::Serialize::Encode::json - encoded a record as JSON
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 
     use Data::Record::Serialize;
 
-    my $s = Data::Record::Serialize->new( encode => 'json', ... );
+    my $s = Data::Record::Serialize->new( encode => 'json', %options );
 
     $s->send( \%record );
 
@@ -117,6 +158,35 @@ read by an incremental decoder, e.g.
 
 It performs the L<Data::Record::Serialize::Role::Encode> role.
 
+=head2 Transformations of Objects
+
+If the L</allow_blessed> and L</convert_blessed> flags are set, the
+underlying JSON module will invoke the C<TO_JSON> method any values
+which are objects, and which provide that method.
+
+Unfortunately, these settings interact with the default values for
+L<Data::Record::Serialize/stringify> and
+L<Data::Record::Serialize/numify> set by this module, which are both
+set to C<1>.
+
+Stringification and numification are performed I<before> being sent to
+the JSON serializer, so it will not see the original object, and thus
+will not run its C<TO_JSON> method.
+
+To remedy this, it's simplest to turn off stringification and
+numification for individual attributes using
+L</Data::Record::Serialize>/Field Selection Specifcations>.  For
+example, if fields C<string_obj1> and C<num_obj1> are objects which
+do not overload numification and stringification, but do support
+C<TO_JSON>, then setting
+
+  stringify       => ['-string_obj2'],
+  numify          => ['-num_obj2'],
+  allow_blessed   => 1,
+  convert_blessed => 1,
+
+will result in C<TO_JSON> being passed the actual objects.
+
 =head1 METHODS
 
 =head2 to_bool
@@ -125,16 +195,42 @@ It performs the L<Data::Record::Serialize::Role::Encode> role.
 
 Convert a truthy value to something that the JSON encoders will recognize as a boolean.
 
+=for Pod::Coverage setup
+
 =for Pod::Coverage encode
 
 =for Pod::Coverage numify
 stringify
 encode_json
 
-=head1 INTERFACE
+=head1 CONSTRUCTOR OPTIONS
 
-There are no additional attributes which may be passed to
-L<< Data::Record::Serialize::new|Data::Record::Serialize/new >>.
+These are equivalent to the methods operating on the underlying JSON
+object (see L<JSON::PP>).
+
+=over
+
+=item ascii => I<boolean>
+
+=item latin1 => I<boolean>
+
+=item utf8 => I<boolean>
+
+=item pretty => I<boolean>
+
+=item indent => I<boolean>
+
+=item space_before => I<boolean>
+
+=item space_after => I<boolean>
+
+=item canonical => I<boolean>
+
+=item allow_blessed => I<boolean>
+
+=item convert_blessed => I<boolean>
+
+=back
 
 =head1 SUPPORT
 

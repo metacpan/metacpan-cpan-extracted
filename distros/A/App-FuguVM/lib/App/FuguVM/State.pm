@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguVM::State;
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
 use Fugu::File;
 use Fugu::Log;
@@ -56,6 +56,9 @@ sub new ( $class, $state_dir, $vm_name, %opts )
 		vm_pid => Fugu::Pidfile->new( path => "$vm_state_dir/vm.pid" ),
 		proxy_pid =>
 		    Fugu::Pidfile->new( path => "$vm_state_dir/proxy.pid" ),
+		autoinstall_pid => Fugu::Pidfile->new(
+			path => "$vm_state_dir/autoinstall.pid"
+		),
 		store => Fugu::StateFile->new(
 			path => "$vm_state_dir/status",
 			mode => 0600,
@@ -112,6 +115,16 @@ sub proxy_pidfile ($self)
 	return $self->{proxy_pid};
 }
 
+# $self->autoinstall_pidfile:
+#	Return the PID file of the autoinstall responder child.
+#	App::FuguVM::Guest gives it to the responder supervisor. The
+#	file lives in the state directory of the guest, so an
+#	interrupted run leaves no listener that nothing owns.
+sub autoinstall_pidfile ($self)
+{
+	return $self->{autoinstall_pid};
+}
+
 # VM PID management. QEMU writes the pid file itself, so the module
 # only reads and clears it.
 sub get_vm_pid ($self)
@@ -150,11 +163,55 @@ sub is_installed ($self)
 	return $self->{store}->get('installed') ? 1 : 0;
 }
 
-sub mark_installed ($self)
+# $self->mark_installed($arch):
+#	Record the install mark and the architecture of the installed
+#	disk. The argument is required, so no path can forget it.
+sub mark_installed ( $self, $arch )
 {
-	$self->{store}->data->{installed}    = 1;
-	$self->{store}->data->{installed_at} = time;
+	my $data = $self->{store}->data;
+	$data->{installed}      = 1;
+	$data->{installed_at}   = time;
+	$data->{installed_arch} = $arch;
 	$self->{store}->save;
+
+	return $self;
+}
+
+# $self->get_installed_arch:
+#	Return the recorded architecture of the installed disk, or
+#	undef.
+sub get_installed_arch ($self)
+{
+	return $self->{store}->get('installed_arch');
+}
+
+# The runtime record: the facts of one run of one guest. The record
+# holds the selected accelerator and the two resolved host ports.
+# App::FuguVM::Guest writes it before it spawns QEMU, and the stop
+# verbs clear it beside clear_vm_pid.
+
+# $self->set_runtime(%facts):
+#	Record accel, ssh_port and console_port, and save the store.
+sub set_runtime ( $self, %facts )
+{
+	$self->{store}->set( runtime => \%facts );
+
+	return $self;
+}
+
+# $self->get_runtime:
+#	Return the recorded facts as a hash reference. Return an empty
+#	hash reference when the guest never ran.
+sub get_runtime ($self)
+{
+	return $self->{store}->get('runtime') // {};
+}
+
+# $self->clear_runtime:
+#	Delete the record, and save the store.
+sub clear_runtime ($self)
+{
+	$self->{store}->delete('runtime');
 
 	return $self;
 }

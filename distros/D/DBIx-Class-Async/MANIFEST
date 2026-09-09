@@ -125,6 +125,7 @@ t/153-dbic-async-exception.t
 t/154-grouped-delete.t
 t/155-select-normaliser.t
 t/156-resultset-inflate-datetime.t
+t/157-safe-class-loading.t
 t/benchmark.pl
 t/changes.t
 t/manifest.t
@@ -142,6 +143,7 @@ t/lib/TestSchema/Result/Thing.pm
 t/lib/TestSchema/Result/Sprocket.pm
 t/lib/TestSchema/Result/Interface.pm
 t/lib/TestSchema/Result/Maintenance.pm
+xt/docker-compose.yml
 xt/001-oracle.t
 xt/002-mysql.t
 xt/lib/TestSchema.pm

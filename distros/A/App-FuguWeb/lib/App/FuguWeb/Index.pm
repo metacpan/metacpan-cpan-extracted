@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Index;
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
 
 use App::FuguWeb;
 use Fugu::File;

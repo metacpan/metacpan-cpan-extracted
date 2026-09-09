@@ -139,6 +139,133 @@ subtest escaped_pipe => sub {
   $db->disconnect;
 };
 
+subtest apostrophe_in_pattern => sub {
+  my $dbfile  = uniqfile( 'map_apostrophe', 'sqlite3' );
+  my $csvfile = uniqfile( 'map_apostrophe', 'csv' );
+  my $mapfile = uniqfile( 'map_apostrophe', 'map' );
+  my $db      = freshdb($dbfile);
+  freshcsv( $csvfile,
+    q{04/25/2026,1,Checking,5.00,Kaplan's new model,Kaplan's new model,Other},
+    q{04/25/2026,2,Savings,5.00,Kaplan's new model,Kaplan's new model,Other},
+  );
+  freshmap( $mapfile,
+    q{[Checking] payee | ^kaplan's new model$ | Expenses:LiteralApostrophe},
+    "[Savings] payee | ^kaplan\\'s new model\$ | Expenses:EscapedApostrophe",
+    'default | source',
+  );
+  Finance::Tiller2QIF::ReadCSV::Ingest( $csvfile, $dbfile );
+  Finance::Tiller2QIF::Map::Map({db_path => $dbfile, mapfile => $mapfile});
+  my %tx = map { $_->{id} => $_ }
+    $db->select( 'transactions', [qw(id mapped_category)] )->hashes->@*;
+  is( $tx{1}{mapped_category}, 'Expenses:LiteralApostrophe',
+    "Apostrophe matches without escaping" );
+  is( $tx{2}{mapped_category}, 'Expenses:EscapedApostrophe',
+    "Apostrophe matches with regex escaping" );
+  $db->disconnect;
+};
+
+subtest escaped_regex_metacharacters => sub {
+  my $dbfile  = uniqfile( 'map_metacharacters', 'sqlite3' );
+  my $csvfile = uniqfile( 'map_metacharacters', 'csv' );
+  my $mapfile = uniqfile( 'map_metacharacters', 'map' );
+  my $db      = freshdb($dbfile);
+  freshcsv( $csvfile,
+    q{04/25/2026,1,AccountA,5.00,Price $5.00 (sale)?,Price $5.00 (sale)?,Other},
+    q{04/25/2026,2,AccountB,5.00,File [A].txt,File [A].txt,Other},
+    q{04/25/2026,3,AccountC,5.00,Bonus + tax *,Bonus + tax *,Other},
+    q{04/25/2026,4,AccountD,5.00,C:\Temp\file,C:\Temp\file,Other},
+    q{04/25/2026,5,AccountE,5.00,Path /tmp,Path /tmp,Other},
+  );
+  freshmap( $mapfile,
+    q{[AccountA] payee | /^Price \$5\.00 \(sale\)\?$/ | Expenses:Price},
+    q{[AccountB] payee | /^File \[A\]\.txt$/ | Expenses:File},
+    q{[AccountC] payee | /^Bonus \+ tax \*$/ | Expenses:Bonus},
+    q{[AccountD] payee | C:\\\\Temp\\\\file | Expenses:Path},
+    q{[AccountE] payee | /^Path \/tmp$/ | Expenses:Slash},
+    'default | source',
+  );
+  Finance::Tiller2QIF::ReadCSV::Ingest( $csvfile, $dbfile );
+  Finance::Tiller2QIF::Map::Map({db_path => $dbfile, mapfile => $mapfile});
+  my %tx = map { $_->{id} => $_ }
+    $db->select( 'transactions', [qw(id mapped_category)] )->hashes->@*;
+  is( $tx{1}{mapped_category}, 'Expenses:Price', 'Escaped dollar, dot, parentheses, and question mark match' );
+  is( $tx{2}{mapped_category}, 'Expenses:File',  'Escaped brackets and dot match' );
+  is( $tx{3}{mapped_category}, 'Expenses:Bonus', 'Escaped plus and star match' );
+  is( $tx{4}{mapped_category}, 'Expenses:Path',  'Escaped backslashes match' );
+  is( $tx{5}{mapped_category}, 'Expenses:Slash', 'Escaped slash matches in slash-delimited pattern' );
+  $db->disconnect;
+};
+
+# Kaplan's New Model Bakery is real
+# Consider the variants that might come through
+# and then tiller truncating it to "Kaplan's New Model Bphiladelphia"
+
+subtest kaplans_new_model_bakery => sub {
+  my @cases = (
+    {
+      name    => 'Kaplan New payee',
+      account => 'Checking',
+      payee   => q{Kaplan New Bakery Philadelphia},
+      memo    => q{Kaplan New Bakery Philadelphia},
+      rule    => q{payee | /kaplan(?:'s|s)? new(?: model)?/ | Expenses:Bakeries},
+    },
+    {
+      name    => 'Kaplan New Model payee shorter regex',
+      account => 'Checking',
+      payee   => q{Kaplan New Model Bakery Philadelphia},
+      memo    => q{Kaplan Bakery Philadelphia},
+      rule    => q{payee | /kaplan(?:'s|s)? new model?/ | Expenses:Bakeries},
+    },
+    {
+      name    => 'Kaplan New Model payee shorter regex matches \' ',
+      account => 'Checking',
+      payee   => q{Kaplan's New Model Bakery Philadelphia},
+      memo    => q{Kaplan Bakery Philadelphia},
+      rule    => q{payee | /kaplan(?:'s|s)? new model?/ | Expenses:Bakeries},
+    },
+    {
+      name    => q{Kaplan's New Model payee},
+      account => 'Savings',
+      payee   => q{Kaplan's New Model Bakery Philadelphia},
+      memo    => q{Kaplan's New Model Bakery Philadelphia},
+      rule    => q{payee | /kaplan(?:'s|s)? new(?: model)?/ | Expenses:Bakeries},
+    },
+    {
+      name    => 'Kaplans New Model memo',
+      account => 'Bakery Card',
+      payee   => 'New Model BPhiladel',
+      memo    => q{Kaplans New Model Bakery Philadelphia},
+      rule    => q{[Bakery Card] memo | /kaplan(?:'s|s)? new(?: model)?/ | Expenses:Bakeries},
+    },
+    {
+      name    => 'Tiller-truncated payee',
+      account => 'Truncated Bakery Card',
+      payee   => 'New Model BPhiladel',
+      memo    => q{Kaplan's New Model Bakery Philadelphia},
+      rule    => q{[Truncated Bakery Card] payee | New Model BPhiladel | Expenses:Bakeries},
+    },
+  );
+
+  for my $case (@cases) {
+    subtest $case->{name} => sub {
+      my $dbfile  = uniqfile( 'map_kaplans_bakery', 'sqlite3' );
+      my $csvfile = uniqfile( 'map_kaplans_bakery', 'csv' );
+      my $mapfile = uniqfile( 'map_kaplans_bakery', 'map' );
+      my $db      = freshdb($dbfile);
+      freshcsv( $csvfile,
+        qq{04/25/2026,1,$case->{account},12.50,$case->{payee},$case->{memo},Other},
+      );
+      freshmap( $mapfile, $case->{rule}, 'default | source' );
+      Finance::Tiller2QIF::ReadCSV::Ingest( $csvfile, $dbfile );
+      Finance::Tiller2QIF::Map::Map({db_path => $dbfile, mapfile => $mapfile});
+      my $tx = $db->select( 'transactions', ['mapped_category'], { id => 1 } )->hash;
+      is( $tx->{mapped_category}, 'Expenses:Bakeries',
+        "$case->{name} maps with its own map file" );
+      $db->disconnect;
+    };
+  }
+};
+
 my $wildcarddb = q{
   INSERT INTO transactions
   (id, account, date, amount, payee, memo, category, mapped_category, check_number, skipped, exported)

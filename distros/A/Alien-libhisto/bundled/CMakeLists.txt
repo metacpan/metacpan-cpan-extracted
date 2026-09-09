@@ -1,15 +1,39 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(libhisto
-    VERSION 0.3.0
+    VERSION 0.4.0
     DESCRIPTION "Fast, portable, memory-safe 1D and 2D histogramming and statistical computing C library"
     LANGUAGES C
 )
+
+include(GNUInstallDirs)
 
 # Standard C99
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
+
+# Enable C++ for optional C++ test suite if compiler is available and functional
+include(CheckLanguage)
+check_language(CXX)
+if(CMAKE_CXX_COMPILER)
+    if(MSVC)
+        enable_language(CXX OPTIONAL)
+    else()
+        set(_CXX_PROBE_FILE "${CMAKE_BINARY_DIR}/cxx_probe.cpp")
+        file(WRITE "${_CXX_PROBE_FILE}" "int main(){return 0;}\n")
+        execute_process(
+            COMMAND ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} ${CMAKE_EXE_LINKER_FLAGS} "${_CXX_PROBE_FILE}" -o /dev/null
+            RESULT_VARIABLE _CXX_PROBE_RESULT
+            ERROR_QUIET
+            OUTPUT_QUIET
+        )
+        file(REMOVE "${_CXX_PROBE_FILE}")
+        if(_CXX_PROBE_RESULT EQUAL 0)
+            enable_language(CXX OPTIONAL)
+        endif()
+    endif()
+endif()
 
 # Export compile commands for language servers
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -43,6 +67,9 @@ if(LIBHISTO_ENABLE_TSAN)
 endif()
 if(LIBHISTO_ENABLE_MSAN)
     math(EXPR _sanitizer_count "${_sanitizer_count} + 1")
+    if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR "MemorySanitizer (LIBHISTO_ENABLE_MSAN) requires Clang (clang). Current compiler is ${CMAKE_C_COMPILER_ID}. Please configure with CC=clang.")
+    endif()
 endif()
 
 if(_sanitizer_count GREATER 1)
@@ -52,6 +79,10 @@ endif()
 # Standard Doxygen integration
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(NOT Python3_EXECUTABLE)
+        find_program(Python3_EXECUTABLE NAMES python3 python)
+    endif()
     set(LIBHISTO_BUILD_DOCS ON CACHE BOOL "Build Doxygen documentation" FORCE)
 endif()
 
@@ -62,11 +93,13 @@ find_package(Threads REQUIRED)
 add_library(histo_compiler_flags INTERFACE)
 if(MSVC)
     target_compile_options(histo_compiler_flags INTERFACE /W4 /wd4056 /wd4756 /wd4996)
+    target_compile_definitions(histo_compiler_flags INTERFACE _USE_MATH_DEFINES _CRT_SECURE_NO_WARNINGS WIN32_LEAN_AND_MEAN)
     if(LIBHISTO_WARNINGS_AS_ERRORS)
         target_compile_options(histo_compiler_flags INTERFACE /WX)
     endif()
 else()
-    target_compile_options(histo_compiler_flags INTERFACE -Wall -Wextra -Wpedantic)
+    target_compile_options(histo_compiler_flags INTERFACE -Wall -Wextra -pedantic)
+    target_compile_definitions(histo_compiler_flags INTERFACE _POSIX_C_SOURCE=200809L _DEFAULT_SOURCE _BSD_SOURCE=1 _XOPEN_SOURCE=700 __BSD_VISIBLE=1)
     if(LIBHISTO_WARNINGS_AS_ERRORS)
         target_compile_options(histo_compiler_flags INTERFACE -Werror)
     endif()
@@ -148,13 +181,12 @@ endif()
 # ------------------------------------------------------------------------------
 # Installation, Export Targets & Packaging
 # ------------------------------------------------------------------------------
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 # Public Headers
 install(DIRECTORY include/histo
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    FILES_MATCHING PATTERN "*.h"
+    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
 )
 
 # pkg-config file

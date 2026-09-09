@@ -10,7 +10,7 @@ eval {
 
 if (-e 'Build.PL.in') {
     die "error: This is an in-tree build, not a proper perl distribution.\n" .
-        "To create one please configure normally and then run 'make dist'.\n";
+        "To create one, configure normally and then run 'make dist'.\n";
 }
 
 my $class = Module::Build->subclass(
@@ -83,7 +83,7 @@ my $class = Module::Build->subclass(
 my $build = $class->new(
     dist_name       => 'Dpkg',
     dist_abstract   => 'Debian Package Manager Perl modules',
-    dist_version    => '1.23.4',
+    dist_version    => '1.23.9',
     dist_author     => 'Dpkg Developers <debian-dpkg@lists.debian.org>',
     license         => 'GPL_2',
 

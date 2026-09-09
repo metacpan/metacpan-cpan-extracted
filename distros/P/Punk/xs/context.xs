@@ -330,6 +330,38 @@ json(self, data, status = &PL_sv_undef)
     OUTPUT:
         RETVAL
 
+# A File::Raw::XML::Document or ::Node is serialised; a string is markup the
+# caller already built and goes out as it stands. Anything else is refused
+# rather than stringified, which is the difference between an empty element
+# and a body reading HASH(0x7f...).
+SV *
+xml(self, data, status = &PL_sv_undef)
+        SV *self
+        SV *data
+        SV *status
+    CODE:
+    {
+        AV *av  = pcx_av(aTHX_ self);
+        AV *res = pcx_res_av(aTHX_ av);
+        IV st = SvOK(status) ? SvIV(status) : pcx_res_status(aTHX_ res);
+        SV *bytes;
+        if (SvROK(data)) {
+            SV *err = NULL;
+            if (!punk_xml_is(aTHX_ data))
+                croak("Punk: xml() takes a File::Raw::XML::Document, a "
+                      "::Node, or a string of markup");
+            bytes = punk_xml_bytes(aTHX_ data, &err);
+            if (!bytes) croak("%s", err ? SvPV_nolen(err) : "Punk: xml");
+        }
+        else bytes = newSVsv(data);
+        if (!st) st = 200;
+        RETVAL = punk_triplet(aTHX_ st,
+                    sv_2mortal(newSVpvs(PK_XML_CT)),
+                    bytes, res ? pcx_res_headers(aTHX_ res) : NULL);
+    }
+    OUTPUT:
+        RETVAL
+
 SV *
 text(self, body, status = &PL_sv_undef)
         SV *self

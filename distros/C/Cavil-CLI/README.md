@@ -2,9 +2,10 @@
 
 [![CI](https://github.com/openSUSE/cavil-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/openSUSE/cavil-cli/actions/workflows/ci.yml)
 
-Your AI assistant can reproduce a licensed function verbatim in your code, as if it were your own. Cavil CLI
-checks a git change or a whole tree against what [Cavil](https://github.com/openSUSE/cavil) has indexed, open
-source and commercial, and reports the license and risk of any copied code before it ships.
+Get a legal review for the project you are working on. Cavil CLI uploads your working tree to
+[Cavil](https://github.com/openSUSE/cavil), runs its standard legal review (unpack, index, analyze), and
+reports the licensing risk, for a developer's laptop or a CI gate. The uploaded tree includes the vendored
+dependencies actually on disk (`node_modules` and the like), which a full review must cover.
 
 ## Usage
 
@@ -15,12 +16,11 @@ cavil-cli config --url https://legaldb.suse.de
 # Confirm it works (and time the round trip)
 cavil-cli whoami
 
-# Check the current git change set (what your branch introduces), against the default branch
+# Upload the current directory for a legal review and print the verdict
 cavil-cli check
 
-# Scan a whole tree instead (a path, or --all for the current directory)
-cavil-cli check ./project
-cavil-cli check --all
+# Check another directory, and also download the SBOM
+cavil-cli check ./project --sbom
 ```
 
 Credentials come from the saved config in `~/.config/cavil-cli`, or from `CAVIL_URL` and `CAVIL_API_KEY` in CI
@@ -28,29 +28,29 @@ Credentials come from the saved config in `~/.config/cavil-cli`, or from `CAVIL_
 stays in your shell history, and no `--url` outside `config`, because pointing at another server would send it
 a token saved for this one. `cavil-cli config --show` displays what is saved, with the token masked.
 
-A check prints a headline tied to the CI gate, a one-line tally, then a per-file (or per-region) checklist,
-problems first:
+A check prints a headline tied to the CI gate, a one-line tally, then the licenses found, highest risk first:
 
 ```
-$ cavil-cli check --all ./project
-✗ 2 files at or above risk 4
-  42 files · 29 clean · 4 with known code · 9 skipped
+$ cavil-cli check ./project
+✗ project - risk 6 (restrictive obligations) ≥ threshold 5
+  4 licenses · 0 unresolved · review state: new
 
-  ✗  src/net.c        SSPL-1.0  risk 6 (restrictive obligations)  modified 74% of mongodb src/net.c
-  ✗  src/hash.c       GPL-3.0-only  risk 4 (strong copyleft)  modified 68% of coreutils lib/hash.c
-  •  src/ls.c         MIT  risk 2 (permissive)  identical to coreutils src/ls.c
-  •  src/opt.c        declared BSD-3-Clause  modified 61% of util-linux lib/opt.c
-  ✓  src/local.c
-  ·  gen.h            too short
-  ·  bundle.min.js    too large
+  ✗  SSPL-1.0                       risk 6 (restrictive obligations)
+  •  GPL-3.0-only                   risk 4 (strong copyleft)
+  ✓  Apache-2.0                     risk 2 (permissive)
+  ✓  MIT                            risk 2 (permissive)
 
-  2 license files not scanned (a copy of a licence is not a finding)
+  Report: https://legaldb.suse.de/reviews/details/1234
 ```
 
-`✓` is your own code (nothing known was found), `•` is known code - permissive with no real obligations, or
-worth a closer look, `✗` is at or above the risk gate, `·` was not scanned, with the reason (`too short` to
-locate, or `too large` - a data or generated file). When no per-file license is detected but the carrier
-package declares a short one, it is shown as a hint (`declared BSD-3-Clause`).
+`✓` is obligation-free (permissive or public domain), `•` carries obligations but is below the gate, `✗` is at
+or above the gate. The web report link has the full detail.
+
+## Access
+
+Submitting a package runs Cavil's full review and enters its legal backlog, so `check` needs a read-write API
+key whose user has admin access, the same bar as Cavil's web upload form. Generate a key from the "API Keys"
+menu after logging in. (A lighter, backlog-free path for ordinary users is planned.)
 
 ## Commands
 
@@ -60,56 +60,43 @@ cavil-cli <command> [DIR] [options]
 
 | Command | Purpose |
 | --- | --- |
-| `check [DIR]` | Check a git change set, or a whole tree, for known code |
-| `baseline [DIR]` | Record a tree's current matches as already accepted |
+| `check [DIR]` | Upload a project for a legal review and report its licensing risk (default DIR: `.`) |
 | `whoami` | Verify the configured URL and token |
 | `config` | Save the URL and token |
 
-Common options (`--format` applies to `check` and `whoami`):
+### `check [DIR]`
+
+```sh
+cavil-cli check              # the current directory
+cavil-cli check ./project    # another directory
+```
 
 | Option | Description |
 | --- | --- |
+| `--name <name>` | Package name to review under (default: the directory name) |
+| `--priority <n>` | Review priority 1-8 (default 5) |
+| `--fail-on-risk <n>` | Exit non-zero at this risk or above (default: the instance's acceptable risk + 1) |
+| `--sbom [<file>]` | Download the SPDX SBOM (default file: `<name>.spdx.json`) |
+| `--notice [<file>]` | Download the NOTICE attribution file (default file: `<name>.NOTICE.txt`) |
+| `--respect-gitignore` | Also drop `.gitignore`'d paths from the archive (off by default, to keep vendored code) |
+| `--exclude-path <p>` | Drop this path from the archive (a `tar` pattern). Repeatable; also `CAVIL_EXCLUDE_PATHS` |
+| `--external-link <s>` | Source label for traceability (default: the git remote and commit, if any) |
+| `--timeout <n>` | Seconds to wait for the review before giving up (default 900) |
 | `--format text\|json` | Output format; `json` for CI to police or store |
 | `--no-color` | Never colour the output (also honours `NO_COLOR`) |
 | `--quiet` | No progress output |
 | `-h`, `--help` | Show usage |
 
-### `check [DIR]`
+The archive is the working tree as it sits on disk, minus `.git` and anything in a `.cavilignore` file (one
+`tar` pattern per line) or given with `--exclude-path`. Vendored dependencies are kept on purpose; use
+`--respect-gitignore` for the leaner case.
 
-```sh
-cavil-cli check              # the current git change set
-cavil-cli check ./project    # a whole tree
-cavil-cli check --all        # the current directory as a tree
-```
+To catch an accidental large file (a build artifact, a data dump), `check` refuses before uploading if the
+archive exceeds the server's upload limit (250 MiB by default), telling you to trim it. Set `CAVIL_MAX_UPLOAD_MB`
+to match an instance configured to accept more.
 
-| Option | Description |
-| --- | --- |
-| `--all` | Scan the whole tree instead of the change set |
-| `--since <ref>` | Diff against this ref instead of the default branch |
-| `--staged` | Check staged changes only |
-| `--fail-on-risk <n>` | Exit non-zero at risk `n` or above (default `4`) |
-| `--fail-on-unknown` | Exit non-zero if any code has no known provenance |
-| `--baseline <file>` | Use this baseline instead of `DIR/.cavil-baseline.json` |
-| `--no-baseline` | Report every match, ignoring an existing baseline |
-| `--exclude-package <name>` | Ignore matches carried only by this package, so a working copy of an open source project does not match its own indexed package (repeatable, `CAVIL_EXCLUDE_PACKAGES`) |
-| `--exclude-path <glob>` | Skip files under this path entirely, e.g. test fixtures (repeatable, `CAVIL_EXCLUDE_PATHS`) |
-| `--hidden` | Also scan hidden files (dotfiles); skipped by default |
-
-The default gate of `4` is strong copyleft, where a copy makes your work a derivative. Raise it if you already
-ship copyleft, lower it to `3` if you cannot take in any.
-
-### `baseline [DIR]`
-
-```sh
-cavil-cli baseline ./project
-```
-
-Writes every current match to `DIR/.cavil-baseline.json`. Commit it, and later checks report only what is
-*not* in it - so the report stays about new code instead of repeating decisions you have already made.
-
-Entries are pinned to a file's content and to what it matched, and never hide a risk higher than the one
-accepted; see the [architecture guide](docs/Architecture.md) for the full rules. Takes the same `--baseline`,
-`--exclude-*` and `--hidden` options as `check`.
+The default gate is one above the instance's own acceptable risk, so a project the instance would accept passes
+without any configuration. Raise `--fail-on-risk` if you already ship higher-risk code, lower it to be stricter.
 
 ### `whoami`
 
@@ -117,7 +104,7 @@ accepted; see the [architecture guide](docs/Architecture.md) for the full rules.
 cavil-cli whoami
 ```
 
-Shows who the token belongs to, and the round-trip time to the instance.
+Shows who the token belongs to, its roles and write access, and the round-trip time to the instance.
 
 ### `config`
 
@@ -138,7 +125,7 @@ never from the command line, where it would linger in shell history and process 
 
 | Code | Meaning |
 | --- | --- |
-| `0` | Clean |
+| `0` | Within the risk gate |
 | `1` | The risk gate failed |
 | `2` | Usage or configuration problem |
 | `3` | Server or connection error |

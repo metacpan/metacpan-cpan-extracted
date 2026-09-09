@@ -2,7 +2,7 @@ package App::Yath::Command::recent;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Term::Table;
 use Test2::Harness::UI::Util qw/config_from_settings/;
@@ -135,7 +135,7 @@ sub get_from_db {
         username     => $user,
         project_name => $project,
         query        => {},
-        attrs        => {order_by => {'-desc' => 'added'}, rows => $count},
+        attrs        => {order_by => {'-desc' => 'run_ord'}, rows => $count},
         list         => 1,
     );
 

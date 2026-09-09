@@ -13,6 +13,10 @@
 #include <string.h>
 #include <math.h>
 
+#if defined(_WIN32) || defined(_MSC_VER) || defined(__MINGW32__)
+#include <malloc.h>
+#endif
+
 #if defined(_MSC_VER)
 #if !defined(__cplusplus) && !defined(inline)
 #define inline __inline
@@ -114,12 +118,12 @@ static inline double histo_letoh_d(double d) {
 static inline void* histo_alloc_aligned(size_t size) {
     if (size == 0) return NULL;
     void *ptr = NULL;
-#if defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200112L)
+#if defined(_WIN32) || defined(_MSC_VER) || defined(__MINGW32__)
+    ptr = _aligned_malloc(size, 64);
+#elif defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200112L)
     if (posix_memalign(&ptr, 64, size) != 0) {
         return NULL;
     }
-#elif defined(_MSC_VER)
-    ptr = _aligned_malloc(size, 64);
 #else
     ptr = malloc(size);
 #endif
@@ -131,7 +135,7 @@ static inline void* histo_alloc_aligned(size_t size) {
 
 static inline void histo_free_aligned(void *ptr) {
     if (!ptr) return;
-#if defined(_MSC_VER)
+#if defined(_WIN32) || defined(_MSC_VER) || defined(__MINGW32__)
     _aligned_free(ptr);
 #else
     free(ptr);

@@ -1,5 +1,12 @@
 Revision history for Math-Histo
 
+0.4.0   2026-09-08
+        - Align with libhisto C core 0.4.0 release.
+        - Require Alien::libhisto 0.4.0 in build and runtime prerequisites.
+        - Support new core accessors for flags, underflow/overflow sum_w2, and 2D guard regions.
+        - Add editor swap and temporary file exclusion patterns to MANIFEST.SKIP.
+        - Clean compilation and test verification on Perl 5.8 through 5.40+.
+
 0.3.0   2026-08-29
         - Bundle Devel::PPPort ppport.h for Perl XS backward compatibility (fixing undefined symbol av_top_index on Perl 5.8 through 5.16).
         - Align with libhisto C core 0.3.0 with high-throughput batching, bpftrace stream detection, and declarative CLI parser.

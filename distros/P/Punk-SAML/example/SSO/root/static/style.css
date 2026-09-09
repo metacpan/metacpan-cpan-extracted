@@ -1,0 +1,309 @@
+/* A photocopied-zine landing page: cheap copier stock, black ink, and the two
+ * colours punk sleeves were actually printed in - hot pink and acid yellow.
+ *
+ * Everything is local: system fonts, CSS gradients for the halftone, no
+ * images, no script, no webfont. It is here to prove the view tier works and
+ * to be deleted the moment you have something of your own. */
+
+:root {
+    --paper:  #e9e7e2;   /* copier stock: grey, not cream */
+    --ink:    #15151a;
+    --smudge: rgba(21, 21, 26, .09);
+
+    /* The two spot colours are printed inks: they do not change with the
+     * theme, and neither does what is legible on top of them. --ink flips
+     * between themes, so using it on yellow would put near-white text on
+     * #ffe600 in the dark. These pairings are fixed for that reason. */
+    --hot:     #ff2d6b;
+    --on-hot:  #ffffff;
+    --acid:    #ffe600;
+    --on-acid: #15151a;
+
+    --stack:  ui-sans-serif, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono:   ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --serif:  ui-serif, Georgia, "Times New Roman", serif;
+}
+
+/* Only the ground and its ink move between themes; style through the tokens
+ * above, never inside a theme block, or a pairing like the one this comment
+ * exists because of goes wrong again. */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --paper:  #0e0e12;
+        --ink:    #eceae4;
+        --smudge: rgba(236, 234, 228, .08);
+    }
+}
+
+/* An explicit choice wins over the system preference, in both directions. */
+:root[data-theme="dark"] {
+    --paper:  #0e0e12;
+    --ink:    #eceae4;
+    --smudge: rgba(236, 234, 228, .08);
+}
+
+:root[data-theme="light"] {
+    --paper:  #e9e7e2;
+    --ink:    #15151a;
+    --smudge: rgba(21, 21, 26, .09);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 3.5rem 1.25rem 4rem;
+    background: var(--paper);
+    /* the xerox grain: two offset dot grids, resolution-independent */
+    background-image:
+        radial-gradient(var(--smudge) 1px, transparent 1.1px),
+        radial-gradient(var(--smudge) 1px, transparent 1.1px);
+    background-size: 7px 7px, 11px 11px;
+    background-position: 0 0, 3px 4px;
+    color: var(--ink);
+    font: 16px/1.65 var(--stack);
+    -webkit-text-size-adjust: 100%;
+}
+
+main {
+    max-width: 46rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+}
+
+:focus-visible {
+    outline: 3px solid var(--hot);
+    outline-offset: 2px;
+}
+
+/* ---- masthead ------------------------------------------------------------ */
+
+.masthead {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 7px solid var(--ink);
+}
+
+/* A ransom note is cut from whatever was to hand, so no two letters share a
+ * face, a size or an angle. That mismatch is the whole device. */
+.wordmark {
+    display: flex;
+    align-items: flex-end;
+    gap: .3rem;
+    margin: 0;
+    line-height: 1;
+}
+
+.wordmark b {
+    display: inline-block;
+    padding: .16rem .42rem;
+    background: var(--ink);
+    color: var(--paper);
+    font: 900 1rem/1 var(--stack);
+}
+
+.wordmark b:nth-child(1) { transform: rotate(-5deg); }
+.wordmark b:nth-child(2) {
+    background: var(--hot);
+    color: var(--on-hot);
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    font-style: italic;
+    transform: rotate(4deg);
+}
+.wordmark b:nth-child(3) {
+    font-family: var(--mono);
+    font-size: .9rem;
+    transform: rotate(-2deg);
+}
+.wordmark b:nth-child(4) {
+    background: var(--acid);
+    color: var(--on-acid);
+    font-size: 1.25rem;
+    transform: rotate(6deg);
+}
+
+h1 {
+    margin: 0;
+    font-size: clamp(2.75rem, 12vw, 5.5rem);
+    line-height: .9;
+    font-weight: 900;
+    font-stretch: condensed;
+    letter-spacing: -.045em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    word-break: break-word;
+    /* the second impression a misaligned copier leaves */
+    text-shadow: 4px 4px 0 var(--hot);
+}
+
+.sticker {
+    position: absolute;
+    top: -.35rem;
+    right: 0;
+    margin: 0;
+    padding: .35rem .7rem;
+    background: var(--acid);
+    color: var(--on-acid);
+    border: 2px solid var(--on-acid);
+    font-weight: 900;
+    font-size: .75rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    transform: rotate(7deg);
+}
+
+.lede {
+    margin: 0;
+    max-width: 32rem;
+    font-size: 1.05rem;
+}
+
+/* ---- sections ------------------------------------------------------------ */
+
+section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+h2 {
+    margin: 0;
+    padding: .22rem .65rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: .78rem;
+    font-weight: 900;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    transform: skewX(-9deg);
+}
+
+/* ---- routes -------------------------------------------------------------- */
+
+.routes {
+    width: 100%;
+    overflow-x: auto;
+    border: 3px solid var(--ink);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+}
+
+th {
+    background: var(--ink);
+    color: var(--paper);
+    text-align: left;
+    font-size: .68rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+th, td {
+    padding: .5rem .7rem;
+    border-bottom: 1px solid var(--ink);
+    white-space: nowrap;
+}
+
+tr:last-child td { border-bottom: 0; }
+
+.verb {
+    display: inline-block;
+    padding: .08rem .4rem;
+    border: 2px solid var(--ink);
+    font: 700 .72rem/1.35 var(--mono);
+    letter-spacing: .06em;
+}
+
+code {
+    font: .875em var(--mono);
+    word-break: break-word;
+}
+
+/* ---- the three ways in --------------------------------------------------- */
+/* Not a sequence - three separate doors, so no numbers on them. */
+
+.next {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+}
+
+.next li {
+    position: relative;
+    padding-left: 1.9rem;
+}
+
+.next li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: .45rem;
+    width: .85rem;
+    height: .85rem;
+    background: var(--hot);
+    transform: rotate(-8deg);
+}
+
+.next li:nth-child(2)::before { background: var(--acid); }
+
+.next strong {
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+pre {
+    margin: .6rem 0 0;
+    padding: .8rem .9rem;
+    overflow-x: auto;
+    border-left: 5px solid var(--ink);
+    background: var(--smudge);
+    font: .82rem/1.55 var(--mono);
+}
+
+/* ---- footer -------------------------------------------------------------- */
+
+.foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .9rem;
+    margin: .75rem 0 0;
+    padding-top: 1.2rem;
+    border-top: 3px dashed var(--ink);
+    font-size: .76rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.tape {
+    padding: .25rem .6rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 900;
+    transform: rotate(-2deg);
+}
+
+a {
+    color: inherit;
+    text-decoration-color: var(--hot);
+    text-decoration-thickness: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .sticker { transition: transform .18s ease; }
+    .sticker:hover { transform: rotate(0deg) scale(1.06); }
+}

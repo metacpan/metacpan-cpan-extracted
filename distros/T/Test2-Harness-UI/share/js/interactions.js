@@ -12,7 +12,7 @@ function build_interactions(item, state) {
         content.append('<hr />');
 
         content.append('<h2>Found ' + item.data + ' jobs that overlapped with this event</h2>');
-        content.append("<p>Click any file in this list to jump down to it's event data. Only events within " + context_count + " seconds of this failure will be shown.</p>");
+        content.append("<p>Click any file in this list to jump down to its event data. Only events within " + context_count + " seconds of this failure will be shown.</p>");
 
         var form = $('<form><input id="context_count" value="' + context_count + '" /><input type="submit" id="context_count_go" value="reload" /></input></form>');
         content.append(form);
@@ -26,7 +26,7 @@ function build_interactions(item, state) {
             state = {};
             var uri = base_uri + 'interactions/data/' + event_id + '/' + val;
             t2hui.fetch(uri, {}, function(item) { build_interactions(item, state) });
-            return true;
+            return false;
         });
 
         var list = $('<ol></ol>');

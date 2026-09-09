@@ -13,7 +13,7 @@ use Plack::Request;
 use Encode;
 use File::Spec::Functions qw(catdir);
 use namespace::autoclean;
-our $VERSION = v0.21.1;
+our $VERSION = v0.22.1;
 
 sub app {
     my ($class, %params) = @_;
@@ -105,7 +105,8 @@ sub app {
         my $mimes = { %{ $Plack::MIME::MIME_TYPES } };
         for my $ext (keys %{ $mimes }) {
             $mimes->{$ext} = 'text/plain'
-                if $mimes->{$ext} =~ /html|x-c|xml|calendar|vcard/
+                if $mimes->{$ext} =~ /html|x-c|calendar|vcard/
+                || ($mimes->{$ext} =~ /xml/ && $mimes->{$ext} !~ /\Aimage\//)
                 || any { $ext eq $_ } qw(.bat .css .eml .js .json .mime .swf);
         }
         my $src_dir = Plack::App::Directory->new(
@@ -225,7 +226,7 @@ David E. Wheeler <david.wheeler@pgexperts.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2025 David E. Wheeler.
+Copyright (c) 2011-2026 David E. Wheeler.
 
 This module is free software; you can redistribute it and/or modify it under
 the L<PostgreSQL License|http://www.opensource.org/licenses/postgresql>.

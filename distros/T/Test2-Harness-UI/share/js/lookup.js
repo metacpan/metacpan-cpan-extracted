@@ -1,6 +1,4 @@
 $(function() {
-    var users     = $('div#run_list');
-    var projectss = $('div#run_list');
     var runs      = $('div#run_list');
     var jobs      = $('div#job_list');
     var events    = $('div#event_list');

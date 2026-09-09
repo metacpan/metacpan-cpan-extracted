@@ -14,7 +14,10 @@ my $d = MIDI::Drummer::Tiny->new(
     snare => 40,
     bpm   => 70,
 );
-my $grooves = MIDI::Drummer::Tiny::Grooves->new(drummer => $d);
+my $grooves = MIDI::Drummer::Tiny::Grooves->new(
+    drummer    => $d,
+    share_file => './share/drum-pattern-bit-strings.txt', # author only
+);
 
 my $set = {};
 # $set = $grooves->all_grooves;
@@ -25,7 +28,8 @@ $set = $grooves->search({ name => $name }, $set) if $name;       # "
 
 for my $n (sort keys %$set) {
     my $groove = $set->{$n};
-    print $groove->{name}, "\n";
+    my $density = $grooves->density($groove);
+    print "$groove->{name}: $density\n";
     $grooves->groove($groove->{groove});
 }
 

@@ -6,45 +6,45 @@ use Test::Lib;
 
 use Data::Record::Serialize;
 
-subtest "default behavior" => sub {
+subtest 'default behavior' => sub {
 
     my $drs;
     ok( lives { $drs = Data::Record::Serialize->new( encode => '+My::Test::Encode::store' ) },
         'construct object' )
       or note "Error: $@";
 
-    is( $drs->nullified, [], "no nullified fields prior to sending first record" );
+    is( $drs->nullified, [], 'no nullified fields prior to sending first record' );
 
     # prime @fields
-    $drs->send( { integer => 1, string => '', number => '' } );
+    $drs->send( { integer => 1, string => q{}, number => q{} } );
 
-    is( $drs->nullified, [], "no nullified fields after sending first record" );
+    is( $drs->nullified, [], 'no nullified fields after sending first record' );
 
     is(
         $drs->output->[-1],
         hash {
             field integer => 1;
-            field string  => "";
-            field number  => "";
+            field string  => q{};
+            field number  => q{};
             end;
         },
-        "no output fields nullified"
+        'no output fields nullified'
     );
 
 };
 
 
-subtest "nullify boolean" => sub {
+subtest 'nullify boolean' => sub {
 
     my $drs;
     ok(
         lives {
             $drs = Data::Record::Serialize->new(
                 encode  => '+My::Test::Encode::store',
-                nullify => 1
+                nullify => 1,
             )
         },
-        'construct object'
+        'construct object',
     ) or note $@;
 
     # prime @fields
@@ -59,11 +59,11 @@ subtest "nullify boolean" => sub {
             item 'number';
             end;
         },
-        "correct fields nullified"
+        'correct fields nullified'
     );
 
     # these will be nullified
-    $drs->send( { integer => 1, string => "", number => "" } );
+    $drs->send( { integer => 1, string => q{}, number => q{} } );
 
     is(
         $drs->output->[-1],
@@ -73,28 +73,28 @@ subtest "nullify boolean" => sub {
             field number  => undef;
             end;
         },
-        "correct output fields nullified"
+        'correct output fields nullified'
     );
 
-    ok( lives { $drs->nullify( 0 ) }, "reset nullify" );
-    is( $drs->nullified, [], "no fields nullified" );
+    ok( lives { $drs->nullify( 0 ) }, 'reset nullify' );
+    is( $drs->nullified, [], 'no fields nullified' );
 
-    $drs->send( { integer => 1, string => "", number => "" } );
+    $drs->send( { integer => 1, string => q{}, number => q{} } );
 
     is(
         $drs->output->[-1],
         hash {
             field integer => 1;
-            field string  => "";
-            field number  => "";
+            field string  => q{};
+            field number  => q{};
             end;
         },
-        "no output fields nullified"
+        'no output fields nullified'
     );
 
 };
 
-subtest "bad field name" => sub {
+subtest 'bad field name' => sub {
 
     my $drs;
     ok(
@@ -109,12 +109,12 @@ subtest "bad field name" => sub {
     my $error;
 
     $error
-      = dies { $drs->send( { integer => 1, string => "", number => "" } ); };
+      = dies { $drs->send( { integer => 1, string => q{}, number => q{} } ); };
 
     isa_ok(
         $error,
         ['Data::Record::Serialize::Error::Role::Base::fields'],
-        "send: caught bad nullification field error"
+        'send: caught bad nullification field error',
     );
     like( $error, qr/foobar/, 'identified bad field name' );
 
@@ -122,14 +122,12 @@ subtest "bad field name" => sub {
     isa_ok(
         $error,
         ['Data::Record::Serialize::Error::Role::Base::fields'],
-        "nullified: caught bad nullification field error"
+        'nullified: caught bad nullification field error',
     );
     like( $error, qr/foobar/, 'identified bad field name' );
-
-
 };
 
-subtest "nullify sub" => sub {
+subtest 'nullify sub' => sub {
 
     my $drs;
     ok(
@@ -139,10 +137,10 @@ subtest "nullify sub" => sub {
                 nullify => sub { shift->numeric_fields },
             )
         },
-        'construct object'
+        'construct object',
     ) or note $@;
 
-    $drs->send( { integer => 1, string => "string", number => 2.2 } );
+    $drs->send( { integer => 1, string => 'string', number => 2.2 } );
 
     is(
         $drs->nullified,
@@ -151,22 +149,51 @@ subtest "nullify sub" => sub {
             item 'number';
             end;
         },
-        "correct fields nullified"
+        'correct fields nullified',
     );
 
-    $drs->send( { integer => 1, string => "", number => '' } );
+    $drs->send( { integer => 1, string => q{}, number => q{} } );
 
     is(
         $drs->output->[-1],
         hash {
             field integer => 1;
-            field string  => "";
+            field string  => q{};
             field number  => undef;
             end;
         },
-        "correct output fields nullified"
+        'correct output fields nullified',
     );
 
+};
+
+subtest 'nullify field selection specification' => sub {
+
+    my $drs = Data::Record::Serialize->new(
+        encode  => '+My::Test::Encode::store',
+        fields  => [qw( integer string number boolean )],
+        types   => { integer => 'I', string => 'S', number => 'N', boolean => 'B' },
+        nullify => [qw( -integer -boolean )],
+    );
+
+    is(
+        $drs->nullified,
+        bag { item 'string'; item 'number'; end; },
+        'initial exclusions select remaining fields'
+    );
+
+    $drs->send( { integer => q{}, string => q{}, number => q{}, boolean => 1 } );
+
+    is(
+        $drs->output->[-1],
+        {
+            integer => q{},
+            string  => undef,
+            number  => undef,
+            boolean => 1,
+        },
+        'only selected fields are nullified',
+    );
 };
 
 done_testing;

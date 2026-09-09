@@ -19,16 +19,20 @@
  * when no edit has happened. That call is the only thing under this
  * header that writes to a document.
  *
- * Needs frx_arena.h, frx_tree.h, frx_parse.h, frx_xpath_lex.h,
- * frx_xpath_parse.h, frx_xpath_eval.h. */
+ * Needs frx_abi.h, frx_arena.h, frx_tree.h, frx_parse.h,
+ * frx_xpath_lex.h, frx_xpath_parse.h, frx_xpath_eval.h.
+ *
+ * frx_xpath is opaque in frx_abi.h and defined here: the typedef is
+ * written once, there, since repeating it is a C11 feature and a C89
+ * compiler refuses it. */
 
-typedef struct frx_xpath {
+struct frx_xpath {
     frx_arena   arena;
     frx_xn     *ast;
     frx_xp_var *vars;
     int         n_vars;
     int         max_depth;
-} frx_xpath;
+};
 
 static void
 frx_xpath_free(frx_xpath *x)

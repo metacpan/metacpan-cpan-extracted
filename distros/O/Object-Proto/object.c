@@ -1769,11 +1769,35 @@ static OP* pp_object_func_set(pTHX) {
     RETURN;
 }
 
+/* Custom ops from other modules that are safe to use as an accessor operand:
+ * side-effect free, and leaving exactly one value on the stack. Matched by the
+ * name the op was registered under, so neither dist needs to know how to build
+ * against the other. Seeded with Confold's `<:`, whose whole purpose is to mark
+ * a value as constant. */
+#define OBJECT_MAX_SIMPLE_CUSTOM 8
+static const char *g_simple_custom_ops[OBJECT_MAX_SIMPLE_CUSTOM] = { "confold" };
+static int g_simple_custom_op_count = 1;
+
+OBJECT_INLINE bool is_simple_custom_op(pTHX_ OP *op) {
+    const char *name;
+    int i;
+
+    name = XopENTRYCUSTOM(op, xop_name);
+    if (!name) return false;
+
+    for (i = 0; i < g_simple_custom_op_count; i++) {
+        if (strEQ(name, g_simple_custom_ops[i])) return true;
+    }
+    return false;
+}
+
 /* Check if an op is "simple" (can be safely used in optimized accessor) */
-OBJECT_INLINE bool is_simple_op(OP *op) {
+OBJECT_INLINE bool is_simple_op(pTHX_ OP *op) {
     if (!op) return false;
     /* Simple ops: pad variables, constants, global variables */
     switch (op->op_type) {
+        case OP_CUSTOM:
+            return is_simple_custom_op(aTHX_ op);
         case OP_PADSV:    /* $lexical */
         case OP_CONST:    /* literal value */
         case OP_GV:       /* *glob */
@@ -1823,7 +1847,7 @@ static OP* func_accessor_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckob
 
         /* Only optimize if exactly 2 args and both are simple ops */
         if (valop && OpSIBLING(valop) == cvop &&
-            is_simple_op(objop) && is_simple_op(valop)) {
+            is_simple_op(aTHX_ objop) && is_simple_op(aTHX_ valop)) {
             OpMORESIB_set(pushop, cvop);
             OpLASTSIB_set(valop, NULL);
             OpLASTSIB_set(objop, NULL);
@@ -1845,7 +1869,7 @@ static OP* func_accessor_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckob
     }
 
     /* Getter: name($obj) - optimize only if objop is simple */
-    if (!is_simple_op(objop)) {
+    if (!is_simple_op(aTHX_ objop)) {
         return entersubop;
     }
 
@@ -4232,6 +4256,36 @@ PERL_CALLCONV RegisteredType* object_get_registered_type(pTHX_ const char *name)
 }
 
 /* Object::Proto::register_type($name, $check_cb [, $coerce_cb]) */
+/* Object::Proto::register_simple_custom_op($xop_name) - let a custom op from
+ * another module be used as an accessor operand without deoptimising the call.
+ * The op must be free of side effects and leave exactly one value on the
+ * stack; nothing here can check that, so registering is a promise. */
+XS_INTERNAL(xs_register_simple_custom_op) {
+    dXSARGS;
+    STRLEN len;
+    const char *name;
+    int i;
+
+    if (items != 1)
+        croak("Usage: Object::Proto::register_simple_custom_op($xop_name)");
+
+    name = SvPV(ST(0), len);
+    if (!len)
+        croak("register_simple_custom_op: name must not be empty");
+
+    for (i = 0; i < g_simple_custom_op_count; i++) {
+        if (strEQ(name, g_simple_custom_ops[i]))
+            XSRETURN_YES;   /* already registered */
+    }
+
+    if (g_simple_custom_op_count >= OBJECT_MAX_SIMPLE_CUSTOM)
+        croak("register_simple_custom_op: registry is full (max %d)",
+              OBJECT_MAX_SIMPLE_CUSTOM);
+
+    g_simple_custom_ops[g_simple_custom_op_count++] = savepvn(name, len);
+    XSRETURN_YES;
+}
+
 XS_INTERNAL(xs_register_type) {
     dXSARGS;
     STRLEN name_len;
@@ -4781,6 +4835,9 @@ XS_EXTERNAL(boot_Object__Proto) {
     /* Inheritance API */
     newXS("Object::Proto::parent", xs_parent, __FILE__);
     newXS("Object::Proto::ancestors", xs_ancestors, __FILE__);
+
+    /* Simple custom op registry */
+    newXS("Object::Proto::register_simple_custom_op", xs_register_simple_custom_op, __FILE__);
 
     /* Type registry API */
     newXS("Object::Proto::register_type", xs_register_type, __FILE__);

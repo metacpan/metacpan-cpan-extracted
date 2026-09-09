@@ -1,6 +1,8 @@
 package MIDI::Drummer::Tiny::SwingFills;
-$MIDI::Drummer::Tiny::SwingFills::VERSION = '0.7016';
+$MIDI::Drummer::Tiny::SwingFills::VERSION = '0.7020';
 our $AUTHORITY = 'cpan:GENE';
+
+# ABSTRACT: Drum fills with swing
 
 use Moo;
 use strictures 2;
@@ -387,11 +389,11 @@ __END__
 
 =head1 NAME
 
-MIDI::Drummer::Tiny::SwingFills
+MIDI::Drummer::Tiny::SwingFills - Drum fills with swing
 
 =head1 VERSION
 
-version 0.7016
+version 0.7020
 
 =head1 SYNOPSIS
 

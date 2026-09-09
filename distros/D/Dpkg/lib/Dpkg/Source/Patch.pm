@@ -33,13 +33,14 @@ package Dpkg::Source::Patch 0.01;
 use v5.36;
 
 use POSIX qw(:errno_h :sys_wait_h);
+use File::stat ();
 use File::Find;
 use File::Basename;
 use File::Spec;
 use File::Path qw(make_path);
 use File::Compare;
 use Fcntl qw(:mode);
-use Time::HiRes qw(stat);
+use Time::HiRes;
 
 use Dpkg;
 use Dpkg::Gettext;
@@ -84,6 +85,15 @@ sub get_header {
     }
 }
 
+sub _gen_hires_diff_label($filename)
+{
+    # XXX: Make do without File::stat::stat as otherwise we need to use the
+    # undocumented File::stat::populate() function with Time::HiRes::stat().
+    my $mtime = (Time::HiRes::stat($filename))[9];
+    my $t = POSIX::strftime('%Y-%m-%d %H:%M:%S', gmtime $mtime);
+    return sprintf "\t%s.%09d +0000", $t, ($mtime - int $mtime) * 1_000_000_000;
+}
+
 sub add_diff_file {
     my ($self, $old, $new, %opts) = @_;
     $opts{include_timestamp} //= 0;
@@ -104,14 +114,8 @@ sub add_diff_file {
     # Add labels.
     if ($opts{label_old} and $opts{label_new}) {
         if ($opts{include_timestamp}) {
-            my $ts = (stat($old))[9];
-            my $t = POSIX::strftime('%Y-%m-%d %H:%M:%S', gmtime($ts));
-            $opts{label_old} .= sprintf("\t%s.%09d +0000", $t,
-                                        ($ts - int($ts)) * 1_000_000_000);
-            $ts = (stat($new))[9];
-            $t = POSIX::strftime('%Y-%m-%d %H:%M:%S', gmtime($ts));
-            $opts{label_new} .= sprintf("\t%s.%09d +0000", $t,
-                                        ($ts - int($ts)) * 1_000_000_000);
+            $opts{label_old} .= _gen_hires_diff_label($old);
+            $opts{label_new} .= _gen_hires_diff_label($new);
         } else {
             # Space in filenames need special treatment.
             $opts{label_old} .= "\t" if $opts{label_old} =~ / /;
@@ -150,12 +154,14 @@ sub add_diff_file {
             error(g_("unknown line from diff -u on %s: '%s'"), $new, $_);
         }
         if (*$self->{empty} and defined(*$self->{header})) {
-            $self->print($self->get_header()) or syserr(g_('failed to write'));
+            $self->print($self->get_header())
+                or syserr(g_('cannot write'));
             *$self->{empty} = 0;
         }
-        print { $self } $_ or syserr(g_('failed to write'));
+        print { $self } $_
+            or syserr(g_('cannot write'));
     }
-    close($diffgen) or syserr('close on diff pipe');
+    close($diffgen) or syserr(g_('cannot close diff pipe'));
     wait_child($diff_pid,
         no_check => 1,
         cmdline => "diff -u @options -- $old $new",
@@ -193,26 +199,27 @@ sub add_diff_directory {
         my $fn = (length > length($new)) ? substr($_, length($new) + 1) : '.';
         return if $diff_ignore->($fn);
         $files_in_new{$fn} = 1;
-        lstat("$new/$fn") or syserr(g_('cannot stat file %s'), "$new/$fn");
-        my $mode = S_IMODE((lstat(_))[2]);
-        my $size = (lstat(_))[7];
-        if (-l _) {
+        my $new_st = File::stat::lstat("$new/$fn")
+            or syserr(g_('cannot stat file %s'), "$new/$fn");
+        my $mode = S_IMODE($new_st->mode);
+        my $size = $new_st->size;
+        if (-l $new_st) {
             unless (-l "$old/$fn") {
                 $self->_fail_not_same_type("$old/$fn", "$new/$fn", $fn);
                 return;
             }
             my $n = readlink("$new/$fn");
             unless (defined $n) {
-                syserr(g_('cannot read link %s'), "$new/$fn");
+                syserr(g_('cannot read symbolic link %s'), "$new/$fn");
             }
             my $n2 = readlink("$old/$fn");
             unless (defined $n2) {
-                syserr(g_('cannot read link %s'), "$old/$fn");
+                syserr(g_('cannot read symbolic link %s'), "$old/$fn");
             }
             unless ($n eq $n2) {
                 $self->_fail_not_same_type("$old/$fn", "$new/$fn", $fn);
             }
-        } elsif (-f _) {
+        } elsif (-f $new_st) {
             my $old_file = "$old/$fn";
             if (not lstat("$old/$fn")) {
                 if ($! != ENOENT) {
@@ -230,14 +237,14 @@ sub add_diff_directory {
             }
             push @diff_files, [$fn, $mode, $size, $old_file, "$new/$fn",
                                $label_old, "$basedir/$fn"];
-        } elsif (-p _) {
+        } elsif (-p $new_st) {
             unless (-p "$old/$fn") {
                 $self->_fail_not_same_type("$old/$fn", "$new/$fn", $fn);
             }
-        } elsif (-b _ || -c _ || -S _) {
+        } elsif (-b $new_st || -c $new_st || -S $new_st) {
             $self->_fail_with_msg("$new/$fn",
                 g_('device or socket is not allowed'));
-        } elsif (-d _) {
+        } elsif (-d $new_st) {
             if (not lstat("$old/$fn")) {
                 if ($! != ENOENT) {
                     syserr(g_('cannot stat file %s'), "$old/$fn");
@@ -266,7 +273,7 @@ sub add_diff_directory {
         } elsif (-d _) {
             warning(g_('ignoring deletion of directory %s'), $fn);
         } elsif (-l _) {
-            warning(g_('ignoring deletion of symlink %s'), $fn);
+            warning(g_('ignoring deletion of symbolic link %s'), $fn);
         } else {
             $self->_fail_not_same_type("$old/$fn", "$new/$fn", $fn);
         }
@@ -345,22 +352,29 @@ sub finish {
     return not *$self->{errors};
 }
 
+sub has_errors($self)
+{
+    return *$self->{errors};
+}
+
 sub register_error {
     my $self = shift;
     *$self->{errors}++;
 }
 sub _fail_with_msg {
     my ($self, $file, $msg) = @_;
-    errormsg(g_('cannot represent change to %s: %s'), $file, $msg);
+    errormsg(g_('cannot represent changes to %s: %s'), $file, $msg);
     $self->register_error();
 }
 sub _fail_not_same_type {
     my ($self, $old, $new, $file) = @_;
     my $old_type = get_type($old);
     my $new_type = get_type($new);
-    errormsg(g_('cannot represent change to %s:'), $file);
+    errormsg(g_('cannot represent changes to %s using GNU diff:'), $file);
     errormsg(g_('  new version is %s'), $new_type);
     errormsg(g_('  old version is %s'), $old_type);
+    hint(g_('you can use a git formatted patch to represent these changes:'));
+    hint(g_('  with "git format-patch" or "git diff --no-index a/ b/"'));
     $self->register_error();
 }
 
@@ -408,11 +422,12 @@ sub _intuit_file_patched {
     # where patch picks the one with the fewest directories to create
     # since dpkg-source will pre-create the required directories.
 
-    # Precalculate metrics used by patch.
+    # Pre-calculate metrics used by patch.
     my ($tmp_o, $tmp_n) = ($old, $new);
     my ($len_o, $len_n) = (length($old), length($new));
-    $tmp_o =~ s{[/\\]+}{/}g;
-    $tmp_n =~ s{[/\\]+}{/}g;
+    $tmp_o =~ tr{/\\}{/}s;
+    $tmp_n =~ tr{/\\}{/}s;
+    # Count the number of / in the strings.
     my $nb_comp_o = ($tmp_o =~ tr{/}{/});
     my $nb_comp_n = ($tmp_n =~ tr{/}{/});
     $tmp_o =~ s{^.*/}{};
@@ -500,10 +515,6 @@ sub analyze {
             }
             my $path = $fn{$key};
             while (1) {
-                if (-l $path) {
-                    error(g_('diff %s modifies file %s through a symlink: %s'),
-                          $diff, $fn{$key}, $path);
-                }
                 last unless $path =~ s{/+[^/]*$}{};
                 # $destdir is assumed safe.
                 last if length($path) <= length($destdir);
@@ -528,14 +539,13 @@ sub analyze {
             $dirtocreate{$dirname} = 1;
         }
 
-        if (-e $fn) {
-            if (not -f _) {
+        my $st = File::stat::stat($fn);
+        if (defined $st) {
+            if (not -f $st) {
                 error(g_("diff '%s' patches something which is not a plain file"),
                       $diff);
             }
-            # Note: We cannot use "stat _" due to Time::HiRes.
-            my $nlink = (stat $fn)[3];
-            if ($nlink > 1) {
+            if ($st->nlink > 1) {
                 warning(g_("diff '%s' patches hard link %s which can have " .
                            'unintended consequences'), $diff, $fn);
             }
@@ -675,7 +685,8 @@ sub apply {
         }
         if ($opts{remove_backup}) {
             $fn .= '.dpkg-orig';
-            unlink($fn) or syserr(g_('remove patch backup file %s'), $fn);
+            unlink($fn)
+                or syserr(g_('cannot remove patch backup file %s'), $fn);
         }
     }
     return $analysis;
@@ -739,7 +750,7 @@ sub get_type {
             if -f _ ;
         return g_('directory')
             if -d _;
-        return sprintf(g_('symlink to %s'), readlink($file))
+        return sprintf(g_('symbolic link to %s'), readlink($file))
             if -l _;
         return g_('block device')
             if -b _;

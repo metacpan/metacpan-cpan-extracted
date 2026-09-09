@@ -5,45 +5,49 @@ use warnings;
 use Carp qw(croak);
 use version 0.77;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.2';
 
 use Text::AsciidocDown::Include ();
-use Text::AsciidocDown::Parser ();
+use Text::AsciidocDown::Parser  ();
 
-sub new {
-  my ($class, %opts) = @_;
-  return bless { options => \%opts }, $class;
+sub new
+{
+   my ($class, %opts) = @_;
+   return bless {options => \%opts}, $class;
 }
 
-sub convert {
-  my ($self, $text, $opts) = @_;
+sub convert
+{
+   my ($self, $text, $opts) = @_;
 
-  croak 'convert must be called on an object instance (call ->new first)'
-    unless ref($self) && eval { $self->isa(__PACKAGE__) };
+   croak 'convert must be called on an object instance (call ->new first)'
+     unless ref($self) && eval { $self->isa(__PACKAGE__) };
 
-  $text = '' unless defined $text;
-  $opts = _merge_options($self->{options}, $opts);
+   $text = '' unless defined $text;
+   $opts = _merge_options($self->{options}, $opts);
 
-  $text = Text::AsciidocDown::Include::expand_includes($text, $opts);
+   $text = Text::AsciidocDown::Include::expand_includes($text, $opts);
 
-  return Text::AsciidocDown::Parser::convert($text, $opts);
+   return Text::AsciidocDown::Parser::convert($text, $opts);
 }
 
-sub _merge_options {
-  my ($base, $overrides) = @_;
-  $base ||= {};
-  $overrides ||= {};
+sub _merge_options
+{
+   my ($base, $overrides) = @_;
+   $base      ||= {};
+   $overrides ||= {};
 
-  my %merged = (%{$base}, %{$overrides});
-  if (ref($base->{attributes}) eq 'HASH' || ref($overrides->{attributes}) eq 'HASH') {
-    my %attrs = (
-      %{ref($base->{attributes}) eq 'HASH' ? $base->{attributes} : {}},
-      %{ref($overrides->{attributes}) eq 'HASH' ? $overrides->{attributes} : {}},
-    );
-    $merged{attributes} = \%attrs;
-  }
+   my %merged = (%{$base}, %{$overrides});
+   if (ref($base->{attributes}) eq 'HASH' || ref($overrides->{attributes}) eq 'HASH')
+   {
+      my %attrs = (
+                   %{ref($base->{attributes}) eq 'HASH'      ? $base->{attributes}      : {}},
+                   %{ref($overrides->{attributes}) eq 'HASH' ? $overrides->{attributes} : {}},
+                   );
+      $merged{attributes} = \%attrs;
+   }
 
-  return \%merged;
+   return \%merged;
 }
 
 1;

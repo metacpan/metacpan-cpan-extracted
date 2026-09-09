@@ -30,6 +30,7 @@ lib/Data/Record/Serialize/Sink/null.pm
 lib/Data/Record/Serialize/Sink/stream.pm
 lib/Data/Record/Serialize/Types.pm
 lib/Data/Record/Serialize/Util.pm
+mutagen.yml
 perlcritic.rc
 perltidy.rc
 t/00-compile.t
@@ -62,6 +63,7 @@ t/numify.t
 t/stream.t
 t/stream/flush.t
 t/stringify.t
+t/util.t
 t/workflow.t
 templates/CONTRIBUTING.md
 tidyall.ini

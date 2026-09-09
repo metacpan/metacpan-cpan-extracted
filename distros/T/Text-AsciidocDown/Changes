@@ -1,5 +1,70 @@
 Revision history for Text-AsciidocDown
 
+v0.1.2  2026-09-08
+  - Fix: paired curly quotes ("`text`" and '`text`') no longer share one
+    "quotes" attribute or default to raw "<q></q>" HTML.
+    * Verified against downdoc's actual source (lib/index.js) and test
+      suite that downdoc's own default IS "<q> </q>" applied identically
+      to both forms via one shared attribute -- this is real, tested
+      downdoc behavior, not an oversight, so it is not a parity bug by
+      itself. However, that default is not round-trip stable through
+      Text::MarkdownAdoc: raw "<q>" HTML is unknown to it and gets
+      progressively re-escaped as "+++<q>+++" passthrough on every pass.
+    * Verified against Text::MarkdownAdoc's source
+      (lib/Text/MarkdownAdoc/Inline.pm, _convert_smart_quotes) that it
+      maps U+201C/U+201D and U+2018/U+2019 straight back to "`text`" and
+      '`text`' respectively.
+    * Decision (deliberate, documented deviation from downdoc, made after
+      discussing the trade-off with the maintainer): default output now
+      uses real curly Unicode characters, and the two forms are
+      independently configurable via two attributes: `quotes`
+      (double-quoted, default U+201C/U+201D) and the new `quotes-single`
+      (single-quoted, default U+2018/U+2019). This distinguishes the two
+      forms in the output and makes a Markdown -> AsciiDoc -> Markdown
+      round trip through Text::MarkdownAdoc reach an exact, stable
+      fixpoint by default -- verified end-to-end with the installed
+      Text::MarkdownAdoc.
+    * The old shared "<q></q>" downdoc-parity behavior remains available
+      by setting both `quotes` and `quotes-single` explicitly.
+    * This is a user-visible default change; hence the minor version bump.
+  - Fix (found while verifying the above against downdoc's actual
+    QuotedSpanRx): apply_quotes() now requires quoted content to be
+    bounded by non-whitespace on both sides (a single non-space
+    character, or non-space...non-space), matching downdoc's own
+    `\S|\S.*?\S` restriction. Previously, whitespace-padded
+    (`"` text `"`) or empty (`"``"`) spans were incorrectly treated as
+    paired quotes; they are now left for
+    apply_standalone_quote_markers() to resolve marker-by-marker, which
+    still produces a sensible result.
+  - Fix: inline AsciiDoc passthrough (`+++...+++`) is now recognized and
+    preserved verbatim -- no `<` escaping, no quote/format substitution,
+    no attribute or macro expansion inside it. Previously this content
+    was silently corrupted (its `<` escaped to `&lt;`) because nothing
+    recognized the markers before the rest of the substitution pipeline
+    ran. This is a real correctness bug independent of any round trip
+    (hand-written passthrough content was corrupted on the very first
+    conversion), and it also permanently corrupted (not merely
+    destabilized) a round trip through Text::MarkdownAdoc whenever a
+    caller used the shared `<q></q>` downdoc-parity `quotes` setting,
+    since that tool wraps unrecognized HTML tags as `+++<tag>+++`
+    passthrough on the way back to AsciiDoc. Fixed even though downdoc
+    itself has no equivalent inline construct, since it was blocking
+    correct round trips in a configuration this module explicitly
+    supports.
+  - Updated POD and README.md to document the quotes/quotes-single
+    attribute grammar and the passthrough fix.
+
+v0.1.1  2026-09-08
+  - Fix: implement the standalone typographic curly-quote/apostrophe
+    markers (`', '`, `", "`) so they resolve to their Unicode characters
+    (U+2019, U+2018, U+201D, U+201C) instead of passing through literally.
+    This fixes a round-trip regression where Text::MarkdownAdoc's `` `' ``
+    output was not converted back to a curly apostrophe by
+    Text::AsciidocDown.
+  - The fix lives in Subs::apply_inline_formatting(), between the
+    monospace stash and unstash, so real code-span backticks (e.g.
+    `` `code`'s ``) are never mistaken for a standalone marker.
+
 v0.1.0  2026-07-02
   - Initial public release.
   - OO API via Text::AsciidocDown->new and ->convert.

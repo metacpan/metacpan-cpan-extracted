@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::Pidfile;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 use Fcntl qw(:flock O_CREAT O_RDWR SEEK_SET);
 use Fugu::Process;

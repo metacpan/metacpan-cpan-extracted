@@ -167,6 +167,29 @@ is(hit($app, path => '/ctx-notfound')->[0], 404, '$c->not_found');
     my $x = Punk::Response->new->type('text/csv')->body('a,b')->finalize;
     my %xh = @{ $x->[1] };
     is($xh{'Content-Type'}, 'text/csv', 'an explicit type wins over the default');
+
+    # The fourth rule, and the one that had to come before the reference rule
+    # above: an XML document is a blessed reference, so until it was named
+    # here it went to the JSON encoder like any other.
+    require File::Raw::XML;
+    my $doc = File::Raw::XML->new_document;
+    my $el  = $doc->new_element('', 'r');
+    $doc->document->append($el);
+
+    my $x1 = Punk::Response->new->body($doc)->finalize;
+    my %x1h = @{ $x1->[1] };
+    is($x1h{'Content-Type'}, 'application/xml; charset=utf-8',
+        'an XML DOCUMENT body is written as markup, tested before the '
+      . 'reference rule because it is also a reference');
+    like($x1->[2][0], qr/<r\/>/, 'written through the XML ABI');
+    is($x1h{'Content-Length'}, length $x1->[2][0],
+        'with the byte count - to_string hands back bytes, not characters');
+
+    my $x2 = Punk::Response->new->type('application/atom+xml')
+                                ->body($doc)->finalize;
+    my %x2h = @{ $x2->[1] };
+    is($x2h{'Content-Type'}, 'application/atom+xml',
+        'and an explicit type still wins over that one too');
 }
 
 done_testing();

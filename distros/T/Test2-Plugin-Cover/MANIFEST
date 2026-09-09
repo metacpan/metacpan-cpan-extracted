@@ -13,6 +13,7 @@ dist.ini
 lib/Test2/EventFacet/Coverage.pm
 lib/Test2/Plugin/Cover.pm
 t/disable.t
+t/exclude.t
 t/extract.t
 t/filter.t
 t/from.t

@@ -109,4 +109,65 @@ ok !eval { Crypt::JWS::Key->from_jwk({ kty => 'EC', crv => 'P-256',
     y => Crypt::JWS::b64url("\x02" x 32) }); 1 },
     'point not on curve croaks';
 
+# X.509 certificates: the public key out of DER, which is the form
+# XML-DSig's <ds:X509Certificate> carries and the form from_pem refuses.
+{
+    my ($dir) = grep { -d } ('t/data', 'data');
+    my $slurp = sub {
+        open my $fh, '<:raw', "$dir/$_[0]" or die "$dir/$_[0]: $!";
+        local $/; <$fh>;
+    };
+    my $der_of = sub {
+        my ($pem) = @_;
+        my ($b64) = $pem =~ /-----BEGIN CERTIFICATE-----(.*?)-----END/s
+            or die 'no CERTIFICATE block';
+        require MIME::Base64;
+        MIME::Base64::decode_base64($b64);
+    };
+
+    for my $case ([RSA => 'rsa', 'RS256'], [EC => 'ec', 'ES256']) {
+        my ($kty, $stem, $alg) = @$case;
+        my $cert = $slurp->("test-$stem-cert.pem");
+        my $der  = $der_of->($cert);
+
+        # from_pem refuses a certificate: this is the gap the entry fills,
+        # and the test asserts it so the entry cannot quietly become
+        # redundant without someone noticing.
+        ok !eval { Crypt::JWS::Key->from_pem($cert); 1 },
+            "$kty: from_pem refuses a CERTIFICATE block";
+
+        my $pub = Crypt::JWS::Key->from_x509_der($der);
+        is $pub->kty, $kty, "$kty: from_x509_der gives the right kty";
+        ok !$pub->is_private, "$kty: a certificate key is public";
+
+        # the point of the entry: the extracted key is the certificate's
+        # key, proven against a signature only its private half could make
+        my $priv = Crypt::JWS::Key->from_pem($slurp->("test-$stem-key.pem"));
+        my $tok  = Crypt::JWS::sign($priv, 'payload', alg => $alg);
+        is Crypt::JWS::verify($tok, $pub, algs => [$alg]), 'payload',
+            "$kty: the extracted key verifies what the private key signed";
+    }
+
+    # refusals: nothing here may croak in C or return a key
+    my $rsa_der = $der_of->($slurp->('test-rsa-cert.pem'));
+    for my $bad (['empty', ''], ['garbage', 'not a certificate'],
+                 ['PEM where DER belongs', $slurp->('test-rsa-cert.pem')],
+                 ['a private key', $slurp->('test-rsa-key.pem')],
+                 ['DER with a trailing byte', $rsa_der . "\x00"]) {
+        my ($name, $bytes) = @$bad;
+        ok !eval { Crypt::JWS::Key->from_x509_der($bytes); 1 },
+            "from_x509_der refuses $name";
+    }
+
+    # truncation at every byte offset: the family's habit, and the one
+    # shape that finds a read past the end of the buffer
+    my $survived = 0;
+    for my $n (0 .. length($rsa_der) - 1) {
+        my $k = eval { Crypt::JWS::Key->from_x509_der(substr $rsa_der, 0, $n) };
+        $survived++ if !defined $k;
+    }
+    is $survived, length($rsa_der),
+        'every truncation of the DER is refused, and none crashes';
+}
+
 done_testing();

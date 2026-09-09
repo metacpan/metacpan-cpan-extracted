@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 use File::Raw;
 
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-File::Raw::XML - a signature-grade XML parser, and a full XML processor behind one option
+File::Raw::XML - an XML parser
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -534,7 +534,7 @@ Perl callers should use L</DIRECT CODEC> and the two classes above.
 
 The contract lives in F<include/frx_abi.h>:
 
-    #define FRX_ABI_VERSION 1
+    #define FRX_ABI_VERSION 2
 
     typedef struct frx_doc  frx_doc;      /* opaque; owns every node and string */
     typedef struct frx_node frx_node;     /* opaque; borrowed from its doc */
@@ -631,6 +631,34 @@ strings, so a consumer can free what failed and then report it.
 C<reader_new>, C<xpath_compile> and C<xpath_result_new> each hand out
 something the consumer frees with the matching entry. C<new_document> and
 C<reader_subtree> hand out documents, freed with C<doc_free>.
+
+=head2 The SV bridge
+
+Everything above hands a consumer handles. Four entries, added at version
+2, cross between a handle and the blessed object the Perl surface uses, so
+a consumer can parse in C and hand the result to Perl code, or take a
+document back from Perl code and serialise it in C without a method call.
+
+    SV *(*doc_to_sv)(pTHX_ frx_doc *d);
+    frx_doc *(*doc_from_sv)(pTHX_ SV *sv);
+    const frx_node *(*node_from_sv)(pTHX_ SV *sv, frx_doc **owner);
+    SV *(*node_to_sv)(pTHX_ SV *doc_sv, const frx_node *n);
+
+C<doc_to_sv> B<takes ownership> of the document, and it is the only entry
+that does: the blessed SV's magic frees it when the last reference goes,
+so a consumer that also calls C<doc_free> has freed it twice.
+
+C<doc_from_sv> and C<node_from_sv> are the type test as well as the
+unwrap. They answer C<NULL> for anything that is not the object they name
+- a plain reference, an unblessed one, a different class, an C<undef> -
+rather than croaking, so a consumer can ask "is this a document?" of every
+value it is handed. What they return is borrowed from the SV and lives as
+long as it does; C<node_from_sv> fills C<*owner> with the node's document,
+which the node borrows from and which outlives it.
+
+C<node_to_sv> takes the blessed Document the node belongs to, not a
+handle, because the node it returns keeps that document alive - which is
+what makes the borrow safe.
 
 =head2 Example: a consumer walking an Assertion
 

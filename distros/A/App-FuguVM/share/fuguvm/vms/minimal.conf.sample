@@ -4,9 +4,10 @@
 #
 
 name = openbsd-minimal
+arch = arm64
 version = 7.8
 memory = 1024
 disk_size = 4G
 
-ssh_port = 2223
-console_port = 4445
+ssh_port = auto
+console_port = auto

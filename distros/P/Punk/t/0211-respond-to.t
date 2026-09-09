@@ -6,6 +6,7 @@ use FindBin ();
 use lib "$FindBin::Bin/lib";
 use Test::More;
 use Punk::Test;
+use File::Raw::XML ();
 
 # Accept negotiation ($c->respond_to, punk_accept.h). The assertions worth
 # having are the ones naive substring matching fails: a real browser Accept
@@ -23,6 +24,21 @@ use Punk::Test;
         $c->respond_to(
             json => sub { $_[0]->json({ kind => 'json' }) },
             html => sub { $_[0]->html('<p>html</p>') },
+        );
+    };
+    # The `xml` shorthand has been in pa_fmt_mime since it was written and
+    # nothing exercised it. The branch returns a bare document: respond_to
+    # sets no content type of its own, so this is also what proves the
+    # coercion is what makes the answer application/xml.
+    get '/doc' => sub {
+        my ($c) = @_;
+        $c->respond_to(
+            json => sub { $_[0]->json({ kind => 'json' }) },
+            xml  => sub {
+                my $d = File::Raw::XML->new_document;
+                $d->document->append($d->new_element('', 'kind'));
+                return $d;
+            },
         );
     };
     get '/typed' => sub {
@@ -168,6 +184,33 @@ $t->get_ok('/bad', headers => { Accept => 'application/json' })
     $m->json_like('/errors/0/message' => qr/at most 16 formats/,
         'and the fixed table has a stated ceiling rather than a buffer to '
       . 'run off the end of');
+}
+
+# ---- the xml format ----------------------------------------------------------
+{
+    my $x = Punk::Test->new('NApp');
+
+    $x->get_ok('/doc', headers => { Accept => 'application/xml' })
+      ->header_is('Content-Type', 'application/xml; charset=utf-8',
+          'the `xml` shorthand negotiates to application/xml, and a document '
+        . 'returned from the branch is what gives it that content type - '
+        . 'respond_to sets none itself');
+    $x->content_like(qr/<kind\/>/, 'with the document as the body');
+
+    $x->get_ok('/doc', headers => { Accept => 'application/json' })
+      ->header_is('Content-Type', 'application/json',
+          'and the json branch still wins when it is the one asked for');
+
+    $x->get_ok('/doc', headers => { Accept => 'application/xml' })
+      ->header_like('Vary', qr/\bAccept\b/,
+          'Vary: Accept is set for the xml outcome too');
+
+    # a browser line: xml is offered at a lower q than html, and html is not
+    # on offer here, so xml wins on being the only acceptable one
+    $x->get_ok('/doc', headers => {
+        Accept => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' })
+      ->header_is('Content-Type', 'application/xml; charset=utf-8',
+          'and a real browser Accept line picks it over the wildcard');
 }
 
 done_testing;

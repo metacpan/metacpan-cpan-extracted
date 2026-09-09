@@ -24,16 +24,5 @@
 \bMANIFEST\.bak\b
 
 # Avoid spec/planning docs (not part of distribution)
-\bprompts\b
-\bROADMAP\.md\b
-\bHIGH_LEVEL_DESIGN\.md\b
-\bdowndoc-behavior-spec-for-perl\.md\b
-\bCOMPATIBILITY_REPORT\.md\b
-\bDockerfile\b
+\bdocs/
 
-# Avoid npm/downdoc artifacts
-\bnpm\b
-\bbuild\b
-\bnpmrc\b
-\.eslintrc$
-\.mocharc\.js$

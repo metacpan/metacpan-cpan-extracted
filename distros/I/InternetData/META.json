@@ -66,6 +66,6 @@
          "web" : "https://github.com/internetdata/sdk-perl"
       }
    },
-   "version" : "v1.1.1",
+   "version" : "v1.2.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

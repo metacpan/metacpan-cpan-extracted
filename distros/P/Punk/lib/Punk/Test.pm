@@ -11,6 +11,7 @@ use Scalar::Util ();
 use Socket qw(AF_UNIX SOCK_STREAM PF_UNSPEC);
 use POSIX ();
 use File::Raw::JSON qw(file_json_encode file_json_decode);
+use File::Raw::XML ();
 use Punk::Test::WS ();
 use Punk::Test::WS::Conn ();
 
@@ -142,7 +143,7 @@ sub _build_env {
     my ($body, $type) = ('', $o{type});
     my ($in, $clen);
     if (exists $o{upload}) {
-        for my $k (qw(json body type)) {
+        for my $k (qw(json xml body type)) {
             die "Punk::Test: upload and $k do not combine - an upload "
               . "is multipart/form-data\n" if exists $o{$k};
         }
@@ -151,6 +152,12 @@ sub _build_env {
     elsif (exists $o{json}) {
         $body = file_json_encode($o{json});
         $type //= 'application/json';
+    }
+    elsif (exists $o{xml}) {
+        # a Document or Node serialises itself; anything else is markup the
+        # caller wrote, including the malformed strings a test wants to send
+        $body = ref $o{xml} ? $o{xml}->to_string : $o{xml};
+        $type //= 'application/xml';
     }
     elsif (exists $o{form}) {
         my $f = $o{form};
@@ -398,7 +405,7 @@ sub _set_response {
         eval { $fh->close };
     }
     $self->{res} = { status => $r->[0], headers => $r->[1], body => $body };
-    delete $self->{json};
+    delete $self->{$_} for qw(json xml);
     my @h = @{ $r->[1] };
     while (my ($k, $v) = splice @h, 0, 2) {
         next unless lc $k eq 'set-cookie';
@@ -439,6 +446,14 @@ sub json {
     my ($self) = @_;
     return unless $self->{res};
     return $self->{json} //= eval { file_json_decode($self->{res}{body}) };
+}
+
+sub xml {
+    my ($self) = @_;
+    return unless $self->{res};
+    return $self->{xml} //= eval {
+        File::Raw::XML::file_xml_decode($self->{res}{body});
+    };
 }
 
 sub cookie { $_[0]{jar}{ $_[1] } }
@@ -1218,10 +1233,19 @@ I<request's>.
 
 =head1 THE RESPONSE
 
-=head2 status / body / header($name) / json
+=head2 status / body / header($name) / json / xml
 
-The last response's status, body, one header (case-insensitive), and
-the body decoded as JSON (cached; undef if it does not decode).
+The last response's status, body, one header (case-insensitive), the
+body decoded as JSON, and the body parsed as XML into a
+L<File::Raw::XML::Document>. The last two are cached, and undef when the
+body does not decode - a JSON response asked for its C<xml> is undef, not
+an exception. Both caches are dropped with the response they came from, so
+an assertion always reads the request it follows.
+
+A request body is sent the same way it is read: C<< json => $data >> or
+C<< xml => $doc_or_markup >>, each setting its own content type. C<xml>
+takes a Document or Node, which serialises itself, or a string, which is
+sent as it stands - including a malformed one, for testing a refusal.
 
 =head2 cookie($name) / csrf_token / reset_session
 

@@ -22,7 +22,7 @@ my $pkg;
 eval { $pkg = ExtUtils::Depends->new('File::Raw::XML', 'File::Raw'); };
 if (!$pkg) {
     die "Cannot find the File::Raw dependency.\n"
-      . "Install File::Raw 0.17+, or place it as a sibling directory.\n"
+      . "Install File::Raw 0.18+, or place it as a sibling directory.\n"
         unless -d '../File-Raw/include';
     $pkg = ExtUtils::Depends->new('File::Raw::XML');
     $pkg->set_inc('-I. -Iinclude -I../File-Raw/include');
@@ -90,8 +90,9 @@ my %WriteMakefileArgs = (
         # 0.17 is where file_chunk.h arrives, and Reader->from_file calls
         # file_chunk_open/read/close: there is no older version this
         # builds against. The floor is a header that has to be there, not
-        # a comparison this time.
-        'File::Raw'           => '0.17',   # file_plugin.h, file_chunk.h
+        # a comparison this time. 0.18 closes the file when a stream
+        # callback dies, which t/37 asserts.
+        'File::Raw'           => '0.18',   # file_plugin.h, file_chunk.h
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -112,7 +113,7 @@ my %WriteMakefileArgs = (
         },
     },
     PREREQ_PM => {
-        'File::Raw' => '0.17',
+        'File::Raw' => '0.18',
     },
     XS     => { 'XML.xs' => 'XML.c' },
     OBJECT => 'XML$(OBJ_EXT)',

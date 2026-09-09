@@ -1,0 +1,53 @@
+{
+   "abstract" : "Pure-Perl implementation of the QUIC Transport Protocol (RFC 9000, RFC 9001, RFC 9002)",
+   "author" : [
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Protocol-QUIC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Protocol::QUIC" : {
+         "file" : "lib/Protocol/QUIC.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

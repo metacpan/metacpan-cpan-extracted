@@ -39,6 +39,19 @@ a qcow2: a cached base image or a snapshot.
 The method returns the path unchanged when the file already exists.
 Thus a caller that replaces a disk with an overlay unlinks it first.
 
+=head2 convert
+
+    App::FuguVM::Disk->convert($source, $target, %opts)
+
+Convert C<$source> into a fresh image at C<$target>. This method is
+the one home of C<qemu-img convert> in the distribution. The
+C<format> option is C<qcow2> or C<raw>, and the default is C<qcow2>.
+A raw target is sparse: its apparent size is the virtual size of the
+disk. The C<backing> option names a parent image, and the target then
+stores only the difference. The method also works on the class,
+because it reads no state directory. It returns the target path, or
+C<undef> after a diagnostic.
+
 =head2 info
 
 Return the L<qemu-img(1)> report as a hash reference, or C<undef>.

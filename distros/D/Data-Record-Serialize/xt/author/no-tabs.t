@@ -55,6 +55,7 @@ my @files = (
     't/stream.t',
     't/stream/flush.t',
     't/stringify.t',
+    't/util.t',
     't/workflow.t'
 );
 

@@ -42,6 +42,8 @@ our @EXPORT_OK = qw(
 
 use Exporter qw(import);
 use Errno qw(ENOENT);
+use Fcntl qw(:mode);
+use File::stat ();
 
 use Dpkg::ErrorHandling;
 use Dpkg::Gettext;
@@ -58,9 +60,9 @@ sub erasedir {
     subprocerr("rm -rf $dir") if $?;
     if (not stat($dir)) {
         return if $! == ENOENT;
-        syserr(g_("unable to check for removal of directory '%s'"), $dir);
+        syserr(g_("cannot check for removal of directory '%s'"), $dir);
     }
-    error(g_("rm -rf failed to remove '%s'"), $dir);
+    error(g_("cannot remove directory '%s' with '%s' command"), $dir, 'rm -rf');
 }
 
 sub fixperms {
@@ -91,7 +93,9 @@ sub fixperms {
 # but not necessarily ownership of those files.
 sub chmod_if_needed {
     my ($newperms, $pathname) = @_;
-    my $oldperms = (stat $pathname)[2] & 0o7777;
+    my $st = File::stat::stat($pathname);
+    return 0 if ! defined $st;
+    my $oldperms = S_IMODE($st->mode);
 
     return 1 if $oldperms == $newperms;
     return chmod $newperms, $pathname;
@@ -108,16 +112,13 @@ sub fs_time {
     my $file = shift;
     my $is_temp = 0;
     if (not -e $file) {
-        file_touch($file);
         $is_temp = 1;
-    } else {
-        utime(undef, undef, $file) or
-            syserr(g_('cannot change timestamp for %s'), $file);
     }
-    stat($file) or syserr(g_('cannot read timestamp from %s'), $file);
-    my $mtime = (stat(_))[9];
+    file_touch($file);
+    my $st = File::stat::stat($file)
+        or syserr(g_('cannot read timestamp from %s'), $file);
     unlink($file) if $is_temp;
-    return $mtime;
+    return $st->mtime;
 }
 
 sub is_binary {

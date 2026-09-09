@@ -7,7 +7,7 @@ has output => (
     required => 1,
 );
 
-sub send {
+sub send {    ## no critic (ProhibitBuiltinHomonyms)
     my $self = shift;
     push @{ $self->output }, @_;
 }
@@ -22,7 +22,7 @@ sub finalize {
     push @{ $self->output }, 'finalize';
 }
 
-sub close { }
+sub close { }    ## no critic (ProhibitBuiltinHomonyms, ProhibitAmbiguousNames)
 
 with 'Data::Record::Serialize::Role::EncodeAndSink';
 

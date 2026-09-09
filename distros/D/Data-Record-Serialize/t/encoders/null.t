@@ -12,7 +12,7 @@ ok(
     lives {
         $s = Data::Record::Serialize->new( encode => 'null', )
     },
-    "constructor"
+    'constructor'
 ) or diag $@;
 
 ok( lives { $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } ) }, 'send' );

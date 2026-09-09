@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/spatocs/asciidoc-down/issues
   license: https://dev.perl.org/licenses/
   repository: https://github.com/spatocs/asciidoc-down.git
-version: v0.1.0
+version: v0.1.2
 x_contributors:
   - 'Sandor Patocs'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

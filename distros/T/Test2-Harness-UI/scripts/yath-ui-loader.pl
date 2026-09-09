@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Test2::Harness::UI::Config;
 use Test2::Harness::UI::Loader;
 
 if (grep { m/^-+(h(?:elp)?|\?)$/ } @ARGV) {
-    print "Usage: $0 outputfile 'DSN' ['USER'] ['PASSWORD']\nDSN is required, sql username and password are optional.\n";
+    print "Usage: $0 'DSN' ['USER'] ['PASSWORD']\nDSN is required, sql username and password are optional.\n";
     exit 0;
 }
 

@@ -14,6 +14,7 @@ XS/Boolean.pm
 XS/Type.pm
 bin/cpanel_json_xs
 eg/bench
+eg/bench_large.pl
 ppport.h
 t/00_load.t
 t/01_utf8.t
@@ -47,6 +48,7 @@ t/120_type_all_string.t
 t/121_memleak.t
 t/122_type_encode.t
 t/125_shared_boolean.t
+t/126_encode_to.t
 t/12_blessed.t
 t/13_limit.t
 t/14_latin1.t
@@ -423,6 +425,7 @@ xt/leaktrace.t
 xt/manifest.t
 xt/meta.t
 xt/perl_minimum_version.t
+xt/pod-checker.t
 xt/pod-coverage.t
 xt/pod-spell-mistakes.t
 xt/pod-spelling.t

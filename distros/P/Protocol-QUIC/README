@@ -1,0 +1,13 @@
+Protocol-QUIC
+=============
+
+Protocol::QUIC is a pure-Perl implementation of the QUIC Transport Protocol (RFC 9000, RFC 9001, RFC 9002).
+
+INSTALLATION
+
+To install this module, run:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

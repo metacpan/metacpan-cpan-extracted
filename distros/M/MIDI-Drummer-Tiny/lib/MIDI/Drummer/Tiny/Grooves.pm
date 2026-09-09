@@ -1,10 +1,12 @@
 package MIDI::Drummer::Tiny::Grooves;
-$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7016';
+$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7020';
 our $AUTHORITY = 'cpan:GENE';
+
+# ABSTRACT: Common drum grooves
 
 use Moo;
 use strictures 2;
-use Data::Dumper::Compact qw(ddc);
+# use Data::Dumper::Compact qw(ddc); # debugging
 use File::ShareDir qw(dist_dir);
 use Path::Tiny;
 use MIDI::Drummer::Tiny ();
@@ -14,7 +16,6 @@ use namespace::clean;
 #pod
 #pod   use MIDI::Drummer::Tiny ();
 #pod   use MIDI::Drummer::Tiny::Grooves ();
-#pod   # TODO use MIDI::Drummer::Tiny::Grooves qw(:house :rock); # maybe
 #pod
 #pod   my $drummer = MIDI::Drummer::Tiny->new(
 #pod     file => "grooves.mid",
@@ -25,24 +26,37 @@ use namespace::clean;
 #pod     drummer => $drummer
 #pod   );
 #pod
-#pod   my $all = $grooves->all_grooves;
+#pod   # get a random groove from all known grooves
+#pod   my $groove = $grooves->get_groove;
 #pod
-#pod   my $groove = $grooves->get_groove;  # random groove
-#pod   $groove = $grooves->get_groove(42); # numbered groove
+#pod   my $set = $grooves->all_grooves;
+#pod
+#pod   # get a random groove from a set
+#pod   $groove = $grooves->get_groove(0, $set);
+#pod   # get a numbered groove
+#pod   $groove = $grooves->get_groove(42);
 #pod   print "42. $groove->{cat}\n$groove->{name}";
-#pod   $grooves->groove($groove->{groove}) for 1 .. 4; # add to score
 #pod
-#pod   my $set = $grooves->search({ cat => 'house' });
-#pod   my $pattern = $set->{27}{groove}; # { kick => '...', }
+#pod   my $density = $grooves->density($groove);
+#pod
+#pod   # searching
+#pod   $set = $grooves->search({ cat => 'house' });
 #pod   $set = $grooves->search({ name => 'deep' }, $set); # refine search
+#pod   $set = $grooves->search({ cat => 'house', name => 'deep' }); # same
 #pod
+#pod   # funk and soul patterns have WAY too much crashing imho:
+#pod   $set = $grooves->search({ cat => 'funk' });
+#pod   $groove = $grooves->get_groove(0, $set); # random funk groove
+#pod   $groove = $grooves->swap_pat($groove, 'crash', 'closed');
+#pod
+#pod   # add grooves to the score
 #pod   for my $i (sort keys %$set) {
 #pod     $groove = $set->{$i};
 #pod     print "$i. $groove->{cat}\n$groove->{name}]\n";
-#pod     $grooves->groove($groove->{groove}); # a bit redundant!
+#pod     $grooves->groove($groove->{groove}); # a bit redundant - ugh!
 #pod   }
 #pod
-#pod   $grooves->drummer->write;
+#pod   $drummer->write;
 #pod   # then:
 #pod   # > timidity grooves.mid
 #pod
@@ -56,14 +70,39 @@ use namespace::clean;
 #pod structure:
 #pod
 #pod   1 => {
-#pod       cat  => "Basic Patterns",
-#pod       name => "ONE AND SEVEN & FIVE AND THIRTEEN",
+#pod       cat    => "Basic Patterns",
+#pod       name   => "ONE AND SEVEN & FIVE AND THIRTEEN",
 #pod       groove => {
 #pod         kick  => { num => $self->kick,  pat => ['1000001000000000'] },
 #pod         snare => { num => $self->snare, pat => ['0000100000001000'] },
 #pod         ...
 #pod       },
 #pod   },
+#pod
+#pod The known groove categories are:
+#pod
+#pod   Afro-Cuban,
+#pod   Basic Patterns,
+#pod   Breaks,
+#pod   Breaks - Kick,
+#pod   Breaks - Snare,
+#pod   Drum Rolls,
+#pod   Drum and Bass,
+#pod   Dub,
+#pod   EDM,
+#pod   Electro,
+#pod   Funk and Soul,
+#pod   Ghost Snares,
+#pod   Hip-Hop,
+#pod   House,
+#pod   Hybrid Breaks With Alternate Endings,
+#pod   Irregular Breaks,
+#pod   Miami Bass,
+#pod   Pop,
+#pod   Reggaeton,
+#pod   Rock,
+#pod   Rolling Breaks,
+#pod   Standard Breaks
 #pod
 #pod =cut
 
@@ -365,6 +404,26 @@ sub swap_pat {
     return $pat;
 }
 
+#pod =head2 density
+#pod
+#pod   $density = $grooves->density($groove);
+#pod
+#pod Return the total number of strikes. This is basically the number of
+#pod C<1>s in the instrument pattern.
+#pod
+#pod =cut
+
+sub density {
+    my ($self, $pat) = @_;
+    my $density = 0;
+    for my $instrument (keys $pat->{groove}->%*) {
+        print "$instrument\n";
+        my $ones =()= $pat->{groove}{$instrument}{pat} =~ /1/g;
+        $density += $ones;
+    }
+    return $density;
+}
+
 1;
 
 __END__
@@ -375,17 +434,16 @@ __END__
 
 =head1 NAME
 
-MIDI::Drummer::Tiny::Grooves
+MIDI::Drummer::Tiny::Grooves - Common drum grooves
 
 =head1 VERSION
 
-version 0.7016
+version 0.7020
 
 =head1 SYNOPSIS
 
   use MIDI::Drummer::Tiny ();
   use MIDI::Drummer::Tiny::Grooves ();
-  # TODO use MIDI::Drummer::Tiny::Grooves qw(:house :rock); # maybe
 
   my $drummer = MIDI::Drummer::Tiny->new(
     file => "grooves.mid",
@@ -396,24 +454,37 @@ version 0.7016
     drummer => $drummer
   );
 
-  my $all = $grooves->all_grooves;
+  # get a random groove from all known grooves
+  my $groove = $grooves->get_groove;
 
-  my $groove = $grooves->get_groove;  # random groove
-  $groove = $grooves->get_groove(42); # numbered groove
+  my $set = $grooves->all_grooves;
+
+  # get a random groove from a set
+  $groove = $grooves->get_groove(0, $set);
+  # get a numbered groove
+  $groove = $grooves->get_groove(42);
   print "42. $groove->{cat}\n$groove->{name}";
-  $grooves->groove($groove->{groove}) for 1 .. 4; # add to score
 
-  my $set = $grooves->search({ cat => 'house' });
-  my $pattern = $set->{27}{groove}; # { kick => '...', }
+  my $density = $grooves->density($groove);
+
+  # searching
+  $set = $grooves->search({ cat => 'house' });
   $set = $grooves->search({ name => 'deep' }, $set); # refine search
+  $set = $grooves->search({ cat => 'house', name => 'deep' }); # same
 
+  # funk and soul patterns have WAY too much crashing imho:
+  $set = $grooves->search({ cat => 'funk' });
+  $groove = $grooves->get_groove(0, $set); # random funk groove
+  $groove = $grooves->swap_pat($groove, 'crash', 'closed');
+
+  # add grooves to the score
   for my $i (sort keys %$set) {
     $groove = $set->{$i};
     print "$i. $groove->{cat}\n$groove->{name}]\n";
-    $grooves->groove($groove->{groove}); # a bit redundant!
+    $grooves->groove($groove->{groove}); # a bit redundant - ugh!
   }
 
-  $grooves->drummer->write;
+  $drummer->write;
   # then:
   # > timidity grooves.mid
 
@@ -427,14 +498,39 @@ A groove is a numbered and named hash reference, with the following
 structure:
 
   1 => {
-      cat  => "Basic Patterns",
-      name => "ONE AND SEVEN & FIVE AND THIRTEEN",
+      cat    => "Basic Patterns",
+      name   => "ONE AND SEVEN & FIVE AND THIRTEEN",
       groove => {
         kick  => { num => $self->kick,  pat => ['1000001000000000'] },
         snare => { num => $self->snare, pat => ['0000100000001000'] },
         ...
       },
   },
+
+The known groove categories are:
+
+  Afro-Cuban,
+  Basic Patterns,
+  Breaks,
+  Breaks - Kick,
+  Breaks - Snare,
+  Drum Rolls,
+  Drum and Bass,
+  Dub,
+  EDM,
+  Electro,
+  Funk and Soul,
+  Ghost Snares,
+  Hip-Hop,
+  House,
+  Hybrid Breaks With Alternate Endings,
+  Irregular Breaks,
+  Miami Bass,
+  Pop,
+  Reggaeton,
+  Rock,
+  Rolling Breaks,
+  Standard Breaks
 
 =head1 ACCESSORS
 
@@ -528,6 +624,17 @@ on, the patterns are just returned.
 =head2 swap_pat
 
   $pat = $grooves->swap_pat($pattern, 'crash', 'closed');
+
+=head2 density
+
+  $density = $grooves->density($groove);
+
+Return the total number of strikes. This is basically the number of
+C<1>s in the instrument pattern.
+
+=head1 TO DO
+
+`use MIDI::Drummer::Tiny::Grooves qw(:house :rock);` # maybe?
 
 =head1 SEE ALSO
 

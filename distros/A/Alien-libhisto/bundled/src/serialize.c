@@ -14,8 +14,6 @@ static const uint8_t HISTO_MAGIC[HISTO_MAGIC_LEN] = {0x89, 'L', 'H', 'I', 'S', '
 #define HISTO_FORMAT_VERSION HISTO_FORMAT_V2
 #define HISTO_HEADER_SIZE 256
 
-typedef histo_status_t (*histo_migration_step_fn)(const uint8_t *in_buf, size_t in_size, uint8_t **out_buf, size_t *out_size);
-
 /* ========================================================================= */
 /* Binary Serialization & Deserialization                                    */
 /* ========================================================================= */

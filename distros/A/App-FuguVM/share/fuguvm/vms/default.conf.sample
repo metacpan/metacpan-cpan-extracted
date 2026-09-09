@@ -5,11 +5,16 @@
 # The project config overrides the global config for the same VM name.
 
 vm "default" {
+	arch         arm64
 	version      7.8
 	memory       2048
 	disk_size    8G
 	ssh_port     2222
 	console_port 4444
+	bind_address 127.0.0.1
+
+	# Optional: install from an autoinstall(8) response file
+	# autoinstall  install.conf
 }
 
 # Example: dedicated integration test VM

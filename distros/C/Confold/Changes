@@ -1,0 +1,9 @@
+Revision history for Confold
+
+0.01    2026-09-09
+        Add the <: prefix operator for compile-time constant folding.
+        Fold a constant operand away entirely; copy anything else read-only.
+        Bind as tightly as \ and unary minus.
+        Give a variable declared with <: a value the compiler can read.
+        Pass that value on to subroutines, including calls made while compiling.
+        Retire a variable's recorded value when it is assigned to.

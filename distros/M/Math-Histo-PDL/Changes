@@ -1,5 +1,10 @@
 Revision history for Perl extension Math::Histo::PDL.
 
+0.4.0   2026-09-08
+        - Synchronize version and dependencies with Math::Histo 0.4.0 and libhisto 0.4.0.
+        - Require Math::Histo 0.4.0 in runtime and test prerequisites.
+        - Add editor swap and backup file exclusion patterns to MANIFEST.SKIP.
+
 0.3.0   2026-08-29
         - Synchronize version and dependencies with Math::Histo 0.3.0 and libhisto 0.3.0.
         - Support weighted 1D/2D piddle ingestion and coordinate conversions with improved performance.

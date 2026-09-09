@@ -61,7 +61,7 @@ no_index:
 provides:
   Alien::Xmake:
     file: lib/Alien/Xmake.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Capture::Tiny: '0'
   ExtUtils::Helpers: '0.028'
@@ -73,7 +73,7 @@ resources:
   homepage: https://github.com/sanko/Alien-Xmake
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/sanko/Alien-Xmake.git
-version: v1.0.0
+version: v1.0.1
 x_authority: cpan:SANKO
 x_ignore:
   - .tidyallrc

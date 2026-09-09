@@ -1,0 +1,137 @@
+=head1 NAME
+
+App::FuguVM::Autoinstall - serve one autoinstall(8) response file
+
+=head1 SYNOPSIS
+
+    use App::FuguVM::Autoinstall;
+
+    my $responder = App::FuguVM::Autoinstall->new(
+        file      => '/project/install.conf',
+        pidfile   => $state->autoinstall_pidfile,
+        store     => $state->store,
+        proxy_url => $proxy->guest_url,
+        logfile   => $state->vm_state_dir . '/autoinstall.log',
+    );
+
+    my $port = $responder->start
+        or die $responder->error;
+
+    # The guest fetches http://10.0.2.2:<port>/install.conf
+    say $responder->guest_url;
+
+    $responder->stop;
+
+=head1 DESCRIPTION
+
+The module holds the response file of an autoinstall(8) run and the
+responder: a small HTTP child that answers that one file to one
+guest. The OpenBSD installer fetches the file once, at the start of
+the install, and the file answers every installer question.
+
+The child binds C<127.0.0.1> only, because a response file can hold
+the root password. The guest still reaches it: QEMU user-mode
+networking routes a request to the gateway address C<10.0.2.2> to
+the host, so no port forward is needed. The child takes a free port
+from 8181 to 8280, one range above the mirror proxy.
+
+The child answers one path:
+
+    GET /install.conf     200, the rendered bytes, text/plain
+    HEAD /install.conf    200, the headers only
+    any other path        404
+    any other method      405
+    a head above 8 KB     400, and the connection closes
+
+Every answer carries C<Content-Length> and C<Connection: close>. The
+child parses the request line and nothing else, it logs each request
+line, and it never logs the file content. A connection that sends
+nothing gets no answer and no log line: the readiness probe of
+C<start> connects and closes. It uses
+L<IO::Socket::INET>, which is core Perl, so the module adds no CPAN
+dependency.
+
+The tool serves the file byte for byte, with one exception: it
+replaces every occurrence of the token C<@PROXY_URL@> with the guest
+URL of the mirror proxy. The substitution happens at serve time, and
+it does not change the image-cache key, because a proxy port does
+not shape the installed disk. A response file with no token installs
+its sets straight from the mirror; the download is then not cached,
+and a second installation pays for it again.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguVM::Autoinstall->new(%args)
+
+Take C<file>, C<pidfile>, C<store>, C<proxy_url>, C<logfile> and
+C<log>. C<pidfile> is a L<Fugu::Pidfile> and C<store> is a
+L<Fugu::StateFile>; both are required. The constructor opens
+nothing.
+
+=head2 path
+
+Return the response-file path.
+
+=head2 start
+
+Take a free port, spawn the child, record the PID and the port, and
+wait until the port answers. Return the port, or C<undef> with the
+reason in C<error>. A responder that already runs returns its port
+and starts nothing.
+
+=head2 stop
+
+Stop the child and forget the port. The method returns 1.
+
+=head2 is_running
+
+Report whether the child is alive. The check reaps first, so a child
+that became a zombie reads as stopped.
+
+=head2 port
+
+Return the recorded port, or C<undef>.
+
+=head2 error
+
+Return the reason of the last failed C<start>, or C<undef>.
+
+=head2 guest_url
+
+Return the response-file URL as the guest reaches it:
+C<http://10.0.2.2:E<lt>portE<gt>/install.conf>. Return C<undef> when
+no port is recorded.
+
+=head2 run_child
+
+    App::FuguVM::Autoinstall->run_child($port, $file, $proxy_url)
+
+The entry point of the spawned child. The child reads the file,
+renders it, and serves it until a C<SIGTERM>.
+
+=head2 render
+
+    App::FuguVM::Autoinstall->render($bytes, $proxy_url)
+
+Return the bytes with every C<@PROXY_URL@> token replaced. The
+method is pure, so a test proves it with no socket. With an
+undefined or empty proxy URL the bytes return unchanged.
+
+=head1 SECURITY
+
+A response file answers the root password question of the installer.
+The child therefore binds the loopback address only, and the tool
+never copies the file into the cache or into the state directory.
+The image-cache key hashes the file content, and the key is a
+truncated digest, not the content.
+
+=head1 SEE ALSO
+
+L<Fugu::Pidfile>, L<Fugu::Process>, L<Fugu::StateFile>,
+L<App::FuguVM::Guest>, L<App::FuguVM::Proxy>, L<fuguvm(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@dickolsson.com>

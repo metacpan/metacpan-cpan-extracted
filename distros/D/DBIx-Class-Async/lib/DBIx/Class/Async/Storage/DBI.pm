@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.8');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use base 'DBIx::Class::Async::Storage';
@@ -16,7 +16,7 @@ DBIx::Class::Async::Storage::DBI - DBI-based async storage backend for DBIx::Cla
 
 =head1 VERSION
 
-Version v1.0.8
+Version v1.1.0
 
 =head1 SYNOPSIS
 
@@ -449,6 +449,28 @@ The async C<txn_do> supports internal variable registration. You can
 create a record in Step A and use its auto-incremented ID in Step B
 using the C<$name.id> syntax. This allows for complex, multi-step
 dependent operations to remain fully asynchronous and atomic.
+
+B<Security note (raw SQL steps):> for C<< { action => 'raw', sql => ..., bind => [...] } >>
+steps, C<$name.id> substitution is only performed inside the C<bind>
+arrayref, where it is passed to the database as a genuine parameter.
+It is deliberately B<not> substituted into the C<sql> string itself,
+that string is executed as literal SQL, so splicing a value into it
+would create a SQL injection hole for any non-numeric ID (e.g. a
+string/UUID primary key). Always write raw steps with a placeholder in
+the SQL and the referenced value in C<bind>:
+
+    {
+        action => 'raw',
+        sql    => 'UPDATE t SET x = ? WHERE owner_id = ?',
+        bind   => [ 1, '$owner.id' ]
+    }
+
+not:
+
+    {
+        action => 'raw',
+        sql    => 'UPDATE t SET x = 1 WHERE owner_id = $owner.id'
+    }  # NOT substituted
 
 =head2 ResultSet State
 

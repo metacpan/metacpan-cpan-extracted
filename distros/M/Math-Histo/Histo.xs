@@ -17,6 +17,70 @@
 #include <histo/types.h>
 #include <histo/version.h>
 
+static int histo_xs_cli_capture(int argc, char **argv, char **out_buf_p, size_t *out_sz_p, char **err_buf_p, size_t *err_sz_p) {
+    char *out_buf = NULL;
+    size_t out_sz = 0;
+    char *err_buf = NULL;
+    size_t err_sz = 0;
+
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L && !defined(_WIN32)
+    FILE *out_f = open_memstream(&out_buf, &out_sz);
+    FILE *err_f = open_memstream(&err_buf, &err_sz);
+#else
+    FILE *out_f = tmpfile();
+    FILE *err_f = tmpfile();
+#endif
+
+    if (!out_f || !err_f) {
+        if (out_f) fclose(out_f);
+        if (err_f) fclose(err_f);
+        return -1;
+    }
+
+    int code = histo_cli_main(argc, argv, out_f, err_f);
+
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L && !defined(_WIN32)
+    fclose(out_f);
+    fclose(err_f);
+#else
+    fflush(out_f);
+    fflush(err_f);
+    fseek(out_f, 0, SEEK_END);
+    long o_len = ftell(out_f);
+    fseek(out_f, 0, SEEK_SET);
+    if (o_len > 0) {
+        out_sz = (size_t)o_len;
+        out_buf = (char *)malloc(out_sz + 1);
+        if (out_buf) {
+            size_t read_bytes = fread(out_buf, 1, out_sz, out_f);
+            out_buf[read_bytes] = '\0';
+            out_sz = read_bytes;
+        }
+    }
+    fclose(out_f);
+
+    fseek(err_f, 0, SEEK_END);
+    long e_len = ftell(err_f);
+    fseek(err_f, 0, SEEK_SET);
+    if (e_len > 0) {
+        err_sz = (size_t)e_len;
+        err_buf = (char *)malloc(err_sz + 1);
+        if (err_buf) {
+            size_t read_bytes = fread(err_buf, 1, err_sz, err_f);
+            err_buf[read_bytes] = '\0';
+            err_sz = read_bytes;
+        }
+    }
+    fclose(err_f);
+#endif
+
+    *out_buf_p = out_buf;
+    *out_sz_p = out_sz;
+    *err_buf_p = err_buf;
+    *err_sz_p = err_sz;
+    return code;
+}
+
 
 MODULE = Math::Histo    PACKAGE = Math::Histo    PREFIX = histo_xs_
 
@@ -2078,24 +2142,14 @@ capture(...)
         size_t out_sz = 0;
         char *err_buf = NULL;
         size_t err_sz = 0;
-        FILE *out_f = open_memstream(&out_buf, &out_sz);
-        FILE *err_f = open_memstream(&err_buf, &err_sz);
-
-        if (!out_f || !err_f) {
-            if (out_f) fclose(out_f);
-            if (err_f) fclose(err_f);
-            croak("Math::Histo::CLI::capture: open_memstream failed");
-        }
-
         int code = 0;
+
         if (argc == 0) {
-            char *default_argv[] = { "phisto", NULL };
-            code = histo_cli_main(1, default_argv, out_f, err_f);
+            char *default_argv[] = { (char *)"phisto", NULL };
+            code = histo_xs_cli_capture(1, default_argv, &out_buf, &out_sz, &err_buf, &err_sz);
         } else {
             char **argv = (char **)malloc(((size_t)argc + 2) * sizeof(char *));
             if (!argv) {
-                fclose(out_f); fclose(err_f);
-                free(out_buf); free(err_buf);
                 croak("Math::Histo::CLI::capture: out of memory");
             }
             argv[0] = (char *)"phisto";
@@ -2103,18 +2157,20 @@ capture(...)
                 argv[i + 1] = SvPV_nolen(ST(start + i));
             }
             argv[argc + 1] = NULL;
-            code = histo_cli_main(argc + 1, argv, out_f, err_f);
+            code = histo_xs_cli_capture(argc + 1, argv, &out_buf, &out_sz, &err_buf, &err_sz);
             free(argv);
         }
-        fclose(out_f);
-        fclose(err_f);
+
+        if (code < 0 && !out_buf && !err_buf) {
+            croak("Math::Histo::CLI::capture: stream capture failed");
+        }
 
         EXTEND(SP, 3);
         PUSHs(sv_2mortal(newSViv(code)));
         PUSHs(sv_2mortal(out_buf ? newSVpvn(out_buf, out_sz) : newSVpvn("", 0)));
         PUSHs(sv_2mortal(err_buf ? newSVpvn(err_buf, err_sz) : newSVpvn("", 0)));
-        free(out_buf);
-        free(err_buf);
+        if (out_buf) free(out_buf);
+        if (err_buf) free(err_buf);
 
 
 int

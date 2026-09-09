@@ -24,34 +24,45 @@ use v5.36;
 # the hypervisor says and not what a sleep guessed.
 
 package App::FuguVM::Guest;
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
+use App::FuguVM::Arch;
+use App::FuguVM::Autoinstall;
+use App::FuguVM::Config;
 use App::FuguVM::Miniroot;
+use App::FuguVM::Mirror;
 use App::FuguVM::DiskCache;
 use App::FuguVM::Disk;
 use App::FuguVM::Console;
 use App::FuguVM::Proxy;
 use App::FuguVM::QMP;
+use App::FuguVM::State;
 
+use Fcntl qw(:flock);
+use Fugu::File;
 use Fugu::Random;
 use Fugu::Process;
 use Fugu::SSH;
 use Fugu::Timeout;
 
 use constant {
-	EXIT_SUCCESS    => 0,
-	EXIT_ERROR      => 1,
-	EXIT_VM_RUNNING => 5,
-	EXIT_TIMEOUT    => 7,
+	EXIT_SUCCESS       => 0,
+	EXIT_ERROR         => 1,
+	EXIT_CONFIG_ERROR  => 3,
+	EXIT_VM_RUNNING    => 5,
+	EXIT_TIMEOUT       => 7,
+	EXIT_EXPECT_FAILED => 9,
 
-	# Fixed configuration for OpenBSD arm64 guests
-	QEMU_BINARY    => 'qemu-system-aarch64',
 	MEMORY_DEFAULT => '1G',
 	CPU_COUNT      => 2,
 
-	# The guest CPU model under TCG emulation. TCG does not use host
-	# passthrough.
-	TCG_CPU => 'cortex-a57',
+	# The port lock closes the window between the probe and the
+	# record of both ports. A probe is quick, so a long wait means
+	# a wedged holder, and the probe then runs without the lock.
+	PORT_LOCK_TIMEOUT => 30,
+
+	# The bound on one 'qemu --version' run.
+	QEMU_VERSION_TIMEOUT => 10,
 };
 
 sub new ( $class, %args )
@@ -74,6 +85,12 @@ sub up ($self)
 	my $state  = $self->{state};
 	my $log    = $self->{log};
 
+	# The QEMU binary of the architecture must be on PATH before
+	# any other work starts.
+	return EXIT_CONFIG_ERROR if !$self->_require_qemu;
+
+	return EXIT_ERROR if !$self->_check_installed_arch;
+
 	# Check if the VM already runs
 	if ( $self->_is_running ) {
 
@@ -87,6 +104,11 @@ sub up ($self)
 		$log->info("VM '$config->{name}' is already running");
 		return EXIT_SUCCESS;
 	}
+
+	# The version gate runs one time for each invocation, before
+	# any expensive work starts.
+	my $failure = $self->_check_qemu_version;
+	return $failure if defined $failure;
 
 	# Verify the backing chain of the disk before other checks read
 	# the disk. A base image that is missing from the cache is not
@@ -112,17 +134,85 @@ sub up ($self)
 		$state->clear_shutdown_state;
 	}
 
+	# The mode decides the origin of the disk. The configuration
+	# loader derives the value, and no module compares the
+	# directives again.
+	my $mode = $config->{install_mode} // 'expect';
+
 	# Derive the installed-image cache key one time only, before the
-	# installer runs. key() hashes install.exp at call time. An
+	# installer runs. key() hashes its script at call time. An
 	# install takes tens of minutes. A key derived again after the
 	# install would publish the image the OLD installer made under
 	# the NEW digest.
 	my $cache     = $self->_image_cache;
 	my $cache_key = defined $cache ? $cache->key($config) : undef;
 
-	# Restore from the installed-image cache when there is no disk yet
+	# An imported base lives in the cache, so the import mode
+	# cannot run without one. The configuration loader refuses
+	# 'image_cache no'; this check covers 'up --no-cache'.
+	if ( $mode eq 'import' && !defined $cache ) {
+		$log->error(  "base_disk needs the image cache;"
+			    . " run 'fuguvm up' without --no-cache" );
+		return EXIT_CONFIG_ERROR;
+	}
+	if ( $mode eq 'import' && !defined $cache_key ) {
+		$log->error("Cannot derive the cache key of the imported base");
+		return EXIT_ERROR;
+	}
+
+	# Outside the expect mode the operator owns the credential.
+	# Seed the state from root_password_file, so the SSH key setup
+	# can authenticate. The state then behaves as after an expect
+	# install.
+	if ( $mode ne 'expect' && defined $config->{root_password_file} ) {
+		my $password = $self->_root_password;
+		$state->set_root_password($password) if defined $password;
+	}
+
+	# Restore from the installed-image cache when there is no disk
+	# yet. A miss can mean that a sibling run installs this entry
+	# right now. The lock makes this run wait, and the second lookup
+	# then uses the entry that the sibling published. A run without
+	# the lock still installs correctly, because store() is
+	# write-once: it wastes an install, never the cache.
+	my $cache_lock;
 	if ( !$state->disk_exists && defined $cache_key ) {
-		$self->_cache_restore( $cache, $cache_key );
+		if ( !$self->_cache_restore( $cache, $cache_key ) ) {
+
+			# The wait can last as long as one installation,
+			# so the operator hears about it first.
+			$log->info("Taking the image-cache lock of $cache_key");
+			$cache_lock = $cache->lock_entry($cache_key);
+			if ( !defined $cache_lock ) {
+				$log->warning(
+"Image-cache lock not acquired, installing without it"
+				);
+			}
+			elsif ( $self->_cache_restore( $cache, $cache_key ) ) {
+
+				# The entry exists now, so nothing here
+				# installs. Release the lock at once: a
+				# sibling behind it needs only the entry.
+				close $cache_lock;
+				undef $cache_lock;
+			}
+
+			# The import mode installs nothing: publish the
+			# outside file as the entry, then overlay it. The
+			# lock above serializes the publication, so a
+			# parallel fleet publishes one time.
+			if ( !$state->disk_exists && $mode eq 'import' ) {
+				my $imported =
+				    $self->_import_base( $cache, $cache_key )
+				    && $self->_cache_restore( $cache,
+					$cache_key );
+				if ( defined $cache_lock ) {
+					close $cache_lock;
+					undef $cache_lock;
+				}
+				return EXIT_ERROR if !$imported;
+			}
+		}
 	}
 
 	# Start the caching proxy for the VM installation. The VM
@@ -149,17 +239,18 @@ sub up ($self)
 
 	if ( !$state->is_installed ) {
 		$log->info("Checking OpenBSD image...");
-		my $image =
-		    App::FuguVM::Miniroot->new( $self->_cache_dir, $proxy );
-		$image_path = $image->ensure( $config->{version} );
+		my $mirror = $self->_mirror($proxy);
+		my $image  = App::FuguVM::Miniroot->new( $self->_cache_dir,
+			$proxy, $mirror );
+		$image_path = $image->ensure;
 
 		if ( !defined $image_path ) {
-			my $url = $image->url( $config->{version} );
+			my $url = $image->url;
 			$log->error(
-"Failed to download image for OpenBSD $config->{version}"
+"Failed to get a verified image for OpenBSD $config->{version}"
 			);
+			$log->error( $mirror->error ) if defined $mirror->error;
 			$log->error("URL: $url");
-			$log->error("Try downloading manually: curl -fLO $url");
 			return EXIT_ERROR;
 		}
 
@@ -179,6 +270,12 @@ sub up ($self)
 			return EXIT_ERROR;
 		}
 	}
+
+	# Resolve and record the ports directly before the spawn. An
+	# 'up' that failed above then reserves no port for a guest
+	# that never started.
+	$failure = $self->_resolve_ports;
+	return $failure if defined $failure;
 
 	# Start the VM
 	$log->info("Starting VM...");
@@ -202,30 +299,42 @@ sub up ($self)
 		# gateway.
 		my $install_proxy_url = $proxy_vm_url // 'none';
 
-		# Generate a strong random password for this installation
-		my $root_password = Fugu::Random->random_password(32);
-		$state->set_root_password($root_password);
-		$log->info("Generated secure root password");
+		# The tool owns the credential in the expect mode only.
+		# In the autoinstall mode the response file owns it, and
+		# the seeding above stored the operator's copy.
+		my $root_password;
+		if ( $mode eq 'expect' ) {
+			$root_password = $self->_root_password;
+			$state->set_root_password($root_password);
+		}
+		else {
+			$root_password = $state->get_root_password;
+		}
 
 		$log->info("Installing OpenBSD...");
 		my $expect = App::FuguVM::Console->new(
-			host => '127.0.0.1',
-			port => $config->{console_port},
+			host => $self->connect_address,
+			port => $self->console_port,
 		);
 
-		# Use the generated password for the installation
-		my $install_config = {
-			%$config,
-			root_password => $root_password,
-			proxy_url     => $install_proxy_url,
-		};
-		my $ok = $expect->run_install($install_config);
-		if ( !$ok ) {
-			$log->error("Installation failed");
-			return EXIT_ERROR;
+		if ( $mode eq 'autoinstall' ) {
+			my $failure =
+			    $self->_run_autoinstall( $expect, $proxy_vm_url );
+			return $failure if defined $failure;
+		}
+		else {
+			# Use the generated password for the installation
+			my $ok = $expect->run_install(
+				$self->_install_config(
+					$root_password, $install_proxy_url
+				) );
+			if ( !$ok ) {
+				$log->error("Installation failed");
+				return EXIT_EXPECT_FAILED;
+			}
 		}
 
-		$state->mark_installed;
+		$state->mark_installed( $config->{arch} );
 		$log->info("Installation complete");
 
 		# Stop the VM gracefully through QMP. The image cache
@@ -246,6 +355,10 @@ sub up ($self)
 		}
 		$state->clear_vm_pid;
 
+		# The runtime record stays: the restart below uses the
+		# same ports, and a sibling that resolves ports in this
+		# window must still skip them.
+
 		# Publish the installed disk as a cached base image. A VM
 		# that was force stopped can leave the disk mid-write. Thus
 		# the code skips that capture and does not publish it.
@@ -261,6 +374,13 @@ sub up ($self)
 			}
 		}
 
+		# The entry is published, or this run cannot publish it.
+		# Either way a waiting sibling can proceed now.
+		if ( defined $cache_lock ) {
+			close $cache_lock;
+			undef $cache_lock;
+		}
+
 		# Restart the VM without the install media
 		$log->info("Restarting installed system...");
 		$pid = $self->_start_qemu;    # No boot image, no exit_on_halt
@@ -271,8 +391,12 @@ sub up ($self)
 		$log->info("Started $config->{name} (PID: $pid)");
 
 		# Install the SSH authorized key for future key-based
-		# authentication
-		return $self->_complete_ssh_setup;
+		# authentication. Outside the expect mode a guest can
+		# carry no configured key: the image must trust the key
+		# of the operator already, and the wait below proves it.
+		if ( $mode eq 'expect' || $self->_needs_ssh_key_update ) {
+			return $self->_complete_ssh_setup;
+		}
 	}
 
 	# The VM is installed. Check if the SSH key must be installed or
@@ -373,7 +497,7 @@ sub _cache_restore ( $self, $cache, $key )
 	# that the installer would have written comes from the metadata
 	# of the base. The later SSH key install authenticates with the
 	# root password. That password is baked into the image.
-	$state->mark_installed;
+	$state->mark_installed( $config->{arch} );
 	my $password = $hit->{meta}{root_password};
 	$state->set_root_password($password) if defined $password;
 	$state->data->{cached_from} = $key;
@@ -454,9 +578,159 @@ sub _reparent_disk ( $self, $base )
 	return 1;
 }
 
+# $self->_import_base($cache, $key):
+#	Publish the configured base_disk as the cache entry of $key.
+#	The publication costs one conversion of the whole image, and
+#	it happens one time for each host: the entry is write-once,
+#	and every guest of the project derives the same key. The tool
+#	only reads the source file. The metadata holds no root
+#	password, because the tool must not invent a credential for an
+#	image that it did not install. Return 1 on success.
+sub _import_base ( $self, $cache, $key )
+{
+	my $config = $self->{config};
+	my $log    = $self->{log};
+	my $source = $config->{base_disk};
+
+	if ( !-f $source ) {
+		$log->error(  "The base_disk file is gone: $source"
+			    . " (cache miss for $key)" );
+		return 0;
+	}
+
+	$log->info("Publishing $source as $key...");
+	my $base = $cache->store(
+		$key, $source,
+		{
+			imported_from => $source,
+			install_mode  => 'import',
+			version       => $config->{version},
+		} );
+	if ( !defined $base ) {
+
+		# store is write-once, so a sibling can have published
+		# the entry inside the window. A lookup decides.
+		return defined $cache->lookup($key) ? 1 : 0;
+	}
+
+	$log->info("Published imported base: $base");
+	return 1;
+}
+
+# $self->_install_config($root_password, $proxy_url):
+#	Return the configuration of one expect install. The verify
+#	flag rides along as the word that the script reads: 'yes' or
+#	'no'.
+sub _install_config ( $self, $root_password, $proxy_url )
+{
+	return {
+		%{ $self->{config} },
+		root_password => $root_password,
+		proxy_url     => $proxy_url // 'none',
+		verify => ( $self->{config}{verify} // 1 ) ? 'yes' : 'no',
+	};
+}
+
+# $self->_mirror($proxy):
+#	Build the mirror of this guest over the cache of the proxy. A
+#	run without a proxy still verifies: the mirror then builds a
+#	cache over the same directory.
+sub _mirror ( $self, $proxy = undef )
+{
+	my $config = $self->{config};
+
+	my $cache =
+	    defined $proxy
+	    ? $proxy->cache
+	    : App::FuguVM::Proxy::Cache->new( $self->_cache_dir );
+
+	return App::FuguVM::Mirror->new(
+		cache   => $cache,
+		version => $config->{version},
+		arch    => $config->{arch},
+		verify  => $config->{verify} // 1,
+		(
+			defined $config->{signify_dir}
+			? ( keys_dir => $config->{signify_dir} )
+			: ()
+		),
+	);
+}
+
+# $self->_run_autoinstall($expect, $proxy_url):
+#	Start the responder, drive the autoinstall over the console,
+#	and stop the responder on every path out of the install.
+#	Return undef on success, and an exit code on failure.
+sub _run_autoinstall ( $self, $expect, $proxy_url = undef )
+{
+	my $log = $self->{log};
+
+	my $responder = $self->_autoinstall($proxy_url);
+	if ( !defined $responder->start ) {
+		$log->error( 'Responder did not start: '
+			    . ( $responder->error // 'unknown' ) );
+		return EXIT_ERROR;
+	}
+
+	my $url = $responder->guest_url;
+	$log->info("Responder started: $url");
+
+	my $ok = $expect->run_autoinstall(
+		{ %{ $self->{config} }, autoinstall_url => $url } );
+
+	$responder->stop;
+
+	if ( !$ok ) {
+		$log->error("Autoinstall failed");
+		return EXIT_EXPECT_FAILED;
+	}
+
+	return;
+}
+
+# $self->_root_password:
+#	Return the root password of this guest. The tool owns the
+#	credential in the expect mode, so the method generates one
+#	there. In every other mode the operator owns it, and the
+#	method returns the first line of root_password_file, with no
+#	trailing newline, or undef without the directive. Thus the
+#	secret has a short life in the process, and no configuration
+#	hash carries it.
+sub _root_password ($self)
+{
+	my $config = $self->{config};
+	my $mode   = $config->{install_mode} // 'expect';
+
+	if ( $mode eq 'expect' ) {
+		$self->{log}->info("Generated secure root password");
+		return Fugu::Random->random_password(32);
+	}
+
+	my $file = $config->{root_password_file};
+	return if !defined $file;
+
+	my $bits = ( stat $file )[2];
+	$self->{log}->warning("The group or other users can read $file")
+	    if defined $bits && $bits & 0044;
+
+	open my $fh, '<', $file or do {
+		$self->{log}->error("Cannot read $file: $!");
+		return;
+	};
+	my $line = <$fh>;
+	close $fh;
+	return if !defined $line;
+
+	chomp $line;
+	return $line;
+}
+
 sub down ($self)
 {
-	# Stop the proxy if it runs
+	# Stop the responder and the proxy if they run
+	if ( $self->_stop_autoinstall ) {
+		$self->{log}->info("Autoinstall responder stopped");
+	}
 	if ( $self->_stop_proxy ) {
 		$self->{log}->info("Proxy stopped");
 	}
@@ -470,7 +744,10 @@ sub destroy ($self)
 	my $log    = $self->{log};
 	my $config = $self->{config};
 
-	# Stop the proxy if it runs
+	# Stop the responder and the proxy if they run
+	if ( $self->_stop_autoinstall ) {
+		$log->info("Autoinstall responder stopped");
+	}
 	if ( $self->_stop_proxy ) {
 		$log->info("Proxy stopped");
 	}
@@ -508,6 +785,10 @@ sub start ($self)
 	my $log    = $self->{log};
 	my $config = $self->{config};
 
+	return EXIT_CONFIG_ERROR if !$self->_require_qemu;
+
+	return EXIT_ERROR if !$self->_check_installed_arch;
+
 	if ( $self->_is_running ) {
 		$log->error("VM '$config->{name}' is already running");
 		return EXIT_VM_RUNNING;
@@ -517,6 +798,14 @@ sub start ($self)
 		$log->error("No disk image. Run 'fuguvm up' first.");
 		return EXIT_ERROR;
 	}
+
+	# The version gate and the port resolution run one time for
+	# each invocation, before the spawn.
+	my $failure = $self->_check_qemu_version;
+	return $failure if defined $failure;
+
+	$failure = $self->_resolve_ports;
+	return $failure if defined $failure;
 
 	my $pid = $self->_start_qemu;
 	if ( !defined $pid ) {
@@ -535,6 +824,11 @@ sub stop ( $self, $force = 0 )
 	my $config = $self->{config};
 
 	if ( !$self->_is_running ) {
+
+		# A crashed guest cannot clear its own record and its
+		# own pid file, so the stop verb clears both here.
+		$state->clear_vm_pid;
+		$state->clear_runtime;
 		$log->info("VM '$config->{name}' is not running");
 		return EXIT_SUCCESS;
 	}
@@ -550,6 +844,7 @@ sub stop ( $self, $force = 0 )
 	if ( $self->_graceful_shutdown ) {
 		$state->mark_clean_shutdown;
 		$state->clear_vm_pid;
+		$state->clear_runtime;
 		$log->info("VM stopped");
 		return EXIT_SUCCESS;
 	}
@@ -571,6 +866,7 @@ sub _stop_unclean ($self)
 	$state->mark_unclean_shutdown;
 	$self->_force_stop;
 	$state->clear_vm_pid;
+	$state->clear_runtime;
 	$self->{log}->info("VM stopped");
 
 	return EXIT_SUCCESS;
@@ -598,11 +894,24 @@ sub status ($self)
 	return {
 		name  => $config->{name},
 		state => $running ? ( $qemu_status // 'running' ) : 'stopped',
-		pid   => $pid,
-		ssh_port     => $config->{ssh_port},
-		console_port => $config->{console_port},
+
+		# A dead process ID is not a fact of a stopped guest, so
+		# a pid file that a crash left behind reads as empty.
+		pid          => $running ? $pid : undef,
+		arch         => $config->{arch},
+		accel        => $self->accel,
+		bind_address => $self->bind_address,
+		ssh_port     => $self->ssh_port,
+		console_port => $self->console_port,
 		installed    => $state->is_installed ? 1 : 0,
 		disk_exists  => $state->disk_exists  ? 1 : 0,
+
+		# The proxy URL as the guest reaches it, or empty while
+		# the proxy does not run. The port changes between runs,
+		# so a consumer reads the value here and must not write
+		# it in a file. Scalar context: a bare return would
+		# collapse the pair.
+		proxy_url => scalar $self->_proxy->guest_url,
 	};
 }
 
@@ -611,14 +920,78 @@ sub is_running ($self)
 	return $self->_is_running;
 }
 
+# $self->accel:
+#	Return the recorded accelerator while the guest runs: a guest
+#	that started under --emulate runs TCG whatever the host can do
+#	now. Return the accelerator that the tool selects now in every
+#	other case. App::FuguVM::Arch->accelerator owns the choice.
+sub accel ($self)
+{
+	if ( $self->{state} && $self->_is_running ) {
+		my $recorded = $self->{state}->get_runtime->{accel};
+		return $recorded if defined $recorded;
+	}
+
+	return 'tcg' if $self->{emulate};
+
+	return $self->_arch->accelerator( $^O, _host_arch(),
+		-w '/dev/kvm' ? 1 : 0 );
+}
+
+# $self->bind_address:
+#	Return the host address of the forwarded ports. The
+#	configuration loader injects the value; the fallback only
+#	serves VM objects built without a configuration.
+sub bind_address ($self)
+{
+	return $self->{config}{bind_address}
+	    // App::FuguVM::Config::DEFAULT_BIND_ADDRESS();
+}
+
+# $self->connect_address:
+#	Return the address that the tool connects to. A bind address
+#	of 0.0.0.0 is not a destination, so the loopback address
+#	serves that one case.
+sub connect_address ($self)
+{
+	my $address = $self->bind_address;
+	return '127.0.0.1' if $address eq '0.0.0.0';
+
+	return $address;
+}
+
+# The resolved ports. Each method returns the recorded port, and
+# falls back to the configured number. It returns undef for 'auto'
+# with no record: the record dies with the run, so a stopped guest
+# has no port.
 sub ssh_port ($self)
 {
-	return $self->{config}{ssh_port};
+	return $self->_resolved_port('ssh_port');
 }
 
 sub console_port ($self)
 {
-	return $self->{config}{console_port};
+	return $self->_resolved_port('console_port');
+}
+
+sub _resolved_port ( $self, $directive )
+{
+	# The record describes the current run, so it serves only
+	# while the guest runs. A crashed guest leaves a record
+	# behind. That record must not read as a live port.
+	if ( $self->{state} && $self->_is_running ) {
+		my $recorded = $self->{state}->get_runtime->{$directive};
+		return $recorded if defined $recorded;
+	}
+
+	# The answer is one scalar, undef included: a caller builds a
+	# hash with it, and a bare return would collapse the pair.
+	my $configured = $self->{config}{$directive};
+	$configured = undef
+	    if defined $configured
+	    && $configured eq App::FuguVM::Config::AUTO_PORT();
+
+	return $configured;
 }
 
 # $self->wait_ssh($timeout, $password):
@@ -629,8 +1002,8 @@ sub console_port ($self)
 sub wait_ssh ( $self, $timeout = 120, $password = undef )
 {
 	my $ssh = Fugu::SSH->new(
-		host => '127.0.0.1',
-		port => $self->{config}{ssh_port},
+		host => $self->connect_address,
+		port => $self->ssh_port,
 		user => 'root',
 		( defined $password ? ( password => $password ) : () ),
 	);
@@ -720,8 +1093,8 @@ sub _install_ssh_key ( $self, $password )
 
 	# Connect with the password
 	my $ssh = Fugu::SSH->new(
-		host     => '127.0.0.1',
-		port     => $config->{ssh_port},
+		host     => $self->connect_address,
+		port     => $self->ssh_port,
 		user     => 'root',
 		password => $password,
 	);
@@ -754,8 +1127,7 @@ sub _install_ssh_key ( $self, $password )
 # power off through the ACPI power button, and report the result.
 sub _graceful_shutdown ($self)
 {
-	my $config = $self->{config};
-	my $log    = $self->{log};
+	my $log = $self->{log};
 
 	# Do a best-effort filesystem sync over SSH before the code
 	# pulls the power. The sync has a hard time bound. A wedged
@@ -768,8 +1140,8 @@ sub _graceful_shutdown ($self)
 		Fugu::SSH::DEFAULT_TIMEOUT() + 5,
 		sub {
 			my $ssh = Fugu::SSH->new(
-				host => '127.0.0.1',
-				port => $config->{ssh_port},
+				host => $self->connect_address,
+				port => $self->ssh_port,
 				user => 'root',
 			);
 			return $ssh->run_command('sync; sync; sync');
@@ -810,6 +1182,10 @@ sub _ensure_proxy ($self)
 	my $proxy = $self->_proxy;
 	return $proxy if $proxy->is_running;
 
+	# The spawn passes a fixed argument list, so the distfile cap
+	# reaches the child through the environment.
+	$ENV{FUGUVM_DISTFILE_LIMIT} = $self->{config}{distfile_cache} // 0;
+
 	unless ( defined $proxy->start ) {
 		$self->{log}->warning(
 			'Proxy did not start: %s',
@@ -841,12 +1217,44 @@ sub _proxy ($self)
 	my $state = $self->{state};
 
 	return App::FuguVM::Proxy->new(
-		cache   => App::FuguVM::Proxy::Cache->new( $self->_cache_dir ),
+		cache => App::FuguVM::Proxy::Cache->new(
+			$self->_cache_dir, $self->{config}{distfile_cache} // 0
+		),
 		pidfile => $state->proxy_pidfile,
 		store   => $state->store,
 		logfile => $state->vm_state_dir . '/proxy.log',
 		log     => $self->{log},
 	);
+}
+
+# $self->_autoinstall($proxy_url):
+#	Build the responder supervisor over this VM's state and the
+#	guest URL of the mirror proxy.
+sub _autoinstall ( $self, $proxy_url = undef )
+{
+	my $state = $self->{state};
+
+	return App::FuguVM::Autoinstall->new(
+		file      => $self->{config}{autoinstall},
+		pidfile   => $state->autoinstall_pidfile,
+		store     => $state->store,
+		proxy_url => $proxy_url,
+		logfile   => $state->vm_state_dir . '/autoinstall.log',
+		log       => $self->{log},
+	);
+}
+
+# $self->_stop_autoinstall:
+#	Stop the responder if it runs. The method returns 1 when it
+#	stopped one, and 0 when there was none. It follows _stop_proxy.
+sub _stop_autoinstall ($self)
+{
+	my $responder = $self->_autoinstall;
+	return 0 unless $responder->is_running;
+
+	$responder->stop;
+
+	return 1;
 }
 
 # $self->_force_stop:
@@ -914,23 +1322,32 @@ sub _start_qemu ( $self, $boot_image = undef )
 {
 	my $config = $self->{config};
 	my $state  = $self->{state};
+	my $arch   = $self->_arch;
 
-	my @cmd = (QEMU_BINARY);
+	my @cmd = ( $arch->qemu_binary );
 
-	# Set the machine type for arm64. Select the accelerator by the
-	# host capability.
-	push @cmd, '-M', 'virt,highmem=off';
+	# Set the machine type of the architecture. Select the
+	# accelerator by the host capability.
+	push @cmd, '-M', $arch->machine;
 	push @cmd, $self->_accel_args;
 
 	# Memory and CPU
 	push @cmd, '-m',   $config->{memory} // MEMORY_DEFAULT;
 	push @cmd, '-smp', CPU_COUNT;
 
-	# EFI firmware for arm64
-	my $bios = $self->_find_efi_firmware;
-	if ( defined $bios ) {
-		push @cmd, '-bios', $bios;
+	# EFI firmware of the architecture. Both machines boot through
+	# EFI, so a start without a firmware file cannot work. Fail
+	# with a message rather than boot into the wrong firmware.
+	my $firmware = $self->_find_efi_firmware;
+	if ( !defined $firmware ) {
+		$self->{log}->error(
+			sprintf( "No EFI firmware for %s guests found",
+				$self->_arch->name ) );
+		return;
 	}
+	my @args = $self->_firmware_args($firmware);
+	return unless @args;
+	push @cmd, @args;
 
 	# The main disk with the safe cache mode. The writethrough mode
 	# syncs on each write.
@@ -939,19 +1356,13 @@ sub _start_qemu ( $self, $boot_image = undef )
 	    "file=$disk_path,format=qcow2,if=virtio,cache=writethrough";
 
 	# Boot image (CD-ROM) for installation
-	if ( defined $boot_image ) {
-		push @cmd, '-drive',
-		    "file=$boot_image,format=raw,if=virtio,readonly=on";
-	}
+	push @cmd, $self->_media_args($boot_image);
 
-	# Network with port forwarding
-	my $ssh_port = $config->{ssh_port};
-	push @cmd, '-device', 'virtio-net-pci,netdev=net0';
-	push @cmd, '-netdev', "user,id=net0,hostfwd=tcp::$ssh_port-:22";
-
-	# Serial console on telnet
-	my $console_port = $config->{console_port};
-	push @cmd, '-serial', "tcp::$console_port,server,telnet,nowait";
+	# Network with port forwarding, and the serial console on
+	# telnet
+	my $console_port = $state->get_runtime->{console_port};
+	push @cmd, $self->_network_args;
+	push @cmd, $self->_serial_args;
 
 	# QMP control socket
 	my $qmp_path = $self->_qmp_socket_path;
@@ -1001,16 +1412,62 @@ sub _start_qemu ( $self, $boot_image = undef )
 	# port closed. This check fails fast with the QEMU log, not with
 	# a long telnet timeout later.
 	if ( defined $boot_image
-		&& !$self->_wait_console_ready( $config->{console_port}, 30 ) )
+		&& !$self->_wait_console_ready( $console_port, 30 ) )
 	{
 		$self->{log}
 		    ->error( 'QEMU console port %d not listening after start',
-			$config->{console_port} );
+			$console_port );
 		$self->_dump_qemu_log($log_file);
 		return;
 	}
 
 	return $pid;
+}
+
+# $self->_media_args($boot_image):
+#	Return the QEMU arguments of the install media, or an empty
+#	list when no media is attached. An autoinstall reboots
+#	itself, and the miniroot is still attached. -no-reboot makes
+#	the reboot an exit, so the guest cannot install a second
+#	time.
+sub _media_args ( $self, $boot_image = undef )
+{
+	return () if !defined $boot_image;
+
+	my @args =
+	    ( '-drive', "file=$boot_image,format=raw,if=virtio,readonly=on" );
+	push @args, '-no-reboot'
+	    if ( $self->{config}{install_mode} // '' ) eq 'autoinstall';
+
+	return @args;
+}
+
+# $self->_network_args:
+#	Return the QEMU network arguments. The ports come from the
+#	record that _resolve_ports wrote before the spawn: the public
+#	accessors serve a running guest only, and QEMU does not run
+#	yet. The forwarded port binds to the configured host address,
+#	and the default is loopback.
+sub _network_args ($self)
+{
+	my $bind_address = $self->bind_address;
+	my $ssh_port     = $self->{state}->get_runtime->{ssh_port};
+
+	return ( '-device', 'virtio-net-pci,netdev=net0', '-netdev',
+		"user,id=net0,hostfwd=tcp:$bind_address:" . "$ssh_port-:22",
+	);
+}
+
+# $self->_serial_args:
+#	Return the QEMU serial-console arguments: a telnet listener on
+#	the bind address and the recorded console port.
+sub _serial_args ($self)
+{
+	my $bind_address = $self->bind_address;
+	my $console_port = $self->{state}->get_runtime->{console_port};
+
+	return ( '-serial',
+		"tcp:$bind_address:$console_port,server,telnet,nowait" );
 }
 
 # $self->_wait_console_ready($port, $timeout):
@@ -1026,7 +1483,7 @@ sub _wait_console_ready ( $self, $port, $timeout )
 		$timeout, 0.2,
 		sub {
 			my $sock = IO::Socket::INET->new(
-				PeerAddr => '127.0.0.1',
+				PeerAddr => $self->connect_address,
 				PeerPort => $port,
 				Proto    => 'tcp',
 				Timeout  => 2,
@@ -1066,31 +1523,305 @@ sub _dump_qemu_log ( $self, $log_file )
 }
 
 # $self->_accel_args():
-#	Pick the QEMU accelerator for the host. Use HVF on macOS. Use
-#	KVM on aarch64 Linux hosts with /dev/kvm. Use TCG software
-#	emulation in the other cases, or when --emulate was given. Host
-#	CPU passthrough is only valid with hardware acceleration. TCG
-#	needs a named model.
+#	Return the accelerator arguments, with the matching CPU model.
+#	Host CPU passthrough is only valid with hardware acceleration.
+#	TCG needs the named model of the architecture. The choice
+#	itself comes from accel.
 sub _accel_args ($self)
 {
-	my $accel;
-	if ( $self->{emulate} ) {
-		$accel = 'tcg';
-	}
-	elsif ( $^O eq 'darwin' ) {
-		$accel = 'hvf';
-	}
-	elsif ( $^O eq 'linux' && -w '/dev/kvm' && _host_arch() eq 'aarch64' ) {
-		$accel = 'kvm';
-	}
-	else {
-		$accel = 'tcg';
-	}
+	my $arch  = $self->_arch;
+	my $accel = $self->accel;
 
 	$self->{log}->debug("Using QEMU accelerator: $accel")
 	    if $self->{log};
 
-	return ( '-accel', $accel, '-cpu', $accel eq 'tcg' ? TCG_CPU : 'host' );
+	return ( '-accel', $accel,
+		'-cpu', $accel eq 'tcg' ? $arch->tcg_cpu : 'host' );
+}
+
+# $self->_arch:
+#	Return the App::FuguVM::Arch object of the configured value,
+#	and cache it. The configuration loader is the boundary of the
+#	directive, so an unknown value here is a programming error.
+sub _arch ($self)
+{
+	my $name = $self->{config}{arch};
+
+	$self->{arch} //= App::FuguVM::Arch->new($name)
+	    // die 'unknown architecture: ' . ( $name // '(none)' ) . "\n";
+
+	return $self->{arch};
+}
+
+# $self->_qemu_path:
+#	Return the path of the QEMU binary of the architecture on
+#	PATH, or undef.
+sub _qemu_path ($self)
+{
+	my $binary = $self->_arch->qemu_binary;
+
+	for my $dir ( split /:/, $ENV{PATH} // '' ) {
+		next if $dir eq '';
+		my $path = "$dir/$binary";
+		return $path if -f $path && -x $path;
+	}
+
+	return;
+}
+
+# $self->_require_qemu:
+#	Diagnose an absent QEMU binary, once for up and start. The
+#	message names the binary and the architecture.
+sub _require_qemu ($self)
+{
+	return 1 if defined $self->_qemu_path;
+
+	my $arch = $self->_arch;
+	$self->{log}->error(
+		sprintf(
+			"QEMU binary '%s' for %s guests is not on PATH",
+			$arch->qemu_binary, $arch->name
+		) );
+
+	return 0;
+}
+
+# $self->_check_qemu_version:
+#	Enforce the optional qemu_version directive, once for up and
+#	start. Return undef when the check passes, and when no
+#	directive exists. Return EXIT_CONFIG_ERROR otherwise. A pinned
+#	version that the tool cannot verify fails closed: an absent
+#	binary, and output with no version in it, both refuse the
+#	start. The match runs component by component, over the
+#	components that the directive names: 9.0 accepts 9.0.4 and
+#	refuses 9.1.0.
+sub _check_qemu_version ($self)
+{
+	my $pinned = $self->{config}{qemu_version};
+	return if !defined $pinned;
+
+	my $reported = $self->_qemu_version;
+	if ( !defined $reported ) {
+		$self->{log}->error(
+"Cannot read the QEMU version to check against the pinned $pinned"
+		);
+		return EXIT_CONFIG_ERROR;
+	}
+
+	my @want = split /\./, $pinned;
+	my @have = split /\./, $reported;
+	for my $i ( 0 .. $#want ) {
+		next if defined $have[$i] && $have[$i] == $want[$i];
+
+		$self->{log}->error(
+"QEMU version $reported does not match the pinned $pinned"
+		);
+		return EXIT_CONFIG_ERROR;
+	}
+
+	return;
+}
+
+# $self->_qemu_version:
+#	Return the version that the QEMU binary reports, or undef. The
+#	version is the first dotted-decimal token of the first output
+#	line.
+sub _qemu_version ($self)
+{
+	my $binary = $self->_qemu_path;
+	return if !defined $binary;
+
+	my $result = Fugu::Process->run(
+		cmd     => [ $binary, '--version' ],
+		timeout => QEMU_VERSION_TIMEOUT,
+	);
+	return if !$result->{success};
+
+	my ($line) = split /\n/, $result->{stdout} // '';
+	return if !defined $line;
+
+	my ($version) = $line =~ /([0-9]+(?:\.[0-9]+)+)/;
+
+	return $version;
+}
+
+# $self->_resolve_ports:
+#	Resolve both host ports, and record them with the selected
+#	accelerator, before the tool spawns QEMU. A number resolves to
+#	itself, and 'auto' takes a free port of the fixed range of its
+#	directive. Return undef on success, and EXIT_ERROR when a range
+#	is exhausted.
+#
+#	The port lock closes the window between the probe and the
+#	record. One window stays open: a foreign process can take a
+#	probed port before QEMU binds it. QEMU then fails to start, and
+#	the tool reports that failure with the QEMU log.
+sub _resolve_ports ($self)
+{
+	my $config = $self->{config};
+
+	my %range = (
+		ssh_port     => App::FuguVM::Config::DEFAULT_SSH_PORT(),
+		console_port => App::FuguVM::Config::DEFAULT_CONSOLE_PORT(),
+	);
+
+	my $lock  = $self->_lock_ports;
+	my $taken = $self->_taken_ports;
+
+	# The fixed ports of every VM declaration of the project are
+	# taken too, whether the declared guest runs now or not. The
+	# loader injects the set, like cache_dir.
+	%$taken = ( %$taken, %{ $config->{declared_ports} // {} } );
+
+	# The fixed ports of this guest are taken too: a probe for one
+	# directive must not select the number that the other directive
+	# holds.
+	for my $directive (qw(ssh_port console_port)) {
+		my $configured = $config->{$directive};
+		$taken->{$configured} = 1
+		    if defined $configured
+		    && $configured ne App::FuguVM::Config::AUTO_PORT();
+	}
+
+	my %resolved;
+	for my $directive (qw(ssh_port console_port)) {
+		my $configured = $config->{$directive};
+
+		if ( defined $configured
+			&& $configured eq App::FuguVM::Config::AUTO_PORT() )
+		{
+			my $first = $range{$directive};
+			my $last =
+			    $first + App::FuguVM::Config::AUTO_PORT_COUNT() - 1;
+
+			my $port = $self->_free_port( $first, $last, $taken );
+			if ( !defined $port ) {
+				$self->{log}->error(
+"No free $directive in the range $first-$last"
+				);
+				close $lock if defined $lock;
+				return EXIT_ERROR;
+			}
+			$resolved{$directive} = $port;
+		}
+		else {
+			$resolved{$directive} = $configured;
+		}
+
+		$taken->{ $resolved{$directive} } = 1
+		    if defined $resolved{$directive};
+	}
+
+	$self->{state}->set_runtime( accel => $self->accel, %resolved );
+	close $lock if defined $lock;
+
+	return;
+}
+
+# $self->_free_port($first, $last, $taken):
+#	Return the first port of the range that binds on the bind
+#	address and that $taken does not hold. Return undef for an
+#	exhausted range.
+sub _free_port ( $self, $first, $last, $taken )
+{
+	require IO::Socket::INET;
+
+	for my $port ( $first .. $last ) {
+		next if $taken->{$port};
+
+		my $sock = IO::Socket::INET->new(
+			LocalAddr => $self->bind_address,
+			LocalPort => $port,
+			Proto     => 'tcp',
+			Listen    => 1,
+		);
+		next if !defined $sock;
+
+		$sock->close;
+		return $port;
+	}
+
+	return;
+}
+
+# $self->_taken_ports:
+#	Return the recorded ports of every guest of the project, as a
+#	hash reference keyed by port. The method enumerates the state
+#	directory, like App::FuguVM::CLI::_disks_backed_by: a record
+#	counts whether a 'vm' block still declares its guest or not.
+sub _taken_ports ($self)
+{
+	my %taken;
+
+	my $state_dir = $self->{state}->state_dir;
+	return \%taken if !-d $state_dir;
+
+	opendir my $dh, $state_dir or return \%taken;
+	my @names = sort grep { !/^\./ && -d "$state_dir/$_" } readdir $dh;
+	closedir $dh;
+
+	for my $name (@names) {
+		my $sibling = App::FuguVM::State->new( $state_dir, $name )
+		    or next;
+		my $runtime = $sibling->get_runtime;
+		for my $directive (qw(ssh_port console_port)) {
+			my $port = $runtime->{$directive};
+			$taken{$port} = 1 if defined $port;
+		}
+	}
+
+	return \%taken;
+}
+
+# $self->_lock_ports:
+#	Return the locked handle of ports.lock, or undef on the
+#	deadline. The lock file lives in the cache directory, so every
+#	project that shares that directory probes one port at a time.
+#	The record exclusion of _taken_ports covers this project only.
+#	A collision with an other project surfaces when QEMU binds the
+#	port, as a reported startup failure. The caller probes without
+#	the lock when the deadline elapses: a wedged holder must not
+#	fail a run.
+sub _lock_ports ($self)
+{
+	my $dir = $self->_cache_dir;
+	Fugu::File->ensure_dir($dir) or return;
+
+	my $path = "$dir/ports.lock";
+	open my $fh, '>>', $path or do {
+		$self->{log}->warning("Cannot open $path: $!");
+		return;
+	};
+
+	my $locked = Fugu::Timeout::bounded( PORT_LOCK_TIMEOUT,
+		sub { flock $fh, LOCK_EX } );
+	return $fh if $locked;
+
+	close $fh;
+	$self->{log}->warning("Port lock not acquired, probing without it");
+
+	return;
+}
+
+# $self->_check_installed_arch:
+#	Report if the configured architecture matches the installed
+#	disk, once for up and start. A disk belongs to one
+#	architecture, so a changed directive must not start the wrong
+#	QEMU on an existing disk. An absent record cannot prove a
+#	difference, so the check passes.
+sub _check_installed_arch ($self)
+{
+	my $config = $self->{config};
+
+	my $installed = $self->{state}->get_installed_arch;
+	return 1 if !defined $installed || $installed eq $config->{arch};
+
+	$self->{log}->error(
+"The disk of '$config->{name}' holds an $installed installation, not $config->{arch}"
+	);
+	$self->{log}->error("Run 'fuguvm destroy' to rebuild the VM.");
+
+	return 0;
 }
 
 # _host_arch():
@@ -1102,26 +1833,56 @@ sub _host_arch ()
 	return $uname[4] // '';
 }
 
+# $self->_find_efi_firmware:
+#	Return the firmware of the architecture as { code, vars }, or
+#	undef. The vars entry is the variable-store template beside
+#	the code file. It is undef when -bios boots the code file
+#	alone. A code file without its template is not usable, so the
+#	search walks on.
 sub _find_efi_firmware ($self)
 {
-	my @paths = (
-		'/opt/homebrew/share/qemu/edk2-aarch64-code.fd',
-		'/usr/local/share/qemu/edk2-aarch64-code.fd',
-		'/usr/share/qemu-efi-aarch64/QEMU_EFI.fd',
-		'/usr/share/AAVMF/AAVMF_CODE.fd',
-		'/usr/share/qemu/edk2-aarch64-code.fd',
-	);
+	my $arch = $self->_arch;
 
-	for my $path (@paths) {
-		return $path if -f $path;
+	my @candidates = $arch->firmware_paths;
+	push @candidates, glob( $arch->firmware_glob );
+
+	for my $code (@candidates) {
+		next unless -f $code;
+
+		my $vars = $arch->firmware_vars_path($code);
+		next if defined $vars && !-f $vars;
+
+		return { code => $code, vars => $vars };
 	}
 
-	# Try a glob for the versioned Homebrew paths
-	my @glob_paths =
-	    glob('/opt/homebrew/Cellar/qemu/*/share/qemu/edk2-aarch64-code.fd');
-	return $glob_paths[0] if @glob_paths;
-
 	return;
+}
+
+# $self->_firmware_args($firmware):
+#	Return the QEMU arguments for the firmware, or an empty list
+#	on failure. A code file without a variable store boots with
+#	-bios. A code file with one boots through two pflash devices:
+#	the code read-only, and a fresh copy of the variable-store
+#	template. The copy is throwaway state, so every start makes it
+#	again.
+sub _firmware_args ( $self, $firmware )
+{
+	my $code = $firmware->{code};
+	my $vars = $firmware->{vars};
+
+	return ( '-bios', $code ) if !defined $vars;
+
+	my $copy = $self->{state}->vm_state_dir . '/efivars.fd';
+	require File::Copy;
+	unless ( File::Copy::copy( $vars, $copy ) ) {
+		$self->{log}->error("Cannot copy $vars to $copy: $!");
+		return;
+	}
+
+	return (
+		'-drive', "if=pflash,format=raw,readonly=on,file=$code",
+		'-drive', "if=pflash,format=raw,file=$copy",
+	);
 }
 
 # $self->_cache_dir:

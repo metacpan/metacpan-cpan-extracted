@@ -7,9 +7,8 @@ use Mojo::Base -base, -signatures;
 use Mojo::File qw(path);
 use Mojo::JSON qw(from_json to_json);
 
-# Persistent per-user settings (the Cavil URL and API token) so they need not be passed on every run. Kept
-# under XDG_CONFIG_HOME rather than beside the cache on purpose: the cache is disposable and deleted routinely,
-# whereas the token must survive that. It holds a credential, so the file is written 0600.
+# Persistent per-user settings (the Cavil URL and API token) so they need not be passed on every run. Under
+# XDG_CONFIG_HOME, and written 0600 because it holds a credential.
 
 has dir => sub { path($ENV{XDG_CONFIG_HOME} || (($ENV{HOME} // '.') . '/.config'))->child('cavil-cli') };
 

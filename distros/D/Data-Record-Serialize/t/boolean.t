@@ -21,8 +21,8 @@ subtest 'no encoder support' => sub {
     ) or note $@;
 
     for my $test (
-        [ '',    0, '""' ],
-        [ '0',   0, '"0"' ],
+        [ q{},   0, q{""} ],
+        [ '0',   0, q{"0"} ],
         [ 0,     0, '0' ],
         [ undef, 0, 'undef' ],
         [ '1',   1, '"1"' ],
@@ -64,8 +64,8 @@ subtest 'encoder support' => sub {
     ) or note $@;
 
     for my $test (
-        [ '',    'false', '""' ],
-        [ '0',   'false', '"0"' ],
+        [ q{},   'false', q{""} ],
+        [ '0',   'false', q{"0"} ],
         [ 0,     'false', '0' ],
         [ undef, 'false', 'undef' ],
         [ '1',   'true',  '"1"' ],

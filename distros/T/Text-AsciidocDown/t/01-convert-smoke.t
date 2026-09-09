@@ -7,18 +7,21 @@ use Text::AsciidocDown;
 
 my $input = "= Title\n\nA paragraph.\n";
 my $converter = Text::AsciidocDown->new(
-  attributes => {
-    project => 'asciidoc-down',
-  },
-);
+                                        attributes => {
+                                                       project => 'asciidoc-down',
+                                          },
+                                          );
 
-my $out = $converter->convert($input, {
-  attributes => {
-    company => 'ACME',
-  },
-});
+my $out = $converter->convert(
+                              $input,
+                              {
+                               attributes => {
+                                              company => 'ACME',
+                                 },
+                              }
+                              );
 
-is($out, "# Title\n\nA paragraph.", 'convert applies Prompt 01 doctitle mapping');
+is($out, "# Title\n\nA paragraph.", 'convert applies doctitle mapping');
 ok(!ref($out), 'convert returns a plain string');
 
 eval { Text::AsciidocDown->convert($input) };

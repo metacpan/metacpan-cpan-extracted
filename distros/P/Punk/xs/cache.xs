@@ -261,7 +261,7 @@ stats(self)
         uint64_t bytes = 0, entries = 0;
         punk_cachefile_check_fork(aTHX_ c);
         punk_cachefile_usage(c, &bytes, &entries);
-        EXTEND(SP, 16);
+        EXTEND(SP, 18);
         mPUSHp("hits", 4);       mPUSHu((UV)c->hits);
         mPUSHp("misses", 6);     mPUSHu((UV)c->misses);
         mPUSHp("evictions", 9);  mPUSHu((UV)c->evictions);
@@ -270,6 +270,9 @@ stats(self)
         mPUSHp("bytes", 5);      mPUSHu((UV)bytes);
         mPUSHp("entries", 7);    mPUSHu((UV)entries);
         mPUSHp("max_bytes", 9);  mPUSHu((UV)c->max_bytes);
+        /* not in the memory store's list: only the file store has a lock
+         * that can fail to be attempted at all */
+        mPUSHp("lock_errors", 11); mPUSHu((UV)c->lock_errors);
     }
 
 # The single-flight seam, used by Punk::Cache::compute.
@@ -287,7 +290,11 @@ _lock(self, key)
         punk_cachefile *c = INT2PTR(punk_cachefile *, SvIV(SvRV(self)));
         STRLEN kl;
         const char *k = SvPV_const(key, kl);
-        RETVAL = punk_cachefile_lock(aTHX_ c, k, (uint32_t)kl);
+        int r = punk_cachefile_lock(aTHX_ c, k, (uint32_t)kl);
+        /* 1 or 0 out here: a lock that could not be attempted answers
+         * "compute", the same degradation the C front end makes, so a Perl
+         * caller never sees a third value it would have to interpret. */
+        RETVAL = (r == PCF_LOCK_UNAVAILABLE) ? 1 : r;
     }
     OUTPUT:
         RETVAL

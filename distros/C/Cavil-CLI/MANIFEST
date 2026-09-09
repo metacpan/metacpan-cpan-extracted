@@ -3,33 +3,25 @@ Changes
 cpanfile
 docs/Architecture.md
 lib/Cavil/CLI.pm
-lib/Cavil/CLI/Baseline.pm
-lib/Cavil/CLI/Cache.pm
+lib/Cavil/CLI/Archive.pm
 lib/Cavil/CLI/Client.pm
 lib/Cavil/CLI/Config.pm
 lib/Cavil/CLI/Progress.pm
-lib/Cavil/CLI/Scan.pm
 lib/Cavil/CLI/Util.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
 script/cavil-cli
-t/cache.t
-t/chunking.t
+t/archive.t
 t/config.t
 t/lib/CavilCliTest.pm
 t/progress.t
-t/scan.t
-t/scenario_baseline.t
-t/scenario_cache_hit.t
-t/scenario_check_diff.t
-t/scenario_resume.t
-t/scenario_scan_limits.t
-t/scenario_scan_tree.t
+t/scenario_check.t
+t/scenario_check_auth.t
+t/scenario_check_size.t
+t/scenario_sbom.t
 t/scenario_server_error.t
 t/scenario_spinner.t
-t/scenario_unknown.t
 t/scenario_whoami.t
-t/util.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

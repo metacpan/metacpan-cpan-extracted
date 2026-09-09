@@ -235,6 +235,12 @@ static int pcx_is_triplet(pTHX_ SV *ret) {
 /* Coerce a handler return into a PSGI triplet: a triplet passes through, a
  * Punk::Response finalizes, a Future is awaited and re-coerced, anything else
  * is JSON-encoded (folding in the context's pending status/headers). +1. */
+/* The 500 envelope, or $on_error's own response. Defined in punk_serve.h,
+ * which is included later because it is the dispatcher and needs everything;
+ * it calls punk_coerce in turn, so one of the two has to be declared ahead of
+ * the other. Same arrangement as pk_after_res below. */
+static SV *punk_handle_error(pTHX_ SV *c, SV *err, SV *on_error);
+
 static SV *punk_coerce(pTHX_ SV *c, SV *ret) {
     /* a coderef is a PSGI streaming / delayed-response body (SSE uses this on
      * a psgi.streaming server) - hand it straight to the server */
@@ -251,6 +257,28 @@ static SV *punk_coerce(pTHX_ SV *c, SV *ret) {
         }
         if (sv_derived_from(ret, "Punk::Response"))
             return pcx_call_meth(aTHX_ ret, "finalize", NULL, 0, 1);
+        /* An XML document, before the on_ready probe below (which walks the
+         * stash of every object) and before the JSON fallthrough (which would
+         * encode it as the blessed reference it is). This is also what makes
+         * respond_to(xml => sub { $doc }) answer application/xml: respond_to
+         * sets no type of its own, it returns whatever its branch returned. */
+        if (punk_xml_is(aTHX_ ret)) {
+            AV *res = pcx_res_av(aTHX_ pcx_av(aTHX_ c));
+            IV  st  = pcx_res_status(aTHX_ res);
+            SV *err = NULL;
+            SV *bytes = punk_xml_bytes(aTHX_ ret, &err);
+            /* write reports a refusal rather than croaking, which is what
+             * lets this be a branch: punk_coerce runs from loop callbacks
+             * with no eval around them, so a croak here would leave Punk
+             * instead of becoming a response. */
+            if (!bytes)
+                return punk_handle_error(aTHX_ c,
+                           err ? err : sv_2mortal(newSVpvs("Punk: xml")), NULL);
+            if (!st) st = 200;
+            return punk_triplet(aTHX_ st,
+                       sv_2mortal(newSVpvs(PK_XML_CT)),
+                       bytes, res ? pcx_res_headers(aTHX_ res) : NULL);
+        }
         if (pcx_can(aTHX_ ret, "on_ready")) {
             SV *got = pcx_call_meth(aTHX_ ret, "get", NULL, 0, 1);
             SV *r   = punk_coerce(aTHX_ c, got ? got : &PL_sv_undef);

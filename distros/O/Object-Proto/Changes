@@ -1,5 +1,9 @@
 Revision history for Object-Proto
 
+0.22	2026-09-09
+	- Accept a registered simple custom op as a function-style accessor operand
+	- Add register_simple_custom_op
+
 0.21	2026-08-29
 	- Fix the POD examples: remove trailing closing paren
 

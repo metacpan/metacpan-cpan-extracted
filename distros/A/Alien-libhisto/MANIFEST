@@ -4,10 +4,19 @@ bundled/CMakeLists.txt
 bundled/Doxyfile.in
 bundled/include/histo/cli.h
 bundled/include/histo/fit.h
+bundled/include/histo/fit.hpp
 bundled/include/histo/histo.h
+bundled/include/histo/histo.hpp
 bundled/include/histo/histo2d.h
+bundled/include/histo/histogram.hpp
+bundled/include/histo/histogram2d.hpp
+bundled/include/histo/histogram2d_view.hpp
+bundled/include/histo/histogram_view.hpp
 bundled/include/histo/kde.h
+bundled/include/histo/kde.hpp
 bundled/include/histo/sketch.h
+bundled/include/histo/sketch.hpp
+bundled/include/histo/status.hpp
 bundled/include/histo/types.h
 bundled/include/histo/version.h
 bundled/libhisto.pc.in
@@ -42,8 +51,9 @@ bundled/tools/include/tui_shm.h
 bundled/tools/include/tui_term.h
 bundled/tools/include/tui_thread.h
 bundled/tools/scripts/bump_version.py
+bundled/tools/scripts/doxygen_md_filter.py
 bundled/tools/scripts/gen_terminal_svg.py
-bundled/tools/src/.tui_engine.c.swp
+bundled/tools/scripts/test_container.py
 bundled/tools/src/cli_common.c
 bundled/tools/src/cli_main.c
 bundled/tools/src/cli_opt.c
@@ -61,7 +71,7 @@ Changes
 lib/Alien/libhisto.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/00_load.t

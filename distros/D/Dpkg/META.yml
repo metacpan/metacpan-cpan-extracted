@@ -76,12 +76,15 @@ provides:
   Dpkg::Checksums:
     file: lib/Dpkg/Checksums.pm
     version: '1.04'
+  Dpkg::Color:
+    file: lib/Dpkg/Color.pm
+    version: '0.01'
   Dpkg::Compression:
     file: lib/Dpkg/Compression.pm
-    version: '2.01'
+    version: '3.00'
   Dpkg::Compression::FileHandle:
     file: lib/Dpkg/Compression/FileHandle.pm
-    version: '1.01'
+    version: '1.02'
   Dpkg::Compression::Process:
     file: lib/Dpkg/Compression/Process.pm
     version: '1.00'
@@ -305,5 +308,5 @@ resources:
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.23.4
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: v1.23.9
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

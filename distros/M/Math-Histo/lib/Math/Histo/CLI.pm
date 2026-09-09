@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Math::Histo ();
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 
 # Handled by XS: Math::Histo::CLI::run and Math::Histo::CLI::run_raw

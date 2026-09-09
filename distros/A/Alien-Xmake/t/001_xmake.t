@@ -9,7 +9,7 @@ use Alien::Xmake;
 #
 ok $Alien::Xmake::VERSION, 'Alien::Xmake::VERSION';
 #
-my $xmake = Alien::Xmake->new;
+my $xmake = Alien::Xmake->new( verbose => 1 );
 ok $xmake->version,         'version is set';
 ok defined $xmake->buildid, 'buildid is defined-ish';
 ok my $exe = $xmake->exe,   'exe works';
@@ -47,7 +47,7 @@ subtest 'lua_json decodes emitted / returned Lua values' => sub {
 };
 subtest 'scaffold a project and drive it' => sub {
     my $old = getcwd;
-    my $dir = tempdir( CLEANUP => 1 );
+    my $dir = tempdir( CLEANUP => 0 );
     chdir $dir or die "chdir $dir: $!";
     local $@;
     ok $xmake->create( 't_demo', template => 'console' ), 'create scaffolds a project';
@@ -68,7 +68,7 @@ subtest 'scaffold a project and drive it' => sub {
 };
 subtest 'drive a Perl-generated build file via file=>' => sub {
     my $old = getcwd;
-    my $dir = tempdir( CLEANUP => 1 );
+    my $dir = tempdir( CLEANUP => 0 );
     mkdir "$dir/src" or die "mkdir src: $!";
     open my $fh, '>', "$dir/src/main.cpp" or die "src/main.cpp: $!";
     print {$fh} "int main(){ return 0; }\n";

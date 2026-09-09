@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Events;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use List::Util qw/max/;
 use Test2::Harness::UI::Response qw/resp error/;
@@ -48,6 +48,8 @@ sub handle {
         return $res;
     }
 
+    $query{job_key} = $event->job_key;
+
     if ($p->{load_subtests}) {
         # If we are loading subtests then we want ALL descendants, so here
         # we take the parent event and find the next event of the same
@@ -61,6 +63,7 @@ sub handle {
             },
         );
 
+        die error(404 => 'Cannot find subtest boundary') unless $end_at;
         $query{event_ord} = {'>' => $event->event_ord, '<' => $end_at->event_ord};
     }
     else {

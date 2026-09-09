@@ -106,6 +106,10 @@ sub init_archive {
     $self->{fh}->stat
         or syserr(g_('cannot get archive %s size'), $self->{filename});
     $self->{size} = -s _;
+    if ($self->{size} % 2) {
+        error(g_('archive %s is truncated or corrupt, ' .
+                 'it has a non-even byte size'), $self->{filename});
+    }
 
     return;
 }
@@ -210,27 +214,35 @@ sub parse_member {
     my $hdr = $self->_read_buf(g_('a file header'), $AR_HDR_LEN)
         or return;
 
+    my %hdr;
     my $hdr_fmt = 'A16A12A6A6A8A10a2';
-    my ($name, $time, $uid, $gid, $mode, $size, $fmag) = unpack $hdr_fmt, $hdr;
+    @hdr{qw(name time uid gid mode size fmag)} = unpack $hdr_fmt, $hdr;
 
-    if ($fmag ne $AR_FMAG) {
+    if ($hdr{fmag} ne $AR_FMAG) {
         error(g_('file header at offset %d in archive %s contains bad magic'),
               $offs, $self->{filename});
     }
 
     # Remove trailing spaces from the member name.
-    $name =~ s{ *$}{};
+    $hdr{name} =~ s{ *$}{};
 
     # Remove optional slash terminator (on GNU-style archives).
-    $name =~ s{/$}{};
+    $hdr{name} =~ s{/$}{};
+
+    foreach my $f (qw(name time uid gid mode size fmag)) {
+        if (not length $hdr{$f}) {
+            error(g_('file member %s in archive %s contains empty %s field'),
+                  $hdr{name}, $self->{filename}, $f);
+        }
+    }
 
     my $member = {
-        name => $name,
-        time => int $time,
-        uid => int $uid,
-        gid => int $gid,
-        mode => oct $mode,
-        size => int $size,
+        name => $hdr{name},
+        time => int $hdr{time},
+        uid => int $hdr{uid},
+        gid => int $hdr{gid},
+        mode => oct $hdr{mode},
+        size => int $hdr{size},
         offs => $offs,
     };
     push @{$self->{members}}, $member;

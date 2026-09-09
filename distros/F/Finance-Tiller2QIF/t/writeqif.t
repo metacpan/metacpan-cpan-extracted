@@ -7,7 +7,6 @@ use Finance::Tiller2QIF::ReadCSV;
 use Finance::Tiller2QIF::Map;
 use Finance::Tiller2QIF::WriteQIF;
 use Finance::Tiller2QIF::Util;
-use Mojo::SQLite;
 use feature qw/signatures postderef/;
 
 require './t/TestHelper.pm';
@@ -95,7 +94,7 @@ subtest marks_exported => sub {
   Finance::Tiller2QIF::ReadCSV::Ingest( $csvfile, $dbfile );
   Finance::Tiller2QIF::WriteQIF::Emit( $dbfile, $qiffile );
 
-  my $db         = Mojo::SQLite->new($dbfile)->options({ sqlite_unicode => 1 })->db;
+  my $db         = dbi_connect($dbfile);
   my $unexported = $db->select( 'transactions', ['id'], { exported => 0 } )->arrays;
   my $exported   = $db->select( 'transactions', ['id'], { exported => 1 } )->arrays;
   is( scalar @$unexported, 0, 'No transactions remain unexported after Emit' );
@@ -155,7 +154,7 @@ subtest skipped_excluded => sub {
   unlike( $qif, qr/PCardPymt/,  'Skipped transaction absent from QIF' );
 
   # Skipped transactions are still marked exported so they don't reappear
-  my $db = Mojo::SQLite->new($dbfile)->options({ sqlite_unicode => 1 })->db;
+  my $db = dbi_connect($dbfile);
   is( $db->select( 'transactions', ['exported'], { id => 91 } )->hash->{exported},
     1, 'Skipped transaction is marked exported after Emit' );
   $db->disconnect;
@@ -184,8 +183,7 @@ subtest qifdate_formats => sub {
     like( path($qiffile)->slurp_utf8, qr/\Q$expected\E/,
       "date format '$fmt' produces '$expected'" );
     # reset exported flag so next iteration can re-emit
-    Mojo::SQLite->new($dbfile)->options({ sqlite_unicode => 1 })
-      ->db->query('UPDATE transactions SET exported = 0');
+    dbi_connect($dbfile)->query('UPDATE transactions SET exported = 0');
     unlink $qiffile;
   }
 

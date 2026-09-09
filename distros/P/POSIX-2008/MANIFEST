@@ -4,6 +4,7 @@ Makefile.PL
 MANIFEST
 README
 ppport.h
+typemap
 2008.xs
 constants.txt			All constants we might export
 functions.txt			All functions we might export

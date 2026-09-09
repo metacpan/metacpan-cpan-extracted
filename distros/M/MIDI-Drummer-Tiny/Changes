@@ -1,5 +1,19 @@
 Revision history for MIDI-Drummer
 
+0.7020 2026-09-08 12:42:53
+    - Add the groove `density()` method.
+    - Improve documentation.
+
+0.7019 2026-09-08 10:58:40
+    - Fix stupid typo and docs in general.
+
+0.7018 2026-09-08 10:36:10
+    - Add an ABSTRACT where it's missing.
+    - Improve documentation.
+
+0.7017 2026-09-08 10:05:28
+    - Improve documentation.
+
 0.7016 2026-09-07 11:10:55
     - Add the `swap_pat()` method to the Grooves module.
 

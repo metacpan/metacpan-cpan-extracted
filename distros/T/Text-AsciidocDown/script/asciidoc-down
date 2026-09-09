@@ -5,10 +5,10 @@ use warnings;
 
 use File::Basename qw(dirname basename);
 use File::Spec;
-use File::Temp qw(tempdir);
+use File::Temp   qw(tempdir);
 use Getopt::Long qw(GetOptions);
-use Cwd qw(abs_path getcwd);
-use Pod::Usage qw(pod2usage);
+use Cwd          qw(abs_path getcwd);
+use Pod::Usage   qw(pod2usage);
 
 use lib File::Spec->catdir(dirname(dirname(abs_path(__FILE__))), 'lib');
 use Text::AsciidocDown;
@@ -22,109 +22,129 @@ my $prepublish;
 my $postpublish;
 
 GetOptions(
-  'attribute|a=s@' => \@attrs,
-  'output|o=s' => \$output,
-  'help|h' => \$help,
-  'man' => \$man,
-  'version|v' => \$version,
-  'prepublish' => \$prepublish,
-  'postpublish' => \$postpublish,
-) or usage(1);
+           'attribute|a=s@' => \@attrs,
+           'output|o=s'     => \$output,
+           'help|h'         => \$help,
+           'man'            => \$man,
+           'version|v'      => \$version,
+           'prepublish'     => \$prepublish,
+           'postpublish'    => \$postpublish,
+  ) or
+  usage(1);
 
-if ($help) {
-  print "Usage: asciidoc-down [OPTION]... FILE\n";
-  print "Convert AsciiDoc FILE to Markdown.\n";
-  print "  -a, --attribute name=val   set attribute (repeatable)\n";
-  print "  -o, --output path|-        output path or stdout\n";
-  print "      --prepublish           convert and hide source\n";
-  print "      --postpublish          restore hidden source and remove output\n";
-  print "  -h, --help                 show help\n";
-  print "      --man                  show full man-page help\n";
-  print "  -v, --version              show version\n";
-  exit 0;
+if ($help)
+{
+   print "Usage: asciidoc-down [OPTION]... FILE\n";
+   print "Convert AsciiDoc FILE to Markdown.\n";
+   print "  -a, --attribute name=val   set attribute (repeatable)\n";
+   print "  -o, --output path|-        output path or stdout\n";
+   print "      --prepublish           convert and hide source\n";
+   print "      --postpublish          restore hidden source and remove output\n";
+   print "  -h, --help                 show help\n";
+   print "      --man                  show full man-page help\n";
+   print "  -v, --version              show version\n";
+   exit 0;
 }
 
-if ($man) {
-  pod2usage(-verbose => 2, -exitval => 0, -input => $0, -output => \*STDOUT);
+if ($man)
+{
+   pod2usage(-verbose => 2, -exitval => 0, -input => $0, -output => \*STDOUT);
 }
 
-if ($version) {
-  print $Text::AsciidocDown::VERSION, "\n";
-  exit 0;
+if ($version)
+{
+   print $Text::AsciidocDown::VERSION, "\n";
+   exit 0;
 }
 
 my $input = shift @ARGV;
 $input = 'README.adoc' if !defined($input) && ($prepublish || $postpublish);
 usage(1) unless defined $input;
 
-if ($postpublish) {
-  my $out = defined($output) ? $output : to_output_path($input);
-  my $hidden = to_hidden_path($input);
-  rename $hidden, $input if -f $hidden;
-  unlink $out if defined($out) && $out ne '-' && -f $out;
-  exit 0;
+if ($postpublish)
+{
+   my $out    = defined($output) ? $output : to_output_path($input);
+   my $hidden = to_hidden_path($input);
+   rename $hidden, $input if -f $hidden;
+   unlink $out if defined($out) && $out ne '-' && -f $out;
+   exit 0;
 }
 
 my %attr_map = map { split_attr($_) } @attrs;
 
 my $source_text;
-if ($input eq '-') {
-  local $/;
-  $source_text = <STDIN>;
-} else {
-  open my $fh, '<:encoding(UTF-8)', $input or die "asciidoc-down: $input: $!\n";
-  local $/;
-  $source_text = <$fh>;
-  close $fh;
+if ($input eq '-')
+{
+   local $/;
+   $source_text = <STDIN>;
+}
+else
+{
+   open my $fh, '<:encoding(UTF-8)', $input or die "asciidoc-down: $input: $!\n";
+   local $/;
+   $source_text = <$fh>;
+   close $fh;
 }
 
 my $converter = Text::AsciidocDown->new(attributes => \%attr_map);
-my $out_text = $converter->convert($source_text, {
-  attributes => \%attr_map,
-  source_path => ($input eq '-' ? undef : abs_path($input)),
-}) . "\n";
+my $out_text = $converter->convert(
+                                   $source_text,
+                                   {
+                                    attributes  => \%attr_map,
+                                    source_path => ($input eq '-' ? undef : abs_path($input)),
+                                   }
+  ) .
+  "\n";
 
 my $target = defined($output) ? $output : to_output_path($input);
-if ($target eq '-') {
-  print $out_text;
-} else {
-  open my $fh, '>:encoding(UTF-8)', $target or die "asciidoc-down: $target: $!\n";
-  print {$fh} $out_text;
-  close $fh;
+if ($target eq '-')
+{
+   print $out_text;
+}
+else
+{
+   open my $fh, '>:encoding(UTF-8)', $target or die "asciidoc-down: $target: $!\n";
+   print {$fh} $out_text;
+   close $fh;
 }
 
-if ($prepublish && $input ne '-') {
-  my $hidden = to_hidden_path($input);
-  rename $input, $hidden or die "asciidoc-down: cannot hide $input: $!\n";
+if ($prepublish && $input ne '-')
+{
+   my $hidden = to_hidden_path($input);
+   rename $input, $hidden or die "asciidoc-down: cannot hide $input: $!\n";
 }
 
 exit 0;
 
-sub split_attr {
-  my ($raw) = @_;
-  my ($k, $v) = split /=/, $raw, 2;
-  $v = '' unless defined $v;
-  return ($k => $v);
+sub split_attr
+{
+   my ($raw) = @_;
+   my ($k, $v) = split /=/, $raw, 2;
+   $v = '' unless defined $v;
+   return ($k => $v);
 }
 
-sub to_output_path {
-  my ($path) = @_;
-  return '-' if $path eq '-';
-  (my $out = $path) =~ s/\.adoc$/.md/;
-  return $out;
+sub to_output_path
+{
+   my ($path) = @_;
+   return '-' if $path eq '-';
+   (my $out = $path) =~ s/\.adoc$/.md/;
+   return $out;
 }
 
-sub to_hidden_path {
-  my ($path) = @_;
-  my $base = basename($path);
-  my $dir = dirname($path);
-  return File::Spec->catfile($dir, '.' . $base);
+sub to_hidden_path
+{
+   my ($path) = @_;
+   my $base   = basename($path);
+   my $dir    = dirname($path);
+   return File::Spec->catfile($dir, '.' . $base);
 }
 
-sub usage {
-  my ($code) = @_;
-  print STDERR "Usage: asciidoc-down [OPTION]... FILE\n";
-  exit $code;
+sub usage
+{
+   my ($code) = @_;
+   print STDERR "Usage: asciidoc-down [OPTION]... FILE\n";
+   exit $code;
 }
 
 __END__

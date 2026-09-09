@@ -23,7 +23,7 @@ Dpkg::Control::HashCore - parse and manipulate a stanza of deb822 fields
 =head1 DESCRIPTION
 
 The L<Dpkg::Control::Hash> class is a hash-like representation of a set of
-RFC822-like fields. The fields names are case insensitive and are always
+L<deb822(5)> fields. The fields names are case insensitive and are always
 capitalized the same when output (see field_capitalize() function in
 L<Dpkg::Control::Fields>).
 The order in which fields have been set is remembered and is used
@@ -65,7 +65,7 @@ use overload
 
 =over 4
 
-=item $c = Dpkg::Control::Hash->new(%opts)
+=item $ctrl = Dpkg::Control::Hash->new(%opts)
 
 Creates a new object with the indicated options.
 
@@ -148,7 +148,7 @@ sub DESTROY {
     delete $$self->{fields};
 }
 
-=item $c->set_options($option, %opts)
+=item $ctrl->set_options($option, %opts)
 
 Changes the value of one or more options.
 
@@ -159,7 +159,7 @@ sub set_options {
     $$self->{$_} = $opts{$_} foreach keys %opts;
 }
 
-=item $value = $c->get_option($option)
+=item $value = $ctrl->get_option($option)
 
 Returns the value of the corresponding option.
 
@@ -170,7 +170,7 @@ sub get_option {
     return $$self->{$k};
 }
 
-=item $c->parse_error($file, $fmt, ...)
+=item $ctrl->parse_error($file, $fmt, ...)
 
 Prints an error message and dies on syntax parse errors.
 
@@ -183,7 +183,7 @@ sub parse_error {
     error(g_('syntax error in %s at line %d: %s'), $file, $., $msg);
 }
 
-=item $c->parse($fh, $description)
+=item $bool = $ctrl->parse($fh, $description)
 
 Parse a control file from the given filehandle. Exits in case of errors.
 $description is used to describe the filehandle, ideally it's a filename
@@ -304,12 +304,12 @@ sub parse {
     return defined($cf);
 }
 
-=item $c->load($file)
+=item $bool = $ctrl->load($file)
 
 Parse the content of $file. Exits in case of errors. Returns true if some
 fields have been parsed.
 
-=item $c->find_custom_field($name)
+=item $field = $ctrl->find_custom_field($name)
 
 Scan the fields and look for a user specific field whose name matches the
 following regex: /X[SBC]*-$name/i. Return the name of the field found or
@@ -325,7 +325,7 @@ sub find_custom_field {
     return;
 }
 
-=item $c->get_custom_field($name)
+=item $value = $ctrl->get_custom_field($name)
 
 Identify a user field and retrieve its value.
 
@@ -338,15 +338,15 @@ sub get_custom_field {
     return;
 }
 
-=item $str = $c->output()
+=item $string = "$ctrl"
 
-=item "$c"
+=item $string = $ctrl->output()
 
 Get a string representation of the control information. The fields
 are sorted in the order in which they have been read or set except
 if the order has been overridden with set_output_order().
 
-=item $c->output($fh)
+=item $string = $ctrl->output($fh)
 
 Print the string representation of the control information to a
 filehandle.
@@ -398,7 +398,7 @@ sub output {
             # Print it out.
             if ($fh) {
                 print { $fh } $kv
-                    or syserr(g_('write error on control data'));
+                    or syserr(g_('cannot write control data'));
             }
             $str .= $kv if defined wantarray;
         }
@@ -406,11 +406,11 @@ sub output {
     return $str;
 }
 
-=item $c->save($filename)
+=item $ctrl->save($filename)
 
 Write the string representation of the control information to a file.
 
-=item $c->set_output_order(@fields)
+=item $ctrl->set_output_order(@fields)
 
 Define the order in which fields will be displayed in the output() method.
 
@@ -422,7 +422,7 @@ sub set_output_order {
     $$self->{out_order} = [ @fields ];
 }
 
-=item $c->apply_substvars($substvars)
+=item $ctrl->apply_substvars($substvars)
 
 Update all fields by replacing the variables references with
 the corresponding value stored in the L<Dpkg::Substvars> object.

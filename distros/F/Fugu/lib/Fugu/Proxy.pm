@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::Proxy;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 use Fugu::File;
 use Fugu::Log;
@@ -472,7 +472,7 @@ sub _stream_file ( $self, $socket, $path, $size )
 }
 
 package Fugu::Proxy::Cache;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 use File::Basename qw(dirname);
 use Fugu::File;
@@ -705,7 +705,7 @@ sub walk ( $self, $dir, $callback )
 }
 
 package Fugu::Proxy::Meta;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 # Fugu::Proxy::Meta - the metadata of the cached files, in memory.
 #

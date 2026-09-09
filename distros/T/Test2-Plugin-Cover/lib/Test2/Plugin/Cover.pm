@@ -10,7 +10,7 @@ use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 # Directly modifying this is a bad idea, but for the XS to work it needs to be
 # a package var, not a lexical.
@@ -28,6 +28,7 @@ BEGIN {
 }
 
 my %FILTER;
+my %EXCLUDE_ROOT_CACHE;
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -37,7 +38,7 @@ XSLoader::load(__PACKAGE__, $VERSION);
 my $IMPORTED = 0;
 sub import {
     my $class = shift;
-    my %params = @_;
+    my %params = $class->_parse_params(@_);
 
     if ($params{disabled}) {
         $class->disable;
@@ -77,6 +78,7 @@ sub import {
 sub reload {
     $ROOT = $LOAD_ROOT // "" . path('.')->realpath;
     %FILTER = map {-f $_ ? ($_ => 1) : ()} $0, __FILE__, File::Spec->rel2abs($0), File::Spec->rel2abs(__FILE__);
+    %EXCLUDE_ROOT_CACHE = ();
 }
 
 sub enabled { $ENABLED }
@@ -176,6 +178,10 @@ sub filter {
     # Compare the resolved path, not the raw input, so symlinked roots and
     # files resolve consistently with the relative() call below.
     return () unless $root->subsumes($path);
+
+    for my $exclude (@{$class->_exclude_roots($params{exclude})}) {
+        return () if $exclude->subsumes($path);
+    }
 
     return $path->relative($root)->stringify();
 }
@@ -311,6 +317,61 @@ sub report {
     $ctx->release unless $params{ctx};
 
     return $event;
+}
+
+# 'exclude' can be given more than once, which a hash cannot hold, so the
+# argument list is walked in pairs instead of being assigned to one.
+sub _parse_params {
+    my $class = shift;
+
+    my (%params, @exclude);
+    while (@_) {
+        my $key = shift;
+
+        unless (@_) {
+            carp "Odd number of parameters for $class, '$key' has no value";
+            last;
+        }
+
+        my $val = shift;
+
+        if ($key eq 'exclude') {
+            push @exclude => ref($val) eq 'ARRAY' ? @$val : $val;
+        }
+        else {
+            $params{$key} = $val;
+        }
+    }
+
+    $params{exclude} = \@exclude if @exclude;
+
+    return %params;
+}
+
+sub _exclude_roots {
+    my $class = shift;
+    my ($exclude) = @_;
+
+    return [] unless defined $exclude;
+
+    my @out;
+    for my $item (ref($exclude) eq 'ARRAY' ? @$exclude : ($exclude)) {
+        next unless defined $item && length "$item";
+
+        my $path = path($item);
+
+        # filter() runs once per recorded file and would otherwise resolve the
+        # same roots again for every one of them. Only absolute paths are
+        # cached, a relative one means something different after a chdir.
+        unless ($path->is_absolute) {
+            push @out => $path->exists ? $path->realpath : $path->absolute;
+            next;
+        }
+
+        push @out => $EXCLUDE_ROOT_CACHE{"$item"} //= $path->exists ? $path->realpath : $path->absolute;
+    }
+
+    return \@out;
 }
 
 sub _process {
@@ -536,6 +597,31 @@ INLINE:
 
     use Test2::Plugin::Cover no_event => 1;
 
+=head2 EXCLUDE DIRECTORIES
+
+A directory under the root, such as a dependency tree installed inside the
+workspace, can be kept out of the coverage data entirely:
+
+CLI:
+
+    HARNESS_PERL_SWITCHES=-MTest2::Plugin::Cover=exclude,deps prove ...
+
+INLINE:
+
+    use Test2::Plugin::Cover exclude => 'deps';
+
+    # Or several at once
+    use Test2::Plugin::Cover exclude => ['deps', 'vendor'];
+
+An excluded path and everything under it, at any depth, is dropped before the
+coverage event is sent, so excluded files never reach tools consuming that
+event. Paths are compared component by component, so excluding C<lib> does not
+exclude a sibling C<library>. Relative paths are resolved against the current
+directory.
+
+Wildcards are not supported, an exclusion is a literal path. Excluding a whole
+tree needs only the top of it.
+
 =head1 KNOWING WHAT CALLED WHAT
 
 If you use a system like L<Test::Class>, L<Test::Class::Moose>, or
@@ -686,6 +772,8 @@ The 'stdin' string will be used as STDIN for the test.
 
 =item $arrayref = $class->files(root => $path)
 
+=item $arrayref = $class->files(exclude => $path_or_arrayref)
+
 This will return an arrayref of all files touched so far.
 
 The list of files will be sorted alphabetically, and duplicates will be
@@ -695,12 +783,18 @@ If a root path is provided it may be a L<Path::Tiny> instance or a plain
 string. This path will be used to filter out any files not under the root
 directory.
 
+If an exclude path is provided, that path and everything under it is left out
+of the results. It may be a single path or an arrayref of them, each a
+L<Path::Tiny> instance or a plain string.
+
 The running test file (C<$0>) and this plugin's own file are always excluded
 from the results.
 
 =item $hashref = $class->data()
 
 =item $hashref = $class->data(root => $path)
+
+=item $hashref = $class->data(exclude => $path_or_arrayref)
 
 This returns the processed coverage data that goes into the report event:
 
@@ -719,8 +813,8 @@ This returns the processed coverage data that goes into the report event:
     }
 
 Duplicate 'from' values are removed (compared by content, not reference), and
-each list is sorted deterministically. The C<root> parameter behaves as it
-does in C<files()>.
+each list is sorted deterministically. The C<root> and C<exclude> parameters
+behave as they do in C<files()>.
 
 =item $event = $class->report(%options)
 
@@ -736,6 +830,16 @@ Options:
 Normally this is set to the current directory at module load-time. This is used
 to filter out any source files that do not live under the current directory.
 This may be a L<Path::Tiny> instance or a plain string.
+
+=item exclude => $path_or_arrayref
+
+Paths to leave out of the report entirely, along with everything under them.
+May be a single path or an arrayref of them, each a L<Path::Tiny> instance or
+a plain string. Relative paths are resolved against the current directory, and
+wildcards are not supported.
+
+When passed at import time this option may be given more than once instead of
+using an arrayref, which is how it survives the C<-M> command line form.
 
 =item verbose => $BOOL
 
@@ -767,6 +871,8 @@ Calls both C<reset_coverage()> and C<reset_from()>.
 
 =item $file_or_undef = $class->filter($file, root => Path::Tiny->new('...'))
 
+=item $file_or_undef = $class->filter($file, exclude => ['...'])
+
 This method is used as a callback when getting the final list of covered source
 files. The default implementation removes any files that are not under the
 current directory which lets you focus on files in the distribution you are
@@ -775,6 +881,10 @@ the default implementation will turn it into a relative path.
 
 If you provide a custom C<root> parameter, it may be a L<Path::Tiny> instance
 or a plain string.
+
+Exclusions are applied here, so a subclass that replaces this method is
+responsible for honoring the C<exclude> parameter if it needs exclusions to
+keep working.
 
 A custom filter callback should look something like this:
 

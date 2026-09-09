@@ -628,6 +628,14 @@ SV* file_plugin_dispatch_record(pTHX_ HV *opts, const char *path, SV *record) {
     return out;
 }
 
+/* the save stack closes the descriptor, so a die in the plugin or in the
+ * per-record callback does not leak it; on Windows a leaked descriptor
+ * also keeps the file locked against unlink */
+static void file_close_fd(pTHX_ void *p) {
+    PERL_UNUSED_CONTEXT;
+    close((int)(IV)p);
+}
+
 /* file_plugin_dispatch_stream is defined below - it relies on
  * FILE_BUFFER_SIZE and the platform open()/read() wrappers. */
 SV* file_plugin_dispatch_stream(pTHX_ HV *opts, const char *path, SV *cb) {
@@ -655,6 +663,8 @@ SV* file_plugin_dispatch_stream(pTHX_ HV *opts, const char *path, SV *cb) {
         fd = file_open3(path, open_flags, 0);
     }
     if (fd < 0) return NULL;
+    ENTER;
+    SAVEDESTRUCTOR_X(file_close_fd, INT2PTR(void *, (IV)fd));
 
     ctx.path         = path;
     ctx.data         = NULL;
@@ -675,7 +685,7 @@ SV* file_plugin_dispatch_stream(pTHX_ HV *opts, const char *path, SV *cb) {
         /* EOF flush so the plugin can emit any buffered final record. */
         p->stream_fn(aTHX_ &ctx, NULL, 0, 1);
     }
-    close(fd);
+    LEAVE;                                  /* closes fd */
     return (cancelled || ctx.cancel) ? NULL : &PL_sv_yes;
 }
 

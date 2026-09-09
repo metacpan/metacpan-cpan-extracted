@@ -18,7 +18,7 @@
 use v5.36;
 
 package Fugu::Control;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 use IO::Socket::UNIX;
 use JSON::PP ();
@@ -528,7 +528,7 @@ sub _log ($self)
 }
 
 package Fugu::Control::Client;
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 use Errno qw(EACCES ENOENT);
 use IO::Socket::UNIX;

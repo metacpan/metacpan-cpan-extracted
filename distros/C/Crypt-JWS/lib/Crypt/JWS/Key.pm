@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1;
 
@@ -44,6 +44,24 @@ persist as PEM (C<to_pem(1)>), and only public halves travel as JWKs.
 =head1 METHODS
 
 =head2 from_pem ($pem)
+
+Reads a private key or a public key. It does not read a certificate;
+for that see C<from_x509_der>.
+
+=head2 from_x509_der ($der)
+
+The public key carried by a DER-encoded X.509 certificate. This is the
+form XML-DSig and SAML metadata carry, base64-encoded, in
+C<< <ds:X509Certificate> >>.
+
+The certificate is not validated. Its chain, its validity dates and its
+own signature are all ignored, and only the key it carries is returned,
+because the caller knows where the certificate came from and this method
+does not. Bytes after the end of the certificate are refused rather than
+ignored, so that a certificate and its digest always identify each other.
+
+The key that comes back is public, so C<is_private> is false and
+C<to_pem(1)> croaks.
 
 =head2 from_jwk (\%jwk)
 

@@ -2,7 +2,7 @@ package Test2::Harness::UI::CPANImporter;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Carp qw/croak/;
 
@@ -73,7 +73,7 @@ sub run {
             }) or die "Could not add permissions for $id on $project";
         }
     }
-    close($dfh);
+    close($pfh);
 
     my $dbh = $self->{+CONFIG}->connect;
     my $sth = $dbh->prepare('DELETE FROM permissions WHERE cpan_batch IS NOT NULL AND cpan_batch != ?');

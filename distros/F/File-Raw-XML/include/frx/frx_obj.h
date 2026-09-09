@@ -114,6 +114,60 @@ frx_node_doc_rv(pTHX_ SV *doc_iv)
     return newRV_inc(doc_iv);
 }
 
+/* ---- the C ABI's SV bridge ------------------------------------------------
+ *
+ * Declared in frx_abi_impl.h, which the table needs and which is included
+ * before this file. These are the entries a consumer crosses between a
+ * handle and a blessed object with.
+ *
+ * The two unwrapping entries answer NULL where the invocant forms above
+ * croak. A consumer uses them as the type test - Punk asks "is this thing a
+ * document?" of every object a handler returns - and a croak is the wrong
+ * answer to a question. It is also the rule the whole table keeps: the core
+ * fills an frx_err and returns NULL, it does not longjmp through a
+ * consumer's C. */
+
+static SV *
+frx_abi_doc_to_sv(pTHX_ frx_doc *d)
+{
+    if (!d) return NULL;
+    return frx_doc_bless(aTHX_ d);   /* takes ownership; magic frees it */
+}
+
+static frx_doc *
+frx_abi_doc_from_sv(pTHX_ SV *sv)
+{
+    MAGIC *mg = frx_obj_magic(aTHX_ sv, &frx_doc_vtbl);
+    return (mg && mg->mg_ptr) ? (frx_doc *)mg->mg_ptr : NULL;
+}
+
+static const frx_node *
+frx_abi_node_from_sv(pTHX_ SV *sv, frx_doc **owner)
+{
+    MAGIC *mg = frx_obj_magic(aTHX_ sv, &frx_node_vtbl);
+    if (owner) *owner = NULL;
+    if (!mg || !mg->mg_ptr || !mg->mg_obj) return NULL;
+    if (owner) {
+        /* mg_obj is the document's inner IV, which carries the doc magic */
+        MAGIC *dm = mg_findext(mg->mg_obj, PERL_MAGIC_ext, &frx_doc_vtbl);
+        if (!dm || !dm->mg_ptr) return NULL;
+        *owner = (frx_doc *)dm->mg_ptr;
+    }
+    return (const frx_node *)mg->mg_ptr;
+}
+
+static SV *
+frx_abi_node_to_sv(pTHX_ SV *doc_sv, const frx_node *n)
+{
+    MAGIC *mg;
+    if (!n) return NULL;
+    mg = frx_obj_magic(aTHX_ doc_sv, &frx_doc_vtbl);
+    if (!mg || !mg->mg_ptr) return NULL;
+    /* the node's magic holds the document's inner IV, not the RV, which is
+     * what keeps the document alive for exactly as long as the node */
+    return frx_node_bless(aTHX_ SvRV(doc_sv), n);
+}
+
 /* a string across the seam: characters */
 static SV *
 frx_str_sv(pTHX_ const frx_str *s)
@@ -304,6 +358,68 @@ frx_is_dir_sep(char c)
 #endif
 }
 
+/* "C:" and what follows it: an absolute path with its drive, on the one
+ * platform that has drives */
+static int
+frx_is_drive(const char *p)
+{
+#ifdef _WIN32
+    return ((p[0] >= 'A' && p[0] <= 'Z') || (p[0] >= 'a' && p[0] <= 'z')) && p[1] == ':';
+#else
+    PERL_UNUSED_ARG(p);
+    return 0;
+#endif
+}
+
+/* the real path of p as a base a URI join can use (RFC 3986 section 5.2).
+ * A POSIX path already is one. A Windows path is not: its drive letter
+ * parses as a scheme, and its separators are not the path separator a
+ * merge looks for, so "doc.dtd" against "C:\d\doc.xml" would come out
+ * "C:doc.dtd" and be read against the process directory. It becomes
+ * /C:/d/doc.xml, which merges as any absolute path does; frx_file_resolve
+ * reads that form, and a file: identifier, back to a native path. */
+static char *
+frx_realpath_as_base(const char *p)
+{
+    char *real = frx_realpath(p);
+#ifdef _WIN32
+    char  *uri;
+    size_t n, i, j = 0;
+    if (!real) return NULL;
+    n = strlen(real);
+    uri = (char *)malloc(n + 2);
+    if (!uri) { free(real); return NULL; }
+    if (frx_is_drive(real)) uri[j++] = '/';
+    for (i = 0; i < n; i++) uri[j++] = real[i] == '\\' ? '/' : real[i];
+    uri[j] = '\0';
+    free(real);
+    return uri;
+#else
+    return real;
+#endif
+}
+
+/* real starts with the dir_len bytes of dir, as this platform names files */
+static int
+frx_path_under(const char *real, const char *dir, size_t dir_len)
+{
+#ifdef _WIN32
+    size_t i;
+    for (i = 0; i < dir_len; i++) {
+        char a = real[i], b = dir[i];
+        if (!a) return 0;
+        if (a >= 'A' && a <= 'Z') a = (char)(a + 32);
+        if (b >= 'A' && b <= 'Z') b = (char)(b + 32);
+        if (a == '/') a = '\\';
+        if (b == '/') b = '\\';
+        if (a != b) return 0;
+    }
+    return 1;
+#else
+    return strncmp(real, dir, dir_len) == 0;
+#endif
+}
+
 static const char *
 frx_file_resolve(void *vud, const char *pub, const char *sys, const char *base,
                  int kind, frx_fetched *out)
@@ -329,7 +445,8 @@ frx_file_resolve(void *vud, const char *pub, const char *sys, const char *base,
         path = sys + 5;
         if (path[0] == '/' && path[1] == '/') {
             path += 2;                                  /* file://host/path: the host must be empty */
-            if (*path != '/') return "a file: identifier with a host is not read";
+            if (*path != '/' && !frx_is_drive(path))    /* file://C:/... names a drive, not a host */
+                return "a file: identifier with a host is not read";
         }
     } else {
         const char *q = sys;
@@ -338,9 +455,10 @@ frx_file_resolve(void *vud, const char *pub, const char *sys, const char *base,
         if (q > sys && *q == ':' && q[1] == '/' && q[2] == '/')
             return "only a file path or a file: identifier is read by the file resolver";
     }
+    if (path[0] == '/' && frx_is_drive(path + 1)) path++;   /* /C:/d/x: the slash is the URI's */
     real = frx_realpath(path);
     if (!real) return "the system identifier does not name a readable file";
-    if (strncmp(real, ud->dir, ud->dir_len) != 0 || !frx_is_dir_sep(real[ud->dir_len])) {
+    if (!frx_path_under(real, ud->dir, ud->dir_len) || !frx_is_dir_sep(real[ud->dir_len])) {
         free(real);
         return "the system identifier escapes the document's directory";
     }
@@ -529,7 +647,7 @@ frx_parse_to_sv(pTHX_ const char *in, STRLEN len, HV *opts, const char *path)
     char           *real = NULL;
     frx_opts_from_hv(aTHX_ opts, &o, &ud, path);
     if (o.resolve && !o.base_uri && path) {
-        real = frx_realpath(path);
+        real = frx_realpath_as_base(path);
         if (real) o.base_uri = real;
     }
     d = frx_parse_doc_ex(in, (size_t)len, &o, &e);
@@ -745,7 +863,7 @@ frx_reader_xs_new(pTHX_ HV *opts, const char *path)
         x->base = frx_strdup(oe.base_uri);
         oe.base_uri = x->base;
     } else if (oe.resolve && path) {
-        x->base = frx_realpath(path);
+        x->base = frx_realpath_as_base(path);
         oe.base_uri = x->base;
     }
     if (oe.encoding) {

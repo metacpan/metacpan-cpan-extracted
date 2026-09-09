@@ -40,6 +40,7 @@ our @EXPORT = qw(
     gettext
     ngettext
     g_
+    C_
     P_
     N_
 );
@@ -103,12 +104,12 @@ Returns $msgid if $n is 1 or $msgid_plural otherwise.
 =item $trans = g_($msgid)
 
 Calls dgettext() on the $msgid and returns its translation for the current
-locale. If dgettext() is not available, simply returns $msgid.
+locale. If dgettext() is not available, returns $msgid.
 
 =item $trans = C_($msgctxt, $msgid)
 
 Calls dgettext() on the $msgid and returns its translation for the specific
-$msgctxt supplied. If dgettext() is not available, simply returns $msgid.
+$msgctxt supplied. If dgettext() is not available, returns $msgid.
 
 =item $trans = P_($msgid, $msgid_plural, $n)
 
@@ -165,8 +166,10 @@ BEGIN {
         };
         *C_ = sub {
             my ($msgctxt, $msgid) = @_;
-            return dgettext($DEFAULT_TEXT_DOMAIN,
-                            $msgctxt . GETTEXT_CONTEXT_GLUE . $msgid);
+            my $msgctxtid = $msgctxt . GETTEXT_CONTEXT_GLUE . $msgid;
+            my $msg = dgettext($DEFAULT_TEXT_DOMAIN, $msgctxtid);
+
+            return $msg eq $msgctxtid ? $msgid : $msg;
         };
         *P_ = sub {
             return dngettext($DEFAULT_TEXT_DOMAIN, @_);

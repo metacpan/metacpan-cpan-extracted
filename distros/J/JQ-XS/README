@@ -1,0 +1,110 @@
+JQ-XS version 1.01
+==================
+
+JQ::XS is a clean object-oriented Perl wrapper for libjq, the C library
+behind the jq command-line JSON query language.
+
+FEATURES
+
+  - Compile and execute jq filter programs
+  - Process Perl data structures (hashes, arrays, numbers, strings)
+  - Process JSON text directly
+  - UTF-8 string support
+  - Comprehensive error handling with Perl exceptions
+  - Support for complex nested data structures
+  - Multiple output values per input
+
+SYNOPSIS
+
+  use JQ::XS;
+
+  my $jq = JQ::XS->new('.foo[] | select(. > 2)');
+  my @results = $jq->process({ foo => [1, 3, 5] });
+  # Returns: (3, 5)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires:
+
+  - Perl 5.26.3 or higher
+  - libjq 1.6 or compatible
+  - A C compiler (gcc)
+
+On Red Hat/CentOS systems, install with:
+  yum install jq-devel
+
+On Debian/Ubuntu systems, install with:
+  apt-get install libjq-dev
+
+BUILDING PACKAGES
+
+An RPM spec file is provided in rpm/perl-JQ-XS.spec and Debian packaging in
+debian/.  To build a .deb from a source checkout:
+
+   apt-get build-dep .        # or: apt-get install libjq-dev libjson-pp-perl
+   perl Makefile.PL
+   make deb
+
+The .deb lands in the parent directory.  "make deb_clean" removes what the
+build leaves behind in the source tree.  The underlying command and its flags
+can be overridden:
+
+   make deb DPKG_BUILDPACKAGE_FLAGS="-us -uc"   # binary and source packages
+   make deb DPKG_BUILDPACKAGE=debuild           # run lintian afterwards
+
+To build an RPM from a source checkout:
+
+   dnf builddep rpm/perl-JQ-XS.spec   # jq-devel is in powertools/crb
+   perl Makefile.PL
+   make rpm
+
+"make rpm" refuses to run unless the Version: in the spec matches the module
+version.  It builds the release tarball first, because the spec installs
+META.json, which only exists inside the tarball.  The packages land under
+rpmbuild/RPMS; "make rpm_clean" removes that tree.  As with deb, the tool and
+its flags can be overridden:
+
+   make rpm RPMBUILD_FLAGS=-ba                  # binary and source RPMs
+   make rpm RPMBUILD_FLAGS="-bb --nocheck"      # skip the test suite
+
+RELEASES
+
+.github/workflows/release.yml runs both of the above in containers for RHEL
+8, 9 and 10 and for Debian 12 and 13, and attaches the resulting packages to
+a GitHub release.  Pushing a tag named v<version> triggers it; running the
+workflow by hand builds the same packages but publishes nothing.
+
+The version is written in three places, and the workflow refuses to build
+unless they agree with each other and with the tag:
+
+   lib/JQ/XS.pm            our $VERSION = '...';
+   rpm/perl-JQ-XS.spec     Version:
+   debian/changelog        the version in the top entry, as <version>-1
+
+Bump all three, and add a %changelog and a debian/changelog entry, before
+tagging.  The Debian packages get a +debNu1 suffix added at build time so the
+two suites do not produce the same filename.
+
+METHODS
+
+  new($program)       - Compile a jq filter program
+  process($data)      - Process Perl data through the filter
+  process_json($text) - Process JSON text through the filter
+  program()           - Get the source of the compiled program
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by James Rouzier
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the MIT license. See the LICENSE file included
+with this distribution.

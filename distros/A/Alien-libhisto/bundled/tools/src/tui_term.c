@@ -2,9 +2,18 @@
  * Low-level terminal raw mode handling, mouse tracking, and screen drawing.
  */
 
+#ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
-#define _DEFAULT_SOURCE
+#endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#endif
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE 1
+#endif
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700
+#endif
 
 #include "tui_term.h"
 #include <stdio.h>
@@ -14,7 +23,9 @@
 #include <stdbool.h>
 #include <ctype.h>
 #if defined(_WIN32)
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 #include <io.h>
 #include <conio.h>
@@ -27,7 +38,14 @@
 #ifndef isatty
 #define isatty _isatty
 #endif
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+#ifndef ENABLE_VIRTUAL_TERMINAL_INPUT
+#define ENABLE_VIRTUAL_TERMINAL_INPUT 0x0200
+#endif
 #else
+#include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
 #include <sys/ioctl.h>
@@ -77,7 +95,9 @@ bool tui_term_init(void) {
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = sigwinch_handler;
+#ifdef SIGWINCH
     sigaction(SIGWINCH, &sa, NULL);
+#endif
 
     struct sigaction sa_int;
     memset(&sa_int, 0, sizeof(sa_int));
@@ -469,39 +489,6 @@ void tui_frame_free(tui_frame_t *f) {
     }
     f->len = 0;
     f->cap = 0;
-}
-
-void tui_term_get_color(double fraction, bool monochrome, char *out_ansi, size_t max_len) {
-    if (!out_ansi || max_len == 0) return;
-    out_ansi[0] = '\0';
-    if (monochrome) return;
-
-    if (fraction < 0.0) fraction = 0.0;
-    if (fraction > 1.0) fraction = 1.0;
-
-    int r = 0, g = 0, b = 0;
-    if (fraction < 0.25) {
-        double t = fraction / 0.25;
-        r = 0;
-        g = (int)(t * 255.0);
-        b = 255;
-    } else if (fraction < 0.5) {
-        double t = (fraction - 0.25) / 0.25;
-        r = 0;
-        g = 255;
-        b = (int)((1.0 - t) * 255.0);
-    } else if (fraction < 0.75) {
-        double t = (fraction - 0.5) / 0.25;
-        r = (int)(t * 255.0);
-        g = 255;
-        b = 0;
-    } else {
-        double t = (fraction - 0.75) / 0.25;
-        r = 255;
-        g = (int)((1.0 - t) * 255.0);
-        b = 0;
-    }
-    snprintf(out_ansi, max_len, "\033[38;2;%d;%d;%dm", r, g, b);
 }
 
 int tui_visual_width(const char *str) {

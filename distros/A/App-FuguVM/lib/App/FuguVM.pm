@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguVM;
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
 # App::FuguVM - install and manage OpenBSD virtual machines under
 # QEMU.

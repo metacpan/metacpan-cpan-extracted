@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 use Scalar::Util qw(refaddr weaken);
+use File::Temp qw(tempfile);
 use File::Raw::XML qw(file_xml_decode);
 
 # A node keeps its document alive; nothing else does, and nothing has to.
@@ -55,10 +56,17 @@ use File::Raw::XML qw(file_xml_decode);
     ok(!defined $weak, 'and is freed when the last node goes');
 }
 
-# a node held in a global survives to global destruction without a word
+# a node held in a global survives to global destruction without a word.
+# The program goes in a file: -e with a quoted one-liner is a shell's, and
+# the document's angle brackets are cmd.exe's redirections.
 {
-    my @inc = map { "-I$_" } grep { m{blib} } @INC;
-    my $out = `$^X -w @inc -MFile::Raw::XML=file_xml_decode -e 'our \$N = file_xml_decode("<a><b/></a>")->root; print \$N->local' 2>&1`;
+    my ($fh, $file) = tempfile(SUFFIX => '.pl', UNLINK => 1);
+    print $fh qq{use File::Raw::XML qw(file_xml_decode);\n},
+              qq{our \$N = file_xml_decode("<a><b/></a>")->root;\n},
+              qq{print \$N->local;\n};
+    close $fh;
+    my @inc = map { qq{"-I$_"} } grep { m{blib} } @INC;
+    my $out = `"$^X" -w @inc "$file" 2>&1`;
     is($out, 'a', 'a global node is fine at global destruction, with no warning');
 }
 

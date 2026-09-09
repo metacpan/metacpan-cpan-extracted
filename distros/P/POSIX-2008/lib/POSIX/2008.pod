@@ -42,11 +42,12 @@ with L<C<select()>|perlfunc/select>.
 A system call return value of 0 meaning "success" is mapped to "0 but true".
 
 For system calls where 0 does not just mean "success", 0 is returned
-unchanged. These are L<C<creat()>|"creat">, L<C<open()>|"open">,
-L<C<read()>|"read">, L<C<write()>|"write">, L<C<readv()>|"readv">,
-L<C<writev()>|"writev">, L<C<pread()>|"pread">, L<C<pwrite()>|"pwrite">,
-L<C<preadv()>|"preadv">, L<C<pwritev()>|"pwritev">, L<C<preadv2()>|"preadv2">,
-L<C<pwritev2()>|"pwritev2">, L<C<getpriority()>|"getpriority">,
+unchanged. These are L<C<creat()>|"creat">, L<C<dup3()>|"dup3">,
+L<C<open()>|"open">, L<C<read()>|"read">, L<C<write()>|"write">,
+L<C<readv()>|"readv">, L<C<writev()>|"writev">, L<C<pread()>|"pread">,
+L<C<pwrite()>|"pwrite">, L<C<preadv()>|"preadv">, L<C<pwritev()>|"pwritev">,
+L<C<preadv2()>|"preadv2">, L<C<pwritev2()>|"pwritev2">,
+L<C<getpriority()>|"getpriority">,
 L<C<nice()>|"nice">. L<C<openat()>|"openat"> gets a special treatment in this
 regard, see below.
 
@@ -71,6 +72,30 @@ by your system.
 
 Note that the library functions use signed integers, so C<abs(~0)> is 1.
 If you don't want that, use C<CORE::abs()>.
+
+=item C<accept4>
+
+ conn = accept4(sock, flags);
+
+C<accept4()> is similar to L<C<accept>|perlfunc/accept> except for the
+following differences.
+
+I<sock> is a numeric file descriptor or a Perl file handle referring to a
+listening socket.
+
+I<flags> is the bitwise OR of zero or more of C<SOCK_CLOEXEC>,
+C<SOCK_CLOFORK>, C<SOCK_NONBLOCK>. Your system might support a different set
+of flags.
+
+C<accept4()> returns a numeric file descriptor (which may be 0) or a Perl file
+handle for the accepted socket. The type of the return value is the same as
+that of the I<sock> argument.
+
+On error, undef is returned.
+
+C<accept4()> was standardized with POSIX.1-2024.
+
+I<New in version 0.29.>
 
 =item C<access>
 
@@ -375,7 +400,7 @@ I<div>.
 
 =item C<dlopen>
 
- dlhandle = dlopen(file, mode);
+ dlhandle = dlopen(filename, flags);
 
 =item C<dlsym>
 
@@ -388,6 +413,28 @@ I<div>.
 =item C<endutxent>
 
  endutxent();
+
+=item C<dup3>
+
+ newfd = dup3(oldfd, newfd, flags);
+
+C<dup3()> is similar to L<C<POSIX::dup2()>|POSIX/dup2> except for the
+following differences.
+
+I<oldfd> and I<newfd> may be numeric file descriptors or Perl file handles. If
+I<oldfd> equals I<newfd>, then C<dup3()> fails with the error C<EINVAL>.
+
+The I<flags> parameter forces the file descriptor flags of I<newfd> to be the
+bitwise OR of zero or more of C<O_CLOEXEC>, C<O_CLOFORK>. Your system might
+support a different set of flags.
+
+C<dup3()> returns the new numeric file descriptor (which may be 0).
+
+On error, undef is returned.
+
+C<dup3()> was standardized with POSIX.1-2024.
+
+I<New in version 0.29.>
 
 =item C<erand48>
 
@@ -665,7 +712,9 @@ C<AT_NO_AUTOMOUNT>. Your system might support a different set of flags.
 See L<C<stat()>|"stat"> for notes on the return values and bugs in
 C<CORE::stat()>.
 
-Returns the empty list on error.
+In list context, it returns the above list on success or the empty list on
+error. In scalar context, it returns a (non-undef) boolean value indicating
+success or failure.
 
 =item C<fsync>
 
@@ -704,12 +753,14 @@ even on systems that believe C<EIO> is right.
 
 If your system does not provide C<getentropy()>, it is emulated via
 C<getrandom()>, C<arc4random_buf()>, C<BCryptGenRandom()> (Windows), C<RDRAND>
-(Intel/AMD), or C<RNDR> (ARM64) if available (picked in this order at build
-time).
+(Intel/AMD), C<RNDR> (ARM64), or C<DARN> (Power9) if available (picked in this
+order at build time).
 
 C<getentropy()> was standardized with POSIX.1-2024.
 
 I<New in version 0.27.>
+
+I<Changed in version 0.29:> Added DARN as a fallback on Power9.
 
 =item C<geteuid>
 
@@ -1068,7 +1119,9 @@ C<path> is assumed to be a string (or will be converted to a string).
 See L<C<stat()>|"stat"> for notes on the return values and bugs in
 C<CORE::stat()>.
 
-Returns the empty list on error.
+In list context, it returns the above list on success or the empty list on
+error. In scalar context, it returns a (non-undef) boolean value indicating
+success or failure.
 
 =item C<mkdir>
 
@@ -1217,6 +1270,30 @@ I<New in version 0.22.>
 =item C<pause>
 
  rv = pause();
+
+=item C<pipe2>
+
+ (read_fd, write_fd) = pipe2(flags);
+
+ (read_fh, write_fh) = pipe2(\flags);
+
+C<pipe2()> is similar to L<C<POSIX::pipe()>|POSIX/pipe> except for the
+following differences.
+
+I<flags> is the bitwise OR of zero or more of C<O_CLOEXEC>, C<O_CLOFORK>,
+C<O_NONBLOCK>. Your system might support a different set of flags.
+
+If I<flags> is an ordinary scalar, then two numeric file descriptors are
+returned. If I<flags> is a reference to a scalar, then two Perl file handles
+are returned.
+
+If I<flags> is 0 then C<pipe2()> is the same as C<pipe()>.
+
+On error, the empty list is returned.
+
+C<pipe2()> was standardized with POSIX.1-2024.
+
+I<New in version 0.29.>
 
 =item C<poll>
 
@@ -1757,7 +1834,9 @@ is unsigned.
 C<POSIX::2008::stat()> doesn't mimic these bugs and uses the correct data types
 for all values.
 
-Returns the empty list on error.
+In list context, it returns the above list on success or the empty list on
+error. In scalar context, it returns a (non-undef) boolean value indicating
+success or failure.
 
 =item C<statvfs>
 
@@ -1774,7 +1853,9 @@ I<f_fsid>.
 Only the ST_NOSUID and ST_RDONLY flags of the I<f_flag> field are specified
 in POSIX but this module provides additional ST_ flags if available.
 
-Returns the empty list on error.
+In list context, it returns the above list on success or the empty list on
+error. In scalar context, it returns a (non-undef) boolean value indicating
+success or failure.
 
 I<New in version 0.25.>
 
@@ -2082,11 +2163,11 @@ C<UT_UNKNOWN>
 
 C<CLOCK_BOOTTIME> C<CLOCK_BOOTTIME_ALARM> C<CLOCK_HIGHRES> C<CLOCK_MONOTONIC>
 C<CLOCK_MONOTONIC_COARSE> C<CLOCK_MONOTONIC_FAST> C<CLOCK_MONOTONIC_PRECISE>
-C<CLOCK_MONOTONIC_RAW> C<CLOCK_PROCESS_CPUTIME_ID> C<CLOCK_REALTIME>
-C<CLOCK_REALTIME_ALARM> C<CLOCK_REALTIME_COARSE> C<CLOCK_REALTIME_FAST>
-C<CLOCK_REALTIME_PRECISE> C<CLOCK_SOFTTIME> C<CLOCK_TAI>
-C<CLOCK_THREAD_CPUTIME_ID> C<CLOCK_UPTIME> C<CLOCK_UPTIME_FAST>
-C<CLOCK_UPTIME_PRECISE>
+C<CLOCK_MONOTONIC_RAW> C<CLOCK_PROCESS_CPUTIME_ID> C<CLOCK_PROF>
+C<CLOCK_REALTIME> C<CLOCK_REALTIME_ALARM> C<CLOCK_REALTIME_COARSE>
+C<CLOCK_REALTIME_FAST> C<CLOCK_REALTIME_PRECISE> C<CLOCK_SECOND>
+C<CLOCK_SOFTTIME> C<CLOCK_TAI> C<CLOCK_THREAD_CPUTIME_ID> C<CLOCK_UPTIME>
+C<CLOCK_UPTIME_FAST> C<CLOCK_UPTIME_PRECISE> C<CLOCK_VIRTUAL>
 
 C<E2BIG> C<EACCES> C<EADDRINUSE> C<EADDRNOTAVAIL> C<EAFNOSUPPORT> C<EAGAIN>
 C<EALREADY> C<EBADF> C<EBADMSG> C<EBUSY> C<ECANCELED> C<ECHILD>
@@ -2128,10 +2209,10 @@ C<MSG_CMSG_CLOEXEC> C<MSG_CMSG_CLOFORK> C<MSG_CTRUNC> C<MSG_DONTROUTE>
 C<MSG_EOR> C<MSG_NOSIGNAL> C<MSG_OOB> C<MSG_PEEK> C<MSG_TRUNC> C<MSG_WAITALL>
 
 C<O_ACCMODE> C<O_APPEND> C<O_ASYNC> C<O_CLOEXEC> C<O_CLOFORK> C<O_CREAT>
-C<O_DIRECT> C<O_DIRECTORY> C<O_DSYNC> C<O_EMPTY_PATH> C<O_EXEC> C<O_EXCL>
+C<O_DIRECT> C<O_DIRECTORY> C<O_DSYNC> C<O_EMPTY_PATH> C<O_EXCL> C<O_EXEC>
 C<O_EXLOCK> C<O_LARGEFILE> C<O_NDELAY> C<O_NOATIME> C<O_NOCTTY> C<O_NOFOLLOW>
-C<O_NONBLOCK> C<O_NOSIGPIPE> C<O_PATH> C<O_RDONLY> C<O_RDWR>
-C<O_RESOLVE_BENEATH> C<O_REGULAR> C<O_RSYNC> C<O_SEARCH> C<O_SHLOCK> C<O_SYNC>
+C<O_NONBLOCK> C<O_NOSIGPIPE> C<O_NOSTDFD> C<O_PATH> C<O_RDONLY> C<O_RDWR>
+C<O_REGULAR> C<O_RESOLVE_BENEATH> C<O_RSYNC> C<O_SEARCH> C<O_SHLOCK> C<O_SYNC>
 C<O_TMPFILE> C<O_TRUNC> C<O_TTY_INIT> C<O_WRONLY> C<FASYNC>
 
 C<POSIX_FADV_NORMAL> C<POSIX_FADV_SEQUENTIAL> C<POSIX_FADV_RANDOM>
@@ -2143,8 +2224,11 @@ C<RENAME_EXCHANGE> C<RENAME_NOREPLACE> C<RENAME_WHITEOUT> C<RESOLVE_BENEATH>
 C<RESOLVE_IN_ROOT> C<RESOLVE_NO_MAGICLINKS> C<RESOLVE_NO_SYMLINKS>
 C<RESOLVE_NO_XDEV> C<RESOLVE_CACHED>
 
-C<RTLD_DEEPBIND> C<RTLD_GLOBAL> C<RTLD_LAZY> C<RTLD_LOCAL> C<RTLD_MEMBER>
-C<RTLD_NOAUTODEFER> C<RTLD_NODELETE> C<RTLD_NOLOAD> C<RTLD_NOW>
+C<RTLD_DEFAULT> C<RTLD_GLOBAL> C<RTLD_LAZY> C<RTLD_LOCAL> C<RTLD_NEXT>
+C<RTLD_NOW>
+
+C<RTLD_DEEPBIND> C<RTLD_MEMBER> C<RTLD_NOAUTODEFER> C<RTLD_NODELETE>
+C<RTLD_NOLOAD>
 
 C<RWF_APPEND> C<RWF_ATOMIC> C<RWF_DONTCACHE> C<RWF_DSYNC> C<RWF_HIPRI>
 C<RWF_NOAPPEND> C<RWF_NOSIGNAL> C<RWF_NOWAIT> C<RWF_SUPPORTED> C<RWF_SYNC>
@@ -2160,8 +2244,8 @@ C<SEEK_SET> C<SEEK_CUR> C<SEEK_END> C<SEEK_DATA> C<SEEK_HOLE>
 
 C<SHUT_RD> C<SHUT_RDWR> C<SHUT_WR>
 
-C<SOCK_DGRAM> C<SOCK_RAW> C<SOCK_SEQPACKET> C<SOCK_STREAM> C<SOCK_NONBLOCK>
-C<SOCK_CLOEXEC> C<SOCK_CLOFORK>
+C<SOCK_DGRAM> C<SOCK_RAW> C<SOCK_SEQPACKET> C<SOCK_STREAM> C<SOCK_NDELAY>
+C<SOCK_NONBLOCK> C<SOCK_CLOEXEC> C<SOCK_CLOFORK>
 
 C<SOL_SOCKET> C<SOMAXCONN>
 
@@ -2174,10 +2258,11 @@ C<TIMER_ABSTIME> C<UTIME_NOW> C<UTIME_OMIT>
 
 C<F_OK> C<R_OK> C<W_OK> C<X_OK>
 
-C<INFTIM> C<POLLERR> C<POLLFREE> C<POLLHUP> C<POLLIN> C<POLLINIGNEOF>
-C<POLLMSG> C<POLLNORM> C<POLLNVAL> C<POLLOUT> C<POLLPRI> C<POLLRDBAND>
-C<POLLRDHUP> C<POLLRDNORM> C<POLLREMOVE> C<POLLSTANDARD> C<POLLWRBAND>
-C<POLLWRNORM> C<POLL_BUSY_LOOP>
+C<POLLERR> C<POLLHUP> C<POLLIN> C<POLLNVAL> C<POLLOUT> C<POLLPRI> C<POLLRDBAND>
+C<POLLRDNORM> C<POLLWRBAND> C<POLLWRNORM>
+
+C<INFTIM> C<POLLFREE> C<POLLINIGNEOF> C<POLLMSG> C<POLLNORM> C<POLLRDHUP>
+C<POLLREMOVE> C<POLLSTANDARD> C<POLL_BUSY_LOOP>
 
 C<ST_NOSUID> C<ST_RDONLY>
 
@@ -2364,6 +2449,10 @@ C<_SC_XOPEN_VERSION> C<_SC_XOPEN_XCU_VERSION> C<_SC_XOPEN_XPG2>
 C<_SC_XOPEN_XPG3> C<_SC_XOPEN_XPG4>
 
 =head1 NOTES
+
+Warnings about C<embedded null character in path> can (but should not) be
+suppressed with C<no warnings 'syscalls';> or, before Perl 5.20.0,
+C<no warnings 'misc';>.
 
 Since version 0.27, math functions use quadmath or long doubles if Perl was
 built with C<-Dusequadmath> or C<-Duselongdouble> respectively and your system

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/PP.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/05/03
+## Modified 2026/09/08
 ## All rights reserved
 ## 
 ## 
@@ -59,7 +59,7 @@ BEGIN
         }
     }
     warnings::register_categories( 'DateTime::Lite' );
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 {
@@ -229,13 +229,67 @@ sub _normalize_leap_seconds
     # $_[1] = days (aliased), $_[2] = secs (aliased)
     # Short-circuit for non-finite values (Inf/-Inf from Infinite objects)
     return unless( defined( $_[2] ) && ( $_[2] - $_[2] ) == 0 );
+
+    my $old_days = $_[1];
+
+    # Step 1: fast constant-time normalisation, ignoring leap seconds.
+    # This handles large $secs values in O(1) via integer division, mirroring what
+    # _normalize_tai_seconds does.
+    # Previously, this method looped one day at a time, which allowed a caller who
+    # controls $secs (for example using $dt->add(seconds => $N) on a non-floating timezone)
+    # to hold a worker process for O(|N|/86400) iterations. This is an
+    # inefficient-algorithmic-complexity issue (CWE-407).
+    use integer;
+    if( $_[2] < 0 )
+    {
+        # For negative values, subtracting 86399 before dividing floors the quotient
+        # toward negative infinity under C-style truncation-toward-zero division.
+        # The same formula is used in _normalize_tai_seconds.
+        my $adj = ( $_[2] - 86399 ) / 86400;
+        $_[1] += $adj;
+        $_[2] -= $adj * 86400;
+    }
+    elsif( $_[2] >= 86400 )
+    {
+        my $adj = $_[2] / 86400;
+        $_[1] += $adj;
+        $_[2] -= $adj * 86400;
+    }
+    no integer;
+
+    # Step 2: correct for leap seconds that occurred in the interval we crossed during
+    # step 1. Each real leap-second day is 86401 seconds long rather than 86400, so the
+    # constant-time normalisation over-counted forward moves (or under-counted backward
+    # moves) by the number of leap seconds in the crossed interval.
+    # _leap_seconds_for() returns the cumulative count in O(1) via a bounded chain of
+    # comparisons over the IANA leap-second table (currently 27 entries covering all
+    # history since 1972).
+    my $new_days = $_[1];
+    if( $new_days > $old_days )
+    {
+        # Forward: crossed days are [old_days, new_days - 1].
+        my $leap_delta = _leap_seconds_for( $new_days - 1 )
+                       - _leap_seconds_for( $old_days - 1 );
+        $_[2] -= $leap_delta;
+    }
+    elsif( $new_days < $old_days )
+    {
+        # Backward: crossed days are [new_days, old_days - 1].
+        my $leap_delta = _leap_seconds_for( $old_days - 1 )
+                       - _leap_seconds_for( $new_days - 1 );
+        $_[2] += $leap_delta;
+    }
+
+    # Step 3: residual normalisation. The leap-second adjustment above may have pushed
+    # $secs slightly out of [0, day_length($days)). This loop is bounded by the total
+    # leap seconds in the crossed interval (at most 27 across all IANA history), and in
+    # practice runs at most a handful of times.
     while( $_[2] < 0 )
     {
         my $dl = _day_length_for( $_[1] - 1 );
         $_[2] += $dl;
         $_[1]--;
     }
-
     my $dl = _day_length_for( $_[1] );
     while( $_[2] > $dl - 1 )
     {
@@ -464,7 +518,7 @@ You should not normally load or call this module directly.
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 SEE ALSO
 

@@ -19,6 +19,13 @@
 #
 #######################################################################
 
+
+2026-09-04  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000835 released
+
+        * Fixed Dependency in Makefile.PL
+
 2026-09-03  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000834 released

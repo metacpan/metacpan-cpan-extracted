@@ -6,14 +6,39 @@
 #define HISTO_TUI_THREAD_H
 
 #if defined(_WIN32)
+    #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN
+    #endif
     #include <windows.h>
+    #include <stdlib.h>
     typedef HANDLE           histo_thread_t;
     typedef CRITICAL_SECTION histo_mutex_t;
 
+    typedef struct {
+        void *(*fn)(void *);
+        void *arg;
+    } histo_win_thread_args_t;
+
+    static inline DWORD WINAPI histo_win_thread_trampoline(LPVOID param) {
+        histo_win_thread_args_t *args = (histo_win_thread_args_t *)param;
+        void *(*fn)(void *) = args->fn;
+        void *arg = args->arg;
+        free(args);
+        fn(arg);
+        return 0;
+    }
+
     static inline int histo_thread_create(histo_thread_t *t, void *(*fn)(void *), void *arg) {
-        *t = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)fn, arg, 0, NULL);
-        return (*t != NULL) ? 0 : -1;
+        histo_win_thread_args_t *args = (histo_win_thread_args_t *)malloc(sizeof(histo_win_thread_args_t));
+        if (!args) return -1;
+        args->fn = fn;
+        args->arg = arg;
+        *t = CreateThread(NULL, 0, histo_win_thread_trampoline, args, 0, NULL);
+        if (!*t) {
+            free(args);
+            return -1;
+        }
+        return 0;
     }
     static inline int histo_thread_join(histo_thread_t t) {
         WaitForSingleObject(t, INFINITE);

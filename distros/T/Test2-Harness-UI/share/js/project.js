@@ -280,7 +280,7 @@ t2hui.project_stats.reload = function(all) {
                                 ul.append(li);
                             });
                         }
-                        if (typeof col === "object") {
+                        else if (typeof col === "object") {
                             td.text(col.formatted);
                             td.attr('data-order', col.raw);
                         }

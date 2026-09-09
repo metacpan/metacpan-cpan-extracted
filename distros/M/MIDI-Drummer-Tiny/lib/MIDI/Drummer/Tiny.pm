@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.7016';
+our $VERSION = '0.7020';
 
 use 5.024;
 use strictures 2;
@@ -957,8 +957,8 @@ sub metronome7 (
 #pod
 #pod Add a steady quarter-note based 4/4 beat to the score.
 #pod
-#pod If a B<flag> is provided the beat is modified to include alternating
-#pod eighth-note kicks.
+#pod If a B<flag> is provided to include alternating eighth-note kicks in
+#pod the groove.
 #pod
 #pod =cut
 
@@ -1404,7 +1404,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.7016
+version 0.7020
 
 =head1 SYNOPSIS
 
@@ -1702,8 +1702,8 @@ Add a 7/x beat to the score.
 
 Add a steady quarter-note based 4/4 beat to the score.
 
-If a B<flag> is provided the beat is modified to include alternating
-eighth-note kicks.
+If a B<flag> is provided to include alternating eighth-note kicks in
+the groove.
 
 =head2 flam
 

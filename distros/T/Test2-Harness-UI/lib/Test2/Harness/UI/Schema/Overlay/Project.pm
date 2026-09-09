@@ -10,7 +10,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 sub last_covered_run {
     my $self = shift;
@@ -86,7 +86,7 @@ sub durations {
         my @ids = map { $_->[0] } @{$sth->fetchall_arrayref};
 
         if (@ids) {
-            $query .= "AND run_id IN (" . ('?' x scalar @ids) . ")\n";
+            $query .= "AND run_id IN (" . join(',', ('?') x scalar @ids) . ")\n";
             push @vals => (@ids);
         }
     }
@@ -104,7 +104,7 @@ sub durations {
     for my $file (keys %$data) {
         my $set  = delete $data->{$file} or next;
         my $time = median($set);
-        $data->{$file} = median($set);
+        $data->{$file} = $time;
     }
 
     if ($median) {

@@ -1,5 +1,18 @@
 Revision history for Cavil::CLI
 
+0.03   2026-09-08
+        - Repurposed from a code-search / plagiarism client into a legal-review client. "check" now uploads the
+          project's working tree to Cavil, waits for the standard legal review (unpack, index, analyze), and
+          reports its licensing risk; the code-search "baseline" command, local fingerprinting and result cache
+          are gone, along with their Cavil::Matcher, Mojo::SQLite, Text::Glob and Cpanel::JSON::XS dependencies.
+        - The uploaded archive is the working tree as it sits on disk, including installed vendored dependencies
+          (node_modules and the like) that .gitignore usually hides but a full legal review must cover; only .git
+          and explicit excludes are dropped. Use --respect-gitignore for the leaner case, --exclude-path or a
+          .cavilignore file to drop more.
+        - The CI gate is the report's licensing risk: --fail-on-risk defaults to the instance's acceptable risk
+          plus one, so a project the instance would accept passes without any per-project configuration. --sbom
+          and --notice download the SPDX SBOM and NOTICE attribution file.
+
 0.02   2026-08-31
         - Removed --token, and --url is now accepted only by "config". A token passed as an argument is
           world-readable in ps output and stays in shell history, and once the token can only come from the

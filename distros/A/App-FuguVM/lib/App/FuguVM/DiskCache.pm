@@ -28,26 +28,31 @@ use v5.36;
 # media that produced it. Neither is a cache of the other.
 
 package App::FuguVM::DiskCache;
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
 use Digest::SHA ();
+use Fcntl       qw(:flock);
 use File::Path  qw(remove_tree);
 use Fugu::File;
 use Fugu::Log;
 use Fugu::Proxy;
+use Fugu::Timeout;
 use App::FuguVM::Console;
-use App::FuguVM::Miniroot;
+use App::FuguVM::Disk;
 
 use constant {
-	BASE_NAME         => 'base.qcow2',
-	META_NAME         => 'meta.json',
-	INSTALLED_DIR     => 'installed',
-	SNAPSHOT_DIR      => 'snapshots',
-	TEMP_PREFIX       => '.tmp.',
-	GENERATION_FILE   => 'cache-generation',
-	INSTALL_SCRIPT    => 'install.exp',
-	KEY_HASH_LENGTH   => 8,
-	MAX_SNAPSHOT_NAME => 128,
+	BASE_NAME          => 'base.qcow2',
+	META_NAME          => 'meta.json',
+	INSTALLED_DIR      => 'installed',
+	SNAPSHOT_DIR       => 'snapshots',
+	TEMP_PREFIX        => '.tmp.',
+	LOCK_PREFIX        => '.lock.',
+	LOCK_TIMEOUT       => 3600,
+	GENERATION_FILE    => 'cache-generation',
+	INSTALL_SCRIPT     => 'install.exp',
+	AUTOINSTALL_SCRIPT => 'autoinstall.exp',
+	KEY_HASH_LENGTH    => 8,
+	MAX_SNAPSHOT_NAME  => 128,
 };
 
 sub new ( $class, $cache_dir )
@@ -83,51 +88,96 @@ sub base_path ( $self, $key )
 
 # $self->key($vm_config):
 #	Derive the cache key for a VM configuration:
-#	<version>-<arch>-<hash8>. The hash covers everything that
-#	shapes an installed disk: the OpenBSD version, the
-#	architecture, the disk size, the installer script, and the
-#	generation counter. It covers nothing else. Thus memory and
-#	port changes keep hitting the same entry. Return undef when an
-#	input cannot be read. Then the caller has no key and thus no
-#	caching.
+#	<version>-<arch>-<hash8>. The hash covers each input that
+#	shapes an installed disk, and it covers nothing else. Thus
+#	memory and port changes keep hitting the same entry. The
+#	record follows the install mode, because each mode shapes the
+#	disk with different inputs:
+#
+#	expect       version, arch, disk_size, the digest of
+#	             install.exp, the digest of the generation file
+#	autoinstall  version, arch, disk_size, the digest of
+#	             autoinstall.exp, the digest of the response file,
+#	             the digest of the generation file
+#	import       version, arch, the digest of the generation file
+#
+#	An import runs no script, and its overlay inherits the virtual
+#	size of the base. Thus the import record holds no script digest
+#	and no disk_size, and an imported entry survives a change to a
+#	shipped expect script. Return undef when an input cannot be
+#	read. Then the caller has no key and thus no caching.
 sub key ( $self, $vm_config )
 {
-	my $version   = _sanitize( $vm_config->{version} // '' );
-	my $arch      = _sanitize(App::FuguVM::Miniroot::ARCH);
-	my $disk_size = $vm_config->{disk_size} // '';
-
-	my $script = $self->_install_script;
-	if ( !defined $script ) {
-		warn "Cannot locate " . INSTALL_SCRIPT . " for cache key\n";
+	if ( !defined $vm_config->{arch} ) {
+		warn "Cannot derive a cache key without an architecture\n";
 		return;
 	}
 
-	my $installer = Fugu::File->read($script);
-	return if !defined $installer;
+	my $version = _sanitize( $vm_config->{version} // '' );
+	my $arch    = _sanitize( $vm_config->{arch} );
+	my $mode    = $vm_config->{install_mode} // 'expect';
 
-	my $generation_file = $self->_generation_file;
-	if ( !defined $generation_file ) {
-		warn "Cannot locate " . GENERATION_FILE . " for cache key\n";
-		return;
+	my @inputs = ( "version=$version", "arch=$arch" );
+
+	push @inputs, 'disk_size=' . ( $vm_config->{disk_size} // '' )
+	    if $mode ne 'import';
+	push @inputs, "install_mode=$mode";
+
+	# The verify switch shapes an installed disk: the installer of
+	# the expect mode reads it, and every install boots a miniroot
+	# that the host fetched under it. An import runs no install, so
+	# the switch does not shape an imported entry.
+	push @inputs, 'verify=' . ( ( $vm_config->{verify} // 1 ) ? 1 : 0 )
+	    if $mode ne 'import';
+
+	if ( $mode ne 'import' ) {
+		my $script =
+		    $mode eq 'autoinstall'
+		    ? AUTOINSTALL_SCRIPT
+		    : INSTALL_SCRIPT;
+		my $digest =
+		    $self->_file_digest( $self->_driver_script($script),
+			$script );
+		return if !defined $digest;
+		push @inputs, "install=$digest";
 	}
 
-	my $generation = Fugu::File->read($generation_file);
+	if ( $mode eq 'autoinstall' ) {
+		my $digest = $self->_file_digest(
+			$vm_config->{autoinstall},
+			'the autoinstall response file'
+		);
+		return if !defined $digest;
+		push @inputs, "response=$digest";
+	}
+
+	my $generation =
+	    $self->_file_digest( $self->_generation_file, GENERATION_FILE );
 	return if !defined $generation;
-
-	# Hash the file contents separately. Thus the joined record
-	# stays free of newlines, and an input value cannot forge the
-	# delimiter.
-	my @inputs = (
-		"version=$version",
-		"arch=$arch",
-		"disk_size=$disk_size",
-		'install=' . Digest::SHA::sha256_hex($installer),
-		'generation=' . Digest::SHA::sha256_hex($generation),
-	);
+	push @inputs, "generation=$generation";
 
 	my $hash = Digest::SHA::sha256_hex( join( "\n", @inputs ) );
 
 	return "$version-$arch-" . substr( $hash, 0, KEY_HASH_LENGTH );
+}
+
+# $self->_file_digest($path, $what):
+#	Hash the content of one key input. The record holds the digest
+#	and not the content. Thus the joined record stays free of
+#	newlines, and an input value cannot forge the delimiter. Return
+#	undef, with a warning that names $what, when the file cannot be
+#	read.
+sub _file_digest ( $, $path, $what )
+{
+	if ( !defined $path ) {
+		warn "Cannot locate $what for cache key\n";
+		return;
+	}
+
+	my $content = Fugu::File->read($path);
+	return if !defined $content;
+
+	return Digest::SHA::sha256_hex($content);
 }
 
 # $self->lookup($key):
@@ -188,7 +238,8 @@ sub store ( $self, $key, $disk_path, $meta = {} )
 		$target,
 		sub ($tmp) {
 			my $base = "$tmp/" . BASE_NAME;
-			return 0 if !_convert( $disk_path, $base );
+			return 0
+			    if !App::FuguVM::Disk->convert( $disk_path, $base );
 
 			chmod 0400, $base or do {
 				Fugu::Log->default->warning(
@@ -211,6 +262,41 @@ sub store ( $self, $key, $disk_path, $meta = {} )
 	return if !defined $built;
 
 	return "$target/" . BASE_NAME;
+}
+
+# $self->lock_entry($key, $timeout):
+#	Return an open, exclusively locked handle on the lock file of
+#	$key. The caller holds the lock until the handle closes or the
+#	process exits, so a stale lock file blocks nothing. Return
+#	undef when the deadline elapses, and undef when the file cannot
+#	open.
+#
+#	The lock serializes the first population of one entry across
+#	every project that shares the cache directory. It does not
+#	replace the write-once rule of store: a run that lost the lock
+#	to the deadline still cannot publish a second entry.
+#
+#	The file name starts with a dot, so it cannot collide with an
+#	entry. list reads only a directory whose name has no leading
+#	dot. sweep_temp removes only a '.tmp.' directory.
+sub lock_entry ( $self, $key, $timeout = LOCK_TIMEOUT )
+{
+	return if !defined $key;
+
+	Fugu::File->ensure_dir( $self->installed_dir ) or return;
+
+	my $path = $self->installed_dir . '/' . LOCK_PREFIX . $key;
+	open my $fh, '>>', $path or do {
+		Fugu::Log->default->warning( 'Cannot open %s: %s', $path, $! );
+		return;
+	};
+
+	my $locked =
+	    Fugu::Timeout::bounded( $timeout, sub { flock $fh, LOCK_EX } );
+	return $fh if $locked;
+
+	close $fh;
+	return;
 }
 
 # $self->list:
@@ -332,7 +418,10 @@ sub snapshot_store ( $self, $key, $name, $disk_path, $meta = {} )
 
 	unlink $tmp_disk;
 
-	if ( !_convert( $disk_path, $tmp_disk, $entry->{base} ) ) {
+	if (
+		!App::FuguVM::Disk->convert(
+			$disk_path, $tmp_disk, backing => $entry->{base} ) )
+	{
 		unlink $tmp_disk;
 		return;
 	}
@@ -473,6 +562,12 @@ sub _snapshot_names ( $self, $key )
 sub remove ( $self, $key )
 {
 	my $dir = $self->entry_dir($key);
+
+	# The lock file of the entry goes too, so removed keys leave no
+	# lock files behind. A holder keeps its flock on the unlinked
+	# file until it exits.
+	unlink $self->installed_dir . '/' . LOCK_PREFIX . $key;
+
 	return 1 if !-d $dir;
 
 	remove_tree( $dir, { safe => 0 } );
@@ -493,32 +588,13 @@ sub sweep_temp ($self)
 	return Fugu::File->sweep_temp( $self->installed_dir );
 }
 
-# _convert($source, $target, $backing):
-#	Compact $source into a fresh qcow2 at $target. When $backing is
-#	given, keep it as the parent. Then the target stores only the
-#	difference.
-sub _convert ( $source, $target, $backing = undef )
+# $self->_driver_script($name):
+#	Return the shipped expect script whose bytes go into the cache
+#	key. The path resolves through App::FuguVM::Console. Thus it is
+#	always the same file that the console methods would execute.
+sub _driver_script ( $, $name )
 {
-	my @cmd = ( 'qemu-img', 'convert', '-O', 'qcow2' );
-	push @cmd, '-B', $backing, '-F', 'qcow2' if defined $backing;
-	push @cmd, $source, $target;
-
-	my $result = system(@cmd);
-	if ( $result != 0 ) {
-		warn "qemu-img convert failed for $source\n";
-		return 0;
-	}
-
-	return 1;
-}
-
-# $self->_install_script:
-#	Return the installer script whose bytes go into the cache key.
-#	The path resolves through App::FuguVM::Console. Thus it is always the
-#	same file that run_install would execute.
-sub _install_script ($)
-{
-	return App::FuguVM::Console->script_path(INSTALL_SCRIPT);
+	return App::FuguVM::Console->script_path($name);
 }
 
 # $self->_generation_file:

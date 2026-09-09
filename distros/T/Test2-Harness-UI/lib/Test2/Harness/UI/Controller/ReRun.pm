@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::ReRun;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Test2::Harness::UI::Response qw/resp error/;
 use Test2::Harness::Util::JSON qw/encode_json encode_pretty_json decode_json/;
@@ -30,7 +30,7 @@ sub handle {
         $run_id = uuid_inflate($run_id) or die error(404 => "Invalid run id");
     }
 
-    error(404 => 'No source') unless $run_id || ($project_name && $username);
+    die error(404 => 'No source') unless $run_id || ($project_name && $username);
     my $schema = $self->{+CONFIG}->schema;
 
     my $query = {};

@@ -1,5 +1,5 @@
 {
-   "abstract" : "a signature-grade XML parser, and a full XML processor behind one option",
+   "abstract" : "an XML parser",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -29,12 +29,12 @@
          "requires" : {
             "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0",
-            "File::Raw" : "0.17"
+            "File::Raw" : "0.18"
          }
       },
       "runtime" : {
          "requires" : {
-            "File::Raw" : "0.17",
+            "File::Raw" : "0.18",
             "perl" : "5.010000"
          }
       },
@@ -49,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

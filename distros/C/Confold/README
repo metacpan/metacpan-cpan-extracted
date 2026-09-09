@@ -1,0 +1,56 @@
+Confold
+
+The `<:` prefix operator, which marks an expression as a compile-time constant.
+
+    use Confold;
+
+    my $x = <: 42;         # folded at compile time
+    my $y = <: "hello";    # folded at compile time
+    my $z = <: $variable;  # runtime: creates immutable copy
+
+When the operand is a literal, the operator is folded away entirely and leaves
+a plain constant behind, with no runtime overhead at all. When it is not, a
+runtime path produces an immutable copy of the value.
+
+The operator says something to the compiler that a function call cannot. Once
+an expression is wrapped in an `entersub`, every call checker and optimisation
+pass downstream has lost sight of what it contains; `<:` is visible earlier, so
+a value marked with it can still be recognised as simple.
+
+The immutable copy is the same promise enforced at run time. Perl aliases `@_`
+to the caller's variables, so an ordinary argument can be modified by the sub
+it is passed to. An argument marked with `<:` cannot.
+
+`<:` binds as tightly as `\` and unary minus, so it takes the smallest term to
+its right: `<: $a + $b` means `(<: $a) + $b`. It is lexically scoped, and it is
+recognised while tokenising code only, so quoted text, here-documents and
+regular expressions are never affected.
+
+
+REQUIREMENTS
+
+Requires perl 5.38 or newer, for the core PL_infix_plugin hook the operator is
+built on. The operator is the module's only purpose, so it does not install on
+older perls. No other dependencies.
+
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+    perldoc Confold
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

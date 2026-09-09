@@ -14,7 +14,7 @@
  * SV * are owned by the caller (REFCNT 1, not mortal).
  */
 
-#define JWS_ABI_VERSION 2
+#define JWS_ABI_VERSION 3
 
 typedef struct jws_abi {
   int version;
@@ -55,6 +55,18 @@ typedef struct jws_abi {
                     const unsigned char *in, STRLEN len);
   SV  *(*hmac_sha512)(pTHX_ const unsigned char *key, STRLEN keylen,
                       const unsigned char *in, STRLEN len);
+
+  /* ---- version 3 --------------------------------------------------------
+   * A public key from a DER-encoded X.509 certificate; NULL on failure.
+   * XML-DSig carries <ds:X509Certificate> as base64 of these bytes, which
+   * key_from_pem cannot read: it wants a PUBLIC KEY block. The key comes
+   * back public, and the certificate is not validated - no chain, no
+   * dates, no signature - because the caller pins the certificate and owns
+   * that decision. Free it with key_free like any other. Check
+   * `version >= 3` before using this; never check equality, which turns
+   * every later append into a breaking change for consumers already
+   * shipped. */
+  void *(*key_from_x509_der)(pTHX_ const unsigned char *der, STRLEN len);
 } jws_abi;
 
 #endif

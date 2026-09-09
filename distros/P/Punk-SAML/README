@@ -1,0 +1,57 @@
+Punk-SAML
+
+SAML 2.0 single sign-on for Punk applications, as a SERVICE PROVIDER: an
+identity provider - Okta, Entra ID, Keycloak, ADFS - signs users into
+your application. It implements the Web Browser SSO profile, with
+HTTP-Redirect outbound and HTTP-POST inbound.
+
+It is not an identity provider, it is not a user directory, and it does
+NOT do single logout: $c->logout is local logout, which ends this
+application's session and leaves the one at the identity provider alone.
+That is what nearly every service provider actually does, and the reasons
+are in the plugin's documentation under "what is not supported".
+
+It requires https. The identity provider answers with a cross-site POST,
+the cookie that carries the login state must therefore be SameSite=None,
+and browsers drop such a cookie unless it is also Secure. The plugin
+refuses to boot over plain http rather than failing at every login with
+nothing in the log.
+
+WHAT IS CHECKED
+
+The signature, the issuer, the audience, the destination, the recipient,
+the validity window, the subject confirmation, the InResponseTo, and
+replay. Each refusal has a code, the codes are listed in
+Punk::SAML::Error, and the plugin's documentation gives them in the order
+they are checked - which is the section to paste into a security
+questionnaire.
+
+Signature wrapping is prevented by one rule applied without exception:
+the element whose child the signature is, is the element the signature
+covers, is the element the identity is read from.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Requires Punk, File::Raw::XML, Crypt::JWS and Fetch.
+
+DOCUMENTATION
+
+    perldoc Punk::Plugin::SAML
+
+COMMANDS
+
+    punk saml key                 a secret for the flow cookie
+    punk saml metadata            this application's SP metadata
+    punk saml idp <file-or-url>   what this plugin reads from metadata
+    punk saml verify <file>       run the checks over a saved Response
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under the Artistic License 2.0.

@@ -82,7 +82,7 @@ sub get_vendor_dir {
     return $origins;
 }
 
-=item $fields = get_vendor_info([$name])
+=item $ctrl = get_vendor_info([$name])
 
 Returns a L<Dpkg::Control> object with the information parsed from the
 corresponding vendor file in $Dpkg::CONFDIR/origins/. If $name is omitted,
@@ -92,6 +92,7 @@ if there's no file for the given vendor.
 
 =cut
 
+my $vendor_ok_regex = qw{[A-Za-z0-9]+};
 my $vendor_sep_regex = qr{[^A-Za-z0-9]+};
 
 sub get_vendor_info {
@@ -174,7 +175,7 @@ sub get_vendor_object {
     state %OBJECT_CACHE;
     return $OBJECT_CACHE{$vendor_key} if exists $OBJECT_CACHE{$vendor_key};
 
-    my @vendor_parts = split m{$vendor_sep_regex}, $vendor;
+    my @vendor_parts = $vendor =~ m{$vendor_ok_regex}g;
 
     my @names;
     push @names, join q{}, map { ucfirst } @vendor_parts;

@@ -139,6 +139,7 @@ include/punk/punk_ws.h
 include/punk/punk_wsconn.h
 include/punk/punk_wshandshake.h
 include/punk/punk_wsroom.h
+include/punk/punk_xml.h
 lib/Punk.pm
 lib/Punk/App.pm
 lib/Punk/Auth.pm
@@ -270,6 +271,7 @@ t/0220-cookie.t
 t/0221-cookie-signed.t
 t/0230-max-body.t
 t/0240-body-stream.t
+t/0250-xml.t
 t/0300-views.t
 t/0301-stencil-abi.t
 t/0302-render-layout.t
@@ -314,6 +316,7 @@ t/0741-validate-route.t
 t/0800-cache-memory.t
 t/0801-cache-file.t
 t/0802-cache-custom.t
+t/0803-cache-lock.t
 t/0810-cache-invalidate.t
 t/0811-cache-tier.t
 t/0820-conform-memory.t
@@ -375,6 +378,7 @@ t/1312-serve.t
 t/1320-test-client.t
 t/1321-test-client-stream.t
 t/1322-test-client-upload.t
+t/1323-test-client-xml.t
 t/1330-dev-error.t
 t/1340-myapp.t
 t/lib/Kinds/Controller/Thing.pm

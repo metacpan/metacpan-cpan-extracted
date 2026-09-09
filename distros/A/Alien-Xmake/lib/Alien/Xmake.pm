@@ -3,7 +3,7 @@ use experimental 'class';
 use builtin 'is_bool';
 no warnings 'experimental::builtin';
 #
-class Alien::Xmake v1.0.0 {
+class Alien::Xmake v1.0.1 {
     use File::Spec;
     use File::Basename qw[dirname];
     use File::Temp     qw[tempdir];
@@ -631,6 +631,10 @@ class Alien::Xmake v1.0.0 {
         ( '0.0.0', () );
     }
 
+    method _scrub_env () {
+        delete @ENV{qw[XMAKE_PROGRAM_DIR XMAKE_PROGRAM_FILE XMAKE_ROOTDIR]} if $self->install_type eq 'share';
+    }
+
     # Resolve absolute path without quotes
     method _resolve_path () {
         my $bin = $config->{bin};
@@ -638,6 +642,7 @@ class Alien::Xmake v1.0.0 {
         # If ConfigData failed or we are in a fallback state:
         $bin = File::Spec->catfile( $dir, 'xmake' . ( $windows ? '.exe' : '' ) ) if !$bin && $dir;
         $bin //= 'xmake';
+        $self->_scrub_env;
 
         # Ensure we return a stringified absolute path safe for system()
         File::Spec->rel2abs($bin);

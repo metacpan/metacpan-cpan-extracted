@@ -8,7 +8,7 @@ use Data::Record::Serialize;
 use Test::Lib;
 
 
-subtest "illegal types" => sub {
+subtest 'illegal types' => sub {
 
     my $err;
 
@@ -28,7 +28,7 @@ subtest "illegal types" => sub {
 };
 
 
-subtest "types from first record" => sub {
+subtest 'types from first record' => sub {
     my $s;
 
     ok(
@@ -62,7 +62,7 @@ subtest "types from first record" => sub {
 
 };
 
-subtest "allow type fields to differ from fields" => sub {
+subtest 'allow type fields to differ from fields' => sub {
 
     my $s;
 
@@ -91,7 +91,7 @@ subtest "allow type fields to differ from fields" => sub {
 };
 
 
-subtest "type lists follow output fields if numify/stringify/nullify is boolean" => sub {
+subtest 'type lists follow output fields if numify/stringify/nullify is boolean' => sub {
 
     subtest 'default type' => sub {
 
@@ -183,7 +183,7 @@ subtest "type lists follow output fields if numify/stringify/nullify is boolean"
 };
 
 
-subtest "fold I type into N" => sub {
+subtest 'fold I type into N' => sub {
 
     my $s;
 
@@ -214,7 +214,7 @@ subtest "fold I type into N" => sub {
     );
 };
 
-subtest "encoder mapped types " => sub {
+subtest 'encoder mapped types ' => sub {
 
     my $s;
 
@@ -253,7 +253,7 @@ subtest "encoder mapped types " => sub {
     );
 };
 
-subtest "encoder mapped types, auto map I => N " => sub {
+subtest 'encoder mapped types, auto map I => N ' => sub {
 
     my $s;
 

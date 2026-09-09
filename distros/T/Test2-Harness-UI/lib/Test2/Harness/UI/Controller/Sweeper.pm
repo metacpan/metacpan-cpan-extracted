@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Sweeper;
 use strict;
 use warnings;
 
-our $VERSION = '0.000145';
+our $VERSION = '0.000147';
 
 use Test2::Harness::UI::Sweeper;
 use Test2::Harness::UI::Response qw/resp error/;
@@ -20,6 +20,7 @@ sub handle {
     my $req = $self->{+REQUEST};
     my $res = resp(200);
 
+    die error(401 => 'Login required') unless $req->user;
     die error(404 => 'Missing route') unless $route;
     my $count = $route->{count} or die error(404 => 'No count');
     my $units = $route->{units} or die error(404 => 'No units');
@@ -33,10 +34,11 @@ sub handle {
 
     my $purged = $sweeper->sweep;
 
-    my $ct ||= lc($req->headers->{'content-type'} || $req->parameters->{'Content-Type'} || $req->parameters->{'content-type'} || 'text/html; charset=utf-8');
-    $res->content_type($ct);
+    my $ct = lc($req->parameters->{'content-type'} || $req->parameters->{'Content-Type'} || '');
+    my $wants_json = $ct eq 'application/json';
+    $res->content_type($wants_json ? 'application/json' : 'text/html; charset=utf-8');
 
-    if ($ct eq 'application/json') {
+    if ($wants_json) {
         $res->raw_body($purged);
     }
     else {

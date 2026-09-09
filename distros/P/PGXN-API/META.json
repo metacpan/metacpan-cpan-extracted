@@ -51,7 +51,7 @@
             "Plack::App::File" : "0",
             "Plack::Builder" : "0",
             "Plack::Middleware::JSONP" : "0",
-            "Text::Markup" : "0.40",
+            "Text::Markup" : "0.41",
             "URI::Template" : "0.16",
             "XML::LibXML" : "1.70",
             "namespace::autoclean" : "0.11",
@@ -72,25 +72,25 @@
    "provides" : {
       "PGXN::API" : {
          "file" : "lib/PGXN/API.pm",
-         "version" : "v0.21.1"
+         "version" : "v0.22.1"
       },
       "PGXN::API::Indexer" : {
          "file" : "lib/PGXN/API/Indexer.pm",
-         "version" : "v0.21.1"
+         "version" : "v0.22.1"
       },
       "PGXN::API::Router" : {
          "file" : "lib/PGXN/API/Router.pm",
-         "version" : "v0.21.1"
+         "version" : "v0.22.1"
       },
       "PGXN::API::Sync" : {
          "file" : "lib/PGXN/API/Sync.pm",
-         "version" : "v0.21.1"
+         "version" : "v0.22.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://api.pgxn.org/"
    },
-   "version" : "v0.21.1",
+   "version" : "v0.22.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
