@@ -1,3 +1,37 @@
+1.002000   2026-09-08
+
+  - Require Net::Nostr::Core 1.002000 or later for the September protocol
+    APIs, preventing incompatible mixed-version installations.
+
+  - Group policy review: reject malformed metadata, role labels, and join
+    codes before mutation. Emit ordered relay-signed membership transitions
+    for creators and every accepted membership action, avoiding duplicate IDs
+    and stale membership history during rapid changes.
+
+  - Add opt-in RelayGroups policy with signed NIP-29 group state, moderation,
+    invites, member access, ordered pin lists, and validated subgroup trees.
+    Reparenting updates both sides, parent deletion promotes children to
+    roots, and memberships and admin rights remain independent per group.
+
+  - Require NIP-42 authentication as the event author to publish or read
+    kinds 78 and 30078, following the NIP-78 privacy recommendation. Apply
+    visibility to stored queries, live delivery, COUNT, and negentropy.
+    Public app data on these kinds is no longer served to other users.
+  - Add opt-in eose_hints for NIP-67 completeness and authentication hints,
+    including AUTH ordering, timestamp ties, and NIP-11 advertisement.
+  - Apply authorization before per-filter query limits. Storage backends
+    must return all matches for unlimited queries; COUNT now uses that path.
+
+  - Fix NIP-09 coordinate deletion for addressable events with empty or
+    missing d tags
+  - Fix coordinate deletion for both replaceable and addressable events to
+    remove all stored versions at or before the deletion request timestamp,
+    including timestamp ties, even when newer versions exist. Preserve newer
+    versions, events belonging to other authors, and deletion requests.
+  - Clarify RelayStore::delete_matching documentation for exact coordinate
+    matching, the timestamp cutoff, and counting each deleted event once
+    when references overlap or repeat
+
 1.001001   2026-07-06
 
   - Verify NIP-01 Schnorr signatures over the 32-byte event id instead of

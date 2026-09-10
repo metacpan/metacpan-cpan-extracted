@@ -1,28 +1,21 @@
 /* hm_atomic.h - the atomics probe, and the handful of operations the
  * fork-shared arenas are built from.
  *
- * WHY THIS IS ITS OWN FILE.
+ * Its own file because two shared-memory arenas - the abuse controls in
+ * hm_ratelimit.h and the message bus in hm_bus.h - need the same four
+ * operations over the same builtins. Probed separately they would eventually
+ * disagree, on the one machine nobody develops on.
  *
- * There are two shared-memory arenas now - the abuse controls in
- * hm_ratelimit.h and the message bus in hm_bus.h - and they need the same
- * four operations over the same builtins. Probed separately they would
- * eventually disagree, and the disagreement would surface on the one machine
- * nobody develops on: the FreeBSD 9 smoker, whose base cc is gcc 4.2.1. One
- * probe, one answer, both arenas.
- *
- * THE PROBE IS OF A FEATURE, NOT A COMPILER VERSION.
- *
- * The __atomic builtins are the ones we want, but they only arrived in GCC
- * 4.7: __GNUC__ alone is not the question to ask, and asking it broke the
- * build on FreeBSD 9 ('__ATOMIC_ACQUIRE' undeclared). That compiler does have
- * the older __sync family (GCC 4.1), and __sync says everything needed here:
- * a lock test-and-set IS an acquire, a lock release IS a release, and a full
- * barrier either side of a plain aligned word turns it into the acquire load
- * / release store a slot is published with.
+ * THE PROBE IS OF A FEATURE, NOT A COMPILER VERSION. The __atomic builtins
+ * only arrived in GCC 4.7, so __GNUC__ alone is the wrong question and asking
+ * it broke the FreeBSD 9 build ('__ATOMIC_ACQUIRE' undeclared, base cc gcc
+ * 4.2.1). That compiler has the older __sync family (GCC 4.1), which says
+ * everything needed here: a lock test-and-set IS an acquire, a lock release
+ * IS a release, and a full barrier either side of a plain aligned word turns
+ * it into the acquire load / release store a slot is published with.
  *
  * Only when NEITHER family exists is the whole thing disabled, and every
- * caller is written to fail open in that case. That is a supported
- * configuration, not a broken one.
+ * caller fails open in that case. That is a supported configuration.
  */
 
 #ifndef HM_ATOMIC_H

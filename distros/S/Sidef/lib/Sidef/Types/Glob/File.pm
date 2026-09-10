@@ -95,6 +95,22 @@ sub compare {
       :            Sidef::Types::Number::Number::ZERO;
 }
 
+sub is_newer_than {
+    ref($_[0]) || shift(@_);
+    my ($self, $other) = @_;
+    my $self_mtime  = (CORE::stat("$self"))[9]  // return undef;
+    my $other_mtime = (CORE::stat("$other"))[9] // return undef;
+    ($self_mtime > $other_mtime) ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_older_than {
+    ref($_[0]) || shift(@_);
+    my ($self, $other) = @_;
+    my $self_mtime  = (CORE::stat("$self"))[9]  // return undef;
+    my $other_mtime = (CORE::stat("$other"))[9] // return undef;
+    ($self_mtime < $other_mtime) ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
+}
+
 sub mktemp {
     my ($self, %opts) = @_;
     state $x = require File::Temp;
@@ -192,19 +208,22 @@ sub has_sticky_bit {
 sub modification_time_days_diff {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
-    Sidef::Types::Number::Number->new(-M "$self");
+    my $days = -M "$self";
+    defined($days) ? Sidef::Types::Number::Number->new($days) : undef;
 }
 
 sub access_time_days_diff {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
-    Sidef::Types::Number::Number->new(-A "$self");
+    my $days = -A "$self";
+    defined($days) ? Sidef::Types::Number::Number->new($days) : undef;
 }
 
 sub change_time_days_diff {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
-    Sidef::Types::Number::Number->new(-C "$self");
+    my $days = -C "$self";
+    defined($days) ? Sidef::Types::Number::Number->new($days) : undef;
 }
 
 sub is_executable {
@@ -289,6 +308,22 @@ sub dirname {
 *dir      = \&dirname;
 *dir_name = \&dirname;
 
+sub extension {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $base = "$self";
+    $base =~ s{.*/}{};
+    ($base =~ /\.([^.]+)\z/) ? Sidef::Types::String::String->new($1) : Sidef::Types::String::String->new('');
+}
+
+sub basename_without_ext {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $str = "" . $self->basename;
+    $str =~ s/\.[^.]+\z//;
+    Sidef::Types::String::String->new($str);
+}
+
 sub is_absolute {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
@@ -363,24 +398,32 @@ sub copy {
 
 *cp = \&copy;
 
+sub backup {
+    ref($_[0]) || shift(@_);
+    my ($self, $suffix) = @_;
+    $suffix //= '.bak';
+    my $dest = "$self" . "$suffix";
+    $self->copy($dest);
+}
+
 sub edit {
     ref($_[0]) || shift(@_);
     my ($self, $code) = @_;
 
     my @lines;
-    open(my $fh, '+<:utf8', "$self") || return (Sidef::Types::Bool::Bool::FALSE);
+    CORE::open(my $fh, '+<:utf8', "$self") || return (Sidef::Types::Bool::Bool::FALSE);
     while (defined(my $line = <$fh>)) {
         push @lines, $code->run(Sidef::Types::String::String->new($line));
     }
 
-    truncate($fh, 0) || return undef;
-    seek($fh, 0, 0)  || return undef;
+    CORE::truncate($fh, 0) || return undef;
+    CORE::seek($fh, 0, 0)  || return undef;
 
     do {
         local $, = q{};
         local $\ = q{};
         (print $fh @lines) || return undef;
-        close $fh;
+        CORE::close $fh;
       }
       ? (Sidef::Types::Bool::Bool::TRUE)
       : (Sidef::Types::Bool::Bool::FALSE);
@@ -391,7 +434,8 @@ sub read {
     my ($self, $mode) = @_;
 
     $mode = defined($mode) ? "$mode" : 'utf8';
-    open(my $fh, "<:$mode", "$self") || return undef;
+    $mode =~ s/^://;
+    CORE::open(my $fh, "<:$mode", "$self") || return undef;
 
     local $/;
     Sidef::Types::String::String->new(scalar <$fh>);
@@ -402,11 +446,11 @@ sub write {
     my ($self, $string, $mode) = @_;
 
     $mode = defined($mode) ? "$mode" : 'utf8';
-    open(my $fh, ">:$mode", "$self") || return undef;
+    CORE::open(my $fh, ">:$mode", "$self") || return undef;
 
     (print $fh "$string") || return undef;
 
-    (close $fh)
+    (CORE::close $fh)
       ? (Sidef::Types::Bool::Bool::TRUE)
       : (Sidef::Types::Bool::Bool::FALSE);
 }
@@ -416,13 +460,34 @@ sub append {
     my ($self, $string, $mode) = @_;
 
     $mode = defined($mode) ? "$mode" : 'utf8';
-    open(my $fh, ">>:$mode", "$self") || return undef;
+    CORE::open(my $fh, ">>:$mode", "$self") || return undef;
 
     (print $fh "$string") || return undef;
 
-    (close $fh)
+    (CORE::close $fh)
       ? (Sidef::Types::Bool::Bool::TRUE)
       : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub lines {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    CORE::open(my $fh, '<:utf8', "$self") or return undef;
+    my @lines = map { chomp; Sidef::Types::String::String->new($_) } <$fh>;
+    CORE::close($fh);
+    Sidef::Types::Array::Array->new(\@lines);
+}
+
+sub each_line {
+    ref($_[0]) || shift(@_);
+    my ($self, $block) = @_;
+    CORE::open(my $fh, '<:utf8', "$self") or return Sidef::Types::Bool::Bool::FALSE;
+    while (defined(my $line = <$fh>)) {
+        chomp($line);
+        $block->run(Sidef::Types::String::String->new($line));
+    }
+    CORE::close($fh);
+    Sidef::Types::Bool::Bool::TRUE;
 }
 
 sub open {

@@ -22,7 +22,7 @@ use utf8;
 use open qw(:std :encoding(UTF-8));
 
 package App::PDFLibrarian::QueryDialog::impl;
-$App::PDFLibrarian::QueryDialog::impl::VERSION = '6.3.1';
+$App::PDFLibrarian::QueryDialog::impl::VERSION = '6.3.2';
 use Wx qw(:dialog :statictext :combobox :textctrl :sizer :panel :window :id);
 use Wx::ArtProvider;
 use Wx::Event qw(EVT_BUTTON EVT_TEXT EVT_TEXT_ENTER);

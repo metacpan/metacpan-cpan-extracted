@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.27';
 
 use File::Raw::JSON ();   # JSON encode/decode via its C ABI (ft_json.h / _abi_ptr)
 
@@ -25,11 +25,11 @@ __END__
 
 =head1 NAME
 
-Fetch - HTTP/2 Future-based user agent
+Fetch - HTTP/3, HTTP/2 and HTTP/1.1 Future-based user agent
 
 =head1 VERSION
 
-Version 0.21
+Version 0.27
 
 =head1 SYNOPSIS
 
@@ -58,13 +58,14 @@ Version 0.21
 
 =head1 DESCRIPTION
 
-Fetch is an HTTP user agent whose socket, TLS, HTTP/2 framing and HTTP/1.1
-parsing hot path lives in vendored C, and whose asynchronous results are
+Fetch is an HTTP user agent whose socket, TLS, QUIC, HTTP/3, HTTP/2 framing
+and HTTP/1.1 parsing hot path lives in vendored C, and whose asynchronous results are
 L<Fetch::Future> objects that compose with the Hyperman event loop and other
 CPAN loops (IO::Async, AnyEvent) - or with nothing at all, since Fetch ships
 its own event loop (L<Fetch::Loop::Standalone>) and uses it automatically.
 
-HTTP/1.1 and HTTP/2 (ALPN-negotiated over TLS), over cleartext and TLS, with
+HTTP/1.1, HTTP/2 (ALPN-negotiated over TLS) and HTTP/3 (over QUIC, reached
+through C<Alt-Svc> - see L</HTTP/3>), over cleartext and TLS, with
 keep-alive connection pooling, redirect following, per-request timeouts,
 streaming response bodies, a cookie jar, JSON request/response helpers, and
 native WebSockets. Every request method returns a
@@ -159,6 +160,45 @@ response, so reach for it when you are consuming millions of responses and want
 the leanest possible per-response cost. Default false.
 
 =back
+
+=head1 HTTP/3
+
+Fetch speaks HTTP/3 over QUIC, and reaching it takes no code: an ordinary
+C<< $ua->get >> uses it when the origin has said it can.
+
+    my $ua = Fetch->new;
+    $ua->get('https://example.com/one')->get;   # HTTP/1.1 or HTTP/2
+    $ua->get('https://example.com/two')->get;   # HTTP/3, if the first
+                                                # response advertised it
+
+B<Discovery is C<Alt-Svc>, and that means the first request to an origin is
+never HTTP/3.> There is no way for a client to know QUIC is there until the
+server says so, so the first response is what teaches it; every later request
+to that origin goes over QUIC until the advertisement's C<ma> expires. This is
+how browsers do it and it is not a limitation Fetch invented. The record is
+per B<process>, not per user agent - it describes the origin, not the client -
+and is not kept across processes.
+
+B<The attempt is never a commitment.> If HTTP/3 was not built in, or the UDP
+port is blocked - common enough on real networks that C<Alt-Svc> is advisory
+by design - the request falls back to TCP with nothing lost but the attempt,
+and the advertisement is forgotten so the next request does not pay for it
+again. Nothing is thrown and no code changes.
+
+Concurrent requests to one origin share B<one> QUIC connection, each on its
+own stream, rather than opening a connection apiece.
+
+Only C<h3> is taken from an C<Alt-Svc> header. The drafts (C<h3-29> and
+friends) name wire formats this does not implement, and treating them as
+C<h3> would hand the connection to a server speaking something else.
+
+HTTP/3 needs ngtcp2, C<ngtcp2_crypto_ossl> and nghttp3 at build time, against
+an OpenSSL new enough to hand them its handshake (3.5 or later). Without them
+Fetch builds and behaves exactly as before, minus the upgrade. LibreSSL has no
+ngtcp2 crypto backend at all, so it never has HTTP/3.
+
+There is no way to B<force> HTTP/3 on an origin that has not advertised it,
+and no support yet for discovering it from a DNS C<HTTPS> record.
 
 =head1 REQUEST METHODS
 

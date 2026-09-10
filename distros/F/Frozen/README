@@ -1,0 +1,60 @@
+Frozen
+
+An immutable container that survives a fork.
+
+Perl's preload-then-fork idiom does not do what it appears to. Data loaded
+before a fork is shared with every worker by copy-on-write, but the first
+READ of an SV writes to its reference count, the page is copied, and the
+sharing is gone. Under traffic it lasts about as long as it takes to serve
+the first request.
+
+Measured on Linux with four workers reading 20,000 random keys out of a
+preloaded nested hash: 47 MiB of previously shared pages became private. An
+exists check that never fetches a value still dirtied 18 MiB, because the
+cost is walking the structure rather than copying the string at the end of
+it.
+
+CPython hit the same wall and answered it in 3.7 with gc.freeze(). Perl has
+no answer. Frozen is one: an immutable, position-independent block of bytes
+holding nested data, addressed by offset, read without touching a reference
+count.
+
+This release is the build plumbing and the ABI resolution mechanism. The
+format, the reader and the doors onto it land in the releases that follow.
+
+Requires a C compiler and perl 5.10 or later. No runtime prerequisites.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Frozen
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Frozen
+
+    Search CPAN
+        https://metacpan.org/release/Frozen
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

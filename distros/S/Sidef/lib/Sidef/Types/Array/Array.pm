@@ -1100,8 +1100,10 @@ sub summod {
 
 sub avg_by {
     my ($self, $block) = @_;
-    $self->sum_by($block)->div($self->len);
+    $self->map($block)->avg;
 }
+
+*arithmetic_mean_by = \&avg_by;
 
 sub avg {
     my ($self, $arg) = @_;
@@ -1110,7 +1112,84 @@ sub avg {
         goto &avg_by;
     }
 
-    $self->sum->div($self->len);
+    Sidef::Types::Number::Number::arithmetic_mean(@$self);
+}
+
+*arithmetic_mean = \&avg;
+
+sub geometric_mean_by {
+    my ($self, $block) = @_;
+    $self->map($block)->geometric_mean;
+}
+
+sub geometric_mean {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &geometric_mean_by;
+    }
+
+    Sidef::Types::Number::Number::geometric_mean(@$self);
+}
+
+sub harmonic_mean_by {
+    my ($self, $block) = @_;
+    $self->map($block)->harmonic_mean;
+}
+
+sub harmonic_mean {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &harmonic_mean_by;
+    }
+
+    Sidef::Types::Number::Number::harmonic_mean(@$self);
+}
+
+sub median_by {
+    my ($self, $block) = @_;
+    $self->map($block)->median;
+}
+
+sub median {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &median_by;
+    }
+
+    Sidef::Types::Number::Number::median(@$self);
+}
+
+sub variance_by {
+    my ($self, $block) = @_;
+    $self->map($block)->variance;
+}
+
+sub variance {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &variance_by;
+    }
+
+    Sidef::Types::Number::Number::variance(@$self);
+}
+
+sub stddev_by {
+    my ($self, $block) = @_;
+    $self->map($block)->stddev;
+}
+
+sub stddev {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &stddev_by;
+    }
+
+    Sidef::Types::Number::Number::stddev(@$self);
 }
 
 sub prod_by {
@@ -1519,6 +1598,57 @@ sub slice_after {
     }
 
     bless [map { bless($_) } @new];
+}
+
+sub squeeze {
+    my ($self) = @_;
+
+    my @result;
+
+    foreach my $item (@$self) {
+        if (!@result || $result[-1] ne $item) {
+            CORE::push(@result, $item);
+        }
+    }
+
+    bless \@result;
+}
+
+*squeeze_dup = \&squeeze;
+
+sub squeeze_by {
+    my ($self, $block) = @_;
+
+    my @result;
+
+    foreach my $item (@$self) {
+        if (@result && $block->run($result[-1], $item)) {
+            next;
+        }
+        CORE::push(@result, $item);
+    }
+
+    bless \@result;
+}
+
+sub chunk_while {
+    my ($self, $block) = @_;
+
+    my @chunks;
+    my @current;
+
+    foreach my $item (@$self) {
+        if (@current && !$block->run($current[-1], $item)) {
+            CORE::push(@chunks, bless [CORE::splice(@current)]);
+        }
+        CORE::push(@current, $item);
+    }
+
+    if (@current) {
+        CORE::push(@chunks, bless \@current);
+    }
+
+    bless \@chunks;
 }
 
 sub each_cons {

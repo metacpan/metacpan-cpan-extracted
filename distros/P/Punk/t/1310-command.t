@@ -93,7 +93,7 @@ sub spew  { open my $f, '>', $_[0] or die $!; print $f $_[1]; close $f }
 }
 
 {
-    # Named routes (plan_punk_named_routes/ phase 0): the table is where a
+    # Named routes: the table is where a
     # person goes to find out what a name means, so `punk routes` shows the
     # column and filters on it. The column appears only when something is
     # named - the case above proves the unnamed table is unchanged.

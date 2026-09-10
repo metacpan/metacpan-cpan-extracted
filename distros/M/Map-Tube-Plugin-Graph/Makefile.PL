@@ -199,7 +199,7 @@ WriteMakefile(
                     'Test::CPAN::Meta::JSON' => 0,
                     'Test::CPAN::Meta'       => 0,
                     'Test::Pod'              => 1.22,
-                    'Test::Version'          => 0,
+                    'Path::Tiny'             => 0.146,
                 },
             },
         },

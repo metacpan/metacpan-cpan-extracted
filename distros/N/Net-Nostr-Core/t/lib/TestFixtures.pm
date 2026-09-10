@@ -3,7 +3,17 @@ package TestFixtures;
 use strictures 2;
 use Exporter 'import';
 
-our @EXPORT_OK = qw(%FIATJAF_EVENT @REAL_EVENTS make_event make_key_from_hex);
+our @EXPORT_OK = qw(%FIATJAF_EVENT @REAL_EVENTS make_event make_key_from_hex invalid_filter_cases pod_code);
+
+sub pod_code {
+    my ($path, $heading) = @_;
+    open my $fh, '<', $path or die "open $path: $!";
+    my $source = do { local $/; <$fh> };
+    my ($section) = $source =~ /^=head[12] \Q$heading\E\n(.*?)(?=^=head[12] |\z)/ms;
+    die "missing POD section $heading in $path" unless defined $section;
+    my @code = map { s/^    //; $_ } grep { /^    / || /^$/ } split /\n/, $section;
+    return join "\n", @code;
+}
 
 # A real-world note from fiatjaf
 our %FIATJAF_EVENT = (
@@ -57,6 +67,44 @@ sub make_key_from_hex {
     my $key = bless {}, 'Net::Nostr::Key';
     $key->{_cryptpkecc} = $pk;
     return $key;
+}
+
+sub invalid_filter_cases {
+    my @cases;
+    for my $field ('ids', 'authors', '#e', '#p') {
+        my $hex = 'ab' x 32;
+        for my $bad (
+            ['trailing newline', "$hex\n"],
+            ['leading newline', "\n$hex"],
+            ['trailing CRLF', "$hex\r\n"],
+            ['trailing space', "$hex "],
+            ['embedded newline', ('a' x 32) . "\n" . ('b' x 31)],
+            ['trailing NUL', "$hex\0"],
+            ['non-ASCII hex lookalikes', "\x{FF41}" x 64],
+        ) {
+            push @cases, ["$field: $bad->[0]", { $field => [$bad->[1]] }, qr/64-char lowercase hex/];
+        }
+    }
+    for my $field (qw(kinds since until limit)) {
+        for my $bad (
+            ['trailing newline', "1\n"],
+            ['leading newline', "\n1"],
+            ['trailing CRLF', "1\r\n"],
+            ['trailing space', '1 '],
+            ['embedded newline', "1\n2"],
+            ['trailing NUL', "1\0"],
+            ['Arabic-Indic digit', "\x{0661}"],
+            ['fullwidth digit', "\x{FF11}"],
+            ['mixed ASCII and Unicode digits', "1\x{0661}"],
+        ) {
+            my $value = $field eq 'kinds' ? [$bad->[1]] : $bad->[1];
+            push @cases, ["$field: $bad->[0]", { $field => $value }, qr/valid kind|non-negative integer/];
+        }
+    }
+    for my $name ("#e\n", "#p\n", "#t\n", "#overnet_et\n") {
+        push @cases, ['tag filter name with trailing newline', { $name => ['a' x 64] }, qr/unknown argument/];
+    }
+    return @cases;
 }
 
 1;

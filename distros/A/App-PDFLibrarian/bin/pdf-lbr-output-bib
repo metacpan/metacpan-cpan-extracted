@@ -27,6 +27,7 @@ use Carp;
 use Clipboard;
 use FindBin qw($Script);
 use Getopt::Long qw(:config no_ignore_case);
+use JSON;
 use Pod::Usage;
 
 FindBin::again();
@@ -47,7 +48,7 @@ B<pdf-lbr-output-bib> - Output BibTeX bibliographic metadata from PDF files.
 B<pdf-lbr-output-bib> B<--version>
 B<pdf-lbr-output-bib> B<--help>|B<-h>
 
-B<pdf-lbr-output-bib> [ B<--clipboard>|B<-c> ] [ B<--max-authors>|B<-m> I<count> [ B<--only-first-author>|B<-f> ] ] [ B<--filter>|B<-F> [I<type>B<:>]I<field>[B<?>I<iffield>|B<!>I<ifnotfield>...]B<=>I<spec> ... ] [ B<--no-default-filter>|B<-N> ] [ B<--abbreviate>|B<-a> I<scheme> ... ] [ B<--output-text-format>|B<-o> I<type>=<format> ... | B<--output-text>|B<-O> | B<--pdf-file-comment>|B<-P> ] I<files>|I<directories> ...
+B<pdf-lbr-output-bib> [ B<--clipboard>|B<-c> ] [ B<--max-authors>|B<-m> I<count> [ B<--only-first-author>|B<-f> ] ] [ B<--filter>|B<-F> [I<type>B<:>]I<field>[B<?>I<iffield>|B<!>I<ifnotfield>...]B<=>I<spec> ... ] [ B<--no-default-filter>|B<-N> ] [ B<--abbreviate>|B<-a> I<scheme> ... ] [ B<--output-text-format>|B<-o> I<type>=<format> ... | B<--output-text>|B<-O> | B<--output-json>|B<-J> | B<--pdf-file-comment>|B<-P> ] I<files>|I<directories> ...
 
 ... I<files>|I<directories> ... B<|> B<pdf-lbr-output-bib> ...
 
@@ -131,6 +132,10 @@ Format text surrounded by curly braces is removed if it contains a I<%> from an 
 
 Instead of outputting a BibTeX entry, output plain text, formatting entries with formats given in the configuration file.
 
+=item B<--output-json>|B<-J>
+
+Instead of outputting a BibTeX entry, output a JSON record.
+
 =back
 
 =head1 PART OF
@@ -144,7 +149,7 @@ Copyright (C) 2016--2026 Karl Wette. Licensed under the GNU General Public Licen
 =cut
 
 # handle help options
-my ($version, $help, $clipboard, $max_authors, $only_first_author, %filter, $no_default_filter, @abbreviate_schemes, $pdf_file_comment, %output_text_format, $output_text);
+my ($version, $help, $clipboard, $max_authors, $only_first_author, %filter, $no_default_filter, @abbreviate_schemes, $pdf_file_comment, %output_text_format, $output_text, $output_json);
 $max_authors = 0;
 $pdf_file_comment = 0;
 GetOptions(
@@ -159,6 +164,7 @@ GetOptions(
            "pdf-file-comment|P" => \$pdf_file_comment,
            "output-text-format|o=s" => \%output_text_format,
            "output-text|O" => \$output_text,
+           "output-json|J" => \$output_json,
           ) or croak "$Script: could not parse options";
 if ($version) { print "App::PDFLibrarian version $App::PDFLibrarian::VERSION\n"; exit 1; }
 pod2usage(-verbose => 2, -exitval => 1) if ($help);
@@ -465,6 +471,57 @@ if ($output_text) {
     $bibstring .= "\n$bibstr\n";
 
   }
+
+} elsif ($output_json) {
+
+  # preserve input order of files in output plain text entries
+  my %pdffileorder;
+  my $order = 0;
+  foreach my $pdffile (@pdffiles) {
+    $pdffileorder{$pdffile} = ++$order;
+  }
+
+  # write JSON
+  my @jsonentries;
+  foreach my $bibentry (sort { $pdffileorder{$a->get("file")} <=> $pdffileorder{$b->get("file")} } @bibentries) {
+    my $jsonentry;
+
+    # get entry type
+    $jsonentry->{type} = $bibentry->type;
+
+    # get BibTeX fields
+    my %bibfields;
+    foreach my $bibfield ($bibentry->fieldlist()) {
+
+      # skip some fields
+      next if $bibfield eq "file" or $bibfield eq "checksum";
+
+      if ($bibfield eq "author" or $bibfield eq "editor") {
+
+        # format authors/editors
+        my @names = format_bib_authors("vljf", $max_authors, "et al.", $bibentry->names($bibfield));
+        $jsonentry->{$bibfield} = [ @names ];
+
+      } elsif ($bibfield eq "collaboration") {
+
+        # format collaborations
+        my @names = format_bib_authors("l", $max_authors, "et al.", $bibentry->names($bibfield));
+        $jsonentry->{$bibfield} = [ @names ];
+
+      } else {
+        $jsonentry->{$bibfield} = remove_tex_markup($bibentry->get($bibfield));
+      }
+    }
+
+    # add entry
+    push @jsonentries, $jsonentry;
+
+  }
+
+  # set output string
+  my $json_encoder = JSON->new->pretty;
+  $json_encoder->canonical();
+  $bibstring = $json_encoder->encode(\@jsonentries);
 
 } else {
 

@@ -148,4 +148,31 @@ sub each {
     $self;
 }
 
+sub map {
+    my ($self, $block) = @_;
+    Sidef::Types::Array::Array->new([CORE::map { $block->run($_) } @{$self->entries}]);
+}
+
+sub grep {
+    my ($self, $block) = @_;
+    Sidef::Types::Array::Array->new([CORE::grep { $block->run($_) } @{$self->entries}]);
+}
+
+sub walk {
+    my ($self, $code) = @_;
+    foreach my $entry (@{$self->entries}) {
+        $code->run($entry);
+        if ($entry->is_dir) {
+            my $dh = $entry->open() // next;
+            $dh->walk($code);
+        }
+    }
+    $self;
+}
+
+sub count {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::_set_int(scalar(@{$self->entries}));
+}
+
 1

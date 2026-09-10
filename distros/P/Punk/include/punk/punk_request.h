@@ -247,11 +247,53 @@ static IV pq_read_state(pTHX_ AV *req) {
     return (flag && *flag && SvOK(*flag)) ? SvIV(*flag) : PQ_UNREAD;
 }
 
-/* The raw request body: read CONTENT_LENGTH bytes from psgi.input via
- * PerlIO on first call (then rewind, matching the Perl semantics),
- * cache in the BODY slot. Returns the cached SV (borrowed) - undef SV
- * when there is no body. sv_2io croaks on a non-handle the same way
- * the read builtin would. */
+/* The window a body is read in when its length is not known in advance. */
+#define PQ_STREAM_CHUNK 65536
+
+/* Does the server hold the whole body already?
+ *
+ * This is the one signal that says how much of HTTP the environment is
+ * describing. Transfer-Encoding answers "is there a body" for HTTP/1 only:
+ * HTTP/2 and HTTP/3 forbid the header outright, so a multiplexed request with
+ * a body of undeclared length carries neither it nor CONTENT_LENGTH, and
+ * reading the two headers alone concludes there is no body when there is one.
+ *
+ * psgix.input.buffered is true when psgi.input is a finite thing already in
+ * memory (or spilled to a file) rather than a live socket, which is what makes
+ * reading to EOF safe - and it is set by every server that buffers, on every
+ * protocol version, which is why the decision keys off it first. */
+static int pq_input_buffered(pTHX_ HV *env) {
+    SV **b = env ? hv_fetchs(env, "psgix.input.buffered", 0) : NULL;
+    return (b && *b && SvTRUE(*b)) ? 1 : 0;
+}
+
+/* The route's `max_body` ceiling, as published into the environment by
+ * pd_body_limit. It is there for exactly the requests that check cannot make
+ * up front - a body whose length was never declared - and it becomes the
+ * default ceiling for every read below, so the limit bites on the bytes that
+ * actually arrive rather than on a header nobody sent. 0 when there is none. */
+#define PQ_ENV_MAX_BODY "punk.max_body"
+
+static IV pq_env_ceiling(pTHX_ HV *env) {
+    SV **e = env ? hv_fetchs(env, PQ_ENV_MAX_BODY, 0) : NULL;
+    IV n = (e && *e && SvOK(*e)) ? SvIV(*e) : 0;
+    return n > 0 ? n : 0;
+}
+
+#define PQ_OVER_CEILING(max)                                            \
+    croak("Punk::Request: the request body passed %" IVdf " bytes, "    \
+          "the ceiling this read was given", (IV)(max))
+
+/* The raw request body: read from psgi.input via PerlIO on first call (then
+ * rewind, matching the Perl semantics), cache in the BODY slot. Returns the
+ * cached SV (borrowed) - undef SV when there is no body. sv_2io croaks on a
+ * non-handle the same way the read builtin would.
+ *
+ * How much to read is the same question pq_body_stream answers below, and it
+ * is answered the same way: CONTENT_LENGTH when there is one, otherwise to
+ * EOF if the server says its input is buffered, otherwise nothing at all
+ * because the handle is a live socket and there is no length to stop at.
+ * pq_env_ceiling bounds the undeclared case. */
 static SV *pq_body(pTHX_ AV *req) {
     SV **flag = av_fetch(req, PQ_READ, 0);
     SV **b;
@@ -263,26 +305,38 @@ static SV *pq_body(pTHX_ AV *req) {
         HV *env = punk_req_env(aTHX_ req);
         SV **in = hv_fetchs(env, "psgi.input", 0);
         SV **cl = hv_fetchs(env, "CONTENT_LENGTH", 0);
-        IV len  = (cl && *cl && SvOK(*cl)) ? SvIV(*cl) : 0;
+        IV len  = (cl && *cl && SvOK(*cl)) ? SvIV(*cl) : -1;
+        IV max  = pq_env_ceiling(aTHX_ env);
+        if (len < 0 && !pq_input_buffered(aTHX_ env)) len = 0;
         (void)av_store(req, PQ_READ, newSViv(1));
-        if (in && *in && SvTRUE(*in) && len > 0) {
+        if (in && *in && SvTRUE(*in) && len != 0) {
             IO *io = sv_2io(*in);
             PerlIO *fp = io ? IoIFP(io) : NULL;
             if (fp) {
-                SV *raw = newSV(len + 1);
-                char *d;
+                /* into the slot before the first read: the ceiling croaks
+                 * from inside the loop, and the request must still own what
+                 * has been read by then rather than leak it */
+                SV *raw = newSV((len > 0 ? (STRLEN)len : PQ_STREAM_CHUNK) + 1);
                 IV got = 0;
                 SvPOK_on(raw);
-                d = SvPVX(raw);
-                while (got < len) {
-                    SSize_t n = PerlIO_read(fp, d + got, (Size_t)(len - got));
+                SvCUR_set(raw, 0);
+                *SvPVX(raw) = '\0';
+                (void)av_store(req, PQ_BODY, raw);
+                for (;;) {
+                    STRLEN want = (len >= 0) ? (STRLEN)(len - got)
+                                             : (STRLEN)PQ_STREAM_CHUNK;
+                    SSize_t n;
+                    char *d;
+                    if (!want) break;
+                    d = SvGROW(raw, (STRLEN)got + want + 1);
+                    n = PerlIO_read(fp, d + got, want);
                     if (n <= 0) break;
                     got += (IV)n;
+                    SvCUR_set(raw, (STRLEN)got);
+                    SvPVX(raw)[got] = '\0';
+                    if (max && got > max) PQ_OVER_CEILING(max);
                 }
-                d[got] = '\0';
-                SvCUR_set(raw, (STRLEN)got);
                 (void)PerlIO_seek(fp, 0, SEEK_SET);
-                (void)av_store(req, PQ_BODY, raw);
             }
             else (void)av_store(req, PQ_BODY, newSV(0));
         }
@@ -305,8 +359,6 @@ static SV *pq_body(pTHX_ AV *req) {
  * ceiling does).
  */
 typedef int (*pq_sink_fn)(pTHX_ void *ud, const char *buf, STRLEN len);
-
-#define PQ_STREAM_CHUNK 65536
 
 /* Feed a cached body through the sink: what happens when the body was already
  * read whole. The bytes are here, so serving them costs nothing and the
@@ -332,22 +384,29 @@ static IV pq_stream_cached(pTHX_ SV *body, STRLEN chunk, pq_sink_fn sink,
  * With a CONTENT_LENGTH exactly that many bytes are read, which is what PSGI
  * requires of an application.
  *
- * Without one, what happens turns on Transfer-Encoding, because that is what
- * decides whether there is a body at all. A request with neither header has
- * none, and this reads nothing - it does NOT go looking, which would turn an
- * ordinary bodyless POST into an error. A chunked request has a body of
- * unknown length, and that one is read to EOF - but only when the server says
- * its input is buffered, since reading to EOF on a live socket is how an
- * application hangs, and refusing with a reason beats hanging.
+ * Without one, what happens turns on psgix.input.buffered, because that is
+ * what decides whether reading to EOF is safe. A buffered input is a finite
+ * thing the server is already holding, so EOF arrives; the body is read to it
+ * and a request that had none costs an empty read. That is the multiplexed
+ * case: HTTP/2 and HTTP/3 forbid Transfer-Encoding, so an undeclared-length
+ * body over either arrives with no framing header of any kind, and a rule
+ * written around Transfer-Encoding drops it.
  *
- * `max` (0 for none) stops the read and croaks. It is the only ceiling there
- * is once no length was declared, which is exactly when max_body had nothing
- * to check either.
+ * On an unbuffered input - a live socket - reading to EOF is how an
+ * application hangs, so Transfer-Encoding decides instead, and it can, because
+ * an unbuffered input is HTTP/1 by construction. Neither header means no body,
+ * and this reads nothing: it does NOT go looking, which would turn an ordinary
+ * bodyless POST into an error. Chunked means a body of unknown length that
+ * cannot be read here, and refusing with a reason beats hanging.
+ *
+ * `max` stops the read and croaks; 0 falls back to the route's max_body
+ * (pq_env_ceiling), which is the only ceiling there is once no length was
+ * declared - exactly the case pd_body_limit could not check up front.
  */
 static IV pq_body_stream(pTHX_ AV *req, STRLEN chunk, IV max,
                          pq_sink_fn sink, void *ud) {
     HV *env;
-    SV **in, **cl, **buf;
+    SV **in, **cl;
     IV len, got = 0;
     IO *io;
     PerlIO *fp;
@@ -372,20 +431,19 @@ static IV pq_body_stream(pTHX_ AV *req, STRLEN chunk, IV max,
     in  = hv_fetchs(env, "psgi.input", 0);
     cl  = hv_fetchs(env, "CONTENT_LENGTH", 0);
     len = (cl && *cl && SvOK(*cl)) ? SvIV(*cl) : -1;
+    if (!max) max = pq_env_ceiling(aTHX_ env);
 
-    if (len < 0) {
+    if (len < 0 && !pq_input_buffered(aTHX_ env)) {
         SV **te = hv_fetchs(env, "HTTP_TRANSFER_ENCODING", 0);
         if (!(te && *te && SvOK(*te) && SvCUR(*te))) {
             /* no length and no transfer coding: the request has no body */
             (void)av_store(req, PQ_READ, newSViv(PQ_STREAMED));
             return 0;
         }
-        buf = hv_fetchs(env, "psgix.input.buffered", 0);
-        if (!(buf && *buf && SvTRUE(*buf)))
-            croak("Punk::Request: a chunked body with no CONTENT_LENGTH, and "
-                  "this server does not declare psgix.input.buffered - there "
-                  "is no length to read to and reading to EOF on a live "
-                  "socket would hang");
+        croak("Punk::Request: a chunked body with no CONTENT_LENGTH, and "
+              "this server does not declare psgix.input.buffered - there "
+              "is no length to read to and reading to EOF on a live "
+              "socket would hang");
     }
 
     /* the state changes before the first read: a sink that dies halfway
@@ -409,9 +467,7 @@ static IV pq_body_stream(pTHX_ AV *req, STRLEN chunk, IV max,
         n = PerlIO_read(fp, w, want);
         if (n <= 0) break;
         got += (IV)n;
-        if (max && got > max)
-            croak("Punk::Request: the request body passed %" IVdf " bytes, "
-                  "the ceiling this read was given", max);
+        if (max && got > max) PQ_OVER_CEILING(max);
         if (sink(aTHX_ ud, w, (STRLEN)n)) break;
     }
     return got;

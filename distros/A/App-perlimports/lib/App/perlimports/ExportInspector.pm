@@ -4,7 +4,7 @@ use Moo;
 
 ## no critic (Modules::RequireExplicitInclusion, Subroutines::ProhibitCallsToUnexportedSubs, TestingAndDebugging::ProhibitNoStrict)
 
-our $VERSION = '0.000063';
+our $VERSION = '0.000064';
 
 use App::perlimports::Sandbox ();
 use Class::Inspector          ();
@@ -537,7 +537,7 @@ App::perlimports::ExportInspector - Inspect code for exportable symbols
 
 =head1 VERSION
 
-version 0.000063
+version 0.000064
 
 =head1 SYNOPSIS
 

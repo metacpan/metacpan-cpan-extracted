@@ -1,5 +1,10 @@
 Revision history for module Map::Tube::Plugin::Graph
 
+1.2.1   2026-09-10
+        - Fixed a typo on t\08-drivers.t; made it more robust.
+        - Fixed MANIFEST.SKIP
+        - Added Path::Tiny to test requirements.
+
 1.2.0   2026-08-27
         - Add Boolean option overlap, making overlap avoidance configurable.
         - At install time try to warn users if external GraphViz binary

@@ -9,7 +9,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 our $VERBOSE = 0;        # verbose mode
 
 our $LZ_MIN_LEN         = 4;          # minimum match length in LZ parsing
@@ -127,7 +127,6 @@ our %EXPORT_TAGS = (
           deflate_decode
 
           lzss_encode
-          lzss_encode_hash4
           lzss_encode_fast
           lzss_encode_fast_symbolic
           lzss_decode
@@ -177,6 +176,9 @@ our %EXPORT_TAGS = (
           elias_gamma_encode
           elias_gamma_decode
 
+          elias_delta_encode
+          elias_delta_decode
+
           elias_omega_encode
           elias_omega_decode
 
@@ -200,6 +202,20 @@ our %EXPORT_TAGS = (
           deflate_extract_block_type_0
           deflate_extract_block_type_1
           deflate_extract_block_type_2
+
+          golomb_rice_encode
+          golomb_rice_decode
+
+          leb128_encode
+          leb128_decode
+
+          shannon_entropy
+
+          detect_format
+          decompress_auto
+
+          best_compress
+          best_decompress
           )
     ]
 );
@@ -277,27 +293,21 @@ sub int2bytes_lsb ($value, $size) {
     pack('b*', scalar reverse sprintf("%0*b", 8 * $size, $value));
 }
 
-sub bytes2int($fh, $n) {
-
+sub bytes2int ($fh, $n) {
     if (ref($fh) eq '') {
         open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $n);
     }
-
-    my $bytes = '';
-    $bytes .= getc($fh) for (1 .. $n);
+    read($fh, my $bytes, $n) == $n or confess "truncated read: expected $n bytes";
     oct('0b' . unpack('B*', $bytes));
 }
 
 sub bytes2int_lsb ($fh, $n) {
-
     if (ref($fh) eq '') {
         open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $n);
     }
-
-    my $bytes = '';
-    $bytes .= getc($fh) for (1 .. $n);
+    read($fh, my $bytes, $n) == $n or confess "truncated read: expected $n bytes";
     oct('0b' . reverse unpack('b*', $bytes));
 }
 
@@ -336,12 +346,9 @@ sub symbols2string ($symbols) {
 }
 
 sub read_null_terminated ($fh) {
-    my $string = '';
-    while (1) {
-        my $c = getc($fh) // confess "can't read character";
-        last if $c eq "\0";
-        $string .= $c;
-    }
+    local $/ = "\0";
+    my $string = <$fh> // confess "can't read string";
+    chop($string);
     return $string;
 }
 
@@ -349,6 +356,20 @@ sub frequencies ($symbols) {
     my %freq;
     ++$freq{$_} for @$symbols;
     return \%freq;
+}
+
+sub shannon_entropy ($symbols) {
+
+    my $len  = scalar(@$symbols) || return 0;
+    my $freq = frequencies($symbols);
+
+    my $entropy = 0;
+    foreach my $count (values %$freq) {
+        my $p = $count / $len;
+        $entropy -= $p * log($p);
+    }
+
+    return $entropy / log(2);
 }
 
 sub deltas ($integers) {
@@ -525,6 +546,60 @@ sub abc_decode ($fh) {
             push @integers, oct('0b' . $chunk);
         }
     }
+
+    return \@integers;
+}
+
+################################################
+# LEB128 (byte-aligned variable-length quantity)
+################################################
+
+sub leb128_encode ($integers) {
+
+    my $bytes = '';
+
+    foreach my $n (scalar(@$integers), @$integers) {
+        $n >= 0 or confess "error: leb128_encode() requires non-negative integers";
+
+        my $v = $n;
+        while (1) {
+            my $byte = $v & 0x7f;
+            $v >>= 7;
+            if ($v != 0) {
+                $bytes .= chr($byte | 0x80);
+            }
+            else {
+                $bytes .= chr($byte);
+                last;
+            }
+        }
+    }
+
+    return $bytes;
+}
+
+sub leb128_decode ($fh) {
+
+    if (ref($fh) eq '') {
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
+        return __SUB__->($fh2);
+    }
+
+    my $read_one = sub {
+        my ($n, $shift) = (0, 0);
+        while (1) {
+            my $byte = ord(getc($fh) // confess "can't read byte");
+            $n |= ($byte & 0x7f) << $shift;
+            last if !($byte & 0x80);
+            $shift += 7;
+        }
+        return $n;
+    };
+
+    my $len = $read_one->();
+
+    my @integers;
+    push @integers, $read_one->() for (1 .. $len);
 
     return \@integers;
 }
@@ -953,21 +1028,42 @@ sub binary_vrl_decode ($bitstring) {
 ############################
 
 sub bwt_sort ($s, $LOOKAHEAD_LEN = 128) {    # O(n * LOOKAHEAD_LEN) space (fast)
-    my $len      = length($s);
-    my $double_s = $s . $s;                  # Pre-compute doubled string
+    my $len = length($s);
 
-    # Schwartzian transform with optimized sorting
+    return [0 .. $len - 1] if $len <= 1;
+
+    # Fast-path for uniform strings ("A" x 10000)
+    return [0 .. $len - 1] if $s =~ /^(.)\1*\z/s;
+
+    my $double_s = $s . $s;    # Pre-compute doubled string
+
+    # Schwartzian transform with optimized tie-breaking
     return [
         map { $_->[1] }
         sort {
             ($a->[0] cmp $b->[0])
               || do {
-                my ($cmp, $s_len) = (0, $LOOKAHEAD_LEN << 2);
-                while (1) {
-                    ($cmp = substr($double_s, $a->[1], $s_len) cmp substr($double_s, $b->[1], $s_len)) && last;
-                    $s_len <<= 1;
+                my $p1     = $a->[1];
+                my $p2     = $b->[1];
+                my $offset = $LOOKAHEAD_LEN;
+                my $chunk  = $LOOKAHEAD_LEN << 5;
+                my $cmp    = 0;
+
+                # Compare remaining characters in exponentially growing chunks
+                while ($offset < $len) {
+                    my $rem        = $len - $offset;
+                    my $curr_chunk = ($chunk < $rem) ? $chunk : $rem;
+
+                    $cmp = substr($double_s, $p1 + $offset, $curr_chunk) cmp substr($double_s, $p2 + $offset, $curr_chunk);
+
+                    last if $cmp;
+
+                    $offset += $curr_chunk;
+                    $chunk <<= 1;
                 }
-                $cmp;
+
+                # If identical up to string length, tie-break by index for stability
+                $cmp || ($p1 <=> $p2);
             }
         }
         map {
@@ -2284,22 +2380,71 @@ sub elias_gamma_decode ($fh) {
 }
 
 #####################
+# Elias delta coding
+#####################
+
+sub elias_delta_encode ($integers) {
+
+    my $bitstring = '';
+    foreach my $k (scalar(@$integers), @$integers) {
+        my $t = sprintf('%b', $k + 1);
+        my $l = length($t);
+        my $L = sprintf('%b', $l);
+        $bitstring .= ('1' x (length($L) - 1)) . '0' . substr($L, 1) . substr($t, 1);
+    }
+
+    pack('B*', $bitstring);
+}
+
+sub elias_delta_decode ($fh) {
+
+    if (ref($fh) eq '') {
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
+        return __SUB__->($fh2);
+    }
+
+    my @ints;
+    my $len    = 0;
+    my $buffer = '';
+
+    for (my $k = 0 ; $k <= $len ; ++$k) {
+
+        my $bl = 0;
+        ++$bl while (read_bit($fh, \$buffer) eq '1');
+
+        my $bl2 = oct('0b1' . join('', map { read_bit($fh, \$buffer) } 1 .. $bl));
+        my $int = oct('0b1' . join('', map { read_bit($fh, \$buffer) } 1 .. ($bl2 - 1))) - 1;
+
+        push @ints, $int;
+
+        if ($k == 0) {
+            $len = pop(@ints);
+        }
+    }
+
+    return \@ints;
+}
+
+#####################
 # Elias omega coding
 #####################
 
 sub elias_omega_encode ($integers) {
 
     my $bitstring = '';
+
     foreach my $k (scalar(@$integers), @$integers) {
-        if ($k == 0) {
-            $bitstring .= '0';
+
+        my $n    = $k + 1;    # shift by one, so 0 can be encoded
+        my $code = '0';       # terminator bit
+
+        while ($n != 1) {
+            my $t = sprintf('%b', $n);
+            $code = $t . $code;
+            $n    = length($t) - 1;
         }
-        else {
-            my $t = sprintf('%b', $k + 1);
-            my $l = length($t);
-            my $L = sprintf('%b', $l);
-            $bitstring .= ('1' x (length($L) - 1)) . '0' . substr($L, 1) . substr($t, 1);
-        }
+
+        $bitstring .= $code;
     }
 
     pack('B*', $bitstring);
@@ -2318,19 +2463,13 @@ sub elias_omega_decode ($fh) {
 
     for (my $k = 0 ; $k <= $len ; ++$k) {
 
-        my $bl = 0;
-        ++$bl while (read_bit($fh, \$buffer) eq '1');
+        my $n = 1;
 
-        if ($bl > 0) {
-
-            my $bl2 = oct('0b1' . join('', map { read_bit($fh, \$buffer) } 1 .. $bl));
-            my $int = oct('0b1' . join('', map { read_bit($fh, \$buffer) } 1 .. ($bl2 - 1))) - 1;
-
-            push @ints, $int;
+        while (read_bit($fh, \$buffer) eq '1') {
+            $n = oct('0b1' . join('', map { read_bit($fh, \$buffer) } 1 .. $n));
         }
-        else {
-            push @ints, 0;
-        }
+
+        push @ints, $n - 1;
 
         if ($k == 0) {
             $len = pop(@ints);
@@ -2338,6 +2477,71 @@ sub elias_omega_decode ($fh) {
     }
 
     return \@ints;
+}
+
+########################################
+# Golomb-Rice coding
+########################################
+
+# Picks a good Rice parameter for a geometrically-distributed sample,
+# using the standard approximation k = ceil(log2(mean * ln(2))).
+# Private helper -- not exported.
+sub _golomb_rice_optimal_k ($integers) {
+
+    return 0 if !@$integers;
+
+    my $mean = sum(@$integers) / scalar(@$integers);
+    return 0 if $mean < 1;
+
+    my ($k, $m) = (0, 1);
+    while ($m < $mean * log(2)) {
+        $m <<= 1;
+        ++$k;
+    }
+
+    return $k;
+}
+
+sub golomb_rice_encode ($integers, $k = undef) {
+
+    $k = _golomb_rice_optimal_k($integers) if !defined($k);
+    $k >= 0 or confess "error: \$k must be non-negative";
+
+    my $header = fibonacci_encode([scalar(@$integers), $k]);
+
+    my $bitstring = '';
+    my $mask      = (1 << $k) - 1;
+
+    foreach my $n (@$integers) {
+        $n >= 0 or confess "error: golomb_rice_encode() requires non-negative integers";
+        my $q = $n >> $k;
+        $bitstring .= ('1' x $q) . '0';
+        $bitstring .= sprintf('%0*b', $k, $n & $mask) if $k > 0;
+    }
+
+    return $header . pack('B*', $bitstring);
+}
+
+sub golomb_rice_decode ($fh) {
+
+    if (ref($fh) eq '') {
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
+        return __SUB__->($fh2);
+    }
+
+    my ($len, $k) = @{fibonacci_decode($fh)};
+
+    my @integers;
+    my $buffer = '';
+
+    foreach (1 .. $len) {
+        my $q = 0;
+        ++$q while (read_bit($fh, \$buffer) eq '1');
+        my $r = $k > 0 ? bits2int($fh, $k, \$buffer) : 0;
+        push @integers, ($q << $k) | $r;
+    }
+
+    return \@integers;
 }
 
 ###################
@@ -2587,7 +2791,7 @@ sub lzss_decode ($literals, $distances, $lengths) {
         }
         else {                     # overlapping matches
             my $pattern   = substr($data, $data_len - $dist, $dist) // confess "bad input";
-            my $full_reps = int(($length + $dist - 1) / $dist) + 1;
+            my $full_reps = int(($length + $dist - 1) / $dist);
             $data .= substr($pattern x $full_reps, 0, $length) // confess "bad input";
         }
 
@@ -2730,82 +2934,6 @@ sub lzss_encode_fast($str, %params) {
     return (\@literals, \@distances, \@lengths);
 }
 
-##################################################################
-# LZSS encoding via O(1) flat-array hashing, LZ4-style.
-##################################################################
-
-sub lzss_encode_hash4 ($str, %params) {
-
-    state $LZ4_HASH_BITS = 16;            # hash table has 2**this slots
-    state $LZ4_HASH_MUL  = 0x9E3779B1;    # Fibonacci hashing multiplier, scrambles the 4-byte window's bits
-
-    if (ref($str) ne '') {
-        confess "lzss_encode_hash4: symbolic-array input isn't supported (fixed 4-byte hashing needs a byte string)";
-    }
-
-    my $min_len  = 4;
-    my $max_len  = $params{max_len}  // $LZ_MAX_LEN;
-    my $max_dist = $params{max_dist} // $LZ_MAX_DIST;
-
-    my @symbols = unpack('C*', $str);
-
-    my $end = $#symbols;
-    my (@literals, @distances, @lengths);
-
-    if ($end + 1 < $min_len) {    # fewer than 4 bytes total: nothing to hash, every byte is a literal
-        for my $la (0 .. $end) {
-            push @lengths,   0;
-            push @distances, 0;
-            push @literals,  $symbols[$la];
-        }
-        return (\@literals, \@distances, \@lengths);
-    }
-
-    my $hash_size = 1 << $LZ4_HASH_BITS;
-    my @hash_table;
-
-    my $shift = 32 - $LZ4_HASH_BITS;
-    my $la    = 0;
-
-    while ($la + $min_len - 1 <= $end) {
-
-        my $seq = substr($str, $la, 4);
-        my $val = unpack('N', $seq);
-        my $h   = (($val * $LZ4_HASH_MUL) & 0xFFFFFFFF) >> $shift;
-
-        my $p = $hash_table[$h];
-        $hash_table[$h] = $la;
-
-        if (defined($p) and $la - $p <= $max_dist and substr($str, $p, $min_len) eq $seq) {
-
-            my $n = $min_len;
-
-            ++$n while ($la + $n <= $end and $symbols[$la + $n - 1] == $symbols[$p + $n - 1] and $n <= $max_len);
-
-            push @lengths,   $n - 1;
-            push @distances, $la - $p;
-            push @literals,  undef;
-
-            $la += $n - 1;    # the "jump": intermediate match bytes are never indexed
-            next;
-        }
-
-        push @lengths,   0;
-        push @distances, 0;
-        push @literals,  $symbols[$la];
-        $la++;
-    }
-
-    while ($la <= $end) {    # trailing <4 bytes: no room left to hash, always literals
-        push @lengths,   0;
-        push @distances, 0;
-        push @literals,  $symbols[$la];
-        $la++;
-    }
-
-    return (\@literals, \@distances, \@lengths);
-}
-
 ################################
 # LZ77 encoding, inspired by LZ4
 ################################
@@ -2903,9 +3031,9 @@ sub lz77_decode($symbols, $dist_symbols, $len_symbols, $match_symbols) {
             $data .= substr($data, -1) x $match_len;
         }
         else {                        # overlapping matches
-            foreach my $i (1 .. $match_len) {
-                $data .= substr($data, $data_len + $i - $dist - 1, 1) // confess "bad input";
-            }
+            my $pattern   = substr($data, $data_len - $dist, $dist) // confess "bad input";
+            my $full_reps = int(($match_len + $dist - 1) / $dist);
+            $data .= substr($pattern x $full_reps, 0, $match_len) // confess "bad input";
         }
 
         $data_len += $match_len;
@@ -3137,15 +3265,15 @@ sub lzb_decompress($fh) {
         my $offset = oct('0b' . unpack('B*', substr($block, 0, 2, '')));
 
         if ($offset >= $match_len) {    # non-overlapping matches
-            $search_window .= substr($search_window, length($search_window) - $offset, $match_len);
+            $search_window .= substr($search_window, length($search_window) - $offset, $match_len) // confess "bad input";
         }
         elsif ($offset == 1) {          # run-length of last character
             $search_window .= substr($search_window, -1) x $match_len;
         }
         else {                          # overlapping matches
-            foreach my $i (1 .. $match_len) {
-                $search_window .= substr($search_window, length($search_window) - $offset, 1);
-            }
+            my $pattern   = substr($search_window, length($search_window) - $offset, $offset) // confess "bad input";
+            my $full_reps = int(($match_len + $offset - 1) / $offset);
+            $search_window .= substr($pattern x $full_reps, 0, $match_len) // confess "bad input";
         }
 
         $data .= substr($search_window, -($match_len + $literals_length));
@@ -3324,17 +3452,24 @@ sub crc32($str, $crc = 0) {
     return (($crc & 0xffffffff) ^ 0xffffffff);
 }
 
-sub adler32($str, $adler = 1) {
+use constant ADLER_NMAX => 5552;
 
-    # Reference:
-    #   https://datatracker.ietf.org/doc/html/rfc1950#section-9
-
+sub adler32 ($str, $adler = 1) {
     my $s1 = $adler & 0xffff;
     my $s2 = ($adler >> 16) & 0xffff;
 
-    foreach my $c (unpack('C*', $str)) {
-        $s1 = ($s1 + $c) % 65521;
-        $s2 = ($s2 + $s1) % 65521;
+    my $len = length($str);
+    my $pos = 0;
+    while ($len > 0) {
+        my $k = $len < ADLER_NMAX ? $len : ADLER_NMAX;
+        $len -= $k;
+        foreach my $c (unpack('C*', substr($str, $pos, $k))) {
+            $s1 += $c;
+            $s2 += $s1;
+        }
+        $pos += $k;
+        $s1 %= 65521;
+        $s2 %= 65521;
     }
     return (($s2 << 16) + $s1);
 }
@@ -4069,7 +4204,8 @@ sub _deflate_decode_huffman($in_fh, $buffer, $rev_dict, $dist_rev_dict, $search_
     my $max_dist_code_len = max(map { length($_) } keys %$dist_rev_dict);
 
     while (1) {
-        $code .= read_bit_lsb($in_fh, $buffer);
+        if ($$buffer eq '') { $$buffer = unpack('B*', getc($in_fh) // confess "can't read bit"); }
+        $code .= chop($$buffer);
 
         if (length($code) > $max_ll_code_len) {
             confess "[!] Something went wrong: length of LL code `$code` is > $max_ll_code_len.";
@@ -4094,7 +4230,8 @@ sub _deflate_decode_huffman($in_fh, $buffer, $rev_dict, $dist_rev_dict, $search_
                 my $dist_code = '';
 
                 while (1) {
-                    $dist_code .= read_bit_lsb($in_fh, $buffer);
+                    if ($$buffer eq '') { $$buffer = unpack('B*', getc($in_fh) // confess "can't read bit"); }
+                    $dist_code .= chop($$buffer);
 
                     if (length($dist_code) > $max_dist_code_len) {
                         confess "[!] Something went wrong: length of distance code `$dist_code` is > $max_dist_code_len.";
@@ -4108,16 +4245,16 @@ sub _deflate_decode_huffman($in_fh, $buffer, $rev_dict, $dist_rev_dict, $search_
                 my ($dist, $dist_bits) = @{$DISTANCE_SYMBOLS->[$dist_rev_dict->{$dist_code} + 1]};
                 $dist += bits2int_lsb($in_fh, $dist_bits, $buffer) if ($dist_bits > 0);
 
-                if ($dist == 1) {
+                if ($dist >= $length) {    # non-overlapping matches
+                    $$search_window .= substr($$search_window, length($$search_window) - $dist, $length) // confess "bad input";
+                }
+                elsif ($dist == 1) {
                     $$search_window .= substr($$search_window, -1) x $length;
                 }
-                elsif ($dist >= $length) {    # non-overlapping matches
-                    $$search_window .= substr($$search_window, length($$search_window) - $dist, $length);
-                }
-                else {                        # overlapping matches
-                    foreach my $i (1 .. $length) {
-                        $$search_window .= substr($$search_window, length($$search_window) - $dist, 1);
-                    }
+                else {                     # overlapping matches
+                    my $pattern   = substr($$search_window, length($$search_window) - $dist, $dist) // confess "bad input";
+                    my $full_reps = int(($length + $dist - 1) / $dist);
+                    $$search_window .= substr($pattern x $full_reps, 0, $length) // confess "bad input";
                 }
 
                 $data .= substr($$search_window, -$length);
@@ -4780,15 +4917,15 @@ sub lz4_decompress($fh) {
                     ## say STDERR "Total match len: $match_len\n";
 
                     if ($offset >= $match_len) {    # non-overlapping matches
-                        $decoded .= substr($decoded, length($decoded) - $offset, $match_len);
+                        $decoded .= substr($decoded, length($decoded) - $offset, $match_len) // confess "bad input";
                     }
                     elsif ($offset == 1) {
                         $decoded .= substr($decoded, -1) x $match_len;
                     }
                     else {                          # overlapping matches
-                        foreach my $i (1 .. $match_len) {
-                            $decoded .= substr($decoded, length($decoded) - $offset, 1);
-                        }
+                        my $pattern   = substr($decoded, length($decoded) - $offset, $offset) // confess "bad input";
+                        my $full_reps = int(($match_len + $offset - 1) / $offset);
+                        $decoded .= substr($pattern x $full_reps, 0, $match_len) // confess "bad input";
                     }
                 }
             }
@@ -4817,6 +4954,91 @@ sub lz4_decompress($fh) {
     }
 
     return $decompressed;
+}
+
+################################################
+# Format detection + auto-dispatch decompression
+################################################
+
+sub detect_format ($data) {
+
+    my $peek;
+
+    if (ref($data) eq '') {
+        $peek = substr($data, 0, 4);
+    }
+    else {
+        my $n = read($data, $peek, 4) // confess "error: $!";
+        seek($data, -$n, 1) or confess "error: $!" if $n > 0;
+    }
+
+    return 'gzip'  if substr($peek, 0, 2) eq "\x1f\x8b";
+    return 'bzip2' if substr($peek, 0, 3) eq 'BZh';
+    return 'lz4'   if substr($peek, 0, 4) eq "\x04\x22\x4d\x18";
+
+    if (length($peek) >= 2) {
+        my ($cmf, $flg) = unpack('CC', $peek);
+        if (($cmf & 0x0f) == 8 and (($cmf << 8) + $flg) % 31 == 0) {
+            return 'zlib';
+        }
+    }
+
+    return undef;
+}
+
+sub decompress_auto ($data) {
+
+    my $format = detect_format($data) // confess "error: unrecognized compressed format";
+
+    return gzip_decompress($data)  if $format eq 'gzip';
+    return zlib_decompress($data)  if $format eq 'zlib';
+    return bzip2_decompress($data) if $format eq 'bzip2';
+    return lz4_decompress($data)   if $format eq 'lz4';
+
+    confess "error: unhandled format: $format";    # unreachable, kept for safety
+}
+
+########################################
+# Best-of-N meta-compressor
+########################################
+
+sub best_compress ($data, $methods = undef) {
+
+    $methods //= [['G', \&gzip_compress], ['B', \&bwt_compress], ['M', \&mrl_compress],];
+
+    my ($best_tag, $best_out);
+
+    foreach my $pair (@$methods) {
+        my ($tag, $sub) = @$pair;
+        length($tag) == 1 or confess "error: tag must be a single character";
+
+        my $out = $sub->($data);
+
+        if (!defined($best_out) or length($out) < length($best_out)) {
+            ($best_tag, $best_out) = ($tag, $out);
+        }
+    }
+
+    return $best_tag . $best_out;
+}
+
+sub best_decompress ($fh, $methods = undef) {
+
+    if (ref($fh) eq '') {
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
+        return __SUB__->($fh2, $methods);
+    }
+
+    $methods //= {
+                  'G' => \&gzip_decompress,
+                  'B' => \&bwt_decompress,
+                  'M' => \&mrl_decompress,
+                 };
+
+    my $tag = getc($fh)        // confess "error: can't read compression tag";
+    my $sub = $methods->{$tag} // confess "error: unknown compression tag: '$tag'";
+
+    return $sub->($fh);
 }
 
 1;

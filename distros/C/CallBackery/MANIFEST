@@ -7,8 +7,14 @@ MANIFEST
 README.md
 bin/callbackery-pobuilder
 t/basic.t
+t/config-restore.t
+t/doc-traversal.t
 t/export-qrcode.t
+t/invalidPlugin.t
+t/jsonrpc.t
+t/session_expiry.t
 t/callbackery.cfg
+t/lib/CallBackeryTest.pm
 lib/CallBackery/Config.pm
 lib/CallBackery/Controller/RpcService.pm
 lib/CallBackery/Database.pm

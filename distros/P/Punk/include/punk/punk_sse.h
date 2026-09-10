@@ -6,8 +6,23 @@
  * reuses the WS connection's byte machinery (pw_append / a mirrored flush with
  * io_watch WRITE backpressure / teardown) and drops the rest.
  *
- * Three transports, chosen in order: Hyperman detach (stream on the loop),
- * psgi.streaming (the portable delayed-response writer), and blocking psgix.io.
+ * Four transports, chosen in order: Hyperman detach (stream on the loop), the
+ * Hyperman stream handle (ABI v6), psgi.streaming (the portable
+ * delayed-response writer), and blocking psgix.io.
+ *
+ * The stream handle sits under detach rather than over it, which is not where
+ * an earlier sketch of this put it. Two things decide the order. On HTTP/1.1
+ * in clear, detach already works and its bytes are what every existing test
+ * asserts, so nothing may be taken off it. And a handle can only be opened
+ * from a DEFERRED response - hm_stream_open refuses an HTTP/1.1 connection
+ * whose handler has not yet returned, because a synchronous return value
+ * would be serialised on top of the body - so the branch lives inside the
+ * psgi.streaming responder, which is the deferral. What it buys is exactly
+ * the cases detach refuses: HTTP/2, where a stream is one of many on a shared
+ * connection and there is no fd to hand over, and TLS, where the session
+ * state belongs to the server. Both used to end at a 503 or at a
+ * psgi.streaming writer that buffers to close - which for an SSE stream that
+ * never closes means nothing is ever delivered.
  *
  * Must be included after punk_wsconn.h (punk_hm, pw_append) and
  * punk_wshandshake.h (pw_err / pw_empty), and punk_context.h (pcx_* / frj).
@@ -18,7 +33,8 @@
 
 #include <fcntl.h>
 
-enum { SSE_MODE_DETACH = 0, SSE_MODE_STREAM = 1, SSE_MODE_BLOCK = 2 };
+enum { SSE_MODE_DETACH = 0, SSE_MODE_STREAM = 1, SSE_MODE_BLOCK = 2,
+       SSE_MODE_HSTREAM = 3 };
 enum { SSE_OPEN = 0, SSE_CLOSED = 1 };
 
 typedef struct punk_sse {
@@ -33,9 +49,16 @@ typedef struct punk_sse {
     SV    *self_rv;              /* strong self while live */
     void  *loop;
     const hm_abi *abi;
+    void  *sh;                    /* the v6 stream handle (HSTREAM mode) */
     hm_abi_timer *hb_tw;          /* heartbeat timer */
     double heartbeat;             /* seconds; 0 = off */
 } punk_sse;
+
+/* The transports that run on the worker's event loop, and so have a timer to
+ * arm a heartbeat on. The two differ in what they write through, not in when
+ * they get to run. */
+#define SE_ON_LOOP(sse) ((sse)->mode == SSE_MODE_DETACH \
+                      || (sse)->mode == SSE_MODE_HSTREAM)
 
 static const char SSE_RESPONSE[] =
     "HTTP/1.1 200 OK\r\n"
@@ -102,6 +125,21 @@ static void se_on_readable(pTHX_ int fd, int mask, void *ud) {
 /* queue bytes to the active backend */
 static void se_write(pTHX_ punk_sse *sse, const char *bytes, size_t len) {
     if (sse->state != SSE_OPEN) return;
+    if (sse->mode == SSE_MODE_HSTREAM) {
+        /* The write can close the connection under us, and Hyperman fires
+         * the abort callback from there - which tears this stream down and
+         * drops its own last reference. So the reference is held across the
+         * call, exactly as the heartbeat holds one. */
+        SV *keep = sse->self_rv ? SvREFCNT_inc(sse->self_rv) : NULL;
+        int r = sse->abi->stream_write(aTHX_ sse->sh, bytes, len);
+        /* HM_ABI_STREAM_FULL is not an error: the bytes were taken and the
+         * connection is merely backed up. An event stream's writes are small
+         * and there is nothing useful to drop, so the bound that matters is
+         * Hyperman's own connection buffer rather than one kept here. */
+        if (r < 0 && sse->state == SSE_OPEN) se_teardown(aTHX_ sse);
+        if (keep) SvREFCNT_dec(keep);             /* sse may be gone now */
+        return;
+    }
     if (sse->mode == SSE_MODE_STREAM) {
         dSP;
         ENTER; SAVETMPS;
@@ -202,9 +240,23 @@ static void se_heartbeat_cb(pTHX_ void *ud) {
 
 static void se_arm_heartbeat(pTHX_ punk_sse *sse) {
     if (sse->state == SSE_OPEN && sse->heartbeat > 0
-        && sse->mode == SSE_MODE_DETACH && sse->abi && sse->loop)
+        && SE_ON_LOOP(sse) && sse->abi && sse->loop)
         sse->hb_tw = sse->abi->timer(aTHX_ sse->loop, sse->heartbeat,
                                      se_heartbeat_cb, sse);
+}
+
+/* The stream died before it was closed - an HTTP/2 RST_STREAM on this one
+ * stream of many, or the connection going away underneath it.
+ *
+ * This has no HTTP/1 analogue and is the reason the handle beats detach
+ * rather than merely matching it: on a multiplexed transport a peer can kill
+ * one stream while the connection carries on, and a producer that never hears
+ * about it goes on generating events for nobody. The handle stays valid to
+ * close, which is what teardown does with it. */
+static void se_on_abort(pTHX_ void *h, void *ud) {
+    punk_sse *sse = (punk_sse *)ud;
+    PERL_UNUSED_ARG(h);
+    se_teardown(aTHX_ sse);
 }
 
 static SV *se_cb(pTHX_ punk_sse *sse, const char *name) {
@@ -219,8 +271,18 @@ static void se_teardown(pTHX_ punk_sse *sse) {
     if (sse->mode == SSE_MODE_DETACH && sse->abi && sse->loop) {
         if (sse->reading) sse->abi->io_unwatch(aTHX_ sse->loop, sse->fd, HM_ABI_READ);
         if (sse->writing) sse->abi->io_unwatch(aTHX_ sse->loop, sse->fd, HM_ABI_WRITE);
-        if (sse->hb_tw) { sse->abi->timer_cancel(aTHX_ sse->loop, sse->hb_tw);
-                          sse->hb_tw = NULL; }
+    }
+    if (SE_ON_LOOP(sse) && sse->abi && sse->loop && sse->hb_tw) {
+        sse->abi->timer_cancel(aTHX_ sse->loop, sse->hb_tw);
+        sse->hb_tw = NULL;
+    }
+    if (sse->mode == SSE_MODE_HSTREAM && sse->abi && sse->sh) {
+        /* NULLed first: closing ends the body, which on an EOF-delimited
+         * HTTP/1.1 response closes the connection, and a re-entrant teardown
+         * from that must not close the same handle twice. */
+        void *h = sse->sh;
+        sse->sh = NULL;
+        (void)sse->abi->stream_close(aTHX_ h);
     }
     sse->reading = sse->writing = 0;
     if (sse->mode == SSE_MODE_STREAM && sse->writer) {
@@ -255,8 +317,14 @@ static void se_free(pTHX_ punk_sse *sse) {
          * connection will be given */
         if (sse->reading) sse->abi->io_unwatch(aTHX_ sse->loop, sse->fd, HM_ABI_READ);
         if (sse->writing) sse->abi->io_unwatch(aTHX_ sse->loop, sse->fd, HM_ABI_WRITE);
-        if (sse->hb_tw)   sse->abi->timer_cancel(aTHX_ sse->loop, sse->hb_tw);
     }
+    if (SE_ON_LOOP(sse) && sse->abi && sse->loop && sse->hb_tw)
+        sse->abi->timer_cancel(aTHX_ sse->loop, sse->hb_tw);
+    /* The handle names this struct through its callbacks, so it goes first;
+     * stream_close is the only entry point that releases one, and a stream
+     * aborted underneath us still has to be closed. */
+    if (sse->mode == SSE_MODE_HSTREAM && sse->abi && sse->sh)
+        (void)sse->abi->stream_close(aTHX_ sse->sh);
     if (sse->fd >= 0) close(sse->fd);
     if (sse->wbuf)   free(sse->wbuf);
     if (sse->writer) SvREFCNT_dec(sse->writer);
@@ -300,9 +368,37 @@ static void se_run_handler(pTHX_ SV *code, SV *c, SV *self) {
     }
 }
 
+/* The SSE response head as a structured header list rather than the
+ * SSE_RESPONSE byte string.
+ *
+ * Content-Type and Cache-Control carry over unchanged. Connection does NOT:
+ * it is hop-by-hop, HTTP/2 and HTTP/3 forbid it outright, and there is no
+ * connection to keep alive when the stream is one of many on a shared one.
+ * X-Accel-Buffering is kept because it costs a header and an application may
+ * still be behind nginx - though it means nothing when Hyperman is itself the
+ * edge, which is the point of serving h2 and h3 natively. Owned (+1). */
+static AV *se_header_av(pTHX) {
+    AV *hdrs = newAV();
+    av_push(hdrs, newSVpvs("Content-Type"));      av_push(hdrs, newSVpvs("text/event-stream"));
+    av_push(hdrs, newSVpvs("Cache-Control"));     av_push(hdrs, newSVpvs("no-cache"));
+    av_push(hdrs, newSVpvs("X-Accel-Buffering")); av_push(hdrs, newSVpvs("no"));
+    return hdrs;
+}
+
+/* The `retry: N` field, which has to go out before anything the handler
+ * writes and is the same three lines on every transport. */
+static void se_send_retry(pTHX_ punk_sse *sse, HV *opts) {
+    SV **r = opts ? hv_fetchs(opts, "retry", 0) : NULL;
+    if (r && *r && SvOK(*r)) {
+        se_field(aTHX_ sse, "retry: ", *r);   /* retry: N */
+        se_write(aTHX_ sse, "\n", 1);         /* + blank = dispatch */
+    }
+}
+
 /* the psgi.streaming responder: capture [ $c, $code, $opts ]. The server calls
- * it with the responder; we open the writer with the SSE headers, build a
- * STREAM stream over it and run the handler. */
+ * it with the responder, which is the deferral a stream handle needs - so the
+ * handle is tried first and the writer is the fallback. Either way the
+ * handler sees one Punk::SSE and never learns which it got. */
 XS_INTERNAL(sse_stream_cb);
 XS_INTERNAL(sse_stream_cb) {
     dXSARGS;
@@ -310,18 +406,39 @@ XS_INTERNAL(sse_stream_cb) {
     SV *c    = *av_fetch(cap, 0, 0);
     SV *code = *av_fetch(cap, 1, 0);
     SV *osv  = *av_fetch(cap, 2, 0);
+    SV *esv  = *av_fetch(cap, 3, 0);
     HV *opts = (SvROK(osv) && SvTYPE(SvRV(osv)) == SVt_PVHV) ? (HV *)SvRV(osv) : NULL;
+    HV *envh = (SvROK(esv) && SvTYPE(SvRV(esv)) == SVt_PVHV) ? (HV *)SvRV(esv) : NULL;
     SV *responder = items > 0 ? ST(0) : &PL_sv_undef;
-    AV *hdrs = newAV(), *sh = newAV();
-    SV *writer, *self;
+    AV *hdrs = se_header_av(aTHX);
+    SV *self;
     punk_sse *sse;
-    av_push(hdrs, newSVpvs("Content-Type"));      av_push(hdrs, newSVpvs("text/event-stream"));
-    av_push(hdrs, newSVpvs("Cache-Control"));     av_push(hdrs, newSVpvs("no-cache"));
-    av_push(hdrs, newSVpvs("X-Accel-Buffering")); av_push(hdrs, newSVpvs("no"));
-    av_push(sh, newSViv(200));
-    av_push(sh, newRV_noinc((SV *)hdrs));
+    const hm_abi *A = NULL;
+    void *loop = NULL, *h = NULL;
+
+    if (envh) h = punk_hm_stream_open(aTHX_ envh, &A, &loop, 200, hdrs);
+    if (h) {
+        sse = se_new(aTHX_ SSE_MODE_HSTREAM, opts);
+        sse->abi = A; sse->loop = loop; sse->sh = h;
+        SvREFCNT_dec((SV *)hdrs);
+        self = sv_2mortal(sv_setref_iv(newSV(0), "Punk::SSE", PTR2IV(sse)));
+        sse->self_rv = newSVsv(self);
+        /* before the handler writes anything: a stream reset while the
+         * handler is still producing must reach it, and registering after
+         * the event still fires, so there is no race to lose */
+        (void)A->stream_on_abort(aTHX_ h, se_on_abort, sse);
+        se_send_retry(aTHX_ sse, opts);
+        se_arm_heartbeat(aTHX_ sse);
+        se_run_handler(aTHX_ code, c, self);
+        XSRETURN_EMPTY;
+    }
+
     {
+        AV *sh = newAV();
+        SV *writer;
         dSP; int n;
+        av_push(sh, newSViv(200));
+        av_push(sh, newRV_noinc((SV *)hdrs));
         ENTER; SAVETMPS;
         PUSHMARK(SP); EXTEND(SP, 1);
         PUSHs(sv_2mortal(newRV_noinc((SV *)sh)));
@@ -330,16 +447,12 @@ XS_INTERNAL(sse_stream_cb) {
         SPAGAIN;
         writer = n > 0 ? SvREFCNT_inc(POPs) : &PL_sv_undef;
         PUTBACK; FREETMPS; LEAVE;
+        sse = se_new(aTHX_ SSE_MODE_STREAM, opts);
+        sse->writer = writer;                          /* +1 owned */
     }
-    sse = se_new(aTHX_ SSE_MODE_STREAM, opts);
-    sse->writer = writer;                          /* +1 owned */
     self = sv_2mortal(sv_setref_iv(newSV(0), "Punk::SSE", PTR2IV(sse)));
     sse->self_rv = newSVsv(self);
-    if (opts) {
-        SV **r = hv_fetchs(opts, "retry", 0);
-        if (r && *r && SvOK(*r)) { se_field(aTHX_ sse, "retry: ", *r);
-                                   se_write(aTHX_ sse, "\n", 1); }
-    }
+    se_send_retry(aTHX_ sse, opts);
     se_run_handler(aTHX_ code, c, self);
     XSRETURN_EMPTY;
 }
@@ -357,7 +470,15 @@ static SV *punk_sse_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
     x = hv_fetchs(rech, K_CODE, 0);
     code = (x && *x) ? *x : &PL_sv_undef;
 
-    /* 1. Hyperman detach: stream on the worker loop */
+    /* 1. Hyperman detach: stream on the worker loop.
+     *
+     * A refusal falls through rather than answering 503. conn_detach says no
+     * to TLS (-3) because the session state belongs to the server, and that
+     * used to be the end of it - which is why deploying this meant
+     * terminating TLS in front and speaking plain HTTP/1 to the application.
+     * The stream handle below takes exactly that case, so the refusal is now
+     * a reason to try the next transport rather than an answer to the
+     * client. */
     x = hv_fetchs(envh, "psgix.hyperman.conn", 0);
     if (x && *x && SvROK(*x) && SvTYPE(SvRV(*x)) == SVt_PVAV) {
         const hm_abi *A = punk_hm(aTHX);
@@ -367,41 +488,38 @@ static SV *punk_sse_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
             void *loop = A->cur_loop(aTHX);
             int fd; int fl;
             punk_sse *sse; SV *self;
-            if (!(fsv && *fsv && isv && *isv && loop))
-                return pw_err(aTHX_ 500, "cannot stream this connection\n", NULL, NULL);
-            fd = (int)SvIV(*fsv);
-            if (A->conn_detach(aTHX_ loop, fd, SvUV(*isv)) != 0)
-                return pw_err(aTHX_ 503, "cannot stream this connection\n", NULL, NULL);
-            fl = fcntl(fd, F_GETFL, 0);
-            if (fl >= 0) (void)fcntl(fd, F_SETFL, fl | O_NONBLOCK);
-            sse = se_new(aTHX_ SSE_MODE_DETACH, opts);
-            sse->fd = fd; sse->abi = A; sse->loop = loop;
-            self = sv_2mortal(sv_setref_iv(newSV(0), "Punk::SSE",
-                                           PTR2IV(sse)));
-            sse->self_rv = newSVsv(self);
-            se_write(aTHX_ sse, SSE_RESPONSE, sizeof(SSE_RESPONSE) - 1);
-            if (opts) {
-                SV **r = hv_fetchs(opts, "retry", 0);
-                if (r && *r && SvOK(*r)) {
-                    se_field(aTHX_ sse, "retry: ", *r);   /* retry: N */
-                    se_write(aTHX_ sse, "\n", 1);         /* + blank = dispatch */
-                }
+            if (fsv && *fsv && isv && *isv && loop
+                && (fd = (int)SvIV(*fsv)) >= 0
+                && A->conn_detach(aTHX_ loop, fd, SvUV(*isv)) == 0) {
+                fl = fcntl(fd, F_GETFL, 0);
+                if (fl >= 0) (void)fcntl(fd, F_SETFL, fl | O_NONBLOCK);
+                sse = se_new(aTHX_ SSE_MODE_DETACH, opts);
+                sse->fd = fd; sse->abi = A; sse->loop = loop;
+                self = sv_2mortal(sv_setref_iv(newSV(0), "Punk::SSE",
+                                               PTR2IV(sse)));
+                sse->self_rv = newSVsv(self);
+                se_write(aTHX_ sse, SSE_RESPONSE, sizeof(SSE_RESPONSE) - 1);
+                se_send_retry(aTHX_ sse, opts);
+                A->io_watch(aTHX_ loop, fd, HM_ABI_READ, se_on_readable, sse);
+                sse->reading = 1;
+                se_arm_heartbeat(aTHX_ sse);
+                se_run_handler(aTHX_ code, c, self);
+                return pw_empty(aTHX_ 200);     /* the socket is ours now */
             }
-            A->io_watch(aTHX_ loop, fd, HM_ABI_READ, se_on_readable, sse);
-            sse->reading = 1;
-            se_arm_heartbeat(aTHX_ sse);
-            se_run_handler(aTHX_ code, c, self);
-            return pw_empty(aTHX_ 200);         /* the socket is ours now */
         }
     }
 
-    /* 2. psgi.streaming: the portable delayed-response writer */
+    /* 2. the deferred branch: a Hyperman v6 stream handle when the server
+     * offers one (HTTP/2, and HTTP/1.1 over TLS), else the portable
+     * psgi.streaming writer. sse_stream_cb decides, because the choice can
+     * only be made once the response has been deferred. */
     x = hv_fetchs(envh, "psgi.streaming", 0);
     if (x && *x && SvTRUE(*x)) {
         AV *cap = newAV();
         av_push(cap, newSVsv(c));
         av_push(cap, newSVsv(code));
         av_push(cap, opts ? newRV_inc((SV *)opts) : newSV(0));
+        av_push(cap, newRV_inc((SV *)envh));
         return punk_closure(aTHX_ sse_stream_cb, cap);   /* the responder */
     }
 
@@ -420,11 +538,7 @@ static SV *punk_sse_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
                                                PTR2IV(sse)));
                 sse->self_rv = newSVsv(self);
                 se_write(aTHX_ sse, SSE_RESPONSE, sizeof(SSE_RESPONSE) - 1);
-                if (opts) {
-                    SV **r = hv_fetchs(opts, "retry", 0);
-                    if (r && *r && SvOK(*r)) { se_field(aTHX_ sse, "retry: ", *r);
-                                               se_write(aTHX_ sse, "\n", 1); }
-                }
+                se_send_retry(aTHX_ sse, opts);
                 se_run_handler(aTHX_ code, c, self);     /* a sync generator */
                 return pw_empty(aTHX_ 200);
             }

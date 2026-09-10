@@ -697,7 +697,7 @@ sub complete_table_name {
 
     if (-l $fqfn) {
 	my $real = Cwd::abs_path ($fqfn);
-	unless (List::Util::any { $real =~ m{^\Q$_\E} } @bases) {
+	unless (List::Util::any { $real =~ m{^\Q$_\E(?:$|/)} } @bases) {
             croak "Data file $fqfn is a outside of f_dir f_and f_dir_search\n";
 	    }
 	}
@@ -1432,7 +1432,7 @@ tables, but they will not covered by C<table_info>.
 
 This module is currently maintained by
 
-H.Merijn Brand < hmbrand at cpan.org > and
+H.Merijn Brand < perl5 at tux.freedom.nl > and
 Jens Rehsack < rehsack at googlemail.com >
 
 The original author is Jochen Wiedmann.

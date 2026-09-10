@@ -1,5 +1,5 @@
 package Crypt::JWS::OpenSSL::Algorithm::RSA;
-$Crypt::JWS::OpenSSL::Algorithm::RSA::VERSION = '0.004';
+$Crypt::JWS::OpenSSL::Algorithm::RSA::VERSION = '0.005';
 use Moo;
 with qw(
     Crypt::JWS::OpenSSL::Role::Algorithm
@@ -142,7 +142,7 @@ sub _build_can_use_pkcs1_padding {
     my $self = shift;
     my $_rsa_ver = $self->numify_version($Crypt::OpenSSL::RSA::VERSION);
     
-    ## version 0.36 and 0.37 are broken
+    ### version 0.36 and 0.37 are broken
     if ( $_rsa_ver > 0.35 && $_rsa_ver < 0.38  ) {
         return 0;
     }
@@ -162,7 +162,7 @@ sub _build_can_use_pkcs1_padding {
 sub _build__version_supports_pss {
     my $self = shift;
     my $_rsa_ver = $self->numify_version($Crypt::OpenSSL::RSA::VERSION);
-    return ( $_rsa_ver >= 0.38 ) ? 1 : 0;
+    return ( $_rsa_ver >= 0.36 ) ? 1 : 0;
 }
 
 1;
@@ -179,7 +179,7 @@ Crypt::JWS::OpenSSL::Algorithm::RSA - Sign and verify tokens using RSA algorithm
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -314,7 +314,7 @@ RSA signatures can use two types of padding, RSASSA-PKCS-v1_5 and RSASSA-PSS.
 
 Algorithms PS256, PS384 and PS512 use RSASSA-PSS.
 
-You need Crypt::OpenSSL::RSA versions >= 0.38 and OpenSSL 3 to
+You need Crypt::OpenSSL::RSA versions >= 0.36 and OpenSSL 3 to
 sign and verify tokens using these algorithms.
 
 =head1 ALGORITHMS
@@ -325,31 +325,37 @@ sign and verify tokens using these algorithms.
 
 C<RSASSA-PKCS-v1_5 using SHA-256>
 
+Cannot be used with Crypt::OpenSSL::RSA versions 0.36 and 0.37
+
 =item RS384
 
 C<RSASSA-PKCS-v1_5 using SHA-384>
+
+Cannot be used with Crypt::OpenSSL::RSA versions 0.36 and 0.37
 
 =item RS512
 
 C<RSASSA-PKCS-v1_5 using SHA-512>
 
+Cannot be used with Crypt::OpenSSL::RSA versions 0.36 and 0.37
+
 =item PS256
 
 C<RSASSA-PSS using SHA-256 and MGF1 with SHA-256>
 
-Needs Crypt::OpenSSL::RSA versions >= 0.38 and OpenSSL 3
+Needs Crypt::OpenSSL::RSA versions >= 0.36 and OpenSSL 3
 
 =item PS384
 
 C<RSASSA-PSS using SHA-384 and MGF1 with SHA-384>
 
-Needs Crypt::OpenSSL::RSA versions >= 0.38 and OpenSSL 3
+Needs Crypt::OpenSSL::RSA versions >= 0.36 and OpenSSL 3
 
 =item PS512
 
 C<RSASSA-PSS using SHA-512 and MGF1 with SHA-512>
 
-Needs Crypt::OpenSSL::RSA versions >= 0.38 and OpenSSL 3
+Needs Crypt::OpenSSL::RSA versions >= 0.36 and OpenSSL 3
 
 =back
 

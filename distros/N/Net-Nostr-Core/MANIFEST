@@ -36,6 +36,7 @@ lib/Net/Nostr/Metadata.pm
 lib/Net/Nostr/MintDiscovery.pm
 lib/Net/Nostr/Negentropy.pm
 lib/Net/Nostr/Nutzap.pm
+lib/Net/Nostr/PaymentTargets.pm
 lib/Net/Nostr/Reaction.pm
 lib/Net/Nostr/RelayAccess.pm
 lib/Net/Nostr/RelayAdmin.pm
@@ -106,6 +107,7 @@ t/53-RelayAccess.t
 t/54-LiveActivity.t
 t/55-Wiki.t
 t/57-Thread.t
+t/60-EventContent.t
 t/author/00-author.t
 t/data/nip44.vectors.json
 t/lib/TestFixtures.pm
@@ -145,6 +147,7 @@ t/nip/60.t
 t/nip/61.t
 t/nip/65.t
 t/nip/66.t
+t/nip/67.t
 t/nip/73.t
 t/nip/78.t
 t/nip/86.t
@@ -154,6 +157,7 @@ t/nip/92.t
 t/nip/94.t
 t/nip/98.t
 t/nip/99.t
+t/nip/A3.t
 t/nip/B7.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,40 +1,33 @@
 ---
-abstract: 'Database independent interface for Perl'
+abstract: Database independent interface for Perl
 author:
-  - 'DBI team (dbi-users@perl.org)'
+  - DBI team (dbi-users@perl.org)
 build_requires:
-  ExtUtils::MakeMaker: '6.48'
-  Test::Simple: '0.96'
+  perl: '5.008001'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.48'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: Author, CPAN::Meta::Converter version 2.150013
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: DBI
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  DBI:
+    file: DBI.pm
+    version: '1.653'
+recommends:
+  Encode: '3.24'
+  Test::More: '1.302224'
 requires:
   Module::Load: '0.22'
+  Test::More: '0.96'
+  XSLoader: '0'
   perl: '5.012000'
 resources:
   IRC: irc://irc.perl.org/#dbi
-  MailingList: mailto:dbi-dev@perl.org
   bugtracker: https://github.com/perl5-dbi/dbi/issues
-  homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/dbi
-version: '1.652'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
-x_suggests:
-  Clone: 0.47
-  DB_File: 0
-  MLDBM: 0
-  Net::Daemon: 0
-  RPC::PlClient: 0.202
-  RPC::PlServer: 0.202
-  SQL::Statement: 1.414
+version: '1.653'

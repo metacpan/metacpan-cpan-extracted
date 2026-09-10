@@ -44,9 +44,9 @@
 
 /* THE MEMORY TIER.
  *
- * A file hit is 7.2us and 6.2us of that is the `open` syscall - measured, in
- * plan_punk_cache/phase-6-xs-front.md. Nothing around the syscall is worth
- * tuning, so the only way a hit gets faster is not to open the file, and a
+ * A file hit is 7.2us and 6.2us of that is the `open` syscall, measured.
+ * Nothing around the syscall is worth tuning, so the only way a hit gets
+ * faster is not to open the file, and a
  * per-worker memory cache in front does exactly that.
  *
  * It is the byte-budgeted LRU from punk_cache.h, held HERE rather than

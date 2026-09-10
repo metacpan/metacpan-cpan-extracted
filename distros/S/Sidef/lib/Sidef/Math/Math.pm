@@ -67,31 +67,34 @@ sub min {
 
 sub arithmetic_mean {
     my ($self, @list) = @_;
-
-    my $sum = Sidef::Types::Number::Number::sum(@list);
-    my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
-
-    $sum->div($n);
+    Sidef::Types::Number::Number::arithmetic_mean(@list);
 }
 
 *avg = \&arithmetic_mean;
 
 sub geometric_mean {
     my ($self, @list) = @_;
-
-    my $prod = Sidef::Types::Number::Number::prod(@list);
-    my $n    = Sidef::Types::Number::Number::_set_int(scalar(@list));
-
-    $prod->root($n);
+    Sidef::Types::Number::Number::geometric_mean(@list);
 }
 
 sub harmonic_mean {
     my ($self, @list) = @_;
+    Sidef::Types::Number::Number::harmonic_mean(@list);
+}
 
-    my $sum = Sidef::Types::Number::Number::sum(map { $_->inv } @list);
-    my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
+sub median {
+    my ($self, @list) = @_;
+    Sidef::Types::Number::Number::median(@list);
+}
 
-    $n->div($sum);
+sub variance {
+    my ($self, @list) = @_;
+    Sidef::Types::Number::Number::variance(@list);
+}
+
+sub stddev {
+    my ($self, @list) = @_;
+    Sidef::Types::Number::Number::stddev(@list);
 }
 
 sub solve_seq {

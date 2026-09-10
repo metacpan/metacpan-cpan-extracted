@@ -1,4 +1,4 @@
-/* punk_response.h - C response assembly (phase 5, tier 1).
+/* punk_response.h - C response assembly.
  *
  * Builds the PSGI triplet - status, header AV with Content-Type and
  * Content-Length, single-element body AV - in one pass, and gives the

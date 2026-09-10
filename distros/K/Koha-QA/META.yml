@@ -1,0 +1,37 @@
+---
+abstract: 'Quality Assurance utilities for Koha'
+author:
+  - 'Jonathan Druart <jonathan.druart@bugs.koha-community.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Koha-QA
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::ShareDir: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  IPC::Run3: '0'
+  Modern::Perl: '0'
+  Perl::Critic: '0'
+  Perl::Tidy: '== 20250105'
+  Pod::Checker: '0'
+  perl: '5.016000'
+resources:
+  bugtracker: https://gitlab.com/joubu/koha-qa/-/issues
+  repository: https://gitlab.com/joubu/koha-qa.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

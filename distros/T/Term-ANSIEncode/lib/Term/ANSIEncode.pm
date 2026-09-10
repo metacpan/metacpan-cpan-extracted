@@ -1,4 +1,4 @@
-package Term::ANSIEncode 2.05;
+package Term::ANSIEncode 2.08;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -31,9 +31,9 @@ use constant {
 
 use Time::HiRes qw( sleep );
 use Text::Format;
+use Term::Drawille;
 
 # use Data::Dumper::Simple;$Data::Dumper::Terse=TRUE;$Data::Dumper::Indent=TRUE;$Data::Dumper::Useqq=TRUE;$Data::Dumper::Deparse=TRUE;$Data::Dumper::Quotekeys=TRUE;$Data::Dumper::Trailingcomma=TRUE;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;$Data::Dumper::Deparse=TRUE;
-# use Term::Drawille;
 
 # UTF-8 is required for special character handling
 binmode(STDERR, ":encoding(UTF-8)");
@@ -59,14 +59,14 @@ BEGIN {
     our @EXPORT_OK = qw(ansi_colors);
 } ## end BEGIN
 
-our $VERSION = '2.05';
+our $VERSION = '2.08';
 
 # Package-level caches so large tables are built only once per process.
 our $GLOBAL_ANSI_META = _global_ansi_meta();
 
 # Table of styles. Each entry is [tl,tr,bl,br,top,bot,vl,vr]
 our %STYLES = (
-    'DEFAULT'        => ['╔', '╗', '╚', '╝', '═', '═', '║', '║'],
+    'DOUBLE'         => ['╔', '╗', '╚', '╝', '═', '═', '║', '║'],
     'THIN'           => ['┌', '┐', '└', '┘', '─', '─', '│', '│'],
     'ROUND'          => ['╭', '╮', '╰', '╯', '─', '─', '│', '│'],
     'THICK'          => ['┏', '┓', '┗', '┛', '━', '━', '┃', '┃'],
@@ -89,6 +89,11 @@ our %STYLES = (
     'FAT ARROWHEADS' => ['🡅', '🡇', '🡅', '🡇', '🡆', '🡄', '🡅', '🡇'],
     'SOLID'          => ['█', '█', '█', '█', '█', '█', '█', '█'],
 );
+$STYLES{'DEFAULT'} = $STYLES{'DOUBLE'};
+
+# Precomputed 256-color palette and LRU/memoization cache for RGB downsampling
+our (@ANSI_PALETTE, %RGB_CACHE);
+_init_ansi_palette();
 
 sub new {
     my $class = shift;
@@ -111,6 +116,35 @@ sub new {
     return ($self);
 } ## end sub new
 
+sub _init_ansi_palette {
+    return if @ANSI_PALETTE;
+
+    # 0..15 standard/bright system colors (VGA/xterm defaults)
+    my @system = (
+        [0, 0, 0],       [128, 0, 0],     [0, 128, 0],     [128, 128, 0],
+        [0, 0, 128],     [128, 0, 128],   [0, 128, 128],   [192, 192, 192],
+        [128, 128, 128], [255, 0, 0],     [0, 255, 0],     [255, 255, 0],
+        [0, 0, 255],     [255, 0, 255],   [0, 255, 255],   [255, 255, 255]
+    );
+    push @ANSI_PALETTE, @system;
+
+    # 16..231: 6x6x6 color cube
+    my @levels = (0, 95, 175, 215, 239, 255);
+    for my $r (0 .. 5) {
+        for my $g (0 .. 5) {
+            for my $b (0 .. 5) {
+                push @ANSI_PALETTE, [ $levels[$r], $levels[$g], $levels[$b] ];
+            }
+        }
+    }
+
+    # 232..255: Grayscale ramp
+    for my $i (0 .. 23) {
+        my $v = 8 + ($i * 10);
+        push @ANSI_PALETTE, [ $v, $v, $v ];
+    }
+}
+
 sub ansi_decode {
     my $self = shift;
     my $text = shift;
@@ -118,6 +152,32 @@ sub ansi_decode {
     # Nothing to do for very short strings
     return $text unless defined $text && length($text) > 1;
 
+    # Flatten the ansi_meta lookup to a simple, case-insensitive hash
+    my %lookup;
+    for my $code (qw(foreground background special clear cursor attributes)) {
+        my $map = $self->{'ansi_meta'}->{$code} or next;
+        while (my ($name, $info) = each %{$map}) {
+            next unless defined $info->{out};
+            my $seq = $info->{out};
+
+            # Automatically convert 24-bit named presets if TrueColor is unsupported
+            if (! $self->{'CAPS'}->{'24 BIT'} && $seq =~ /\e\[(38|48);2;(\d+);(\d+);(\d+)m/) {
+                my ($plane, $r, $g, $b) = ($1, $2, $3, $4);
+                $seq = $self->_rgb_to_ansi($r, $g, $b, ($plane eq '48' ? 1 : 0));
+            }
+
+            $lookup{ lc $name } = $seq;
+        }
+    }
+
+    # If a literal screen reset token exists, remove it and run reset once.
+    if ($text =~ /\[%\s+SCREEN\s+RESET\s+%\]/) {
+        $text =~ s/\[%\s+SCREEN\s+RESET\s+%\]//gs;
+        system('reset');
+    }
+
+    # Convenience CSI
+    my $csi = $self->{'ansi_meta'}->{special}->{CSI}->{out};
 	# Before parsing all other tokens, parse BLOCK and ENDBLOCK tokens
 ###
     $text =~ s{
@@ -136,16 +196,53 @@ sub ansi_decode {
     #      x: Allows for extended mode, which ignores whitespace and comments in the regex for better readability.
 ###
 
-    # If a literal screen reset token exists, remove it and run reset once.
-    if ($text =~ /\[%\s+SCREEN\s+RESET\s+%\]/) {
-        $text =~ s/\[%\s+SCREEN\s+RESET\s+%\]//gs;
-        system('reset');
+while ($text =~ m{\[%\s*CANVAS(?:\s+(.*?))?\s*%\]([\s\S]*?)\[%\s*ENDCANVAS\s*%\]}si) {
+        my ($params, $commands) = ($1, $2);
+        my $matched = $&;
+
+        my @parts = split(/\s*,\s*/, (defined $params ? $params : ''));
+        my $x = (defined $parts[0] && $parts[0] =~ /^\d+$/) ? int($parts[0]) : 1;
+        my $y = (defined $parts[1] && $parts[1] =~ /^\d+$/) ? int($parts[1]) : 1;
+        my $w = (defined $parts[2] && $parts[2] =~ /^\d+$/) ? int($parts[2]) : 160;
+        my $h = (defined $parts[3] && $parts[3] =~ /^\d+$/) ? int($parts[3]) : 80;
+
+        $w = 2 if $w < 2;
+        $h = 4 if $h < 4;
+
+        my $canvas = Term::Drawille->new(
+            width  => $w,
+            height => $h,
+        );
+
+        for my $cmd (split(/\r?\n/, $commands)) {
+            $cmd =~ s/^\s+|\s+$//g;
+            next unless length($cmd);
+
+            if ($cmd =~ /^line\s+(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i) {
+                _drawille_line($canvas, $1, $2, $3, $4);
+            } elsif ($cmd =~ /^pixel\s+(\d+)\s*,\s*(\d+)/i) {
+                $canvas->set($1, $2);
+            } elsif ($cmd =~ /^unset\s+(\d+)\s*,\s*(\d+)/i) {
+                $canvas->unset($1, $2);
+            }
+        }
+
+        my $canvas_str = $canvas->as_string();
+        $canvas_str =~ s/\r//g;
+        my @lines = split(/\n/, $canvas_str);
+
+        # Build replacement string safely using explicit cursor save/restore
+        my $replacement = "\e[s";
+        my $cur_y = $y;
+        for my $line (@lines) {
+            $replacement .= "\e[${cur_y};${x}H" . $line;
+            $cur_y++;
+        }
+        $replacement .= "\e[u";
+
+        $text =~ s/\Q$matched\E/$replacement/;
     }
-
-    # Convenience CSI
-    my $csi = $self->{'ansi_meta'}->{special}->{CSI}->{out};
-
-    #
+	#
     # BOX blocks (BOX ... ENDBOX) - handle first.
     # Use a while loop and plain Perl code for replacements (avoid s///e/do-block in-place),
     # so we don't accidentally create replacement-string interpolation warnings.
@@ -185,23 +282,38 @@ sub ansi_decode {
           '[% RETURN %][% B_' . $color . ' %][% CLEAR LINE %][% RESET %]';
       }/egs;
 
-    while ($text =~ /\[%\s+UNDERLINE COLOR RGB\s+(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s+%\]/) {
-        my ($red, $green, $blue) = ($1, $2, $3);
-        my $new = "\e[58;2;${red};${green};${blue}m";
-        $text =~ s/\[%\s+UNDERLINE COLOR RGB\s+$red,$green,$blue\s+%\]/$new/gs;
-    }
+   # Underline colors
+   while ($text =~ /\[%\s+UNDERLINE COLOR RGB\s+(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s+%\]/) {
+       my ($red, $green, $blue) = ($1 & 255, $2 & 255, $3 & 255);
+       my $new;
+       if ($self->{'CAPS'}->{'24 BIT'}) {
+           $new = "\e[58;2;${red};${green};${blue}m";
+       } elsif ($self->{'CAPS'}->{'8 BIT'}) {
+           my $code = $self->_rgb_to_256($red, $green, $blue);
+           $new = "\e[58;5;${code}m";
+       } else {
+           $new = '';    # Not supported below 8-bit
+       }
+       $text =~ s/\[%\s+UNDERLINE COLOR RGB\s+$red,$green,$blue\s+%\]/$new/gs;
+   }
     while ($text =~ /\[%\s+UNDERLINE COLOR\s+(.*?)\s+%\]/) {
-        my $color = $1;
-        my $new;
-        $new = "\e[58;5;" . substr($self->{'ansi_meta'}->{'foreground'}->{$color}->{'out'}, 3);
-        $text =~ s/\[%\s+UNDERLINE COLOR $color\s+%\]/$new/gs;
+        my $color = uc($1);
+		if (exists($self->{'ansi_meta'}->{'foreground'}->{$color})) {
+	        my $new = "\e[58;5;" . substr($self->{'ansi_meta'}->{'foreground'}->{$color}->{'out'}, 3);
+    	    $text =~ s/\[%\s+UNDERLINE COLOR\s+$color\s+%\]/$new/gs;
+		} else {
+    	    $text =~ s/\[%\s+UNDERLINE COLOR\s+$color\s+%\]//gs;
+		}
     } ## end while ($text =~ /\[%\s+UNDERLINE COLOR\s+(.*?)\s+%\]/)
 
-    # 24-bit RGB foreground/background
+	# 24-bit RGB foreground/background with dynamic fallback
     $text =~ s/\[%\s*RGB\s+(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*%\]/
-      do { my ($r,$g,$b)=($1&255,$2&255,$3&255); $csi . "38:2:$r:$g:$b" . 'm' }/egs;
+        $self->_rgb_to_ansi($1 & 255, $2 & 255, $3 & 255, 0);
+    /egs;
+
     $text =~ s/\[%\s*B_RGB\s+(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*%\]/
-      do { my ($r,$g,$b)=($1&255,$2&255,$3&255); $csi . "48:2:$r:$g:$b" . 'm' }/egs;
+        $self->_rgb_to_ansi($1 & 255, $2 & 255, $3 & 255, 1);
+    /egs;
 
     while ($text =~ /\[%\s+WRAP\s+%\](.*?)\[%\s+ENDWRAP\s+%\]/s) {
         my $wrapped = $1;
@@ -230,39 +342,39 @@ sub ansi_decode {
         $text =~ s/\[%\s+JUSTIFIED\s+%\].*?\[%\s+ENDJUSTIFIED\s+%\]/$wrapped/s;
     } ## end while ($text =~ /\[%\s+JUSTIFIED\s+%\](.*?)\[%\s+ENDJUSTIFIED\s+%\]/s)
 
-    #
-    # Flatten the ansi_meta lookup to a simple, case-insensitive hash for a single-pass
-    # substitution of tokens like [% RED %], [% RESET %], etc.
-    #
-    my %lookup;
-    for my $code (qw(foreground background special clear cursor attributes)) {
-        my $map = $self->{'ansi_meta'}->{$code} or next;
-        while (my ($name, $info) = each %{$map}) {
-            next unless defined $info->{out};
-            $lookup{ lc $name } = $info->{out};
-        }
-    } ## end for my $code (qw(foreground background special clear cursor attributes))
 
     # Final single-pass replacement for remaining [% ... %] tokens.
     # If token matches a lookup entry, substitute; otherwise if it's a named char use charnames;
     # else leave token visible.
 ###
-    $text =~ s/\[%\s*(.+?)\s*%\]/
-      do {
-          my $tok = $1;
-          my $key = lc $tok;
-          if ( exists $lookup{$key} ) {
-              $lookup{$key};
-          } elsif ( defined( my $char = charnames::string_vianame($tok) ) ) {
-              $char;
-          } else {
-              $&;    # leave the original token intact
-          }
-      }/egs;
+# Final single-pass replacement for remaining [% ... %] tokens.
+    $text =~ s/\[%\s*(.+?)\s*%\]/ $self->_resolve_token($1, $&, \%lookup) /egs;
 ###
 
     return $text;
 } ## end sub ansi_decode
+
+sub _resolve_token {
+    my ($self, $tok, $matched, $lookup_ref) = @_;
+    
+    # If the token contains lowercase characters, it is descriptive text (e.g. "color"), not a macro token.
+    return $matched if $tok =~ /[a-z]/;
+    return $matched unless $tok =~ /^[A-Z0-9 _,-]+$/;
+
+    my $key = lc $tok;
+    return $lookup_ref->{$key} if exists $lookup_ref->{$key};
+
+    if ($tok =~ /^[A-Z0-9 ]+$/) {
+        my $char;
+        {
+            no warnings;
+            $char = charnames::string_vianame($tok);
+        }
+        return $char if defined $char;
+    }
+
+    return $matched;
+}
 
 sub ansi_output {
     my $self = shift;
@@ -291,6 +403,9 @@ sub ansi_box {
     my $h      = shift;
     my $type   = shift;
     my $string = shift;
+
+    # Decode any inner tokens inside the box body first
+    $string = $self->ansi_decode($string) if defined $string;
 
     # Basic validation/fallbacks
     $w ||= 3;
@@ -348,6 +463,99 @@ sub ansi_box {
 
     return ($text);
 } ## end sub ansi_box
+
+sub _drawille_line {
+    my ($canvas, $x0, $y0, $x1, $y1) = @_;
+    my $dx = abs($x1 - $x0);
+    my $dy = abs($y1 - $y0);
+    my $sx = $x0 < $x1 ? 1 : -1;
+    my $sy = $y0 < $y1 ? 1 : -1;
+    my $err = $dx - $dy;
+
+    while (1) {
+        $canvas->set($x0, $y0);
+        last if $x0 == $x1 && $y0 == $y1;
+        my $e2 = 2 * $err;
+        if ($e2 > -$dy) {
+            $err -= $dy;
+            $x0  += $sx;
+        }
+        if ($e2 < $dx) {
+            $err += $dx;
+            $y0  += $sy;
+        }
+    }
+}
+
+sub _rgb_to_ansi {
+    my ($self, $r, $g, $b, $is_bg) = @_;
+    $is_bg = $is_bg ? 1 : 0;
+
+    my $caps = $self->{'CAPS'};
+
+    # 1. 24-bit TrueColor supported
+    if ($caps->{'24 BIT'}) {
+        my $plane = $is_bg ? 48 : 38;
+        return "\e[${plane};2;${r};${g};${b}m";
+    }
+
+    # Cache lookup key
+    my $cache_key = "$r,$g,$b,$is_bg";
+    return $RGB_CACHE{$cache_key} if exists $RGB_CACHE{$cache_key};
+
+    # 2. Downgrade to 8-bit (256-color)
+    if ($caps->{'8 BIT'}) {
+        my $code = $self->_rgb_to_256($r, $g, $b);
+        my $plane = $is_bg ? 48 : 38;
+        return $RGB_CACHE{$cache_key} = "\e[${plane};5;${code}m";
+    }
+
+    # 3. Downgrade to 4-bit (16-color) or 3-bit (8-color)
+    my $code = $self->_rgb_to_16($r, $g, $b, $caps->{'4 BIT'});
+    my $plane_offset = $is_bg ? ($code >= 90 ? 10 : 40) : ($code >= 90 ? 0 : 30);
+    my $final_code   = ($code >= 90) ? ($code + ($is_bg ? 10 : 0)) : ($plane_offset + ($code % 10));
+
+    return $RGB_CACHE{$cache_key} = "\e[${final_code}m";
+}
+
+sub _rgb_to_256 {
+    my ($self, $r, $g, $b) = @_;
+
+    # Search cube + grayscale ramp (indices 16..255)
+    my ($best_idx, $min_dist) = (16, ~0);
+
+    for my $idx (16 .. 255) {
+        my ($pr, $pg, $pb) = @{ $ANSI_PALETTE[$idx] };
+        # Weighted Euclidean distance (human eye sensitivity: 2R + 4G + 3B)
+        my $dist = (2 * ($r - $pr)**2) + (4 * ($g - $pg)**2) + (3 * ($b - $pb)**2);
+        if ($dist < $min_dist) {
+            $min_dist = $dist;
+            $best_idx = $idx;
+            last if $dist == 0;
+        }
+    }
+    return $best_idx;
+}
+
+sub _rgb_to_16 {
+    my ($self, $r, $g, $b, $allow_bright) = @_;
+
+    # 3-bit standard base coordinates
+    my $v = ($r > 127 ? 1 : 0) | ($g > 127 ? 2 : 0) | ($b > 127 ? 4 : 0);
+
+    # Standard ANSI colors: 0=Black, 1=Red, 2=Green, 3=Yellow, 4=Blue, 5=Magenta, 6=Cyan, 7=White
+    my @ansi3_map = (0, 1, 2, 3, 4, 5, 6, 7);
+    my $base = $ansi3_map[$v];
+
+    if ($allow_bright) {
+        # Check if luminance warrants high-intensity / bright variant
+        my $luminance = (0.299 * $r) + (0.587 * $g) + (0.114 * $b);
+        if ($luminance > 160 || ($r > 200 || $g > 200 || $b > 200)) {
+            return 90 + $base;    # Bright range: 90..97
+        }
+    }
+    return 30 + $base;            # Standard range: 30..37
+}
 
 sub _global_ansi_meta {    # prefills the hash cache
     my $esc = chr(27);
@@ -432,6 +640,7 @@ sub _global_ansi_meta {    # prefills the hash cache
             'SUPERSCRIPT'               => { 'out' => $csi . '73m', 'desc' => 'Turn on superscript' },
             'SUPERSCRIPT OFF'           => { 'out' => $csi . '75m', 'desc' => 'Turn off superscript' },
             'UNDERLINE'                 => { 'out' => $csi . '4m',  'desc' => 'Set to underlined text' },
+#			'UNDERLINE COLOR'           => { 'out' => $csi . '58m', 'desc' => 'Set underline color' },
         },
 
         # Color
@@ -1362,8 +1571,8 @@ TOKENS
                 }
             } ## end while (scalar(@d))
         } ## end while (scalar(@names))
-        $to .= "$bar " . sprintf('%-34s',  'UNDERLINE COLOR color') . "$bar " . sprintf('%-38s', 'Set the underline color using color') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s',  ' ') . " $bar " . sprintf('%-38s', 'token.') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s',  'UNDERLINE COLOR RGB red,green,blue') . "$bar " . sprintf('%-38s', 'Set the underline RGB color') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s',  'UNDERLINE COLOR color') . "$bar " . sprintf('%-38s', 'Set the underline color') . " $bar\n";
         $to .= "$bar " . sprintf('%-34s ', 'WRAP') . "$bar " . sprintf('%-38s', 'Begin text block to be word-wrapped') . " $bar\n";
         $to .= "$bar " . sprintf('%-34s ', 'ENDWRAP') . "$bar " . sprintf('%-38s', 'End text block to be word-wrapped') . " $bar\n";
         $to .= "$bar " . sprintf('%-34s ', 'JUSTIFIED') . "$bar " . sprintf('%-38s', 'Begin text block to be word-wrapped') . " $bar\n";
@@ -1438,14 +1647,22 @@ TOKENS
         $to .= '[% BRIGHT CYAN %]│ ' . '─' x 34 . " $bar [% BRIGHT CYAN %]" . '─' x 38 . ' │[% RESET %]' . "\n";
         $to .= "$bar " . sprintf('%-34s', 'SPACES count') . " $bar " . sprintf('%-38s', 'Outputs "count" number of spaces') . " $bar\n";
         $to .= "$bar " . sprintf('%-34s', 'CHAR character(s),count') . " $bar " . sprintf('%-38s', 'Outputs "count" number of "character"') . " $bar\n";
+		$to .= "$bar " . sprintf('%-34s', 'CANVAS col,row,width,height') . " $bar " . sprintf('%-38s', 'Shows a high-resolution Braille') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', ' ') . " $bar " . sprintf('%-38s', 'canvas at the selected location.') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', ' ') . " $bar " . sprintf('%-38s', 'Vector drawing commands like line,') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', ' ') . " $bar " . sprintf('%-38s', 'pixel go between CANVAS & ENDCANVAS.') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', 'ENDCANVAS') . " $bar " . sprintf('%-38s', 'Ends the CANVAS token function') . " $bar\n";
     }
     $to .= '[% BRIGHT GREEN %]╰' . '─' x 36 . '┴' . '─' x 40 . '╯[% RESET %]' . "\n";
 
     {    # Post processing
-        my $new = 'UNDERLINE COLOR [% UNDERLINE %][% UNDERLINE COLOR RED %][% FAINT %][% ITALIC %]co[% RESET %][% UNDERLINE %][% UNDERLINE COLOR GREEN %][% FAINT %][% ITALIC %]l[% RESET %][% UNDERLINE %][% UNDERLINE COLOR BLUE %][% FAINT %][% ITALIC %]or[% RESET %]';
+        my $new = 'UNDERLINE COLOR RGB [% UNDERLINE %][% UNDERLINE COLOR RGB 255,0,0 %][% FAINT %][% ITALIC %]red[% RESET %],[% UNDERLINE %][% UNDERLINE COLOR RGB 0,255,0 %][% FAINT %][% ITALIC %]green[% RESET %],[% UNDERLINE %][% UNDERLINE COLOR RGB 0,0,255 %][% FAINT %][% ITALIC %]blue[% RESET %]';
+        $to =~ s/UNDERLINE COLOR RGB red,green,blue/$new /gs;
+
+        $new = 'UNDERLINE COLOR [% UNDERLINE %][% UNDERLINE COLOR RED %][% FAINT %][% ITALIC %]co[% RESET %][% UNDERLINE %][% UNDERLINE COLOR GREEN %][% FAINT %][% ITALIC %]l[% RESET %][% UNDERLINE %][% UNDERLINE COLOR BLUE %][% FAINT %][% ITALIC %]or[% RESET %]';
         $to =~ s/UNDERLINE COLOR color/$new /gs;
 
-        $new = '[% FAINT %][% ITALIC %] color     [% RESET %]';
+		$new = '[% FAINT %][% ITALIC %] color     [% RESET %]';
         $to =~ s/ color     /$new/gs;
 
         $new = '[% FAINT %][% ITALIC %]character(s)[% RESET %],[% FAINT %][% ITALIC %]count[% RESET %]';
@@ -1462,6 +1679,12 @@ TOKENS
 
         $new = ' [% FAINT %][% ITALIC %]color[% RESET %],[% FAINT %][% ITALIC %]col[% RESET %],[% FAINT %][% ITALIC %]row[% RESET %],[% FAINT %][% ITALIC %]width[% RESET %],[% FAINT %][% ITALIC %]hght[% RESET %],[% FAINT %][% ITALIC %]type[% RESET %]';
         $to =~ s/ color,col,row,width,hght,type/$new/gs;
+
+		$new = ' [% FAINT %][% ITALIC %]color[% RESET %],[% FAINT %][% ITALIC %]col[% RESET %],[% FAINT %][% ITALIC %]row[% RESET %],[% FAINT %][% ITALIC %]width[% RESET %],[% FAINT %][% ITALIC %]hght[% RESET %],[% FAINT %][% ITALIC %]type[% RESET %]';
+        $to =~ s/ color,col,row,width,hght,type/$new/gs;
+
+        $new = ' [% FAINT %][% ITALIC %]col[% RESET %],[% FAINT %][% ITALIC %]row[% RESET %],[% FAINT %][% ITALIC %]width[% RESET %],[% FAINT %][% ITALIC %]height[% RESET %]';
+        $to =~ s/ col,row,width,height/$new/gs;
     }
     return ($to);
 } ## end sub expand_tokens
@@ -1986,6 +2209,41 @@ For example, for a color of blue, use the following
 =over 4
 
 =item HORIZONTAL RULE [color]             = A solid line of [color] background
+
+=back
+
+=head2 GRAPHICS CANVAS
+
+Makes a high-resolution sub-pixel vector graphics canvas using Unicode Braille patterns via C<Term::Drawille>.
+
+For example:
+
+ [% CANVAS 10, 5, 120, 60 %]
+ line 0,0,120,60
+ pixel 30,30
+ [% ENDCANVAS %]
+
+=over 4
+
+=item B<[% CANVAS column,row,pixel_width,pixel_height %]>
+
+Begins the canvas definition at the specified terminal column and row.
+
+=item B<line x1,y1,x2,y2>
+
+Draws a line using Bresenham's algorithm within the canvas pixel grid.
+
+=item B<pixel x,y>
+
+Sets a single pixel dot.
+
+=item B<unset x,y>
+
+Clears a single pixel dot.
+
+=item B<[% ENDCANVAS %]>
+
+Ends the canvas definition and renders the graphic onto the screen.
 
 =back
 

@@ -16,8 +16,8 @@ use Punk ();
 # heads are paths, and a string literal is only a filter ARGUMENT.
 #
 # The hash is built once per catalogue rather than per request, because
-# building one per request would copy the catalogue into SVs on every page -
-# the cost phase 0 exists to avoid.
+# building one per request would copy the catalogue into SVs on every page,
+# which is the cost the whole design exists to avoid.
 #
 # The two tests that matter here fail in opposite directions and both have to
 # pass at once: markup in the catalogue must survive, and markup in a

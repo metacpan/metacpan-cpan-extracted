@@ -81,6 +81,20 @@ static int OPENSSL_init_ssl(unsigned long opts, const void *settings) {
 #define HM_HAVE_NUM_TICKETS 1
 #endif
 
+/* TLS 1.3 itself: the version constant is 1.1.1+, the max-version setter
+ * 1.1.0+. LibreSSL ships both once it defines TLS1_3_VERSION, so the constant
+ * alone is the probe. Without it a build serves TLS 1.2 and no QUIC. */
+#ifdef TLS1_3_VERSION
+#define HM_HAVE_TLS13 1
+#endif
+
+/* HTTP/3 is TLS 1.3 or nothing. The Makefile.PL probe links against this same
+ * library, so this cannot normally fire - it fires if HM_HAVE_HTTP3 is forced
+ * by hand, and says why rather than failing later inside ngtcp2. */
+#if defined(HM_HAVE_HTTP3) && !defined(HM_HAVE_TLS13)
+#error "HM_HAVE_HTTP3 needs a TLS 1.3 OpenSSL (1.1.1+)"
+#endif
+
 /* The ticket-key get/set pair are macros over SSL_CTX_ctrl, absent when the
  * library was built with OPENSSL_NO_TLSEXT. */
 #ifdef SSL_CTX_set_tlsext_ticket_keys
@@ -134,6 +148,22 @@ static int hm_tls_sni_ex_idx = -1;
 /* ALPN: prefer h2, fall back to http/1.1. Installed only when HTTP/2 is on and
  * the OpenSSL in use provides ALPN (1.0.2+). */
 #ifdef HM_HAVE_ALPN
+/* QUIC serves h3 and nothing else - there is no "fall back to HTTP/1.1 over
+ * QUIC" - so this is a second, shorter callback rather than a parameter on
+ * the TCP one, which is on the h2 path and should not move. */
+static const unsigned char HM_TLS_ALPN_H3[] = { 2, 'h', '3' };
+
+static int hm_tls_alpn_h3_cb(SSL *ssl, const unsigned char **out,
+                             unsigned char *outlen, const unsigned char *in,
+                             unsigned int inlen, void *arg) {
+    (void)ssl; (void)arg;
+    if (SSL_select_next_proto((unsigned char **)out, outlen,
+                              HM_TLS_ALPN_H3, sizeof(HM_TLS_ALPN_H3),
+                              in, inlen) != OPENSSL_NPN_NEGOTIATED)
+        return SSL_TLSEXT_ERR_ALERT_FATAL;
+    return SSL_TLSEXT_ERR_OK;
+}
+
 static int hm_tls_alpn_cb(SSL *ssl, const unsigned char **out,
                           unsigned char *outlen, const unsigned char *in,
                           unsigned int inlen, void *arg) {
@@ -195,15 +225,37 @@ static void hm_tls_init(void) {
  * ALPN and client-cert verification. tkey, when given, is a 48-byte
  * session-ticket key to install instead of the random one SSL_CTX_new mints
  * (see hm_tls_ctx_build). Returns NULL (reason on stderr) on error. */
+/* HM_TLSCTX_QUIC: build the context QUIC needs instead of the TCP one. It is
+ * a flag rather than a second builder because everything that matters is the
+ * same - the certificate, the chain, the CA and client-cert verification, and
+ * above all the SESSION TICKET KEY. A QUIC context carrying a different key
+ * from its TCP sibling silently degrades cross-protocol resumption to full
+ * handshakes, which is the identical bug the SNI note below describes. */
+#define HM_TLSCTX_QUIC 1
+
 static SSL_CTX *hm_tls_ctx_one(const char *cert, const char *key,
                                const char *ca, int verify, int alpn_h2,
-                               const unsigned char *tkey, size_t tkeylen) {
+                               const unsigned char *tkey, size_t tkeylen,
+                               int flags) {
+    const int quic = (flags & HM_TLSCTX_QUIC) != 0;
     /* Any fixed non-empty string will do: it only has to be stable across the
      * contexts a client might resume against, which one constant guarantees. */
     static const unsigned char sid[] = "hyperman";
     SSL_CTX *ctx = SSL_CTX_new(TLS_server_method());
     if (!ctx) return NULL;
+    /* QUIC is TLS 1.3 only - there is no QUIC over 1.2 - and pinning the max
+     * as well as the min says so rather than leaving it to negotiation.
+     * TLS1_3_VERSION and the max-version setter are 1.1.1 and 1.1.0; a library
+     * with neither cannot drive ngtcp2, so HM_HAVE_HTTP3 is never set against
+     * one and no QUIC context is ever built there. The pinning is therefore
+     * compiled out rather than emulated, leaving the TLS 1.2 floor the TCP
+     * listener has always had. */
+#ifdef HM_HAVE_TLS13
+    SSL_CTX_set_min_proto_version(ctx, quic ? TLS1_3_VERSION : TLS1_2_VERSION);
+    if (quic) SSL_CTX_set_max_proto_version(ctx, TLS1_3_VERSION);
+#else
     SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION);
+#endif
     SSL_CTX_set_options(ctx, SSL_OP_NO_COMPRESSION | SSL_OP_CIPHER_SERVER_PREFERENCE
 #ifdef HM_HAVE_KTLS
                              /* Ask for the kernel record layer. OpenSSL only
@@ -221,6 +273,14 @@ static SSL_CTX *hm_tls_ctx_one(const char *cert, const char *key,
                              | SSL_OP_NO_RENEGOTIATION
 #endif
                              );
+#ifdef HM_HAVE_KTLS
+    /* There is no kernel record layer for QUIC: ngtcp2 encrypts every packet
+     * itself, so asking for kTLS here is at best inert and at worst a
+     * handshake OpenSSL sets up and nothing uses. */
+    if (quic) SSL_CTX_clear_options(ctx, SSL_OP_ENABLE_KTLS);
+#endif
+    /* PARTIAL_WRITE is about SSL_write, which a QUIC context never calls. */
+    if (!quic)
     SSL_CTX_set_mode(ctx, SSL_MODE_ENABLE_PARTIAL_WRITE
                           | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER
 #ifdef SSL_MODE_RELEASE_BUFFERS
@@ -269,9 +329,20 @@ static SSL_CTX *hm_tls_ctx_one(const char *cert, const char *key,
         SSL_CTX_free(ctx); return NULL;
     }
 #ifdef HM_HAVE_ALPN
-    if (alpn_h2) SSL_CTX_set_alpn_select_cb(ctx, hm_tls_alpn_cb, NULL);
+    /* h3 only on a QUIC context: offering h2 or http/1.1 over QUIC is a
+     * protocol error. The TCP list is untouched - h3 is discovered through
+     * Alt-Svc, never through ALPN over TCP. */
+    if (quic)         SSL_CTX_set_alpn_select_cb(ctx, hm_tls_alpn_h3_cb, NULL);
+    else if (alpn_h2) SSL_CTX_set_alpn_select_cb(ctx, hm_tls_alpn_cb, NULL);
 #else
     (void)alpn_h2;   /* ALPN unavailable on this OpenSSL; h2-over-TLS not offered */
+#endif
+    /* 0-RTT refused explicitly rather than left at a default: accepting it
+     * means accepting replayable application data, and that is a decision
+     * this server has not made. The setter is 1.1.1+, and a library without
+     * it has no 0-RTT to refuse - nor any QUIC context to refuse it on. */
+#ifdef HM_HAVE_TLS13
+    if (quic) SSL_CTX_set_max_early_data(ctx, 0);
 #endif
     if (verify != HM_TLS_VERIFY_NONE) {
         int flags = SSL_VERIFY_PEER;
@@ -327,6 +398,27 @@ static int hm_tls_get_ticket_key(void *ctxv, unsigned char *buf, size_t *len) {
  * hm_tls_reload passes the running context's key in for the same reason
  * across processes - it runs per worker, so each would otherwise rotate to a
  * key its siblings cannot read. */
+/* The QUIC context for a listener, built through hm_tls_ctx_one so it shares
+ * the certificate, the verification policy and - the one that bites quietly -
+ * the SESSION TICKET KEY with its TCP sibling.
+ *
+ * `tkey` is the key already in use on that sibling. Pass it, always: a QUIC
+ * context left to mint its own means a client that resumes across protocols
+ * gets a full handshake and nothing reports it. */
+static void *hm_tls_quic_ctx_build(const char *cert, const char *key,
+                                   const char *ca, int verify,
+                                   const unsigned char *tkey, size_t tkeylen) {
+    hm_tls_init();
+    return (void *)hm_tls_ctx_one(cert, key, ca, verify, 0, tkey, tkeylen,
+                                  HM_TLSCTX_QUIC);
+}
+
+/* The session-ticket key a built context is using, so the QUIC context can be
+ * given the same one. */
+static int hm_tls_ctx_tkey(void *ctx, unsigned char *out, size_t *len) {
+    return hm_tls_get_ticket_key((SSL_CTX *)ctx, out, len);
+}
+
 static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
                               const char *ca, int verify,
                               SV *sni_hv, int alpn_h2,
@@ -334,7 +426,7 @@ static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
     SSL_CTX *def;
     unsigned char kbuf[HM_TLS_TKEY_MAX];
     hm_tls_init();
-    def = hm_tls_ctx_one(cert, key, ca, verify, alpn_h2, tkey, tkeylen);
+    def = hm_tls_ctx_one(cert, key, ca, verify, alpn_h2, tkey, tkeylen, 0);
     if (!def) return NULL;
     if (!tkey && hm_tls_get_ticket_key(def, kbuf, &tkeylen)) tkey = kbuf;
 
@@ -362,7 +454,7 @@ static void *hm_tls_ctx_build(pTHX_ const char *cert, const char *key,
                 fprintf(stderr, "Hyperman TLS: SNI host '%s' needs cert and key\n", host);
                 continue;
             }
-            hctx = hm_tls_ctx_one(hc, hk, ca, verify, alpn_h2, tkey, tkeylen);
+            hctx = hm_tls_ctx_one(hc, hk, ca, verify, alpn_h2, tkey, tkeylen, 0);
             if (!hctx) continue;
             lchost = strdup(host);
             if (!lchost) { SSL_CTX_free(hctx); continue; }
@@ -444,11 +536,20 @@ static int hm_tls_wrap(hm_conn *c, void *ctx) {
  * the connection, so they sit on hm_conn directly; the heap struct is only
  * paid for when a client certificate was actually presented, which on a
  * public listener is never. */
-static void hm_tls_capture_peer(hm_conn *c) {
-    SSL *ssl = (SSL *)c->ssl;
+/* The handshake's results, off an SSL and into three out-parameters rather
+ * than into an hm_conn.
+ *
+ * QUIC's handshake is a TLS handshake and its connection is an hm_qconn, not
+ * an hm_conn - so a version of this that took hm_conn * could only ever serve
+ * the TCP half, and HTTP/3 would silently report no client certificate at
+ * all. mTLS working on one transport and quietly not on the other is a worse
+ * failure than not supporting it. */
+static void hm_tls_capture_ssl(SSL *ssl, const char **proto,
+                               const char **cipher, void **peer_out) {
     X509 *cert;
-    c->tls_proto  = SSL_get_version(ssl);
-    c->tls_cipher = SSL_get_cipher(ssl);
+    if (proto)  *proto  = SSL_get_version(ssl);
+    if (cipher) *cipher = SSL_get_cipher(ssl);
+    if (!peer_out) return;
     cert = SSL_get1_peer_certificate(ssl);
     if (cert) {
         hm_tls_peer *p = (hm_tls_peer *)hm_xcalloc(1, sizeof(hm_tls_peer));
@@ -459,8 +560,13 @@ static void hm_tls_capture_peer(hm_conn *c) {
         if (X509_NAME_oneline(X509_get_issuer_name(cert), buf, sizeof(buf)))
             p->issuer = strdup(buf);
         X509_free(cert);
-        c->tls_peer = p;
+        *peer_out = p;
     }
+}
+
+static void hm_tls_capture_peer(hm_conn *c) {
+    hm_tls_capture_ssl((SSL *)c->ssl, &c->tls_proto, &c->tls_cipher,
+                       &c->tls_peer);
 }
 
 static void hm_tls_conn_free(hm_conn *c) {
@@ -546,20 +652,23 @@ static void hm_tls_env_init(pTHX) {
 }
 
 /* Add the TLS $env keys (mod_ssl-style) for a TLS connection. */
-static void hm_tls_env(pTHX_ hm_conn *c, HV *env) {
+/* The TLS half of $env, from the captured results rather than from a
+ * connection - so HTTP/3 reports SSL_CLIENT_* exactly as HTTP/1.1 and
+ * HTTP/2 do. ktls is passed in because there is no kernel record layer for
+ * QUIC and the caller is the only one that knows which it is. */
+static void hm_tls_env_from(pTHX_ HV *env, const char *proto,
+                            const char *cipher, void *peer, int ktls) {
     hm_tls_peer *p;
-    if (!c->ssl) return;
     hm_tls_env_init(aTHX);
     (void)hv_store_ent(env, hm_tlsk[HM_TLSK_HTTPS], newSVpvs("on"), 0);
-    if (c->tls_proto)
+    if (proto)
         (void)hv_store_ent(env, hm_tlsk[HM_TLSK_PROTOCOL],
-                           newSVpv(c->tls_proto, 0), 0);
-    if (c->tls_cipher)
+                           newSVpv(proto, 0), 0);
+    if (cipher)
         (void)hv_store_ent(env, hm_tlsk[HM_TLSK_CIPHER],
-                           newSVpv(c->tls_cipher, 0), 0);
-    (void)hv_store_ent(env, hm_tlsk[HM_TLSK_KTLS],
-                       newSViv(hm_ktls_tx(c) ? 1 : 0), 0);
-    p = (hm_tls_peer *)c->tls_peer;
+                           newSVpv(cipher, 0), 0);
+    (void)hv_store_ent(env, hm_tlsk[HM_TLSK_KTLS], newSViv(ktls ? 1 : 0), 0);
+    p = (hm_tls_peer *)peer;
     if (p) {
         (void)hv_store_ent(env, hm_tlsk[HM_TLSK_VERIFY],
                            newSVpv(p->verified ? "SUCCESS" : "FAILED", 0), 0);
@@ -572,6 +681,12 @@ static void hm_tls_env(pTHX_ hm_conn *c, HV *env) {
     } else {
         (void)hv_store_ent(env, hm_tlsk[HM_TLSK_VERIFY], newSVpvs("NONE"), 0);
     }
+}
+
+static void hm_tls_env(pTHX_ hm_conn *c, HV *env) {
+    if (!c->ssl) return;
+    hm_tls_env_from(aTHX_ env, c->tls_proto, c->tls_cipher, c->tls_peer,
+                    hm_ktls_tx(c) ? 1 : 0);
 }
 
 /* Non-blocking read. >0 bytes, 0 = EOF/closed, -1 = error (errno==EAGAIN when

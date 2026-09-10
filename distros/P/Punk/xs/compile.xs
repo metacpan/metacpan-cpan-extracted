@@ -652,7 +652,8 @@ compile(self)
                  * which is how url_for tells the two apart: [ mount prefix,
                  * parsed template ].
                  *
-                 * operationIds are NOT held to phase 0's identifier rule.
+                 * operationIds are NOT held to the route-name identifier
+                 * rule.
                  * They are the spec's, and a spec may say `get-book` or
                  * `book.get`; those are callable from url_for as whatever
                  * they are, and simply absent from the template `url` hash,

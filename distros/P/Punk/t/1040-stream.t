@@ -99,6 +99,53 @@ sub dechunk {
     is($body, 'onetwo', 'the raw body, close-delimited');
 }
 
+# ---- the multiplexed versions: also no chunked framing -----------------------
+#
+# Chunked transfer coding is HTTP/1.1's and only HTTP/1.1's. HTTP/1.0 has no
+# such coding and HTTP/2 and HTTP/3 forbid the header outright, framing the
+# body in the protocol instead. So the test asks whether the protocol IS
+# HTTP/1.1, rather than whether it is not HTTP/1.0 - which put a
+# Transfer-Encoding on every h2 response, Hyperman spelling its h2 protocol
+# "HTTP/2" (six bytes, not "HTTP/2.0") and never matching the exclusion.
+#
+# A missing SERVER_PROTOCOL is HTTP/1.1, which is what the synthetic
+# environments elsewhere in this file rely on.
+{
+    package MuxApp;
+    use Punk;
+    get '/x' => sub {
+        $_[0]->stream('text/plain', { blocking => 1 },
+                      sub { $_[1]->write('one')->write('two') });
+    };
+    package main;
+}
+my $muxapp = MuxApp->to_app;
+
+for my $case ([ 'HTTP/2', 'h2' ], [ 'HTTP/3', 'h3' ], [ undef, 'no SERVER_PROTOCOL' ]) {
+    my ($proto, $label) = @$case;
+
+    socketpair(my $ours, my $theirs, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
+        or die "socketpair: $!";
+    $muxapp->({ REQUEST_METHOD => 'GET', PATH_INFO => '/x',
+                (defined $proto ? (SERVER_PROTOCOL => $proto) : ()),
+                'psgix.io' => $theirs });
+    close $theirs;
+    my $raw = '';
+    eval { local $SIG{ALRM} = sub { die "to\n" }; alarm 2;
+           while (sysread $ours, my $c, 4096) { $raw .= $c } alarm 0 };
+    my ($head, $body) = split /\r\n\r\n/, $raw, 2;
+    if (defined $proto) {
+        unlike($head, qr{Transfer-Encoding}, "no chunked framing for $label");
+        is($body, 'onetwo', "the raw body for $label, framed by the transport");
+    }
+    else {
+        like($head, qr{Transfer-Encoding: chunked\r\n},
+             'chunked framing when SERVER_PROTOCOL is absent');
+        my ($payload) = dechunk($body);
+        is($payload, 'onetwo', '...and the body still reassembles');
+    }
+}
+
 # ---- a die mid-stream is visible truncation ----------------------------------
 {
     package DieApp;

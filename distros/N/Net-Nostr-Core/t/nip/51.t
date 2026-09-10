@@ -840,4 +840,15 @@ subtest 'private_items returns a copy not a reference' => sub {
     is(scalar @{$list->private_items}, 1, 'original not modified');
 };
 
+subtest 'favorite follow sets kind 10011 round trip' => sub {
+    my $list = Net::Nostr::List->new(kind=>10011);
+    $list->add('a','30000:'.('a'x64).':friends');
+    $list->add('a','30000:'.('b'x64).':developers');
+    my $event = $list->to_event(pubkey=>'c'x64,created_at=>1000);
+    ok $event->is_replaceable, 'favorite follow sets are a standard replaceable list';
+    my $parsed = Net::Nostr::List->from_event($event);
+    is $parsed->kind, 10011, 'favorite follow sets kind retained';
+    is $parsed->items, $list->items, 'ordered kind-30000 references retained';
+    is $parsed->to_event(pubkey=>'c'x64,created_at=>1000)->to_hash, $event->to_hash, 'event round trip';
+};
 done_testing;

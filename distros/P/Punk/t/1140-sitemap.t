@@ -13,7 +13,7 @@ use Punk::Plugin::Sitemap;
 # everything passes "the guarded route is absent" on its own, so every
 # exclusion is tested beside the inclusion it must not have taken with it.
 
-# ---- the whole claim of phase 1 ----------------------------------------------
+# ---- the whole claim: the filter over the route table ------------------------
 {
     package SiteApp;
     use Punk;
@@ -172,7 +172,7 @@ use Punk::Plugin::Sitemap;
       . 'added to the known list, not the check removed');
 }
 
-# ---- phase 2: the document ---------------------------------------------------
+# ---- the document ------------------------------------------------------------
 # Rendered once at to_app and served from memory: the route half changes only
 # when the routes do, which is never while the process runs.
 {
@@ -308,7 +308,7 @@ use Punk::Plugin::Sitemap;
       . 'crawler following a stale index should be told it is gone');
 }
 
-# ---- phase 3: the dynamic half -----------------------------------------------
+# ---- the dynamic half --------------------------------------------------------
 # The route table cannot know ids, so /users/:id contributes nothing on its
 # own. The `sitemap` keyword is where the application supplies them.
 {
@@ -470,7 +470,7 @@ use Punk::Plugin::Sitemap;
     like($doc,   qr{/second}, 'so an override wins rather than doubling');
 }
 
-# ---- an app with no sections keeps phase 2 exactly ---------------------------
+# ---- an app with no sections never rebuilds ----------------------------------
 {
     package StaticApp;
     use Punk;
@@ -487,7 +487,7 @@ use Punk::Plugin::Sitemap;
       . 'change while the process runs, so there is nothing to refresh');
 }
 
-# ---- phase 4: robots.txt -----------------------------------------------------
+# ---- robots.txt --------------------------------------------------------------
 # The same decision, made once, spelled twice. Written apart the two drift
 # within a release, and the drift is silent in both directions.
 {

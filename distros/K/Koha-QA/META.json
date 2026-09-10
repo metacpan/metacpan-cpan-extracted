@@ -1,0 +1,67 @@
+{
+   "abstract" : "Quality Assurance utilities for Koha",
+   "author" : [
+      "Jonathan Druart <jonathan.druart@bugs.koha-community.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Koha-QA",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "File::Slurp" : "0",
+            "File::Temp" : "0",
+            "IPC::Run3" : "0",
+            "Modern::Perl" : "0",
+            "Perl::Critic" : "0",
+            "Perl::Tidy" : "== 20250105",
+            "Pod::Checker" : "0",
+            "perl" : "5.016000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/joubu/koha-qa/-/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/joubu/koha-qa.git",
+         "web" : "https://gitlab.com/joubu/koha-qa"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -1,75 +1,42 @@
 /* hm_bus.h - a cross-worker message bus on a fork-shared ring.
  *
- * WHAT THIS EXISTS FOR.
+ * One ring in shared memory, mapped by the supervisor BEFORE it forks, so
+ * every worker publishes into and reads from the same copy. It exists because
+ * a per-worker structure like Punk::WebSocket::Room broadcasts to roughly
+ * 1/workers of its members and reports a plausible number for it.
  *
- * Punk::WebSocket::Room says it in its own documentation: a room is per
- * worker, so under `workers => 4` a broadcast reaches roughly a quarter of
- * the people in it. The call succeeds, the return value is a plausible
- * number, and nobody is told. That is not a missing feature, it is a wrong
- * answer that nothing reports.
+ * A message is published once; the delivery mode is WHERE THE CURSOR LIVES.
+ * A fanout subscriber keeps its cursor in its own process, so every
+ * subscriber reads every message. A queue group keeps one cursor in the
+ * arena, so exactly one member gets each message - and the load balancing
+ * falls out of the claim, since a busy worker is not in the drain loop and
+ * not claiming.
  *
- * This is the substrate that fixes it: one ring in shared memory, mapped by
- * the supervisor BEFORE it forks, so every worker publishes into and reads
- * from the same copy. No Redis, no hub process, no new prerequisite.
+ * The claim races: every worker wakes on a publish and one wins each slot. A
+ * lost race costs a CAS and a retry, 20ns with two processes and 167ns with
+ * eight, which is what makes waking everybody affordable.
  *
- * TWO DELIVERY MODES, ONE MECHANISM.
+ * CAS and not fetch-add, for correctness rather than speed. A fetch-add
+ * cannot be taken back: a claimer that overshoots the last published sequence
+ * has already moved the SHARED cursor past sequences nobody has written, and
+ * those messages are skipped forever with no gap counted.
  *
- * A message is published once. What differs is WHERE THE CURSOR LIVES:
+ * Queue groups are AT-MOST-ONCE. A worker that claims a slot and then dies
+ * loses that message; Punk::Queue is the durable at-least-once one. Choosing
+ * wrongly is a data-loss bug, so it is documented beside the feature.
  *
- *   - a FANOUT subscriber keeps its cursor in its own process, so every
- *     subscriber reads every message. This is what a chat room wants.
+ * Overflow is bounded, drop-oldest and COUNTED - a silently short chat room
+ * is indistinguishable from a quiet one, and a gap with a number beside it is
+ * a diagnosis.
  *
- *   - a QUEUE GROUP keeps one cursor in the arena, advanced with an atomic
- *     add, so exactly one member gets each message. This is load-balanced
- *     work distribution, and the balancing falls out of the claim: a worker
- *     that is busy is not in the drain loop, is not claiming, and the free
- *     workers take the traffic. There is no scheduler and nothing to tune.
+ * Fixed slots rather than a length-prefixed byte ring: publish is ~3ns slower
+ * for a small message and faster for a large one, but the group's cursor IS
+ * the slot address, so a claim is one atomic op. A byte ring would need a
+ * second index of message offsets kept in lockstep with the write cursor.
  *
- * The claim races. Every worker wakes on a publish and only one wins each
- * slot; a lost race costs one compare-and-swap and a retry - measured at 20ns
- * with two processes and 167ns with eight, against a message that is about to
- * be written to a socket. That is why waking everybody is affordable.
- *
- * It is a CAS and not a fetch-add, and the difference is not performance. A
- * fetch-add cannot be taken back: a claimer that added and then found it had
- * overshot the last published sequence has already moved the SHARED cursor
- * past sequences nobody has written yet, and every one of those messages is
- * then skipped forever with no gap counted, because nothing noticed. The
- * phase-0 spike printed that bug in its own output - `final cursor 1000002`
- * for two processes claiming a million - and it went unread until a forked
- * test lost a message an hour later.
- *
- * QUEUE GROUPS ARE AT-MOST-ONCE, AND THAT IS NOT A BUG TO BE FIXED LATER.
- * A worker that claims a slot and then dies loses that message. If losing it
- * matters, the answer is Punk::Queue, which is durable and at-least-once and
- * already exists. This is the fast lossy one. Both are right for different
- * jobs and choosing wrongly is a data-loss bug, so the documentation says so
- * beside the feature rather than in a footnote.
- *
- * OVERFLOW: BOUNDED, DROP-OLDEST, COUNTED.
- *
- * A slow reader gets lapped. Every part of the response is deliberate:
- * bounded, because an unbounded buffer in front of a stalled worker is a
- * memory leak with a schedule; drop-OLDEST, because the recent messages are
- * the ones anybody wants; and COUNTED, because a silently short chat room is
- * indistinguishable from a quiet one. A gap with a number beside it is a
- * diagnosis; a gap without one is a mystery. The job is not "do not lose
- * messages", it is DO NOT BECOME THE PROBLEM.
- *
- * WHY FIXED SLOTS.
- *
- * Measured against a length-prefixed byte ring (plan_punk_bus/phase-0-ring.md
- * has the numbers). Publishing is ~3ns slower for a small message and FASTER
- * for a large one; draining is a wash. The decision is the claim: with fixed
- * slots the group's cursor IS the slot address, so a claim is one atomic add.
- * A byte ring has no such integer and would need a second index of message
- * offsets kept in lockstep with the write cursor, under concurrent
- * publishers, for nothing.
- *
- * Everything here FAILS OPEN. With no arena - Windows, no atomics, or simply
- * not running under Hyperman - publish reports that it was local only and the
- * caller delivers to its own subscribers. A test script and a single-process
- * dev server keep working, which is the same answer deny_check and
+ * Everything here FAILS OPEN. With no arena - Windows, no atomics, or not
+ * running under Hyperman - publish reports that it was local only and the
+ * caller delivers to its own subscribers, the same answer deny_check and
  * ratelimit_hit give.
  */
 
@@ -90,30 +57,23 @@
 
 #include "hm_atomic.h"
 
-/* Give the CPU back, so a DESCHEDULED publisher can run.
- *
- * This is not a shorter spin, it is a different kind of wait, and the
- * difference is the whole point. A claimer waiting on a slot is waiting for
- * one specific process to finish two memcpys. If that publisher holds no CPU
- * - four spinning claimers on a two-core smoker, or any oversubscribed box -
- * then spinning is not merely wasteful, it is the thing PREVENTING the
- * progress it waits for. Only yielding can end that wait. */
+/* Give the CPU back, so a DESCHEDULED publisher can run. A claimer waits on
+ * one specific process finishing two memcpys; if that publisher holds no CPU
+ * - four spinning claimers on a two-core smoker - then spinning is the thing
+ * preventing the progress it waits for. */
 #ifdef _WIN32
 #  define hm_bus_yield() SwitchToThread()
 #else
 #  define hm_bus_yield() sched_yield()
 #endif
 
-/* Give the CPU back for a fixed LENGTH OF TIME, which a yield does not.
+/* Give the CPU back for a fixed LENGTH OF TIME, which a yield does not:
+ * sched_yield returns as soon as nothing else wants the CPU, so a yield
+ * bounds the wait in run-queue turns rather than in time.
  *
- * sched_yield returns as soon as nothing else wants the CPU, so a budget of
- * ten thousand of them can be spent in a few milliseconds - and a publisher on
- * an oversubscribed box is descheduled for longer than that. A yield bounds
- * the wait in run-queue turns; only a sleep bounds it in the units the delay
- * is actually measured in. */
-/* poll(2) with nothing to poll, rather than nanosleep: nanosleep lives in
- * librt on the older Solaris toolchains and this header is published for
- * consumers that link nothing but libc. */
+ * poll(2) with nothing to poll, rather than nanosleep, which lives in librt
+ * on older Solaris toolchains - this header is published for consumers that
+ * link nothing but libc. */
 #ifdef _WIN32
 #  define hm_bus_nap() Sleep(1)
 #else
@@ -128,15 +88,12 @@
 
 #define HM_BUS_MAGIC      0x484D4255u   /* "HMBU" */
 
-/* The defaults come from the phase-0 measurements, and the shape of the ring
- * is chosen for DEPTH over message size. Mapped memory is not resident until
- * written - 16MB mapped and never used costs 1MB - but after one full wrap
- * every page has been touched and a long-running server always gets there. So
- * the steady-state cost is the whole mapping, and 4MB is what that should be.
- *
- * At 4MB the shape is free, and 2048 x 2KB buys 2048 messages of headroom
- * before a slow worker is lapped, with 2KB carrying a chat message, a
- * presence update, an SSE event or an invalidation key with room over.
+/* The ring's shape is chosen for DEPTH over message size. Mapped memory is
+ * not resident until written, but after one full wrap every page has been
+ * touched, so a long-running server pays for the whole mapping - 4MB is what
+ * that should be. At 4MB the shape is free, and 2048 x 2KB buys 2048 messages
+ * of headroom before a slow worker is lapped, with 2KB carrying a chat
+ * message, a presence update or an invalidation key with room over.
  *
  * bus_slot_size raises the ceiling for bigger messages; bus_slots raises the
  * headroom for burstier ones. */
@@ -146,38 +103,28 @@
 #define HM_BUS_NAMELEN    64
 #define HM_BUS_CLAIM_SPIN 10000    /* bounded wait for a slot being written */
 /* ... then yields, because the spin cannot outlast a descheduled publisher.
- * 10000 yields is a long time to a scheduler and still finite, so a publisher
- * killed between reserving a sequence and writing it costs one gap rather
- * than a wedged pool. */
+ * Finite, so a publisher killed between reserving a sequence and writing it
+ * costs one gap rather than a wedged pool. */
 #define HM_BUS_CLAIM_YIELD 10000
 /* ... and then sleeps, because the yield budget is not a length of time.
- *
- * The same smoker signature came back after the yields went in - 39 of 40
- * handled, one gap, in a ring with 24 slots free and nothing that could have
- * lapped. Ten thousand yields against three other spinning claimers is a few
- * milliseconds of wall clock, and a publisher on a loaded box loses the CPU
- * for longer than that between reserving its sequence and writing the slot.
- *
- * 1000 x 1ms is a second of real time before the message is written off, so
- * the wait now outlasts a scheduling delay rather than a run-queue turn. The
- * cost when a publisher really did die mid-write is that one claimer stalls
- * for a second, once, per lost message - paid only in a case that has already
- * gone wrong, and cheaper than the silent loss it replaces. */
+ * 10000 yields against three other spinning claimers is a few milliseconds,
+ * and a publisher on a loaded box loses the CPU for longer than that between
+ * reserving its sequence and writing the slot - which showed up as one gap in
+ * forty on a smoker with 24 ring slots free and nothing that could have
+ * lapped. 1000 x 1ms is a second of real time before a message is written
+ * off; the cost when a publisher really did die mid-write is one claimer
+ * stalling for a second, once. */
 #define HM_BUS_CLAIM_NAP 1000
 #define HM_BUS_WAKERS     256      /* one per worker; the pool is smaller */
 #define HM_BUS_SUBS       64       /* registrations per process */
 
-/* What a read of one slot found.
- *
- * PENDING is the distinction that matters, and getting it wrong is expensive:
- * a publisher zeroes a slot's sequence before it writes the body, so a reader
- * that arrives at that exact moment sees a sequence which is not the one it
- * wanted. Treating that as "lapped" counts a gap and skips forever a message
- * that was merely still being written - which at four readers spinning against
- * one publisher lost ten percent of a chat room and blamed the ring for it.
- *
- * A slot whose sequence is BELOW the one wanted has not been written yet:
- * wait. Only a sequence ABOVE it means the ring has moved past. */
+/* What a read of one slot found. PENDING is the distinction that matters: a
+ * publisher zeroes a slot's sequence before writing the body, so a reader
+ * arriving at that moment sees a sequence that is not the one it wanted.
+ * Treating that as lapped skips a message that was merely still being written
+ * - ten percent of a chat room, at four readers against one publisher. A
+ * sequence BELOW the one wanted has not been written yet: wait. Only one
+ * ABOVE it means the ring has moved past. */
 #define HM_BUS_READ_OK       1
 #define HM_BUS_READ_PENDING  0
 #define HM_BUS_READ_LAPPED (-1)
@@ -200,12 +147,11 @@ typedef struct {
 /* A named queue group. `cursor` is the shared one - the whole difference
  * between the two delivery modes.
  *
- * A group is bound to a TOPIC, and that is not decoration. The cursor is
- * consumed by whatever it advances past, so a group that claimed every topic
- * on the ring would swallow other people's messages: a thumbnail worker would
- * take a chat broadcast, mark it handled, and the room would never see it.
- * A slot whose topic does not match is stepped over without being delivered -
- * cheap, because the group's cursor is nobody else's. */
+ * A group is bound to a TOPIC because the cursor is consumed by whatever it
+ * advances past: a group claiming every topic would swallow other people's
+ * messages, a thumbnail worker taking a chat broadcast and marking it
+ * handled. A slot whose topic does not match is stepped over without being
+ * delivered, which is cheap because the group's cursor is nobody else's. */
 typedef struct {
     volatile uint64_t cursor;  /* next sequence to claim */
     volatile uint64_t gaps;    /* claims that found a lapped slot */
@@ -216,23 +162,21 @@ typedef struct {
 } hm_bus_group;
 
 /* How a worker gets TOLD, rather than finding out when it next looks.
- *
- * Without this a reader polls, and the interval is the delivery latency: a
- * chat message sits in the ring until somebody wakes up anyway. With it a
- * publish pokes every other worker's descriptor and the loop returns from
+ * Without it a reader polls and the interval is the delivery latency; with it
+ * a publish pokes every other worker's descriptor and the loop returns from
  * epoll with the message already there.
  *
- * The descriptors are created BEFORE THE FORK, which is the only time it can
- * be done: a pipe made in a worker is invisible to its siblings, and the bug
- * that produces is "delivery works to some workers". Being inherited, the fd
- * NUMBERS are the same in every process, so they can live in shared memory
- * as plain integers.
+ * The descriptors are created BEFORE THE FORK, the only time it can be done:
+ * a pipe made in a worker is invisible to its siblings, and the bug that
+ * produces is "delivery works to some workers". Being inherited, the fd
+ * NUMBERS match in every process, so they live in shared memory as plain
+ * integers.
  *
- * `pending` is the coalescing flag, and it is not an optimisation. A burst of
- * a thousand publishes must not become a thousand writes to each of N
- * descriptors - the bus would become its own thundering herd, precisely under
- * the load where that hurts. A publisher only writes to a worker whose flag it
- * won the right to set, and the worker clears it when it drains. */
+ * `pending` coalesces: a burst of a thousand publishes must not become a
+ * thousand writes to each of N descriptors, or the bus becomes its own
+ * thundering herd under exactly the load where that hurts. A publisher writes
+ * only to a worker whose flag it won the right to set, and the worker clears
+ * it when it drains. */
 typedef struct {
     volatile uint32_t pending;   /* 1 = a poke is already in flight */
     volatile uint32_t live;      /* 0 = this slot is unused */
@@ -356,16 +300,15 @@ static uint64_t hm_bus_seq(void) {
 
 /* Make `n` wakers. MUST run in the supervisor, before it forks: a descriptor
  * created in a worker is invisible to its siblings, and the failure that
- * produces is the worst kind - delivery that works to SOME workers.
+ * produces is delivery that works to SOME workers.
  *
- * A pipe rather than an eventfd, deliberately. eventfd is Linux-only and the
- * saving is one descriptor per worker; a pipe is the same three lines
- * everywhere this runs, and the wakeup path is one byte either way.
+ * A pipe rather than an eventfd: eventfd is Linux-only and saves one
+ * descriptor per worker, while the wakeup path is one byte either way.
  *
  * Guarded on the inside, like hm_bus_arena_init and unlike the rest of the
- * wakeup below: the server core calls this on the way up on every platform,
- * including the ones with no arena to wake anybody about. Sitting inside the
- * block instead is what broke the Windows build. */
+ * wakeup below, because the server core calls this on the way up on every
+ * platform - including the ones with no arena. Guarding it from outside is
+ * what broke the Windows build. */
 static void hm_bus_wakers_init(uint32_t n) {
 #if HM_BUS_HAVE_ATOMICS
     hm_bus_arena *a = hm_bus;
@@ -375,14 +318,11 @@ static void hm_bus_wakers_init(uint32_t n) {
     for (i = 0; i < n; i++) {
         int fd[2];
         if (pipe(fd) != 0) break;
-        /* Non-blocking on BOTH ends. A worker that has stopped draining fills
-         * its pipe, and a publisher that blocked on it would have been taken
-         * down by the slowest consumer in the pool. The ring carries the data;
-         * the poke is only a nudge, and a lost nudge costs latency, not a
-         * message.
-         *
-         * Done here with fcntl rather than through hm_core.h's helper, because
-         * this header knows nothing about the server and should not start. */
+        /* Non-blocking on BOTH ends: a worker that stopped draining fills its
+         * pipe, and a publisher blocking on it would be taken down by the
+         * slowest consumer in the pool. The ring carries the data, so a lost
+         * poke costs latency, not a message. fcntl rather than hm_core.h's
+         * helper - this header knows nothing about the server. */
         (void)fcntl(fd[0], F_SETFL, fcntl(fd[0], F_GETFL, 0) | O_NONBLOCK);
         (void)fcntl(fd[1], F_SETFL, fcntl(fd[1], F_GETFL, 0) | O_NONBLOCK);
         a->wakers[i].rfd = fd[0];
@@ -400,13 +340,12 @@ static void hm_bus_wakers_init(uint32_t n) {
 /* Claim a waker slot for this process and return its read end, or -1.
  * Called from a worker after the fork, which is when it knows it is one.
  *
- * The slot is EMPTIED as it is taken, and that is not tidiness. The
- * descriptors exist from before the fork, so anything published in the
- * supervisor - loading config, warming a cache - has already poked every
- * slot, including the ones no process owned yet. A worker inheriting those
- * bytes returns from its first select immediately, with nothing on the ring
- * for it, and every measurement of "did the wakeup work" is then measuring a
- * stale byte instead. The bug hides itself by passing the test. */
+ * The slot is EMPTIED as it is taken. The descriptors exist from before the
+ * fork, so anything published in the supervisor has already poked every slot,
+ * including ones no process owned yet. A worker inheriting those bytes
+ * returns from its first select immediately with nothing on the ring, and
+ * every measurement of "did the wakeup work" then measures a stale byte -
+ * a bug that hides itself by passing the test. */
 static int hm_bus_waker_take(int widx) {
     hm_bus_arena *a = hm_bus;
     char buf[64];
@@ -424,32 +363,24 @@ static int hm_bus_waker_fd(void) {
     return a->wakers[hm_bus_self].rfd;
 }
 
-/* Drain the poke. One byte or a hundred mean the same thing - there is
- * something on the ring - so the read is only to stop the descriptor staying
- * readable.
+/* Drain the poke. One byte or a hundred mean the same thing, so the read is
+ * only to stop the descriptor staying readable.
  *
- * THE ORDER OF THE TWO LINES BELOW IS THE WHOLE CORRECTNESS OF THE WAKEUP.
+ * THE ORDER IS THE WHOLE CORRECTNESS OF THE WAKEUP: empty the pipe FIRST,
+ * then clear the flag, and only then read the ring. The flag says "a poke is
+ * already on its way", so it may go back to zero only once every byte it
+ * stands for has been consumed. Clearing first lets a publisher see a clear
+ * flag, set it and write its byte while this read loop is still running, and
+ * swallow it - the flag is then set with an empty pipe, and since only the
+ * process that flips it from zero writes anything, no publisher ever pokes
+ * this worker again. It goes permanently deaf. A publisher sending two
+ * messages in a row aims its second poke squarely at the first one's wakeup,
+ * which is where that happens.
  *
- * Empty the pipe FIRST, then clear the flag, and only then let the caller
- * read the ring. The flag says "a poke is already on its way", so it may only
- * go back to zero once every byte it stands for has been consumed. Clearing
- * it first opens a window in which a publisher sees a clear flag, sets it,
- * writes its byte - and this read loop, still running, swallows that byte.
- * The flag is then set with an empty pipe, and since only the process that
- * flips it from zero writes anything, NO publisher ever pokes this worker
- * again. It goes permanently deaf to the bus and only sees a message again if
- * it publishes one itself and drains inline.
- *
- * That is not a theoretical window. A publisher that sends two messages in a
- * row - a room forwarding to two topics - aims its second poke squarely at
- * the first one's wakeup, which is where the swallow happens.
- *
- * Clearing before the ring is read is still required, and for the opposite
- * reason: a publish that lands while the caller is draining must be able to
- * set the flag and poke afresh rather than being folded into a wakeup that
- * has already looked. Nothing is lost in the gap between the read and the
- * clear either - a publisher there skips its write, but it has already
- * committed to the ring, and the caller reads the ring after the clear. */
+ * Clearing before the ring is read is equally required, so a publish landing
+ * mid-drain can poke afresh rather than being folded into a wakeup that has
+ * already looked. Nothing is lost between the read and the clear: a publisher
+ * there skips its write but has already committed to the ring. */
 static void hm_bus_waker_drained(void) {
     hm_bus_arena *a = hm_bus;
     char buf[64];
@@ -573,18 +504,11 @@ static int hm_bus_read_slot(hm_bus_arena *a, uint64_t want,
 }
 #endif
 
-/* Drain everything a fanout subscriber has not seen.
- *
- * `cursor` is the caller's own, in the caller's own process - that is what
- * makes this fanout rather than a claim. It is advanced past what was
- * delivered AND past what was lost, because a cursor that stalls on a lapped
- * slot never moves again.
- *
- * `gaps` is incremented by the number of messages this subscriber missed.
- * Reporting it is not optional: it is the difference between a diagnosis and
- * a mystery.
- *
- * Returns how many were delivered. */
+/* Drain everything a fanout subscriber has not seen, returning how many were
+ * delivered. `cursor` is the caller's own, in the caller's own process, which
+ * is what makes this fanout rather than a claim; it advances past what was
+ * delivered AND past what was lost, since a cursor that stalls on a lapped
+ * slot never moves again. `gaps` is incremented by the number missed. */
 static long hm_bus_drain(uint64_t *cursor, uint64_t *gaps,
                          hm_bus_cb cb, void *ud) {
 #if HM_BUS_HAVE_ATOMICS
@@ -693,16 +617,14 @@ static int hm_bus_group_of(const char *topic, uint32_t tlen,
 #endif
 }
 
-/* Claim and handle whatever this group has not been handled by anybody.
+/* Claim and handle whatever this group has not been handled by anybody,
+ * returning how many this caller handled.
  *
- * THE ONE ATOMIC THAT MAKES IT WORK: fetch-add on the group's shared cursor
+ * THE ONE ATOMIC THAT MAKES IT WORK: the CAS on the group's shared cursor
  * hands each sequence to exactly one caller, in one process, across the whole
- * pool. Everything else here is bookkeeping.
- *
- * Balancing is not implemented, it is a consequence: a busy worker is not in
- * this loop, so it does not claim, so the free workers take the traffic.
- *
- * Returns how many this caller handled. */
+ * pool. Everything else here is bookkeeping. Balancing is a consequence, not
+ * an implementation: a busy worker is not in this loop, so it does not claim,
+ * so the free workers take the traffic. */
 static long hm_bus_claim(int gidx, hm_bus_cb cb, void *ud) {
 #if HM_BUS_HAVE_ATOMICS
     hm_bus_arena *a = hm_bus;
@@ -718,18 +640,12 @@ static long hm_bus_claim(int gidx, hm_bus_cb cb, void *ud) {
         uint64_t mine = hm_at_load64_acq(&g->cursor);
         uint32_t tl = 0, pl = 0;
 
-        /* CAS, NOT fetch-add.
-         *
-         * A fetch-add cannot be taken back. A claimer that added and then
-         * found it had overshot `end` would already have moved the SHARED
-         * cursor past sequences nobody had published yet - and every one of
-         * those messages would then be skipped forever, with no gap counted,
-         * because nothing had noticed. That is silent loss, which is the one
-         * failure this design promises not to have.
-         *
-         * The CAS advances only when this caller both wins the race and is
-         * still inside what has actually been published. Losing costs a
-         * retry. */
+        /* CAS, NOT fetch-add. A fetch-add cannot be taken back: a claimer
+         * that added and then found it had overshot `end` has already moved
+         * the SHARED cursor past sequences nobody has published, and those
+         * messages are then skipped forever with no gap counted. The CAS
+         * advances only when this caller wins the race AND is still inside
+         * what has been published; losing costs a retry. */
         if (mine >= end) break;
         if (!hm_at_cas64(&g->cursor, mine, mine + 1)) continue;
 
@@ -746,31 +662,21 @@ static long hm_bus_claim(int gidx, hm_bus_cb cb, void *ud) {
                        == HM_BUS_READ_PENDING && ++spin < HM_BUS_CLAIM_SPIN)
                 ;
 
-            /* Still PENDING is NOT still lapped, and the spin expiring says
-             * nothing about which one it is.
+            /* Still PENDING is not lapped, and the spin expiring says nothing
+             * about which it is. A publisher reserves its sequence before it
+             * writes the slot, so a claimer that wins that sequence and finds
+             * it unwritten is waiting on a live publisher inside a window of
+             * two memcpys - and the one thing that closes the window is that
+             * publisher getting a CPU, which spinning does not give it. On an
+             * oversubscribed box the spin budget expired with the publisher
+             * runnable-not-running and the message was skipped forever, by
+             * the only member that could ever have handled it: silent loss
+             * wearing a gap counter.
              *
-             * A publisher reserves its sequence with the fetch-add and only
-             * then writes the slot, so `a->seq` promises the message before
-             * the bytes are there. A claimer that wins that sequence and
-             * finds the slot unwritten is waiting on a live publisher inside
-             * a window of two memcpys - and the ONE thing that closes the
-             * window is that publisher getting a CPU.
-             *
-             * Spinning does not give it one. On an oversubscribed box the
-             * spin budget expired with the publisher still runnable-not-
-             * running, the claimer counted a gap, and the message was skipped
-             * forever - by the only member that could ever have handled it.
-             * That is silent loss wearing a gap counter, and it is what the
-             * smokers caught: 39 of 40 handled, one gap, in a ring that had
-             * 24 free slots and could not have lapped anything.
-             *
-             * So yield, and then SLEEP. The bound stays - a publisher killed
-             * mid-write must not wedge the pool forever - but it is now a
-             * bound on real time rather than on instructions or on run-queue
-             * turns, and a gap is counted only once a live publisher has had
-             * every chance to finish. Yields first because the common case is
-             * a publisher one memcpy from done, and a millisecond of sleep is
-             * an eternity to pay for that. */
+             * So yield, then SLEEP. The bound stays, since a publisher killed
+             * mid-write must not wedge the pool, but it is now a bound on
+             * real time rather than on run-queue turns. Yields first because
+             * the common case is a publisher one memcpy from done. */
             while (r == HM_BUS_READ_PENDING && ++yields < HM_BUS_CLAIM_YIELD) {
                 hm_bus_yield();
                 r = hm_bus_read_slot(a, mine, &tl, &pl);
@@ -827,14 +733,13 @@ static uint64_t hm_bus_published(void) {
 
 /* ---- subscribers --------------------------------------------------------- */
 /*
- * PROCESS-LOCAL, and that is the point. A registration is a callback, and a
- * callback cannot cross a fork; the shared thing is the ring, not the list of
- * people reading it.
+ * PROCESS-LOCAL: a registration is a callback and a callback cannot cross a
+ * fork. The shared thing is the ring, not the list of people reading it.
  *
  * A subscription is either FANOUT (group empty - this process sees every
  * message on the topic) or a QUEUE GROUP (this process competes with every
- * other member for each one). One registration function, with the group as
- * the only difference, because they are one mechanism.
+ * other member for each one). One registration function, because they are
+ * one mechanism.
  */
 typedef struct {
     int       used;
@@ -874,21 +779,15 @@ static int hm_bus_subscribe(const char *topic, uint32_t tlen,
         if (group && glen) {
             memcpy(sb->group, group, glen);
             sb->glen = glen;
-            /* Resolve NOW if there is an arena, and lazily if there is not.
-             *
-             * Both halves matter. A subscription starts "from now on", and
-             * "now" is when the caller subscribed - resolving at first
-             * dispatch instead would silently move a group's start point
-             * later and lose whatever was published in between.
-             *
-             * But there is often no arena yet: subscriptions belong at boot,
-             * in the parent, before the server forks - which is also before
-             * run() maps the ring. Failing here would break group
-             * subscriptions in the one place they should be made, and the
-             * failure would look like the group simply never receiving
-             * anything. So it is deferred, and nothing is lost by that,
-             * because nothing can have been published before the ring
-             * existed. */
+            /* Resolve NOW if there is an arena, lazily if there is not. A
+             * subscription starts from when the caller subscribed, so
+             * resolving at first dispatch would move a group's start point
+             * later and lose what was published in between. But there is
+             * often no arena yet - subscriptions belong at boot, in the
+             * parent, before run() maps the ring - and failing here would
+             * break them in the one place they should be made. Nothing is
+             * lost by deferring, since nothing can have been published before
+             * the ring existed. */
 #if HM_BUS_HAVE_ATOMICS
             sb->gidx = hm_bus ? hm_bus_group_of(topic, tlen, group, glen) : -1;
 #else

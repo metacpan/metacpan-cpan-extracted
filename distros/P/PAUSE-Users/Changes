@@ -1,5 +1,11 @@
 Revision history for Perl module PAUSE::Users
 
+0.13 2026-09-09 NEILB
+    - Improved cpan-whoise error message when user(s) not found,
+      from briang.
+    - Changed main example in cpan-whois doc to not be cpan.org user
+    - Changed my contact email address to non-cpan.org address.
+
 0.12 2026-05-30 NEILB
     - Added `nologin`, `deleted`, and `type` slots to User.
 

@@ -18,7 +18,7 @@ use VPNDetection::Database;
 use VPNDetection::Error;
 use VPNDetection::Result;
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.5.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.44';
+our $VERSION = '0.48';
 
 
 1;
@@ -44,11 +44,28 @@ handler for an C<sse> route is called with the L<Punk::Context> and a stream
 once Punk has taken the socket over, and pushes events onto it; the stream then
 lives on the worker's event loop with no worker pinned per connection.
 
-Three transports carry it, chosen per request: a L<Hyperman> worker B<detaches>
-the socket and streams it on the loop; a C<psgi.streaming> server uses the
-standard delayed-response writer; and C<< blocking => 1 >> streams inside the
-handler over C<psgix.io> (pinning one worker). Without any of them the request
-gets a 501.
+Four transports carry it, chosen per request: a L<Hyperman> worker B<detaches>
+the socket and streams it on the loop; a Hyperman B<stream handle> sends the
+body through the server for the connections detach cannot take; a
+C<psgi.streaming> server uses the standard delayed-response writer; and
+C<< blocking => 1 >> streams inside the handler over C<psgix.io> (pinning one
+worker). Without any of them the request gets a 501.
+
+=head2 HTTP/2 and TLS
+
+The stream handle is what makes those two work, and until Hyperman grew one
+they did not. Detaching hands over a file descriptor, and there is nothing
+coherent to hand over on either: an HTTP/2 stream is one of many on a shared
+connection, so no descriptor means "this stream", and a TLS session's state
+belongs to the server. Both refusals are correct, so the fix was a different
+seam rather than a wider C<detach>.
+
+Nothing in a handler changes. The stream is the same object with the same
+methods, and the transport is chosen for the connection it arrived on.
+
+The response head differs where the protocol requires it: C<Connection> is
+hop-by-hop and HTTP/2 and HTTP/3 forbid it, so it is sent on HTTP/1 and not
+on a multiplexed transport, and framing is the transport's own.
 
 Backpressure is bounded by C<write_buffer_limit> as for websockets: a client
 that will not read is closed rather than allowed to buffer without limit.

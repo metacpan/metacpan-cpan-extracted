@@ -2,13 +2,15 @@ use FindBin;
 
 use lib $FindBin::Bin.'/../thirdparty/lib/perl5';
 use lib $FindBin::Bin.'/../lib';
+use lib $FindBin::Bin.'/lib';
 
 use Mojo::Base -strict;
 
 use Test::More;
 use Test::Mojo;
+use CallBackeryTest qw(setupTestConfig);
 
-$ENV{CALLBACKERY_CONF} = $FindBin::Bin.'/callbackery.cfg';
+setupTestConfig();
 
 my $t = Test::Mojo->new('CallBackery');
 

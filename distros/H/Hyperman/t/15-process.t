@@ -8,7 +8,7 @@ use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
 
-# Process model (plan/06-process-model.md): max_requests_per_worker recycle,
+# Process model: max_requests_per_worker recycle,
 # USR1 stats dump, bounded graceful shutdown with a hung async request,
 # extended stats counters.
 

@@ -4,7 +4,7 @@
       "Nicholas B. Hubbard <nicholashubbard@posteo.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "gpl_3"
    ],
@@ -28,7 +28,7 @@
             "Crypt::PK::ECC::Schnorr" : "0",
             "CryptX" : "0",
             "JSON" : "0",
-            "Net::Nostr::Core" : "0",
+            "Net::Nostr::Core" : "1.002000",
             "perl" : "5.016",
             "strictures" : "2"
          }
@@ -43,6 +43,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "1.001001",
+   "version" : "1.002000",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

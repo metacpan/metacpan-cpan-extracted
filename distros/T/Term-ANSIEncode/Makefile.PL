@@ -89,6 +89,7 @@ WriteMakefile(
         'Time::HiRes'       => '0',
         'Getopt::Long'      => '0',
 		'Text::Format'      => '0',
+		'Term::Drawille'    => '0.01',
     },
     EXE_FILES => ['bin/ansiencode'],
 	INSTALLSCRIPT => '/usr/local/bin',

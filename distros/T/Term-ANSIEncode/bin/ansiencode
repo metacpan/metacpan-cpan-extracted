@@ -45,11 +45,11 @@ my $tokens     = FALSE;
 my $rawtokens  = FALSE;
 my $symbols    = FALSE;
 my $unicode    = FALSE;
-                                                                                                                                                                                                                                                                                              my $colors     = FALSE;
 my $Dump       = FALSE;
 my $frames     = FALSE;
 my $rules      = FALSE;
 my $ansi_modes = FALSE;
+my $colors     = FALSE;
 my $width      = 80;
 my $baud       = 0;
 my $speed      = 0;
@@ -123,20 +123,22 @@ if ($version) {
 } elsif ($colors) {
     $ansi->ansi_output($ansi->ansi_colors({ '3 BIT' => $ansi->{'CAPS'}->{'3 BIT'}, '4 BIT' => $ansi->{'CAPS'}->{'4 BIT'}, '8 BIT' => $ansi->{'CAPS'}->{'8 BIT'}, '24 BIT' => $ansi->{'CAPS'}->{'24 BIT'} }));
 } else {    # Output file to STDOUT
-    my $file = $ARGV[0];
-    if (defined $file and -e $file) {
-        open my $fh, '<:encoding(UTF-8)', $file
-          or do { warn "Could not open file '$file': $!\n"; exit 2; };
+	my $file = $ARGV[0];
+	if (defined $file and -e $file) {
+		open my $fh, '<:encoding(UTF-8)', $file or do { warn "Could not open file '$file': $!\n"; exit 2; };
 
-        # Stream the file to the output renderer to avoid huge memory usage.
-        while (my $chunk = <$fh>) {
-            $ansi->ansi_output($chunk);
-        }
-        close $fh;
-    } else {
-        $ansi->ansi_output(help_text());
-        $| = 1;
-    }
+		# Slurp the entire file so multi-line blocks (CANVAS, BOX, WRAP) parse cleanly
+		my $content = do {
+			local $/;
+			<$fh>;
+		};
+		close $fh;
+
+		$ansi->ansi_output($content . '[% CURSOR ON %]');
+	} else {
+		$ansi->ansi_output(help_text());
+		$| = 1;
+	}
 }
 
 exit(0);

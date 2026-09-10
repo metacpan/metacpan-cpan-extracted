@@ -350,11 +350,10 @@ static void pcsp_scan(pTHX_ SV *c, SV *template, SV *bytes) {
             return;
         }
 
-        {   /* Phase 2 deferred this here, and it costs nothing extra now the
-             * body is in hand: a nonce in the markup that is not THIS
-             * request's is a page that came out of a cache. Every script on
-             * it is blocked, and the fault appears long after the change that
-             * caused it. */
+        {   /* Deferred to here, where it costs nothing extra now the body
+             * is in hand: a nonce in the markup that is not THIS request's is
+             * a page that came out of a cache. Every script on it is blocked,
+             * and the fault appears long after the change that caused it. */
             const char *at = pcsp_find(b, bl, "nonce=\"");
             if (at) {
                 AV *av = pcx_av(aTHX_ c);

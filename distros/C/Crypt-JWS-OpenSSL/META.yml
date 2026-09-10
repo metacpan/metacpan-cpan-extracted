@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/markdootson/crypt-jws-openssl-perl/issues
   homepage: https://metacpan.org/pod/Crypt::JWS::OpenSSL
   repository: git://github.com/markdootson/crypt-jws-openssl-perl.git
-version: '0.004'
+version: '0.005'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

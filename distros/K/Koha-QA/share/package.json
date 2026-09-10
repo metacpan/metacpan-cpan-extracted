@@ -1,0 +1,23 @@
+{
+  "name": "koha-qa",
+  "version": "0.0.3",
+  "previous_version": "0.0.2",
+  "description": "Koha QA",
+  "dependencies": {
+    "prettier": "^3.8.1",
+    "@koha-community/prettier-plugin-template-toolkit": "^2.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/joubu/koha-qa.git"
+  },
+  "author": "Jonathan Druart<jonathan.druart@bugs.koha-community.org>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://gitlab.com/joubu/koha-qa/issues"
+  },
+  "homepage": "https://gitlab.com/joubu/koha-qa#readme",
+  "scripts": {
+    "prettier": "prettier"
+  }
+}

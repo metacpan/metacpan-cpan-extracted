@@ -19,7 +19,7 @@ name: Media-AssetView
 provides:
   Media::AssetView:
     file: lib/Media/AssetView.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Exporter: '5.57'
   perl: '5.010001'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Media-AssetView
   homepage: https://metacpan.org/release/Media-AssetView
   repository: git://github.com/perlancar/perl-Media-AssetView.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

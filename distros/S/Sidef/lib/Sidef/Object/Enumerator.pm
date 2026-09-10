@@ -2,6 +2,8 @@ package Sidef::Object::Enumerator;
 
 use utf8;
 use 5.016;
+use Sidef::Types::Block::Block;
+
 ##use overload q{""} => \&to_a;
 
 sub new {
@@ -80,6 +82,24 @@ sub while {
   RETURN: Sidef::Types::Array::Array->new(\@arr);
 }
 
+sub drop_while {
+    my ($self, $block) = @_;
+    my @arr;
+    my $dropping = 1;
+    $self->{block}->run(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                if ($dropping) {
+                    $block->run(@_) and return;
+                    $dropping = 0;
+                }
+                push @arr, @_;
+            }
+        )
+    );
+    Sidef::Types::Array::Array->new(\@arr);
+}
+
 sub to_a {
     my ($self) = @_;
 
@@ -135,6 +155,21 @@ sub grep {
 
 *select = \&grep;
 
+sub reduce {
+    my ($self, $block, $initial) = @_;
+
+    my $acc = $initial;
+    $self->{block}->run(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $acc = defined($acc) ? $block->run($acc, @_) : $_[0];
+            }
+        )
+    );
+
+    $acc;
+}
+
 sub count {
     my ($self, $block) = @_;
 
@@ -170,6 +205,55 @@ sub length {
 
 *len  = \&length;    # alias
 *size = \&length;
+
+sub sum {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    my $total;
+    $self->{block}->run(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                my $v = $block->run(@_);
+                $total = defined($total) ? $total->add($v) : $v;
+            }
+        )
+    );
+    $total // Sidef::Types::Number::Number::ZERO;
+}
+
+sub min {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    my ($best, $best_v);
+    $self->{block}->run(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                my $v = $block->run(@_);
+                if (!defined($best_v) || CORE::int($v cmp $best_v) < 0) {
+                    ($best, $best_v) = ($_[0], $v);
+                }
+            }
+        )
+    );
+    $best;
+}
+
+sub max {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    my ($best, $best_v);
+    $self->{block}->run(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                my $v = $block->run(@_);
+                if (!defined($best_v) || CORE::int($v cmp $best_v) > 0) {
+                    ($best, $best_v) = ($_[0], $v);
+                }
+            }
+        )
+    );
+    $best;
+}
 
 #<<<
 #~ #

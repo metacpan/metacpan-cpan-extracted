@@ -1,0 +1,12 @@
+Revision history for Luv-CLI
+
+0.001     2026-09-09 17:56:40-04:00 America/New_York
+    - Initial release
+    - `luv init` scaffolds a new project (luv.json, main.lua, conf.lua,
+      .gitignore, source/library/assets/build directories)
+    - `luv add` fetches a dependency by registry name or raw git URL
+    - `luv remove` deletes a vendored dependency and its manifest entry
+    - `luv list` prints current dependencies
+    - `luv build` packages the project into a .love archive
+    - `luv search` searches a local cache of the awesome-love2d library list
+    - `luv update` refreshes the local registry cache

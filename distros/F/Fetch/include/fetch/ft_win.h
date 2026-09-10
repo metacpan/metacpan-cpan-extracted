@@ -201,6 +201,33 @@ static void ft_os_random(unsigned char *out, size_t n) {
 
 #endif /* _WIN32 */
 
+/* Monotonic seconds, for deadlines and cache expiry. clock_gettime and
+ * CLOCK_MONOTONIC are POSIX, and no Windows toolchain has both: MSVC before
+ * VS2015 has neither the function nor struct timespec, and the mingw of the
+ * older Strawberry perls declares timespec but no CLOCK_MONOTONIC.
+ *
+ * QueryPerformanceCounter is declared unconditionally, is monotonic and has
+ * better resolution. GetTickCount64 would be the obvious choice and is not
+ * usable: the SDK hides it unless _WIN32_WINNT >= 0x0600, which perl's build
+ * does not set, so cl only warns C4013 and assumes it returns int - truncating
+ * the tick count to 24 days and making every deadline nonsense. */
+#if defined(_WIN32)
+static double ft_monotonic(void) {
+    static LARGE_INTEGER freq;   /* idempotent: a race just recomputes it */
+    LARGE_INTEGER now;
+    if (freq.QuadPart == 0 && !QueryPerformanceFrequency(&freq))
+        freq.QuadPart = 1;
+    QueryPerformanceCounter(&now);
+    return (double)now.QuadPart / (double)freq.QuadPart;
+}
+#else
+static double ft_monotonic(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (double)ts.tv_sec + (double)ts.tv_nsec / 1e9;
+}
+#endif
+
 /* memmem is a GNU/BSD extension the MinGW CRT lacks; use the C library's where
  * it exists and a plain scan on Windows. The needles here (\r\n, \r\n\r\n) are
  * tiny, so the fallback's O(n*m) is fine. */

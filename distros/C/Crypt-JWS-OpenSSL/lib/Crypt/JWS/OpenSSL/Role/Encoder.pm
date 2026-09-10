@@ -1,5 +1,5 @@
 package Crypt::JWS::OpenSSL::Role::Encoder;
-$Crypt::JWS::OpenSSL::Role::Encoder::VERSION = '0.004';
+$Crypt::JWS::OpenSSL::Role::Encoder::VERSION = '0.005';
 use Moo::Role;
 use MIME::Base64 ();
 use JSON::MaybeXS 1.002002 ();
@@ -172,7 +172,7 @@ L<Crypt::JWS::OpenSSL::Algorithm::HMAC>
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

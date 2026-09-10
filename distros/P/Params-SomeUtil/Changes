@@ -1,5 +1,13 @@
 Revision history for Perl extension Params-SomeUtil
 
+1.11 Wed  9 Sep 2026
+  - Updated WHY section to document new differences with Params::Util
+    None of them are functional, three functions were added to a
+    development release.
+
+1.10 Wed  9 Sep 2026
+  - Updated FSF address.
+
 1.09 Sun  3 May 2026
   - Documentation fixes (thanks RJBS)
 

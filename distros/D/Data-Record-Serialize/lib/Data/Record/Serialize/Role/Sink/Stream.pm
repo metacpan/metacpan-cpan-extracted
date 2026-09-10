@@ -9,7 +9,7 @@ use Moo::Role;
 use Data::Record::Serialize::Error { errors => [ '::create', '::parameter', '::internal' ] }, -all;
 use Types::Standard qw[ Bool ];
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use IO::File;
 
@@ -212,7 +212,7 @@ Data::Record::Serialize::Role::Sink::Stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

@@ -77,16 +77,35 @@ sub create_uri {
 # Info event (kind 13194)
 ###############################################################################
 
+sub _validate_tokens {
+    my ($field, $values) = @_;
+    croak "$field must be an array of non-empty tokens"
+        unless ref($values) eq 'ARRAY';
+    for my $value (@$values) {
+        croak "$field must contain non-empty tokens without whitespace"
+            unless defined($value) && !ref($value) && $value =~ /\A[^\s\x00-\x1f\x7f]+\z/;
+    }
+}
+
 sub info_event {
     my $class = shift;
     my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
+    my %known = map { $_ => 1 } qw(pubkey capabilities encryption notifications extensions);
+    my @unknown = grep { !$known{$_} } keys %args;
+    croak 'unknown argument(s): ' . join(', ', sort @unknown) if @unknown;
+    for my $field (qw(capabilities encryption notifications extensions)) {
+        _validate_tokens($field, $args{$field}) if exists $args{$field};
+    }
     my @tags;
 
-    if ($args{encryption} && @{$args{encryption}}) {
+    if (exists $args{encryption}) {
         push @tags, ['encryption', join(' ', @{$args{encryption}})];
     }
     if ($args{notifications} && @{$args{notifications}}) {
         push @tags, ['notifications', join(' ', @{$args{notifications}})];
+    }
+    if (exists $args{extensions}) {
+        push @tags, ['extensions', join(' ', @{$args{extensions}})];
     }
 
     return Net::Nostr::Event->new(
@@ -101,25 +120,32 @@ sub parse_info {
     my ($class, $event) = @_;
     croak "info event MUST be kind 13194" unless $event->kind == 13194;
 
-    my @capabilities = split / /, $event->content;
-    my (@encryption, @notification_types);
+    my @capabilities = split / /, $event->content, -1;
+    @capabilities = () unless length $event->content;
+    my (@encryption, @notification_types, @extensions);
+    my %seen;
 
     for my $tag (@{$event->tags}) {
-        next unless @$tag >= 2;
+        next unless $tag->[0] =~ /\A(?:encryption|notifications|extensions)\z/;
+        croak "$tag->[0] tag must have one value and occur only once"
+            unless @$tag == 2 && !$seen{$tag->[0]}++;
         if ($tag->[0] eq 'encryption') {
-            @encryption = split / /, $tag->[1];
+            @encryption = length($tag->[1]) ? split(/ /, $tag->[1], -1) : ();
         } elsif ($tag->[0] eq 'notifications') {
-            @notification_types = split / /, $tag->[1];
+            @notification_types = length($tag->[1]) ? split(/ /, $tag->[1], -1) : ();
+        } elsif ($tag->[0] eq 'extensions') {
+            @extensions = length($tag->[1]) ? split(/ /, $tag->[1], -1) : ();
         }
     }
 
     # Absence of encryption tag implies nip04
-    @encryption = ('nip04') unless @encryption;
+    @encryption = ('nip04') unless $seen{encryption};
 
     return Net::Nostr::WalletConnect::Info->new(
         capabilities       => \@capabilities,
         encryption         => \@encryption,
         notification_types => \@notification_types,
+        extensions         => \@extensions,
     );
 }
 
@@ -326,7 +352,7 @@ sub is_expired {
 {
     package Net::Nostr::WalletConnect::Info;
     use Carp qw(croak);
-    my @_ARRAY_FIELDS = qw(capabilities encryption notification_types);
+    my @_ARRAY_FIELDS = qw(capabilities encryption notification_types extensions);
     use Class::Tiny ();
     sub new {
         my $class = shift;
@@ -335,7 +361,9 @@ sub is_expired {
         my @unknown = grep { !exists $known{$_} } keys %$self;
         croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
         for my $f (@_ARRAY_FIELDS) {
-            $self->{$f} = [@{$self->{$f}}] if ref $self->{$f} eq 'ARRAY';
+            $self->{$f} = [] unless exists $self->{$f};
+            Net::Nostr::WalletConnect::_validate_tokens($f, $self->{$f});
+            $self->{$f} = [@{$self->{$f}}];
         }
         return $self;
     }
@@ -351,6 +379,11 @@ sub is_expired {
     sub supports_capability {
         my ($self, $cap) = @_;
         return scalar grep { $_ eq $cap } @{$self->{capabilities}};
+    }
+
+    sub supports_extension {
+        my ($self, $extension) = @_;
+        return scalar grep { $_ eq $extension } @{$self->{extensions}};
     }
 
     sub supports_encryption {
@@ -542,6 +575,18 @@ or a non-empty arrayref of strict relay URLs.
 
 Creates a kind 13194 info L<Net::Nostr::Event>. The C<capabilities> are
 joined as a space-separated string in the content field.
+Optional C<extensions> is an arrayref of NWC extension identifiers, such as
+C<['02', '03', '04']>, serialized as a space-separated C<extensions> tag.
+An explicit empty array emits an empty tag; omission emits no tag.
+Unknown extension identifiers are accepted. Extension methods should also
+be included in C<capabilities>.
+
+This builder validates the public key through L<Net::Nostr::Event> and rejects
+unknown arguments and malformed discovery lists. All supplied lists must be
+arrayrefs of non-empty scalar tokens without whitespace or control characters.
+It returns an unsigned event; use a wallet key to sign it before publication.
+An explicit empty C<encryption> array emits an empty encryption tag, advertising
+no usable schemes. Omit that option only when advertising legacy NIP-04.
 
 =head2 parse_info
 
@@ -550,6 +595,13 @@ joined as a space-separated string in the content field.
 Parses a kind 13194 info event. Returns an L</Info> object. Croaks if the
 event is not kind 13194. If the event has no C<encryption> tag, defaults
 to C<['nip04']> per spec.
+An explicitly empty encryption tag yields an empty array and never enables
+NIP-04 implicitly.
+Discovery tags must contain exactly one space-separated value and occur at
+most once. Malformed tokens are rejected. An absent C<extensions> tag becomes
+an empty array. The returned Info has validated discovery fields; this parser
+does not authenticate the event signature. Verify wire events before trusting
+a wallet's advertisement.
 
 =head2 request
 
@@ -672,7 +724,9 @@ reference.
 
 =head2 Info
 
-Returned by L</parse_info>. Croaks on unknown arguments.
+Returned by L</parse_info>. Croaks on unknown arguments or malformed token
+arrays. Omitted fields default to empty arrays. All arrays are copied on
+construction and access, and accessors are read-only.
 Its constructor accepts named arguments as either a flat list or a single hash
 reference.
 
@@ -683,6 +737,10 @@ reference.
 =item C<encryption> - Arrayref of supported encryption schemes
 
 =item C<notification_types> - Arrayref of supported notification types
+
+=item C<extensions> - Arrayref of supported NWC extension identifiers
+
+=item C<supports_extension($identifier)> - Returns true if the extension is advertised
 
 =item C<supports_capability($name)> - Returns true if the capability is supported
 
@@ -735,6 +793,16 @@ reference.
 =back
 
 =head1 SEE ALSO
+
+NIP-47 core defines C<pay_invoice>, C<make_invoice>, C<lookup_invoice>,
+C<get_balance>, and C<get_info>. Advanced commands remain usable through the
+generic payload helpers. Existing notification APIs implement
+L<NWC-02|https://github.com/nostr-wallet-connect/nwc/blob/main/02.md> and hold
+invoice notifications are described by
+L<NWC-03|https://github.com/nostr-wallet-connect/nwc/blob/main/03.md>.
+Keysend, history, metadata conventions, and pairing deep links now live in
+L<the NWC extension specifications|https://github.com/nostr-wallet-connect/nwc>.
+C<get_info> response payloads preserve the optional C<extensions> array.
 
 L<NIP-47|https://github.com/nostr-protocol/nips/blob/master/47.md>,
 L<Net::Nostr>, L<Net::Nostr::Event>, L<Net::Nostr::Zap>

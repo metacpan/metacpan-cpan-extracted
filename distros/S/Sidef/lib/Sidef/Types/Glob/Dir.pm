@@ -92,6 +92,24 @@ sub find {
 }
 
 *browse = \&find;
+*walk   = \&find;
+
+sub each {
+    ref($_[0]) || shift(@_);
+    my ($self, $block) = @_;
+    my $dh = $self->open() // return Sidef::Types::Bool::Bool::FALSE;
+    $dh->each($block);
+    $dh->close;
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub glob {
+    ref($_[0]) || shift(@_);
+    my ($self, $pattern) = @_;
+    state $x = require File::Spec;
+    my @matches = CORE::glob(File::Spec->catfile("$self", "$pattern"));
+    Sidef::Types::Array::Array->new([map { (-d $_) ? __PACKAGE__->new($_) : Sidef::Types::Glob::File->new($_) } @matches]);
+}
 
 sub cwd {
     state $x = require Cwd;
@@ -193,6 +211,33 @@ sub open {
 sub open_w  { ... }
 sub open_rw { ... }
 
+sub entries {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $dh     = $self->open() // return undef;
+    my $result = $dh->entries;
+    $dh->close;
+    $result;
+}
+
+sub files {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $dh     = $self->open() // return undef;
+    my $result = $dh->files;
+    $dh->close;
+    $result;
+}
+
+sub subdirs {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $dh     = $self->open() // return undef;
+    my $result = $dh->dirs;
+    $dh->close;
+    $result;
+}
+
 sub chdir {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
@@ -226,7 +271,17 @@ sub is_empty {
         return (Sidef::Types::Bool::Bool::FALSE);
     }
     CORE::closedir($dir_h);
-    (Sidef::Types::Bool::Bool::TRUE);
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub size {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $total = 0;
+    foreach my $item (@{$self->find}) {
+        $item->is_file and $total += (-s "$item" // 0);
+    }
+    Sidef::Types::Number::Number::_set_int($total);
 }
 
 sub dump {

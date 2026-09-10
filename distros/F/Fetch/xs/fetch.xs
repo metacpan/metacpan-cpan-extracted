@@ -116,6 +116,26 @@ _h2_available()
     OUTPUT:
         RETVAL
 
+# True if built with ngtcp2 + nghttp3 against an OpenSSL that can drive them
+# (HTTP/3). False means an h3 attempt falls back to TCP.
+int
+_h3_available()
+    CODE:
+        RETVAL = FT_H3_AVAILABLE;
+    OUTPUT:
+        RETVAL
+
+# True if a name is resolved off the loop thread (ft_dns.h). False means the
+# build found no pthreads, or this is native Windows, and getaddrinfo runs
+# inline the way it always did - slower under concurrency, never wrong. An
+# address literal never resolves at all and is unaffected either way.
+int
+_dns_async()
+    CODE:
+        RETVAL = FT_DNS_ASYNC;
+    OUTPUT:
+        RETVAL
+
 # Start an HTTP/1.1 request on $loop to host:port with the pre-built request
 # bytes; returns a pending Fetch::Future resolving to a Fetch::Response.
 SV *
@@ -153,6 +173,43 @@ _request(loop, pool, host, port, req, tls, verify, timeout, method, scheme, auth
         RETVAL = ft_h1_start(aTHX_ l, lsv, pl, host, port, bytes, len, tls, verify,
                              timeout, method, scheme, authority, path, headers,
                              body, on_body, NULL);
+        hmf_pin_loop(aTHX_ RETVAL, loop);   /* only this loop can resolve it */
+    }
+    OUTPUT:
+        RETVAL
+
+# The same request over HTTP/3. No `req` byte string and no `tls` flag: QUIC
+# frames the request itself from the structured pieces, and there is no
+# cleartext QUIC to choose. Returns a pending Fetch::Future, or one already
+# failed when h3 cannot be used - which is an answer the caller can fall back
+# to TCP on rather than an exception.
+SV *
+_h3_request(loop, pool, host, port, verify, timeout, method, scheme, authority, path, headers, body, on_body)
+    SV         *loop
+    SV         *pool
+    const char *host
+    const char *port
+    int         verify
+    double      timeout
+    SV         *method
+    SV         *scheme
+    SV         *authority
+    SV         *path
+    SV         *headers
+    SV         *body
+    SV         *on_body
+    CODE:
+    {
+        ft_loop *l = NULL;
+        SV      *lsv = NULL;
+        ft_pool *pl = ft_pool_from_sv(aTHX_ pool);
+        if (sv_isobject(loop) && sv_derived_from(loop, "Fetch::Loop::Standalone"))
+            l = ft_loop_from_sv(aTHX_ loop);
+        else
+            lsv = loop;
+        RETVAL = ft_h3_start(aTHX_ l, lsv, pl, host, port, verify, timeout,
+                             method, scheme, authority, path, headers, body,
+                             on_body);
         hmf_pin_loop(aTHX_ RETVAL, loop);   /* only this loop can resolve it */
     }
     OUTPUT:

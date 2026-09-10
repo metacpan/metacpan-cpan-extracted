@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.48';
 
 1;
 
@@ -185,12 +185,26 @@ where a body was expected is a bug that ships. The other order is not a trap:
 a body already read whole is replayed to C<body_each> from the copy, so the
 order two pieces of code happen to run in cannot break either.
 
-What happens with no C<CONTENT_LENGTH> is HTTP's answer. With no transfer
-coding either, the request has no body and nothing is read. A chunked body has
-no declared length, so it is read to EOF - but only on a server that sets
-C<psgix.input.buffered>, because reading to EOF on a live socket is how an
-application hangs. C<max> is the only ceiling in that case: C<max_body> had no
-length to check either.
+=head2 A body with no CONTENT_LENGTH
+
+An HTTP/2 or HTTP/3 client streaming an upload declares no length: both
+versions forbid C<Transfer-Encoding>, so such a request carries no framing
+header at all. HTTP/1.1 spells the same thing C<< Transfer-Encoding: chunked >>.
+Either way there is no length to read to, and what decides whether the body
+can be read is C<psgix.input.buffered>.
+
+A server that sets it - Hyperman on every protocol version, Starman, anything
+that buffers the request before calling the application - is holding a finite
+body already, so it is read to EOF. A server that does not is handing over a
+live socket, where reading to EOF is how an application hangs: an HTTP/1.1
+chunked body croaks with that reason rather than hanging, and a request with
+no framing header at all is taken to have no body and nothing is read. That
+last case is the ordinary bodyless C<POST>, and going looking for a body there
+would turn it into an error.
+
+C<max> is the ceiling in all of this. Without an explicit one the route's
+L<Punk/max_body> applies, which is the ceiling C<max_body> could not enforce
+up front for want of a declared length to compare against.
 
 =head2 cookies
 

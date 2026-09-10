@@ -1,4 +1,4 @@
-/* punk_route.h - the C web router (phase 5 tier 2, completed in phase 6).
+/* punk_route.h - the C web router.
  *
  * Compiled once at to_app from the frozen Perl route table. The whole match
  * path now lives here: an exact-match table for static routes, typed-segment

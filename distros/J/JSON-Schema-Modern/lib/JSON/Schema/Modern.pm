@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.646-2-g46707000
+package JSON::Schema::Modern; # git description: v0.647-8-g8fac104a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.647';
+our $VERSION = '0.648';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -1244,12 +1244,12 @@ has _encoding => (
       identity => sub ($content_ref, @) { $content_ref },
       base64 => sub ($content_ref, @) {
         die "invalid characters\n"
-          if $content_ref->$* =~ m{[^A-Za-z0-9+/=]} or $content_ref->$* =~ m{=(?=[^=])};
+          if $content_ref->$* =~ m{[^[:alnum:]+/=]}a or $content_ref->$* =~ m{=(?=[^=])};
         require MIME::Base64; \ MIME::Base64::decode_base64($content_ref->$*);
       },
       base64url => sub ($content_ref, @) {
         die "invalid characters\n"
-          if $content_ref->$* =~ m{[^A-Za-z0-9=_-]} or $content_ref->$* =~ m{=(?=[^=])};
+          if $content_ref->$* =~ m{[^[:alnum:]=_-]}a or $content_ref->$* =~ m{=(?=[^=])};
         require MIME::Base64; \ MIME::Base64::decode_base64url($content_ref->$*);
       },
     };
@@ -1307,7 +1307,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.647
+version 0.648
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

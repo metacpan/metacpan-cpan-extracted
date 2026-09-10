@@ -3,62 +3,53 @@
  *
  * A static file hit is dominated by syscalls. Profiled under load, `open` was
  * 55% of the whole request, the PerlIO layer around it another 3.5%, sendfile
- * 7.7% and the close 1.2% - roughly two thirds of the request spent getting at
- * bytes the worker read moments ago and will read again thousands of times a
- * second. Holding the CONTENT removed all of it, and left `stat` as the last
- * file syscall on the path, at 15%. Holding the STAT removes that one too, and
- * with it the sibling probes that go looking for a .gz that is usually not
- * there.
+ * 7.7% and the close 1.2%. Holding the CONTENT removed all of it and left
+ * `stat` as the last file syscall on the path, at 15%; holding the STAT
+ * removes that one too, along with the sibling probes that go looking for a
+ * .gz that is usually not there.
  *
- * TWO CACHES, TWO DIFFERENT BARGAINS, AND THEY ARE NOT THE SAME BARGAIN.
+ * TWO CACHES, TWO DIFFERENT BARGAINS.
  *
  *   The CONTENT cache is EXACTLY correct. It re-reads whenever the file's
- *   (dev, ino, mtime, size) changes, and it learns that from a stat the caller
- *   had to do anyway - so it costs no syscall to validate and never serves
- *   bytes that disagree with the file it just looked at.
+ *   (dev, ino, mtime, size) changes, and it learns that from a stat the
+ *   caller had to do anyway - so validating costs no syscall and it never
+ *   serves bytes that disagree with the file it just looked at.
  *
- *   The STAT cache is EVENTUALLY correct, bounded by PFC_STAT_TTL (1 second by
- *   default). Inside that second a change on disk is not looked for, so it is
- *   not seen. That is a real trade and it is why it has its own knob:
+ *   The STAT cache is EVENTUALLY correct, bounded by PFC_STAT_TTL (1 second
+ *   by default): inside that second a change on disk is not looked for.
  *   PUNK_STATIC_STAT_TTL=0 goes back to statting every request - still with
- *   the content cache, and so still without the open - which is the exactly
+ *   the content cache, so still without the open - which is the exactly
  *   correct configuration at most of the speed.
  *
  * WHY CONTENT AND NOT AN OPEN DESCRIPTOR. Caching the descriptor and handing
- * out `dup`s of it looks better - a dup is 33x cheaper than an open (0.187us
- * against 6.205us, measured) and it keeps the sendfile path. It is also WRONG,
- * and wrong in the way that only shows up in production:
- *
- *     dup A reads: ABCD
- *     dup B reads: EFGH        <-- dup SHARES the file offset
- *     after B rewinds, A reads: ABCD
- *
- * A dup is a new descriptor onto the SAME open file description, so it shares
- * the offset. Two concurrent requests for one file read through each other,
- * and rewinding for one of them seeks the other back to the start mid-body.
- * No sequential test can see it. Content has no offset, so the class goes away.
+ * out `dup`s looks better: a dup is 33x cheaper than an open (0.187us against
+ * 6.205us, measured) and it keeps the sendfile path. It is also wrong, in the
+ * way that only shows up in production - a dup is a new descriptor onto the
+ * SAME open file description, so it SHARES THE OFFSET. Two concurrent
+ * requests for one file read through each other, and rewinding for one seeks
+ * the other back to the start mid-body. No sequential test can see it.
+ * Content has no offset, so the class goes away.
  *
  * WHY NOT fstat FOR VALIDATION. The question is "is the file at this PATH
- * still the file I read", and fstat cannot answer it: it describes the inode
- * already held, so a deploy that replaces the file leaves it reporting,
- * truthfully and uselessly, that nothing has changed. Statting the PATH
- * catches a replacement exactly, because a replacement gets a new inode.
+ * still the file I read", and fstat describes the inode already held - so a
+ * deploy that replaces the file leaves it reporting, truthfully and
+ * uselessly, that nothing has changed. Statting the PATH catches a
+ * replacement exactly, because a replacement gets a new inode.
  *
- * WHAT IT DOES NOT CACHE. Anything over PFC_MAX_FILE keeps the existing open +
- * sendfile path, which is already zero-copy and is right for a large file:
+ * WHAT IT DOES NOT CACHE. Anything over PFC_MAX_FILE keeps the existing open
+ * + sendfile path, which is already zero-copy and right for a large file:
  * caching a video would evict a site's whole stylesheet set to save one
- * request, and lose the kernel's own page cache doing it. Content is for the
- * small hot assets - stylesheets, scripts, icons, fonts - which is what a web
- * app actually serves. A stat entry is kept for any path, at any size.
+ * request, and lose the kernel's own page cache doing it. A stat entry is
+ * kept for any path, at any size.
  *
- * NEGATIVE ENTRIES ARE THE POINT, not an afterthought. The precompressed
- * sibling probe asks for `style.css.br` and `style.css.gz` on every request
- * from every browser, because every browser sends Accept-Encoding, and on a
- * site with no build step neither file has ever existed. Remembering that they
- * are absent is worth two syscalls a request.
+ * NEGATIVE ENTRIES ARE THE POINT. The precompressed sibling probe asks for
+ * `style.css.br` and `style.css.gz` on every request from every browser,
+ * because every browser sends Accept-Encoding, and on a site with no build
+ * step neither has ever existed. Remembering they are absent is worth two
+ * syscalls a request.
  *
- * It fails open everywhere: too big, unreadable, budget refused, all fall back
- * to the syscall this sits in front of.
+ * It fails open everywhere: too big, unreadable, budget refused, all fall
+ * back to the syscall this sits in front of.
  */
 
 #ifndef PUNK_FILECACHE_H

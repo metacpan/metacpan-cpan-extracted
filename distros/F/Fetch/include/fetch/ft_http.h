@@ -14,8 +14,19 @@
  * Winsock on native Windows and to the POSIX headers everywhere else); the
  * socket/IO calls below go through its ft_os_* wrappers. */
 
-typedef enum { FT_CONNECTING, FT_HANDSHAKING, FT_WRITING, FT_READING,
-               FT_PARKED } ft_http_state;
+#include "ft_dns.h"       /* name resolution, off the loop thread */
+#include "ft_altsvc.h"    /* how an https:// URL ever learns h3 exists */
+
+/* FT_RESOLVING comes first because a request in it has no socket yet: c->fd is
+ * the resolver's pipe, so the arming, the deadline and the teardown all work
+ * on it unchanged and a resolve that never answers times out like anything
+ * else. See ft_dns.h. */
+/* FT_QUIC_HANDSHAKING is HTTP/3's equivalent of FT_CONNECTING plus
+ * FT_HANDSHAKING at once: QUIC carries its TLS handshake inside the transport
+ * handshake, so there is no point between them where a connection is "up but
+ * not secure". */
+typedef enum { FT_RESOLVING, FT_CONNECTING, FT_HANDSHAKING, FT_WRITING,
+               FT_READING, FT_PARKED, FT_QUIC_HANDSHAKING } ft_http_state;
 
 typedef struct ft_conn {
     ft_loop      *loop;        /* native Standalone loop, or NULL if foreign */
@@ -41,16 +52,37 @@ typedef struct ft_conn {
     ft_timer     *timer;
     SV           *timer_h;
     SV           *timer_cb;
+    /* A SECOND, independent timer, for loss detection.
+     *
+     * The deadline above fires once and kills the request. QUIC's probe
+     * timeout is the opposite shape: it is rearmed after almost every packet
+     * sent or acknowledged, it fires many times over one request, and firing
+     * is routine rather than fatal. Sharing one slot would mean a rearmed PTO
+     * silently cancelling the caller's timeout, so it gets its own - same
+     * three-way native/foreign/hm-direct split, no other difference. */
+    ft_timer     *pto;
+    SV           *pto_h;
+    SV           *pto_cb;
+    hm_abi_timer *hm_pto;
+    /* what a fired PTO runs; `struct ft_conn` because the typedef is not
+     * complete until this struct is */
+    void        (*pto_fn)(pTHX_ struct ft_conn *c);
     /* TLS */
     void         *ssl;         /* SSL* when https, else NULL */
     int           tls;         /* request wants TLS */
     int           verify;      /* verify peer + hostname */
     char         *host;        /* SNI / verify host, and the redial target */
     char         *port;        /* service, kept for the keep-alive redial */
+    ft_dns       *dns;         /* in-flight resolve (FT_RESOLVING), or NULL */
     /* HTTP/2 (nghttp2) - populated after ALPN negotiates h2 */
     void         *h2;          /* nghttp2_session* */
     int           is_h2;
     int           h2_done;     /* stream closed */
+    /* HTTP/3 (ngtcp2 + nghttp3). One ft_qconn (ft_h3.h) holds the whole QUIC
+     * connection AND its list of in-flight request streams - unlike h2, where
+     * the connection and the one request it carries are the same object. */
+    void         *h3;          /* ft_qconn*, or NULL */
+    int           is_h3;
     /* structured request pieces, kept for the h2 nva (built after ALPN) */
     SV           *rq_method;   /* "GET" ...            */
     SV           *rq_scheme;   /* "http"/"https"       */
@@ -90,7 +122,7 @@ typedef struct ft_conn {
      * (fd + TLS kept open) in the owning pool under poolkey instead of closed,
      * and revived for the next request to the same host. */
     struct ft_pool *pool;      /* owning pool (NULL = close-per-request) */
-    char         *poolkey;     /* "tls:host:port" identity for reuse */
+    char         *poolkey;     /* "proto:tls:host:port" identity for reuse */
     struct ft_conn *next_idle; /* pool free-list link while parked */
     int           reused;      /* revived from the pool this request */
     int           simple;      /* resolve with a raw hash, not a blessed
@@ -124,10 +156,17 @@ typedef struct ft_pool {
 #include "ft_tls.h"            /* operates on ft_conn (c->ssl, c->fd) */
 
 static void ft_h2_free(ft_conn *c);   /* defined in ft_h2.h */
+static void ft_h3_free(pTHX_ ft_conn *c);   /* defined in ft_h3.h */
+static void ft_h3_step(pTHX_ ft_conn *c);   /* defined in ft_h3.h */
 static void ft_loop_arm(pTHX_ ft_conn *c, int mask);       /* foreign, below */
 static void ft_loop_untimer(pTHX_ ft_conn *c);             /* foreign, below */
 static void ft_arm(pTHX_ ft_conn *c, int mask);            /* below */
 static void ft_hm_ready(pTHX_ int fd, int mask, void *ud); /* hm-direct, below */
+static void ft_conn_cancel_pto(pTHX_ ft_conn *c);          /* below */
+/* The loss-detection timer, declared here because ft_h3.h is included before
+ * it is defined and QUIC is the only thing that arms one. */
+static void ft_conn_arm_pto(pTHX_ ft_conn *c, double secs,
+                            void (*fn)(pTHX_ struct ft_conn *c));
 
 /* Cancel a pending deadline timer (nothing to do if it already fired: the
  * fire path clears c->timer/c->timer_h/c->hm_timer before running). */
@@ -152,6 +191,20 @@ static void *ft_conn_hm_loop_next = NULL;
  * create/revive). Fired once, before the body, with ($status, [k,v,...]). */
 static SV *ft_conn_on_headers_next = NULL;
 
+/* The transport a request is being started on. It is part of the pool key
+ * because an idle connection is only reusable by a request that speaks what
+ * it speaks: handing an HTTP/3 connection to a request expecting to write
+ * HTTP/1.1 bytes at a socket is not a subtle failure, it is a hang.
+ *
+ * The key names the protocol ASKED FOR, not the one negotiated. Those differ
+ * on TLS, where ALPN can turn an intended h1 connection into h2 - but an h2
+ * connection never parks (ft_conn_reusable), so nothing under the "h1" key is
+ * ever anything else. Alt-Svc is what makes a request ask for h3 in the first
+ * place, and it asks before the connection exists. */
+#define FT_PROTO_H1 "h1"
+#define FT_PROTO_H3 "h3"
+static const char *ft_conn_proto_next = FT_PROTO_H1;
+
 /* Hand the parsed status line + header list to the on_headers sink, once. */
 static void ft_fire_headers(pTHX_ ft_conn *c) {
     dSP;
@@ -171,7 +224,14 @@ static void ft_fire_headers(pTHX_ ft_conn *c) {
 static void ft_conn_free(pTHX_ ft_conn *c) {
     if (!c) return;
     ft_conn_cancel_timer(aTHX_ c);
+    ft_conn_cancel_pto(aTHX_ c);
+    /* A resolve still in flight: drop this side's reference and go. The
+     * thread cannot be stopped and is not waited for - it finishes into a
+     * struct nobody is reading, finds itself holding the last reference and
+     * frees it there. The pipe's read end is c->fd and is closed below. */
+    if (c->dns) { ft_dns_unref(c->dns); c->dns = NULL; }
     ft_h2_free(c);
+    ft_h3_free(aTHX_ c);
     ft_tls_free(c);
     if (c->fd >= 0) {
         if (c->armed) {
@@ -195,6 +255,7 @@ static void ft_conn_free(pTHX_ ft_conn *c) {
     if (c->ws_waiter)     SvREFCNT_dec(c->ws_waiter);
     if (c->ws_inbox)      SvREFCNT_dec(c->ws_inbox);
     if (c->timer_cb)     SvREFCNT_dec(c->timer_cb);
+    if (c->pto_cb)       SvREFCNT_dec(c->pto_cb);
     if (c->loop_sv)      SvREFCNT_dec(c->loop_sv);
     if (c->future)       SvREFCNT_dec(c->future);
     if (c->watcher)      SvREFCNT_dec(c->watcher);
@@ -240,6 +301,22 @@ static ft_conn *ft_pool_take(ft_pool *p, const char *key) {
         }
         pp = &(*pp)->next_idle;
     }
+    return NULL;
+}
+
+/* Find a connection under this key WITHOUT taking it out.
+ *
+ * The h1 pool holds only idle connections and hands one over exclusively,
+ * because an HTTP/1.1 connection carries one request at a time. An HTTP/3
+ * connection carries many, so it stays in the pool while it is in use and a
+ * second request attaches to it rather than replacing it - which is the
+ * difference between multiplexing and taking turns, and the reason this
+ * exists beside ft_pool_take rather than instead of it. */
+static ft_conn *ft_pool_peek(ft_pool *p, const char *key) {
+    ft_conn *c;
+    if (!p) return NULL;
+    for (c = p->idle; c; c = c->next_idle)
+        if (c->poolkey && strcmp(c->poolkey, key) == 0) return c;
     return NULL;
 }
 
@@ -303,47 +380,75 @@ static void ft_conn_park(pTHX_ ft_conn *c) {
 }
 
 /* resolve the request's future with a Fetch::Response, then park or free */
-static void ft_conn_finish(pTHX_ ft_conn *c) {
+/* Build the response object and settle a future with it.
+ *
+ * Split out of ft_conn_finish because HTTP/3 finishes a REQUEST without
+ * finishing the connection: several streams settle their own futures on one
+ * connection, so the pieces come from a per-stream struct rather than from
+ * the ft_conn. Everything a caller sees - the hash keys, the blessing, the
+ * absent trailers key - is decided here and once, so the transports cannot
+ * drift in what a Fetch::Response is. `body` is borrowed. */
+static void ft_settle_response(pTHX_ SV *future, int status, AV *headers,
+                               AV *trailers, const char *body, size_t blen,
+                               int simple) {
     /* the Response stash never changes; look it up once per process */
     static HV *resp_stash = NULL;
     HV *resp = newHV();
-    int reuse = ft_conn_reusable(c);
-    SV *body = (c->is_h2 || c->chunked)
-        ? newSVpvn(c->dbody ? c->dbody : "", c->dblen)     /* h2 + chunked decode into dbody */
-        : newSVpvn(c->rbuf + c->hdr_end, c->rlen - c->hdr_end);
     SV *rv, *fut;
     AV *vals;
-    (void)hv_stores(resp, "status",  newSViv(c->status));
+    (void)hv_stores(resp, "status",  newSViv(status));
     (void)hv_stores(resp, "headers",
-        c->headers ? newRV_inc((SV *)c->headers) : newRV_noinc((SV *)newAV()));
+        headers ? newRV_inc((SV *)headers) : newRV_noinc((SV *)newAV()));
     /* Only when there were any: an HTTP/1 response has no trailers and should
      * not grow an empty key, and a consumer can tell "none were sent" from
      * "none were captured" by the absence. */
-    if (c->trailers)
-        (void)hv_stores(resp, "trailers", newRV_inc((SV *)c->trailers));
-    (void)hv_stores(resp, "content", body);
-    if (c->simple) {
+    if (trailers)
+        (void)hv_stores(resp, "trailers", newRV_inc((SV *)trailers));
+    (void)hv_stores(resp, "content", newSVpvn(body ? body : "", blen));
+    if (simple) {
         rv = newRV_noinc((SV *)resp);        /* raw hash: no bless, no methods */
     } else {
         if (!resp_stash) resp_stash = gv_stashpv("Fetch::Response", GV_ADD);
         rv = sv_bless(newRV_noinc((SV *)resp), resp_stash);
     }
     /* hand the response straight to the future's value AV - no extra copy */
-    fut = SvREFCNT_inc(c->future);
+    fut  = SvREFCNT_inc(future);
     vals = newAV();
     av_push(vals, rv);                       /* transfers our ref */
     hmf_settle_av(aTHX_ fut, HMF_DONE, vals);
     SvREFCNT_dec(fut);
+}
+
+static void ft_conn_finish(pTHX_ ft_conn *c) {
+    int reuse = ft_conn_reusable(c);
+    /* Alt-Svc, on the way past. A response that arrived over TCP is the only
+     * place an origin can say it also answers over QUIC, so this is where a
+     * later request learns to try h3 - see ft_altsvc.h. */
+    if (c->tls && c->host && c->headers)
+        ft_altsvc_note(aTHX_ c->host, c->port ? atoi(c->port) : 443, c->headers);
+    /* h2 and chunked decode into dbody; a plain h1 body is still in rbuf */
+    const char *body = (c->is_h2 || c->chunked)
+        ? (c->dbody ? c->dbody : "") : c->rbuf + c->hdr_end;
+    size_t blen = (c->is_h2 || c->chunked)
+        ? c->dblen : c->rlen - c->hdr_end;
+    ft_settle_response(aTHX_ c->future, c->status, c->headers, c->trailers,
+                       body, blen, c->simple);
     if (reuse) { ft_conn_park(aTHX_ c); return; }
     ft_conn_free(aTHX_ c);
 }
 
 static void ft_conn_fail(pTHX_ ft_conn *c, const char *msg) {
-    SV *e   = sv_2mortal(newSVpvf("Fetch: %s", msg));
-    SV *fut = SvREFCNT_inc(c->future);
-    if (hmf_state(aTHX_ fut) == HMF_PENDING)
-        hmf_settle(aTHX_ fut, HMF_FAILED, &e, 1);
-    SvREFCNT_dec(fut);
+    /* An HTTP/3 connection has no future of its own: the futures belong to
+     * its streams, and ft_h3_fail_all has already settled every one of them
+     * before calling this to tear the connection down. Everywhere else there
+     * is exactly one, and it is this. */
+    if (c->future) {
+        SV *e   = sv_2mortal(newSVpvf("Fetch: %s", msg));
+        SV *fut = SvREFCNT_inc(c->future);
+        if (hmf_state(aTHX_ fut) == HMF_PENDING)
+            hmf_settle(aTHX_ fut, HMF_FAILED, &e, 1);
+        SvREFCNT_dec(fut);
+    }
     ft_conn_free(aTHX_ c);
 }
 
@@ -470,16 +575,23 @@ static int ft_body_complete(ft_conn *c) {
 }
 
 /* hand one body chunk to the streaming sink; deaths become warnings */
-static void ft_emit_body(pTHX_ ft_conn *c, const char *buf, size_t len) {
+/* One chunk to a streaming sink. Takes the coderef rather than the
+ * connection, because on HTTP/3 the sink belongs to one of several streams on
+ * a shared connection and there is no single c->on_body to reach for. */
+static void ft_emit_body_sv(pTHX_ SV *on_body, const char *buf, size_t len) {
     dSP;
-    if (!len) return;
+    if (!len || !on_body) return;
     ENTER; SAVETMPS;
     PUSHMARK(SP);
     XPUSHs(sv_2mortal(newSVpvn(buf, len)));
     PUTBACK;
-    call_sv(c->on_body, G_DISCARD | G_EVAL);
+    call_sv(on_body, G_DISCARD | G_EVAL);
     if (SvTRUE(ERRSV)) warn("Fetch: on_body callback died: %s", SvPV_nolen(ERRSV));
     FREETMPS; LEAVE;
+}
+
+static void ft_emit_body(pTHX_ ft_conn *c, const char *buf, size_t len) {
+    ft_emit_body_sv(aTHX_ c->on_body, buf, len);
 }
 
 /* Foreign loop: reconcile interest for c->fd to exactly `mask` by calling the
@@ -597,6 +709,7 @@ static ssize_t ft_send(ft_conn *c, const void *buf, size_t n, int *want) {
 }
 
 #include "ft_h2.h"   /* nghttp2 client; uses ft_recv/ft_send/ft_arm/finish/fail */
+#include "ft_h3.h"   /* nghttp3 + ngtcp2 client, on the same seams */
 #include "ft_ws.h"   /* WebSocket framing; uses ft_recv/ft_send/ft_arm */
 
 /* Verify a 101 + Sec-WebSocket-Accept and switch into frame mode, resolving
@@ -715,9 +828,61 @@ static int ft_conn_retry(pTHX_ ft_conn *c) {
 /* One pass of the connection state machine. TLS handshake, request send, and
  * response recv+parse all re-arm the loop for whichever direction OpenSSL (or
  * the socket) next needs. */
+/* Walk a resolved address list and start a non-blocking connect on the first
+ * address that takes one. Returns the fd, or -1 with errno set by the last
+ * attempt. Shared by the inline and the threaded resolve so the two cannot
+ * drift in what "the first usable address" means. */
+static int ft_conn_dial(struct addrinfo *ai) {
+    struct addrinfo *rp;
+    for (rp = ai; rp; rp = rp->ai_next) {
+        int fd = ft_os_socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (fd < 0) continue;
+        ft_os_set_nonblock(fd);
+        if (ft_os_connect(fd, rp->ai_addr, (int)rp->ai_addrlen) == 0
+            || errno == EINPROGRESS)
+            return fd;
+        ft_os_close(fd);
+    }
+    return -1;
+}
+
 static void ft_conn_step(pTHX_ ft_conn *c) {
     if (c->is_ws) { ft_ws_step(aTHX_ c); return; }
     if (c->is_h2) { ft_h2_step(aTHX_ c); return; }
+    if (c->is_h3) { ft_h3_step(aTHX_ c); return; }
+
+    if (c->state == FT_RESOLVING) {
+        /* The resolver woke us. The byte carries nothing - the answer is in
+         * the struct, and it is the write that made it visible here. */
+        ft_dns *d = c->dns;
+        char b;
+        int fd;
+        (void)!read(c->fd, &b, 1);
+        /* Unarm BEFORE the fd changes: ft_arm reconciles against c->fd, so
+         * dropping the watch afterwards would name the socket that is about
+         * to take its place - or, once the number is recycled, somebody
+         * else's. */
+        ft_arm(aTHX_ c, 0);
+        ft_os_close(c->fd);
+        c->fd  = -1;
+        c->dns = NULL;
+        if (!d || d->gai != 0) {
+            char msg[320];
+            my_snprintf(msg, sizeof msg, "resolve %s:%s: %s",
+                        c->host ? c->host : "?", c->port ? c->port : "?",
+                        d ? gai_strerror(d->gai) : "no resolver");
+            ft_dns_unref(d);
+            ft_conn_fail(aTHX_ c, msg);
+            return;
+        }
+        fd = ft_conn_dial(d->ai);
+        ft_dns_unref(d);
+        if (fd < 0) { ft_conn_fail(aTHX_ c, "connect failed"); return; }
+        c->fd    = fd;
+        c->state = FT_CONNECTING;
+        ft_arm(aTHX_ c, HM_EV_WRITE);   /* wait for connect() to complete */
+        return;
+    }
 
     if (c->state == FT_CONNECTING) {
         int err = 0; socklen_t el = sizeof(err);
@@ -888,6 +1053,74 @@ static void ft_hm_timeout(pTHX_ void *ud) {
     ft_conn_fail(aTHX_ c, "request timed out");
 }
 
+/* ---- the loss-detection timer -------------------------------------------- */
+
+XS_INTERNAL(ft_conn_pto_cb);
+XS_INTERNAL(ft_conn_pto_cb) {
+    dVAR; dXSARGS;
+    hm_clos *cl = hm_clos_of(aTHX_ cv);
+    ft_conn *c  = INT2PTR(ft_conn *, cl->i);
+    PERL_UNUSED_VAR(items);
+    c->pto = NULL;
+    if (c->pto_h) { SvREFCNT_dec(c->pto_h); c->pto_h = NULL; }
+    if (c->pto_fn) c->pto_fn(aTHX_ c);
+    XSRETURN_EMPTY;
+}
+
+static void ft_hm_pto(pTHX_ void *ud) {
+    ft_conn *c = (ft_conn *)ud;
+    c->hm_pto = NULL;              /* the handle died with the fire */
+    if (c->pto_fn) c->pto_fn(aTHX_ c);
+}
+
+static void ft_conn_cancel_pto(pTHX_ ft_conn *c) {
+    if (c->hm_pto) {
+        if (!PL_dirty) c->hm->timer_cancel(aTHX_ c->hm_loop, c->hm_pto);
+        c->hm_pto = NULL;
+    }
+    if (c->pto) { ft_del_timer(aTHX_ c->loop, c->pto); c->pto = NULL; }
+    if (c->pto_h) {
+        /* the foreign-loop handle: cancelled the same way the deadline's is */
+        SvREFCNT_dec(c->pto_h);
+        c->pto_h = NULL;
+    }
+}
+
+/* Can this connection carry a probe timeout at all?
+ *
+ * It needs a real one-shot timer. The native loop has them and the
+ * Hyperman-direct path has them (hm->timer is a kernel timer with a C
+ * callback). A FOREIGN Perl loop does not, necessarily: Fetch::Loop::Hyperman
+ * without the C ABI deliberately keeps a list and sweeps it every 0.1s, which
+ * is a sound trade for a request deadline measured in seconds and useless for
+ * loss detection measured in milliseconds - a PTO quantised to 100ms is not a
+ * PTO, it is a stall.
+ *
+ * So this is asked before a transport that needs one is chosen, and the honest
+ * answer where it is false is to refuse that transport rather than to run it
+ * badly. */
+static int ft_conn_can_pto(ft_conn *c) {
+    return c->hm != NULL || c->loop_sv == NULL;
+}
+
+/* (Re)arm the probe timeout. Unlike the deadline this is called constantly,
+ * so it cancels whatever was pending first: the last call wins. */
+static void ft_conn_arm_pto(pTHX_ ft_conn *c, double secs,
+                            void (*fn)(pTHX_ struct ft_conn *c)) {
+    ft_conn_cancel_pto(aTHX_ c);
+    c->pto_fn = fn;
+    if (secs <= 0 || !fn) return;
+    if (c->hm) {
+        c->hm_pto = c->hm->timer(aTHX_ c->hm_loop, secs, ft_hm_pto, c);
+        return;
+    }
+    if (c->loop_sv) return;        /* refused above; nothing to arm */
+    if (!c->pto_cb)
+        c->pto_cb = hm_closure(aTHX_ ft_conn_pto_cb, NULL, NULL, NULL, NULL,
+                               PTR2IV(c), 0);
+    c->pto = ft_add_timer(aTHX_ c->loop, secs, c->pto_cb, 1);
+}
+
 /* Arm the per-request deadline (seconds). Native loop uses the C timer;
  * a foreign loop is asked via _ft_timer. */
 static void ft_conn_arm_timeout(pTHX_ ft_conn *c, double secs) {
@@ -948,15 +1181,17 @@ static SV *ft_h1_start(pTHX_ ft_loop *loop, SV *loop_sv, ft_pool *pool,
                        SV *method, SV *scheme, SV *authority, SV *path,
                        SV *headers_av, SV *body, SV *on_body,
                        const char *ws_key) {
-    struct addrinfo hints, *ai = NULL, *rp;
-    int fd = -1, gai;
+    struct addrinfo *ai = NULL;
+    int fd = -1, dnsfd = -1;
+    ft_dns *dns = NULL;
     ft_conn *c;
     char poolkey[300];
     SV *future = hmf_new(aTHX_ "Fetch::Future");
 
     /* reuse a live parked connection to the same host, if we have one */
     if (pool) {
-        snprintf(poolkey, sizeof(poolkey), "%d:%s:%s", tls ? 1 : 0, host, port);
+        snprintf(poolkey, sizeof(poolkey), "%s:%d:%s:%s",
+                 ft_conn_proto_next, tls ? 1 : 0, host, port);
         for (;;) {
             ft_conn *k = ft_pool_take(pool, poolkey);
             if (!k) break;
@@ -966,29 +1201,51 @@ static SV *ft_h1_start(pTHX_ ft_loop *loop, SV *loop_sv, ft_pool *pool,
         }
     }
 
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family   = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    gai = getaddrinfo(host, port, &hints, &ai);
-    if (gai != 0) {
-        SV *e = sv_2mortal(newSVpvf("Fetch: resolve %s:%s: %s", host, port, gai_strerror(gai)));
-        hmf_settle(aTHX_ future, HMF_FAILED, &e, 1);
-        return future;
+    /* Three ways to get an address, in order of what costs least.
+     *
+     * A literal - which is every request in this dist's own tests, and every
+     * request to a machine named by number - is a parse and nothing else, so
+     * it connects here with no thread and no extra loop turn.
+     *
+     * A name goes to the resolver thread (ft_dns.h) and the connection starts
+     * in FT_RESOLVING with the pipe as its fd. Only if that cannot be started
+     * at all - no pthreads in the build, native Windows, or the process out
+     * of threads - does this fall back to resolving inline, which is what
+     * every request used to do and is the one thing here that can stall the
+     * loop. */
+    if (ft_dns_numeric(host, port, &ai)) {
+        fd = ft_conn_dial(ai);
+        freeaddrinfo(ai);
+        ai = NULL;
+        if (fd < 0) {
+            SV *e = sv_2mortal(newSVpvf("Fetch: connect %s:%s: %s",
+                                        host, port, strerror(errno)));
+            hmf_settle(aTHX_ future, HMF_FAILED, &e, 1);
+            return future;
+        }
     }
-    for (rp = ai; rp; rp = rp->ai_next) {
-        fd = ft_os_socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-        if (fd < 0) continue;
-        ft_os_set_nonblock(fd);
-        if (ft_os_connect(fd, rp->ai_addr, (int)rp->ai_addrlen) == 0
-            || errno == EINPROGRESS)
-            break;
-        ft_os_close(fd); fd = -1;
-    }
-    freeaddrinfo(ai);
-    if (fd < 0) {
-        SV *e = sv_2mortal(newSVpvf("Fetch: connect %s:%s: %s", host, port, strerror(errno)));
-        hmf_settle(aTHX_ future, HMF_FAILED, &e, 1);
-        return future;
+    else if ((dnsfd = ft_dns_start(host, port, &dns)) < 0) {
+        struct addrinfo hints;
+        int gai;
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family   = AF_UNSPEC;
+        hints.ai_socktype = SOCK_STREAM;
+        gai = getaddrinfo(host, port, &hints, &ai);
+        if (gai != 0) {
+            SV *e = sv_2mortal(newSVpvf("Fetch: resolve %s:%s: %s",
+                                        host, port, gai_strerror(gai)));
+            hmf_settle(aTHX_ future, HMF_FAILED, &e, 1);
+            return future;
+        }
+        fd = ft_conn_dial(ai);
+        freeaddrinfo(ai);
+        ai = NULL;
+        if (fd < 0) {
+            SV *e = sv_2mortal(newSVpvf("Fetch: connect %s:%s: %s",
+                                        host, port, strerror(errno)));
+            hmf_settle(aTHX_ future, HMF_FAILED, &e, 1);
+            return future;
+        }
     }
 
     Newxz(c, 1, ft_conn);
@@ -999,8 +1256,11 @@ static SV *ft_h1_start(pTHX_ ft_loop *loop, SV *loop_sv, ft_pool *pool,
         Newx(c->poolkey, strlen(poolkey) + 1, char);
         memcpy(c->poolkey, poolkey, strlen(poolkey) + 1);
     }
-    c->fd     = fd;
-    c->state  = FT_CONNECTING;
+    /* Either a socket mid-connect, or the resolver's pipe. The rest of the
+     * machinery does not care which: it arms c->fd and waits. */
+    c->fd     = dns ? dnsfd : fd;
+    c->dns    = dns;
+    c->state  = dns ? FT_RESOLVING : FT_CONNECTING;
     c->future = SvREFCNT_inc(future);
     c->simple = ft_conn_simple_next;   /* raw-hash response mode for this UA */
     c->content_len = -1;
@@ -1040,8 +1300,142 @@ static SV *ft_h1_start(pTHX_ ft_loop *loop, SV *loop_sv, ft_pool *pool,
     if (!c->hm)   /* the hm path never fires a coderef; skip building one */
         c->watcher = hm_closure(aTHX_ ft_conn_ready_cb, NULL, NULL, NULL, NULL,
                                 PTR2IV(c), 0);
-    ft_arm(aTHX_ c, HM_EV_WRITE);   /* wait for connect() to complete */
+    /* Resolving waits to READ the answer; connecting waits for WRITE, which
+     * is how a non-blocking connect reports itself finished. */
+    ft_arm(aTHX_ c, dns ? HM_EV_READ : HM_EV_WRITE);
+    (void)ft_pool_peek;   /* used by ft_h3_start below */
+    /* The deadline covers the resolve as well as the request, which is the
+     * point of putting the pipe in c->fd: a nameserver that never answers
+     * fails with the timeout the caller asked for rather than hanging. */
     ft_conn_arm_timeout(aTHX_ c, timeout);
+    return future;
+}
+
+/* Start a request over HTTP/3.
+ *
+ * The shape differs from ft_h1_start in one way that matters: a connection is
+ * REUSED WHILE LIVE. ft_pool_peek finds an h3 connection to this origin
+ * whether or not it is idle, and the request becomes another stream on it -
+ * so N concurrent requests cost one handshake and one socket. Only when there
+ * is none does this build one, and it is put in the pool immediately rather
+ * than when it goes idle, so the requests started right after it find it.
+ *
+ * Returns a pending Fetch::Future, or one already failed when h3 cannot be
+ * used at all - the caller (ft_ua.h) then has an ordinary answer to fall back
+ * to TCP on rather than an exception. */
+static SV *ft_h3_start(pTHX_ ft_loop *loop, SV *loop_sv, ft_pool *pool,
+                       const char *host, const char *port,
+                       int verify, double timeout,
+                       SV *method, SV *scheme, SV *authority, SV *path,
+                       SV *headers_av, SV *body, SV *on_body) {
+    SV *future = hmf_new(aTHX_ "Fetch::Future");
+    char poolkey[300];
+    ft_conn *c = NULL;
+    struct addrinfo *ai = NULL;
+    int simple = ft_conn_simple_next;
+
+    if (!FT_H3_AVAILABLE) {
+        SV *e = sv_2mortal(newSVpvs("Fetch: HTTP/3 not built "
+                                    "(need ngtcp2 + nghttp3)"));
+        hmf_settle(aTHX_ future, HMF_FAILED, &e, 1);
+        return future;
+    }
+
+    snprintf(poolkey, sizeof(poolkey), "%s:1:%s:%s", FT_PROTO_H3, host, port);
+    if (pool) c = ft_pool_peek(pool, poolkey);
+    if (c && ft_conn_alive_h3(c)) {
+        ft_h3_request(aTHX_ c, future, method, scheme, authority, path,
+                      headers_av, body, on_body, ft_conn_on_headers_next,
+                      simple);
+        return future;
+    }
+    if (c) {   /* it died since it was parked; do not hand it out again */
+        ft_pool_remove(pool, c);
+        c->pool = NULL;
+        ft_conn_free(aTHX_ c);
+        c = NULL;
+    }
+
+    Newxz(c, 1, ft_conn);
+    c->loop    = loop;
+    c->loop_sv = loop_sv ? SvREFCNT_inc(loop_sv) : NULL;
+    c->fd      = -1;
+    c->verify  = verify;
+    c->tls     = 1;                       /* there is no cleartext QUIC */
+    c->simple  = simple;
+    c->content_len = -1;
+    c->hm      = ft_conn_hm_next;
+    c->hm_loop = ft_conn_hm_loop_next;
+    { size_t l = strlen(host); Newx(c->host, l + 1, char); memcpy(c->host, host, l + 1); }
+    { size_t l = strlen(port); Newx(c->port, l + 1, char); memcpy(c->port, port, l + 1); }
+
+    /* Loss detection needs a real one-shot timer, and a foreign Perl loop
+     * with only a coarse sweep has none. Refusing here is the honest answer
+     * the caller can act on; running QUIC on a 100ms timer would look like a
+     * network problem rather than a configuration one. */
+    if (!ft_conn_can_pto(c)) {
+        SV *e = sv_2mortal(newSVpvs("Fetch: HTTP/3 needs the standalone loop "
+                                    "or Hyperman's C ABI - this loop has no "
+                                    "timer fine enough for loss detection"));
+        ft_conn_free(aTHX_ c);
+        hmf_settle(aTHX_ future, HMF_FAILED, &e, 1);
+        return future;
+    }
+
+    /* QUIC dials UDP, so the address is wanted here rather than handed to a
+     * connect() the loop finishes. Resolution reuses ft_dns.h's inline path:
+     * an h3 attempt follows an Alt-Svc header from a request that has already
+     * resolved this origin, so the answer is in the system's cache. */
+    {
+        struct addrinfo hints;
+        int gai;
+        if (!ft_dns_numeric(host, port, &ai)) {
+            memset(&hints, 0, sizeof hints);
+            hints.ai_family   = AF_UNSPEC;
+            hints.ai_socktype = SOCK_DGRAM;
+            gai = getaddrinfo(host, port, &hints, &ai);
+            if (gai != 0) {
+                SV *e = sv_2mortal(newSVpvf("Fetch: resolve %s:%s: %s",
+                                            host, port, gai_strerror(gai)));
+                ft_conn_free(aTHX_ c);
+                hmf_settle(aTHX_ future, HMF_FAILED, &e, 1);
+                return future;
+            }
+        }
+    }
+
+    if (ft_h3_connect(aTHX_ c, ai) != 0) {
+        freeaddrinfo(ai);
+        {
+            SV *e = sv_2mortal(newSVpvs("Fetch: HTTP/3 connect failed"));
+            ft_conn_free(aTHX_ c);
+            hmf_settle(aTHX_ future, HMF_FAILED, &e, 1);
+        }
+        return future;
+    }
+    freeaddrinfo(ai);
+
+    if (pool) {
+        c->pool = pool;
+        Newx(c->poolkey, strlen(poolkey) + 1, char);
+        memcpy(c->poolkey, poolkey, strlen(poolkey) + 1);
+        /* In the pool from the start, not when it goes idle: the requests
+         * issued in the same tick have to find it, or each opens its own
+         * connection and the multiplexing never happens. */
+        ft_pool_put(aTHX_ pool, c);
+    }
+    if (!c->hm)
+        c->watcher = hm_closure(aTHX_ ft_conn_ready_cb, NULL, NULL, NULL, NULL,
+                                PTR2IV(c), 0);
+    ft_h3_request(aTHX_ c, future, method, scheme, authority, path,
+                  headers_av, body, on_body, ft_conn_on_headers_next, simple);
+    /* The handshake's first flight, and then wait for the peer. */
+    ft_h3_step(aTHX_ c);
+    /* The deadline is the CONNECTION's here, not the request's: several
+     * requests share it and the last one to finish is what it has to cover.
+     * A per-request deadline over a shared connection would kill the
+     * connection out from under everybody else's request. */
+    (void)timeout;
     return future;
 }
 

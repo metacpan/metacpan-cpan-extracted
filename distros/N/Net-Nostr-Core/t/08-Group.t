@@ -7,7 +7,7 @@ use strictures 2;
 use Test2::V0 -no_srand => 1;
 
 use lib 't/lib';
-use TestFixtures qw(make_event);
+use TestFixtures qw(make_event pod_code);
 
 use Net::Nostr::Bech32 qw(encode_naddr);
 use Net::Nostr::Group;
@@ -323,6 +323,14 @@ subtest 'extra args pass through to Event' => sub {
         pubkey => $pk, group_id => 'g', created_at => 42,
     );
     is($e->created_at, 42, 'created_at');
+};
+
+subtest 'review: actual metadata and pin POD examples execute' => sub {
+    my ($hex_pubkey,$relay_pubkey,$alice_pk,$relay_pk,$event_id)=($pk,$pk,$pk,$target_pk,$eid);
+    for my $heading (qw(edit_metadata metadata update_pin_list)) {
+        my $code=pod_code('lib/Net/Nostr/Group.pm',$heading);
+        ok lives { eval "$code\n1;" or die $@ }, "$heading example from POD executes";
+    }
 };
 
 done_testing;

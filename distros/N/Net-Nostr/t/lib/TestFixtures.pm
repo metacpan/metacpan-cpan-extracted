@@ -3,7 +3,7 @@ package TestFixtures;
 use strictures 2;
 use Exporter 'import';
 
-our @EXPORT_OK = qw(%FIATJAF_EVENT make_event make_key_from_hex);
+our @EXPORT_OK = qw(%FIATJAF_EVENT make_event make_key_from_hex make_signed_event);
 
 # A real-world note from fiatjaf
 our %FIATJAF_EVENT = (
@@ -32,6 +32,13 @@ sub make_key_from_hex {
     my $key = bless {}, 'Net::Nostr::Key';
     $key->{_cryptpkecc} = $pk;
     return $key;
+}
+
+sub make_signed_event {
+    my $key = shift;
+    return $key->create_event(
+        kind => 1, content => 'test', created_at => 1000, tags => [], @_,
+    );
 }
 
 1;

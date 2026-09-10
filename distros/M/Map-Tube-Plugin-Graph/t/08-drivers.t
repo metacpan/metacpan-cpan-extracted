@@ -22,9 +22,15 @@ for my $driver(@drivers) {
   if ( $@ ne '' ) {
     diag( "It seems the GraphViz binary (dot) does not fully support\n" .
           "non-overlapping node placement for driver $driver.\n" .
-          "Use 'overlap => 1' in in your own applications if necessary."
+          "Use 'overlap => 1' in your own applications if necessary."
         );
-    ($diagram, undef) = $tube->render( driver => $driver, overlap => 0 );
+    eval { ($diagram, undef) = $tube->render( driver => $driver, overlap => 1 ); };
+    if ( $@ ne '' ) {
+      diag( "Strangely, it seems the GraphViz binary (dot) does not fully support\n" .
+            "overlapping node placement for driver $driver, either.\n" .
+            "I'm stymied."
+          );
+    }
   }
   isnt( $diagram, '', "$driver driver" );
 }

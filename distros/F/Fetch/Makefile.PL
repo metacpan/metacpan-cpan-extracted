@@ -39,6 +39,10 @@ if ($^O eq 'linux') {
 }
 
 # --- OpenSSL (TLS/HTTPS + ALPN for h2) ------------------------------------
+# The flags are kept: the QUIC probe below links against libssl itself, so it
+# has to be given the same OpenSSL this build found rather than whichever one
+# the compiler would pick on its own.
+my ($tls_inc, $tls_libs) = ('', '');
 {
     my ($cflags, $libs);
     if (system('pkg-config --exists openssl >/dev/null 2>&1') == 0) {
@@ -61,6 +65,7 @@ if ($^O eq 'linux') {
         $DEFINE .= ' -DFT_HAVE_OPENSSL';
         $INC    .= " $cflags";
         $LIBS   .= " $libs";
+        ($tls_inc, $tls_libs) = ($cflags || '', $libs);
         print "Found OpenSSL: HTTPS/TLS support enabled.\n";
     } else {
         print "OpenSSL not found: HTTPS disabled (install libssl-dev).\n";
@@ -102,9 +107,97 @@ if ($^O eq 'linux') {
     }
 }
 
+# --- HTTP/3 over QUIC: ngtcp2 + ngtcp2_crypto_ossl + nghttp3 -------------
+#
+# The same three libraries, the same all-or-none rule and the same
+# link-not-compile requirement as the server side (Hyperman's Makefile.PL),
+# because it is the same stack and a client that disagreed with the server
+# about whether it is usable would be worse than one without it.
+#
+# It needs TLS: there is no cleartext QUIC the way there is h2c, so the probe
+# does not run at all without OpenSSL, and the OpenSSL flags found above are
+# threaded through it because the crypto shim links against libssl.
+#
+# Absent any of it, ft_h3.h compiles to stubs, Fetch::_h3_available is false
+# and an h3 attempt falls back to TCP. LibreSSL has no ngtcp2 crypto backend,
+# so OpenBSD smokers land here by design.
+if (!$ENV{FT_NO_HTTP3} && $tls_libs) {
+    my ($cflags, $libs);
+    my $pc = 'libngtcp2 libngtcp2_crypto_ossl libnghttp3';
+    if (system("pkg-config --exists $pc >/dev/null 2>&1") == 0) {
+        chomp($cflags = `pkg-config --cflags $pc 2>/dev/null`);
+        chomp($libs   = `pkg-config --libs $pc 2>/dev/null`);
+        $libs ||= '-lngtcp2 -lngtcp2_crypto_ossl -lnghttp3';
+    }
+    # pkg-config can find .pc files for a stack this OpenSSL cannot drive.
+    # Believe the compiler, not the metadata.
+    if ($libs && !probe_h3($cflags || '', $libs, $tls_inc, $tls_libs)) {
+        ($cflags, $libs) = ('', '');
+    }
+    if (!$libs) {
+        my $bare = '-lngtcp2 -lngtcp2_crypto_ossl -lnghttp3';
+        ($cflags, $libs) = ('', $bare)
+            if probe_h3('', $bare, $tls_inc, $tls_libs);
+    }
+    if (!$libs) {   # homebrew keg-only path (no pkg-config on macOS)
+        for my $p ('/opt/homebrew', '/usr/local') {
+            next unless -e "$p/include/ngtcp2/ngtcp2.h"
+                     && -e "$p/include/nghttp3/nghttp3.h";
+            my $l = "-L$p/lib -lngtcp2 -lngtcp2_crypto_ossl -lnghttp3";
+            if (probe_h3("-I$p/include", $l, $tls_inc, $tls_libs)) {
+                ($cflags, $libs) = ("-I$p/include", $l);
+                last;
+            }
+        }
+    }
+    if ($libs) {
+        $DEFINE .= ' -DFT_HAVE_QUIC';
+        $INC    .= " $cflags";
+        $LIBS   .= " $libs";
+        print "Found ngtcp2 + nghttp3: HTTP/3 support enabled.\n";
+    } else {
+        print "ngtcp2/nghttp3 not found (or this OpenSSL cannot drive them): "
+            . "HTTP/3 disabled.\n";
+    }
+} elsif ($ENV{FT_NO_HTTP3}) {
+    print "HTTP/3 disabled by FT_NO_HTTP3.\n";
+} else {
+    print "HTTP/3 disabled: it needs TLS, and OpenSSL was not found.\n";
+}
+
+# --- pthreads: name resolution off the loop thread (ft_dns.h) ------------
+#
+# getaddrinfo is the one call in a request that blocks, and it blocks the
+# whole loop rather than the one connection - so it runs on a thread of its
+# own. The thread touches no Perl, so this has nothing to do with whether
+# perl itself is threaded; it is the C library's pthreads and nothing more.
+#
+# The probe must LINK. On glibc 2.34+ and on macOS the symbols are in libc
+# and no flag is needed; on older glibc and on some BSDs they are in
+# libpthread, and a compile-only probe would find the header either way and
+# ship a .so that fails to load. Without it Fetch resolves inline exactly as
+# it always did - slower under concurrency, never wrong.
+unless ($^O eq 'MSWin32') {
+    my $inc  = "#include <pthread.h>\n#include <netdb.h>";
+    my $body = 'pthread_t t; pthread_attr_t a; pthread_attr_init(&a); '
+             . 'return pthread_create(&t, &a, 0, 0) == 0;';
+    if (probe('pthread', '', $inc, $body, '')) {
+        $DEFINE .= ' -DFT_HAVE_PTHREAD';
+        print "pthreads: name resolution runs off the loop thread.\n";
+    }
+    elsif (probe('pthread', '', $inc, $body, '-lpthread')) {
+        $DEFINE .= ' -DFT_HAVE_PTHREAD';
+        $LIBS   .= ' -lpthread';
+        print "pthreads (-lpthread): name resolution runs off the loop thread.\n";
+    }
+    else {
+        print "pthreads not found: name resolution stays inline.\n";
+    }
+}
+
 # --- clock_gettime: needs -lrt on old glibc (< 2.17) ---------------------
 #
-# backend_poll.c calls clock_gettime(CLOCK_MONOTONIC). Before glibc 2.17 that
+# ft_monotonic (ft_win.h) calls clock_gettime(CLOCK_MONOTONIC). Before glibc 2.17 that
 # symbol lives in librt, so the .so loads with "undefined symbol:
 # clock_gettime" unless we link -lrt. Newer glibc folds it into libc, and
 # macOS/BSD have no librt, so only add it when a link probe needs it.
@@ -220,6 +313,48 @@ sub probe {
         $ok = system("$cc $flags $src -o $bin $libs >/dev/null 2>&1") == 0;
     }
     unlink $src, $bin; rmdir $dir;
+    return $ok;
+}
+
+# Does this QUIC stack actually work with this OpenSSL?
+#
+# The version calls are not the probe - they link against any build of these
+# libraries and say nothing. What is being asked is whether THIS OpenSSL can
+# hand its handshake to ngtcp2: ngtcp2_crypto_ossl_init exists only in a
+# crypto shim built for the OSSL provider path, and SSL_set_quic_tls_cbs only
+# in OpenSSL 3.5+. Referencing both is what makes the link fail on a stack
+# that cannot speak HTTP/3 - a probe that merely confirms the libraries are
+# installed confirms the bug instead of finding it.
+sub probe_h3 {
+    my ($cflags, $libs, $tlsc, $tlsl) = @_;
+    my $dir = "ft_probe_h3_$$";
+    mkdir $dir or return 0;
+    my ($src, $bin, $ok) = ("$dir/p.c", "$dir/p", 0);
+    for ($tlsc) { defined or $_ = ''; s/-DFT_HAVE_\w+//g; }
+    $tlsl = '' unless defined $tlsl;
+    if (open my $fh, '>', $src) {
+        print $fh <<'C';
+#include <ngtcp2/ngtcp2.h>
+#include <ngtcp2/ngtcp2_crypto.h>
+#include <ngtcp2/ngtcp2_crypto_ossl.h>
+#include <nghttp3/nghttp3.h>
+#include <openssl/ssl.h>
+int main(void) {
+    void *p;
+    if (ngtcp2_crypto_ossl_init() != 0) return 1;
+    p = (void *)&SSL_set_quic_tls_cbs;
+    if (!p) return 1;
+    if (!ngtcp2_version(0) || !nghttp3_version(0)) return 1;
+    return 0;
+}
+C
+        close $fh;
+        my $cc = $Config{cc} || 'cc';
+        $ok = system("$cc $cflags $tlsc $src -o $bin $libs $tlsl "
+                   . ">/dev/null 2>&1") == 0;
+    }
+    unlink $src, $bin;
+    rmdir $dir;
     return $ok;
 }
 

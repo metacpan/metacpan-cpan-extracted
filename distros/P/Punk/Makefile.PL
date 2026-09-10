@@ -7,69 +7,59 @@ use File::Find ();
 use Config;
 
 my @PROVIDERS = (
-    [ 'File::Raw::JSON'   => '../File-Raw-JSON/include'     ],  # frj_abi.h
-    [ 'File::Raw::XML'    => '../File-Raw-XML/include'      ],  # frx_abi.h
-    [ 'JSON::Schema::Fast'=> '../JSON-Schema-Fast/include'  ],  # jsf_abi.h
-    [ 'Open::API'         => '../Open-API/include'          ],  # oa_abi.h
-    [ 'Template::Stencil' => '../Template-Stencil/include'  ],  # st_abi.h
-    [ 'Hyperman'          => '../Hyperman/include/hyperman' ],  # hm_abi.h
-    [ 'Markdown::Simple'  => '../Markdown-Simple/include'   ],  # mds_abi.h
-    [ 'Search::Trigram'   => '../Search-Trigram/include'    ],  # sg_abi.h
-    [ 'DBIx::Loop'        => '../DBIx-Loop/include'         ],  # dbil_abi.h
-    [ 'Apophis'           => '../Apophis/include'           ],  # ap_abi.h
+    [ 'File::Raw::JSON'   => '../File-Raw-JSON/include'     ],
+    [ 'File::Raw::XML'    => '../File-Raw-XML/include'      ],
+    [ 'JSON::Schema::Fast'=> '../JSON-Schema-Fast/include'  ],
+    [ 'Open::API'         => '../Open-API/include'          ],
+    [ 'Template::Stencil' => '../Template-Stencil/include'  ],
+    [ 'Hyperman'          => '../Hyperman/include/hyperman' ],
+    [ 'Markdown::Simple'  => '../Markdown-Simple/include'   ],
+    [ 'Search::Trigram'   => '../Search-Trigram/include'    ],
+    [ 'DBIx::Loop'        => '../DBIx-Loop/include'         ],
+    [ 'Apophis'           => '../Apophis/include'           ],
 );
 my $INC = '-Iinclude';
 my $pkg;
 if (eval { $pkg = ExtUtils::Depends->new('Punk',
                       map { $_->[0] } @PROVIDERS); 1 } && $pkg) {
-    # the consumer INC is merged below, together with the provider vars
+    # A sibling checkout, when there is one, comes FIRST - ahead of the
+    # headers ExtUtils::Depends found in the installed dists.
+    #
+    # Otherwise a development tree compiles against whatever was last
+    # installed while declaring a dependency on something newer, and the two
+    # never meet: PREREQ_PM checks a .pm's $VERSION and the C is taken from
+    # that dist's Install/ directory, so Punk can require Hyperman 0.45,
+    # build against 0.44's hm_abi.h, and fail on a struct member that the
+    # version it asked for does have. The failure names the member, not the
+    # stale header, which is a long way from the cause.
+    #
+    # Nothing changes for an ordinary build: with no sibling directories
+    # present this adds no paths at all.
+    my @sib = grep { -d $_->[1] } @PROVIDERS;
+    $INC .= join '', map { " -I$_->[1]" } @sib if @sib;
 }
 else {
     my @missing = grep { !-d $_->[1] } @PROVIDERS;
     die "Punk needs " . join(', ', map { $_->[0] } @missing)
       . " installed, or present as sibling directories.\n" if @missing;
     $INC .= join '', map { " -I$_->[1]" } @PROVIDERS;
-    $pkg = ExtUtils::Depends->new('Punk');             # provider only
+    $pkg = ExtUtils::Depends->new('Punk');
 }
 
-# ---- Punk as a PROVIDER --------------------------------------------------- *
-# Punk has consumed five C ABIs for a while and published none. pk_abi.h is
-# its own: the table a consumer XS module observes a request through, without
-# a Perl frame between the dispatcher and its code. Same mechanism Punk uses
-# to reach Open::API's - ExtUtils::Depends installs the header and records the
-# include path, Punk::_abi_ptr hands over the address at runtime.
 $pkg->install('include/pk_abi.h');
 mkdir 'Install' unless -d 'Install';
 $pkg->save_config('Install/Files.pm');
 my %dep = $pkg->get_makefile_vars;
 $INC .= ' ' . delete $dep{INC} if $dep{INC};
-# EU::Depends returns an empty LIBS/LDFROM that would otherwise clobber
-# MakeMaker's defaults; Punk links nothing extra, so drop them.
 delete $dep{LIBS};
 delete $dep{LDFROM};
 
-# EU::Depends' PM map (installing pk_abi.h + Files.pm) REPLACES MakeMaker's
-# auto-detected PM, so everything under lib/ has to be re-added by hand or it
-# silently stops being installed - and Punk ships 41 modules plus the `punk
-# new` skeleton templates, which are not .pm files and would go just as
-# quietly.
 File::Find::find(sub {
     return unless -f;
     (my $rel = $File::Find::name) =~ s{^lib/}{};
     $dep{PM}{$File::Find::name} = "\$(INST_LIB)/$rel";
 }, 'lib');
 
-# getentropy(2) for CSRF token generation - macOS 10.12+, glibc 2.25+, the
-# BSDs. It is declared in <sys/random.h> on macOS and <unistd.h> on glibc, so
-# both are probed. Where it is missing punk_csrf.h falls back to a cached
-# /dev/urandom descriptor, so this is a convenience, not a requirement.
-#
-# The probe must LINK, not just compile: FreeBSD before 12 has no
-# getentropy in libc and declares nothing, and its old compilers (gcc
-# 4.2.1, clang 3.4) take the implicit declaration as a warning - so a
-# compile-only probe false-positives and the built .so fails to load with
-# "Undefined symbol getentropy" (CPAN Testers, Punk 0.09). Only the
-# linker asks libc the real question.
 my @DEFINE;
 {
     my $dir = "punk_probe_$$";
@@ -95,16 +85,6 @@ my @DEFINE;
     }
 }
 
-# Sub-second mtime from stat(2), for the file cache's single-flight lock.
-#
-# The lock's holder is judged dead by the age of its lock file, and with
-# whole-second st_mtime that age carries up to a full second of error - so a
-# `lock_wait` under a second means the lock is stolen almost at once and at
-# random, and two callers compute the same thing. The field is spelled three
-# ways: st_mtim.tv_nsec is POSIX 2008 (Linux, Solaris, modern BSD),
-# st_mtimespec.tv_nsec is the older BSD/macOS spelling, and st_mtimensec is
-# NetBSD's. Where none is there punk_cachefile.h keeps second resolution and
-# widens the budget by a second rather than stealing early.
 {
     my $dir = "punk_probe_mtime_$$";
     if (mkdir $dir) {
@@ -138,96 +118,58 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Punk.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.010000',
-    # Every provider above is needed HERE, at configure time: this file
-    # asks ExtUtils::Depends for their installed headers before it can
-    # write a Makefile. A client installs configure_requires before
-    # running Makefile.PL and PREREQ_PM only after, so listing them below
-    # alone is too late - a clean machine dies in the block above with
-    # "Punk needs ... installed", which is not even a test failure, just
-    # a configure that never produced a Makefile.
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
-        'File::Raw::JSON'     => '0.06',   # provides frj_abi.h
-        'File::Raw::XML'      => '0.03',   # provides frx_abi.h (v2: the SV bridge)
-        'JSON::Schema::Fast'  => '0.05',   # provides jsf_abi.h
-        'Open::API'           => '0.09',   # provides oa_abi.h
-        'Apophis'             => '0.05',   # provides ap_abi.h
-        'Template::Stencil'   => '0.10',   # provides st_abi.h
-        'Hyperman'            => '0.32',   # provides hm_abi.h (v3: rate limit)
-        'Markdown::Simple'    => '0.21',   # provides mds_abi.h
-        'Search::Trigram'     => '0.03',   # provides sg_abi.h
-        'DBIx::Loop'          => '0.03',   # provides dbil_abi.h
+        'File::Raw::JSON'     => '0.06',
+        'File::Raw::XML'      => '0.03',
+        'JSON::Schema::Fast'  => '0.05',
+        'Open::API'           => '0.09',
+        'Apophis'             => '0.05',
+        'Template::Stencil'   => '0.10',
+        'Hyperman'            => '0.45',
+        'Markdown::Simple'    => '0.21',
+        'Search::Trigram'     => '0.03',
+        'DBIx::Loop'          => '0.03',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Open::API'            => '0.09',   # spec-first routing + validation; oa_abi.h
-        'Template::Stencil'    => '0.10',   # Punk::View::Stencil; st_abi.h.
-                                            # 0.10 for tied hashes in a path,
-                                            # which is what Punk::Plugin::I18n
-                                            # binds as `locale` - before it a
-                                            # tied hash resolved to nothing
-        'File::Raw::JSON'      => '0.06',   # body decode / auto-JSON encode
-        'File::Raw::XML'       => '0.03',   # $c->req->xml, XML response
-                                            # bodies; 0.03 is the first with
-                                            # the SV bridge, which is what
-                                            # lets the whole path stay in C
-        'Fetch'                => '0.12',   # $c->ua, on the worker's own loop
-        'JSON::Schema::Fast'   => '0.05',   # schema field validation
-        'YAML::XS'             => '0',      # Punk::Config; every scaffolded
-                                            # app carries a config/punk.yml
-        'Hyperman'             => '0.32',   # the native server; hm_abi.h's
-                                            # detach ABI is what websocket
-                                            # routes attach through, and v3
-                                            # is the rate-limit / denylist arena
-        'Markdown::Simple'     => '0.21',   # the markdown mount; mds_abi.h,
-                                            # whose heading anchors and TOC
-                                            # the docs shell is built on
-        'Search::Trigram'      => '0.03',   # markdown search; sg_abi.h
-        'Apophis'              => '0.05',   # Punk::Plugin::Blob's store:
-                                            # content-addressed uploads, so
-                                            # a user's filename never becomes
-                                            # a filesystem path. 0.05 is the
-                                            # first with ap_abi.h, which the
-                                            # plugin needs at boot
-        'DBIx::Loop'           => '0.07',   # Punk::Model::DBIx::Loop, the
-                                            # async model backend; dbil_abi.h.
-                                            # 0.07 is the first where a do()
-                                            # that fails in the database
-                                            # fails its future, which a
-                                            # transaction's rollback relies on
+        'Open::API'            => '0.09',
+        'Template::Stencil'    => '0.10',
+        'File::Raw::JSON'      => '0.06',
+        'File::Raw::XML'       => '0.03',
+        'Fetch'                => '0.12',
+        'JSON::Schema::Fast'   => '0.05',
+        'YAML::XS'             => '0',
+        'Hyperman'             => '0.45',
+        'Markdown::Simple'     => '0.21',
+        'Search::Trigram'      => '0.03',
+        'Apophis'              => '0.05',
+        'DBIx::Loop'           => '0.07',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
         prereqs => {
             runtime => {
                 recommends => {
-                    'Future'          => '0',     # non-blocking handlers
+                    'Future'          => '0',
                     'Future::AsyncAwait'
-                                      => '0.66',  # Punk::AsyncAwait: the
-                                                  # async/await keywords. Needs
-                                                  # perl 5.16, so it stays a
-                                                  # recommends and nothing in
-                                                  # Punk loads that module.
-                    'DBI'             => '0',     # Punk::Model::DBI backend
-                    'Eshu'            => '0',     # syntax-highlighted snippets
-                                                  # on the dev error page
+                                      => '0.66',
+                    'DBI'             => '0',
+                    'Eshu'            => '0',
                 },
             },
         },
     },
-    EXE_FILES => ['bin/punk'],   # the `punk new` scaffolder
-    %dep,   # ExtUtils::Depends: installs pk_abi.h + Files.pm, and the PM map
+    EXE_FILES => ['bin/punk'],
+    %dep,
     INC    => $INC,
     DEFINE => join(' ', @DEFINE),
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Punk-*' },
-    # MakeMaker maps Punk.xs -> Punk.c and does not rescan the INCLUDE:
-    # fragments or the C headers, so force a regenerate of Punk.c when an
-    # xs/ fragment changes and a rebuild of the object when a header does.
     depend => {
         'Punk.c'         => join(' ', glob('xs/*.xs')),
         'Punk$(OBJ_EXT)' => join(' ', glob('include/punk/*.h'),
@@ -235,7 +177,6 @@ my %WriteMakefileArgs = (
     },
 );
 
-# Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
     my $test_requires = delete $WriteMakefileArgs{TEST_REQUIRES} || {};
     @{$WriteMakefileArgs{PREREQ_PM}}{keys %$test_requires} = values %$test_requires;

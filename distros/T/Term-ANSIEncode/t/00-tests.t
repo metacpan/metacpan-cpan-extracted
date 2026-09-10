@@ -11,7 +11,7 @@ use List::Util qw(max);
 use utf8;
 use Data::Dumper;
 
-use Test::More tests => 2092;
+use Test::More tests => 2096;
 # use Test::More 'no_plan';
 
 BEGIN {
@@ -63,17 +63,22 @@ foreach my $code (sort(keys %{$ansi->{'ansi_meta'}})) {
             colored(['white'], 'tokens -> ') .
             colored(['bright_yellow'], $text) . clline . "\r\e[1A"
         );
-        my $output = $ansi->ansi_decode($text);
+		my $output = $ansi->ansi_decode($text);
 
-        $output =~ s/\e/\\e/gs;
-        $output =~ s/\r/\\r/gs;
+		$output =~ s/\e/\\e/gs;
+		$output =~ s/\r/\\r/gs;
 
-        my $test = $ansi->{'ansi_meta'}->{$code}->{$token}->{'out'};
+		my $test = $ansi->{'ansi_meta'}->{$code}->{$token}->{'out'};
 
-        $test =~ s/\e/\\e/gs;
-        $test =~ s/\[\% RETURN \%\]/\\r/gs;
+		# If 24-bit is not supported, downsample the expected string to match
+		if (! $ansi->{'CAPS'}->{'24 BIT'} && $test =~ /^\e\[(38|48);2;(\d+);(\d+);(\d+)m$/) {
+			$test = $ansi->_rgb_to_ansi($2, $3, $4, ($1 eq '48' ? 1 : 0));
+		}
 
-        cmp_ok($output,'eq', $test, $text);
+		$test =~ s/\e/\\e/gs;
+		$test =~ s/\[\% RETURN \%\]/\\r/gs;
+
+		cmp_ok($output,'eq', $test, $text);
     }
     diag("\r" . clline .
         colored(['white'], sprintf('%29s','Tested ')) .
@@ -83,62 +88,7 @@ foreach my $code (sort(keys %{$ansi->{'ansi_meta'}})) {
 }
 diag("\r" . ' ' x 79 . "\r\e[7A" . colored(['bright_yellow on_blue'],sprintf('%-41s',' Tested tokens ')) . colored(['bright_green'],' OK ') . clline . "\n\r " x 6);
 
-diag("\r" . clline . colored(['bright_yellow on_red'],  sprintf('%-41s', ' Testing macros ')) . colored(['bright_yellow'],' ...'));
-{
-    my $text = q{[% BLOCK 3 %]Duplicate this[% ENDBLOCK %]};
-    my $expected = 'Duplicate thisDuplicate thisDuplicate this';
-    diag("\r" . clline .
-        colored(['bright_white on_black'], sprintf('%41s', ' BLOCK count ')) .
-        colored(['bright_yellow'], " $text") . clline . "\r\e[1A"
-    );
-    cmp_ok($ansi->ansi_decode($text), 'eq', "$expected", $text);
-    diag("\r" . clline . 
-        colored(['bright_white on_black'], sprintf('%41s', ' BLOCK count ')) .
-        colored(['bright_green'], ' OK')
-    );
-}
-
-=pod
-
-{
-    my $text = q{[% BOX BLUE,10,10,40,4,DOUBLE %]Text that will be wrapped inside the box[% ENDBOX %]};
-    my $expected = qq{\e[H\e[2J\e[3J\e[10;10H\e[34m╔══════════════════════════════════════╗\e[0m\e[11;10H\e[34m║\e[0m                                      \e[34m║\e[0m\e[12;10H\e[34m║\e[0m                                      \e[34m║\e[0m\e[13;10H\e[34m╚══════════════════════════════════════╝\e[0m\e[s\e[11;11H\e[11;11HText that will be wrapped inside the\e[12;11Hbox\e[u};
-    diag("\r" . clline .
-        colored(['bright_white on_black'], sprintf('%41s', ' BOX color,column,row,width,height,type ')) .
-        colored(['bright_yellow'], " $text") . clline . "\r\e[1A"
-    );
-    if (cmp_ok($ansi->ansi_decode($text), 'eq', $expected, ' [% BOX ... %] ')) {
-        diag("\r" . clline . 
-          colored(['bright_white on_black'], sprintf('%41s', ' BOX color,column,row,width,height,type ')) .
-          colored(['bright_green'], ' OK')
-        );
-    } else {
-        diag("\r" . clline . 
-          colored(['bright_white on_black'], sprintf('%41s', ' BOX color,column,row,width,height,type ')) .
-          colored(['bright_red'], ' FAILED')
-        );
-	}
-}
-
-=cut
-
-diag("\r" . clline . colored(['bright_white on_black'], sprintf('%41s',  ' BOX color,column,row,width,height,type ')) . colored(['bright_cyan'], ' Not tested'));
-
-{
-    my $text = q{[% CHAR X,20 %]};
-    my $expected = 'X' x 20;
-    diag("\r" . clline .
-        colored(['bright_white on_black'], sprintf('%41s', ' CHAR char,count ')) .
-        colored(['bright_yellow'], " $text") . clline . "\r\e[1A"
-    );
-    cmp_ok($ansi->ansi_decode($text), 'eq', $expected, $text);
-    diag("\r" . clline . 
-        colored(['bright_white on_black'], sprintf('%41s', ' CHAR char,count ')) .
-        colored(['bright_green'], ' OK')
-    );
-}
-
-
+diag("\r" . clline . colored(['bright_yellow on_cyan'],  sprintf('%-41s', ' Testing extended attributes ')) . colored(['bright_yellow'],' ...'));
 
 {
     my $text = q{[% JUSTIFIED %]There are many more background colors available than the sixteen below.  However, the ones below should work on any color terminal.  Other colors may require 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have 'Term256' features.  You can used the '-t' option for all of the color tokens available or use the 'B_RGB' token for access to 16 million colors.[% ENDJUSTIFIED %]};
@@ -161,15 +111,41 @@ diag("\r" . clline . colored(['bright_white on_black'], sprintf('%41s',  ' BOX c
 }
 
 {
-    my $text = q{[% SPACES 20 %]};
-    my $expected = ' ' x 20;
+    my $text = q{[% UNDERLINE COLOR RED %]};
+    my $expected = $ansi->{'CAPS'}->{'24 BIT'} || $ansi->{'CAPS'}->{'8 BIT'} ? "\e[58;5;1m" : '';
+
     diag("\r" . clline .
-        colored(['bright_white on_black'], sprintf('%41s', ' SPACES count ')) .
+        colored(['bright_white on_black'], sprintf('%41s', ' UNDERLINE COLOR color ')) .
         colored(['bright_yellow'], " $text") . clline . "\r\e[1A"
     );
+
     cmp_ok($ansi->ansi_decode($text), 'eq', $expected, $text);
     diag("\r" . clline . 
-        colored(['bright_white on_black'], sprintf('%41s', ' SPACES count ')) .
+        colored(['bright_white on_black'], sprintf('%41s', ' UNDERLINE COLOR color ')) .
+        colored(['bright_green'], ' OK')
+    );
+}
+
+{
+    my $text = q{[% UNDERLINE COLOR RGB 255,0,0 %]};
+    my $expected;
+    if ($ansi->{'CAPS'}->{'24 BIT'}) {
+        $expected = "\e[58;2;255;0;0m";
+    } elsif ($ansi->{'CAPS'}->{'8 BIT'}) {
+        my $code = $ansi->_rgb_to_256(255, 0, 0);
+        $expected = "\e[58;5;${code}m";
+    } else {
+        $expected = '';
+    }
+
+    diag("\r" . clline .
+        colored(['bright_white on_black'], sprintf('%41s', ' UNDERLINE COLOR RGB r,g,b ')) .
+        colored(['bright_yellow'], " $text") . clline . "\r\e[1A"
+    );
+
+    cmp_ok($ansi->ansi_decode($text), 'eq', $expected, $text);
+    diag("\r" . clline . 
+        colored(['bright_white on_black'], sprintf('%41s', ' UNDERLINE COLOR RGB r,g,b ')) .
         colored(['bright_green'], ' OK')
     );
 }
@@ -194,7 +170,117 @@ diag("\r" . clline . colored(['bright_white on_black'], sprintf('%41s',  ' BOX c
 	}
 }
 
-diag("\r" . ' ' x 79 . "\r\e[7A" . colored(['bright_yellow on_red'],sprintf('%-41s',' Tested macros ')) . colored(['bright_green'],' OK ') . clline . "\n\r " x 7);
+diag("\r" . ' ' x 79 . "\r\e[5A" . colored(['bright_yellow on_cyan'],sprintf('%-41s',' Tested extended attributes ')) . colored(['bright_green'],' OK ') . clline . "\n\r " x 4);
+
+diag("\r" . clline . colored(['bright_yellow on_blue'],  sprintf('%-41s', ' Testing macros ')) . colored(['bright_yellow'],' ...'));
+{
+    my $text = q{[% BLOCK 3 %]Duplicate this[% ENDBLOCK %]};
+    my $expected = 'Duplicate thisDuplicate thisDuplicate this';
+    diag("\r" . clline .
+        colored(['bright_white on_black'], sprintf('%41s', ' BLOCK count ')) .
+        colored(['bright_yellow'], " $text") . clline . "\r\e[1A"
+    );
+    cmp_ok($ansi->ansi_decode($text), 'eq', "$expected", $text);
+    diag("\r" . clline . 
+        colored(['bright_white on_black'], sprintf('%41s', ' BLOCK count ')) .
+        colored(['bright_green'], ' OK')
+    );
+}
+
+{
+	my $text = q{[% BOX BLUE,10,10,40,4,DOUBLE %]Text that will be wrapped inside the box[% ENDBOX %]};
+
+	# Construct the exact expected byte sequence emitted by ansi_box():
+	# Top border (row 10, col 10, w=40)
+	# Middle rows (rows 11..12)
+	# Bottom border (row 13) + Save Cursor (\e[s)
+	# Target coordinate prefix before formatting: \e[11;11H
+	# Text lines (width = 40 - 3 = 37) positioned at 11;11 and 12;11
+	# Restore Cursor (\e[u)
+	my $expected = 
+	  "\e[10;10H\e[34m╔" . ('═' x 38) . "╗\e[0m" .
+	  "\e[11;10H\e[34m║\e[0m" . (' ' x 38) . "\e[34m║\e[0m" .
+	  "\e[12;10H\e[34m║\e[0m" . (' ' x 38) . "\e[34m║\e[0m" .
+	  "\e[13;10H\e[34m╚" . ('═' x 38) . "╝\e[0m\e[s" .
+	  "\e[11;11H" .
+	  "\e[11;11HText that will be wrapped inside the\e[12;11Hbox" .
+	  "\e[u";
+
+	diag("\r" . clline .
+		colored(['bright_white on_black'], sprintf('%41s', ' BOX color,column,row,width,height,type ')) .
+		colored(['bright_yellow'], " $text") . clline . "\r\e[1A"
+	);
+
+	my $got = $ansi->ansi_decode($text);
+
+	if (cmp_ok($got, 'eq', $expected, ' [% BOX ... %] ')) {
+		diag("\r" . clline .
+			colored(['bright_white on_black'], sprintf('%41s', ' BOX color,column,row,width,height,type ')) .
+			colored(['bright_green'], ' OK')
+		);
+	} else {
+		diag("\r" . clline .
+			colored(['bright_white on_black'], sprintf('%41s', ' BOX color,column,row,width,height,type ')) .
+			colored(['bright_red'], ' FAILED')
+		);
+	}
+}
+
+{
+    my $text = q{[% CHAR X,20 %]};
+    my $expected = 'X' x 20;
+    diag("\r" . clline .
+        colored(['bright_white on_black'], sprintf('%41s', ' CHAR char,count ')) .
+        colored(['bright_yellow'], " $text") . clline . "\r\e[1A"
+    );
+    cmp_ok($ansi->ansi_decode($text), 'eq', $expected, $text);
+    diag("\r" . clline . 
+        colored(['bright_white on_black'], sprintf('%41s', ' CHAR char,count ')) .
+        colored(['bright_green'], ' OK')
+    );
+}
+
+{
+    my $text = q{[% SPACES 20 %]};
+    my $expected = ' ' x 20;
+    diag("\r" . clline .
+        colored(['bright_white on_black'], sprintf('%41s', ' SPACES count ')) .
+        colored(['bright_yellow'], " $text") . clline . "\r\e[1A"
+    );
+    cmp_ok($ansi->ansi_decode($text), 'eq', $expected, $text);
+    diag("\r" . clline . 
+        colored(['bright_white on_black'], sprintf('%41s', ' SPACES count ')) .
+        colored(['bright_green'], ' OK')
+    );
+}
+
+{
+    my $text = q{[% CANVAS 5, 2, 40, 20 %]pixel 0,0[% ENDCANVAS %]};
+
+    diag("\r" . clline .
+        colored(['bright_white on_black'], sprintf('%41s', ' CANVAS col,row,width,height ')) .
+        colored(['bright_yellow'], " $text") . clline . "\r\e[1A"
+    );
+
+    my $got = $ansi->ansi_decode($text);
+
+    # Verify cursor save, coordinate positioning at column 5, row 2, and cursor restore
+    if ($got =~ /\e\[s/ && $got =~ /\e\[2;5H/ && $got =~ /\e\[u/) {
+        pass(' [% CANVAS ... %] ');
+        diag("\r" . clline .
+            colored(['bright_white on_black'], sprintf('%41s', ' CANVAS col,row,width,height ')) .
+            colored(['bright_green'], ' OK')
+        );
+    } else {
+        fail(' [% CANVAS ... %] ');
+        diag("\r" . clline .
+            colored(['bright_white on_black'], sprintf('%41s', ' CANVAS col,row,width,height ')) .
+            colored(['bright_red'], ' FAILED')
+        );
+    }
+}
+
+diag("\r" . ' ' x 79 . "\r\e[6A" . colored(['bright_yellow on_red'],sprintf('%-41s',' Tested macros ')) . colored(['bright_green'],' OK ') . clline . "\n\r " x 5);
 
 exit(0);
 

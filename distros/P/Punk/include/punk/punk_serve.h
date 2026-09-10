@@ -202,6 +202,27 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
     }
 
     method = ps_env_str(aTHX_ env, "REQUEST_METHOD", "GET", &mlen);
+
+    /* An Extended CONNECT (RFC 8441 / RFC 9220) is routed as the GET it
+     * stands in for.
+     *
+     * A `websocket` route registers as a GET route - it is a GET upgrade on
+     * HTTP/1.1 - so a CONNECT would match nothing and the client would get a
+     * 405 for a request that is a websocket handshake. That the pseudo
+     * request carries :scheme and :path at all, which an ordinary CONNECT
+     * does not, is exactly so it can be routed this way.
+     *
+     * Only the METHOD USED FOR MATCHING changes. REQUEST_METHOD in $env
+     * still reads CONNECT, which is what punk_ws_dispatch keys on and what
+     * an application should see. */
+    if (mlen == 7 && memEQ(method, "CONNECT", 7)) {
+        SV **cp = hv_fetchs(env, "psgix.connect_protocol", 0);
+        if (cp && *cp && SvOK(*cp) && SvCUR(*cp) == 9
+            && memEQ(SvPVX(*cp), "websocket", 9)) {
+            method = "GET";
+            mlen   = 3;
+        }
+    }
     const char *path   = ps_env_str(aTHX_ env, "PATH_INFO", "/", &plen);
     int is_head = (mlen == 4 && memEQ(method, "HEAD", 4));
     SV *rec = NULL, *caps = NULL;

@@ -143,8 +143,7 @@ static I32 pks_cmp_pair(pTHX_ SV *a, SV *b) {
  *
  * Paths, not URLs: the absolute form needs the configured base, and taking
  * that from the request would be a host-header injection delivered to search
- * engines - see plan_punk_sitemap/phase-0. Joining happens where the base is
- * known to be configuration. */
+ * engines. Joining happens where the base is known to be configuration. */
 static AV *pks_paths(pTHX_ SV *appsv) {
     HV *app = app_hv(aTHX_ appsv);
     AV *raw = app ? pks_raw(aTHX_ app) : NULL;
@@ -216,8 +215,8 @@ static AV *pks_paths(pTHX_ SV *appsv) {
  * One unescaped `&` makes the document not well-formed, and a crawler
  * rejects ALL of it rather than the offending entry - so this is a
  * correctness problem before it is a security one. The route half rarely
- * contains anything needing it; the dynamic half of phase 3 routinely will,
- * because a slug with an ampersand in it is ordinary. */
+ * contains anything needing it; the dynamic half routinely will, because a
+ * slug with an ampersand in it is ordinary. */
 static void pks_xml_cat(pTHX_ SV *out, const char *s, STRLEN l) {
     STRLEN i, start = 0;
     for (i = 0; i < l; i++) {
@@ -635,8 +634,8 @@ static void pks_build(pTHX_ SV *appsv) {
 /* Does the document need rebuilding before it is served?
  *
  * The route half never does - routes cannot change while the process runs -
- * so an application with no sections keeps phase 2's behaviour exactly: built
- * at to_app, served from memory, never rebuilt.
+ * so an application with no sections is built at to_app, served from memory
+ * and never rebuilt.
  *
  * A section reads a database, so its answer changes underneath us. Running it
  * per request would be a query nobody is watching, on a schedule somebody

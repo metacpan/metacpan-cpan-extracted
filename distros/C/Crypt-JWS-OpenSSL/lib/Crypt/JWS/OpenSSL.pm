@@ -1,5 +1,5 @@
 package Crypt::JWS::OpenSSL;
-$Crypt::JWS::OpenSSL::VERSION = '0.004';
+$Crypt::JWS::OpenSSL::VERSION = '0.005';
 use v5.8.9;
 use Moo 2.004003;
 with qw( Crypt::JWS::OpenSSL::Role::Encoder );
@@ -305,7 +305,7 @@ Crypt::JWS::OpenSSL - Encode, decode and verify signed compact JWTs using OpenSS
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSYS
 
@@ -554,7 +554,7 @@ This padding method is necessary for algorithms
 PS256, PS384, and PS512
 
 This padding method requires OpenSSL 3.x and Crypt::OpenSSL::RSA version
-greater than or equal to 0.38
+greater than or equal to 0.36
 
 See also L<Crypt::JWS::OpenSSL::Local>
 

@@ -7,6 +7,9 @@ use Test2::V0 -no_srand => 1;
 use Net::Nostr::Filter;
 use Net::Nostr::Event;
 
+use lib 't/lib';
+use TestFixtures qw(invalid_filter_cases);
+
 my %BASE_EVENT = (
     pubkey     => 'aa' x 32,
     kind       => 1,
@@ -38,6 +41,27 @@ subtest 'new() with all fields' => sub {
     is($filter->limit, 10, 'limit set');
     is($filter->tag_filter('e'), ['cc' x 32], '#e tag filter set');
     is($filter->tag_filter('p'), ['dd' x 32], '#p tag filter set');
+};
+
+subtest 'new() rejects malformed identifier, integer, and tag-name boundaries' => sub {
+    for my $case (invalid_filter_cases()) {
+        my ($name, $args, $error) = @$case;
+        like dies { Net::Nostr::Filter->new(%$args) }, $error, "$name rejected as a flat list";
+        like dies { Net::Nostr::Filter->new($args) }, $error, "$name rejected as a hashref";
+    }
+};
+
+subtest 'valid filter values round-trip through to_hash and construction' => sub {
+    my %args = (
+        ids => ['a' x 64, '0' x 64], authors => ['b' x 64, 'f' x 64],
+        '#e' => ['c' x 64], '#p' => ['d' x 64], kinds => [0, 65535],
+        since => 0, until => 1700000000, limit => 0,
+        '#t' => ["arbitrary\ntext \x{2603}"], '#overnet_et' => ['chat'],
+    );
+    my $filter = Net::Nostr::Filter->new(%args);
+    is $filter->to_hash, \%args, 'valid boundaries and arbitrary non-hex tag values are preserved';
+    my $again = Net::Nostr::Filter->new($filter->to_hash);
+    is $again->to_hash, \%args, 'reconstructed filter retains all valid values';
 };
 
 subtest 'new() with no fields is an empty filter' => sub {

@@ -23,7 +23,7 @@ use open qw(:std :encoding(UTF-8));
 
 package App::PDFLibrarian;
 # ABSTRACT: Manage a library of academic papers in PDF format with embedded BibTeX metadata
-$App::PDFLibrarian::VERSION = '6.3.1';
+$App::PDFLibrarian::VERSION = '6.3.2';
 use parent 'Exporter';
 
 use Carp;

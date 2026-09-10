@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.46';
+    $VERSION = '0.48';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -147,9 +147,8 @@ route option the list below does not name croaks at boot.
 =item * C<compress> - C<0> opts the route out of response compression.
 See below.
 
-=item * C<max_body> - refuse a request whose C<CONTENT_LENGTH> exceeds
-this, overriding the application's L</max_body>. C<0> disables the check
-for this route.
+=item * C<max_body> - refuse a request whose body exceeds this, overriding
+the application's L</max_body>. C<0> disables the check for this route.
 
 =item * C<sitemap> - C<0> keeps the route out of the generated
 C<sitemap.xml>; C<1> puts it in despite a guard the plugin would
@@ -740,9 +739,11 @@ L<Punk::Auth/GUARDS>.
     post '/upload'  => $t, { max_body => 50_000_000 };
     post '/webhook' => $t, { max_body => 0 };    # no check on this route
 
-Refuse a request whose C<CONTENT_LENGTH> exceeds a ceiling, with the same
-C<413> an over-large L</api> operation gets. A route's own value wins over
-the app-wide one, and C<0> on a route switches the check off there.
+Refuse a request whose body exceeds a ceiling: a declared C<CONTENT_LENGTH>
+over it gets the same C<413> an over-large L</api> operation gets, and a body
+with no declared length is stopped at the ceiling as it is read. A route's own
+value wins over the app-wide one, and C<0> on a route switches the check off
+there.
 
 The check runs in C after routing and B<before> the hook chain, the guards
 and the handler, so an oversize request costs no auth lookup, no
@@ -756,9 +757,14 @@ success. The thing that actually bounds a worker's memory is the server's
 own ceiling, L<Hyperman/"max_body: the request ceiling">, and this keyword
 cannot stand in for it. Set both.
 
-A request with no C<CONTENT_LENGTH> is passed through: that is a chunked
-body, which the server has already decoded and bounded against its own
-ceiling by the time Punk runs.
+A request with no C<CONTENT_LENGTH> cannot be answered here, because there
+is no declared length to compare against - and from HTTP/2 on that is an
+ordinary request rather than an exotic one, since HTTP/2 and HTTP/3 both
+forbid C<Transfer-Encoding> and a client streaming an upload therefore
+declares nothing at all. The ceiling is not abandoned there: it bounds the
+read instead, and the request is refused once the body passes it. That is a
+later and less thrifty refusal than the C<413> - the body has been read up to
+the ceiling by then - but the alternative was no ceiling at all.
 
 What the application can still avoid is a B<second> copy of those bytes.
 C<< $c->req->body >> puts the whole request in one scalar; for a large one,

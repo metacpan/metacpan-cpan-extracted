@@ -21,7 +21,7 @@ configure_requires:
   Module::Build::Pluggable::CPANfile: '0.05'
   rlib: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,11 +36,13 @@ provides:
     file: Base/CLI_Opts.pm
   MOP4Import::Base::Configure:
     file: Base/Configure.pm
+  MOP4Import::Base::IOHandle:
+    file: Base/IOHandle.pm
   MOP4Import::Base::JSON:
     file: Base/JSON.pm
   MOP4Import::Declare:
     file: Declare.pm
-    version: '0.072'
+    version: '0.073'
   MOP4Import::Declare::Type:
     file: Declare/Type.pm
   MOP4Import::FieldSpec:
@@ -89,5 +91,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/hkoba/perl-mop4import-declare
-version: '0.072'
+version: '0.073'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

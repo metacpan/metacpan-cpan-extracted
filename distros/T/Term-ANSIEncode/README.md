@@ -253,6 +253,7 @@
    | SUPERSCRIPT OFF | Turn off superscript text |
    | UNDERLINE | Underline text |
    | UNDERLINE COLOR color | Set the color of underlines to the color token |
+   | UNDERLINE COLOR RGB red,green,blue | Set the color of underlines to the RGB value |
    | WRAP | Begin text region to be word-wrapped |
    | ENDWRAP | Ends text region to be word-wrapped |
    | JUSTFIFIED | Begin text region to be word-wrapped and justified |
@@ -325,6 +326,7 @@
    | **Token** | **End Token** | **Description** |
    | --- | --- | --- |
    | BLOCK count | ENDBLOCK | Duplicate a block of text for "count" number of times between the tokens |
+   | CANVAS col,row,width,height | ENDCANVAS | Shows a high-resolution graphics canvas at the selected location.  Vector drawing commands like line, pixel go between CANVAS & ENDCANVAS. |
    | BOX color,column,rowm,width,height,type | ENDBOX | Wrapped text inside a box |
    | CHAR char,count | | Duplicate "char" "count" number of times |
    | HORIZONTAL RULE token | | A solid line of background in the color defined by "token" |

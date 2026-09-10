@@ -14,8 +14,12 @@ our %FIELDS;
 
 #---------
 
+sub cf_make_object {
+  fields::new(shift);
+}
+
 sub new :method {
-  my MY $self = fields::new(shift);
+  my MY $self = shift->cf_make_object;
   $self->configure(@_);
   $self->before_configure_default;
   $self->after_new;

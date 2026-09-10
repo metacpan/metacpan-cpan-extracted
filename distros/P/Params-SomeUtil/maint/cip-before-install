@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [ "$CIP_PP" = "1" ]; then
+    cip sudo apt-get -y update
+    cip sudo apt-get -y purge gcc
+fi

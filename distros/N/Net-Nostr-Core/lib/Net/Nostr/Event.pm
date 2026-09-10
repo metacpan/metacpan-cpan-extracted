@@ -77,6 +77,8 @@ sub new {
 
     croak "content is required"
         unless defined $self->{content};
+    croak "content must be a string"
+        if ref $self->{content};
 
     croak "sig must be 128-char lowercase hex"
         if defined $self->{sig} && $self->{sig} !~ $HEX128;
@@ -396,7 +398,7 @@ Croaks if any required field is missing or if values fail format validation:
 
 =item * C<kind> must be an integer between 0 and 65535
 
-=item * C<content> must be defined
+=item * C<content> must be defined and must not be a reference; empty strings are allowed
 
 =item * C<sig>, if provided, must be 128-character lowercase hex
 
@@ -415,6 +417,9 @@ wire (e.g. from JSON-decoded protocol messages). All seven NIP-01 event
 fields are required: C<id>, C<pubkey>, C<created_at>, C<kind>, C<tags>,
 C<content>, C<sig>. No defaults are applied. Croaks if any field is
 missing, undefined, or fails format validation.
+
+Content references, including decoded JSON arrays, objects, and booleans,
+are rejected during parsing, before any later C<validate> call.
 
 String values in the hashref are expected to already be decoded Perl
 character strings, as produced by L<Net::Nostr::Message/parse> from

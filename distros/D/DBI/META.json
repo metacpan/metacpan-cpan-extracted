@@ -1,10 +1,13 @@
 {
    "abstract" : "Database independent interface for Perl",
-   "author" : [
-      "DBI team (dbi-users@perl.org)"
-      ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "Author",
+   "version" : "1.653",
+   "provides" : {
+      "DBI" : {
+         "version" : "1.653",
+         "file" : "DBI.pm"
+         }
+      },
    "license" : [
       "perl_5"
       ],
@@ -12,56 +15,68 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
       },
-   "name" : "DBI",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-         ]
-      },
+   "dynamic_config" : 1,
+   "release_status" : "stable",
    "prereqs" : {
-      "build" : {
+      "configure" : {
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.78"
+            },
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48",
-            "Test::Simple" : "0.96"
+            "ExtUtils::MakeMaker" : "6.48"
             }
          },
-      "configure" : {
+      "test" : {
+         "recommends" : {
+            "Test::More" : "1.302224"
+            },
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::More" : "0.96"
             }
          },
       "runtime" : {
+         "recommends" : {
+            "Encode" : "3.24"
+            },
+         "suggests" : {
+            "Net::Daemon" : "0.52",
+            "MLDBM" : "0",
+            "RPC::PlServer" : "0.2020",
+            "Clone" : "0.50",
+            "Params::Util" : "1.102",
+            "RPC::PlClient" : "0.2020",
+            "SQL::Statement" : "1.414",
+            "DB_File" : "0",
+            "Module::Load" : "0.36"
+            },
          "requires" : {
+            "XSLoader" : "0",
             "Module::Load" : "0.22",
             "perl" : "5.012000"
             }
+         },
+      "build" : {
+         "requires" : {
+            "perl" : "5.008001"
+            }
          }
       },
-   "release_status" : "stable",
+   "author" : [
+      "DBI team (dbi-users@perl.org)"
+      ],
+   "name" : "DBI",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/perl5-dbi/dbi/issues"
          },
-      "homepage" : "http://dbi.perl.org/",
       "license" : [
          "http://dev.perl.org/licenses/"
          ],
       "repository" : {
+         "web" : "https://github.com/perl5-dbi/dbi",
+         "type" : "git",
          "url" : "https://github.com/perl5-dbi/dbi"
          },
-      "x_IRC" : "irc://irc.perl.org/#dbi",
-      "x_MailingList" : "mailto:dbi-dev@perl.org"
-      },
-   "version" : "1.652",
-   "x_serialization_backend" : "JSON::PP version 4.18",
-   "x_suggests" : {
-      "Clone" : 0.47,
-      "DB_File" : 0,
-      "MLDBM" : 0,
-      "Net::Daemon" : 0,
-      "RPC::PlClient" : 0.202,
-      "RPC::PlServer" : 0.202,
-      "SQL::Statement" : 1.414
+      "x_IRC" : "irc://irc.perl.org/#dbi"
       }
    }

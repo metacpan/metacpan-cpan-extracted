@@ -8,7 +8,7 @@ my %runtime_requires = (
     'Class::Tiny'                 => 0,
     'AnyEvent'                    => 0,
     'AnyEvent::WebSocket::Client' => 0,
-    'Net::Nostr::Core'            => 0,
+    'Net::Nostr::Core'            => '1.002000',
 );
 
 my %test_requires = (
@@ -26,7 +26,7 @@ WriteMakefile(
     PREREQ_PM        => \%runtime_requires,
     TEST_REQUIRES    => \%test_requires,
     test => {
-        TESTS => 't/*.t',
+        TESTS => 't/*.t t/nip/*.t',
     },
     META_ADD => {
         'meta-spec' => { version => 2 },

@@ -8,7 +8,6 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use File::Basename 'dirname';
 use File::Spec;
-use IO::File;
 use Mojo::Asset::File;
 use Mojo::ByteStream 'b';
 use Mojo::DOM;
@@ -55,16 +54,28 @@ sub register {
       my $html;
       my $cpan = 'http://search.cpan.org/perldoc';
       $module =~ s/\//\:\:/g;
+
+      # Only ever look up plain module names. Pod::Simple::Search->find splits
+      # the name on '::' and rejoins the parts with File::Spec->catfile, so a
+      # name containing '..' would walk out of @INC and render the POD of any
+      # readable file. Answer 404 without echoing the rejected name back.
+      return $self->reply->not_found
+            unless $module =~ /\A\w+(?:::\w+)*\z/;
+
       my $path;
       $path = Pod::Simple::Search->new->find($module, @PATHS);
       # Redirect to CPAN
       return $self->redirect_to("$cpan?$module")
             unless $path && -r $path;
 
-      # Turn POD into HTML
-      my $file = IO::File->new;
-      $file->open("< $path");
+      # Turn POD into HTML. Three argument open, so that a path can never be
+      # read as a shell pipe and leading or trailing whitespace is not
+      # stripped. The open is also checked, as -r above only proves the file
+      # was readable a moment ago.
+      open my $file, '<', $path
+            or return $self->reply->not_found;
       $html = _pod_to_html(join '', <$file>);
+      close $file;
 
       # Rewrite links
       my $dom     = Mojo::DOM->new("$html");

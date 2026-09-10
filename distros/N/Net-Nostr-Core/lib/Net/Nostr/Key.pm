@@ -446,6 +446,8 @@ Returns the signature as a 128-character hex string.
 
 Convenience method that creates a new L<Net::Nostr::Event> with the
 key's public key, signs it, and returns the signed event.
+Applies L<Net::Nostr::Event/new> validation before signing, including
+rejection of references as C<content>.
 
     my $event = $key->create_event(
         kind    => 1,

@@ -6,9 +6,9 @@ use ExtUtils::MakeMaker;
 my %runtime_requires = (
     'strictures'         => 2,
     'AnyEvent::HTTP'     => 0,
-    'Net::Nostr::Core'   => 0,
-    'Net::Nostr::Client' => 0,
-    'Net::Nostr::Relay'  => 0,
+    'Net::Nostr::Core'   => '1.002000',
+    'Net::Nostr::Client' => '1.002000',
+    'Net::Nostr::Relay'  => '1.002000',
 );
 
 my %test_requires = (

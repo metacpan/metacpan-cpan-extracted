@@ -106,14 +106,14 @@ static const frx_abi *punk_frx(pTHX) {
 #include "punk/punk_flash.h"      /* one-request messages over the session */
 #include "punk/punk_ua.h"        /* the shared outbound Fetch agent        */
 #include "punk/punk_log.h"       /* the level-based logger               */
-#include "punk/punk_dispatch.h"   /* the Open::API C ABI consumer (phase 6) */
+#include "punk/punk_dispatch.h"   /* the Open::API C ABI consumer          */
 #include "punk/punk_views.h"      /* the view-engine registry              */
 #include "punk/punk_scope.h"      /* the `under` handle (needs context)     */
 #include "punk/punk_app.h"        /* the Punk::App registrar (needs context) */
 #include "punk/punk_host.h"       /* the origin + host allowlist (needs app) */
 #include "punk/punk_proxy.h"      /* reverse-proxy trust (used by serve)    */
 #include "punk/punk_serve.h"      /* the request dispatcher                 */
-#include "punk/punk_ws.h"         /* the RFC 6455 frame codec (phase 8)    */
+#include "punk/punk_ws.h"         /* the RFC 6455 frame codec              */
 #include "punk/punk_config.h"      /* layered YAML config + resolved secrets */
 #include "punk/punk_asset.h"     /* content-addressed asset URLs (needs sha256) */
 #include "punk/punk_filecache.h" /* static files by content + their stat: the

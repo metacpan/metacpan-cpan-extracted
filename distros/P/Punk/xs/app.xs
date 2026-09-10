@@ -165,9 +165,10 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
              * A coderef is the STRONG validator: it is called before the
              * handler and what it returns identifies the entity, so an
              * unchanged one answers 304 without the handler running. The
-             * body ETag (`etag => 1`) is phase 2 and croaks here rather
-             * than being accepted and quietly doing nothing - an option
-             * that looks like it worked is worse than one that failed. */
+             * body ETag (`etag => 1`) is not implemented and croaks here
+             * rather than being accepted and quietly doing nothing - an
+             * option that looks like it worked is worse than one that
+             * failed. */
             vp = hv_fetchs(oh, K_ETAG, 0);
             if (vp && *vp && SvOK(*vp)) {
                 HV *rec;

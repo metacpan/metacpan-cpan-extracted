@@ -29,20 +29,45 @@ Inherits methods from L<Sidef::Object::Object>.
 
 =head2 new
 
-    Date(sec)
-    Date.new(sec)
+    Date()
+    Date(epoch_seconds)
+    Date(other_date)
+    Date(date_string)
+    Date(year, month=1, day=1, hour=0, min=0, sec=0)
 
-Creates a new C<Date> object. If C<sec> is given, it is used as the number of seconds since the Unix epoch (a plain number, or anything that stringifies/numifies to one); otherwise, the current time is used.
+Creates a new C<Date> object. With no arguments, uses the current moment. With a single numeric argument, treats it as Unix epoch seconds. With a single C<Date> argument, copy-constructs from it. With a single non-numeric string, attempts to parse it against a short list of common formats, in order: C<"%Y-%m-%d %H:%M:%S">, C<"%Y-%m-%dT%H:%M:%S">, C<"%Y-%m-%d">, C<"%Y/%m/%d">, C<"%d-%m-%Y">, C<"%m/%d/%Y"> -- the first one that matches wins; if none do, this dies with an error naming the formats tried. For anything needing a specific, unambiguous format, use L</from_string> with an explicit format instead. With two or more arguments, builds a date from calendar components -- only C<year> is required; C<month> and C<day> default to C<1>, and C<hour>/C<min>/C<sec> default to C<0>.
+
+    var d1 = Date()
+    var d2 = Date(1735084800)
+    var d3 = Date("2024-01-15")
+    var d4 = Date("2024-01-15T10:30:00")
+    var d5 = Date(2024, 1, 15)
+    var d6 = Date(2024, 1, 15, 10, 30, 0)
+    var d7 = Date(d5)              # copy
 
 Aliases: I<call>
 
 =cut
 
-=head2 call
+=head2 from_ymd
 
-    Date(sec)
+    Date.from_ymd(year, month=1, day=1, hour=0, min=0, sec=0)
 
-Allows a C<Date> class to be invoked directly as a function/callable, equivalent to L</new>.
+Alias for the calendar-component form of L</new>, for readability at call sites.
+
+    var d = Date.from_ymd(2024, 12, 25)
+
+=cut
+
+=head2 from_string
+
+    Date.from_string(str)
+    Date.from_string(str, format)
+
+With C<format>, behaves exactly like L</parse>/L</strptime>: parses C<str> against that exact format. Without it, tries the same short list of common formats that L</new> does. Prefer this over relying on L</new>'s implicit string-parsing when you want the auto-detection behavior to be visible at the call site.
+
+    var d1 = Date.from_string("2024-01-15")
+    var d2 = Date.from_string("15.01.2024", "%d.%m.%Y")
 
 =cut
 
@@ -314,23 +339,13 @@ Aliases: I<yday>
 
 =cut
 
-=head2 isdst
+=head2 is_dst
 
-    self.isdst
+    self.is_dst
 
 Returns C<true> if daylight saving time is in effect for this date, otherwise C<false>.
 
 Aliases: I<daylight_savings>
-
-=cut
-
-=head2 daylight_savings
-
-    self.daylight_savings
-
-Returns C<true> if daylight saving time is in effect for this date, otherwise C<false>.
-
-Aliases: I<isdst>
 
 =cut
 
@@ -350,11 +365,97 @@ Returns the week number of the year, as computed by L<Time::Piece>.
 
 =cut
 
+=head2 quarter
+
+    self.quarter
+
+Returns the calendar quarter (C<1> to C<4>) the date falls in.
+
+=cut
+
 =head2 month_last_day
 
     self.month_last_day
 
 Returns the last day of the month for this date (28, 29, 30, or 31, depending on the month and whether the year is a leap year).
+
+=cut
+
+=head2 is_leap_year
+
+    self.is_leap_year
+
+Returns C<true> if the date's year is a leap year, otherwise C<false>.
+
+    say Date.parse("2024-12-25", "%Y-%m-%d").is_leap_year   #=> true
+
+=cut
+
+=head2 is_weekend
+
+    self.is_weekend
+
+Returns C<true> if the date falls on a Saturday or Sunday, otherwise C<false>.
+
+=cut
+
+=head2 is_weekday
+
+    self.is_weekday
+
+Returns C<true> if the date falls on Monday through Friday, otherwise C<false>. The logical complement of L</is_weekend>.
+
+=cut
+
+=head2 is_today
+
+    self.is_today
+
+Returns C<true> if the date is the same calendar day as C<Date.today>, otherwise C<false>.
+
+=cut
+
+=head2 is_future
+
+    self.is_future
+
+Returns C<true> if the date/time is later than the current moment, otherwise C<false>.
+
+=cut
+
+=head2 is_past
+
+    self.is_past
+
+Returns C<true> if the date/time is earlier than the current moment, otherwise C<false>.
+
+=cut
+
+=head2 is_between
+
+    self.is_between(start, end)
+
+Returns C<true> if the date/time falls within C<[start, end]> (inclusive), otherwise C<false>.
+
+    say(Date.today.is_between(start_date, end_date))
+
+=cut
+
+=head2 is_same_day
+
+    self.is_same_day(other)
+
+Returns C<true> if C<self> and C<other> fall on the same calendar day, ignoring time-of-day.
+
+=cut
+
+=head2 age
+
+    self.age
+
+Treats the date as a birth date and returns the current age in whole years (accounting for whether this year's anniversary has passed yet).
+
+    say Date.parse("2000-06-15", "%Y-%m-%d").age
 
 =cut
 
@@ -515,6 +616,14 @@ Returns a new C<Date> object with C<days> days added to it. Accepts both positiv
 
 =cut
 
+=head2 add_weeks
+
+    self.add_weeks(n)
+
+Returns a new C<Date> object with C<n> weeks (C<n * 7> days) added. Accepts both positive and negative values.
+
+=cut
+
 =head2 add_months
 
     self.add_months(months)
@@ -542,13 +651,13 @@ Aliases: I<sub>, operator C<->
 
 =cut
 
-=head2 sub
+=head2 days_until
 
-    self.sub(that)
+    self.days_until(other)
 
-If C<that> is another C<Date> object, returns the difference between the two dates in seconds. Otherwise, returns a new C<Date> object with C<that> seconds subtracted.
+Returns the number of whole days from C<self> to C<other> (negative if C<other> is earlier).
 
-Aliases: I<subtract>, operator C<->
+    say(Date.parse("2024-01-01", "%Y-%m-%d").days_until(Date.parse("2024-01-10", "%Y-%m-%d")))   #=> 9
 
 =cut
 
@@ -607,6 +716,14 @@ Returns a new C<Date> object with the seconds set to zero, preserving the date, 
     self.truncate_to_second
 
 Returns a new C<Date> object truncated to whole-second precision (a no-op for this class, since C<Date> objects already have second precision).
+
+=cut
+
+=head2 end_of_month
+
+    self.end_of_month
+
+Returns a new C<Date> set to the last day of the current month, at midnight. The counterpart to L</truncate_to_month>, which gives the first day.
 
 =cut
 

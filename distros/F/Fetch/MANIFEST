@@ -13,7 +13,10 @@ include/fetch/ft_compat.h
 include/fetch/ft_cookiejar.h
 include/fetch/ft_core.h
 include/fetch/ft_future.h
+include/fetch/ft_altsvc.h
+include/fetch/ft_dns.h
 include/fetch/ft_h2.h
+include/fetch/ft_h3.h
 include/fetch/ft_headers.h
 include/fetch/ft_hm.h
 include/fetch/ft_http.h
@@ -70,6 +73,8 @@ t/25-tunnel-starttls.t
 t/26-awaitable.t
 t/27-awaitable-conformance.t
 t/28-fork.t
+t/29-dns.t
+t/30-h3.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -82,5 +87,6 @@ xs/loop.xs
 xs/response.xs
 xs/websocket.xs
 xt/boilerplate.t
+xt/win32-clock.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

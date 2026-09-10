@@ -34,6 +34,30 @@ Blesses the raw reference C<ref> into C<obj>'s own class (or, if C<obj> is itsel
 
 =cut
 
+=head1 CHAINING
+
+=head2 tap
+
+    self.tap(block)
+
+Calls C<block> with C<self> (for a side effect, such as logging), then returns C<self> unchanged -- lets you insert an inspection step into a method chain without breaking it.
+
+    var result = [1, 2, 3].map {|n| n * 2 } \
+                          .tap {|arr| say("after map: #{arr}") } \
+                          .sum
+
+=cut
+
+=head2 then
+
+    self.then(block)
+
+Calls C<block> with C<self> and returns I<whatever the block returns>, unlike L</tap>, which always returns C<self>.
+
+    say 5.then {|n| n * 2 }   #=> 10
+
+=cut
+
 =head1 IMPLICIT CONVERSIONS AND COMPARISON
 
 Every Sidef object gets the following fallback behavior for free (via Perl operator overloading), used whenever the language needs to treat an object as a boolean, a number, or a string, or needs to compare/order two objects and the object's own class doesn't define the relevant method itself:
@@ -122,6 +146,17 @@ Creates a C<NamedParam> object from C<a> (the name) and C<b> (the value), using 
 
 =cut
 
+=head2 in
+
+    self.in(collection)
+
+Returns C<true> if C<collection> contains C<self> -- equivalent to C<collection.contains(self)>, but reads more naturally when C<self> is the focus of the expression.
+
+    say 5.in(1..10)          #=> true
+    say "x".in(["a", "b"])   #=> false
+
+=cut
+
 =head2 smartmatch
 
     a.smartmatch(b)
@@ -177,16 +212,6 @@ Aliases: operator C<~~>
 
 =cut
 
-=head2 ~~
-
-    a ~~ b
-
-Operator form of L</smartmatch>.
-
-Aliases: I<smartmatch>
-
-=cut
-
 =head2 !~
 
     a !~ b
@@ -216,8 +241,9 @@ Returns the full class (package) name of the object as a C<String> -- for exampl
 =head2 is_a
 
     self.is_a(class)
+    self.is_a(class1, class2, ...)
 
-Returns C<true> if the object is an instance of C<class>, or of a subclass of C<class>, otherwise C<false>.
+Returns C<true> if the object is an instance of any of the given classes, otherwise C<false>.
 
 Aliases: I<is_an>, I<kind_of>
 
@@ -241,9 +267,10 @@ Returns C<true> if the value is a bare typename string (not an instantiated obje
 
 =head2 respond_to
 
-    self.respond_to(method)
+    self.respond_to(name)
+    self.respond_to(*names)
 
-Returns C<true> if the object's class has a method with the given name (inherited methods count too), otherwise C<false>.
+Returns C<true> if the object's class responds to I<every> one of C<names> (inherited methods count too), otherwise C<false>.
 
 =cut
 

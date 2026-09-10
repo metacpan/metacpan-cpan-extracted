@@ -1,0 +1,43 @@
+Changes
+cpanfile
+cpanfile.snapshot
+lib/Koha/QA.pm
+lib/Koha/QA/Base.pm
+lib/Koha/QA/FilePermissions.pm
+lib/Koha/QA/PerlCritic.pm
+lib/Koha/QA/PerlSyntax.pm
+lib/Koha/QA/PodChecker.pm
+lib/Koha/QA/Security.pm
+lib/Koha/QA/Security/CSRF.pm
+lib/Koha/QA/Security/Nonce.pm
+lib/Koha/QA/Security/TemplateFilters.pm
+lib/Koha/QA/Spelling.pm
+lib/Koha/QA/TestNoWarnings.pm
+lib/Koha/QA/Tidy.pm
+lib/Koha/QA/Tidy/JS.pm
+lib/Koha/QA/Tidy/Perl.pm
+lib/Koha/QA/Tidy/TT.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+share/package.json
+share/perlcriticrc
+share/perltidyrc
+share/prettierrc.js
+t/00-load.t
+t/file_permissions.t
+t/perl_syntax.t
+t/perlcritic.t
+t/pod_checker.t
+t/security/csrf.t
+t/security/nonce.t
+t/security/template_filters.t
+t/spelling.t
+t/tidy/js.t
+t/tidy/perl.t
+t/tidy/tt.t
+t/use-test-no-warnings.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

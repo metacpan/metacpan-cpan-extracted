@@ -1,4 +1,4 @@
-/* punk_dispatch.h - the Open::API C ABI dispatch path (phase 6).
+/* punk_dispatch.h - the Open::API C ABI dispatch path.
  *
  * Punk reaches Open::API's router and validator through its public C ABI
  * (oa_abi.h, reached through ExtUtils::Depends). Open::API 0.04+ is a hard
@@ -202,6 +202,17 @@ static HV *punk_oa_build_raw(pTHX_ HV *env, HV *caps, SV *body, IV cl) {
  * mount's `max_body_size` and the `max_body` keyword - so a plain route and
  * an API operation answer a client byte for byte identically.
  *
+ * A request whose length was never declared cannot be answered here, and
+ * HTTP/2 and HTTP/3 make that shape ordinary rather than exotic: both forbid
+ * Transfer-Encoding, so a streamed upload arrives with no length at all.
+ * Returning NULL and stopping there left those requests with no ceiling
+ * whatsoever. Instead the ceiling is published into the environment, where
+ * every body reader picks it up as its default `max` (pq_env_ceiling) and
+ * stops on the bytes that actually arrive. That is a later and less thrifty
+ * refusal than a 413 before the guards - the body has been read up to the
+ * ceiling by then - but it is a refusal, and it is the earliest one the
+ * declared length permits.
+ *
  * Note what this is NOT. By the time any of this runs the body is already
  * resident in the server's buffer; the memory was spent before Punk was
  * called. What the check buys is the parse, the multipart walk, the guards,
@@ -212,6 +223,7 @@ static SV *pd_body_limit(pTHX_ HV *env, IV max_body) {
     SV **e;
     IV cl;
     if (max_body <= 0 || !env) return NULL;
+    (void)hv_stores(env, PQ_ENV_MAX_BODY, newSViv(max_body));
     e = hv_fetchs(env, "CONTENT_LENGTH", 0);
     cl = (e && *e && SvOK(*e)) ? SvIV(*e) : 0;
     if (cl <= max_body) return NULL;

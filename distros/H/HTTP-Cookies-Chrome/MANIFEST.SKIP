@@ -71,3 +71,5 @@ test-corpus/Cookies\.save
 
 \.gitattributes\b
 util/
+
+.downstream.json

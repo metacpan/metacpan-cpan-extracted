@@ -292,6 +292,32 @@ Recursively removes the directory and everything inside it. This cannot be undon
 
 =head1 CONTENTS AND TRAVERSAL
 
+=head2 entries
+
+    self.entries
+
+Opens the directory, collects every entry (via C<DirHandle>'s C<entries>) into an C<Array>, and closes it again. Returns C<nil> if the directory couldn't be opened.
+
+    say Dir("/tmp").entries
+
+=cut
+
+=head2 files
+
+    self.files
+
+Opens the directory, collects only its immediate regular-file entries (via C<DirHandle>'s C<files>), and closes it. Unlike L</find>, this does not recurse into subdirectories.
+
+=cut
+
+=head2 subdirs
+
+    self.subdirs
+
+Like L</files>, but collects only immediate subdirectory entries.
+
+=cut
+
 =head2 is_empty
 
     self.is_empty
@@ -302,21 +328,51 @@ Returns C<true> if the directory contains no entries (other than C<.> and C<..>)
 
 =cut
 
-=head2 find
+=head2 size
 
-    self.find
-    self.find(block)
+    self.size
+
+Returns the total size, in bytes, of every regular file found recursively under this directory (via L</walk>).
+
+    say Dir("/var/log").size
+
+=cut
+
+=head2 walk
+
+    self.walk
+    self.walk(block)
 
 Recursively traverses the directory tree, starting from (and including) the directory itself. With a block, calls it once for every item found (a C<Dir> for each subdirectory, a C<File> for each regular file) and returns C<self>. With no block, collects everything into an C<Array> instead.
 
-    dir.find {|item|
+    dir.walk {|item|
         say(item) if item.is_file
     }
 
-    var all_items = dir.find
+    var all_items = dir.walk
     say("Found #{all_items.len} items")
 
-Aliases: I<browse>
+Aliases: I<browse>, I<find>
+
+=cut
+
+=head2 each
+
+    self.each(block)
+
+Opens the directory, calls C<block> once per entry name (including C<.> and C<..>), and closes it again. Returns C<true> on success, C<false> if the directory couldn't be opened.
+
+    Dir("/tmp").each {|name| say name }
+
+=cut
+
+=head2 glob
+
+    self.glob(pattern)
+
+Returns an C<Array> of every entry matching the shell glob C<pattern> (e.g. C<"*.txt">), as C<File> or C<Dir> objects.
+
+    Dir("/var/log").glob("*.log").each {|f| say f }
 
 =cut
 

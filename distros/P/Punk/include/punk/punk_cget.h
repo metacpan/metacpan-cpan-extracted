@@ -23,9 +23,8 @@
  * authorisation check into a cache hit.
  *
  * So the check sits between the guards and the handler, where no public hook
- * phase runs. Phase 0 recorded that gap rather than working around it: as it
- * stands, `before_dispatch` cannot be used for anything that must respect a
- * guard.
+ * phase runs. That gap is recorded rather than worked around: as it stands,
+ * `before_dispatch` cannot be used for anything that must respect a guard.
  */
 
 /* Is this a method a 304 may answer? RFC 9110 13.1.3 - a conditional POST

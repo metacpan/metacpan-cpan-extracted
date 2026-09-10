@@ -426,7 +426,7 @@ origin(self)
 #
 # An argument naming a capture fills that segment; anything left over is the
 # query string, keys sorted. `absolute` and `query` are reserved words rather
-# than captures - phase 0 refuses them as route names for that reason.
+# than captures - they are refused as route names for that reason.
 #
 # Every result carries the application's prefix: the path on `host` and then
 # SCRIPT_NAME, which are layers rather than alternatives (a proxy strips one,

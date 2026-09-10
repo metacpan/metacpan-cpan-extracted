@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,7 +80,7 @@ WriteMakefile(%WriteMakefileArgs);
 package MY;
 sub postamble {
 my $self = shift;
-my $text = $self->SUPER::postamble // '';
+my $text = $self->SUPER::postamble || '';
 
 $text .= "\n\nconfig ::\n\t\$(PERLRUN) inc/do_postamble_action.pl\n\n";
 return $text;

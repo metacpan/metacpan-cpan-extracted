@@ -1,5 +1,5 @@
 package Crypt::JWS::OpenSSL::Algorithm::HMAC;
-$Crypt::JWS::OpenSSL::Algorithm::HMAC::VERSION = '0.004';
+$Crypt::JWS::OpenSSL::Algorithm::HMAC::VERSION = '0.005';
 use Moo;
 with qw(
   Crypt::JWS::OpenSSL::Role::Algorithm
@@ -43,7 +43,7 @@ Crypt::JWS::OpenSSL::Algorithm::HMAC - Sign and verify tokens using shared HMAC 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

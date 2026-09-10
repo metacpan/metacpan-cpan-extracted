@@ -118,6 +118,8 @@ run(class, ...)
             else if (strEQ(key, "shutdown_grace")) cfg.grace = SvNV(val);
             else if (strEQ(key, "affinity"))       cfg.affinity = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "http2"))          dfl.http2 = SvTRUE(val) ? 1 : 0;
+            else if (strEQ(key, "http3"))          dfl.http3 = SvTRUE(val) ? 1 : 0;
+            else if (strEQ(key, "http3_max_conns")) cfg.http3_max_conns = SvUV(val);
             else if (strEQ(key, "tls_cert"))       dfl.tls_cert = SvOK(val) ? SvPV_nolen(val) : NULL;
             else if (strEQ(key, "tls_key"))        dfl.tls_key  = SvOK(val) ? SvPV_nolen(val) : NULL;
             else if (strEQ(key, "tls_ca"))         dfl.tls_ca   = SvOK(val) ? SvPV_nolen(val) : NULL;
@@ -229,6 +231,11 @@ stats(...)
             hv_stores(h, "accepts",     newSVuv(hm_cur_loop->accepts));
             hv_stores(h, "denied",      newSVuv(hm_cur_loop->denied));
             hv_stores(h, "bytes_out",   newSVuv(hm_cur_loop->bytes_out));
+            hv_stores(h, "datagrams",   newSVuv(hm_cur_loop->datagrams));
+            hv_stores(h, "h3_conns",    newSVuv(hm_cur_loop->h3_conns));
+            hv_stores(h, "h3_live",     newSVuv(hm_cur_loop->h3_live));
+            hv_stores(h, "h3_requests", newSVuv(hm_cur_loop->h3_requests));
+            hv_stores(h, "datagrams_out", newSVuv(hm_cur_loop->datagrams_out));
             hv_stores(h, "connections", newSViv(hm_cur_loop->nconns));
             hv_stores(h, "backend",     newSVpv(hm_cur_loop->be->name, 0));
             hv_stores(h, "pid",         newSViv((IV)hm_os_getpid()));
@@ -243,6 +250,32 @@ has_http2(...)
     CODE:
         PERL_UNUSED_VAR(items);
         RETVAL = hm_h2_available();
+    OUTPUT:
+        RETVAL
+
+# True when HTTP/3 (QUIC) support was built in - ngtcp2, ngtcp2_crypto_ossl,
+# nghttp3 and an OpenSSL that can hand them its handshake, all four. There is
+# no cleartext QUIC the way there is h2c, so this is false wherever has_tls
+# is, and it is false on LibreSSL, which has no ngtcp2 crypto backend at all.
+int
+has_http3(...)
+    CODE:
+        PERL_UNUSED_VAR(items);
+        RETVAL = hm_h3_available();
+    OUTPUT:
+        RETVAL
+
+# The runtime QUIC stack banner ("ngtcp2 1.25.0, nghttp3 1.18.0"), or undef
+# when HTTP/3 support was not built. Both libraries, because a QUIC problem
+# is as often nghttp3's as ngtcp2's. The counterpart to tls_library.
+SV *
+quic_library(...)
+    PREINIT:
+        const char *s;
+    CODE:
+        PERL_UNUSED_VAR(items);
+        s = hm_quic_library();
+        RETVAL = s ? newSVpv(s, 0) : newSV(0);
     OUTPUT:
         RETVAL
 
@@ -392,7 +425,8 @@ detach(env)
         e = hv_fetchs(ehv, "psgix.hyperman.conn", 0);
         if (!(e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVAV))
             croak("Hyperman::detach: no psgix.hyperman.conn in this env "
-                  "(HTTP/2 streams and non-Hyperman servers cannot detach)");
+                  "(HTTP/2 and HTTP/3 streams share one connection, and "
+                  "non-Hyperman servers have none, so none can detach)");
         cid = (AV *)SvRV(*e);
         fsv = av_fetch(cid, 0, 0);
         isv = av_fetch(cid, 1, 0);
@@ -417,6 +451,59 @@ detach(env)
             default: croak("Hyperman::detach: failed (%d)", rc);
         }
         RETVAL = (IV)fd;
+    }
+    OUTPUT:
+        RETVAL
+
+# Hyperman::stream($env, $status, \@headers) - begin a streamed response body
+# on this request and return a Hyperman::Writer for it.
+#
+# The Perl door onto ABI v6 (include/hyperman/hm_abi.h). The C door is the
+# table's stream_open; both reach the one registry in hm_stream.h and have the
+# same contract, so a pure-Perl application gets the transport neutrality an
+# XS one gets. Unlike detach it works on HTTP/2 - it hands out a stream, not a
+# socket - and it works on TLS, where there is no fd to hand over at all.
+#
+# The writer owns the handle: ->close ends the body, and letting the writer go
+# out of scope closes it too.
+SV *
+stream(env, status = 200, headers = NULL)
+        SV *env
+        int status
+        SV *headers
+    CODE:
+    {
+        AV *w;
+        void *h;
+        int fd;
+        UV id;
+        int64_t sid = -1;
+        if (!hm_cur_loop)
+            croak("Hyperman::stream: no running loop (call it from inside "
+                  "a request)");
+        if (!SvROK(env) || SvTYPE(SvRV(env)) != SVt_PVHV)
+            croak("Hyperman::stream: give it the PSGI env hashref");
+        if (!hm_stream_ticket(aTHX_ env, &fd, &id, &sid))
+            croak("Hyperman::stream: no usable psgix.hyperman.stream in this "
+                  "env (not a Hyperman request, or the env is stale)");
+        if (headers && !SvOK(headers)) headers = NULL;
+        if (headers && !(SvROK(headers)
+                         && SvTYPE(SvRV(headers)) == SVt_PVAV))
+            croak("Hyperman::stream: headers must be an array reference");
+        h = hm_stream_open(aTHX_ (void *)hm_cur_loop, fd, id, sid,
+                           status, headers);
+        if (!h)
+            croak("Hyperman::stream: cannot stream on this request (the "
+                  "client is gone, a response was already sent, or the "
+                  "handler has not deferred - open a stream from a "
+                  "psgi.streaming coderef or after parking on a Future)");
+        w = newAV();
+        av_extend(w, 2);
+        av_store(w, 0, newSViv(PTR2IV(h)));
+        av_store(w, 1, newSVuv(((hm_stream *)h)->serial));
+        av_store(w, 2, newSVpvs("stream"));
+        RETVAL = newRV_noinc((SV *)w);
+        sv_bless(RETVAL, gv_stashpv("Hyperman::Writer", GV_ADD));
     }
     OUTPUT:
         RETVAL

@@ -1,5 +1,82 @@
 Revision history for Hyperman
 
+0.46	2026-09-10
+        - FIX: 0.45 did not compile against any OpenSSL older than 1.1.1.
+          The QUIC context pinned its protocol range with TLS1_3_VERSION
+          and SSL_CTX_set_max_proto_version, which are 1.1.1 and 1.1.0;
+          the constant stopped the build outright and the setter would
+          have been an undefined symbol at load. Both are now compiled
+          out on a library that has neither, leaving the TLS 1.2 floor
+          the TCP listener has always had. HTTP/3 is unaffected: it needs
+          TLS 1.3 to exist at all, and now says so if forced.
+        - FIX: SSL_CTX_set_max_early_data, the 0-RTT refusal, was reached
+          for unguarded on the same libraries. Once the build got past
+          the error above it would have loaded no .so at all.
+
+0.45	2026-09-09
+        - ADDS: HTTP/3 over QUIC (ngtcp2 + nghttp3). `http3 => 1` beside
+          a certificate serves h3 on the same port over UDP, through the
+          same sync, Future and psgi.streaming paths as HTTP/1.1 and
+          HTTP/2. 
+	- ADDS: ABI v8 stream_on_data. A stream handle becomes
+          bidirectional: request bytes go to a callback instead of being
+          buffered into psgi.input, which a tunnelled stream needs
+          because it never ends.
+        - ADDS: Extended CONNECT (RFC 8441 on HTTP/2, RFC 9220 on
+          HTTP/3), the WebSocket handshake for a multiplexed transport.
+        - ADDS: datagrams_out in Hyperman->stats, and bytes_out on
+          HTTP/3 is no longer counted twice.
+        - ADDS: http3_max_conns, and h3_conns / h3_live / h3_requests /
+          datagrams in Hyperman->stats.
+        - FIX: client certificates were not reported over HTTP/3.
+          SSL_CLIENT_VERIFY read NONE for a peer that had presented a
+          valid one, so an application checking it refused a client it
+          should have accepted. mTLS now reports identically on every
+          transport.
+        - FIX: reloading certificates rebuilt the TCP context and left
+          the QUIC one stale, so a fleet served a fresh certificate over
+          TCP and an old one over QUIC. Both are now swapped together or
+          neither is.
+        - FIX: tools/cppcheck.sh reported clean whatever cppcheck found,
+          and never defined HM_HAVE_HTTP3 - so no QUIC or HTTP/3 code had
+          been analysed. Both fixed, and the findings that surfaced.
+        - FIX: an application that answered through a stream handle and
+          then returned a sentinel put TWO responses on one HTTP/2 or
+          HTTP/3 stream. The sentinel is now discarded, as it already
+          was on the detach path.
+        - FIX: HTTP/3 throughput collapsed about 20x under sustained
+          concurrent large responses. A stream blocked by flow control
+          was handed to nghttp3 and never unblocked, because ngtcp2's
+          extend_max_stream_data callback was not registered.
+        - HTTP/3 address validation: Retry above a half-open threshold,
+          NEW_TOKEN so a returning client skips it, and a Stateless
+          Reset for a connection id this server does not hold.
+        - FIX: the depend block missed xs/bus.xs and six headers that
+          Hyperman.xs includes, so a rebuild could test stale objects.
+        - FIX: t/41-stream-abi.t's backpressure test could not reach the
+          high-water mark where a Linux send buffer autotunes past the
+          body, and reported no pause. The client now caps its own
+          receive window and the body outgrows the buffers.
+
+0.44	2026-09-09
+        - psgix.input.buffered is set with the rest of an HTTP/2 request's
+          environment rather than at dispatch, so an application can tell
+          that a bodied h2 request with no content-length is complete.
+        - ADDS: ABI v6 stream handles. One seam writes a response body a
+          piece at a time over HTTP/1.1 or over an HTTP/2 stream, on TLS
+          or in clear, where conn_detach can only hand over a socket.
+        - stream_on_abort reports a stream die under its producer,
+          including an HTTP/2 RST_STREAM on one stream of many.
+        - stream_on_drain and an HM_ABI_STREAM_FULL return give the
+          HTTP/1.1 streaming path backpressure it did not have.
+        - ADDS: Hyperman::stream($env, $status, \@headers), the Perl door
+          onto the same registry, returning a Hyperman::Writer.
+        - ADDS: psgix.hyperman.stream, the [fd, generation, stream id]
+          ticket both doors take. Unlike psgix.hyperman.conn it is
+          present on HTTP/2.
+        - An HTTP/2 body written through a stream handle is framed as it
+          is produced.
+
 0.43	2026-09-04
         - ADDS: Expect: 100-continue. A client asking permission before a
           large body gets an interim 100 rather than a stall, and a body

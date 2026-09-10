@@ -11,7 +11,7 @@ use Module::Version;
 
 use Moo::Role;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 our $JSON;
 
 BEGIN {
@@ -24,7 +24,7 @@ BEGIN {
     # Cpanel::JSON::XS's version, but it's better not to load it in
     # the first place.
     $JSON = do {
-        if ( Module::Version::get_version( 'Cpanel::JSON::XS' ) >= $Cpanel_JSON_XS_VERSION ) {
+        if ( ( Module::Version::get_version( 'Cpanel::JSON::XS' ) // 0 >= $Cpanel_JSON_XS_VERSION ) ) {
             require Cpanel::JSON::XS;
             'Cpanel::JSON::XS';
         }
@@ -129,7 +129,7 @@ Data::Record::Serialize::Encode::json - encoded a record as JSON
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

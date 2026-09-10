@@ -1056,4 +1056,14 @@ subtest 'parse_discovery_event: short tags are skipped' => sub {
     is $disc->nostrconnect_url, undef, 'short nostrconnect_url tag skipped';
 };
 
+subtest 'unsupported method receives an error preserving the request ID' => sub {
+    my $request = Net::Nostr::RemoteSigning->parse_request(
+        Net::Nostr::RemoteSigning->request(id=>'future-42',method=>'future_method',params=>[]));
+    is $request->method, 'future_method', 'parser preserves unknown method for dispatch';
+    my $wire = Net::Nostr::RemoteSigning->response(id=>$request->id,error=>'unsupported method: '.$request->method);
+    my $response = Net::Nostr::RemoteSigning->parse_response($wire);
+    is $response->id, 'future-42', 'error correlated to request';
+    is $response->error, 'unsupported method: future_method', 'explicit error response';
+    ok !defined($response->result), 'no success result on error';
+};
 done_testing;

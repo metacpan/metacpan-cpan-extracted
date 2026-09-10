@@ -91,6 +91,63 @@ sub run {
 
 *do = \&run;
 
+sub curry {
+    my ($self, @args) = @_;
+    __PACKAGE__->new(code => sub { $self->call(@args, @_) });
+}
+
+sub negate {
+    my ($self) = @_;
+    __PACKAGE__->new(
+        code => sub {
+            $self->run(@_)
+              ? Sidef::Types::Bool::Bool::FALSE
+              : Sidef::Types::Bool::Bool::TRUE;
+        }
+    );
+}
+
+sub pipe {
+    my ($block1, $block2) = @_;
+    __PACKAGE__->new(code => sub { $block2->call($block1->call(@_)) });
+}
+
+sub once {
+    my ($self) = @_;
+    my ($called, $result);
+    __PACKAGE__->new(
+        code => sub {
+            $called and return $result;
+            $called = 1;
+            $result = $self->run(@_);
+        }
+    );
+}
+
+sub constant {
+    my (undef, $value) = @_;
+    __PACKAGE__->new(code => sub { $value });
+}
+
+sub retry {
+    my ($self, $n) = @_;
+    $n = CORE::int($n // 1);
+    __PACKAGE__->new(
+        code => sub {
+            my @args     = @_;
+            my $attempts = 0;
+            my $result;
+            while (1) {
+                $result = eval { $self->call(@args) };
+                last unless $@;
+                ++$attempts;
+                $attempts >= $n and die $@;
+            }
+            $result;
+        }
+    );
+}
+
 # Recursively walks the ISA hierarchy to discover additional method candidates
 # from parent classes, appending them (with their kids/fallback) to @$methods.
 sub _collect_inherited_methods {

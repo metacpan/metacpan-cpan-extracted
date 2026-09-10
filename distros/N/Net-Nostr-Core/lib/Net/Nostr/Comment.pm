@@ -47,8 +47,6 @@ sub comment {
     my @tags;
 
     if ($event) {
-        croak "comments MUST NOT be used to reply to kind 1 notes (see NIP-10)"
-            if $event->kind == 1;
 
         my $relay = $args{relay_url} // '';
         my $kind_str = '' . $event->kind;
@@ -277,8 +275,8 @@ Comments use uppercase tags (C<E>, C<A>, C<I>, C<K>, C<P>) for the root
 scope and lowercase tags (C<e>, C<a>, C<i>, C<k>, C<p>) for the parent
 item. For top-level comments, root and parent point to the same target.
 
-Comments MUST NOT be used to reply to kind 1 notes; use
-L<Net::Nostr::Thread> (NIP-10) instead.
+Comments may reply to kind 1 notes as well as other Nostr events.
+L<Net::Nostr::Thread> remains available for NIP-10 threads.
 
 =head1 CONSTRUCTOR
 

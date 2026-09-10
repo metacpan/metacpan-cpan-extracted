@@ -1,5 +1,5 @@
 {
-   "abstract" : "HTTP/2 Future-based user agent",
+   "abstract" : "HTTP/3, HTTP/2 and HTTP/1.1 Future-based user agent",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.24",
+   "version" : "0.27",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

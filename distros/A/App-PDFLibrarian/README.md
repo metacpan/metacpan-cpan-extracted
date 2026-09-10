@@ -67,7 +67,7 @@ Any modifications are then written back to the PDF files given by the _file_ fie
 **pdf-lbr-output-bib** **--version**
 **pdf-lbr-output-bib** **--help**|**-h**
 
-**pdf-lbr-output-bib** \[ **--clipboard**|**-c** \] \[ **--max-authors**|**-m** _count_ \[ **--only-first-author**|**-f** \] \] \[ **--filter**|**-F** \[_type_**:**\]_field_\[**?**_iffield_|**!**_ifnotfield_...\]**=**_spec_ ... \] \[ **--no-default-filter**|**-N** \] \[ **--abbreviate**|**-a** _scheme_ ... \] \[ **--output-text-format**|**-o** _type_=&lt;format> ... | **--output-text**|**-O** | **--pdf-file-comment**|**-P** \] _files_|_directories_ ...
+**pdf-lbr-output-bib** \[ **--clipboard**|**-c** \] \[ **--max-authors**|**-m** _count_ \[ **--only-first-author**|**-f** \] \] \[ **--filter**|**-F** \[_type_**:**\]_field_\[**?**_iffield_|**!**_ifnotfield_...\]**=**_spec_ ... \] \[ **--no-default-filter**|**-N** \] \[ **--abbreviate**|**-a** _scheme_ ... \] \[ **--output-text-format**|**-o** _type_=&lt;format> ... | **--output-text**|**-O** | **--output-json**|**-J** | **--pdf-file-comment**|**-P** \] _files_|_directories_ ...
 
 ... _files_|_directories_ ... **|** **pdf-lbr-output-bib** ...
 
@@ -135,6 +135,10 @@ The BibTeX metadata is then printed to standard output; if **--clipboard** is gi
 - **--output-text**|**-O**
 
     Instead of outputting a BibTeX entry, output plain text, formatting entries with formats given in the configuration file.
+
+- **--output-json**|**-J**
+
+    Instead of outputting a BibTeX entry, output a JSON record.
 
 ## **pdf-lbr-output-key** - Output BibTeX bibliographic keys from PDF files.
 

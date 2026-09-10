@@ -6,13 +6,48 @@ use Test2::V0 -no_srand => 1;
 use JSON;
 
 use lib 't/lib';
-use TestFixtures qw(%FIATJAF_EVENT);
+use TestFixtures qw(%FIATJAF_EVENT invalid_filter_cases);
 
 use Net::Nostr::Event;
 use Net::Nostr::Filter;
 use Net::Nostr::Message;
 
 my $EVENT = Net::Nostr::Event->new(%FIATJAF_EVENT);
+
+subtest 'filter messages reject malformed field boundaries from JSON' => sub {
+    for my $type (qw(REQ COUNT NEG-OPEN)) {
+        subtest $type => sub {
+            for my $case (invalid_filter_cases()) {
+                my ($name, $filter, $error) = @$case;
+                my @message = ($type, 'filter-test', $filter);
+                push @message, '6100' if $type eq 'NEG-OPEN';
+                my $wire = JSON->new->utf8->encode(\@message);
+                like dies { Net::Nostr::Message->parse($wire) }, $error, "$name rejected from wire";
+            }
+        };
+    }
+};
+
+subtest 'valid filter messages preserve fields through serialization and parsing' => sub {
+    my %fields = (
+        ids => ['a' x 64], authors => ['b' x 64],
+        '#e' => ['c' x 64], '#p' => ['d' x 64], kinds => [0, 65535],
+        since => 0, until => 1700000000, limit => 0,
+        '#t' => ["arbitrary\ntext \x{2603}"], '#overnet_et' => ['chat'],
+    );
+    for my $type (qw(REQ COUNT NEG-OPEN)) {
+        my @wire_fields = ($type, 'filter-test', \%fields);
+        push @wire_fields, '6100' if $type eq 'NEG-OPEN';
+        my $wire = JSON->new->utf8->encode(\@wire_fields);
+        my $parsed = Net::Nostr::Message->parse($wire);
+        my $filter = $type eq 'NEG-OPEN' ? $parsed->filter : $parsed->filters->[0];
+        is $filter->to_hash, \%fields, "$type preserves valid boundary values";
+        is JSON::decode_json($parsed->serialize), \@wire_fields, "$type parse/serialize preserves wire fields";
+        my $again = Net::Nostr::Message->parse($parsed->serialize);
+        my $again_filter = $type eq 'NEG-OPEN' ? $again->filter : $again->filters->[0];
+        is $again_filter->to_hash, \%fields, "$type serialize/parse preserves filter values";
+    }
+};
 
 ###############################################################################
 # Client-to-relay: EVENT

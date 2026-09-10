@@ -28,6 +28,14 @@
 
 typedef struct punk_wsconn {
     int    fd;
+    /* Extended CONNECT (RFC 8441 / RFC 9220): the connection rides an h2 or
+     * h3 STREAM rather than a socket, so there is no descriptor at all.
+     * When this is set, fd is meaningless: writes go through the stream
+     * handle and reads arrive by callback instead of from a read watcher.
+     * Everything above this line - the framing, masking, ping/pong, close
+     * handshake and UTF-8 validation - is unchanged, which is the whole
+     * reason the handshake and the codec were kept apart. */
+    void  *sh;
     int    state;
     int    blocking;              /* opt-in fallback: no loop, no watchers */
     unsigned char reading, writing, close_sent, close_rcvd, in_teardown;
@@ -94,6 +102,47 @@ static const hm_abi *punk_hm(pTHX) {
         }
     }
     return PUNK_HM;
+}
+
+/* Open a Hyperman stream handle for this request, or NULL.
+ *
+ * The ticket is psgix.hyperman.stream: [fd, generation, stream id], which
+ * unlike psgix.hyperman.conn is present on HTTP/2 - there is no fd that means
+ * "this stream", but there is a stream id, and that is the whole reason the
+ * seam is a handle rather than a descriptor.
+ *
+ * NULL when the server is not Hyperman, when the ticket names a connection
+ * that has gone, or when the response has not been deferred yet (an HTTP/1.1
+ * handler that has not returned would have its return value serialised on top
+ * of the streamed body). Every caller falls through to the transport it would
+ * have used, so a NULL here is a choice of transport and never an error.
+ *
+ * No version check: punk_hm already refuses a table older than the header
+ * this was compiled against, so a resolved table has the v6 entries. */
+static void *punk_hm_stream_open(pTHX_ HV *envh, const hm_abi **out_abi,
+                                 void **out_loop, int status, AV *hdrs) {
+    SV **t = envh ? hv_fetchs(envh, "psgix.hyperman.stream", 0) : NULL;
+    const hm_abi *A;
+    AV *tick;
+    SV **fsv, **isv, **ssv;
+    void *loop, *h;
+    if (!(t && *t && SvROK(*t) && SvTYPE(SvRV(*t)) == SVt_PVAV)) return NULL;
+    A = punk_hm(aTHX);
+    if (!A) return NULL;
+    tick = (AV *)SvRV(*t);
+    fsv = av_fetch(tick, 0, 0);
+    isv = av_fetch(tick, 1, 0);
+    ssv = av_fetch(tick, 2, 0);
+    if (!(fsv && *fsv && isv && *isv)) return NULL;
+    loop = A->cur_loop(aTHX);
+    if (!loop) return NULL;
+    h = A->stream_open(aTHX_ loop, (int)SvIV(*fsv), SvUV(*isv),
+                       (ssv && *ssv) ? (int64_t)SvIV(*ssv) : -1,
+                       status, sv_2mortal(newRV_inc((SV *)hdrs)));
+    if (!h) return NULL;
+    *out_abi  = A;
+    *out_loop = loop;
+    return h;
 }
 
 /* ---- small buffer helpers ------------------------------------------------ */
@@ -184,6 +233,21 @@ static int pw_emit(pTHX_ punk_wsconn *ws, const char *name,
 static void pw_on_writable(pTHX_ int fd, int mask, void *ud);
 
 static void pw_flush(pTHX_ punk_wsconn *ws) {
+    if (ws->sh) {
+        /* The server owns the framing and the backpressure here, so this is
+         * a hand-off rather than a write loop: there is no partial write to
+         * resume and no write watcher to arm. */
+        if (ws->woff < ws->wlen && ws->abi) {
+            int r = ws->abi->stream_write(aTHX_ ws->sh, ws->wbuf + ws->woff,
+                                          ws->wlen - ws->woff);
+            if (r < 0) { pw_teardown(aTHX_ ws, PW_CLOSE_ABNORMAL, NULL, 0); return; }
+            ws->woff = ws->wlen;
+        }
+        ws->wlen = ws->woff = 0;
+        if (ws->state == PW_ST_CLOSING && ws->close_sent && ws->close_rcvd)
+            pw_teardown(aTHX_ ws, 0, NULL, 0);
+        return;
+    }
     while (ws->woff < ws->wlen) {
         ssize_t n = write(ws->fd, ws->wbuf + ws->woff, ws->wlen - ws->woff);
         if (n > 0) { ws->woff += (size_t)n; continue; }
@@ -272,6 +336,14 @@ static void pw_teardown(pTHX_ punk_wsconn *ws, uint16_t code,
         }
     }
     ws->reading = ws->writing = 0;
+    if (ws->sh) {
+        /* Stream-backed: there is no descriptor to close, and the server
+         * owns the stream. Releasing the handle is what ends it - and it
+         * has to happen exactly once, so the pointer is cleared first. */
+        void *h = ws->sh;
+        ws->sh = NULL;
+        if (ws->abi) (void)ws->abi->stream_close(aTHX_ h);
+    }
     if (ws->fd >= 0) { close(ws->fd); ws->fd = -1; }
     ws->state = PW_ST_CLOSED;
 
@@ -435,6 +507,45 @@ consumed:
         ws->rlen -= off;
     }
     if (guard) SvREFCNT_dec(guard);
+}
+
+/* Bytes handed up by the server on an Extended CONNECT stream. The socket
+ * read loop's job, without the socket: append and let the codec run. */
+static void pw_feed(pTHX_ punk_wsconn *ws, const char *buf, size_t len,
+                    int fin) {
+    if (ws->state == PW_ST_CLOSED) return;
+    if (len) {
+        size_t cap = ws->max_message_size
+                   ? ws->max_message_size + PW_READ_CHUNK : 0;
+        if (cap && ws->rlen + len > cap) {
+            pw_fail(aTHX_ ws, PW_CLOSE_MESSAGE_TOO_BIG, "message too big");
+            return;
+        }
+        pw_buf_reserve(&ws->rbuf, &ws->rcap, ws->rlen + len);
+        memcpy(ws->rbuf + ws->rlen, buf, len);
+        ws->rlen += len;
+    }
+    pw_process(aTHX_ ws);
+    /* The peer half-closed its side of the stream: the same thing a read of
+     * zero means on a socket. */
+    if (fin && ws->state != PW_ST_CLOSED)
+        pw_teardown(aTHX_ ws, PW_CLOSE_ABNORMAL, NULL, 0);
+}
+
+/* The ABI's read half (v8) delivers here. */
+static void pw_on_stream_data(pTHX_ void *h, const char *buf, STRLEN len,
+                              int fin, void *ud) {
+    punk_wsconn *ws = (punk_wsconn *)ud;
+    PERL_UNUSED_ARG(h);
+    pw_feed(aTHX_ ws, buf, (size_t)len, fin);
+}
+
+/* The stream died under us - an h2 RST_STREAM, or the connection going. */
+static void pw_on_stream_abort(pTHX_ void *h, void *ud) {
+    punk_wsconn *ws = (punk_wsconn *)ud;
+    PERL_UNUSED_ARG(h);
+    if (ws->state != PW_ST_CLOSED)
+        pw_teardown(aTHX_ ws, PW_CLOSE_ABNORMAL, NULL, 0);
 }
 
 static void pw_on_readable(pTHX_ int fd, int mask, void *ud) {

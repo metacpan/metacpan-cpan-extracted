@@ -1,3 +1,31 @@
+0.60.1 2026-09-09 22:37:58 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - SECURITY: CallBackery::Plugin::Doc passed the client supplied document
+   name to Pod::Simple::Search->find without validation. find() treats
+   "::" as a path separator, so a name such as "..::..::..::etc::motd"
+   escaped @INC and let an unauthenticated GET on /doc render the POD of
+   any file readable by the server process. Because the traversal stays
+   inside a single URL path segment, no browser, router or reverse proxy
+   ever saw a ".." segment to normalise away. The document name is now
+   required to be a plain module name (\w+ parts joined by "::") and
+   anything else answers 404 without echoing the name back. Reported by
+   CPANSec. (CWE-22)
+
+ - CallBackery::Plugin::Doc now reads the documentation file with a three
+   argument open instead of IO::File and a two argument "< $path", and
+   checks that the open succeeded. Hardening only, as the path is built
+   from the validated module name.
+
+ - The test suite no longer drops a callbackery.db into the current
+   directory. t/callbackery.cfg names its config database with a relative
+   path, so every test built straight from it wrote into the checkout
+   root. The new t/lib/CallBackeryTest.pm redirects cfg_db to a uniquely
+   named database below the system temp directory, which is removed when
+   the test process exits.
+
+ - MANIFEST was missing five of the seven test files, so released
+   tarballs shipped only t/basic.t. All tests are listed now.
+
 0.60.0 2026-08-27 08:42:19 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - Excel export: new makeExportAction option "extraCols" adds generated

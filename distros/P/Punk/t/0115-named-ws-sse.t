@@ -8,11 +8,11 @@ use Test::More;
 use PunkTest;
 use Punk ();
 
-# Names on websocket and sse routes. Phase 3 of plan_punk_named_routes/.
+# Names on websocket and sse routes.
 #
 # Both keywords build a GET route by calling route(), then record their own
 # options hash for the compiler to stamp onto that record. `name` is a ROUTE
-# option, so it is forwarded to route() - where phase 0's recording, stamping
+# option, so it is forwarded to route() - where the recording, stamping
 # and duplicate croak all run unchanged - and then DROPPED from the copy that
 # becomes the transport's configuration, which does not know the key.
 

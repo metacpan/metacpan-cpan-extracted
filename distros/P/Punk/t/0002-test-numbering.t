@@ -21,8 +21,6 @@ use Test::More;
 # tests. Inside a band numbers step by one, and sub-groups start on a
 # multiple of ten - so a new store goes beside the stores, and there is
 # always room between one group and the next.
-#
-# plan_punk_test_renumber/ has the map and the reasoning.
 
 my @BANDS = (
     [    0, 'dist meta, load, ABI and refcount guards' ],

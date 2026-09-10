@@ -5,6 +5,9 @@ use strictures 2;
 use Net::Nostr::_ConstructorArgs ();
 
 use Carp qw(croak);
+use Encode ();
+use URI::Escape ();
+use Scalar::Util qw(blessed);
 use Net::Nostr::Bech32 qw(encode_naddr decode_naddr);
 use Net::Nostr::Event;
 
@@ -12,23 +15,43 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
 sub parse_id {
     my ($class, $str) = @_;
-    my $data = decode_naddr($str);
+    croak 'group identifier must be a non-empty string'
+        unless defined($str) && !ref($str) && length($str);
+    my ($base, $query) = split /\?/, $str, 2;
+    my $invite;
+    if (defined $query) {
+        croak 'invalid invite suffix'
+            unless $query =~ /\Ainvite=([^&#\s]+)\z/ && $query !~ /%(?![0-9A-Fa-f]{2})/;
+        my $encoded = $1;
+        $encoded =~ tr/+/ /;
+        my $bytes = URI::Escape::uri_unescape($encoded);
+        $invite = eval { Encode::decode('UTF-8', $bytes, Encode::FB_CROAK()) };
+        croak 'invite must be valid UTF-8' if $@;
+        _validate_invite($invite);
+    }
+    my $data = decode_naddr($base);
     croak "group identifier MUST reference kind 39000 metadata"
         unless $data->{kind} == 39000;
+    croak 'group identifier requires a non-empty group id'
+        unless $class->validate_group_id($data->{identifier});
     return {
         group_id => $data->{identifier},
         pubkey   => $data->{pubkey},
         kind     => $data->{kind},
         relays   => $data->{relays},
         relay    => $data->{relays}[0],
+        (defined($invite) ? (invite => $invite) : ()),
     };
 }
 
 sub format_id {
     my $class = shift;
     my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
+    my %known = map { $_ => 1 } qw(pubkey group_id relay relays invite);
+    croak 'unknown group reference argument' if grep { !$known{$_} } keys %args;
     my $pubkey   = $args{pubkey}   // croak "format_id requires 'pubkey'";
     my $group_id = $args{group_id} // croak "format_id requires 'group_id'";
+    croak 'group_id must be a non-empty string' unless $class->validate_group_id($group_id);
     my @relays;
     push @relays, $args{relay} if defined $args{relay};
     if (defined $args{relays}) {
@@ -36,12 +59,23 @@ sub format_id {
             unless ref $args{relays} eq 'ARRAY';
         push @relays, @{$args{relays}};
     }
-    return encode_naddr(
+    my $identifier = encode_naddr(
         identifier => $group_id,
         pubkey     => $pubkey,
         kind       => 39000,
         relays     => \@relays,
     );
+    if (exists $args{invite}) {
+        _validate_invite($args{invite});
+        $identifier .= '?invite=' . URI::Escape::uri_escape_utf8($args{invite});
+    }
+    return $identifier;
+}
+
+sub _validate_invite {
+    my ($code) = @_;
+    croak 'invite must be a non-empty string without control characters'
+        unless defined($code) && !ref($code) && length($code) && $code !~ /[[:cntrl:]]/;
 }
 
 sub validate_group_id {
@@ -63,10 +97,21 @@ sub _validate_and_extract_group {
 sub _build_tags_with_h {
     my ($class, $group_id, $previous) = @_;
     my @tags = (['h', $group_id]);
-    if ($previous && @$previous) {
+    _validate_previous($previous) if defined $previous;
+    if (defined($previous) && @$previous) {
         push @tags, ['previous', @$previous];
     }
     return @tags;
+}
+
+sub _validate_previous {
+    my ($previous) = @_;
+    croak 'previous must be an array of eight-character lowercase hex references'
+        unless ref($previous) eq 'ARRAY';
+    for my $prefix (@$previous) {
+        croak 'previous must contain eight-character lowercase hex references'
+            unless defined($prefix) && !ref($prefix) && $prefix =~ /\A[0-9a-f]{8}\z/;
+    }
 }
 
 # Kind 9000: put-user
@@ -107,6 +152,62 @@ sub remove_user {
 }
 
 # Kind 9002: edit-metadata
+sub _extra_metadata_tags {
+    my ($class, $group_id, $args) = @_;
+    my @tags;
+    if (exists $args->{banner}) {
+        croak 'banner must be a string' unless defined($args->{banner}) && !ref($args->{banner});
+        push @tags, ['banner', $args->{banner}];
+    }
+    if (exists $args->{parent}) {
+        croak 'parent must be a non-empty group id distinct from this group'
+            unless $class->validate_group_id($args->{parent}) && $args->{parent} ne $group_id;
+        push @tags, ['parent', $args->{parent}];
+    }
+    if (exists $args->{children}) {
+        croak 'children must be an array of distinct group ids' unless ref($args->{children}) eq 'ARRAY';
+        my %seen;
+        for my $child (@{$args->{children}}) {
+            croak 'child must be a distinct non-empty group id, not this group'
+                unless $class->validate_group_id($child) && $child ne $group_id && !$seen{$child}++;
+            push @tags, ['child', $child];
+        }
+    }
+    return @tags;
+}
+
+sub _metadata_tags {
+    my ($class, $group_id, $args, $edit) = @_;
+    croak 'group_id must be a non-empty string' unless $class->validate_group_id($group_id);
+    my @tags;
+    for my $name (qw(name picture about)) {
+        next unless exists $args->{$name};
+        croak "$name must be a string" unless defined($args->{$name}) && !ref($args->{$name});
+        push @tags, [$name, $args->{$name}];
+    }
+    push @tags, $class->_extra_metadata_tags($group_id, $args);
+    my @flags = $edit ? qw(private closed unrestricted open visible public restricted hidden livekit)
+        : qw(livekit private restricted hidden closed);
+    for my $flag (@flags) {
+        next unless exists $args->{$flag};
+        croak "$flag must be 0 or 1" unless defined($args->{$flag}) && !ref($args->{$flag})
+            && $args->{$flag} =~ /\A[01]\z/;
+        push @tags, [$flag] if $args->{$flag};
+    }
+    for my $pair ([qw(private public)], [qw(closed open)], [qw(hidden visible)], [qw(restricted unrestricted)]) {
+        croak "conflicting $pair->[0] and $pair->[1] flags" if $args->{$pair->[0]} && $args->{$pair->[1]};
+    }
+    if (exists $args->{supported_kinds}) {
+        croak 'supported_kinds must be an array reference' unless ref($args->{supported_kinds}) eq 'ARRAY';
+        for my $kind (@{$args->{supported_kinds}}) {
+            croak 'supported_kinds must contain integers from 0 through 65535'
+                unless defined($kind) && !ref($kind) && $kind =~ /\A[0-9]+\z/ && $kind <= 65535;
+        }
+        push @tags, ['supported_kinds', map { "$_" } @{$args->{supported_kinds}}];
+    }
+    return @tags;
+}
+
 sub edit_metadata {
     my $class = shift;
     my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
@@ -115,18 +216,10 @@ sub edit_metadata {
 
     my @tags = $class->_build_tags_with_h($group_id, $args{previous});
 
-    # Metadata fields as tags
-    push @tags, ['name', $args{name}]       if defined $args{name};
-    push @tags, ['picture', $args{picture}] if defined $args{picture};
-    push @tags, ['about', $args{about}]     if defined $args{about};
+    push @tags, $class->_metadata_tags($group_id, \%args, 1);
 
-    # Property flags (single-element tags)
-    for my $flag (qw(private closed unrestricted open visible public restricted hidden)) {
-        push @tags, [$flag] if $args{$flag};
-    }
-
-    delete @args{qw(group_id reason previous name picture about
-                    private closed unrestricted open visible public restricted hidden)};
+    delete @args{qw(group_id reason previous name picture about banner parent children
+                    private closed unrestricted open visible public restricted hidden livekit supported_kinds)};
     return Net::Nostr::Event->new(%args, kind => 9002, content => $reason, tags => \@tags);
 }
 
@@ -223,21 +316,9 @@ sub metadata {
 
     my @tags = (['d', $group_id]);
 
-    push @tags, ['name', $args{name}]       if defined $args{name};
-    push @tags, ['picture', $args{picture}] if defined $args{picture};
-    push @tags, ['about', $args{about}]     if defined $args{about};
-    push @tags, ['livekit']                 if $args{livekit};
-    if (exists $args{supported_kinds}) {
-        croak "supported_kinds must be an array reference"
-            unless ref $args{supported_kinds} eq 'ARRAY';
-        push @tags, ['supported_kinds', map { "$_" } @{$args{supported_kinds}}];
-    }
+    push @tags, $class->_metadata_tags($group_id, \%args, 0);
 
-    for my $flag (qw(private restricted hidden closed)) {
-        push @tags, [$flag] if $args{$flag};
-    }
-
-    delete @args{qw(group_id name picture about livekit supported_kinds
+    delete @args{qw(group_id name picture about banner parent children livekit supported_kinds
                     private restricted hidden closed)};
     return Net::Nostr::Event->new(%args, kind => 39000, content => '', tags => \@tags);
 }
@@ -326,32 +407,103 @@ sub participants {
 
 # Parsing methods
 
+sub _validate_pins {
+    my ($pins) = @_;
+    croak 'pins must be an array reference' unless ref($pins) eq 'ARRAY';
+    for my $pin (@$pins) {
+        croak 'pin must contain a tag name and reference'
+            unless ref($pin) eq 'ARRAY' && @$pin == 2 && defined($pin->[0])
+                && !ref($pin->[0]) && defined($pin->[1]) && !ref($pin->[1]);
+        if ($pin->[0] eq 'e') {
+            croak 'pin event id must be 64-char lowercase hex' unless $pin->[1] =~ $HEX64;
+        } elsif ($pin->[0] eq 'a') {
+            croak 'pin address must identify an addressable event'
+                unless $pin->[1] =~ /\A(3[0-9]{4}):([0-9a-f]{64}):(.*)\z/s;
+        } else {
+            croak 'pin tag must be e or a';
+        }
+    }
+}
+
+sub _pin_event {
+    my $class = shift;
+    my $kind = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
+    my (undef, $group_id) = $class->_validate_and_extract_group('pin list', %args);
+    _validate_pins($args{pins});
+    my @tags = ([$kind == 9010 ? 'h' : 'd', $group_id], map { [@$_] } @{$args{pins}});
+    if ($kind == 9010 && exists $args{previous}) {
+        _validate_previous($args{previous});
+        push @tags, ['previous', @{$args{previous}}];
+    }
+    my $reason = delete $args{reason} // '';
+    delete @args{qw(group_id pins previous)};
+    return Net::Nostr::Event->new(%args, kind=>$kind, content=>$kind == 9010 ? $reason : '', tags=>\@tags);
+}
+
+sub update_pin_list {
+    my $class = shift;
+    return $class->_pin_event(9010, Net::Nostr::_ConstructorArgs::normalize(@_));
+}
+
+sub pinned_events {
+    my $class = shift;
+    return $class->_pin_event(39005, Net::Nostr::_ConstructorArgs::normalize(@_));
+}
+
+sub pins_from_event {
+    my ($class, $event) = @_;
+    croak 'pin event must be a Net::Nostr::Event' unless blessed($event) && $event->isa('Net::Nostr::Event');
+    croak 'pin event must be kind 9010 or 39005' unless $event->kind == 9010 || $event->kind == 39005;
+    my $id_tag = $event->kind == 9010 ? 'h' : 'd';
+    my (@ids, @pins);
+    for my $tag (@{$event->tags}) {
+        croak 'pin tag requires a name' unless @$tag && defined($tag->[0]);
+        if ($tag->[0] eq $id_tag) {
+            croak 'pin group tag must have one value' unless @$tag == 2;
+            push @ids, $tag->[1];
+        } elsif ($tag->[0] eq 'e' || $tag->[0] eq 'a') {
+            push @pins, [@$tag];
+        } elsif ($tag->[0] eq 'previous') {
+            _validate_previous([@$tag[1 .. $#$tag]]);
+        } else {
+            croak 'unknown pin tag';
+        }
+    }
+    croak 'pin event requires exactly one non-empty group id'
+        unless @ids == 1 && $class->validate_group_id($ids[0]);
+    _validate_pins(\@pins);
+    return {group_id=>$ids[0], pins=>\@pins};
+}
+
 sub metadata_from_event {
     my ($class, $event) = @_;
+    croak 'metadata event must be a Net::Nostr::Event' unless blessed($event) && $event->isa('Net::Nostr::Event');
     croak "event must be kind 39000" unless $event->kind == 39000;
 
-    my %meta;
-    my %flags = map { $_ => 1 } qw(private restricted hidden closed);
+    my (%meta, %seen);
+    my %flags = map { $_ => 1 } qw(private restricted hidden closed livekit);
+    my %values = map { $_ => 1 } qw(d name picture about banner parent);
 
     for my $tag (@{$event->tags}) {
         my $name = $tag->[0];
-        if ($name eq 'd') {
-            $meta{group_id} = $tag->[1];
-        } elsif ($name eq 'name') {
-            $meta{name} = $tag->[1];
-        } elsif ($name eq 'picture') {
-            $meta{picture} = $tag->[1];
-        } elsif ($name eq 'about') {
-            $meta{about} = $tag->[1];
-        } elsif ($name eq 'livekit') {
-            $meta{livekit} = 1;
+        croak 'metadata tag requires a name' unless defined $name;
+        if ($values{$name}) {
+            croak "$name must have one value and occur at most once" unless @$tag == 2 && !$seen{$name}++;
+            $meta{$name eq 'd' ? 'group_id' : $name} = $tag->[1];
+        } elsif ($name eq 'child') {
+            croak 'child tag must have one value' unless @$tag == 2;
+            push @{$meta{children}}, $tag->[1];
         } elsif ($name eq 'supported_kinds') {
+            croak 'supported_kinds must occur at most once' if $seen{$name}++;
             $meta{supported_kinds} = [@{$tag}[1 .. $#$tag]];
         } elsif ($flags{$name}) {
+            croak "$name must be a single-element tag occurring at most once" unless @$tag == 1 && !$seen{$name}++;
             $meta{$name} = 1;
         }
     }
 
+    $class->_metadata_tags($meta{group_id}, \%meta, 0);
     return \%meta;
 }
 
@@ -607,9 +759,14 @@ Net::Nostr::Group - NIP-29 relay-based groups
 Implements NIP-29 relay-based groups. Groups have arbitrary non-empty
 C<group_id> strings in event C<h> and C<d> tags. Public group identifiers
 are C<naddr> references to the group's kind 39000 metadata event. Group
-state is managed through moderation events (kinds 9000-9009) and user
+state is managed through moderation events (kinds 9000-9010) and user
 events (kinds 9021-9022). Relay-generated group state is published as
-addressable events (kinds 39000-39004) signed by the relay.
+addressable events (kinds 39000-39005) signed by the relay.
+
+This module supplies event and identifier helpers. L<Net::Nostr::RelayGroups>
+provides an optional relay policy for moderation, subgroup trees, and pins.
+L<Net::Nostr::GroupDiscovery> coordinates cached-admin migration and fork
+lookups; applications supply its discovery transport and user interaction.
 
 All user and moderation events MUST include an C<h> tag with the group
 id. Group metadata events use a C<d> tag instead.
@@ -633,15 +790,28 @@ with C<group> and C<r> tags per NIP-51:
 
 =head2 parse_id
 
+Accepts the optional C<?invite=...> suffix. The result includes C<invite> when
+present; pass it as C<code> to L</join_request>. Validates the bech32 metadata
+reference, suffix shape, percent encoding, and UTF-8. Empty codes, repeated
+invite parameters, fragments, and control characters are rejected. An ordinary
+identifier continues to parse without an C<invite> key.
+
     my $parsed = Net::Nostr::Group->parse_id($naddr);
     # { group_id => 'pizza', pubkey => $relay_pubkey, kind => 39000, ... }
 
 Parses a group identifier C<naddr> that references a kind 39000 metadata
 event. Returns the raw C<group_id>, relay pubkey, kind, relay hints, and
 the first relay hint as C<relay>. Croaks for legacy host-based identifiers,
-invalid bech32 data, or C<naddr> values that do not reference kind 39000.
+invalid bech32 data, empty group IDs, or C<naddr> values that do not reference
+kind 39000. The returned reference is structurally validated; it does not
+prove that the relay hosts the group.
 
 =head2 format_id
+
+Optional C<invite> accepts a non-empty string without control characters and
+appends a percent-encoded UTF-8 query value. The bech32 prefix remains a valid
+standalone group reference. Relay hints and the referenced public key retain
+the validation performed by L<Net::Nostr::Bech32/encode_naddr>.
 
     my $id = Net::Nostr::Group->format_id(
         pubkey   => $relay_pubkey,
@@ -653,7 +823,7 @@ invalid bech32 data, or C<naddr> values that do not reference kind 39000.
 Formats a public group identifier as an C<naddr> referencing the group's
 kind 39000 metadata event. C<pubkey> is the relay's self pubkey.
 C<relay> or C<relays> may be supplied as relay hints. C<relays> must be
-an arrayref.
+an arrayref. This strict builder rejects empty group IDs and unknown options.
 
 =head2 validate_group_id
 
@@ -693,10 +863,22 @@ Creates a kind 9001 moderation event to remove a user from the group.
 All user and moderation event builders (C<put_user>, C<remove_user>,
 C<edit_metadata>, C<delete_event>, C<create_group>, C<delete_group>,
 C<create_invite>, C<join_request>, C<leave_request>) accept an optional
-C<previous> parameter for timeline references. See C<put_user> for an
+C<previous> parameter for timeline references. When defined it must be an
+array of eight-character lowercase hex strings; an empty array adds no tag.
+The relay must check that referenced events exist. See C<put_user> for an
 example.
 
 =head2 edit_metadata
+
+Also accepts C<banner>, C<parent>, and C<children>. C<banner> is a display
+string. C<parent> is a non-empty group ID distinct from this group; omission
+requests promotion to a root. C<children> is an array of distinct non-empty
+group IDs in display order, excluding this group itself. The builder validates
+these structural rules. Relay authorization, existence of the parent, cycles,
+and completeness of the child list require the relay's group state.
+Also accepts C<livekit> and C<supported_kinds>, as described under L</metadata>.
+The Core builder can describe AV support even when the chosen relay does not
+provide it; L<Net::Nostr::RelayGroups> rejects AV edits.
 
     my $event = Net::Nostr::Group->edit_metadata(
         pubkey       => $hex_pubkey,
@@ -708,14 +890,15 @@ example.
         restricted   => 1,                    # optional flag
         hidden       => 1,                    # optional flag
         closed       => 1,                    # optional flag
-        unrestricted => 1,                    # optional flag
-        open         => 1,                    # optional flag
-        visible      => 1,                    # optional flag
-        public       => 1,                    # optional flag
+        supported_kinds => [9, 11],           # optional text event kinds
     );
 
 Creates a kind 9002 moderation event to update group metadata. Metadata
-fields become tags. Boolean flags become single-element tags when true.
+fields become tags. Supplied flags must be C<0> or C<1>; true flags become
+single-element tags. To reverse flags, use C<public>, C<unrestricted>,
+C<visible>, or C<open>. Supplying both members of an opposing pair as true
+croaks. Display fields must be defined scalar strings. This is a strict
+structural builder returning an unsigned event; it does not authorize edits.
 
 =head2 delete_event
 
@@ -781,6 +964,10 @@ Creates a kind 9022 leave request event.
 
 =head2 metadata
 
+Supports the same C<banner>, C<parent>, and ordered C<children> fields and
+structural checks as L</edit_metadata>. It builds an unsigned metadata event;
+only the hosting relay's key should sign the result.
+
     my $event = Net::Nostr::Group->metadata(
         pubkey     => $relay_pubkey,
         group_id   => 'pizza',
@@ -798,7 +985,11 @@ Creates a kind 9022 leave request event.
 Creates a kind 39000 addressable event describing group metadata.
 This event should be signed by the relay's master key. Uses a C<d>
 tag (not C<h>) with the group id. C<supported_kinds>, when supplied,
-must be an arrayref.
+must be an arrayref of integer kinds from 0 through 65535. An empty array
+emits an empty tag (no supported text kinds); omission leaves kinds unlimited.
+Display fields must be defined scalar strings and flags must be C<0> or C<1>.
+Group IDs must be non-empty. This builder checks structure, including subgroup
+references, but does not verify relay ownership or other groups' state.
 
 =head2 admins
 
@@ -851,7 +1042,51 @@ Creates a kind 39004 addressable event listing current LiveKit
 participants. C<participants> must be an arrayref. This event should be
 signed by the relay's master key.
 
+=head2 update_pin_list
+
+    my $pins = [['e', $event_id], ['a', "30023:$alice_pk:post"]];
+    my $update = Net::Nostr::Group->update_pin_list(
+        pubkey => $alice_pk, group_id => 'pizza', pins => $pins,
+    );
+    my $announcement = Net::Nostr::Group->pinned_events(
+        pubkey => $relay_pk, group_id => 'pizza', pins => $pins,
+    );
+    my $decoded = Net::Nostr::Group->pins_from_event($announcement);
+
+Builds an unsigned kind 9010 moderation event. Requires C<pubkey>, C<group_id>,
+and C<pins>, an array of two-element tags. Each tag must be C<['e', $id]> with
+a 64-character lowercase hex event ID or C<['a', $coordinate]> referencing
+an addressable kind (30000 through 39999). The order is preserved; an empty
+array clears the pins. Accepts the usual C<reason>, C<previous>, and event
+fields. Invalid references, tag shapes, and missing fields croak. Authorization
+and a relay's optional pin count limit are enforced by the relay.
+C<previous> must be an array of eight-character lowercase hex timeline
+references. The relay checks whether those references belong to its history.
+
+=head2 pinned_events
+
+Builds unsigned relay metadata of kind 39005. Requires C<pubkey>, C<group_id>,
+and C<pins>, validated exactly as in L</update_pin_list>. Emits a C<d> tag and
+the ordered full pin list with empty content. Sign with the hosting relay key.
+
+=head2 pins_from_event
+
+Parses kind 9010 or 39005 into C<{ group_id =E<gt> $id, pins =E<gt> \@tags }>.
+Validates the kind, exactly one non-empty C<h> or C<d> group tag as appropriate,
+and every pin reference and tag shape. A C<previous> tag is permitted and its
+values must be eight-character lowercase hex strings; other
+tag names are rejected. Returns copied pin arrays. It does not authenticate
+the signature or check group administration; verify the event before trusting
+it. Parsing then rebuilding preserves the pin order, including an empty list.
+
 =head2 metadata_from_event
+
+The result includes C<banner>, C<parent>, and ordered C<children> when present.
+Requires exactly one non-empty C<d> tag. Recognized display, parent, flag,
+and supported-kind tags must have the correct shape and occur at most once.
+Self references, duplicate children, and invalid supported kinds croak.
+Unknown named tags are ignored. These are structural checks; validating a
+complete relay tree requires its other metadata and administrator lists.
 
     my $meta = Net::Nostr::Group->metadata_from_event($event);
     # { group_id => '...', name => '...', picture => '...',
@@ -860,7 +1095,9 @@ signed by the relay's master key.
 Parses a kind 39000 event. Returns a hashref with group metadata.
 Boolean flags (C<private>, C<restricted>, C<hidden>, C<closed>,
 C<livekit>) are set to 1 when present. C<supported_kinds> is returned
-as an arrayref when present. Croaks if the event is not kind 39000.
+as an arrayref when present. Requires a L<Net::Nostr::Event> of kind 39000;
+does not authenticate its ID or signature. Authenticate remote metadata before
+trusting it. The returned fields require no later structural validation.
 
 =head2 admins_from_event
 

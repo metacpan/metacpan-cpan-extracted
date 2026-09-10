@@ -457,3 +457,22 @@
 2.05    Jun 27, 2026
 
         Fixed formatting error for dump
+
+2.06    Sep 9, 2026
+
+        Fixed some bugs.
+
+2.07    Sep 9, 2026
+
+        Added "CANVAS" and "ENDCANVAS" tokens.  This draws graphics using
+        braille charachers.  At the moment, only "pixel" and "line"
+        primitives are supported.
+
+        Better handling of "UNDERLINE COLOR RGB red,green,blue" and
+        "UNDERLINE COLOR color" extended attributes.
+
+        Added testing for new features.
+
+2.08    Sep 9, 2026
+
+        Added overlooked "-t" tokens output for "ENDCANVAS"

@@ -1,5 +1,10 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.039     2026-09-09 22:03:38Z
+        - new "skip_tests" feature, using the same format as "todo_tests"
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/6648e8194c69697b2e1a15fe76a06a480b183a51...f6fd52a0a95472e079cbfc6ef7f089702b80e045
+
 1.038     2026-08-16 00:22:45Z
         - removed dependency on Ref::Util
         - updated test suite:

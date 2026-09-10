@@ -124,6 +124,40 @@ sub max {
       : $self->{from};
 }
 
+sub min_max {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my $iter  = $self->iter;
+    my $first = $iter->run() // return (undef, undef);
+
+    my ($min, $max) = ($first, $first);
+    my ($min_v, $max_v) = ($block->run($first), $block->run($first));
+
+    while (1) {
+        my $curr   = $iter->run() // last;
+        my $curr_v = $block->run($curr);
+        if (CORE::int($curr_v cmp $min_v) < 0) { $min = $curr; $min_v = $curr_v; }
+        if (CORE::int($curr_v cmp $max_v) > 0) { $max = $curr; $max_v = $curr_v; }
+    }
+
+    ($min, $max);
+}
+
+sub partition {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my (@yes, @no);
+    my $iter = $self->iter;
+    for (; ;) {
+        my $obj = $iter->run() // last;
+        $block->run($obj) ? push(@yes, $obj) : push(@no, $obj);
+    }
+
+    (Sidef::Types::Array::Array->new(\@yes), Sidef::Types::Array::Array->new(\@no));
+}
+
 sub step {
     $_[0]->{step};
 }
@@ -256,6 +290,31 @@ sub each {
 *for     = \&each;
 *foreach = \&each;
 
+sub group_by {
+    my ($self, $block) = @_;
+    my (%groups, @order);
+    my $iter = $self->iter;
+    for (; ;) {
+        my $obj = $iter->run() // last;
+        my $key = $block->run($obj);
+        my $k   = "$key";
+        push(@order, $key) unless exists $groups{$k};
+        push @{$groups{$k}}, $obj;
+    }
+    Sidef::Types::Hash::Hash->new(map { ("$_" => Sidef::Types::Array::Array->new($groups{"$_"})) } @order);
+}
+
+sub each_kv {
+    my ($self, $block) = @_;
+    my $i    = 0;
+    my $iter = $self->iter;
+    for (; ;) {
+        my $obj = $iter->run() // last;
+        $block->run(Sidef::Types::Number::Number::_set_int($i++), $obj);
+    }
+    $self;
+}
+
 sub while {
     my ($self, $block) = @_;
 
@@ -338,6 +397,19 @@ sub map {
     Sidef::Types::Array::Array->new(\@values);
 }
 
+sub zip {
+    my ($self, $other) = @_;
+    my $iter1 = $self->iter;
+    my $iter2 = $other->iter;
+    my @pairs;
+    for (; ;) {
+        my $a = $iter1->run() // last;
+        my $b = $iter2->run() // last;
+        push @pairs, Sidef::Types::Array::Array->new([$a, $b]);
+    }
+    Sidef::Types::Array::Array->new(\@pairs);
+}
+
 sub map_cons {
     my ($self, $n, $block) = @_;
     $self->to_a->map_cons($n, $block);
@@ -369,6 +441,18 @@ sub grep {
 }
 
 *select = \&grep;
+
+sub take_while {
+    my ($self, $block) = @_;
+    my @values;
+    my $iter = $self->iter;
+    for (; ;) {
+        my $obj = $iter->run() // last;
+        $block->run($obj) or last;
+        push @values, $obj;
+    }
+    Sidef::Types::Array::Array->new(\@values);
+}
 
 sub any {
     my ($self, $block) = @_;

@@ -8,7 +8,7 @@ use Test::More;
 use PunkTest;
 use Punk::Test;
 
-# Punk::Plugin::ConditionalGet, phase 1: the strong validator. The
+# Punk::Plugin::ConditionalGet: the strong validator. The
 # application names something it knows cheaply, and an unchanged resource
 # answers 304 WITHOUT THE HANDLER RUNNING - which is the whole point, and
 # the assertion that matters most in this file is the one counting how many
@@ -324,7 +324,7 @@ my $gapp = Guarded->to_app;
        'the plugin has nothing to configure, and says so';
 }
 
-# ---- phase 2: the body ETag --------------------------------------------------
+# ---- the body ETag -----------------------------------------------------------
 #
 # etag => 1 hashes the rendered bytes. It saves the wire and the client's
 # parse; it saves the server nothing, because the response was produced
@@ -473,7 +473,7 @@ sub breq {
        '...and its filehandle body was not consumed to hash it';
 }
 
-# ---- phase 3: the 304 as an HTTP message ------------------------------------
+# ---- the 304 as an HTTP message ---------------------------------------------
 #
 # A 304 is a response whose correctness is mostly about what is ABSENT.
 # Getting it wrong gives the worst failure this feature has - a client
@@ -629,7 +629,7 @@ is +(dreq('/strong', method => 'POST',
           env => { HTTP_IF_NONE_MATCH => '"dv1"' }))[0], 405,
    'and a method that is not GET or HEAD never reaches the check';
 
-# ---- phase 4: what a validator does to a shared cache -----------------------
+# ---- what a validator does to a shared cache --------------------------------
 #
 # An ETag is a storage instruction. A response that is per-user or
 # per-encoding, carrying a validator with nothing saying what it depends on,

@@ -109,8 +109,8 @@ register(self, app, opts = &PL_sv_undef)
             r = pcx_call_meth(aTHX_ app, "route", argv, 5, 1);
             if (r) SvREFCNT_dec(r);
 
-            /* /sitemap/1.xml, /2.xml and so on. A capture, so phase 1's rules
-             * keep it out of the sitemap with no option needed. */
+            /* /sitemap/1.xml, /2.xml and so on. A capture, so the listing
+             * rules keep it out of the sitemap with no option needed. */
             cap = newAV();
             av_push(cap, newSVsv(app));
             av_push(cap, newSViv(1));
@@ -168,7 +168,7 @@ register(self, app, opts = &PL_sv_undef)
     }
 
 # The rendered document for a part, or the index. Private, and what the
-# phase-2 tests parse.
+# tests parse.
 SV *
 _doc(class, app, n = 0)
         SV *class
@@ -231,8 +231,8 @@ _build(class, app)
         PERL_UNUSED_VAR(class);
         pks_build(aTHX_ app);
 
-# The robots.txt body. Private, and what the phase-4 tests compare against
-# the sitemap so the two cannot be shown to disagree.
+# The robots.txt body. Private, and what the tests compare against the
+# sitemap so the two cannot be shown to disagree.
 SV *
 _robots(class, app)
         SV *class
@@ -243,9 +243,9 @@ _robots(class, app)
     OUTPUT:
         RETVAL
 
-# The candidate paths, in sorted order. Private, and the seam the phase-1
-# tests assert through: a guarded route being ABSENT is the claim, and a
-# claim needs something to look at.
+# The candidate paths, in sorted order. Private, and the seam the tests
+# assert through: a guarded route being ABSENT is the claim, and a claim
+# needs something to look at.
 void
 _paths(class, app)
         SV *class
@@ -260,7 +260,7 @@ _paths(class, app)
             PUSHs(sv_2mortal(newSVsv(*av_fetch(out, i, 0))));
     }
 
-# The configured base, for phase 2 to join paths onto.
+# The configured base, joined onto each path.
 SV *
 _base(class, app)
         SV *class

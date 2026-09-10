@@ -309,6 +309,26 @@ Returns the Chebyshev (L∞, chessboard) distance between C<self> and C<other>: 
 
 =cut
 
+=head2 normalize
+
+    self.normalize
+
+Returns a new vector in the same direction as C<self> but with magnitude (L</abs>) C<1>. Returns C<self> unchanged if its magnitude is C<0>.
+
+    say(Vector(3, 4).normalize)   #=> Vector(0.6, 0.8)
+
+=cut
+
+=head2 lerp
+
+    self.lerp(other, t)
+
+Returns the point C<t> of the way from C<self> to C<other>: C<self + (other - self) * t>. C<t=0> gives C<self>, C<t=1> gives C<other>.
+
+    say(Vector(0, 0).lerp(Vector(10, 10), 0.5))   #=> Vector(5, 5)
+
+=cut
+
 =head2 atan2
 
     self.atan2(other)
@@ -316,6 +336,26 @@ Returns the Chebyshev (L∞, chessboard) distance between C<self> and C<other>: 
 Returns the angle (in radians, as a plain C<Number>) between C<self> and C<other> -- I<not> an element-wise arctangent. For vectors of exactly 2 elements, this is computed directly from their dot and cross products, giving a signed angle. For any other dimension, it's computed by projecting C<other> onto C<self>'s direction and taking the angle between the projection and the leftover perpendicular component -- which is always non-negative (between C<0> and π), since it relies on L</abs>.
 
     say(Vector(1, 0).atan2(Vector(0, 1)))   # pi/2 (~1.5708) -- a right angle
+
+=cut
+
+=head2 project
+
+    self.project(onto)
+
+Returns the vector projection of C<self> onto C<onto>: the component of C<self> that points in C<onto>'s direction.
+
+    say(Vector(3, 4).project(Vector(1, 0)))   #=> Vector(3, 0)
+
+=cut
+
+=head2 reject
+
+    self.reject(onto)
+
+Returns the vector rejection of C<self> from C<onto>: C<self> minus its L</project>ion onto C<onto> -- the leftover component perpendicular to C<onto>.
+
+    say(Vector(3, 4).reject(Vector(1, 0)))    #=> Vector(0, 4)
 
 =cut
 

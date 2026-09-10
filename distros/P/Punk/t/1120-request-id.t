@@ -220,8 +220,8 @@ sub hdr {
 }
 
 # ---- across a real worker pool -----------------------------------------------
-# Phase 0 proved this for the generator; this proves it through the plugin, on
-# forked processes, which is where the entropy buffer would betray it. Filled
+# Proved for the generator above; this proves it through the plugin, on forked
+# processes, which is where the entropy buffer would betray it. Filled
 # once and inherited, every worker hands out the same bytes - and it looks
 # perfectly random while doing it.
 SKIP: {

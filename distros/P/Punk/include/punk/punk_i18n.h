@@ -38,7 +38,7 @@
  * would be two orders of magnitude slower on the path that matters: a
  * Punk::Cache::File hit is about 7.2us, of which 6.2us is the open syscall,
  * so a page with forty translated strings would pay ~288us against a hash
- * probe now. plan_i18n/phase-0-the-catalogue.md has the whole argument.
+ * probe now.
  */
 
 /* ---- why the files are read in Perl --------------------------------------

@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+# PODNAME: luv
+# ABSTRACT: command-line dependency manager for love2d projects
+
+use v5.38;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Luv::CLI;
+
+Luv::CLI->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+luv - command-line dependency manager for love2d projects
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Nobunaga <nobunaga@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Ogun.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

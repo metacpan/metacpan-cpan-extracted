@@ -294,7 +294,7 @@ SKIP: {
 }
 
 # A tier makes a SHARED store unshared as far as Punk::Cache is concerned, and
-# the phase-0 check had to know the difference. This is that check, from the
+# the store check has to know the difference. This is that check, from the
 # other side: a tiered store is still a legitimate session store.
 {
     package TStillOk;

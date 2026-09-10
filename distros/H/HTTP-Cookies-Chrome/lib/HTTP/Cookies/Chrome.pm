@@ -96,7 +96,7 @@ use vars qw( $VERSION );
 use constant TRUE  => 1;
 use constant FALSE => 0;
 
-$VERSION = '3.002';
+$VERSION = '4.001';
 
 use DBI;
 
@@ -844,7 +844,7 @@ Jon Orwant pointed out the problem with dates too far in the future
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2009-2025, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2009-2026, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

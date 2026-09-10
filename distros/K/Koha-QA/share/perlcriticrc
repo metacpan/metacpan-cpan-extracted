@@ -1,0 +1,14 @@
+severity = 5
+include = ProhibitUnusedVariables Objects::ProhibitIndirectSyntax
+exclude = Miscellanea::RequireRcsKeywords
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval]
+allow_includes =1
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Modern::Perl
+
+[-Modules::RequireBarewordIncludes]

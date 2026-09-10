@@ -3,7 +3,7 @@ package MyApp;
 use Punk;
 use File::Basename ();
 
-# Phase 1-4 wiring: web routes + an under guard, Stencil views, the
+# The wiring: web routes + an under guard, Stencil views, the
 # spec-first API mounted under /api with the docs UI at /docs, and the
 # Book model over Punk::Model::DBI. The SQLite dsn comes from the
 # environment so t/1340-myapp.t can point it at a fixture it builds.

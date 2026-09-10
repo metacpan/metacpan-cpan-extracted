@@ -41,6 +41,15 @@ sub stringify {
 
 *pretty = \&stringify;
 
+sub reduce {
+    my ($x) = @_;
+    my $g = $x->{a}->gcd($x->{b});
+    ($g->is_zero or $g->is_one) and return $x;
+    __PACKAGE__->new($x->{a}->div($g), $x->{b}->div($g));
+}
+
+*simplify = \&reduce;
+
 sub is_nan {
     my ($x) = @_;
     if ($x->{a}->is_zero and $x->{b}->is_zero) {
@@ -55,6 +64,14 @@ sub is_real {
         return Sidef::Types::Bool::Bool::FALSE;
     }
     $x->{a}->is_real and $x->{b}->is_real;
+}
+
+sub mediant {
+    my ($x, $y) = @_;
+    if (ref($y) ne __PACKAGE__) {
+        $y = __PACKAGE__->new($y);
+    }
+    __PACKAGE__->new($x->{a}->add($y->{a}), $x->{b}->add($y->{b}));
 }
 
 sub eval {

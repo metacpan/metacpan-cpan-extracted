@@ -11,8 +11,8 @@ use Punk ();
 #
 #     get '/books/:id' => 'Web::Book#view', { name => 'book' };
 #
-# Phase 0 of plan_punk_named_routes/. Nothing here builds a URL - that is
-# $c->url_for, phase 1. What is proved here is the table it will read: the
+# Nothing here builds a URL - that is $c->url_for, in t/0114. What is proved
+# here is the table it will read: the
 # name reaches the compiled record, every name in the application resolves
 # to exactly one record index, and a name that could not work fails at the
 # line that wrote it rather than at a render.
@@ -81,7 +81,7 @@ use Punk ();
     }
 
     # the index is the one the dispatcher speaks, so it addresses the record
-    # holding the code - which is what phase 1 walks to build the URL
+    # holding the code - which is what url_for walks to build the URL
     is $recs->[ $names->{book} ]{path}, '/books/:id',
         'the index addresses the declared path, captures and all';
     is ref $recs->[ $names->{book} ]{code}, 'CODE',
@@ -93,7 +93,7 @@ use Punk ();
 # A name resolves to a RECORD index, and building a URL from a dynamic route
 # means reaching that record's parsed segments - which live in `recs`,
 # indexed by dynamic position, not by record index. dyn_of is the crossing,
-# filled in the one loop that fills recs. Nothing uses it until phase 1, so
+# filled in the one loop that fills recs. Nothing uses it until url_for, so
 # the invariant is asserted here rather than discovered wrong there.
 {
     my $rt    = NR::Accept->punk_app->{router};

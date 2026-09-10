@@ -11,7 +11,7 @@ use overload
     'bool' => sub { 1 },
     fallback => 1;
 
-our $VERSION = '1.2.3';
+our $VERSION = '1.3.0';
 
 my %RETRYABLE = (rate_limited => 1, server_error => 1, network => 1);
 

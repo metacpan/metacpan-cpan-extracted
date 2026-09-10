@@ -536,10 +536,49 @@ static SV *ft_request_once(pTHX_ SV *self_sv, ft_ua *ua, const char *method,
         ft_conn_hm_loop_next = ua->hm_loop;
         ft_conn_on_headers_next =
             (on_headers && SvROK(on_headers)) ? on_headers : NULL;
-        f = ft_h1_start(aTHX_ l, lsv, pl, u.host, portbuf, rb, rl, tls, verify,
-                        timeout, m_sv, sc_sv, au_sv, pa_sv, hdrs2_rv,
-                        body ? body : &PL_sv_undef,
-                        on_body ? on_body : &PL_sv_undef, NULL);
+        /* HTTP/3, when this origin has said it speaks it.
+         *
+         * There is no h3:// scheme, so nothing about the URL can ask for
+         * this: the only way to know is an Alt-Svc header on an earlier
+         * response over TCP (ft_altsvc.h). A cache miss is the ordinary case
+         * for a first request and takes the TCP path below, which is also
+         * what records the header for next time.
+         *
+         * The h3 attempt is not a commitment. If it fails - the libraries are
+         * not built in, the loop has no timer fine enough for loss detection,
+         * the UDP port is blocked, which is common enough on real networks to
+         * be the reason Alt-Svc is advisory - the future comes back failed
+         * rather than throwing, and the request falls back to TCP with
+         * nothing lost but the attempt. */
+        f = NULL;
+        if (tls && FT_H3_AVAILABLE) {
+            char origin[300];
+            ft_altsvc *alt;
+            snprintf(origin, sizeof origin, "%s:%d", u.host, u.port);
+            alt = ft_altsvc_get(origin);
+            if (alt) {
+                char h3port[16];
+                SV *hf;
+                snprintf(h3port, sizeof h3port, "%d", alt->port);
+                hf = ft_h3_start(aTHX_ l, lsv, pl, alt->host, h3port, verify,
+                                 timeout, m_sv, sc_sv, au_sv, pa_sv, hdrs2_rv,
+                                 body ? body : &PL_sv_undef,
+                                 on_body ? on_body : &PL_sv_undef);
+                if (hmf_state(aTHX_ hf) == HMF_FAILED) {
+                    /* it could not even be started; forget the advertisement
+                     * so the next request does not pay for this again */
+                    ft_altsvc_forget(origin);
+                    SvREFCNT_dec(hf);
+                } else {
+                    f = hf;
+                }
+            }
+        }
+        if (!f)
+            f = ft_h1_start(aTHX_ l, lsv, pl, u.host, portbuf, rb, rl, tls, verify,
+                            timeout, m_sv, sc_sv, au_sv, pa_sv, hdrs2_rv,
+                            body ? body : &PL_sv_undef,
+                            on_body ? on_body : &PL_sv_undef, NULL);
         ft_conn_on_headers_next = NULL;   /* borrowed; do not keep past the call */
         hmf_pin_loop(aTHX_ f, ua->loop);  /* only this loop can resolve it */
     }

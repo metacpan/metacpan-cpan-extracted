@@ -14,7 +14,7 @@ sub _validate_hex64 {
     my ($field, $values) = @_;
     for my $v (@$values) {
         croak "$field: '$v' is not 64-char lowercase hex"
-            unless $v =~ /^[0-9a-f]{64}$/;
+            unless $v =~ /\A[0-9a-f]{64}\z/;
     }
 }
 
@@ -22,14 +22,14 @@ sub _validate_kinds {
     my ($values) = @_;
     for my $v (@$values) {
         croak "kinds: '$v' is not a valid kind (integer 0-65535)"
-            unless defined $v && $v =~ /^\d+$/ && $v >= 0 && $v <= 65535;
+            unless defined $v && $v =~ /\A[0-9]+\z/ && $v >= 0 && $v <= 65535;
     }
 }
 
 sub _validate_non_negative_int {
     my ($field, $value) = @_;
     croak "$field must be a non-negative integer"
-        unless defined $value && $value =~ /^\d+$/;
+        unless defined $value && $value =~ /\A[0-9]+\z/;
 }
 
 use Class::Tiny qw(since until limit search _tag_filters);
@@ -49,7 +49,7 @@ sub new {
     my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     {
         my %known = map { $_ => 1 } (@SCALAR_FIELDS, @LIST_FIELDS);
-        my @unknown = grep { !$known{$_} && !/^#[a-zA-Z][a-zA-Z0-9_]*$/ } keys %args;
+        my @unknown = grep { !$known{$_} && !/\A#[a-zA-Z][a-zA-Z0-9_]*\z/ } keys %args;
         croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
     }
     my $self = bless {}, $class;
@@ -82,7 +82,7 @@ sub new {
     # extract #<tag-name> tag filters
     my %tf;
     for my $k (keys %args) {
-        if ($k =~ /^#([a-zA-Z][a-zA-Z0-9_]*)$/) {
+        if ($k =~ /\A#([a-zA-Z][a-zA-Z0-9_]*)\z/) {
             croak "$k must be a non-empty array"
                 unless ref($args{$k}) eq 'ARRAY' && @{$args{$k}};
             _validate_hex64("#$1", $args{$k}) if $HEX64_REQUIRED{$1};
@@ -263,13 +263,20 @@ Accepts named arguments as either a flat list or a single hash reference.
         '#t'    => ['nostr'],
     );
 
-All fields are optional. C<ids>, C<authors>, C<#e>, and C<#p> values must
-be 64-character lowercase hex strings. C<kinds> values must be integers
-between 0 and 65535. C<since>, C<until>, and C<limit> must be non-negative
-integers. C<search> must be a plain string (not a reference). Tag filter
-keys use the form C<#E<lt>nameE<gt>> where the name starts with a letter
-and may contain letters, digits, and underscores (e.g. C<#t>, C<#e>,
-C<#overnet_et>). Croaks on invalid values or unknown arguments.
+All fields are optional. C<ids>, C<authors>, C<kinds>, and tag filters must
+be non-empty array references. C<ids>, C<authors>, C<#e>, and C<#p> values
+must be exactly 64 lowercase ASCII hex characters. C<kinds> values must be
+integers between 0 and 65535. C<since>, C<until>, and C<limit> must be
+non-negative integers. Integer fields accept only ASCII decimal digits.
+C<search> must be a plain string (not a reference), or C<undef>. Tag filter
+keys use the form C<#E<lt>nameE<gt>> where the name starts with an ASCII
+letter and may contain ASCII letters, digits, and underscores (e.g. C<#t>,
+C<#e>, C<#overnet_et>).
+
+Hex strings, integer fields, and tag filter names are checked in full;
+whitespace, including a trailing newline, is rejected rather than trimmed.
+These format checks run during construction and croak on invalid values or
+unknown arguments; no later C<validate()> call is required.
 
 The C<search> field (NIP-50) is a human-readable query string. It may
 contain C<key:value> extension pairs (e.g. C<language:en>). See
@@ -327,15 +334,15 @@ includes fields that were set.
 
     my $ids = $filter->ids;  # arrayref or undef
 
-Event id prefixes to match. Events whose id starts with any of these
-hex strings are included.
+Event ids to match. Events whose id exactly matches any of these
+64-character lowercase hex strings are included.
 
 =head2 authors
 
     my $authors = $filter->authors;  # arrayref or undef
 
-Pubkey prefixes to match. Events whose pubkey starts with any of these
-hex strings are included.
+Pubkeys to match. Events whose pubkey exactly matches any of these
+64-character lowercase hex strings are included.
 
 =head2 kinds
 

@@ -69,7 +69,7 @@ Aliases: I<call>
 Returns the file's path exactly as given (or as joined, if constructed from multiple components), as a String -- this does not make it absolute or otherwise normalize it.
 
     var file = File("/home/user/file.txt")
-    say(file.name)                   #=> "/home/user/file.txt"
+    say file.name                   #=> "/home/user/file.txt"
 
 =cut
 
@@ -80,7 +80,7 @@ Returns the file's path exactly as given (or as joined, if constructed from mult
 Returns just the filename portion of the path (without any directory component), like the Unix C<basename> command.
 
     var file = File("/home/user/document.txt")
-    say(file.basename)               #=> "document.txt"
+    say file.basename               #=> "document.txt"
 
 Aliases: I<base>, I<base_name>
 
@@ -93,9 +93,30 @@ Aliases: I<base>, I<base_name>
 Returns the directory portion of the path, as a C<Dir> object (I<not> a plain String), like the Unix C<dirname> command.
 
     var file = File("/home/user/documents/file.txt")
-    say(file.dirname)                #=> Dir("/home/user/documents")
+    say file.dirname                #=> Dir("/home/user/documents")
 
 Aliases: I<dir>, I<dir_name>
+
+=cut
+
+=head2 extension
+
+    file.extension
+
+Returns the file's extension (without the leading dot), or an empty String if it has none.
+
+    say File("archive.tar.gz").extension   #=> "gz"
+    say File("README").extension           #=> ""
+
+=cut
+
+=head2 basename_without_ext
+
+    file.basename_without_ext
+
+Returns L</basename> with its final extension removed.
+
+    say File("/path/to/document.txt").basename_without_ext   #=> "document"
 
 =cut
 
@@ -475,13 +496,33 @@ Returns the size of the file in bytes.
 
 =cut
 
+=head2 lines
+
+    file.lines
+
+Opens the file, reads every line (terminators removed) into an C<Array> of Strings, and closes it. Returns C<nil> if the file can't be opened.
+
+    File("data.txt").lines.each {|line| say(line) }
+
+=cut
+
+=head2 each_line
+
+    file.each_line(block)
+
+Opens the file, calls C<block> once per line, and closes it again -- without you needing to call L</open_r> and close the handle yourself. Returns C<true> on success, C<false> if the file couldn't be opened.
+
+    File("data.txt").each_line {|line| say(line.uc) }
+
+=cut
+
 =head2 read
 
     file.read(layer="utf8")
 
 Reads and returns the entire contents of the file as a String, decoded through the given PerlIO C<layer> (I<without> a leading colon -- just the layer name itself, e.g. C<"utf8"> or C<"raw">). Defaults to UTF-8. Returns C<nil> if the file can't be opened.
 
-    var content = File("data.txt").read           # read as UTF-8 text
+    var content = File("data.txt").read            # read as UTF-8 text
     var binary  = File("data.bin").read("raw")     # read as raw bytes
 
 =cut
@@ -514,7 +555,6 @@ Appends C<string> to the end of the file (creating it if it doesn't exist), thro
 Rewrites the file in place, one I<line at a time>: C<block> is called once per line (each as a String, including its line terminator), and the collected return values of every call replace the file's entire content. C<block> does I<not> receive the whole file at once.
 
     File("text.txt").edit {|line| line.uc }
-
     File("config.ini").edit {|line| line.gsub(/old_value/, "new_value") }
 
 =cut
@@ -563,6 +603,24 @@ Compares the byte contents of C<self> and C<other>. Returns C<0> if identical, C
         when (0)  { say("Files are identical") }
         default   { say("Files differ") }
     }
+
+=cut
+
+=head2 is_newer_than
+
+    file.is_newer_than(other)
+
+Returns C<true> if this file's modification time is later than C<other>'s, C<false> if not, or C<nil> if either file doesn't exist.
+
+    File("build/app.js").is_newer_than(File("src/app.js")) || rebuild()
+
+=cut
+
+=head2 is_older_than
+
+    file.is_older_than(other)
+
+The inverse of L</is_newer_than>.
 
 =cut
 
@@ -731,6 +789,14 @@ Copies the file to C<destination> (a filename, or a C<File>/C<Dir> object). Retu
     File("source.txt").copy("backup.txt")
 
 Aliases: I<cp>
+
+=cut
+
+=head2 backup
+
+    file.backup(suffix=".bak")
+
+Copies the file to a new file with C<suffix> appended to its name (e.g. C<"data.txt.bak">). Returns C<true> on success, C<false> otherwise.
 
 =cut
 

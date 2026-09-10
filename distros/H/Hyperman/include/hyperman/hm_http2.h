@@ -33,6 +33,10 @@ typedef struct hm_h2_stream {
     int      resp_status;    /* streaming: stashed until close        */
     SV      *resp_headers;   /* streaming: stashed headers arrayref   */
     int      awaiting;       /* parked on a Future                    */
+    unsigned char producing; /* an open stream handle is feeding this:
+                              * the end of resp_body is not the end of
+                              * the body, so the provider defers       */
+    unsigned char prod_done; /* ... and now it is (stream_close ran)   */
     struct hm_h2_stream *next;
 } hm_h2_stream;
 
@@ -80,14 +84,26 @@ static void hm_h2_env_init(pTHX_ hm_h2_sess *s, HV *env) {
     hv_stores(env, "psgi.streaming",    newSViv(1));
     hv_stores(env, "psgi.nonblocking",  newSViv(1));
     hv_stores(env, "psgi.errors",       newRV_inc((SV *)PL_stderrgv));
+    /* The body is complete before the application ever sees it: a stream is
+     * dispatched on END_STREAM and psgi.input is built from the whole of
+     * st->body. Declared here with the rest of the environment rather than
+     * left to dispatch, because it is the only thing that tells an
+     * application a bodied request with no content-length - which is what h2
+     * sends for a streamed upload, having no Transfer-Encoding to use - can
+     * be read to EOF safely. */
+    hv_stores(env, "psgix.input.buffered", newSViv(1));
     if (!loop->self_sv) loop->self_sv = hm_loop_to_sv(aTHX_ loop);
     hv_stores(env, "psgix.loop",        SvREFCNT_inc(loop->self_sv));
 }
 
-static void hm_h2_add_header(pTHX_ hm_h2_stream *st,
+/* Request headers into $env. Takes the HV rather than a stream, because it
+ * only ever touched st->env and HTTP/3 needs exactly this: its
+ * pseudo-headers are HTTP/2's and QPACK yields the same lowercase pairs, so
+ * sharing it is the difference between one implementation and two that drift.
+ * hm_http3.h calls it with its own stream's env. */
+static void hm_h2_add_header(pTHX_ HV *env,
                              const char *nm, size_t nl,
                              const char *vl, size_t vlen) {
-    HV *env = st->env;
     if (nl && nm[0] == ':') {                       /* pseudo-headers */
         if (nl == 7 && memcmp(nm, ":method", 7) == 0)
             hv_stores(env, "REQUEST_METHOD", newSVpvn(vl, vlen));
@@ -96,6 +112,15 @@ static void hm_h2_add_header(pTHX_ hm_h2_stream *st,
         else if (nl == 10 && memcmp(nm, ":authority", 10) == 0) {
             hv_stores(env, "HTTP_HOST",   newSVpvn(vl, vlen));
             hv_stores(env, "SERVER_NAME", newSVpvn(vl, vlen));
+        }
+        else if (nl == 9 && memcmp(nm, ":protocol", 9) == 0) {
+            /* RFC 8441 / RFC 9220 Extended CONNECT: the only pseudo-header
+             * that has no HTTP/1.1 counterpart. It is what distinguishes a
+             * WebSocket handshake over h2 or h3 from an ordinary CONNECT
+             * tunnel, so it is surfaced under its own key rather than being
+             * folded into HTTP_UPGRADE and made to look like something it
+             * is not. */
+            hv_stores(env, "psgix.connect_protocol", newSVpvn(vl, vlen));
         }
         else if (nl == 5 && memcmp(nm, ":path", 5) == 0) {
             const char *q = (const char *)memchr(vl, '?', vlen);
@@ -220,6 +245,19 @@ static ssize_t hm_h2_data_read(nghttp2_session *ses, int32_t sid, uint8_t *buf,
     n = remain < length ? remain : length;
     if (n) memcpy(buf, bp + st->resp_off, n);
     st->resp_off += n;
+    if (st->producing) {
+        /* A live producer (hm_stream.h): running out of buffered bytes is
+         * not end of body. Drop what has gone out rather than letting the
+         * cursor run away for the life of the stream, then defer - nothing
+         * more can be said until stream_write resumes us. */
+        if (st->resp_off >= blen && st->resp_body) {
+            sv_setpvs(st->resp_body, "");
+            st->resp_off = 0;
+        }
+        if (st->prod_done) *data_flags |= NGHTTP2_DATA_FLAG_EOF;
+        else if (n == 0)   return NGHTTP2_ERR_DEFERRED;
+        return (ssize_t)n;
+    }
     if (st->resp_off >= blen) *data_flags |= NGHTTP2_DATA_FLAG_EOF;
     return (ssize_t)n;
 }
@@ -237,7 +275,10 @@ static int hm_h2_hopbyhop(const char *n, size_t l) {
 static void hm_h2_submit_response(pTHX_ hm_h2_sess *s, hm_h2_stream *st,
                                   int status, AV *hav) {
     SSize_t hn = hav ? av_len(hav) + 1 : 0;
-    size_t maxnv = 1 + (size_t)(hn / 2);
+    /* :status, every header pair, and one more slot for Alt-Svc. The
+     * count has to cover every nv this function can write - it is the
+     * bound on a heap array being filled by a loop. */
+    size_t maxnv = 2 + (size_t)(hn / 2);
     nghttp2_nv *nva = (nghttp2_nv *)hm_xmalloc(maxnv * sizeof(nghttp2_nv));
     char **freelist = (char **)hm_xmalloc(maxnv * sizeof(char *));
     size_t nfree = 0, n = 0;
@@ -270,6 +311,15 @@ static void hm_h2_submit_response(pTHX_ hm_h2_sess *s, hm_h2_stream *st,
         nva[n].flags = NGHTTP2_NV_FLAG_NONE; n++;
     }
 
+    /* Alt-Svc, the same advertisement the HTTP/1.1 path makes: an h2 client
+     * on this origin is told it can use HTTP/3 next time. Precomputed per
+     * listener, so this is a pointer and not an snprintf per response. */
+    if (s->conn->lst && s->conn->lst->altsvc) {
+        nva[n].name = (uint8_t *)"alt-svc"; nva[n].namelen = 7;
+        nva[n].value = (uint8_t *)s->conn->lst->altsvc;
+        nva[n].valuelen = strlen(s->conn->lst->altsvc);
+        nva[n].flags = NGHTTP2_NV_FLAG_NONE; n++;
+    }
     st->status = status;
     st->resp_off = 0;
     prd.source.ptr = st;
@@ -510,7 +560,18 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
         else
             hv_stores(env, "psgi.input", SvREFCNT_inc(hm_empty_input));
     }
-    hv_stores(env, "psgix.input.buffered", newSViv(1));  /* :scalar handle, seekable */
+    /* psgix.hyperman.stream: [fd, connection generation, stream id] - the
+     * ticket ABI v6's stream_open takes. Deliberately not published as
+     * psgix.hyperman.conn, which names an fd an application may take over
+     * and which h2 has nothing to put behind it. */
+    {
+        AV *tick = newAV();
+        av_extend(tick, 2);
+        av_store(tick, 0, newSViv(c->fd));
+        av_store(tick, 1, newSVuv(c->id));
+        av_store(tick, 2, newSViv(st->id));
+        hv_stores(env, "psgix.hyperman.stream", newRV_noinc((SV *)tick));
+    }
     env_rv = newRV_noinc((SV *)env);
     resp = hm_call_app(aTHX_ loop, env_rv);
     loop->requests++;
@@ -527,6 +588,16 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
         return;
     }
 
+    /* A stream handle already sent this stream's response - the application
+     * answered through the seam and its return value is the sentinel that
+     * goes with it, the way [101,[],[]] is on the detach path. Submitting it
+     * as well would put two responses on one stream, which is a protocol
+     * error the client sees and the server does not. */
+    if (st->producing) {
+        if (resp) SvREFCNT_dec(resp);
+        SvREFCNT_dec(env_rv);
+        return;
+    }
     hm_h2_respond(aTHX_ s, st, resp);
     if (hm_logging(loop))
         hm_access_log(aTHX_ loop, env_rv, st->status, (ssize_t)st->blen);
@@ -576,7 +647,7 @@ static int hm_h2_cb_header(nghttp2_session *ses, const nghttp2_frame *frame,
     st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(
              ses, frame->hd.stream_id);
     if (st && st->env)
-        hm_h2_add_header(aTHX_ st, (const char *)name, namelen,
+        hm_h2_add_header(aTHX_ st->env, (const char *)name, namelen,
                          (const char *)value, valuelen);
     return 0;
 }
@@ -585,24 +656,54 @@ static int hm_h2_cb_data_chunk(nghttp2_session *ses, uint8_t flags,
                                int32_t sid, const uint8_t *data,
                                size_t len, void *ud) {
     dTHX;
+    hm_h2_sess *s = (hm_h2_sess *)ud;
     hm_h2_stream *st;
-    (void)ud; (void)flags;
+    (void)flags;
     st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(ses, sid);
     if (!st) return 0;
+    /* A stream handle with a read callback takes these bytes instead. An
+     * Extended CONNECT stream has no end, so buffering it into psgi.input
+     * would grow without bound and nothing would ever read it. */
+    if (hm_stream_deliver(aTHX_ s->conn->fd, s->conn->id, (int64_t)sid,
+                          (const char *)data, (STRLEN)len, 0))
+        return 0;
     if (!st->body) st->body = newSVpvn((const char *)data, len);
     else           sv_catpvn(st->body, (const char *)data, len);
     return 0;
+}
+
+/* Does this request's environment carry an Extended CONNECT :protocol? */
+static int hm_h2_is_connect(pTHX_ HV *env) {
+    SV **p;
+    if (!env) return 0;
+    p = hv_fetchs(env, "psgix.connect_protocol", 0);
+    return p && *p && SvOK(*p) && SvCUR(*p) > 0;
 }
 
 static int hm_h2_cb_frame_recv(nghttp2_session *ses,
                                const nghttp2_frame *frame, void *ud) {
     dTHX;
     hm_h2_sess *s = (hm_h2_sess *)ud;
-    if ((frame->hd.type == NGHTTP2_DATA || frame->hd.type == NGHTTP2_HEADERS)
-        && (frame->hd.flags & NGHTTP2_FLAG_END_STREAM)) {
+    if (frame->hd.type != NGHTTP2_DATA && frame->hd.type != NGHTTP2_HEADERS)
+        return 0;
+    {
         hm_h2_stream *st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(
                                ses, frame->hd.stream_id);
-        if (st && st->env) hm_h2_dispatch(aTHX_ s, st);
+        if (!st || !st->env) return 0;
+        if (frame->hd.flags & NGHTTP2_FLAG_END_STREAM) {
+            hm_h2_dispatch(aTHX_ s, st);
+            return 0;
+        }
+        /* An Extended CONNECT stream has no end: the client sends headers
+         * and then holds the stream open for as long as the session lasts.
+         * Waiting for END_STREAM here would mean never dispatching it at
+         * all, so it goes to the application as soon as the headers are
+         * complete - which is also when the application has everything it
+         * needs to accept or refuse the upgrade. */
+        if (frame->hd.type == NGHTTP2_HEADERS
+            && (frame->hd.flags & NGHTTP2_FLAG_END_HEADERS)
+            && hm_h2_is_connect(aTHX_ st->env))
+            hm_h2_dispatch(aTHX_ s, st);
     }
     return 0;
 }
@@ -626,6 +727,9 @@ static int hm_h2_cb_stream_close(nghttp2_session *ses, int32_t sid,
     hm_h2_stream *st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(
                            ses, sid);
     (void)error_code;
+    /* A peer can reset one stream out of many; any stream handle still open
+     * on it has to hear about it before st is freed underneath it. */
+    if (s->conn) hm_stream_h2_gone(aTHX_ s->conn->fd, s->conn->id, (int64_t)sid);
     if (st) {
         nghttp2_session_set_stream_user_data(ses, sid, NULL);
         hm_h2_stream_free(aTHX_ s, st);
@@ -672,10 +776,15 @@ static int hm_h2_new_session(pTHX_ hm_conn *c) {
 }
 
 static void hm_h2_submit_our_settings(hm_h2_sess *s) {
-    nghttp2_settings_entry iv[1];
+    nghttp2_settings_entry iv[2];
     iv[0].settings_id = NGHTTP2_SETTINGS_MAX_CONCURRENT_STREAMS;
     iv[0].value = 100;
-    nghttp2_submit_settings(s->session, NGHTTP2_FLAG_NONE, iv, 1);
+    /* RFC 8441 Extended CONNECT. Without this a client will not attempt a
+     * WebSocket over HTTP/2 at all - the setting IS the advertisement, and
+     * there is no other way to say the server understands :protocol. */
+    iv[1].settings_id = NGHTTP2_SETTINGS_ENABLE_CONNECT_PROTOCOL;
+    iv[1].value = 1;
+    nghttp2_submit_settings(s->session, NGHTTP2_FLAG_NONE, iv, 2);
 }
 
 static int hm_h2_start(pTHX_ hm_conn *c) {

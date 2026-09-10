@@ -4,23 +4,19 @@
 /* hm_compress.h - gzip on the way out.
  *
  * Why this layer and not the framework: compression is a property of the
- * write path, and Hyperman serves apps that are not Punk - the
- * openapi-proxy gateway calls Hyperman->run directly and is the heaviest
- * JSON-over-the-wire consumer there is. A framework-level compressor would
- * give the app that needs it most nothing. Hyperman is also the only layer
- * that could ever compress a STREAMED body, since a framework hands
- * psgi.streaming responses off as coderefs and never sees the bytes.
- * (Streaming compression is not in this release; choosing this layer is
- * what leaves the door open.)
+ * write path, and Hyperman serves apps that are not Punk. It is also the
+ * only layer that could ever compress a STREAMED body, since a framework
+ * hands psgi.streaming responses off as coderefs and never sees the bytes
+ * (streaming compression is not in this release; this layer leaves the door
+ * open).
  *
- * THE ANTI-COLLISION RULE, which is the whole contract with anything above:
- * we never touch a response that already carries a Content-Encoding. A
- * framework serving precompressed files off disk sets `gzip`; a route that
- * opts out sets `identity`, which we strip before writing. That channel is
- * a plain response header, so it is a contract any PSGI framework can use,
- * not a private arrangement with one of them.
+ * THE ANTI-COLLISION RULE, the whole contract with anything above: never
+ * touch a response that already carries a Content-Encoding. A framework
+ * serving precompressed files sets `gzip`; a route that opts out sets
+ * `identity`, which we strip before writing. That channel is a plain
+ * response header, so any PSGI framework can use it.
  *
- * Off by default: a server that starts compressing on upgrade is a
+ * Off by default - a server that starts compressing on upgrade is a
  * surprise. `compress => 1` on run() turns it on.
  *
  * Everything is prefixed hz_ / HZ_. Included from hm_core.h after hm_win.h.

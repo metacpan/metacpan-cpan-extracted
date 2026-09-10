@@ -138,6 +138,14 @@ reference to the app name and context (or any other arbitrary string).
 Kind 78 is a normal event form for app data that should not replace prior
 events. The C<content> and other tags can be anything or in any format.
 
+These kinds hold private application storage. Use dedicated event kinds for
+public data or interchange between applications. NIP-78 recommends NIP-42
+authentication before publication or retrieval, with reads restricted to the
+authenticated event author. L<Net::Nostr::Relay> enforces this policy for both
+kinds, including stored and live delivery, COUNT, and negentropy. Authenticate
+with the author key before publishing or requesting app data. Access control
+does not encrypt the stored content; the hosting relay can read it.
+
 Use cases include:
 
 =over 4

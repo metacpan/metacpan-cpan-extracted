@@ -257,3 +257,6 @@ is used in combination with a UTF-8 input encoding.
 van-de-bugger, for finding a bug in C<> heuristics for adding quotes that
 made the wrong decision in some cases where the contents of C<> included
 newlines.
+
+Jitka Plesnikova, for discovering that the wrapping approach in Pod::Text
+and submodules could go into an infinite loop.

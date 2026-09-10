@@ -163,7 +163,16 @@ _hm_detach(env)
         if (rc != 0)
             croak("Punk::WebSocket: detach failed (%d: %s)", rc,
                   rc == -1 ? "connection gone or stale"
-                : rc == -2 ? "HTTP/2 cannot be detached"
+                  /* Not the end of the story, and the message should not
+                   * read as though it were: a multiplexed transport carries
+                   * WebSocket through Extended CONNECT (RFC 8441 on h2, RFC
+                   * 9220 on h3), which needs no descriptor at all. Hyperman
+                   * serves that handshake; wiring it into this ladder is
+                   * still to do. */
+                : rc == -2 ? "HTTP/2 streams share one connection, so there "
+                             "is no descriptor to hand over; WebSocket over "
+                             "h2 needs Extended CONNECT, which this ladder "
+                             "does not use yet"
                 : rc == -3 ? "TLS cannot be detached"
                 : rc == -4 ? "a response is still draining"
                 : rc == -5 ? "already detached" : "unknown");
@@ -220,6 +229,46 @@ _attach(class, fd, handshake, opts)
                               pw_on_readable, ws);
             ws->reading = 1;
         }
+    }
+    OUTPUT:
+        RETVAL
+
+# Attach to an Extended CONNECT stream (RFC 8441 on HTTP/2, RFC 9220 on
+# HTTP/3) rather than to a descriptor.
+#
+# There is no socket here and no handshake bytes to flush: the 200 and its
+# headers went out when the stream handle was opened, because on a
+# multiplexed transport the acceptance IS the response. Everything after
+# that point - framing, masking, ping/pong, the close handshake - is the
+# same codec the detached path uses, which is why this is a second door and
+# not a second implementation.
+SV *
+_attach_stream(class, handle, opts)
+        SV *class
+        IV  handle
+        SV *opts
+    CODE:
+    {
+        punk_wsconn *ws;
+        HV *o = (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
+              ? (HV *)SvRV(opts) : NULL;
+        const hm_abi *A = punk_hm(aTHX);
+        if (!A) croak("Punk::WebSocket: Hyperman's ABI is unavailable");
+        if (A->abi_version < 8 || !A->stream_on_data)
+            croak("Punk::WebSocket: websocket over HTTP/2 or HTTP/3 needs "
+                  "Hyperman's ABI v8 (the read half of a stream handle)");
+        if (!handle) croak("Punk::WebSocket: no stream handle");
+        ws = pw_new(aTHX_ -1, o);          /* -1: there is no descriptor */
+        ws->abi  = A;
+        ws->loop = A->cur_loop(aTHX);
+        ws->sh   = INT2PTR(void *, handle);
+        if (!ws->loop) { pw_free(aTHX_ ws);
+                         croak("Punk::WebSocket: no running loop"); }
+        RETVAL = sv_setref_iv(newSV(0), SvPV_nolen(class), PTR2IV(ws));
+        ws->self_rv = newSVsv(RETVAL);
+        ws->state   = PW_ST_OPEN;
+        (void)A->stream_on_data(aTHX_ ws->sh, pw_on_stream_data, ws);
+        (void)A->stream_on_abort(aTHX_ ws->sh, pw_on_stream_abort, ws);
     }
     OUTPUT:
         RETVAL

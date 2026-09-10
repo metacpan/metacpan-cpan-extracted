@@ -188,15 +188,13 @@ subtest 'comment() rejects missing content' => sub {
     );
 };
 
-subtest 'comment() rejects kind 1 event' => sub {
+subtest 'comment() accepts kind 1 event' => sub {
     my $note = make_event(
         id => $event_id, pubkey => $alice_pk, kind => 1, content => 'hello',
     );
-    like(
-        dies { Net::Nostr::Comment->comment(event => $note, pubkey => $bob_pk, content => 'hi') },
-        qr/kind 1/,
-        'kind 1 event rejected'
-    );
+    my $comment = Net::Nostr::Comment->comment(event => $note, pubkey => $bob_pk, content => 'hi');
+    is $comment->kind, 1111, 'kind 1 reply is a comment';
+    ok lives { Net::Nostr::Comment->validate($comment) }, 'comment validates';
 };
 
 subtest 'comment() rejects missing event and identifier' => sub {

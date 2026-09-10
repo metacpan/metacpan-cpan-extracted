@@ -8,27 +8,22 @@
  *     Hyperman->on_worker_start(sub { $dbh = DBI->connect(...) });
  *     Hyperman->run(app => $app, workers => 4);
  *
- * A prefork server needs that and PSGI has no standard for it. Anything
+ * A prefork server needs that and PSGI has no standard for it: anything
  * holding a file descriptor - a database handle, a cache connection, a
- * seeded RNG - is wrong in a child that inherited it from the parent, and
- * until now the only ways to deal with that under Hyperman were to be an XS
- * module or to detect the fork yourself on the first request.
+ * seeded RNG - is wrong in a child that inherited it.
  *
  * Register BEFORE run(). The registry is walked in the child once its loop
  * exists and before the loop starts turning, so a callback registered after
- * run() has already forked will never fire in the workers already running.
+ * run() has forked never fires in the workers already running.
  *
  * The coderef survives the fork for free: it lives in the parent interpreter,
  * which is what a child gets a copy of. That is why this can hold an SV where
- * hm_workerhook.h deliberately does not - it stores a pointer into memory the
- * fork duplicates wholesale, not a resource the child would have to reopen.
+ * hm_workerhook.h deliberately does not.
  *
- * A callback runs at worker boot, before anything is being served, so there
- * is no request for a death to damage - but a die propagating out of here
- * would come up through hm_worker and take the whole worker with it, before
- * it has served anything. So the shim runs under G_EVAL and turns a death
- * into a warning: a worker that could not run your setup code is still a
- * worker, and one that never starts is an outage.
+ * The shim runs under G_EVAL and turns a death into a warning. A die
+ * propagating out of here would come up through hm_worker and take the whole
+ * worker with it before it had served anything; a worker that could not run
+ * your setup code is still a worker.
  *
  * Needs hm_workerhook.h. Included after it.
  */

@@ -42,8 +42,10 @@ subtest 'distribution version is self-consistent' => sub {
     ok(defined $version, "$dist declares a \$VERSION") or return;
 
     my $changes = _slurp('Changes');
-    my ($top) = $changes =~ /\A(\S+)\s+\d{4}-\d{2}-\d{2}/;
-    ok(defined $top, "$dist Changes opens with a dated release entry") or return;
+    my $released_changes = $changes;
+    $released_changes =~ s/\AUnreleased\b.*?(?=^\S)//ms;
+    my ($top) = $released_changes =~ /\A(\S+)\s+\d{4}-\d{2}-\d{2}/;
+    ok(defined $top, "$dist Changes has a dated release entry after any Unreleased section") or return;
     is($version, $top, "$dist \$VERSION ($version) matches its latest Changes entry ($top)");
 
     like($version, qr/\A1\./, "$dist keeps its 1.x version line");
@@ -114,7 +116,7 @@ subtest 'unrecommended NIPs removed from Core surface' => sub {
 };
 
 subtest 'NIP conformance target is documented' => sub {
-    my $target = '8f8444d05a8842c40211ded5d10af3521541f865';
+    my $target = 'c3fd9af17939316bf6d0d83a5759100f8b0a1bdb';
     my $source = _slurp($main_module);
     like($source, qr/nostr-protocol\/nips/, "$main_module names the NIP repository");
     like($source, qr/\Q$target\E/, "$main_module documents the exact NIP commit");

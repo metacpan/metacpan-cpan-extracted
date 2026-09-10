@@ -4,7 +4,7 @@ Data::Record::Serialize - Flexible serialization of a record
 
 # VERSION
 
-version 2.04
+version 2.05
 
 # SYNOPSIS
 

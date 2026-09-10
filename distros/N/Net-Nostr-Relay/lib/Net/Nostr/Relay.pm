@@ -2,7 +2,7 @@ package Net::Nostr::Relay;
 
 use strictures 2;
 
-our $VERSION = '1.001001';
+our $VERSION = '1.002000';
 
 use Net::Nostr::_ConstructorArgs ();
 
@@ -25,6 +25,14 @@ use Net::Nostr::Negentropy;
 use Net::Nostr::RelayInfo;
 
 use Net::Nostr::RelayStore;
+use Net::Nostr::RelayGroups;
+use Scalar::Util qw(blessed);
+
+sub eose_hints {
+    my ($self, @args) = @_;
+    croak 'eose_hints is read-only' if @args;
+    return $self->{eose_hints};
+}
 
 use Class::Tiny qw(
     _server
@@ -63,6 +71,8 @@ use Class::Tiny qw(
     _sub_by_kind
     _sub_no_kind
     _neg_sessions
+    eose_hints
+    groups
 );
 
 sub connections {
@@ -83,6 +93,27 @@ sub new {
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
     $self->verify_signatures(1) unless defined $self->verify_signatures;
+    if (exists $self->{groups}) {
+        croak 'groups must be a Net::Nostr::RelayGroups policy'
+            unless blessed($self->groups) && $self->groups->isa('Net::Nostr::RelayGroups');
+        my $info = $self->relay_info ? JSON::decode_json($self->relay_info->to_json) : {supported_nips=>[1,42,78]};
+        push @{$info->{supported_nips}},29 unless grep { $_ == 29 } @{$info->{supported_nips} || []};
+        $info->{self} = $self->groups->pubkey;
+        $info->{nip29} = {subgroups=>JSON::true};
+        $self->relay_info(Net::Nostr::RelayInfo->new(%$info));
+    }
+    $self->{eose_hints} = 0 unless exists $self->{eose_hints};
+    croak 'eose_hints must be 0 or 1'
+        unless defined($self->{eose_hints}) && !ref($self->{eose_hints})
+            && $self->{eose_hints} =~ /\A[01]\z/;
+    if ($self->eose_hints) {
+        my $info = $self->relay_info
+            ? JSON::decode_json($self->relay_info->to_json)
+            : { supported_nips => [1, 42, 78] };
+        push @{$info->{supported_nips}}, 67
+            unless grep { $_ == 67 } @{$info->{supported_nips} || []};
+        $self->relay_info(Net::Nostr::RelayInfo->new(%$info));
+    }
 
     # Validate event_rate_limit format
     if (defined $self->event_rate_limit) {
@@ -372,6 +403,7 @@ sub broadcast {
     for my $entry (values %candidates) {
         my ($conn_id, $sub_id) = @$entry;
         my $conn = $self->_connections->{$conn_id} or next;
+        next unless $self->_can_read($conn_id, $event);
         my $filters = $subs->{$conn_id}{$sub_id} or next;
         if (Net::Nostr::Filter->matches_any($event, @$filters)) {
             $conn->send(Net::Nostr::Message->new(type => 'EVENT', subscription_id => $sub_id, event => $event)->serialize);
@@ -635,6 +667,14 @@ sub _handle_event {
         return;
     }
 
+    # NIP-78 app data belongs to the authenticated author.
+    if (($event->kind == 78 || $event->kind == 30078)
+        && !(($self->_authenticated || {})->{$conn_id} || {})->{$event->pubkey}) {
+        $conn->send(Net::Nostr::Message->new(type => 'OK', event_id => $event->id,
+            accepted => 0, message => 'auth-required: app data requires its authenticated owner')->serialize);
+        return;
+    }
+
     # Content length limit
     if (defined $self->max_content_length && length($event->content) > $self->max_content_length) {
         $conn->send(Net::Nostr::Message->new(type => 'OK', event_id => $event->id, accepted => 0, message => 'invalid: content too long')->serialize);
@@ -721,6 +761,19 @@ sub _handle_event {
         return;
     }
 
+    my $group_plan;
+    if ($self->groups) {
+        $group_plan = eval { $self->groups->prepare($event,$self->store) };
+        if ($@) {
+            my $reason = $@;
+            $reason =~ s/ at .*//s;
+            $reason = "invalid: $reason" unless $reason =~ /\A[\w-]+:/;
+            $conn->send(Net::Nostr::Message->new(type=>'OK',event_id=>$event->id,
+                accepted=>0,message=>$reason)->serialize);
+            return;
+        }
+    }
+
     # ephemeral events: broadcast but don't store
     if ($event->is_ephemeral) {
         $conn->send(Net::Nostr::Message->new(type => 'OK', event_id => $event->id, accepted => 1, message => '')->serialize);
@@ -760,6 +813,19 @@ sub _handle_event {
     }
 
     $self->store->store($event);
+    if ($group_plan) {
+        # Reconciliation snapshots must not outlive changes to group access.
+        $self->_neg_sessions({}) if @{$group_plan->{events}} || @{$group_plan->{delete_ids}};
+        $self->store->delete_by_id($_) for @{$group_plan->{delete_ids}};
+        for my $generated (@{$group_plan->{events}}) {
+            if ($generated->is_addressable) {
+                my $previous = $self->store->find_addressable($generated->pubkey,$generated->kind,$generated->d_tag);
+                $self->store->delete_by_id($previous->id) if $previous;
+            }
+            $self->store->store($generated);
+        }
+        $self->broadcast($_) for @{$group_plan->{events}};
+    }
     $conn->send(Net::Nostr::Message->new(type => 'OK', event_id => $event->id, accepted => 1, message => '')->serialize);
     $self->broadcast($event);
 }
@@ -834,6 +900,55 @@ sub _handle_auth {
     $conn->send(Net::Nostr::Message->new(type => 'OK', event_id => $event->id, accepted => 1, message => '')->serialize);
 }
 
+sub _can_read {
+    my ($self, $conn_id, $event) = @_;
+    my $authed = ($self->_authenticated || {})->{$conn_id} || {};
+    return 0 if $self->groups && !$self->groups->can_read($event,$authed,$self->store);
+    return 1 unless $event->kind == 78 || $event->kind == 30078;
+    return !!$authed->{$event->pubkey};
+}
+
+sub _auth_may_help {
+    my ($self, $conn_id, $filters) = @_;
+    my $authed = ($self->_authenticated || {})->{$conn_id} || {};
+    for my $filter (@$filters) {
+        my $kinds = $filter->kinds;
+        next if $kinds && !grep { $_ == 78 || $_ == 30078 } @$kinds;
+        my $authors = $filter->authors;
+        return 1 unless $authors;
+        return 1 if grep { !$authed->{$_} } @$authors;
+    }
+    return 0;
+}
+
+# Apply authorization before per-filter limits and union the results. Backends
+# must honor an absent limit by returning the complete matching stored set.
+sub _query_visible {
+    my ($self, $conn_id, $filters, $ignore_limits) = @_;
+    my (%selected, %available);
+    for my $filter (@$filters) {
+        my $hash = $filter->to_hash;
+        delete $hash->{limit};
+        my $all = $self->store->query([Net::Nostr::Filter->new(%$hash)]);
+        my @visible = grep { $self->_can_read($conn_id, $_) } @$all;
+        $available{$_->id} = 1 for @visible;
+        my $limit = $ignore_limits ? undef : $filter->limit;
+        my $n = defined($limit) && $limit < @visible ? $limit : scalar @visible;
+        if (!$ignore_limits && $self->eose_hints && $n > 0) {
+            my $boundary = $visible[$n - 1]->created_at;
+            while ($n < @visible && $visible[$n]->created_at == $boundary
+                && (!defined($self->max_limit) || $n < $self->max_limit)) {
+                $n++;
+            }
+        }
+        for my $i (0 .. $n - 1) {
+            $selected{$visible[$i]->id} = $visible[$i];
+        }
+    }
+    my @results = sort { $b->created_at <=> $a->created_at || $a->id cmp $b->id } values %selected;
+    return (\@results, scalar(keys %selected) < scalar(keys %available));
+}
+
 sub _handle_req {
     my ($self, $conn_id, $sub_id, @filters) = @_;
     my $conn = $self->_connections->{$conn_id};
@@ -879,13 +994,19 @@ sub _handle_req {
     $self->_subscriptions->{$conn_id}{$sub_id} = \@filters;
     $self->_add_to_sub_index($conn_id, $sub_id, \@filters);
 
-    my $results = $self->store->query(\@filters);
+    my ($results, $more) = $self->_query_visible($conn_id, \@filters);
 
     for my $event (@$results) {
         $conn->send(Net::Nostr::Message->new(type => 'EVENT', subscription_id => $sub_id, event => $event)->serialize);
     }
 
-    $conn->send(Net::Nostr::Message->new(type => 'EOSE', subscription_id => $sub_id)->serialize);
+    my @hints;
+    if ($self->eose_hints) {
+        push @hints, 'auth' if $self->_auth_may_help($conn_id, \@filters);
+        push @hints, $more ? 'more' : 'finish';
+    }
+    $conn->send(Net::Nostr::Message->new(type => 'EOSE', subscription_id => $sub_id,
+        ($self->eose_hints ? (hints => \@hints) : ()))->serialize);
 }
 
 sub _handle_count {
@@ -900,7 +1021,8 @@ sub _handle_count {
         return;
     }
 
-    my $count = $self->store->count(\@filters);
+    my ($visible) = $self->_query_visible($conn_id, \@filters, 1);
+    my $count = scalar @$visible;
 
     $conn->send(Net::Nostr::Message->new(
         type => 'COUNT', subscription_id => $sub_id, count => $count,
@@ -932,7 +1054,7 @@ sub _handle_neg_open {
     my $unlimited_filter = Net::Nostr::Filter->new(%$filter_hash);
 
     my $ne = Net::Nostr::Negentropy->new;
-    my $events = $self->store->query([$unlimited_filter]);
+    my ($events) = $self->_query_visible($conn_id, [$unlimited_filter], 1);
     for my $ev (@$events) {
         $ne->add_item($ev->created_at, $ev->id);
     }
@@ -1135,6 +1257,15 @@ Supports all NIP-01 event semantics:
 
 =head2 new
 
+Kinds 78 and 30078 are private application data under NIP-78. Publication
+requires NIP-42 authentication as the event author; rejection uses
+C<auth-required:>. Reads, live subscriptions, COUNT, and negentropy expose
+only events owned by one of the connection's authenticated identities.
+Unauthorized reads omit those events. Authentication can be repeated for
+multiple identities on the same connection. After authentication, reissue REQ
+to retrieve previously hidden stored data. Local C<inject_event> and C<events>
+are trusted administrative storage APIs; wire reads still apply this policy.
+
 Accepts named arguments as either a flat list or a single hash reference.
 
     my $relay = Net::Nostr::Relay->new;
@@ -1198,6 +1329,24 @@ front of the relay or serve the document separately.
         ),
     );
 
+=item C<eose_hints> - Enable NIP-67 completeness hints. Must be C<0> or C<1>;
+default C<0> preserves two-element EOSE messages. When enabled, emits
+C<finish> if all authorized matching stored events were sent, otherwise
+C<more>. Adds C<auth> when authenticating additional authors may reveal
+app data. The connection's AUTH challenge is sent before any EOSE.
+NIP-11 gains C<67>; a minimal information document is created if necessary.
+
+Hints describe the union of all filters after authorization. Timestamp ties
+at a positive limit are included together when they fit C<max_limit>.
+An explicit zero limit remains zero, and live delivery is unaffected.
+
+=item C<groups> - Optional L<Net::Nostr::RelayGroups> policy object. Omitted
+by default. Enables group moderation, pins, subgroup trees, and member-only
+reads for private groups. NIP-11 advertises C<29>, C<nip29.subgroups>, and the
+policy's signing public key as C<self>. See that module for role policy,
+timestamp restrictions, durable storage requirements, and unsupported AV
+services. Do not replace the policy while the relay is running.
+
 =item C<ssl_cert_file> - Path to a PEM certificate file used to accept secure
 WebSocket listeners (C<wss://>). The PEM file may contain both the certificate
 and private key. Default: C<undef> (plain C<ws://> listener).
@@ -1214,6 +1363,12 @@ C<ssl_cert_file>. Default: C<undef>. If set, C<ssl_cert_file> is required.
 interface as L<Net::Nostr::RelayStore> (duck-typed). When provided,
 C<max_events> is ignored (configure it on the store directly). Default: a new
 L<Net::Nostr::RelayStore> instance.
+
+Queries without a limit must return the complete matching stored set, ordered
+by descending timestamp and ascending ID. The relay applies owner visibility
+before per-filter limits and deduplication, including COUNT and negentropy.
+This may read more records than the requested limit; custom backends must
+not silently cap unlimited queries.
 
     use Net::Nostr::RelayStore;
 
@@ -1547,6 +1702,15 @@ Returns the maximum event content length in bytes, or C<undef> if unlimited.
 
 Returns the maximum event tag count, or C<undef> if unlimited.
 
+=head2 eose_hints
+
+Read-only accessor for the boolean NIP-67 constructor option. Defaults to C<0>.
+
+=head2 groups
+
+Returns the optional L<Net::Nostr::RelayGroups> policy or C<undef>. Configure
+it at construction; changing policy while connections are active is unsupported.
+
 =head2 max_limit
 
     my $max = $relay->max_limit;
@@ -1611,6 +1775,10 @@ Keys are connection IDs, values are hashrefs of pubkey hex strings.
     }
 
 =head1 SEE ALSO
+
+L<NIP-67|https://github.com/nostr-protocol/nips/blob/master/67.md>,
+L<NIP-78|https://github.com/nostr-protocol/nips/blob/master/78.md>,
+L<NIP-29|https://github.com/nostr-protocol/nips/blob/master/29.md>,
 
 L<NIP-01|https://github.com/nostr-protocol/nips/blob/master/01.md>,
 L<NIP-42|https://github.com/nostr-protocol/nips/blob/master/42.md>,

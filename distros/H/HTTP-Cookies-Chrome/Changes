@@ -1,5 +1,10 @@
 Revision history for Perl module HTTP::Cookies::Chrome
 
+4.001 2026-09-10T04:59:54Z
+	* minimum perl version is now v5.12 because DBI raised its minimum verison
+	* versions below 4.x should still work with older DBI, so you may
+	want to pin one of those.
+
 3.002 2025-08-24T19:28:56Z
 	* handle the new cookie format for Chrome cookie database v24 and above
 

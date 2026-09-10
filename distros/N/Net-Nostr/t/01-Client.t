@@ -14,6 +14,11 @@ use Net::Nostr::Event;
 use Net::Nostr::Filter;
 use Net::Nostr::Key;
 
+use lib 't/lib';
+use TestFixtures qw(make_key_from_hex make_signed_event);
+
+my $event_key = make_key_from_hex('1' x 64);
+
 sub free_port {
     my $sock = IO::Socket::INET->new(
         Listen => 1, LocalAddr => '127.0.0.1', LocalPort => 0,
@@ -21,19 +26,6 @@ sub free_port {
     my $port = $sock->sockport;
     close $sock;
     return $port;
-}
-
-sub make_event {
-    my (%override) = @_;
-    Net::Nostr::Event->new(
-        pubkey     => 'a' x 64,
-        kind       => 1,
-        content    => 'test',
-        sig        => 'a' x 128,
-        created_at => 1000,
-        tags       => [],
-        %override,
-    );
 }
 
 sub create_tls_material {
@@ -173,7 +165,7 @@ subtest 'publish sends EVENT and receives OK via callback' => sub {
     $relay->start('127.0.0.1', $port);
 
     my $client = Net::Nostr::Client->new;
-    my $event = make_event(content => 'publish test');
+    my $event = make_signed_event($event_key, content => 'publish test');
 
     my $cv = AnyEvent->condvar;
     my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
@@ -208,7 +200,7 @@ subtest 'subscribe receives stored events then EOSE' => sub {
     $relay->start('127.0.0.1', $port);
 
     my $client = Net::Nostr::Client->new;
-    my $event = make_event(content => 'stored event');
+    my $event = make_signed_event($event_key, content => 'stored event');
 
     my $cv = AnyEvent->condvar;
     my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
@@ -297,8 +289,8 @@ subtest 'subscribe with multiple filters' => sub {
     $relay->start('127.0.0.1', $port);
 
     my $client = Net::Nostr::Client->new;
-    my $e1 = make_event(kind => 1, content => 'kind 1');
-    my $e2 = make_event(kind => 0, content => '{"name":"test"}');
+    my $e1 = make_signed_event($event_key, kind => 1, content => 'kind 1');
+    my $e2 = make_signed_event($event_key, kind => 0, content => '{"name":"test"}');
 
     my $cv = AnyEvent->condvar;
     my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
@@ -355,7 +347,7 @@ subtest 'receive live events after EOSE' => sub {
     $client1->on(eose => sub {
         $got_eose = 1;
         # publish from client2 — should arrive as live event
-        my $live = make_event(content => 'live!', created_at => 2000);
+        my $live = make_signed_event($event_key, content => 'live!', created_at => 2000);
         $client2->publish($live);
     });
 
@@ -402,7 +394,7 @@ subtest 'on notice callback' => sub {
 
 subtest 'publish before connect croaks' => sub {
     my $client = Net::Nostr::Client->new;
-    my $event = make_event();
+    my $event = make_signed_event($event_key);
     ok(dies { $client->publish($event) }, 'publish before connect dies');
 };
 
@@ -684,8 +676,8 @@ subtest 'dying event callback does not break subsequent messages' => sub {
     $client1->subscribe('s1', $filter);
 
     # Publish two events — first triggers the die, second should still arrive
-    $client2->publish(make_event(content => 'first',  created_at => 1000));
-    $client2->publish(make_event(content => 'second', created_at => 2000));
+    $client2->publish(make_signed_event($event_key, content => 'first',  created_at => 1000));
+    $client2->publish(make_signed_event($event_key, content => 'second', created_at => 2000));
 
     $cv->recv;
 

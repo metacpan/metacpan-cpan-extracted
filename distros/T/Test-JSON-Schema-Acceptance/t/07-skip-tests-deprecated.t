@@ -67,7 +67,7 @@ foreach my $test (
   cmp_result(
     \@warnings,
     [ re(qr/'skip_tests' option is deprecated at /) ],
-    'got deprecation warnings for skip_tests feature',
+    'got deprecation warnings for old skip_tests feature',
   );
 }
 

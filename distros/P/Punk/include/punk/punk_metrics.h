@@ -1,38 +1,26 @@
 /* punk_metrics.h - a Prometheus /metrics endpoint.
  *
- * WHY, GIVEN Punk::OpenTelemetry EXISTS.
+ * NOT A SUBSTITUTE FOR Punk::OpenTelemetry: the difference is push against
+ * pull. OpenTelemetry pushes OTLP to a collector somebody has to run;
+ * Prometheus scrapes an endpoint, which needs nothing deployed beside the
+ * application. They coexist - the same request feeds both, and an application
+ * that later adopts a collector keeps its dashboards.
  *
- * They are not substitutes: the difference is push against pull. OpenTelemetry
- * pushes OTLP to a collector somebody has to run. Prometheus scrapes an
- * endpoint, and a scrape needs nothing deployed beside the application. For a
- * great many deployments that is the difference between "metrics exist" and
- * "metrics were a project". They coexist: the same request feeds both, and an
- * application that later adopts a collector keeps its dashboards.
+ * CARDINALITY. A counter labelled with the REQUEST path is the classic
+ * monitoring outage: /users/1, /users/2 and a million more each become their
+ * own time series, and the scrape target takes the monitoring system down
+ * with it. Punk cannot make that mistake, because the compiled route table IS
+ * the label set: every pattern is known at to_app, the set is bounded, and
+ * /users/:id is one series however many ids exist. Anything with no route to
+ * name - a 404, a mount - is labelled once as <other>.
  *
- * CARDINALITY, WHICH IS THE THING MOST OF THESE GET WRONG.
- *
- * A counter labelled with the REQUEST path is the classic monitoring outage:
- * /users/1, /users/2 and a million more each become their own time series,
- * and the scrape target eventually takes the monitoring system down with it.
- *
- * Punk cannot make that mistake, because the compiled route table is the
- * label set. Every route pattern is known at to_app, the set is bounded, and
- * /users/:id is ONE series however many ids exist. That is a real dividend of
- * compiling routes at boot. Anything with no route to name - a 404, a mount -
- * is labelled once as <other>, for exactly the same reason.
- *
- * THE PREFORK TRAP.
- *
- * A scrape hits ONE worker. Whichever worker the listener hands the connection
- * to answers with that worker's counters, so a naive exporter reports one Nth
- * of the traffic and a different Nth every scrape - every graph then wrong in
- * a way that looks like noise.
- *
- * Two ways out. Aggregate through the shared arena, which is correct and costs
- * an atomic per request on a shared cacheline - the exact contention pattern
- * worth measuring before committing, against a request path of about 4.4us.
- * Or export per-worker series with a `worker` label and let Prometheus sum
- * them: no shared state, no contention, honest about what it is.
+ * THE PREFORK TRAP. A scrape hits ONE worker, so a naive exporter reports one
+ * Nth of the traffic and a different Nth every scrape - every graph wrong in
+ * a way that looks like noise. Two ways out: aggregate through the shared
+ * arena, which is correct and costs an atomic per request on a shared
+ * cacheline against a request path of about 4.4us; or export per-worker
+ * series with a `worker` label and let Prometheus sum them, with no shared
+ * state and no contention.
  *
  * THIS DOES THE SECOND, and says so in the documentation rather than letting
  * an operator discover it from a graph. `sum by (route) (...)` is the cost.

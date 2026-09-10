@@ -6,7 +6,6 @@ use Text::Table::Tiny qw/ generate_table /;
 
 die "usage: $0 <user-id>\n" unless @ARGV > 0;
 
-my $count     = int(@ARGV);
 my %requested = map { (uc($_) => 1) } @ARGV;
 my $users     = PAUSE::Users->new(max_age => '1 day');
 my $iterator  = $users->user_iterator();
@@ -19,16 +18,20 @@ while (defined(my $user = $iterator->next_user)) {
         push(@rows, [$user->id.":",
                      $user->asciiname // $user->fullname,
                      "<".($user->email // 'no-email-address').">"]);
-        --$count;
+        delete $requested{ $user->id };
     }
-    if ($count == 0) {
+    if (keys %requested == 0) {
         print generate_table(rows => \@rows, style => 'norule',
                              top_and_tail => 1, align => [qw/ r l l /]), "\n";
         exit 0;
     }
 }
 
-die "Not found\n";
+my $missing = join ", ", keys %requested;
+
+die sprintf("User%s not found: %s\n",
+            keys %requested > 1 ? "s" : "",
+            $missing);
 
 =encoding utf8
 
@@ -46,8 +49,8 @@ B<cpan-whois> takes one or more PAUSE usernames and displays the public
 information known for the account(s).
 By default just the name and email address are displayed:
 
- % cpan-whois puck
- PUCK: Andrew Ruthven <puck@cpan.org>
+ % cpan-whois manwar
+ MANWAR:   Mohammad Sajid Anwar   <mohammad.anwar@yahoo.com>
 
 If the user's name includes non-ASCII characters,
 then PAUSE has an ASCII Name field as well.
@@ -65,12 +68,11 @@ L<https://github.com/neilb/Pause-Users>
 
 =head1 AUTHOR
 
-Neil Bowers E<lt>neilb@cpan.orgE<gt>
+Neil Bowers E<lt>neil@bowers.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Neil Bowers <neilb@cpan.org>.
+This software is copyright (c) 2020 by Neil Bowers <neil@bowers.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-

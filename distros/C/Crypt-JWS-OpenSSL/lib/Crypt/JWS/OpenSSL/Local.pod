@@ -24,7 +24,7 @@ C<$Crypt::JWS::OpenSSL::Local::HAS_OPENSSL3> as required.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

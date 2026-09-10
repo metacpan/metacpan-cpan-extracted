@@ -102,7 +102,7 @@ static int ps_id_ok(const char *s, STRLEN len) {
  * wire. The signer, the verifier and the expiry check are the ones already in
  * service, so there is no second crypto path to keep in step. The 0.19 expiry
  * stamp keeps applying, so a cookie past its lifetime is refused rather than
- * looked up. And phase 2 changes only what goes INTO the payload.
+ * looked up. And only what goes INTO the payload changes.
  *
  * The signature is not protecting a secret any more - an id is not one - so it
  * would be easy to argue away. It stays because an unsigned id turns the store

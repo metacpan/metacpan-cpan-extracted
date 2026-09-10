@@ -1,5 +1,5 @@
 package Crypt::JWS::OpenSSL::Role::ECEncoder;
-$Crypt::JWS::OpenSSL::Role::ECEncoder::VERSION = '0.004';
+$Crypt::JWS::OpenSSL::Role::ECEncoder::VERSION = '0.005';
 use Moo::Role;
 use Carp qw( croak );
 
@@ -139,7 +139,7 @@ L<Crypt::JWS::OpenSSL::Util::PEM>
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

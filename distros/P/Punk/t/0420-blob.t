@@ -507,7 +507,7 @@ my $xid = Punk::Plugin::Blob->_store($ca, \$XSS);
     my $c_id = Punk::Plugin::Blob->_store($store, \$bytes);
 
     ok(-f $store->path_for($c_id),
-        'THE PHASE-6 GATE: a blob written through the C ABI lands exactly '
+        'THE ABI GATE: a blob written through the C ABI lands exactly '
       . 'where path_for looks for it - Punk calls the ABI\'s build_path '
       . 'rather than reimplementing the sharding, and a second copy of that '
       . 'rule is how every blob on disk goes missing the day it changes');
@@ -568,9 +568,9 @@ PROG
 }
 
 # ---- an upload already on disk is stored WITHOUT being read into memory -----
-# Phases 1 to 3 of the upload work got a large file from the wire to a temp
-# file without it being resident anywhere. Storing it through ->content would
-# have undone all of that at the last step - an id derived from the contents
+# The upload path gets a large file from the wire to a temp file without it
+# being resident anywhere. Storing it through ->content would undo all of
+# that at the last step - an id derived from the contents
 # means the contents must be READ, and reading them into a scalar to hash them
 # is exactly the copy that was removed.
 #

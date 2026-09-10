@@ -38,6 +38,7 @@
          "requires" : {
             "Getopt::Long" : "0",
             "List::Util" : "1.20",
+            "Term::Drawille" : "0.01",
             "Text::Format" : "0",
             "Time::HiRes" : "0",
             "charnames" : "0",
@@ -46,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.05",
+   "version" : "2.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -262,6 +262,80 @@ sub map {
 
 *collect = \&map;
 
+sub drop {
+    my ($self, $n) = @_;
+    $n = CORE::int($n);
+    my $count = 0;
+    __PACKAGE__->new(
+        obj   => $self->{obj},
+        calls => [
+            @{$self->{calls}},
+            sub {
+                if ($count < $n) { ++$count; return (); }
+                ($_[0]);
+            },
+        ],
+    );
+}
+
+sub uniq {
+    my ($self) = @_;
+    my %seen;
+    __PACKAGE__->new(
+        obj   => $self->{obj},
+        calls => [
+            @{$self->{calls}},
+            sub {
+                my $key = "$_[0]";
+                $seen{$key}++ ? () : ($_[0]);
+            },
+        ],
+    );
+}
+
+sub zip {
+    my ($self, $other) = @_;
+    my $iter1 = $self->iter;
+    my $iter2 = $other->iter;
+    my @pairs;
+    for (; ;) {
+        my $A = $iter1->run() // last;
+        my $B = $iter2->run() // last;
+        push @pairs, Sidef::Types::Array::Array->new([$A, $B]);
+    }
+    Sidef::Types::Array::Array->new(\@pairs);
+}
+
+sub take {
+    my ($self, $n) = @_;
+    $n = CORE::int($n);
+    my $orig      = $self->{obj};
+    my $remaining = $n;
+    my $limited = bless {
+                         obj => $orig,
+                         n   => $n,
+                        },
+      'Sidef::Object::Lazy::_Take';
+
+    {
+        no strict 'refs';
+        *{'Sidef::Object::Lazy::_Take::iter'} = sub {
+            my ($lim)     = @_;
+            my $inner     = $lim->{obj}->iter;
+            my $remaining = $lim->{n};
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $remaining > 0 or return undef;
+                    --$remaining;
+                    $inner->run();
+                }
+            );
+        };
+    }
+
+    __PACKAGE__->new(obj => $limited, calls => [@{$self->{calls}}]);
+}
+
 sub lazy {
     my ($self) = @_;
     $self;

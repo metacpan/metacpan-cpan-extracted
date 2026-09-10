@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.037-13-gee49d85
+package Test::JSON::Schema::Acceptance; # git description: v1.038-4-g8b3b4d1
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.038';
+our $VERSION = '1.039';
 
 use 5.020;
 use Moo;
@@ -142,7 +142,8 @@ sub acceptance {
   die 'cannot provide both "validate_data" and "validate_json_string"'
     if $options->{validate_data} and $options->{validate_json_string};
 
-  warn "'skip_tests' option is deprecated" if $options->{skip_tests};
+  warn "'skip_tests' option is deprecated" if $options->{skip_tests}
+    and (not ref $options->{skip_tests} eq 'ARRAY' or not (grep +ref, $options->{skip_tests}->@*));
 
   my $ctx = Test2::API::context;
 
@@ -191,6 +192,7 @@ sub acceptance {
 
     $ctx->note('');
 
+    SKIP:
     foreach my $test_group ($one_file->{json}->@*) {
       next if $options->{tests} and $options->{tests}{group_description}
         and not grep $_ eq $test_group->{description},
@@ -208,6 +210,19 @@ sub acceptance {
               and not $o->{test_description}
           }
           $options->{todo_tests}->@*;
+
+      $ctx->skip('SKIP', 'Test marked skip via "skip_tests"'), next SKIP
+        if $options->{skip_tests}
+          and ref $options->{skip_tests} eq 'ARRAY'
+          and not (grep +!ref, $options->{skip_tests}->@*)
+          and any {
+            my $o = $_;
+            (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? $o->{file}->@* : $o->{file}))
+              and
+            (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? $o->{group_description}->@* : $o->{group_description}))
+              and not $o->{test_description}
+          }
+          $options->{skip_tests}->@*;
 
       my $schema_fails;
       if ($self->test_schemas) {
@@ -237,6 +252,7 @@ sub acceptance {
         my $todo;
         $todo = Test2::Todo->new(reason => 'Test marked TODO via deprecated "skip_tests"')
           if ref $options->{skip_tests} eq 'ARRAY'
+            and not (grep +ref, $options->{skip_tests}->@*)
             and grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/),
               $options->{skip_tests}->@*;
 
@@ -560,7 +576,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.038
+version 1.039
 
 =head1 SYNOPSIS
 
@@ -584,6 +600,7 @@ In the JSON::Schema::Modern module, a test could look like the following:
       return JSON::Schema::Modern->new($schema)->validate($input_data);
     },
     todo_tests => [ { file => 'dependencies.json' } ],
+    skip_tests => [ { file => 'bad_tests.json' } ],
   );
 
   done_testing();
@@ -870,13 +887,26 @@ The syntax can take one of many forms:
 
 =head3 todo_tests
 
-Optional. Mentioned tests will run as L<"TODO"|Test::More/TODO: BLOCK>. Uses arrayrefs of
+Optional. Mentioned tests will run as if in a L<"TODO"|Test::More/TODO: BLOCK>. Uses arrayrefs of
 the same hashref structure as L</tests> above, which are ORed together.
 
   todo_tests => [
     # all tests in this file are TODO
     { file => 'dependencies.json' },
     # just some tests in this file are TODO
+    { file => 'boolean_schema.json', test_description => 'array is invalid' },
+    # .. etc
+  ]
+
+=head3 skip_tests
+
+Optional. Mentioned tests will run as if in a L<""|Test::More/SKIP: BLOCK>. Uses arrayrefs of
+the same hashref structure as L</tests> above, which are ORed together.
+
+  skip_tests => [
+    # all tests in this file are SKIPped
+    { file => 'dependencies.json' },
+    # just some tests in this file are SKIPped
     { file => 'boolean_schema.json', test_description => 'array is invalid' },
     # .. etc
   ]

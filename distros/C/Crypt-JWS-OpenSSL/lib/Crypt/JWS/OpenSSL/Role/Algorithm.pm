@@ -1,5 +1,5 @@
 package Crypt::JWS::OpenSSL::Role::Algorithm;
-$Crypt::JWS::OpenSSL::Role::Algorithm::VERSION = '0.004';
+$Crypt::JWS::OpenSSL::Role::Algorithm::VERSION = '0.005';
 use Moo::Role;
 
 requires qw(
@@ -21,7 +21,7 @@ Crypt::JWS::OpenSSL::Role::Algorithm - Role composed into Crypt::JWS::OpenSSL al
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

@@ -7,9 +7,9 @@ use warnings;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-27'; # DATE
+our $DATE = '2026-09-07'; # DATE
 our $DIST = 'Media-AssetView'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(
                        create_views_symlinks
@@ -42,7 +42,7 @@ Media::AssetView - Handle the Asset-Views directory organization
 
 =head1 VERSION
 
-This document describes version 0.001 of Media::AssetView (from Perl distribution Media-AssetView), released on 2026-04-27.
+This document describes version 0.002 of Media::AssetView (from Perl distribution Media-AssetView), released on 2026-09-07.
 
 =head1 SYNOPSIS
 
@@ -57,38 +57,49 @@ The Assets-Views organization scheme lets you put actual media files (with a
 specific naming convention) and can automatically create various views using
 symlinks.
 
-Media files are put in F<assets/>:
+Media files are put in F<assets/>, while symlinks are put in F<views/>:
 
  ROOT_DIR
    assets/
      audio/
+     a -> audio/                                                # shortcut symlink
      photo/
-     video/
+     p -> photo/                                                # shortcut symlink video/
        2026/
          202604/
            20260427a-type=ad-char=char1,char2-prod=PROD1/
-           20260427a-type=footage-ai=1-char=char2-prod=PROD1/
+             .tag-keyword-foo_bar                               # tag files can be used to add links in views/by-keywords/ without having to rename directories
+           20260427b-type=footage-ai=1-char=char2-prod=PROD1/
+             .tag-keyword-char2_stock_footage
+             .tag-keyword-baz
        ...
+     v -> video/                                                # shortcut symlink
+   a -> assets/                                                 # shortcut symlink
    views/
      by-character/
        char1/
-         20260427a-type=ad-char=char1,char2-prod=PROD1/
+         20260427a-type=ad-char=char1,char2-prod=PROD1 -> ../../../assets/video/2026/202604/20260427a-type=ad-char=char1,char2-prod=PROD1/
        char2/
-         20260427a-type=ad-char=char1,char2-prod=PROD1/
-         20260427a-type=footage-ai=1-char=char2-prod=PROD1/
+         20260427a-type=ad-char=char1,char2-prod=PROD1 -> ../../../assets/video/2026/202604/20260427a-type=ad-char=char1,char2-prod=PROD1/
+         20260427b-type=footage-ai=1-char=char2-prod=PROD1 -> ../../../assets/video/2026/202604/20260427b-type=footage-ai=1-char=char2-prod=PROD1/
      by-product/
        PROD1/
-         20260427a-type=footage-ai=1-char=char2-prod=PROD1/
+         20260427b-type=footage-ai=1-char=char2-prod=PROD1 -> ../../../assets/video/2026/202604/20260427b-type=footage-ai=1-char=char2-prod=PROD1/
      by-type/
        ad/
-         20260427a-type=ad-char=char1,char2-prod=PROD1/
+         20260427a-type=ad-char=char1,char2-prod=PROD1 -> ../../../assets/video/2026/202604/20260427a-type=ad-char=char1,char2-prod=PROD1/
        footage/
-         20260427a-type=footage-ai=1-char=char2-prod=PROD1/
+         20260427b-type=footage-ai=1-char=char2-prod=PROD1 -> ../../../assets/video/2026/202604/20260427b-type=footage-ai=1-char=char2-prod=PROD1/
      by-ai/
        no-ai/
-         20260427a-type=ad-char=char1,char2-prod=PROD1/
+         20260427a-type=ad-char=char1,char2-prod=PROD1 -> ../../../assets/video/2026/202604/20260427a-type=ad-char=char1,char2-prod=PROD1/
        ai/
-         20260427a-type=footage-ai=1-char=char2-prod=PROD1/
+         20260427b-type=footage-ai=1-char=char2-prod=PROD1 -> ../../../assets/video/2026/202604/20260427b-type=footage-ai=1-char=char2-prod=PROD1/
+     by-keywords/
+       foo_bar -> ../../assets/video/2026/202604/20260427a-type=ad-char=char1,char2-prod=PROD1/
+       char2_stock_footage -> ../../assets/video/2026/202604/20260427b-type=footage-ai=1-char=char2-prod=PROD1/
+       baz -> ../../assets/video/2026/202604/20260427b-type=footage-ai=1-char=char2-prod=PROD1/
+   v -> views/                                                  # shortcut symlink
 
 =head1 FUNCTIONS
 

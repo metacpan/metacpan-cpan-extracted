@@ -90,6 +90,19 @@ These are the intentional differences from [Params::Util](https://metacpan.org/p
     \_ARRAY and \_HASH.  It was clear to me from reading the documentation that \_ARRAY0 and
     \_HASH0 also had the same bug so they have also been corrected.
 
+- Missing \_CLASSCAN, \_INSTANCECAN and \_INVOCANTCAN
+
+    Upstream [Params::Util](https://metacpan.org/pod/Params%3A%3AUtil) added these to avoid the `UNIVERSAL::can` pitfall
+    (calling `can` as a function bypasses any overridden `can` method), but only
+    in the unreleased 1.105\_001 developer release. Since there hasn't been a public
+    release of [Params::Util](https://metacpan.org/pod/Params%3A%3AUtil) that includes them, they are not implemented here.
+    We will consider implementing them if and when there is one.
+
+    If you're using a new enough Perl to have the core `isa` operator (5.32+,
+    stable since 5.36), it's worth reaching for that instead: `$thing isa
+    $class` dispatches safely without a dependency, for the common case where a
+    class/instance relationship check is all you need.
+
 This is as of [Params::Util](https://metacpan.org/pod/Params%3A%3AUtil) version 1.102, which is the current version as of this writing.
 If there is a release of [Params::Util](https://metacpan.org/pod/Params%3A%3AUtil) I will endevour to update this list.
 

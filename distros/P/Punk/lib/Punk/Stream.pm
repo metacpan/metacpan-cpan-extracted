@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.44';
+our $VERSION = '0.48';
 
 
 1;
@@ -39,12 +39,14 @@ produced - a CSV export walking a large query, an NDJSON dump, anything of
 unknown length that should not cost its size in memory. The callback gets the
 L<Punk::Context> and a writer; the handler returns what C<stream> returns.
 
-This is the SSE transport machinery with the event framing removed. Three
+This is the SSE transport machinery with the event framing removed. Four
 transports carry it, chosen per request: a L<Hyperman> worker B<detaches> the
-socket and streams it on the loop; a C<psgi.streaming> server uses the
-standard delayed-response writer; and C<< blocking => 1 >> streams inside the
-handler over C<psgix.io> (pinning one worker). Without any of them the
-request gets a 501.
+socket and streams it on the loop; a Hyperman B<stream handle> sends the body
+through the server for the connections detach cannot take, which is what
+serves HTTP/2 and TLS (see L<Punk::SSE/"HTTP/2 and TLS">); a
+C<psgi.streaming> server uses the standard delayed-response writer; and
+C<< blocking => 1 >> streams inside the handler over C<psgix.io> (pinning one
+worker). Without any of them the request gets a 501.
 
 =head2 How it ends
 
@@ -65,6 +67,13 @@ request id when L<Punk::Plugin::RequestId> has issued one.
 
 =back
 
+The stream handle says the same two things differently, because it is the
+server that frames the body there: the clean end is a normal end of body, and
+the hard one is C<RST_STREAM> on HTTP/2 or a connection reset on HTTP/1.1 over
+TLS. Either way the client can tell a response that finished from one that
+stopped, which is the part that matters - a streamed body has no declared
+length, so ending cleanly B<is> the claim that it is whole.
+
 A stream does not outlive its callback. For a connection that stays open and
 is pushed to later, use an C<sse> or C<websocket> route - that is what they
 are for.
@@ -76,9 +85,11 @@ C<1> once everything written so far has reached the kernel, or C<0> when the
 stream closed first (the client disconnected, or the buffer ceiling was
 hit). Awaiting it after each write bounds memory to one chunk, and on a
 Hyperman worker the await pumps the event loop - other requests are served
-while your stream waits for a slow client to read. On the blocking and
-C<psgi.streaming> transports writes are synchronous, so C<drain> comes back
-already settled and the same loop costs nothing.
+while your stream waits for a slow client to read. On the stream handle it
+settles from the server's own drain, or at once when a write was taken
+without the connection backing up. On the blocking and C<psgi.streaming>
+transports writes are synchronous, so C<drain> comes back already settled and
+the same loop costs nothing.
 
 =head1 THE CALL
 

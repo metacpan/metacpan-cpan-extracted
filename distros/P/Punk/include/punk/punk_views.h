@@ -1,4 +1,4 @@
-/* punk_views.h - the C view-engine registry (phase 6+).
+/* punk_views.h - the C view-engine registry.
  *
  * Punk::Views is entirely XS: the object is a blessed IV-ref to this struct.
  * new() resolves each `views Name => \%opts` to Punk::View::Name (or the

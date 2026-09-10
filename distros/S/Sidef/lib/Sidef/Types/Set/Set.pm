@@ -13,6 +13,7 @@ use overload
   q{@{}}  => sub { [CORE::values(%{$_[0]})] },
   q{""}   => \&_dump;
 
+use List::Util qw();
 use Sidef::Types::Block::Block;
 use Sidef::Types::Bool::Bool;
 use Sidef::Types::Number::Number;
@@ -314,6 +315,21 @@ sub sort {
     $self->values->sort(defined($block) ? $block : ());
 }
 
+sub sample {
+    my ($self, $n) = @_;
+    my @values = CORE::values(%$self);
+    $n = defined($n) ? CORE::int($n) : 1;
+    my @shuffled = List::Util::shuffle(@values);
+    Sidef::Types::Array::Array->new([@shuffled[0 .. List::Util::min($n, scalar(@shuffled)) - 1]]);
+}
+
+sub pick {
+    my ($self) = @_;
+    my @values = CORE::values(%$self);
+    @values or return undef;
+    $values[CORE::int(CORE::rand(scalar(@values)))];
+}
+
 sub min {
     my ($self) = @_;
     $self->values->min;
@@ -406,6 +422,45 @@ sub is_superset {
     return Sidef::Types::Bool::Bool::TRUE;
 }
 
+sub is_disjoint {
+    my ($A, $B) = @_;
+
+    if (ref($B) ne __PACKAGE__) {
+        $B = $B->to_set;
+    }
+
+    foreach my $key (CORE::keys(%$A)) {
+        CORE::exists($B->{$key})
+          and return Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    return Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub is_proper_subset {
+    my ($A, $B) = @_;
+
+    if (ref($B) ne __PACKAGE__) {
+        $B = $B->to_set;
+    }
+
+    ($A->is_subset($B) && !$A->eq($B))
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_proper_superset {
+    my ($A, $B) = @_;
+
+    if (ref($B) ne __PACKAGE__) {
+        $B = $B->to_set;
+    }
+
+    ($A->is_superset($B) && !$A->eq($B))
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
 sub contains_all {
     my ($self, @objects) = @_;
 
@@ -416,6 +471,16 @@ sub contains_all {
     }
 
     return Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub powerset {
+    my ($self)  = @_;
+    my @values  = CORE::values(%$self);
+    my @subsets = ([]);
+    foreach my $v (@values) {
+        push @subsets, map { [@$_, $v] } @subsets;
+    }
+    Sidef::Types::Array::Array->new([map { __PACKAGE__->new(@$_) } @subsets]);
 }
 
 sub join {

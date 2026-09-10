@@ -1,8 +1,15 @@
 Changes
 lib/Net/Nostr/Client.pm
+lib/Net/Nostr/GroupDiscovery.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 t/01-Client.t
+t/02-EventVerification.t
+t/03-GroupDiscovery.t
+t/author/00-author.t
+t/lib/TestFixtures.pm
+t/nip/29.t
+t/nip/67.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

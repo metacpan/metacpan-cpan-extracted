@@ -6,6 +6,7 @@ use Test2::V0;
 use Test::Lib;
 use Encode;
 use JSON::PP ();
+use charnames ':full';
 
 use My::Test::Util -all;
 
@@ -22,6 +23,8 @@ BEGIN {
         }
     }
 }
+
+use constant UNICODE_TEXT => "caf\N{MUSICAL SYMBOL G CLEF}";
 
 sub encode_json_line {
     my ( $data, %attr ) = @_;
@@ -160,7 +163,7 @@ for my $test ( @tests ) {
 }
 
 subtest 'ascii' => sub {
-    my $text         = "caf\N{FACE WITH HEAD-BANDAGE}";
+    my $text         = UNICODE_TEXT;
     my %hash         = ( txt => $text );
     my $expected     = qq[{"txt":"$text"}];
     my $got_no_ascii = encode_json_line( \%hash, ascii => 0, utf8 => 0 );
@@ -175,7 +178,7 @@ subtest 'ascii' => sub {
 };
 
 subtest 'utf8' => sub {
-    my $text            = "caf\N{FACE WITH HEAD-BANDAGE}";
+    my $text            = UNICODE_TEXT;
     my %hash            = ( txt => $text );
     my $expected_perl   = qq[{"txt":"$text"}];
     my $expected_octets = encode( 'UTF-8', $expected_perl );

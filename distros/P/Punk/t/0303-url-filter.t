@@ -9,7 +9,7 @@ use PunkTest;
 use Punk ();
 
 # The template half of named routes: the `url_for` filter and the bound
-# `url` hash. Phase 2 of plan_punk_named_routes/.
+# `url` hash.
 #
 # Two seams, because Stencil has two. A filter takes the value and one
 # literal argument, so `{% row | url_for('book') %}` can carry captures; a

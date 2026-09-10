@@ -6,7 +6,7 @@ use Test::More;
 use Punk ();
 use File::Temp ();
 
-# Punk::Plugin::CSP, phases 0 and 1: the nonce, and the policy on every
+# Punk::Plugin::CSP: the nonce, and the policy on every
 # response.
 #
 # `headers` can already set a static Content-Security-Policy. The policy that
@@ -200,7 +200,7 @@ sub nonce_of {
       . 'its own policy keeps it');
 }
 
-# ---- PHASE 2: the thread to the template -------------------------------------
+# ---- the thread to the template ----------------------------------------------
 # The assertion this phase exists for. Not "the template renders a nonce" and
 # not "the header carries one" - the two, against each other, on the SAME
 # response.
@@ -339,7 +339,7 @@ sub nonce_of {
       . 'give this one a nonce');
 }
 
-# ---- PHASE 3: report-only, and the endpoint ----------------------------------
+# ---- report-only, and the endpoint -------------------------------------------
 # A strict CSP always breaks something on first contact. A framework that only
 # offers enforcing mode gets switched on once, breaks a page, and is switched
 # off for good.
@@ -484,7 +484,7 @@ sub nonce_of {
       . 'and mounting one would be answering for a host that is not us');
 }
 
-# ---- PHASE 4: the inline-handler check ---------------------------------------
+# ---- the inline-handler check ------------------------------------------------
 # A script nonce does NOT cover inline event handlers. One onclick= in one
 # template silently requires 'unsafe-inline', and adding that back defeats the
 # policy for every page - including the ones with no inline handler at all.
@@ -607,7 +607,7 @@ SKIP: {
 }
 
 # ---- across a forked pool ----------------------------------------------------
-# The phase-0 gate. An entropy buffer filled once and inherited through fork
+# The fork gate. An entropy buffer filled once and inherited through fork
 # hands every worker the same bytes - measured at 767 duplicates in 8000
 # across four workers while building Punk::Plugin::RequestId, looking
 # perfectly random throughout. For a request id that is a nuisance; for a

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.647';
+our $VERSION = '0.648';
 
 use 5.020;
 use strictures 2;
@@ -151,7 +151,7 @@ sub is_type ($type, $value, $config = {}) {
       else {
         # note: values that are larger than $Config{ivsize} will be represented as an NV, not IV,
         # therefore they will fail this check -- which is why use of Math::BigInt is recommended
-        # if the exact type is important, or loss of any accuracy is unacceptable
+        # if the exact type is important, or if loss of any accuracy is unacceptable
         return is_bignum($value) && $value->is_int
           # if dualvar, PV and stringified NV/IV must be identical
           || created_as_number($value) && int($value) == $value;
@@ -507,13 +507,13 @@ sub core_formats_type () {
 
   # see RFC9110 §8.3.1 for ABNF
   my $OWS = q{[\x09\x20]*};
-  my $TOKEN = q{[a-zA-Z0-9!#$%&'*+.^_`|~-]+};
+  my $TOKEN = q{[[:alnum:]!#$%&'*+.^_`|~-]+};
   my $QUOTED_STRING = q{"((?:[\x09\20\x21\x23-\x5B\x5D-\x7E\x80-\xFF]|\x5C[\x09\x20-\x7E\x80-\xFF])*)"};
 
   # parses into hashref: { type => .., subtype => .., params => { .. } }
   my sub _parse_media_type ($media_type_string) {
     my ($type_subtype, @params) = split /$OWS;$OWS/, $media_type_string;
-    my ($type, $subtype) = ($type_subtype//'') =~ m{^($TOKEN)/($TOKEN)\z};
+    my ($type, $subtype) = ($type_subtype//'') =~ m{^($TOKEN)/($TOKEN)\z}a;
     return if not defined $type or not defined $subtype;
 
     # RFC9110 §5.6.4: "The backslash octet ("\") can be used as a single-octet quoting mechanism
@@ -1009,7 +1009,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.647
+version 0.648
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

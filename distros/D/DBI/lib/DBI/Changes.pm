@@ -12,6 +12,32 @@ DBI::Changes - List of significant changes to the DBI
 
 =encoding UTF-8
 
+=head2 Changes in DBI 1.653 - 09 Sep 2026
+
+=over 2
+
+=item *
+
+Fix test for 32bit-perl (report in PR#189)
+
+=item *
+
+Fix arbitrary module and file loading via dbm_type/dbm_mldbm (CVE-2026-78030)
+
+=item *
+
+More META checking/updates
+
+=item *
+
+Tighten symlink outside of f_dir (CVE-2026-15392) check (reported by Raj)
+
+=item *
+
+CPAN.org does not forward email anymore
+
+=back
+
 =head2 Changes in DBI 1.652 - 15 Aug 2026
 
 =over 2

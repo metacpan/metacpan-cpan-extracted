@@ -1,5 +1,46 @@
 Revision history for Punk
 
+0.48    2026-09-09
+        - ADDS: websocket routes work over HTTP/2 through Extended
+          CONNECT (RFC 8441). There is no 101, no Upgrade header and no
+          Sec-WebSocket-Key on a multiplexed transport, so the handshake
+          is new - but the RFC 6455 codec above it is the same one the
+          HTTP/1.1 path uses. An Extended CONNECT is routed as the GET
+          it stands in for, and the origin check still applies to it.
+        - ADDS: sse routes and $c->stream work over HTTP/2 and over TLS.
+          Both ran on Hyperman's detach, which hands over a file
+          descriptor and so refuses an h2 stream and a TLS session; they
+          now fall through to Hyperman's ABI v6 stream handle, which
+          sends status, headers and body pieces through the server.
+        - A stream reset by the peer, or a client that goes away, now
+          reaches the handler: an sse stream's close callback fires and a
+          $c->stream drain settles. HTTP/1 could only infer this from a
+          dead connection, and a multiplexed transport cannot.
+        - No Connection and no Transfer-Encoding on an HTTP/2 or HTTP/3
+          streamed response. Both are hop-by-hop and forbidden there.
+        - A refused detach falls through to the next transport instead of
+          answering 503.
+        - A die mid-stream truncates on the stream handle too, through
+          Hyperman's v7 stream_abort: RST_STREAM on HTTP/2, a connection
+          reset on TLS. A streamed body has no declared length, so ending
+          cleanly is the claim that it is whole.
+        - Requires Hyperman 0.45.
+
+0.47    2026-09-09
+        - FIXES: a request body with no CONTENT_LENGTH and no
+          Transfer-Encoding was read as no body at all. HTTP/2 and HTTP/3
+          forbid Transfer-Encoding, so that is every streamed h2 upload.
+          The read now keys off psgix.input.buffered, and HTTP/1 is
+          unchanged.
+        - FIXES: max_body imposed no ceiling on a request with no declared
+          length. It now bounds the read, for ->body, body_each, body_to
+          and the multipart streamer.
+        - FIXES: $c->stream chunk-framed every response that was not
+          literally HTTP/1.0, putting a Transfer-Encoding on HTTP/2 and
+          HTTP/3 responses, which forbid it. Only HTTP/1.1 is chunked now.
+        - Punk::Test's environment sets SERVER_PROTOCOL to HTTP/1.1,
+          overridable per request through `env`.
+
 0.46    2026-09-08
         - ADDS: $c->req->xml - the request body parsed as XML through
           File::Raw::XML's C ABI, as a File::Raw::XML::Document. The parse

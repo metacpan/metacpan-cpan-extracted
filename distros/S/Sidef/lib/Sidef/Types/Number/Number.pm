@@ -114,7 +114,7 @@ use constant {
 
     SMALL_INTS_SIZE => $#SMALL_INTS,
 
-    PARI_GP_MIN            => 40,     # in decimal digits
+    PARI_GP_MIN            => 45,     # in decimal digits
     YAFU_MIN               => 49,     # in decimal digits
     FACTORDB_MIN           => 65,     # in decimal digits
     SPECIAL_FACTORS_MIN    => 36,     # in decimal digits (must be greater than SMALL_NUMBER_MAX_BITS)
@@ -4824,6 +4824,112 @@ sub tetration {
     $x->pow($x->tetration($y->dec));
 }
 
+# smallest integer T such that 2^T >= m  (m a Math::GMPz > 0)
+sub _log2_ceil {
+    my ($m) = @_;
+    my $bits = Math::GMPz::Rmpz_sizeinbase($m, 2);
+    (Math::GMPz::Rmpz_popcount($m) == 1) ? ($bits - 1) : $bits;
+}
+
+# Returns (is_ge, value): is_ge=1 iff a^^h >= cap (value undef);
+# is_ge=0 iff a^^h < cap (value = exact Math::GMPz). Assumes a>=2, h>=0, cap>=1.
+sub _capped_tetration {
+    my ($a, $h, $cap) = @_;
+
+    if (Math::GMPz::Rmpz_sgn($h) == 0) {    # a^^0 = 1
+        return (Math::GMPz::Rmpz_cmp_ui($cap, 1) <= 0) ? (1, undef) : (0, Math::GMPz::Rmpz_init_set_ui(1));
+    }
+    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {    # a^^1 = a
+        return (Math::GMPz::Rmpz_cmp($a, $cap) >= 0) ? (1, undef) : (0, Math::GMPz::Rmpz_init_set($a));
+    }
+
+    # h>=2: if base 'a' is already >= cap, the tetration will vastly
+    # exceed cap. Return immediately to prevent calculating huge numbers.
+    if (Math::GMPz::Rmpz_cmp($a, $cap) >= 0) {
+        return (1, undef);
+    }
+
+    if (Math::GMPz::Rmpz_cmp_ui($cap, 4) <= 0) {    # a^^h >= 4 for a>=2, h>=2
+        return (1, undef);
+    }
+
+    my $bits    = Math::GMPz::Rmpz_sizeinbase($cap, 2);
+    my $sub_cap = Math::GMPz::Rmpz_init_set_ui($bits + 1);
+
+    my $h_dec = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sub_ui($h_dec, $h, 1);
+
+    my ($sub_ge, $sub_val) = _capped_tetration($a, $h_dec, $sub_cap);
+    return (1, undef) if $sub_ge;
+
+    my $val = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_pow_ui($val, $a, Math::GMPz::Rmpz_get_ui($sub_val));    # sub_val is small
+    (Math::GMPz::Rmpz_cmp($val, $cap) >= 0) ? (1, undef) : (0, $val);
+}
+
+sub _tetration_mod {
+    my ($a, $h, $m) = @_;
+
+    return $ZERO if Math::GMPz::Rmpz_cmp_ui($m, 1) == 0;
+
+    if (Math::GMPz::Rmpz_sgn($h) == 0) {                                     # a^^0 = 1
+                                                                             # m > 1 is guaranteed here, so 1 % m is always 1.
+        return $ONE;
+    }
+    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {                               # a^^1 = a
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r, $a, $m);
+        return $r;
+    }
+
+    my $h_dec = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sub_ui($h_dec, $h, 1);
+
+    # We fetch capping BEFORE recursion. If the exponent hasn't saturated,
+    # we completely bypass the expensive modulo recursion tree.
+    my $T = Math::GMPz::Rmpz_init_set_ui(_log2_ceil($m));
+    my ($is_big, $exact_val) = _capped_tetration($a, $h_dec, $T);
+
+    my $exponent = Math::GMPz::Rmpz_init();
+    if ($is_big) {
+        my $phi_boxed = (bless \$m)->euler_phi;
+        my $phi_m     = _any2mpz($$phi_boxed);
+
+        my $exponent_mod_phi = _tetration_mod($a, $h_dec, $phi_m);
+        Math::GMPz::Rmpz_add($exponent, $exponent_mod_phi, $phi_m);
+    }
+    else {
+        # Modulo phi(m) is mathematically invalid if b < log2(m) because T can be > phi(m).
+        Math::GMPz::Rmpz_set($exponent, $exact_val);
+    }
+
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_powm($r, $a, $exponent, $m);
+    return $r;
+}
+
+sub tetration_mod {
+    my ($x, $y, $m_in) = @_;
+
+    ref($y) eq __PACKAGE__    or _valid(\$y);
+    ref($m_in) eq __PACKAGE__ or _valid(\$m_in);
+
+    my $a = _any2mpz($$x)    // goto &nan;
+    my $h = _any2mpz($$y)    // goto &nan;
+    my $m = _any2mpz($$m_in) // goto &nan;
+
+    Math::GMPz::Rmpz_sgn($h) >= 0 or goto &nan;
+    Math::GMPz::Rmpz_sgn($m) > 0  or goto &nan;
+
+    if (Math::GMPz::Rmpz_cmp_ui($a, 2) < 0) {
+        return ((bless \$a)->tetration(bless \$h)->mod(bless \$m));
+    }
+
+    bless \_tetration_mod($a, $h, $m);
+}
+
+*tetrationmod = \&tetration_mod;
+
 sub ipow {
     my ($x, $y) = @_;
     ref($y) eq __PACKAGE__ or _valid(\$y);
@@ -5249,15 +5355,19 @@ sub __lgrt__ {
 
     $PREC = CORE::int($PREC) if ref($PREC);
 
-    my $p = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
-
     goto($DISPATCH_TAG{ref($c)});
 
   Math_MPFR: {
 
-        # Return a complex number for x < e^(-1/e)
-        if (Math::MPFR::Rmpfr_cmp_d($c, CORE::exp(-1 / CORE::exp(1))) < 0) {
+        # Exactly compute the branch point: e^(-1/e)
+        my $threshold = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_si($threshold, -1, $ROUND);
+        Math::MPFR::Rmpfr_exp($threshold, $threshold, $ROUND);           # e^(-1) = 1/e
+        Math::MPFR::Rmpfr_mul_si($threshold, $threshold, -1, $ROUND);    # -1/e
+        Math::MPFR::Rmpfr_exp($threshold, $threshold, $ROUND);           # e^(-1/e)
+
+        # Route to complex for c < e^(-1/e)
+        if (Math::MPFR::Rmpfr_cmp($c, $threshold) < 0) {
             $c = _mpfr2mpc($c);
             goto Math_MPC;
         }
@@ -5265,23 +5375,42 @@ sub __lgrt__ {
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_log($r, $c, $ROUND);
 
-        Math::MPFR::Rmpfr_set_ui((my $x = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
-        Math::MPFR::Rmpfr_set_ui((my $y = Math::MPFR::Rmpfr_init2($PREC)), 0, $ROUND);
+        my $x = Math::MPFR::Rmpfr_init2($PREC);
+
+        # Conditional initial guess to optimize convergence speed
+        if (Math::MPFR::Rmpfr_cmp_ui($r, 3) > 0) {
+
+            # For large numbers, x ~= r / log(r)
+            Math::MPFR::Rmpfr_log($x, $r, $ROUND);
+            Math::MPFR::Rmpfr_div($x, $r, $x, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_set_ui($x, 1, $ROUND);
+        }
+
+        my $y   = Math::MPFR::Rmpfr_init2($PREC);
+        my $tmp = Math::MPFR::Rmpfr_init2($PREC);
+
+        # Bitwise tolerance: 2^(-PREC)
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui_2exp($p, 1, -($PREC >> 1), $ROUND);
 
         my $count = 0;
-        my $tmp   = Math::MPFR::Rmpfr_init2($PREC);
 
         while (1) {
-            Math::MPFR::Rmpfr_sub($tmp, $x, $y, $ROUND);
-            Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0 and last;
-
             Math::MPFR::Rmpfr_set($y, $x, $ROUND);
 
+            # x_{new} = (x + r) / (ln(x) + 1)
             Math::MPFR::Rmpfr_log($tmp, $x, $ROUND);
             Math::MPFR::Rmpfr_add_ui($tmp, $tmp, 1, $ROUND);
 
             Math::MPFR::Rmpfr_add($x, $x, $r, $ROUND);
             Math::MPFR::Rmpfr_div($x, $x, $tmp, $ROUND);
+
+            # Check convergence
+            Math::MPFR::Rmpfr_sub($tmp, $x, $y, $ROUND);
+            last if Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0;
+
             last if ++$count > $PREC;
         }
 
@@ -5293,30 +5422,48 @@ sub __lgrt__ {
         Math::MPC::Rmpc_log($d, $c, $ROUND);
 
         my $x = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_sqrt($x, $c, $ROUND);
-        Math::MPC::Rmpc_add_ui($x, $x, 1, $ROUND);
-        Math::MPC::Rmpc_log($x, $x, $ROUND);
 
-        my $y = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_set_ui($y, 0, $ROUND);
+        my $abs_c = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($abs_c, $c, $ROUND);
 
+        if (Math::MPFR::Rmpfr_cmp_ui($abs_c, 3) > 0) {
+
+            # For large magnitudes, x ~= d / log(d)
+            my $log_d = Math::MPC::Rmpc_init2($PREC);
+            Math::MPC::Rmpc_log($log_d, $d, $ROUND);
+            Math::MPC::Rmpc_div($x, $d, $log_d, $ROUND);
+        }
+        else {
+            # For small magnitudes (or negatives), x = sqrt(c) + 1 prevents
+            # log(x) from throwing errors or division-by-zero on complex branch cuts.
+            Math::MPC::Rmpc_sqrt($x, $c, $ROUND);
+            Math::MPC::Rmpc_add_ui($x, $x, 1, $ROUND);
+        }
+
+        my $y   = Math::MPC::Rmpc_init2($PREC);
         my $tmp = Math::MPC::Rmpc_init2($PREC);
         my $abs = Math::MPFR::Rmpfr_init2($PREC);
 
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui_2exp($p, 1, -($PREC >> 1), $ROUND);
+
         my $count = 0;
+
         while (1) {
-            Math::MPC::Rmpc_sub($tmp, $x, $y, $ROUND);
-
-            Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
-            Math::MPFR::Rmpfr_cmp($abs, $p) <= 0 and last;
-
             Math::MPC::Rmpc_set($y, $x, $ROUND);
 
+            # x_{new} = (x + d) / (ln(x) + 1)
             Math::MPC::Rmpc_log($tmp, $x, $ROUND);
             Math::MPC::Rmpc_add_ui($tmp, $tmp, 1, $ROUND);
 
             Math::MPC::Rmpc_add($x, $x, $d, $ROUND);
             Math::MPC::Rmpc_div($x, $x, $tmp, $ROUND);
+
+            # Check convergence
+            Math::MPC::Rmpc_sub($tmp, $x, $y, $ROUND);
+            Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
+            last if Math::MPFR::Rmpfr_cmp($abs, $p) <= 0;
+
             last if ++$count > $PREC;
         }
 
@@ -5334,61 +5481,94 @@ sub __LambertW__ {
 
     $PREC = CORE::int($PREC) if ref($PREC);
 
-    my $p = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
-
     goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
+        # Compute exact -1/e in MPFR to avoid double-precision truncation bugs
+        my $minus_inv_e = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_si($minus_inv_e, -1, $ROUND);
+        Math::MPFR::Rmpfr_exp($minus_inv_e, $minus_inv_e, $ROUND);
+
         # Return a complex number for x < -1/e
-        if (Math::MPFR::Rmpfr_cmp_d($x, -1 / CORE::exp(1)) < 0) {
+        if (Math::MPFR::Rmpfr_cmp($x, $minus_inv_e) < 0) {
             $x = _mpfr2mpc($x);
             goto Math_MPC;
         }
 
-        Math::MPFR::Rmpfr_set_ui((my $r = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
-        Math::MPFR::Rmpfr_set_ui((my $y = Math::MPFR::Rmpfr_init2($PREC)), 0, $ROUND);
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+        # Initial guess for r = e^W(x)
+        if (Math::MPFR::Rmpfr_cmp_ui($x, 3) > 0) {
+
+            # For large x, W(x) ~ ln(x), so r = e^W(x) ~ x
+            Math::MPFR::Rmpfr_set($r, $x, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_set_ui($r, 1, $ROUND);
+        }
+
+        my $tmp = Math::MPFR::Rmpfr_init2($PREC);
+        my $y   = Math::MPFR::Rmpfr_init2($PREC);
+
+        # Tolerance: 2^(-PREC)
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui_2exp($p, 1, -($PREC >> 1), $ROUND);
 
         my $count = 0;
-        my $tmp   = Math::MPFR::Rmpfr_init2($PREC);
 
+        # Newton's method on r*ln(r) = x  =>  r_{n+1} = (r_n + x) / (ln(r_n) + 1)
         while (1) {
-            Math::MPFR::Rmpfr_sub($tmp, $r, $y, $ROUND);
-            Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0 and last;
-
             Math::MPFR::Rmpfr_set($y, $r, $ROUND);
 
-            Math::MPFR::Rmpfr_log($tmp, $r, $ROUND);
-            Math::MPFR::Rmpfr_add_ui($tmp, $tmp, 1, $ROUND);
+            Math::MPFR::Rmpfr_log($tmp, $r, $ROUND);            # tmp = ln(r)
+            Math::MPFR::Rmpfr_add_ui($tmp, $tmp, 1, $ROUND);    # tmp = ln(r) + 1
 
-            Math::MPFR::Rmpfr_add($r, $r, $x, $ROUND);
-            Math::MPFR::Rmpfr_div($r, $r, $tmp, $ROUND);
+            Math::MPFR::Rmpfr_add($r, $r, $x, $ROUND);          # r = r + x
+            Math::MPFR::Rmpfr_div($r, $r, $tmp, $ROUND);        # r = (r + x) / tmp
+
+            # Convergence check: |\Delta r| / |r| <= tolerance (equivalent to |\Delta w| <= tol)
+            Math::MPFR::Rmpfr_sub($tmp, $r, $y, $ROUND);
+            last if Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0;
+
             last if ++$count > $PREC;
         }
 
+        # Return w = ln(r)
         Math::MPFR::Rmpfr_log($r, $r, $ROUND);
         return $r;
     }
 
   Math_MPC: {
         my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_sqrt($r, $x, $ROUND);
-        Math::MPC::Rmpc_add_ui($r, $r, 1, $ROUND);
 
-        my $y = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_set_ui($y, 0, $ROUND);
+        # Calculate absolute magnitude of x
+        my $abs_x = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($abs_x, $x, $ROUND);
 
-        my $tmp = Math::MPC::Rmpc_init2($PREC);
-        my $abs = Math::MPFR::Rmpfr_init2($PREC);
+        if (Math::MPFR::Rmpfr_cmp_ui($abs_x, 3) > 0) {
+
+            # For large magnitudes, W(x) ~ ln(x), so r = e^W(x) ~ x
+            Math::MPC::Rmpc_set($r, $x, $ROUND);
+        }
+        else {
+            # For smaller magnitudes, W(x) ~ ln(sqrt(x) + 1), so r ~ sqrt(x) + 1
+            # This safely prevents complex origin singularities.
+            Math::MPC::Rmpc_sqrt($r, $x, $ROUND);
+            Math::MPC::Rmpc_add_ui($r, $r, 1, $ROUND);
+        }
+
+        my $tmp   = Math::MPC::Rmpc_init2($PREC);
+        my $y     = Math::MPC::Rmpc_init2($PREC);
+        my $abs   = Math::MPFR::Rmpfr_init2($PREC);
+        my $abs_r = Math::MPFR::Rmpfr_init2($PREC);
+
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui_2exp($p, 1, -($PREC >> 1), $ROUND);
 
         my $count = 0;
+
         while (1) {
-            Math::MPC::Rmpc_sub($tmp, $r, $y, $ROUND);
-
-            Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
-            Math::MPFR::Rmpfr_cmp($abs, $p) <= 0 and last;
-
             Math::MPC::Rmpc_set($y, $r, $ROUND);
 
             Math::MPC::Rmpc_log($tmp, $r, $ROUND);
@@ -5396,9 +5576,18 @@ sub __LambertW__ {
 
             Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
             Math::MPC::Rmpc_div($r, $r, $tmp, $ROUND);
+
+            # Convergence check: |\Delta r| / |r| <= tolerance
+            Math::MPC::Rmpc_sub($tmp, $r, $y, $ROUND);
+            Math::MPC::Rmpc_abs($abs,   $tmp, $ROUND);
+            Math::MPC::Rmpc_abs($abs_r, $r,   $ROUND);
+            Math::MPFR::Rmpfr_div($abs, $abs, $abs_r, $ROUND);
+
+            last if Math::MPFR::Rmpfr_cmp($abs, $p) <= 0;
             last if ++$count > $PREC;
         }
 
+        # Return w = ln(r)
         Math::MPC::Rmpc_log($r, $r, $ROUND);
         return $r;
     }
@@ -8613,6 +8802,67 @@ sub prod {
 *Π       = \&prod;
 *vecprod = \&prod;
 
+sub arithmetic_mean {
+    my (@list) = @_;
+
+    @list || goto &nan;
+
+    my $sum = Sidef::Types::Number::Number::sum(@list);
+    my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
+
+    $sum->div($n);
+}
+
+*avg = \&arithmetic_mean;
+
+sub geometric_mean {
+    my (@list) = @_;
+
+    @list || return ONE;
+
+    my $prod = Sidef::Types::Number::Number::prod(@list);
+    my $n    = Sidef::Types::Number::Number::_set_int(scalar(@list));
+
+    $prod->root($n);
+}
+
+sub harmonic_mean {
+    my (@list) = @_;
+
+    @list || goto &nan;
+
+    my $sum = Sidef::Types::Number::Number::sum(map { $_->inv } @list);
+    my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
+
+    $n->div($sum);
+}
+
+sub median {
+    my (@list) = @_;
+
+    @list || goto &nan;
+
+    @list = @{Sidef::Types::Array::Array->new(\@list)->isort};
+    my $n = scalar(@list);
+    return $list[($n - 1) >> 1] if ($n % 2 == 1);
+    $list[($n >> 1) - 1]->add($list[$n >> 1])->div(Sidef::Types::Number::Number::TWO);
+}
+
+sub variance {
+    my (@list) = @_;
+
+    @list || goto &nan;
+
+    my $mean        = Sidef::Types::Number::Number::arithmetic_mean(@list);
+    my $sum_sq_diff = Sidef::Types::Number::Number::sum(map { $_->sub($mean)->sqr } @list);
+    $sum_sq_diff->div(Sidef::Types::Number::Number::_set_int(scalar(@list)));
+}
+
+sub stddev {
+    my (@list) = @_;
+    Sidef::Types::Number::Number::variance(@list)->sqrt;
+}
+
 sub max {
     my (@vals) = @_;
     _valid(\(@vals));
@@ -9681,6 +9931,92 @@ sub solve_pell {
 
     _array(_sort_pell_solutions(@solutions));
 }
+
+sub solve_thue {
+    my ($D_in, $k_in, $N_in, $bound_in, $first_only) = @_;
+
+    my $D = _any2mpz($$D_in) // return _array();
+
+    ref($k_in) eq __PACKAGE__ or _valid(\$k_in);
+    my $k = _any2ui($$k_in) // return _array();
+
+    $k >= 1 or return _array();
+
+    my $N = defined($N_in) ? do { _any2mpz($$N_in) // return _array() } : Math::GMPz::Rmpz_init_set($ONE);
+
+    my $bound =
+      defined($bound_in)
+      ? do { ref($bound_in) eq __PACKAGE__ or _valid(\$bound_in); _any2ui($$bound_in) // return _array() }
+      : 1e6;
+
+    $bound > 0 or return _array();
+
+    # D = 0: equation reduces to x^k = N (a single check, not a search over y)
+    if (Math::GMPz::Rmpz_sgn($D) == 0) {
+
+        return _array() if Math::GMPz::Rmpz_sgn($N) < 0 and $k % 2 == 0;
+
+        my $neg = (Math::GMPz::Rmpz_sgn($N) < 0);
+        state $abs_N = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_abs($abs_N, $N);
+
+        if ($k == 1) {
+            my $x = Math::GMPz::Rmpz_init_set($neg ? do { Math::GMPz::Rmpz_neg((my $tmp = Math::GMPz::Rmpz_init()), $abs_N); $tmp } : $abs_N);
+            my $y = Math::GMPz::Rmpz_init_set_ui(0);
+            return _array([_array([bless(\$x), bless(\$y)])]);
+        }
+
+        Math::GMPz::Rmpz_perfect_power_p($abs_N) or return _array();
+
+        state $root = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_root($root, $abs_N, $k) or return _array();
+
+        my $x = Math::GMPz::Rmpz_init_set($root);
+        $neg and Math::GMPz::Rmpz_neg($x, $x);
+        my $y = Math::GMPz::Rmpz_init_set_ui(0);
+        return _array([_array([bless(\$x), bless(\$y)])]);
+    }
+
+    my $k_even = ($k % 2 == 0);
+
+    state $t   = Math::GMPz::Rmpz_init_nobless();
+    state $x_z = Math::GMPz::Rmpz_init_nobless();
+
+    my @solutions;
+
+    for (my $y = 1 ; $y <= $bound ; ++$y) {
+
+        Math::GMPz::Rmpz_ui_pow_ui($t, $y, $k);
+        Math::GMPz::Rmpz_mul($t, $t, $D);
+        Math::GMPz::Rmpz_add($t, $t, $N);
+
+        my $sign = Math::GMPz::Rmpz_sgn($t);
+
+        # IMPORTANT: mpz_root() invokes undefined behaviour when given a
+        # negative operand together with an even root.
+        next if $k_even and $sign < 0;
+
+        if ($sign == 0) {
+            push @solutions, [Math::GMPz::Rmpz_init_set_ui(0), Math::GMPz::Rmpz_init_set_ui($y)];
+        }
+        elsif ($k == 1) {
+            push @solutions, [Math::GMPz::Rmpz_init_set($t), Math::GMPz::Rmpz_init_set_ui($y)];
+        }
+        elsif (Math::GMPz::Rmpz_root($x_z, $t, $k)) {    # exact k-th root?
+                                                         # Rmpz_root acts as both the perfect power check and the extraction.
+            push @solutions, [Math::GMPz::Rmpz_init_set($x_z), Math::GMPz::Rmpz_init_set_ui($y)];
+        }
+        else {
+            next;
+        }
+
+        last if $first_only;
+    }
+
+    _array([map { _array([bless(\$_->[0]), bless(\$_->[1])]) } @solutions]);
+}
+
+*binomial_thue_solve = \&solve_thue;
 
 sub solve_lcg {
     my ($n, $r, $m) = @_;
@@ -30215,17 +30551,97 @@ sub strict_partitions {
     sub {
         my ($n, $max_part) = @_;
         if ($n == 0) {
-            unshift @results, _array([@path]);
+            unshift @results, _array([map { bless \$_ } @path]);
             return;
         }
         my $upper = ($n < $max_part ? $n : $max_part);
         for my $part (1 .. $upper) {
-            push @path, bless \$part;
+            push @path, $part;
             __SUB__->($n - $part, $part - 1);
             pop @path;    # backtrack
         }
       }
       ->($n, $max_value);
+    return _array(\@results);
+}
+
+sub prime_partitions {
+    my ($n, $max_value) = @_;
+
+    $n = _any2ui($$n) // return _array();
+
+    if (defined($max_value)) {
+        ref($max_value) eq __PACKAGE__ or _valid(\$max_value);
+        $max_value = _any2ui($$max_value) // return _array();
+    }
+    else {
+        $max_value = $n;
+    }
+
+    my @results;
+    my @path;
+
+    my @primes = @{_primes(2, $max_value)};
+
+    sub {
+        my ($n, $max_part) = @_;
+
+        if ($n == 0) {
+            unshift @results, _array([map { bless \$_ } @path]);
+            return;
+        }
+
+        my $upper = ($n < $max_part ? $n : $max_part);
+
+        foreach my $part (@primes) {
+            $part > $upper and last;
+            push @path, $part;
+            __SUB__->($n - $part, $part);
+            pop @path;    # backtrack
+        }
+      }
+      ->($n, $max_value);
+
+    return _array(\@results);
+}
+
+sub strict_prime_partitions {
+    my ($n, $max_value) = @_;
+
+    $n = _any2ui($$n) // return _array();
+
+    if (defined($max_value)) {
+        ref($max_value) eq __PACKAGE__ or _valid(\$max_value);
+        $max_value = _any2ui($$max_value) // return _array();
+    }
+    else {
+        $max_value = $n;
+    }
+
+    my @results;
+    my @path;
+
+    my @primes = @{_primes(2, $max_value)};
+
+    sub {
+        my ($n, $max_part) = @_;
+
+        if ($n == 0) {
+            unshift @results, _array([map { bless \$_ } @path]);
+            return;
+        }
+
+        my $upper = ($n < $max_part ? $n : $max_part);
+
+        foreach my $part (@primes) {
+            $part > $upper and last;
+            push @path, $part;
+            __SUB__->($n - $part, $part - 1);
+            pop @path;    # backtrack
+        }
+      }
+      ->($n, $max_value);
+
     return _array(\@results);
 }
 
@@ -30249,7 +30665,7 @@ sub multisets {
         my ($pos, $max_value, $sum) = @_;
 
         if ($pos == $n) {
-            push @results, _array([@path]);
+            push @results, _array([map { bless \$_ } @path]);
             return;
         }
 
@@ -30257,7 +30673,7 @@ sub multisets {
             if (defined $max_sum) {
                 last if ($sum + $v > $max_sum);
             }
-            push @path, bless \$v;
+            push @path, $v;
             __SUB__->($pos + 1, $v, $sum + $v);
             pop @path;    # backtrack
         }
@@ -31482,6 +31898,42 @@ sub euler_phi {
 *euler_totient = \&euler_phi;
 *totient       = \&euler_phi;
 
+sub schemmel_totient {
+    my ($self, $k_in) = @_;
+
+    my $k       = defined($k_in) ? (_any2ui($$k_in) // return _array()) : 1;
+    my $factors = $self->factor_exp();
+
+    my $res = Math::GMPz::Rmpz_init_set_ui(1);
+    state $term      = Math::GMPz::Rmpz_init_nobless();
+    state $p_minus_k = Math::GMPz::Rmpz_init_nobless();
+
+    foreach my $pair (@$factors) {
+
+        # TODO: optimize for native prime factors
+        my $p = _any2mpz(${$pair->[0]});
+        my $e = _any2ui(${$pair->[1]});
+
+        if (Math::GMPz::Rmpz_cmp_ui($p, $k) <= 0) {
+
+            # If any prime factor p <= k, S_k(n) becomes 0
+            Math::GMPz::Rmpz_set_ui($res, 0);
+            last;
+        }
+
+        # p^(e-1) * (p - k)
+        Math::GMPz::Rmpz_pow_ui($term, $p, $e - 1);
+        Math::GMPz::Rmpz_sub_ui($p_minus_k, $p, $k);
+
+        Math::GMPz::Rmpz_mul($term, $term, $p_minus_k);
+        Math::GMPz::Rmpz_mul($res,  $res,  $term);
+    }
+
+    bless \$res;
+}
+
+*schemmel = \&schemmel_totient;
+
 sub phi_sum {
     my ($n, $k) = @_;
 
@@ -31962,6 +32414,319 @@ sub inverse_euler_phi_max {
 *phi_inverse_max     = \&inverse_euler_phi_max;
 *inverse_phi_max     = \&inverse_euler_phi_max;
 *inverse_totient_max = \&inverse_euler_phi_max;
+
+sub _cook_carmichael_lambda {
+    my ($N) = @_;
+
+    my $p = Math::GMPz::Rmpz_init();
+    my $v = Math::GMPz::Rmpz_init();
+
+    my %L;
+    my @D = _divisors($N);
+
+    foreach my $d (@D) {
+
+        Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::addint($d, 1)) || next;
+
+        (FAST_MODE and $d < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $d)
+          : Math::GMPz::Rmpz_set_str($p, $d, 10);
+
+        Math::GMPz::Rmpz_add_ui($p, $p, 1);
+
+        if (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0) {
+
+            # p = 2 is special: lambda(2) = 1, lambda(4) = 2,
+            # and lambda(2^e) = 2^(e-2) for e >= 3.
+
+            my $t = Math::GMPz::Rmpz_remove($v, $N, $p);    # 2-adic valuation of N
+
+            push @{$L{2}}, [Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(2)];    # e=1
+
+            if ($t >= 1) {
+                push @{$L{2}}, [Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set_ui(4)];    # e=2
+            }
+
+            foreach my $k (3 .. $t + 2) {                                                             # e=k: x = 2^(k-2), y = 2^k
+                my $x = Math::GMPz::Rmpz_init();
+                my $y = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_ui_pow_ui($x, 2, $k - 2);
+                Math::GMPz::Rmpz_ui_pow_ui($y, 2, $k);
+                push @{$L{2}}, [$x, $y];
+            }
+
+            next;
+        }
+
+        # Odd prime p: lambda(p^k) = (p-1) * p^(k-1), for k = 1 .. t+1,
+        # where t is the p-adic valuation of N (same bound as _cook_euler_phi,
+        # since p is coprime to p-1, so all of N's p-power budget is free here).
+
+        my $t = Math::GMPz::Rmpz_remove($v, $N, $p);
+
+        push @{$L{$p}}, map {
+            my $x = Math::GMPz::Rmpz_init();
+            my $y = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_pow_ui($v, $p, $_ - 1);
+            Math::GMPz::Rmpz_pow_ui($y, $p, $_);
+            Math::GMPz::Rmpz_sub_ui($x, $p, 1);
+            Math::GMPz::Rmpz_mul($x, $x, $v);
+
+            [$x, $y]
+        } 1 .. $t + 1;
+    }
+
+    [values %L];
+}
+
+sub _lcm_coverage_blocks {
+    my ($N, $L) = @_;
+
+    my @qf = _factor_exp($N);    # [[q1,f1], [q2,f2], ...]
+    my $r  = scalar(@qf);
+
+    my @qz = map {
+        my $q = $_->[0];
+        ($q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_init_set_ui($q)
+          : Math::GMPz::Rmpz_init_set_str("$q", 10);
+    } @qf;
+
+    my $tmp = Math::GMPz::Rmpz_init();
+
+    my @blocks_by_prime;
+
+    foreach my $group (@$L) {
+        my @blocks;
+        foreach my $pair (@$group) {
+            my ($x, $y) = @$pair;
+            my $mask = 0;
+            for my $j (0 .. $r - 1) {
+                my $val = Math::GMPz::Rmpz_remove($tmp, $x, $qz[$j]);
+                $mask |= (1 << $j) if $val == $qf[$j][1];
+            }
+            push @blocks, [$mask, $y];
+        }
+        push @blocks_by_prime, \@blocks;
+    }
+
+    ($r, \@blocks_by_prime);
+}
+
+sub _dynamic_preimage_lcm {
+    my ($N, $L) = @_;
+
+    my ($r, $blocks_by_prime) = _lcm_coverage_blocks($N, $L);
+    my $full_mask = (1 << $r) - 1;
+
+    my %R = (0 => [Math::GMPz::Rmpz_init_set_ui(1)]);
+
+    foreach my $blocks (@$blocks_by_prime) {
+        my %t;
+
+        foreach my $block (@$blocks) {
+            my ($bmask, $y) = @$block;
+
+            foreach my $mask (keys %R) {
+                my $nm = $mask | $bmask;
+
+                push @{$t{$nm}}, map {
+                    my $w = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($w, $_, $y);
+                    $w;
+                } @{$R{$mask}};
+            }
+        }
+
+        foreach my $k (keys %t) {
+            push @{$R{$k}}, @{delete $t{$k}};
+        }
+    }
+
+    $R{$full_mask} // [];
+}
+
+sub _dynamic_preimage_lcm_len_bigint {
+    my ($N, $L) = @_;
+
+    my ($r, $blocks_by_prime) = _lcm_coverage_blocks($N, $L);
+    my $full_mask = (1 << $r) - 1;
+
+    my %R = (0 => Math::GMPz::Rmpz_init_set_ui(1));
+
+    foreach my $blocks (@$blocks_by_prime) {
+        my %t;
+
+        foreach my $block (@$blocks) {
+            my $bmask = $block->[0];
+
+            foreach my $mask (keys %R) {
+                my $nm = $mask | $bmask;
+                $t{$nm} //= Math::GMPz::Rmpz_init_set_ui(0);
+                Math::GMPz::Rmpz_add($t{$nm}, $t{$nm}, $R{$mask});
+            }
+        }
+
+        foreach my $k (keys %t) {
+            $R{$k} //= Math::GMPz::Rmpz_init_set_ui(0);
+            Math::GMPz::Rmpz_add($R{$k}, $R{$k}, $t{$k});
+        }
+    }
+
+    exists($R{$full_mask}) ? Math::GMPz::Rmpz_get_str($R{$full_mask}, 10) : 0;
+}
+
+sub _dynamic_preimage_lcm_len {
+    my ($N, $L) = @_;
+
+    my ($r, $blocks_by_prime) = _lcm_coverage_blocks($N, $L);
+    my $full_mask = (1 << $r) - 1;
+
+    my %R = (0 => 1);
+
+    foreach my $blocks (@$blocks_by_prime) {
+        my %t;
+
+        foreach my $block (@$blocks) {
+            my $bmask = $block->[0];
+
+            foreach my $mask (keys %R) {
+                $t{$mask | $bmask} += $R{$mask};
+            }
+        }
+
+        foreach my $k (keys %t) {
+            $R{$k} += $t{$k};
+        }
+    }
+
+    my $r_val = $R{$full_mask} // 0;
+    ($r_val < ~0) || goto &_dynamic_preimage_lcm_len_bigint;
+    $r_val;
+}
+
+sub _dynamic_preimage_lcm_minmax {
+    my ($N, $L, %opt) = @_;
+
+    my ($r, $blocks_by_prime) = _lcm_coverage_blocks($N, $L);
+    my $full_mask = (1 << $r) - 1;
+    my $min       = $opt{min};
+
+    my %R = (0 => Math::GMPz::Rmpz_init_set_ui(1));
+    my $w = Math::GMPz::Rmpz_init();
+
+    foreach my $blocks (@$blocks_by_prime) {
+        my %t;
+
+        foreach my $block (@$blocks) {
+            my ($bmask, $y) = @$block;
+
+            foreach my $mask (keys %R) {
+                my $nm = $mask | $bmask;
+
+                Math::GMPz::Rmpz_mul($w, $R{$mask}, $y);
+
+                if (
+                    !exists($t{$nm})
+                    or (
+                        $min
+                        ? Math::GMPz::Rmpz_cmp($w, $t{$nm}) < 0
+                        : Math::GMPz::Rmpz_cmp($w, $t{$nm}) > 0
+                       )
+                  ) {
+                    $t{$nm} = Math::GMPz::Rmpz_init_set($w);
+                }
+            }
+        }
+
+        foreach my $k (keys %t) {
+            if (
+                !exists($R{$k})
+                or (
+                    $min
+                    ? Math::GMPz::Rmpz_cmp($t{$k}, $R{$k}) < 0
+                    : Math::GMPz::Rmpz_cmp($t{$k}, $R{$k}) > 0
+                   )
+              ) {
+                $R{$k} = $t{$k};
+            }
+        }
+    }
+
+    $R{$full_mask};
+}
+
+sub inverse_carmichael_lambda {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n) // return _array();
+
+    if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+        return _array(ZERO) if !Math::GMPz::Rmpz_sgn($n);
+        return _array();
+    }
+
+    my $result = _dynamic_preimage_lcm($n, _cook_carmichael_lambda($n));
+    _array([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
+}
+
+*lambda_inverse            = \&inverse_carmichael_lambda;
+*inverse_lambda            = \&inverse_carmichael_lambda;
+*carmichael_lambda_inverse = \&inverse_carmichael_lambda;
+
+sub inverse_carmichael_lambda_len {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n) // return ZERO;
+
+    if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+        return ONE if !Math::GMPz::Rmpz_sgn($n);
+        return ZERO;
+    }
+
+    _set_int(_dynamic_preimage_lcm_len($n, _cook_carmichael_lambda($n)));
+}
+
+*lambda_inverse_len            = \&inverse_carmichael_lambda_len;
+*inverse_lambda_len            = \&inverse_carmichael_lambda_len;
+*carmichael_lambda_inverse_len = \&inverse_carmichael_lambda_len;
+
+sub inverse_carmichael_lambda_min {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n) // return undef;
+
+    if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+        return ZERO if !Math::GMPz::Rmpz_sgn($n);
+        return undef;
+    }
+
+    my $r = _dynamic_preimage_lcm_minmax($n, _cook_carmichael_lambda($n), min => 1) // return undef;
+    bless \$r;
+}
+
+*lambda_inverse_min            = \&inverse_carmichael_lambda_min;
+*inverse_lambda_min            = \&inverse_carmichael_lambda_min;
+*carmichael_lambda_inverse_min = \&inverse_carmichael_lambda_min;
+
+sub inverse_carmichael_lambda_max {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n) // return undef;
+
+    if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+        return ZERO if !Math::GMPz::Rmpz_sgn($n);
+        return undef;
+    }
+
+    my $r = _dynamic_preimage_lcm_minmax($n, _cook_carmichael_lambda($n), min => 0) // return undef;
+    bless \$r;
+}
+
+*lambda_inverse_max            = \&inverse_carmichael_lambda_max;
+*inverse_lambda_max            = \&inverse_carmichael_lambda_max;
+*carmichael_lambda_inverse_max = \&inverse_carmichael_lambda_max;
 
 sub _cook_dedekind_psi {
     my ($N, $k) = @_;
@@ -34797,6 +35562,37 @@ sub sigma0 {
 
 *d             = \&sigma0;
 *divisor_count = \&sigma0;
+
+sub piltz_tau {
+    my ($self, $k_in) = @_;
+
+    # Computes d_k(n), the number of ways to write n as an ordered product of k integers.
+    # Uses the prime factorization exponents of n: d_k(n) = prod( binomial(e_i + k - 1, k - 1) )
+
+    my $k = defined($k_in) ? (_any2ui($$k_in) // goto &nan) : 2;
+
+    if ($k == 0) {
+        my $res = (__cmp__($$self, 1) // goto &nan) == 0 ? ONE : ZERO;
+        return $res;
+    }
+
+    if ($k == 1) {
+        return ONE;
+    }
+
+    my $res = Math::GMPz::Rmpz_init_set_ui(1);
+    state $bin = Math::GMPz::Rmpz_init_nobless();
+
+    foreach my $pair (_factor_exp($$self)) {
+        my $e = $pair->[1];
+        Math::GMPz::Rmpz_bin_uiui($bin, $e + $k - 1, $k - 1);
+        Math::GMPz::Rmpz_mul($res, $res, $bin);
+    }
+
+    bless \$res;
+}
+
+*piltz = \&piltz_tau;
 
 sub sigma {
     my ($n, $k) = @_;
@@ -41062,6 +41858,23 @@ sub is_weird {
     $n->is_abundant || return $FALSE;
     $n->is_pseudoperfect && return $FALSE;
     return $TRUE;
+}
+
+sub is_hyperperfect {
+    my ($n, $k_in) = @_;
+
+    my $k    = defined($k_in) ? (_any2mpz($$k_in) // return $FALSE) : $ONE;
+    my $temp = Math::GMPz::Rmpz_init_set_str("${$n->sigma}", 10);
+
+    $n = _any2mpz($$n) // return $FALSE;
+    Math::GMPz::Rmpz_sgn($n) > 0 or return $FALSE;
+
+    Math::GMPz::Rmpz_sub($temp, $temp, $n);
+    Math::GMPz::Rmpz_sub_ui($temp, $temp, 1);
+    Math::GMPz::Rmpz_mul($temp, $temp, $k);
+    Math::GMPz::Rmpz_add_ui($temp, $temp, 1);
+
+    Math::GMPz::Rmpz_cmp($n, $temp) == 0 ? $TRUE : $FALSE;
 }
 
 sub _power_factor {

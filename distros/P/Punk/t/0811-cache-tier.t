@@ -10,9 +10,8 @@ use Punk::Cache;
 # The memory tier: a per-worker cache in front of a shared store.
 #
 # It exists because a file hit is 7.2us and 6.2us of that is the open()
-# syscall - measured, in plan_punk_cache/phase-6-xs-front.md. Nothing around
-# the syscall was worth tuning, so the only way a hit gets faster is not to
-# open the file.
+# syscall, measured. Nothing around the syscall was worth tuning, so the only
+# way a hit gets faster is not to open the file.
 #
 # t/0821 already asserts that a tier changes no ANSWERS, by running the whole
 # conformance battery through one. What is left is here: that it changes the

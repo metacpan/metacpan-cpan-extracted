@@ -1,3 +1,16 @@
+2.003000   2026-09-08
+
+  - Require Core, Client, and Relay 1.002000 or later so installing this
+    release upgrades all components to the September protocol APIs.
+
+  - Include NIP review fixes for group validation and membership history,
+    wallet encryption discovery, and tested group discovery documentation.
+
+  - Update the documented NIP conformance target to c3fd9af1 (2026-09-04).
+
+  - Document NIP-67 EOSE hints and NIP-A3 payment targets in the supported
+    NIP list, and expose the group discovery and relay policy documentation.
+
 2.002000   2026-07-03
 
   - Split the project into Net-Nostr-Core, Net-Nostr-Client, Net-Nostr-Relay,

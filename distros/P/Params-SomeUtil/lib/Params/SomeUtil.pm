@@ -98,6 +98,19 @@ versions, and the documentation.  The suggested fixes in the ticket were applied
 _ARRAY and _HASH.  It was clear to me from reading the documentation that _ARRAY0 and
 _HASH0 also had the same bug so they have also been corrected.
 
+=item Missing _CLASSCAN, _INSTANCECAN and _INVOCANTCAN
+
+Upstream L<Params::Util> added these to avoid the C<UNIVERSAL::can> pitfall
+(calling C<can> as a function bypasses any overridden C<can> method), but only
+in the unreleased 1.105_001 developer release. Since there hasn't been a public
+release of L<Params::Util> that includes them, they are not implemented here.
+We will consider implementing them if and when there is one.
+
+If you're using a new enough Perl to have the core C<isa> operator (5.32+,
+stable since 5.36), it's worth reaching for that instead: C<< $thing isa
+$class >> dispatches safely without a dependency, for the common case where a
+class/instance relationship check is all you need.
+
 =back
 
 This is as of L<Params::Util> version 1.102, which is the current version as of this writing.
@@ -124,7 +137,7 @@ require DynaLoader;
 
 use vars qw{$VERSION @ISA @EXPORT_OK %EXPORT_TAGS};
 
-$VERSION   = '1.09';
+$VERSION   = '1.11';
 @ISA       = qw{
 	Exporter
 	DynaLoader
@@ -207,6 +220,11 @@ C<undef> if not.
 
 eval <<'END_PERL' unless defined &_STRING;
 sub _STRING ($) {
+	# Unlike _IDENTIFIER/_CLASS/_POSINT/etc (rt#81276), this does not
+	# copy $_[0] to a lexical first. Those needed the copy because a
+	# capture-less regex match against an aliased $1 clears $1 (and
+	# thus $_[0]) as a side effect. length() performs no match/mutation,
+	# so $_[0] is safe to use directly here even when passed $1.
 	(defined $_[0] and ! ref $_[0] and length($_[0])) ? $_[0] : undef;
 }
 END_PERL
@@ -343,6 +361,11 @@ number.
 
 eval <<'END_PERL' unless defined &_NUMBER;
 sub _NUMBER ($) {
+	# Unlike _IDENTIFIER/_CLASS/_POSINT/etc (rt#81276), this does not
+	# copy $_[0] to a lexical first. Those needed the copy because a
+	# capture-less regex match against an aliased $1 clears $1 (and
+	# thus $_[0]) as a side effect. looks_like_number() is not a regex
+	# match, so $_[0] is safe to use directly here even when passed $1.
 	( defined $_[0] and ! ref $_[0] and looks_like_number($_[0]) )
 	? $_[0]
 	: undef;
@@ -955,6 +978,7 @@ L<Params::Validate>
 =head1 COPYRIGHT
 
 Copyright 2005 - 2012 Adam Kennedy.
+Copyright 2026 Graham Ollis.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

@@ -227,6 +227,96 @@ subtest 'delete_matching respects before_ts for addresses' => sub {
     is $store->event_count, 1, 'event still there';
 };
 
+subtest 'delete_matching removes every eligible version of a coordinate' => sub {
+    my @cases = (
+        (map { ["replaceable kind $_", $_, '', [['d', 'ignored']]] } (0, 3, 10000, 19999)),
+        (map { ["addressable kind $_", $_, 'slug', [['d', 'slug']]] } (30000, 30023, 39999)),
+        ['empty d tag', 30023, '', [['d', '']]],
+        ['missing d tag', 30023, '', []],
+        ['first d tag is empty', 30023, '', [['d', ''], ['d', 'other']]],
+        ['d tag containing colons and Unicode', 30023, "part:two:\x{2603}", [['d', "part:two:\x{2603}"]]],
+    );
+    for my $case (@cases) {
+        my ($label, $kind, $d_tag, $tags) = @$case;
+        for my $keep_newer (0, 1) {
+            subtest "$label, newer versions: $keep_newer" => sub {
+                my $store = Net::Nostr::RelayStore->new;
+                my @eligible = map {
+                    make_event(pubkey => $PK1, kind => $kind, content => "version $_",
+                        created_at => $_ == 0 ? 1000 : 2000,
+                        tags => [@$tags, ['t', 'deletion-target']])
+                } 0 .. 2;
+                my @newer = $keep_newer ? map {
+                    make_event(pubkey => $PK1, kind => $kind, created_at => $_,
+                        tags => [@$tags, ['t', 'deletion-target']])
+                } (3000, 4000) : ();
+                my @unrelated = (
+                    make_event(pubkey => $PK2, kind => $kind, created_at => 1000, tags => $tags),
+                    make_event(pubkey => $PK1, kind => 1, created_at => 1000, tags => $tags),
+                );
+                push @unrelated, make_event(pubkey => $PK1, kind => $kind,
+                    created_at => 1000, tags => [['d', 'other']]) if $kind >= 30000;
+                # Store older versions last so insertion order cannot hide them.
+                $store->store($_) for reverse(@eligible, @newer, @unrelated);
+
+                my $count = $store->delete_matching($PK1, [], ["$kind:$PK1:$d_tag"], 2000);
+                is $count, 3, 'deletes older versions and every version at the cutoff';
+                is $store->get_by_id($_->id), undef, 'eligible version removed by id' for @eligible;
+                my @survivors = (@newer, @unrelated);
+                is [sort map { $_->id } @{$store->all_events}],
+                    [sort map { $_->id } @survivors], 'only newer versions and unrelated events remain';
+                is $store->event_count, scalar @survivors, 'event count is consistent';
+                my $indexed = $kind >= 30000
+                    ? $store->find_addressable($PK1, $kind, $d_tag)
+                    : $store->find_replaceable($PK1, $kind);
+                is defined($indexed) ? $indexed->id : undef,
+                    $keep_newer ? $newer[-1]->id : undef, 'coordinate index retains the newest survivor or clears';
+                my $query = $store->query([Net::Nostr::Filter->new(
+                    authors => [$PK1], '#t' => ['deletion-target'],
+                )]);
+                is [sort map { $_->id } @$query], [sort map { $_->id } @newer],
+                    'queries by author do not return deleted versions';
+                my $tag_query = $store->query([Net::Nostr::Filter->new('#t' => ['deletion-target'])]);
+                is [sort map { $_->id } @$tag_query], [sort map { $_->id } @newer],
+                    'queries by tag do not return deleted versions';
+            };
+        }
+    }
+};
+
+subtest 'delete_matching preserves ownership and coordinate type boundaries' => sub {
+    my $store = Net::Nostr::RelayStore->new;
+    my @events = map {
+        make_event(pubkey => $PK1, kind => $_, created_at => 1000, tags => [['d', 'slug']])
+    } (1, 5, 10000, 20000, 29999, 30023, 40000);
+    $store->store($_) for @events;
+    is $store->delete_matching($PK2, [], ["30023:$PK1:slug", "10000:$PK1:"], 2000),
+        0, 'another author cannot delete addressable or replaceable events';
+    is $store->delete_matching($PK1, [], [
+        (map { ("$_:$PK1:", "$_:$PK1:slug") } (1, 5, 20000, 29999, 40000)),
+        "10000:$PK1:slug", "30023:$PK1:missing", "30024:$PK1:slug", "30023:$PK2:slug",
+    ], 2000), 0, 'only matching addressable or replaceable coordinates delete events';
+    is $store->event_count, scalar @events, 'unmatched events are preserved';
+};
+
+subtest 'delete_matching counts overlapping and duplicate references only once' => sub {
+    my $store = Net::Nostr::RelayStore->new;
+    my @versions = map {
+        make_event(pubkey => $PK1, kind => 30023, created_at => $_, tags => [['d', '']])
+    } (1000, 1500, 2000, 3000);
+    my $note = make_event(pubkey => $PK1, kind => 1, created_at => 5000);
+    my $deletion = make_event(pubkey => $PK1, kind => 5, created_at => 1000);
+    $store->store($_) for (@versions, $note, $deletion);
+    my @ids = ($versions[0]->id, $versions[0]->id, $note->id, $deletion->id);
+    my @addresses = ("30023:$PK1:", "30023:$PK1:", "5:$PK1:");
+    is $store->delete_matching($PK1, \@ids, \@addresses, 2000), 4,
+        'each event counted once, with no timestamp cutoff for explicit event ids';
+    is [sort map { $_->id } @{$store->all_events}],
+        [sort ($versions[-1]->id, $deletion->id)], 'newer coordinate version and deletion request survive';
+    is $store->delete_matching($PK1, \@ids, \@addresses, 2000), 0,
+        'repeating the deletion removes nothing further';
+};
+
 subtest 'delete_matching skips kind 5 events' => sub {
     my $store = Net::Nostr::RelayStore->new;
     my $del_event = make_event(

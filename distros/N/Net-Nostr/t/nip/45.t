@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use JSON ();
 
 use lib 't/lib';
-use TestFixtures qw(make_event);
+use TestFixtures qw(make_event make_key_from_hex make_signed_event);
 
 use Net::Nostr::Event;
 use Net::Nostr::Filter;
@@ -466,9 +466,8 @@ subtest 'COUNT does not create a live subscription' => sub {
         my ($sub_id, $count) = @_;
         $got_count++;
         # After receiving count, inject an event and wait
-        my $event = make_event(
-            pubkey => $alice_pk, kind => 1,
-            content => 'later', sig => 'a' x 128,
+        my $event = make_signed_event(make_key_from_hex('1' x 64),
+            kind => 1, content => 'later',
         );
         $relay->inject_event($event);
         $relay->broadcast($event);

@@ -1,3 +1,40 @@
+1.002001   2026-09-09
+
+  - Reject references as event content during construction and wire parsing,
+    including JSON arrays, objects, and booleans. This tightens validation
+    in Event->new/from_wire, Key->create_event, and EVENT/AUTH message parsing.
+    Prevent signing reference stringifications that disagree with the
+    serialized wire content and fail validation after a JSON round trip.
+
+1.002000   2026-09-08
+
+  - Review fixes: validate all recognized group metadata fields and timeline
+    references, reject conflicting flags and empty group identifiers, and
+    allow edit_metadata to describe supported kinds and LiveKit support.
+    Explicit empty wallet encryption advertisements no longer imply NIP-04.
+    Execute the actual metadata, pin, and PaymentTargets POD examples in tests.
+
+  - Update the documented NIP conformance target to c3fd9af1 (2026-09-04).
+
+  - Add Net::Nostr::PaymentTargets for NIP-A3 kind 10133 lists, strict target
+    parsing, and URI rendering for known and future payment types.
+  - Document and test NIP-51 favorite follow sets (kind 10011) and NIP-46
+    unsupported-method error replies without restricting future method names.
+
+  - Allow NIP-22 comments on kind 1 notes.
+  - Parse and serialize optional NIP-67 EOSE hint arrays, preserving unknown
+    strings and rejecting malformed hint values.
+  - Add NIP-47 extension discovery and Info::extensions/supports_extension.
+    Discovery builders and parsers now reject malformed token lists and
+    duplicate or malformed discovery tags; existing notification APIs remain.
+  - Add NIP-29 invite suffixes, banner/parent/ordered child metadata, and
+    update_pin_list/pinned_events/pins_from_event helpers with strict validation.
+
+  - Tighten Filter validation to reject trailing newlines in identifiers,
+    integer fields, and tag filter names, and reject non-ASCII digits in
+    kinds, since, until, and limit. This also applies to filters parsed
+    from REQ, COUNT, and NEG-OPEN messages.
+
 1.001002   2026-07-07
 
   - Rework Net::Nostr::Blossom as a strict NIP-B7/BUD-03 integration

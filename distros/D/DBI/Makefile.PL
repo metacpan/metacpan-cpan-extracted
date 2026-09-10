@@ -80,6 +80,7 @@ my %opts = (
 	    "RPC::PlClient"   => 0.2020,
 	    "RPC::PlServer"   => 0.2020,
 	    "Net::Daemon"     => 0,
+	    "Params::Util"    => '1.100',
 	    "SQL::Statement"  => 1.414,
 	    "Clone"           => 0.47,
 	    "MLDBM"           => 0,
@@ -377,7 +378,7 @@ $(changes_pm2): $(changes_pm1)
 ptest:  all
 	prove --blib --jobs 8 --shuffle
 
-.PHONY:	doc change changes spellcheck checkpod newdist
+.PHONY:	doc change changes spellcheck checkpod newdist checkmeta disttgz tgzdist
 changes:	$(changes_pm1)
 doc:
 	perl dbixs_rev.pl
@@ -393,8 +394,14 @@ ppport:		dbipport.h
 # make dist does not remove existing .tar.gz causing questions
 newdist:
 	-@rm -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz
-tgzdist:	changes spellcheck newdist dist
-	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz
+checkmeta:	changes spellcheck ppport metafile
+	perl sandbox/genMETA.pl -c
+	perl sandbox/genMETA.pl
+# New target without the obsolete parts
+disttgz:	distdir
+	$(TAR) --format=ustar -czf $(DISTVNAME).tgz $(DISTVNAME)
+	$(RM_RF) $(DISTVNAME)
+tgzdist:	checkmeta newdist disttgz distcheck
 	-@cpants_lint.pl $(DISTVNAME).tgz
 	-@rm -f Debian_CPANTS.txt
 };

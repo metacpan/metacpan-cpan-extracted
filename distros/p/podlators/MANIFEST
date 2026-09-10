@@ -36,6 +36,7 @@ t/data/snippets/color/nonbreaking-wrap
 t/data/snippets/color/tag-width
 t/data/snippets/color/tag-wrapping
 t/data/snippets/color/width
+t/data/snippets/color/wrap-width
 t/data/snippets/color/wrapping
 t/data/snippets/man/agrave
 t/data/snippets/man/backslash-man-ref
@@ -101,6 +102,7 @@ t/data/snippets/man/x-whitespace-entry
 t/data/snippets/man/zero-width-space
 t/data/snippets/overstrike/nonbreaking-wrap
 t/data/snippets/overstrike/tag-width
+t/data/snippets/overstrike/wrap-width
 t/data/snippets/overstrike/wrapping
 t/data/snippets/README.md
 t/data/snippets/termcap/escape-wrapping
@@ -109,6 +111,7 @@ t/data/snippets/termcap/tag-width
 t/data/snippets/termcap/tag-wrapping
 t/data/snippets/termcap/term-unknown
 t/data/snippets/termcap/width
+t/data/snippets/termcap/wrap-width
 t/data/snippets/termcap/wrapping
 t/data/snippets/text/alt
 t/data/snippets/text/c-with-newline
@@ -148,6 +151,7 @@ t/data/snippets/text/sentence-spacing
 t/data/snippets/text/utf8
 t/data/snippets/text/utf8-iso
 t/data/snippets/text/verbatim
+t/data/snippets/text/wrap-width
 t/data/termcap
 t/docs/changes.t
 t/docs/pod-spelling.t

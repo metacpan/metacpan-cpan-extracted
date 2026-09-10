@@ -56,6 +56,12 @@ typedef struct {
     int   port;
     void *tls_ctx;        /* SSL_CTX*; NULL = plain                   */
     int   http2;          /* per-listener h2 (h2c / ALPN)             */
+    int   http3;          /* per-listener h3: a QUIC listener on the
+                           * same host and port, over UDP. Intrinsically
+                           * the same origin as the TLS listener it sits
+                           * on - same certificate, same SNI registry -
+                           * which is why it is a flag here rather than
+                           * a listener of its own (hm_quic.h)        */
     int   redirect_https; /* 0 = off; else target https port for 301  */
 
     /* What the context above was built from, kept so a worker can build
@@ -67,6 +73,15 @@ typedef struct {
     char *tls_key;
     char *tls_ca;         /* NULL unless client certs are verified    */
     int   tls_verify;
+
+    /* The QUIC half, when http3 is on. It rides on this listener rather
+     * than being one of its own because h3 is intrinsically the same origin
+     * as the TLS listener it advertises from: same host, same port number,
+     * same certificate, same SNI registry - only the transport differs. */
+    int   udp_fd;         /* bound SOCK_DGRAM fd, or -1               */
+    void *quic;           /* hm_quic_srv *, or NULL                   */
+    void *quic_ctx;       /* the QUIC-side SSL_CTX                    */
+    char *altsvc;         /* precomputed Alt-Svc value, or NULL       */
 } hm_listener;
 
 struct hm_conn {
@@ -135,6 +150,15 @@ struct hm_conn {
     hm_loop *loop;
     hm_listener *lst;       /* listener this conn was accepted on   */
 };
+
+/* QUIC's expiry min-heap. hm_quic.h owns every operation on it; the type is
+ * here because hm_loop carries one BY VALUE, so the "has QUIC anything to do"
+ * test on the loop's hot path is a load and a compare rather than a
+ * dereference. ngtcp2 rearms a connection's expiry after essentially every
+ * packet, and none of the backend timer vtables can carry that - see the
+ * header comment in hm_quic.h for the costing. */
+typedef struct hm_qconn hm_qconn;
+typedef struct { hm_qconn **a; int n, cap; } hm_qheap;
 
 /* app-owned fd watcher: a one-shot Future, a persistent Perl callback, or a
  * persistent C callback (the ABI path - dispatched with no Perl frame) */
@@ -210,17 +234,49 @@ struct hm_loop {
     UV          accepts;            /* connections accepted (stats) */
     UV          denied;             /* connections dropped at accept, denylist */
     UV          bytes_out;          /* response bytes queued (stats) */
+    UV          datagrams;          /* QUIC datagrams taken off the wire */
+    UV          h3_conns;           /* QUIC handshakes completed         */
+    UV          h3_live;            /* QUIC connections open now         */
+    UV          h3_requests;        /* requests served over HTTP/3       */
+    UV          datagrams_out;      /* QUIC datagrams sent (one sendto
+                                     * each: no GSO anywhere yet)       */
+    UV          http3_max_conns;    /* ceiling on h3_live, 0 = unlimited */
+    hm_qheap    qheap;              /* QUIC expiry deadlines (hm_quic.h) */
     UV          max_requests;       /* recycle worker after N (0=off) */
     int         recycle_pending;    /* max_requests hit; drain at loop top */
     double      shutdown_grace;     /* graceful-drain bound (secs)   */
     hm_tw      *hardstop_tw;
 };
 
+/* Does a Hyperman::Writer's tag slot hold this string? The four-element
+ * writer shapes (h2 and h3) have the same arity, so they are told apart by
+ * the tag and never by length - a length test routes an HTTP/3 body into an
+ * nghttp2 session. Used from xs/writer.xs. */
+static int hm_writer_tag_is(pTHX_ AV *w, const char *want, STRLEN wantlen) {
+    SV **t = av_fetch(w, 3, 0);
+    STRLEN l;
+    const char *p;
+    if (!t || !*t || !SvOK(*t)) return 0;
+    p = SvPV(*t, l);
+    return l == wantlen && memcmp(p, want, l) == 0;
+}
+
 /* Find the listener owning a ready fd (listener count is tiny). */
 static hm_listener *hm_listener_for_fd(hm_loop *loop, int fd) {
     int i;
     for (i = 0; i < loop->nlisteners; i++)
         if (loop->listeners[i].fd == fd) return &loop->listeners[i];
+    return NULL;
+}
+
+/* The same, for the QUIC side. Separate rather than a flag on the above,
+ * because a UDP listener fd is never in loop->conns[] and the caller wants
+ * to know which of the two it has. */
+static hm_listener *hm_listener_for_udp(hm_loop *loop, int fd) {
+    int i;
+    for (i = 0; i < loop->nlisteners; i++)
+        if (loop->listeners[i].udp_fd >= 0 && loop->listeners[i].udp_fd == fd)
+            return &loop->listeners[i];
     return NULL;
 }
 
@@ -244,6 +300,27 @@ static void hm_wb_put(hm_conn *c, const char *p, size_t n);
 static void hm_again_push(hm_loop *loop, hm_conn *c);
 static void hm_h2_free(pTHX_ void *h2);   /* defined in hm_http2.h */
 static void hm_readable(pTHX_ hm_conn *c);
+
+/* ABI v6 stream handles, defined in hm_stream.h (included below, after the
+ * HTTP/1 and HTTP/2 halves it sits on top of). The two counters are read on
+ * the close and flush paths rather than called into, because they are zero
+ * for every connection that never opened a handle - which is nearly all of
+ * them - and a list walk per flush is not free. */
+static int  hm_stream_live_n   = 0;
+static int  hm_stream_paused_n = 0;
+static void hm_quic_readable(pTHX_ hm_loop *loop, hm_listener *lst); /* hm_quic.h */
+static void hm_quic_expire(pTHX_ hm_loop *loop);                     /* hm_quic.h */
+static void hm_quic_srv_attach(pTHX_ hm_loop *loop, hm_listener *lst, int widx);
+static void hm_quic_srv_free(pTHX_ hm_listener *lst);
+static void hm_quic_shutdown(pTHX_ hm_loop *loop);
+static void hm_quic_ctx_swap(pTHX_ hm_listener *lst, void *fresh);
+static uint64_t hm_quic_next_deadline(hm_loop *loop);
+static void hm_quic_secret_init(void);
+static void hm_stream_conn_gone(pTHX_ int fd, UV id);
+static int  hm_stream_deliver(pTHX_ int fd, UV cid, int64_t sid,
+                              const char *buf, STRLEN len, int fin);
+static void hm_stream_h2_gone(pTHX_ int fd, UV id, int64_t sid);
+static void hm_stream_drained(pTHX_ hm_conn *c);
 
 #include "hm_tls.h"                        /* SSL_CTX, wrap, hm_cread/hm_cwrite */
 
@@ -423,9 +500,7 @@ static int hm_body_tmpfile(void) {
  * The file is UNLINKED as soon as it is open, and the handle keeps it alive:
  * it vanishes when the handle is closed, whether that is a normal response, a
  * handler that died, or the worker being killed mid-request. There is no
- * cleanup path to forget, nothing on disk for another process to find, and
- * nothing inherited across a fork - which is the failure mode this workspace
- * keeps meeting from the other direction.
+ * cleanup path to forget and nothing on disk for another process to find.
  *
  * Returns NULL to fall back to the in-memory handle, because a server that
  * cannot make a temp file should still serve the request.
@@ -887,12 +962,22 @@ static void hm_rearm_read(hm_loop *loop, hm_conn *c) {
 }
 
 static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
+    /* Stream handles open on this connection die with it. They are told
+     * first, while the connection is still consistent, and they are only
+     * marked dead - the handle itself belongs to whoever opened it until
+     * it calls stream_close. */
+    if (hm_stream_live_n) hm_stream_conn_gone(aTHX_ c->fd, c->id);
     /* Before anything else touches the buffers: if the kernel is still
      * holding a pointer into this connection's read buffer, take the buffer
      * away from the connection so the pooling below cannot hand it to the
      * next one. The connection is pooled with a NULL rbuf and hm_new_conn
      * allocates a fresh one. */
-    if (c && c->recv_inflight) {
+    /* c is never NULL here - every caller passes a live connection, and this
+     * function dereferences it unconditionally a few lines down. The `c &&`
+     * these two guards used to carry was dead, and it told a static analyser
+     * the opposite of the truth: cppcheck reported four null dereferences
+     * from it, all of them the guard's fault rather than the code's. */
+    if (c->recv_inflight) {
         if (loop->be->cancel_recv) loop->be->cancel_recv(loop->be, c->fd);
         hm_quar_push(loop, HM_RECV_TOKEN(c), c->rbuf);
         c->rbuf = NULL;
@@ -900,7 +985,7 @@ static void hm_close(pTHX_ hm_loop *loop, hm_conn *c) {
         c->rlen = 0;
         c->recv_inflight = 0;
     }
-    if (c && c->spill_fd >= 0) {     /* a body was still draining */
+    if (c->spill_fd >= 0) {          /* a body was still draining */
         PerlLIO_close(c->spill_fd);
         c->spill_fd = -1;
         c->spill_got = 0;
@@ -996,6 +1081,9 @@ static int hm_detach(pTHX_ hm_loop *loop, int fd, UV id) {
 static void hm_conn_release(pTHX_ hm_loop *loop, hm_conn *c) {
     int fd = c->fd;
     SV *pending = c->resp_f;
+    /* The fd survives, the connection object does not: a handle naming it
+     * is as dead as it would be after a close. */
+    if (hm_stream_live_n) hm_stream_conn_gone(aTHX_ c->fd, c->id);
     c->resp_f = NULL;
     if (c->bsrc.kind) hm_bsrc_release(aTHX_ &c->bsrc);
     hm_lru_unlink(loop, c);
@@ -1196,7 +1284,7 @@ enum {
     HMK_PSGI_MULTIPROCESS, HMK_PSGI_RUN_ONCE, HMK_PSGI_STREAMING,
     HMK_PSGI_NONBLOCKING, HMK_PSGI_ERRORS, HMK_PSGIX_LOOP, HMK_PSGIX_IO,
     HMK_PSGI_INPUT, HMK_PSGIX_INPUT_BUFFERED, HMK_CONTENT_LENGTH,
-    HMK_CONTENT_TYPE, HMK_PSGIX_HM_CONN, HMK_COUNT
+    HMK_CONTENT_TYPE, HMK_PSGIX_HM_CONN, HMK_PSGIX_HM_STREAM, HMK_COUNT
 };
 static const char *const hm_env_key_name[HMK_COUNT] = {
     "REQUEST_METHOD", "REQUEST_URI", "PATH_INFO", "QUERY_STRING",
@@ -1206,7 +1294,7 @@ static const char *const hm_env_key_name[HMK_COUNT] = {
     "psgi.multiprocess", "psgi.run_once", "psgi.streaming",
     "psgi.nonblocking", "psgi.errors", "psgix.loop", "psgix.io",
     "psgi.input", "psgix.input.buffered", "CONTENT_LENGTH",
-    "CONTENT_TYPE", "psgix.hyperman.conn"
+    "CONTENT_TYPE", "psgix.hyperman.conn", "psgix.hyperman.stream"
 };
 static SV *hm_env_key[HMK_COUNT];
 static SV *hm_env_zero, *hm_env_one;   /* read-only 0/1 flag values      */
@@ -1375,12 +1463,18 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
      * makes a stale ticket a no-op rather than a wrong-connection hit. */
     if (!c->cid_sv) {
         AV *cid = newAV();
-        av_extend(cid, 1);
+        av_extend(cid, 2);
         av_store(cid, 0, newSViv(c->fd));
         av_store(cid, 1, newSVuv(c->id));
+        /* The third element is the stream id, and -1 is "the whole
+         * connection is the stream" - which is what HTTP/1.1 is. It rides on
+         * the same cached arrayref rather than a second one, so
+         * psgix.hyperman.stream costs a store and not an allocation. */
+        av_store(cid, 2, newSViv(-1));
         c->cid_sv = newRV_noinc((SV *)cid);
     }
-    hm_env_store(env, HMK_PSGIX_HM_CONN, SvREFCNT_inc(c->cid_sv));
+    hm_env_store(env, HMK_PSGIX_HM_CONN,   SvREFCNT_inc(c->cid_sv));
+    hm_env_store(env, HMK_PSGIX_HM_STREAM, SvREFCNT_inc(c->cid_sv));
     if (c->ssl) hm_tls_env(aTHX_ c, env);
 
     c->keepalive = (plen == 8 && memcmp(proto, "HTTP/1.1", 8) == 0);
@@ -1886,6 +1980,16 @@ static int hm_queue_response(pTHX_ hm_conn *c, SV *resp) {
         hm_wb_put(c, "Content-Encoding: gzip\r\n", 24);
         hm_wb_put(c, "Vary: Accept-Encoding\r\n", 23);
     }
+    /* Alt-Svc: how a client finds out this origin also speaks HTTP/3. It is
+     * advertised on the HTTP/1.1 and HTTP/2 responses and never on an h3 one,
+     * where it would be telling a client what it is already using. The value
+     * is precomputed per listener in hm_worker_listeners - never built from a
+     * client-supplied Host, which would let a request choose the header. */
+    if (c->lst && c->lst->altsvc) {
+        hm_wb_put(c, "Alt-Svc: ", 9);
+        hm_wb_put(c, c->lst->altsvc, strlen(c->lst->altsvc));
+        hm_wb_put(c, "\r\n", 2);
+    }
     /* 1xx/204/304 carry no entity: no Content-Length, no body (RFC 7230) */
     {
         int no_entity = (status < 200 || status == 204 || status == 304);
@@ -2080,6 +2184,15 @@ static int hm_flush(pTHX_ hm_conn *c) {
     if (c->writing) {
         loop->be->remove_io(loop->be, c->fd, HM_EV_WRITE);
         c->writing = 0;
+    }
+    /* A stream handle that was told to stop producing can start again. The
+     * callback may write, and writing calls back in here, so re-read the
+     * connection afterwards rather than deciding on what was true before. */
+    if (hm_stream_paused_n) {
+        int fd = c->fd;
+        hm_stream_drained(aTHX_ c);
+        if (loop->conns[fd] != c)      return -1;
+        if (c->wlen || c->bsrc.kind)   return 0;
     }
     if (!c->keepalive && !c->awaiting) { hm_close(aTHX_ loop, c); return -1; }
     /* requests that pipelined in behind the stream were parked; pick them
@@ -2327,6 +2440,15 @@ static void hm_delayed(pTHX_ hm_conn *c, SV *code) {
 /* ---- HTTP/2 (h2c via nghttp2), reusing the helpers above ----------------- */
 
 #include "hm_http2.h"
+
+/* ---- ABI v6 stream handles, over both halves above ---------------------- */
+
+#include "hm_stream.h"
+
+/* ---- HTTP/3 over QUIC: the transport, then the semantics ---------------- */
+
+#include "hm_quic.h"
+#include "hm_http3.h"
 
 /* ---- request processing -------------------------------------------------- */
 
@@ -2897,10 +3019,18 @@ static void hm_on_signal(pTHX_ hm_loop *loop) {
     loop->stopping = 1;
     {
         int i;
-        for (i = 0; i < loop->nlisteners; i++)
+        for (i = 0; i < loop->nlisteners; i++) {
             if (loop->listeners[i].fd >= 0)
                 loop->be->remove_io(loop->be, loop->listeners[i].fd, HM_EV_READ);
+            /* Stop taking datagrams too. A QUIC connection already up is
+             * not on this fd in any fd-indexed sense, so nothing else here
+             * reaches it; draining those needs a graceful shutdown that
+             * sends CONNECTION_CLOSE, which is not implemented. */
+            if (loop->listeners[i].udp_fd >= 0)
+                loop->be->remove_io(loop->be, loop->listeners[i].udp_fd, HM_EV_READ);
+        }
     }
+    hm_quic_shutdown(aTHX_ loop);
     c = loop->lru_head;
     while (c) {
         hm_conn *next = c->lru_next;
@@ -3053,6 +3183,13 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
         hm_conn *c;
         hm_listener *lst;
         if ((lst = hm_listener_for_fd(loop, fd))) { hm_accept(aTHX_ loop, lst); return; }
+        /* Between the two, because a UDP listener fd is never in conns[]:
+         * QUIC multiplexes every connection over the one socket, so there is
+         * nothing fd-indexed to find. */
+        if ((lst = hm_listener_for_udp(loop, fd))) {
+            hm_quic_readable(aTHX_ loop, lst);
+            return;
+        }
         if ((c = loop->conns[fd])) {
             if (c->tls_hs)              hm_tls_handshake(aTHX_ c);
             else                        hm_readable(aTHX_ c);
@@ -3105,9 +3242,28 @@ static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
         if (loop->stop) break;
         if (until && hmf_state(aTHX_ until) != HMF_PENDING) break;
         if (av_len(loop->deferred) >= 0 || loop->again_n) timeout = 0.0;
+        /* QUIC's deadlines do not live in the backend's timer list - see the
+         * costing in hm_quic.h - so the wait is clamped to the nearest one
+         * here instead. Rounding UP is correct: ngtcp2 copes with a late
+         * expiry and not with an early one, and the backends already round
+         * to milliseconds. One compare when there is no QUIC listener. */
+        if (loop->qheap.n) {
+            /* Through a function rather than reaching into the heap here:
+             * hm_qconn is an opaque forward declaration on a build without
+             * QUIC, and dereferencing it would compile only where the
+             * feature is present - which is not where the mistake shows up. */
+            uint64_t now_ns = hm_now_ns();
+            uint64_t due    = hm_quic_next_deadline(loop);
+            if (due != (uint64_t)-1) {
+                double secs = due <= now_ns ? 0.0
+                                            : (double)(due - now_ns) / 1e9;
+                if (timeout < 0.0 || secs < timeout) timeout = secs;
+            }
+        }
         n = loop->be->wait(loop->be, evs, HM_MAXEV, timeout);
         if (n < 0) { if (errno == EINTR) continue; break; }
         for (i = 0; i < n; i++) hm_dispatch(aTHX_ loop, &evs[i]);
+        if (loop->qheap.n) hm_quic_expire(aTHX_ loop);
         if (loop->log_fd >= 0 && loop->log_len) hm_log_flush(loop);
         if (loop->stop) break;
         if (until && hmf_state(aTHX_ until) != HMF_PENDING) break;
@@ -3169,13 +3325,12 @@ static hm_loop *hm_loop_new(pTHX_ const char *backend_name) {
  * freed WITHOUT closing anything: the memory is ours to release, the fds are
  * not.
  *
- * Closing them is not merely untidy, it is destructive. kqueue descriptors do
- * not survive fork(2) at all - the kernel invalidates the child's copy, so the
- * number is free, and the very next kqueue() in the child is handed it back.
- * Closing the inherited loop then shuts the CHILD'S OWN queue and nothing it
- * watches ever fires again. The epoll and connection fds are less spectacular
- * but no better: they are the parent's, still live, and closing our duplicates
- * frees numbers that the child immediately reuses. */
+ * Closing them is destructive, not merely untidy. kqueue descriptors do not
+ * survive fork(2): the kernel invalidates the child's copy, so the number is
+ * free and the child's very next kqueue() is handed it back - closing the
+ * inherited loop then shuts the CHILD'S OWN queue and nothing it watches
+ * fires again. The epoll and connection fds are the parent's, still live, and
+ * closing our duplicates frees numbers the child immediately reuses. */
 /* A loop inherited across a fork must never reach its backend. On Linux an
  * epoll INSTANCE is a shared kernel object: fork duplicates the fd but both
  * processes' epoll_ctl calls edit the SAME interest list, so a child
@@ -3225,8 +3380,19 @@ static void hm_loop_free(pTHX_ hm_loop *loop) {
     }
     if (loop->log_fd >= 0 && owned) { hm_log_flush(loop); hm_os_close(loop->log_fd); }
     if (loop->log_buf) free(loop->log_buf);
-    for (i = 0; i < loop->nlisteners; i++)
-        if (loop->listeners[i].host) free(loop->listeners[i].host);
+    for (i = 0; i < loop->nlisteners; i++) {
+        /* Before the fds: freeing a connection writes a CONNECTION_CLOSE. */
+        if (owned) hm_quic_srv_free(aTHX_ &loop->listeners[i]);
+        if (loop->listeners[i].host)   free(loop->listeners[i].host);
+        if (loop->listeners[i].altsvc) free(loop->listeners[i].altsvc);
+        /* `owned` for the same reason every other descriptor here is: a loop
+         * belonging to another process holds fd NUMBERS that are ours, and
+         * closing them would close whatever this process has since put
+         * there. An inherited UDP listener is the third case of that, after
+         * the backend descriptor and the connections. */
+        if (loop->listeners[i].udp_fd >= 0 && owned)
+            hm_os_close(loop->listeners[i].udp_fd);
+    }
     if (loop->listeners) free(loop->listeners);
     if (loop->self_sv) SvREFCNT_dec(loop->self_sv);
     if (loop->log_cb)  SvREFCNT_dec(loop->log_cb);
@@ -3236,6 +3402,7 @@ static void hm_loop_free(pTHX_ hm_loop *loop) {
     if (loop->hidx) free(loop->hidx);
     if (loop->sweep_tw) free(loop->sweep_tw);
     if (loop->hardstop_tw) free(loop->hardstop_tw);
+    if (loop->qheap.a) free(loop->qheap.a);
     /* destroy() releases the backend's memory either way; `foreign` is what
      * stops it closing descriptors that are not ours - see the note above */
     if (!owned) loop->be->foreign = 1;
@@ -3252,8 +3419,15 @@ static void hm_attach_server(pTHX_ hm_loop *loop, SV *app) {
     int i;
     loop->app = SvREFCNT_inc(app);
     loop->attached = 1;
-    for (i = 0; i < loop->nlisteners; i++)
+    for (i = 0; i < loop->nlisteners; i++) {
         loop->be->add_io(loop->be, loop->listeners[i].fd, HM_EV_READ, 0);
+        if (loop->listeners[i].udp_fd >= 0) {
+            /* After the fork, in the worker that will serve: the SSL_CTX and
+             * the CID table belong to this process alone. */
+            hm_quic_srv_attach(aTHX_ loop, &loop->listeners[i], i);
+            loop->be->add_io(loop->be, loop->listeners[i].udp_fd, HM_EV_READ, 0);
+        }
+    }
 #ifndef _WIN32
     /* Ignore the default dispositions: these arrive through the backend's
      * signal watcher instead. Windows has no signal to ignore - the
@@ -3392,6 +3566,42 @@ static int hm_make_listener(const char *host, int port, int reuseport) {
     return fd;
 }
 
+/* The QUIC listener: the same address as its TCP twin, over UDP. No
+ * listen(2) - there is no accept queue, because there is no accept: one
+ * socket carries every connection and the Destination Connection ID in each
+ * packet says which (hm_quic.h). SO_REUSEPORT is honoured the same way, and
+ * carries the same caveat the TCP side does not have: the kernel's UDP
+ * reuseport hash is over the 4-tuple, so a client that migrates lands on a
+ * different worker than the one holding its connection. That is why
+ * migration is deferred rather than half-supported. */
+static int hm_make_udp_listener(const char *host, int port, int reuseport) {
+    struct sockaddr_in addr;
+    int one = 1;
+    int fd = hm_os_socket(PF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) return -1;
+#ifdef _WIN32
+    hm_os_setsockopt(fd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, &one, sizeof(one));
+#else
+    hm_os_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+#endif
+#ifdef SO_REUSEPORT
+    if (reuseport)
+        hm_os_setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &one, sizeof(one));
+#else
+    (void)reuseport;
+#endif
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port   = htons((unsigned short)port);
+    addr.sin_addr.s_addr = inet_addr(host);
+    if (addr.sin_addr.s_addr == INADDR_NONE) addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    if (hm_os_bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        hm_os_close(fd); return -1;
+    }
+    hm_set_nonblock(fd);
+    return fd;
+}
+
 /* ---- the supervisor half: POSIX only --------------------------------------
  * Everything from here to the end of hm_run_server's pool branch needs
  * fork(2), waitpid(2) and POSIX signal delivery. Windows has none of the
@@ -3427,8 +3637,10 @@ typedef struct {
     int         tls_verify;
     SV         *tls_sni;
     int         http2;
+    int         http3;
     int         redirect_https;
     int         fd;                 /* bound fd (parent), or -1 under reuseport */
+    int         udp_fd;             /* the QUIC socket, same rules; -1 if no h3 */
     void       *tls_ctx;            /* built SSL_CTX*, or NULL for plain        */
 } hm_listener_spec;
 
@@ -3447,6 +3659,18 @@ static void hm_check_listener(pTHX_ const hm_listener_spec *s) {
     if (s->http2 && !hm_h2_available())
         croak("Hyperman->run: http2 requested but nghttp2 support was not "
               "built (install libnghttp2-dev and reinstall Hyperman)");
+    if (s->http3) {
+        if (!hm_h3_available())
+            croak("Hyperman->run: http3 requested but QUIC support was not "
+                  "built (it needs ngtcp2, ngtcp2_crypto_ossl, nghttp3 and "
+                  "OpenSSL 3.5 or newer - reinstall Hyperman once they are "
+                  "installed)");
+        /* There is no cleartext QUIC the way there is h2c: the transport's
+         * handshake IS a TLS handshake, so a certificate is not optional. */
+        if (!(s->tls_cert && s->tls_key))
+            croak("Hyperman->run: http3 needs tls_cert and tls_key (QUIC has "
+                  "no cleartext mode)");
+    }
     if (s->redirect_https && (s->tls_cert || s->tls_key))
         croak("Hyperman->run: redirect_https on a TLS listener makes no sense");
 }
@@ -3466,6 +3690,7 @@ static void hm_listener_from_hv(pTHX_ HV *h, hm_listener_spec *s) {
         else if (strEQ(k, "tls_ca"))   s->tls_ca   = SvOK(v) ? SvPV_nolen(v) : NULL;
         else if (strEQ(k, "tls_sni"))  s->tls_sni  = SvOK(v) ? v : NULL;
         else if (strEQ(k, "http2"))    s->http2 = SvTRUE(v) ? 1 : 0;
+        else if (strEQ(k, "http3"))    s->http3 = SvTRUE(v) ? 1 : 0;
         else if (strEQ(k, "redirect_https")) s->redirect_https = (int)SvIV(v);
         else if (strEQ(k, "tls_verify")) {
             const char *m = SvPV_nolen(v);
@@ -3499,6 +3724,7 @@ typedef struct {
     SV         *deny;               /* arrayref of IPs to denylist, or NULL */
     unsigned    deny_cap, rate_cap; /* arena table sizes, 0 = default        */
     unsigned    bus_slots, bus_slot_size, bus_groups;  /* 0 = default        */
+    UV          http3_max_conns;    /* QUIC connection ceiling, 0 = off      */
 } hm_worker_cfg;
 
 /* Populate the loop's listener array from the (already bound) specs. Under
@@ -3514,10 +3740,12 @@ static int hm_worker_listeners(hm_loop *loop, const hm_worker_cfg *cfg,
         hm_listener *l = &loop->listeners[i];
         l->fd = fds ? fds[i] : s->fd;
         if (l->fd < 0) return -1;
+        l->udp_fd = fds ? fds[cfg->nlspecs + i] : s->udp_fd;
         l->host = strdup(s->host && *s->host ? s->host : "0.0.0.0");
         l->port = s->port;
         l->tls_ctx = s->tls_ctx;
         l->http2 = s->http2;
+        l->http3 = s->http3;
         l->redirect_https = s->redirect_https;
         /* Copied, not borrowed: hm_tls_reload frees the context it
          * replaces, and a rebuild has to name the same cert and key. */
@@ -3525,6 +3753,15 @@ static int hm_worker_listeners(hm_loop *loop, const hm_worker_cfg *cfg,
         l->tls_key    = s->tls_key  ? strdup(s->tls_key)  : NULL;
         l->tls_ca     = s->tls_ca   ? strdup(s->tls_ca)   : NULL;
         l->tls_verify = s->tls_verify;
+        /* Precomputed once here rather than per response: the value never
+         * changes for the life of the listener, and a header built per
+         * request would be built on the hot path for every request the
+         * listener ever serves. */
+        if (l->udp_fd >= 0) {
+            char b[64];
+            int n = snprintf(b, sizeof(b), "h3=\":%d\"; ma=86400", l->port);
+            l->altsvc = (n > 0 && n < (int)sizeof(b)) ? strdup(b) : NULL;
+        }
     }
     return 0;
 }
@@ -3548,12 +3785,9 @@ static int hm_worker_listeners(hm_loop *loop, const hm_worker_cfg *cfg,
  *     with a message and still returns a usable default, which is right
  *     at boot but silently drops that domain to the fallback here. So
  *     the built registry is counted against what was asked for, and a
- *     context carrying fewer hosts is thrown away.
- *
- * The cost of the second rule is that one customer's corrupt PEM defers
- * everybody's update to the next poll. The alternative is installing a
- * context that has quietly stopped serving somebody's domain, which is
- * the outage this whole feature exists to prevent.
+ *     context carrying fewer hosts is thrown away. The cost is that one
+ *     corrupt PEM defers everybody's update to the next poll, against
+ *     installing a context that quietly stopped serving a domain.
  *
  * Returns the number of listeners rebuilt. */
 static int hm_tls_reload(pTHX_ hm_loop *loop, SV *sni) {
@@ -3594,6 +3828,29 @@ static int hm_tls_reload(pTHX_ hm_loop *loop, SV *sni) {
             continue;
         }
 
+        /* The QUIC context serves the SAME certificate over the same origin,
+         * so it is rebuilt with the TCP one and the two are swapped together
+         * or not at all. Swapping only the TCP side leaves a fleet serving a
+         * fresh certificate over TCP and a stale one over QUIC - a mismatch
+         * no TCP-only monitor can see, on the transport a browser prefers.
+         *
+         * The new QUIC context is built BEFORE either is installed, so a
+         * failure to build it keeps both of the running pair rather than
+         * leaving a half-swapped listener. */
+        if (l->udp_fd >= 0 && l->quic) {
+            void *qfresh = hm_tls_quic_ctx_build(l->tls_cert, l->tls_key,
+                                                 l->tls_ca, l->tls_verify,
+                                                 tk, tklen);
+            if (!qfresh) {
+                fprintf(stderr, "Hyperman TLS: reload could not rebuild the "
+                                "QUIC context; keeping both running "
+                                "certificates\n");
+                hm_tls_ctx_free(fresh);
+                continue;
+            }
+            hm_quic_ctx_swap(aTHX_ l, qfresh);
+        }
+
         hm_tls_ctx_free(l->tls_ctx);
         l->tls_ctx = fresh;
         done++;
@@ -3610,8 +3867,7 @@ static int hm_tls_reload(pTHX_ hm_loop *loop, SV *sni) {
  * The callback MUST NOT CROAK. It is called from the event loop with no Perl
  * frame around it, and a die from a subscriber would unwind through the loop
  * and take the worker with it - so the dispatch below is the only thing here,
- * and anything Perl-facing wraps itself in G_EVAL before it gets this far.
- * The queue plan learned that the expensive way at its phase 5. */
+ * and anything Perl-facing wraps itself in G_EVAL before it gets this far. */
 static void hm_bus_wake_cb(pTHX_ int fd, int mask, void *ud) {
     PERL_UNUSED_ARG(fd);
     PERL_UNUSED_ARG(mask);
@@ -3662,6 +3918,7 @@ static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
     if (cfg->compress_min) loop->compress_min = cfg->compress_min;
     if (cfg->compress_level) loop->compress_level = cfg->compress_level;
     if (cfg->max_read) loop->max_read = cfg->max_read;
+    loop->http3_max_conns = cfg->http3_max_conns;
     loop->compress_types = cfg->compress_types
                            ? SvREFCNT_inc(cfg->compress_types) : NULL;
     if (hm_worker_listeners(loop, cfg, fds) < 0) {
@@ -3733,14 +3990,23 @@ static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
         (void)widx;
 #endif
         if (cfg->reuseport) {
-            int i;
-            fds = cfg->nlspecs <= (int)(sizeof(stackfds)/sizeof(stackfds[0]))
+            int i, n = cfg->nlspecs;
+            /* Two descriptors per listener now, TCP in the first half and
+             * QUIC in the second, so hm_worker_listeners reads fds[i] and
+             * fds[n + i]. */
+            fds = 2 * n <= (int)(sizeof(stackfds)/sizeof(stackfds[0]))
                   ? stackfds
-                  : (int *)hm_xmalloc(sizeof(int) * cfg->nlspecs);
-            for (i = 0; i < cfg->nlspecs; i++) {
+                  : (int *)hm_xmalloc(sizeof(int) * 2 * n);
+            for (i = 0; i < n; i++) {
                 fds[i] = hm_make_listener(cfg->lspecs[i].host,
                                           cfg->lspecs[i].port, 1);
                 if (fds[i] < 0) _exit(1);
+                fds[n + i] = -1;
+                if (cfg->lspecs[i].http3) {
+                    fds[n + i] = hm_make_udp_listener(cfg->lspecs[i].host,
+                                                      cfg->lspecs[i].port, 1);
+                    if (fds[n + i] < 0) _exit(1);
+                }
             }
         }
         /* This child's own waker slot, claimed before hm_worker so the
@@ -3772,6 +4038,13 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
      * first accepted connection. Single-worker (dev) mode maps it too, so the
      * ABI behaves the same whether or not a supervisor forks. */
     hm_rl_arena_init(cfg->deny_cap, cfg->rate_cap);
+
+    /* QUIC's stateless-reset and (later) Retry secret, generated HERE - once,
+     * before any worker forks - for the same reason the TLS ticket key is:
+     * under SO_REUSEPORT a client's token can land on a different worker than
+     * the one that issued it, and a per-worker secret would make every such
+     * token unverifiable. Inherited across the fork, so every worker agrees. */
+    hm_quic_secret_init();
 
     /* The message bus, mapped in the same place and for the same reason: a
      * ring created after the fork would be one ring per worker, which is a
@@ -3836,7 +4109,19 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
             s->fd = hm_make_listener(s->host, s->port, cfg->reuseport);
             if (s->fd < 0)
                 croak("Hyperman: bind %s:%d: %s", s->host, s->port, strerror(errno));
-            if (cfg->reuseport) { hm_os_close(s->fd); s->fd = -1; }  /* probe only */
+            /* Assigned on every spec, not only the h3 ones: the struct is
+             * memset to zero and 0 is a legitimate descriptor. */
+            s->udp_fd = -1;
+            if (s->http3) {
+                s->udp_fd = hm_make_udp_listener(s->host, s->port, cfg->reuseport);
+                if (s->udp_fd < 0)
+                    croak("Hyperman: bind udp %s:%d: %s", s->host, s->port,
+                          strerror(errno));
+            }
+            if (cfg->reuseport) {                                    /* probe only */
+                hm_os_close(s->fd); s->fd = -1;
+                if (s->udp_fd >= 0) { hm_os_close(s->udp_fd); s->udp_fd = -1; }
+            }
         }
     }
 
@@ -3846,11 +4131,17 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
         if (cfg->reuseport) {
             int i;
             for (i = 0; i < cfg->nlspecs; i++) {
-                cfg->lspecs[i].fd = hm_make_listener(cfg->lspecs[i].host,
-                                                     cfg->lspecs[i].port, 1);
-                if (cfg->lspecs[i].fd < 0)
-                    croak("Hyperman: bind %s:%d: %s", cfg->lspecs[i].host,
-                          cfg->lspecs[i].port, strerror(errno));
+                hm_listener_spec *s = &cfg->lspecs[i];
+                s->fd = hm_make_listener(s->host, s->port, 1);
+                if (s->fd < 0)
+                    croak("Hyperman: bind %s:%d: %s", s->host, s->port,
+                          strerror(errno));
+                if (s->http3) {
+                    s->udp_fd = hm_make_udp_listener(s->host, s->port, 1);
+                    if (s->udp_fd < 0)
+                        croak("Hyperman: bind udp %s:%d: %s", s->host, s->port,
+                              strerror(errno));
+                }
             }
         }
         hm_worker(aTHX_ cfg, NULL);

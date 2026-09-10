@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000835';
+our $VERSION='1.0000836';
 
 #print `env`,"\n\n\n";
 
@@ -136,6 +136,8 @@ END
 
 }
 
+umask 0022;
+use File::Basename;
 our $aws;
 our %amazon;
 $ENV{LOADED_MODULES}||='';
@@ -710,6 +712,7 @@ $SIG{__DIE__} = sub{ eval { require Term::ReadKey };
                    exit 1};
 
 use Cwd qw/cwd/;
+my $rootdir=&cwd;
 use File::stat;
 unless (grep { /CPAN|SKIP/ } @ARGV) {
    {
@@ -1706,10 +1709,19 @@ sub fa_find_latest {
       }
       $ENV{CPAN_BUILD_DIR}=$d;
    }
+   my $basename='';
    if ($cpanfil) {
-      my $cwd=&cwd;
-      fa_system("cd $ENV{CPAN_BUILD_DIR};tar xvf ".
-                "$cwd/dependencies/CPAN/authors/id/$cpanfil;cd $cwd");
+      $basename=basename($rootdir);
+      unless (-e "$ENV{CPAN_BUILD_DIR}/$basename") {
+         $basename=$rootdir;
+      } elsif ($basename!~/Net-FullAuto/) {
+         $basename="Net-FullAuto-$VERSION";
+      }
+      eval {
+         fa_system("cd $ENV{CPAN_BUILD_DIR};tar xvf ".
+                   "$basename/dependencies/CPAN/authors/id/$cpanfil");
+      };
+      chdir $rootdir;
       $look=$cpanfil;
       $look=~s/.tar.gz//;
       $look=~s/^.*\/(.*)$/$1/;

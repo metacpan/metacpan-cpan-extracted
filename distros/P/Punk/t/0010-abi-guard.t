@@ -9,7 +9,7 @@ use Test::More;
 use PunkTest;
 use File::Raw::JSON qw(file_json_decode);
 
-# Phase 6: an API operation is routed and dispatched entirely in C through
+# An API operation is routed and dispatched entirely in C through
 # Open::API's ABI (oa_abi.h) - before hooks, guards, 413/501, validation and
 # the controller. Open::API 0.04+ is a hard prerequisite, so there is no Perl
 # fallback: the ABI is always there, and a version mismatch is a boot error.

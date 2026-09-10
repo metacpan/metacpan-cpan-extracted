@@ -10,14 +10,15 @@ use AnyEvent;
 use IO::Socket::INET;
 
 use lib 't/lib';
-use TestFixtures qw(make_event);
+use TestFixtures qw(make_event make_key_from_hex make_signed_event);
 
 use Net::Nostr::Event;
 use Net::Nostr::Filter;
 use Net::Nostr::Client;
 use Net::Nostr::Relay;
 
-my $alice_pk = 'a' x 64;
+my $alice_key = make_key_from_hex('1' x 64);
+my $alice_pk = $alice_key->pubkey_hex;
 
 ###############################################################################
 # "The expiration tag enables users to specify a unix timestamp"
@@ -117,9 +118,9 @@ subtest 'relay rejects expired events on publish' => sub {
     my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
     $relay->start('127.0.0.1', $port);
 
-    my $expired = make_event(
-        pubkey => $alice_pk, kind => 1,
-        content => 'old news', sig => 'a' x 128,
+    my $expired = make_signed_event($alice_key,
+        kind => 1,
+        content => 'old news',
         tags => [['expiration', '1000000000']],
     );
 
@@ -153,9 +154,9 @@ subtest 'relay accepts non-expired events' => sub {
     $relay->start('127.0.0.1', $port);
 
     my $far_future = time() + 86400 * 365 * 10;
-    my $event = make_event(
-        pubkey => $alice_pk, kind => 1,
-        content => 'still fresh', sig => 'a' x 128,
+    my $event = make_signed_event($alice_key,
+        kind => 1,
+        content => 'still fresh',
         tags => [['expiration', "$far_future"]],
     );
 
@@ -192,9 +193,9 @@ subtest 'relay does not return expired events in queries' => sub {
     $relay->start('127.0.0.1', $port);
 
     # Manually store an event that has since expired
-    my $expired = make_event(
-        pubkey => $alice_pk, kind => 1,
-        content => 'expired now', sig => 'a' x 128,
+    my $expired = make_signed_event($alice_key,
+        kind => 1,
+        content => 'expired now',
         tags => [['expiration', '1000000000']],
     );
     $relay->inject_event($expired);
@@ -227,9 +228,9 @@ subtest 'relay does not broadcast expired events' => sub {
     $relay->start('127.0.0.1', $port);
 
     # Manually inject an expired event that was stored before it expired
-    my $expired = make_event(
-        pubkey => $alice_pk, kind => 1,
-        content => 'will expire', sig => 'a' x 128,
+    my $expired = make_signed_event($alice_key,
+        kind => 1,
+        content => 'will expire',
         tags => [['expiration', '1000000000']],
     );
 
@@ -270,9 +271,9 @@ subtest 'expiration does not affect ephemeral event handling' => sub {
     $relay->start('127.0.0.1', $port);
 
     my $far_future = time() + 86400 * 365 * 10;
-    my $ephemeral = make_event(
-        pubkey => $alice_pk, kind => 20001,
-        content => 'ephemeral with expiry', sig => 'a' x 128,
+    my $ephemeral = make_signed_event($alice_key,
+        kind => 20001,
+        content => 'ephemeral with expiry',
         tags => [['expiration', "$far_future"]],
     );
 
@@ -304,9 +305,9 @@ subtest 'expired ephemeral event is still accepted and broadcast' => sub {
     my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
     $relay->start('127.0.0.1', $port);
 
-    my $expired_ephemeral = make_event(
-        pubkey => $alice_pk, kind => 20001,
-        content => 'expired ephemeral', sig => 'a' x 128,
+    my $expired_ephemeral = make_signed_event($alice_key,
+        kind => 20001,
+        content => 'expired ephemeral',
         tags => [['expiration', '1000000000']],
     );
 
@@ -342,9 +343,9 @@ subtest 'events without expiration are unaffected by relay filtering' => sub {
     my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
     $relay->start('127.0.0.1', $port);
 
-    my $normal = make_event(
-        pubkey => $alice_pk, kind => 1,
-        content => 'permanent note', sig => 'a' x 128,
+    my $normal = make_signed_event($alice_key,
+        kind => 1,
+        content => 'permanent note',
     );
 
     my $client = Net::Nostr::Client->new;

@@ -1,5 +1,29 @@
 Revision history for Compression-Util
 
+0.18    2026-09-09
+
+        [ADDITIONS]
+
+        - Added the `elias_delta_encode` / `elias_delta_decode` functions.
+        - Added the `shannon_entropy` function.
+        - Added the `leb128_encode` / `leb128_decode` functions.
+        - Added the `golomb_rice_encode` / `golomb_rice_decode` functions.
+        - Added the `detect_format` function.
+        - Added the `decompress_auto` function.
+        - Added the `best_compress` / `best_decompress` functions.
+
+        [IMPROVEMENTS]
+
+        - Slightly faster `adler32` (1.2x faster).
+        - Better performance in `bwt_sort` for highly repetitive patterns.
+        - Better performance in `bytes2int`, `bytes2int_lsb` and `read_null_terminated`.
+        - Faster LZSS/LZ77 decoding for overlapping matches.
+
+        [CHANGES]
+
+        - Changed the `elias_omega_encode` to properly implement Elias Omega coding (it used to implement Elias Delta coding).
+        - Removed the `lzss_encode_hash4()` function. Use `lzss_encode_fast()` instead!
+
 0.17    2026-08-11
 
         [ADDITIONS]

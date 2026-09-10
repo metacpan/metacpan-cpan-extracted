@@ -87,6 +87,7 @@ t/lzss_with_mrl_symbolic.t
 t/lzssf_symbolic.t
 t/lzw.t
 t/lzw_delta.t
+t/lzw_elias_delta.t
 t/lzw_elias_gamma.t
 t/lzw_elias_omega.t
 t/lzw_fibonacci.t

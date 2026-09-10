@@ -3,9 +3,9 @@
 use 5.036;
 use Test::More;
 use Compression::Util qw(:all);
-use List::Util        qw(shuffle);
+use List::Util        qw(shuffle min max);
 
-plan tests => 866;
+plan tests => 957;
 
 ##################################
 
@@ -15,9 +15,12 @@ sub test_array ($arr) {
 
     is_deeply(mtf_decode(mtf_encode($arr)),                      $arr);
     is_deeply(abc_decode(abc_encode($arr)),                      $arr);
+    is_deeply(golomb_rice_decode(golomb_rice_encode($arr)),      $arr);
+    is_deeply(leb128_decode(leb128_encode($arr)),                $arr);
     is_deeply(ac_decode(ac_encode($arr)),                        $arr);
     is_deeply(adaptive_ac_decode(adaptive_ac_encode($arr)),      $arr);
     is_deeply(elias_gamma_decode(elias_gamma_encode($arr)),      $arr);
+    is_deeply(elias_delta_decode(elias_delta_encode($arr)),      $arr);
     is_deeply(elias_omega_decode(elias_omega_encode($arr)),      $arr);
     is_deeply(fibonacci_decode(fibonacci_encode($arr)),          $arr);
     is_deeply(delta_decode(delta_encode($arr)),                  $arr);
@@ -72,6 +75,13 @@ foreach my $str (
                  join('', 'a' x 280, 'b' x 301),
   ) {
     test_array(string2symbols($str));
+
+    is(decompress_auto(bzip2_compress($str)), $str);
+    is(decompress_auto(gzip_compress($str)),  $str);
+    is(decompress_auto(zlib_compress($str)),  $str);
+    is(decompress_auto(lz4_compress($str)),   $str);
+
+    is(best_decompress(best_compress($str)), $str);
 
     is(bzip2_decompress(bzip2_compress($str)),                   $str);
     is(gzip_decompress(gzip_compress($str)),                     $str);
@@ -187,6 +197,7 @@ is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic([])),  []);
     is(lzw_decompress(lzw_compress($str)), $str);
     is(lzw_decompress(lzw_compress($str, \&delta_encode),             \&delta_decode),             $str);
     is(lzw_decompress(lzw_compress($str, \&elias_omega_encode),       \&elias_omega_decode),       $str);
+    is(lzw_decompress(lzw_compress($str, \&elias_delta_encode),       \&elias_delta_decode),       $str);
     is(lzw_decompress(lzw_compress($str, \&fibonacci_encode),         \&fibonacci_decode),         $str);
     is(lzw_decompress(lzw_compress($str, \&elias_gamma_encode),       \&elias_gamma_decode),       $str);
     is(lzw_decompress(lzw_compress($str, \&create_ac_entry),          \&decode_ac_entry),          $str);
@@ -567,6 +578,16 @@ is(
                   ),
     "abcabcabc\n" . "abcabcabcaaaaaaaaaaaaaaa\n" . "TOBEORNOTTOBEORTOBEORNOT" . "abcabcabcaaaaaaaaaaaaaaa"
   );
+
+###################################################
+is(shannon_entropy([0, 1, 0, 1, 0, 1]), 1);
+is(shannon_entropy([5, 5, 5, 5, 5]), 0);
+###################################################
+
+is(detect_format(bzip2_compress("foobar")), "bzip2");
+is(detect_format(gzip_compress("foobar")),  "gzip");
+is(detect_format(zlib_compress("foobar")),  "zlib");
+is(detect_format(lz4_compress("foobar")),   "lz4");
 
 ###################################################
 

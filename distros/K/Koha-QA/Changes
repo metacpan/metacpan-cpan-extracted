@@ -1,0 +1,31 @@
+Revision history for Koha-QA
+
+0.1.0  2026-09-10
+    - First public release to CPAN
+    - Cleaned up stale MANIFEST entries
+    - 00-load.t now loads every shipped module
+
+0.0.3  2026-07-28
+    - Added Koha::QA::FilePermissions module for checking file permissions
+    - Added Koha::QA::PodChecker module for checking POD documentation
+    - Added Koha::QA::TestNoWarnings module for checking test warnings
+    - Added Koha::QA::Tidy::JS module for JavaScript tidiness checking
+    - Added Koha::QA::Tidy::TT module for Template Toolkit tidiness checking
+    - Added .gitlab-ci.yml for continuous integration
+    - Fixed PerlSyntax to not return empty line for failed-compilation
+    - Fixed Tidy::JS to work as CPAN distribution
+    - Fixed Node.js plugin resolution for Tidy::TT
+    - Updated MANIFEST
+
+0.0.2  2026-07-21
+    - Added Koha::QA::Security::TemplateFilters module for detecting and fixing missing filters in TT templates
+    - Added Koha::QA::Security::CSRF module for detecting missing CSRF tokens in forms
+    - Added Koha::QA::Security::Nonce module for detecting missing nonce attributes in script/link tags
+    - Added Koha::QA::Spelling for detecting spelling issue using codespell
+    - Added Koha::QA::PerlSyntax for checking Perl syntax
+    - Added Koha::QA::Tidy::Perl for checking Perl tidiness using perltidy
+    - Added Makefile.PL
+
+0.0.1  2026-07-07
+    - Initial release
+    - Added Koha::QA::Security::TemplateFilters module for detecting and fixing missing filters in TT templates

@@ -9,8 +9,8 @@ use Hyperman;
 # The wakeup: a publish from one process reaches another PROMPTLY, because it
 # was told rather than because it happened to look.
 #
-# Phase 1 proved the ring. This proves the poke - and the difference matters,
-# because a polling reader passes every phase-1 test while delivering whenever
+# t/35 proves the ring. This proves the poke - and the difference matters,
+# because a polling reader passes every ring test while delivering whenever
 # it next wakes up anyway.
 
 plan skip_all => 'fork is POSIX-only here' if $^O eq 'MSWin32';

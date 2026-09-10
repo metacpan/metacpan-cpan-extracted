@@ -1,0 +1,40 @@
+use strictures 2;
+use Test2::V0 -no_srand => 1;
+use JSON ();
+use Net::Nostr::GroupDiscovery;
+use Net::Nostr::Key;
+use lib 't/lib';
+use TestFixtures qw(client_connection);
+
+subtest 'POD: dedicated Client transports discovery through EVENT and EOSE' => sub {
+    my ($discovery_client,$connection) = client_connection();
+    my $admin = Net::Nostr::Key->new;
+    my $relay_key = Net::Nostr::Key->new;
+    my ($admin_pubkey,$relay_pubkey) = ($admin->pubkey_hex,$relay_key->pubkey_hex);
+    open my $pod_fh, '<', 'lib/Net/Nostr/GroupDiscovery.pm' or die $!;
+    my $source=do {local $/; <$pod_fh>};
+    my ($example)=$source =~ /=head1 SYNOPSIS\n(.*?)=head1 DESCRIPTION/s;
+    $example =~ s/^    //mg;
+    my $result=eval $example . qq{\n} . '{watch=>$watch,candidates=>\@candidates}';
+    die $@ if $@;
+    my ($watch,$candidates)=@$result{qw(watch candidates)};
+    my $first=$connection->{sent}[0][1];
+    is $connection->{sent}[0], ['REQ',$first,{kinds=>[10009],authors=>[$admin_pubkey]}], 'wire discovery request';
+    my $event=$admin->create_event(kind=>10009,content=>'',tags=>[['group','pizza','wss://new.example']]);
+    $connection->receive(JSON::encode_json(['EVENT',$first,$event->to_hash]));
+    is $candidates, [], 'waits for EOSE before selecting latest announcements';
+    $connection->receive(JSON::encode_json(['EOSE',$first,['finish']]));
+    is $connection->{sent}[1], ['CLOSE',$first], 'one-shot lookup closes subscription';
+    is $candidates->[0]{relay},'wss://new.example','verified wire event produces a candidate';
+    $watch->check;
+    my $second=$connection->{sent}[-1][1];
+    isnt $second,$first,'every lookup gets a distinct subscription ID';
+    $connection->receive(JSON::encode_json(['EOSE',$first,['finish']]));
+    is $watch->check,0,'late prior EOSE cannot complete the new lookup';
+    my $new=$admin->create_event(kind=>10009,created_at=>$event->created_at+1,
+        content=>'',tags=>[['group','pizza','wss://later.example']]);
+    $connection->receive(JSON::encode_json(['EVENT',$second,$new->to_hash]));
+    $connection->receive(JSON::encode_json(['EOSE',$second,['finish']]));
+    is $candidates->[-1]{relay},'wss://later.example','new lookup completes with its own results';
+};
+done_testing;

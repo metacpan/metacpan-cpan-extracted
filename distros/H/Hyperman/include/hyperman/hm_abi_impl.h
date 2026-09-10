@@ -191,6 +191,13 @@ static const hm_abi hm_abi_table = {
     hm_abi_bus_subscribe,
     hm_abi_bus_unsubscribe,
     hm_abi_bus_dispatch,
+    hm_stream_open,              /* v6 - the registry lives in hm_stream.h, */
+    hm_stream_write_h,           /* which owns the transport branch so the  */
+    hm_stream_close_h,           /* table can stay four plain forwards      */
+    hm_stream_on_drain,
+    hm_stream_on_abort,
+    hm_stream_abort_h,           /* v7 - the ending a failed producer needs */
+    hm_stream_on_data,           /* v8 - the read half                     */
 };
 
 /* ---- v4 on_worker_start, driven from C (t/33-worker-start.t) ------------ *
@@ -215,6 +222,149 @@ static int hm_abi_worker_hook_install(pTHX) {
     const hm_abi *A = INT2PTR(const hm_abi *, PTR2IV(&hm_abi_table));
     if (!A || A->abi_version != HM_ABI_VERSION) return 0;
     return A->on_worker_start(aTHX_ hm_abi_st_worker_cb, NULL);
+}
+
+/* ---- v6 stream handles, driven from C (t/41-stream-abi.t) --------------- *
+ *
+ * The static half - that the entries exist and that a stale handle is an
+ * error return rather than a crash - is in hm_abi_selftest below. This is the
+ * live half, which needs a real connection and therefore a real server: an
+ * application calls these from inside a request, the C side does everything
+ * through the TABLE, and a later request reads the counters back out.
+ *
+ * One handle at a time, in a process-global, because the tests that use it
+ * run with workers => 1 and a single handle is what makes "did the abort
+ * fire" answerable from Perl at all. */
+static void *HM_ABI_ST_SH        = NULL;
+static IV    HM_ABI_ST_SH_ABORTS = 0;
+static IV    HM_ABI_ST_SH_DRAINS = 0;
+static IV    HM_ABI_ST_SH_WRITES = 0;
+static IV    HM_ABI_ST_SH_TODO   = 0;   /* chunks still owed on the stream */
+static IV    HM_ABI_ST_SH_FULLS  = 0;   /* times the connection said stop  */
+
+static void hm_abi_st_stream_abort(pTHX_ void *h, void *ud) {
+    PERL_UNUSED_CONTEXT;
+    PERL_UNUSED_ARG(ud);
+    HM_ABI_ST_SH_ABORTS++;
+    HM_ABI_ST_SH_TODO = 0;              /* nobody is listening any more */
+    /* The handle survives an abort - only stream_close frees it - so it is
+     * deliberately NOT released here. The test's next request closes it and
+     * proves the release path copes with a stream that died first. */
+    (void)h;
+}
+
+/* Produce until the connection says stop, then stop until it says go. This is
+ * the whole backpressure contract, and it is the only honest way to test it:
+ * a producer that only ever writes small chunks never reaches it. */
+static void hm_abi_st_stream_pump(pTHX_ void *h) {
+    const hm_abi *A = &hm_abi_table;
+    char buf[4096];
+    memset(buf, 'x', sizeof buf);
+    while (HM_ABI_ST_SH_TODO > 0) {
+        int r = A->stream_write(aTHX_ h, buf, sizeof(buf));
+        if (r < 0) { HM_ABI_ST_SH_TODO = 0; return; }
+        HM_ABI_ST_SH_TODO--;
+        HM_ABI_ST_SH_WRITES++;
+        if (r == HM_ABI_STREAM_FULL) { HM_ABI_ST_SH_FULLS++; return; }
+    }
+    if (HM_ABI_ST_SH == h) {
+        A->stream_close(aTHX_ h);
+        HM_ABI_ST_SH = NULL;
+    }
+}
+
+static void hm_abi_st_stream_drain(pTHX_ void *h, void *ud) {
+    PERL_UNUSED_ARG(ud);
+    HM_ABI_ST_SH_DRAINS++;
+    hm_abi_st_stream_pump(aTHX_ h);
+}
+
+/* Open a stream on the request this env names, over whichever transport it
+ * arrived on. 1 = open, 0 = refused. */
+static int hm_abi_st_stream_open(pTHX_ SV *env, int status, SV *headers) {
+    const hm_abi *A = &hm_abi_table;
+    int fd;
+    UV id;
+    int64_t sid;
+    if (HM_ABI_ST_SH) return 0;                  /* one at a time */
+    if (!hm_stream_ticket(aTHX_ env, &fd, &id, &sid)) return 0;
+    HM_ABI_ST_SH = A->stream_open(aTHX_ (void *)hm_cur_loop, fd, id, sid,
+                                  status, headers);
+    if (!HM_ABI_ST_SH) return 0;
+    HM_ABI_ST_SH_WRITES = 0;
+    A->stream_on_abort(aTHX_ HM_ABI_ST_SH, hm_abi_st_stream_abort, NULL);
+    A->stream_on_drain(aTHX_ HM_ABI_ST_SH, hm_abi_st_stream_drain, NULL);
+    return 1;
+}
+
+static int hm_abi_st_stream_write(pTHX_ SV *data) {
+    const hm_abi *A = &hm_abi_table;
+    STRLEN l;
+    const char *p;
+    int r;
+    if (!HM_ABI_ST_SH) return HM_ABI_STREAM_STALE;
+    p = SvPV(data, l);
+    r = A->stream_write(aTHX_ HM_ABI_ST_SH, p, l);
+    if (r >= 0) HM_ABI_ST_SH_WRITES++;
+    return r;
+}
+
+/* Owe the stream n chunks of 4KiB and start producing them. */
+static void hm_abi_st_stream_produce(pTHX_ IV n) {
+    if (!HM_ABI_ST_SH) return;
+    HM_ABI_ST_SH_TODO = n;
+    hm_abi_st_stream_pump(aTHX_ HM_ABI_ST_SH);
+}
+
+/* v8: what the read half delivered, echoed back so a Perl test can see it.
+ * Bounded - this is a test hook on an unbounded stream, and an unbounded
+ * buffer behind a test hook is still an unbounded buffer. */
+static char HM_ABI_ST_SH_RX[4096];
+static IV   HM_ABI_ST_SH_RXLEN = 0;
+static IV   HM_ABI_ST_SH_RXN   = 0;
+
+static void hm_abi_st_stream_data(pTHX_ void *h, const char *buf, STRLEN len,
+                                  int fin, void *ud) {
+    PERL_UNUSED_CONTEXT;
+    PERL_UNUSED_ARG(ud);
+    (void)h; (void)fin;
+    HM_ABI_ST_SH_RXN++;
+    if (len > sizeof(HM_ABI_ST_SH_RX) - (size_t)HM_ABI_ST_SH_RXLEN)
+        len = sizeof(HM_ABI_ST_SH_RX) - (size_t)HM_ABI_ST_SH_RXLEN;
+    if (len) {
+        memcpy(HM_ABI_ST_SH_RX + HM_ABI_ST_SH_RXLEN, buf, len);
+        HM_ABI_ST_SH_RXLEN += (IV)len;
+    }
+}
+
+/* Register the read half on the open handle, through the TABLE. */
+static int hm_abi_st_stream_read(pTHX) {
+    const hm_abi *A = &hm_abi_table;
+    if (!HM_ABI_ST_SH) return HM_ABI_STREAM_STALE;
+    HM_ABI_ST_SH_RXLEN = 0;
+    HM_ABI_ST_SH_RXN   = 0;
+    return A->stream_on_data(aTHX_ HM_ABI_ST_SH, hm_abi_st_stream_data, NULL);
+}
+
+static int hm_abi_st_stream_close(pTHX) {
+    const hm_abi *A = &hm_abi_table;
+    int r;
+    if (!HM_ABI_ST_SH) return HM_ABI_STREAM_STALE;
+    r = A->stream_close(aTHX_ HM_ABI_ST_SH);
+    HM_ABI_ST_SH = NULL;
+    return r;
+}
+
+/* The other ending, so t/41-stream-abi.t can drive it over both transports.
+ * Releases the handle exactly as close does - a producer calls one or the
+ * other, and the selftest must not be the thing that gets that wrong. */
+static int hm_abi_st_stream_do_abort(pTHX) {
+    const hm_abi *A = &hm_abi_table;
+    int r;
+    if (!HM_ABI_ST_SH) return HM_ABI_STREAM_STALE;
+    r = A->stream_abort(aTHX_ HM_ABI_ST_SH);
+    HM_ABI_ST_SH = NULL;
+    return r;
 }
 
 /* ---- _abi_selftest: drive the whole table from C (t/22-abi.t) ----------- */
@@ -305,6 +455,35 @@ static int hm_abi_selftest(pTHX) {
          * connection and is covered end to end by t/23-detach.t. */
         if (!A->conn_detach)                                      ok = 0;
         else if (A->conn_detach(aTHX_ (void *)loop, 4094, 1) != -1) ok = 0;
+
+        /* v6 stream handles. The success path needs a live request and is
+         * covered end to end by t/41-stream-abi.t, over HTTP/1.1 and over
+         * HTTP/2. What is provable with no connection is the half that
+         * matters most for memory safety: a ticket naming nothing hands
+         * back no handle, and every entry point given a pointer that is not
+         * a live handle SAYS SO instead of dereferencing it. The address
+         * below is deliberately a plausible-looking one. */
+        if (!A->stream_open || !A->stream_write || !A->stream_close
+            || !A->stream_on_drain || !A->stream_on_abort
+            || !A->stream_abort)                                  ok = 0;
+        else {
+            void *bogus = (void *)&hm_abi_table;    /* real memory, no handle */
+            if (A->stream_abort(aTHX_ bogus) != HM_ABI_STREAM_STALE) ok = 0;
+            if (A->stream_abort(aTHX_ NULL)  != HM_ABI_STREAM_STALE) ok = 0;
+            if (A->stream_open(aTHX_ (void *)loop, 4094, 1, -1, 200, NULL))
+                                                                  ok = 0;
+            if (A->stream_open(aTHX_ (void *)loop, 4094, 1, 3, 200, NULL))
+                                                                  ok = 0;
+            if (A->stream_write(aTHX_ bogus, "x", 1) != HM_ABI_STREAM_STALE)
+                                                                  ok = 0;
+            if (A->stream_write(aTHX_ NULL, "x", 1) != HM_ABI_STREAM_STALE)
+                                                                  ok = 0;
+            if (A->stream_close(aTHX_ bogus) != HM_ABI_STREAM_STALE) ok = 0;
+            if (A->stream_on_drain(aTHX_ bogus, NULL, NULL)
+                != HM_ABI_STREAM_STALE)                           ok = 0;
+            if (A->stream_on_abort(aTHX_ bogus, NULL, NULL)
+                != HM_ABI_STREAM_STALE)                           ok = 0;
+        }
 
         hm_loop_free(aTHX_ loop);
     }

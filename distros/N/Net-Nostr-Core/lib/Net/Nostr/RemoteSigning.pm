@@ -715,6 +715,24 @@ if C<pubkey> is missing or not 64-char lowercase hex.
 
 =head2 response
 
+A signer must reply to unknown or unsupported methods with an error using
+the original request ID. C<parse_request> deliberately preserves unknown
+method names so the application's dispatcher can do this. For example:
+
+    my $request = Net::Nostr::RemoteSigning->parse_request(
+        Net::Nostr::RemoteSigning->request(
+            id => 'future-42', method => 'future_method', params => [],
+        ),
+    );
+    my $reply = Net::Nostr::RemoteSigning->response(
+        id => $request->id, error => 'unsupported method: ' . $request->method,
+    );
+
+Use this error branch whenever no permitted handler exists, then encrypt and
+send the response through the established signer connection. This module
+provides payload helpers; dispatch and automatic replies belong to the signer
+application.
+
     my $json = Net::Nostr::RemoteSigning->response(
         id     => 'req-1',
         result => 'pong',

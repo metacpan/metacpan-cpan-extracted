@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.44';
+our $VERSION = '0.48';
 1;
 
 __END__

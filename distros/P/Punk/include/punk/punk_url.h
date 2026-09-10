@@ -1,15 +1,13 @@
-/* punk_url.h - named routes: what a name may be, and (phase 1) the URL a
- * name builds.
+/* punk_url.h - named routes: what a name may be, and the URL a name builds.
  *
- * Phase 0 is the table only. A route carries a `name` option, the keyword
- * records it, to_app stamps it onto the compiled record and resolves the
- * whole set into one name -> record index hash. Nothing here builds a URL
- * yet; $c->url_for is phase 1, and it walks the pr_seg array punk_route.h
- * already parsed at to_app.
+ * A route carries a `name` option, the keyword records it, to_app stamps it
+ * onto the compiled record and resolves the whole set into one name ->
+ * record index hash. $c->url_for reads that hash and walks the pr_seg array
+ * punk_route.h already parsed at to_app.
  *
  * The validator lives here rather than in xs/app.xs because three callers
- * want one answer: the route option, the websocket/sse keywords (phase 3),
- * and the documentation that has to say what a name is.
+ * want one answer: the route option, the websocket/sse keywords, and the
+ * documentation that has to say what a name is.
  */
 
 #ifndef PUNK_URL_H

@@ -813,4 +813,63 @@ subtest 'is_expired: not expired if timestamp in future' => sub {
     ok !$exp, 'future expiration';
 };
 
+subtest 'extension discovery: current spec example and future extensions' => sub {
+    my @core = qw(pay_invoice get_balance make_invoice lookup_invoice get_info);
+    my $event = Net::Nostr::WalletConnect->info_event(
+        pubkey => 'a' x 64, capabilities => \@core,
+        encryption => [qw(nip44_v2 nip04)], extensions => [qw(02 03 04)],
+    );
+    is $event->tags, [['encryption','nip44_v2 nip04'],['extensions','02 03 04']], 'exact spec tags';
+    is $event->content, join(' ', @core), 'all five core methods';
+    my $info = Net::Nostr::WalletConnect->parse_info($event);
+    ok $info->can('extensions'), 'extension accessor exists';
+    return unless $info->can('extensions');
+    is $info->extensions, [qw(02 03 04)], 'discovery round trip';
+    ok $info->supports_extension('03'), 'advertised extension';
+    ok !$info->supports_extension('08'), 'unadvertised extension';
+    push @{$info->extensions}, '08';
+    is $info->extensions, [qw(02 03 04)], 'defensive output copy';
+    my $input = ['08','future'];
+    my $future = Net::Nostr::WalletConnect::Info->new(extensions => $input);
+    $input->[0] = 'changed';
+    is $future->extensions, ['08','future'], 'future identifiers accepted with defensive input copy';
+    my $legacy = Net::Nostr::WalletConnect->parse_info(Net::Nostr::WalletConnect->info_event(
+        pubkey => 'a' x 64, capabilities => ['pay_invoice'], notifications => ['payment_received']));
+    is $legacy->extensions, [], 'absent extensions default to empty';
+    is $legacy->notification_types, ['payment_received'], 'legacy notifications retained';
+    is $legacy->encryption, ['nip04'], 'legacy encryption default retained';
+    my $response = Net::Nostr::WalletConnect->parse_response(JSON::encode_json({
+        result_type => 'get_info', error => undef,
+        result => { methods => \@core, extensions => [qw(02 03 04)] },
+    }));
+    is $response->result->{extensions}, [qw(02 03 04)], 'get_info extension result preserved';
+};
+
+subtest 'discovery constructors reject malformed token lists' => sub {
+    for my $field (qw(capabilities encryption notifications extensions)) {
+        for my $bad (undef, '02', {}, [undef], [{}], [''], ['02 03'], ["02\n03"]) {
+            like dies { Net::Nostr::WalletConnect->info_event(pubkey => 'a' x 64, $field => $bad) },
+                qr/\Q$field\E/, "$field rejects malformed input";
+            my $info_field = $field eq 'notifications' ? 'notification_types' : $field;
+            like dies { Net::Nostr::WalletConnect::Info->new($info_field => $bad) },
+                qr/\Q$info_field\E/, "Info validates $info_field";
+        }
+    }
+    like dies { Net::Nostr::WalletConnect->info_event(pubkey => 'a' x 64, typo => []) },
+        qr/unknown/, 'misspelled discovery option rejected';
+    for my $tag (['extensions'], ['extensions', '02  03'], ['extensions', '02', '03']) {
+        my $bad = Net::Nostr::Event->new(pubkey=>'a'x64,kind=>13194,content=>'get_info',tags=>[$tag]);
+        like dies { Net::Nostr::WalletConnect->parse_info($bad) }, qr/extensions/, 'malformed wire discovery rejected';
+    }
+};
+
+subtest 'review: explicit empty encryption never enables legacy encryption' => sub {
+    my $wire=make_event(kind=>13194,content=>'get_info',tags=>[['encryption','']]);
+    is(Net::Nostr::WalletConnect->parse_info($wire)->encryption, [], 'present empty tag advertises no encryption');
+    my $built=Net::Nostr::WalletConnect->info_event(pubkey=>$wallet_pubkey,
+        capabilities=>['get_info'],encryption=>[]);
+    is $built->tags, [['encryption','']], 'builder preserves explicitly empty encryption';
+    is(Net::Nostr::WalletConnect->parse_info($built)->encryption, [], 'empty encryption round trip');
+};
+
 done_testing;

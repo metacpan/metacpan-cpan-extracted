@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.48';
 
 use Test::Builder ();
 use Scalar::Util ();
@@ -179,6 +179,7 @@ sub _build_env {
         QUERY_STRING      => $query,
         SERVER_NAME       => 'localhost',
         SERVER_PORT       => 80,
+        SERVER_PROTOCOL   => 'HTTP/1.1',
         HTTP_HOST         => 'localhost',
         'psgi.url_scheme' => 'http',
         'psgi.input'      => $in,
@@ -1158,6 +1159,13 @@ C<csrf> (send the jar's CSRF token in the configured header), C<env>
 (raw PSGI env keys, merged last), C<name> (the test name). A
 C<psgi.streaming> response is driven to completion and its writes
 become the body.
+
+The environment says C<< SERVER_PROTOCOL => 'HTTP/1.1' >>. Anything
+that frames a response by protocol version - L<Punk/stream> and its
+chunked encoding - therefore behaves as it does on an ordinary HTTP/1.1
+request. Override it through C<env> to test another version:
+
+    $t->get_ok('/report', env => { SERVER_PROTOCOL => 'HTTP/2' });
 
 =head3 Uploads
 

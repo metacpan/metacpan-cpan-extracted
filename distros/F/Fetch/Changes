@@ -1,5 +1,26 @@
 Revision history for Fetch
 
+0.27    2026-09-10
+        - fixes the Windows build: the Alt-Svc cache called clock_gettime,
+          which no Windows toolchain has
+
+0.26    2026-09-09
+        - t/09-timeout.t and t/16-timeout-hyperman.t time a deadline on
+          CLOCK_MONOTONIC
+
+0.25    2026-09-09
+        - Fetch is now an HTTP/3, HTTP/2 and HTTP/1.1 user agent
+        - ADDS: HTTP/3 over QUIC (ngtcp2 + nghttp3). An ordinary get uses
+          it once the origin has advertised Alt-Svc; concurrent requests
+          share one QUIC connection. 
+        - FIXES: a name was resolved with a blocking getaddrinfo, which
+          stalled the whole loop and not just its own request. It now runs
+          on a thread of its own, keeping every resolution semantic the
+          system has - /etc/hosts, nsswitch, mDNS, search domains. An
+          address literal still resolves inline and starts no thread.
+        - Without pthreads, and on native Windows, resolution stays
+          inline as before. Fetch::_dns_async reports which.
+
 0.24    2026-09-07
         - ft_win.h defines ECONNRESET, ECONNREFUSED and ETIMEDOUT when
           <errno.h> lacks them.

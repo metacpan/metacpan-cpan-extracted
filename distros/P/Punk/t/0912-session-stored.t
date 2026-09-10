@@ -147,7 +147,7 @@ cmp_ok(length($val), '<', 200,
 }
 
 # ---- a guess never reaches the store -----------------------------------------
-# Phase 1 proved the signature refuses a forged id. This is the consequence
+# t/0911 proves the signature refuses a forged id. This is the consequence
 # that made the signature worth keeping: the refusal happens BEFORE the lookup,
 # so an attacker cannot make the server work by guessing.
 {

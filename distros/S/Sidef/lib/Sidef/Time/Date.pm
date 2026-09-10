@@ -16,20 +16,72 @@ use overload
 use Sidef::Types::String::String;
 use Sidef::Types::Number::Number;
 
+my @_DATE_AUTO_FORMATS = ('%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%Y/%m/%d', '%d-%m-%Y', '%m/%d/%Y',);
+
+sub _parse_auto {
+    my ($str) = @_;
+    foreach my $format (@_DATE_AUTO_FORMATS) {
+        my $t = eval { Time::Piece->strptime($str, $format) };
+        defined($t) and return $t;
+    }
+
+    my $tried = join(', ', @_DATE_AUTO_FORMATS);
+    die "[ERROR] Date: unable to parse date string '$str' (tried: $tried)\n";
+}
+
 sub new {
-    my (undef, $sec) = @_;
+    my (undef, @args) = @_;
 
-    if (defined $sec) {
-        $sec = CORE::int($sec) if ref($sec);
-    }
-    else {
-        $sec = CORE::time;
+    # No arguments: current moment
+    if (!@args) {
+        return bless {time => Time::Piece->new(CORE::time)};
     }
 
-    bless {time => Time::Piece->new($sec),};
+    # Single argument: epoch seconds, a Date to copy, or a date string to auto-parse
+    if (@args == 1) {
+        my ($arg) = @args;
+
+        if (ref($arg) eq __PACKAGE__) {
+            return bless {time => Time::Piece->new($arg->{time}->epoch)};
+        }
+
+        if (ref($arg) eq 'Sidef::Types::Number::Number' or (ref($arg) eq '' and $arg =~ /^[0-9]+\z/)) {
+            return bless {time => Time::Piece->new(CORE::int($arg))};
+        }
+
+        return bless {time => _parse_auto("$arg")};
+    }
+
+    # Two or more arguments: calendar components
+    __PACKAGE__->from_ymd(@args);
 }
 
 *call = \&new;
+
+sub from_ymd {
+    my (undef, $year, $month, $day, $hour, $min, $sec) = @_;
+
+    # Safely pad missing components to their POD-specified defaults
+    my $str = CORE::sprintf(
+                            '%04d-%02d-%02d %02d:%02d:%02d',
+                            CORE::int($year  // 0),
+                            CORE::int($month // 1),
+                            CORE::int($day   // 1),
+                            CORE::int($hour  // 0),
+                            CORE::int($min   // 0),
+                            CORE::int($sec   // 0)
+                           );
+
+    bless {time => Time::Piece->strptime($str, '%Y-%m-%d %H:%M:%S')};
+}
+
+sub from_string {
+    my (undef, $str, $format) = @_;
+
+    defined($format)
+      ? (bless {time => Time::Piece->strptime("$str", "$format")})
+      : (bless {time => _parse_auto("$str")});
+}
 
 sub get_value {
     $_[0]->{time} // Time::Piece->new(CORE::time);
@@ -52,6 +104,7 @@ sub get_value {
     *month_day        = \&mday;
     *week_day         = \&wday;
     *year_day         = \&yday;
+    *is_dst           = \&isdst;
     *daylight_savings = \&isdst;
 
     foreach my $name (qw(monname fullmonth wdayname date)) {
@@ -163,6 +216,11 @@ sub add_days {
     $self->add_seconds(86400 * CORE::int($days));
 }
 
+sub add_weeks {
+    my ($self, $weeks) = @_;
+    $self->add_days(7 * CORE::int($weeks));
+}
+
 sub add_months {
     my ($self, $months) = @_;
     bless {time => scalar $self->{time}->add_months(CORE::int($months))};
@@ -173,9 +231,97 @@ sub add_years {
     bless {time => scalar $self->{time}->add_years(CORE::int($years))};
 }
 
+sub is_today {
+    my ($self) = @_;
+    my $today = __PACKAGE__->today;
+    ($self->{time}->ymd eq $today->{time}->ymd)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_leap_year {
+    my ($self) = @_;
+    my $y = $self->{time}->year;
+    (($y % 4 == 0 and $y % 100 != 0) or $y % 400 == 0)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_weekend {
+    my ($self) = @_;
+    my $wday = $self->{time}->wday;
+    ($wday == 1 or $wday == 7)    # 1 = Sunday, 7 = Saturday
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_weekday {
+    my ($self) = @_;
+    my $wday = $self->{time}->wday;
+    ($wday == 1 or $wday == 7)
+      ? Sidef::Types::Bool::Bool::FALSE
+      : Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub is_future {
+    my ($self) = @_;
+    ($self->{time}->epoch > CORE::time)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_past {
+    my ($self) = @_;
+    ($self->{time}->epoch < CORE::time)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_between {
+    my ($self, $start, $end) = @_;
+    ($self->{time}->epoch >= $start->{time}->epoch and $self->{time}->epoch <= $end->{time}->epoch)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub days_until {
+    my ($self, $other) = @_;
+    state $day_sec = Sidef::Types::Number::Number::_set_int(86400);
+    Sidef::Types::Number::Number->new($self->{time}->subtract($other->{time}))->div($day_sec)->int->neg;
+}
+
+sub is_same_day {
+    my ($self, $other) = @_;
+    ($self->{time}->ymd eq $other->{time}->ymd)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub end_of_month {
+    my ($self) = @_;
+    my $last_day = $self->{time}->month_last_day;
+    bless {time => scalar $self->{time}->truncate(to => 'day')->add(($last_day - $self->{time}->mday) * 86400)};
+}
+
+sub age {
+    my ($self) = @_;
+    my $now    = Time::Piece->new(CORE::time);
+    my $years  = $now->year - $self->{time}->year;
+    if ($now->mon < $self->{time}->mon
+        or ($now->mon == $self->{time}->mon and $now->mday < $self->{time}->mday)) {
+        --$years;
+    }
+    Sidef::Types::Number::Number::_set_int($years);
+}
+
+sub quarter {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::_set_int(CORE::int(($self->{time}->mon - 1) / 3) + 1);
+}
+
 sub cmp {
     my ($this, $that) = @_;
-    Sidef::Types::Number::Number->new(CORE::int($this) <=> CORE::int($that));
+    Sidef::Types::Number::Number::_set_int(CORE::int($this) <=> CORE::int($that));
 }
 
 sub eq {

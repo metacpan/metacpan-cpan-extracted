@@ -9,7 +9,7 @@ use PunkTest;
 use Punk ();
 
 # $c->url_for: a path from a name, built over the segments punk_route.h
-# parsed at to_app. Phase 1 of plan_punk_named_routes/.
+# parsed at to_app.
 #
 # The claim being tested is not "it returns a string" - it is that the
 # string ROUTES BACK. A URL builder that disagrees with the matcher is worse

@@ -195,6 +195,18 @@ Net::Nostr::List - NIP-51 lists and sets
 
 =head1 DESCRIPTION
 
+NIP-51 favorite follow sets use kind 10011 with C<a> tags referencing kind
+30000 follow sets. They use the same generic list representation:
+
+    my $list = Net::Nostr::List->new(kind => 10011);
+    $list->add('a', '30000:' . ('a' x 64) . ':friends');
+    $list->add('a', '30000:' . ('b' x 64) . ':developers');
+    my $event = $list->to_event(pubkey => 'c' x 64, created_at => 1000);
+    my $parsed = Net::Nostr::List->from_event($event);
+
+The generic list helper preserves these references and their order; it does
+not perform kind-specific semantic validation of each list item's coordinate.
+
 Implements NIP-51 lists. Lists are events whose tags represent references
 to things (pubkeys, events, relays, hashtags, etc.). Items can be
 B<public> (in the event tags) or B<private> (encrypted in the event

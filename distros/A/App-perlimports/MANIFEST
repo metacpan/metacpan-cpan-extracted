@@ -181,6 +181,7 @@ test-data/lib/Local/LongList.pm
 test-data/lib/Local/MooseTypeLibrary.pm
 test-data/lib/Local/MyOwnMoo.pm
 test-data/lib/Local/MyOwnMoose.pm
+test-data/lib/Local/NoImport.pm
 test-data/lib/Local/ReExportViaSubExporter.pm
 test-data/lib/Local/RequireExporter.pm
 test-data/lib/Local/Round.pm

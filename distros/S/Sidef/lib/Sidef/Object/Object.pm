@@ -157,6 +157,22 @@ sub lazy {
     Sidef::Object::Lazy->new(obj => $self);
 }
 
+sub tap {
+    my ($self, $block) = @_;
+    $block->run($self);
+    $self;
+}
+
+sub then {
+    my ($self, $block) = @_;
+    $block->run($self);
+}
+
+sub in {
+    my ($self, $collection) = @_;
+    $collection->contains($self);
+}
+
 sub method {
     my ($self, $method, @args) = @_;
     Sidef::Object::LazyMethod->new({obj => $self, method => "$method", args => \@args});
@@ -262,17 +278,24 @@ sub dclone {
 *deep_clone = \&dclone;
 
 sub respond_to {
-    my ($self, $method) = @_;
-    UNIVERSAL::can($self, "$method")
-      ? (Sidef::Types::Bool::Bool::TRUE)
-      : (Sidef::Types::Bool::Bool::FALSE);
+    my ($self, @methods) = @_;
+
+    foreach my $method (@methods) {
+        UNIVERSAL::can($self, "$method")
+          || return (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    (Sidef::Types::Bool::Bool::TRUE);
 }
 
 sub is_a {
-    my ($self, $obj) = @_;
-    UNIVERSAL::isa($self, "$obj")
-      ? (Sidef::Types::Bool::Bool::TRUE)
-      : (Sidef::Types::Bool::Bool::FALSE);
+    my ($self, @classes) = @_;
+    my $ref = ref($self) || $self;
+    foreach my $class (@classes) {
+        UNIVERSAL::isa($ref, ref($class) ? ref($class) : "$class")
+          and return Sidef::Types::Bool::Bool::TRUE;
+    }
+    Sidef::Types::Bool::Bool::FALSE;
 }
 
 *is_an   = \&is_a;

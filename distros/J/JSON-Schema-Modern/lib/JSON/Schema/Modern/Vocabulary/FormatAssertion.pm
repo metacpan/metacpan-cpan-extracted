@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.647';
+our $VERSION = '0.648';
 
 use 5.020;
 use Moo;
@@ -170,8 +170,8 @@ sub keywords ($class, $spec_version) {
     'idn-hostname' => sub { $is_hostname->($idn_decode->($_[0])) },
     ipv4 => $is_ipv4,
     ipv6 => sub {
-      ($_[0] =~ /^(?:[[:xdigit:]]{0,4}:){0,8}[[:xdigit:]]{0,4}\z/
-          || $_[0] =~ /^(?:[[:xdigit:]]{0,4}:){1,7}((?:[0-9]{1,3}\.){3}[0-9]{1,3})\z/
+      ($_[0] =~ /^(?:[[:xdigit:]]{0,4}:){0,8}[[:xdigit:]]{0,4}\z/a
+          || $_[0] =~ /^(?:[[:xdigit:]]{0,4}:){1,7}((?:[0-9]{1,3}\.){3}[0-9]{1,3})\z/a
             && $is_ipv4->($1))
         && $_[0] !~ /:::/
         && $_[0] !~ /^:[^:]/
@@ -187,24 +187,33 @@ sub keywords ($class, $spec_version) {
         };
     },
     uri => sub {
+      return if $_[0] =~ /%.?\z/ or $_[0] =~ /%[^[:xdigit:]]/a or $_[0] =~ /%.[^[:xdigit:]]/a;
+      return if $_[0] =~ /[^[:ascii:]]/;
       my $uri = Mojo::URL->new($_[0]);
-      return if not fc($uri->to_unsafe_string) eq fc($_[0]) && $uri->is_abs && $_[0] !~ /[^[:ascii:]]/;
+      return if not fc($uri->to_unsafe_string) eq fc($_[0]) && $uri->is_abs;
       require Data::Validate::URI;
       return Data::Validate::URI::is_uri($_[0]);
     },
     'uri-reference' => sub {
-      fc(Mojo::URL->new($_[0])->to_unsafe_string) eq fc($_[0]) && $_[0] !~ /[^[:ascii:]]/;
+      return if $_[0] =~ /%.?\z/ or $_[0] =~ /%[^[:xdigit:]]/a or $_[0] =~ /%.[^[:xdigit:]]/a;
+      return if $_[0] =~ /[^[:ascii:]]/;
+      fc(Mojo::URL->new($_[0])->to_unsafe_string) eq fc($_[0]);
     },
-    iri => sub { Mojo::URL->new($_[0])->is_abs },
-    uuid => sub { $_[0] =~ /^[[:xdigit:]]{8}-(?:[[:xdigit:]]{4}-){3}[[:xdigit:]]{12}\z/ },
+    iri => sub {
+      return if $_[0] =~ /%.?\z/ or $_[0] =~ /%[^[:xdigit:]]/a or $_[0] =~ /%.[^[:xdigit:]]/a;
+      Mojo::URL->new($_[0])->is_abs;
+    },
+    'iri-reference' => sub {
+      return if $_[0] =~ /%.?\z/ or $_[0] =~ /%[^[:xdigit:]]/a or $_[0] =~ /%.[^[:xdigit:]]/a;
+      return 1;
+    },
+    uuid => sub { $_[0] =~ /^[[:xdigit:]]{8}-(?:[[:xdigit:]]{4}-){3}[[:xdigit:]]{12}\z/a },
     'json-pointer' => sub { (!length($_[0]) || $_[0] =~ m{^/}) && $_[0] !~ m{~(?![01])} },
     'relative-json-pointer' => sub { $_[0] =~ m{^(?:0|[1-9][0-9]*)(?:#\z|\z|/)} && $_[0] !~ m{~(?![01])} },
     regex => sub {
       local $SIG{__WARN__} = sub { die @_ };
       eval { qr/$_[0]/; 1 };
     },
-
-    'iri-reference' => sub { 1 },
     # uri-template is not implemented, but user can add a custom definition
   };
 
@@ -317,7 +326,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.647
+version 0.648
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

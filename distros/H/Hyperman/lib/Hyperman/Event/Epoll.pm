@@ -3,7 +3,7 @@ package Hyperman::Event::Epoll;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.46';
 
 require Hyperman;   # loads the shared XS (available())
 

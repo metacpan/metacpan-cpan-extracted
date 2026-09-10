@@ -256,6 +256,111 @@ if (!$ENV{HM_NO_ZLIB}) {
     }
 }
 
+# --- HTTP/3 over QUIC: ngtcp2 + ngtcp2_crypto_ossl + nghttp3 -------------
+#
+# Three libraries and an OpenSSL new enough to hand its TLS handshake to
+# them, which is the whole reason this is one probe rather than three: any
+# of them missing means no HTTP/3, so there is no partial state worth
+# recording. Detected like the others - pkg-config, bare compile probe, then
+# the homebrew keg-only path.
+#
+# It needs TLS. There is no cleartext QUIC the way there is h2c, so this
+# probe does not run at all when OpenSSL was not found, and $tls_inc/$tls_libs
+# are threaded into it because the crypto shim links against libssl itself.
+#
+# Absent any of it, hm_quic.h and hm_http3.h compile to stubs, has_http3 is
+# false and `http3 => 1` errors at runtime. LibreSSL has no ngtcp2 crypto
+# backend at all, so OpenBSD smokers land here by design and not by accident.
+my ($q_inc, $q_libs) = ('', '');
+if (!$ENV{HM_NO_HTTP3} && $tls_libs) {
+    my ($cflags, $libs);
+    my $pc = 'libngtcp2 libngtcp2_crypto_ossl libnghttp3';
+    if (system("pkg-config --exists $pc >$DEVNULL 2>&1") == 0) {
+        chomp($cflags = `pkg-config --cflags $pc 2>$DEVNULL`);
+        chomp($libs   = `pkg-config --libs $pc 2>$DEVNULL`);
+        $libs ||= '-lngtcp2 -lngtcp2_crypto_ossl -lnghttp3';
+    }
+    if ($libs && !probe_http3($cflags || '', $libs, $tls_inc, $tls_libs)) {
+        # pkg-config found .pc files for a stack this OpenSSL cannot drive.
+        # Believe the compiler, not the metadata.
+        ($cflags, $libs) = ('', '');
+    }
+    if (!$libs) {
+        my $bare = '-lngtcp2 -lngtcp2_crypto_ossl -lnghttp3';
+        if (probe_http3('', $bare, $tls_inc, $tls_libs)) {
+            ($cflags, $libs) = ('', $bare);
+        }
+    }
+    if (!$libs) {   # homebrew keg-only path (no pkg-config on macOS)
+        for my $p ('/opt/homebrew', '/usr/local') {
+            next unless -e "$p/include/ngtcp2/ngtcp2.h"
+                     && -e "$p/include/nghttp3/nghttp3.h";
+            my $l = "-L$p/lib -lngtcp2 -lngtcp2_crypto_ossl -lnghttp3";
+            if (probe_http3("-I$p/include", $l, $tls_inc, $tls_libs)) {
+                ($cflags, $libs) = ("-I$p/include", $l);
+                last;
+            }
+        }
+    }
+    if ($libs) {
+        $q_inc  = " $cflags -DHM_HAVE_HTTP3";
+        $q_libs = " $libs";
+        print "Found ngtcp2 + nghttp3: HTTP/3 (QUIC) support enabled.\n";
+    } else {
+        print "ngtcp2/nghttp3 not found (or this OpenSSL cannot drive them): "
+            . "HTTP/3 support disabled.\n";
+    }
+} elsif ($ENV{HM_NO_HTTP3}) {
+    print "HTTP/3 support disabled by HM_NO_HTTP3.\n";
+} else {
+    print "HTTP/3 support disabled: it needs TLS, and OpenSSL was not found.\n";
+}
+
+# Does this stack actually work together?
+#
+# The three version calls are not the probe - they would link against any
+# build of these libraries and tell us nothing. What is being asked is
+# whether THIS OpenSSL can hand its handshake to ngtcp2:
+# ngtcp2_crypto_ossl_init() is only present in a crypto shim built for the
+# OSSL provider path, and SSL_set_quic_tls_cbs only exists in OpenSSL 3.5+.
+# Referencing both is what makes the link fail on the stacks that cannot
+# serve HTTP/3, which is the whole point - a probe that merely confirms the
+# libraries exist confirms the bug instead of finding it.
+sub probe_http3 {
+    my ($cflags, $libs, $tlsc, $tlsl) = @_;
+    my $dir = "hm_q_probe_$$";
+    mkdir $dir or return 0;
+    my ($src, $bin, $ok) = ("$dir/probe.c", "$dir/probe", 0);
+    # -DHM_HAVE_OPENSSL is a Hyperman define, not a compiler flag the probe
+    # wants; strip it so the probe compiles the same way on every path.
+    for ($tlsc) { defined or $_ = ''; s/-DHM_HAVE_\w+//g; }
+    $tlsl = '' unless defined $tlsl;
+    if (open my $fh, '>', $src) {
+        print $fh <<'C';
+#include <ngtcp2/ngtcp2.h>
+#include <ngtcp2/ngtcp2_crypto.h>
+#include <ngtcp2/ngtcp2_crypto_ossl.h>
+#include <nghttp3/nghttp3.h>
+#include <openssl/ssl.h>
+int main(void) {
+    void *p;
+    if (ngtcp2_crypto_ossl_init() != 0) return 1;
+    p = (void *)&SSL_set_quic_tls_cbs;
+    if (!p) return 1;
+    if (!ngtcp2_version(0) || !nghttp3_version(0)) return 1;
+    return 0;
+}
+C
+        close $fh;
+        my $cc = $Config{cc} || 'cc';
+        $ok = system("$cc $cflags $tlsc $src -o $bin $libs $tlsl "
+                   . ">$DEVNULL 2>&1") == 0;
+    }
+    unlink $src, $bin;
+    rmdir $dir;
+    return $ok;
+}
+
 sub probe_zlib {
     my $flags = shift;
     my $dir = "hm_z_probe_$$";
@@ -511,22 +616,35 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.010000',
     OBJECT           => 'Hyperman$(OBJ_EXT)',
     INC              => join(' ', grep { defined && length }
-                            '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc . $sf_inc . $z_inc,
+                            '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc . $sf_inc . $z_inc . $q_inc,
                             $dep_inc),
-    LIBS             => [ join(' ', grep { defined && length } $uring_libs, $h2_libs, $tls_libs, $z_libs, $rt_libs, $win_libs, $dep_libs) ],
+    LIBS             => [ join(' ', grep { defined && length } $uring_libs, $h2_libs, $tls_libs, $z_libs, $q_libs, $rt_libs, $win_libs, $dep_libs) ],
+    # MakeMaker tracks neither include/*.h nor the xs/*.xs pulled in with
+    # INCLUDE:, so every one of them has to be listed here or a rebuild
+    # silently tests stale objects. Both lists were incomplete: xs/bus.xs is
+    # INCLUDE:d by Hyperman.xs:87 and was missing, as were six headers
+    # Hyperman.xs includes. Keep them in the order the files are included.
     depend           => {
         'Hyperman.c' => 'xs/hyperman.xs xs/future.xs xs/loop.xs '
-                      . 'xs/writer.xs xs/event.xs xs/abi.xs',
+                      . 'xs/writer.xs xs/event.xs xs/abi.xs xs/bus.xs '
+                      . 'xs/quic.xs',
         'Hyperman$(OBJ_EXT)' =>
             'include/hyperman/hyperman.h include/hyperman/hm_core.h '
+          . 'include/hyperman/hm_compat.h '
           . 'include/hyperman/hm_future.h include/hyperman/backend_kqueue.c '
           . 'include/hyperman/backend_epoll.c include/hyperman/backend_poll.c '
           . 'include/hyperman/backend_wsapoll.c '
           . 'include/hyperman/backend_iouring.c include/hyperman/hm_http2.h '
           . 'include/hyperman/hm_tls.h include/hyperman/hm_abi.h '
           . 'include/hyperman/hm_win.h include/hyperman/hm_abi_impl.h '
+          . 'include/hyperman/hm_stream.h '
+          . 'include/hyperman/hm_quic.h include/hyperman/hm_http3.h '
           . 'include/hyperman/hm_compress.h include/hyperman/hm_parse.h '
-          . 'include/hyperman/hm_ratelimit.h',
+          . 'include/hyperman/hm_ratelimit.h '
+          . 'include/hyperman/hm_atomic.h include/hyperman/hm_bus.h '
+          . 'include/hyperman/hm_bus_perl.h '
+          . 'include/hyperman/hm_workerhook.h '
+          . 'include/hyperman/hm_workerhook_perl.h',
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',

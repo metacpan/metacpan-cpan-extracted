@@ -8,7 +8,7 @@ use Test::More;
 use PunkTest;
 use Punk ();
 
-# url_for over an OpenAPI mount. Phase 3 of plan_punk_named_routes/.
+# url_for over an OpenAPI mount.
 #
 # An operation has an operationId and a path template with {holes}: a named
 # route by another spelling, and an application with an `api` keyword would

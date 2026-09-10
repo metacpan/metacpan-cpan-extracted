@@ -5,7 +5,7 @@ use warnings;
 
 use Time::HiRes ();
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.5.0';
 
 # A node is [key, value, expires_at, older, newer]. The hash finds a node, the
 # links order them by recency, so a get, a set and an eviction are each O(1). A

@@ -4,7 +4,7 @@
       "Nicholas B. Hubbard <nicholashubbard@posteo.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "gpl_3"
    ],
@@ -48,6 +48,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "1.001002",
+   "version" : "1.002001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

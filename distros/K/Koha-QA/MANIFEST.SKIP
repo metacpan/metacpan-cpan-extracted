@@ -1,0 +1,16 @@
+^\.git/
+^wip/
+^local/
+^.gitignore
+^.dockerignore
+^AGENTS.md
+^blib/
+.patch
+\.swo$
+\.swp$
+\.patch$
+^node_modules/
+^share/node_modules/
+^none/
+\.gitlab-ci.yml$
+^Makefile.old$

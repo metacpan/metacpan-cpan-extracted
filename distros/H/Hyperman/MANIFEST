@@ -19,8 +19,11 @@ include/hyperman/hm_compress.h
 include/hyperman/hm_core.h
 include/hyperman/hm_future.h
 include/hyperman/hm_http2.h
+include/hyperman/hm_http3.h
 include/hyperman/hm_parse.h
+include/hyperman/hm_quic.h
 include/hyperman/hm_ratelimit.h
+include/hyperman/hm_stream.h
 include/hyperman/hm_tls.h
 include/hyperman/hm_win.h
 include/hyperman/hm_workerhook.h
@@ -33,6 +36,7 @@ lib/Hyperman/Event/Kqueue.pm
 lib/Hyperman/Event/Poll.pm
 lib/Hyperman/Future.pm
 lib/Hyperman/Loop.pm
+lib/Hyperman/Writer.pm
 lib/Plack/Handler/Hyperman.pm
 t/00-load.t
 t/01-plack.t
@@ -67,6 +71,14 @@ t/37-ktls.t
 t/38-awaitable.t
 t/39-awaitable-conformance.t
 t/40-continue.t
+t/41-stream-abi.t
+t/42-http3-stub.t
+t/43-quic-listener.t
+t/44-quic-cid.t
+t/45-quic-handshake.t
+t/46-quic-tokens.t
+t/47-http3.t
+t/48-extended-connect.t
 t/lib/HMTest.pm
 t/manifest.t
 t/pod-coverage.t
@@ -77,6 +89,7 @@ xs/event.xs
 xs/future.xs
 xs/hyperman.xs
 xs/loop.xs
+xs/quic.xs
 xs/writer.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -115,6 +115,20 @@ without it. So C<hm_detach> refuses:
 which Punk reports as C<< TLS cannot be detached >>. On a TLS listener the
 pages would serve and the chat would not.
 
+B<This is now a WebSocket constraint and not a streaming one.> It used to
+apply equally to L<Punk/sse> and L<Punk/stream>, which were built on the same
+C<detach> and refused for the same reason. They are not any more: both run on
+Hyperman's stream-handle seam, which sends status, headers and body pieces
+through the server instead of taking its socket away, and so works on TLS and
+on HTTP/2 alike. An app whose live updates are server-sent events - which is
+most of them, and would have been enough for this one - needs none of what
+follows and can serve C<tls_cert> directly.
+
+A WebSocket is bidirectional, and its handshake is C<101 Switching
+Protocols>, which does not exist in HTTP/2 or HTTP/3 at all. Those use
+Extended CONNECT (RFC 9220), a different handshake rather than a port of this
+one, so it is still C<detach> or nothing here.
+
 Serving the WebSocket from a second, plain port does not rescue it: a browser
 refuses a C<ws://> socket opened from an C<https://> page, so it has to be
 C<wss://> on the same origin as the page.

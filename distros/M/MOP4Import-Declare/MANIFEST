@@ -7,6 +7,7 @@ Base/CLI_JSON.pm
 Base/CLI_JSON.pod
 Base/CLI_Opts.pm
 Base/Configure.pm
+Base/IOHandle.pm
 Base/JSON.pm
 Build.PL
 Changes

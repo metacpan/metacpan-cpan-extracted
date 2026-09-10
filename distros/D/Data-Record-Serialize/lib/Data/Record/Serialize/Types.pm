@@ -6,7 +6,7 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use Type::Utils -all;
 use Types::Standard qw( ArrayRef Str Enum );
@@ -44,7 +44,7 @@ Data::Record::Serialize::Types - Types for Data::Record::Serialize
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SUPPORT
 

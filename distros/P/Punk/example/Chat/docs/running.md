@@ -24,6 +24,14 @@ property of a listener, not of an application, and terminating in front is the
 only shape that serves `wss://` on a Hyperman deployment. See the README for
 the longer version of that argument.
 
+That argument is now about WebSockets and nothing else. `sse` routes and
+`$c->stream` used to share it - all three were built on `detach`, which
+refuses TLS because the OpenSSL session state belongs to the server - and
+they no longer do: both run on Hyperman's stream-handle seam, which works on
+TLS and over HTTP/2. An application whose live updates are server-sent events
+can point `tls_cert` and `tls_key` at Hyperman and skip the terminator
+entirely.
+
 ## Without TLS
 
 For poking at it with `curl`, the plain app is an ordinary PSGI application:

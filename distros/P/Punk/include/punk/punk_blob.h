@@ -306,9 +306,9 @@ static int pb_same_file(pTHX_ const char *a, const char *b) {
 
 /* Store an upload that is already on disk, without ever holding it.
  *
- * Phases 1 to 3 of the upload work got a large file from the wire to a temp
- * file without it being resident anywhere. Storing it through ->content would
- * have undone all of that at the last step: the whole point of an id derived
+ * The upload path gets a large file from the wire to a temp file without it
+ * being resident anywhere. Storing it through ->content would undo all of
+ * that at the last step: the whole point of an id derived
  * from the contents is that the contents must be READ, and reading them into
  * a scalar to hash them is the copy that was just removed.
  *

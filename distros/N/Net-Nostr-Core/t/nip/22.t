@@ -475,17 +475,27 @@ subtest 'mentions supported on reply' => sub {
 };
 
 ###############################################################################
-# "Comments MUST NOT be used to reply to kind 1 notes"
+# NIP-22 now permits comments on kind 1 notes.
 ###############################################################################
 
-subtest 'comment rejects kind 1 events' => sub {
+subtest 'comment accepts kind 1 events and round-trips its references' => sub {
     my $note = make_event(
         id => $event_id_1, pubkey => $alice_pk, kind => 1, content => 'hello',
     );
 
-    like dies { Net::Nostr::Comment->comment(
+    my $comment;
+    ok lives { $comment = Net::Nostr::Comment->comment(
         event => $note, pubkey => $bob_pk, content => 'reply',
-    ) }, qr/kind 1/i, 'croaks on kind 1 event';
+    ) }, 'kind 1 is a valid comment target';
+    return unless $comment;
+    my $parsed = Net::Nostr::Comment->from_event($comment);
+    is $parsed->root_kind, '1', 'root kind';
+    is $parsed->parent_kind, '1', 'parent kind';
+    is $parsed->root_value, $event_id_1, 'root id';
+    is $parsed->parent_value, $event_id_1, 'parent id';
+    is $parsed->root_pubkey, $alice_pk, 'root author';
+    my $reply = Net::Nostr::Comment->reply(to => $comment, pubkey => $alice_pk, content => 'follow-up');
+    is(Net::Nostr::Comment->from_event($reply)->root_kind, '1', 'nested reply retains note root');
 };
 
 ###############################################################################

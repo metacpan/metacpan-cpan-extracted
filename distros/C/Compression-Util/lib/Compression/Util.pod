@@ -5,6 +5,10 @@
 
 Compression::Util - Implementation of various techniques used in data compression.
 
+=head1 VERSION
+
+Version 0.18
+
 =head1 SYNOPSIS
 
     use 5.036;
@@ -31,6 +35,20 @@ Compression::Util - Implementation of various techniques used in data compressio
 
     $opts{d} ? decompress(\*STDIN, \*STDOUT) : compress(\*STDIN, \*STDOUT);
 
+A quicker taste, compressing and decompressing a string in memory with a real, industry-standard container format:
+
+    use 5.036;
+    use Compression::Util qw(gzip_compress gzip_decompress);
+
+    my $data       = "the quick brown fox jumps over the lazy dog " x 20;
+    my $compressed = gzip_compress($data);
+    my $round_trip = gzip_decompress($compressed);
+
+    $round_trip eq $data or die "round-trip failed";
+
+    printf("%d -> %d bytes (%.1f%%)\n",
+        length($data), length($compressed), 100 * length($compressed) / length($data));
+
 =head1 DESCRIPTION
 
 B<Compression::Util> is a function-based module, implementing various techniques used in data compression, such as:
@@ -38,10 +56,10 @@ B<Compression::Util> is a function-based module, implementing various techniques
     * Burrows-Wheeler transform
     * Move-to-front transform
     * Huffman Coding
-    * Arithmetic Coding (in fixed bits)
+    * Arithmetic Coding (in fixed bits, static and adaptive)
     * Run-length encoding
     * Fibonacci coding
-    * Elias gamma/omega coding
+    * Elias gamma/delta/omega coding
     * Delta coding
     * BWT-based (de)compression
     * LZ77/LZSS (de)compression
@@ -50,6 +68,8 @@ B<Compression::Util> is a function-based module, implementing various techniques
     * GZIP (de)compression
     * ZLIB (de)compression
     * LZ4 (de)compression
+
+Nothing is exported by default: every function below is available on demand, either individually or via the C<:all> tag (see L</EXPORT>). This makes it straightforward to build compressors ranging from a couple of lines that reuse a full pipeline (L</HIGH-LEVEL FUNCTIONS>), down to hand-rolled formats assembled from individual transforms and entropy coders (L</LOW-LEVEL FUNCTIONS> and L</MEDIUM-LEVEL FUNCTIONS>).
 
 The provided techniques can be easily combined in various ways to create powerful compressors, such as the Bzip2 compressor, which is a pipeline of the following methods:
 
@@ -81,6 +101,10 @@ A simple BWT-based compression method (similar to Bzip2) is provided by the func
     # Decompress the result
     bwt_decompress($enc) eq $data or die "decompression error";
 
+=head2 CHOOSING A FUNCTION
+
+If you just want to shrink some data and don't care how, reach for a L</HIGH-LEVEL FUNCTIONS> pair such as C<gzip_compress()> / C<gzip_decompress()> (a real, interoperable GZIP stream) or C<bwt_compress()> / C<bwt_decompress()> (a lighter, module-specific container). If you want to design your own container format out of individual building blocks -- for example, applying Huffman coding to the output of your own transform -- use the L</MEDIUM-LEVEL FUNCTIONS>. If you are implementing a specific bit-exact format (such as DEFLATE) or need direct access to bit/byte I/O, transforms, or entropy coders in isolation, use the L</LOW-LEVEL FUNCTIONS>.
+
 =head2 TERMINOLOGY
 
 =head3 bit
@@ -89,7 +113,7 @@ A bit value is either C<1> or C<0>.
 
 =head3 bitstring
 
-A bitstring is a string containing only 1s and 0s.
+A bitstring is a string containing only the characters C<1> and C<0> (not packed bits). Many low-level encoders return a bitstring; pass it through C<pack('B*', $bitstring)> to get a packed binary string, and C<unpack('B*', $string)> to go the other way.
 
 =head3 byte
 
@@ -97,17 +121,45 @@ A byte value is an integer between C<0> and C<255>, inclusive.
 
 =head3 string
 
-A string means a binary (non-UTF*) string.
+A string means a binary (non-UTF*) string. Any file-handle used to read or write such a string must have its encoding layer set to C<:raw> (see L</filehandle> below).
 
 =head3 symbols
 
-An array of symbols means an array of non-negative integer values.
+An array of symbols means an array-ref of non-negative integer values. Symbols are not restricted to the C<[0, 255]> byte range unless a specific function says otherwise (for example C<encode_alphabet_256()>); this is what makes the "symbolic" variants of many functions (C<bwt_encode_symbolic()>, C<lzss_encode_symbolic()>, C<lz77_encode_symbolic()>, etc.) useful for compressing sequences of large integers rather than bytes, such as intermediate output from another codec.
+
+=head3 alphabet
+
+An alphabet is a sorted array-ref of the distinct symbols that occur in a sequence, with no repeats. Several functions (such as C<mtf_encode()> and C<adaptive_ac_encode()>) return or accept an alphabet alongside the encoded data.
 
 =head3 filehandle
 
-A filehandle is denoted by C<$fh>.
+A filehandle is denoted by C<$fh>. The encoding of file-handles must be set to C<:raw> (i.e. C<open(my $fh, '<:raw', $path)>), so that bytes are read and written without any character-encoding or line-ending translation.
 
-The encoding of file-handles must be set to C<:raw>.
+=head3 entropy coding sub
+
+Many of the higher-level functions accept an optional code-ref parameter (commonly named C<$entropy_sub>) that plugs in the final entropy-coding stage of a pipeline, letting you swap Huffman coding for Arithmetic Coding (or a custom coder) without re-implementing the surrounding pipeline. See L</create_huffman_entry> and L</create_ac_entry> for the two coders built into this module, and L</Combining LZSS + MRL compression> for a usage example.
+
+=head2 CONVENTIONS
+
+A few conventions apply consistently across the module and are worth knowing up front, rather than being repeated in every function's description:
+
+=over 4
+
+=item * B<String or symbols.> Functions documented as accepting C<\@symbols> will also accept a plain string in its place (it is converted internally via C<string2symbols()>). Functions with a C<_symbolic> counterpart (e.g. C<bwt_encode()> / C<bwt_encode_symbolic()>) exist because the plain version is optimized for byte strings, while the C<_symbolic> version works with arbitrary non-negative integers and has no upper bound on symbol values.
+
+=item * B<Filehandle or string, transparently.> Any decoder that takes C<$fh> as its first argument will also accept a plain packed binary string; internally it opens an in-memory filehandle over the string (C<open($fh2, '<:raw', \$string)>) and recurses. This means C<lzss_decompress($string)> and C<lzss_decompress($fh)> both work, and the two forms can be mixed freely when chaining decoders.
+
+=item * B<Streaming decompression.> Because decoders read only as much as they need from C<$fh>, several compressed blocks can be concatenated back-to-back in a single file and decoded one at a time in a loop (see the L</SYNOPSIS>), without needing to record each block's length up front.
+
+=item * B<Package variables are dynamically scoped.> The C<$LZ_*> tuning variables (L</PACKAGE VARIABLES> below) are read at the time an LZ-family encoder runs. Use C<local> to override them for the duration of a single call, so that concurrent or later calls elsewhere in your program are unaffected:
+
+    {
+        local $Compression::Util::LZ_MAX_CHAIN_LEN = 128;
+        my $enc = lzss_compress($data);   # uses the higher chain length
+    }
+    # back to the default of 32 here
+
+=back
 
 =head1 PACKAGE VARIABLES
 
@@ -118,8 +170,9 @@ B<Compression::Util> provides the following package variables:
     $Compression::Util::LZ_MIN_LEN = 4;        # minimum match length in LZ parsing
     $Compression::Util::LZ_MAX_LEN = 1 << 15;  # maximum match length in LZ parsing
 
-    $Compression::Util::LZ_MAX_DIST = ~0;      # maximum back-reference distance allowed
-    $Compression::Util::LZ_MAX_CHAIN_LEN = 32; # how many recent positions to remember for each match in LZ parsing
+    $Compression::Util::LZ_MAX_DIST = ~0;              # maximum back-reference distance allowed
+    $Compression::Util::LZ_MAX_CHAIN_LEN = 32;         # how many recent positions to remember for each match in LZ parsing
+    $Compression::Util::LZ_MAX_CHAIN_WIDTH = 1024;     # how many positions to store per matched prefix
 
 These package variables can also be imported as:
 
@@ -130,6 +183,12 @@ These package variables can also be imported as:
         $LZ_MAX_CHAIN_LEN
         $LZ_MAX_CHAIN_WIDTH
     );
+
+=head2 $VERBOSE
+
+When set to a true value, many functions print diagnostic information (block sizes, header fields, checksums, and so on) to C<STDERR>. Useful when debugging a hand-assembled pipeline or inspecting third-party GZIP/ZLIB/LZ4 streams being decoded.
+
+By default, C<$VERBOSE> is set to C<0>.
 
 =head2 $LZ_MIN_LEN
 
@@ -171,7 +230,18 @@ By default, C<$LZ_MAX_CHAIN_WIDTH> is set to C<1024>.
 
 B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using a value of C<1>.
 
+=head2 CHOOSING AN LZSS ENCODER
+
+The module ships three LZ-parsing engines with different speed/ratio trade-offs, all of which produce output consumable by the same C<lzss_decode()> / C<lzss_decode_symbolic()>:
+
+    lzss_encode()             # best compression; honors all $LZ_* tuning variables
+    lzss_encode_fast()        # faster, chain length fixed to 1; good with $LZ_MIN_LEN = 5
+
+Any of these can be plugged into the higher-level compressors (C<lz77_compress()>, C<lzss_compress()>, C<lzb_compress()>, C<lz4_compress()>, C<gzip_compress()>, C<zlib_compress()>) via their optional C<$lzss_encoding_sub> argument, so the trade-off can be tuned per call without touching the rest of the pipeline.
+
 =head1 HIGH-LEVEL FUNCTIONS
+
+Ready-made compressors and decompressors, each wrapping a full pipeline of transforms and an entropy coder. Start here unless you need to design your own format.
 
       create_huffman_entry(\@symbols)      # Create a Huffman Coding block
       decode_huffman_entry($fh)            # Decode a Huffman Coding block
@@ -224,12 +294,20 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       lz4_compress($string)                # Compress a given string using the LZ4 frame format
       lz4_decompress($fh)                  # Inverse of the above method
 
+      detect_format($fh)                   # Sniffs the magic bytes of a compressed blob
+      decompress_auto($fh)                 # Decompresses a blob produced by GZIP, ZLIB, BZIP2 or LZ4
+
+      best_compress($data)                 # Compresses $data using several methods, optimizing for best size
+      best_decompress($data)               # Inverse of the above method
+
 =head1 MEDIUM-LEVEL FUNCTIONS
+
+Individual transforms and entropy coders, meant to be composed together into your own pipeline (as the L</HIGH-LEVEL FUNCTIONS> do internally).
 
       deltas(\@ints)                       # Computes the differences between integers
       accumulate(\@deltas)                 # Inverse of the above method
 
-      delta_encode(\@ints)                 # Delta+RLE encoding of an array-ref of integers
+      delta_encode(\@ints)                 # Delta+RLE+Elias omega encoding of an array-ref of integers
       delta_decode($fh)                    # Inverse of the above method
 
       fibonacci_encode(\@symbols)          # Fibonacci coding of an array-ref of symbols
@@ -237,6 +315,9 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
 
       elias_gamma_encode(\@symbols)        # Elias Gamma coding method of an array-ref of symbols
       elias_gamma_decode($fh)              # Inverse of the above method
+
+      elias_delta_encode(\@symbols)        # Elias Delta coding method of an array-ref of symbols
+      elias_delta_decode($fh)              # Inverse of the above method
 
       elias_omega_encode(\@symbols)        # Elias Omega coding method of an array-ref of symbols
       elias_omega_decode($fh)              # Inverse of the above method
@@ -253,6 +334,12 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       bwt_encode_symbolic(\@symbols)       # Burrows-Wheeler transform over an array-ref of symbols
       bwt_decode_symbolic(\@bwt, $idx)     # Inverse of symbolic Burrows-Wheeler transform
 
+      golomb_rice_encode(\@symbols)        # Encodes a sequence of symbols using Golomb-Rice coding
+      golomb_rice_decode($fh)              # Inverse of the above method
+
+      leb128_encode(\@symbols)             # Encodes a sequence of symbols using unsigned LEB128 (Little Endian Base 128)
+      leb128_decode($fh)                   # Inverse of the above method
+
       mtf_encode(\@symbols)                # Move-to-front transform
       mtf_decode(\@mtf, \@alphabet)        # Inverse of the above method
 
@@ -263,6 +350,7 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       decode_alphabet_256($fh)             # Inverse of the above method
 
       frequencies(\@symbols)               # Returns a dictionary with symbol frequencies
+      shannon_entropy(\@symbols)           # Computes the (zeroth-order) Shannon entropy of a sequence of symbols
       run_length(\@symbols, $max=undef)    # Run-length encoding, returning a 2D array-ref
 
       rle4_encode(\@symbols, $max=255)     # Run-length encoding with 4 or more consecutive characters
@@ -282,7 +370,10 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
 
 =head1 LOW-LEVEL FUNCTIONS
 
+Bit/byte I/O primitives, raw LZ parsing, Huffman table construction, and DEFLATE block handling. These are what the medium- and high-level functions are built from; reach for them when implementing a specific bit-exact format or when you need finer control than the higher tiers expose.
+
       crc32($string, $prev_crc = 0)        # Compute the CRC32 value of a given string
+      adler32($string, $prev_adler = 1)    # Compute the Adler32 value of a given string
 
       read_bit($fh, \$buffer)              # Read one bit from file-handle (MSB)
       read_bit_lsb($fh, \$buffer)          # Read one bit from file-handle (LSB)
@@ -329,8 +420,6 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       lzss_encode_fast($string)                # Fast-LZSS encoding into literals, distances and lengths
       lzss_encode_fast_symbolic(\@symbols)     # Fast-LZSS encoding into literals, distances and lengths (symbolic)
 
-      lzss_encode_hash4($string)               # LZSS encoding via O(1) flat-array hashing, LZ4-style.
-
       lzss_decode(\@lits, \@dist, \@lens)          # Inverse of lzss_encode() and lzss_encode_fast()
       lzss_decode_symbolic(\@lits, \@dist, \@lens) # Inverse of lzss_encode_symbolic() and lzss_encode_fast_symbolic()
 
@@ -350,6 +439,11 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
     my $string = create_huffman_entry(\@symbols);
 
 High-level function that generates a Huffman coding block, given an array-ref of symbols.
+
+Example:
+
+    my $block = create_huffman_entry([65, 65, 66, 65, 67]);
+    decode_huffman_entry($block);    # [65, 65, 66, 65, 67]
 
 =head2 decode_huffman_entry
 
@@ -376,6 +470,8 @@ Inverse of C<create_ac_entry()>.
     my $string = create_adaptive_ac_entry(\@symbols);
 
 High-level function that generates an Adaptive Arithmetic Coding block, given an array-ref of symbols.
+
+Unlike C<create_ac_entry()>, no frequency table needs to be stored in the block: the model adapts to the data as it is decoded, which can save space on short or skewed inputs at the cost of somewhat slower encoding/decoding.
 
 =head2 decode_adaptive_ac_entry
 
@@ -462,7 +558,7 @@ Inverse of C<lzss_compress()> and C<lzss_compress_symbolic()>, respectively.
     my $string = lzb_compress($data);
     my $string = lzb_compress($data, \&lzss_encode_fast);   # with fast-LZ parsing
 
-High-level function that performs byte-oriented LZSS compression, inspired by LZ4.
+High-level function that performs byte-oriented LZSS compression, inspired by LZ4. Unlike C<lz4_compress()>, this is a self-contained format specific to this module, not an interoperable LZ4 stream.
 
 =head2 lzb_decompress
 
@@ -500,7 +596,6 @@ High-level function that performs LZW (Lempel-Ziv-Welch) compression on the prov
 =head2 lzw_decompress
 
     my $data = lzw_decompress($fh);
-    my $data = lzw_decompress($string);
 
 Performs Lempel-Ziv-Welch (LZW) decompression on the provided string or file-handle. Inverse of C<lzw_compress()>.
 
@@ -559,14 +654,14 @@ Inverse of C<bwt_compress_symbolic()>.
     my $string = bzip2_compress($data);
     my $string = bzip2_compress($fh);
 
-Valid Bzip2 compressor, given a string or an input file-handle.
+Valid Bzip2 compressor, given a string or an input file-handle. The output can be decompressed by any standard C<bzip2> tool, not just by C<bzip2_decompress()>.
 
 =head2 bzip2_decompress
 
     my $data = bzip2_decompress($string);
     my $data = bzip2_decompress($fh);
 
-Valid Bzip2 decompressor, given a string or an input file-handle.
+Valid Bzip2 decompressor, given a string or an input file-handle. Understands streams produced by the standard C<bzip2> tool as well as by C<bzip2_compress()>.
 
 =head2 gzip_compress
 
@@ -574,14 +669,18 @@ Valid Bzip2 decompressor, given a string or an input file-handle.
     my $string = gzip_compress($data);
     my $string = gzip_compress($data, \&lzss_encode_fast);  # using fast LZ-parsing
 
-Valid GZIP compressor (RFC 1952), given a string or an input file-handle.
+Valid GZIP compressor (RFC 1952), given a string or an input file-handle. The output is a standard C<.gz> stream, decodable with C<gzip -d>, C<zcat>, or any GZIP-compatible library.
+
+    use Compression::Util qw(gzip_compress);
+    open my $out_fh, '>:raw', 'file.txt.gz' or die $!;
+    print $out_fh gzip_compress("Hello, world!\n");
 
 =head2 gzip_decompress
 
     my $data = gzip_decompress($string);
     my $data = gzip_decompress($fh);
 
-Valid GZIP decompressor (RFC 1952), given a string or an input file-handle.
+Valid GZIP decompressor (RFC 1952), given a string or an input file-handle. Understands streams produced by the standard C<gzip> tool as well as by C<gzip_compress()>, including multiple concatenated members.
 
 =head2 zlib_compress
 
@@ -608,14 +707,14 @@ Valid ZLIB decompressor (RFC 1950), given a string or an input file-handle.
     my $enc = mrl_compress($str, \&create_ac_entry);
     my $enc = mrl_compress(\@symbols, \&create_ac_entry);
 
-A fast compression method, using the following pipeline:
+A fast compression method (no BWT stage, so it is cheaper but generally less effective than C<bwt_compress()>), using the following pipeline:
 
     1. mtf_encode
     2. zrle_encode
     3. rle4_encode
     4. create_huffman_entry
 
-It accepts an arbitrary array-ref of non-negative integer values as input.
+It accepts either a string or an arbitrary array-ref of non-negative integer values as input; C<mrl_compress()> and C<mrl_compress_symbolic()> are, in fact, the same function under two names.
 
 =head2 mrl_decompress / mrl_decompress_symbolic
 
@@ -631,7 +730,70 @@ It accepts an arbitrary array-ref of non-negative integer values as input.
     my $symbols = mrl_decompress_symbolic($fh, \&decode_ac_entry);
     my $symbols = mrl_decompress_symbolic($string, \&decode_ac_entry);
 
-Inverse of C<mrl_decompress()> and C<mrl_compress_symbolic()>.
+Inverse of C<mrl_compress()> and C<mrl_compress_symbolic()>.
+
+=head2 detect_format
+
+    my $format = detect_format($string);
+    my $format = detect_format($fh);
+
+Sniffs the magic bytes of a compressed blob (or the next few bytes of a filehandle) and returns one of C<"gzip">, C<"zlib">, C<"bzip2">, C<"lz4">, or C<undef> if none of the four is recognized.
+
+Given a filehandle, C<detect_format()> peeks at the first 4 bytes and seeks back, leaving the filehandle's position unchanged -- so it is safe to call before handing the same filehandle to C<gzip_decompress()>, C<zlib_decompress()>, and so on (this is exactly what C<decompress_auto()> does internally). The filehandle must support C<seek()> (a real file or an in-memory string filehandle both do; a pipe or socket does not).
+
+Detection for gzip, bzip2 and lz4 is exact (each format has a fixed, unambiguous magic number). Zlib streams have no dedicated magic number by design of the format, so detection there is a validity check on the header's checksum bits (RFC 1950, section 2.2) -- reliable in practice, but with an intrinsic (very small, roughly 1-in-500) false-positive rate on arbitrary non-zlib data, which is a property of the zlib format itself rather than of this function.
+
+Note this only recognizes the four self-describing container formats above; it has no way to distinguish this module's own C<bwt_compress()>/C<mrl_compress()> output (which carries no format signature) from arbitrary binary data. See C<best_compress()> below if you need to auto-detect between this module's own compression methods.
+
+=cut
+
+=head2 decompress_auto
+
+    my $data = decompress_auto($string);
+    my $data = decompress_auto($fh);
+
+Decompresses a blob produced by (real) C<gzip>, C<zlib>, C<bzip2>, or C<lz4> -- or by this module's own C<gzip_compress()>/C<zlib_compress()>/C<bzip2_compress()>/C<lz4_compress()> -- without the caller needing to know in advance which of the four it is. Internally calls C<detect_format()> and dispatches to the matching C<*_decompress()> function; dies if the format isn't recognized.
+
+Example:
+
+    # Anywhere upstream, some file may have been compressed with any tool:
+    my $data = decompress_auto($fh);
+
+=cut
+
+=head2 best_compress
+
+    my $string = best_compress($data);
+    my $string = best_compress($data, \@methods);
+
+Compresses C<$data> using several methods and keeps whichever produced the smallest output, prefixed with a single-character tag identifying which method won (so C<best_decompress()> knows how to reverse it).
+
+By default, three of this module's own high-level compressors are tried: C<gzip_compress()> (tag C<"G">), C<bwt_compress()> (tag C<"B">), and C<mrl_compress()> (tag C<"M">) -- deliberately three different algorithm families (LZ77/LZSS, BWT+MTF, MTF-only), so that at least one tends to do reasonably well regardless of what kind of redundancy the input has. This costs roughly the sum of all three methods' compression time; it is meant for cases where compression happens once (or offline) and is read many times, not for a hot path where compression speed matters as much as ratio.
+
+The default set can be overridden with C<\@methods>, an array-ref of C<[$tag, $compress_sub]> pairs, where C<$tag> is a single character and C<$compress_sub> is a code-ref taking the same single argument C<best_compress()> itself received (a string, or whatever C<$compress_sub> accepts). If you do this, pass a matching tag-to-decompressor mapping to C<best_decompress()> (see below), since its own default set only understands C<"G">/C<"B">/C<"M">.
+
+Example:
+
+    my $enc = best_compress($data);
+    say best_decompress($enc) eq $data;    # true
+
+    # Restrict the race to two fast methods:
+    my $enc2 = best_compress($data, [
+        ['M', \&mrl_compress],
+        ['L', \&lzss_compress],
+    ]);
+
+=head2 best_decompress
+
+    my $data = best_decompress($fh);
+    my $data = best_decompress($string);
+    my $data = best_decompress($fh, \%methods);
+
+Inverse of C<best_compress()>. Reads the single-character method tag and dispatches to the corresponding decompressor.
+
+The default C<%methods> mapping (C<< G => \&gzip_decompress, B => \&bwt_decompress, M => \&mrl_decompress >>) matches C<best_compress()>'s default set. If C<best_compress()> was called with a custom C<\@methods> list, pass the corresponding C<{tag => $decompress_sub}> hash-ref here as well.
+
+=cut
 
 =head1 INTERFACE FOR MEDIUM-LEVEL FUNCTIONS
 
@@ -639,19 +801,45 @@ Inverse of C<mrl_decompress()> and C<mrl_compress_symbolic()>.
 
     my $freq = frequencies(\@symbols);
 
-Returns an hash ref dictionary with frequencies, given an array-ref of symbols.
+Returns a hash-ref dictionary with frequencies, given an array-ref of symbols. For example:
+
+    frequencies([65, 65, 66, 65, 67]);   # { 65 => 3, 66 => 1, 67 => 1 }
+
+=head2 shannon_entropy
+
+    my $bits_per_symbol = shannon_entropy(\@symbols);
+
+Computes the (zeroth-order) Shannon entropy of a sequence of symbols, in bits per symbol, based on the empirical frequency of each distinct symbol in C<\@symbols> (via C<frequencies()>).
+
+This is the information-theoretic lower bound on the average code length any symbol-by-symbol entropy coder (Huffman coding, arithmetic coding) could achieve on this data, ignoring any structure a transform like BWT or LZ parsing might expose beforehand. It's useful for deciding whether an entropy-coding stage is worth its overhead at all, for comparing how much a preprocessing transform (MTF, delta, BWT) has "flattened" the distribution, or for estimating a theoretical best-case compressed size before actually running a coder.
+
+Returns C<0> for an empty array-ref or when every symbol is identical.
+
+Example:
+
+    shannon_entropy([0,1,0,1,0,1]);         # 1.0 -- one fair coin flip per symbol
+    shannon_entropy([5,5,5,5,5]);           # 0.0 -- no information at all
+    shannon_entropy(string2symbols($text)); # bits/byte of the raw text
+
+    # Multiply by the symbol count for a total-bits estimate:
+    my $symbols   = string2symbols($data);
+    my $est_bytes = shannon_entropy($symbols) * scalar(@$symbols) / 8;
 
 =head2 deltas
 
     my $deltas = deltas(\@integers);
 
-Computes the differences between consecutive integers, returning an array.
+Computes the differences between consecutive integers, returning an array-ref, where the first delta is relative to C<0>. For example:
+
+    deltas([10, 12, 13, 11]);   # [10, 2, 1, -2]
 
 =head2 accumulate
 
     my $integers = accumulate(\@deltas);
 
-Inverse of C<deltas()>.
+Inverse of C<deltas()>. For example:
+
+    accumulate([10, 2, 1, -2]);   # [10, 12, 13, 11]
 
 =head2 delta_encode
 
@@ -661,7 +849,7 @@ Encodes a sequence of integers (including negative integers) using Delta + Run-l
 
 Delta encoding calculates the difference between consecutive integers in the sequence and encodes these differences using Elias omega coding. When it's beneficial, runs of identical symbols are collapsed with RLE.
 
-This method supports both positive and negative integers.
+This method supports both positive and negative integers, and is well suited to sequences that increase monotonically or vary smoothly, such as timestamps or sorted indices.
 
 =head2 delta_decode
 
@@ -677,7 +865,7 @@ Inverse of C<delta_encode()>.
 
     my $string = fibonacci_encode(\@symbols);
 
-Encodes a sequence of non-negative integers using Fibonacci coding, returning a binary string.
+Encodes a sequence of non-negative integers using Fibonacci coding, returning a binary string. Fibonacci codes are self-synchronizing (a corrupted bit cannot propagate errors past the next codeword) and tend to compress small values well.
 
 =head2 fibonacci_decode
 
@@ -693,7 +881,7 @@ Inverse of C<fibonacci_encode()>.
 
     my $string = elias_gamma_encode(\@symbols);
 
-Encodes a sequence of non-negative integers using Elias Gamma coding, returning a binary string.
+Encodes a sequence of non-negative integers using Elias Gamma coding, returning a binary string. Elias Gamma coding is simple and fast, and works best when small values dominate the sequence.
 
 =head2 elias_gamma_decode
 
@@ -705,11 +893,27 @@ Encodes a sequence of non-negative integers using Elias Gamma coding, returning 
 
 Inverse of C<elias_gamma_encode()>.
 
+=head2 elias_delta_encode
+
+    my $string = elias_delta_encode(\@symbols);
+
+Encodes a sequence of non-negative integers using Elias Delta coding, returning a binary string. Elias Delta coding encodes the bit-length of each value using Elias Gamma coding, then appends the value's remaining bits directly. It sits between Elias Gamma and Elias Omega: tighter than Gamma on large values, without Omega's fully recursive length-of-length encoding.
+
+=head2 elias_delta_decode
+
+    # Given a file-handle
+    my $symbols = elias_delta_decode($fh);
+
+    # Given a binary string
+    my $symbols = elias_delta_decode($string);
+
+Inverse of C<elias_delta_encode()>.
+
 =head2 elias_omega_encode
 
     my $string = elias_omega_encode(\@symbols);
 
-Encodes a sequence of non-negative integers using Elias Omega coding, returning a binary string.
+Encodes a sequence of non-negative integers using Elias Omega coding, returning a binary string. Compared to Elias Gamma, Omega coding scales better to large values, at a small cost for small ones.
 
 =head2 elias_omega_decode
 
@@ -727,7 +931,7 @@ Inverse of C<elias_omega_encode()>.
 
 Encodes a sequence of non-negative integers using the Adaptive Binary Concatenation encoding method.
 
-This method is particularly effective in encoding a sequence of integers that are in ascending order or have roughly the same size in binary.
+This method is particularly effective in encoding a sequence of integers that are in ascending order or have roughly the same size in binary (this is why it is used as the default entropy coder for LZW codes in C<lzw_compress()>, since LZW dictionary indices grow roughly monotonically).
 
 =head2 abc_decode
 
@@ -739,6 +943,54 @@ This method is particularly effective in encoding a sequence of integers that ar
 
 Inverse of C<abc_encode()>.
 
+=head2 golomb_rice_encode
+
+    my $string = golomb_rice_encode(\@integers);
+    my $string = golomb_rice_encode(\@integers, $k);
+
+Encodes a sequence of non-negative integers using Golomb-Rice coding, returning a binary string.
+
+Golomb-Rice coding splits each integer C<n> into a quotient C<n E<gt>E<gt> k> (stored in unary) and a remainder C<n & (2**k - 1)> (stored in C<$k> fixed bits). It is near-optimal for geometrically-distributed data -- residuals from a predictor, run lengths, gaps between sorted values -- and is the entropy coder used by FLAC and many other lossless audio/image formats for exactly that reason.
+
+If C<$k> is omitted, it is chosen automatically from the mean of C<\@integers> using the standard approximation for geometric sources. Passing C<$k> explicitly skips this estimate, which is useful when you already know (or want to fix) the distribution's scale, or when encoding many small sequences drawn from the same distribution and want a single shared C<$k> instead of paying for a per-call estimate.
+
+Unlike C<elias_gamma_encode()>/C<elias_omega_encode()>, which are parameter-free but assume small values are far more likely than large ones, Golomb-Rice coding is tunable to the actual scale of the data, and generally compresses geometric/Laplacian-ish data more tightly once C<$k> is well chosen.
+
+Example:
+
+    my @residuals = (0, 1, 0, 2, 0, 0, 1, 3, 0, 1, 0, 0, 2, 1, 0);
+    my $enc = golomb_rice_encode(\@residuals);
+    golomb_rice_decode($enc);    # \@residuals
+
+=head2 golomb_rice_decode
+
+    my $integers = golomb_rice_decode($fh);
+    my $integers = golomb_rice_decode($string);
+
+Inverse of C<golomb_rice_encode()>. The array length and the C<$k> parameter used at encoding time are both stored in the stream (via C<elias_omega_encode()>), so nothing besides the encoded string/filehandle needs to be supplied.
+
+=head2 leb128_encode
+
+    my $string = leb128_encode(\@integers);
+
+Encodes a sequence of non-negative integers using unsigned LEB128 (Little Endian Base 128), the same variable-length byte encoding used by protobuf, WebAssembly, DWARF, and the Git packfile format. Each integer is split into 7-bit groups, least-significant group first; every byte but the last has its high bit set as a continuation marker.
+
+Being byte-aligned rather than bit-aligned, LEB128 is both faster to decode than any of the bit-level codes in this module (C<fibonacci_encode()>, C<elias_gamma_encode()>, C<golomb_rice_encode()>, ...) and produces output compatible with other LEB128 implementations -- useful when the priority is decode speed or interop rather than the tightest possible ratio. For small values it is also reasonably compact: any value below 128 costs exactly one byte.
+
+As with C<fibonacci_encode()> and the Elias coders, the array length is stored as the first encoded value, so C<leb128_decode()> is fully self-contained.
+
+Example:
+
+    my $enc = leb128_encode([0, 1, 127, 128, 300, 16384]);
+    leb128_decode($enc);    # [0, 1, 127, 128, 300, 16384]
+
+=head2 leb128_decode
+
+    my $integers = leb128_decode($fh);
+    my $integers = leb128_decode($string);
+
+Inverse of C<leb128_encode()>.
+
 =head2 obh_encode
 
     # With Huffman Coding
@@ -749,7 +1001,7 @@ Inverse of C<abc_encode()>.
 
 Encodes a sequence of non-negative integers using offset bits and Huffman coding.
 
-This method is particularly effective in encoding a sequence of moderately large random integers, such as the list of distances returned by C<lzss_encode()>.
+This method is particularly effective in encoding a sequence of moderately large random integers, such as the list of distances returned by C<lzss_encode()> (which is exactly how C<lz77_compress()> uses it internally).
 
 =head2 obh_decode
 
@@ -768,7 +1020,14 @@ Inverse of C<obh_encode()>.
     my ($bwt, $idx) = bwt_encode($string);
     my ($bwt, $idx) = bwt_encode($string, $lookahead_len);
 
-Applies the Burrows-Wheeler Transform (BWT) to a given string.
+Applies the Burrows-Wheeler Transform (BWT) to a given string, returning the transformed string and the index of the original string among the sorted rotations.
+
+By default, C<$lookahead_len> is C<128> (see C<bwt_sort()>).
+
+Example:
+
+    my ($bwt, $idx) = bwt_encode("banana");
+    bwt_decode($bwt, $idx);   # "banana"
 
 =head2 bwt_decode
 
@@ -795,11 +1054,18 @@ Reverses the Burrows-Wheeler Transform (BWT) applied to a sequence of symbolic e
     my $mtf = mtf_encode(\@symbols, \@alphabet);
     my ($mtf, $alphabet) = mtf_encode(\@symbols);
 
-Performs Move-To-Front (MTF) encoding on a sequence of symbols.
+Performs Move-To-Front (MTF) encoding on a sequence of symbols (also accepts a plain string in place of C<\@symbols>).
 
 The function returns the encoded MTF sequence and the sorted list of unique symbols in the input data, representing the alphabet.
 
 Optionally, the alphabet can be provided as a second argument. When two arguments are provided, only the MTF sequence is returned.
+
+Example:
+
+    my ($mtf, $alphabet) = mtf_encode([2, 2, 5, 2, 9]);
+    # $mtf      = [0, 0, 1, 1, 2]
+    # $alphabet = [2, 5, 9]
+    mtf_decode($mtf, $alphabet);    # [2, 2, 5, 2, 9]
 
 =head2 mtf_decode
 
@@ -812,7 +1078,7 @@ Inverse of C<mtf_encode()>.
     my $string = encode_alphabet(\@alphabet);        # supports arbitrarily large symbols
     my $string = encode_alphabet_256(\@alphabet);    # limited to symbols [0..255]
 
-Encode a sorted alphabet of symbols into a binary string.
+Encode a sorted alphabet of symbols into a binary string. Use C<encode_alphabet_256()> when you know every symbol fits in a byte (for instance, the alphabet produced by C<mtf_encode()> on ordinary text); it produces a more compact header than the general-purpose C<encode_alphabet()>.
 
 =head2 decode_alphabet / decode_alphabet_256
 
@@ -822,7 +1088,7 @@ Encode a sorted alphabet of symbols into a binary string.
     my $alphabet = decode_alphabet_256($fh);
     my $alphabet = decode_alphabet_256($string);
 
-Decodes an encoded alphabet, given a file-handle or a binary string, returning an array-ref of symbols. Inverse of C<encode_alphabet()>.
+Decodes an encoded alphabet, given a file-handle or a binary string, returning an array-ref of symbols. Inverse of C<encode_alphabet()> and C<encode_alphabet_256()>, respectively.
 
 =head2 run_length
 
@@ -837,7 +1103,9 @@ The function returns a 2D-array, with pairs: C<[symbol, run_length]>, such that 
 
     my @symbols = map { ($_->[0]) x $_->[1] } @$rl;
 
-By default, the maximum run-length is unlimited.
+By default, the maximum run-length is unlimited. Example:
+
+    run_length([1, 1, 1, 2, 2, 3]);   # [[1, 3], [2, 2], [3, 1]]
 
 =head2 rle4_encode
 
@@ -845,7 +1113,7 @@ By default, the maximum run-length is unlimited.
     my $rle4 = rle4_encode(\@symbols);
     my $rle4 = rle4_encode(\@symbols, $max_run);
 
-Performs Run-Length Encoding (RLE) on a sequence of symbolic elements, specifically designed for runs of four or more consecutive symbols.
+Performs Run-Length Encoding (RLE) on a sequence of symbolic elements, specifically designed for runs of four or more consecutive symbols (shorter runs are left untouched, which is cheaper when most of the data doesn't repeat).
 
 It takes two parameters: C<\@symbols>, representing an array of symbols, and C<$max_run>, indicating the maximum run length allowed during encoding.
 
@@ -866,7 +1134,7 @@ Inverse of C<rle4_encode()>.
 
 Performs Zero-Run-Length Encoding (ZRLE) on a sequence of symbolic elements, returning the encoded ZRLE sequence as an array-ref of symbols.
 
-This function efficiently encodes runs of zeros, but also increments each symbol by C<1>.
+This function efficiently encodes runs of zeros, but also increments each symbol by C<1> (so that C<0> is freed up to serve purely as a run marker in the output alphabet -- useful right after C<mtf_encode()>, whose output is dominated by zeros).
 
 =head2 zrle_decode
 
@@ -878,11 +1146,11 @@ Inverse of C<zrle_encode()>.
 
     my ($bitstring, $freq) = ac_encode(\@symbols);
 
-Performs Arithmetic Coding on the provided symbols.
+Performs (static) Arithmetic Coding on the provided symbols.
 
 It takes a single parameter, C<\@symbols>, representing the symbols to be encoded.
 
-The function returns two values: C<$bitstring>, which is a string of 1s and 0s, and C<$freq>, representing the frequency table used for encoding.
+The function returns two values: C<$bitstring>, which is a string of 1s and 0s, and C<$freq>, representing the frequency table used for encoding -- this table must be kept (or otherwise reconstructed) in order to decode the data with C<ac_decode()>, since it is not embedded in C<$bitstring>. (C<create_ac_entry()> takes care of storing it for you.)
 
 =head2 ac_decode
 
@@ -903,14 +1171,14 @@ Performs Adaptive Arithmetic Coding on the provided symbols.
 
 It takes a single parameter, C<\@symbols>, representing the symbols to be encoded.
 
-The function returns two values: C<$bitstring>, which is a string of 1s and 0s, and C<$alphabet>, which is an array-ref of distinct sorted symbols.
+The function returns two values: C<$bitstring>, which is a string of 1s and 0s, and C<$alphabet>, which is an array-ref of distinct sorted symbols. Unlike C<ac_encode()>, no per-symbol frequencies need to be stored -- only the alphabet -- because the model adapts as it goes.
 
 =head2 adaptive_ac_decode
 
     my $symbols = adaptive_ac_decode($bits_fh, \@alphabet);
     my $symbols = adaptive_ac_decode($bitstring, \@alphabet);
 
-Performs Adaptive Arithmetic Coding decoding using the provided frequency table and a string of 1s and 0s.
+Performs Adaptive Arithmetic Coding decoding using the provided alphabet and a string of 1s and 0s.
 
 It takes two parameters: C<$bitstring>, representing a string of 1s and 0s containing the adaptive arithmetic coded data, and C<\@alphabet>, representing the array of distinct sorted symbols that appear in the encoded data.
 
@@ -924,7 +1192,7 @@ Performs Lempel-Ziv-Welch (LZW) encoding on the provided string.
 
 It takes a single parameter, C<$string>, representing the data to be encoded.
 
-The function returns an array-ref of symbols.
+The function returns an array-ref of symbols (dictionary indices).
 
 =head2 lzw_decode
 
@@ -941,14 +1209,18 @@ The function returns the decoded string.
     my $int32 = crc32($data);
     my $int32 = crc32($data, $prev_crc32);
 
-Compute the CRC32 checksum of a given string.
+Compute the CRC32 checksum of a given string, as used by GZIP and ZLIB. The optional second argument allows a checksum to be computed incrementally, over successive chunks:
+
+    my $crc = 0;
+    $crc = crc32($chunk1, $crc);
+    $crc = crc32($chunk2, $crc);
 
 =head2 adler32
 
     my $int32 = adler32($data);
     my $int32 = adler32($data, $prev_adler32);
 
-Compute the Adler32 checksum of a given string.
+Compute the Adler-32 checksum of a given string, as used by ZLIB. Like C<crc32()>, it can be computed incrementally by passing the running checksum as the second argument; note that its identity value is C<1>, not C<0>.
 
 =head2 read_bit
 
@@ -956,7 +1228,7 @@ Compute the Adler32 checksum of a given string.
 
 Reads a single bit from a file-handle C<$fh> (MSB order).
 
-The function stores the extra bits inside the C<$buffer>, reading one character at a time from the file-handle.
+The function stores the extra bits inside the C<$buffer>, reading one character at a time from the file-handle. Pass the same C<\$buffer> scalar-ref on every call so left-over bits from a partially consumed byte carry over correctly to the next read.
 
 =head2 read_bit_lsb
 
@@ -984,6 +1256,13 @@ Reads a specified number of bits (C<$bits_len>) from a file-handle (C<$fh>) and 
 
 Convert a non-negative integer to a bitstring of width C<$size>, in MSB order.
 
+Example:
+
+    int2bits(5, 8);        # "00000101"
+    bits2int_from_string(int2bits(5, 8));   # see note below
+
+Note: to turn a bitstring back into a packed binary string (rather than reading it from a file-handle with C<bits2int()>), use C<pack('B*', $bitstring)>.
+
 =head2 int2bits_lsb
 
     my $bitstring = int2bits_lsb($symbol, $size)
@@ -994,13 +1273,13 @@ Convert a non-negative integer to a bitstring of width C<$size>, in LSB order.
 
     my $string = int2bytes($symbol, $size);
 
-Convert a non-negative integer to a byte-string of width C<$size>, in MSB order.
+Convert a non-negative integer to a byte-string of width C<$size>, in MSB order. For example, C<int2bytes(1, 4)> returns the 4-byte big-endian encoding of C<1>.
 
 =head2 int2bytes_lsb
 
     my $string = int2bytes_lsb($symbol, $size);
 
-Convert a non-negative integer to a byte-string of width C<$size>, in LSB order.
+Convert a non-negative integer to a byte-string of width C<$size>, in LSB order (little-endian).
 
 =head2 bits2int
 
@@ -1036,19 +1315,19 @@ Read C<$n> bytes from a file-handle C<$fh> or from a string C<$str> and convert 
 
     my $symbols = string2symbols($string)
 
-Returns an array-ref of code points, given a string.
+Returns an array-ref of code points, given a string. Equivalent to C<[unpack('C*', $string)]>.
 
 =head2 symbols2string
 
     my $string = symbols2string(\@symbols)
 
-Returns a string, given an array-ref of code points.
+Returns a string, given an array-ref of code points. Equivalent to C<pack('C*', @$symbols)>. Inverse of C<string2symbols()>.
 
 =head2 read_null_terminated
 
     my $string = read_null_terminated($fh)
 
-Read a string from file-handle C<$fh> that ends with a NULL character ("\0").
+Read a string from file-handle C<$fh> that ends with a NULL character ("\0"). The terminator itself is consumed but not included in the returned string.
 
 =head2 binary_vrl_encode
 
@@ -1069,7 +1348,7 @@ Given an encoded bitstring, returned by C<binary_vrl_encode()>, gives back the d
 
 Low-level function that sorts the rotations of a given string using the Burrows-Wheeler Transform (BWT) algorithm.
 
-It takes two parameters: C<$string>, which is the input string to be transformed, and C<$LOOKAHEAD_LEN> (optional), representing the length of look-ahead during sorting.
+It takes two parameters: C<$string>, which is the input string to be transformed, and C<$lookahead_len> (optional), representing the length of look-ahead during sorting, which trades memory for speed (O(n * C<$lookahead_len>) space). By default, C<$lookahead_len> is C<128>.
 
 The function returns an array-ref of indices.
 
@@ -1079,9 +1358,9 @@ There is probably no need to call this function explicitly. Use C<bwt_encode()> 
 
     my $indices = bwt_sort_symbolic(\@symbols);
 
-Low-level function that sorts the rotations of a sequence of symbolic elements using the Burrows-Wheeler Transform (BWT) algorithm.
+Low-level function that sorts the rotations of a sequence of symbolic elements using the Burrows-Wheeler Transform (BWT) algorithm. Unlike C<bwt_sort()>, this uses O(n) space with no look-ahead parameter, and is somewhat slower for large inputs.
 
-It takes a single parameter C<\@symbols>, which represents the input sequence of symbolic elements. The function returns an array of indices.
+It takes a single parameter C<\@symbols>, which represents the input sequence of symbolic elements. The function returns an array-ref of indices.
 
 There is probably no need to call this function explicitly. Use C<bwt_encode_symbolic()> instead!
 
@@ -1092,7 +1371,7 @@ There is probably no need to call this function explicitly. Use C<bwt_encode_sym
 
 Low-level function that constructs Huffman prefix codes, based on the frequency of symbols provided in a hash table.
 
-It takes a single parameter, C<\%freq>, representing the hash table where keys are symbols, and values are their corresponding frequencies.
+It takes a single parameter, C<\%freq>, representing the hash table where keys are symbols, and values are their corresponding frequencies (such as the hash-ref returned by C<frequencies()>).
 
 The function returns two values: C<$dict>, which is the mapping of symbols to Huffman codes, and C<$rev_dict>, which holds the reverse mapping of Huffman codes to symbols.
 
@@ -1103,7 +1382,7 @@ The prefix codes are in canonical form, as defined in RFC 1951 (Section 3.2.2).
     my $dict = huffman_from_symbols(\@symbols);
     my ($dict, $rev_dict) = huffman_from_symbols(\@symbols);
 
-Low-level function that constructs Huffman prefix codes, given an array-ref of symbols.
+Low-level function that constructs Huffman prefix codes, given an array-ref of symbols. Equivalent to C<huffman_from_freq(frequencies(\@symbols))>.
 
 It takes a single parameter, C<\@symbols>, from which it computes the frequency of each symbol and generates the corresponding Huffman prefix codes.
 
@@ -1119,21 +1398,23 @@ The prefix codes are in canonical form, as defined in RFC 1951 (Section 3.2.2).
     my $dict = huffman_from_code_lengths(\%code_lengths);
     my ($dict, $rev_dict) = huffman_from_code_lengths(\%code_lengths);
 
-Low-level function that constructs a dictionary of canonical prefix codes as defined in RFC 1951 (Section 3.2.2), given an array-ref of code lengths or a hash-ref of (symbol => length) values,
+Low-level function that constructs a dictionary of canonical prefix codes as defined in RFC 1951 (Section 3.2.2), given an array-ref of code lengths or a hash-ref of C<< symbol => length >> values.
 
-It takes a single parameter, C<\@code_lengths>, where entry C<$i> in the array corresponds to the code length for symbol C<$i>.
+It takes a single parameter, C<\@code_lengths>, where entry C<$i> in the array corresponds to the code length for symbol C<$i> (a length of C<0> means the symbol is unused).
 
-Similarily, when a hash-ref table is given, C<\%code_lengths>, keys are the symbols and values are the code lengths. This variant is useful for large symbols.
+Similarly, when a hash-ref table is given, C<\%code_lengths>, keys are the symbols and values are the code lengths. This variant is useful for large symbols, where an array indexed by symbol value would be wastefully sparse.
 
 In list context, the function returns two values: C<$dict>, which is the mapping of symbols to Huffman codes, and C<$rev_dict>, which holds the reverse mapping of Huffman codes to symbols.
 
 In scalar context, it returns only the C<$dict> table.
 
+This is the function used to reconstruct Huffman codes purely from the list of code lengths transmitted in a DEFLATE header, without needing to re-run the frequency-based algorithm.
+
 =head2 huffman_encode
 
     my $bitstring = huffman_encode(\@symbols, $dict);
 
-Low-level function that performs Huffman encoding on a sequence of symbols using a provided dictionary, returned by C<huffman_from_freq()>.
+Low-level function that performs Huffman encoding on a sequence of symbols using a provided dictionary, returned by C<huffman_from_freq()>, C<huffman_from_symbols()>, or C<huffman_from_code_lengths()>.
 
 It takes two parameters: C<\@symbols>, representing the sequence of symbols to be encoded, and C<$dict>, representing the Huffman dictionary mapping symbols to their corresponding Huffman codes.
 
@@ -1149,21 +1430,33 @@ It takes two parameters: C<$bitstring>, representing the Huffman-encoded string 
 
 The function returns the decoded sequence of symbols as an array-ref.
 
+Putting the last few functions together, without using C<create_huffman_entry()>'s bookkeeping:
+
+    my @symbols = (65, 65, 66, 65, 67, 65, 66);
+    my ($dict, $rev_dict) = huffman_from_symbols(\@symbols);
+
+    my $bitstring = huffman_encode(\@symbols, $dict);
+    my $decoded   = huffman_decode($bitstring, $rev_dict);
+
+    "@$decoded" eq "@symbols" or die "mismatch";
+
 =head2 lz77_encode / lz77_encode_symbolic
 
     my ($literals, $distances, $lengths, $matches) = lz77_encode($string);
     my ($literals, $distances, $lengths, $matches) = lz77_encode(\@symbols);
 
-Low-level function that combines LZSS with ideas from the LZ4 method.
+Low-level function that combines LZSS with ideas from the LZ4 method (interleaving literal runs and matches into parallel arrays, rather than a single flat token stream).
 
 The function returns four values:
 
     $literals   # array-ref of uncompressed symbols
     $distances  # array-ref of back-reference distances
-    $lengths    # array-ref of literal lengths
+    $lengths    # array-ref of literal-run lengths
     $matches    # array-ref of match lengths
 
-The output can be decoded with C<lz77_decode()> and C<lz77_decode_symbolic()>, respectively.
+The output can be decoded with C<lz77_decode()> and C<lz77_decode_symbolic()>, respectively. C<lz77_encode_symbolic()> is currently the same underlying function as C<lz77_encode()>, since C<lz77_encode()> already dispatches on whether it was given a string or an array-ref.
+
+Ignores C<$LZ_MAX_LEN>, always using unlimited match lengths (see L</$LZ_MAX_LEN>).
 
 =head2 lz77_decode / lz77_decode_symbolic
 
@@ -1176,15 +1469,15 @@ Inverse of C<lz77_encode()> and C<lz77_encode_symbolic()>, respectively.
 
 =head2 lzss_encode / lzss_encode_fast / lzss_encode_symbolic / lzss_encode_fast_symbolic
 
-    # Standard version
+    # Standard version -- best compression
     my ($literals, $distances, $lengths) = lzss_encode($data, %params);
     my ($literals, $distances, $lengths) = lzss_encode(\@symbols, %params);
 
-    # Faster version
+    # Faster version -- lower chain length, still string-hash based
     my ($literals, $distances, $lengths) = lzss_encode_fast($data, %params);
     my ($literals, $distances, $lengths) = lzss_encode_fast(\@symbols, %params);
 
-Low-level function that applies the LZSS (Lempel-Ziv-Storer-Szymanski) algorithm on the provided data.
+Low-level function that applies the LZSS (Lempel-Ziv-Storer-Szymanski) algorithm on the provided data. See L</CHOOSING AN LZSS ENCODER> for how this compares to C<lzss_encode_fast()>.
 
 The accepted C<%params> are:
 
@@ -1192,6 +1485,8 @@ The accepted C<%params> are:
     max_len         => $LZ_MAX_LEN,
     max_dist        => $LZ_MAX_DIST,
     max_chain_len   => $LZ_MAX_CHAIN_LEN,
+
+Any key omitted from C<%params> falls back to the corresponding package variable (see L</PACKAGE VARIABLES>).
 
 The function returns three values:
 
@@ -1201,29 +1496,6 @@ The function returns three values:
 
 The output can be decoded with C<lzss_decode()> and C<lzss_decode_symbolic()>, respectively.
 
-=head2 lzss_encode_hash4
-
-    my ($literals, $distances, $lengths) = lzss_encode_hash4($data, %params);
-
-Low-level function that applies a fast LZSS compression algorithm using a fixed 4-byte hash window and an O(1) flat-array hash table.
-
-Unlike C<lzss_encode_fast()>, it uses integer hashing instead of string keys and skips indexing the bytes covered by a match, providing an LZ4-style performance trade-off.
-
-The accepted C<%params> are:
-
-    max_len     => $LZ_MAX_LEN,
-    max_dist    => $LZ_MAX_DIST,
-
-The minimum match length is fixed at 4 bytes. Symbolic-array input is not supported.
-
-The function returns three values:
-
-    $literals   # array-ref of uncompressed bytes
-    $distances  # array-ref of back-reference distances
-    $lengths    # array-ref of match lengths
-
-The output can be decoded with C<lzss_decode()>.
-
 =head2 lzss_decode / lzss_decode_symbolic
 
     my $string  = lzss_decode(\@literals, \@distances, \@lengths);
@@ -1231,7 +1503,7 @@ The output can be decoded with C<lzss_decode()>.
 
 Low-level function that decodes the LZSS encoding, using the provided literals, distances, and lengths of matched sub-strings.
 
-Inverse of C<lzss_encode()> and C<lzss_encode_fast()>.
+Inverse of C<lzss_encode()> and C<lzss_encode_fast()> (both produce output in the same C<($literals, $distances, $lengths)> shape).
 
 =head2 deflate_encode
 
@@ -1239,7 +1511,7 @@ Inverse of C<lzss_encode()> and C<lzss_encode_fast()>.
     my $string = deflate_encode(\@literals, \@distances, \@lengths);
     my $string = deflate_encode(\@literals, \@distances, \@lengths, \&create_ac_entry);
 
-Low-level function that encodes the results returned by C<lzss_encode()> and C<lzss_encode_fast()>, using a DEFLATE-like approach, combined with Huffman coding.
+Low-level function that encodes the results returned by C<lzss_encode()> or C<lzss_encode_fast()>, using a DEFLATE-like approach, combined with Huffman coding by default (or the given C<$entropy_sub>).
 
 =head2 deflate_decode
 
@@ -1270,7 +1542,7 @@ There is no need to call this function explicitly. Use C<deflate_encode()> inste
 
     my $index = find_deflate_index($value, $DISTANCE_SYMBOLS);
 
-Low-level function that returns the index inside the DEFLATE tables for a given value.
+Low-level function that returns the index inside the DEFLATE tables (as returned by C<make_deflate_tables()>) for a given value.
 
 =head2 deflate_create_block_type_0_header
 
@@ -1294,15 +1566,15 @@ which can be recovered as:
 
     my $bitstring = deflate_create_block_type_1($literals, $distances, $lengths);
 
-Creates a DEFLATE block of type 1 (fixed prefix-codes), as a bitstring, given the ARRAY-refs of literals, distances and lengths, returned by C<lzss_encode()>.
+Creates a DEFLATE block of type 1 (fixed prefix-codes), as a bitstring, given the array-refs of literals, distances and lengths, returned by C<lzss_encode()>.
 
-This type of block uses fixed prefix-codes and is pretty fast.
+This type of block uses fixed prefix-codes and is pretty fast, at the cost of a somewhat lower compression ratio than type 2.
 
 =head2 deflate_create_block_type_2
 
-    my $bitstring = deflate_create_block_type_1($literals, $distances, $lengths);
+    my $bitstring = deflate_create_block_type_2($literals, $distances, $lengths);
 
-Creates a DEFLATE block of type 2 (dynamic prefix-codes), as a bitstring, given the ARRAY-refs of literals, distances and lengths, returned by C<lzss_encode()>.
+Creates a DEFLATE block of type 2 (dynamic prefix-codes), as a bitstring, given the array-refs of literals, distances and lengths, returned by C<lzss_encode()>.
 
 This type of block uses dynamic prefix-codes (Huffman codes) and produces good compression ratio on most inputs.
 
@@ -1343,7 +1615,9 @@ Given an input filehandle, a bitstring buffer and a search window, it extracts a
 
     my $data = deflate_extract_next_block($fh, \$buffer, \$search_window);
 
-Given an input filehandle, a bitstring buffer and a search window, it extracts the next DEFLATE block. The next two bits in the input file-handle (or in the bitstring buffer) must contain the block-type number.
+Given an input filehandle, a bitstring buffer and a search window, it extracts the next DEFLATE block, dispatching automatically to C<deflate_extract_block_type_0()>, C<deflate_extract_block_type_1()>, or C<deflate_extract_block_type_2()> based on the block-type bits. The next two bits in the input file-handle (or in the bitstring buffer) must contain the block-type number.
+
+This is the function C<gzip_decompress()> and C<zlib_decompress()> use internally to walk a stream one block at a time; C<$search_window> accumulates the last 32 KiB of decoded output across calls, as required for resolving back-references near a block boundary.
 
 =head1 EXPORT
 
@@ -1354,6 +1628,8 @@ Each function can be exported individually, as:
 By specifying the B<:all> keyword, will export all the exportable functions:
 
     use Compression::Util qw(:all);
+
+The package variables (C<$VERBOSE>, C<$LZ_MIN_LEN>, C<$LZ_MAX_LEN>, C<$LZ_MAX_DIST>, C<$LZ_MAX_CHAIN_LEN>, C<$LZ_MAX_CHAIN_WIDTH>) are B<not> included in C<:all>; import them explicitly by name if needed (see L</PACKAGE VARIABLES>).
 
 Nothing is exported by default.
 
@@ -1411,6 +1687,51 @@ The functions can be combined in various ways, easily creating novel compression
         my $distances = obh_decode($fh, \&mrl_decompress_symbolic);
         lz77_decode($literals, $distances, $lengths, $matches);
     };
+
+=head2 Compressing a list of integers directly (no string involved):
+
+Delta coding is a good fit whenever the data is naturally a sequence of integers rather than text -- for example, a column of sorted database IDs, or timestamps:
+
+    my @ids = (1000, 1001, 1002, 1050, 1051, 1052, 2000);
+
+    my $enc = delta_encode(\@ids);
+    my $dec = delta_decode($enc);
+
+    "@$dec" eq "@ids" or die "mismatch";
+
+=head2 Choosing an entropy coder based on input size:
+
+Adaptive Arithmetic Coding avoids storing an explicit frequency table, which tends to pay off on short inputs, while plain Huffman coding (via C<create_huffman_entry()>) is typically faster and does just as well once the input is large enough to amortize the table's size:
+
+    sub smart_compress ($data) {
+        length($data) < 1024
+          ? ("A", create_adaptive_ac_entry(string2symbols($data)))
+          : ("H", create_huffman_entry(string2symbols($data)));
+    }
+
+    sub smart_decompress ($tag, $fh) {
+        my $symbols =
+            $tag eq 'A' ? decode_adaptive_ac_entry($fh)
+          : $tag eq 'H' ? decode_huffman_entry($fh)
+          :                die "unknown tag: $tag";
+        symbols2string($symbols);
+    }
+
+=head2 Tuning LZ parsing for speed vs. ratio:
+
+    use Compression::Util qw(:all);
+
+    # Favor speed: shallower search, fewer chain positions remembered
+    {
+        local $Compression::Util::LZ_MAX_CHAIN_LEN = 4;
+        my $fast_enc = lzss_compress($data);
+    }
+
+    # Favor ratio: deeper search (default is 32)
+    {
+        local $Compression::Util::LZ_MAX_CHAIN_LEN = 128;
+        my $tight_enc = lzss_compress($data);
+    }
 
 =head1 REFERENCES
 
@@ -1477,6 +1798,18 @@ The functions can be combined in various ways, easily creating novel compression
 =head1 BUGS AND LIMITATIONS
 
 Please report any bugs or feature requests to: L<https://github.com/trizen/Compression-Util>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Compress::Bzip2> -- bindings to the corresponding C libraries, generally much faster than this pure-Perl implementation for production use.
+
+=item * L<Compress::Raw::Zlib> -- low-level bindings, if only speed matters and not portability.
+
+=back
+
+Use B<Compression::Util> when you want a pure-Perl implementation with no XS/C dependencies, when you want to inspect or hand-tune every stage of the pipeline, or for learning how these algorithms work.
 
 =head1 AUTHOR
 

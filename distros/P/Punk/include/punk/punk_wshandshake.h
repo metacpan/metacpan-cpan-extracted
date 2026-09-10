@@ -187,6 +187,7 @@ static SV *punk_ws_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
     HV *rech = (SvROK(rec) && SvTYPE(SvRV(rec)) == SVt_PVHV) ? (HV *)SvRV(rec) : NULL;
     HV *opts = NULL;
     SV **x, *code = NULL, *protocol = NULL;
+    int is_connect = 0;
     const char *method, *upg, *conn, *key, *ver;
     STRLEN mlen, ul, cl, kl, vl;
     unsigned char digest[20];
@@ -201,22 +202,49 @@ static SV *punk_ws_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
     code = (x && *x) ? *x : &PL_sv_undef;
 
     method = pw_env(aTHX_ envh, "REQUEST_METHOD", &mlen);
-    if (!(mlen == 3 && memEQ(method, "GET", 3)))
-        return pw_err(aTHX_ 405, "websocket routes are GET\n", "Allow", "GET");
 
-    upg  = pw_env(aTHX_ envh, "HTTP_UPGRADE", &ul);
-    conn = pw_env(aTHX_ envh, "HTTP_CONNECTION", &cl);
-    if (!(pw_ci_has(upg, ul, "websocket") && pw_ci_has(conn, cl, "upgrade")))
-        return pw_err(aTHX_ 400, "not a websocket upgrade\n", NULL, NULL);
+    /* Extended CONNECT (RFC 8441 on HTTP/2, RFC 9220 on HTTP/3): a
+     * multiplexed transport has no 101, no Upgrade header, and forbids
+     * Connection outright, so the handshake below simply does not exist
+     * there. The server having advertised ENABLE_CONNECT_PROTOCOL is the
+     * whole of the negotiation.
+     *
+     * The origin check and the subprotocol negotiation that follow are NOT
+     * skipped. Neither is HTTP/1.1-specific: an Extended CONNECT carries the
+     * user's cookies exactly as an upgrade does, so skipping the origin
+     * check here would open the hole it exists to close on precisely the
+     * transport a browser prefers. */
+    {
+        SV **cp = hv_fetchs(envh, "psgix.connect_protocol", 0);
+        if (cp && *cp && SvOK(*cp)) {
+            STRLEN pl;
+            const char *pv = SvPV_const(*cp, pl);
+            if (pl == 9 && memEQ(pv, "websocket", 9)) is_connect = 1;
+        }
+    }
 
-    key = pw_env(aTHX_ envh, "HTTP_SEC_WEBSOCKET_KEY", &kl);
-    if (!pw_is_b64_key(key, kl))
-        return pw_err(aTHX_ 400, "bad Sec-WebSocket-Key\n", NULL, NULL);
+    if (is_connect) {
+        if (!(mlen == 7 && memEQ(method, "CONNECT", 7)))
+            return pw_err(aTHX_ 400,
+                "websocket over HTTP/2 or HTTP/3 uses CONNECT\n", NULL, NULL);
+    } else {
+        if (!(mlen == 3 && memEQ(method, "GET", 3)))
+            return pw_err(aTHX_ 405, "websocket routes are GET\n", "Allow", "GET");
 
-    ver = pw_env(aTHX_ envh, "HTTP_SEC_WEBSOCKET_VERSION", &vl);
-    if (!(vl == 2 && memEQ(ver, "13", 2)))
-        return pw_err(aTHX_ 426, "unsupported websocket version\n",
-                      "Sec-WebSocket-Version", "13");
+        upg  = pw_env(aTHX_ envh, "HTTP_UPGRADE", &ul);
+        conn = pw_env(aTHX_ envh, "HTTP_CONNECTION", &cl);
+        if (!(pw_ci_has(upg, ul, "websocket") && pw_ci_has(conn, cl, "upgrade")))
+            return pw_err(aTHX_ 400, "not a websocket upgrade\n", NULL, NULL);
+
+        key = pw_env(aTHX_ envh, "HTTP_SEC_WEBSOCKET_KEY", &kl);
+        if (!pw_is_b64_key(key, kl))
+            return pw_err(aTHX_ 400, "bad Sec-WebSocket-Key\n", NULL, NULL);
+
+        ver = pw_env(aTHX_ envh, "HTTP_SEC_WEBSOCKET_VERSION", &vl);
+        if (!(vl == 2 && memEQ(ver, "13", 2)))
+            return pw_err(aTHX_ 426, "unsupported websocket version\n",
+                          "Sec-WebSocket-Version", "13");
+    }
 
     /* Origin. The upgrade carries the user's cookies and the same-origin
      * policy does not cover it, so a page anywhere could otherwise open an
@@ -289,28 +317,36 @@ static SV *punk_ws_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
             return pw_err(aTHX_ 400, "no acceptable subprotocol\n", NULL, NULL);
     }
 
-    /* Sec-WebSocket-Accept = base64(sha1(key . GUID)) */
-    {
-        unsigned char kg[24 + sizeof(PW_GUID) - 1];
-        memcpy(kg, key, 24);
-        memcpy(kg + 24, PW_GUID, sizeof(PW_GUID) - 1);
-        pw_sha1(kg, sizeof(kg), digest);
-        pw_base64(digest, 20, accept);
-    }
+    /* The HTTP/1.1 response, and ONLY for HTTP/1.1. Extended CONNECT has no
+     * 101 to send and, more to the point, no Sec-WebSocket-Key to hash: the
+     * key parse above is skipped on that path, so running this would take
+     * the digest of an uninitialised pointer. */
+    if (is_connect) {
+        hs = sv_2mortal(newSVpvs(""));
+    } else {
+        /* Sec-WebSocket-Accept = base64(sha1(key . GUID)) */
+        {
+            unsigned char kg[24 + sizeof(PW_GUID) - 1];
+            memcpy(kg, key, 24);
+            memcpy(kg + 24, PW_GUID, sizeof(PW_GUID) - 1);
+            pw_sha1(kg, sizeof(kg), digest);
+            pw_base64(digest, 20, accept);
+        }
 
-    hs = sv_2mortal(newSVpvs(
-        "HTTP/1.1 101 Switching Protocols\r\n"
-        "Upgrade: websocket\r\n"
-        "Connection: Upgrade\r\n"
-        "Sec-WebSocket-Accept: "));
-    sv_catpv(hs, accept);
-    sv_catpvs(hs, "\r\n");
-    if (protocol) {
-        sv_catpvs(hs, "Sec-WebSocket-Protocol: ");
-        sv_catsv(hs, protocol);
+        hs = sv_2mortal(newSVpvs(
+            "HTTP/1.1 101 Switching Protocols\r\n"
+            "Upgrade: websocket\r\n"
+            "Connection: Upgrade\r\n"
+            "Sec-WebSocket-Accept: "));
+        sv_catpv(hs, accept);
+        sv_catpvs(hs, "\r\n");
+        if (protocol) {
+            sv_catpvs(hs, "Sec-WebSocket-Protocol: ");
+            sv_catsv(hs, protocol);
+            sv_catpvs(hs, "\r\n");
+        }
         sv_catpvs(hs, "\r\n");
     }
-    sv_catpvs(hs, "\r\n");
 
     /* the attach options: the route opts minus the two the handshake has
      * already spent (`protocols`, `origin`), plus the negotiated `protocol`
@@ -328,6 +364,40 @@ static SV *punk_ws_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
     }
     if (protocol) (void)hv_stores(attach, "protocol", newSVsv(protocol));
     attach_rv = sv_2mortal(newRV_noinc((SV *)attach));
+
+    /* Extended CONNECT, tried first because when it applies nothing below
+     * can work: there is no descriptor to detach and no psgix.io to own.
+     *
+     * The acceptance IS the response here - a 200 with the negotiated
+     * subprotocol, sent by opening the stream handle - so no handshake
+     * bytes are written and `hs` goes unused on this path. Everything after
+     * that is the same codec the detached path drives. */
+    if (is_connect) {
+        const hm_abi *A = NULL;
+        void *loop = NULL, *h = NULL;
+        AV *hdrs = newAV();
+        if (protocol) {
+            av_push(hdrs, newSVpvs("sec-websocket-protocol"));
+            av_push(hdrs, newSVsv(protocol));
+        }
+        h = punk_hm_stream_open(aTHX_ envh, &A, &loop, 200, hdrs);
+        SvREFCNT_dec((SV *)hdrs);
+        if (!h)
+            return pw_err(aTHX_ 501,
+                "this server cannot carry a websocket over HTTP/2 or HTTP/3 "
+                "(needs Hyperman's ABI v8)\n", NULL, NULL);
+        {
+            SV *ws, *argv[2];
+            argv[0] = sv_2mortal(newSViv(PTR2IV(h)));
+            argv[1] = attach_rv;
+            ws = pw_class_call(aTHX_ "_attach_stream", argv, 2);
+            pw_run_handler(aTHX_ code, c, ws ? ws : &PL_sv_undef);
+            if (ws) SvREFCNT_dec(ws);
+        }
+        /* The response already went out with the stream handle; this is the
+         * sentinel the server discards, as the 101 is on the detach path. */
+        return pw_empty(aTHX_ 200);
+    }
 
     /* Hyperman: detach the socket and drive it on the worker loop. */
     x = hv_fetchs(envh, "psgix.hyperman.conn", 0);

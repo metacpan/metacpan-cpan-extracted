@@ -48,14 +48,24 @@ select(undef, undef, undef, 0.2);
 
 plan tests => 7;
 
+# Deadlines are timed on a monotonic clock, as the library times them.
+# Time::HiRes::time() is the wall clock, which a smoker's host can step
+# (an NTP correction, a VM resuming): an interval measured across a step
+# comes back short, or negative, with nothing wrong at the timer.
+my $now = eval {
+    my $clk = Time::HiRes::CLOCK_MONOTONIC();
+    Time::HiRes::clock_gettime($clk);
+    sub { Time::HiRes::clock_gettime($clk) };
+} || \&Time::HiRes::time;
+
 my $ua = Fetch->new;
 
 # ---- a stalled request fails with a timeout ------------------------------
 {
-    my $t0 = Time::HiRes::time();
+    my $t0 = $now->();
     my $f  = $ua->get("$base/slow", timeout => 0.3);
     eval { $f->get };
-    my $elapsed = Time::HiRes::time() - $t0;
+    my $elapsed = $now->() - $t0;
 
     ok($f->is_failed, 'stalled request fails');
     like($f->failure, qr/timed out/, 'failure says it timed out');
@@ -67,9 +77,9 @@ my $ua = Fetch->new;
 # this box, the deadlines there are multiples of it.
 my $rtt;
 {
-    my $t0  = Time::HiRes::time();
+    my $t0  = $now->();
     my $res = $ua->get("$base/fast", timeout => 30)->get;
-    $rtt = Time::HiRes::time() - $t0;
+    $rtt = $now->() - $t0;
     is($res->content, 'quick', 'fast request succeeds with a timeout set');
 }
 
@@ -97,15 +107,22 @@ my $rtt;
             unless $res;
         is($res->content, 'quick', "fast request cancels its ${short}s deadline");
 
-        my $t0 = Time::HiRes::time();
+        my $t0 = $now->();
         my $f  = $ua->get("$base/slow2", timeout => $long);
         eval { $f->get };
-        my $elapsed = Time::HiRes::time() - $t0;
+        my $elapsed = $now->() - $t0;
         ok($f->is_failed, 'the following stalled request still fails');
-        cmp_ok($elapsed, '>=', $short * 1.5,
-               'on its own deadline, not the cancelled one')
-            or diag "failed after ${elapsed}s of a ${long}s deadline: "
-                  . (defined $f->failure ? $f->failure : 'no failure');
+      SKIP: {
+            # Only reachable on the wall-clock fallback; time cannot run
+            # backwards on the monotonic one, and a stepped clock measures
+            # the host, not the deadline.
+            skip "the clock stepped back ${elapsed}s mid-request", 1
+                if $elapsed < 0;
+            cmp_ok($elapsed, '>=', $short * 1.5,
+                   'on its own deadline, not the cancelled one')
+                or diag "failed after ${elapsed}s of a ${long}s deadline: "
+                      . (defined $f->failure ? $f->failure : 'no failure');
+        }
     }
 }
 

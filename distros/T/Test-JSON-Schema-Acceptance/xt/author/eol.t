@@ -27,6 +27,7 @@ my @files = (
     't/14-add-resource.t',
     't/15-mutation.t',
     't/16-skip_dir.t',
+    't/17-skip_tests.t',
     't/99-sanity.t',
     't/lib/Helper.pm',
     't/lib/SchemaParser.pm',

@@ -8,7 +8,7 @@ use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
 
-# Phase 5 production behavior: supervisor respawn, SIGHUP zero-downtime
+# Production behaviour: supervisor respawn, SIGHUP zero-downtime
 # recycle, per-worker stats, access_log.
 
 my $dir    = File::Temp::tempdir(CLEANUP => 1);

@@ -74,7 +74,20 @@ sub stdin {
 
 sub autoflush {
     my ($self, $bool) = @_;
-    select((select($self->{fh}), $| = $bool ? 1 : 0)[0]);
+    my $fh     = $self->{fh};
+    my $old_fh = CORE::select($fh);
+    local $| = ($bool ? 1 : 0);
+    CORE::select($old_fh);
+    $self;
+}
+
+sub flush {
+    my ($self) = @_;
+    my $fh     = $self->{fh};
+    my $old_fh = CORE::select($fh);
+    local $| = 1;
+    print $fh '';
+    CORE::select($old_fh);
     $self;
 }
 
@@ -216,10 +229,20 @@ sub read_char {
 *char = \&read_char;
 *getc = \&read_char;
 
+sub peek_char {
+    my ($self) = @_;
+    my $pos    = CORE::tell($self->{fh});
+    my $char   = CORE::getc($self->{fh});
+    defined($char) or return undef;
+    CORE::seek($self->{fh}, $pos, 0);
+    Sidef::Types::String::String->new($char);
+}
+
 sub read_byte {
     my ($self, $var_ref) = @_;
 
-    my $byte = CORE::ord(CORE::getc($self->{fh}) // return (defined($var_ref) ? Sidef::Types::Bool::Bool::FALSE : undef));
+    my $char = CORE::getc($self->{fh});
+    my $byte = defined($char) ? CORE::ord($char) : undef;
 
     if (defined $var_ref) {
         $$var_ref = Sidef::Types::Number::Number::_set_int($byte // return Sidef::Types::Bool::Bool::FALSE);
@@ -306,6 +329,16 @@ sub each {
 }
 
 *each_line = \&each;
+
+sub each_kv {
+    my ($self, $code) = @_;
+    my $i = 0;
+    while (defined(my $line = CORE::readline($self->{fh}))) {
+        chomp($line);
+        $code->run(Sidef::Types::Number::Number::_set_int($i++), Sidef::Types::String::String->new($line));
+    }
+    $self;
+}
 
 sub each_char {
     my ($self, $code) = @_;
@@ -423,14 +456,19 @@ sub write_from {
 }
 
 sub copy {
-    my ($self, $fh) = @_;
-
-    if (ref($fh) ne __PACKAGE__) {
-        return;
-    }
+    my ($self, $other) = @_;
 
     state $x = require File::Copy;
-    File::Copy::copy($self->{fh}, $fh->{fh})
+
+    if (ref($other) eq __PACKAGE__) {
+        return (
+                File::Copy::copy($self->{fh}, $other->{fh})
+                ? (Sidef::Types::Bool::Bool::TRUE)
+                : (Sidef::Types::Bool::Bool::FALSE)
+               );
+    }
+
+    File::Copy::copy($self->{fh}, "$other")
       ? (Sidef::Types::Bool::Bool::TRUE)
       : (Sidef::Types::Bool::Bool::FALSE);
 }

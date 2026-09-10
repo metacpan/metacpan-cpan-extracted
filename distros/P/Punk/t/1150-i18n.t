@@ -12,8 +12,7 @@ use Punk ();
 # The catalogue is read once at boot into a C arena rather than into Perl
 # data, and that is not a micro-optimisation: loading before the fork is only
 # worth doing if the pages STAY shared, and the first read of an SV touches
-# its refcount and copies the page. plan_i18n/phase-0-the-catalogue.md has the
-# argument.
+# its refcount and copies the page.
 
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 

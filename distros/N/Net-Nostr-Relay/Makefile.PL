@@ -11,7 +11,7 @@ my %runtime_requires = (
     'CryptX'                      => 0,
     'Crypt::PK::ECC::Schnorr'     => 0,
     'JSON'                        => 0,
-    'Net::Nostr::Core'            => 0,
+    'Net::Nostr::Core'            => '1.002000',
 );
 
 my %test_requires = (

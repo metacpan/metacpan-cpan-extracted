@@ -85,3 +85,4 @@ INCLUDE: xs/writer.xs
 INCLUDE: xs/event.xs
 INCLUDE: xs/abi.xs
 INCLUDE: xs/bus.xs
+INCLUDE: xs/quic.xs

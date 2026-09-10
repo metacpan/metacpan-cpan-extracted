@@ -8,20 +8,16 @@
  *
  *     Fetch->on_request(\&start, \&done);
  *
- * The contract is deliberately identical to the C one rather than friendlier -
- * process-global, fired per hop, no deregistration - so the two doors cannot
- * drift into different semantics. What differs is only what it costs (one
- * call_sv per hop, paid by the process that asked for it) and one rule that C
- * could state and Perl cannot enforce:
- *
- *   "Neither callback may croak."
- *
- * A C consumer honours that by construction. A Perl one dies on a typo, and a
- * die propagating out of here would come up through whatever the event loop
- * was doing and take an unrelated request down with it. So both shims run
- * under G_EVAL and turn a death into a warning naming which half died: an
- * observer is a bystander, and a broken bystander must not fail the request
- * it was only watching.
+ * The contract is deliberately identical to the C one rather than friendlier
+ * - process-global, fired per hop, no deregistration - so the two doors
+ * cannot drift into different semantics. What differs is the cost (one
+ * call_sv per hop, paid by the process that asked for it) and one rule C
+ * could state and Perl cannot enforce: NEITHER CALLBACK MAY CROAK. A C
+ * consumer honours that by construction; a Perl one dies on a typo, and the
+ * die would come up through whatever the event loop was doing and take an
+ * unrelated request down with it. So both shims run under G_EVAL and turn a
+ * death into a warning naming which half died - an observer is a bystander,
+ * and a broken bystander must not fail the request it was watching.
  *
  * Included after ft_obs.h, which holds the table it registers into.
  */

@@ -9,17 +9,17 @@ use PunkTest;
 use Punk::Test;
 use Punk ();
 
-# Punk::Plugin::ConditionalGet, phase 5: the things that are only true of the
-# finished feature.
+# Punk::Plugin::ConditionalGet: the things that are only true of the finished
+# feature.
 #
 #   1. The POD's SYNOPSIS runs, read out of the POD rather than copied.
 #   2. A SHARED CACHE in front of two users cannot hand one the other's page.
-#      Phase 4 asserted the headers and said plainly that it had not asserted
+#      t/1100 asserts the headers and says plainly that it has not asserted
 #      the behaviour. This is that debt, paid: a small conformant cache, and
 #      two users driven through it.
 #   3. The plugin in an application using everything at once - session, flash,
 #      CSRF, respond_to, auth - because that combination is where every trap
-#      in this plan lives.
+#      lives.
 
 # ---- 1. the SYNOPSIS, executed ------------------------------------------------
 

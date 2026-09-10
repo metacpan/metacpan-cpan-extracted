@@ -60,7 +60,7 @@ acceptance_tests(
   test => {
     $ENV{NO_TODO} ? () : (todo_tests => [
       { file => [
-          'iri-reference.json',                       # all strings are considered valid
+          'iri-reference.json',                       # most strings are considered valid
           'uri-template.json',                        # not yet implemented
           # these all depend on optional prereqs
           !$ENV{AUTHOR_TESTING} && !eval { require Email::Address::XS; Email::Address::XS->VERSION(1.04); 1 } ? qw(email.json idn-email.json) : (),
@@ -115,6 +115,8 @@ acceptance_tests(
           'bracketed content that is not an address is not valid',
           'a parenthesis in an unquoted local part is not valid',
           'a parenthesis in the domain is not valid',
+          'an invalid domain',
+          'an invalid IPv4-address-literal',
         ] },
     ]),
   },

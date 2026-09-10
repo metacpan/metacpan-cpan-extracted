@@ -605,14 +605,41 @@ sub delete_first_if {
     $self;
 }
 
+sub scale {
+    my ($self, $factor) = @_;
+    $factor = CORE::int($factor // 1);
+    my %new;
+    foreach my $key (CORE::keys(%$self)) {
+        my $elem = $self->{$key};
+        $new{$key} = {value => $elem->{value}, count => CORE::int($elem->{count} * $factor)};
+    }
+    bless \%new, ref($self);
+}
+
 sub freq {
     my ($self) = @_;
     Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})]) }
                                     CORE::values(%$self));
 }
 
+sub relative_frequencies {
+    my ($self) = @_;
+    my $total = $self->length;
+    Sidef::Types::Array::Array->new(
+               [map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})->div($total)]) } CORE::values(%$self)]);
+}
+
+sub variety {
+    my ($self) = @_;
+    my $total = $self->length;
+    $total->is_zero and return Sidef::Types::Number::Number::ZERO;
+    $self->elems->div($total);
+}
+
 sub most_common {
     my ($self, $n) = @_;
+
+    $n //= Sidef::Types::Number::Number::ONE;
 
     my @sorted = sort { $b->{count} <=> $a->{count} } CORE::values(%$self);
     my @top    = splice(@sorted, 0, CORE::int($n));
@@ -621,6 +648,19 @@ sub most_common {
 }
 
 *top = \&most_common;
+
+sub mode {
+    my ($self) = @_;
+    my ($best_key, $best_count);
+    foreach my $key (CORE::keys(%$self)) {
+        my $count = $self->{$key}{count};
+        if (!defined($best_count) or $count > $best_count) {
+            $best_count = $count;
+            $best_key   = $key;
+        }
+    }
+    defined($best_key) ? $self->{$best_key}{value} : undef;
+}
 
 sub uniq {
     my ($self) = @_;
@@ -807,6 +847,11 @@ sub to_a {
 
 *to_array = \&to_a;
 *expand   = \&to_a;
+
+sub to_h {
+    my ($self) = @_;
+    Sidef::Types::Hash::Hash->new(map { ($_->{value} => Sidef::Types::Number::Number::_set_int($_->{count})) } CORE::values(%$self));
+}
 
 sub keys {
     my ($self) = @_;

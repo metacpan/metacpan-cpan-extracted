@@ -10,7 +10,7 @@ use JSON;
 use Digest::SHA qw(sha256_hex);
 
 use lib 't/lib';
-use TestFixtures qw(%FIATJAF_EVENT);
+use TestFixtures qw(%FIATJAF_EVENT make_signed_event);
 
 use Net::Nostr;
 use Net::Nostr::Client;
@@ -1677,6 +1677,49 @@ subtest 'relay accepts event with valid signature' => sub {
 # Relay: CLOSED message (MUST send when refusing REQ)
 ###############################################################################
 
+subtest 'relay rejects malformed filter boundaries and still accepts a valid REQ' => sub {
+    my @filters = (
+        (map { +{ $_ => [('a' x 64) . "\n"] } } ('ids', 'authors', '#e', '#p')),
+        { kinds => ["1\n"] },
+        (map { +{ $_ => "1\n" } } qw(since until limit)),
+        { kinds => ["\x{0661}"] }, { since => "\x{FF11}" },
+        { "#e\n" => ['a' x 64] },
+    );
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new;
+    $relay->start('127.0.0.1', $port);
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak('timeout') });
+    my @responses;
+    my $ref = connect_to_relay($port, sub {
+        my ($conn) = @_;
+        $conn->on(each_message => sub {
+            my ($c, $msg) = @_;
+            my $parsed = $JSON_CODEC->decode($msg->body);
+            push @responses, $parsed;
+            $cv->send if $parsed->[0] eq 'EOSE' && $parsed->[1] eq 'valid-filter';
+        });
+        for my $i (0 .. $#filters) {
+            $conn->send($JSON_CODEC->encode(['REQ', "invalid-$i", $filters[$i]]));
+        }
+        $conn->send($JSON_CODEC->encode(['REQ', 'valid-filter', {
+            kinds => [0, 65535], since => 0, until => 1700000000, limit => 0,
+        }]));
+    });
+    $cv->recv;
+
+    is scalar @responses, scalar(@filters) + 1, 'one response per invalid REQ and one valid EOSE';
+    for my $i (0 .. $#filters) {
+        is $responses[$i][0], 'CLOSED', "invalid filter $i rejected";
+        is $responses[$i][1], "invalid-$i", 'rejection identifies the subscription';
+        like $responses[$i][2], qr/^error:/, 'rejection includes a machine-readable prefix';
+    }
+    is $responses[-1], ['EOSE', 'valid-filter'], 'valid REQ succeeds on the same connection';
+    my ($subscriptions) = values %{$relay->subscriptions};
+    is [sort keys %$subscriptions], ['valid-filter'], 'invalid filters do not create subscriptions';
+    $relay->stop;
+};
+
 subtest 'relay sends CLOSED when subscription_id is invalid' => sub {
     my $port = free_port();
     my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
@@ -1794,6 +1837,56 @@ subtest 'relay allows new connection after disconnect frees a slot' => sub {
     ok($c2->is_connected, 'connection succeeds after disconnect freed slot');
 
     $c2->disconnect;
+    $relay->stop;
+};
+
+subtest 'client verifies stored and live events before delivering callbacks' => sub {
+    my $key = Net::Nostr::Key->new;
+    my $valid = make_signed_event($key, content => "verified \x{1F600}");
+    my $tampered = make_signed_event($key, content => 'original', created_at => 2000)->to_hash;
+    $tampered->{content} = 'tampered';
+    my $invalid_sig = make_signed_event($key, content => 'bad signature', created_at => 3000)->to_hash;
+    $invalid_sig->{sig} = '0' x 128;
+
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new;
+    # Bypass relay validation to simulate untrusted events returned by a relay.
+    $relay->inject_event(Net::Nostr::Event->from_wire($_)) for ($tampered, $invalid_sig);
+    $relay->inject_event($valid);
+    $relay->start('127.0.0.1', $port);
+
+    my $client = Net::Nostr::Client->new;
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak('timeout') });
+    my $live = make_signed_event($key, content => 'verified live event');
+    my @received;
+    $client->on(event => sub {
+        push @received, ['EVENT', $_[0], $_[1]->to_hash];
+        $cv->send if $_[1]->id eq $live->id;
+    });
+    $client->on(eose => sub {
+        push @received, ['EOSE', $_[0]];
+        $relay->broadcast(Net::Nostr::Event->from_wire($invalid_sig));
+        $relay->broadcast($live);
+    });
+
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    $client->connect("ws://127.0.0.1:$port");
+    $client->subscribe('verified', Net::Nostr::Filter->new(kinds => [1]));
+    $cv->recv;
+
+    is \@received, [
+        ['EVENT', 'verified', $valid->to_hash], ['EOSE', 'verified'],
+        ['EVENT', 'verified', $live->to_hash],
+    ], 'only verified events reach callbacks, with EOSE and live delivery preserved';
+    is scalar @warnings, 3, 'each invalid stored or live event produces one warning';
+    like $warnings[0], qr/^invalid event from relay: signature is invalid/, 'stored bad signature rejected';
+    like $warnings[1], qr/^invalid event from relay: id does not match event hash/, 'tampered stored event rejected';
+    like $warnings[2], qr/^invalid event from relay: signature is invalid/, 'live bad signature rejected';
+    ok $client->is_connected, 'same connection survives rejected events';
+
+    $client->disconnect;
     $relay->stop;
 };
 

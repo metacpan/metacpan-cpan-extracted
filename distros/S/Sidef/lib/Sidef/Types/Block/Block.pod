@@ -97,6 +97,16 @@ Aliases: I<do>
 
 =cut
 
+=head2 retry
+
+    block.retry(n=1)
+
+Returns a new block that, if the original block raises an exception, calls it again (up to C<n> times total) before finally letting the exception propagate.
+
+    var fetch = unreliable_request.retry(3)
+
+=cut
+
 =head2 do
 
     block.do(*args)
@@ -249,13 +259,63 @@ Aliases: operator C<∘>
 
 =cut
 
-=head2 ∘
+=head2 curry
 
-    block_a ∘ block_b
+    block.curry(*args)
 
-Operator form of L</compose>.
+Returns a new block that, when called, invokes the original block with C<args> followed by whatever arguments it's given -- a way to partially apply a multi-argument block ahead of time.
 
-Aliases: I<compose>
+    var add  = {|a, b| a + b }
+    var add5 = add.curry(5)
+    say(add5(3))          #=> 8
+
+=cut
+
+=head2 negate
+
+    block.negate
+
+Returns a new block that returns the logical negation (as a proper C<Bool>) of whatever the original block returns.
+
+    var is_even = {|n| n.is_even }
+    var is_odd  = is_even.negate
+    say(is_odd(3))        #=> true
+
+=cut
+
+=head2 pipe
+
+    block_a.pipe(block_b)
+
+Like L</compose>, but in the opposite order: C<block_a.pipe(block_b)(*args)> is equivalent to C<block_b(block_a(*args))> -- read left to right.
+
+    var inc    = {|x| x + 1}
+    var double = {|x| 2*x }
+    var f = inc.pipe(double)
+    say f(3)    #=> 8 -- double(inc(3))
+
+=cut
+
+=head2 once
+
+    block.once
+
+Returns a new block that runs the original block only the I<first> time it's called, caching that single result forever (regardless of what arguments are given on later calls) -- unlike L</cache>, which memoizes per distinct argument set.
+
+    var init = { say("initializing"); 42 }.once
+    init()   # prints "initializing", returns 42
+    init()   # returns 42, nothing printed
+
+=cut
+
+=head2 constant
+
+    Block.constant(value)
+
+Returns a block that ignores whatever arguments it's given and always returns C<value>.
+
+    var always_zero = Block.constant(0)
+    say(always_zero(1, 2, 3))   #=> 0
 
 =cut
 
@@ -271,16 +331,6 @@ If C<num> is a C<Number>, calls C<num.times(block)>, running the block C<num> ti
     say(rolls)           #=> [3, 1, 6, 2, 5, 4, 1, 6, 3, 2]
 
 Aliases: operator C<*>
-
-=cut
-
-=head2 *
-
-    block * num
-
-Operator form of L</repeat>.
-
-Aliases: I<repeat>
 
 =cut
 
@@ -354,16 +404,6 @@ Aliases: I<each>, I<foreach>, operator C<< << >>
 
 =cut
 
-=head2 <<
-
-    block << iterable
-
-Operator form of L</for>. The block is the left-hand operand.
-
-Aliases: I<for>, I<each>, I<foreach>
-
-=cut
-
 =head2 map
 
     block.map(*iterables)
@@ -379,16 +419,6 @@ Aliases: operator C<< >> >>
 
 =cut
 
-=head2 >>
-
-    block >> iterable
-
-Operator form of L</map>. The block is the left-hand operand.
-
-Aliases: I<map>
-
-=cut
-
 =head2 grep
 
     block.grep(*iterables)
@@ -401,16 +431,6 @@ Calls the block once for each element produced by the given iterable object(s), 
     say(evens)           #=> [2, 4, 6]
 
 Aliases: operator C<&>
-
-=cut
-
-=head2 &
-
-    block & iterable
-
-Operator form of L</grep>. The block is the left-hand operand.
-
-Aliases: I<grep>
 
 =cut
 

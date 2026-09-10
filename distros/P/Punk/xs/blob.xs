@@ -198,7 +198,7 @@ _id_ok(class, id)
     OUTPUT:
         RETVAL
 
-# The store seam the phase-1 tests assert through.
+# The store seam the tests assert through.
 SV *
 _store(class, ca, content)
         SV *class

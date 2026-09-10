@@ -1,5 +1,16 @@
                       Revision history for podlators
 
+v6.1.1 - 2026-09-09
+
+- Avoid errors or an infinite loop in Pod::Text and its subclasses when
+  attempting to wrap text whose margin equals or exceeds the output width.
+  Instead, report an error and force the margin to zero. Thanks to Jitka
+  Plesnikova for the report. (CVE-2026-82560)
+
+- When Pod::Text::Overstrike wraps a line at a bold or underscored space,
+  avoid leaving partially formatted spaces at the start of the subsequent
+  line.
+
 v6.1.0 - 2026-07-19
 
 - groff 1.24.0 broke use of the .IP macro for tag list formatting by

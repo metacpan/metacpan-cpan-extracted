@@ -150,6 +150,39 @@ static ssize_t hm_os_send(int fd, const void *buf, size_t n) {
     return r;
 }
 
+/* Datagrams, for the QUIC listener (hm_quic.h). One packet per call.
+ *
+ * recvmsg/sendmsg would additionally give the LOCAL address (IP_PKTINFO) and
+ * ECN, and recvmmsg/sendmmsg would batch - all of which QUIC eventually
+ * wants and none of which is here yet. Swapping them in does not ripple
+ * because there is exactly one call site each, inside hm_quic.h: keep it
+ * that way rather than reaching for these from anywhere else. */
+static ssize_t hm_os_recvfrom(int fd, void *buf, size_t n,
+                              struct sockaddr *sa, socklen_t *salen) {
+    int r = recvfrom(HM_SOCK(fd), (char *)buf, (int)n, 0, sa, salen);
+    if (r == SOCKET_ERROR) { hm_os_seterrno(); return -1; }
+    return r;
+}
+
+static ssize_t hm_os_sendto(int fd, const void *buf, size_t n,
+                            const struct sockaddr *sa, socklen_t salen) {
+    int r = sendto(HM_SOCK(fd), (const char *)buf, (int)n, 0, sa, salen);
+    if (r == SOCKET_ERROR) { hm_os_seterrno(); return -1; }
+    return r;
+}
+
+/* Monotonic nanoseconds. loop->now is time(NULL) - seconds, and wall clock
+ * at that - which ngtcp2 cannot use for a PTO measured in microseconds.
+ * backend_poll.c keeps its own hm_poll_now for its own timer list; it is
+ * deliberately not refactored onto this. */
+static uint64_t hm_now_ns(void) {
+    static LARGE_INTEGER freq;
+    LARGE_INTEGER c;
+    if (!freq.QuadPart) QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&c);
+    return (uint64_t)((double)c.QuadPart * 1e9 / (double)freq.QuadPart);
+}
+
 #include <process.h>
 #include <sys/stat.h>
 #define hm_os_getpid() ((int)_getpid())
@@ -279,6 +312,28 @@ static ssize_t hm_os_writev(int fd, hm_iovec *iov, int n) {
 #define hm_os_open_file(path, flags, mode)      open((path), (flags), (mode))
 #define hm_os_write_file(fd, buf, n)            write((fd), (buf), (n))
 #define hm_os_pread(fd, buf, n, off)            pread((fd), (buf), (n), (off))
+
+/* Datagrams, for the QUIC listener (hm_quic.h). One packet per call.
+ *
+ * recvmsg/sendmsg would additionally give the LOCAL address (IP_PKTINFO) and
+ * ECN, and recvmmsg/sendmmsg would batch - all of which QUIC eventually
+ * wants and none of which is here yet. Swapping them in does not ripple
+ * because there is exactly one call site each, inside hm_quic.h: keep it
+ * that way rather than reaching for these from anywhere else. */
+#define hm_os_recvfrom(fd, b, n, sa, len)  recvfrom((fd), (b), (n), 0, (sa), (len))
+#define hm_os_sendto(fd, b, n, sa, len)    sendto((fd), (b), (n), 0, (sa), (len))
+
+/* Monotonic nanoseconds. loop->now is time(NULL) - seconds, and wall clock
+ * at that - which ngtcp2 cannot use for a PTO measured in microseconds.
+ * clock_gettime needs -lrt on glibc before 2.17; Makefile.PL already probes
+ * for that because backend_poll.c calls it, and backend_poll.c keeps its own
+ * hm_poll_now for its own timer list rather than being refactored onto this. */
+#include <time.h>
+static uint64_t hm_now_ns(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)ts.tv_sec * 1000000000ULL + (uint64_t)ts.tv_nsec;
+}
 
 /* the same self-pipe, where a pipe is pollable */
 static int hm_os_selfpipe(int *rfd, int *wfd) {

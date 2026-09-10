@@ -130,18 +130,21 @@ subtest 'kind 3 is replaceable: new list overwrites old on relay' => sub {
     my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
     $relay->start('127.0.0.1', $port);
 
-    my $pubkey = 'a' x 64;
+    my $key = Net::Nostr::Key->new;
+    my $pubkey = $key->pubkey_hex;
 
     # Publish first follow list
     my $fl1 = Net::Nostr::FollowList->new;
     $fl1->add('b' x 64, petname => 'bob');
-    my $e1 = $fl1->to_event(pubkey => $pubkey, created_at => 1000, sig => 'a' x 128);
+    my $e1 = $fl1->to_event(pubkey => $pubkey, created_at => 1000);
+    $key->sign_event($e1);
 
     # Publish second follow list (newer)
     my $fl2 = Net::Nostr::FollowList->new;
     $fl2->add('b' x 64, petname => 'bob');
     $fl2->add('c' x 64, petname => 'carol');
-    my $e2 = $fl2->to_event(pubkey => $pubkey, created_at => 2000, sig => 'a' x 128);
+    my $e2 = $fl2->to_event(pubkey => $pubkey, created_at => 2000);
+    $key->sign_event($e2);
 
     my $client = Net::Nostr::Client->new;
     my $cv = AnyEvent->condvar;

@@ -55,16 +55,28 @@ plan tests => 4;
 
 my $ua = Fetch->new(loop => Hyperman::Loop->new);
 
+# Deadlines are timed on a monotonic clock, as the library times them: a
+# smoker whose host steps the wall clock measures the step, not the sweep.
+my $now = eval {
+    my $clk = Time::HiRes::CLOCK_MONOTONIC();
+    Time::HiRes::clock_gettime($clk);
+    sub { Time::HiRes::clock_gettime($clk) };
+} || \&Time::HiRes::time;
+
 # ---- a stalled request fails with a timeout (the sweep fires it) ----------
 {
-    my $t0 = Time::HiRes::time();
+    my $t0 = $now->();
     my $f  = $ua->get("$base/slow", timeout => 0.3);
     eval { $f->get };
-    my $elapsed = Time::HiRes::time() - $t0;
+    my $elapsed = $now->() - $t0;
 
     ok($f->is_failed, 'stalled request fails on the Hyperman loop');
     like($f->failure, qr/timed out/, 'failure says it timed out');
-    cmp_ok($elapsed, '>=', 0.25, 'waited about the timeout, not forever');
+  SKIP: {
+        skip "the clock stepped back ${elapsed}s mid-request", 1
+            if $elapsed < 0;
+        cmp_ok($elapsed, '>=', 0.25, 'waited about the timeout, not forever');
+    }
 }
 
 # ---- a prompt request beats a generous timeout (deadline cancels cleanly) --

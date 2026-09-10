@@ -252,6 +252,22 @@ sub vector_columns {
 *vec_cols    = \&vector_columns;
 *vec_columns = \&vector_columns;
 
+sub each_row {
+    my ($self, $block) = @_;
+    foreach my $row (@$self) {
+        $block->run(Sidef::Types::Array::Vector->new(@$row));
+    }
+    $self;
+}
+
+sub each_column {
+    my ($self, $block) = @_;
+    foreach my $col (@{$self->vector_columns}) {
+        $block->run($col);
+    }
+    $self;
+}
+
 sub neg {
     my ($m1) = @_;
     bless($m1->scalar_operator('neg'));
@@ -265,35 +281,72 @@ sub abs {
 sub add {
     my ($m1, $m2) = @_;
 
+    if (ref($m2) eq 'Sidef::Types::Array::Vector') {
+        my @result;
+        foreach my $row (@$m1) {
+            my @new_row;
+            $new_row[$_] = $row->[$_]->add($m2->[$_]) for 0 .. $#$row;
+            push @result, bless(\@new_row, 'Sidef::Types::Array::Array');
+        }
+        return bless \@result;
+    }
+
     if (_is_matrix($m2)) {
         return bless($m1->wise_operator('+', $m2));
     }
-
     bless($m1->scalar_operator('+', $m2));
 }
 
 sub sub {
     my ($m1, $m2) = @_;
 
+    if (ref($m2) eq 'Sidef::Types::Array::Vector') {
+        my @result;
+        foreach my $row (@$m1) {
+            my @new_row;
+            $new_row[$_] = $row->[$_]->sub($m2->[$_]) for 0 .. $#$row;
+            push @result, bless(\@new_row, 'Sidef::Types::Array::Array');
+        }
+        return bless \@result;
+    }
+
     if (_is_matrix($m2)) {
         return bless($m1->wise_operator('-', $m2));
     }
-
     bless($m1->scalar_operator('-', $m2));
 }
 
 sub div {
     my ($m1, $m2) = @_;
 
+    if (ref($m2) eq 'Sidef::Types::Array::Vector') {
+        my @result;
+        foreach my $row (@$m1) {
+            my @new_row;
+            $new_row[$_] = $row->[$_]->div($m2->[$_]) for 0 .. $#$row;
+            push @result, bless(\@new_row, 'Sidef::Types::Array::Array');
+        }
+        return bless \@result;
+    }
+
     if (_is_matrix($m2)) {
         return $m1->mul($m2->inv);
     }
-
     bless($m1->scalar_operator('/', $m2));
 }
 
 sub mul {
     my ($m1, $m2) = @_;
+
+    if (ref($m2) eq 'Sidef::Types::Array::Vector') {
+        my @result;
+        foreach my $row (@$m1) {
+            my $sum = Sidef::Types::Number::Number::ZERO;
+            $sum = $sum->add($row->[$_]->mul($m2->[$_])) for 0 .. $#$row;
+            push @result, $sum;
+        }
+        return bless(\@result, 'Sidef::Types::Array::Vector');
+    }
 
     if (!_is_matrix($m2)) {
         return bless($m1->scalar_operator('*', $m2));
@@ -590,6 +643,106 @@ sub determinant {
 }
 
 *det = \&determinant;
+
+sub trace {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::sum(@{$self->diagonal});
+}
+
+sub is_symmetric {
+    my ($self) = @_;
+    my $n = CORE::int($self->row_count);
+    foreach my $i (0 .. $n - 1) {
+        foreach my $j ($i + 1 .. $n - 1) {
+            $self->[$i][$j]->eq($self->[$j][$i])
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub is_orthogonal {
+    my ($self) = @_;
+    $self->is_square or return Sidef::Types::Bool::Bool::FALSE;
+    my $n       = CORE::int($self->row_count);
+    my $product = $self->mul($self->transpose);
+    foreach my $i (0 .. $n - 1) {
+        foreach my $j (0 .. $n - 1) {
+            my $expected =
+              ($i == $j)
+              ? Sidef::Types::Number::Number::ONE
+              : Sidef::Types::Number::Number::ZERO;
+            $product->[$i][$j]->eq($expected)
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub is_identity {
+    my ($self) = @_;
+    ($self->is_square && $self->is_diagonal)
+      or return Sidef::Types::Bool::Bool::FALSE;
+    foreach my $d (@{$self->diagonal}) {
+        $d->is_one
+          or return Sidef::Types::Bool::Bool::FALSE;
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub is_diagonal {
+    my ($self) = @_;
+    my $n      = CORE::int($self->row_count);
+    my $m      = CORE::int($self->column_count);
+    foreach my $i (0 .. $n - 1) {
+        foreach my $j (0 .. $m - 1) {
+            next if $i == $j;
+            $self->[$i][$j]->is_zero
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub is_upper_triangular {
+    my ($self) = @_;
+    my $n = CORE::int($self->row_count);
+    foreach my $i (0 .. $n - 1) {
+        foreach my $j (0 .. $i - 1) {
+            $self->[$i][$j]->is_zero
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub is_lower_triangular {
+    my ($self) = @_;
+    my $n      = CORE::int($self->row_count);
+    my $m      = CORE::int($self->column_count);
+    foreach my $i (0 .. $n - 1) {
+        foreach my $j ($i + 1 .. $m - 1) {
+            $self->[$i][$j]->is_zero
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub rank {
+    my ($self) = @_;
+    my $r      = $self->rref;
+    my $count  = 0;
+    foreach my $row (@$r) {
+        foreach my $value (@$row) {
+            if (!$value->is_zero) {
+                ++$count;
+                last;
+            }
+        }
+    }
+    Sidef::Types::Number::Number::_set_int($count);
+}
 
 # Reduced row echelon form
 sub rref {

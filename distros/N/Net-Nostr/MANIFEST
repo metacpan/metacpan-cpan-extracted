@@ -6,6 +6,7 @@ MANIFEST			This list of files
 t/00-Nostr.t
 t/01-Client.t
 t/59-ConstructorArgs.t
+t/author/00-author.t
 t/lib/TestFixtures.pm
 t/nip/01.t
 t/nip/02.t

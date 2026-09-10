@@ -104,22 +104,37 @@ static void pq_sink_write(pTHX_ pq_sink *s, const char *p, STRLEN n,
     sv_catpvn(s->sv, p, n);
 }
 
+/* What bounds the read.
+ *
+ * `left` counts down CONTENT_LENGTH when there is one, so a body that lies
+ * about its length cannot make this read for ever. When there is none it is
+ * -1 and the walk runs to EOF, which is the only thing it can do - and which
+ * on HTTP/2 and HTTP/3 is the ordinary case, not the exotic one, because both
+ * forbid Transfer-Encoding and a streamed upload declares no length at all.
+ * `max` is the route's max_body ceiling and is what bounds that case; 0 is
+ * none. `got` is what has been taken off the handle, which is the number the
+ * ceiling is about. */
+typedef struct { IV left; IV got; IV max; } pq_mp_lim;
+
 /* Read up to `want` more bytes onto the end of buf. Returns 0 at EOF with
- * nothing added. `left` counts down CONTENT_LENGTH when there is one, so a
- * body that lies about its length cannot make this read for ever. */
-static int pq_mp_fill(pTHX_ PerlIO *fp, SV *buf, STRLEN want, IV *left) {
+ * nothing added, and croaks past the ceiling. */
+static int pq_mp_fill(pTHX_ PerlIO *fp, SV *buf, STRLEN want, pq_mp_lim *lim) {
     STRLEN have = SvCUR(buf);
     SSize_t got;
     char *d;
-    if (*left == 0) return 0;
-    if (*left > 0 && (IV)want > *left) want = (STRLEN)*left;
+    if (lim->left == 0) return 0;
+    if (lim->left > 0 && (IV)want > lim->left) want = (STRLEN)lim->left;
     if (!want) return 0;
     d = SvGROW(buf, have + want + 1);
     got = PerlIO_read(fp, d + have, want);
-    if (got <= 0) { *left = 0; return 0; }
+    if (got <= 0) { lim->left = 0; return 0; }
     SvCUR_set(buf, have + (STRLEN)got);
     SvPVX(buf)[have + got] = '\0';
-    if (*left > 0) *left -= got;
+    if (lim->left > 0) lim->left -= got;
+    lim->got += (IV)got;
+    if (lim->max && lim->got > lim->max)
+        croak("Punk::Request: the request body passed %" IVdf " bytes, "
+              "the ceiling this read was given", lim->max);
     return 1;
 }
 
@@ -166,7 +181,7 @@ static void pq_tmp_own(pTHX_ AV *av) {
 }
 
 /* The parse. Returns the number of parts seen. */
-static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen,
+static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
                                     const char *bnd, STRLEN bl,
                                     HV *form, HV *uploads, SV *dir,
                                     AV *tempfiles) {
@@ -175,9 +190,13 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen,
     SV *ndsv = sv_2mortal(newSVpvs("\r\n--"));
     const char *D, *ND;
     STRLEN Dl, NDl, keep;
-    IV left = clen > 0 ? clen : -1;
+    pq_mp_lim lim;
     IV parts = 0;
     UV seq = 0;
+
+    lim.left = clen > 0 ? clen : -1;
+    lim.got  = 0;
+    lim.max  = max > 0 ? max : 0;
 
     sv_catpvn(dsv, bnd, bl);
     sv_catpvn(ndsv, bnd, bl);
@@ -192,7 +211,7 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen,
                   ? ninstr(b, b + SvCUR(buf), (char *)D, (char *)D + Dl) : NULL;
         if (hit) { pq_mp_consume(aTHX_ buf, (STRLEN)(hit - b) + Dl); break; }
         if (SvCUR(buf) > keep) pq_mp_consume(aTHX_ buf, SvCUR(buf) - keep);
-        if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &left)) return 0;
+        if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &lim)) return 0;
     }
 
     for (;;) {
@@ -203,7 +222,7 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen,
 
         /* "--" here is the closing delimiter; CRLF starts another part */
         while (SvCUR(buf) < 2)
-            if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &left)) return parts;
+            if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &lim)) return parts;
         if (SvPVX(buf)[0] == '-' && SvPVX(buf)[1] == '-') return parts;
         if (SvPVX(buf)[0] != '\r' || SvPVX(buf)[1] != '\n') return parts;
         pq_mp_consume(aTHX_ buf, 2);
@@ -216,7 +235,7 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen,
                             (char *)crlf2, (char *)crlf2 + 4); }
             if (hend) break;
             if (SvCUR(buf) > PQ_MP_HDR_MAX) return parts;
-            if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &left)) return parts;
+            if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &lim)) return parts;
         }
         {   /* the same header reading the whole-buffer parser does */
             const char *hp = SvPVX(buf);
@@ -271,7 +290,7 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen,
                     pq_sink_write(aTHX_ &sink, b, flush, dir, seq);
                     pq_mp_consume(aTHX_ buf, flush);
                 }
-                if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &left)) {
+                if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &lim)) {
                     /* truncated: the part never ended */
                     pq_sink_write(aTHX_ &sink, SvPVX(buf), SvCUR(buf), dir, seq);
                     pq_mp_consume(aTHX_ buf, SvCUR(buf));

@@ -275,17 +275,23 @@ form(self)
                     SV **in  = hv_fetchs(env, "psgi.input", 0);
                     SV **cl2 = hv_fetchs(env, "CONTENT_LENGTH", 0);
                     IV len = (cl2 && *cl2 && SvOK(*cl2)) ? SvIV(*cl2) : -1;
+                    /* no declared length is the h2/h3 upload, and the walk
+                     * runs to EOF: max_body is then the only bound there is */
+                    IV max = pq_env_ceiling(aTHX_ env);
                     IO *io = (in && *in && SvTRUE(*in)) ? sv_2io(*in) : NULL;
                     PerlIO *fp = io ? IoIFP(io) : NULL;
                     if (fp) {
                         SV *dir = pq_upload_dir(aTHX_ req);
                         AV *tmps = newAV();
                         pq_tmp_own(aTHX_ tmps);   /* unlinked when freed */
-                        (void)pq_parse_multipart_stream(aTHX_ fp, len,
-                                  boundary, boundl, built, uploads, dir, tmps);
-                        (void)PerlIO_seek(fp, 0, SEEK_SET);
+                        /* handed to the request BEFORE the walk: the ceiling
+                         * croaks from inside it, and the parts spilled by
+                         * then must still be unlinked when the request goes */
                         (void)av_store(req, PQ_TEMPFILES,
                                       newRV_noinc((SV *)tmps));
+                        (void)pq_parse_multipart_stream(aTHX_ fp, len, max,
+                                  boundary, boundl, built, uploads, dir, tmps);
+                        (void)PerlIO_seek(fp, 0, SEEK_SET);
                     }
                 }
                 (void)pq_cached(aTHX_ req, PQ_UPLOADS, uploads);

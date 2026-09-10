@@ -30,10 +30,10 @@ requires:
   HTTP::Cookies: '0'
   PBKDF2::Tiny: '0'
   POSIX: '0'
-  perl: '5.010'
+  perl: '5.012'
 resources:
   bugtracker: https://github.com/briandfoy/http-cookies-chrome/issues
   homepage: https://github.com/briandfoy/http-cookies-chrome
   repository: https://github.com/briandfoy/http-cookies-chrome
-version: '3.002'
+version: '4.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

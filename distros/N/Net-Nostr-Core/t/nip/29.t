@@ -1517,4 +1517,140 @@ subtest 'hex64 validation rejects invalid pubkeys and event ids' => sub {
     like($@, qr/member pubkey must be 64-char lowercase hex/, 'members rejects bad member pubkey');
 };
 
+subtest 'invite suffix round trip and join request' => sub {
+    my $base = Net::Nostr::Group->format_id(pubkey=>$relay_pk, group_id=>'pizza', relay=>$relay_url);
+    my $code = "a+b &/\x{2603}";
+    my $reference = Net::Nostr::Group->format_id(pubkey=>$relay_pk,group_id=>'pizza',relay=>$relay_url,invite=>$code);
+    like $reference, qr/\Q$base\E\?invite=/, 'suffix leaves bech32 prefix intact';
+    my $parsed;
+    ok lives { $parsed = Net::Nostr::Group->parse_id($reference) }, 'invite parses';
+    if ($parsed) {
+        is $parsed->{invite}, $code, 'Unicode and query punctuation preserved';
+        my $join = Net::Nostr::Group->join_request(pubkey=>$alice_pk,group_id=>$parsed->{group_id},code=>$parsed->{invite});
+        is $join->tags, [['h','pizza'],['code',$code]], 'invite supplied in join code tag';
+    }
+    is(Net::Nostr::Group->parse_id($base)->{group_id}, 'pizza', 'bare identifier still parses');
+    for my $suffix ('?invite=', '?invite=%GG', '?invite=%FF', '?invite=a&invite=b', '?invite=a#fragment') {
+        like dies { Net::Nostr::Group->parse_id($base.$suffix) }, qr/invite|identifier|UTF-8/i, 'malformed suffix rejected';
+    }
+    for my $bad (undef, '', []) {
+        like dies { Net::Nostr::Group->format_id(pubkey=>$relay_pk,group_id=>'pizza',invite=>$bad) }, qr/invite/, 'bad invite rejected';
+    }
+};
+
+subtest 'banner and ordered subgroup metadata round trip' => sub {
+    my $event;
+    ok lives { $event = Net::Nostr::Group->metadata(pubkey=>$relay_pk,group_id=>'pizza',
+        name=>'Pizza Lovers',picture=>'https://pizza.com/pizza.png',banner=>'https://pizza.com/banner.png',
+        about=>'a group for people who love pizza',private=>1,closed=>1,supported_kinds=>[9,11],
+        parent=>'food',children=>['recipes','meetups']) }, 'new metadata builds';
+    return unless $event;
+    my $parsed = Net::Nostr::Group->metadata_from_event($event);
+    is $parsed->{banner}, 'https://pizza.com/banner.png', 'spec banner example';
+    is $parsed->{parent}, 'food', 'parent preserved';
+    is $parsed->{children}, ['recipes','meetups'], 'ordered children preserved';
+    is(Net::Nostr::Group->metadata(pubkey=>$relay_pk,%$parsed)->tags, $event->tags, 'metadata parse/build round trip');
+    my $edit = Net::Nostr::Group->edit_metadata(pubkey=>$alice_pk,group_id=>'pizza',
+        banner=>'https://pizza.com/banner.png',parent=>'food',children=>['meetups','recipes']);
+    is $edit->tags, [['h','pizza'],['banner','https://pizza.com/banner.png'],['parent','food'],
+        ['child','meetups'],['child','recipes']], 'edit carries parent and desired child order';
+};
+
+subtest 'subgroup structural errors rejected by builders and parser' => sub {
+    for my $bad ({parent=>''}, {parent=>[]}, {parent=>'pizza'}, {children=>'child'},
+        {children=>['']}, {children=>['pizza']}, {children=>['child','child']}, {banner=>[]}) {
+        for my $method (qw(metadata edit_metadata)) {
+            like dies { Net::Nostr::Group->$method(pubkey=>$relay_pk,group_id=>'pizza',%$bad) },
+                qr/parent|child|banner/, 'invalid metadata input rejected';
+        }
+    }
+    for my $tags ([['parent','food'],['parent','tech']], [['parent']], [['parent','pizza']],
+                  [['child']], [['child','pizza']], [['child','one'],['child','one']], [['banner']]) {
+        my $event = make_event(kind=>39000,tags=>[['d','pizza'],@$tags]);
+        like dies { Net::Nostr::Group->metadata_from_event($event) }, qr/parent|child|banner/, 'bad wire metadata rejected';
+    }
+};
+
+subtest 'ordered pin lists replace, reorder, and clear' => sub {
+    ok(Net::Nostr::Group->can('update_pin_list'), 'moderation builder exists');
+    ok(Net::Nostr::Group->can('pinned_events'), 'relay pin builder exists');
+    ok(Net::Nostr::Group->can('pins_from_event'), 'pin parser exists');
+    return unless Net::Nostr::Group->can('pins_from_event');
+    my $pins = [['e',$event_id],['a',"30023:$alice_pk:post"]];
+    for my $previous ('bad', {}, ['bad'], ['012345678'], [undef]) {
+        like dies { Net::Nostr::Group->update_pin_list(pubkey=>$alice_pk,group_id=>'pizza',pins=>[],previous=>$previous) },
+            qr/previous/, 'pin builder validates timeline references';
+    }
+    for my $list ($pins, [reverse @$pins], []) {
+        my $update = Net::Nostr::Group->update_pin_list(pubkey=>$alice_pk,group_id=>'pizza',pins=>$list);
+        is $update->kind, 9010, 'update-pin-list kind';
+        is $update->tags, [['h','pizza'],@$list], 'full ordered list including empty clear';
+        my $event = Net::Nostr::Group->pinned_events(pubkey=>$relay_pk,group_id=>'pizza',pins=>$list);
+        is $event->kind, 39005, 'relay pin kind';
+        is(Net::Nostr::Group->pins_from_event($event), {group_id=>'pizza',pins=>$list}, 'relay pins round trip');
+        is(Net::Nostr::Group->pins_from_event($update), {group_id=>'pizza',pins=>$list}, 'moderation pins round trip');
+    }
+    for my $bad (undef, {}, [['p',$alice_pk]], [['e','bad']], [['a','30023:bad:id']],
+        [['a',"1:$alice_pk:id"]], [['e',$event_id,'extra']], [[]]) {
+        like dies { Net::Nostr::Group->update_pin_list(pubkey=>$alice_pk,group_id=>'pizza',pins=>$bad) },
+            qr/pins|pin/, 'invalid pin list rejected';
+        next unless ref($bad) eq 'ARRAY';
+        my $event = eval { make_event(kind=>39005,tags=>[['d','pizza'],@$bad]) };
+        next unless $event;
+        like dies { Net::Nostr::Group->pins_from_event($event) }, qr/pins|pin/, 'invalid wire pins rejected';
+    }
+};
+
+subtest 'review: metadata builders and parsers validate every recognized field' => sub {
+    for my $method (qw(metadata edit_metadata)) {
+        for my $bad ({group_id=>''}, {name=>undef}, {picture=>[]}, {private=>2},
+            {hidden=>{}}, {supported_kinds=>['bad']}, {supported_kinds=>[-1]},
+            {supported_kinds=>[65536]}, {supported_kinds=>[undef]}) {
+            ok dies { Net::Nostr::Group->$method(pubkey=>$relay_pk,group_id=>'pizza',%$bad) },
+                "$method rejects malformed metadata";
+        }
+        for my $kinds ([], [0,9,11,65535]) {
+            my $event;
+            ok lives { $event=Net::Nostr::Group->$method(pubkey=>$relay_pk,group_id=>'pizza',supported_kinds=>$kinds) },
+                "$method accepts supported kind boundaries and empty lists";
+            next unless $event;
+            is [grep { $_->[0] eq 'supported_kinds' } @{$event->tags}],
+                [['supported_kinds',map { "$_" } @$kinds]], 'supported kinds serialized';
+        }
+    }
+    for my $tags ([], [['d','']], [['d','pizza'],['d','pizza']],
+        [['d','pizza'],['name']], [['d','pizza'],['name','one'],['name','two']],
+        [['d','pizza'],['private','yes']], [['d','pizza'],['livekit','url']],
+        [['d','pizza'],['supported_kinds','-1']], [['d','pizza'],['supported_kinds','65536']],
+        [['d','pizza'],['supported_kinds','text']], [['d','pizza'],['supported_kinds'],['supported_kinds','9']]) {
+        ok dies { Net::Nostr::Group->metadata_from_event(make_event(kind=>39000,tags=>$tags)) },
+            'malformed recognized wire metadata rejected';
+    }
+    for my $pair ([qw(private public)], [qw(closed open)], [qw(hidden visible)], [qw(restricted unrestricted)]) {
+        ok dies { Net::Nostr::Group->edit_metadata(pubkey=>$relay_pk,group_id=>'pizza',map { $_=>1 } @$pair) },
+            'contradictory edit flags rejected';
+    }
+};
+
+subtest 'review: group references and parsed pin timelines are strict' => sub {
+    ok dies { Net::Nostr::Group->format_id(pubkey=>$relay_pk,group_id=>'') }, 'empty group reference rejected';
+    ok dies { Net::Nostr::Group->format_id(pubkey=>$relay_pk,group_id=>'pizza',typo=>1) }, 'unknown reference option rejected';
+    my $empty=encode_naddr(identifier=>'',pubkey=>$relay_pk,kind=>39000,relays=>[]);
+    ok dies { Net::Nostr::Group->parse_id($empty) }, 'empty decoded group rejected';
+    for my $prefix ('bad', '012345678', 'ABCDEF12') {
+        ok dies { Net::Nostr::Group->pins_from_event(make_event(kind=>9010,
+            tags=>[['h','pizza'],['previous',$prefix]])) }, 'parsed timeline reference validated';
+    }
+    ok lives { Net::Nostr::Group->pins_from_event(make_event(kind=>9010,
+        tags=>[['h','pizza'],['previous','eb96c864','2db75638','b5d1065f']])) }, 'spec timeline example accepted';
+    for my $previous ('', 'bad', {}, ['bad'], ['ABCDEF12']) {
+        ok dies { Net::Nostr::Group->edit_metadata(pubkey=>$relay_pk,group_id=>'pizza',previous=>$previous) },
+            'metadata edit builder validates timeline references';
+    }
+    my $edit=Net::Nostr::Group->edit_metadata(pubkey=>$relay_pk,group_id=>'pizza',
+        livekit=>1,supported_kinds=>[],previous=>['eb96c864','2db75638','b5d1065f']);
+    is $edit->tags,[['h','pizza'],['previous','eb96c864','2db75638','b5d1065f'],['livekit'],['supported_kinds']],
+        'AV-only metadata and exact spec timeline can be built';
+};
+
 done_testing;

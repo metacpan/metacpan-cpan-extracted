@@ -1,5 +1,8 @@
 Revision history for Confold
 
+0.02    2026-09-09
+        Accept either B::Concise spelling of a const operand in the tests.
+
 0.01    2026-09-09
         Add the <: prefix operator for compile-time constant folding.
         Fold a constant operand away entirely; copy anything else read-only.

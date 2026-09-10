@@ -7,7 +7,7 @@
  * path is here because an id is minted on EVERY request, including the ones
  * that 404, so it sits on the floor of the framework's cost.
  *
- * ---- why the shape is what it is (phase 0's measurements) ----------------
+ * ---- why the shape is what it is (measured) ------------------------------
  *
  * A bare Punk request - one route, in-process dispatch, no socket - is
  * 1058 ns. Against that:

@@ -29,10 +29,12 @@ is(Hyperman::_abi_selftest(), 1,
 # above also exercises the v2 conn_detach entry's rejection path (a ticket
 # naming no connection); t/23-detach.t covers the success path live. It also
 # drives the v3 abuse controls (deny_check/add/remove and a fixed-window
-# ratelimit_hit) against the shared arena.
-is(Hyperman::_abi_version(), 5,
-   'ABI version 5 (v2 conn_detach, v3 denylist + rate limit, v4 worker start, '
- . 'v5 the cross-worker message bus)');
+# ratelimit_hit) against the shared arena, and the v6 stream entries' refusal
+# paths - a ticket naming no connection, and every entry point handed a
+# pointer that is not a live handle. t/41-stream-abi.t covers v6 live.
+is(Hyperman::_abi_version(), 8,
+   'ABI version 8 (v2 conn_detach, v3 denylist + rate limit, v4 worker start, '
+ . 'v5 the cross-worker message bus, v6 stream handles, v7 stream_abort, v8 stream_on_data)');
 
 # v4 on_worker_start registers here; that it actually FIRES, once per worker
 # and after the fork, is t/33-worker-start.t, which needs a live server.

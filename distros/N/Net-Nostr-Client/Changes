@@ -1,3 +1,26 @@
+1.002000   2026-09-08
+
+  - Require Net::Nostr::Core 1.002000 or later for the September protocol
+    APIs, preventing incompatible mixed-version installations.
+
+  - Preserve arbitrary naddr1-prefixed raw group IDs during discovery and
+    migration. Test the actual discovery POD example, use distinct lookup
+    subscription IDs, and document transport completeness and cleanup duties.
+
+  - Add Net::Nostr::GroupDiscovery for NIP-29 cached admin discovery,
+    periodic/offline lookup coordination, fork notifications, and signed
+    migration list construction, preserving public and encrypted entries.
+    Applications supply lookup transport, persistence, and user interaction.
+  - Include client NIP conformance tests in the distribution's test target.
+
+  - Pass optional NIP-67 hints as the second eose callback argument (undef for
+    legacy messages). Preserve the subscription ID as the first argument.
+
+  - Tighten incoming EVENT validation: always verify the event ID and Schnorr
+    signature before invoking the event callback, for stored and live events
+  - Drop events that fail verification with a warning and continue processing
+    later messages on the same connection
+
 1.001000   2026-07-03
 
   - First independent Net-Nostr-Client release, split from Net-Nostr

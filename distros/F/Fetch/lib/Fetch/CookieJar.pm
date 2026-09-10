@@ -3,7 +3,7 @@ package Fetch::CookieJar;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.27';
 
 require Fetch;
 

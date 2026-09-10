@@ -1,5 +1,5 @@
 package Crypt::JWS::OpenSSL::Util::PEM;
-$Crypt::JWS::OpenSSL::Util::PEM::VERSION = '0.004';
+$Crypt::JWS::OpenSSL::Util::PEM::VERSION = '0.005';
 use Moo;
 with qw(
     Crypt::JWS::OpenSSL::Role::Encoder
@@ -101,7 +101,7 @@ Crypt::JWS::OpenSSL::Util::PEM - Utility to generate pem encoded keys.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

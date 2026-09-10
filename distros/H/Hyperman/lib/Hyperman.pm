@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.46';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -75,6 +75,11 @@ interfaces (F<xs/>).
         affinity       => 0,           # pin worker i to core i%ncpu (Linux)
         http2          => 0,           # accept HTTP/2 (h2c, and h2 over TLS via
                                        # ALPN); needs the nghttp2 build
+        http3          => 0,           # serve HTTP/3 over QUIC on the same
+                                       # port; needs the ngtcp2/nghttp3 build
+                                       # and a certificate
+        http3_max_conns => 0,          # QUIC connection ceiling per worker
+                                       # (0 = unlimited)
         tls_cert       => $cert_pem,   # serve HTTPS (needs the OpenSSL build,
         tls_key        => $key_pem,    # Hyperman->has_tls); both required
         tls_ca         => $ca_pem,     # verify client certs against this CA
@@ -139,7 +144,7 @@ A single C<run> can bind several listeners, each independently plain or TLS -
 the common case being plain B<:80> beside HTTPS B<:443>. Pass C<listen> an
 arrayref of per-listener hashrefs; each takes its own C<port> (required) plus
 any of C<host>, C<tls_cert>, C<tls_key>, C<tls_ca>, C<tls_verify>, C<tls_sni>,
-C<http2>, and C<redirect_https>. A missing per-listener field falls back to the
+C<http2>, C<http3>, and C<redirect_https>. A missing per-listener field falls back to the
 top-level value of the same name, and the top-level C<port>/C<listen> are
 mutually exclusive shorthands - C<< port => [80, 8080] >> is sugar for several
 plain listeners sharing the top-level options.
@@ -394,6 +399,98 @@ multiplexed streams, HPACK, and flow control, with each stream dispatched to
 the app like any request (sync, C<Hyperman::Future>, or C<psgi.streaming>
 responses all work). HTTP/1.1 remains the default on the same port.
 
+=head2 HTTP/3
+
+With C<< http3 => 1 >> alongside C<tls_cert>/C<tls_key>, the listener also
+binds a UDP socket on the same port and serves B<HTTP/3 over QUIC>
+(L<ngtcp2|https://nghttp2.org/ngtcp2/> for the transport,
+L<nghttp3|https://nghttp2.org/nghttp3/> for the protocol). Requests arrive
+through the same sync, C<Hyperman::Future> and C<psgi.streaming> paths as
+HTTP/1.1 and HTTP/2, so an application does not change when the transport
+does. C<SERVER_PROTOCOL> is C<HTTP/3> and C<psgi.url_scheme> is always
+C<https>.
+
+Clients discover it through C<Alt-Svc>, which is emitted on the HTTP/1.1 and
+HTTP/2 responses of a listener with C<http3> on, and never on an HTTP/3 one.
+That is also why the TCP listener's ALPN list is unchanged: HTTP/3 is not
+negotiated over TCP.
+
+Client certificates work over HTTP/3 exactly as they do over HTTP/1.1 and
+HTTP/2 - C<tls_verify>/C<tls_ca> apply, and C<SSL_CLIENT_VERIFY>,
+C<SSL_CLIENT_S_DN> and C<SSL_CLIENT_I_DN> reach C<$env> the same way. A QUIC
+handshake is a TLS handshake. C<SSL_KTLS> is always C<0> there, because there
+is no kernel record layer for QUIC.
+
+C<tls_reload> rebuilds the QUIC context with the TCP one, and swaps both or
+neither: a listener serving a fresh certificate over TCP and a stale one over
+QUIC is a mismatch no TCP-only monitor would see.
+
+L</detach> is refused on HTTP/3 for the reason it is refused on HTTP/2 - the
+streams share one connection, and there is no descriptor that means "this
+stream". L<Hyperman/stream> is the seam that does work there.
+
+C<< Hyperman->has_http3 >> reports whether the support was compiled in,
+which needs all of L<ngtcp2|https://nghttp2.org/ngtcp2/>,
+C<ngtcp2_crypto_ossl>, L<nghttp3|https://nghttp2.org/nghttp3/> and OpenSSL
+3.5 or newer. C<< Hyperman->quic_library >> returns the runtime banner for
+the stack (C<"ngtcp2 1.25.0, nghttp3 1.18.0">) or C<undef> when it was not
+built - both libraries, because a QUIC problem is as often one as the other.
+
+C<http3> is per-listener as well as top level, and requires
+C<tls_cert>/C<tls_key>: QUIC's handshake is a TLS handshake, so there is no
+cleartext mode the way there is C<h2c>. It is refused with a reason on a
+build without the libraries, and refused again without a certificate, rather
+than starting a listener that cannot speak. LibreSSL has no ngtcp2 crypto
+backend at all, so C<has_http3> is false there however the rest is built.
+
+B<Address validation.> A QUIC server sends its whole first flight, certificate
+included, to an address it has not yet heard back from, so a spoofed source
+address would make it an amplifier. Two things prevent that, and neither costs
+an idle server anything. A B<Retry> is demanded once a worker is carrying more
+half-open handshakes than its threshold: the client must come back echoing a
+token, which proves it can receive at the address it claims, at the price of
+one round trip. And a B<NEW_TOKEN> is issued after every completed handshake,
+so a returning client skips validation entirely and pays no round trip even
+while everyone else is being retried. Both are bound to the address they were
+issued to and verified against a secret generated once before the workers fork
+- per worker would not survive C<SO_REUSEPORT>, which can land a client's token
+on a worker that did not mint it.
+
+A packet naming a connection this server does not have - the usual cause being
+a client still talking across a restart - is answered with a B<Stateless
+Reset>, so the client gives up now instead of retrying to its idle timeout.
+That reply is always smaller than the packet that provoked it.
+
+C<http3_max_conns> caps live QUIC connections per worker (0, the default,
+is unlimited); past it, new handshakes are dropped rather than queued.
+C<< Hyperman->stats >> reports C<h3_conns> (handshakes completed),
+C<h3_live> (open now) and C<datagrams>.
+
+=head2 Extended CONNECT (WebSocket over HTTP/2 and HTTP/3)
+
+HTTP/2 and HTTP/3 have no C<101>, no C<Upgrade> header, and forbid
+C<Connection>, so the HTTP/1.1 WebSocket handshake cannot happen on them at
+all. RFC 8441 and RFC 9220 replace it: the server advertises that it
+understands the C<:protocol> pseudo-header, and a client then opens an
+ordinary stream with C<< :method = CONNECT >> and C<< :protocol = websocket >>.
+The answer is a C<200>, and the stream stays open carrying frames both ways.
+
+Hyperman advertises this on both transports and needs no configuration for
+it. A request that arrives this way is dispatched like any other, with one
+extra key:
+
+    $env->{'psgix.connect_protocol'}   # 'websocket', or absent
+
+Two things about such a stream differ from an ordinary request, and both
+follow from it having no end. It is dispatched when its B<headers> are
+complete rather than when the request ends, because it does not end. And its
+body is not accumulated into C<psgi.input>, which would grow without bound -
+an application reads it through the C ABI's C<stream_on_data> instead, and
+answers through L</stream>. See L</Stream handles>.
+
+The framing that then runs over the stream is RFC 6455 and is the
+application's business; Hyperman carries the bytes.
+
 =head2 TLS / HTTPS
 
 With C<tls_cert>/C<tls_key> (PEM paths; requires the OpenSSL build,
@@ -530,6 +627,47 @@ before an upgrade - but not from a C<psgi.streaming> responder, which has
 already forced C<Connection: close>, nor once response bytes are queued.
 
 The equivalent for a C consumer is the table's C<conn_detach>.
+
+=head2 stream
+
+    my $w = Hyperman::stream($env, 200, [ 'Content-Type' => 'text/plain' ]);
+    $w->write($chunk);
+    $w->close;
+
+Begin a streamed response body on this request and return a
+L<Hyperman::Writer> for it. Unlike L</detach> it works on B<HTTP/2>, where
+it writes one stream of many rather than taking the socket, and on B<TLS>,
+where there is no descriptor to hand over at all. The application does not
+say which: the transport branch is inside the handle.
+
+    my $tick = $env->{'psgix.hyperman.stream'};
+    # [ fd, generation id, stream id ]  - stream id is -1 on HTTP/1.1
+
+C<psgix.hyperman.stream> is the ticket, and is present on both transports.
+It is a separate key from C<psgix.hyperman.conn>, which names a descriptor
+an application may take over and which HTTP/2 has nothing to put behind.
+
+The response must already be B<deferred> - a C<psgi.streaming> coderef, or a
+handler parked on a Future. A synchronous handler's return value is still
+coming and would be serialised on top of the body being streamed, so
+streaming from one croaks rather than corrupting the response.
+
+    sub {
+        my $env = shift;
+        return sub {                    # the responder is not needed
+            my $w = Hyperman::stream($env, 200, \@headers);
+            $w->write($_) for @chunks;
+            $w->close;
+        };
+    }
+
+C<< ->close >> ends the body; a writer that goes out of scope unclosed ends
+it too. Writing to a stream whose connection has gone is silently dropped
+rather than fatal - the C door returns the reason, and a Perl producer that
+needs to know has already lost the reader.
+
+The equivalent for a C consumer is the table's C<stream_open>; see
+L</Stream handles>.
 
 =head2 Denylist and rate limiting
 
@@ -841,7 +979,7 @@ F<hm_abi.h>.
 
 =head2 The table
 
-    #define HM_ABI_VERSION 5
+    #define HM_ABI_VERSION 8
 
     #define HM_ABI_READ  0x1        /* io_watch masks     */
     #define HM_ABI_WRITE 0x2
@@ -851,12 +989,22 @@ F<hm_abi.h>.
     #define HM_ABI_FAILED    2
     #define HM_ABI_CANCELLED 3
 
+    #define HM_ABI_STREAM_OK      0 /* stream_write, stream_close */
+    #define HM_ABI_STREAM_FULL    1
+    #define HM_ABI_STREAM_STALE  -1
+    #define HM_ABI_STREAM_GONE   -2
+    #define HM_ABI_STREAM_ARG    -3
+    #define HM_ABI_STREAM_HIWAT (256 * 1024)
+
     typedef struct hm_abi_timer hm_abi_timer;    /* opaque handle */
 
     typedef void (*hm_abi_io_cb)(pTHX_ int fd, int mask, void *ud);
     typedef void (*hm_abi_timer_cb)(pTHX_ void *ud);
     typedef void (*hm_abi_ready_cb)(pTHX_ SV *future, void *ud);
     typedef void (*hm_abi_worker_cb)(pTHX_ void *loop, void *ud);
+    typedef void (*hm_abi_stream_cb)(pTHX_ void *h, void *ud);
+    typedef void (*hm_abi_stream_data_cb)(pTHX_ void *h, const char *buf,
+                                          STRLEN len, int fin, void *ud);
 
     typedef struct hm_abi {
         int abi_version;                          /* == HM_ABI_VERSION */
@@ -916,6 +1064,35 @@ F<hm_abi.h>.
                              const char *group, STRLEN glen,
                              hm_abi_bus_cb cb, void *ud);
         int (*bus_unsubscribe)(pTHX_ int id);
+
+        /* v6: stream handles. stream_open sends status + headers and
+         * returns an opaque handle, or NULL if the ticket names no live
+         * connection, a response has already gone out, or (HTTP/1.1) the
+         * handler has not deferred yet. (fd, id, stream_id) is the ticket
+         * published as psgix.hyperman.stream; stream_id is -1 on HTTP/1.1.
+         * headers is a PSGI header arrayref, not a byte string, so h2 can
+         * pass it to nghttp2 as nghttp2_nv[]. The caller owns the handle
+         * until stream_close, the only entry point that frees one. */
+        void *(*stream_open)(pTHX_ void *loop, int fd, UV id,
+                             int64_t stream_id, int status, SV *headers);
+        int   (*stream_write)(pTHX_ void *h, const char *buf, STRLEN len);
+        int   (*stream_close)(pTHX_ void *h);
+        int   (*stream_on_drain)(pTHX_ void *h, hm_abi_stream_cb cb, void *ud);
+        int   (*stream_on_abort)(pTHX_ void *h, hm_abi_stream_cb cb, void *ud);
+
+        /* v7: the other ending. Stops a body so the peer can tell it was
+         * not finished - RST_STREAM on h2 and h3, a connection reset on
+         * HTTP/1.1 - and releases the handle the way stream_close does.
+         * A producer calls one or the other, never both. */
+        int   (*stream_abort)(pTHX_ void *h);
+
+        /* v8: the read half, which makes a handle bidirectional. With a
+         * callback registered, request bytes on this stream go to it
+         * instead of into psgi.input - which is what a stream opened by
+         * Extended CONNECT needs, since it never ends and buffering it
+         * would grow without bound. NULL removes it. */
+        int   (*stream_on_data)(pTHX_ void *h, hm_abi_stream_data_cb cb,
+                                void *ud);
     } hm_abi;
 
 C<on_worker_start> is the seam for anything a consumer owns that is bound to
@@ -936,6 +1113,50 @@ application that wants to reopen a database handle rather than attach a
 watcher. A Perl callback is handed no loop - C<< Hyperman->loop >> is the
 worker's own once it is running - because the useful thing to do with the raw
 pointer is a C entry point.
+
+=head2 Stream handles
+
+C<conn_detach> hands over a file descriptor, and that is why it refuses
+HTTP/2 and TLS. Those refusals are correct rather than gaps: an HTTP/2
+stream is one of many on a shared connection, so no descriptor means "this
+stream", and a TLS session's state belongs to the server and not to the
+socket. The seam that works on every transport is a B<stream handle>, and
+the five v6 entries are it. L</stream> is the same registry as a Perl call.
+
+    void *h = A->stream_open(aTHX_ loop, fd, id, sid, 200, headers);
+    A->stream_on_abort(aTHX_ h, on_abort, ud);
+    A->stream_on_drain(aTHX_ h, on_drain, ud);
+    if (A->stream_write(aTHX_ h, buf, len) == HM_ABI_STREAM_FULL)
+        return;                     /* resume from on_drain */
+    A->stream_close(aTHX_ h);
+
+The handle carries its own generation guard and every entry point checks it
+against the live registry before dereferencing it, so a write arriving after
+the connection died is C<HM_ABI_STREAM_GONE> and never a read of freed
+memory. Nothing but C<stream_close> frees a handle: a connection that goes
+away only marks its handles dead and fires their abort callbacks, and an
+aborted stream still has to be closed.
+
+C<stream_on_abort> is what makes this better than detach rather than merely
+equivalent. A multiplexed peer can reset one stream out of many - an HTTP/2
+C<RST_STREAM> - and the producer has to hear about it and stop; HTTP/1.1 has
+no analogue, where the whole connection simply dies. Registering it on a
+stream that is already dead fires it immediately, the same contract
+C<future_on_ready> has on a settled future, so the wakeup cannot be lost to
+a race.
+
+C<stream_on_data> (v8) is the read half, and it is what makes a handle
+B<bidirectional>. Everything else here writes, which is the whole of an
+ordinary response; a stream opened by L</Extended CONNECT (WebSocket over
+HTTP/2 and HTTP/3)> carries traffic both ways. With a callback registered,
+request bytes on that stream go to it instead of into C<psgi.input>.
+
+C<stream_on_drain> is backpressure. C<stream_write> answers
+C<HM_ABI_STREAM_FULL> once the connection is holding more than
+C<HM_ABI_STREAM_HIWAT> unwritten bytes: the bytes were taken, but a
+well-behaved producer stops there and resumes when the drain callback fires.
+
+Like every other callback in the table, neither may croak.
 
 =head2 Hyperman::_abi_ptr
 

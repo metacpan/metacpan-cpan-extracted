@@ -9,6 +9,7 @@
 #ifndef _WIN32
 
 #include "ft_backend.h"
+#include "ft_win.h"        /* ft_monotonic: clock_gettime here, QPC on Windows */
 
 #include <poll.h>
 #include <signal.h>
@@ -47,11 +48,7 @@ static void hm_poll_handler(int signo) {
     }
 }
 
-static double hm_poll_now(void) {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (double)ts.tv_sec + (double)ts.tv_nsec / 1e9;
-}
+#define hm_poll_now() ft_monotonic()
 
 static short hm_poll_events(int mask) {
     short ev = 0;

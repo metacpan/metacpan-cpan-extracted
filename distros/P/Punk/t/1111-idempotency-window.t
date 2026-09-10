@@ -8,7 +8,7 @@ use Test::More;
 use File::Temp ();
 use Punk ();
 
-# The window, and the seam - phase 4 of plan_punk_idempotency.
+# The window, and the seam.
 #
 # Cache-backed idempotency COLLAPSES the window between the work being done
 # and the key being recorded. It does not remove it. A process killed in that

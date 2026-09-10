@@ -8,7 +8,7 @@ use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
 
-# Async PSGI (plan/04-async-psgi.md): Future-returning handlers, psgix.loop /
+# Async PSGI: Future-returning handlers, psgix.loop /
 # psgix.io, failure -> 500 with the connection kept alive, and cancellation
 # of the response Future when the client disconnects.
 

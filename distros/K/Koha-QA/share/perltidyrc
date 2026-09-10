@@ -1,0 +1,18 @@
+# delete backup if no errors
+--backup-file-extension='/'
+
+--character-encoding=utf8
+--output-line-ending=unix
+--iterations=2
+
+# } else {
+--cuddled-else
+
+# Use the full indent size for continuations
+--continuation-indentation=4
+
+--no-outdent-long-lines
+
+--maximum-line-length=120
+
+--break-at-old-comma-breakpoints

@@ -58,8 +58,11 @@ SKIP: {
     B::Concise::compile('-exec', $probe)->();
     close $fh;
 
-    like   $out, qr/const\[PV "early"\]/, 'it compiles to the constant itself';
-    unlike $out, qr/\bconfold\b/,         'no runtime operator is left behind';
+    # B::Concise brackets a const's SV when it lives in the pad, under
+    # ithreads, and parenthesises it when the op carries it directly.
+    like   $out, qr/const[\[(]PV "early"[\])]/,
+                                  'it compiles to the constant itself';
+    unlike $out, qr/\bconfold\b/, 'no runtime operator is left behind';
 }
 
 # Passing one to a subroutine hands over the value, not the variable. That is

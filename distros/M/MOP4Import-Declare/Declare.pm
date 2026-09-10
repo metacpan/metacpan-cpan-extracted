@@ -3,7 +3,7 @@ package MOP4Import::Declare;
 use 5.010;
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-our $VERSION = '0.072'; BEGIN {$VERSION = '0.072'};
+our $VERSION = '0.073'; BEGIN {$VERSION = '0.073'};
 use Carp;
 use mro qw/c3/;
 
@@ -512,7 +512,7 @@ sub declare___field :MetaOnly {
 
     *{globref($opts->{objpkg}, $name)}
       = Sub::Util::set_subname(join("::", $opts->{objpkg}, $name)
-                               , sub :method { $_[0]->{$name} });
+                               , $myPack->declare___accessor($opts, $name));
   }
 
   foreach my $delayed (@delayed) {
@@ -528,6 +528,11 @@ sub declare___field :MetaOnly {
   }
 
   $fs;
+}
+
+sub declare___accessor :MetaOnly {
+  (my $myPack, my Opts $opts, my ($name)) = m4i_args(@_);
+  return sub :method { $_[0]->{$name} };
 }
 
 sub declare___field_with_default :MetaOnly {

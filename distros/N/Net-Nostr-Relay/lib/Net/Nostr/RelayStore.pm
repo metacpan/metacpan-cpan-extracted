@@ -197,24 +197,17 @@ sub delete_matching {
         $count++;
     }
 
-    # delete by address (kind:pubkey:d_tag or kind:pubkey: for replaceable)
-    for my $addr (@$addresses) {
-        my ($kind, $addr_pubkey, $d_tag) = split /:/, $addr, 3;
-        next unless defined $d_tag;
+    return $count unless @$addresses;
 
-        my $event;
-        if (length $d_tag) {
-            # Addressable event (kind 30000-39999)
-            my $key = "$addr_pubkey:$kind:$d_tag";
-            $event = $self->{_by_pubkey_kind_dtag}{$key};
-        } else {
-            # Replaceable event (kind 0, 3, 10000-19999) — empty d_tag
-            my $key = "$addr_pubkey:$kind";
-            $event = $self->{_by_pubkey_kind}{$key};
-        }
-        next unless $event;
-        next unless $event->pubkey eq $pubkey;
-        next if $event->kind == 5;
+    # Coordinate deletion covers all versions, including those hidden by a
+    # newer version in the replaceable/addressable indexes.
+    my %wanted = map { $_ => 1 } @$addresses;
+    my $by_pubkey = $self->{_by_pubkey}{$pubkey} // {};
+    for my $event (values %$by_pubkey) {
+        next unless $event->is_replaceable || $event->is_addressable;
+        my $d_tag = $event->is_addressable ? $event->d_tag : '';
+        my $coordinate = join ':', $event->kind, $event->pubkey, $d_tag;
+        next unless $wanted{$coordinate};
         next if $event->created_at > $before_ts;
         $self->delete_by_id($event->id);
         $count++;
@@ -548,15 +541,24 @@ index entry is cleared.
     my $count = $store->delete_matching($pubkey, \@ids, \@addresses, $before_ts);
 
 NIP-09 bulk deletion. Deletes events owned by C<$pubkey> by event id or by
-coordinate. Addresses may be addressable (C<"kind:pubkey:d_tag">) or
-replaceable (C<"kind:pubkey:"> with empty d_tag). Both id-based and
-address-based deletions skip events belonging to a different pubkey.
-Address-based deletion additionally only removes events with
-C<created_at E<lt>= $before_ts>. Kind 5 (deletion) events are never deleted.
-Returns the number of events deleted.
+coordinate. Addressable events (kinds 30000-39999) use
+C<"kind:pubkey:d_tag">, including an empty identifier when the first C<d>
+tag is empty or missing. Replaceable events (kinds 0, 3, and 10000-19999)
+use C<"kind:pubkey:"> regardless of any C<d> tags on the event. Coordinates
+are matched exactly, preserving any colons or Unicode in the identifier.
+
+Coordinate deletion removes B<all stored versions> with
+C<created_at E<lt>= $before_ts>, including all versions at the cutoff.
+Newer versions remain stored and do not prevent older versions from being
+deleted. The cutoff does not apply to explicit event ids. Both forms skip
+events belonging to a different pubkey, and kind 5 (deletion request)
+events are never deleted. Unmatched references have no effect.
+Returns the number of distinct events deleted; duplicate references or
+overlap between ids and coordinates do not count an event more than once.
 
     $store->delete_matching($pk, [$event_id], [], 9999);
     $store->delete_matching($pk, [], ["30023:$pk:slug"], $deletion_ts);
+    $store->delete_matching($pk, [], ["30023:$pk:"], $deletion_ts);  # empty identifier
     $store->delete_matching($pk, [], ["10000:$pk:"], $deletion_ts);  # replaceable
 
 =head2 query
@@ -618,6 +620,7 @@ interface is duck-typed.
 =head1 SEE ALSO
 
 L<Net::Nostr::Relay>, L<Net::Nostr::Filter>, L<Net::Nostr::Event>,
-L<NIP-01|https://github.com/nostr-protocol/nips/blob/master/01.md>
+L<NIP-01|https://github.com/nostr-protocol/nips/blob/master/01.md>,
+L<NIP-09|https://github.com/nostr-protocol/nips/blob/master/09.md>
 
 =cut

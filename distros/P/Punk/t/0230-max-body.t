@@ -61,8 +61,11 @@ is +(hit('/plain', 1000))[0], 200, 'exactly at the ceiling passes';
 is +(hit('/plain', 1001))[0], 413, 'one byte over is refused';
 is +(hit('/plain', 99999))[0], 413, 'far over is refused';
 
-# No CONTENT_LENGTH means a chunked request, which the server has already
-# decoded and bounded by the time we see it. Nothing to check here.
+# No CONTENT_LENGTH: there is no declared length to compare against, so
+# nothing can be answered here and the request goes through. The ceiling is
+# not abandoned - it is published into the environment and bounds the read
+# instead, which t/0241-body-multiplex.t is about. This env has no body to
+# read, so it arrives at the handler either way.
 is +(hit('/plain', undef))[0], 200,
    'a request with no CONTENT_LENGTH is passed through';
 

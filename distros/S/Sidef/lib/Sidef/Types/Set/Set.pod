@@ -202,6 +202,35 @@ Aliases: operator C<< >= >>, operator C<≥>, operator C<⊇>
 
 =cut
 
+=head2 is_disjoint
+
+    self.is_disjoint(other)
+
+Returns C<true> if C<self> and C<other> share no elements, C<false> otherwise (C<other> is converted with C<.to_set> first if needed).
+
+    say(Set(1, 2, 3).is_disjoint(Set(4, 5, 6)))   #=> true
+
+=cut
+
+=head2 is_proper_subset
+
+    self.is_proper_subset(other)
+
+Like L</is_subset>, but also requires C<self> and C<other> to not be equal (a strict subset).
+
+    say(Set(1, 2).is_proper_subset(Set(1, 2, 3)))   #=> true
+    say(Set(1, 2).is_proper_subset(Set(1, 2)))      #=> false
+
+=cut
+
+=head2 is_proper_superset
+
+    self.is_proper_superset(other)
+
+Like L</is_superset>, but also requires C<self> and C<other> to not be equal (a strict superset).
+
+=cut
+
 =head2 ≡
 
     self ≡ other
@@ -387,6 +416,32 @@ Like L</grep>, but for a set I<whose elements are themselves array-like> -- each
 
     var pairs = Set([10, "a"], [20, "b"], [5, "c"])
     say(pairs.grep_2d {|n, label| n > 8 })   #=> Set([10, "a"], [20, "b"])
+
+=cut
+
+=head2 powerset
+
+    self.powerset
+
+Returns a C<Set> of every subset of C<self> (each itself a C<Set>, including the empty set and C<self>). Has C<2**n> elements for a set of size C<n>.
+
+    say(Set(1, 2).powerset)   #=> Set(Set(), Set(1), Set(2), Set(1, 2))
+
+=cut
+
+=head2 sample
+
+    self.sample(n=1)
+
+Returns an C<Array> of C<n> distinct random elements from the set (without replacement). If the set has fewer than C<n> elements, returns all of them.
+
+=cut
+
+=head2 pick
+
+    self.pick
+
+Returns a single random element from the set, or C<nil> if it's empty.
 
 =cut
 

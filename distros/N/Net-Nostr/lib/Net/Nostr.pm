@@ -2,7 +2,7 @@ package Net::Nostr;
 
 use strictures 2;
 
-our $VERSION = '2.002000';
+our $VERSION = '2.003000';
 
 use Net::Nostr::Client;
 use Net::Nostr::Relay;
@@ -152,6 +152,8 @@ Equivalent to C<< Net::Nostr::Relay->new >>.
 
 =item L<Net::Nostr::Group> - NIP-29 relay-based groups
 
+=item L<Net::Nostr::GroupDiscovery> - NIP-29 migration and fork discovery coordination
+
 =item L<Net::Nostr::HttpAuth> - NIP-98 HTTP auth
 
 =item L<Net::Nostr::Identifier> - NIP-05 DNS-based internet identifiers
@@ -180,6 +182,8 @@ Equivalent to C<< Net::Nostr::Relay->new >>.
 
 =item L<Net::Nostr::Nutzap> - NIP-61 nutzaps (Cashu ecash payments)
 
+=item L<Net::Nostr::PaymentTargets> - NIP-A3 payment target lists and URIs
+
 =item L<Net::Nostr::Reaction> - NIP-25 reactions
 
 =item L<Net::Nostr::Relay> - WebSocket relay server
@@ -189,6 +193,8 @@ Equivalent to C<< Net::Nostr::Relay->new >>.
 =item L<Net::Nostr::RelayAdmin> - NIP-86 relay management API
 
 =item L<Net::Nostr::RelayInfo> - NIP-11 relay information document
+
+=item L<Net::Nostr::RelayGroups> - Optional NIP-29 group relay policy
 
 =item L<Net::Nostr::RelayList> - NIP-65 relay list metadata
 
@@ -221,8 +227,8 @@ Equivalent to C<< Net::Nostr::Relay->new >>.
 =head1 SUPPORTED NIPS
 
 Conformance target:
-L<nostr-protocol/nips commit 8f8444d0|https://github.com/nostr-protocol/nips/commit/8f8444d05a8842c40211ded5d10af3521541f865>
-(2026-07-01).
+L<nostr-protocol/nips commit c3fd9af1|https://github.com/nostr-protocol/nips/commit/c3fd9af17939316bf6d0d83a5759100f8b0a1bdb>
+(2026-09-04).
 
 =over 4
 
@@ -314,6 +320,8 @@ L<nostr-protocol/nips commit 8f8444d0|https://github.com/nostr-protocol/nips/com
 
 =item L<NIP-66|https://github.com/nostr-protocol/nips/blob/master/66.md> - Relay Discovery and Liveness Monitoring
 
+=item L<NIP-67|https://github.com/nostr-protocol/nips/blob/master/67.md> - EOSE completeness hints
+
 =item L<NIP-70|https://github.com/nostr-protocol/nips/blob/master/70.md> - Protected Events
 
 =item L<NIP-73|https://github.com/nostr-protocol/nips/blob/master/73.md> - External Content IDs
@@ -335,6 +343,8 @@ L<nostr-protocol/nips commit 8f8444d0|https://github.com/nostr-protocol/nips/com
 =item L<NIP-98|https://github.com/nostr-protocol/nips/blob/master/98.md> - HTTP auth
 
 =item L<NIP-99|https://github.com/nostr-protocol/nips/blob/master/99.md> - Classified Listings
+
+=item L<NIP-A3|https://github.com/nostr-protocol/nips/blob/master/A3.md> - Payment targets
 
 =item L<NIP-B7|https://github.com/nostr-protocol/nips/blob/master/B7.md> - Blossom media
 

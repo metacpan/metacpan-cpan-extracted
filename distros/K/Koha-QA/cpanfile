@@ -1,0 +1,13 @@
+requires 'Modern::Perl';
+requires 'File::Temp';
+requires 'File::Slurp';
+requires 'File::ShareDir';
+requires 'IPC::Run3';
+requires 'Perl::Tidy', '== 20250105';
+requires 'Perl::Critic';
+requires 'Pod::Checker';
+
+on 'test' => sub {
+    requires 'Test::More';
+    requires 'Test::NoWarnings';
+};

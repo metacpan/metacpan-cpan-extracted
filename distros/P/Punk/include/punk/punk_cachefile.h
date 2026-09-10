@@ -21,8 +21,8 @@
  * and at 1KB the syscalls ARE the cost, so it lost to a plain stat+read. The
  * obvious correction, one big read plus a memmove to strip the header, is
  * worse still at 1MB (41.4us against 28.6): stripping a header off a megabyte
- * means moving a megabyte, and the copy costs more than the syscall it saves.
- * plan_punk_cache/phase-0-contract.md has the table.
+ * means moving a megabyte, and the copy costs more than the syscall it
+ * saves.
  *
  * THE KEY NEVER BECOMES A PATH.
  *

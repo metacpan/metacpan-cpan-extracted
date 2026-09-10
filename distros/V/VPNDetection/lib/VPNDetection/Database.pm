@@ -7,7 +7,7 @@ use Carp ();
 
 use VPNDetection::Error;
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.5.0';
 
 # The dataset FAMILIES your organization is licensed to download. A license
 # covers a family, while a download names one of its versions, so the ids the
@@ -255,6 +255,8 @@ itself:
         license_type => 'standard',   # evaluation, standard or redistribute
         starts => '2026-09-04T07:49:45.118Z',
         expires => undef,               # undef when the license does not expire
+        renews_at => undef,             # when a rolling license next turns over
+        notice_due_at => undef,         # last day to give notice for that term
         in_term => 1,                   # false once the term has ended
         standing => 'licensed',         # licensed, expired or unlicensed
         versions => [

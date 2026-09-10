@@ -9,9 +9,28 @@ use JSON ();
 use Scalar::Util qw(blessed);
 use Net::Nostr::Event;
 use Net::Nostr::Filter;
-use Class::Tiny qw(type subscription_id event event_id accepted message prefix filters challenge count approximate neg_msg filter neg_limit);
+sub hints {
+    my $self = shift;
+    if (@_) {
+        croak 'hints are only valid for EOSE' unless $self->type eq 'EOSE';
+        _validate_hints($_[0]);
+        $self->{hints} = [@{$_[0]}];
+    }
+    return exists $self->{hints} ? [@{$self->{hints}}] : undef;
+}
+
+use Class::Tiny qw(type subscription_id event event_id accepted message prefix filters challenge count approximate neg_msg filter neg_limit hints);
 
 my $JSON = JSON->new->utf8;
+
+sub _validate_hints {
+    my ($hints) = @_;
+    croak 'hints must be an array of strings' unless ref($hints) eq 'ARRAY';
+    for my $hint (@$hints) {
+        croak 'each hint must be a string'
+            unless defined($hint) && !ref($hint) && $JSON->encode($hint) =~ /\A"/;
+    }
+}
 
 sub _validate_subscription_id {
     my ($sub_id) = @_;
@@ -59,6 +78,7 @@ sub new {
     $self->type($args{type});
 
     my $type = $args{type};
+    croak 'hints are only valid for EOSE' if exists($args{hints}) && $type ne 'EOSE';
 
     if ($type eq 'EVENT') {
         croak "event is required for EVENT message" unless $args{event};
@@ -91,6 +111,7 @@ sub new {
         croak "subscription_id is required for EOSE"
             unless defined $args{subscription_id};
         $self->subscription_id($args{subscription_id});
+        $self->hints($args{hints}) if exists $args{hints};
     } elsif ($type eq 'NOTICE') {
         croak "message is required for NOTICE" unless defined $args{message};
         croak "message must be a string" if ref($args{message});
@@ -192,7 +213,8 @@ sub serialize {
     } elsif ($type eq 'OK') {
         return $JSON->encode(['OK', $self->event_id, $self->accepted ? JSON::true : JSON::false, $self->message]);
     } elsif ($type eq 'EOSE') {
-        return $JSON->encode(['EOSE', $self->subscription_id]);
+        return $JSON->encode(['EOSE', $self->subscription_id,
+            (exists $self->{hints} ? ($self->hints) : ())]);
     } elsif ($type eq 'NOTICE') {
         return $JSON->encode(['NOTICE', $self->message]);
     } elsif ($type eq 'CLOSED') {
@@ -260,11 +282,12 @@ my %PARSERS = (
     },
     EOSE => sub {
         my ($arr) = @_;
-        croak "EOSE message requires 2 elements\n" unless @$arr == 2;
+        croak "EOSE message requires 2 or 3 elements\n" unless @$arr == 2 || @$arr == 3;
         croak "EOSE subscription_id must be a string\n"
             if ref($arr->[1]);
         return (
             subscription_id => $arr->[1],
+            (@$arr == 3 ? (hints => $arr->[2]) : ()),
         );
     },
     CLOSED => sub {
@@ -485,7 +508,7 @@ Required fields by type:
     REQ    - subscription_id, filters (arrayref of Net::Nostr::Filter)
     CLOSE  - subscription_id
     OK     - event_id (64-char lowercase hex), accepted (bool), optional message (defaults to '')
-    EOSE   - subscription_id
+    EOSE   - subscription_id, optional hints (arrayref of strings)
     NOTICE - message (string)
     CLOSED - subscription_id, message (string)
     COUNT     - subscription_id, filters (client-to-relay) or count (non-negative integer, relay-to-client); mutually exclusive
@@ -502,6 +525,10 @@ back whatever the client sent). C<event_id> must be 64-character
 lowercase hex. C<event> must be a L<Net::Nostr::Event> object.
 C<filters> must be an arrayref of L<Net::Nostr::Filter> objects.
 C<message> and C<challenge> must be non-reference scalars.
+C<hints> is allowed only for EOSE and must be an arrayref of JSON strings;
+null, numbers, booleans, and references as hint elements are rejected.
+An empty array is valid. Unknown hint strings are preserved for forward
+compatibility. Omitting C<hints> preserves the legacy two-element message.
 
 For C<AUTH>, passing both C<event> and C<challenge> is rejected. For
 C<COUNT>, passing both C<count> and C<filters> is rejected. Croaks on
@@ -537,7 +564,8 @@ objects or arrays. C<event_id> in OK messages must be 64-character
 lowercase hex. For EVENT and AUTH messages, the contained event is
 constructed via C<< Net::Nostr::Event->from_wire >> which requires all
 seven NIP-01 fields (id, pubkey, created_at, kind, tags, content, sig)
-and rejects missing or undefined fields.
+and rejects missing or undefined fields. Event C<content> cannot be a
+JSON array, object, or boolean.
 
 B<Trust boundary>: C<parse> validates message structure and field formats
 but does B<not> verify event signatures, event ID hashes, or
@@ -632,6 +660,18 @@ The challenge string. Present on AUTH messages from relays.
     my $msg = Net::Nostr::Message->parse('["AUTH","challenge123"]');
     say $msg->challenge;  # 'challenge123'
 
+=head2 hints
+
+Returns a copy of the optional NIP-67 EOSE hint array, or C<undef> when the
+third wire element was absent. Passing an array sets it after the same
+validation as the constructor; this is only allowed on EOSE messages.
+Input and output arrays are copied so callers cannot bypass validation.
+Parsing and serializing preserve absent, empty, and populated hint arrays.
+
+Recognized hints are C<finish>, C<more>, and C<auth>. Applications must ignore
+unknown hints when deciding whether to paginate. Hints concern stored events;
+live delivery continues after EOSE.
+
 =head2 neg_msg
 
     my $hex = $msg->neg_msg;
@@ -658,6 +698,8 @@ negative values, or floats.
     say $msg->neg_limit;  # 100000
 
 =head1 SEE ALSO
+
+L<NIP-67|https://github.com/nostr-protocol/nips/blob/master/67.md>,
 
 L<NIP-01|https://github.com/nostr-protocol/nips/blob/master/01.md>,
 L<NIP-42|https://github.com/nostr-protocol/nips/blob/master/42.md>,
