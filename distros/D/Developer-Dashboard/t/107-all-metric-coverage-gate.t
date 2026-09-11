@@ -419,6 +419,117 @@ REPORT
     );
 }
 
+# ---------------------------------------------------------------------------
+# DD-774: an honestly-excused annotation still LOOKS like a flagged line in the
+# raw echoed table - the discriminator (a leading '-' on the row's own metric,
+# with NO '***') is empirically verified but not called out anywhere in the
+# printed output. These four scenarios exercise the new
+# _honored_annotation_lines() reporting, in both directions and on both a
+# passing and a failing report.
+# ---------------------------------------------------------------------------
+
+# Scenario: a genuine unannotated gap must never appear in the accounted-for
+# set - it is the thing that failed the gate, and must stay visible as that.
+{
+    my ( $exit, undef, $stderr ) = run_gate(<<'REPORT');
+File              stmt   bran   cond    sub  total
+Total            100.0   50.0  100.0  100.0   87.5
+
+lib/Developer/Dashboard/Example.pm
+
+line  err      %   true  false   branch
+----- --- ------ ------ ------   ------
+9     ***     50      1      0   if ($x)
+REPORT
+
+    isnt( $exit, 0, 'a genuine unannotated gap still fails the gate' );
+    unlike(
+        $stderr,
+        qr/already accounted for/i,
+        'a genuine gap is never reported as already accounted for'
+    );
+}
+
+# Scenario: an honestly-excused annotation on a PASSING report is named
+# separately as already accounted for, not left to look like a flagged line.
+{
+    my ( $exit, $stdout, $stderr ) = run_gate(<<'REPORT');
+File              stmt   bran   cond    sub  total
+Total            100.0  100.0  100.0  100.0  100.0
+
+lib/Developer/Dashboard/Example.pm
+
+line  err      %   true  false   branch
+----- --- ------ ------ ------   ------
+4           - 50      1     -0   if ($x)
+REPORT
+
+    is( $exit, 0, 'a passing report with only an honest annotation still passes' );
+    like(
+        $stdout,
+        qr/already accounted for/i,
+        'a passing report names the honestly-excused row as already accounted for'
+    );
+    like( $stdout, qr/Example\.pm/, 'the accounted-for note names the file' );
+    like( $stdout, qr/\b4\b/,       'the accounted-for note names the line' );
+}
+
+# Scenario: the SAME honest-annotation row is named as accounted-for even when
+# a DIFFERENT file's genuine gap is what fails the whole report - this is the
+# case that actually costs time: a reader hunting for the real gap should not
+# have to separately rule out every honestly-excused row along the way.
+{
+    my ( $exit, undef, $stderr ) = run_gate(<<'REPORT');
+File              stmt   bran   cond    sub  total
+Total            100.0   50.0  100.0  100.0   87.5
+
+lib/Developer/Dashboard/Excused.pm
+
+line  err      %   true  false   branch
+----- --- ------ ------ ------   ------
+4           - 50      1     -0   if ($x)
+
+lib/Developer/Dashboard/Broken.pm
+
+line  err      %   true  false   branch
+----- --- ------ ------ ------   ------
+9     ***     50      1      0   if ($x)
+REPORT
+
+    isnt( $exit, 0, 'the report still fails on Broken.pm\'s genuine gap' );
+    like(
+        $stderr,
+        qr/already accounted for/i,
+        'the failing report also names the honestly-excused row separately'
+    );
+    like( $stderr, qr/Excused\.pm/, 'the accounted-for note names the excused file' );
+    unlike( $stderr, qr/Broken\.pm.*already accounted for/is,
+        'the genuine gap file is never folded into the accounted-for note' );
+}
+
+# Scenario: a STALE annotation must never be double-counted into the
+# accounted-for set - it already has its own EXIT_STALE path and message, and
+# folding it into "accounted for" would misreport an actual lie as harmless.
+{
+    my ( $exit, undef, $stderr ) = run_gate(<<'REPORT');
+File              stmt   bran   cond    sub  total
+Total            100.0  100.0  100.0  100.0  100.0
+
+lib/Developer/Dashboard/Example.pm
+
+line  err      %   true  false   branch
+----- --- ------ ------ ------   ------
+16    ***   -100     -1      1   if ($x)
+REPORT
+
+    isnt( $exit, 0, 'a stale annotation still fails via its own EXIT_STALE path' );
+    unlike(
+        $stderr,
+        qr/already accounted for/i,
+        'a stale annotation is never folded into the accounted-for note'
+    );
+}
+
 done_testing;
 
 __END__

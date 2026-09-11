@@ -11,7 +11,7 @@ use File::Temp qw(tempdir);
 use POSIX qw(:sys_wait_h);
 use Socket qw(AF_UNIX PF_UNSPEC SOCK_STREAM);
 use Test::More;
-use Time::HiRes qw(sleep);
+use Time::HiRes qw(sleep time);
 
 use lib 'lib';
 
@@ -717,10 +717,21 @@ ok( $manager->_same_pid_namespace($$),       '_same_pid_namespace true for the c
             exec { $sleep_bin } $probe_title, '30' or POSIX::_exit(127);
         }
 
+        # BOUND BY WALL-CLOCK, NOT A POLL COUNT (DD-767, closing a gap DD-482
+        # specified but never shipped). A fixed iteration count is not a time
+        # bound: under Devel::Cover, each poll's own cost varies with
+        # instrumentation overhead and host contention - the two things this
+        # bound most needs to survive. DD-482 measured 678 polls (~6.8s)
+        # needed under coverage on a quiet host; raising the count to 3000
+        # still failed a third time on a genuinely loaded host (DD-767).
+        # Raising the count again would be the same fix, shipped a third
+        # time, to fail a fourth - the bound is expressed in seconds instead.
+        my $probe_deadline_seconds = $ENV{DD_EMPTY_ENVIRON_PROBE_SECONDS} || 60;
         my $probe_environ;
-        my $probe_polls = 0;
-        for ( 1 .. 3000 ) {
-            $probe_polls = $_;
+        my $probe_polls    = 0;
+        my $probe_deadline = time() + $probe_deadline_seconds;
+        while ( time() < $probe_deadline ) {
+            $probe_polls++;
             my $cmdline = '';
             if ( open my $cf, '<', "/proc/$child/cmdline" ) { local $/; $cmdline = <$cf>; close $cf; }
             if ( defined $cmdline && index( $cmdline, $probe_title ) == 0 ) {
@@ -739,9 +750,25 @@ ok( $manager->_same_pid_namespace($$),       '_same_pid_namespace true for the c
         # distinguishes neither. Note undef never means "the environ was
         # empty": a genuinely empty /proc/<pid>/environ reads back as '' with
         # length 0, which is exactly what the assertion below demands.
+        #
+        # "-e /proc/<pid>" is TRUE FOR A ZOMBIE (DD-767), so the old wording
+        # could report a dead child as "alive". Read the state letter and the
+        # actual cmdline instead: together they distinguish exec-never-ran
+        # (cmdline is still the parent interpreter), exec-ran-with-unexpected-
+        # argv0, and genuinely-died.
         if ( !defined $probe_environ ) {
-            my $alive = -e "/proc/$child" ? 'alive' : 'gone';
-            diag("empty-environ probe gave up after $probe_polls polls; child is $alive and never exposed its exec'd argv[0]");
+            my $state = 'gone';
+            if ( open my $sf, '<', "/proc/$child/stat" ) {
+                my $line = <$sf>;
+                close $sf;
+                $state = ( split ' ', ( $line // '' ) )[2] // '?';
+            }
+            my $cmd = '';
+            if ( open my $cf, '<', "/proc/$child/cmdline" ) { local $/; $cmd = <$cf> // ''; close $cf; }
+            $cmd =~ s/\0/ /g;
+            $cmd = '(empty)' if $cmd eq '';
+            diag("empty-environ probe gave up after $probe_polls polls (deadline ${probe_deadline_seconds}s); "
+                . "child state=$state cmdline=<$cmd> expected argv[0]=<$probe_title>");
         }
 
         is( $probe_environ, '', 'the probe child exposes a readable zero-length environ' );

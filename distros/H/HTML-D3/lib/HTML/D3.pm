@@ -17,11 +17,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -746,7 +746,7 @@ sub render_zoomable_line_chart_snippet
 
     function redraw(newData, ms) {
 	x.domain(newData.map(d => d.label));
-	y.domain([0, d3.max(newData, d => d.value)]).nice();
+	y.domain([Math.min(0, d3.min(newData, d => d.value)), d3.max(newData, d => d.value)]).nice();
 
 	const t = svg.transition().duration(ms);
 

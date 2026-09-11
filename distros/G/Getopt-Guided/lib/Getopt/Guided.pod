@@ -205,8 +205,12 @@ value for true changes to the option name prefixed by the options delimiter.
 
 =head1 DEFAULT OPTIONS
 
-The C<readopts( \@ )> function reads default command-line options from a
+The C<readopts( \@;@ )> function reads default command-line options from an
 rcfile and prepends them to the command-line arguments list C<@argv>. This
+list is the first parameter of the C<readopts()> function. The remaining
+optional parameters of the C<readopts()> function, represent hard-coded
+default command-line options that if present will be prepended even before
+the default command-line options read from the rcfile. The C<readopts()>
 function is usually called immediately before the C<processopts()> function.
 
 The basename of the rcfile is the program name with the

@@ -1,0 +1,1 @@
+perltidy -b lib/Luv/CLI.pm lib/Luv/CLI/*.pm lib/Luv/CLI/Command/*.pm t/*.t 

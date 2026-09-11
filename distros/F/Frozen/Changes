@@ -1,4 +1,36 @@
 Revision history for Frozen
 
+0.06    2026-09-11
+        - documents stringify
+
+0.05    2026-09-11
+        - ABI version 4. freeze and freeze_container take a flags word 
+        - stringify => 1 stores every defined non-reference scalar as its
+          string form. A reader that returns text otherwise has to bridge
+          the gap itself, because JSON's 5 decodes to an IV and freezes as
+          an integer, and str answers NULL for it.
+
+0.04    2026-09-10
+        - ABI version 3, appending three entries: borrow attaches to bytes
+          in place without copying them, for a block the caller owns and
+          that outlives the reader; release is close without an
+          interpreter; verify walks a block and says whether its structure
+          holds together. What borrow saves scales with the block: nothing
+          much at 568 bytes, nearly all of it at three megabytes.
+
+0.03    2026-09-10
+        - ABI version 2, appending three entries: freeze and
+          freeze_container build a block from Perl data through the table
+          rather than through the Perl surface, and val_at reads a hash
+          value by index the way at() already reads an array element.
+        - freeze_container adopts the bytes it just built instead of
+          copying them, so a consumer that freezes at boot pays one
+          allocation where freeze-then-attach paid two.
+
+0.02    2026-09-10
+        - fixes the Windows build: the ABI's own selftest called the table's
+          close member, which XSUB.h redefines as a macro under
+          PERL_IMPLICIT_SYS.
+
 0.01    2026-09-10
         - First version.

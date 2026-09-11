@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Frozen', $VERSION);
@@ -21,7 +21,7 @@ Frozen - an immutable container that survives a fork
 
 =head1 VERSION
 
-Version 0.01
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -57,22 +57,22 @@ count.
 
   perl hash  ~ 13877790 bytes  (payload 2677790 + 200000 SV heads at 56, bucket array ignored)
   Frozen        6420016 bytes  (2.16x smaller)
-  
+
 =head2 Speed
 
 Frozen's lookup is B<flat> where a Perl hash B<degrades>. Per hit, net of the
-measuring loop, on one machine:
+measuring loop, best of three runs on one machine:
 
     keys        perl hash      Frozen
-        500       22.0 ns     23.9 ns
-     10,000       30.0 ns     26.3 ns
-     50,000       37.5 ns     26.4 ns
-    200,000       40.3 ns     29.2 ns
+        500       22.2 ns     23.9 ns
+     10,000       32.8 ns     26.7 ns
+     50,000       41.9 ns     28.6 ns
+    200,000       47.4 ns     32.1 ns
 
 For a three-level catalogue, which is the shape that motivates the dist:
 
-    perl nested traversal     95.1 ns    10,516,435/s
-    $fz->get('a.b.c')         63.6 ns    15,721,519/s
+    perl nested traversal     88.9 ns    11,247,577/s
+    $fz->get('a.b.c')         61.4 ns    16,283,212/s
 
 
 =head1 THE TWO DOORS
@@ -90,20 +90,20 @@ and a door that used it to mean absent could not tell the two apart. Use
 C<exists> to ask the other question.
 
 C<get> is the door to put on a request path. Reaching the same leaf by
-descending - C<child>, C<child>, C<fetch> - costs 170.8 ns against C<get>'s
-63.6 ns, because each segment is another call.
+descending - C<child>, C<child>, C<fetch> - costs 166.0 ns against C<get>'s
+61.4 ns, because each segment is another call.
 
 =head2 The tied door
 
     my $h = $fz->tied;                     # a plain hashref
     print $h->{items}{one};
 
-Ergonomic, and B<11.6 times slower> than the fast door at three segments:
+Ergonomic, and B<11.9 times slower> than the fast door at three segments:
 
-    $fz->get('a.b.c')      63.6 ns
-    $h->{a}{b}{c}         757.5 ns
+    $fz->get('a.b.c')      61.4 ns
+    $h->{a}{b}{c}         729.5 ns
 
-A single tied C<FETCH> is 263.5 ns, four times an XSUB call, because C<tie>
+A single tied C<FETCH> is 260.8 ns, four times an XSUB call, because C<tie>
 magic is a full method dispatch rather than a call. Use the tied view for
 templates. Use C<get> on a request path.
 
@@ -164,10 +164,20 @@ exit status rather than a dead test run. Clean under ASAN on Linux.
 
 =head1 BUILDING A BLOCK
 
-Both builders take the same two options. C<< flat => '.' >> builds an index
-over joined paths, which is what makes C<get> one probe instead of one per
-segment. C<< lossy_nv => 1 >> accepts an NV that does not fit a double,
-narrowing it instead of refusing it.
+Both builders take the same options.
+
+C<< flat => '.' >> builds an index over joined paths, which is what makes
+C<get> one probe instead of one per segment.
+
+C<< lossy_nv => 1 >> accepts an NV that does not fit a double, narrowing it
+instead of refusing it.
+
+C<< stringify => 1 >> stores every defined non-reference scalar as its string
+form, so C<5> is kept as C<"5"> and a string read answers for it. It is for a
+reader that returns text and has no use for the difference between a number
+and its digits - a translation catalogue, a table of labels - which would
+otherwise have to walk its own data and stringify it first. C<undef> is
+untouched, so a reader that refuses null can still see it.
 
 Neither is exported. L<Storable> exports C<freeze> and C<thaw>, and a program
 importing both modules would get the wrong function.
@@ -180,6 +190,14 @@ Builds a block in memory and returns it as a string of bytes. Croaks, naming
 the path to the offending value, for anything the format cannot hold - see
 L</WHAT IS REFUSED>.
 
+B<A block records what the SVs are, not what they held.> Asking an integer
+for its string caches that string on the SV, so it is afterwards both, and
+the block stores the string. C<< print $h->{n} >> is enough to do it. Two
+freezes of "the same data" can therefore differ if anything looked at a value
+in between. That matters only if you were going to treat the bytes as a
+checksum of a Perl structure: they are a faithful record of the SVs as they
+were, which is not the same promise.
+
     my $bytes = Frozen->freeze(
         { messages => { welcome => 'Hello', bye => 'Goodbye' } },
         flat => '.',
@@ -187,6 +205,12 @@ L</WHAT IS REFUSED>.
 
     open my $fh, '>:raw', 'catalogue.frz' or die $!;
     print $fh $bytes;
+
+    # numbers kept as text, for a reader that only returns text
+    my $labels = Frozen->freeze({ port => 8080, name => 'web' },
+                                stringify => 1);
+    my $fz = Frozen->attach($labels);
+    my ($p) = $fz->get('port');        # "8080", not 8080
 
 =head2 freeze_to
 
@@ -518,7 +542,7 @@ A tied hashref or arrayref over the node, for code that wants to read the
 block with ordinary Perl syntax. Defaults to the root. Nested nodes tie
 themselves as you descend into them.
 
-Writing through it croaks. It is also B<11.6 times slower> than L</get> at
+Writing through it croaks. It is also B<11.9 times slower> than L</get> at
 three segments - see L</The tied door>. Use it for templates, not on a request
 path.
 
@@ -556,6 +580,35 @@ frame at all. See the header for the table, the ownership rules and the
 resolution idiom; it is the normative description.
 
 The byte format is specified in C<include/fz/fz_format.h>.
+
+=head2 Reading a block out of shared memory
+
+C<attach> copies the bytes it is given, which is the only safe thing to do with
+a scalar the caller may free the moment the call returns.
+
+For a block that lives somewhere the caller controls and outlives the reader -
+a page of shared memory, mapped once and read by many processes - that copy is
+waste, and it undoes the reason for putting the block there. C<borrow> attaches
+to the bytes in place:
+
+    fz_container *c = FZ->borrow(bytes, len, &err);
+    uint32_t root   = FZ->root(c);
+    ...
+    FZ->release(c);
+
+B<The caller owns the lifetime.> The bytes must outlive the container and
+nothing in the library can check that, which is why this is not on the Perl
+surface: a Perl caller has C<attach>, which copies, and the container returned
+by C<< Frozen->attach >>, which holds a reference to the scalar. C<borrow> is
+for a C consumer holding a mapping of its own.
+
+C<release> is C<close> without an interpreter, and C<verify> walks the block and
+reports whether the structure holds together - which is what makes a block that
+arrived through shared memory safe to trust, since nothing else can tell you
+whether the process that wrote it finished.
+
+These three take no C<pTHX> and no Perl type. The rest of the header does, so a
+consumer still needs the Perl headers to include it.
 
 =head1 AUTHOR
 

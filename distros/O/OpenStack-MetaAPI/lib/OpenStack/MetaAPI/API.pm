@@ -15,7 +15,9 @@ sub get_service {
     my $pkg = ucfirst $name;
     $pkg = __PACKAGE__ . "::$pkg";
 
-    eval qq{ require $pkg; 1 } or die "Failed to load $pkg: $@";
+    (my $file = $pkg) =~ s{::}{/}g;
+    $file .= '.pm';
+    eval { require $file; 1 } or die "Failed to load $pkg: $@";
 
     delete $opts{name};
 
@@ -36,7 +38,7 @@ OpenStack::MetaAPI::API
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

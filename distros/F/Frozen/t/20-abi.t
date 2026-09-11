@@ -57,7 +57,7 @@ is_deeply($data, {
 # notices when an append moves one and not the other: the table would answer 1
 # while the header promised 2, and every consumer built against 2 would refuse
 # a provider that in fact has what it wants.
-is(Frozen::_abi_version(), 1, 'the table reports the version it shipped at');
+is(Frozen::_abi_version(), 4, 'the table reports the version it shipped at');
 
 {
     require Frozen::Install::Files;
@@ -105,7 +105,9 @@ is(Frozen::_abi_version(), 1, 'the table reports the version it shipped at');
             root probe child path at key_at count kind
             str iv uv nv
             walk sv_from_node
-        )], 'the entries are in the order version 1 published them');
+            freeze freeze_container val_at
+            borrow release verify
+        )], 'the entries are in the order versions 1 to 3 published them');
     }
 }
 

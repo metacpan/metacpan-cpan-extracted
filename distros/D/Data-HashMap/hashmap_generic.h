@@ -58,23 +58,18 @@
 
 /* ---- TTL timestamp helper ---- */
 
-/* Compute expiry timestamp, clamping to 1 if the addition wraps to 0.
- * expires_at==0 is the sentinel for "no expiry", so we must avoid it. */
+/* Saturates; 0 is the no-expiry sentinel, so an exact 0 becomes 1. */
 #ifndef HM_EXPIRY_AT_DEFINED
 #define HM_EXPIRY_AT_DEFINED
 static inline uint32_t hm_expiry_at(uint32_t ttl) {
-    uint32_t e = (uint32_t)time(NULL) + ttl;
+    uint32_t now = (uint32_t)time(NULL);
+    uint32_t e = now + ttl;
+    if (e < now) e = UINT32_MAX;
     return e ? e : 1;
 }
 #endif
 
-/* Shared TTL check at slot `idx`: if entry has an expires_at set and it is
- * in the past, call the variant's expire_at() and return false from the
- * enclosing function. `may_compact` tells expire_at whether to trigger
- * compaction (false for read paths, true for write paths so compaction
- * can happen while the lock is held). Defined once; HM_FN() in the body
- * is expanded at each call site to the current variant's symbol.
- */
+/* If idx has expired, expires it and returns false from the enclosing function. */
 #ifndef HM_TTL_CHECK_EXPIRED_DEFINED
 #define HM_TTL_CHECK_EXPIRED_DEFINED
 #define HM_TTL_CHECK_EXPIRED(map, idx, may_compact) do { \
@@ -86,36 +81,34 @@ static inline uint32_t hm_expiry_at(uint32_t ttl) {
 } while (0)
 #endif
 
-/* Compaction policy after a tombstone is created: compact when dead slots
- * exceed 25% capacity or outnumber live entries. Centralized so future
- * threshold tuning touches one macro. */
 #ifndef HM_MAYBE_COMPACT_DEFINED
 #define HM_MAYBE_COMPACT_DEFINED
 #define HM_MAYBE_COMPACT(map) do { \
     if ((map)->tombstones > (map)->capacity / 4 || \
-        ((map)->size > 0 && (map)->tombstones > (map)->size)) \
+        ((map)->size > 0 && (map)->tombstones > (map)->size && \
+         (map)->tombstones > (map)->capacity / 8)) \
         HM_FN(compact)(map); \
 } while (0)
 #endif
 
-/* Grow-or-compact when load factor >= 75%. LRU maps with tombstones
- * compact in place (preserving max_size); all others resize. Returns
- * `fail_ret` from the enclosing function if the operation fails. */
+/* Returns fail_ret from the enclosing function on OOM. */
 #ifndef HM_ENSURE_CAPACITY_DEFINED
 #define HM_ENSURE_CAPACITY_DEFINED
 #define HM_ENSURE_CAPACITY(map, fail_ret) do { \
     if (((map)->size + (map)->tombstones) * 4 >= (map)->capacity * 3) { \
-        if ((map)->max_size > 0 && (map)->tombstones > 0) { \
-            if (!HM_FN(compact)(map)) return fail_ret; \
-        } else { \
-            if (!HM_FN(resize)(map)) return fail_ret; \
+        if ((map)->expires_at) HM_FN(reap_expired)(map); \
+        if (((map)->size + (map)->tombstones) * 4 >= (map)->capacity * 3) { \
+            if ((map)->tombstones * 2 >= (map)->size) { \
+                if (!HM_FN(compact)(map)) return fail_ret; \
+            } else { \
+                if (!HM_FN(resize)(map)) return fail_ret; \
+            } \
         } \
     } \
 } while (0)
 #endif
 
-/* Lazily allocate expires_at[] on first per-key TTL use. Returns
- * `fail_ret` on OOM. */
+/* Call before changing map state: returns fail_ret from the enclosing function on OOM. */
 #ifndef HM_LAZY_ALLOC_EXPIRES_DEFINED
 #define HM_LAZY_ALLOC_EXPIRES_DEFINED
 #define HM_LAZY_ALLOC_EXPIRES(map, entry_ttl, fail_ret) do { \
@@ -126,8 +119,7 @@ static inline uint32_t hm_expiry_at(uint32_t ttl) {
 } while (0)
 #endif
 
-/* Apply TTL to slot (get_or_set path, where slot is known-zero). Use
- * entry_ttl if > 0, else default_ttl. No-op if neither is set. */
+/* Assumes expires_at[slot] is already 0, as on a fresh get_or_set slot. */
 #ifndef HM_APPLY_ENTRY_TTL_DEFINED
 #define HM_APPLY_ENTRY_TTL_DEFINED
 #define HM_APPLY_ENTRY_TTL(map, idx, entry_ttl) do { \
@@ -173,10 +165,7 @@ static inline uint32_t hm_expiry_at(uint32_t ttl) {
 #ifndef HM_HASH_FUNCTIONS_DEFINED
 #define HM_HASH_FUNCTIONS_DEFINED
 
-/* Perl may redefine malloc/free/calloc/realloc to its own allocators.
- * On threaded perls with PERL_NO_GET_CONTEXT these need my_perl in scope,
- * which static inline functions (xxHash, our own helpers) won't have.
- * We intentionally use system allocators for our data structures. */
+/* perl's malloc macros need my_perl, which static inline code lacks: use the system allocator. */
 #undef malloc
 #undef free
 #undef calloc
@@ -185,12 +174,15 @@ static inline uint32_t hm_expiry_at(uint32_t ttl) {
 #define XXH_INLINE_ALL
 #include "xxhash.h"
 
+/* Derived once in BOOT from PL_hash_seed. */
+static XXH_ALIGN(XXH_SEC_ALIGN) uint8_t hm_hash_secret[XXH3_SECRET_DEFAULT_SIZE];
+
 static inline size_t hm_hash_int64(int64_t key) {
-    return (size_t)XXH3_64bits(&key, sizeof(key));
+    return (size_t)XXH3_64bits_withSecret(&key, sizeof(key), hm_hash_secret, sizeof(hm_hash_secret));
 }
 
 static inline uint32_t hm_hash_string(const char* data, uint32_t len) {
-    return (uint32_t)XXH3_64bits(data, len);
+    return (uint32_t)XXH3_64bits_withSecret(data, len, hm_hash_secret, sizeof(hm_hash_secret));
 }
 
 #endif /* HM_HASH_FUNCTIONS_DEFINED */
@@ -237,17 +229,16 @@ typedef struct {
     uint32_t  lru_tail;
     uint32_t* lru_prev;
     uint32_t* lru_next;
-    /* LRU probabilistic skip (0 = strict, 1-99 = skip %) */
     uint32_t  lru_skip;       /* original percentage for accessor */
-    uint32_t  lru_skip_every; /* promote every Nth access (0 = every time) */
-    uint32_t  lru_skip_ctr;   /* countdown to next promotion */
-    /* TTL fields (active only when default_ttl > 0) */
+    uint32_t  lru_skip_ctr;   /* gains 100 - lru_skip per access; promotes at 100 */
+    /* TTL fields (allocated on first TTL use) */
     uint32_t  default_ttl;
     uint32_t* expires_at;
-    /* Iterator state for each() */
     size_t    iter_pos;
 #ifdef HM_VALUE_IS_SV
-    void (*free_value_fn)(void*);  /* SvREFCNT_dec callback */
+    void (*free_value_fn)(void*);      /* deferred release, for single-slot paths */
+    void (*free_value_now_fn)(void*);  /* immediate release, for clear/destroy */
+    bool copy_values;                  /* store copies instead of the caller's SV */
 #endif
 } HM_MAP_TYPE;
 
@@ -288,7 +279,7 @@ static inline void HM_FN(init_nodes)(HM_NODE_TYPE* nodes, size_t capacity) {
 
 /* ---- Free resources for a single node ---- */
 
-static inline void HM_FN(free_node)(HM_MAP_TYPE* map, HM_NODE_TYPE* node) {
+static inline void HM_FN(free_node_impl)(HM_MAP_TYPE* map, HM_NODE_TYPE* node, bool now) {
     (void)map;
 #ifndef HM_KEY_IS_INT
     if (node->key != NULL && node->key != HM_STR_TOMBSTONE) {
@@ -302,13 +293,17 @@ static inline void HM_FN(free_node)(HM_MAP_TYPE* map, HM_NODE_TYPE* node) {
         node->value = NULL;
     }
 #elif defined(HM_VALUE_IS_SV)
-    if (node->value != NULL && map->free_value_fn) {
-        map->free_value_fn(node->value);
+    if (node->value != NULL) {
+        void (*rel)(void*) = now ? map->free_value_now_fn : map->free_value_fn;
+        if (rel) rel(node->value);
         node->value = NULL;
     }
 #endif
-    (void)node;
+    (void)node; (void)now;
 }
+
+#define HM_FREE_NODE(map, node)     HM_FN(free_node_impl)((map), (node), false)
+#define HM_FREE_NODE_NOW(map, node) HM_FN(free_node_impl)((map), (node), true)
 
 /* ---- LRU helpers ---- */
 
@@ -335,17 +330,17 @@ static inline void HM_FN(lru_push_front)(HM_MAP_TYPE* map, uint32_t idx) {
 
 static inline void HM_FN(lru_promote)(HM_MAP_TYPE* map, uint32_t idx) {
     if (map->lru_head == idx) return;
-    if (map->lru_skip_every && idx != map->lru_tail) {
-        if (++map->lru_skip_ctr < map->lru_skip_every) return;
-        map->lru_skip_ctr = 0;
+    if (map->lru_skip && idx != map->lru_tail) {
+        map->lru_skip_ctr += 100 - map->lru_skip;
+        if (map->lru_skip_ctr < 100) return;
+        map->lru_skip_ctr -= 100;
     }
     HM_FN(lru_unlink)(map, idx);
     HM_FN(lru_push_front)(map, idx);
 }
 
-/* Tombstone a node at a known index (used by LRU eviction and TTL expiry) */
 static void HM_FN(tombstone_at)(HM_MAP_TYPE* map, size_t index) {
-    HM_FN(free_node)(map, &map->nodes[index]);
+    HM_FREE_NODE(map, &map->nodes[index]);
 #ifdef HM_KEY_IS_INT
     map->nodes[index].key = HM_TOMBSTONE_KEY;
 #else
@@ -361,7 +356,6 @@ static void HM_FN(tombstone_at)(HM_MAP_TYPE* map, size_t index) {
     map->tombstones++;
 }
 
-/* Evict the LRU tail entry */
 static void HM_FN(lru_evict_one)(HM_MAP_TYPE* map) {
     uint32_t victim = map->lru_tail;
     if (victim == HM_LRU_NONE) return;
@@ -369,13 +363,9 @@ static void HM_FN(lru_evict_one)(HM_MAP_TYPE* map) {
     HM_FN(tombstone_at)(map, (size_t)victim);
 }
 
-/* Forward declaration (needed by expire_at) */
 static bool HM_FN(compact)(HM_MAP_TYPE* map);
 
-/* Expire a TTL'd entry at a known index.
- * may_compact: true for write paths (put/remove/incr/get_or_set),
- *              false for read paths (get/exists) to avoid resetting
- *              iter_pos and invalidating get_direct pointers. */
+/* may_compact is false on read paths so that a lookup never resets an each() in progress. */
 static void HM_FN(expire_at)(HM_MAP_TYPE* map, size_t index, bool may_compact) {
     if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_unlink)(map, (uint32_t)index);
     HM_FN(tombstone_at)(map, index);
@@ -395,8 +385,6 @@ static HM_MAP_TYPE* HM_FN(create)(size_t max_size, uint32_t default_ttl, uint32_
     map->max_size = max_size;
     map->default_ttl = default_ttl;
     map->lru_skip = (lru_skip > 99) ? 99 : lru_skip;
-    /* Convert percentage to "promote every Nth": 0%→1(every), 50%→2, 90%→10, 99%→100 */
-    map->lru_skip_every = (map->lru_skip > 0) ? (uint32_t)(100 / (100 - map->lru_skip)) : 0;
     map->lru_skip_ctr = 0;
     map->lru_head = HM_LRU_NONE;
     map->lru_tail = HM_LRU_NONE;
@@ -405,6 +393,8 @@ static HM_MAP_TYPE* HM_FN(create)(size_t max_size, uint32_t default_ttl, uint32_
     map->iter_pos = 0;
 #ifdef HM_VALUE_IS_SV
     map->free_value_fn = NULL;
+    map->free_value_now_fn = NULL;
+    map->copy_values = false;
 #endif
     map->expires_at = NULL;
 
@@ -443,7 +433,7 @@ static void HM_FN(destroy)(HM_MAP_TYPE* map) {
         size_t i;
         for (i = 0; i < map->capacity; i++) {
             if (HM_SLOT_IS_LIVE(&map->nodes[i])) {
-                HM_FN(free_node)(map, &map->nodes[i]);
+                HM_FREE_NODE_NOW(map, &map->nodes[i]);
             }
         }
     }
@@ -459,18 +449,7 @@ static void HM_FN(destroy)(HM_MAP_TYPE* map) {
 
 static void HM_FN(clear)(HM_MAP_TYPE* map) {
     if (!map) return;
-#if !defined(HM_KEY_IS_INT) || defined(HM_VALUE_IS_STR) || defined(HM_VALUE_IS_SV)
-    {
-        size_t i;
-        for (i = 0; i < map->capacity; i++) {
-            if (HM_SLOT_IS_LIVE(&map->nodes[i]))
-                HM_FN(free_node)(map, &map->nodes[i]);
-        }
-    }
-#endif
-    HM_FN(init_nodes)(map->nodes, map->capacity);
-    map->size = 0;
-    map->tombstones = 0;
+    /* A value's DESTROY may look at the map, so it stays consistent at every step. */
     map->iter_pos = 0;
     if (map->lru_prev) {
         memset(map->lru_prev, 0xFF, map->capacity * sizeof(uint32_t));
@@ -480,11 +459,28 @@ static void HM_FN(clear)(HM_MAP_TYPE* map) {
     }
     if (map->expires_at)
         memset(map->expires_at, 0, map->capacity * sizeof(uint32_t));
+    {
+        size_t i;
+        for (i = 0; i < map->capacity; i++) {
+            if (HM_SLOT_IS_LIVE(&map->nodes[i])) {
+                HM_NODE_TYPE dead = map->nodes[i];
+                HM_FN(init_nodes)(&map->nodes[i], 1);
+                if (map->size) map->size--;
+                HM_FREE_NODE_NOW(map, &dead);
+            } else if (HM_SLOT_IS_TOMBSTONE(&map->nodes[i])) {
+                HM_FN(init_nodes)(&map->nodes[i], 1);
+                if (map->tombstones) map->tombstones--;
+            }
+        }
+    }
+    map->size = 0;
+    map->tombstones = 0;
 }
 
-/* ---- purge: force-expire all TTL'd entries ---- */
+/* ---- reap_expired / purge ---- */
 
-static void HM_FN(purge)(HM_MAP_TYPE* map) {
+/* Must not compact: the capacity check that calls it decides between compacting and growing. */
+static void HM_FN(reap_expired)(HM_MAP_TYPE* map) {
     if (!map || !map->expires_at) return;
     uint32_t now = (uint32_t)time(NULL);
     size_t i;
@@ -496,6 +492,11 @@ static void HM_FN(purge)(HM_MAP_TYPE* map) {
             HM_FN(tombstone_at)(map, i);
         }
     }
+}
+
+static void HM_FN(purge)(HM_MAP_TYPE* map) {
+    if (!map || !map->expires_at) return;
+    HM_FN(reap_expired)(map);
     if (map->tombstones > 0) HM_FN(compact)(map);
 }
 
@@ -506,10 +507,11 @@ static HM_MAP_TYPE* HM_FN(clone)(const HM_MAP_TYPE* map) {
 
     HM_MAP_TYPE* c = (HM_MAP_TYPE*)malloc(sizeof(HM_MAP_TYPE));
     if (!c) return NULL;
-    *c = *map;  /* shallow copy */
+    *c = *map;
     c->iter_pos = 0;
 #ifdef HM_VALUE_IS_SV
     c->free_value_fn = NULL;  /* prevent double-dec on OOM cleanup */
+    c->free_value_now_fn = NULL;
 #endif
 
     c->nodes = (HM_NODE_TYPE*)malloc(map->capacity * sizeof(HM_NODE_TYPE));
@@ -519,15 +521,25 @@ static HM_MAP_TYPE* HM_FN(clone)(const HM_MAP_TYPE* map) {
     c->lru_next = NULL;
     c->expires_at = NULL;
 
-    /* Init all nodes empty first, then deep-copy live entries one by one.
-       This ensures OOM during copy leaves a valid (partial) map for destroy. */
+    /* Start empty so that an OOM part-way leaves a valid map for destroy(). */
     HM_FN(init_nodes)(c->nodes, map->capacity);
     c->size = 0;
     c->tombstones = 0;
     {
         size_t i;
         for (i = 0; i < map->capacity; i++) {
-            if (!HM_SLOT_IS_LIVE(&map->nodes[i])) continue;
+            if (!HM_SLOT_IS_LIVE(&map->nodes[i])) {
+                /* Tombstones hold probe chains together, so they must survive the copy. */
+                if (HM_SLOT_IS_TOMBSTONE(&map->nodes[i])) {
+#ifdef HM_KEY_IS_INT
+                    c->nodes[i].key = HM_TOMBSTONE_KEY;
+#else
+                    c->nodes[i].key = HM_STR_TOMBSTONE;
+#endif
+                    c->tombstones++;
+                }
+                continue;
+            }
 #ifdef HM_KEY_IS_INT
             c->nodes[i].key = map->nodes[i].key;
 #else
@@ -550,7 +562,7 @@ static HM_MAP_TYPE* HM_FN(clone)(const HM_MAP_TYPE* map) {
             c->nodes[i].val_len = map->nodes[i].val_len;
 #elif defined(HM_VALUE_IS_SV)
             c->nodes[i].value = map->nodes[i].value;
-            /* SV* refcount increment done by caller (needs pTHX) */
+            /* the caller copies SV* values (needs pTHX) */
 #else
             c->nodes[i].value = map->nodes[i].value;
 #endif
@@ -558,7 +570,6 @@ static HM_MAP_TYPE* HM_FN(clone)(const HM_MAP_TYPE* map) {
         }
     }
 
-    /* Deep copy LRU arrays (already NULLed above) */
     if (map->lru_prev) {
         c->lru_prev = (uint32_t*)malloc(map->capacity * sizeof(uint32_t));
         c->lru_next = (uint32_t*)malloc(map->capacity * sizeof(uint32_t));
@@ -567,7 +578,6 @@ static HM_MAP_TYPE* HM_FN(clone)(const HM_MAP_TYPE* map) {
         memcpy(c->lru_next, map->lru_next, map->capacity * sizeof(uint32_t));
     }
 
-    /* Deep copy TTL array (already NULLed above) */
     if (map->expires_at) {
         c->expires_at = (uint32_t*)malloc(map->capacity * sizeof(uint32_t));
         if (!c->expires_at) goto fail;
@@ -576,12 +586,11 @@ static HM_MAP_TYPE* HM_FN(clone)(const HM_MAP_TYPE* map) {
 
 #ifdef HM_VALUE_IS_SV
     c->free_value_fn = map->free_value_fn;  /* restore after successful copy */
+    c->free_value_now_fn = map->free_value_now_fn;
 #endif
     return c;
 
 fail:
-    /* Partial cleanup — nodes may have partially-copied keys/values.
-       Use destroy which handles all cases correctly. */
     HM_FN(destroy)(c);
     return NULL;
 }
@@ -589,13 +598,13 @@ fail:
 /* ---- Rehash: resize to specific capacity ---- */
 
 static bool HM_FN(rehash_to)(HM_MAP_TYPE* map, size_t new_capacity) {
+    if (new_capacity == 0 || new_capacity > SIZE_MAX / sizeof(HM_NODE_TYPE)) return false;
     size_t old_capacity = map->capacity;
     HM_NODE_TYPE* old_nodes = map->nodes;
     size_t new_mask = new_capacity - 1;
     HM_NODE_TYPE* new_nodes = (HM_NODE_TYPE*)malloc(new_capacity * sizeof(HM_NODE_TYPE));
     if (!new_nodes) return false;
 
-    /* Allocate new LRU arrays if active */
     uint32_t* new_lru_prev = NULL;
     uint32_t* new_lru_next = NULL;
     uint32_t* old_to_new = NULL;
@@ -616,7 +625,6 @@ static bool HM_FN(rehash_to)(HM_MAP_TYPE* map, size_t new_capacity) {
         memset(old_to_new, 0xFF, old_capacity * sizeof(uint32_t));
     }
 
-    /* Allocate new TTL array if active */
     uint32_t* new_expires_at = NULL;
     if (map->expires_at) {
         new_expires_at = (uint32_t*)calloc(new_capacity, sizeof(uint32_t));
@@ -628,7 +636,6 @@ static bool HM_FN(rehash_to)(HM_MAP_TYPE* map, size_t new_capacity) {
 
     HM_FN(init_nodes)(new_nodes, new_capacity);
 
-    /* Copy live entries */
     {
         size_t i;
         for (i = 0; i < old_capacity; i++) {
@@ -650,7 +657,6 @@ static bool HM_FN(rehash_to)(HM_MAP_TYPE* map, size_t new_capacity) {
         }
     }
 
-    /* Rebuild LRU linked list preserving order */
     if (map->lru_prev && map->lru_head != HM_LRU_NONE) {
         uint32_t old_idx = map->lru_head;
         uint32_t prev_new = HM_LRU_NONE;
@@ -698,6 +704,7 @@ static bool HM_FN(rehash_to)(HM_MAP_TYPE* map, size_t new_capacity) {
 }
 
 static bool HM_FN(resize)(HM_MAP_TYPE* map) {
+    if (map->capacity > SIZE_MAX / 2) return false;
     return HM_FN(rehash_to)(map, map->capacity * 2);
 }
 
@@ -706,13 +713,15 @@ static bool HM_FN(compact)(HM_MAP_TYPE* map) {
 }
 
 static bool HM_FN(reserve)(HM_MAP_TYPE* map, size_t count) {
-    if (count > SIZE_MAX / 4) return false;  /* overflow guard */
+    if (count > SIZE_MAX / 4) return false;
     /* Compute capacity for count entries at 75% load factor */
     size_t needed = (count * 4 + 2) / 3;
     if (needed <= map->capacity) return true;
-    /* Round up to power of 2 */
     size_t cap = map->capacity;
-    while (cap < needed) cap <<= 1;
+    while (cap < needed) {
+        if (cap > SIZE_MAX / 2) return false;
+        cap <<= 1;
+    }
     return HM_FN(rehash_to)(map, cap);
 }
 
@@ -744,12 +753,12 @@ static inline size_t HM_FN(find_node)(const HM_MAP_TYPE* map,
     const HM_NODE_TYPE* nodes = map->nodes;
 
     do {
-        if (nodes[index].key == NULL) return index; /* empty */
+        if (nodes[index].key == NULL) return index;
         if (nodes[index].key != HM_STR_TOMBSTONE &&
             nodes[index].key_hash == key_hash &&
             HM_UNPACK_LEN(nodes[index].key_len) == key_len &&
             memcmp(nodes[index].key, key, key_len) == 0) {
-            return index; /* found */
+            return index;
         }
         index = (index + 1) & map->mask;
     } while (HM_LIKELY(index != original_index));
@@ -825,6 +834,10 @@ static inline size_t HM_FN(find_slot_for_insert)(HM_MAP_TYPE* map,
 
 #ifdef HM_KEY_IS_INT
 
+static inline bool HM_FN(key_is_reserved)(HM_INT_TYPE key) {
+    return HM_IS_RESERVED_KEY(key);
+}
+
 static bool HM_FN(put)(HM_MAP_TYPE* map, HM_INT_TYPE key,
 #ifdef HM_VALUE_IS_STR
                         const char* value, uint32_t val_len, bool val_utf8,
@@ -842,7 +855,6 @@ static bool HM_FN(put)(HM_MAP_TYPE* map, HM_INT_TYPE key,
     size_t index = HM_FN(find_slot_for_insert)(map, key, &found);
     if (index >= map->capacity) return false;
 
-    /* LRU eviction: only on new insert at capacity */
     if (!found && map->max_size > 0 && map->size >= map->max_size) {
         HM_FN(lru_evict_one)(map);
         /* Re-probe after eviction to find optimal insertion slot */
@@ -850,11 +862,9 @@ static bool HM_FN(put)(HM_MAP_TYPE* map, HM_INT_TYPE key,
         if (index >= map->capacity) return false;
     }
 
-    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
     HM_LAZY_ALLOC_EXPIRES(map, entry_ttl, false);
 
 #ifdef HM_VALUE_IS_STR
-    /* Pre-allocate value before modifying map state */
     char* new_val = NULL;
     uint32_t new_val_len = 0;
     if (value && val_len > 0) {
@@ -893,12 +903,10 @@ static bool HM_FN(put)(HM_MAP_TYPE* map, HM_INT_TYPE key,
     map->nodes[index].value = value;
 #endif
 
-    /* LRU maintenance */
     if (HM_UNLIKELY(map->lru_prev)) {
         if (found) HM_FN(lru_promote)(map, (uint32_t)index);
         else       HM_FN(lru_push_front)(map, (uint32_t)index);
     }
-    /* TTL maintenance */
     if (map->expires_at) {
         uint32_t ttl = entry_ttl > 0 ? entry_ttl : map->default_ttl;
         if (ttl > 0)
@@ -930,7 +938,6 @@ static bool HM_FN(put)(HM_MAP_TYPE* map,
     size_t index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
     if (index >= map->capacity) return false;
 
-    /* LRU eviction: only on new insert at capacity */
     if (!found && map->max_size > 0 && map->size >= map->max_size) {
         HM_FN(lru_evict_one)(map);
         /* Re-probe after eviction to find optimal insertion slot */
@@ -938,11 +945,9 @@ static bool HM_FN(put)(HM_MAP_TYPE* map,
         if (index >= map->capacity) return false;
     }
 
-    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
     HM_LAZY_ALLOC_EXPIRES(map, entry_ttl, false);
 
 #ifdef HM_VALUE_IS_STR
-    /* Pre-allocate value before modifying map state */
     char* new_val = NULL;
     uint32_t new_val_len = 0;
     if (value && val_len > 0) {
@@ -993,12 +998,10 @@ static bool HM_FN(put)(HM_MAP_TYPE* map,
     map->nodes[index].value = value;
 #endif
 
-    /* LRU maintenance */
     if (HM_UNLIKELY(map->lru_prev)) {
         if (found) HM_FN(lru_promote)(map, (uint32_t)index);
         else       HM_FN(lru_push_front)(map, (uint32_t)index);
     }
-    /* TTL maintenance */
     if (map->expires_at) {
         uint32_t ttl = entry_ttl > 0 ? entry_ttl : map->default_ttl;
         if (ttl > 0)
@@ -1341,11 +1344,9 @@ static bool HM_FN(swap)(HM_MAP_TYPE* map, HM_INT_TYPE key,
     size_t index = HM_FN(find_node)(map, key);
     if (index >= map->capacity || map->nodes[index].key != key) return false;
     HM_TTL_CHECK_EXPIRED(map, index, true);
-    /* Extract old */
     *out_old = map->nodes[index].value;
     *out_old_len = HM_UNPACK_LEN(map->nodes[index].val_len);
     *out_old_utf8 = HM_UNPACK_UTF8(map->nodes[index].val_len);
-    /* Store new */
     if (new_val && new_len > 0) {
         char* buf = (char*)malloc(new_len + 1);
         if (!buf) return false;
@@ -1529,7 +1530,6 @@ static bool HM_FN(increment)(HM_MAP_TYPE* map, HM_INT_TYPE key, HM_INT_TYPE* out
 
     size_t index = HM_FN(find_node)(map, key);
     if (index < map->capacity && map->nodes[index].key == key) {
-        /* TTL check */
         if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) > map->expires_at[index]) {
             HM_FN(expire_at)(map, index, true);
@@ -1561,7 +1561,6 @@ static bool HM_FN(increment_by)(HM_MAP_TYPE* map, HM_INT_TYPE key, HM_INT_TYPE d
 
     size_t index = HM_FN(find_node)(map, key);
     if (index < map->capacity && map->nodes[index].key == key) {
-        /* TTL check */
         if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) > map->expires_at[index]) {
             HM_FN(expire_at)(map, index, true);
@@ -1600,7 +1599,6 @@ static bool HM_FN(decrement)(HM_MAP_TYPE* map, HM_INT_TYPE key, HM_INT_TYPE* out
 
     size_t index = HM_FN(find_node)(map, key);
     if (index < map->capacity && map->nodes[index].key == key) {
-        /* TTL check */
         if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) > map->expires_at[index]) {
             HM_FN(expire_at)(map, index, true);
@@ -1685,7 +1683,6 @@ static bool HM_FN(increment)(HM_MAP_TYPE* map,
 
     size_t index = HM_FN(find_node)(map, key, key_len, key_hash);
     if (index < map->capacity && HM_SLOT_IS_LIVE(&map->nodes[index])) {
-        /* TTL check */
         if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) > map->expires_at[index]) {
             HM_FN(expire_at)(map, index, true);
@@ -1719,7 +1716,6 @@ static bool HM_FN(increment_by)(HM_MAP_TYPE* map,
 
     size_t index = HM_FN(find_node)(map, key, key_len, key_hash);
     if (index < map->capacity && HM_SLOT_IS_LIVE(&map->nodes[index])) {
-        /* TTL check */
         if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) > map->expires_at[index]) {
             HM_FN(expire_at)(map, index, true);
@@ -1760,7 +1756,6 @@ static bool HM_FN(decrement)(HM_MAP_TYPE* map,
 
     size_t index = HM_FN(find_node)(map, key, key_len, key_hash);
     if (index < map->capacity && HM_SLOT_IS_LIVE(&map->nodes[index])) {
-        /* TTL check */
         if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) > map->expires_at[index]) {
             HM_FN(expire_at)(map, index, true);
@@ -1810,7 +1805,6 @@ static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map, HM_INT_TYPE key,
     if (index >= map->capacity) return map->capacity;
 
     if (found) {
-        /* TTL check */
         if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) > map->expires_at[index]) {
             HM_FN(expire_at)(map, index, true);
@@ -1827,17 +1821,14 @@ static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map, HM_INT_TYPE key,
         return index;
     }
 
-    /* LRU eviction */
     if (map->max_size > 0 && map->size >= map->max_size) {
         HM_FN(lru_evict_one)(map);
         index = HM_FN(find_slot_for_insert)(map, key, &found);
         if (index >= map->capacity) return map->capacity;
     }
 
-    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
     HM_LAZY_ALLOC_EXPIRES(map, entry_ttl, map->capacity);
 
-    /* Pre-allocate value */
     char* new_val = NULL;
     uint32_t new_val_len = 0;
     if (def_val && def_len > 0) {
@@ -1898,7 +1889,6 @@ static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map, HM_INT_TYPE key,
         if (index >= map->capacity) return map->capacity;
     }
 
-    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
     HM_LAZY_ALLOC_EXPIRES(map, entry_ttl, map->capacity);
 
     if (HM_SLOT_IS_TOMBSTONE(&map->nodes[index])) map->tombstones--;
@@ -1945,7 +1935,6 @@ static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map, HM_INT_TYPE key,
         if (index >= map->capacity) return map->capacity;
     }
 
-    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
     HM_LAZY_ALLOC_EXPIRES(map, entry_ttl, map->capacity);
 
     if (HM_SLOT_IS_TOMBSTONE(&map->nodes[index])) map->tombstones--;
@@ -1998,10 +1987,8 @@ static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map,
         if (index >= map->capacity) return map->capacity;
     }
 
-    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
     HM_LAZY_ALLOC_EXPIRES(map, entry_ttl, map->capacity);
 
-    /* Allocate key + value */
     char* new_key = (char*)malloc(key_len + 1);
     if (!new_key) return map->capacity;
     memcpy(new_key, key, key_len);
@@ -2070,7 +2057,6 @@ static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map,
         if (index >= map->capacity) return map->capacity;
     }
 
-    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
     HM_LAZY_ALLOC_EXPIRES(map, entry_ttl, map->capacity);
 
     char* new_key = (char*)malloc(key_len + 1);
@@ -2125,7 +2111,6 @@ static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map,
         if (index >= map->capacity) return map->capacity;
     }
 
-    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
     HM_LAZY_ALLOC_EXPIRES(map, entry_ttl, map->capacity);
 
     char* new_key = (char*)malloc(key_len + 1);

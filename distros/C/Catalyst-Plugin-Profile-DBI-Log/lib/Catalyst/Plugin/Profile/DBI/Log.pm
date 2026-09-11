@@ -1,7 +1,7 @@
 package Catalyst::Plugin::Profile::DBI::Log;
 # ABSTRACT: Capture queries executed during a Catalyst route with DBI::Log
 
-our $VERSION = '0.02'; # VERSION (maintained by DZP::OurPkgVersion)
+our $VERSION = '0.03'; # VERSION (maintained by DZP::OurPkgVersion)
 
 use Moose::Role;
 use namespace::autoclean;
@@ -9,7 +9,7 @@ use namespace::autoclean;
 use CatalystX::InjectComponent;
 use Data::UUID;
 use DateTime;
-use DDP;
+use JSON;
 use Path::Tiny;
 use Time::HiRes;
 
@@ -20,6 +20,7 @@ use DBI::Log timing => 1, trace => 1, format => 'json', file => '/dev/null';
 
 # Ick - find a better way to pass this around than a global var!
 my $dbilog_output_dir;
+my $dbilog_open_failed;
 
 after 'setup_finalize' => sub {
     my $self = shift;
@@ -62,7 +63,13 @@ after 'prepare_body' => sub {
     $path .= substr Data::UUID->new->create_str, 0, 8;
     $path = Path::Tiny::path($dbilog_output_dir, $path);
     open my $dbilog_fh, ">", $path
-        or $c->log->debug("Can't open $path to write - $!");
+        or do {
+            $c->log->warn("Can't open $path to write - $!");
+            $dbilog_open_failed = 1;
+            return;
+        };
+
+    $dbilog_open_failed = 0;
 
     # Write our metadata to the log first
     print {$dbilog_fh} JSON::to_json(
@@ -85,6 +92,9 @@ after 'prepare_body' => sub {
 after 'finalize_body' => sub {
     my $c = shift;
     $c->log->debug("finalize_body fired, stop profiling");
+
+    return if $dbilog_open_failed;
+
     # Make sure the file has been flushed before we do anything
     $DBI::Log::opts{fh}->flush();
 
@@ -98,6 +108,7 @@ after 'finalize_body' => sub {
         unlink $DBI::Log::opts{file};
     }
 
+    close $DBI::Log::opts{fh};
 };
 
 

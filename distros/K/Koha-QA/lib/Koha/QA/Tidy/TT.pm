@@ -4,6 +4,7 @@ use Modern::Perl;
 use base 'Koha::QA::Base';
 use File::ShareDir qw(dist_file dist_dir);
 use File::Slurp    qw(read_file write_file);
+use File::Spec;
 use IPC::Run3;
 
 =head1 NAME
@@ -54,7 +55,7 @@ the output from prettier.
   my @errors = $checker->errors;
 
 Returns array of error hashrefs, each with:
-  - error: the error type (tidy_tt, no_prettierrc)
+  - error: the error type (tidy_tt, no_prettierrc, tidy_tt_empty_output, tidy_tt_prettier_failed)
 
 =head2 fix
 
@@ -84,6 +85,10 @@ sub check {
     my $file       = $self->file;
     my $prettierrc = $self->{prettierrc} // dist_file( 'Koha-QA', 'prettierrc.js' );
 
+    # _prettier_cmd() cd's into the share dir so Node can resolve the plugin from node_modules,
+    # so a relative prettierrc must be resolved against the real cwd before that happens
+    $prettierrc = File::Spec->rel2abs($prettierrc);
+
     # Check if prettier is available
     # FIXME Do we really need this additional prettier call per file?
     unless ( $self->_has_prettier() ) {
@@ -111,7 +116,11 @@ sub check {
     for my $pass ( 1 .. 2 ) {
         my $cmd = $self->_prettier_cmd( [ "--config=$prettierrc", "--write", $temp_file ] );
         my ( $stdout, $stderr );
-        my $success = run3( $cmd, undef, \$stdout, \$stderr );
+        run3( $cmd, undef, \$stdout, \$stderr );
+
+        # run3 always returns true regardless of the child's exit status;
+        # the exit status must be checked via $? instead.
+        my $success = $? == 0;
 
         # FIXME raise exception if stderr is defined?
         warn $stderr if $stderr;
@@ -127,17 +136,30 @@ sub check {
             $content =~ s#\n*( *)</script>\n*#\n$1</script>\n#g;
             $content =~ s#(\[%\s*SWITCH[^\]]*\]\n)\n#$1#g;
 
-            unless ($content) {
-                return (
-                    0,  "Something went wrong, Prettier generated an empty file. The original file was kept", [],
-                    [], []
-                );
+            if ( !length($content) && length( $self->content ) ) {
+                $self->{_errors} = [
+                    {
+                        error   => 'tidy_tt_empty_output',
+                        message => 'Prettier generated an empty file, the original content was kept',
+                    }
+                ];
+                return 0;
             }
             if ( $pass == 1 ) {
                 write_file( $temp_file, $content );
             } else {
                 $tidy_output = $content;
             }
+        } else {
+
+            # prettier failed to process the file
+            $self->{_errors} = [
+                {
+                    error   => 'tidy_tt_prettier_failed',
+                    message => 'prettier failed to process the file, the original content was kept',
+                }
+            ];
+            return 0;
         }
     }
 

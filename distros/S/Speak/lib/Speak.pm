@@ -52,7 +52,7 @@ use base 'Exporter';
 
 use Clipboard;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 {
 
@@ -164,7 +164,7 @@ our @EXPORT_OK = qw(speak say_persona);
 # speak() to redirect config loading (useful in tests).
 our @CONFIG_PATHS = (
   ($ENV{HOME} || q{}) . '/.speak/speak.conf',
-  '/etc/speak/speak.conf', '/etc/speak.conf',
+  '/etc/speak.conf',
   '/opt/clearscm/Speak/etc/speak.conf',
 );
 
@@ -322,8 +322,11 @@ Returns:
   } ## end foreach my $conf_file (@CONFIG_PATHS)
 
   $persona ||= $ENV{SPEAK_PERSONA} || $sys_conf{persona};
-  my $server = $ENV{SPEAK_SERVER} || $sys_conf{server};
-  my $port   = $ENV{SPEAK_PORT}   || $sys_conf{port};
+  my $server     = $ENV{SPEAK_SERVER}     || $sys_conf{server};
+  my $port       = $ENV{SPEAK_PORT}       || $sys_conf{port};
+  my $wan_server = $ENV{SPEAK_WAN_SERVER} || $sys_conf{wan_server};
+  my $wan_port   = $ENV{SPEAK_WAN_PORT}   || $sys_conf{wan_port}   || 443;
+  my $wan_scheme = $ENV{SPEAK_WAN_SCHEME} || $sys_conf{wan_scheme} || (($wan_port eq '443') ? 'https' : 'http');
 
   # Sanitize escape sequences
   # 1. Remove bells (\a)
@@ -366,13 +369,32 @@ Returns:
       $req_data->{ref_audio} = $persona if $persona;
       my $req_json = $json->encode ($req_data);
 
-      my $url = "http://$server:$port/clone_voice_audio";
+      my $scheme = ($port eq '443' || $server =~ /^https/i) ? 'https' : 'http';
+      my $clean_server = $server;
+      $clean_server =~ s{^https?://}{};
+      my $url = ($port eq '443' || $port eq '80')
+        ? "$scheme://$clean_server/clone_voice_audio"
+        : "$scheme://$clean_server:$port/clone_voice_audio";
+
       my $req = HTTP::Request->new ('POST', $url);
       $req->header  ('Content-Type' => 'application/json');
       $req->header  ('Accept'       => 'audio/wav');
       $req->content ($req_json);
 
       my $res = $ua->request ($req);
+      if (!$res->is_success && $wan_server && $clean_server ne $wan_server) {
+        my $clean_wan_server = $wan_server;
+        $clean_wan_server =~ s{^https?://}{};
+        my $fallback_url = ($wan_port eq '443' || $wan_port eq '80')
+          ? "$wan_scheme://$clean_wan_server/clone_voice_audio"
+          : "$wan_scheme://$clean_wan_server:$wan_port/clone_voice_audio";
+
+        my $fb_req = HTTP::Request->new ('POST', $fallback_url);
+        $fb_req->header  ('Content-Type' => 'application/json');
+        $fb_req->header  ('Accept'       => 'audio/wav');
+        $fb_req->content ($req_json);
+        $res = $ua->request ($fb_req);
+      }
       if ($res->is_success) {
         my ($fh, $filename) = tempfile (SUFFIX => '.wav', UNLINK => 0);
         binmode $fh;
@@ -633,8 +655,18 @@ SPEAK_LANG: Language code (e.g. 'en', 'en-gb', 'en-au').
             See etc/speak.conf for available languages.
             Defaults to $ENV{SPEAK_LANG} or 'en'.
 
-SPEAK_PERSONA: Default persona to use for the voice (e.g. 'picard').
+SPEAK_PERSONA: Default persona to use for the voice (e.g. 'Arnold').
                If set, the MCP TTS engine is used by default.
+
+SPEAK_SERVER: MCP TTS primary server hostname or IP address.
+
+SPEAK_PORT: MCP TTS primary server port number.
+
+SPEAK_WAN_SERVER: MCP TTS WAN/external server hostname for failover when off-LAN.
+
+SPEAK_WAN_PORT: MCP TTS WAN/external server port number (defaults to 443).
+
+SPEAK_WAN_SCHEME: MCP TTS WAN/external server scheme ('https' or 'http').
 
 SPEAK_MUTE: If set to a true value, speech output is muted.
             Alternatively, if a file exists at $ENV{HOME}/.speak/shh
@@ -653,8 +685,13 @@ Format:
   # other options...
 
 Supported keys:
-  language - Default language code for speech generation.
-  persona  - Default persona to use for the MCP voice engine.
+  language   - Default language code for speech generation.
+  persona    - Default persona to use for the MCP voice engine.
+  server     - MCP server hostname or IP address.
+  port       - MCP server port number.
+  wan_server - Public WAN server hostname for failover when off-LAN.
+  wan_port   - Public WAN server port number.
+  wan_scheme - Public WAN URL scheme (http/https).
 
 =head1 DEPENDENCIES
 

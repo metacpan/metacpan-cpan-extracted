@@ -12,9 +12,8 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.016',
     PL_FILES         => {},
     EXE_FILES        => [
-        'bin/amberdb_backup.pl',
-        'bin/convert_dbstore.pl',
-        'bin/setup_ramdisk.pl',
+        'bin/amberdb_setup.pl',
+        'bin/amberdb_daemon.pl',
     ],
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
@@ -52,27 +51,19 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         no_index    => {
             directory => [
+                'lib/AmberDB/Base',
                 'lib/AmberDB/Locale/Lang',
-                'lib/AmberDB/Index',
             ],
             file => [
                 'lib/AmberDB/Base.pm',
-                'lib/AmberDB/Cache.pm',
-                'lib/AmberDB/Transact.pm',
-                'lib/AmberDB/Index.pm',
                 'lib/AmberDB/Locale/Currency.pm',
             ],
             namespace => [
+                'AmberDB::Base',
                 'AmberDB::Locale::Lang',
-                'AmberDB::Index',
             ],
             package => [
                 'AmberDB::Base',
-                'AmberDB::Cache',
-                'AmberDB::Transact',
-                'AmberDB::Index',
-                'AmberDB::Index::Facet',
-                'AmberDB::Index::Junk',
                 'AmberDB::Locale::Currency',
             ],
         },

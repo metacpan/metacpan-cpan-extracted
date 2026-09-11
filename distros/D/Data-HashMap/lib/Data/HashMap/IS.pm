@@ -2,7 +2,7 @@ package Data::HashMap::IS;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub import {
     $^H{"Data::HashMap::IS/hm_is_put"}    = 1;
@@ -35,3 +35,23 @@ sub import {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Data::HashMap::IS - hash map from int64 keys to string values
+
+=head1 SYNOPSIS
+
+    use Data::HashMap::IS;
+    my $map = Data::HashMap::IS->new;
+    hm_is_put $map, 1, "v";
+    my $v = hm_is_get $map, 1;
+
+=head1 DESCRIPTION
+
+One of the fourteen variants of L<Data::HashMap>, which documents the API, the
+C<hm_is_*> keywords and every caveat.
+
+=cut

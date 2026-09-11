@@ -4,6 +4,7 @@ use utf8;
 
 use Capture::Tiny qw(capture);
 use Cwd qw(getcwd);
+use Developer::Dashboard::PerlEnv;
 use File::Path ();
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -13,9 +14,14 @@ my $UNDER_COVER = exists $INC{'Devel/Cover.pm'};
 my $repo = getcwd();
 
 local $ENV{HOME} = tempdir(CLEANUP => 1);
-local $ENV{PERL5LIB} = join ':',
+# DD-800: this used to prepend a literal '/home/mv/perl5/lib/perl5'. Do not put
+# a machine-specific path back - see the fuller note in t/05-cli-smoke.t, which
+# carried the identical two lines. In short: localising HOME above destroys
+# $HOME-relative resolution, the literal was added to compensate, and it MASKED
+# a caller who had not set PERL5LIB rather than fixing anything. This file
+# passes with the entry absent (25/25 in a container with no /home/mv).
+local $ENV{PERL5LIB} = join Developer::Dashboard::PerlEnv::path_separator(),
     grep { defined && $_ ne '' }
-    '/home/mv/perl5/lib/perl5',
     ( $ENV{PERL5LIB} || () );
 local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
 local $ENV{DEVELOPER_DASHBOARD_CONFIGS};

@@ -25,7 +25,7 @@ OpenStack::MetaAPI::API::Specs::Compute::v2_0
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 
@@ -47,6 +47,7 @@ get:
     perl_api:
       method: server_from_uid
       type: getfromid
+      uid: '{server_id}'
     request:
       path:
         server_id:
@@ -63,6 +64,20 @@ get:
         hostname: {}
         image: {}
         ip: {}
+  /flavors:
+    perl_api:
+      method: flavors
+      type: listable
+      listable_key: 'flavors'
+    request:
+      query:
+        sort_key: {}
+        sort_dir: {}
+        limit: {}
+        marker: {}
+        minDisk: {}
+        minRam: {}
+        isPublic: {}
   /os-keypairs:
     perl_api:
       method: keypairs
@@ -78,6 +93,7 @@ delete:
     perl_api:
       method: delete_server_from_uid
       type: getfromid
+      uid: '{server_id}'
     request:
       path:
         server_id:

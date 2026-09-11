@@ -10,7 +10,7 @@ use File::Basename ();
 use Getopt::Long ();
 use Punk ();
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 # The whole punk command line. bin/punk is two lines - `exit
 # Punk::Command->main(@ARGV)` - and everything else is here: a registry of
@@ -1273,6 +1273,21 @@ sub _abi_report {
         { name   => 'File::Raw::XML (frx_abi)',
           detail => $p ? "v" . ($v // '?') . ", resolved" : 'not resolved',
           state  => $p ? 'ok' : 'NOT RESOLVED' };
+    };
+
+    # Frozen holds the i18n catalogues. Hard, unlike the markdown pair
+    # below: an app with the I18n plugin cannot boot without it, so a
+    # missing table is a fault rather than a note.
+    push @out, do {
+        my $ok   = eval { Punk::_fz_available() };
+        my $want = eval { Punk::_fz_abi_version() };
+        my $have = eval { require Frozen; Frozen::_abi_version() };
+        { name   => 'Frozen (fz_abi)',
+          detail => $ok ? "v$have, resolved"
+                  : defined $have ? "v$have present, v$want wanted"
+                  : 'not available',
+          state  => $ok ? 'ok'
+                  : defined $have ? 'TOO OLD (upgrade Frozen)' : 'MISSING' };
     };
 
     # The markdown mount's two. Both are optional in the sense that an app

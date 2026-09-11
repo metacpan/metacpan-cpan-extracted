@@ -27,6 +27,7 @@ our @EXPORT_OK = qw(
   txt_plain
 
   last_http_request
+  last_http_content
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -54,9 +55,17 @@ sub txt_plain {
 }
 
 our $LAST_REQUEST;
+our $LAST_CONTENT;
 
 sub last_http_request {
     return $LAST_REQUEST;
+}
+
+# The body we sent, so a test can assert on what was asked for and not only on
+# where it was asked.  For anything the API encodes on the caller's behalf, the
+# encoding *is* the behaviour under test.
+sub last_http_content {
+    return $LAST_CONTENT;
 }
 
 sub mock_lwp_useragent {
@@ -76,6 +85,7 @@ sub mock_lwp_useragent {
             my $uri    = $req->uri;
 
             $LAST_REQUEST = $method . " " . $uri;
+            $LAST_CONTENT = $req->content;
 
             note "LWP: ", $LAST_REQUEST;
 

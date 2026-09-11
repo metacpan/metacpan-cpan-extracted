@@ -2,7 +2,10 @@
 use 5.010;
 use strict;
 use warnings;
+use FindBin ();
+use lib "$FindBin::Bin/lib";
 use Test::More;
+use Punk::Test;
 use File::Temp ();
 use File::Spec ();
 use Time::HiRes ();
@@ -195,6 +198,143 @@ sub render {
     note sprintf 'one-lookup render: %.1fus each over %d renders',
         $el / $n * 1e6, $n;
     ok($el >= 0, 'measured');
+}
+
+# ---- the locale hash is iterable ---------------------------------------------
+#
+# `keys %$locale` used to DIE: there was no FIRSTKEY, so tie magic had
+# nothing to call, and a template that wanted to list a section - every menu
+# label, every error message - could not.
+#
+# The hash only exists on the render data, so a before_render hook is how a
+# test gets hold of it. That is also how an application would.
+{
+    my $seen;
+    my $pkg = 'TIter';
+    eval qq{
+        package $pkg;
+        use Punk;
+        plugin 'I18n' => { dir => '$cat', default => 'en' };
+        views Stencil => { template_dir => '$dir' };
+        hook before_render => sub {
+            \$main::CAPTURED = \$_[2]->{locale};
+            return;
+        };
+        get '/p' => sub { \$_[0]->render('plain') };
+        1;
+    } or die $@;
+
+    my $t = Punk::Test->new($pkg);
+    $t->request_header('Accept-Language' => 'en');
+    $t->get_ok('/p');
+    my $loc = our $CAPTURED;
+    ok($loc && ref $loc eq 'HASH', 'the render data carries a hashref');
+
+    my @k = sort keys %$loc;
+    ok(scalar @k, 'keys %$locale works at all, which it did not before')
+        or diag 'no keys';
+    is_deeply(\@k, [sort qw(welcome plain amp greeting items deep)],
+        'and lists the catalogue top level');
+
+    cmp_ok(scalar(%$loc), '==', 6,
+        'scalar %$locale is the number of keys at this level');
+
+    # each, which needs FIRSTKEY and NEXTKEY to agree with one another
+    my %via_each;
+    while (my ($k, $v) = each %$loc) { $via_each{$k} = defined $v ? 1 : 0 }
+    is_deeply([sort keys %via_each], \@k, 'each walks the same keys');
+
+    # descending gives a hash that iterates its own level
+    is_deeply([sort keys %{ $loc->{items} }], [qw(one other)],
+        'a nested level iterates its own keys, not the root\'s');
+
+    ok(!eval { %$loc = (); 1 }, 'CLEAR croaks rather than dying obscurely');
+    like($@, qr/read-only/, 'and says why');
+    ok(!eval { $loc->{x} = 1; 1 }, 'STORE still croaks');
+    like($@, qr/read-only/, 'with the reason kept from 0.48');
+}
+
+# ---- a level that exists only in the default iterates as empty ---------------
+#
+# fr has neither `items` nor `deep`; en has both. Descending into one from a
+# French request finds a level - so the template can go on - but there is
+# nothing of it in THIS locale to list.
+#
+# Iterating the union with the default was the alternative. It is more useful
+# for a partly translated section and it is more expensive and order-unstable,
+# and it would disagree with the missing-key rule everywhere else: a key that
+# is not in this locale reads as itself, so a section that is not in this
+# locale lists as nothing. Fetching a known key still falls back, which is
+# what keeps a half-translated page readable.
+{
+    my $pkg = 'TIterFr';
+    eval qq{
+        package $pkg;
+        use Punk;
+        plugin 'I18n' => { dir => '$cat', default => 'en' };
+        views Stencil => { template_dir => '$dir' };
+        hook before_render => sub { \$main::CAPFR = \$_[2]->{locale}; return };
+        get '/p' => sub { \$_[0]->render('plain') };
+        1;
+    } or die $@;
+
+    my $t = Punk::Test->new($pkg);
+    $t->request_header('Accept-Language' => 'fr');
+    $t->get_ok('/p');
+    my $loc = our $CAPFR;
+
+    is_deeply([keys %{ $loc->{items} }], [],
+        'a level present only in the default lists nothing in this locale');
+    is($loc->{items}{one}, '1 item',
+        'but a known key under it still falls back to the default');
+}
+
+# ---- iteration order is the same in every process -----------------------------
+#
+# Frozen sorts hash keys when it builds the block, so the order is a
+# property of the block rather than of this interpreter's hash seed. A Perl
+# hash gives no such promise, and somebody will rely on this one either way.
+{
+    my $probe = File::Spec->catfile($cat, 'order.pl');
+    open my $p, '>', $probe or die $!;
+    print $p <<"PROBE";
+use strict; use warnings;
+eval {
+    package POrder;
+    use Punk;
+    plugin 'I18n' => { dir => '$cat', default => 'en' };
+    views Stencil => { template_dir => '$dir' };
+    hook before_render => sub { \$main::C = \$_[2]->{locale}; return };
+    get '/p' => sub { \$_[0]->render('plain') };
+    1;
+} or die \$@;
+my \$env = { REQUEST_METHOD => 'GET', PATH_INFO => '/p', QUERY_STRING => '',
+             'psgi.input' => undef, 'psgi.errors' => \\*STDERR };
+POrder->to_app->(\$env);
+print join(',', keys %{ \$main::C }), "\\n";
+PROBE
+    close $p;
+
+    # the child must load the Punk the PARENT did - under prove the site
+    # directories come first in \@INC and a child would silently load an
+    # installed copy instead
+    my @first;
+    if (my $loaded = $INC{'Punk.pm'}) {
+        (my $libdir = $loaded) =~ s{[\\/]Punk\.pm\z}{};
+        push @first, $libdir;
+        (my $arch = $libdir) =~ s{([\\/])lib\z}{${1}arch};
+        push @first, $arch if $arch ne $libdir && -d $arch;
+    }
+    my $inc = join ' ', map { "-I$_" } @first, grep { !ref } @INC;
+    my %orders;
+    for (1 .. 6) {
+        my $out = `$^X $inc $probe 2>/dev/null`;
+        chomp $out;
+        $orders{$out}++ if length $out;
+    }
+    is(scalar keys %orders, 1,
+        'every process iterates the catalogue in the same order')
+        or diag 'orders seen: ', join(' | ', sort keys %orders);
 }
 
 done_testing;

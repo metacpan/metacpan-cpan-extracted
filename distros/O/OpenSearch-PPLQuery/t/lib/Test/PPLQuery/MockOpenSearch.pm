@@ -7,8 +7,8 @@ use HTTP::Response ();
 use Cpanel::JSON::XS ();
 
 sub start {
-    my $daemon = HTTP::Daemon->new(LocalAddr => '127.0.0.1', LocalPort => 9200, ReuseAddr => 1)
-        or die "Cannot start mock OpenSearch on 127.0.0.1:9200: $!\n";
+    my $daemon = HTTP::Daemon->new(LocalAddr => '127.0.0.1', LocalPort => 0, ReuseAddr => 1)
+        or die "Cannot start mock OpenSearch: $!\n";
     pipe my $reader, my $writer or die "Cannot create mock OpenSearch readiness pipe: $!\n";
     my $pid = fork;
     die "Cannot fork mock OpenSearch: $!\n" if !defined $pid;
@@ -31,8 +31,10 @@ sub start {
     my $ready = <$reader>;
     close $reader;
     die "Mock OpenSearch failed to start\n" if !defined($ready) || $ready ne "ready\n";
-    return bless {pid => $pid}, __PACKAGE__;
+    return bless {pid => $pid, url => 'http://127.0.0.1:' . $daemon->sockport}, __PACKAGE__;
 }
+
+sub url { return $_[0]{url}; }
 
 sub stop {
     my ($self) = @_;

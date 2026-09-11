@@ -1,5 +1,35 @@
 Revision history for Punk
 
+0.49    2026-09-11
+        - ADDS: i18n catalogues are held in a Frozen block instead of an
+          arena built here. The block holds a tree, so a level and a leaf
+          are different nodes.
+        - FIXES: a literal key containing a dot and the nested form it
+          looks like were the same key, and which one answered was decided
+          by the hash order of the process that loaded it. Two workers in
+          one pool could serve different translations for the same key. A
+          dotted key is now a boot error.
+        - FIXES: a catalogue value that is not text no longer renders as
+          the key. null, an array and a boolean are boot errors naming the
+          path; numbers are stored as their digits and read back unchanged.
+        - FIXES: UTF-8 is preserved through interpolation. A substituted
+          value was appended as raw bytes into a string that was then
+          flagged UTF-8, so a non-ASCII entry plus a downgraded
+          substitution produced malformed output. Reachable from a form
+          field.
+        - FIXES: a catalogue from any producer keeps its encoding. Only the
+          JSON path was correct before, and only because that decoder
+          happens to decode to UTF-8.
+        - FIXES: the documentation described a language-switcher cookie
+          that was never implemented. Punk reads punk.lang and has never
+          written it; the POD now says so and shows the handler that does.
+        - ADDS: the locale hash can be iterated. keys, each and scalar used
+          to die. The order is the same in every process.
+        - BREAKING: _build takes catalogues that have been through
+          Frozen's builder; a catalogue key may not contain a dot; a
+          catalogue value must be text.
+        - Requires Frozen 0.06.
+
 0.48    2026-09-09
         - ADDS: websocket routes work over HTTP/2 through Extended
           CONNECT (RFC 8441). There is no 101, no Upgrade header and no

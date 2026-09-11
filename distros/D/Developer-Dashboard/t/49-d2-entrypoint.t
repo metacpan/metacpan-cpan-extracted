@@ -9,6 +9,8 @@ use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 use File::Spec;
 use Capture::Tiny qw(capture);
+use File::Path qw(make_path);
+use File::Temp qw(tempdir);
 
 my $repo_root = abs_path( File::Spec->catdir( dirname(__FILE__), '..' ) );
 my $lib       = File::Spec->catdir( $repo_root, 'lib' );
@@ -64,6 +66,39 @@ like(
     qr/EXE_FILES\s*=>\s*\[[^\]]*'bin\/d2'/s,
     'Makefile.PL installs bin/d2 as an executable so d2 is a real command after install',
 );
+
+# DD-810: the main gate is inherited through the re-exec, and runs exactly
+# once for it - d2 must not gate once itself and once again in dashboard.
+{
+    my $gate_home  = abs_path( tempdir( CLEANUP => 1 ) );
+    my $hooks_dir  = File::Spec->catdir( $gate_home, '.developer-dashboard', 'hooks' );
+    my $marker     = File::Spec->catfile( $gate_home, 'hook-marker' );
+    make_path($hooks_dir);
+    my $hook = File::Spec->catfile( $hooks_dir, '10-mark.sh' );
+    open my $hook_fh, '>', $hook or die "Unable to write $hook: $!";
+    print {$hook_fh} "#!/bin/sh\nprintf 'HOOK-RAN %s\\n' \"\$*\" >> '$marker'\n";
+    close $hook_fh or die "Unable to close $hook: $!";
+    chmod 0755, $hook or die "Unable to chmod $hook: $!";
+
+    my ( $gated_out, $gated_err, $gated_exit ) = capture {
+        local $ENV{HOME} = $gate_home;
+        system( $^X, '-I', $lib, $d2, 'version' );
+    };
+    is( $gated_exit >> 8, 0,       'd2 version exits cleanly with a main-gate hook installed' );
+    is( $gated_out,       $db_out, 'd2 version prints the same version through the main gate' );
+    is( $gated_err,       '',      'd2 version through the main gate writes nothing to stderr' );
+
+    my @marker_lines = ();
+    if ( open my $marker_fh, '<', $marker ) {
+        @marker_lines = <$marker_fh>;
+        close $marker_fh;
+        chomp @marker_lines;
+    }
+    # DD-835 (reverses DD-832): the hook's argv is the full command line as
+    # typed - "version" is prepended, not stripped.
+    is_deeply( \@marker_lines, ['HOOK-RAN version'],
+        'd2 inherits the main gate through its re-exec exactly once, not twice' );
+}
 
 done_testing;
 

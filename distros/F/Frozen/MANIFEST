@@ -48,5 +48,6 @@ xs/read.xs
 xs/tie.xs
 xs/xop.xs
 xt/boilerplate.t
+xt/implicit-sys.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

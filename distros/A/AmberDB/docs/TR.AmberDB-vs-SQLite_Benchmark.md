@@ -4,7 +4,7 @@ title: 600,000 Gerçek IMDb Kaydıyla Büyük Veritabanı Benchmarkı - AmberDB 
 description: 600,000 gerçek IMDb filmi üzerinde AmberDB ve SQLite 3 karşılaştırmalı performans, derin sayfalama (read_all), ters dizin arama, çoklu alan filtreleme ve nokta okuma benchmark raporu.
 ---
 
-[🏠 Ana Sayfa](index_tr.html) &nbsp;•&nbsp; [📖 Hakkında](TR.AmberDB-Hakkinda.html) &nbsp;•&nbsp; [📘 Tutorial](TR.AmberDB_Veritabani_Sistemi.html) &nbsp;•&nbsp; [📊 Benchmark Raporu](TR.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [🌐 Locale](TR.AmberDB-Locale_Kullanim_Rehberi.html) &nbsp;•&nbsp; [🇬🇧 English](EN.AmberDB-vs-SQLite_Benchmark.html)
+[Ana Sayfa](index_tr.html) &nbsp;•&nbsp; [Hakkında](TR.AmberDB-Hakkinda.html) &nbsp;•&nbsp; [Hızlı Başlangıç](index_tr.html#hızlı-başlangıç) &nbsp;•&nbsp; [Tutorial](TR.AmberDB_Veritabani_Sistemi.html) &nbsp;•&nbsp; [Benchmark](TR.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [Locale](TR.AmberDB-Locale_Kullanim_Rehberi.html) &nbsp;•&nbsp; [SQL Rehberi](TR.AmberDB-vs-SQL_Kullanim_Rehberi.html) &nbsp;•&nbsp; [English](EN.AmberDB-vs-SQLite_Benchmark.html)
 
 ---
 
@@ -57,16 +57,16 @@ Aşağıdaki ölçümler, Linux Ext4 dosya sistemi üzerinde önceden diske yaz�
 
 | Test Senaryosu / Metrik | SQLite 3 (FTS5 İndeksli) | AmberDB v5.24.0 (İndeksli) | Kazanan / Fark |
 | :--- | :---: | :---: | :---: |
-| **Toplam Kayıt Sayısı** | 600,000 film | 600,000 film | — |
-| **Noktasal Okuma (Point Read Latency)** | 9.0 µs | **1.7 µs** | 🏆 **AmberDB (5.3 Kat Daha Hızlı - 588K ops/s)** |
-| **Sayfalamalı Derin Tarama (`offset=430K`, limit=20)** | 32.59 ms | **3.26 ms** | 🏆 **AmberDB (10 Kat Daha Hızlı!)** |
-| **Çoklu Alan Filtreleme (Yönetmen + Tür + Dil)** | 91.84 ms | **8.96 ms** | 🏆 **AmberDB (10.2 Kat Daha Hızlı!)** |
-| **Tek Blok Çekme (Yönetmenin Tüm Filmleri)** | 24.05 ms | **21.99 ms** | 🏆 **AmberDB (Daha Hızlı)** |
-| **Tarih Aralığı Filtresi (1990–2016)** | **0.22 ms** | 2.79 ms | İkisi de son derece hızlı (sub-3ms) |
+| **Toplam Kayıt Sayısı** | 600,000 film | 600,000 film | - |
+| **Noktasal Okuma (Point Read Latency)** | 9.0 µs | **1.7 µs** | **AmberDB (5.3 Kat Daha Hızlı - 588K ops/s)** |
+| **Sayfalamalı Derin Tarama (`offset=430K`, limit=20)** | 32.59 ms | **3.26 ms** | **AmberDB (10 Kat Daha Hızlı!)** |
+| **Çoklu Alan Filtreleme (Yönetmen + Tür + Dil)** | 91.84 ms | **8.96 ms** | **AmberDB (10.2 Kat Daha Hızlı!)** |
+| **Tek Blok Çekme (Yönetmenin Tüm Filmleri)** | 24.05 ms | **21.99 ms** | **AmberDB (Daha Hızlı)** |
+| **Tarih Aralığı Filtresi (1990-2016)** | **0.22 ms** | 2.79 ms | İkisi de son derece hızlı (sub-3ms) |
 | **Çapraz Blok Arama (`Canadian Moore`)** | **0.32 ms** | 1.00 ms | İkisi de milisaniye seviyesinde |
-| **Omnibox Arama (`beyaz 2012 ölü`)** | **0.23 ms** | 0.46 ms | ⚡ İkisi de yarım milisaniyenin altında |
-| **Omnibox Arama (`venky 2003 nenu`)** | **0.22 ms** | 0.44 ms | ⚡ İkisi de yarım milisaniyenin altında |
-| **Omnibox Arama (`natale 1996 green`)** | **0.38 ms** | 0.99 ms | ⚡ İkisi de 1 milisaniyenin altında |
+| **Omnibox Arama (`beyaz 2012 ölü`)** | **0.23 ms** | 0.46 ms | İkisi de yarım milisaniyenin altında |
+| **Omnibox Arama (`venky 2003 nenu`)** | **0.22 ms** | 0.44 ms | İkisi de yarım milisaniyenin altında |
+| **Omnibox Arama (`natale 1996 green`)** | **0.38 ms** | 0.99 ms | İkisi de 1 milisaniyenin altında |
 | **Disk Ayak İzi (Tüm İndeksler Dahil)** | **488.91 MB** | 522.95 MB | Neredeyse eşit (AmberDB sadece %7 fark) |
 | **Toplu Veri Yükleme (Bulk Ingest)** | **12.55 sn** (47,814 k/sn) | 433.64 sn (1,384 k/sn) | SQLite (Derlenmiş C) |
 
@@ -102,7 +102,13 @@ Tüm testler ve sürücüler `benchmark/` dizininde açık kaynak olarak yer alm
 git clone https://github.com/marufcetin/amberdb.git
 cd amberdb
 
-# 2. 600K benchmark testini izole süreçlerde başlatın
+# 2. Resmi IMDb dökümlerini indirip 600K+ master veri kümesini oluşturun (~633K gerçek film)
+perl benchmark/download_real_imdb.pl
+
+# (Alternatif: İndirmeden anında çevrimdışı test verisi üretmek isterseniz)
+# perl benchmark/data/prepare_data.pl --generate --total=100000
+
+# 3. 600K benchmark testini izole süreçlerde başlatın
 perl -Ilib benchmark/run_benchmark.pl total=600000 motors=amberdb,sqlite -with-index -random action=read
 ```
 

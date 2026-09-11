@@ -9,6 +9,7 @@ use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use Socket qw(AF_UNIX SOCK_STREAM PF_UNSPEC);
 use Test::More;
+use Time::HiRes qw(time);
 
 use lib 'lib';
 
@@ -348,23 +349,27 @@ SKIP: {
     }
     # Poll on the exec'd argv[0], which only the post-exec process can show.
     #
-    # The bound is 30 seconds, and it is measured rather than chosen (DD-482).
-    # The previous bound was 500 polls -- 5 seconds -- and the coverage gate
-    # failed on it while the plain suite passed. Instrumenting the loop showed
-    # the bound expiring with the child still ALIVE in state R, having not yet
-    # reached its exec: a Devel::Cover-instrumented child flushes its coverage
-    # database before exec'ing, which took 678 polls (~6.8s) against 2 polls
-    # plain. So the old bound sat just under what the gated run needs.
+    # BOUND BY WALL-CLOCK, NOT A POLL COUNT (DD-767, closing a gap DD-482
+    # specified but never shipped). DD-482 measured 678 polls (~6.8s) needed
+    # under coverage on a quiet host - a fixed iteration count is not a time
+    # bound, since each poll's own cost varies with instrumentation overhead
+    # and host contention, the two things this bound most needs to survive.
+    # Raising the count to 3000 still failed a third time on a genuinely
+    # loaded host (DD-767); raising it again would be the same fix shipped a
+    # third time, to fail a fourth - the bound is expressed in seconds
+    # instead, with real headroom over the measured need.
     #
-    # Widening a poll loop is normally a smell, and in this repo it has been an
-    # actual defect (a loop once widened past a sleep that was silently zero).
-    # The difference is that the mechanism here was demonstrated before the
-    # number was changed, and the timeout below now reports what it saw so a
-    # future failure is diagnosable instead of a bare undef.
+    # Widening a poll loop is normally a smell, and in this repo it has been
+    # an actual defect (a loop once widened past a sleep that was silently
+    # zero). The difference is that the mechanism here was demonstrated
+    # before the bound was changed, and the timeout below now reports what
+    # it saw so a future failure is diagnosable instead of a bare undef.
+    my $probe_deadline_seconds = $ENV{DD_EMPTY_ENVIRON_PROBE_SECONDS} || 60;
     my $probe_environ;
-    my $probe_polls = 0;
-    for ( 1 .. 3000 ) {
-        $probe_polls = $_;
+    my $probe_polls    = 0;
+    my $probe_deadline = time() + $probe_deadline_seconds;
+    while ( time() < $probe_deadline ) {
+        $probe_polls++;
         my $cmdline = '';
         if ( open my $cf, '<', "/proc/$child/cmdline" ) { local $/; $cmdline = <$cf>; close $cf; }
         if ( defined $cmdline && index( $cmdline, $probe_title ) == 0 ) {
@@ -380,15 +385,25 @@ SKIP: {
     # failures happened: the child never reached its exec, or its environ could
     # not be read. Note that undef never means "the environ was empty" -- a
     # genuinely empty /proc/<pid>/environ reads back as '' with length 0.
+    #
+    # "-e /proc/<pid>" is TRUE FOR A ZOMBIE (DD-767), so the old "alive/gone"
+    # wording could report a dead child as alive. Read the actual cmdline
+    # too: together with state it distinguishes exec-never-ran (cmdline is
+    # still the parent interpreter), exec-ran-with-unexpected-argv0, and
+    # genuinely-died.
     if ( !defined $probe_environ ) {
-        my $alive = -e "/proc/$child" ? 'alive' : 'gone';
         my $state = eval {
             open my $st, '<', "/proc/$child/stat" or die;
             my $line = <$st>;
             close $st;
             ( split / /, $line )[2];
         } // '?';
-        diag("probe gave up after $probe_polls polls; child is $alive in state $state and never exposed its exec'd argv[0]");
+        my $cmd = '';
+        if ( open my $cf, '<', "/proc/$child/cmdline" ) { local $/; $cmd = <$cf> // ''; close $cf; }
+        $cmd =~ s/\0/ /g;
+        $cmd = '(empty)' if $cmd eq '';
+        diag("probe gave up after $probe_polls polls (deadline ${probe_deadline_seconds}s); "
+            . "child state=$state cmdline=<$cmd> expected argv[0]=<$probe_title>");
     }
     # Pin the precondition the coverage below depends on. Without this the
     # marker assertion is satisfied by any environ that lacks the key, so the

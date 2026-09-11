@@ -48,6 +48,7 @@ method is_stale ( $max_age_seconds = 86400 * 7 ) {
 
 method add_entry ( $name, %info ) {
     $entries{ lc $name } = {
+        name        => $name,
         url         => $info{url},
         category    => $info{category},
         description => $info{description},
@@ -109,6 +110,10 @@ method refresh () {
     return scalar keys %entries;
 }
 
+method all_entries () {
+    return values %entries;
+}
+
 1;
 
 __END__
@@ -123,7 +128,7 @@ Luv::CLI::Registry - local cache of the awesome-love2d library list
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -188,6 +193,10 @@ in-memory index.
 
 Fetches the current awesome-love2d README, parses it, and saves the
 result to the cache. Returns the number of entries indexed.
+
+=head2 all_entries()
+
+Returns a list of every entry currently in the index.
 
 =head1 AUTHOR
 

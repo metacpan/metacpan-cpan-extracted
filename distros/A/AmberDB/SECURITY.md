@@ -15,7 +15,7 @@ If you discover a security vulnerability within AmberDB, please do **NOT** open 
 
 Instead, please send an email directly to **Maruf Cetin** at:
 
-📧 `marufcetin@gmail.com`
+`marufcetin@gmail.com`
 
 Please include:
 - A description of the vulnerability.

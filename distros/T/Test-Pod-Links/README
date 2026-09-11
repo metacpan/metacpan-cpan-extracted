@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.003
+    Version 0.004
 
 SYNOPSIS
 
@@ -15,6 +15,13 @@ DESCRIPTION
 
     Tests that all HTTP/S links from Pod documentation are reachable by
     calling the head method of HTTP::Tiny on them.
+
+    Some web servers do not answer HEAD requests but serve the same URL
+    without a complaint on a GET request. If the HEAD request returns a
+    response from the server that indicates an error, the link is retried
+    with the get method before it is reported as broken. A request that did
+    not reach a server at all, e.g. one that ran into a connection timeout,
+    is not retried.
 
     All non HTTP/S links are ignored. You can check them with
     Test::Pod::LinkCheck.
@@ -48,6 +55,13 @@ USAGE
     http://www.example.com/. (But if a link doesn't work it most likely
     shouldn't be in an L tag anyway.)
 
+    It is also the way to deal with a link that is correct, and works in a
+    browser, but cannot be verified by this test. Some sites answer every
+    request that does not come from a browser with an error, e.g. a '403
+    Forbidden', regardless of the user agent that is used. Such a link can
+    never be verified and has to be excluded. Use ignore_match to exclude a
+    whole site instead of a single URL.
+
   ignore_match (optional)
 
     The ignore_match argument is either a regex or an array ref of regexes.
@@ -57,6 +71,10 @@ USAGE
 
     The ua argument is used to supply your own, HTTP::Tiny compatible, user
     agent. Use this if you need a special configured HTTP::Tiny user agent.
+
+    The user agent must implement the head method. A user agent that also
+    implements the get method is additionally used to retry links whose
+    HEAD request failed.
 
  pod_file_ok( FILENAME )
 
@@ -79,8 +97,8 @@ USAGE
     It calls done_testing or skip_all so you can't have already called
     plan.
 
-    <all_pod_files_ok> returns something true if all web links are
-    reachable and false otherwise.
+    all_pod_files_ok returns something true if all web links are reachable
+    and false otherwise.
 
     Please see XT::Files for how to configure the files to be checked.
 
@@ -90,9 +108,9 @@ USAGE
 
 EXAMPLES
 
- Example 1 Default Usage
+ Example 1 Default usage
 
-    Check the web links in all files in the bin, script and lib directory.
+    Check the web links in all files returned by XT::Files.
 
         use 5.006;
         use strict;
@@ -261,12 +279,4 @@ SUPPORT
 AUTHOR
 
     Sven Kirmess <sven.kirmess@kzone.ch>
-
-COPYRIGHT AND LICENSE
-
-    This software is Copyright (c) 2018-2019 by Sven Kirmess.
-
-    This is free software, licensed under:
-
-      The (two-clause) FreeBSD License
 

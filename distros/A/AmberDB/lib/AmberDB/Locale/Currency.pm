@@ -2,10 +2,10 @@ package AmberDB::Locale::Currency;
 
 use 5.016;
 use warnings;
-#use utf8; # bu aktif edildiğinde tüm sitede wide character hatasına sebep oluyor
+use utf8;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.24.0';
+our $VERSION = '5.25.1';
 my $CREATED  = '2026-08-06';
 
 # Master ISO 4217 Currency Dictionary
@@ -64,74 +64,3 @@ sub active_codes {
 }
 
 1;
-
-__END__
-
-=encoding utf8
-
-=head1 NAME
-
-AmberDB::Locale::Currency - ISO 4217 Currency Definition and Symbol Dictionary
-
-=head1 SYNOPSIS
-
-  use AmberDB::Locale::Currency;
-
-  # Symbol and name lookups
-  my $sym  = AmberDB::Locale::Currency->symbol('TRY'); # '₺'
-  my $name = AmberDB::Locale::Currency->name('USD');   # 'US Dollar'
-  my $info = AmberDB::Locale::Currency->by_code('EUR');
-  # => { num => '978', name => 'Euro', symbol => '€', digits => 2 }
-
-  # Dropdown options for UI forms
-  my @options = AmberDB::Locale::Currency->all();
-  # => ( [ 'TRY', 'Turkish Lira' ], [ 'USD', 'US Dollar' ], ... )
-
-=head1 DESCRIPTION
-
-C<AmberDB::Locale::Currency> provides an immutable dictionary of ISO 4217 currency definitions, numeric codes, currency symbols, and default subunit decimal precision.
-
-=head1 METHODS
-
-=head2 by_code($iso_code)
-
-Returns the currency definition hash reference for the given 3-letter ISO 4217 code (case-insensitive).
-
-  my $curr = AmberDB::Locale::Currency->by_code('GBP');
-  # Returns: { num => '826', name => 'Pound Sterling', symbol => '£', digits => 2 }
-
-=head2 symbol($iso_code)
-
-Returns the currency symbol for the given ISO code (e.g. C<'₺'>, C<'$'>, C<'€'>, C<'£'>, C<'₽'>, C<'¥'>). If the code is unknown, returns the uppercase code itself.
-
-  my $sym = AmberDB::Locale::Currency->symbol('TRY'); # '₺'
-
-=head2 name($iso_code)
-
-Returns the English currency name for the given ISO code.
-
-  my $name = AmberDB::Locale::Currency->name('USD'); # 'US Dollar'
-
-=head2 all()
-
-Returns a list of 2-element array references C<[ $code, $name ]> ordered by priority, suitable for rendering HTML C<E<lt>selectE<gt>> form dropdowns.
-
-  my @dropdown_items = AmberDB::Locale::Currency->all();
-
-=head2 active_codes()
-
-Returns the list of active 3-letter ISO 4217 currency codes supported by the dictionary (e.g. C<TRY>, C<USD>, C<EUR>, C<GBP>, C<RUB>, C<AZN>, C<SAR>, C<JPY>, C<CHF>, C<CAD>, C<AUD>, C<CNY>).
-
-  my @codes = AmberDB::Locale::Currency->active_codes();
-
-=head1 AUTHOR
-
-Maruf Cetin <marufcetin@gmail.com>
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright (C) 2026 Maruf Cetin.
-
-This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
-
-=cut

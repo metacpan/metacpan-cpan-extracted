@@ -1,12 +1,13 @@
-[🏠 Home](index.html) &nbsp;•&nbsp; [📖 About](EN.About_AmberDB.html) &nbsp;•&nbsp; [🚀 Quick Start](index.html#-quick-start) &nbsp;•&nbsp; [📘 Tutorial](EN.AmberDB_User-Guide.html) &nbsp;•&nbsp; [🌐 Locale](EN.AmberDB-Locale_User-Guide.html) &nbsp;•&nbsp; [📋 Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [📚 Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [🇹🇷 Türkçe](TR.AmberDB_Veritabani_Sistemi.html)
+[Home](index.html) &nbsp;•&nbsp; [About](EN.About_AmberDB.html) &nbsp;•&nbsp; [Quick Start](index.html#quick-start) &nbsp;•&nbsp; [Tutorial](EN.AmberDB_User-Guide.html) &nbsp;•&nbsp; [Benchmark](EN.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [Locale](EN.AmberDB-Locale_User-Guide.html) &nbsp;•&nbsp; [SQL Guide](EN.AmberDB-vs-SQL_User-Guide.html) &nbsp;•&nbsp; [Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [Türkçe](TR.AmberDB_Veritabani_Sistemi.html)
 
 ---
 
 # Developer Guide and Comprehensive Documentation
 
-> **Version:** 5.23.1 · **Initial Design:** 2005 · **Last Updated:** 2026  
+> **Architecture:** AmberDB v5 · **Initial Design:** 2005 · **Last Updated:** 2026  
 > **Namespace:** `AmberDB`  
-> **Built-in Modules:** `Base`, `Index`, `Transact`, `Cache`, `Array`, `String`, `Date`, `Locale`, `Tools`
+> **Modular Engine:** `AmberDB::Base::*` (`Encoder`, `Schema`, `Ramdisk`, `Cache`, `Index`, `Facet`, `Junk`, `Transact`)  
+> **Standalone Components:** `AmberDB::Date`, `AmberDB::Locale`, `AmberDB::Tools`, `AmberDB::Array`
 
 ---
 
@@ -24,7 +25,7 @@
 10. [Database Group Structure (.dbase)](#10-database-group-structure-dbase)
 11. [Smart Tiered (Hot / Cold Junk) Indexing](#11-smart-tiered-hot--cold-junk-indexing)
 12. [Automated URL Slug Management](#12-automated-url-slug-management)
-13. [Unified Shared RAM Cache (.db / .inx) & Persistent Buffer](#13-unified-shared-ram-cache-db--inx--persistent-buffer)
+13. [Transparent Physical RAM-Disk Acceleration & In-Memory Storage](#13-transparent-physical-ram-disk-acceleration--in-memory-storage)
 14. [Configuration and Deterministic Flag Management (`config`)](#14-configuration-and-deterministic-flag-management-config)
 15. [Data Structures, Low-Level Table and Stream Operations](#15-data-structures-low-level-table-and-stream-operations)
 16. [Faceted Search & Category Filters (Facet Engine)](#16-faceted-search--category-filters-facet-engine)
@@ -57,9 +58,9 @@ AmberDB is self-contained and does not rely on heavy external dependencies:
 │  AmberDB::Base     → Schema parsing, paths, data serialization          │
 │  AmberDB::Index    → Binary indexes (.inx, .fld, .src, .fac, .srt)      │
 │  AmberDB::Transact → Undo-log transactions, rollback & recovery         │
-│  AmberDB::Cache    → Native RAM-Disk (tmpfs) Shared Cache & TTL         │
+│  AmberDB::Ramdisk  → Native RAM-Disk (tmpfs/APFS/ImDisk) Shared Cache      │
 │  AmberDB::Array    → High-speed array utilities (nodup, crop)           │
-│  AmberDB::String   → String utilities, HTML formatting & cleaning       │
+│  Amber::Util::String   → String utilities, HTML formatting & cleaning       │
 │  AmberDB::Date     → Date calculations, timestamps, formatting          │
 │  AmberDB::Locale   → Built-in multilingual collation & word search      │
 ├─────────────────────────────────────────────────────────────────────────┤
@@ -80,7 +81,7 @@ use AmberDB;
 
 my $adb = AmberDB->new(
     cfg  => { 
-        language => "en",          # Built-in Locale language ("en", "tr", "de" etc.)
+        language => "gb",          # Built-in Locale language ("gb" [default], "en", "tr", "de" etc.)
     },
     path => { 
         dbase_dir => "./dbstore",  # Database root directory
@@ -175,7 +176,7 @@ Creating a `.table` schema file is **not strictly mandatory**; schemaless tables
 1. Every `insert_id`, `modify_id`, or `delete_id` call **automatically compiles, synchronizes, and maintains all secondary search, match, and sort indexes** in the background.
 2. Read, query, and search operations (`read_all`, `field_fetch`, `search_table`, `facet_menu`, etc.) **automatically utilize these precomputed indexes**, bypassing slow full disk scans and executing via direct index lookups.
 
-### 3.1 Inserting Records — `insert_id`
+### 3.1 Inserting Records - `insert_id`
 
 In AmberDB, relational fields (configured via `match_block` and `rdbm`) store **foreign primary keys (IDs)** rather than plain text strings. 
 
@@ -230,14 +231,14 @@ $adb->insert_id("catalog_product", @product_data);
 # =========================================================================
 # STEP 3: How Multi-Value Lookups (field_fetch) Work
 # =========================================================================
-# AmberDB's 'field_to_list' feature automatically unpacks comma-delimited strings
+# AmberDB's 'set_fieldlist' feature automatically unpacks comma-delimited strings
 # ("5,12" and "7,9") and indexes each discrete ID into its respective .fld index.
 # Both of the following independent queries will immediately find the product via fast direct index lookup:
 my @cat12_items   = $adb->field_fetch("catalog_product", 1, "12"); # All products in Category 12
 my @author9_items = $adb->field_fetch("catalog_product", 3, "9");  # All products by Author 9
 ```
 
-### 3.2 Updating Records — `modify_id`
+### 3.2 Updating Records - `modify_id`
 
 In AmberDB, updating records is performed consistently and holistically using the record array (`@record` or `@fields`) where Index 0 contains the target Record ID. The `modify_id` method automatically consumes the first element (`$record[0]`) as the Primary Key ID:
 
@@ -278,14 +279,14 @@ if ($ok || $ok2) {
 > [!WARNING]
 > Since the record array (`@record` / `@fields`) already contains the Record ID at Index 0, do not pass an extra ID argument after the table name (i.e. avoid `$adb->modify_id("table", 5001, @fields)`). Always pass the array directly.
 
-### 3.3 Deleting Records — `delete_id`
+### 3.3 Deleting Records - `delete_id`
 
 ```perl
 # Delete single record
 $adb->delete_id("catalog_product", 5001);
 ```
 
-### 3.4 Reading Records — `read_id`
+### 3.4 Reading Records - `read_id`
 
 ```perl
 # Retrieve single record by ID
@@ -325,54 +326,54 @@ AmberDB provides flexible methods for listing, filtering, and sorting records.
 >   `my @records = $adb->read_all("catalog_product");`  
 >   *(Every item in `@records` is a record arrayref: `$records[0]->[1]`)*
 > 
-> * **2. Paginated Calls (`$limit > 0` e.g. `0, 20` or `start => 0, limit => 20`):**  
+> * **2. Paginated Calls (`$limit > 0` e.g. `{ offset => 0, limit => 20 }`):**  
 >   Instead of reading thousands of records into RAM, the engine only deserializes the requested page slice (e.g. 20 records). However, web UIs require the total matched count to render pagination bars (e.g. *"Showing 1-20 of 1,250 products"*). AmberDB retrieves this total count instantly from binary indexes and prepends it as the **first returned element (`$total_count`)**:  
->   `my ($total_count, @page_records) = $adb->read_all("catalog_product", 0, 20);`
+>   `my ($total_count, @page_records) = $adb->read_all("catalog_product", { offset => 0, limit => 20 });`
 >
-> ⚠️ **FATAL ERROR WARNING:**  
-> If you assign paginated results to a single array (`my @records = $adb->read_all("catalog_product", 0, 20);`), the first element `$records[0]` will be the **integer total** (e.g. `1250`), not a record reference. Attempting `$records[0]->[1]` or `$records[0][1]` causes Perl to throw a **fatal error**: **`Can't use string ("1250") as an ARRAY ref while "strict refs" in use`**!  
+> **FATAL ERROR WARNING:**  
+> If you assign paginated results to a single array (`my @records = $adb->read_all("catalog_product", { offset => 0, limit => 20 });`), the first element `$records[0]` will be the **integer total** (e.g. `1250`), not a record reference. Attempting `$records[0]->[1]` or `$records[0][1]` causes Perl to throw a **fatal error**: **`Can't use string ("1250") as an ARRAY ref while "strict refs" in use`**!  
 > **Rule:** Whenever `$limit > 0`, always unpack results as `my ($total, @records)`.
 
-### 4.1 `read_all` — Reading All Records with Pagination
+### 4.1 `read_all` - Reading All Records with Pagination
 
 ```perl
 # 1. Read all records in default order (newest first - descending ID)
 my @all_records = $adb->read_all("catalog_product");
 
-# 2. Unpaginated with Extra Options (start: 0, limit: 0 returns @records / @ids directly)
-# 2.1 Retrieve record IDs only (Zero deserialization, ultra memory-efficient — keys_only)
-my @all_ids       = $adb->read_all("catalog_product", 0, 0, keys_only => 1);
+# 2. Unpaginated Options (Returns @records or @ids directly)
+# 2.1 Retrieve record IDs only (Zero deserialization, ultra memory-efficient - keys_only)
+my @all_ids       = $adb->read_all("catalog_product", { keys_only => 1 });
 
 # 2.2 Tiered Query Mode (jnktype => 'A' [Active only] | 'B' [Junk only] | 'AB' [Active + Junk])
-my @active_only   = $adb->read_all("catalog_product", 0, 0, jnktype => 'A');
-my @active_and_jnk= $adb->read_all("catalog_product", 0, 0, jnktype => 'AB');
+my @active_only   = $adb->read_all("catalog_product", { jnktype => 'A' });
+my @active_and_jnk= $adb->read_all("catalog_product", { jnktype => 'AB' });
 
 # 2.3 Bypass index for direct table scan (no_index)
-my @raw_records   = $adb->read_all("catalog_product", 0, 0, no_index => 1);
+my @raw_records   = $adb->read_all("catalog_product", { no_index => 1 });
 
 # 2.4 Unpaginated sorting (sort => 10 [descending] or sort => -10 [ascending])
-my @all_price_asc = $adb->read_all("catalog_product", 0, 0, sort => -10); # Cheapest first
-my @all_price_desc= $adb->read_all("catalog_product", 0, 0, sort => 10);  # Highest first
-my @all_alpha     = $adb->read_all("catalog_product", 0, 0, sort => { blk => 4, reverse => 1 });
+my @all_price_asc = $adb->read_all("catalog_product", { sort => -10 }); # Cheapest first
+my @all_price_desc= $adb->read_all("catalog_product", { sort => 10 });  # Highest first
+my @all_alpha     = $adb->read_all("catalog_product", { sort => { blk => 4, reverse => 1 } });
 
 # 3. Paginated Queries (limit > 0 always returns ($total_count, @page))
 # 3.1 First 20 records
-my ($total, @page1)      = $adb->read_all("catalog_product", 0, 20);
+my ($total, @page1)      = $adb->read_all("catalog_product", { offset => 0, limit => 20 });
 print "Total records: $total, Retrieved on this page: " . scalar(@page1) . "\n";
 
 # 3.2 Paginated ID list (keys_only)
-my ($total, @page_ids)   = $adb->read_all("catalog_product", 0, 50, keys_only => 1);
+my ($total, @page_ids)   = $adb->read_all("catalog_product", { offset => 0, limit => 50, keys_only => 1 });
 
 # 3.3 Paginated and sorted
-my ($total, @sorted_alpha) = $adb->read_all("catalog_product", 0, 20, sort => { blk => 4, reverse => 1 });
-my ($total, @highest_price)= $adb->read_all("catalog_product", 0, 10, sort => 10);
-my ($total, @lowest_price) = $adb->read_all("catalog_product", 0, 10, sort => -10);
+my ($total, @sorted_alpha) = $adb->read_all("catalog_product", { offset => 0, limit => 20, sort => { blk => 4, reverse => 1 } });
+my ($total, @highest_price)= $adb->read_all("catalog_product", { offset => 0, limit => 10, sort => 10 });
+my ($total, @lowest_price) = $adb->read_all("catalog_product", { offset => 0, limit => 10, sort => -10 });
 
 # 3.4 Paginated and tiered (Active + Junk)
-my ($total, @tiered_page)  = $adb->read_all("catalog_product", 0, 20, jnktype => 'AB');
+my ($total, @tiered_page)  = $adb->read_all("catalog_product", { offset => 0, limit => 20, jnktype => 'AB' });
 ```
 
-### 4.2 `field_fetch` — Inverted Match Index (.fld) and Multi-Value Querying
+### 4.2 `field_fetch` - Inverted Match Index (.fld) and Multi-Value Querying
 
 Fields defined in `match_block` are retrieved via inverted match indexes (`.fld`) with O(1) average lookup time per indexed key (when querying multiple values, cost scales with the number of keys). Even if a record stores multiple comma-separated IDs (e.g. `"5,12"` or `"7,9"`), each value is indexed independently. If an index file (`.fld`) does not exist (unindexed tables), AmberDB seamlessly falls back to a sequential table scan (`recs_scan`) with identical results:
 
@@ -384,11 +385,11 @@ my @products = $adb->field_fetch("catalog_product", 1, "5");
 my @author_prods = $adb->field_fetch("catalog_product", 3, "9");
 
 # 3. Paginated & sorted: Category 5 products sorted by Price (Block 10) ascending
+# tableid, block_index, block_value, \%options
 my ($count, @sorted_prods) = $adb->field_fetch(
     "catalog_product", 
-    1, "5",                             # Block 1 == "5"
-    0, 12,                              # Start: 0, Limit: 12
-    sort => { blk => 10, reverse => 1 } # Price ascending
+    1, "5",
+    { offset => 0, limit => 12, sort => { blk => 10, reverse => 1 } }
 );
 
 # 4. Multi-value matching (ARRAY ref, comma-separated string, or semicolon-separated)
@@ -396,46 +397,37 @@ my @multi = $adb->field_fetch("catalog_product", 1, ["5", "8"]);
 my @multi = $adb->field_fetch("catalog_product", 1, "5, 8");
 
 # 5. Fetch scalar record IDs only (Memory-efficient pipeline)
-my ($total, @id_list) = $adb->field_fetch("catalog_product", 1, "5", 0, 50, keys_only => 1);
-my @all_ids           = $adb->field_fetch("catalog_product", 1, "5", keys_only => 1);
+my ($total, @id_list) = $adb->field_fetch("catalog_product", 1, "5", { offset => 0, limit => 50, keys_only => 1 });
+my @all_ids           = $adb->field_fetch("catalog_product", 1, "5", { keys_only => 1 });
 ```
 
 > **Deduplication Guarantee:** Even if a record matches multiple query values simultaneously, `array_nodup` guarantees that each record ID appears exactly once in the result set.
 
-# 2. Multi-value Match: Fetch products where Block 1 matches 5 OR 12
-my @products = $adb->field_fetch("catalog_product", 1, "5,12");
-
-# 3. Paginated and Sorted Match: First 10 items in Category 5 sorted by price ascending
-my ($total, @paged) = $adb->field_fetch(
-    "catalog_product", 1, "5",
-    0, 10,
-    sort => { blk => 10, reverse => 1 }
-);
-```
-
-### 4.3 `field_filter` — Multi-Criteria Faceted Filtering
+### 4.3 `field_filter` - Multi-Criteria Faceted Filtering
 
 Executes compound boolean queries (AND / OR) across multiple block conditions with automated bitmask intersection:
 
 ```perl
-my $filter_query = {
-    1  => "5",            # Category ID == 5
-    2  => [ "8", "14" ],  # Brand ID IN (8, 14)
-    10 => "100..500",     # Price between $100 and $500
-    11 => "1",            # In Stock == 1
-};
-
-my $result = $adb->field_filter("catalog_product", $filter_query, {
-    start => 0,
-    limit => 20,
-    sort  => { blk => 10, reverse => 1 }
+my $result = $adb->field_filter("catalog_product", {
+    type   => "and",
+    filter => {
+        1  => "5",            # Category ID == 5
+        2  => [ "8", "14" ],  # Brand ID IN (8, 14)
+        10 => "100..500",     # Price between $100 and $500
+        11 => "1",            # In Stock == 1
+    },
+    start  => 0,
+    limit  => 20,
+    sort   => { blk => 10, reverse => 1 },
 });
 
 print "Filtered Count: $result->{count}\n";
 my @record_ids = @{ $result->{ids} };
+my @records = $adb->read_list("catalog_product", \@record_ids); # or
+my @records = $adb->read_list("catalog_product", $result->{ids});
 ```
 
-### 4.4 `search_table` — Full-Text & Phonetic Keyword Search
+### 4.4 `search_table` - Full-Text & Phonetic Keyword Search
 
 Performs intelligent locale-aware token search across fields defined in `search_block`. Runs against `.src` inverted index files for indexed tables via direct token lookups, or performs a full table scan with identical normalization parity for unindexed tables.
 
@@ -447,14 +439,17 @@ my @results = $adb->search_table("catalog_product", "headphones bluetooth");
 my ($count, @results) = $adb->search_table(
     "catalog_product",
     "wireless headphones",
-    0, 20,                                  # First 20 results
-    "or",                                   # Match any keyword
-    sort => { blk => 10, reverse => 1 }     # Sort by price ascending
+    {
+        type   => "or",
+        offset => 0,
+        limit  => 20,
+        sort   => { blk => 10, reverse => 1 },
+    }
 );
 
 # 3. Retrieve only matching record IDs (keys_only)
-my ($count, @id_list) = $adb->search_table("catalog_product", "sony", 0, 50, keys_only => 1);
-my @all_ids           = $adb->search_table("catalog_product", "sony", keys_only => 1);
+my ($count, @id_list) = $adb->search_table("catalog_product", "sony", { offset => 0, limit => 50, keys_only => 1 });
+my @all_ids           = $adb->search_table("catalog_product", "sony", { keys_only => 1 });
 ```
 
 #### Key Highlights of AmberDB Search Normalization:
@@ -463,7 +458,7 @@ my @all_ids           = $adb->search_table("catalog_product", "sony", keys_only 
 - **Circumflex Vowels:** Accented vowels (`â, î, û`) match standard vowels: `"kârın"` $\leftrightarrow$ `"karın"`, `"ÂLÎM"` $\leftrightarrow$ `"alim"`.
 - **Character & ASCII Equivalence:** Full case-insensitive and Turkish/ASCII folding (`"ığdır"` $\leftrightarrow$ `"IĞDIR"` $\leftrightarrow$ `"igdir"`, `"ÇARŞI"` $\leftrightarrow$ `"çarşı"` $\leftrightarrow$ `"carsi"`, `"ÇÖPÇÜ"` $\leftrightarrow$ `"copcu"`.
 
-### 4.5 `read_list` — Reading Specific IDs in Specified Sequence
+### 4.5 `read_list` - Reading Specific IDs in Specified Sequence
 
 `read_list` is AmberDB's high-throughput batch record resolution engine. It plays an essential role both in the engine's internal query pipeline and in developer application code:
 
@@ -523,7 +518,7 @@ if ($adb->exist_table("catalog_product", "slg")) {
 }
 ```
 
-### 4.7 Positional and Special Reads — `read_firstid`, `read_lastid`, `read_randid`, and `read_count`
+### 4.7 Positional and Special Reads - `read_firstid`, `read_lastid`, `read_randid`, and `read_count`
 
 ```perl
 # 1. Read First Record by Numeric Key Order
@@ -584,7 +579,7 @@ Simple Mode can be activated in four distinct ways:
    );
    ```
 
-> **Directory Layout Note:** In standard mode, tables reside under `$dbase_dir/tables/`. In Simple Mode, the engine creates and reads database files directly inside the root of `dbase_dir` (`$dbase_dir/<table_name>.<ext>`). To open existing standard-mode tables in simple mode, set `dbase_dir` directly to `dbstore/tables`.
+> **Directory Layout Note:** In standard mode, tables reside under `$dbase_dir/table/`. In Simple Mode, the engine creates and reads database files directly inside the root of `dbase_dir` (`$dbase_dir/<table_name>.<ext>`). To open existing standard-mode tables in simple mode, set `dbase_dir` directly to `dbstore/table`.
 
 ---
 
@@ -632,14 +627,14 @@ Since secondary index files are omitted, queries stream sequentially across the 
 
 1. **Table Scan and Pagination (`read_all`):**
    ```perl
-   # Paged scan (start => 0, limit => 10)
-   my ( $total_count, @records ) = $adb->read_all( 'items', 0, 10 );
+   # All records or paginated slice (offset => 0, limit => 10)
+   my ( $total_count, @records ) = $adb->read_all( 'items', { offset => 0, limit => 10 } );
    
    # Retrieve keys only
-   my @keys = $adb->read_all( 'items', keys_only => 1 );
+   my @keys = $adb->read_all( 'items', { keys_only => 1 } );
    
    # In-memory sorting (Block 3 ASC: -3, DESC: 3)
-   my @sorted = $adb->read_all( 'items', sort => -3, keys_only => 1 );
+   my @sorted = $adb->read_all( 'items', { sort => -3, keys_only => 1 } );
    ```
 
 2. **Field Value Fetching (`field_fetch`):**
@@ -648,7 +643,7 @@ Since secondary index files are omitted, queries stream sequentially across the 
    my @apparel = $adb->field_fetch( 'catalog', 2, 'Apparel' );
    
    # Multi-value matching (Block 3: Color in ['Blue', 'Black'])
-   my ( $cnt, @results ) = $adb->field_fetch( 'catalog', 3, [ 'Blue', 'Black' ], 0, 20, sort => -4 );
+   my ( $cnt, @results ) = $adb->field_fetch( 'catalog', 3, [ 'Blue', 'Black' ], { offset => 0, limit => 20, sort => -4 } );
    ```
 
 3. **Full-Text Word Search (`search_table`):**
@@ -657,7 +652,7 @@ Since secondary index files are omitted, queries stream sequentially across the 
    my @articles = $adb->search_table( 'articles', 'market economy' );
    
    # Combined search with field filter (Block 2: Category = 'Finance')
-   my ( $cnt, @filtered ) = $adb->search_table( 'articles', 'rates', 0, 10, filter => [ 2, 'Finance' ] );
+   my ( $cnt, @filtered ) = $adb->search_table( 'articles', 'rates', { offset => 0, limit => 10, filter => [ 2, 'Finance' ] } );
    ```
 
 ---
@@ -701,7 +696,7 @@ In accordance with Simple Mode's flat directory structure, no separate `backup/`
 
 ### 5.7 RAM-Disk Architecture & Caching in Simple Mode
 
-In standard mode, AmberDB manages RAM-disk staging via schema `use_cache => 2` rules.
+In standard mode, AmberDB manages RAM-disk staging via schema `use_ramdisk => 2` rules.
 
 **In Simple Mode, RAM-disk utilization is direct and flexible:**  
 Since Simple Mode requires no schema files, creating a high-performance in-memory cache or session store simply involves binding a second AmberDB instance directly to the RAM-disk / tmpfs mount:
@@ -709,12 +704,12 @@ Since Simple Mode requires no schema files, creating a high-performance in-memor
 ```perl
 # 1. Persistent disk instance (For durable storage)
 my $db_disk = AmberDB->new(
-    path => { dbase_dir => "/var/data/app/dbstore/tables" },
+    path => { dbase_dir => "/var/data/app/dbstore/table" },
     cfg  => { simple => 1 },
 );
 
 # 2. RAM-Disk instance (Zero-latency in-memory cache/session store)
-# (Linux: /dev/shm or tmpfs, Windows: ImDisk / RamDisk volume)
+# (Linux: /dev/shm or tmpfs, Windows: ImDisk, macOS: APFS RAM-Disk /Volumes/AmberDB_RAM)
 my $db_ramdisk = AmberDB->new(
     path => { dbase_dir => "/dev/shm/amber_cache" },
     cfg  => { simple => 1, no_backup => 1 }, # Disable backup for pure transient cache
@@ -750,11 +745,11 @@ Benefits of this dual-instance design:
 | **Secondary Indexes (`.inx, .fld, .src, .srt, .fac`)** | Generated & Maintained | **Disabled (Zero Index Cost)** |
 | **URL Slug Mapping (`.slg`)** | Auto Generated | Disabled |
 | **Audit Logs (`.aut`) & Archive (`.del`)** | Schema-Driven | Disabled |
-| **Directory Hierarchy** | `tables/`, `schema/`, `backup/`, etc. | **Flat Single Directory (`$dbase_dir/<table_name>.db`)** |
+| **Directory Hierarchy** | `table/`, `schema/`, `backup/`, etc. | **Flat Single Directory (`$dbase_dir/<table_name>.db`)** |
 | **Secondary Indexes (`.inx, .fld, .src, .srt, .fac`)** | Generated & Maintained | **Disabled (Zero Index Cost)** |
 | **URL Slug Mapping (`.slg`)** | Auto Generated | Disabled |
 | **Audit Logs (`.aut`) & Archive (`.del`)** | Schema-Driven | Disabled |
-| **Directory Hierarchy** | `tables/`, `schema/`, `backup/`, etc. | **Flat Single Directory (`$dbase_dir/<table_name>.db`)** |
+| **Directory Hierarchy** | `table/`, `schema/`, `backup/`, etc. | **Flat Single Directory (`$dbase_dir/<table_name>.db`)** |
 
 ---
 
@@ -787,7 +782,7 @@ This binary layout enables zero-copy slicing for pagination (`LIMIT/OFFSET`) dir
 For fields declared under `match_block`, AmberDB indexes data across two complementary tiers:
 
 1. **Packed Binary Inverted Match Index (`.fld`):**  
-   Maintains a dedicated `<table_name>_<blk>.fld` file per block. Keys map directly to 8-byte packed binary arrays (`(Q>)*`) containing matching record IDs. Queries via `field_fetch` perform direct $O(1)$ key lookups into this file.
+   AmberDB consolidates all field matches into a single `<table_name>.fld` file per table. Keys use the `"$blk:$val"` format and map directly to 8-byte packed binary arrays (`(Q>)*`) containing matching record IDs. Queries via `field_fetch` perform direct $O(1)$ key lookups into this unified file.
 
 2. **Bidirectional String-to-ID Dictionary (`.str`):**  
    For non-relational free-text attributes (Category Name, Brand Name, Author, Status Tags), the engine automatically manages a companion `<table_name>_<blk>.str` dictionary:
@@ -818,19 +813,19 @@ Pass the `sort` option to `read_all`, `field_fetch`, or `search_table` to retrie
 
 ```perl
 # 1. Default Direction: Descending / Highest First (DESC: 99->0, Z->A)
-my @products = $adb->read_all("catalog_product", sort => 10);
-my @products = $adb->read_all("catalog_product", sort => { blk => 10 });
+my @products = $adb->read_all("catalog_product", { sort => 10 });
+my @products = $adb->read_all("catalog_product", { sort => { blk => 10 } });
 
 # 2. Reverse Direction: Ascending / Lowest First (ASC: 0->99, A->Z)
-my @products = $adb->read_all("catalog_product", sort => -10);
-my @products = $adb->read_all("catalog_product", sort => { blk => 10, reverse => 1 });
+my @products = $adb->read_all("catalog_product", { sort => -10 });
+my @products = $adb->read_all("catalog_product", { sort => { blk => 10, reverse => 1 } });
 
 # 3. Primary Key (ID) Ascending Order:
-my @products = $adb->read_all("catalog_product", sort => { reverse => 1 }); # 1..N oldest first
+my @products = $adb->read_all("catalog_product", { sort => { reverse => 1 } }); # 1..N oldest first
 
 # 4. Sorting with field_fetch and search_table:
-my @cat_items       = $adb->field_fetch("catalog_product", 1, "electronics", sort => { blk => 10, reverse => 1 });
-my ($count, @search) = $adb->search_table("catalog_product", "headphone", 0, 20, sort => -10);
+my @cat_items        = $adb->field_fetch("catalog_product", 1, "electronics", { sort => { blk => 10, reverse => 1 } });
+my ($count, @search) = $adb->search_table("catalog_product", "headphone", { offset => 0, limit => 20, sort => -10 });
 ```
 
 ---
@@ -866,7 +861,7 @@ AmberDB guarantees the four classical ACID properties through embedded flat-file
 | ACID Property | Implementation Mechanism & Guarantees |
 | :--- | :--- |
 | **Atomicity** | **Disk-Backed Undo-Journaling:** When `transact_start()` is called, a microsecond-stamped `.txn` journal is created. Every `insert_id`, `modify_id`, and `delete_id` call appends reverse undo instructions. If a critical base error occurs or `transact_rollback()` is triggered, changes across base records (`.db`), soft-delete archives (`.del`), user audit logs (`.aut`), and all secondary indexes (`.inx`, `.src`, `.fld`, `.fac`, `.srt`, `.slg`, `.jinx`, `.jsrc`, `.jfld`) are completely reverted in **reverse LIFO order**. |
-| **Consistency** | **Schema, Index, and State Integrity:** Inbound records are validated against schema field rules, data types, and byte limits. Primary keys (`autoid`), inverted word indexes, columnar facets, and URL slugs are synchronized in real time. Upon rollback, both in-memory caches (`cache_delete`) and secondary indexes revert to their clean pre-transaction state, preventing corrupted intermediate states. |
+| **Consistency** | **Schema, Index, and State Integrity:** Inbound records are validated against schema field rules, data types, and byte limits. Primary keys (`autoid`), inverted word indexes, columnar facets, and URL slugs are synchronized in real time. Upon rollback, both in-memory caches (`set_cache`) and secondary indexes revert to their clean pre-transaction state, preventing corrupted intermediate states. |
 | **Isolation** | **Strict Two-Phase Locking (Strict 2PL):** Every record modified within an active transaction acquires an exclusive OS-level lock (`flock LOCK_EX`). Locks are held throughout the entire transaction duration, preventing concurrent workers from modifying the locked records. Locks are released simultaneously only upon commit or rollback, providing serializable isolation. |
 | **Durability** | **Synchronous Journaling & Crash Recovery (`transact_recover`):** All journal writes invoke `$fh->flush`. When configured with `cfg => { txn_sync => 1 }`, AmberDB triggers OS/kernel `fsync` (`$fh->sync`) and Berkeley DB cache flushing (`DB_File->sync`). If a process or server crashes mid-transaction, orphaned `.txn` files are detected via non-blocking flock checks and rolled back automatically. |
 
@@ -877,8 +872,8 @@ AmberDB guarantees the four classical ACID properties through embedded flat-file
 
 In the public API, transaction workflows are driven by 3 primary methods:
 
-1. **`transact_start()`**: Opens a microsecond-stamped undo journal (`.txn`) in `$dbase_dir/txn/` and recovers any orphaned transactions left by dead processes (`transact_recover`).
-2. **CRUD Operations & `transact_error($context, $message)`**: `insert_id`, `modify_id`, `delete_id` write updates to the base `.db` file, acquire record write locks (`flock`), and record reverse undo entries in the `.txn` journal. If a business logic constraint or validation fails, call `$adb->transact_error(...)`; `transact_error` immediately invokes `transact_rollback()` to revert all mutations in reverse LIFO order, unlinks the `.txn` journal, and atomically releases all locks (no need to call `transact_end()` upon failure).
+1. **`transact_start()`**: Opens a microsecond-stamped undo journal (`txn_*`) in `$dbase_dir/journal/` and recovers any orphaned transactions left by dead processes (`transact_recover`).
+2. **CRUD Operations & `transact_error($context, $message)`**: `insert_id`, `modify_id`, `delete_id` write updates to the base `.db` file, acquire record write locks (`flock`), and record reverse undo entries in the journal. If a business logic constraint or validation fails, call `$adb->transact_error(...)`; `transact_error` immediately invokes `transact_rollback()` to revert all mutations in reverse LIFO order, unlinks the journal file, and atomically releases all locks (no need to call `transact_end()` upon failure).
 3. **`transact_end()`**: Finalizes and commits the transaction if everything proceeded normally without errors (`status => "commit"`). If an unhandled underlying database error occurred, it executes an automatic LIFO rollback (`status => "rollback"`).
 
 > [!NOTE]
@@ -1069,19 +1064,19 @@ AmberDB stores tables, indexes, and schema definitions in dedicated physical dir
 
 | Directory | Purpose |
 |---|---|
-| `dbstore/tables/` | Base data (`.db`) and binary indexes (`.inx`, `.fld`, `.src`, `.fac`, `.srt`, `.slg`) |
+| `dbstore/table/` | Base data (`.db`) and binary indexes (`.inx`, `.fld`, `.src`, `.fac`, `.srt`, `.slg`) |
 | `dbstore/schema/` | Schema files (`.table`) and group configs (`.dbase`) |
-| `dbstore/conf/` | Plain-text `.conf` configuration and property files |
+| `dbstore/config/` | Plain-text `.conf` configuration and property files |
 | `dbstore/backup/` | Daily CSV audit backups (`dbgun/YYYYMMDD/`) |
-| `dbstore/cache/` | **Unified Shared RAM-Disk (ImDisk/tmpfs) Root:** |
-| `dbstore/cache/tables/` | Mirrored hot `.db` and `.inx` tables in RAM for `use_cache => 1 & 2` |
-| `dbstore/cache/conf/` | Compiled high-speed config cache (`*.pl` hash references) |
-| `dbstore/cache/schema/` | Cached / pre-compiled table schemas in RAM (`*.table`, `*.dbase`) |
-| `dbstore/cache/lock/` | Process and table-level `flock` lock files in RAM (`*.lock`) |
-| `dbstore/cache/pids/` | Process lock files and login error state logs (`*.pid`, `*.error`) |
+| `dbstore/ramdisk/` | **Unified Shared RAM-Disk (Linux tmpfs, Windows ImDisk, macOS APFS RAM-Disk) Root:** |
+| `dbstore/ramdisk/table/` | Mirrored hot `.db` and `.inx` tables in RAM for `use_ramdisk => 1, 2, 3` |
+| `dbstore/ramdisk/config/` | Compiled high-speed config cache (`*.pl` hash references) |
+| `dbstore/ramdisk/schema/` | Cached / pre-compiled table schemas in RAM (`*.table`, `*.dbase`) |
+| `dbstore/ramdisk/lock/` | Process and table-level `flock` lock files in RAM (`*.lock`) |
+| `dbstore/ramdisk/pids/` | Process lock files and login error state logs (`*.pid`, `*.error`) |
 
 > [!IMPORTANT]
-> **Version 5.21.0 Migration Notice:** The only manual action required when upgrading existing projects is to rename your database directory's `dbstore/scheme/` folder to **`dbstore/schema/`**. All programmatic path resolutions and API calls are automatically handled by the engine.
+> **Directory Structure Compatibility Note:** The only manual action required when upgrading legacy projects is to rename your database directory's `dbstore/scheme/` folder to **`dbstore/schema/`**. All programmatic path resolutions and API calls are automatically handled by the engine.
 
 ### 9.2 Schema Role & Flexibility: Optional vs. Full Definition
 
@@ -1155,34 +1150,35 @@ The following reference table details all top-level parameters supported in `.ta
 
 | Parameter | Type | Default | Legacy / Alias | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| `name` | `string` | `"Table"` | — | Human-readable table title. |
+| `name` | `string` | `"Table"` | - | Human-readable table title. |
 | `use_simple` | `0 / 1` | `0` | `simple` | When `1`, enables key-value mode allowing arbitrary string keys up to 255 bytes (UUIDs, slugs, tokens) with zero `.inx` index overhead. |
 | `record_index` | `0 / 1` | `0` | `readall` | When `1`, enables the `.inx` primary binary index, `table_count`, `table_lastid`, and auto-increment. |
-| `search_block` | `ARRAY` | `[]` | — | Block numbers indexed in `.src` for full-text inverted search. |
+| `search_block` | `ARRAY` | `[]` | - | Block numbers indexed in `.src` for full-text inverted search. |
 | `match_block` | `ARRAY` | `[]` | `fields` | Block numbers indexed in `.fld` for exact field-to-ID matching and relational lookup. |
-| `sort_block` | `ARRAY` | `[]` | — | Pre-computed `.srt` binary sort indexes (`[ 4, { blk => 10, type => 'num' } ]`). |
+| `sort_block` | `ARRAY` | `[]` | - | Pre-computed `.srt` binary sort indexes (`[ 4, { blk => 10, type => 'num' } ]`). |
 | `facet_block` | `ARRAY` | `[]` | `filter_block` | Block numbers indexed in `.fac` for columnar faceted category navigation. |
 | `slug_block` | `ARRAY` | `[]` | `rwlink` | Block numbers combined for automated bidirectional `.slg` URL slug generation (e.g. `[2, 4]`). |
-| `use_facet` | `0 / 1` | `0` | — | Enables the facet counting engine and `field_fltkeys` / `facet_menu` on the table. |
-| `facet_rules` | `ARRAY` | `[]` | — | Scoping rules for facet counting (e.g., displaying only in-stock items in filter menus). |
-| `use_junk` | `0 / 1` | `0` | — | Enables dual-tier indexing by segregating inactive/out-of-stock records to Cold Tier B. |
-| `junk_rules` | `ARRAY` | `[]` | — | Business rules determining automatic routing of records between active and junk tiers. |
-| `use_cache` | `0 / 1 / 2` | `0` | `usecache` | `0`: Disabled, `1`: Soft (.inx metadata), `2`: Hard (Full shared RAM-Disk mirror). |
-| `cache_ttl` | `integer` | `3600` | — | Table-specific RAM cache time-to-live in seconds. |
+| `use_facet` | `0 / 1` | `0` | - | Enables the facet counting engine and `field_fltkeys` / `facet_menu` on the table. |
+| `facet_rules` | `ARRAY` | `[]` | - | Scoping rules for facet counting (e.g., displaying only in-stock items in filter menus). |
+| `use_junk` | `0 / 1` | `0` | - | Enables dual-tier indexing by segregating inactive/out-of-stock records to Cold Tier B. |
+| `junk_rules` | `ARRAY` | `[]` | - | Business rules determining automatic routing of records between active and junk tiers. |
+| `use_ramdisk` | `0 / 1 / 2 / 3` | `0` | - | `0`: Disabled, `1`: RAM index mirror, `2`: Full RAM-Disk mirror (dual-write), `3`: Volatile pure RAM-disk (.db only, unindexed simple mode). |
+| `ramdisk_ttl` | `integer` | `300` | - | Time-to-live in seconds, strictly applicable to `use_ramdisk => 3`. |
+| `table_dir` | `string` | `""` | - | Custom storage subfolder (e.g., `table_dir => 'orders'`, `table_dir => ''` for root directory). |
 | `keep_deleted` | `0 / 1` | `0` | `nodelete` | Preserves deleted records in `.del` soft-delete archive instead of permanent deletion. |
 | `log_owner` | `0 / 1` | `0` | `authority` | Records user modification audit trails in `.aut` files. |
-| `use_alias` | `0 / 1` | `0` | `uselnk` | Enables `.lnk` alias routing table for merged records or legacy URL redirections. |
+| `use_alias` | `0 / 1` | `0` | `uselnk` | Enables `.lnk` alias routing table for tables where duplicate records are deleted and merged. |
 | `use_counter` | `0 / 1` | `0` | `usecnt` | Enables automated hit/view read counters in `.cnt` files. |
-| `parent_table` | `string` | `""` | — | Parent table name for vertical partitioning (child table shares the same primary ID). |
-| `force` | `0 / 1` | `0` | — | When `1`, `insert_id` overwrites existing records rather than failing (Replace mode). |
+| `parent_table` | `string` | `""` | - | Parent table name for vertical partitioning (child table shares the same primary ID). |
+| `force` | `0 / 1` | `0` | - | When `1`, `insert_id` overwrites existing records rather than failing (Replace mode). |
 | `min_char` | `integer` | `2` | `minchar` | Minimum word length for full-text search indexing (1, 2, or 3). |
 | `stop_word` | `string` | `""` | `nextkey` | Stop-words excluded from full-text search indexing (e.g., `"the and for with"`). |
-| `repeat_ids` | `integer` | `undef` | — | Target block number where extracted child item IDs are consolidated. |
-| `repeat_start` | `integer` | `undef` | — | Starting block index for dynamic repeating child rows (order items, cart lines). |
-| `view_block` | `ARRAY` | `[]` | — | Priority block numbers displayed in UI / CMS listing views. |
-| `use_menu` | `0 / 1` | `1` | — | Controls display of the table in admin panel navigation menus. |
-| `no_transact` | `0 / 1` | `0` | — | Exempts table from transactional rollback error propagation. |
-| `no_backup` | `0 / 1` | `0` | — | Disables daily CSV user audit logging for this table. |
+| `repeat_ids` | `integer` | `undef` | - | Target block number where extracted child item IDs are consolidated. |
+| `repeat_start` | `integer` | `undef` | - | Starting block index for dynamic repeating child rows (order items, cart lines). |
+| `view_block` | `ARRAY` | `[]` | - | Priority block numbers displayed in UI / CMS listing views. |
+| `use_menu` | `0 / 1` | `1` | - | Controls display of the table in admin panel navigation menus. |
+| `no_transact` | `0 / 1` | `0` | - | Exempts table from transactional rollback error propagation. |
+| `no_backup` | `0 / 1` | `0` | - | Disables daily CSV user audit logging for this table. |
 
 ---
 
@@ -1376,7 +1372,7 @@ $adb->table_attr("catalog_product", { search_block => [ 4, 9 ] });
 $adb->table_attr("catalog_product", { keep_deleted => 1 });
 
 # Scenario 3: Temporarily disable cache during heavy batch ETL or reporting
-$adb->table_attr("catalog_product", { use_cache => 0 });
+$adb->table_attr("catalog_product", { use_ramdisk => 0 });
 ```
 
 ---
@@ -1421,8 +1417,8 @@ AmberDB breaks free from fixed column width constraints by allowing a variable n
 #### 9.10.2 Engine Processing & Automatic Indexing (`repeat_fields`)
 During every `insert_id`, `modify_id`, `insert_list`, or `modify_list` call, the engine automatically processes all repeating blocks starting from `repeat_start` (15):
 1. It extracts the identifier of each repeating block (the first element `$_->[0]` if it's an ARRAY reference, or the scalar value itself).
-2. It joins these IDs into a comma-separated string (`"101,102,103"`) and assigns it automatically to block `repeat_ids` (12) — developers do not need to populate this field manually.
-3. Because Block 12 is declared in `match_block`, the engine automatically indexes each product key into `order_active_12.fld` via `field_to_list`.
+2. It joins these IDs into a comma-separated string (`"101,102,103"`) and assigns it automatically to block `repeat_ids` (12) - developers do not need to populate this field manually.
+3. Because Block 12 is declared in `match_block`, the engine automatically indexes each product key into `order_active.fld` (under key `"12:$id"`) via `set_fieldlist`.
 
 > [!NOTE]
 > **Repeating Blocks in Schemaless Simple Mode:**  
@@ -1508,7 +1504,7 @@ The **Junk Subsystem** is an automated performance shield that partitions your d
 ### 11.1 Key Benefits & Features
 
 * **Storefront Search Stays Fast Forever:** When customers search or browse categories, the engine never wastes time scanning dead historical records; active products load at maximum speed.
-* **Smart Search Prioritization (Active First, Out-of-Stock Last):** If a customer searches for an older book/product by name, the item is still found—but active in-stock items always rank first, followed by archived items.
+* **Smart Search Prioritization (Active First, Out-of-Stock Last):** If a customer searches for an older book/product by name, the item is still found - but active in-stock items always rank first, followed by archived items.
 * **Zero Manual Maintenance (Full Automation):** When an item sells out or a supplier is disabled, you don't need to write any data migration scripts. The system automatically migrates records between tiers on every update.
 * **Full Back-Office & Invoice Access:** Back-office admins and invoice systems can query archived or historical records at any time using a single parameter (`jnktype => "AB"` or `"B"`).
 
@@ -1547,10 +1543,10 @@ Keep category listings and customer browsing clean of obsolete items:
 
 ```perl
 # Read active products for category listing:
-my @storefront_items = $adb->read_all("catalog_product", jnktype => "A");
+my @storefront_items = $adb->read_all("catalog_product", { jnktype => "A" });
 
 # Customer search:
-my @results = $adb->search_table("catalog_product", "headphones", jnktype => "A");
+my @results = $adb->search_table("catalog_product", "headphones", { jnktype => "A" });
 ```
 
 #### B. Storewide Search (Active First, Archived Items Appended - Mode `AB`)
@@ -1558,7 +1554,7 @@ Ensure rare or older items remain discoverable without burying in-stock products
 
 ```perl
 # Active products rank first, discontinued items appear at the end:
-my ($total, @results) = $adb->search_table("catalog_product", "clean code", 0, 20, jnktype => "AB");
+my ($total, @results) = $adb->search_table("catalog_product", "clean code", { offset => 0, limit => 20, jnktype => "AB" });
 ```
 
 #### C. Back-Office Admin & Reports (Archived Items Only - Mode `B`)
@@ -1566,7 +1562,7 @@ Inspect discontinued, out-of-stock, or passive catalog items:
 
 ```perl
 # List all archived/junk product IDs:
-my @archived_ids = $adb->read_all("catalog_product", jnktype => "B", keys_only => 1);
+my @archived_ids = $adb->read_all("catalog_product", { jnktype => "B", keys_only => 1 });
 ```
 
 #### D. Order & Invoice Processing (Direct ID Access)
@@ -1609,53 +1605,145 @@ When multiple records generate identical base slugs (e.g. two distinct products 
 
 ---
 
-## 13. Unified Shared RAM Cache (.db / .inx) & Persistent Buffer
+## 13. Transparent Physical RAM-Disk Acceleration & In-Memory Storage
 
-`AmberDB::Cache` provides a unified shared RAM cache mirroring AmberDB's native `.db` and `.inx` formats:
+AmberDB provides native, transparent physical RAM-disk acceleration (Linux `tmpfs`, macOS `APFS RAM-Disk` via `hdiutil`, or Windows `ImDisk`). By mirroring database tables and index files directly onto an in-memory filesystem, AmberDB achieves microsecond read latencies without sacrificing data persistence or requiring external cache daemons.
 
 ```text
-                               ┌────────────────────────────────────────────────┐
-                               │       dbstore/cache/ (tmpfs RAM-Disk)          │
-                               ├──────────────────────┬─────────────────────────┤
-                               │ cache/${table}.db    │ cache/${table}.inx      │
-                               │ (Records)            │ (lastid, keys, meta...) │
-                               └──────────────────────┴─────────────────────────┘
+                               ┌─────────────────────────────────────────────────────────────┐
+                               │ dbstore/ramdisk/ (Linux tmpfs, macOS APFS, Windows ImDisk)  │
+                               ├──────────────────────────┬──────────────────────────────────┤
+                               │ ramdisk/${table}.db      │ ramdisk/${table}.inx             │
+                               │ (Native Berkeley DB)     │ (Native 8-Byte Binary Indexes)   │
+                               └──────────────────────────┴──────────────────────────────────┘
 ```
 
-### Cache Levels (`use_cache`)
-* **`0` (Disabled):** No caching.
-* **`1` (Soft Cache):** Caches `lastid`, `keys`, and `count` metadata in `cache/${table}.inx`, and supports manual `$adb->cache_write` / `$adb->cache_read`.
-* **`2` (Hard Cache - Full Table RAM Mirror):** Table records are cached in `cache/${table}.db` and `cache/${table}.inx` in RAM. Reads (`read_id`, `read_list`) are served directly from RAM.
+### 13.1 What is RAM-Disk Acceleration?
+
+Unlike network-based cache layers (such as Redis or Memcached), AmberDB's RAM-disk engine operates directly at the operating system filesystem block level. It maps tables and indexes to an in-memory mount point (`dbstore/ramdisk/` or custom OS mount points such as `R:\amberdb` or `/Volumes/AmberDB_RAM`).
+
+**Key Architectural Differences:**
+* **Zero External Daemons:** No Redis or Memcached server processes to install, configure, monitor, or manage.
+* **Zero Network Latency:** Access occurs via direct local filesystem syscalls (`pread`, `pwrite`, `mmap`) rather than TCP sockets or IPC overhead.
+* **Unified Data Format:** Stores the exact same native Berkeley DB (`.db`) and binary index files (`.inx`, `.fld`, etc.) as disk storage, eliminating serialization translation layers.
+* **Process-Shared Memory:** Shared seamlessly across all concurrent Perl processes, Apache/FastCGI workers, and cron jobs.
+
+### 13.2 How It Works
+
+* **Native File Format Mirroring:** AmberDB stores all table files on RAM-disk using their exact native extensions (`.db`, `.inx`, `.fld`, `.src`, `.fac`, `.unq`, `.slg`). Proprietary `.cache` file formats are completely retired.
+* **Synchronous Dual-Writing:** When a record is created or modified, the engine writes to both the persistent disk and the RAM-disk synchronously. Reads are served at RAM speeds; disk permanence is never compromised.
+* **ACID Transaction Protection:** Writes to RAM-disk are fully protected by AmberDB's WAL undo-journaling (`.txn`) and Strict 2PL locking. If a transaction rolls back, changes across both persistent disk and RAM-disk are cleanly restored in reverse LIFO order.
+* **Automated Mount Verification & Fallback:** Before accessing RAM-disk files, the engine verifies that the RAM-disk is actively mounted. If unmounted, AmberDB automatically and gracefully falls back to durable disk storage with zero downtime.
+
+### 13.3 RAM-Disk vs. L1 Process Cache
+
+AmberDB distinguishes between two distinct caching and in-memory layers:
+
+| Feature | Physical RAM-Disk Layer (`use_ramdisk`) | L1 In-Memory Process Cache (`get_cache` / `set_cache`) |
+| :--- | :--- | :--- |
+| **Scope** | Cross-process, system-wide shared memory | Single Perl process / worker memory |
+| **Storage Engine** | Native `DB_File` and binary index files | Internal Perl hash references |
+| **Persistence** | Synchronized with permanent disk (Tiers 1 & 2) | Process lifetime only |
+| **Methods** | `insert_id`, `read_id`, `search_table`, `modify_id` | `$adb->get_cache()`, `$adb->set_cache()` |
 
 ```perl
-# 1. Manual Cache Write (stores in cache/${table}.inx)
-$adb->cache_write("catalog_product", "featured_items", @featured_list);
-
-# 2. Cache Read
-my @featured = $adb->cache_read("catalog_product", "featured_items");
-
-# 3. Hard Cache Table Preload
-$adb->cache_preload("catalog_category");
-
-# 4. Invalidate Cache (Automatically purged on modify / delete_id)
-$adb->cache_delete("catalog_product", "featured_items"); # Single key
-$adb->cache_delete("catalog_product");                   # Entire table cache (.db and .inx)
-
-# 5. Inspect RAM-Disk Diagnostics & Mount Status
-my $cache_diag = $adb->cache_setup();
-# Returns hashref: { is_mounted => 1, mount_desc => "...", cache_dir => "...", cache_size => "512M" }
+# L1 In-Memory Process Cache Operations
+$adb->set_cache("dashboard", "active_users", @user_ids);
+my @users = $adb->get_cache("dashboard", "active_users");
+$adb->set_cache("dashboard", "active_users", undef); # Invalidate
 ```
 
-### Cache TTL (`cache_ttl`) & Runtime Overrides
-The `cache_ttl` expiration time is defined per-table directly inside its schema (e.g. `cache_ttl => 1800`). Ephemeral data structures like session tokens or process locks can have their expiration configured in the schema or dynamically tuned at runtime using `table_attr`:
+### 13.4 Acceleration Tiers (`use_ramdisk`)
+
+Tables are assigned an acceleration tier in their `.table` schema or dynamically via `table_attr()`:
+
+* **`0` (Disabled):** Standard persistent disk access.
+* **`1` (Hybrid Index-Only Acceleration):** Only secondary index files (`.inx`, `.src`, `.fld`, `.fac`, `.unq`, `.slg`) are placed in RAM-disk. Master data (`.db`) remains on physical disk. Searches, filters, and lookups run at memory speed while RAM footprint is kept minimal.
+* **`2` (Full RAM-Disk Mirror - Dual-Write):** Both data (`.db`) and all index files are mirrored on RAM-disk. Reads are served directly from RAM-disk; writes dual-write synchronously to both layers.
+* **`3` (Volatile Pure RAM-Disk - Simple Key-Value):** Data exists **strictly on RAM-disk** (`.db`). Zero physical disk files and zero index files are created (`use_simple => 1`). Designed for ephemeral sessions, shopping carts, and transient tokens. Supports sliding TTL expiration (`ramdisk_ttl`).
+
+### 13.5 Transparent Management: `use_ramdisk` Configuration
+
+No special read/write functions are needed to manage the RAM-disk layer; everything is handled automatically in the background. Management is performed entirely through the `use_ramdisk` configuration option:
+
+#### 1. Global Configuration (Default for All Tables)
+You can enable index or full-table acceleration across the entire database in one step:
 
 ```perl
-# Dynamically configure session table cache TTL to 30 minutes (1800 seconds)
-$adb->table_attr("session", { use_cache => 1, cache_ttl => 1800 });
+# Apply Tier 1 (Hybrid Index) to all tables upon initialization
+my $adb = AmberDB->new(
+    cfg  => { use_ramdisk => 1 },
+    path => { dbase_dir   => "/var/data/amberdb" }
+);
+
+# Dynamically change global tier at runtime
+$adb->config(use_ramdisk => 2); # Switch all tables to Tier 2 (Full Mirror)
 ```
 
-### Temporary Disk Buffer
-For large reporting queries or intermediate batch jobs:
+#### 2. Per-Table Flexible Configuration and Overrides
+Each table can be independently assigned its own acceleration tier in its `.table` schema file or at runtime via `table_attr()`:
+
+```perl
+# Put high-traffic categories table into Full RAM-Disk Mirroring
+$adb->table_attr("catalog_category", use_ramdisk => 2);
+
+# Exclude an infrequently accessed archive table from RAM-disk (keep on disk)
+$adb->table_attr("audit_archive", use_ramdisk => 0);
+```
+
+#### 3. Direct Usage via Standard CRUD Calls
+Developers only use standard AmberDB methods. The underlying engine transparently handles RAM-disk preloading, memory-speed reads, and synchronous dual-writes:
+
+```perl
+# Reads: If use_ramdisk is 1 or 2, queries return directly from RAM in microseconds
+my @product = $adb->read_id("catalog_product", 101);
+my ($count, @results) = $adb->search_table("catalog_product", "wireless headphones");
+
+# Writes: The engine automatically dual-writes to both persistent disk and RAM-disk
+$adb->insert_id("catalog_product", 0, @new_product);
+$adb->modify_id("catalog_product", 101, @updated_data);
+```
+
+### 13.6 RAM-Disk Administration (`amberdb_setup.pl`)
+
+AmberDB provides unified RAM-disk configuration and maintenance across all platforms (Linux, macOS, Windows) via `amberdb_setup.pl`:
+
+- **Mount RAM-Disk (Start):** `perl bin/amberdb_setup.pl --action=ramdisk --start --size 512M`
+- **Inspect Status:** `perl bin/amberdb_setup.pl --action=ramdisk --status`
+- **Unmount RAM-Disk (Stop):** `perl bin/amberdb_setup.pl --action=ramdisk --stop`
+- **Full Infrastructure Setup:** `perl bin/amberdb_setup.pl --action=install --user=eticaretim --size 256M --cron`
+
+### 13.7 Volatile Storage & Sliding TTL (`ramdisk_ttl`)
+
+The `ramdisk_ttl` parameter strictly applies to **`use_ramdisk => 3` (volatile pure RAM-disk)** tables (default: 300 seconds). Expired sessions or carts are automatically purged on access:
+
+```perl
+# Configure session table as volatile RAM-disk with 30-minute sliding TTL
+$adb->table_attr("session", {
+    use_ramdisk => 3,
+    ramdisk_ttl => 1800,      # 30-minute TTL (Tier 3 only)
+    table_dir   => 'session'  # routes to ramdisk/session/
+});
+```
+
+### 13.8 Custom Storage Subfolder (`table_dir`)
+
+Tables default to `table/`. Use `table_dir` to specify custom folder organization:
+
+```perl
+# Route orders table to 'orders' subfolder:
+# Physical: dbstore/orders/orders.db
+# RAM-Disk: ramdisk/orders/orders.db
+$adb->table_attr("orders", table_dir => 'orders');
+
+# Route directly to root (overwrite default 'table/' prefix):
+$adb->table_attr("root_table", table_dir => '');
+```
+
+### 13.9 Temporary Staging Disk Buffer
+
+For large reporting queries, intermediate batch jobs, or staging data outside RAM:
+
 ```perl
 $adb->buffer_write("temp_report", @large_data);
 my @data = $adb->buffer_read("temp_report");
@@ -1671,11 +1759,11 @@ Runtime behavior can be tuned and safely configured via the `$adb->config()` met
 ```perl
 # Bulk or single configuration assignment (Recommended)
 $adb->config(
-    no_write   => 1,              # Read-only maintenance mode: block all writes
-    no_backup  => 1,              # Disable daily CSV audit logging for all tables
-    simple     => 1,              # Direct unindexed mode: bypasses secondary index generation
-    keys_only  => 1,              # read_all returns IDs only
-    cache_size => '1024M',        # RAM-Disk / tmpfs cache size (Default: 512M)
+    no_write     => 1,            # Read-only maintenance mode: block all writes
+    no_backup    => 1,            # Disable daily CSV audit logging for all tables
+    simple       => 1,            # Direct unindexed mode: bypasses secondary index generation
+    keys_only    => 1,            # read_all returns IDs only
+    ramdisk_size => '1024M',      # RAM-Disk (tmpfs/APFS/ImDisk) size (Default: 512M)
 );
 
 # Single scalar getter:
@@ -1773,9 +1861,9 @@ my $new_id = $adb->table_autoid("catalog_product");
 $adb->table_create("catalog_product");
 ```
 
-### 15.5 String & Text Processing Utilities (`AmberDB::String`)
+### 15.5 String & Text Processing Utilities (`Amber::Util::String`)
 
-Since `AmberDB` inherits from `AmberDB::String`, a suite of fast string sanitization, formatting, and classification helpers are directly accessible on `$adb`:
+Since `AmberDB` inherits from `Amber::Util::String`, a suite of fast string sanitization, formatting, and classification helpers are directly accessible on `$adb`:
 
 ```perl
 # 1. Whitespace Normalization & Flattener (trim_space)
@@ -1982,7 +2070,7 @@ $tools->set_index("catalog_product");
 $tools->index_alltables();
 
 # 3. Verify index consistency
-my @records = $adb->read_all("catalog_product", 0, 0, no_index => 1);
+my @records = $adb->read_all("catalog_product", { no_index => 1 });
 my $diff    = $tools->check_readall("catalog_product", @records);
 
 # 4. Vacuum Table (Removes fragmentation and shrinks .db file)
@@ -2011,10 +2099,10 @@ AmberDB file extensions are classified into 3 operational tiers based on their a
 | Extension | Role / Classification | Reconstructible? | Description |
 |---|---|---|---|
 | **Authoritative Master Data** | | | |
-| `.db` | Primary Data (Source of Truth) | ❌ **No** (Authoritative) | Berkeley DB master document table (`DB_File` Hash). |
-| `.del` | Soft-Deleted Archive | ❌ **No** (Authoritative) | Archive of soft-deleted records (`keep_deleted`). |
-| `.aut` | User Audit Trail | ❌ **No** (Authoritative) | Chronological user action log (`log_owner`). |
-| `.str` | String Dictionary Mapping | ❌ **No** (Authoritative) | Bidirectional string-to-foreign-key dictionary file (`_${blk}.str`). |
+| `.db` | Primary Data (Source of Truth) | **No** (Authoritative) | Berkeley DB master document table (`DB_File` Hash). |
+| `.del` | Soft-Deleted Archive | **No** (Authoritative) | Archive of soft-deleted records (`keep_deleted`). |
+| `.aut` | User Audit Trail | **No** (Authoritative) | Chronological user action log (`log_owner`). |
+| `.str` | String Dictionary Mapping | **No** (Authoritative) | Bidirectional string-to-foreign-key dictionary file (`_${blk}.str`). |
 | **Derived Secondary Indexes** | | | |
 | `.inx` | Record Index |  **Yes** (`set_index`) | Binary array of all active IDs, total count, highest ID. |
 | `.fld` | Inverted Match Index |  **Yes** (`set_index`) | Block-level key-to-IDs inverted index (`match_block`). |
@@ -2026,11 +2114,10 @@ AmberDB file extensions are classified into 3 operational tiers based on their a
 | `.jfld`| Junk Match Index |  **Yes** (`set_index`) | Field match index for cold records (`jnktype => 'B'/'AB'`). |
 | `.jsrc`| Junk Full-Text Search |  **Yes** (`set_index`) | Word-level inverted index for cold records (`jnktype => 'B'/'AB'`). |
 | **Runtime & Transient Files** | | | |
-| `.cnt` | View / Hit Counter | ⚠️ Counter state | Hit/read counter file (`use_counter`). |
-| `.txn` | Transaction Undo Journal | ⚠️ Transient (Runtime) | Active transaction rollback journal file (`txn/`). |
-| `.cache`| Shared RAM-Disk Cache |  Yes (RAM-Disk) | RAM-Disk shared cache file (`cache/`). |
-| `.tmp` | Disk Buffer File | ⚠️ Transient (Staging) | Disk staging buffer file under `dbstore/buffer/` (`buffer_write`). |
-| `.lock` | Process Mutex Lock | ⚠️ Transient (Mutex) | OS `flock` process synchronization lock file. |
+| `.cnt` | View / Hit Counter | Counter state | Hit/read counter file (`use_counter`). |
+| `.txn` | Transaction Undo Journal | Transient (Runtime) | Active transaction rollback journal file (`txn/`). |
+| `.tmp` | Disk Buffer File | Transient (Staging) | Disk staging buffer file under `dbstore/buffer/` (`buffer_write`). |
+| `.lock` | Process Mutex Lock | Transient (Mutex) | OS `flock` process synchronization lock file. |
 
 ---
 
@@ -2044,16 +2131,15 @@ dbstore/
 │   └── catalog_category.table   ← Category table schema
 ├── tables/                      ← Main Data and Index Files
 │   ├── catalog_product.db       ← Main data file
-│   ├── catalog_product.inx      ← Binary record index
-│   ├── catalog_product_1.fld    ← Category match index
-│   ├── catalog_product_4.src    ← Title search index
-│   ├── catalog_product_10.srt   ← Price sort index
-│   ├── catalog_product.fac      ← Facet index
-│   ├── catalog_product_0.slg    ← ID → Slug Map
-│   ├── catalog_product_1.slg    ← Slug → ID Map
+│   ├── catalog_product.inx      ← Binary record and sort index
+│   ├── catalog_product.fld      ← Exact-match inverted index (all blocks "$blk:$val")
+│   ├── catalog_product.src      ← Full-text search index
+│   ├── catalog_product.fac      ← Facet filtering index
+│   ├── catalog_product.unq      ← String dictionary
+│   ├── catalog_product.slg      ← Bidirectional URL slug map ("0:$id", "1:$slug")
 │   ├── catalog_product.aut      ← Audit trail
 │   └── catalog_product.del      ← Soft-deleted records
-├── cache/                       ← Shared RAM-Disk Cache Files
+├── ramdisk/                     ← RAM-Disk Mount & Storage (Linux tmpfs, macOS APFS, Windows ImDisk)
 ├── buffer/                      ← Transient Disk Buffer / Staging Files
 ├── txn/                         ← Active Transaction Journals
 ├── pids/                        ← Lock Files
@@ -2067,7 +2153,7 @@ dbstore/
 1. **Use `insert_list` for Bulk Ingestion:** When adding hundreds of records, use `insert_list` instead of looping over `insert_id`. Batch mode writes all records in a single file session and rebuilds indexes in one pass.
 2. **Wrap Multi-Step Writes in `transact_start`:** Always wrap inventory deductions, checkout sequences, or multi-table balance updates inside transactions.
 3. **Index Only Required Fields:** Only assign fields to `match_block` or `search_block` if they are actively queried to minimize disk write overhead.
-4. **Always Handle Pagination Return Signatures Correctly:** When passing `$limit > 0` to `read_all`, `field_fetch`, or `search_table`, remember that the first returned value is `$total_count` integer. Never unpack into a single array (`my @records = $adb->read_all(..., 0, 20)`) as `$records[0]` will be an integer scalar causing fatal crashes upon dereferencing. Always unpack paginated queries as `my ($total_count, @records)`.
+4. **Always Handle Pagination Return Signatures Correctly:** When passing `$limit > 0` to `read_all`, `field_fetch`, or `search_table`, remember that the first returned value is `$total_count` integer. Never unpack into a single array (`my @records = $adb->read_all("table", { offset => 0, limit => 20 })`) as `$records[0]` will be an integer scalar causing fatal crashes upon dereferencing. Always unpack paginated queries as `my ($total_count, @records)`.
 5. **Choose Primary Key Architecture Appropriately:** Standard relational tables enforce pure 64-bit integer IDs for optimal binary packing performance (`(Q>)*`). For arbitrary string identifiers (UUIDs, slugs, session tokens), configure the table with `use_simple => 1` for zero indexing overhead directly in Berkeley DB.
 6. **Standardize on Record Array ID at Index 0:** Always maintain the Primary Key ID at Index 0 (`$record[0]`) within record arrays (`@record`). For new records, initialize with `0` and assign the returned ID via `my $id = $record[0] = $adb->insert_id("table", @record);`. Performing retrieval (`read_id`), updating (`modify_id("table", @record)`), and deletion (`delete_id("table", $record[0])`) against this unified structure ensures clean code and eliminates positional argument shifting bugs.
 
@@ -2084,7 +2170,7 @@ use AmberDB;
 
 # 1. Initialize Engine
 my $adb = AmberDB->new(
-    cfg  => { language => "en", user => "cashier_1" },
+    cfg  => { language => "gb", user => "cashier_1" },
     path => { dbase_dir => "./dbstore" }
 );
 
@@ -2118,8 +2204,11 @@ print "2. Product URL -> /product/$slug_map->{$product_id}\n";
 
 # 5. Query Multi-Category (e.g. Category 12) Sorted by Price
 my ($total, @items) = $adb->field_fetch(
-    "catalog_product", 1, "12", 0, 10,
-    sort => { blk => 10, reverse => 1 } # Price ascending
+    "catalog_product", 1, "12", {
+        offset => 0,
+        limit  => 10,
+        sort   => { blk => 10, reverse => 1 } # Price ascending
+    }
 );
 print "3. Listed $total products in Category 12.\n";
 
@@ -2163,10 +2252,10 @@ if ($txn->{status} eq "commit") {
 | `delete_list` | `$table, @ids` | `\%status` | High-throughput bulk delete. |
 | **Reading and Querying** | | | |
 | `read_id` | `$table, $id` | `@fields` | Reads single record by primary key ID. |
-| `read_all` | `$table, [$s, $l, %opt]` | `($count, @records)` | Paginated & sorted read of all records. |
+| `read_all` | `$table, [\%opts]` | `($count, @records)` | Paginated & sorted read of all records. |
 | `read_list` | `$table, \@id_list` | `@records` | Reads records in given ID order. |
-| `field_fetch` | `$table, $blk, $val, [%opt]` | `($count, @records)` (paginated) / `@records` | Direct key lookup via inverted match index (`.fld`). |
-| `search_table` | `$table, $query, [%opt]` | `($count, @records)` (paginated) / `@records` | Full-text keyword search via search index. |
+| `field_fetch` | `$table, $blk, $val, [\%opts]` | `($count, @records)` (paginated) / `@records` | Direct key lookup via inverted match index (`.fld`). |
+| `search_table` | `$table, $query, [\%opts]` | `($count, @records)` (paginated) / `@records` | Full-text keyword search via search index. |
 | `field_filter` | `$table, \%filter_opts` | `{ count, ids }` | Multi-block composite query with sorting. |
 | `field_fltkeys` | `$table, \%facet_opts` | `\%counts` | Computes dynamic facet count maps. |
 | **Existence & Positional Lookups** | | | |
@@ -2191,18 +2280,17 @@ if ($txn->{status} eq "commit") {
 | `recs_del` | `$file_path, @ids` | `1` | Direct batch `$db->del()` for provided record IDs. |
 | `recs_cutting` | `$start, $limit, @list`| `($count, @slice)` | In-memory array pagination slicer. |
 | **Transaction Management** | | | |
-| `transact_start`| — | `1/undef` | Starts a new transaction with undo journaling. |
+| `transact_start`| - | `1/undef` | Starts a new transaction with undo journaling. |
 | `transact_error`| `$context, $message` | `undef` | Records transaction error (ensures transact_end rolls back). |
-| `transact_end`  | — | `\%result` | Concludes transaction (commits clean or triggers auto-rollback). |
-| `transact_rollback` | — | `\%result` | (Internal) Forces immediate manual rollback. |
-| `transact_commit`   | — | `\%result` | (Internal) Flushes and commits active transaction. |
-| `transact_recover`  | — | `\%result` | Recovers orphaned/crashed transactions. |
+| `transact_end`  | - | `\%result` | Concludes transaction (commits clean or triggers auto-rollback). |
+| `transact_rollback` | - | `\%result` | (Internal) Forces immediate manual rollback. |
+| `transact_commit`   | - | `\%result` | (Internal) Flushes and commits active transaction. |
+| `transact_recover`  | - | `\%result` | Recovers orphaned/crashed transactions. |
 | **Cache, Slug, Schema & Audit** | | | |
 | `table_info`   | `$table` | `\%schema` | Retrieves active table schema configuration hash. |
 | `table_attr`   | `$table, \%attrs` | `1` | Dynamically mutates in-memory table schema at runtime. |
-| `cache_read`   | `$table, $key` | `@data` | Reads from RAM-Disk shared cache. |
-| `cache_write`  | `$table, $key, @data` | `1` | Writes to RAM-Disk shared cache. |
-| `cache_delete` | `$table, [$key]` | `1` | Purges cache entries. |
+| `get_cache`    | `$group, [$key]` | `@data / $val` | Reads from in-memory L1 cache (returns list in list context, scalar or hashref). |
+| `set_cache`    | `$group, [$key], [@data]` | `$data / 1` | Sets, updates, or deletes keys/groups in in-memory L1 cache. |
 | `get_slug`     | `$table, $type, @keys` | `\%map` | Resolves ID ↔ URL slug mappings. |
 | `auth_view`    | `$table, $id` | `$html` | Returns user audit trail as HTML. |
 
@@ -2237,17 +2325,17 @@ This entire document is written to the `.db` file as a **single key-value pair**
 In SQL, answering *"Which orders contain Product 101?"* requires scanning the `order_items` index/table, joining with `orders`, and executing multiple disk/cache seeks across separate tables.
 
 **In AmberDB:**
-The order record contains the array of product items in Block 3. When `match_block => [3]` is defined in the schema, the engine automatically extracts each product ID using `field_to_list` and indexes it into `orders_3.fld`.
+The order record contains the array of product items in Block 3. When `match_block => [3]` is defined in the schema, the engine automatically extracts each product ID using `set_fieldlist` and indexes it into `orders.fld` under the key `"3:$id"`.
 
 ```perl
 # Fetch all order records containing Product 101:
 my @orders = $adb->field_fetch("orders", 3, 101);
 ```
 
-This operation executes a **single direct key lookup** from `orders_3.fld`, retrieving all Order IDs matching the key `101` directly (with O(1) average-time lookup per indexed key):
+This operation executes a **single direct key lookup** from `orders.fld` for key `"3:101"`, retrieving all Order IDs matching the key `101` directly (with O(1) average-time lookup per indexed key):
 ```text
-# Inside orders_3.fld:
-# 101 => [ 1001, 1005, 1023 ] (Packed binary RID array)
+# Inside orders.fld:
+# "3:101" => [ 1001, 1005, 1023 ] (Packed binary RID array)
 ```
 
 After retrieving the keys, the engine reads their record values in a single pass and returns all detailed information belonging to the matching orders.
@@ -2322,5 +2410,5 @@ The following architectural choices might appear restrictive from an ad-hoc SQL 
 
 ---
 
-*This documentation is maintained for `AmberDB` v5.23.1 and aligns with active codebase architecture and developer practices.*
+*This documentation is maintained for the AmberDB v5 architecture and aligns with active codebase practices.*
 

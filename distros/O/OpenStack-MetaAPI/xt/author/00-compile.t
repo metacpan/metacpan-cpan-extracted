@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 17;
+plan tests => 18;
 
 my @module_files = (
     'OpenStack/MetaAPI.pm',
@@ -21,6 +21,7 @@ my @module_files = (
     'OpenStack/MetaAPI/API/Specs/Default.pm',
     'OpenStack/MetaAPI/API/Specs/Network/v2.pm',
     'OpenStack/MetaAPI/API/Specs/Roles/Service.pm',
+    'OpenStack/MetaAPI/API/Volume.pm',
     'OpenStack/MetaAPI/Helpers/DataAsYaml.pm',
     'OpenStack/MetaAPI/Roles/GetFromId.pm',
     'OpenStack/MetaAPI/Roles/Listable.pm',

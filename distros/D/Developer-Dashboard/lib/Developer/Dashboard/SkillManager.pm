@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Cwd qw(realpath);
 use File::Copy qw(copy);
@@ -1698,9 +1698,26 @@ sub _install_skill_package_json {
     };
 }
 
+# _skill_venv_python_path($skill_path)
+# Resolves the interpreter path a skill's own local/venv would carry, whether
+# or not it exists yet (DD-824).
+# Input: absolute skill root directory path.
+# Output: venv python interpreter path string.
+sub _skill_venv_python_path {
+    my ( $self, $skill_path ) = @_;
+    my $venv_dir = File::Spec->catdir( $skill_path, 'local', 'venv' );
+    return $self->_is_windows
+      ? File::Spec->catfile( $venv_dir, 'Scripts', 'python.exe' )
+      : File::Spec->catfile( $venv_dir, 'bin',     'python' );
+}
+
 # _install_skill_requirements_txt($skill_path)
-# Installs Python dependencies declared by requirements.txt into the current
-# user's Python environment through python -m pip --user.
+# Installs Python dependencies declared by requirements.txt into the skill's
+# own local/venv (DD-824), creating that venv first if it does not already
+# exist - the same per-skill isolation boundary Node dependencies already
+# have via local/. Falls back to today's global-python --user behavior if
+# venv creation fails, so a skill still gets its dependencies rather than
+# silently getting none.
 # Input: absolute skill root directory path.
 # Output: result hash reference with success or error state.
 sub _install_skill_requirements_txt {
@@ -1708,8 +1725,27 @@ sub _install_skill_requirements_txt {
     my $requirements = File::Spec->catfile( $skill_path, 'requirements.txt' );
     return { success => 1, skipped => 1 } if !-f $requirements;
 
+    my $venv_python = $self->_skill_venv_python_path($skill_path);
+    if ( !-f $venv_python ) {
+        my $venv_dir = File::Spec->catdir( $skill_path, 'local', 'venv' );
+        my $venv_run = $self->_run_streaming_command(
+            command    => [ $self->_python_dependency_command, '-m', 'venv', $venv_dir ],
+            cwd        => $skill_path,
+            banner     => "Creating Python venv for " . basename($skill_path) . " at $venv_dir",
+            timeout_ms => $self->_skill_install_timeout_ms,
+        );
+        # A venv creation failure is not fatal - fall back to the global
+        # python/--user path below rather than leaving the skill with no
+        # dependencies installed at all.
+    }
+
+    my $pip_python = -f $venv_python ? $venv_python : $self->_python_dependency_command;
+    my @install_argv = -f $venv_python
+      ? ( $pip_python, '-m', 'pip', 'install', '--requirement', $requirements )
+      : ( $pip_python, '-m', 'pip', 'install', '--user', '--requirement', $requirements );
+
     my $run = $self->_run_streaming_command(
-        command    => [ $self->_python_dependency_command, '-m', 'pip', 'install', '--user', '--requirement', $requirements ],
+        command    => \@install_argv,
         cwd        => $skill_path,
         banner     => "Installing Python dependencies for " . basename($skill_path) . " from $requirements",
         timeout_ms => $self->_skill_install_timeout_ms,

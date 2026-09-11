@@ -1,5 +1,9 @@
 Revision history for Catalyst-Plugin-Profile-DBI-Log
 
+0.03   2026-09-10
+- Styling to make generated pages much more appealing
+- Various bug & security fixes following AI review
+
 0.02   2024-08-30
 - Initial release version
 

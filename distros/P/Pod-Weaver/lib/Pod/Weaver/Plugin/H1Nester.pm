@@ -1,4 +1,4 @@
-package Pod::Weaver::Plugin::H1Nester 4.020;
+package Pod::Weaver::Plugin::H1Nester 4.021;
 # ABSTRACT: structure the input pod document into head1-grouped sections
 
 use Moose;
@@ -56,7 +56,7 @@ Pod::Weaver::Plugin::H1Nester - structure the input pod document into head1-grou
 
 =head1 VERSION
 
-version 4.020
+version 4.021
 
 =head1 OVERVIEW
 
@@ -83,7 +83,7 @@ Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo SIGNES.
+This software is copyright (c) 2026 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

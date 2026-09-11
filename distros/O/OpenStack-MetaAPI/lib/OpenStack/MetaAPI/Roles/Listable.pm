@@ -49,13 +49,13 @@ sub _list {
 
                     # can use a regexp as a filter
                     next
-                      unless $candidate->{$filter}
+                      unless defined $candidate->{$filter}
                       && $candidate->{$filter} =~ $opts{$filter};
                 } else {
 
                     # otherwise do one 'eq' check
                     next
-                      unless $candidate->{$filter}
+                      unless defined $candidate->{$filter}
                       && $candidate->{$filter} eq $opts{$filter};
                 }
 
@@ -88,7 +88,7 @@ OpenStack::MetaAPI::Roles::Listable
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

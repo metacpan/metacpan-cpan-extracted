@@ -4,7 +4,7 @@ package App::perlimports::Annotations;
 
 use Moo;
 
-our $VERSION = '0.000064';
+our $VERSION = '0.000065';
 
 use Types::Standard qw( ArrayRef Object );
 
@@ -99,7 +99,7 @@ App::perlimports::Annotations - Find line ranges where perlimports has been disa
 
 =head1 VERSION
 
-version 0.000064
+version 0.000065
 
 =head1 SYNOPSIS
 

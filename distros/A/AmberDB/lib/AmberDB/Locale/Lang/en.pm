@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '5.24.0';
+our $VERSION = '5.25.1';
 
 my $CREATED  = '2026-07-22';
 
@@ -12,7 +12,7 @@ my $CREATED  = '2026-07-22';
 # Pure data module — no logic, no methods other than data().
 # Returns a hash-ref consumed by AmberDB::Locale.
 #
-# English is the default/fallback locale.
+# Global Base (gb) is the default/fallback locale.
 # Perl's built-in uc/lc already handle ASCII correctly,
 # so most maps here are empty (no special casing needed).
 # -------------------------------------------------------
@@ -174,7 +174,7 @@ __END__
 
 =head1 NAME
 
-AmberDB::Locale::Lang::en - English Language Definition and Default Locale Data for AmberDB
+AmberDB::Locale::Lang::en - English Language Definition and Locale Data for AmberDB
 
 =head1 SYNOPSIS
 
@@ -183,7 +183,7 @@ AmberDB::Locale::Lang::en - English Language Definition and Default Locale Data 
 
 =head1 DESCRIPTION
 
-Provides English (en) casing, character maps, number/currency formats, date templates, and plural rules for the AmberDB locale engine. English serves as the fallback locale.
+Provides English (en) casing, character maps, number/currency formats, date templates, and plural rules for the AmberDB locale engine.
 
 =head1 AUTHOR
 

@@ -51,7 +51,7 @@ _build(self, app, cats, opts = &PL_sv_undef)
                   "with no answer to that renders empty pages");
 
         defp = SvPV_const(*def, defl);
-        ar = pi_arena_build(aTHX_ (HV *)SvRV(cats), defp, defl);
+        ar = pi_arena_build(aTHX_ cats, defp, defl);
 
         (void)hv_stores(cfg, "dir",
             (dir && *dir && SvOK(*dir)) ? newSVsv(*dir) : newSVpvs(""));
@@ -114,6 +114,7 @@ _locale(c, ...)
             char pkey[PI_KEY_MAX + 1];
             int r;
             int j;
+            int vu = 0;
 
             /* `count => N` selects a plural category, so `items` reaches
              * `items.few` under a rule that has one. The count stays in the
@@ -127,6 +128,14 @@ _locale(c, ...)
                     SV *cv = ST(j + 1);
                     NV nv = SvOK(cv) ? SvNV(cv) : 0;
                     int is_int = 1;
+                    /* At the top of the block, not beside their first use.
+                     * This header has to compile on every perl from 5.10,
+                     * and a declaration after a statement is C99 - MSVC and
+                     * -Wdeclaration-after-statement both refuse it. */
+                    pi_rule rule;
+                    pi_pcat pc;
+                    const char *cn;
+                    STRLEN cnl, want;
 
                     /* CLDR's `v` is the number of VISIBLE fraction digits,
                      * which is a property of how the count was written and
@@ -142,11 +151,8 @@ _locale(c, ...)
                             if (sp[z] == '.') { is_int = 0; break; }
                     }
                     if (is_int && nv != (NV)(IV)nv) is_int = 0;
-                    pi_rule rule = pi_rule_for(cat->tag, cat->taglen);
-                    pi_pcat pc;
-                    const char *cn;
-                    STRLEN cnl, want;
 
+                    rule = pi_rule_for(cat->tag, cat->taglen);
                     if (rule == PR_NONE) break;   /* checked at boot */
                     pc  = pi_plural(rule, (double)nv, is_int);
                     cn  = PI_CAT_NAME[pc];
@@ -158,7 +164,7 @@ _locale(c, ...)
                     memcpy(pkey + kl + 1, cn, cnl);
                     want = kl + 1 + cnl;
 
-                    if (pi_get(cat, pkey, want, &vl)) {
+                    if (pi_get(cat, pkey, want, &vl, NULL)) {
                         k = pkey; kl = want;
                     }
                     else {
@@ -168,7 +174,7 @@ _locale(c, ...)
                          * than to the key. */
                         memcpy(pkey + kl + 1, "other", 5);
                         want = kl + 1 + 5;
-                        if (pi_get(cat, pkey, want, &vl)) { k = pkey; kl = want; }
+                        if (pi_get(cat, pkey, want, &vl, NULL)) { k = pkey; kl = want; }
                     }
                 }
                 break;
@@ -177,7 +183,7 @@ _locale(c, ...)
             /* The same lookup the template hash uses - the counters and the
              * warning live in there, so the two paths cannot disagree about
              * what is missing. */
-            r = pi_lookup(aTHX_ ar, cat, k, kl, &v, &vl);
+            r = pi_lookup(aTHX_ ar, cat, k, kl, &v, &vl, &vu);
 
             if (r != PI_HIT) {
                 /* The KEY, never the empty string. An empty gap hides the
@@ -189,12 +195,25 @@ _locale(c, ...)
                 if (r == PI_MISSING && pi_dev(aTHX_ cfg))
                     pi_warn_missing(aTHX_ c, k, kl);
                 RETVAL = newSVpvn(k, kl);
+                /* the key echoed back, so it carries the CALLER's flag and
+                 * not the block's - a non-ASCII key must come back the way
+                 * it went in */
+                if (SvUTF8(ST(1))) SvUTF8_on(RETVAL);
             }
             else if (items > 2) {
-                RETVAL = pi_interpolate(aTHX_ v, vl, &ST(2), items - 2);
+                /* pi_interpolate is told the flag and manages the result
+                 * itself, because it is joining two encodings. Forcing the
+                 * flag on afterwards is what corrupted a downgraded
+                 * substitution. */
+                RETVAL = pi_interpolate(aTHX_ v, vl, vu, &ST(2), items - 2);
             }
-            else RETVAL = newSVpvn(v, vl);
-            SvUTF8_on(RETVAL);
+            else {
+                RETVAL = newSVpvn(v, vl);
+                /* Conditional. The block records the flag per string, so a
+                 * producer that handed over Latin-1 no longer has it
+                 * relabelled as UTF-8 on the way out. */
+                if (vu) SvUTF8_on(RETVAL);
+            }
         }
     }
     OUTPUT:
@@ -251,53 +270,67 @@ FETCH(self, key)
         SV **pfx  = av_fetch(o, PIT_PREFIX, 0);
         SV **cfgs = av_fetch(o, PIT_CFG, 0);
         SV **ctx  = av_fetch(o, PIT_CTX, 0);
+        SV **nds  = av_fetch(o, PIT_NODE, 0);
+        SV **dnds = av_fetch(o, PIT_DNODE, 0);
         pi_arena *ar = (arsv && *arsv) ? INT2PTR(pi_arena *, SvIV(*arsv)) : NULL;
         int idx = (idxs && *idxs) ? (int)SvIV(*idxs) : -1;
         HV *cfg = (cfgs && *cfgs && SvROK(*cfgs)) ? (HV *)SvRV(*cfgs) : NULL;
         SV *c   = (ctx && *ctx) ? *ctx : NULL;
+        uint32_t node  = (nds  && *nds)  ? (uint32_t)SvUV(*nds)  : FZ_NOHANDLE;
+        uint32_t dnode = (dnds && *dnds) ? (uint32_t)SvUV(*dnds) : FZ_NOHANDLE;
+        uint32_t child = FZ_NOHANDLE, dchild = FZ_NOHANDLE;
         const pi_cat *cat;
-        SV *full;
-        STRLEN kl, fl;
-        const char *k, *vp = NULL, *fp;
-        STRLEN vl = 0;
-        int r;
+        STRLEN kl, vl = 0;
+        const char *k, *vp = NULL;
+        int r, vu = 0;
 
         if (!ar || idx < 0 || idx >= ar->ncat) XSRETURN_UNDEF;
         cat = &ar->cat[idx];
 
-        /* The path so far, joined with a dot - the same flat key the arena
-         * was loaded with, so a nested catalogue and a dotted key are one
-         * thing to look up. */
+        /* One probe from where the last FETCH stopped, not a re-walk of the
+         * whole path from the catalogue root. */
         k = SvPV_const(key, kl);
-        if (pfx && *pfx && SvOK(*pfx)) {
-            full = sv_2mortal(newSVsv(*pfx));
-            sv_catpvs(full, ".");
-            sv_catpvn(full, k, kl);
-        }
-        else full = sv_2mortal(newSVpvn(k, kl));
-
-        fp = SvPV_const(full, fl);
-        r = pi_lookup(aTHX_ ar, cat, fp, fl, &vp, &vl);
+        r = pi_step(aTHX_ ar, cat, node, dnode, k, kl,
+                    &vp, &vl, &vu, &child, &dchild);
 
         if (r == PI_HIT) {
             RETVAL = newSVpvn(vp, vl);
-            SvUTF8_on(RETVAL);
-        }
-        else if (r == PI_LEVEL) {
-            /* Descend. `items` in a catalogue holding `items.one` is not a
-             * translation and not missing - it is a level, and the template
-             * is part way down a path. */
-            RETVAL = pi_tied_hash(aTHX_ ar, idx, full, cfg, c);
+            if (vu) SvUTF8_on(RETVAL);
         }
         else {
-            /* The KEY, exactly as the handler path renders it. A template
-             * resolves a missing path to the empty string, and an omission
-             * that is visible in a handler and invisible in a template is
-             * the worse half to lose - which is the whole reason this hash
-             * is tied. */
-            if (cfg && pi_dev(aTHX_ cfg) && c && SvOK(c))
-                pi_warn_missing(aTHX_ c, fp, fl);
-            RETVAL = newSVpvn(fp, fl);
+            /* The joined path is built only when it is going to be USED -
+             * to descend, so a nested miss can name itself, or to be the
+             * answer to a miss. A hit never pays for it. */
+            SV *full;
+            STRLEN fl;
+            const char *fp;
+
+            if (pfx && *pfx && SvOK(*pfx)) {
+                full = sv_2mortal(newSVsv(*pfx));
+                sv_catpvs(full, ".");
+                sv_catpvn(full, k, kl);
+            }
+            else full = sv_2mortal(newSVpvn(k, kl));
+            fp = SvPV_const(full, fl);
+
+            if (r == PI_LEVEL) {
+                /* Descend. `items` in a catalogue holding `items.one` is not
+                 * a translation and not missing - it is a level, and the
+                 * template is part way down a path. */
+                RETVAL = pi_tied_hash(aTHX_ ar, idx, full, cfg, c,
+                                      child, dchild);
+            }
+            else {
+                /* The KEY, exactly as the handler path renders it. A
+                 * template resolves a missing path to the empty string, and
+                 * an omission that is visible in a handler and invisible in
+                 * a template is the worse half to lose - which is the whole
+                 * reason this hash is tied. */
+                if (cfg && pi_dev(aTHX_ cfg) && c && SvOK(c))
+                    pi_warn_missing(aTHX_ c, fp, fl);
+                RETVAL = newSVpvn(fp, fl);
+                if (SvUTF8(key)) SvUTF8_on(RETVAL);
+            }
         }
     }
     OUTPUT:
@@ -313,34 +346,106 @@ EXISTS(self, key)
         AV *o = (AV *)SvRV(self);
         SV **arsv = av_fetch(o, PIT_ARENA, 0);
         SV **idxs = av_fetch(o, PIT_CAT, 0);
-        SV **pfx  = av_fetch(o, PIT_PREFIX, 0);
+        SV **nds  = av_fetch(o, PIT_NODE, 0);
+        SV **dnds = av_fetch(o, PIT_DNODE, 0);
         pi_arena *ar = (arsv && *arsv) ? INT2PTR(pi_arena *, SvIV(*arsv)) : NULL;
         int idx = (idxs && *idxs) ? (int)SvIV(*idxs) : -1;
-        STRLEN kl, fl;
+        uint32_t node  = (nds  && *nds)  ? (uint32_t)SvUV(*nds)  : FZ_NOHANDLE;
+        uint32_t dnode = (dnds && *dnds) ? (uint32_t)SvUV(*dnds) : FZ_NOHANDLE;
+        STRLEN kl;
         const char *k;
-        SV *full;
+        const pi_cat *cat, *d;
+        uint32_t slot = 0;
 
         if (!ar || idx < 0 || idx >= ar->ncat) XSRETURN_NO;
-        k = SvPV_const(key, kl);
-        if (pfx && *pfx && SvOK(*pfx)) {
-            full = sv_2mortal(newSVsv(*pfx));
-            sv_catpvs(full, ".");
-            sv_catpvn(full, k, kl);
-        }
-        else full = sv_2mortal(newSVpvn(k, kl));
-        {
-            const char *fp = SvPV_const(full, fl);
-            const pi_cat *cat = &ar->cat[idx];
-            STRLEN vl;
-            RETVAL = (pi_get(cat, fp, fl, &vl) != NULL)
-                  || pi_is_prefix(cat, fp, fl);
-        }
+        cat = &ar->cat[idx];
+        d   = (ar->def >= 0) ? &ar->cat[ar->def] : NULL;
+        k   = SvPV_const(key, kl);
+
+        /* True for a leaf AND for a level: a template descending into
+         * `items` is asking whether it can, not whether `items` is itself a
+         * translation. Not routed through pi_step, because EXISTS must not
+         * move the missing counter - asking is not the same as reading. */
+        if (cat->fz && node != FZ_NOHANDLE && PUNK_FZ
+            && (PUNK_FZ->probe)(cat->fz, node, k, kl, &slot) != FZ_ABSENT)
+            XSRETURN_YES;
+        if (d && d != cat && d->fz && dnode != FZ_NOHANDLE && PUNK_FZ
+            && (PUNK_FZ->probe)(d->fz, dnode, k, kl, &slot) != FZ_ABSENT)
+            XSRETURN_YES;
+        XSRETURN_NO;
+    }
+
+# ---- iteration --------------------------------------------------------------
+#
+# `keys %$locale` used to die: there was no FIRSTKEY, so tie magic had
+# nothing to call. A template that wants to list a section - every error
+# message, every menu label - could not.
+#
+# The keys are the NEGOTIATED catalogue's, not the union with the default.
+# A union would be more useful for a partly translated section and is more
+# expensive and order-unstable, and it would disagree with the missing-key
+# rule everywhere else: a section that does not exist in this locale reads
+# as empty, the same way an absent key reads as itself.
+#
+# The order is Frozen's, which sorts keys when it builds the block. So it is
+# stable, and identical in every process reading the same block - which a
+# Perl hash is not.
+
+SV *
+FIRSTKEY(self)
+        SV *self
+    CODE:
+    {
+        AV *o = (AV *)SvRV(self);
+        av_store(o, PIT_ITER, newSViv(0));
+        RETVAL = pi_key_at(aTHX_ o, 0);
     }
     OUTPUT:
         RETVAL
 
-# A catalogue is read-only at request time. Saying so beats letting a template
-# write into one and wonder why it did not stick.
+SV *
+NEXTKEY(self, last = &PL_sv_undef)
+        SV *self
+        SV *last
+    CODE:
+    {
+        AV *o = (AV *)SvRV(self);
+        SV **it = av_fetch(o, PIT_ITER, 0);
+        IV i = (it && *it) ? SvIV(*it) + 1 : 1;
+        PERL_UNUSED_VAR(last);
+        av_store(o, PIT_ITER, newSViv(i));
+        RETVAL = pi_key_at(aTHX_ o, (uint32_t)i);
+    }
+    OUTPUT:
+        RETVAL
+
+# scalar %$locale, and the boolean context a template puts it in.
+IV
+SCALAR(self)
+        SV *self
+    CODE:
+    {
+        AV *o = (AV *)SvRV(self);
+        SV **arsv = av_fetch(o, PIT_ARENA, 0);
+        SV **nds  = av_fetch(o, PIT_NODE, 0);
+        SV **idxs = av_fetch(o, PIT_CAT, 0);
+        pi_arena *ar = (arsv && *arsv) ? INT2PTR(pi_arena *, SvIV(*arsv)) : NULL;
+        int idx = (idxs && *idxs) ? (int)SvIV(*idxs) : -1;
+        uint32_t node = (nds && *nds) ? (uint32_t)SvUV(*nds) : FZ_NOHANDLE;
+        RETVAL = 0;
+        if (ar && idx >= 0 && idx < ar->ncat && node != FZ_NOHANDLE && PUNK_FZ)
+            RETVAL = (IV)(PUNK_FZ->count)(ar->cat[idx].fz, node);
+    }
+    OUTPUT:
+        RETVAL
+
+# ---- writing ----------------------------------------------------------------
+#
+# Restored verbatim from 0.48: the wording says WHY, and why is the whole
+# value of the message. CLEAR is new, and croaks for the same reason - it
+# was simply missing, so `%$locale = ()` used to die with "Can't locate
+# object method" instead of saying anything useful.
+
 void
 STORE(self, key, value)
         SV *self
@@ -359,6 +464,13 @@ DELETE(self, key)
         SV *key
     CODE:
         PERL_UNUSED_VAR(self); PERL_UNUSED_VAR(key);
+        croak("Punk::Plugin::I18n: the locale hash is read-only");
+
+void
+CLEAR(self)
+        SV *self
+    CODE:
+        PERL_UNUSED_VAR(self);
         croak("Punk::Plugin::I18n: the locale hash is read-only");
 
 MODULE = Punk        PACKAGE = Punk::Plugin::I18n
@@ -380,7 +492,12 @@ _interpolate(class, str, ...)
         const char *v;
         PERL_UNUSED_VAR(class);
         v = SvPV_const(str, vl);
-        RETVAL = pi_interpolate(aTHX_ v, vl, &ST(2), items - 2);
+        /* The seam's own argument carries the flag the block would have
+         * recorded. It used to pass none, so this answered a different
+         * question from the request path - which is part of why neither
+         * encoding bug was ever caught through it. */
+        RETVAL = pi_interpolate(aTHX_ v, vl, SvUTF8(str) ? 1 : 0,
+                                &ST(2), items - 2);
     }
     OUTPUT:
         RETVAL
@@ -417,6 +534,11 @@ _negotiate(class, header, tags)
             for (j = 0; j < tl; j++) ar.cat[ar.ncat].tag[j] = pi_fold(tp[j]);
             ar.cat[ar.ncat].tag[tl] = '\0';
             ar.cat[ar.ncat].taglen  = tl;
+            /* No block here: this seam tests the Accept-Language rules on
+             * tags alone. Said explicitly rather than left to Newxz, so the
+             * next person to add a pi_get gets a refusal and not a crash. */
+            ar.cat[ar.ncat].fz      = NULL;
+            ar.cat[ar.ncat].node    = FZ_NOHANDLE;
             ar.ncat++;
         }
 
@@ -428,5 +550,26 @@ _negotiate(class, header, tags)
                : newSV(0);
         Safefree(ar.cat);
     }
+    OUTPUT:
+        RETVAL
+
+MODULE = Punk    PACKAGE = Punk
+
+# Whether Frozen's ABI table resolved. Nothing on the request path asks -
+# punk_fz croaks at boot if it is missing, because Frozen is a hard
+# dependency with no arena to fall back to. This is for the guard test and
+# for `punk doctor`. PUNK_FAKE_FZ_BAD simulates a version mismatch.
+int
+_fz_available()
+    CODE:
+        RETVAL = punk_fz_try(aTHX) ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+# The ABI version this was compiled against, for the guard test.
+int
+_fz_abi_version()
+    CODE:
+        RETVAL = FZ_ABI_VERSION;
     OUTPUT:
         RETVAL

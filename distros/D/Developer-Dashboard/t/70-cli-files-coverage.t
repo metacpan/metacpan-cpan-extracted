@@ -13,6 +13,7 @@ use Capture::Tiny qw(capture);
 use lib 'lib';
 
 use Developer::Dashboard::CLI::Files;
+use Developer::Dashboard::CLI::TableHelpers;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::Config;
@@ -236,46 +237,46 @@ run_ok( command => 'file', args => [ 'add', 'locroot', $locdir ] );
     like( $table, qr/File/, '_files_table renders a header even without an inventory hash' );
 }
 {
-    my $table = Developer::Dashboard::CLI::Files::_aliases_table(undef);
-    like( $table, qr/Alias/, '_aliases_table renders a header even without alias data' );
+    my $table = Developer::Dashboard::CLI::TableHelpers::aliases_table(undef);
+    like( $table, qr/Alias/, 'aliases_table renders a header even without alias data' );
 }
 {
-    my $table = Developer::Dashboard::CLI::Files::_list_table( 'Path', undef );
-    like( $table, qr/Path/, '_list_table renders a header even without item data' );
+    my $table = Developer::Dashboard::CLI::TableHelpers::list_table( 'Path', undef );
+    like( $table, qr/Path/, 'list_table renders a header even without item data' );
 }
 {
-    my $table = Developer::Dashboard::CLI::Files::_mutation_table( alias => 'lonely' );
-    like( $table, qr/lonely/, '_mutation_table blanks missing stored/resolved/status fields' );
+    my $table = Developer::Dashboard::CLI::TableHelpers::mutation_table( alias => 'lonely' );
+    like( $table, qr/lonely/, 'mutation_table blanks missing stored/resolved/status fields' );
 }
 {
-    my $removed = Developer::Dashboard::CLI::Files::_removal_table( alias => 'gone', removed => 1 );
-    like( $removed, qr/removed/, '_removal_table reports removed aliases' );
+    my $removed = Developer::Dashboard::CLI::TableHelpers::removal_table( alias => 'gone', removed => 1 );
+    like( $removed, qr/removed/, 'removal_table reports removed aliases' );
 
-    my $kept = Developer::Dashboard::CLI::Files::_removal_table( removed => 0 );
-    like( $kept, qr/no-change/, '_removal_table reports no-change and blanks a missing alias' );
+    my $kept = Developer::Dashboard::CLI::TableHelpers::removal_table( removed => 0 );
+    like( $kept, qr/no-change/, 'removal_table reports no-change and blanks a missing alias' );
 }
 {
-    my $empty = Developer::Dashboard::CLI::Files::_render_table( undef, undef );
-    ok( defined $empty, '_render_table tolerates undef header and rows without dying' );
+    my $empty = Developer::Dashboard::CLI::TableHelpers::render_table( undef, undef );
+    ok( defined $empty, 'render_table tolerates undef header and rows without dying' );
 
-    my $undef_header = Developer::Dashboard::CLI::Files::_render_table( [ undef, 'X' ], [] );
-    like( $undef_header, qr/X/, '_render_table blanks undef header cells' );
+    my $undef_header = Developer::Dashboard::CLI::TableHelpers::render_table( [ undef, 'X' ], [] );
+    like( $undef_header, qr/X/, 'render_table blanks undef header cells' );
 
-    my $normal = Developer::Dashboard::CLI::Files::_render_table( [ 'A', 'B' ], [ [ '1', '2' ] ] );
-    like( $normal, qr/A\s+B/, '_render_table renders a populated header and row' );
+    my $normal = Developer::Dashboard::CLI::TableHelpers::render_table( [ 'A', 'B' ], [ [ '1', '2' ] ] );
+    like( $normal, qr/A\s+B/, 'render_table renders a populated header and row' );
 }
 
 # ---------------------------------------------------------------------------
-# _build_paths with a falsy HOME exercises the "$ENV{HOME} || ''" fallback.
+# build_paths with a falsy HOME exercises the "$ENV{HOME} || ''" fallback.
 # ---------------------------------------------------------------------------
 {
     local $ENV{HOME} = '';
     local $ENV{USERPROFILE};
     local $ENV{HOMEDRIVE};
     local $ENV{HOMEPATH};
-    my $built = eval { Developer::Dashboard::CLI::Files::_build_paths() };
-    ok( !defined $built, '_build_paths with an empty HOME cannot build a registry' );
-    like( $@, qr/Missing home directory/, '_build_paths uses the empty-string HOME fallback before the missing-home guard fires' );
+    my $built = eval { Developer::Dashboard::CLI::TableHelpers::build_paths() };
+    ok( !defined $built, 'build_paths with an empty HOME cannot build a registry' );
+    like( $@, qr/Missing home directory/, 'build_paths uses the empty-string HOME fallback before the missing-home guard fires' );
 }
 
 is( scalar @warnings, 0, 'exercising the file CLI helpers stays warning-clean' )

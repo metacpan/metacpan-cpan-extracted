@@ -21,24 +21,16 @@ no_index:
   directory:
     - t
     - inc
+    - lib/AmberDB/Base
     - lib/AmberDB/Locale/Lang
-    - lib/AmberDB/Index
   file:
     - lib/AmberDB/Base.pm
-    - lib/AmberDB/Cache.pm
-    - lib/AmberDB/Transact.pm
-    - lib/AmberDB/Index.pm
     - lib/AmberDB/Locale/Currency.pm
   namespace:
+    - AmberDB::Base
     - AmberDB::Locale::Lang
-    - AmberDB::Index
   package:
     - AmberDB::Base
-    - AmberDB::Cache
-    - AmberDB::Transact
-    - AmberDB::Index
-    - AmberDB::Index::Facet
-    - AmberDB::Index::Junk
     - AmberDB::Locale::Currency
 requires:
   Archive::Tar: '0'
@@ -60,5 +52,5 @@ requires:
 resources:
   bugtracker: https://github.com/marufcetin/amberdb/issues
   repository: https://github.com/marufcetin/amberdb.git
-version: v5.24.0
+version: v5.25.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

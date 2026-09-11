@@ -1,4 +1,4 @@
-[🏠 Ana Sayfa](index_tr.html) &nbsp;•&nbsp; [📖 Hakkında](TR.AmberDB-Hakkinda.html) &nbsp;•&nbsp; [🚀 Hızlı Başlangıç](index_tr.html#-hızlı-başlangıç) &nbsp;•&nbsp; [📘 Tutorial](TR.AmberDB_Veritabani_Sistemi.html) &nbsp;•&nbsp; [🌐 Locale](TR.AmberDB-Locale_Kullanim_Rehberi.html) &nbsp;•&nbsp; [📋 Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [📚 Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [🇬🇧 English](EN.About_AmberDB.html)
+[Ana Sayfa](index_tr.html) &nbsp;•&nbsp; [Hakkında](TR.AmberDB-Hakkinda.html) &nbsp;•&nbsp; [Hızlı Başlangıç](index_tr.html#hızlı-başlangıç) &nbsp;•&nbsp; [Tutorial](TR.AmberDB_Veritabani_Sistemi.html) &nbsp;•&nbsp; [Benchmark](TR.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [Locale](TR.AmberDB-Locale_Kullanim_Rehberi.html) &nbsp;•&nbsp; [SQL Rehberi](TR.AmberDB-vs-SQL_Kullanim_Rehberi.html) &nbsp;•&nbsp; [Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [English](EN.About_AmberDB.html)
 
 ---
 
@@ -24,7 +24,7 @@ AmberDB, tek bir Perl veritabanı motorunda çeşitli yetenekleri bir araya geti
 - Çok tablolu ilişkisel işlemleri yönetme
 - ACID uyumlu transaction
 - Alışveriş sitelerindeki gibi facet filtreleme oluşturma
-- Redis gibi RAM-Disk katmanı
+- Ayrı sunucu gerektirmeyen gömülü RAM-Disk hızlandırma katmanı
 - Yüksek verimli toplu kayıt işleme
 - Kullanıcıların her kayıt için yaptığı işlemleri loglama
 - Tablo tanımına özgü yumuşak silme, (silinen kaydı bir yerde saklar)
@@ -43,7 +43,7 @@ use AmberDB;
 
 # nesneyi oluştur
 my $adb = AmberDB->new(
-	cfg => { user => 'admin', language => 'en' },
+	cfg => { user => 'admin', language => 'gb' },
 	path => { dbase_dir => './dbstore' }
 );
 
@@ -136,14 +136,16 @@ Bu, filtreleme, sıralama, sayfalama ve büyük veri kümelerinde arama gibi iş
 my ($total, @products) = $adb->search_table(
 	"products",             # tablo id
 	"kablosuz kulaklıklar", # aranan string
-	start => 0,             # sayfalama için nereye atlayacak
-	limit => 20             # her sayfada kaç kayıt okunacak
+	{
+		offset => 0,             # sayfalama için nereye atlayacak
+		limit  => 20             # her sayfada kaç kayıt okunacak
+	}
 );
 ```
 
 Bu örnekte "products" tablosundan "kablosuz kulaklıklar" stringinin geçtiği tüm kayıtlardan ilk 0-20 aralığının tüm bilgilerini @products içinde array of array olarak getirir. Index sayesinde veritabanında milyonlarca kayıt olsa bile sonuç milisaniyeler içinde gerçekleşecektir.
 
-**Önemli Not:** "search_table"ye "start+limit" parametresi verilirse dönüşün en başına "$total" değerini döndürür. $total ise veri tablosunda bu aramaya uyan kaç sonucun olduğunu bildirir. Sayfalama için gerekli. 
+**Önemli Not:** "search_table"ye `limit` parametresi verilirse dönüşün en başına "$total" değerini döndürür. $total ise veri tablosunda bu aramaya uyan kaç sonucun olduğunu bildirir. Sayfalama için gerekli. 
 
 ## AmberDB birleştirme yapmaz.
 

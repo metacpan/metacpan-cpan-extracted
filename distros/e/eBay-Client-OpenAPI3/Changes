@@ -1,0 +1,13 @@
+Revision history for eBay-Client-OpenAPI3
+
+0.01  2026-09-10
+    - Initial CPAN release.
+    - Preserve the existing ebayapi3 command-line behavior used by existing
+      consumers, including browse output and pagination behavior.
+    - Add a testable command-line run() entry point without changing normal
+      command-line execution semantics.
+    - Make the documented --config option functional on API subcommands.
+    - Add get_item() as an optional Perl-style alias while retaining getItem().
+    - Clarify module and command-line POD to describe the implemented behavior.
+    - Add offline unit tests, GitHub Actions CI, CPAN prerequisites, and
+      Dist::Zilla metadata for local/manual releases.

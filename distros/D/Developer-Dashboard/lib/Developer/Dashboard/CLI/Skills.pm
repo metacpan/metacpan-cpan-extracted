@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Cwd qw(getcwd);
@@ -27,149 +27,214 @@ sub run_skills_command {
     my @argv = @{$argv};
     my $action = shift @argv || '';
 
-    if ( $action eq 'install' ) {
-        my $use_ddfile = 0;
-        my $output = 'table';
-        my $notest = 0;
-        GetOptionsFromArray( \@argv, 'ddfile' => \$use_ddfile, 'o|output=s' => \$output, 'notest' => \$notest );
-        return _usage_error("Usage: dashboard skills install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n")
-          if $output ne 'json' && $output ne 'table';
-        return _usage_error(
-            "Usage: dashboard skills install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n"
-              . "Usage: dashboard skill install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n"
-              . "Usage: dashboard skills install --ddfile [--notest] [-o json|table]\n"
-        ) if $use_ddfile && @argv;
-        my $paths = _build_paths();
-        my @progress_sources = @argv;
-        if ( !$use_ddfile && !@progress_sources ) {
-            my $source_manager = Developer::Dashboard::SkillManager->new( paths => $paths );
-            @progress_sources = $source_manager->registered_skill_sources;
-        }
-        my $progress = !$use_ddfile
-          ? @progress_sources == 1 && @argv == 1
-              ? _skills_install_progress()
-              : _skills_install_progress_for_sources(@progress_sources)
-          : undef;
-        my $manager = Developer::Dashboard::SkillManager->new(
-            paths      => $paths,
-            progress   => $progress ? $progress->callback : undef,
-            skip_tests => $notest,
-        );
-        my $result;
-        my $error;
-        eval {
-            $result = $use_ddfile
-              ? $manager->install_from_ddfiles( getcwd() )
-              : @argv
-                ? @argv == 1
-                    ? $manager->install( shift @argv )
-                    : $manager->install_many(@argv)
-                : $manager->install_registered_skills;
-            1;
-        } or do {
-            $error = $@ || "dashboard skills install failed\n";
-        };
-        if ($error) {
-            $progress->finish if $progress;
-            die $error;
-        }
-        $progress->finish if $progress;
-        if ( $output eq 'json' ) {
-            print json_encode($result);
-        }
-        else {
-            print _skills_install_summary_table($result);
-        }
-        return $result->{error} ? 1 : 0;
-    }
-    if ( $action eq 'uninstall' ) {
-        my $output = 'table';
-        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
-        my $repo_name = shift @argv || die "Usage: dashboard skills uninstall <repo-name>\n";
-        my $result = $manager->uninstall($repo_name);
-        if ( $output eq 'json' ) {
-            print json_encode($result);
-            return $result->{error} ? 1 : 0;
-        }
-        die "Usage: dashboard skills uninstall <repo-name> [-o json|table]\n" if $output ne 'table';
-        print _skills_state_table( $repo_name, $result->{error} ? 'error' : 'removed', undef );
-        return $result->{error} ? 1 : 0;
-    }
-    if ( $action eq 'enable' ) {
-        my $output = 'table';
-        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
-        my $repo_name = shift @argv || die "Usage: dashboard skills enable <repo-name>\n";
-        my $result = $manager->enable($repo_name);
-        if ( $output eq 'json' ) {
-            print json_encode($result);
-            return $result->{error} ? 1 : 0;
-        }
-        die "Usage: dashboard skills enable <repo-name> [-o json|table]\n" if $output ne 'table';
-        print _skills_state_table( $repo_name, $result->{enabled} ? 'enabled' : 'disabled', $result->{enabled} );
-        return $result->{error} ? 1 : 0;
-    }
-    if ( $action eq 'disable' ) {
-        my $output = 'table';
-        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
-        my $repo_name = shift @argv || die "Usage: dashboard skills disable <repo-name>\n";
-        my $result = $manager->disable($repo_name);
-        if ( $output eq 'json' ) {
-            print json_encode($result);
-            return $result->{error} ? 1 : 0;
-        }
-        die "Usage: dashboard skills disable <repo-name> [-o json|table]\n" if $output ne 'table';
-        print _skills_state_table( $repo_name, $result->{enabled} ? 'enabled' : 'disabled', $result->{enabled} );
-        return $result->{error} ? 1 : 0;
-    }
-    if ( $action eq 'list' ) {
-        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
-        my $output = 'table';
-        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-        my $skills = $manager->list();
-        if ( $output eq 'json' ) {
-            print json_encode( { skills => $skills } );
-            return 0;
-        }
-        if ( $output eq 'table' ) {
-            print _skills_table($skills);
-            return 0;
-        }
-        die "Usage: dashboard skills list [-o json|table]\n";
-    }
-    if ( $action eq 'usage' ) {
-        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
-        my $output = 'table';
-        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-        my $repo_name = shift @argv || die "Usage: dashboard skills usage <repo-name> [-o json|table]\n";
-        my $usage = $manager->usage($repo_name);
-        if ( $output eq 'json' ) {
-            print json_encode($usage);
-            return $usage->{error} ? 1 : 0;
-        }
-        if ( $output eq 'table' ) {
-            die $usage->{error} . "\n" if $usage->{error};
-            print _usage_table($usage);
-            return 0;
-        }
-        die "Usage: dashboard skills usage <repo-name> [-o json|table]\n";
-    }
-    if ( $action eq '_exec' ) {
-        require Developer::Dashboard::SkillDispatcher;
-        my $skill_name = shift @argv || die "Usage: dashboard <skill-name>.<command> [args...]\n";
-        my $skill_cmd  = shift @argv || die "Usage: dashboard <skill-name>.<command> [args...]\n";
-        my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
-        my $result = $dispatcher->exec_command( $skill_name, $skill_cmd, @argv );
-        if ( $result->{error} ) {
-            print STDERR $result->{error}, "\n";
-            return 1;
-        }
-        return 0;
-    }
+    if ( $action eq 'install' )   { return _skills_action_install( \@argv ) }
+    if ( $action eq 'uninstall' ) { return _skills_action_uninstall( \@argv ) }
+    if ( $action eq 'enable' )    { return _skills_action_enable( \@argv ) }
+    if ( $action eq 'disable' )   { return _skills_action_disable( \@argv ) }
+    if ( $action eq 'list' )      { return _skills_action_list( \@argv ) }
+    if ( $action eq 'usage' )     { return _skills_action_usage( \@argv ) }
+    if ( $action eq '_exec' )     { return _skills_action_exec( \@argv ) }
 
     die "Unknown skills action: $action\nUsage: dashboard skills [install|uninstall|enable|disable|list|usage]\n";
+}
+
+# _skills_action_install($argv)
+# Implements "dashboard skills install [--ddfile] [--notest] [-o json|table]
+# [<git-url-or-local-dir> ...]".
+# Input: array reference of the arguments following the "install" action.
+# Output: prints the install result as JSON or a summary table; returns the
+# numeric exit code.
+sub _skills_action_install {
+    my ($argv) = @_;
+    my @argv = @{$argv};
+    my $use_ddfile = 0;
+    my $output = 'table';
+    my $notest = 0;
+    GetOptionsFromArray( \@argv, 'ddfile' => \$use_ddfile, 'o|output=s' => \$output, 'notest' => \$notest );
+    return _usage_error("Usage: dashboard skills install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n")
+      if $output ne 'json' && $output ne 'table';
+    return _usage_error(
+        "Usage: dashboard skills install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n"
+          . "Usage: dashboard skill install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n"
+          . "Usage: dashboard skills install --ddfile [--notest] [-o json|table]\n"
+    ) if $use_ddfile && @argv;
+    my $paths = _build_paths();
+    my @progress_sources = @argv;
+    if ( !$use_ddfile && !@progress_sources ) {
+        my $source_manager = Developer::Dashboard::SkillManager->new( paths => $paths );
+        @progress_sources = $source_manager->registered_skill_sources;
+    }
+    my $progress = !$use_ddfile
+      ? @progress_sources == 1 && @argv == 1
+          ? _skills_install_progress()
+          : _skills_install_progress_for_sources(@progress_sources)
+      : undef;
+    my $manager = Developer::Dashboard::SkillManager->new(
+        paths      => $paths,
+        progress   => $progress ? $progress->callback : undef,
+        skip_tests => $notest,
+    );
+    my $result;
+    my $error;
+    eval {
+        $result = $use_ddfile
+          ? $manager->install_from_ddfiles( getcwd() )
+          : @argv
+            ? @argv == 1
+                ? $manager->install( shift @argv )
+                : $manager->install_many(@argv)
+            : $manager->install_registered_skills;
+        1;
+    } or do {
+        $error = $@ || "dashboard skills install failed\n";
+    };
+    if ($error) {
+        $progress->finish if $progress;
+        die $error;
+    }
+    $progress->finish if $progress;
+    if ( $output eq 'json' ) {
+        print json_encode($result);
+    }
+    else {
+        print _skills_install_summary_table($result);
+    }
+    return $result->{error} ? 1 : 0;
+}
+
+# _skills_action_uninstall($argv)
+# Implements "dashboard skills uninstall <repo-name> [-o json|table]".
+# Input: array reference of the arguments following the "uninstall" action.
+# Output: prints the removal result as JSON or a state summary table;
+# returns the numeric exit code.
+sub _skills_action_uninstall {
+    my ($argv) = @_;
+    my @argv = @{$argv};
+    my $output = 'table';
+    GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+    my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
+    my $repo_name = shift @argv || die "Usage: dashboard skills uninstall <repo-name>\n";
+    my $result = $manager->uninstall($repo_name);
+    if ( $output eq 'json' ) {
+        print json_encode($result);
+        return $result->{error} ? 1 : 0;
+    }
+    die "Usage: dashboard skills uninstall <repo-name> [-o json|table]\n" if $output ne 'table';
+    print _skills_state_table( $repo_name, $result->{error} ? 'error' : 'removed', undef );
+    return $result->{error} ? 1 : 0;
+}
+
+# _skills_action_enable($argv)
+# Implements "dashboard skills enable <repo-name> [-o json|table]".
+# Input: array reference of the arguments following the "enable" action.
+# Output: prints the enable result as JSON or a state summary table; returns
+# the numeric exit code.
+sub _skills_action_enable {
+    my ($argv) = @_;
+    my @argv = @{$argv};
+    my $output = 'table';
+    GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+    my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
+    my $repo_name = shift @argv || die "Usage: dashboard skills enable <repo-name>\n";
+    my $result = $manager->enable($repo_name);
+    if ( $output eq 'json' ) {
+        print json_encode($result);
+        return $result->{error} ? 1 : 0;
+    }
+    die "Usage: dashboard skills enable <repo-name> [-o json|table]\n" if $output ne 'table';
+    print _skills_state_table( $repo_name, $result->{enabled} ? 'enabled' : 'disabled', $result->{enabled} );
+    return $result->{error} ? 1 : 0;
+}
+
+# _skills_action_disable($argv)
+# Implements "dashboard skills disable <repo-name> [-o json|table]".
+# Input: array reference of the arguments following the "disable" action.
+# Output: prints the disable result as JSON or a state summary table;
+# returns the numeric exit code.
+sub _skills_action_disable {
+    my ($argv) = @_;
+    my @argv = @{$argv};
+    my $output = 'table';
+    GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+    my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
+    my $repo_name = shift @argv || die "Usage: dashboard skills disable <repo-name>\n";
+    my $result = $manager->disable($repo_name);
+    if ( $output eq 'json' ) {
+        print json_encode($result);
+        return $result->{error} ? 1 : 0;
+    }
+    die "Usage: dashboard skills disable <repo-name> [-o json|table]\n" if $output ne 'table';
+    print _skills_state_table( $repo_name, $result->{enabled} ? 'enabled' : 'disabled', $result->{enabled} );
+    return $result->{error} ? 1 : 0;
+}
+
+# _skills_action_list($argv)
+# Implements "dashboard skills list [-o json|table]".
+# Input: array reference of the arguments following the "list" action.
+# Output: prints the installed-skill inventory as JSON or a summary table;
+# returns 0, or dies with a usage message for an unsupported format.
+sub _skills_action_list {
+    my ($argv) = @_;
+    my @argv = @{$argv};
+    my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
+    my $output = 'table';
+    GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+    my $skills = $manager->list();
+    if ( $output eq 'json' ) {
+        print json_encode( { skills => $skills } );
+        return 0;
+    }
+    if ( $output eq 'table' ) {
+        print _skills_table($skills);
+        return 0;
+    }
+    die "Usage: dashboard skills list [-o json|table]\n";
+}
+
+# _skills_action_usage($argv)
+# Implements "dashboard skills usage <repo-name> [-o json|table]".
+# Input: array reference of the arguments following the "usage" action.
+# Output: prints the skill's usage summary as JSON or a table; returns the
+# numeric exit code, or dies with a usage message for missing/unsupported
+# arguments.
+sub _skills_action_usage {
+    my ($argv) = @_;
+    my @argv = @{$argv};
+    my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
+    my $output = 'table';
+    GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+    my $repo_name = shift @argv || die "Usage: dashboard skills usage <repo-name> [-o json|table]\n";
+    my $usage = $manager->usage($repo_name);
+    if ( $output eq 'json' ) {
+        print json_encode($usage);
+        return $usage->{error} ? 1 : 0;
+    }
+    if ( $output eq 'table' ) {
+        die $usage->{error} . "\n" if $usage->{error};
+        print _usage_table($usage);
+        return 0;
+    }
+    die "Usage: dashboard skills usage <repo-name> [-o json|table]\n";
+}
+
+# _skills_action_exec($argv)
+# Implements the internal "dashboard skills _exec <skill> <command> [args...]"
+# dotted-command dispatch entrypoint.
+# Input: array reference of the arguments following the "_exec" action.
+# Output: prints any dispatch error to STDERR; returns the numeric exit code.
+sub _skills_action_exec {
+    my ($argv) = @_;
+    my @argv = @{$argv};
+    require Developer::Dashboard::SkillDispatcher;
+    my $skill_name = shift @argv || die "Usage: dashboard <skill-name>.<command> [args...]\n";
+    my $skill_cmd  = shift @argv || die "Usage: dashboard <skill-name>.<command> [args...]\n";
+    my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
+    my $result = $dispatcher->exec_command( $skill_name, $skill_cmd, @argv );
+    if ( $result->{error} ) {
+        print STDERR $result->{error}, "\n";
+        return 1;
+    }
+    return 0;
 }
 
 # _usage_error($message)

@@ -40,6 +40,7 @@
 \.tar\.gz$
 \.tgz$
 \.zip$
+\bINDEX_KEY_MAP\.md$
 
 # Database runtime stores and temp files
 \bdbstore\b

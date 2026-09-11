@@ -3,11 +3,12 @@ package Developer::Dashboard::FileRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use File::Spec;
 use File::Find ();
 use Developer::Dashboard::Config ();
+use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
 
 # new(%args)
 # Constructs a logical file registry.
@@ -15,7 +16,7 @@ use Developer::Dashboard::Config ();
 # Output: Developer::Dashboard::FileRegistry object.
 sub new {
     my ( $class, %args ) = @_;
-    my $paths = $args{paths} || die 'Missing paths registry';
+    my $paths = require_paths_arg(%args);
     return bless {
         paths                  => $paths,
         named_files            => {},

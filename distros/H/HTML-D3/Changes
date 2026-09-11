@@ -1,5 +1,14 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.11 Thu Sep 10 09:32:08 PM EDT 2026
+	[ Bug Fixes ]
+	- render_zoomable_line_chart_snippet: the y-axis lower bound was
+	  hard-coded to 0, causing data points with negative Y values to be
+	  plotted off-screen below the x-axis.  Changed to
+	  Math.min(0, d3.min(newData, d => d.value)) so the domain extends
+	  downward when the data contains negative values (e.g.
+	  accounting-notation amounts).
+
 0.10 Fri Aug 28 08:57:09 PM EDT 2026
 	[ Enhancements ]
 	- Added render_zoomable_line_chart_snippet(): embeddable line chart with brush-to-zoom — drag to select an x-axis range, animated transition to the zoomed view, incremental re-zoom on the zoomed view, and a Reset zoom button to restore the full dataset

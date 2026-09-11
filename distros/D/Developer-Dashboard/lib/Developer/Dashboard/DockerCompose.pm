@@ -3,10 +3,11 @@ package Developer::Dashboard::DockerCompose;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
+use Developer::Dashboard::DirEntries qw(sorted_dir_entries);
 use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
@@ -51,7 +52,6 @@ sub resolve {
 
     my @addons = @{ $args{addons} || [] };
     my @modes  = @{ $args{modes}  || [] };
-    my @services = @{ $args{services} || [] };
 
     my %addon_map = (
         %{ $docker_cfg->{addons} || {} },
@@ -62,85 +62,55 @@ sub resolve {
     my %service_map = (
         %{ $docker_cfg->{services} || {} },
     );
-    my @inferred_services = $self->_infer_services_from_args(
-        args         => \@passthrough,
+    my @services = $self->_resolve_effective_services(
+        requested    => $args{services} || [],
+        passthrough  => \@passthrough,
         project_root => $project_root,
         service_map  => \%service_map,
     );
-    my %service_seen;
-    @services = grep { !$service_seen{$_}++ } ( @services, @inferred_services );
-    if ( !@services ) {
-        my @auto_services = $self->_discover_enabled_services(
-            project_root => $project_root,
-            service_map  => \%service_map,
-        );
-        @services = grep { !$service_seen{$_}++ } @auto_services;
-    }
 
-    my @service_files;
-    for my $service (@services) {
-        my $def = $service_map{$service};
-        next if ref($def) ne 'HASH';
-        push @service_files, @{ $def->{files} } if ref( $def->{files} ) eq 'ARRAY';
-    }
-    for my $service (@services) {
-        push @service_files, $self->_discover_service_files(
-            service      => $service,
-            project_root => $project_root,
-            modes        => \@modes,
-        );
-    }
-    push @compose_files, @service_files;
-    push @layers, { name => 'service', files => [@service_files] } if @service_files;
+    my $service_files = $self->_gather_service_files(
+        services     => \@services,
+        service_map  => \%service_map,
+        project_root => $project_root,
+        modes        => \@modes,
+    );
+    push @compose_files, @{$service_files};
+    push @layers, { name => 'service', files => [ @{$service_files} ] } if @{$service_files};
 
-    my @addon_files;
-    for my $addon (@addons) {
-        my $def = $addon_map{$addon};
-        next if ref($def) ne 'HASH';
-        push @addon_files, @{ $def->{files} } if ref( $def->{files} ) eq 'ARRAY';
-        push @modes, @{ $def->{modes} } if ref( $def->{modes} ) eq 'ARRAY';
-    }
-    push @compose_files, @addon_files;
-    push @layers, { name => 'addon', files => [@addon_files] } if @addon_files;
+    my $addon_files = $self->_gather_addon_files(
+        addons    => \@addons,
+        addon_map => \%addon_map,
+        modes     => \@modes,    # pushed into by this call - addons may inject extra modes
+    );
+    push @compose_files, @{$addon_files};
+    push @layers, { name => 'addon', files => [ @{$addon_files} ] } if @{$addon_files};
 
-    my @mode_files;
-    for my $mode (@modes) {
-        my $def = $mode_map{$mode};
-        next if ref($def) ne 'HASH';
-        push @mode_files, @{ $def->{files} } if ref( $def->{files} ) eq 'ARRAY';
-    }
-    push @compose_files, @mode_files;
-    push @layers, { name => 'mode', files => [@mode_files] } if @mode_files;
+    my $mode_files = $self->_gather_mode_files(
+        modes    => \@modes,
+        mode_map => \%mode_map,
+    );
+    push @compose_files, @{$mode_files};
+    push @layers, { name => 'mode', files => [ @{$mode_files} ] } if @{$mode_files};
 
-    my @files;
-    my %seen;
-    for my $file (@compose_files) {
-        next if !defined $file || $file eq '';
-        $file = $self->_expand_env_path($file);
-        $file = File::Spec->catfile( $project_root, $file ) if !File::Spec->file_name_is_absolute($file);
-        next if $seen{$file}++;
-        push @files, $file if -f $file;
-    }
+    my @files = $self->_finalize_compose_files(
+        compose_files => \@compose_files,
+        project_root  => $project_root,
+    );
 
     my $skill_env = $self->_resolve_skill_service_env(
         project_root => $project_root,
         services     => \@services,
     );
-    my %env = (
-        %{ $skill_env->{env} },
-        %{ $docker_cfg->{env} || {} },
-        DDDC => $docker_root,
+    my %env = $self->_resolve_docker_env(
+        skill_env   => $skill_env,
+        docker_cfg  => $docker_cfg,
+        docker_root => $docker_root,
+        addons      => \@addons,
+        addon_map   => \%addon_map,
+        modes       => \@modes,
+        mode_map    => \%mode_map,
     );
-    for my $addon (@addons) {
-        my $def = $addon_map{$addon};
-        next if ref($def) ne 'HASH' || ref( $def->{env} ) ne 'HASH';
-        @env{ keys %{ $def->{env} } } = values %{ $def->{env} };
-    }
-    for my $mode (@modes) {
-        my $def = $mode_map{$mode};
-        next if ref($def) ne 'HASH' || ref( $def->{env} ) ne 'HASH';
-        @env{ keys %{ $def->{env} } } = values %{ $def->{env} };
-    }
 
     my @command = ('docker', 'compose');
     for my $file (@files) {
@@ -160,6 +130,140 @@ sub resolve {
         layers       => \@layers,
         precedence   => [ qw(base project service addon mode) ],
     };
+}
+
+# _resolve_effective_services(%args)
+# Determines the final service list: explicitly requested services, plus any
+# inferred from passthrough args, falling back to auto-discovered enabled
+# services when nothing else names any.
+# Input: requested (array ref), passthrough (array ref), project_root,
+# service_map (hash ref).
+# Output: deduplicated list of service names.
+sub _resolve_effective_services {
+    my ( $self, %args ) = @_;
+    my @services = @{ $args{requested} };
+    my @inferred_services = $self->_infer_services_from_args(
+        args         => $args{passthrough},
+        project_root => $args{project_root},
+        service_map  => $args{service_map},
+    );
+    my %service_seen;
+    @services = grep { !$service_seen{$_}++ } ( @services, @inferred_services );
+    if ( !@services ) {
+        my @auto_services = $self->_discover_enabled_services(
+            project_root => $args{project_root},
+            service_map  => $args{service_map},
+        );
+        @services = grep { !$service_seen{$_}++ } @auto_services;
+    }
+    return @services;
+}
+
+# _gather_service_files(%args)
+# Collects the compose files a resolved service list contributes, both from
+# its static config entry and from filesystem discovery.
+# Input: services (array ref), service_map (hash ref), project_root, modes
+# (array ref).
+# Output: array reference of compose file paths.
+sub _gather_service_files {
+    my ( $self, %args ) = @_;
+    my ( $services, $service_map, $project_root, $modes ) = @args{qw(services service_map project_root modes)};
+    my @service_files;
+    for my $service ( @{$services} ) {
+        my $def = $service_map->{$service};
+        next if ref($def) ne 'HASH';
+        push @service_files, @{ $def->{files} } if ref( $def->{files} ) eq 'ARRAY';
+    }
+    for my $service ( @{$services} ) {
+        push @service_files, $self->_discover_service_files(
+            service      => $service,
+            project_root => $project_root,
+            modes        => $modes,
+        );
+    }
+    return \@service_files;
+}
+
+# _gather_addon_files(%args)
+# Collects the compose files a resolved addon list contributes, mutating the
+# shared modes list in place since an addon definition may inject extra modes.
+# Input: addons (array ref), addon_map (hash ref), modes (array ref, mutated).
+# Output: array reference of compose file paths.
+sub _gather_addon_files {
+    my ( $self, %args ) = @_;
+    my ( $addons, $addon_map, $modes ) = @args{qw(addons addon_map modes)};
+    my @addon_files;
+    for my $addon ( @{$addons} ) {
+        my $def = $addon_map->{$addon};
+        next if ref($def) ne 'HASH';
+        push @addon_files, @{ $def->{files} } if ref( $def->{files} ) eq 'ARRAY';
+        push @{$modes}, @{ $def->{modes} } if ref( $def->{modes} ) eq 'ARRAY';
+    }
+    return \@addon_files;
+}
+
+# _gather_mode_files(%args)
+# Collects the compose files a resolved mode list contributes.
+# Input: modes (array ref), mode_map (hash ref).
+# Output: array reference of compose file paths.
+sub _gather_mode_files {
+    my ( $self, %args ) = @_;
+    my ( $modes, $mode_map ) = @args{qw(modes mode_map)};
+    my @mode_files;
+    for my $mode ( @{$modes} ) {
+        my $def = $mode_map->{$mode};
+        next if ref($def) ne 'HASH';
+        push @mode_files, @{ $def->{files} } if ref( $def->{files} ) eq 'ARRAY';
+    }
+    return \@mode_files;
+}
+
+# _finalize_compose_files(%args)
+# Expands, absolutizes, deduplicates, and existence-filters the accumulated
+# compose file list.
+# Input: compose_files (array ref), project_root.
+# Output: list of existing, absolute, deduplicated compose file paths.
+sub _finalize_compose_files {
+    my ( $self, %args ) = @_;
+    my ( $compose_files, $project_root ) = @args{qw(compose_files project_root)};
+    my @files;
+    my %seen;
+    for my $file ( @{$compose_files} ) {
+        next if !defined $file || $file eq '';
+        $file = $self->_expand_env_path($file);
+        $file = File::Spec->catfile( $project_root, $file ) if !File::Spec->file_name_is_absolute($file);
+        next if $seen{$file}++;
+        push @files, $file if -f $file;
+    }
+    return @files;
+}
+
+# _resolve_docker_env(%args)
+# Merges skill, project, addon, and mode environment layers into the final
+# environment hash for the resolved docker compose invocation.
+# Input: skill_env (hash ref), docker_cfg (hash ref), docker_root, addons
+# (array ref), addon_map (hash ref), modes (array ref), mode_map (hash ref).
+# Output: merged environment hash.
+sub _resolve_docker_env {
+    my ( $self, %args ) = @_;
+    my ( $skill_env, $docker_cfg, $docker_root, $addons, $addon_map, $modes, $mode_map )
+      = @args{qw(skill_env docker_cfg docker_root addons addon_map modes mode_map)};
+    my %env = (
+        %{ $skill_env->{env} },
+        %{ $docker_cfg->{env} || {} },
+        DDDC => $docker_root,
+    );
+    for my $addon ( @{$addons} ) {
+        my $def = $addon_map->{$addon};
+        next if ref($def) ne 'HASH' || ref( $def->{env} ) ne 'HASH';
+        @env{ keys %{ $def->{env} } } = values %{ $def->{env} };
+    }
+    for my $mode ( @{$modes} ) {
+        my $def = $mode_map->{$mode};
+        next if ref($def) ne 'HASH' || ref( $def->{env} ) ne 'HASH';
+        @env{ keys %{ $def->{env} } } = values %{ $def->{env} };
+    }
+    return %env;
 }
 
 # _expand_env_path($path)
@@ -480,7 +584,7 @@ sub _installed_skill_docker_roots_for_runtime {
     while (@queue) {
         my $parent = shift @queue;
         opendir my $dh, $parent or next;
-        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
+        for my $entry ( sorted_dir_entries($dh) ) {
             my $skill_root = File::Spec->catdir( $parent, $entry );
             next if !-d $skill_root;
             next if $seen{$skill_root}++;    # uncoverable branch true the breadth-first walk visits each skill root once

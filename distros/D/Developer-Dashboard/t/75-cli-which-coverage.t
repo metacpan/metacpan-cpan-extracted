@@ -15,6 +15,7 @@ use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SkillManager;
 use Developer::Dashboard::SkillDispatcher;
 use Developer::Dashboard::CLI::Which;
+use Developer::Dashboard::CLI::TableHelpers;
 
 # Hermetic runtime: a temp HOME the test also chdirs into, so the
 # DD-OOP-LAYERS runtime root resolves from this directory (the which helper
@@ -26,9 +27,9 @@ chdir $home or die "Unable to chdir to $home: $!";
 
 my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
 
-# Resolve the exact cli layer the which helper's own _build_paths will inspect,
+# Resolve the exact cli layer the which helper's shared build_paths will inspect,
 # so custom-command and hook fixtures land where the resolver looks.
-my @cli_layers = Developer::Dashboard::CLI::Which::_build_paths()->cli_layers;
+my @cli_layers = Developer::Dashboard::CLI::TableHelpers::build_paths()->cli_layers;
 my $cli_root   = $cli_layers[-1];
 make_path($cli_root);
 
@@ -133,7 +134,7 @@ my $tool = make_exec( File::Spec->catfile( $cli_root, 'coverage-tool' ) );
     my $registry;
     {
         local $ENV{HOME} = '';
-        $registry = eval { Developer::Dashboard::CLI::Which::_build_paths() };
+        $registry = eval { Developer::Dashboard::CLI::TableHelpers::build_paths() };
     }
     ok(
         !defined $registry || $registry->isa('Developer::Dashboard::PathRegistry'),
@@ -283,6 +284,71 @@ is( scalar Developer::Dashboard::CLI::Which::_resolve_directory_runner( File::Sp
         [ Developer::Dashboard::CLI::Which::_dashboard_entry_command() ],
         ['dashboard'],
         '_dashboard_entry_command defaults to the public dashboard entrypoint',
+    );
+}
+
+# --- main-gate hook discovery (DD-810) ---------------------------------------
+# The switchboard runs <layer>/hooks/* once per invocation before the command is
+# resolved, so `dashboard which` reports those hooks ahead of the per-command
+# ones. Drive the registry guard, the no-hooks-root skip, the runnable / `run` /
+# subdirectory filters, the deepest-first layer order, and the printed order.
+{
+    eval { Developer::Dashboard::CLI::Which::_main_gate_hook_files() };
+    like( $@, qr/Missing paths registry/, '_main_gate_hook_files requires a paths registry' );
+
+    is_deeply(
+        [ Developer::Dashboard::CLI::Which::_main_gate_hook_files( paths => $paths ) ],
+        [],
+        '_main_gate_hook_files returns nothing when no layer has a hooks directory',
+    );
+
+    my $home_hooks = File::Spec->catdir( $home, '.developer-dashboard', 'hooks' );
+    make_path($home_hooks);
+    my $hook_a = make_exec( File::Spec->catfile( $home_hooks, '10-a' ) );
+    my $hook_b = make_exec( File::Spec->catfile( $home_hooks, '20-b' ) );
+    make_exec( File::Spec->catfile( $home_hooks, 'run' ) );
+    {
+        my $noexec = File::Spec->catfile( $home_hooks, 'zz-noexec' );
+        open my $fh, '>', $noexec or die "Unable to write $noexec: $!";
+        print {$fh} "not runnable\n";
+        close $fh or die "Unable to close $noexec: $!";
+        chmod 0644, $noexec or die "Unable to chmod $noexec: $!";
+    }
+    make_path( File::Spec->catdir( $home_hooks, 'sub' ) );
+
+    is_deeply(
+        [ Developer::Dashboard::CLI::Which::_main_gate_hook_files( paths => $paths ) ],
+        [ $hook_a, $hook_b ],
+        '_main_gate_hook_files lists sorted runnable files and skips run, non-executables and subdirectories',
+    );
+
+    my $project       = File::Spec->catdir( $home, 'proj' );
+    my $project_hooks = File::Spec->catdir( $project, '.developer-dashboard', 'hooks' );
+    make_path($project_hooks);
+    my $hook_deep = make_exec( File::Spec->catfile( $project_hooks, '05-deep' ) );
+    my $layered   = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $project );
+    is_deeply(
+        [ Developer::Dashboard::CLI::Which::_main_gate_hook_files( paths => $layered ) ],
+        [ $hook_deep, $hook_a, $hook_b ],
+        '_main_gate_hook_files walks the layers deepest first and the home layer last',
+    );
+
+    # which prints the main-gate hooks before the per-command hooks, each in run order.
+    my $tool_hooks = File::Spec->catdir( $cli_root, 'coverage-tool.d' );
+    make_path($tool_hooks);
+    my $tool_hook = make_exec( File::Spec->catfile( $tool_hooks, '10-hook' ) );
+    my ($out) = capture_stdout(
+        sub {
+            Developer::Dashboard::CLI::Which::run_which_command(
+                command => 'which',
+                args    => ['coverage-tool'],
+            );
+        }
+    );
+    is_deeply(
+        [ split /\n/, $out ],
+        [ "COMMAND $tool", "HOOK $hook_a", "HOOK $hook_b", "HOOK $tool_hook" ],
+        'run_which_command reports the main-gate hooks before the per-command hooks',
     );
 }
 

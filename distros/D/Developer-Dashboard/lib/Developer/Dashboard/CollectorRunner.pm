@@ -3,7 +3,7 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -328,71 +328,14 @@ sub start_loop {
     my $pidfile = $self->_pidfile($name);
     my $title   = $self->_process_title($name);
 
-    # The pidfile is a RECORD of what is running, not the authority on it. Asking
-    # only the file is what let 27 supervisor loops accumulate for a collector
-    # declared singleton: once the file was gone - a crash before the write, a
-    # cleanup, a /tmp sweep - every start forked another loop that nothing could
-    # see, stop or count, and each one went on spawning work every interval.
-    #
-    # So if the record is missing, ask the process table before forking. A loop
-    # already running for this collector is adopted and its record rewritten,
-    # which is both the correct outcome and the repair of the missing file.
-    my $existing = -f $pidfile ? do { my $recorded = _slurp($pidfile); chomp $recorded; $recorded } : undef;
-    $existing = $self->_find_running_loop($name) if !$existing;
-
-    # Truthy rather than merely defined, and that is the guarantee the line above
-    # already gives: an empty or zero pidfile leaves $existing false, and that case
-    # is REPLACED by _find_running_loop, which returns a real pid or undef. So a
-    # false-but-defined $existing cannot arrive here.
-    #
-    # This read `defined $existing` with a further `$pid &&` inside, and that inner
-    # test was the last genuinely uncovered condition in lib (DD-532): unreachable
-    # by construction, while looking reachable enough that three rounds of theories
-    # were spent on an unrelated line before anyone read the per-outcome counts.
-    # Deleting the dead test beats annotating it - the guarantee is now stated once,
-    # where it actually holds, rather than re-checked where it cannot fail.
-    if ($existing) {
-        my $pid = $existing;
-        # Recognize an already-running managed loop by its recorded state as
-        # well as by proc/ps identity, so the supervisor's start_loop does not
-        # create a DUPLICATE loop when it races the fresh loop before that loop
-        # has set its process title.
-        if ( $self->_is_managed_loop( $pid, $name ) || $self->_state_confirms_managed_loop( $name, $pid ) ) {
-            $self->_write_loop_state(
-                $name,
-                {
-                    pid          => $pid,
-                    name         => $name,
-                    process_name => $title,
-                    interval     => $interval,
-                    schedule     => $schedule_mode,
-                    status       => 'running',
-                    heartbeat_at => _now_iso8601(),
-                }
-            );
-
-            # Repair the missing record, AFTER the state and never before:
-            # running_loops keys on the pidfile and identifies the pid from the
-            # recorded state, so a pidfile existing without one is exactly the
-            # window DD-488 closed. Adopting a loop found in the process table and
-            # leaving its pidfile absent would fix the duplicate while leaving the
-            # collector invisible to stop and to status, which both key off that
-            # file - one missing record causing two more symptoms.
-            #
-            # close is unchecked, like the original write further down: checking it
-            # raised "Bad file descriptor" and killed start_loop outright, which is
-            # a far worse outcome than an unclosed handle.
-            if ( !-f $pidfile ) {
-                # the state root was created by this same process moments earlier, so a write failure here means the disk vanished mid-call
-                open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";    # uncoverable branch true
-                print {$fh} $pid;
-                close $fh;
-                $self->{paths}->secure_file_permissions($pidfile);
-            }
-            return $pid;
-        }
-        $self->_cleanup_loop_files($name);
-    }
+    my $adopted_pid = $self->_adopt_existing_loop_if_running(
+        pidfile       => $pidfile,
+        name          => $name,
+        title         => $title,
+        interval      => $interval,
+        schedule_mode => $schedule_mode,
+    );
+    return $adopted_pid if defined $adopted_pid;
 
     if ( is_windows() ) {
         return $self->_start_windows_loop_process(
@@ -461,6 +404,89 @@ sub start_loop {
         schedule_mode => $schedule_mode,
         title         => $title,
     );
+}
+
+# _adopt_existing_loop_if_running(%args)
+# Checks whether a collector loop is already running for this name and, if
+# so, adopts it - rewriting its recorded state (and repairing a missing
+# pidfile) rather than letting start_loop fork a duplicate. Runs entirely
+# before any fork, so it carries none of start_loop's fork-timing risk.
+# Input: pidfile path, collector name, process title, effective interval,
+# and schedule mode.
+# Output: the adopted pid if a genuinely running loop was found and adopted;
+# undef if start_loop should proceed to fork a fresh loop.
+sub _adopt_existing_loop_if_running {
+    my ( $self, %args ) = @_;
+    my ( $pidfile, $name, $title, $interval, $schedule_mode )
+      = @args{qw(pidfile name title interval schedule_mode)};
+
+    # The pidfile is a RECORD of what is running, not the authority on it. Asking
+    # only the file is what let 27 supervisor loops accumulate for a collector
+    # declared singleton: once the file was gone - a crash before the write, a
+    # cleanup, a /tmp sweep - every start forked another loop that nothing could
+    # see, stop or count, and each one went on spawning work every interval.
+    #
+    # So if the record is missing, ask the process table before forking. A loop
+    # already running for this collector is adopted and its record rewritten,
+    # which is both the correct outcome and the repair of the missing file.
+    my $existing = -f $pidfile ? do { my $recorded = _slurp($pidfile); chomp $recorded; $recorded } : undef;
+    $existing = $self->_find_running_loop($name) if !$existing;
+
+    # Truthy rather than merely defined, and that is the guarantee the line above
+    # already gives: an empty or zero pidfile leaves $existing false, and that case
+    # is REPLACED by _find_running_loop, which returns a real pid or undef. So a
+    # false-but-defined $existing cannot arrive here.
+    #
+    # This read `defined $existing` with a further `$pid &&` inside, and that inner
+    # test was the last genuinely uncovered condition in lib (DD-532): unreachable
+    # by construction, while looking reachable enough that three rounds of theories
+    # were spent on an unrelated line before anyone read the per-outcome counts.
+    # Deleting the dead test beats annotating it - the guarantee is now stated once,
+    # where it actually holds, rather than re-checked where it cannot fail.
+    if ($existing) {
+        my $pid = $existing;
+        # Recognize an already-running managed loop by its recorded state as
+        # well as by proc/ps identity, so the supervisor's start_loop does not
+        # create a DUPLICATE loop when it races the fresh loop before that loop
+        # has set its process title.
+        if ( $self->_is_managed_loop( $pid, $name ) || $self->_state_confirms_managed_loop( $name, $pid ) ) {
+            $self->_write_loop_state(
+                $name,
+                {
+                    pid          => $pid,
+                    name         => $name,
+                    process_name => $title,
+                    interval     => $interval,
+                    schedule     => $schedule_mode,
+                    status       => 'running',
+                    heartbeat_at => _now_iso8601(),
+                }
+            );
+
+            # Repair the missing record, AFTER the state and never before:
+            # running_loops keys on the pidfile and identifies the pid from the
+            # recorded state, so a pidfile existing without one is exactly the
+            # window DD-488 closed. Adopting a loop found in the process table and
+            # leaving its pidfile absent would fix the duplicate while leaving the
+            # collector invisible to stop and to status, which both key off that
+            # file - one missing record causing two more symptoms.
+            #
+            # close is unchecked, like the original write further down: checking it
+            # raised "Bad file descriptor" and killed start_loop outright, which is
+            # a far worse outcome than an unclosed handle.
+            if ( !-f $pidfile ) {
+                # the state root was created by this same process moments earlier, so a write failure here means the disk vanished mid-call
+                open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";    # uncoverable branch true
+                print {$fh} $pid;
+                close $fh;
+                $self->{paths}->secure_file_permissions($pidfile);
+            }
+            return $pid;
+        }
+        $self->_cleanup_loop_files($name);
+    }
+
+    return undef;
 }
 
 

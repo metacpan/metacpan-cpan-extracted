@@ -6,7 +6,7 @@ use v5.38;
 
 use App::Cmd::Setup -app;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 1;
 
@@ -22,7 +22,7 @@ Luv::CLI - command-line dependency manager for love2d projects
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

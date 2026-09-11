@@ -11,6 +11,7 @@ use FindBin qw($RealBin);
 use Capture::Tiny qw(capture);
 use JSON::XS ();
 use Test::More;
+use version ();
 use Archive::Tar;
 
 my $ROOT = abs_path( File::Spec->catdir( $RealBin, File::Spec->updir ) );
@@ -81,7 +82,7 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '4.30', 'repo version bumped for the 30-card queue spanning DD-616..DD-776, dominated by gate-instrument correctness (DD-744, DD-746, DD-750, DD-729, DD-734) plus the DD-764 session-expiry fail-closed fix' );
+is( $version, '4.31', 'repo version bumped to release DD-770..DD-767: host-ready exe-veto, the shared gate-lock premise correction, the checkout-root resolver, the paths-registry constructor extraction, and the empty-environ wall-clock probe fix' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
 {
     my @module_files;
@@ -171,6 +172,8 @@ if ( $dist ne '' ) {
     like( $dist, qr/^exclude_match = \^updates\/$/m, 'dist.ini excludes checkout-only update scripts so user-defined update remains the installed runtime contract' );
     like( $dist, qr/^exclude_match = \^dogfood-output\/$/m, 'dist.ini excludes dogfood-output so browser QA evidence and screenshots do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^\\\.worktrees\/$/m, 'dist.ini excludes .worktrees so ticket worktrees do not leak into release tarballs' );
+    like( $dist, qr/^exclude_match = \^\\\.developer-dashboard\/$/m, 'dist.ini excludes .developer-dashboard so operator runtime state does not leak into release tarballs' );
+    like( $dist, qr/^exclude_match = \^_developer-dashboard\/$/m, 'dist.ini excludes _developer-dashboard so a non-dot rename of the runtime root does not leak into release tarballs (DD-432 class)' );
     unlike( $dist, qr/^exclude_match = \^integration\/$/m, 'dist.ini keeps integration assets in the release tarball so install-time integration tests can read them' );
     unlike( $dist, qr/^exclude_match = \\.md\$$/m, 'dist.ini keeps Markdown documentation in the release tarball so release tests can read the shipped docs' );
     like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
@@ -256,8 +259,8 @@ my %runtime_prereq_minimum = (
     'LWP::Protocol::https'   => '6.07',
     'LWP::UserAgent'         => '6.83',
     'Template'               => '3.103',
-    'URI'                    => '0',
-    'URI::Escape'            => '0',
+    'URI'                    => '5.36',
+    'URI::Escape'            => '5.36',
     'XML::Parser'            => '2.48',
 );
 for my $module ( sort keys %runtime_prereq_minimum ) {
@@ -269,6 +272,26 @@ for my $module ( sort keys %runtime_prereq_minimum ) {
     like( $makefile, qr/["']\Q$module\E["']\s*=>\s*$makefile_value/, "Makefile.PL declares runtime prerequisite $module at $minimum" );
     like( $cpanfile, $cpanfile_re, "cpanfile declares runtime prerequisite $module at $minimum" );
     like( $dist, qr/^\Q$module\E = \Q$minimum\E$/m, "dist.ini declares runtime prerequisite $module at $minimum" ) if $dist ne '';
+}
+
+# DD-789: URI below 5.36 carries CVE-2026-19953, so an unversioned requirement is
+# a declaration that a vulnerable resolution is acceptable. The loop above already
+# pins all three manifests to the SAME version, which is a consistency check - it
+# would pass just as happily if this floor were lowered to 0 in every one of them
+# at once. These assertions add the security constraint the consistency check
+# cannot express, and they compare numerically so raising the floor later keeps
+# passing while lowering or removing it fails.
+#
+# URI::Escape ships inside the URI distribution and tracks its version, so both
+# are floored: advisories are published against distributions while manifests
+# declare modules, and a floor on only one of them silently stops constraining
+# the distribution the day the other requirement is removed.
+for my $uri_module (qw(URI URI::Escape)) {
+    my $declared = $runtime_prereq_minimum{$uri_module};
+    ok(
+        defined $declared && $declared ne '0' && version->parse($declared) >= version->parse('5.36'),
+        "the canonical runtime floor for $uri_module is at least 5.36, so the declared chain cannot permit CVE-2026-19953"
+    ) or diag( "canonical floor for $uri_module is " . ( defined $declared ? "'$declared'" : 'undefined' ) );
 }
 for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket workspace path paths ps1 encode decode indicator collector config auth api ask init cpan page action docker serve stop restart shell doctor housekeeper skills which upgrade)) {
     ok( -f _repo_path( 'share', 'private-cli', $helper ), "share/private-cli/$helper is shipped as a private helper asset" );
@@ -337,6 +360,8 @@ my @operator_local_files = qw(
         Developer-Dashboard-9.99/lib/Developer/Dashboard.pm
         dogfood-output/screenshot.png
         .worktrees/dd-432/lib/Developer/Dashboard.pm
+        .developer-dashboard/config/auth.json
+        _developer-dashboard/config/auth.json
         node_modules/left-pad/index.js
         bin/jq
         .claude/rules/tira-board-contract.md
@@ -372,6 +397,24 @@ my @operator_local_files = qw(
         install.sh
     );
     ok( !$excluded->($_), "dist.ini exclusions leave $_ in the release tarball" ) for @must_be_shipped;
+}
+
+# MANIFEST.SKIP is a separate exclusion mechanism from dist.ini's GatherDir
+# exclude_match (used by the `make dist`/MakeMaker MANIFEST path rather than
+# dzil's own build), and until now carried no test coverage of its own -
+# assert both spellings of the runtime state root are excluded there too, the
+# same way DD-432 excluded both hermes spellings in both files at once.
+{
+    my $manifest_skip = _slurp( _repo_path('MANIFEST.SKIP') );
+    my @skip_pattern = map { qr/$_/ } split /\n/, $manifest_skip;
+    like( $manifest_skip, qr/^\^\\\.developer-dashboard\/$/m, 'MANIFEST.SKIP excludes .developer-dashboard so operator runtime state does not leak into a MANIFEST-built tarball' );
+    like( $manifest_skip, qr/^\^_developer-dashboard\/$/m, 'MANIFEST.SKIP excludes _developer-dashboard so a non-dot rename does not leak into a MANIFEST-built tarball (DD-432 class)' );
+    for my $spelling (qw(.developer-dashboard _developer-dashboard)) {
+        ok(
+            ( scalar grep { "$spelling/config/auth.json" =~ $_ } @skip_pattern ),
+            "MANIFEST.SKIP patterns actually match $spelling/config/auth.json, not merely name it",
+        );
+    }
 }
 
 my @required_tarball_paths = (
@@ -776,6 +819,46 @@ for my $path ( _shipped_perl_doc_paths() ) {
     );
 }
 
+# Every test file a document cites must exist at exactly that path. The
+# upgrade test was renamed twice (t/107 -> t/122 -> t/136) and two documents
+# kept the first number for months; nothing caught it because a later test
+# took the t/122- prefix, so the stale name looked plausible to a reader and
+# no check ever resolved the token. Prefix similarity is not resolution.
+{
+    my @citation_population = _test_citation_population();
+    cmp_ok( scalar(@citation_population), '>', 0, 'test-citation guard reads a non-empty set of documents' );
+
+    my @documents = map { [ File::Spec->abs2rel( $_, $ROOT ) => _slurp($_) ] } @citation_population;
+    my %cited = map { $_ => 1 } map { _cited_test_paths( $_->[1] ) } @documents;
+    cmp_ok( scalar( keys %cited ), '>', 0, 'test-citation guard found at least one cited test path to resolve' );
+
+    my %unresolved = _unresolved_test_citations(@documents);
+    if (%unresolved) {
+        for my $token ( sort keys %unresolved ) {
+            fail("cited test $token does not exist at that path - cited by: " . join( ', ', @{ $unresolved{$token} } ));
+        }
+    }
+    else {
+        pass('every test path cited by the documentation and POD exists at exactly that path');
+    }
+
+    # Control pair, so the resolver is known to discriminate. The stale token
+    # is assembled at runtime: this file is in the population it scans, and a
+    # guard that exempted its own text would have a hole exactly where the
+    # next person copies from.
+    my $stale_token   = join '', 't/122-', 'upgrade-cli.t';
+    my $current_token = 't/136-upgrade-cli.t';
+    my @prefix_holders = glob( _repo_path( 't', '122-*' ) );
+    cmp_ok( scalar(@prefix_holders), '>', 0, 'control precondition: another test owns the t/122- prefix' );
+    ok( !-f _repo_path( split m{/}, $stale_token ), 'control precondition: the stale token itself does not exist' );
+
+    my %control_stale = _unresolved_test_citations( [ 'control' => "prove -lv $stale_token" ] );
+    is_deeply( [ sort keys %control_stale ], [$stale_token], 'control: a prefix match does not resolve a stale test citation' );
+
+    my %control_current = _unresolved_test_citations( [ 'control' => "prove -lv $current_token" ] );
+    is_deeply( [ sort keys %control_current ], [], 'control: an existing test path resolves' );
+}
+
 done_testing();
 
 sub _slurp {
@@ -835,6 +918,58 @@ sub _perl_doc_paths {
 
     my %seen;
     return sort grep { !$seen{$_}++ } @paths;
+}
+
+# Purpose: list every document whose test citations must resolve - markdown
+# under doc/ and docs/, README.md, and every Perl file _perl_doc_paths() walks.
+# Input: none. Output: sorted, de-duplicated list of absolute paths.
+sub _test_citation_population {
+    my @paths = grep { -f $_ } ( _repo_path('README.md') );
+    for my $root ( _repo_path('doc'), _repo_path('docs') ) {
+        next if !-d $root;
+        find(
+            {
+                no_chdir => 1,
+                wanted   => sub {
+                    return if !-f $_;
+                    return if $_ !~ /\.md\z/;
+                    push @paths, $File::Find::name;
+                },
+            },
+            $root,
+        );
+    }
+    push @paths, _perl_doc_paths();
+
+    my %seen;
+    return sort grep { !$seen{$_}++ } @paths;
+}
+
+# Purpose: extract every repo-relative test path a piece of text cites.
+# Input: the text. Output: list of distinct tokens shaped t/NN-name.t, in
+# order of first appearance. A token is a citation whatever surrounds it -
+# a prose mention counts exactly as much as a prove command.
+sub _cited_test_paths {
+    my ($content) = @_;
+    my %seen;
+    return grep { !$seen{$_}++ } ( $content =~ m{(?<![\w./-])(t/[0-9]{2,3}-[A-Za-z0-9_.-]+\.t)\b}g );
+}
+
+# Purpose: resolve every cited test path against the repository at its EXACT
+# path and report the ones that do not exist. Input: a list of [label, text]
+# pairs. Output: hash of unresolved token => [labels that cite it]. A test
+# sharing only the numeric prefix with the token is not a match.
+sub _unresolved_test_citations {
+    my (@documents) = @_;
+    my %unresolved;
+    for my $document (@documents) {
+        my ( $label, $content ) = @{$document};
+        for my $token ( _cited_test_paths($content) ) {
+            next if -f _repo_path( split m{/}, $token );
+            push @{ $unresolved{$token} }, $label;
+        }
+    }
+    return %unresolved;
 }
 
 sub _shipped_perl_doc_paths {
@@ -948,7 +1083,12 @@ __END__
 
 This test keeps the shipped version metadata, public executable list, and core
 documentation aligned for the private-helper and isolated-skill packaging
-model.
+model. It also pins the declared runtime dependency floors, so a
+distribution carrying a published advisory cannot be permitted by the manifests
+even where no current advisory database is installed to notice.
+It also resolves every C<t/NN-name.t> path cited in the README, the markdown under
+C<doc/> and C<docs/>, and the POD of every Perl file, so a renamed test file
+cannot leave a stale citation behind in the documentation.
 
 =for comment FULL-POD-DOC START
 

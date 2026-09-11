@@ -32,12 +32,12 @@ subtest "2. bin_add" => sub {
     # Add array of IDs with duplicates
     $buf = $adb->bin_add($buf, [200, 100, 300, 200]);
     is( $adb->bin_count($buf), 3, "Count is 3 after adding [200, 100, 300, 200]" );
-    ( undef, @ids ) = $adb->bin_decode($buf);
+    ( undef, @ids ) = $adb->bin_decode($buf, 0, 0, 'asc');
     is_deeply( \@ids, [100, 200, 300], "Decoded is [100, 200, 300]" );
 
     # Add from undef
     my $buf2 = $adb->bin_add(undef, [10, 20, 20, 30]);
-    ( undef, @ids ) = $adb->bin_decode($buf2);
+    ( undef, @ids ) = $adb->bin_decode($buf2, 0, 0, 'asc');
     is_deeply( \@ids, [10, 20, 30], "Adding to undef creates clean buffer [10, 20, 30]" );
 };
 
@@ -47,12 +47,12 @@ subtest "3. bin_punch" => sub {
     # Delete single middle ID (bsearch path)
     $buf = $adb->bin_punch($buf, 30);
     is( $adb->bin_count($buf), 4, "Count is 4 after deleting 30" );
-    my ( undef, @ids ) = $adb->bin_decode($buf);
+    my ( undef, @ids ) = $adb->bin_decode($buf, 0, 0, 'asc');
     is_deeply( \@ids, [10, 20, 40, 50], "Decoded is [10, 20, 40, 50]" );
 
     # Delete head and tail IDs
     $buf = $adb->bin_punch($buf, [10, 50]);
-    ( undef, @ids ) = $adb->bin_decode($buf);
+    ( undef, @ids ) = $adb->bin_decode($buf, 0, 0, 'asc');
     is_deeply( \@ids, [20, 40], "Decoded is [20, 40]" );
 
     # Delete non-existent ID
@@ -67,7 +67,7 @@ subtest "3. bin_punch" => sub {
     # Test unsorted buffer deletion (fallback path)
     my $unsorted = pack("(Q>)*", 50, 10, 40, 20, 30);
     $unsorted = $adb->bin_punch($unsorted, [10, 30]);
-    ( undef, @ids ) = $adb->bin_decode($unsorted);
+    @ids = unpack("(Q>)*", $unsorted);
     is_deeply( \@ids, [50, 40, 20], "Unsorted buffer correctly punched to [50, 40, 20]" );
 };
 
@@ -88,7 +88,7 @@ subtest "4. bin_find" => sub {
 subtest "5. bin_sort" => sub {
     my $buf = pack("(Q>)*", 500, 2, 1000000, 45, 1);
     my $sorted = $adb->bin_sort($buf);
-    my ( undef, @ids ) = $adb->bin_decode($sorted);
+    my ( undef, @ids ) = $adb->bin_decode($sorted, 0, 0, 'asc');
     is_deeply( \@ids, [1, 2, 45, 500, 1000000], "Binary sort correctly sorted 64-bit Big-Endian integers" );
 };
 

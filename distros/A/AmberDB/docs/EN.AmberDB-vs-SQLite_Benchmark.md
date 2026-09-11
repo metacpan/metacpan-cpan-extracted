@@ -4,7 +4,7 @@ title: Large-Scale Benchmark on 600,000 Real IMDb Records - AmberDB vs SQLite 3
 description: Comparative benchmark evaluating AmberDB vs SQLite 3 on 600,000 real-world IMDb movies, deep offset pagination (read_all), inverted index search, multi-field filtering, and point read latency.
 ---
 
-[🏠 Home](index.html) &nbsp;•&nbsp; [📖 About](EN.About_AmberDB.html) &nbsp;•&nbsp; [📘 Tutorial](EN.AmberDB_User-Guide.html) &nbsp;•&nbsp; [📊 Benchmark Report](EN.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [🌐 Locale](EN.AmberDB-Locale_User-Guide.html) &nbsp;•&nbsp; [🇹🇷 Türkçe](TR.AmberDB-vs-SQLite_Benchmark.html)
+[Home](index.html) &nbsp;•&nbsp; [About](EN.About_AmberDB.html) &nbsp;•&nbsp; [Quick Start](index.html#quick-start) &nbsp;•&nbsp; [Tutorial](EN.AmberDB_User-Guide.html) &nbsp;•&nbsp; [Benchmark](EN.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [Locale](EN.AmberDB-Locale_User-Guide.html) &nbsp;•&nbsp; [SQL Guide](EN.AmberDB-vs-SQL_User-Guide.html) &nbsp;•&nbsp; [Türkçe](TR.AmberDB-vs-SQLite_Benchmark.html)
 
 ---
 
@@ -55,16 +55,16 @@ All benchmarks below were executed on Linux Ext4 targeting pre-written disk file
 
 | Benchmark Metric / Scenario | SQLite 3 (FTS5 Indexed) | AmberDB v5.24.0 (Indexed) | Winner / Delta |
 | :--- | :---: | :---: | :---: |
-| **Total Real Records** | 600,000 movies | 600,000 movies | — |
-| **Point Read Latency (Random Lookup)** | 9.0 µs | **1.7 µs** | 🏆 **AmberDB (5.3x Faster - 588K ops/s)** |
-| **Deep Paginated Scan (Offset: 430K, Limit: 20)** | 32.59 ms | **3.26 ms** | 🏆 **AmberDB (10.0x FASTER!)** |
-| **Multi-Field Filter (Director + Genre + Language)** | 91.84 ms | **8.96 ms** | 🏆 **AmberDB (10.2x FASTER!)** |
-| **Single-Block Fetch (All Director Movies)** | 24.05 ms | **21.99 ms** | 🏆 **AmberDB (Faster)** |
-| **Date Range Filter (1990–2016)** | **0.22 ms** | 2.79 ms | Both sub-3 ms |
+| **Total Real Records** | 600,000 movies | 600,000 movies | - |
+| **Point Read Latency (Random Lookup)** | 9.0 µs | **1.7 µs** | **AmberDB (5.3x Faster - 588K ops/s)** |
+| **Deep Paginated Scan (Offset: 430K, Limit: 20)** | 32.59 ms | **3.26 ms** | **AmberDB (10.0x FASTER!)** |
+| **Multi-Field Filter (Director + Genre + Language)** | 91.84 ms | **8.96 ms** | **AmberDB (10.2x FASTER!)** |
+| **Single-Block Fetch (All Director Movies)** | 24.05 ms | **21.99 ms** | **AmberDB (Faster)** |
+| **Date Range Filter (1990-2016)** | **0.22 ms** | 2.79 ms | Both sub-3 ms |
 | **Cross-Block Multi-Word (`Canadian Moore`)** | **0.32 ms** | 1.00 ms | Both millisecond-scale |
-| **Omnibox Search (`beyaz 2012 ölü`)** | **0.23 ms** | 0.46 ms | ⚡ Both under 0.5 ms |
-| **Omnibox Search (`venky 2003 nenu`)** | **0.22 ms** | 0.44 ms | ⚡ Both under 0.5 ms |
-| **Omnibox Search (`natale 1996 green`)** | **0.38 ms** | 0.99 ms | ⚡ Both under 1.0 ms |
+| **Omnibox Search (`beyaz 2012 ölü`)** | **0.23 ms** | 0.46 ms | Both under 0.5 ms |
+| **Omnibox Search (`venky 2003 nenu`)** | **0.22 ms** | 0.44 ms | Both under 0.5 ms |
+| **Omnibox Search (`natale 1996 green`)** | **0.38 ms** | 0.99 ms | Both under 1.0 ms |
 | **Disk Storage Footprint** | **488.91 MB** | 522.95 MB | Close parity (AmberDB only +7%) |
 | **Bulk Ingest Rate** | **12.55 sec** (47,814 r/s) | 433.64 sec (1,384 r/s) | SQLite (Compiled C) |
 
@@ -100,7 +100,13 @@ All benchmarks and drivers are open-source and included in the repository:
 git clone https://github.com/marufcetin/amberdb.git
 cd amberdb
 
-# 2. Run the 600K benchmark in isolated processes
+# 2. Download official IMDb dumps and build the 600K+ master dataset (~633K movies)
+perl benchmark/download_real_imdb.pl
+
+# (Alternative: Generate offline synthetic test data instantly without downloading)
+# perl benchmark/data/prepare_data.pl --generate --total=100000
+
+# 3. Run the 600K benchmark in isolated processes
 perl -Ilib benchmark/run_benchmark.pl total=600000 motors=amberdb,sqlite -with-index -random action=read
 ```
 
@@ -118,6 +124,6 @@ Across 600,000 real-world movies:
 * **10x faster** in deep offset pagination (3.26 ms vs 32.59 ms),
 * **5.3x faster** in primary key point reads (1.7 µs vs 9.0 µs),
 * **10.2x faster** in multi-field compound filtering (8.96 ms vs 91.84 ms),
-* **Sub-millisecond** cross-block fulltext record retrieval (0.4 – 0.9 ms).
+* **Sub-millisecond** cross-block fulltext record retrieval (0.4 - 0.9 ms).
 
 AmberDB establishes itself as a state-of-the-art embedded NoSQL document database for Perl.

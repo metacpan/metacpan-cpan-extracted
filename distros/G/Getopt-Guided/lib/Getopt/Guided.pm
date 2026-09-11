@@ -6,7 +6,7 @@ use warnings;
 #<<<
 package Getopt::Guided;
 BEGIN {
-our $VERSION = 'v3.2.3';
+our $VERSION = 'v3.3.0';
 }
 #>>>
 
@@ -233,8 +233,8 @@ sub processopts ( \@@ ) {
   @error == 0
 }
 
-sub readopts ( \@ ) {
-  my ( $argv ) = @_;
+sub readopts ( \@;@ ) {
+  my $argv = shift;
 
   require File::Spec::Functions;
   return
@@ -257,6 +257,8 @@ sub readopts ( \@ ) {
     }
     croakf "File '%s' contains the invalid line '%s'", $file, $_
   }
+  # Prepend hard defaults
+  unshift @$argv, @_;
 
   return
 }

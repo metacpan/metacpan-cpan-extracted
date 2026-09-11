@@ -2,7 +2,7 @@ package Data::HashMap::SI;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub import {
     $^H{"Data::HashMap::SI/hm_si_put"}     = 1;
@@ -38,3 +38,23 @@ sub import {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Data::HashMap::SI - hash map from string keys to int64 values
+
+=head1 SYNOPSIS
+
+    use Data::HashMap::SI;
+    my $map = Data::HashMap::SI->new;
+    hm_si_put $map, "k", 2;
+    my $v = hm_si_get $map, "k";
+
+=head1 DESCRIPTION
+
+One of the fourteen variants of L<Data::HashMap>, which documents the API, the
+C<hm_si_*> keywords and every caveat.
+
+=cut

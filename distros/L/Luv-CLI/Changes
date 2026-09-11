@@ -1,5 +1,16 @@
 Revision history for Luv-CLI
 
+0.002     2026-09-11 02:15:47-04:00 America/New_York
+    - `luv add` and `luv remove` accept multiple libraries in a single
+      invocation
+    - `luv remove --all`/`-a` removes every dependency at once
+    - `luv search --all`/`-a` lists every library in the local
+      registry cache
+    - Added Manifest::clear_dependencies and Registry::all_entries
+    - Fixed stale-cache/old-format manifest entries missing a display
+      name, with a graceful fallback
+    - Added test coverage for Registry::all_entries
+
 0.001     2026-09-09 17:56:40-04:00 America/New_York
     - Initial release
     - `luv init` scaffolds a new project (luv.json, main.lua, conf.lua,

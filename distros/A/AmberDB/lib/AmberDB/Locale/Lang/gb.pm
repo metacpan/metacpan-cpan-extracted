@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '5.24.0';
+our $VERSION = '5.25.1';
 
 my $CREATED  = '2026-09-03';
 
@@ -293,3 +293,32 @@ sub data {
 }
 
 1;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+AmberDB::Locale::Lang::gb - Global Base Language Definition and Default Locale Data for AmberDB
+
+=head1 SYNOPSIS
+
+    use AmberDB::Locale;
+    my $loc = AmberDB::Locale->new('gb');
+
+=head1 DESCRIPTION
+
+Provides Global Base (gb) universal casing, multilingual extended Latin character maps, search regex patterns, canonical accent folding, ASCII transliteration, and international formatting for the AmberDB locale engine. Global Base (gb) serves as the default and fallback locale.
+
+=head1 AUTHOR
+
+Maruf Cetin <marufcetin@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Maruf Cetin.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

@@ -5,18 +5,19 @@ freeze(class, data, ...)
         SV *class
         SV *data
     PREINIT:
-        int lossy = 0;
+        unsigned flags = 0;
         const char *flat = NULL;
         I32 i;
     CODE:
         PERL_UNUSED_VAR(class);
         for (i = 2; i + 1 < items; i += 2) {
             const char *o = SvPV_nolen(ST(i));
-            if      (strEQ(o, "lossy_nv")) lossy = SvTRUE(ST(i + 1));
-            else if (strEQ(o, "flat"))     flat  = SvOK(ST(i + 1))
+            if      (strEQ(o, "lossy_nv"))  { if (SvTRUE(ST(i + 1))) flags |= FZ_F_LOSSY_NV; }
+            else if (strEQ(o, "stringify")) { if (SvTRUE(ST(i + 1))) flags |= FZ_F_STRINGIFY; }
+            else if (strEQ(o, "flat"))      flat = SvOK(ST(i + 1))
                                                  ? SvPV_nolen(ST(i + 1)) : NULL;
         }
-        RETVAL = SvREFCNT_inc(fz_freeze_sv(aTHX_ data, lossy, flat));
+        RETVAL = SvREFCNT_inc(fz_freeze_sv(aTHX_ data, flags, flat));
     OUTPUT:
         RETVAL
 
@@ -26,7 +27,7 @@ freeze_to(class, path, data, ...)
         SV *path
         SV *data
     PREINIT:
-        int lossy = 0;
+        unsigned flags = 0;
         const char *flat = NULL;
         I32 i;
         SV *blk;
@@ -40,11 +41,12 @@ freeze_to(class, path, data, ...)
         PERL_UNUSED_VAR(class);
         for (i = 3; i + 1 < items; i += 2) {
             const char *o = SvPV_nolen(ST(i));
-            if      (strEQ(o, "lossy_nv")) lossy = SvTRUE(ST(i + 1));
-            else if (strEQ(o, "flat"))     flat  = SvOK(ST(i + 1))
+            if      (strEQ(o, "lossy_nv"))  { if (SvTRUE(ST(i + 1))) flags |= FZ_F_LOSSY_NV; }
+            else if (strEQ(o, "stringify")) { if (SvTRUE(ST(i + 1))) flags |= FZ_F_STRINGIFY; }
+            else if (strEQ(o, "flat"))      flat = SvOK(ST(i + 1))
                                                  ? SvPV_nolen(ST(i + 1)) : NULL;
         }
-        blk = fz_freeze_sv(aTHX_ data, lossy, flat);
+        blk = fz_freeze_sv(aTHX_ data, flags, flat);
         bytes = SvPV(blk, len);
         p = SvPV_nolen(path);
         tmp = sv_2mortal(newSVpvf("%s.tmp%ld", p, (long)PerlProc_getpid()));

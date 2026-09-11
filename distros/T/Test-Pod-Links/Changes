@@ -1,5 +1,16 @@
 Revision history for Test-Pod-Links
 
+0.004  2026-09-10 20:10:03 UTC
+
+  - Retry a link with a GET request if the HEAD request returned an error
+    response from the server. Some web servers, e.g. news.ycombinator.com,
+    answer HEAD requests with a '405 Not Allowed' but serve the same URL
+    on a GET request.
+  - Document that ignore, or ignore_match, has to be used for links that
+    cannot be verified without a browser.
+  - Switch license to the ISC license
+  - use redefine() instead of mock() from Test::MockModule
+
 0.003  2019-08-02 08:21:21 UTC
   - API change: all_pod_files_ok() no longer takes files or directories
     as arguments. The files to be tested is now obtained from XT::Files.

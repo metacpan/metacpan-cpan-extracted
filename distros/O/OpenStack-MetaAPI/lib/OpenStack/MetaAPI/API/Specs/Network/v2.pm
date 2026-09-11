@@ -25,7 +25,7 @@ OpenStack::MetaAPI::API::Specs::Network::v2
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 
@@ -83,7 +83,7 @@ get:
         mac_address: {}
         name: {}
         network_id: {}
-        prokect_id: {}
+        project_id: {}
         revision_number: {}
         sort_dir: {}
         sort_key: {}

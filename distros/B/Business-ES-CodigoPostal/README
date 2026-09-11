@@ -1,70 +1,97 @@
 Business-ES-CodigoPostal
+========================
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+Validación de códigos postales españoles: formato, provincia, comunidad
+autónoma, región y localidades.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+    use Business::ES::CodigoPostal qw(validate_cp municipios asignado);
+
+    my $cp = validate_cp('18001');
+
+    if ($cp->{valid}) {
+        print $cp->{provincia};   # Granada
+        print $cp->{ca};          # Andalucía
+        print $cp->{region};      # Peninsula
+        print $cp->{iso_3166_2};  # ES-GR
+    }
+    else {
+        print $cp->{error};
+    }
+
+    my @m = municipios('28017');   # ('Madrid')
+
+También hay interfaz orientada a objetos:
+
+    my $cp = Business::ES::CodigoPostal->new(codigo => '28001');
+    $cp->provincia;  $cp->ca;  $cp->region;  $cp->insular;
+    $cp->set('08001');
 
 
-INSTALLATION
+VALIDAR NO ES EXISTIR
+---------------------
 
-To install this module, run the following commands:
+validate_cp comprueba que el código tenga cinco dígitos y caiga en el rango
+01000-52999, es decir, que su prefijo sea un número de provincia real. Eso no
+garantiza que el código esté asignado a algún sitio:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+    validate_cp('28107')->{valid}   # 1 -- prefijo 28, Madrid
+    asignado('28107')               # 0 -- no existe
 
-SUPPORT AND DOCUMENTATION
+Alcobendas es 28100, 28108 y 28109. Una transposición de dígitos dentro de la
+misma provincia sólo se detecta preguntando por la localidad, y es un error
+frecuente en direcciones tecleadas a mano.
 
-After installing, you can find documentation for this module with the
-perldoc command.
 
-    perldoc Business::ES::CodigoPostal
+NORMALIZACIÓN
+-------------
 
-LICENSE AND COPYRIGHT
+Por defecto la validación es estricta. Con strict a 0 se limpia la entrada,
+que es lo que hace falta al procesar hojas de cálculo, donde los ceros
+iniciales desaparecen:
 
-Copyright (C) 2013 Harun Delgado L<http://djmania.es>
+    validate_cp('8015', { strict => 0 })->{provincia}   # Barcelona
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+CODIFICACIÓN
+------------
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+Desde la 0.03 el módulo devuelve CARACTERES en todas sus salidas de texto.
+Hasta la 0.02 devolvía bytes UTF-8 crudos, y guardarlos en una base de datos
+con la conexión en UTF-8 producía doble codificación. Si tu código
+decodificaba la salida, deja de hacerlo.
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
 
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
+INSTALACIÓN
+-----------
 
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
+    perl Makefile.PL
+    make
+    make test
+    make install
 
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+O con cpanm:
 
+    cpanm Business::ES::CodigoPostal
+
+
+DATOS
+-----
+
+Las tablas de provincias, comunidades y regiones son propias del módulo.
+
+Las localidades de Business::ES::CodigoPostal::Municipios proceden de GeoNames
+(https://www.geonames.org/, volcado export/zip/ES.zip), bajo licencia Creative
+Commons Attribution 4.0 (https://creativecommons.org/licenses/by/4.0/).
+Se regeneran con maint/gen-municipios.pl.
+
+Ese módulo pesa unos 650 KB y se carga sólo cuando se piden localidades:
+validar un código o resolver su provincia no lo toca.
+
+
+LICENCIA
+--------
+
+Copyright 2025-2026 HDELGADO.
+
+Software libre bajo los mismos términos que Perl. Los datos de localidades
+conservan su licencia propia (CC BY 4.0).

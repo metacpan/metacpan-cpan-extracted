@@ -37,8 +37,8 @@ subtest '1. .unq dictionary prefix architecture (s: and n:)' => sub {
     my $table_path = $adb->table_path('catalog_product');
     my $tinfo = $adb->table_info('catalog_product');
 
-    # Convert strings to IDs (write mode)
-    my @ids = $adb->field_to_list( 'Elektronik', 'write', $table_path, $tinfo, 1 );
+    # Convert strings to IDs (write mode via set_fieldlist)
+    my @ids = $adb->set_fieldlist( 'Elektronik', $table_path, $tinfo, 1 );
     is( scalar @ids, 1, "Generated 1 numeric ID for 'Elektronik'" );
     my $elek_id = $ids[0];
     ok( $elek_id =~ /^\d+$/, "ID is numeric" );
@@ -52,12 +52,12 @@ subtest '1. .unq dictionary prefix architecture (s: and n:)' => sub {
     my ($stored_name) = $adb->index_get( $unq_file, "1:n:$elek_id", 'raw' );
     is( $stored_name, 'Elektronik', "1:n:$elek_id maps back to 'Elektronik'" );
 
-    # Test reading mode (read mode)
-    my @read_ids = $adb->field_to_list( 'Elektronik', 'read', $table_path, $tinfo, 1 );
-    is_deeply( \@read_ids, [$elek_id], "field_to_list read mode resolves 'Elektronik' to $elek_id" );
+    # Test reading mode (read mode via get_fieldlist)
+    my @read_ids = $adb->get_fieldlist( 'Elektronik', $table_path, $tinfo, 1 );
+    is_deeply( \@read_ids, [$elek_id], "get_fieldlist read mode resolves 'Elektronik' to $elek_id" );
 
     # Idempotent write: same string gets same ID
-    my @ids2 = $adb->field_to_list( 'Elektronik', 'write', $table_path, $tinfo, 1 );
+    my @ids2 = $adb->set_fieldlist( 'Elektronik', $table_path, $tinfo, 1 );
     is( $ids2[0], $elek_id, "Idempotent: same string reuses existing ID" );
 };
 
@@ -150,9 +150,9 @@ subtest '5. Facet lifecycle with Junk transitions (Active -> Junk -> Active)' =>
     my ($fac_101_junk) = $adb->index_get( "${table_path}.fac", "1:101", 'raw' );
     ok( !defined $fac_101_junk, "Active -> Junk: 101 was removed from .fac" );
 
-    # Verify 101 is in junk j:keys in .inx
-    my ( undef, @jinx_keys ) = $adb->index_get( "$table_path.inx", "j:keys" );
-    ok( ( grep { $_ == 101 } @jinx_keys ), "Product 101 is correctly indexed in .inx (j:keys)" );
+    # Verify 101 is in junk B:keys in .inx
+    my ( undef, @jinx_keys ) = $adb->index_get( "$table_path.inx", "B:keys" );
+    ok( ( grep { $_ == 101 } @jinx_keys ), "Product 101 is correctly indexed in .inx (B:keys)" );
 
     # Transition 2: Product 101 becomes in-sale again (status 1) -> restored to active -> restored to .fac
     $adb->modify_id( 'catalog_product', 101, 'Telefon', 'Apple', 'Siyah', 1 );

@@ -135,8 +135,8 @@ subtest "3. Archive Package Inspection & Integrity" => sub {
     ok( grep { $_ eq 'manifest.json' } @files, "Archive contains manifest.json" );
     ok( grep { $_ eq 'schema/catalog.dbase' } @files, "Archive contains schema/catalog.dbase" );
     ok( grep { $_ eq 'schema/catalog_product.table' } @files, "Archive contains schema/catalog_product.table" );
-    ok( grep { $_ eq 'tables/catalog_product.db' } @files, "Archive contains tables/catalog_product.db" );
-    ok( grep { $_ eq 'tables/catalog_product.unq' } @files, "Archive contains tables/catalog_product.unq" );
+    ok( grep { $_ eq 'table/catalog_product.db' } @files, "Archive contains table/catalog_product.db" );
+    ok( grep { $_ eq 'table/catalog_product.unq' } @files, "Archive contains table/catalog_product.unq" );
 
     # Verify that derived index files are NOT packaged in the archive
     my @inx_files = grep { /\.inx$|\.src$|\.fac$|\.fld$|\.srt$/ } @files;
@@ -145,7 +145,7 @@ subtest "3. Archive Package Inspection & Integrity" => sub {
     # Validate embedded manifest checksum
     my $manifest_content = $tar->get_content('manifest.json');
     my $manifest = JSON::PP::decode_json($manifest_content);
-    my $sha = $manifest->{tables}->{catalog_product}->{sha256}->{'tables/catalog_product.db'};
+    my $sha = $manifest->{tables}->{catalog_product}->{sha256}->{'table/catalog_product.db'};
     ok( defined $sha && length($sha) == 64, "Manifest contains valid 64-character SHA-256 hash" );
 };
 
@@ -181,7 +181,7 @@ subtest "4. Database Restore and Index Reconstruction" => sub {
     # 4.4 Verify .dbase, .table, and .unq files were restored
     my $stage_schema_dir = $stage_adb->path('schema_dir') || "$stagedir/schema";
     ok( -e "$stage_schema_dir/catalog.dbase", "catalog.dbase restored to schema directory" );
-    ok( -e "$stagedir/tables/catalog_product.unq", "catalog_product.unq restored to tables directory" );
+    ok( -e "$stagedir/table/catalog_product.unq", "catalog_product.unq restored to tables directory" );
 
     my $restored_dbase = $stage_adb->dbase_info('catalog');
     ok( defined $restored_dbase, "catalog dbase_info loaded" );

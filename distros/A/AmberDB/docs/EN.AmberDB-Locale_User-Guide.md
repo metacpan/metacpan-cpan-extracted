@@ -1,8 +1,8 @@
-[🏠 Home](index.html) &nbsp;•&nbsp; [📖 About](EN.About_AmberDB.html) &nbsp;•&nbsp; [🚀 Quick Start](index.html#-quick-start) &nbsp;•&nbsp; [📘 Tutorial](EN.AmberDB_User-Guide.html) &nbsp;•&nbsp; [🌐 Locale](EN.AmberDB-Locale_User-Guide.html) &nbsp;•&nbsp; [📋 Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [📚 Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [🇹🇷 Türkçe](TR.AmberDB-Locale_Kullanim_Rehberi.html)
+[Home](index.html) &nbsp;•&nbsp; [About](EN.About_AmberDB.html) &nbsp;•&nbsp; [Quick Start](index.html#quick-start) &nbsp;•&nbsp; [Tutorial](EN.AmberDB_User-Guide.html) &nbsp;•&nbsp; [Benchmark](EN.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [Locale](EN.AmberDB-Locale_User-Guide.html) &nbsp;•&nbsp; [SQL Guide](EN.AmberDB-vs-SQL_User-Guide.html) &nbsp;•&nbsp; [Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [Türkçe](TR.AmberDB-Locale_Kullanim_Rehberi.html)
 
 ---
 
-# AmberDB::Locale — Comprehensive Guide
+# AmberDB::Locale - Comprehensive Guide
 
 ## 1. Overview
 
@@ -107,11 +107,11 @@ Complete schema of the structure returned by each language module:
 
 ---
 
-## 5. Public API — Method Reference
+## 5. Public API - Method Reference
 
 ### 5.1 Case Conversions
 
-#### `uc($string)` — Convert to uppercase
+#### `uc($string)` - Convert to uppercase
 
 ```perl
 my $tr = AmberDB::Locale->new(language => "tr");
@@ -124,7 +124,7 @@ $de->uc("straße");      # "STRASSE"   (ß → SS)
 
 > **Turkish detail:** The mapping `'i' => "\x{130}"` inside `uc_map` is applied **before** Perl's `CORE::uc()` call. This ensures the `i → İ` conversion is done correctly.
 
-#### `lc($string)` — Convert to lowercase
+#### `lc($string)` - Convert to lowercase
 
 ```perl
 $tr->lc("İSTANBUL");    # "istanbul"  (İ → i, I → ı)
@@ -133,7 +133,7 @@ $tr->lc("IĞDIR");       # "ığdır"
 
 > Inside `lc_map`, the mappings `'I' => "\x{131}"` and `"\x{130}" => 'i'` are applied before `CORE::lc()`.
 
-#### `ucfirst($string)` — Capitalize word beginnings
+#### `ucfirst($string)` - Capitalize word beginnings
 
 ```perl
 $tr->ucfirst("istanbul büyükşehir belediyesi");
@@ -142,7 +142,7 @@ $tr->ucfirst("istanbul büyükşehir belediyesi");
 
 First the entire string is lowercased via `lc()`, then the first character after spaces, periods, exclamation marks, colons, quotes, `/`, `(`, `)` is uppercased.
 
-#### `fold($string)` — Normalization for search
+#### `fold($string)` - Normalization for search
 
 ```perl
 my $key = $tr->fold("İSTANBUL");   # "istanbul" (NFKC + lc)
@@ -150,7 +150,7 @@ my $key = $tr->fold("İSTANBUL");   # "istanbul" (NFKC + lc)
 
 Applies Unicode NFKC decomposition + locale `lc()`. Designed for search indexing and matching.
 
-#### `ieq($str1, $str2)` — Case-insensitive comparison
+#### `ieq($str1, $str2)` - Case-insensitive comparison
 
 ```perl
 $tr->ieq("İstanbul", "istanbul");  # 1 (true)
@@ -173,10 +173,10 @@ my $tr = AmberDB::Locale->new(language => "tr");
 my @sorted = $tr->sort(["İzmir", "Ankara", "Van", "Şanlıurfa", "Bursa", "Çanakkale"]);
 # => ("Ankara", "Bursa", "Çanakkale", "İzmir", "Şanlıurfa", "Van")
 
-# Array of hashrefs — sort by field name
+# Array of hashrefs - sort by field name
 my @sorted = $tr->sort(\@products, "name");
 
-# Array of arrayrefs — sort by index number
+# Array of arrayrefs - sort by index number
 my @sorted = $tr->sort(\@rows, 2);
 ```
 
@@ -189,7 +189,7 @@ my @sorted = $tr->sort(\@rows, 2);
 
 ### 5.3 Text Normalization
 
-#### `normalize($string)` — Clean up
+#### `normalize($string)` - Clean up
 
 ```perl
 my $clean = $tr->normalize('<p>Kâr &amp; zarar &ccedil;izelgesi</p>');
@@ -204,7 +204,7 @@ Processing order:
 5. Remove characters outside the safe character class
 6. Collapse multiple whitespace to single space, trim edges
 
-#### `to_ascii($string [, $nonspace])` — ASCII transliteration
+#### `to_ascii($string [, $nonspace])` - ASCII transliteration
 
 ```perl
 $tr->to_ascii("çarşı");           # "carsi"
@@ -471,7 +471,7 @@ $tr->plural(1, { one => "{count} ürün", other => "{count} ürün" });
 $tr->plural(5, { one => "{count} ürün", other => "{count} ürün" });
 # "5 ürün"
 
-# Russian — 4 different forms
+# Russian - 4 different forms
 my $ru = AmberDB::Locale->new(language => "ru");
 $ru->plural(1,  { one => "{count} яблоко", few => "{count} яблока",
                   many => "{count} яблок",  other => "{count} яблока" });
@@ -496,12 +496,12 @@ one{n%10==1&&n%100!=11}few{n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)}many{...}othe
 ### 5.12 Other Accessors
 
 ```perl
-$lang->language();   # "tr" — active language tag
+$lang->language();   # "tr" - active language tag
 $lang->months();     # ["Ocak", "Şubat", ..., "Aralık"]
 $lang->days();       # ["Pazar", "Pazartesi", ..., "Cumartesi"]
 ```
 
-#### `first_char($string)` — Alphabetical index character
+#### `first_char($string)` - Alphabetical index character
 
 ```perl
 $tr->first_char("  çarşı  ");    # "Ç"
@@ -511,7 +511,7 @@ $tr->first_char("İzmir");        # "İ"
 
 ---
 
-## 6. `AmberDB::Locale::Currency` — Universal Currency Data
+## 6. `AmberDB::Locale::Currency` - Universal Currency Data
 
 **12 currencies** are defined in the ISO 4217 standard:
 

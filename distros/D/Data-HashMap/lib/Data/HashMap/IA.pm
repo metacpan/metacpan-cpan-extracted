@@ -2,7 +2,7 @@ package Data::HashMap::IA;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub import {
     $^H{"Data::HashMap::IA/hm_ia_put"}        = 1;
@@ -34,3 +34,23 @@ sub import {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Data::HashMap::IA - hash map from int64 keys to any Perl value values
+
+=head1 SYNOPSIS
+
+    use Data::HashMap::IA;
+    my $map = Data::HashMap::IA->new;
+    hm_ia_put $map, 1, [1, 2];
+    my $v = hm_ia_get $map, 1;
+
+=head1 DESCRIPTION
+
+One of the fourteen variants of L<Data::HashMap>, which documents the API, the
+C<hm_ia_*> keywords and every caveat.
+
+=cut

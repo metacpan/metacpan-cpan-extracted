@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use Cwd qw(getcwd);
+use Developer::Dashboard::PerlEnv;
 use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
@@ -39,7 +40,7 @@ my $repo_lib = File::Spec->catdir( getcwd(), 'lib' );
 # current working directory, so anchor HOME and the CWD in one temp dir.
 my $home = tempdir( 'dd440-fetch-metadata-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
 local $ENV{HOME} = $home;
-local $ENV{PERL5LIB} = join ':', grep { defined && $_ ne '' } $repo_lib, $ENV{PERL5LIB};
+local $ENV{PERL5LIB} = join Developer::Dashboard::PerlEnv::path_separator(), grep { defined && $_ ne '' } $repo_lib, $ENV{PERL5LIB};
 delete local $ENV{DEVELOPER_DASHBOARD_SSL_PROXIED};
 delete local $ENV{DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS};
 delete local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};

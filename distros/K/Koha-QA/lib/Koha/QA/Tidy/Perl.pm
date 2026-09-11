@@ -51,7 +51,7 @@ the output from perltidy.
   my @errors = $checker->errors;
 
 Returns array of error hashrefs, each with:
-  - error: the error type (tidy_perl, no_perltidyrc)
+  - error: the error type (tidy_perl, no_perltidyrc, tidy_perl_empty_output, tidy_perl_perltidy_failed)
 
 =head2 fix
 
@@ -86,11 +86,37 @@ sub check {
     my ( $stdout, $stderr );
     run3( $cmd, undef, \$stdout, \$stderr );
 
+    my $success = $? == 0;
+
     # FIXME raise exception if stderr is defined?
     warn $stderr if $stderr;
 
+    unless ($success) {
+
+        # perltidy failed to process the file
+        $self->{_errors} = [
+            {
+                error   => 'tidy_perl_perltidy_failed',
+                message => 'perltidy failed to process the file, the original content was kept',
+            }
+        ];
+        return 0;
+    }
+
     my $original    = $self->content;
     my $tidy_output = $stdout || '';
+
+    if ( length($original) && !length($tidy_output) ) {
+
+        # Defensive safety net, not currently known to be reachable
+        $self->{_errors} = [
+            {
+                error   => 'tidy_perl_empty_output',
+                message => 'perltidy produced no output, the original content was kept'
+            }
+        ];
+        return 0;
+    }
 
     $self->{_fixed_content} = $tidy_output;
 

@@ -26,6 +26,8 @@ bench/apps/punk-db.psgi
 bench/apps/punk-dyn.psgi
 bench/apps/punk-dyn50.psgi
 bench/apps/punk-hello.psgi
+bench/apps/punk-i18n-fn.psgi
+bench/apps/punk-i18n.psgi
 bench/apps/punk-idempotency.psgi
 bench/apps/punk-json.psgi
 bench/apps/punk-page.psgi
@@ -93,6 +95,7 @@ include/punk/punk_entropy.h
 include/punk/punk_favicon.h
 include/punk/punk_filecache.h
 include/punk/punk_flash.h
+include/punk/punk_frozen.h
 include/punk/punk_future.h
 include/punk/punk_headers.h
 include/punk/punk_health.h
@@ -240,6 +243,7 @@ t/0002-test-numbering.t
 t/0010-abi-guard.t
 t/0011-pk-abi.t
 t/0012-immortal-refcount.t
+t/0013-frozen-abi.t
 t/0020-manifest.t
 t/0021-pod.t
 t/0022-pod-coverage.t
@@ -365,6 +369,7 @@ t/1150-i18n.t
 t/1151-i18n-negotiate.t
 t/1152-i18n-template.t
 t/1153-i18n-plurals.t
+t/1154-i18n-utf8.t
 t/1200-config.t
 t/1210-proxy-parse.t
 t/1211-proxy.t

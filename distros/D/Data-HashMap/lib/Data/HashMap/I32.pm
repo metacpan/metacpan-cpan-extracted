@@ -2,7 +2,7 @@ package Data::HashMap::I32;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub import {
     $^H{"Data::HashMap::I32/hm_i32_put"}     = 1;
@@ -38,3 +38,23 @@ sub import {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Data::HashMap::I32 - hash map from int32 keys to int32 values
+
+=head1 SYNOPSIS
+
+    use Data::HashMap::I32;
+    my $map = Data::HashMap::I32->new;
+    hm_i32_put $map, 1, 2;
+    my $v = hm_i32_get $map, 1;
+
+=head1 DESCRIPTION
+
+One of the fourteen variants of L<Data::HashMap>, which documents the API, the
+C<hm_i32_*> keywords and every caveat.
+
+=cut

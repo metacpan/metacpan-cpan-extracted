@@ -3,7 +3,7 @@ package Developer::Dashboard::Housekeeper;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use File::Path qw(remove_tree);
 use File::Spec;
@@ -15,6 +15,7 @@ use Developer::Dashboard::CollectorRunner;
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::JSON qw(json_decode);
+use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
 use Developer::Dashboard::SessionStore;
 
 # new(%args)
@@ -23,7 +24,7 @@ use Developer::Dashboard::SessionStore;
 # Output: Developer::Dashboard::Housekeeper object.
 sub new {
     my ( $class, %args ) = @_;
-    my $paths = $args{paths} || die 'Missing paths registry';
+    my $paths = require_paths_arg(%args);
     return bless {
         paths => $paths,
     }, $class;
@@ -359,10 +360,7 @@ sub _collector_runner {
 # Output: Developer::Dashboard::Config object.
 sub _config {
     my ($self) = @_;
-    return $self->{config} ||= Developer::Dashboard::Config->new(
-        paths => $self->{paths},
-        files => Developer::Dashboard::FileRegistry->new( paths => $self->{paths} ),    # uncoverable condition false
-    );
+    return $self->{config} ||= Developer::Dashboard::Config->for_paths( $self->{paths} );    # uncoverable condition false
 }
 
 # _now_iso8601()

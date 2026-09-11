@@ -1,4 +1,8 @@
 Revision history for Punk-SAML
 
+0.02    2026-09-11
+        - Fix the build on older ExtUtils::ParseXS: an XSUB local named sp
+          shadowed the stack pointer.
+
 0.01    2026-09-09
         - First version.

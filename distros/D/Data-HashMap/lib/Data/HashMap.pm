@@ -3,10 +3,27 @@ package Data::HashMap;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Data::HashMap', $VERSION);
+
+sub CLONE_SKIP { 1 }
+
+sub STORABLE_freeze { $_[0]->freeze }
+
+sub STORABLE_thaw {
+    my ($self, undef, $blob) = @_;
+    my $tmp = ref($self)->thaw($blob);
+    $$self = $$tmp;
+    $$tmp  = 0;
+    return;
+}
+
+for my $v (qw(I16 I16A I16S I32 I32A I32S IA II IS SA SI16 SI32 SI SS)) {
+    no strict 'refs';
+    @{"Data::HashMap::${v}::ISA"} = (__PACKAGE__);
+}
 
 1;
 
@@ -29,7 +46,7 @@ Data::HashMap - Fast type-specialized hash maps with TTL and LRU, in C
 
     # Method API (convenient - same operations)
     $map->put(42, 100);
-    my $val = $map->get(42);         # 100
+    $val = $map->get(42);            # 100
     $map->exists(42);                # true
     $map->remove(42);
 
@@ -42,7 +59,7 @@ Data::HashMap - Fast type-specialized hash maps with TTL and LRU, in C
     my @keys   = hm_ii_keys $map;
     my @values = hm_ii_values $map;
     my @pairs  = hm_ii_items $map;   # (k1, v1, k2, v2, ...)
-    while (my ($k, $v) = hm_ii_each $map) { ... }
+    while (my ($k, $v) = hm_ii_each $map) { print "$k=$v\n" }
 
     # Bulk operations
     my $href = hm_ii_to_hash $map;   # Perl hashref snapshot
@@ -65,37 +82,40 @@ Data::HashMap - Fast type-specialized hash maps with TTL and LRU, in C
 
 =head1 DESCRIPTION
 
-Data::HashMap provides fourteen type-specialized hash map implementations
-in C, each optimized for its specific key/value type combination.
-All data access uses keyword syntax, which bypasses Perl's method
-dispatch for maximum performance. A method-call API
-(C<< $map->get($key) >>) is also available for convenience.
+Fourteen hash maps implemented in C, each specialised for one combination of
+key and value type. Most operations are available both as a keyword, which
+bypasses method dispatch, and as a method (C<< $map->get($key) >>); a few are
+methods only.
 
-Keywords are automatically enabled when you C<use> a variant module.
+Keywords are enabled by C<use Data::HashMap::XX> for the rest of the enclosing
+lexical scope, normally the file. Each file that calls them needs its own
+C<use> line; C<use Data::HashMap::XX ()> does not enable them. Without it a call
+still compiles, as a method call, and fails when it runs with
+C<Can't locate object method "hm_xx_get" via package "Data::HashMap::XX">.
 
 =head1 VARIANTS
 
 =over
 
-=item L<Data::HashMap::I16> - int16 keys, int16 values (4 bytes/entry)
+=item L<Data::HashMap::I16> - int16 keys, int16 values (4-byte node)
 
-=item L<Data::HashMap::I16A> - int16 keys, any Perl SV* values (refs, objects, etc.)
+=item L<Data::HashMap::I16A> - int16 keys, any Perl value
 
 =item L<Data::HashMap::I16S> - int16 keys, string values
 
-=item L<Data::HashMap::I32> - int32 keys, int32 values (8 bytes/entry)
+=item L<Data::HashMap::I32> - int32 keys, int32 values (8-byte node)
 
-=item L<Data::HashMap::I32A> - int32 keys, any Perl SV* values (refs, objects, etc.)
+=item L<Data::HashMap::I32A> - int32 keys, any Perl value
 
 =item L<Data::HashMap::I32S> - int32 keys, string values
 
-=item L<Data::HashMap::II> - int64 keys, int64 values (16 bytes/entry)
+=item L<Data::HashMap::II> - int64 keys, int64 values (16-byte node)
 
-=item L<Data::HashMap::IA> - int64 keys, any Perl SV* values (refs, objects, etc.)
+=item L<Data::HashMap::IA> - int64 keys, any Perl value
 
 =item L<Data::HashMap::IS> - int64 keys, string values
 
-=item L<Data::HashMap::SA> - string keys, any Perl SV* values (refs, objects, etc.)
+=item L<Data::HashMap::SA> - string keys, any Perl value
 
 =item L<Data::HashMap::SI16> - string keys, int16 values
 
@@ -121,7 +141,7 @@ variant prefix: C<i16>, C<i16a>, C<i16s>, C<i32>, C<i32a>, C<i32s>, C<ia>, C<ii>
     hm_xx_pop $map                  # remove+return (key,val): LRU tail or next entry
     hm_xx_shift $map                # remove+return (key,val): LRU head or prev entry
     hm_xx_reserve $map, $n          # pre-allocate capacity for N entries
-    hm_xx_purge $map                # force-expire all TTL'd entries
+    hm_xx_purge $map                # reap already-expired TTL entries
     hm_xx_capacity $map             # current internal table capacity
     hm_xx_persist $map, $key        # remove TTL from key (make permanent)
     hm_xx_swap $map, $key, $new     # replace value, return old (undef if missing)
@@ -135,7 +155,7 @@ Integer-value variants (I16, I32, II, SI16, SI32, SI) also provide:
 
 All variants also provide:
 
-    hm_xx_size $map                 # returns entry count (includes TTL-expired not yet reaped)
+    hm_xx_size $map                 # entry count, including expired entries not yet reaped
     hm_xx_keys $map                 # returns list of keys
     hm_xx_values $map               # returns list of values
     hm_xx_items $map                # returns (k1,v1, k2,v2, ...)
@@ -156,9 +176,9 @@ String-value variants (SS, IS, I32S, I16S) also provide:
 
 Method-only operations (no keyword form):
 
-    $map->clone                     # deep copy the map
+    $map->clone                     # copy the map (SV* values per its copy mode)
     $map->from_hash(\%h)            # bulk-insert from a Perl hashref
-    $map->merge($other_map)         # merge entries from another map of same type
+    $map->merge($other_map)         # copy in another map's entries; it wins on a conflict
     $map->freeze                    # serialize to binary string (non-SV* variants)
     MyVariant->thaw($data)          # reconstruct map from freeze data
 
@@ -169,149 +189,280 @@ Method-only operations (no keyword form):
     my $ttl  = Data::HashMap::II->new(0, 60);         # TTL: 60-second expiry
     my $both = Data::HashMap::II->new(1000, 60);      # LRU + TTL
     my $fast = Data::HashMap::II->new(1000, 0, 90);   # LRU + 90% skip
+    my $safe = Data::HashMap::SA->new(0, 0, 0, 1);    # SV* variants: copy values
+
+The arguments are C<max_size>, C<ttl> in seconds, and C<lru_skip>, each a
+non-negative number; the SV* variants take a fourth, C<copy> (see
+L</CAVEATS>). A reference, a non-numeric string or an extra argument croaks; a C<ttl> below one second rounds up to one, and one beyond 2**32
+seconds saturates.
 
 =head2 LRU eviction
 
-When C<max_size> is set, the map acts as an LRU cache. Inserting beyond
-capacity evicts the least-recently-used entry. C<get>, C<put> (update),
-and counter operations promote the accessed entry to most-recently-used.
+With C<max_size> set, inserting a new key into a full map evicts the least
+recently used entry. C<get>, C<put> on an existing key, and the counters promote
+the entry they touch; C<exists> does not.
 
-The optional third argument C<lru_skip> (0-99) enables approximate LRU:
-only every Nth access promotes the entry, skipping the linked-list update
-the rest of the time. The tail entry (eviction candidate) is always
-promoted to prevent starvation. This trades eviction precision for speed
-on read-heavy workloads with hot keys (Zipf-like access patterns).
-
-    lru_skip=0    strict LRU (default)
-    lru_skip=90   promote every 10th access --good balance
-    lru_skip=99   promote every 100th access --near-zero overhead
-
-Recommended value for caching workloads: B<90>.
+C<lru_skip> (0-99, larger values clamp to 99) skips promotion on exactly that
+percentage of the accesses that would promote: 90 promotes one in ten. The
+least recently used entry is always promoted when touched, so it cannot be
+starved, and touching the most recently used one never counts. This trades
+eviction precision for speed on read-heavy workloads with hot keys; 90 suits
+most caches.
 
 =head2 TTL expiry
 
-When C<default_ttl> is set (in seconds), entries expire lazily: expired
-entries are removed on access (C<get>, C<exists>, counter ops) and
-skipped during iteration (C<keys>, C<values>, C<items>, C<each>, C<to_hash>). Note that
-C<hm_xx_size> returns the count of all inserted entries including those
-past their TTL that have not yet been lazily removed. C<exists> does not
-promote entries in LRU mode (read-only check). C<get_or_set> inserts
-with the map's default TTL; per-key TTL is not supported via C<get_or_set>
-(use C<put_ttl> for that).
+With a default C<ttl>, or a per-key one from C<put_ttl> (which also works on a
+map without a default), entries expire lazily, with one-second resolution: an
+entry with a TTL of I<n> seconds is readable for between I<n> and I<n>+1
+seconds. Iteration (C<keys>, C<values>, C<items>, C<each>, C<to_hash>) skips
+expired entries, and C<get>, C<exists> and the counters remove one they touch;
+C<size> counts expired entries until they are removed.
 
-Individual entries can also be given a per-key TTL via C<hm_xx_put_ttl>
-or C<< $map->put_ttl($key, $value, $seconds) >>, even on maps created
-without a default TTL. The expires array is lazily allocated on first use.
+Entries nobody touches again are reaped when the table would otherwise grow, so
+a map fed never-repeating keys stays bounded, at a few times its live set.
+C<purge> reaps every expired entry on demand and never removes a live one.
 
-Both features use parallel arrays indexed by slot, keeping the core
-node struct unchanged. Maps created without LRU/TTL have zero overhead
-beyond a never-taken branch.
+On a map with a default TTL, C<put> and the counters renew an existing entry's
+lifetime to that default -- even one given its own TTL by C<put_ttl> or made
+permanent by C<persist> -- so a counter that keeps being hit never expires.
+C<swap>, C<cas>, C<get_or_set> on an existing key, and reads leave the expiry
+alone. On a map without a default the counters leave it alone too, while C<put>
+clears any C<put_ttl> deadline. C<get_or_set> inserts with the default TTL; use
+C<put_ttl> for a per-key one.
+
+On a map with both C<max_size> and a TTL, eviction takes the least recently
+used entry whether or not it has expired, and an expired entry keeps its slot
+and its value until it is reaped: call C<purge> periodically so that expired
+entries, not live ones, make room.
+
+=head1 CAVEATS
+
+=over
+
+=item Keyword syntax
+
+A keyword taking two or more arguments takes a plain comma list with no
+parentheses: C<hm_ii_get $m, $k>. C<hm_ii_get($m, $k)> fails to compile with
+"Expected ','", and C<< => >> is not a separator; one-argument keywords such as
+C<hm_xx_size($m)> do accept parentheses. A keyword parses like a list operator,
+so everything after the last comma is the last argument:
+C<< hm_xx_get $m, $k // $default >> looks up C<< $k // $default >>.
+Parenthesise the call when an operator follows it:
+C<< (hm_xx_get $m, $k) // $default >>, C<< (hm_sa_get $m, $id)->{field} >>.
+C<hm_xx_keys>, C<hm_xx_values> and C<hm_xx_items> return the entry count in
+scalar context, which on a TTL map includes expired entries the list form
+skips. C<no Data::HashMap::XX> does not remove the keywords.
+
+=item Integers
+
+Keys and values are checked against the variant's range on every call,
+C<from_hash> included, and croak outside it rather than wrap. INT_MIN and
+INT_MIN+1 are reserved as keys: C<put>, C<put_ttl>, C<get_or_set> and lookups
+ignore them, while C<incr>, C<decr> and C<incr_by> croak. The counters also
+croak rather than overflow, leaving the value unchanged, with the same
+C<increment failed> message. The I16 and I32 croaks name the full type range,
+reserved values included. A 64-bit perl (C<use64bitint>) is required.
+
+=item String keys
+
+Identity is the key's bytes. A UTF-8-flagged key whose characters fit in one
+byte is downgraded first, so C<"caf\xe9"> and its upgraded form are one key, as
+in a hash. A key that needs UTF-8 is returned with the flag of its most recent
+C<put>, and collides with its own encoded octets: C<"\x{263a}"> and
+C<"\xe2\x98\xba"> are one key here and two in a hash, so copying a hash that
+holds both into a map keeps only one.
+
+=item Perl values
+
+By default the SV* variants (I16A, I32A, IA, SA) store the SV you pass, not a
+copy, as 0.08 did. That is the fastest option, but the stored value stays tied
+to the caller's variable: storing C<$_> in a C<while (E<lt>$fhE<gt>)> loop
+leaves every entry holding the loop's final C<undef>; a C<substr> result, C<$1>
+or a C<foreach> variable changes after it is stored; C<from_hash>, C<clone>,
+C<merge> and C<to_hash> share SVs with their source; and a stored literal is
+read-only. Store a copy (C<"$_">), or pass a true fourth argument, C<copy>, to
+C<new>: the map then copies each value it stores, as a hash does, and each put
+costs 1.6 to 2.6 times as much, still less than a Perl hash. In either mode
+C<get>, C<values>, C<items> and C<each> return the map's own SV, as
+C<values %h> does, and referents are shared.
+
+=item Iteration and order
+
+Key order is unspecified and differs between processes, as with Perl's own
+hashes; sort if you need a stable one. C<each> restarts if a C<put>, C<remove>,
+C<incr> or C<get_or_set> resizes or compacts the table, so do not mutate the
+map during C<each>; in scalar context it returns the key. C<drain> removes
+entries in table order, not LRU order, unlike C<pop> and C<shift> on an LRU
+map. C<pop> and C<shift> skip expired entries; on an LRU map they also reap
+them, and on a plain map C<size> keeps counting them until a lookup reaps them.
+
+=item get_direct
+
+Returns a read-only SV that borrows the map's buffer instead of copying it, for
+immediate use such as comparing or printing. It is valid until that entry is
+next changed, removed, reaped or evicted, so on a TTL or LRU map treat it as
+valid only until the next call on the map. Arguments are evaluated before a
+call: C<< f($m->get_direct($k), $m->remove($k)) >> hands C<f> freed memory.
+C<< my $d = $m->get_direct($k) >> copies, so C<$d> is safe to keep.
+
+=item freeze and thaw
+
+The format is native-endian and not portable across byte orders. Output is not
+byte-stable -- table order drifts across rehashes and, with the per-process hash
+seed, between runs -- so do not use a frozen blob as a digest or cache key;
+C<thaw> round-trips the data regardless. Each entry's remaining lifetime is
+stored, and C<thaw> starts that countdown afresh, so time spent frozen does not
+count. A C<thaw>ed LRU map has lost its recency order. All of this applies to
+L<Storable> too.
+
+=item from_hash and merge
+
+C<from_hash> croaks on a key or value the matching C<put> would reject, leaving
+the entries inserted so far in place, skips reserved keys silently, and reads
+tied hashes. C<merge> copies another map's entries in, the other map winning a
+conflict; they take this map's TTL rules, not the other map's, so merging into
+a map without a TTL makes them permanent.
+
+=item Capacity
+
+A table never shrinks: C<remove> and C<clear> keep its capacity for reuse;
+build a new map to release the memory. The table is the next power of two at or
+above 4/3 of the entries it holds, so a full LRU map's table is between about
+1.34 and 4 times C<max_size>: smaller while filling, larger after a C<reserve>.
+
+=item Taint
+
+The string-value variants (I16S, I32S, IS, SS) keep values in plain C buffers,
+so a tainted string comes back untainted. Under C<-T> do not round-trip
+untrusted data through them into a sensitive operation; the SV* variants
+preserve taint. Keys are never tainted, as with Perl's hashes.
+
+=back
+
+=head1 STORABLE
+
+L<Storable>'s C<freeze>, C<thaw> and C<dclone> work on the ten variants with a
+native C<freeze>, through that format, and produce a separate map. The four SV*
+variants croak with C<freeze not supported for SV* variants; use to_hash +
+Storable>. L<Clone> and other deep copiers that duplicate a blessed scalar
+without a hook are not supported: the copy would share the C table and free it
+twice.
+
+=head1 THREADS
+
+Maps are not shared between ithreads. Every variant inherits C<CLONE_SKIP> from
+C<Data::HashMap>, so a child thread keeps the reference but it points at an
+unblessed C<undef>, and C<DESTROY> never runs on it there; without that, both
+interpreters would free the same C table. Test with
+C<Scalar::Util::blessed($map)>. A thread that needs a map should build its own,
+or receive the contents as a plain hash via C<to_hash>.
 
 =head1 PERFORMANCE
 
-Benchmarks with 100k entries on Linux x86_64 (higher is better):
+Benchmarks with 100k entries on Linux x86_64, in iterations per second (higher
+is better). The 16-bit variants (I16, I16A, I16S, SI16) run at 30k entries,
+since int16 caps them near 65k unique keys, so their rows overstate their
+speed; at equal size SI16 and SI32 run within a few percent of SI, so choose
+them for their range checks.
 
     INSERT (iterations/sec):
-              Rate perl_ss perl_ii    SA    SS    IA  I32A  SI32   SI   IS I32S  I32   II I16S SI16 I16A  I16
-    perl_ss 17.6/s      --     -1%  -11%  -27%  -45%  -48%  -51% -53% -54% -55% -83% -83% -86% -86% -88% -96%
-    perl_ii 17.7/s      1%      --  -11%  -26%  -45%  -48%  -51% -53% -54% -54% -82% -83% -86% -86% -87% -96%
-    SA      19.8/s     12%     12%    --  -18%  -38%  -42%  -45% -47% -48% -49% -80% -81% -84% -84% -86% -95%
-    SS      24.1/s     37%     36%   22%    --  -25%  -29%  -33% -36% -37% -38% -76% -77% -81% -81% -83% -94%
-    IA      32.0/s     82%     81%   62%   33%    --   -6%  -11% -15% -16% -17% -68% -70% -75% -75% -77% -92%
-    I32A    34.0/s     93%     92%   72%   41%    6%    --   -5% -10% -11% -13% -66% -68% -73% -73% -76% -92%
-    SI32    35.9/s    104%    103%   81%   49%   12%    6%    --  -5%  -6%  -8% -64% -66% -72% -72% -75% -91%
-    SI      37.6/s    113%    112%   90%   56%   17%   11%    5%   --  -2%  -3% -63% -65% -70% -70% -73% -91%
-    IS      38.3/s    118%    116%   93%   59%   20%   13%    7%   2%   --  -1% -62% -64% -70% -70% -73% -91%
-    I32S    38.8/s    121%    119%   96%   61%   21%   14%    8%   3%   1%   -- -61% -63% -69% -69% -73% -90%
-    I32      101/s    472%    468%  408%  318%  214%  196%  180% 168% 163% 159%   --  -5% -20% -20% -29% -75%
-    II       106/s    501%    498%  435%  339%  230%  212%  195% 182% 176% 173%   5%   -- -16% -16% -25% -74%
-    I16S     126/s    618%    614%  538%  425%  295%  272%  252% 236% 230% 226%  26%  19%   --  -0% -11% -69%
-    SI16     126/s    618%    614%  538%  425%  295%  272%  252% 236% 230% 226%  26%  19%   0%   -- -11% -69%
-    I16A     141/s    703%    698%  614%  487%  341%  316%  294% 276% 269% 264%  40%  34%  12%  12%   -- -65%
-    I16      404/s   2196%   2182% 1941% 1577% 1161% 1090% 1027% 976% 955% 941% 302% 282% 220% 220% 186%   --
+              Rate perl_ss perl_ii    SA    SS  I32A    IA I32S   IS   SI SI32  I32   II I16A I16S SI16  I16
+    perl_ss 20.0/s      --     -1%   -2%  -26%  -31%  -32% -51% -52% -53% -54% -81% -82% -84% -86% -87% -95%
+    perl_ii 20.2/s      1%      --   -1%  -25%  -30%  -32% -51% -51% -53% -54% -81% -82% -83% -86% -87% -95%
+    SA      20.4/s      2%      1%    --  -25%  -29%  -31% -50% -51% -53% -53% -81% -82% -83% -86% -87% -95%
+    SS      27.1/s     35%     34%   33%    --   -6%   -8% -34% -35% -37% -38% -75% -76% -78% -81% -83% -94%
+    I32A    28.8/s     44%     43%   41%    6%    --   -3% -30% -30% -33% -34% -73% -74% -76% -80% -82% -93%
+    IA      29.6/s     48%     46%   45%    9%    3%    -- -28% -29% -31% -32% -72% -73% -76% -79% -81% -93%
+    I32S    41.0/s    105%    103%  101%   51%   42%   39%   --  -1%  -5%  -6% -62% -63% -66% -71% -74% -90%
+    IS      41.4/s    107%    105%  103%   53%   44%   40%   1%   --  -4%  -5% -61% -63% -66% -71% -74% -90%
+    SI      42.9/s    115%    113%  111%   59%   49%   45%   5%   4%   --  -1% -60% -61% -65% -70% -73% -90%
+    SI32    43.5/s    118%    115%  113%   61%   51%   47%   6%   5%   1%   -- -59% -61% -64% -70% -72% -90%
+    I32      107/s    435%    430%  425%  295%  272%  262% 161% 159% 149% 146%   --  -3% -12% -25% -32% -75%
+    II       111/s    453%    448%  442%  309%  284%  274% 170% 167% 158% 154%   3%   --  -9% -23% -29% -74%
+    I16A     121/s    507%    501%  495%  348%  322%  311% 196% 193% 183% 179%  13%  10%   -- -15% -23% -71%
+    I16S     143/s    614%    607%  600%  428%  396%  383% 248% 245% 233% 228%  33%  29%  18%   --  -9% -66%
+    SI16     157/s    684%    676%  669%  479%  444%  430% 282% 279% 265% 260%  46%  42%  29%  10%   -- -63%
+    I16      424/s   2020%   1999% 1980% 1466% 1372% 1334% 934% 925% 887% 875% 296% 283% 249% 197% 170%   --
 
     LOOKUP (iterations/sec):
-                Rate SS_direct perl_ii    SS    SA perl_ss   SI SI32   IS I32S I32A IS_direct   IA   II  I32 SI16 I16A I16S  I16
-    SS_direct 26.0/s        --    -15%  -17%  -18%    -21% -30% -31% -43% -49% -54%      -54% -60% -68% -76% -84% -86% -90% -93%
-    perl_ii   30.5/s       17%      --   -2%   -4%     -8% -18% -19% -34% -40% -46%      -47% -53% -62% -72% -81% -84% -88% -92%
-    SS        31.3/s       20%      3%    --   -1%     -6% -16% -16% -32% -38% -44%      -45% -52% -61% -72% -81% -83% -88% -92%
-    SA        31.7/s       22%      4%    1%    --     -4% -15% -15% -31% -38% -44%      -45% -51% -61% -71% -80% -83% -88% -92%
-    perl_ss   33.1/s       27%      9%    6%    5%      -- -11% -12% -28% -35% -41%      -42% -49% -59% -70% -79% -82% -87% -91%
-    SI        37.2/s       43%     22%   19%   17%     12%   --  -1% -19% -27% -34%      -35% -43% -54% -66% -77% -80% -85% -90%
-    SI32      37.5/s       44%     23%   20%   18%     13%   1%   -- -19% -26% -33%      -34% -42% -54% -66% -77% -80% -85% -90%
-    IS        46.0/s       77%     51%   47%   45%     39%  24%  23%   --  -9% -18%      -20% -29% -43% -58% -71% -75% -82% -88%
-    I32S      50.7/s       95%     66%   62%   60%     53%  36%  35%  10%   -- -10%      -11% -22% -37% -54% -69% -73% -80% -86%
-    I32A      56.3/s      116%     85%   80%   78%     70%  51%  50%  22%  11%   --       -2% -13% -30% -49% -65% -70% -78% -85%
-    IS_direct 57.2/s      120%     87%   83%   80%     73%  54%  53%  24%  13%   2%        -- -12% -29% -48% -65% -69% -78% -85%
-    IA        64.7/s      149%    112%  107%  104%     95%  74%  73%  41%  28%  15%       13%   -- -20% -42% -60% -65% -75% -83%
-    II        80.8/s      210%    165%  158%  155%    144% 117% 116%  76%  59%  43%       41%  25%   -- -27% -50% -57% -68% -78%
-    I32        111/s      325%    263%  254%  249%    234% 198% 196% 141% 118%  97%       94%  71%  37%   -- -31% -41% -57% -71%
-    SI16       161/s      520%    428%  415%  409%    387% 334% 331% 250% 218% 186%      182% 149% 100%  46%   -- -13% -37% -57%
-    I16A       186/s      615%    510%  495%  487%    462% 401% 397% 305% 267% 231%      226% 188% 130%  68%  15%   -- -27% -50%
-    I16S       256/s      885%    740%  719%  709%    674% 589% 584% 457% 405% 355%      348% 296% 217% 132%  59%  38%   -- -32%
-    I16        375/s     1342%   1130% 1100% 1084%   1033% 910% 902% 716% 640% 566%      556% 480% 365% 239% 133% 102%  46%   --
+                Rate    SS    SA SS_direct perl_ii perl_ss    SI  SI32   IS I32S IS_direct I32A   IA   II  I32 SI16 I16A I16S  I16
+    SS        35.0/s    --   -2%       -3%     -7%    -12%  -19%  -20% -43% -45%      -47% -47% -47% -72% -75% -83% -88% -89% -93%
+    SA        35.7/s    2%    --       -1%     -5%    -10%  -18%  -18% -42% -43%      -45% -46% -46% -71% -74% -82% -88% -89% -93%
+    SS_direct 36.2/s    3%    1%        --     -4%     -9%  -17%  -17% -41% -43%      -45% -45% -46% -71% -74% -82% -88% -89% -93%
+    perl_ii   37.7/s    8%    5%        4%      --     -5%  -13%  -13% -39% -40%      -42% -43% -43% -70% -73% -82% -87% -89% -92%
+    perl_ss   39.6/s   13%   11%        9%      5%      --   -9%   -9% -36% -37%      -40% -40% -41% -68% -72% -81% -87% -88% -92%
+    SI        43.3/s   24%   21%       20%     15%     10%    --   -0% -30% -31%      -34% -34% -35% -65% -69% -79% -85% -87% -91%
+    SI32      43.5/s   24%   22%       20%     15%     10%    0%    -- -29% -31%      -33% -34% -35% -65% -69% -79% -85% -87% -91%
+    IS        61.5/s   76%   72%       70%     63%     56%   42%   41%   --  -2%       -6%  -7%  -8% -51% -56% -70% -79% -81% -88%
+    I32S      63.0/s   80%   76%       74%     67%     59%   45%   45%   2%   --       -4%  -5%  -5% -49% -55% -69% -79% -81% -87%
+    IS_direct 65.4/s   87%   83%       81%     74%     65%   51%   50%   6%   4%        --  -1%  -2% -47% -53% -68% -78% -80% -87%
+    I32A      66.0/s   89%   85%       83%     75%     67%   52%   52%   7%   5%        1%   --  -1% -47% -53% -68% -78% -80% -87%
+    IA        66.6/s   90%   86%       84%     77%     68%   54%   53%   8%   6%        2%   1%   -- -47% -52% -67% -78% -80% -86%
+    II         124/s  256%  248%      244%    230%    215%  187%  186% 102%  97%       90%  88%  87%   -- -11% -39% -58% -62% -75%
+    I32        140/s  300%  291%      287%    271%    253%  223%  221% 127% 122%      114% 112% 110%  12%   -- -31% -53% -58% -72%
+    SI16       204/s  483%  470%      463%    441%    415%  370%  368% 231% 223%      211% 208% 206%  64%  46%   -- -32% -38% -59%
+    I16A       297/s  751%  733%      723%    690%    652%  586%  584% 384% 372%      355% 350% 347% 139% 113%  46%   -- -10% -40%
+    I16S       329/s  841%  821%      810%    774%    732%  659%  657% 435% 422%      403% 398% 394% 164% 135%  62%  11%   -- -33%
+    I16        492/s 1308% 1278%     1261%   1207%   1144% 1036% 1032% 700% 681%      653% 645% 639% 296% 252% 142%  65%  50%   --
 
     INCREMENT (iterations/sec):
-              Rate perl_ss perl_ii    SI32      SI     I32      II    SI16     I16
-    perl_ss 26.2/s      --     -5%    -12%    -15%    -64%    -65%    -77%    -90%
-    perl_ii 27.6/s      5%      --     -8%    -10%    -62%    -63%    -76%    -89%
-    SI32    30.0/s     14%      9%      --     -3%    -59%    -60%    -73%    -88%
-    SI      30.7/s     17%     12%      3%      --    -58%    -59%    -73%    -88%
-    I32     73.1/s    179%    165%    144%    138%      --     -2%    -35%    -71%
-    II      74.4/s    184%    170%    148%    142%      2%      --    -34%    -71%
-    SI16     113/s    330%    310%    277%    267%     54%     52%      --    -56%
-    I16      255/s    871%    824%    750%    728%    248%    242%    126%      --
+              Rate perl_ss perl_ii      SI    SI32      II     I32    SI16     I16
+    perl_ss 31.2/s      --     -5%    -24%    -26%    -66%    -70%    -79%    -92%
+    perl_ii 32.9/s      6%      --    -19%    -22%    -64%    -68%    -78%    -91%
+    SI      40.9/s     31%     24%      --     -3%    -55%    -60%    -73%    -89%
+    SI32    42.1/s     35%     28%      3%      --    -54%    -59%    -72%    -89%
+    II      91.0/s    192%    177%    123%    116%      --    -11%    -40%    -76%
+    I32      103/s    229%    212%    151%    144%     13%      --    -32%    -73%
+    SI16     151/s    386%    360%    271%    260%     66%     48%      --    -60%
+    I16      380/s   1118%   1054%    829%    802%    317%    270%    151%      --
 
     DELETE (iterations/sec):
-              Rate    SA    SS    IS  SI32    SI perl_ss I32S   IA perl_ii I32A   II  I32 SI16 I16A I16S  I16
-    SA      10.9/s    --   -6%  -18%  -25%  -25%    -27% -32% -32%    -36% -41% -58% -76% -83% -84% -86% -93%
-    SS      11.6/s    6%    --  -13%  -20%  -21%    -22% -27% -28%    -32% -37% -55% -74% -82% -83% -85% -93%
-    IS      13.3/s   22%   14%    --   -9%   -9%    -11% -17% -17%    -23% -28% -48% -70% -80% -81% -83% -92%
-    SI32    14.6/s   33%   25%    9%    --   -0%     -2%  -9% -10%    -15% -21% -44% -68% -78% -79% -81% -91%
-    SI      14.6/s   34%   26%   10%    0%    --     -2%  -8%  -9%    -15% -21% -43% -68% -78% -79% -81% -91%
-    perl_ss 14.9/s   36%   28%   12%    2%    2%      --  -7%  -8%    -13% -19% -42% -67% -77% -78% -81% -91%
-    I32S    16.0/s   46%   37%   20%   10%    9%      7%   --  -1%     -7% -14% -38% -65% -76% -77% -80% -90%
-    IA      16.1/s   47%   38%   21%   11%   10%      8%   1%   --     -6% -13% -38% -64% -76% -76% -79% -90%
-    perl_ii 17.2/s   57%   48%   29%   18%   18%     16%   8%   7%      --  -7% -33% -62% -74% -75% -78% -90%
-    I32A    18.5/s   69%   59%   39%   27%   26%     24%  16%  15%      7%   -- -28% -59% -72% -73% -76% -89%
-    II      25.8/s  136%  122%   94%   77%   77%     73%  62%  60%     50%  40%   -- -43% -61% -62% -67% -84%
-    I32     45.1/s  313%  288%  239%  210%  208%    203% 182% 180%    162% 144%  75%   -- -32% -34% -42% -73%
-    SI16    65.9/s  503%  467%  395%  353%  351%    343% 313% 310%    283% 257% 155%  46%   --  -3% -15% -60%
-    I16A    68.3/s  525%  487%  413%  369%  367%    359% 328% 324%    297% 270% 164%  51%   4%   -- -12% -58%
-    I16S    78.0/s  614%  571%  486%  436%  433%    424% 388% 384%    353% 322% 202%  73%  18%  14%   -- -53%
-    I16      165/s 1406% 1315% 1136% 1030% 1025%   1005% 930% 922%    856% 791% 537% 265% 150% 141% 111%   --
+              Rate    SS perl_ss    SA perl_ii    SI  SI32 I32A   IA I32S   IS   II  I32 I16A SI16 I16S  I16
+    SS      13.0/s    --    -11%  -15%    -25%  -39%  -41% -48% -49% -53% -53% -78% -81% -87% -87% -89% -95%
+    perl_ss 14.6/s   12%      --   -5%    -16%  -31%  -33% -42% -42% -47% -47% -76% -79% -85% -85% -88% -94%
+    SA      15.3/s   18%      5%    --    -12%  -28%  -30% -39% -40% -44% -45% -75% -78% -84% -84% -88% -94%
+    perl_ii 17.4/s   34%     19%   14%      --  -18%  -21% -31% -31% -36% -37% -71% -75% -82% -82% -86% -93%
+    SI      21.3/s   64%     46%   39%     22%    --   -3% -15% -16% -22% -23% -65% -69% -78% -78% -83% -92%
+    SI32    21.9/s   68%     50%   43%     26%    3%    -- -13% -13% -20% -21% -64% -68% -78% -78% -82% -91%
+    I32A    25.2/s   94%     73%   65%     45%   18%   15%   --  -0%  -8%  -9% -58% -63% -74% -74% -79% -90%
+    IA      25.3/s   94%     73%   65%     45%   19%   15%   0%   --  -8%  -9% -58% -63% -74% -74% -79% -90%
+    I32S    27.4/s  111%     88%   79%     57%   29%   25%   9%   8%   --  -1% -54% -60% -72% -72% -78% -89%
+    IS      27.8/s  113%     90%   82%     60%   30%   27%  10%  10%   1%   -- -54% -60% -72% -72% -77% -89%
+    II      60.3/s  363%    313%  294%    246%  183%  175% 139% 138% 120% 117%   -- -13% -38% -38% -51% -76%
+    I32     69.0/s  430%    372%  351%    296%  224%  215% 173% 173% 152% 148%  14%   -- -29% -29% -44% -73%
+    I16A    97.6/s  649%    568%  537%    460%  357%  345% 287% 286% 256% 251%  62%  41%   --  -0% -21% -62%
+    SI16    97.8/s  651%    569%  539%    461%  359%  346% 287% 286% 256% 252%  62%  42%   0%   -- -20% -62%
+    I16S     123/s  843%    740%  702%    605%  476%  460% 387% 385% 348% 342% 104%  78%  26%  26%   -- -52%
+    I16      254/s 1852%   1640% 1561%   1359% 1092% 1059% 908% 905% 827% 815% 322% 269% 161% 160% 107%   --
 
 =head2 LRU / TTL overhead
 
-LRU and TTL add parallel arrays for linked-list pointers and expiry timestamps.
-Maps created without these features have zero overhead beyond a never-taken branch.
-
     INSERT, II variant (iterations/sec):
-                 Rate     II_lru II_lru_ttl         II
-    II_lru     68.8/s         --        -2%       -16%
-    II_lru_ttl 70.4/s         2%         --       -14%
-    II         81.9/s        19%        16%         --
+                 Rate II_lru_ttl     II_lru         II
+    II_lru_ttl 75.5/s         --        -7%       -31%
+    II_lru     81.5/s         8%         --       -26%
+    II          110/s        45%        34%         --
 
     LOOKUP, II variant (iterations/sec):
-                 Rate II_lru_ttl     II_lru         II
-    II_lru_ttl 68.3/s         --       -14%       -33%
-    II_lru     79.3/s        16%         --       -23%
-    II          103/s        50%        29%         --
+                 Rate II_lru_ttl II_lru_s90     II_lru         II
+    II_lru_ttl 84.2/s         --        -9%       -11%       -32%
+    II_lru_s90 92.8/s        10%         --        -3%       -25%
+    II_lru     95.2/s        13%         3%         --       -23%
+    II          124/s        47%        33%        30%         --
 
     LRU EVICTION CHURN: insert 100k into capacity 50k (iterations/sec):
                  Rate II_lru_ttl     II_lru
-    II_lru_ttl 61.7/s         --       -13%
-    II_lru     71.0/s        15%         --
+    II_lru_ttl 92.2/s         --        -9%
+    II_lru      102/s        10%         --
 
 =head2 Method vs keyword overhead
 
-Keywords bypass Perl's method dispatch for maximum performance. Method calls
-(C<< $map->get($key) >>) are convenient but slower:
+Method calls cost more than keywords:
 
     II variant, 100k operations (iterations/sec):
-                    keyword    method    overhead
-    LOOKUP          85.5/s    59.1/s       -31%
-    INSERT          71.1/s    59.0/s       -17%
+                    keyword    method    extra time per call
+    LOOKUP             122/s      105/s      +16%
+    INSERT             110/s     98.4/s      +12%
 
 =head1 MEMORY
 
@@ -319,7 +470,7 @@ Memory usage with 1M entries (fork-isolated measurements):
 
     Variant       Memory       Bytes/entry   vs Perl hash
     -------       ------       -----------   ------------
-    I16*           0.5 MB        16            10x less
+    I16*           0.6 MB        21             8x less
     I32            29 MB         30            5.5x less
     II             45 MB         46            3.5x less
     I32S           73 MB         75            2.2x less
@@ -327,7 +478,8 @@ Memory usage with 1M entries (fork-isolated measurements):
     SI16           73 MB         75            2.2x less
     SI32           73 MB         75            2.2x less
     SI             73 MB         75            2.2x less
-    I16A           0.5 MB        16            10x less
+    I16A*          0.6 MB        21             8x less
+    I16S*          0.6 MB        21             8x less
     I32A           92 MB         95            1.7x less
     IA             92 MB         95            1.7x less
     SS            121 MB        124            1.3x less
@@ -335,12 +487,16 @@ Memory usage with 1M entries (fork-isolated measurements):
     perl %h (int) 159 MB        163            (baseline)
     perl %h (str) 166 MB        170            (baseline)
 
-    * I16/I16A/I16S measured at 30k entries (int16 key range limits max unique keys to ~65k)
+    * I16/I16A/I16S measured at 30k entries (the int16 key range caps unique keys
+      at ~65k). Every row is larger than its node size because the table is a
+      power of two at or above 4/3 of the entries and a growth step transiently
+      holds both tables; the I16 row is the least favourable case, sitting just
+      above a power-of-two boundary.
 
 =head2 LRU / TTL memory overhead
 
-Overhead per entry for LRU (prev/next pointers) and TTL (expiry timestamp),
-measured with 1M entries in fork-isolated processes.
+Per-entry cost of LRU (prev/next indices) and TTL (expiry timestamp), at 1M
+entries.
 
     II variant (int64/int64):
     Variant        Bytes/entry   LRU overhead   +TTL overhead
@@ -369,29 +525,15 @@ measured with 1M entries in fork-isolated processes.
 
 =over
 
-=item * Open addressing with linear probing
+=item * Open addressing with linear probing; tombstone deletion with automatic compaction
 
-=item * xxHash v0.8.3 (XXH3_64bits) hash functions for both integer and string keys
+=item * xxHash v0.8.3 (C<XXH3_64bits_withSecret>) for integer and string keys, keyed by a secret derived at load time from Perl's hash seed for DoS resistance
 
-=item * Automatic resize at 75% load factor
+=item * Resize at 75% load; initial capacity 16
 
-=item * Tombstone deletion with automatic compaction
+=item * LRU and TTL state in parallel arrays indexed by slot, allocated only when used, so a map without them pays one never-taken branch
 
-=item * Raw C strings (no Perl SV overhead) for string storage
-
-=item * UTF-8 flag packed into high bit of length fields as metadata only; string keys with identical bytes collide regardless of UTF-8 flag, matching native Perl hash semantics. The stored flag reflects the most-recent put and controls how the key is returned from iteration.
-
-=item * Sentinel values for integer keys (INT_MIN, INT_MIN+1 are reserved and silently rejected). I16/I32 variants croak on out-of-range keys and values.
-
-=item * C<each()> iterator resets if C<put>/C<remove>/C<incr>/C<get_or_set> triggers a resize or compaction; do not mutate the map during C<each()> iteration. In scalar context, C<< $map->each >> returns the key only; the keyword form C<hm_xx_each> always evaluates in list context (XS::Parse::Keyword limitation).
-
-=item * Requires 64-bit Perl (C<use64bitint>); II/IS/IA/SI variants use int64 keys/values via IV
-
-=item * C<get_direct> returns a B<read-only> SV pointing at the map's internal buffer (zero-copy, no malloc). The returned value must not be held past any map mutation (C<put>, C<remove>, C<clear>, or any operation that may resize). Safe for immediate use: comparisons, printing, passing to functions. Use C<get> (the default) when you need to store the value. Note: C<< my $d = $m->get_direct(...) >> copies the value via normal Perl assignment semantics, so the read-only guarantee applies only to the direct returned SV, not to any assigned-to scalar.
-
-=item * C<pop>/C<shift> filter TTL-expired entries out of results. In LRU mode they also reap expired tail/head entries (tombstone them). In non-LRU iteration mode they skip expired entries without tombstoning, so C<size> may remain non-zero; a subsequent read-path operation (C<get>, C<exists>, C<remove>) triggers lazy reaping.
-
-=item * C<freeze>/C<thaw> produces a native-endian binary format; frozen data is not portable between systems with different byte orders. Byte-identical output across C<freeze>-E<gt>C<thaw>-E<gt>C<freeze> is not guaranteed: bucket iteration order may drift across rehashes.
+=item * Strings stored as raw C buffers, with the UTF-8 flag in the high bit of the length
 
 =back
 

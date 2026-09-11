@@ -21,10 +21,10 @@ my %WriteMakefileArgs = (
   "NAME" => "OpenSearch::PPLQuery",
   "PREREQ_PM" => {
     "Cpanel::JSON::XS" => "4.37",
+    "Getopt::Long::Descriptive" => 0,
     "HTTP::Request" => 0,
     "LWP::Protocol::https" => 0,
     "LWP::UserAgent" => 0,
-    "Scalar::Util" => 0,
     "URI" => 0
   },
   "TEST_REQUIRES" => {
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "HTTP::Response" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,12 +41,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Cpanel::JSON::XS" => "4.37",
+  "Getopt::Long::Descriptive" => 0,
   "HTTP::Daemon" => 0,
   "HTTP::Request" => 0,
   "HTTP::Response" => 0,
   "LWP::Protocol::https" => 0,
   "LWP::UserAgent" => 0,
-  "Scalar::Util" => 0,
   "Test::More" => 0,
   "URI" => 0
 );

@@ -20,6 +20,7 @@ lib/Luv/CLI/Git.pm
 lib/Luv/CLI/Manifest.pm
 lib/Luv/CLI/Package.pm
 lib/Luv/CLI/Registry.pm
+run-perltidy.sh
 share/templates/conf.lua.tpl
 share/templates/gitignore.tpl
 share/templates/main.lua.tpl

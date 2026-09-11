@@ -1,0 +1,40 @@
+# Keycloak for xt/interop.t.
+#
+# UNVERIFIED. Written from Keycloak's documented import behaviour and not
+# yet run; phase 11 is where it gets exercised against a real container.
+#
+#   docker compose -f xt/interop/docker-compose.yml up -d
+#   PUNK_SAML_INTEROP_URL=http://localhost:8080 prove -lv xt/interop.t
+#   docker compose -f xt/interop/docker-compose.yml down -v
+#
+# start-dev, because this is a throwaway provider for one test: it runs
+# over plain http and keeps the realm in memory, which is what makes
+# `down -v` enough of a reset.
+#
+# The realm below defines the SAML client. Its entity id and assertion
+# consumer URL have to match what xt/interop.t configures, which is
+# PUNK_SAML_INTEROP_HOST (default https://sp.example.com) with /saml/
+# under it. Change one and change the other.
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./realm.json:/opt/keycloak/data/import/realm.json:ro
+    # The test FAILS rather than skips when the provider does not answer,
+    # so the only thing this buys is a clearer `up -d` - but a compose
+    # that reports healthy before the realm is imported is how a suite
+    # ends up testing an empty server.
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q UP"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s

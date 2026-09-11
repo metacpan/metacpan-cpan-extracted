@@ -1,5 +1,25 @@
 Revision history for Koha-QA
 
+0.1.4  2026-09-10
+    - Tidy::TT, Tidy::JS and Tidy::Perl now report a distinct error when
+      prettier/perltidy itself fails, instead of folding it into ordinary
+      untidiness or "no output produced"
+
+0.1.3  2026-09-10
+    - Fixed Tidy::TT silently reporting a failed prettier run (parse error,
+      broken prettierrc) as tidy instead of surfacing the failure
+
+0.1.2  2026-09-10
+    - Fixed Tidy::TT resolving a relative prettierrc (e.g. Koha's default
+      .prettierrc.js) against the wrong directory, causing prettier to fail
+      with "Cannot find module" instead of tidying the file
+
+0.1.1  2026-09-10
+    - Fixed Tidy::Perl, Tidy::JS and Tidy::TT to report an error instead of
+      returning a truncating empty fix when perltidy/prettier produce no
+      output (broken perltidyrc/prettierrc, tool crash, etc.)
+    - Tidy::TT no longer misreports an already-empty file as an error
+
 0.1.0  2026-09-10
     - First public release to CPAN
     - Cleaned up stale MANIFEST entries

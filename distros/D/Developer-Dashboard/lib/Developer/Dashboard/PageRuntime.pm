@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::DataHelper qw(j je);
@@ -1047,16 +1047,15 @@ sub _code_header {
     return $header;
 }
 
-# _new_sandpit(%args)
-# Creates one throwaway package used across CODE blocks for a single page run.
-# Input: mutable stash hash reference and runtime context hash.
-# Output: hash reference containing the generated package name.
-sub _new_sandpit {
-    my ( $self, %args ) = @_;
-    my $package = sprintf 'Developer::Dashboard::Sandpit::%d::%d::%d', $$, time, ++$SANDPIT_SEQ;
-    $package =~ s/[^A-Za-z0-9:]/_/g;
-
-    my $compiled = <<"PERL";
+# _sandpit_package_source($package)
+# Builds the Perl source of one throwaway sandpit package: the CODE-block
+# accessors (stash/hide/void/stop/params) plus the internal error/context
+# machinery __run_code and __initial_context call.
+# Input: fully-qualified package name to declare.
+# Output: Perl source text ready for eval.
+sub _sandpit_package_source {
+    my ($package) = @_;
+    return <<"PERL";
 package $package;
 use strict;
 use warnings;
@@ -1170,7 +1169,18 @@ sub __run_code {
 
 1;
 PERL
-    my $ok = eval $compiled;
+}
+
+# _new_sandpit(%args)
+# Creates one throwaway package used across CODE blocks for a single page run.
+# Input: mutable stash hash reference and runtime context hash.
+# Output: hash reference containing the generated package name.
+sub _new_sandpit {
+    my ( $self, %args ) = @_;
+    my $package = sprintf 'Developer::Dashboard::Sandpit::%d::%d::%d', $$, time, ++$SANDPIT_SEQ;
+    $package =~ s/[^A-Za-z0-9:]/_/g;
+
+    my $ok = eval _sandpit_package_source($package);
     die "Unable to setup sandpit $@\n" if !$ok;    # uncoverable branch true
 
     $package->__initial_context(

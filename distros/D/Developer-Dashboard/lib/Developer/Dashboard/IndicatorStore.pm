@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -13,6 +13,7 @@ use File::Spec;
 use Time::HiRes qw(time);
 
 use Developer::Dashboard::JSON qw(json_encode json_decode);
+use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
 use Developer::Dashboard::Platform qw(command_in_path);
 
 my $STATUS_ICONS = {
@@ -63,7 +64,7 @@ my $PROMPT_STATUS_ICONS = {
 # Output: Developer::Dashboard::IndicatorStore object.
 sub new {
     my ( $class, %args ) = @_;
-    my $paths = $args{paths} || die 'Missing paths registry';
+    my $paths = require_paths_arg(%args);
     return bless { paths => $paths }, $class;
 }
 

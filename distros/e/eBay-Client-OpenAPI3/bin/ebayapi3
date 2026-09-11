@@ -1,0 +1,535 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+package bin::ebayapi3;
+
+use FindBin qw/$Bin/;
+use lib qq{$Bin/../lib};
+use JSON::XS             qw/encode_json decode_json/;
+use Util::H2O::More      qw/ddd Getopt2h2o h2o o2h o2d/;
+use URI ();
+use YAML                 qw//;
+use eBay::Client::OpenAPI3;
+use Dispatch::Fu;
+use Text::ASCII::Convert qw/convert_to_ascii/;
+use POSIX qw/ceil/;
+
+#binmode( STDOUT, ":encoding(UTF-8)" );
+binmode STDOUT;
+
+use constant {
+    EXIT_SUCCESS => 0,
+    EXIT_FATAL   => 1,
+    CONFIG        => sprintf( qq{%s/%s}, ( getpwuid $< )[7], qq{.ebayapi3.conf} ),
+    MAX_TOTAL     => 10_000,                                                    #per documentation
+};
+
+sub _default_options {
+    return {
+        config  => CONFIG,
+        debug   => undef,
+        limit   => 200,
+        offset  => 0,
+        sort    => q{endingSoonest},
+        verbose => undef,
+    };
+}
+
+sub run {
+    my ($argv_ref) = @_;
+    $argv_ref ||= \@ARGV;
+
+    my @argv       = @$argv_ref;
+    my $subcommand = shift @argv;
+    my $o          = _default_options();
+
+#<<<
+    return dispatch {
+        my $input_ref = shift;
+        my ( $subcommand, $ARGV_ref, $o ) = @$input_ref;
+        xdefault $subcommand, q{oauth2};
+    }
+    [ $subcommand, \@argv, $o ],
+    on browse => \&browse,
+    on help   => \&show_help,
+    on item   => \&get_item,
+    on oauth2 => \&oauth2,
+    on rate   => \&rate_limit,
+    ;
+#>>>
+}
+
+if ( not caller ) {
+    exit run(\@ARGV);
+}
+
+sub show_help {
+    print STDERR <<EOHELP;
+ebayapi3 Client
+
+Each subcommand has it's own options.
+
+Subcommand: 'help'  - prints this help text
+
+ Example:
+
+   ebayapi3 help
+
+Subcommand: 'oauth2' - creates a new, valid OAuth token
+
+ Example:
+
+   ebayapi3 oauth2
+
+Subcommand: 'browse' - returns a list of items in the specified category(s)
+
+ Example:
+
+   ebayapi3 browse --limit 200 --category_ids 13885 --stats --as json
+
+ Options:
+   --as=s             json, compactjson, ascii
+   --buyopt=s@        passed to API URL query string
+   --category_ids=s   item categories to grab
+   --q=s              keyword query passed to item_summary/search
+   --filter=s@        extra raw Browse API filter(s), repeatable
+   --continue         run again, with the updated pagination parameters
+   --limit=i          enforces a limit
+   --max=i            bound number of results
+   --nextcmd
+   --offset=i         pagination controller
+   --sort=s           API sort parameter: price, -price, newlyListed, endingSoonest, distance (requires input, not supported atm)
+   --stats            reports iteration and item count via STDERR
+
+Subcommand: 'item' - dumps the JSON for the specified item id
+
+  Example
+
+    ebayapi3 item --itemid 21323232123 --as json
+
+  Options:
+    --itemid          eBay item id, internally converts it to the "legacy" format
+    --as              json, compactjson, summary
+
+Subcommand: 'rate' - dumps the JSON for the calling rate quota
+
+  Example
+
+    ebayapi3 rate --as json
+
+  Options:
+    --as              json, compactjson, summary
+
+Author:
+
+Brett Estrade <oodler\@cpan.org>, <brett\@acutisdata.com>
+
+Support Statement:
+
+This client is meant to serve the needs of those who use it, if
+a feature you want is not here; let me know, and we'll work something
+out.
+  
+EOHELP
+    return EXIT_FATAL;
+}
+
+sub oauth2 { my $input_ref = shift;
+    my ( $subcommand, $ARGV_ref, $o ) = @$input_ref;
+    Getopt2h2o $ARGV_ref, $o, qw/as=s config=s/;
+    my $ec = eBay::Client::OpenAPI3->new( config => $o->config );
+    $ec->oauth2;
+    if ( $o->as and $o->as eq q{json} ) {
+        print encode_json o2h $ec->token;
+    }
+    print $ec->token->access_token;
+    return EXIT_SUCCESS;
+}
+
+sub rate_limit {
+    my $input_ref = shift;
+    my ( $subcommand, $ARGV_ref, $o ) = @$input_ref;
+    Getopt2h2o $ARGV_ref, $o, qw/as=s config=s/;
+
+    my $ec = eBay::Client::OpenAPI3->new( config => $o->config );
+
+    local $@;
+    my $ref = eval { $ec->oauth2->rate_limit( api_name => "browse" ) } or undef;
+    if ($@) {
+       warn sprintf "FATAL: eBay 'rate_limit' (developer/analytics/v1_beta/rate_limit?api_name=browse) API Error, %s", $@;
+       return EXIT_FATAL;
+    }
+
+#<<<
+   dispatch {
+     my $input_ref = shift;
+     my ($o, $ref) = @$input_ref;
+     xdefault $o->as, q{json};
+   } [ $o, $ref ],
+   on compactjson => sub {
+     my $input_ref = shift;
+     my ($o, $ref) = @$input_ref;
+     my $coder = JSON::XS->new->utf8;
+     print $coder->encode(o2d $ref);
+   },
+   on json => sub {
+     my $input_ref = shift;
+     my ($o, $ref) = @$input_ref;
+     my $coder = JSON::XS->new->utf8->pretty;
+     print $coder->encode(o2d $ref);
+   },
+   on summary => sub {
+     my $input_ref = shift;
+     my ($o, $ref) = @$input_ref;
+     my $format = <<EOF;
+%s API Call Rates
+Limit:  %s
+Used :  %s
+Left :  %s
+Reset:  %s
+Period: %s
+EOF
+     my $info = $ref->rateLimits->get(0)->resources->get(0);
+     my $rates = $info->rates->get(0);
+     printf $format, $info->name, $rates->limit, $rates->count, $rates->remaining, $rates->reset, $rates->timeWindow;
+   },
+   ;
+#>>>
+
+  return EXIT_SUCCESS;
+}
+
+sub get_item {
+    my $input_ref = shift;
+    my ( $subcommand, $ARGV_ref, $o ) = @$input_ref;
+    Getopt2h2o $ARGV_ref, $o, qw/as=s config=s itemid=i/;
+
+    my $ec = eBay::Client::OpenAPI3->new( config => $o->config );
+
+    local $@;
+    my $ref = eval { $ec->oauth2->getItem( itemid => $o->itemid ) } or undef;
+    if ($@) {
+       warn sprintf "FATAL: eBay 'getItem' (buy/browse/v1/item) API Error, %s", $@;
+       return EXIT_FATAL;
+    }
+
+#<<<
+   dispatch {
+     my $input_ref = shift;
+     my ($o, $ref) = @$input_ref;
+     xdefault $o->as, q{json};
+   } [ $o, $ref ],
+   on compactjson => sub {
+     my $input_ref = shift;
+     my ($o, $ref) = @$input_ref;
+     $ref->title(convert_to_ascii($ref->title));
+     my $coder = JSON::XS->new->utf8;
+     my $ascii = $coder->encode(o2d $ref);
+     print $ascii;
+   },
+   on json => sub {
+     my $input_ref = shift;
+     my ($o, $ref) = @$input_ref;
+     $ref->title(convert_to_ascii($ref->title));
+     my $coder = JSON::XS->new->utf8->pretty;
+     my $ascii = $coder->encode(o2d $ref);
+     print $ascii;
+   },
+   on summary => sub {
+     my $input_ref = shift;
+     my ($o, $ref) = @$input_ref;
+     $ref->title(convert_to_ascii($ref->title));
+     $ref->itemId((split(/\|/, $ref->itemId))[1]); # extracts actual itemId out of the "v1|ITEMID|0" legacy format
+     my $format = <<EOF;
+%s Title: %s
+Bids: %s
+Price: %s (%s)
+EOF
+     printf $format, $ref->itemId, $ref->title, $ref->bidCount, $ref->price->value, $ref->price->currency;
+   },
+   ;
+#>>>
+
+  return EXIT_SUCCESS;
+}
+
+sub shell_quote {
+    my ($value) = @_;
+    return q{''} if not defined $value or $value eq q{};
+    $value =~ s/'/'\''/g;
+    return qq{'$value'};
+}
+
+sub browse {
+    my $input_ref = shift;
+    my ( $subcommand, $ARGV_ref, $o ) = @$input_ref;
+    Getopt2h2o $ARGV_ref, $o, qw/as=s brand=s@ buyopt=s@ category_ids=s config=s q=s filter=s@ continue limit=i max=i nextcmd offset=i sort=s stats/;
+
+    my $ec = eBay::Client::OpenAPI3->new( config => $o->config );
+    my ( $total, $gotten, $num_requests, $request_count );
+
+  GETITEMS:
+    {
+        $o->buyopt( [qw/AUCTION/] ) if not $o->buyopt;
+        my $buyingOptions = join q{|}, @{ $o->buyopt };
+        my $filter        = sprintf qq/buyingOptions:{%s}/, $buyingOptions;
+
+        # add 1 or more brands to the filter
+        if ($o->brand) {
+          my $brands      = join(q{|}, map { qq/"$_"/ } @{ $o->brand  }); # need to wrap brands in quotes
+          $filter         = sprintf qq/brand:{%s},%s/, $brands, $filter;
+        }
+
+        # add raw Browse API filters, conservatively appended after generated filters
+        if ($o->filter) {
+          $filter = join q{,}, $filter, @{ $o->filter };
+        }
+
+        local $@;
+        my $ref           = eval {
+          $ec->oauth2->browse(
+            filter       => $filter,
+            category_ids => $o->category_ids,
+            q            => $o->q,
+            limit        => $o->limit,
+            offset       => $o->offset,
+            sort         => $o->sort,
+          )
+        };
+        # handle error; array reference, $ref->{errors}->{all} is expected to exist
+        if ($@) {
+          warn sprintf "FATAL: eBay 'browse' (item_summary/search) API Error, %s", $@;
+          return EXIT_FATAL;
+        }
+
+        foreach my $warning ($ref->warnings->all) {
+          warn sprintf "API WARNING: %s\n", $warning->message;
+        }
+
+        # set before first results are in
+        $total = $o->max // $ref->total;
+        $total        = ( $total < MAX_TOTAL ) ? $total : MAX_TOTAL;    # limit set above, based on eBay docs
+        $num_requests = ceil($total / $o->limit);
+        $o->max($total);
+
+        $gotten += ($total > $o->limit) ? $o->limit : $total;
+
+        ++$request_count;
+
+        printf STDERR qq{%02d/%02d requests, %05d/%02d items gotten ...\n}, $request_count, $num_requests, $gotten, $total if $o->stats;
+
+        if ( $o->max and $o->max < $gotten ) {
+            printf STDERR qq{fetch shutting down, number got exceeded max set with, "--max %d"\n}, $o->max;
+            return EXIT_SUCCESS;
+        }
+
+#<<<    
+        # handle output options
+        dispatch {
+          my $input_ref = shift;
+          my ($o, $ref) = @$input_ref;
+          xdefault $o->as, q{json};
+        } [ $o, $ref ],
+        on yaml => sub {
+          my $input_ref = shift;
+          my ($o, $ref) = @$input_ref;
+          my $_ref = o2d $ref;
+          my $yaml = YAML::Dump($_ref);
+          print $yaml;
+        },
+        on json => sub {
+          my $input_ref = shift;
+          my ($o, $ref) = @$input_ref;
+          foreach my $item ($ref->itemSummaries->all) {
+            my $title = $item->title;
+            $item->title(convert_to_ascii($title));
+          }
+          my $coder = JSON::XS->new->utf8->pretty;
+          my $ascii = $coder->encode(o2d $ref);
+          print $ascii;
+        },
+        on compactjson => sub {
+          my $input_ref = shift;
+          my ($o, $ref) = @$input_ref;
+          foreach my $item ($ref->itemSummaries->all) {
+            my $title = $item->title;
+            $item->title(convert_to_ascii($title));
+          }
+          my $coder = JSON::XS->new->utf8;
+          my $ascii = $coder->encode(o2d $ref);
+          print $ascii;
+        };
+#>>>
+
+        # run again, with the updated pagination parameters
+        if ( $o->continue and $ec->next ) {
+           # parse out query params in the 'next' field, (next URL with updated pagination details)
+           my (@query) = split /[?&]/, $ec->next;
+           my $url     = shift @query;
+           my %params  = map { split /=/, $_ } @query;
+           my $p       = h2o \%params;
+
+           # output "next" command to STDERR, maybe can be used to script an external looping...
+           if ($o->nextcmd) {
+              my $q_arg      = defined $o->q ? sprintf(q{ --q %s}, shell_quote($o->q)) : q{};
+              my $filter_arg = $o->filter  ? join(q{}, map { sprintf(q{ --filter %s}, shell_quote($_)) } @{ $o->filter }) : q{};
+
+              printf STDERR qq{./bin/ebayapi3 browse --offset %s --limit %s --sort %s --category_ids %s%s%s --as yaml --continue\n},
+                shell_quote($p->offset),
+                shell_quote($p->limit),
+                shell_quote($p->sort),
+                shell_quote($p->category_ids),
+                $q_arg,
+                $filter_arg;
+           }
+
+           $o->offset( $p->offset );
+           $o->limit( $p->limit );
+           goto GETITEMS;
+        }
+    }
+
+    return EXIT_SUCCESS;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+ebayapi3 - command-line client for eBay::Client::OpenAPI3
+
+=head1 SYNOPSIS
+
+  ebayapi3 oauth2
+
+  ebayapi3 browse \
+      --limit 200 \
+      --category_ids 13885 \
+      --stats \
+      --continue \
+      --as yaml > latest.yaml
+
+  ebayapi3 item --itemid 21323232123 --as json
+
+  ebayapi3 rate --as summary
+
+=head1 DESCRIPTION
+
+C<ebayapi3> is the command-line interface used with
+L<eBay::Client::OpenAPI3>.  The initial CPAN packaging deliberately preserves
+its pre-CPAN command behavior because existing applications use this utility.
+
+The available subcommands are C<oauth2>, C<browse>, C<item>, C<rate>, and
+C<help>.  With no subcommand, the utility defaults to C<oauth2> as before.
+
+=head1 CONFIGURATION
+
+By default the utility reads C<~/.ebayapi3.conf>.  The documented C<--config>
+option is accepted by each API subcommand in version 0.01 so a different INI
+file can be selected explicitly.
+
+  [eBay]
+  client_id            = your-client-id
+  client_secret        = your-client-secret
+  affiliateCampaignId  = your-epn-campaign-id
+  affiliateReferenceId = optional-reference-id
+
+=head1 COMMANDS
+
+=head2 oauth2
+
+Obtains a new application OAuth token.
+
+The historical default output is the bare access token.  For compatibility,
+C<--as json> retains the existing behavior: it prints the encoded token response
+and then the bare access token.  This is not changed in the initial CPAN
+packaging pass.
+
+=head2 browse
+
+Calls the Browse API C<item_summary/search> endpoint.
+
+The default output selected by the executable is JSON.  C<--as compactjson> and
+C<--as yaml> are also supported.  This corrects older POD which said YAML was
+the default even though the executable actually defaulted to JSON.
+
+C<--continue> retains the existing pagination behavior.  In particular, JSON
+page responses are written consecutively; the utility does not wrap them in a
+new JSON array in version 0.01.  Existing consumers depending on that stream are
+therefore not forced to change for the CPAN release.
+
+C<--nextcmd> likewise retains the existing command format, including emitting a
+YAML continuation command.
+
+Common options include:
+
+  --as=s
+  --brand=s@
+  --buyopt=s@
+  --category_ids=s
+  --config=s
+  --q=s
+  --filter=s@
+  --continue
+  --limit=i
+  --max=i
+  --nextcmd
+  --offset=i
+  --sort=s
+  --stats
+
+Unless C<--buyopt> is supplied, the utility retains its existing AUCTION buying
+option filter.
+
+=head2 item
+
+Retrieves one item by its numeric legacy eBay item ID.
+
+  ebayapi3 item --itemid 21323232123 --as json
+
+Output modes are C<json>, C<compactjson>, and C<summary>.
+
+=head2 rate
+
+Retrieves Developer Analytics rate-limit information for the Browse API.
+
+Output modes are C<json>, C<compactjson>, and C<summary>.
+
+=head2 help
+
+Prints command help to STDERR.  The historical non-zero help return status is
+retained in version 0.01.
+
+=head1 EXIT STATUS
+
+Normal API commands return 0 on success and 1 for the handled API failures that
+were already reported by the command.  The explicit C<help> command retains its
+historical status of 1.
+
+=head1 COMPATIBILITY
+
+Version 0.01 adds a callable C<run()> entry point to make the command dispatcher
+testable, but normal execution still invokes exactly the same subcommands and
+preserves the existing CLI output/pagination semantics.  The new entry point is
+primarily an internal testing seam.
+
+=head1 BUGS AND SUPPORT
+
+L<https://github.com/oodler577/p5-eBay-Client-OpenAPI3/issues>
+
+=head1 AUTHOR
+
+Oodler 577 L<< <oodler@cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2026 by Brett Estrade.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
+
+=cut

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 # `use Punk::Controller;` is the one-line preamble: it makes the caller a
 # controller and turns on strict and warnings, which is what `use Punk::Model`

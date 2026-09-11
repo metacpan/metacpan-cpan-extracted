@@ -10,7 +10,7 @@ use File::Copy ();
 use File::Basename ();
 use Template::Stencil;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 sub new {
     my ($class, %args) = @_;

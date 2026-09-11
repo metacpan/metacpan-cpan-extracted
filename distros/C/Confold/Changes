@@ -1,5 +1,9 @@
 Revision history for Confold
 
+0.03    2026-09-10
+        Document how <: differs from use constant, and where it does not.
+        Add constant to SEE ALSO.
+
 0.02    2026-09-09
         Accept either B::Concise spelling of a const operand in the tests.
 

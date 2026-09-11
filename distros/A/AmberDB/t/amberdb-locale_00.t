@@ -19,7 +19,7 @@ my $tr = AmberDB::Locale->new( language => 'tr' );
 is( $tr->language, 'tr', 'Constructor: language tag stored' );
 
 # ============================================================
-# 2. English fallback
+# 2. English locale and Global Base (gb) fallback
 # ============================================================
 my $en = AmberDB::Locale->new( language => 'en' );
 is( $en->language, 'en', 'Constructor: English locale' );

@@ -1,5 +1,146 @@
 Revision history for AmberDB
 
+5.25.1  2026-09-11
+        - [JOURNAL & TRANSACTION STANDARDIZATION] Extensionless Uniform Journaling:
+          * Standardized all transaction undo logs and RAM-disk write-behind queues under $dbase_dir/journal/ ($adb->journal_dir()).
+          * Removed legacy .txn extension; transaction journal files now follow the standard extensionless format dbstore/journal/txn_<timestamp>_<seq>_<pid> (Base.pm:481-488).
+          * Modernized transact_recover() to scan journal/ directory for txn_* files and extract process IDs via /[-_](\d+)$/ for deterministic crash recovery without race conditions.
+          * Added explicit transact_commit() method alias to transact_end() matching documented public API semantics.
+          * Cleaned out obsolete legacy 5-parameter signature fallback and 6-field journal format fallback in AmberDB::Base::Transact.
+          
+        - [RAM-DISK TIER 4 WRITE-BEHIND JOURNALING] Explicit sync_ramdisk Queue:
+          * Renamed dirty sync queue from sync_events to sync_ramdisk for clear semantic clarity:
+            - Active Queue: dbstore/journal/sync_ramdisk
+            - Rotated Queue: dbstore/journal/sync_ramdisk_<timestamp>
+          * Updated AmberDB::Base::Ramdisk (ramdisk_mark_dirty, ramdisk_sync, ramdisk_sync_db_path) and AmberDB::Base (journal_slot, journal_scan) to reflect sync_ramdisk naming.
+          * Synchronized background daemon engine (bin/amberdb_daemon.pl) and unit test suites (t/amberdb_ramdisk_tiers.t, t/amberdb_journal.t).
+
+        - [MODERN COMMAND LINE INTERFACE & NATURAL QUERY PARSER]
+          * Implemented unified bin/amberdb_cli.pl with bin/amberdb (POSIX shell) and bin/amberdb.bat (Windows CMD) wrappers.
+          * Natural positional query signatures:
+            - amberdb read <table> <id> (read_id)
+            - amberdb read <table> all [offset] [limit] [modifiers] (read_all)
+            - amberdb search <table> <query> [offset] [limit] [modifiers] (search_table)
+            - amberdb fetch <table> <block> <value> (field_fetch)
+            - amberdb count <table>, amberdb info <table>, amberdb status, amberdb ping
+          * Dual execution model: direct stateless execution against database without background session side-effects, and isolated session management via 4-digit numeric tokens (connect, disconnect, config, path, attr).
+          * Trailing output format (json, pretty, tsv, dumper, table, raw) and elapsed execution time (time, time=1, --time) keywords.
+          * Preserved clean machine-readable JSON output by rendering execution time metrics as an independent footer line.
+          * Completely eliminated redundant %cli_path and %cli_cfg hashes in CLI, directly utilizing $adb->path() and $adb->config().
+          * Added full CLI test suite in t/amberdb_cli.t (100% pass) and updated wiki documentation (TR-Guide-CLI.md, Guide-CLI.md, bin/commands.md).
+
+5.25.0  2026-09-10
+        - [CORE ENGINE MODULARIZATION & NAMESPACE RESTRUCTURING] Grouped Internal Engine Modules Under AmberDB::Base::*:
+          * Migrated and reorganized core engine components into AmberDB::Base namespace:
+            - AmberDB::Base::Encoder (Serialization, multi-era format decoding, binary index packing)
+            - AmberDB::Base::Schema (Schema definition, table_info, table_attr, field type system)
+            - AmberDB::Base::Ramdisk (Physical RAM-disk Linux tmpfs, macOS APFS, Windows ImDisk file acceleration)
+            - AmberDB::Base::Cache (In-memory L1 process cache and staging disk buffer)
+            - AmberDB::Base::Index (Field indexing, foreign keys, operators)
+            - AmberDB::Base::Facet (Faceted search and category aggregation)
+            - AmberDB::Base::Junk (Multi-tiered soft-delete and junk rule processing)
+            - AmberDB::Base::Transact (WAL transaction engine and atomic journaling)
+          * Excluded entire lib/AmberDB/Base/ directory and AmberDB::Base namespace from CPAN indexing in Makefile.PL (no_index), keeping MetaCPAN documentation clean and focused on public standalone interfaces.
+          * Consolidated public submodule architecture in AmberDB POD to focus exclusively on standalone components (AmberDB::Date, AmberDB::Locale, AmberDB::Tools).
+          * Integrated ISO 4217 Currency Dictionary documentation into AmberDB::Locale and removed standalone POD from internal AmberDB::Locale::Currency to prevent separate CPAN indexing.
+          * Deprecated and removed unused legacy Amber::Util::String module; consolidated trim_space utility into AmberDB::Base.
+
+        - [TRANSPARENT PHYSICAL RAM-DISK ACCELERATION & CROSS-PLATFORM ORCHESTRATION]
+          * Cross-Platform Support (Linux, macOS, Windows): Standardized bin/ramdisk_* suite (ramdisk_amberdb.pl, ramdisk_windows.bat/ps1, ramdisk_macos.sh, ramdisk_linux.sh) with native support for Linux tmpfs, macOS APFS RAM-Disk (hdiutil), and Windows ImDisk with project namespace isolation.
+          * Global & Per-Table Acceleration: Supports global use_ramdisk => 1|2 in AmberDB->new with per-table overrides (use_ramdisk => 0|1|2|3) and lazy preloading on first table access.
+          * Volatile Pure RAM-Disk Mode (Tier 3 & ramdisk_ttl): Supports memory-only unindexed tables (use_ramdisk => 3, use_simple => 1) with configurable sliding time-to-live expiration (ramdisk_ttl, default 300s).
+          * Custom Storage Subfolder Organization (table_dir): Allows routing table and index files to dedicated subfolders (e.g. table_dir => 'orders') or directly to the database root (table_dir => '').
+          * Standardized Path & Environment Options (dbase_dir): Engine root storage path formalized with full runtime reflection and set_datadir migration.
+          * Standardized RAM-Disk Parameters: Replaced legacy cache_size and cache_dir with ramdisk_size and ramdisk_dir across constructor, config, and diagnostic reporting.
+          * Native File Extension Architecture: RAM-disk stores all database and index files with their native extensions (.db, .inx, .fld, .src, .fac, .unq, .slg), retiring proprietary .cache file formats.
+          * Unified ramdisk_setup([$tableid]): Consolidated environment validation, mount diagnostics, and deterministic table preloading into a single method ($adb->ramdisk_setup), superseding legacy cache_setup and cache_preload.
+          * Dedicated L1 Process Cache API: Replaced legacy cache_* routines with clean, dedicated get_cache and set_cache methods for in-memory L1 storage.
+          * Hardened Mount Detection: Validates symlinks/junctions (-l) and direct RAM paths with zero-subprocess /proc/mounts verification, auto-registered to $adb->config('ramdisk_mounted').
+          * Dual-Write & Transaction Safety: Real-time dual-write across index and data files with atomic Berkeley DB preloading and WAL rollback protection.
+          * Decoupled Engine Architecture: Separated AmberDB::Base::Ramdisk (physical file storage) from AmberDB::Base::Cache (in-memory L1 cache and staging buffers).
+
+        - [ENCODER & TOOLS UNIFICATION] Consolidated Multi-Era Text Decoding:
+          * Unified legacy and historical text decoding (v1 FlatDB, v2 \T, v3 <TAB>, v4 ARRAY/HASH) into tsv_decode in AmberDB::Base::Encoder.
+          * Streamlined AmberDB::Tools to directly delegate format detection and decoding to inherited $adb methods ($adb->detect_record_format and $adb->tsv_decode), eliminating redundant module requires.
+
+        - [OBJECT-RELATIONAL MAPPING & DATA HYDRATION] Native inflate and deflate Engine:
+          * AmberDB::inflate: High-performance transformation of flat storage arrays into schema-mapped hash structures:
+            - Named field key resolution based on table schema blocks (e.g. { id => 101, title => "Item", price => 500 }).
+            - Dynamic RDBM foreign relation resolution: resolves foreign IDs in 'display' mode (e.g. { 101 => "Samsung" }) or recursive 'full' mode.
+            - Repeating block support (repeat_start / type => 'repeat'): aggregates child items into an arrayref.
+            - Dual return formats: returns arrayref of records ('list') or primary-key indexed hashref ('hash') via { result => 'hash' }.
+            - Schemaless fallback: returns raw array reference safely when no schema blocks are defined.
+            - Transparently integrated with read_id, read_all, field_fetch, and search_table via { inflate => ... } or string "inflate".
+          * AmberDB::deflate: Inverse transformation of structured hashrefs into schema-ordered arrays:
+            - Accepts single hashref, arrayref of hashrefs, list of hashrefs, or hash-of-hashes.
+            - Re-encodes foreign relation hashes back into comma-separated ID lists.
+            - Automatically populates repeating child blocks and synchronizes summary repeat_ids fields.
+            - Transparently integrated with insert_id, modify_id, and insert_list for hash-based CRUD operations.
+
+        - [PARTIAL RECORD UPDATES & GRANULAR FIELD OPERATIONS] Direct Field Mutation:
+          * update_field($table, $id, ...): Updates a single block value or repeating child item without full record rewrite:
+            - Fixed schema blocks: accepts symbolic block name (e.g. "price") or numeric block index (e.g. 2).
+            - Repeating items: supports updating child items via id => $id, $item or pos => $idx, $item.
+            - Validates and normalizes field types via enc_field.
+            - Diff no-op guard: returns immediately if field value is unchanged.
+            - Clearing/reset: accepts undef or "" to reset field values according to schema type (e.g. 0 for numeric).
+            - Safety guard: prevents modification of primary key ID (block 0).
+            - Full transactional consistency, Strict 2PL locking, L1 cache invalidation, and index update (search, match, facet, unique, sort, slug).
+          * insert_field($table, $id, $item, %opts): Inserts a child item into repeating blocks (repeat_start):
+            - Default append to end or positional insertion via pos => $idx (e.g. pos => 0 to prepend).
+            - Duplicate child item ID protection: prevents duplicate entries if child ID already exists.
+            - Automatically synchronizes summary repeat_ids fields.
+          * delete_field($table, $id, %opts): Safely removes a child item from repeat blocks:
+            - Mandatory explicit targeting: strictly requires id => $item_id or pos => $idx (eliminating ambiguity and collision between child IDs and block/item position indexes; bare numbers and arbitrary keys are rejected).
+            - Guard against deleting fixed schema blocks (< repeat_start).
+            - Automatically synchronizes summary repeat_ids fields.
+          * Low-level binary primitives: Added bin_mod and bin_del for granular manipulation of 8-byte packed binary buffers.
+
+        - [3-STREAM DUAL-TIER JUNK INDEXING ARCHITECTURE]
+          * Separated indexing into three distinct streams: Base (all records without prefix), Tier A (A: prefix, active records), and Tier B (B: prefix, junk/passive records).
+          * Replaced legacy asymmetric j: prefix with clean, symmetric A: and B: tiers.
+          * Supports query modes A, B, AB, BA, and ALL/none, with query-level jnktype override and dynamic table_attr toggle.
+          * Hardened transaction engine (WAL) rollback to maintain full 3-stream parity across Base, Tier A, and Tier B streams on insert, modify, and delete rollbacks.
+          * Unified indexing methods (records_add/del, match_*, search_*, sort_*) with a direct $tier parameter, eliminating separate duplicate methods without extra helpers or aliases.
+          * Renamed re-indexing script from bin/convert_dbstore.pl to bin/dbstore_reindex.pl for clarity.
+          * NOTE: Upgrading to this architecture requires re-indexing existing tables via bin/dbstore_reindex.pl or AmberDB::Tools->set_index.
+
+        - [BUG FIXES] Index Read Order & Direction:
+          * Fixed read order regression in read_all, field_fetch, and table_keys: restored default descending order (N..1, newest records first) to fix pagination drift.
+          * Added explicit dir => 'asc'|'desc' (alias order) option across read_all and field_fetch.
+
+        - [STORAGE MIGRATION & UPGRADE INSTRUCTIONS FOR EXISTING DEPLOYMENTS]
+          * Upgrading Existing Installations (< 5.25.0):
+            - Existing deployments upgrading from prior AmberDB releases must migrate their database storage layout and formats using the unified amberdb_setup.pl utility:
+                perl bin/amberdb_setup.pl --action=update-storage --dbase_dir=<path_to_dbase> --all
+              Or check and apply full engine + storage updates:
+                perl bin/amberdb_setup.pl --action=update --dbase_dir=<path_to_dbase>
+            - Automated Migration Stages in v5.25.0:
+              * Directory Migration (tables/ -> table/): Automatically merges files into standard 'table/' layout. If 'table/' already exists, files are merged safely; any name collisions are preserved and renamed with a date stamp (<basename>_<YYYY-MM-DD>.<ext>, e.g., catalog_product_2026-08-25.db, catalog_product_2026-08-25.inx) with secondary collision counters (_1, _2) to guarantee zero data loss.
+              * Binary Record Format (ABR v5): Upgrades all legacy table formats (TSV, FlatDB, HTML entities) to native 5-byte magic packed binary records.
+              * Secondary Index Rebuilding: Reconstructs and repacks all secondary indexes (.inx, .fld, .unq, .fac, .slg, .srt) for the dual-tier 3-stream indexing architecture.
+              * Standard Directory Layout: Synchronizes and verifies all required runtime directories (table, schema, journal, lock, session, config, ramdisk) and stamps config/storage_version.json with 5.25.0.
+
+        - [TEST SUITE & COMPATIBILITY]
+          * Added dedicated test suite t/amberdb_migrate_5_25_conflict.t covering tables/ to table/ migration, date-stamped conflict resolution, and amberdb_setup.pl update-storage execution.
+          * Added dedicated test suite t/amberdb_junk_tiered.t covering 3-stream dual-tier indexing (CRUD, transitions, hybrid modes, Tools rebuild).
+          * Added dedicated test suite t/amberdb_read_order.t verifying default descending (N..1) read order and explicit direction flags.
+          * Added dedicated test suite t/amberdb_inflate_deflate.t covering single/batch inflate, deflate, RDBM resolution, and repeat blocks.
+          * Added dedicated test suite t/amberdb_field_ops.t covering update_field, insert_field, delete_field, and constraint guards.
+          * Added dedicated test suite xt/amberdb_ramdisk.t covering physical RAM-disk operations, isolated under author tests (xt/) to ensure standard installation tests pass without pre-mounted RAM-disk filesystems.
+          * Added dedicated test suite t/amberdb_schema_types.t covering all 9 schema types and type conversions.
+          * Refactored t/amberdb_cache.t to comprehensively test L1 in-memory caching and persistent staging buffers.
+          * Added default language ('gb') verification tests in t/amberdb_encapsulation.t and t/amberdb-locale_09_gb.t.
+          * 100% test pass rate across all 57 standard installation test files (534 assertions) and extended author test suite (xt/).
+
+5.24.1  2026-09-05
+        - Standardized 'offset' pagination parameter with backward-compatible 'start' alias (read_all, field_fetch, search_table, field_filter, bin_decode, bin_crop, facet_menu).
+        - Added 'update_id' and 'update_list' method aliases for modify_id and modify_list.
+        - Fixed CPAN POD parsing error by adding =encoding utf8 to AmberDB::Locale.
+        - Globalized POD documentation: converted code examples in non-locale modules to standard English ASCII.
+        - Fixed POD list syntax in AmberDB::Base and eliminated whitespace warning in AmberDB.pm.
+        - Added t/amberdb_offset_update_alias.t unit test suite.
+
 5.24.0  2026-09-05
         - [BINARY RECORD SERIALIZATION ARCHITECTURE (ABR v5)] Native Pure Perl Binary Serialization:
           * Introduced high-performance native pure Perl binary record serialization format (ABR v5 / Format 5) replacing legacy delimiter and regex text serialization (db_encode / db_decode), aligning format versioning with historical eras (v1: 2003 FlatDB, v2: 2005 \T, v3: 2021 <TAB>, v4: 2026 HTML entities, v5: 2026 ABR Binary).
@@ -79,7 +220,7 @@ Revision history for AmberDB
           * Removed legacy id_type schema attribute across all modules and test suites; standard relational tables strictly enforce positive integer numeric IDs.
         - [STORAGE & PER-TABLE SIMPLE MODE] Hybrid Multi-Model Architecture with use_simple => 1:
           * Introduced per-table use_simple => 1 attribute allowing key-value tables with arbitrary string keys up to 255 bytes (UUIDs, session tokens, emails, slugs, etc.) alongside standard relational tables.
-          * Preserved canonical physical table path ($dbase_dir/tables/$table.db) for use_simple tables in standard database mode.
+          * Preserved canonical physical table path ($dbase_dir/table/$table.db) for use_simple tables in standard database mode.
           * Selective schema sanitization: tables with use_simple => 1 strip indexing, columnar, and caching definitions (blocks, match_block, search_block, facet_block, sort_block, record_index, use_cache, cache_ttl) to achieve zero index/cache I/O overhead while preserving behavioral features (keep_deleted, force, no_transact, no_backup, use_menu, log_owner).
           * Enabled keep_deleted => 1 archiving (.del) on use_simple tables.
         - [RDBM & INTEGRITY] Foreign Key and Cross-Table Isolation:
@@ -89,7 +230,7 @@ Revision history for AmberDB
           * Cleaned up legacy id_type occurrences across all 41 test files and concurrency stress tests (xt/amberdb_concurrency_stress.t).
         - [DISTRIBUTION & METADATA] Decoupled Internal Module Versions and CPAN no_index:
           * Stripped redundant $VERSION definitions from 15 internal/engine-only modules (Base, Cache, Transact, Index, Index::Facet, Index::Junk, Locale::Currency, Locale::Lang::*) to streamline release maintenance.
-          * Retained explicit $VERSION in public, standalone modules (AmberDB, AmberDB::Array, AmberDB::Date, AmberDB::Locale, AmberDB::String, AmberDB::Tools).
+          * Retained explicit $VERSION in public, standalone modules (AmberDB, AmberDB::Array, AmberDB::Date, AmberDB::Locale, Amber::Util::String, AmberDB::Tools).
           * Added comprehensive META_MERGE no_index configuration in Makefile.PL covering internal directories, namespaces, and packages.
         - [DATA STRUCTURES & UTILITIES] Non-Destructive hash_diff in AmberDB::Array:
           * Implemented hash_diff($hash1, $hash2) in AmberDB::Array with safe shallow copying, ensuring input hash structures are never mutated.

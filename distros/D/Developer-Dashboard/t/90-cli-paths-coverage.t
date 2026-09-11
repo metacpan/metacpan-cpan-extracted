@@ -15,6 +15,7 @@ use File::Temp qw(tempdir);
 use lib 'lib';
 
 use Developer::Dashboard::CLI::Paths ();
+use Developer::Dashboard::CLI::TableHelpers ();
 use Developer::Dashboard::PathRegistry;
 
 # Warnings are fatal in this repository: collect any that escape and assert the
@@ -34,18 +35,18 @@ my $cwd       = cwd();
 my $preferred = basename($cwd);
 
 my $run              = \&Developer::Dashboard::CLI::Paths::run_paths_command;
-my $build_paths      = \&Developer::Dashboard::CLI::Paths::_build_paths;
+my $build_paths      = \&Developer::Dashboard::CLI::TableHelpers::build_paths;
 my $normalize_delete = \&Developer::Dashboard::CLI::Paths::_normalize_delete_argument;
 my $cdr_payload      = \&Developer::Dashboard::CLI::Paths::_cdr_payload;
 my $cdr_completion   = \&Developer::Dashboard::CLI::Paths::_cdr_completion;
 my $initial          = \&Developer::Dashboard::CLI::Paths::_cdr_initial_candidates;
 my $dir_candidates   = \&Developer::Dashboard::CLI::Paths::_cdr_directory_candidates;
 my $paths_table      = \&Developer::Dashboard::CLI::Paths::_paths_table;
-my $aliases_table    = \&Developer::Dashboard::CLI::Paths::_aliases_table;
-my $list_table       = \&Developer::Dashboard::CLI::Paths::_list_table;
-my $mutation_table   = \&Developer::Dashboard::CLI::Paths::_mutation_table;
-my $removal_table    = \&Developer::Dashboard::CLI::Paths::_removal_table;
-my $render_table     = \&Developer::Dashboard::CLI::Paths::_render_table;
+my $aliases_table    = \&Developer::Dashboard::CLI::TableHelpers::aliases_table;
+my $list_table       = \&Developer::Dashboard::CLI::TableHelpers::list_table;
+my $mutation_table   = \&Developer::Dashboard::CLI::TableHelpers::mutation_table;
+my $removal_table    = \&Developer::Dashboard::CLI::TableHelpers::removal_table;
+my $render_table     = \&Developer::Dashboard::CLI::TableHelpers::render_table;
 
 {
     package Test::CLIPaths::PathsStub;

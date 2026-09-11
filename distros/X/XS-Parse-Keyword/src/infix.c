@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -737,7 +737,7 @@ static OP *pp_push_defav_with_count(pTHX)
     EXTEND(SP, count);
   for(U32 i = 0; i < count; i++)
     if(explode) {
-      if(!SvRV(svp[i]) || SvTYPE(SvRV(svp[i])) != SVt_PVAV)
+      if(!SvROK(svp[i]) || SvTYPE(SvRV(svp[i])) != SVt_PVAV)
         croak("Expected an ARRAY reference, got %" SVf, SVfARG(svp[i]));
       AV *av = (AV *)SvRV(svp[i]);
       PUSHMARK(SP);
@@ -1246,13 +1246,15 @@ void XSParseInfix_boot(pTHX)
    */
 
   HV *stash = gv_stashpvs("XS::Parse::Infix", TRUE);
-  newCONSTSUB(stash, "HAVE_PL_INFIX_PLUGIN", boolSV(
+  bool have_pl_infix_plugin =
 #ifdef HAVE_PL_INFIX_PLUGIN
       TRUE
 #else
       FALSE
 #endif
-  ));
+      ;
+
+  newCONSTSUB(stash, "HAVE_PL_INFIX_PLUGIN", boolSV(have_pl_infix_plugin));
 
 #ifdef HAVE_PL_INFIX_PLUGIN
   wrap_infix_plugin(&my_infix_plugin, &next_infix_plugin);

@@ -222,4 +222,50 @@ sub say_n {
         or diag $@;
 }
 
+# ---- a top-level key named for a category is a word, not a category ---------
+#
+# `one` at the top of a catalogue is a translation of the English word "one",
+# and refusing it would make a whole vocabulary of ordinary words unusable in
+# any language whose plural rule is not known. Only a key that sits UNDER
+# another one is a category, which is the depth >= 2 rule in the boot walk -
+# the exact equivalent of the old scan's "skip if there is no dot".
+{
+    my $ok = File::Temp::tempdir(CLEANUP => 1);
+    open my $fh, '>:raw', File::Spec->catfile($ok, 'en.json') or die $!;
+    print $fh '{ "one": "one", "two": "two", "few": "a few" }';
+    close $fh;
+    open my $x, '>:raw', File::Spec->catfile($ok, 'xx.json') or die $!;
+    print $x '{ "one": "un", "two": "deux", "few": "quelques" }';
+    close $x;
+
+    my $lived = eval qq{
+        package PTopLevelWords;
+        use Punk;
+        plugin 'I18n' => { dir => '$ok', default => 'en' };
+        1;
+    };
+    ok($lived,
+        'top-level keys named one/two/few are words and boot fine in a '
+      . 'language with no plural rule')
+        or diag $@;
+
+    # One level down, the same names ARE categories.
+    my $bad = File::Temp::tempdir(CLEANUP => 1);
+    open my $f2, '>:raw', File::Spec->catfile($bad, 'en.json') or die $!;
+    print $f2 '{ "n": { "one": "one" } }';
+    close $f2;
+    open my $x2, '>:raw', File::Spec->catfile($bad, 'xx.json') or die $!;
+    print $x2 '{ "n": { "one": "un" } }';
+    close $x2;
+
+    eval qq{
+        package PNestedCategory;
+        use Punk;
+        plugin 'I18n' => { dir => '$bad', default => 'en' };
+        1;
+    };
+    like($@ || '', qr/no plural rule/,
+        'and the same name one level down is a category, so it is refused');
+}
+
 done_testing;

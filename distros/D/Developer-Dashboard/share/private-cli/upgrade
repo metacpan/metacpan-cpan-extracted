@@ -72,7 +72,7 @@ runtimes, and focused upgrade acceptance tests use this helper.
 
   dashboard upgrade --dry-run
   d2 upgrade
-  prove -lv t/122-upgrade-cli.t
+  prove -lv t/136-upgrade-cli.t
 
 =for comment FULL-POD-DOC END
 

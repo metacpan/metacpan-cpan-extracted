@@ -3,7 +3,7 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -1241,118 +1241,133 @@ sub _supervise_collectors_once {
     );
 
     for my $name (@names) {
-        my $job = eval { $self->_collector_job_by_name($name) };
-        if ( !$job ) {
-            my $error = $@;    # _collector_job_by_name always dies (setting $@) when it yields a false job, so $@ is the message
+        my $outcome = $self->_supervise_one_collector( $name, $running{$name} );
+        next if !$outcome;
+        push @{ $result{ $outcome->{bucket} } }, $outcome->{entry};
+    }
+
+    return \%result;
+}
+
+# _supervise_one_collector($name, $running_entry)
+# Runs one watchdog pass for a single named collector: checks whether it is
+# stalled or dead, stops and restarts it if the restart budget allows, and
+# records the outcome via the same status-writing and logging calls the
+# original inline loop body used.
+# Input: collector name, and its running_loops entry if currently running
+# (undef otherwise).
+# Output: undef when the collector needed no action (running and healthy);
+# otherwise a hash reference with "bucket" ('restarted' or 'attention') and
+# "entry" (the hash to push onto that bucket).
+sub _supervise_one_collector {
+    my ( $self, $name, $running_entry ) = @_;
+
+    my $job = eval { $self->_collector_job_by_name($name) };
+    if ( !$job ) {
+        my $error = $@;    # _collector_job_by_name always dies (setting $@) when it yields a false job, so $@ is the message
+        $self->_mark_collector_watchdog_attention(
+            $name,
+            $error,
+            restart_count => 0,
+        );
+        return { bucket => 'attention', entry => { name => $name, reason => $error } };
+    }
+
+    my $status = $self->{collectors}->read_status($name) || {};
+    my $stalled = $running_entry
+      ? $self->_collector_stalled_for_watchdog( $job, $status )
+      : 0;
+    return undef if $running_entry && !$stalled;
+
+    my $stopped_stalled = 0;
+    if ($running_entry) {
+        my $ok = eval { $self->{runner}->stop_loop($name); 1 };
+        if ( !$ok ) {
+            my $error = $@;    # the failed stop_loop eval always leaves a truthy $@, so it carries the message
+            chomp $error;
             $self->_mark_collector_watchdog_attention(
                 $name,
                 $error,
                 restart_count => 0,
             );
-            push @{ $result{attention} }, { name => $name, reason => $error };
-            next;
+            return { bucket => 'attention', entry => { name => $name, reason => $error } };
         }
+        $stopped_stalled = 1;
+    }
 
-        my $status = $self->{collectors}->read_status($name) || {};
-        my $stalled = $running{$name}
-          ? $self->_collector_stalled_for_watchdog( $job, $status )
-          : 0;
-        next if $running{$name} && !$stalled;
+    my ( $restart_count, $window_started_at, $window_started_epoch ) =
+      $self->_collector_watchdog_window($status);
+    my $observed_at_epoch = time;
+    my $observed_at = _now_iso8601();
+    $restart_count++;
 
-        my $stopped_stalled = 0;
-        if ( $running{$name} ) {
-            my $ok = eval { $self->{runner}->stop_loop($name); 1 };
-            if ( !$ok ) {
-                my $error = $@;    # the failed stop_loop eval always leaves a truthy $@, so it carries the message
-                chomp $error;
-                $self->_mark_collector_watchdog_attention(
-                    $name,
-                    $error,
-                    restart_count => 0,
-                );
-                push @{ $result{attention} }, { name => $name, reason => $error };
-                next;
-            }
-            $stopped_stalled = 1;
-        }
+    if ( $restart_count > $self->_collector_restart_limit ) {
+        my $message = sprintf
+          "Collector '%s' stopped unexpectedly too many times within %s seconds; manual investigation is required",
+          $name, $self->_collector_restart_window_seconds;
+        $self->_mark_collector_watchdog_attention(
+            $name,
+            $message,
+            observed_at            => $observed_at,
+            observed_at_epoch      => $observed_at_epoch,
+            restart_count          => $restart_count,
+            window_started_at      => $window_started_at,
+            window_started_epoch   => $window_started_epoch,
+        );
+        return { bucket => 'attention', entry => { name => $name, reason => $message } };
+    }
 
-        my ( $restart_count, $window_started_at, $window_started_epoch ) =
-          $self->_collector_watchdog_window($status);
-        my $observed_at_epoch = time;
-        my $observed_at = _now_iso8601();
-        $restart_count++;
+    my $loop_job = $self->_loop_job_for_named_start($job);
+    my $pid = eval { $self->{runner}->start_loop($loop_job) };
+    my $start_error = $@;
+    if ( !$start_error && defined $pid && !$self->_collector_runtime_ready( $name, $pid ) ) {
+        eval { $self->{runner}->stop_loop($name) };
+        $start_error = "Failed to keep collector '$name' running after watchdog restart\n";
+    }
 
-        if ( $restart_count > $self->_collector_restart_limit ) {
-            my $message = sprintf
-              "Collector '%s' stopped unexpectedly too many times within %s seconds; manual investigation is required",
-              $name, $self->_collector_restart_window_seconds;
-            $self->_mark_collector_watchdog_attention(
-                $name,
-                $message,
-                observed_at            => $observed_at,
-                observed_at_epoch      => $observed_at_epoch,
-                restart_count          => $restart_count,
-                window_started_at      => $window_started_at,
-                window_started_epoch   => $window_started_epoch,
-            );
-            push @{ $result{attention} }, { name => $name, reason => $message };
-            next;
-        }
-
-        my $loop_job = $self->_loop_job_for_named_start($job);
-        my $pid = eval { $self->{runner}->start_loop($loop_job) };
-        my $start_error = $@;
-        if ( !$start_error && defined $pid && !$self->_collector_runtime_ready( $name, $pid ) ) {
-            eval { $self->{runner}->stop_loop($name) };
-            $start_error = "Failed to keep collector '$name' running after watchdog restart\n";
-        }
-
-        if ($start_error) {
-            chomp $start_error;
-            $self->{collectors}->write_status(
-                $name,
-                {
-                    running                              => 0,
-                    watchdog_attention_required          => 0,
-                    watchdog_last_error                  => $start_error,
-                    watchdog_last_unexpected_stop_at     => $observed_at,
-                    watchdog_last_unexpected_stop_at_epoch => $observed_at_epoch,
-                    watchdog_restart_count               => $restart_count,
-                    watchdog_restart_window_started_at   => $window_started_at,
-                    watchdog_restart_window_started_at_epoch => $window_started_epoch,
-                    watchdog_status                      => 'restart_failed',
-                }
-            );
-            $self->_log_collector_watchdog_event( $name, $start_error );
-            next;
-        }
-
+    if ($start_error) {
+        chomp $start_error;
         $self->{collectors}->write_status(
             $name,
             {
-                running                              => 1,
+                running                              => 0,
                 watchdog_attention_required          => 0,
-                watchdog_last_error                  => $stopped_stalled
-                  ? sprintf(
-                    "Collector '%s' stopped making progress and was restarted by the watchdog",
-                    $name
-                  )
-                  : undef,
-                watchdog_last_restart_at             => $observed_at,
-                watchdog_last_restart_at_epoch       => $observed_at_epoch,
+                watchdog_last_error                  => $start_error,
                 watchdog_last_unexpected_stop_at     => $observed_at,
                 watchdog_last_unexpected_stop_at_epoch => $observed_at_epoch,
                 watchdog_restart_count               => $restart_count,
                 watchdog_restart_window_started_at   => $window_started_at,
                 watchdog_restart_window_started_at_epoch => $window_started_epoch,
-                watchdog_status                      => 'running',
+                watchdog_status                      => 'restart_failed',
             }
         );
-        $self->_log_collector_watchdog_event( $name, "Watchdog restarted collector '$name' (attempt $restart_count)" );
-        push @{ $result{restarted} }, { name => $name, pid => $pid };
+        $self->_log_collector_watchdog_event( $name, $start_error );
+        return undef;
     }
 
-    return \%result;
+    $self->{collectors}->write_status(
+        $name,
+        {
+            running                              => 1,
+            watchdog_attention_required          => 0,
+            watchdog_last_error                  => $stopped_stalled
+              ? sprintf(
+                "Collector '%s' stopped making progress and was restarted by the watchdog",
+                $name
+              )
+              : undef,
+            watchdog_last_restart_at             => $observed_at,
+            watchdog_last_restart_at_epoch       => $observed_at_epoch,
+            watchdog_last_unexpected_stop_at     => $observed_at,
+            watchdog_last_unexpected_stop_at_epoch => $observed_at_epoch,
+            watchdog_restart_count               => $restart_count,
+            watchdog_restart_window_started_at   => $window_started_at,
+            watchdog_restart_window_started_at_epoch => $window_started_epoch,
+            watchdog_status                      => 'running',
+        }
+    );
+    $self->_log_collector_watchdog_event( $name, "Watchdog restarted collector '$name' (attempt $restart_count)" );
+    return { bucket => 'restarted', entry => { name => $name, pid => $pid } };
 }
 
 # _collector_stalled_for_watchdog($job, $status)

@@ -49,19 +49,3 @@ sub me {
 
 __END__
 
-=head1 NAME
-
-SSODemo::Controller::Web::Root - the front page
-
-=head1 METHODS
-
-=head2 index
-
-Renders the welcome page, with a sign-in link per configured provider.
-
-=head2 me
-
-Renders the identity of the signed-in user, or redirects home when there
-is none.
-
-=cut

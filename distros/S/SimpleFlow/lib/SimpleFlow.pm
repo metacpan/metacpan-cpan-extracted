@@ -11,7 +11,7 @@ use feature 'say';
 
 # Quoted, not the bare number: a numeric version is stringified through %g,
 # so 0.20 would become "0.2" and compare as older than "0.15" on CPAN.
-our $VERSION = '0.16';
+our $VERSION = '0.161';
 
 use Capture::Tiny 'capture';
 use Cwd 'getcwd';
@@ -38,14 +38,12 @@ BEGIN {
 		&& !$ENV{ANSICON};   # ANSICON
 }
 
-# Ceiling for Data::Printer's string_max when the result record is printed.
-# string_max is raised to the longest field so that nothing is silently
-# truncated (0.11), but leaving it uncapped means a chatty command's entire
-# stdout is echoed: a measured 3 MB capture wrote 3,002,832 bytes to the
-# terminal and the same again to the log. 4096 is roughly 50 lines of an
-# 80-column terminal -- enough to read a typical error message in full.
-# Data::Printer marks what it drops with "(...skipping N chars...)", so a
-# truncated field is never mistaken for a short one.
+# Ceiling on the length of any one field of the record when it is printed.
+# Nothing was capped at all before 0.16, so a chatty command's entire stdout
+# was echoed: a measured 3 MB capture wrote 3,002,832 bytes to the terminal
+# and the same again to the log. 4096 is roughly 50 lines of an 80-column
+# terminal -- enough to read a typical error message in full. What was
+# dropped is marked, so a clipped field is never mistaken for a short one.
 my $STRING_MAX_CAP = 4096;
 
 # Minimal drop-in for Term::ANSIColor's colored(\@attrs, $text): map the few
@@ -102,11 +100,28 @@ sub _autoflush {
 	return;
 }
 
-# string_max for Data::Printer: large enough not to truncate the record's own
-# fields, but never above $STRING_MAX_CAP.
-sub _string_max {
-	my $wanted = shift;
-	return min($wanted, $STRING_MAX_CAP);
+# A copy of a record with its over-long fields clipped to $STRING_MAX_CAP and
+# the drop marked. Data::Printer's own "string_max" property does this job,
+# and 0.16 left it to do it -- but string_max only arrived in Data::Printer
+# 0.99_001 (2018), and every release before that ignores a property it does
+# not recognize, in silence. A CPAN tester on Data::Printer 0.38 therefore had
+# the whole of a 200,000-character capture printed to its terminal and copied
+# into its log. Clipping here holds the ceiling on every version.
+# The record the caller is handed is untouched: only the printed copy is
+# clipped, so $t->{stdout} still has the full capture. The mark is
+# Data::Printer's own wording, so the output does not change on the versions
+# that were already capping it.
+sub _clipped {
+	my $r = shift;
+	my %clipped = %$r; # shallow: only the top-level fields are ever this long
+	foreach my $key (grep {ref $clipped{$_} eq ''} keys %clipped) {
+		next unless defined $clipped{$key}; # length undef is fatal here
+		my $dropped = length($clipped{$key}) - $STRING_MAX_CAP;
+		next if $dropped <= 0;
+		$clipped{$key} = substr($clipped{$key}, 0, $STRING_MAX_CAP)
+			. "(...skipping $dropped chars...)";
+	}
+	return \%clipped;
 }
 
 # Print the result record to the terminal (unless "quiet") and to the log
@@ -114,10 +129,13 @@ sub _string_max {
 # errors still go to STDERR, since a caller that asked for less noise did not
 # ask to be kept in the dark about a failure.
 sub _report {
-	my ($r, $log_fh, $quiet, $string_max) = @_;
-	$string_max = _string_max($string_max);
-	p(%$r, output => $log_fh, string_max => $string_max) if defined $log_fh;
-	p(%$r, string_max => $string_max) unless $quiet;
+	my ($r, $log_fh, $quiet) = @_;
+	my $clipped = _clipped($r);
+	# string_max => 0 turns Data::Printer 1.x's own clipping off: the fields
+	# arrive clipped already, and a second pass would print a second
+	# "skipping" mark. Older releases ignore the property either way.
+	p(%$clipped, output => $log_fh, string_max => 0) if defined $log_fh;
+	p(%$clipped, string_max => 0) unless $quiet;
 	return;
 }
 
@@ -396,10 +414,6 @@ sub task {
 	$r{'out.of.date'} = $is_stale;
 
 	my %output_file_size = map {$_ => -s $_} @output_files;
-	my $string_max = 0;
-	foreach my $key (grep {ref $r{$_} eq ''} keys %r) {
-		$string_max = max($string_max, length $r{$key});
-	}
 	if (
 			(!$r{overwrite})   &&
 			(!$is_stale)       &&
@@ -410,7 +424,7 @@ sub task {
 		$r{'will.do'} = 'no';
 		say colored(['black on_green'], "\"$cmd_string\"\n") . ' has been done before' unless $r{quiet};
 		$r{'output.file.size'} = \%output_file_size;
-		_report(\%r, $args->{'log.fh'}, $r{quiet}, $string_max);
+		_report(\%r, $args->{'log.fh'}, $r{quiet});
 		return \%r;
 	} else {
 		$r{done} = 'not yet';
@@ -459,7 +473,6 @@ sub task {
 	}
 	foreach my $std ('stderr', 'stdout') {
 		$r{$std} =~ s/\s+$//; # remove trailing whitespace/newline
-		$string_max = max($string_max, length $r{$std});
 	}
 	$r{done} = 'now';
 	$r{'will.do'} = 'done';
@@ -473,15 +486,16 @@ sub task {
 		$r{'will.do'} = 'FAILED';
 	}
 	if (scalar @missing_output_files > 0) {
+		my $clipped_args = _clipped($args);
 		say STDERR "this input to $current_sub:";
-		p $args;
+		p $clipped_args;
 		say {$args->{'log.fh'}} "this input to $current_sub:" if defined $args->{'log.fh'};
-		p($args, output => $args->{'log.fh'}, string_max => _string_max($string_max)) if defined $args->{'log.fh'};
+		p($clipped_args, output => $args->{'log.fh'}, string_max => 0) if defined $args->{'log.fh'};
 		say STDERR 'has these output files missing:';
 		say {$args->{'log.fh'}} 'has these output files missing:' if defined $args->{'log.fh'};
 		p @missing_output_files;
-		p(@missing_output_files, output => $args->{'log.fh'}, string_max => _string_max($string_max)) if defined $args->{'log.fh'};
-		_report(\%r, $args->{'log.fh'}, $r{quiet}, $string_max);
+		p(@missing_output_files, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
+		_report(\%r, $args->{'log.fh'}, $r{quiet});
 		if ($r{'die'}) { # use the resolved value (defaults to 1), not the raw arg
 			die 'those above files should have been made but are missing';
 		} else {
@@ -496,7 +510,7 @@ sub task {
 		warn 'the above output files have 0 size.';
 	}
 	if ($r{'timed.out'}) {
-		_report(\%r, $args->{'log.fh'}, $r{quiet}, $string_max);
+		_report(\%r, $args->{'log.fh'}, $r{quiet});
 		if ($r{'die'}) {
 			die "\"$cmd_string\" was killed after exceeding its $r{timeout}s timeout, from $c[1] line $c[2]";
 		}
@@ -504,7 +518,7 @@ sub task {
 		return \%r;
 	}
 	if ($r{'exit'} != 0) {
-		_report(\%r, $args->{'log.fh'}, $r{quiet}, $string_max);
+		_report(\%r, $args->{'log.fh'}, $r{quiet});
 		if ($r{'die'}) {
 			die "\"$cmd_string\" failed from $c[1] line $c[2]"
 		}
@@ -514,7 +528,7 @@ sub task {
 		warn "\"$cmd_string\" exited $r{'exit'} from $c[1] line $c[2]";
 		return \%r;
 	}
-	_report(\%r, $args->{'log.fh'}, $r{quiet}, $string_max);
+	_report(\%r, $args->{'log.fh'}, $r{quiet});
 	return \%r;
 }
 1;
@@ -527,7 +541,7 @@ SimpleFlow - easy, simple workflow manager (and logger); for keeping track of an
 
 =head1 VERSION
 
-version 0.16
+version 0.161
 
 =head1 DESCRIPTION
 
@@ -950,217 +964,8 @@ L<Test::Exception>.
 
 =head1 Changes
 
-=head2 0.16 2026-08-28 (Claude Opus 5 helped)
-
-=head3 Fixed
-
-=over
-
-=item * B<< C<< die =E<gt> 0 >> never reported a failure. >> The C<< will.do =E<gt> "FAILED" >> assignment
-sat inside the C<if ($r{die})> branch, so it could only run on the path that
-immediately died. Under C<< die =E<gt> 0 >> — the mode in which the caller is meant
-to read C<will.do> — a command that exited non-zero was reported as C<"done">,
-and nothing warned. C<will.do> is now C<"FAILED"> for a non-zero exit, a
-timeout, or a missing output file regardless of C<die>, and C<< die =E<gt> 0 >> emits
-a warning naming the exit code.
-
-=item * B<The log lost the record of the task that killed the run.> The log
-filehandle was never autoflushed. Measured with a C<SIGKILL> part-way through
-a pipeline (the shape of an OOM kill or a scheduler eviction), a log holding
-862 bytes on a clean exit held 139 bytes after the kill: everything written
-after the last command started — its exit code, duration and captured output
-— was still in stdio's buffer. C<task> and C<say2> now switch the handle to
-autoflush.
-
-=item * B<An undefined filename still crashed.> 0.14 added a C<defined> guard to the
-0-length check, but the C<-f -r> filetest ran first, so an C<undef> element of
-an C<input.files> array died as C<Use of uninitialized value $_ in -r> under
-C<< warnings FATAL =E<gt> 'all' >>. Names are now validated before anything is
-filetested.
-
-=item * B<< The 0-length C<input.files> check was unreachable. >> C<''> fails C<-f>, so an
-empty input filename was reported as C<"missing or unreadable"> and the
-0-length check below it could never fire. Both undefined and 0-length names
-are now reported as what they are, and the message names the offending index.
-
-=item * B<< C<cmd> was not type-checked. >> Only definedness was checked, so any reference
-was stringified straight into the shell: C<< task(cmd =E<gt> ['echo','hi']) >> ran the
-literal command C<ARRAY(0x5ed9d076e618)>. C<cmd> must now be a non-empty string
-or a non-empty array ref of defined values.
-
-=item * B<Skip detection and the post-run check disagreed.> Skipping tested a bare
-C<-f> while the post-run check tested C<-f -r>, so an output file that existed
-but could not be read counted as already done. Both use C<-f -r> now.
-
-=item * B<The result record changed shape between paths.> C<exit>, C<signal>, C<stdout>
-and C<stderr> were absent after a skip or a dry run, so a caller running under
-the C<< warnings FATAL =E<gt> 'all' >> this module recommends died just by reading
-C<< $t-E<gt>{'exit'} >>. They are now always present, holding their empty values.
-
-=item * B<< C<string_max> was uncapped >>, so a chatty command had its whole capture echoed
-to the terminal and written to the log — a measured 3 MB stdout wrote
-3,002,832 bytes to each. It is now capped at 4096 characters; Data::Printer
-marks what it drops. The full capture is still on the result hash.
-
-=item * B<< Loading SimpleFlow polluted C<main::>. >> C<use DDP> and C<use Cwd 'getcwd'> sat
-above the C<package> statement, so C<p>, C<np> and C<getcwd> were imported into
-every program that loaded the module. The C<package> statement now comes
-first, and the duplicated C<use> lines are gone.
-
-=item * B<Unbalanced parenthesis> in the 0-length C<output.files> error message.
-
-=back
-
-=head3 Added
-
-=over
-
-=item * B<< C<stale> >>: also re-run when an input file is newer than an output file, the
-rule C<make> and C<snakemake> use. Off by default, so existing pipelines are
-unaffected. The result carries C<out.of.date>.
-
-=item * B<< C<timeout> >>: a wall-clock budget in whole seconds. The command runs in its
-own process group and the whole group is killed if the budget is exceeded,
-so a wedged pipeline does not leave orphans behind. The result carries
-C<timed.out>. POSIX only.
-
-=item * B<< An array-ref C<cmd> >> runs the command without a shell, so arguments coming
-from data need no quoting.
-
-=item * B<< C<quiet> >>: suppress the record printed to the terminal without silencing the
-log or C<STDERR>.
-
-=item * B<< C<input.file> >>, the single-file convenience form of C<input.files>, matching
-C<output.file>.
-
-=back
-
-=head3 Changed
-
-=over
-
-=item * C<$VERSION> is now a quoted string. As a bare number it was stringified through
-C<%g>, so a future C<0.20> would have become C<"0.2"> and compared as older than
-C<"0.15"> on CPAN.
-
-=item * B<Incompatible:> C<input.files> on the result is now always an array ref, as
-C<output.files> always was. A scalar argument used to be stored raw.
-
-=item * C<POSIX> (core) is now a dependency, for C<_exit> in the timeout child.
-
-=back
-
-=head2 0.15 2026-07-17 (Claude Opus 4.8 helped)
-
-addition of C<output.file>, a single-file convenience form of C<output.files>. It
-takes one plain filename, cannot be combined with C<output.files>, and dies if
-given a reference or an empty name.
-
-removal of Term::ANSIColor dependency
-
-improved coverage testing
-
-=head2 0.14 2026-06-29 (Claude Opus 4.8 helped)
-
-=head3 C<task>
-
-=over
-
-=item * B<New:> accepts a flat key/value list as well as a hash ref —
-C<< task(cmd =E<gt> ...) >> and C<< task( cmd =E<gt> ... ) >> are now equivalent. A lone
-non-hashref scalar or any odd-length argument list is fatal.
-
-=item * B<Bug fix:> the default C<< die =E<gt> 1 >> was ignored when checking for missing
-C<output.files>. The block tested the raw C<< $args-E<gt>{'die'} >> (undef when the
-caller omitted it) instead of the resolved C<$r{'die'}>, so a command that
-failed to produce its declared outputs only warned instead of dying. Now
-consistent with the exit-code check.
-
-=item * B<Bug fix:> removed a stray C<)> (and an extraneous leading space) from the
-"command is" line written to the log file; it now matches the on-screen form.
-
-=item * B<Bug fix:> C<length $_ == 0> could throw a fatal uninitialized-value warning
-(under C<< warnings FATAL =E<gt> 'all' >>) on an undef element of the C<input.files>
-array branch and the C<output.files> empty-name check. Both now guard with
-C<(defined $_) && (length $_ == 0)>, matching the C<input.files> scalar branch.
-
-=back
-
-=head2 0.13 2026-06-11
-
-=head3 Fixed (Claude Opus 4.8 helped)
-
-=over
-
-=item * B<Exit status and signal are now decoded correctly.> C<task()> previously
-computed the exit code (C<< $status E<gt>E<gt> 8 >>) and I<then> derived the signal as
-C<$exit & 127>. Because the signal lives in the low byte of the raw wait
-status, which C<< E<gt>E<gt> 8 >> discards the C<signal> field was always wrong: a clean
-C<exit 42> was reported as C<signal 42>, and a process actually killed by a
-signal reported C<signal 0>. The signal is now read from the raw status before
-shifting, so C<exit> and C<signal> are independent and accurate.
-
-=item * B<< No longer dies on a missing output file when C<< die =E<gt> 0 >>. >> The zero-size
-check did C<(-s $file) == 0>, which is C<undef == 0> when a declared output file
-is absent. Under C<< use warnings FATAL =E<gt> 'all' >> that "uninitialized value"
-warning was fatal, so a task that was meant to I<warn> about missing output
-(with C<< die =E<gt> 0 >>) crashed instead. Missing sizes are now treated as C<0>, so
-the task warns and returns its result hash as intended.
-
-=item * B<< The "already done" result is now logged with its C<duration>. >> In the
-short-circuit path (output files already exist), C<duration> was set I<after>
-the record was written to the log, so the logged hash was missing it; the
-duplicate C<< done =E<gt> 'before' >> assignment was also removed.
-
-=back
-
-=head3 Changed / Windows support
-
-=over
-
-=item * B<Portable exit-status handling.> Decoding now branches on C<$^O>: Windows has
-no POSIX signals (C<signal> is reported as C<0> there), and a C<system()> that
-fails to launch the command (C<-1>) yields C<< exit =E<gt> -1 >> instead of a garbage
-value from shifting C<-1>.
-
-=item * B<ANSI colour is disabled on the legacy Windows console.> C<Term::ANSIColor>
-output is suppressed on C<MSWin32> unless an ANSI-capable terminal is detected
-(Windows Terminal, ConEmu, or ANSICON), so C<cmd.exe> no longer prints raw
-escape sequences and redirected logs stay clean. Unix and modern Windows
-terminals are unaffected.
-
-=back
-
-=head3 Tests
-
-=over
-
-=item * Rewrote C<t/01.t> to be cross-platform: shell commands now invoke the running
-Perl interpreter (C<"$^X" -e ...>) instead of Unix-only tools (C<which>, C<ls>,
-C<ln>, C<cp>), and temp files use the system temp directory instead of a
-hard-coded C</tmp>.
-
-=item * Added regression tests for both fixed bugs (exit/signal decoding; surviving a
-missing output file with C<< die =E<gt> 0 >>).
-
-=item * Added coverage for the C<note> field, the C<input.file.size> / C<output.file.size>
-hashes, scalar-vs-array normalisation of C<input.files> / C<output.files>, the
-C<dir> / C<source.file> / C<source.line> metadata, captured C<stdout> / C<stderr>
-(including trailing-whitespace stripping), and argument validation (missing
-C<cmd>, unknown keys, bad C<log.fh>, missing input files).
-
-=back
-
-=head2 0.12 2026-02-14
-
-exit code now matches what shell would show it as; signal now appears
-
-=head2 0.11 2026-01-13
-
-max string length now corresponds to max of output strings, no more truncated output
-added List::Util dependency for string length maxes
-memory size now shows when output
-directory is now output during dry runs
+The release notes are in the C<Changes> file at the root of the
+distribution, in the format CPAN itself reads.
 
 =head1 COPYRIGHT AND LICENSE
 

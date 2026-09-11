@@ -3,11 +3,12 @@ package Developer::Dashboard::Config;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use File::Spec;
 use Cwd qw(cwd);
 
+use JSON::XS ();
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 
 # new(%args)
@@ -23,6 +24,18 @@ sub new {
         paths => $paths,
         repo_root => $args{repo_root},
     }, $class;
+}
+
+# for_paths($paths)
+# Constructs a configuration loader bound to a path registry, building the
+# matching file registry itself - the shape both Housekeeper and Doctor
+# needed identically (DD-763).
+# Input: Developer::Dashboard::PathRegistry object.
+# Output: Developer::Dashboard::Config object.
+sub for_paths {
+    my ( $class, $paths ) = @_;
+    require Developer::Dashboard::FileRegistry;
+    return $class->new( paths => $paths, files => Developer::Dashboard::FileRegistry->new( paths => $paths ) );
 }
 
 # load_global()
@@ -258,12 +271,17 @@ sub _normalize_collector_job {
 }
 
 # _collector_disable_flag($value)
-# Normalizes one collector disable value into a stable boolean flag.
+# Normalizes one collector disable value into a stable boolean flag. A JSON
+# literal true/false arrives from json_decode as a blessed boolean reference
+# (JSON::XS::is_bool detects it), so it is unwrapped to its truth value
+# BEFORE the reference test - otherwise "disable": false read as disabled
+# (DD-813).
 # Input: scalar config value from collector disable.
 # Output: numeric boolean where 1 disables the collector and 0 keeps it active.
 sub _collector_disable_flag {
     my ( $self, $value ) = @_;
     return 0 if !defined $value;
+    $value = $value ? 1 : 0 if JSON::XS::is_bool($value);
     return 1 if ref($value);
     return 0 if $value =~ /\A(?:0|false|no|off)\z/i;
     return $value ne '' ? 1 : 0;
@@ -1017,7 +1035,10 @@ sub _merge_api_key_hashes {
 
 # _api_key_disabled_flag($entry)
 # Returns whether one raw API config entry is an explicit child-layer
-# tombstone.
+# tombstone. A JSON literal true/false on the flag field arrives as a
+# blessed boolean reference (JSON::XS::is_bool detects it) and is unwrapped
+# before the reference test, so "disabled": false keeps the key visible
+# (DD-813); any other reference still counts as a tombstone.
 # Input: API entry hash reference.
 # Output: numeric boolean flag.
 sub _api_key_disabled_flag {
@@ -1026,6 +1047,7 @@ sub _api_key_disabled_flag {
     for my $field (qw(disabled _disabled)) {
         next if !exists $entry->{$field};
         my $value = $entry->{$field};
+        $value = $value ? 1 : 0 if JSON::XS::is_bool($value);
         return 1 if ref($value);
         return 0 if !defined $value || $value eq '' || $value =~ /\A(?:0|false|no|off)\z/i;
         return 1;

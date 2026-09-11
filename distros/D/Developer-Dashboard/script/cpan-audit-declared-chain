@@ -21,6 +21,28 @@ use constant EXIT_CLEAN   => 0;
 use constant EXIT_FINDING => 1;
 use constant EXIT_UNUSABLE => 2;
 
+# Stricter than CPAN::Audit::FreshnessCheck's own default of 30 days, deliberately.
+# Upstream's threshold serves an interactive audit, where a warning on STDERR is
+# read by the person who typed the command. This is a release gate, and 30 days is
+# precisely the age at which this project's database silently lacked the URI
+# advisory that a clean verdict was then cited to disprove (DD-790). The knob is
+# upstream's own CPAN_AUDIT_FRESH_DAYS, so one name moves the warning and the
+# refusal together rather than letting two thresholds disagree in silence.
+#
+# WHY 21 AND NOT A ROUNDER NUMBER. The limit must EXCEED THE LARGEST REAL GAP
+# BETWEEN PUBLICATIONS, or the gate refuses during a normal quiet spell while no
+# newer database exists to install - blocking for a reason nobody can act on, which
+# is how a gate gets routed around instead of fixed. Measured from the CPAN index
+# on 2026-09-06 across 40 CPANSA-DB releases spanning 223 days: median gap 4 days,
+# mean 5.7, MAXIMUM 18, with 1 gap of 39 exceeding 14 days and none exceeding 30.
+# 21 clears the observed maximum with three days of margin and still catches the
+# 30-day staleness this card was raised for. IF A LONGER GAP EVER APPEARS UPSTREAM,
+# THIS IS THE NUMBER THAT MOVES - the measurement, not the constant, is the reason.
+# And 18 is the maximum of a 223-DAY WINDOW, which is one sample of the tail rather
+# than the tail itself: read 21 as "chosen against the largest gap seen in 223 days",
+# never as a proven ceiling.
+use constant DEFAULT_MAX_DB_AGE_DAYS => 21;
+
 exit main(@ARGV);
 
 # Purpose: run the declared-chain advisory gate end to end.
@@ -52,6 +74,18 @@ sub main {
     my $version_class = _load_audit_modules();
     return _unusable('CPAN::Audit::DB and CPAN::Audit::Version must be loadable; install CPAN::Audit and put it on PERL5LIB')
         if !$version_class;
+
+    # The corpus is established BEFORE the subject is walked, because a database
+    # too old to answer with makes every later step moot - and reporting it only
+    # on the failure path would name the database exactly when nobody needs it.
+    my $corpus = _corpus_report($perl5_root);
+    # Flushed, because the refusal below goes to STDERR while this goes to STDOUT.
+    # Block-buffered, the corpus line lands AFTER the refusal in any combined log -
+    # so the reader meets "refused because the database is old" before being told
+    # which database, which is the wrong way round for the only line that explains it.
+    local $| = 1;
+    print $corpus->{line};
+    return _unusable( $corpus->{refusal} ) if defined $corpus->{refusal};
 
     my $declared = _parse_cpanfile($cpanfile);
     return _unusable("no runtime requirements declared in $cpanfile")
@@ -112,6 +146,100 @@ sub _unusable {
     my ($reason) = @_;
     printf {*STDERR} "cannot audit the declared chain: %s\n", $reason;
     return EXIT_UNUSABLE;
+}
+
+# Purpose: days elapsed since 1970-01-01 for a civil year/month/day, by pure
+#          integer arithmetic.
+# Input: $y (full year), $m (1-12), $d (1-31).
+# Output: an integer day number, negative before 1970.
+#
+# Deliberately not Time::Local: its two-digit-year heuristics and the epoch
+# rollover in timegm have surprised callers, and a date comparison that can be
+# moved by a timezone or an interpretation rule is exactly the kind of quiet
+# wrongness this gate exists to refuse. This is Howard Hinnant's days_from_civil,
+# which is total and has no configuration.
+sub _days_from_civil {
+    my ( $y, $m, $d ) = @_;
+    $y -= ( $m <= 2 ? 1 : 0 );
+    my $era = int( ( $y >= 0 ? $y : $y - 399 ) / 400 );
+    my $yoe = $y - $era * 400;
+    my $doy = int( ( 153 * ( $m + ( $m > 2 ? -3 : 9 ) ) + 2 ) / 5 ) + $d - 1;
+    my $doe = $yoe * 365 + int( $yoe / 4 ) - int( $yoe / 100 ) + $doy;
+    return $era * 146_097 + $doe - 719_468;
+}
+
+# Purpose: the age in days of a CPANSA database stamp.
+# Input: $stamp - a version in CPANSA's YYYYMMDD.NNN form.
+# Output: the age in days, or undef when the stamp is not that shape.
+#
+# undef means "this cannot be judged", never "this is fine". The caller turns it
+# into a refusal, because a stamp we cannot read is a corpus we cannot vouch for.
+sub _database_age_days {
+    my ($stamp) = @_;
+    return undef if !defined $stamp;
+    return undef if $stamp !~ /^([0-9]{4})([0-9]{2})([0-9]{2})(?:[.]|\z)/;
+    my ( $y, $m, $d ) = ( $1, $2, $3 );
+    return undef if $m < 1 || $m > 12 || $d < 1 || $d > 31;
+    my @now = gmtime(time);
+    return _days_from_civil( $now[5] + 1900, $now[4] + 1, $now[3] )
+      - _days_from_civil( $y, $m, $d );
+}
+
+# Purpose: the configured maximum advisory-database age.
+# Input: none (reads CPAN_AUDIT_FRESH_DAYS).
+# Output: ( $days, undef ) or ( undef, $complaint ) when the variable is unusable.
+#
+# A malformed value is refused rather than ignored. Silently falling back to the
+# default would mean an operator who set the knob and mistyped it gets the
+# default's behaviour while believing they set their own - the silent-drop failure
+# this project has met repeatedly in option handling.
+sub _max_database_age_days {
+    my $configured = $ENV{CPAN_AUDIT_FRESH_DAYS};
+    return ( DEFAULT_MAX_DB_AGE_DAYS, undef ) if !defined $configured || $configured eq '';
+    return ( undef, "CPAN_AUDIT_FRESH_DAYS is set to '$configured', which is not a whole number of days" )
+      if $configured !~ /^[0-9]+$/;
+    return ( $configured + 0, undef );
+}
+
+# Purpose: name the advisory database behind this run, and decide whether it is
+#          fit to answer with.
+# Input: none.
+# Output: a hash reference - {line} always, {refusal} when the gate must not
+#         report a verdict.
+#
+# WHY THE LINE IS UNCONDITIONAL. A verdict is only meaningful alongside the corpus
+# it was reached from, and the clean path is the one readers believe. Two clean runs
+# of this gate were cited as evidence on 2026-09-06 while the database predated the
+# advisory in question by three weeks; nothing in that output could have revealed it.
+# Printing the corpus only when refusing would reproduce the defect on the exact
+# path that caused it.
+sub _corpus_report {
+    my ($audited_root) = @_;
+    my $stamp = eval { CPAN::Audit::DB->VERSION };
+    my $shown = defined $stamp && $stamp ne '' ? $stamp : 'unknown';
+    my $age   = _database_age_days($stamp);
+    my ( $limit, $complaint ) = _max_database_age_days();
+
+    my $line = sprintf "advisory database: CPAN::Audit::DB %s%s\n", $shown,
+      defined $age ? sprintf( ' (%d day%s old)', $age, $age == 1 ? '' : 's' ) : ' (age unknown)';
+
+    return { line => $line, refusal => $complaint } if defined $complaint;
+    return {
+        line    => $line,
+        refusal => "the advisory database version '$shown' is not in CPANSA's YYYYMMDD.NNN form, so its age cannot be established"
+    } if !defined $age;
+    return {
+        line    => $line,
+        refusal => sprintf(
+            "the advisory database is %d days old (%s) and the limit is %d. Refresh it WITHOUT disturbing a shared CPAN tree:\n"
+              . "    DIR=\$(mktemp -d)\n"
+              . "    cpanm --local-lib-contained \"\$DIR\" CPANSA::DB\n"
+              . "    PERL5LIB=\"\$DIR/lib/perl5:\$PERL5LIB\" %s %s\n"
+              . "Or set CPAN_AUDIT_FRESH_DAYS if you accept auditing against a corpus that old.",
+            $age, $shown, $limit, $0, ( defined $audited_root ? $audited_root : '<root>' )
+        )
+    } if $age > $limit;
+    return { line => $line, refusal => undef };
 }
 
 # Purpose: load the CPAN::Audit advisory database and version-range comparator
@@ -510,7 +638,8 @@ moves, so a chain that was clean yesterday can legitimately fail today.
 
 Give it the Perl library root whose distribution metadata should be walked. The
 C<cpanfile> and the reviewed advisory disposition file default to the ones next
-to the script, and both can be overridden.
+to the script, and both can be overridden. C<CPAN_AUDIT_FRESH_DAYS> overrides how
+old an advisory database may be before the gate refuses to answer from it.
 
 Exit codes are fail-closed:
 
@@ -522,12 +651,65 @@ advisory range.
 =item * C<1> - at least one permitted vulnerable resolution was found.
 
 =item * C<2> - the gate could not audit the whole chain (bad usage, missing
-C<CPAN::Audit>, a library root with no distribution metadata, or a distribution
-metadata file it could not read or parse). It never reports a clean chain it did
-not establish, and an unreadable metadata file is not established: dropping one
+C<CPAN::Audit>, a library root with no distribution metadata, a distribution
+metadata file it could not read or parse, or an advisory database whose age
+could not be established or exceeds the limit). It never reports a clean chain it
+did not establish, and an unreadable metadata file is not established: dropping one
 shrinks the closure, and a smaller closure is exactly what hides a finding.
 
 =back
+
+=head2 The advisory database is named on every run
+
+Every run prints the advisory database behind its verdict and how old it is,
+whether or not that run finds anything:
+
+    advisory database: CPAN::Audit::DB 20260906.002 (0 days old)
+
+This is not decoration. A verdict is only as good as the corpus it was reached
+from, and on 2026-09-06 this gate reported the closure clean against a database
+thirty days old that did not contain C<URI> at all - so a real advisory against
+the installed C<URI> was not missed but unreportable, and the clean line looked
+exactly like a clean line from a current database. Naming the corpus is what lets
+a reader tell "nothing is wrong" from "nothing could have been found", and the
+clean path is the one that most needs it.
+
+=head2 Refusing a corpus too old to answer from
+
+Past a limit the gate declines to produce a verdict at all rather than answering
+from a database it cannot vouch for, and the refusal names the fix.
+
+The threshold is C<CPAN_AUDIT_FRESH_DAYS>, which is C<CPAN::Audit>'s own variable
+rather than a private one, so setting it moves upstream's freshness warning and
+this refusal together instead of leaving two thresholds to disagree in silence.
+The refusal names a way forward, because a refusal with no way forward gets
+worked around rather than followed. That recipe creates its own directory with
+C<mktemp -d> and never names a fixed path: a fixed path under world-writable
+F</tmp> is predictable, C<cpanm> reuses an existing directory rather than
+refusing it, and the next line of the recipe puts that directory B<first> on
+C<PERL5LIB>. Recommending it would mean a security tool advising the user to
+load Perl from a location they do not control (CWE-377, CWE-378). The audited
+root is still echoed back at the end of the recipe so the command can be re-run
+as printed - that path is the caller's own argument, not one this gate invents.
+
+It defaults here to B<21 days> - stricter than upstream's 30, because 30 days is
+precisely the age at which this project's database lacked the advisory a clean
+verdict was later cited to disprove.
+
+Twenty-one is derived rather than chosen. The limit must exceed the largest real
+gap between publications, or the gate refuses during an ordinary quiet spell when
+no newer database exists to install - blocking for a reason nobody can act on,
+which is how a gate gets routed around instead of fixed. Measured across 40
+C<CPANSA-DB> releases spanning 223 days: median gap 4 days, maximum 18. That
+maximum is one sample of the tail rather than the tail, so read 21 as "above the
+largest gap seen in 223 days", not as a proven ceiling; if a longer gap appears
+upstream, that is the number to move.
+
+Note that upstream already detects this and deliberately declines to act on it:
+C<cpan-audit --fresh> warns through C<CPAN::Audit::FreshnessCheck> but leaves the
+exit status unchanged, so no caller reading a status can see it. That is the right
+choice for an interactive audit and the wrong one for a release gate. This gate
+escalates a signal upstream already emits; it does not invent a policy.
 
 =head1 WHAT USES IT
 

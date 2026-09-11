@@ -1,0 +1,20 @@
+{
+  "current_storage_version": "5.25.0",
+  "min_engine_version": "5.21.0",
+  "roadmap": [
+    {
+      "version": "5.21.0",
+      "title": "Rename legacy scheme/ directory to schema/",
+      "description": "Renames or merges dbstore/scheme to dbstore/schema for modern AmberDB schema resolution.",
+      "script": "migrations/versions/5.21.0/migrate.pl",
+      "requires_reindex": false
+    },
+    {
+      "version": "5.25.0",
+      "title": "Directory transition (tables -> table), native ABR v5 binary conversion & secondary index rebuild",
+      "description": "Renames dbstore/tables to dbstore/table, upgrades all legacy records (v1-v4) to native ABR v5 binary format, and reconstructs all secondary indexes (.inx, .fld, .unq, .fac, .slg, .srt).",
+      "script": "migrations/versions/5.25.0/migrate.pl",
+      "requires_reindex": true
+    }
+  ]
+}

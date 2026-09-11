@@ -43,7 +43,14 @@ my $switchboard_paths;
 
 my $cmd = shift @ARGV || '';
 _load_runtime_env();
-_prime_command_result_env( $cmd, @ARGV ) if $cmd ne '';
+
+# DD-835 (reverses DD-832): also set before the main gate runs, as an
+# additional signal - a main-gate hook's own @ARGV already carries the
+# top-level command name (prepended below), but a hook may prefer reading
+# it from the environment instead.
+$ENV{DEVELOPER_DASHBOARD_COMMAND} = $cmd if $cmd ne '';
+my $main_gate_results = _run_main_gate_hooks( $cmd, @ARGV );
+_prime_command_result_env( $cmd, $main_gate_results, @ARGV ) if $cmd ne '';
 
 if ( $cmd eq '' ) {
     pod2usage(
@@ -90,25 +97,29 @@ pod2usage(
     -sections => [qw(NAME SYNOPSIS)],
 );
 
-# _prime_command_result_env($cmd, @argv)
+# _prime_command_result_env($cmd, $main_gate_results, @argv)
 # Runs executable per-command hook files from every DD-OOP-LAYERS CLI root and
 # exposes their captured output through RESULT JSON for later hooks and the
-# final command target.
-# Input: top-level command name plus the remaining argv list.
+# final command target. The record starts from whatever the main gate already
+# wrote, so the command sees both stages; with no main-gate results the
+# inherited channels are cleared exactly as before the main gate existed.
+# Input: top-level command name, the main gate's results hash reference, and
+# the remaining argv list.
 # Output: true value after hook execution completes.
 sub _prime_command_result_env {
-    my ( $cmd, @argv ) = @_;
+    my ( $cmd, $main_gate_results, @argv ) = @_;
     require Developer::Dashboard::Runtime::Result;
-    Developer::Dashboard::Runtime::Result::clear_current();
-    Developer::Dashboard::Runtime::Result::clear_last_result();
-    $ENV{DEVELOPER_DASHBOARD_COMMAND} = $cmd if defined $cmd && $cmd ne '';
+    my %results = %{ $main_gate_results || {} };
+    if ( !%results ) {
+        Developer::Dashboard::Runtime::Result::clear_current();
+        Developer::Dashboard::Runtime::Result::clear_last_result();
+    }
     return 1 if !defined $cmd || $cmd eq '';
 
     my @hook_roots = _command_hook_roots($cmd);
     return 1 if !@hook_roots;
     my $stream = $cmd eq 'doctor' ? 0 : 1;
 
-    my %results;
     for my $hook_root (@hook_roots) {
         opendir my $dh, $hook_root or next;
         for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir $dh ) {
@@ -234,6 +245,80 @@ sub _run_command_hook_streaming {
         stderr    => $stderr_text,
         exit_code => $? >> 8,
     };
+}
+
+# _main_gate_hook_roots()
+# Resolves every main-gate hook directory (<layer>/hooks/) across the runtime
+# layer stack, deepest participating layer first and the home layer last, so
+# the layer closest to the working directory speaks before the ones it inherits.
+# Input: none.
+# Output: ordered list of existing hook directory paths.
+sub _main_gate_hook_roots {
+    return grep { -d $_ }
+      map { File::Spec->catdir( $_, 'hooks' ) } reverse _switchboard_paths()->runtime_layers;
+}
+
+# _run_main_gate_hooks($cmd, @argv)
+# Runs the main gate once per invocation, before the command is resolved and
+# for every form of the command line (no command, help, version, which, an
+# unknown command). Each runnable file directly under a main-gate root runs in
+# sorted order with the FULL command line as typed - the top-level command
+# name ('' when none) prepended to the remaining argv (DD-835, reversing
+# DD-832's contract of stripping it) - so a hook can tell which command is
+# running directly from its own @ARGV; $ENV{DEVELOPER_DASHBOARD_COMMAND} (set
+# by the caller before this sub runs) carries the same information as a
+# secondary signal. Output is streamed as it appears and its captured result
+# recorded in RESULT/LAST_RESULT for the hooks after it and for the command.
+# A hook printing the [[STOP]] marker on stderr ends the invocation: the
+# remaining hooks are skipped, the command never runs and the process exits 1
+# with the hook's stderr already on the terminal. A dashboard started by a
+# hook inherits DEVELOPER_DASHBOARD_MAIN_GATE and skips the gate, so a hook
+# may call dashboard without re-firing itself.
+# Input: top-level command name ('' when none) plus the remaining argv list.
+# Output: hash reference of hook results keyed by hook name; empty when the
+# gate ran no hook.
+sub _run_main_gate_hooks {
+    my ( $cmd, @argv ) = @_;
+    return {} if $ENV{DEVELOPER_DASHBOARD_MAIN_GATE};
+    my @hook_roots = _main_gate_hook_roots();
+    return {} if !@hook_roots;
+
+    require Developer::Dashboard::Runtime::Result;
+    Developer::Dashboard::Runtime::Result::clear_current();
+    Developer::Dashboard::Runtime::Result::clear_last_result();
+    local $ENV{DEVELOPER_DASHBOARD_MAIN_GATE} = 1;
+    my @hook_argv = ( ( $cmd ne '' ? $cmd : () ), @argv );
+    my %results;
+    for my $hook_root (@hook_roots) {
+        opendir my $dh, $hook_root or next;
+        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir $dh ) {
+            my $path = File::Spec->catfile( $hook_root, $entry );
+            next if !is_runnable_file($path);
+            next if $entry eq 'run';
+            my $hook_result = _run_command_hook_streaming( $path, stream => 1, argv => \@hook_argv );
+            my $result_key = exists $results{$entry} ? _command_hook_result_key($path) : $entry;
+            $results{$result_key} = {
+                stdout => $hook_result->{stdout},
+                stderr => $hook_result->{stderr},
+            };
+            $results{$result_key}{exit_code} = $hook_result->{exit_code} if defined $hook_result->{exit_code};
+            Developer::Dashboard::Runtime::Result::set_current( \%results );
+            Developer::Dashboard::Runtime::Result::set_last_result(
+                {
+                    file   => $path,
+                    exit   => $hook_result->{exit_code},
+                    STDOUT => $hook_result->{stdout},
+                    STDERR => $hook_result->{stderr},
+                }
+            );
+            if ( Developer::Dashboard::Runtime::Result::stop_requested( $hook_result->{stderr} ) ) {
+                closedir $dh;
+                exit 1;
+            }
+        }
+        closedir $dh;
+    }
+    return \%results;
 }
 
 # _command_hook_roots($cmd)
@@ -532,6 +617,11 @@ bootstraps the repo lib path when running from a checkout
 
 =item *
 
+runs the main gate: every executable file under a layer's F<hooks/>
+directory, once per invocation, before the command is even resolved
+
+=item *
+
 runs layered per-command hooks across C<DD-OOP-LAYERS>
 
 =item *
@@ -551,6 +641,36 @@ execs the resolved helper or custom command
 The real built-in command implementations live outside this entrypoint, either
 in private staged helper scripts under F<share/private-cli/> or in reusable
 Perl modules loaded by those helpers.
+
+=head2 The main gate
+
+Before any command is resolved - including C<dashboard> with no command,
+C<help>, C<version>, C<which> and a command that does not exist - the
+switchboard runs the main gate: every executable regular file directly under a
+runtime layer's F<hooks/> directory, in sorted filename order. Files that are
+not executable, subdirectories and a file named F<run> are skipped, exactly as
+the per-command hook chain skips them. The layers run deepest first and home
+last, so F<./.developer-dashboard/hooks/> speaks before
+F<~/.developer-dashboard/hooks/>, and every layer between the working
+directory and home contributes its own hooks.
+
+Each hook receives the full command line, command word first (for
+C<d2 version --json> that is C<version --json>; with no command the hook gets
+no arguments). Its stdout streams to the terminal ahead of the command's
+output, and its captured stdout, stderr and exit code are recorded in
+C<RESULT> and C<LAST_RESULT> for the hooks after it and for the command
+itself. A hook that prints the literal marker C<[[STOP]]> on stderr stops the
+invocation: the remaining hooks are skipped, the command does not run, and
+C<dashboard> exits 1 with the hook's stderr visible. That differs on purpose
+from a per-command hook's C<[[STOP]]>, which only ends the remaining hook chain
+and still runs the command.
+
+A hook that itself runs C<dashboard> or C<d2> does not re-fire the gate: the
+hooks run with C<DEVELOPER_DASHBOARD_MAIN_GATE> set, and a nested switchboard
+that inherits it skips the gate. C<d2> re-execs its sibling C<dashboard> with
+the same arguments, so the gate fires exactly once through either entrypoint.
+With no F<hooks/> directory on any layer, nothing changes: no output, no
+stderr, the same exit status as before the gate existed.
 
 =for comment FULL-POD-DOC START
 
@@ -622,7 +742,18 @@ Example 5:
 Exercise the explicit stop-marker hook path, where one hook ends the remaining
 hook chain but control still returns to the main command.
 
-Example 5:
+Example 6:
+
+  mkdir -p ~/.developer-dashboard/hooks
+  printf '#!/bin/sh\n[ -n "$DD_TICKET" ] && exit 0\necho "set DD_TICKET first" >&2\necho "[[STOP]]" >&2\n' > ~/.developer-dashboard/hooks/10-ticket
+  chmod +x ~/.developer-dashboard/hooks/10-ticket
+  dashboard version          # refused, exit 1, stderr says why
+  DD_TICKET=DD-1 d2 version  # gate passes, version prints
+
+Exercise the main gate: one hook under F<hooks/> runs before every command,
+through both entrypoints, and its C<[[STOP]]> refuses the command entirely.
+
+Example 7:
 
   prove -lv t/30-dashboard-loader.t
 

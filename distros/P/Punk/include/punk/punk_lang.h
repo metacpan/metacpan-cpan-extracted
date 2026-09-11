@@ -222,22 +222,79 @@ static pl_choice pl_resolve(const char *param, STRLEN paraml,
 #define PI_MISSING 2   /* nowhere at all */
 
 static int pi_lookup(pTHX_ const pi_arena *ar, const pi_cat *cat,
-                     const char *k, STRLEN kl, const char **vp, STRLEN *vl) {
+                     const char *k, STRLEN kl, const char **vp, STRLEN *vl,
+                     int *utf8) {
     const pi_cat *d;
 
-    *vp = pi_get(cat, k, kl, vl);
+    if (utf8) *utf8 = 0;
+    *vp = pi_get(cat, k, kl, vl, utf8);
     if (*vp) return PI_HIT;
 
     /* The default catalogue before giving up: a key present in `en` and
      * missing from `fr-CA` is UNTRANSLATED, not missing. */
     d = (ar && ar->def >= 0) ? &ar->cat[ar->def] : NULL;
     if (d && d != cat) {
-        *vp = pi_get(d, k, kl, vl);
+        *vp = pi_get(d, k, kl, vl, utf8);
         if (*vp) { pi_n_untranslated++; return PI_HIT; }
     }
 
     if (pi_is_prefix(cat, k, kl) || (d && d != cat && pi_is_prefix(d, k, kl)))
         return PI_LEVEL;
+
+    pi_n_missing++;
+    return PI_MISSING;
+}
+
+/* The same three answers, one step at a time.
+ *
+ * pi_lookup takes a whole dotted key and walks it from the catalogue root.
+ * This takes ONE segment and the node the last step reached, which is what
+ * the tied hash needs: a template descends one key per FETCH, and re-walking
+ * the whole path each time is what made the tied door cost six probes for
+ * three segments.
+ *
+ * The default catalogue is probed LAZILY. On a hit in the negotiated
+ * catalogue - the common case - it is not probed at all, so the fast path is
+ * a single probe. It is only consulted to fall back, or to carry the
+ * default's position down into a nested level.
+ *
+ * The counters live here, next to pi_lookup's, so the two doors cannot come
+ * to different conclusions about what is missing and what is merely
+ * untranslated. */
+static int pi_step(pTHX_ const pi_arena *ar, const pi_cat *cat,
+                   uint32_t node, uint32_t dnode,
+                   const char *k, STRLEN kl,
+                   const char **vp, STRLEN *vl, int *utf8,
+                   uint32_t *child, uint32_t *dchild) {
+    const pi_cat *d = (ar && ar->def >= 0) ? &ar->cat[ar->def] : NULL;
+    uint32_t slot = FZ_NOHANDLE, dslot = FZ_NOHANDLE;
+    int r = FZ_ABSENT, dr = FZ_ABSENT;
+
+    if (utf8) *utf8 = 0;
+    *child = *dchild = FZ_NOHANDLE;
+
+    if (cat && cat->fz && node != FZ_NOHANDLE && PUNK_FZ)
+        r = (PUNK_FZ->probe)(cat->fz, node, k, kl, &slot);
+
+    if (r == FZ_LEAF) {
+        *child = slot;
+        *vp = (PUNK_FZ->str)(cat->fz, slot, vl, utf8);
+        if (*vp) return PI_HIT;
+    }
+
+    /* Only now is the default worth asking. */
+    if (d == cat) { dr = r; dslot = slot; }
+    else if (d && d->fz && dnode != FZ_NOHANDLE && PUNK_FZ)
+        dr = (PUNK_FZ->probe)(d->fz, dnode, k, kl, &dslot);
+
+    if (r  != FZ_ABSENT) *child  = slot;
+    if (dr != FZ_ABSENT) *dchild = dslot;
+
+    if (dr == FZ_LEAF && d != cat) {
+        *vp = (PUNK_FZ->str)(d->fz, dslot, vl, utf8);
+        if (*vp) { pi_n_untranslated++; return PI_HIT; }
+    }
+    if (r == FZ_BRANCH || dr == FZ_BRANCH) return PI_LEVEL;
 
     pi_n_missing++;
     return PI_MISSING;
@@ -312,23 +369,52 @@ static void pi_warn_missing(pTHX_ SV *c, const char *k, STRLEN kl) {
 /* One level of the `locale` hash a template reads. punk_i18n.h says why it is
  * tied rather than built, and what it needed from Template::Stencil 0.10. */
 static SV *pi_tied_hash(pTHX_ pi_arena *ar, int idx, SV *prefix, HV *cfg,
-                        SV *c) {
+                        SV *c, uint32_t node, uint32_t dnode) {
     AV *o = newAV();
     HV *h = newHV();
     SV *obj;
 
-    av_extend(o, 4);
+    av_extend(o, PIT_MAX - 1);
     av_store(o, PIT_ARENA,  newSViv(PTR2IV(ar)));
     av_store(o, PIT_CAT,    newSViv(idx));
     av_store(o, PIT_PREFIX, prefix ? newSVsv(prefix) : newSV(0));
     av_store(o, PIT_CFG,    cfg ? newRV_inc((SV *)cfg) : newSV(0));
     av_store(o, PIT_CTX,    c ? newSVsv(c) : newSV(0));
+    av_store(o, PIT_NODE,   newSVuv((UV)node));
+    av_store(o, PIT_DNODE,  newSVuv((UV)dnode));
+    av_store(o, PIT_ITER,   newSViv(0));
 
     obj = sv_bless(newRV_noinc((SV *)o),
                    gv_stashpv("Punk::Plugin::I18n::Cat", GV_ADD));
     hv_magic(h, (GV *)obj, PERL_MAGIC_tied);
     SvREFCNT_dec(obj);          /* hv_magic took its own reference */
     return newRV_noinc((SV *)h);
+}
+
+/* The i'th key of the node a tied hash is sitting on.
+ *
+ * Frozen sorts hash keys when it builds the block, so this order is stable
+ * and IDENTICAL in every process reading the same block. A Perl hash is
+ * neither, which is worth knowing before a template relies on it. */
+static SV *pi_key_at(pTHX_ AV *o, uint32_t i) {
+    SV **arsv = av_fetch(o, PIT_ARENA, 0);
+    SV **idxs = av_fetch(o, PIT_CAT, 0);
+    SV **nds  = av_fetch(o, PIT_NODE, 0);
+    pi_arena *ar = (arsv && *arsv) ? INT2PTR(pi_arena *, SvIV(*arsv)) : NULL;
+    int idx = (idxs && *idxs) ? (int)SvIV(*idxs) : -1;
+    uint32_t node = (nds && *nds) ? (uint32_t)SvUV(*nds) : FZ_NOHANDLE;
+    const char *k = NULL;
+    STRLEN kl = 0;
+    int u = 0;
+    SV *sv;
+
+    if (!ar || idx < 0 || idx >= ar->ncat || node == FZ_NOHANDLE || !PUNK_FZ)
+        return newSV(0);
+    if (!(PUNK_FZ->key_at)(ar->cat[idx].fz, node, i, &k, &kl, &u))
+        return newSV(0);
+    sv = newSVpvn(k, kl);
+    if (u) SvUTF8_on(sv);
+    return sv;
 }
 
 static pi_arena *pi_arena_of(pTHX_ HV *cfg) {
@@ -423,10 +509,19 @@ static const pi_cat *pi_for_request(pTHX_ SV *c, HV *cfg, pi_arena *ar) {
     if (ch.idx < 0) return NULL;
 
     (void)hv_stores(env, PL_ENV_KEY, newSViv(ch.idx));
-    /* An explicit choice is worth remembering, or the switcher works once and
-     * appears broken on the next link. The env flag is what the response path
-     * reads to decide whether to write the cookie. */
-    if (ch.explicit_) (void)hv_stores(env, PL_ENV_KEY "_set", newSViv(1));
+
+    /* There was a second write here - PL_ENV_KEY "_set" - with a comment
+     * saying "the env flag is what the response path reads to decide whether
+     * to write the cookie". NOTHING EVER READ IT, and no code in this
+     * distribution has ever written a punk.lang cookie. The POD promised the
+     * feature and described its absence as a caveat.
+     *
+     * `ch.explicit_` stays, because it is the fact a future implementation
+     * would derive the decision from: it says the locale came from ?lang= or
+     * the cookie rather than from Accept-Language. Nothing consumes it today.
+     * Writing the cookie is a response-path change with its own SameSite,
+     * Secure, Max-Age and Path decisions, and it belongs in its own release
+     * where a bisect can see it. */
     return &ar->cat[ch.idx];
 }
 
@@ -453,9 +548,13 @@ static void pi_bind_vars(pTHX_ SV *c, SV *data) {
      * handler rendering with a hashref it keeps between requests would
      * otherwise serve the first request's language for ever, and a page in
      * the wrong language still looks like a page. */
-    (void)hv_stores((HV *)SvRV(data), "locale",
-                    pi_tied_hash(aTHX_ ar, (int)(cat - ar->cat), NULL,
-                                 cfg, c));
+    {
+        const pi_cat *d = (ar->def >= 0) ? &ar->cat[ar->def] : NULL;
+        (void)hv_stores((HV *)SvRV(data), "locale",
+                        pi_tied_hash(aTHX_ ar, (int)(cat - ar->cat), NULL,
+                                     cfg, c, cat->node,
+                                     d ? d->node : FZ_NOHANDLE));
+    }
 }
 
 #endif /* PUNK_LANG_H */

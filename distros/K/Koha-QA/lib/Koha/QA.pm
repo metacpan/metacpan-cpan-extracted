@@ -2,7 +2,7 @@ package Koha::QA;
 
 use Modern::Perl;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.4';
 
 =head1 NAME
 

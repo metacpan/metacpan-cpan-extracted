@@ -113,7 +113,7 @@ PROBE_SCRIPT
 {
     my $sandpit = tempdir( CLEANUP => 1 );
     my $db      = File::Spec->catdir( $sandpit, 'cover_db' );
-    my $target  = File::Spec->catfile( $ROOT, 't', '110-saved-ajax-group-coverage.t' );
+    my $target  = File::Spec->catfile( $ROOT, 't', '32-saved-ajax-group-coverage.t' );
     ok( -f $target, 'the saved-Ajax process-group test file is present' );
 
     my $origin = getcwd();
@@ -183,7 +183,7 @@ Run the gate on its own:
 
 Run it beside the test file whose attribution it protects:
 
-  prove -lv t/110-saved-ajax-group-coverage.t t/138-coverage-exec-truncation.t
+  prove -lv t/32-saved-ajax-group-coverage.t t/138-coverage-exec-truncation.t
 
 Run it beside the other coverage-instrument gates:
 

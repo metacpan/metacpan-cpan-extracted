@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::API;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Digest::SHA qw(sha256_hex);
 use Getopt::Long qw(GetOptionsFromArray);
@@ -365,7 +365,7 @@ secret digest.
 
 Example 4:
 
-  prove -lv t/05-cli-smoke.t t/15-cli-module-coverage.t
+  prove -lv t/05-cli-smoke.t t/22-cli-module-coverage.t
 
 Rerun the focused CLI and module regression tests after changing this helper.
 

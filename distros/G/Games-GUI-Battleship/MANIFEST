@@ -1,0 +1,29 @@
+bin/battleship
+Changes
+examples/POD/battleship_screenshot.png
+ignore.txt
+lib/Games/GUI/Battleship.pm
+lib/Games/GUI/Battleship/AI.pm
+lib/Games/GUI/Battleship/AI/Hard.pm
+lib/Games/GUI/Battleship/AI/Naive.pm
+lib/Games/GUI/Battleship/AI/Parity.pm
+lib/Games/GUI/Battleship/Board.pm
+lib/Games/GUI/Battleship/Renderer.pm
+lib/Games/GUI/Battleship/Ship.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
+README
+README.md
+t/00-load.t
+t/01-board.t
+t/02-referee.t
+t/03-ai.t
+t/04-game-flow.t
+t/05-radar-sweep.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t

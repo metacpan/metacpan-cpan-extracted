@@ -2,7 +2,7 @@ package Data::HashMap::I16;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub import {
     $^H{"Data::HashMap::I16/hm_i16_put"}     = 1;
@@ -38,3 +38,23 @@ sub import {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Data::HashMap::I16 - hash map from int16 keys to int16 values
+
+=head1 SYNOPSIS
+
+    use Data::HashMap::I16;
+    my $map = Data::HashMap::I16->new;
+    hm_i16_put $map, 1, 2;
+    my $v = hm_i16_get $map, 1;
+
+=head1 DESCRIPTION
+
+One of the fourteen variants of L<Data::HashMap>, which documents the API, the
+C<hm_i16_*> keywords and every caveat.
+
+=cut

@@ -3,7 +3,7 @@ package Developer::Dashboard::Doctor;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use File::Find ();
 use File::Spec;
@@ -11,9 +11,9 @@ use Time::Local qw(timegm);
 use Capture::Tiny qw(capture);
 
 use Developer::Dashboard::Config ();
-use Developer::Dashboard::FileRegistry ();
 use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::JSON qw(json_decode);
+use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
 
 # new(%args)
 # Constructs the dashboard doctor runtime service.
@@ -21,7 +21,7 @@ use Developer::Dashboard::JSON qw(json_decode);
 # Output: Developer::Dashboard::Doctor object.
 sub new {
     my ( $class, %args ) = @_;
-    my $paths = $args{paths} || die 'Missing paths registry';
+    my $paths = require_paths_arg(%args);
     return bless { paths => $paths }, $class;
 }
 
@@ -427,16 +427,13 @@ sub _slurp_text_file {
 }
 
 # _config()
-# Lazily constructs the merged runtime config loader, following the same shape
-# Housekeeper::_config already uses for this exact pattern.
+# Lazily constructs the merged runtime config loader, via the shared
+# Config->for_paths classmethod (DD-763) both Housekeeper and Doctor use.
 # Input: none.
 # Output: Developer::Dashboard::Config object.
 sub _config {
     my ($self) = @_;
-    return $self->{config} ||= Developer::Dashboard::Config->new(
-        paths => $self->{paths},
-        files => Developer::Dashboard::FileRegistry->new( paths => $self->{paths} ),    # uncoverable condition false
-    );
+    return $self->{config} ||= Developer::Dashboard::Config->for_paths( $self->{paths} );    # uncoverable condition false
 }
 
 # _mode_octal($path)

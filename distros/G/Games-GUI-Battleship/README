@@ -1,0 +1,107 @@
+Games::GUI::Battleship - Play Battleship through a GUI
+
+Version 1.0
+
+SYNOPSIS
+
+    battleship
+    
+DESCRIPTION
+
+Play a game of Battleship against a computer opponent. It uses Prima for the GUI and Cairo for the graphics.
+
+Menus
+=====
+
+Game
+----
+
+The "New Game" option will start a new game at a given difficulty level.
+
+"Randomize Fleet" will reset any ongoing game and deploy your vessels in a random layout, bypassing the need for manually placing the vessels.
+
+"Reset Fleet" will reset the game.
+
+"Exit" exits the game.
+
+Difficulty
+----------
+
+Select the level of difficulty. There are three different settings, each backed by an "AI" with different play strategies.
+
+Radar
+-----
+
+Use "Radar Sweep Effect" to toggle the scanning radar visual effect.
+
+"Speed" gives options on the speed of the radar sweep.
+
+Help
+----
+
+"How to Play" shows a short instructions dialog.
+
+About 
+-----
+
+shows a small about dialog.
+    
+How to play
+===========
+
+Place vessels by clicking the mouse in the left grid. The game will highlight where the vessel will be placed. Use the space bar, "R" key, or right-click the mouse to rotate the vessel before placement.
+
+Once all vessels are placed, click empty cells in the right grid to launch attacks on the opponent. The cell will record a hit or miss icon. Take turns trading attacks with the computer opponent until there is a winner.
+
+SEE ALSO
+
+Prima
+Logic::Relational
+
+AUTHOR
+
+Matt Johnson, <mjohnson at affectivesilicon.com>
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by Matt Johnson.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Games::GUI::Battleship
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-GUI-Battleship
+
+    Search CPAN
+        https://metacpan.org/release/Games-GUI-Battleship
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by Matt Johnson <mjohnson@affectivesilicon.com>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+

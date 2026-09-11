@@ -7,7 +7,7 @@ use Exporter 'import';
 use Cwd ();
 use Developer::Dashboard::Handle;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 our @EXPORT = ('d2');
 
@@ -41,7 +41,7 @@ __END__
 Developer::Dashboard - a local home for development work
 
 =head1 VERSION
-4.30
+4.31
 
 =head1 INTRODUCTION
 
@@ -885,6 +885,9 @@ deepest active child layer, and installed skills contribute their own layered
 C<config/api.json> fragments for skill-local saved Ajax routes. The built-in
 C<dashboard api> command is the supported way to inspect or update the writable
 runtime layer for that registry.
+An entry carrying C<"disabled": true> (or the same flag under C<_disabled>)
+is dropped from the registry; a JSON literal C<false> there keeps the key
+visible, exactly as C<"disabled": 0> or C<"disabled": "no"> does.
 Saved bookmark Ajax handlers also default to C<text/plain> when no explicit
 C<type =E<gt> ...> argument is supplied, and the generated Perl wrapper now
 enables autoflush on both C<STDOUT> and C<STDERR> so long-running handlers
@@ -2101,6 +2104,10 @@ will not start that collector, explicit named starts reject it, and any
 already-running managed loop for that collector is stopped during the next
 collector lifecycle action. Managed indicator state for that collector is
 also removed instead of lingering as if it were still active.
+The flag is read by its truth value, so a JSON literal C<false> (or C<0>,
+C<"false">, C<"no">, C<"off">) keeps the collector enabled while C<true> and
+any other non-empty value disable it; C<"disable": false> is not a disabled
+collector.
 
 =item *
 

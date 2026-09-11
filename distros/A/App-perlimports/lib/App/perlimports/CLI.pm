@@ -3,7 +3,7 @@ package App::perlimports::CLI;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000064';
+our $VERSION = '0.000065';
 
 use App::perlimports           ();
 use App::perlimports::Config   ();
@@ -234,6 +234,11 @@ sub _build_args {
         ],
         [],
         [
+            'preserve-require!',
+            'Preserve require statements rather than translating them to "use Module ();". This is the default behaviour.',
+        ],
+        [],
+        [
             'preserve-unused!',
             'Preserve use statements for modules which appear to be unused. This is the default behaviour. You are encouraged to disable it.',
         ],
@@ -302,6 +307,7 @@ sub _build_config {
         pad_brackets
         padding
         preserve_duplicates
+        preserve_require
         preserve_unused
         sort
         tidy_whitespace
@@ -500,6 +506,7 @@ sub run {
         pad_brackets        => $self->_config->pad_brackets,
         padding             => $self->_config->padding,
         preserve_duplicates => $self->_config->preserve_duplicates,
+        preserve_require    => $self->_config->preserve_require,
         preserve_unused     => $self->_config->preserve_unused,
         sort                => $self->_config->sort,
         tidy_whitespace     => $self->_config->tidy_whitespace,
@@ -605,7 +612,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000064
+version 0.000065
 
 =head1 DESCRIPTION
 

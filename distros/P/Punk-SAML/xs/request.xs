@@ -119,12 +119,12 @@ _verify_bytes(pub_pem, alg, input, sig)
         const char *pp = SvPVbyte(pub_pem, pl);
         const char *ap = SvPVbyte(alg, al);
         const char *ip = SvPVbyte(input, il);
-        const char *sp = SvPVbyte(sig, sl);
+        const char *gp = SvPVbyte(sig, sl);
         void *k = J->key_from_pem(aTHX_ pp, pl);
         if (!k) croak("%s: the public key will not parse", PSAML_WHO);
         RETVAL = J->verify(aTHX_ k, ap, al,
                            (const unsigned char *)ip, il,
-                           (const unsigned char *)sp, sl);
+                           (const unsigned char *)gp, sl);
         J->key_free(aTHX_ k);
     OUTPUT:
         RETVAL

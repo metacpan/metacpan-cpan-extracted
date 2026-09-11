@@ -219,7 +219,7 @@ subtest '5. Dynamic Price Range (Min/Max Slider) & Facet Integration' => sub {
     my $max_price = 200.00;
 
     # Read active products price column to get matching IDs
-    my ( undef, @all_active_ids ) = $adb->index_get( $adb->table_path('catalog_product') . ".inx", "keys" );
+    my ( undef, @all_active_ids ) = $adb->index_get( $adb->table_path('catalog_product') . ".inx", "A:keys" );
     my @price_matched_ids;
     for my $id (@all_active_ids) {
         my @row = $adb->read_id( 'catalog_product', $id );

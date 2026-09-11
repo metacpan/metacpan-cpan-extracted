@@ -8,13 +8,14 @@ use Test::More;
 use File::Temp qw(tempdir);
 use File::Spec;
 use File::Path qw(make_path remove_tree);
+use Cwd ();
 
 use lib 'lib';
 
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::Config;
-use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::JSON qw(json_decode json_encode);
 
 # A tiny path-registry stand-in whose home() can be undef or empty, so the
 # home-shorthand branches in Config that guard on a missing home directory can
@@ -33,6 +34,28 @@ local $ENV{HOME} = $home;
 chdir $home or die "Unable to chdir to $home: $!";
 
 my $paths  = Developer::Dashboard::PathRegistry->new( home => $home );
+
+# runtime_layer_root_for's own guard against an undef/empty $path: a real
+# external caller (any consumer of is_runtime_layer_path, secure_file_permissions
+# or secure_dir_permissions) could pass one, so this is exercised directly.
+is( $paths->runtime_layer_root_for(undef), '', 'runtime_layer_root_for(undef) returns empty rather than dying' );
+is( $paths->runtime_layer_root_for(''),    '', 'runtime_layer_root_for empty string returns empty' );
+
+# The loop-internal $root guard: none of its three enumerated sources can
+# yield undef/empty in production, so it cannot be driven by any real caller.
+# Stub the first source to inject exactly that - an undef entry, then an
+# empty-string entry - ahead of a real root, so the OR's two operands each
+# fire true independently while the real root below them still falls through
+# to a normal (both-false) match.
+{
+    no warnings 'redefine';
+    my $real_root = $paths->home_runtime_path;
+    local *Developer::Dashboard::PathRegistry::_runtime_layers_from_env = sub { return ( undef, '', $real_root ) };
+    my $probe = File::Spec->catdir( $real_root, 'probe.txt' );
+    is( $paths->runtime_layer_root_for($probe), $real_root,
+        'runtime_layer_root_for skips an injected undef and empty layer root and still finds the real one' );
+}
+
 my $files  = Developer::Dashboard::FileRegistry->new( paths => $paths );
 my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
 
@@ -135,6 +158,18 @@ sub dies_like {
     is( $config->_collector_disable_flag('0'),   0, '_collector_disable_flag treats a false token as enabled' );
     is( $config->_collector_disable_flag(''),    0, '_collector_disable_flag treats an empty string as enabled' );
     is( $config->_collector_disable_flag('yes'), 1, '_collector_disable_flag treats a non-empty value as disabled' );
+
+    # DD-813: a JSON literal true/false arrives from json_decode as a
+    # JSON::PP::Boolean object, so it is a reference - and the reference test
+    # above must not swallow it before the token test sees its truth value.
+    # Decoded here rather than built by hand so the test sees the exact shape
+    # every config.json on disk produces.
+    my ( $json_true, $json_false ) = @{ json_decode('[true,false]') };
+    ok( ref($json_false), 'json_decode gives a reference for a JSON false (the shape under test)' );
+    is( $config->_collector_disable_flag($json_false), 0, '_collector_disable_flag treats a JSON false as enabled' );
+    is( $config->_collector_disable_flag($json_true),  1, '_collector_disable_flag treats a JSON true as disabled' );
+    is( $config->_normalize_collector_job( { name => 'j', disable => $json_false } )->{disable}, 0, '_normalize_collector_job keeps a collector with "disable": false enabled' );
+    is( $config->_normalize_collector_job( { name => 'k', disable => $json_true } )->{disable},  1, '_normalize_collector_job disables a collector with "disable": true' );
 }
 
 # -------------------------------------------------------------------------
@@ -220,6 +255,17 @@ sub dies_like {
     is( $config->_api_key_disabled_flag( { disabled => '0' } ),   0, '_api_key_disabled_flag treats a false token as enabled' );
     is( $config->_api_key_disabled_flag( { disabled => '1' } ),   1, '_api_key_disabled_flag treats a truthy token as disabled' );
     is( $config->_api_key_disabled_flag( {} ),                    0, '_api_key_disabled_flag returns 0 when no flag field exists' );
+
+    # DD-813: the same JSON::PP::Boolean shape on the api.json tombstone field.
+    my ( $api_true, $api_false ) = @{ json_decode('[true,false]') };
+    is( $config->_api_key_disabled_flag( { disabled => $api_false } ),  0, '_api_key_disabled_flag treats a JSON false as enabled' );
+    is( $config->_api_key_disabled_flag( { disabled => $api_true } ),   1, '_api_key_disabled_flag treats a JSON true as disabled' );
+    is( $config->_api_key_disabled_flag( { _disabled => $api_false } ), 0, '_api_key_disabled_flag treats a JSON false _disabled as enabled' );
+    is_deeply(
+        $config->_normalize_api_keys( { live => { secret => 'ls', disabled => $api_false }, gone => { secret => 'gs', disabled => $api_true } } ),
+        { live => { secret => 'ls', ajax => [] } },
+        '_normalize_api_keys keeps a key whose "disabled" is JSON false and drops one whose "disabled" is JSON true',
+    );
 
     # 939/943/947/948: ajax route normalization.
     is_deeply( $config->_normalize_api_ajax_routes('scalar'), [], '_normalize_api_ajax_routes returns empty for a non-array payload' );
@@ -676,6 +722,82 @@ sub dies_like {
         chmod 0700, $file;
         remove_tree( File::Spec->catdir( $skills, 'iofail' ) );
     }
+}
+
+# -------------------------------------------------------------------------
+# Block K (DD-784): config written into a PROJECT-LOCAL runtime layer must be
+# secured exactly as the home layer already is.
+#
+# config/api.json holds the machine-tier API secret digests and each key's
+# /ajax/ route allowlist. Config::_write_json_atomic secured it through
+# PathRegistry::secure_file_permissions, which returns early unless the path is
+# under the HOME runtime or the state root - so in a project-local layer, which
+# DD-OOP-LAYERS makes the write target whenever one exists, the file kept the
+# umask default. Measured before the fix: api.json 0664 inside a 0775 config
+# directory, against 0600/0700 in the home layer. Under a group-writable umask
+# that is a machine-tier authentication bypass: a group member can replace the
+# file and register their own key.
+#
+# THE PRECONDITION MATTERS AND IS EASY TO MISS. _ancestor_runtime_layers
+# returns nothing unless the cwd sits under $HOME or under a detected project
+# root, so without the .git below no project layer is discovered at all, the
+# write falls back to the home layer, and the defect silently does not appear.
+# Three probes reported 0600/0700 for exactly that reason before this was
+# reproduced.
+#
+# The umask is pinned to 002 rather than inherited: with a strict umask the
+# file would arrive at 0600 by accident and this test would pass while
+# discriminating nothing.
+# -------------------------------------------------------------------------
+{
+    my $saved_umask = umask 0002;
+    my $saved_cwd   = Cwd::getcwd();
+    my $saved_home  = $ENV{HOME};
+
+    my $layer_home = tempdir( CLEANUP => 1 );
+    my $project    = tempdir( CLEANUP => 1 );
+    make_path( File::Spec->catdir( $project, '.git' ) );
+    make_path( File::Spec->catdir( $project, '.developer-dashboard' ) );
+
+    $ENV{HOME} = $layer_home;
+    chdir $project or die "Unable to chdir to $project: $!";
+
+    my $layer_paths = Developer::Dashboard::PathRegistry->new;
+    my $layer_files = Developer::Dashboard::FileRegistry->new( paths => $layer_paths );
+    my $layer_config = Developer::Dashboard::Config->new( files => $layer_files, paths => $layer_paths );
+
+    my $layer_config_root = $layer_paths->config_root;
+
+    # Positive control: the project layer really is the write target here. If it
+    # were not, the assertions below would be measuring the home layer - which
+    # was already correct - and would pass without discriminating anything.
+    ok( !$layer_paths->is_home_runtime_path($layer_config_root),
+        'DD-784 setup: the config root under test is a project-local layer, not the home layer' );
+
+    my $layer_api = File::Spec->catfile( $layer_config_root, 'api.json' );
+    $layer_config->_write_json_atomic( $layer_api, json_encode( { keys => [ { id => 'probe', secret_digest => 'deadbeef' } ] } ) );
+
+    is( sprintf( '%04o', ( stat $layer_api )[2] & 07777 ), '0600',
+        'api.json in a project-local layer is written 0600, not left at the umask default (DD-784)' );
+    is( sprintf( '%04o', ( stat $layer_config_root )[2] & 07777 ), '0700',
+        'the project-local config directory is 0700, so the file cannot simply be replaced (DD-784)' );
+
+    chdir $saved_cwd or die "Unable to restore cwd: $!";
+    if ( defined $saved_home ) { $ENV{HOME} = $saved_home; }
+    else                       { delete $ENV{HOME}; }
+    umask $saved_umask;
+}
+
+# DD-763: Config->for_paths($paths) is the shared classmethod extracted from
+# Housekeeper::_config / Doctor::_config, which built the identical
+# Config->new(paths=>..., files=>FileRegistry->new(paths=>...)) shape.
+{
+    my $paths      = Developer::Dashboard::PathRegistry->new;
+    my $for_paths  = Developer::Dashboard::Config->for_paths($paths);
+    isa_ok( $for_paths, 'Developer::Dashboard::Config', 'for_paths returns a Config object' );
+    is( $for_paths->{paths}, $paths, 'for_paths binds the given paths object' );
+    isa_ok( $for_paths->{files}, 'Developer::Dashboard::FileRegistry', 'for_paths builds a matching FileRegistry' );
+    is( $for_paths->{files}{paths}, $paths, 'for_paths\' FileRegistry is bound to the SAME paths object' );
 }
 
 done_testing;

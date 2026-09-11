@@ -348,4 +348,204 @@ SKIP: {
     is($s{untranslated}, 0, 'and not as untranslated');
 }
 
+# ---- a dotted key is refused at boot ------------------------------------------
+#
+# It used to be indistinguishable from the nested form, and worse than
+# ambiguously: the old arena flattened {"a": {"b": x}} to the string "a.b",
+# a literal key "a.b" produced the same string, and which of the two won was
+# decided by Perl's hash order - which is perturbed per process. Two workers
+# in one pool could serve different translations for the same key, so a page
+# changed wording on refresh.
+#
+# The block holds a tree, so the nested form is a real path. That leaves the
+# literal "a.b" key unreachable - $c->locale descends past it, and a
+# template splits on dots before the lookup ever runs - so it is refused at
+# boot rather than left to be a silent miss.
+{
+    my $d = File::Temp::tempdir(CLEANUP => 1);
+    open my $fh, '>:raw', File::Spec->catfile($d, 'en.json') or die $!;
+    print $fh '{"a.b":"FLAT","a":{"b":"NESTED"}}';
+    close $fh;
+
+    my $err = boot_err($d, 'en');
+    like($err, qr/\Qkey containing a dot\E/,
+        'a literal dotted key is a boot error, not a silent miss');
+    like($err, qr/\Qa.b\E/, 'and the message names the key');
+
+    # The same catalogue without the collision resolves, so the refusal is
+    # narrow: it is the dot in a KEY that is refused, not nesting.
+    my $d2 = File::Temp::tempdir(CLEANUP => 1);
+    open my $fh2, '>:raw', File::Spec->catfile($d2, 'en.json') or die $!;
+    print $fh2 '{"a":{"b":"NESTED"}}';
+    close $fh2;
+
+    my $pkg = 'I18nDot';
+    eval qq{
+        package $pkg;
+        use Punk;
+        plugin 'I18n' => { dir => '$d2', default => 'en' };
+        get '/ab' => sub { \$_[0]->text(\$_[0]->locale('a.b')) };
+        1;
+    } or die $@;
+    is($pkg->to_app->(env_for(path => '/ab'))->[2][0], 'NESTED',
+        'and the nested form still answers a dotted lookup');
+}
+
+# ---- a translation is text; what cannot become text is refused at boot --------
+#
+# The old arena called SvPV on every value, so a JSON number was simply its
+# digits and {"count": 5} worked. The block records the KIND, so an untouched
+# 5 freezes as an integer and the lookup - which returns text - has nothing
+# to give back. That would have been a SILENT miss rendering as the key.
+#
+# Numbers are therefore stringified at load, which is what the old arena did
+# implicitly. What has no sensible text form - an array, null, a boolean -
+# is refused at boot with the path named, where before it was silent or,
+# for null, quietly an empty string.
+{
+    my $boot = sub {
+        my ($json) = @_;
+        my $d = File::Temp::tempdir(CLEANUP => 1);
+        open my $fh, '>:raw', File::Spec->catfile($d, 'en.json') or die $!;
+        print $fh $json;
+        close $fh;
+        return ($d, boot_err($d, 'en'));
+    };
+    my $refuse = sub { (my $d, my $e) = $boot->(@_); return $e };
+
+    like($refuse->('{"nope":null}'), qr/\Qnull at 'nope'\E/,
+        'null is refused, naming the path');
+    like($refuse->('{"list":["a","b"]}'), qr/\Qan array at 'list'\E/,
+        'an array is refused - fz_path descends through objects, so nothing '
+      . 'in the surface could ever have reached its elements');
+    like($refuse->('{"on":true}'), qr/\Qblessed reference\E/,
+        'a boolean is refused by the freeze itself, which names the path');
+    like($refuse->('{"a":{"b":{"c":null}}}'), qr/\Qat 'a.b.c'\E/,
+        'and the path is the joined one, however deep');
+
+    # Numbers go through, as text, exactly as they did in 0.48.
+    my ($d) = $boot->('{"count":5,"pi":1.5,"s":"x"}');
+    my $pkg = 'I18nNum';
+    eval qq{
+        package $pkg;
+        use Punk;
+        plugin 'I18n' => { dir => '$d', default => 'en' };
+        get '/k' => sub { \$_[0]->text(\$_[0]->locale(\$_[0]->param('k'))) };
+        1;
+    } or die $@;
+    my $app = $pkg->to_app;
+    my $at = sub { $app->(env_for(path => '/k', query => 'k=' . $_[0]))->[2][0] };
+
+    is($at->('count'), '5',   'an integer reads back as its digits');
+    is($at->('pi'),    '1.5', 'and so does a fractional number');
+    is($at->('s'),     'x',   'beside an ordinary string');
+}
+
+# ---- a key resolves at every depth, through the fast door ---------------------
+#
+# The lookup became a segment WALK: one probe per dot where the joined key
+# was one probe whatever its depth. So depth is now a thing that can break,
+# and nothing pinned it on the $c->locale side - t/1152 covers the template
+# door only.
+#
+# The cost is real and measured: 40 keys of mixed depth are 81 probes here
+# where they were 40. See plan_punk_frozen/03-catalogue-block.md.
+{
+    my $d = File::Temp::tempdir(CLEANUP => 1);
+    open my $fh, '>:raw', File::Spec->catfile($d, 'en.json') or die $!;
+    print $fh '{"one":"1","two":{"x":"2"},"three":{"x":{"y":"3"}},'
+            . '"four":{"a":{"b":{"c":"4"}}},"empty":{"s":""}}';
+    close $fh;
+
+    my $pkg = 'I18nDepth';
+    eval qq{
+        package $pkg;
+        use Punk;
+        plugin 'I18n' => { dir => '$d', default => 'en' };
+        get '/k' => sub { \$_[0]->text(\$_[0]->locale(\$_[0]->param('k'))) };
+        1;
+    } or die $@;
+    my $app = $pkg->to_app;
+    my $at  = sub {
+        $app->(env_for(path => '/k', query => 'k=' . $_[0]))->[2][0];
+    };
+
+    is($at->('one'),          '1', 'one segment resolves');
+    is($at->('two.x'),        '2', 'two segments resolve');
+    is($at->('three.x.y'),    '3', 'three segments resolve');
+    is($at->('four.a.b.c'),   '4', 'four segments resolve');
+
+    # A level is not a leaf. Asking for one as a string gets the key back,
+    # the same answer a miss gets, because there is no translation AT
+    # `three` - only below it.
+    is($at->('three'),   'three',   'a branch asked for as a string is not a hit');
+    is($at->('three.x'), 'three.x', 'nor is an intermediate branch');
+
+    # An empty translation is a HIT with nothing in it, not a miss. The old
+    # arena needed a sentinel to tell those apart; a leaf and a level are
+    # now different node kinds, so the distinction is structural.
+    is($at->('empty.s'), '', 'an empty string is a hit, not a miss');
+
+    is($at->('two.nope'), 'two.nope', 'a missing leaf under a real branch misses');
+    is($at->('nope.x'),   'nope.x',   'and so does a path through a missing branch');
+}
+
+# ---- a failed boot does not leak the block ------------------------------------
+#
+# The validation walk records a fault and lets the CALLER croak. That is not
+# style: Frozen's own fz_walk mallocs a segment stack and frees it after the
+# walk returns, so a croak from inside longjmps past that free and leaks on
+# every boot - and `punk dev` reboots the app on every file change, so it
+# would be a slow leak with no visible cause.
+#
+# Measured as a DIFFERENCE against a boot that fails before any block is
+# built. An absolute RSS bound would be measuring Perl's per-package
+# overhead, which is most of the growth here and is never reclaimed.
+SKIP: {
+    my $rss = sub { my $k = `ps -o rss= -p $$` || ''; $k =~ /(\d+)/ ? $1 : 0 };
+    skip 'ps -o rss is not usable here', 1 unless $rss->() > 0;
+
+    my $body = '{' . join(',', map { qq{"k$_":"v$_ padding padding padding"} }
+                                1 .. 500);
+    my %d;
+    for my $case (qw(early late)) {
+        $d{$case} = File::Temp::tempdir(CLEANUP => 1);
+        open my $fh, '>:raw', File::Spec->catfile($d{$case}, 'en.json') or die $!;
+        print $fh $case eq 'late' ? "$body,\"bad\":null}" : "$body}";
+        close $fh;
+    }
+
+    my $n = 0;
+    my $boot = sub {
+        my ($case) = @_;
+        my $pkg = 'I18nLeak' . ++$n;
+        my $dir = $case eq 'early' ? '/no/such/directory/anywhere' : $d{$case};
+        eval qq{
+            package $pkg;
+            use Punk;
+            plugin 'I18n' => { dir => '$dir', default => 'en' };
+            1;
+        };
+    };
+
+    my %grew;
+    for my $case (qw(early late)) {
+        $boot->($case) for 1 .. 10;          # warm the allocator
+        my $before = $rss->();
+        $boot->($case) for 1 .. 100;
+        $grew{$case} = $rss->() - $before;
+    }
+    my $extra = $grew{late} - $grew{early};
+    note sprintf 'growth over 100 boots: before-the-block %d KB, '
+               . 'after-it-is-built %d KB, difference %d KB',
+               $grew{early}, $grew{late}, $extra;
+
+    # A leaked block would be ~25 KB x 100. The observed difference is
+    # tens of KB, so this bound is loose by two orders of magnitude and
+    # still catches the failure it exists for.
+    cmp_ok($extra, '<', 2048,
+        'failing validation after the block is built leaks no more than '
+      . 'failing before it exists');
+}
+
 done_testing;

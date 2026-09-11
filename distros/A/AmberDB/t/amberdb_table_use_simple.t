@@ -19,7 +19,7 @@ my $db_dir  = "$tmp_dir/main_db";
 my $sch_dir = "$tmp_dir/schema";
 mkdir $db_dir;
 mkdir $sch_dir;
-mkdir "$db_dir/tables";
+mkdir "$db_dir/table";
 
 # Create standard schema for products
 my $prod_sch = "$sch_dir/products.table";
@@ -45,6 +45,8 @@ print $sfh <<'SCHEMA';
 {
     use_simple   => 1,
     keep_deleted => 1,
+    use_ramdisk  => 1,
+    ramdisk_ttl  => 3600,
     use_cache    => 1,
     cache_ttl    => 3600,
     blocks       => [ { name => "id", type => "string" }, { name => "data", type => "string" } ],
@@ -64,7 +66,7 @@ my $adb = AmberDB->new(
 # 1. Schema Sanitization for use_simple Table
 # ============================================================
 subtest '1. Schema Sanitization & Path Verification' => sub {
-    plan tests => 7;
+    plan tests => 9;
 
     # Sessions table info should have index/block/cache definitions stripped, but behavioral flags preserved
     my $s_info = $adb->table_info('sessions');
@@ -72,12 +74,14 @@ subtest '1. Schema Sanitization & Path Verification' => sub {
     is( $s_info->{keep_deleted}, 1, 'keep_deleted preserved' );
     ok( !exists $s_info->{blocks}, 'blocks stripped for use_simple table' );
     ok( !exists $s_info->{match_block}, 'match_block stripped for use_simple table' );
+    ok( !exists $s_info->{use_ramdisk}, 'use_ramdisk stripped for use_simple table' );
+    ok( !exists $s_info->{ramdisk_ttl}, 'ramdisk_ttl stripped for use_simple table' );
     ok( !exists $s_info->{use_cache}, 'use_cache stripped for use_simple table' );
     ok( !exists $s_info->{cache_ttl}, 'cache_ttl stripped for use_simple table' );
 
-    # Table path must be within standard tables/ directory, NOT root dbase_dir
+    # Table path must be within standard table/ directory, NOT root dbase_dir
     my $path = $adb->table_path('sessions');
-    like( $path, qr{[/\\]tables[/\\]sessions$}, 'table_path is in dbase_dir/tables/ directory' );
+    like( $path, qr{[/\\]table[/\\]sessions$}, 'table_path is in dbase_dir/table/ directory' );
 };
 
 # ============================================================
@@ -129,11 +133,11 @@ subtest '3. keep_deleted Behavior & Zero Index File Guarantee' => sub {
     ok( !@after_del, 'Deleted record not returned by read_id' );
 
     # Check that .del archive file exists and contains the deleted record
-    my $del_file = "$db_dir/tables/sessions.del";
+    my $del_file = "$db_dir/table/sessions.del";
     ok( -e $del_file, 'sessions.del archive created by keep_deleted' );
 
     # Check that NO index files exist for sessions
-    my @all_files = glob("$db_dir/tables/*");
+    my @all_files = glob("$db_dir/table/*");
     my @index_files = grep { /sessions\.(inx|fld|src|srt|fac|slg)$/ } @all_files;
     is_deeply( \@index_files, [], 'No index files (.inx, .fld, .src, .srt, .fac, .slg) created for sessions' );
 };

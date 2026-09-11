@@ -4,7 +4,7 @@ use 5.038;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -24,7 +24,7 @@ Confold - the C<< <: >> compile time constant operator
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,40 @@ Loading Confold enables Perl's pluggable-operator path for the rest of the
 process. That is a compile-time cost only, and applies to any module using that
 hook; execution speed of code that does not use C<< <: >> is unaffected.
 
+=head2 Compared with C<use constant>
+
+L<constant> has covered part of the case this operator is since 5.004, and
+covers that part well. C<< use constant PI => 3.14 >> writes an inlinable constant
+sub, so the use site compiles to a C<const> op rather than a call, the value
+is readable from a C<BEGIN> block compiled later, and passing it to a
+subroutine that assigns to C<$_[0]> already dies read-only. B<For naming a
+literal, use C<constant>.> C<< <: >> adds nothing there.
+
+Three things L<constant> cannot do.
+
+B<Mark an expression rather than a name.> C<< <: >> applies at a use site to
+something that already exists, and declares nothing:
+
+    f(<: $h->{k});
+
+B<Make a run-time value immutable.> A constant's value has to exist at compile
+time. C<< <: >> copies whatever the variable holds when the call is reached,
+so a value that is not known until run time can still be protected from C<@_>
+aliasing:
+
+    my $shut = read_from_the_database();
+    clobber(<: $shut);         # dies: Modification of a read-only value
+
+B<Scope to a block.> C<use constant> writes a sub into the package. It is
+visible outside the block it was written in, it answers to C<< ->can >>, it is
+inherited like any other sub, and it cannot be reassigned. C<< my $slot = <:
+'age:Int' >> is an ordinary lexical that happens to carry a value the compiler
+can read, and assigning to it retires that value rather than being an error.
+
 =head1 SEE ALSO
+
+L<constant>, Perl's built-in for naming a literal, and the right tool when
+that is what you want. The DESCRIPTION says where the two differ.
 
 L<Infix::Custom>, for user-defined infix operators.
 

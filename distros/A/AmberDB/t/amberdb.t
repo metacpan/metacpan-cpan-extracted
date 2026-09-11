@@ -21,7 +21,7 @@ subtest 'AmberDB - VERSION' => sub {
 # ---------------------------------------------------------------------------
 subtest 'AmberDB - can() checks' => sub {
     my @expected_methods = qw(
-        new insert_id modify_id delete_id read_id read_all read_list
+        new insert_id modify_id update_id modify_list update_list delete_id read_id read_all read_list
         table_read table_write table_close
         recs_get recs_put recs_del recs_exist recs_keys recs_scan
         exist_id exist_list
@@ -49,9 +49,14 @@ subtest 'AmberDB::Locale' => sub {
     use_ok('AmberDB::Locale');
 };
 
-subtest 'AmberDB::String' => sub {
+subtest 'AmberDB::Base::Schema' => sub {
     plan tests => 1;
-    use_ok('AmberDB::String');
+    use_ok('AmberDB::Base::Schema');
+};
+
+subtest 'AmberDB::Base::Encoder' => sub {
+    plan tests => 1;
+    use_ok('AmberDB::Base::Encoder');
 };
 
 subtest 'AmberDB::Tools' => sub {

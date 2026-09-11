@@ -41,34 +41,94 @@ static HV* stash_ss;
 
 /* ---- Helper macros ---- */
 
+/* The cached stash is the BOOT interpreter's; a map built in another thread needs the by-name check. */
+#define HM_NOT_A_MAP(stash_var, classname, sv) \
+    (!SvROK(sv) || !SvOBJECT(SvRV(sv)) || \
+     (SvSTASH(SvRV(sv)) != stash_var && !sv_derived_from(sv, classname)))
+
 #define EXTRACT_MAP(type, stash_var, classname, sv) \
-    if (!SvROK(sv) || !SvOBJECT(SvRV(sv)) || SvSTASH(SvRV(sv)) != stash_var) \
+    if (HM_NOT_A_MAP(stash_var, classname, sv)) \
         croak("Expected a %s object", classname); \
     type* self = INT2PTR(type*, SvIV(SvRV(sv))); \
     if (!self) croak("Attempted to use a destroyed %s object", classname)
 
+#define EXTRACT_OTHER_MAP(type, stash_var, classname, sv) \
+    if (HM_NOT_A_MAP(stash_var, classname, sv)) \
+        croak("Expected a %s object", classname); \
+    type* other = INT2PTR(type*, SvIV(SvRV(sv))); \
+    if (!other) croak("Attempted to use a destroyed %s object", classname)
+
+/* Clears the pointer before destroy() so a value's DESTROY reaching back croaks "destroyed". */
+#define HM_DESTROY(type, destroy_fn, sv) STMT_START { \
+    if (!SvROK(sv)) XSRETURN_EMPTY; \
+    type* _map = INT2PTR(type*, SvIV(SvRV(sv))); \
+    if (!_map) XSRETURN_EMPTY; \
+    sv_setiv(SvRV(sv), 0); \
+    destroy_fn(_map); \
+} STMT_END
+
 #define HM_MAX_STR_LEN 0x7FFFFFFFU
 
-/* Range-check helpers for typemap (called from generated INPUT code) */
-static void croak_i16(IV val) {
+static void croak_i16(SV* sv) {
     dTHX;
-    Perl_croak(aTHX_ "%" IVdf " out of int16 range [-32768, 32767]", val);
+    Perl_croak(aTHX_ "%" SVf " out of int16 range [-32768, 32767]", SVfARG(sv));
 }
-static void croak_i32(IV val) {
+static void croak_i32(SV* sv) {
     dTHX;
-    Perl_croak(aTHX_ "%" IVdf " out of int32 range [-2147483648, 2147483647]", val);
+    Perl_croak(aTHX_ "%" SVf " out of int32 range [-2147483648, 2147483647]", SVfARG(sv));
+}
+static void croak_i64(SV* sv) {
+    dTHX;
+    Perl_croak(aTHX_ "%" SVf " out of int64 range", SVfARG(sv));
 }
 
-/* SV* value free callback for IA/SA variants */
+static IV hm_sv_to_int(pTHX_ SV* sv, IV lo, IV hi, int width) {
+    /* SvIV first: a key arrives as a string, and the flags that show it overflowed appear only after conversion. */
+    IV v = SvIV(sv);
+    if (SvIsUV(sv)) {
+        UV u = SvUV(sv);
+        if (u > (UV)hi) goto bad;
+        return (IV)u;
+    }
+    if (SvNOK(sv)) {
+        NV nv = SvNV(sv);
+        if (!(nv == nv) || nv < (NV)lo || nv > (NV)hi) goto bad;
+    }
+    if (v < lo || v > hi) goto bad;
+    return v;
+bad:
+    if (width == 16) croak_i16(sv);
+    if (width == 32) croak_i32(sv);
+    croak_i64(sv);
+    return 0;
+}
+
+#define HM_SV_TO_I16(var, sv) (var) = (int16_t)hm_sv_to_int(aTHX_ (sv), -32768, 32767, 16)
+
+#define HM_SV_TO_I64(var, sv) (var) = (int64_t)hm_sv_to_int(aTHX_ (sv), IV_MIN, IV_MAX, 64)
+
+#define HM_SV_TO_I32(var, sv) (var) = (int32_t)hm_sv_to_int(aTHX_ (sv), (IV)(-2147483647-1), 2147483647, 32)
+
+/* newSVsv_nomg only exists from 5.32; get-magic was already run by the caller. */
+static SV* hm_copy_nomg(pTHX_ SV* sv) {
+    SV* copy = newSV(0);
+    sv_setsv_nomg(copy, sv);
+    return copy;
+}
+
+/* Deferred: the value's DESTROY may reach back into the map, which is mid-mutation here. */
 static void hm_sv_free(void* sv) {
+    dTHX;
+    sv_2mortal((SV*)sv);
+}
+
+/* Only for callers that have already made the map consistent (clear, destroy). */
+static void hm_sv_free_now(void* sv) {
     dTHX;
     SvREFCNT_dec((SV*)sv);
 }
 
-/* Zero-copy SV from internal string buffer (opt-in via get_direct).
- * Returns a read-only SV pointing directly at the map's internal buffer.
- * SvLEN=0 tells Perl not to free the buffer; SvREADONLY prevents writes.
- * Caller must not hold the SV past any map mutation (put/remove/clear). */
+/* Borrows the map's buffer: valid only until that entry is next changed, reaped or evicted. */
 static inline SV* hm_zerocopy_sv(pTHX_ const char* buf, uint32_t len, bool is_utf8) {
     SV* sv = newSV_type(SVt_PV);
     SvPV_set(sv, (char*)buf);
@@ -82,27 +142,68 @@ static inline SV* hm_zerocopy_sv(pTHX_ const char* buf, uint32_t len, bool is_ut
 
 #define EXTRACT_STR_KEY(sv) \
     STRLEN _klen; \
-    const char* _kstr = SvPV(sv, _klen); \
+    SvGETMAGIC(sv); \
+    const char* _kstr = SvPV_nomg(sv, _klen); \
     if (_klen > HM_MAX_STR_LEN) croak("key too long (max 2GB)"); \
     bool _kutf8 = SvUTF8(sv) ? true : false; \
+    /* Perl's own rule: a flagged key that fits in bytes is the byte key. */ \
+    if (_kutf8) { \
+        STRLEN _i = 0; \
+        while (_i < _klen && !((U8)_kstr[_i] & 0x80)) _i++; \
+        if (_i == _klen) _kutf8 = false; \
+        else { \
+            bool _still_utf8 = true; \
+            U8* _kbytes = bytes_from_utf8((const U8*)_kstr, &_klen, &_still_utf8); \
+            if (!_still_utf8) { SAVEFREEPV(_kbytes); _kstr = (const char*)_kbytes; _kutf8 = false; } \
+        } \
+    } \
     uint32_t _khash = hm_hash_string(_kstr, (uint32_t)_klen); \
     (void)_kutf8
 
 #define EXTRACT_STR_VAL(sv) \
     STRLEN _vlen; \
-    const char* _vstr = SvPV(sv, _vlen); \
+    SvGETMAGIC(sv); \
+    const char* _vstr = SvPV_nomg(sv, _vlen); \
     if (_vlen > HM_MAX_STR_LEN) croak("value too long (max 2GB)"); \
     bool _vutf8 = SvUTF8(sv) ? true : false
 
-/* ---- Extract optional (max_size, default_ttl) from new() args ---- */
+static void hm_num_arg(pTHX_ SV* sv, const char* what) {
+    if (SvROK(sv) || (SvOK(sv) && !looks_like_number(sv)))
+        croak("%s must be a number, got '%" SVf "'", what, SVfARG(sv));
+}
+static uint32_t hm_ttl_arg(pTHX_ SV* sv) {
+    hm_num_arg(aTHX_ sv, "ttl");
+    {
+        NV nv = SvNV(sv);
+        if (nv < 0) croak("ttl must be non-negative, got %" NVgf, nv);
+        if (nv > 0 && nv < 1) return 1;   /* 0 means no TTL; a fraction must not truncate to it */
+    }
+    { UV v = SvUV(sv); return v > UINT32_MAX ? UINT32_MAX : (uint32_t)v; }
+}
+static size_t hm_size_arg(pTHX_ SV* sv, const char* what) {
+    hm_num_arg(aTHX_ sv, what);
+    if (SvNV(sv) < 0) croak("%s must be non-negative, got %" NVgf, what, SvNV(sv));
+    return (size_t)SvUV(sv);
+}
 
-#define EXTRACT_NEW_ARGS(max_size_var, ttl_var, lru_skip_var) \
+/* ---- new() arguments ---- */
+
+#define HM_NEW_ARGS(max_size_var, ttl_var, lru_skip_var, nargs, names) \
     size_t max_size_var = 0; \
     uint32_t ttl_var = 0; \
     uint32_t lru_skip_var = 0; \
-    if (items > 1) max_size_var = (size_t)SvUV(ST(1)); \
-    if (items > 2) ttl_var = (uint32_t)SvUV(ST(2)); \
-    if (items > 3) lru_skip_var = (uint32_t)SvUV(ST(3))
+    if (items > (nargs) + 1) croak("new() takes at most " names); \
+    if (items > 1) max_size_var = hm_size_arg(aTHX_ ST(1), "max_size"); \
+    if (items > 2) ttl_var = hm_ttl_arg(aTHX_ ST(2)); \
+    if (items > 3) { \
+        size_t _ls = hm_size_arg(aTHX_ ST(3), "lru_skip"); \
+        lru_skip_var = _ls > 99 ? 99 : (uint32_t)_ls; \
+    }
+
+#define EXTRACT_NEW_ARGS(m, t, s) HM_NEW_ARGS(m, t, s, 3, "three arguments: max_size, ttl, lru_skip")
+#define EXTRACT_NEW_ARGS_SV(m, t, s) HM_NEW_ARGS(m, t, s, 4, "four arguments: max_size, ttl, lru_skip, copy")
+
+#define HM_STORE_SV(map, sv, copy) ((map)->copy_values ? (copy) : SvREFCNT_inc_simple_NN(sv))
 
 /* ---- Generic keyword build functions ---- */
 
@@ -159,14 +260,14 @@ static int build_kw_4arg(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nar
     return KEYWORD_PLUGIN_EXPR;
 }
 
-/* list-returning variant for keys/values/items */
+/* keys/values/items: context is left to the caller, so scalar context counts */
 static int build_kw_1arg_list(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata) {
     (void)nargs;
     const char *func = (const char *)hookdata;
     OP *map_op = args[0]->op;
     OP *cvref = newCVREF(0, newGVOP(OP_GV, 0, gv_fetchpv(func, GV_ADD, SVt_PVCV)));
     OP *arglist = op_append_elem(OP_LIST, map_op, cvref);
-    *out = op_convert_list(OP_ENTERSUB, OPf_STACKED | OPf_WANT_LIST, arglist);
+    *out = op_convert_list(OP_ENTERSUB, OPf_STACKED, arglist);
     return KEYWORD_PLUGIN_EXPR;
 }
 
@@ -188,14 +289,7 @@ static const struct XSParseKeywordPieceType pieces_4expr[] = {
 };
 
 
-/* ---- Keyword hook definitions ----
- *
- * Macro to define a keyword hook struct.
- * variant = i16, i16a, i16s, i32, i32a, i32s, ia, ii, is, sa, si16, si32, si, ss
- * kw = keyword name (e.g., put, get)
- * nargs = 1, 2, or 3
- * builder = build function (build_kw_1arg, build_kw_2arg, etc.)
- */
+/* ---- Keyword hook definitions ---- */
 #define DEFINE_KW_HOOK(variant, PKG, kw, nargs, builder) \
     static const struct XSParseKeywordHooks hooks_hm_##variant##_##kw = { \
         .flags = XPK_FLAG_EXPR, \
@@ -631,31 +725,30 @@ DEFINE_KW_HOOK(sa, "SA", get_or_set, 3, build_kw_3arg)
 
 /* ---- Live node checks ---- */
 #define I16_NODE_LIVE(n)  ((n).key != INT16_MIN && (n).key != (INT16_MIN + 1))
-#define I16S_NODE_LIVE(n) I16_NODE_LIVE(n)  /* I16S keys are int16_t */
+#define I16S_NODE_LIVE(n) I16_NODE_LIVE(n)
 #define I32_NODE_LIVE(n)  ((n).key != INT32_MIN && (n).key != (INT32_MIN + 1))
-#define I32S_NODE_LIVE(n) I32_NODE_LIVE(n)  /* I32S keys are int32_t */
+#define I32S_NODE_LIVE(n) I32_NODE_LIVE(n)
 #define II_NODE_LIVE(n)   ((n).key != INT64_MIN && (n).key != (INT64_MIN + 1))
-#define IS_NODE_LIVE(n)   II_NODE_LIVE(n)   /* IS keys are int64_t */
+#define IS_NODE_LIVE(n)   II_NODE_LIVE(n)
 #define STR_NODE_LIVE(n)  ((n).key != NULL && (n).key != &hm_str_tombstone_marker)
 #define SI16_NODE_LIVE(n) STR_NODE_LIVE(n)
 #define SI32_NODE_LIVE(n) STR_NODE_LIVE(n)
 #define SI_NODE_LIVE(n)   STR_NODE_LIVE(n)
 #define SS_NODE_LIVE(n)   STR_NODE_LIVE(n)
-#define I32A_NODE_LIVE(n) I32_NODE_LIVE(n)  /* I32A keys are int32_t */
-#define I16A_NODE_LIVE(n) I16_NODE_LIVE(n) /* I16A keys are int16_t */
-#define IA_NODE_LIVE(n)   II_NODE_LIVE(n)   /* IA keys are int64_t */
+#define I32A_NODE_LIVE(n) I32_NODE_LIVE(n)
+#define I16A_NODE_LIVE(n) I16_NODE_LIVE(n)
+#define IA_NODE_LIVE(n)   II_NODE_LIVE(n)
 #define SA_NODE_LIVE(n)   STR_NODE_LIVE(n)
 
 /* ---- TTL-aware iteration helper ---- */
 #define HM_TTL_SKIP_EXPIRED(self, i, now) \
     (self->expires_at && self->expires_at[i] && (now) > self->expires_at[i])
 
-/* Compaction policy after drain/pop/shift in XS. Variant-agnostic: caller
- * supplies the variant-prefixed compact function. Mirrors the C-template's
- * HM_MAYBE_COMPACT macro so the threshold lives in one place per layer. */
+/* Must match HM_MAYBE_COMPACT in hashmap_generic.h. */
 #define HM_MAYBE_COMPACT_XS(self, compact_fn) do { \
     if ((self)->tombstones > (self)->capacity / 4 || \
-        ((self)->size > 0 && (self)->tombstones > (self)->size)) \
+        ((self)->size > 0 && (self)->tombstones > (self)->size && \
+         (self)->tombstones > (self)->capacity / 8)) \
         compact_fn(self); \
 } while (0)
 
@@ -664,6 +757,13 @@ MODULE = Data::HashMap    PACKAGE = Data::HashMap::I32
 PROTOTYPES: DISABLE
 
 BOOT:
+    {
+        uint64_t seed = 0;
+        size_t seed_len = sizeof(seed) < (size_t)PERL_HASH_SEED_BYTES
+                        ? sizeof(seed) : (size_t)PERL_HASH_SEED_BYTES;
+        memcpy(&seed, PL_hash_seed, seed_len);
+        XXH3_generateSecret_fromSeed(hm_hash_secret, seed);
+    }
     boot_xs_parse_keyword(0.40);
     stash_i16  = gv_stashpvn("Data::HashMap::I16",  18, GV_ADD);
     stash_i16a = gv_stashpvn("Data::HashMap::I16A", 19, GV_ADD);

@@ -115,6 +115,12 @@ method load() {
     return;
 }
 
+method clear_dependencies() {
+    %dependencies = ();
+
+    return;
+}
+
 method exists_on_disk() {
     return -e $path;
 }
@@ -133,7 +139,7 @@ Luv::CLI::Manifest - reads and writes a luv project's luv.json manifest
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -217,6 +223,10 @@ Writes the manifest to C<path> as JSON.
 =head2 load()
 
 Reads and parses the manifest from C<path>, populating this object's fields.
+
+=head2 clear_dependencies()
+
+Removes all dependencies from the manifest.
 
 =head2 exists_on_disk()
 

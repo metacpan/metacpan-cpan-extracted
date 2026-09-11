@@ -20,7 +20,7 @@ use_ok('AmberDB') or BAIL_OUT('Cannot load AmberDB');
 # 1. Constructor and Aliases
 # ============================================================
 subtest '1. Constructor and Aliases' => sub {
-    plan tests => 6;
+    plan tests => 7;
 
     # Default constructor without arguments must return 'gb'
     my $def = AmberDB::Locale->new();
@@ -45,6 +45,10 @@ subtest '1. Constructor and Aliases' => sub {
     # Positional string
     my $pos = AmberDB::Locale->new('gb');
     is( $pos->language, 'gb', 'Positional string new("gb") resolves to gb' );
+
+    # Alias 'en_gb'
+    my $en_gb = AmberDB::Locale->new( language => 'en_gb' );
+    is( $en_gb->language, 'gb', 'Alias language => en_gb resolves to gb' );
 };
 
 # ============================================================
@@ -139,7 +143,7 @@ subtest '5. Multilingual Search Regex Pattern' => sub {
 # 6. AmberDB Engine Integration: Default Language is 'gb'
 # ============================================================
 subtest '6. AmberDB Engine Integration with Default gb Locale' => sub {
-    plan tests => 7;
+    plan tests => 8;
 
     my $tmpdir = tempdir( CLEANUP => 1 );
     my $adb = AmberDB->new(
@@ -147,6 +151,7 @@ subtest '6. AmberDB Engine Integration with Default gb Locale' => sub {
     );
 
     is( $adb->language, 'gb', 'AmberDB instance initializes with gb language by default' );
+    is( $adb->config('language'), 'gb', 'AmberDB config("language") defaults to gb' );
 
     my $tbl = 'global_catalog';
     $adb->table_attr( $tbl, {

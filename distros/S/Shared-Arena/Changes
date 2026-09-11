@@ -1,0 +1,21 @@
+Revision history for Shared::Arena
+
+0.02    2026-09-11
+        - FIXES the Windows FAIL in 0.01. Three test files forked without
+          skipping on MSWin32, where fork is emulated with threads: a child
+          calling exit ends the whole file, so every assertion passed, no plan
+          was printed, and the harness called it a FAIL.
+        - FIXES a test that failed 9 runs in 12 on a two-processor container
+          and 0 in 12 here. It had four children write 2000 churn keys into a
+          512-entry cache to force eviction, then asserted an entry written
+          before that churn had survived it. The children report through a
+          pipe now; eviction is still asserted, where it belongs.
+        - FIXES carving a region being refused under contention. The stripe
+          lock is a pure spin, so with more carvers than cores the budget
+          burned while the holder was not scheduled
+        - FIXES a test using pack('Q<'), which is a fatal "Invalid type" on a
+          perl built with ivsize=4.
+
+
+0.01    2026-09-10
+        - First version.

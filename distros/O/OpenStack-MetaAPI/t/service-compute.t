@@ -108,6 +108,30 @@ ok $api, "got one api object" or die;
 
 }
 
+{
+    note "Testing server_from_uid rejects malformed UUIDs";
+
+    like dies { $api->server_from_uid('not-a-uuid') },
+        qr/Invalid UUID format/,
+        "server_from_uid rejects non-UUID string";
+
+    like dies { $api->server_from_uid('aaa-bbb-ccc') },
+        qr/Invalid UUID format/,
+        "server_from_uid rejects too-short hex-dash string";
+
+    like dies { $api->server_from_uid('33748c2338dd4f70b774522fc69e7b67') },
+        qr/Invalid UUID format/,
+        "server_from_uid rejects UUID without dashes";
+
+    like dies { $api->server_from_uid('33748c23-38dd-4f70-b774') },
+        qr/Invalid UUID format/,
+        "server_from_uid rejects truncated UUID";
+
+    like dies { $api->server_from_uid('ZZZZZZZZ-ZZZZ-ZZZZ-ZZZZ-ZZZZZZZZZZZZ') },
+        qr/Invalid UUID format/,
+        "server_from_uid rejects non-hex characters";
+}
+
 done_testing;
 
 sub json_for_server {

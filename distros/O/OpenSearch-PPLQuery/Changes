@@ -1,0 +1,10 @@
+Revision history for OpenSearch-PPLQuery
+
+1.1.0  2026-09-11
+  - Replaced named JSON connections with connection headers: a query may begin with a strict "// pplquery" comment header, or one may be kept in a standalone file selected with --connection-file.
+  - Removed --config, --connection, --list-connections, connections.json, and the OPENSEARCH_* variables; connection environment variables are now the PPLQUERY_* namespace.
+  - Added short options: -u, -U, -p, -c, -f, -w, -t.
+  - Table output measures cell width in terminal columns, so --max-width no longer separates a character from its combining marks.
+
+1.0.0  2026-09-07
+  - First release.

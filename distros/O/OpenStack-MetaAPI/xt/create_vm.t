@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../t/lib";
 
 use Test::OpenStack::MetaAPI qw{:all};
 
-my $VALID_ID = match qr{^[a-f0-9\-]+$};
+my $VALID_ID = match qr{^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$}i;
 
 my $IMAGE_UID  = '170fafa5-1329-44a3-9c27-9bb77b77206d';
 my $IMAGE_NAME = 'myimage';

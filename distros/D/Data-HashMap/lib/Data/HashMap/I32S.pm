@@ -2,7 +2,7 @@ package Data::HashMap::I32S;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub import {
     $^H{"Data::HashMap::I32S/hm_i32s_put"}    = 1;
@@ -35,3 +35,23 @@ sub import {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Data::HashMap::I32S - hash map from int32 keys to string values
+
+=head1 SYNOPSIS
+
+    use Data::HashMap::I32S;
+    my $map = Data::HashMap::I32S->new;
+    hm_i32s_put $map, 1, "v";
+    my $v = hm_i32s_get $map, 1;
+
+=head1 DESCRIPTION
+
+One of the fourteen variants of L<Data::HashMap>, which documents the API, the
+C<hm_i32s_*> keywords and every caveat.
+
+=cut

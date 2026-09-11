@@ -1,5 +1,23 @@
 Revision history for Data-HashMap
 
+0.09  2026-09-11
+    - Per-process hash seed; key order and freeze output vary between runs
+    - SV* variants: opt-in value copying (fourth new() argument)
+    - Maps are not cloned into new threads; maps made in a thread work
+    - Storable support for non-SV* variants; SV* variants croak
+    - new() croaks on refs, non-numbers and extra arguments
+    - ttl below one second rounds up to one
+    - Out-of-range integers croak instead of wrapping
+    - Downgradable UTF-8 keys equal their Latin-1 form
+    - keys, values and items return a count in scalar context
+    - Every variant isa Data::HashMap
+    - TTL maps stay bounded; lru_skip below 50 takes effect
+    - Fix crashes: tied from_hash, destroyed-map merge, re-entrant DESTROY
+    - Fix clone losing keys, pop/shift missing entries, put_ttl leak
+    - Fix severe LRU and sparse-table slowdowns
+    - thaw, from_hash and merge fail cleanly on bad input or low memory
+    - POD: caveats section, a page per variant
+
 0.08  2026-04-19
     - Fix UTF-8 flag in string key identity: same bytes with different
       utf8 flag now collide (matches native Perl hash)

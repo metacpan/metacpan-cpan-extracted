@@ -38,7 +38,7 @@ available.
 For development, run the acceptance contract with:
 
 ```text
-prove -lv t/122-upgrade-cli.t
+prove -lv t/136-upgrade-cli.t
 ```
 
 Release-grade verification also requires the normal source-suite, all-metric

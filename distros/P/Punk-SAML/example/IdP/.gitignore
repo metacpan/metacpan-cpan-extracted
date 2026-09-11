@@ -1,0 +1,17 @@
+# Machine-local configuration: the layer punk.yml is merged with last, and
+# the one Punk::Config exempts from its secret guardrail. Keep it out of git.
+config/punk.local.yml
+
+# Perl build droppings
+blib/
+Makefile
+Makefile.old
+MYMETA.*
+pm_to_blib
+*.o
+*.bs
+
+# Editor and OS
+*~
+*.swp
+.DS_Store

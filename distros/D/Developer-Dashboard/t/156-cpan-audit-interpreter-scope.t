@@ -16,7 +16,7 @@ plan skip_all => "audit gate not present at $GATE" if !-f $GATE;
 
 # WHY THIS FILE EXISTS (DD-567)
 #   Five consecutive merges landed on master with no test verdict and no coverage
-#   verdict. CI step 7 - "Audit isolated Perl dependencies" - failed because the
+#   verdict. CI step 7 - "Audit isolated dependency root" - failed because the
 #   PERL INTERPRETER had an advisory (CVE-2026-15534 against 5.44.0), and its
 #   failure skipped steps 8 through 11: the declared-chain audit, the test run and
 #   the coverage gate. Every local run reported PASS throughout, which is exactly
@@ -35,6 +35,28 @@ plan skip_all => "audit gate not present at $GATE" if !-f $GATE;
 #   formality.
 
 # _shim(%behaviour)
+# Purpose: the sh prologue every cpan-audit double needs so the gate's corpus
+#          probe is answered the way the real binary answers it.
+# Input:   none.
+# Output:  a shell snippet answering --version and falling through otherwise.
+#
+# The gate establishes which advisory database it is auditing against before it
+# audits (DD-790), so a double that ignores --version is an incomplete model of
+# the binary: the gate refuses it as UNUSABLE, correctly, and every case in this
+# file fails for a reason none of them is about. The stamp is today's, computed
+# rather than written, so this file cannot start failing by the calendar.
+sub _version_prologue {
+    my @now   = gmtime(time);
+    my $stamp = sprintf '%04d%02d%02d.001', $now[5] + 1900, $now[4] + 1, $now[3];
+    return
+        qq{for a in "\$\@"; do\n}
+      . qq{  if [ "\$a" = "--version" ]; then\n}
+      . qq{    echo "cpan-audit version 1.503 using:"\n}
+      . qq{    echo "\tCPANSA::DB       $stamp"\n}
+      . qq{    exit 0\n}
+      . qq{  fi\ndone\n};
+}
+
 # Purpose: put a deterministic cpan-audit on PATH, so these assertions test the
 #          GATE rather than whichever advisories happen to be live tonight.
 #          Depending on the real advisory database would make this file pass or
@@ -60,9 +82,12 @@ sub _shim {
       ? q{echo "Some-Dist (have ==1.00) has 1 advisory"; echo "    CPANSA-Some-Dist-2026-0001"; found=1}
       : q{:};
 
+    my $prologue = _version_prologue();
+
     open my $fh, '>', $bin or die "cannot write shim: $!";
     print {$fh} <<"SHIM";
 #!/bin/sh
+$prologue
 found=0
 $dist_line
 $perl_line
@@ -170,7 +195,7 @@ my $root = _seed($tmp);
     my $dir = tempdir( CLEANUP => 1 );
     my $bin = File::Spec->catfile( $dir, 'cpan-audit' );
     open my $fh, '>', $bin or die $!;
-    print {$fh} qq{#!/bin/sh\nprintf '\\033[31mperl (have 5.044000) has 1 advisory\\033[0m\\n'\nexit 65\n};
+    print {$fh} qq{#!/bin/sh\n} . _version_prologue() . qq{printf '\\033[31mperl (have 5.044000) has 1 advisory\\033[0m\\n'\nexit 65\n};
     close $fh;
     chmod 0755, $bin;
     my ( $status, undef ) = _run( $root, $dir );
@@ -181,7 +206,7 @@ my $root = _seed($tmp);
     my $dir = tempdir( CLEANUP => 1 );
     my $bin = File::Spec->catfile( $dir, 'cpan-audit' );
     open my $fh, '>', $bin or die $!;
-    print {$fh} qq{#!/bin/sh\nprintf '\\033[31mSome-Dist (have ==1.00) has 1 advisory\\033[0m\\n'\nexit 65\n};
+    print {$fh} qq{#!/bin/sh\n} . _version_prologue() . qq{printf '\\033[31mSome-Dist (have ==1.00) has 1 advisory\\033[0m\\n'\nexit 65\n};
     close $fh;
     chmod 0755, $bin;
     my ( $status, undef ) = _run( $root, $dir );
@@ -236,7 +261,7 @@ result.
 =head1 WHAT USES IT
 
 The suite, through C<prove -lr t>. It exercises C<script/cpan-audit-project>,
-which CI runs as the "Audit isolated Perl dependencies" step of the Test
+which CI runs as the "Audit isolated dependency root" step of the Test
 workflow.
 
 =head1 EXAMPLES

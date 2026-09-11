@@ -5,7 +5,7 @@
 Developer::Dashboard - a local home for development work
 
 # VERSION
-4.30
+4.31
 
 # INTRODUCTION
 
@@ -666,6 +666,9 @@ deepest active child layer, and installed skills contribute their own layered
 `config/api.json` fragments for skill-local saved Ajax routes. The built-in
 `dashboard api` command is the supported way to inspect or update the writable
 runtime layer for that registry.
+An entry carrying `"disabled": true` (or the same flag under `_disabled`)
+is dropped from the registry; a JSON literal `false` there keeps the key
+visible, exactly as `"disabled": 0` or `"disabled": "no"` does.
 Saved bookmark Ajax handlers also default to `text/plain` when no explicit
 `type => ...` argument is supplied, and the generated Perl wrapper now
 enables autoflush on both `STDOUT` and `STDERR` so long-running handlers
@@ -1764,6 +1767,10 @@ will not start that collector, explicit named starts reject it, and any
 already-running managed loop for that collector is stopped during the next
 collector lifecycle action. Managed indicator state for that collector is
 also removed instead of lingering as if it were still active.
+The flag is read by its truth value, so a JSON literal `false` (or `0`,
+`"false"`, `"no"`, `"off"`) keeps the collector enabled while `true` and
+any other non-empty value disable it; `"disable": false` is not a disabled
+collector.
 - Stopping a singleton collector loop also terminates the long-running command
 currently owned by that loop, so `dashboard stop collector foo` does not leave
 the old worker command alive behind the stopped dispatcher.

@@ -1,9 +1,95 @@
 OpenStack::MetaAPI Changes
 
-NEXT
-- add Test::MockModule requirement version for 'redefine'
-- fix some test dependency issues
+0.004     2026-09-10 20:02:40-06:00 America/Denver
 
-- initial release of OpenStack::MetaAPI
-this is very very :alpha: state at this stage...
+  [ New features ]
+  - Compute: add limits(), flavors_detail(), console_output(),
+    server_action() and create_image() so a server can be managed for its
+    whole life, not only created and deleted.
+  - Add a Volume service (Cinder): list, get, create and delete volumes.
+    The catalogue type is resolved at runtime, newest first, so volumev3
+    and volumev2 deployments both work.
+  - Compute: add attach_volume(), detach_volume() and server_volumes().
+  - Images: add list_images(), a filtered and paginated listing. Glance
+    does the filtering, so finding a guest's snapshots is one request
+    instead of paging the whole project. images() is still blocked.
+  - create_vm(): pass user_data (base64 encoded for you),
+    availability_zone, metadata and block_device_mapping_v2 through to
+    Nova. Fields are only sent when asked for.
+  - create_vm(): network_for_floating_ip is now optional. Without it the
+    server is created and no floating IP is requested.
+  - new(): an OpenStack::Client::Auth object passed in is now honoured,
+    so Keystone v3 application credentials and any other scheme the auth
+    class does not build itself can be used.
 
+  [ Bug fixes ]
+  - root_uri(): the version-path guard only matched single-digit ports and
+    returned undef on match. Endpoints such as http://host:9696/v2.0 now
+    keep their URI and no longer produce /v2.0/v2.0/... paths.
+  - create_vm(): detect ERROR status while polling and die at once with the
+    fault code and message, instead of waiting for the timeout.
+  - create_vm(): die with a clear message when the image lookup finds
+    nothing. It used to reach for the id on an undef and crash with
+    "Can't use undef as HASH ref".
+  - delete_server(): handle multi-homed VMs. The port list was read in
+    scalar context, which gave a count and crashed with "Can't use string
+    as HASH ref" on servers with more than one port.
+  - add_floating_ip_to_server(): accept an optional network_id and filter
+    ports by it, so the floating IP lands on the right interface. Omitting
+    it keeps the old first-port behaviour.
+  - _list(): filter on defined() rather than truth, so fields holding 0,
+    "0" or "" (for example OS-EXT-STS:power_state) match.
+  - new(): require a blessed auth object. A clouds.yaml-shaped hash was
+    accepted verbatim and failed later, far from the cause.
+  - create_vm(): send the security group by name, falling back to its id.
+  - Network v2 specs: fix the 'prokect_id' typo, which made project_id
+    filters silently fall back to client-side filtering.
+  - Compute v2_0 specs: add the missing /flavors entry, restoring parity
+    with v2_1, and the uid field both getfromid entries were missing.
+    Without the uid, setup_api_methods_for_service() died at load time on
+    any deployment running API version 2.0.
+  - image_from_uid(), server_from_uid() and the spec-generated getfromid
+    methods now check the id against the RFC 4122 8-4-4-4-12 hex format and
+    die with a clear message. A malformed id used to reach OpenStack and
+    come back as a cryptic 404 or 400. _looks_valid_id() stays loose on
+    purpose: it only routes id-versus-name, and flavors use numeric ids.
+  - image_from_name(): die, listing the duplicate ids, when more than one
+    image shares a name. It used to return an arrayref where callers such
+    as create_vm expected a hashref, so $image->{id} read as undef and the
+    failure surfaced later as a confusing API error.
+  - Replace bare die calls with messages naming the method and the missing
+    argument.
+
+  [ Security ]
+  - Replace string eval module loading in API.pm and Service.pm with
+    path-based require, removing a code injection vector. DataAsYaml.pm no
+    longer uses a symbolic-reference string eval.
+
+  [ Internals and packaging ]
+  - Remove the unused _get_from_id() method from GetFromId.pm.
+  - Remove the stale __DATA__ block of Compute specs from Images.pm.
+  - Add GitHub Actions CI across Linux, macOS and Windows; drop .travis.yml.
+    The matrix now starts at Perl 5.14, the floor set by OpenStack::Client.
+  - Do not ship CLAUDE.md, .claude/ or local/ in the distribution.
+  - Compute v2_1 specs: remove the delete section. It generated a
+    getfromid method, so delete_server_from_uid issued a GET rather than a
+    DELETE, and it was never reachable through Routes. delete_server() in
+    Compute.pm is the real implementation.
+  - Remove the dead .whitesource configuration; the integration is gone.
+  - Point the bugtracker and repository metadata at the cpan-authors org.
+  - Add AI_POLICY.md and SECURITY.md.
+  - Routes.pm: drop an unused YAML::XS import. create_vm(): drop a
+    duplicated status check and initialise the readiness flag explicitly.
+  - Many new tests: Routes, the API factory, DataAsYaml, the Listable and
+    GetFromId roles, spec field names, spec integrity, root_uri, UUID
+    validation, and the create_vm error and no-floating-IP paths. The
+    image fixture now matches what Glance v2 really returns, a flat hash,
+    rather than the Compute-style wrapping that left the id undef.
+
+0.003 2019-04-29
+  - add Test::MockModule requirement version for 'redefine'
+  - fix some test dependency issues
+
+0.001 2019-04-19
+  - initial release of OpenStack::MetaAPI
+    this is very very :alpha: state at this stage...

@@ -7,13 +7,15 @@ use lib "$Bin/../lib", 'lib';
 my @modules = qw(
     AmberDB
     AmberDB::Base
-    AmberDB::Index
-    AmberDB::Index::Facet
-    AmberDB::Index::Junk
-    AmberDB::Transact
-    AmberDB::Cache
+    AmberDB::Base::Schema
+    AmberDB::Base::Encoder
+    AmberDB::Base::Index
+    AmberDB::Base::Facet
+    AmberDB::Base::Junk
+    AmberDB::Base::Transact
+    AmberDB::Base::Cache
+    AmberDB::Base::Ramdisk
     AmberDB::Array
-    AmberDB::String
     AmberDB::Date
     AmberDB::Locale
     AmberDB::Locale::Currency

@@ -12,11 +12,13 @@ use Luv::CLI::Registry;
 sub abstract {"Searches the local library registry."}
 
 sub opt_spec {
-    return ( [ 'update' => 'refresh the registry before searching' ], );
+    return (
+        [ 'update' => 'refresh the registry before searching' ],
+        [ 'all|a'  => 'list all libraries in the local registry cache' ],
+    );
 }
 
 sub execute ( $self, $opt, $args ) {
-    my $term       = $args->[0] or die "Usage: luv search <term>\n";
     my $cache_path = File::HomeDir->my_home . '/.cache/luv/registry.json';
     my $registry   = Luv::CLI::Registry->new( cache_path => $cache_path );
 
@@ -28,16 +30,27 @@ sub execute ( $self, $opt, $args ) {
         $registry->load;
     }
 
-    my @matches = $registry->search($term);
+    my @matches;
+    if ( $opt->{all} ) {
+        @matches = $registry->all_entries;
+    }
+    else {
+        my $term = $args->[0] or die "Usage: luv search <term> | --all\n";
+        @matches = $registry->search($term);
+    }
 
     if ( !@matches ) {
-        print "No libraries found matching '$term'\n";
+        print "No libraries found\n";
         return;
     }
 
-    for my $m (@matches) {
-        print "$m->{name} — $m->{description}\n  $m->{url}\n\n";
+    for my $m ( sort { ( $a->{name} // '' ) cmp ( $b->{name} // '' ) }
+        @matches )
+    {
+        my $name = $m->{name} // '(unknown)';
+        print "$name — $m->{description}\n  $m->{url}\n\n";
     }
+
     return;
 }
 
@@ -55,18 +68,20 @@ Luv::CLI::Command::Search - search the library registry
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
     luv search input
     luv search physics --update
+    luv search --all
 
 =head1 DESCRIPTION
 
 Searches the local registry cache for libraries matching the given
 term, by name or description. Refreshes the cache first if it's stale
-or if C<--update> is given.
+or if C<--update> is given. With C<--all> (or C<-a>), lists every
+library in the cache instead of requiring a search term.
 
 =head1 NAME
 

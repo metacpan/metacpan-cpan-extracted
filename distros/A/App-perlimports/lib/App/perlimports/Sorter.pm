@@ -7,7 +7,7 @@ use App::perlimports::Annotations ();
 use PPI::Document                 ();
 use Types::Standard               qw( Str );
 
-our $VERSION = '0.000064';
+our $VERSION = '0.000065';
 
 with 'App::perlimports::Role::Logger';
 
@@ -192,7 +192,7 @@ App::perlimports::Sorter - Sort a document's include statements
 
 =head1 VERSION
 
-version 0.000064
+version 0.000065
 
 =head1 SYNOPSIS
 

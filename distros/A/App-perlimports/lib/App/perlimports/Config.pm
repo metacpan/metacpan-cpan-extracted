@@ -3,7 +3,7 @@ package App::perlimports::Config;
 use Moo;
 use MooX::StrictConstructor;
 
-our $VERSION = '0.000064';
+our $VERSION = '0.000065';
 
 use List::Util             qw( uniq );
 use Path::Tiny             qw( path );
@@ -151,6 +151,13 @@ has preserve_duplicates => (
     default => 1,
 );
 
+has preserve_require => (
+    is      => 'ro',
+    isa     => Bool,
+    lazy    => 1,
+    default => 1,
+);
+
 has preserve_unused => (
     is      => 'ro',
     isa     => Bool,
@@ -241,7 +248,7 @@ App::perlimports::Config - Generic configuration options for C<perlimports>
 
 =head1 VERSION
 
-version 0.000064
+version 0.000065
 
 =head1 DESCRIPTION
 
@@ -291,6 +298,7 @@ never_export_modules_filename   = ""
 pad_brackets                    = false
 padding                         = true
 preserve_duplicates             = false
+preserve_require                = true
 preserve_unused                 = false
 sort                            = false
 tidy_whitespace                 = true

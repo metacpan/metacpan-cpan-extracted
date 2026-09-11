@@ -2,7 +2,7 @@ package Data::HashMap::SS;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub import {
     $^H{"Data::HashMap::SS/hm_ss_put"}    = 1;
@@ -35,3 +35,23 @@ sub import {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Data::HashMap::SS - hash map from string keys to string values
+
+=head1 SYNOPSIS
+
+    use Data::HashMap::SS;
+    my $map = Data::HashMap::SS->new;
+    hm_ss_put $map, "k", "v";
+    my $v = hm_ss_get $map, "k";
+
+=head1 DESCRIPTION
+
+One of the fourteen variants of L<Data::HashMap>, which documents the API, the
+C<hm_ss_*> keywords and every caveat.
+
+=cut

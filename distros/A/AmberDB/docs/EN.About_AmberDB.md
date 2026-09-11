@@ -1,4 +1,4 @@
-[🏠 Home](index.html) &nbsp;•&nbsp; [📖 About](EN.About_AmberDB.html) &nbsp;•&nbsp; [🚀 Quick Start](index.html#-quick-start) &nbsp;•&nbsp; [📘 Tutorial](EN.AmberDB_User-Guide.html) &nbsp;•&nbsp; [🌐 Locale](EN.AmberDB-Locale_User-Guide.html) &nbsp;•&nbsp; [📋 Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [📚 Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [🇹🇷 Türkçe](TR.AmberDB-Hakkinda.html)
+[Home](index.html) &nbsp;•&nbsp; [About](EN.About_AmberDB.html) &nbsp;•&nbsp; [Quick Start](index.html#quick-start) &nbsp;•&nbsp; [Tutorial](EN.AmberDB_User-Guide.html) &nbsp;•&nbsp; [Benchmark](EN.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [Locale](EN.AmberDB-Locale_User-Guide.html) &nbsp;•&nbsp; [SQL Guide](EN.AmberDB-vs-SQL_User-Guide.html) &nbsp;•&nbsp; [Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [Türkçe](TR.AmberDB-Hakkinda.html)
 
 ---
 
@@ -23,7 +23,7 @@ AmberDB brings together diverse capabilities within a single Perl database engin
 * **Nested & Repeating Blocks:** Automatic management of relational and repeating data blocks.
 * **Multi-Table Relational Transactions:** ACID-compliant transaction management with Strict 2-Phase Locking (Strict 2PL).
 * **Faceted Filtering:** Dynamic faceted filtering generation, just like on modern e-commerce sites.
-* **RAM-to-Disk Tiering:** RAM buffer caching layer similar to Redis.
+* **RAM-to-Disk Tiering:** Embedded OS-level RAM-Disk acceleration layer without external cache daemons.
 * **High-Throughput Batch Processing:** Dedicated bulk ingestion and index-merge pipeline.
 * **Audit Logging:** Built-in logging of user operations on each record.
 * **Soft Deletes:** Table-definition-specific soft delete (stores deleted records in an archive tier).
@@ -44,7 +44,7 @@ use AmberDB;
 
 # 1. Create AmberDB instance
 my $adb = AmberDB->new(
-    cfg  => { user => 'admin', language => 'en' },
+    cfg  => { user => 'admin', language => 'gb' },
     path => { dbase_dir => './dbstore' }
 );
 
@@ -132,14 +132,16 @@ This makes tasks such as filtering, sorting, pagination, and searching across la
 my ($total, @products) = $adb->search_table(
     "products",              # table id
     "wireless headphones",   # query string
-    start => 0,              # offset for pagination
-    limit => 20              # number of records per page
+    {
+        offset => 0,              # offset for pagination
+        limit  => 20              # number of records per page
+    }
 );
 ```
 
-In this example, all data for the first 0–20 slice matching the string `"wireless headphones"` in the `products` table is returned as an array of arrays within `@products`. Thanks to indexing, the result arrives within milliseconds even if the database holds millions of records.
+In this example, all data for the first 0-20 slice matching the string `"wireless headphones"` in the `products` table is returned as an array of arrays within `@products`. Thanks to indexing, the result arrives within milliseconds even if the database holds millions of records.
 
-> **Important Note:** If `start` + `limit` parameters are passed to `search_table`, it prepends `$total` to the return list. `$total` reports how many matching records exist in the table, which is essential for pagination.
+> **Important Note:** If `limit` parameter is passed to `search_table`, it prepends `$total` to the return list. `$total` reports how many matching records exist in the table, which is essential for pagination.
 
 ---
 
@@ -186,7 +188,7 @@ $adb->transact_start();
 $adb->transact_end();
 ```
 
-If an error occurs, the entire transaction—including associated index changes—is rolled back. The undo log also ensures recovery following an unexpected process or system failure.
+If an error occurs, the entire transaction - including associated index changes - is rolled back. The undo log also ensures recovery following an unexpected process or system failure.
 
 ---
 

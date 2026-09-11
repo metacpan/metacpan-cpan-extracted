@@ -17,27 +17,19 @@
       "directory" : [
          "t",
          "inc",
-         "lib/AmberDB/Locale/Lang",
-         "lib/AmberDB/Index"
+         "lib/AmberDB/Base",
+         "lib/AmberDB/Locale/Lang"
       ],
       "file" : [
          "lib/AmberDB/Base.pm",
-         "lib/AmberDB/Cache.pm",
-         "lib/AmberDB/Transact.pm",
-         "lib/AmberDB/Index.pm",
          "lib/AmberDB/Locale/Currency.pm"
       ],
       "namespace" : [
-         "AmberDB::Locale::Lang",
-         "AmberDB::Index"
+         "AmberDB::Base",
+         "AmberDB::Locale::Lang"
       ],
       "package" : [
          "AmberDB::Base",
-         "AmberDB::Cache",
-         "AmberDB::Transact",
-         "AmberDB::Index",
-         "AmberDB::Index::Facet",
-         "AmberDB::Index::Junk",
          "AmberDB::Locale::Currency"
       ]
    },
@@ -95,6 +87,6 @@
          "web" : "https://github.com/marufcetin/amberdb"
       }
    },
-   "version" : "v5.24.0",
+   "version" : "v5.25.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

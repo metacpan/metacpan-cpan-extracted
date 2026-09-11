@@ -142,6 +142,115 @@ fi
 # the isolated root still exits 5, including when an interpreter advisory appears
 # in the same run, and a cpan-audit that died before auditing is still UNUSABLE
 # rather than clean. Pinned by t/156-cpan-audit-interpreter-scope.t.
+# CORPUS PRECONDITION (DD-790).
+#
+# Every verdict below is only as good as the advisory database behind it, and until
+# now no run said which database that was. On 2026-09-06 this project's database was
+# thirty days old and did not contain URI at all, so a genuine advisory against the
+# installed URI 5.34 was not merely missed - it was unreportable. The run said
+# "clean" in the words it uses when it has actually looked.
+#
+# THE STAMP COMES FROM THE BINARY WE ACTUALLY SHELL OUT TO. A `perl -MCPANSA::DB`
+# one-liner here could resolve a different @INC than the cpan-audit on PATH and
+# report the version of a database no verdict came from - this card's own defect,
+# rebuilt inside its fix. `cpan-audit --version` names what the tool loaded.
+#
+# Upstream already warns about this (cpan-audit --fresh, CPAN::Audit::FreshnessCheck)
+# but measured on 2026-09-06 it writes to STDERR and leaves the exit status alone -
+# 91 with the flag and 91 without - so no caller reading a status can see it. The
+# threshold below is upstream's own CPAN_AUDIT_FRESH_DAYS, so one name moves the
+# warning and this refusal together; only the consequence is ours.
+set +e
+version_output="$(cpan-audit --version 2>&1)"
+version_rc=$?
+set -e
+if [ "$version_rc" -ne 0 ]; then
+  printf 'did not audit: cannot establish the advisory database version - cpan-audit --version exited %s\n' "$version_rc" >&2
+  exit 4
+fi
+
+db_stamp="$(printf '%s\n' "$version_output" | awk '/CPANSA::DB/ {print $2; exit}')"
+if [ -z "$db_stamp" ]; then
+  db_stamp="$(printf '%s\n' "$version_output" | awk '/CPAN::Audit::DB/ {print $2; exit}')"
+fi
+
+# A stamp we cannot parse is a corpus we cannot vouch for, so it refuses rather than
+# defaulting to acceptance - the gate must never report clean on a database whose
+# provenance it could not establish.
+if ! printf '%s' "$db_stamp" | grep -qE '^[0-9]{8}([.][0-9]+)?$'; then
+  printf 'advisory database: %s (age unknown)\n' "${db_stamp:-unreported}"
+  printf 'did not audit: cpan-audit --version reported no YYYYMMDD.NNN database stamp, so the corpus cannot be established\n' >&2
+  exit 4
+fi
+
+# The AGE is computed in perl, and that is not a contradiction of the rule above.
+# The rule is about the STAMP: it must come from the binary that produces the
+# verdict, because a stamp read from anywhere else can describe a database no
+# verdict came from. Arithmetic on a stamp already in hand carries no such risk.
+#
+# It is perl rather than date(1) because `date -d` is a GNU extension. BSD and
+# macOS date reject it, so the original version of this block was silently
+# Linux-only: on a Mac it would have fallen into the guard below and refused to
+# audit at all, turning a portable gate into one that fail-closes on half its
+# platforms. perl is already a hard dependency here - the gate audits a Perl
+# library root and cpan-audit is itself perl - so this adds nothing new.
+db_age_days="$(perl -e '
+    my ($y, $m, $d) = ($ARGV[0] =~ /^(\d{4})(\d{2})(\d{2})/) or exit 1;
+    sub dfc { my ($y,$m,$d)=@_; $y -= ($m<=2?1:0);
+              my $e=int(($y>=0?$y:$y-399)/400); my $yoe=$y-$e*400;
+              my $doy=int((153*($m+($m>2?-3:9))+2)/5)+$d-1;
+              return $e*146097 + $yoe*365+int($yoe/4)-int($yoe/100)+$doy - 719468; }
+    my @n = gmtime(time);
+    print dfc($n[5]+1900, $n[4]+1, $n[3]) - dfc($y, $m, $d);
+' "$db_stamp" 2>/dev/null || true)"
+if [ -z "$db_age_days" ]; then
+  printf 'advisory database: %s (age unknown)\n' "$db_stamp"
+  printf 'did not audit: could not compute the age of advisory database stamp %s\n' "$db_stamp" >&2
+  exit 4
+fi
+
+# 21, stricter than upstream's 30 on purpose: 30 days is precisely the age at which
+# this project's database silently lacked the advisory a clean verdict was cited to
+# disprove. CI installs CPANSA-DB fresh on every run, so this cannot wedge a runner.
+#
+# 21 rather than a rounder number because the limit must EXCEED THE LARGEST REAL GAP
+# BETWEEN PUBLICATIONS, or the gate refuses during a normal quiet spell with no newer
+# database to install. Measured from the CPAN index on 2026-09-06 over 40 CPANSA-DB
+# releases across 223 days: median gap 4, mean 5.7, MAXIMUM 18, one gap of 39 over
+# 14 days and none over 30. That 18 is the max of a 223-day window - one sample of
+# the tail, not the tail - so 21 is "above the largest gap seen", not a proven
+# ceiling. Keep this in step with DEFAULT_MAX_DB_AGE_DAYS in
+# script/cpan-audit-declared-chain; they are one policy expressed in two languages.
+db_age_limit="${CPAN_AUDIT_FRESH_DAYS:-21}"
+if ! printf '%s' "$db_age_limit" | grep -qE '^[0-9]+$'; then
+  printf 'did not audit: CPAN_AUDIT_FRESH_DAYS is set to %s, which is not a whole number of days\n' "$db_age_limit" >&2
+  exit 4
+fi
+
+# Printed on EVERY run, including clean ones. The clean path is the one readers
+# believe, so it is the one that must carry the corpus.
+printf 'advisory database: %s (%s days old)\n' "$db_stamp" "$db_age_days"
+
+if [ "$db_age_days" -gt "$db_age_limit" ]; then
+  # THE RECIPE CREATES ITS OWN DIRECTORY AND NEVER NAMES A FIXED PATH (DD-798).
+  # A fixed path under world-writable /tmp is predictable; /tmp is 1777, so the
+  # sticky bit stops a user deleting another's files but not creating that
+  # directory first; cpanm REUSES an existing directory rather than refusing it;
+  # and the next line puts it FIRST on PERL5LIB. Together that is a security tool
+  # advising the user to load Perl from a location they do not control - CWE-377
+  # and CWE-378. The audited root IS still echoed at the end of the recipe so the
+  # command can be re-run as printed: that path is the caller's own argument, not
+  # one this gate invents, which is the distinction two drafts of the test got
+  # wrong before the assertion was narrowed to the created-and-prepended directory.
+  printf 'did not audit: advisory database is %s days old (%s) and the limit is %s. Refresh it WITHOUT disturbing a shared CPAN tree:\n' \
+    "$db_age_days" "$db_stamp" "$db_age_limit" >&2
+  printf '    DIR=$(mktemp -d)\n' >&2
+  printf '    cpanm --local-lib-contained "$DIR" CPANSA::DB\n' >&2
+  printf '    PERL5LIB="$DIR/lib/perl5:$PERL5LIB" %s %s\n' "$0" "$perl5_root" >&2
+  printf 'Or set CPAN_AUDIT_FRESH_DAYS if you accept auditing against a corpus that old.\n' >&2
+  exit 4
+fi
+
 set +e
 audit_output="$(cpan-audit installed "$perl5_root" --perl --exclude-file "$exclusions" 2>&1)"
 set -e

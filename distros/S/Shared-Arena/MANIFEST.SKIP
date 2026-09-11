@@ -1,0 +1,21 @@
+# What is not shipped. REGEXES, not globs - ExtUtils::Manifest matches these
+# with m//, so `*.o` is not a pattern that means anything here, it is a syntax
+# error waiting to be one.
+#
+# ignore.txt beside this file is the same list in glob form, and nothing reads
+# it: ExtUtils::Manifest looks for MANIFEST.SKIP under that name and no other.
+# Without this file every build product counted as a MANIFEST gap, which is a
+# good way to stop reading the output of a check that also reports real ones.
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+^MYMETA\.
+^Install/
+\.o$
+\.bs$
+^Arena\.c$
+^Shared-Arena-
+\.tar\.gz$
+^\.git
+~$

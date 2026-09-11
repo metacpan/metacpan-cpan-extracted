@@ -1789,6 +1789,69 @@ my $repos = tempdir( CLEANUP => 1 );
 }
 
 # ===========================================================================
+# DD-824: _install_skill_requirements_txt resolves into the skill's own
+# local/venv, creating it first if it does not exist, and falls back to the
+# global --user path unchanged when a skill has no requirements.txt.
+# ===========================================================================
+{
+    # AC-1: a skill whose venv ALREADY exists (simulating a prior successful
+    # `python -m venv` run) installs through that venv's own pip - the
+    # install argv omits --user and the venv path is the interpreter used.
+    my $skill = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'venv-skill' );
+    make_path($skill);
+    _spew( File::Spec->catfile( $skill, 'requirements.txt' ), "requests\n" );
+    my $venv_python = $manager->_skill_venv_python_path($skill);
+    make_path( ( File::Spec->splitpath($venv_python) )[1] );
+    _spew( $venv_python, "#!/bin/sh\nexit 0\n" );
+    chmod 0755, $venv_python;
+
+    my @seen_commands;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillManager::_run_streaming_command = sub {
+            my ( $self, %args ) = @_;
+            push @seen_commands, $args{command};
+            return { stdout => '', stderr => '', exit => 0, timed_out => 0 };
+        };
+        my $res = $manager->_install_skill_requirements_txt($skill);
+        ok( !$res->{error}, 'requirements.txt install succeeds when the venv already exists (AC-1)' );
+    }
+    is( scalar(@seen_commands), 1, 'only the pip install command ran - the venv already existed, no venv-creation call' );
+    is( $seen_commands[0][0], $venv_python, 'pip is invoked through the venv python interpreter, not the global one (AC-1)' );
+    ok( !( grep { $_ eq '--user' } @{ $seen_commands[0] } ), 'the venv install path does not pass --user (AC-1)' );
+
+    # AC-2: a skill whose venv does not exist and cannot be created (no real
+    # python available) falls back to the global --user path unchanged.
+    my $skill2 = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'no-venv-skill' );
+    make_path($skill2);
+    _spew( File::Spec->catfile( $skill2, 'requirements.txt' ), "requests\n" );
+    my @seen_commands2;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillManager::_run_streaming_command = sub {
+            my ( $self, %args ) = @_;
+            push @seen_commands2, $args{command};
+            return { stdout => '', stderr => '', exit => 0, timed_out => 0 };
+        };
+        my $res = $manager->_install_skill_requirements_txt($skill2);
+        ok( !$res->{error}, 'requirements.txt install succeeds via the global fallback when no venv exists (AC-2)' );
+    }
+    is( scalar(@seen_commands2), 2, 'two commands ran - venv creation attempt, then the global-fallback pip install' );
+    ok( ( grep { $_ eq '--user' } @{ $seen_commands2[1] } ), 'the fallback install path still passes --user, unchanged (AC-2)' );
+
+    # AC-3: two independent skills each resolve their OWN venv path, with no
+    # interference between them.
+    my $skill3 = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'venv-skill-3' );
+    isnt( $manager->_skill_venv_python_path($skill3), $venv_python, 'a second skill resolves its OWN venv path, independent of the first (AC-3)' );
+
+    # AC-4: on a forced-Windows host, the venv python path uses the
+    # Scripts/python.exe layout instead of bin/python.
+    local $ENV{DD_TEST_OS} = 'MSWin32';
+    my $win_venv_python = $manager->_skill_venv_python_path($skill3);
+    like( $win_venv_python, qr/Scripts.python\.exe$/, '_skill_venv_python_path uses Scripts/python.exe on a forced-Windows host (AC-4)' );
+}
+
+# ===========================================================================
 # _package_json_dependency_specs edge cases.
 # ===========================================================================
 {

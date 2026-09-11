@@ -19,8 +19,10 @@ no_index:
     - inc
 requires:
   Clipboard: '0'
+  HTTP::Request: '0'
+  JSON::PP: '0'
   LWP::UserAgent: '0'
   URI::Escape: '0'
   perl: '5.006'
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

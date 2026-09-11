@@ -147,7 +147,7 @@ PERL
     is( scalar( keys %seen_ids ), $expected_total, "All generated IDs are 100% unique (no ID collisions)" );
 
     # Verify index integrity (.inx contains all keys)
-    my $inx_file = "$tmpdir/tables/${tbl_name}.inx";
+    my $inx_file = "$tmpdir/table/${tbl_name}.inx";
     my ( undef, @inx_keys ) = $parent_db->index_get( $inx_file, "keys" );
     is( scalar(@inx_keys), $expected_total, "Primary binary index (.inx) contains exactly $expected_total keys" );
 

@@ -54,7 +54,7 @@ the output from prettier.
   my @errors = $checker->errors;
 
 Returns array of error hashrefs, each with:
-  - error: the error type (tidy_js, no_prettierrc)
+  - error: the error type (tidy_js, no_prettierrc, tidy_js_empty_output, tidy_js_prettier_failed)
 
 =head2 fix
 
@@ -101,11 +101,37 @@ sub check {
     my ( $stdout, $stderr );
     run3( $cmd, undef, \$stdout, \$stderr );
 
+    my $success = $? == 0;
+
     # FIXME raise exception if stderr is defined?
     warn $stderr if $stderr;
 
+    unless ($success) {
+
+        # prettier failed to process the file
+        $self->{_errors} = [
+            {
+                error   => 'tidy_js_prettier_failed',
+                message => 'prettier failed to process the file, the original content was kept',
+            }
+        ];
+        return 0;
+    }
+
     my $original    = $self->content;
     my $tidy_output = $stdout || '';
+
+    if ( length($original) && !length($tidy_output) ) {
+
+        # prettier produced nothing (e.g. invalid input or broken prettierrc), don't overwrite the file with that
+        $self->{_errors} = [
+            {
+                error   => 'tidy_js_empty_output',
+                message => 'prettier produced no output, the original content was kept'
+            }
+        ];
+        return 0;
+    }
 
     $self->{_fixed_content} = $tidy_output;
 

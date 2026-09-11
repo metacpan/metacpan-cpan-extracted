@@ -3,7 +3,7 @@
 use strict;
 
 # use lib 'lib';
-use Test::Most tests => 8;
+use Test::Most tests => 10;
 
 BEGIN {
 	use_ok('HTML::D3')
@@ -23,3 +23,13 @@ cmp_ok($obj->{'height'}, '==', 100, 'direct key-value pairs');
 my $obj2 = $obj->new({ height => 200 });
 cmp_ok($obj2->{'width'}, '==', 50, 'clone keeps old args');
 cmp_ok($obj2->{'height'}, '==', 200, 'clone adds new args');
+
+# Regression test for RT#0011 / 0.11 fix: before adding "use Carp qw(carp)" to
+# HTML::D3, calling ::new() with a defined undef first arg and any keyword args
+# would die with "Undefined subroutine &HTML::D3::carp".  It must instead carp
+# (emit a warning) and return undef.
+my $bad;
+warnings_like { $bad = HTML::D3::new(undef, width => 100) }
+	qr/use ->new\(\) not ::new\(\)/,
+	'::new() with undef class and args carps instead of dying';
+ok(!defined($bad), '::new() with undef class and args returns undef');

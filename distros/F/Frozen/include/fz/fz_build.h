@@ -17,7 +17,7 @@ typedef struct {
     HV     *seen;
     SV     *path;
     int     depth;
-    int     lossy_nv;
+    unsigned flags;
 } fz_builder;
 
 #define FZ_INPROGRESS ((IV)-1)
@@ -140,7 +140,7 @@ static uint32_t fz_emit_nv(pTHX_ fz_builder *B, NV v) {
     uint32_t off;
     double d = (double)v;
 
-    if (!B->lossy_nv && (NV)d != v && v == v)
+    if (!(B->flags & FZ_F_LOSSY_NV) && (NV)d != v && v == v)
         fz_croak(aTHX_ B, "an NV that does not fit a double (pass lossy_nv => 1 to narrow it)");
     if (!fz_buf_align(&B->buf)) fz_croak(aTHX_ B, "the block would exceed 2 GiB");
     off = (uint32_t)B->buf.len;
@@ -378,6 +378,10 @@ static uint32_t fz_emit(pTHX_ fz_builder *B, SV *sv) {
     }
 
     B->depth--;
+
+    if ((B->flags & FZ_F_STRINGIFY) && SvOK(sv))
+        return FZ_SLOT(FZ_T_STR, fz_emit_str(aTHX_ B, sv));
+
     if (SvPOKp(sv)) return FZ_SLOT(FZ_T_STR,  fz_emit_str(aTHX_ B, sv));
     if (SvIOKp(sv)) {
         if (SvIsUV(sv) && SvUV(sv) > (UV)IV_MAX)
@@ -437,7 +441,7 @@ static void fz_flat_free(fz_flat *f) {
     free(f->paths); free(f->lens); free(f->slots);
 }
 
-static SV *fz_freeze_sv(pTHX_ SV *data, int lossy_nv, const char *flatsep) {
+static SV *fz_freeze_sv(pTHX_ SV *data, unsigned flags, const char *flatsep) {
     fz_builder B;
     uint32_t root, flat_off = 0;
     SV *out;
@@ -448,7 +452,7 @@ static SV *fz_freeze_sv(pTHX_ SV *data, int lossy_nv, const char *flatsep) {
     B.seen     = newHV();
     B.path     = newSVpvs("");
     B.depth    = 0;
-    B.lossy_nv = lossy_nv;
+    B.flags = flags;
 
     SAVEFREESV((SV *)B.interned);
     SAVEFREESV((SV *)B.seen);

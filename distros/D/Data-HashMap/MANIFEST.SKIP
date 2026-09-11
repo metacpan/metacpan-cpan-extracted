@@ -5,6 +5,8 @@
 ^MYMETA\.
 ^Makefile$
 ^Makefile\.old$
+^CLAUDE\.md$
+^MANIFEST\.bak$
 ^blib/
 ^pm_to_blib
 ^ppport\.h$

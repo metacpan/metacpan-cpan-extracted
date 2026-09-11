@@ -14,9 +14,7 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        hashmap_i16s_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
+        HM_DESTROY(HashMapI16S, hashmap_i16s_destroy, self_sv);
 
 bool
 put(SV* self_sv, int16_t key, SV* value)
@@ -118,6 +116,7 @@ void
 keys(SV* self_sv)
     PPCODE:
         EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
+        if (GIMME_V == G_SCALAR) { mXPUSHu(self->size); XSRETURN(1); }
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -130,6 +129,7 @@ void
 values(SV* self_sv)
     PPCODE:
         EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
+        if (GIMME_V == G_SCALAR) { mXPUSHu(self->size); XSRETURN(1); }
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -150,6 +150,7 @@ void
 items(SV* self_sv)
     PPCODE:
         EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
+        if (GIMME_V == G_SCALAR) { mXPUSHu(self->size); XSRETURN(1); }
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -205,7 +206,9 @@ drain(SV* self_sv, UV count)
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         UV n = 0;
         EXTEND(SP, (count < self->size ? count : self->size) * 2);
-        while (self->iter_pos < self->capacity && n < count) {
+        size_t scanned;
+        for (scanned = 0; scanned < self->capacity && n < count; scanned++) {
+            if (self->iter_pos >= self->capacity) self->iter_pos = 0;
             size_t i = self->iter_pos++;
             if (I16S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 mXPUSHi(self->nodes[i].key);
@@ -247,7 +250,9 @@ pop(SV* self_sv)
             }
             XSRETURN_EMPTY;
         } else {
-            while (self->iter_pos < self->capacity) {
+            size_t scanned;
+            for (scanned = 0; scanned < self->capacity; scanned++) {
+                if (self->iter_pos >= self->capacity) self->iter_pos = 0;
                 size_t i = self->iter_pos++;
                 if (I16S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                     EXTEND(SP, 2);
@@ -291,8 +296,9 @@ shift(SV* self_sv)
             }
             XSRETURN_EMPTY;
         } else {
-            if (self->iter_pos == 0) self->iter_pos = self->capacity;
-            while (self->iter_pos > 0) {
+            size_t scanned;
+            for (scanned = 0; scanned < self->capacity; scanned++) {
+                if (self->iter_pos == 0) self->iter_pos = self->capacity;
                 size_t i = --self->iter_pos;
                 if (I16S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                     EXTEND(SP, 2);
@@ -391,21 +397,21 @@ thaw(char* class, SV* data)
         uint32_t ls; memcpy(&ls, p, 4); p += 4;
         HashMapI16S* map = hashmap_i16s_create((size_t)ms, dt, ls);
         if (!map) croak("Failed to create map for thaw");
-        if (cnt > 0) hashmap_i16s_reserve(map, (size_t)cnt);
+        if ((size_t)(end - p) / 11 < cnt) { hashmap_i16s_destroy(map); croak("Truncated freeze data"); }
+        if (cnt > 0 && !hashmap_i16s_reserve(map, (size_t)cnt)) { hashmap_i16s_destroy(map); croak("OOM during thaw"); }
         { uint32_t j;
           for (j = 0; j < cnt; j++) {
             if (p + 11 > end) { hashmap_i16s_destroy(map); croak("Truncated freeze data"); }
             int16_t key; memcpy(&key, p, 2); p += 2;
             uint32_t vl; memcpy(&vl, p, 4); p += 4;
             uint8_t vu = *p++; bool vutf8 = vu ? true : false;
-            if (p + vl + 4 > end) { hashmap_i16s_destroy(map); croak("Truncated freeze data"); }
+            if (vl > HM_MAX_STR_LEN || (size_t)(end - p) < (size_t)vl + 4) { hashmap_i16s_destroy(map); croak("Truncated freeze data"); }
             const char* vstr = (const char*)p; p += vl;
             uint32_t ttl; memcpy(&ttl, p, 4); p += 4;
             if (!hashmap_i16s_put(map, key, vstr, vl, vutf8, ttl)) { hashmap_i16s_destroy(map); croak("OOM during thaw"); }
             if (ttl == 0 && map->expires_at) hashmap_i16s_persist(map, key);
           }
         }
-        if (p > end) croak("Truncated freeze data");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -458,30 +464,30 @@ from_hash(SV* self_sv, SV* href)
         if (!SvROK(href) || SvTYPE(SvRV(href)) != SVt_PVHV)
             croak("from_hash requires a hashref");
         HV* hv = (HV*)SvRV(href);
-        hashmap_i16s_reserve(self, (size_t)HvUSEDKEYS(hv));
+        if (!hashmap_i16s_reserve(self, (size_t)HvUSEDKEYS(hv))) croak("OOM during from_hash");
         hv_iterinit(hv);
         HE* he;
         while ((he = hv_iternext(hv))) {
             SV* ksv = hv_iterkeysv(he);
-            int16_t key = (int16_t)SvIV(ksv);
-            SV* val = HeVAL(he);
+            int16_t key; HM_SV_TO_I16(key, ksv);
+            if (hashmap_i16s_key_is_reserved(key)) continue;
+            SV* val = hv_iterval(hv, he);   /* HeVAL is NULL for a tied hash */
             STRLEN vlen; const char* vstr = SvPV(val, vlen); bool vutf8 = SvUTF8(val) ? true : false;
-            hashmap_i16s_put(self, key, vstr, (uint32_t)vlen, vutf8, 0);
+            if (!hashmap_i16s_put(self, key, vstr, (uint32_t)vlen, vutf8, 0)) croak("OOM during from_hash");
         }
 
 void
 merge(SV* self_sv, SV* other_sv)
     CODE:
         EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        if (!SvROK(other_sv) || !SvOBJECT(SvRV(other_sv)) || SvSTASH(SvRV(other_sv)) != stash_i16s)
-            croak("Expected a Data::HashMap::I16S object");
-        HashMapI16S* other = INT2PTR(HashMapI16S*, SvIV(SvRV(other_sv)));
-        hashmap_i16s_reserve(self, self->size + other->size);
+        EXTRACT_OTHER_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", other_sv);
+        if (self == other) XSRETURN_EMPTY;
+        if (!hashmap_i16s_reserve(self, self->size + other->size)) croak("OOM during merge");
         uint32_t now = other->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
         for (i = 0; i < other->capacity; i++) {
             if (I16S_NODE_LIVE(other->nodes[i]) && !HM_TTL_SKIP_EXPIRED(other, i, now))
-                hashmap_i16s_put(self, other->nodes[i].key, other->nodes[i].value, HM_UNPACK_LEN(other->nodes[i].val_len), HM_UNPACK_UTF8(other->nodes[i].val_len), 0);
+                if (!hashmap_i16s_put(self, other->nodes[i].key, other->nodes[i].value, HM_UNPACK_LEN(other->nodes[i].val_len), HM_UNPACK_UTF8(other->nodes[i].val_len), 0)) croak("OOM during merge");
         }
 
 
@@ -510,11 +516,11 @@ to_hash(SV* self_sv)
         RETVAL
 
 bool
-put_ttl(SV* self_sv, int16_t key, SV* value, UV ttl)
+put_ttl(SV* self_sv, int16_t key, SV* value, SV* ttl)
     CODE:
         EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         EXTRACT_STR_VAL(value);
-        RETVAL = hashmap_i16s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl);
+        RETVAL = hashmap_i16s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, hm_ttl_arg(aTHX_ ttl));
     OUTPUT:
         RETVAL
 

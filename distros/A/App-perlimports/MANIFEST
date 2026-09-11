@@ -56,7 +56,9 @@ t/doc-imports.t
 t/double-quoted-q.t
 t/dump-perl-exports.t
 t/dupes.t
+t/english-program-name.t
 t/english.t
+t/env.t
 t/explodes.t
 t/export-tags.t
 t/exported-variables.t
@@ -74,9 +76,11 @@ t/heredoc.t
 t/ignored-modules.t
 t/import-error.t
 t/indent.t
+t/indirect-object-syntax.t
 t/interpolation.t
 t/is-ignored.t
 t/lib/TestHelper.pm
+t/local-lib.t
 t/locally-defined-sub.t
 t/lookalike-words.t
 t/maybe-new-include.t
@@ -98,6 +102,7 @@ t/perl-imports.t
 t/perl.t
 t/perlimports.t
 t/pragma.t
+t/preserve-include-comments.t
 t/preserve-some-padding.t
 t/preserve-spaces.t
 t/qualified-bareword.t
@@ -142,7 +147,16 @@ test-data/datetime.pl
 test-data/doc-imports.pl
 test-data/double-quoted-q.pl
 test-data/dupes.pl
+test-data/english-program-name.pl
 test-data/english.pl
+test-data/env-bare.pl
+test-data/env-comma.pl
+test-data/env-interpolated.pl
+test-data/env-mixed.pl
+test-data/env-scalar.pl
+test-data/env-unused.pl
+test-data/env-version.pl
+test-data/env.pl
 test-data/exceptional.pl
 test-data/explodes.pl
 test-data/export-tags.pl
@@ -171,6 +185,8 @@ test-data/heredoc.pl
 test-data/http-status.pl
 test-data/ignore-modules-pattern.txt
 test-data/ignore-modules.txt
+test-data/indirect-object-syntax-preserved.pl
+test-data/indirect-object-syntax.pl
 test-data/inner-package.pl
 test-data/interpolation.pl
 test-data/lib/Local/After.pm
@@ -203,6 +219,7 @@ test-data/lint-failure-import-args.pl
 test-data/lint-failure-indented-duplicate.pl
 test-data/lint-failure-unused-import.pl
 test-data/lint-success.pl
+test-data/local-lib.pl
 test-data/long-list.pl
 test-data/long-test-more.pl
 test-data/lookalike-words.pl

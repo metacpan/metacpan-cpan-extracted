@@ -2,7 +2,7 @@ package Data::HashMap::II;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub import {
     $^H{"Data::HashMap::II/hm_ii_put"}     = 1;
@@ -38,3 +38,23 @@ sub import {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Data::HashMap::II - hash map from int64 keys to int64 values
+
+=head1 SYNOPSIS
+
+    use Data::HashMap::II;
+    my $map = Data::HashMap::II->new;
+    hm_ii_put $map, 1, 2;
+    my $v = hm_ii_get $map, 1;
+
+=head1 DESCRIPTION
+
+One of the fourteen variants of L<Data::HashMap>, which documents the API, the
+C<hm_ii_*> keywords and every caveat.
+
+=cut

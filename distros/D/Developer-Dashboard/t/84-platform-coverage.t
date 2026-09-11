@@ -7,6 +7,7 @@ use utf8;
 use Test::More;
 use File::Temp qw(tempdir);
 use File::Spec;
+use File::Path qw(make_path);
 
 use lib 'lib';
 
@@ -158,6 +159,59 @@ ok( !defined command_in_path(''),    'command_in_path empty-string returns undef
     my $found = command_in_path('python');
     ok( defined $found, 'command_in_path still finds a real command past empty/undef PATH dirs' );
     ok( !defined command_in_path('definitely-absent-xyz'), 'an absent command returns undef' );
+}
+
+# ---------------------------------------------------------------------------
+# DD-765: a bare name must never resolve against the CWD. The process is
+# already chdir'd into $home (see the hermetic-runtime block at the top of
+# this file), which is exactly the shape of the real bug - a file sitting in
+# the directory dashboard happens to be run from, sharing a name with a real
+# command. PATH is restricted to $bin (which does not contain 'make'), so a
+# fix-correct resolver must return undef here, never the cwd shadow file.
+# ---------------------------------------------------------------------------
+{
+    my $shadow = File::Spec->catfile( $home, 'make' );
+    write_file( $shadow, "#!/bin/sh\necho shadow\n" );
+    chmod 0755, $shadow;
+    local $ENV{PATH} = $bin;
+    my $found = command_in_path('make');
+    ok( !defined $found,
+        'command_in_path never resolves a same-named file sitting in the cwd, only PATH (DD-765)' );
+    unlink $shadow;
+}
+
+# A caller passing an actual PATH-separator-bearing path (not a bare name)
+# is asking a different question, and that path is still resolved directly -
+# this is the branch that stays reachable after DD-765's fix.
+{
+    my $subdir = File::Spec->catdir( $home, 'toolsub' );
+    mkdir $subdir or die "mkdir $subdir: $!";
+    my $explicit = File::Spec->catfile( $subdir, 'explicit-tool' );
+    write_file( $explicit, "#!/bin/sh\necho explicit\n" );
+    chmod 0755, $explicit;
+    my $rel = File::Spec->abs2rel($explicit);
+    local $ENV{PATH} = $bin;
+    is( command_in_path($rel), $rel,
+        'command_in_path still resolves an explicit path containing a directory separator (DD-765)' );
+    unlink $explicit;
+
+    # And the false side of that same -f check: a separator-bearing path that
+    # does not exist there falls through to a genuine PATH search rather than
+    # short-circuiting on the strength of merely looking like a path.
+    local $ENV{PATH} = $bin;
+    ok( !defined command_in_path( File::Spec->catfile( $subdir, 'no-such-tool' ) ),
+        'command_in_path with a separator-bearing but nonexistent path falls through, never fabricates a hit (DD-765)' );
+    rmdir $subdir;
+}
+
+# Every path command_in_path DOES return must be absolute - a relative result
+# denotes a different file once the caller's cwd changes (DD-765 AC-2).
+{
+    only_commands('python');
+    local $ENV{PATH} = $bin;
+    my $found = command_in_path('python');
+    ok( $found && File::Spec->file_name_is_absolute($found),
+        'command_in_path returns an absolute path, never relative (DD-765 AC-2)' );
 }
 
 # ---------------------------------------------------------------------------
@@ -358,6 +412,22 @@ ok( length $root_from_inc, '_module_lib_root resolves via %INC' );
     like( $@, qr/Unable to exec go run/, 'go-run failure surfaced' );
 }
 
+# DD-825: go run must be launched with -C <the source file's own directory>,
+# not a bare `go run <path>` - a bare invocation lets go.mod discovery walk up
+# from the CALLER's cwd rather than the skill's own directory, so a skill's
+# go.mod is silently missed unless the caller happens to already be inside it.
+{
+    my @seen_argv;
+    local $Developer::Dashboard::Platform::EXEC_LAUNCHER = sub { @seen_argv = @_; return 1 };
+    my $go_path = File::Spec->catfile( $work, 'skill', 'cli', 'foo.go' );
+    eval { Developer::Dashboard::Platform::_exec_go_source($go_path); 1 };
+    is_deeply(
+        \@seen_argv,
+        [ 'go', 'run', '-C', File::Spec->catdir( $work, 'skill', 'cli' ), $go_path ],
+        '_exec_go_source passes -C <source dir> so go.mod discovery starts at the skill layer, not the caller cwd'
+    );
+}
+
 # ---------------------------------------------------------------------------
 # _java_main_class : line 361 + 363
 # ---------------------------------------------------------------------------
@@ -427,6 +497,208 @@ is(
     $? = 12 << 8;                                                                       ## no critic (Variables::RequireLocalizedPunctuationVars)
     eval { Developer::Dashboard::Platform::_exec_java_source($hello); 1 };
     is( $? >> 8, 12, '_exec_java_source does not leak javac\'s exit status into the caller global $? on the die path' );
+}
+
+# ---------------------------------------------------------------------------
+# DD-823: _find_layer_pom + _exec_java_source_via_mvn - per-skill-layer
+# config/pom.xml dependency resolution, falling back to plain javac when no
+# layer in the file's ancestry has one.
+# ---------------------------------------------------------------------------
+{
+    ok( !defined Developer::Dashboard::Platform::_find_layer_pom( File::Spec->catfile( $work, 'nolayer', 'cli', 'Foo.java' ) ),
+        '_find_layer_pom returns undef when no ancestor layer has a config/pom.xml' );
+}
+{
+    my $skill = File::Spec->catdir( $work, 'skill' );
+    my $cli   = File::Spec->catdir( $skill, 'cli' );
+    my $config = File::Spec->catdir( $skill, 'config' );
+    mkdir $skill; mkdir $cli; mkdir $config;
+    my $pom = write_file( File::Spec->catfile( $config, 'pom.xml' ), "<project/>\n" );
+    my $foo = write_file( File::Spec->catfile( $cli, 'Foo.java' ), "package demo;\npublic class Foo { public static void main(String[] a) {} }\n" );
+
+    is( Developer::Dashboard::Platform::_find_layer_pom($foo), $pom, '_find_layer_pom finds the layer pom.xml walking up from the source file' );
+
+    # AC-2: a file with no config/pom.xml anywhere in its ancestry still
+    # takes the plain-javac path, unchanged.
+    is( Developer::Dashboard::Platform::_find_layer_pom($hello), undef, '_find_layer_pom returns undef for a file whose ancestry has no pom.xml' );
+
+    # AC-1: when a layer pom.xml exists, _exec_java_source dispatches to mvn
+    # instead of javac, and passes the resolved classpath (layer's own
+    # target/classes plus mvn's dependency:build-classpath output) to java.
+    my @mvn_calls;
+    my $cp_written;
+    local $Developer::Dashboard::Platform::SYSTEM_LAUNCHER = sub {
+        push @mvn_calls, [@_];
+        if ( $_[0] eq 'mvn' && grep { $_ eq 'dependency:build-classpath' } @_ ) {
+            my ($outfile) = grep { /^-Dmdep\.outputFile=/ } @_;
+            $outfile =~ s/^-Dmdep\.outputFile=//;
+            open my $fh, '>', $outfile or die $!;
+            print {$fh} "/fake/dep1.jar:/fake/dep2.jar";
+            close $fh;
+            $cp_written = 1;
+        }
+        $? = 0;    ## no critic (Variables::RequireLocalizedPunctuationVars)
+        return 1;
+    };
+    my @java_exec;
+    local $Developer::Dashboard::Platform::EXEC_LAUNCHER = sub { @java_exec = @_; return 1 };
+
+    my $ret = eval { Developer::Dashboard::Platform::_exec_java_source( $foo, 'alpha' ); 1 };
+    ok( $ret, '_exec_java_source with a layer pom.xml dispatches to mvn instead of javac' );
+    is( scalar(@mvn_calls), 2, 'mvn was invoked exactly twice - compile then dependency:build-classpath' );
+    is_deeply( $mvn_calls[0], [ 'mvn', '-f', $pom, '-q', 'compile' ], 'first mvn call compiles the layer module' );
+    ok( $cp_written, 'the dependency:build-classpath mvn call resolved a classpath file' );
+    is( $java_exec[0], 'java', 'java is invoked to run the resolved main class' );
+    is( $java_exec[1], '-cp', 'the -cp flag is passed' );
+    like( $java_exec[2], qr{\Q/target/classes\E:/fake/dep1\.jar:/fake/dep2\.jar\z}, 'classpath includes the layer target/classes plus mvn-resolved dependencies' );
+    is( $java_exec[3], 'demo.Foo', 'the resolved fully-qualified class is execed' );
+    is( $java_exec[4], 'alpha', 'passthrough argv reaches java' );
+
+    # AC-3: a second, independent skill layer with its own pom.xml resolves
+    # against its own layer root, with no interference between the two.
+    my $skill2 = File::Spec->catdir( $work, 'skill2' );
+    my $cli2   = File::Spec->catdir( $skill2, 'cli' );
+    my $config2 = File::Spec->catdir( $skill2, 'config' );
+    mkdir $skill2; mkdir $cli2; mkdir $config2;
+    my $pom2 = write_file( File::Spec->catfile( $config2, 'pom.xml' ), "<project/>\n" );
+    my $bar = write_file( File::Spec->catfile( $cli2, 'Bar.java' ), "package other;\npublic class Bar { public static void main(String[] a) {} }\n" );
+    is( Developer::Dashboard::Platform::_find_layer_pom($bar), $pom2, 'a second skill layer resolves its OWN pom.xml, independent of the first' );
+
+    # mvn compile failure surfaces.
+    local $Developer::Dashboard::Platform::SYSTEM_LAUNCHER = sub { $? = 3 << 8; return 1 };    ## no critic (Variables::RequireLocalizedPunctuationVars)
+    my $failed = eval { Developer::Dashboard::Platform::_exec_java_source($foo); 1 };
+    ok( !$failed, '_exec_java_source dies when mvn compile fails' );
+    like( $@, qr/mvn compile failed/, 'mvn compile failure surfaced' );
+}
+
+# DD-823: the remaining branches of _exec_java_source_via_mvn - the
+# dependency:build-classpath mvn call failing, the classpath file being
+# unreadable, an empty resolved classpath (ternary's other side), and the
+# final java exec failing.
+{
+    my $skill = File::Spec->catdir( $work, 'skill3' );
+    my $cli   = File::Spec->catdir( $skill, 'cli' );
+    my $config = File::Spec->catdir( $skill, 'config' );
+    mkdir $skill; mkdir $cli; mkdir $config;
+    my $pom = write_file( File::Spec->catfile( $config, 'pom.xml' ), "<project/>\n" );
+    my $baz = write_file( File::Spec->catfile( $cli, 'Baz.java' ), "package demo3;\npublic class Baz { public static void main(String[] a) {} }\n" );
+
+    # dependency:build-classpath mvn call fails.
+    {
+        local $Developer::Dashboard::Platform::SYSTEM_LAUNCHER = sub {
+            $? = ( $_[0] eq 'mvn' && grep { $_ eq 'dependency:build-classpath' } @_ ) ? ( 5 << 8 ) : 0;    ## no critic (Variables::RequireLocalizedPunctuationVars)
+            return 1;
+        };
+        my $ok = eval { Developer::Dashboard::Platform::_exec_java_source($baz); 1 };
+        ok( !$ok, '_exec_java_source dies when mvn dependency:build-classpath fails' );
+        like( $@, qr/mvn dependency:build-classpath failed/, 'dependency:build-classpath failure surfaced' );
+    }
+
+    # the resolved classpath file is unreadable (mvn "succeeds" but never
+    # writes the file the caller was told to expect).
+    {
+        local $Developer::Dashboard::Platform::SYSTEM_LAUNCHER = sub { $? = 0; return 1 };    ## no critic (Variables::RequireLocalizedPunctuationVars)
+        my $ok = eval { Developer::Dashboard::Platform::_exec_java_source($baz); 1 };
+        ok( !$ok, '_exec_java_source dies when the resolved classpath file cannot be read' );
+        like( $@, qr/Unable to read resolved classpath/, 'unreadable classpath file surfaced' );
+    }
+
+    # an EMPTY resolved classpath (mvn writes nothing to declare) exercises
+    # the ternary's other side: classpath is just the layer's target/classes,
+    # with no ":dependency" suffix.
+    {
+        local $Developer::Dashboard::Platform::SYSTEM_LAUNCHER = sub {
+            if ( $_[0] eq 'mvn' && grep { $_ eq 'dependency:build-classpath' } @_ ) {
+                my ($outfile) = grep { /^-Dmdep\.outputFile=/ } @_;
+                $outfile =~ s/^-Dmdep\.outputFile=//;
+                open my $fh, '>', $outfile or die $!;
+                close $fh;
+            }
+            $? = 0;    ## no critic (Variables::RequireLocalizedPunctuationVars)
+            return 1;
+        };
+        my @java_exec;
+        local $Developer::Dashboard::Platform::EXEC_LAUNCHER = sub { @java_exec = @_; return 1 };
+        my $ok = eval { Developer::Dashboard::Platform::_exec_java_source($baz); 1 };
+        ok( $ok, '_exec_java_source succeeds with an empty resolved classpath' );
+        like( $java_exec[2], qr{\Q/target/classes\E\z}, 'an empty dependency classpath leaves just the layer target/classes, no trailing colon-suffix' );
+    }
+
+    # the final java exec fails.
+    {
+        local $Developer::Dashboard::Platform::SYSTEM_LAUNCHER = sub {
+            if ( $_[0] eq 'mvn' && grep { $_ eq 'dependency:build-classpath' } @_ ) {
+                my ($outfile) = grep { /^-Dmdep\.outputFile=/ } @_;
+                $outfile =~ s/^-Dmdep\.outputFile=//;
+                open my $fh, '>', $outfile or die $!;
+                print {$fh} '/fake/dep.jar';
+                close $fh;
+            }
+            $? = 0;    ## no critic (Variables::RequireLocalizedPunctuationVars)
+            return 1;
+        };
+        local $Developer::Dashboard::Platform::EXEC_LAUNCHER = sub { return 0 };
+        my $ok = eval { Developer::Dashboard::Platform::_exec_java_source($baz); 1 };
+        ok( !$ok, '_exec_java_source dies when the java launcher fails (mvn path)' );
+        like( $@, qr/Unable to exec java/, 'java exec failure surfaced (mvn path)' );
+    }
+}
+
+# ---------------------------------------------------------------------------
+# DD-824: _find_layer_venv_python + command_argv_for_path's .py dispatch -
+# per-skill-layer local/venv python resolution, falling back to the global
+# python when no layer in the file's ancestry has one.
+# ---------------------------------------------------------------------------
+{
+    ok( !defined Developer::Dashboard::Platform::_find_layer_venv_python( File::Spec->catfile( $work, 'nolayer', 'cli', 'foo.py' ) ),
+        '_find_layer_venv_python returns undef when no ancestor layer has a local/venv' );
+}
+{
+    my $skill = File::Spec->catdir( $work, 'pyskill' );
+    my $cli   = File::Spec->catdir( $skill, 'cli' );
+    my $venv_bin = File::Spec->catdir( $skill, 'local', 'venv', 'bin' );
+    mkdir $skill; mkdir $cli;
+    make_path($venv_bin) if !-d $venv_bin;
+    my $venv_python = write_file( File::Spec->catfile( $venv_bin, 'python' ), "#!/bin/sh\n" );
+    chmod 0755, $venv_python;
+    my $foo = write_file( File::Spec->catfile( $cli, 'foo.py' ), "print('hi')\n" );
+
+    is( Developer::Dashboard::Platform::_find_layer_venv_python($foo), $venv_python,
+        '_find_layer_venv_python finds the layer local/venv/bin/python walking up from the source file' );
+
+    # AC-2: a .py file with no local/venv anywhere in its ancestry still
+    # resolves through the global python, unchanged.
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Platform::command_in_path = sub { return '/usr/local/bin/python' };
+        my $hello = write_file( File::Spec->catfile( $work, 'hello.py' ), "print('hi')\n" );
+        is_deeply(
+            [ command_argv_for_path($hello) ],
+            [ '/usr/local/bin/python', $hello ],
+            'command_argv_for_path falls back to the global python when no layer venv exists (AC-2)'
+        );
+    }
+
+    # AC-1: a .py file whose layer DOES have a local/venv resolves through
+    # that venv's own python interpreter, not the global one.
+    is_deeply(
+        [ command_argv_for_path($foo) ],
+        [ $venv_python, $foo ],
+        "command_argv_for_path resolves through the layer's own venv python when one exists (AC-1)"
+    );
+
+    # AC-3: a second, independent skill layer with its own venv resolves
+    # against its own venv, with no interference between the two.
+    my $skill2 = File::Spec->catdir( $work, 'pyskill2' );
+    my $cli2   = File::Spec->catdir( $skill2, 'cli' );
+    my $venv_bin2 = File::Spec->catdir( $skill2, 'local', 'venv', 'bin' );
+    mkdir $skill2; mkdir $cli2;
+    make_path($venv_bin2) if !-d $venv_bin2;
+    my $venv_python2 = write_file( File::Spec->catfile( $venv_bin2, 'python' ), "#!/bin/sh\n" );
+    chmod 0755, $venv_python2;
+    my $bar = write_file( File::Spec->catfile( $cli2, 'bar.py' ), "print('hi')\n" );
+    is( Developer::Dashboard::Platform::_find_layer_venv_python($bar), $venv_python2,
+        "a second skill layer resolves its OWN local/venv, independent of the first (AC-3)" );
 }
 
 # ---------------------------------------------------------------------------

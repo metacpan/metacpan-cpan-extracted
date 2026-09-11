@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
   Test::NoWarnings: '0'
+  Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.52'
   File::ShareDir::Install: '0'
@@ -33,5 +34,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/joubu/koha-qa/-/issues
   repository: https://gitlab.com/joubu/koha-qa.git
-version: v0.1.0
+version: v0.1.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

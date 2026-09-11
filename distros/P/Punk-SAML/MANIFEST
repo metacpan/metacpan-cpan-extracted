@@ -3,6 +3,15 @@ MANIFEST
 Makefile.PL
 PSAML.xs
 README
+example/IdP/.gitignore
+example/IdP/README.md
+example/IdP/app.psgi
+example/IdP/config/punk.yml
+example/IdP/lib/SSODemoIdP.pm
+example/IdP/root/static/style.css
+example/IdP/root/templates/layout.tmpl
+example/IdP/t/01-basic.t
+example/SSO/.gitignore
 example/SSO/README.md
 example/SSO/app.psgi
 example/SSO/config/punk.yml
@@ -14,7 +23,13 @@ example/SSO/root/templates/failed.tmpl
 example/SSO/root/templates/layout.tmpl
 example/SSO/root/templates/me.tmpl
 example/SSO/root/templates/welcome.tmpl
+example/SSO/server.pl
 example/SSO/t/01-basic.t
+example/certs/idp-cert.pem
+example/certs/idp-key.pem
+example/certs/sp-tls-cert.pem
+example/certs/sp-tls-key.pem
+example/run.pl
 ignore.txt
 include/psaml/psaml_abi.h
 include/psaml/psaml_b64.h
@@ -68,5 +83,8 @@ xs/request.xs
 xs/response.xs
 xs/util.xs
 xt/boilerplate.t
+xt/interop.t
+xt/interop/docker-compose.yml
+xt/interop/realm.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

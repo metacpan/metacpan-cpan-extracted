@@ -66,7 +66,9 @@ sub BUILD_api_specs {    # load specs
     my $pkg =
       'OpenStack::MetaAPI::API::Specs::' . ucfirst($self->name) . '::' . $v;
 
-    my $load = eval qq{ require $pkg; 1 };
+    (my $file = $pkg) =~ s{::}{/}g;
+    $file .= '.pm';
+    my $load = eval { require $file; 1 };
     if ($load) {
         return $pkg->new();
     }
@@ -84,7 +86,7 @@ sub root_uri {
     return $uri if $uri =~ m{^v};    # already contains a version
 
     # endpoint already contains a version
-    return if $self->endpoint && $self->endpoint =~ m{:[\d]/v}a;
+    return $uri if $self->endpoint && $self->endpoint =~ m{/v\d}a;
 
     # append our prefix to the endpoint
     if ($self->version_prefix) {
@@ -100,9 +102,9 @@ sub root_uri {
 sub setup_method {
     my ($self, $name, $sub) = @_;
 
-    die                unless ref $self;
-    die "missing name" unless $name;
-    die                unless ref $sub eq 'CODE';
+    die "setup_method must be called as an instance method" unless ref $self;
+    die "setup_method: method name is required"            unless $name;
+    die "setup_method: second argument must be a CODE ref" unless ref $sub eq 'CODE';
 
     my $methods = $self->methods();
     die "Method '$name' already exists" if defined $methods->{$name};
@@ -142,7 +144,7 @@ OpenStack::MetaAPI::API::Service
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

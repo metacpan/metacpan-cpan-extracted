@@ -1,0 +1,32 @@
+---
+abstract: 'Play a game of Battleship through a GUI'
+author:
+  - 'Matt Johnson <mjohnson@affectivesilicon.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0.000155'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Games-GUI-Battleship
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cairo: '1.109'
+  Logic::Relational: '0.01'
+  Prima: '1.74'
+  Prima::Cairo: '1.08'
+  perl: '5.038000'
+resources:
+  bugtracker: https://github.com/mjohnson108/p5-Games-GUI-Battleship/issues
+  homepage: https://github.com/mjohnson108/
+  repository: https://github.com/mjohnson108/p5-Games-GUI-Battleship.git
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

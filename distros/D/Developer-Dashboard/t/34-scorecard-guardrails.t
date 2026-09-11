@@ -261,7 +261,10 @@ my $fuzz_workflow = _slurp('.github/workflows/fuzz-js.yml');
 like( $fuzz_workflow, qr/fast-check/, 'fuzz workflow runs the fast-check property-based suite' );
 like( $fuzz_workflow, qr/uses:\s*actions\/setup-node\@[0-9a-f]{40}/, 'setup-node action is pinned by full SHA in the fuzz workflow' );
 like( $fuzz_workflow, qr/uses:\s*shogo82148\/actions-setup-perl\@[0-9a-f]{40}/, 'fuzz workflow installs Perl before invoking dashboard commands' );
-like( $fuzz_workflow, qr/cpanm\s+--installdeps\s+--notest\s+\./, 'fuzz workflow installs the repo Perl runtime prerequisites' );
+like( $fuzz_workflow, qr/cpanm\s+--installdeps\s+--notest\s+-L\s+local\s+\./,
+    'fuzz workflow installs the repo Perl runtime prerequisites into a contained root (DD-794)' );
+like( $fuzz_workflow, qr/PERL5LIB:.*local\/lib\/perl5/,
+    'fuzz workflow exports PERL5LIB covering the contained install so the spawned perl can resolve it (DD-794)' );
 
 my $clusterfuzz = _slurp('.clusterfuzzlite/Dockerfile');
 like( $clusterfuzz, qr/\AFROM\s+ubuntu:24\.04\@sha256:/, 'ClusterFuzzLite Dockerfile pins its base image by digest' );

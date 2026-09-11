@@ -13,28 +13,35 @@ use File::Temp qw(tempdir);
 use File::Spec;
 
 use_ok('AmberDB')               or BAIL_OUT('Cannot load AmberDB');
-use_ok('AmberDB::Index')         or BAIL_OUT('Cannot load AmberDB::Index');
-use_ok('AmberDB::Index::Facet')  or BAIL_OUT('Cannot load AmberDB::Index::Facet');
-use_ok('AmberDB::Tools')         or BAIL_OUT('Cannot load AmberDB::Tools');
+use_ok('AmberDB::Base::Index')        or BAIL_OUT('Cannot load AmberDB::Base::Index');
+use_ok('AmberDB::Base::Facet')        or BAIL_OUT('Cannot load AmberDB::Base::Facet');
+use_ok('AmberDB::Tools')              or BAIL_OUT('Cannot load AmberDB::Tools');
 
 subtest 'Index Methods Existence' => sub {
-    plan tests => 12;
-    can_ok( 'AmberDB::Index',        'field_to_list' );
-    can_ok( 'AmberDB::Index',        'rdbm_target' );
-    can_ok( 'AmberDB::Index',        'repeat_fields' );
-    can_ok( 'AmberDB::Index::Facet', 'facet_rules' );
-    can_ok( 'AmberDB::Index::Facet', 'facet_add' );
-    can_ok( 'AmberDB::Index::Facet', 'facet_modify' );
-    can_ok( 'AmberDB::Index::Facet', 'facet_del' );
-    can_ok( 'AmberDB::Index',        'match_add' );
-    can_ok( 'AmberDB::Index',        'search_add' );
-    can_ok( 'AmberDB::Index',        'records_add' );
-    can_ok( 'AmberDB::Index',        'set_slug' );
-    can_ok( 'AmberDB::Index',        'get_slug' );
+    plan tests => 17;
+    can_ok( 'AmberDB::Base::Index', 'get_fieldlist' );
+    can_ok( 'AmberDB::Base::Index', 'set_fieldlist' );
+    can_ok( 'AmberDB::Base::Index', 'field_to_list' );
+    can_ok( 'AmberDB::Base::Index', 'rdbm_target' );
+    can_ok( 'AmberDB::Base::Index', 'repeat_fields' );
+    can_ok( 'AmberDB::Base::Facet', 'facet_rules' );
+    can_ok( 'AmberDB::Base::Facet', 'facet_add' );
+    can_ok( 'AmberDB::Base::Facet', 'facet_modify' );
+    can_ok( 'AmberDB::Base::Facet', 'facet_del' );
+    can_ok( 'AmberDB::Base::Index', 'match_add' );
+    can_ok( 'AmberDB::Base::Index', 'search_add' );
+    can_ok( 'AmberDB::Base::Index', 'records_add' );
+    can_ok( 'AmberDB::Base::Index', 'slug_add' );
+    can_ok( 'AmberDB::Base::Index', 'slug_del' );
+    can_ok( 'AmberDB::Base::Index', 'slug_modify' );
+    can_ok( 'AmberDB::Base::Index', 'set_slug' );
+    can_ok( 'AmberDB::Base::Index', 'get_slug' );
 };
 
 subtest 'AmberDB Inheritance of Index Methods' => sub {
-    plan tests => 12;
+    plan tests => 17;
+    can_ok( 'AmberDB', 'get_fieldlist' );
+    can_ok( 'AmberDB', 'set_fieldlist' );
     can_ok( 'AmberDB', 'field_to_list' );
     can_ok( 'AmberDB', 'rdbm_target' );
     can_ok( 'AmberDB', 'repeat_fields' );
@@ -45,6 +52,9 @@ subtest 'AmberDB Inheritance of Index Methods' => sub {
     can_ok( 'AmberDB', 'match_add' );
     can_ok( 'AmberDB', 'search_add' );
     can_ok( 'AmberDB', 'records_add' );
+    can_ok( 'AmberDB', 'slug_add' );
+    can_ok( 'AmberDB', 'slug_del' );
+    can_ok( 'AmberDB', 'slug_modify' );
     can_ok( 'AmberDB', 'set_slug' );
     can_ok( 'AmberDB', 'get_slug' );
 };
@@ -155,7 +165,7 @@ subtest 'index_get binary -> bin_decode pipeline' => sub {
     $adb->index_put( $inx_path, 'keys', \@ids );
     $adb->table_close($inx_path);
 
-    my ( $total_pipe, @decoded ) = $adb->index_get( $inx_path, 'keys' );
+    my ( $total_pipe, @decoded ) = $adb->index_get( $inx_path, 'keys', 0, 0, 'asc' );
     is( $total_pipe, 5,              'keys total = 5' );
     is_deeply( \@decoded, \@ids,     'index_get IDs match original' );
 
@@ -173,7 +183,7 @@ subtest 'insert_id -> .inx -> read_all integration' => sub {
     plan tests => 11;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
-    my $conf_dir   = File::Spec->catdir( $temp_dir, 'conf' );
+    my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
     my $schema_dir = File::Spec->catdir( $temp_dir, 'schema' );
     mkdir $conf_dir;
     mkdir $schema_dir;
@@ -206,7 +216,7 @@ SCHEMA
 
     ok( -e $inx_path, '.inx file created after inserts' );
 
-    my ( $cnt_all, @allkeys ) = $adb->index_get( $inx_path, 'keys' );
+    my ( $cnt_all, @allkeys ) = $adb->index_get( $inx_path, 'keys', 0, 0, 'asc' );
     my ($count)  = $adb->index_get( $inx_path, 'count' );
     my ($lastid) = $adb->index_get( $inx_path, 'lastid' );
     ok( defined $cnt_all, 'keys present in .inx' );
@@ -220,7 +230,7 @@ SCHEMA
     my @all_recs = $adb->read_all('items');
     is( scalar @all_recs, 5, 'read_all returns 5 records (no limit)' );
 
-    my ( $cnt, @page ) = $adb->read_all( 'items', 0, 3 );
+    my ( $cnt, @page ) = $adb->read_all( 'items', 0, 3, dir => 'asc' );
     is( $cnt, 5,             'read_all total count = 5' );
     is( scalar @page, 3,    'read_all limit=3 returns 3 records' );
     my @page_ids = map { $_->[0] } @page;
@@ -234,7 +244,7 @@ subtest 'set_readall rebuild -> read_all' => sub {
     plan tests => 6;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
-    my $conf_dir   = File::Spec->catdir( $temp_dir, 'conf' );
+    my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
     my $schema_dir = File::Spec->catdir( $temp_dir, 'schema' );
     mkdir $conf_dir;
     mkdir $schema_dir;
@@ -287,7 +297,7 @@ subtest 'delete_id -> .inx -> read_all reflects deletion' => sub {
     plan tests => 5;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
-    my $conf_dir   = File::Spec->catdir( $temp_dir, 'conf' );
+    my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
     my $schema_dir = File::Spec->catdir( $temp_dir, 'schema' );
     mkdir $conf_dir;
     mkdir $schema_dir;
@@ -318,13 +328,13 @@ SCHEMA
 
     $adb->delete_id( 'nodes', 2 );
 
-    my @after = $adb->read_all('nodes');
+    my @after = $adb->read_all('nodes', dir => 'asc');
     is( scalar @after, 2, 'read_all = 2 after delete' );
 
     my @after_ids = map { $_->[0] } @after;
     ok( !( grep { $_ == 2 } @after_ids ), 'deleted ID 2 not in results' );
 
-    my ( $cnt ) = $adb->read_all( 'nodes', 0, 5 );
+    my ( $cnt ) = $adb->read_all( 'nodes', 0, 5, dir => 'asc' );
     is( $cnt, 2, 'total count = 2 after delete' );
     is_deeply( \@after_ids, [1, 3], 'remaining IDs = [1, 3]' );
 };
@@ -356,6 +366,61 @@ subtest 'rdbm_target schema parsing' => sub {
 
     my ( $non_rdbm ) = $adb->rdbm_target( $table_info, 1 );
     ok( !$non_rdbm, 'Block 1 non-RDBM returns falsy' );
+};
+
+subtest 'table_info schema normalization pipeline (RDBM splitters)' => sub {
+    plan tests => 13;
+    my $adb = AmberDB->new();
+
+    $adb->table_attr(
+        'test_rdbm_norm',
+        blocks => [
+            { id => 'id' },
+            { id => 'cat_comma',     rdbm => 'catalog_category,2' },
+            { id => 'cat_semi',      rdbm => 'catalog_category;3' },
+            { id => 'cat_pipe',      rdbm => 'catalog_category|4' },
+            { id => 'cat_colon',     rdbm => 'catalog_category:5' },
+            { id => 'cat_spaces',    rdbm => 'catalog_category | 6 ' },
+            { id => 'cat_no_disp',   rdbm => 'catalog_category' },
+            { id => 'cat_hash',      rdbm => { table => 'catalog_category', display => 8 } },
+        ]
+    );
+
+    my $info = $adb->table_info('test_rdbm_norm');
+
+    # Check comma
+    is_deeply( $info->{blocks}->[1]->{rdbm}, { table => 'catalog_category', display => 2 }, 'comma separator normalized' );
+
+    # Check semicolon
+    is_deeply( $info->{blocks}->[2]->{rdbm}, { table => 'catalog_category', display => 3 }, 'semicolon separator normalized' );
+
+    # Check pipe
+    is_deeply( $info->{blocks}->[3]->{rdbm}, { table => 'catalog_category', display => 4 }, 'pipe separator normalized' );
+
+    # Check colon
+    is_deeply( $info->{blocks}->[4]->{rdbm}, { table => 'catalog_category', display => 5 }, 'colon separator normalized' );
+
+    # Check whitespace trimmed
+    is_deeply( $info->{blocks}->[5]->{rdbm}, { table => 'catalog_category', display => 6 }, 'spaces around separator trimmed' );
+
+    # Check default display
+    is_deeply( $info->{blocks}->[6]->{rdbm}, { table => 'catalog_category', display => 1 }, 'default display is 1 when omitted' );
+
+    # Check hashref preserved
+    is_deeply( $info->{blocks}->[7]->{rdbm}, { table => 'catalog_category', display => 8 }, 'hashref preserved' );
+
+    # Check rdbm_target resolution on normalized blocks
+    my ($t1, $b1) = $adb->rdbm_target($info, 1);
+    is( $t1, 'catalog_category', 'rdbm_target resolves table for comma' );
+    is( $b1, 2, 'rdbm_target resolves display for comma' );
+
+    my ($t3, $b3) = $adb->rdbm_target($info, 3);
+    is( $t3, 'catalog_category', 'rdbm_target resolves table for pipe' );
+    is( $b3, 4, 'rdbm_target resolves display for pipe' );
+
+    my ($t5, $b5) = $adb->rdbm_target($info, 5);
+    is( $t5, 'catalog_category', 'rdbm_target resolves table for trimmed pipe' );
+    is( $b5, 6, 'rdbm_target resolves display for trimmed pipe' );
 };
 
 done_testing();

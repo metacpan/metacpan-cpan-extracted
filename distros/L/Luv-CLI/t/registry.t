@@ -55,4 +55,11 @@ subtest 'search matches name and description' => sub {
     is scalar(@by_desc), 1, 'search by description finds one match';
 };
 
+subtest 'all_entries returns everything' => sub {
+    my $r = Luv::CLI::Registry->new( cache_path => $cache_path );
+    $r->parse_readme($sample_readme);
+    my @all = $r->all_entries;
+    is scalar(@all), 3, 'all three sample entries returned';
+};
+
 done_testing;

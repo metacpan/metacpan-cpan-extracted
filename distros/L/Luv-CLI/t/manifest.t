@@ -59,4 +59,13 @@ subtest 'add/remove dependency' => sub {
     like $@, qr/No such dependency/, 'removing missing dep dies';
 };
 
+subtest 'clear_dependencies' => sub {
+    my $m = Luv::CLI::Manifest->new( path => $path, project_name => 'clear' );
+    $m->add_dependency( 'a', url => 'https://example.com/a' );
+    $m->add_dependency( 'b', url => 'https://example.com/b' );
+    $m->clear_dependencies;
+    ok !$m->has_dependency('a'), 'a cleared';
+    ok !$m->has_dependency('b'), 'b cleared';
+};
+
 done_testing;

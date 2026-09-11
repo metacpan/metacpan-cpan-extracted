@@ -1,13 +1,29 @@
-package Test::Pod::Links;
+# vim: ts=4 sts=4 sw=4 et: syntax=perl
+#
+# Copyright (c) 2018-2026 Sven Kirmess
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+package Test::Pod::Links;
 
-use Carp ();
-use HTTP::Tiny 0.014 ();
+our $VERSION = '0.004';
+
+use Carp                    ();
+use HTTP::Tiny 0.014        ();
 use Pod::Simple::Search     ();
 use Pod::Simple::SimpleTree ();
 use Scalar::Util            ();
@@ -24,7 +40,7 @@ my $TEST = Test::Builder->new();
 #   Test::Builder::Tester because TBT cannot test them.
 
 sub all_pod_files_ok {
-    my $self = shift;
+    my ($self) = @_;
 
     my @files = Test::XTFiles->new->all_files();
     if ( !@files ) {
@@ -144,7 +160,6 @@ sub pod_file_ok {
     }
 
     my $rc = 1;
-    my $ua = $self->_ua;
     my %url_checked_in_this_file;
 
   LINK:
@@ -153,7 +168,7 @@ sub pod_file_ok {
         $url_checked_in_this_file{$link} = 1;
 
         if ( !exists $self->{_cache}->{$link} ) {
-            $self->{_cache}->{$link} = $ua->head($link);
+            $self->{_cache}->{$link} = $self->_check_url($link);
         }
         my $res = $self->{_cache}->{$link};
 
@@ -169,6 +184,31 @@ sub pod_file_ok {
 
     return 1 if $rc;
     return;
+}
+
+# Some web servers do not answer HEAD requests, e.g. news.ycombinator.com
+# replies with a '405 Not Allowed', but serve the very same URL without a
+# complaint on a GET request. Retry such a link with GET before we report it
+# as broken.
+#
+# HTTP::Tiny uses the status 599 to signal an internal error, e.g. a failed
+# connection or a timeout. In that case we never received a response from a
+# server and a GET request would only run into the same error again, which is
+# why we don't retry these.
+#
+# The response of the last request we made is the one we report, because that
+# is the one that describes why we consider the link broken.
+sub _check_url {
+    my ( $self, $url ) = @_;
+
+    my $ua  = $self->_ua;
+    my $res = $ua->head($url);
+
+    return $res if $res->{success};
+    return $res if defined $res->{status} && $res->{status} == 599;
+    return $res if !$ua->can('get');
+
+    return $ua->get($url);
 }
 
 sub _extract_links_from_pod {
@@ -230,7 +270,7 @@ Test::Pod::Links - test Pod for invalid HTTP/S links
 
 =head1 VERSION
 
-Version 0.003
+Version 0.004
 
 =head1 SYNOPSIS
 
@@ -241,6 +281,13 @@ Version 0.003
 
 Tests that all HTTP/S links from Pod documentation are reachable by calling
 the C<head> method of L<HTTP::Tiny> on them.
+
+Some web servers do not answer C<HEAD> requests but serve the same URL
+without a complaint on a C<GET> request. If the C<HEAD> request returns a
+response from the server that indicates an error, the link is retried with
+the C<get> method before it is reported as broken. A request that did not
+reach a server at all, e.g. one that ran into a connection timeout, is not
+retried.
 
 All non HTTP/S links are ignored. You can check them with
 L<Test::Pod::LinkCheck>.
@@ -273,6 +320,13 @@ This can be used to exclude URLs that are known to not work like
 C<http://www.example.com/>. (But if a link doesn't work it most likely
 shouldn't be in an C<L> tag anyway.)
 
+It is also the way to deal with a link that is correct, and works in a
+browser, but cannot be verified by this test. Some sites answer every
+request that does not come from a browser with an error, e.g. a
+'403 Forbidden', regardless of the user agent that is used. Such a link can
+never be verified and has to be excluded. Use C<ignore_match> to exclude a
+whole site instead of a single URL.
+
 =head3 ignore_match (optional)
 
 The C<ignore_match> argument is either a regex or an array ref of regexes.
@@ -283,6 +337,10 @@ URLs that match one of these regexes are not checked.
 The C<ua> argument is used to supply your own, L<HTTP::Tiny> compatible,
 user agent. Use this if you need a special configured L<HTTP::Tiny> user
 agent.
+
+The user agent must implement the C<head> method. A user agent that also
+implements the C<get> method is additionally used to retry links whose
+C<HEAD> request failed.
 
 =head2 pod_file_ok( FILENAME )
 
@@ -300,12 +358,12 @@ Calls the C<all_files> method of L<Test::XTFiles> to get all the files to
 be tested. Then, C<contains_pod> from L<Pod::Simple::Search> is used to
 identify files that contain Pod.
 
-All files that contain Pod will be checked  by calling C<pod_file_ok>.
+All files that contain Pod will be checked by calling C<pod_file_ok>.
 
 It calls C<done_testing> or C<skip_all> so you can't have already called
 C<plan>.
 
-<all_pod_files_ok> returns something I<true> if all web links are reachable
+C<all_pod_files_ok> returns something I<true> if all web links are reachable
 and I<false> otherwise.
 
 Please see L<XT::Files> for how to configure the files to be checked.
@@ -316,10 +374,9 @@ L<XT::Files>.
 
 =head1 EXAMPLES
 
-=head2 Example 1 Default Usage
+=head2 Example 1 Default usage
 
-Check the web links in all files in the F<bin>, F<script> and F<lib>
-directory.
+Check the web links in all files returned by L<XT::Files>.
 
     use 5.006;
     use strict;
@@ -500,14 +557,4 @@ L<https://github.com/skirmess/Test-Pod-Links>
 
 Sven Kirmess <sven.kirmess@kzone.ch>
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018-2019 by Sven Kirmess.
-
-This is free software, licensed under:
-
-  The (two-clause) FreeBSD License
-
 =cut
-
-# vim: ts=4 sts=4 sw=4 et: syntax=perl

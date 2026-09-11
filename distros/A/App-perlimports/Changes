@@ -1,5 +1,34 @@
 Revision history for App-perlimports
 
+0.000065  2026-09-10 14:43:00Z
+    - Preserve `require Module;` statements by default rather than rewriting
+      them to `use Module ();`. The two are not equivalent (`require` loads at
+      runtime, `use` at compile time) and a `require` is frequently
+      deliberate. Disable the new `preserve_require` option
+      (`--no-preserve-require`) to restore the previous translate-to-`use`
+      behaviour (GH#76) (Olaf Alders)
+    - Handle `Env` instead of ignoring it: prune unused variables from a
+      `use Env qw( ... )` statement and keep the ones which are actually used
+      (including interpolated and bareword-scalar forms), rather than leaving
+      every `use Env` untouched. A bare `use Env;` is still left alone
+      (GH#23) (Olaf Alders)
+    - Preserve an explicitly-imported typeglob slot (e.g.
+      `use English qw( $PROGRAM_NAME )`) instead of normalizing it to the
+      `*PROGRAM_NAME` typeglob form (GH#97) (Olaf Alders)
+    - Recognize indirect object syntax (e.g. `new File $path`) as a use of
+      the named module, so a module used only that way is no longer reported
+      as unused and removed (GH#99) (Olaf Alders)
+    - Preserve comments embedded in `use` statements (e.g. a `## no critic`
+      annotation between the module name and the import list), which were
+      previously dropped when the statement was rebuilt (GH#50) (Olaf Alders)
+    - Ignore `use Test::NoWarnings` by default. It exists purely for its
+      side-effecting END block and was previously stripped entirely;
+      loading it also registered a stray test on the Test::Builder
+      singleton (GH#44) (Olaf Alders)
+    - Ignore `use local::lib` by default. It manipulates @INC as a side
+      effect and exports nothing worth managing, but was previously stripped
+      entirely (GH#117) (Olaf Alders)
+
 0.000064  2026-09-09 14:10:05Z
     - Write the "<file> OK" --lint success summary to STDOUT instead of
       STDERR, so a clean run leaves STDERR empty, and add a --quiet/-q flag

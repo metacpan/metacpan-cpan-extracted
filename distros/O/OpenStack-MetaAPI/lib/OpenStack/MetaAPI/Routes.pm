@@ -6,7 +6,6 @@ use warnings;
 use Moo;
 
 use OpenStack::MetaAPI::API ();
-use YAML::XS;
 
 use OpenStack::MetaAPI::Helpers::DataAsYaml;
 
@@ -89,7 +88,7 @@ OpenStack::MetaAPI::Routes
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 
@@ -138,5 +137,33 @@ image_from_uid:
   service: images
 image_from_name:
   service: images
+list_images:
+  service: images
+limits:
+  service: compute
+server_action:
+  service: compute
+create_image:
+  service: compute
+flavors_detail:
+  service: compute
+console_output:
+  service: compute
+server_volumes:
+  service: compute
+attach_volume:
+  service: compute
+detach_volume:
+  service: compute
+volumes:
+  service: volume
+volume_from_uid:
+  service: volume
+create_volume:
+  service: volume
+delete_volume:
+  service: volume
+volume_limits:
+  service: volume
 
 

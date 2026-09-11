@@ -254,6 +254,16 @@ sub _check_report {
 
     if (@failed) {
         print {*STDERR} 'coverage gate: below 100.0: ' . join( ', ', @failed ) . "\n";
+
+        # DD-774: this is exactly when a reader most needs the honestly-excused
+        # rows ruled out - hunting for the real gap among every file's detail
+        # rows is what cost time isolating one during DD-824's coverage work.
+        my $honored = _honored_annotation_lines($lines);
+        if ( @{$honored} ) {
+            print {*STDERR} "coverage gate: " . scalar( @{$honored} )
+                . " line(s) already accounted for by an uncoverable annotation (not a defect):\n";
+            print {*STDERR} "coverage gate:   $_\n" for @{$honored};
+        }
         return EXIT_SHORTFALL;
     }
 
@@ -278,6 +288,17 @@ sub _check_report {
         ? "; $examined detail rows examined, no stale uncoverable annotations"
         : '; examined no annotation detail rows, so nothing was checked for stale uncoverable annotations'
         ) . "\n";
+
+    # DD-774: even on a clean pass, an honestly-excused row still LOOKS like a
+    # flagged line to anyone glancing at the raw table above. Naming it here
+    # is purely informational - it changes nothing about the EXIT_CLEAN verdict.
+    my $honored = _honored_annotation_lines($lines);
+    if ( @{$honored} ) {
+        print "coverage gate: " . scalar( @{$honored} )
+            . " line(s) already accounted for by an uncoverable annotation (not a defect):\n";
+        print "coverage gate:   $_\n" for @{$honored};
+    }
+
     return EXIT_CLEAN;
 }
 
@@ -299,6 +320,59 @@ sub _check_report {
 # offsets silently skips the others, which is where branch and condition
 # annotations live - measured at 3 entries found where the true count was far
 # larger.
+# Purpose: find HONESTLY-EXCUSED uncoverable annotations - the third leg of
+#          the honest/stale/genuine-gap split, distinct from both.
+# Input: an array reference of report lines (the same report _stale_annotations
+#        reads).
+# Output: a list of "FILE line N" strings, one per honestly-excused row.
+#
+# DD-774: an honored annotation's row and a genuine unannotated gap's row both
+# print as a sub-100% line in the same detail table, and nothing in the raw
+# output tells them apart. Empirically verified (a live experiment against
+# real Devel::Cover 1.52 output, three branches - annotated, unannotated,
+# fully covered):
+#
+#   4           - 50      1     -0   if ($x)   <- honest: annotated, excused
+#   9     ***     50      1      0   if ($x)   <- genuine gap: no annotation
+#
+# The discriminator is a leading '-' on the row's own metric value (an excused
+# position exists) WITH NO '***' (nothing stale about it - the excused side
+# was never hit). A genuine gap carries neither: its low percentage is a plain
+# number, and its own '***' is Devel::Cover's "this needs attention" mark
+# firing for the opposite reason - no annotation exists to excuse it. This
+# reuses _stale_annotations()'s row-parsing skeleton exactly, so both share the
+# same section-layout handling this file's own header comment already covers.
+sub _honored_annotation_lines {
+    my ($lines) = @_;
+
+    my ( @honored, $file, $code_column );
+
+    for my $line ( @{$lines} ) {
+        if ( $line =~ m{\A(\S*lib/\S+\.(?:pm|pl))\s*\z} ) {
+            $file        = $1;
+            $code_column = undef;
+            next;
+        }
+
+        if ( $line =~ /\Aline\s+err\s+/ ) {
+            my ($last) = $line =~ /(\S+)\s*\z/;
+            $code_column = defined $last ? rindex( $line, $last ) : undef;
+            next;
+        }
+
+        next if !defined $code_column;
+        next if $line !~ /\A(\d+)[ \t]/;
+
+        my $number  = $1;
+        my $metrics = substr $line, 0, $code_column;
+        next if index( $metrics, '***' ) >= 0;
+        push @honored, sprintf( '%s line %d', ( defined $file ? $file : 'unknown file' ), $number )
+            if $metrics =~ /-\d/;
+    }
+
+    return \@honored;
+}
+
 sub _stale_annotations {
     my ($lines) = @_;
 

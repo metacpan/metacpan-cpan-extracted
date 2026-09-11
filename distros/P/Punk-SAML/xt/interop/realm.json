@@ -1,0 +1,68 @@
+{
+  "realm": "punksaml",
+  "enabled": true,
+  "sslRequired": "none",
+  "users": [
+    {
+      "username": "jo",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "jo@example.com",
+      "firstName": "Jo",
+      "lastName": "Example",
+      "credentials": [
+        { "type": "password", "value": "jo-password", "temporary": false }
+      ],
+      "groups": ["/staff"]
+    }
+  ],
+  "groups": [
+    { "name": "staff" }
+  ],
+  "clients": [
+    {
+      "clientId": "https://sp.example.com/saml/metadata",
+      "name": "Punk-SAML interop",
+      "protocol": "saml",
+      "enabled": true,
+      "fullScopeAllowed": true,
+      "redirectUris": ["https://sp.example.com/saml/*"],
+      "attributes": {
+        "saml_assertion_consumer_url_post": "https://sp.example.com/saml/acs",
+        "saml_assertion_consumer_url_redirect": "https://sp.example.com/saml/acs",
+        "saml_name_id_format": "email",
+        "saml.assertion.signature": "true",
+        "saml.server.signature": "true",
+        "saml.signature.algorithm": "RSA_SHA256",
+        "saml.client.signature": "false",
+        "saml.authnstatement": "true",
+        "saml.force.post.binding": "true",
+        "saml.encrypt": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "email",
+          "protocol": "saml",
+          "protocolMapper": "saml-user-property-mapper",
+          "config": {
+            "user.attribute": "email",
+            "attribute.name": "email",
+            "attribute.nameformat": "Basic",
+            "friendly.name": "E-Mail Address"
+          }
+        },
+        {
+          "name": "groups",
+          "protocol": "saml",
+          "protocolMapper": "saml-group-membership-mapper",
+          "config": {
+            "attribute.name": "groups",
+            "attribute.nameformat": "Basic",
+            "single": "false",
+            "full.path": "false"
+          }
+        }
+      ]
+    }
+  ]
+}

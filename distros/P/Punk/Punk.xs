@@ -132,6 +132,7 @@ static const frx_abi *punk_frx(pTHX) {
 #include "punk/punk_mpstream.h"  /* multipart, parsed as it arrives    */
 #include "punk/punk_csp.h"       /* CSP nonce + policy (needs entropy)      */
 #include "punk/punk_reqid.h"     /* an id per request (uuidv7, buffered) */
+#include "punk/punk_frozen.h"    /* Frozen's C ABI, resolved on first use   */
 #include "punk/punk_plural.h"    /* CLDR plural categories (before i18n)    */
 #include "punk/punk_i18n.h"      /* the catalogue arena, loaded at boot     */
 #include "punk/punk_lang.h"      /* Accept-Language (needs accept + context) */

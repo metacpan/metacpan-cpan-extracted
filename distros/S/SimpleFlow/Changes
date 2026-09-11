@@ -1,6 +1,58 @@
 Revision history for SimpleFlow
 
 
+0.161 2026-09-07 (Claude Opus 5 helped)
+
+ [Fixed]
+
+ - **The printed record's length cap did nothing on Data::Printer before
+     0.99_001.** 0.16 capped each field of the record at 4096 characters by
+     handing `string_max` to Data::Printer and leaving the clipping to it, but
+     that property only arrived in Data::Printer 0.99_001 (2018-04-21) and
+     every earlier release ignores a property it does not know, in silence. A
+     CPAN tester on perl 5.20.0 with Data::Printer 0.38 therefore had a
+     200,000-character capture printed whole: 200,927 bytes to the terminal and
+     200,914 bytes to the log. SimpleFlow now clips the strings itself before
+     printing them, and marks what it dropped in Data::Printer's own wording,
+     so the ceiling holds on every version. The full capture is still on the
+     result hash, and the output on Data::Printer 1.x is unchanged.
+
+ [Tests]
+
+ - Added a regression test for the above (block 17 of `t/02.fixes.t`), confirmed
+     to fail against 0.16 first. Its probe loads a stub `DDP` that ignores every
+     property it is handed, which is what those Data::Printer releases did, and
+     is the only way to reproduce the flood on a machine whose Data::Printer is
+     current; it needs no network and nothing installed.
+
+ - Block 10 asked that `$VERSION` have exactly two decimal places, which this
+     release does not: 0.161 is a point release on 0.16 and keeps three. The
+     assertion now takes two or more, and a new one compares `$VERSION` against
+     the literal in the source digit for digit -- the check that actually
+     catches an unquoted version, since with the quotes off 0.161 the module
+     still reports "0.161" and any pattern on the digits passes.
+
+ - A passing run of the suite no longer looks like a crash. task() prints the
+     result record, and its failure paths dump the arguments with `p` and then
+     warn or die on the terminal -- all as documented -- so the three test
+     files together printed some 1,180 lines of record dumps and eight
+     backtraces on a clean, wholly successful run. Every call whose printing is
+     not itself under test now goes through a `quietly` helper that captures
+     both streams with `Capture::Tiny`, and the expected diagnostics are
+     asserted on rather than discarded: `prove -Ilib t/` prints TAP and nothing
+     else. Capturing was chosen over passing `quiet => 1` because it leaves the
+     arguments handed to task() unchanged, which is what keeps blocks 1-11 of
+     `t/02.fixes.t` runnable against 0.15 (re-checked: they still fail there).
+     No module behaviour changed.
+
+ [Documentation]
+
+ - README.md no longer carries the release notes, so they are no longer copied
+     into `read.me.pod` and the module's POD either. `Changes` is the only copy
+     now, and `md2pod.pl` checks it with `changes_file_ok()` rather than
+     generating it.
+
+
 0.16 2026-08-28 (Claude Opus 5 helped)
 
  [Fixed]

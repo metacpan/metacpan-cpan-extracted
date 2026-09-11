@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use v5.38;
+use experimental 'signatures';
+use feature 'try';
+no warnings 'experimental::try';
+use FindBin;
+use lib ( "$FindBin::Bin/../lib", "$FindBin::Bin/../../lib" );
+
+use IO::Handle;
+use Getopt::Long qw(GetOptions :config ignore_case);
+
+STDOUT->autoflush(1);
+STDERR->autoflush(1);
+
+my $difficulty = 'normal';
+GetOptions(
+    'easy|e'              => sub { $difficulty = 'easy' },
+    'normal|n'            => sub { $difficulty = 'normal' },
+    'hard|h'              => sub { $difficulty = 'hard' },
+    'difficulty|diff|d=s' => \$difficulty,
+);
+
+$difficulty = lc($difficulty);
+if ( $difficulty !~ /\A(?:easy|normal|hard)\z/x ) {
+    warn
+      "Warning: Unknown difficulty '$difficulty', falling back to 'normal'.\n";
+    $difficulty = 'normal';
+}
+
+require Games::GUI::Battleship;
+my $app = Games::GUI::Battleship->new( difficulty => $difficulty );
+say "Starting Battleship with "
+  . ucfirst($difficulty)
+  . " difficulty ("
+  . $app->{ai}->name . ")...";
+$app->run;
+

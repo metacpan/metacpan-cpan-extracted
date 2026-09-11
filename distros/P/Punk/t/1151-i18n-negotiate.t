@@ -2,7 +2,10 @@
 use 5.010;
 use strict;
 use warnings;
+use FindBin ();
+use lib "$FindBin::Bin/lib";
 use Test::More;
+use Punk::Test;
 use Punk ();
 
 # Accept-Language negotiation.
@@ -186,6 +189,59 @@ my $neg = sub { Punk::Plugin::I18n->_negotiate($_[0], $_[1]) };
         'the stored choice is found beside other cookies');
     is($hit->(cookie => 'punk.langy=de', lang => 'fr'), 'fr',
         'and a cookie whose name merely starts the same is not it');
+}
+
+# ---- the switcher the POD documents, run end to end --------------------------
+#
+# Punk READS punk.lang and never writes it. The POD used to promise the
+# opposite - "an explicit ?lang= is remembered" - and described the symptom
+# of its own absence as a caveat: "a language switcher works once and appears
+# broken on the next link". There was even an env flag, PL_ENV_KEY "_set",
+# with a comment saying the response path read it to decide whether to set
+# the cookie. Nothing ever read it.
+#
+# The POD now tells an application to set the cookie itself. This runs that
+# advice, because documentation nobody has executed is how the wrong claim
+# got there in the first place.
+{
+    require File::Temp; require File::Spec;
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    for my $t (qw(en fr)) {
+        open my $fh, '>:raw', File::Spec->catfile($dir, "$t.json") or die $!;
+        print $fh qq({ "hi": "$t" });
+        close $fh;
+    }
+
+    my $pkg = 'SwitcherApp';
+    eval qq{
+        package $pkg;
+        use Punk;
+        plugin 'I18n' => { dir => '$dir', default => 'en' };
+        get '/lang' => sub {
+            my (\$c) = \@_;
+            \$c->cookie('punk.lang' => \$c->param('to'));
+            \$c->text('set');
+        };
+        get '/tag' => sub { \$_[0]->text(\$_[0]->locale) };
+        1;
+    } or die $@;
+
+    my $t = Punk::Test->new($pkg);
+    $t->request_header('Accept-Language' => 'en');
+
+    $t->get_ok('/tag');
+    is($t->body, 'en', 'the browser language to begin with');
+
+    $t->get_ok('/lang?to=fr');
+    is($t->cookie('punk.lang'), 'fr',
+        'the handler set the cookie, which is what the POD tells it to do');
+
+    # the client keeps the jar, so this is the NEXT link - the one the old
+    # POD said would appear broken
+    $t->get_ok('/tag');
+    is($t->body, 'fr',
+        'and the choice survives to the next request, so a switcher written '
+      . 'the documented way actually works');
 }
 
 done_testing;

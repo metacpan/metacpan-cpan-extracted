@@ -2,15 +2,19 @@
 
 use strict;
 use warnings;
+use utf8;                 # desde 0.04 el modulo devuelve caracteres, no bytes
 use Test::More;
+
+binmode Test::More->builder->$_, ':encoding(UTF-8)'
+    for qw(output failure_output todo_output);
 
 use_ok('Business::ES::CodigoPostal');
 
 use constant {
-	      RE_5DIGIT => qr/Código postal no son 5 dígitos/i,
-	      RE_ASSIGN => qr/Código postal no asignado/i,
-	      RE_DEFINE => qr/Código postal no definido/i,
-	     };
+              RE_5DIGIT => qr/Código postal no son 5 dígitos/i,
+              RE_ASSIGN => qr/Código postal no asignado/i,
+              RE_DEFINE => qr/Código postal no definido/i,
+             };
 
 my @tests =
   (
@@ -31,9 +35,9 @@ for my $case (@tests) {
   my $cp = Business::ES::CodigoPostal->new(codigo => $case->{codigo});
 
   ok(defined $cp, "Instancia creada para $case->{codigo}");
-  
+
   is($cp->valid,    $case->{valid},     "Validez correcta para $case->{codigo}");
-  
+
   if ($case->{valid}) {
     is($cp->provincia   , $case->{provincia} , "Provincia OK para $case->{codigo}");
     is($cp->{iso_3166_2}, $case->{iso_3166_2}, "ISO3166_2 OK para $case->{iso_3166_2}");
@@ -51,12 +55,12 @@ subtest 'Normalize' => sub {
 
 subtest 'Region' => sub {
   my @t = ({
-	    cp => '07001', pv => 'Baleares',
-	    cp => '35001', pv => 'Canarias',
-	    cp => '38001', pv => 'Canarias',
-	    cp => '51001', pv => 'Ceuta',
-	    cp => '52001', pv => 'Melilla'
-	   });
+            cp => '07001', pv => 'Baleares',
+            cp => '35001', pv => 'Canarias',
+            cp => '38001', pv => 'Canarias',
+            cp => '51001', pv => 'Ceuta',
+            cp => '52001', pv => 'Melilla'
+           });
 
   for my $T (@t) {
     my $cp = Business::ES::CodigoPostal->new(codigo => $T->{cp});

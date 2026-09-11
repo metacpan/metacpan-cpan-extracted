@@ -21,7 +21,7 @@ sub opt_spec {
 }
 
 sub execute ( $self, $opt, $args ) {
-    my $target = $args->[0] or die "Usage: luv add <repo-url|library-name>\n";
+    die "Usage: luv add <repo-url|library-name> [...]\n" unless @$args;
 
     my $manifest_path = "luv.json";
     die "No luv.json found — run 'luv init' first\n" unless -e $manifest_path;
@@ -29,42 +29,53 @@ sub execute ( $self, $opt, $args ) {
     my $manifest = Luv::CLI::Manifest->new( path => $manifest_path );
     $manifest->load;
 
-    my ( $name, $url );
+    for my $target (@$args) {
+        my ( $name, $url );
 
-    if ( $target =~ m{^https?://} || $target =~ m{^git\@} ) {
-        $url = $target;
-        ($name) = $url =~ m{([^/]+?)(?:\.git)?/?$};
+        if ( $target =~ m{^https?://} || $target =~ m{^git\@} ) {
+            $url = $target;
+            ($name) = $url =~ m{([^/]+?)(?:\.git)?/?$};
+        }
+        else {
+            my $cache_path
+                = File::HomeDir->my_home . '/.cache/luv/registry.json';
+            my $registry
+                = Luv::CLI::Registry->new( cache_path => $cache_path );
+            $registry->load;
+
+            my $entry = $registry->find($target);
+            unless ($entry) {
+                warn
+                    "Library '$target' not found in registry — try 'luv search $target' or pass a git URL\n";
+                next;
+            }
+
+            $name = $target;
+            $url  = $entry->{url};
+        }
+
+        if ( $manifest->has_dependency($name) ) {
+            warn "Dependency '$name' already exists — skipping\n";
+            next;
+        }
+
+        my $dest = $manifest->library_dir . "/$name";
+        my $git  = Luv::CLI::Git->new;
+
+        eval {
+            $git->clone( $url, $dest, $opt->{ref} );
+            $manifest->add_dependency(
+                $name,
+                url  => $url,
+                ref  => $opt->{ref} // 'main',
+                path => $dest
+            );
+            print "Added '$name' from $url\n";
+        };
+        warn "Failed to add '$target': $@" if $@;
     }
-    else {
-        my $cache_path = File::HomeDir->my_home . '/.cache/luv/registry.json';
-        my $registry   = Luv::CLI::Registry->new( cache_path => $cache_path );
-        $registry->load;
 
-        my $entry = $registry->find($target);
-        die
-            "Library '$target' not found in registry — try 'luv search $target' or pass a git URL\n"
-            unless $entry;
-
-        $name = $target;
-        $url  = $entry->{url};
-    }
-
-    die "Dependency '$name' already exists\n"
-        if $manifest->has_dependency($name);
-
-    my $dest = $manifest->library_dir . "/$name";
-    my $git  = Luv::CLI::Git->new;
-    $git->clone( $url, $dest, $opt->{ref} );
-
-    $manifest->add_dependency(
-        $name,
-        url  => $url,
-        ref  => $opt->{ref} // 'main',
-        path => $dest
-    );
     $manifest->save;
-
-    print "Added '$name' from $url\n";
     return;
 }
 
@@ -82,18 +93,21 @@ Luv::CLI::Command::Add - add a library dependency from a git repo or the registr
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
     luv add baton
+    luv add baton bump https://github.com/tesselode/some-lib
     luv add https://github.com/tesselode/baton --ref v1.0
 
 =head1 DESCRIPTION
 
-Resolves the given argument either as a library name (looked up in the
+Resolves each given argument either as a library name (looked up in the
 local registry cache) or a raw git URL, clones it into the project's
-library directory, and records it in C<luv.json>.
+library directory, and records it in C<luv.json>. Accepts one or more
+arguments in a single invocation; if one fails to resolve or clone, a
+warning is printed and the rest continue.
 
 =head1 NAME
 

@@ -1,4 +1,4 @@
-[🏠 Ana Sayfa](index_tr.html) &nbsp;•&nbsp; [📖 Hakkında](TR.AmberDB-Hakkinda.html) &nbsp;•&nbsp; [🚀 Hızlı Başlangıç](#-hızlı-başlangıç) &nbsp;•&nbsp; [📘 Tutorial](TR.AmberDB_Veritabani_Sistemi.html) &nbsp;•&nbsp; [📊 Benchmark](TR.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [🌐 Locale](TR.AmberDB-Locale_Kullanim_Rehberi.html) &nbsp;•&nbsp; [📋 Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [📚 Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [🇬🇧 English](index.html)
+[Ana Sayfa](index_tr.html) &nbsp;•&nbsp; [Hakkında](TR.AmberDB-Hakkinda.html) &nbsp;•&nbsp; [Hızlı Başlangıç](#hızlı-başlangıç) &nbsp;•&nbsp; [Tutorial](TR.AmberDB_Veritabani_Sistemi.html) &nbsp;•&nbsp; [Benchmark](TR.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [Locale](TR.AmberDB-Locale_Kullanim_Rehberi.html) &nbsp;•&nbsp; [SQL Rehberi](TR.AmberDB-vs-SQL_Kullanim_Rehberi.html) &nbsp;•&nbsp; [Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [English](index.html)
 
 ---
 
@@ -13,21 +13,22 @@
 
 ---
 
-## 📚 Dokümantasyon ve Kılavuzlar
+## Dokümantasyon ve Kılavuzlar
 
 | Bölüm | Açıklama | Bağlantı |
 | :--- | :--- | :--- |
-| **AmberDB Hakkında** | Mimari genel bakış, tasarım felsefesi, neden AmberDB ve temel yetenekler. | [📖 AmberDB Hakkında Oku](TR.AmberDB-Hakkinda.html) |
-| **Tutorial & Geliştirici Kılavuzu** | Tüm CRUD işlemleri, Şema mimarisi, ACID işlemler, İndeksleme, Arama motoru, Facet ve En İyi Pratikler. | [📘 Geliştirici Kılavuzunu Aç](TR.AmberDB_Veritabani_Sistemi.html) |
-| **Büyük Benchmark Raporu (600K Film)** | 600,000 gerçek IMDb kaydıyla AmberDB vs SQLite 3 derin sayfalama, arama, filtreleme ve nokta okuma karşılaştırması. | [📊 Benchmark Raporunu Oku](TR.AmberDB-vs-SQLite_Benchmark.html) |
-| **AmberDB::Locale Rehberi** | Çok dilli (Global Base varsayılan 10 dil) metin işleme, yerelleştirme, evrensel aksan açılımları ve büyük/küçük harf dönüşümleri. | [🌐 Locale Rehberini Aç](TR.AmberDB-Locale_Kullanim_Rehberi.html) |
-| **Sürüm Notları (Changes)** | Sürüm geçmişi, son mimari güncellemeler ve değişiklik günlüğü. | [📋 Değişiklikleri Gör](https://github.com/marufcetin/amberdb/blob/main/Changes) |
-| **GitHub Wiki** | Metod bazlı API dokümantasyonu, mimari konseptler, bayraklar ve dosya formatları. | [📚 Proje Wiki Sayfasını Aç](https://github.com/marufcetin/amberdb/wiki) |
-| **🇬🇧 English Documentation** | English landing page, overview article, complete developer guide, and locale manual. | [🇬🇧 Switch to English](index.html) |
+| **AmberDB Hakkında** | Mimari genel bakış, tasarım felsefesi, neden AmberDB ve temel yetenekler. | [AmberDB Hakkında Oku](TR.AmberDB-Hakkinda.html) |
+| **Tutorial & Geliştirici Kılavuzu** | Tüm CRUD işlemleri, Şema mimarisi, ACID işlemler, İndeksleme, Arama motoru, Facet ve En İyi Pratikler. | [Geliştirici Kılavuzunu Aç](TR.AmberDB_Veritabani_Sistemi.html) |
+| **SQL Karşılaştırmalı Kullanım Rehberi** | SQL'den gelen geliştiriciler için "SQL'de şu şekilde, AmberDB'de bu şekilde" eşleştirmeleri, pratik kod örnekleri ve kopya kağıdı. | [SQL Rehberini Aç](TR.AmberDB-vs-SQL_Kullanim_Rehberi.html) |
+| **Büyük Benchmark Raporu (600K Film)** | 600,000 gerçek IMDb kaydıyla AmberDB vs SQLite 3 derin sayfalama, arama, filtreleme ve nokta okuma karşılaştırması. | [Benchmark Raporunu Oku](TR.AmberDB-vs-SQLite_Benchmark.html) |
+| **AmberDB::Locale Rehberi** | Çok dilli (Global Base varsayılan 10 dil) metin işleme, yerelleştirme, evrensel aksan açılımları ve büyük/küçük harf dönüşümleri. | [Locale Rehberini Aç](TR.AmberDB-Locale_Kullanim_Rehberi.html) |
+| **Sürüm Notları (Changes)** | Sürüm geçmişi, son mimari güncellemeler ve değişiklik günlüğü. | [Değişiklikleri Gör](https://github.com/marufcetin/amberdb/blob/main/Changes) |
+| **GitHub Wiki** | Metod bazlı API dokümantasyonu, mimari konseptler, bayraklar ve dosya formatları. | [Proje Wiki Sayfasını Aç](https://github.com/marufcetin/amberdb/wiki) |
+| **English Documentation** | English landing page, overview article, complete developer guide, and locale manual. | [Switch to English](index.html) |
 
 ---
 
-## 🚀 Hızlı Başlangıç
+## Hızlı Başlangıç
 
 ### 1. Kurulum
 
@@ -101,7 +102,7 @@ $adb->delete_id( "products", $id );
 
 ---
 
-## ⚡ Temel Mimari ve Yetenekler
+## Temel Mimari ve Yetenekler
 
 ### 1. JOIN İhtiyacı Olmayan Hiyerarşik Kayıtlar
 Veriyi birden fazla ilişkisel tabloya bölüp okuma anında maliyetli SQL `JOIN` işlemleriyle birleştirmek yerine, AmberDB kayıtları doğal iç içe liste (array) ve sözlük (hash) biçiminde saklar. Bu yaklaşım Perl'in veri modeliyle birebir örtüşür ve maksimum okuma hızı sağlar.
@@ -113,7 +114,7 @@ Birincil ve ikincil indeksler sabit 8-byte Big-Endian paketlenmiş tamsayı tamp
 Disk tabanlı geri alma günlüğü (`.txn`) ve Strict Two-Phase Locking (Strict 2PL) kilit yönetimi ile tam ACID desteği sunulur. Süreç çökmelerinde kurtarma adımı otomatik LIFO geri alma (rollback) uygular.
 
 ### 4. Yüksek Başarımlı Toplu (Batch) İşlemler
-Toplu veri aktarımı metodları (`insert_list`, `modify_list`, `delete_list`), ana `.db` dosyasını tek seferde açıp indeksleri tek geçişte birleştirerek tek tek kayıt döngülerine kıyasla 50x–100x kat daha yüksek veri işleme hızı sunar.
+Toplu veri aktarımı metodları (`insert_list`, `modify_list`, `delete_list`), ana `.db` dosyasını tek seferde açıp indeksleri tek geçişte birleştirerek tek tek kayıt döngülerine kıyasla 50x-100x kat daha yüksek veri işleme hızı sunar.
 
 ### 5. Akıllı Sıcak / Soğuk Katmanlama (Junk Sistemi)
 Canlı kayıtlar (`.db`) ile geçmiş/arşiv verileri (`.jnk`) birbirinden fiziksel olarak ayrıştırılır; tek sorguda hibrit olarak taranabilir (`jnktype => 'A' | 'B' | 'AB' | 'BA'`).
@@ -123,7 +124,7 @@ E-ticaret ve zengin ürün katalogları için bit düzeyinde küme kesişimleri 
 
 ---
 
-## 📊 Mimari Karşılaştırma Tablosu
+## Mimari Karşılaştırma Tablosu
 
 | Özellik | AmberDB | SQLite | Geleneksel RDBMS (PostgreSQL/MySQL) |
 | :--- | :--- | :--- | :--- |
@@ -138,7 +139,7 @@ E-ticaret ve zengin ürün katalogları için bit düzeyinde küme kesişimleri 
 
 ---
 
-## 🔗 Kaynaklar ve Topluluk
+## Kaynaklar ve Topluluk
 
 * **GitHub Deposu:** [https://github.com/marufcetin/amberdb](https://github.com/marufcetin/amberdb)
 * **Kapsamlı Proje Wiki:** [https://github.com/marufcetin/amberdb/wiki](https://github.com/marufcetin/amberdb/wiki)

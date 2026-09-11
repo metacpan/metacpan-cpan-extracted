@@ -135,4 +135,75 @@ SKIP: {
     ok(defined $b, 'and lossy_nv => 1 accepts it') or diag $@;
 }
 
+# ---- stringify: a reader that only wants text --------------------------------
+#
+# A JSON 5 decodes to an IV and freezes as an integer, so `str` answers NULL
+# for it and a consumer whose lookup returns text gets nothing back. The
+# alternative is for every such consumer to walk its own data first and
+# stringify it, which is a loop each of them has to remember to write.
+#
+# undef is deliberately untouched: it has no string form worth inventing,
+# and a consumer that refuses null wants to go on being able to see it.
+{
+    my $data = { i => 5, big => 2**40, f => 1.5, s => 'text',
+                 u => undef, deep => { n => 42 } };
+
+    my $plain = Frozen->attach(Frozen->freeze($data));
+    my $strd  = Frozen->attach(Frozen->freeze($data, stringify => 1));
+
+    my $kind = sub {
+        my ($fz, $k) = @_;
+        $fz->kind($fz->child($fz->root, $k));
+    };
+
+    is($kind->($plain, 'i'), 'int',    'without the flag an integer is an int');
+    is($kind->($plain, 'f'), 'num',    'and a float is a num');
+
+    is($kind->($strd, 'i'),   'string', 'with it an integer is a string');
+    is($kind->($strd, 'big'), 'string', 'so is one too large for an IV');
+    is($kind->($strd, 'f'),   'string', 'and a float');
+    is($kind->($strd, 's'),   'string', 'a string is still a string');
+    is($kind->($strd, 'u'),   'undef',  'and undef is left alone');
+
+    my ($i) = $strd->get('i');
+    my ($f) = $strd->get('f');
+    my ($n) = $strd->get('deep.n');
+    is($i, '5',   'the integer reads back as its digits');
+    is($f, '1.5', 'and the float as its own');
+    is($n, '42',  'nested values are stringified too');
+
+    # The flag changes the block, so it must change the bytes. FRESH data,
+    # because of the next block: freezing is not free of side effects.
+    isnt(Frozen->freeze({ i => 5 }),
+         Frozen->freeze({ i => 5 }, stringify => 1),
+        'the two blocks are not the same bytes');
+}
+
+# ---- what a block records is the SV's CURRENT form ---------------------------
+#
+# Not new to stringify, and not really Frozen's doing: asking an IV for its
+# string caches that string on the SV, so the SV is afterwards both an
+# integer and a string, and freeze stores whichever it checks first - which
+# is the string. `print $h->{n}` has the same effect.
+#
+# So two freezes of "the same data" can differ if anything looked at a value
+# in between. Worth knowing before anyone treats the bytes as a checksum of
+# a Perl structure; they are a faithful record of the SVs as they were.
+{
+    my $d = { n => 5 };
+    my $before = Frozen->freeze($d);
+    my $strd   = Frozen->freeze($d, stringify => 1);
+    my $after  = Frozen->freeze($d);
+
+    isnt($before, $after,
+        'a freeze after a stringify differs, because SvPV cached a string');
+    is($after, $strd, '...and now matches the stringified one');
+
+    my $e = { n => 5 };
+    my $plain = Frozen->freeze($e);
+    my $str   = "$e->{n}";                 # nothing to do with Frozen
+    isnt(Frozen->freeze($e), $plain,
+        'and plain Perl stringification does exactly the same thing');
+}
+
 done_testing;

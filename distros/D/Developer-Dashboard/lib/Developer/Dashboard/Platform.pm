@@ -3,7 +3,7 @@ package Developer::Dashboard::Platform;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Exporter 'import';
 use File::Basename qw(basename dirname);
@@ -127,14 +127,27 @@ sub shell_command_argv {
 
 # command_in_path($name)
 # Resolves a command name from PATH using PATHEXT semantics on Windows when needed.
-# Input: bare command name or path string.
-# Output: absolute/relative executable path string or undef when not found.
+# Input: bare command name.
+# Output: absolute executable path string or undef when not found.
 sub command_in_path {
     my ($name) = @_;
     return if !defined $name || $name eq '';
 
-    for my $candidate ( _path_candidates($name) ) {
-        return $candidate if -f $candidate;
+    # DD-765: a BARE name (no directory separator) is a request to search
+    # PATH - the caller's cwd is not on PATH, and never was. Testing the
+    # bare name as a relative filesystem path here resolved it against the
+    # process's cwd, so a same-named file sitting in whatever directory
+    # dashboard happened to be run from was preferred over the real PATH
+    # executable and returned as a RELATIVE string - a dot-in-PATH hazard
+    # reached without dot ever being on PATH, and unconditionally wrong the
+    # moment any caller's cwd changes between the check and the use. Every
+    # current caller passes a bare name, so this loop never had a legitimate
+    # reason to exist; a caller with an actual path does not need this
+    # resolver at all.
+    if ( $name =~ m{[\\/]} ) {
+        for my $candidate ( _path_candidates($name) ) {
+            return $candidate if -f $candidate;
+        }
     }
 
     for my $dir ( File::Spec->path ) {
@@ -184,7 +197,11 @@ sub command_argv_for_path {
     my $lower = lc $resolved;
 
     return ( $^X, '-I', _module_lib_root(), $resolved ) if $lower =~ /\.pl\z/;
-    return ( _python_binary(), $resolved ) if $lower =~ /\.py\z/;
+    if ( $lower =~ /\.py\z/ ) {
+        my $venv_python = _find_layer_venv_python($resolved);
+        return ( $venv_python, $resolved ) if defined $venv_python;
+        return ( _python_binary(), $resolved );
+    }
     return ( _node_binary(), $resolved ) if $lower =~ /\.js\z/;
     return ( $^X, '-I', _module_lib_root(), '-MDeveloper::Dashboard::Platform', '-e', 'Developer::Dashboard::Platform::_exec_go_source(@ARGV)', $resolved )
       if $lower =~ /\.go\z/;
@@ -312,6 +329,29 @@ sub _python_binary {
     return command_in_path('python') || command_in_path('python3') || 'python';
 }
 
+# _find_layer_venv_python($path)
+# Walks up from a .py file's own directory looking for a DD-OOP-LAYERS skill
+# layer's own local/venv (DD-824) - reuses the existing per-layer walk
+# pattern (same as DD-823's _find_layer_pom) rather than inventing a new
+# top-level convention.
+# Input: Python source file path.
+# Output: absolute venv python interpreter path string, or undef when no
+# layer in the file's ancestry has one.
+sub _find_layer_venv_python {
+    my ($path) = @_;
+    my $dir = dirname($path);
+    while (1) {
+        my $python = is_windows()
+          ? File::Spec->catfile( $dir, 'local', 'venv', 'Scripts', 'python.exe' )
+          : File::Spec->catfile( $dir, 'local', 'venv', 'bin',     'python' );
+        return $python if -f $python;
+        my $parent = dirname($dir);
+        last if $parent eq $dir;    # reached filesystem root
+        $dir = $parent;
+    }
+    return undef;
+}
+
 # _node_binary()
 # Resolves the preferred Node.js executable name for JavaScript-backed hooks and commands.
 # Input: none.
@@ -354,24 +394,50 @@ sub _module_lib_root {
 
 # _exec_go_source($path, @args)
 # Re-execs one executable Go source file through go run so hook and command
-# launch code can treat it like any other runnable script.
+# launch code can treat it like any other runnable script. Passes -C <the
+# source file's own directory> (Go 1.20+) so go.mod discovery starts at the
+# file's own skill layer instead of walking up from the caller's cwd - a
+# bare `go run <path>` silently misses a skill's own go.mod unless the
+# caller happens to already be inside that directory tree (DD-825).
 # Input: Go source file path plus passthrough argv.
 # Output: does not return on success; dies when exec fails.
 sub _exec_go_source {
     my ( $path, @args ) = @_;
     die "Missing Go source path\n" if !defined $path || $path eq '';
-    $EXEC_LAUNCHER->( 'go', 'run', $path, @args ) or die "Unable to exec go run for $path: $!";
+    $EXEC_LAUNCHER->( 'go', 'run', '-C', dirname($path), $path, @args ) or die "Unable to exec go run for $path: $!";
+}
+
+# _find_layer_pom($path)
+# Walks up from a source file's own directory looking for a DD-OOP-LAYERS
+# skill layer's config/pom.xml - reuses the existing per-layer walk pattern
+# rather than inventing a new top-level convention (DD-823).
+# Input: source file path.
+# Output: absolute pom.xml path string, or undef when no layer has one.
+sub _find_layer_pom {
+    my ($path) = @_;
+    my $dir = dirname($path);
+    while (1) {
+        my $pom = File::Spec->catfile( $dir, 'config', 'pom.xml' );
+        return $pom if -f $pom;
+        my $parent = dirname($dir);
+        last if $parent eq $dir;    # reached filesystem root
+        $dir = $parent;
+    }
+    return undef;
 }
 
 # _exec_java_source($path, @args)
-# Compiles one executable Java source file into an isolated temp directory and
-# then re-execs the resulting main class through java.
+# Runs one executable Java source file. When its DD-OOP-LAYERS skill layer
+# carries a config/pom.xml, builds and resolves dependencies through mvn
+# (DD-823) so a layer's declared Maven dependencies are available; otherwise
+# falls back to compiling standalone with javac into an isolated temp
+# directory exactly as before, unchanged.
 # Input: Java source file path plus passthrough argv.
 # Output: does not return on success; dies when compilation or exec fails.
 sub _exec_java_source {
     my ( $path, @args ) = @_;
 
-    # DD-597: the javac launch below mutates the caller's global $? as a
+    # DD-597: the javac/mvn launches below mutate the caller's global $? as a
     # side effect; without this guard that stays set in the caller's process
     # after this sub returns (the die path only - a successful exec below
     # replaces the process image and never returns).
@@ -381,6 +447,9 @@ sub _exec_java_source {
     my $class = _java_main_class($path);
     my ($simple_class) = $class =~ /([^\.]+)\z/;
     die "Unable to resolve Java main class for $path\n" if !defined $simple_class;
+
+    my $pom = _find_layer_pom($path);
+    return _exec_java_source_via_mvn( $pom, $class, @args ) if defined $pom;
 
     my $build_root = tempdir( CLEANUP => 1 );
     my $source_root = tempdir( CLEANUP => 1 );
@@ -392,6 +461,43 @@ sub _exec_java_source {
     die "javac failed for $path with exit code $exit_code\n" if $exit_code != 0;
 
     $EXEC_LAUNCHER->( 'java', '-cp', $build_root, $class, @args ) or die "Unable to exec java for $path: $!";
+}
+
+# _exec_java_source_via_mvn($pom, $class, @args)
+# Builds one skill layer through its own config/pom.xml (treating the layer
+# as one Maven module) and execs the resolved main class with mvn's declared
+# dependencies on the classpath (DD-823).
+# Input: pom.xml path, fully qualified main class name, passthrough argv.
+# Output: does not return on success; dies when build or exec fails.
+sub _exec_java_source_via_mvn {
+    my ( $pom, $class, @args ) = @_;
+
+    # DD-597 convention: the mvn launches below mutate the caller's global $?
+    # as a side effect; without this guard that stays set in the caller's
+    # process after this sub returns (the die path only - a successful exec
+    # replaces the process image and never returns).
+    local $?;
+    my $layer_root = dirname( dirname($pom) );
+
+    $SYSTEM_LAUNCHER->( 'mvn', '-f', $pom, '-q', 'compile' );
+    my $compile_exit = $? >> 8;
+    die "mvn compile failed for $pom with exit code $compile_exit\n" if $compile_exit != 0;
+
+    my $cp_file = File::Spec->catfile( tempdir( CLEANUP => 1 ), 'classpath.txt' );
+    $SYSTEM_LAUNCHER->( 'mvn', '-f', $pom, '-q', 'dependency:build-classpath', "-Dmdep.outputFile=$cp_file" );
+    my $cp_exit = $? >> 8;
+    die "mvn dependency:build-classpath failed for $pom with exit code $cp_exit\n" if $cp_exit != 0;
+
+    open my $fh, '<', $cp_file or die "Unable to read resolved classpath $cp_file: $!";
+
+    my $dependency_classpath = do { local $/; <$fh> } // '';    # uncoverable condition right
+    close $fh;
+    $dependency_classpath =~ s/\s+\z//;
+
+    my $classes_dir = File::Spec->catdir( $layer_root, 'target', 'classes' );
+    my $classpath = $dependency_classpath eq '' ? $classes_dir : "$classes_dir:$dependency_classpath";
+
+    $EXEC_LAUNCHER->( 'java', '-cp', $classpath, $class, @args ) or die "Unable to exec java for $pom: $!";
 }
 
 # _java_main_class($path)

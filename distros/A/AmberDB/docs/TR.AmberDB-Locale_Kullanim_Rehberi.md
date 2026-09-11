@@ -1,8 +1,8 @@
-[🏠 Ana Sayfa](index_tr.html) &nbsp;•&nbsp; [📖 Hakkında](TR.AmberDB-Hakkinda.html) &nbsp;•&nbsp; [🚀 Hızlı Başlangıç](index_tr.html#-hızlı-başlangıç) &nbsp;•&nbsp; [📘 Tutorial](TR.AmberDB_Veritabani_Sistemi.html) &nbsp;•&nbsp; [🌐 Locale](TR.AmberDB-Locale_Kullanim_Rehberi.html) &nbsp;•&nbsp; [📋 Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [📚 Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [🇬🇧 English](EN.AmberDB-Locale_User-Guide.html)
+[Ana Sayfa](index_tr.html) &nbsp;•&nbsp; [Hakkında](TR.AmberDB-Hakkinda.html) &nbsp;•&nbsp; [Hızlı Başlangıç](index_tr.html#hızlı-başlangıç) &nbsp;•&nbsp; [Tutorial](TR.AmberDB_Veritabani_Sistemi.html) &nbsp;•&nbsp; [Benchmark](TR.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [Locale](TR.AmberDB-Locale_Kullanim_Rehberi.html) &nbsp;•&nbsp; [SQL Rehberi](TR.AmberDB-vs-SQL_Kullanim_Rehberi.html) &nbsp;•&nbsp; [Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [English](EN.AmberDB-Locale_User-Guide.html)
 
 ---
 
-# AmberDB::Locale — Kapsamlı Rehber
+# AmberDB::Locale - Kapsamlı Rehber
 
 ---
 
@@ -109,11 +109,11 @@ Her dil modülünün döndürdüğü yapının tam şeması:
 
 ---
 
-## 5. Public API — Metot Referansı
+## 5. Public API - Metot Referansı
 
 ### 5.1 Büyük/Küçük Harf Dönüşümleri
 
-#### `uc($string)` — Büyük harfe çevir
+#### `uc($string)` - Büyük harfe çevir
 
 ```perl
 my $tr = AmberDB::Locale->new(language => "tr");
@@ -126,7 +126,7 @@ $de->uc("straße");      # "STRASSE"   (ß → SS)
 
 > **Türkçe detay:** `uc_map` içinde `'i' => "\x{130}"` eşlemesi Perl'in `CORE::uc()` çağrısından **önce** uygulanır. Böylece `i → İ` dönüşümü doğru yapılır.
 
-#### `lc($string)` — Küçük harfe çevir
+#### `lc($string)` - Küçük harfe çevir
 
 ```perl
 $tr->lc("İSTANBUL");    # "istanbul"  (İ → i, I → ı)
@@ -135,7 +135,7 @@ $tr->lc("IĞDIR");       # "ığdır"
 
 > `lc_map` içinde `'I' => "\x{131}"` ve `"\x{130}" => 'i'` eşlemeleri `CORE::lc()` öncesi uygulanır.
 
-#### `ucfirst($string)` — Kelime başlarını büyüt
+#### `ucfirst($string)` - Kelime başlarını büyüt
 
 ```perl
 $tr->ucfirst("istanbul büyükşehir belediyesi");
@@ -144,7 +144,7 @@ $tr->ucfirst("istanbul büyükşehir belediyesi");
 
 Önce tamamı `lc()` ile küçültülür, ardından boşluk, nokta, ünlem, iki nokta, tırnak, `/`, `(`, `)` sonrası ilk karakter büyütülür.
 
-#### `fold($string)` — Arama için normalizasyon
+#### `fold($string)` - Arama için normalizasyon
 
 ```perl
 my $key = $tr->fold("İSTANBUL");   # "istanbul" (NFKC + lc)
@@ -152,7 +152,7 @@ my $key = $tr->fold("İSTANBUL");   # "istanbul" (NFKC + lc)
 
 Unicode NFKC ayrıştırması + locale `lc()` uygular. Arama indeksleme ve eşleştirme için tasarlanmıştır.
 
-#### `ieq($str1, $str2)` — Büyük/küçük harf duyarsız karşılaştırma
+#### `ieq($str1, $str2)` - Büyük/küçük harf duyarsız karşılaştırma
 
 ```perl
 $tr->ieq("İstanbul", "istanbul");  # 1 (true)
@@ -175,10 +175,10 @@ my $tr = AmberDB::Locale->new(language => "tr");
 my @sorted = $tr->sort(["İzmir", "Ankara", "Van", "Şanlıurfa", "Bursa", "Çanakkale"]);
 # => ("Ankara", "Bursa", "Çanakkale", "İzmir", "Şanlıurfa", "Van")
 
-# Hashref dizisi — alan adına göre
+# Hashref dizisi - alan adına göre
 my @sorted = $tr->sort(\@products, "name");
 
-# Arrayref dizisi — indeks numarasına göre
+# Arrayref dizisi - indeks numarasına göre
 my @sorted = $tr->sort(\@rows, 2);
 ```
 
@@ -191,7 +191,7 @@ my @sorted = $tr->sort(\@rows, 2);
 
 ### 5.3 Metin Normalizasyonu
 
-#### `normalize($string)` — Temizleme
+#### `normalize($string)` - Temizleme
 
 ```perl
 my $clean = $tr->normalize('<p>Kâr &amp; zarar &ccedil;izelgesi</p>');
@@ -206,7 +206,7 @@ my $clean = $tr->normalize('<p>Kâr &amp; zarar &ccedil;izelgesi</p>');
 5. Güvenli karakter sınıfı dışındakileri silme
 6. Fazla boşlukları teke indirme, kenar boşluklarını kırpma
 
-#### `to_ascii($string [, $nonspace])` — ASCII dönüşümü
+#### `to_ascii($string [, $nonspace])` - ASCII dönüşümü
 
 ```perl
 $tr->to_ascii("çarşı");           # "carsi"
@@ -473,7 +473,7 @@ $tr->plural(1, { one => "{count} ürün", other => "{count} ürün" });
 $tr->plural(5, { one => "{count} ürün", other => "{count} ürün" });
 # "5 ürün"
 
-# Rusça — 4 farklı form
+# Rusça - 4 farklı form
 my $ru = AmberDB::Locale->new(language => "ru");
 $ru->plural(1,  { one => "{count} яблоко", few => "{count} яблока",
                   many => "{count} яблок",  other => "{count} яблока" });
@@ -498,12 +498,12 @@ one{n%10==1&&n%100!=11}few{n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)}many{...}othe
 ### 5.12 Diğer Erişimciler
 
 ```perl
-$lang->language();   # "tr" — aktif dil etiketi
+$lang->language();   # "tr" - aktif dil etiketi
 $lang->months();     # ["Ocak", "Şubat", ..., "Aralık"]
 $lang->days();       # ["Pazar", "Pazartesi", ..., "Cumartesi"]
 ```
 
-#### `first_char($string)` — Alfabetik indeks karakteri
+#### `first_char($string)` - Alfabetik indeks karakteri
 
 ```perl
 $tr->first_char("  çarşı  ");    # "Ç"
@@ -513,7 +513,7 @@ $tr->first_char("İzmir");        # "İ"
 
 ---
 
-## 6. `AmberDB::Locale::Currency` — Evrensel Para Birimi Verisi
+## 6. `AmberDB::Locale::Currency` - Evrensel Para Birimi Verisi
 
 ISO 4217 standardında **12 para birimi** tanımlıdır:
 

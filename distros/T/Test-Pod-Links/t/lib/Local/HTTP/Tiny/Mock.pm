@@ -1,8 +1,26 @@
-package Local::HTTP::Tiny::Mock;
+# vim: ts=4 sts=4 sw=4 et: syntax=perl
+#
+# Copyright (c) 2018-2026 Sven Kirmess
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 use 5.006;
 use strict;
 use warnings;
+
+package Local::HTTP::Tiny::Mock;
+
+our $VERSION = '0.001';
 
 ## no critic (CodeLayout::RequireTrailingCommaAtNewline)
 ## no critic (ErrorHandling::RequireCarping)
@@ -12,10 +30,11 @@ use warnings;
 
 sub new {
     my $class = shift;
-    return bless { history => [] }, $class;
+    return bless { history => [], get_history => [] }, $class;
 }
 
 my %HEAD;
+my %GET;
 
 sub head {
     my ( $self, $url ) = @_;
@@ -27,10 +46,26 @@ sub head {
     return $HEAD{$url};
 }
 
+sub get {
+    my ( $self, $url ) = @_;
+
+    die "URL '$url' is not cached for GET" if !exists $GET{$url};
+
+    push @{ $self->{get_history} }, $url;
+
+    return $GET{$url};
+}
+
 sub history {
     my ($self) = @_;
 
     return @{ $self->{history} };
+}
+
+sub get_history {
+    my ($self) = @_;
+
+    return @{ $self->{get_history} };
 }
 
 # perl -e 'use HTTP::Tiny; use Data::Dumper; print Dumper(HTTP::Tiny->new->head(q{https://www.perl.com/}));'
@@ -163,6 +198,71 @@ $HEAD{'http://192.0.2.7/'} = {
     'status' => 599
 };
 
-1;
+# news.ycombinator.com answers HEAD requests with a '405 Not Allowed' but
+# serves the same URL on a GET request.
+# perl -e 'use HTTP::Tiny; use Data::Dumper; print Dumper(HTTP::Tiny->new->head(q{https://news.ycombinator.com/}));'
+$HEAD{'https://news.ycombinator.com/'} = {
+    'headers' => {
+        'connection'     => 'keep-alive',
+        'content-length' => '150',
+        'content-type'   => 'text/html; charset=utf-8',
+        'date'           => 'Wed, 09 Sep 2026 12:52:21 GMT',
+        'server'         => 'nginx'
+    },
+    'url'      => 'https://news.ycombinator.com/',
+    'success'  => '',
+    'status'   => '405',
+    'reason'   => 'Not Allowed',
+    'protocol' => 'HTTP/1.1'
+};
 
-# vim: ts=4 sts=4 sw=4 et: syntax=perl
+# perl -e 'use HTTP::Tiny; use Data::Dumper; print Dumper(HTTP::Tiny->new->get(q{https://news.ycombinator.com/}));'
+# (the content was removed)
+$GET{'https://news.ycombinator.com/'} = {
+    'headers' => {
+        'cache-control'             => 'private; max-age=0',
+        'connection'                => 'keep-alive',
+        'content-type'              => 'text/html; charset=utf-8',
+        'date'                      => 'Wed, 09 Sep 2026 12:52:21 GMT',
+        'referrer-policy'           => 'origin',
+        'server'                    => 'nginx',
+        'strict-transport-security' => 'max-age=31556900',
+        'transfer-encoding'         => 'chunked',
+        'vary'                      => 'Accept-Encoding',
+        'x-content-type-options'    => 'nosniff',
+        'x-frame-options'           => 'DENY',
+        'x-xss-protection'          => '1; mode=block'
+    },
+    'url'      => 'https://news.ycombinator.com/',
+    'success'  => 1,
+    'status'   => '200',
+    'reason'   => 'OK',
+    'protocol' => 'HTTP/1.1'
+};
+
+# A URL that is broken for HEAD and for GET.
+$HEAD{'https://www.example.net/not_found'} = {
+    'headers' => {
+        'content-type' => 'text/html; charset=utf-8',
+        'server'       => 'nginx'
+    },
+    'url'      => 'https://www.example.net/not_found',
+    'success'  => '',
+    'status'   => '405',
+    'reason'   => 'Not Allowed',
+    'protocol' => 'HTTP/1.1'
+};
+
+$GET{'https://www.example.net/not_found'} = {
+    'headers' => {
+        'content-type' => 'text/html; charset=utf-8',
+        'server'       => 'nginx'
+    },
+    'url'      => 'https://www.example.net/not_found',
+    'success'  => '',
+    'status'   => '404',
+    'reason'   => 'Not Found',
+    'protocol' => 'HTTP/1.1'
+};
+
+1;

@@ -1,5 +1,13 @@
 Changes file for Speak
 
+1.05    2026-09-10
+        - Decoupled network transport logic from proprietary domains.
+        - Made WAN server failover completely generic and configurable via
+          SPEAK_WAN_SERVER, SPEAK_WAN_PORT, SPEAK_WAN_SCHEME environment variables
+          and wan_server, wan_port, wan_scheme configuration keys.
+        - Updated configuration search path order in Speak.pm (@CONFIG_PATHS).
+        - Added persona setting to etc/speak.conf example configuration.
+
 1.04    2026-08-27
         - Added logrotate configuration definition in etc/speak.logrotate for /var/log/speak.log.
 

@@ -1,4 +1,4 @@
-[🏠 Home](index.html) &nbsp;•&nbsp; [📖 About](EN.About_AmberDB.html) &nbsp;•&nbsp; [🚀 Quick Start](#-quick-start) &nbsp;•&nbsp; [📘 Tutorial](EN.AmberDB_User-Guide.html) &nbsp;•&nbsp; [📊 Benchmark](EN.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [🌐 Locale](EN.AmberDB-Locale_User-Guide.html) &nbsp;•&nbsp; [📋 Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [📚 Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [🇹🇷 Türkçe](index_tr.html)
+[Home](index.html) &nbsp;•&nbsp; [About](EN.About_AmberDB.html) &nbsp;•&nbsp; [Quick Start](#quick-start) &nbsp;•&nbsp; [Tutorial](EN.AmberDB_User-Guide.html) &nbsp;•&nbsp; [Benchmark](EN.AmberDB-vs-SQLite_Benchmark.html) &nbsp;•&nbsp; [Locale](EN.AmberDB-Locale_User-Guide.html) &nbsp;•&nbsp; [SQL Guide](EN.AmberDB-vs-SQL_User-Guide.html) &nbsp;•&nbsp; [Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) &nbsp;•&nbsp; [Wiki](https://github.com/marufcetin/amberdb/wiki) &nbsp;•&nbsp; [Türkçe](index_tr.html)
 
 ---
 
@@ -13,21 +13,22 @@
 
 ---
 
-## 📚 Documentation & Guides
+## Documentation & Guides
 
 | Section | Description | Link |
 | :--- | :--- | :--- |
-| **About AmberDB** | Architecture overview, design philosophy, why AmberDB, and core capabilities. | [📖 Read About AmberDB](EN.About_AmberDB.html) |
-| **Tutorial & Developer Guide** | Comprehensive manual covering CRUD operations, schemas, transactions, indexing, search, and best practices. | [📘 Open Developer Guide](EN.AmberDB_User-Guide.html) |
-| **Large-Scale Benchmark Report (600K Movies)** | Extensive benchmark on 600,000 real IMDb records: AmberDB vs SQLite 3 deep pagination, multi-field filtering, search, and point reads. | [📊 Read Benchmark Report](EN.AmberDB-vs-SQLite_Benchmark.html) |
-| **AmberDB::Locale Guide** | Multilingual (10 languages with Global Base default) string processing, locale-aware case folding, accent/circumflex unfolding, and collation. | [🌐 Open Locale Guide](EN.AmberDB-Locale_User-Guide.html) |
-| **Release Changes** | Version history, recent architectural updates, and changelog. | [📋 View Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) |
-| **Project Wiki** | Method-by-method API documentation, concept deep-dives, flags, and file format references. | [📚 Open Project Wiki](https://github.com/marufcetin/amberdb/wiki) |
-| **🇹🇷 Türkçe Dokümantasyon** | Türkçe ana sayfa, mimari makale, geliştirici kılavuzu ve dil kütüphanesi dokümanları. | [🇹🇷 Türkçe Sayfaya Geç](index_tr.html) |
+| **About AmberDB** | Architecture overview, design philosophy, why AmberDB, and core capabilities. | [Read About AmberDB](EN.About_AmberDB.html) |
+| **Tutorial & Developer Guide** | Comprehensive manual covering CRUD operations, schemas, transactions, indexing, search, and best practices. | [Open Developer Guide](EN.AmberDB_User-Guide.html) |
+| **AmberDB for SQL Developers** | Practical migration guide with side-by-side SQL vs. AmberDB code equivalents, relations without JOINs, and cheat sheet. | [Open SQL Guide](EN.AmberDB-vs-SQL_User-Guide.html) |
+| **Large-Scale Benchmark Report (600K Movies)** | Extensive benchmark on 600,000 real IMDb records: AmberDB vs SQLite 3 deep pagination, multi-field filtering, search, and point reads. | [Read Benchmark Report](EN.AmberDB-vs-SQLite_Benchmark.html) |
+| **AmberDB::Locale Guide** | Multilingual (10 languages with Global Base default) string processing, locale-aware case folding, accent/circumflex unfolding, and collation. | [Open Locale Guide](EN.AmberDB-Locale_User-Guide.html) |
+| **Release Changes** | Version history, recent architectural updates, and changelog. | [View Changes](https://github.com/marufcetin/amberdb/blob/main/Changes) |
+| **Project Wiki** | Method-by-method API documentation, concept deep-dives, flags, and file format references. | [Open Project Wiki](https://github.com/marufcetin/amberdb/wiki) |
+| **Türkçe Dokümantasyon** | Türkçe ana sayfa, mimari makale, geliştirici kılavuzu ve dil kütüphanesi dokümanları. | [Türkçe Sayfaya Geç](index_tr.html) |
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Installation
 
@@ -64,7 +65,7 @@ use AmberDB;
 
 # 1. Initialize Database Instance
 my $adb = AmberDB->new(
-    cfg  => { user => 'admin', language => 'en' },
+    cfg  => { user => 'admin', language => 'gb' },
     path => { dbase_dir => './dbstore' }
 );
 
@@ -101,7 +102,7 @@ $adb->delete_id( "products", $id );
 
 ---
 
-## ⚡ Core Architecture & Capabilities
+## Core Architecture & Capabilities
 
 ### 1. JOIN-Free Hierarchical Records
 Instead of distributing data across multiple normalized tables and reassembling via costly SQL `JOIN`s, AmberDB stores records as natural, nested array tuples (including sub-arrays and sub-hashes). This matches Perl's native data structures and delivers ultra-fast retrieval.
@@ -113,7 +114,7 @@ Primary and secondary indexes use fixed 8-byte packed Big-Endian unsigned intege
 Full multi-table transaction support with a disk-backed undo journal (`.txn`) and Strict Two-Phase Locking (Strict 2PL). Abnormal terminations trigger automatic LIFO rollbacks upon recovery.
 
 ### 4. High-Throughput Batch Ingestion
-Bulk ETL methods (`insert_list`, `modify_list`, `delete_list`) open master tables once and merge indexes in a single pass, delivering 50x–100x higher throughput compared to single-record loops.
+Bulk ETL methods (`insert_list`, `modify_list`, `delete_list`) open master tables once and merge indexes in a single pass, delivering 50x-100x higher throughput compared to single-record loops.
 
 ### 5. Multi-Tier Junk & Archiving
 Active records (`.db`) are seamlessly segregated from historical or archived rows (`.jnk`), supporting unified single-pass queries (`jnktype => 'A' | 'B' | 'AB' | 'BA'`).
@@ -123,7 +124,7 @@ Built-in columnar facet indexing (`.fac`) with bitwise set intersections and str
 
 ---
 
-## 📊 Feature Comparison
+## Feature Comparison
 
 | Capability | AmberDB | SQLite | Traditional RDBMS (PostgreSQL/MySQL) |
 | :--- | :--- | :--- | :--- |
@@ -138,7 +139,7 @@ Built-in columnar facet indexing (`.fac`) with bitwise set intersections and str
 
 ---
 
-## 🔗 Resources & Community
+## Resources & Community
 
 * **GitHub Repository:** [https://github.com/marufcetin/amberdb](https://github.com/marufcetin/amberdb)
 * **Comprehensive Wiki:** [https://github.com/marufcetin/amberdb/wiki](https://github.com/marufcetin/amberdb/wiki)

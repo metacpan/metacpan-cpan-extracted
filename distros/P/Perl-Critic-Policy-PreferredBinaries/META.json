@@ -1,0 +1,103 @@
+{
+   "abstract" : "Recommend a perl sub over shelling out to a binary that does the same job",
+   "author" : [
+      "George S. Baugh <george@troglodyne.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-PreferredBinaries",
+   "no_index" : {
+      "directory" : [
+         "docs",
+         "t",
+         "templates"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::DistManifest" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::INI::Reader" : "0",
+            "File::Basename" : "0",
+            "Perl::Critic::Exception::Configuration::Generic" : "0",
+            "Perl::Critic::Policy" : "0",
+            "Perl::Critic::Utils" : "0",
+            "Scalar::Util" : "0",
+            "constant" : "0",
+            "parent" : "0",
+            "perl" : "5.014",
+            "re" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin::libs" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Perl::Critic" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::PreferredBinaries" : {
+         "file" : "lib/Perl/Critic/Policy/PreferredBinaries.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Troglodyne-Internet-Widgets/perl-critic-policy-preferredbinaries/issues"
+      },
+      "homepage" : "https://github.com/Troglodyne-Internet-Widgets/perl-critic-policy-preferredbinaries",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Troglodyne-Internet-Widgets/perl-critic-policy-preferredbinaries.git",
+         "web" : "https://github.com/Troglodyne-Internet-Widgets/perl-critic-policy-preferredbinaries"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.44.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_spdx_expression" : "MIT"
+}
+

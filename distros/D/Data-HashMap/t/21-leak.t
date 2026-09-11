@@ -161,6 +161,32 @@ no_leaks_ok {
     hm_i16a_clear $m;
 } 'I16A: SV* values lifecycle';
 
+# ---- SV* variants with the copy flag ----
+
+for my $c (qw(SA IA I32A I16A)) {
+    my $class = "Data::HashMap::$c";
+    no_leaks_ok {
+        my $m = $class->new(0, 0, 0, 1);
+        $m->put($_, { n => $_ }) for 1 .. 50;
+        $m->put(1, [1]);
+        $m->put_ttl(51, [2], 60);
+        $m->get_or_set(52, [3]);
+        $m->get_or_set(52, [4]);
+        $m->swap(52, [5]);
+        $m->from_hash({ 53 => [6] });
+        $m->remove(25);
+        my $th = $m->to_hash;
+        my $cl = $m->clone;
+        my $m2 = $class->new(0, 0, 0, 1);
+        $m2->merge($m);
+        $m->clear;
+    } "$c copy: every store site";
+    no_leaks_ok {
+        my $m = $class->new(10, 0, 0, 1);
+        $m->put($_, [$_]) for 1 .. 100;
+    } "$c copy LRU: evicted copies freed";
+}
+
 # ---- Overwrite: old values must be freed ----
 
 no_leaks_ok {
@@ -430,6 +456,9 @@ no_leaks_ok {
 SKIP: {
     skip 'RSS reclamation test requires /proc (Linux)', 8
         unless -r "/proc/$$/status";
+    # Shadow memory and the quarantine make RSS meaningless under a sanitizer.
+    skip 'RSS reclamation is not measurable under a sanitizer', 8
+        if ($ENV{LD_PRELOAD} || '') =~ /libu?[at]san/ || $ENV{ASAN_OPTIONS};
 
     my $get_rss = sub {
         open my $fh, '<', "/proc/$$/status" or return 0;

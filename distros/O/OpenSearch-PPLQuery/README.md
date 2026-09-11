@@ -16,18 +16,29 @@ OpenSearch::PPLQuery
     pplquery --format csv query.ppl > results.csv
     pplquery --format json query.ppl | jq .
 
-    # Use a named connection from the connection file
-    pplquery --connection staging query.ppl
-
     # Point at a cluster directly
-    pplquery --url https://search.example.com --user reader query.ppl
+    pplquery --url https://search.example.com query.ppl
 
-    # See which connections are configured
-    pplquery --list-connections
+    # Use Basic authentication without putting the password in an argument
+    read -rs PPLQUERY_PASSWORD && export PPLQUERY_PASSWORD
+    pplquery --url https://search.example.com \
+      --user reader query.ppl
+
+    # Or keep reusable connection metadata in the query itself
+    // pplquery
+    // url: https://search.example.com
+    // user: reader
+    // password-environment: PPLQUERY_READER_PASSWORD
+    // timeout: 30
+
+    source = logs | head 10
+
+    # Or select one reusable standalone connection header
+    pplquery --connection-file connections/production.pplconn query.ppl
 
 # DESCRIPTION
 
-`pplquery` reads an OpenSearch Pipe Processing Language (PPL) query from a file or standard input, and prints the result as a table, as JSON, or as CSV. Its companion ["VS CODE EXTENSION"](#vs-code-extension) transforms your IDE into a PPL Query Studio.
+`pplquery` reads an OpenSearch Piped Processing Language (PPL) query from a file or standard input, and prints the result as a table, as JSON, or as CSV. Its companion ["VS CODE EXTENSION"](#vs-code-extension) transforms your IDE into a PPL Query Studio.
 
 # INSTALLATION
 
@@ -60,62 +71,53 @@ If you installed to an alternate location you may need to locate and put pplquer
     pplquery errors-by-host.ppl
     echo 'source=logs | stats count() by host' | pplquery -
 
-Query files are UTF-8 text. The specification does not allow for comments, but it is hugely convenient for development to have them. pplquery removes lines beginning with '#' before submitting the query.
+Query files are UTF-8 text. A connection header is optional. Without one, the complete decoded query is submitted unchanged. With one, `pplquery` removes the header and its separator before submission; see ["CONNECTION HEADERS"](#connection-headers). Other PPL comments, including `//` to the end of a line and `/* ... */` blocks, remain part of the query sent to OpenSearch.
 
-    # Failed requests in the last hour, busiest hosts first.
+    // Failed requests in the last hour, busiest hosts first.
     source=access_logs
-    | where status >= 500
+    | where status >= 500        // server errors only
     | stats count() as failures by host
     | sort - failures
+    | where @timestamp >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
     | head 20
-
-Only whole-line comments are recognised; a `#` partway through a line is sent as part of the query. A query that is empty, or nothing but comments, is an error.
 
 # OPTIONS
 
-- **--config** _FILE_
+- **--connection-file** (**-c**) _FILE_
 
-    Connection configuration file to read. Defaults to `PPLQUERY_CONFIG`, then to the location in ["Where the file goes"](#where-the-file-goes).
+    Read connection metadata from one strict `// pplquery` header in a UTF-8 file. The file must contain only the header and optional trailing whitespace; unlike a query header, it does not require a blank separator at EOF. Its fields override approved environment values and defaults but remain below explicit command-line connection options. This is not the removed named JSON configuration interface; see ["CONNECTION FILES"](#connection-files).
 
-- **--connection** _NAME_
+- **--url** (**-u**) _URL_
 
-    Use the named connection _NAME_. Defaults to `PPLQUERY_CONNECTION`, then to the file's declared default. Cannot be combined with **--url**, **--user**, **--ca-file**, or **--insecure**.
+    OpenSearch base URL, such as `https://search.example.com`. Overrides the selected connection-file or query-header `url` and `PPLQUERY_URL`; the final default is `http://127.0.0.1:9200`. It must be an ASCII `http` or `https` base URL with a host and no credentials, query string, fragment, or path other than `/`.
 
-- **--list-connections**
+- **--user** (**-U**) _USER_
 
-    List the configured connections and exit, marking the default with `*`. Accepts **--format json**; `csv` is not supported. Takes no query file, and cannot be combined with connection or password options.
+    Basic-authentication username. Overrides the selected connection-file or query-header `user` and `PPLQUERY_USER`. The username must be ASCII and must be paired with exactly one selected password source. Basic authentication requires HTTPS. See ["AUTHENTICATION AND PASSWORDS"](#authentication-and-passwords).
 
-- **--url** _URL_
+- **--password-file** (**-p**) _FILE_
 
-    OpenSearch base URL, such as `https://search.example.com`. Defaults to `OPENSEARCH_URL`, then to `http://127.0.0.1:9200`. It must be a base URL: `http` or `https`, a host, no path, and no embedded credentials, query string, or fragment.
-
-- **--user** _USER_
-
-    Basic-authentication username. Defaults to `OPENSEARCH_USERNAME`. Requires an HTTPS URL. See ["PASSWORDS"](#passwords) for the password.
-
-- **--password-file** _FILE_
-
-    Read the password from a UTF-8 file, one trailing line ending removed. Overrides the password source of a selected connection. Defaults to `PPLQUERY_PASSWORD_FILE`.
+    Read the Basic-authentication password from a UTF-8 file. This replaces both header password reference fields and both environment password sources. A relative command-line path resolves against the process current directory. See ["AUTHENTICATION AND PASSWORDS"](#authentication-and-passwords).
 
 - **--ca-file** _FILE_
 
-    Certificate authority file used to verify the server's certificate, for a cluster with a private or internal CA. Requires HTTPS, and cannot be combined with **--insecure**.
+    Certificate authority file used to verify the server's certificate, for a cluster with a private or internal CA. Overrides the selected connection-file or query-header `ca-file` and `PPLQUERY_CA_FILE`. A relative command-line path resolves against the process current directory. Requires HTTPS and cannot be combined with **--insecure** or a selected `tls-verify: false` value.
 
 - **--insecure**
 
-    Disable certificate and hostname verification. Requires HTTPS. This forfeits the protection HTTPS gives against an impersonated server, so prefer **--ca-file** wherever the certificate can be verified.
+    Disable certificate and hostname verification, overriding the selected connection-file or query-header `tls-verify` and `PPLQUERY_TLS_VERIFY`. Requires HTTPS. This forfeits the protection HTTPS gives against an impersonated server, so prefer **--ca-file** wherever the certificate can be verified.
 
-- **--format** _FORMAT_
+- **--format** (**-f**) _FORMAT_
 
     Output format: `table` (default), `json`, or `csv`. See ["OUTPUT FORMATS"](#output-formats).
 
-- **--max-width** _N_
+- **--max-width** (**-w**) _N_
 
-    Truncate table cells to _N_ characters, marking shortened values with an ellipsis. `0`, the default, means no limit. Affects `table` only.
+    Truncate table cells to _N_ terminal columns, marking shortened values with an ellipsis. A value is cut only between characters, so an accent or other combining mark is never separated from the character it belongs to. `0`, the default, means no limit. Affects `table` only. Internally pplquery counts columns, but multi-character sequences may not always be counted correctly.
 
-- **--timeout** _SECONDS_
+- **--timeout** (**-t**) _SECONDS_
 
-    HTTP timeout. Defaults to `60`, or to a selected connection's `timeoutSeconds`, and overrides either. Must be greater than zero.
+    Positive HTTP timeout in seconds, up to `86400`. Overrides the selected connection-file or query-header `timeout` and `PPLQUERY_TIMEOUT`; the final default is `60`.
 
 - **--help**
 
@@ -123,182 +125,179 @@ Only whole-line comments are recognised; a `#` partway through a line is sent as
 
 # OUTPUT FORMATS
 
-The default output is a table, the maximum cell width can be controlled with the --max-width switch, output may also be in either CSV or JSON, json output gets the full error messages.
+The default output is a table. The maximum table-cell width can be controlled with **--max-width**. Output may also be CSV or JSON; JSON output preserves full OpenSearch error responses.
 
 # CONNECTING TO A CLUSTER
 
-**Direct options** name the endpoint on the command line or in the environment: **--url**, **--user**, **--ca-file**, and **--insecure**, backed by `OPENSEARCH_URL`, for authenticated clusters `OPENSEARCH_USERNAME` `OPENSEARCH_PASSWORD` are required . This suits a single cluster, and is the shortest path when trying the tool for the first time.
+`pplquery` combines explicit command-line connection options, either the file selected by **--connection-file** or an optional header in the query, environment variables, and built-in defaults. A query without either header source uses command-line options, environment variables, and defaults; with no connection settings at all it connects anonymously to `http://127.0.0.1:9200`, verifies TLS when HTTPS is selected, and uses a 60-second timeout.
 
-**Named connections** store each cluster's endpoint, username, TLS policy, and password source together under a name, selected with **--connection**.
+# CONNECTION HEADERS
 
-When using **--connection** any with other direct parameters is an error, and environment variables other than `OPENSEARCH_PASSWORD` are ignored.
+A query may begin with connection metadata in PPL line comments. The complete header, including the required separator line, is stripped before the query is submitted.
 
-## Which cluster is chosen
+    // pplquery
+    // url: https://cluster.example.com:9200
+    // user: analyst
+    // password-environment: PPLQUERY_ANALYST_PASSWORD
+    // ca-file: certificates/internal-ca.pem
+    // tls-verify: true
+    // timeout: 60
 
-When several sources could apply, `pplquery` resolves them in this order:
+    source = logs
+    | where status >= 500
 
-1. **--connection** _NAME_, if given.
-2. `PPLQUERY_CONNECTION`, if set and no direct option was given.
-3. The configuration file's default connection, if the file was named by **--config** or `PPLQUERY_CONFIG`, or if it exists and `OPENSEARCH_URL` is not set.
-4. Direct configuration: `OPENSEARCH_URL` or `http://127.0.0.1:9200`, with any direct options applied on top.
+## Exact syntax and termination
 
-The third rule is what keeps `OPENSEARCH_URL` working as it always did: setting it outranks a configuration file's default, so adding a connection file does not change an existing environment-based setup. Naming a file explicitly overrides that.
+The sentinel must be exactly `// pplquery` on line 1, optionally followed by spaces or tabs, and then an LF or CRLF line ending. Leading whitespace is forbidden. Header fields immediately follow as contiguous lines in the exact form `// key: value`: there is exactly one space between `//` and the key, the key starts with a lowercase ASCII letter and continues with only lowercase ASCII letters, digits, or hyphens, and the colon immediately follows the case-sensitive key. Spaces and tabs after the colon and at the end of the value are trimmed; internal whitespace is preserved.
 
-# NAMED CONNECTIONS
+A line containing only spaces or tabs terminates the header and is required even when the header contains no fields. Every line between the sentinel and this separator must be a field line, so an ordinary comment or query text there is malformed. LF and CRLF are accepted; bare CR is not. An exact sentinel with leading indentation, after line 1, or repeated later in the submitted query is an error rather than ordinary query text. Text such as `// pplquery-specific` is not a sentinel.
 
-A named connection records everything needed to reach one cluster — URL, username, TLS policy, timeout, and where to find its password — under a short name, turning this:
+The header is optional. This fieldless header is valid and uses environment settings and defaults:
 
-    pplquery --url https://search-staging.example.com --user ppl-reader \
-             --ca-file ~/certificates/staging-ca.pem query.ppl
+    // pplquery
 
-into this:
+    source = logs
 
-    pplquery --connection staging query.ppl
+## Supported fields
 
-Connections live in a JSON file. **There is no default file and no command that creates one** — if you have never made one, you do not have one, and `pplquery` uses direct configuration instead. Creating the file is the whole of the setup.
-
-## Where the file goes
-
-- Unix and macOS: `$XDG_CONFIG_HOME/pplquery/connections.json`, or `~/.config/pplquery/connections.json` when `XDG_CONFIG_HOME` is not set
-- Windows: `%APPDATA%\pplquery\connections.json`
-
-**--config** _FILE_ or `PPLQUERY_CONFIG` reads a different file, which suits a connection file checked into a project alongside the queries and certificates it belongs with.
-
-## Creating your first connection
-
-Make the directory and the file:
-
-    mkdir -p ~/.config/pplquery
-    install -m 600 /dev/null ~/.config/pplquery/connections.json
-
-Mode `600` makes it readable only by you. It holds no passwords, but it does describe your clusters and usernames.
-
-Put this in it — the smallest file that does something useful:
-
-    {
-      "default": "local",
-      "connections": {
-        "local": {
-          "url": "http://127.0.0.1:9200",
-          "authentication": {"type": "none"} } }
-    }
-
-`connections` holds one entry per cluster, keyed by the name you will use with **--connection**.
-
-    pplquery --list-connections
-
-    * local       http://127.0.0.1:9200   none
-
-The `*` marks the default. Adding **--format json** prints the same thing machine-readably, including each connection's password source and TLS settings.
-
-## Adding a cluster that needs a password
-
-A real cluster usually wants credentials. Add a second entry beside `local` in `connections`:
-
-    "staging": {
-      "url": "https://search-staging.example.com",
-      "authentication": {"type": "basic", "username": "ppl-reader",
-                         "passwordEnvironment": "STAGING_PPL_PASSWORD"} }
-
-`"type": "basic"` turns on HTTP Basic authentication and requires a `username` and an `https` URL. `passwordEnvironment` says _where the password comes from_, not what it is; the password itself never appears in this file. Before querying `staging`, put it in that variable:
-
-    read -rs STAGING_PPL_PASSWORD && export STAGING_PPL_PASSWORD
-    pplquery --connection staging query.ppl
-
-Swap `passwordEnvironment` for `passwordFile` to read from a file instead, which suits unattended jobs. A connection may name one of these, never both; with neither, the password falls back to `OPENSEARCH_PASSWORD`. See ["PASSWORDS"](#passwords).
-
-## Adding a private certificate authority
-
-An internal cluster's certificate is often signed by a CA your system does not trust, which shows up as `certificate verify failed`. Name the CA certificate rather than switching verification off, by adding to the `staging` entry:
-
-    "tls": {"verify": true, "caFile": "certificates/staging-ca.pem"}
-
-`caFile` is relative to the directory holding the configuration file, so `~/.config/pplquery/certificates/staging-ca.pem` is what gets read; `passwordFile` resolves the same way. That is deliberate: a connection file, its certificates, and its password files can be moved, backed up, or checked into a project as one unit.
-
-## Property reference
-
-At the top level, `connections` is required and `default` is optional. `default` is a sibling of `connections`, not a member of it — putting it inside produces the confusing complaint that a connection named `default` is not an object.
-
-Connection names must start with a letter or digit, and may then contain letters, digits, dots, underscores, and hyphens.
-
-Each connection accepts exactly these properties:
+Only these fields are supported:
 
 - `url`
 
-    **Required.** The cluster's base URL: `http` or `https`, a host, optionally a port. No path, credentials, query string, or fragment — `https://search.example.com:9200` is fine, `https://search.example.com/_plugins/_ppl` is not, because the endpoint path is appended for you.
+    The OpenSearch base URL. It has the same validation as **--url**: ASCII `http` or `https`, a host, no credentials, query, fragment, or non-root path.
 
-- `authentication`
+- `user`
 
-    **Required**, even when there is none to do — write `{"type": "none"}`. `type` is `"none"` or `"basic"`.
+    The ASCII Basic-authentication username. Authentication is inferred after all fields are merged; see ["AUTHENTICATION AND PASSWORDS"](#authentication-and-passwords).
 
-    `"basic"` also requires `username` (ASCII only) and an `https` URL, and accepts at most one of `passwordEnvironment` (the name of an environment variable) or `passwordFile` (a path). Neither `username` nor a password source may appear under `"none"`.
+- `password-environment`
 
-- `tls`
+    The name of the environment variable from which to read the password. It must match `PPLQUERY_[A-Z][A-Z0-9_]*`. This is a reference, not a password value.
 
-    _Optional_, and permitted only on `https` URLs — present but empty (`{}`) still counts as present, and is rejected on `http`.
+- `password-file`
 
-    `verify` is a JSON boolean, defaulting to true; `false` disables certificate and hostname checking and is incompatible with `caFile`. `caFile` is a path to a certificate authority file.
+    The path of a UTF-8 password file holding the password on a single line. It is mutually exclusive with `password-environment`.
 
-- `timeoutSeconds`
+- `ca-file`
 
-    _Optional_ positive integer, defaulting to `60`. It must be a JSON integer: `60` is accepted, `"60"` and `60.0` are not.
+    The CA certificate used for HTTPS verification. It requires an HTTPS URL and cannot be combined with `tls-verify: false`. A query header may only supply it for a URL that same header selects; see ["Header transport trust"](#header-transport-trust).
 
-Unknown properties are rejected rather than ignored, at every level. A setting quietly discarded because of a typo could leave you believing TLS verification or a password source had been applied when it had not.
+- `tls-verify`
 
-## Several connections, one cluster
+    Whether to verify the HTTPS certificate and hostname. The value must be exactly lowercase `true` or `false`. A query header may only turn verification off for a URL that same header selects; see ["Header transport trust"](#header-transport-trust).
 
-Nothing requires connection names to map one-to-one onto clusters. Multiple entries may share a URL with different usernames and password sources:
+- `timeout`
 
-    "logs-reader":  {"url": "https://search.example.com",
-                     "authentication": {"type": "basic", "username": "logs-ro",
-                                        "passwordEnvironment": "LOGS_RO_PASSWORD"}},
-    "metrics-admin": {"url": "https://search.example.com",
-                      "authentication": {"type": "basic", "username": "metrics-rw",
-                                         "passwordEnvironment": "METRICS_RW_PASSWORD"}}
+    The HTTP timeout in seconds. The value must be a canonical positive integer: digits beginning with `1` through `9`, with no sign, leading zero, decimal point, or whitespace after header trimming.
 
-This is how to work with a cluster whose index-level security grants different principals access to different indices: choose the identity by name at the point of use, rather than by remembering to change an environment variable.
+Unknown fields, including `password`, are rejected. Duplicate, malformed, and empty fields are rejected. Header syntax, individual values, and relationships between header fields are validated even if a higher-precedence command-line option will replace them. An overridden password reference is checked for valid syntax but its environment variable or file is not resolved.
 
-## When the file is wrong
+## Paths and submitted text
 
-The whole file is parsed and validated before any network call, so a mistake is reported as a specific complaint rather than a puzzling failure later. Errors name the connection and the property:
+Relative `password-file` and `ca-file` paths in a query header resolve against that query file's directory. In a query header read from standard input, they resolve against the process current directory. Relative paths in a file selected by **--connection-file** resolve against the selected file's directory. Absolute paths remain absolute. Relative paths supplied by command-line options or environment variables resolve against the process current directory.
 
-    Connection 'staging' contains unknown property 'timeout'
-    Connection 'staging' basic authentication requires an https URL
-    Connection 'staging' url must be a base URL without a path
+After decoding the input as UTF-8, `pplquery` removes the complete header and separator and submits the remainder character-for-character. Header metadata never reaches OpenSearch as query text. A header-only input or a remainder containing only whitespace is rejected as an empty query. Without an exact sentinel, the decoded query is submitted unchanged after checks for a misplaced sentinel.
 
-Three situations are not errors at all:
+# CONNECTION FILES
 
-- **The file does not exist.** At the default location it is skipped silently and direct configuration applies. Only a file named by **--config** or `PPLQUERY_CONFIG` must exist.
-- **The file has no `default`.** Valid, but every run must then select a connection with **--connection** or `PPLQUERY_CONNECTION`; one that does not is told `has no default connection; use --connection`.
-- **`OPENSEARCH_URL` is set.** It outranks the configuration file, unless the file was named explicitly; see ["Which cluster is chosen"](#which-cluster-is-chosen).
+**--connection-file** selects one UTF-8 file containing exactly one header under the same strict sentinel, field, value, and relationship rules described in ["CONNECTION HEADERS"](#connection-headers). Standalone connection files conventionally use the `.pplconn` filename extension; the CLI accepts any explicitly supplied filename. The sentinel is mandatory. Trailing ASCII spaces, tabs, and line endings are ignored, so EOF terminates the external header without requiring a blank separator line; if a separator is present, only whitespace may follow it. An unreadable file, invalid UTF-8, absent sentinel, malformed or invalid header, or non-whitespace body is rejected before an OpenSearch client is created.
 
-# PASSWORDS
+For example, `connections/production.pplconn` can contain:
 
-A password is never accepted as a command-line argument, because arguments are visible to every other process on the machine and are recorded in shell history. It is never read from the connection file either; that file describes where the password comes from, not what it is. Basic authentication is refused over plain HTTP, so credentials are never sent in the clear.
+    // pplquery
+    // url: https://search.example.com
+    // user: reader
+    // password-file: secrets/reader.password
+    // ca-file: certificates/internal-ca.pem
+    // timeout: 30
 
-For a connection with `"type": "basic"`, the password is found in this order:
+Both relative paths resolve from the `connections` directory, regardless of the query file's location or the process current directory.
 
-1. The file named by **--password-file** or `PPLQUERY_PASSWORD_FILE`. This per-invocation override beats the connection's own setting.
-2. The environment variable named by the connection's `passwordEnvironment`. If it is unset the run fails rather than falling back — a connection that names its own variable is taken at its word.
-3. The file named by the connection's `passwordFile`.
-4. `OPENSEARCH_PASSWORD`.
+When **--connection-file** is supplied, any connection header-like text in the query is non-authoritative and is not strictly validated. If the query begins with the exact sentinel line and a blank or horizontal-whitespace separator line occurs later, `pplquery` strips through the first such separator without examining the intervening lines. If that complete anchored shape is absent, including an incomplete, late, or indented header-like comment, the query is passed to OpenSearch unchanged. Query emptiness is checked after this stripping.
 
-Without a named connection, only steps 1 and 4 apply.
+This deliberately small behavior lets an operator override a query's metadata without allowing malformed query metadata to block the selected connection. The external file itself remains fully strict.
 
-Password files are UTF-8, and one trailing line ending is removed. Restrict their permissions:
+# PRECEDENCE
 
-    install -m 600 /dev/null ~/.config/pplquery/staging.password
-    printf '%s' 'the-password' > ~/.config/pplquery/staging.password
+Connection values normally merge field by field in this order: explicit command-line option, selected connection-file or query-header field, approved environment variable, then default. **--connection-file** makes its header the only metadata tier and query-header fields are ignored as connection inputs. Supplying one higher-precedence field does not replace unrelated lower-precedence fields. For example, a connection-file `timeout` may be combined with `PPLQUERY_URL`, while **--user** may be combined with a selected header password source.
+
+- URL: **--url**, selected `url`, `PPLQUERY_URL`, then `http://127.0.0.1:9200`
+- User: **--user**, selected `user`, then `PPLQUERY_USER`
+- Password source: **--password-file**, one selected header password reference, then `PPLQUERY_PASSWORD` or `PPLQUERY_PASSWORD_FILE`
+- CA file: **--ca-file**, selected `ca-file`, then `PPLQUERY_CA_FILE`, restricted for query headers by ["Header transport trust"](#header-transport-trust)
+- TLS verification: **--insecure**, selected `tls-verify`, `PPLQUERY_TLS_VERIFY`, then verification enabled, restricted for query headers by ["Header transport trust"](#header-transport-trust)
+- Timeout: **--timeout**, selected `timeout`, `PPLQUERY_TIMEOUT`, then `60`
+
+The password alternatives form one mutually exclusive semantic field. **--password-file** replaces either selected header reference and both environment sources. A selected query-header or connection-file `password-environment` or `password-file` replaces both environment sources. Otherwise `PPLQUERY_PASSWORD` and `PPLQUERY_PASSWORD_FILE` conflict if both are present. Lower-precedence environment values are not validated or resolved when the corresponding field has been replaced.
+
+## Header URL authentication isolation
+
+There is one security-specific exception to ordinary field merging. When the selected URL comes from the query header because neither **--url** nor **--connection-file** was supplied, environment authentication is excluded as a unit: `PPLQUERY_USER`, `PPLQUERY_PASSWORD`, and `PPLQUERY_PASSWORD_FILE` are not inherited for that endpoint. The query header may select anonymous access, or it must provide enough explicit CLI/header values to pair a username with a password source. A one-sided query-header user or password reference does not fall back to environment authentication.
+
+If **--url** replaces the query-header URL, environment authentication may merge because the query no longer controls the selected endpoint. A connection-file URL may also merge with environment authentication because **--connection-file** was explicitly selected by the operator. Timeout continues to follow normal field-by-field precedence; CA and TLS verification are subject to the separate restriction below.
+
+## Header transport trust
+
+A query header decides how the connection is verified only for a URL that same header selects. If the URL comes from **--url** or from `PPLQUERY_URL`, a query header carrying `ca-file` or `tls-verify: false` is refused with an error rather than applied, because the operator chose that endpoint and the query would otherwise be weakening the protection guarding it. Naming a CA is a restriction in form only: a CA the query chose accepts a server the operator's trust store would have rejected, exactly as skipping verification does.
+
+`tls-verify: true` is never refused, because it asks for the verification that is already the default and weakens nothing. A header field that a command-line option replaces is not refused either, since the replaced value is never applied. A file selected by **--connection-file** is exempt from the whole restriction: the operator chose that file explicitly, so its `ca-file` and `tls-verify` apply to a URL from any source.
+
+# AUTHENTICATION AND PASSWORDS
+
+There is no authentication-type option or header field. Basic authentication is inferred only when the merged connection contains both a user and one selected password source. Neither means anonymous access; either one alone is an error. Basic authentication is refused over plain HTTP, so credentials are not sent without HTTPS. Usernames and resolved passwords must be ASCII.
+
+Passwords are not accepted as command-line values or raw header fields. Command arguments are visible to other processes and may be recorded in shell history, while query files are commonly shared. Use **--password-file**, `PPLQUERY_PASSWORD`, `PPLQUERY_PASSWORD_FILE`, or a header password reference.
+
+A selected `password-environment` must name a nonempty variable matching `PPLQUERY_[A-Z][A-Z0-9_]*`. The named variable must be present and nonempty. It does not fall back to `PPLQUERY_PASSWORD`, and no variable outside the `PPLQUERY_` namespace can be named.
+
+A selected password file is decoded as UTF-8 and holds the password on a single line. Trailing LF and CRLF line endings are removed, however many the file ends with, so a file saved with a trailing blank line still yields the password the author intended. Trailing spaces are kept, because a password may legitimately end in one. The result must be nonempty and must not contain a line break or other control character: a file holding more than one line is a mistake rather than a multi-line password, and is rejected instead of producing an authentication failure whose cause is invisible. Restrict password-file permissions:
+
+    install -m 600 /dev/null ~/.config/pplquery/reader.password
+    read -rs password
+    printf '%s' "$password" > ~/.config/pplquery/reader.password && unset password
+    PPLQUERY_PASSWORD_FILE=$HOME/.config/pplquery/reader.password \
+      PPLQUERY_USER=reader PPLQUERY_URL=https://search.example.com \
+      pplquery query.ppl
+
+## Query-file trust and secret disclosure
+
+A query that controls `url` and names a `PPLQUERY_*` password variable explicitly authorizes sending that secret to that endpoint. Treat query files with connection headers as security-sensitive input: inspect an untrusted or newly downloaded query before running it. Namespace restriction, explicit username/password pairing, HTTPS enforcement, header-URL isolation, and the transport-trust restriction described in ["Header transport trust"](#header-transport-trust) prevent accidental inheritance, unrelated-environment lookup, and silent weakening of a connection the query did not choose, but they do not make a deliberately named secret safe to disclose to an untrusted endpoint. `pplquery` does not prompt or try compatibility fallbacks.
 
 # ENVIRONMENT
 
-The `PPLQUERY_*` variables stand in for the corresponding options: `PPLQUERY_CONFIG` for **--config**, `PPLQUERY_CONNECTION` for **--connection**, `PPLQUERY_PASSWORD_FILE` for **--password-file**.
+All supported connection environment variables use the `PPLQUERY_` namespace. Every present selected value must be nonempty. Boolean and integer values are strict and are not trimmed.
 
-The `OPENSEARCH_*` variables configure one cluster directly, and apply whenever no named connection does: `OPENSEARCH_URL` (default `http://127.0.0.1:9200`), `OPENSEARCH_USERNAME`, and `OPENSEARCH_PASSWORD`. For a single local cluster these three are the entire setup — no configuration file is needed, and `OPENSEARCH_URL` alone is enough for an unauthenticated one. See ["Which cluster is chosen"](#which-cluster-is-chosen) and ["PASSWORDS"](#passwords) for how they rank against a connection file.
+- `PPLQUERY_URL`
+
+    OpenSearch base URL. Default: `http://127.0.0.1:9200`.
+
+- `PPLQUERY_USER`
+
+    ASCII Basic-authentication username. It must be paired with a selected password source and is excluded when a query-header URL is selected, but may merge with an operator-selected connection-file URL.
+
+- `PPLQUERY_PASSWORD`
+
+    Direct Basic-authentication password. It conflicts with `PPLQUERY_PASSWORD_FILE`, is excluded when a query-header URL is selected, and is replaced by a CLI or selected header password source.
+
+- `PPLQUERY_PASSWORD_FILE`
+
+    Path to a UTF-8 password file. It conflicts with `PPLQUERY_PASSWORD`, is excluded when a query-header URL is selected, and is replaced by a CLI or selected header password source.
+
+- `PPLQUERY_CA_FILE`
+
+    CA certificate path for HTTPS verification. It cannot be combined with disabled TLS verification.
+
+- `PPLQUERY_TLS_VERIFY`
+
+    Exactly `true` or `false`. Default: `true`.
+
+- `PPLQUERY_TIMEOUT`
+
+    A canonical positive integer with no sign, leading zero, decimal point, or surrounding whitespace. Default: `60`.
 
 # EXIT STATUS
 
-`pplquery` exits `0` when the query succeeds and `1` otherwise — a rejected query, an authentication or TLS failure, an unreachable cluster, a malformed connection file, or invalid options.
+`pplquery` exits `0` when the query succeeds and `1` otherwise: a rejected query, an authentication or TLS failure, an unreachable cluster, a malformed query or external connection header, an empty query, or invalid options.
 
 Errors go to standard error prefixed with `pplquery:`, so they stay out of piped or redirected results. **--format json** is the exception: an error response from OpenSearch is printed to standard output as JSON, with exit status still `1`, keeping the cluster's full error available to scripts.
 
@@ -307,6 +306,10 @@ Errors go to standard error prefixed with `pplquery:`, so they stay out of piped
 An extension for Visual Studio Code and compatible editors runs `.ppl` files from the editor, providing syntax highlighting, snippets, field-name completion, and a results panel. It executes queries by invoking the `pplquery` command described here.
 
 Install `pplquery` first. The extension expects it on `PATH`; if it is elsewhere, set `pplquery.path` to the executable's full path.
+
+With CodeLens enabled, every `.ppl` document has a control row above line 1 containing **Run Query** and **Connection: Header/env**. Click the connection control to open a compact list of the active file, recently selected files, and `*.pplconn` files in the workspace. Choose **Browse...** only when the file is elsewhere. The control displays the selected filename and adds **Clear Connection**. The absolute path and recent list are retained in VS Code workspace state, not user or workspace settings, and the active file is passed to both query execution and field completion as **--connection-file**. The same select and clear actions are available from the Command Palette.
+
+While an external connection file is selected, the CLI strips and ignores a complete leading query header as described in ["CONNECTION FILES"](#connection-files). The extension does not read the external file, so it cannot prompt for a `password-environment` named there; that variable must already exist in the extension environment, or the connection file can use `password-file`. Selecting or clearing a connection file clears cached field names. Run **PPL: Refresh PPL Field Names** after the selected file's contents or an index mapping changes.
 
 ## From the Visual Studio Marketplace
 
@@ -322,33 +325,87 @@ Editors that do not use the Visual Studio Marketplace can install the packaged e
 
 Substitute the version you downloaded, and your editor's own command for `code`. The same file installs from the Extensions view through the `...` menu, **Install from VSIX**. To build it from a checkout, run `vsce package` in the `vscode` directory.
 
-## Settings
-
-The extension does not create or modify connection files. Set `pplquery.config` and `pplquery.connection` to use a named connection, or leave them unset and let the CLI's own configuration apply. Passwords are never stored in editor settings: when direct Basic authentication needs one, the extension prompts for it and keeps it in memory for the session only.
-
 # TROUBLESHOOTING
+
+Every error names the problem on its first line, echoing the value that was rejected and, for a header field, the line it appeared on. Because a connection field can be set from several places, the following lines list the sources that field accepts rather than reporting which one supplied the value; check the ones you use. Errors are matched below by their opening words.
+
+- `Cannot reach OpenSearch at ...`
+
+    The connection was never established, so the cluster returned nothing and is not necessarily at fault. The cause follows the endpoint: `Connection refused` usually means the wrong port or a cluster that is not running, a hostname failure means the name did not resolve, and `certificate verify failed` is covered separately below. Confirm the URL, then that the cluster is reachable from this host.
 
 - `Basic authentication requires an https URL`
 
     A username was supplied for an `http://` endpoint. Use the cluster's HTTPS URL.
 
+- `Basic-auth username and password must be set together`
+
+    The merged connection contains only one half of Basic authentication. The message says which half was supplied and lists the sources for the missing one. Supply both, or remove both for anonymous access. When the URL comes from a query header, the message also says that environment authentication was intentionally excluded for that endpoint; see ["Header URL authentication isolation"](#header-url-authentication-isolation).
+
 - `certificate verify failed`
 
-    The cluster's certificate was not signed by a certificate authority your system trusts, which is usual for an internal cluster. Point **--ca-file**, or the connection's `caFile`, at the issuing CA certificate. **--insecure** also silences it, but disables the check that detects an impersonated server.
+    Reported as part of `Cannot reach OpenSearch`. The cluster's certificate was not signed by a certificate authority your system trusts, which is usual for an internal cluster. Point **--ca-file**, header `ca-file`, or `PPLQUERY_CA_FILE` at the issuing CA certificate. **--insecure** also silences it, but disables the check that detects an impersonated server.
+
+- `A CA file requires an https URL`
+
+    A CA certificate was supplied for an `http://` endpoint, where there is no certificate to verify. The message echoes the URL in force. Either use the cluster's HTTPS URL or drop the CA file.
+
+- `A CA file and disabled TLS verification cannot be used together`
+
+    Both a CA file and `tls-verify: false` or **--insecure** were selected. A CA file already restricts which certificates are accepted, so the two settings contradict each other. Keep whichever you meant.
+
+- `A query header may not choose the CA` / `may not disable TLS verification`
+
+    A query header tried to change how the connection is verified for a URL it did not select; see ["Header transport trust"](#header-transport-trust). Give the header its own `url` field, move the setting to the command line, or select the connection with **--connection-file**.
+
+- `Malformed pplquery header field`
+
+    A header line is not in the required form. The message quotes the line and its number. Every field is written exactly `// key: value`: one space after the slashes, no space before the colon. A line that is an ordinary comment rather than a field is rejected too, because a connection header admits no free text.
+
+- `Password file ... must contain a single line`
+
+    The file holds a line break or control character after its trailing line endings were removed, so it contains more than a password. This is almost always a file saved with extra content rather than a deliberately multi-line password, and is rejected here instead of failing later as an authentication error with no visible cause.
+
+- `Query is empty`
+
+    The input contains no PPL text. The message names the file, or standard input. A connection header and its separator line are metadata and are removed before this check, so a file holding only a header is empty as far as the query is concerned; a header-only file belongs to **--connection-file**.
+
+- `... is not valid UTF-8`
+
+    A query file, connection file, password file, environment variable, or command-line argument contained bytes that are not UTF-8. `pplquery` decodes every input as UTF-8 and never guesses another encoding. Re-save the file as UTF-8.
+
+- `HTTP ... with a body that is not JSON` / `The response ... is not valid JSON`
+
+    Something answered, but not with the JSON the PPL plugin returns. A proxy, load balancer, or sign-in page in front of the cluster is the usual cause, and its status code and the start of its body are shown to help identify it. Confirm the URL addresses OpenSearch directly, and that any gateway in between passes `/_plugins/_ppl` through.
 
 - `OpenSearch URL must be a base URL without a path`
 
     The URL includes a path, such as a trailing `/_plugins/_ppl`. Give only the scheme, host, and port.
 
-- `Connection configuration ... contains unknown property`
+- `The pplquery header requires a blank separator line`
 
-    A property name is misspelled, or belongs at a different level of the file. Compare it against ["Property reference"](#property-reference).
+    The query input starts with the exact `// pplquery` sentinel but has no spaces-only or tabs-only separator after its field lines, so the parser read to the end of the input still inside the header. The message names the last line it read, which is usually the first line of the query being consumed as a field. Add the required separator before the PPL query. A standalone file selected by **--connection-file** may instead end after its final field.
+
+- `OpenSearch returned HTTP ...`
+
+    The cluster answered and rejected the request. The cluster's own `reason` leads the message, with its error type in parentheses; for a query mistake that reason names the token it stopped at. Add **--format json** to see the full error document, which is printed to standard output so it can be piped.
+
+- `Unknown pplquery header field`
+
+    The header contains a misspelled or unsupported key. The message quotes the line, its number, and the full list of supported fields; ["Supported fields"](#supported-fields) describes each one. Raw passwords and unapproved extension fields are intentionally rejected.
+
+- `PPLQUERY_PASSWORD and PPLQUERY_PASSWORD_FILE cannot both be set`
+
+    The environment selects two password sources at the same precedence tier. Unset one, or select a single higher-precedence source with **--password-file**, header `password-environment`, or header `password-file`.
 
 # CLOUD AND MANAGED OPENSEARCH
 
 Many Organizations that use Amazon OpenSearch Service likely require IAM, AWS Signature Version 4 request signing is not currently implemented. Other providers have their own schemes — API keys, bearer tokens, mutual TLS — and none are implemented either.
 
-If you use OpenSearch through AWS or another managed provider and would like `pplquery` to work there, please open a pull request or an issue at [https://codeberg.org/brainbuz/pplquery](https://codeberg.org/brainbuz/pplquery). Provider implementations should include mock tests that were developed from live tests against the target environment.
+If you use OpenSearch through AWS or another managed provider and would like `pplquery` to work there, please open a pull request or an issue at [https://codeberg.org/brainbuz/pplquery](https://codeberg.org/brainbuz/pplquery).
+
+# No SQL Support
+
+Conceptually on the Perl side it would be easy to add support for OpenSearch SQL. The VSCode extension has syntax highlighting and suggestions which is where more work and maintenance would like. Of the two SQL has a significant functionality deficit, limiting its usefulness. At present there is no plan to add it, it is a future consideration.
 
 # SEE ALSO
 

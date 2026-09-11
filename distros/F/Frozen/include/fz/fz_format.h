@@ -32,6 +32,9 @@
 #define FZ_TAG_MASK  0xFu
 #define FZ_ALIGN     8
 
+#define FZ_F_LOSSY_NV  1u
+#define FZ_F_STRINGIFY 2u
+
 #define FZ_MAX_BLOCK 0x7FFFFFF8u
 
 #define FZ_MAX_DEPTH 256

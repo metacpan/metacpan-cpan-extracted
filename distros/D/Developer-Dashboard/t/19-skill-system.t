@@ -265,7 +265,13 @@ my @dependency_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dependen
 close $dependency_log_fh;
 is_deeply(
     [ map { (/^(DDFILE_LOCAL|DDFILE|APT|BREW|NPM|PYTHON|CPANM):/)[0] } @dependency_steps ],
-    [ 'APT', 'NPM', 'PYTHON', 'CPANM', 'CPANM', 'DDFILE', 'DDFILE_LOCAL' ],
+
+    # DD-824: requirements.txt now attempts venv creation (python -m venv)
+    # before the pip install itself, so the PYTHON step now logs twice - the
+    # venv-creation attempt, then the install (which falls back to the
+    # previous global --user path here, since the python stub does not
+    # actually create a real venv for the fallback check to find).
+    [ 'APT', 'NPM', 'PYTHON', 'PYTHON', 'CPANM', 'CPANM', 'DDFILE', 'DDFILE_LOCAL' ],
     'skill install processes aptfile, package.json, requirements.txt, cpanfile, cpanfile.local, ddfile, and ddfile.local in policy order on Debian-like hosts while leaving apkfile, wingetfile, dnfile, and brewfile inactive',
 );
 open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
@@ -286,10 +292,18 @@ like(
 open my $python_log_fh, '<', $python_log or die "Unable to read $python_log: $!";
 my @python_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$python_log_fh>;
 close $python_log_fh;
+
+# DD-824: the first python invocation is now the venv-creation attempt
+# (python -m venv <skill>/local/venv), before the pip install itself.
 is(
     $python_steps[0],
+    "-m venv $install->{path}/local/venv|cwd=$install->{path}",
+    'requirements.txt install first attempts to create the skill its own local/venv',
+);
+is(
+    $python_steps[1],
     "-m pip install --user --requirement $install->{path}/requirements.txt|cwd=$install->{path}",
-    'requirements.txt installs declared Python dependencies through python -m pip install --user from the skill root itself',
+    'requirements.txt falls back to python -m pip install --user from the skill root itself when the venv the stub "created" is not actually a real interpreter',
 );
 ok( -d File::Spec->catdir( $ENV{HOME}, 'node_modules', 'express' ), 'package.json merges staged Node dependencies into HOME/node_modules' );
 ok( -d File::Spec->catdir( $ENV{HOME}, 'node_modules', 'uuid' ), 'package.json merges additional staged Node dependencies into HOME/node_modules' );

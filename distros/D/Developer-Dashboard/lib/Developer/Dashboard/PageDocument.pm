@@ -3,7 +3,7 @@ package Developer::Dashboard::PageDocument;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 
@@ -240,22 +240,10 @@ sub render_html {
     my $chrome_html = defined $opts{chrome_html} ? $opts{chrome_html} : '';
     my $nav_html = defined $opts{nav_html} ? $opts{nav_html} : '';
 
-    my $runtime_bootstrap = '';
-    my $runtime_output = '';
-    for my $chunk ( @{ $self->{meta}{runtime_outputs} || [] } ) {
-        next if !defined $chunk || ref($chunk);
-        if ( $chunk =~ /\A<script>/ && $chunk =~ /(set_chain_value|dashboard_ajax_singleton_cleanup)/ ) {
-            $runtime_bootstrap .= $chunk;
-            next;
-        }
-        $runtime_output .= $chunk;
-    }
-    my $runtime_errors = '';
-    for my $chunk ( @{ $self->{meta}{runtime_errors} || [] } ) {
-        next if !defined $chunk || ref($chunk);
-        $runtime_errors .= qq{<pre class="runtime-error">} . _html($chunk) . qq{</pre>\n};
-    }
+    my ( $runtime_bootstrap, $runtime_output ) = _split_runtime_output_chunks( $self->{meta}{runtime_outputs} );
+    my $runtime_errors = _render_runtime_error_chunks( $self->{meta}{runtime_errors} );
     my $legacy_bootstrap = _legacy_bootstrap();
+    my $style_block = _html_document_style();
 
     return <<"HTML";
 <!DOCTYPE html>
@@ -264,6 +252,65 @@ sub render_html {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>$title</title>
+$style_block
+</head>
+<body>
+$legacy_bootstrap
+<main>
+  $chrome_html
+  $nav_html
+  @{[ $desc ne '' ? qq{<p>$desc</p>} : '' ]}
+  <section class="body">$body_html</section>
+  $runtime_bootstrap
+  $runtime_output
+  $runtime_errors
+</main>
+</body>
+</html>
+HTML
+}
+
+# _split_runtime_output_chunks($runtime_outputs)
+# Separates the bootstrap-script runtime chunks (the ones that set up chain
+# values or singleton ajax cleanup) from the rest of the runtime output.
+# Input: array reference of runtime output chunks, or undef.
+# Output: two-element list of (bootstrap HTML string, remaining output HTML
+# string).
+sub _split_runtime_output_chunks {
+    my ($runtime_outputs) = @_;
+    my $runtime_bootstrap = '';
+    my $runtime_output = '';
+    for my $chunk ( @{ $runtime_outputs || [] } ) {
+        next if !defined $chunk || ref($chunk);
+        if ( $chunk =~ /\A<script>/ && $chunk =~ /(set_chain_value|dashboard_ajax_singleton_cleanup)/ ) {
+            $runtime_bootstrap .= $chunk;
+            next;
+        }
+        $runtime_output .= $chunk;
+    }
+    return ( $runtime_bootstrap, $runtime_output );
+}
+
+# _render_runtime_error_chunks($runtime_errors)
+# Renders each runtime error chunk as an HTML-escaped <pre> block.
+# Input: array reference of runtime error chunks, or undef.
+# Output: concatenated HTML string.
+sub _render_runtime_error_chunks {
+    my ($runtime_errors) = @_;
+    my $rendered = '';
+    for my $chunk ( @{ $runtime_errors || [] } ) {
+        next if !defined $chunk || ref($chunk);
+        $rendered .= qq{<pre class="runtime-error">} . _html($chunk) . qq{</pre>\n};
+    }
+    return $rendered;
+}
+
+# _html_document_style()
+# Returns the static <style> block shared by every rendered page document.
+# Input: none.
+# Output: HTML string containing the <style>...</style> element.
+sub _html_document_style {
+    return <<'STYLE';
   <style>
     :root {
       --bg: #f7f4ec;
@@ -355,21 +402,7 @@ sub render_html {
       color: var(--accent, var(--text, var(--ink)));
     }
   </style>
-</head>
-<body>
-$legacy_bootstrap
-<main>
-  $chrome_html
-  $nav_html
-  @{[ $desc ne '' ? qq{<p>$desc</p>} : '' ]}
-  <section class="body">$body_html</section>
-  $runtime_bootstrap
-  $runtime_output
-  $runtime_errors
-</main>
-</body>
-</html>
-HTML
+STYLE
 }
 
 # _decode_structured_json($text)

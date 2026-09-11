@@ -1,5 +1,51 @@
+4.31  2026-09-11
+
+  - DD-770: .claude/tools/host-ready's foreign-process detector matched on
+    command-line TEXT, which is spoofable - a process can rewrite its own
+    $0, and ps args/cmdline/comm all read the same rewritten buffer. Added a
+    positive-only /proc/PID/exe veto to dd_foreign_now(): a candidate is
+    excluded only when exe provably resolves to something other than
+    perl/prove/cover; an unreadable exe (the ordinary case across a
+    container's mount namespace) leaves it counted, never turning
+    could-not-look into excluded.
+  - DD-771: corrected a false premise found during this card's own research
+    - the /tmp/dd-gate-host.lock shared with the Tira project is deliberate
+    (TKT-857), not an accidental collision. Fixed the two genuine survivors:
+    run-suite's refusal now names the holding project via its cwd instead of
+    a bare pid, and a retry no longer silently truncates a failed attempt's
+    log (preserved to $LOG.prev before truncation).
+  - DD-740: extracted .claude/tools/board's DD-545 checkout-root resolution
+    (git --git-common-dir) into a shared .claude/tools/checkout-root helper;
+    board-pulse, next-action and tira-bridge-run now source it instead of
+    each hardcoding the checkout's absolute path.
+  - DD-785: extracted the duplicated paths-registry constructor guard from
+    seven modules (Collector, Doctor, IndicatorStore, PageStore,
+    Housekeeper, FileRegistry, Prompt) into
+    Developer::Dashboard::PathsRegistryArg (require_paths_arg), mirroring
+    DD-762's DirEntries.pm precedent.
+  - DD-767: bound t/100 and t/103's empty-environ probe loops by wall-clock
+    (Time::HiRes, 60s) instead of a fixed 3000-poll count - closing a gap
+    DD-482 specified but never shipped. A poll count is not a stable time
+    bound under Devel::Cover, where instrumentation overhead and host
+    contention both change what a fixed count buys; raising the count (as
+    shipped twice before) failed a third time under real load. Also fixes
+    a zombie-blind "-e /proc/PID" liveness check with a state+cmdline
+    diagnostic.
+
 4.30  2026-09-05
 
+  - DD-810: the switchboard now runs a main gate before resolving any command:
+    every executable file directly under <layer>/hooks/ in the runtime layer
+    stack runs once per invocation, deepest layer first and home last, with
+    the full command argv, and each hook's RESULT/LAST_RESULT is recorded
+    under the same keys the per-command chain writes. A hook that prints the
+    marker [[STOP]] on stderr skips the remaining hooks and the command does
+    not run; dashboard exits 1 with the hook's stderr visible. A layer stack
+    with no hooks/ directory produces bit-for-bit today's output and an empty
+    stderr. The hooks run with DEVELOPER_DASHBOARD_MAIN_GATE set so a nested
+    dashboard or d2 does not re-fire the gate, and d2's re-exec of dashboard
+    fires it exactly once. `dashboard which <cmd>` lists the main-gate hooks
+    before the per-command ones, in run order.
   - DD-764: a stored session record whose expires_at was absent, empty or "0"
     was accepted as valid forever by SessionStore::from_cookie and skipped by
     sweep_expired, so the record was both immortal and uncollectable - while a

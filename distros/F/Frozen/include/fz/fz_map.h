@@ -13,9 +13,10 @@
 #  include <unistd.h>
 #endif
 
-#define FZ_SRC_MMAP   0
-#define FZ_SRC_MALLOC 1
-#define FZ_SRC_SV     2
+#define FZ_SRC_MMAP     0
+#define FZ_SRC_MALLOC   1
+#define FZ_SRC_SV       2
+#define FZ_SRC_BORROWED 3
 
 #ifndef FZ_CONTAINER_FWD
 #define FZ_CONTAINER_FWD
@@ -26,7 +27,6 @@ struct fz_container {
     const unsigned char *base;
     size_t               len;
     int                  src;
-    int                  borrow;
     SV                  *holder;
 #ifdef _WIN32
     HANDLE               fh;
@@ -187,10 +187,39 @@ static int fz_container_attach_bytes(fz_container *c, const char *p, size_t len)
     return FZ_OPEN_OK;
 }
 
+static int fz_container_borrow(fz_container *c, const void *p, size_t len) {
+    if (!c || !p) return FZ_OPEN_MAP;
+    memset(c, 0, sizeof *c);
+#ifdef _WIN32
+    c->fh = INVALID_HANDLE_VALUE;
+    c->mh = INVALID_HANDLE_VALUE;
+#endif
+    c->base = (const unsigned char *)p;
+    c->len  = len;
+    c->src  = FZ_SRC_BORROWED;
+    return FZ_OPEN_OK;
+}
+
 static int fz_container_attach(pTHX_ fz_container *c, SV *sv) {
     STRLEN len;
     const char *p = SvPV(sv, len);
     return fz_container_attach_bytes(c, p, (size_t)len);
+}
+
+static int fz_container_adopt(pTHX_ fz_container *c, SV *sv) {
+    STRLEN len;
+    const char *p;
+    memset(c, 0, sizeof *c);
+#ifdef _WIN32
+    c->fh = INVALID_HANDLE_VALUE;
+    c->mh = INVALID_HANDLE_VALUE;
+#endif
+    p = SvPV(sv, len);
+    c->base   = (const unsigned char *)p;
+    c->len    = (size_t)len;
+    c->src    = FZ_SRC_SV;
+    c->holder = SvREFCNT_inc_simple_NN(sv);
+    return FZ_OPEN_OK;
 }
 
 #endif

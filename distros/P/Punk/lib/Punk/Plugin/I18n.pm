@@ -4,11 +4,14 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Punk ();
 use File::Spec ();
-use File::Raw::JSON qw(file_json_decode);
+use File::Raw ();
+# Loaded for its side effect: it registers the 'json' plugin that
+# File::Raw::slurp uses below. Nothing is imported.
+use File::Raw::JSON ();
 
 sub register {
     my ($class, $app, $opts) = @_;
@@ -40,18 +43,16 @@ sub register {
     my %cats;
     for my $f (@files) {
         (my $tag = $f) =~ s/\.json\z//;
+        $tag =~ tr/A-Z/a-z/;
         my $path = File::Spec->catfile($dir, $f);
 
-        open my $fh, '<:raw', $path
-            or die "Punk::Plugin::I18n: cannot read '$path': $!\n";
-        my $json = do { local $/; <$fh> };
-        close $fh;
-
-        my $data = eval { file_json_decode($json) };
-        if ($@) {
+        my $data = eval { File::Raw::slurp($path, plugin => 'json') };
+        if (!defined $data) {
             my $why = $@;
             $why =~ s/\s+\z//;
-            die "Punk::Plugin::I18n: '$path' will not parse: $why\n";
+            die -r $path
+                ? "Punk::Plugin::I18n: '$path' will not parse: $why\n"
+                : "Punk::Plugin::I18n: cannot read '$path': $!\n";
         }
         ref $data eq 'HASH'
             or die "Punk::Plugin::I18n: '$path' is not a JSON object - a "
@@ -59,7 +60,12 @@ sub register {
         $cats{$tag} = $data;
     }
 
-    return $class->_build($app, \%cats, $opts);
+    my $ok = eval { $class->_build($app, \%cats, $opts); 1 };
+    return 1 if $ok;
+
+    my $why = $@;
+    $why =~ s/\s+\z//;
+    die "$why (catalogues from '$dir')\n";
 }
 
 1;
@@ -117,7 +123,20 @@ The query parameter naming a locale explicitly. Defaults to C<lang>.
 
 =item C<cookie>
 
-Where an explicit choice is remembered. Defaults to C<punk.lang>.
+The cookie a stored language choice is B<read> from. Defaults to
+C<punk.lang>.
+
+Punk does not write it. Setting it is the application's job, in whatever
+handler its language switcher posts to:
+
+    post '/language' => sub {
+        my ($c) = @_;
+        $c->cookie('punk.lang' => $c->param('lang'));
+        $c->redirect('/');
+    };
+
+which is also where the C<SameSite>, C<Secure> and expiry belong, because
+those are decisions about your site rather than about translation.
 
 =back
 
@@ -132,6 +151,29 @@ catalogue is an error at boot, in front of whoever deployed it, rather than a
 missing string at three in the morning.
 
 There is no reload. Changing a translation is a deploy.
+
+=head2 What a catalogue may contain
+
+A translation is B<text>. Numbers are stored as their digits, so
+C<< {"count": 5} >> reads back as C<"5">; anything with no sensible text form
+is refused at boot, with the path named:
+
+    { "x": null }          refused
+    { "x": [ "a", "b" ] }  refused - there is no way to ask for an element
+    { "x": true }          refused
+    { "a.b": "..." }       refused - see below
+
+Each of those used to be a B<silence>. A null rendered as the empty string
+and the rest rendered as the key, so the page was wrong and nothing said so.
+
+B<A key may not contain a dot.> A dot separates levels, so C<< {"a.b": "x"} >>
+could never be reached: C<< $c->locale('a.b') >> descends through C<a>, and a
+template splits on dots long before the lookup runs. It is now a boot error
+rather than a key that quietly answers for a different one - which it did,
+and B<not even consistently>: which of C<< {"a.b": x} >> and
+C<< {"a": {"b": y}} >> won was decided by the hash order of the process that
+loaded it, so two workers in one pool could serve different translations for
+the same key and a page changed wording on refresh.
 
 =head2 In templates
 
@@ -203,6 +245,21 @@ An object nests, and the levels join with a dot:
 
     $c->locale('items.one')
 
+In a template the same object is a hash, and it can be B<iterated>:
+
+    {% for k in locale.items %}...{% end %}
+
+    my @keys = keys %{ $data->{locale}{items} };
+
+The order is the same in every process. That is a property of the stored
+catalogue rather than of this interpreter, so unlike an ordinary Perl hash it
+is safe to rely on. Iteration lists the keys of the B<negotiated> language
+only: a section that has not been translated yet lists as empty, while
+C<< $c->locale >> on a key inside it still falls back to the default, which
+is what keeps a half-translated page readable.
+
+The hash is read-only. Writing to it croaks and says why.
+
 =head2 C<< $c->locale >>
 
     $c->locale                    # the negotiated tag, e.g. 'en-GB'
@@ -269,10 +326,14 @@ C<default>.
 
 =back
 
-An explicit C<?lang=> is remembered, or a language switcher works once and
-appears broken on the next link. A C<?lang=> naming a locale with no catalogue
-falls through to the next source rather than failing: it is exactly the
-parameter people hand-edit.
+A C<?lang=> naming a locale with no catalogue falls through to the next source
+rather than failing: it is exactly the parameter people hand-edit.
+
+B<An explicit C<?lang=> is not remembered for you.> It selects the language
+for that request and nothing more, so a switcher that only links to
+C<?lang=fr> works once and appears broken on the next link. To make it stick,
+write the cookie yourself - see L</cookie> - which is the one line that turns
+a one-request choice into a stored one.
 
 =head3 Negotiation
 

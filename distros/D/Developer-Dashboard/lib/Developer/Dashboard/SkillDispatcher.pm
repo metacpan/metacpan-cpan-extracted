@@ -3,9 +3,10 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Config ();
+use Developer::Dashboard::DirEntries qw(sorted_dir_entries);
 use IPC::Open3 qw(open3);
 use File::Spec;
 use IO::Select;
@@ -162,7 +163,7 @@ sub execute_hooks {
         my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$resolved_command.d" );
         next if !-d $hooks_dir;
         opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";    # uncoverable branch true
-        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
+        for my $entry ( sorted_dir_entries($dh) ) {
             my $hook_path = File::Spec->catfile( $hooks_dir, $entry );
             next unless is_runnable_file($hook_path);
 
@@ -234,7 +235,7 @@ sub _execute_hooks_streaming {
         my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$command.d" );
         next if !-d $hooks_dir;
         opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";    # uncoverable branch true
-        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
+        for my $entry ( sorted_dir_entries($dh) ) {
             my $hook_path = File::Spec->catfile( $hooks_dir, $entry );
             next unless is_runnable_file($hook_path);
 
@@ -556,7 +557,7 @@ sub command_hook_paths {
         my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$resolved_command.d" );
         next if !-d $hooks_dir;
         opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";    # uncoverable branch true
-        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
+        for my $entry ( sorted_dir_entries($dh) ) {
             my $hook_path = File::Spec->catfile( $hooks_dir, $entry );
             next unless is_runnable_file($hook_path);
             push @hooks, $hook_path;
@@ -1359,7 +1360,7 @@ sub _relative_files {
 
     my @relative_files;
     opendir my $dh, $root or die "Unable to read $root: $!";    # uncoverable branch true
-    for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir $dh ) {
+    for my $entry ( sorted_dir_entries($dh) ) {
         my $path = File::Spec->catfile( $root, $entry );
         if ( -d $path ) {
             push @relative_files, map { $entry . '/' . $_ } $self->_relative_files($path);

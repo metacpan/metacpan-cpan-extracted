@@ -26,26 +26,26 @@ subtest '1. Format Detection and Legacy Decoding' => sub {
 
     # v1: 2003 FlatDB
     my $r_v1 = "101\tProduct 2003\tDescription\\twith tab";
-    is( $tools->_detect_record_format($r_v1), 'v1', 'Detected 2003 format as v1' );
-    my @dec_v1 = $tools->decode_legacy_record($r_v1);
+    is( $adb->detect_record_format($r_v1), 'v1', 'Detected 2003 format as v1' );
+    my @dec_v1 = $adb->tsv_decode($r_v1);
     is_deeply( \@dec_v1, [ "101", "Product 2003", "Description\twith tab" ], '2003 v1 decoded accurately' );
 
     # v2: 2005 \T array
     my $r_v2 = "102\tLaptop\tred\\Tblue\\Tgreen";
-    is( $tools->_detect_record_format($r_v2), 'v2', 'Detected 2005 format as v2' );
-    my @dec_v2 = $tools->decode_legacy_record($r_v2);
+    is( $adb->detect_record_format($r_v2), 'v2', 'Detected 2005 format as v2' );
+    my @dec_v2 = $adb->tsv_decode($r_v2);
     is_deeply( \@dec_v2, [ "102", "Laptop", [ "red", "blue", "green" ] ], '2005 v2 decoded accurately' );
 
     # v3: 2021 <TAB> hierarchy
     my $r_v3 = "103<TAB0>Phone<TAB0>opt1<TAB1>opt2<TAB1>opt3";
-    is( $tools->_detect_record_format($r_v3), 'v3', 'Detected 2021 format as v3' );
-    my @dec_v3 = $tools->decode_legacy_record($r_v3);
+    is( $adb->detect_record_format($r_v3), 'v3', 'Detected 2021 format as v3' );
+    my @dec_v3 = $adb->tsv_decode($r_v3);
     is_deeply( \@dec_v3, [ "103", "Phone", [ "opt1", "opt2", "opt3" ] ], '2021 v3 decoded accurately' );
 
     # v4: 2026 ARRAY: / HASH:
     my $r_v4 = "104\tiPhone\tARRAY:tag1|tag2\tHASH:color=Titanium|stock=10";
-    is( $tools->_detect_record_format($r_v4), 'v4', 'Detected 2026 format as v4' );
-    my @dec_v4 = $tools->decode_legacy_record($r_v4);
+    is( $adb->detect_record_format($r_v4), 'v4', 'Detected 2026 format as v4' );
+    my @dec_v4 = $adb->tsv_decode($r_v4);
     is_deeply( \@dec_v4, [ "104", "iPhone", [ "tag1", "tag2" ], { color => "Titanium", stock => "10" } ], '2026 v4 decoded accurately' );
 };
 

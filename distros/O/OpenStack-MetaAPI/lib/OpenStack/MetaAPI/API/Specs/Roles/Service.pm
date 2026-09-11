@@ -41,9 +41,9 @@ sub post {
 sub query_filters_for {
     my ($self, $method, $route, $args) = @_;
 
-    die unless defined $method;
-    die unless defined $route;
-    die unless ref $args eq 'ARRAY';
+    die "query_filters_for: method is required"          unless defined $method;
+    die "query_filters_for: route is required"           unless defined $route;
+    die "query_filters_for: args must be an ARRAY ref"   unless ref $args eq 'ARRAY';
 
     return unless @$args % 2 == 0;
 
@@ -134,7 +134,7 @@ OpenStack::MetaAPI::API::Specs::Roles::Service
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

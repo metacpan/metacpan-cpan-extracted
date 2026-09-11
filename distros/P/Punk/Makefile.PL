@@ -17,6 +17,7 @@ my @PROVIDERS = (
     [ 'Search::Trigram'   => '../Search-Trigram/include'    ],
     [ 'DBIx::Loop'        => '../DBIx-Loop/include'         ],
     [ 'Apophis'           => '../Apophis/include'           ],
+    [ 'Frozen'            => '../Frozen/include'            ],
 );
 my $INC = '-Iinclude';
 my $pkg;
@@ -130,7 +131,8 @@ my %WriteMakefileArgs = (
         'Hyperman'            => '0.45',
         'Markdown::Simple'    => '0.21',
         'Search::Trigram'     => '0.03',
-        'DBIx::Loop'          => '0.03',
+        'DBIx::Loop'          => '0.07',
+        'Frozen'              => '0.06',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -138,6 +140,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'Open::API'            => '0.09',
         'Template::Stencil'    => '0.10',
+        'File::Raw'            => '0.18',
         'File::Raw::JSON'      => '0.06',
         'File::Raw::XML'       => '0.03',
         'Fetch'                => '0.12',
@@ -148,6 +151,7 @@ my %WriteMakefileArgs = (
         'Search::Trigram'      => '0.03',
         'Apophis'              => '0.05',
         'DBIx::Loop'           => '0.07',
+        'Frozen'               => '0.06',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

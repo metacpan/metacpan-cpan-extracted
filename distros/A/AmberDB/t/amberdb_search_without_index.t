@@ -29,7 +29,7 @@ my $adb = AmberDB->new(
 # SUBTEST 1: Unindexed Schema & No Index Files Verification
 # ==============================================================================
 subtest '1. Unindexed Schema & Verification of No Index Files on Disk' => sub {
-    plan tests => 8;
+    plan tests => 6;
 
     my $tbl = 'catalog_unindexed';
     my $table_info = {
@@ -54,16 +54,12 @@ subtest '1. Unindexed Schema & Verification of No Index Files on Disk' => sub {
     }
 
     my $table_path = $adb->table_path($tbl);
-    my $src1_path  = "${table_path}_1.src";
-    my $src2_path  = "${table_path}_2.src";
-    my $src3_path  = "${table_path}_3.src";
     my $db_file    = "$table_path.db";
+    my $src_path   = "${table_path}.src";
 
     # Confirm raw .db file exists, but NO search index (.src) files exist
     ok( -e $db_file, "Data file ${tbl}.db created on disk" );
-    ok( !-e $src1_path, "No .src index file created for SKU block" );
-    ok( !-e $src2_path, "No .src index file created for title block" );
-    ok( !-e $src3_path, "No .src index file created for description block" );
+    ok( !-e $src_path, "No .src index file created" );
 
     # Basic unindexed search verification via table scan
     my @res_kulaklik = $adb->search_table( $tbl, 'kulaklık' );

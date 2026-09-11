@@ -15,8 +15,30 @@ my $TOOLS = File::Spec->catdir( $ROOT, '.claude', 'tools' );
 # on .git, because a linked worktree keeps .git as a FILE holding a gitdir
 # pointer, and a -d test switched a whole guard off in exactly the place all
 # ticket work is authored (t/139 guards that pattern).
-plan skip_all => 'not a source tree, or no operator tools directory'
-  if !-e File::Spec->catdir( $ROOT, '.git' ) || !-d $TOOLS;
+# TWO CAUSES, TWO MESSAGES (DD-797). These are not the same event and reporting
+# them in one sentence is what hid the second for as long as .claude/ has been
+# out of git:
+#
+#   no .git        an installed copy from the tarball. There is genuinely nothing
+#                  here to run, skipping is correct, and it needs no attention.
+#   .git, no tools a SOURCE TREE MISSING ITS OPERATOR TOOLS - every CI run, since
+#                  origin/master carries zero .claude paths, and every sandbox.
+#                  The specs exist; they are not reachable from here. That is a
+#                  gap, and it used to announce itself in the words of the case
+#                  above.
+#
+# This project already requires every checker to separate CLEAN from
+# COULD-NOT-LOOK. A skip is the same decision-not-to-measure, and this is where
+# that rule was missing. It still SKIPS rather than fails: the absence is a
+# deliberate operator-local choice, and reddening CI for it would punish everyone
+# for a decision made on purpose.
+plan skip_all => 'not a source tree - no .git here, so this is an installed copy with nothing to run'
+  if !-e File::Spec->catdir( $ROOT, '.git' );
+
+plan skip_all => "operator tool specs are not reachable from this tree: $TOOLS does not exist, "
+  . 'so none of them ran here. .claude/ is operator-local and carries no paths on origin/master, '
+  . 'which is why this skip is the normal state in CI and in every sandbox'
+  if !-d $TOOLS;
 
 # WHY THIS FILE EXISTS (DD-573)
 #   Thirteen spec files sat under .claude/tools/ and NOTHING executed any of

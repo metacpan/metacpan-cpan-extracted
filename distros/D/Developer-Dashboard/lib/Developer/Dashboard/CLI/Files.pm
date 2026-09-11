@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Files;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Cwd qw(cwd);
 use Getopt::Long qw(GetOptionsFromArray);
@@ -11,6 +11,14 @@ use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::CLI::TableHelpers qw(
+    build_paths
+    aliases_table
+    list_table
+    mutation_table
+    removal_table
+    render_table
+);
 
 # run_files_command(%args)
 # Dispatches the lightweight dashboard file/files CLI behaviour without loading
@@ -25,7 +33,7 @@ sub run_files_command {
     my $argv    = $args{args}    || die "Missing command arguments\n";
     die "Command arguments must be an array reference\n" if ref($argv) ne 'ARRAY';
 
-    my $paths = _build_paths();
+    my $paths = build_paths();
     my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
     my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
     my $aliases_loaded = 0;
@@ -81,7 +89,7 @@ sub run_files_command {
             print json_encode($matches);
             return 1;
         }
-        print _list_table( 'Path', $matches );
+        print list_table( 'Path', $matches );
         return 1;
     }
     if ( $action eq 'add' ) {
@@ -97,7 +105,7 @@ sub run_files_command {
             print json_encode($saved);
             return 1;
         }
-        print _mutation_table(
+        print mutation_table(
             alias    => $saved->{name},
             stored   => $saved->{path},
             resolved => $saved->{resolved},
@@ -116,7 +124,7 @@ sub run_files_command {
             print json_encode($deleted);
             return 1;
         }
-        print _removal_table(
+        print removal_table(
             alias   => $deleted->{name},
             removed => $deleted->{removed},
         );
@@ -131,26 +139,11 @@ sub run_files_command {
             print json_encode( $files->named_files );
             return 1;
         }
-        print _aliases_table( $files->named_files );
+        print aliases_table( $files->named_files );
         return 1;
     }
 
     die "Usage: dashboard file <resolve|locate|add|del|list> ...\n";
-}
-
-# _build_paths()
-# Builds the lightweight path registry used by the file helper commands.
-# Input: none.
-# Output: Developer::Dashboard::PathRegistry object scoped to the current cwd.
-sub _build_paths {
-    my $home = $ENV{HOME} || '';
-    my @roots = grep { -d } map { "$home/$_" } qw(projects src work);
-    return Developer::Dashboard::PathRegistry->new(
-        home            => $home,
-        cwd             => cwd(),
-        workspace_roots => \@roots,
-        project_roots   => \@roots,
-    );
 }
 
 # _files_table($files_hash)
@@ -160,74 +153,7 @@ sub _build_paths {
 sub _files_table {
     my ($all_files) = @_;
     my @rows = map { [ $_, $all_files->{$_} ] } sort keys %{ $all_files || {} };
-    return _render_table( [ 'File', 'Value' ], \@rows );
-}
-
-# _aliases_table($aliases_hash)
-# Renders one saved file-alias registry as a summary table.
-# Input: hash reference keyed by alias name.
-# Output: formatted table text string.
-sub _aliases_table {
-    my ($aliases) = @_;
-    my @rows = map { [ $_, $aliases->{$_} ] } sort keys %{ $aliases || {} };
-    return _render_table( [ 'Alias', 'Path' ], \@rows );
-}
-
-# _list_table($label, $items)
-# Renders one flat file-match list as a single-column summary table.
-# Input: column label string and array reference of scalar items.
-# Output: formatted table text string.
-sub _list_table {
-    my ( $label, $items ) = @_;
-    my @rows = map { [ $_ ] } @{ $items || [] };
-    return _render_table( [$label], \@rows );
-}
-
-# _mutation_table(%args)
-# Renders one file-alias add/update result as a summary table.
-# Input: alias, stored path, resolved path, and status strings.
-# Output: formatted table text string.
-sub _mutation_table {
-    my (%args) = @_;
-    return _render_table(
-        [ 'Alias', 'Stored', 'Resolved', 'Status' ],
-        [ [ map { $args{$_} // '' } qw(alias stored resolved status) ] ],
-    );
-}
-
-# _removal_table(%args)
-# Renders one file-alias removal result as a summary table.
-# Input: alias string and removed boolean flag.
-# Output: formatted table text string.
-sub _removal_table {
-    my (%args) = @_;
-    return _render_table(
-        [ 'Alias', 'Removed', 'Status' ],
-        [ [ $args{alias} // '', $args{removed} ? 'yes' : 'no', $args{removed} ? 'removed' : 'no-change' ] ],
-    );
-}
-
-# _render_table($header, $rows)
-# Formats one rectangular data set as a padded terminal table.
-# Input: header array reference and row array reference.
-# Output: formatted table text string.
-sub _render_table {
-    my ( $header, $rows ) = @_;
-    my @widths = map { length( defined $_ ? $_ : '' ) } @{ $header || [] };
-    for my $row ( @{ $rows || [] } ) {
-        for my $idx ( 0 .. $#{$row} ) {
-            my $value = defined $row->[$idx] ? $row->[$idx] : '';
-            my $width = length($value);
-            $widths[$idx] = $width if $width > $widths[$idx];
-        }
-    }
-    my @lines;
-    push @lines, join( '  ', map { sprintf "%-*s", $widths[$_], ( $header->[$_] // '' ) } 0 .. $#widths );
-    push @lines, join( '  ', map { '-' x $widths[$_] } 0 .. $#widths );
-    for my $row ( @{ $rows || [] } ) {
-        push @lines, join( '  ', map { sprintf "%-*s", $widths[$_], ( defined $row->[$_] ? $row->[$_] : '' ) } 0 .. $#widths );
-    }
-    return join( "\n", @lines ) . "\n";
+    return render_table( [ 'File', 'Value' ], \@rows );
 }
 
 1;

@@ -14,9 +14,7 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        hashmap_ii_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
+        HM_DESTROY(HashMapII, hashmap_ii_destroy, self_sv);
 
 bool
 put(SV* self_sv, int64_t key, int64_t value)
@@ -131,6 +129,7 @@ void
 keys(SV* self_sv)
     PPCODE:
         EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
+        if (GIMME_V == G_SCALAR) { mXPUSHu(self->size); XSRETURN(1); }
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -143,6 +142,7 @@ void
 values(SV* self_sv)
     PPCODE:
         EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
+        if (GIMME_V == G_SCALAR) { mXPUSHu(self->size); XSRETURN(1); }
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -155,6 +155,7 @@ void
 items(SV* self_sv)
     PPCODE:
         EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
+        if (GIMME_V == G_SCALAR) { mXPUSHu(self->size); XSRETURN(1); }
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -196,7 +197,9 @@ drain(SV* self_sv, UV count)
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         UV n = 0;
         EXTEND(SP, (count < self->size ? count : self->size) * 2);
-        while (self->iter_pos < self->capacity && n < count) {
+        size_t scanned;
+        for (scanned = 0; scanned < self->capacity && n < count; scanned++) {
+            if (self->iter_pos >= self->capacity) self->iter_pos = 0;
             size_t i = self->iter_pos++;
             if (II_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 mXPUSHi(self->nodes[i].key);
@@ -230,7 +233,9 @@ pop(SV* self_sv)
             }
             XSRETURN_EMPTY;
         } else {
-            while (self->iter_pos < self->capacity) {
+            size_t scanned;
+            for (scanned = 0; scanned < self->capacity; scanned++) {
+                if (self->iter_pos >= self->capacity) self->iter_pos = 0;
                 size_t i = self->iter_pos++;
                 if (II_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                     EXTEND(SP, 2);
@@ -266,8 +271,9 @@ shift(SV* self_sv)
             }
             XSRETURN_EMPTY;
         } else {
-            if (self->iter_pos == 0) self->iter_pos = self->capacity;
-            while (self->iter_pos > 0) {
+            size_t scanned;
+            for (scanned = 0; scanned < self->capacity; scanned++) {
+                if (self->iter_pos == 0) self->iter_pos = self->capacity;
                 size_t i = --self->iter_pos;
                 if (II_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                     EXTEND(SP, 2);
@@ -358,7 +364,8 @@ thaw(char* class, SV* data)
         uint32_t ls; memcpy(&ls, p, 4); p += 4;
         HashMapII* map = hashmap_ii_create((size_t)ms, dt, ls);
         if (!map) croak("Failed to create map for thaw");
-        if (cnt > 0) hashmap_ii_reserve(map, (size_t)cnt);
+        if ((size_t)(end - p) / 20 < cnt) { hashmap_ii_destroy(map); croak("Truncated freeze data"); }
+        if (cnt > 0 && !hashmap_ii_reserve(map, (size_t)cnt)) { hashmap_ii_destroy(map); croak("OOM during thaw"); }
         { uint32_t j;
           for (j = 0; j < cnt; j++) {
             if (p + 20 > end) { hashmap_ii_destroy(map); croak("Truncated freeze data"); }
@@ -369,7 +376,6 @@ thaw(char* class, SV* data)
             if (ttl == 0 && map->expires_at) hashmap_ii_persist(map, key);
           }
         }
-        if (p > end) croak("Truncated freeze data");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -427,29 +433,30 @@ from_hash(SV* self_sv, SV* href)
         if (!SvROK(href) || SvTYPE(SvRV(href)) != SVt_PVHV)
             croak("from_hash requires a hashref");
         HV* hv = (HV*)SvRV(href);
-        hashmap_ii_reserve(self, (size_t)HvUSEDKEYS(hv));
+        if (!hashmap_ii_reserve(self, (size_t)HvUSEDKEYS(hv))) croak("OOM during from_hash");
         hv_iterinit(hv);
         HE* he;
         while ((he = hv_iternext(hv))) {
             SV* ksv = hv_iterkeysv(he);
-            int64_t key = (int64_t)SvIV(ksv);
-            SV* val = HeVAL(he);
-            hashmap_ii_put(self, key, (int64_t)SvIV(val), 0);
+            int64_t key; HM_SV_TO_I64(key, ksv);
+            if (hashmap_ii_key_is_reserved(key)) continue;
+            SV* val = hv_iterval(hv, he);   /* HeVAL is NULL for a tied hash */
+            int64_t v; HM_SV_TO_I64(v, val);
+            if (!hashmap_ii_put(self, key, v, 0)) croak("OOM during from_hash");
         }
 
 void
 merge(SV* self_sv, SV* other_sv)
     CODE:
         EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        if (!SvROK(other_sv) || !SvOBJECT(SvRV(other_sv)) || SvSTASH(SvRV(other_sv)) != stash_ii)
-            croak("Expected a Data::HashMap::II object");
-        HashMapII* other = INT2PTR(HashMapII*, SvIV(SvRV(other_sv)));
-        hashmap_ii_reserve(self, self->size + other->size);
+        EXTRACT_OTHER_MAP(HashMapII, stash_ii, "Data::HashMap::II", other_sv);
+        if (self == other) XSRETURN_EMPTY;
+        if (!hashmap_ii_reserve(self, self->size + other->size)) croak("OOM during merge");
         uint32_t now = other->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
         for (i = 0; i < other->capacity; i++) {
             if (II_NODE_LIVE(other->nodes[i]) && !HM_TTL_SKIP_EXPIRED(other, i, now))
-                hashmap_ii_put(self, other->nodes[i].key, other->nodes[i].value, 0);
+                if (!hashmap_ii_put(self, other->nodes[i].key, other->nodes[i].value, 0)) croak("OOM during merge");
         }
 
 
@@ -473,10 +480,10 @@ to_hash(SV* self_sv)
         RETVAL
 
 bool
-put_ttl(SV* self_sv, int64_t key, int64_t value, UV ttl)
+put_ttl(SV* self_sv, int64_t key, int64_t value, SV* ttl)
     CODE:
         EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        RETVAL = hashmap_ii_put(self, key, value, (uint32_t)ttl);
+        RETVAL = hashmap_ii_put(self, key, value, hm_ttl_arg(aTHX_ ttl));
     OUTPUT:
         RETVAL
 

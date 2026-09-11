@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000064';
+our $VERSION = '0.000065';
 
 ## no critic (Bangs::ProhibitDebuggingModules)
 
@@ -141,6 +141,13 @@ has _pad_imports => (
     default  => 1,
 );
 
+has _preserve_require => (
+    is       => 'ro',
+    isa      => Bool,
+    init_arg => 'preserve_require',
+    default  => 1,
+);
+
 has _tidy_whitespace => (
     is       => 'ro',
     isa      => Bool,
@@ -169,9 +176,45 @@ sub _build_export_inspector {
 # what gets exported by using the implicit list.
 sub _build_explicit_exports {
     my $self = shift;
+
+    # Env is a special case. It ties environment variables to Perl variables,
+    # so there is no @EXPORT for the ExportInspector to discover -- whatever a
+    # given "use Env" statement imports is exactly what it provides. Treat the
+    # statement's own arguments as its exportable symbols so that unused ones
+    # can be pruned. See t/env.t and GH #23.
+    if ( $self->_is_env ) {
+        return $self->_env_exports;
+    }
+
     return $self->_export_inspector->has_explicit_exports
         ? $self->_export_inspector->explicit_exports
         : $self->_export_inspector->implicit_exports;
+}
+
+sub _is_env {
+    my $self = shift;
+    my $name = $self->module_name;
+    return defined $name && $name eq 'Env';
+}
+
+sub _env_exports {
+    my $self = shift;
+
+    my %exports;
+    for my $arg ( @{ $self->_found_imports // [] } ) {
+
+        # A bareword (FOO) and the scalar form ($FOO) both tie the scalar
+        # $FOO; only @FOO and %FOO tie the array or hash. Key on the sigil'd
+        # symbol we'll actually search for in the code, but keep the literal
+        # the user wrote as the value so we preserve their original style.
+        my $sigil = substr( $arg, 0, 1 );
+        my $key
+            = ( $sigil eq '$' || $sigil eq '@' || $sigil eq '%' )
+            ? $arg
+            : '$' . $arg;
+        $exports{$key} = $arg;
+    }
+    return \%exports;
 }
 
 ## no critic (Subroutines::ProhibitExcessComplexity)
@@ -372,7 +415,16 @@ sub _build_imports {
         }
     }
 
-    my @found = map { $self->_import_name($_) } keys %found;
+    # When a module exports a typeglob (e.g. English exports *PROGRAM_NAME),
+    # _import_name normalizes an imported slot like $PROGRAM_NAME to the
+    # typeglob form *PROGRAM_NAME. But if the user explicitly imported a valid
+    # slot form, that is correct and more minimal, so preserve what they wrote
+    # rather than expanding it to the typeglob.
+    my %found_imports
+        = map { $_ => 1 } @{ $self->_found_imports // [] };
+    my @found
+        = map { exists $found_imports{$_} ? $_ : $self->_import_name($_); }
+        keys %found;
 
     # Some modules have imports which are basically flags, rather than names of
     # symbols to export.  So if a flag is already in the import, we need to
@@ -403,6 +455,11 @@ sub _build_is_ignored {
         return 1 if !$self->_is_translatable;
     }
 
+    # A bare "use Env;" imports every environment variable. There are no
+    # explicit arguments to prune, so leave the statement untouched rather than
+    # collapsing it to "use Env ();". See GH #23.
+    return 1 if $self->_is_env && !@{ $self->_found_imports // [] };
+
     # This will be rewritten as "use Foo ();"
     return 0 if $self->_will_never_export;
 
@@ -427,6 +484,13 @@ sub _build_is_translatable {
 
     return 0 if !$self->_include->type;
     return 0 if $self->_include->type ne 'require';
+
+    # A "require Foo;" is functionally distinct from "use Foo ();" -- require
+    # loads at runtime, use at compile time -- and is often deliberate. By
+    # default we leave requires untouched. Disable preserve_require to restore
+    # the old behaviour of translating them to "use Foo ();". See GH #76.
+    return 0 if $self->_preserve_require;
+
     return 0 if $self->module_name eq 'Exporter';
 
     # We can deal with a top level require.
@@ -635,6 +699,25 @@ sub _imports_remain {
     return keys %{$found} < $self->_explicit_export_count;
 }
 
+# Comments which live *inside* the original include statement (e.g. a
+# "## no critic (...)" annotation between the module name and the import list,
+# or a comment nested inside an explicit "( ... )" import list) are
+# descendants of the PPI::Statement::Include and always appear before its
+# terminating ";". Because we rebuild the statement from scratch, they would
+# otherwise be silently dropped (see #50), so we collect them here, in source
+# order, to be re-attached as a trailing side comment. Only the comment
+# *content* is preserved, not its original position: every embedded comment is
+# moved to the end of the rewritten statement. A comment which already trails
+# the ";" is a sibling of the statement rather than a descendant, so it is left
+# in place by the document and is intentionally not collected here.
+sub _original_side_comments {
+    my $self = shift;
+    my $comments
+        = $self->_include->find( sub { $_[1]->isa('PPI::Token::Comment') } );
+    return q{} unless $comments;
+    return join q{ }, map { $_->content =~ s{\s+\z}{}r } @{$comments};
+}
+
 # Takes a string 'use SomeModule ...', returns a PPI:Statement:Include.
 # The returned obj could be one made from the string, if its different from
 # the existing one, else it is just the original.
@@ -642,6 +725,41 @@ sub _maybe_get_new_include {
     my $self      = shift;
     my $statement = shift;
     my $orig      = $self->_include;
+
+    # Re-attach any comments which were embedded in the original statement as a
+    # trailing side comment so they survive the rewrite (#50). Four spaces of
+    # separation matches perltidy's default --minimum-space-to-comment, so the
+    # result is stable under a subsequent perltidy run. We only pipe through
+    # Perl::Tidy for single-line statements: running it over an already-wrapped
+    # (multi-line) import list would re-flow the indentation and fight our own
+    # --indent handling.
+    #
+    # Known limitation: whenever a rewrite ends up with more than one comment on
+    # the single collapsed line -- multiple comments embedded in the original
+    # statement (collected here), or one embedded plus one already trailing the
+    # ";" (kept in place by the document) -- their text is preserved, but
+    # Perl::Critic honours only the first "## no critic" on a physical line, so a
+    # second such annotation stops suppressing. These cases are rare and we
+    # deliberately keep every comment rather than drop one; a human can merge the
+    # annotations if needed.
+    my $comments = $self->_original_side_comments;
+    if ( length $comments ) {
+        $statement .= q{    } . $comments;
+        if ( $statement !~ m{\n} ) {
+            require Perl::Tidy;    ## no perlimports
+            my $sbt    = $self->_pad_brackets ? 0 : 1;
+            my $indent = $self->_indent;
+            my $tidied;
+            Perl::Tidy::perltidy(
+                argv        => "-npro -sbt=$sbt -i=$indent",
+                source      => \$statement,
+                destination => \$tidied,
+            );
+            $tidied =~ s{\s+\z}{};
+            $statement = $tidied;
+        }
+    }
+
     return $orig if $statement eq $orig;    # quick exit
 
     # Prefix newlines to reproduce original's location
@@ -660,7 +778,26 @@ sub _maybe_get_new_include {
     my $rewrite = do {
         $doc->index_locations;
         my $includes = $doc->find('Statement::Include');
-        $includes->[0]->clone;
+        my $found    = $includes->[0];
+        my $clone    = $found->clone;
+
+        # A re-attached side comment sits *after* the terminating ";", so PPI
+        # parses it as a sibling of the include rather than a child. Pull those
+        # trailing comment tokens into the clone so they are not lost when the
+        # document is destroyed.
+        if ( length $comments ) {
+            my @trailing;
+            my $sibling = $found;
+            while ( $sibling = $sibling->next_sibling ) {
+                last if $sibling->isa('PPI::Statement');
+                push @trailing, $sibling;
+            }
+            pop @trailing
+                while @trailing
+                && !$trailing[-1]->isa('PPI::Token::Comment');
+            $clone->add_element( $_->clone ) for @trailing;
+        }
+        $clone;
     };
 
     # If the -only- difference is some whitespace before the symbol list, we
@@ -783,7 +920,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000064
+version 0.000065
 
 =head1 METHODS
 

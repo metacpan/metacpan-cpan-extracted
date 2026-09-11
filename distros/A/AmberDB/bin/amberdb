@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+exec perl "$(dirname "$0")/amberdb_cli.pl" "$@"

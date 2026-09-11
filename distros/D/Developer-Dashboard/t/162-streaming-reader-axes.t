@@ -120,7 +120,7 @@ like( $SOURCE{PageRuntime}, qr/sub\s+_stream_sysread/,
 # 3. So the fix could have landed in StreamDrain with these still passing,
 # unchanged, which is exactly the invisibility they existed to prevent.
 #
-# The behavioural pin now lives in t/164-stream-drain-eintr.t, which asserts
+# The behavioural pin now lives in t/177-stream-drain-eintr.t, which asserts
 # what the shared helper DOES and therefore cannot be invalidated by moving code
 # between files.
 #

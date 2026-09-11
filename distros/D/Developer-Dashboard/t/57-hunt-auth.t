@@ -107,6 +107,55 @@ close $lfh;
 ok( $auth->verify_user( username => $legacy_user, password => $legacy_pass ), 'legacy single-round SHA-256 records still verify (no lockout on upgrade)' );
 ok( !$auth->verify_user( username => $legacy_user, password => 'nope' ), 'legacy records still reject wrong passwords' );
 
+# ---------------------------------------------------------------------------
+# DD-783: an UNKNOWN username must cost the same as a known one.
+#
+# verify_user used to return the instant get_user found no record, so a known
+# username paid for a 210,000-iteration PBKDF2 derivation while an unknown one
+# paid nothing. Measured before the fix: 0.6082s against 0.0000s. The response
+# body is identical either way, so the body resisted enumeration correctly
+# while the clock disclosed which helper accounts exist - to any
+# unauthenticated client, on a service whose default bind is 0.0.0.0.
+#
+# ASSERTED BY MECHANISM, NOT BY WALL CLOCK. A timing assertion would be flaky
+# on a shared host and would fail for reasons that have nothing to do with the
+# defect. Counting the derivations proves the work actually happens on the
+# unknown-user path, which is the property that closes the oracle; the elapsed
+# time is a consequence of it rather than the thing worth asserting.
+# ---------------------------------------------------------------------------
+{
+    my $derivations = 0;
+    my $real        = \&Developer::Dashboard::Auth::_pbkdf2_hmac_sha256_hex;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Auth::_pbkdf2_hmac_sha256_hex = sub {
+        $derivations++;
+        return $real->(@_);
+    };
+    use warnings 'redefine';
+
+    $derivations = 0;
+    ok( !$auth->verify_user( username => $username, password => 'wrong-password' ),
+        'a known username with a wrong password is still rejected' );
+    my $known_cost = $derivations;
+    cmp_ok( $known_cost, '>=', 1,
+        'a KNOWN username performs at least one PBKDF2 derivation' );
+
+    $derivations = 0;
+    ok( !$auth->verify_user( username => 'no-such-helper-account', password => 'wrong-password' ),
+        'an unknown username is rejected' );
+    is( $derivations, $known_cost,
+        'an UNKNOWN username performs the SAME number of derivations as a known one - no enumeration oracle (DD-783)' );
+
+    # The guard must not fire before the username/password presence checks:
+    # those return without consulting any record, so they disclose nothing
+    # about which accounts exist and should not pay the derivation cost.
+    $derivations = 0;
+    ok( !$auth->verify_user( username => '', password => 'x' ), 'an empty username is rejected' );
+    ok( !$auth->verify_user( username => 'someone', password => '' ), 'an empty password is rejected' );
+    is( $derivations, 0,
+        'a missing username or password costs no derivation - neither reveals whether an account exists' );
+}
+
 # The constant-time comparison must behave like equality across the edge cases
 # that matter for hash checking without leaking match progress via early exit.
 ok( Developer::Dashboard::Auth::_secure_compare( 'abc123', 'abc123' ), 'secure compare accepts identical strings' );

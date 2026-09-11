@@ -138,7 +138,7 @@ use Data::HashMap::SA;
     is(hm_ss_get $m, $ucp,    "ucp", 'Unicode-codepoint key preserved');
 }
 
-# ---- Retrieval flag follows most-recent put ----
+# ---- A flagged key that fits in bytes is the byte key (Perl's rule) ----
 
 {
     my $m = Data::HashMap::SS->new();
@@ -146,12 +146,51 @@ use Data::HashMap::SA;
     my $flagged = "k"; utf8::upgrade($flagged);
 
     hm_ss_put $m, $plain, "a";
-    hm_ss_put $m, $flagged, "b";  # updates, flag now on for stored key
+    hm_ss_put $m, $flagged, "b";  # same key as far as %h is concerned
 
     my @keys = hm_ss_keys $m;
-    is scalar(@keys), 1, 'one key after toggle put';
-    ok utf8::is_utf8($keys[0]),
-        'stored key reflects flag from most-recent put';
+    is scalar(@keys), 1, 'one key after put by both forms';
+    ok !utf8::is_utf8($keys[0]), 'stored as bytes, like a Perl hash key';
+    my $by_plain = hm_ss_get $m, $plain;
+    my $by_flag  = hm_ss_get $m, $flagged;
+    is $by_plain, "b", 'byte form sees the update';
+    is $by_flag,  "b", 'flagged form sees the update';
+
+    my $wide = "k\x{263a}";
+    hm_ss_put $m, $wide, "c";
+    my @flagged = grep { utf8::is_utf8($_) } hm_ss_keys $m;
+    is scalar(@flagged), 1, 'a key that needs UTF-8 keeps its flag';
+
+    my $latin = "caf\xe9"; my $up = "caf\xe9"; utf8::upgrade($up);
+    hm_ss_put $m, $latin, "x"; hm_ss_put $m, $up, "y";
+    my $h = hm_ss_to_hash $m;
+    is scalar(keys %$h), hm_ss_size($m), 'to_hash is lossless across encodings';
+}
+
+
+# ---- byte identity: what it costs, as the POD states it ----
+
+{
+    my $m = Data::HashMap::SS->new();
+    $m->put("\x{263a}", "a");
+    $m->put("\xe2\x98\xba", "b");
+    is $m->size, 1, 'a wide key and its octets are one key (byte identity)';
+
+    my %h = ("\x{263a}" => "a", "\xe2\x98\xba" => "b");
+    is scalar(keys %h), 2, 'a Perl hash keeps them apart (the documented divergence)';
+
+    my $lossy = Data::HashMap::SS->new();
+    $lossy->from_hash(\%h);
+    my $out = $lossy->to_hash;
+    is scalar(keys %$out), $lossy->size,
+        'to_hash returns exactly what the map holds, even when the source hash held more';
+    cmp_ok scalar(keys %$out), '<', scalar(keys %h),
+        'and that is fewer keys than the source hash, as the POD warns';
+
+    my $flagged = Data::HashMap::SS->new();
+    $flagged->put("\x{263a}", "v");
+    my ($k) = $flagged->keys;
+    ok utf8::is_utf8($k), 'a key that needs UTF-8 comes back flagged';
 }
 
 done_testing;

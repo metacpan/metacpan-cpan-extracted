@@ -32,8 +32,8 @@ requires 'HTTP::Tiny', '0.095';
 requires 'LWP::Protocol::https', '6.07';
 requires 'LWP::UserAgent', '6.83';
 requires 'Template', '3.103';
-requires 'URI';
-requires 'URI::Escape';
+requires 'URI', '5.36';
+requires 'URI::Escape', '5.36';
 requires 'XML::Parser', '2.48';
 
 on 'develop' => sub {

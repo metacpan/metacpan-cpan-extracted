@@ -23,11 +23,13 @@
 - **ACID-Compliant Undo-Journal Transactions**: Full ACID multi-table transactions with disk-backed journaling (`.txn`), Strict Two-Phase Locking (Strict 2PL), automatic LIFO rollback upon failure or abnormal process exit, and orphaned journal recovery.
 - **2-Pillar Disaster Recovery & Native `.amberdb` Archiving**: 
   - **Pillar 1 (Continuous Recovery Stream):** Automatic append-only audit stream in `backup/YYYY/YYYY-MM-DD.csv` capturing every `insert`, `modify`, and `delete`.
-  - **Pillar 2 (Native Portable Archive):** Compressed, portable `.amberdb` archives containing schemas (`schema/*.table`, `schema/*.dbase`) and authoritative data files (`tables/*.db`, `tables/*.del`, `tables/*.aut`, `tables/*.cnt`, `tables/*_*.str`) with SHA-256 integrity verification. Derived indexes are excluded to save space and reconstructed deterministically on restore.
+  - **Pillar 2 (Native Portable Archive):** Compressed, portable `.amberdb` archives containing schemas (`schema/*.table`, `schema/*.dbase`) and authoritative data files (`table/*.db`, `table/*.del`, `table/*.aut`, `table/*.cnt`, `table/*_*.str`) with SHA-256 integrity verification. Derived indexes are excluded to save space and reconstructed deterministically on restore.
 - **Multi-Granularity Concurrency Control**: Non-blocking shared reads and exclusive writes at both table-level and individual record-level using OS-native `flock`.
+- **ORM & Data Hydration (`inflate` / `deflate`)**: Native transformation between flat storage arrays and schema-mapped hash structures (`$adb->inflate` and `$adb->deflate`), including automatic RDBM foreign relationship resolution and repeating child rows.
+- **Granular Field Operations**: Direct field mutation without full record rewriting via `update_field`, positional child block insertion via `insert_field`, and safe targeted child deletion via `delete_field`.
 - **Multilingual Locale Engine**: Out-of-the-box support for 10 languages (`gb` [default Global Base], `en`, `tr`, `de`, `fr`, `es`, `ja`, `ru`, `ar`, `az`) with language-specific case folding (e.g. Turkish `ı/I` and `i/İ`), cross-lingual accent folding, collation, currency, and date formatting.
 - **High-Throughput 2-Phase Batch Operations**: High-performance batch ingestion pipeline (`insert_list`, `modify_list`, `delete_list`) opens master `.db` once for batch writing and executes single-pass index merging (`.inx`, `.src`, `.fld`, `.fac`, `.srt`), delivering 50x-100x faster ETL data imports without per-record locking overhead.
-- **RAM-Disk Acceleration**: Integrated CLI tools and automation for mounting `tmpfs` (Linux) or `ImDisk` (Windows) for sub-microsecond in-memory table access.
+- **Transparent Physical RAM-Disk Acceleration**: Integrated cross-platform orchestration (`tmpfs` Linux, `APFS` macOS, `ImDisk` Windows) across 4 operational tiers (0: Disk, 1: Hybrid Index-only, 2: Full RAM Mirror with dual-write, 3: Volatile pure RAM-disk with sliding TTL `ramdisk_ttl`). Supports custom directory isolation (`table_dir`).
 
 ---
 
@@ -37,24 +39,23 @@ AmberDB organizes database files into a clean, deterministic physical directory 
 
 ```text
 dbstore/
-├── schema/                      ← Database Group & Table Schemas
-│   ├── catalog.dbase            ← Database group configuration
+├── schema/                     ← Database Group & Table Schemas
+│   ├── catalog.dbase           ← Database group configuration
 │   └── catalog_product.table   ← Product table schema
-├── tables/                      ← Master Data & Derived Index Files
+├── table/                      ← Master Data & Derived Index Files
 │   ├── catalog_product.db      ← Primary key-value data table (DB_File Hash)
 │   ├── catalog_product.del     ← Soft-deleted records archive (keep_deleted)
 │   ├── catalog_product.aut     ← User audit trail log (log_owner)
 │   ├── catalog_product.cnt     ← View/hit counters (use_counter)
-│   ├── catalog_product_1.str   ← Bidirectional string-to-ID dictionary
-│   ├── catalog_product.inx     ← Primary 8-byte packed ID index
-│   ├── catalog_product_1.fld   ← Inverted exact-match field index
-│   ├── catalog_product_2.src   ← Full-text keyword search index
-│   ├── catalog_product_3.fac   ← Columnar facet filter bitset index
-│   └── catalog_product_4.srt   ← Monotonic binary pre-sorted index
-└── backup/                      ← Disaster Recovery & Archives
+│   ├── catalog_product.unq     ← Bidirectional string-to-ID dictionary
+│   ├── catalog_product.inx     ← Primary 8-byte packed ID and sort index
+│   ├── catalog_product.fld     ← Inverted exact-match field index ("$blk:$val")
+│   ├── catalog_product.src     ← Full-text keyword search index
+│   └── catalog_product.fac     ← Columnar facet filter index
+└── backup/                     ← Disaster Recovery & Archives
     └── 2026/
-        ├── 2026-08-28.csv       ← Continuous time-series audit stream (Pillar 1)
-        └── full_backup.amberdb  ← Compressed native database archive (Pillar 2)
+        ├── 2026-08-28.csv      ← Continuous time-series audit stream (Pillar 1)
+        └── full_backup.amberdb ← Compressed native database archive (Pillar 2)
 ```
 
 ### File Extension Reference
@@ -62,10 +63,10 @@ dbstore/
 | File Extension | Classification | Reconstructible? | Description |
 | :--- | :--- | :--- | :--- |
 | **Authoritative Master Data** | | | |
-| `.db` | **Primary Data (Source of Truth)** | ❌ **No** (Authoritative) | Berkeley DB master document table (`DB_File` Hash) |
-| `.del` | **Soft-Deleted Archive** | ❌ **No** (Authoritative) | Archive of soft-deleted records (`keep_deleted`) |
-| `.aut` | **User Audit Trail** | ❌ **No** (Authoritative) | Chronological user action log (`log_owner`) |
-| `.str` | **String Dictionary** | ❌ **No** (Authoritative) | Bidirectional string-to-foreign-key dictionary (`_${blk}.str`) |
+| `.db` | **Primary Data (Source of Truth)** | **No** (Authoritative) | Berkeley DB master document table (`DB_File` Hash) |
+| `.del` | **Soft-Deleted Archive** | **No** (Authoritative) | Archive of soft-deleted records (`keep_deleted`) |
+| `.aut` | **User Audit Trail** | **No** (Authoritative) | Chronological user action log (`log_owner`) |
+| `.str` | **String Dictionary** | **No** (Authoritative) | Bidirectional string-to-foreign-key dictionary (`_${blk}.str`) |
 | **Derived Secondary Indexes** | | | |
 | `.inx` | **Record Index** |  **Yes** (`set_index`) | Binary array of all active IDs, total count, highest ID |
 | `.fld` | **Inverted Match Index** |  **Yes** (`set_index`) | Block-level key-to-IDs inverted index (`match_block`) |
@@ -81,7 +82,6 @@ dbstore/
 | `.csv` | **Continuous WAL Stream** | Append-Only Log | Daily chronological audit stream (`backup/YYYY/YYYY-MM-DD.csv`) |
 | `.cnt` | **View / Hit Counter** | Counter State | High-throughput concurrent counter store (`use_counter`) |
 | `.txn` | **Transaction Undo Journal** | Transient (Runtime) | Active transaction rollback journal file (`txn/`) |
-| `.cache` | **Shared RAM-Disk Cache** | Yes (RAM-Disk) | RAM-Disk shared cache file (`cache/`) |
 | `.tmp` | **Disk Buffer File** | Transient (Staging) | Disk staging buffer file under `dbstore/buffer/` (`buffer_write`) |
 | `.lock` | **Process Mutex Lock** | Transient (Mutex) | OS `flock` process synchronization lock file |
 
@@ -125,7 +125,7 @@ use AmberDB;
 
 # Initialize AmberDB instance handle ($adb)
 my $adb = AmberDB->new(
-    cfg  => { user => 'admin_user', language => 'en' },
+    cfg  => { user => 'admin_user', language => 'gb' },
     path => { dbase_dir => './dbstore' }
 );
 ```
@@ -145,7 +145,7 @@ print "Product Title: $product[1]\n";
 
 # --- UPDATE ---
 $product[3] = 129.99; # Update Price
-$adb->modify_id("catalog_product", @product);
+$adb->update_id("catalog_product", @product); # alias: modify_id
 
 # --- DELETE ---
 $adb->delete_id("catalog_product", $id);
@@ -161,20 +161,22 @@ $adb->delete_id("catalog_product", $id);
 ```perl
 # --- 1. Unpaginated Queries (Returns pure record or ID array) ---
 my @all_products = $adb->read_all("catalog_product");
-my @all_ids      = $adb->read_all("catalog_product", 0, 0, keys_only => 1); # ID list (ultra low-memory)
-my @sorted_all   = $adb->read_all("catalog_product", 0, 0, sort => -3);      # Unpaginated ascending sort
+my @all_ids      = $adb->read_all("catalog_product", { keys_only => 1 }); # ID list (ultra low-memory)
+my @sorted_all   = $adb->read_all("catalog_product", { sort => -3 });      # Unpaginated ascending sort
 
 # --- 2. Paginated Queries (limit > 0: first element is $total_count integer) ---
 my ($total_count, @page_products) = $adb->read_all(
     "catalog_product",
-    start => 0,
-    limit => 20,
-    sort  => { blk => 3, reverse => 1 } # Sort descending by Price (field 3)
+    {
+        offset => 0,
+        limit  => 20,
+        sort   => { blk => 3, reverse => 1 }, # Sort descending by Price (field 3)
+    }
 );
 print "Total Matching: $total_count, Page Size: " . scalar(@page_products) . "\n";
 
 # Paginated high-efficiency pipeline returning only record IDs (keys_only)
-my ($total, @page_ids) = $adb->read_all("catalog_product", 0, 50, keys_only => 1);
+my ($total, @page_ids) = $adb->read_all("catalog_product", { offset => 0, limit => 50, keys_only => 1 });
 ```
 
 ### 4. Full-Text Search
@@ -184,8 +186,10 @@ my ($total, @page_ids) = $adb->read_all("catalog_product", 0, 50, keys_only => 1
 my ($total, @results) = $adb->search_table(
     "catalog_product",
     "wireless headphone",
-    start => 0,
-    limit => 20,
+    {
+        offset => 0,
+        limit  => 20,
+    }
 );
 ```
 
@@ -199,7 +203,7 @@ my $res = $adb->field_filter("catalog_product", {
         5 => 1 # Active status
     },
     sort   => { blk => 3, reverse => 0 }, # Ascending price
-    start  => 0,
+    offset => 0,
     limit  => 10,
 });
 
@@ -286,35 +290,50 @@ $adb->delete_list("catalog_product", 101, 102, 103);
 
 ## CLI Utilities
 
-AmberDB ships with standalone command-line tools in `bin/`:
+AmberDB ships with two consolidated, production-ready command-line tools in `bin/`:
 
-### 1. `bin/amberdb_backup.pl` (Native Backup & Restore)
-Create and restore compressed, portable `.amberdb` database archives:
+### 1. `bin/amberdb_setup.pl` (Setup, Infrastructure & Maintenance)
+Unified administrative entry point for setup, RAM-disk management, table upgrades, backups, and re-indexing:
 ```bash
-# Dump entire database to default archive
-perl bin/amberdb_backup.pl --dump
+# Display comprehensive usage and available actions
+perl bin/amberdb_setup.pl
 
-# Dump specific tables to custom archive
-perl bin/amberdb_backup.pl --dump --file backup/catalog.amberdb --tables products,orders
+# Full infrastructure installation & permission setup
+sudo perl bin/amberdb_setup.pl --action=install --user=eticaretim --size=256M --cron
 
-# Restore archive into database with automatic index rebuilding
-perl bin/amberdb_backup.pl --restore --file backup/catalog.amberdb --force
+# RAM-disk management (Linux tmpfs, macOS APFS, Windows ImDisk)
+perl bin/amberdb_setup.pl --action=ramdisk --start --size=512M
+perl bin/amberdb_setup.pl --action=ramdisk --status
+perl bin/amberdb_setup.pl --action=ramdisk --stop
+
+# Native backup (.amberdb dump and restore)
+perl bin/amberdb_setup.pl --action=backup --dump --file=backup/catalog.amberdb
+perl bin/amberdb_setup.pl --action=backup --restore --file=backup/catalog.amberdb --force
+
+# Table migration (upgrade legacy tables to current ABR v1 binary format)
+perl bin/amberdb_setup.pl --action=update --all
+
+# Re-index secondary binary indexes (.inx, .fld, .src, .srt)
+perl bin/amberdb_setup.pl --action=reindex
 ```
 
-### 2. `bin/convert_dbstore.pl` (Binary Re-Indexer)
-Scans and rebuilds all table indexes (`.inx`, `.fld`, `.src`, `.srt`) into packed 8-byte binary format:
+### 2. `bin/amberdb_daemon.pl` (Service Supervisor & Sync Daemon)
+Unified process controller, self-healing cron watchdog, and Tier 4 background write-behind sync engine:
 ```bash
-perl bin/convert_dbstore.pl --dbstore ./dbstore
-```
+# Start background write-behind sync daemon
+perl bin/amberdb_daemon.pl start
 
-### 3. `bin/setup_ramdisk.pl` (RAM-Disk Accelerator)
-Mounts/unmounts ultra-fast RAM-disk caches for Linux (`tmpfs`) and Windows (`ImDisk`):
-```bash
-# Mount 512MB RAM-disk
-sudo perl bin/setup_ramdisk.pl --start --size 512M
+# Inspect running daemon, RAM-disk status, and journal queue
+perl bin/amberdb_daemon.pl status
 
-# Check status
-perl bin/setup_ramdisk.pl --status
+# Synchronous flush of all pending journal events
+perl bin/amberdb_daemon.pl flush
+
+# Gracefully stop daemon process
+perl bin/amberdb_daemon.pl stop
+
+# Cron watchdog (exits in <1ms if healthy, auto-restarts if dead)
+perl bin/amberdb_daemon.pl watchdog
 ```
 
 ---
@@ -338,7 +357,7 @@ print $locale->normalize("Ahmet'in kitabı"); # "ahmet kitabi"
 print $locale->format_currency(1250.50, 'TRY'); # "₺1.250,50"
 ```
 
-Supported Languages: **English (`en`)**, **Turkish (`tr`)**, **German (`de`)**, **French (`fr`)**, **Spanish (`es`)**, **Japanese (`ja`)**, **Russian (`ru`)**, **Arabic (`ar`)**, **Azerbaijani (`az`)**.
+Supported Languages: **Global Base (`gb`)**, **English (`en`)**, **Turkish (`tr`)**, **German (`de`)**, **French (`fr`)**, **Spanish (`es`)**, **Japanese (`ja`)**, **Russian (`ru`)**, **Arabic (`ar`)**, **Azerbaijani (`az`)**.
 
 ---
 
@@ -346,12 +365,16 @@ Supported Languages: **English (`en`)**, **Turkish (`tr`)**, **German (`de`)**, 
 
 Full comprehensive guides are available in the [`docs/`](docs/) directory:
 
-- 📖 **English Documentation**:
+- **English Documentation**:
   - [AmberDB Database System & Architecture Guide](docs/EN.AmberDB_User-Guide.md)
   - [AmberDB::Locale User Guide](docs/EN.AmberDB-Locale_User-Guide.md)
-- 📖 **Türkçe Dokümantasyon**:
+  - [AmberDB vs SQL Comparison Guide](docs/EN.AmberDB-vs-SQL_User-Guide.md)
+  - [AmberDB vs SQLite Benchmark Report (600K Movies)](docs/EN.AmberDB-vs-SQLite_Benchmark.md)
+- **Türkçe Dokümantasyon**:
   - [AmberDB Veritabanı Sistemi & Mimari Rehberi](docs/TR.AmberDB_Veritabani_Sistemi.md)
   - [AmberDB::Locale Kullanım Rehberi](docs/TR.AmberDB-Locale_Kullanim_Rehberi.md)
+  - [AmberDB vs SQL Karşılaştırmalı Kullanım Rehberi](docs/TR.AmberDB-vs-SQL_Kullanim_Rehberi.md)
+  - [AmberDB vs SQLite Kıyaslama Raporu (600K Film)](docs/TR.AmberDB-vs-SQLite_Benchmark.md)
 
 ---
 
@@ -360,12 +383,13 @@ Full comprehensive guides are available in the [`docs/`](docs/) directory:
 AmberDB includes an exhaustive test suite covering core operations, indexing, transactions, search, facets, locales, and backups, along with multi-process concurrency stress tests:
 
 ```bash
-# Run standard unit & integration test suite (39 test files, 390+ assertions)
+# Run standard unit & integration test suite (51 test files, 470+ assertions)
 prove -l t/
 
-# Run multi-process concurrency & stress test suite (cross-platform Linux & Windows)
+# Run author & extended integration test suite (RAM-disk & multi-process stress)
 prove -l xt/
 # or directly:
+perl -Ilib xt/amberdb_ramdisk.t
 perl -Ilib xt/amberdb_concurrency_stress.t
 ```
 

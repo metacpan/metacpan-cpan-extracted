@@ -1,5 +1,21 @@
 #!perl
 
+# vim: ts=4 sts=4 sw=4 et: syntax=perl
+#
+# Copyright (c) 2018-2026 Sven Kirmess
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
 use 5.006;
 use strict;
 use warnings;
@@ -14,6 +30,7 @@ use File::Temp;
 use FindBin qw($RealBin);
 use lib "$RealBin/lib";
 
+use Local::HTTP::HeadOnly;
 use Local::HTTP::Tiny::Mock;
 
 main();
@@ -25,8 +42,8 @@ sub main {
         my $obj = $class->new;
 
         #
-        like( exception { $obj->pod_file_ok() },      qr{usage: pod_file_ok[(]FILE[)]}, 'pod_file_ok() throws an exception with too few arguments' );
-        like( exception { $obj->pod_file_ok(undef) }, qr{usage: pod_file_ok[(]FILE[)]}, '... undef for a file name' );
+        like( exception { $obj->pod_file_ok() },                 qr{usage: pod_file_ok[(]FILE[)]}, 'pod_file_ok() throws an exception with too few arguments' );
+        like( exception { $obj->pod_file_ok(undef) },            qr{usage: pod_file_ok[(]FILE[)]}, '... undef for a file name' );
         like( exception { $obj->pod_file_ok( 'file', 'name' ) }, qr{usage: pod_file_ok[(]FILE[)]}, '... too many arguments' );
 
         #
@@ -149,7 +166,8 @@ sub main {
         test_test('pod_file_ok (pod file with three links (one dead))');
 
         is( $rc, undef, '... returns undef' );
-        is_deeply( [ $ua->history ], [qw(https://www.perl.com/ http://192.0.2.7/ https://metacpan.org/)], '... there were three head requests to the UA' );
+        is_deeply( [ $ua->history ],     [qw(https://www.perl.com/ http://192.0.2.7/ https://metacpan.org/)], '... there were three head requests to the UA' );
+        is_deeply( [ $ua->get_history ], [],                                                                  '... and no get request because the head request ran into an internal error' );
     }
 
     {
@@ -181,7 +199,7 @@ sub main {
                   https://metacpan.org/
                   https://www.cpan.org/
                   https://www.perl.com/
-                  ),
+                ),
             ],
             '... there were five head requests to the UA',
         );
@@ -213,7 +231,7 @@ sub main {
                   https://metacpan.org/
                   https://www.cpan.org/
                   https://www.perl.com/
-                  ),
+                ),
             ],
             '... there were four head requests to the UA',
         );
@@ -243,7 +261,7 @@ sub main {
                   https://metacpan.org/
                   https://www.cpan.org/
                   https://www.perl.com/
-                  ),
+                ),
             ],
             '... there were three head requests to the UA',
         );
@@ -272,10 +290,66 @@ sub main {
                 qw(
                   http://cpanmin.us/
                   https://www.perl.com/
-                  ),
+                ),
             ],
             '... there were two head requests to the UA',
         );
+    }
+
+    {
+        my $file = 'corpus/2_links_head_not_allowed.pod';
+
+        my $ua  = Local::HTTP::Tiny::Mock->new();
+        my $obj = $class->new( ua => $ua );
+
+        test_out("ok 1 - Parse Pod ($file)");
+        test_out("ok 2 - https://news.ycombinator.com/ ($file)");
+        test_out("not ok 3 - https://www.example.net/not_found ($file)");
+        test_fail(+4);
+        test_diag(q{});
+        test_diag('Not Found');
+        test_diag(q{});
+        my $rc = $obj->pod_file_ok($file);
+        test_test('pod_file_ok (pod file with two links whose server does not answer head requests)');
+
+        is( $rc, undef, '... returns undef' );
+        is_deeply(
+            [ $ua->history ],
+            [
+                qw(
+                  https://news.ycombinator.com/
+                  https://www.example.net/not_found
+                ),
+            ],
+            '... there were two head requests to the UA',
+        );
+        is_deeply(
+            [ $ua->get_history ],
+            [
+                qw(
+                  https://news.ycombinator.com/
+                  https://www.example.net/not_found
+                ),
+            ],
+            '... and both were retried with a get request',
+        );
+    }
+
+    {
+        my $file = 'corpus/1_link_web.pod';
+
+        my $obj = $class->new( ua => Local::HTTP::HeadOnly->new() );
+
+        test_out("ok 1 - Parse Pod ($file)");
+        test_out("not ok 2 - https://www.perl.com/ ($file)");
+        test_fail(+4);
+        test_diag(q{});
+        test_diag('Not Allowed');
+        test_diag(q{});
+        my $rc = $obj->pod_file_ok($file);
+        test_test('pod_file_ok (a ua without a get method is not retried)');
+
+        is( $rc, undef, '... returns undef' );
     }
 
     {
@@ -297,5 +371,3 @@ sub main {
 
     exit 0;
 }
-
-# vim: ts=4 sts=4 sw=4 et: syntax=perl

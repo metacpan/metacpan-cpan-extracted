@@ -1340,22 +1340,27 @@ $m->{_current_request_context} ||= { host => '127.0.0.1', remote_addr => '127.0.
   SKIP: {
         chmod 0000, $nav_dir or skip 'chmod not honored on this filesystem', 1;
 
-        # NOTE: the assertion below is a tautology - ok(1) after an eval whose
-        # result is discarded - and cannot fail for any process. That is tracked
-        # separately as DD-745; this card changes WHEN a denial test runs, never
-        # WHAT it asserts, so the guard is added and the assertion left alone.
         my $probe_dh;
         my $can_open = opendir( $probe_dh, $nav_dir ) ? do { closedir $probe_dh; 1 } : 0;
 
+        my ( $html, $died );
         if ( !$can_open ) {
             my $welcome = $store->load_saved_page('welcome');
-            eval { $m->_nav_items_html( page => $welcome, runtime_context => { params => {}, current_page => '/x' } ) };
+            $html = eval { $m->_nav_items_html( page => $welcome, runtime_context => { params => {}, current_page => '/x' } ) };
+            $died = $@;
         }
         chmod 0755, $nav_dir;
 
         skip 'this process can open a mode-0000 directory, so the opendir failure cannot occur', 1
           if $can_open;
-        ok( 1, 'nav opendir failure path (2004 true)' );
+
+        # DD-745: the previous form discarded the eval's result and asserted
+        # ok(1,...), which cannot fail for any process. App.pm:2334's
+        # 'opendir ... or next' establishes the real contract - an unreadable
+        # nav root is skipped gracefully, never an exception - so this checks
+        # that contract directly: no exception, and a defined string back.
+        ok( $died eq '' && defined $html,
+            'nav opendir failure path is handled gracefully (no exception, defined result) (2004 true)' );
     }
 }
 {

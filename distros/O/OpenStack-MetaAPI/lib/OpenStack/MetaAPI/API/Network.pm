@@ -41,7 +41,7 @@ sub create_floating_ip {
 }
 
 sub add_floating_ip_to_server {
-    my ($self, $floatingip_id, $server_id) = @_;
+    my ($self, $floatingip_id, $server_id, %opts) = @_;
 
     die "floatingip_id is required" unless defined $floatingip_id;
     die "server_id is required"     unless defined $server_id;
@@ -49,9 +49,19 @@ sub add_floating_ip_to_server {
     my $uri = $self->root_uri('/ports');
     my $ports = $self->get($uri, device_id => $server_id);
 
-    # pick the first port for now (maybe need to check the network_id...)
-    my $port_id = eval { $ports->{ports}->[0]->{id} };
-    die "Cannot find a port for server $server_id: $@" unless defined $port_id;
+    my $port_id;
+    if (my $network_id = $opts{network_id}) {
+        my @matching = grep { $_->{network_id} eq $network_id }
+            @{ $ports->{ports} // [] };
+        die "Cannot find a port on network $network_id for server $server_id"
+            unless @matching;
+        $port_id = $matching[0]->{id};
+    }
+    else {
+        $port_id = eval { $ports->{ports}->[0]->{id} };
+        die "Cannot find a port for server $server_id: $@"
+            unless defined $port_id;
+    }
 
     # now link the floating ip to the port
     return $self->put(
@@ -73,7 +83,7 @@ OpenStack::MetaAPI::API::Network
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

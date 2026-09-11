@@ -1,4 +1,4 @@
-package Pod::Weaver::Role::Plugin 4.020;
+package Pod::Weaver::Role::Plugin 4.021;
 # ABSTRACT: a Pod::Weaver plugin
 
 use Moose::Role;
@@ -11,7 +11,7 @@ no feature 'switch';
 use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
 # END BOILERPLATE
 
-use Params::Util qw(_HASHLIKE);
+use Params::SomeUtil qw(_HASHLIKE);
 
 use namespace::autoclean;
 
@@ -71,7 +71,7 @@ Pod::Weaver::Role::Plugin - a Pod::Weaver plugin
 
 =head1 VERSION
 
-version 4.020
+version 4.021
 
 =head1 PERL VERSION
 
@@ -108,7 +108,7 @@ Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo SIGNES.
+This software is copyright (c) 2026 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

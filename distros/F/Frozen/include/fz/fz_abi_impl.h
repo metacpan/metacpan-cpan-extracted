@@ -10,6 +10,8 @@ typedef char fz_abi_assert_kinds[
   && FZ_K_UINT  == (int)FZ_T_UINT  && FZ_K_NUM   == (int)FZ_T_NUM
   && FZ_K_STR   == (int)FZ_T_STR   && FZ_K_HASH  == (int)FZ_T_HASH
   && FZ_K_ARRAY == (int)FZ_T_ARRAY && FZ_K_ARRAY == (int)FZ_T_MAX) ? 1 : -1];
+typedef char fz_abi_assert_flags[
+    (FZ_F_LOSSY_NV == 1u && FZ_F_STRINGIFY == 2u) ? 1 : -1];
 typedef char fz_abi_assert_errors[
     (FZ_ERR_OK      == FZ_OPEN_OK      && FZ_ERR_ENOENT == FZ_OPEN_ENOENT
   && FZ_ERR_SHORT   == FZ_OPEN_SHORT   && FZ_ERR_MAGIC  == FZ_OPEN_MAGIC
@@ -225,6 +227,92 @@ fz_abi_sv_from_node(pTHX_ fz_container *c, uint32_t node)
     return fz_slot_to_sv(aTHX_ c, node);
 }
 
+static SV *
+fz_abi_freeze(pTHX_ SV *data, unsigned flags, const char *flatsep)
+{
+    return SvREFCNT_inc(fz_freeze_sv(aTHX_ data, flags, flatsep));
+}
+
+static fz_container *
+fz_abi_freeze_container(pTHX_ SV *data, unsigned flags, const char *flatsep,
+                        int *err)
+{
+    fz_container *c;
+    SV *blk;
+    int rc;
+    if (err) *err = FZ_ERR_MAP;
+    c = (fz_container *)malloc(sizeof(fz_container));
+    if (!c) return NULL;
+    blk = fz_freeze_sv(aTHX_ data, flags, flatsep);
+    rc = fz_container_adopt(aTHX_ c, blk);
+    if (rc == FZ_OPEN_OK) rc = fz_check_header(c->base, c->len);
+    if (err) *err = rc;
+    if (rc != FZ_OPEN_OK) {
+        if (c->holder) { SvREFCNT_dec(c->holder); c->holder = NULL; }
+        fz_container_release(c);
+        free(c);
+        return NULL;
+    }
+    return c;
+}
+
+static uint32_t
+fz_abi_val_at(const fz_container *c, uint32_t node, uint32_t i)
+{
+    uint32_t slot;
+    if (!c || !c->base) return FZ_NOHANDLE;
+    if (FZ_SLOT_TAG(node) != FZ_T_HASH) return FZ_NOHANDLE;
+    if (!fz_handle_ok(c->base, (uint32_t)c->len, node)) return FZ_NOHANDLE;
+    if (i >= fz_count(c->base, (uint32_t)c->len, node)) return FZ_NOHANDLE;
+    slot = fz_val_at(c->base, (uint32_t)c->len, node, i);
+    return fz_handle_ok(c->base, (uint32_t)c->len, slot) ? slot : FZ_NOHANDLE;
+}
+
+/* ---- version 3 ------------------------------------------------------------ */
+
+static fz_container *
+fz_abi_borrow(const void *bytes, size_t len, int *err)
+{
+    fz_container *c;
+    int rc;
+    if (err) *err = FZ_ERR_MAP;
+    if (!bytes) return NULL;
+    c = (fz_container *)malloc(sizeof(fz_container));
+    if (!c) return NULL;
+    rc = fz_container_borrow(c, bytes, len);
+    /* The header check still runs. Borrowing skips the COPY, not the
+     * validation - and a block that arrived out of shared memory is the one
+     * most in need of it. */
+    if (rc == FZ_OPEN_OK) rc = fz_check_header(c->base, c->len);
+    if (err) *err = rc;
+    if (rc != FZ_OPEN_OK) {
+        fz_container_release(c);
+        free(c);
+        return NULL;
+    }
+    return c;
+}
+
+/* close, without an interpreter. Refuses a container holding a perl reference,
+ * because dropping one needs a perl to drop it in. */
+static int
+fz_abi_release(fz_container *c)
+{
+    if (!c) return 0;
+    if (c->holder) return 0;
+    fz_container_release(c);
+    free(c);
+    return 1;
+}
+
+static long
+fz_abi_verify(const fz_container *c)
+{
+    if (!c || !c->base) return FZ_E_BOUNDS;
+    return fz_walk_check(c->base, (uint32_t)c->len,
+                         fz_rd_u32(c->base + FZ_H_ROOT), 0);
+}
+
 static const fz_abi FZ_ABI = {
     FZ_ABI_VERSION,
 
@@ -248,7 +336,16 @@ static const fz_abi FZ_ABI = {
     fz_abi_nv,
 
     fz_abi_walk,
-    fz_abi_sv_from_node
+    fz_abi_sv_from_node,
+
+    fz_abi_freeze,
+    fz_abi_freeze_container,
+    fz_abi_val_at,
+
+    /* version 3 */
+    fz_abi_borrow,
+    fz_abi_release,
+    fz_abi_verify
 };
 
 #define FZ_STEP(n) do { *step = (n); } while (0)
@@ -341,12 +438,12 @@ fz_abi_selftest(pTHX_ int *step, SV **data)
         char zeros[FZ_HEADER_SIZE];
         int e2 = FZ_ERR_OK;
         fz_container *bad = A->attach("not a block", 11, &e2);
-        if (bad) { A->close(aTHX_ bad); FZ_STEP(3); goto done; }
+        if (bad) { (A->close)(aTHX_ bad); FZ_STEP(3); goto done; }
         if (e2 != FZ_ERR_SHORT || !A->error(e2)) { FZ_STEP(3); goto done; }
         memset(zeros, 0, sizeof zeros);
         e2 = FZ_ERR_OK;
         bad = A->attach(zeros, sizeof zeros, &e2);
-        if (bad) { A->close(aTHX_ bad); FZ_STEP(3); goto done; }
+        if (bad) { (A->close)(aTHX_ bad); FZ_STEP(3); goto done; }
         if (e2 != FZ_ERR_MAGIC || !A->error(e2)) { FZ_STEP(3); goto done; }
     }
 
@@ -473,8 +570,130 @@ fz_abi_selftest(pTHX_ int *step, SV **data)
         SvREFCNT_dec(all);
     }
 
+    {
+        uint32_t n = A->count(c, root), i, seen_str = 0;
+        uint32_t bogus = 0;
+        for (i = 0; i < n; i++) {
+            const char *k; STRLEN kl;
+            uint32_t byname, byidx;
+            if (!A->key_at(c, root, i, &k, &kl, NULL)) { FZ_STEP(15); goto done; }
+            byname = A->child(c, root, k, kl);
+            byidx  = A->val_at(c, root, i);
+            if (byname != byidx) { FZ_STEP(15); goto done; }
+            if (A->kind(c, byidx) == FZ_K_STR) seen_str++;
+        }
+        if (!seen_str) { FZ_STEP(15); goto done; }
+        if (A->val_at(c, root, n) != FZ_NOHANDLE) { FZ_STEP(15); goto done; }
+        bogus = A->child(c, root, "greeting", 8);
+        if (A->val_at(c, bogus, 0) != FZ_NOHANDLE) { FZ_STEP(15); goto done; }
+    }
+
+    {
+        SV *b2 = A->freeze(aTHX_ sv, 0, ".");
+        if (!b2 || !SvPOK(b2)) { if (b2) SvREFCNT_dec(b2); FZ_STEP(16); goto done; }
+        if (SvCUR(b2) != SvCUR(block)
+            || memcmp(SvPVX(b2), SvPVX(block), SvCUR(b2))) {
+            SvREFCNT_dec(b2); FZ_STEP(16); goto done;
+        }
+        SvREFCNT_dec(b2);
+    }
+
+    {
+        int err = 0;
+        fz_container *c2 = A->freeze_container(aTHX_ sv, 0, ".", &err);
+        if (!c2 || err != FZ_ERR_OK) {
+            if (c2) (A->close)(aTHX_ c2);
+            FZ_STEP(17); goto done;
+        }
+        if (c2->len != (size_t)SvCUR(block)
+            || memcmp(c2->base, SvPVX(block), c2->len)) {
+            (A->close)(aTHX_ c2); FZ_STEP(17); goto done;
+        }
+        {
+            uint32_t r2 = A->root(c2);
+            STRLEN len = 0;
+            const char *p = A->str(c2, A->child(c2, r2, "greeting", 8), &len, NULL);
+            if (!p || len != 5 || memcmp(p, "hello", 5)) {
+                (A->close)(aTHX_ c2); FZ_STEP(17); goto done;
+            }
+            if (p < (const char *)c2->base
+                || p >= (const char *)c2->base + c2->len) {
+                (A->close)(aTHX_ c2); FZ_STEP(17); goto done;
+            }
+        }
+        (A->close)(aTHX_ c2);
+    }
+
+    /* 18: borrow, release and verify - version 3.
+     *
+     * THE ASSERTION IS POINTER IDENTITY, and it has to be. Every other property
+     * of a borrowed container is one a COPYING attach also has, so a `borrow`
+     * that quietly copied would pass a test of reads, of the root, of the
+     * error path, of everything except this: `c3->base` must BE the caller's
+     * bytes, not bytes that look like them. */
+    {
+        int err = 0;
+        const unsigned char *bytes = (const unsigned char *)SvPVX(block);
+        fz_container *c3 = A->borrow(bytes, (size_t)SvCUR(block), &err);
+
+        if (!c3 || err != FZ_ERR_OK) {
+            if (c3) (void)A->release(c3);
+            FZ_STEP(18); goto done;
+        }
+        if (c3->base != bytes) {                  /* it copied: the whole point */
+            (void)A->release(c3);
+            FZ_STEP(18); goto done;
+        }
+        if (c3->src != FZ_SRC_BORROWED) {
+            (void)A->release(c3);
+            FZ_STEP(18); goto done;
+        }
+        {
+            uint32_t r3 = A->root(c3);
+            STRLEN len = 0;
+            const char *p = A->str(c3, A->child(c3, r3, "greeting", 8), &len, NULL);
+            if (!p || len != 5 || memcmp(p, "hello", 5)) {
+                (void)A->release(c3); FZ_STEP(18); goto done;
+            }
+            /* And the string it hands back points INTO the caller's bytes. */
+            if (p < (const char *)bytes
+                || p >= (const char *)bytes + SvCUR(block)) {
+                (void)A->release(c3); FZ_STEP(18); goto done;
+            }
+        }
+        if (A->verify(c3) <= 0) { (void)A->release(c3); FZ_STEP(18); goto done; }
+        if (A->release(c3) != 1) { FZ_STEP(18); goto done; }
+
+        /* The bytes are still there afterwards: release must not have freed
+         * something it does not own. */
+        if (memcmp(bytes, SvPVX(block), (size_t)SvCUR(block))) {
+            FZ_STEP(18); goto done;
+        }
+
+        /* A block that is not one is still refused, and refusing must not free
+         * the caller's bytes either. */
+        {
+            static const unsigned char junk[64] = { 0 };
+            int e2 = 0;
+            if (A->borrow(junk, sizeof junk, &e2) || e2 == FZ_ERR_OK) {
+                FZ_STEP(18); goto done;
+            }
+        }
+
+        /* release REFUSES a container holding a perl reference, because
+         * dropping one needs an interpreter. Nothing to free here: the refusal
+         * is the assertion, and (FZ->close) is what such a container wants. */
+        {
+            fz_container *c4 = A->attach(SvPVX(block), SvCUR(block), &err);
+            if (!c4 || err != FZ_ERR_OK) { FZ_STEP(18); goto done; }
+            c4->holder = SvREFCNT_inc_simple_NN(block);
+            if (A->release(c4) != 0) { FZ_STEP(18); goto done; }
+            (A->close)(aTHX_ c4);
+        }
+    }
+
 done:
-    if (c) A->close(aTHX_ c);
+    if (c) (A->close)(aTHX_ c);
     return block;
 }
 

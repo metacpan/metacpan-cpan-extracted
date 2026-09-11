@@ -18,10 +18,11 @@ WriteMakefile (
     'Test::More' => '0',
   },
   PREREQ_PM => {
-    'Clipboard'      => '0',
+    'Clipboard'     => '0',
+    'HTTP::Request' => '0',
+    'JSON::PP'      => '0',
     'LWP::UserAgent' => '0',
-    'URI::Escape'    => '0',
-
+    'URI::Escape'   => '0',
   },
   dist      => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
   clean     => {FILES    => 'Speak-*'},

@@ -31,7 +31,7 @@ sub LoadDataFrom {
     my $data;
     {
         local $/;
-        my $fh = eval '\*' . $pkg . '::DATA';
+        my $fh = do { no strict 'refs'; \*{"${pkg}::DATA"} };
         $data = <$fh>;
     }
 
@@ -60,7 +60,7 @@ OpenStack::MetaAPI::Helpers::DataAsYaml
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

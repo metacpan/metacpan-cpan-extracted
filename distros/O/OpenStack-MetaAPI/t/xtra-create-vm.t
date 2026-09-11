@@ -16,6 +16,7 @@ use Test::OpenStack::MetaAPI qw{:all};
 use Test::OpenStack::MetaAPI::Auth qw{:all};
 
 use JSON;
+use MIME::Base64 ();
 
 mock_lwp_useragent();
 
@@ -59,9 +60,26 @@ ok $api, "got one api object" or die;
         qr{Cannot find 'networks' for id/name '$FLOATING_IP_NETWORK'},
         "fail when using an unkown network");
 
-    note "attempt 2";
+    note "attempt: image not found";
 
     $FLOATING_IP_NETWORK = 'net2';
+
+    # mock image lookup to return empty results
+    mock_get_request(
+        'http://127.0.0.1:9292/v2/images/170fafa5-1329-44a3-9c27-9bb77b77206d',
+        application_json('{}'),
+    );
+    mock_get_request(
+        'http://127.0.0.1:9292/v2/images',
+        application_json('{"images": []}'),
+    );
+
+    like(
+        dies { $create_vm->() },
+        qr{Cannot find image for id/name '$IMAGE_UID'},
+        "fail when image is not found");
+
+    note "attempt: server creation";
 
     mock_get_request(
         'http://127.0.0.1:9292/v2/images/170fafa5-1329-44a3-9c27-9bb77b77206d',
@@ -79,7 +97,7 @@ ok $api, "got one api object" or die;
     );
 
     mock_get_request(
-        'http://127.0.0.1:8774/v2.1/servers/aaaaa-bbbb-ccccc-dddd',
+        'http://127.0.0.1:8774/v2.1/servers/aaaaabbb-bccc-cddd-d000-000000000000',
         application_json(json_for_server()),
     );
 
@@ -98,7 +116,7 @@ ok $api, "got one api object" or die;
 
     my $iteration = 0;
     mock_get_request(
-        'http://127.0.0.1:8774/v2.1/servers/aaaaa-bbbb-ccccc-dddd',
+        'http://127.0.0.1:8774/v2.1/servers/aaaaabbb-bccc-cddd-d000-000000000000',
         sub {
             my ($request) = @_;
             note "checking server state ", ++$iteration;
@@ -114,7 +132,7 @@ ok $api, "got one api object" or die;
 
             # then the server is active
 
-            die "Too many calls to servers/aaaaa-bbbb-ccccc-dddd"
+            die "Too many calls to servers/aaaaabbb-bccc-cddd-d000-000000000000"
               if $iteration >= 10;
 
             return {
@@ -138,12 +156,12 @@ ok $api, "got one api object" or die;
     );
 
     mock_get_request(
-        'http://127.0.0.1:9696/v2.0/ports?device_id=aaaaa-bbbb-ccccc-dddd',
+        'http://127.0.0.1:9696/v2.0/ports?device_id=aaaaabbb-bccc-cddd-d000-000000000000',
         application_json(json_for_ports_device_id()),
     );
 
     mock_put_request(
-        'http://127.0.0.1:9696/v2.0/floatingips/ffffff-000000-fffff-111111-7777777',
+        'http://127.0.0.1:9696/v2.0/floatingips/ffffff00-0000-ffff-1111-117777777777',
         application_json(json_for_put_floatingips()),
     );
 
@@ -152,7 +170,7 @@ ok $api, "got one api object" or die;
     is $vm => hash {
         field id                  => '33748c23-38dd-4f70-b774-522fc69e7b67';
         field floating_ip_address => '10.1.2.3';
-        field floating_ip_id      => 'ffffff-000000-fffff-111111-7777777';
+        field floating_ip_id      => 'ffffff00-0000-ffff-1111-117777777777';
         field status              => 'ACTIVE';
         field user_id             => 'fake';
 
@@ -160,6 +178,64 @@ ok $api, "got one api object" or die;
 
     }, "create a vm";
 
+    note "what actually gets sent to Nova";
+
+    # Re-registered as a sub so the request body can be captured.  For a field
+    # the API encodes on the caller's behalf, the encoding is the behaviour, and
+    # asserting on the response would not exercise it at all.
+    my $posted;
+    mock_post_request(
+        'http://127.0.0.1:8774/v2.1/servers',
+        sub {
+            my ($request) = @_;
+            $posted = decode_json($request->content);
+            return {code => 200, msg => 'created', %{application_json(json_create_server())}};
+        },
+    );
+
+    my $cloud_config = "#cloud-config\nhostname: vm.example.com\n";
+
+    $api->create_vm(
+        name                    => $SERVER_NAME,
+        image                   => $IMAGE_UID,
+        flavor                  => 'small',
+        key_name                => 'My SSH Key',
+        network                 => 'net1',
+        network_for_floating_ip => $FLOATING_IP_NETWORK,
+        user_data               => $cloud_config,
+        availability_zone       => 'nova',
+        metadata                => {domain => 'vm.example.com'},
+    );
+
+    ok $posted, "the create request was captured" or return;
+
+    is MIME::Base64::decode_base64($posted->{server}{user_data}), $cloud_config,
+      "user_data arrives base64 encoded, which is the only form Nova takes";
+    is $posted->{server}{availability_zone}, 'nova', "availability_zone is passed through";
+    is $posted->{server}{metadata}, {domain => 'vm.example.com'}, "and metadata";
+    is $posted->{server}{key_name}, 'My SSH Key', "alongside what already worked";
+
+    is $posted->{server}{security_groups}, [{name => 'default'}],
+      "the security group goes by name, which is what the field is";
+
+    ok !exists $posted->{server}{block_device_mapping_v2},
+      "and a pass-through nobody asked for is not sent at all";
+
+    note "a cloud with no tenant network to escape from";
+
+    # Where the only network is external and shared, a server on it gets a
+    # routable address directly and there is no floating IP to attach.  Such a
+    # cloud could not be built on at all while this argument was required.
+    my $no_float = $api->create_vm(
+        name    => $SERVER_NAME,
+        image   => $IMAGE_UID,
+        flavor  => 'small',
+        network => 'net1',
+    );
+
+    ok $no_float, "a server is created without a floating network";
+    ok !exists $no_float->{floating_ip_address},
+      "and no floating IP was attached, because none was asked for";
 }
 
 done_testing;
@@ -174,7 +250,7 @@ sub json_for_ports_device_id {
             "created_at": "2016-03-08T20:19:41",
             "data_plane_status": null,
             "description": "",
-            "device_id": "aaaaa-bbbb-ccccc-dddd",
+            "device_id": "aaaaabbb-bccc-cddd-d000-000000000000",
             "device_owner": "network:router_gateway",
             "dns_assignment": {
                 "hostname": "myport",
@@ -200,7 +276,7 @@ sub json_for_ports_device_id {
             "ip_allocation": "immediate",
             "mac_address": "fa:16:3e:58:42:ed",
             "name": "",
-            "network_id": "70c1db1f-b701-45bd-96e0-a313ee3430b3",
+            "network_id": "d32019d3-bc6e-4319-9c1d-6722fc136a22",
             "project_id": "",
             "revision_number": 1,
             "security_groups": [],
@@ -225,7 +301,7 @@ sub json_for_put_floatingips {
         "fixed_ip_address": "172.24.4.228",
         "floating_ip_address": "10.1.2.3",
         "floating_network_id": "376da547-b977-4cfe-9cba-275c80debf57",
-        "id": "ffffff-000000-fffff-111111-7777777",
+        "id": "ffffff00-0000-ffff-1111-117777777777",
         "description": "floating ip for testing",
         "dns_domain": "my-domain.org.",
         "dns_name": "myfip",
@@ -259,7 +335,7 @@ sub json_for_post_floatingips {
         "fixed_ip_address": "172.24.4.228",
         "floating_ip_address": "10.1.2.3",
         "floating_network_id": "376da547-b977-4cfe-9cba-275c80debf57",
-        "id": "ffffff-000000-fffff-111111-7777777",
+        "id": "ffffff00-0000-ffff-1111-117777777777",
         "port_id": "ce705c24-c1ef-408a-bda3-7bbd946164ab",
         "router_id": "d23abc8d-2991-4a55-ba98-2aaea84cc72f",
         "status": "ACTIVE",
@@ -385,7 +461,7 @@ sub json_create_server {
     return <<'JSON';
 {
     "server" : {
-        "id": "aaaaa-bbbb-ccccc-dddd",
+        "id": "aaaaabbb-bccc-cddd-d000-000000000000",
         "accessIPv4": "1.2.3.4",
         "accessIPv6": "80fe::",
         "name" : "new-server-test",
@@ -417,41 +493,25 @@ JSON
 }
 
 sub json_imageid {
+
+    # Glance v2 API returns a flat image object (not wrapped in {image: ...})
     return <<'JSON';
 {
-    "image": {
-        "OS-DCF:diskConfig": "AUTO",
-        "OS-EXT-IMG-SIZE:size": "74185822",
-        "created": "2011-01-01T01:02:03Z",
-        "id": "70a599e0-31e7-49b7-b260-868f441e862b",
-        "links": [
-            {
-                "href": "http://openstack.example.com/v2/6f70656e737461636b20342065766572/images/70a599e0-31e7-49b7-b260-868f441e862b",
-                "rel": "self"
-            },
-            {
-                "href": "http://openstack.example.com/6f70656e737461636b20342065766572/images/70a599e0-31e7-49b7-b260-868f441e862b",
-                "rel": "bookmark"
-            },
-            {
-                "href": "http://glance.openstack.example.com/images/70a599e0-31e7-49b7-b260-868f441e862b",
-                "rel": "alternate",
-                "type": "application/vnd.openstack.image"
-            }
-        ],
-        "metadata": {
-            "architecture": "x86_64",
-            "auto_disk_config": "True",
-            "kernel_id": "nokernel",
-            "ramdisk_id": "nokernel"
-        },
-        "minDisk": 0,
-        "minRam": 0,
-        "name": "fakeimage7",
-        "progress": 100,
-        "status": "ACTIVE",
-        "updated": "2011-01-01T01:02:03Z"
-    }
+    "id": "70a599e0-31e7-49b7-b260-868f441e862b",
+    "name": "fakeimage7",
+    "status": "active",
+    "visibility": "public",
+    "min_disk": 0,
+    "min_ram": 0,
+    "size": 74185822,
+    "container_format": "bare",
+    "disk_format": "raw",
+    "created_at": "2011-01-01T01:02:03Z",
+    "updated_at": "2011-01-01T01:02:03Z",
+    "schema": "/v2/schemas/image",
+    "self": "/v2/images/70a599e0-31e7-49b7-b260-868f441e862b",
+    "file": "/v2/images/70a599e0-31e7-49b7-b260-868f441e862b/file",
+    "tags": []
 }
 JSON
 }

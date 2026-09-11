@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000064';
+our $VERSION = '0.000065';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -258,6 +258,13 @@ has _preserve_duplicates => (
     default  => 1,
 );
 
+has _preserve_require => (
+    is       => 'ro',
+    isa      => Bool,
+    init_arg => 'preserve_require',
+    default  => 1,
+);
+
 has _preserve_unused => (
     is       => 'ro',
     isa      => Bool,
@@ -329,7 +336,6 @@ my %default_ignore = (
     'Devel::Confess'                 => 1,
     'DynaLoader'                     => 1,
     'Encode::Guess'                  => 1,
-    'Env'                            => 1,    # see t/env.t
     'Exception::Class'               => 1,
     'Exporter'                       => 1,
     'Exporter::Lite'                 => 1,
@@ -338,6 +344,7 @@ my %default_ignore = (
     'Git::Sub'                       => 1,
     'HTTP::Message::PSGI'            => 1,    # HTTP::Request::(to|from)_psgi
     'Import::Into'                   => 1,
+    'local::lib'                     => 1,
     'MLDBM'                          => 1,
     'Modern::Perl'                   => 1,
     'Mojo::Base'                     => 1,
@@ -369,6 +376,7 @@ my %default_ignore = (
     'Test2::Util::HashBase'                               => 1,
     'Test::Exception'                                     => 1,
     'Test::Needs'                                         => 1,
+    'Test::NoWarnings'                                    => 1,
     'Test::Number::Delta'                                 => 1,
     'Test::Pod'                                           => 1,
     'Test::Pod::Coverage'                                 => 1,
@@ -999,6 +1007,8 @@ sub _is_used_fully_qualified {
                     $_[1]->content =~ m{\A${module_name}::[a-zA-Z0-9_]*\z}
                     || (   $_[1]->content eq ${module_name}
                         && $_[1]->snext_sibling eq '->' )
+                    || ( $_[1]->content eq ${module_name}
+                        && _is_indirect_object_notation( $_[1] ) )
                     )
                 )
                 || ( $_[1]->isa('PPI::Token::Symbol')
@@ -1017,6 +1027,38 @@ sub _is_used_fully_qualified {
     }
 
     return 0;
+}
+
+# Barewords which precede another bareword but do not introduce indirect object
+# syntax. These are declaration/import keywords (e.g. "sub Foo", "use Foo"),
+# where the following bareword is a name being defined or imported rather than a
+# class being acted upon.
+my %not_indirect_method = map { $_ => 1 } qw(
+    no
+    package
+    require
+    sub
+    use
+);
+
+# Detects indirect object syntax such as "new File $path" or "connect Database
+# $dsn", where a module name is used as the invocant of a method without an
+# arrow. In PPI this is a bareword whose previous significant sibling is another
+# bareword (the method name). This is a heuristic: erring towards treating the
+# module as used is the safe direction, since a false negative would remove an
+# import which is actually in use.
+
+sub _is_indirect_object_notation {
+    my $word = shift;
+
+    my $prev = $word->sprevious_sibling;
+    return 0 unless ref $prev && $prev->isa('PPI::Token::Word');
+
+    # The method name is a simple identifier; a package-qualified name before
+    # the module would not be indirect object syntax.
+    return 0 unless $prev->content =~ m{\A[a-zA-Z_]\w*\z};
+
+    return !$not_indirect_method{ $prev->content };
 }
 
 sub _is_ignored {
@@ -1091,14 +1133,15 @@ sub _include_analyzer {
     my ( $self, $include ) = @_;
 
     return my $e = App::perlimports::Include->new(
-        document        => $self,
-        include         => $include,
-        indent          => $self->_indent,
-        logger          => $self->logger,
-        found_imports   => $self->found_imports->{ $include->module },
-        pad_brackets    => $self->_pad_brackets,
-        pad_imports     => $self->_padding,
-        tidy_whitespace => $self->_tidy_whitespace,
+        document         => $self,
+        include          => $include,
+        indent           => $self->_indent,
+        logger           => $self->logger,
+        found_imports    => $self->found_imports->{ $include->module },
+        pad_brackets     => $self->_pad_brackets,
+        pad_imports      => $self->_padding,
+        preserve_require => $self->_preserve_require,
+        tidy_whitespace  => $self->_tidy_whitespace,
     );
 }
 
@@ -1564,7 +1607,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000064
+version 0.000065
 
 =head1 MOTIVATION
 

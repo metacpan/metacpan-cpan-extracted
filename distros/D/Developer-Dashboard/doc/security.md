@@ -261,7 +261,7 @@ The cost of not having this is measured: the gate was run against
 `$HOME/perl5/lib/perl5` and exited 88 with twenty-four advisories across seven
 distributions, not one of them a declared runtime dependency. Three separate
 rounds read that as a release blocker, and one filed it as a priority-2 security
-defect, while the product's own position was clean across the 81 distributions
+defect, while the product's own position was clean across every distribution
 in its declared closure.
 
 ## CI Action Pinning

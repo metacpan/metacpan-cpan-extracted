@@ -378,9 +378,9 @@ STUB
         is( $out, 'stub-ran', 'AC-4: and still returns the trimmed stdout' );
     }
 
-    # AC-6 HOOKS STILL RUN. Not asserted directly - a hook test would need a
-    # real layered runtime - but asserted by its MECHANISM, which is the thing a
-    # refactor could actually lose. Layered pre-run hooks execute because
+    # AC-6 HOOKS STILL RUN. Asserted here by its MECHANISM, which is the thing a
+    # refactor could actually lose (the main-gate block near the end of this file
+    # asserts the consequence directly, with a real layered runtime). Layered pre-run hooks execute because
     # Handle::run shells out through the real `dashboard` entrypoint; anything
     # that reaches the CLI that way gets them for free. So what has to hold is
     # that the proxy terminator goes through run() and inherits its WHOLE
@@ -443,6 +443,53 @@ JSTUB
 
     undef $proxy;    # last reference dropped -> DESTROY runs HERE, not at exit
     is( $proxy, undef, 'AC-5: dropping the last reference destroys the proxy in scope' );
+}
+
+# DD-810 AC-2/AC-6 - THE MAIN GATE IS INHERITED THROUGH THE HANDLE, asserted
+# DIRECTLY this time. The AC-6 block above proves the mechanism (run() reaches
+# the real entrypoint); this block proves the consequence with a real layered
+# runtime: a `dashboard` on PATH that execs the checkout's own bin/dashboard, a
+# main-gate hook under <home>/.developer-dashboard/hooks/, and a marker file the
+# hook appends its argv to. Handle::run('version') must fire that hook exactly
+# once, with the full command argv, and the command must still answer.
+#
+# The marker is a FILE, not stdout: main-gate hook output is streamed through the
+# entrypoint's own stdout, which run() captures and returns, so asserting on it
+# would couple this test to the streaming plumbing rather than to the gate.
+{
+    my $marker = File::Spec->catfile( $home, 'main-gate-handle.log' );
+    my $hooks  = File::Spec->catdir( $home, '.developer-dashboard', 'hooks' );
+    require File::Path;
+    File::Path::make_path($hooks);
+    my $hook = File::Spec->catfile( $hooks, '10-handle-marker' );
+    open my $hfh, '>', $hook or die "Unable to write $hook: $!";
+    print {$hfh} "#!/bin/sh\nprintf '%s\\n' \"\$*\" >> '$marker'\n";
+    close $hfh or die "Unable to close $hook: $!";
+    chmod 0755, $hook or die "Unable to chmod $hook: $!";
+
+    my $real_dir   = tempdir( CLEANUP => 1 );
+    my $real       = File::Spec->catfile( $real_dir, 'dashboard' );
+    my $entrypoint = File::Spec->catfile( $starting_cwd, 'bin', 'dashboard' );
+    my $lib        = File::Spec->catdir( $starting_cwd, 'lib' );
+    open my $rfh, '>', $real or die "Unable to write $real: $!";
+    print {$rfh} "#!/bin/sh\nexec '$^X' -I'$lib' '$entrypoint' \"\$@\"\n";
+    close $rfh or die "Unable to close $real: $!";
+    chmod 0755, $real or die "Unable to chmod $real: $!";
+    local $ENV{PATH} = "$real_dir:$ENV{PATH}";
+
+    my $h   = Developer::Dashboard::Handle->new( cwd => $home );
+    my $out = $h->run('version');
+    like( $out, qr/\d+\.\d+/, 'DD-810: the command still answers after the main gate ran' );
+
+    my @marker_lines;
+    if ( open my $mfh, '<', $marker ) {
+        chomp( @marker_lines = <$mfh> );
+        close $mfh;
+    }
+    # DD-835 (reverses DD-832): the hook's argv is the full command line as
+    # typed - "version" is prepended, not stripped.
+    is_deeply( \@marker_lines, ['version'],
+        'DD-810 AC-2/AC-6: Handle::run inherits the main gate through the real entrypoint - the hook fired exactly once with argv matching what the user typed' );
 }
 
 done_testing;

@@ -14,3 +14,8 @@
 ^none/
 \.gitlab-ci.yml$
 ^Makefile.old$
+^Makefile$
+^MYMETA\.
+^MANIFEST\.bak$
+^cpanfile\.snapshot$
+\.tar\.gz$

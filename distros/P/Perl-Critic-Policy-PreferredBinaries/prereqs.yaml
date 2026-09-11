@@ -1,0 +1,17 @@
+---
+runtime:
+  requires:
+    perl: '5.014'
+    Perl::Critic: '1.140'
+    Perl::Critic::Utils: '0'
+    Perl::Critic::Exception::Configuration::Generic: '0'
+    Config::INI::Reader: '0'
+    File::Basename: '0'
+    Scalar::Util: '0'
+    PPI: '0'
+test:
+  requires:
+    Test::More: '0'
+    Test::NoWarnings: '0'
+    File::Temp: '0'
+    FindBin::libs: '0'

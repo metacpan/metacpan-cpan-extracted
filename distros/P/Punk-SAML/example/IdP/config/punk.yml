@@ -1,0 +1,8 @@
+# SSODemoIdP configuration.
+#
+# There is deliberately nothing here about secrets or sessions: this
+# provider has no users, no sessions and nothing to protect. Its signing
+# key sits in ../certs, committed, because the whole point of it is that
+# anyone cloning this repository can run both halves.
+
+host: http://127.0.0.1:5001

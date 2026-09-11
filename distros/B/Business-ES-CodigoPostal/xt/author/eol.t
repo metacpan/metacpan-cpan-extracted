@@ -8,10 +8,12 @@ use Test::EOL;
 
 my @files = (
     'lib/Business/ES/CodigoPostal.pm',
+    'lib/Business/ES/CodigoPostal/Municipios.pm',
     't/00-compile.t',
     't/basic.t',
     't/codigos.t',
     't/function.t',
+    't/municipios.t',
     't/pod.t'
 );
 

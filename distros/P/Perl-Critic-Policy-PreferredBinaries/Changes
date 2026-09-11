@@ -1,0 +1,25 @@
+Revision history for Perl-Critic-Policy-PreferredBinaries
+
+0.002     2026-09-11 TEODESIAN
+
+    - Document that runners are matched by name, method calls included, and
+      what that means for a method that runs commands on another machine:
+      name it for what it does rather than annotating every call.
+    - A runner name used as a hash key -- ( run => 'ssh-keygen' ) -- is no
+      longer read as a call.
+    - IPC::Cmd::run's named command => argument is read, as the POD for 0.001
+      claimed and the code did not.
+    - Capture::Tiny's capture_merged, capture_stdout, capture_stderr, tee and
+      tee_merged are no longer read as runners.  They capture a block of perl,
+      not a command, and a shell-out inside the block is already reported as
+      whatever it is.  capture stays, as IPC::System::Simple's.
+    - IPC::System::Simple's capturex, runx and systemx are read as runners.
+    - A runners parameter names more subs to read as runners -- a project's
+      own wrapper around system, say.  It adds to the defaults rather than
+      replacing them.
+
+0.001     2026-09-11 TEODESIAN
+
+    - First release.  Recommends a perl sub over shelling out to a binary that
+      does the same job, configured the same way as
+      Perl::Critic::Policy::PreferredModules.

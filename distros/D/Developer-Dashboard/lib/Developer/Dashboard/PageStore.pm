@@ -3,7 +3,7 @@ package Developer::Dashboard::PageStore;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 use utf8;
 
 use Encode qw(decode FB_CROAK FB_DEFAULT);
@@ -17,6 +17,7 @@ use URI::Escape qw(uri_escape);
 use Developer::Dashboard::Codec qw(encode_payload decode_payload);
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::Platform qw(is_windows);
+use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
 
 # Fallback no-follow flag: O_NOFOLLOW where the platform provides the macro,
 # otherwise 0 so path-based fallback opens still work on such runtimes.
@@ -28,7 +29,7 @@ my $NOFOLLOW = eval { O_NOFOLLOW } || 0;    # uncoverable condition false O_NOFO
 # Output: Developer::Dashboard::PageStore object.
 sub new {
     my ( $class, %args ) = @_;
-    my $paths = $args{paths} || die 'Missing paths registry';
+    my $paths = require_paths_arg(%args);
     return bless { paths => $paths }, $class;
 }
 

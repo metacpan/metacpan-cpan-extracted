@@ -4,10 +4,12 @@ PROTOTYPES: DISABLE
 SV*
 new(char* class, ...)
     CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl, _lru_skip);
+        EXTRACT_NEW_ARGS_SV(_max_size, _ttl, _lru_skip);
         HashMapSA* map = hashmap_sa_create(_max_size, _ttl, _lru_skip);
         if (!map) croak("Failed to create HashMap::SA");
         map->free_value_fn = hm_sv_free;
+        map->free_value_now_fn = hm_sv_free_now;
+        map->copy_values = items > 4 && SvTRUE(ST(4));
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -15,16 +17,15 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        hashmap_sa_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
+        HM_DESTROY(HashMapSA, hashmap_sa_destroy, self_sv);
 
 bool
 put(SV* self_sv, SV* key_sv, SV* value)
     CODE:
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
+        SvGETMAGIC(value);
         EXTRACT_STR_KEY(key_sv);
-        SvREFCNT_inc(value);
+        value = HM_STORE_SV(self, value, hm_copy_nomg(aTHX_ value));
         RETVAL = hashmap_sa_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)value, 0);
         if (!RETVAL) SvREFCNT_dec(value);
     OUTPUT:
@@ -107,6 +108,7 @@ void
 keys(SV* self_sv)
     PPCODE:
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
+        if (GIMME_V == G_SCALAR) { mXPUSHu(self->size); XSRETURN(1); }
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -123,6 +125,7 @@ void
 values(SV* self_sv)
     PPCODE:
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
+        if (GIMME_V == G_SCALAR) { mXPUSHu(self->size); XSRETURN(1); }
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -137,6 +140,7 @@ void
 items(SV* self_sv)
     PPCODE:
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
+        if (GIMME_V == G_SCALAR) { mXPUSHu(self->size); XSRETURN(1); }
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -188,7 +192,9 @@ drain(SV* self_sv, UV count)
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         UV n = 0;
         EXTEND(SP, (count < self->size ? count : self->size) * 2);
-        while (self->iter_pos < self->capacity && n < count) {
+        size_t scanned;
+        for (scanned = 0; scanned < self->capacity && n < count; scanned++) {
+            if (self->iter_pos >= self->capacity) self->iter_pos = 0;
             size_t i = self->iter_pos++;
             if (SA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 {
@@ -236,7 +242,9 @@ pop(SV* self_sv)
             }
             XSRETURN_EMPTY;
         } else {
-            while (self->iter_pos < self->capacity) {
+            size_t scanned;
+            for (scanned = 0; scanned < self->capacity; scanned++) {
+                if (self->iter_pos >= self->capacity) self->iter_pos = 0;
                 size_t i = self->iter_pos++;
                 if (SA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                     EXTEND(SP, 2);
@@ -286,8 +294,9 @@ shift(SV* self_sv)
             }
             XSRETURN_EMPTY;
         } else {
-            if (self->iter_pos == 0) self->iter_pos = self->capacity;
-            while (self->iter_pos > 0) {
+            size_t scanned;
+            for (scanned = 0; scanned < self->capacity; scanned++) {
+                if (self->iter_pos == 0) self->iter_pos = self->capacity;
                 size_t i = --self->iter_pos;
                 if (SA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                     EXTEND(SP, 2);
@@ -331,6 +340,7 @@ purge(SV* self_sv)
 SV*
 freeze(SV* self_sv)
     CODE:
+        PERL_UNUSED_VAR(self_sv);
         croak("freeze not supported for SV* variants; use to_hash + Storable");
         RETVAL = &PL_sv_undef;
     OUTPUT:
@@ -358,9 +368,10 @@ SV*
 swap(SV* self_sv, SV* key_sv, SV* new_val)
     CODE:
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
+        SvGETMAGIC(new_val);
         EXTRACT_STR_KEY(key_sv);
         void* old;
-        SvREFCNT_inc(new_val);
+        new_val = HM_STORE_SV(self, new_val, hm_copy_nomg(aTHX_ new_val));
         if (!hashmap_sa_swap(self, _kstr, (uint32_t)_klen, _khash, (void*)new_val, &old)) { SvREFCNT_dec(new_val); XSRETURN_UNDEF; }
         RETVAL = (SV*)old;
     OUTPUT:
@@ -375,7 +386,7 @@ clone(SV* self_sv)
         if (!clone) croak("Failed to clone");
         { size_t _i; for (_i = 0; _i < clone->capacity; _i++) {
             if (SA_NODE_LIVE(clone->nodes[_i]) && clone->nodes[_i].value)
-                SvREFCNT_inc((SV*)clone->nodes[_i].value);
+                clone->nodes[_i].value = HM_STORE_SV(clone, (SV*)clone->nodes[_i].value, newSVsv((SV*)clone->nodes[_i].value));
         } }
         RETVAL = sv_setref_pv(newSV(0), HvNAME(SvSTASH(SvRV(self_sv))), (void*)clone);
     OUTPUT:
@@ -388,32 +399,37 @@ from_hash(SV* self_sv, SV* href)
         if (!SvROK(href) || SvTYPE(SvRV(href)) != SVt_PVHV)
             croak("from_hash requires a hashref");
         HV* hv = (HV*)SvRV(href);
-        hashmap_sa_reserve(self, (size_t)HvUSEDKEYS(hv));
+        if (!hashmap_sa_reserve(self, (size_t)HvUSEDKEYS(hv))) croak("OOM during from_hash");
         hv_iterinit(hv);
         HE* he;
         while ((he = hv_iternext(hv))) {
             STRLEN klen; const char* kstr = HePV(he, klen);
             bool kutf8 = HeUTF8(he) ? true : false;
             uint32_t khash = hm_hash_string(kstr, (uint32_t)klen);
-            SV* val = HeVAL(he);
-            SvREFCNT_inc(val);
-            if (!hashmap_sa_put(self, kstr, (uint32_t)klen, khash, kutf8, (void*)val, 0)) SvREFCNT_dec(val);
+            SV* val = hv_iterval(hv, he);   /* HeVAL is NULL for a tied hash */
+            val = HM_STORE_SV(self, val, newSVsv(val));
+            if (!hashmap_sa_put(self, kstr, (uint32_t)klen, khash, kutf8, (void*)val, 0)) {
+                SvREFCNT_dec(val);
+                croak("OOM during from_hash");
+            }
         }
 
 void
 merge(SV* self_sv, SV* other_sv)
     CODE:
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        if (!SvROK(other_sv) || !SvOBJECT(SvRV(other_sv)) || SvSTASH(SvRV(other_sv)) != stash_sa)
-            croak("Expected a Data::HashMap::SA object");
-        HashMapSA* other = INT2PTR(HashMapSA*, SvIV(SvRV(other_sv)));
-        hashmap_sa_reserve(self, self->size + other->size);
+        EXTRACT_OTHER_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", other_sv);
+        if (self == other) XSRETURN_EMPTY;
+        if (!hashmap_sa_reserve(self, self->size + other->size)) croak("OOM during merge");
         uint32_t now = other->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
         for (i = 0; i < other->capacity; i++) {
             if (SA_NODE_LIVE(other->nodes[i]) && !HM_TTL_SKIP_EXPIRED(other, i, now)) {
-                SvREFCNT_inc((SV*)other->nodes[i].value);
-                if (!hashmap_sa_put(self, other->nodes[i].key, HM_UNPACK_LEN(other->nodes[i].key_len), other->nodes[i].key_hash, HM_UNPACK_UTF8(other->nodes[i].key_len), (void*)other->nodes[i].value, 0)) SvREFCNT_dec((SV*)other->nodes[i].value);
+                SV* _copy = HM_STORE_SV(self, (SV*)other->nodes[i].value, newSVsv((SV*)other->nodes[i].value));
+                if (!hashmap_sa_put(self, other->nodes[i].key, HM_UNPACK_LEN(other->nodes[i].key_len), other->nodes[i].key_hash, HM_UNPACK_UTF8(other->nodes[i].key_len), (void*)_copy, 0)) {
+                    SvREFCNT_dec(_copy);
+                    croak("OOM during merge");
+                }
             }
         }
 
@@ -429,7 +445,7 @@ to_hash(SV* self_sv)
             if (SA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
                 bool kutf8 = HM_UNPACK_UTF8(self->nodes[i].key_len);
-                SV* val = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
+                SV* val = self->nodes[i].value ? HM_STORE_SV(self, (SV*)self->nodes[i].value, newSVsv((SV*)self->nodes[i].value)) : newSV(0);
                 (void)hv_store(hv, self->nodes[i].key, kutf8 ? -(I32)klen : (I32)klen, val, 0);
             }
         }
@@ -438,12 +454,15 @@ to_hash(SV* self_sv)
         RETVAL
 
 bool
-put_ttl(SV* self_sv, SV* key_sv, SV* value, UV ttl)
+put_ttl(SV* self_sv, SV* key_sv, SV* value, SV* ttl)
     CODE:
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
+        SvGETMAGIC(value); SvGETMAGIC(ttl);
         EXTRACT_STR_KEY(key_sv);
-        SvREFCNT_inc(value);
-        RETVAL = hashmap_sa_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)value, (uint32_t)ttl);
+        /* Before the copy: it can croak, and would orphan the copy. */
+        uint32_t _ttl = hm_ttl_arg(aTHX_ ttl);
+        value = HM_STORE_SV(self, value, hm_copy_nomg(aTHX_ value));
+        RETVAL = hashmap_sa_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)value, _ttl);
         if (!RETVAL) SvREFCNT_dec(value);
     OUTPUT:
         RETVAL
@@ -452,9 +471,10 @@ SV*
 get_or_set(SV* self_sv, SV* key_sv, SV* default_value)
     CODE:
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
+        SvGETMAGIC(default_value);
         EXTRACT_STR_KEY(key_sv);
         bool was_found;
-        SvREFCNT_inc(default_value);
+        default_value = HM_STORE_SV(self, default_value, hm_copy_nomg(aTHX_ default_value));
         size_t idx = hashmap_sa_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)default_value, 0, &was_found);
         if (idx >= self->capacity) {
             SvREFCNT_dec(default_value);

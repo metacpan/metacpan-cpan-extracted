@@ -3,13 +3,15 @@ package Developer::Dashboard::CLI::Which;
 use strict;
 use warnings;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 
 use Cwd qw(cwd);
+use Developer::Dashboard::DirEntries qw(sorted_dir_entries);
 use File::Spec;
 use Getopt::Long qw(GetOptionsFromArray);
 use Developer::Dashboard::InternalCLI;
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::CLI::TableHelpers qw(build_paths);
 use Developer::Dashboard::Platform qw(command_argv_for_path resolve_runnable_file is_runnable_file);
 use Developer::Dashboard::SkillDispatcher;
 use Developer::Dashboard::SkillManager;
@@ -38,7 +40,7 @@ sub run_which_command {
     my $target = shift @argv || die _usage();
     die _usage() if @argv;
 
-    my $paths = _build_paths();
+    my $paths = build_paths();
     my $result = _locate_target(
         paths  => $paths,
         target => $target,
@@ -63,21 +65,6 @@ sub _usage {
     return "Usage: dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\n";
 }
 
-# _build_paths()
-# Builds the lightweight path registry used by the which helper.
-# Input: none.
-# Output: Developer::Dashboard::PathRegistry object scoped to the current cwd.
-sub _build_paths {
-    my $home = $ENV{HOME} || '';
-    my @roots = grep { -d } map { "$home/$_" } qw(projects src work);
-    return Developer::Dashboard::PathRegistry->new(
-        home            => $home,
-        cwd             => cwd(),
-        workspace_roots => \@roots,
-        project_roots   => \@roots,
-    );
-}
-
 # _locate_target(%args)
 # Resolves one dashboard command target into the actual runnable file path and
 # the ordered hook files that will execute before it.
@@ -90,19 +77,15 @@ sub _locate_target {
     my $target = $args{target} || '';
     return { command => '', hooks => [] } if $target eq '';
 
-    if ( my $skill = _locate_skill_target( paths => $paths, target => $target ) ) {
-        return $skill;
-    }
+    my $located = _locate_skill_target( paths => $paths, target => $target )
+      || _builtin_target( paths => $paths, target => $target )
+      || _custom_target( paths => $paths, target => $target );
+    return { command => '', hooks => [] } if !$located;
 
-    if ( my $helper = _builtin_target( paths => $paths, target => $target ) ) {
-        return $helper;
-    }
-
-    if ( my $custom = _custom_target( paths => $paths, target => $target ) ) {
-        return $custom;
-    }
-
-    return { command => '', hooks => [] };
+    # The main gate runs before the command is resolved, so its hooks come
+    # first in the report - exactly the order the switchboard executes them.
+    unshift @{ $located->{hooks} }, _main_gate_hook_files( paths => $paths );
+    return $located;
 }
 
 # _builtin_target(%args)
@@ -178,16 +161,50 @@ sub _command_hook_files {
         my $plain_root = File::Spec->catdir( $root, $command );
         my $hooks_root = -d $plain_root ? $plain_root : File::Spec->catdir( $root, $command . '.d' );
         next if !-d $hooks_root;
-        opendir( my $dh, $hooks_root ) or die "Unable to read $hooks_root: $!";
-        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
-            my $path = File::Spec->catfile( $hooks_root, $entry );
-            next if $entry eq 'run';
-            next if !is_runnable_file($path);
-            push @hooks, $path;
-        }
-        closedir($dh);
+        push @hooks, _runnable_hook_entries($hooks_root);
     }
 
+    return @hooks;
+}
+
+# _main_gate_hook_files(%args)
+# Enumerates the main-gate hook files (<layer>/hooks/*) that the switchboard
+# runs once per invocation before any command is resolved, deepest participating
+# DD-OOP-LAYER first and the home layer last, in execution order.
+# Input: path registry under "paths".
+# Output: ordered list of absolute hook file paths; empty when no layer has a
+# hooks directory.
+sub _main_gate_hook_files {
+    my (%args) = @_;
+    my $paths = $args{paths} || die "Missing paths registry\n";
+
+    my @hooks;
+    for my $layer ( reverse $paths->runtime_layers ) {
+        my $hooks_root = File::Spec->catdir( $layer, 'hooks' );
+        next if !-d $hooks_root;
+        push @hooks, _runnable_hook_entries($hooks_root);
+    }
+
+    return @hooks;
+}
+
+# _runnable_hook_entries($hooks_root)
+# Reads one hook directory the way the switchboard does: entries sorted by
+# name, skipping the "run" body and anything that is not an executable regular
+# file.
+# Input: existing hook directory path.
+# Output: ordered list of absolute hook file paths.
+sub _runnable_hook_entries {
+    my ($hooks_root) = @_;
+    opendir( my $dh, $hooks_root ) or die "Unable to read $hooks_root: $!";
+    my @hooks;
+    for my $entry ( sorted_dir_entries($dh) ) {
+        my $path = File::Spec->catfile( $hooks_root, $entry );
+        next if $entry eq 'run';
+        next if !is_runnable_file($path);
+        push @hooks, $path;
+    }
+    closedir($dh);
     return @hooks;
 }
 
@@ -318,7 +335,11 @@ Call C<run_which_command(command =E<gt> 'which', args =E<gt> \@ARGV)>. The modul
 builds a lightweight path registry, detects whether the target is a built-in
 helper, a layered custom command, or a dotted skill command, then prints one
 C<COMMAND /full/path> line followed by zero or more C<HOOK /full/path> lines in
-the same order the runtime would execute them. When users add C<--edit>, the
+the same order the runtime would execute them: the main-gate hooks (every
+executable file directly under a layer's F<hooks/> directory, deepest layer
+first and the home layer last) come before the per-command
+F<E<lt>commandE<gt>.d/> hooks, because the switchboard runs the main gate once
+before it resolves the command. When users add C<--edit>, the
 module skips the printed inspection output and re-enters C<dashboard open-file>
 with the resolved command file path so the existing editor-selection behavior
 is reused.

@@ -17,7 +17,8 @@ BEGIN {
 }
 
 use Test::NoWarnings qw(had_no_warnings);
-use Test::More tests => 6;
+use Test::More tests => 9;
+use Test::Warn;
 use File::Temp qw(tempfile);
 
 sub check_tidy {
@@ -135,18 +136,111 @@ INPUT
     is( $checker->fix, $tidy_input, "check called before fix" );
 };
 
+subtest 'File passed via file parameter' => sub {
+    plan tests => 2;
+
+    my $tidy_input = <<INPUT;
+for (const user of ["Alice", "Bob", "Charlie"]) {
+    console.log(user);
+}
+INPUT
+
+    my $untidy_input = <<INPUT;
+for ( const user of ["Alice", "Bob", "Charlie"] ) {
+    console.log( user );
+
+}
+INPUT
+
+    my ( $fh, $filename ) = tempfile( UNLINK => 0, TEMPDIR => 1, SUFFIX => '.js' );
+    print $fh $tidy_input;
+    close $fh;
+
+    my $checker = Koha::QA::Tidy::JS->new( { file => $filename } );
+    my @errors  = $checker->errors() if $checker->check();
+    is( scalar @errors, 0, 'Tidy file passed via file parameter should pass tidy check' );
+
+    ( $fh, $filename ) = tempfile( UNLINK => 0, TEMPDIR => 1, SUFFIX => '.js' );
+    print $fh $untidy_input;
+    close $fh;
+
+    $checker = Koha::QA::Tidy::JS->new( { file => $filename } );
+    $checker->check();
+    is( $checker->fix, $tidy_input, 'Untidy file passed via file parameter should be fixed' );
+};
+
 subtest 'Non-existing prettierrc file passed' => sub {
-    plan tests => 1;
+    plan tests => 2;
 
     my $input = <<INPUT;
 File does not exist
 INPUT
 
     my $nonexistent_prettierrc = q{.this-should-not-exist};
-    my @errors                 = check_tidy( $input, { prettierrc => $nonexistent_prettierrc } );
+    my $checker = Koha::QA::Tidy::JS->new( { content => $input, prettierrc => $nonexistent_prettierrc } );
+    $checker->check();
     is_deeply(
-        \@errors,
+        [ $checker->errors ],
         [ { error => 'no_prettierrc', message => qq{prettierrc file not found: $nonexistent_prettierrc} } ]
+    );
+    is( $checker->fix, undef, 'fix() returns undef rather than silently truncating the file' );
+};
+
+subtest 'Broken prettierrc fails the check' => sub {
+    plan tests => 5;
+
+    my ( $fh, $broken_prettierrc ) = tempfile( UNLINK => 0, TEMPDIR => 1, SUFFIX => '.js' );
+    print $fh "this is not valid javascript {{{\n";
+    close $fh;
+
+    my $input = <<INPUT;
+var x = 1;
+INPUT
+
+    my $checker = Koha::QA::Tidy::JS->new( { content => $input, prettierrc => $broken_prettierrc } );
+    my $is_valid;
+    warning_like { $is_valid = $checker->check() } qr/\[error\]/,
+        "check() warns with prettier's config error";
+    is( $is_valid, 0, 'check() reports failure' );
+    is_deeply(
+        [ $checker->errors ],
+        [
+            {
+                error   => 'tidy_js_prettier_failed',
+                message => 'prettier failed to process the file, the original content was kept'
+            }
+        ],
+        'check() reports the prettier-failed error, not "not tidy"'
+    );
+
+    my $fixed;
+    warning_like { $fixed = $checker->fix } qr/\[error\]/, 'fix() re-running check() warns again';
+    is( $fixed, undef, 'fix() returns undef rather than silently truncating the file' );
+};
+
+subtest 'Prettier fail to parse the content' => sub {
+    plan tests => 3;
+
+    my $input = <<'INPUT';
+function foo( { console.log("bad");
+INPUT
+
+    my $checker = Koha::QA::Tidy::JS->new( { content => $input } );
+    my $is_valid;
+
+    warning_like { $is_valid = $checker->check } qr/SyntaxError/,
+        "check() warns with prettier's parse error";
+
+    ok( !$is_valid, 'check() reports the file as not tidy when prettier fails to parse it' );
+    is_deeply(
+        [ $checker->errors ],
+        [
+            {
+                message => 'prettier failed to process the file, the original content was kept',
+                error   => 'tidy_js_prettier_failed'
+            }
+        ],
+        'the parse failure is reported'
     );
 };
 

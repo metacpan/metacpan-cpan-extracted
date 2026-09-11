@@ -20,36 +20,36 @@ binmode(STDOUT, ':utf8');
 binmode(STDERR, ':utf8');
 
 use_ok('AmberDB')        or BAIL_OUT('Cannot load AmberDB');
-use_ok('AmberDB::Index') or BAIL_OUT('Cannot load AmberDB::Index');
+use_ok('AmberDB::Base::Index') or BAIL_OUT('Cannot load AmberDB::Base::Index');
 use_ok('AmberDB::Tools') or BAIL_OUT('Cannot load AmberDB::Tools');
 
 # ------------------------------------------------------------------
-# SUBTEST 1: field_to_list unit tests (trim_space & normalization)
+# SUBTEST 1: get_fieldlist / set_fieldlist unit tests (trim_space & normalization)
 # ------------------------------------------------------------------
-subtest 'field_to_list normalization and trim_space' => sub {
+subtest 'get_fieldlist normalization and trim_space' => sub {
     plan tests => 10;
 
     my $adb = AmberDB->new();
 
     # 1. Undef / empty
-    is_deeply( [ $adb->field_to_list(undef) ], [], 'undef returns empty list' );
-    is_deeply( [ $adb->field_to_list('') ],    [], 'empty string returns empty list' );
-    is_deeply( [ $adb->field_to_list('   ') ], [], 'whitespace-only returns empty list' );
+    is_deeply( [ $adb->get_fieldlist(undef) ], [], 'undef returns empty list' );
+    is_deeply( [ $adb->get_fieldlist('') ],    [], 'empty string returns empty list' );
+    is_deeply( [ $adb->get_fieldlist('   ') ], [], 'whitespace-only returns empty list' );
 
     # 2. Single value with whitespace
-    is_deeply( [ $adb->field_to_list('  Edebiyat  ') ], ['Edebiyat'], 'single string trimmed' );
+    is_deeply( [ $adb->get_fieldlist('  Edebiyat  ') ], ['Edebiyat'], 'single string trimmed' );
 
     # 3. Comma / semicolon delimited with multiple spaces & tabs
     my $str1 = " Edebiyat ,  Dünya   Klasikleri ; \t Rus Romanları \n ";
     is_deeply(
-        [ $adb->field_to_list($str1) ],
+        [ $adb->get_fieldlist($str1) ],
         [ 'Edebiyat', 'Dünya Klasikleri', 'Rus Romanları' ],
         'comma/semicolon delimited string trimmed and normalized'
     );
 
     # 4. Numeric comma list
     is_deeply(
-        [ $adb->field_to_list(' 49 , 112 ; 167 ') ],
+        [ $adb->get_fieldlist(' 49 , 112 ; 167 ') ],
         [ '49', '112', '167' ],
         'numeric comma/semicolon list parsed'
     );
@@ -57,7 +57,7 @@ subtest 'field_to_list normalization and trim_space' => sub {
     # 5. Array reference with trailing/leading spaces
     my $arr1 = [ ' Edebiyat ', '  Dünya  Klasikleri  ', '', '   ' ];
     is_deeply(
-        [ $adb->field_to_list($arr1) ],
+        [ $adb->get_fieldlist($arr1) ],
         [ 'Edebiyat', 'Dünya Klasikleri' ],
         'array ref elements trimmed and empty items removed'
     );
@@ -65,7 +65,7 @@ subtest 'field_to_list normalization and trim_space' => sub {
     # 6. Nested array reference
     my $arr2 = [ '49', [ ' 112 ', ' 167 ' ] ];
     is_deeply(
-        [ $adb->field_to_list($arr2) ],
+        [ $adb->get_fieldlist($arr2) ],
         [ '49', '112', '167' ],
         'nested array ref flattened and trimmed'
     );
@@ -86,7 +86,7 @@ subtest 'rdbm match_block numeric indexing (Case 1)' => sub {
     plan tests => 6;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
-    my $conf_dir   = File::Spec->catdir( $temp_dir, 'conf' );
+    my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
     my $schema_dir = File::Spec->catdir( $temp_dir, 'schema' );
     mkdir $conf_dir;
     mkdir $schema_dir;
@@ -147,7 +147,7 @@ subtest 'non-rdbm string match_block with .unq and lastid (Case 2)' => sub {
     plan tests => 13;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
-    my $conf_dir   = File::Spec->catdir( $temp_dir, 'conf' );
+    my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
     my $schema_dir = File::Spec->catdir( $temp_dir, 'schema' );
     mkdir $conf_dir;
     mkdir $schema_dir;
@@ -224,7 +224,7 @@ subtest 'modify_id, delete_id and index rebuild' => sub {
     plan tests => 8;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
-    my $conf_dir   = File::Spec->catdir( $temp_dir, 'conf' );
+    my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
     my $schema_dir = File::Spec->catdir( $temp_dir, 'schema' );
     mkdir $conf_dir;
     mkdir $schema_dir;
@@ -298,7 +298,7 @@ subtest 'batch match_add handle lifecycle and whitespace cleaning' => sub {
     plan tests => 6;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
-    my $conf_dir   = File::Spec->catdir( $temp_dir, 'conf' );
+    my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
     my $schema_dir = File::Spec->catdir( $temp_dir, 'schema' );
     mkdir $conf_dir;
     mkdir $schema_dir;
@@ -327,8 +327,8 @@ SCHEMA
         }
     );
 
-    # Test newline/tab normalization in field_to_list
-    my @f_list = $adb->field_to_list("  Bilim\nKurgu  ,  Yapay\tZeka  ");
+    # Test newline/tab normalization in get_fieldlist
+    my @f_list = $adb->get_fieldlist("  Bilim\nKurgu  ,  Yapay\tZeka  ");
     is_deeply( \@f_list, [ 'Bilim Kurgu', 'Yapay Zeka' ], 'embedded newlines and tabs normalized to single spaces' );
 
     # Batch records insertion
@@ -360,8 +360,8 @@ SCHEMA
     my ( undef, @recs_fizik ) = $adb->index_get( $fld_path, "1:$id_fizik" );
     is_deeply( [ sort @recs_fizik ], [ 1, 3 ], 'Fizik index correctly maps to records 1 and 3 across batch' );
 
-    # Verify field_to_list read mode does not open-close erroneously
-    my @read_ids = $adb->field_to_list( 'Fizik, Geometri', 'read', $table_path, $table_info, 1 );
+    # Verify get_fieldlist read mode does not open-close erroneously
+    my @read_ids = $adb->get_fieldlist( 'Fizik, Geometri', 'read', $table_path, $table_info, 1 );
     is_deeply( \@read_ids, [ $id_fizik, 5 ], 'read mode resolves batch strings to numeric IDs' );
 };
 
@@ -372,7 +372,7 @@ subtest 'valid => "unique" constraint check in insert/modify/delete' => sub {
     plan tests => 8;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
-    my $conf_dir   = File::Spec->catdir( $temp_dir, 'conf' );
+    my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
     my $schema_dir = File::Spec->catdir( $temp_dir, 'schema' );
     mkdir $conf_dir;
     mkdir $schema_dir;
@@ -440,10 +440,10 @@ SCHEMA
 # SUBTEST 7: RDBM Foreign String auto-resolution via foreign .unq
 # ------------------------------------------------------------------
 subtest 'RDBM Foreign String auto-resolution via foreign .unq' => sub {
-    plan tests => 9;
+    plan tests => 8;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
-    my $conf_dir   = File::Spec->catdir( $temp_dir, 'conf' );
+    my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
     my $schema_dir = File::Spec->catdir( $temp_dir, 'schema' );
     mkdir $conf_dir;
     mkdir $schema_dir;
@@ -509,17 +509,18 @@ SCHEMA
     my ( undef, @books_10_all ) = $adb->index_get( $book_fld, '1:10' );
     is_deeply( [ sort @books_10_all ], [ 1001, 1002 ], 'Both books match Brand ID 10' );
 
-    # Insert book 1003 passing new brand 'İthaki Yayınları' (auto-registered)
+    # Insert book 1003 passing new brand 'İthaki Yayınları' (does NOT create foreign record, only unq)
     my $k3 = $adb->insert_id( 'catalog_book', 1003, 'İthaki Yayınları', 'Dune' );
-    is( $k3, 1003, 'Book 1003 inserted with new brand auto-resolution' );
+    is( $k3, 1003, 'Book 1003 inserted' );
 
-    # Verify target table catalog_brand has fully registered record 11 with indexes
-    my @b11_rec = $adb->read_id( 'catalog_brand', 11 );
-    is( $b11_rec[0], 11, 'Auto-registered brand has ID 11' );
-    is( $b11_rec[1], 'İthaki Yayınları', 'Auto-registered brand has name at block 1' );
-
+    # Verify target table catalog_brand has NOT created a foreign record (remains 1 record)
     my @all_brands = $adb->read_all('catalog_brand');
-    is( scalar @all_brands, 2, 'catalog_brand has exactly 2 records in .inx index' );
+    is( scalar @all_brands, 1, 'catalog_brand has NOT created foreign record; exactly 1 record remains in .inx index' );
+
+    # Verify catalog_book.unq has registered 'İthaki Yayınları' ("sadece unq üretsin")
+    my $book_unq = $adb->table_path('catalog_book') . '.unq';
+    my ($ithaki_unq_id) = $adb->index_get( $book_unq, '1:s:İthaki Yayınları', 'raw' );
+    ok( defined $ithaki_unq_id && $ithaki_unq_id ne '', 'catalog_book.unq generated unq ID for string publisher' );
 };
 
 done_testing();

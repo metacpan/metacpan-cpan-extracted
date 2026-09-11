@@ -47,7 +47,8 @@
       "test" : {
          "requires" : {
             "Test::More" : "0",
-            "Test::NoWarnings" : "0"
+            "Test::NoWarnings" : "0",
+            "Test::Warn" : "0"
          }
       }
    },
@@ -62,6 +63,6 @@
          "web" : "https://gitlab.com/joubu/koha-qa"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

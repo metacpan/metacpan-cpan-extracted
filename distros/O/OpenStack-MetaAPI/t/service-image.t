@@ -46,7 +46,7 @@ ok $api, "got one api object" or die;
         'created_at'       => '2019-04-10T20:23:09Z',
         'disk_format'      => 'raw',
         'file'         => '/v2/images/6056cbf415fd5f8c223c8a69341e44ee/file',
-        'id'           => 'b763530-fe64d-2116b5-c627a7-7f0cf71b',
+        'id'           => 'b7635300-fe6d-2116-c627-7f0cf71b0000',
         'min_disk'     => 0,
         'min_ram'      => 0,
         'name'         => 'MyImage',
@@ -104,6 +104,78 @@ ok $api, "got one api object" or die;
 
 }
 
+{
+    note "Testing image_from_uid rejects malformed UUIDs";
+
+    like dies { $api->image_from_uid('not-a-uuid') },
+        qr/Invalid UUID format/,
+        "image_from_uid rejects non-UUID string";
+
+    like dies { $api->image_from_uid('aaa-bbb-ccc') },
+        qr/Invalid UUID format/,
+        "image_from_uid rejects too-short hex-dash string";
+
+    like dies { $api->image_from_uid('170fafa513294a3c9c279bb77b77206d') },
+        qr/Invalid UUID format/,
+        "image_from_uid rejects UUID without dashes";
+
+    like dies { $api->image_from_uid('170fafa5-1329-44a3-9c27') },
+        qr/Invalid UUID format/,
+        "image_from_uid rejects truncated UUID";
+}
+
+{
+    note "Testing images() is not exposed at MetaAPI level";
+
+    ok !$api->can('images'),
+      "images() is not available via MetaAPI (use image_from_uid or image_from_name)";
+}
+
+{
+    note "Testing image_from_uid requires uid parameter";
+
+    like dies { $api->image_from_uid(undef) },
+      qr/image_from_uid: uid is required/,
+      "image_from_uid dies when uid is undef";
+}
+
+{
+    note "Testing image_from_name requires name parameter";
+
+    like dies { $api->image_from_name(undef) },
+      qr/image_from_name: name is required/,
+      "image_from_name dies when name is undef";
+}
+
+{
+    note "Testing image_from_name with duplicate image names";
+
+    mock_get_request(
+        'http://127.0.0.1:9292/v2/images?name=in:%22duplicate-image%22',
+        application_json(json_for_duplicate_images()),
+    );
+
+    like dies { $api->image_from_name('duplicate-image') },
+      qr/multiple images found for name 'duplicate-image'/,
+      "image_from_name dies on duplicate names";
+
+    like dies { $api->image_from_name('duplicate-image') },
+      qr/Use image_from_uid to select a specific image/,
+      "error message suggests using image_from_uid";
+}
+
+{
+    note "Testing image_from_name with no results";
+
+    mock_get_request(
+        'http://127.0.0.1:9292/v2/images?name=in:%22nonexistent%22',
+        application_json(json_for_no_images()),
+    );
+
+    is $api->image_from_name('nonexistent'), undef,
+      "image_from_name returns undef when no images found";
+}
+
 done_testing;
 
 sub json_for_image {
@@ -112,7 +184,7 @@ sub json_for_image {
     return <<'JSON';
 {
    "min_ram" : 0,
-   "id" : "b763530-fe64d-2116b5-c627a7-7f0cf71b",
+   "id" : "b7635300-fe6d-2116-c627-7f0cf71b0000",
    "os_version" : "7",
    "created_at" : "2019-04-10T20:23:09Z",
    "os_arch" : "x86_64",
@@ -170,6 +242,39 @@ sub json_for_image_name {
          "owner" : "79ee01d32d3c2dfec7d693743aeffa7b"
       }
    ]
+}
+JSON
+}
+
+sub json_for_duplicate_images {
+    return <<'JSON';
+{
+   "first" : "/v2/images?name=in%3A%22duplicate-image%22",
+   "schema" : "/v2/schemas/images",
+   "images" : [
+      {
+         "id" : "aaaa1111-2222-3333-4444-555566667777",
+         "name" : "duplicate-image",
+         "status" : "active",
+         "visibility" : "shared"
+      },
+      {
+         "id" : "bbbb1111-2222-3333-4444-555566667777",
+         "name" : "duplicate-image",
+         "status" : "active",
+         "visibility" : "shared"
+      }
+   ]
+}
+JSON
+}
+
+sub json_for_no_images {
+    return <<'JSON';
+{
+   "first" : "/v2/images?name=in%3A%22nonexistent%22",
+   "schema" : "/v2/schemas/images",
+   "images" : []
 }
 JSON
 }

@@ -6,7 +6,7 @@ use utf8;
 use Encode qw(decode encode);
 use Carp qw(croak cluck);
 
-our $VERSION = '5.24.0';
+our $VERSION = '5.25.1';
 my $CREATED  = '2017-07-22';
 
 my %LOCALE_CACHE;
@@ -20,11 +20,11 @@ my %WARNED_LOCALES;
 #
 # USAGE:
 #   # New API (explicit language):
+#   my $lang = AmberDB::Locale->new(language => "gb");
 #   my $lang = AmberDB::Locale->new(language => "tr");
-#   my $lang = AmberDB::Locale->new(language => "de");
 #
-#   # With AmberDB engine (language from cfg):
-#   AmberDB->new(cfg => { language => "tr" });
+#   # With AmberDB engine (language from cfg, defaults to "gb"):
+#   AmberDB->new(cfg => { language => "gb" });
 #   # then $self->uc($str) works on the inherited object
 # -------------------------------------------------------
 
@@ -38,9 +38,9 @@ sub new {
     my $lang;
 
     # Handle calling conventions:
-    #   1. new(language => "tr")     — named-param API
-    #   2. new({ language => "tr" }) — unblessed hash ref API
-    #   3. new("tr")                 — positional string API
+    #   1. new(language => "gb")     — named-param API
+    #   2. new({ language => "gb" }) — unblessed hash ref API
+    #   3. new("gb")                 — positional string API
     #   4. new()                     — no args; use default ("gb")
     if ( @_ ) {
         if ( @_ == 1 && !ref( $_[0] ) ) {
@@ -61,7 +61,7 @@ sub new {
         'tr-tr'       => 'tr',
         'english'     => 'en',
         'en_us'       => 'en',
-        'en_gb'       => 'en',
+        'en_gb'       => 'gb',
         'german'      => 'de',
         'de_de'       => 'de',
         'french'      => 'fr',
@@ -602,14 +602,14 @@ sub first_char {
 # my $text = $lang->num2text($number, currency => { main=>"EUR", sub=>"cent" });
 #
 # %custom_data can be a complete numbers hash or partial override.
-# If locale has no numbers data, falls back to English.
+# If locale has no numbers data, falls back to Global Base (gb).
 # -------------------------------------------------------
 sub num2text {
     my ( $self, $num, %opts ) = @_;
 
     return '' unless defined $num;
 
-    # Resolve numbers dataset: explicit override > locale > en fallback
+    # Resolve numbers dataset: explicit override > locale > gb fallback
     my $numbers;
     if ( $opts{numbers} ) {
         $numbers = $opts{numbers};
@@ -618,8 +618,8 @@ sub num2text {
         $numbers = $self->{_locale}{numbers};
     }
     else {
-        require AmberDB::Locale::Lang::en;
-        $numbers = AmberDB::Locale::Lang::en->data()->{numbers};
+        require AmberDB::Locale::Lang::gb;
+        $numbers = AmberDB::Locale::Lang::gb->data()->{numbers};
     }
 
     # Normalize Eastern Arabic-Indic numerals and decimal separator
@@ -1160,6 +1160,8 @@ sub language { return $_[0]->{_lang} }
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 AmberDB::Locale - Multilingual text processing, collation, number/currency formatting, and search normalization engine
@@ -1168,9 +1170,9 @@ AmberDB::Locale - Multilingual text processing, collation, number/currency forma
 
   # =========================================================================
   # 1. DIRECT USAGE VIA AMBERDB INSTANCE ($adb inherits AmberDB::Locale):
-  # Reads active language from config (default is 'tr' or configured language)
+  # Reads active language from config (default is 'gb' or configured language)
   # =========================================================================
-  my $adb = AmberDB->new(cfg => { language => "tr" });
+  my $adb = AmberDB->new(cfg => { language => "gb" });
 
   # Case Conversions & Comparison
   my $upper  = $adb->uc("ığdır");                         # "IĞDIR"
@@ -1288,7 +1290,7 @@ C<AmberDB::Locale> is a comprehensive, high-performance, locale-aware text proce
 
 =back
 
-Language-specific datasets and rule tables are decoupled into modular packages (e.g. C<AmberDB::Locale::Lang::tr>, C<AmberDB::Locale::Lang::de>, C<AmberDB::Locale::Lang::en>, C<AmberDB::Locale::Lang::ru>, C<AmberDB::Locale::Lang::fr>, C<AmberDB::Locale::Lang::es>, C<AmberDB::Locale::Lang::az>, C<AmberDB::Locale::Lang::ar>, C<AmberDB::Locale::Lang::ja>).
+Language-specific datasets and rule tables are decoupled into modular packages (e.g. C<AmberDB::Locale::Lang::gb>, C<AmberDB::Locale::Lang::tr>, C<AmberDB::Locale::Lang::de>, C<AmberDB::Locale::Lang::en>, C<AmberDB::Locale::Lang::ru>, C<AmberDB::Locale::Lang::fr>, C<AmberDB::Locale::Lang::es>, C<AmberDB::Locale::Lang::az>, C<AmberDB::Locale::Lang::ar>, C<AmberDB::Locale::Lang::ja>).
 
 B<Inheritance Note:> C<AmberDB> inherits from C<AmberDB::Locale> via C<use parent>. When an C<AmberDB> instance is constructed, it automatically initializes its locale subsystem from C<$adb-E<gt>config('language')>. All methods documented below can be called directly on C<$adb> (e.g. C<$adb-E<gt>format_currency(...)>).
 
@@ -1564,6 +1566,44 @@ Custom formatting overrides:
 
   $tr->format_currency(100, symbol => 'TL', position => 'suffix', space => 1);
   # => "100,00 TL"
+
+=head3 ISO 4217 Currency Dictionary
+
+C<AmberDB::Locale> integrates a master dictionary of ISO 4217 currency definitions, numeric codes, currency symbols, and default subunit decimal precision (implemented internally via C<AmberDB::Locale::Currency>).
+
+Direct dictionary lookups, symbol conversions, and select dropdown lists can be accessed via:
+
+  use AmberDB::Locale::Currency;
+
+  # Symbol and name lookups
+  my $sym  = AmberDB::Locale::Currency->symbol('TRY'); # '₺'
+  my $name = AmberDB::Locale::Currency->name('USD');   # 'US Dollar'
+  my $info = AmberDB::Locale::Currency->by_code('EUR');
+  # => { num => '978', name => 'Euro', symbol => '€', digits => 2 }
+
+  # Dropdown options for UI forms
+  my @options = AmberDB::Locale::Currency->all();
+  # => ( [ 'TRY', 'Turkish Lira' ], [ 'USD', 'US Dollar' ], ... )
+
+  # List active ISO codes
+  my @codes = AmberDB::Locale::Currency->active_codes();
+  # => ('TRY', 'USD', 'EUR', 'GBP', 'RUB', 'AZN', 'SAR', 'JPY', 'CHF', 'CAD', 'AUD', 'CNY')
+
+Supported helper methods:
+
+=over 4
+
+=item * C<AmberDB::Locale::Currency-E<gt>by_code($iso_code)> - Returns the currency definition hash reference for the given 3-letter ISO 4217 code (case-insensitive), containing C<num>, C<name>, C<symbol>, and C<digits>.
+
+=item * C<AmberDB::Locale::Currency-E<gt>symbol($iso_code)> - Returns the currency symbol for the given ISO code (e.g. C<'₺'>, C<'$'>, C<'€'>, C<'£'>, C<'₽'>, C<'¥'>). If the code is unknown, returns the uppercase code itself.
+
+=item * C<AmberDB::Locale::Currency-E<gt>name($iso_code)> - Returns the English currency name for the given ISO code.
+
+=item * C<AmberDB::Locale::Currency-E<gt>all()> - Returns a list of 2-element array references C<[ $code, $name ]> ordered by priority, suitable for rendering HTML C<E<lt>selectE<gt>> form dropdowns.
+
+=item * C<AmberDB::Locale::Currency-E<gt>active_codes()> - Returns the list of active 3-letter ISO 4217 currency codes supported by the dictionary.
+
+=back
 
 =head2 Date & Time Operations
 

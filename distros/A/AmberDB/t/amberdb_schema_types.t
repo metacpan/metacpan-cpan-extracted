@@ -14,7 +14,7 @@ my $tmp_dir = tempdir( CLEANUP => 1 );
 subtest '1. Schema Setup with 8 Core Types' => sub {
     my $db_dir     = "$tmp_dir/db_types";
     my $schema_dir = "$db_dir/schema";
-    my $table_dir  = "$db_dir/tables";
+    my $table_dir  = "$db_dir/table";
     mkdir($db_dir);
     mkdir($schema_dir);
     mkdir($table_dir);
@@ -102,6 +102,19 @@ subtest '2. enc_validate & dec_validate Direct Unit Tests' => sub {
     is( $dec[3], 0,     "dec_validate converts empty num to 0" );
     is_deeply( $dec[6], ["a", "b"], "dec_validate ensures array ref" );
     is_deeply( $dec[7], { a => 1 }, "dec_validate ensures hash ref" );
+
+    # Direct single-block helper tests: enc_field & dec_field
+    my $num_blk   = { id => "price", type => "num" };
+    my $ascii_blk = { id => "code",  type => "ascii" };
+    my $array_blk = { id => "tags",  type => "array" };
+
+    is( $adb->enc_field( $num_blk, undef ), 0, "enc_field: undef num becomes 0" );
+    is( $adb->enc_field( $num_blk, "" ), 0, "enc_field: empty string num becomes 0" );
+    is( $adb->enc_field( $num_blk, " 350.25 " ), 350.25, "enc_field: valid float trimmed and cast" );
+    is( $adb->enc_field( $ascii_blk, "Işık_Türkçe" ), "Isik_Turkce", "enc_field: ascii normalized" );
+    is( $adb->dec_field( $num_blk, "" ), 0, "dec_field: empty num becomes 0" );
+    is( $adb->dec_field( $num_blk, "45.90" ), 45.9, "dec_field: num cast to float" );
+    is_deeply( $adb->dec_field( $array_blk, "x,y,z" ), ["x", "y", "z"], "dec_field: comma string to array ref" );
 };
 
 # ============================================================

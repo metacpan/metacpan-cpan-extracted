@@ -195,6 +195,15 @@ sub _write_file {
 # Output: a two element list of exit code and captured output.
 sub _run_gate {
     my (@args) = @_;
+    # The corpus guard (DD-790) is stood down here, deliberately and narrowly.
+    # Every case in this file is about what the declared CHAIN permits and how the
+    # gate ATTRIBUTES it - closure walking, floors, dispositions, unusable
+    # metadata. None is about how old the advisory database is, and most read the
+    # host's real one. Leaving the age check live would fail thirteen of thirty
+    # subtests whenever this machine's database happened to be three weeks old,
+    # for a reason none of them names. Freshness is owned by
+    # t/172-cpan-audit-database-age.t, which shims the stamp and needs no host.
+    local $ENV{CPAN_AUDIT_FRESH_DAYS} = 100_000;
     my $command = join ' ', $^X, $GATE, @args;
     my $out = `$command 2>&1`;
     my $rc  = ${^CHILD_ERROR_NATIVE} >> 8;

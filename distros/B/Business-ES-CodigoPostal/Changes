@@ -1,5 +1,23 @@
 Revision history for Business-ES-CodigoPostal
 
+0.03	metodos, municipios y salidas de texto en caracteres
+
+	- insular(), set() y new() (estaban escritos y sin publicar).
+	- municipios($cp) y asignado($cp). Los datos viven en
+	  Business::ES::CodigoPostal::Municipios y se cargan solo cuando se
+	  piden localidades: validar un CP o resolver su provincia no los
+	  toca. Cargar el modulo cuesta 1,6 ms; los datos, 20 ms y 4 MB, una
+	  vez por proceso.
+	- asignado() ve los codigos que caen dentro del rango y no existen.
+	  28107 pasa valid() --prefijo 28, Madrid-- pero nunca se asigno:
+	  Alcobendas es 28100, 28108 y 28109. Un error de transposicion
+	  dentro de la misma provincia no se detecta de otra forma.
+	- INCOMPATIBLE: 'use utf8'. provincia, ca y error devolvian bytes
+	  UTF-8 crudos y ahora devuelven caracteres. Quien decodificaba la
+	  salida debe dejar de hacerlo.
+	- Datos de GeoNames (CC BY 4.0): 11.150 codigos, 37.867 pares
+	  codigo/localidad. Regenerables con maint/gen-municipios.pl.
+
 0.02	region + comunidad
 0.01	Module
 0.00    First Version

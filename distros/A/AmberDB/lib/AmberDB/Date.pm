@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use Encode;         # Encoding management if needed
 use Time::Local;    # Core module for time operations
 
-our $VERSION = '5.24.0';
+our $VERSION = '5.25.1';
 my $CREATED = '2008-02-07';
 
 # Default English Month Names
@@ -587,7 +587,7 @@ Returns the underlying Unix epoch timestamp (integer seconds).
 
 =head2 monthname([$epoch]) / dayname([$epoch])
 
-Returns the localized full month name (e.g. C<"January">, C<"Ağustos">) or day name (e.g. C<"Friday">, C<"Cuma">).
+Returns the localized full month name (e.g. C<"January">, C<"August">) or day name (e.g. C<"Friday">, C<"Monday">).
 
 =head1 METHODS
 

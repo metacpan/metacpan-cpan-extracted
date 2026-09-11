@@ -16,6 +16,7 @@ use lib 'lib';
 use Developer::Dashboard::CLI::Complete ();
 use Developer::Dashboard::CLI::Files ();
 use Developer::Dashboard::CLI::Paths ();
+use Developer::Dashboard::CLI::TableHelpers ();
 use Developer::Dashboard::CLI::Progress ();
 use Developer::Dashboard::CLI::Skills ();
 use Developer::Dashboard::File ();
@@ -703,7 +704,7 @@ subtest 'CLI::Files covers files inventory and locate branches' => sub {
     no warnings 'redefine';
     no warnings 'once';
 
-    local *Developer::Dashboard::CLI::Files::_build_paths = sub { return bless {}, 'TestCLIPathRegistry' };
+    local *Developer::Dashboard::CLI::Files::build_paths = sub { return bless {}, 'TestCLIPathRegistry' };
     local *Developer::Dashboard::FileRegistry::new = sub {
         return bless {
             named => {},
@@ -810,7 +811,7 @@ subtest 'CLI::Files covers files inventory and locate branches' => sub {
     like( $stdout_del, qr/report\s+yes\s+removed/, 'file del summary table reports removed aliases' );
 
     like(
-        Developer::Dashboard::CLI::Files::_render_table(
+        Developer::Dashboard::CLI::TableHelpers::render_table(
             [ 'Alias', 'Status' ],
             [
                 [ undef,     'saved' ],
@@ -868,7 +869,7 @@ subtest 'CLI::Paths covers table defaults and output guards' => sub {
     no warnings 'redefine';
     no warnings 'once';
 
-    local *Developer::Dashboard::CLI::Paths::_build_paths = sub {
+    local *Developer::Dashboard::CLI::Paths::build_paths = sub {
         return bless {
             named_paths => {},
         }, 'TestCLIPathRegistry';
@@ -966,7 +967,7 @@ subtest 'CLI::Paths covers table defaults and output guards' => sub {
     is( $stdout_project_root, "$project_root\n", 'path project-root prints the current project root' );
 
     like(
-        Developer::Dashboard::CLI::Paths::_render_table(
+        Developer::Dashboard::CLI::TableHelpers::render_table(
             [ 'Alias', 'Status' ],
             [
                 [ undef,     'saved' ],

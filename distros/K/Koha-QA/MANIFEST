@@ -1,6 +1,5 @@
 Changes
 cpanfile
-cpanfile.snapshot
 lib/Koha/QA.pm
 lib/Koha/QA/Base.pm
 lib/Koha/QA/FilePermissions.pm

@@ -1,4 +1,4 @@
-package Pod::Weaver 4.020;
+package Pod::Weaver 4.021;
 # ABSTRACT: weave together a Pod document from an outline
 
 use Moose;
@@ -240,7 +240,7 @@ Pod::Weaver - weave together a Pod document from an outline
 
 =head1 VERSION
 
-version 4.020
+version 4.021
 
 =head1 SYNOPSIS
 
@@ -331,7 +331,7 @@ Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Peters Apocalypse Blabos de Blebe Caleb Cushing Christian Walde Christopher J. Madsen Chris Weyl Dave Houston Rolsky David E. Wheeler Golden Miguel Susano Pinto Zurborg Doug Bell Florian Ragwitz Jonathan "Duke" Leto Joshua Keroes Karen Etheridge Kent Fredric Kivanc Yazan Marcel Gruenauer Randy Stauner Ricardo Signes Sam Graham Shlomi Fish
+=for stopwords Alex Peters Apocalypse Blabos de Blebe Caleb Cushing Christian Walde Christopher J. Madsen Chris Weyl Dave Houston Rolsky David E. Wheeler Golden Miguel Susano Pinto Zurborg Doug Bell Florian Ragwitz Graham Ollis Jonathan "Duke" Leto Joshua Keroes Karen Etheridge Kent Fredric Kivanc Yazan Marcel Gruenauer Randy Stauner Ricardo Signes Sam Shlomi Fish
 
 =over 4
 
@@ -397,6 +397,10 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
+Graham Ollis <gollis@fastly.com>
+
+=item *
+
 Jonathan "Duke" Leto <jonathan@leto.net>
 
 =item *
@@ -439,7 +443,7 @@ Shlomi Fish <shlomif@shlomifish.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo SIGNES.
+This software is copyright (c) 2026 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-package Pod::Weaver::Role::Section 4.020;
+package Pod::Weaver::Role::Section 4.021;
 # ABSTRACT: a plugin that will get a section into a woven document
 
 use Moose::Role;
@@ -34,7 +34,7 @@ Pod::Weaver::Role::Section - a plugin that will get a section into a woven docum
 
 =head1 VERSION
 
-version 4.020
+version 4.021
 
 =head1 PERL VERSION
 
@@ -65,7 +65,7 @@ Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo SIGNES.
+This software is copyright (c) 2026 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
