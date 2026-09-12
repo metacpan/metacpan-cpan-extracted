@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Map - a fixed-capacity map several processes share
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -89,9 +89,34 @@ enough to be interesting.
 =head2 store
 
     my $rc = $map->store($key, $value);
+    my $rc = $map->store($key, $value, ttl => 300);      # seconds
+    my $rc = $map->store($key, $value, ttl_ms => 5000);  # milliseconds
 
 1 when stored, 0 when the table is full, -1 when the key is empty or the pair
 does not fit a slot.
+
+A C<ttl> gives the entry a deadline. After it, the key reads as B<absent> from
+every process - C<fetch> returns an empty list and C<exists> returns false -
+because the deadline is a wall-clock timestamp stored in the entry, not
+per-process state. Without one the entry lives until it is deleted or
+overwritten.
+
+This is the difference between a map and a denylist, a nonce store, or a dedup
+window. Doing it by hand - storing an expiry beside the value and checking it on
+every read - works until the day a caller forgets the check, and a forgotten
+expiry check turns every ban permanent. Here the map keeps the deadline.
+
+B<Expiry is lazy.> A lapsed entry is not swept in the background; it is
+collected by the next C<fetch> or C<exists> that lands on it, which turns the
+slot into a tombstone the next insert can reuse. An entry nobody looks at again
+sits until an insert probes over it. C<stats> reports C<expired>, the running
+count of entries collected this way, so a table full of stale keys is visible
+rather than mysterious.
+
+A re-C<store> of a key sets a fresh deadline, so touching an entry renews it.
+
+The clock is read only when a deadline is involved, so a map that never passes
+a C<ttl> pays nothing for the feature.
 
 =head2 fetch
 
@@ -127,6 +152,10 @@ A key holding a value that is not a counter is refused rather than
 reinterpreted. Storing a string and then counting on it is a bug, and quietly
 overwriting the string would hide both the bug and the string.
 
+A counter whose TTL has lapsed is treated as gone: the next C<incr> starts it
+fresh at C<$by> rather than adding to the stale value. A window counter and its
+deadline stay consistent without the caller resetting anything.
+
 =head2 counter
 
     my $n = $map->counter($key);
@@ -149,7 +178,7 @@ is being written.
 =head2 stats
 
     my %s = $map->stats;
-    # used, capacity, tombstones, busy, full
+    # used, capacity, tombstones, busy, full, expired
 
 =head2 max_pair, capacity
 

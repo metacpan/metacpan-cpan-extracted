@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Frozen;
 
@@ -23,7 +23,7 @@ Shared::Arena - memory two processes can both read, without a syscall
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ C<Shared::Arena> is that region. It is mapped once, carved into named
 sub-regions, and read by every process that maps it without any of them
 copying, locking or calling into the kernel.
 
-Eight things come with it to put in one.
+Eleven things come with it to put in one.
 
 =over 4
 
@@ -72,6 +72,10 @@ one pool of workers warms one cache instead of N.
 
 =item * L<Shared::Arena::Bloom> - a set that answers "no" exactly and "yes"
 probably, and holds no keys at all.
+
+=item * L<Shared::Arena::Cuckoo> - the same kind of set, which can also forget
+a key, so members that expire are removed one at a time instead of the whole
+set being rotated.
 
 =item * L<Shared::Arena::CountMin> - counts how often each key has been seen
 without storing any of them, which is how you find the loud one when you cannot
@@ -88,12 +92,22 @@ workers.
 where it lies: nested data every worker reads without any of them rebuilding
 it.
 
+=item * L<Shared::Arena::Lease> - one holder at a time, and a successor when it
+dies: leader election for the one job in a pool that only one worker should do.
+
+=item * L<Shared::Arena::Scoreboard> - one row per worker, published live: each
+worker writes its own row with no lock, and a supervisor reads the whole board
+in one pass, so a status page costs no pipe or socket per worker.
+
 =back
 
-The first seven store B<opaque bytes>, or in the case of the filter and the
-sketch no keys at all, so a nested structure has to be flattened going in and
-rebuilt coming out. C<Shared::Arena::Frozen> is the one that does not rebuild,
-and it is the reason L<Frozen> is a prerequisite.
+The first eight store B<opaque bytes>, or in the case of the two filters and
+the sketch no keys at all, so a nested structure has to be flattened going in
+and rebuilt coming out. C<Shared::Arena::Frozen> is the one that does not
+rebuild, and it is the reason L<Frozen> is a prerequisite.
+C<Shared::Arena::Lease> and C<Shared::Arena::Scoreboard> store no caller data at
+all: the lease holds a pid and a deadline, the scoreboard a row of gauges per
+worker. They are coordination and observability rather than storage.
 
 =head2 Two ways in
 
@@ -200,6 +214,17 @@ call this with the same arguments.
 A L<Shared::Arena::Bloom> in this arena, created on first use. Every process may
 call this with the same arguments.
 
+=head2 cuckoo
+
+    my $f = $arena->cuckoo($name, capacity => 1_000_000);
+
+A L<Shared::Arena::Cuckoo> in this arena, created on first use. Every process
+may call this with the same arguments.
+
+A set like the bloom filter's that can also C<remove> a key. Its false-positive
+rate is fixed, at about 0.011% when it holds its capacity, and when it is full
+it refuses the next key instead of saturating.
+
 =head2 histogram
 
     my $h = $arena->histogram($name, max => 60_000_000, sigbits => 5);
@@ -223,6 +248,57 @@ may call this with the same arguments.
 
 C<size> is the largest block it will carry and the region costs C<size * slots>,
 because a publish never writes where a reader is reading.
+
+=head2 lease
+
+    my $lease = $arena->lease($name, ttl => 30);
+
+A L<Shared::Arena::Lease> in this arena, created on first use. Every process may
+call this with the same arguments.
+
+Leader election: whoever holds the lease is the one worker that runs the cron,
+warms the cache, applies the migration. When the holder stops renewing - it
+exited, crashed, or wedged - a successor takes it over. C<ttl> (seconds) is how
+long an acquire or renew keeps it before it lapses; the holder must renew inside
+that window.
+
+    if ($lease->acquire) {
+        # I am the one, for now
+        run_the_scheduled_job();
+        $lease->renew;      # ... and keep saying so
+    }
+
+Unlike every other tenant here, C<$name> is not a store of the caller's bytes -
+it names a single lock. See L<Shared::Arena::Lease> for the deadline, the
+fast handover when a holder is provably dead, and the fencing token.
+
+=head2 scoreboard
+
+    my $sb = $arena->scoreboard($name,
+                                fields => ['inflight', 'served'],
+                                slots  => 256);
+
+A L<Shared::Arena::Scoreboard> in this arena, created on first use. C<fields>
+names the gauge columns, set once by whoever creates the board; a later caller
+names the same ones or inherits them, and inherits C<slots> too, so a worker
+need not know how big the supervisor made it.
+
+One row per worker, published live. Each worker claims a row and is its only
+writer, so an update takes no lock; a supervisor reads every row in one pass.
+
+    # in each worker, after the fork
+    $sb->take;
+    $sb->update(inflight => $n, served => $total, status => "GET $path");
+
+    # in the supervisor or a status endpoint
+    for my $row ($sb->all) {
+        printf "pid %d %s %s\n", $row->{pid},
+               ($row->{alive} ? 'up' : 'DEAD'), $row->{status};
+    }
+
+It is the inverse of the other tables: instead of many writers contending on
+one structure, each worker owns its own row and nobody contends at all. A dead
+worker's row is shown as not alive and reclaimed by the next worker to start.
 
 =head2 rate
 
@@ -409,9 +485,12 @@ before.
 =head1 THE HOT METHODS ARE OPCODES
 
 The doors called in a loop are compiled to run without a subroutine call:
-C<get> and C<set> on a cache, C<fetch>, C<store>, C<exists> and C<incr> on a
-map, C<add> and C<check> on a filter, C<add> and C<estimate> on a sketch,
-C<record> on a histogram, C<publish> on a ring, and C<allow> on a limiter.
+C<get> and C<set> on a cache, C<fetch>, C<store>, C<exists>, C<incr> and
+C<counter> on a map, C<add> and C<check> on either filter, C<add> and
+C<estimate> on a sketch, C<record> on a histogram, C<publish> on a ring, and
+C<allow>, C<remaining> and C<retry_after> on a limiter. The optional arguments
+are compiled too: C<set> with a C<ttl>, C<incr> with a step, C<record> and a
+sketch's C<add> with a count, C<allow> with a cost.
 
 Nothing needs doing to get this. The ordinary method call B<is> the fast path,
 there is no second API to migrate to, and the answers are identical either way,
@@ -419,15 +498,27 @@ including which of them return an empty list for a miss.
 
 Measured on an M-series Mac, nanoseconds per call, ordinary against compiled:
 
-    cache->get     60.2  ->  55.1
+    cache->get     60.2  ->  42.4
     cache->set     37.4  ->  30.2
     map->fetch     54.1  ->  42.6
     map->exists    30.9  ->  23.8
     map->incr      37.6  ->  24.4
     bloom->check   31.9  ->  22.8
     bloom->add     30.6  ->  21.1
+    cuckoo->check  29.8  ->  23.5
     countmin->add  30.2  ->  24.9
     hist->record   25.1  ->  13.1
+
+and for the optional arguments and the rest of a limiter:
+
+    map->incr($k, $by)          40.4  ->  20.9
+    cache->set(..., ttl => N)   42.8  ->  29.9
+    hist->record($v, $n)        30.3  ->  16.1
+    countmin->add($k, $n)       33.4  ->  22.3
+    rate->allow($k, $cost)      37.5  ->  27.1
+    rate->remaining             34.0  ->  21.8
+    rate->retry_after           34.0  ->  22.8
+    map->counter                38.5  ->  21.7
 
 Anything that would change the answer takes the ordinary path instead: a
 subclass that overrides the method, a replaced subroutine, an argument list of
@@ -435,11 +526,11 @@ a width the call site was not compiled with, an object whose handle has been
 released. So a debugger, a profiler and C<local *Some::Method = sub {...}> all
 work the way they did.
 
-C<cache-E<gt>get> gains least, and the reason is worth knowing: L<Frozen>
-compiles its own C<-E<gt>get> the same way, and two of these cannot own one
-call site. Whichever got there first keeps it and the other takes what is left,
-which here is about half. Both remain correct and neither is slowed by the
-other. It only affects a name both dists compile, which today is C<get>.
+C<cache-E<gt>get> has a twist worth knowing: L<Frozen> compiles its own
+C<-E<gt>get> the same way, and two of these cannot own one call site. Frozen
+gets there first, so at a C<get> call site this module answers from the half
+that is left and skips the other entirely, rather than falling back to an
+ordinary call. Both remain correct and neither is slowed by the other.
 
 =head2 What it costs a program that does not use it
 
@@ -485,12 +576,22 @@ make the next process to bind that tenant write twenty-one kilobytes past the
 end of its own mapping. t/30-bounds.t is that attack, and it is a test rather
 than a note because the promise is worth nothing if nobody checks it.
 
+B<Threads get no copy.> Every object here stands for memory this process
+mapped, so a new ithread is given an inert copy of each one rather than a second
+owner of the same mapping, and the first of the two to go cannot unmap it under
+the other. A thread that wants the arena attaches to it by name, as another
+process would. Windows emulates C<fork> with threads, so the same holds for a
+forked child there. A L<Shared::Arena::Lease> is held per process, and two
+threads are one process.
+
 =head1 SEE ALSO
 
 L<Shared::Arena::Frozen>, L<Shared::Arena::Frozen::View>, L<Frozen>,
 L<Shared::Arena::Ring>, L<Shared::Arena::Ring::Cursor>, L<Shared::Arena::Map>,
 L<Shared::Arena::Bloom>, L<Shared::Arena::Histogram>, L<Shared::Arena::Cache>,
-L<Shared::Arena::Rate>, L<Shared::Arena::CountMin>.
+L<Shared::Arena::Rate>, L<Shared::Arena::CountMin>, L<Shared::Arena::Cuckoo>,
+L<Shared::Arena::Ring::Group>, L<Shared::Arena::Lease>,
+L<Shared::Arena::Scoreboard>.
 
 =head1 AUTHOR
 

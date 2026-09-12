@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Frozen - one structure, published once and read in place by every
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -37,9 +37,12 @@ Version 0.02
     });
 
     # every worker reads it without rebuilding any of it
+    my $port = $conf->get('db.port');
+    my $on   = $conf->get('features.search');
+
+    # several reads that must all come from the same publish
     my $view = $conf->view or return;
-    my $port = $view->get('db.port');
-    my $on   = $view->get('features.search');
+    my ($host, $p) = ($view->get('db.host'), $view->get('db.port'));
 
 =head1 DESCRIPTION
 
@@ -71,19 +74,20 @@ by every worker for the life of the process.
 Reading one field, against the same structure serialized into a
 L<Shared::Arena::Map> and rebuilt per read, on an M-series Mac:
 
-    structure        serialized       this      view held
-    10 keys            2,224 ns     207 ns          71 ns
-    200 keys          30,054 ns     210 ns          74 ns
-    2000 keys        318,111 ns     221 ns          76 ns
+    structure      serialized     get    view per read   view held
+    10 keys          2,205 ns   73 ns           214 ns       74 ns
+    200 keys        29,675 ns   74 ns           211 ns       73 ns
+    2000 keys      317,568 ns   79 ns           221 ns       80 ns
 
-The right-hand columns barely move, and that is the entire point rather than a
-detail of the benchmark: the cost of reading one field does not depend on how
-big the structure is, because nothing is rebuilt to get at it. The left-hand
-column is proportional to the whole structure every single time.
+Every column but the first barely moves, and that is the entire point rather
+than a detail of the benchmark: the cost of reading one field does not depend
+on how big the structure is, because nothing is rebuilt to get at it. The
+first column is proportional to the whole structure every single time.
 
-The middle column takes a fresh view per read, which is what a request handler
-should do. The last holds one across the loop, which is what a tight loop over
-many keys should do. See L</view>.
+C<get> is what a request handler should use: it reads whatever is live now,
+with nothing to take or drop. A view taken per read pays mostly for making and
+destroying the view. A held view reads as fast as C<get> and is for several
+reads that must all come from the same publish. See L</get> and L</view>.
 
 =head2 A block cannot be edited, so publishing replaces it
 
@@ -110,9 +114,9 @@ opened on. Ask C<< $view->fresh >> to find out.
 
 The rule that follows is short:
 
-B<Take a view, read it, drop it.> A view taken per request costs a borrow. A
-view cached in a global and held across a configuration reload is the one thing
-this cannot make safe.
+B<For a lookup, use L</get> and hold nothing.> When several reads must agree,
+take a view, read it, drop it. A view cached in a global and held across a
+configuration reload is the one thing this cannot make safe.
 
 =head1 METHODS
 
@@ -148,6 +152,35 @@ a header. They are about to become every other process's idea of the
 configuration, and the cheapest moment to discover they are not a block is
 before publishing rather than during somebody else's read. Croaks if they are
 not one.
+
+=head2 get
+
+    my $port = $conf->get('db.port');
+    my $host = $conf->get('db/host', '/');
+
+The value at a dotted path in whatever is published B<now>, or an B<empty
+list> when nothing is published or the path does not resolve. A second
+argument is the separator, one character, for keys with a dot in them.
+
+This is the method for a request handler. It keeps one reader over the live
+block and takes a new one only after a publish, so there is no view to take
+and drop, and every call sees the latest publish. Two calls may therefore read
+two different blocks if a publish lands between them; take a L</view> when
+several reads must agree.
+
+=head2 find
+
+    my $v = $conf->find('a.key.with.dots');
+
+One key at the top level of whatever is published now, with no path
+splitting. An empty list when it is not there.
+
+=head2 exists
+
+    if ($conf->exists('features.search')) { ... }
+
+Whether a path resolves in whatever is published now, without building the
+value. False when nothing has been published.
 
 =head2 view
 

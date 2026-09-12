@@ -1,5 +1,46 @@
 Revision history for Database-BI
 
+0.005.2 Fri Sep 11 06:08:10 AM EDT 2026
+    [ Bug Fixes ]
+    - Fixed SIGABRT crash (DBI XS assertion failure) in t/edge_cases.t on
+      DEBUGGING-enabled perls (observed: perl 5.44.0 + DBI 1.651 + DBD::CSV
+      0.64).  When a 0-byte CSV file was opened, _detect_file_info returned
+      the generic "not CSV" sentinel ({}), causing _init_backend to create a
+      Database::Abstraction object without the max_slurp_size guard.  D::A
+      fell back to the DBD::CSV path, which issued "SELECT * FROM <table>" on
+      an empty file; DBD::CSV's EOF error left DBI's internal Errstr SV in a
+      shape that violated an XS assertion, crashing the process during global
+      destruction after all test assertions had already passed (so the TAP
+      plan was never written and the harness reported FAIL).
+      Fix: _detect_file_info now returns { _file_is_empty => 1, file_size => 0 }
+      for 0-byte files.  _init_backend detects this sentinel and short-circuits
+      before creating D::A; fetch_all returns [] immediately.  DBI is never
+      contacted and no crash occurs.
+      References: https://www.cpantesters.org/cpan/report/117b2a76-a4e5-11f1-9192-ffecfaad6fbc
+    - Reference lines (Min / Avg / Max) on the line graph now recalculate
+      correctly after a brush-to-zoom or Reset zoom interaction.  Two bugs
+      were responsible:
+      * The previous implementation tried to hook into the zoom by listening
+        for a D3 brush "end" DOM event, but D3 fires brush callbacks through
+        its own internal dispatch, not through DOM events.  The listener
+        never fired.  The fix patches the global `redraw` function (a
+        function declaration, not a `const`) and recalculates the reference
+        values (min / avg / max) from the data currently being drawn
+        (`newData`) rather than the full-dataset values stored at page load.
+        This ensures the lines always fall within the visible y-domain even
+        after zooming into a subset of the data.
+      * `drawRefLines()` was called synchronously during the 500 ms D3
+        transition.  Although `y.domain()` is updated before the transition
+        begins, the y-axis visually animates to the new domain over 500 ms;
+        appending lines mid-transition produced a brief positional mismatch.
+        The call is now deferred with `setTimeout(drawRefLines, ms + 20)`.
+    - Requires HTML::D3 >= 0.11 for the companion fix: the zoomable line
+      chart y-domain now uses `Math.min(0, d3.min(...))` as its lower bound
+      instead of hard-coding 0.  This ensures data points and reference
+      lines with negative Y values (e.g. accounting-notation amounts) are
+      plotted within the visible chart area rather than appearing off-screen
+      below the x-axis.
+
 0.005.1	Sun Aug 30 08:29:03 PM EDT 2026
     [ Bug Fixes ]
     - Fixed compatibility with Database::Abstraction >= 0.41.  D::A 0.41 changed

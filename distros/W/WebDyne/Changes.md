@@ -1,5 +1,32 @@
 # Revision history for WebDyne
 
+## 3.029 - 2026-09-11
+
+- Read CGI cookies from the current request header, including absent
+  headers, so PAGI sessions reuse their cookie and cannot inherit ambient
+  process cookies. Preserve outgoing cookie construction and security flags.
+
+- Add an optional content_type override to redirect() for HTML, text and
+  JSON responses, allowing applications to return SVG and other MIME types
+  without a Worker-side header override.
+
+- Preserve binary and pre-encoded byte strings in PAGI responses. Continue
+  UTF-8 encoding Perl character strings before sending them.
+
+- Encode Perl character responses at the PSGI and wdrender fake HTTP
+  response boundaries. Recalculate Content-Length in bytes without changing
+  existing byte bodies. The separate wdrender terminal wide-character print
+  warning is unchanged.
+
+- Add the opt-in param_utf8(name) accessor for strict UTF-8 decoding of
+  parameter value copies. Preserve scalar/list behaviour and original
+  values, reject malformed UTF-8, and leave the existing param() API
+  unchanged.
+
+- Update XML documentation and add regression coverage for request cookies,
+  UTF-8 form values, explicit response MIME types, and Unicode and binary
+  response bodies.
+
 ## 3.028 - 2026-09-08
 
 - Add optional startup and shutdown coderefs to WebDyne::PAGI. Callbacks

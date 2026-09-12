@@ -110047,3 +110047,15 @@ A/AC/ACRUSSELL/Term-GnuScreen-0.06.tar.gz
 S/SK/SKIRMESS/Test-Pod-Links-0.004.tar.gz
 F/FK/FKENTO/Text-ASCII-Convert-0.37.tar.gz
 P/PE/PEVANS/XS-Parse-Keyword-0.50.tar.gz
+V/VO/VOEGELAS/Alien-libmaxminddb-2.004.tar.gz
+F/FR/FREDERICD/Koha-Contrib-Sudoc-2.50.tar.gz
+R/RU/RURBAN/Cpanel-JSON-XS-4.51.tar.gz
+N/NH/NHORNE/Database-BI-0.005.2.tar.gz
+A/AS/ASPEER/WebDyne-3.029.tar.gz
+S/SV/SVW/Getopt-Guided-v3.3.1.tar.gz
+L/LI/LION/Lingua-Generic-Interface-v0.03.tar.gz
+D/DJ/DJZORT/NetAddr-MAC-1.02.tar.gz
+Y/YA/YANGAK/PayProp-API-Public-Client-1.04.tar.gz
+L/LN/LNATION/Shared-Arena-0.03.tar.gz
+G/GL/GLBRUNE/Sim-OPT-0.997.tar.gz
+D/DE/DERF/Travel-Status-DE-DBRIS-0.33.tar.gz

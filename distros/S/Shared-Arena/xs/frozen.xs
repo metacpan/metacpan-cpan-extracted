@@ -162,6 +162,91 @@ saf_view(self)
         SvREFCNT_inc(SvRV(self));
         XPUSHs(sv_2mortal(obj));
 
+# A value by dotted path from whatever is published NOW, or an EMPTY LIST when
+# nothing is published or the path does not resolve.
+#
+# The request-path door. It reads through a reader this handle keeps over the
+# live block and borrows again only after a publish, so there is no view to
+# take and drop, and every call sees the latest publish.
+void
+saf_get(self, path, ...)
+        SV *self
+        SV *path
+    PREINIT:
+        sa_frozen *f;
+        fz_container *c;
+        const char *p;
+        STRLEN plen;
+        char sep = '.';
+        uint32_t node;
+    PPCODE:
+        f = SA_SELF(sa_frozen, self);
+        if (!f) croak("Shared::Arena::Frozen: this block is released");
+        if (items > 2) {
+            STRLEN slen;
+            const char *s = SvPV(ST(2), slen);
+            if (slen != 1)
+                croak("Shared::Arena::Frozen: a separator is one character");
+            sep = s[0];
+        }
+        p = SvPV(path, plen);
+        c = sa_fz_reader(f);
+        if (!c) XSRETURN_EMPTY;
+        node = (SA_FZ->path)(c, (SA_FZ->root)(c), p, plen, sep);
+        if (node == FZ_NOHANDLE) XSRETURN_EMPTY;
+        XPUSHs(sv_2mortal((SA_FZ->sv_from_node)(aTHX_ c, node)));
+
+# One key against the root of whatever is published now, with no path
+# splitting: the door for a key that contains the separator.
+void
+saf_find(self, key)
+        SV *self
+        SV *key
+    PREINIT:
+        sa_frozen *f;
+        fz_container *c;
+        const char *k;
+        STRLEN klen;
+        uint32_t node;
+    PPCODE:
+        f = SA_SELF(sa_frozen, self);
+        if (!f) croak("Shared::Arena::Frozen: this block is released");
+        k = SvPV(key, klen);
+        c = sa_fz_reader(f);
+        if (!c) XSRETURN_EMPTY;
+        node = (SA_FZ->child)(c, (SA_FZ->root)(c), k, klen);
+        if (node == FZ_NOHANDLE) XSRETURN_EMPTY;
+        XPUSHs(sv_2mortal((SA_FZ->sv_from_node)(aTHX_ c, node)));
+
+# Whether a dotted path resolves in whatever is published now, without
+# building the value. False when nothing is published.
+int
+saf_exists(self, path, ...)
+        SV *self
+        SV *path
+    PREINIT:
+        sa_frozen *f;
+        fz_container *c;
+        const char *p;
+        STRLEN plen;
+        char sep = '.';
+    CODE:
+        f = SA_SELF(sa_frozen, self);
+        if (!f) croak("Shared::Arena::Frozen: this block is released");
+        if (items > 2) {
+            STRLEN slen;
+            const char *s = SvPV(ST(2), slen);
+            if (slen != 1)
+                croak("Shared::Arena::Frozen: a separator is one character");
+            sep = s[0];
+        }
+        p = SvPV(path, plen);
+        c = sa_fz_reader(f);
+        RETVAL = (c && (SA_FZ->path)(c, (SA_FZ->root)(c), p, plen, sep)
+                           != FZ_NOHANDLE) ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
 UV
 saf_generation(self)
         SV *self

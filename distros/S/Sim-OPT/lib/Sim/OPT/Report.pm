@@ -27,8 +27,9 @@ use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
 use Sim::OPT::Parcoord3d;
 use Sim::OPT::Stats;
+use Sim::OPT::DWGI;
 eval { use Sim::OPTcue::OPTcue; 1 };
-eval { use Sim::OPTcue::Metabridge; 1 };
+eval { use Sim::OPT::Metabridge; 1 };
 eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
 eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
 eval { use Sim::OPTcue::Exogen::Armijo; 1 };
@@ -116,7 +117,8 @@ sub newretrieve
   my $flfile = $dt{flfile};
   my %vehicles = %{ $dt{vehicles} };
   my $precious = $dt{precious};
-  my %inst = %{ $dt{inst} };
+  # Do not copy the global %inst map here. newretrieve does not use it.
+  # On large searches this map can contain four entries per instance.
   my %dowhat = %{ $dt{dowhat} };
 
   my $repfile = $dirfiles{repfile}; say  "IN RETRIEVE FROM DIRFILES \$repfile $repfile";
@@ -124,9 +126,12 @@ sub newretrieve
   #my $csim = $dt{csim};
 
   @{ $dirfiles{dones} } = uniq( @{ $dirfiles{dones} } );
-  #%inst = %{ Sim::OPT::>washhash( \%inst ) }; say  "3 HERE IN OPT SUB CALLBLOCK \%onst: " . dump( \%onst );
-  $inst_ref = Sim::OPT::filterinsts_wnames( \@{ $dirfiles{dones} } , \%inst );
-  %inst = %{ $inst_ref }; # REASSIGNMENT!!!!!!
+
+  # PERFORMANCE: the old code called filterinsts_wnames() here. That routine
+  # scans every key of %inst against every name in dirfiles{dones}.  The
+  # resulting filtered hash was used only to compute $cleanto below, and
+  # $cleanto was never used by newretrieve.  Removing that dead O(N*M) scan
+  # avoids the dominant retrieval overhead on large runs.
 
 
   my %d = %{ $dt{instance} };
@@ -173,7 +178,8 @@ sub newretrieve
     $thisto= $to{to}; #say  "\$thisto: $thisto";
   }
 
-  my $cleanto = $inst{$thisto}; #say  "\$cleanto: $cleanto";
+  # $cleanto used to be looked up through the filtered %inst map here, but
+  # it is not used anywhere in newretrieve.
 
   my $origin = $d{origin};
   my $from = $origin; #say  "HERE IN NEWRETRIEVE \$from: " . dump( $from );
@@ -197,7 +203,6 @@ sub newretrieve
   my $shortflfile = $flfile;
   $shortflfile =~ s/$thisto\/cfg\///; #say  "IN RETRIEVE: \$shortflfile: $shortflfile, \$flfile: $flfile";
 
-  #say  "RELAUNCHED IN RETRIEVE WITH INST " . dump( %inst );
 
   my $counttool = 1;
   while ( $counttool <= $numberof_simtools )

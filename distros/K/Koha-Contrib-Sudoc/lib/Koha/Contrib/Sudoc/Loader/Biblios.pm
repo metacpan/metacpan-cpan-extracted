@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader::Biblios;
 # ABSTRACT: Chargeur de notices biblio
-$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.49';
+$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.50';
 use Moose;
 
 extends 'Koha::Contrib::Sudoc::Loader';
@@ -47,14 +47,20 @@ sub handle_record {
     # FIXME Reset de la connexion tous les x enregistrements
     $self->sudoc->koha->zconn_reset()  unless $self->count % 10;
 
+    $self->converter->build($record);
+
     my $ppn = $record->field('001')->value;
-    $self->log->notice("Notice #" . $self->count . " ppn $ppn\n");
+    my $rcr_hash = $self->sudoc->c->{rcr};
+    my @attached_bibs = sort map { $rcr_hash->{$_} } keys %{$self->converter->item};
+
+    $self->log->notice(
+        "Notice #" . $self->count . " ppn $ppn (" .
+        join(', ', @attached_bibs) . ")\n");
     $self->log->debug( $self->sudoc->record_as_text($record) );
 
     # On déplace le PPN
     $self->sudoc->ppn_move($record, $self->sudoc->c->{biblio}->{ppn_move});
 
-    $self->converter->build($record);
 
     # Est-ce qu'il faut passer la notice ?
     if ( $self->converter->skip($record) ) {
@@ -75,7 +81,6 @@ sub handle_record {
     else {
         # On cherche un 035 avec un $5 contenant un RCR de l'ILN, auquel cas $a contient
         # le biblionumber d'une notice Koha
-        my $rcr_hash = $self->sudoc->c->{rcr};
         for my $field ( $record->field('035') ) {
             my $rcr = $field->subfield('5');
             next unless $rcr;
@@ -161,7 +166,7 @@ Koha::Contrib::Sudoc::Loader::Biblios - Chargeur de notices biblio
 
 =head1 VERSION
 
-version 2.49
+version 2.50
 
 =head1 AUTHOR
 

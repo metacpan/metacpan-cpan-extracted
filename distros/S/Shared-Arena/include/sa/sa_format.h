@@ -43,7 +43,11 @@
 /* "SARN" read as a native word. Not a byte-order-independent spelling, because
  * the endian probe below is what answers that question. */
 #define SA_MAGIC          0x4E524153u   /* 'S','A','R','N' little-endian */
-#define SA_LAYOUT_VERSION 1
+/* Bumped to 2 for 0.03: the map's slot layout changed (a per-key `expires`
+ * field), so a 0.02 and a 0.03 build sharing one NAMED arena would read each
+ * other's map slots at the wrong stride. The layout number is checked at attach
+ * exactly so that disagreement FAILS OPEN rather than silently misreading. */
+#define SA_LAYOUT_VERSION 2
 #define SA_ENDIAN_PROBE   0x01020304u
 
 #define SA_ALIGN          16            /* every carved region starts here  */
@@ -62,6 +66,9 @@
 #define SA_T_RATE   6u
 #define SA_T_CMS    7u
 #define SA_T_FROZEN 8u
+#define SA_T_CUCKOO 9u
+#define SA_T_LEASE  10u
+#define SA_T_SCOREBOARD 11u
 
 /* registry entry states. `state` is published LAST with a release store, so a
  * reader either sees a complete entry or no entry at all. */

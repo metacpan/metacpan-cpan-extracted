@@ -32,6 +32,7 @@ BOOT:
     sa_stash_ring  = gv_stashpv("Shared::Arena::Ring", GV_ADD);
     sa_stash_rate  = gv_stashpv("Shared::Arena::Rate", GV_ADD);
     sa_stash_cms   = gv_stashpv("Shared::Arena::CountMin", GV_ADD);
+    sa_stash_cuckoo = gv_stashpv("Shared::Arena::Cuckoo", GV_ADD);
 
     /* Two things per door: the GLOB, whose current CV the method op pushes so
      * a monkeypatch takes effect, and the CV that was in it at BOOT, which the

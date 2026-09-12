@@ -96,6 +96,13 @@ typedef struct sa_frozen {
     unsigned char  *slots;        /* nslots * (slot header + slot_bytes)     */
     uint32_t        nslots;
     uint64_t        slot_bytes;
+    /* A reader over the live block, kept by this process between reads and
+     * replaced when a publish moves on. Opaque here, because this file does
+     * not know what the bytes are; the layer that does supplies the release. */
+    void           *reader;
+    void          (*reader_free)(void *reader);
+    uint64_t        reader_gen;
+    uint32_t        reader_slot;
 } sa_frozen;
 
 #define SA_FZ_OK      0
@@ -189,7 +196,10 @@ static sa_frozen *sa_frozen_bind(sa_region *arena, sa_reg *e,
 #endif
 }
 
-static void sa_frozen_free(sa_frozen *f) { free(f); }
+static void sa_frozen_free(sa_frozen *f) {
+    if (f && f->reader && f->reader_free) f->reader_free(f->reader);
+    free(f);
+}
 
 /* Put a block in the slot furthest from use and point `current` at it.
  *

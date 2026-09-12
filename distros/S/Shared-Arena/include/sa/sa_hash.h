@@ -44,10 +44,36 @@
  * could-not-read are different answers, and conflating them is how a caller
  * ends up believing a key was deleted when a writer was simply mid-update.
  *
+ * ---- expiry is per key, lazy, and by a wall clock ---------------------------
+ *
+ * A slot carries a deadline: 0 for never, otherwise a millisecond on the same
+ * clock the cache uses (sa_now_ms). A WALL clock rather than a monotonic one,
+ * because the deadline is written by one process and read by another, and the
+ * only clock two processes certainly agree on is the machine's. A step in it
+ * moves every deadline together, which costs at worst one round of early or
+ * late expiry.
+ *
+ * LAZY, not swept. A read that lands on an expired entry treats it as absent
+ * and turns it into a tombstone in passing, so the space comes back without a
+ * background sweeper and without a lock on the read path for the common case.
+ * An expiry a caller never reads again sits until an insert probes over it,
+ * exactly as a delete does. `expired` counts the ones collected this way, so a
+ * table full of stale keys is visible rather than mysterious.
+ *
+ * A TOMBSTONE ON EXPIRY IS A WRITE, so the reader takes the stripe lock to do
+ * it - and only to do it. A live-but-current entry is still read with no lock
+ * at all; the lock is paid once, by whoever first notices a key has died.
+ *
+ * The point of all this is the case a plain map handles wrong: a denylist, a
+ * nonce store, a dedup window. Without a deadline every caller writes its own
+ * `> time` check and its own delete, and the failure is always the same one -
+ * forgetting the check, which turns every ban permanent.
+ *
  * Needs sa_arena.h.
  */
 
 #include "sa/sa_arena.h"
+#include "sa/sa_time.h"
 
 #define SA_HASH_MAGIC 0x5048534Du    /* 'M','S','H','P' little-endian */
 
@@ -79,6 +105,7 @@ typedef struct {
     volatile uint32_t klen;
     volatile uint32_t vlen;
     volatile uint64_t tag;      /* the hash, so most probes skip the memcmp */
+    volatile uint64_t expires;  /* ms wall clock; 0 = never                 */
     char              bytes[1]; /* key then value, slot_size in total       */
 } sa_hash_slot;
 
@@ -91,6 +118,7 @@ typedef struct {
     volatile uint64_t tombstones;
     volatile uint64_t busy;       /* reads that gave up mid-update          */
     volatile uint64_t full;       /* stores refused for want of room        */
+    volatile uint64_t expired;    /* entries collected because they lapsed  */
     volatile unsigned char locks[SA_LOCK_STRIPES];
 } sa_hash_hdr;
 
@@ -199,6 +227,82 @@ static void sa_hash_free(sa_hash *m) { free(m); }
  * MISS: telling a caller a key is absent when it is merely being rewritten is
  * how a cache turns an update into a delete.
  */
+/* A live slot's deadline has passed. `now` of 0 means "do not check", which is
+ * how a caller that never set a TTL avoids reading the clock at all. */
+#define SA_H_EXPIRED(s, now) \
+    ((now) && (s)->expires && (now) >= (s)->expires)
+
+/* Find the slot this key belongs in, under the caller's lock. Returns the slot
+ * to use, or NULL when the table is full.
+ *
+ * `*found` is 0 for a fresh slot (empty or tombstone, not counted in `used`),
+ * 1 for a live current match, and 2 for a live match whose deadline has passed
+ * - which is still counted in `used` but is logically absent, so the caller
+ * refreshes it in place rather than allocating, and never increments `used`. */
+static sa_hash_slot *sa_hash_place(sa_hash *m, const char *key, uint32_t klen,
+                                   uint64_t tag, uint64_t now, int *found)
+{
+#if !SA_HAVE_ATOMICS
+    (void)m; (void)key; (void)klen; (void)tag; (void)now; (void)found;
+    return NULL;
+#else
+    uint64_t i, start = tag % m->nslots;
+    sa_hash_slot *reuse = NULL;
+
+    *found = 0;
+    for (i = 0; i < m->nslots; i++) {
+        sa_hash_slot *s = SA_HSLOT_AT(m, start + i);
+        uint32_t st = sa_at_load32_acq(&s->state);
+
+        if (st == SA_H_EMPTY) return reuse ? reuse : s;
+        if (st == SA_H_DEAD) {
+            /* Remember the first tombstone, but keep probing: the key may be
+             * live further along, and inserting a second copy of it here would
+             * leave two entries that disagree. */
+            if (!reuse) reuse = s;
+            continue;
+        }
+        if (sa_at_load64_acq(&s->tag) == tag
+            && s->klen == klen
+            && memcmp(s->bytes, key, klen) == 0) {
+            *found = SA_H_EXPIRED(s, now) ? 2 : 1;
+            return s;
+        }
+    }
+    return reuse;
+#endif
+}
+
+/* Store, with an optional deadline. `ttl_ms` of 0 is "never expires"; anything
+ * else is a lifetime in milliseconds from now, and the clock is read only when
+ * one is asked for. */
+/* Collect an entry a reader found expired: tombstone it under the stripe lock,
+ * but only if it is STILL the same expired key - a writer may have refreshed it
+ * between the lock-free read and this lock. Best effort: if the lock is
+ * contended it is left for the next reader to notice, never waited on. */
+static void sa_hash_reap(sa_hash *m, const char *key, uint32_t klen,
+                         uint64_t tag, uint64_t now)
+{
+#if SA_HAVE_ATOMICS
+    sa_hash_hdr *h = m->hdr;
+    sa_hash_slot *s;
+    int found = 0;
+
+    if (!sa_at_lock(h->locks, tag)) return;
+    s = sa_hash_place(m, key, klen, tag, now, &found);
+    if (s && found == 2) {
+        sa_at_store32_rel(&s->state, SA_H_DEAD);
+        sa_at_store32_rel(&s->vlen, 0);
+        sa_at_fetch_add64(&h->used, (uint64_t)-1);
+        sa_at_fetch_add64(&h->tombstones, 1);
+        sa_at_fetch_add64(&h->expired, 1);
+    }
+    sa_at_unlock(h->locks, tag);
+#else
+    (void)m; (void)key; (void)klen; (void)tag; (void)now;
+#endif
+}
+
 static int sa_hash_fetch(sa_hash *m, const char *key, uint32_t klen,
                          char *out, uint32_t outmax, uint32_t *vlen)
 {
@@ -221,6 +325,7 @@ static int sa_hash_fetch(sa_hash *m, const char *key, uint32_t klen,
         for (;;) {
             uint32_t v1 = sa_at_load32_acq(&s->version);
             uint32_t kl, vl;
+            uint64_t exp;
 
             if (v1 & 1u) {                        /* mid-update: wait  */
                 if (++spin >= SA_HASH_SPIN) {
@@ -230,10 +335,28 @@ static int sa_hash_fetch(sa_hash *m, const char *key, uint32_t klen,
                 continue;
             }
 
-            kl = sa_at_load32_acq(&s->klen);
-            vl = sa_at_load32_acq(&s->vlen);
+            kl  = sa_at_load32_acq(&s->klen);
+            vl  = sa_at_load32_acq(&s->vlen);
+            exp = sa_at_load64_acq(&s->expires);
             if (kl != klen || (uint64_t)kl + vl > m->pair_max) break;
             if (memcmp(s->bytes, key, klen) != 0) break;
+
+            /* THE EXPIRY CHECK COMES BEFORE THE too-big-for-buffer EARLY OUT.
+             * exists() passes a zero-length buffer, so a non-empty value takes
+             * the BUSY branch below - and an expired key returning BUSY reads
+             * as present, which is the exact bug this whole thing exists to
+             * prevent. The clock is only read when a deadline is set, so a map
+             * with no TTL still pays nothing. The reap re-verifies under the
+             * lock, so acting here on an `exp` that a concurrent refresh has
+             * already moved is harmless: a refreshed key is not collected. */
+            if (exp) {
+                uint64_t nowms = sa_now_ms();
+                if (nowms >= exp) {
+                    sa_hash_reap(m, key, klen, tag, nowms);
+                    return SA_H_MISS;
+                }
+            }
+
             if (vl > outmax) { if (vlen) *vlen = vl; return SA_H_BUSY; }
 
             memcpy(out, s->bytes + kl, (size_t)vl);
@@ -259,62 +382,30 @@ static int sa_hash_fetch(sa_hash *m, const char *key, uint32_t klen,
 
 /* ---- writing, under a stripe lock ------------------------------------------ */
 
-/* Find the slot this key belongs in, under the caller's lock. Returns the slot
- * to use, or NULL when the table is full. `*found` says whether the key was
- * already there. */
-static sa_hash_slot *sa_hash_place(sa_hash *m, const char *key, uint32_t klen,
-                                   uint64_t tag, int *found)
+static int sa_hash_store_ttl(sa_hash *m, const char *key, uint32_t klen,
+                             const char *val, uint32_t vlen, uint64_t ttl_ms)
 {
 #if !SA_HAVE_ATOMICS
-    (void)m; (void)key; (void)klen; (void)tag; (void)found;
-    return NULL;
-#else
-    uint64_t i, start = tag % m->nslots;
-    sa_hash_slot *reuse = NULL;
-
-    *found = 0;
-    for (i = 0; i < m->nslots; i++) {
-        sa_hash_slot *s = SA_HSLOT_AT(m, start + i);
-        uint32_t st = sa_at_load32_acq(&s->state);
-
-        if (st == SA_H_EMPTY) return reuse ? reuse : s;
-        if (st == SA_H_DEAD) {
-            /* Remember the first tombstone, but keep probing: the key may be
-             * live further along, and inserting a second copy of it here would
-             * leave two entries that disagree. */
-            if (!reuse) reuse = s;
-            continue;
-        }
-        if (sa_at_load64_acq(&s->tag) == tag
-            && s->klen == klen
-            && memcmp(s->bytes, key, klen) == 0) {
-            *found = 1;
-            return s;
-        }
-    }
-    return reuse;
-#endif
-}
-
-static int sa_hash_store(sa_hash *m, const char *key, uint32_t klen,
-                         const char *val, uint32_t vlen)
-{
-#if !SA_HAVE_ATOMICS
-    (void)m; (void)key; (void)klen; (void)val; (void)vlen;
+    (void)m; (void)key; (void)klen; (void)val; (void)vlen; (void)ttl_ms;
     return SA_H_FULL;
 #else
     sa_hash_hdr *h = m->hdr;
-    uint64_t tag;
+    uint64_t tag, exp;
     sa_hash_slot *s;
     int found = 0, rc = SA_H_OK;
 
     if ((uint64_t)klen + vlen > m->pair_max) return SA_H_TOOBIG;
     if (!klen) return SA_H_TOOBIG;
 
+    exp = ttl_ms ? sa_now_ms() + ttl_ms : 0;
+
     tag = sa_at_fnv(key, klen);
     if (!sa_at_lock(h->locks, tag)) return SA_H_FULL;
 
-    s = sa_hash_place(m, key, klen, tag, &found);
+    /* now = 0: store overwrites the value and sets the new deadline whether the
+     * old entry was current or expired, so it need not tell the two apart -
+     * only whether the slot was already counted in `used`, which is found!=0. */
+    s = sa_hash_place(m, key, klen, tag, 0, &found);
     if (!s) {
         sa_at_unlock(h->locks, tag);
         sa_at_fetch_add64(&h->full, 1);
@@ -338,6 +429,7 @@ static int sa_hash_store(sa_hash *m, const char *key, uint32_t klen,
     }
     memcpy(s->bytes + klen, val, vlen);
     s->vlen = vlen;
+    sa_at_store64_rel(&s->expires, exp);
 
     sa_at_fence_rel();
     sa_at_store32_rel(&s->version, (sa_at_load32_acq(&s->version) + 1u) | 0u);
@@ -346,6 +438,12 @@ static int sa_hash_store(sa_hash *m, const char *key, uint32_t klen,
     sa_at_unlock(h->locks, tag);
     return rc;
 #endif
+}
+
+static int sa_hash_store(sa_hash *m, const char *key, uint32_t klen,
+                         const char *val, uint32_t vlen)
+{
+    return sa_hash_store_ttl(m, key, klen, val, vlen, 0);
 }
 
 static int sa_hash_delete(sa_hash *m, const char *key, uint32_t klen)
@@ -363,7 +461,9 @@ static int sa_hash_delete(sa_hash *m, const char *key, uint32_t klen)
     tag = sa_at_fnv(key, klen);
     if (!sa_at_lock(h->locks, tag)) return 0;
 
-    s = sa_hash_place(m, key, klen, tag, &found);
+    /* now = 0: delete removes the entry whether current or expired, so it need
+     * not read the clock to classify it. */
+    s = sa_hash_place(m, key, klen, tag, 0, &found);
     if (!s || !found) { sa_at_unlock(h->locks, tag); return 0; }
 
     /* A TOMBSTONE, not an empty slot. An empty slot stops a probe, and a probe
@@ -407,32 +507,49 @@ static int sa_hash_incr(sa_hash *m, const char *key, uint32_t klen,
     tag = sa_at_fnv(key, klen);
     if (!sa_at_lock(h->locks, tag)) return SA_H_FULL;
 
-    s = sa_hash_place(m, key, klen, tag, &found);
+    /* now = 0: find any live match, then check its own deadline below. Reading
+     * the clock only for a match that actually carries one keeps a counter
+     * with no TTL - the rate-limit hot path - free of a clock call. */
+    s = sa_hash_place(m, key, klen, tag, 0, &found);
     if (!s) {
         sa_at_unlock(h->locks, tag);
         sa_at_fetch_add64(&h->full, 1);
         return SA_H_FULL;
     }
-    if (found && sa_at_load32_acq(&s->vlen) != 8) {
-        sa_at_unlock(h->locks, tag);
-        return SA_H_NOTNUM;
-    }
+    {
+        /* An EXPIRED counter is logically gone, so it is reset to zero rather
+         * than added to a stale value - the one thing a plain "found" flag
+         * would get wrong. A non-counter that has expired is likewise gone, so
+         * the deadline is checked before the not-a-counter refusal. */
+        int reset = 0;
+        if (found && sa_at_load64_acq(&s->expires)
+            && sa_now_ms() >= sa_at_load64_acq(&s->expires))
+            reset = 1;
 
-    if (!found) {
-        uint32_t was = sa_at_load32_acq(&s->state);
-        uint64_t zero = 0;
-        sa_at_store32_rel(&s->version, sa_at_load32_acq(&s->version) | 1u);
-        sa_at_fence_rel();
-        memcpy(s->bytes, key, klen);
-        s->klen = klen;
-        memcpy(s->bytes + klen, &zero, 8);
-        s->vlen = 8;
-        sa_at_store64_rel(&s->tag, tag);
-        sa_at_fence_rel();
-        sa_at_store32_rel(&s->version, sa_at_load32_acq(&s->version) + 1u);
-        sa_at_store32_rel(&s->state, SA_H_LIVE);
-        if (was == SA_H_DEAD) sa_at_fetch_add64(&h->tombstones, (uint64_t)-1);
-        sa_at_fetch_add64(&h->used, 1);
+        if (found && !reset && sa_at_load32_acq(&s->vlen) != 8) {
+            sa_at_unlock(h->locks, tag);
+            return SA_H_NOTNUM;
+        }
+
+        if (!found || reset) {
+            uint32_t was = sa_at_load32_acq(&s->state);
+            uint64_t zero = 0;
+            sa_at_store32_rel(&s->version, sa_at_load32_acq(&s->version) | 1u);
+            sa_at_fence_rel();
+            memcpy(s->bytes, key, klen);
+            s->klen = klen;
+            memcpy(s->bytes + klen, &zero, 8);
+            s->vlen = 8;
+            sa_at_store64_rel(&s->tag, tag);
+            sa_at_store64_rel(&s->expires, 0);   /* a reset counter has no TTL */
+            sa_at_fence_rel();
+            sa_at_store32_rel(&s->version, sa_at_load32_acq(&s->version) + 1u);
+            sa_at_store32_rel(&s->state, SA_H_LIVE);
+            if (was == SA_H_DEAD) sa_at_fetch_add64(&h->tombstones, (uint64_t)-1);
+            /* reset reuses a slot already counted in `used`; only a genuinely
+             * new key adds to it. */
+            if (!found) sa_at_fetch_add64(&h->used, 1);
+        }
     }
 
     /* The counter itself, aligned inside the slot only if the key length says

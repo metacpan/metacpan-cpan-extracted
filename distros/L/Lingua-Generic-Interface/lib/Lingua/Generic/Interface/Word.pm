@@ -14,17 +14,9 @@ use warnings;
 use Carp;
 use Data::Identifier v0.34;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
-use parent qw(Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Simple);
-
-use overload (
-    '""'    => \&as_string,
-    'eq'    => sub {  $_[0]->eq($_[1]) },
-    'ne'    => sub { !$_[0]->eq($_[1]) },
-    'cmp'   => sub {  $_[0]->cmp($_[1]) },
-);
-
+use parent 'Lingua::Generic::Interface::Element';
 
 
 sub new {
@@ -55,12 +47,6 @@ sub new {
     } else {
         croak 'Bad type: '.$type;
     }
-}
-
-
-sub as_string {
-    my ($self, @opts) = @_;
-    return $self->{string} // confess 'BUG: No valid string';
 }
 
 
@@ -108,29 +94,6 @@ sub cmp {
 }
 
 
-sub natural_language {
-    my ($self) = @_;
-    ...
-}
-
-
-sub displayname {
-    my ($self, @opts) = @_;
-    return $self->as_string if scalar(@opts) == 0;
-    { # work around the case we have no working $self->as().
-        my %x = @opts;
-        delete $x{default};
-        delete $x{no_defaults};
-        return $self->as_string if scalar(keys %x) == 0;
-    }
-    return $self->as('Data::Identifier')->displayname(@opts);
-}
-
-
-sub ise {
-    ...
-}
-
 
 
 
@@ -150,7 +113,7 @@ Lingua::Generic::Interface::Word - module to interact with the words of any lang
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -166,10 +129,10 @@ This module provides a base implementation for some of it's required methods.
 Methods which this module cannot provide a useful default implementation for will have an implementation that dies on call.
 
 This module inherits from
-L<Data::Identifier::Interface::Simple>,
-and L<Data::Identifier::Interface::Subobjects>.
+L<Lingua::Generic::Interface::Element> (since v0.03),
+and L<Lingua::Generic::Interface::Base>.
 
-Package may also want to implement L<Data::Identifier::Interface::Known>.
+Packages may also want to implement L<Data::Identifier::Interface::Known>.
 
 =head1 METHODS
 
@@ -183,7 +146,7 @@ Package may also want to implement L<Data::Identifier::Interface::Known>.
 
 Constructs a new word.
 The word is normalised as part of this.
-This method deduplicate instances.
+This method may deduplicate instances.
 
 Currently the following types (C<$type>) are defined:
 
@@ -220,18 +183,6 @@ For C<string> it will create a new object that will work with the rest of the de
 Such object will be a blessed hash reference with the string set in a key C<string>.
 
 It will fail in all other cases.
-
-=head2 as_string
-
-    my $str = $word->as_string;
-
-(since v0.01)
-
-Returns the string representation of the word.
-
-=head3 Default implementation
-
-The default implementation will return the string value from the key C<string>.
 
 =head2 eq
 
@@ -293,48 +244,11 @@ After that it will compare the actual packages, and then the string values as pe
 
     my Data::Identifier $natural_language = $word->natural_language;
 
-(since v0.01)
+(since v0.01, moved to L<Lingua::Generic::Interface::Element/natural_language> in v0.03)
 
 Returns the natural language this word is in.
-When no parameters are passed an instance of L<Data::Identifier> must be returned.
 
-The implementation must die if any parameters are passed.
-
-=head3 Default implementation
-
-The default implementation dies.
-
-=head2 displayname
-
-    my $displayname = $word->displayname;
-
-(since v0.01)
-
-This method returns a string suitable to display to the user.
-
-This is the same as L<Data::Identifier::Interface::Simple/displayname>.
-
-=head3 Default implementation
-
-The default implementation is compatible with L<Data::Identifier::Interface::Simple/displayname>.
-It will make use of L</as_string> as good as possible, then fall back to calling L</as> asking for a L<Data::Identifier> to handle the request.
-
-=head2 ise
-
-    my $ise = $word->ise(...)
-
-(since v0.01)
-
-This is the same as L<Data::Identifier::Interface::Simple/ise>.
-
-If an implementations implement this method or L<Data::Identifier::Interface::Simple/as> as their primary method to create L<Data::Identifier> objects
-this method might be overridden by the default implementation from L<Data::Identifier::Interface::Simple> such as by:
-
-    sub ise { goto &Data::Identifier::Interface::Simple::ise } # overridden using tail-call
-
-=head3 Default implementation
-
-The default implementation will die.
+For details see L<Lingua::Generic::Interface::Element/natural_language>.
 
 =head2 register
 
@@ -370,46 +284,7 @@ Unimplemented. Future versions may provide a default implementation.
 
 =head1 RESERVED METHODS
 
-The following methods are reserved for future use:
-
-=over
-
-=item concept
-
-=item concepts
-
-=item tagname
-
-=item as_number
-
-=item combine
-
-=item language
-
-=item modifiers
-
-=item prefix
-
-=item suffix
-
-=item type
-
-=item has_type
-
-=item role
-
-=item roles
-
-=item has_roles
-
-=item flags
-
-=item markers
-
-=back
-
-Also the methods from the following interfaces are reserved for their designated usages:
-L<Data::Identifier::Interface::Known>.
+See L<Lingua::Generic::Interface::Base> for a list of reserved methods.
 
 =head1 AUTHOR
 

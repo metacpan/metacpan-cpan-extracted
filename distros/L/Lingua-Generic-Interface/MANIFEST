@@ -10,6 +10,10 @@ README
 cpanfile
 dist.ini
 lib/Lingua/Generic/Interface.pm
+lib/Lingua/Generic/Interface/Base.pm
+lib/Lingua/Generic/Interface/Element.pm
+lib/Lingua/Generic/Interface/Fragment.pm
+lib/Lingua/Generic/Interface/Modifier.pm
 lib/Lingua/Generic/Interface/Word.pm
 t/01_load.t
 xt/author/pod-syntax.t

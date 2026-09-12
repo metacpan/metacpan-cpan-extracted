@@ -13,6 +13,25 @@
   #chart { overflow: visible; }
   .graph-container { padding-left: 3rem; }
 
+  /* Reference-line checkboxes in the export bar */
+  .graph-refline-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: 0.5rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid #ccc;
+  }
+  .refline-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .refline-label input[type="checkbox"] { cursor: pointer; }
+
   /* Style the HTML::D3-generated Reset zoom button to match .btn-graph-export */
   #reset-btn {
     padding: 0.28rem 0.75rem;
@@ -36,6 +55,13 @@
   <button class="btn-graph-export" onclick="biExportSVG()">Export SVG</button>
   <button class="btn-graph-export" onclick="biExportPNG()">Export PNG</button>
   <span class="graph-point-count">Plotting [% point_count %] point[% IF point_count != 1 %]s[% END %]</span>
+  [% IF ref_min_y.defined %]
+  <span class="graph-refline-controls">
+    <label class="refline-label"><input type="checkbox" id="rl-min"> Min ([% ref_min_y %])</label>
+    <label class="refline-label"><input type="checkbox" id="rl-avg"> Avg ([% ref_avg_y %])</label>
+    <label class="refline-label"><input type="checkbox" id="rl-max"> Max ([% ref_max_y %])</label>
+  </span>
+  [% END %]
 </div>
 
 <div class="graph-container">
@@ -99,5 +125,113 @@
   window.biExportPNG = biExportPNG;
 }());
 </script>
+
+[% IF ref_min_y.defined %]
+<script>
+// Reference lines — drawn using the D3 `y` scale and `chart` group that
+// render_zoomable_line_chart_snippet declares at the top level of its <script>
+// block (not inside an IIFE), so they are accessible here.
+(function () {
+  var REF = {
+    min: [% ref_min_y %],
+    avg: [% ref_avg_y %],
+    max: [% ref_max_y %]
+  };
+  var LINE_DEFS = [
+    { id: 'rl-min', key: 'min', color: '#3b82f6', label: 'Min' },
+    { id: 'rl-avg', key: 'avg', color: '#10b981', label: 'Avg' },
+    { id: 'rl-max', key: 'max', color: '#ef4444', label: 'Max' }
+  ];
+
+  function drawRefLines() {
+    // `chart` and `y` and `width` are declared by HTML::D3's snippet at the
+    // top level of its <script> block — they are visible in this scope.
+    if (typeof chart === 'undefined' || typeof y === 'undefined') return;
+    chart.selectAll('.bi-ref-line').remove();
+    chart.selectAll('.bi-ref-label').remove();
+    LINE_DEFS.forEach(function (def) {
+      var cb = document.getElementById(def.id);
+      if (!cb || !cb.checked) return;
+      var val  = REF[def.key];
+      var yPos = y(val);
+      chart.append('line')
+        .attr('class', 'bi-ref-line')
+        .attr('x1', 0).attr('x2', width)
+        .attr('y1', yPos).attr('y2', yPos)
+        .attr('stroke', def.color)
+        .attr('stroke-width', 1.5)
+        .attr('stroke-dasharray', '5 3')
+        .attr('pointer-events', 'none');
+      chart.append('text')
+        .attr('class', 'bi-ref-label')
+        .attr('x', width + 5)
+        .attr('y', yPos + 4)
+        .attr('fill', def.color)
+        .attr('font-size', '11px')
+        .attr('pointer-events', 'none')
+        .text(def.label);
+    });
+  }
+
+  // Patch `redraw` (a function declaration — globally patchable) so that
+  // reference lines recalculate whenever the chart updates.
+  //
+  // Why recalculate REF from newData?  HTML::D3 uses
+  //   y.domain([0, d3.max(newData, d => d.value)]).nice()
+  // so the y-domain minimum is always 0.  When the user zooms into a region
+  // whose maximum is smaller than the full-dataset REF values, those values
+  // fall above the visible domain and their pixel position is negative — i.e.
+  // off-screen above the chart.  Recalculating from newData keeps the lines
+  // inside the visible domain after every zoom or reset.
+  //
+  // Why setTimeout?  The `redraw` transition runs for `ms` ms (500 on zoom /
+  // reset, 0 on initial render).  We must wait until the transition ends
+  // before appending the reference lines; otherwise the y-axis is still
+  // animating from its old position when we compute y(val), producing a
+  // brief positional mismatch.
+  if (typeof redraw === 'function') {
+    var _origRedraw = redraw;
+    redraw = function (newData, ms) {
+      // Recalculate REF from the data currently being drawn so lines stay
+      // within the visible y-domain even after a zoom or reset.
+      if (newData && newData.length) {
+        var yVals = newData.map(function (d) { return d.value; })
+                          .filter(function (v) { return isFinite(v); });
+        if (yVals.length) {
+          REF.min = Math.min.apply(null, yVals);
+          REF.max = Math.max.apply(null, yVals);
+          REF.avg = yVals.reduce(function (a, b) { return a + b; }, 0) / yVals.length;
+          // Update the checkbox label text to show the new recalculated value.
+          // Each label is <label><input id="rl-*"> Min (X)</label>; the number
+          // lives in the text node immediately after the <input>.
+          LINE_DEFS.forEach(function (def) {
+            var cb = document.getElementById(def.id);
+            if (!cb || !cb.parentNode) return;
+            var nodes = cb.parentNode.childNodes;
+            for (var i = 0; i < nodes.length; i++) {
+              if (nodes[i].nodeType === 3) {
+                // 4 significant figures, stripping trailing zeros (like %.4g in Perl)
+                var fmtVal = parseFloat(REF[def.key].toPrecision(4));
+                nodes[i].textContent = nodes[i].textContent.replace(/\([^)]*\)/, '(' + fmtVal + ')');
+              }
+            }
+          });
+        }
+      }
+      // Remove stale lines before the transition starts.
+      chart.selectAll('.bi-ref-line, .bi-ref-label').remove();
+      _origRedraw(newData, ms);
+      setTimeout(drawRefLines, (ms || 0) + 20);
+    };
+  }
+
+  // Wire up checkboxes.
+  LINE_DEFS.forEach(function (def) {
+    var cb = document.getElementById(def.id);
+    if (cb) cb.addEventListener('change', drawRefLines);
+  });
+}());
+</script>
+[% END %]
 
 [%- END -%]

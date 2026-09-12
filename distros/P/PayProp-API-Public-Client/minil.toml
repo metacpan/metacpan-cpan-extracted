@@ -1,0 +1,7 @@
+name = "PayProp-API-Public-Client"
+
+[requires]
+perl = "5.008001"
+
+[meta_add]
+x_deprecated = 1

@@ -42,6 +42,8 @@ for my $keys (10, 200, 2000) {
     bench('frozen:   one field, view held',
           sub { my $view = $conf->view;
                 my $v; $v = $view->get('key1.n') for 1 .. $N });
+    bench('frozen:   one field, no view',
+          sub { my $v; $v = $conf->get('key1.n') for 1 .. $N });
 
 }
 

@@ -1,5 +1,24 @@
 Revision history for Shared::Arena
 
+0.03	2026-09-11
+        - Add Shared::Arena::Cuckoo, a shared filter that can remove a key.
+        - Add Shared::Arena::Scoreboard, one row per worker published live:
+          each worker writes its own row with no lock, a supervisor reads the
+          whole board in one pass
+        - Add Shared::Arena::Lease, leader election: one holder at a time and
+          a successor when the holder dies, with a fencing token.
+        - Shared::Arena::Map store takes ttl / ttl_ms, a per-key deadline after
+          which the key reads as absent everywhere; expiry is lazy and counted
+          in the new `expired` stat, and an expired counter resets on incr.
+        - Cache reads scale across processes. A hit wrote a counter every
+          process shares; counts are now published every 64. Eight processes
+          reading one key: 530ns a get before, 87ns now.
+        - A cache get reads the clock only for an entry with a ttl, and a get
+          or fetch no longer allocates on a miss. A cache miss: 51ns to 29ns.
+        - FIXES a double free under ithreads: a new thread cloned every handle
+          and freed it on exit, unmapping the arena under its creator. Handles
+          are no longer cloned; a thread attaches by name.
+
 0.02    2026-09-11
         - FIXES the Windows FAIL in 0.01. Three test files forked without
           skipping on MSWin32, where fork is emulated with threads: a child

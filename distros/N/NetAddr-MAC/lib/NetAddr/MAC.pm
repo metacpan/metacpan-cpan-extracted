@@ -5,16 +5,15 @@ use strict;
 use warnings;
 use v5.10;
 package NetAddr::MAC;
-$NetAddr::MAC::VERSION = '1.01';
+$NetAddr::MAC::VERSION = '1.02';
 
 use Carp qw( croak );
 use Exporter 'import';
 use List::Util qw( first );
 
-use constant EUI48LENGTHHEX => 12;
 use constant EUI48LENGTHDEC => 6;
-use constant EUI64LENGTHHEX => 16;
 use constant EUI64LENGTHDEC => 8;
+use constant MAXPRIORITY    => 65535;    # 16 bit field in the STP bridge id
 
 our %EXPORT_TAGS;
 
@@ -27,6 +26,8 @@ our %EXPORT_TAGS;
           mac_is_vrrp4     mac_is_vrrp6
           mac_is_hsrp      mac_is_hsrp2
           mac_is_msnlb
+          mac_is_ipv4_multicast
+          mac_is_ipv6_multicast
           mac_is_local     mac_is_universal
           mac_as_basic     mac_as_sun
           mac_as_microsoft mac_as_cisco
@@ -44,6 +45,8 @@ our %EXPORT_TAGS;
           mac_is_vrrp4     mac_is_vrrp6
           mac_is_hsrp      mac_is_hsrp2
           mac_is_msnlb
+          mac_is_ipv4_multicast
+          mac_is_ipv6_multicast
           mac_is_local     mac_is_universal
           )
     ],
@@ -88,31 +91,32 @@ sub new {
 
 {
 
-    my $_die;
-
     sub _init {
 
         my ( $self, %args ) = @_;
 
-        $_die = undef;
-
-        if ( defined $args{die_on_error} ) {
-            $_die = ++$self->{_die}
-                if $args{die_on_error};
-        }
-        else {
-            $_die = ++$self->{_die}
-                if $NetAddr::MAC::die_on_error;
-        }
+        # the object option wins over the global, and a defined false value
+        # must be able to switch dying off
+        $self->{_die} = defined $args{die_on_error}
+            ? ( $args{die_on_error} ? 1 : 0 )
+            : ( $NetAddr::MAC::die_on_error ? 1 : 0 );
 
         $self->{original} = $args{mac};
 
-        if ($args{mac} =~ m/^(\d+)\#(.+)$/ ) {
+        if ( defined $args{mac} and $args{mac} =~ m/^([0-9]+)\#(.+)$/ ) {
             $self->{priority} = $1;
             $args{mac} = $2;
         }
 
-        $self->{mac} = _mac_to_integers( $args{mac} );
+        for my $p ( grep { defined } $self->{priority}, $args{priority} ) {
+            next if $p =~ m/^[0-9]+$/ and $p <= MAXPRIORITY;
+            my $e = "Invalid priority '$p', must be an integer from 0 to " . MAXPRIORITY;
+            croak "$e\n" if $self->{_die};
+            $NetAddr::MAC::errstr = $e;
+            return
+        }
+
+        $self->{mac} = _mac_to_integers( $args{mac}, $self->{_die} );
 
         unless ( $self->{mac} ) {
             croak $NetAddr::MAC::errstr . "\n" if $self->{_die};
@@ -120,7 +124,7 @@ sub new {
         }
 
         if (defined $self->{priority}) {
-            if ($args{priority} and $args{priority} != $self->{priority}) {
+            if ( defined $args{priority} and $args{priority} != $self->{priority} ) {
                 my $e = "Conflicting priority in '$self->{original}' and priority argument $args{priority}";
                 croak "$e\n" if $self->{_die};
                 $NetAddr::MAC::errstr = $e;
@@ -128,11 +132,14 @@ sub new {
             }
         }
         else {
-            $self->{priority} = $args{priority} || 0;
+            $self->{priority} = $args{priority} // 0;
         }
 
         # check none of the list elements are empty
-        if (first { not defined $_ or 0 == length $_} @{$self->{mac}}) {
+        # grep, not first: first returns the element, and an empty string
+        # is false, so the check it guarded never fired
+        if ( grep { not defined $_ or 0 == length $_ } @{ $self->{mac} } ) {
+
             my $e = "Invalid MAC format '$self->{original}'";
             croak "$e\n" if $self->{_die};
             $NetAddr::MAC::errstr = $e;
@@ -145,13 +152,16 @@ sub new {
 
     sub _mac_to_integers {
 
-        my $mac = shift;
+        my ( $mac, $die ) = @_;
         my $e;
+
+        # procedural callers pass no flag and get the global behaviour
+        $die = ( $NetAddr::MAC::die_on_error ? 1 : 0 ) unless defined $die;
 
         CHECK_BLOCK:
         {
 
-            unless ($mac) {
+            unless ( defined $mac and length $mac ) {
                 $e = 'Please provide a mac address';
                 last CHECK_BLOCK;
             }
@@ -160,8 +170,10 @@ sub new {
             $mac =~ s/^\s+//;
             $mac =~ s/\s+$//;
 
-            $mac =~ s{^1,\d,}{}
-              ; # blindly remove the prefix from bpr, we could check that \d is the actual length, but oh well
+            # bpr prefix is "1,<octet count>," and the count must match the
+            # octets that follow
+            my $bpr_count;
+            $bpr_count = $1 if $mac =~ s{^1,([0-9]+),}{};
 
             # avoid matching ipv6
             last CHECK_BLOCK if $mac =~ m/[a-f0-9]{1,4}:[a-f0-9]{1,4}::([a-f0-9]{1,4})?/i;
@@ -180,50 +192,26 @@ sub new {
                     : $o
                 } @parts;
 
-            # 12 characters for EUI48, 16 for EUI64
-            if (
-                @parts == 1
-                && (   length $parts[0] == EUI48LENGTHHEX
-                    || length $parts[0] == EUI64LENGTHHEX )
-              )
-            {    # 0019e3010e72
-                local $_ = shift(@parts);
-                while (m{([a-f0-9]{2})}igx) { push( @parts, $1 ) }
-                return [ map { hex($_) } @parts ]
-            }
+            # every part is now one or two hex digits, or it is not an octet.
+            # a longer part must never reach hex(), it would yield a value
+            # above 255 that every as_* method then prints back verbatim
+            last CHECK_BLOCK if grep { length $_ > 2 } @parts;
 
-            # 00:19:e3:01:0e:72
+            # 00:19:e3:01:0e:72, 0019.e301.0e72, 0019e3010e72 and friends all
+            # arrive here as 6 or 8 parts after the split above
+            last CHECK_BLOCK if defined $bpr_count and $bpr_count != @parts;
+
             if ( @parts == EUI48LENGTHDEC || @parts == EUI64LENGTHDEC ) {
                 return [ map { hex($_) } @parts ]
             }
 
-            # 0019:e301:0e72
-            if ( @parts == EUI48LENGTHDEC / 2 || @parts == EUI64LENGTHDEC / 2 )
-            {
-                # it would be nice to accept no leading 0's but this gives
-                # problems detecting broken formatted macs.
-                # cisco doesnt drop leading zeros so lets go for the least
-                # edgey of the edge cases.
-                last CHECK_BLOCK if (first {length $_ < 4} @parts);
 
-                return [
-                    map {
-                        m{^ ([a-f0-9]{2}) ([a-f0-9]{2}) $}ix
-                          && ( hex($1), hex($2) )
-                    } @parts
-                ];
-            }
 
         }
 
         $e ||= "Invalid MAC format '$mac'";
 
-        if ( defined $_die ) {
-            croak "$e\n" if $_die;
-        }
-        elsif ($NetAddr::MAC::die_on_error) {
-            croak "$e\n";
-        }
+        croak "$e\n" if $die;
 
         $NetAddr::MAC::errstr = $e;
 
@@ -360,6 +348,30 @@ sub is_broadcast {
         return 0 if $_ != 255
     }
     return 1
+}
+
+
+sub is_ipv4_multicast {
+    my $self = shift;
+
+    return
+      is_eui48($self) &&
+      $self->{mac}->[0] == 1 &&
+      $self->{mac}->[1] == 0 &&
+      $self->{mac}->[2] == hex('0x5e') &&
+      !( $self->{mac}->[3] & hex('0x80') );
+
+}
+
+
+sub is_ipv6_multicast {
+    my $self = shift;
+
+    return
+      is_eui48($self) &&
+      $self->{mac}->[0] == hex('0x33') &&
+      $self->{mac}->[1] == hex('0x33');
+
 }
 
 
@@ -723,6 +735,42 @@ sub mac_is_unicast {
 }
 
 
+sub mac_is_ipv4_multicast {
+
+    my $mac = shift;
+    croak 'please use is_ipv4_multicast'
+      if ref $mac eq __PACKAGE__;
+    if ( ref $mac ) {
+        my $e = 'argument must be a string';
+        croak "$e\n" if $NetAddr::MAC::die_on_error;
+        $NetAddr::MAC::errstr = $e;
+        return
+    }
+
+    $mac = _mac_to_integers($mac) or return;
+    return is_ipv4_multicast( { mac => $mac } )
+
+}
+
+
+sub mac_is_ipv6_multicast {
+
+    my $mac = shift;
+    croak 'please use is_ipv6_multicast'
+      if ref $mac eq __PACKAGE__;
+    if ( ref $mac ) {
+        my $e = 'argument must be a string';
+        croak "$e\n" if $NetAddr::MAC::die_on_error;
+        $NetAddr::MAC::errstr = $e;
+        return
+    }
+
+    $mac = _mac_to_integers($mac) or return;
+    return is_ipv6_multicast( { mac => $mac } )
+
+}
+
+
 sub mac_is_vrrp {
 
     my $mac = shift;
@@ -894,7 +942,7 @@ sub mac_as_basic {
 sub mac_as_bpr {
 
     my $mac = shift;
-    croak 'please use as_basic'
+    croak 'please use as_bpr'
       if ref $mac eq __PACKAGE__;
     if ( ref $mac ) {
         my $e = 'argument must be a string';
@@ -905,6 +953,7 @@ sub mac_as_bpr {
 
     $mac = _mac_to_integers($mac) or return;
     return as_bpr( { mac => $mac } )
+
 
 }
 
@@ -1072,7 +1121,7 @@ NetAddr::MAC - MAC hardware address functions and object (EUI48 and EUI64)
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -1289,6 +1338,22 @@ Returns true if mac address is determined to be a multicast address
 
 Returns true if mac address is determined to be a broadcast address
 
+=head2 is_ipv4_multicast
+
+Returns true if mac address is determined to be an IPv4 multicast address (RFC 1112 s6.4)
+
+i.e. 01-00-5E-00-00-00 through 01-00-5E-7F-FF-FF, the low 23 bits carry the group address
+
+always returns false for eui64.
+
+=head2 is_ipv6_multicast
+
+Returns true if mac address is determined to be an IPv6 multicast address (RFC 2464 s7)
+
+i.e. 33-33-XX-XX-XX-XX, the low 32 bits carry the low 32 bits of the group address
+
+always returns false for eui64.
+
 =head2 is_vrrp
 
 Returns true if mac address is determined to be a Virtual Router Redundancy (VRRP) address (RFC 5798 s7.4)
@@ -1297,7 +1362,8 @@ i.e. 00-00-5E-00-01-XX or 00-00-5E-00-02-XX
 
 always returns false for eui64.
 
-I'm not quite sure what to do with 01-00-5E-00-00-12, suggestions welcomed.
+Note that 01-00-5E-00-00-12 is the IPv4 multicast address for the VRRP group 224.0.0.18,
+see B<is_ipv4_multicast>, and is not a virtual router address.
 
 =head2 is_vrrp4
 
@@ -1462,6 +1528,18 @@ Returns true if mac address in $mac is determined to be a broadcast address
 =head2 mac_is_unicast($mac)
 
 Returns true if mac address in $mac is determined to be a unicast address
+
+=head2 mac_is_ipv4_multicast($mac)
+
+Returns true if mac address in $mac is determined to be an IPv4 multicast address
+
+i.e. 01-00-5E-00-00-00 through 01-00-5E-7F-FF-FF
+
+=head2 mac_is_ipv6_multicast($mac)
+
+Returns true if mac address in $mac is determined to be an IPv6 multicast address
+
+i.e. 33-33-XX-XX-XX-XX
 
 =head2 mac_is_vrrp($mac)
 

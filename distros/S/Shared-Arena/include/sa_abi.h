@@ -83,12 +83,14 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/* Version 1, and it stays 1 until the first release: the table only gets a
- * history once somebody could have compiled against an earlier one. Bumping it
- * while the dist is unreleased would claim a compatibility story that never
- * happened and tell a consumer nothing. The first append AFTER 0.01 is
- * version 2. */
-#define SA_ABI_VERSION 1
+/* The history, one line per append:
+ *
+ *   1  0.01 and 0.02 - everything up to and including queue groups.
+ *   2  0.03 - map_store_ttl, the cuckoo filter, lease, then the scoreboard.
+ *
+ * A consumer that needs only what version 1 had keeps asking for >= 1 and
+ * loads against this table unchanged. */
+#define SA_ABI_VERSION 2
 
 /* The three handles, opaque here. The guards are shared with the private
  * headers, which define the structs in the provider build - C89 makes a
@@ -163,6 +165,7 @@ typedef struct sa_map_counts {
     uint64_t tombstones;
     uint64_t busy;
     uint64_t full;
+    uint64_t expired;   /* entries collected because their TTL lapsed */
 } sa_map_counts;
 
 /* What a map lookup answers. Absent and could-not-read are different answers:
@@ -221,6 +224,57 @@ typedef struct sa_cache_counts {
     uint64_t capacity;
     uint32_t ways;
 } sa_cache_counts;
+
+#ifndef SA_CUCKOO_FWD
+#define SA_CUCKOO_FWD
+typedef struct sa_cuckoo sa_cuckoo;
+#endif
+
+#ifndef SA_SB_FWD
+#define SA_SB_FWD
+typedef struct sa_sb sa_sb;
+#endif
+
+/* One scoreboard row, read out coherently. Defined under a guard SHARED with
+ * sa_scoreboard.h, so whichever is included first wins and the other skips -
+ * the layout is identical either way (8 gauges, a 64-byte status). A consumer
+ * maps field names to gauge indices with sb_field / sb_field_name. The write
+ * side passes the row as an opaque void* so this header need not expose the
+ * slot layout. */
+#ifndef SA_SB_READING_DEFINED
+#define SA_SB_READING_DEFINED
+typedef struct sa_sb_reading {
+    uint64_t pid;
+    uint64_t epoch;
+    uint64_t updated;
+    int      alive;
+    uint64_t gauges[8];
+    uint32_t statuslen;
+    char     status[64];
+} sa_sb_reading;
+#endif
+
+#ifndef SA_LEASE_FWD
+#define SA_LEASE_FWD
+typedef struct sa_lease sa_lease;
+#endif
+
+/* What a cuckoo filter holds. `count` against `slots` is the load, which is
+ * the number that says how close the next refusal is; `full` is adds already
+ * refused. `kicks` is adds that had to move keys to make room and `moves` the
+ * keys moved, so a filter whose kicks climb is one approaching full.
+ * `recovered` is relocation locks taken over from a process that died holding
+ * one - zero, or somebody was killed mid-add. */
+typedef struct sa_cuckoo_counts {
+    uint64_t count;
+    uint64_t slots;
+    uint64_t buckets;
+    uint64_t capacity;
+    uint64_t kicks;
+    uint64_t moves;
+    uint64_t full;
+    uint64_t recovered;
+} sa_cuckoo_counts;
 
 /* One delivered record. `topic` and `data` point into the cursor's scratch and
  * are valid only for this call. MUST NOT croak or longjmp: this is reached from
@@ -490,6 +544,90 @@ typedef struct sa_abi {
                                uint32_t *flags);
     uint64_t    (*group_position)(const sa_group_h *g);
     void        (*group_counts)(const sa_group_h *g, sa_group_counts *out);
+
+    /* map_store with a per-key deadline. `ttl_ms` of 0 never expires; anything
+     * else is a lifetime in milliseconds. An expired entry reads as absent and
+     * is collected lazily by the next reader that lands on it. This is what a
+     * denylist or a nonce store wants and a plain map gets wrong. */
+    int         (*map_store_ttl)(sa_hash *m, const char *key, uint32_t klen,
+                                 const char *val, uint32_t vlen,
+                                 uint64_t ttl_ms);
+
+    /* ---- the cuckoo filter ------------------------------------------------
+     *
+     * A set that answers 0 exactly and 1 probably, like the bloom filter, and
+     * can also REMOVE a key. `cuckoo_add` answers 1 when the key is stored and
+     * 0 when there is no room, and a refusal moves nothing already stored.
+     * Every add stores a copy, so a key added twice needs removing twice, and
+     * one key can be added at most eight times.
+     *
+     * `cuckoo_remove` must only be given keys that were added. A key never
+     * added can share a fingerprint and a bucket with one that was, and take
+     * THAT key's copy - the one way to make `cuckoo_check` answer 0 for a key
+     * that is there.
+     *
+     * The false-positive rate is fixed by the fingerprint width at about
+     * 8 * load / 65535. A NULL filter answers 0 to everything. */
+    sa_cuckoo  *(*cuckoo_open)(sa_region *r, const char *name, size_t nlen,
+                               uint64_t capacity, int *err);
+    void        (*cuckoo_release)(sa_cuckoo *c);
+    int         (*cuckoo_add)(sa_cuckoo *c, const char *key, uint32_t klen);
+    int         (*cuckoo_check)(sa_cuckoo *c, const char *key, uint32_t klen);
+    int         (*cuckoo_remove)(sa_cuckoo *c, const char *key, uint32_t klen);
+    void        (*cuckoo_reset)(sa_cuckoo *c);
+    void        (*cuckoo_counts)(sa_cuckoo *c, sa_cuckoo_counts *out);
+
+    /* ---- the lease: one holder, a successor when it dies ------------------
+     *
+     * Leader election. `lease_acquire` returns 1 when this process now holds
+     * the lease, 0 when another holds a current one; it takes over a holder
+     * that has LAPSED (failed to renew before ttl_ms) or is PROVABLY DEAD, and
+     * sets `*stole` when it did. `lease_renew` extends a lease this handle
+     * holds; `lease_release` gives it up early. The deadline carries
+     * correctness, the pid check only makes handover faster.
+     *
+     * `lease_fence` is the generation this handle acquired at - the fencing
+     * token that lets a resource reject a superseded leader's late write. */
+    sa_lease *(*lease_open)(sa_region *r, const char *name, size_t nlen,
+                            int *err);
+    void       (*lease_release_handle)(sa_lease *l);
+    int        (*lease_acquire)(sa_lease *l, uint64_t ttl_ms, int *stole);
+    int        (*lease_renew)(sa_lease *l, uint64_t ttl_ms);
+    int        (*lease_release)(sa_lease *l);
+    int        (*lease_mine)(sa_lease *l);
+    uint64_t   (*lease_holder)(sa_lease *l);
+    uint64_t   (*lease_fence)(sa_lease *l);
+
+    /* ---- the scoreboard: one row per worker, published live ---------------
+     *
+     * Each worker owns one row and is its only writer, so a write takes no
+     * lock; a reader - a supervisor, a status endpoint - reads every row in one
+     * pass. `sb_take` claims a row (reclaiming a dead worker's), `sb_field`
+     * maps a name to a gauge index, and the write is bracketed:
+     *
+     *     void *row = A->sb_begin(b);
+     *     if (row) { A->sb_set_gauge(row, i, v); A->sb_set_status(row, p, n);
+     *                A->sb_end(b, row); }
+     *
+     * so a reader sees the whole update at once or not at all. The row is a
+     * void* here on purpose: the slot layout stays private to the build.
+     * `sb_read` copies row `i` coherently into an sa_sb_reading; it returns 0
+     * for an empty row or one whose writer died mid-update. */
+    sa_sb    *(*sb_open)(sa_region *r, const char *name, size_t nlen,
+                         const char *const *fields, uint32_t nfields,
+                         uint32_t slots, int *err);
+    void      (*sb_release)(sa_sb *b);
+    int       (*sb_take)(sa_sb *b);
+    int       (*sb_field)(const sa_sb *b, const char *name, uint32_t nlen);
+    void     *(*sb_begin)(sa_sb *b);
+    void      (*sb_set_gauge)(void *row, int idx, uint64_t v);
+    void      (*sb_add_gauge)(void *row, int idx, int64_t by);
+    void      (*sb_set_status)(void *row, const char *p, uint32_t n);
+    void      (*sb_end)(sa_sb *b, void *row);
+    int       (*sb_read)(sa_sb *b, uint32_t i, sa_sb_reading *out);
+    uint64_t  (*sb_slots)(const sa_sb *b);
+    uint32_t  (*sb_nfields)(const sa_sb *b);
+    const char *(*sb_field_name)(const sa_sb *b, uint32_t idx);
 } sa_abi;
 
 #endif /* SA_ABI_H */

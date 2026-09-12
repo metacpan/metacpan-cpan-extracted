@@ -17,10 +17,24 @@ imported_ok 'readopts';
   subtest 'rcfile is missing' => sub {
     plan tests => 2;
 
-    local $0    = 'missing';
-    local @ARGV = ();
-    ok lives { readopts( @ARGV ) }, 'No exception';
-    is \@ARGV, [], 'No defaults added';
+    local $0 = 'missing';
+
+    subtest 'No hard defaults' => sub {
+      plan 2;
+
+      local @ARGV = ();
+      ok lives { readopts( @ARGV ) }, 'No exception';
+      is \@ARGV, [], '@ARGV ok'
+    };
+
+    subtest 'Hard defaults prepended although readopts has read nothing' => sub {
+      plan 2;
+
+      # Filled command-line argument list
+      local @ARGV = qw( -a quux );
+      ok lives { readopts( @ARGV, qw( -a baz -c ) ) }, 'No exception';
+      is \@ARGV, [ '-a', 'baz', '-c', '-a', 'quux' ], '@ARGV ok'
+    }
   };
 
   subtest 'rcfile exists and is fine' => sub {

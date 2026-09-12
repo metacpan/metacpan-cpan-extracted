@@ -26,6 +26,13 @@ It is normally created indirectly through `$self->CGI()` or `WebDyne::CGI`.
 
     Construct a CGI-style parameter object from a WebDyne request object.
 
+* **cookie(...)**, **raw_cookie(...)**
+
+    Read cookies from the current request's Cookie header, including when no
+    header is present. Cookie parsing and outgoing cookie construction retain
+    CGI::Simple semantics. Ambient CGI cookie environment variables are restored
+    after each call.
+
 * **Vars()**
 
     Return a `Hash::MultiValue` object of all current parameters. When called with an argument, replace the current parameter set from the supplied multivalue object.

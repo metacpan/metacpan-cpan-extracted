@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Sudoc
 
+2.50 2026-09-11
+
+  - Indication des bibs rattachés à chaque notice Sudic entrante.
+
 2.48 2026-01-08
 
   - ES avec login/password

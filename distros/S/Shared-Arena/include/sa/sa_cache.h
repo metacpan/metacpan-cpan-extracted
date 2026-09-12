@@ -51,6 +51,7 @@
  */
 
 #include "sa/sa_arena.h"
+#include "sa/sa_peer.h"      /* sa_getpid, for the batched counts */
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -109,6 +110,10 @@ typedef struct sa_cache {
     uint32_t       nways;
     uint64_t       nbuckets;
     uint64_t       pair_max;
+    /* Counted in this process and published in batches: see sa_cache_count. */
+    uint64_t       pend_pid;
+    uint32_t       pend_hits;
+    uint32_t       pend_misses;
 } sa_cache;
 
 #define SA_CWAY_AT(c, b, w) \
@@ -127,26 +132,8 @@ static uint64_t sa_cache_bytes(uint64_t nbuckets, uint32_t nways,
          + sa_align_up(nbuckets * 4u);
 }
 
-/* Milliseconds since the epoch. A wall clock, deliberately: a deadline set by
- * one process is read by another, and the only clock they certainly agree on is
- * the one the machine keeps. A step in it moves every deadline together, which
- * for a cache costs at worst one round of early or late expiry. */
-static uint64_t sa_now_ms(void) {
-#ifdef _WIN32
-    FILETIME ft;
-    ULARGE_INTEGER u;
-    GetSystemTimeAsFileTime(&ft);
-    u.LowPart  = ft.dwLowDateTime;
-    u.HighPart = ft.dwHighDateTime;
-    /* 100ns units since 1601; the offset is dropped because only differences
-     * and comparisons against each other matter here. */
-    return (uint64_t)(u.QuadPart / 10000ULL);
-#else
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (uint64_t)tv.tv_sec * 1000ULL + (uint64_t)(tv.tv_usec / 1000);
-#endif
-}
+/* sa_now_ms moved to sa_time.h, so the map's TTL and this cache read the one
+ * shared wall clock rather than each keeping their own. */
 
 static sa_cache *sa_cache_bind(sa_region *arena, sa_reg *e, uint64_t nbuckets,
                                uint32_t nways, uint32_t way_size, int *err)
@@ -222,7 +209,81 @@ static sa_cache *sa_cache_bind(sa_region *arena, sa_reg *e, uint64_t nbuckets,
 #endif
 }
 
-static void sa_cache_free(sa_cache *c) { free(c); }
+/* ---- THE HIT AND MISS COUNTS ARE BATCHED PER PROCESS -----------------------
+ *
+ * A hit used to add to hdr->hits, a line every process shares, so every read
+ * in every process was an atomic write to one place. Measured with K forked
+ * readers on one hot key, ns per get per process at K = 1 / 2 / 4 / 8:
+ *
+ *     counted per hit, CLOCK bit stored per hit    56 / 140 / 189 / 530
+ *     the bit stored only when it reads clear      57 / 101 / 157 / 440
+ *     and the hit not counted at all               57 /  63 /  62 / 112
+ *
+ * So a process counts in its own handle and publishes every SA_CACHE_BATCH.
+ * Its own stats are exact, because asking for them publishes first. Another
+ * process's reading can trail by up to SA_CACHE_BATCH - 1 of each per process,
+ * and a process that exits without releasing its handle takes that many with
+ * it.
+ *
+ * A FORK COPIES THE PENDING COUNTS, and the parent publishes its own copy. So
+ * the counts carry the pid they were made under, and a child that finds a
+ * different one discards them before counting its own. sa_getpid is a cached
+ * load where pthread_atfork exists to invalidate it; where it does not, the
+ * check would be a syscall per read, so those builds count every hit directly
+ * as before. */
+#if defined(SA_HAVE_ATFORK) && !defined(_WIN32)
+#  define SA_CACHE_BATCH 64u
+#else
+#  define SA_CACHE_BATCH 1u
+#endif
+
+/* Publish what this process has counted and not yet published. */
+static void sa_cache_flush(sa_cache *c) {
+#if SA_HAVE_ATOMICS
+    uint64_t me;
+    if (!c) return;
+    me = sa_getpid();
+    if (c->pend_pid != me) {
+        /* inherited across a fork: the parent's, and the parent's to publish */
+        c->pend_pid  = me;
+        c->pend_hits = c->pend_misses = 0;
+        return;
+    }
+    if (c->pend_hits)   sa_at_fetch_add64(&c->hdr->hits,   c->pend_hits);
+    if (c->pend_misses) sa_at_fetch_add64(&c->hdr->misses, c->pend_misses);
+    c->pend_hits = c->pend_misses = 0;
+#else
+    (void)c;
+#endif
+}
+
+static void sa_cache_count(sa_cache *c, int hit) {
+#if SA_HAVE_ATOMICS
+#  if SA_CACHE_BATCH > 1
+    uint64_t me = sa_getpid();
+    uint32_t *n = hit ? &c->pend_hits : &c->pend_misses;
+    if (c->pend_pid != me) {
+        c->pend_pid  = me;
+        c->pend_hits = c->pend_misses = 0;
+    }
+    if (++*n >= SA_CACHE_BATCH) {
+        sa_at_fetch_add64(hit ? &c->hdr->hits : &c->hdr->misses, (uint64_t)*n);
+        *n = 0;
+    }
+#  else
+    sa_at_fetch_add64(hit ? &c->hdr->hits : &c->hdr->misses, 1);
+#  endif
+#else
+    (void)c; (void)hit;
+#endif
+}
+
+/* Published before the handle goes, so a process that releases it leaves
+ * nothing uncounted. */
+static void sa_cache_free(sa_cache *c) {
+    sa_cache_flush(c);
+    free(c);
+}
 
 /* Has this entry's deadline passed? A zero deadline never does. */
 static int sa_cache_dead(sa_cache_way *w, uint64_t now) {
@@ -241,7 +302,6 @@ static int sa_cache_get(sa_cache *c, const char *key, uint32_t klen,
 #else
     uint64_t tag = sa_at_fnv(key, klen);
     uint64_t b   = tag % c->nbuckets;
-    uint64_t now = sa_now_ms();
     uint32_t w;
 
     for (w = 0; w < c->nways; w++) {
@@ -254,22 +314,27 @@ static int sa_cache_get(sa_cache *c, const char *key, uint32_t klen,
         for (;;) {
             uint32_t v1 = sa_at_load32_acq(&e->version);
             uint32_t kl, vl;
+            uint64_t exp;
 
             if (v1 & 1u) {
                 if (++spin >= SA_HASH_SPIN) return SA_C_BUSY;
                 continue;
             }
-            kl = sa_at_load32_acq(&e->klen);
-            vl = sa_at_load32_acq(&e->vlen);
+            kl  = sa_at_load32_acq(&e->klen);
+            vl  = sa_at_load32_acq(&e->vlen);
+            exp = sa_at_load64_acq(&e->expires);
             if (kl != klen || (uint64_t)kl + vl > c->pair_max) break;
             if (memcmp(e->bytes, key, klen) != 0) break;
 
-            if (sa_cache_dead(e, now)) {
+            /* The clock is read only when this entry has a deadline. It is
+             * 11ns, and a cache that never set a ttl used to pay it on every
+             * get, a miss included. */
+            if (exp && exp <= sa_now_ms()) {
                 /* Expired, and noticed rather than swept. It stays where it is
                  * and becomes the first thing evicted when this bucket needs
                  * room, which costs nothing until then. */
                 sa_at_fetch_add64(&c->hdr->expired, 1);
-                sa_at_fetch_add64(&c->hdr->misses, 1);
+                sa_cache_count(c, 0);
                 return SA_C_MISS;
             }
             if (vl > outmax) { if (vlen) *vlen = vl; return SA_C_BUSY; }
@@ -281,15 +346,17 @@ static int sa_cache_get(sa_cache *c, const char *key, uint32_t klen,
                 continue;
             }
 
-            /* CLOCK's reference bit: one atomic store on the read path, and
-             * the whole reason this is not LRU. */
-            sa_at_store32_rel(&e->used, 1);
-            sa_at_fetch_add64(&c->hdr->hits, 1);
+            /* CLOCK's reference bit, stored only when it reads clear. Storing
+             * it on every hit made every reader of a hot key write the line
+             * they all load the entry from; the note above sa_cache_flush has
+             * what that cost. */
+            if (!sa_at_load32_acq(&e->used)) sa_at_store32_rel(&e->used, 1);
+            sa_cache_count(c, 1);
             if (vlen) *vlen = vl;
             return SA_C_HIT;
         }
     }
-    sa_at_fetch_add64(&c->hdr->misses, 1);
+    sa_cache_count(c, 0);
     return SA_C_MISS;
 #endif
 }
@@ -303,7 +370,7 @@ static int sa_cache_get(sa_cache *c, const char *key, uint32_t klen,
  * something live was thrown out, and `*was_dead` whether it had already
  * expired - which is not an eviction, it is a collection. */
 static sa_cache_way *sa_cache_place(sa_cache *c, uint64_t b, const char *key,
-                                    uint32_t klen, uint64_t tag, uint64_t now,
+                                    uint32_t klen, uint64_t tag, uint64_t *now,
                                     int *found, int *evicted, int *was_dead)
 {
 #if !SA_HAVE_ATOMICS
@@ -328,7 +395,16 @@ static sa_cache_way *sa_cache_place(sa_cache *c, uint64_t b, const char *key,
             *found = 1;
             return e;
         }
-        if (!dead && sa_cache_dead(e, now)) dead = e;
+        if (!dead) {
+            /* `*now` is 0 until something needs it: the clock is read for the
+             * first entry that has a deadline, and never for a bucket where
+             * none does. */
+            uint64_t exp = sa_at_load64_acq(&e->expires);
+            if (exp) {
+                if (!*now) *now = sa_now_ms();
+                if (exp <= *now) dead = e;
+            }
+        }
     }
 
     if (empty) return empty;
@@ -371,13 +447,16 @@ static int sa_cache_set(sa_cache *c, const char *key, uint32_t klen,
 
     tag = sa_at_fnv(key, klen);
     b   = tag % c->nbuckets;
-    now = sa_now_ms();
+    /* Only a ttl needs the clock up front. Otherwise place reads it if it
+     * meets an entry with a deadline, and a cache that never sets one never
+     * reads it at all. */
+    now = ttl_ms ? sa_now_ms() : 0;
 
     /* The lock is on the BUCKET rather than the key, because a victim hunt
      * touches every way in it. */
     if (!sa_at_lock(h->locks, b)) return SA_C_TOOBIG;
 
-    e = sa_cache_place(c, b, key, klen, tag, now, &found, &evicted, &was_dead);
+    e = sa_cache_place(c, b, key, klen, tag, &now, &found, &evicted, &was_dead);
     if (!e) { sa_at_unlock(h->locks, b); return SA_C_TOOBIG; }
 
     sa_at_store32_rel(&e->version, sa_at_load32_acq(&e->version) | 1u);

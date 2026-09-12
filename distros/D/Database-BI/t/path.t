@@ -304,11 +304,13 @@ subtest '_detect_file_info path-D: PSV file -> sep_char "|"' => sub {
 	is $result->{id},       'id', 'path D: first psv column is id';
 };
 
-subtest '_detect_file_info path-E: CSV exists but is empty -> skip, return {}' => sub {
+subtest '_detect_file_info path-E: CSV exists but is empty -> _file_is_empty sentinel' => sub {
 	Mojo::File->new("$TMPDIR/emptycsv.csv")->spew('');
 	my $result = $DETECT->($TMPDIR, 'emptycsv');
-	# empty CSV: $line is undef -> next; no psv exists -> return {}
-	is_deeply $result, {}, 'path E: empty CSV -> next -> no psv -> {}';
+	# 0-byte CSV: returns a sentinel so _init_backend skips D::A/DBI entirely,
+	# preventing a DBI XS assertion crash (DBI 1.651 + DEBUGGING perl 5.44).
+	ok $result->{_file_is_empty}, 'path E: 0-byte CSV -> _file_is_empty sentinel set';
+	is $result->{file_size}, 0, 'path E: file_size is 0 for empty file';
 };
 
 subtest '_detect_file_info path-F: CSV absent, PSV present -> use PSV' => sub {

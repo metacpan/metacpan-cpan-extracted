@@ -40,7 +40,7 @@ use Sim::OPT::Interlinear;
 
 use Sim::OPT::Stats;
 eval { use Sim::OPTcue::OPTcue; 1 };
-eval { use Sim::OPTcue::Metabridge; 1 };
+eval { use Sim::OPT::Metabridge; 1 };
 eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
 eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
 eval { use Sim::OPTcue::Exogen::Armijo; 1 };

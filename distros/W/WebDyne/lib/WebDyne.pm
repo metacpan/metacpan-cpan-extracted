@@ -66,7 +66,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='3.028';
+$VERSION='3.029';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -2148,7 +2148,10 @@ sub redirect {
         #  Set content type
         #
         my $r=$self->r() || return err();
-        if ($redirect_type eq 'html') {
+        if (my $content_type=$param_hr->{'content_type'}) {
+            $r->content_type($content_type)
+        }
+        elsif ($redirect_type eq 'html') {
             $r->content_type(WEBDYNE_CONTENT_TYPE_HTML)
         }
         elsif ($redirect_type eq 'text') {

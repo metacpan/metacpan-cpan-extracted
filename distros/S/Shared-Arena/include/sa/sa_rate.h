@@ -440,6 +440,31 @@ static uint64_t sa_rate_used(sa_rate *r) {
     return n;
 }
 
+#else /* !SA_HAVE_ATOMICS */
+
+/* No atomics, so no limiter: sa_rate_bind refuses. These FAIL OPEN, as the
+ * XSUBs do in that build and as a NULL limiter does everywhere: a limiter must
+ * never be the reason a good request is refused. */
+static int sa_rate_take(sa_rate *r, const char *key, uint32_t klen,
+                        uint64_t cost_u, int peek,
+                        uint64_t *left_u, uint64_t *retry_ms)
+{
+    (void)r; (void)key; (void)klen; (void)cost_u; (void)peek;
+    if (left_u)   *left_u   = 0;
+    if (retry_ms) *retry_ms = 0;
+    return 1;
+}
+
+static void sa_rate_reset_key(sa_rate *r, const char *key, uint32_t klen) {
+    (void)r; (void)key; (void)klen;
+}
+
+static void sa_rate_forget(sa_rate *r, const char *key, uint32_t klen) {
+    (void)r; (void)key; (void)klen;
+}
+
+static uint64_t sa_rate_used(sa_rate *r) { (void)r; return 0; }
+
 #endif /* SA_HAVE_ATOMICS */
 
 #endif /* SA_RATE_H */

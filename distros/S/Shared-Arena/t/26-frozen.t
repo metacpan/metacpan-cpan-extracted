@@ -116,6 +116,40 @@ my $arena = Shared::Arena->create(size => 8 << 20);
     is($fresh->get('mark'), 'third', 'and reads the current block');
 }
 
+# ---- reading without a view ------------------------------------------------
+#
+# get, find and exists on the tenant itself read whatever is live NOW, through
+# a reader the handle keeps and replaces after a publish. So they must never
+# report a superseded block, including once the slots have come all the way
+# round to the one the kept reader was opened on.
+{
+    my $f = $arena->frozen('direct', size => 4096, slots => 2);
+    is(scalar(() = $f->get('n')), 0, 'nothing published: get is an empty list');
+    ok(!defined scalar $f->find('n'), 'and find is undef in scalar context');
+    ok(!$f->exists('n'), 'and nothing exists');
+
+    $f->publish({ n => 1, db => { host => 'h' }, 'a.b' => 'dotted' });
+    is($f->get('n'), 1, 'get reads the published block');
+    is($f->get('db.host'), 'h', 'by dotted path');
+    is($f->get('db/host', '/'), 'h', 'or with a separator of its own');
+    is($f->find('a.b'), 'dotted', 'find takes a key with a dot in it whole');
+    ok($f->exists('db.host'), 'exists says yes to a path that is there');
+    ok(!$f->exists('db.nope'), 'and no to one that is not');
+    is(scalar(() = $f->get('nope')), 0, 'a missing key is an empty list');
+
+    # Two slots, so this laps them twice, and every lap reuses the slot the
+    # kept reader was opened on.
+    for my $n (2 .. 5) {
+        $f->publish({ n => $n });
+        is($f->get('n'), $n, "generation $n is read the moment it lands");
+    }
+    ok(!$f->exists('db'), 'and a key the newest block dropped is gone');
+
+    my $err = '';
+    eval { $f->get('db.host', '::'); 1 } or $err = $@;
+    like($err, qr/one character/, 'a separator longer than one character croaks');
+}
+
 # ---- a block that does not fit is refused, not truncated -------------------
 {
     my $f = $arena->frozen('small', size => 1024);

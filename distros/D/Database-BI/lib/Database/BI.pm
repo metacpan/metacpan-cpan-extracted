@@ -8,7 +8,7 @@ use Readonly;
 
 use Database::BI::Model::DataSource;
 
-our $VERSION = '0.005.1';
+our $VERSION = '0.005.2';
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -28,42 +28,18 @@ Database::BI - Web-based Business Intelligence viewer for flat data files
 
 =head1 VERSION
 
-0.005.1
-
-=head1 SYNOPSIS
-
-B<Start the development server (restarts automatically when you edit a file):>
-
-    morbo script/database-bi
-
-B<Start the production server:>
-
-    hypnotoad script/database-bi
-
-B<Use a different data directory:>
-
-    # In database_bi.conf (create this file in the same folder as script/):
-    { data_dir => '/home/user/data' }
-
-B<Change the language used for templates:>
-
-    # In database_bi.conf:
-    { data_dir => 'data', language => 'fr', platform => 'web' }
-    # Then create templates/web/fr/ and put your French .html.tt files there.
-
-B<Run the test suite to verify everything is working:>
-
-    make test
-
-B<Generate the Makefile for the first time or after editing Makefile.PL:>
-
-    perl Makefile.PL
+0.005.2
 
 =head1 DESCRIPTION
 
-C<Database::BI> is a L<Mojolicious> web application that reads arbitrary
+C<Database::BI> is a self-contained L<Mojolicious> web application that reads arbitrary
 flat data files (CSV, PSV, SQLite, XML, etc.) via L<Database::Abstraction>
 and presents them as styled, sortable, reorderable HTML tables.
+It has no persistent database of its own,
+it reads arbitrary data files (CSV, PSV, SQLite, XML etc) presents each file as a styled, sortable, exportable HTML table.
+
+Users navigate to pick a file, open the filesystem browser to navigate anywhere on disk, drag-and-drop files to upload, join multiple tables in memory, apply server-side filters, and export results as CSV, SQLite, or JSON.
+A D3.js line graph view plots any numeric column.
 
 Key features:
 
@@ -114,6 +90,35 @@ the current logical view (after joins and filters) to a chosen filesystem
 path as CSV (C<.csv>) or SQLite (C<.sql>).
 
 =back
+
+=head1 SYNOPSIS
+
+B<Start the development server (restarts automatically when you edit a file):>
+
+    morbo script/database-bi
+
+B<Start the production server:>
+
+    hypnotoad script/database-bi
+
+B<Use a different data directory:>
+
+    # In database_bi.conf (create this file in the same folder as script/):
+    { data_dir => '/home/user/data' }
+
+B<Change the language used for templates:>
+
+    # In database_bi.conf:
+    { data_dir => 'data', language => 'fr', platform => 'web' }
+    # Then create templates/web/fr/ and put your French .html.tt files there.
+
+B<Run the test suite to verify everything is working:>
+
+    make test
+
+B<Generate the Makefile for the first time or after editing Makefile.PL:>
+
+    perl Makefile.PL
 
 =head1 ROUTES
 

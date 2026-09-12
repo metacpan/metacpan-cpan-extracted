@@ -13,6 +13,8 @@ use Test::More;
 use blib;
 use Shared::Arena;
 
+plan skip_all => 'no atomics in this build' unless Shared::Arena::have_atomics();
+
 my $arena = Shared::Arena->create(size => 4 << 20);
 my $cache = $arena->cache('c', capacity => 256, entry_size => 512);
 my $map   = $arena->map('m', slots => 256, slot_size => 512);
@@ -38,12 +40,17 @@ my $ring  = $arena->ring('r', slots => 64, slot_size => 512);
 
     # `set` is ours outright. `get` is a name Frozen compiles too, and Frozen
     # is a prerequisite so it is always loaded and always gets there first -
-    # which leaves the method op to us and the entersub to it. So `get`
-    # reaches no door of ours and counts no hit, and that is the arrangement
-    # working rather than failing. See sa_xop.h on why the op is not taken
-    # back.
+    # which leaves the method op to us and the entersub to it. So at `get` the
+    # method op makes the whole call itself and skips the entersub; see
+    # sa_xop.h on why the entersub is not taken back.
     cmp_ok($methonly, '>', 0,
            'and at least one call site is shared with another dist');
+
+    Shared::Arena::_xop_reset();
+    my $again = $cache->get('k');
+    (undef, $hits) = Shared::Arena::_xop_stats();
+    is($again, 'v', 'a shared get site answers');
+    is($hits, 1, 'through a door of ours, not an ordinary call');
 }
 
 # ---------------------------------------------------------------------------
@@ -215,6 +222,35 @@ my $ring  = $arena->ring('r', slots => 64, slot_size => 512);
 }
 
 # ---------------------------------------------------------------------------
+# And a third
+#
+# The cuckoo filter answers to `add` and `check` as well, so both doors cover
+# it beside the bloom filter, and `check` is a two-class door the way `add`
+# already was. The same two assertions: every call took the op path, and the
+# answers are the ones the XSUB gives.
+{
+    my $ck = $arena->cuckoo('ck', capacity => 1000);
+    my $b3 = $arena->bloom('b3', capacity => 1000);
+    my $xs_add   = Shared::Arena::Cuckoo->can('add');
+    my $xs_check = Shared::Arena::Cuckoo->can('check');
+
+    Shared::Arena::_xop_reset();
+
+    is($ck->add('x'), 1, 'the cuckoo filter stores a key');
+    is($ck->check('x'), 1, 'and finds it');
+    is($ck->check('never'), 0, 'and does not find one it was never given');
+    is($b3->check('x'), 0, 'while the bloom filter at the same door keeps its own answer');
+
+    my (undef, $hits, $miss) = Shared::Arena::_xop_stats();
+    is($hits, 4, 'every one of those took the op path');
+    is($miss, 0, 'and none of them had to decline');
+
+    is($ck->add('y'), $ck->$xs_add('z'), 'cuckoo add: op path and XSUB agree');
+    is($ck->check('y'), $ck->$xs_check('z'), 'cuckoo check: same present');
+    is($ck->check('q'), $ck->$xs_check('w'), 'cuckoo check: same absent');
+}
+
+# ---------------------------------------------------------------------------
 # Sharing a call site with the dist we depend on
 #
 # Frozen compiles `->get($k)` into an opcode exactly as this does, and both are
@@ -272,19 +308,82 @@ my $ring  = $arena->ring('r', slots => 64, slot_size => 512);
 }
 
 {
-    # A different arity than the one hooked takes the ordinary path, which is
-    # how the optional arguments keep working.
+    # An optional argument is a door of its own width, so the wider forms take
+    # the op path too - and must answer as the XSUB does.
+    my $xs_set = Shared::Arena::Cache->can('set');
+    my $xs_ctr = Shared::Arena::Map->can('counter');
+
     Shared::Arena::_xop_reset();
-    $cache->set('ttl', 'v', ttl => 60);
+    is($cache->set('ttl', 'v', ttl => 60),
+       $cache->$xs_set('ttl2', 'v', ttl => 60), 'set with a ttl: same return');
+    is($cache->set('ttlms', 'v', ttl_ms => 60_000), 1, 'and with ttl_ms');
     is($cache->get('ttl'), 'v', 'set with a ttl still stores');
 
     my $c1 = $map->incr('by');
     my $c2 = $map->incr('by', 5);
     is($c2, $c1 + 5, 'incr with a step still steps');
+    is($map->incr('by', -2), $c2 - 2, 'and a negative step counts down');
+    is($map->counter('by'), $map->$xs_ctr('by'), 'counter: same value both ways');
+    is($map->counter('a'), undef, 'counter: undef for a key holding a string');
+    is($map->counter('never'), undef, 'and for a key that is not there');
 
+    my %before = $hist->stats;
     $hist->record(7, 3);
-    my (undef, $hits) = Shared::Arena::_xop_stats();
-    ok($hits < 5, "the extra-argument forms went the long way ($hits)");
+    my %after = $hist->stats;
+    is($after{count} - $before{count}, 3, 'record with a count counts that many');
+
+    my (undef, $hits, $miss) = Shared::Arena::_xop_stats();
+    is($hits, 10, 'every wider form took the op path');
+    is($miss, 0, 'and none of them declined');
+
+    # An option name the door does not know is the XSUB's to handle.
+    Shared::Arena::_xop_reset();
+    is($cache->set('odd', 'v', bogus => 1), 1, 'an unknown option still stores');
+    (undef, $hits) = Shared::Arena::_xop_stats();
+    is($hits, 0, 'by the ordinary path');
+
+    # A void door answers ONE undef in scalar context, as the XSUB does.
+    my @one = map { scalar $hist->record($_) } 1 .. 3;
+    is(scalar @one, 3, 'record in scalar context is one undef per call');
+    my @two = map { scalar $hist->record($_, 2) } 1 .. 3;
+    is(scalar @two, 3, 'and so is the two-argument form');
+}
+
+{
+    my $rl = $arena->rate('rl3', limit => 10, window => 60, slots => 64);
+    my $xs_rem   = Shared::Arena::Rate->can('remaining');
+    my $xs_retry = Shared::Arena::Rate->can('retry_after');
+
+    Shared::Arena::_xop_reset();
+    ok($rl->allow('k', 4), 'allow with a cost');
+    my ($op, $xs) = ($rl->remaining('k'), $rl->$xs_rem('k'));
+    cmp_ok(abs($op - $xs), '<', 0.01, 'remaining: same both ways');
+    cmp_ok($op, '>', 5.9, 'and the cost was spent');
+    cmp_ok($op, '<', 6.1, 'all of it');
+    ok($rl->allow('k', 6), 'the rest of the budget');
+    ok(!$rl->allow('k', 1), 'and then nothing');
+    ($op, $xs) = ($rl->retry_after('k'), $rl->$xs_retry('k'));
+    cmp_ok($op, '>', 0, 'retry_after says how long');
+    cmp_ok(abs($op - $xs), '<', 0.01, 'and agrees with the XSUB');
+
+    # allow three times, remaining once, retry_after once; the two $xs_ calls
+    # are the ordinary path by construction.
+    my (undef, $hits, $miss) = Shared::Arena::_xop_stats();
+    is($hits, 5, 'every limiter call above took the op path');
+    is($miss, 0, 'and none of them declined');
+}
+
+{
+    my $cms = $arena->countmin('cm2', error => 0.001, confidence => 0.99);
+    my $xs_add = Shared::Arena::CountMin->can('add');
+    is($cms->add('k', 5), 5, 'a sketch add with a count');
+    is($cms->add('k', 5), 10, 'counts on');
+    is($cms->$xs_add('k', 5), 15, 'and the XSUB agrees on the running total');
+
+    my $bl = $arena->bloom('b4', capacity => 100);
+    my $err = '';
+    eval { $bl->add('x', 2); 1 } or $err = $@;
+    like($err, qr/Usage/, 'a filter given a count gets the ordinary usage error');
 }
 
 # ---------------------------------------------------------------------------

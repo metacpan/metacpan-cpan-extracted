@@ -1089,6 +1089,17 @@ static int sa_group_claim(sa_ring *r, sa_group *g, sa_cursor *scratch,
     return SA_READ_PENDING;
 }
 
+#else /* !SA_HAVE_ATOMICS */
+
+/* No atomics, so no group: sa_group_new is not compiled and the XS refuses to
+ * make one. Releasing touches nothing shared, though, so the release is the
+ * same one, here so that DESTROY and the ABI table have it in this build. */
+static void sa_group_free(sa_group_h *gh) {
+    if (!gh) return;
+    if (gh->scratch) sa_cursor_free(gh->scratch);
+    free(gh);
+}
+
 #endif /* SA_HAVE_ATOMICS */
 
 #endif /* SA_RING_H */

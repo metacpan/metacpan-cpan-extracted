@@ -1473,5 +1473,9 @@ t/psgi-body.t
 t/psgi-response-headers.t
 t/static-no-plack.t
 t/pagi-lifespan-callbacks.t
+t/22-cgi-request-cookies.t
+t/pagi-redirect-content-type.t
+t/psgi-response-bytes.t
+t/22-cgi-param-utf8.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

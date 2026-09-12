@@ -1,5 +1,5 @@
 ---
-abstract: 'PayProp API Public Client'
+abstract: '(DEPRECATED) PayProp API client.'
 author:
   - 'Yanga Kandeni <yangak@cpan.org>'
 build_requires:
@@ -8,9 +8,9 @@ build_requires:
   Test::Most: '0'
   lib: '0'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +18,102 @@ meta-spec:
 name: PayProp-API-Public-Client
 no_index:
   directory:
-    - eg
-    - examples
-    - inc
-    - share
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  PayProp::API::Public::Client:
+    file: lib/PayProp/API/Public/Client.pm
+    version: '1.04'
+  PayProp::API::Public::Client::Authorization::APIKey:
+    file: lib/PayProp/API/Public/Client/Authorization/APIKey.pm
+  PayProp::API::Public::Client::Authorization::Base:
+    file: lib/PayProp/API/Public/Client/Authorization/Base.pm
+  PayProp::API::Public::Client::Authorization::ClientCredentials:
+    file: lib/PayProp/API/Public/Client/Authorization/ClientCredentials.pm
+  PayProp::API::Public::Client::Authorization::Storage::Local:
+    file: lib/PayProp/API/Public/Client/Authorization/Storage/Local.pm
+  PayProp::API::Public::Client::Authorization::Storage::Memcached:
+    file: lib/PayProp/API/Public/Client/Authorization/Storage/Memcached.pm
+  PayProp::API::Public::Client::Error::Authorization:
+    file: lib/PayProp/API/Public/Client/Error/Authorization.pm
+  PayProp::API::Public::Client::Error::Response:
+    file: lib/PayProp/API/Public/Client/Error/Response.pm
+  PayProp::API::Public::Client::Exception::Authorization:
+    file: lib/PayProp/API/Public/Client/Exception/Authorization.pm
+  PayProp::API::Public::Client::Exception::Base:
+    file: lib/PayProp/API/Public/Client/Exception/Base.pm
+  PayProp::API::Public::Client::Exception::Connection:
+    file: lib/PayProp/API/Public/Client/Exception/Connection.pm
+  PayProp::API::Public::Client::Exception::Response:
+    file: lib/PayProp/API/Public/Client/Exception/Response.pm
+  PayProp::API::Public::Client::Exception::Storage:
+    file: lib/PayProp/API/Public/Client/Exception/Storage.pm
+  PayProp::API::Public::Client::Request::Entity:
+    file: lib/PayProp/API/Public/Client/Request/Entity.pm
+  PayProp::API::Public::Client::Request::Entity::Invoice:
+    file: lib/PayProp/API/Public/Client/Request/Entity/Invoice.pm
+  PayProp::API::Public::Client::Request::Entity::Payment:
+    file: lib/PayProp/API/Public/Client/Request/Entity/Payment.pm
+  PayProp::API::Public::Client::Request::Export:
+    file: lib/PayProp/API/Public/Client/Request/Export.pm
+  PayProp::API::Public::Client::Request::Export::Beneficiaries:
+    file: lib/PayProp/API/Public/Client/Request/Export/Beneficiaries.pm
+  PayProp::API::Public::Client::Request::Export::Tenants:
+    file: lib/PayProp/API/Public/Client/Request/Export/Tenants.pm
+  PayProp::API::Public::Client::Request::Tags:
+    file: lib/PayProp/API/Public/Client/Request/Tags.pm
+  PayProp::API::Public::Client::Response::Entity::Invoice:
+    file: lib/PayProp/API/Public/Client/Response/Entity/Invoice.pm
+  PayProp::API::Public::Client::Response::Entity::Payment:
+    file: lib/PayProp/API/Public/Client/Response/Entity/Payment.pm
+  PayProp::API::Public::Client::Response::Export::Beneficiary:
+    file: lib/PayProp/API/Public/Client/Response/Export/Beneficiary.pm
+  PayProp::API::Public::Client::Response::Export::Beneficiary::Address:
+    file: lib/PayProp/API/Public/Client/Response/Export/Beneficiary/Address.pm
+  PayProp::API::Public::Client::Response::Export::Beneficiary::Property:
+    file: lib/PayProp/API/Public/Client/Response/Export/Beneficiary/Property.pm
+  PayProp::API::Public::Client::Response::Export::Tenant:
+    file: lib/PayProp/API/Public/Client/Response/Export/Tenant.pm
+  PayProp::API::Public::Client::Response::Export::Tenant::Address:
+    file: lib/PayProp/API/Public/Client/Response/Export/Tenant/Address.pm
+  PayProp::API::Public::Client::Response::Export::Tenant::Property:
+    file: lib/PayProp/API/Public/Client/Response/Export/Tenant/Property.pm
+  PayProp::API::Public::Client::Response::Tag:
+    file: lib/PayProp/API/Public/Client/Response/Tag.pm
+  PayProp::API::Public::Client::Role::APIRequest:
+    file: lib/PayProp/API/Public/Client/Role/APIRequest.pm
+  PayProp::API::Public::Client::Role::Attribute::APIVersion:
+    file: lib/PayProp/API/Public/Client/Role/Attribute/APIVersion.pm
+  PayProp::API::Public::Client::Role::Attribute::Authorization:
+    file: lib/PayProp/API/Public/Client/Role/Attribute/Authorization.pm
+  PayProp::API::Public::Client::Role::Attribute::Domain:
+    file: lib/PayProp/API/Public/Client/Role/Attribute/Domain.pm
+  PayProp::API::Public::Client::Role::Attribute::Storage:
+    file: lib/PayProp/API/Public/Client/Role/Attribute/Storage.pm
+  PayProp::API::Public::Client::Role::Attribute::Token:
+    file: lib/PayProp/API/Public/Client/Role/Attribute/Token.pm
+  PayProp::API::Public::Client::Role::Attribute::UA:
+    file: lib/PayProp/API/Public/Client/Role/Attribute/UA.pm
+  PayProp::API::Public::Client::Role::Encrypt:
+    file: lib/PayProp/API/Public/Client/Role/Encrypt.pm
+  PayProp::API::Public::Client::Role::JSON:
+    file: lib/PayProp/API/Public/Client/Role/JSON.pm
+  PayProp::API::Public::Client::Role::Request:
+    file: lib/PayProp/API/Public/Client/Role/Request.pm
+  PayProp::API::Public::Client::Role::Storage:
+    file: lib/PayProp/API/Public/Client/Role/Storage.pm
+  PayProp::API::Public::Client::Util::APIRequest:
+    file: lib/PayProp/API/Public/Client/Util/APIRequest.pm
+  PayProp::API::Public::Client::Util::Request:
+    file: lib/PayProp/API/Public/Client/Util/Request.pm
+  Test::PayProp::API::Public::Emulator:
+    file: lib/Test/PayProp/API/Public/Emulator.pm
 requires:
   Cache::Memcached: '0'
   Crypt::CBC: '0'
@@ -44,14 +134,12 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/Humanstate/api-client-public-module/issues
-  homepage: https://github.com/Humanstate/api-client-public-module
-  repository: https://github.com/Humanstate/api-client-public-module.git
-version: '0.04'
+  bugtracker: https://github.com/payprop/api-client-public-module/issues
+  homepage: https://github.com/payprop/api-client-public-module
+  repository: https://github.com/payprop/api-client-public-module.git
+version: '1.04'
 x_contributors:
   - 'Valters Skrupskis <valters.skrupskis@humanstate.com>'
-  - 'yangakandeni <kandeni.yanga@gmail.com>'
-x_generated_by_perl: v5.32.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+  - 'Yanga <kandeni.yanga@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

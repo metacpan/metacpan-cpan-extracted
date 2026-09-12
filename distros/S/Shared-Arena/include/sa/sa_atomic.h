@@ -36,7 +36,16 @@
 #  define SA_ATOMIC_GNU 1
 #endif
 
-#if defined(SA_ATOMIC_GNU)
+/* SA_NO_ATOMICS is Makefile.PL's verdict, and it outranks every family check
+ * below. The probe compiles AND links a 64-bit compare-and-swap, so it sees the
+ * one case those checks cannot: a compiler that has the builtins on a target
+ * where they fail to link. Until 0.03 the define was set and nothing read it,
+ * so that target built the atomic paths anyway and failed at dlopen. It is also
+ * how a build with no atomics is compiled and tested on a machine that has
+ * them:  make DEFINE=-DSA_NO_ATOMICS */
+#if defined(SA_NO_ATOMICS)
+#  define SA_HAVE_ATOMICS 0
+#elif defined(SA_ATOMIC_GNU)
 #  define SA_HAVE_ATOMICS 1
 #elif defined(__GNUC__) \
     && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1))
@@ -305,6 +314,58 @@ static int sa_at_lock(volatile unsigned char *locks, uint64_t h) {
     return 1;
 }
 
+static void sa_at_unlock(volatile unsigned char *locks, uint64_t h) {
+    sa_at_clear(&locks[h % SA_LOCK_STRIPES]);
+}
+
+#else /* !SA_HAVE_ATOMICS */
+
+/* COMPILE-ONLY, AND NEVER REACHED. With no atomics sa_map_open refuses, so no
+ * region is ever created or attached and no tenant or handle ever exists to
+ * call any of these. They are here so that every caller need not be wrapped in
+ * #if SA_HAVE_ATOMICS: most callers were not, and the configuration this file
+ * calls supported did not build until 0.03. Plain accesses, which are right
+ * for one thread and would be wrong across processes; nothing runs them. */
+static int sa_at_tas(volatile unsigned char *l) {
+    int was = *l != 0;
+    *l = 1;
+    return was;
+}
+static void sa_at_clear(volatile unsigned char *l) { *l = 0; }
+static uint32_t sa_at_load32_acq(volatile uint32_t *p) { return *p; }
+static void sa_at_store32_rel(volatile uint32_t *p, uint32_t v) { *p = v; }
+static uint64_t sa_at_load64_acq(volatile uint64_t *p) { return *p; }
+static void sa_at_store64_rel(volatile uint64_t *p, uint64_t v) { *p = v; }
+static uint64_t sa_at_fetch_add64(volatile uint64_t *p, uint64_t n) {
+    uint64_t was = *p;
+    *p = was + n;
+    return was;
+}
+static uint32_t sa_at_fetch_add32(volatile uint32_t *p, uint32_t n) {
+    uint32_t was = *p;
+    *p = was + n;
+    return was;
+}
+static uint64_t sa_at_fetch_or64(volatile uint64_t *p, uint64_t bits) {
+    uint64_t was = *p;
+    *p = was | bits;
+    return was;
+}
+static int sa_at_cas64(volatile uint64_t *p, uint64_t expect, uint64_t want) {
+    if (*p != expect) return 0;
+    *p = want;
+    return 1;
+}
+static int sa_at_cas32(volatile uint32_t *p, uint32_t expect, uint32_t want) {
+    if (*p != expect) return 0;
+    *p = want;
+    return 1;
+}
+static void sa_at_fence_rel(void) { }
+static void sa_at_fence_acq(void) { }
+static int sa_at_lock(volatile unsigned char *locks, uint64_t h) {
+    return !sa_at_tas(&locks[h % SA_LOCK_STRIPES]);
+}
 static void sa_at_unlock(volatile unsigned char *locks, uint64_t h) {
     sa_at_clear(&locks[h % SA_LOCK_STRIPES]);
 }

@@ -90,12 +90,13 @@
          "web" : "https://github.com/djzort/NetAddr-MAC"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_contributors" : [
       "Dean Hamstead <djzort@cpan.org>",
+      "Dean Hamstead <djzort@fragfest.com.au>",
       "James C Sinclair <james.sinclair@linode.com>",
       "Jon Miner <jon.miner@wisc.edu>",
       "Oliver Gorwits <oliver@cpan.org>"

@@ -100,11 +100,11 @@ subtest '_detect_file_info -- FD lifecycle: no handle accumulation over repeated
 };
 
 subtest '_detect_file_info -- FD lifecycle: handle closed when file is empty (no header)' => sub {
-	# <$fh> returns undef for an empty file; close($fh) must still be called
-	# before the "next unless defined $line" guard (DataSource.pm line 273).
+	# A 0-byte file returns the _file_is_empty sentinel (not {}); the handle
+	# is explicitly closed before returning so there is no FD leak.
 	Mojo::File->new("$DIR/empty_hdr.csv")->spew('');
 	my $info = $DETECT_INFO->($DIR, 'empty_hdr');
-	is_deeply $info, {}, 'empty file returns {} (no header parsed)';
+	ok $info->{_file_is_empty}, 'empty file returns _file_is_empty sentinel';
 	SKIP: {
 		skip '/proc/self/fd not available (non-Linux)', 1
 			unless -d '/proc/self/fd';

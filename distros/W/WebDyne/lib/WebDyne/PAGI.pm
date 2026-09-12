@@ -64,7 +64,7 @@ my %ENV_BASE=(
 
 #  Version information
 #
-$VERSION='3.028';
+$VERSION='3.029';
 
 
 #==================================================================================================
@@ -688,10 +688,14 @@ sub handler_http {
             $r->res->content_type($r->content_type() || $WEBDYNE_CONTENT_TYPE_HTML);
         }
 
-        #  PAGI requires lowercase names in response events. Normalize only
-        #  the outgoing header pairs, preserving values, order and duplicates.
+        #  Encode character strings, but preserve byte strings from files and R2.
         #
-        my $respond_or=$r->res->send($body)->respond(sub {
+        my $send_method=utf8::is_utf8($body) ? 'send' : 'send_raw';
+        my $respond_or=$r->res->$send_method($body)->respond(sub {
+
+            #  PAGI requires lowercase names in response events. Normalize only
+            #  the outgoing header pairs, preserving values, order and duplicates.
+            #
             my $event_hr=shift();
             if ($event_hr->{'type'} eq 'http.response.start') {
                 $event_hr={

@@ -261,6 +261,18 @@
 [% END %]
 
 <script>
+// parseAccounting is defined at module scope (outside any IIFE) so it is
+// accessible from all script blocks on this page — the sort block uses it for
+// numeric column detection, and the graph panel's isNumericVal delegates to it.
+function parseAccounting(v) {
+  if (v === '') return NaN;
+  var s   = v.trim();
+  var neg = /^\(.*\)$/.test(s);      // (value) means negative
+  s = s.replace(/[^\d.\-]/g, '');    // strip $, commas, parens, spaces, etc.
+  var n = parseFloat(s);
+  return isNaN(n) ? NaN : (neg ? -Math.abs(n) : n);
+}
+
 (function () {
   var table = document.getElementById('bi-table');
   if (!table) return;
@@ -308,19 +320,6 @@
   }
 
   // --- Sort ---
-
-  // Parses an accounting-style value to a float.
-  // Handles: ($1,234.56) -> -1234.56, $1,234.56 -> 1234.56, -15.00 -> -15.
-  // Parentheses around a value indicate a negative number (accounting convention).
-  // Returns NaN if the value cannot be parsed as a number.
-  function parseAccounting(v) {
-    if (v === '') return NaN;
-    var s   = v.trim();
-    var neg = /^\(.*\)$/.test(s);      // (value) means negative
-    s = s.replace(/[^\d.\-]/g, '');    // strip $, commas, parens, spaces, etc.
-    var n = parseFloat(s);
-    return isNaN(n) ? NaN : (neg ? -Math.abs(n) : n);
-  }
 
   // Returns a YYYYMMDD integer sort key for recognised date strings, else null.
   // Handles YYYY-MM-DD (ISO) and M/D/YYYY or D/M/YYYY slash formats.

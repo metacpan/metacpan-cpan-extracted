@@ -1449,4 +1449,98 @@ subtest 'Transaction 22: Graph button disabled when no numeric column' => sub {
 			'Phase 4: auto-selected label text present in page source');
 };
 
+# ======================================================================
+# TRANSACTION 23: Reference lines on line graph (0.005.2)
+#
+# Verifies that the /graph page includes Min/Avg/Max reference-line
+# checkboxes populated with server-computed values, the JS block that
+# patches `redraw` to recalculate lines on zoom/reset, and the HTML::D3
+# y-domain fix that lets negative Y values appear within the chart area.
+#
+# Lifecycle:
+#   Phase 1  GET /graph?l=table:sales&x=product&y=amount
+#            -> rl-min, rl-avg, rl-max checkboxes present
+#   Phase 2  Label text shows correct server-computed values
+#            (sales.csv amounts min=725.25, max=2100.00, avg=1296)
+#   Phase 3  Reference-line JS block present: drawRefLines, REF
+#            recalculation, _origRedraw patch, setTimeout deferral,
+#            toPrecision(4) label update
+#   Phase 4  HTML::D3 >= 0.11 y-domain fix present in snippet JS:
+#            Math.min(0, d3.min) rather than hard-coded 0
+#   Phase 5  .graph-export-bar uses align-items:center so "Plotting N"
+#            text is vertically centred with buttons and checkboxes
+#   Phase 6  Accounting-notation negative amounts render correctly:
+#            ref_min_y is negative and page contains the y-domain fix
+# ======================================================================
+
+subtest 'Transaction 23: Reference lines on line graph' => sub {
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 23;
+
+		# Phase 1 + 2: sales.csv graph shows checkboxes and correct values.
+		# amounts: 1250.00 875.50 2100.00 950.00 1875.00 725.25
+		#   min=725.25  max=2100.00  avg=sprintf('%.4g',7775.75/6)=1296
+		$t->get_ok('/graph?l=table:sales&x=product&y=amount')
+			->status_is(200, 'Phase 1: /graph with valid params returns 200')
+			->content_like(qr/id="rl-min"/,
+				'Phase 1: Min reference-line checkbox (rl-min) present')
+			->content_like(qr/id="rl-avg"/,
+				'Phase 1: Avg reference-line checkbox (rl-avg) present')
+			->content_like(qr/id="rl-max"/,
+				'Phase 1: Max reference-line checkbox (rl-max) present')
+			->content_like(qr/graph-refline-controls/,
+				'Phase 1: refline controls container present in export bar');
+
+		$t->content_like(qr/Min \(725\.25\)/,
+			'Phase 2: Min label shows 725.25 (lowest sales amount)')
+		  ->content_like(qr/Max \(2100/,
+			'Phase 2: Max label shows 2100 (highest sales amount)')
+		  ->content_like(qr/Avg \(1296\)/,
+			'Phase 2: Avg label shows 1296 (%.4g of 7775.75/6)');
+
+		# Phase 3: reference-line JS block contains the required identifiers.
+		$t->content_like(qr/function drawRefLines/,
+			'Phase 3: drawRefLines function defined in graph page JS')
+		  ->content_like(qr/toPrecision\(4\)/,
+			'Phase 3: toPrecision(4) used for label update (matches %.4g)')
+		  ->content_like(qr/setTimeout\(drawRefLines/,
+			'Phase 3: drawRefLines deferred via setTimeout (runs after transition)')
+		  ->content_like(qr/REF\.min\s*=\s*Math\.min/,
+			'Phase 3: REF.min recalculated from newData on zoom/reset')
+		  ->content_like(qr/_origRedraw/,
+			'Phase 3: global redraw patched (_origRedraw identifier present)');
+
+		# Phase 4: HTML::D3 >= 0.11 y-domain lower bound fix.
+		$t->content_like(qr/Math\.min\(0,\s*d3\.min/,
+			'Phase 4: y-domain lower bound uses Math.min(0,d3.min) not hard-coded 0');
+
+		# Phase 5: export bar vertical alignment.
+		$t->content_like(qr/align-items\s*:\s*center/,
+			'Phase 5: align-items:center present (centres point-count with buttons)');
+
+		# Phase 6: accounting-notation negative amounts.
+		# Upload a CSV with parenthesised negatives; /graph must return 200 and
+		# show a negative ref_min_y in the Min checkbox label.
+		my $acct_csv = "date,amount\n" .
+			"2025-01-01,(450.00)\n" .
+			"2025-01-02,(200.00)\n" .
+			"2025-01-03,300.00\n"   .
+			"2025-01-04,150.00\n";
+
+		$t->post_ok('/upload',
+			{ 'Content-Type' => 'multipart/form-data' },
+			form => { file => { content => $acct_csv, filename => 'acct.csv' } },
+		)->status_is(200, 'Phase 6: accounting-notation CSV uploaded');
+		my $acct_path = decode_json($t->tx->res->body)->{path};
+		ok defined $acct_path, 'Phase 6: upload returned a path';
+
+		$t->get_ok('/graph?l=' . url_escape("path:$acct_path") . '&x=date&y=amount')
+			->status_is(200, 'Phase 6: /graph for accounting-notation CSV returns 200')
+			->content_like(qr/Min \(-/,
+				'Phase 6: ref_min_y is negative (accounting negatives below 0)')
+			->content_like(qr/Math\.min\(0,\s*d3\.min/,
+				'Phase 6: y-domain extends below 0 so negatives are visible');
+	}
+};
+
 done_testing();

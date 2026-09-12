@@ -1,3 +1,5 @@
+#!perl
+
 use strict;
 use warnings;
 
@@ -14,6 +16,8 @@ my @properties = qw(
           mac_is_vrrp4     mac_is_vrrp6
           mac_is_hsrp      mac_is_hsrp2
           mac_is_msnlb
+          mac_is_ipv4_multicast
+          mac_is_ipv6_multicast
           mac_is_local     mac_is_universal
 );
 

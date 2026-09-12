@@ -23,6 +23,7 @@ my @files = (
     't/131-utils-mac-properties.t',
     't/132-utils-mac-normals.t',
     't/133-random.t',
+    't/134-ip-multicast.t',
     't/140-new.t',
     't/150-misc-bad-formats-via-die.t',
     't/author-critic.t',

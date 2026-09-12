@@ -13,7 +13,7 @@ has ua => (
 	lazy => 1,
 	default => sub {
 		my $UA = Mojo::UserAgent->new
-			->insecure(1)
+			->insecure(0)
 			->max_redirects(1)
 			->connect_timeout(10)
 			->inactivity_timeout(10)

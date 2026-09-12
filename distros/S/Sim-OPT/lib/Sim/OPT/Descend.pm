@@ -26,7 +26,7 @@ use Sim::OPT::Interlinear;
 use Sim::OPT::Parcoord3d;
 use Sim::OPT::Stats;
 eval { use Sim::OPTcue::OPTcue; 1 };
-eval { use Sim::OPTcue::Metabridge; 1 };
+eval { use Sim::OPT::Metabridge; 1 };
 eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
 eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
 eval { use Sim::OPTcue::Exogen::Armijo; 1 };
@@ -60,7 +60,7 @@ no warnings;
 
 our @EXPORT = qw( descend prepareblank tee ); # our @EXPORT = qw( );
 
-$VERSION = '0.182'; # our $VERSION = '';
+$VERSION = '0.183'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -3561,48 +3561,39 @@ for ( my $i = 0 ; $i < $max ; $i++ )
       $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r ) = @_;
 
     my %dowhat = %$dowhat_r;
-
     return unless ( defined($dowhat{metamodel}) && $dowhat{metamodel} eq "y" );
 
-    # -----------------------------------------------------------------
-    # Metamodel dispatch (new semantics)
-    #
-    #  $dowhat{altmetamodel} = "" (or undef)  => OPTcue not present, Interlinear only (dwgn)
-    #  $dowhat{altmetamodel} = "cue"          => OPTcue + Metabridge available (notify)
-    #
-    # Method selection is by $dowhat{canon}:
-    #  $dowhat{canon} = "" (or undef)         => Interlinear (dwgn)
-    #  $dowhat{canon} = "NeuralBoltzmann" ... => Metabridge dispatch
-    #
-    # Backward compatibility:
-    #  * $dowhat{altmetamodel} = "y" is treated as "cue".
-    #  * $dowhat{metamodeltreaty} overrides altmetamodel if set.
-    # -----------------------------------------------------------------
-    my $treaty = defined($dowhat{altmetamodel}) ? $dowhat{altmetamodel} : "";
-    $treaty = $dowhat{metamodeltreaty} if defined($dowhat{metamodeltreaty}) && $dowhat{metamodeltreaty} ne "";
-    $treaty = "cue" if defined($treaty) && lc($treaty) eq "y";
-
-    if ( defined($treaty) && lc($treaty) eq "cue" )
-    {
-      require Sim::OPTcue::OPTcue;
-      return Sim::OPTcue::OPTcue::notify(
-        $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
-        $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r
-      );
-    }
-
-    return dwgn(
+    # A single open dispatcher owns metamodel selection.  Descend deliberately
+    # does not inspect engine names or proprietary/open namespaces here.
+    require Sim::OPT::Metabridge;
+    return Sim::OPT::Metabridge::notify(
       $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
       $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r
     );
   }
 
 
-
   sub dwgn
   {
+    my @args = @_;
+    require Sim::OPT::Interlinear;
+    return gradientmetamodel(
+      @args,
+      { name => "dwgn", code => \&Sim::OPT::Interlinear::interlinear }
+    );
+  }
+
+
+  sub gradientmetamodel
+  {
     my ( $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
-      $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r ) = @_;
+      $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r, $backend_r ) = @_;
+
+    die "gradientmetamodel: backend specification missing\n"
+      unless ref($backend_r) eq "HASH" && ref($backend_r->{code}) eq "CODE";
+    my $backend_name = defined($backend_r->{name}) && $backend_r->{name} ne ""
+      ? $backend_r->{name} : "gradient";
+    my $backend_code = $backend_r->{code};
 
     my %dowhat = %$dowhat_r;
     my %dirfiles = %$dirfiles_r;
@@ -3820,15 +3811,17 @@ for ( my $i = 0 ; $i < $max ; $i++ )
       close $PF;
     }
 
-    say "!!!!!ABOUT TO CALL INTERLINEAR WITH " . dump( @prepfile_lines );
+    say "!!!!!ABOUT TO CALL METAMODEL ENGINE $backend_name WITH " . scalar( @prepfile_lines ) . " PREPARED LATTICE ROWS";
     my $rawmetafile = $metafile . "_tmp_raw.csv";
-    my ( $arr_r, $fulls_r ) = Sim::OPT::Interlinear::interlinear( $sortmixed, $confinterlinear, 
-      $rawmetafile, \@blockelts, $tofile, $countblock, 
-      $dowhat_r, $dirfiles_r, \@prepfile_lines );
+    my ( $arr_r, $fulls_r ) = $backend_code->(
+      $sortmixed, $confinterlinear, $rawmetafile, \@blockelts, $tofile, $countblock,
+      $dowhat_r, $dirfiles_r, \@prepfile_lines
+    );
+
     my @fulls = @$fulls_r;
 
-    say "!!!!! FROM INTERLINEAR IN DESCEND RETURNED NOT USED \@ARR " . dump( $arr_r );
-    say "!!!!! AND RETURNED NEWARR " . dump( @fulls );
+    say "!!!!! FROM METAMODEL ENGINE $backend_name IN DESCEND RETURNED NOT USED \@ARR " . dump( $arr_r );
+    say "!!!!! METAMODEL ENGINE $backend_name RETURNED NEWARR " . dump( @fulls );
     #open( my $RM, "<", $rawmetafile ) or die "Cannot open $rawmetafile: $!\n";
     #my @fulls = <$RM>;
     #close $RM;
@@ -3881,7 +3874,7 @@ for ( my $i = 0 ; $i < $max ; $i++ )
         . ( $skipped_rows ? " ($skipped_rows unresolved rows skipped)." : "." )
         if defined($weightordmeta) && $weightordmeta ne "";
     }
-  }  # END SUB DWGN
+  }  # END SUB gradientmetamodel
 
 
   # Resolve an instance identifier to its variable-level coordinates for

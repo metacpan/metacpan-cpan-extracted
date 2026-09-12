@@ -321,6 +321,27 @@ static uint64_t sa_cms_error(sa_cms *s) {
                       * (double)sa_at_load64_acq(&s->hdr->total));
 }
 
+#else /* !SA_HAVE_ATOMICS */
+
+/* No atomics, so no sketch: sa_cms_bind refuses. These answer the way the XSUBs
+ * do in that build, nothing counted and nothing estimated, so that the op doors
+ * and the ABI table have something to point at. */
+static uint64_t sa_cms_add(sa_cms *s, const char *key, uint32_t klen,
+                           uint64_t n)
+{
+    (void)s; (void)key; (void)klen; (void)n;
+    return 0;
+}
+
+static uint64_t sa_cms_estimate(sa_cms *s, const char *key, uint32_t klen) {
+    (void)s; (void)key; (void)klen;
+    return 0;
+}
+
+static void sa_cms_reset(sa_cms *s) { (void)s; }
+
+static uint64_t sa_cms_error(sa_cms *s) { (void)s; return 0; }
+
 #endif /* SA_HAVE_ATOMICS */
 
 #endif /* SA_CMS_H */

@@ -222,4 +222,57 @@ SKIP: {
            'and the cache never exceeded its capacity under contention');
 }
 
+# ---- the counts are exact across a fork ------------------------------------
+#
+# A process counts hits in its own handle and publishes them in batches, and a
+# fork copies whatever it has not published yet. The parent publishes its copy,
+# so the child must throw its own copy away or every fork counts the parent's
+# recent hits twice. Ten hits and three misses are left pending on purpose.
+SKIP: {
+    skip 'fork is POSIX-only here', 2 if $^O eq 'MSWin32';
+    require POSIX;
+
+    my $c = $arena->cache('tally', capacity => 64, ways => 8, entry_size => 128);
+    $c->set('k', 'v');
+    my %before = $c->stats;
+    $c->get('k')    for 1 .. 10;
+    $c->get('nope') for 1 .. 3;
+
+    my $KIDS = 4;
+    my @pids;
+    for my $kid (1 .. $KIDS) {
+        my $pid = fork();
+        die "fork: $!" unless defined $pid;
+        if (!$pid) {
+            $c->get('k')    for 1 .. 1000;
+            $c->get('nope') for 1 .. 100;
+            undef $c;                  # letting the handle go publishes
+            POSIX::_exit(0);
+        }
+        push @pids, $pid;
+    }
+    waitpid $_, 0 for @pids;
+
+    my %s = $c->stats;
+    is($s{hits} - $before{hits}, 10 + $KIDS * 1000,
+       'every hit in every process counted once - the ten pending at the fork '
+     . 'were not counted again by each child');
+    is($s{misses} - $before{misses}, 3 + $KIDS * 100, 'and every miss');
+}
+
+# ---- a value wider than the stack buffer -----------------------------------
+#
+# A get copies onto the stack when an entry is small enough, and allocates the
+# most an entry could hold when it is not. Both paths, both answers.
+{
+    my $c = $arena->cache('wide', capacity => 8, ways => 8, entry_size => 4096);
+    cmp_ok($c->max_pair, '>', 1024, 'an entry wider than the stack buffer');
+    my $big = join '', map { chr(65 + $_ % 26) } 1 .. 3000;
+    is($c->set('big', $big), 1, 'a 3000-byte value stored');
+    $c->set('small', 'v');
+    is(($c->get('big'))[0], $big, 'and it comes back whole');
+    is(($c->get('small'))[0], 'v', 'and so does a small one beside it');
+    is_deeply([$c->get('nope')], [], 'and a miss is still an empty list');
+}
+
 done_testing;

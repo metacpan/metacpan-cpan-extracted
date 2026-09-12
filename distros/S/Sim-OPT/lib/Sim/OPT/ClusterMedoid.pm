@@ -18,12 +18,13 @@ use Exporter 'import';
 use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
+use JSON::PP ();
 use List::Util qw(min max);
 use Text::CSV;
 
 our @EXPORT = qw(cluster_medoid);
 our @EXPORT_OK = qw(cluster_medoid run_cli);
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 our $ABSTRACT = 'Cluster discrete Sim::OPT problem landscapes with a hybrid arithmetic-geometric similarity and identify representative medoid instances.';
 
 sub cluster_medoid {
@@ -315,194 +316,576 @@ sub _run {
     };
 
     my $DIST_SCALE = 1_000_000_000;
-    my $D = "\0" x (4 * $n * $n);
-    my @row_sum_q = (0) x $n;
-    my $get_q = sub { return vec($D, $_[0] * $n + $_[1], 32); };
+    my $distance_q = sub {
+        my ($i, $j) = @_;
+        return 0 if $i == $j;
+        my $d = _clamp01(1 - $overall_similarity->($rows[$i], $rows[$j]));
+        return int($d * $DIST_SCALE + 0.5);
+    };
 
-    $self->_progress("Building distance matrix for $n rows...");
-    for my $i (0 .. $n - 1) {
-        for my $j ($i + 1 .. $n - 1) {
-            my $d = _clamp01(1 - $overall_similarity->($rows[$i], $rows[$j]));
-            my $q = int($d * $DIST_SCALE + 0.5);
-            vec($D, $i * $n + $j, 32) = $q;
-            vec($D, $j * $n + $i, 32) = $q;
-            $row_sum_q[$i] += $q;
-            $row_sum_q[$j] += $q;
-        }
+    # Exact PAM-style k-medoids needs a dense n x n distance matrix and
+    # quadratic medoid updates.  That is appropriate for small landscapes but
+    # not for StructureDesign surrogate lattices with hundreds of thousands of
+    # rows.  In automatic mode, retain the historical exact path while its
+    # matrix fits within the configured budget; otherwise use CLARA, the
+    # standard sampling extension of k-medoids for large data sets.
+    my $algorithm = exists($ccfg->{algorithm}) ? lc($ccfg->{algorithm}) : 'auto';
+    die "clustering.algorithm must be exact, clara, or auto\n"
+        unless $algorithm eq 'exact' || $algorithm eq 'clara' || $algorithm eq 'auto';
+    my $max_exact_matrix_bytes = exists($ccfg->{max_exact_matrix_bytes})
+        ? 0 + $ccfg->{max_exact_matrix_bytes}
+        : 512 * 1024 * 1024;
+    die "clustering.max_exact_matrix_bytes must be >= 0\n" if $max_exact_matrix_bytes < 0;
+    my $exact_matrix_bytes = 4 * $n * $n;
+    if ($algorithm eq 'auto') {
+        $algorithm = $exact_matrix_bytes <= $max_exact_matrix_bytes ? 'exact' : 'clara';
     }
-
-    my $init_medoids = sub {
-        my ($k) = @_;
-        my $first = 0;
-        for my $i (1 .. $n - 1) {
-            $first = $i if $row_sum_q[$i] < $row_sum_q[$first];
-        }
-        my @medoids = ($first);
-        my %is_medoid = ($first => 1);
-        while (@medoids < $k) {
-            my ($best_i, $best_nearest) = (-1, -1);
-            for my $i (0 .. $n - 1) {
-                next if $is_medoid{$i};
-                my $nearest = $get_q->($i, $medoids[0]);
-                for my $m (@medoids[1 .. $#medoids]) {
-                    my $q = $get_q->($i, $m);
-                    $nearest = $q if $q < $nearest;
-                }
-                if ($nearest > $best_nearest) {
-                    ($best_i, $best_nearest) = ($i, $nearest);
-                }
-            }
-            push @medoids, $best_i;
-            $is_medoid{$best_i} = 1;
-        }
-        return @medoids;
-    };
-
-    my $assign_to_medoids = sub {
-        my ($medoids) = @_;
-        my @assign;
-        for my $i (0 .. $n - 1) {
-            my ($best_c, $best_q) = (0, $get_q->($i, $medoids->[0]));
-            for my $c (1 .. $#$medoids) {
-                my $q = $get_q->($i, $medoids->[$c]);
-                if ($q < $best_q || ($q == $best_q && $medoids->[$c] < $medoids->[$best_c])) {
-                    ($best_c, $best_q) = ($c, $q);
-                }
-            }
-            $assign[$i] = $best_c;
-        }
-        return \@assign;
-    };
-
-    my $recompute_medoids = sub {
-        my ($k, $assign, $old_medoids) = @_;
-        my @members;
-        push @{$members[$assign->[$_]]}, $_ for 0 .. $n - 1;
-        my @new = @$old_medoids;
-        for my $c (0 .. $k - 1) {
-            next unless defined($members[$c]) && @{$members[$c]};
-            my @m = @{$members[$c]};
-            my @cost = (0) x @m;
-            for my $a (0 .. $#m) {
-                for my $b ($a + 1 .. $#m) {
-                    my $q = $get_q->($m[$a], $m[$b]);
-                    $cost[$a] += $q;
-                    $cost[$b] += $q;
-                }
-            }
-            my $best = 0;
-            for my $a (1 .. $#m) {
-                $best = $a if $cost[$a] < $cost[$best]
-                    || ($cost[$a] == $cost[$best] && $m[$a] < $m[$best]);
-            }
-            $new[$c] = $m[$best];
-        }
-        return \@new;
-    };
-
-    my $fit_kmedoids = sub {
-        my ($k) = @_;
-        my @medoids = $init_medoids->($k);
-        my $assign;
-        for my $iter (1 .. $max_iterations) {
-            $assign = $assign_to_medoids->(\@medoids);
-            my $new = $recompute_medoids->($k, $assign, \@medoids);
-            my $changed = 0;
-            for my $c (0 .. $k - 1) {
-                if ($new->[$c] != $medoids[$c]) { $changed = 1; last; }
-            }
-            @medoids = @$new;
-            last unless $changed;
-        }
-        $assign = $assign_to_medoids->(\@medoids);
-        return (\@medoids, $assign);
-    };
-
-    my $sample_indices = sub {
-        my ($wanted) = @_;
-        return [0 .. $n - 1] if !$wanted || $wanted >= $n;
-        return [0] if $wanted == 1;
-        my (@idx, %seen);
-        for my $t (0 .. $wanted - 1) {
-            my $i = int(($t * ($n - 1)) / ($wanted - 1) + 0.5);
-            push @idx, $i unless $seen{$i}++;
-        }
-        return \@idx;
-    };
-
-    my $silhouette_score = sub {
-        my ($k, $assign, $sample) = @_;
-        return 0 if $k <= 1 || $n <= 2;
-        my @cluster_size = (0) x $k;
-        $cluster_size[$assign->[$_]]++ for 0 .. $n - 1;
-        my $indices = $sample_indices->($sample);
-        my $total = 0;
-        my $counted = 0;
-        for my $i (@$indices) {
-            my $ci = $assign->[$i];
-            next if $cluster_size[$ci] <= 1;
-            my @sum_q = (0) x $k;
-            for my $j (0 .. $n - 1) {
-                next if $j == $i;
-                $sum_q[$assign->[$j]] += $get_q->($i, $j);
-            }
-            my $a = $sum_q[$ci] / ($cluster_size[$ci] - 1);
-            my $b;
-            for my $c (0 .. $k - 1) {
-                next if $c == $ci || $cluster_size[$c] == 0;
-                my $avg = $sum_q[$c] / $cluster_size[$c];
-                $b = $avg if !defined($b) || $avg < $b;
-            }
-            next unless defined $b;
-            my $den = max($a, $b);
-            $total += $den > 0 ? ($b - $a) / $den : 0;
-            $counted++;
-        }
-        return $counted ? $total / $counted : 0;
-    };
 
     my $requested = exists($ccfg->{clusters}) ? $ccfg->{clusters} : 'auto';
     my ($chosen_k, $chosen_medoids, $chosen_assign, $chosen_silhouette);
     my @score_table;
+    my @distortion_table;
+    my $selection_method = 'silhouette';
+    my $target_k;
+    my $hierarchy;
+    my %scaling_info = (
+        algorithm => $algorithm,
+        exact_matrix_bytes => $exact_matrix_bytes,
+        max_exact_matrix_bytes => $max_exact_matrix_bytes,
+    );
 
-    if (defined($requested) && $requested ne 'auto') {
-        my $k = int($requested);
-        die "clustering.clusters must be between 1 and $n\n" if $k < 1 || $k > $n;
-        $self->_progress("Clustering with k=$k...");
-        my ($m, $a) = $fit_kmedoids->($k);
-        my $sample = exists($ccfg->{silhouette_sample}) ? int($ccfg->{silhouette_sample}) : 0;
-        my $s = $silhouette_score->($k, $a, $sample);
-        ($chosen_k, $chosen_medoids, $chosen_assign, $chosen_silhouette) = ($k, $m, $a, $s);
-        push @score_table, [$k, $s];
-    } else {
-        if ($n < 3) {
-            my ($m, $a) = $fit_kmedoids->(1);
-            ($chosen_k, $chosen_medoids, $chosen_assign, $chosen_silhouette) = (1, $m, $a, 0);
-            push @score_table, [1, 0];
-        } else {
+    if ($algorithm eq 'exact') {
+        my $D = "\0" x $exact_matrix_bytes;
+        my @row_sum_q = (0) x $n;
+        my $get_q = sub { return vec($D, $_[0] * $n + $_[1], 32); };
+
+        $self->_progress("Building distance matrix for $n rows...");
+        for my $i (0 .. $n - 1) {
+            for my $j ($i + 1 .. $n - 1) {
+                my $q = $distance_q->($i, $j);
+                vec($D, $i * $n + $j, 32) = $q;
+                vec($D, $j * $n + $i, 32) = $q;
+                $row_sum_q[$i] += $q;
+                $row_sum_q[$j] += $q;
+            }
+        }
+
+        my $init_medoids = sub {
+            my ($k) = @_;
+            my $first = 0;
+            for my $i (1 .. $n - 1) {
+                $first = $i if $row_sum_q[$i] < $row_sum_q[$first];
+            }
+            my @medoids = ($first);
+            my %is_medoid = ($first => 1);
+            while (@medoids < $k) {
+                my ($best_i, $best_nearest) = (-1, -1);
+                for my $i (0 .. $n - 1) {
+                    next if $is_medoid{$i};
+                    my $nearest = $get_q->($i, $medoids[0]);
+                    for my $m (@medoids[1 .. $#medoids]) {
+                        my $q = $get_q->($i, $m);
+                        $nearest = $q if $q < $nearest;
+                    }
+                    if ($nearest > $best_nearest) {
+                        ($best_i, $best_nearest) = ($i, $nearest);
+                    }
+                }
+                push @medoids, $best_i;
+                $is_medoid{$best_i} = 1;
+            }
+            return @medoids;
+        };
+
+        my $assign_to_medoids = sub {
+            my ($medoids) = @_;
+            my @assign;
+            for my $i (0 .. $n - 1) {
+                my ($best_c, $best_q) = (0, $get_q->($i, $medoids->[0]));
+                for my $c (1 .. $#$medoids) {
+                    my $q = $get_q->($i, $medoids->[$c]);
+                    if ($q < $best_q || ($q == $best_q && $medoids->[$c] < $medoids->[$best_c])) {
+                        ($best_c, $best_q) = ($c, $q);
+                    }
+                }
+                $assign[$i] = $best_c;
+            }
+            return \@assign;
+        };
+
+        my $recompute_medoids = sub {
+            my ($k, $assign, $old_medoids) = @_;
+            my @members;
+            push @{$members[$assign->[$_]]}, $_ for 0 .. $n - 1;
+            my @new = @$old_medoids;
+            for my $c (0 .. $k - 1) {
+                next unless defined($members[$c]) && @{$members[$c]};
+                my @m = @{$members[$c]};
+                my @cost = (0) x @m;
+                for my $a (0 .. $#m) {
+                    for my $b ($a + 1 .. $#m) {
+                        my $q = $get_q->($m[$a], $m[$b]);
+                        $cost[$a] += $q;
+                        $cost[$b] += $q;
+                    }
+                }
+                my $best = 0;
+                for my $a (1 .. $#m) {
+                    $best = $a if $cost[$a] < $cost[$best]
+                        || ($cost[$a] == $cost[$best] && $m[$a] < $m[$best]);
+                }
+                $new[$c] = $m[$best];
+            }
+            return \@new;
+        };
+
+        my $fit_kmedoids = sub {
+            my ($k) = @_;
+            my @medoids = $init_medoids->($k);
+            my $assign;
+            for my $iter (1 .. $max_iterations) {
+                $assign = $assign_to_medoids->(\@medoids);
+                my $new = $recompute_medoids->($k, $assign, \@medoids);
+                my $changed = 0;
+                for my $c (0 .. $k - 1) {
+                    if ($new->[$c] != $medoids[$c]) { $changed = 1; last; }
+                }
+                @medoids = @$new;
+                last unless $changed;
+            }
+            $assign = $assign_to_medoids->(\@medoids);
+            return (\@medoids, $assign);
+        };
+
+        my $sample_indices = sub {
+            my ($wanted) = @_;
+            return [0 .. $n - 1] if !$wanted || $wanted >= $n;
+            return [0] if $wanted == 1;
+            my (@idx, %seen);
+            for my $t (0 .. $wanted - 1) {
+                my $i = int(($t * ($n - 1)) / ($wanted - 1) + 0.5);
+                push @idx, $i unless $seen{$i}++;
+            }
+            return \@idx;
+        };
+
+        my $silhouette_score = sub {
+            my ($k, $assign, $sample) = @_;
+            return 0 if $k <= 1 || $n <= 2;
+            my @cluster_size = (0) x $k;
+            $cluster_size[$assign->[$_]]++ for 0 .. $n - 1;
+            my $indices = $sample_indices->($sample);
+            my $total = 0;
+            my $counted = 0;
+            for my $i (@$indices) {
+                my $ci = $assign->[$i];
+                next if $cluster_size[$ci] <= 1;
+                my @sum_q = (0) x $k;
+                for my $j (0 .. $n - 1) {
+                    next if $j == $i;
+                    $sum_q[$assign->[$j]] += $get_q->($i, $j);
+                }
+                my $a = $sum_q[$ci] / ($cluster_size[$ci] - 1);
+                my $b;
+                for my $c (0 .. $k - 1) {
+                    next if $c == $ci || $cluster_size[$c] == 0;
+                    my $avg = $sum_q[$c] / $cluster_size[$c];
+                    $b = $avg if !defined($b) || $avg < $b;
+                }
+                next unless defined $b;
+                my $den = max($a, $b);
+                $total += $den > 0 ? ($b - $a) / $den : 0;
+                $counted++;
+            }
+            return $counted ? $total / $counted : 0;
+        };
+
+        my $hierarchical = defined($requested) && !ref($requested) && lc($requested) eq 'hierarchical';
+        if ($hierarchical) {
+            $selection_method = 'hierarchical_distortion';
             my $k_min = exists($ccfg->{k_min}) ? int($ccfg->{k_min}) : 2;
             my $k_max = exists($ccfg->{k_max}) ? int($ccfg->{k_max}) : 12;
+            $k_min = 1 if $k_min < 1;
+            $k_max = $n if $k_max > $n;
+            die "clustering.k_min must not exceed clustering.k_max\n" if $k_min > $k_max;
+            my $sample = exists($ccfg->{silhouette_sample}) ? int($ccfg->{silhouette_sample}) : min(600, $n);
+            my @curve;
+            for my $k (1 .. $k_max) {
+                $self->_progress("Testing representation distortion at k=$k...");
+                my ($m, $a) = $fit_kmedoids->($k);
+                my $sumq = 0;
+                for my $i (0 .. $n - 1) {
+                    $sumq += $get_q->($i, $m->[$a->[$i]]);
+                }
+                my $mean = ($sumq / $n) / $DIST_SCALE;
+                push @curve, [$k, $mean];
+            }
+            ($target_k, my $annotated) = _distortion_knee(\@curve, $k_min, $k_max);
+            @distortion_table = @$annotated;
+            $self->_progress("Distortion knee selected $target_k leaf medoids; allocating them hierarchically...");
+            $hierarchy = _hierarchical_exact(
+                self => $self, n => $n, target_k => $target_k,
+                max_iterations => $max_iterations, distance_q => $distance_q,
+                dist_scale => $DIST_SCALE,
+            );
+            ($chosen_k, $chosen_medoids, $chosen_assign) = @{$hierarchy}{qw(clusters medoids assign)};
+            my $sil_indices = $sample_indices->($sample);
+            $chosen_silhouette = _sample_pairwise_silhouette(
+                distance_q => $distance_q, labels => $chosen_assign,
+                k => $chosen_k, indices => $sil_indices,
+            );
+            push @score_table, [$chosen_k, $chosen_silhouette];
+            $scaling_info{silhouette_mode} = 'sampled_pairwise_hierarchical';
+            $scaling_info{silhouette_sample} = scalar(@$sil_indices);
+        } elsif (defined($requested) && $requested ne 'auto') {
+            my $k = int($requested);
+            die "clustering.clusters must be between 1 and $n\n" if $k < 1 || $k > $n;
+            $self->_progress("Clustering with k=$k...");
+            my ($m, $a) = $fit_kmedoids->($k);
+            my $sample = exists($ccfg->{silhouette_sample}) ? int($ccfg->{silhouette_sample}) : 0;
+            my $s = $silhouette_score->($k, $a, $sample);
+            ($chosen_k, $chosen_medoids, $chosen_assign, $chosen_silhouette) = ($k, $m, $a, $s);
+            push @score_table, [$k, $s];
+        } else {
+            if ($n < 3) {
+                my ($m, $a) = $fit_kmedoids->(1);
+                ($chosen_k, $chosen_medoids, $chosen_assign, $chosen_silhouette) = (1, $m, $a, 0);
+                push @score_table, [1, 0];
+            } else {
+                my $k_min = exists($ccfg->{k_min}) ? int($ccfg->{k_min}) : 2;
+                my $k_max = exists($ccfg->{k_max}) ? int($ccfg->{k_max}) : 12;
+                $k_min = 2 if $k_min < 2;
+                $k_max = $n - 1 if $k_max >= $n;
+                die "clustering.k_min must not exceed clustering.k_max\n" if $k_min > $k_max;
+                my $sample = exists($ccfg->{silhouette_sample}) ? int($ccfg->{silhouette_sample}) : min(600, $n);
+                my $best_s;
+                for my $k ($k_min .. $k_max) {
+                    $self->_progress("Testing k=$k...");
+                    my ($m, $a) = $fit_kmedoids->($k);
+                    my $s = $silhouette_score->($k, $a, $sample);
+                    push @score_table, [$k, $s];
+                    if (!defined($best_s) || $s > $best_s + 1e-12) {
+                        ($best_s, $chosen_k, $chosen_medoids, $chosen_assign) = ($s, $k, $m, $a);
+                    }
+                }
+                $chosen_silhouette = $ccfg->{exact_final_silhouette}
+                    ? $silhouette_score->($chosen_k, $chosen_assign, 0)
+                    : $best_s;
+            }
+        }
+
+        if (!$hierarchical) {
+            $chosen_medoids = $recompute_medoids->($chosen_k, $chosen_assign, $chosen_medoids);
+            $chosen_assign = $assign_to_medoids->($chosen_medoids);
+            $scaling_info{silhouette_mode} = 'historical_exact_reference';
+        }
+    } else {
+        # CLARA: exact PAM within several small samples; candidate medoid sets
+        # are compared on an independent validation sample.  The final chosen
+        # medoids are then assigned across all n rows once, O(n*k), with no
+        # dense full-landscape distance matrix.
+        my $clara_samples = exists($ccfg->{clara_samples}) ? int($ccfg->{clara_samples}) : 5;
+        die "clustering.clara_samples must be >= 1\n" if $clara_samples < 1;
+        my $clara_sample_size = exists($ccfg->{clara_sample_size}) ? int($ccfg->{clara_sample_size}) : 2048;
+        $clara_sample_size = $n if $clara_sample_size > $n;
+        die "clustering.clara_sample_size must be >= 2\n" if $clara_sample_size < 2 && $n >= 2;
+        my $validation_size = exists($ccfg->{clara_validation_sample}) ? int($ccfg->{clara_validation_sample}) : 4096;
+        $validation_size = $n if $validation_size > $n;
+        $validation_size = 2 if $validation_size < 2 && $n >= 2;
+        my $seed = exists($ccfg->{random_seed}) ? int($ccfg->{random_seed}) : 1;
+
+        my $lcg_sample = sub {
+            my ($wanted, $seed0) = @_;
+            return [0 .. $n - 1] if $wanted >= $n;
+            my $state = $seed0 & 0x7fffffff;
+            $state = 1 if !$state;
+            my $rand_int = sub {
+                my ($limit) = @_;
+                $state = (1103515245 * $state + 12345) % 2147483648;
+                return int(($state / 2147483648) * $limit);
+            };
+            my @res = (0 .. $wanted - 1);
+            for my $i ($wanted .. $n - 1) {
+                my $j = $rand_int->($i + 1);
+                $res[$j] = $i if $j < $wanted;
+            }
+            @res = sort { $a <=> $b } @res;
+            return \@res;
+        };
+
+        my $validation = $lcg_sample->($validation_size, $seed + 104729);
+        my $sil_n = exists($ccfg->{silhouette_sample}) ? int($ccfg->{silhouette_sample}) : min(600, $validation_size);
+        $sil_n = $validation_size if !$sil_n || $sil_n > $validation_size;
+        my $silhouette_pick = $lcg_sample->($sil_n, $seed + 130363);
+        my @silhouette_indices = @$silhouette_pick;
+
+        my $hierarchical = defined($requested) && !ref($requested) && lc($requested) eq 'hierarchical';
+        my ($k_min, $k_max);
+        if ($hierarchical) {
+            $selection_method = 'hierarchical_distortion';
+            my $requested_min = exists($ccfg->{k_min}) ? int($ccfg->{k_min}) : 2;
+            $k_min = 1;
+            $k_max = exists($ccfg->{k_max}) ? int($ccfg->{k_max}) : 12;
+            $k_max = $n if $k_max > $n;
+            die "clustering.k_min must not exceed clustering.k_max\n" if $requested_min > $k_max;
+        } elsif (defined($requested) && $requested ne 'auto') {
+            $k_min = $k_max = int($requested);
+            die "clustering.clusters must be between 1 and $n\n" if $k_min < 1 || $k_min > $n;
+        } elsif ($n < 3) {
+            $k_min = $k_max = 1;
+        } else {
+            $k_min = exists($ccfg->{k_min}) ? int($ccfg->{k_min}) : 2;
+            $k_max = exists($ccfg->{k_max}) ? int($ccfg->{k_max}) : 12;
             $k_min = 2 if $k_min < 2;
             $k_max = $n - 1 if $k_max >= $n;
             die "clustering.k_min must not exceed clustering.k_max\n" if $k_min > $k_max;
-            my $sample = exists($ccfg->{silhouette_sample}) ? int($ccfg->{silhouette_sample}) : min(600, $n);
-            my $best_s;
-            for my $k ($k_min .. $k_max) {
-                $self->_progress("Testing k=$k...");
-                my ($m, $a) = $fit_kmedoids->($k);
-                my $s = $silhouette_score->($k, $a, $sample);
-                push @score_table, [$k, $s];
-                if (!defined($best_s) || $s > $best_s + 1e-12) {
-                    ($best_s, $chosen_k, $chosen_medoids, $chosen_assign) = ($s, $k, $m, $a);
+        }
+        die "clustering.clara_sample_size must be >= maximum k ($k_max)\n"
+            if $clara_sample_size < $k_max;
+
+        my %best_for_k;
+        for my $trial (1 .. $clara_samples) {
+            my $sample = $lcg_sample->($clara_sample_size, $seed + 1009 * $trial);
+            my $sn = scalar @$sample;
+            my $sample_bytes = 4 * $sn * $sn;
+            my $SD = "\0" x $sample_bytes;
+            my @row_sum_q = (0) x $sn;
+            my $sget_q = sub { return vec($SD, $_[0] * $sn + $_[1], 32); };
+            $self->_progress("CLARA sample $trial/$clara_samples: building $sn x $sn distance matrix...");
+            for my $a (0 .. $sn - 1) {
+                for my $b ($a + 1 .. $sn - 1) {
+                    my $q = $distance_q->($sample->[$a], $sample->[$b]);
+                    vec($SD, $a * $sn + $b, 32) = $q;
+                    vec($SD, $b * $sn + $a, 32) = $q;
+                    $row_sum_q[$a] += $q;
+                    $row_sum_q[$b] += $q;
                 }
             }
-            $chosen_silhouette = $ccfg->{exact_final_silhouette}
-                ? $silhouette_score->($chosen_k, $chosen_assign, 0)
-                : $best_s;
+
+            my $fit_sample_k = sub {
+                my ($k) = @_;
+                my $first = 0;
+                for my $i (1 .. $sn - 1) {
+                    $first = $i if $row_sum_q[$i] < $row_sum_q[$first];
+                }
+                my @med = ($first);
+                my %is_med = ($first => 1);
+                return [$sample->[$first]] if $k == 1;
+                while (@med < $k) {
+                    my ($best_i, $best_nearest) = (-1, -1);
+                    for my $i (0 .. $sn - 1) {
+                        next if $is_med{$i};
+                        my $nearest = $sget_q->($i, $med[0]);
+                        for my $m (@med[1 .. $#med]) {
+                            my $q = $sget_q->($i, $m);
+                            $nearest = $q if $q < $nearest;
+                        }
+                        if ($nearest > $best_nearest) {
+                            ($best_i, $best_nearest) = ($i, $nearest);
+                        }
+                    }
+                    push @med, $best_i;
+                    $is_med{$best_i} = 1;
+                }
+                my $assign_local = sub {
+                    my ($meds) = @_;
+                    my @as;
+                    for my $i (0 .. $sn - 1) {
+                        my ($bc, $bq) = (0, $sget_q->($i, $meds->[0]));
+                        for my $c (1 .. $#$meds) {
+                            my $q = $sget_q->($i, $meds->[$c]);
+                            if ($q < $bq || ($q == $bq && $meds->[$c] < $meds->[$bc])) {
+                                ($bc, $bq) = ($c, $q);
+                            }
+                        }
+                        $as[$i] = $bc;
+                    }
+                    return \@as;
+                };
+                for my $iter (1 .. $max_iterations) {
+                    my $as = $assign_local->(\@med);
+                    my @members;
+                    push @{$members[$as->[$_]]}, $_ for 0 .. $sn - 1;
+                    my @new = @med;
+                    for my $c (0 .. $k - 1) {
+                        next unless defined($members[$c]) && @{$members[$c]};
+                        my @m = @{$members[$c]};
+                        my @cost = (0) x @m;
+                        for my $a (0 .. $#m) {
+                            for my $b ($a + 1 .. $#m) {
+                                my $q = $sget_q->($m[$a], $m[$b]);
+                                $cost[$a] += $q;
+                                $cost[$b] += $q;
+                            }
+                        }
+                        my $best = 0;
+                        for my $a (1 .. $#m) {
+                            $best = $a if $cost[$a] < $cost[$best]
+                                || ($cost[$a] == $cost[$best] && $m[$a] < $m[$best]);
+                        }
+                        $new[$c] = $m[$best];
+                    }
+                    my $changed = 0;
+                    for my $c (0 .. $k - 1) {
+                        if ($new[$c] != $med[$c]) { $changed = 1; last; }
+                    }
+                    @med = @new;
+                    last unless $changed;
+                }
+                return [map { $sample->[$_] } @med];
+            };
+
+            for my $k ($k_min .. $k_max) {
+                my $medoids = $fit_sample_k->($k);
+                my $cost = 0;
+                for my $i (@$validation) {
+                    my $best = $distance_q->($i, $medoids->[0]);
+                    for my $c (1 .. $#$medoids) {
+                        my $q = $distance_q->($i, $medoids->[$c]);
+                        $best = $q if $q < $best;
+                    }
+                    $cost += $best;
+                }
+                if (!exists($best_for_k{$k}) || $cost < $best_for_k{$k}{validation_cost}) {
+                    $best_for_k{$k} = { medoids => $medoids, validation_cost => $cost, trial => $trial };
+                }
+            }
+        }
+
+        my $sample_silhouette = sub {
+            my ($k, $medoids) = @_;
+            return 0 if $k <= 1 || @silhouette_indices <= 2;
+            my @lab;
+            for my $ii (0 .. $#silhouette_indices) {
+                my $i = $silhouette_indices[$ii];
+                my ($bc, $bq) = (0, $distance_q->($i, $medoids->[0]));
+                for my $c (1 .. $#$medoids) {
+                    my $q = $distance_q->($i, $medoids->[$c]);
+                    if ($q < $bq || ($q == $bq && $medoids->[$c] < $medoids->[$bc])) {
+                        ($bc, $bq) = ($c, $q);
+                    }
+                }
+                $lab[$ii] = $bc;
+            }
+            my @size = (0) x $k;
+            $size[$_]++ for @lab;
+            my ($total, $counted) = (0, 0);
+            for my $a (0 .. $#silhouette_indices) {
+                my $ca = $lab[$a];
+                next if $size[$ca] <= 1;
+                my @sum = (0) x $k;
+                for my $b (0 .. $#silhouette_indices) {
+                    next if $a == $b;
+                    $sum[$lab[$b]] += $distance_q->($silhouette_indices[$a], $silhouette_indices[$b]);
+                }
+                my $ain = $sum[$ca] / ($size[$ca] - 1);
+                my $bout;
+                for my $c (0 .. $k - 1) {
+                    next if $c == $ca || !$size[$c];
+                    my $avg = $sum[$c] / $size[$c];
+                    $bout = $avg if !defined($bout) || $avg < $bout;
+                }
+                next unless defined $bout;
+                my $den = max($ain, $bout);
+                $total += $den > 0 ? ($bout - $ain) / $den : 0;
+                $counted++;
+            }
+            return $counted ? $total / $counted : 0;
+        };
+
+        if ($hierarchical) {
+            my $requested_min = exists($ccfg->{k_min}) ? int($ccfg->{k_min}) : 2;
+            my @curve;
+            for my $k (1 .. $k_max) {
+                my $mean = ($best_for_k{$k}{validation_cost} / scalar(@$validation)) / $DIST_SCALE;
+                push @curve, [$k, $mean];
+            }
+            ($target_k, my $annotated) = _distortion_knee(\@curve, $requested_min, $k_max);
+            @distortion_table = @$annotated;
+            $self->_progress("Distortion knee selected $target_k leaf medoids; allocating them hierarchically...");
+            my $hier_samples = exists($ccfg->{hierarchy_samples}) ? int($ccfg->{hierarchy_samples}) : 3;
+            my $hier_sample_size = exists($ccfg->{hierarchy_sample_size}) ? int($ccfg->{hierarchy_sample_size}) : min(512, $clara_sample_size);
+            my $hier_validation = exists($ccfg->{hierarchy_validation_sample}) ? int($ccfg->{hierarchy_validation_sample}) : min(1024, $validation_size);
+            my $hier_working = exists($ccfg->{hierarchy_working_sample}) ? int($ccfg->{hierarchy_working_sample}) : min(4096, $n);
+            $hierarchy = _hierarchical_clara(
+                self => $self, n => $n, target_k => $target_k,
+                max_iterations => $max_iterations, distance_q => $distance_q,
+                dist_scale => $DIST_SCALE, seed => $seed + 900001,
+                samples => $hier_samples, sample_size => $hier_sample_size,
+                validation_size => $hier_validation, working_size => $hier_working,
+            );
+            ($chosen_k, $chosen_medoids, $chosen_assign) = @{$hierarchy}{qw(clusters medoids assign)};
+            $chosen_silhouette = _sample_pairwise_silhouette(
+                distance_q => $distance_q, labels => $chosen_assign,
+                k => $chosen_k, indices => \@silhouette_indices,
+            );
+            push @score_table, [$chosen_k, $chosen_silhouette];
+        } else {
+            my $best_s;
+            for my $k ($k_min .. $k_max) {
+                my $m = $best_for_k{$k}{medoids};
+                my $s = $sample_silhouette->($k, $m);
+                push @score_table, [$k, $s];
+                if (!defined($best_s) || $s > $best_s + 1e-12) {
+                    ($best_s, $chosen_k, $chosen_medoids) = ($s, $k, $m);
+                }
+            }
+            $chosen_silhouette = $best_s // 0;
+
+            # One full assignment after k selection.  This is the only O(n*k)
+            # pass over the complete landscape in the legacy CLARA path.
+            my @assign;
+            for my $i (0 .. $n - 1) {
+                my ($bc, $bq) = (0, $distance_q->($i, $chosen_medoids->[0]));
+                for my $c (1 .. $#$chosen_medoids) {
+                    my $q = $distance_q->($i, $chosen_medoids->[$c]);
+                    if ($q < $bq || ($q == $bq && $chosen_medoids->[$c] < $chosen_medoids->[$bc])) {
+                        ($bc, $bq) = ($c, $q);
+                    }
+                }
+                $assign[$i] = $bc;
+            }
+            $chosen_assign = \@assign;
+        }
+
+        $scaling_info{clara_samples} = $clara_samples;
+        $scaling_info{clara_sample_size} = $clara_sample_size;
+        $scaling_info{clara_validation_sample} = $validation_size;
+        $scaling_info{random_seed} = $seed;
+        $scaling_info{silhouette_mode} = 'sampled_pairwise';
+        $scaling_info{silhouette_sample} = scalar(@silhouette_indices);
+        if ($hierarchical) {
+            $scaling_info{hierarchy_samples} = exists($ccfg->{hierarchy_samples}) ? int($ccfg->{hierarchy_samples}) : 3;
+            $scaling_info{hierarchy_sample_size} = exists($ccfg->{hierarchy_sample_size}) ? int($ccfg->{hierarchy_sample_size}) : min(512, $clara_sample_size);
+            $scaling_info{hierarchy_validation_sample} = exists($ccfg->{hierarchy_validation_sample}) ? int($ccfg->{hierarchy_validation_sample}) : min(1024, $validation_size);
+            $scaling_info{hierarchy_working_sample} = exists($ccfg->{hierarchy_working_sample}) ? int($ccfg->{hierarchy_working_sample}) : min(4096, $n);
         }
     }
 
-    $chosen_medoids = $recompute_medoids->($chosen_k, $chosen_assign, $chosen_medoids);
+    if ($hierarchy && ref($hierarchy->{nodes}) eq 'ARRAY') {
+        for my $node (@{$hierarchy->{nodes}}) {
+            my $i = $node->{medoid_row_index};
+            next unless defined($i) && $i >= 0 && $i < $n;
+            $node->{medoid_csv_row} = $rows[$i]{csv_row};
+            $node->{medoid_instance} = $rows[$i]{combo_text};
+            $node->{medoid_performance} = 0 + $rows[$i]{performance};
+            if (ref($node->{split_medoid_row_indices}) eq 'ARRAY') {
+                my @split;
+                for my $si (@{$node->{split_medoid_row_indices}}) {
+                    die "Hierarchy split medoid row index $si is outside 0..$#rows\n"
+                        if $si < 0 || $si > $#rows;
+                    push @split, {
+                        row_index => 0 + $si,
+                        csv_row => 0 + $rows[$si]{csv_row},
+                        instance => $rows[$si]{combo_text},
+                        performance => 0 + $rows[$si]{performance},
+                    };
+                }
+                $node->{split_medoids} = \@split;
+            }
+        }
+    }
+
     my @old_clusters = sort { $chosen_medoids->[$a] <=> $chosen_medoids->[$b] } 0 .. $chosen_k - 1;
     my %new_number;
     $new_number{$old_clusters[$_]} = $_ + 1 for 0 .. $#old_clusters;
@@ -522,6 +905,8 @@ sub _run {
     my $clustered_path = "$output_prefix.clustered.csv";
     my $medoids_path = "$output_prefix.medoids.csv";
     my $scores_path = "$output_prefix.silhouette.csv";
+    my $distortion_path = "$output_prefix.distortion.csv";
+    my $hierarchy_path = "$output_prefix.hierarchy.json";
     my $info_path = "$output_prefix.info.txt";
 
     my $outcsv = Text::CSV->new({ binary => 1, eol => "\n" });
@@ -547,22 +932,54 @@ sub _run {
         my $i = $medoid_for_cluster{$c};
         my $r = $rows[$i];
         $outcsv->print($mfh, [$c, $r->{csv_row}, $r->{combo_text}, $r->{performance}, map {$r->{combo}{$_}} @variable_ids]);
-        push @medoid_records, {
+        my $rec = {
             cluster     => $c,
             csv_row     => $r->{csv_row},
             instance    => $r->{combo_text},
             performance => $r->{performance},
             variables   => { %{$r->{combo}} },
         };
+        if ($hierarchy && ref($hierarchy->{leaf_meta}) eq 'ARRAY' && $hierarchy->{leaf_meta}[$c - 1]) {
+            my $hm = $hierarchy->{leaf_meta}[$c - 1];
+            $rec->{hierarchy_node} = $hm->{node_id};
+            $rec->{hierarchy_depth} = $hm->{depth};
+            $rec->{hierarchy_path} = $hm->{path};
+            $rec->{representation_mean_distance} = $hm->{mean_distance};
+        }
+        push @medoid_records, $rec;
     }
     close $mfh;
 
     open my $sfh, '>', $scores_path or die "Cannot write $scores_path: $!\n";
-    $outcsv->print($sfh, ['k', 'silhouette_used_for_selection']);
+    $outcsv->print($sfh, ['k', $selection_method eq 'hierarchical_distortion' ? 'silhouette_diagnostic' : 'silhouette_used_for_selection']);
     for my $x (@score_table) {
         $outcsv->print($sfh, [$x->[0], sprintf('%.10f', $x->[1])]);
     }
     close $sfh;
+
+    if ($selection_method eq 'hierarchical_distortion') {
+        open my $dfh, '>', $distortion_path or die "Cannot write $distortion_path: $!\n";
+        $outcsv->print($dfh, [qw(k validation_mean_distance monotone_mean_distance relative_to_k1 marginal_reduction knee_score selected_target)]);
+        for my $x (@distortion_table) {
+            $outcsv->print($dfh, [
+                $x->{k}, sprintf('%.10f', $x->{raw}), sprintf('%.10f', $x->{monotone}),
+                sprintf('%.10f', $x->{relative}), sprintf('%.10f', $x->{marginal}),
+                sprintf('%.10f', $x->{knee_score}), ($x->{k} == $target_k ? 1 : 0),
+            ]);
+        }
+        close $dfh;
+        my $hj = {
+            schema => 'Sim::OPT::ClusterMedoid/hierarchical-distortion-1',
+            selection_method => $selection_method,
+            target_leaf_clusters => 0 + ($target_k || $chosen_k),
+            realized_leaf_clusters => 0 + $chosen_k,
+            final_mean_distance => 0 + ($hierarchy->{final_mean_distance} // 0),
+            nodes => $hierarchy->{nodes} || [],
+        };
+        open my $hfh, '>', $hierarchy_path or die "Cannot write $hierarchy_path: $!\n";
+        print {$hfh} JSON::PP->new->canonical(1)->pretty(1)->encode($hj);
+        close $hfh;
+    }
 
     my @cluster_size = (0) x ($chosen_k + 1);
     $cluster_size[$_]++ for @labels;
@@ -588,6 +1005,15 @@ sub _run {
     say $ifh "overall_similarity=hybrid_mean(context_if_any,problem,performance)";
     say $ifh "distance=1-overall_similarity";
     say $ifh "clustering=k_medoids";
+    say $ifh "clustering_algorithm=$scaling_info{algorithm}";
+    say $ifh "selection_method=$selection_method";
+    say $ifh "target_leaf_clusters=$target_k" if defined $target_k;
+    say $ifh "representation_mean_distance=$hierarchy->{final_mean_distance}" if $hierarchy;
+    say $ifh "exact_matrix_bytes=$scaling_info{exact_matrix_bytes}";
+    say $ifh "max_exact_matrix_bytes=$scaling_info{max_exact_matrix_bytes}";
+    for my $name (qw(clara_samples clara_sample_size clara_validation_sample random_seed silhouette_mode silhouette_sample hierarchy_samples hierarchy_sample_size hierarchy_validation_sample hierarchy_working_sample)) {
+        say $ifh "$name=$scaling_info{$name}" if exists $scaling_info{$name};
+    }
     say $ifh "clusters=$chosen_k";
     say $ifh "silhouette=" . sprintf('%.10f', $chosen_silhouette);
     for my $c (1 .. $chosen_k) {
@@ -600,7 +1026,34 @@ sub _run {
         rows               => $n,
         clusters           => $chosen_k,
         silhouette         => 0 + $chosen_silhouette,
+        clustering_algorithm => $scaling_info{algorithm},
+        selection_method    => $selection_method,
+        target_clusters     => (defined($target_k) ? 0 + $target_k : 0 + $chosen_k),
+        distortion_curve    => [map { { %$_ } } @distortion_table],
+        hierarchy           => ($hierarchy ? { nodes => $hierarchy->{nodes}, final_mean_distance => 0 + ($hierarchy->{final_mean_distance} // 0) } : undef),
+        scaling             => { %scaling_info },
         lambda             => $lambda,
+        metric             => {
+            schema => 'Sim::OPT::ClusterMedoid/hybrid-distance-1',
+            variable_levels => { %levels },
+            fixed_levels => { %fixed_level },
+            context_variables => [@context],
+            problem_variables => [@problem],
+            lambda => 0 + $lambda,
+            variable_weights => { %variable_weight },
+            component_weights => { %component_weight },
+            performance => {
+                best => 0 + $pbest,
+                worst => 0 + $pworst,
+                divisions => 0 + $divisions,
+            },
+            formulas => {
+                variable_distance => 'log(1+level_difference)/log(number_of_levels)',
+                group_similarity => '(1-lambda)*weighted_arithmetic_mean+lambda*weighted_geometric_mean',
+                performance_similarity => '1-log(1+performance_difference/step)/log(1+divisions), clipped',
+                distance => '1-overall_similarity',
+            },
+        },
         instance_prefix    => $instance_prefix,
         performance_column => $performance_col_spec,
         variables          => [@variable_ids],
@@ -614,9 +1067,409 @@ sub _run {
             clustered => $clustered_path,
             medoids    => $medoids_path,
             silhouette => $scores_path,
+            ($selection_method eq 'hierarchical_distortion' ? (distortion => $distortion_path, hierarchy => $hierarchy_path) : ()),
             info       => $info_path,
         },
     };
+}
+
+sub _distortion_knee {
+    my ($curve, $k_min, $k_max) = @_;
+    die "distortion curve must be a non-empty ARRAY\n" unless ref($curve) eq 'ARRAY' && @$curve;
+    $k_min = 1 if !defined($k_min) || $k_min < 1;
+    $k_max = $curve->[-1][0] unless defined $k_max;
+
+    my @raw = map { [0 + $_->[0], 0 + $_->[1]] } @$curve;
+    my @mono;
+    my $best;
+    for my $x (@raw) {
+        $best = $x->[1] if !defined($best) || $x->[1] < $best;
+        push @mono, [$x->[0], $best];
+    }
+    my $d1 = $mono[0][1];
+    my $dlast = $mono[-1][1];
+    my $range = $d1 - $dlast;
+    my $denx = max(1, $mono[-1][0] - $mono[0][0]);
+    my $target = $k_min;
+    my $best_score = -1;
+    my @out;
+    for my $i (0 .. $#mono) {
+        my ($k, $d) = @{$mono[$i]};
+        my $xnorm = ($k - $mono[0][0]) / $denx;
+        my $ynorm = $range > 1e-15 ? ($d - $dlast) / $range : 0;
+        my $score = $range > 1e-15 ? (1 - $xnorm) - $ynorm : 0;
+        $score = 0 if $score < 0;
+        my $relative = $d1 > 0 ? $d / $d1 : 0;
+        my $marginal = $i == 0 ? 0 : max(0, $mono[$i-1][1] - $d);
+        push @out, {
+            k => $k, raw => $raw[$i][1], monotone => $d,
+            relative => $relative, marginal => $marginal, knee_score => $score,
+        };
+        next if $k < $k_min || $k > $k_max;
+        next if $k == $mono[-1][0] && $k > $k_min;
+        if ($score > $best_score + 1e-15) {
+            ($best_score, $target) = ($score, $k);
+        }
+    }
+    $target = $k_min if $range <= 1e-15;
+    $target = $k_max if $target > $k_max;
+    return ($target, \@out);
+}
+
+sub _sample_pairwise_silhouette {
+    my (%a) = @_;
+    my $distance_q = $a{distance_q};
+    my $labels = $a{labels};
+    my $k = $a{k};
+    my $indices = $a{indices};
+    return 0 if $k <= 1 || ref($indices) ne 'ARRAY' || @$indices <= 2;
+    my @size = (0) x $k;
+    $size[$labels->[$_]]++ for @$indices;
+    my ($total, $counted) = (0, 0);
+    for my $aa (0 .. $#$indices) {
+        my $i = $indices->[$aa];
+        my $ci = $labels->[$i];
+        next if $size[$ci] <= 1;
+        my @sum = (0) x $k;
+        for my $bb (0 .. $#$indices) {
+            next if $aa == $bb;
+            my $j = $indices->[$bb];
+            $sum[$labels->[$j]] += $distance_q->($i, $j);
+        }
+        my $ain = $sum[$ci] / ($size[$ci] - 1);
+        my $bout;
+        for my $c (0 .. $k - 1) {
+            next if $c == $ci || !$size[$c];
+            my $avg = $sum[$c] / $size[$c];
+            $bout = $avg if !defined($bout) || $avg < $bout;
+        }
+        next unless defined $bout;
+        my $den = max($ain, $bout);
+        $total += $den > 0 ? ($bout - $ain) / $den : 0;
+        $counted++;
+    }
+    return $counted ? $total / $counted : 0;
+}
+
+sub _hierarchical_exact {
+    my (%a) = @_;
+    my $self = $a{self};
+    my $n = $a{n};
+    my $target = min($a{target_k}, $n);
+    my $distance_q = $a{distance_q};
+    my $scale = $a{dist_scale};
+    my $max_iterations = $a{max_iterations};
+
+    my $fit_node = sub {
+        my ($members) = @_;
+        my $m = scalar @$members;
+        my $med1 = $members->[0];
+        my $best_sum;
+        for my $cand (@$members) {
+            my $sum = 0;
+            $sum += $distance_q->($cand, $_) for @$members;
+            if (!defined($best_sum) || $sum < $best_sum || ($sum == $best_sum && $cand < $med1)) {
+                ($best_sum, $med1) = ($sum, $cand);
+            }
+        }
+        my $res = { medoid => $med1, mean1_q => $m ? $best_sum / $m : 0, splittable => 0 };
+        return $res if $m < 2;
+
+        my $med2 = $members->[0] == $med1 ? $members->[1] : $members->[0];
+        my $far = -1;
+        for my $cand (@$members) {
+            next if $cand == $med1;
+            my $q = $distance_q->($cand, $med1);
+            if ($q > $far || ($q == $far && $cand < $med2)) { ($far, $med2) = ($q, $cand); }
+        }
+        my @med = ($med1, $med2);
+        my @assign;
+        for my $iter (1 .. $max_iterations) {
+            my @groups = ([], []);
+            for my $idx (@$members) {
+                my $q0 = $distance_q->($idx, $med[0]);
+                my $q1 = $distance_q->($idx, $med[1]);
+                my $c = ($q1 < $q0 || ($q1 == $q0 && $med[1] < $med[0])) ? 1 : 0;
+                push @{$groups[$c]}, $idx;
+            }
+            last unless @{$groups[0]} && @{$groups[1]};
+            my @new = @med;
+            for my $c (0,1) {
+                my ($best, $bsum) = ($groups[$c][0], undef);
+                for my $cand (@{$groups[$c]}) {
+                    my $sum = 0;
+                    $sum += $distance_q->($cand, $_) for @{$groups[$c]};
+                    if (!defined($bsum) || $sum < $bsum || ($sum == $bsum && $cand < $best)) {
+                        ($best, $bsum) = ($cand, $sum);
+                    }
+                }
+                $new[$c] = $best;
+            }
+            my $changed = ($new[0] != $med[0] || $new[1] != $med[1]);
+            @med = @new;
+            last unless $changed;
+        }
+        my @groups = ([], []);
+        my $sum2 = 0;
+        for my $idx (@$members) {
+            my $q0 = $distance_q->($idx, $med[0]);
+            my $q1 = $distance_q->($idx, $med[1]);
+            my $c = ($q1 < $q0 || ($q1 == $q0 && $med[1] < $med[0])) ? 1 : 0;
+            push @{$groups[$c]}, $idx;
+            $sum2 += $c ? $q1 : $q0;
+        }
+        if (@{$groups[0]} && @{$groups[1]}) {
+            my $mean2 = $sum2 / $m;
+            my $gain = $res->{mean1_q} - $mean2;
+            $res->{splittable} = $gain > 0 ? 1 : 0;
+            $res->{split_medoids} = [@med];
+            $res->{split_groups} = \@groups;
+            $res->{mean2_q} = $mean2;
+            $res->{gain_q} = $gain;
+            $res->{gain_total_q} = $gain * $m;
+            $res->{relative_gain} = $res->{mean1_q} > 0 ? $gain / $res->{mean1_q} : 0;
+        }
+        return $res;
+    };
+
+    return _grow_hierarchy(
+        n => $n, target_k => $target, fit_node => $fit_node,
+        distance_q => $distance_q, dist_scale => $scale,
+    );
+}
+
+sub _hierarchical_clara {
+    my (%a) = @_;
+    my $self = $a{self};
+    my $n = $a{n};
+    my $target = min($a{target_k}, $n);
+    my $distance_q = $a{distance_q};
+    my $scale = $a{dist_scale};
+    my $max_iterations = $a{max_iterations};
+    my $base_seed = $a{seed};
+    my $trials = max(1, int($a{samples} || 3));
+    my $sample_size_cfg = max(2, int($a{sample_size} || 1024));
+    my $validation_cfg = max(2, int($a{validation_size} || 1024));
+    my $working_cfg = max(2, int($a{working_size} || 4096));
+    my $node_counter = 0;
+
+    my $sample_members = sub {
+        my ($members, $wanted, $seed) = @_;
+        my $m = scalar @$members;
+        return [@$members] if $wanted >= $m;
+        my $state = $seed & 0x7fffffff;
+        $state ||= 1;
+        my $rand_int = sub {
+            my ($limit) = @_;
+            $state = (1103515245 * $state + 12345) & 0x7fffffff;
+            return int(($state / 2147483648) * $limit);
+        };
+        my @pos = (0 .. $wanted - 1);
+        for my $i ($wanted .. $m - 1) {
+            my $j = $rand_int->($i + 1);
+            $pos[$j] = $i if $j < $wanted;
+        }
+        @pos = sort { $a <=> $b } @pos;
+        return [map { $members->[$_] } @pos];
+    };
+
+    my $fit_node = sub {
+        my ($members) = @_;
+        my $m = scalar @$members;
+        my $nid = ++$node_counter;
+        return { medoid => $members->[0], mean1_q => 0, splittable => 0 } if $m == 1;
+        my $validation = $sample_members->($members, min($validation_cfg, $m), $base_seed + 7919*$nid);
+        my (%best, %best_cost);
+        for my $trial (1 .. $trials) {
+            my $sample = $sample_members->($members, min($sample_size_cfg, $m), $base_seed + 104729*$nid + 1009*$trial);
+            my $sn = scalar @$sample;
+            my $SD = "\0" x (4 * $sn * $sn);
+            my @row_sum = (0) x $sn;
+            my $get = sub { vec($SD, $_[0] * $sn + $_[1], 32) };
+            for my $i (0 .. $sn - 1) {
+                for my $j ($i + 1 .. $sn - 1) {
+                    my $q = $distance_q->($sample->[$i], $sample->[$j]);
+                    vec($SD, $i*$sn+$j, 32) = $q;
+                    vec($SD, $j*$sn+$i, 32) = $q;
+                    $row_sum[$i] += $q; $row_sum[$j] += $q;
+                }
+            }
+            my $fit_k = sub {
+                my ($k) = @_;
+                my $first = 0;
+                for my $i (1 .. $sn-1) { $first = $i if $row_sum[$i] < $row_sum[$first]; }
+                my @med = ($first); my %used = ($first=>1);
+                return [$sample->[$first]] if $k == 1;
+                while (@med < $k) {
+                    my ($bi,$bd)=(-1,-1);
+                    for my $i (0 .. $sn-1) {
+                        next if $used{$i};
+                        my $d=$get->($i,$med[0]);
+                        for my $mm (@med[1..$#med]) { my $q=$get->($i,$mm); $d=$q if $q<$d; }
+                        if ($d>$bd || ($d==$bd && ($bi<0 || $i<$bi))) { ($bi,$bd)=($i,$d); }
+                    }
+                    push @med,$bi; $used{$bi}=1;
+                }
+                for my $iter (1..$max_iterations) {
+                    my @groups = map { [] } 0..$k-1;
+                    for my $i (0..$sn-1) {
+                        my ($bc,$bq)=(0,$get->($i,$med[0]));
+                        for my $c (1..$#med) { my $q=$get->($i,$med[$c]); if($q<$bq || ($q==$bq && $med[$c]<$med[$bc])){($bc,$bq)=($c,$q)} }
+                        push @{$groups[$bc]},$i;
+                    }
+                    my @new=@med;
+                    for my $c (0..$k-1) {
+                        next unless @{$groups[$c]};
+                        my ($best_i,$best_sum)=($groups[$c][0],undef);
+                        for my $cand (@{$groups[$c]}) {
+                            my $sum=0; $sum += $get->($cand,$_) for @{$groups[$c]};
+                            if(!defined($best_sum)||$sum<$best_sum||($sum==$best_sum&&$cand<$best_i)){($best_i,$best_sum)=($cand,$sum)}
+                        }
+                        $new[$c]=$best_i;
+                    }
+                    my $changed=0; for my $c(0..$k-1){ if($new[$c]!=$med[$c]){$changed=1;last} }
+                    @med=@new; last unless $changed;
+                }
+                return [map {$sample->[$_]} @med];
+            };
+            for my $k (1,2) {
+                next if $k > $sn;
+                my $med = $fit_k->($k);
+                my $cost=0;
+                for my $idx (@$validation) {
+                    my $d=$distance_q->($idx,$med->[0]);
+                    for my $c (1..$#$med){ my $q=$distance_q->($idx,$med->[$c]); $d=$q if $q<$d; }
+                    $cost += $d;
+                }
+                if(!defined($best_cost{$k}) || $cost<$best_cost{$k}){ $best_cost{$k}=$cost; $best{$k}=$med; }
+            }
+        }
+        my $mean1 = $best_cost{1} / scalar(@$validation);
+        my $res = { medoid => $best{1}[0], mean1_q => $mean1, splittable => 0 };
+        if ($best{2}) {
+            my $mean2 = $best_cost{2} / scalar(@$validation);
+            my $gain = $mean1 - $mean2;
+            if ($gain > 0 && $best{2}[0] != $best{2}[1]) {
+                $res->{splittable}=1;
+                $res->{split_medoids}=[@{$best{2}}];
+                $res->{mean2_q}=$mean2;
+                $res->{gain_q}=$gain;
+                $res->{gain_total_q}=$gain*$m;
+                $res->{relative_gain}=$mean1>0 ? $gain/$mean1 : 0;
+            }
+        }
+        return $res;
+    };
+
+    my @all = (0 .. $n - 1);
+    my $root_members = $sample_members->(\@all, min($working_cfg, $n), $base_seed + 424243);
+    return _grow_hierarchy(
+        n => $n, target_k => $target, fit_node => $fit_node,
+        distance_q => $distance_q, dist_scale => $scale,
+        root_members => $root_members,
+    );
+}
+
+sub _grow_hierarchy {
+    my (%a) = @_;
+    my $n = $a{n};
+    my $target = $a{target_k};
+    my $fit_node = $a{fit_node};
+    my $distance_q = $a{distance_q};
+    my $scale = $a{dist_scale};
+    my $root_members = ref($a{root_members}) eq 'ARRAY' ? $a{root_members} : [0 .. $n - 1];
+    my @nodes;
+    my $next_id = 1;
+    my $root = { node_id=>1, parent=>undef, depth=>0, path=>'1', members=>[@$root_members], leaf=>1 };
+    $root->{fit} = $fit_node->($root->{members});
+    push @nodes,$root;
+
+    while (scalar(grep {$_->{leaf}} @nodes) < $target) {
+        my @cand = grep { $_->{leaf} && $_->{fit}{splittable} } @nodes;
+        last unless @cand;
+        @cand = sort {
+            $b->{fit}{gain_total_q} <=> $a->{fit}{gain_total_q}
+            || $a->{node_id} <=> $b->{node_id}
+        } @cand;
+        my $node = $cand[0];
+        my @groups = ([],[]);
+        my $med = $node->{fit}{split_medoids};
+        for my $idx (@{$node->{members}}) {
+            my $q0=$distance_q->($idx,$med->[0]);
+            my $q1=$distance_q->($idx,$med->[1]);
+            my $c=($q1<$q0 || ($q1==$q0 && $med->[1]<$med->[0])) ? 1:0;
+            push @{$groups[$c]},$idx;
+        }
+        if (!@{$groups[0]} || !@{$groups[1]}) { $node->{fit}{splittable}=0; next; }
+        $node->{leaf}=0;
+        $node->{split_gain_mean}=($node->{fit}{gain_q}||0)/$scale;
+        $node->{split_gain_relative}=0+($node->{fit}{relative_gain}||0);
+        my @child_ids;
+        for my $c (0,1) {
+            my $id=++$next_id;
+            my $child={ node_id=>$id,parent=>$node->{node_id},depth=>$node->{depth}+1,path=>$node->{path}.'.'.($c+1),members=>$groups[$c],leaf=>1 };
+            $child->{fit}=$fit_node->($child->{members});
+            push @nodes,$child; push @child_ids,$id;
+        }
+        $node->{children}=\@child_ids;
+    }
+
+    my @leaves=grep {$_->{leaf}} @nodes;
+    @leaves=sort { $a->{fit}{medoid}<=>$b->{fit}{medoid} } @leaves;
+    my @medoids=map {$_->{fit}{medoid}} @leaves;
+    my %leaf_cluster = map { $leaves[$_]{node_id} => $_ } 0..$#leaves;
+    my %by_id = map { $_->{node_id} => $_ } @nodes;
+    my @assign=(0)x$n;
+    my @actual_size=(0)x($next_id+1);
+    my @leaf_sum_q=(0)x scalar(@leaves);
+    my $sumq=0;
+
+    # One full-landscape pass only.  The hierarchy itself was learned on the
+    # representative working sample; every full row is then routed through the
+    # learned binary tree, preserving hierarchical membership without repeated
+    # O(n) assignments at each split.
+    for my $idx (0..$n-1) {
+        my $node=$root;
+        $actual_size[$node->{node_id}]++;
+        while (!$node->{leaf}) {
+            my $med=$node->{fit}{split_medoids};
+            my $q0=$distance_q->($idx,$med->[0]);
+            my $q1=$distance_q->($idx,$med->[1]);
+            my $c=($q1<$q0 || ($q1==$q0 && $med->[1]<$med->[0])) ? 1:0;
+            $node=$by_id{$node->{children}[$c]};
+            $actual_size[$node->{node_id}]++;
+        }
+        my $c=$leaf_cluster{$node->{node_id}};
+        $assign[$idx]=$c;
+        my $q=$distance_q->($idx,$node->{fit}{medoid});
+        $sumq += $q;
+        $leaf_sum_q[$c] += $q;
+    }
+
+    my @leaf_meta;
+    for my $c (0..$#leaves) {
+        my $leaf=$leaves[$c];
+        $leaf->{cluster}=$c+1;
+        my $count=$actual_size[$leaf->{node_id}] || 0;
+        push @leaf_meta, {
+            node_id=>$leaf->{node_id},depth=>$leaf->{depth},path=>$leaf->{path},
+            mean_distance=>$count ? $leaf_sum_q[$c]/$count/$scale : 0,
+        };
+    }
+    my @public;
+    for my $node (sort {$a->{node_id}<=>$b->{node_id}} @nodes) {
+        push @public, {
+            node_id=>$node->{node_id}, parent=>$node->{parent}, depth=>$node->{depth}, path=>$node->{path},
+            size=>0+($actual_size[$node->{node_id}]||0), sample_size=>scalar(@{$node->{members}}),
+            leaf=>$node->{leaf}?JSON::PP::true:JSON::PP::false,
+            medoid_row_index=>0+$node->{fit}{medoid}, mean_sample_distance=>0+(($node->{fit}{mean1_q}||0)/$scale),
+            (defined($node->{cluster}) ? (cluster=>0+$node->{cluster}) : ()),
+            ($node->{children} ? (children=>[@{$node->{children}}]) : ()),
+            (ref($node->{fit}{split_medoids}) eq 'ARRAY' ? (split_medoid_row_indices=>[map {0+$_} @{$node->{fit}{split_medoids}}]) : ()),
+            (defined($node->{split_gain_mean}) ? (split_gain_mean=>0+$node->{split_gain_mean},split_gain_relative=>0+$node->{split_gain_relative}) : ()),
+        };
+    }
+    return { clusters=>scalar(@leaves),medoids=>\@medoids,assign=>\@assign,nodes=>\@public,leaf_meta=>\@leaf_meta,final_mean_distance=>($n?$sumq/$n/$scale:0) };
 }
 
 sub _load_search_config {

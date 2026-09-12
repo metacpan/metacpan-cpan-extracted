@@ -39,7 +39,7 @@ $CGI::Simple::MOD_PERL=0;
 
 #  Version information
 #
-$VERSION='3.028';
+$VERSION='3.029';
 
 
 #  CGI upload vars
@@ -127,6 +127,12 @@ sub new {
             $cgi_or=CGI::Simple->new($r->args);
         }
 
+
+        #  Keep cookie reads tied to this request, including requests with
+        #  no Cookie header. CGI::Simple otherwise reads the process environment.
+        #
+        $cgi_or->{'_cookie_header'}=$r->headers_in('Cookie') || '';
+
     }
         
     
@@ -140,6 +146,46 @@ sub new {
     #
     return bless($cgi_or, __PACKAGE__);
     
+}
+
+
+sub cookie {
+
+    my $self=shift();
+    local $ENV{'HTTP_COOKIE'}=$self->{'_cookie_header'};
+    local $ENV{'COOKIE'}='';
+    return $self->SUPER::cookie(@_);
+
+}
+
+
+sub raw_cookie {
+
+    my $self=shift();
+    local $ENV{'HTTP_COOKIE'}=$self->{'_cookie_header'};
+    local $ENV{'COOKIE'}='';
+    return $self->SUPER::raw_cookie(@_);
+
+}
+
+
+sub param_utf8 {
+
+    my $self=shift();
+    require Carp;
+    (@_==1 && defined($_[0])) ||
+        Carp::croak('param_utf8 requires one parameter name');
+    require Encode;
+
+    #  Decode copies only, preserving the ordinary byte-oriented parameter API.
+    #
+    my @value=wantarray ? $self->param(@_) : scalar($self->param(@_));
+    foreach my $value (@value) {
+        next if !defined($value) || utf8::is_utf8($value);
+        $value=Encode::decode('UTF-8', $value, Encode::FB_CROAK());
+    }
+    return wantarray ? @value : $value[0];
+
 }
 
 

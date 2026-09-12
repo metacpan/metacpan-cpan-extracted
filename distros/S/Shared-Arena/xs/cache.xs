@@ -97,20 +97,33 @@ sac_get(self, key)
         const char *k;
         STRLEN klen;
         SV *out;
+        char buf[1024];
         uint32_t vlen = 0;
         int rc;
     PPCODE:
         c = SA_SELF(sa_cache, self);
         if (!c) croak("Shared::Arena::Cache: this cache is released");
         k = SvPV(key, klen);
-        out = sv_2mortal(newSV((STRLEN)c->pair_max + 1));
-        SvPOK_on(out);
-        rc = sa_cache_get(c, k, (uint32_t)klen, SvPVX(out),
-                          (uint32_t)c->pair_max, &vlen);
-        if (rc != SA_C_HIT) XSRETURN_EMPTY;
-        SvCUR_set(out, (STRLEN)vlen);
-        SvPVX(out)[vlen] = '\0';
-        XPUSHs(out);
+        /* Onto the stack first where an entry fits, so a miss allocates
+         * nothing and a hit allocates what the value needs rather than the
+         * most an entry could hold, which a caller keeping the value would
+         * otherwise carry for its life. */
+        if (c->pair_max < sizeof buf) {
+            rc = sa_cache_get(c, k, (uint32_t)klen, buf,
+                              (uint32_t)c->pair_max, &vlen);
+            if (rc != SA_C_HIT) XSRETURN_EMPTY;
+            XPUSHs(sv_2mortal(newSVpvn(buf, (STRLEN)vlen)));
+        }
+        else {
+            out = sv_2mortal(newSV((STRLEN)c->pair_max + 1));
+            SvPOK_on(out);
+            rc = sa_cache_get(c, k, (uint32_t)klen, SvPVX(out),
+                              (uint32_t)c->pair_max, &vlen);
+            if (rc != SA_C_HIT) XSRETURN_EMPTY;
+            SvCUR_set(out, (STRLEN)vlen);
+            SvPVX(out)[vlen] = '\0';
+            XPUSHs(out);
+        }
 
 int
 sac_remove(self, key)
@@ -175,6 +188,7 @@ sac_stats(self)
     PPCODE:
         c = SA_SELF(sa_cache, self);
         if (!c) croak("Shared::Arena::Cache: this cache is released");
+        sa_cache_flush(c);        /* this process's own counts, exactly */
         h = sa_at_load64_acq(&c->hdr->hits);
         m = sa_at_load64_acq(&c->hdr->misses);
         EXTEND(SP, 16);

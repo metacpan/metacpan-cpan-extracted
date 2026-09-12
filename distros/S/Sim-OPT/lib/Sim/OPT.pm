@@ -58,8 +58,9 @@ use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
 use Sim::OPT::Parcoord3d;
 use Sim::OPT::Stats;
+use Sim::OPT::DWGI;
 eval { use Sim::OPTcue::OPTcue; 1 };
-eval { use Sim::OPTcue::Metabridge; 1 };
+eval { use Sim::OPT::Metabridge; 1 };
 eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
 eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
 eval { use Sim::OPTcue::Exogen::Armijo; 1 };
@@ -79,7 +80,7 @@ eval { use Sim::OPTcue::Exogen::GBDT; 1 };
 eval { use Sim::OPTcue::Endogen::DWGN2; 1 };
 eval { use Sim::OPTcue::Endogen::NeuralBoltzmann; 1 };
 
-$VERSION = '0.957';
+$VERSION = '0.997';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
@@ -2127,6 +2128,176 @@ sub genextremes
 }
 
 
+# Return the radical inverse of a positive integer in the requested base.
+# Used by the undiagonal star-centre generator to obtain a deterministic
+# low-discrepancy sequence without adding an external dependency.
+sub _star_radical_inverse
+{
+  my ( $index, $base ) = @_;
+  my $inverse = 0;
+  my $factor = 1 / $base;
+  while ( $index > 0 )
+  {
+    $inverse += ( $index % $base ) * $factor;
+    $index = int( $index / $base );
+    $factor /= $base;
+  }
+  return $inverse;
+}
+
+
+sub _star_gcd
+{
+  my ( $a, $b ) = @_;
+  $a = abs( int($a) );
+  $b = abs( int($b) );
+  while ( $b )
+  {
+    my $t = $a % $b;
+    $a = $b;
+    $b = $t;
+  }
+  return $a;
+}
+
+
+# Generate unique, deterministic star centres throughout the active lattice.
+# The requested number of centres retains the historical n> progression:
+# 1, 3, 5, 9, 17, 33, 65, ... = 2^(n-1)+1 for n > 1.
+#
+# The historical generator obtains those centres by repeatedly bisecting the
+# segment joining opposite multidimensional extremes.  That works well at low
+# depth but eventually collapses onto an already-resolved diagonal.  This
+# alternative uses a Halton low-discrepancy sequence, quantised to the actual
+# discrete parameter levels, and removes duplicate centres before they reach
+# the star search.  If quantisation makes Halton convergence slow near full
+# lattice coverage, a deterministic coprime mixed-radix walk completes the set.
+sub _undiagonal_star_centres
+{
+  my ( $varnumbers_ref, $stardivisions ) = @_;
+  my @varnumbers = @{ $varnumbers_ref };
+
+  # stararrange()/washn() normally leave the current case as a single hash.
+  # Merge defensively if more than one hash is supplied, retaining the largest
+  # declared level count for each variable rather than silently dropping keys.
+  my %levels;
+  foreach my $href ( @varnumbers )
+  {
+    next unless ref($href) eq 'HASH';
+    foreach my $key ( keys %{ $href } )
+    {
+      my $v = 0 + $href->{$key};
+      $levels{$key} = $v if ( !defined($levels{$key}) or $v > $levels{$key} );
+    }
+  }
+
+  my @vars = sort { $a <=> $b } keys %levels;
+  return [] unless @vars;
+
+  my $total = 1;
+  foreach my $key ( @vars )
+  {
+    my $n = int( $levels{$key} || 1 );
+    $n = 1 if $n < 1;
+    $levels{$key} = $n;
+    $total *= $n;
+  }
+
+  my $target = 1;
+  if ( $stardivisions > 1 )
+  {
+    $target = 1;
+    my $i = 1;
+    while ( $i < $stardivisions )
+    {
+      $target *= 2;
+      last if $target >= ( $total - 1 );
+      $i++;
+    }
+    $target += 1;
+  }
+  $target = $total if $target > $total;
+
+  my @primes = ( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37,
+                 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89 );
+  die "starsubdivide=undiagonal supports at most " . scalar(@primes) .
+      " active variables" if @vars > @primes;
+
+  my @centres;
+  my %seen;
+
+  # Preserve an exact central star as the first centre.  Unlike the legacy
+  # method, subsequent centres are not constrained to the centre-to-corner
+  # diagonal.
+  my %mid;
+  foreach my $key ( @vars )
+  {
+    $mid{$key} = int( $levels{$key} / 2 ) + 1;
+  }
+  my $midkey = join( ',', map { $mid{$_} } @vars );
+  push( @centres, \%mid );
+  $seen{$midkey} = 1;
+
+  # Low-discrepancy candidates.  Quantisation can create duplicates, which are
+  # discarded here before Sim::OPT constructs any stars around them.
+  my $index = 1;
+  my $attempt_limit = max( 10000, $target * 40 );
+  while ( @centres < $target and $index <= $attempt_limit )
+  {
+    my %point;
+    my $d = 0;
+    foreach my $key ( @vars )
+    {
+      my $u = _star_radical_inverse( $index, $primes[$d] );
+      my $level = 1 + int( $u * $levels{$key} );
+      $level = $levels{$key} if $level > $levels{$key};
+      $point{$key} = $level;
+      $d++;
+    }
+    my $key = join( ',', map { $point{$_} } @vars );
+    if ( !$seen{$key} )
+    {
+      push( @centres, \%point );
+      $seen{$key} = 1;
+    }
+    $index++;
+  }
+
+  # Guaranteed deterministic completion.  Multiplication by a number coprime
+  # to the lattice cardinality permutes every mixed-radix cell exactly once.
+  if ( @centres < $target )
+  {
+    my $stride = int( $total * 0.618033988749895 );
+    $stride = 1 if $stride < 1;
+    $stride++ while _star_gcd( $stride, $total ) != 1;
+    my $offset = int( $total * 0.381966011250105 ) % $total;
+
+    my $j = 0;
+    while ( @centres < $target and $j < $total )
+    {
+      my $flat = ( $offset + ( $j * $stride ) ) % $total;
+      my $rest = $flat;
+      my %point;
+      foreach my $key ( @vars )
+      {
+        my $n = $levels{$key};
+        $point{$key} = ( $rest % $n ) + 1;
+        $rest = int( $rest / $n );
+      }
+      my $key = join( ',', map { $point{$_} } @vars );
+      if ( !$seen{$key} )
+      {
+        push( @centres, \%point );
+        $seen{$key} = 1;
+      }
+      $j++;
+    }
+  }
+
+  return( \@centres );
+}
+
+
 sub gencentres
 {
   my ( $vars_ref ) =  @_;
@@ -2296,6 +2467,8 @@ sub solvestar
 
 	$dirfiles{direction} = "star";
 	$dirfiles{starorder} = $dowhat{starorder}->[$countcase]->[0];
+	$dirfiles{starsubdivide} = $dowhat{starsubdivide}
+		if defined( $dowhat{starsubdivide} );
 
 	my ( @gencetres, @genextremes, @genpoints, $genextremes_ref, $gencentres_ref,
 		@starpositions, @dummysweeps );
@@ -3279,11 +3452,22 @@ sub genstar
 	my @varnumbers = @{ $varnumbers_ref };
 
 	my (  @genextremes, @gencentres, @starpositions );
+	my $starsubdivide = defined( $dowhat{starsubdivide} ) ? lc( $dowhat{starsubdivide} ) : "";
+	$starsubdivide =~ s/^\s+|\s+$//g;
+	$starsubdivide = "diagonal" if $starsubdivide eq "";
+	die "Unknown starsubdivide mode '$starsubdivide'; expected diagonal or undiagonal"
+		unless ( $starsubdivide eq "diagonal" or $starsubdivide eq "undiagonal" );
+
 	if ( $dowhat{stardivisions} == 1 )
 	{
 		$gencentres_ref = gencen( \@varnumbers);
 		@gencentres = @{ $gencentres_ref };
 		push( @starpositions, @gencentres );
+	}
+	elsif ( ( $dowhat{stardivisions} > 1 ) and ( $starsubdivide eq "undiagonal" ) )
+	{
+		my $centres_ref = _undiagonal_star_centres( \@varnumbers, $dowhat{stardivisions} );
+		push( @starpositions, @{ $centres_ref } );
 	}
 	elsif ( $dowhat{stardivisions} > 1 )
 	{
@@ -3731,6 +3915,8 @@ sub opt
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Sim::OPT.
@@ -3765,6 +3951,28 @@ OPT can work on a given set of pre-simulated results without launching new simul
 By default the behaviour of the program is sequential.
 
 OPT can perform star searches (Jacoby method of course, but also Gauss-Seidel) within blocks in place of multilevel full-factorial searches. To ask for that in a configuration file, the first number in a block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in the block. A block, in that case, should be declared with something like this: ( "2>1", 2, 3). When operating with pre-simulated dataseries or metamodels, OPT can also perform: factorial searches (to set that, the first number in the concerned block of @sweeps in the configuration file has to be preceded by a "<" sign); and face-centered composite design searches of the DOE type (in that case, that first number has to be preceded by a "£").
+
+=head2 STAR-CENTRE SUBDIVISION
+
+When an C<nE<gt>> star search is used and explicit C<$dowhat{starpositions}> are not supplied, Sim::OPT can generate star centres automatically.  The optional configuration setting C<$dowhat{starsubdivide}> selects how those centres are generated.
+
+=over 4
+
+=item * C<$dowhat{starsubdivide} = "diagonal">
+
+Uses the historical Sim::OPT procedure: opposite multidimensional extremes are recursively subdivided and the inserted centres lie on the resulting multidimensional diagonal.  This is also the default when C<starsubdivide> is empty or not specified, preserving backward compatibility.
+
+=item * C<$dowhat{starsubdivide} = "undiagonal">
+
+Uses a deterministic low-discrepancy procedure to distribute the requested star centres throughout the discrete active-variable lattice.  The number of requested centres follows the same historical C<nE<gt>> progression (for example C<7E<gt>> requests 65 centres and C<11E<gt>> requests 1025 centres), but duplicate centre coordinates are removed before star casting.  This mode is intended for progressively denser space-filling star sampling when the diagonal subdivision has reached the resolution of the lattice and further subdivisions would otherwise reproduce mostly redundant centres.
+
+=back
+
+For reproducible studies the setting should be stated explicitly even though C<diagonal> remains the default.  For example:
+
+  $dowhat{starsubdivide} = "undiagonal";
+
+The switch affects automatic centre generation only.  Explicit C<$dowhat{starpositions}> continue to take precedence, and Sim::OPT's normal duplicate-instance suppression remains in force for overlaps among the stars themselves.
 
 For specifying in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from star searches or other "positions" instead of a multilevel full-factorial search, it is necessary to assign the value "y" to the variable $dowhat{metamodel}, or to precede the first iteam of a block with the letter "ø".
 

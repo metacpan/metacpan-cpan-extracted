@@ -4,6 +4,7 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   DBD::CSV: '0'
+  Encode: '0'
   ExtUtils::MakeMaker: '0'
   IPC::System::Simple: '0'
   Test::Memory::Cycle: '0'
@@ -18,7 +19,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,10 +37,11 @@ requires:
   Database::Abstraction: '0.41'
   File::Spec: '3.40'
   File::Temp: '0.22'
-  HTML::D3: '0.1'
+  HTML::D3: '0.11'
   HTML::TableExtract: '0'
   LWP::UserAgent: '0'
   LWP::UserAgent::Cached: '0'
+  List::Util: '1.40'
   Mojolicious: '9.49'
   Mojolicious::Plugin::TemplateToolkit: '0'
   Params::Get: '0'
@@ -52,5 +54,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Database-BI/issues
   repository: https://github.com/nigelhorne/Database-BI.git
-version: v0.005.1
+version: v0.005.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

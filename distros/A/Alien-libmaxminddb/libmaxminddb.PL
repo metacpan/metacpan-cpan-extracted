@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 
 my $DIST_NAME       = 'Alien-libmaxminddb';
-my $BUNDLED_VERSION = '1.13.3';
+my $BUNDLED_VERSION = '1.14.0';
 
 package PgkConf;
 

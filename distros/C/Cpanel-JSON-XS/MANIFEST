@@ -417,6 +417,8 @@ t/test_transform/string_3_invalid_codepoints.json
 t/test_transform/string_with_escaped_NULL.json
 t/zero-mojibake.t
 typemap
+utf8_range.c
+utf8_range.h
 xt/changes.t
 xt/checkchanges.t
 xt/gh70-asan.t

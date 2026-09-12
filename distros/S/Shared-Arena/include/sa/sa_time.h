@@ -50,6 +50,30 @@ static uint64_t sa_now_us(void) {
 #endif
 }
 
+/* Milliseconds since the epoch. A WALL clock, deliberately, and a different
+ * one from sa_now_us above: a deadline is set by one process and read by
+ * another, and the only clock two processes certainly agree on is the one the
+ * machine keeps. sa_now_us is a monotonic tick for measuring intervals within
+ * a process; this is a shared timestamp for comparing deadlines across them.
+ * A step in it moves every deadline together, which costs at worst one round of
+ * early or late expiry - the cache and the map's TTL both rely on that. */
+static uint64_t sa_now_ms(void) {
+#ifdef _WIN32
+    FILETIME ft;
+    ULARGE_INTEGER u;
+    GetSystemTimeAsFileTime(&ft);
+    u.LowPart  = ft.dwLowDateTime;
+    u.HighPart = ft.dwHighDateTime;
+    /* 100ns units since 1601; the offset is dropped because only differences
+     * and comparisons against each other matter here. */
+    return (uint64_t)(u.QuadPart / 10000ULL);
+#else
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (uint64_t)tv.tv_sec * 1000ULL + (uint64_t)(tv.tv_usec / 1000);
+#endif
+}
+
 /* Sleep, in microseconds. A real sleep and not a spin: a process waiting on
  * somebody else's commit has nothing to do, and burning a core to find that out
  * helps nobody. */

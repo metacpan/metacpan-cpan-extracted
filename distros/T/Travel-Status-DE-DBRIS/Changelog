@@ -1,3 +1,7 @@
+Travel::Status::DE::DBRIS 0.33 - Fri Sep 11 2026
+
+    * Formation: Catch invalid UIC IDs before parsing
+
 Travel::Status::DE::DBRIS 0.32 - Thu Jul 16 2026
 
     * Update rolling stock models and train names (patches by Lili Urban)

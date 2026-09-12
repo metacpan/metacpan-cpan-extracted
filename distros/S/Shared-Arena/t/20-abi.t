@@ -33,11 +33,14 @@ is(Shared::Arena::_abi_selftest(), 0,
 # notices when an append moves one and not the other: the table would answer 1
 # while the header promised 2, and every consumer built against 2 would refuse a
 # provider that in fact has what it wants.
-# One, and it stays one until the first release. A table only earns a history
-# when somebody could have compiled against an earlier one; bumping it before
-# then claims a compatibility story that never happened.
-is(Shared::Arena::_abi_version(), 1,
-   'the table is at version 1, which is where an unreleased dist stays');
+# The header's own policy (see sa_abi.h): the table only grows at the end and
+# SA_ABI_VERSION bumps on every append, so a consumer that checks
+# `t->abi_version >= SA_ABI_VERSION` refuses a provider that is missing entries
+# it was built against. 0.03 appended map_store_ttl and the cuckoo filter,
+# taking it to 2. The next `is` proves the header and the compiled table agree
+# on that number, which is what actually matters.
+is(Shared::Arena::_abi_version(), 2,
+   'the table is at version 2, matching sa_abi.h after the 0.03 appends');
 
 {
     require Shared::Arena::Install::Files;
@@ -105,7 +108,19 @@ is(Shared::Arena::_abi_version(), 1,
 
             group_open group_release group_claim
             group_position group_counts
-        )], 'the entries are in the order version 1 publishes them');
+
+            map_store_ttl
+
+            cuckoo_open cuckoo_release cuckoo_add cuckoo_check
+            cuckoo_remove cuckoo_reset cuckoo_counts
+
+            lease_open lease_release_handle lease_acquire lease_renew
+            lease_release lease_mine lease_holder lease_fence
+
+            sb_open sb_release sb_take sb_field sb_begin sb_set_gauge
+            sb_add_gauge sb_set_status sb_end sb_read sb_slots sb_nfields
+            sb_field_name
+        )], 'the entries are in the order they were published in');
 
         # Under PERL_IMPLICIT_SYS - every Strawberry perl - XSUB.h redefines
         # these as function-like macros, and a member with one of those names

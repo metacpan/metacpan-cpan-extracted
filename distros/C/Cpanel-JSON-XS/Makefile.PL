@@ -46,6 +46,7 @@ EOT
     unlink("tmp.c", $exe, "tmp$Config{obj_ext}");
   }
 }
+my $yath = MM->maybe_command("yath");
 
 WriteMakefile(
   dist	 => {
@@ -56,6 +57,9 @@ WriteMakefile(
   EXE_FILES    => [ "bin/cpanel_json_xs" ],
   VERSION_FROM => "XS.pm",
   NAME         => "Cpanel::JSON::XS",
+  # the SIMD utf8 validator is its own object so its inlining cannot affect
+  # the parser's hot loops (GH #213)
+  OBJECT       => 'XS$(OBJ_EXT) utf8_range$(OBJ_EXT)',
   CONFIGURE_REQUIRES => {
     'Config'              => 0,
     'ExtUtils::MakeMaker' => 0,
@@ -238,7 +242,8 @@ release : xtest dist
 
 xtest :: test
 	\$(MAKE) test TEST_FILES=xt/*.t
-
+" . ($yath ? "\tyath .\n" : "") .
+"
 const-c.inc const-xs.inc : Makefile.PL
 
 # versioned gcc needs overrides

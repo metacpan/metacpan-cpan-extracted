@@ -157,6 +157,7 @@ static void sa_abi_map_counts(const sa_hash *m, sa_map_counts *out) {
     out->tombstones = sa_at_load64_acq(&m->hdr->tombstones);
     out->busy       = sa_at_load64_acq(&m->hdr->busy);
     out->full       = sa_at_load64_acq(&m->hdr->full);
+    out->expired    = sa_at_load64_acq(&m->hdr->expired);
 }
 
 static uint64_t sa_abi_map_pair_max(const sa_hash *m) {
@@ -253,6 +254,7 @@ static sa_cache *sa_abi_cache_open(sa_region *r, const char *name, size_t nlen,
 static void sa_abi_cache_counts(sa_cache *c, sa_cache_counts *out) {
     if (!out) return;
     if (!c) { memset(out, 0, sizeof *out); return; }
+    sa_cache_flush(c);        /* this process's own counts, exactly */
     out->hits      = sa_at_load64_acq(&c->hdr->hits);
     out->misses    = sa_at_load64_acq(&c->hdr->misses);
     out->evictions = sa_at_load64_acq(&c->hdr->evictions);
@@ -356,6 +358,137 @@ static uint64_t sa_abi_cms_total(sa_cms *s) {
 }
 static uint32_t sa_abi_cms_rows(const sa_cms *s)  { return s ? s->rows  : 0; }
 static uint64_t sa_abi_cms_width(const sa_cms *s) { return s ? s->width : 0; }
+
+/* ---- the cuckoo filter ------------------------------------------------------
+ *
+ * Capacity is the one number either surface takes, and both turn it into
+ * buckets through sa_cuckoo_buckets, so a C consumer and a Perl one naming the
+ * same capacity get the same filter and can attach to each other's. */
+static sa_cuckoo *sa_abi_cuckoo_open(sa_region *r, const char *name,
+                                     size_t nlen, uint64_t capacity, int *err)
+{
+    sa_reg *e;
+    uint64_t b;
+
+    if (err) *err = SA_E_OK;
+    b = sa_cuckoo_buckets(capacity);
+    e = sa_carve(r, name, nlen, sa_cuckoo_bytes(b), SA_T_CUCKOO, err);
+    if (!e) return NULL;
+    return sa_cuckoo_bind(r, e, b, capacity, err);
+}
+
+static void sa_abi_cuckoo_counts(sa_cuckoo *c, sa_cuckoo_counts *out) {
+    if (!out) return;
+    memset(out, 0, sizeof *out);
+    if (!c) return;
+    out->slots    = c->buckets * SA_CK_LANES;
+    out->buckets  = c->buckets;
+    out->capacity = c->hdr->capacity;
+#if SA_HAVE_ATOMICS
+    out->count     = sa_at_load64_acq(&c->hdr->count);
+    out->kicks     = sa_at_load64_acq(&c->hdr->kicks);
+    out->moves     = sa_at_load64_acq(&c->hdr->moves);
+    out->full      = sa_at_load64_acq(&c->hdr->full);
+    out->recovered = sa_at_load64_acq(&c->hdr->recovered);
+#endif
+}
+
+/* ---- the lease ------------------------------------------------------------- */
+
+static sa_lease *sa_abi_lease_open(sa_region *r, const char *name, size_t nlen,
+                                   int *err)
+{
+    if (err) *err = SA_E_OK;
+    if (!r) { if (err) *err = SA_E_NOENT; return NULL; }
+#if SA_HAVE_ATOMICS
+    return sa_lease_bind(r, name, (uint32_t)nlen, err);
+#else
+    (void)name; (void)nlen;
+    if (err) *err = SA_E_NOATOMICS;
+    return NULL;
+#endif
+}
+
+/* sa_lease_acquire / _renew / _release / _mine / _holder / _fence and
+ * sa_lease_free already match the ABI signatures exactly, so the table points
+ * straight at them. */
+
+/* ---- the scoreboard -------------------------------------------------------- */
+
+static sa_sb *sa_abi_sb_open(sa_region *r, const char *name, size_t nlen,
+                             const char *const *fields, uint32_t nfields,
+                             uint32_t slots, int *err)
+{
+    sa_reg *e;
+    uint64_t want;
+
+    if (err) *err = SA_E_OK;
+    if (!r) { if (err) *err = SA_E_NOENT; return NULL; }
+#if SA_HAVE_ATOMICS
+    /* `slots` of 0 inherits an existing board, the same as the Perl surface. */
+    if (slots) {
+        if (slots > SA_SB_SLOTS_MAX) slots = SA_SB_SLOTS_MAX;
+        want = sa_sb_bytes(slots);
+    }
+    else if (sa_find(r, name, nlen)) {
+        want = 0;
+    }
+    else {
+        want = sa_sb_bytes(256);
+    }
+    e = sa_carve(r, name, nlen, want, SA_T_SCOREBOARD, err);
+    if (!e) return NULL;
+    return sa_sb_bind(r, e, fields, nfields, err);
+#else
+    (void)name; (void)nlen; (void)fields; (void)nfields; (void)slots; (void)want;
+    if (err) *err = SA_E_NOATOMICS;
+    return NULL;
+#endif
+}
+
+/* The write side passes the row as an opaque void* in the ABI, so these cast it
+ * back. sa_sb_take / sa_sb_field / sa_sb_read / sa_sb_free match directly. */
+static void *sa_abi_sb_begin(sa_sb *b) {
+#if SA_HAVE_ATOMICS
+    return (void *)sa_sb_begin(b);
+#else
+    (void)b; return NULL;
+#endif
+}
+static void sa_abi_sb_set_gauge(void *row, int idx, uint64_t v) {
+#if SA_HAVE_ATOMICS
+    sa_sb_set_gauge((sa_sb_slot *)row, idx, v);
+#else
+    (void)row; (void)idx; (void)v;
+#endif
+}
+static void sa_abi_sb_add_gauge(void *row, int idx, int64_t by) {
+#if SA_HAVE_ATOMICS
+    sa_sb_add_gauge((sa_sb_slot *)row, idx, by);
+#else
+    (void)row; (void)idx; (void)by;
+#endif
+}
+static void sa_abi_sb_set_status(void *row, const char *p, uint32_t n) {
+#if SA_HAVE_ATOMICS
+    sa_sb_set_status((sa_sb_slot *)row, p, n);
+#else
+    (void)row; (void)p; (void)n;
+#endif
+}
+static void sa_abi_sb_end(sa_sb *b, void *row) {
+#if SA_HAVE_ATOMICS
+    sa_sb_end(b, (sa_sb_slot *)row);
+#else
+    (void)b; (void)row;
+#endif
+}
+static uint64_t sa_abi_sb_slots(const sa_sb *b) { return b ? b->nslots : 0; }
+static uint32_t sa_abi_sb_nfields(const sa_sb *b) { return b ? b->nfields : 0; }
+static const char *sa_abi_sb_field_name(const sa_sb *b, uint32_t idx) {
+    if (!b || idx >= b->nfields) return NULL;
+    return b->hdr->fields[idx];
+}
 
 /* ---- queue groups ---------------------------------------------------------- */
 
@@ -530,7 +663,44 @@ static const sa_abi SA_ABI = {
     sa_group_free,
     sa_abi_group_claim,
     sa_abi_group_position,
-    sa_abi_group_counts
+    sa_abi_group_counts,
+
+    /* map, with a TTL */
+    sa_hash_store_ttl,
+
+    /* the cuckoo filter */
+    sa_abi_cuckoo_open,
+    sa_cuckoo_free,
+    sa_cuckoo_add,
+    sa_cuckoo_check,
+    sa_cuckoo_remove,
+    sa_cuckoo_reset,
+    sa_abi_cuckoo_counts,
+
+    /* the lease */
+    sa_abi_lease_open,
+    sa_lease_free,
+    sa_lease_acquire,
+    sa_lease_renew,
+    sa_lease_release,
+    sa_lease_mine,
+    sa_lease_holder,
+    sa_lease_fence,
+
+    /* the scoreboard */
+    sa_abi_sb_open,
+    sa_sb_free,
+    sa_sb_take,
+    sa_sb_field,
+    sa_abi_sb_begin,
+    sa_abi_sb_set_gauge,
+    sa_abi_sb_add_gauge,
+    sa_abi_sb_set_status,
+    sa_abi_sb_end,
+    sa_sb_read,
+    sa_abi_sb_slots,
+    sa_abi_sb_nfields,
+    sa_abi_sb_field_name
 };
 
 /* ---- the selftest ---------------------------------------------------------
@@ -597,6 +767,17 @@ static int sa_abi_selftest(void)
     /* 3: create an anonymous region */
     cfg.bytes = 512 * 1024;
     r = A->create(&cfg, &err);
+#if !SA_HAVE_ATOMICS
+    /* With no atomics the table's answer is that there is no region, and it
+     * must give that answer as NULL and a code, never a pointer - for attach
+     * as for create. Every later check needs a region, so this is the whole of
+     * the test in this build. */
+    if (r || err != SA_E_NOATOMICS || !A->errstr(err)) { SA_STEP(3); goto done; }
+    err = SA_E_OK;
+    r = A->attach_named("sa-selftest", 11, &err);
+    if (r || err != SA_E_NOATOMICS) { SA_STEP(3); goto done; }
+    goto done;
+#endif
     if (!r || err != SA_E_OK) { SA_STEP(3); goto done; }
     if (!A->is_creator(r)) { SA_STEP(3); goto done; }
     if (A->region_bytes(r) < cfg.bytes) { SA_STEP(3); goto done; }
@@ -779,6 +960,18 @@ static int sa_abi_selftest(void)
 
         A->map_counts(mp, &mc);
         if (mc.capacity != 16 || mc.tombstones != 1 || mc.used != 1)
+            { A->map_release(mp); SA_STEP(15); goto done; }
+
+        /* map_store_ttl through the table: a far deadline stores and reads
+         * like any other entry. The expiry itself needs a clock the selftest
+         * cannot advance, so real lapsing is a Perl test's job; this proves the
+         * entry points at a working function. */
+        if (A->map_store_ttl(mp, "ttl", 3, "live", 4, 3600000ULL) != SA_H_OK)
+            { A->map_release(mp); SA_STEP(15); goto done; }
+        if (A->map_fetch(mp, "ttl", 3, buf, sizeof buf, &vl) != SA_MAP_HIT
+            || vl != 4 || memcmp(buf, "live", 4))
+            { A->map_release(mp); SA_STEP(15); goto done; }
+        if (!A->map_delete(mp, "ttl", 3))
             { A->map_release(mp); SA_STEP(15); goto done; }
 
         /* fill it and check the ceiling refuses rather than growing */
@@ -1092,6 +1285,141 @@ static int sa_abi_selftest(void)
         A->group_release(ga);
         A->group_release(gb);
         A->ring_release(gr);
+    }
+
+    /* 22: the cuckoo filter. Filled to 200 of its 256 slots, so keys may have
+     * to move to make room, and the assertion is the guarantee rather than the
+     * arithmetic: nothing added and not removed ever checks 0. */
+    {
+        sa_cuckoo *ck = A->cuckoo_open(r, "selk", 4, 200, &err);
+        sa_cuckoo_counts cc;
+        char kb[16];
+        int i, n, lost = 0;
+
+        if (!ck || err != SA_E_OK) { SA_STEP(22); goto done; }
+        A->cuckoo_counts(ck, &cc);
+        if (cc.slots < 200 || cc.count != 0 || cc.capacity != 200)
+            { A->cuckoo_release(ck); SA_STEP(22); goto done; }
+
+        /* Empty: an exact no, and nothing to remove. */
+        if (A->cuckoo_check(ck, "one", 3) || A->cuckoo_remove(ck, "one", 3))
+            { A->cuckoo_release(ck); SA_STEP(22); goto done; }
+
+        /* In, found, out, gone - with nothing else in the filter for the
+         * last answer to be a coincidence with. */
+        if (!A->cuckoo_add(ck, "one", 3) || !A->cuckoo_check(ck, "one", 3))
+            { A->cuckoo_release(ck); SA_STEP(22); goto done; }
+        if (!A->cuckoo_remove(ck, "one", 3) || A->cuckoo_check(ck, "one", 3))
+            { A->cuckoo_release(ck); SA_STEP(22); goto done; }
+
+        for (i = 0; i < 200; i++) {
+            n = sprintf(kb, "k%d", i);
+            if (!A->cuckoo_add(ck, kb, (uint32_t)n))
+                { A->cuckoo_release(ck); SA_STEP(22); goto done; }
+        }
+        for (i = 0; i < 200; i++) {
+            n = sprintf(kb, "k%d", i);
+            if (!A->cuckoo_check(ck, kb, (uint32_t)n)) lost++;
+        }
+        if (lost) { A->cuckoo_release(ck); SA_STEP(22); goto done; }
+
+        A->cuckoo_counts(ck, &cc);
+        if (cc.count != 200 || cc.full != 0)
+            { A->cuckoo_release(ck); SA_STEP(22); goto done; }
+
+        A->cuckoo_reset(ck);
+        A->cuckoo_counts(ck, &cc);
+        if (cc.count != 0 || A->cuckoo_check(ck, "k7", 2))
+            { A->cuckoo_release(ck); SA_STEP(22); goto done; }
+
+        A->cuckoo_release(ck);
+    }
+
+    /* 23: the lease. One process cannot demonstrate handoff to itself - the
+     * holder is keyed on pid, so two handles here both "hold" it - so this
+     * proves the single-process semantics and every table entry, and leaves
+     * cross-process stealing to a fork test. */
+    {
+        sa_lease *ls = A->lease_open(r, "sele", 4, &err);
+        int held = 0, stole = 0;
+        uint64_t f1, f2;
+
+        if (!ls || err != SA_E_OK) { SA_STEP(23); goto done; }
+
+        held = A->lease_acquire(ls, 30000, &stole);
+        if (!held || stole) { A->lease_release_handle(ls); SA_STEP(23); goto done; }
+        if (!A->lease_mine(ls)) { A->lease_release_handle(ls); SA_STEP(23); goto done; }
+        if (!A->lease_holder(ls)) { A->lease_release_handle(ls); SA_STEP(23); goto done; }
+        f1 = A->lease_fence(ls);
+        if (!f1) { A->lease_release_handle(ls); SA_STEP(23); goto done; }
+
+        if (!A->lease_renew(ls, 30000))
+            { A->lease_release_handle(ls); SA_STEP(23); goto done; }
+        if (A->lease_fence(ls) != f1)          /* renew keeps the tenure */
+            { A->lease_release_handle(ls); SA_STEP(23); goto done; }
+
+        if (!A->lease_release(ls))
+            { A->lease_release_handle(ls); SA_STEP(23); goto done; }
+        if (A->lease_mine(ls) || A->lease_holder(ls))
+            { A->lease_release_handle(ls); SA_STEP(23); goto done; }
+
+        /* Re-acquiring a lease we just released is a new tenure: the fence must
+         * move, or a superseded holder could not be told from a current one. */
+        if (!A->lease_acquire(ls, 30000, &stole))
+            { A->lease_release_handle(ls); SA_STEP(23); goto done; }
+        f2 = A->lease_fence(ls);
+        if (f2 <= f1) { A->lease_release_handle(ls); SA_STEP(23); goto done; }
+
+        A->lease_release(ls);
+        A->lease_release_handle(ls);
+    }
+
+    /* 24: the scoreboard. One process claims a row, writes it coherently
+     * through the begin/set/end trio, and reads it back - the cross-worker
+     * exclusion and reclaim are a fork test's job. */
+    {
+        const char *flds[2];
+        sa_sb *sb;
+        void *row;
+        sa_sb_reading rd;
+        int fi_a, fi_b;
+
+        flds[0] = "a"; flds[1] = "b";
+        sb = A->sb_open(r, "sele-sb", 7, flds, 2, 8, &err);
+        if (!sb || err != SA_E_OK) { SA_STEP(24); goto done; }
+        if (A->sb_slots(sb) != 8 || A->sb_nfields(sb) != 2)
+            { A->sb_release(sb); SA_STEP(24); goto done; }
+
+        fi_a = A->sb_field(sb, "a", 1);
+        fi_b = A->sb_field(sb, "b", 1);
+        if (fi_a < 0 || fi_b < 0 || A->sb_field(sb, "nope", 4) >= 0)
+            { A->sb_release(sb); SA_STEP(24); goto done; }
+        if (strcmp(A->sb_field_name(sb, 0), "a")
+            || strcmp(A->sb_field_name(sb, 1), "b"))
+            { A->sb_release(sb); SA_STEP(24); goto done; }
+
+        if (A->sb_take(sb) < 0) { A->sb_release(sb); SA_STEP(24); goto done; }
+
+        row = A->sb_begin(sb);
+        if (!row) { A->sb_release(sb); SA_STEP(24); goto done; }
+        A->sb_set_gauge(row, fi_a, 100);
+        A->sb_set_gauge(row, fi_b, 7);
+        A->sb_set_status(row, "busy", 4);
+        A->sb_end(sb, row);
+
+        row = A->sb_begin(sb);
+        if (row) { A->sb_add_gauge(row, fi_b, 5); A->sb_end(sb, row); }
+
+        /* Row 0 is ours; read it back coherently. */
+        if (!A->sb_read(sb, 0, &rd)) { A->sb_release(sb); SA_STEP(24); goto done; }
+        if (rd.gauges[fi_a] != 100 || rd.gauges[fi_b] != 12)
+            { A->sb_release(sb); SA_STEP(24); goto done; }
+        if (rd.statuslen != 4 || memcmp(rd.status, "busy", 4))
+            { A->sb_release(sb); SA_STEP(24); goto done; }
+        if (!rd.alive)          /* the writer - us - is running */
+            { A->sb_release(sb); SA_STEP(24); goto done; }
+
+        A->sb_release(sb);
     }
 
 done:

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Cache - a shared cache that evicts instead of refusing
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -132,6 +132,12 @@ Drops everything.
 C<hit_rate> is the number a cache exists to produce, and C<evictions> against
 C<capacity> is what says whether it is big enough. C<live> walks every entry,
 so this belongs on a status page rather than in a request.
+
+C<hits> and C<misses> are counted by each process and published every 64, so
+that readers in different processes are not all writing to one counter. The
+calling process's own counts are always included, but another process's may
+trail by up to 63 of each. A process that exits without letting its cache
+object go, through C<POSIX::_exit> for instance, takes up to that many with it.
 
 =head2 capacity, max_pair
 

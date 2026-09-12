@@ -71,41 +71,50 @@
  * taken. The other dist keeps its entersub guard, which declines for an
  * invocant that is not its own and delegates, so both stay correct.
  *
- * IT IS NOT THE WHOLE WIN, AND THE ABLATION SAYS SO. `cache->get` measured
+ * IT WAS NOT THE WHOLE WIN, AND THE ABLATION SAID SO. `cache->get` measured
  * 60.2ns unhooked, 55.1ns with the method op alone, and 48.8ns with both. The
  * two swaps are not additive - each alone is worth about 5ns and together they
  * are worth 12 - because when both belong to the same hook the method op
  * pushes a CV that the entersub immediately consumes, and neither has to go
  * through a generic dispatch to hand it over.
  *
- * So a shared call site costs this dist about 6ns it would otherwise have. The
- * fix is not to grab the op back: overwriting the other hook's ppaddr would
- * take the same 13ns off THEIR door, which is no better for being invisible
- * from here. It is for both hooks to delegate to the ppaddr they displaced
- * rather than to PL_ppaddr, and that is a change to both dists.
+ * Overwriting the other hook's ppaddr would take the same saving off THEIR
+ * door, which is no better for being invisible from here. So at a shared site
+ * the method op makes the whole call itself and returns the op AFTER the
+ * entersub, which then never runs: sa_pp_methdoor_cache_get, below. That is
+ * the two-op saving from one op, with no change to the other dist and no side
+ * table keyed by op address. Measured on one machine: 52.5ns before, 42.4
+ * after.
  *
- * The two guards compose because each one checks the invocant's class and the
- * CV's identity. For a Cache, this pushes Cache::get and Frozen's entersub
- * guard sees a CV that is not its own and steps aside. For a Frozen container,
- * this declines at the method op and Frozen's own fast path runs untouched.
+ * The guards compose because each one checks the invocant's class and the
+ * CV's identity. For a Cache the method op answers and Frozen's entersub is
+ * never reached. For a Frozen container this declines at the method op and
+ * Frozen's own fast path runs untouched.
  *
  * ---- what it costs everybody else ------------------------------------------
  *
  * The hook sees every `->get`, `->set`, `->add`, `->check`, `->record`,
- * `->store`, `->fetch`, `->exists`, `->incr`, `->publish` and `->allow` in the
- * whole program, not only this dist's. A call on another class runs the guard,
- * declines and delegates: measured at 2.5ns per non-matching call, 39.6 to
- * 42.1. A program that makes millions of those and few of ours is paying for
- * something it does not use, and sets SHARED_ARENA_NO_XOP=1.
+ * `->store`, `->fetch`, `->exists`, `->incr`, `->counter`, `->publish`,
+ * `->allow`, `->remaining`, `->retry_after` and `->estimate` in the whole
+ * program, not only this dist's, at each width a door exists for. A call on
+ * another class runs the guard, declines and delegates: measured at 2.5ns per
+ * non-matching call, 39.6 to 42.1. A program that makes millions of those and
+ * few of ours is paying for something it does not use, and sets
+ * SHARED_ARENA_NO_XOP=1.
+ *
+ * `delete` and `remove` are deliberately not hooked at all. They are common
+ * names on other classes, the tax would fall on every one of them, and neither
+ * is on a request path often enough to pay for that.
  *
  * ---- what is NOT hooked ----------------------------------------------------
  *
  * op_type is left alone, so B::Deparse, B::Concise and every other dumper see
  * an ordinary entersub and keep working. A guard that fails delegates rather
- * than croaking. And a door with a variable number of arguments - `set` with a
- * ttl, `drain` with a max - is hooked only in its commonest shape; the others
- * take the ordinary path, because a guard that has to cope with any stack shape
- * is a guard that has stopped being cheap.
+ * than croaking. A door with optional arguments is a separate door per width,
+ * each compiled only where the call site has exactly that many; a width nobody
+ * wrote a door for - `drain` with a max - takes the ordinary path, because a
+ * guard that has to cope with any stack shape is a guard that has stopped
+ * being cheap.
  */
 
 #include "sa/sa_cache.h"
@@ -115,6 +124,7 @@
 #include "sa/sa_ring.h"
 #include "sa/sa_rate.h"
 #include "sa/sa_cms.h"
+#include "sa/sa_cuckoo.h"
 #include "xop_compat.h"
 
 static Perl_check_t sa_prev_ck_entersub = NULL;
@@ -126,6 +136,7 @@ static HV *sa_stash_hist  = NULL;
 static HV *sa_stash_ring  = NULL;
 static HV *sa_stash_rate  = NULL;
 static HV *sa_stash_cms   = NULL;
+static HV *sa_stash_cuckoo = NULL;
 
 /* Per door: the glob, read every call, and the XSUB that was in it at BOOT,
  * compared but never called. */
@@ -142,7 +153,12 @@ static HV *sa_stash_cms   = NULL;
     _(ring_publish, "Shared::Arena::Ring::publish")                         \
     _(rate_allow,   "Shared::Arena::Rate::allow")                            \
     _(cms_add,      "Shared::Arena::CountMin::add")                         \
-    _(cms_estimate, "Shared::Arena::CountMin::estimate")
+    _(cms_estimate, "Shared::Arena::CountMin::estimate")                    \
+    _(cuckoo_add,   "Shared::Arena::Cuckoo::add")                           \
+    _(cuckoo_check, "Shared::Arena::Cuckoo::check")                         \
+    _(rate_remaining,   "Shared::Arena::Rate::remaining")                   \
+    _(rate_retry_after, "Shared::Arena::Rate::retry_after")                 \
+    _(map_counter,  "Shared::Arena::Map::counter")
 
 #define SA_DOOR_DECL(door, path) \
     static GV *sa_gv_##door = NULL; static CV *sa_cv_##door = NULL;
@@ -206,6 +222,47 @@ static IV sa_xop_meth = 0;   /* sites where only the method op was ours */
         sa_xop_miss++;                                 \
         return PL_ppaddr[OP_ENTERSUB](aTHX)
 
+/* An integer answer goes in the entersub's pad target, which is where the XSUB
+ * this replaces put it through dXSTARG. A fresh mortal per call is an
+ * allocation and a free that the XSUB never paid. */
+#define SA_XOP_TARG()                                          \
+    ((PL_op->op_private & OPpENTERSUB_HASTARG)                 \
+        ? PAD_SV(PL_op->op_targ) : sv_newmortal())
+
+#define SA_XOP_RETURN_IV(nargs, iv)                            \
+    do {                                                       \
+        SV *targ_ = SA_XOP_TARG();                             \
+        sv_setiv_mg(targ_, (IV)(iv));                          \
+        SA_XOP_RETURN(nargs, targ_);                           \
+    } while (0)
+
+#define SA_XOP_RETURN_UV(nargs, uv)                            \
+    do {                                                       \
+        SV *targ_ = SA_XOP_TARG();                             \
+        sv_setuv_mg(targ_, (UV)(uv));                          \
+        SA_XOP_RETURN(nargs, targ_);                           \
+    } while (0)
+
+#define SA_XOP_RETURN_NV(nargs, nv)                            \
+    do {                                                       \
+        SV *targ_ = SA_XOP_TARG();                             \
+        sv_setnv_mg(targ_, (NV)(nv));                          \
+        SA_XOP_RETURN(nargs, targ_);                           \
+    } while (0)
+
+/* Nothing to return, as from the void XSUB this replaces - which pp_entersub
+ * turns into ONE undef in scalar context. The op has to do the same, or
+ * `map { scalar $h->record($_) } 1 .. 3` comes back with no elements. */
+#define SA_XOP_VOID(nargs)                                     \
+    do {                                                       \
+        (void)POPMARK;                                         \
+        sp -= (nargs) + 2;                                     \
+        if (GIMME_V == G_SCALAR) PUSHs(&PL_sv_undef);          \
+        PUTBACK;                                               \
+        sa_xop_hits++;                                         \
+        return NORMAL;                                         \
+    } while (0)
+
 /* ---- the method resolution ------------------------------------------------
  *
  * pp_method_named walks the stash and checks the method cache. When the
@@ -233,7 +290,6 @@ SA_XOP_METH(map_fetch,    sa_stash_map)
 SA_XOP_METH(map_store,    sa_stash_map)
 SA_XOP_METH(map_incr,     sa_stash_map)
 SA_XOP_METH(map_exists,   sa_stash_map)
-SA_XOP_METH(bloom_check,  sa_stash_bloom)
 SA_XOP_METH(hist_record,  sa_stash_hist)
 SA_XOP_METH(ring_publish, sa_stash_ring)
 SA_XOP_METH(rate_allow,   sa_stash_rate)
@@ -250,9 +306,18 @@ static OP *sa_pp_cache_get(pTHX) {
             STRLEN klen;
             const char *k;
             SV *out;
+            char buf[1024];
             uint32_t vlen = 0;
             if (!c) goto delegate;
             k = SvPV(mark[2], klen);
+            /* Stack first where an entry fits, as the XSUB does: a miss
+             * allocates nothing and a hit only what the value needs. */
+            if (c->pair_max < sizeof buf) {
+                if (sa_cache_get(c, k, (uint32_t)klen, buf,
+                                 (uint32_t)c->pair_max, &vlen) != SA_C_HIT)
+                    SA_XOP_EMPTY(1);
+                SA_XOP_RETURN(1, sv_2mortal(newSVpvn(buf, (STRLEN)vlen)));
+            }
             out = sv_2mortal(newSV((STRLEN)c->pair_max + 1));
             SvPOK_on(out);
             if (sa_cache_get(c, k, (uint32_t)klen, SvPVX(out),
@@ -279,7 +344,7 @@ static OP *sa_pp_cache_set(pTHX) {
             k = SvPV(mark[2], klen);
             v = SvPV(mark[3], vlen);
             rc = sa_cache_set(c, k, (uint32_t)klen, v, (uint32_t)vlen, 0);
-            SA_XOP_RETURN(2, sv_2mortal(newSViv(rc)));
+            SA_XOP_RETURN_IV(2, rc);
         }
     }
     SA_XOP_DELEGATE();
@@ -294,9 +359,17 @@ static OP *sa_pp_map_fetch(pTHX) {
             STRLEN klen;
             const char *k;
             SV *out;
+            char buf[1024];
             uint32_t vlen = 0;
             if (!m) goto delegate;
             k = SvPV(mark[2], klen);
+            /* Stack first where a slot fits, as the XSUB does. */
+            if (m->pair_max < sizeof buf) {
+                if (sa_hash_fetch(m, k, (uint32_t)klen, buf,
+                                  (uint32_t)m->pair_max, &vlen) != SA_H_HIT)
+                    SA_XOP_EMPTY(1);
+                SA_XOP_RETURN(1, sv_2mortal(newSVpvn(buf, (STRLEN)vlen)));
+            }
             out = sv_2mortal(newSV((STRLEN)m->pair_max + 1));
             SvPOK_on(out);
             if (sa_hash_fetch(m, k, (uint32_t)klen, SvPVX(out),
@@ -323,7 +396,7 @@ static OP *sa_pp_map_store(pTHX) {
             k = SvPV(mark[2], klen);
             v = SvPV(mark[3], vlen);
             rc = sa_hash_store(m, k, (uint32_t)klen, v, (uint32_t)vlen);
-            SA_XOP_RETURN(2, sv_2mortal(newSViv(rc)));
+            SA_XOP_RETURN_IV(2, rc);
         }
     }
     SA_XOP_DELEGATE();
@@ -342,7 +415,7 @@ static OP *sa_pp_map_incr(pTHX) {
             k = SvPV(mark[2], klen);
             if (sa_hash_incr(m, k, (uint32_t)klen, 1, &now) != SA_H_OK)
                 SA_XOP_RETURN(1, &PL_sv_undef);
-            SA_XOP_RETURN(1, sv_2mortal(newSVuv((UV)now)));
+            SA_XOP_RETURN_UV(1, (UV)now);
         }
     }
     SA_XOP_DELEGATE();
@@ -363,26 +436,55 @@ static OP *sa_pp_map_exists(pTHX) {
             k = SvPV(mark[2], klen);
             hit = sa_hash_fetch(m, k, (uint32_t)klen, scratch, 0, &vlen)
                   != SA_H_MISS;
-            SA_XOP_RETURN(1, sv_2mortal(newSViv(hit ? 1 : 0)));
+            SA_XOP_RETURN_IV(1, hit ? 1 : 0);
         }
     }
     SA_XOP_DELEGATE();
 }
 
-static OP *sa_pp_bloom_check(pTHX) {
+/* `check` is a name both filters answer to, so it is one door for two classes,
+ * told apart the way `add` below tells its three apart: by the CV the method op
+ * pushed, which is also the identity that keeps a monkeypatch working. */
+static OP *sa_pp_meth_check(pTHX) {
     dSP;
-    {
-        SA_XOP_SELF(sa_cv_bloom_check, sa_stash_bloom, 1);
-        {
-            sa_bloom *b = SA_XOP_PTR(sa_bloom *);
-            STRLEN klen;
-            const char *k;
-            if (!b) goto delegate;
-            k = SvPV(mark[2], klen);
-            SA_XOP_RETURN(1,
-                sv_2mortal(newSViv(sa_bloom_check(b, k, (uint32_t)klen))));
-        }
+    SV **mark = PL_stack_base + TOPMARK;
+    SV *self;
+    CV *cv = NULL;
+    if (sp <= mark) return PL_ppaddr[OP_METHOD_NAMED](aTHX);
+    self = mark[1];
+    if      (SA_IS(self, sa_stash_bloom) && sa_gv_bloom_check)
+        cv = GvCV(sa_gv_bloom_check);
+    else if (SA_IS(self, sa_stash_cuckoo) && sa_gv_cuckoo_check)
+        cv = GvCV(sa_gv_cuckoo_check);
+    if (!cv) return PL_ppaddr[OP_METHOD_NAMED](aTHX);
+    XPUSHs((SV *)cv);
+    PUTBACK;
+    return NORMAL;
+}
+
+static OP *sa_pp_check(pTHX) {
+    dSP;
+    SV **mark = PL_stack_base + TOPMARK;
+    SV *self;
+    STRLEN klen;
+    const char *k;
+
+    if (sp - mark != 3) goto delegate;
+    self = mark[1];
+
+    if ((CV *)*sp == sa_cv_bloom_check && SA_IS(self, sa_stash_bloom)) {
+        sa_bloom *b = SA_XOP_PTR(sa_bloom *);
+        if (!b) goto delegate;
+        k = SvPV(mark[2], klen);
+        SA_XOP_RETURN_IV(1, sa_bloom_check(b, k, (uint32_t)klen));
     }
+    if ((CV *)*sp == sa_cv_cuckoo_check && SA_IS(self, sa_stash_cuckoo)) {
+        sa_cuckoo *ck = SA_XOP_PTR(sa_cuckoo *);
+        if (!ck) goto delegate;
+        k = SvPV(mark[2], klen);
+        SA_XOP_RETURN_IV(1, sa_cuckoo_check(ck, k, (uint32_t)klen));
+    }
+
     SA_XOP_DELEGATE();
 }
 
@@ -395,12 +497,8 @@ static OP *sa_pp_hist_record(pTHX) {
             if (!h) goto delegate;
             sa_hist_record(h, (uint64_t)SvUV(mark[2]), 1);
             /* record returns nothing, so the op must leave the stack the way
-             * a void XSUB would: empty. */
-            (void)POPMARK;
-            sp -= 1 + 2;
-            PUTBACK;
-            sa_xop_hits++;
-            return NORMAL;
+             * a void XSUB would - which is not quite empty: see SA_XOP_VOID. */
+            SA_XOP_VOID(1);
         }
     }
     SA_XOP_DELEGATE();
@@ -420,8 +518,8 @@ static OP *sa_pp_ring_publish(pTHX) {
             t = SvPV(mark[2], tlen);
             p = SvPV(mark[3], plen);
             rc = sa_ring_publish(r, t, (uint32_t)tlen, p, (uint32_t)plen, &seq);
-            SA_XOP_RETURN(2, sv_2mortal(newSViv(
-                rc == SA_PUB_OK ? (IV)seq : (IV)rc)));
+            SA_XOP_RETURN_IV(2,
+                rc == SA_PUB_OK ? (IV)seq : (IV)rc);
         }
     }
     SA_XOP_DELEGATE();
@@ -447,7 +545,7 @@ static OP *sa_pp_rate_allow(pTHX) {
 #else
             ok = 1;
 #endif
-            SA_XOP_RETURN(1, sv_2mortal(newSViv(ok)));
+            SA_XOP_RETURN_IV(1, ok);
         }
     }
     SA_XOP_DELEGATE();
@@ -456,8 +554,8 @@ static OP *sa_pp_rate_allow(pTHX) {
 /* A sketch is added to once per event and asked once per report, so `add` is as
  * hot as anything in the dist. Both return the counter's new or current value,
  * which is the one estimate a caller wants without a second call. */
-/* `add` is a name TWO of this dist's own classes answer to, so one door has to
- * cover both. The method op resolves whichever class the invocant is, and the
+/* `add` is a name THREE of this dist's own classes answer to, so one door has
+ * to cover them all. The method op resolves whichever class the invocant is, and the
  * entersub door below tells them apart by the CV the method op pushed - which
  * is the same identity check that keeps a monkeypatch working, doing a second
  * job here for free.
@@ -476,6 +574,8 @@ static OP *sa_pp_meth_add(pTHX) {
         cv = GvCV(sa_gv_bloom_add);
     else if (SA_IS(self, sa_stash_cms) && sa_gv_cms_add)
         cv = GvCV(sa_gv_cms_add);
+    else if (SA_IS(self, sa_stash_cuckoo) && sa_gv_cuckoo_add)
+        cv = GvCV(sa_gv_cuckoo_add);
     if (!cv) return PL_ppaddr[OP_METHOD_NAMED](aTHX);
     XPUSHs((SV *)cv);
     PUTBACK;
@@ -496,14 +596,19 @@ static OP *sa_pp_add(pTHX) {
         sa_bloom *b = SA_XOP_PTR(sa_bloom *);
         if (!b) goto delegate;
         k = SvPV(mark[2], klen);
-        SA_XOP_RETURN(1, sv_2mortal(newSViv(sa_bloom_add(b, k, (uint32_t)klen))));
+        SA_XOP_RETURN_IV(1, sa_bloom_add(b, k, (uint32_t)klen));
     }
     if ((CV *)*sp == sa_cv_cms_add && SA_IS(self, sa_stash_cms)) {
         sa_cms *cm = SA_XOP_PTR(sa_cms *);
         if (!cm) goto delegate;
         k = SvPV(mark[2], klen);
-        SA_XOP_RETURN(1,
-            sv_2mortal(newSVuv((UV)sa_cms_add(cm, k, (uint32_t)klen, 1))));
+        SA_XOP_RETURN_UV(1, (UV)sa_cms_add(cm, k, (uint32_t)klen, 1));
+    }
+    if ((CV *)*sp == sa_cv_cuckoo_add && SA_IS(self, sa_stash_cuckoo)) {
+        sa_cuckoo *ck = SA_XOP_PTR(sa_cuckoo *);
+        if (!ck) goto delegate;
+        k = SvPV(mark[2], klen);
+        SA_XOP_RETURN_IV(1, sa_cuckoo_add(ck, k, (uint32_t)klen));
     }
 
     SA_XOP_DELEGATE();
@@ -519,11 +624,309 @@ static OP *sa_pp_cms_estimate(pTHX) {
             const char *k;
             if (!cm) goto delegate;
             k = SvPV(mark[2], klen);
-            SA_XOP_RETURN(1, sv_2mortal(newSVuv(
-                (UV)sa_cms_estimate(cm, k, (uint32_t)klen))));
+            SA_XOP_RETURN_UV(1,
+                (UV)sa_cms_estimate(cm, k, (uint32_t)klen));
         }
     }
     SA_XOP_DELEGATE();
+}
+
+/* ---- the other widths of the same doors ------------------------------------
+ *
+ * An optional argument used to send the call the ordinary way, on the
+ * reasoning that a guard coping with any stack shape stops being cheap. It
+ * would, so each width is its own door instead, compiled only at a call site
+ * with exactly that many arguments and counted again at runtime. Measured
+ * before, on an M-series Mac, the hooked width against the same door with its
+ * optional argument:
+ *
+ *     map->incr($k)      / ($k, $by)             26.2 / 40.4 ns
+ *     cache->set($k, $v) / (..., ttl => N)       31.2 / 42.8
+ *     hist->record($v)   / ($v, $n)              13.5 / 30.3
+ *     rate->allow($k)    / ($k, $cost)           28.6 / 37.5
+ *     countmin->add($k)  / ($k, $n)              25.0 / 33.4
+ *
+ * Each shares the method op of the narrower width, which pushes the same CV
+ * whatever the width. Arguments are read in the order the XSUB reads them, so
+ * a tied one is fetched the same number of times either way. */
+
+static OP *sa_pp_map_incr_by(pTHX) {
+    dSP;
+    {
+        SA_XOP_SELF(sa_cv_map_incr, sa_stash_map, 2);
+        {
+            sa_hash *m = SA_XOP_PTR(sa_hash *);
+            STRLEN klen;
+            const char *k;
+            IV by;
+            uint64_t now = 0;
+            if (!m) goto delegate;
+            k  = SvPV(mark[2], klen);
+            by = SvIV(mark[3]);
+            if (sa_hash_incr(m, k, (uint32_t)klen, (int64_t)by, &now) != SA_H_OK)
+                SA_XOP_RETURN(2, &PL_sv_undef);
+            SA_XOP_RETURN_UV(2, (UV)now);
+        }
+    }
+    SA_XOP_DELEGATE();
+}
+
+/* `set($k, $v, ttl => N)` and its `ttl_ms` spelling. Any other option name is
+ * the XSUB's to handle, so the door looks at the name before touching anything
+ * else and steps aside for one it does not know. */
+static OP *sa_pp_cache_set_ttl(pTHX) {
+    dSP;
+    {
+        SA_XOP_SELF(sa_cv_cache_set, sa_stash_cache, 4);
+        {
+            sa_cache *c = SA_XOP_PTR(sa_cache *);
+            SV *opt = mark[4];
+            STRLEN klen, vlen;
+            const char *k, *v;
+            int ms, rc;
+            UV ttl;
+            if (!c) goto delegate;
+            if (!SvPOK(opt) || SvGMAGICAL(opt)) goto delegate;
+            if      (SvCUR(opt) == 3 && memEQ(SvPVX(opt), "ttl", 3))    ms = 0;
+            else if (SvCUR(opt) == 6 && memEQ(SvPVX(opt), "ttl_ms", 6)) ms = 1;
+            else goto delegate;
+            k   = SvPV(mark[2], klen);
+            v   = SvPV(mark[3], vlen);
+            ttl = ms ? SvUV(mark[5]) : (UV)(SvNV(mark[5]) * 1000.0);
+            rc  = sa_cache_set(c, k, (uint32_t)klen, v, (uint32_t)vlen,
+                               (uint64_t)ttl);
+            SA_XOP_RETURN_IV(4, rc);
+        }
+    }
+    SA_XOP_DELEGATE();
+}
+
+static OP *sa_pp_hist_record_n(pTHX) {
+    dSP;
+    {
+        SA_XOP_SELF(sa_cv_hist_record, sa_stash_hist, 2);
+        {
+            sa_hist *h = SA_XOP_PTR(sa_hist *);
+            UV v, n;
+            if (!h) goto delegate;
+            v = SvUV(mark[2]);
+            n = SvUV(mark[3]);
+            sa_hist_record(h, (uint64_t)v, (uint64_t)n);
+            SA_XOP_VOID(2);
+        }
+    }
+    SA_XOP_DELEGATE();
+}
+
+static OP *sa_pp_rate_allow_cost(pTHX) {
+    dSP;
+    {
+        SA_XOP_SELF(sa_cv_rate_allow, sa_stash_rate, 2);
+        {
+            sa_rate *rl = SA_XOP_PTR(sa_rate *);
+            STRLEN klen;
+            const char *k;
+            UV cost;
+            int ok;
+            if (!rl) goto delegate;
+            cost = SvUV(mark[3]);
+            if (cost < 1) cost = 1;
+            k = SvPV(mark[2], klen);
+#if SA_HAVE_ATOMICS
+            ok = sa_rate_take(rl, k, (uint32_t)klen,
+                              (uint64_t)cost * SA_RATE_SCALE, 0, NULL, NULL);
+#else
+            PERL_UNUSED_VAR(k);
+            ok = 1;
+#endif
+            SA_XOP_RETURN_IV(2, ok);
+        }
+    }
+    SA_XOP_DELEGATE();
+}
+
+/* `add($k, $n)` is the sketch's alone: the filters take one argument, so a
+ * filter at this width gets the ordinary call and its ordinary usage error. */
+static OP *sa_pp_add_n(pTHX) {
+    dSP;
+    SV **mark = PL_stack_base + TOPMARK;
+    SV *self;
+
+    if (sp - mark != 4) goto delegate;
+    self = mark[1];
+
+    if ((CV *)*sp == sa_cv_cms_add && SA_IS(self, sa_stash_cms)) {
+        sa_cms *cm = SA_XOP_PTR(sa_cms *);
+        STRLEN klen;
+        const char *k;
+        UV n;
+        if (!cm) goto delegate;
+        n = SvUV(mark[3]);
+        if (n < 1) n = 1;
+        k = SvPV(mark[2], klen);
+#if SA_HAVE_ATOMICS
+        SA_XOP_RETURN_UV(2, (UV)sa_cms_add(cm, k, (uint32_t)klen, (uint64_t)n));
+#else
+        PERL_UNUSED_VAR(k);
+        SA_XOP_RETURN_UV(2, 0);
+#endif
+    }
+
+    SA_XOP_DELEGATE();
+}
+
+/* ---- the rest of a request's rate limiting, and a counter read ---------------
+ *
+ * A handler that sets X-RateLimit headers asks `remaining` on every request and
+ * `retry_after` on every refusal, beside the `allow` that was already an op;
+ * both were ordinary calls at 34ns. `counter` reads a Map counter without
+ * changing it, at 38.5ns. None of the three is a common method name, so what
+ * the hook costs other classes' call sites is close to nothing. */
+SA_XOP_METH(rate_remaining,   sa_stash_rate)
+SA_XOP_METH(rate_retry_after, sa_stash_rate)
+SA_XOP_METH(map_counter,      sa_stash_map)
+
+static OP *sa_pp_rate_remaining(pTHX) {
+    dSP;
+    {
+        SA_XOP_SELF(sa_cv_rate_remaining, sa_stash_rate, 1);
+        {
+            sa_rate *rl = SA_XOP_PTR(sa_rate *);
+            STRLEN klen;
+            const char *k;
+            uint64_t left = 0;
+            if (!rl) goto delegate;
+            k = SvPV(mark[2], klen);
+#if SA_HAVE_ATOMICS
+            (void)sa_rate_take(rl, k, (uint32_t)klen,
+                               (uint64_t)SA_RATE_SCALE, 1, &left, NULL);
+#else
+            PERL_UNUSED_VAR(k);
+#endif
+            SA_XOP_RETURN_NV(1, (NV)left / (NV)SA_RATE_SCALE);
+        }
+    }
+    SA_XOP_DELEGATE();
+}
+
+static OP *sa_pp_rate_retry_after(pTHX) {
+    dSP;
+    {
+        SA_XOP_SELF(sa_cv_rate_retry_after, sa_stash_rate, 1);
+        {
+            sa_rate *rl = SA_XOP_PTR(sa_rate *);
+            STRLEN klen;
+            const char *k;
+            uint64_t retry = 0;
+            if (!rl) goto delegate;
+            k = SvPV(mark[2], klen);
+#if SA_HAVE_ATOMICS
+            (void)sa_rate_take(rl, k, (uint32_t)klen,
+                               (uint64_t)SA_RATE_SCALE, 1, NULL, &retry);
+#else
+            PERL_UNUSED_VAR(k);
+#endif
+            SA_XOP_RETURN_NV(1, (NV)retry / (NV)1000.0);
+        }
+    }
+    SA_XOP_DELEGATE();
+}
+
+static OP *sa_pp_map_counter(pTHX) {
+    dSP;
+    {
+        SA_XOP_SELF(sa_cv_map_counter, sa_stash_map, 1);
+        {
+            sa_hash *m = SA_XOP_PTR(sa_hash *);
+            STRLEN klen;
+            const char *k;
+            char buf[8];
+            uint32_t vlen = 0;
+            uint64_t v;
+            if (!m) goto delegate;
+            k = SvPV(mark[2], klen);
+            if (sa_hash_fetch(m, k, (uint32_t)klen, buf, 8, &vlen) != SA_H_HIT
+                || vlen != 8)
+                SA_XOP_RETURN(1, &PL_sv_undef);
+            memcpy(&v, buf, 8);
+            SA_XOP_RETURN_UV(1, (UV)v);
+        }
+    }
+    SA_XOP_DELEGATE();
+}
+
+/* ---- the whole door in the method op, where the entersub is not ours -------
+ *
+ * Frozen owns the entersub at every one-argument `->get` site, and Frozen is
+ * always loaded, so the cache's main door was only ever half hooked: the
+ * method op pushed our CV, Frozen's entersub stepped aside for it, and
+ * pp_entersub then made an ordinary XSUB call. 55.1ns against 48.8 with both
+ * ops ours.
+ *
+ * A pp function returns the op to run next. So a method op that has already
+ * made the call can return the op AFTER the entersub and skip it entirely,
+ * whoever owns it - which needs no change to the other dist and no side table
+ * keyed by op address. The method op then does the entersub's checking itself:
+ *
+ *   - the width, one fewer here because no CV has been pushed yet;
+ *   - the identity: the glob's CV against the one captured at BOOT, so a
+ *     monkeypatch falls through to the ordinary path and the replacement runs;
+ *   - the context, which is the ENTERSUB's. This op's own flags say scalar
+ *     whatever the call, so GIMME_V is read with PL_op pointed at the call.
+ *
+ * Anything else falls through to the plain method-op door, which pushes the
+ * CV and lets the entersub, and its owner, carry on as before. Installed only
+ * where the entersub is another dist's; where both ops are ours the two-op door
+ * already has the whole saving. */
+static OP *sa_pp_methdoor_cache_get(pTHX) {
+    dSP;
+    SV **mark = PL_stack_base + TOPMARK;
+    OP *call = PL_op->op_next;
+    SV *self, *out = NULL;
+    sa_cache *c;
+    STRLEN klen;
+    const char *k;
+    char buf[1024];
+    uint32_t vlen = 0;
+    int hit;
+    U8 gimme;
+
+    if (sp - mark != 2 || !call || call->op_type != OP_ENTERSUB)
+        return sa_pp_meth_cache_get(aTHX);
+    self = mark[1];
+    if (!SA_IS(self, sa_stash_cache) || !sa_gv_cache_get || !sa_cv_cache_get
+        || GvCV(sa_gv_cache_get) != sa_cv_cache_get)
+        return sa_pp_meth_cache_get(aTHX);
+    c = SA_XOP_PTR(sa_cache *);
+    if (!c) return sa_pp_meth_cache_get(aTHX);
+
+    k = SvPV(mark[2], klen);
+    if (c->pair_max < sizeof buf) {
+        hit = sa_cache_get(c, k, (uint32_t)klen, buf, (uint32_t)c->pair_max,
+                           &vlen) == SA_C_HIT;
+        if (hit) out = sv_2mortal(newSVpvn(buf, (STRLEN)vlen));
+    }
+    else {
+        out = sv_2mortal(newSV((STRLEN)c->pair_max + 1));
+        SvPOK_on(out);
+        hit = sa_cache_get(c, k, (uint32_t)klen, SvPVX(out),
+                           (uint32_t)c->pair_max, &vlen) == SA_C_HIT;
+        if (hit) { SvCUR_set(out, (STRLEN)vlen); SvPVX(out)[vlen] = '\0'; }
+    }
+
+    {
+        OP *was = PL_op;
+        PL_op = call;
+        gimme = GIMME_V;
+        PL_op = was;
+    }
+    (void)POPMARK;
+    sp = mark;
+    if (hit)                     PUSHs(out);
+    else if (gimme != SA_G_LIST) PUSHs(&PL_sv_undef);
+    PUTBACK;
+    sa_xop_hits++;
+    return call->op_next;
 }
 
 /* ---- the check hook -------------------------------------------------------- */
@@ -532,11 +935,15 @@ static int sa_xop_is_ours(Perl_ppaddr_t p) {
     return p == sa_pp_cache_get   || p == sa_pp_cache_set
         || p == sa_pp_map_fetch   || p == sa_pp_map_store
         || p == sa_pp_map_incr    || p == sa_pp_map_exists
-        || p == sa_pp_bloom_check
+        || p == sa_pp_check       || p == sa_pp_meth_check
         || p == sa_pp_hist_record || p == sa_pp_ring_publish
         || p == sa_pp_rate_allow  || p == sa_pp_add
         || p == sa_pp_meth_add
-        || p == sa_pp_cms_estimate;
+        || p == sa_pp_cms_estimate
+        || p == sa_pp_map_incr_by      || p == sa_pp_cache_set_ttl
+        || p == sa_pp_hist_record_n    || p == sa_pp_rate_allow_cost
+        || p == sa_pp_add_n            || p == sa_pp_rate_remaining
+        || p == sa_pp_rate_retry_after || p == sa_pp_map_counter;
 }
 
 static void sa_try_hook(pTHX_ OP *o) {
@@ -575,9 +982,12 @@ static void sa_try_hook(pTHX_ OP *o) {
 
     /* BOTH ops where both are free: the entersub loses the call frame, and the
      * method_named loses the stash walk that would otherwise happen first.
-     * Where another dist already owns one of them, take the other and leave
-     * theirs alone - see the note above on why that is nearly all of it. */
-#define SA_HOOK(n, meth, door)                                        \
+     * Where another dist already owns the entersub, the method op gets
+     * `shared` instead: for `get` that is the door which makes the whole call
+     * from the method op and skips the entersub, elsewhere the plain push.
+     * `mdoor` names the method op, which a wider form shares with the
+     * narrower one because it pushes the same CV. */
+#define SA_HOOK_AS(n, meth, door, mdoor, shared)                      \
     if (nargs == (n) && strEQ(name, meth)) {                          \
         int got = 0;                                                  \
         if (o->op_ppaddr == PL_ppaddr[OP_ENTERSUB]) {                 \
@@ -585,26 +995,37 @@ static void sa_try_hook(pTHX_ OP *o) {
             got = 1;                                                  \
         }                                                             \
         if (last->op_ppaddr == PL_ppaddr[OP_METHOD_NAMED]) {          \
-            last->op_ppaddr = sa_pp_meth_##door;                      \
+            last->op_ppaddr = got ? sa_pp_meth_##mdoor : (shared);    \
             if (!got) sa_xop_meth++;                                  \
             got = 1;                                                  \
         }                                                             \
         if (got) sa_xop_hook++;                                       \
         return;                                                       \
     }
+#define SA_HOOK(n, meth, door) \
+    SA_HOOK_AS(n, meth, door, door, sa_pp_meth_##door)
 
-    SA_HOOK(1, "get",     cache_get)
+    SA_HOOK_AS(1, "get",  cache_get, cache_get, sa_pp_methdoor_cache_get)
     SA_HOOK(2, "set",     cache_set)
+    SA_HOOK_AS(4, "set",  cache_set_ttl, cache_set, sa_pp_meth_cache_set)
     SA_HOOK(1, "fetch",   map_fetch)
     SA_HOOK(2, "store",   map_store)
     SA_HOOK(1, "incr",    map_incr)
+    SA_HOOK_AS(2, "incr", map_incr_by, map_incr, sa_pp_meth_map_incr)
     SA_HOOK(1, "exists",  map_exists)
-    SA_HOOK(1, "check",   bloom_check)
+    SA_HOOK(1, "counter", map_counter)
+    SA_HOOK(1, "check",   check)
     SA_HOOK(1, "record",  hist_record)
+    SA_HOOK_AS(2, "record", hist_record_n, hist_record, sa_pp_meth_hist_record)
     SA_HOOK(2, "publish", ring_publish)
     SA_HOOK(1, "allow",    rate_allow)
+    SA_HOOK_AS(2, "allow", rate_allow_cost, rate_allow, sa_pp_meth_rate_allow)
+    SA_HOOK(1, "remaining",   rate_remaining)
+    SA_HOOK(1, "retry_after", rate_retry_after)
     SA_HOOK(1, "estimate", cms_estimate)
     SA_HOOK(1, "add",      add)
+    SA_HOOK_AS(2, "add",   add_n, add, sa_pp_meth_add)
+#undef SA_HOOK_AS
 #undef SA_HOOK
 }
 

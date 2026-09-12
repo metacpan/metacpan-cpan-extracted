@@ -4,7 +4,44 @@ Database::BI - Web-based Business Intelligence viewer for flat data files
 
 # VERSION
 
-0.005.0
+0.005.2
+
+# DESCRIPTION
+
+`Database::BI` is a self-contained [Mojolicious](https://metacpan.org/pod/Mojolicious) web application that reads arbitrary
+flat data files (CSV, PSV, SQLite, XML, etc.) via [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction)
+and presents them as styled, sortable, reorderable HTML tables.
+It has no persistent database of its own,
+it reads arbitrary data files (CSV, PSV, SQLite, XML etc) presents each file as a styled, sortable, exportable HTML table.
+
+Users navigate to pick a file, open the filesystem browser to navigate anywhere on disk, drag-and-drop files to upload, join multiple tables in memory, apply server-side filters, and export results as CSV, SQLite, or JSON.
+A D3.js line graph view plots any numeric column.
+
+Key features:
+
+- **File picker** - the home page scans `data_dir` and shows a card for
+every supported file.  Recently opened filesystem files appear in a
+"Recently opened" section powered by `localStorage`.
+- **Filesystem browser** - `/browse` lets the user navigate the entire
+filesystem and open any supported data file, not just files in `data_dir`.
+- **Column sort and reorder** - clicking a header sorts the table; headers
+are draggable to reorder.  Both settings are persisted in `localStorage`
+by column name and survive page reloads.
+- **Left join** - the "Merge data / Filter results" panel on any table view
+lets the user join one or more additional tables on a shared key.  Every
+left row is kept; right-table columns are appended for matching rows.
+- **Result filters** - the same panel lets the user add filter conditions
+(column / operator / value) that are applied server-side after all joins.
+Operators: `eq`, `ne`, `contains`, `starts`, `lt`, `le`, `gt`,
+`ge`, `empty`, `notempty`.  Active filters are shown as chips in the
+toolbar with a one-click "Clear" link.
+- **Drag-and-drop upload** - any supported data file can be dropped directly
+onto the application.  On the home page the file is opened immediately;
+when the join panel is open the dropped file populates the right-table
+path field.
+- **Export** - the toolbar on any view offers an export panel that writes
+the current logical view (after joins and filters) to a chosen filesystem
+path as CSV (`.csv`) or SQLite (`.sql`).
 
 # SYNOPSIS
 
@@ -34,38 +71,6 @@ Database::BI - Web-based Business Intelligence viewer for flat data files
 **Generate the Makefile for the first time or after editing Makefile.PL:**
 
     perl Makefile.PL
-
-# DESCRIPTION
-
-`Database::BI` is a [Mojolicious](https://metacpan.org/pod/Mojolicious) web application that reads arbitrary
-flat data files (CSV, PSV, SQLite, XML, etc.) via [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction)
-and presents them as styled, sortable, reorderable HTML tables.
-
-Key features:
-
-- **File picker** - the home page scans `data_dir` and shows a card for
-every supported file.  Recently opened filesystem files appear in a
-"Recently opened" section powered by `localStorage`.
-- **Filesystem browser** - `/browse` lets the user navigate the entire
-filesystem and open any supported data file, not just files in `data_dir`.
-- **Column sort and reorder** - clicking a header sorts the table; headers
-are draggable to reorder.  Both settings are persisted in `localStorage`
-by column name and survive page reloads.
-- **Left join** - the "Merge data / Filter results" panel on any table view
-lets the user join one or more additional tables on a shared key.  Every
-left row is kept; right-table columns are appended for matching rows.
-- **Result filters** - the same panel lets the user add filter conditions
-(column / operator / value) that are applied server-side after all joins.
-Operators: `eq`, `ne`, `contains`, `starts`, `lt`, `le`, `gt`,
-`ge`, `empty`, `notempty`.  Active filters are shown as chips in the
-toolbar with a one-click "Clear" link.
-- **Drag-and-drop upload** - any supported data file can be dropped directly
-onto the application.  On the home page the file is opened immediately;
-when the join panel is open the dropped file populates the right-table
-path field.
-- **Export** - the toolbar on any view offers an export panel that writes
-the current logical view (after joins and filters) to a chosen filesystem
-path as CSV (`.csv`) or SQLite (`.sql`).
 
 # ROUTES
 

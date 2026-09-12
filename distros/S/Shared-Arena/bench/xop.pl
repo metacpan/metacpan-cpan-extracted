@@ -23,10 +23,12 @@ my $cache = $arena->cache('c', capacity => 4096, entry_size => 256);
 my $map   = $arena->map('m', slots => 4096, slot_size => 256);
 my $bloom = $arena->bloom('b', capacity => 100_000);
 my $hist  = $arena->histogram('h', max => 10_000_000, sigbits => 4);
+my $cuck  = $arena->cuckoo('k', capacity => 100_000);
 
 $cache->set('key', 'value');
 $map->store('key', 'value');
 $bloom->add('key');
+$cuck->add('key');
 
 my ($hooked) = Shared::Arena::_xop_stats();
 printf "%s  (%d call sites rewritten)\n\n",
@@ -52,6 +54,8 @@ bench('map->fetch',        sub { my $v; $v = $map->fetch('key')  for 1 .. $N });
 bench('map->exists',       sub { my $v; $v = $map->exists('key') for 1 .. $N });
 bench('map->incr',         sub { my $v; $v = $map->incr('n')     for 1 .. $N });
 bench('bloom->check',      sub { my $v; $v = $bloom->check('key')for 1 .. $N });
+bench('cuckoo->check (hit)',  sub { my $v; $v = $cuck->check('key')  for 1 .. $N });
+bench('cuckoo->check (miss)', sub { my $v; $v = $cuck->check('nope') for 1 .. $N });
 bench('hist->record',      sub { $hist->record(1234)             for 1 .. $N });
 
 # ---- the tax ---------------------------------------------------------------

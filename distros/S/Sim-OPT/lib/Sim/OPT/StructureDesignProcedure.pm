@@ -5,7 +5,7 @@ use warnings;
 use Exporter 'import';
 use Cwd qw(getcwd abs_path);
 use File::Basename qw(basename dirname);
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
 use File::Copy qw(copy);
 use File::Find qw(find);
 use File::Spec;
@@ -13,12 +13,15 @@ use JSON::PP ();
 use Digest::SHA qw(sha256_hex);
 use Time::Piece;
 
-our $VERSION = '0.18';
+our $VERSION = '0.30';
+our $LANGUAGE_VERSION = '1.2';
+our $PROCEDURE_SCHEMA = 'Sim::OPT::StructureDesign/procedure-1';
 our @EXPORT_OK = qw(
-    design state experience derive reembed merge imagine abstract compare reconstruct_memory
+    design state experience parallel derive reembed merge imagine abstract retain_memory apply_abstraction compare statistics reconstruct_memory validation_sample direct_validation_statistics
     search star surrogate medoids surrogating_with clustering_and_finding_medoids clustering_and_medoiding
     reduce_scope enlarge_scope increase_resolution decrease_resolution pan maintain_resolution
     incumbent result_of
+    procedure_language_version procedure_schema
     load_procedure run_procedure
 );
 
@@ -33,7 +36,7 @@ sub design {
     my $steps = delete($a{steps}) || [];
     die "design: steps must be an ARRAY reference\n" unless ref($steps) eq 'ARRAY';
     return {
-        schema => 'Sim::OPT::StructureDesign/procedure-1',
+        schema => $PROCEDURE_SCHEMA,
         name   => $name,
         root_dir => $a{root_dir} || $ENV{HOME} || '.',
         manifest => $a{manifest},
@@ -56,13 +59,19 @@ sub _node {
 
 sub state      { return _node('state',      @_); }
 sub experience { return _node('experience', @_); }
+sub parallel   { return _node('parallel',   @_); }
 sub derive     { return _node('derive',     @_); }
 sub reembed    { return _node('reembed',    @_); }
 sub merge      { return _node('merge',      @_); }
 sub imagine    { return _node('imagine',    @_); }
 sub abstract   { return _node('abstract',   @_); }
+sub retain_memory { return _node('retain_memory', @_); }
+sub apply_abstraction { return _node('apply_abstraction', @_); }
 sub compare    { return _node('compare',    @_); }
+sub statistics { return _node('statistics', @_); }
 sub reconstruct_memory { return _node('reconstruct_memory', @_); }
+sub validation_sample { return _node('validation_sample', @_); }
+sub direct_validation_statistics { return _node('direct_validation_statistics', @_); }
 
 sub search     { return { kind => 'search', @_ }; }
 sub star       { return { kind => 'star', @_ }; }
@@ -94,6 +103,9 @@ sub maintain_resolution { return { op => 'maintain_resolution', @_ }; }
 sub incumbent { return { ref => 'incumbent', step => $_[0] }; }
 sub result_of { return { ref => 'result',    step => $_[0], key => $_[1] }; }
 
+sub procedure_language_version { return $LANGUAGE_VERSION; }
+sub procedure_schema           { return $PROCEDURE_SCHEMA; }
+
 # -------------------------------------------------------------------------
 # Loading and manifest helpers
 # -------------------------------------------------------------------------
@@ -107,7 +119,7 @@ sub load_procedure {
     die "Cannot load procedure $abs: $@\n" if $@;
     die "Cannot read procedure $abs: $!\n" unless defined $p;
     die "Procedure $abs did not return a HASH reference\n" unless ref($p) eq 'HASH';
-    die "Unsupported procedure schema\n" unless ($p->{schema} || '') eq 'Sim::OPT::StructureDesign/procedure-1';
+    die "Unsupported procedure schema\n" unless ($p->{schema} || '') eq $PROCEDURE_SCHEMA;
     $p->{_procedure_file} = $abs;
     return $p;
 }
@@ -207,6 +219,9 @@ sub _runtime_signature {
     my $sd = _find_inc_file('Sim/OPT/StructureDesign.pm');
     my $sd_hash = _file_sha256($sd);
     push @parts, "StructureDesign-file=$sd_hash" if defined $sd_hash;
+    my $cm = _find_inc_file('Sim/OPT/ClusterMedoid.pm');
+    my $cm_hash = _file_sha256($cm);
+    push @parts, "ClusterMedoid-file=$cm_hash" if defined $cm_hash;
     return sha256_hex(join("\n", @parts));
 }
 
@@ -458,6 +473,82 @@ sub _set_dowhat_perl_value {
     $n = ($txt =~ s/(%dowhat\s*=\s*\(.*?)(^\s*\);[^\n]*$)/$1$key => $value_text,\n$2/ms);
     die "config variant: could not insert '$key' into %dowhat\n" unless $n == 1;
     return $txt;
+}
+
+sub _read_active_dowhat_string {
+    my ($source, $key) = @_;
+    die "config inheritance: source configuration required\n"
+        unless defined($source) && length($source);
+    die "config inheritance: key required\n"
+        unless defined($key) && length($key);
+    die "config inheritance: source configuration not found: $source\n"
+        unless -f $source;
+
+    my $txt = _read_text_file($source);
+    my ($body) = $txt =~ /%dowhat\s*=\s*\((.*?)^\s*\);[^\n]*$/ms;
+    die "config inheritance: cannot locate %dowhat in $source\n"
+        unless defined $body;
+
+    my @values = $body =~ /^(?!\s*#)\s*\Q$key\E\s*=>\s*["']([^"']*)["']\s*,/mg;
+    die "config inheritance: multiple active '$key' entries in $source\n"
+        if @values > 1;
+    return @values ? (1, $values[0]) : (0, undef);
+}
+
+sub _resolve_inherited_dowhat {
+    my (%a) = @_;
+    my $step = $a{step} || {};
+    my $procedure = $a{procedure} || {};
+    my $inherit = $step->{inherit_dowhat};
+    return {} unless defined $inherit;
+    die "config inheritance: inherit_dowhat must be a HASH reference\n"
+        unless ref($inherit) eq 'HASH';
+
+    my $from_state = $inherit->{from_state};
+    die "config inheritance: from_state required\n"
+        unless defined($from_state) && length($from_state);
+    my $config = $inherit->{config} || "$from_state.pl";
+    my $keys = $inherit->{keys};
+    die "config inheritance: keys must be a non-empty ARRAY reference\n"
+        unless ref($keys) eq 'ARRAY' && @$keys;
+
+    my $source_dir = _state_dir($procedure, $from_state);
+    my $source = File::Spec->file_name_is_absolute($config)
+        ? $config : File::Spec->catfile($source_dir, $config);
+
+    my %values;
+    for my $key (@$keys) {
+        die "config inheritance: keys must contain non-empty strings\n"
+            unless defined($key) && !ref($key) && length($key);
+        my ($found, $value) = _read_active_dowhat_string($source, $key);
+        $values{$key} = $value if $found;
+    }
+    return \%values;
+}
+
+sub _experience_config_variant {
+    my (%a) = @_;
+    my $step = $a{step} || {};
+    my $base = $step->{config_variant} || {};
+    die "experience config variant: config_variant must be a HASH reference\n"
+        unless ref($base) eq 'HASH';
+
+    # Clone only the variant structure that we may extend.  The procedure
+    # declaration remains immutable for signature/checkpoint purposes.
+    my $variant = JSON::PP->new->decode(JSON::PP->new->encode($base));
+    my $inherited = _resolve_inherited_dowhat(%a);
+    return $variant unless keys %$inherited;
+
+    $variant->{dowhat} ||= {};
+    die "experience config inheritance: config_variant.dowhat must be a HASH reference\n"
+        unless ref($variant->{dowhat}) eq 'HASH';
+
+    for my $key (keys %$inherited) {
+        # An explicit stage override wins over an inherited user preference.
+        $variant->{dowhat}{$key} = $inherited->{$key}
+            unless exists $variant->{dowhat}{$key};
+    }
+    return $variant;
 }
 
 sub _render_config_variant {
@@ -1429,6 +1520,7 @@ sub _write_clustermedoid_config {
     my $root = $a{root};
     my $counts = $a{counts};
     my $fixed = $a{fixed};
+    my $cluster = ref($a{clustering}) eq 'HASH' ? $a{clustering} : {};
     die "write_clustermedoid_config: path required\n" unless defined($path) && length($path);
     die "write_clustermedoid_config: counts HASH required\n" unless ref($counts) eq 'HASH';
     die "write_clustermedoid_config: fixed HASH required\n" unless ref($fixed) eq 'HASH';
@@ -1456,12 +1548,41 @@ sub _write_clustermedoid_config {
     print {$fh} "    context_variables => [],\n";
     print {$fh} "    lambda => 0.5,\n";
     print {$fh} "    performance => { divisions => 100 },\n";
+    my $selection = $cluster->{selection} || 'silhouette';
+    my $clusters = exists($cluster->{clusters}) ? $cluster->{clusters}
+        : ($selection eq 'hierarchical_distortion' ? 'hierarchical' : 'auto');
+    my $k_min = exists($cluster->{k_min}) ? int($cluster->{k_min}) : 2;
+    my $k_max = exists($cluster->{k_max}) ? int($cluster->{k_max}) : 12;
+    my $max_iterations = exists($cluster->{max_iterations}) ? int($cluster->{max_iterations}) : 50;
+    my $silhouette_sample = exists($cluster->{silhouette_sample}) ? int($cluster->{silhouette_sample}) : 600;
     print {$fh} "    clustering => {\n";
-    print {$fh} "        clusters => 'auto',\n";
-    print {$fh} "        k_min => 2,\n";
-    print {$fh} "        k_max => 12,\n";
-    print {$fh} "        max_iterations => 50,\n";
-    print {$fh} "        silhouette_sample => 600,\n";
+    if (defined($clusters) && $clusters =~ /^\d+$/) {
+        print {$fh} "        clusters => $clusters,\n";
+    } else {
+        print {$fh} "        clusters => ", _perl_sq($clusters), ",\n";
+    }
+    print {$fh} "        k_min => $k_min,\n";
+    print {$fh} "        k_max => $k_max,\n";
+    print {$fh} "        max_iterations => $max_iterations,\n";
+    print {$fh} "        silhouette_sample => $silhouette_sample,\n";
+    if (exists $cluster->{algorithm}) {
+        print {$fh} "        algorithm => ", _perl_sq(lc($cluster->{algorithm})), ",\n";
+    }
+    for my $key (qw(max_exact_matrix_bytes clara_samples clara_sample_size clara_validation_sample random_seed)) {
+        next unless exists $cluster->{$key};
+        my $v = 0 + $cluster->{$key};
+        print {$fh} "        $key => $v,\n";
+    }
+    if ($selection eq 'hierarchical_distortion') {
+        my $hs = exists($cluster->{hierarchy_samples}) ? int($cluster->{hierarchy_samples}) : 3;
+        my $hss = exists($cluster->{hierarchy_sample_size}) ? int($cluster->{hierarchy_sample_size}) : 512;
+        my $hvs = exists($cluster->{hierarchy_validation_sample}) ? int($cluster->{hierarchy_validation_sample}) : 1024;
+        my $hws = exists($cluster->{hierarchy_working_sample}) ? int($cluster->{hierarchy_working_sample}) : 4096;
+        print {$fh} "        hierarchy_samples => $hs,\n";
+        print {$fh} "        hierarchy_sample_size => $hss,\n";
+        print {$fh} "        hierarchy_validation_sample => $hvs,\n";
+        print {$fh} "        hierarchy_working_sample => $hws,\n";
+    }
     print {$fh} "    },\n";
     print {$fh} ");\n1;\n";
     close $fh or die "Cannot close $path: $!\n";
@@ -1496,8 +1617,8 @@ sub _execute_abstract {
     die "abstract '$state': no lattice manifest found\n"
         unless defined($lattice_manifest) && -f $lattice_manifest;
     my $lattice = _read_json($lattice_manifest);
-    my $counts = $lattice->{global_counts} || $lattice->{target_counts};
-    die "abstract '$state': lattice manifest has no global_counts or target_counts\n"
+    my $counts = $lattice->{global_counts} || $lattice->{target_counts} || $lattice->{lattice_counts};
+    die "abstract '$state': lattice manifest has no global_counts, target_counts, or lattice_counts\n"
         unless ref($counts) eq 'HASH' && keys %$counts;
 
     my ($fixed, $rows) = _infer_fixed_levels_from_totres(path => $results, counts => $counts);
@@ -1528,7 +1649,7 @@ sub _execute_abstract {
     make_path($out_dir);
     _write_clustermedoid_config(
         path => $cfg, state_dir => $state_dir, root => $root,
-        counts => $counts, fixed => $fixed,
+        counts => $counts, fixed => $fixed, clustering => $using,
     );
 
     require Sim::OPT::ClusterMedoid;
@@ -1563,6 +1684,11 @@ sub _execute_abstract {
         files => $res->{files},
         medoids => $res->{medoids},
         silhouette_scores => $res->{silhouette_scores},
+        selection_method => $res->{selection_method},
+        target_clusters => $res->{target_clusters},
+        distortion_curve => $res->{distortion_curve},
+        hierarchy => $res->{hierarchy},
+        metric => $res->{metric},
     };
     my $record_path = File::Spec->catfile($out_dir, 'structuredesign-abstraction.json');
     _write_json($record_path, $record);
@@ -1576,6 +1702,406 @@ sub _execute_abstract {
         config => $cfg,
         manifest => $record_path,
     };
+}
+
+sub _read_cluster_membership_for_memory {
+    my ($path) = @_;
+    die "retain_memory: clustered file not found: $path\n" unless defined($path) && -f $path;
+    require Text::CSV;
+    my $csv = Text::CSV->new({ binary=>1, auto_diag=>1 });
+    open my $fh, '<', $path or die "Cannot read $path: $!\n";
+    my $header = $csv->getline($fh) or die "retain_memory: clustered file is empty: $path\n";
+    my %ix = map { $header->[$_] => $_ } 0 .. $#$header;
+    die "retain_memory: clustered file lacks cluster/is_medoid columns: $path\n"
+        unless exists($ix{cluster}) && exists($ix{is_medoid});
+    my (%membership, %medoid_flag);
+    while (my $r = $csv->getline($fh)) {
+        next unless @$r;
+        my $id = $r->[0];
+        next unless defined($id) && length($id);
+        die "retain_memory: duplicate clustered instance '$id' in $path\n" if exists $membership{$id};
+        $membership{$id} = 0 + $r->[$ix{cluster}];
+        $medoid_flag{$id} = 0 + ($r->[$ix{is_medoid}] || 0);
+    }
+    close $fh;
+    return (\%membership, \%medoid_flag);
+}
+
+sub _read_experience_rows_for_memory {
+    my ($path) = @_;
+    die "retain_memory: experience file not found: $path\n" unless defined($path) && -f $path;
+    require Text::CSV;
+    my $csv = Text::CSV->new({ binary=>1, auto_diag=>1 });
+    open my $fh, '<', $path or die "Cannot read $path: $!\n";
+    my (%rows, %line_number);
+    my $n = 0;
+    while (my $line = <$fh>) {
+        $n++;
+        $line =~ s/\r?\n\z//;
+        next unless length($line);
+        die "retain_memory: cannot parse CSV row $n in $path\n" unless $csv->parse($line);
+        my @f = $csv->fields;
+        my $id = $f[0];
+        next unless defined($id) && $id =~ /(?:^|_)\d+-\d+(?:_|$)/;
+        if (exists $rows{$id}) {
+            die "retain_memory: conflicting duplicate experience row for '$id' in $path\n"
+                if $rows{$id} ne $line;
+            next;
+        }
+        $rows{$id} = $line;
+        $line_number{$id} = $n;
+    }
+    close $fh;
+    return (\%rows, \%line_number);
+}
+
+sub _execute_retain_memory {
+    my (%a) = @_;
+    my $s = $a{step};
+    my $p = $a{procedure};
+    my $manifest = $a{manifest};
+    my $commit = $a{commit};
+    my $state = $s->{name} || $s->{state} or die "retain_memory: state required\n";
+    my $state_dir = _state_dir($p, $state);
+    die "retain_memory '$state': state directory not found: $state_dir\n" unless -d $state_dir;
+
+    my $abs_ref = $s->{abstraction} or die "retain_memory '$state': abstraction reference required\n";
+    my $abs_path = _resolve_reference($abs_ref, $manifest);
+    die "retain_memory '$state': abstraction manifest not found: $abs_path\n" unless -f $abs_path;
+    my $abs = _read_json($abs_path);
+    die "retain_memory '$state': invalid abstraction schema\n"
+        unless ref($abs) eq 'HASH' && ($abs->{schema} || '') eq 'Sim::OPT::StructureDesign/abstraction-1';
+    die "retain_memory '$state': abstraction has no retained medoids\n"
+        unless ref($abs->{medoids}) eq 'ARRAY' && @{ $abs->{medoids} };
+    my $clustered = $abs->{files}{clustered};
+    die "retain_memory '$state': abstraction does not identify its clustered file\n" unless defined($clustered);
+    # Completed manifests can contain absolute paths from the production tree.
+    # Prefer them when valid, otherwise resolve the basename under the current
+    # abstraction directory so uploaded/relocated states remain inspectable.
+    if (!-f $clustered) {
+        my $candidate = File::Spec->catfile(dirname($abs_path), basename($clustered));
+        $clustered = $candidate if -f $candidate;
+    }
+    die "retain_memory '$state': clustered file not found: $clustered\n" unless -f $clustered;
+
+    my $exp_name = $s->{experience_file} or die "retain_memory '$state': experience_file required\n";
+    my $exp_path = File::Spec->file_name_is_absolute($exp_name) ? $exp_name : File::Spec->catfile($state_dir, $exp_name);
+    die "retain_memory '$state': experience file not found: $exp_path\n" unless -f $exp_path;
+    my $kind = $s->{experience_kind} || 'direct_simulation';
+
+    my ($membership, $medoid_flag) = _read_cluster_membership_for_memory($clustered);
+    my ($experience, $line_number) = _read_experience_rows_for_memory($exp_path);
+
+    my @support;
+    my %by_cluster;
+    for my $id (sort keys %$experience) {
+        die "retain_memory '$state': experienced instance '$id' has no membership in frozen abstraction\n"
+            unless exists $membership->{$id};
+        my $cluster = 0 + $membership->{$id};
+        push @support, {
+            cluster=>$cluster, instance=>$id, row=>$experience->{$id},
+            source_line=>0+$line_number->{$id}, provenance=>$kind,
+        };
+        $by_cluster{$cluster}++;
+    }
+
+    my @medoids;
+    for my $m (@{ $abs->{medoids} }) {
+        die "retain_memory '$state': malformed medoid record\n"
+            unless ref($m) eq 'HASH' && defined($m->{cluster}) && defined($m->{instance});
+        my $cluster = 0 + $m->{cluster};
+        push @medoids, {
+            cluster=>$cluster,
+            instance=>$m->{instance},
+            (defined($m->{performance}) ? (performance=>0+$m->{performance}) : ()),
+            support_count=>0+($by_cluster{$cluster} || 0),
+            medoid_is_direct_experience=>(exists($experience->{$m->{instance}}) ? JSON::PP::true : JSON::PP::false),
+        };
+    }
+
+    my $rel = $s->{output_dir} || 'memory';
+    my $out_dir = File::Spec->catdir($state_dir, $rel);
+    my $packet_path = File::Spec->catfile($out_dir, 'structuredesign-memory-packet.json');
+    my $packet = {
+        schema=>'Sim::OPT::StructureDesign/memory-packet-1',
+        operation=>'retain_memory',
+        semantics=>'retained archetypes with cluster-conditioned direct experiential support',
+        state=>$state,
+        abstraction_manifest=>$abs_path,
+        clustered_file=>$clustered,
+        experience_file=>$exp_path,
+        experience_kind=>$kind,
+        assignment_basis=>'exact instance membership in the frozen antecedent clustering',
+        cluster_count=>0+($abs->{clusters} || scalar(@medoids)),
+        medoid_count=>scalar(@medoids),
+        support_count=>scalar(@support),
+        support_by_cluster=>{ map { ("$_", 0+($by_cluster{$_}||0)) } map { 0+$_->{cluster} } @medoids },
+        medoids=>\@medoids,
+        support=>\@support,
+    };
+
+    return {
+        state=>$state, operation=>'retain_memory', abstraction=>$abs_path,
+        experience_file=>$exp_path, medoid_count=>scalar(@medoids),
+        support_count=>scalar(@support), support_by_cluster=>$packet->{support_by_cluster},
+        manifest=>$packet_path, planned=>1,
+    } unless $commit;
+
+    die "retain_memory '$state': refusing to overwrite existing output directory $out_dir\n" if -e $out_dir;
+    make_path($out_dir);
+    _write_json($packet_path, $packet);
+    return {
+        state=>$state, operation=>'retain_memory', abstraction=>$abs_path,
+        experience_file=>$exp_path, medoid_count=>scalar(@medoids),
+        support_count=>scalar(@support), support_by_cluster=>$packet->{support_by_cluster},
+        manifest=>$packet_path,
+    };
+}
+
+
+sub _write_fixed_partition_medoid_config {
+    my (%a) = @_;
+    my $path = $a{path};
+    my $metric = $a{metric};
+    my $work_dir = $a{work_dir};
+    die "fixed_partition_medoid_config: path required\n" unless defined($path) && length($path);
+    die "fixed_partition_medoid_config: metric HASH required\n" unless ref($metric) eq 'HASH';
+    my $levels = $metric->{variable_levels};
+    die "fixed_partition_medoid_config: metric variable_levels HASH required\n"
+        unless ref($levels) eq 'HASH' && keys %$levels;
+    my $fixed = ref($metric->{fixed_levels}) eq 'HASH' ? $metric->{fixed_levels} : {};
+    my $ctx = ref($metric->{context_variables}) eq 'ARRAY' ? $metric->{context_variables} : [];
+    my $vw = ref($metric->{variable_weights}) eq 'HASH' ? $metric->{variable_weights} : {};
+    my $cw = ref($metric->{component_weights}) eq 'HASH' ? $metric->{component_weights} : {};
+    my $pc = ref($metric->{performance}) eq 'HASH' ? $metric->{performance} : {};
+    for my $k (qw(best worst divisions)) {
+        die "fixed_partition_medoid_config: frozen metric performance.$k required\n"
+            unless exists $pc->{$k};
+    }
+
+    open my $fh, '>', $path or die "Cannot write $path: $!\n";
+    print {$fh} "# Generated for medoid extraction inside one frozen antecedent partition.\n";
+    print {$fh} '$mypath = ', _perl_sq($work_dir), ";\n";
+    print {$fh} '$file = ', _perl_sq('bt'), ";\n";
+    print {$fh} "\@varinumbers = ({\n";
+    for my $v (sort { $a <=> $b } keys %$levels) {
+        print {$fh} "    $v => ", 0 + $levels->{$v}, ",\n";
+    }
+    print {$fh} "});\n";
+    print {$fh} "%landscapecluster = (\n";
+    print {$fh} "    sweep_index => 0,\n";
+    print {$fh} "    combination_column => 0,\n";
+    print {$fh} "    performance_column => 2,\n";
+    print {$fh} "    header => 0,\n";
+    print {$fh} "    fixed_levels => {\n";
+    for my $v (sort { $a <=> $b } keys %$fixed) {
+        print {$fh} "        $v => ", 0 + $fixed->{$v}, ",\n";
+    }
+    print {$fh} "    },\n";
+    print {$fh} "    context_variables => [", join(', ', map {0+$_} @$ctx), "],\n";
+    print {$fh} "    lambda => ", 0 + ($metric->{lambda} // 0.5), ",\n";
+    print {$fh} "    variable_weights => {\n";
+    for my $v (sort { $a <=> $b } keys %$vw) {
+        print {$fh} "        $v => ", 0 + $vw->{$v}, ",\n";
+    }
+    print {$fh} "    },\n";
+    print {$fh} "    component_weights => {\n";
+    for my $k (qw(context problem performance)) {
+        next unless exists $cw->{$k};
+        print {$fh} "        $k => ", 0 + $cw->{$k}, ",\n";
+    }
+    print {$fh} "    },\n";
+    print {$fh} "    performance => { best => ", 0 + $pc->{best}, ", worst => ", 0 + $pc->{worst}, ", divisions => ", 0 + $pc->{divisions}, " },\n";
+    # k=1 means ClusterMedoid performs no partition discovery here.  It only
+    # selects the represented case minimizing within-partition dissimilarity.
+    print {$fh} "    clustering => { clusters => 1, algorithm => 'auto', max_iterations => 50 },\n";
+    print {$fh} ");\n1;\n";
+    close $fh or die "Cannot close $path: $!\n";
+}
+
+sub _compute_secondary_medoids_from_applied_partitions {
+    my (%a) = @_;
+    my $members = $a{members};
+    my $metric = $a{metric};
+    my $out_dir = $a{out_dir};
+    my $prefix = $a{prefix} || 'secondary';
+    die "secondary_medoids: members HASH required\n" unless ref($members) eq 'HASH';
+    die "secondary_medoids: metric HASH required\n" unless ref($metric) eq 'HASH';
+    my $work_root = File::Spec->catdir($out_dir, 'secondary-medoid-work');
+    make_path($work_root);
+    require Text::CSV;
+    require Sim::OPT::ClusterMedoid;
+    my $csv = Text::CSV->new({ binary => 1, eol => "\n" });
+    my @secondary;
+    for my $cluster (sort { $a <=> $b } keys %$members) {
+        my $rows = $members->{$cluster};
+        next unless ref($rows) eq 'ARRAY' && @$rows;
+        my $cdir = File::Spec->catdir($work_root, "cluster-$cluster");
+        make_path($cdir);
+        my $dataset = File::Spec->catfile($cdir, 'partition.csv');
+        open my $dfh, '>', $dataset or die "Cannot write $dataset: $!\n";
+        my %by_source;
+        for my $r (@$rows) {
+            $csv->print($dfh, [$r->{source_instance}, $r->{local_instance}, $r->{performance}]);
+            $by_source{$r->{source_instance}} = $r;
+        }
+        close $dfh or die "Cannot close $dataset: $!\n";
+        my $cfg = File::Spec->catfile($cdir, 'medoid-config.pl');
+        _write_fixed_partition_medoid_config(path=>$cfg, metric=>$metric, work_dir=>$cdir);
+        my $oprefix = File::Spec->catfile($cdir, 'fixed-partition');
+        my $res = Sim::OPT::ClusterMedoid::cluster_medoid(
+            search_config => $cfg,
+            results_file => $dataset,
+            output_prefix => $oprefix,
+        );
+        die "secondary_medoids: ClusterMedoid returned no single medoid for cluster $cluster\n"
+            unless ref($res) eq 'HASH' && ref($res->{medoids}) eq 'ARRAY' && @{$res->{medoids}} == 1;
+        my $m = $res->{medoids}[0];
+        my $src = $m->{instance};
+        my $orig = $by_source{$src} or die "secondary_medoids: selected medoid $src not found in partition $cluster\n";
+        push @secondary, {
+            cluster => 0 + $cluster,
+            local_instance => $orig->{local_instance},
+            source_instance => $src,
+            performance => 0 + $orig->{performance},
+            partition_size => scalar(@$rows),
+            algorithm => $res->{clustering_algorithm},
+            criterion => 'minimum total frozen-metric dissimilarity within fixed antecedent partition',
+        };
+    }
+    return \@secondary;
+}
+
+sub _execute_apply_abstraction {
+    my (%a) = @_;
+    my $s = $a{step};
+    my $p = $a{procedure};
+    my $manifest = $a{manifest};
+    my $commit = $a{commit};
+    my $state = $s->{name} || $s->{state} or die "apply_abstraction: state required\n";
+
+    my $source_abs_path = _resolve_reference($s->{abstraction} // $s->{source_abstraction}, $manifest);
+    die "apply_abstraction '$state': antecedent abstraction manifest required\n"
+        unless defined($source_abs_path) && length($source_abs_path);
+    die "apply_abstraction '$state': antecedent abstraction manifest not found: $source_abs_path\n"
+        unless -f $source_abs_path;
+    my $model = _read_json($source_abs_path);
+    die "apply_abstraction '$state': invalid antecedent abstraction schema\n"
+        unless ($model->{schema} || '') eq 'Sim::OPT::StructureDesign/abstraction-1';
+    die "apply_abstraction '$state': antecedent abstraction does not persist its metric; frozen recall cannot be guaranteed\n"
+        unless ref($model->{metric}) eq 'HASH';
+    die "apply_abstraction '$state': antecedent abstraction has no retained medoids\n"
+        unless ref($model->{medoids}) eq 'ARRAY' && @{$model->{medoids}};
+
+    my $state_dir = _state_dir($p, $state);
+    die "apply_abstraction '$state': state directory not found: $state_dir\n" unless -d $state_dir;
+    my $root = $s->{model_root} || 'btmed';
+    my $results = $s->{results_file} || ($root . '-report-0-0.csv_sortm.csv_weightordmeta.csv');
+    $results = File::Spec->catfile($state_dir, $results) unless File::Spec->file_name_is_absolute($results);
+    die "apply_abstraction '$state': results file not found: $results\n" unless -f $results;
+    my $performance_column = exists($s->{performance_column})
+        ? $s->{performance_column}
+        : $model->{performance_column};
+    die "apply_abstraction '$state': no performance column is defined by the step or antecedent abstraction\n"
+        unless defined $performance_column;
+
+    my $map_name = $s->{memory_manifest};
+    my $map_path = defined($map_name) && length($map_name)
+        ? (File::Spec->file_name_is_absolute($map_name) ? $map_name : File::Spec->catfile($state_dir, $map_name))
+        : undef;
+    my ($mapper, $memory_plan) = _memory_mapper_stats($map_path);
+    my ($rows, $row_count) = _read_landscape_index_stats(
+        path => $results, performance_column => $performance_column, mapper => $mapper,
+    );
+    die "apply_abstraction '$state': reconstructed landscape is empty\n" unless $row_count;
+
+    my $rel = $s->{output_dir} || 'applied';
+    my $out_dir = File::Spec->file_name_is_absolute($rel) ? $rel : File::Spec->catdir($state_dir, $rel);
+    my $prefix_name = $s->{output_prefix} || ($state . '-retained-categories');
+    my $assignments_path = File::Spec->catfile($out_dir, $prefix_name . '.assignments.csv');
+    my $record_path = File::Spec->catfile($out_dir, 'structuredesign-applied-abstraction.json');
+
+    my $summary = {
+        state => $state,
+        operation => 'apply_abstraction',
+        source_abstraction => $source_abs_path,
+        rows => 0 + $row_count,
+        clusters => 0 + ($model->{clusters} || scalar(@{$model->{medoids}})),
+        retained_medoid_count => scalar(@{$model->{medoids}}),
+        results_file => $results,
+        performance_column => 0 + $performance_column,
+        memory_manifest => $map_path,
+        output_dir => $out_dir,
+        assignments => $assignments_path,
+    };
+    return $summary unless $commit;
+
+    die "apply_abstraction '$state': refusing to overwrite existing output directory $out_dir\n" if -e $out_dir;
+    make_path($out_dir);
+    require Sim::OPT::StructureDesign;
+    require Text::CSV;
+    my $csv = Text::CSV->new({ binary => 1, eol => "\n" });
+    open my $fh, '>', $assignments_path or die "Cannot write $assignments_path: $!\n";
+    $csv->print($fh, [qw(local_instance source_instance performance cluster retained_medoid_source_instance retained_medoid_performance distance_to_retained_medoid partition_semantics)]);
+    my (%cluster_size, %members_by_cluster, %partition_semantics);
+    for my $source_instance (sort keys %$rows) {
+        my $r = $rows->{$source_instance};
+        my $applied = Sim::OPT::StructureDesign::apply_abstraction_model(
+            model => $model,
+            instance => $source_instance,
+            performance => $r->{performance},
+        );
+        $cluster_size{$applied->{cluster}}++;
+        my $partition_semantics = $applied->{partition_semantics} || 'unspecified';
+        $partition_semantics{$partition_semantics}++;
+        push @{$members_by_cluster{$applied->{cluster}}}, {
+            local_instance => $r->{local_instance}, source_instance => $source_instance,
+            performance => 0 + $r->{performance},
+        };
+        $csv->print($fh, [
+            $r->{local_instance}, $source_instance, $r->{performance}, $applied->{cluster},
+            $applied->{medoid_instance}, $applied->{medoid_performance}, $applied->{distance}, $partition_semantics,
+        ]);
+    }
+    close $fh or die "Cannot close $assignments_path: $!\n";
+
+    my $secondary = _compute_secondary_medoids_from_applied_partitions(
+        members => \%members_by_cluster, metric => $model->{metric}, out_dir => $out_dir, prefix => $prefix_name,
+    );
+    my $secondary_path = File::Spec->catfile($out_dir, $prefix_name . '.secondary-medoids.csv');
+    open my $smfh, '>', $secondary_path or die "Cannot write $secondary_path: $!\n";
+    $csv->print($smfh, [qw(cluster local_instance source_instance performance partition_size algorithm criterion)]);
+    for my $m (@$secondary) {
+        $csv->print($smfh, [$m->{cluster},$m->{local_instance},$m->{source_instance},$m->{performance},$m->{partition_size},$m->{algorithm},$m->{criterion}]);
+    }
+    close $smfh or die "Cannot close $secondary_path: $!\n";
+
+    my %cluster_sizes;
+    for my $c (sort { $a <=> $b } keys %cluster_size) {
+        $cluster_sizes{$c} = 0 + $cluster_size{$c};
+    }
+    my $record = {
+        schema => 'Sim::OPT::StructureDesign/applied-abstraction-2',
+        operation => 'apply_abstraction',
+        semantics => 'route regenerated states through the frozen antecedent partition and regenerate one medoid inside each resulting reconstructed partition',
+        state => $state,
+        source_abstraction => $source_abs_path,
+        rows => 0 + $row_count,
+        clusters => 0 + ($model->{clusters} || scalar(@{$model->{medoids}})),
+        metric => $model->{metric},
+        medoids => $model->{medoids},
+        retained_medoid_count => scalar(@{$model->{medoids}}),
+        secondary_medoids => $secondary,
+        secondary_medoid_count => scalar(@$secondary),
+        partition_semantics => { %partition_semantics },
+        cluster_sizes => { %cluster_sizes },
+        results_file => $results,
+        performance_column => 0 + $performance_column,
+        memory_manifest => $map_path,
+        files => { assignments => $assignments_path, secondary_medoids => $secondary_path },
+    };
+    _write_json($record_path, $record);
+    return { %$summary, manifest => $record_path, files => $record->{files}, cluster_sizes => $record->{cluster_sizes} };
 }
 
 sub _resolve_executable {
@@ -2023,6 +2549,9 @@ sub _compile_zoom {
         resolution_factors => \%factors,
         local_levels => \%local,
         local_strides => \%strides,
+        (exists($step->{mediumiters}) ? (mediumiters => $step->{mediumiters}) : ()),
+        (exists($step->{refined_mediumiters})
+            ? (refined_mediumiters => $step->{refined_mediumiters}) : ()),
         child_dir => $child_dir,
         child_config => $child_cfg,
     );
@@ -2093,6 +2622,7 @@ sub _compile_enlarge_pan {
         source_incumbent => $around,
         variables => \@vars,
         scope_factor => $factor,
+        (exists($step->{mediumiters}) ? (mediumiters => $step->{mediumiters}) : ()),
         child_dir => $child_dir,
         child_config => $child_cfg,
         model_root => $step->{model_root} || $lm->{model_root} || 'bt',
@@ -2113,6 +2643,92 @@ sub _reconstruct_memory_artifacts_ok {
         my $path = File::Spec->file_name_is_absolute($name) ? $name : File::Spec->catfile($dir, $name);
         return -f $path && -s $path ? 1 : 0;
     }
+    if (($s->{type} || '') eq 'abstract') {
+        my $state = $s->{name} || $s->{state} || return 0;
+        my $dir = _state_dir($p, $state);
+        return 0 unless -d $dir;
+        my $rel = $s->{output_dir} || 'abstract';
+        my $out_dir = File::Spec->catdir($dir, $rel);
+        return 0 unless -d $out_dir;
+
+        my $r = ref($old->{result}) eq 'HASH' ? $old->{result} : {};
+        my $mp = $r->{manifest} || File::Spec->catfile($out_dir, 'structuredesign-abstraction.json');
+        return 0 unless -f $mp && -s $mp;
+        my $m = eval { _read_json($mp) };
+        return 0 if $@ || ref($m) ne 'HASH';
+        return 0 unless ($m->{schema} || '') eq 'Sim::OPT::StructureDesign/abstraction-1';
+        return 0 unless ($m->{operation} || '') eq 'abstract';
+        return 0 unless defined($m->{clusters}) && 0 + $m->{clusters} >= 1;
+        return 0 unless ref($m->{medoids}) eq 'ARRAY' && @{$m->{medoids}};
+
+        # Validate every clustering product declared by the manifest.  This is
+        # intentionally generic: legacy abstractions declare clustered/medoids/
+        # silhouette/info, while hierarchical-distortion abstractions additionally
+        # declare distortion and hierarchy.  Future declared files are checked
+        # automatically without teaching the checkpoint layer their names.
+        my $files = $m->{files};
+        return 0 unless ref($files) eq 'HASH' && keys %$files;
+        for my $path (values %$files) {
+            return 0 unless defined($path) && !ref($path) && -f $path && -s $path;
+        }
+        if (defined($m->{clustering_config}) && length($m->{clustering_config})) {
+            return 0 unless -f $m->{clustering_config} && -s $m->{clustering_config};
+        }
+        return 1;
+    }
+    if (($s->{type} || '') eq 'retain_memory') {
+        my $state = $s->{name} || $s->{state} || return 0;
+        my $dir = _state_dir($p, $state);
+        return 0 unless -d $dir;
+        my $rel = $s->{output_dir} || 'memory';
+        my $out_dir = File::Spec->file_name_is_absolute($rel) ? $rel : File::Spec->catdir($dir, $rel);
+        my $r = ref($old->{result}) eq 'HASH' ? $old->{result} : {};
+        my $mp = $r->{manifest} || File::Spec->catfile($out_dir, 'structuredesign-memory-packet.json');
+        return 0 unless -f $mp && -s $mp;
+        my $m = eval { _read_json($mp) };
+        return 0 if $@ || ref($m) ne 'HASH';
+        return 0 unless ($m->{schema} || '') eq 'Sim::OPT::StructureDesign/memory-packet-1';
+        return 0 unless ($m->{operation} || '') eq 'retain_memory';
+        return 0 unless ref($m->{medoids}) eq 'ARRAY' && @{$m->{medoids}};
+        return 0 unless ref($m->{support}) eq 'ARRAY';
+        return 0 unless defined($m->{support_count}) && 0 + $m->{support_count} == scalar(@{$m->{support}});
+        return 1;
+    }
+    if (($s->{type} || '') eq 'apply_abstraction') {
+        my $state = $s->{name} || $s->{state} || return 0;
+        my $dir = _state_dir($p, $state);
+        return 0 unless -d $dir;
+        my $rel = $s->{output_dir} || 'applied';
+        my $out_dir = File::Spec->file_name_is_absolute($rel) ? $rel : File::Spec->catdir($dir, $rel);
+        my $r = ref($old->{result}) eq 'HASH' ? $old->{result} : {};
+        my $mp = $r->{manifest} || File::Spec->catfile($out_dir, 'structuredesign-applied-abstraction.json');
+        return 0 unless -f $mp && -s $mp;
+        my $m = eval { _read_json($mp) };
+        return 0 if $@ || ref($m) ne 'HASH';
+        return 0 unless ($m->{schema} || '') =~ /^Sim::OPT::StructureDesign\/applied-abstraction-[12]$/;
+        return 0 unless ($m->{operation} || '') eq 'apply_abstraction';
+        return 0 unless ref($m->{metric}) eq 'HASH';
+        return 0 unless ref($m->{medoids}) eq 'ARRAY' && @{$m->{medoids}};
+        return 0 unless defined($m->{rows}) && 0 + $m->{rows} >= 1;
+        my $files = $m->{files};
+        return 0 unless ref($files) eq 'HASH' && defined($files->{assignments});
+        return 0 unless -f $files->{assignments} && -s $files->{assignments};
+        return 1;
+    }
+    if (($s->{type} || '') eq 'statistics') {
+        my $r = ref($old->{result}) eq 'HASH' ? $old->{result} : {};
+        my $mp = $r->{manifest};
+        return 0 unless defined($mp) && -f $mp && -s $mp;
+        my $m = eval { _read_json($mp) };
+        return 0 if $@ || ref($m) ne 'HASH';
+        return 0 unless ($m->{schema} || '') =~ /^Sim::OPT::StructureDesign\/landscape-statistics-[12]$/;
+        my $files = $m->{files};
+        return 0 unless ref($files) eq 'HASH' && keys %$files;
+        for my $path (values %$files) {
+            return 0 unless defined($path) && !ref($path) && -f $path && -s $path;
+        }
+        return 1;
+    }
     return 1 unless ($s->{type} || '') eq 'reconstruct_memory';
     my $dir = _state_dir($p, $s->{name});
     return 0 unless -d $dir;
@@ -2121,8 +2737,14 @@ sub _reconstruct_memory_artifacts_ok {
     return 0 unless -f $mp && -s $mp;
     my $m = eval { _read_json($mp) };
     return 0 if $@ || ref($m) ne 'HASH';
-    return 0 unless ($m->{schema} || '') eq 'Sim::OPT::StructureDesign/memory-reconstruction-3';
-    return 0 unless ($m->{mode} || '') eq 'shared_multistar_compressed';
+    my $reconstruction_mode = _reconstruction_mode_for_step($s);
+    if ($reconstruction_mode eq 'legacy_medoid_only') {
+        return 0 unless ($m->{schema} || '') eq 'Sim::OPT::StructureDesign/memory-reconstruction-3';
+        return 0 unless ($m->{mode} || '') eq 'shared_multistar_compressed';
+    } else {
+        return 0 unless ($m->{schema} || '') eq 'Sim::OPT::StructureDesign/memory-reconstruction-4';
+        return 0 unless ($m->{mode} || '') eq 'shared_multistar_experiential_memory';
+    }
     my $tot = $m->{totres};
     my $w = $m->{weightordmeta};
     return 0 unless defined($tot) && -f $tot && -s $tot;
@@ -2134,7 +2756,68 @@ sub _reconstruct_memory_artifacts_ok {
     return 1;
 }
 
+sub _write_memory_seed_files {
+    my (%a) = @_;
+    my $plan = $a{plan};
+    my $target_dir = $a{target_dir};
+    my $memory_root = $a{memory_root};
+    die "memory seed: plan HASH required\n" unless ref($plan) eq 'HASH';
+    my $support = $plan->{retained_support};
+    die "memory seed: retained_support ARRAY required\n" unless ref($support) eq 'ARRAY';
+    my $totres = File::Spec->catfile($target_dir, $memory_root . '-0_totres.csv');
+    my $audit = File::Spec->catfile($target_dir, 'structuredesign-memory-seed.csv');
+    require Text::CSV;
+    my $parse = Text::CSV->new({ binary=>1, auto_diag=>1 });
+    my $write = Text::CSV->new({ binary=>1, eol=>"\n" });
+    open my $tfh, '>', $totres or die "Cannot write $totres: $!\n";
+    open my $afh, '>', $audit or die "Cannot write $audit: $!\n";
+    $write->print($afh, [qw(local_instance source_instance cluster provenance source_line)]);
+    my %seen;
+    for my $r (@$support) {
+        die "memory seed: malformed retained support record\n"
+            unless ref($r) eq 'HASH' && defined($r->{row}) && defined($r->{local_instance}) && defined($r->{instance});
+        die "memory seed: duplicate local instance '$r->{local_instance}'\n" if $seen{$r->{local_instance}}++;
+        die "memory seed: cannot parse retained result row for '$r->{instance}'\n" unless $parse->parse($r->{row});
+        my @f = $parse->fields;
+        die "memory seed: retained result row is empty for '$r->{instance}'\n" unless @f;
+        $f[0] = $r->{local_instance};
+        $write->print($tfh, \@f);
+        $write->print($afh, [
+            $r->{local_instance}, $r->{instance}, 0+$r->{cluster},
+            ($r->{provenance} || 'direct_simulation'), 0+($r->{source_line} || 0),
+        ]);
+    }
+    close $tfh or die "Cannot close $totres: $!\n";
+    close $afh or die "Cannot close $audit: $!\n";
+    return { totres=>$totres, audit=>$audit, rows=>scalar(@$support) };
+}
+
+sub _reconstruction_mode_for_step {
+    my ($s) = @_;
+    die "reconstruct_memory: step HASH required\n" unless ref($s) eq 'HASH';
+    my $mode = $s->{reconstruction_mode};
+    if (!defined($mode) || !length($mode)) {
+        # Historical procedure files have no retained-memory dependency.  The
+        # experiential procedure does.  Preserve both meanings when old files
+        # are replayed under a newer module.
+        return exists($s->{memory}) && defined($s->{memory})
+            ? 'experiential_cloud'
+            : 'legacy_medoid_only';
+    }
+    die "reconstruct_memory '$s->{name}': reconstruction_mode must be 'legacy_medoid_only' or 'experiential_cloud'\n"
+        unless $mode eq 'legacy_medoid_only' || $mode eq 'experiential_cloud';
+    return $mode;
+}
+
 sub _execute_reconstruct_memory {
+    my (%a) = @_;
+    my $mode = _reconstruction_mode_for_step($a{step});
+    return _execute_reconstruct_memory_legacy(%a)
+        if $mode eq 'legacy_medoid_only';
+    return _execute_reconstruct_memory_experiential(%a);
+}
+
+sub _execute_reconstruct_memory_legacy {
     my (%a) = @_;
     my $s = $a{step};
     my $p = $a{procedure};
@@ -2183,11 +2866,23 @@ sub _execute_reconstruct_memory {
         push @medoids, $m->{instance};
     }
 
+    my $star_divisions;
     if (exists $s->{star_divisions}) {
-        print "[StructureDesign] NOTE reconstruct_memory '$to': star_divisions is obsolete in shared multi-star mode; retained medoids themselves are the explicit starpositions.\n";
+        $star_divisions = $s->{star_divisions};
+    } elsif (exists $s->{cloud_star_divisions}) {
+        # Allows the same procedure declaration to change only
+        # reconstruction_mode when comparing legacy and experiential recall.
+        $star_divisions = $s->{cloud_star_divisions};
+        die "reconstruct_memory '$to': star_divisions must be an integer >= 2\n"
+            unless defined($star_divisions)
+                && "$star_divisions" =~ /^\d+$/
+                && $star_divisions >= 2;
     }
 
     require Sim::OPT::StructureDesign;
+    my $inherited_dowhat = _resolve_inherited_dowhat(
+        step => $s, procedure => $p,
+    );
     my $plan = Sim::OPT::StructureDesign::plan_memory_reconstruction(
         source_config => $source_cfg,
         medoids => \@medoids,
@@ -2195,12 +2890,20 @@ sub _execute_reconstruct_memory {
         child_dir => $target_dir,
         child_config => ($s->{config} || 'memory.pl'),
         memory_model_root => $memory_root,
+        (defined($star_divisions) ? (star_divisions => $star_divisions) : ()),
+        (exists($s->{mediumiters}) ? (mediumiters => $s->{mediumiters}) : ()),
+        dowhat_inherit => $inherited_dowhat,
     );
 
     return {
         state => $to, from => $from, operation => 'reconstruct_memory',
+        reconstruction_mode => 'legacy_medoid_only',
         mode => $plan->{mode}, abstraction => $abs_path,
         medoids => scalar(@medoids), variables => \@vars,
+        (defined($plan->{star_divisions}) ? (star_divisions => $plan->{star_divisions}) : ()),
+        medoid_star_count => $plan->{medoid_star_count},
+        subdivision_star_count => $plan->{subdivision_star_count},
+        effective_star_count => $plan->{effective_star_count},
         expected_sample_rows => $plan->{expected_sample_rows},
         expected_lattice_rows => $plan->{expected_lattice_rows},
         source_model_root => $source_root, memory_model_root => $memory_root,
@@ -2256,6 +2959,7 @@ sub _execute_reconstruct_memory {
     my $record = {
         schema => 'Sim::OPT::StructureDesign/memory-reconstruction-3',
         operation => 'reconstruct_memory',
+        reconstruction_mode => 'legacy_medoid_only',
         mode => $plan->{mode},
         state => $to,
         from_state => $from,
@@ -2268,7 +2972,14 @@ sub _execute_reconstruct_memory {
         medoid_count => scalar(@manifest_medoids),
         medoids => \@manifest_medoids,
         source_starpositions => $plan->{source_starpositions},
+        medoid_starpositions => $plan->{medoid_starpositions},
+        subdivision_source_starpositions => $plan->{subdivision_source_starpositions},
+        subdivision_starpositions => $plan->{subdivision_starpositions},
         starpositions => $plan->{starpositions},
+        (defined($plan->{star_divisions}) ? (star_divisions => 0 + $plan->{star_divisions}) : ()),
+        medoid_star_count => 0 + ($plan->{medoid_star_count} || 0),
+        subdivision_star_count => 0 + ($plan->{subdivision_star_count} || 0),
+        effective_star_count => 0 + ($plan->{effective_star_count} || 0),
         lattice_counts => $plan->{lattice_counts},
         per_variable_axes => $plan->{per_variable_axes},
         workspace => $target_dir,
@@ -2286,10 +2997,211 @@ sub _execute_reconstruct_memory {
     _write_json($record_path, $record);
     return {
         state => $to, from => $from, operation => 'reconstruct_memory',
+        reconstruction_mode => 'legacy_medoid_only',
         mode => $plan->{mode}, medoid_count => scalar(@manifest_medoids),
-        variables => \@vars, sampled_rows => $sample_rows,
+        variables => \@vars,
+        (defined($plan->{star_divisions}) ? (star_divisions => $plan->{star_divisions}) : ()),
+        medoid_star_count => $plan->{medoid_star_count},
+        subdivision_star_count => $plan->{subdivision_star_count},
+        effective_star_count => $plan->{effective_star_count},
+        sampled_rows => $sample_rows,
         reconstructed_rows => $reconstructed_rows,
         manifest => $record_path, totres => $totres, weightordmeta => $weight,
+    };
+}
+
+sub _execute_reconstruct_memory_experiential {
+    my (%a) = @_;
+    my $s = $a{step};
+    my $p = $a{procedure};
+    my $manifest = $a{manifest};
+    my $commit = $a{commit};
+    my $to = $s->{name} or die "reconstruct_memory: target state name required\n";
+    my $from = $s->{from} or die "reconstruct_memory '$to': from required\n";
+    my $source_dir = _state_dir($p, $from);
+    my $target_dir = _state_dir($p, $to);
+    my $source_root = $s->{model_root} || 'bt';
+    my $memory_root = $s->{memory_model_root} || 'btmed';
+    die "reconstruct_memory '$to': memory_model_root must be a simple model-directory name\n"
+        unless $memory_root =~ /^[A-Za-z0-9_.-]+$/;
+    my $source_cfg_name = $s->{source_config} || "$from.pl";
+    my $source_cfg = File::Spec->file_name_is_absolute($source_cfg_name)
+        ? $source_cfg_name : File::Spec->catfile($source_dir, $source_cfg_name);
+    die "reconstruct_memory '$to': source config not found: $source_cfg\n" unless -f $source_cfg;
+
+    my $abs_ref = $s->{abstraction} or die "reconstruct_memory '$to': abstraction reference required\n";
+    my $abs_path = _resolve_reference($abs_ref, $manifest);
+    die "reconstruct_memory '$to': abstraction manifest not found: $abs_path\n" unless -f $abs_path;
+    my $abs = _read_json($abs_path);
+    die "reconstruct_memory '$to': unsupported abstraction manifest\n"
+        unless ref($abs) eq 'HASH'
+            && ($abs->{schema} || '') eq 'Sim::OPT::StructureDesign/abstraction-1'
+            && ref($abs->{medoids}) eq 'ARRAY' && @{ $abs->{medoids} };
+
+    my $memory_ref = $s->{memory} or die "reconstruct_memory '$to': retained memory packet reference required\n";
+    my $memory_path = _resolve_reference($memory_ref, $manifest);
+    die "reconstruct_memory '$to': retained memory packet not found: $memory_path\n" unless -f $memory_path;
+    my $memory = _read_json($memory_path);
+    die "reconstruct_memory '$to': invalid retained memory packet\n"
+        unless ref($memory) eq 'HASH'
+            && ($memory->{schema} || '') eq 'Sim::OPT::StructureDesign/memory-packet-1'
+            && ref($memory->{medoids}) eq 'ARRAY'
+            && ref($memory->{support}) eq 'ARRAY';
+
+    my $vars = $s->{variables};
+    $vars = $abs->{problem_variables} unless ref($vars) eq 'ARRAY' && @$vars;
+    die "reconstruct_memory '$to': no problem variables available\n" unless ref($vars) eq 'ARRAY' && @$vars;
+    my @vars = sort { $a <=> $b } map { 0 + $_ } @$vars;
+
+    my @medoid_records = @{ $abs->{medoids} };
+    if (defined $s->{medoid_limit}) {
+        my $lim = 0 + $s->{medoid_limit};
+        die "reconstruct_memory '$to': medoid_limit must be >= 1\n" if $lim < 1;
+        @medoid_records = @medoid_records[0 .. ($lim - 1)] if @medoid_records > $lim;
+    }
+    my @medoids;
+    my %selected_cluster;
+    for my $i (0 .. $#medoid_records) {
+        my $m = $medoid_records[$i];
+        die "reconstruct_memory '$to': malformed medoid record at index $i\n"
+            unless ref($m) eq 'HASH' && defined($m->{instance}) && defined($m->{cluster});
+        push @medoids, $m->{instance};
+        $selected_cluster{0+$m->{cluster}} = 1;
+    }
+    my %memory_medoid = map { (defined($_->{instance}) ? ($_->{instance}=>1) : ()) } @{ $memory->{medoids} };
+    for my $mid (@medoids) {
+        die "reconstruct_memory '$to': retained memory packet does not contain antecedent medoid '$mid'\n" unless $memory_medoid{$mid};
+    }
+    my $memory_for_plan = {
+        %$memory,
+        medoids=>[ grep { $selected_cluster{0+$_->{cluster}} } @{ $memory->{medoids} } ],
+        support=>[ grep { $selected_cluster{0+$_->{cluster}} } @{ $memory->{support} } ],
+    };
+
+    my $cloud_star_divisions;
+    if (exists $s->{cloud_star_divisions}) {
+        $cloud_star_divisions = $s->{cloud_star_divisions};
+    } elsif (exists $s->{star_divisions}) {
+        $cloud_star_divisions = $s->{star_divisions};
+    }
+    if (defined $cloud_star_divisions) {
+        die "reconstruct_memory '$to': cloud_star_divisions must be an integer >= 2\n"
+            unless "$cloud_star_divisions" =~ /^\d+$/ && $cloud_star_divisions >= 2;
+    }
+
+    require Sim::OPT::StructureDesign;
+    my $inherited_dowhat = _resolve_inherited_dowhat(step=>$s, procedure=>$p);
+    my $plan = Sim::OPT::StructureDesign::plan_memory_reconstruction(
+        source_config=>$source_cfg,
+        medoids=>\@medoids,
+        memory_packet=>$memory_for_plan,
+        variables=>\@vars,
+        child_dir=>$target_dir,
+        child_config=>($s->{config} || 'memory.pl'),
+        memory_model_root=>$memory_root,
+        (defined($cloud_star_divisions) ? (cloud_star_divisions=>$cloud_star_divisions) : ()),
+        (exists($s->{mediumiters}) ? (mediumiters=>$s->{mediumiters}) : ()),
+        dowhat_inherit=>$inherited_dowhat,
+    );
+
+    return {
+        state=>$to, from=>$from, operation=>'reconstruct_memory', reconstruction_mode=>'experiential_cloud', mode=>$plan->{mode},
+        abstraction=>$abs_path, memory=>$memory_path,
+        medoids=>scalar(@medoids), variables=>\@vars,
+        (defined($plan->{cloud_star_divisions}) ? (cloud_star_divisions=>$plan->{cloud_star_divisions}) : ()),
+        medoid_star_count=>$plan->{medoid_star_count}, cloud_star_count=>$plan->{cloud_star_count},
+        effective_star_count=>$plan->{effective_star_count},
+        retained_support_total=>$plan->{retained_support_total},
+        retained_support_in_scope=>$plan->{retained_support_in_scope},
+        retained_support_in_scope_by_cluster=>$plan->{retained_support_in_scope_by_cluster},
+        expected_star_sample_rows=>$plan->{expected_star_sample_rows},
+        expected_sample_rows=>$plan->{expected_sample_rows},
+        expected_lattice_rows=>$plan->{expected_lattice_rows},
+        source_model_root=>$source_root, memory_model_root=>$memory_root,
+        target_dir=>$target_dir, planned=>1,
+    } unless $commit;
+
+    die "reconstruct_memory '$to': refusing to overwrite existing target directory $target_dir\n" if -e $target_dir;
+    my $root_model = File::Spec->catdir($source_dir, $source_root);
+    die "reconstruct_memory '$to': canonical source root not found: $root_model\n" unless -d $root_model;
+
+    Sim::OPT::StructureDesign::create_memory_workspace(plan=>$plan, commit=>1, root_model_dir=>$root_model);
+    my $seed = _write_memory_seed_files(plan=>$plan, target_dir=>$target_dir, memory_root=>$memory_root);
+    my $run = _run_opt(
+        state=>$to, state_dir=>$target_dir, config=>$plan->{child_config},
+        executable=>$s->{executable}, root_dir=>$p->{root_dir},
+    );
+
+    my $totres = File::Spec->catfile($target_dir, $memory_root . '-0_totres.csv');
+    my $weight = File::Spec->catfile($target_dir, $memory_root . '-report-0-0.csv_sortm.csv_weightordmeta.csv');
+    die "reconstruct_memory '$to': sampled/remembered totres missing or empty: $totres\n" unless -f $totres && -s $totres;
+    die "reconstruct_memory '$to': reconstructed surrogate missing or empty: $weight\n" unless -f $weight && -s $weight;
+
+    my $sample_rows = _count_result_rows($totres);
+    my $reconstructed_rows = _count_result_rows($weight);
+    die "reconstruct_memory '$to': sampled+remembered totres has $sample_rows rows; expected exactly $plan->{expected_sample_rows} unique instances\n"
+        unless $sample_rows == $plan->{expected_sample_rows};
+    die "reconstruct_memory '$to': surrogate reconstruction is incomplete: $reconstructed_rows rows in weightordmeta, expected full $plan->{expected_lattice_rows}-row lattice\n"
+        unless $reconstructed_rows == $plan->{expected_lattice_rows};
+
+    my @manifest_medoids;
+    for my $i (0 .. $#medoid_records) {
+        my $m = $medoid_records[$i];
+        push @manifest_medoids, {
+            medoid_index=>$i+1, cluster=>0+$m->{cluster}, medoid=>$m->{instance},
+            (exists($m->{performance}) ? (performance=>0+$m->{performance}) : ()),
+        };
+    }
+
+    my $record = {
+        schema=>'Sim::OPT::StructureDesign/memory-reconstruction-4',
+        operation=>'reconstruct_memory', reconstruction_mode=>'experiential_cloud', mode=>$plan->{mode},
+        semantics=>'medoid-anchored experiential-memory reactivation',
+        scope_basis=>$plan->{scope_basis}, scope_expansions=>$plan->{scope_expansions},
+        state=>$to, from_state=>$from,
+        source_dir=>$source_dir, source_config=>$source_cfg,
+        abstraction_manifest=>$abs_path, memory_packet=>$memory_path,
+        source_model_root=>$source_root, model_root=>$memory_root,
+        variables=>\@vars, medoid_count=>scalar(@manifest_medoids), medoids=>\@manifest_medoids,
+        source_starpositions=>$plan->{source_starpositions},
+        medoid_starpositions=>$plan->{medoid_starpositions},
+        cloud_source_starpositions=>$plan->{cloud_source_starpositions},
+        cloud_starpositions=>$plan->{cloud_starpositions},
+        starpositions=>$plan->{starpositions},
+        (defined($plan->{cloud_star_divisions}) ? (
+            cloud_star_divisions=>0+$plan->{cloud_star_divisions},
+            cloud_target_centres_per_cluster=>0+$plan->{cloud_target_centres_per_cluster},
+        ) : ()),
+        medoid_star_count=>0+($plan->{medoid_star_count}||0),
+        cloud_star_count=>0+($plan->{cloud_star_count}||0),
+        effective_star_count=>0+($plan->{effective_star_count}||0),
+        retained_support_total=>0+$plan->{retained_support_total},
+        retained_support_in_scope=>0+$plan->{retained_support_in_scope},
+        retained_support_out_of_scope=>0+$plan->{retained_support_out_of_scope},
+        retained_support_by_cluster=>$plan->{retained_support_by_cluster},
+        retained_support_in_scope_by_cluster=>$plan->{retained_support_in_scope_by_cluster},
+        lattice_counts=>$plan->{lattice_counts}, per_variable_axes=>$plan->{per_variable_axes},
+        workspace=>$target_dir,
+        config=>File::Spec->catfile($target_dir, $plan->{child_config}),
+        local_manifest=>File::Spec->catfile($target_dir, 'structuredesign-memory-local.json'),
+        seed_audit=>$seed->{audit}, totres=>$totres, weightordmeta=>$weight,
+        seed_rows=>0+$seed->{rows},
+        expected_star_sample_rows=>0+$plan->{expected_star_sample_rows},
+        expected_sample_rows=>0+$plan->{expected_sample_rows}, sampled_rows=>0+$sample_rows,
+        expected_lattice_rows=>0+$plan->{expected_lattice_rows}, reconstructed_rows=>0+$reconstructed_rows,
+        exit_status=>0+($run->{exit_status}||0),
+    };
+    my $record_path = File::Spec->catfile($target_dir, 'structuredesign-memory.json');
+    _write_json($record_path, $record);
+    return {
+        state=>$to, from=>$from, operation=>'reconstruct_memory', reconstruction_mode=>'experiential_cloud', mode=>$plan->{mode},
+        medoid_count=>scalar(@manifest_medoids), variables=>\@vars,
+        (defined($plan->{cloud_star_divisions}) ? (cloud_star_divisions=>$plan->{cloud_star_divisions}) : ()),
+        medoid_star_count=>$plan->{medoid_star_count}, cloud_star_count=>$plan->{cloud_star_count},
+        effective_star_count=>$plan->{effective_star_count},
+        retained_support_in_scope=>$plan->{retained_support_in_scope},
+        sampled_rows=>$sample_rows, reconstructed_rows=>$reconstructed_rows,
+        manifest=>$record_path, totres=>$totres, weightordmeta=>$weight,
     };
 }
 
@@ -2382,10 +3294,897 @@ sub _regression_metrics {
         n => $n,
         mean_signed_error => $sum_err / $n,
         mae => $sum_abs / $n,
+        mse => $sum_sq / $n,
         rmse => sqrt($sum_sq / $n),
         max_absolute_error => $max_abs,
         r_squared => $sst > 0 ? 1 - ($sum_sq / $sst) : undef,
     };
+}
+
+sub _clamp01_stats {
+    my ($x) = @_;
+    return 0 if $x < 0;
+    return 1 if $x > 1;
+    return $x;
+}
+
+sub _hybrid_stats {
+    my ($values, $weights, $lambda) = @_;
+    die "statistics hybrid: no values\n" unless ref($values) eq 'ARRAY' && @$values;
+    my ($wsum, $asum, $logsum, $zero) = (0, 0, 0, 0);
+    for my $i (0 .. $#$values) {
+        my $v = _clamp01_stats(0 + $values->[$i]);
+        my $w = 0 + $weights->[$i];
+        $wsum += $w;
+        $asum += $w * $v;
+        if ($v <= 0) { $zero = 1; }
+        else { $logsum += $w * log($v); }
+    }
+    die "statistics hybrid: non-positive total weight\n" unless $wsum > 0;
+    my $A = $asum / $wsum;
+    my $G = $zero ? 0 : exp($logsum / $wsum);
+    return _clamp01_stats((1 - $lambda) * $A + $lambda * $G);
+}
+
+sub _metric_distance_from_spec {
+    my (%a) = @_;
+    require Sim::OPT::StructureDesign;
+    return Sim::OPT::StructureDesign::abstraction_distance(%a);
+}
+
+sub _csv_column_index_stats {
+    my ($spec, $n) = @_;
+    $spec = 2 unless defined $spec;
+    my $i = int($spec);
+    $i = $n + $i if $i < 0;
+    die "statistics: CSV column $spec outside row width $n\n" if $i < 0 || $i >= $n;
+    return $i;
+}
+
+sub _read_landscape_index_stats {
+    my (%a) = @_;
+    my $path = $a{path};
+    my $mapper = $a{mapper} || sub { $_[0] };
+    my $wanted = $a{wanted};
+    my $perfcol = $a{performance_column};
+    die "statistics: landscape file not found: $path\n" unless -f $path;
+    require Text::CSV;
+    my $csv = Text::CSV->new({ binary => 1, auto_diag => 1 });
+    open my $fh, '<', $path or die "Cannot read $path: $!\n";
+    my (%out, $rows);
+    while (my $r = $csv->getline($fh)) {
+        next unless @$r;
+        my $local = $r->[0];
+        next unless defined($local) && $local =~ /^(?:\d+-\d+)(?:_\d+-\d+)+$/;
+        my $mapped = $mapper->($local);
+        next unless defined $mapped;
+        next if ref($wanted) eq 'HASH' && !$wanted->{$mapped};
+        my $pi = _csv_column_index_stats($perfcol, scalar(@$r));
+        my $v = $r->[$pi];
+        die "statistics: non-numeric performance '$v' in $path for $local\n"
+            unless defined($v) && $v =~ /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?$/;
+        die "statistics: duplicate mapped instance '$mapped' in $path\n" if exists $out{$mapped};
+        $out{$mapped} = { local_instance => $local, instance => $mapped, performance => 0 + $v };
+        $rows++;
+    }
+    close $fh;
+    return (\%out, 0 + ($rows || 0));
+}
+
+sub _read_sample_set_stats {
+    my (%a) = @_;
+    my $path = $a{path};
+    return {} unless defined($path) && -f $path;
+    my $mapper = $a{mapper} || sub { $_[0] };
+    open my $fh, '<', $path or die "Cannot read $path: $!\n";
+    my %set;
+    while (my $line = <$fh>) {
+        if ($line =~ /^((?:\d+-\d+)(?:_\d+-\d+)+),/) {
+            my $m = $mapper->($1);
+            $set{$m} = 1 if defined $m;
+        }
+    }
+    close $fh;
+    return \%set;
+}
+
+sub _read_cluster_assignments_stats {
+    my (%a) = @_;
+    my $path = $a{path};
+    my $mapper = $a{mapper} || sub { $_[0] };
+    my $wanted = $a{wanted};
+    die "statistics: clustered file not found: $path\n" unless -f $path;
+    require Text::CSV;
+    my $csv = Text::CSV->new({ binary => 1, auto_diag => 1 });
+    open my $fh, '<', $path or die "Cannot read $path: $!\n";
+    my %out;
+    my $first = 1;
+    while (my $r = $csv->getline($fh)) {
+        if ($first && defined($r->[0]) && $r->[0] eq 'col0') { $first = 0; next; }
+        $first = 0;
+        next unless @$r >= 2;
+        my $local = $r->[0];
+        next unless defined($local) && $local =~ /^(?:\d+-\d+)(?:_\d+-\d+)+$/;
+        my $mapped = $mapper->($local);
+        next unless defined $mapped;
+        next if ref($wanted) eq 'HASH' && !$wanted->{$mapped};
+        my $cluster = $r->[-2];
+        next unless defined($cluster) && $cluster =~ /^\d+$/;
+        $out{$mapped} = 0 + $cluster;
+    }
+    close $fh;
+    return \%out;
+}
+
+sub _read_applied_assignments_stats {
+    my (%a) = @_;
+    my $path = $a{path};
+    my $wanted = $a{wanted};
+    die "statistics: applied assignments file not found: $path\n" unless defined($path) && -f $path;
+    require Text::CSV;
+    my $csv = Text::CSV->new({ binary => 1, auto_diag => 1 });
+    open my $fh, '<', $path or die "Cannot read $path: $!\n";
+    my $header = $csv->getline($fh);
+    die "statistics: applied assignments file is empty: $path\n" unless ref($header) eq 'ARRAY';
+    my %ix;
+    $ix{$header->[$_]} = $_ for 0 .. $#$header;
+    for my $name (qw(local_instance source_instance performance cluster retained_medoid_source_instance retained_medoid_performance distance_to_retained_medoid)) {
+        die "statistics: applied assignments file lacks '$name': $path\n" unless exists $ix{$name};
+    }
+    my %out;
+    while (my $r = $csv->getline($fh)) {
+        my $source = $r->[$ix{source_instance}];
+        next unless defined($source) && length($source);
+        next if ref($wanted) eq 'HASH' && !$wanted->{$source};
+        die "statistics: duplicate applied source instance '$source' in $path\n" if exists $out{$source};
+        my $cluster = $r->[$ix{cluster}];
+        my $distance = $r->[$ix{distance_to_retained_medoid}];
+        die "statistics: non-numeric applied cluster '$cluster' for $source\n"
+            unless defined($cluster) && $cluster =~ /^\d+$/;
+        die "statistics: non-numeric applied distance '$distance' for $source\n"
+            unless defined($distance) && $distance =~ /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?$/;
+        $out{$source} = {
+            local_instance => $r->[$ix{local_instance}],
+            source_instance => $source,
+            performance => 0 + $r->[$ix{performance}],
+            cluster => 0 + $cluster,
+            retained_medoid_source_instance => $r->[$ix{retained_medoid_source_instance}],
+            retained_medoid_performance => 0 + $r->[$ix{retained_medoid_performance}],
+            distance => 0 + $distance,
+        };
+    }
+    close $fh;
+    return \%out;
+}
+
+sub _metric_from_abstraction_stats {
+    my ($abs) = @_;
+    return $abs->{metric} if ref($abs->{metric}) eq 'HASH';
+    my $lm = _read_json($abs->{lattice_manifest});
+    my $levels = $lm->{global_counts} || $lm->{target_counts} || $lm->{lattice_counts};
+    die "statistics: cannot derive metric levels from abstraction manifest\n"
+        unless ref($levels) eq 'HASH';
+    my ($idx) = _read_landscape_index_stats(
+        path => $abs->{results_file}, performance_column => $abs->{performance_column},
+    );
+    my @p = map { $_->{performance} } values %$idx;
+    die "statistics: cannot derive performance range\n" unless @p;
+    my ($best, $worst) = ($p[0], $p[0]);
+    for (@p) { $best = $_ if $_ < $best; $worst = $_ if $_ > $worst; }
+    my %vw = map { $_ => 1 } keys %$levels;
+    return {
+        schema => 'Sim::OPT::ClusterMedoid/hybrid-distance-1-fallback',
+        variable_levels => { %$levels },
+        fixed_levels => { %{ $abs->{fixed_levels} || {} } },
+        context_variables => [ @{ $abs->{context_variables} || [] } ],
+        problem_variables => [ @{ $abs->{problem_variables} || [] } ],
+        lambda => 0 + ($abs->{lambda} // 0.5),
+        variable_weights => \%vw,
+        component_weights => { context => 1, problem => 1, performance => 1 },
+        performance => { best => $best, worst => $worst, divisions => 100 },
+    };
+}
+
+sub _memory_mapper_stats {
+    my ($path) = @_;
+    return (sub { $_[0] }, undef) unless defined($path) && length($path);
+    die "statistics: memory mapping manifest not found: $path\n" unless -f $path;
+    my $plan = _read_json($path);
+    require Sim::OPT::StructureDesign;
+    my $mapper = sub {
+        return Sim::OPT::StructureDesign::map_memory_instance_to_source($_[0], $plan);
+    };
+    return ($mapper, $plan);
+}
+
+sub _optimal_medoid_matching_stats {
+    my ($left, $right, $metric) = @_;
+    my $nl = @$left; my $nr = @$right;
+    return [] unless $nl && $nr;
+    my ($small, $large, $swapped) = $nl <= $nr ? ($left, $right, 0) : ($right, $left, 1);
+    my $ns = @$small; my $ng = @$large;
+    my @cost;
+    for my $i (0 .. $ns-1) {
+        for my $j (0 .. $ng-1) {
+            my ($L, $R) = $swapped ? ($large->[$j], $small->[$i]) : ($small->[$i], $large->[$j]);
+            $cost[$i][$j] = _metric_distance_from_spec(
+                metric => $metric,
+                instance_a => $L->{source_instance}, performance_a => $L->{performance},
+                instance_b => $R->{source_instance}, performance_b => $R->{performance},
+            );
+        }
+    }
+    my %dp = (0 => [0, []]);
+    for my $i (0 .. $ns-1) {
+        my %next;
+        while (my ($mask, $state) = each %dp) {
+            for my $j (0 .. $ng-1) {
+                next if $mask & (1 << $j);
+                my $nm = $mask | (1 << $j);
+                my $nc = $state->[0] + $cost[$i][$j];
+                if (!exists($next{$nm}) || $nc < $next{$nm}[0]) {
+                    $next{$nm} = [$nc, [ @{$state->[1]}, $j ]];
+                }
+            }
+        }
+        %dp = %next;
+    }
+    my ($best) = sort { $dp{$a}[0] <=> $dp{$b}[0] } keys %dp;
+    my @sel = @{ $dp{$best}[1] };
+    my @pairs;
+    for my $i (0 .. $#sel) {
+        my $j = $sel[$i];
+        my ($li, $ri) = $swapped ? ($j, $i) : ($i, $j);
+        push @pairs, { left_index => $li, right_index => $ri, distance => 0 + $cost[$i][$j] };
+    }
+    return \@pairs;
+}
+
+sub _ari_stats {
+    my ($pairs) = @_;
+    return undef unless ref($pairs) eq 'ARRAY' && @$pairs >= 2;
+    my (%a, %b, %ab);
+    for my $p (@$pairs) {
+        $a{$p->[0]}++; $b{$p->[1]}++; $ab{$p->[0]}{$p->[1]}++;
+    }
+    my $c2 = sub { my ($n)=@_; return $n < 2 ? 0 : $n*($n-1)/2; };
+    my $sum_ab = 0; for my $x (keys %ab) { $sum_ab += $c2->($_) for values %{$ab{$x}}; }
+    my $sum_a = 0; $sum_a += $c2->($_) for values %a;
+    my $sum_b = 0; $sum_b += $c2->($_) for values %b;
+    my $total = $c2->(scalar(@$pairs));
+    return undef unless $total > 0;
+    my $expected = ($sum_a * $sum_b) / $total;
+    my $maxi = 0.5 * ($sum_a + $sum_b);
+    return 1 if abs($maxi - $expected) < 1e-15 && abs($sum_ab - $expected) < 1e-15;
+    return ($sum_ab - $expected) / ($maxi - $expected) if abs($maxi - $expected) >= 1e-15;
+    return undef;
+}
+
+sub _median_stats {
+    my (@v) = sort { $a <=> $b } @_;
+    return undef unless @v;
+    return $v[int(@v/2)] if @v % 2;
+    return 0.5 * ($v[@v/2-1] + $v[@v/2]);
+}
+
+sub _write_csv_stats {
+    my ($path, $header, $rows) = @_;
+    require Text::CSV;
+    make_path(dirname($path)) unless -d dirname($path);
+    my $csv = Text::CSV->new({ binary => 1, eol => "\n" });
+    open my $fh, '>', $path or die "Cannot write $path: $!\n";
+    $csv->print($fh, $header);
+    for my $r (@$rows) { $csv->print($fh, [ map { defined($_) ? $_ : '' } @$r ]); }
+    close $fh or die "Cannot close $path: $!\n";
+}
+
+sub _rewrite_statistics_aggregate {
+    my ($root) = @_;
+    return unless -d $root;
+    opendir my $dh, $root or die "Cannot open statistics directory $root: $!\n";
+    my @dirs = sort grep { $_ ne '.' && $_ ne '..' && -d File::Spec->catdir($root, $_) } readdir($dh);
+    closedir $dh;
+    my @records;
+    for my $d (@dirs) {
+        my $p = File::Spec->catfile($root, $d, 'summary.json');
+        next unless -f $p;
+        my $r = eval { _read_json($p) };
+        next if $@ || ref($r) ne 'HASH' || ($r->{schema}||'') !~ /^Sim::OPT::StructureDesign\/landscape-statistics-[12]$/;
+        push @records, $r;
+    }
+    my @header = qw(pair left_state right_state common_instances mae rmse mse mean_signed_error max_absolute_error r_squared surrogate_to_surrogate_n surrogate_to_surrogate_mae surrogate_to_surrogate_rmse recall_semantics retained_medoids category_ari direct_category_agreement category_changes source_mean_distance_to_retained_medoid recall_mean_distance_to_retained_medoid mean_distance_change secondary_medoid_count secondary_medoid_exact_matches secondary_medoid_mean_distance secondary_medoid_median_distance secondary_medoid_max_distance);
+    my @rows;
+    for my $r (@records) {
+        my $lm = $r->{landscape_metrics} || {};
+        my $ss = (ref($r->{category_metrics}) eq 'HASH' && ref($r->{category_metrics}{surrogate_to_surrogate}) eq 'HASH')
+            ? $r->{category_metrics}{surrogate_to_surrogate} : {};
+        my $rc = $r->{recall_category_metrics} || {};
+        my $ret = $r->{retained_model_metrics} || {};
+        my $legacy_cm = $r->{cluster_metrics} || {};
+        my $legacy_mm = $r->{medoid_metrics} || {};
+        my $sec = $r->{secondary_medoid_metrics} || {};
+        push @rows, [
+            $r->{pair}, $r->{left_state}, $r->{right_state}, $lm->{n}, $lm->{mae}, $lm->{rmse}, $lm->{mse},
+            $lm->{mean_signed_error}, $lm->{max_absolute_error}, $lm->{r_squared},
+            $ss->{n}, $ss->{mae}, $ss->{rmse},
+            $r->{recall_semantics}, ($ret->{medoid_count} // $legacy_mm->{left_count}),
+            ($rc->{adjusted_rand_index} // $legacy_cm->{adjusted_rand_index}),
+            ($rc->{direct_agreement} // $legacy_cm->{aligned_agreement}), $rc->{changed},
+            $rc->{source_mean_distance_to_retained_medoid}, $rc->{recall_mean_distance_to_retained_medoid}, $rc->{mean_distance_change},
+            $sec->{secondary_medoid_count}, $sec->{exact_coordinate_matches}, $sec->{mean_hybrid_distance}, $sec->{median_hybrid_distance}, $sec->{max_hybrid_distance},
+        ];
+    }
+    _write_csv_stats(File::Spec->catfile($root, 'structuredesign-summary.csv'), \@header, \@rows);
+    _write_json(File::Spec->catfile($root, 'structuredesign-summary.json'), {
+        schema => 'Sim::OPT::StructureDesign/statistics-summary-2',
+        pairs => \@records,
+    });
+}
+
+sub _execute_statistics_applied {
+    my (%a) = @_;
+    my $s = $a{step};
+    my $p = $a{procedure};
+    my $manifest = $a{manifest};
+    my $commit = $a{commit};
+    my $left = $s->{left} or die "statistics: left state required\n";
+    my $right = $s->{right} or die "statistics: right state required\n";
+    my $pair = $s->{name} || "$left-$right";
+    my $left_abs_path = _resolve_reference($s->{left_abstraction}, $manifest);
+    my $right_app_path = _resolve_reference($s->{right_application}, $manifest);
+    die "statistics '$pair': left abstraction manifest not found: $left_abs_path\n" unless defined($left_abs_path) && -f $left_abs_path;
+    die "statistics '$pair': right applied-abstraction manifest not found: $right_app_path\n" unless defined($right_app_path) && -f $right_app_path;
+    my $la = _read_json($left_abs_path);
+    my $ra = _read_json($right_app_path);
+    die "statistics '$pair': invalid left abstraction schema\n" unless ($la->{schema}||'') eq 'Sim::OPT::StructureDesign/abstraction-1';
+    die "statistics '$pair': invalid right applied-abstraction schema\n" unless ($ra->{schema}||'') =~ /^Sim::OPT::StructureDesign\/applied-abstraction-[12]$/;
+
+    my $json = JSON::PP->new->canonical(1);
+    die "statistics '$pair': applied metric is not the frozen left abstraction metric\n"
+        unless $json->encode($la->{metric}) eq $json->encode($ra->{metric});
+    my @lm = map { { cluster=>0+$_->{cluster}, instance=>$_->{instance}, performance=>0+$_->{performance} } } @{ $la->{medoids} || [] };
+    my @rm = map { { cluster=>0+$_->{cluster}, instance=>$_->{instance}, performance=>0+$_->{performance} } } @{ $ra->{medoids} || [] };
+    die "statistics '$pair': retained medoid set changed during recall\n"
+        unless $json->encode(\@lm) eq $json->encode(\@rm);
+    die "statistics '$pair': abstraction has no retained medoids\n" unless @lm;
+
+    my @secondary = map {
+        { cluster=>0+$_->{cluster}, source_instance=>$_->{source_instance}, local_instance=>$_->{local_instance}, performance=>0+$_->{performance} }
+    } @{ $ra->{secondary_medoids} || [] };
+    my %secondary_by_cluster = map { $_->{cluster} => $_ } @secondary;
+    my (@secondary_comparison, @secondary_distances);
+    my $secondary_exact = 0;
+    if (@secondary) {
+        for my $pm (@lm) {
+            my $sm = $secondary_by_cluster{$pm->{cluster}};
+            next unless $sm;
+            my $d = _metric_distance_from_spec(
+                metric=>$la->{metric},
+                instance_a=>$pm->{instance}, performance_a=>$pm->{performance},
+                instance_b=>$sm->{source_instance}, performance_b=>$sm->{performance},
+            );
+            push @secondary_distances, $d;
+            my $exact = ($pm->{instance} eq $sm->{source_instance}) ? 1 : 0;
+            $secondary_exact += $exact;
+            push @secondary_comparison, [
+                $pm->{cluster}, $pm->{instance}, $pm->{performance},
+                $sm->{local_instance}, $sm->{source_instance}, $sm->{performance}, $d, $exact,
+            ];
+        }
+    }
+    my $secondary_metrics;
+    if (@secondary_distances) {
+        my $sum=0; $sum += $_ for @secondary_distances;
+        my $max=0; for (@secondary_distances) { $max=$_ if $_>$max; }
+        $secondary_metrics = {
+            compared_clusters => scalar(@secondary_distances),
+            secondary_medoid_count => scalar(@secondary),
+            exact_coordinate_matches => 0 + $secondary_exact,
+            mean_hybrid_distance => $sum/@secondary_distances,
+            median_hybrid_distance => _median_stats(@secondary_distances),
+            max_hybrid_distance => $max,
+            semantics => 'secondary medoids regenerated within frozen antecedent partitions; matched by inherited category identity',
+        };
+    }
+
+    my $right_dir = _state_dir($p, $right);
+    my $map_name = exists($s->{right_memory_manifest}) ? $s->{right_memory_manifest} : $ra->{memory_manifest};
+    my $map_path = defined($map_name) && length($map_name)
+        ? (File::Spec->file_name_is_absolute($map_name) ? $map_name : File::Spec->catfile($right_dir, $map_name))
+        : undef;
+    my ($right_mapper) = _memory_mapper_stats($map_path);
+    my $left_mapper = sub { $_[0] };
+
+    my ($right_rows) = _read_landscape_index_stats(
+        path => $ra->{results_file}, performance_column => $ra->{performance_column}, mapper => $right_mapper,
+    );
+    my %wanted = map { $_ => 1 } keys %$right_rows;
+    my ($left_rows) = _read_landscape_index_stats(
+        path => $la->{results_file}, performance_column => $la->{performance_column}, mapper => $left_mapper, wanted => \%wanted,
+    );
+    my @common = sort grep { exists $left_rows->{$_} } keys %$right_rows;
+    die "statistics '$pair': no physically common landscape instances\n" unless @common;
+
+    my $left_dir = _state_dir($p, $left);
+    my $left_tot = $s->{left_totres_file} || (($s->{left_model_root} || 'bt') . '-0_totres.csv');
+    $left_tot = File::Spec->catfile($left_dir, $left_tot) unless File::Spec->file_name_is_absolute($left_tot);
+    my $right_tot = $s->{right_totres_file} || (($s->{right_model_root} || 'btmed') . '-0_totres.csv');
+    $right_tot = File::Spec->catfile($right_dir, $right_tot) unless File::Spec->file_name_is_absolute($right_tot);
+    my $left_sampled = _read_sample_set_stats(path => $left_tot, mapper => $left_mapper);
+    my $right_sampled = _read_sample_set_stats(path => $right_tot, mapper => $right_mapper);
+
+    my (@reg, %cat_pairs);
+    for my $id (@common) {
+        my $lv = $left_rows->{$id}{performance};
+        my $rv = $right_rows->{$id}{performance};
+        my $ls = $left_sampled->{$id} ? 1 : 0;
+        my $rs = $right_sampled->{$id} ? 1 : 0;
+        my $cat = ($ls ? 'sampled' : 'surrogate') . '_to_' . ($rs ? 'sampled' : 'surrogate');
+        push @reg, { actual => $lv, predicted => $rv };
+        push @{$cat_pairs{$cat}}, { actual => $lv, predicted => $rv };
+    }
+    my $metrics = _regression_metrics(\@reg);
+    $metrics->{mse} = $metrics->{rmse} * $metrics->{rmse};
+    my %category_metrics;
+    for my $cat (sort keys %cat_pairs) {
+        my $m = _regression_metrics($cat_pairs{$cat});
+        $m->{mse} = $m->{rmse} * $m->{rmse};
+        $category_metrics{$cat} = $m;
+    }
+
+    my %common_wanted = map { $_=>1 } @common;
+    my $lc = _read_cluster_assignments_stats(path=>$la->{files}{clustered}, mapper=>$left_mapper, wanted=>\%common_wanted);
+    my $rc = _read_applied_assignments_stats(path=>$ra->{files}{assignments}, wanted=>\%common_wanted);
+    my %medoid_by_cluster = map { $_->{cluster} => $_ } @lm;
+    my (@cluster_pairs, %cont, @common_csv, @source_dist, @recall_dist);
+    my ($agree,$cn)=(0,0);
+    my $metric = $la->{metric};
+    for my $id (@common) {
+        die "statistics '$pair': source category missing for common instance $id\n" unless exists $lc->{$id};
+        die "statistics '$pair': recalled category missing for common instance $id\n" unless exists $rc->{$id};
+        my ($a1,$b1)=($lc->{$id},$rc->{$id}{cluster});
+        my $med = $medoid_by_cluster{$a1} or die "statistics '$pair': no retained medoid for source cluster $a1\n";
+        my $sd = _metric_distance_from_spec(
+            metric=>$metric, instance_a=>$id, performance_a=>$left_rows->{$id}{performance},
+            instance_b=>$med->{instance}, performance_b=>$med->{performance},
+        );
+        my $rd = $rc->{$id}{distance};
+        push @source_dist,$sd; push @recall_dist,$rd;
+        push @cluster_pairs,[$a1,$b1]; $cont{$a1}{$b1}++; $cn++; $agree++ if $a1==$b1;
+        my $ls = $left_sampled->{$id} ? 1 : 0; my $rs = $right_sampled->{$id} ? 1 : 0;
+        my $cat = ($ls ? 'sampled' : 'surrogate') . '_to_' . ($rs ? 'sampled' : 'surrogate');
+        push @common_csv,[$id,$right_rows->{$id}{local_instance},$left_rows->{$id}{performance},$right_rows->{$id}{performance},
+            $right_rows->{$id}{performance}-$left_rows->{$id}{performance},abs($right_rows->{$id}{performance}-$left_rows->{$id}{performance}),
+            $ls,$rs,$cat,$a1,$b1,($a1==$b1?1:0),$sd,$rd,$rd-$sd];
+    }
+    my $ari = _ari_stats(\@cluster_pairs);
+    my $direct = $cn ? $agree/$cn : undef;
+    my @cont_csv;
+    for my $x (sort {$a<=>$b} keys %cont) { for my $y (sort {$a<=>$b} keys %{$cont{$x}}) { push @cont_csv,[$x,$y,$cont{$x}{$y}]; } }
+    my $sum_sd=0; $sum_sd+=$_ for @source_dist; my $sum_rd=0; $sum_rd+=$_ for @recall_dist;
+    my $mean_sd=@source_dist ? $sum_sd/@source_dist : undef; my $mean_rd=@recall_dist ? $sum_rd/@recall_dist : undef;
+    my $max_sd=0; for (@source_dist) { $max_sd=$_ if $_>$max_sd; }
+    my $max_rd=0; for (@recall_dist) { $max_rd=$_ if $_>$max_rd; }
+    my $recall_cat = {
+        common_classified_instances=>0+$cn, preserved=>0+$agree, changed=>0+($cn-$agree),
+        direct_agreement=>$direct, adjusted_rand_index=>$ari,
+        source_mean_distance_to_retained_medoid=>$mean_sd, recall_mean_distance_to_retained_medoid=>$mean_rd,
+        mean_distance_change=>(defined($mean_sd)&&defined($mean_rd)?$mean_rd-$mean_sd:undef),
+        source_median_distance_to_retained_medoid=>_median_stats(@source_dist), recall_median_distance_to_retained_medoid=>_median_stats(@recall_dist),
+        source_max_distance_to_retained_medoid=>$max_sd, recall_max_distance_to_retained_medoid=>$max_rd,
+    };
+
+    my $stats_root = File::Spec->catdir($p->{root_dir}, $s->{statistics_dir} || 'statistics');
+    my $rel = $s->{output_dir} || $pair;
+    my $out = File::Spec->file_name_is_absolute($rel) ? $rel : File::Spec->catdir($stats_root,$rel);
+    my $summary_path = File::Spec->catfile($out,'summary.json');
+    my $aggregate_csv = File::Spec->catfile($stats_root,'structuredesign-summary.csv');
+    my $aggregate_json = File::Spec->catfile($stats_root,'structuredesign-summary.json');
+    my $common_path = File::Spec->catfile($out,'common-instances.csv');
+    my $transition_path = File::Spec->catfile($out,'category-transition.csv');
+    my $categories_path = File::Spec->catfile($out,'category-metrics.csv');
+    my $secondary_medoid_path = File::Spec->catfile($out,'secondary-medoid-comparison.csv');
+    my $record = {
+        schema=>'Sim::OPT::StructureDesign/landscape-statistics-2', operation=>'statistics', pair=>$pair,
+        recall_semantics=>'frozen_antecedent_categories', left_state=>$left, right_state=>$right,
+        left_abstraction=>$left_abs_path, right_application=>$right_app_path, right_memory_manifest=>$map_path,
+        landscape_metrics=>$metrics, category_metrics=>\%category_metrics, recall_category_metrics=>$recall_cat,
+        retained_model_metrics=>{ medoid_count=>scalar(@lm), medoids_fixed=>JSON::PP::true, metric_frozen=>JSON::PP::true },
+        secondary_medoid_metrics=>$secondary_metrics,
+        metric=>$metric,
+        files=>{ summary=>$summary_path, common_instances=>$common_path, category_transition=>$transition_path,
+                 category_metrics=>$categories_path, secondary_medoid_comparison=>$secondary_medoid_path, aggregate_csv=>$aggregate_csv, aggregate_json=>$aggregate_json },
+    };
+    return $record unless $commit;
+    make_path($out) unless -d $out;
+    _write_csv_stats($common_path,[qw(source_instance memory_instance source_performance memory_performance signed_error absolute_error source_sampled memory_sampled acquisition_category source_category recalled_category category_preserved source_distance_to_retained_medoid recall_distance_to_retained_medoid distance_change)],\@common_csv);
+    _write_csv_stats($transition_path,[qw(source_category recalled_category common_instance_count)],\@cont_csv);
+    my @category_csv;
+    for my $cat (sort keys %category_metrics) { my $m=$category_metrics{$cat}; push @category_csv,[$cat,$m->{n},$m->{mean_signed_error},$m->{mae},$m->{mse},$m->{rmse},$m->{max_absolute_error},$m->{r_squared}]; }
+    _write_csv_stats($categories_path,[qw(category n mean_signed_error mae mse rmse max_absolute_error r_squared)],\@category_csv);
+    _write_csv_stats($secondary_medoid_path,[qw(category primary_medoid primary_performance secondary_local_instance secondary_source_instance secondary_performance hybrid_distance exact_coordinate_match)],\@secondary_comparison);
+    _write_json($summary_path,$record);
+    _rewrite_statistics_aggregate($stats_root);
+    return { pair=>$pair, manifest=>$summary_path, files=>$record->{files}, landscape_metrics=>$metrics, recall_category_metrics=>$recall_cat, retained_model_metrics=>$record->{retained_model_metrics}, secondary_medoid_metrics=>$secondary_metrics };
+}
+
+sub _execute_statistics {
+    my (%a) = @_;
+    return _execute_statistics_applied(%a) if exists($a{step}{right_application});
+    my $s = $a{step};
+    my $p = $a{procedure};
+    my $manifest = $a{manifest};
+    my $commit = $a{commit};
+    my $left = $s->{left} or die "statistics: left state required\n";
+    my $right = $s->{right} or die "statistics: right state required\n";
+    my $pair = $s->{name} || "$left-$right";
+    my $left_abs_path = _resolve_reference($s->{left_abstraction}, $manifest);
+    my $right_abs_path = _resolve_reference($s->{right_abstraction}, $manifest);
+    die "statistics '$pair': left abstraction manifest not found: $left_abs_path\n" unless defined($left_abs_path) && -f $left_abs_path;
+    die "statistics '$pair': right abstraction manifest not found: $right_abs_path\n" unless defined($right_abs_path) && -f $right_abs_path;
+    my $la = _read_json($left_abs_path);
+    my $ra = _read_json($right_abs_path);
+    die "statistics '$pair': invalid left abstraction schema\n" unless ($la->{schema}||'') eq 'Sim::OPT::StructureDesign/abstraction-1';
+    die "statistics '$pair': invalid right abstraction schema\n" unless ($ra->{schema}||'') eq 'Sim::OPT::StructureDesign/abstraction-1';
+
+    my $right_dir = _state_dir($p, $right);
+    my $map_name = $s->{right_memory_manifest};
+    my $map_path = defined($map_name) && length($map_name)
+        ? (File::Spec->file_name_is_absolute($map_name) ? $map_name : File::Spec->catfile($right_dir, $map_name))
+        : undef;
+    my ($right_mapper, $memory_plan) = _memory_mapper_stats($map_path);
+    my $left_mapper = sub { $_[0] };
+
+    my ($right_rows) = _read_landscape_index_stats(
+        path => $ra->{results_file}, performance_column => $ra->{performance_column}, mapper => $right_mapper,
+    );
+    my %wanted = map { $_ => 1 } keys %$right_rows;
+    my ($left_rows) = _read_landscape_index_stats(
+        path => $la->{results_file}, performance_column => $la->{performance_column}, mapper => $left_mapper, wanted => \%wanted,
+    );
+    my @common = sort grep { exists $left_rows->{$_} } keys %$right_rows;
+    die "statistics '$pair': no physically common landscape instances\n" unless @common;
+
+    my $left_dir = _state_dir($p, $left);
+    my $left_tot = $s->{left_totres_file} || (($s->{left_model_root} || 'bt') . '-0_totres.csv');
+    $left_tot = File::Spec->catfile($left_dir, $left_tot) unless File::Spec->file_name_is_absolute($left_tot);
+    my $right_tot = $s->{right_totres_file} || (($s->{right_model_root} || 'btmed') . '-0_totres.csv');
+    $right_tot = File::Spec->catfile($right_dir, $right_tot) unless File::Spec->file_name_is_absolute($right_tot);
+    my $left_sampled = _read_sample_set_stats(path => $left_tot, mapper => $left_mapper);
+    my $right_sampled = _read_sample_set_stats(path => $right_tot, mapper => $right_mapper);
+
+    my (@reg, @common_csv, %cat_pairs);
+    for my $id (@common) {
+        my $lv = $left_rows->{$id}{performance};
+        my $rv = $right_rows->{$id}{performance};
+        my $ls = $left_sampled->{$id} ? 1 : 0;
+        my $rs = $right_sampled->{$id} ? 1 : 0;
+        my $cat = ($ls ? 'sampled' : 'surrogate') . '_to_' . ($rs ? 'sampled' : 'surrogate');
+        push @reg, { actual => $lv, predicted => $rv };
+        push @{$cat_pairs{$cat}}, { actual => $lv, predicted => $rv };
+        push @common_csv, [$id, $right_rows->{$id}{local_instance}, $lv, $rv, $rv-$lv, abs($rv-$lv), $ls, $rs, $cat];
+    }
+    my $metrics = _regression_metrics(\@reg);
+    $metrics->{mse} = $metrics->{rmse} * $metrics->{rmse};
+    my %category_metrics;
+    for my $cat (sort keys %cat_pairs) {
+        my $m = _regression_metrics($cat_pairs{$cat});
+        $m->{mse} = $m->{rmse} * $m->{rmse};
+        $category_metrics{$cat} = $m;
+    }
+
+    my $metric = _metric_from_abstraction_stats($la);
+    my @lm;
+    for my $m (@{ $la->{medoids} || [] }) {
+        push @lm, { cluster=>0+$m->{cluster}, source_instance=>$m->{instance}, local_instance=>$m->{instance}, performance=>0+$m->{performance} };
+    }
+    my @rm;
+    for my $m (@{ $ra->{medoids} || [] }) {
+        my $src = $right_mapper->($m->{instance});
+        push @rm, { cluster=>0+$m->{cluster}, source_instance=>$src, local_instance=>$m->{instance}, performance=>0+$m->{performance} };
+    }
+    die "statistics '$pair': abstraction has no medoids\n" unless @lm && @rm;
+
+    my %LS = map { $_->{source_instance} => 1 } @lm;
+    my %RS = map { $_->{source_instance} => 1 } @rm;
+    my @exact = grep { $RS{$_} } keys %LS;
+    my %union = (%LS, %RS);
+    my $matching = _optimal_medoid_matching_stats(\@lm, \@rm, $metric);
+    my @md = map { $_->{distance} } @$matching;
+    my $sumd = 0; $sumd += $_ for @md;
+    my $maxd = 0; for (@md) { $maxd = $_ if $_ > $maxd; }
+
+    my @left_near;
+    for my $L (@lm) {
+        my $best;
+        for my $R (@rm) {
+            my $d = _metric_distance_from_spec(metric=>$metric, instance_a=>$L->{source_instance},performance_a=>$L->{performance}, instance_b=>$R->{source_instance},performance_b=>$R->{performance});
+            $best = $d if !defined($best) || $d < $best;
+        }
+        push @left_near, $best;
+    }
+    my @right_near;
+    for my $R (@rm) {
+        my $best;
+        for my $L (@lm) {
+            my $d = _metric_distance_from_spec(metric=>$metric, instance_a=>$L->{source_instance},performance_a=>$L->{performance}, instance_b=>$R->{source_instance},performance_b=>$R->{performance});
+            $best = $d if !defined($best) || $d < $best;
+        }
+        push @right_near, $best;
+    }
+    my $haus = 0; for (@left_near,@right_near) { $haus = $_ if $_ > $haus; }
+
+    my %right_to_left_cluster;
+    my %matched_right;
+    my @matching_csv;
+    for my $q (@$matching) {
+        my $L = $lm[$q->{left_index}]; my $R = $rm[$q->{right_index}];
+        $right_to_left_cluster{$R->{cluster}} = $L->{cluster};
+        $matched_right{$q->{right_index}} = 1;
+        push @matching_csv, [$L->{cluster},$L->{source_instance},$L->{performance},$R->{cluster},$R->{local_instance},$R->{source_instance},$R->{performance},$q->{distance},($L->{source_instance} eq $R->{source_instance}?1:0)];
+    }
+    for my $ri (0 .. $#rm) {
+        next if $matched_right{$ri};
+        my $R=$rm[$ri]; my ($bestd,$bestc);
+        for my $L (@lm) {
+            my $d=_metric_distance_from_spec(metric=>$metric,instance_a=>$L->{source_instance},performance_a=>$L->{performance},instance_b=>$R->{source_instance},performance_b=>$R->{performance});
+            if (!defined($bestd)||$d<$bestd) { $bestd=$d; $bestc=$L->{cluster}; }
+        }
+        $right_to_left_cluster{$R->{cluster}}=$bestc;
+    }
+
+    my $left_clustered = $la->{files}{clustered};
+    my $right_clustered = $ra->{files}{clustered};
+    my %common_wanted = map { $_=>1 } @common;
+    my $lc = _read_cluster_assignments_stats(path=>$left_clustered, mapper=>$left_mapper, wanted=>\%common_wanted);
+    my $rc = _read_cluster_assignments_stats(path=>$right_clustered, mapper=>$right_mapper, wanted=>\%common_wanted);
+    my (@cluster_pairs,%cont,$agree,$cn);
+    for my $id (@common) {
+        next unless exists($lc->{$id}) && exists($rc->{$id});
+        my ($a1,$b1)=($lc->{$id},$rc->{$id});
+        push @cluster_pairs, [$a1,$b1];
+        $cont{$a1}{$b1}++;
+        $cn++;
+        $agree++ if defined($right_to_left_cluster{$b1}) && $right_to_left_cluster{$b1} == $a1;
+    }
+    my $ari = _ari_stats(\@cluster_pairs);
+    my $aligned = $cn ? $agree/$cn : undef;
+    my @cont_csv;
+    for my $x (sort {$a<=>$b} keys %cont) { for my $y (sort {$a<=>$b} keys %{$cont{$x}}) { push @cont_csv, [$x,$y,$cont{$x}{$y}]; } }
+
+    my $stats_root = File::Spec->catdir($p->{root_dir}, $s->{statistics_dir} || 'statistics');
+    my $rel = $s->{output_dir} || $pair;
+    my $out = File::Spec->file_name_is_absolute($rel) ? $rel : File::Spec->catdir($stats_root, $rel);
+    my $summary_path = File::Spec->catfile($out, 'summary.json');
+    my $aggregate_csv = File::Spec->catfile($stats_root, 'structuredesign-summary.csv');
+    my $aggregate_json = File::Spec->catfile($stats_root, 'structuredesign-summary.json');
+    my $common_path = File::Spec->catfile($out, 'common-instances.csv');
+    my $matching_path = File::Spec->catfile($out, 'medoid-matching.csv');
+    my $clusters_path = File::Spec->catfile($out, 'cluster-overlap.csv');
+    my $categories_path = File::Spec->catfile($out, 'category-metrics.csv');
+    my $record = {
+        schema => 'Sim::OPT::StructureDesign/landscape-statistics-1', operation=>'statistics', pair=>$pair,
+        left_state=>$left,right_state=>$right,left_abstraction=>$left_abs_path,right_abstraction=>$right_abs_path,
+        right_memory_manifest=>$map_path,
+        landscape_metrics=>$metrics, category_metrics=>\%category_metrics,
+        medoid_metrics=>{
+            left_count=>scalar(@lm), right_count=>scalar(@rm), exact_matches=>scalar(@exact),
+            jaccard=>scalar(@exact)/scalar(keys %union), matched_count=>scalar(@$matching),
+            matched_mean_distance=>@md ? $sumd/@md : undef, matched_median_distance=>_median_stats(@md), matched_max_distance=>@md ? $maxd : undef,
+            left_to_right_nearest_mean=>@left_near ? do {my $s=0;$s+=$_ for @left_near;$s/@left_near}:undef,
+            right_to_left_nearest_mean=>@right_near ? do {my $s=0;$s+=$_ for @right_near;$s/@right_near}:undef,
+            symmetric_hausdorff_distance=>$haus,
+        },
+        cluster_metrics=>{ common_clustered_instances=>0+($cn||0), adjusted_rand_index=>$ari, aligned_agreement=>$aligned },
+        metric=>$metric,
+        files=>{ summary=>$summary_path, common_instances=>$common_path, medoid_matching=>$matching_path, cluster_overlap=>$clusters_path, category_metrics=>$categories_path, aggregate_csv=>$aggregate_csv, aggregate_json=>$aggregate_json },
+    };
+    return $record unless $commit;
+    make_path($out) unless -d $out;
+    _write_csv_stats($common_path,[qw(source_instance memory_instance source_performance memory_performance signed_error absolute_error source_sampled memory_sampled category)],\@common_csv);
+    _write_csv_stats($matching_path,[qw(source_cluster source_medoid source_performance memory_cluster memory_medoid memory_medoid_in_source_coordinates memory_performance hybrid_distance exact_coordinate_match)],\@matching_csv);
+    _write_csv_stats($clusters_path,[qw(source_cluster memory_cluster common_instance_count)],\@cont_csv);
+    my @category_csv;
+    for my $cat (sort keys %category_metrics) {
+        my $m = $category_metrics{$cat};
+        push @category_csv, [$cat,$m->{n},$m->{mean_signed_error},$m->{mae},$m->{mse},$m->{rmse},$m->{max_absolute_error},$m->{r_squared}];
+    }
+    _write_csv_stats($categories_path,[qw(category n mean_signed_error mae mse rmse max_absolute_error r_squared)],\@category_csv);
+    _write_json($summary_path,$record);
+    _rewrite_statistics_aggregate($stats_root);
+    return { pair=>$pair, manifest=>$summary_path, files=>$record->{files}, landscape_metrics=>$metrics, medoid_metrics=>$record->{medoid_metrics}, cluster_metrics=>$record->{cluster_metrics} };
+}
+
+sub _validation_sample_manifest_path {
+    my (%a) = @_;
+    my $p = $a{procedure};
+    my $s = $a{step};
+    my $state = $s->{name} || $s->{state} or die "validation_sample: target state required\n";
+    my $dir = _state_dir($p, $state);
+    my $name = $s->{manifest_file} || 'structuredesign-validation-sample.json';
+    return File::Spec->file_name_is_absolute($name) ? $name : File::Spec->catfile($dir, $name);
+}
+
+sub _execute_validation_sample {
+    my (%a) = @_;
+    my $s = $a{step};
+    my $p = $a{procedure};
+    my $commit = $a{commit};
+    my $target = $s->{name} || $s->{state} or die "validation_sample: target state required\n";
+    my $source = $s->{source_state} or die "validation_sample '$target': source_state required\n";
+    my $sample_size = $s->{sample_size};
+    die "validation_sample '$target': sample_size must be a positive integer\n"
+        unless defined($sample_size) && !ref($sample_size) && $sample_size =~ /^\d+$/ && $sample_size > 0;
+    my $seed = exists($s->{seed}) ? $s->{seed} : 1;
+    die "validation_sample '$target': seed must be a scalar\n" if ref($seed);
+
+    my $source_dir = _state_dir($p, $source);
+    my $target_dir = _state_dir($p, $target);
+    my $source_name = $s->{source_file} || 'btmed-report-0-0.csv_sortm.csv_weightordmeta.csv';
+    my $source_path = File::Spec->file_name_is_absolute($source_name)
+        ? $source_name : File::Spec->catfile($source_dir, $source_name);
+    my $pass_name = $s->{passnames_file} || 'passnames_.txt';
+    my $pass_path = File::Spec->file_name_is_absolute($pass_name)
+        ? $pass_name : File::Spec->catfile($target_dir, $pass_name);
+    my $manifest_path = _validation_sample_manifest_path(procedure=>$p, step=>$s);
+
+    return {
+        state=>$target, source_state=>$source, source_file=>$source_path,
+        sample_size=>0+$sample_size, seed=>"$seed", passnames=>$pass_path,
+        manifest=>$manifest_path, planned=>1,
+    } unless $commit;
+
+    die "validation_sample '$target': target state directory not found: $target_dir\n" unless -d $target_dir;
+    die "validation_sample '$target': source landscape not found: $source_path\n" unless -f $source_path;
+
+    require Text::CSV;
+    my $csv = Text::CSV->new({ binary=>1, auto_diag=>1 });
+    open my $fh, '<', $source_path or die "Cannot read $source_path: $!\n";
+    my (@ids, %seen);
+    while (my $r = $csv->getline($fh)) {
+        next unless ref($r) eq 'ARRAY' && @$r;
+        my $id = $r->[0];
+        next unless defined($id) && $id =~ /^\d+-\d+(?:_\d+-\d+)*$/;
+        next if $seen{$id}++;
+        push @ids, $id;
+    }
+    close $fh;
+    die "validation_sample '$target': source landscape contains no instance rows\n" unless @ids;
+    die "validation_sample '$target': sample_size $sample_size exceeds available unique instances " . scalar(@ids) . "\n"
+        if $sample_size > @ids;
+
+    # A seeded SHA-256 ranking is a deterministic pseudorandom permutation.
+    # It avoids changing Perl's process-global rand()/srand() state and makes
+    # the exact validation batch reproducible on every platform.
+    my @ordered = sort {
+        sha256_hex("$seed\0$a") cmp sha256_hex("$seed\0$b") || $a cmp $b
+    } @ids;
+    my @selected = @ordered[0 .. $sample_size-1];
+
+    open my $pfh, '>', $pass_path or die "Cannot write $pass_path: $!\n";
+    print {$pfh} "$_\n" for @selected;
+    close $pfh or die "Cannot close $pass_path: $!\n";
+
+    open my $sfh, '<', $source_path or die "Cannot read $source_path: $!\n";
+    binmode $sfh;
+    local $/;
+    my $source_bytes = <$sfh>;
+    close $sfh;
+    my $source_sha = sha256_hex($source_bytes // '');
+    my $selection_sha = sha256_hex(join("\n", @selected) . "\n");
+
+    my $record = {
+        schema=>'Sim::OPT::StructureDesign/validation-sample-1',
+        operation=>'validation_sample',
+        target_state=>$target,
+        source_state=>$source,
+        source_file=>$source_path,
+        source_sha256=>$source_sha,
+        available_unique_instances=>0+@ids,
+        requested_sample_size=>0+$sample_size,
+        realised_sample_size=>0+@selected,
+        seed=>"$seed",
+        selection_method=>'sha256_seeded_order',
+        selection_sha256=>$selection_sha,
+        passnames_file=>$pass_path,
+        selected_instances=>\@selected,
+    };
+    _write_json($manifest_path, $record);
+    return { %$record, manifest=>$manifest_path, passnames=>$pass_path };
+}
+
+sub _execute_direct_validation_statistics {
+    my (%a) = @_;
+    my $s = $a{step};
+    my $p = $a{procedure};
+    my $manifest = $a{manifest};
+    my $commit = $a{commit};
+    my $pair = $s->{name} || 'direct-validation';
+    my $prediction_state = $s->{prediction_state} or die "direct_validation_statistics '$pair': prediction_state required\n";
+    my $direct_state = $s->{direct_state} or die "direct_validation_statistics '$pair': direct_state required\n";
+    my $pred_dir = _state_dir($p, $prediction_state);
+    my $direct_dir = _state_dir($p, $direct_state);
+    die "direct_validation_statistics '$pair': prediction state directory not found: $pred_dir\n" unless -d $pred_dir;
+    die "direct_validation_statistics '$pair': direct state directory not found: $direct_dir\n" unless -d $direct_dir;
+
+    my $prediction_name = $s->{prediction_file} || 'btmed-report-0-0.csv_sortm.csv_weightordmeta.csv';
+    my $prediction_path = File::Spec->file_name_is_absolute($prediction_name)
+        ? $prediction_name : File::Spec->catfile($pred_dir, $prediction_name);
+    my $root = $s->{model_root} || 'btmed';
+    my $direct_name = $s->{direct_results_file} || ($root . '-0_totres.csv');
+    my $direct_path = File::Spec->file_name_is_absolute($direct_name)
+        ? $direct_name : File::Spec->catfile($direct_dir, $direct_name);
+    my $sample_path = _resolve_reference($s->{sample_manifest}, $manifest);
+    die "direct_validation_statistics '$pair': sample manifest not found: $sample_path\n"
+        unless defined($sample_path) && -f $sample_path;
+    for my $f ($prediction_path,$direct_path) {
+        die "direct_validation_statistics '$pair': required file not found: $f\n" unless -f $f;
+    }
+
+    my $sample = _read_json($sample_path);
+    die "direct_validation_statistics '$pair': invalid sample manifest schema\n"
+        unless ($sample->{schema}||'') eq 'Sim::OPT::StructureDesign/validation-sample-1';
+    my @selected = @{ $sample->{selected_instances} || [] };
+    die "direct_validation_statistics '$pair': sample manifest contains no selected instances\n" unless @selected;
+    my %wanted = map { $_=>1 } @selected;
+
+    # Reconstructed weightordmeta and directly simulated totres use the same
+    # Sim::OPT objective weighting/normalisation because the direct validation
+    # state is cloned from the reconstruction's memory.pl.  Compare the final
+    # weighted scalar directly; do not renormalise the validation batch.
+    my $pred = _read_prediction_scores_for_ids(path=>$prediction_path, wanted=>\%wanted);
+    my $direct_rows = _read_totres_rows(source=>$direct_path, mapper=>sub { $_[0] }, label=>$direct_state);
+    my %direct = map { $_->{clear} => $_ } @$direct_rows;
+
+    my @missing_direct = grep { !exists $direct{$_} } @selected;
+    die "direct_validation_statistics '$pair': direct results lack " . scalar(@missing_direct)
+        . " selected instances; first missing '$missing_direct[0]'\n" if @missing_direct;
+    my @missing_pred = grep { !exists $pred->{$_} } @selected;
+    die "direct_validation_statistics '$pair': prediction file lacks " . scalar(@missing_pred)
+        . " selected instances; first missing '$missing_pred[0]'\n" if @missing_pred;
+
+    my %selected_set = map { $_=>1 } @selected;
+    my @unexpected = grep { !$selected_set{$_} } keys %direct;
+    die "direct_validation_statistics '$pair': direct results contain " . scalar(@unexpected)
+        . " unrequested instances; first unexpected '$unexpected[0]'\n" if @unexpected;
+    die "direct_validation_statistics '$pair': direct result count " . scalar(@$direct_rows)
+        . " differs from selected sample size " . scalar(@selected) . "\n"
+        unless @$direct_rows == @selected;
+
+    my (@pairs,@csv_rows);
+    for my $id (@selected) {
+        my $actual = _payload_weighted_scalar($direct{$id}{payload});
+        my $predicted = 0 + $pred->{$id};
+        push @pairs, { instance=>$id, predicted=>$predicted, actual=>$actual };
+        push @csv_rows, [$id,$predicted,$actual,$predicted-$actual,abs($predicted-$actual)];
+    }
+    my $metrics = _regression_metrics(\@pairs);
+    $metrics->{mse} = $metrics->{rmse} * $metrics->{rmse};
+
+    my $stats_root = File::Spec->catdir($p->{root_dir}, $s->{statistics_dir} || 'bt-statistics');
+    my $rel = $s->{output_dir} || $pair;
+    my $out = File::Spec->file_name_is_absolute($rel) ? $rel : File::Spec->catdir($stats_root,$rel);
+    my $summary_path = File::Spec->catfile($out,'summary.json');
+    my $rows_path = File::Spec->catfile($out,'direct-validation-instances.csv');
+    my $record = {
+        schema=>'Sim::OPT::StructureDesign/direct-validation-statistics-1',
+        operation=>'direct_validation_statistics',
+        pair=>$pair,
+        prediction_state=>$prediction_state,
+        direct_state=>$direct_state,
+        prediction_file=>$prediction_path,
+        direct_results=>$direct_path,
+        sample_manifest=>$sample_path,
+        sample_size=>0+@selected,
+        score_semantics=>'same_config_weighted_scalar_no_batch_renormalisation',
+        metrics=>$metrics,
+        files=>{summary=>$summary_path, instances=>$rows_path},
+    };
+    return $record unless $commit;
+    make_path($out) unless -d $out;
+    _write_csv_stats($rows_path,[qw(instance predicted_surrogate direct_simulation signed_error absolute_error)],\@csv_rows);
+    _write_json($summary_path,$record);
+    return { %$record, manifest=>$summary_path };
 }
 
 sub _execute_compare {
@@ -2490,6 +4289,143 @@ sub _execute_compare {
     return { %$record, output => $output };
 }
 
+sub _execute_parallel {
+    my (%a) = @_;
+    my $s = $a{step};
+    my $p = $a{procedure};
+    my $manifest = $a{manifest};
+    my $commit = $a{commit};
+
+    my $children = $s->{steps};
+    die "parallel: steps must be a non-empty ARRAY reference\n"
+        unless ref($children) eq 'ARRAY' && @$children;
+    my @children = grep { $_->{enabled} } @$children;
+    die "parallel: no enabled child steps\n" unless @children;
+
+    my $max_workers = defined($s->{max_workers}) ? 0 + $s->{max_workers} : scalar(@children);
+    die "parallel: max_workers must be an integer >= 1\n"
+        unless $max_workers =~ /^\d+$/ && $max_workers >= 1;
+    $max_workers = scalar(@children) if $max_workers > @children;
+
+    # The first installed parallel primitive is deliberately narrow.  It exists
+    # to run independent, long-lived acquisitions concurrently while the parent
+    # process remains the sole writer of the procedure run manifest.  Broader
+    # DAG semantics should not be implied until dependency analysis is explicit.
+    my %state_seen;
+    my @plan;
+    for my $i (0 .. $#children) {
+        my $c = $children[$i];
+        die "parallel: child step must be a HASH reference\n" unless ref($c) eq 'HASH';
+        my $type = $c->{type} || '';
+        die "parallel: only experience child steps are currently supported (child " . ($i + 1) . " is '$type')\n"
+            unless $type eq 'experience';
+        my $state = $c->{name} || $c->{state};
+        die "parallel: experience child " . ($i + 1) . " has no state\n"
+            unless defined($state) && length($state);
+        die "parallel: state '$state' occurs more than once; concurrent children must write to distinct state directories\n"
+            if $state_seen{$state}++;
+        push @plan, {
+            id => _step_id($c, $i),
+            type => $type,
+            state => $state,
+            signature => _step_signature($c),
+        };
+    }
+
+    return {
+        mode => 'parallel_experiences',
+        max_workers => $max_workers,
+        children => \@plan,
+        planned => 1,
+    } unless $commit;
+
+    my $group_id = $s->{id} || $s->{name} || 'parallel';
+    $group_id =~ s/[^A-Za-z0-9_.-]+/_/g;
+    my $work_dir = File::Spec->catdir($p->{root_dir}, '.structuredesign', 'parallel', $group_id . '-' . $$);
+    make_path($work_dir);
+
+    my @queue = map { [$_, $children[$_], $plan[$_]] } (0 .. $#children);
+    my %running;
+    my @results;
+    my @errors;
+
+    while (@queue || keys %running) {
+        while (@queue && keys(%running) < $max_workers) {
+            my ($idx, $child, $meta) = @{ shift @queue };
+            my $result_path = File::Spec->catfile($work_dir, sprintf('%03d-%s.json', $idx + 1, $meta->{id}));
+            my $pid = fork();
+            die "parallel '$group_id': fork failed: $!\n" unless defined $pid;
+            if ($pid == 0) {
+                my $payload;
+                my $ok = eval {
+                    my $result = _execute_step(
+                        step => $child,
+                        procedure => $p,
+                        manifest => $manifest,
+                        commit => 1,
+                    );
+                    $payload = { ok => JSON::PP::true, result => ($result || {}) };
+                    1;
+                };
+                if (!$ok) {
+                    my $err = $@ || 'unknown child error';
+                    $payload = { ok => JSON::PP::false, error => "$err" };
+                }
+                my $write_ok = eval { _write_json($result_path, $payload); 1 };
+                if (!$write_ok) {
+                    print STDERR "parallel '$group_id': cannot write child result $result_path: " . ($@ || $!) . "\n";
+                    exit 2;
+                }
+                exit($payload->{ok} ? 0 : 1);
+            }
+            print "[StructureDesign] PARALLEL START $meta->{id} ($meta->{state}) pid=$pid\n";
+            $running{$pid} = {
+                idx => $idx,
+                meta => $meta,
+                result_path => $result_path,
+            };
+        }
+
+        my $pid = wait();
+        die "parallel '$group_id': wait failed: $!\n" if $pid < 0;
+        my $status = $?;
+        my $run = delete $running{$pid};
+        next unless $run;
+        my $meta = $run->{meta};
+        my $payload = eval { _read_json($run->{result_path}) };
+        if ($@ || ref($payload) ne 'HASH') {
+            push @errors, "$meta->{id}: child result record missing/corrupt ($run->{result_path})";
+            print "[StructureDesign] PARALLEL FAIL $meta->{id} ($meta->{state})\n";
+            next;
+        }
+        if (($status >> 8) != 0 || ($status & 127) || !$payload->{ok}) {
+            my $err = $payload->{error} || sprintf('child process status=%d signal=%d', ($status >> 8), ($status & 127));
+            $err =~ s/\s+\z//;
+            push @errors, "$meta->{id}: $err";
+            print "[StructureDesign] PARALLEL FAIL $meta->{id} ($meta->{state})\n";
+            next;
+        }
+        $results[$run->{idx}] = {
+            %$meta,
+            result => ($payload->{result} || {}),
+        };
+        print "[StructureDesign] PARALLEL DONE $meta->{id} ($meta->{state})\n";
+    }
+
+    if (@errors) {
+        # Preserve per-child records to diagnose a partial group.  The parent
+        # manifest will mark the group FAILED; it remains the only manifest writer.
+        die "parallel '$group_id' failed:\n  " . join("\n  ", @errors) . "\nChild records preserved in $work_dir\n";
+    }
+
+    remove_tree($work_dir);
+    return {
+        mode => 'parallel_experiences',
+        max_workers => $max_workers,
+        children => \@results,
+    };
+}
+
 sub _execute_step {
     my (%a) = @_;
     my $s = $a{step};
@@ -2497,6 +4433,10 @@ sub _execute_step {
     my $manifest = $a{manifest};
     my $commit = $a{commit};
     my $type = $s->{type} || '';
+
+    if ($type eq 'parallel') {
+        return _execute_parallel(step => $s, procedure => $p, manifest => $manifest, commit => $commit);
+    }
 
     if ($type eq 'state') {
         my $name = $s->{name} or die "state: name required\n";
@@ -2616,11 +4556,14 @@ sub _execute_step {
                         ? $s->{geometry_manifest}
                         : File::Spec->catfile($dir, $s->{geometry_manifest});
                 }
+                my $variant = _experience_config_variant(
+                    step => $s, procedure => $p,
+                );
                 _materialize_config_variant(
                     source => $source_cfg,
                     target => File::Spec->catfile($dir, $cfg),
                     mypath => $dir,
-                    variant => $s->{config_variant} || {},
+                    variant => $variant,
                     geometry_manifest => $geometry_manifest,
                 );
             }
@@ -2780,8 +4723,23 @@ sub _execute_step {
     if ($type eq 'abstract') {
         return _execute_abstract(step => $s, procedure => $p, manifest => $manifest, commit => $commit);
     }
+    if ($type eq 'retain_memory') {
+        return _execute_retain_memory(step => $s, procedure => $p, manifest => $manifest, commit => $commit);
+    }
+    if ($type eq 'apply_abstraction') {
+        return _execute_apply_abstraction(step => $s, procedure => $p, manifest => $manifest, commit => $commit);
+    }
+    if ($type eq 'validation_sample') {
+        return _execute_validation_sample(step => $s, procedure => $p, manifest => $manifest, commit => $commit);
+    }
+    if ($type eq 'direct_validation_statistics') {
+        return _execute_direct_validation_statistics(step => $s, procedure => $p, manifest => $manifest, commit => $commit);
+    }
     if ($type eq 'compare') {
         return _execute_compare(step => $s, procedure => $p, manifest => $manifest, commit => $commit);
+    }
+    if ($type eq 'statistics') {
+        return _execute_statistics(step => $s, procedure => $p, manifest => $manifest, commit => $commit);
     }
 
     die "Unknown procedure step type '$type'\n";
@@ -2852,6 +4810,12 @@ sub run_procedure {
                 print "  target=$s->{name} from=$s->{from}; operators=" . join('+', @ops) . "; detailed lattice plan deferred until execution inputs are available\n";
                 next;
             }
+            if ($s->{type} eq 'parallel') {
+                my $n = ref($s->{steps}) eq 'ARRAY' ? scalar(grep { $_->{enabled} } @{ $s->{steps} }) : 0;
+                my $mw = defined($s->{max_workers}) ? $s->{max_workers} : $n;
+                print "  concurrent experience group; children=$n; max_workers=$mw; execution deferred\n";
+                next;
+            }
             if ($s->{type} eq 'experience') {
                 my $kind = ref($s->{using}) eq 'HASH' ? ($s->{using}{kind} || 'search') : 'search';
                 print "  state=$s->{name}; acquisition=$kind; execution deferred\n";
@@ -2868,9 +4832,39 @@ sub run_procedure {
                 print "  state=$s->{name}; abstract by clustering and finding medoids; outputs=$out; execution deferred\n";
                 next;
             }
+            if ($s->{type} eq 'retain_memory') {
+                my $rel = $s->{output_dir} || 'memory';
+                my $out = File::Spec->catdir(_state_dir($p, $s->{name}), $rel);
+                print "  state=$s->{name}; retain medoids with cluster-conditioned direct experience; outputs=$out; execution deferred\n";
+                next;
+            }
+            if ($s->{type} eq 'apply_abstraction') {
+                my $rel = $s->{output_dir} || 'applied';
+                my $out = File::Spec->catdir(_state_dir($p, $s->{name}), $rel);
+                print "  state=$s->{name}; assign regenerated landscape to frozen antecedent categories; outputs=$out; execution deferred\n";
+                next;
+            }
             if ($s->{type} eq 'reconstruct_memory') {
                 my $vars = ref($s->{variables}) eq 'ARRAY' ? join(',', @{ $s->{variables} }) : 'from-abstraction';
-                print "  state=$s->{name}; reconstruct memory from=$s->{from}; variables=$vars; retained medoids become explicit centres in one shared multi-star Sim::OPT workspace; one totres and one surrogate output\n";
+                my $rm = _reconstruction_mode_for_step($s);
+                if ($rm eq 'legacy_medoid_only') {
+                    print "  state=$s->{name}; reconstruct memory from=$s->{from}; variables=$vars; reconstruction_mode=legacy_medoid_only; retained medoids are the memory cues and explicit centres; auxiliary stars, if requested, are distributed over the compact shared lattice; one totres and one surrogate output\n";
+                } else {
+                    print "  state=$s->{name}; reconstruct memory from=$s->{from}; variables=$vars; reconstruction_mode=experiential_cloud; retained medoids remain privileged centres; retained direct experience positions and seeds one compact shared multi-star workspace; one totres and one surrogate output\n";
+                }
+                next;
+            }
+            if ($s->{type} eq 'validation_sample') {
+                my $n = $s->{sample_size} // '?';
+                print "  state=$s->{name}; select reproducible random validation sample of $n instances from=$s->{source_state}; write passnames_.txt\n";
+                next;
+            }
+            if ($s->{type} eq 'direct_validation_statistics') {
+                print "  compare reconstructed surrogate predictions against newly simulated validation instances\n";
+                next;
+            }
+            if ($s->{type} eq 'statistics') {
+                print "  compare source and memory landscapes; under applied recall, evaluate preservation against frozen antecedent categories\n";
                 next;
             }
             if ($s->{type} =~ /^(?:reembed|merge|compare)$/) {
@@ -2923,16 +4917,989 @@ __END__
 
 =head1 NAME
 
-Sim::OPT::StructureDesignProcedure - executable high-level procedure language for design operations
+Sim::OPT::StructureDesignProcedure - Perl-embedded procedure language for Sim::OPT hierarchical structure design
 
-=head1 PURPOSE
+=head1 VERSION
 
-The procedure language separates the description of a design process from the
-implementation of individual operators. Case-study order, state names, branch
-choices and acquisition/inference choices belong in a procedure file; filesystem
-rewrites and Sim::OPT calls belong in installed modules.  Article-facing inference
-uses the phrase 'imagine by surrogating with ...'; representation uses 'abstract by
-clustering and finding medoids'.  Abstraction products are scoped to the directory of the
-state being abstracted.
+Module version 0.27.
+
+Procedure-language version 1.0.
+
+Procedure schema C<Sim::OPT::StructureDesign/procedure-1>.
+
+=head1 SYNOPSIS
+
+A procedure is an ordinary Perl file that returns one C<design(...)> value.
+The language is embedded in Perl: Perl supplies syntax, data structures,
+modules, interpolation and error handling; this module supplies the
+StructureDesign vocabulary and execution semantics.
+
+    use strict;
+    use warnings;
+    use Sim::OPT::StructureDesignProcedure qw(
+        design state experience derive reembed merge abstract
+        retain_memory reconstruct_memory statistics compare
+        search clustering_and_finding_medoids
+        reduce_scope increase_resolution
+        enlarge_scope maintain_resolution pan
+        incumbent result_of
+    );
+
+    return design 'example',
+        root_dir => ($ENV{STRUCTUREDESIGN_ROOT} || $ENV{HOME}),
+        steps => [
+
+            state('base',
+                id       => 'state_base',
+                existing => 1,
+                config   => 'base.pl',
+            ),
+
+            experience('base',
+                id         => 'search_base',
+                config     => 'base.pl',
+                using      => search(),
+                model_root => 'base',
+                executable => "$ENV{HOME}/base/opt",
+            ),
+
+            derive('local',
+                id            => 'make_local',
+                from          => 'base',
+                parent_config => 'base.pl',
+                config        => 'local.pl',
+                around        => incumbent('search_base'),
+                by => [
+                    reduce_scope(
+                        variables => [1, 2, 3],
+                        levels    => 3,
+                    ),
+                    increase_resolution(
+                        variables => [1, 2, 3],
+                        factor    => 2,
+                    ),
+                ],
+            ),
+        ];
+
+A procedure can be loaded and planned without executing it:
+
+    use Sim::OPT::StructureDesignProcedure qw(load_procedure run_procedure);
+    my $p = load_procedure('./example-procedure.pl');
+    run_procedure($p);
+
+Execution is requested explicitly:
+
+    run_procedure($p, commit => 1);
+
+=head1 DESCRIPTION
+
+C<Sim::OPT::StructureDesignProcedure> is the public procedure-language layer
+for hierarchical StructureDesign workflows in Sim::OPT. It describes design
+processes as ordered, inspectable declarations rather than embedding each
+experiment directly in filesystem manipulation or Sim::OPT launch code.
+
+The module intentionally separates three levels:
+
+    procedure file
+        -> Sim::OPT::StructureDesignProcedure language/runtime
+        -> Sim::OPT::StructureDesign geometric planner and workspace engine
+        -> generated Sim::OPT configurations, searches and result artifacts
+
+A file such as C<bt-procedure.pl> is therefore a program written in this
+embedded domain-specific language. It is not itself the language definition.
+The language definition is the constructor vocabulary and execution semantics
+implemented here.
+
+The language is declarative in the following limited sense: constructors such
+as C<derive(...)> and C<abstract(...)> create data structures that describe
+intent. They do not perform filesystem operations when the procedure file is
+loaded. Execution occurs later through C<run_procedure()>.
+
+=head1 DESIGN PRINCIPLES
+
+=head2 Procedure declarations are separate from operator implementations
+
+The procedure states what should happen and in what order. Detailed geometry,
+configuration rewriting, workspace construction, model copying and Sim::OPT
+execution are implemented by installed modules.
+
+=head2 State transitions are explicit
+
+Each major representation is named as a state. Transformations create new
+states rather than silently mutating the conceptual identity of a previous
+state.
+
+=head2 References are explicit dependencies
+
+C<incumbent($step_id)> and C<result_of($step_id, $key)> refer to results of
+previous completed steps. They are resolved from the run manifest at execution
+time.
+
+=head2 Checkpoint reuse is conservative
+
+Completed steps are associated with signatures of their declarations and with
+a runtime signature. A completed checkpoint is reused only when the runtime can
+verify that the declaration and required output artifacts remain compatible.
+
+=head2 Scientific choices belong in the procedure
+
+Acquisition density, scope transformations, abstraction choices and memory
+reactivation density belong in the procedure declaration when they are
+experimental choices. They should not be hard-coded inside a generic runtime
+operator.
+
+=head1 LANGUAGE AND MODULE VERSIONING
+
+C<$Sim::OPT::StructureDesignProcedure::VERSION> identifies the Perl module
+implementation. C<procedure_language_version()> identifies the public embedded
+language version. C<procedure_schema()> returns the procedure data schema.
+
+    my $language = procedure_language_version();  # "1.1"
+    my $schema   = procedure_schema();            # procedure-1 schema
+
+The language version is deliberately separate from the module version. An
+implementation can receive bug fixes without requiring a new language version.
+
+=head1 PROCEDURE FILE CONTRACT
+
+A procedure file must return a HASH reference created by C<design(...)> or an
+equivalent structure using the supported procedure schema. C<load_procedure()>
+loads the file with Perl C<do>, verifies the returned object and records the
+absolute procedure-file path for provenance.
+
+The normal form is:
+
+    return design 'procedure_name',
+        root_dir => '/path/to/root',
+        steps    => [ ... ];
+
+=head2 C<design($name, %args)>
+
+Creates the top-level procedure object.
+
+Common arguments:
+
+=over 4
+
+=item C<root_dir>
+
+Root directory under which named state directories are resolved. Defaults to
+C<$ENV{HOME}> and then C<.>.
+
+=item C<manifest>
+
+Optional explicit run-manifest path. If omitted, the default is:
+
+    <root_dir>/.structuredesign/<procedure-name>.json
+
+=item C<steps>
+
+Array reference containing the ordered procedure steps.
+
+=back
+
+Every constructor-generated step is enabled by default. Set C<enabled =E<gt> 0>
+to retain a declaration without executing it.
+
+=head1 STEP IDENTIFIERS
+
+A step should normally have an explicit C<id>. References and C<--from>-style
+resumption use step identifiers, not state names.
+
+If no C<id> is supplied, the runtime generates an identifier from ordinal
+position, step type and step name. Explicit IDs are preferable for procedures
+intended to be resumed, cited or maintained over time.
+
+Example:
+
+    experience('base',
+        id => 'search_base',
+        ...
+    )
+
+=head1 CORE STEP CONSTRUCTORS
+
+=head2 C<state($name, %args)>
+
+Declares a named problem-space state.
+
+For an already existing state:
+
+    state('base',
+        id       => 'state_base',
+        existing => 1,
+        config   => 'base.pl',
+    )
+
+The runtime verifies that the state directory and configuration file exist.
+
+A state can also be cloned from another state:
+
+    state('branch',
+        id                => 'state_branch',
+        from              => 'source',
+        source_config     => 'source.pl',
+        config            => 'branch.pl',
+        model_root        => 'bt',
+        geometry_manifest => 'structuredesign-scope.json',
+    )
+
+For cloned states the canonical model root is copied, the configuration is
+rendered for the target directory, and an optional geometry manifest is
+materialized for the clone. Existing target directories are not overwritten.
+
+Optional C<config_variant> and inherited C<dowhat> values can be used when the
+clone requires a controlled configuration variant.
+
+=head2 C<experience($state, %args)>
+
+Runs an acquisition/evaluation operation in a state.
+
+The installed executor supports C<search()> and C<star(...)> acquisition kinds.
+Other acquisition descriptors may be representable by the language but are not
+silently substituted for an installed executor.
+
+Typical search form:
+
+    experience('sampled',
+        id           => 'sample_sampled',
+        config       => 'sampled.meta.pl',
+        config_from  => 'sampled.pl',
+        using        => search(),
+        model_root   => 'bt',
+        executable   => "$ENV{HOME}/bt/opt",
+        config_variant => {
+            sweeps => [ [ '2>1', 2, 3, 4, 5 ] ],
+            dowhat => {
+                names             => 'short',
+                metamodel         => 'y',
+                convergeintomodel => 'y',
+            },
+        },
+    )
+
+When C<config_from> is present, the runtime creates the requested configuration
+variant before launching Sim::OPT.
+
+Useful validation arguments include:
+
+=over 4
+
+=item C<expected_result_rows>
+
+Require an exact number of rows in the direct result file after the run.
+
+=item C<expected_full_factorial>
+
+Array reference of variables expected to have been exhaustively enumerated.
+The expected count is derived from the active lattice rather than hard-coded.
+
+=item C<required_output_files>
+
+Array reference of files that must exist and be non-empty after execution.
+
+=item C<geometry_manifest> or C<lattice_manifest>
+
+Geometry information used to validate or count the active lattice.
+
+=item C<config_variant>
+
+Controlled modifications to C<@sweeps>, C<%dowhat> and, where used internally,
+explicit star positions.
+
+=item C<inherit_dowhat>
+
+Requests selected C<%dowhat> string values from another state's configuration.
+An explicit value in C<config_variant.dowhat> takes precedence over an inherited
+value.
+
+=back
+
+After Sim::OPT completes, the runtime determines the clear incumbent from the
+produced result evidence. An incumbent-dependent downstream step cannot proceed
+without a resolvable winner.
+
+=head2 C<derive($target, %args)>
+
+Declares a structural transformation from one state into another.
+
+The C<by> argument is an array of structural operators.
+
+The current runtime has two installed derive families.
+
+=head3 Local refinement
+
+    derive('local',
+        from   => 'base',
+        around => incumbent('search_base'),
+        by => [
+            reduce_scope(variables => [1,2,3], levels => 3),
+            increase_resolution(variables => [1,2,3], factor => 2),
+        ],
+    )
+
+C<reduce_scope> is required by this executor. C<increase_resolution> is
+optional. Geometry is planned by C<Sim::OPT::StructureDesign::plan_zoom_in>.
+
+C<mediumiters> and C<refined_mediumiters> can be supplied explicitly when a
+procedure needs to override the planner's normal policy.
+
+=head3 Scope enlargement with preserved resolution and panning
+
+    derive('wide',
+        from => 'merged',
+        by => [
+            enlarge_scope(variables => [1,2,3,4,5], factor => 2),
+            maintain_resolution(variables => [1,2,3,4,5]),
+            pan(around => incumbent('make_merged')),
+        ],
+    )
+
+The installed executor requires all three operators. The source lattice
+manifest supplies the existing global counts; the planner derives the enlarged
+geometry without requiring physical step sizes to be repeated in the procedure.
+
+=head2 C<reembed($target, %args)>
+
+Re-embeds a locally refined state into the global refined lattice described by
+a zoom manifest.
+
+Typical form:
+
+    reembed('refined_global',
+        id         => 'make_refined_global',
+        from       => 'local',
+        into       => 'global_refined_lattice',
+        config     => 'refined_global.pl',
+        incumbent  => incumbent('search_local'),
+        model_root => 'bt',
+    )
+
+The executor maps local clear instance identifiers into global refined-lattice
+coordinates, rewrites result identities and cryptolinks consistently, and can
+translate the local incumbent into the global coordinate system.
+
+=head2 C<merge($target, %args)>
+
+Combines compatible parent and refined experience on a common refined lattice.
+
+    merge('merged',
+        id               => 'make_merged',
+        parent           => 'base',
+        refined          => 'refined_global',
+        zoom_plan        => 'local/structuredesign-zoom.json',
+        incumbent_policy => 'best_merged_scalar',
+        config           => 'merged.pl',
+        model_root       => 'bt',
+    )
+
+Overlapping physical instances must have compatible result payloads. The
+refined state's canonical geometry is cloned into the merged state; merging
+changes accumulated experience, not the lattice geometry itself.
+
+Do not specify both an explicit C<incumbent> and C<incumbent_policy>.
+
+=head2 C<abstract($state, %args)>
+
+Compresses a represented landscape by clustering and medoid selection.
+
+    abstract('landscape',
+        id               => 'abstract_landscape',
+        source           => 'weightordmeta',
+        results_file     => 'bt-report-0-0.csv_sortm.csv_weightordmeta.csv',
+        lattice_manifest => 'structuredesign-scope.json',
+        using            => clustering_and_finding_medoids(
+                                selection => 'hierarchical_distortion'),
+        output_dir       => 'abstract',
+        output_prefix    => 'landscape-weightordmeta',
+        model_root       => 'bt',
+    )
+
+The installed abstraction executor delegates to
+C<Sim::OPT::ClusterMedoid>. The supplied results file defines the landscape
+being clustered. Consequently, a medoid is an actual row of that landscape,
+but it is not necessarily a directly simulated row if the landscape itself is
+a surrogate C<weightordmeta> representation.
+
+The abstraction manifest records the selected medoids and the metric metadata
+needed by later reconstruction and statistical comparison.
+
+The C<source> string is provenance metadata. The operative dataset is selected
+by C<results_file>.
+
+=head2 C<retain_memory($state, %args)>
+
+Materialises the declarative memory passed from a completed abstraction.  The
+retained object is not only the medoid set: every directly experienced result
+row is joined to its already-frozen cluster membership and stored with the
+corresponding medoid/category.
+
+    retain_memory('landscape',
+        id              => 'retain_landscape_memory',
+        abstraction     => result_of('abstract_landscape', 'manifest'),
+        experience_file => 'bt-0_ordres.csv',
+        experience_kind => 'direct_simulation',
+        output_dir      => 'memory-retained',
+    )
+
+C<experience_file> must contain actual accumulated experience, not the surrogate
+landscape used for clustering.  Cluster pertinence is inherited by exact
+instance identity from the frozen clustered landscape; retention does not
+recluster or reassign those experiences.  A category is allowed to have zero
+direct support: its medoid remains a valid retained archetypal cue.
+
+=head2 C<reconstruct_memory($target, %args)>
+
+Reactivates a retained abstraction into one shared compact memory workspace.
+The reconstruction semantics are selected by C<reconstruction_mode>.  This is
+an experimental/scientific choice and should be explicit in new procedures.
+
+Two modes are available.
+
+=head3 C<reconstruction_mode =E<gt> 'legacy_medoid_only'>
+
+This reproduces the historical reconstruction used for the first recall runs.
+Only the abstraction medoids are retained as memory cues.  They remain explicit
+star centres in a compact shared lattice derived from their source positions.
+Optional C<star_divisions> adds an nE<gt>-equivalent evenly distributed set of
+auxiliary centres over that same recalled lattice; these auxiliary centres do
+not replace the medoids.
+
+    reconstruct_memory('memory',
+        id                  => 'reconstruct_memory',
+        reconstruction_mode => 'legacy_medoid_only',
+        from                => 'landscape',
+        source_config       => 'landscape.pl',
+        abstraction         => result_of('abstract_landscape', 'manifest'),
+        variables           => [1,2,3,4,5],
+        star_divisions      => 3,       # optional enriched legacy probing
+        model_root          => 'bt',
+        memory_model_root   => 'btmed',
+        executable          => "$ENV{HOME}/bt/opt",
+    )
+
+No retained experiential packet is required or consumed in this mode.  If a
+procedure also contains a C<memory> argument, it is deliberately ignored by the
+legacy executor so that a comparison procedure can change only the mode switch.
+For the same reason C<cloud_star_divisions> is accepted as an alias of
+C<star_divisions> while legacy mode is selected.
+
+=head3 C<reconstruction_mode =E<gt> 'experiential_cloud'>
+
+This implements medoid-anchored experiential recall.  The abstraction medoids
+remain privileged archetypal cues, but a retained memory packet also carries
+directly experienced points with their already-frozen category pertinence.
+
+    reconstruct_memory('memory',
+        id                  => 'reconstruct_memory',
+        reconstruction_mode => 'experiential_cloud',
+        from                => 'landscape',
+        source_config       => 'landscape.pl',
+        abstraction         => result_of('abstract_landscape', 'manifest'),
+        memory              => result_of('retain_landscape_memory', 'manifest'),
+        variables           => [1,2,3,4,5],
+        cloud_star_divisions => 3,      # optional enriched cloud probing
+        model_root          => 'bt',
+        memory_model_root   => 'btmed',
+        executable          => "$ENV{HOME}/bt/opt",
+    )
+
+The architecture is:
+
+    frozen categories + retained medoids + cluster-conditioned direct experience
+        -> one compact shared source-grid-aligned memory lattice
+        -> remembered direct rows seed the accumulated result set
+        -> one mandatory reactivation star per medoid
+        -> optional cloud-conditioned auxiliary stars
+        -> one reconstructed surrogate landscape
+
+The recalled scope is not expanded to the full antecedent lattice merely
+because remembered points span it.  Retained experiential clouds position the
+compact window.  If a category has direct remembered support but the nominal
+window would contain none of it, the planner expands only enough to admit at
+least one remembered point from that category.  A category with zero direct
+support remains represented by its medoid alone.
+
+C<cloud_star_divisions> enriches renewed probing by selecting additional actual
+remembered experiences within each frozen category using deterministic maximin
+spatial coverage.  These centres are therefore conditioned by the remembered
+cloud rather than cast uniformly across an invented common box.
+
+=head3 Backward-compatible mode inference
+
+Historical procedure files predate C<reconstruction_mode>.  To keep them
+replayable under one installed Sim::OPT version, omission of the switch is
+interpreted as follows:
+
+    memory => ... present     -> experiential_cloud
+    no memory argument        -> legacy_medoid_only
+
+This inference exists only for backward compatibility.  Procedures prepared
+for publication or new experiments should specify C<reconstruction_mode>
+explicitly so the reconstruction semantics are directly inspectable.
+
+Other useful arguments in both modes include C<medoid_limit>, C<mediumiters>,
+C<inherit_dowhat>, C<source_config>, C<model_root> and C<memory_model_root>.
+
+The executor verifies the exact expected sampled union and the completeness of
+the reconstructed surrogate lattice according to the selected mode.
+
+=head2 C<statistics($pair_name, %args)>
+
+Compares two represented landscapes and their abstractions.
+
+    statistics('source-memory',
+        id                    => 'statistics_source_memory',
+        left                  => 'source',
+        right                 => 'memory',
+        left_abstraction      => result_of('abstract_source', 'manifest'),
+        right_abstraction     => result_of('abstract_memory', 'manifest'),
+        right_memory_manifest => 'structuredesign-memory-local.json',
+        left_model_root       => 'bt',
+        right_model_root      => 'btmed',
+        statistics_dir        => 'statistics',
+        output_dir            => 'source-memory',
+    )
+
+When the right-hand state is a compressed memory state, the memory manifest is
+used to map local memory coordinates back into source-lattice coordinates
+before comparison. Raw local memory instance names therefore must not be
+compared directly with source instance names.
+
+The statistics executor records pointwise regression/error measures, categories
+based on direct versus surrogate status, globally matched medoid distances,
+set-level medoid measures, adjusted Rand index and aligned cluster agreement.
+It writes machine-readable JSON and CSV outputs.
+
+=head2 C<compare($name, %args)>
+
+Performs direct-evidence validation between two states sharing physical
+instances and a prediction landscape.
+
+    compare('sparse_dense_validation',
+        id               => 'validate_sparse_against_dense',
+        left             => 'sparse',
+        right            => 'dense',
+        model_root       => 'bt',
+        prediction_state => 'sparse',
+        prediction_file  => 'bt-report-0-0.csv_sortm.csv_weightordmeta.csv',
+        output_file      => 'structuredesign-validation.json',
+    )
+
+Shared direct simulations are first required to agree within
+C<overlap_tolerance> (default C<1e-9>). Right-only instances form the holdout
+set. Predictions for those instances are compared with their direct right-hand
+results on the left-hand normalization scale.
+
+Optional count guards include C<expected_left_rows>, C<expected_right_rows>,
+C<expected_overlap_rows> and C<expected_holdout_rows>.
+
+=head2 C<imagine($state, %args)>
+
+C<imagine> is part of the article-facing language vocabulary. It represents
+"imagine by surrogating with ...". In module 0.25 the dedicated generic
+C<imagine> configuration compiler is intentionally not installed. A committed
+C<imagine> step therefore fails explicitly rather than silently running an
+incorrect surrogate operation.
+
+Existing procedures obtain surrogate landscapes through supported Sim::OPT
+search/configuration variants and through memory reconstruction.
+
+=head1 DESCRIPTOR CONSTRUCTORS
+
+=head2 C<search(%args)>
+
+Returns an acquisition descriptor with C<kind =E<gt> 'search'>.
+
+=head2 C<star(%args)>
+
+Returns an acquisition descriptor with C<kind =E<gt> 'star'>. The installed
+star-experience compiler uses StructureDesign star planning and validates the
+result count.
+
+=head2 C<surrogate(%args)>
+
+Returns a generic surrogate descriptor. It is vocabulary-level infrastructure;
+not every descriptor has an independent committed executor.
+
+=head2 C<surrogating_with($method, %args)>
+
+Article-facing surrogate descriptor retaining the named method.
+
+=head2 C<medoids(%args)>
+
+Compatibility abstraction descriptor accepted by the installed abstraction
+executor.
+
+=head2 C<clustering_and_finding_medoids(%args)>
+
+Preferred abstraction descriptor. The currently used selection policy is
+C<hierarchical_distortion> when requested by the procedure. Parameters are
+passed through the generated ClusterMedoid configuration where supported.
+
+=head2 C<clustering_and_medoiding(%args)>
+
+Backward-compatible alias for C<clustering_and_finding_medoids>. New procedure
+files should use the latter spelling.
+
+=head1 STRUCTURAL OPERATORS
+
+These constructors are normally placed in a C<derive(..., by =E<gt> [...])>
+array.
+
+=head2 C<reduce_scope(%args)>
+
+Declares local scope reduction. Common arguments are C<variables> and C<levels>.
+
+=head2 C<increase_resolution(%args)>
+
+Declares increased resolution. Common arguments are C<variables>, C<factor>,
+optional per-variable C<factors>, and optional C<local_strides>.
+
+=head2 C<enlarge_scope(%args)>
+
+Declares scope enlargement. Common arguments are C<variables> and C<factor>.
+
+=head2 C<maintain_resolution(%args)>
+
+Declares that enlargement should retain physical resolution for the listed
+variables.
+
+=head2 C<pan(%args)>
+
+Declares a shift of the represented scope. C<around> normally refers to an
+incumbent from an earlier step.
+
+=head2 C<decrease_resolution(%args)>
+
+The constructor is part of the language vocabulary. The current derive
+executor does not install a general committed executor for an arbitrary
+C<decrease_resolution> transformation. A procedure must therefore not assume
+that declaration alone implies executable support.
+
+=head1 REFERENCE EXPRESSIONS
+
+=head2 C<incumbent($step_id)>
+
+Creates a deferred reference to the C<incumbent> result of a completed step.
+
+    around => incumbent('search_base')
+
+The reference is resolved only during execution. The referenced step must be
+C<COMPLETE> in the run manifest and must have recorded an incumbent.
+
+=head2 C<result_of($step_id, $key)>
+
+Creates a deferred reference to a named result field of a completed step.
+
+    abstraction => result_of('abstract_source', 'manifest')
+
+If C<$key> is omitted, the default key is C<result>.
+
+=head1 CONFIGURATION VARIANTS AND INHERITANCE
+
+Several state and experience operations can create a derived Sim::OPT
+configuration without hand-editing the generated file.
+
+A C<config_variant> can contain:
+
+    config_variant => {
+        sweeps => [ [ '2>1', 2, 3, 4, 5 ] ],
+        dowhat => {
+            names             => 'short',
+            metamodel         => 'y',
+            convergeintomodel => 'y',
+        },
+    }
+
+The runtime patches the active C<@sweeps> assignment and requested C<%dowhat>
+keys, then validates that the generated text contains the requested values.
+
+C<inherit_dowhat> has the form:
+
+    inherit_dowhat => {
+        from_state => 'base',
+        config     => 'base.pl',
+        keys       => [ 'canon' ],
+    }
+
+Only the requested string-valued keys are inherited. An explicit value in
+C<config_variant.dowhat> overrides the inherited value.
+
+=head1 SIM::OPT SWEEP SYNTAX
+
+The procedure language does not redefine Sim::OPT sweep semantics; it carries
+sweep declarations into generated configurations.
+
+For this Sim::OPT codebase:
+
+    [ [ 1, 2, 3, 4, 5 ] ]
+
+is one full-factorial sweep block over variables 1 through 5, whereas:
+
+    [ [1], [2], [3], [4], [5] ]
+
+is sequential coordinate descent.
+
+Subdivision star notation such as:
+
+    [ [ '2>1', 2, 3, 4, 5 ] ]
+
+uses Sim::OPT's C<nE<gt>> mechanism to generate star centres. Procedure code
+should not replace that mechanism with a hand-maintained external
+C<starpositions> file unless an operator explicitly requires resolved star
+positions internally.
+
+=head1 ABSTRACTION, EXPERIENCE AND SURROGATE LANDSCAPES
+
+The dataset passed to C<abstract()> determines what the medoids represent.
+Clustering C<bt-0_totres.csv> selects medoids from directly accumulated result
+rows. Clustering a C<weightordmeta> file selects medoids from the represented
+surrogate landscape. Such a medoid is an actual row of the clustered landscape,
+but it can correspond to a surrogate-predicted rather than directly simulated
+instance.
+
+This distinction is intentional and should be preserved in scientific
+interpretation.
+
+=head1 MEMORY RECONSTRUCTION SEMANTICS
+
+Memory reconstruction treats retained medoids as privileged retrieval cues and
+retained direct cluster members as experiential support.  It does not store one
+independent model workspace per medoid.  The support clouds choose and, when
+needed, minimally enlarge one compact shared lattice.  Direct remembered rows
+inside that lattice seed the result set before renewed probing, after which one
+reconstructed surrogate landscape is produced.
+
+The source-to-memory mapping, seed provenance, category-conditioned support
+counts and auxiliary cloud centres are recorded in the memory manifest.
+Downstream recall classification applies the frozen antecedent category model;
+it does not refit clusters or move medoids.
+
+C<cloud_star_divisions> controls renewed probing density. It does not redefine
+the retained categories or medoids.
+
+=head1 DRY RUNS AND EXECUTION
+
+=head2 C<load_procedure($file)>
+
+Loads a procedure file and verifies its top-level schema.
+
+=head2 C<run_procedure($procedure, %options)>
+
+Without C<commit =E<gt> 1>, the runtime performs a dry plan. It reports the
+declared operations without executing Sim::OPT or requiring downstream results
+that can exist only after earlier committed steps.
+
+Common options:
+
+=over 4
+
+=item C<commit>
+
+Execute rather than only plan.
+
+=item C<from>
+
+Resume from a named step ID. Every enabled prerequisite step before C<from>
+must be recorded as complete with the same step signature and with required
+artifacts still present.
+
+=item C<only>
+
+Select only one step ID after normal manifest safety checks.
+
+=item C<force>
+
+Allow a completed step to be rebuilt instead of reused. This does not waive
+operator-specific refusal to overwrite an existing target directory.
+
+=item C<accept_runtime_change>
+
+With an explicit C<from>, accept a manifest difference caused only by a changed
+StructureDesign runtime. Completed prerequisite declarations are still checked.
+
+=item C<accept_tail_change>
+
+With an explicit C<from>, accept a procedure declaration change in the selected
+step or later tail, provided earlier prerequisite step signatures still match.
+
+=back
+
+=head1 RUN MANIFEST AND CHECKPOINTING
+
+The default run manifest is stored under:
+
+    <root_dir>/.structuredesign/<procedure-name>.json
+
+It records the procedure signature, runtime signature, step status, timestamps,
+step signatures and results returned by completed operators.
+
+A procedure/runtime mismatch is treated conservatively. Unless an explicitly
+supported partial-resume exception is requested, a committed full run archives
+the stale manifest and generated states before starting a new run. Partial runs
+are rejected when the manifest cannot prove their prerequisites safe.
+
+The runtime also verifies required artifacts for checkpointed abstractions,
+comparisons and reconstructed memories before treating their C<COMPLETE> status
+as reusable.
+
+=head1 FILESYSTEM SAFETY
+
+Structural operators that create new states normally refuse to overwrite an
+existing target directory. This is separate from checkpoint policy. C<force>
+controls checkpoint reuse; it is not a general filesystem overwrite switch.
+
+Generated configuration variants are validated before or after materialization
+as appropriate. Geometry manifests are treated as part of the state contract,
+not merely as informal logs.
+
+=head1 OUTPUT AND PROVENANCE ARTIFACTS
+
+Depending on the operators used, a procedure can create:
+
+=over 4
+
+=item * state directories and generated Sim::OPT configuration files
+
+=item * zoom, re-embedding, merge, scope and memory manifests
+
+=item * direct C<totres> result files
+
+=item * surrogate C<weightordmeta> landscapes
+
+=item * clustering/medoid abstractions
+
+=item * comparison and validation JSON
+
+=item * landscape, medoid and cluster statistics in JSON/CSV form
+
+=item * the top-level procedure run manifest
+
+=back
+
+These artifacts are part of the executable provenance of the procedure.
+
+=head1 IMPLEMENTATION STATUS
+
+The language vocabulary is intentionally somewhat broader than the installed
+executor set. Module 0.27 installs committed execution for the step families
+used by the current StructureDesign production workflows: state creation and
+cloning, search/star experience, the two supported derive families, re-embedding,
+merge, clustering/medoid abstraction, experiential-memory retention, frozen-category application, shared-memory reconstruction, statistics
+and comparison.
+
+The generic C<imagine> executor and arbitrary combinations involving
+C<decrease_resolution> are represented but deliberately fail rather than being
+silently approximated by a different operation.
+
+This distinction between a language construct and an installed executor should
+be maintained when the language is extended.
+
+=head1 EXTENDING THE LANGUAGE
+
+A new language operator should normally have three parts:
+
+=over 4
+
+=item 1. A small constructor that records intent without side effects.
+
+=item 2. An executor or compiler that validates the declaration and delegates
+geometry or workspace mechanics to the appropriate Sim::OPT module.
+
+=item 3. Manifest/provenance output sufficient to reproduce and validate the
+resulting state transition.
+
+=back
+
+New experimental choices should be exposed as procedure arguments rather than
+embedded as fixed behavior in the runtime when more than one scientifically
+meaningful policy is possible.
+
+=head1 COMPLETE PUBLIC EXPORT SET
+
+Module 0.27 offers the following symbols through C<@EXPORT_OK>:
+
+    design
+    state
+    experience
+    derive
+    reembed
+    merge
+    imagine
+    abstract
+    retain_memory
+    apply_abstraction
+    compare
+    statistics
+    reconstruct_memory
+
+    search
+    star
+    surrogate
+    medoids
+    surrogating_with
+    clustering_and_finding_medoids
+    clustering_and_medoiding
+
+    reduce_scope
+    enlarge_scope
+    increase_resolution
+    decrease_resolution
+    pan
+    maintain_resolution
+
+    incumbent
+    result_of
+
+    procedure_language_version
+    procedure_schema
+
+    load_procedure
+    run_procedure
+
+Nothing is exported by default.
+
+=head1 RELATION TO C<Sim::OPT::StructureDesign>
+
+This module is the procedure-language and execution-orchestration layer.
+C<Sim::OPT::StructureDesign> is the lower-level geometric planner, mapping and
+workspace-construction engine. Procedure files should normally call the public
+constructors in this module rather than invoking private geometric helpers
+directly.
+
+=head1 RELATION TO C<Sim::OPT::ClusterMedoid>
+
+C<abstract()> with C<clustering_and_finding_medoids()> delegates clustering and
+medoid selection to C<Sim::OPT::ClusterMedoid>. Cluster-selection algorithms and
+dissimilarity mechanics are therefore implementation choices of the
+abstraction operator rather than syntax of the procedure language itself.
+
+=head1 RECOMMENDED TERMINOLOGY
+
+For technical documentation, the most precise description is:
+
+    Sim::OPT StructureDesign Procedure Language
+
+or:
+
+    a Perl-embedded domain-specific language (DSL) for StructureDesign procedures
+
+A particular C<*-procedure.pl> file is a program written in that language.
+
+=head1 DOCUMENTATION PROVENANCE
+
+This manual was initially drafted with the assistance of ChatGPT (OpenAI) from
+the source code of C<Sim::OPT::StructureDesignProcedure>,
+C<Sim::OPT::StructureDesign> and the associated production procedure. The
+technical descriptions were checked against the implementation during drafting.
+Responsibility for the final software and documentation remains with the
+software author and maintainer.
+
+=head1 SEE ALSO
+
+L<Sim::OPT::StructureDesign>, L<Sim::OPT::ClusterMedoid>, C<perldoc>, and the
+procedure examples distributed with this module.
 
 =cut

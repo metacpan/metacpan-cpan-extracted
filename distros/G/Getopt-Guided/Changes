@@ -1,5 +1,8 @@
 Release history for Getopt-Guided
 
+v3.3.1    2026-09-11T15:34:52Z
+          - Use hard-coded defaults even if readopts() reads nothing
+
 v3.3.0    2026-09-11T06:24:47Z
           - Hard-coded defaults can now be passed to readopts()
           - Show in test script why hard-coded defaults should be prepended

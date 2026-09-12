@@ -54,9 +54,13 @@ sar_map(self, name, ...)
 
 MODULE = Shared::Arena    PACKAGE = Shared::Arena::Map    PREFIX = sam_
 
+# $map->store($key, $value)
+# $map->store($key, $value, ttl => 300)      # seconds; the entry expires after
+# $map->store($key, $value, ttl_ms => 5000)  # milliseconds
+#
 # 1 stored / 0 the table is full / -1 the pair does not fit a slot.
 IV
-sam_store(self, key, value)
+sam_store(self, key, value, ...)
         SV *self
         SV *key
         SV *value
@@ -64,12 +68,20 @@ sam_store(self, key, value)
         sa_hash *m;
         const char *k, *v;
         STRLEN klen, vlen;
+        uint64_t ttl_ms = 0;
+        I32 i;
     CODE:
         m = SA_SELF(sa_hash, self);
         if (!m) croak("Shared::Arena::Map: this map is released");
         k = SvPV(key, klen);
         v = SvPV(value, vlen);
-        RETVAL = sa_hash_store(m, k, (uint32_t)klen, v, (uint32_t)vlen);
+        for (i = 3; i + 1 < items; i += 2) {
+            const char *o = SvPV_nolen(ST(i));
+            if      (strEQ(o, "ttl"))    ttl_ms = (uint64_t)(SvNV(ST(i + 1)) * 1000.0);
+            else if (strEQ(o, "ttl_ms")) ttl_ms = (uint64_t)SvUV(ST(i + 1));
+        }
+        RETVAL = sa_hash_store_ttl(m, k, (uint32_t)klen, v, (uint32_t)vlen,
+                                   ttl_ms);
     OUTPUT:
         RETVAL
 
@@ -91,20 +103,32 @@ sam_fetch(self, key)
         const char *k;
         STRLEN klen;
         SV *out;
+        char buf[1024];
         uint32_t vlen = 0;
         int rc;
     PPCODE:
         m = SA_SELF(sa_hash, self);
         if (!m) croak("Shared::Arena::Map: this map is released");
         k = SvPV(key, klen);
-        out = sv_2mortal(newSV((STRLEN)m->pair_max + 1));
-        SvPOK_on(out);
-        rc = sa_hash_fetch(m, k, (uint32_t)klen, SvPVX(out),
-                           (uint32_t)m->pair_max, &vlen);
-        if (rc != SA_H_HIT) XSRETURN_EMPTY;
-        SvCUR_set(out, (STRLEN)vlen);
-        SvPVX(out)[vlen] = '\0';
-        XPUSHs(out);
+        /* Onto the stack first where a slot fits, so a miss allocates nothing
+         * and a hit allocates what the value needs rather than the most a slot
+         * could hold. */
+        if (m->pair_max < sizeof buf) {
+            rc = sa_hash_fetch(m, k, (uint32_t)klen, buf,
+                               (uint32_t)m->pair_max, &vlen);
+            if (rc != SA_H_HIT) XSRETURN_EMPTY;
+            XPUSHs(sv_2mortal(newSVpvn(buf, (STRLEN)vlen)));
+        }
+        else {
+            out = sv_2mortal(newSV((STRLEN)m->pair_max + 1));
+            SvPOK_on(out);
+            rc = sa_hash_fetch(m, k, (uint32_t)klen, SvPVX(out),
+                               (uint32_t)m->pair_max, &vlen);
+            if (rc != SA_H_HIT) XSRETURN_EMPTY;
+            SvCUR_set(out, (STRLEN)vlen);
+            SvPVX(out)[vlen] = '\0';
+            XPUSHs(out);
+        }
 
 int
 sam_exists(self, key)
@@ -233,9 +257,15 @@ sam_keys(self)
         for (i = 0; i < m->nslots; i++) {
             sa_hash_slot *s = SA_HSLOT_AT(m, i);
             uint32_t v1, kl;
+            uint64_t exp;
             if (sa_at_load32_acq(&s->state) != SA_H_LIVE) continue;
             v1 = sa_at_load32_acq(&s->version);
             if (v1 & 1u) continue;              /* mid-update: skip it */
+            /* An expired entry is not a live key. It is left for a fetch to
+             * collect rather than tombstoned here: keys() is a read-only
+             * snapshot and takes no lock. */
+            exp = sa_at_load64_acq(&s->expires);
+            if (exp && sa_now_ms() >= exp) continue;
             kl = sa_at_load32_acq(&s->klen);
             if (!kl || (uint64_t)kl > m->pair_max) continue;
             {
@@ -249,7 +279,7 @@ sam_keys(self)
             }
         }
 
-# used / capacity / tombstones / busy / full
+# used / capacity / tombstones / busy / full / expired
 void
 sam_stats(self)
         SV *self
@@ -265,6 +295,8 @@ sam_stats(self)
         mPUSHu((UV)sa_at_load64_acq(&m->hdr->tombstones));
         mPUSHp("busy", 4);       mPUSHu((UV)sa_at_load64_acq(&m->hdr->busy));
         mPUSHp("full", 4);       mPUSHu((UV)sa_at_load64_acq(&m->hdr->full));
+        mPUSHp("expired", 7);
+        mPUSHu((UV)sa_at_load64_acq(&m->hdr->expired));
 
 void
 sam_DESTROY(self)

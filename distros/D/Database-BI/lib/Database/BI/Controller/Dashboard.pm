@@ -1,10 +1,11 @@
 package Database::BI::Controller::Dashboard;
 
-our $VERSION = '0.005.1';
+our $VERSION = '0.005.2';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
 use Carp		qw(croak carp);
+use List::Util		qw(min max sum);
 use CGI::Info;
 use CGI::Lingua;
 use Mojo::File;
@@ -2074,6 +2075,11 @@ sub graph_view ($self) {
 		status => 200,
 	) unless @pairs;
 
+	my @y_vals  = map { $_->[1] } @pairs;
+	my $min_y   = min(@y_vals);
+	my $max_y   = max(@y_vals);
+	my $avg_y   = sum(@y_vals) / scalar(@y_vals);
+
 	require HTML::D3;
 	my $title   = "$y_col vs $x_col";
 	my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580)
@@ -2089,6 +2095,9 @@ sub graph_view ($self) {
 		back_url     => $back,
 		back_label   => 'Back to table',
 		point_count  => scalar @pairs,
+		ref_min_y    => $min_y,
+		ref_max_y    => $max_y,
+		ref_avg_y    => sprintf('%.4g', $avg_y),
 	);
 }
 

@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use Carp qw(cluck);
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 Travel::Status::DE::DBRIS::Formation::Carriage->mk_ro_accessors(
 	qw(class_type is_closed is_dosto is_locomotive is_powercar
 	  number model section uic_id country type
@@ -49,7 +49,7 @@ sub new {
 	$ref->{section}       = $json{platformPosition}{sector};
 	$ref->{type}          = $json{type}{constructionType};
 
-	if ( defined $ref->{uic_id} ) {
+	if ( defined $ref->{uic_id} and length( $ref->{uic_id} ) >= 12 ) {
 		$ref->{uic_id} =~ s{ ^ \d{11} \K - }{}x;
 		$ref->{country} = substr( $ref->{uic_id}, 2, 2 );
 	}

@@ -111,6 +111,37 @@ have_atomics(...)
     OUTPUT:
         RETVAL
 
+# A new thread gets no copy of anything here.
+#
+# Every object in this dist is a C pointer in a blessed scalar. Cloning an
+# interpreter clones the scalar and shares the pointer, and whichever copy is
+# destroyed first frees it under the other - or, for the region, unmaps the
+# arena under the thread that made it. This makes the new thread's copies
+# inert, and a thread that wants the arena attaches to it by name, as another
+# process would.
+int
+CLONE_SKIP(...)
+    ALIAS:
+        Shared::Arena::Ring::CLONE_SKIP         = 1
+        Shared::Arena::Ring::Cursor::CLONE_SKIP = 2
+        Shared::Arena::Ring::Group::CLONE_SKIP  = 3
+        Shared::Arena::Map::CLONE_SKIP          = 4
+        Shared::Arena::Bloom::CLONE_SKIP        = 5
+        Shared::Arena::Histogram::CLONE_SKIP    = 6
+        Shared::Arena::Cache::CLONE_SKIP        = 7
+        Shared::Arena::Rate::CLONE_SKIP         = 8
+        Shared::Arena::CountMin::CLONE_SKIP     = 9
+        Shared::Arena::Frozen::CLONE_SKIP       = 10
+        Shared::Arena::Frozen::View::CLONE_SKIP = 11
+        Shared::Arena::Cuckoo::CLONE_SKIP       = 12
+        Shared::Arena::Lease::CLONE_SKIP        = 13
+        Shared::Arena::Scoreboard::CLONE_SKIP   = 14
+    CODE:
+        PERL_UNUSED_VAR(ix);
+        RETVAL = 1;
+    OUTPUT:
+        RETVAL
+
 # The compiled layout, so t/01-format.t can assert from Perl what the C thinks
 # it is. These numbers are in the region's own header at create, and a process
 # whose build disagrees fails open rather than reading a shape it does not

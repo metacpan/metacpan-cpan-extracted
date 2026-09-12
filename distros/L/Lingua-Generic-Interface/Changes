@@ -1,3 +1,13 @@
+v0.03  2026-09-11Z
+    - Added more reserved methods
+    - Added interfaces:
+        * Lingua::Generic::Interface::Base
+        * Lingua::Generic::Interface::Element
+        * Lingua::Generic::Interface::Fragment
+        * Lingua::Generic::Interface::Modifier
+    - Added highly experimental helper methods to Lingua::Generic::Interface for creating new objects
+    - Improved documentation
+
 v0.02  2026-08-16Z
     - Added a number of reserved methods
     - Defined new method stem()

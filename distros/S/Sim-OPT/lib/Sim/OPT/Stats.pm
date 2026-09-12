@@ -5,35 +5,15 @@ package Sim::OPT::Stats;
 # The present copy is proprietary. The open-source, GPL version of it can be found at
 # https://metacpan.org/dist/Sim-OPT.
 
-use Sim::OPT;
-use Sim::OPT::Morph;
-use Sim::OPT::Sim;
-use Sim::OPT::Report;
-use Sim::OPT::Descend;
-use Sim::OPT::Takechance;
-use Sim::OPT::Interlinear;
-use Sim::OPT::Parcoord3d;
+use Carp ();
+use Scalar::Util ();
+use List::Util ();
 
-eval { use Sim::OPTcue::OPTcue; 1 };
-eval { use Sim::OPTcue::Metabridge; 1 };
-eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
-eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
-eval { use Sim::OPTcue::Exogen::Armijo; 1 };
-eval { use Sim::OPTcue::Exogen::NSGAII; 1 };
-eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
-eval { use Sim::OPTcue::Exogen::SimulatedAnnealing; 1 };
-eval { use Sim::OPTcue::Exogen::NSGAIII; 1 };
-eval { use Sim::OPTcue::Exogen::MOEAD; 1 };
-eval { use Sim::OPTcue::Exogen::SPEA2; 1 };
-eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
-eval { use Sim::OPTcue::Exogen::RadialBasis; 1 };
-eval { use Sim::OPTcue::Exogen::Kriging; 1 };
-eval { use Sim::OPTcue::Exogen::DecisionTree; 1 };
-eval { use Sim::OPTcue::Exogen::KNN; 1 };
-eval { use Sim::OPTcue::Exogen::FFNN; 1 };
-eval { use Sim::OPTcue::Exogen::GBDT; 1 };
-eval { use Sim::OPTcue::Endogen::DWGN2; 1 };
-eval { use Sim::OPTcue::Endogen::NeuralBoltzmann; 1 };
+# Stats is foundational: do not load Sim::OPT or consumers of Stats here.
+use Sim::OPT::Stats::_Base ();
+use Sim::OPT::Stats::_BinaryBase ();
+use Sim::OPT::Stats::StdDev ();
+use Sim::OPT::Stats::Correlation ();
 
 use Exporter qw();
 our @ISA = qw(Exporter);
@@ -57,17 +37,11 @@ sub import
       }
     push( @export_args, $a );
   }
-  Exporter::import( $class, @export_args );
+  $class->export_to_level( 1, $class, @export_args );
 }
 
 no strict;
 no warnings;
-
-use Carp ();
-
-use Scalar::Util ();
-use List::Util ();
-
 
 our $UNBIAS = 0;
 
