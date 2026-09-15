@@ -6,7 +6,7 @@ use 5.008004;
 use Carp ();
 
 # ABSTRACT: Bundle foreign code with your Perl module
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 
 package FFI::Platypus;
@@ -150,7 +150,7 @@ FFI::Platypus::Bundle - Bundle foreign code with your Perl module
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 SYNOPSIS
 
@@ -680,10 +680,7 @@ C<ffi/compress.c>:
  int
  bzip2__new(bz_stream **stream, int blockSize100k, int verbosity, int workFactor )
  {
-   *stream = malloc(sizeof(bz_stream));
-   (*stream)->bzalloc = NULL;
-   (*stream)->bzfree  = NULL;
-   (*stream)->opaque  = NULL;
+   *stream = calloc(1, sizeof(bz_stream));
  
    return BZ2_bzCompressInit(*stream, blockSize100k, verbosity, workFactor );
  }

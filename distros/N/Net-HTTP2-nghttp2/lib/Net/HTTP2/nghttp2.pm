@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use XSLoader;
 
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 
 XSLoader::load('Net::HTTP2::nghttp2', $VERSION);
 
@@ -20,6 +20,9 @@ our @EXPORT_OK = qw(
     NGHTTP2_ERR_CALLBACK_FAILURE
     NGHTTP2_ERR_TEMPORAL_CALLBACK_FAILURE
     NGHTTP2_ERR_DEFERRED
+    NGHTTP2_ERR_STREAM_CLOSING
+    NGHTTP2_ERR_PROTO
+    NGHTTP2_ERR_HTTP_HEADER
     NGHTTP2_FLAG_NONE
     NGHTTP2_FLAG_END_STREAM
     NGHTTP2_FLAG_END_HEADERS
@@ -58,7 +61,9 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (
     all       => \@EXPORT_OK,
     errors    => [qw(NGHTTP2_ERR_WOULDBLOCK NGHTTP2_ERR_CALLBACK_FAILURE
-                     NGHTTP2_ERR_TEMPORAL_CALLBACK_FAILURE NGHTTP2_ERR_DEFERRED)],
+                     NGHTTP2_ERR_TEMPORAL_CALLBACK_FAILURE NGHTTP2_ERR_DEFERRED
+                     NGHTTP2_ERR_STREAM_CLOSING NGHTTP2_ERR_PROTO
+                     NGHTTP2_ERR_HTTP_HEADER)],
     http2_errors => [qw(
         NGHTTP2_NO_ERROR NGHTTP2_PROTOCOL_ERROR NGHTTP2_INTERNAL_ERROR
         NGHTTP2_FLOW_CONTROL_ERROR NGHTTP2_SETTINGS_TIMEOUT
@@ -140,6 +145,19 @@ session.
 =item NGHTTP2_ERR_DEFERRED
 
 Data production deferred (for flow control).
+
+=item NGHTTP2_ERR_STREAM_CLOSING
+
+The stream is being closed, so a frame queued on it was discarded rather than
+serialized. Reported to C<on_frame_not_send>.
+
+=item NGHTTP2_ERR_PROTO
+
+The peer violated the HTTP/2 protocol. Reported to C<on_invalid_frame_recv>.
+
+=item NGHTTP2_ERR_HTTP_HEADER
+
+The peer sent a header field HTTP/2 does not permit. Reported to C<on_error>.
 
 =back
 
@@ -509,7 +527,7 @@ the HTTP/2 conformance testing tool.
 
 =item * HPACK - All header compression variants (indexed, literal, Huffman)
 
-=item * Server Push - PUSH_PROMISE handling
+=item * Server Push - a PUSH_PROMISE frame from a client is rejected
 
 =back
 

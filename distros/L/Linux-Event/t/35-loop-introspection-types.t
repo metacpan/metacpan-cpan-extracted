@@ -71,7 +71,7 @@ $object{stream} = T::InspectStream->new(
     loop => $loop, fh => $stream_fh,
 );
 $object{listener} = Linux::Event::IO::Sock::Listener->new(
-    loop => $loop, stream_class => 'T::InspectStream',
+    loop => $loop, stream => { class => 'T::InspectStream' },
     host => '127.0.0.1', port => 0,
 );
 $object{dgram} = T::InspectDgram->new(

@@ -16,11 +16,11 @@ Monitoring::Sneck - a boopable LibreNMS JSON style SNMP extend for remotely runn
 
 =head1 VERSION
 
-Version 1.4.1
+Version 1.4.2
 
 =cut
 
-our $VERSION = '1.4.1';
+our $VERSION = '1.4.2';
 
 =head1 SYNOPSIS
 
@@ -415,34 +415,42 @@ sub run {
 			warn( $name . ' check string post variable replacement: "' . $check . '"' );
 		}
 
-		my $check_pid = open3( my $std_in, my $std_out, my $std_err = gensym, $check );
-		if ( $self->{debug} ) {
-			warn( $name . ' open3 called' );
-		}
+		my $exit_code;
+		eval {
+			my $check_pid = open3( my $std_in, my $std_out, my $std_err = gensym, $check );
+			if ( $self->{debug} ) {
+				warn( $name . ' open3 called' );
+			}
 
-		my $s = IO::Select->new();
-		$s->add($std_out);
-		$s->add($std_err);
-		my $output = '';
-		while ( my @ready = $s->can_read ) {
-			foreach my $handle (@ready) {
-				if ( sysread( $handle, my $buf, 4096 ) ) {
-					$output = $output . $buf;
-				} else {
-					$s->remove($handle);
+			my $s = IO::Select->new();
+			$s->add($std_out);
+			$s->add($std_err);
+			my $output = '';
+			while ( my @ready = $s->can_read ) {
+				foreach my $handle (@ready) {
+					if ( sysread( $handle, my $buf, 4096 ) ) {
+						$output = $output . $buf;
+					} else {
+						$s->remove($handle);
+					}
 				}
 			}
-		}
 
-		if ( $self->{debug} ) {
-			warn( $name . ' IO::Select for open3 done... output is... "' . $output . '"' );
-		}
+			if ( $self->{debug} ) {
+				warn( $name . ' IO::Select for open3 done... output is... "' . $output . '"' );
+			}
 
-		# call wait pid so we can get the exit code
-		waitpid( $check_pid, 0 );
-		my $exit_code = $?;
-		$self->{to_return}{data}{$type}{$name}{output} = $output;
-		if ( defined( $self->{to_return}{data}{$type}{$name}{output} ) ) {
+			# call wait pid so we can get the exit code
+			waitpid( $check_pid, 0 );
+			$exit_code = $?;
+			$self->{to_return}{data}{$type}{$name}{output} = $output;
+			if ( defined( $self->{to_return}{data}{$type}{$name}{output} ) ) {
+				chomp( $self->{to_return}{data}{$type}{$name}{output} );
+			}
+		};
+		if ($@) {
+			$exit_code = -1;
+			$self->{to_return}{data}{$type}{$name}{output} = $@;
 			chomp( $self->{to_return}{data}{$type}{$name}{output} );
 		}
 

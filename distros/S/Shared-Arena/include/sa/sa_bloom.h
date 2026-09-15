@@ -70,14 +70,18 @@ typedef struct {
     volatile unsigned char locks[SA_LOCK_STRIPES];
 } sa_bloom_hdr;
 
-typedef struct sa_bloom {
+#ifndef SA_BLOOM_FWD
+#define SA_BLOOM_FWD
+typedef struct sa_bloom sa_bloom;
+#endif
+struct sa_bloom {
     sa_region     *arena;
     sa_bloom_hdr  *hdr;
     volatile uint64_t *words;
     uint64_t       nbits;
     uint64_t       nwords;
     uint32_t       nhash;
-} sa_bloom;
+};
 
 /* Round the bits up to a whole number of 64-bit words. */
 static uint64_t sa_bloom_words(uint64_t nbits) {

@@ -21,6 +21,7 @@ like(
         about => {details => qr/covered \d+ source files/},
 
         coverage => {
+            root         => path('.')->realpath->stringify,
             test_type    => 'flat',
             from_manager => undef,
             details      => qr/covered \d+ source files/,
@@ -49,6 +50,7 @@ ok($ev, "got a second coverage event");
 like(
     $ev->facet_data->{coverage},
     {
+        root         => path('.')->realpath->stringify,
         test_type    => 'split',
         from_manager => 'My::Manager',
 
@@ -60,5 +62,28 @@ like(
 );
 
 $CLASS->full_reset;
+
+# The root travels with the event, resolved the same way the file list was.
+{
+    my $tmp  = Path::Tiny->tempdir;
+    my $real = $tmp->child('real');
+    $real->mkpath;
+    $real->child('ttt.pl')->spew("1;\n");
+
+    $CLASS->full_reset;
+    $CLASS->touch_source_file($real->child('ttt.pl')->stringify);
+
+    $events = intercept { $CLASS->report(root => "$real") };
+    ($ev) = grep { $_->facet_data->{coverage} } @$events;
+
+    like(
+        $ev->facet_data->{coverage},
+        {
+            root  => $real->realpath->stringify,
+            files => {'ttt.pl' => {'*' => ['*']}},
+        },
+        "coverage event names the root its file list is relative to"
+    );
+}
 
 done_testing;

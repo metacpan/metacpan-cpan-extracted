@@ -9,10 +9,10 @@ use Regexp::Common 'balanced';
 use Moo;
 
 use App::mkpkgconfig::PkgConfig::Entry;
-use constant Keyword => 'App::mkpkgconfig::PkgConfig::Entry::Keyword';
+use constant Keyword  => 'App::mkpkgconfig::PkgConfig::Entry::Keyword';
 use constant Variable => 'App::mkpkgconfig::PkgConfig::Entry::Variable';
 
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 use IO::File   ();
 use IO::Handle ();
@@ -60,23 +60,34 @@ has _variables => (
 
 sub new_from {
     my $class = shift;
-    my $file = shift;
+    my $file  = shift;
 
     open( my $fh, '<', $file )
-      or croak ("unable to open $file\n" );
+      or croak( "unable to open $file\n" );
 
-    my $pkg  = $class->new;
+    my $pkg = $class->new;
 
-    while ( defined( $_ = $fh->getline) ) {
+    while ( defined( $_ = $fh->getline ) ) {
 
-        next if /^\s*#/; # ignore comments
-        next if /^\s*$/; # ignore empty lines
+        next if /^\s*#/;    # ignore comments
+        next if /^\s*$/;    # ignore empty lines
 
         chomp;
+        ## no critic (ComplexRegexes)
         croak( "unable to parse line: $_\n" )
-          unless /^[\s]*(?<name>[^\s:=]+)\s*(?<op>[:=])\s*(?<value>.*?)\s*(#.*)?$/;
+          unless m{
+                      ^[\s]*
+                      (?<name>[^\s:=]+)
+                      \s*
+                      (?<op>[:=])
+                      \s*
+                      (?<value>.*?)
+                      \s*
+                      (?:[#].*)?
+                      $
+              }x;
 
-        if ( $+{op} eq ':' ) {
+        if ( $+{op} eq q{:} ) {
             $pkg->add_keyword( $+{name} => $+{value} );
         }
         else {
@@ -152,7 +163,7 @@ sub keywords {
 sub add_variable {
     my ( $self, $name, $value ) = @_;
 
-    croak ( "attempt to set $name to an undefined value\n" )
+    croak( "attempt to set $name to an undefined value\n" )
       unless defined $name;
     $self->_variables->{$name} = Variable->new( $name, $value );
 }
@@ -169,7 +180,7 @@ sub add_variables {
     my ( $self, $variables ) = @_;
 
     $self->add_variable( $_, $variables->{$_} )
-      for keys %{ $variables };
+      for keys %{$variables};
 }
 
 
@@ -184,7 +195,7 @@ sub add_variables {
 sub add_keyword {
     my ( $self, $name, $value ) = @_;
 
-    croak ( "attempt to set $name to an undefined value\n" )
+    croak( "attempt to set $name to an undefined value\n" )
       unless defined $name;
 
     $self->_keywords->{$name} = Keyword->new( $name, $value );
@@ -202,7 +213,7 @@ sub add_keywords {
     my ( $self, $keywords ) = @_;
 
     $self->add_keyword( $_, $keywords->{$_} )
-      for keys %{ $keywords };
+      for keys %{$keywords};
 }
 
 
@@ -237,14 +248,14 @@ sub add_keywords {
 
 
 
-sub write {
+sub write {    ## no critic (BuiltinHomonyms)
     my ( $self, $file ) = ( shift, shift );
 
     my %options = (
-                   vars => [],
-                   write => 'all',
-                   @_
-                   );
+        vars  => [],
+        write => 'all',
+        @_,
+    );
 
     my $fh
       = defined $file
@@ -253,7 +264,7 @@ sub write {
       or croak( "unable to create $file: $!\n" );
 
     if ( $options{comments} && @{ $options{comments} } ) {
-        $fh->say( "# $_" ) for @{ $options{comments}};
+        $fh->say( "# $_" ) for @{ $options{comments} };
         $fh->say();
     }
 
@@ -262,8 +273,7 @@ sub write {
     if ( $options{write} eq 'req' ) {
 
         if ( defined $options{vars} ) {
-            push @entries, $self->_variables->{$_}
-              // croak( "request for an undefined variable: $_\n" )
+            push @entries, $self->_variables->{$_} // croak( "request for an undefined variable: $_\n" )
               for @{ $options{vars} };
         }
     }
@@ -285,7 +295,7 @@ sub write {
 }
 
 sub _entry_type {
-    $_[0]->isa( Keyword ) ? "Keyword" : "Variable",
+    $_[0]->isa( Keyword ) ? 'Keyword' : 'Variable';
 }
 
 
@@ -329,16 +339,14 @@ sub resolve_dependencies {
                         sprintf(
                             "%s '%s' has a circular dependency: %s\n",
                             _entry_type( $entry ),
-                            $entry->name,
-                            join( '->', $track->keys, $name ) ) );
+                            $entry->name, join( '->', $track->keys, $name ) ) );
                 }
 
                 my $var = $self->_variables->{$name} // croak(
                     sprintf(
                         "%s '%s' depends upon an undefined variable: %s\n",
                         _entry_type( $entry ),
-                        $entry->name,
-                        join( '->', $track->keys, $name, 'undef' ),
+                        $entry->name, join( '->', $track->keys, $name, 'undef' ),
                     ) );
 
                 $track->push( $name, undef );
@@ -350,7 +358,7 @@ sub resolve_dependencies {
             pop @depends;
         }
 
-        delete $validated{$entry->name} if $entry->isa( Keyword );
+        delete $validated{ $entry->name } if $entry->isa( Keyword );
     }
 
     return keys %validated;
@@ -373,8 +381,8 @@ sub order_variables {
 
     @needed = do { my %uniqstr; @uniqstr{@needed} = (); keys %uniqstr; };
 
-    my %dephash = map {
-        $_ => [ ( $self->_variables->{$_} // croak( "unknown variable: $_\n" ) )->depends ] }
+    my %dephash
+      = map { $_ => [ ( $self->_variables->{$_} // croak( "unknown variable: $_\n" ) )->depends ] }
       @needed;
 
     require Algorithm::Dependency::Ordered;
@@ -391,15 +399,14 @@ sub order_variables {
         $ordered = $deps->schedule( @needed );
 
         if ( !defined $ordered ) {
-            die( "error in variable dependencies: perhaps there's cycle?\n" ),;
+            die( "error in variable dependencies: perhaps there's cycle?\n" );
         }
-    };
-
-    if ( length( my $err = $@ ) ) {
+        1;
+    } or do {
+        my $err = $@;
         require Data::Dumper;
-        die( $err,
-            Data::Dumper->Dump( [ \%dephash, \@needed ], [qw( deps needed )] ) );
-    }
+        die( $err, Data::Dumper->Dump( [ \%dephash, \@needed ], [qw( deps needed )] ) );
+    };
 
     # move variables with no dependencies to the beginning of the list
     # to make it more human friendly
@@ -428,12 +435,11 @@ sub order_keywords {
     my ( @keywords ) = @_;
 
     my %keywords;
-    @keywords{ @keywords } = ();
+    @keywords{@keywords} = ();
 
-    my @first_keys
-      = grep { exists $keywords{$_} } qw( Name Description Version );
+    my @first_keys = grep { exists $keywords{$_} } qw( Name Description Version );
     my %last_keys;
-    @last_keys{ @keywords } = ();
+    @last_keys{@keywords} = ();
     delete @last_keys{@first_keys};
 
     return @first_keys, keys %last_keys;
@@ -463,7 +469,7 @@ App::mkpkgconfig::PkgConfig - output pkg-config .pc files
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 SYNOPSIS
 
@@ -620,17 +626,17 @@ and C<Version> keywords are at the beginning of the list.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-app-mkpkgconfig@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=App-mkpkgconfig
+Please report any bugs or feature requests to bug-app-mkpkgconfig@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-mkpkgconfig>
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/app-mkpkgconfig
+  https://codeberg.org/djerius/p5-App-mkpkgconfig
 
 and may be cloned from
 
-  https://gitlab.com/djerius/app-mkpkgconfig.git
+  https://codeberg.org/djerius/p5-App-mkpkgconfig.git
 
 =head1 SEE ALSO
 
@@ -646,7 +652,7 @@ L<script::mkpkgconfig|script::mkpkgconfig>
 
 =head1 AUTHOR
 
-Diab Jerius <djerius@cpan.org>
+Diab Jerius <djerius@sao.si.edu>
 
 =head1 COPYRIGHT AND LICENSE
 

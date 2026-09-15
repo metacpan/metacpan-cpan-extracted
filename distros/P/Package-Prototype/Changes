@@ -1,5 +1,15 @@
 Revision history for Perl extension Package-Prototype
 
+0.02 2026-09-14T09:13:38Z
+
+    - Add create() with explicit property readers, writers, and CODE data values.
+    - Verify positional signatures and Perl 5.44 named parameters.
+    - Fix Unicode method names and class labels on Perl 5.36 and later.
+    - Preserve native boolean values through getters and property writers.
+    - Fix getter lifetimes, replacement caches, and leaks on normal and exception paths.
+    - Test Perl 5.12 and 5.36 through 5.44. Perl 5.8 remains unverified.
+    - Declare the XS build helper as a configure dependency.
+
 0.01 2018-03-22T12:56:46Z
 
     - original version

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10;
 package NetAddr::MAC;
-$NetAddr::MAC::VERSION = '1.02';
+$NetAddr::MAC::VERSION = '1.03';
 
 use Carp qw( croak );
 use Exporter 'import';
@@ -89,135 +89,132 @@ sub new {
 
 }
 
-{
+sub _init {
 
-    sub _init {
+    my ( $self, %args ) = @_;
 
-        my ( $self, %args ) = @_;
+    # the object option wins over the global, and a defined false value
+    # must be able to switch dying off
+    $self->{_die} = defined $args{die_on_error}
+        ? ( $args{die_on_error} ? 1 : 0 )
+        : ( $NetAddr::MAC::die_on_error ? 1 : 0 );
 
-        # the object option wins over the global, and a defined false value
-        # must be able to switch dying off
-        $self->{_die} = defined $args{die_on_error}
-            ? ( $args{die_on_error} ? 1 : 0 )
-            : ( $NetAddr::MAC::die_on_error ? 1 : 0 );
+    $self->{original} = $args{mac};
 
-        $self->{original} = $args{mac};
-
-        if ( defined $args{mac} and $args{mac} =~ m/^([0-9]+)\#(.+)$/ ) {
-            $self->{priority} = $1;
-            $args{mac} = $2;
-        }
-
-        for my $p ( grep { defined } $self->{priority}, $args{priority} ) {
-            next if $p =~ m/^[0-9]+$/ and $p <= MAXPRIORITY;
-            my $e = "Invalid priority '$p', must be an integer from 0 to " . MAXPRIORITY;
-            croak "$e\n" if $self->{_die};
-            $NetAddr::MAC::errstr = $e;
-            return
-        }
-
-        $self->{mac} = _mac_to_integers( $args{mac}, $self->{_die} );
-
-        unless ( $self->{mac} ) {
-            croak $NetAddr::MAC::errstr . "\n" if $self->{_die};
-            return
-        }
-
-        if (defined $self->{priority}) {
-            if ( defined $args{priority} and $args{priority} != $self->{priority} ) {
-                my $e = "Conflicting priority in '$self->{original}' and priority argument $args{priority}";
-                croak "$e\n" if $self->{_die};
-                $NetAddr::MAC::errstr = $e;
-                return
-            }
-        }
-        else {
-            $self->{priority} = $args{priority} // 0;
-        }
-
-        # check none of the list elements are empty
-        # grep, not first: first returns the element, and an empty string
-        # is false, so the check it guarded never fired
-        if ( grep { not defined $_ or 0 == length $_ } @{ $self->{mac} } ) {
-
-            my $e = "Invalid MAC format '$self->{original}'";
-            croak "$e\n" if $self->{_die};
-            $NetAddr::MAC::errstr = $e;
-            return
-        }
-
-        return 1
-
+    if ( defined $args{mac} and $args{mac} =~ m/^([0-9]+)\#(.+)$/ ) {
+        $self->{priority} = $1;
+        $args{mac} = $2;
     }
 
-    sub _mac_to_integers {
-
-        my ( $mac, $die ) = @_;
-        my $e;
-
-        # procedural callers pass no flag and get the global behaviour
-        $die = ( $NetAddr::MAC::die_on_error ? 1 : 0 ) unless defined $die;
-
-        CHECK_BLOCK:
-        {
-
-            unless ( defined $mac and length $mac ) {
-                $e = 'Please provide a mac address';
-                last CHECK_BLOCK;
-            }
-
-            # be nice, strip leading and trailing whitespace
-            $mac =~ s/^\s+//;
-            $mac =~ s/\s+$//;
-
-            # bpr prefix is "1,<octet count>," and the count must match the
-            # octets that follow
-            my $bpr_count;
-            $bpr_count = $1 if $mac =~ s{^1,([0-9]+),}{};
-
-            # avoid matching ipv6
-            last CHECK_BLOCK if $mac =~ m/[a-f0-9]{1,4}:[a-f0-9]{1,4}::([a-f0-9]{1,4})?/i;
-            last CHECK_BLOCK if $mac =~ m/[a-f0-9]{1,4}::[a-f0-9]{1,4}:[a-f0-9]{1,4}/i;
-
-            my @parts = grep { length } split( /[^a-z0-9]+/ix, $mac );
-
-            # anything other than hex...
-            last CHECK_BLOCK if ( first { m{[^a-f0-9]}i } @parts );
-
-            # resolve wierd things like aabb.cc.00.11.22 or 11.22.33.aabbcc
-            @parts = map {
-                my $o = $_;
-                (length($o) % 2) == 0
-                    ? $o =~ m/(..)/g
-                    : $o
-                } @parts;
-
-            # every part is now one or two hex digits, or it is not an octet.
-            # a longer part must never reach hex(), it would yield a value
-            # above 255 that every as_* method then prints back verbatim
-            last CHECK_BLOCK if grep { length $_ > 2 } @parts;
-
-            # 00:19:e3:01:0e:72, 0019.e301.0e72, 0019e3010e72 and friends all
-            # arrive here as 6 or 8 parts after the split above
-            last CHECK_BLOCK if defined $bpr_count and $bpr_count != @parts;
-
-            if ( @parts == EUI48LENGTHDEC || @parts == EUI64LENGTHDEC ) {
-                return [ map { hex($_) } @parts ]
-            }
-
-
-
-        }
-
-        $e ||= "Invalid MAC format '$mac'";
-
-        croak "$e\n" if $die;
-
+    for my $p ( grep { defined } $self->{priority}, $args{priority} ) {
+        next if $p =~ m/^[0-9]+$/ and $p <= MAXPRIORITY;
+        my $e = "Invalid priority '$p', must be an integer from 0 to " . MAXPRIORITY;
+        croak "$e\n" if $self->{_die};
         $NetAddr::MAC::errstr = $e;
-
         return
     }
 
+    $self->{mac} = _mac_to_integers( $args{mac}, $self->{_die} );
+
+    unless ( $self->{mac} ) {
+        croak $NetAddr::MAC::errstr . "\n" if $self->{_die};
+        return
+    }
+
+    if (defined $self->{priority}) {
+        if ( defined $args{priority} and $args{priority} != $self->{priority} ) {
+            my $e = "Conflicting priority in '$self->{original}' and priority argument $args{priority}";
+            croak "$e\n" if $self->{_die};
+            $NetAddr::MAC::errstr = $e;
+            return
+        }
+    }
+    else {
+        $self->{priority} = $args{priority} // 0;
+    }
+
+    # check none of the list elements are empty
+    # grep, not first: first returns the element, and an empty string
+    # is false, so the check it guarded never fired
+    if ( grep { not defined $_ or 0 == length $_ } @{ $self->{mac} } ) {
+        my $e = "Invalid MAC format '$self->{original}'";
+        croak "$e\n" if $self->{_die};
+        $NetAddr::MAC::errstr = $e;
+        return
+    }
+
+    return 1
+
+}
+
+sub _mac_to_integers {
+
+    my ( $mac, $die ) = @_;
+    my $e;
+
+    # procedural callers pass no flag and get the global behaviour
+    $die = ( $NetAddr::MAC::die_on_error ? 1 : 0 ) unless defined $die;
+
+    CHECK_BLOCK:
+    {
+
+        unless ( defined $mac and length $mac ) {
+            $e = 'Please provide a mac address';
+            last CHECK_BLOCK;
+        }
+
+        # be nice, strip leading and trailing whitespace
+        $mac =~ s/^\s+//;
+        $mac =~ s/\s+$//;
+
+        # bridge id form "<priority>#<mac>". _init has already taken the
+        # priority for objects, the procedural functions just discard it
+        $mac =~ s{^[0-9]+\#}{};
+
+        # bpr prefix is "1,<octet count>," and the count must match the
+        # octets that follow
+        my $bpr_count;
+        $bpr_count = $1 if $mac =~ s{^1,([0-9]+),}{};
+
+        # avoid matching ipv6
+        last CHECK_BLOCK if $mac =~ m/[a-f0-9]{1,4}:[a-f0-9]{1,4}::([a-f0-9]{1,4})?/i;
+        last CHECK_BLOCK if $mac =~ m/[a-f0-9]{1,4}::[a-f0-9]{1,4}:[a-f0-9]{1,4}/i;
+
+        my @parts = grep { length } split( /[^a-z0-9]+/ix, $mac );
+
+        # anything other than hex...
+        last CHECK_BLOCK if ( first { m{[^a-f0-9]}i } @parts );
+
+        # resolve wierd things like aabb.cc.00.11.22 or 11.22.33.aabbcc
+        @parts = map {
+            my $o = $_;
+            (length($o) % 2) == 0
+                ? $o =~ m/(..)/g
+                : $o
+            } @parts;
+
+        # every part is now one or two hex digits, or it is not an octet.
+        # a longer part must never reach hex(), it would yield a value
+        # above 255 that every as_* method then prints back verbatim
+        last CHECK_BLOCK if grep { length $_ > 2 } @parts;
+
+        # 00:19:e3:01:0e:72, 0019.e301.0e72, 0019e3010e72 and friends all
+        # arrive here as 6 or 8 parts after the split above
+        last CHECK_BLOCK if defined $bpr_count and $bpr_count != @parts;
+
+        if ( @parts == EUI48LENGTHDEC || @parts == EUI64LENGTHDEC ) {
+            return [ map { hex($_) } @parts ]
+        }
+
+    }
+
+    $e ||= "Invalid MAC format '$mac'";
+
+    croak "$e\n" if $die;
+
+    $NetAddr::MAC::errstr = $e;
+
+    return
 }
 
 sub _oui_to_integers {
@@ -638,7 +635,6 @@ sub to_eui64 {
         ];
 
     }
-    else { return }
 
     return 1
 }
@@ -954,7 +950,6 @@ sub mac_as_bpr {
     $mac = _mac_to_integers($mac) or return;
     return as_bpr( { mac => $mac } )
 
-
 }
 
 
@@ -1121,7 +1116,7 @@ NetAddr::MAC - MAC hardware address functions and object (EUI48 and EUI64)
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 

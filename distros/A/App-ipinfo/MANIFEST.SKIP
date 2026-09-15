@@ -14,3 +14,5 @@ nytprof
 \.icloud$
 \A\.github\b
 \.gitattributes\b
+
+.downstream.json

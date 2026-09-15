@@ -21,7 +21,7 @@ our $READ_SIZE = 262_144;
     package Linux::Event::Bench::PayloadSweep::Base;
     use parent 'Linux::Event::IO::Sock::Stream';
 
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return read_size => $main::READ_SIZE,
             read_budget_bytes => $main::READ_SIZE;
     }

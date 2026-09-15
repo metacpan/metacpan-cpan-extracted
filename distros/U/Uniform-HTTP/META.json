@@ -1,0 +1,60 @@
+{
+   "abstract" : "Framework-neutral HTTP messages and authentication",
+   "author" : [
+      "Joshua S. Day <HAX@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Uniform-HTTP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Crypt::SysRandom" : "0.006",
+            "Digest::MD5" : "0",
+            "Digest::SHA" : "5.60",
+            "Encode" : "0",
+            "MIME::Base64" : "0",
+            "Unicode::Normalize" : "0",
+            "parent" : "0",
+            "perl" : "5.016"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haxmeister/perl-Uniform-HTTP/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haxmeister/perl-Uniform-HTTP.git",
+         "web" : "https://github.com/haxmeister/perl-Uniform-HTTP"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

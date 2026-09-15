@@ -11,11 +11,11 @@ use strict;
 use warnings;
 
 package HTML::FromANSI::Tiny;
-# git description: v0.106-2-g1454a0d
+# git description: v0.107-3-gefc628d
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Easily convert colored command line output to HTML
-$HTML::FromANSI::Tiny::VERSION = '0.107';
+$HTML::FromANSI::Tiny::VERSION = '0.108';
 our @COLORS = map { "#$_" }
 qw(
   000  f33  2c2  bb0  55c  d3d  0cc  bbb
@@ -85,6 +85,26 @@ sub attr_to_class {
 }
 
 
+sub attr_to_style {
+  my ($self, $attr) = @_;
+  return $self->_css_class_attr->{ $attr } || $self->_rgb_style($attr);
+}
+
+# The 24-bit color attribute names are those Parse::ANSIColor::Tiny produces
+# (the same ones Term::ANSIColor uses).  Note that the 256-palette names
+# ('rgb515', 'on_rgb000') deliberately don't match this.
+sub _rgb_style {
+  my ($self, $attr) = @_;
+
+  my ($on, @rgb) = $attr =~ /\A(on_)?r([0-9]+)g([0-9]+)b([0-9]+)\z/
+    or return {};
+
+  return {
+    ($on ? 'background-color' : 'color') => sprintf('#%02x%02x%02x', @rgb),
+  };
+}
+
+
 sub css {
   my ($self) = @_;
   my $prefix = $self->{selector_prefix} . '.' . $self->{class_prefix};
@@ -96,7 +116,7 @@ sub css {
       sprintf "%s%s { %s }",
         ${prefix},
         $self->attr_to_class($_),
-        $self->_css_attr_string($styles->{$_})
+        $self->_css_attr_string($self->attr_to_style($_))
     }
       sort keys %$styles
   );
@@ -136,7 +156,10 @@ sub _css_class_attr {
 
 sub _css_attr_string {
   my ($self, $attr) = @_;
-  return join ' ', map { "$_: $attr->{$_};" } keys %$attr;
+  # Sorted so that a style with more than one property is reproducible.
+  # It also happens to put a shorthand before the longhands it can be
+  # overridden by, since its name is a prefix of theirs.
+  return join ' ', map { "$_: $attr->{$_};" } sort keys %$attr;
 }
 
 
@@ -145,10 +168,7 @@ sub html {
   $text = $self->ansi_parser->parse($text)
     unless ref($text) eq 'ARRAY';
 
-  my $tag    = $self->{tag};
-  my $prefix = $self->{class_prefix};
-  # Preload if needed; Don't load if not.
-  my $styles = $self->{inline_style} ? $self->_css_class_attr : {};
+  my $tag = $self->{tag};
 
   local $_;
   my @html = map {
@@ -157,17 +177,56 @@ sub html {
 
     $self->{no_plain_tags} && !@$attr
       ? $h
-      : do {
-        sprintf q[<%s %s="%s">%s</%s>], $tag,
-          ($self->{inline_style}
-            ? (style => join ' ', map { $self->_css_attr_string($styles->{$_}) } @$attr)
-            : (class => join ' ', map { $prefix . $self->attr_to_class($_) } @$attr)
-          ), $h, $tag;
-      }
+      : sprintf q[<%s %s>%s</%s>],
+          $tag, $self->_tag_attributes($attr), $h, $tag;
 
   } @$text;
 
   return wantarray ? @html : join('', @html);
+}
+
+# Build the tag attributes for one run of text.  Note that the class path
+# never asks for the style table: building it isn't free, and it makes the
+# parser enumerate its colors.
+sub _tag_attributes {
+  my ($self, $attr) = @_;
+
+  if( $self->{inline_style} ){
+    my $style = $self->_style_string(map { $self->attr_to_style($_) } @$attr);
+    return sprintf q[style="%s"], $style;
+  }
+
+  my $prefix = $self->{class_prefix};
+  my @html = sprintf q[class="%s"], join ' ',
+    map { $prefix . $self->attr_to_class($_) } @$attr;
+
+  my $style = $self->_style_string(map { $self->_classless_style($_) } @$attr);
+
+  push @html, sprintf q[style="%s"], $style
+    if length $style;
+
+  return join ' ', @html;
+}
+
+# css() can't very well emit a rule for each of sixteen million colors, so a
+# 24-bit color has to be styled inline even when we're generating classes.
+# Consulting $self->{styles} rather than the merged table is what keeps the
+# class path from building the style table; a 24-bit color is never one of the
+# built-in styles anyway.
+# -- claude, 2026-09-08
+sub _classless_style {
+  my ($self, $attr) = @_;
+
+  # A color the caller gave us a style for gets a class and a rule from css()
+  # like any other attribute, so it needs nothing inline.
+  return {} if $self->{styles} && $self->{styles}->{$attr};
+
+  return $self->_rgb_style($attr);
+}
+
+sub _style_string {
+  my ($self, @styles) = @_;
+  return join ' ', grep { length } map { $self->_css_attr_string($_) } @styles;
 }
 
 
@@ -211,8 +270,8 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Randy Stauner ACKNOWLEDGEMENTS inline hashrefs html customizable cpan
-testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata
+=for :stopwords Randy Stauner ACKNOWLEDGEMENTS inline hashrefs truecolor html customizable
+cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata
 placeholders metacpan
 
 =head1 NAME
@@ -221,7 +280,7 @@ HTML::FromANSI::Tiny - Easily convert colored command line output to HTML
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 SYNOPSIS
 
@@ -320,6 +379,22 @@ The default returns the string provided.
 
   $hfat->attr_to_class('red'); # default returns 'red'
 
+=head2 attr_to_style
+
+Takes an ANSI attribute name such as 'red' or 'bold'
+and returns a hash ref of the CSS properties for it
+(as used by L</css> and C<inline_style>).
+
+  $hfat->attr_to_style('red'); # default returns { color => '#f33' }
+
+The C<styles> passed to the constructor take precedence,
+then the built-in defaults.
+The 24-bit colors are computed on demand,
+since there are far too many of them to keep in a table.
+
+Returns an empty hash ref for an attribute with no style,
+such as C<reverse>.
+
 =head2 css
 
   my $css = $hfat->css();
@@ -378,6 +453,13 @@ For example:
 C<$text> may be a string marked with ANSI escape sequences
 or the array ref output of L<Parse::ANSIColor::Tiny>
 if you already have that.
+
+A 24-bit color also gets an inline C<style=""> attribute,
+since L</css> cannot emit a rule for each of sixteen million colors:
+
+  qq[<span class="r255g0b0" style="color: #ff0000;">foo</span>]
+
+See L</24-BIT COLOR>.
 
 In list context returns a list of HTML tags.
 
@@ -441,6 +523,32 @@ pass to the constructor a tree of hashrefs as the C<styles> attribute:
   }
 
 Any styles that are not overridden will get the defaults.
+
+=head1 24-BIT COLOR
+
+Terminals that support 24-bit ("truecolor") sequences
+name a color outright rather than choosing from a palette:
+C<38;2;I<r>;I<g>;I<b>> for the foreground
+and C<48;2;I<r>;I<g>;I<b>> for the background.
+
+L<Parse::ANSIColor::Tiny> identifies these as
+C<< rI<R>gI<G>bI<B> >> and C<< on_rI<R>gI<G>bI<B> >>,
+the names L<Term::ANSIColor> uses for them,
+and this module turns those into CSS colors.
+
+Don't confuse them with the 256-color palette names,
+which look deceptively similar:
+C<rgb515> is one of the 216 palette colors,
+while C<r5g1b5> is very nearly black.
+
+Since there are sixteen million of these colors
+they can't be given class definitions ahead of time by L</css>,
+so L</html> writes them into a C<style=""> attribute
+even when it is generating classes.
+If you would rather it didn't,
+override L</attr_to_style> in a subclass to return an empty hash ref for them
+(or provide a C<styles> entry for the specific colors you care about,
+which will then get a class and a rule from L</css> like anything else).
 
 =head1 COMPARISON TO HTML::FromANSI
 
@@ -511,11 +619,21 @@ L<https://github.com/rwstauner/HTML-FromANSI-Tiny>
 
 Randy Stauner <rwstauner@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Stephen Thirlwall
+=for stopwords Ricardo Signes Stephen Thirlwall
+
+=over 4
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
 
 Stephen Thirlwall <sdt@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

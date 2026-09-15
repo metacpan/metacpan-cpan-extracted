@@ -62,7 +62,7 @@ throws_ok {
 
 throws_ok {
 	Database::Join->new(databases => ['not an object']);
-} qr/not a Database::Abstraction/i, 'non-object element is rejected';
+} qr/does not support the selectall_arrayref/i, 'non-object element is rejected';
 
 throws_ok {
 	Database::Join->new(databases => [ $cust, $loyalty ], join_type => 'bad');

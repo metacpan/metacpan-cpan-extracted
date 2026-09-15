@@ -9,7 +9,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '2.84'; # VERSION
+our $VERSION = '2.87'; # VERSION
 
 
 sub new
@@ -414,7 +414,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 2.84
+version 2.87
 
 =head1 SYNOPSIS
 
@@ -644,6 +644,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 nick nauwelaerts (INPHOBIA)
 
 Florian Weimer
+
+Marcel Telka (mtelka)
 
 =head1 COPYRIGHT AND LICENSE
 

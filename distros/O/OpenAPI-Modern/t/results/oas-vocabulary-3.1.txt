@@ -1,4 +1,5 @@
-generated with:              Test::JSON::Schema::Acceptance 1.037
+generated with:              Test::JSON::Schema::Acceptance 1.039
+on perl:                     v5.45.2
 specification version:       draft2020-12
 using custom test directory: t/oas-vocabulary/3.1
 optional tests included:     no

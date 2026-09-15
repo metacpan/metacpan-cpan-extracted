@@ -52,7 +52,7 @@ die "warmup must be non-negative\n" if $warmup < 0;
     our %READ_SIZE;
     our ($CAPTURE_A, $CAPTURE_B, $CAPTURE_C, $CAPTURE_D) = (1, 2, 3, 4);
 
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return read_size => $READ_SIZE{$class}, read_batch_bytes => 0;
     }
 

@@ -15,7 +15,9 @@ t/basic.t
 t/codigos.t
 t/function.t
 t/municipios.t
+t/paridad.t
 t/pod.t
+t/provincias.t
 xt/author/distmeta.t
 xt/author/eol.t
 xt/author/no-tabs.t

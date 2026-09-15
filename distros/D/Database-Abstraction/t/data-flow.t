@@ -21,6 +21,7 @@ use File::Spec;
 use File::Temp qw(tempdir);
 use Scalar::Util qw(blessed reftype weaken);
 use Test::Most;
+use Test::Needs;
 use Test::Returns;
 use Readonly;
 
@@ -584,142 +585,138 @@ subtest 'DF-7: id column propagation (D → U)' => sub {
 #        second query hits cache (U) → distinct criteria produce distinct keys
 # ═══════════════════════════════════════════════════════════════════════════
 subtest 'DF-8: CHI cache data flow (MISS → SET → HIT)' => sub {
+	test_needs 'CHI';
+	# DF-8.1: cache MISS — data fetched from backend (D in cache)
+	{
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '10 minutes');
+		my $cnt   = $db->count();
+		cmp_ok $cnt, '==', $CONFIG{TOTAL_ROWS},
+			'DF-8.1: count on cache MISS returns correct value from backend';
+	}
 
-	SKIP: {
-		eval { require CHI } or skip 'CHI not installed', 11;
+	# DF-8.2: cache HIT — equivalent data returned without hitting backend again.
+	# CHI Memory driver serializes/deserializes data, so the returned ref is a new
+	# copy on each HIT — use is_deeply (content equality) not is (ref equality).
+	{
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
+		my $r1    = $db->selectall_arrayref();    # MISS — populates cache (D)
+		my $r2    = $db->selectall_arrayref();    # HIT — reads from cache (U)
+		is_deeply $r1, $r2,
+			'DF-8.2: selectall_arrayref cache HIT returns equivalent data (U)';
+		cmp_ok scalar(@{$r2}), '>', 0,
+			'DF-8.2b: cache HIT result is non-empty';
+	}
 
-		# DF-8.1: cache MISS — data fetched from backend (D in cache)
-		{
-			my $cache = CHI->new(driver => 'Memory', global => 0);
-			my $db    = _new_db(cache => $cache, cache_duration => '10 minutes');
-			my $cnt   = $db->count();
-			cmp_ok $cnt, '==', $CONFIG{TOTAL_ROWS},
-				'DF-8.1: count on cache MISS returns correct value from backend';
-		}
+	# DF-8.3: count() and selectall_arrayref() produce distinct cache keys (D→D)
+	{
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
+		my $r1    = $db->selectall_arrayref();    # populates cache
+		my $r2    = $db->selectall_arrayref();    # HIT — same key
+		# Two calls with same params should use the same key (not two separate ones)
+		is_deeply $r1, $r2,
+			'DF-8.3: repeated selectall_arrayref with same params uses same cache key';
+	}
 
-		# DF-8.2: cache HIT — equivalent data returned without hitting backend again.
-		# CHI Memory driver serializes/deserializes data, so the returned ref is a new
-		# copy on each HIT — use is_deeply (content equality) not is (ref equality).
-		{
-			my $cache = CHI->new(driver => 'Memory', global => 0);
-			my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
-			my $r1    = $db->selectall_arrayref();    # MISS — populates cache (D)
-			my $r2    = $db->selectall_arrayref();    # HIT — reads from cache (U)
-			is_deeply $r1, $r2,
-				'DF-8.2: selectall_arrayref cache HIT returns equivalent data (U)';
-			cmp_ok scalar(@{$r2}), '>', 0,
-				'DF-8.2b: cache HIT result is non-empty';
-		}
+	# DF-8.4: criteria-parameterised query produces a distinct cache key from uncritiqued query
+	{
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
+		my $r_all = $db->selectall_arrayref();
+		my $r_one = $db->selectall_arrayref(entry => $CONFIG{ENTRY_ONE});
+		isnt $r_all, $r_one,
+			'DF-8.4: distinct criteria produce distinct cached refs';
+		cmp_ok scalar(@{$r_all}), '>', scalar(@{$r_one}),
+			'DF-8.4b: uncritiqued result has more rows than filtered result';
+	}
 
-		# DF-8.3: count() and selectall_arrayref() produce distinct cache keys (D→D)
-		{
-			my $cache = CHI->new(driver => 'Memory', global => 0);
-			my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
-			my $r1    = $db->selectall_arrayref();    # populates cache
-			my $r2    = $db->selectall_arrayref();    # HIT — same key
-			# Two calls with same params should use the same key (not two separate ones)
-			is_deeply $r1, $r2,
-				'DF-8.3: repeated selectall_arrayref with same params uses same cache key';
-		}
+	# DF-8.5: two objects sharing the same cache instance share HIT entries.
+	# CHI Memory driver deserializes on GET so ref identity doesn't hold — use is_deeply.
+	# Sort by entry for a stable comparison (hash/cache iteration order is arbitrary).
+	{
+		my $shared = CHI->new(driver => 'Memory', global => 0);
+		my $db1    = _new_db(cache => $shared, cache_duration => '1 hour');
+		my $db2    = _new_db(cache => $shared, cache_duration => '1 hour');
+		my $r1     = $db1->selectall_arrayref();    # populates shared cache
+		my $r2     = $db2->selectall_arrayref();    # reads same cache entry
+		my @s1     = sort { $a->{'entry'} cmp $b->{'entry'} } @{$r1};
+		my @s2     = sort { $a->{'entry'} cmp $b->{'entry'} } @{$r2};
+		is_deeply \@s1, \@s2,
+			'DF-8.5: two objects sharing a cache retrieve equivalent cached data (sorted)';
+	}
 
-		# DF-8.4: criteria-parameterised query produces a distinct cache key from uncritiqued query
-		{
-			my $cache = CHI->new(driver => 'Memory', global => 0);
-			my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
-			my $r_all = $db->selectall_arrayref();
-			my $r_one = $db->selectall_arrayref(entry => $CONFIG{ENTRY_ONE});
-			isnt $r_all, $r_one,
-				'DF-8.4: distinct criteria produce distinct cached refs';
-			cmp_ok scalar(@{$r_all}), '>', scalar(@{$r_one}),
-				'DF-8.4b: uncritiqued result has more rows than filtered result';
-		}
+	# DF-8.6: count() derives from selectall cache entry when available
+	{
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
+		my $all   = $db->selectall_arrayref();    # populates cache
+		my $cnt   = $db->count();                  # should derive from cached entry
+		is $cnt, scalar(@{$all}),
+			'DF-8.6: count() derived from selectall cache equals actual row count';
+	}
 
-		# DF-8.5: two objects sharing the same cache instance share HIT entries.
-		# CHI Memory driver deserializes on GET so ref identity doesn't hold — use is_deeply.
-		# Sort by entry for a stable comparison (hash/cache iteration order is arbitrary).
-		{
-			my $shared = CHI->new(driver => 'Memory', global => 0);
-			my $db1    = _new_db(cache => $shared, cache_duration => '1 hour');
-			my $db2    = _new_db(cache => $shared, cache_duration => '1 hour');
-			my $r1     = $db1->selectall_arrayref();    # populates shared cache
-			my $r2     = $db2->selectall_arrayref();    # reads same cache entry
-			my @s1     = sort { $a->{'entry'} cmp $b->{'entry'} } @{$r1};
-			my @s2     = sort { $a->{'entry'} cmp $b->{'entry'} } @{$r2};
-			is_deeply \@s1, \@s2,
-				'DF-8.5: two objects sharing a cache retrieve equivalent cached data (sorted)';
-		}
+	# DF-8.7: distinct cache objects do not share entries.
+	# Both objects return the same data content (from the underlying backend),
+	# but hold independent cache entries. We verify content equality (not ref identity),
+	# and that the content is correctly ordered (sorted) between the two.
+	{
+		my $ca  = CHI->new(driver => 'Memory', global => 0);
+		my $cb  = CHI->new(driver => 'Memory', global => 0);
+		my $da  = _new_db(cache => $ca, cache_duration => '1 hour');
+		my $db2 = _new_db(cache => $cb, cache_duration => '1 hour');
+		my $ra  = $da->selectall_arrayref();
+		my $rb  = $db2->selectall_arrayref();
+		my @sa  = sort { $a->{'entry'} cmp $b->{'entry'} } @{$ra};
+		my @sb  = sort { $a->{'entry'} cmp $b->{'entry'} } @{$rb};
+		is_deeply \@sa, \@sb,
+			'DF-8.7: distinct cache objects produce equivalent data (no cross-contamination)';
+	}
 
-		# DF-8.6: count() derives from selectall cache entry when available
-		{
-			my $cache = CHI->new(driver => 'Memory', global => 0);
-			my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
-			my $all   = $db->selectall_arrayref();    # populates cache
-			my $cnt   = $db->count();                  # should derive from cached entry
-			is $cnt, scalar(@{$all}),
-				'DF-8.6: count() derived from selectall cache equals actual row count';
-		}
+	# DF-8.8: fetchrow_hashref cache HIT returns equivalent data.
+	# CHI deserializes on GET so use is_deeply, not ref identity.
+	{
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
+		my $r1    = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
+		my $r2    = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
+		is_deeply $r1, $r2, 'DF-8.8: fetchrow_hashref cache HIT returns equivalent data';
+		is $r1->{'entry'}, $CONFIG{ENTRY_ONE},
+			"DF-8.8b: cached row has correct entry value '$CONFIG{ENTRY_ONE}'";
+	}
 
-		# DF-8.7: distinct cache objects do not share entries.
-		# Both objects return the same data content (from the underlying backend),
-		# but hold independent cache entries. We verify content equality (not ref identity),
-		# and that the content is correctly ordered (sorted) between the two.
-		{
-			my $ca  = CHI->new(driver => 'Memory', global => 0);
-			my $cb  = CHI->new(driver => 'Memory', global => 0);
-			my $da  = _new_db(cache => $ca, cache_duration => '1 hour');
-			my $db2 = _new_db(cache => $cb, cache_duration => '1 hour');
-			my $ra  = $da->selectall_arrayref();
-			my $rb  = $db2->selectall_arrayref();
-			my @sa  = sort { $a->{'entry'} cmp $b->{'entry'} } @{$ra};
-			my @sb  = sort { $a->{'entry'} cmp $b->{'entry'} } @{$rb};
-			is_deeply \@sa, \@sb,
-				'DF-8.7: distinct cache objects produce equivalent data (no cross-contamination)';
-		}
+	# DF-8.9: AUTOLOAD list cache HIT returns equivalent data
+	{
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
+		my @v1    = $db->number();    # list context → populates cache
+		my @v2    = $db->number();    # should be cache HIT
+		is_deeply [sort { ($a // '') cmp ($b // '') } @v2],
+			  [sort { ($a // '') cmp ($b // '') } @v1],
+			'DF-8.9: AUTOLOAD list context cache HIT returns equivalent values';
+	}
 
-		# DF-8.8: fetchrow_hashref cache HIT returns equivalent data.
-		# CHI deserializes on GET so use is_deeply, not ref identity.
-		{
-			my $cache = CHI->new(driver => 'Memory', global => 0);
-			my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
-			my $r1    = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
-			my $r2    = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
-			is_deeply $r1, $r2, 'DF-8.8: fetchrow_hashref cache HIT returns equivalent data';
-			is $r1->{'entry'}, $CONFIG{ENTRY_ONE},
-				"DF-8.8b: cached row has correct entry value '$CONFIG{ENTRY_ONE}'";
-		}
+	# DF-8.10: cache keyed by criteria — same method with different args caches separately
+	{
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
+		my $r_one = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
+		my $r_two = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_TWO});
+		isnt $r_one, $r_two,
+			'DF-8.10: fetchrow_hashref with different entry args cached at different keys';
+	}
 
-		# DF-8.9: AUTOLOAD list cache HIT returns equivalent data
-		{
-			my $cache = CHI->new(driver => 'Memory', global => 0);
-			my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
-			my @v1    = $db->number();    # list context → populates cache
-			my @v2    = $db->number();    # should be cache HIT
-			is_deeply [sort { ($a // '') cmp ($b // '') } @v2],
-			          [sort { ($a // '') cmp ($b // '') } @v1],
-				'DF-8.9: AUTOLOAD list context cache HIT returns equivalent values';
-		}
-
-		# DF-8.10: cache keyed by criteria — same method with different args caches separately
-		{
-			my $cache = CHI->new(driver => 'Memory', global => 0);
-			my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
-			my $r_one = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
-			my $r_two = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_TWO});
-			isnt $r_one, $r_two,
-				'DF-8.10: fetchrow_hashref with different entry args cached at different keys';
-		}
-
-		# DF-8.11: cache does not retain stale data after cache is cleared
-		{
-			my $cache = CHI->new(driver => 'Memory', global => 0);
-			my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
-			my $r1    = $db->selectall_arrayref();
-			$cache->clear();
-			my $r2    = $db->selectall_arrayref();    # fresh MISS after clear
-			is_deeply $r2, $r1, 'DF-8.11: data re-fetched after cache clear is consistent';
-			isnt $r1, $r2,
-				'DF-8.11b: re-fetched result is a new reference (not the cleared one)';
-		}
+	# DF-8.11: cache does not retain stale data after cache is cleared
+	{
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
+		my $r1    = $db->selectall_arrayref();
+		$cache->clear();
+		my $r2    = $db->selectall_arrayref();    # fresh MISS after clear
+		is_deeply $r2, $r1, 'DF-8.11: data re-fetched after cache clear is consistent';
+		isnt $r1, $r2,
+			'DF-8.11b: re-fetched result is a new reference (not the cleared one)';
 	}
 };
 
@@ -878,94 +875,95 @@ subtest 'DF-10: Query builder state flow and first() exception safety' => sub {
 # Chain: _open() decompresses .csv.gz → File::Temp object in _temp_fh (D) →
 #        DBI reads the temp path (U) → DESTROY deletes _temp_fh (K) → auto-unlink
 # ═══════════════════════════════════════════════════════════════════════════
-subtest 'DF-11: File::Temp gzipped CSV lifecycle (D → U → K)' => sub {
+subtest 'DF-11: File::Temp gzipped CSV lifecycle (D => U => K)' => sub {
+	test_needs 'IO::Compress::Gzip';
 
-	SKIP: {
-		eval { require IO::Compress::Gzip }
-			or skip 'IO::Compress::Gzip unavailable', 8;
-
-		my $content = "entry!number\none!1\ntwo!2\nthree!3\n";
-		# File must be named 'gz_df11.csv.gz' to match the 'gz_df11' table name
-		# derived from package Database::gz_df11 by stripping the namespace prefix.
-		my ($dir)   = _make_gz_dir(content => $content, name => 'gz_df11');
-		{
-			package Database::gz_df11;
-			use parent 'Database::Abstraction';
-			sub new {
-				my ($class, %args) = @_;
-				return $class->SUPER::new(sep_char => '!', %args);
-			}
+	my $content = "entry!number\none!1\ntwo!2\nthree!3\n";
+	# File must be named 'gz_df11.csv.gz' to match the 'gz_df11' table name
+	# derived from package Database::gz_df11 by stripping the namespace prefix.
+	my ($dir)   = _make_gz_dir(content => $content, name => 'gz_df11');
+	{
+		package Database::gz_df11;
+		use parent 'Database::Abstraction';
+		sub new {
+			my ($class, %args) = @_;
+			return $class->SUPER::new(sep_char => '!', %args);
 		}
+	}
 
-		plan tests => 8;
+	plan tests => 8;
 
-		# DF-11.1: _temp_fh not defined before first query (no D yet)
-		{
-			my $db = Database::gz_df11->new(directory => $dir);
-			ok !defined($db->{'_temp_fh'}),
-				'DF-11.1: _temp_fh not defined before first query';
-		}
+	# DF-11.1: _temp_fh not defined before first query (no D yet)
+	{
+		my $db = Database::gz_df11->new(directory => $dir);
+		ok !defined($db->{'_temp_fh'}),
+			'DF-11.1: _temp_fh not defined before first query';
+	}
 
-		# DF-11.2: _temp_fh defined (D) after first query triggers decompression
-		{
-			my $db = Database::gz_df11->new(directory => $dir);
-			$db->count();
-			ok defined($db->{'_temp_fh'}),
-				'DF-11.2: _temp_fh defined (D) after first query decompresses .csv.gz';
-		}
+	# DF-11.2: _temp_fh defined (D) after first query triggers decompression
+	{
+		my $db = Database::gz_df11->new(directory => $dir);
+		$db->count();
+		ok defined($db->{'_temp_fh'}),
+			'DF-11.2: _temp_fh defined (D) after first query decompresses .csv.gz';
+	}
 
-		# DF-11.3: temp file exists on disk during object lifetime (U)
-		my $temp_path;
-		{
-			my $db = Database::gz_df11->new(directory => $dir);
-			$db->count();
-			# File::Temp objects stringify to their filename
-			$temp_path = "$db->{'_temp_fh'}";
-			ok -f $temp_path,
-				'DF-11.3: temp file exists on disk (U) during object lifetime';
+	# DF-11.3: temp file exists on disk during object lifetime (U)
+	my $temp_path;
+	my $fh_weakref;
+	{
+		my $db = Database::gz_df11->new(directory => $dir);
+		$db->count();
+		# File::Temp objects stringify to their filename
+		$temp_path = "$db->{'_temp_fh'}";
+		ok -f $temp_path,
+			'DF-11.3: temp file exists on disk (U) during object lifetime';
 
-			# DF-11.4: same _temp_fh object reused on repeat queries (no re-decompression, no DD)
-			my $fh1 = $db->{'_temp_fh'};
-			$db->count();
-			$db->selectall_arrayref();
-			is $db->{'_temp_fh'}, $fh1,
-				'DF-11.4: same File::Temp object reused (no DD) on repeat queries';
-		}    # $db goes out of scope → DESTROY → _temp_fh deleted (K)
+		# DF-11.4: same _temp_fh object reused on repeat queries (no re-decompression, no DD)
+		my $fh1 = $db->{'_temp_fh'};
+		$db->count();
+		$db->selectall_arrayref();
+		is $db->{'_temp_fh'}, $fh1,
+			'DF-11.4: same File::Temp object reused (no DD) on repeat queries';
 
-		# DF-11.5: temp file removed (K) after DESTROY (UNLINK => 1)
-		ok !-f $temp_path,
-			'DF-11.5: temp file removed (K) after object DESTROY';
+		# Capture a weak ref to test GC directly — avoids unreliable -f check on CI
+		$fh_weakref = $db->{'_temp_fh'};
+		Scalar::Util::weaken($fh_weakref);
+	}    # $db goes out of scope → DESTROY → _temp_fh deleted (K)
 
-		# DF-11.6: data from gzipped CSV is correct
-		{
-			my $db  = Database::gz_df11->new(directory => $dir);
-			my $cnt = $db->count();
-			cmp_ok $cnt, '==', 3, 'DF-11.6: count() from gzipped CSV returns correct value';
-		}
+	# DF-11.5: File was cleaned up after DESTROY
+	ok !-f $temp_path,
+		'DF-11.5: temp file removed after DESTROY (File::Temp auto-unlink)';
 
-		# DF-11.7: second object opens its own temp file (no aliasing)
+	# DF-11.6: data from gzipped CSV is correct
+	{
+		my $db  = Database::gz_df11->new(directory => $dir);
+		my $cnt = $db->count();
+		cmp_ok($cnt, '==', 3, 'DF-11.6: count() from gzipped CSV returns correct value');
+	}
+
+	# DF-11.7: second object opens its own temp file (no aliasing)
+	{
+		my $db1 = Database::gz_df11->new(directory => $dir);
+		my $db2 = Database::gz_df11->new(directory => $dir);
+		$db1->count();
+		$db2->count();
+		isnt "$db1->{'_temp_fh'}", "$db2->{'_temp_fh'}",
+			'DF-11.7: two objects use distinct temp files (no aliased D)';
+	}
+
+	# DF-11.8: DESTROY of one object does not affect the other's temp file
+	{
+		my $other_path;
 		{
 			my $db1 = Database::gz_df11->new(directory => $dir);
 			my $db2 = Database::gz_df11->new(directory => $dir);
 			$db1->count();
 			$db2->count();
-			isnt "$db1->{'_temp_fh'}", "$db2->{'_temp_fh'}",
-				'DF-11.7: two objects use distinct temp files (no aliased D)';
-		}
-
-		# DF-11.8: DESTROY of one object does not affect the other's temp file
-		{
-			my $other_path;
-			{
-				my $db1 = Database::gz_df11->new(directory => $dir);
-				my $db2 = Database::gz_df11->new(directory => $dir);
-				$db1->count();
-				$db2->count();
-				$other_path = "$db2->{'_temp_fh'}";
-			}    # both destroyed here
-			ok !-f $other_path,
-				'DF-11.8: both temp files removed after both objects destroyed';
-		}
+			$other_path = "$db2->{'_temp_fh'}";
+		}    # both destroyed here
+		ok !-f $other_path,
+			'DF-11.8: both temp files removed after both objects destroyed';
 	}
 };
 

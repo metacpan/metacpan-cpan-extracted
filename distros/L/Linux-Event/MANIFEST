@@ -45,6 +45,7 @@ bench/run-stream-payload-sweep.pl
 bench/run-stream-transition-bench.pl
 bench/run-stream-watcher-state-bench.pl
 bench/run-timer-microbench.pl
+bench/run-tls-accept-setup-bench.pl
 bench/run-tls-microbench.pl
 bench/run-wakeup-microbench.pl
 bench/runtime-line/line-asyncio.py
@@ -261,12 +262,14 @@ t/stream-57-callback-batching-benchmark-smoke.t
 t/stream-58-callback-batching-fairness-smoke.t
 t/stream-59-native-consumer-abi.t
 t/stream-60-generic-handles.t
+t/stream-60-runtime-tuning.t
 t/stream-61-teardown-exceptions.t
 t/stream-62-consumer-host-lifetime.t
 t/stream-63-construction-failure.t
 t/stream-64-transition-consumer-flush.t
 t/stream-65-first-class-callbacks.t
 t/stream-66-first-class-framed-callback-benchmark-smoke.t
+t/stream-66-resource-kind-transition.t
 t/stream-67-first-class-raw-callback-benchmark-smoke.t
 t/tls-00-load.t
 t/tls-01-declaration.t
@@ -276,6 +279,7 @@ t/tls-21-stream-deadlines.t
 t/tls-30-sigpipe.t
 t/tls-40-connect-listen.t
 t/tls-41-transition-leftover.t
+t/tls-42-accept-setup-benchmark-smoke.t
 t/tls-certs/server-cert.pem
 t/tls-certs/server-key.pem
 t/wakeup-00-api.t

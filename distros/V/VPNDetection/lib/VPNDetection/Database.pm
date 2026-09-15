@@ -7,7 +7,7 @@ use Carp ();
 
 use VPNDetection::Error;
 
-our $VERSION = '1.5.0';
+our $VERSION = '2.1.0';
 
 # The dataset FAMILIES your organization is licensed to download. A license
 # covers a family, while a download names one of its versions, so the ids the
@@ -21,7 +21,7 @@ sub list {
 sub list_p {
     my ($self, %options) = @_;
     return $self->_body_p('list', \%options, '/api/v1/database/list')
-        ->then(sub { $_[0]->{datasets} });
+        ->then(sub { $_[0]->{databases} });
 }
 
 # What is inside one dataset: schema, samples, row count and per-format sizes.
@@ -222,8 +222,8 @@ VPNDetection::Database - the licensed dataset downloads
 
     my $db = $client->database;
 
-    my $datasets = $db->list;
-    my $id = $datasets->[0]{versions}[0]{id};       # e.g. 'vpn_ip_v1'
+    my $databases = $db->list;
+    my $id = $databases->[0]{versions}[0]{id};       # e.g. 'vpn_ip_v1'
 
     my $meta = $db->metadata($id);
     my $sums = $db->checksums($id, 'mmdb');
@@ -252,7 +252,7 @@ itself:
         base => 'vpn_ip',               # what the license is held against
         name => 'VPN IP',
         summary => 'IP ranges observed as VPN infrastructure.',
-        license_type => 'standard',   # evaluation, standard or redistribute
+        license_type => 'standard',   # evaluation/standard/redistribute, or undef
         starts => '2026-09-04T07:49:45.118Z',
         expires => undef,               # undef when the license does not expire
         renews_at => undef,             # when a rolling license next turns over
@@ -265,7 +265,7 @@ itself:
                 version => 1,
                 summary => 'IP ranges observed as VPN infrastructure.',
                 formats => [{ format => 'csvgz', bytes => 111013959 }, ...],
-                sampleFormats => ['csvgz', 'mmdb'],
+                sample_formats => ['csvgz', 'mmdb'],
             },
         ],
     }

@@ -37,3 +37,9 @@ Inline->bind(
     LIBS => $libs
 );
 say xrepo_versions();
+__END__
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in
+the Artistic License 2. Other copyrights, terms, and conditions may apply to data transmitted
+through this module.

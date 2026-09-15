@@ -4,9 +4,28 @@
 
 =head1 NAME
 
-Alien::Xrepo::Runtime - Consumer class for xrepo-based Aliens
+Alien::Xrepo::Runtime - Consumer class for xrepo-based Alien modules
 
 =head1 SYNOPSIS
+
+    package Alien::Zstd;
+    use v5.40;
+    use experimental 'class';
+    use Alien::Xrepo::Runtime;
+
+    class Alien::Zstd : isa(Alien::Xrepo::Runtime) {
+        method recipe {
+            return {
+                name        => 'Alien-Zstd',
+                packages    => [ { name => 'zstd', kind => 'shared' } ],
+                local_repos => ['vendor/recipes'],   # optional, used by the build engine
+            };
+        }
+    }
+
+    1;
+
+    # A dist with no extra recipe fields may declare only pkg_name instead:
 
     package Alien::Zstd;
     use v5.40;
@@ -23,19 +42,45 @@ Alien::Xrepo::Runtime - Consumer class for xrepo-based Aliens
 
 =head1 DESCRIPTION
 
-C<Alien::Xrepo::Runtime> is the post-build accessor layer for an xrepo-based Alien. It deliberately avoids the
-L<Alien::Base> model of generating a per-subclass C<::ConfigData> module at build time: package paths are resolved by
-asking xrepo itself -- lazily, once per package, cached for the process -- so a fresh checkout of an Alien using this
-class works with no build step at all.
+C<Alien::Xrepo::Runtime> is the post-build accessor layer for an C<xrepo>-based Alien. It deliberately avoids the
+L<Alien::Base> model of generating a per-subclass C<::ConfigData> module at build time. Instead, package paths are
+resolved by querying C<xrepo> itself lazily, once per package, cached for the process. This means a fresh checkout of
+an Alien using this class works perfectly with no build step at all.
 
-Optionally a C<xrepo.json> recipe instead of an inline C<pkg_name>, and a snapshot written by L<Alien::Xrepo::Build>
-(auto-detected from the dist share dir, see C<autodetect_snapshot>) makes resolution fully hermetic: the accessors then
-serve recorded paths and never spawn xrepo.
+Optionally, an C<xrepo.json> recipe instead of an inline C<pkg_name>, alongside a snapshot written by
+L<Alien::Xrepo::Build> (auto-detected from the dist's C<share> directory, see C<autodetect_snapshot>), makes resolution
+fully hermetic. The accessors then serve recorded paths and never spawn C<xrepo>. When the build installs packages into
+the dist's C<share> directory (C<share_dir>), the snapshot records share-relative paths. These are dynamically resolved
+against the snapshot file's own directory, ensuring the same snapshot serves a source-tree C<blib> build and the
+installed C<File::ShareDir> tree alike.
+
+=head2 Describing the dist once: the C<recipe()>
+
+A distribution that ships extra recipe fields (C<local_repos>, C<pkg_roots>, C<hooks>, C<defaults>) benefits from a
+single declaration that serves both phases. A subclass may instead declare a C<recipe> method, honored when no
+C<recipe>/C<pkg_name> constructor argument is supplied (and taking precedence over a C<pkg_name> method). It may
+return:
+
+=over
+
+=item * A hashref of recipe fields (C<name>, C<packages>, C<defaults>, C<pkg_roots>, C<local_repos>, C<hooks>) exactly as L<Alien::Xrepo::Build::Recipe> accepts inline.
+
+=item * An L<Alien::Xrepo::Build::Recipe> object.
+
+=item * A path (file or directory) to an C<xrepo.json>.
+
+=back
+
+The build engine, through L<Alien::Xrepo::Build>, consumes this very same hashref (it may be passed directly as the
+C<recipe =E<gt> ...> argument). This guarantees the distribution's description lives in exactly one place and no
+separate C<xrepo.json> is strictly necessary. A recipe's C<defaults> are treated as ambient install options for every
+package during dynamic resolution. Because this matches the install profile the build engine derives, dynamic and
+hermetic resolution always agree.
 
 =head1 METHODS
 
-The accessor surface follows the L<Alien::Base> conventions. Each accessor takes an optional package name and defaults
-to the primary (first declared) package.
+The accessor surface strictly follows L<Alien::Base> conventions. Each accessor takes an optional package name and
+defaults to the primary (first declared) package.
 
 =over
 
@@ -45,7 +90,7 @@ Include flags (C<-I...>) for the package. Returns an empty string when the packa
 
 =item C<cflags_static( [$pkg] )>
 
-Include flags for static linking. An alias of C<cflags( )> in this release.
+Include flags for static linking. Currently acts as an alias of C<cflags( )> in this release.
 
 =item C<libs( [$pkg] )>
 
@@ -53,32 +98,43 @@ Link flags (C<-L... -l...>) for the package. Returns an empty string when the pa
 
 =item C<libs_static( [$pkg] )>
 
-Link flags for static linking. An alias of C<libs( )> in this release.
+Link flags for static linking. Currently acts as an alias of C<libs( )> in this release.
 
 =item C<libpath( [$pkg] )>
 
-Absolute path to the package's runtime library (DLL/SO/dylib). C<undef> for a header-only package or when
-resolution failed.
+Absolute path to the package's runtime library (DLL/SO/dylib). Returns C<undef> for a header-only package or when
+resolution fails.
 
 =item C<ffi_lib( [$pkg] )>
 
-An alias of C<libpath( )> under the name L<Alien::Base> C<build_ffi> consumers call.
+An alias of C<libpath( )> under the name that L<Alien::Base> C<build_ffi> consumers call.
 
 =item C<dynamic_libs( [$pkg] )>
 
-Absolute paths to every library file xrepo reported for the package.
+Absolute paths to every library file C<xrepo> reported for the package.
 
 =item C<bin_dir( [$pkg] )>
 
-Executable directories (a tool package's C<bin>). An empty list when the package has none.
+Executable directories (a tool package's C<bin>). Returns an empty list when the package has none.
+
+=item C<prepend_to_path( [$pkg] )>
+
+Prepends the package's C<bin_dir> directories to C<$ENV{PATH}> (joined with the platform's path separator, functioning
+properly on both POSIX and Windows). This lets a consumer spawn the shipped tool (e.g., C<Exotic::Ninja>) without
+knowing where C<xrepo> installed it. Returns the prepended directories, or an empty list (leaving C<PATH> untouched)
+when the package has none:
+
+    my $ninja = Exotic::Ninja->new;
+    $ninja->prepend_to_path;
+    system('ninja', '--version') == 0 or die 'ninja did not run';
 
 =item C<version( [$pkg] )>
 
-The installed version as reported by xrepo, or C<undef> before resolution.
+The installed version as reported by C<xrepo>, or C<undef> before resolution.
 
 =item C<kind( [$pkg] )>
 
-The package kind -- C<library> for libraries, C<binary> for tools -- as reported by xrepo.
+The package kind (C<library> for libraries, C<binary> for tools) as reported by C<xrepo>.
 
 =item C<dist_dir( [$pkg] )>
 
@@ -86,13 +142,13 @@ The package's install root (where its files live), or C<undef> before resolution
 
 =item C<install_type( [$pkg] )>
 
-C<'share'> once the package has resolved, C<'system'> otherwise. In hermetic snapshot mode the value recorded
-in the snapshot is returned unchanged.
+C<'share'> once the package has resolved, C<'system'> otherwise. In hermetic snapshot mode, the value recorded in the
+snapshot is returned unchanged.
 
 =item C<alt( $name )>
 
-An accessor bound to a non-primary package; C<alt> of the primary returns C<$self>. E.g. C<<
-Alien::SDL3->alt('libsdl3_ttf')->cflags >>.
+Returns an accessor bound to a non-primary package; calling C<alt> on the primary returns C<$self>. Example: C<<
+Exotic::SDL3->alt('libsdl3_ttf')->cflags >>.
 
 =item C<find_header( $file, [$pkg] )>
 
@@ -104,7 +160,7 @@ The underlying L<Alien::Xrepo::PackageInfo>, or C<undef> before resolution.
 
 =item C<package_names()>
 
-The recipe's package names in declaration order (first is the primary package).
+The recipe's package names in declaration order (the first is the primary package).
 
 =item C<package_defs()>
 
@@ -112,8 +168,8 @@ The recipe's normalized per-package definition hashref.
 
 =item C<split_flags( $flags, [$pkg] )>
 
-Splits a flag string on whitespace and returns the individual flags (Windows-safe list form). The package
-argument is accepted for compatibility with the other accessors but the split itself does not use it.
+Splits a flag string on whitespace and returns the individual flags in a Windows-safe list form. The package argument
+is accepted for compatibility with other accessors, but the split logic itself does not strictly require it.
 
 =back
 
@@ -127,16 +183,19 @@ argument is accepted for compatibility with the other accessors but the split it
         repo         => $alien_xrepo,            # injectable engine
         cache        => 0,                       # bypass Alien::Xrepo's warm-start cache
         snapshot     => $file,                   # hermetic data; wins over dynamic fetch
-        autodetect_snapshot => 1,                # look in the installed dist share dir
-        verbose      => 1,
+        autodetect_snapshot => 1,                # look in the installed dist's share dir
+        verbose      => 1
     )
 
-Subclasses may also declare C<pkg_name> and C<install_opts> as methods, which the constructor honors when no
-constructor argument is supplied.
+C<recipe> is C<undef> by default; when set, it may be an L<Alien::Xrepo::Build::Recipe> object, a file or directory
+path to an C<xrepo.json>, or a hashref of recipe fields (name, packages, defaults, pkg_roots, local_repos, hooks).
 
-B<cache> (default 1) is forwarded to the engine created by this class, so C<cache =E<gt> 0> disables
-L<Alien::Xrepo|/CACHE>'s on-disk resolution cache for a fully live, one-spawn-per-package consumer. When
-C<repo =E<gt> ...> injects an engine, that engine's own cache setting is used instead.
+Subclasses may also declare C<recipe>, C<pkg_name>, and C<install_opts> as methods, which the constructor honors when
+no constructor argument is supplied. A subclass's C<recipe> method takes precedence over C<pkg_name>.
+
+B<cache> (default C<1>) is forwarded to the engine created by this class, so passing C<cache =E<gt> 0> disables
+L<Alien::Xrepo/"Cache System">'s on-disk resolution cache for a fully live, one-spawn-per-package consumer. When C<repo
+=E<gt> ...> injects an engine directly, that engine's own cache setting is respected instead.
 
 =head1 SEE ALSO
 

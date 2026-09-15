@@ -1,5 +1,17 @@
 Revision history for HTML-FromANSI-Tiny
 
+0.108     2026-09-14T15:01:12Z
+
+  - Support 24-bit ("truecolor") SGR sequences (38;2;r;g;b and 48;2;r;g;b),
+    which Parse::ANSIColor::Tiny identifies as 'r255g0b0' and 'on_r0g10b20'.
+    Since there are sixteen million of them, css() can't define a class for
+    each, so html() writes them into a style="" attribute even when it is
+    generating classes.  Bumps the Parse::ANSIColor::Tiny prereq.
+  - Add 'attr_to_style' method to allow subclasses to customize the CSS
+    properties used for an attribute.
+  - Emit the properties of a style in sorted order, so that a 'styles'
+    entry with more than one CSS property is reproducible.
+
 0.107     2024-01-11T15:55:33Z
 
   - Update meta files.  No code changes.

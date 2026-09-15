@@ -1,0 +1,52 @@
+=head1 NAME
+
+App::FuguBench::Keys - the embedded release keys of fugubench
+
+=head1 SYNOPSIS
+
+    use App::FuguBench::Keys;
+
+    for my $pair (App::FuguBench::Keys->keys) {
+        my ($name, $body) = @$pair;
+    }
+
+=head1 DESCRIPTION
+
+B<App::FuguBench::Keys> holds the release public keys of the
+organization. The program embeds them in this module, so a release
+carries the keys that verify the next release. The keys are those of
+F<deps/KEYS.txt> of the org pack, and F<t/fugubench/keys.t> holds
+this module to that file.
+
+The C<deps> verb never reads this list. It verifies with the keys of
+the consumer, because a consumer decides what it trusts.
+
+=head2 keys
+
+C<keys> returns the C<[name, body]> pair of each release key. A name
+is the name of the key line, and a body is the 56 base64 characters
+of a signify public key: the second line of a F<.pub> file. A public
+key carries no secret, so the list is source.
+
+=head1 THE TRUST ORDER
+
+The list order is the line order of F<deps/KEYS.txt>, which is the
+trust order. The current key comes first.
+
+A rotation is a release of the program. The old key stays in the list
+for one release after the new key enters it, so an operator one
+release behind can still update.
+
+=head1 RETURN VALUES
+
+C<keys> returns a list of array references, one for each release key.
+
+=head1 SEE ALSO
+
+L<App::FuguBench>, L<App::FuguBench::Deps>, L<Fugu::Signify>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

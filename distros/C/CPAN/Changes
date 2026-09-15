@@ -1,3 +1,47 @@
+2026-09-12  k  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 2.41
+
+	* unchanged from 2.41-TRIAL
+
+2026-09-06  k  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 2.41-TRIAL
+
+	* Save on the 301 redirect to www.cpan.org (Kudos to Sevan Janiyan)
+
+	* increase timeout in test script
+
+2026-05-24  k  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 2.40-TRIAL
+
+	* fix some internal section links (Thanks to grinnz)
+
+	* suppress warnings in VERSION discovery (Thanks to brian d foy)
+
+	* fix perl version check in Makefile.PL (Thanks to Lukas Mai)
+
+	* adjust distroprefs file thanks to an intervention by mauke
+
+2026-04-21  k  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 2.39-TRIAL
+
+	* set Sortkeys when debugging with Data::Dumper
+
+	* refuse calculating prereq_pm when our builddir is already cleaned up
+
+	* fix a debug diagnostic against unini warnings
+
+	* increase diagnostics during distroprefs resolution
+
+	* Remove MacOS classic support (Thanks to Leon Timmermans)
+
+	* start using the macro YAML_MODULE in the Makefile.PL
+
+	* various distroprefs maintenance
+
 2024-11-17  Andreas Koenig  <andk@cpan.org>
 
 	* release 2.38
@@ -14,7 +58,7 @@
 
 	* release 2.38-TRIAL
 
-	* add documentation how to load your own CPAN/MyConfig.pm from you
+	* add documentation how to load your own CPAN/MyConfig.pm from your
 	own path (thanks to Merijn Brand for asking the question)
 
 	* try to fix tests that were failing on cpantesters

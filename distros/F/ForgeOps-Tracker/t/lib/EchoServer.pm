@@ -9,7 +9,7 @@ use POSIX qw(:sys_wait_h);
 use IO::Socket::INET;
 
 # A real local HTTP server for Client tests to POST against, in the same spirit as
-# sdks/php/tests/fixtures/echo_server.php -- Perl can trivially bind a local listener in-test (no
+# sdks/php/tests/fixtures/echo_server.php: Perl can trivially bind a local listener in-test (no
 # mocking framework needed, no monkeypatching a global HTTP function), so this spins one up for
 # real rather than faking the transport layer. Each received request is appended as one JSON line
 # to a temp file the test process can read back and assert against; responds 401 for
@@ -19,7 +19,7 @@ sub start {
 
     my (undef, $log_path) = tempfile(SUFFIX => '.jsonl', UNLINK => 0);
 
-    # HTTP::Server::PSGI only actually binds its socket inside run() -- and the child process
+    # HTTP::Server::PSGI only actually binds its socket inside run(), and the child process
     # (which calls run()) and the parent (which needs to know the port up front to build request
     # URIs) are different processes with no way to hand a dynamically-chosen port back after the
     # fact. So a free port is found and closed here, then handed to both processes explicitly,
@@ -90,7 +90,7 @@ sub stop {
     kill 'TERM', $self->{pid};
     # Confirmed directly: without localizing $?, the test process's own final exit code picks up
     # the killed child's wait status (128+SIGTERM) here, since nothing else in the test script
-    # ever calls exit() explicitly -- `prove` then reports a passing test file as "Dubious,
+    # ever calls exit() explicitly: `prove` then reports a passing test file as "Dubious,
     # test returned 15" purely from this bookkeeping leaking out, not from any real failure.
     local $?;
     waitpid($self->{pid}, 0);

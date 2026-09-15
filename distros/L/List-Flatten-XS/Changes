@@ -1,5 +1,12 @@
 Revision history for Perl extension List-Flatten-XS
 
+0.06 2026-09-14T07:27:10Z
+
+    - Extend the XS return stack before returning a flattened list, fixing
+      "failed to extend arg stack" on DEBUGGING perls (GH #3).
+    - Add regression coverage for large lists and empty return values.
+    - Declare Module::Build::XSUtil as a configure prerequisite.
+
 0.05 2018-01-21T09:17:41Z
 
     - Added function to throw exception using croak instead of into infinity loop when passed circular reference
@@ -19,4 +26,3 @@ Revision history for Perl extension List-Flatten-XS
 0.01 2017-03-31T06:19:17Z
 
     - original version
-

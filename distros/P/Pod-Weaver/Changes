@@ -1,5 +1,9 @@
 Revision history for Pod-Weaver
 
+4.022     2026-09-13 12:54:01+10:00 Australia/Melbourne
+        - bump required version to v5.22, already required via
+          Log::Dispatchouli
+
 4.021     2026-09-10 21:46:17+10:00 Australia/Melbourne
         - switch from Params::Util to Params::SomeUtil
 

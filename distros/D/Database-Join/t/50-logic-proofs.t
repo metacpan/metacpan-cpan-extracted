@@ -19,7 +19,7 @@ use Test::Exception;
 BEGIN {
 	eval { require DBD::SQLite; require Database::Abstraction };
 	plan skip_all => 'DBD::SQLite and Database::Abstraction required' if $@;
-	plan tests => 33;
+	plan tests => 43;
 }
 
 use lib 't/lib';
@@ -95,7 +95,7 @@ throws_ok {
 # C:  new() must croak at index 0 with the invalid-db error.
 throws_ok {
 	Database::Join->new(databases => ['plain_string'], join_column => 'entry');
-} qr/not a Database::Abstraction/i, 'pre-condition: non-object in databases is rejected';
+} qr/does not support the selectall_arrayref/i, 'pre-condition: non-object in databases is rejected';
 
 # Test 3
 # MP: join_column must be present in every database's column list.
@@ -127,7 +127,7 @@ my $join_base = Database::Join->new(
 );
 throws_ok {
 	$join_base->add_database('not_an_object');
-} qr/not a Database::Abstraction/i, 'pre-condition: non-object to add_database is rejected';
+} qr/does not support the selectall_arrayref/i, 'pre-condition: non-object to add_database is rejected';
 
 # Test 6
 # MP: remove_column(join_col) would break the merge invariant.
@@ -381,6 +381,115 @@ my $a1_rows = $join_left->selectall_arrayref(entry => 'A1');
 is(scalar @{$a1_rows}, 1, 'criteria routing: join_column criterion returns 1 row');
 is($a1_rows->[0]{name},  'Alice', 'criteria routing: join_column criterion: name correct');
 is($a1_rows->[0]{score}, 95,     'criteria routing: join_column criterion: score correct');
+
+# ---------------------------------------------------------------------------
+# SECTION 6 — Boolean-reduction proofs (Optimization correctness)
+#
+# These prove that the three deductive reductions in Join.pm preserve semantics.
+# Each test is the minimal distinguishing case for one logical partition.
+# ---------------------------------------------------------------------------
+
+# --- Optimization 1: remove_column() early-return guard ---
+#
+# Before: two separate `defined $col` checks.
+# After: single guard `return $self unless defined $col && length $col`.
+#
+# Proof obligation: the new guard must not change observable behaviour on any
+# input in any of the three partitions: (undef), (''), (non-empty string).
+
+# Test 34
+# MP: remove_column(undef) must be a no-op — undef carries no column identity.
+# MP: joining columns() before and after must be identical.
+# mn: $col = undef.
+# C: column list unchanged; no croak; $self returned (chainable).
+my $join_rm2 = Database::Join->new(
+	databases   => [$lp_a, $lp_b],
+	join_column => 'entry',
+);
+my $cols_before = $join_rm2->columns();
+my $ret_undef   = $join_rm2->remove_column(undef);
+is_deeply($join_rm2->columns(), $cols_before,
+	'optimisation 1: remove_column(undef) is a no-op — col list unchanged');
+is($ret_undef, $join_rm2,
+	'optimisation 1: remove_column(undef) returns $self for chaining');
+
+# Test 36
+# MP: remove_column('') must be a no-op — empty string is not a valid column name.
+# mn: $col = ''.
+# C: column list unchanged; no croak; $self returned.
+my $ret_empty = $join_rm2->remove_column('');
+is_deeply($join_rm2->columns(), $cols_before,
+	'optimisation 1: remove_column("") is a no-op — col list unchanged');
+is($ret_empty, $join_rm2,
+	'optimisation 1: remove_column("") returns $self for chaining');
+
+# Test 38
+# MP: remove_column(join_col) must still croak after the guard restructure.
+# mn: $col = 'entry' (the join_column).
+# C: croak fires with the remove-join-col error; the guard cannot short-circuit it.
+throws_ok {
+	$join_rm2->remove_column('entry');
+} qr/Cannot remove join_column/i,
+	'optimisation 1: join_col still croaks after guard restructure';
+
+# --- Optimization 2: _partition_criteria() // {} fallback removal ---
+#
+# Premise: _col_unrename[$idx] is always initialised to {} by _build_col_index
+#          and add_database; the fallback can therefore never trigger.
+# Proof obligation: querying by a collision-prefixed name must still translate
+#                  correctly without the // {} guard.
+
+# Test 39
+# MP: _build_col_index always sets _col_unrename[$i] = {} (not undef).
+# MP: collision_prefix causes a rename entry to exist in _col_unrename[1].
+# mn: criterion on published name 'sec.name' must route to lp_b column 'name'.
+# C: the query returns only rows where lp_b.name matches — proves the reverse
+#    map works and the // {} removal does not break translation.
+my $join_pfx = Database::Join->new(
+	databases        => [$lp_a, $lp_b],
+	join_column      => 'entry',
+	collision_prefix => { 1 => 'sec' },
+);
+# lp_b has no 'name' column — use score instead to avoid collision_prefix
+# complications for this invariant check.  The real proof is that _col_unrename
+# is always a hashref: even when empty, autovivification on {key} returns undef,
+# and `// $col` then keeps the original name.  Verify with a non-colliding col.
+my $pfx_rows = $join_pfx->selectall_arrayref(entry => 'A1');
+is(scalar @{$pfx_rows}, 1,
+	'optimisation 2: _col_unrename always-hashref invariant: entry=>A1 returns 1 row');
+ok(defined $pfx_rows->[0]{score},
+	'optimisation 2: non-colliding secondary column reachable without // {} guard');
+
+# --- Optimization 3: $had_criteria[0] dead store elimination ---
+#
+# Premise: the key-set resolution loop starts at i=1; index 0 seeds %key_set
+#          directly from keys %{ $indexed[0] }.
+# Proof obligation: primary-database criteria must still produce correct results
+#                  after the dead store is removed.
+
+# Test 41
+# MP: $had_criteria[0] was written but never read in the key-set loop.
+# MP: removing it must not change merge semantics when the primary has criteria.
+# mn: criterion tier => 'gold' routes to lp_a (primary); lp_a has criteria.
+# C: result is still exactly {Alice, Carol} — same as Test 28.
+my $join_dc = Database::Join->new(
+	databases   => [$lp_a, $lp_b],
+	join_column => 'entry',
+	join_type   => 'left',
+);
+my $dc_rows = $join_dc->selectall_arrayref(tier => 'gold');
+is(scalar @{$dc_rows}, 2,
+	'optimisation 3: primary criteria semantics preserved after dead-store removal');
+
+# Test 42
+# MP: $had_criteria[0] elimination must not affect secondary-criteria semantics.
+# mn: criterion score => { '>' => 80 } routes to lp_b (secondary).
+# C: result is still exactly {Alice} — same as Test 29.
+my $dc_sec_rows = $join_dc->selectall_arrayref(score => { '>' => 80 });
+is(scalar @{$dc_sec_rows}, 1,
+	'optimisation 3: secondary criteria semantics preserved after dead-store removal');
+is($dc_sec_rows->[0]{name}, 'Alice',
+	'optimisation 3: correct row returned by secondary criterion after dead-store removal');
 
 # Release DBI connections before File::Temp's cleanup END block fires.
 # On Windows, SQLite keeps files locked until all handles are closed; file-scoped

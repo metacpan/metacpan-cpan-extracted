@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
 
@@ -6,6 +9,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
+my $loaded;
 BEGIN { $| = 1; print "1..9\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Clone::PP qw( clone );
@@ -25,7 +29,7 @@ use Data::Dumper;
 # use Storable qw( dclone );
 
 $^W = 0;
-$test = 2;
+my $test = 2;
 
 sub ok     { printf("ok %d\n", $test++); }
 sub not_ok { printf("not ok %d\n", $test++); }
@@ -49,7 +53,7 @@ sub DESTROY
 {
   my $self = shift;
   printf("not ") if $ok;
-  printf("ok %d\n", $::test++);
+  printf("ok %d\n", $test++);
 }
 
 package main;

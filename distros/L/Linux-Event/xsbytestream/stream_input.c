@@ -79,14 +79,6 @@ les_process_buffered(pTHX_ les_xsstate_t *st)
         les_process_decimal_length(aTHX_ st);
 }
 
-/*
- * Dispatch bytes that were already in native storage when the Stream changed
- * protocol. Framed-to-framed transitions reinterpret the untouched suffix
- * with the new parser. Framed-to-raw transitions deliver that suffix under
- * the target's ordinary or explicitly batched raw policy. A callback may
- * transition again; in that case the loop restarts under the newest
- * descriptor without recursive parser entry.
- */
 void
 les_process_existing_input(pTHX_ les_xsstate_t *st, int flush_batch)
 {
@@ -95,7 +87,7 @@ les_process_existing_input(pTHX_ les_xsstate_t *st, int flush_batch)
         les_descriptor_t *descriptor = st->descriptor;
 
         if (descriptor->read_mode == LES_READ_DELIVER) {
-            if (descriptor->read_batch_bytes) {
+            if (st->read_batch_bytes) {
                 les_flush_raw_batch(aTHX_ st);
             } else {
                 const char *data = les_input_data(st);
@@ -108,11 +100,6 @@ les_process_existing_input(pTHX_ les_xsstate_t *st, int flush_batch)
             int was_consumer_paused = st->consumer_paused;
             les_process_buffered(aTHX_ st);
             if (st->descriptor != descriptor) {
-                /* message() may have transitioned the descriptor while the
-                 * old parsing phase still owes its deferred consumer flush.
-                 * Settle that phase before any preserved input reaches the
-                 * new descriptor. The consumer provider itself is invariant
-                 * across a live transition. */
                 les_consumer_flush(aTHX_ st);
                 continue;
             }
@@ -127,7 +114,7 @@ les_process_existing_input(pTHX_ les_xsstate_t *st, int flush_batch)
         if (st->descriptor != descriptor)
             continue;
         if (descriptor->read_mode == LES_READ_DELIVER
-            && descriptor->read_batch_bytes && st->input_len)
+            && st->read_batch_bytes && st->input_len)
             continue;
         return;
     }

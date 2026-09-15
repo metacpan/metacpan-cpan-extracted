@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
 
@@ -6,6 +9,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
+my $loaded;
 BEGIN { $| = 1; print "1..6\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Clone::PP qw( clone );
@@ -21,9 +25,7 @@ print "ok 1\n";
 
 package Test::Scalar;
 
-use vars @ISA;
-
-@ISA = qw(Clone::PP);
+our @ISA = qw(Clone::PP);
 
 sub new
   {
@@ -40,6 +42,7 @@ sub DESTROY
 
 package main;
                                                 
+my $test;
 sub ok     { print "ok $test\n"; $test++ }
 sub not_ok { print "not ok $test\n"; $test++ }
 
@@ -55,10 +58,10 @@ $a != $b ? ok : not_ok;
 my $c = \"test 2 scalar";
 my $d = Clone::PP::clone($c, 2);
 
-$$c == $$d ? ok : not_ok;
+$$c eq $$d ? ok : not_ok;
 $c != $d ? ok : not_ok;
 
 my $circ = undef;
 $circ = \$circ;
-$aref = clone($circ);
+my $aref = clone($circ);
 Dumper($circ) eq Dumper($aref) ? ok : not_ok;

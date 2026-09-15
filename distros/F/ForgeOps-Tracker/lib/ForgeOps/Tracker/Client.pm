@@ -5,12 +5,14 @@ use warnings;
 use HTTP::Tiny;
 use JSON::PP qw(encode_json);
 
-# Delivers one payload over HTTP. Every failure mode -- DNS, connection, timeout, a non-2xx
-# response -- is caught here and turned into a false return rather than a thrown exception, since
+# Delivers one payload over HTTP. Every failure mode: DNS, connection, timeout, a non-2xx
+# response: is caught here and turned into a false return rather than a thrown exception, since
 # a broken or unreachable tracker must never be able to break the host app. Uses HTTP::Tiny and
-# JSON::PP, both core since Perl 5.14 -- same reasoning as every other SDK in this repo (see e.g.
+# JSON::PP, both core since Perl 5.14: same reasoning as every other SDK in this repo (see e.g.
 # sdks/node/src/client.js): this has to work in any host app without adding a dependency of its
-# own for something as simple as one POST request.
+# own for something as simple as one POST request. deliver and deliver_performance_samples both
+# post through the same private _post helper, which differs only in which URI it posts to and
+# what payload shape it sends.
 sub new {
     my ($class, $configuration) = @_;
     return bless {
@@ -21,9 +23,22 @@ sub new {
 
 sub deliver {
     my ($self, $payload) = @_;
+    return $self->_post($self->{configuration}->ingestion_uri, $payload, 'delivery');
+}
+
+sub deliver_performance_samples {
+    my ($self, $samples) = @_;
+    return $self->_post(
+        $self->{configuration}->performance_samples_uri,
+        { samples => $samples },
+        'performance samples delivery',
+    );
+}
+
+sub _post {
+    my ($self, $uri, $payload, $description) = @_;
     my $config = $self->{configuration};
 
-    my $uri = $config->ingestion_uri;
     my $api_key = $config->api_key;
     return 0 unless $uri && defined $api_key;
 
@@ -41,13 +56,13 @@ sub deliver {
     };
 
     if (!$response) {
-        $config->log("[forge-ops-tracker] delivery failed: $@") if $@;
+        $config->log("[forge-ops-tracker] $description failed: $@") if $@;
         return 0;
     }
 
     unless ($response->{success}) {
         $config->log(
-            "[forge-ops-tracker] delivery failed: $response->{status} $response->{reason}"
+            "[forge-ops-tracker] $description failed: $response->{status} $response->{reason}"
         );
         return 0;
     }

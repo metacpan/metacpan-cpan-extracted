@@ -30,7 +30,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 119;
+	plan tests => 136;
 	use_ok('Database::Join');
 }
 
@@ -105,19 +105,22 @@ Readonly::Scalar my $TS_B     => 2_000_000;
 sub _bare_whitebox {
 	my (%extra) = @_;
 	return bless {
-		_join_col     => $JC,
-		_join_type    => 'left',
-		_join_map     => {},
-		_filters      => {},
-		_dbs          => [],
-		_col_db       => {},
-		_db_cols      => [],
-		_removed_cols => {},
-		_col_cache    => undef,
-		_schema_cache => undef,
-		_autoload_pk  => $JC,
-		_logger       => undef,
-		_i18n         => undef,
+		_join_col         => $JC,
+		_join_type        => 'left',
+		_join_map         => {},
+		_filters          => {},
+		_dbs              => [],
+		_col_db           => {},
+		_db_cols          => [],
+		_removed_cols     => {},
+		_col_cache        => undef,
+		_schema_cache     => undef,
+		_autoload_pk      => $JC,
+		_logger           => undef,
+		_i18n             => undef,
+		_collision_prefix => {},
+		_col_rename       => [],   # arrayref-of-hashrefs: orig_col => published_col per DB
+		_col_unrename     => [],   # arrayref-of-hashrefs: published_col => orig_col per DB
 		%extra,
 	}, 'Database::Join::WhiteBox';
 }
@@ -326,7 +329,7 @@ subtest 'new: empty databases arrayref croaks' => sub {
 subtest 'new: non-DA object in databases croaks with index' => sub {
 	plan tests => 1;
 	throws_ok { Database::Join->new(databases => [ bless({}, 'NotDA') ], join_column => $JC) }
-		qr/not a Database::Abstraction/i,
+		qr/does not support the selectall_arrayref/i,
 		'new() croaks when a databases element is not a DA subclass';
 };
 
@@ -652,7 +655,7 @@ subtest 'add_database: non-reference first arg that is not a key name croaks' =>
 	plan tests => 1;
 	my $j = _make_join();
 	throws_ok { $j->add_database('not_a_key') }
-		qr/not a Database::Abstraction/i,
+		qr/does not support the selectall_arrayref/i,
 		'add_database() croaks when an unrecognised string is the first argument';
 };
 
@@ -660,7 +663,7 @@ subtest 'add_database: non-DA blessed object croaks' => sub {
 	plan tests => 1;
 	my $j = _make_join();
 	throws_ok { $j->add_database(bless {}, 'WrongClass') }
-		qr/not a Database::Abstraction/i,
+		qr/does not support the selectall_arrayref/i,
 		'add_database() croaks when the database object is not a DA subclass';
 };
 
@@ -1532,6 +1535,384 @@ subtest '_partition_criteria: return type is an arrayref' => sub {
 		'_partition_criteria returns an arrayref');
 	is(scalar @{$result}, 2,
 		'_partition_criteria arrayref has exactly one slot per component database');
+};
+
+# ===========================================================================
+# SECTION 27 -- collision_prefix in _build_col_index (6 tests)
+#
+# _build_col_index runs at construction time (and is re-invoked by the
+# WhiteBox helper via expose_build_col_index).  When collision_prefix is
+# configured for a secondary DB index, a column that already exists in
+# _col_db must be published under "$prefix.$col" rather than overwriting.
+# The join_column is never renamed regardless of prefix configuration.
+# ===========================================================================
+Readonly::Scalar my $CP_PREFIX => 'pfx';   # prefix string used throughout Section 27-31
+Readonly::Scalar my $COL_NOTES => 'notes'; # the colliding column name in these tests
+
+subtest '_build_col_index: collision column published as "prefix.col" in _col_db' => sub {
+	plan tests => 3;
+	# Both databases expose 'notes'; with collision_prefix => { 1 => 'pfx' }:
+	# - DB 0's 'notes' stays in _col_db as 'notes' => 0
+	# - DB 1's 'notes' is added as 'pfx.notes' => 1 (published collision name)
+	# Both entries must coexist; neither overwrites the other.
+	my $wb = _bare_whitebox(
+		_join_col         => $JC,
+		_join_map         => {},
+		_collision_prefix => { 1 => $CP_PREFIX },
+		_dbs              => [
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+		],
+		_col_db           => {},
+		_db_cols          => [],
+		_col_rename       => [],
+		_col_unrename     => [],
+	);
+	$wb->expose_build_col_index();
+	ok(exists $wb->{_col_db}{"$CP_PREFIX.$COL_NOTES"},
+		"_build_col_index publishes collision as '$CP_PREFIX.$COL_NOTES' in _col_db");
+	is($wb->{_col_db}{"$CP_PREFIX.$COL_NOTES"}, 1,
+		"'$CP_PREFIX.$COL_NOTES' routes to DB 1");
+	is($wb->{_col_db}{$COL_NOTES}, 0,
+		"primary '$COL_NOTES' still in _col_db routing to DB 0");
+};
+
+subtest '_build_col_index: _col_rename populated with orig => published mapping' => sub {
+	plan tests => 1;
+	my $wb = _bare_whitebox(
+		_join_col         => $JC,
+		_join_map         => {},
+		_collision_prefix => { 1 => $CP_PREFIX },
+		_dbs              => [
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+		],
+		_col_db           => {},
+		_db_cols          => [],
+		_col_rename       => [],
+		_col_unrename     => [],
+	);
+	$wb->expose_build_col_index();
+	is($wb->{_col_rename}[1]{$COL_NOTES}, "$CP_PREFIX.$COL_NOTES",
+		'_col_rename[1] maps original column name to its published prefixed name');
+};
+
+subtest '_build_col_index: _col_unrename populated with published => orig mapping' => sub {
+	plan tests => 1;
+	my $wb = _bare_whitebox(
+		_join_col         => $JC,
+		_join_map         => {},
+		_collision_prefix => { 1 => $CP_PREFIX },
+		_dbs              => [
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+		],
+		_col_db           => {},
+		_db_cols          => [],
+		_col_rename       => [],
+		_col_unrename     => [],
+	);
+	$wb->expose_build_col_index();
+	is($wb->{_col_unrename}[1]{"$CP_PREFIX.$COL_NOTES"}, $COL_NOTES,
+		'_col_unrename[1] maps published prefixed name back to the original column name');
+};
+
+subtest '_build_col_index: non-colliding secondary column published plain (no prefix)' => sub {
+	plan tests => 2;
+	# 'price' is only in DB 1, so it does not collide — it must appear as 'price',
+	# not 'pfx.price', regardless of the collision_prefix setting.
+	my $wb = _bare_whitebox(
+		_join_col         => $JC,
+		_join_map         => {},
+		_collision_prefix => { 1 => $CP_PREFIX },
+		_dbs              => [
+			MinimalDA->new(cols => [$JC, 'amount'], rows => []),
+			MinimalDA->new(cols => [$JC, 'price'],  rows => []),
+		],
+		_col_db           => {},
+		_db_cols          => [],
+		_col_rename       => [],
+		_col_unrename     => [],
+	);
+	$wb->expose_build_col_index();
+	ok(exists $wb->{_col_db}{'price'},
+		"non-colliding 'price' appears plain in _col_db");
+	ok(!exists $wb->{_col_db}{"$CP_PREFIX.price"},
+		"non-colliding 'price' is NOT prefixed");
+};
+
+subtest '_build_col_index: join_column never prefixed even when shared across all DBs' => sub {
+	plan tests => 2;
+	# The join_column 'entry' is shared by definition.  It must never be renamed to
+	# 'pfx.entry' regardless of collision_prefix, because renaming it would break
+	# the broadcast routing that every query relies on.
+	my $wb = _bare_whitebox(
+		_join_col         => $JC,
+		_join_map         => {},
+		_collision_prefix => { 1 => $CP_PREFIX },
+		_dbs              => [
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+		],
+		_col_db           => {},
+		_db_cols          => [],
+		_col_rename       => [],
+		_col_unrename     => [],
+	);
+	$wb->expose_build_col_index();
+	ok(exists $wb->{_col_db}{$JC},
+		"join_column '$JC' still present under its own name in _col_db");
+	ok(!exists $wb->{_col_db}{"$CP_PREFIX.$JC"},
+		"prefixed join_column '$CP_PREFIX.$JC' is absent (join_col is never renamed)");
+};
+
+subtest '_build_col_index: index-0 collision_prefix entry silently ignored' => sub {
+	plan tests => 1;
+	# collision_prefix => { 0 => 'pfx' } is meaningless (index 0 is the primary);
+	# the code ignores it.  Both DBs share 'notes'; last-DB-wins applies, so DB 1
+	# overwrites DB 0's 'notes' in _col_db (no rename at all for either).
+	my $wb = _bare_whitebox(
+		_join_col         => $JC,
+		_join_map         => {},
+		_collision_prefix => { 0 => $CP_PREFIX },   # index 0 is silently ignored
+		_dbs              => [
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+		],
+		_col_db           => {},
+		_db_cols          => [],
+		_col_rename       => [],
+		_col_unrename     => [],
+	);
+	$wb->expose_build_col_index();
+	# With index-0 prefix ignored and no index-1 prefix, last-DB-wins: _col_db{notes} = 1
+	is($wb->{_col_db}{$COL_NOTES}, 1,
+		'index-0 prefix silently ignored; last-DB-wins still applies for the collision');
+};
+
+# ===========================================================================
+# SECTION 28 -- collision_prefix in columns() and schema() (4 tests)
+#
+# Once _build_col_index has populated _col_rename, the columns() and schema()
+# methods must surface published names (e.g. "pfx.notes") instead of the
+# original column name.  Both methods use $renames->{$col} // $col to translate.
+# ===========================================================================
+Readonly::Scalar my $COL_PFX_NOTES => "$CP_PREFIX.$COL_NOTES";
+
+# Helper: build a real two-DB join with notes colliding, using collision_prefix.
+sub _make_collision_join {
+	my (%opts) = @_;
+	my $db_a = MinimalDA->new(
+		cols   => [$JC, $COL_NOTES, 'amount'],
+		rows   => [{ entry => 'K1', notes => 'note-a', amount => 10 }],
+		schema => {
+			$JC        => { type => 'TEXT' },
+			$COL_NOTES => { type => 'TEXT' },
+			amount     => { type => 'INTEGER' },
+		},
+	);
+	my $db_b = MinimalDA->new(
+		cols   => [$JC, $COL_NOTES, 'price'],
+		rows   => [{ entry => 'K1', notes => 'note-b', price => 5 }],
+		schema => {
+			$JC        => { type => 'TEXT' },
+			$COL_NOTES => { type => 'TEXT' },
+			price      => { type => 'INTEGER' },
+		},
+	);
+	return Database::Join->new(
+		databases        => [$db_a, $db_b],
+		join_column      => $JC,
+		collision_prefix => { 1 => $CP_PREFIX },
+		%opts,
+	);
+}
+
+subtest 'columns: collision_prefix causes prefixed name to appear (not original)' => sub {
+	plan tests => 2;
+	my $j    = _make_collision_join();
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok($col_h{$COL_NOTES},     "primary '$COL_NOTES' present in columns()");
+	ok($col_h{$COL_PFX_NOTES}, "prefixed '$COL_PFX_NOTES' present in columns()");
+};
+
+subtest 'columns: collision_prefix does not create a prefixed join_column entry' => sub {
+	plan tests => 1;
+	my $j    = _make_collision_join();
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok(!$col_h{"$CP_PREFIX.$JC"},
+		"prefixed join_column '$CP_PREFIX.$JC' absent from columns()");
+};
+
+subtest 'schema: collision column keyed under published prefixed name' => sub {
+	plan tests => 2;
+	my $j = _make_collision_join();
+	my $s = $j->schema();
+	ok(exists $s->{$COL_PFX_NOTES},
+		"schema() keyed under '$COL_PFX_NOTES' for the collision column");
+	ok(exists $s->{$COL_NOTES},
+		"primary '$COL_NOTES' still in schema() (from DB 0)");
+};
+
+subtest 'schema: prefixed join_column absent from schema output' => sub {
+	plan tests => 1;
+	my $j = _make_collision_join();
+	ok(!exists $j->schema()->{"$CP_PREFIX.$JC"},
+		"schema() does not contain a prefixed join_column key");
+};
+
+# ===========================================================================
+# SECTION 29 -- collision_prefix in _partition_criteria (2 tests)
+#
+# When a caller passes a criterion like { 'pfx.notes' => 'val' }, the published
+# name must be translated back to the database's own column name ('notes')
+# before the criterion reaches the component DA.  This translation is performed
+# via _col_unrename.
+# ===========================================================================
+
+subtest '_partition_criteria: prefixed name translated to orig before routing to DA' => sub {
+	plan tests => 2;
+	# Build a whitebox already post-indexed (as if _build_col_index had run).
+	# _col_db{ 'pfx.notes' } = 1 and _col_unrename[1]{ 'pfx.notes' } = 'notes'.
+	my $wb = _bare_whitebox(
+		_join_col     => $JC,
+		_join_map     => {},
+		_dbs          => [
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+			MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []),
+		],
+		_col_db       => { $JC => 0, $COL_NOTES => 0, $COL_PFX_NOTES => 1 },
+		_col_unrename => [ {}, { $COL_PFX_NOTES => $COL_NOTES } ],
+	);
+	my $result = $wb->expose_partition({ $COL_PFX_NOTES => 'search-val' });
+	# The prefixed name must NOT arrive at DB 1 — only the original 'notes' key should.
+	ok(exists $result->[1]{$COL_NOTES},
+		"DB-1 criteria contains original column name '$COL_NOTES'");
+	ok(!exists $result->[1]{$COL_PFX_NOTES},
+		"DB-1 criteria does NOT contain the published prefixed name (would fail the DA query)");
+};
+
+subtest '_partition_criteria: non-prefixed secondary column routed without translation' => sub {
+	plan tests => 1;
+	# A column that was not renamed ('price') is routed directly without unrename lookup.
+	my $wb = _bare_whitebox(
+		_join_col     => $JC,
+		_join_map     => {},
+		_dbs          => [
+			MinimalDA->new(cols => [$JC, 'amount'], rows => []),
+			MinimalDA->new(cols => [$JC, 'price'],  rows => []),
+		],
+		_col_db       => { $JC => 0, amount => 0, price => 1 },
+		_col_unrename => [ {}, {} ],   # no renames — both empty
+	);
+	my $result = $wb->expose_partition({ price => 42 });
+	is($result->[1]{price}, 42,
+		'non-prefixed secondary criterion routed to DB 1 unchanged');
+};
+
+# ===========================================================================
+# SECTION 30 -- collision_prefix in _joined_query (3 tests)
+#
+# The merge loop in _joined_query applies _col_rename to translate each
+# secondary column from its original name to its published name before writing
+# into the merged row.  Non-renamed columns are written plain.
+# ===========================================================================
+
+subtest '_joined_query: merged row contains BOTH primary and prefixed secondary notes' => sub {
+	plan tests => 3;
+	my $j   = _make_collision_join();
+	my $row = $j->fetchrow_hashref(entry => 'K1');
+	is($row->{$COL_NOTES},     'note-a',
+		"merged row has primary 'notes' value");
+	is($row->{$COL_PFX_NOTES}, 'note-b',
+		"merged row has prefixed '$COL_PFX_NOTES' value from secondary");
+	ok(!exists $row->{"$CP_PREFIX.$JC"},
+		"prefixed join_column key absent from merged row (join_col never renamed)");
+};
+
+subtest '_joined_query: criterion on prefixed name correctly filters results' => sub {
+	plan tests => 2;
+	# Two primary rows; only K1 has note-b in secondary.
+	my $db_a = MinimalDA->new(
+		cols => [$JC, $COL_NOTES],
+		rows => [
+			{ entry => 'K1', notes => 'note-a1' },
+			{ entry => 'K2', notes => 'note-a2' },
+		],
+	);
+	my $db_b = MinimalDA->new(
+		cols => [$JC, $COL_NOTES],
+		rows => [
+			{ entry => 'K1', notes => 'note-b1' },
+			{ entry => 'K2', notes => 'note-b2' },
+		],
+	);
+	my $j = Database::Join->new(
+		databases        => [$db_a, $db_b],
+		join_column      => $JC,
+		collision_prefix => { 1 => $CP_PREFIX },
+	);
+	my $rows = $j->selectall_arrayref($COL_PFX_NOTES => 'note-b1');
+	is(scalar @{$rows}, 1,         "criterion on '$COL_PFX_NOTES' returns 1 matching row");
+	is($rows->[0]{entry}, 'K1',    'matched row is K1');
+};
+
+subtest '_joined_query: non-colliding secondary column written under plain name' => sub {
+	plan tests => 1;
+	my $j   = _make_collision_join();   # db_b also has 'price', which does not collide
+	my $row = $j->fetchrow_hashref(entry => 'K1');
+	ok(exists $row->{price},
+		"non-colliding secondary column 'price' present under its plain name");
+};
+
+# ===========================================================================
+# SECTION 31 -- collision_prefix in add_database (2 tests)
+#
+# add_database must honour collision_prefix entries that were declared at
+# construction time for database indices that did not yet exist.  The same
+# "$prefix.$col" logic that _build_col_index applies must also run when the
+# database is added later via add_database.
+# ===========================================================================
+
+subtest 'add_database: collision_prefix pre-declared for new index applies prefix' => sub {
+	plan tests => 3;
+	# Construct a join with collision_prefix => { 2 => 'extra' } (DB 2 does not
+	# exist yet).  add_database adds DB 2, which shares 'notes' with DB 0.
+	# After the call:
+	# - 'extra.notes' must appear in _col_db routed to DB 2
+	# - The primary 'notes' (from DB 0, index 0) still routes to DB 0
+	# Both entries coexist, exactly as in _build_col_index for construction-time prefix.
+	my $db_0 = MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []);
+	my $db_1 = MinimalDA->new(cols => [$JC, 'amount'],   rows => []);
+	my $j    = Database::Join->new(
+		databases        => [$db_0, $db_1],
+		join_column      => $JC,
+		collision_prefix => { 2 => 'extra' },
+	);
+	my $db_2 = MinimalDA->new(cols => [$JC, $COL_NOTES, 'price'], rows => []);
+	$j->add_database($db_2);
+	ok(exists $j->{_col_db}{"extra.$COL_NOTES"},
+		"'extra.$COL_NOTES' registered in _col_db after add_database");
+	is($j->{_col_db}{"extra.$COL_NOTES"}, 2,
+		"'extra.$COL_NOTES' routes to the newly added DB (index 2)");
+	is($j->{_col_db}{$COL_NOTES}, 0,
+		"primary '$COL_NOTES' still in _col_db routing to DB 0");
+};
+
+subtest 'add_database: _col_rename and _col_unrename populated for new DB' => sub {
+	plan tests => 2;
+	my $db_0 = MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []);
+	my $j    = Database::Join->new(
+		databases        => [$db_0],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'extra' },
+	);
+	my $db_1 = MinimalDA->new(cols => [$JC, $COL_NOTES], rows => []);
+	$j->add_database($db_1);
+	is($j->{_col_rename}[1]{$COL_NOTES}, "extra.$COL_NOTES",
+		'_col_rename[1] maps original to published name after add_database');
+	is($j->{_col_unrename}[1]{"extra.$COL_NOTES"}, $COL_NOTES,
+		'_col_unrename[1] maps published name back to original after add_database');
 };
 
 diag('All white-box function tests complete') if $ENV{TEST_VERBOSE};

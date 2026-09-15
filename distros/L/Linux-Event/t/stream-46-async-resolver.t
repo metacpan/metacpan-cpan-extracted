@@ -81,7 +81,7 @@ ok(!defined $RESOLVED, 'late resolver completion is discarded after cancellation
 
 $LOOP = Linux::Event::Loop->new;
 my $listener = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'T::ResolverServer', host => '127.0.0.1', port => 0,
+    stream => { class => 'T::ResolverServer' }, host => '127.0.0.1', port => 0,
 );
 $LOOP->add($listener);
 my $client = T::ResolverClient->connect(

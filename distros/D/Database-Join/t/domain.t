@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 79;
+use Test::Most tests => 118;
 use Readonly;
 use Scalar::Util qw(blessed);
 
@@ -87,7 +87,7 @@ Readonly::Scalar my $LONG_COLNAME => 'x' x 255;	# 255-char boundary for join_col
 
 Readonly::Hash my %ERR => (
 	no_databases     => qr/At least one Database::Abstraction object is required/,
-	invalid_db       => qr/databases\[\d+\] is not a Database::Abstraction object/,
+	invalid_db       => qr/databases\[\d+\] does not support/,
 	join_col_missing => qr/join_column "[^"]*" is absent from databases\[\d+\]/,
 	join_col_refval  => qr/join_column "\(join_map\[\d+\] must be a string\)" is absent from databases\[\d+\]/,
 	remove_join_col  => qr/Cannot remove join_column/,
@@ -847,4 +847,349 @@ note '--- Section 11: Combinatorial boundary interactions ---';
 	my %keys = map { $_->{$JC} => 1 } @{ $j->selectall_arrayref() };
 	ok(!$keys{k2},
 		'combinatorial: filtered secondary + outer → k2 excluded (filter overrides outer)');
+}
+
+# ---------------------------------------------------------------------------
+# Helper: two DAs whose 'notes' column collides.
+# Primary:   $JC, name, notes   (notes = 'prim-note')
+# Secondary: $JC, notes, score  (notes = 'sec-note'; score has no collision)
+# ---------------------------------------------------------------------------
+sub _collision_dbs {
+	my $p = DomainDA->new(
+		cols => [$JC, 'name', 'notes'],
+		rows => [{ $JC => 'k1', name => 'Alice', notes => 'prim-note' }],
+	);
+	my $s = DomainDA->new(
+		cols => [$JC, 'notes', 'score'],
+		rows => [{ $JC => 'k1', notes => 'sec-note', score => 42 }],
+	);
+	return ($p, $s);
+}
+
+# ==========================================================================
+# Section 12: `collision_prefix` parameter domain
+#
+# EP valid:  absent or {} → last-database-wins behaviour (no prefix).
+# EP valid:  { N => 'pfx' } where N > 0 → colliding column published as
+#            "$pfx.$col"; original column kept under its plain name.
+# EP note:   index-0 entries are silently ignored.
+# BVA:       non-colliding columns from a prefixed DB are never prefixed.
+# Invariant: join_column is never prefixed regardless of configuration.
+# ==========================================================================
+
+note '--- Section 12: collision_prefix parameter domain ---';
+
+# EP absent: colliding secondary 'notes' silently overwrites primary 'notes' (last-wins).
+{
+	my ($p, $s) = _collision_dbs();
+	my $j   = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $row = $j->fetchrow_hashref();
+	is($row->{notes}, 'sec-note',
+		'collision_prefix: absent → last-wins, secondary "notes" overwrites (EP absent)');
+}
+
+# EP valid empty {}: same last-wins semantics as absent (no-op).
+{
+	my ($p, $s) = _collision_dbs();
+	my $j   = Database::Join->new(databases => [$p, $s], join_column => $JC, collision_prefix => {});
+	my $row = $j->fetchrow_hashref();
+	is($row->{notes}, 'sec-note',
+		'collision_prefix: {} empty → last-wins preserved (EP valid-empty)');
+}
+
+# EP valid {1 => 'pfx'}: both plain and prefixed names appear in columns() and rows.
+{
+	my ($p, $s) = _collision_dbs();
+	my $j    = Database::Join->new(databases => [$p, $s], join_column => $JC,
+		collision_prefix => { 1 => 'pfx' });
+	my %cols = map { $_ => 1 } @{ $j->columns() };
+	ok($cols{notes},        'collision_prefix: original "notes" still present in columns()');
+	ok($cols{'pfx.notes'},  'collision_prefix: "pfx.notes" added to columns() (EP valid)');
+	my $row = $j->fetchrow_hashref();
+	is($row->{notes},        'prim-note', 'collision_prefix: primary "notes" value preserved');
+	is($row->{'pfx.notes'},  'sec-note',  'collision_prefix: secondary "pfx.notes" value correct');
+}
+
+# EP: index-0 entry silently ignored; construction must succeed.
+{
+	my ($p, $s) = _collision_dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC,
+		collision_prefix => { 0 => 'pfx' });
+	isa_ok($j, 'Database::Join',
+		'collision_prefix: index-0 entry silently ignored → construction succeeds');
+}
+
+# BVA non-colliding: 'score' is only in DB[1] → never prefixed, published plain.
+{
+	my ($p, $s) = _collision_dbs();
+	my $j    = Database::Join->new(databases => [$p, $s], join_column => $JC,
+		collision_prefix => { 1 => 'pfx' });
+	my %cols = map { $_ => 1 } @{ $j->columns() };
+	ok( $cols{score},       'collision_prefix: non-colliding "score" published plain (BVA)');
+	ok(!$cols{'pfx.score'}, 'collision_prefix: non-colliding "score" not prefixed');
+}
+
+# Invariant: join_column is never prefixed even when it appears in both databases.
+{
+	my ($p, $s) = _collision_dbs();
+	my $j    = Database::Join->new(databases => [$p, $s], join_column => $JC,
+		collision_prefix => { 1 => 'pfx' });
+	my %cols = map { $_ => 1 } @{ $j->columns() };
+	ok( $cols{$JC},       'collision_prefix: join_column present un-prefixed (Invariant)');
+	ok(!$cols{"pfx.$JC"}, 'collision_prefix: join_column never prefixed (Invariant)');
+}
+
+# ==========================================================================
+# Section 13: `add_database` optional parameters domain
+#
+# EP valid: filter => hashref → stored permanently; acts as inner-join partner.
+# EP valid: filter => {} empty → no-op, all rows visible.
+# EP valid: remove_columns => [...] → listed columns hidden from new DB.
+# EP: chained add_database calls each return $self (enables fluent chaining).
+# ==========================================================================
+
+note '--- Section 13: add_database optional parameters domain ---';
+
+# EP valid: filter => { score => 90 } → only matching row qualifies (inner-join partner).
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p], join_column => $JC);
+	$j->add_database($s, filter => { score => 90 });
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 1,  'add_database filter: non-empty → restricts to matching row (EP valid)');
+	is($rows->[0]{score}, 90, 'add_database filter: correct row returned');
+}
+
+# EP valid: filter => {} empty → no permanent restriction, all rows present.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p], join_column => $JC);
+	$j->add_database($s, filter => {});
+	is(scalar @{ $j->selectall_arrayref() }, 2,
+		'add_database filter: {} empty → all rows (EP valid-empty)');
+}
+
+# EP valid: remove_columns => ['score'] → 'score' absent from columns() after add.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p], join_column => $JC);
+	$j->add_database($s, remove_columns => ['score']);
+	ok(!(grep { $_ eq 'score' } @{ $j->columns() }),
+		'add_database remove_columns: listed column hidden from merged view (EP valid)');
+}
+
+# EP: chained add_database returns $self throughout for fluent chaining.
+{
+	my ($p, $s) = _dbs();
+	my $extra = DomainDA->new(
+		cols => [$JC, 'rank'],
+		rows => [{ $JC => 'k1', rank => 1 }],
+	);
+	my $j   = Database::Join->new(databases => [$p], join_column => $JC);
+	my $ret = $j->add_database($s)->add_database($extra);
+	is($ret, $j, 'add_database: chained calls return $self throughout (EP chaining)');
+}
+
+# ==========================================================================
+# Section 14: `count` return value domain
+#
+# BVA minimum: 0 when no rows qualify.
+# BVA single:  1 when exactly one row qualifies.
+# EP typical:  N when all rows qualify.
+# EP operator: operator-hashref criterion correctly filters the counted set.
+# ==========================================================================
+
+note '--- Section 14: count return value domain ---';
+
+# BVA minimum: disjoint inner join → 0 qualifying rows.
+{
+	my $p = DomainDA->new(cols => [$JC, 'name'],  rows => [{ $JC => 'k1', name => 'A' }]);
+	my $s = DomainDA->new(cols => [$JC, 'score'], rows => [{ $JC => 'k2', score => 1 }]);
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC, join_type => 'inner');
+	is($j->count(), 0, 'count: disjoint inner join → 0 (BVA minimum)');
+}
+
+# BVA single: equality criterion matches exactly one row.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	is($j->count(name => 'Alice'), 1, 'count: equality criterion → 1 matching row (BVA single)');
+}
+
+# EP typical: no criteria → full join count.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	is($j->count(), 2, 'count: no criteria → total row count (EP typical)');
+}
+
+# EP operator: operator-hashref criterion restricts counted set correctly.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	is($j->count(score => { '>=' => 70 }), 2, 'count: score >= 70 → 2 (EP operator-inclusive)');
+	is($j->count(score => { '>'  => 70 }), 1, 'count: score > 70  → 1 (EP operator-exclusive)');
+}
+
+# ==========================================================================
+# Section 15: `fetchrow_hashref` return value domain
+#
+# EP match:     returns a hashref with all expected merged keys.
+# BVA no-match: returns undef (empty result).
+# EP shorthand: positional single scalar == named join_col pair.
+# EP first-wins: when multiple rows qualify, only the first is returned.
+# ==========================================================================
+
+note '--- Section 15: fetchrow_hashref return value domain ---';
+
+# EP match: returns a hashref with correct merged values.
+{
+	my ($p, $s) = _dbs();
+	my $j   = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $row = $j->fetchrow_hashref(name => 'Alice');
+	ok(ref($row) eq 'HASH', 'fetchrow_hashref: match → hashref returned (EP match)');
+	is($row->{name}, 'Alice', 'fetchrow_hashref: hashref contains expected column value');
+}
+
+# BVA no-match: criterion matches nothing → undef.
+{
+	my ($p, $s) = _dbs();
+	my $j   = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $row = $j->fetchrow_hashref(name => 'No_Such_Name');
+	ok(!defined $row, 'fetchrow_hashref: no match → undef (BVA empty)');
+}
+
+# EP shorthand: positional scalar == named join_col pair.
+{
+	my ($p, $s) = _dbs();
+	my $j       = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $by_pos  = $j->fetchrow_hashref('k1');
+	my $by_pair = $j->fetchrow_hashref($JC => 'k1');
+	is_deeply($by_pos, $by_pair,
+		'fetchrow_hashref: positional shorthand == named-pair form (EP shorthand)');
+}
+
+# EP first-wins: multiple qualifying rows → first row by join_col sort order returned.
+{
+	my ($p, $s) = _dbs();
+	my $j   = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $row = $j->fetchrow_hashref();   # both k1 and k2 qualify; k1 is first alphabetically
+	is($row->{$JC}, 'k1',
+		'fetchrow_hashref: multiple matches → first row by join_col sort order (EP first-wins)');
+}
+
+# ==========================================================================
+# Section 16: `selectall_array` calling-context domain
+#
+# EP list context:   returns flat list of hashrefs.
+# EP scalar context: returns first hashref (or undef when empty).
+# BVA empty-result:  list context → empty list; scalar context → undef.
+# ==========================================================================
+
+note '--- Section 16: selectall_array calling-context domain ---';
+
+# EP list context: returns all rows as a flat list of hashrefs.
+{
+	my ($p, $s) = _dbs();
+	my $j    = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my @rows = $j->selectall_array();
+	is(scalar @rows, 2,          'selectall_array: list context → 2 hashrefs (EP list-context)');
+	ok(ref($rows[0]) eq 'HASH', 'selectall_array: each element is a hashref');
+}
+
+# EP scalar context: returns first hashref only.
+{
+	my ($p, $s) = _dbs();
+	my $j     = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $first = $j->selectall_array();
+	ok(ref($first) eq 'HASH', 'selectall_array: scalar context → hashref (EP scalar-context)');
+	is($first->{$JC}, 'k1',   'selectall_array: scalar context → first row by join_col sort');
+}
+
+# BVA empty: scalar context, no rows match → undef.
+{
+	my ($p, $s) = _dbs();
+	my $j    = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $none = $j->selectall_array(name => 'No_One');
+	ok(!defined $none, 'selectall_array: scalar context, no match → undef (BVA empty)');
+}
+
+# BVA empty: list context, no rows match → empty list.
+{
+	my ($p, $s) = _dbs();
+	my $j     = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my @none  = $j->selectall_array(name => 'No_One');
+	is(scalar @none, 0, 'selectall_array: list context, no match → empty list (BVA empty)');
+}
+
+# ==========================================================================
+# Section 17: `updated` return value domain
+#
+# EP single DB:   returns that database's own updated value.
+# BVA equal:      two DBs with identical timestamps → returns that value.
+# EP max-wins:    two DBs with different timestamps → returns the greater one.
+# EP add_database: runtime addition of a newer DB raises the reported maximum.
+# ==========================================================================
+
+note '--- Section 17: updated return value domain ---';
+
+# EP single DB: updated() returns the sole component database's value.
+{
+	my $p = DomainDA->new(cols => [$JC, 'name'], rows => [], updated => 1_000_000);
+	my $j = Database::Join->new(databases => [$p], join_column => $JC);
+	is($j->updated(), 1_000_000, 'updated: single DB → returns its updated value (EP single)');
+}
+
+# BVA equal: both DBs have the same timestamp → returns that value.
+{
+	my $p = DomainDA->new(cols => [$JC, 'name'],  rows => [], updated => 2_000_000);
+	my $s = DomainDA->new(cols => [$JC, 'score'], rows => [], updated => 2_000_000);
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	is($j->updated(), 2_000_000, 'updated: equal timestamps → returns that value (BVA equal)');
+}
+
+# EP max-wins: returns the larger of two differing timestamps.
+{
+	my $p = DomainDA->new(cols => [$JC, 'name'],  rows => [], updated => 1_000_000);
+	my $s = DomainDA->new(cols => [$JC, 'score'], rows => [], updated => 3_000_000);
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	is($j->updated(), 3_000_000, 'updated: two DBs, later timestamp wins (EP max-wins)');
+}
+
+# EP add_database: adding a newer DB raises the reported maximum.
+{
+	my $p = DomainDA->new(cols => [$JC, 'name'],  rows => [], updated => 1_000_000);
+	my $s = DomainDA->new(cols => [$JC, 'score'], rows => [], updated => 2_000_000);
+	my $t = DomainDA->new(cols => [$JC, 'rank'],  rows => [], updated => 5_000_000);
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	is($j->updated(), 2_000_000, 'updated: before add_database → max of existing DBs');
+	$j->add_database($t);
+	is($j->updated(), 5_000_000, 'updated: after add_database with newer DB → new max');
+}
+
+# ==========================================================================
+# Section 18: `query` and `execute` croak domain
+#
+# Both methods are explicitly unsupported on Database::Join and always croak
+# with the documented error messages regardless of any arguments passed.
+# ==========================================================================
+
+note '--- Section 18: query and execute unsupported methods ---';
+
+# EP: query() always croaks with error_query_unsupported.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	throws_ok { $j->query() }
+		qr/query\(\).*not supported/,
+		'query: always croaks error_query_unsupported (EP unsupported)';
+}
+
+# EP: execute() always croaks with error_execute_unsupported.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	throws_ok { $j->execute() }
+		qr/execute\(\).*not supported/,
+		'execute: always croaks error_execute_unsupported (EP unsupported)';
 }

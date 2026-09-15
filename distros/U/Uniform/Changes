@@ -13,3 +13,14 @@ Revision history for Uniform
           distributions (upload size caps, request body size caps, etc).
 1.03  2026-08-23
         - Added links in POD
+1.04  2026-09-13
+        - Corrected the ecosystem specification to distinguish portable
+          protocol/domain components from explicit framework adapters.
+        - Limited apply() to components that stage external side effects;
+          pure calculations and detached value objects no longer require it.
+        - Clarified fluent return requirements for property mutators without
+          constraining operations that return domain results.
+        - Clarified that fail-fast exceptions apply to programmer misuse,
+          while malformed remote input may be represented as data.
+        - Corrected the POD license declaration to match the MIT LICENSE file.
+        - Declared the Test::Exception test dependency.

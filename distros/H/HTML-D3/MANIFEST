@@ -16,6 +16,9 @@ README.md
 t/00-load.t
 t/20-new.t
 t/animated.t
+t/animated_bar.t
+t/animated_line.t
+t/animated_pie.t
 t/bar.t
 t/comment-spelling.t
 t/cover.t
@@ -35,6 +38,7 @@ t/modules-used.t
 t/multiple.t
 t/no404s.t
 t/noplan.t
+t/pie.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-links.t
@@ -43,6 +47,7 @@ t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/snippet.t
+t/snippet_pie.t
 t/tooltip.t
 t/unit.t
 t/zoomable.t

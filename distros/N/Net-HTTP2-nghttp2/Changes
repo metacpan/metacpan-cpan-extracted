@@ -1,5 +1,59 @@
 Revision history for Net-HTTP2-nghttp2
 
+0.011   2026-09-12
+        - Defer a data provider's release while a session call is running.
+          Closing a stream from inside a callback freed the provider that
+          nghttp2 still held as the outbound DATA item's data source; the
+          provider is now unlinked at once and freed when mem_send or
+          mem_recv returns.
+        - mem_send and mem_recv now croak when called from inside a session
+          callback. Re-entering them re-serialized the frame still being
+          processed, recursing until the C stack was exhausted.
+        - Check nghttp2_session_callbacks_new for failure instead of using an
+          uninitialized callbacks pointer.
+        - Every session method now croaks once the session has been destroyed.
+          Teardown clears the nghttp2 handle before releasing the providers and
+          callbacks that run Perl destructors, so a destructor that calls back
+          into the dying session is refused instead of dereferencing a deleted
+          session.
+        - A data provider belongs to the session only after its submit
+          succeeded. A failed nghttp2_submit_response or nghttp2_submit_request
+          now releases the provider before croaking, instead of unlinking
+          whichever provider happened to share the stream id.
+        - A stream carries at most one body provider. A second streaming
+          response on a stream that already has one is refused by name; nghttp2
+          accepted it and left the loser orphaned under the same stream id.
+        - Document that a provider released during a session call that ends by
+          a Perl exception is reclaimed by the next session call or by DESTROY,
+          not immediately.
+        - Release the provider of a response nghttp2 discarded because its
+          stream was already closed. A server answering a stream the peer had
+          just reset held that response's data provider and its callback_data
+          until the session was destroyed: one leak per reset.
+        - The example h2spec-server exercises the send-side callbacks: frame
+          counters under --stats, an /early endpoint that answers before the
+          request body and resets the request half from on_frame_send, a
+          /stream endpoint, and a GOAWAY shutdown on SIGTERM. Author load
+          tests for it live under xt/.
+        - submit_push_promise removed: it never had an XS implementation and
+          could not be called.
+        - Remove the unused _submit_response_with_body XS function, a stub from the
+          first commit that accepted a body and submitted headers only; static
+          bodies have always gone through the streaming provider.
+
+0.010   2026-09-11
+        - Add send-side lifecycle callbacks: on_frame_send reports each frame
+          as it is serialized, and on_frame_not_send reports a queued non-DATA
+          frame discarded before the wire.
+        - Add diagnostic callbacks: on_invalid_frame_recv for a peer frame
+          nghttp2 rejects, and on_error for nghttp2's own error messages.
+        - Add get_stream_remote_close() and get_stream_local_close() to query
+          which halves of a stream are still open.
+        - Add submit_goaway() for a graceful shutdown announcement with an
+          optional error code and debug data.
+        - Export NGHTTP2_ERR_STREAM_CLOSING, NGHTTP2_ERR_PROTO and
+          NGHTTP2_ERR_HTTP_HEADER through the :errors tag.
+
 0.009   2026-08-23
         - Add end-to-end HTTP/2 trailer support, including submit_trailer(),
           content EOF without END_STREAM for streamed and direct bodies, and

@@ -59,6 +59,22 @@ WriteMakefile(
 sub MY::postamble {
     return <<'MAKE_FRAG';
 
+# --- README regeneration ---------------------------------------------
+# Usage: make readme
+#
+# README.md is the GitHub-facing rendering of the pod in Enum.pm; it is
+# not shipped in the dist (see MANIFEST.SKIP), so distcheck cannot flag
+# drift. Regenerate it after any pod change.
+
+.PHONY: readme
+
+readme :
+	@command -v pod2markdown >/dev/null 2>&1 || { \
+	    echo "ERROR: pod2markdown not found in PATH; cpanm Pod::Markdown"; \
+	    exit 1; \
+	}
+	pod2markdown lib/Object/PadX/Enum.pm > README.md
+
 # --- Release target -------------------------------------------------
 # Usage: make release
 #

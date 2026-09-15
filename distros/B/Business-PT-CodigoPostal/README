@@ -1,0 +1,109 @@
+Business-PT-CodigoPostal
+========================
+
+Validação de códigos postais portugueses: formato, distrito, região e
+localidades.
+
+    use Business::PT::CodigoPostal qw(validate_cp localidades asignado);
+
+    my $cp = validate_cp('1000-001');
+
+    if ($cp->{valid}) {
+        print $cp->{distrito};   # Lisboa
+        print $cp->{region};     # Continente
+    }
+    else {
+        print $cp->{error};
+    }
+
+    my @l = localidades('2100-049');
+    asignado('9999-999');            # 0
+
+Também há interface orientada a objectos:
+
+    my $cp = Business::PT::CodigoPostal->new(codigo => '9000-001');
+    $cp->distrito;   # Madeira
+    $cp->insular;    # 1
+    $cp->set('1000-001');
+
+
+O PREFIXO NÃO CHEGA
+-------------------
+
+Em Espanha os dois primeiros dígitos do código postal são o número da
+província, por definição administrativa, e um módulo equivalente resolve-se com
+uma tabela de 52 entradas.
+
+Em Portugal não funciona assim. O código postal é uma divisão de distribuição e
+não respeita as fronteiras dos distritos: o prefixo de dois dígitos é ambíguo em
+25 dos 79 casos --- o 20 tanto é Lisboa como Santarém. Com quatro dígitos restam
+13 prefixos ambíguos em 750, e esses resolvem-se olhando o código completo, com
+o qual não fica nenhum por decidir.
+
+Daí as duas tabelas: 737 prefixos de quatro dígitos e 5.043 códigos completos
+para os 13 prefixos que ficam a cavalo de dois distritos.
+
+
+O QUE CUSTA
+-----------
+
+Os dados de localidades são vários MB e carregam-se só ao pedir localidades:
+
+    validar e obter o distrito     ~13 ms, ~4,5 MB
+    primeira chamada a localidades ~190 ms, ~38 MB (uma vez por processo)
+
+Quem só precisa do distrito --- que é o caso de um formulário de morada --- não
+paga o segundo.
+
+
+NORMALIZAÇÃO
+------------
+
+Por omissão a validação é estrita. Com strict a 0 limpa-se a entrada, que é o
+que faz falta ao processar ficheiros:
+
+    validate_cp('1000001', { strict => 0 })->{distrito}   # Lisboa
+
+
+CODIFICAÇÃO
+-----------
+
+O módulo devolve CARACTERES em todas as saídas de texto, não bytes. Guardar
+bytes numa base de dados com a ligação em UTF-8 produz dupla codificação.
+
+
+INSTALAÇÃO
+----------
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Ou com cpanm:
+
+    cpanm Business::PT::CodigoPostal
+
+
+DADOS
+-----
+
+Distritos, códigos postais e localidades de GeoNames
+(https://www.geonames.org/, ficheiro export/zip/PT.zip), sob licença Creative
+Commons Attribution 4.0 (https://creativecommons.org/licenses/by/4.0/).
+Regeneram-se com maint/gen-datos.pl.
+
+
+VER TAMBÉM
+----------
+
+Business::ES::CodigoPostal, para códigos postais espanhóis.
+
+
+LICENÇA
+-------
+
+Copyright 2026 HDELGADO.
+
+Software livre nos mesmos termos que o Perl. Os dados de localidades mantêm a
+sua própria licença (CC BY 4.0).

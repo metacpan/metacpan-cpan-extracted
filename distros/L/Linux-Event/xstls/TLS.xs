@@ -17,6 +17,12 @@
 
 #include "stream_transport_abi.h"
 
+typedef struct let_server_config_s {
+    unsigned char *alpn;
+    unsigned int alpn_len;
+    UV refs;
+} let_server_config_t;
+
 typedef struct let_tls_s {
     SSL_CTX *ctx;
     SSL *ssl;
@@ -32,6 +38,7 @@ typedef struct let_tls_s {
     double shutdown_timeout;
     unsigned char *alpn;
     unsigned int alpn_len;
+    let_server_config_t *server_config;
     char error[512];
     unsigned long long handshake_calls;
     unsigned long long handshake_successes;
@@ -374,6 +381,28 @@ let_server_alpn_select(SSL *ssl, const unsigned char **out,
     return SSL_TLSEXT_ERR_OK;
 }
 
+static int
+let_prepared_server_alpn_select(SSL *ssl, const unsigned char **out,
+    unsigned char *outlen, const unsigned char *client, unsigned int client_len,
+    void *argument)
+{
+    let_server_config_t *config = (let_server_config_t *)argument;
+    unsigned char *selected = NULL;
+    unsigned char selected_len = 0;
+    int result;
+    (void)ssl;
+
+    if (!config || !config->alpn_len)
+        return SSL_TLSEXT_ERR_NOACK;
+    result = SSL_select_next_proto(&selected, &selected_len,
+        config->alpn, config->alpn_len, client, client_len);
+    if (result != OPENSSL_NPN_NEGOTIATED)
+        return SSL_TLSEXT_ERR_NOACK;
+    *out = selected;
+    *outlen = selected_len;
+    return SSL_TLSEXT_ERR_OK;
+}
+
 static void
 let_copy_alpn(let_tls_t *tls, const unsigned char *alpn, STRLEN length)
 {
@@ -384,6 +413,51 @@ let_copy_alpn(let_tls_t *tls, const unsigned char *alpn, STRLEN length)
         croak("malloc ALPN buffer failed");
     memcpy(tls->alpn, alpn, (size_t)length);
     tls->alpn_len = (unsigned int)length;
+}
+
+static let_server_config_t *
+let_server_config_new(const unsigned char *alpn, STRLEN length)
+{
+    let_server_config_t *config;
+
+    config = (let_server_config_t *)calloc(1, sizeof(*config));
+    if (!config)
+        return NULL;
+    config->refs = 1;
+    if (length) {
+        config->alpn = (unsigned char *)malloc((size_t)length);
+        if (!config->alpn) {
+            free(config);
+            return NULL;
+        }
+        memcpy(config->alpn, alpn, (size_t)length);
+        config->alpn_len = (unsigned int)length;
+    }
+    return config;
+}
+
+static void
+let_server_config_retain(let_server_config_t *config)
+{
+    if (!config)
+        return;
+    if (config->refs == (UV)-1)
+        croak("TLS prepared server context reference overflow");
+    config->refs++;
+}
+
+static void
+let_server_config_release(let_server_config_t *config)
+{
+    if (!config)
+        return;
+    if (!config->refs)
+        croak("TLS prepared server context reference underflow");
+    config->refs--;
+    if (!config->refs) {
+        free(config->alpn);
+        free(config);
+    }
 }
 
 static void
@@ -587,6 +661,98 @@ _new_server(CLASS, cert_file, key_file, alpn_sv, handshake_timeout, shutdown_tim
   OUTPUT:
     RETVAL
 
+SV *
+_new_server_template(CLASS, cert_file, key_file, alpn_sv, handshake_timeout, shutdown_timeout)
+    const char *CLASS
+    const char *cert_file
+    const char *key_file
+    SV *alpn_sv
+    NV handshake_timeout
+    NV shutdown_timeout
+  PREINIT:
+    let_tls_t *tls;
+    let_server_config_t *config;
+    STRLEN alpn_len;
+    const unsigned char *alpn;
+    char construction_error[512];
+  CODE:
+    tls = (let_tls_t *)calloc(1, sizeof(*tls));
+    if (!tls) croak("calloc TLS server template failed");
+    tls->fd = -1;
+    tls->deadline_fd = -1;
+    tls->role = 2;
+    tls->handshake_timeout = (double)handshake_timeout;
+    tls->shutdown_timeout = (double)shutdown_timeout;
+    tls->ctx = SSL_CTX_new(TLS_server_method());
+    if (!tls->ctx) {
+        free(tls);
+        croak("SSL_CTX_new prepared server failed");
+    }
+    SSL_CTX_set_min_proto_version(tls->ctx, TLS1_2_VERSION);
+    if (SSL_CTX_use_certificate_chain_file(tls->ctx, cert_file) != 1
+        || SSL_CTX_use_PrivateKey_file(tls->ctx, key_file,
+            SSL_FILETYPE_PEM) != 1
+        || SSL_CTX_check_private_key(tls->ctx) != 1) {
+        let_set_error(tls, "failed to load prepared TLS server identity");
+        snprintf(construction_error, sizeof(construction_error), "%s", tls->error);
+        SSL_CTX_free(tls->ctx);
+        free(tls);
+        croak("%s", construction_error);
+    }
+    alpn = (const unsigned char *)SvPVbyte(alpn_sv, alpn_len);
+    config = let_server_config_new(alpn, alpn_len);
+    if (!config) {
+        SSL_CTX_free(tls->ctx);
+        free(tls);
+        croak("malloc prepared TLS server configuration failed");
+    }
+    tls->server_config = config;
+    if (config->alpn_len)
+        SSL_CTX_set_alpn_select_cb(tls->ctx,
+            let_prepared_server_alpn_select, config);
+    RETVAL = sv_setref_pv(newSV(0), CLASS, (void *)tls);
+  OUTPUT:
+    RETVAL
+
+SV *
+_clone_server(object)
+    SV *object
+  PREINIT:
+    let_tls_t *template;
+    let_tls_t *tls;
+  CODE:
+    template = let_from_sv(object);
+    if (!template || !template->ctx || template->role != 2
+        || template->ssl || !template->server_config)
+        croak("not a prepared Linux::Event TLS server context");
+    tls = (let_tls_t *)calloc(1, sizeof(*tls));
+    if (!tls) croak("calloc TLS server connection failed");
+    tls->fd = -1;
+    tls->deadline_fd = -1;
+    tls->role = 2;
+    tls->handshake_timeout = template->handshake_timeout;
+    tls->shutdown_timeout = template->shutdown_timeout;
+    if (SSL_CTX_up_ref(template->ctx) != 1) {
+        free(tls);
+        croak("SSL_CTX_up_ref prepared server failed");
+    }
+    tls->ctx = template->ctx;
+    tls->server_config = template->server_config;
+    let_server_config_retain(tls->server_config);
+    tls->ssl = SSL_new(tls->ctx);
+    if (!tls->ssl) {
+        SSL_CTX_free(tls->ctx);
+        let_server_config_release(tls->server_config);
+        free(tls);
+        croak("SSL_new prepared server connection failed");
+    }
+    SSL_set_mode(tls->ssl,
+        SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
+    SSL_set_accept_state(tls->ssl);
+    RETVAL = sv_setref_pv(newSV(0), "Linux::Event::TLS", (void *)tls);
+  OUTPUT:
+    RETVAL
+
 void
 _bind_fd(object, fd)
     SV *object
@@ -597,6 +763,7 @@ _bind_fd(object, fd)
   PPCODE:
     tls = let_from_sv(object);
     if (!tls) croak("TLS provider is closed");
+    if (!tls->ssl) croak("prepared TLS server context cannot be bound directly");
     if (tls->bound) croak("TLS provider is already bound to a Stream");
     if (fd < 0) croak("TLS file descriptor must be >= 0");
     tls->bio_method = let_bio_method_new();
@@ -739,7 +906,7 @@ protocol(object)
     const char *name;
   CODE:
     tls = let_from_sv(object);
-    name = tls && tls->ready ? SSL_get_version(tls->ssl) : NULL;
+    name = tls && tls->ssl && tls->ready ? SSL_get_version(tls->ssl) : NULL;
     RETVAL = name ? newSVpv(name, 0) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -752,7 +919,7 @@ cipher(object)
     const char *name;
   CODE:
     tls = let_from_sv(object);
-    name = tls && tls->ready ? SSL_get_cipher_name(tls->ssl) : NULL;
+    name = tls && tls->ssl && tls->ready ? SSL_get_cipher_name(tls->ssl) : NULL;
     RETVAL = name ? newSVpv(name, 0) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -799,6 +966,7 @@ DESTROY(object)
         if (tls->bio_method) BIO_meth_free(tls->bio_method);
         if (tls->ctx) SSL_CTX_free(tls->ctx);
         free(tls->alpn);
+        let_server_config_release(tls->server_config);
         free(tls);
         sv_setiv(SvRV(object), 0);
     }

@@ -4,12 +4,27 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
-    use vars qw( $DEBUG );
+    use vars qw( $DEBUG $JSON_CLASS );
     use Test::More qw( no_plan );
-    use JSON;
     use Module::Generic::File qw( cwd file tempfile );
     use Scalar::Util qw( reftype );
     use_ok( 'Text::PO' ) || BAIL_OUT( "Cannot load Test::PO" );
+    # JSON backend detection: prefer Cpanel::JSON::XS (fastest, most rigorous), fall back
+    # to JSON::XS, then JSON::PP (core since Perl 5.14).
+    our $JSON_CLASS;
+    if( eval{ require Cpanel::JSON::XS; 1 } )
+    {
+        $JSON_CLASS   = 'Cpanel::JSON::XS';
+    }
+    elsif( eval{ require JSON::XS; 1 } )
+    {
+        $JSON_CLASS   = 'JSON::XS';
+    }
+    else
+    {
+        require JSON::PP;
+        $JSON_CLASS   = 'JSON::PP';
+    }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -29,7 +44,7 @@ local $@;
 # try-catch
 eval
 {
-    my $data = JSON->new->allow_nonref->decode( $json );
+    my $data = $JSON_CLASS->new->allow_nonref->decode( $json );
     is( reftype( $data ), 'HASH', 'as_json' );
 };
 if( $@ )

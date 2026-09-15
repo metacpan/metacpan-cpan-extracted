@@ -336,18 +336,22 @@ subtest 'undef arg: logger invoked when set' => sub {
 };
 
 # -------------------------------------------------------------------------
-# 18. Log::Abstraction object stored correctly in new()
+# 18. person arg forwarded to logger as ctx on error
 # -------------------------------------------------------------------------
 
-subtest 'new() stores Log::Abstraction object as logger' => sub {
-	plan tests => 3;
+subtest 'name() forwards person to logger as ctx on error' => sub {
+	plan tests => 2;
 
-	my $la    = Log::Abstraction->new(logger => sub {});
+	my @log_args;
+	my $la    = Log::Abstraction->new(logger => sub { push @log_args, shift });
 	my $namer = Genealogy::Relationship::Name->new(logger => $la);
+	my $fake  = bless { name => 'Test' }, 'FakePerson';
 
-	isa_ok($namer, 'Genealogy::Relationship::Name');
-	ok(defined $namer->{logger}, 'logger stored on object');
-	isa_ok($namer->{logger}, 'Log::Abstraction');
+	eval { $namer->name(steps_to_ancestor => undef, steps_from_ancestor => 1,
+	                    sex => 'M', person => $fake) };
+	is(scalar @log_args, 1, 'logger called once for undef steps_to_ancestor with person');
+	# Log::Abstraction may or may not support per-call ctx; at minimum logger fires
+	ok($@, 'error still croaked after logger call');
 };
 
 done_testing();

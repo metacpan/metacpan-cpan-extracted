@@ -1,3 +1,8 @@
+1.10.2  2026-09-11
+
+  -  Use shallow clones for the local SBo repo when supported
+  -  Make Perl warnings nonfatal at runtime and fail tests on warnings
+
 1.10.1  2026-09-04
 
   -  Fix handling of invalid SlackBuild package directory arguments

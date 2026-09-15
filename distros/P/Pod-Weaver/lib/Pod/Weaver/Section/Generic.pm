@@ -1,10 +1,10 @@
-package Pod::Weaver::Section::Generic 4.021;
+package Pod::Weaver::Section::Generic 4.022;
 # ABSTRACT: a generic section, found by lifting sections
 
 use Moose;
 with 'Pod::Weaver::Role::Section';
 
-use v5.20.0;
+use v5.22.0;
 use experimental 'postderef'; # this experiment succeeded -- rjbs, 2021-04-02
 
 #pod =head1 OVERVIEW
@@ -108,7 +108,7 @@ Pod::Weaver::Section::Generic - a generic section, found by lifting sections
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

@@ -24,7 +24,24 @@ t/20-streaming-request.t
 t/21-submit-data.t
 t/22-rst-rate-limit.t
 t/23-trailers.t
+t/24-frame-send.t
+t/25-frame-not-send.t
+t/26-stream-close-queries.t
+t/27-invalid-frame-and-error.t
+t/28-goaway.t
+t/29-reset-inside-frame-send.t
+t/30-reentrancy.t
+t/31-pending-free-reentry.t
+t/32-callback-unwind-restores-session.t
+t/33-destroy-order.t
+t/34-provider-ownership.t
+t/35-closed-stream-response.t
+t/36-rapid-reset-response.t
 t/lib/Test/HTTP2/Frame.pm
 t/lib/Test/HTTP2/HPACK.pm
+t/lib/Test/HTTP2/Pair.pm
+xt/lib/Test/HTTP2/LoadServer.pm
+xt/load-h2load.t
+xt/load-nghttp-reset.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

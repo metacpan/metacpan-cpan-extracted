@@ -9,7 +9,7 @@ use Path::Tiny ();
 use File::chdir;
 
 # ABSTRACT: Mock plugin for testing
-our $VERSION = '2.84'; # VERSION
+our $VERSION = '2.87'; # VERSION
 
 
 has 'probe';
@@ -305,7 +305,7 @@ Alien::Build::Plugin::Test::Mock - Mock plugin for testing
 
 =head1 VERSION
 
-version 2.84
+version 2.87
 
 =head1 SYNOPSIS
 
@@ -502,6 +502,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 nick nauwelaerts (INPHOBIA)
 
 Florian Weimer
+
+Marcel Telka (mtelka)
 
 =head1 COPYRIGHT AND LICENSE
 

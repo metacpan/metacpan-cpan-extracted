@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin negotiator for cryptographic signatures
-our $VERSION = '2.84'; # VERSION
+our $VERSION = '2.87'; # VERSION
 
 
 has '+sig' => sub { {} };
@@ -92,7 +92,7 @@ Alien::Build::Plugin::Digest::Negotiate - Plugin negotiator for cryptographic si
 
 =head1 VERSION
 
-version 2.84
+version 2.87
 
 =head1 SYNOPSIS
 
@@ -176,6 +176,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 nick nauwelaerts (INPHOBIA)
 
 Florian Weimer
+
+Marcel Telka (mtelka)
 
 =head1 COPYRIGHT AND LICENSE
 

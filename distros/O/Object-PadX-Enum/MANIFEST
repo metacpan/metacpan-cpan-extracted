@@ -12,5 +12,6 @@ t/05-eval-and-do.t
 t/06-attributes.t
 t/07-new-blocked.t
 t/08-enum-inheritance.t
+t/09-compile-time.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

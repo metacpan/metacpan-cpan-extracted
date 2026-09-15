@@ -14,7 +14,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: August 7 2026 $
+.Dd $Mdocdate: September 13 2026 $
 .Dt FUGUWEB 1
 .Os
 .Sh NAME
@@ -26,269 +26,989 @@
 .Op Fl Fl project Ar dir
 .Ar command
 .Op Ar argument ...
+.Nm fuguweb
+.Cm init
+.Op Ar dir
+.Nm fuguweb
+.Cm build
+.Op Fl Fl out Ar dir
+.Nm fuguweb
+.Cm check
+.Op Fl v
+.Op Fl Fl out Ar dir
+.Nm fuguweb
+.Cm clean
+.Op Fl Fl out Ar dir
+.Nm fuguweb
+.Cm mint-key
+.Fl Fl purpose Ar word
+.Op Fl Fl type Ar type
+.Fl Fl secret Ar path
+.Op Fl Fl signer Ar path
+.Op Fl Fl bind Ar stem Ns = Ns Ar path
+.Op Fl Fl email Ar address
+.Op Fl Fl expires Ar date
+.Op Fl Fl dir Ar name
+.Op Fl Fl bootstrap Fl Fl org Ar word Op Fl Fl url Ar prefix
+.Nm fuguweb
+.Cm import-key
+.Fl Fl purpose Ar word
+.Op Fl Fl type Ar type
+.Fl Fl file Ar path
+.Fl Fl secret Ar path
+.Op Fl Fl signer Ar path
+.Op Fl Fl bind Ar stem Ns = Ns Ar path
+.Op Fl Fl dir Ar name
+.Op Fl Fl bootstrap Fl Fl org Ar word Op Fl Fl url Ar prefix
+.Nm fuguweb
+.Cm promote-key
+.Fl Fl purpose Ar word
+.Fl Fl retiring Ar path
+.Op Fl Fl secret Ar path
+.Op Fl Fl signer Ar path
+.Op Fl Fl bind Ar stem Ns = Ns Ar path
+.Op Fl Fl dir Ar name
+.Nm fuguweb
+.Cm help
+.Op Ar command
 .Sh DESCRIPTION
 .Nm
-builds one static website from the documentation that a Perl project
+renders one static website from the documentation that a Perl project
 already keeps:
 .Xr mdoc 7
-manuals,
-POD sidecars,
-and Markdown.
-There is no templating language and no JavaScript.
-.Nm
-runs
+manuals, POD sidecars, and Markdown.
+It runs
 .Xr mandoc 1 ,
 .Xr lowdown 1
 and
 .Xr pod2man 1 ,
-and wraps each result in one shared chrome.
+and wraps each result in one shared page layout.
+The output is plain HTML and one stylesheet.
+There is no templating language and no JavaScript.
 .Pp
-.Nm
-operates on a project:
-a directory that has a
+A project is a directory that holds a
 .Pa .fuguwebrc
-file.
-The
-.Cm init
-command writes one.
-If you do not give
+file, the site description.
+Without
 .Fl Fl project ,
 .Nm
-searches up from the current directory for a
-.Pa .fuguwebrc
-file.
-The directory that holds this file is the project root.
+searches up from the current directory for that file.
+The directory that holds it is the project root.
+Every relative path in the description, and a relative
+.Fl Fl out ,
+resolves against the project root.
 .Pp
-The build reads nothing from the network,
-writes nothing outside the output directory,
-and gives the same bytes for the same checkout.
+The build reads nothing from the network, writes nothing outside the
+output directory, and gives the same bytes for the same checkout.
 .Pp
-The options are:
+The options are as follows:
 .Bl -tag -width Ds
+.It Fl h , Fl Fl help
+Print the usage message and exit.
 .It Fl Fl project Ar dir
 Use
 .Ar dir
-as the project root,
-and do not search for it.
+as the project root, and do not search for one.
 .It Fl q , Fl Fl quiet
-Do not show informational output.
-.It Fl h , Fl Fl help
-Show the usage message.
+Do not print informational messages.
 .El
 .Pp
-These commands are available:
+The commands are as follows:
 .Bl -tag -width Ds
 .It Cm init Op Ar dir
 Write a starter
 .Pa .fuguwebrc
-in
-.Ar dir
-(default: the current directory).
-The command refuses a directory that already has one.
+into
+.Ar dir ,
+which defaults to the current directory.
+The starter names one page and one navigation entry, and it builds once
+.Pa web/index.body.html
+exists.
+The command refuses a directory that already holds a description.
 .It Cm build Op Fl Fl out Ar dir
-Render the whole site.
+Render the whole site into the output directory.
 .Fl Fl out
 overrides the
-.Va out_dir
-setting,
-and a relative value is resolved against the project root,
-exactly as the setting is.
+.Ic out_dir
+setting.
 .Pp
-The build also removes a page that the site no longer holds,
-so a manual that was renamed leaves nothing behind.
+The command first checks that every renderer is installed, and names
+the first one that is not.
+It runs
+.Xr mandoc 1
+in lint mode over every mdoc source, and a warning fails the build.
+It then writes the stylesheet, the assets, each key directory, each
+page, and one page for each manual.
+Last, it removes every file of the site that the description no longer
+names, so a second build over one directory gives the same tree as the
+first.
+See
+.Sx THE OUTPUT DIRECTORY .
+.It Cm check Oo Fl v Oc Op Fl Fl out Ar dir
+Check a built site.
+The command prints one line for each problem and exits with status 5.
+It prints nothing and exits with status 0 when the site is good.
 .Pp
-The command checks the renderers first,
-and names the one that is missing.
-It then rejects a malformed manual source,
-because such a page must fail the build and not render badly.
+The checks are these:
+every page and asset of the site exists and is not empty;
+every page has a title and carries the whole navigation;
+every local link, manual cross-reference, and fragment resolves;
+no reference starts with a solidus, uses a
+.Ql file\&:
+URL, or reads as a URL scheme;
+every page is reachable from the entry page, except a page marked
+.Ic unlinked ;
+and the output holds the site and nothing else, at any depth.
+A description with a
+.Ic keys
+block adds the checks of
+.Sx THE KEY DIRECTORY .
 .Pp
-The command refuses a symlink on a path that it writes,
-or on a directory above one,
-before it writes one file.
-An open follows a link,
-so a build would write the site outside its own directory.
-A symlink that the build never writes through belongs to somebody else,
-and the build leaves it.
+.Fl v ,
+.Fl Fl verbose
+also prints every external link.
+The command never fetches one.
 .It Cm clean Op Fl Fl out Ar dir
 Remove the output directory.
+The command deletes a tree without asking, so it removes a built site
+and refuses anything else.
+See
+.Sx THE OUTPUT DIRECTORY .
+.Pp
+With
 .Fl Fl out
-overrides the
-.Va out_dir
-setting,
-and a relative value is resolved against the project root,
-exactly as
-.Cm build
-resolves it.
-The working directory does not decide it,
-so
-.Ic clean Fl Fl out Ar build
-names one directory from anywhere in the project.
+the command runs without a loadable description.
+It then knows one flat directory of files, and it refuses a target that
+holds no stylesheet, because every build writes one.
+.It Xo Cm mint-key
+.Fl Fl purpose Ar word
+.Op Fl Fl type Ar type
+.Fl Fl secret Ar path
+.Op Fl Fl signer Ar path
+.Op Fl Fl bind Ar stem Ns = Ns Ar path
+.Op Fl Fl email Ar address
+.Op Fl Fl expires Ar date
+.Op Fl Fl dir Ar name
+.Op Fl Fl bootstrap Fl Fl org Ar word Op Fl Fl url Ar prefix
+.Xc
+Mint the next key of a purpose.
+The
+.Ar type
+defaults to
+.Cm signify ,
+and
+.Cm openpgp
+is the other type that this release mints.
+An OpenPGP mint needs
+.Fl Fl email ,
+and it takes an optional
+.Fl Fl expires .
+A mint of another type takes neither option.
+See
+.Sx KEY ROTATION .
+.It Xo Cm import-key
+.Fl Fl purpose Ar word
+.Op Fl Fl type Ar type
+.Fl Fl file Ar path
+.Fl Fl secret Ar path
+.Op Fl Fl signer Ar path
+.Op Fl Fl bind Ar stem Ns = Ns Ar path
+.Op Fl Fl dir Ar name
+.Op Fl Fl bootstrap Fl Fl org Ar word Op Fl Fl url Ar prefix
+.Xc
+Publish a key that another tool made, under the next name of the
+purpose.
+The command takes
+.Fl Fl purpose ,
+.Fl Fl signer
+and
+.Fl Fl bind
+as a mint of that purpose does, with
+.Fl Fl file
+beside them.
+The
+.Ar type
+defaults to
+.Cm signify ,
+and
+.Cm openpgp
+and
+.Cm x509
+are the other two.
+An issuer makes an
+.Cm x509
+certificate, so this command is the one that publishes one.
+It takes no
+.Fl Fl email
+and no
+.Fl Fl expires ,
+because it generates no key.
+The block of an imported
+.Cm openpgp
+key therefore carries no
+.Ic email ,
+and the Web Key Directory serves no file for the address of its user
+id.
+The
+.Pa KEYS
+file of its own directory still holds that key.
+The
+.Ic Encryption
+field of
+.Pa security.txt
+can still name it, when that directory is the one that names the
+contact.
+A directory with no
+.Ic keys
+block takes one from
+.Fl Fl bootstrap ,
+.Fl Fl dir ,
+.Fl Fl org
+and
+.Fl Fl url ,
+as a mint does.
+.Fl Fl secret
+names the private half of the key in
+.Fl Fl file ,
+and that file must stand.
+The command writes no key file of its own, and that private half
+signs the binding of the new key.
+A mint refuses a
+.Fl Fl secret
+that stands already, because a mint writes one.
+See
+.Sx KEY ROTATION .
+.It Xo Cm promote-key
+.Fl Fl purpose Ar word
+.Fl Fl retiring Ar path
+.Op Fl Fl secret Ar path
+.Op Fl Fl signer Ar path
+.Op Fl Fl bind Ar stem Ns = Ns Ar path
+.Op Fl Fl dir Ar name
+.Xc
+Make the
+.Cm next
+key of a purpose current, and retire the key that was current.
+See
+.Sx KEY ROTATION .
+.It Cm help Op Ar command
+Print the usage of the tool, or of one command.
+.El
+.Sh THE SITE DESCRIPTION
+The description is
+.Pa .fuguwebrc
+at the project root.
+A setting is one
+.Ar name No = Ar value
+line.
+A block opens with its type, a quoted name, and a brace, and closes
+with a brace on a line of its own.
+A
+.Ql #
+starts a comment, and no value can hold one.
 .Pp
-The command removes a built site and refuses anything else.
-It deletes a tree without asking,
-so the rule is the site itself.
+The settings are as follows:
+.Bl -tag -width "module_root" -offset indent
+.It Ic site
+The name of the site.
+It ends the title of every page, and it is the text of the banner link.
+This is the one required setting.
+.It Ic lang
+The
+.Ql lang
+attribute of every page.
+The default is
+.Ql en .
+.It Ic out_dir
+The output directory.
+The default is
+.Pa web/build .
+.It Ic source_dir
+The source directory.
+The default is
+.Pa web .
+.It Ic entry
+The front page, and the target of the banner link.
+The default is
+.Pa index.html .
+.It Ic module_root
+The prefix that a module name drops.
+The default is
+.Pa lib .
+.It Ic mandoc_os
+The operating system name in the footer of every rendered manual.
+The default is
+.Ql OpenBSD .
+.It Ic man_url
+The manual host for a cross-reference to a manual outside the site.
+The default is
+.Lk https://man.openbsd.org/ .
+.It Ic stylesheet
+The path of the base stylesheet.
+By default the build searches for the sheet that ships with the tool.
+.El
 .Pp
-A plain file of the top level is one that a build writes.
-A file below the root must be one that the site names,
-or one of the shapes that the key directory takes.
-A directory must hold a name of the site,
-or be a directory of the key tree.
-A symlink is never a thing that a build wrote.
-The command refuses every other entry,
-and it names the entry.
-A path that you type must never take the tree of somebody else with it.
+A path setting must not step out of the project.
+.Pp
+The block types are as follows:
+.Bl -tag -width Ds
+.It Ic nav Qq Ar href
+One navigation entry, on every page, in file order.
+The block must set a
+.Ic label .
+.It Ic page Qq Ar file
+One page of the site, named by its file in the output directory.
+The name must be one path segment.
+The block sets a
+.Ic title ,
+which defaults to the file name, and exactly one source:
+.Bl -tag -width "markdown" -offset indent
+.It Ic body
+An HTML body fragment in the source directory.
+.It Ic markdown
+A Markdown file, relative to the project root.
+.It Ic index No = Cm yes
+The generated manual index.
+.El
+.Pp
+.Ic unlinked No = Cm yes
+marks a page that no other page links to, such as
+.Pa 404.html ,
+and the reachability check skips it.
+.It Ic manuals Qq Ar heading
+One group of
+.Xr mdoc 7
+manuals.
+The block must set
+.Ic dir ,
+the directory of the sources, and
+.Ic anchor ,
+the fragment identifier of the group on the index page.
+An optional
+.Ic namespace
+prefixes each manual name, so
+.Pa man/fugu/Daemon.3p
+with the namespace
+.Ql Fugu:\&:
+becomes
+.Ql Fugu::Daemon(3p) .
+.It Ic modules Qq Ar heading
+One group of POD sidecars.
+The block must set
+.Ic dir
+and
+.Ic anchor ,
+and
+.Ic dir
+must lie below
+.Ic module_root .
+.It Ic keys Qq Ar name
+One published key directory.
+A description can hold several, and two blocks must not name one
+directory.
+See
+.Sx THE KEY DIRECTORY .
+.El
+.Pp
+The load fails when a block names no source or two sources, when two
+blocks name one page, when a group directory does not exist, or when
+the source directory holds a symlink.
+Every message names the file and the block at fault.
+.Sh THE PAGE LAYOUT
+Every source becomes one HTML body fragment, and the build wraps each
+fragment in one fixed layout: the head, a banner, the navigation, the
+fragment, and a footer.
+A project decides the site name, the language, the navigation, and the
+footer prose.
+.Pp
+The title of a page is its own title, an em dash, and the site name.
+The banner links the site name to the entry page.
+The navigation lists each
+.Ic nav
+block, in file order.
+.Pp
+A
+.Pa footer.body.html
+in the source directory becomes the footer prose.
+A project without one gets no footer element.
+.Pp
+The base stylesheet ships with the tool as
+.Pa share/fuguweb/style.css .
+The build copies it to
+.Pa style.css
+in the output directory, and every page links it under that name.
+The
+.Ic stylesheet
+setting names another sheet.
+A stylesheet that is not found fails the build.
+.Sh MANUALS
+A
+.Ic manuals
+group reads its directory for the plain files
+.Pa *.1 ,
+.Pa *.3p ,
+.Pa *.5
+and
+.Pa *.8 .
+It sorts them by section, in the order 1, 3p, 5, 8, and then by file
+name.
+The build renders each source with
+.Xr mandoc 1
+and names the page
+.Ql <name>.<section>.html .
+A cross-reference to a manual of the site becomes a local link.
+Any other cross-reference links to the
+.Ic man_url
+host.
+.Pp
+A
+.Ic modules
+group finds every
+.Pa .pod
+file below its directory, and the sidecar that names the directory
+itself:
+.Pa lib/App/FuguWeb.pod
+is the umbrella of
+.Pa lib/App/FuguWeb/ .
+The manual name is the path below
+.Ic module_root
+with
+.Ql :\&:
+between the segments, and the section is
+.Ql 3p .
+The build renders each sidecar with
+.Xr pod2man 1
+and then
+.Xr mandoc 1 ,
+so a module page carries the same layout as a hand-written manual.
+The page date is the date of the last commit, from
+.Xr git 1 .
+A
+.Ql L<>
+reference renders as text, not as a link.
+.Pp
+The index page is the
+.Ic page
+block with
+.Ic index No = Cm yes .
+It opens with a paragraph that names the manual host.
+A
+.Pa manuals.body.html
+in the source directory replaces that paragraph.
+Each group then adds one heading with its
+.Ic anchor ,
+and one list of its manuals.
+Each entry links the page and shows the one-line description, from the
+first
+.Ic \&Nd
+macro of an mdoc source or the
+.Sy NAME
+section of a sidecar.
+A group with no manual adds nothing.
+.Sh THE SOURCE DIRECTORY
+The source directory holds the body fragments, the footer, and the
+assets.
+Every plain file directly in it that the build does not render is an
+asset, and the build copies it as it stands.
+A
+.Pa *.body.html
+fragment, a
+.Pa *.md
+file, and a dot file are not assets.
+.Pa robots.txt
+and
+.Pa CNAME
+therefore need no entry in the description, and notes for the
+maintainers are not published.
+.Pp
+The build rejects a symlink in the source directory.
+A copy would publish the bytes of the target, from anywhere on the
+machine.
+.Sh THE OUTPUT DIRECTORY
+The output is one flat directory of files.
+The key directory and the well-known tree are the only parts below the
+top level.
+.Pp
+The build writes plain files only.
+It refuses a symlink on any path that it writes, before it writes one
+file.
+It owns a plain file at the top level, a file that the site names, and
+a file that has a shape of the key directory.
+It keeps every other entry, reports it, and never removes it.
+.Cm clean
+removes what the build owns, and a directory of the site or of the key
+tree.
+It refuses every other entry, and names it, so it never removes a file
+that the build keeps.
 .Pp
 Both
 .Cm build
 and
 .Cm clean
-also refuse the root of the filesystem,
-the home directory,
-the project root,
-and any directory that holds the project.
-They refuse the source directory as well,
-and every directory of it.
+refuse a target that no build may own: the root of the filesystem, the
+home directory, the project root, and any directory that holds the
+project.
+They refuse the source directory and every directory below it.
+The output directory of the description is the one exception, because
+the default output directory sits inside the default source directory.
 .Pp
-The source directory reads like a built site.
-The key directory is the worst case.
-Each key file sits at its top level,
-where the clean takes a plain file.
-A clean of it would take the trust anchor of every release.
-.Pp
-The output directory is the one exception below the source.
-The default output directory is
-.Pa web/build ,
-and it sits inside the default source directory
-.Pa web .
-The description names that path,
-so a build owns it.
-A description that names neither directory takes the two defaults.
-.Pp
-With
-.Fl Fl out
-the command reads the
-.Pa .fuguwebrc
-when it can,
-because the description is what names the key directory.
-A description that does not load names nothing,
-and one flat directory of files is then the whole site that
-.Cm clean
-knows.
-That fallback is weak,
-so the command asks for one more thing:
-the target must hold the stylesheet.
-Every build writes it,
-so a target without it is the output of no build.
-.Pp
-The staging directory holds one flat directory of plain files.
-The command refuses a staging directory of another shape,
-and the build refuses the same one and leaves it.
-.It Cm check Oo Fl Fl out Ar dir Oc Op Fl Fl verbose
-Check a built site:
-that every page and asset is there and is not empty,
-that every page has a title and the whole navigation,
-that every local link and every fragment resolves,
-that no reference is root-absolute or a
-.Ql file:
-URL,
-that no local link reads as a URL scheme,
-that no manual cross-reference dangles,
-that every page is reachable from the front page,
-and that the output holds the site and nothing else.
-.Pp
-The command prints one line for each problem and exits 5.
-It says nothing and exits 0 when the site is good.
-.Fl Fl verbose
-also notes every external link.
-The command never fetches one:
-the build and its checks touch no network.
-.It Cm rotate-key Fl Fl step Ar mint Ns | Ns Ar promote \
-Fl Fl purpose Ar word Fl Fl secret Ar path Op Fl Fl signer Ar path
-Write the key directory:
-mint the next key of a purpose,
-or promote the one that a mint made.
-.Pp
-A consumer verifies a release against the copy of the public key that it holds.
-A release that a new key signs therefore fails in each consumer
-that holds the old copy.
-One rotation runs in two steps,
-and the trust order carries the gap.
-.Pp
-.Fl Fl step Ar mint
-generates the next key of the purpose,
-writes its public half into the key directory,
-and writes its private half to
-.Fl Fl secret .
-The current key of the purpose signs the manifest that names the new key,
-so
-.Fl Fl signer
-names the private half of that key.
-The command refuses a mint that would sign with the key it generated.
-.Pp
-The first mint of a purpose finds no current key.
-That key is current at once,
-it signs its own manifest,
-and the command takes no
-.Fl Fl signer .
-A site that publishes its first key holds no
+The build stages every manual source in
+.Pa .man
+inside the output directory, so that
+.Xr mandoc 1
+resolves a cross-reference against the manuals of the site.
+The build removes the staging directory when it ends.
+It refuses a staging directory of another shape, and so does
+.Cm clean .
+.Sh THE KEY DIRECTORY
+An organization publishes its public keys under one prefix, so a
+consumer can fetch a key and verify a release with it.
+A
 .Ic keys
-block,
-so
-.Fl Fl org
-names the organization word,
+block describes that directory, and the build publishes it.
+A description can hold several such blocks, and each one names one
+directory.
+Two blocks must not name one directory.
+.Pp
+Each directory holds its own root of trust, and a binding never
+crosses a directory.
+A publisher that keeps two trust domains therefore keeps two
+directories in one site.
+The site-level files stay single: one
+.Pa security.txt ,
+and one Web Key Directory that gathers every address.
+.Bd -literal -offset indent
+keys "keys" {
+	org     = fugubsd
+	contact = mailto:security@fugubsd.org
+	expires = 2027-09-07T00:00:00Z
+	url     = https://www.fugubsd.org/keys
+}
+
+key "fugubsd-1-release" {
+	status = current
+	since  = 2026-09-07
+}
+.Ed
+.Pp
+The block name is the directory, one path segment below the source
+directory.
+The settings are as follows:
+.Bl -tag -width "contact" -offset indent
+.It Ic org
+The organization word, the first field of every key name.
+This setting is required.
+Two blocks must not name one word.
+A key name holds no directory name, and the serial of a purpose counts
+inside one directory, so a mint of the second block would write a name
+that the first block publishes.
+.It Ic contact
+The
+.Ql Contact
+field of
+.Pa security.txt .
+.It Ic expires
+The
+.Ql Expires
+field of
+.Pa security.txt ,
+an RFC 3339 timestamp.
+.Ic contact
 and
-.Fl Fl dir
-and
-.Fl Fl url
-name the directory and the published prefix.
-One commit carries the block and the key.
-.Pp
-.Fl Fl step Ar promote
-makes the
-.Ic next
-key current and retires the key that was current.
-.Fl Fl secret
-names the private half of the key that the step makes current,
-and that key signs the manifest.
-A retired key keeps its file and its URL,
-so a release that it signed still verifies.
-.Pp
-The command stages each file and verifies the signature
-before one byte reaches the key directory.
-A step that fails puts every file back,
-and the private half of a new key lands last of all.
-.Pp
-One manifest covers the whole directory,
-and one key signs it,
-so every key of one directory holds one purpose.
-.Fl Fl secret
-must name no file that stands,
-and it must not name
-.Fl Fl signer :
-a rotation cannot make a private half again.
-It prints one
-.Ql name=value
-line for each fact,
-so a caller appends the output to a file that its own steps read.
-.Pp
-The command needs
-.Xr signify 1 .
-It reaches no network and it holds no token:
-a caller stores the private key and declares the public one.
+.Ic expires
+stand or fall together.
+A site publishes one
+.Pa security.txt ,
+so one block alone names the two.
+.It Ic url
+The published prefix of the directory, an absolute URL.
 .El
+.Pp
+Each
+.Ic key
+block names the stem of one key file in the directory.
+The file extension gives the type:
+.Pa .pub
+is a
+.Xr signify 1
+key,
+.Pa .asc
+is an armored OpenPGP key, and
+.Pa .pem
+is one X.509 certificate.
+The block sets a
+.Ic status
+of
+.Cm current ,
+.Cm next
+or
+.Cm retired ,
+and optional
+.Ic since
+and
+.Ic until
+dates.
+An OpenPGP key can set an
+.Ic email
+and a
+.Ic fingerprint
+of 40 hexadecimal characters.
+A certificate can set a
+.Ic fingerprint
+of 64 hexadecimal characters, which is the SHA-256 of its DER form.
+.Pp
+One signify key of the directory is the root of trust, and its purpose
+word is
+.Cm root .
+The current root key signs the manifest, and every other key of the
+directory is a subordinate key.
+A binding is a detached signature by one key over the public key file
+of another key, and its name is
+.Pa <target file>.<signer stem>.<ext> .
+The extension is
+.Pa sig
+for a
+.Xr signify 1
+signer,
+.Pa asc
+for an OpenPGP signer, and
+.Pa p7s
+for an X.509 signer.
+A binding needs no
+.Ic key
+block: its name holds the target, the signer and the type.
+.Pp
+The directory must hold a
+.Pa SHA256
+manifest and its
+.Pa SHA256.sig
+signature.
+The build copies each key file, each binding file and the manifest
+pair byte for byte.
+It signs nothing, and it verifies no
+.Pa SHA256.sig .
+For the example above it generates these files:
+.Pp
+.Bl -tag -width ".well-known/openpgpkey/hu/<hash>" -offset indent -compact
+.It Pa keys/KEYS
+Every OpenPGP key, when the set holds one.
+.It Pa keys/index.html
+The human page, with the serial, purpose, type, status, fingerprint,
+dates and bindings of each key.
+The row of a certificate names its subject and its validity dates
+beside the fingerprint.
+.It Pa .well-known/openpgpkey/hu/<hash>
+The Web Key Directory file of each email address.
+The file holds the keys of that address of every directory, in
+publication order.
+.It Pa .well-known/openpgpkey/policy
+The Web Key Directory policy file.
+.It Pa .well-known/security.txt
+The RFC 9116 file, when a block sets a
+.Ic contact .
+The
+.Ic Encryption
+field names the current OpenPGP key of that block.
+.El
+.Pp
+.Cm check
+reads the source key directory, so the answer does not depend on a
+build.
+It checks that every key file has a block and every block has a file,
+that every name matches the key name pattern or the binding name
+pattern, that every purpose holds exactly one current key, that the
+directory holds one current signify key of the purpose
+.Cm root ,
+that each binding verifies against the public key of its signer and
+holds the retention rule, that the manifest names every key file and
+every binding file with the digest that it has and nothing else, that
+every declared fingerprint equals the computed one, and that the
+signature has the shape of a
+.Xr signify 1
+signature.
+.Pp
+One report reads the whole site.
+The block which names the contact and a
+.Ic url
+must hold a
+.Cm current
+OpenPGP key of its own, because the
+.Ic Encryption
+field names no key of another directory.
+The check reports that block when another key directory holds such a
+key.
+A site that publishes no OpenPGP key at all writes no such field, and
+that one is no problem.
+.Pp
+The retention rule holds each binding of the directory.
+A binding whose signer is
+.Cm current
+or
+.Cm next
+must target the current root key.
+A binding whose signer is
+.Cm retired
+must target a key of its own purpose with a higher serial.
+A signify binding verifies with no command.
+A binding of another type needs
+.Xr gpg 1
+or
+.Xr openssl 1 ,
+and an absent command is a problem.
+.Pp
+The check reads the validity of each
+.Cm current
+and
+.Cm next
+key that carries one.
+It reads the expiry of an OpenPGP key with
+.Xr gpg 1 ,
+and the
+.Ql notBefore
+and
+.Ql notAfter
+of a certificate from the certificate itself.
+An expiry that passed is a problem, and so is a certificate whose
+.Ql notBefore
+has not come.
+An expiry within 30 days of a
+.Cm current
+key is a problem when its purpose holds no
+.Cm next
+key, because one rotation runs in two steps.
+A signify key carries no date, and an OpenPGP key with no expiry
+reaches no rule.
+.Pp
+A key verb fails for none of these reports, so
+.Cm mint-key
+and
+.Cm import-key
+each run on a directory that
+.Cm check
+rejects for a date.
+An expired
+.Cm current
+key is still
+.Cm current
+when the verb reads its work back, so a step of that purpose could
+never be made.
+The 30-day report reads the whole directory, so it would fail a step
+of another purpose, which writes no
+.Cm next
+key of the purpose that the report names.
+.Pp
+.Cm promote-key
+fails when the key that retires is an OpenPGP key whose expiry
+passed.
+That key signs the chain binding, and
+.Xr gpg 1
+signs nothing with an expired key.
+Promote the successor before the current key expires.
+.Sh KEY ROTATION
+Every key verb writes one key directory.
+.Fl Fl dir
+names it.
+A description with one
+.Ic keys
+block needs no name, and one with several refuses a step without it.
+.Pp
+A consumer verifies a release against the copy of the public key that
+it holds.
+A release that a new key signs therefore fails in each consumer that
+holds the old copy.
+One rotation runs in two steps.
+.Pp
+One signify key of the directory is the root of trust, and its purpose
+word is
+.Cm root .
+The current root key signs the manifest, and every other key binds to
+it.
+.Cm mint-key
+and
+.Cm import-key
+refuse a key of another type for the
+.Cm root
+purpose, and the mint refuses before it generates one.
+Every step takes the private half of the current root as
+.Fl Fl signer ,
+with two exceptions below.
+.Pp
+.Cm mint-key
+generates the next key of the purpose, writes its public half into the
+key directory, and writes its private half to
+.Fl Fl secret
+with no group and no other permissions.
+The new key takes the status
+.Cm next ,
+or
+.Cm current
+when the purpose holds no current key.
+.Fl Fl secret
+must not name a file that exists, and must not name the signer.
+A mint refuses a purpose that already holds a
+.Cm next
+key.
+A mint of a subordinate purpose also writes the binding of the new key
+over the public key file of the current root.
+.Pp
+.Cm promote-key
+makes the
+.Cm next
+key of the purpose current, and retires the key that was current with
+an
+.Ic until
+date.
+.Fl Fl retiring
+names the private half of the key that retires, and that key signs the
+chain binding over the key which takes its place.
+A consumer that trusts the old key therefore reaches the new one.
+The promote removes the root binding of the retired key, and the chain
+binding stays published.
+A retired key keeps its file and its URL, so a release that it signed
+still verifies.
+.Ss The key types
+.Xr signify 1
+generates a
+.Cm signify
+key.
+The public half is one comment line and one key body.
+.Pp
+.Xr gpg 1
+generates an
+.Cm openpgp
+key: one Ed25519 primary key with one Curve25519 encryption subkey.
+.Fl Fl email
+names the address, which is the one user id of the key, and a
+correspondent encrypts to the subkey.
+Both halves are armored text.
+The
+.Ic key
+block of the new key takes that
+.Ic email
+and the
+.Ic fingerprint ,
+which the command reads from the key that it generated.
+.Pp
+.Fl Fl expires
+is a date of the form
+.Ar YYYY-MM-DD ,
+and the key expires at the start of that date, in UTC.
+The date must be after the day of the run.
+The day of the run and each earlier date fail the mint, and the reason
+names the date that you gave.
+A mint with no
+.Fl Fl expires
+makes a key with no expiry.
+A key directory retires a key with an
+.Ic until
+date, so a rotation needs no expiry on the key itself.
+.Pp
+An issuer makes an
+.Cm x509
+certificate, such as a code signing certificate of Apple Developer ID,
+so no verb mints one.
+.Cm import-key
+publishes it:
+.Fl Fl file
+names one PEM certificate, and
+.Fl Fl secret
+names its unencrypted PEM private key.
+The verbs take no passphrase, so convert a PKCS#12 file with
+.Ic openssl pkcs12
+first.
+The private key signs the binding of the new key, and
+.Xr openssl 1
+makes that detached CMS signature.
+The
+.Ic key
+block of the new key takes the
+.Ic fingerprint ,
+which the command reads from the certificate that it published.
+The renderer knows no issuer by name, and the root manifest vouches
+for the certificate.
+A renewal is a rotation: the new certificate enters as
+.Cm next ,
+and a promote retires the old one.
+.Ss The first root mint
+The first mint of the
+.Cm root
+purpose finds no root.
+That key is current at once, it signs its own manifest, and it takes
+no
+.Fl Fl signer .
+A directory that already holds keys takes one
+.Fl Fl bind Ar stem Ns = Ns Ar path
+for each current key and each next key of a subordinate purpose, and
+the step writes the binding of every one of them again.
+It refuses before it writes when one private half is absent.
+.Pp
+A directory with no
+.Ic keys
+block takes one from the command line:
+.Fl Fl bootstrap
+states the intent to make that directory,
+.Fl Fl dir
+names it, which defaults to
+.Pa keys ,
+.Fl Fl org
+names the organization word, and
+.Fl Fl url
+names the published prefix.
+A second key directory of a site arrives the same way.
+.Pp
+A step without
+.Fl Fl bootstrap
+refuses a
+.Fl Fl dir
+that no
+.Ic keys
+block names.
+Each key directory holds a root of trust of its own, so a mistyped
+name would otherwise publish a second root in silence.
+.Cm mint-key
+and
+.Cm import-key
+take the option, and
+.Cm promote-key
+makes no directory.
+.Ss The root promote
+A root promote signs the manifest with the key that it makes current,
+so it takes
+.Fl Fl secret
+and no
+.Fl Fl signer .
+It takes one
+.Fl Fl bind
+for each key in force, as the first root mint does, and it removes
+each binding of the retired root but the chain binding that names it.
+.Pp
+Each step verifies the new signature and each new binding against the
+published public key of the signer before one byte reaches the key
+directory, and a step that fails puts every file back.
+On success the command prints one
+.Ar name Ns = Ns Ar value
+line for each fact: the file name, the stem, the serial, the status,
+the retired name of a promote, and the digest and the URL of a new key
+file.
+.Pp
+The command reaches no network and holds no token.
+The caller stores the private key and commits the public one.
 .Sh FILES
 .Bl -tag -width "share/fuguweb/style.css" -compact
 .It Pa .fuguwebrc
 The site description, at the project root.
 .It Pa share/fuguweb/style.css
 The base stylesheet, which ships with the tool.
-The
-.Va stylesheet
-setting overrides the search for it.
+.It Pa web/footer.body.html
+The footer prose, in the default source directory.
+.It Pa web/manuals.body.html
+The opening of the manual index, in the default source directory.
+.It Pa web/build/.man
+The staging directory of the build, in the default output directory.
 .El
 .Sh EXIT STATUS
 .Nm
-exits with one of these values:
+exits with one of the following values:
 .Pp
 .Bl -tag -width Ds -offset indent -compact
 .It 0
@@ -298,31 +1018,113 @@ General error.
 .It 2
 Invalid arguments.
 .It 3
-Configuration error, or not in an
-.Nm
-project.
+Configuration error, or no
+.Pa .fuguwebrc
+found.
 .It 4
-A renderer failed.
+The build failed: a renderer failed, or a manual source is malformed.
 .It 5
 The check found a problem.
 .It 6
-A renderer is not installed.
+A renderer, or a command of a key step such as
+.Xr signify 1 ,
+.Xr gpg 1
+or
+.Xr openssl 1 ,
+is not installed.
 .El
 .Sh EXAMPLES
-Build the site and check it:
+Start a site, write its front page, build it, and check it:
 .Bd -literal -offset indent
-$ fuguweb build --out web/build
-$ fuguweb check --out web/build
+$ fuguweb init
+$ mkdir web
+$ echo "<h1>Home</h1>" >web/index.body.html
+$ fuguweb build
+$ fuguweb check
+.Ed
+.Pp
+Build into another directory, from anywhere in the project:
+.Bd -literal -offset indent
+$ fuguweb build --out /tmp/site
+$ fuguweb check --out /tmp/site
+.Ed
+.Pp
+Publish the root key and the first release key of an organization:
+.Bd -literal -offset indent
+$ fuguweb mint-key --purpose root --bootstrap \e
+	--secret ~/keys/root-1.sec --org fugubsd \e
+	--url https://www.fugubsd.org/keys
+$ fuguweb mint-key --purpose release \e
+	--secret ~/keys/release-1.sec --signer ~/keys/root-1.sec
+.Ed
+.Pp
+Publish an OpenPGP contact key that expires at the start of 2028:
+.Bd -literal -offset indent
+$ fuguweb mint-key --purpose contact --type openpgp \e
+	--email security@fugubsd.org --expires 2028-01-01 \e
+	--secret ~/keys/contact-1.sec --signer ~/keys/root-1.sec
+.Ed
+.Pp
+Publish a code signing certificate, whose private key stays with the
+publisher:
+.Bd -literal -offset indent
+$ fuguweb import-key --purpose sign --type x509 \e
+	--file ~/keys/sign-1.pem --secret ~/keys/sign-1.key \e
+	--signer ~/keys/root-1.sec
+.Ed
+.Pp
+Rotate the release key:
+.Bd -literal -offset indent
+$ fuguweb mint-key --purpose release \e
+	--secret ~/keys/release-2.sec --signer ~/keys/root-1.sec
+$ fuguweb promote-key --purpose release \e
+	--signer ~/keys/root-1.sec --retiring ~/keys/release-1.sec
+.Ed
+.Pp
+Rotate the root key.
+The promote writes the binding of each key in force again, so it takes
+one
+.Fl Fl bind
+for each of them:
+.Bd -literal -offset indent
+$ fuguweb mint-key --purpose root \e
+	--secret ~/keys/root-2.sec --signer ~/keys/root-1.sec
+$ fuguweb promote-key --purpose root \e
+	--secret ~/keys/root-2.sec --retiring ~/keys/root-1.sec \e
+	--bind fugubsd-2-release=~/keys/release-2.sec \e
+	--bind fugubsd-1-contact=~/keys/contact-1.sec \e
+	--bind fugubsd-1-sign=~/keys/sign-1.key
+.Ed
+.Pp
+Publish a second key directory, for the keys of one project:
+.Bd -literal -offset indent
+$ fuguweb mint-key --purpose root --dir project --bootstrap \e
+	--secret ~/keys/project-root-1.sec --org fuguproj \e
+	--url https://www.fugubsd.org/project
+$ fuguweb mint-key --purpose release --dir project \e
+	--secret ~/keys/project-release-1.sec \e
+	--signer ~/keys/project-root-1.sec
 .Ed
 .Sh SEE ALSO
+.Xr gpg 1 ,
 .Xr lowdown 1 ,
 .Xr mandoc 1 ,
+.Xr openssl 1 ,
 .Xr pod2man 1 ,
+.Xr signify 1 ,
 .Xr mdoc 7
 .Pp
 The module documentation is in the
 .Pa .pod
 sidecars beside
 .Pa lib/App/FuguWeb/ .
+.Sh STANDARDS
+.Rs
+.%A E. Foudil
+.%A Y. Shafranovich
+.%D April 2022
+.%R RFC 9116
+.%T A File Format to Aid in Security Vulnerability Disclosure
+.Re
 .Sh AUTHORS
 .An Dick Olsson Aq Mt hi@senzilla.io

@@ -26,7 +26,9 @@ IO::Sock::Stream
 
 rather than choose an internal transport class. A leaf may be used directly
 with constructor callbacks where no reusable class policy is needed, or
-subclassed for framing, tuning, TLS, and other immutable protocol policy.
+subclassed for framing, tuning, socket policy, and named protocol callbacks.
+Transport selection is an acquisition decision layered onto the Stream object;
+it is not a second Stream hierarchy.
 
 This keeps several concerns separate:
 
@@ -87,32 +89,65 @@ readiness and `SSL_write` can need readable readiness.
 The provider also participates in graceful writable shutdown so the public
 `end()` operation can remain ordered-byte lifecycle rather than OpenSSL policy.
 
-## TLS policy
+## TLS acquisition policy
 
 `Linux::Event::TLS` is an OpenSSL transport for
 `Linux::Event::IO::Sock::Stream`. It is not a framer and not a second socket
 hierarchy.
 
-```perl
-package GatewayConnection;
-use parent 'Linux::Event::IO::Sock::Stream';
-use Linux::Event::TLS
-    verify => 1,
-    alpn   => ['http/1.1'];
+For accepted connections, TLS is selected by the Listener's generated-Stream
+recipe:
 
-my $connection = GatewayConnection->connect(
+```perl
+my $listener = Linux::Event::IO::Sock::Listener->new(
     loop => $loop,
-    host => 'gateway.example.test',
-    port => 443,
+    host => '0.0.0.0',
+    port => 9443,
+    stream => {
+        class => 'GatewayConnection',
+        tls => {
+            cert_file => $cert_file,
+            key_file  => $key_file,
+            alpn      => ['http/1.1'],
+        },
+    },
 );
 ```
 
-Outbound `connect()` selects client TLS semantics. A
-`Linux::Event::IO::Sock::Listener` selects server semantics for an accepted
-TLS-declared `stream_class`. Server classes declare `cert_file` and `key_file`,
-which are validated before the listener begins accepting traffic.
+The same `GatewayConnection` class can be used by another Listener without a
+`tls` recipe and will then be plain. Class identity therefore does not decide
+whether an accepted connection is encrypted.
 
-Each connection receives independent native OpenSSL state.
+A Stream subclass may define `tls_defaults()` for reusable server policy such
+as ALPN and handshake/shutdown timeouts. Those defaults are consulted only when
+a Listener explicitly selects TLS; they do not activate TLS by themselves.
+
+Outbound connections retain explicit client acquisition policy. Existing
+class-level `use Linux::Event::TLS ...` declarations remain supported for
+outbound client verification and adopted-handle compatibility, while the
+ordinary server path uses the Listener recipe.
+
+## Prepared server context
+
+Listener construction resolves server TLS before acceptance begins:
+
+1. merge optional class TLS defaults with Listener deployment overrides;
+2. validate certificate/key and TLS policy;
+3. load identity material;
+4. create one reusable server `SSL_CTX` template.
+
+Each accepted TLS connection clones only independent per-connection SSL state
+from that prepared context and binds the accepted descriptor. The shared
+`SSL_CTX` uses OpenSSL reference counting, so established Streams remain valid
+after the Listener closes.
+
+This keeps certificate parsing and configuration merging out of ordinary
+accept/read/write paths. Plain listeners allocate no TLS connection state.
+
+`bench/run-tls-accept-setup-bench.pl` isolates fresh per-connection server
+context construction versus cloning from the prepared Listener-style context.
+`bench/run-tls-microbench.pl` remains the separate established encrypted-I/O
+benchmark.
 
 ## TLS behavior
 
@@ -137,13 +172,13 @@ different layers.
 ## Readiness
 
 A plain stream socket becomes application-ready after connection establishment.
-A TLS-declared stream socket becomes application-ready only after the handshake
-and required verification have succeeded.
+A TLS stream socket becomes application-ready only after the handshake and
+required verification have succeeded.
 
-A listener's `on_accept` callback runs after the accepted stream-socket object
-is constructed and attached. For TLS, that occurs before application
-`on_ready`; the latter remains the notification that encrypted transport is
-usable by the application protocol.
+A Listener's `on_accept` callback runs after the accepted Stream object is
+constructed and attached. For TLS, that occurs before application `on_ready`;
+the latter remains the notification that encrypted transport is usable by the
+application protocol.
 
 ## Read pause and TLS control traffic
 

@@ -52,6 +52,7 @@
 #include "sa/sa_frozen.h"  /* one structure, republished, read in place */
 #include "sa/sa_lease.h"   /* one holder at a time, successor on death  */
 #include "sa/sa_scoreboard.h" /* one row per worker, published live      */
+#include "sa/sa_hll.h"     /* how many distinct, in a few kilobytes     */
 #include "sa/sa_xop.h"     /* the hot doors as opcodes                  */
 #include "sa_abi.h"
 
@@ -157,5 +158,6 @@ INCLUDE: xs/cuckoo.xs
 INCLUDE: xs/frozen.xs
 INCLUDE: xs/lease.xs
 INCLUDE: xs/scoreboard.xs
+INCLUDE: xs/hll.xs
 INCLUDE: xs/abi.xs
 INCLUDE: xs/xop.xs

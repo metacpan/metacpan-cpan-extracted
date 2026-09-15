@@ -15,11 +15,14 @@ t/40-filters.t
 t/50-logic-proofs.t
 t/cgi_security.t
 t/cities.t
+t/collision-prefix.t
 t/data-flow.t
 t/data/cities.csv
 t/data/states.csv
 t/domain.t
 t/edge_cases.t
+t/eof.t
+t/eol.t
 t/function.t
 t/integration.t
 t/lib/Database/cities.pm
@@ -31,9 +34,12 @@ t/lib/Database/lp_b.pm
 t/lib/Database/states.pm
 t/lib/Database/test1.pm
 t/lib/Database/test2.pm
+t/lib/Database/xljoin_a.pm
+t/lib/Database/xljoin_b.pm
 t/path.t
 t/test1_2.t
 t/transaction.t
 t/unit.t
+t/xlsx.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

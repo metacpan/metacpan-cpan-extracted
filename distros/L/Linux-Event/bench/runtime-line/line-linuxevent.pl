@@ -20,7 +20,7 @@ my $port = shift // 0;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', "\n";
 
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return read_size => 65_536;
     }
 }
@@ -46,12 +46,14 @@ my $on_error = sub ($stream, $error) {
 
 my $listener = Linux::Event::Bench::RuntimeLineListener->new(
     loop => $loop,
-    stream_class => 'Linux::Event::Bench::RuntimeLineStream',
     host => $host,
     port => 0 + $port,
     backlog => 8192,
-    on_message => $on_message,
-    on_error => $on_error,
+    stream => {
+        class      => 'Linux::Event::Bench::RuntimeLineStream',
+        on_message => $on_message,
+        on_error   => $on_error,
+    },
 );
 
 $| = 1;

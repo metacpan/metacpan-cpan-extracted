@@ -4,7 +4,10 @@
 # cache, the metadata table and the supervisor are here; the OpenBSD
 # mirror policy is in t/fuguvm/proxy.t.
 
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
 use FindBin    qw($RealBin);
 use lib "$RealBin/../../lib";

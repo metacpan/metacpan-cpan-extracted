@@ -1,0 +1,320 @@
+=head1 NAME
+
+Fugu::Signer - one shape for the three modules that drive a signing command
+
+=head1 SYNOPSIS
+
+    # A caller reads one type, and it then knows the other two.
+    my $signer = Fugu::Signify->new;
+    die $signer->error unless $signer->is_available;
+
+    # Each type takes the arguments that its unit names, such as
+    # the comment of a signify(1) key.
+    $signer->generate(
+        comment => 'example key',
+        public  => '/etc/keys/example.pub',
+        secret  => '/etc/keys/example.sec',
+    ) or die $signer->error;
+
+    $signer->sign(
+        secret    => '/etc/keys/example.sec',
+        file      => '/var/www/htdocs/SHA256',
+        signature => '/var/www/htdocs/SHA256.sig',
+    ) or die $signer->error;
+
+    my $key = $signer->verify(
+        keys      => [ '/etc/keys/current.pub', '/etc/keys/next.pub' ],
+        file      => '/var/www/htdocs/SHA256',
+        signature => '/var/www/htdocs/SHA256.sig',
+    ) or die $signer->error;
+
+    # A subclass names its command and holds one command line for
+    # each verb.
+    package Fugu::Example;
+    our @ISA = ('Fugu::Signer');
+
+    sub _command_label    ($) { return 'example' }
+    sub _command_defaults ($) { return ('example') }
+
+    sub _sign ( $self, %args )
+    {
+        $self->_run( [ '-s', $args{secret}, '-m', $args{file},
+                '-x', $args{signature} ],
+            "cannot sign $args{file}" ) or return;
+
+        return 1;
+    }
+
+=head1 DESCRIPTION
+
+Fugu::Signer is the parent class of L<Fugu::Signify> over signify(1),
+of L<Fugu::OpenPGP> over gpg(1), and of L<Fugu::X509> over openssl(1).
+
+The parent holds what the three share: the constructor and the command
+resolution, the three verbs, the run through L<Fugu::Process>, the key
+walk of a verification, and the failure convention. A subclass holds
+its file formats, its readers, and the arguments of each command line.
+A consumer that learns one type then knows the other two.
+
+The three verbs are C<generate>, C<sign> and C<verify>, and their
+argument names are C<public>, C<secret>, C<keys>, C<file> and
+C<signature>. C<keys> is a list of paths, and each other one is a
+path. A subclass adds an argument that its type needs, and its unit
+names it.
+
+Every private key operation runs in the command. No method takes or
+answers the bytes of a secret half: a secret half enters as a path and
+leaves as a file. A secret half that passes through Perl sits in the
+heap of a long process, and a secret half that a command writes never
+does.
+
+=head2 The private directory of a generator
+
+C<generate> refuses a path that exists, and it makes a key with no
+passphrase.
+
+The command writes the secret half into a private directory beside its
+destination. The method sets the owner-only mode on the file there,
+and one rename then moves it into place. No wider access exists at any
+moment.
+
+The directory sits beside the destination, because the rename that
+publishes the secret half must stay inside one filesystem. The method
+removes the directory on every exit, also after a failure of the
+command.
+
+=head2 The key walk of a verification
+
+C<verify> takes C<keys>, a list of public key paths in trust order:
+the current key first, and the next key second. The walk pins one key
+in one run, so it reads no keyring, no home and no agent of the user.
+It checks no chain. It answers the path of the key that verified.
+
+When no key verifies, C<error> names the file and then one reason for
+each key:
+
+    /var/www/htdocs/SHA256: no key verified the signature:
+        /etc/keys/current.pub: checked against wrong key;
+        /etc/keys/next.pub: checked against wrong key
+
+Each subclass writes that one shape, so a caller tells a wrong key
+from an absent key file under each type.
+
+When a run does not start, the walk stops at that key, and C<error>
+holds that one reason. A failed fork, a failed chdir and an absent
+command give the same answer for every later key. Such a failure is no
+integrity failure.
+
+An empty C<keys> list is a programming error, and the method dies.
+
+=head2 An input path
+
+A command method takes paths. It refuses an input path that is not a
+plain file before it runs the command. A path of C<keys> is the
+exception: a key that does not read is one reason of the walk.
+
+C<public> and C<secret> of C<generate> are outputs, and so is
+C<signature> of C<sign>.
+
+=head2 An absent command
+
+C<command_absent> reports 1 only after a failure in which a method
+needed the command and it never ran. That failure is one of two: no
+command resolved, or the execve(2) failed. It reports 0 after every
+other failure.
+
+An absent command is an install problem, and a failed signature is an
+integrity problem. The caller must tell them apart.
+
+=head1 METHODS
+
+=head2 new
+
+C<new(command =E<gt> $command, timeout =E<gt> $seconds)> builds a
+generator, a signer and a verifier. The method resolves the command
+once, through C<Fugu::Process-E<gt>find_command>, and it runs no
+process.
+
+C<command> names the command, as a name or as an absolute path.
+Without the argument, the module walks C<$ENV{PATH}> over the search
+list of the subclass.
+
+C<timeout> is the bound of one run, in seconds, and the default is 30.
+A value that is no positive number is a programming error, and the
+method dies.
+
+C<new> must not die for an absent command. It sets C<error> instead,
+and C<is_available> then returns 0.
+
+=head2 is_available
+
+C<is_available()> returns 1 when C<verify> can run, and 0 when it
+cannot. The method runs no process, and it never dies. A subclass with
+a verifier in Perl returns 1 with no command.
+
+=head2 command
+
+C<command()> returns the resolved command path, or C<undef>. An
+operator who installed the wrong command needs this answer in a
+diagnostic.
+
+=head2 error
+
+C<error()> returns the reason of the most recent failure, or C<undef>
+after a success. Each public method clears the reason before it
+starts.
+
+=head2 command_absent
+
+C<command_absent()> returns 1 after a failure in which no command
+resolved, or the execve(2) failed. It returns 0 after every other
+failure.
+
+=head2 generate
+
+C<generate(public =E<gt> $path, secret =E<gt> $path)> makes a key pair
+with no passphrase. It returns 1, or C<undef> with the reason in
+C<error>.
+
+=head2 sign
+
+C<sign(secret =E<gt> $path, file =E<gt> $path, signature =E<gt>
+$path)> signs one file with a private half. It returns 1, or C<undef>
+with the reason in C<error>.
+
+The command reads the private half from the path, and it writes the
+signature file itself. A second call over one C<signature> path
+replaces the file, because a rotation signs one manifest again.
+
+=head2 verify
+
+C<verify(keys =E<gt> \@paths, file =E<gt> $path, signature =E<gt>
+$path)> verifies one file against the key set, in trust order. It
+returns the key path that verified the signature, or C<undef> with the
+reason in C<error>.
+
+=head1 A SUBCLASS
+
+A subclass inherits this class with C<our @ISA>. It holds five hooks,
+it can override two more, and it can call the parts below. Each method
+of the parent reports through C<error>, so a subclass writes no reason
+of its own into the object.
+
+=head2 The hooks of a subclass
+
+=over 4
+
+=item C<_command_label()> - the name of the command in a diagnostic,
+such as C<gpg>. The name of the module and the name of the command
+differ.
+
+=item C<_command_defaults()> - the default search list of the command,
+in the order of preference. C<new> walks C<$ENV{PATH}> over it when
+the caller named no command.
+
+=item C<_generate(%args)> - run the generator of one type. The hook
+returns 1, or C<undef> with the reason in C<error>. C<secret> names a
+path inside the private directory, and the parent moves that file into
+place. C<public> names its destination.
+
+=item C<_sign(%args)> - run the signer of one type over C<secret>,
+C<file> and C<signature>. The hook returns 1, or C<undef> with the
+reason in C<error>.
+
+=item C<_verify($key, %args)> - verify C<file> against C<signature>
+with the one key, and pin that key in the run. The hook returns
+C<undef> when the key verified, or the reason that it did not. It
+resolves the command with C<_command> itself, because a subclass can
+verify with no command.
+
+=back
+
+=head2 The overrides of a subclass
+
+The parent holds a default for each method below, so a subclass takes
+it or overrides it.
+
+=over 4
+
+=item C<_reason($result)> - the reason of a run that reached the child
+and failed, and that did not time out. The default takes the first
+line of the diagnostic, or the exit code. A subclass that reads the
+diagnostic form of its command overrides the method.
+
+=item C<_stop_helpers($dir)> - stop each helper process that the
+command started under the temporary directory, before the tree goes.
+The default stops nothing. L<Fugu::OpenPGP> overrides the method,
+because gpg(1) starts an agent.
+
+=back
+
+=head2 The parts that a subclass calls
+
+=over 4
+
+=item C<_begin()> - start one call: clear the reason and each flag of
+a failure. Every public method of a subclass calls it first.
+
+=item C<_set_error($reason)> - the failure return of every method: the
+reason goes to C<error>, and the method answers C<undef>.
+
+=item C<_command()> - the command of one call, or C<undef> with the
+reason in C<error>. It sets C<command_absent> for the call, and it
+sets the flag that stops the key walk of C<verify>.
+
+=item C<_run($args, $what, %options)> - run one command of this
+object, and answer the result of the run, or C<undef> with the reason
+in C<error>. C<$args> holds every argument after the command, as a
+list, so no argument needs quoting. C<$what> names the act that
+failed, and the reason starts with it. With no C<$what> the reason
+stands alone, for the key walk. C<%options> reaches
+C<Fugu::Process-E<gt>run>: C<stdin>, C<env> and C<cwd>.
+
+=item C<_check_input(@paths)> - answer 1 when each path is a plain
+file, or C<undef> with the reason in C<error>.
+
+=item C<_read_bounded($path, $limit)> - the bytes of a file under the
+limit, or C<undef>. The bound reads the size on disk, before the
+content.
+
+=item C<_wide($text)> - true when the string holds a code point above
+255. A reader tests this, because such a string is character data and
+not bytes.
+
+=item C<_with_temp_dir($parent, $body)> - make a private directory
+under C<$parent>, run C<$body> over it, and then remove the tree. An
+undef C<$parent> names the temporary directory of the system. The
+method answers what C<$body> answered, and it removes the tree on
+every exit.
+
+=back
+
+=head1 RETURN VALUES
+
+Every recoverable failure returns C<undef>, and C<error> holds the
+reason. No method answers the reason as a second return value. The
+module never logs, and the caller decides what to report.
+
+A method dies for a programming error alone: a missing necessary
+argument, an empty C<keys> list, and a C<timeout> that is no positive
+number.
+
+=head1 CAVEATS
+
+The module holds no private key of its own. A caller names each key
+file, and it holds the access of each one.
+
+One run of the command ends within C<timeout> seconds, and the run
+takes an argument list and never a shell. A subclass whose command
+needs a wider bound sets C<timeout> before it calls C<new> of this
+class.
+
+=head1 SEE ALSO
+
+L<Fugu::OpenPGP>, L<Fugu::Process>, L<Fugu::Signify>, L<Fugu::X509>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

@@ -28,8 +28,11 @@ on 'configure' => sub {
 };
 
 on 'test' => sub {
+	requires 'CHI';
 	requires 'DBD::CSV';
 	requires 'DBD::XMLSimple', '0.07';
+	requires 'DBM::Deep';
+	requires 'Excel::Writer::XLSX';
 	requires 'Fcntl';
 	requires 'File::Glob';
 	requires 'File::Slurp';
@@ -39,11 +42,16 @@ on 'test' => sub {
 	requires 'FindBin';
 	requires 'Gzip::Faster';
 	requires 'HTML::TableExtract';
+	requires 'HTTP::Response';
+	requires 'IPC::Run';
 	requires 'IPC::System::Simple';
 	requires 'JSON::MaybeXS';
+	requires 'LWP::UserAgent';
 	requires 'LWP::UserAgent::Cached';
 	requires 'POSIX';
 	requires 'Readonly';
+	requires 'Spreadsheet::ParseXLSX';
+	requires 'Spreadsheet::WriteExcel';
 	requires 'Test::Carp';
 	requires 'Test::Compile';
 	requires 'Test::DescribeMe';
@@ -57,7 +65,9 @@ on 'test' => sub {
 	requires 'Test::Which';
 	requires 'Test::Without::Module';
 	requires 'Text::xSV::Slurp';
+	requires 'Time::HiRes';
 	requires 'XML::Simple';
+	requires 'YAML::XS';
 };
 
 on 'develop' => sub {

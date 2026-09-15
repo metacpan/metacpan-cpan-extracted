@@ -11,7 +11,7 @@ use Linux::Event::IO::Sock::Stream;
 {
     package T::Batch::Raw;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return read_size => 4, read_batch_bytes => 10;
     }
     sub on_data ($stream, $bytes) {
@@ -25,7 +25,7 @@ use Linux::Event::IO::Sock::Stream;
 {
     package T::Batch::RawPause;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return read_size => 4, read_batch_bytes => 8;
     }
     sub on_data ($stream, $bytes) {
@@ -38,7 +38,7 @@ use Linux::Event::IO::Sock::Stream;
     package T::Batch::Messages;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return message_batch_size => 3 }
+    sub stream_tuning ($class) { return message_batch_size => 3 }
     sub on_messages ($stream, $messages) {
         push @{ $stream->data->{batches} }, [@$messages];
         $stream->data->{retained} = $messages if $stream->data->{retain};
@@ -50,7 +50,7 @@ use Linux::Event::IO::Sock::Stream;
     package T::Batch::MessagesByteGuard;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return message_batch_size => 10, max_buffer => 5;
     }
     sub on_messages ($stream, $messages) {
@@ -62,7 +62,7 @@ use Linux::Event::IO::Sock::Stream;
     package T::Batch::MessagesOne;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return message_batch_size => 1 }
+    sub stream_tuning ($class) { return message_batch_size => 1 }
     sub on_messages ($stream, $messages) {
         push @{ $stream->data->{batches} }, [@$messages];
     }
@@ -72,7 +72,7 @@ use Linux::Event::IO::Sock::Stream;
     package T::Batch::MessagesPause;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return message_batch_size => 2 }
+    sub stream_tuning ($class) { return message_batch_size => 2 }
     sub on_messages ($stream, $messages) {
         push @{ $stream->data->{batches} }, [@$messages];
         $stream->pause_read if @{ $stream->data->{batches} } == 1;
@@ -83,7 +83,7 @@ use Linux::Event::IO::Sock::Stream;
     package T::Batch::MessagesClose;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return message_batch_size => 2 }
+    sub stream_tuning ($class) { return message_batch_size => 2 }
     sub on_messages ($stream, $messages) {
         push @{ $stream->data->{batches} }, [@$messages];
         $stream->close;
@@ -94,7 +94,7 @@ use Linux::Event::IO::Sock::Stream;
     package T::Batch::MessagesError;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|', max_frame => 4;
-    sub stream_options ($class) { return message_batch_size => 8 }
+    sub stream_tuning ($class) { return message_batch_size => 8 }
     sub on_messages ($stream, $messages) {
         push @{ $stream->data->{order} }, 'batch:' . join(',', @$messages);
     }
@@ -107,7 +107,7 @@ use Linux::Event::IO::Sock::Stream;
     package T::Batch::MessagesDie;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return message_batch_size => 2 }
+    sub stream_tuning ($class) { return message_batch_size => 2 }
     sub on_messages ($stream, $messages) { die "batch callback failed\n" }
 }
 
@@ -115,7 +115,7 @@ use Linux::Event::IO::Sock::Stream;
     package T::Batch::TransitionSource;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return message_batch_size => 2 }
+    sub stream_tuning ($class) { return message_batch_size => 2 }
     sub on_messages ($stream, $messages) {
         push @{ $stream->data->{source} }, @$messages;
         $stream->transition_to('T::Batch::TransitionTarget')
@@ -141,7 +141,7 @@ use Linux::Event::IO::Sock::Stream;
 {
     package T::Batch::TransitionRawTarget;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return read_batch_bytes => 4 }
+    sub stream_tuning ($class) { return read_batch_bytes => 4 }
     sub on_data ($stream, $bytes) {
         push @{ $stream->data->{chunks} }, $bytes;
     }
@@ -362,7 +362,7 @@ sub descriptor_error ($class) {
 {
     package T::Batch::InvalidRawMessageBatch;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return message_batch_size => 2 }
+    sub stream_tuning ($class) { return message_batch_size => 2 }
     sub on_data ($stream, $bytes) { return }
 }
 {
@@ -375,20 +375,20 @@ sub descriptor_error ($class) {
     package T::Batch::InvalidFramedReadBatch;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return read_batch_bytes => 64 }
+    sub stream_tuning ($class) { return read_batch_bytes => 64 }
     sub on_message ($stream, $message) { return }
 }
 {
     package T::Batch::InvalidMissingMessages;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return message_batch_size => 2 }
+    sub stream_tuning ($class) { return message_batch_size => 2 }
 }
 {
     package T::Batch::InvalidBothMessageCallbacks;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return message_batch_size => 2 }
+    sub stream_tuning ($class) { return message_batch_size => 2 }
     sub on_message ($stream, $message) { return }
     sub on_messages ($stream, $messages) { return }
 }
@@ -401,18 +401,18 @@ sub descriptor_error ($class) {
 {
     package T::Batch::InvalidNegativeReadBatch;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return read_batch_bytes => -1 }
+    sub stream_tuning ($class) { return read_batch_bytes => -1 }
     sub on_data ($stream, $bytes) { return }
 }
 {
     package T::Batch::InvalidNegativeMessageBatch;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return message_batch_size => -1 }
+    sub stream_tuning ($class) { return message_batch_size => -1 }
     sub on_message ($stream, $message) { return }
 }
 
-subtest 'batching policies reject ambiguous class contracts' => sub {
+subtest 'batching policies validate class contracts' => sub {
     like(descriptor_error('T::Batch::InvalidRawMessageBatch'),
         qr/message_batch_size is available only to framed ordered-byte classes/,
         'raw ordered-byte class rejects framed batching policy');
@@ -425,12 +425,11 @@ subtest 'batching policies reject ambiguous class contracts' => sub {
     like(descriptor_error('T::Batch::InvalidMissingMessages'),
         qr/requires on_message or a native consumer/,
         'batch policy requires a class or constructor batch callback');
-    like(descriptor_error('T::Batch::InvalidBothMessageCallbacks'),
-        qr/cannot define both on_message.*on_messages/,
-        'batch mode rejects ambiguous callbacks');
+    is(descriptor_error('T::Batch::InvalidBothMessageCallbacks'), '',
+        'a framed class may provide both callbacks for live batch switching');
     like(descriptor_error('T::Batch::InvalidUnconfiguredMessages'),
-        qr/on_messages.*without enabling message_batch_size/,
-        'batch callback requires explicit policy');
+        qr/readable framed Stream requires on_message or a native consumer/,
+        'initial unbatched policy still requires an effective on_message sink');
     like(descriptor_error('T::Batch::InvalidNegativeReadBatch'),
         qr/read_batch_bytes must be a non-negative integer/,
         'raw batch byte limit rejects negative values');

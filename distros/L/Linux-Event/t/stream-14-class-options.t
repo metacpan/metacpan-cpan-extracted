@@ -11,7 +11,7 @@ use Linux::Event::Loop;
     package T::OptionsHash;
     use parent 'Linux::Event::IO::Sock::Stream';
     our $CALLS = 0;
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         $CALLS++;
         return {
             read_size => 8, high_watermark => 1234,
@@ -24,21 +24,21 @@ use Linux::Event::Loop;
 {
     package T::OptionsOdd;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return 'read_size' }
+    sub stream_tuning ($class) { return 'read_size' }
     sub on_data ($stream, $bytes) { }
 }
 
 {
     package T::OptionsUnknown;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return imaginary => 1 }
+    sub stream_tuning ($class) { return imaginary => 1 }
     sub on_data ($stream, $bytes) { }
 }
 
 {
     package T::OptionsWatermark;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return high_watermark => 1, low_watermark => 2;
     }
     sub on_data ($stream, $bytes) { }
@@ -47,14 +47,14 @@ use Linux::Event::Loop;
 {
     package T::OptionsZeroRead;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return read_size => 0 }
+    sub stream_tuning ($class) { return read_size => 0 }
     sub on_data ($stream, $bytes) { }
 }
 
 {
     package T::OptionsNegativeBudget;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return read_budget_bytes => -1 }
+    sub stream_tuning ($class) { return read_budget_bytes => -1 }
     sub on_data ($stream, $bytes) { }
 }
 
@@ -66,7 +66,7 @@ socketpair(my $c, my $d, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
 my $first = T::OptionsHash->new(loop => $loop, fh => $a);
 my $second = T::OptionsHash->new(loop => $loop, fh => $c);
 
-is($T::OptionsHash::CALLS, 1, 'stream_options runs once per Stream subclass');
+is($T::OptionsHash::CALLS, 1, 'stream_tuning runs once per Stream subclass');
 is(refaddr($first->{descriptor}), refaddr($second->{descriptor}),
     'instances reuse the cached class descriptor');
 is_deeply(
@@ -96,7 +96,7 @@ sub descriptor_error ($class) {
 }
 
 like(descriptor_error('T::OptionsOdd'), qr/odd option list/,
-    'odd stream_options list is rejected');
+    'odd stream_tuning list is rejected');
 like(descriptor_error('T::OptionsUnknown'), qr/unknown options: imaginary/,
     'unknown class option is rejected');
 like(descriptor_error('T::OptionsWatermark'), qr/low_watermark must be <=/,

@@ -1,4 +1,6 @@
 #!./perl
+use strict;
+use warnings;
 
 # $Id: dclone.t,v 0.11 2001/07/29 19:31:05 ray Exp $
 #
@@ -47,21 +49,22 @@ use Clone::PP qw(clone);
 
 print "1..9\n";
 
-$a = 'toto';
-$b = \$a;
-$c = bless {}, CLASS;
+my $a = 'toto';
+my $b = \$a;
+my $c = bless {}, 'CLASS';
 $c->{attribute} = 'attrval';
-%a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
-@a = ('first', undef, 3, -4, -3.14159, 456, 4.5,
-	$b, \$a, $a, $c, \$c, \%a);
+my %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
+my @a = ('first', undef, 3, -4, -3.14159, 456, 4.5,
+    $b, \$a, $a, $c, \$c, \%a);
 
+my $aref;
 print "not " unless defined ($aref = clone(\@a));
 print "ok 1\n";
 
-$dumped = &dump(\@a);
+my $dumped = &dump(\@a);
 print "ok 2\n";
 
-$got = &dump($aref);
+my $got = &dump($aref);
 print "ok 3\n";
 
 # print $got;
@@ -71,17 +74,19 @@ print "ok 3\n";
 print "not " unless $got eq $dumped; 
 print "ok 4\n";
 
-package FOO; @ISA = qw(Clone::PP);
+package FOO;
+our @ISA = qw(Clone::PP);
 
 sub make {
-	my $self = bless {};
-	$self->{key} = \%main::a;
-	return $self;
+    my $self = bless {};
+    $self->{key} = \%a;
+    return $self;
 };
 
 package main;
 
-$foo = FOO->make;
+my $foo = FOO->make;
+my $r;
 print "not " unless defined($r = $foo->clone);
 print "ok 5\n";
 

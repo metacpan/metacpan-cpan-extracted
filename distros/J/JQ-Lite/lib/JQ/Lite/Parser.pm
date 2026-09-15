@@ -5,6 +5,8 @@ use warnings;
 
 use JQ::Lite::Util ();
 use JQ::Lite::Error ();
+use JQ::Lite::AST ();
+use JQ::Lite::Tokenizer ();
 use JSON::PP ();
 
 sub _parse_error {
@@ -69,6 +71,14 @@ sub _validate_query_syntax {
     }
 }
 
+sub parse_ast {
+    my ($query) = @_;
+
+    my @parts = parse_query($query);
+    my @filters = map { JQ::Lite::AST->filter($_) } @parts;
+    return JQ::Lite::AST->pipeline(@filters);
+}
+
 sub parse_query {
     my ($query) = @_;
 
@@ -77,12 +87,50 @@ sub parse_query {
 
     _validate_query_syntax($query);
 
-    my @parts = JQ::Lite::Util::_split_top_level_pipes($query);
+    my $tokens = JQ::Lite::Tokenizer::tokenize($query);
+    my @parts = map { $_->{value} } grep { $_->{type} eq 'FILTER' } @{$tokens};
     @parts = map {
         my $part = $_;
         $part =~ s/^\s+|\s+$//g;
         $part;
     } @parts;
+
+    # Expand jq's iterator suffix before path normalization. This preserves
+    # existing dotted path traversal such as .values[] while allowing any
+    # non-path filter that produces an array or object (for example keys,
+    # split(","), or an array constructor) to reuse the existing .[] logic.
+    my @iterator_expanded;
+    for my $part (@parts) {
+        my @sequence_parts = JQ::Lite::Util::_split_top_level_commas($part);
+        if (@sequence_parts > 1) {
+            for my $sequence_part (@sequence_parts) {
+                $sequence_part =~ s/^\s+|\s+$//g;
+                next if $sequence_part =~ /^\./s;
+                if ($sequence_part =~ /^(.*?)\s*\[\s*\]\s*$/s) {
+                    my $filter = $1;
+                    $filter =~ s/\s+$//;
+                    $sequence_part = "($filter | .[])" if $filter =~ /\S/;
+                }
+            }
+            push @iterator_expanded, join(', ', @sequence_parts);
+            next;
+        }
+
+        if ($part !~ /^\s*\./s && $part =~ /^(.*?)\s*\[\s*\]\s*$/s) {
+            my $filter = $1;
+            $filter =~ s/\s+$//;
+            if ($filter =~ /\S/) {
+                push @iterator_expanded, $filter, '.[]';
+            }
+            else {
+                push @iterator_expanded, $part;
+            }
+        }
+        else {
+            push @iterator_expanded, $part;
+        }
+    }
+    @parts = @iterator_expanded;
 
     @parts = map {
         if ($_ eq '.[]') {

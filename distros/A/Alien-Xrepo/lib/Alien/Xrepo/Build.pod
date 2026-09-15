@@ -4,48 +4,57 @@
 
 =head1 NAME
 
-Alien::Xrepo::Build - alienfile-shaped build engine where every stage is xrepo
+Alien::Xrepo::Build - An alienfile-like build engine where every stage uses xrepo
 
 =head1 SYNOPSIS
 
-A distribution ships a declarative recipe (C<xrepo.json>) and lets the engine drive installs through xrepo:
+A distribution ships a declarative recipe and lets the engine drive installs through C<xrepo>:
 
+    # xrepo.json
     {
-       "name" : "Alien-Zstandard",
+       "name" : "Exotic-Zstandard",
+       "defaults" : { "kind" : "shared" },
        "packages" : [
-          { "name" : "zstd", "kind" : "shared" }
+          { "name" : "zstd" }
        ]
     }
 
     # Build.PL
+    use Path::Tiny;
     use Alien::Xrepo::Build;
 
-    my $snapshot = path('blib/lib/auto/share/dist/Alien-Zstandard/xrepo-snapshot.json');
-    Alien::Xrepo::Build->new( recipe => '.' )->run( snapshot => $snapshot );
+    # 'snapshot' (and every other engine option) is a CONSTRUCTOR option; run()
+    # only folds ambient options like kind/mode/plat/arch into the recipe profile.
+    my $snapshot = path('blib/lib/auto/share/dist/Exotic-Zstandard/xrepo-snapshot.json');
+    Alien::Xrepo::Build->new( recipe => '.', snapshot => $snapshot )->run;
+
+Set C<< defaults => { kind => 'shared' } >> (or a per-package C<< { name => 'zstd', kind => 'shared' } >>) when
+consumers bind the library with FFI (L<Affix>, L<FFI::Platypus>): C<xrepo> builds these packages as static libraries by
+default, and C<libpath> / C<ffi_lib> must point to a real shared library for them to load successfully.
 
 =head1 DESCRIPTION
 
-C<Alien::Xrepo::Build> is a build engine in the spirit of L<Alien::Build>: a stage pipeline with hooks and three
-property buckets, all serialized as plain JSON. Unlike alienfile, there are no download/extract/compile stages of our
-own, all of that is handled by xrepo via L<Alien::Xrepo>. What remains is the essential orchestration:
+C<Alien::Xrepo::Build> is a build engine in the spirit of L<Alien::Build>. It acts as a stage pipeline with hooks and
+three property buckets, all serialized as plain JSON. Unlike an C<alienfile>, there are no download/extract/compile
+stages of our own. All of that is handled by C<xrepo> via L<Alien::Xrepo>. What remains is the essential orchestration:
 
 =over
 
-=item * probe: ask xrepo whether a package already satisfies the recipe and skip the install if it does
+=item * B<probe>: Ask C<xrepo> whether a package already satisfies the recipe and skip the install if it does.
 
-=item * install: one xrepo install per package, per-package version/flags/configs merged over the ambient profile, failures isolated
+=item * B<install>: Run one C<xrepo install> per package, merging per-package version/flags/configs over the ambient profile and isolating failures.
 
-=item * gather: ensure every package has consumer-facing paths (C<xrepo fetch --json> data) recorded
+=item * B<gather>: Ensure every package has consumer-facing paths (C<xrepo fetch --json> data) recorded.
 
-=item * export: optionally export packages and/or write the runtime snapshot for hermetic consumers
+=item * B<export>: Optionally export packages and/or write the runtime snapshot for hermetic consumers.
 
-=item * checkpoint/resume: a failed run can be resumed without reinstalling what already happened
+=item * B<checkpoint/resume>: Allow a failed run to be resumed without reinstalling what already succeeded.
 
 =back
 
-=head2 Pipeline stages
+=head2 Pipeline Stages
 
-The pipeline runs C<configure>, C<probe>, C<install>, C<gather>, C<export>, C<test> in order. Each stage method is
+The pipeline runs C<configure>, C<probe>, C<install>, C<gather>, C<export>, and C<test> in order. Each stage method is
 idempotent per run (a checkpointed stage is skipped). Hooks run immediately before their stage body:
 
     $build->register_hook( install => sub ($build) { ... } );
@@ -56,144 +65,168 @@ The three buckets mirror L<Alien::Build>'s meta/install/runtime split:
 
 =over
 
-=item C<meta_prop> -- recipe facts (name, packages, package defs, defaults, pkg_roots, local_repos, hooks)
+=item * C<meta_prop>: Recipe facts (name, packages, package defs, defaults, pkg_roots, local_repos, hooks).
 
-=item C<install_prop> -- this run (store root, ambient profile, probe results)
+=item * C<install_prop>: State of this run (store root, ambient profile, probe results).
 
-=item C<runtime_prop> -- what consumers need (per-package include/lib/link data and an C<errors> map)
+=item * C<runtime_prop>: What consumers need (per-package include/lib/link data and an C<errors> map).
 
 =back
 
-=head2 The recipe
+=head2 The Recipe
 
-C<xrepo.json> is loaded and validated by L<Alien::Xrepo::Build::Recipe>. Its C<packages> array mirrors an
+If it exists, C<xrepo.json> is loaded and validated by L<Alien::Xrepo::Build::Recipe>. Its C<packages> array mirrors an
 L<Alien::Xrepo::Runtime> C<pkg_name> declaration:
 
 =over
 
-=item * a plain string is a bare xrepo package name
+=item * A plain string is a bare C<xrepo> package name.
 
-=item * a hashref adds install flags, e.g. C<< { "name" => "zstd", "version" => "1.5.6", "kind" => "shared", "configs" => { "legacy" => 1 } } >>
+=item * A hashref adds install flags, e.g., C<< { name => 'zstd', version => '1.5.6', kind => 'shared', configs => { legacy => true } } >>.
 
 =back
 
-C<defaults> holds ambient flags applied under every package (same key set, plus C<configs>). C<pkg_roots>,
-C<local_repos>, C<hooks> and C<name> are the remaining top-level keys.
+C<defaults> holds ambient flags applied under every package (using the same key set, plus C<configs>). C<pkg_roots>,
+C<local_repos>, C<hooks>, and C<name> are the remaining top-level keys.
 
-C<pkg_roots> maps a package name to an environment variable whose value names that package's root directory
-(mirroring Alien::Build's C<pkg_roots>): when the variable is set and points at an existing directory, the package is
-treated as system-provided there. Probe reports it satisfied, install/gather skip xrepo entirely, and the root's
-C<include>/C<lib>/C<bin> subdirectories (when present) become the package's resolution data, so a root-resolved
-package leaves C<install_type> at C<'system'>.
+The recipe may be given to C<new( ... )> as a path/dir, an L<Alien::Xrepo::Build::Recipe> object, or a hashref of the
+same fields (which is exactly what an L<Alien::Xrepo::Runtime> subclass's C<recipe()> method returns). A dist that
+describes itself in the class therefore plugs straight into the engine: no C<xrepo.json> is needed, and the file-based
+and inline recipes are entirely interchangeable.
+
+C<pkg_roots> maps a package name to an environment variable whose value names that package's root directory (mirroring
+C<Alien::Build>'s C<pkg_roots>). When the variable is set and points to an existing directory, the package is treated
+as system-provided there. The probe reports it as satisfied, install/gather skip C<xrepo> entirely, and the root's
+C<include>/C<lib>/C<bin> subdirectories (when present) become the package's resolution data. A root-resolved package
+leaves C<install_type> as C<'system'>.
 
 C<hooks> lists recipe hook module names. Each module is loaded once when the configure stage runs and must expose a
-class method C<register_hooks($build)>; the module typically calls the build's C<register_hook> to attach its stage
-callbacks:
+class method C<register_hooks($build)>. The module typically calls the build's C<register_hook> to attach its stage
+callbacks.
 
 =head1 METHODS
 
 =head2 C<new( ... )>
 
     Alien::Xrepo::Build->new(
-        recipe       => $path_or_recipe,   # xrepo.json path/dir or a Recipe object
+        recipe       => $path_or_recipe,   # xrepo.json path/dir, a Recipe object, or a hashref of recipe fields
         root         => $store_root,       # XMAKE_PKG_INSTALLDIR
         repo         => $alien_xrepo,      # injectable engine
         cache        => 0,                 # bypass Alien::Xrepo's warm-start cache
-        verbose      => true,
+        verbose      => 1,
         checkpoint   => $state_file,       # enables resume
         snapshot     => $snapshot_file,    # write runtime data here during export
+        share_dir    => $share_dir,        # shallow-install packages into a self-contained sharedir
         export_dir   => $dir,              # xrepo-export each package here
         probe_policy => 'skip',            # skip|always|off
-        resume       => true               # load checkpoint on construction
+        resume       => 1,                 # load checkpoint on construction
+        update_repo  => 1                  # refresh xrepo repositories once when an install fails
     );
 
 B<cache> (default 1) is forwarded to the engine this class creates, so C<cache =E<gt> 0> disables the on-disk
-resolution cache (see L<Alien::Xrepo|/CACHE>); an injected C<repo =E<gt> ...> keeps its own cache setting.
+resolution cache (see L<Alien::Xrepo/"Cache System">). If an engine is injected via C<repo =E<gt> ...>, it keeps its
+own cache setting.
+
+B<share_dir> switches the run from the ambient C<xmake> cache to a self-contained install: every package is installed
+into C<< <share_dir>/<pkg> >> (its C<installdir>), so the dist can ship its own copy of the libraries and never depend
+on the C<xmake> cache at runtime. When C<share_dir> is set, the snapshot export records those paths relative to
+C<share_dir>; L<Alien::Xrepo::Runtime> then resolves them against the directory where the snapshot file itself lives,
+meaning the same binary C<share> directory keeps working after C<./Build install> relocates it (e.g., from C<blib> to
+the C<File::ShareDir> install tree). Note that C<xrepo> nests the actual payload under C<<
+<share_dir>/<pkg>/l/<pkg>/<version>/<hash> >>.
 
 =head2 C<run( %opts )>
 
-Run the full pipeline: C<configure>, C<probe>, C<install>, C<gather>, C<export>, C<test>. Ambient options (C<kind>,
+Runs the full pipeline: C<configure>, C<probe>, C<install>, C<gather>, C<export>, C<test>. Ambient options (C<kind>,
 C<mode>, C<plat>, C<arch>, C<configs>, ...) are folded over the recipe defaults into the install profile.
 
-Including after a resume, stages that have already run are skipped.
+Options that are wired through the constructor (C<snapshot>, C<checkpoint>, C<export_dir>, C<resume>, C<probe_policy>,
+C<root>) must be passed to C<new()>, not to C<run()>. They are not profile options, so C<< ->run( snapshot => $snapshot
+) >> does nothing.
+
+During a resume, stages that have already successfully run are skipped.
 
 =head2 C<configure( %opts )>
 
-Prepares the run: records the recipe facts into C<meta_prop>, folds the ambient C<%opts> over the recipe
-C<defaults> into C<< install_prop->{profile} >>, resolves C<< install_prop->{store} >> (falling back to C<root>),
-and registers every C<local_repos> entry with the engine. C<install_type> is reset to C<'system'> and the state is
-checkpointed. Safe to call more than once: a stage that already ran is skipped.
+Prepares the run: records the recipe facts into C<meta_prop>, folds the ambient C<%opts> over the recipe C<defaults>
+into C<< install_prop->{profile} >>, resolves C<< install_prop->{store} >> (falling back to C<root>), and registers
+every C<local_repos> entry with the engine. C<install_type> is reset to C<'system'> and the state is checkpointed. It
+is safe to call more than once: a stage that already ran is skipped.
 
-=head2 C<probe()>
+=head2 C<probe( )>
 
 Asks the engine whether each package already satisfies the recipe and records the result as C<<
 install_prop->{probed}{<name>} >> = C<< { version =E<gt> ..., satisfied =E<gt> 0|1 } >>. A package with a usable
 C<pkg_roots> entry is recorded as satisfied (with its C<root>) without consulting the engine. Skipped entirely when
-C<probe_policy =E<gt> 'off'>>.
+C<probe_policy =E<gt> 'off'>.
 
-=head2 C<install()>
+=head2 C<install( )>
 
-Runs one C<xrepo install> per package (per-package options merged over the profile). A package with a usable
+Runs one C<xrepo install> per package (with per-package options merged over the profile). A package with a usable
 C<pkg_roots> entry is recorded directly from its root and never passed to the engine. A package the probe found
-satisfied is skipped when C<probe_policy =E<gt> 'skip'>> (the default) unless C<force> is set. A failing package is
-warned about, recorded in C<< runtime_prop->{errors} >>, and does not abort the remaining packages. Each successful
-install is recorded in C<< runtime_prop->{packages} >> and bumps C<install_type> to C<'share'>.
+satisfied is skipped when C<probe_policy =E<gt> 'skip'> (the default) unless C<force> is set. A failing package
+generates a warning, is recorded in C<< runtime_prop->{errors} >>, and does not abort the remaining packages. Each
+successful install is recorded in C<< runtime_prop->{packages} >> and bumps C<install_type> to C<'share'>. When
+C<update_repo =E<gt> 1> is set, the repository index is refreshed (C<xrepo update-repo>) once, and a failed package is
+retried a single time before the error is recorded; useful when a stale or corrupt registry (e.g., a precompiled
+artifact whose checksum changed on the mirror) is the cause of the failure.
 
-=head2 C<gather()>
+=head2 C<gather( )>
 
-Ensures every package not already recorded (installed, root-provided, or failed) has consumer-facing paths: it fetches
+Ensures every package not already recorded (installed, root-provided, or failed) has consumer-facing paths. It fetches
 each one through the engine and stores the resolution data in C<< runtime_prop->{packages} >>. A root-provided package
 is recorded from its C<pkg_roots> entry directly. A failed fetch is recorded in C<< runtime_prop->{errors} >>.
 
-=head2 C<export()>
+=head2 C<export( )>
 
 Optionally exports each successfully installed package into C<export_dir> (C<xrepo export>, one C<< <name> >>
-subdirectory per package), and writes the hermetic snapshot JSON to C<snapshot>: the C<install_type>, per-package
-resolution data, any C<errors>, and a C<digest> of the configured recipe. The snapshot is what
-L<Alien::Xrepo::Runtime> serves to resolve absolute paths with no xrepo process.
+subdirectory per package), and writes the hermetic snapshot JSON to C<snapshot>. This includes the C<install_type>,
+per-package resolution data, any C<errors>, and a C<digest> of the configured recipe. The snapshot is what
+L<Alien::Xrepo::Runtime> serves to resolve absolute paths without invoking an C<xrepo> process. When C<share_dir> is
+set, recorded paths that live under it are written relative to it (see C<share_dir> above).
 
-=head2 C<test()>
+=head2 C<test( )>
 
 Runs the C<test> hooks. There is no built-in test body; attach your own with C<register_hook>.
 
 =head2 C<register_hook( $stage, $code )>
 
-Attach a hook. Hooks are invoked as C<< $code->($build) >> before the stage body.
+Attaches a hook. Hooks are invoked as C<< $code->($build) >> immediately before the stage body.
 
 =head2 C<has_hook( $stage )>
 
-True when at least one hook is registered for the stage.
+Returns true when at least one hook is registered for the specified stage.
 
-=head2 C<meta_prop()>
+=head2 C<meta_prop( )>
 
-Recipe facts: C<name>, C<packages>, C<package_defs>, C<defaults>, C<pkg_roots>, C<local_repos>, and C<hooks>.
-Filled by the configure stage.
+Recipe facts: C<name>, C<packages>, C<package_defs>, C<defaults>, C<pkg_roots>, C<local_repos>, and C<hooks>. Filled by
+the configure stage.
 
-=head2 C<install_prop()>
+=head2 C<install_prop( )>
 
 This run's state: the C<root>, the merged ambient C<profile>, the resolved C<store>, and the per-package C<probed>
 results.
 
-=head2 C<runtime_prop()>
+=head2 C<runtime_prop( )>
 
-What consumers need: per-package resolution data under C<packages> and a failure map under C<errors>. This is what
-the export stage serializes into the snapshot.
+What consumers need: per-package resolution data under C<packages> and a failure map under C<errors>. This is what the
+export stage serializes into the snapshot.
 
-=head2 C<install_type()>
+=head2 C<install_type( )>
 
-C<'share'> once any package resolved, C<'system'> before that. Restored from the checkpoint on a resume.
+C<'share'> once any package is resolved, C<'system'> before that. Restored from the checkpoint upon a resume.
 
-=head2 C<packages()>
+=head2 C<packages( )>
 
-Recipe package names in order.
+Recipe package names in declaration order.
 
-=head2 C<package_defs()>
+=head2 C<package_defs( )>
 
-The normalized per-package defs from the recipe.
+The normalized per-package definitions from the recipe.
 
-=head2 C<engine()>
+=head2 C<engine( )>
 
-The underlying L<Alien::Xrepo> instance (injectable via C<repo =E<gt>> for tests or alternate engines).
+The underlying L<Alien::Xrepo> instance (injectable via C<repo =E<gt> ...> for tests or alternative engines).
 
 =head1 SEE ALSO
 

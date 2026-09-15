@@ -17,7 +17,7 @@
 #include <histo/types.h>
 #include <histo/version.h>
 
-static int histo_xs_cli_capture(int argc, char **argv, char **out_buf_p, size_t *out_sz_p, char **err_buf_p, size_t *err_sz_p) {
+static int histo_xs_cli_capture(pTHX_ int argc, char **argv, char **out_buf_p, size_t *out_sz_p, char **err_buf_p, size_t *err_sz_p) {
     char *out_buf = NULL;
     size_t out_sz = 0;
     char *err_buf = NULL;
@@ -2146,7 +2146,7 @@ capture(...)
 
         if (argc == 0) {
             char *default_argv[] = { (char *)"phisto", NULL };
-            code = histo_xs_cli_capture(1, default_argv, &out_buf, &out_sz, &err_buf, &err_sz);
+            code = histo_xs_cli_capture(aTHX_ 1, default_argv, &out_buf, &out_sz, &err_buf, &err_sz);
         } else {
             char **argv = (char **)malloc(((size_t)argc + 2) * sizeof(char *));
             if (!argv) {
@@ -2157,7 +2157,7 @@ capture(...)
                 argv[i + 1] = SvPV_nolen(ST(start + i));
             }
             argv[argc + 1] = NULL;
-            code = histo_xs_cli_capture(argc + 1, argv, &out_buf, &out_sz, &err_buf, &err_sz);
+            code = histo_xs_cli_capture(aTHX_ argc + 1, argv, &out_buf, &out_sz, &err_buf, &err_sz);
             free(argv);
         }
 

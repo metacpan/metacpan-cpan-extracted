@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 #use Test::More 'no_plan';
-use Test::More tests => 15;
+use Test::More tests => 16;
 
 use File::Spec;
 use FindBin qw($Bin);
@@ -39,8 +39,10 @@ sub main {
 	);
 	is_deeply(
 		[ App::whichpm::find('Acme::justDie') ],
-		[ $acme_just_die_filename ], 'Acme::justDie (wantarray)'
+		[ $acme_just_die_filename, '0.02' ],
+		'Acme::justDie version is read without loading the module'
 	);
+	ok(!exists $INC{'Acme/justDie.pm'}, 'Acme::justDie was not loaded');
 
 	# pass filename
 	is(App::whichpm::find('Acme/nonEmpty.pm'), $acme_non_empty_filename, 'nonEmpty');
@@ -56,4 +58,3 @@ sub main {
 	
 	return 0;
 }
-

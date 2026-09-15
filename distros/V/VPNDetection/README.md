@@ -42,6 +42,28 @@ print $result->is_hosting;           # 1
 print $result->hosting->{provider};
 ```
 
+### Your own address
+
+```perl
+my $result = $client->my_ip;
+print $result->ip;   # the address we saw this call come from
+```
+
+Same answer `lookup` would give for that address, and the same cost against your allowance. It is deliberately not cached: which address you are is the whole question, and a machine that moves between networks would otherwise be told where it used to be.
+
+### Your plan and usage
+
+```perl
+my $acct = $client->my_account;
+print $acct->{plan}{key};          # max
+print $acct->{usage}{requests};    # 580
+print $acct->{usage}{window_end};  # when the allowance resets
+```
+
+Usage counts against the anniversary of your subscription, not the calendar month and not the billing period, and it is the same number a lookup is gated on. `hard_limit` is `undef` on an uncapped plan, which is not the same as zero.
+
+`my_ip` returns a `VPNDetection::Result` like `lookup` does; `my_account` returns the decoded hashref. `my_ip_p` and `my_account_p` are the non-blocking forms.
+
 ### Batch lookup
 
 You can do batch lookups with a list, which parallelizes requests for you efficiently:
@@ -146,11 +168,11 @@ The blocking calls are those same promises plus a `wait`, so both paths retry, c
 
 ### Database downloads
 
-If your key carries the `db.download` scope, the licensed datasets are available through `$client->database`. A license covers a dataset *family*, and the id you download is the one hanging off its `versions`:
+If your key carries the `db.download` scope, the licensed databases are available through `$client->database`. A license covers a database *family*, and the id you download is the one hanging off its `versions`:
 
 ```perl
-my $datasets = $client->database->list;
-my $id = $datasets->[0]{versions}[0]{id};    # e.g. vpn_ip_v1
+my $databases = $client->database->list;
+my $id = $databases->[0]{versions}[0]{id};    # e.g. vpn_ip_v1
 ```
 
 There are three ways to fetch one: as a link you transfer yourself, as bytes, or straight to a file.
@@ -163,7 +185,7 @@ my $bytes = $db->download_bytes('cdn_ip_v1', 'csvgz');     # in memory
 my $written = $db->download($id, 'mmdb', "./$id.mmdb");    # streamed to disk
 ```
 
-`download` holds nothing beyond one chunk however large the dataset is, writes through a neighboring `.part` file so a transfer that dies half way leaves nothing that reads as a whole dataset, and raises rather than accepts a body that stops early. `download_bytes` holds the **whole file in memory**, and the catalog runs from `cdn_ip_v1` at 10 KB to `resproxy_ip_90d_v1` at 1.79 GB, so use `download` for anything you have not measured.
+`download` holds nothing beyond one chunk however large the database is, writes through a neighboring `.part` file so a transfer that dies half way leaves nothing that reads as a whole database, and raises rather than accepts a body that stops early. `download_bytes` holds the **whole file in memory**, and the catalog runs from `cdn_ip_v1` at 10 KB to `resproxy_ip_90d_v1` at 1.79 GB, so use `download` for anything you have not measured.
 
 ### Absent is not false
 

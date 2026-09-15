@@ -3,17 +3,21 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.112';
+our $VERSION = '0.114';
 
 use parent 'Linux::Event::_Socket::Listener';
 use Carp qw(croak);
 
 sub new ($class, %option) {
-    if (exists $option{stream_class}) {
-        my $stream_class = $option{stream_class};
-        croak 'new(): stream_class must name a Linux::Event::IO::Sock::Stream subclass'
-            if ref($stream_class)
-            || !$stream_class->isa('Linux::Event::IO::Sock::Stream');
+    if (exists $option{stream}) {
+        croak 'new(): stream must be a hash reference'
+            if ref($option{stream}) ne 'HASH';
+        if (exists $option{stream}{class}) {
+            my $stream_class = $option{stream}{class};
+            croak 'new(): stream class must name a Linux::Event::IO::Sock::Stream subclass'
+                if ref($stream_class)
+                || !$stream_class->isa('Linux::Event::IO::Sock::Stream');
+        }
     }
     return $class->SUPER::new(%option);
 }
@@ -31,16 +35,17 @@ Linux::Event::IO::Sock::Listener - asynchronous listening C<SOCK_STREAM> socket
   use v5.36;
   use Linux::Event::Loop;
   use Linux::Event::IO::Sock::Listener;
-  use Linux::Event::IO::Sock::Stream;
 
   my $loop = Linux::Event::Loop->new;
   my $listener = Linux::Event::IO::Sock::Listener->new(
-      loop         => $loop,
-      stream_class => 'Linux::Event::IO::Sock::Stream',
-      host         => '127.0.0.1',
-      port         => 9999,
-      on_data      => sub ($stream, $bytes) {
-          $stream->write($bytes);
+      loop => $loop,
+      host => '127.0.0.1',
+      port => 9999,
+
+      stream => {
+          on_data => sub ($stream, $bytes) {
+              $stream->write($bytes);
+          },
       },
   );
 
@@ -49,46 +54,92 @@ Linux::Event::IO::Sock::Listener - asynchronous listening C<SOCK_STREAM> socket
 =head1 DESCRIPTION
 
 C<Linux::Event::IO::Sock::Listener> owns a listening Linux C<SOCK_STREAM>
-socket and constructs the configured L<Linux::Event::IO::Sock::Stream>
-subclass for every accepted connection. It is a separate public object because
-bind/listen/accept lifecycle is different from connected byte-stream I/O.
+socket and is a generator of connected L<Linux::Event::IO::Sock::Stream>
+objects. Listener options configure bind/listen/accept behavior. The nested
+C<stream =E<gt> {...}> recipe describes the Streams generated for accepted
+connections and is resolved once when the Listener is constructed.
 
 TCP and Unix-domain listeners share this class. Socket family is selected by
 constructor options, not by subclass hierarchy.
 
-=head1 ACCEPTED STREAM SUBCLASS POLICY AND TUNING
+=head1 STREAM RECIPE
 
-C<stream_class> is a prominent part of the Listener design. The selected
-L<Linux::Event::IO::Sock::Stream> subclass gives every accepted connection the
-same native framer, TLS server identity and verification policy, socket policy,
-and C<stream_options> tuning for fairness, batching, limits, watermarks, and
-deadlines. Linux::Event validates and caches that policy once per stream class.
+The C<stream> hash may contain C<class>, C<tuning>, C<tls>, C<data>, and Stream
+callbacks. C<class> defaults to C<Linux::Event::IO::Sock::Stream>, so a simple
+raw server does not require a connection subclass:
 
-Listener constructor callbacks are complementary: C<on_data>, C<on_message>,
-and the other accepted-Stream callback templates can capture lexical server
-state, override same-named stream methods, and are shared rather than rebuilt
-for every accept. This keeps reusable protocol and tuning policy in the Stream
-subclass while preserving ordinary closure scope for a particular listener.
+  my $listener = Linux::Event::IO::Sock::Listener->new(
+      loop => $loop,
+      host => '0.0.0.0',
+      port => 9000,
+      stream => {
+          on_data => sub ($stream, $bytes) {
+              $stream->write($bytes);
+          },
+      },
+  );
 
-The Listener's own C<on_accept> and listener-error policy remain named subclass
-methods because C<on_error> in the constructor belongs to accepted Streams.
+A reusable connection subclass remains the preferred place for framing, named
+callback methods, socket policy, and class tuning defaults:
+
+  package ServerConnection;
+  use parent 'Linux::Event::IO::Sock::Stream';
+
+  sub stream_tuning ($class) {
+      return (
+          read_size         => 65_536,
+          read_budget_bytes => 262_144,
+          idle_timeout      => 60,
+      );
+  }
+
+  sub on_data ($self, $bytes) {
+      $self->write($bytes);
+  }
+
+  package main;
+  my $listener = Linux::Event::IO::Sock::Listener->new(
+      host => '0.0.0.0',
+      port => 9000,
+      stream => {
+          class => 'ServerConnection',
+          tuning => {
+              read_size    => 131_072,
+              idle_timeout => 30,
+          },
+      },
+  );
+
+Recipe tuning overrides C<stream_tuning()> defaults for every Stream generated
+by that Listener. A live Stream may subsequently change its own effective
+operating values with C<< $stream->tune(...) >>.
+
+C<data> is the initial C<data> value supplied to each generated Stream.
+Supported Stream callbacks are C<on_data>, C<on_message>, C<on_messages>,
+C<on_ready>, C<on_transport_ready>, C<on_drain>, C<on_eof>, C<on_error>, and
+C<on_close>. Callback CVs are retained by the resolved recipe; Linux::Event does
+not rebuild the configuration for every accept or every I/O event.
+
+A readable raw Stream must have an effective C<on_data> sink. A framed Stream
+must have the message sink required by its effective batching policy, unless a
+native consumer supplies that sink. These predictable errors are rejected while
+the Listener is being constructed, before any client can be accepted.
 
 =head2 Listener acceptance tuning
 
-Listener tuning is constructor policy; it is distinct from the accepted
-class's C<stream_options> and C<socket_options>:
+Listener settings remain top-level because they configure the listening
+resource itself rather than the Streams it generates:
 
   my $listener = Linux::Event::IO::Sock::Listener->new(
       loop                => $loop,
-      stream_class        => 'ServerConnection',
       host                => '0.0.0.0',
       port                => 9999,
       backlog             => 8_192,
       max_accept_per_tick => 512,
+      stream              => {
+          class => 'ServerConnection',
+      },
   );
-
-These settings are passed directly to C<new>; Listener does not define a
-class-level tuning method. The complete set is:
 
 =over 4
 
@@ -103,83 +154,67 @@ when C<edge_triggered> is enabled.
 
 =item * C<edge_triggered> (default 0)
 
-Boolean C<0> or C<1> selecting edge-triggered accept readiness.
+Boolean selecting edge-triggered accept readiness.
 
 =item * C<reuseaddr> (default 1)
 
-Boolean C<0> or C<1> controlling C<SO_REUSEADDR> for a created listener.
+Boolean controlling C<SO_REUSEADDR> for a created listener.
 
 =item * C<reuseport> (default 0)
 
-Boolean C<0> or C<1> controlling C<SO_REUSEPORT> for a created listener.
+Boolean controlling C<SO_REUSEPORT> for a created listener.
 
 =item * C<v6only> (default unspecified)
 
-Optional boolean C<0> or C<1> controlling C<IPV6_V6ONLY> for a created IPv6
-listener.
+Optional boolean controlling C<IPV6_V6ONLY> for a created IPv6 listener.
 
 =item * C<bind_device> (default unspecified)
 
-Optional non-empty interface name used with C<SO_BINDTODEVICE> for a created
-Internet listener.
+Optional non-empty interface name used with C<SO_BINDTODEVICE> for an Internet
+listener.
 
 =back
 
-Unix listener ownership controls are C<unlink> (default C<0>),
-C<unlink_on_close> (default C<1>), and optional C<permissions> from C<0> through
-C<07777>. C<owns_socket> controls ownership of an adopted C<fh> and is not a
-throughput-tuning option.
+Unix listener ownership controls are C<unlink> (default false),
+C<unlink_on_close> (default true), and optional C<permissions>. C<owns_socket>
+controls ownership of an adopted listening C<fh>. These are construction and
+ownership settings, not Stream tuning.
 
-=head1 CONSTRUCTION
+Exactly one listener source is selected:
 
-C<stream_class> is required and names the stream-socket subclass created for
-each accepted connection. Exactly one listener source is selected:
-
-  Listener->new(
-      stream_class => 'ServerConnection',
-      host         => '0.0.0.0',
-      port         => 9999,
+  Linux::Event::IO::Sock::Listener->new(
+      host => '0.0.0.0', port => 9999, stream => { ... },
   );
 
-  Listener->new(
-      stream_class => 'ServerConnection',
-      unix         => '/run/example.sock',
+  Linux::Event::IO::Sock::Listener->new(
+      unix => '/run/example.sock', stream => { ... },
   );
 
-  Listener->new(
-      stream_class => 'ServerConnection',
-      fh           => $existing_listener,
+  Linux::Event::IO::Sock::Listener->new(
+      fh => $existing_listener, stream => { ... },
   );
 
-C<loop =E<gt> $loop> attaches immediately; otherwise add the detached object
-with C<< $loop->add($listener) >>. Listener C<data> is supplied to each accepted
-connection as its initial C<data> value.
+C<loop =E<gt> $loop> attaches immediately; otherwise add the detached Listener
+with C<< $loop->add($listener) >>.
 
-The Listener may also receive accepted-Stream callback templates directly:
+=head1 LISTENER CALLBACKS
 
-  my $database = ...;
-  my $listener = Listener->new(
-      stream_class => 'Linux::Event::IO::Sock::Stream',
-      host         => '0.0.0.0',
-      port         => 9999,
-      on_data      => sub ($stream, $bytes) {
-          persist($database, $stream, $bytes);
+C<on_accept> and C<on_error> at the top level belong to the Listener. Stream
+C<on_error> belongs inside the C<stream> recipe.
+
+  my $listener = Linux::Event::IO::Sock::Listener->new(
+      host => '0.0.0.0',
+      port => 9999,
+      stream => {
+          on_data => sub ($stream, $bytes) { ... },
+          on_error => sub ($stream, $error) { ... },
       },
+      on_accept => sub ($listener, $stream) { ... },
+      on_error  => sub ($listener, $error)  { ... },
   );
 
-Supported templates and signatures are C<on_data($stream, $bytes)>,
-C<on_message($stream, $message)>, C<on_messages($stream, $messages)>,
-C<on_ready($stream)>, C<on_transport_ready($stream)>, C<on_drain($stream)>,
-C<on_eof($stream)>, C<on_error($stream, $error)>, and C<on_close($stream)>.
-These constructor options belong to each accepted Stream;
-C<on_error($listener, $error)> for the Listener itself remains a Listener
-subclass method. One template CV is retained by the Listener and passed to
-every accepted Stream. Linux::Event does not create a new closure per accept.
-
-TCP listener policy includes C<backlog>, C<reuseaddr>, C<reuseport>, optional
-C<v6only>, and C<bind_device>. Unix listeners support path ownership controls
-including C<unlink>, C<unlink_on_close>, and C<permissions>. Adopted handles
-default to caller ownership unless C<owns_socket> is true.
+A Listener subclass may define the same callback methods as reusable defaults.
+Constructor callbacks override those methods for that Listener instance.
 
 =head1 ACCEPTANCE
 
@@ -187,21 +222,37 @@ Native code drains C<accept4> with nonblocking and close-on-exec flags.
 C<max_accept_per_tick> bounds level-triggered acceptance for fairness; zero
 drains until C<EAGAIN> and is required with edge-triggered operation.
 
-For each accepted socket Linux::Event constructs C<stream_class>, attaches it to
-the same Loop, then invokes optional C<on_accept($listener, $stream)>.
-A plain stream's C<on_ready> follows. For TLS, C<on_accept> still observes the
-new connection immediately after attachment while C<on_ready> waits for the TLS
-handshake and verification to complete.
+For every accepted socket Linux::Event constructs the resolved Stream class
+with the already-prepared recipe descriptor, attaches it to the same Loop, and
+then invokes optional C<on_accept($listener, $stream)>. A plain Stream's
+C<on_ready> follows. For TLS, C<on_ready> waits for handshake and verification.
 
 An C<on_accept> exception closes only that accepted connection and is reported
-as a callback error; it does not silently kill the listener.
+through the Listener C<on_error> callback.
 
 =head1 TLS
 
-TLS policy belongs to the accepted stream-socket class, not the listener. A
-server class declares L<Linux::Event::TLS> with C<cert_file> and C<key_file>.
-Listener validates that server policy during construction and creates fresh TLS
-state for every accepted connection.
+TLS is generated-Stream acquisition policy and therefore belongs under
+C<stream =E<gt> { tls =E<gt> {...} }>. A Stream class does not need to be a
+special TLS subclass. TLS configuration is resolved when the Listener is
+constructed and plain listeners allocate no OpenSSL connection state.
+
+  my $listener = Linux::Event::IO::Sock::Listener->new(
+      host => '0.0.0.0',
+      port => 9443,
+      stream => {
+          class => 'ServerConnection',
+          tls => {
+              cert_file => '/etc/myapp/server-cert.pem',
+              key_file  => '/etc/myapp/server-key.pem',
+          },
+      },
+  );
+
+The Listener prepares reusable server TLS context and policy once. Each accepted
+TLS Stream receives independent connection state while sharing that prepared
+server context. Ordinary server code does not need to load C<Linux::Event::TLS>
+directly.
 
 =head1 METHODS AND LIFECYCLE
 
@@ -211,18 +262,8 @@ identify the listening socket family.
 
 C<pause> and C<resume> control acceptance while retaining the listening socket.
 C<close> ends ownership. C<detach> returns the still-open listening handle and
-is terminal. C<state> reports listener lifecycle such as C<unattached>,
-C<listening>, C<paused>, C<closed>, C<failed>, or C<detached>.
+is terminal. C<state> reports lifecycle such as C<unattached>, C<listening>,
+C<paused>, C<closed>, C<failed>, or C<detached>.
 
 Runtime errors are L<Linux::Event::Error> values. Resource exhaustion pauses
-acceptance before error delivery to prevent a readable-backlog error spin. A
-subclass may define C<on_error($listener, $error)> to implement application
-policy.
-
-=head1 SEE ALSO
-
-L<Linux::Event::IO::Sock::Stream>, L<Linux::Event::TLS>,
-F<docs/LISTENER-DESIGN.md>, F<docs/SOCKET-CONFIGURATION.md>,
-F<docs/FIRST-CLASS-STREAM-CALLBACKS.md>.
-
-=cut
+acceptance before error delivery to prevent a readable-backlog error spin.

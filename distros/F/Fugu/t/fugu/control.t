@@ -4,7 +4,10 @@
 # temporary socket. A forked server serves one connection at a time,
 # so the tests need no event loop.
 
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
 use FindBin qw($RealBin);
 use lib "$RealBin/../../lib";

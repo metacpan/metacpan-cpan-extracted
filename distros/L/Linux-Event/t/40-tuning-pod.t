@@ -17,7 +17,7 @@ sub pod_section ($path, $heading) {
     return $section // '';
 }
 
-my @stream_options = qw(
+my @stream_tuning = qw(
     read_size read_budget_bytes read_batch_bytes message_batch_size max_buffer
     high_watermark low_watermark max_pending_bytes idle_timeout read_timeout
     write_timeout
@@ -28,10 +28,10 @@ for my $path (qw(
     lib/Linux/Event/IO/Pipe.pm
     lib/Linux/Event/IO/TTY.pm
 )) {
-    my $section = pod_section($path, 'stream_options');
-    like $section, qr/^  sub stream_options \(\$class\) \{/m,
-        "$path demonstrates the stream_options class method";
-    for my $option (@stream_options) {
+    my $section = pod_section($path, 'stream_tuning');
+    like $section, qr/^  sub stream_tuning \(\$class\) \{/m,
+        "$path demonstrates the stream_tuning class method";
+    for my $option (@stream_tuning) {
         like $section, qr/=item \* C<\Q$option\E>/,
             "$path lists stream option $option";
     }

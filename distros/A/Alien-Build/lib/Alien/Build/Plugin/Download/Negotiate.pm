@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _has_ssl );
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '2.84'; # VERSION
+our $VERSION = '2.87'; # VERSION
 
 
 has '+url' => undef;
@@ -134,7 +134,7 @@ sub init
     }
   }
 
-  if($self->url =~ /^http.*github.com.*releases$/)
+  if($self->url =~ /^http.*github.com.*releases$/ && !$meta->has_requires('configure', 'Download::GitHub'))
   {
     Alien::Build->log('!! WARNING !! WARNING !!');
     Alien::Build->log('!! WARNING !! It looks like this alien is using the regular download negotiator');
@@ -206,7 +206,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 2.84
+version 2.87
 
 =head1 SYNOPSIS
 
@@ -381,6 +381,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 nick nauwelaerts (INPHOBIA)
 
 Florian Weimer
+
+Marcel Telka (mtelka)
 
 =head1 COPYRIGHT AND LICENSE
 

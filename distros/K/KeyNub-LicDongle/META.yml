@@ -1,0 +1,29 @@
+---
+abstract: 'Perl binding for the KeyNub USB-C license dongle'
+author:
+  - 'KeyNub <support@keynub.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: KeyNub-LicDongle
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  FFI::Platypus: '1.00'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/AB-KeyNub/KeyNub-SDK/issues
+  homepage: https://www.keynub.com/developers/perl/
+  repository: https://github.com/AB-KeyNub/KeyNub-SDK.git
+version: v1.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

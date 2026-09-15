@@ -87,10 +87,11 @@
  *
  *   1  0.01 and 0.02 - everything up to and including queue groups.
  *   2  0.03 - map_store_ttl, the cuckoo filter, lease, then the scoreboard.
+ *   3  0.04 - the HyperLogLog.
  *
  * A consumer that needs only what version 1 had keeps asking for >= 1 and
  * loads against this table unchanged. */
-#define SA_ABI_VERSION 2
+#define SA_ABI_VERSION 3
 
 /* The three handles, opaque here. The guards are shared with the private
  * headers, which define the structs in the provider build - C89 makes a
@@ -228,6 +229,11 @@ typedef struct sa_cache_counts {
 #ifndef SA_CUCKOO_FWD
 #define SA_CUCKOO_FWD
 typedef struct sa_cuckoo sa_cuckoo;
+#endif
+
+#ifndef SA_HLL_FWD
+#define SA_HLL_FWD
+typedef struct sa_hll sa_hll;
 #endif
 
 #ifndef SA_SB_FWD
@@ -628,6 +634,25 @@ typedef struct sa_abi {
     uint64_t  (*sb_slots)(const sa_sb *b);
     uint32_t  (*sb_nfields)(const sa_sb *b);
     const char *(*sb_field_name)(const sa_sb *b, uint32_t idx);
+
+    /* ---- the HyperLogLog: how many distinct, in 2^precision bytes ---------
+     *
+     * The third sketch. `hll_add` is lock-free and commutative - a max on one
+     * register - so any number of processes add to one sketch with nothing to
+     * order. `hll_count` estimates the distinct keys added by everybody, to
+     * within about 1.04 / sqrt(2^precision). `hll_merge` folds src into dst,
+     * register-wise, so dst then estimates the union; both must share a
+     * precision (it returns 0 otherwise). A precision of 0 to hll_open binds
+     * to an existing sketch's, or 14 for a new one. */
+    sa_hll   *(*hll_open)(sa_region *r, const char *name, size_t nlen,
+                          uint32_t precision, int *err);
+    void      (*hll_release)(sa_hll *h);
+    int       (*hll_add)(sa_hll *h, const void *key, size_t klen);
+    double    (*hll_count)(sa_hll *h);
+    int       (*hll_merge)(sa_hll *dst, sa_hll *src);
+    void      (*hll_reset)(sa_hll *h);
+    uint32_t  (*hll_precision)(const sa_hll *h);
+    uint64_t  (*hll_filled)(sa_hll *h);
 } sa_abi;
 
 #endif /* SA_ABI_H */

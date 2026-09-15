@@ -21,8 +21,8 @@ use Linux::Event::IO::Sock::Listener;
 my $loop = Linux::Event::Loop->new;
 my $state = { accepted => [], target => 7 };
 my $listener = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'T::BatchStream',
-    loop => $loop, host => '127.0.0.1', port => 0, data => $state,
+    loop => $loop, host => '127.0.0.1', port => 0,
+    stream => { class => 'T::BatchStream', data => $state },
     max_accept_per_tick => 2,
 );
 my @clients;

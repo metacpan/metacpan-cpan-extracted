@@ -1,3 +1,60 @@
+2.55  2026-09-13
+
+  - Add internal jq-style JSON value classification, recursive equality, and
+    total-order comparison primitives for the 3.0 evaluator.
+  - Keep the new semantics isolated from the stable 2.x filter runtime.
+  - Add an internal built-in registry and dispatch exact and parameterized
+    built-ins to Array, Object, String, Math, Aggregate, Encoding, and Type
+    category modules instead of implementing them directly in Filters.pm.
+  - Preserve numeric JSON identity in the internal value classifier after a
+    scalar has acquired a cached string representation.
+  - Keep the POD version synchronized with the module version.
+
+2.54  2026-09-13
+
+  - Introduce internal Tokenizer, Parser, AST, Evaluator, and Runtime layers
+    while preserving existing 2.x query behavior and public API.
+  - Add the JQ::Lite 3.0 compatibility roadmap.
+  - Clarify that update assignment migration requires version-aware handling.
+  - Document the internal query architecture for maintainers.
+  - Bump module version to 2.54.
+
+2.53  2026-09-13
+
+  - Inventory and classify known JQ::Lite 2.x semantic differences from jq
+    1.7 without changing runtime behaviour.
+  - Classify each difference as preserve, change in v3, or undecided, and add
+    regression coverage across arithmetic/coercion, comparison, null/missing
+    paths, iterators/pipelines, assignment/update, and unsupported jq syntax.
+  - Document and test that contains_subset() is not a drop-in jq contains()
+    replacement for duplicate needles or mixed scalar types.
+  - Generalize jq-compatible iterator suffix syntax to any non-path filter,
+    including function calls and array constructors.
+  - Support whitespace before iterator suffixes while preserving dotted path
+    traversal such as .keys[] and .to_entries[].
+  - Preserve earlier results when an iterator suffix appears in a top-level
+    comma expression.
+  - Strengthen iterator suffix regression coverage with explicit expected
+    results and additional supported filter forms.
+  - Bump module version to 2.53.
+
+2.52  2026-09-13
+
+  - Add jq-compatible iterator suffix syntax for keys[] and to_entries[].
+  - Preserve existing dotted path iteration such as .users[] and .values[].
+  - Add regression coverage for iterator suffix parsing and dotted paths.
+  - Bump module version to 2.52.
+
+2.51  2026-09-12
+
+  - Fix CVE-2026-78497: avoid string eval when compiling user-supplied
+    regular expressions, preventing Perl code execution through runtime
+    regex constructs such as (?{ ... }).
+  - Add regression coverage ensuring runtime Perl code embedded in
+    regular expressions is rejected without being executed.
+  - Preserve support for the i, m, s, and x regex flags.
+  - Bump module version to 2.51.
+
 2.50  2026-08-16
 
   - Define and document the stable JQ::Lite Library API contract.

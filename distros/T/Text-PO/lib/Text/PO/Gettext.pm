@@ -219,13 +219,13 @@ sub dngettext
             return( Text::PO::String->new( $locale_str => $opts->{locale} ) ) if( length( "$locale_str" ) );
             return( Text::PO::String->new( $default ) );
         }
-        return( $def || $default );
+        return( Text::PO::String->new( $def || $default ) );
     }
     elsif( !exists( $dict->{ $msgid } ) )
     {
         warn( "No dictionary was found for msgid \"${msgid}\" and domain \"${domain}\" and locale \"", $self->locale_unix, "\"." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
     }
-    return( $default );
+    return( Text::PO::String->new( $default ) );
 }
 
 sub domain
@@ -460,7 +460,9 @@ sub getTextf
     }
     my $key  = shift( @_ );
     my $text = $self->getText( $key );
-    return( sprintf( $text, @_ ) );
+    # We retrieve the locale from the Text::PO::String object
+    my $locale = $text->locale;
+    return( Text::PO::String->new( sprintf( $text, map( "$_", @_ ) ) => $locale ) );
 }
 
 sub gettext

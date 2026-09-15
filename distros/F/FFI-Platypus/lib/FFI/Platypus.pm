@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -598,7 +598,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 SYNOPSIS
 
@@ -2927,6 +2927,27 @@ feature request, please open an issue on this project's GitHub Issue
 tracker:
 
 L<https://github.com/perlFFI/FFI-Platypus/issues>
+
+=head1 SECURITY
+
+If you have identified a security vulnerability in the code, or the
+possibility of one, please report it right away using GitHub's private
+vulnerability reporting feature at
+L<https://github.com/PerlFFI/FFI-Platypus/security/advisories/new>,
+rather than this project's public GitHub issue tracker, so that a fix
+can be prepared before any public disclosure.
+
+The maintainer will try to respond promptly, and will release a fix
+as soon as reasonably possible.  Please keep in mind, though, that
+C<FFI-Platypus> is maintained by volunteers in their spare time, and a
+rapid response cannot be guaranteed.
+
+Security fixes will normally only be made for the most recent
+production release.
+
+You may also report the issue to L<CPANSec|https://security.metacpan.org/>,
+particularly if the issue is urgent or you do not get a response from
+the maintainer in a reasonable amount of time.
 
 =head1 CONTRIBUTING
 

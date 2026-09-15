@@ -1,0 +1,54 @@
+=head1 NAME
+
+App::FuguBench::Version - the version verb of fugubench
+
+=head1 SYNOPSIS
+
+    $ fugubench version
+    fugubench 0.0.0 (Fugu 0.5.0)
+
+=head1 DESCRIPTION
+
+B<App::FuguBench::Version> holds the C<version> verb. The verb prints
+one line to standard output and returns 0. The line names the version
+of the program and the version of the Fugu library beside it, so one
+command tells a gate what it runs.
+
+The verb reads no checkout, so it runs in a home with no
+F<.toolingrc>.
+
+=head2 command
+
+C<command($verb)> returns the entry of the L<Fugu::CLI> table. The
+module holds one verb, so it ignores the name.
+
+=head2 line
+
+C<line> returns the line of the verb: the version of the program and
+the version of the Fugu library beside it. The doctor reports this
+line as its version check, so the two verbs never name a different
+version.
+
+=head1 THE VERSIONS
+
+The dist build stamps C<our $VERSION> into every staged package. A
+checkout carries no stamp, and the version of the program is then
+C<0.0.0>.
+
+The Fugu version is the version of the loaded library: the installed
+one in a checkout, and the snapshot in the pack.
+
+=head1 RETURN VALUES
+
+C<command> returns a hash reference, and its body returns 0. C<line>
+returns a string.
+
+=head1 SEE ALSO
+
+L<App::FuguBench>, L<App::FuguBench::Doctor>, L<Fugu::CLI>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

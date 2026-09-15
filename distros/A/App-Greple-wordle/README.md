@@ -7,6 +7,10 @@ App::Greple::wordle - wordle module for greple
 
 greple -Mwordle
 
+# VERSION
+
+Version 1.00
+
 # DESCRIPTION
 
 App::Greple::wordle is a greple module that implements the Wordle game.
@@ -20,27 +24,32 @@ Rules are almost the same as the original game, but answers are different.
 Use the **--compat** option to get answers compatible with the original game.
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/screen-5.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/screen-6.png">
 </div>
 
 # OPTIONS
 
 - **--data**=_dataset_
 
-    Choose the word dataset.  Default is `ORIGINAL`.
+    Choose the word dataset.  Default is `NYT`.
 
     Available datasets:
 
     - `ORIGINAL`
 
-        The original word list from the initial Wordle game. This is the
-        default dataset and contains the classic Wordle word list.
+        The original word list from the initial Wordle game.  It contains the
+        classic Wordle word list.
 
     - `NYT`
 
         The New York Times Wordle word list, which includes words used by NYT
-        Wordle. This dataset is updated and may contain different words than
-        the original.
+        Wordle.  It may contain different words than the original.  This is
+        the default dataset.
+
+        When option **--compat** is given and the answer for the index is not
+        included in the dataset, it is fetched from the New York Times web
+        site.  If it cannot be fetched, an answer is selected as described
+        in **--index**.  Fetching requires [IO::Socket::SSL](https://metacpan.org/pod/IO%3A%3ASocket%3A%3ASSL).
 
     Dataset modules are dynamically loaded from `App::Greple::wordle::`
     namespace with uppercase dataset name.
@@ -59,20 +68,27 @@ Use the **--compat** option to get answers compatible with the original game.
     2021/06/19.  If the value is negative, you can get yesterday's
     question by specifying -1.
 
-    If the specified index exceeds the available answer list, a random
-    answer will be selected from the dataset with a warning message.
+    If the specified index exceeds the available answer list, the answer
+    at the index modulo the number of answers is used.  A warning message
+    is shown for series zero, because the answer differs from the
+    original game.
 
-    Answer for option **-s0n0** with `ORIGINAL` dataset is `cigar`.
+    Answer for option **-s0n0** is `cigar`.
 
 - **--**\[**no-**\]**result**
 
     Show result when successful.  Default is true.
 
+- **--**\[**no-**\]**history**
+
+    Show previous attempts above the latest one, so that all attempts are
+    listed together.  Default is true.
+
 - **--random**
 
     Generate a random index every time.
 
-- **--trial**=#, **-x**=#
+- **--trial**=#, **-x**#
 
     Set the trial count.  Default is 6.
 
@@ -132,9 +148,9 @@ The next example shows all words that do not include any letter of `audio` and
 
 ## Using different datasets
 
-    greple -Mwordle --data=NYT            # Use NYT Wordle word list
-    greple -Mwordle --data=ORIGINAL       # Use original word list (default)
-    greple -Mwordle --data=NYT -n0        # First word in NYT dataset (cigar)
+    greple -Mwordle --data=NYT            # Use NYT Wordle word list (default)
+    greple -Mwordle --data=ORIGINAL       # Use original word list
+    greple -Mwordle --data=NYT -s0n0      # First word in NYT dataset (cigar)
 
 <div>
     <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/hint-1.png">
@@ -169,7 +185,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2022-2025 Kazumasa Utashiro.
+Copyright 2022-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,0 +1,136 @@
+=head1 NAME
+
+App::FuguBench::Update - the update verb of fugubench
+
+=head1 SYNOPSIS
+
+    $ fugubench update
+    fugubench 0.2.0
+
+    $ fugubench update --version v0.1.0 --allow-downgrade
+    fugubench 0.1.0
+
+=head1 DESCRIPTION
+
+B<App::FuguBench::Update> holds the C<update> verb. The verb fetches
+a release of the organization, verifies it in this process, and puts
+it in the place of the running program.
+
+The first fetch of the shim trusts HTTPS to GitHub. Every later
+download verifies against the release key of the organization, and
+this verb is one of them. The keys come from
+L<App::FuguBench::Keys>, and the keys of a consumer never enter. A
+release therefore carries the keys that verify the next release.
+
+The verb reads no checkout, so an operator runs it in any directory.
+
+=head2 command
+
+C<command($verb)> returns the entry of the L<Fugu::CLI> table. The
+module holds one verb, so it ignores the name.
+
+=head1 THE COMMAND LINE
+
+The usage is C<update [--version E<lt>tagE<gt>] [--allow-downgrade]>,
+and the verb takes no argument.
+
+C<--version> names one release tag. Without it, the verb takes the
+latest release. A tag must read C<vE<lt>MAJORE<gt>.E<lt>MINORE<gt>.E<lt>PATCHE<gt>>,
+and the verb prints the usage and exits 2 for a value of another
+shape. That value reaches a download address, and it must name one
+path segment.
+
+C<--allow-downgrade> takes a release below the running version.
+
+=head1 THE STEPS
+
+The verb runs these steps in order, and it stops at the first
+failure.
+
+=over 4
+
+=item 1.
+
+It resolves the running file. A file under the shim cache is a
+refusal, and the message names the sync of the org pack as the path
+to a new version. An unset or an empty C<HOME> is a refusal as well,
+because the cache path starts with that value.
+
+=item 2.
+
+It downloads F<SHA256> and F<SHA256.sig> into a temporary directory.
+
+=item 3.
+
+It writes each embedded key as a signify public key file, in trust
+order, and it verifies the manifest against that list.
+
+=item 4.
+
+It reads the version from the versioned tarball name of the
+manifest. A version below the running one is a refusal without
+C<--allow-downgrade>.
+
+=item 5.
+
+It downloads the packed file and holds it to the digest of the
+manifest.
+
+=item 6.
+
+It writes the bytes over the running file, atomically and with mode
+755, and it prints the result line C<fugubench E<lt>versionE<gt>>.
+
+=back
+
+The signature check sits in front of the download of the packed
+file. A release that no embedded key signed then costs the manifest
+and its signature, and nothing more.
+
+=head1 THE ADDRESS
+
+The release directory is
+C<https://github.com/FuguBSD/FuguBench/releases/latest/download/>,
+or the directory of the named tag under
+C<https://github.com/FuguBSD/FuguBench/releases/download/>.
+
+C<FUGUBENCH_RELEASE_URL> replaces the host and the repository of
+that address. A developer and a test point the verb at another
+server with it. A trailing solidus of the value is not part of the
+address.
+
+Each of the three downloads passes the URL shape check of
+L<App::FuguBench::Fetch>. L<Fugu::Curl> places the URL last and
+writes no C<--> separator, so an address that starts with a dash
+would reach the downloader as an option.
+
+=head1 THE SANDBOX
+
+The row of C<update> pledges
+C<stdio rpath wpath cpath fattr proc exec inet dns>. The file
+promises serve the replace, C<fattr> serves the mode, and
+C<proc exec> serves the downloader child. The row unveils nothing,
+because unveil(2) holds across an exec and no list names the files
+of a child.
+
+=head1 RETURN VALUES
+
+C<command> returns a hash reference. The body returns 0 after the
+replace. It returns 1 for a failed download, a signature that no
+embedded key verifies, a manifest that names no single versioned
+tarball, a refused downgrade, a digest that does not match, a
+running file under the shim cache, an unset or an empty C<HOME>,
+and a failed write. It returns 2 for a command line that holds an
+argument, and for a tag of another shape.
+
+=head1 SEE ALSO
+
+L<App::FuguBench>, L<App::FuguBench::Dist>, L<App::FuguBench::Fetch>,
+L<App::FuguBench::Keys>, L<Fugu::CLI>, L<Fugu::Curl>, L<Fugu::File>,
+L<Fugu::Signify>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

@@ -278,7 +278,7 @@ sub define_benchmark_classes () {
 
         package Linux::Event::Bench::Regression::DeadlineRaw;
         use parent -norequire, 'Linux::Event::Bench::Regression::Raw';
-        sub stream_options (\$class) { return idle_timeout => 3_600 }
+        sub stream_tuning (\$class) { return idle_timeout => 3_600 }
 
         package Linux::Event::Bench::Regression::Timer;
         use parent -norequire, 'Linux::Event::Kernel::Timer';
@@ -573,8 +573,11 @@ sub run_connections ($count) {
         server_done => 0,
     };
     my $listener = Linux::Event::Bench::Regression::ConnectionListener->new(
-        stream_class => 'Linux::Event::Bench::Regression::ConnectionServer',
-        host => '127.0.0.1', port => 0, data => $run,
+        host => '127.0.0.1', port => 0,
+        stream => {
+            class => 'Linux::Event::Bench::Regression::ConnectionServer',
+            data  => $run,
+        },
     );
     $loop->add($listener);
     $run->{port} = $listener->port;

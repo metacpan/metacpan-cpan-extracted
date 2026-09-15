@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Site;
-our $VERSION = '0.5.0';
+our $VERSION = '0.6.1';
 
 use App::FuguWeb;
 use App::FuguWeb::Index;
@@ -292,7 +292,7 @@ sub _owns ( $self, $path, $named )
 }
 
 # $self->_key_dir($path):
-#	Report whether a path of the output is a directory of the key
+#	Report whether a path of the output is a directory of a key
 #	directory tree. The tree stays after a description drops a
 #	key, and the clean must still take it.
 sub _key_dir ( $self, $path )
@@ -301,15 +301,15 @@ sub _key_dir ( $self, $path )
 	# it owns no directory of one. A .well-known directory alone
 	# would otherwise make any tree read like a built site.
 	#
-	# A description that did not load names the block all the
-	# same: App::FuguWeb::Config reads that one name out of the
-	# file that failed. The clean must still take the output of a
+	# A description that did not load names each block all the
+	# same: App::FuguWeb::Config reads those names out of the file
+	# that failed. The clean must still take the output of a
 	# build, because it is the command an operator reaches for
 	# when a description is broken.
-	my $dir = $self->{config}->keys_dir;
-	return 0 unless defined $dir;
+	my @dirs = $self->{config}->keys_dirs;
+	return 0 unless @dirs;
 
-	return 1 if $path eq $dir;
+	return 1 if grep { $path eq $_ } @dirs;
 
 	for my $known (
 		App::FuguWeb::Keys::WELL_KNOWN,
@@ -805,10 +805,10 @@ sub _copy_assets ($self)
 }
 
 # $self->_write_keys:
-#	Write the key directory. The build copies each key file and
-#	the manifest pair as they stand. It generates the KEYS file,
-#	the human page, the Web Key Directory tree and security.txt
-#	through the Fugu modules.
+#	Write each key directory that the description names. The build
+#	copies each key file and the manifest pair as they stand. It
+#	generates the KEYS file, the human page, the Web Key Directory
+#	tree and security.txt through the Fugu modules.
 #
 #	A description with no keys block writes no key directory, so
 #	every site that predates it keeps its output.
@@ -819,31 +819,39 @@ sub _copy_assets ($self)
 sub _write_keys ($self)
 {
 	my $config = $self->{config};
-	return 1 unless defined $config->keys_dir;
 
-	my $keys = App::FuguWeb::Keys->new( config => $config );
+	my @dirs = $config->keys_dirs;
+	return 1 unless @dirs;
 
-	# The generation comes first, because it runs the guards of
-	# Fugu::KeyDir over every armored key. A copy that ran first
-	# would leave a private key block in the output of a build
-	# that then failed.
-	my $generated = $keys->generated;
+	# The generation of every directory comes first, because it
+	# runs the guards of Fugu::KeyDir over every armored key. A
+	# copy that ran first would leave a private key block in the
+	# output of a build that then failed.
+	my ( $generated, $reason ) =
+	    App::FuguWeb::Keys->site_generated($config);
 	unless ($generated) {
-		$self->{log}->error( 'The key directory is not usable: %s',
-			$keys->error );
+		$self->{log}
+		    ->error( 'The key directory is not usable: %s', $reason );
 		return;
 	}
 
-	for my $copy ( $keys->copies ) {
-		$self->_write_out(
-			$copy->{to},
-			sub {
-				my $bytes = Fugu::File->read( $copy->{from} );
-				$self->{log}
-				    ->error( 'Cannot read %s', $copy->{from} )
-				    unless defined $bytes;
-				return $bytes;
-			} ) or return;
+	for my $dir (@dirs) {
+		my $keys =
+		    App::FuguWeb::Keys->new( config => $config, dir => $dir );
+
+		for my $copy ( $keys->copies ) {
+			$self->_write_out(
+				$copy->{to},
+				sub {
+					my $bytes =
+					    Fugu::File->read( $copy->{from} );
+					$self->{log}->error(
+						'Cannot read %s',
+						$copy->{from}
+					) unless defined $bytes;
+					return $bytes;
+				} ) or return;
+		}
 	}
 
 	for my $path ( sort keys %$generated ) {

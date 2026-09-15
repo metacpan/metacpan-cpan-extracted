@@ -118,21 +118,23 @@ The listening socket owns its own creation/bind/listen policy:
 
 ```perl
 my $listener = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'ServerConnection',
-    host         => '0.0.0.0',
-    port         => 9443,
-    reuseaddr    => 1,
-    reuseport    => 0,
-    bind_device  => 'eth0',
+    host        => '0.0.0.0',
+    port        => 9443,
+    reuseaddr   => 1,
+    reuseport   => 0,
+    bind_device => 'eth0',
+    stream      => {
+        class => 'ServerConnection',
+    },
 );
 ```
 
 Listener policy configures the listening descriptor only. It does not stand in
 for accepted-connection policy.
 
-Each accepted `ServerConnection` independently applies its cached ordered-byte
-policy, established socket policy, and optional `configure_socket` hook before
-plain readiness or TLS startup.
+Each accepted `ServerConnection` independently applies its resolved
+ordered-byte tuning, established socket policy, and optional `configure_socket`
+hook before plain readiness or TLS startup.
 
 ## Datagram policy
 

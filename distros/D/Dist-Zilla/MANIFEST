@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+SECURITY.md
 bin/dzil
 corpus/README
 corpus/dist/AuthorDeps/LocalPlugin.pm
@@ -189,6 +190,7 @@ t/00-report-prereqs.t
 t/commands/authordeps.t
 t/commands/listdeps.t
 t/compile.t
+t/copyright-year.t
 t/diagnostics/main-module.t
 t/diagnostics/plugin-fail.t
 t/distpl.t

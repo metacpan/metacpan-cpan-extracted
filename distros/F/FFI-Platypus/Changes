@@ -1,5 +1,17 @@
 Revision history for FFI-Platypus
 
+2.12      2026-09-11 15:02:01 -0600
+  - Added FFI::Platypus::Buffer::raw_scalar which allocates an
+    uninitialized scalar of a fixed size for use as a buffer
+    (gh#411)
+  - Fixed intermittent segfault in the bundle-bzip2 example caused
+    by an uninitialized bz_stream struct (gh#411)
+  - FFI::Platypus::Closure sticky and unstick methods now return
+    $self so that they can be chained (gh#411, gh#405 JBARRETT++)
+  - Added a SECURITY policy document (gh#406, gh#411)
+  - Fixed regression from 0.94 that broke the identity cast used
+    internally by attach_cast on hppa-linux (gh#394, gh#411)
+
 2.11      2026-01-12 03:30:38 -0700
   - Documentation updates only
 

@@ -1,5 +1,16 @@
 Revision history for Object::PadX::Enum
 
+0.03    2026-09-14
+        Enums are now fully compile-time constructs. The enum block body
+        executes while it is compiled (BEGIN-block style): item args are
+        evaluated at compile time, the class is sealed early via
+        $meta->seal, and singletons exist as soon as the closing brace
+        has been parsed - including from later BEGIN blocks of the same
+        unit. Item accessors are installed as inlinable constant subs,
+        so function-style calls like Colors::RED() constant-fold at the
+        caller's compile time. Item args must no longer depend on
+        runtime state.
+
 0.02    2026-05-13
         Silence xsubpp "Please specify prototyping behavior" warning by
         adding `PROTOTYPES: DISABLE` to Enum.xs.

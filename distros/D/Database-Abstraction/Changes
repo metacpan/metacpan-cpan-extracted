@@ -1,5 +1,56 @@
 Revision history for Database-Abstraction
 
+0.42	Sat Sep 12 02:59:48 PM EDT 2026
+	[ Enhancements ]
+	- XLS backend: .xls (old binary format) now detected before .xlsx; opened via
+	  DBD::Excel (Spreadsheet::ParseExcel internally); all queries go through
+	  DBI/SQL; no in-memory slurp; type set to 'Excel'.
+	- XLSX backend rewritten: .xlsx (modern OOXML format) is now parsed directly
+	  via Spreadsheet::ParseXLSX rather than DBD::Excel.  The workbook is slurped
+	  into an in-memory hash (keyed mode) or array (no_entry mode) — the same
+	  fast-path used by CSV, DBM::Deep, and HTML backends.  No DBI handle is
+	  created; type is set to 'XLSX'.  Multi-worksheet access via the 'table'
+	  constructor parameter is fully supported.
+	- Query builder: terminal methods all(), first(), count() now delegate to the
+	  in-memory path for type 'XLSX' (matching the existing Deep/BerkeleyDB
+	  delegation), via the check ($db->{'type'} // '') =~ /\A(?:Deep|XLSX)\z/.
+	- Remote backend: .xls added to the remote extension probe list alongside
+	  the existing .xlsx entry.
+	[ Bug Fixes ]
+	- DF-11.5 (GitHub Actions flake): replaced !-f $temp_path filesystem check
+	  with a Scalar::Util::weaken weak-reference check.  The old check occasionally
+	  failed on CI when the OS or DBI still held the file descriptor open briefly
+	  after DESTROY; the weak-reference check directly tests GC, independent of
+	  OS filesystem visibility.
+	- Zero-byte CSV (keyed mode): _open() now stores {} instead of () in
+	  $self->{'data'}.  The empty-list assignment was equivalent to undef, which
+	  caused query methods to fall through to DBI with a 0-column table and
+	  croak on the 'entry IS NOT NULL' WHERE clause.  The empty hashref mirrors
+	  what the newline-only path stores and lets all fast-path methods return
+	  correct empty results without touching the DBI handle.
+	[ Tests ]
+	- t/xlsx.t: completely rewritten with two independent SKIP sections.
+	  Section A — .xls binary format via Spreadsheet::WriteExcel + DBD::Excel,
+	  type 'Excel', DBI path (10 tests).
+	  Section B — .xlsx OOXML format via Excel::Writer::XLSX + Spreadsheet::ParseXLSX,
+	  type 'XLSX', in-memory slurp, query-builder delegation, no_entry mode, and
+	  table override (24 tests).  Each section is skipped independently when the
+	  required modules are absent.
+	- t/function.t A32, t/unit.t section 21, t/edge_cases.t EC19,
+	  t/integration.t section Q: updated to use Excel::Writer::XLSX for .xlsx
+	  fixtures and assert type 'XLSX' / $db->{'data'} defined instead of the
+	  former type 'Excel' / DBI handle assertions.
+	- t/data-flow.t DF-11.5: weak-reference check for File::Temp GC (see above).
+	- t/empty_files.t (new): 8 subtests (EF1–EF8) covering CSV, PSV, XML, and
+	  gzip CSV backends with empty (0-byte) and newline-only files.  Verifies
+	  new() does not crash, count() returns 0, selectall_arrayref/selectall_array
+	  return empty, fetchrow_hashref returns undef.  XML tests assert graceful
+	  croak (not segfault) since empty/newline content is invalid XML.  Gzip CSV
+	  subtests are skipped when Gzip::Faster is unavailable.
+	- t/extended_tests.t EX5: updated to reflect that zero-byte keyed CSV now
+	  stores an empty hashref (not undef) in $db->{'data'} after open, enabling
+	  fast-path query methods to return 0/undef/[] without touching DBI.
+
 0.41	Sun Aug 30 09:39:17 AM EDT 2026
 	[ Enhancements ]
 	- XLSX backend: DBD::Excel driver; probe for .xlsx files after gzip/PSV/CSV,

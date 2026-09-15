@@ -1,0 +1,148 @@
+=head1 NAME
+
+App::FuguBench::Doctor - the doctor verb of fugubench
+
+=head1 SYNOPSIS
+
+    $ fugubench doctor
+    ok version: fugubench 0.0.0 (Fugu 0.5.0)
+    ok git: /usr/bin/git
+    ok make: /usr/bin/make
+    ok downloader: /usr/bin/curl
+    ok hooks: none
+    ok library: absent
+
+    $ fugubench [-C <root>] doctor --fix
+
+=head1 DESCRIPTION
+
+B<App::FuguBench::Doctor> reports the state of one checkout. Each
+check writes one line to standard output,
+C<ok E<lt>checkE<gt>: E<lt>detailE<gt>> or
+C<problem E<lt>checkE<gt>: E<lt>detailE<gt>>. The verb returns 1 when
+it wrote one problem line, so a make target can gate on the report.
+
+The verb reads the state of the checkout, and it changes nothing.
+C<--fix> repairs one shape of that state, and the section below
+states the shape.
+
+The report holds the facts of the other verbs. The version line comes
+from the version verb. The settings path, the keys of that file, the
+entries, and the worktree settings come from the hook verb, so this
+module holds no assumption of Claude Code. The shape of a session
+page, and the body of one, come from the wiki verb.
+
+The library directory is the one fact that the verb reads for itself.
+It reads the two keys that the wiki verb reads, and a key that names
+no library gives the line C<ok library: absent>. The wiki verb reports
+the reason on its own call.
+
+=head2 THE CHECKS
+
+C<version> holds the line of the version verb: the version of the
+program, and the version of the Fugu library beside it. The check
+never fails, because the program answered.
+
+C<git> and C<make> hold the path of the tool on C<PATH>. An absent
+tool gives C<absent from PATH>.
+
+C<downloader> holds the path of the first of C<curl>, C<wget>, and
+C<ftp> on C<PATH>, because L<Fugu::Curl> searches them in that order.
+Without one of the three the detail is
+C<no curl, wget, or ftp on PATH>.
+
+C<hooks> reads the settings file that the hook verb names. A
+checkout that holds no event of the four gives C<ok hooks: none>, and
+an absent file gives that same line. Most checkouts install no hook,
+and that is no problem.
+
+A checkout that holds one event of the four gives one
+C<hook E<lt>eventE<gt>> line for each of the four. The detail is
+C<installed> for an entry that equals the entry of C<hook install>,
+C<absent> for an event that the file lost, and
+C<differs from hook install> for every other entry.
+
+A checkout that holds one event gives one C<worktree.baseRef> line
+too. A C<worktree> key that holds no object gives the problem line of
+that key in its place. C<hook install> writes the base
+reference beside the entries. Without the hooks, the built-in
+creation of a worktree branches from C<origin/main> and skips the
+bootstrap. The detail is C<installed>, C<absent>, or
+C<differs from hook install>, as the detail of an event is.
+
+Each file that stops C<hook install> is a problem: the file that does
+not read, the file that holds no JSON object, a C<hooks> key that
+holds no object, and a C<worktree> key that holds no object. The
+C<worktree> line names the last one, and the C<hooks> line names the
+other three.
+
+=head2 THE LIBRARY
+
+The library is C<wiki.dir> under the home of C<wiki.origin>, as the
+wiki verb reads the two keys. The C<library> detail is C<absent> when
+the checkout names no library, and when the directory holds no clone.
+The detail of a clean clone is the path of the clone.
+
+A clone that holds an uncommitted change gives C<changes> with the
+files. Every capture of the wiki verb commits, so a change that stays
+is the debris of a capture that stopped.
+
+A clone in a stopped rebase gives
+C<stopped rebase, the pending commit adds E<lt>pageE<gt>>. The verb
+finds that rebase through the state directory of git, F<rebase-merge>
+or F<rebase-apply>. C<REBASE_HEAD> tells no stopped rebase: git
+writes that reference when a rebase stops, and a rebase that runs to
+its end leaves the reference behind.
+
+=head2 THE FIX
+
+C<--fix> runs C<git rebase --skip> in the clone, for a pending commit
+of one shape. That commit adds one file, the file is a session page,
+and the page holds no observation. Two sessions of one day take one
+page name, and each one pushes a header alone. The commit that loses
+the race carries no work, so the skip destroys nothing.
+
+The C<Closed:> line of C<wiki close> is no observation. C<close>
+appends that line at the end of the page, under the heading
+C<## Observations>, and the body test drops it. A commit that adds a
+page with that line, and no other text under the heading, takes the
+fix.
+
+The detail of a fix that ended the rebase is
+C<skipped the pending commit E<lt>pageE<gt>>. Every other pending
+commit is a refusal, C<stopped rebase, fix refused:> with the reason.
+A commit that no git call reads gives the reason of git. The operator
+then resolves the rebase by hand.
+
+The fix takes one pending commit. A rebase of several commits stops
+again at the next one, and the detail is then
+C<skipped the pending commit E<lt>pageE<gt>, the rebase stopped again>.
+That line is a problem line, because the clone still needs the
+operator. The next run of the verb reports the new pending commit.
+
+=head2 command
+
+C<command($verb)> returns the entry of the L<Fugu::CLI> table. The
+module holds one verb, so it ignores the name.
+
+=head1 RETURN VALUES
+
+C<command> returns a hash reference.
+
+The verb returns 0 when every line of the report starts with C<ok>,
+and 1 when one line starts with C<problem>. An argument after the
+verb gives the usage error and returns 2. The verb returns 3 when no
+F<.toolingrc> sits above the start of the walk.
+
+=head1 SEE ALSO
+
+L<App::FuguBench>, L<App::FuguBench::Checkout>,
+L<App::FuguBench::Hook>, L<App::FuguBench::Version>,
+L<App::FuguBench::Wiki>, L<Fugu::CLI>, L<Fugu::Curl>, L<Fugu::File>,
+L<Fugu::Process>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

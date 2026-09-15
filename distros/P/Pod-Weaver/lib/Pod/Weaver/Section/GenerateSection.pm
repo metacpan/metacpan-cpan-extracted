@@ -1,11 +1,11 @@
-package Pod::Weaver::Section::GenerateSection 4.021;
+package Pod::Weaver::Section::GenerateSection 4.022;
 # ABSTRACT: add pod section from an interpolated piece of text
 
 use Moose;
 with 'Pod::Weaver::Role::Section';
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -243,7 +243,7 @@ Pod::Weaver::Section::GenerateSection - add pod section from an interpolated pie
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 SYNOPSIS
 

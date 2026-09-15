@@ -9,7 +9,10 @@
 # the missing-CPAN environment is reproduced deterministically instead
 # of depending on what the build host happens to have installed.
 
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
 use Config;
 use FindBin qw($RealBin);

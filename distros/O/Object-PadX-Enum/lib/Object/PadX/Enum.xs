@@ -112,7 +112,14 @@ static int build_enum(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs,
    PL_curstash = (HV *)SvREFCNT_inc(gv_stashsv(packagename, GV_ADD));
    sv_setsv(PL_curstname, packagename);
 
-   I32 save_ix = block_start(TRUE);
+   /* The entire enum body is compiled into an anonymous CV and executed
+    * immediately below, BEGIN-block style, so items exist as soon as the
+    * closing brace has been parsed. start_subparse must precede the body
+    * parse so block lexicals land in the new CV's pad; the same pattern
+    * Object::Pad uses for ADJUST blocks.
+    */
+   I32 floor_ix = start_subparse(FALSE, 0);
+   I32 save_ix  = block_start(TRUE);
 
    OP *body = parse_stmtseq(0);
    body = block_end(save_ix, body);
@@ -120,12 +127,10 @@ static int build_enum(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs,
    if (!lex_consume_unichar('}'))
       croak("Expected '}' at end of 'enum %" SVf "' body", SVfARG(packagename));
 
-   LEAVE;
-
    inside_enum_depth      = saved_depth;
    current_enum_classname = saved_classname;
 
-   /* Trailing runtime call: Object::PadX::Enum::_finalize_enum("NAME"); */
+   /* Trailing call: Object::PadX::Enum::_finalize_enum("NAME"); */
    OP *finalize_args = newLISTOP(OP_LIST, 0, NULL, NULL);
    finalize_args = op_append_elem(OP_LIST, finalize_args,
       newSVOP(OP_CONST, 0, SvREFCNT_inc(packagename)));
@@ -138,12 +143,28 @@ static int build_enum(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs,
       ? op_append_elem(OP_LINESEQ, body, finalize_stmt)
       : finalize_stmt;
 
-   /* Wrap in a once-loop so it behaves as a single statement, mirroring
-    * Object::Pad's class-block emission (Pad.xs:589-591).
+   CV *bodycv = newATTRSUB(floor_ix, NULL, NULL, NULL, combined);
+
+   LEAVE;
+
+   /* Execute the body now, at compile time. Item args are evaluated here;
+    * _finalize_enum seals the class, constructs the singletons and installs
+    * the constant accessors. Any croak becomes a compile-time error.
     */
-   *out = op_append_elem(OP_LINESEQ,
-      newWHILEOP(0, 1, NULL, NULL, combined, NULL, 0),
-      newSVOP(OP_CONST, 0, &PL_sv_yes));
+   {
+      dSP;
+      ENTER;
+      SAVETMPS;
+      PUSHMARK(SP);
+      PUTBACK;
+      call_sv((SV *)bodycv, G_VOID | G_DISCARD | G_NOARGS);
+      FREETMPS;
+      LEAVE;
+   }
+   SvREFCNT_dec(bodycv);
+
+   /* Everything already happened; emit a no-op statement. */
+   *out = newOP(OP_NULL, 0);
 
    return KEYWORD_PLUGIN_STMT;
 }

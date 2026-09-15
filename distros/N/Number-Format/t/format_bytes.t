@@ -34,6 +34,13 @@ is(format_bytes(1234567890.1, mode => "iec"), '1.15GiB',   'gibi');
 is(format_bytes(1048576,      mode => "iec",
                 unit => 'K'),                 '1,024KiB',  'iec unit');
 
+# Tests for >32-bit values
+is(format_bytes(1_234_567_890_123, mode => "trad"), '1.12T',   'tera');
+is(format_bytes(1_234_567_890_123, mode => "iec"),  '1.12TiB', 'tebi');
+is(format_bytes(1_234_567_890_123, base => 1000),   '1.23T',   'teradecimal');
+is(format_bytes(  123_456_789_012, mode => "iec",
+                                   unit => 'T'),    '0.11TiB', 'sub-tebi');
+
 {
     my @warnings;
     local $SIG{__WARN__} = sub { @warnings = @_ };

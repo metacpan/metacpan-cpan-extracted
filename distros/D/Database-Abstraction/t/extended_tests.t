@@ -141,8 +141,8 @@ subtest 'EX4: set_logger() with undef logger croaks with usage message (line 592
 # EX5 — zero-byte CSV triggers the fast-exit empty path (line 766)
 # ---------------------------------------------------------------------------
 
-subtest 'EX5: zero-byte CSV file sets data to undef/empty (line 766)' => sub {
-	plan tests => 2;
+subtest 'EX5: zero-byte CSV file sets data to empty hashref (line 766)' => sub {
+	plan tests => 4;
 
 	my $tmpdir    = tempdir(CLEANUP => 1);
 	my $empty_csv = File::Spec->catfile($tmpdir, 'exttest_empty.csv');
@@ -153,7 +153,11 @@ subtest 'EX5: zero-byte CSV file sets data to undef/empty (line 766)' => sub {
 	lives_ok {
 		$db = Database::exttest_empty->new(directory => $tmpdir);
 	} 'instantiation lives on zero-byte CSV';
-	ok(!$db->{'data'}, 'data is falsy for zero-byte CSV (line 766)');
+	# _open() is lazy; trigger it first so $db->{'data'} is populated.
+	is($db->count(), 0, 'count() returns 0 for zero-byte CSV');
+	# Zero-byte keyed CSV stores {} so fast-path query methods work (return 0/[]/undef)
+	is(ref($db->{'data'}), 'HASH', 'data is an empty hashref for zero-byte CSV (line 766)');
+	ok(!%{$db->{'data'}}, 'data hashref is empty for zero-byte CSV');
 };
 
 # ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package Pod::Weaver::Section::Collect 4.021;
+package Pod::Weaver::Section::Collect 4.022;
 # ABSTRACT: a section that gathers up specific commands
 
 use Moose;
@@ -6,7 +6,7 @@ with 'Pod::Weaver::Role::Section',
      'Pod::Weaver::Role::Transformer';
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -170,7 +170,7 @@ Pod::Weaver::Section::Collect - a section that gathers up specific commands
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

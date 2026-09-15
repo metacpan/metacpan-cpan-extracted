@@ -1,4 +1,4 @@
-package Pod::Weaver::Role::Preparer 4.021;
+package Pod::Weaver::Role::Preparer 4.022;
 # ABSTRACT: something that mucks about with the input before weaving begins
 
 use Moose::Role;
@@ -31,7 +31,7 @@ Pod::Weaver::Role::Preparer - something that mucks about with the input before w
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 PERL VERSION
 

@@ -1328,25 +1328,25 @@ note '--- A31: selectall_hashref / selectall_hash aliases';
 		'selectall_hash(): returns same count as selectall_array()');
 }
 
-# ---- A32: XLSX / DBD::Excel backend ----------------------------------------
-# Verify the _open() xlsx branch: lazy DBD::Excel require, type='Excel',
-# DBI handle stored under the worksheet table name, count/fetch/selectall work,
+# ---- A32: XLSX / Spreadsheet::ParseXLSX backend ----------------------------
+# Verify the _open() xlsx branch: lazy ParseXLSX require, type='XLSX',
+# in-memory data populated, count/fetch/selectall work via slurp path,
 # and the table-override constructor param queries a different worksheet while
 # the filename stem still comes from the class name (not the table override).
-note '--- A32: XLSX / DBD::Excel backend';
+note '--- A32: XLSX / Spreadsheet::ParseXLSX backend';
 SKIP: {
-	my $have_excel = eval { require DBD::Excel; require Spreadsheet::WriteExcel; 1 };
-	skip 'DBD::Excel or Spreadsheet::WriteExcel not available', 18
-		unless $have_excel;
+	my $have_xlsx = eval { require Excel::Writer::XLSX; require Spreadsheet::ParseXLSX; 1 };
+	skip 'Excel::Writer::XLSX or Spreadsheet::ParseXLSX not available', 18
+		unless $have_xlsx;
 
 	my $xdir = tempdir(CLEANUP => 1);
 	my $xlsx = File::Spec->catfile($xdir, 'test1.xlsx');
 
-	# Build a two-worksheet fixture.
+	# Build a two-worksheet fixture using OOXML format (Excel::Writer::XLSX).
 	# worksheet 'test1' — matches the class-derived table name for Database::test1
 	# worksheet 'alt'   — used to verify the table-override path
 	{
-		my $wb = Spreadsheet::WriteExcel->new($xlsx);
+		my $wb = Excel::Writer::XLSX->new($xlsx);
 
 		my $ws1 = $wb->add_worksheet('test1');
 		$ws1->write(0, 0, 'entry'); $ws1->write(0, 1, 'score');
@@ -1364,17 +1364,17 @@ SKIP: {
 	ok(-r $xlsx, 'A32 pre-cond: test1.xlsx fixture created');
 
 	# --- 32a: basic connection via class-derived table name --------------------
-	# The first query triggers _open(); type must be 'Excel' afterwards.
+	# The first query triggers _open(); type must be 'XLSX' afterwards.
 	my $db = Database::test1->new($xdir);
 	my $n = $db->count();
 	is($n, 3, 'XLSX _open(): count() returns 3 rows from test1 worksheet');
-	is($db->{'type'}, 'Excel', 'XLSX _open(): type is set to Excel after first query');
+	is($db->{'type'}, 'XLSX', 'XLSX _open(): type is set to XLSX after first query');
 
-	# The DBI handle must be stored under the worksheet name ('test1'), not undef
-	ok(defined($db->{'test1'}), 'XLSX _open(): DBI handle stored under worksheet name');
+	# XLSX path slurps into memory — data hash must be populated, no DBI handle
+	ok(defined($db->{'data'}), 'XLSX _open(): data loaded into memory (slurp path)');
 
-	# DBD::Excel must now be in %INC (lazy-loaded by _open())
-	ok(exists $INC{'DBD/Excel.pm'}, 'XLSX _open(): DBD::Excel lazy-loaded into %INC');
+	# Spreadsheet::ParseXLSX must now be in %INC (lazy-loaded by _open())
+	ok(exists $INC{'Spreadsheet/ParseXLSX.pm'}, 'XLSX _open(): ParseXLSX lazy-loaded into %INC');
 
 	# --- 32b: fetchrow_hashref ---------------------------------------------------
 	my $row = $db->fetchrow_hashref(entry => 'a');
@@ -1398,15 +1398,15 @@ SKIP: {
 	my $alt_db = Database::test1->new(directory => $xdir, table => 'alt');
 	my $n_alt = $alt_db->count();
 	is($n_alt, 1, 'XLSX table override: alt worksheet has 1 row');
-	is($alt_db->{'type'}, 'Excel',
-		'XLSX table override: type is Excel (test1.xlsx opened, not alt.xlsx)');
+	is($alt_db->{'type'}, 'XLSX',
+		'XLSX table override: type is XLSX (test1.xlsx opened, not alt.xlsx)');
 
 	# Verify the cached table name is 'alt', not 'test1'
 	is($alt_db->{'_table_name'}, 'alt',
 		'XLSX table override: _table_name cached as alt');
 
-	# The handle must be stored under 'alt' (the overridden table name)
-	ok(defined($alt_db->{'alt'}), 'XLSX table override: DBI handle stored under alt');
+	# XLSX slurp path: data hash populated (no DBI handle under 'alt')
+	ok(defined($alt_db->{'data'}), 'XLSX table override: data populated from alt worksheet');
 
 	# Fetch from the alt worksheet using the overridden table
 	my $alt_row = $alt_db->fetchrow_hashref(entry => 'x');

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Handy Utilities for Real-time MIDI
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0401';
 
 use v5.36;
 use feature 'try';
@@ -17,6 +17,7 @@ our @EXPORT = qw(
     stop_device
     input_ports
     output_ports
+    stop_all_notes
 );
 
 no warnings 'experimental::try';
@@ -71,6 +72,15 @@ sub output_ports () {
     ];
 }
 
+
+sub stop_all_notes ($midi_out) {
+    for my $chan (0, 15) {
+        for my $n (0 .. 127) {
+            $midi_out->note_off($chan, $n, 0);
+        }
+    }
+}
+
 1;
 
 __END__
@@ -85,7 +95,7 @@ MIDI::RtMidi::Util - Handy Utilities for Real-time MIDI
 
 =head1 VERSION
 
-version 0.0400
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -100,6 +110,7 @@ version 0.0400
 
   END {
     stop_device($midi_out);
+    stop_all_notes($midi_out);
   }
 
 =head1 DESCRIPTION
@@ -141,6 +152,12 @@ Return an array-reference of open MIDI input port names.
   $output_ports = output_ports();
 
 Return an array-reference of open MIDI output port names.
+
+=head2 stop_all_notes
+
+  stop_all_notes();
+
+Send a C<note_off()> message to all channels and all notes.
 
 =head1 SEE ALSO
 

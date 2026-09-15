@@ -1,5 +1,6 @@
 use v5.40;
-use blib;
+
+#use blib;
 use feature 'class';
 no warnings 'experimental::class';
 
@@ -275,3 +276,9 @@ $app->set_size( 920, 800 );
 $app->show($html);
 $app->wait;
 $app->clean;
+__END__
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in
+the Artistic License 2. Other copyrights, terms, and conditions may apply to data transmitted
+through this module.

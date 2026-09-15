@@ -5,8 +5,9 @@ use warnings;
 
 use Data::Section::Simple qw(get_data_section);
 
-our @WORDS  = get_data_section('WORDS') =~ /\w+/g;
-our @HIDDEN = get_data_section('HIDDEN') =~ /\w+/g;
+my  $data   = get_data_section;
+our @WORDS  = $data->{WORDS} =~ /\w+/g;
+our @HIDDEN = $data->{HIDDEN} =~ /\w+/g;
 
 1;
 

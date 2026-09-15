@@ -1,5 +1,9 @@
 Revision history for Alien-libhisto
 
+0.4.1   2026-09-13
+        - Synchronize bundled libhisto C library and build artifacts.
+        - Synchronize versioning with Math::Histo 0.4.1 release.
+
 0.4.0   2026-09-08
         - Synchronize bundled libhisto C library to v0.4.0.
         - Bundle new C++17 modern headers (include/histo/*.hpp).

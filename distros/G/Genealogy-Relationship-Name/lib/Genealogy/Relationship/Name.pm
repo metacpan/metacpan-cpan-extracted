@@ -6,6 +6,7 @@ package Genealogy::Relationship::Name;
 # Author: Nigel Horne <njh@nigelhorne.com>
 # Licence: GPL v2
 
+use utf8;
 use strict;
 use warnings;
 use autodie qw(:all);
@@ -16,7 +17,7 @@ use Params::Get;
 use Params::Validate::Strict 0.31;
 use Readonly;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # ---------------------------------------------------------------------------
 # Constants – relationship table keys
@@ -160,6 +161,14 @@ Readonly::Hash my %EN_MALE_RELATIONSHIPS => (
 	'10,8' => 'seventh cousin twice-removed',
 	'10,9' => 'eighth cousin once-removed',
 	'10,10' => 'ninth cousin',
+	'11,1' => 'eighth great-uncle',
+	'12,1' => 'ninth great-uncle',
+	'13,1' => 'tenth great-uncle',
+	'14,1' => 'eleventh great-uncle',
+	'15,1' => 'twelfth great-uncle',
+	'16,1' => 'thirteenth great-uncle',
+	'17,1' => 'fourteenth great-uncle',
+	'18,1' => 'fifteenth great-uncle',
 );
 
 Readonly::Hash my %EN_FEMALE_RELATIONSHIPS => (
@@ -284,6 +293,14 @@ Readonly::Hash my %EN_FEMALE_RELATIONSHIPS => (
 	'10,8' => 'seventh cousin twice-removed',
 	'10,9' => 'eighth cousin once-removed',
 	'10,10' => 'ninth cousin',
+	'11,1' => 'eighth great-aunt',
+	'12,1' => 'ninth great-aunt',
+	'13,1' => 'tenth great-aunt',
+	'14,1' => 'eleventh great-aunt',
+	'15,1' => 'twelfth great-aunt',
+	'16,1' => 'thirteenth great-aunt',
+	'17,1' => 'fourteenth great-aunt',
+	'18,1' => 'fifteenth great-aunt',
 );
 
 # ---------------------------------------------------------------------------
@@ -326,7 +343,6 @@ Readonly::Hash my %FR_MALE_RELATIONSHIPS => (
 	'2,10' => 'cousin germain huit fois eloigne',
 	'3,0' => 'arriere-grand-pere',
 	'3,1' => 'grand-oncle',
-	'3,2' => 'cousin germain une fois eloigne',
 	'3,2' => "cousin germain \N{U+00E9}loign\N{U+00E9} au 1er degr\N{U+00E9}",
 	'3,3' => 'cousin issu de germain',
 	'3,4' => 'cousin issu de germain une fois eloigne',
@@ -377,7 +393,7 @@ Readonly::Hash my %FR_MALE_RELATIONSHIPS => (
 	'7,5' => "arri\N{U+00E8}re-petit-cousin \N{U+00E9}loign\N{U+00E9} au 2e degr\N{U+00E9}",
 	'7,6' => 'cousin au sixieme degre une fois eloigne',
 	'7,7' => "sixi\N{U+00E8}me cousin",
-	'7,8' => "sixi\N{U+00E8}me cousin uns fois eloinge",
+	'7,8' => "sixi\N{U+00E8}me cousin une fois \N{U+00E9}loign\N{U+00E9}",
 	'7,9' => 'cousin au septieme degre deux fois eloigne',
 	'7,10' => 'cousin au septieme degre trois fois eloigne',
 	'8,0' => 'arriere-arriere-arriere-arriere-arriere-arriere-grand-pere',
@@ -387,7 +403,7 @@ Readonly::Hash my %FR_MALE_RELATIONSHIPS => (
 	'8,4' => 'cousin au quatrieme degre quatre fois eloigne',
 	'8,5' => 'cousin au cinquieme degre trois fois eloigne',
 	'8,6' => 'cousin au sixieme degre deux fois eloigne',
-	'8,7' => "sixi\N{U+00E8}me cousin uns fois eloinge",
+	'8,7' => "sixi\N{U+00E8}me cousin une fois \N{U+00E9}loign\N{U+00E9}",
 	'8,8' => 'cousin au huitieme degre',
 	'8,9' => 'cousin au huitieme degre une fois eloigne',
 	'8,10' => 'cousin au huitieme degre deux fois eloigne',
@@ -413,6 +429,14 @@ Readonly::Hash my %FR_MALE_RELATIONSHIPS => (
 	'10,8' => 'cousin au huitieme degre deux fois eloigne',
 	'10,9' => 'cousin au neuvieme degre une fois eloigne',
 	'10,10' => 'cousin au dixieme degre',
+	'11,1' => "huiti\N{U+00E8}me grand-oncle",
+	'12,1' => "neuvi\N{U+00E8}me grand-oncle",
+	'13,1' => "dixi\N{U+00E8}me grand-oncle",
+	'14,1' => "onzi\N{U+00E8}me grand-oncle",
+	'15,1' => "douzi\N{U+00E8}me grand-oncle",
+	'16,1' => "treizi\N{U+00E8}me grand-oncle",
+	'17,1' => "quatorzi\N{U+00E8}me grand-oncle",
+	'18,1' => "quinzi\N{U+00E8}me grand-oncle",
 );
 
 Readonly::Hash my %FR_FEMALE_RELATIONSHIPS => (
@@ -487,8 +511,8 @@ Readonly::Hash my %FR_FEMALE_RELATIONSHIPS => (
 	'6,2' => 'cousine germaine quatre fois eloignee',
 	'6,3' => 'cousine issue de germaine trois fois eloignee',
 	'6,4' => 'cousine au quatrieme degre deux fois eloignee',
+	'6,5' => "arri\N{U+00E8}re-petite-cousine \N{U+00E9}loign\N{U+00E9}e au 1er degr\N{U+00E9}",
 	'6,6' => "arri\N{U+00E8}re-arri\N{U+00E8}re-petite-cousine",
-	'6,6' => 'cousine au sixieme degre',
 	'6,7' => 'cousine au sixieme degre une fois eloignee',
 	'6,8' => 'cousine au sixieme degre deux fois eloignee',
 	'6,9' => 'cousine au sixieme degre trois fois eloignee',
@@ -500,8 +524,8 @@ Readonly::Hash my %FR_FEMALE_RELATIONSHIPS => (
 	'7,4' => "petite-cousine \N{U+00E9}loign\N{U+00E9}e au 3e degr\N{U+00E9}",
 	'7,5' => "arri\N{U+00E8}re-petite-cousine \N{U+00E9}loign\N{U+00E9}e au 2e degr\N{U+00E9}",
 	'7,6' => 'cousine au sixieme degre une fois eloignee',
-	'7,7' => "sixi\N{U+00E8}me cousin",
-	'7,8' => "sixi\N{U+00E8}me cousin once-removed",
+	'7,7' => "sixi\N{U+00E8}me cousine",
+	'7,8' => "sixi\N{U+00E8}me cousine une fois \N{U+00E9}loign\N{U+00E9}e",
 	'7,9' => 'cousine au septieme degre deux fois eloignee',
 	'7,10' => 'cousine au septieme degre trois fois eloignee',
 	'8,0' => 'arriere-arriere-arriere-arriere-arriere-arriere-grand-mere',
@@ -511,7 +535,7 @@ Readonly::Hash my %FR_FEMALE_RELATIONSHIPS => (
 	'8,4' => 'cousine au quatrieme degre quatre fois eloignee',
 	'8,5' => 'cousine au cinquieme degre trois fois eloignee',
 	'8,6' => 'cousine au sixieme degre deux fois eloignee',
-	'8,7' => "sixi\N{U+00E8}me cousin once-removed",
+	'8,7' => "sixi\N{U+00E8}me cousine une fois \N{U+00E9}loign\N{U+00E9}e",
 	'8,8' => 'cousine au huitieme degre',
 	'8,9' => 'cousine au huitieme degre une fois eloignee',
 	'8,10' => 'cousine au huitieme degre deux fois eloignee',
@@ -537,6 +561,14 @@ Readonly::Hash my %FR_FEMALE_RELATIONSHIPS => (
 	'10,8' => 'cousine au huitieme degre deux fois eloignee',
 	'10,9' => 'cousine au neuvieme degre une fois eloignee',
 	'10,10' => 'cousine au dixieme degre',
+	'11,1' => "huiti\N{U+00E8}me grand-tante",
+	'12,1' => "neuvi\N{U+00E8}me grand-tante",
+	'13,1' => "dixi\N{U+00E8}me grand-tante",
+	'14,1' => "onzi\N{U+00E8}me grand-tante",
+	'15,1' => "douzi\N{U+00E8}me grand-tante",
+	'16,1' => "treizi\N{U+00E8}me grand-tante",
+	'17,1' => "quatorzi\N{U+00E8}me grand-tante",
+	'18,1' => "quinzi\N{U+00E8}me grand-tante",
 );
 
 # ---------------------------------------------------------------------------
@@ -665,6 +697,14 @@ Readonly::Hash my %DE_MALE_RELATIONSHIPS => (
 	'10,8' => 'Cousin siebten Grades zweimal entfernt',
 	'10,9' => 'Cousin achten Grades einmal entfernt',
 	'10,10' => 'Cousin neunten Grades',
+	'11,1' => 'achtens grossonkel',
+	'12,1' => 'neuntens grossonkel',
+	'13,1' => 'zehntens grossonkel',
+	'14,1' => 'elftens grossonkel',
+	'15,1' => 'zwoelftens grossonkel',
+	'16,1' => 'dreizehntens grossonkel',
+	'17,1' => 'vierzehntens grossonkel',
+	'18,1' => 'fuenfzehntens grossonkel',
 );
 
 Readonly::Hash my %DE_FEMALE_RELATIONSHIPS => (
@@ -789,6 +829,14 @@ Readonly::Hash my %DE_FEMALE_RELATIONSHIPS => (
 	'10,8' => 'Cousine siebten Grades zweimal entfernt',
 	'10,9' => 'Cousine achten Grades einmal entfernt',
 	'10,10' => 'Cousine neunten Grades',
+	'11,1' => 'achtens grosstante',
+	'12,1' => 'neuntens grosstante',
+	'13,1' => 'zehntens grosstante',
+	'14,1' => 'elftens grosstante',
+	'15,1' => 'zwoelftens grosstante',
+	'16,1' => 'dreizehntens grosstante',
+	'17,1' => 'vierzehntens grosstante',
+	'18,1' => 'fuenfzehntens grosstante',
 );
 
 # ---------------------------------------------------------------------------
@@ -918,6 +966,14 @@ Readonly::Hash my %DE_CH_MALE_RELATIONSHIPS => (
 	'10,8' => 'Cousin siebten Grades zweimal entfernt',
 	'10,9' => 'Cousin achten Grades einmal entfernt',
 	'10,10' => 'Cousin neunten Grades',
+	'11,1' => 'achtens grossonkel',
+	'12,1' => 'neuntens grossonkel',
+	'13,1' => 'zehntens grossonkel',
+	'14,1' => 'elftens grossonkel',
+	'15,1' => 'zwoelftens grossonkel',
+	'16,1' => 'dreizehntens grossonkel',
+	'17,1' => 'vierzehntens grossonkel',
+	'18,1' => 'fuenfzehntens grossonkel',
 );
 
 Readonly::Hash my %DE_CH_FEMALE_RELATIONSHIPS => (
@@ -1042,6 +1098,14 @@ Readonly::Hash my %DE_CH_FEMALE_RELATIONSHIPS => (
 	'10,8' => 'Cousine siebten Grades zweimal entfernt',
 	'10,9' => 'Cousine achten Grades einmal entfernt',
 	'10,10' => 'Cousine neunten Grades',
+	'11,1' => 'achtens grosstante',
+	'12,1' => 'neuntens grosstante',
+	'13,1' => 'zehntens grosstante',
+	'14,1' => 'elftens grosstante',
+	'15,1' => 'zwoelftens grosstante',
+	'16,1' => 'dreizehntens grosstante',
+	'17,1' => 'vierzehntens grosstante',
+	'18,1' => 'fuenfzehntens grosstante',
 );
 
 # ---------------------------------------------------------------------------
@@ -1170,6 +1234,14 @@ Readonly::Hash my %ES_MALE_RELATIONSHIPS => (
 	'10,8' => 'primo septimo dos veces removido',
 	'10,9' => 'primo octavo una vez removido',
 	'10,10' => 'primo noveno',
+	'11,1' => 'tio lejano',
+	'12,1' => 'tio lejano',
+	'13,1' => 'tio lejano',
+	'14,1' => 'tio lejano',
+	'15,1' => 'tio lejano',
+	'16,1' => 'tio lejano',
+	'17,1' => 'tio lejano',
+	'18,1' => 'tio lejano',
 );
 
 Readonly::Hash my %ES_FEMALE_RELATIONSHIPS => (
@@ -1294,6 +1366,14 @@ Readonly::Hash my %ES_FEMALE_RELATIONSHIPS => (
 	'10,8' => 'prima septima dos veces removida',
 	'10,9' => 'prima octava una vez removida',
 	'10,10' => 'prima novena',
+	'11,1' => 'tia lejana',
+	'12,1' => 'tia lejana',
+	'13,1' => 'tia lejana',
+	'14,1' => 'tia lejana',
+	'15,1' => 'tia lejana',
+	'16,1' => 'tia lejana',
+	'17,1' => 'tia lejana',
+	'18,1' => 'tia lejana',
 );
 
 # ---------------------------------------------------------------------------
@@ -1424,6 +1504,14 @@ Readonly::Hash my %FA_MALE_RELATIONSHIPS => (
 	'10,8' => "\N{U+067E}\N{U+0633}\N{U+0631}\N{U+0639}\N{U+0645}\N{U+0648}",
 	'10,9' => "\N{U+067E}\N{U+0633}\N{U+0631}\N{U+0639}\N{U+0645}\N{U+0648}",
 	'10,10' => "\N{U+067E}\N{U+0633}\N{U+0631}\N{U+0639}\N{U+0645}\N{U+0648}",
+	'11,1' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'12,1' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'13,1' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'14,1' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'15,1' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'16,1' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'17,1' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'18,1' => "\N{U+0639}\N{U+0645}\N{U+0648}",
 	'2,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
 	'2,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
 	'3,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
@@ -1442,6 +1530,22 @@ Readonly::Hash my %FA_MALE_RELATIONSHIPS => (
 	'9,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
 	'10,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
 	'10,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'11,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
+	'11,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'12,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
+	'12,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'13,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
+	'13,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'14,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
+	'14,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'15,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
+	'15,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'16,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
+	'16,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'17,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
+	'17,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
+	'18,1,maternal' => "\N{U+062F}\N{U+0627}\N{U+06CC}\N{U+06CC}",
+	'18,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0648}",
 );
 
 Readonly::Hash my %FA_FEMALE_RELATIONSHIPS => (
@@ -1566,6 +1670,14 @@ Readonly::Hash my %FA_FEMALE_RELATIONSHIPS => (
 	'10,8' => "\N{U+062F}\N{U+062E}\N{U+062A}\N{U+0631}\N{U+0639}\N{U+0645}\N{U+0648}",
 	'10,9' => "\N{U+062F}\N{U+062E}\N{U+062A}\N{U+0631}\N{U+0639}\N{U+0645}\N{U+0648}",
 	'10,10' => "\N{U+062F}\N{U+062E}\N{U+062A}\N{U+0631}\N{U+0639}\N{U+0645}\N{U+0648}",
+	'11,1' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'12,1' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'13,1' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'14,1' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'15,1' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'16,1' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'17,1' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'18,1' => "\N{U+0639}\N{U+0645}\N{U+0647}",
 	'2,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
 	'2,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
 	'3,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
@@ -1584,6 +1696,22 @@ Readonly::Hash my %FA_FEMALE_RELATIONSHIPS => (
 	'9,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
 	'10,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
 	'10,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'11,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
+	'11,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'12,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
+	'12,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'13,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
+	'13,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'14,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
+	'14,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'15,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
+	'15,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'16,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
+	'16,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'17,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
+	'17,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
+	'18,1,maternal' => "\N{U+062E}\N{U+0627}\N{U+0644}\N{U+0647}",
+	'18,1,paternal' => "\N{U+0639}\N{U+0645}\N{U+0647}",
 );
 
 # ---------------------------------------------------------------------------
@@ -1696,7 +1824,7 @@ Genealogy::Relationship::Name - Return a genealogical relationship name from ste
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -1705,7 +1833,7 @@ Version 0.03
     my $namer = Genealogy::Relationship::Name->new();
 
     my $name = $namer->name(
-        steps_to_ancestor   => 2,
+        steps_to_ancestor  => 2,
         steps_from_ancestor => 3,
         sex                 => 'F',
     );
@@ -1730,8 +1858,8 @@ The relationship tables were originally embedded in the C<gedcom> and C<ged2site
 distributions inside C<Gedcom::Individual::relationship_up()>; this module
 extracts them into a reusable, installable CPAN distribution.
 
-Supported languages: C<en> (English, default), C<de> (German), C<es> (Spanish),
-C<fa> (Farsi/Persian), C<fr> (French), C<la> (Classical Latin).
+Supported languages: C<en> (English, default), C<de> (German), C<de_ch> (Swiss
+German), C<es> (Spanish), C<fa> (Farsi/Persian), C<fr> (French), C<la> (Classical Latin).
 
 =head1 METHODS
 
@@ -1754,7 +1882,8 @@ file via L<Object::Configure>.
 =item C<language> (string, optional)
 
 Default BCP-47 language tag (primary subtag only) for all C<name()> calls
-on this object.  Supported values: C<en> (default), C<fr>, C<de>.  May be
+on this object.  Supported values: C<en> (default), C<de>, C<de_ch> (Swiss
+German), C<es>, C<fa> (Farsi/Persian), C<fr>, C<la> (Classical Latin).  May be
 overridden per-call by passing C<language> to C<name()>.
 
 =item C<logger>
@@ -1792,6 +1921,13 @@ unknown scalar values as configuration file paths).  The C<logger> key is
 therefore stashed before the C<configure()> call and restored afterward.
 Any future object-valued constructor arguments must follow the same pattern.
 
+The C<language> argument is stored without validation at construction time.
+Validation (regex match + table lookup) occurs at the first C<name()> call.
+An invalid language passed to C<new()> will therefore not be detected until
+C<name()> is called.  To catch the error earlier, call
+C<< $namer->name(..., language => $lang) >> with a test pair immediately
+after construction.
+
 =head3 EXAMPLE
 
     use Genealogy::Relationship::Name;
@@ -1821,7 +1957,7 @@ Any future object-valued constructor arguments must follow the same pattern.
 =head4 Input
 
     {
-	language => { type => 'string', regex => qr/^(?:en|de(?:-ch)?|es|fa|fr|la)/, optional => 1 },
+        language => { type => 'string', regex => qr/^(?:en|de(?:[-_]ch)?|es|fa|fr|la)/, optional => 1 },
         logger   => { type => 'object', optional => 1 },
     }
 
@@ -1863,15 +1999,9 @@ sub new {
 	}, ref($class) || $class;
 }
 
-# ---------------------------------------------------------------------------
-# Public method: name()
-# ---------------------------------------------------------------------------
-
 =head2 name
 
 Returns the name of the relationship between person A and person B.
-
-=head3 PURPOSE
 
 Given the number of steps from person A up to the nearest common ancestor
 (C<steps_to_ancestor>) and the number of steps from that ancestor down to
@@ -1898,8 +2028,9 @@ Sex of person B.  Must be C<'M'> (male) or C<'F'> (female).
 
 =item C<language> (string, optional)
 
-BCP-47-style language tag (only the primary subtag is used).
-Supported values: C<en> (default), C<de>, C<es>, C<fa>, C<fr>, C<la>.
+BCP-47-style language tag.
+Supported values: C<en> (default), C<de>, C<de_ch> (Swiss German, may also
+be supplied as the BCP-47 tag C<de-CH>), C<es>, C<fa>, C<fr>, C<la>.
 
 Note: C<fa> (Farsi/Persian) values are stored as C<\N{U+XXXX}> Unicode
 escapes and render correctly in any Unicode-aware context.  C<la>
@@ -1960,7 +2091,7 @@ is not found in the lookup table.
 	steps_to_ancestor   => { type => 'integer', minimum => 0 },
 	steps_from_ancestor => { type => 'integer', minimum => 0 },
 	sex                 => { type => 'string', memberof => ['M', 'F'] },
-        language => { type => 'string', regex => qr/^(?:en|de(?:-ch)?|es|fa|fr|la)/, optional => 1 },
+        language => { type => 'string', regex => qr/^(?:en|de(?:[-_]ch)?|es|fa|fr|la)/, optional => 1 },
 	# person is handled before validate_strict (PVS infers constraints from objects)
 	family_side => { type => 'string', memberof => ['paternal','maternal'], optional => 1 },
     }
@@ -1971,23 +2102,6 @@ is not found in the lookup table.
         type     => 'string',
         optional => 1,     # undef when the combination is not tabulated
     }
-
-=head3 FORMAL SPECIFICATION
-
-    name ______________________________________________________
-    [In]  steps_to_ancestor   : N0
-          steps_from_ancestor : N0
-          sex                 : {M, F}
-          language            : {en, es, fa, fr, de, la}?  (default en)
-          person              : Object?
-    [Out] result              : String | undef
-
-    Let key      == steps_to_ancestor ++ "," ++ steps_from_ancestor
-    Let side_key == key ++ "," ++ family_side  if family_side defined
-    Let table    == RELATIONSHIP_TABLES(language)(sex)
-    result == table(side_key)  if family_side defined and side_key in dom table
-           == table(key)       if key in dom table
-           == undef            otherwise
 
 =cut
 
@@ -2001,28 +2115,32 @@ sub name {
 			steps_to_ancestor   => { type => 'integer', minimum => 0 },
 			steps_from_ancestor => { type => 'integer', minimum => 0 },
 			sex                 => { type => 'string', memberof => ['M', 'F'] },
-			language => { type => 'string', regex => qr/^(?:en|de(?:-ch)?|es|fa|fr|la)/, optional => 1 },
+			language => { type => 'string', regex => qr/^(?:en|de(?:[-_]ch)?|es|fa|fr|la)/, optional => 1 },
 			person              => { type => 'object', optional => 1 },
 			family_side         => { type => 'string', memberof => ['paternal','maternal'],
 			                         optional => 1 },
 		}
 	);
 
-	# Extract individual parameters; undef means arg was given as undef, so
-	# report via logger if set, otherwise croak
-	foreach my $arg(qw(steps_to_ancestor steps_from_ancestor sex)) {
-		if(!defined($args->{$arg})) {
-			if(my $logger = $self->{logger}) {
-				$logger->error("$arg not given");
-			}
-			croak("$arg not given");
+	# person is extracted early so it can be forwarded to the logger on error;
+	# it overrides the ctx set at construction time per the POD contract
+	my $person      = $args->{person};
+	my $family_side = $args->{family_side};
+
+	# Validate required args; undef means the caller explicitly passed undef
+	# (distinct from omitting the arg), so report via logger if set, then croak
+	foreach my $arg (qw(steps_to_ancestor steps_from_ancestor sex)) {
+		next if defined $args->{$arg};
+		if(my $logger = $self->{logger}) {
+			# Pass person as ctx so caller's complain() handler can attach it
+			my @ctx = defined $person ? (ctx => $person) : ();
+			$logger->error("$arg not given", @ctx);
 		}
+		croak("$arg not given");
 	}
 	my $steps1 = $args->{steps_to_ancestor};
 	my $steps2 = $args->{steps_from_ancestor};
 	my $sex    = $args->{sex};
-	my $person      = $args->{person};
-	my $family_side = $args->{family_side};
 
 	# Fall back to constructor default or hard default if no per-call language given
 	my $lang = lc($args->{language} // $self->{language} // $DEFAULT_LANGUAGE);
@@ -2094,6 +2212,8 @@ currently C<('de', 'de_ch', 'en', 'es', 'fa', 'fr', 'la')>.
 =cut
 
 sub supported_languages {
+	my $self = shift;
+
 	# Return the sorted set of keys from the master dispatch table
 	my @langs = sort keys %RELATIONSHIP_TABLES;
 	return wantarray ? @langs : \@langs;
@@ -2144,6 +2264,8 @@ None.
 =cut
 
 sub known_sexes {
+	my $self = shift;
+
 	# Return the two valid sex codes in sorted order
 	my @sexes = sort($SEX_FEMALE, $SEX_MALE);
 	return wantarray ? @sexes : \@sexes;
@@ -2224,19 +2346,28 @@ Optionally L<Log::Abstraction> (E<gt>= 0.28) for the C<logger>/C<ctx> error
 dispatch path.
 L<Params::Get>, L<Params::Validate::Strict>, L<Readonly>
 
+=encoding UTF-8
+
 =head1 BUGS AND LIMITATIONS
 
-The lookup tables currently cover steps 0-6 in both directions.  Relationships
-further removed (seventh cousin, etc.) return C<undef>.  Pull requests adding
-deeper tables are welcome.
+The direct-line and cousin tables cover steps 0-10 in both directions.
+Some language tables have sparser coverage at high step counts (e.g. Latin
+has no classical term beyond 6th-degree ancestors, and returns C<undef>).
+The French tables use two overlapping naming conventions (I<arrière-petit-cousin>
+vs I<cousin au N-ième degré>) that are not applied fully consistently; a
+native-French genealogist's review of the higher-step entries would be welcome.
+The C<person> argument to C<name()> is forwarded to the logger as C<ctx>
+when an error occurs, but Log::Abstraction's per-call C<ctx> override
+API may not be available in all versions; test your logger integration
+if you rely on this behaviour.
 
 =head1 TODO
 
 =over 4
 
-=item * Extract and integrate the Latin relationship handling code currently
-embedded in the C<gedcom> and C<ged2site> programs, adding C<la> as a
-supported language alongside C<en>, C<fr>, and C<de>.
+=item * Add Readme section documenting the French dual-naming convention
+(I<arrière-petit-cousin> vs I<cousin au N-ième degré>) and the depth at which
+each language's table becomes sparse.
 
 =back
 
@@ -2321,14 +2452,17 @@ L<http://deps.cpantesters.org/?module=Genealogy::Relationship::Name>
     [In]  steps_to_ancestor   : N0
           steps_from_ancestor : N0
           sex                 : {M, F}
-          language            : {en, fr, de}?  (default en)
+          language            : {en, es, fa, fr, de, de_ch, la}?  (default en)
           person              : Object?
+          family_side         : {paternal, maternal}?
     [Out] result              : String | undef
 
-    Let key == steps_to_ancestor ++ "," ++ steps_from_ancestor
-    Let table == RELATIONSHIP_TABLES(language)(sex)
-    result == table(key)  if key in dom table
-           == undef       otherwise
+    Let key      == steps_to_ancestor ++ "," ++ steps_from_ancestor
+    Let side_key == key ++ "," ++ family_side  if family_side defined
+    Let table    == RELATIONSHIP_TABLES(language)(sex)
+    result == table(side_key)  if family_side defined and side_key in dom table
+           == table(key)       if key in dom table
+           == undef            otherwise
 
 =head2 supported_languages
 

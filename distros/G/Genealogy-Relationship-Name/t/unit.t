@@ -734,4 +734,165 @@ subtest 'supported_languages() includes all new languages' => sub {
 };
 
 
+# =========================================================================
+# Regression: data-table bug-fixes (typos/copy-paste errors corrected)
+# =========================================================================
+
+subtest 'Regression: EN typo fixes - eighth/twelfth great-uncle/aunt' => sub {
+	plan tests => 6;
+
+	my $namer = Genealogy::Relationship::Name->new();
+
+	# These were misspelled as 'eigth'/'twelth' in earlier versions
+	like($namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'M'),
+		qr/^eighth great-uncle$/i, 'en 11,1 M => eighth great-uncle (not eigth)');
+	like($namer->name(steps_to_ancestor => 15, steps_from_ancestor => 1, sex => 'M'),
+		qr/^twelfth great-uncle$/i, 'en 15,1 M => twelfth great-uncle (not twelth)');
+	like($namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'F'),
+		qr/^eighth great-aunt$/i, 'en 11,1 F => eighth great-aunt (not eigth)');
+	like($namer->name(steps_to_ancestor => 14, steps_from_ancestor => 1, sex => 'F'),
+		qr/great-aunt$/i, 'en 14,1 F => ...great-aunt (not great-uncle copy-paste)');
+	like($namer->name(steps_to_ancestor => 15, steps_from_ancestor => 1, sex => 'F'),
+		qr/^twelfth great-aunt$/i, 'en 15,1 F => twelfth great-aunt (not twelth/uncle)');
+	# '18,1' was previously a duplicate key shadowing '17,1'
+	is($namer->name(steps_to_ancestor => 17, steps_from_ancestor => 1, sex => 'F'),
+		'fourteenth great-aunt', 'en 17,1 F => fourteenth great-aunt (was shadowed by duplicate 17,1)');
+};
+
+subtest 'Regression: FR ordinals use è not œ ligature' => sub {
+	plan tests => 6;
+
+	my $namer = Genealogy::Relationship::Name->new();
+
+	# \N{U+0153} (oe ligature) was wrong; should be \N{U+00E8} (è) for -ième suffix
+	my $m11 = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'M', language => 'fr');
+	my $m12 = $namer->name(steps_to_ancestor => 12, steps_from_ancestor => 1, sex => 'M', language => 'fr');
+	my $f11 = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'F', language => 'fr');
+	my $f12 = $namer->name(steps_to_ancestor => 12, steps_from_ancestor => 1, sex => 'F', language => 'fr');
+
+	like($m11, qr/grand-oncle$/, 'fr 11,1 M ends grand-oncle');
+	unlike($m11, qr/\x{0153}/, 'fr 11,1 M has no oe ligature');
+	like($m12, qr/grand-oncle$/, 'fr 12,1 M ends grand-oncle');
+	like($f11, qr/grand-tante$/, 'fr 11,1 F ends grand-tante (not grand-tant)');
+	unlike($f11, qr/\x{0153}/, 'fr 11,1 F has no oe ligature');
+	like($f12, qr/grand-tante$/, 'fr 12,1 F ends grand-tante');
+};
+
+subtest 'Regression: FR female table no English text and correct gender' => sub {
+	plan tests => 4;
+
+	my $namer = Genealogy::Relationship::Name->new();
+
+	# '7,7' was "sixième cousin" (male form) in the female table
+	my $f77 = $namer->name(steps_to_ancestor => 7, steps_from_ancestor => 7, sex => 'F', language => 'fr');
+	unlike($f77, qr/\bonce-removed\b/, 'fr 7,7 F has no English "once-removed"');
+	like($f77, qr/cousine/, 'fr 7,7 F uses feminine "cousine"');
+
+	# '7,8' and '8,7' contained English "once-removed" instead of French
+	my $f78 = $namer->name(steps_to_ancestor => 7, steps_from_ancestor => 8, sex => 'F', language => 'fr');
+	my $f87 = $namer->name(steps_to_ancestor => 8, steps_from_ancestor => 7, sex => 'F', language => 'fr');
+	unlike($f78, qr/\bonce-removed\b/, 'fr 7,8 F has no English "once-removed"');
+	unlike($f87, qr/\bonce-removed\b/, 'fr 8,7 F has no English "once-removed"');
+};
+
+subtest 'Regression: de_ch underscore form accepted by name() (API contract)' => sub {
+	plan tests => 2;
+
+	my $namer = Genealogy::Relationship::Name->new();
+
+	# supported_languages() returns 'de_ch' (underscore); passing that back to
+	# name() must not croak.  Previously the validation regex only matched 'de-ch'.
+	my $m = eval { $namer->name(steps_to_ancestor => 2, steps_from_ancestor => 0, sex => 'M', language => 'de_ch') };
+	ok(!$@, 'de_ch (underscore) accepted without croak');
+	is($m, 'Grossvater', 'de_ch => Grossvater');
+};
+
+subtest 'Regression: DE-CH 11,1 entries present (were missing)' => sub {
+	plan tests => 2;
+
+	my $namer = Genealogy::Relationship::Name->new();
+
+	my $m = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'M', language => 'de-CH');
+	my $f = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'F', language => 'de-CH');
+	ok(defined $m, 'de-CH 11,1 M is defined (was missing)');
+	ok(defined $f, 'de-CH 11,1 F is defined (was missing)');
+};
+
+subtest 'Regression: ES 11-18,1 entries added' => sub {
+	plan tests => 4;
+
+	my $namer = Genealogy::Relationship::Name->new();
+
+	is($namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'M', language => 'es'),
+		'tio lejano', 'es 11,1 M => tio lejano');
+	is($namer->name(steps_to_ancestor => 18, steps_from_ancestor => 1, sex => 'M', language => 'es'),
+		'tio lejano', 'es 18,1 M => tio lejano');
+	is($namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'F', language => 'es'),
+		'tia lejana', 'es 11,1 F => tia lejana');
+	is($namer->name(steps_to_ancestor => 18, steps_from_ancestor => 1, sex => 'F', language => 'es'),
+		'tia lejana', 'es 18,1 F => tia lejana');
+};
+
+subtest 'Regression: FR 14-18,1 entries added' => sub {
+	plan tests => 4;
+
+	my $namer = Genealogy::Relationship::Name->new();
+
+	is($namer->name(steps_to_ancestor => 14, steps_from_ancestor => 1, sex => 'M', language => 'fr'),
+		"onzi\N{U+00E8}me grand-oncle", 'fr 14,1 M => onzième grand-oncle');
+	is($namer->name(steps_to_ancestor => 18, steps_from_ancestor => 1, sex => 'M', language => 'fr'),
+		"quinzi\N{U+00E8}me grand-oncle", 'fr 18,1 M => quinzième grand-oncle');
+	is($namer->name(steps_to_ancestor => 14, steps_from_ancestor => 1, sex => 'F', language => 'fr'),
+		"onzi\N{U+00E8}me grand-tante", 'fr 14,1 F => onzième grand-tante');
+	is($namer->name(steps_to_ancestor => 18, steps_from_ancestor => 1, sex => 'F', language => 'fr'),
+		"quinzi\N{U+00E8}me grand-tante", 'fr 18,1 F => quinzième grand-tante');
+};
+
+subtest 'Regression: DE/DE-CH 14-18,1 entries added' => sub {
+	plan tests => 8;
+
+	my $namer = Genealogy::Relationship::Name->new();
+
+	is($namer->name(steps_to_ancestor => 14, steps_from_ancestor => 1, sex => 'M', language => 'de'),
+		'elftens grossonkel', 'de 14,1 M => elftens grossonkel');
+	is($namer->name(steps_to_ancestor => 18, steps_from_ancestor => 1, sex => 'M', language => 'de'),
+		'fuenfzehntens grossonkel', 'de 18,1 M => fuenfzehntens grossonkel');
+	is($namer->name(steps_to_ancestor => 14, steps_from_ancestor => 1, sex => 'F', language => 'de'),
+		'elftens grosstante', 'de 14,1 F => elftens grosstante');
+	is($namer->name(steps_to_ancestor => 18, steps_from_ancestor => 1, sex => 'F', language => 'de'),
+		'fuenfzehntens grosstante', 'de 18,1 F => fuenfzehntens grosstante');
+	is($namer->name(steps_to_ancestor => 14, steps_from_ancestor => 1, sex => 'M', language => 'de-CH'),
+		'elftens grossonkel', 'de-CH 14,1 M => elftens grossonkel');
+	is($namer->name(steps_to_ancestor => 18, steps_from_ancestor => 1, sex => 'M', language => 'de-CH'),
+		'fuenfzehntens grossonkel', 'de-CH 18,1 M => fuenfzehntens grossonkel');
+	is($namer->name(steps_to_ancestor => 14, steps_from_ancestor => 1, sex => 'F', language => 'de-CH'),
+		'elftens grosstante', 'de-CH 14,1 F => elftens grosstante');
+	is($namer->name(steps_to_ancestor => 18, steps_from_ancestor => 1, sex => 'F', language => 'de-CH'),
+		'fuenfzehntens grosstante', 'de-CH 18,1 F => fuenfzehntens grosstante');
+};
+
+subtest 'Regression: FA 11-18,1 generic and side-specific entries added' => sub {
+	plan tests => 8;
+
+	my $namer = Genealogy::Relationship::Name->new();
+
+	my $m11 = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'M', language => 'fa');
+	my $m18 = $namer->name(steps_to_ancestor => 18, steps_from_ancestor => 1, sex => 'M', language => 'fa');
+	my $f11 = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'F', language => 'fa');
+	my $f18 = $namer->name(steps_to_ancestor => 18, steps_from_ancestor => 1, sex => 'F', language => 'fa');
+	ok(defined $m11, 'fa 11,1 M generic defined');
+	ok(defined $m18, 'fa 18,1 M generic defined');
+	ok(defined $f11, 'fa 11,1 F generic defined');
+	ok(defined $f18, 'fa 18,1 F generic defined');
+
+	my $mp = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'M', language => 'fa', family_side => 'paternal');
+	my $mm = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'M', language => 'fa', family_side => 'maternal');
+	my $fp = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'F', language => 'fa', family_side => 'paternal');
+	my $fm = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 1, sex => 'F', language => 'fa', family_side => 'maternal');
+	ok(defined $mp, 'fa 11,1 M paternal defined');
+	ok(defined $mm, 'fa 11,1 M maternal defined');
+	ok(defined $fp, 'fa 11,1 F paternal defined');
+	ok(defined $fm, 'fa 11,1 F maternal defined');
+};
+
 done_testing();

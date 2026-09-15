@@ -12,6 +12,7 @@ t/eol.t
 t/extended_tests.t
 t/function.t
 t/integration.t
+t/locales.t
 t/mutant_survivors.t
 t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

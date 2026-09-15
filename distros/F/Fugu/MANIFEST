@@ -12,8 +12,12 @@ lib/Fugu/Config.pm
 lib/Fugu/Config.pod
 lib/Fugu/Control.pm
 lib/Fugu/Control.pod
+lib/Fugu/Curl.pm
+lib/Fugu/Curl.pod
 lib/Fugu/Daemon.pm
 lib/Fugu/Daemon.pod
+lib/Fugu/Ed25519.pm
+lib/Fugu/Ed25519.pod
 lib/Fugu/EventLoop.pm
 lib/Fugu/EventLoop.pod
 lib/Fugu/File.pm
@@ -50,6 +54,8 @@ lib/Fugu/Sandbox.pm
 lib/Fugu/Sandbox.pod
 lib/Fugu/Signal.pm
 lib/Fugu/Signal.pod
+lib/Fugu/Signer.pm
+lib/Fugu/Signer.pod
 lib/Fugu/Signify.pm
 lib/Fugu/Signify.pod
 lib/Fugu/StateFile.pm
@@ -58,6 +64,8 @@ lib/Fugu/TestLog.pm
 lib/Fugu/TestLog.pod
 lib/Fugu/Timeout.pm
 lib/Fugu/Timeout.pod
+lib/Fugu/X509.pm
+lib/Fugu/X509.pod
 lib/Protocol/Imsg.pm
 lib/Protocol/Imsg.pod
 t/conformance/mdns-control.t
@@ -66,7 +74,9 @@ t/fugu/cli.t
 t/fugu/config.t
 t/fugu/control.t
 t/fugu/coreperl.t
+t/fugu/curl.t
 t/fugu/daemon.t
+t/fugu/ed25519.t
 t/fugu/eventloop.t
 t/fugu/file.t
 t/fugu/fugu.t
@@ -85,10 +95,12 @@ t/fugu/random.t
 t/fugu/repl.t
 t/fugu/sandbox.t
 t/fugu/signal.t
+t/fugu/signer.t
 t/fugu/signify.t
 t/fugu/ssh.t
 t/fugu/statefile.t
 t/fugu/testlog.t
 t/fugu/timeout.t
+t/fugu/x509.t
 t/protocol/boundary.t
 t/protocol/imsg.t

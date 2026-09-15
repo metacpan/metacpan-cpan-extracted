@@ -14,7 +14,7 @@ Alien::Build::Manual::Security - General alien author documentation
 
 =head1 VERSION
 
-version 2.84
+version 2.87
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ if it is L<Alien>, you still don't like the idea of downloading external
 dependencies and you can't firewall just the L<CPAN> module installs.
 
 L<Alien::Build> based L<Alien>s respect a number of environment variables
-that at least give you some control over how aggresive L<Alien::Build>
+that at least give you some control over how aggressive L<Alien::Build>
 will be at fetching random stuff off the internet.
 
 =over 4
@@ -282,6 +282,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 nick nauwelaerts (INPHOBIA)
 
 Florian Weimer
+
+Marcel Telka (mtelka)
 
 =head1 COPYRIGHT AND LICENSE
 

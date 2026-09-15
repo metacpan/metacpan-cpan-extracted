@@ -10,7 +10,10 @@
 # writes the index page and the KEYS file on every build, so an
 # unstable order would make a diff on each run.
 
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
 use FindBin qw($RealBin);
 use lib "$RealBin/../../lib";
@@ -62,6 +65,9 @@ subtest 'parse_name reads a valid name of each type' => sub {
 	is( $openpgp->{type},   'openpgp', 'a .asc name gives the openpgp type' );
 	is( $openpgp->{serial}, 12,        'a two-digit serial reads as 12' );
 
+	my $x509 = $kd->parse_name('fugubsd-4-code.pem');
+	is( $x509->{type}, 'x509', 'a .pem name gives the x509 type' );
+
 	# The serial must be a number, so a sort of 2 and 10 puts 10
 	# second. A text sort would put 10 first.
 	my @serials =
@@ -108,9 +114,11 @@ subtest 'name_for is the inverse of parse_name' => sub {
 		'fugubsd-1-release.pub', 'a signify name' );
 	is( $kd->name_for( serial => 2, purpose => 'mail', type => 'openpgp' ),
 		'fugubsd-2-mail.asc', 'an openpgp name' );
+	is( $kd->name_for( serial => 4, purpose => 'code', type => 'x509' ),
+		'fugubsd-4-code.pem', 'an x509 name' );
 
 	# The round trip must return the parts that went in.
-	for my $type (qw(signify openpgp)) {
+	for my $type (qw(signify openpgp x509)) {
 		my $name = $kd->name_for(
 			serial  => 7,
 			purpose => 'release',
@@ -131,6 +139,150 @@ subtest 'name_for is the inverse of parse_name' => sub {
 	is( $kd->name_for( serial => 1, purpose => 'release', type => 'gpg' ),
 		undef, 'an unknown type fails' );
 	like( $kd->error, qr/unknown key type/, 'and the reason says so' );
+};
+
+subtest 'binding_for is the inverse of parse_binding' => sub {
+	is(
+		$kd->binding_for(
+			target => 'fugubsd-1-root.pub',
+			signer => 'fugubsd-2-release.pub'
+		),
+		'fugubsd-1-root.pub.fugubsd-2-release.sig',
+		'a signify signer names a .sig binding'
+	);
+
+	is(
+		$kd->binding_for(
+			target => 'fugubsd-1-root.pub',
+			signer => 'fugubsd-3-mail.asc'
+		),
+		'fugubsd-1-root.pub.fugubsd-3-mail.asc',
+		'an OpenPGP signer names an .asc binding'
+	);
+
+	is(
+		$kd->binding_for(
+			target => 'fugubsd-1-root.pub',
+			signer => 'fugubsd-4-code.pem'
+		),
+		'fugubsd-1-root.pub.fugubsd-4-code.p7s',
+		'an X.509 signer names a .p7s binding'
+	);
+
+	is_deeply(
+		$kd->parse_binding('fugubsd-1-root.pub.fugubsd-2-release.sig'),
+		{
+			target => 'fugubsd-1-root.pub',
+			signer => 'fugubsd-2-release.pub',
+			type   => 'signify',
+		},
+		'parse_binding reads the target, the signer and the type'
+	);
+
+	is( $kd->parse_binding('fugubsd-1-root.pub.fugubsd-3-mail.asc')
+		    ->{type},
+		'openpgp',
+		'an .asc binding names an OpenPGP signer'
+	);
+
+	# The name of a binding holds the stem of the signer, and
+	# the answer completes it with the key extension of the
+	# type.
+	is_deeply(
+		$kd->parse_binding('fugubsd-1-root.pub.fugubsd-4-code.p7s'),
+		{
+			target => 'fugubsd-1-root.pub',
+			signer => 'fugubsd-4-code.pem',
+			type   => 'x509',
+		},
+		'a .p7s binding names an X.509 signer and its .pem key file'
+	);
+
+	# The round trip must return the names that went in, in both
+	# directions. A builder and a parser that drift would name two
+	# files for one signature, and a reader would find neither.
+	# The module holds the extension table, so this test holds no
+	# copy of it.
+	for my $signer (
+		qw(fugubsd-2-release.pub fugubsd-3-mail.asc fugubsd-4-code.pem)
+	    )
+	{
+		for my $target (
+			qw(fugubsd-1-root.pub fugubsd-4-code.asc fugubsd-5-cert.pem)
+		    )
+		{
+			my $name = $kd->binding_for(
+				target => $target,
+				signer => $signer
+			);
+			my $parts = $kd->parse_binding($name);
+			is( $parts->{target}, $target, "$name: the target" );
+			is( $parts->{signer}, $signer,
+				"$name: the key file of the signer" );
+
+			# The other direction: the parts of a parse
+			# name the same file again, with no work in the
+			# caller.
+			is( $kd->binding_for(%$parts),
+				$name, "$name: the parts name the file again" );
+		}
+	}
+
+	is( $kd->binding_for( target => 'fugubsd-1-root.pub' ),
+		undef, 'an absent signer fails' );
+	like( $kd->error, qr/the signer is no key name/, 'and the reason says so' );
+
+	is( $kd->binding_for( signer => 'fugubsd-2-release.pub' ),
+		undef, 'an absent target fails' );
+	like( $kd->error, qr/the target is no key name/, 'and the reason says so' );
+
+	is(
+		$kd->binding_for(
+			target => 'fugubsd-1-root.pub',
+			signer => 'other-2-release.pub'
+		),
+		undef,
+		'a signer of another organization fails'
+	);
+	like( $kd->error, qr/names the organization other/,
+		'and the reason holds the reason of parse_name' );
+};
+
+subtest 'parse_binding rejects a bad name' => sub {
+	my %bad = (
+		''                   => qr/empty/,
+		'fugubsd-1-root.pub' => qr/does not match/,
+		'fugubsd-1-root.pub.fugubsd-2-release' => qr/does not match/,
+		'fugubsd-1-root.pub.fugubsd-2-release.sig.sig' =>
+		    qr/does not match/,
+		'keys/fugubsd-1-root.pub.fugubsd-2-release.sig' => qr/solidus/,
+		'fugubsd-1-root.pub.fugubsd-2-release.pub' =>
+		    qr/unknown binding extension/,
+		'fugubsd-1-root.pub.fugubsd-2-release.SIG' =>
+		    qr/unknown binding extension/,
+		'fugubsd-1-root.txt.fugubsd-2-release.sig' =>
+		    qr/the target of .* is no key name/,
+		'fugubsd-0-root.pub.fugubsd-2-release.sig' =>
+		    qr/the target of .* is no key name/,
+		'fugubsd-1-root.pub.other-2-release.sig' =>
+		    qr/the signer of .* is no key name/,
+		'fugubsd-1-root.pub.fugubsd-0-release.sig' =>
+		    qr/the signer of .* is no key name/,
+	);
+
+	for my $name ( sort keys %bad ) {
+		is( $kd->parse_binding($name), undef, "$name fails" );
+		like( $kd->error, $bad{$name}, "$name: the reason" );
+	}
+
+	is( $kd->parse_binding(undef), undef, 'an undefined name fails' );
+	like( $kd->error, qr/empty/, 'and the reason says so' );
+
+	# A binding name holds no path, as a key name holds none. A
+	# caller that passes a path would read a file outside the
+	# directory.
+	is( $kd->parse_binding('../fugubsd-1-root.pub.fugubsd-2-release.sig'),
+		undef, 'a relative path fails' );
 };
 
 subtest 'the serial holds a digit bound' => sub {
@@ -403,6 +555,147 @@ subtest 'check_statuses holds one current key for each purpose' => sub {
 		undef, 'one bad purpose beside a good one fails' );
 	like( $kd->error, qr/mail holds 0 current keys/,
 		'and the reason names the bad purpose' );
+};
+
+subtest 'check_bindings holds the retention rule' => sub {
+	my @keys = (
+		{ name => 'fugubsd-1-root.pub',    status => 'current' },
+		{ name => 'fugubsd-1-release.pub', status => 'retired' },
+		{ name => 'fugubsd-2-release.pub', status => 'current' },
+		{ name => 'fugubsd-3-release.pub', status => 'next' },
+		{ name => 'fugubsd-1-mail.asc',    status => 'current' },
+	);
+	my $root = 'fugubsd-1-root.pub';
+
+	# A key in force signs the root, and a retired key signs its
+	# own successor.
+	my @good = (
+		'fugubsd-1-root.pub.fugubsd-2-release.sig',
+		'fugubsd-1-root.pub.fugubsd-3-release.sig',
+		'fugubsd-1-root.pub.fugubsd-1-mail.asc',
+		'fugubsd-1-root.pub.fugubsd-1-root.sig',
+		'fugubsd-2-release.pub.fugubsd-1-release.sig',
+	);
+	is( $kd->check_bindings( \@keys, \@good, $root ),
+		1, 'a valid set of bindings passes' );
+	is( $kd->error, undef, 'and it reports no reason' );
+
+	is( $kd->check_bindings( \@keys, [], $root ),
+		1, 'a set with no binding passes' );
+
+	# A key in force that signs anything but the root leaves the
+	# root with no attestation of that key.
+	is(
+		$kd->check_bindings(
+			\@keys,
+			['fugubsd-1-mail.asc.fugubsd-2-release.sig'], $root
+		),
+		undef,
+		'a current signer that misses the root fails'
+	);
+	like( $kd->error, qr/current signer fugubsd-2-release\.pub/,
+		'and the reason names the signer' );
+	like( $kd->error, qr/must target the root key fugubsd-1-root\.pub/,
+		'and it names the root' );
+
+	is(
+		$kd->check_bindings(
+			\@keys,
+			['fugubsd-2-release.pub.fugubsd-3-release.sig'], $root
+		),
+		undef,
+		'a next signer that misses the root fails'
+	);
+
+	# A retired key signs a key of its own purpose, so a holder of
+	# the old key verifies the new one. A binding to another
+	# purpose breaks that chain.
+	is(
+		$kd->check_bindings(
+			\@keys,
+			['fugubsd-1-mail.asc.fugubsd-1-release.sig'], $root
+		),
+		undef,
+		'a retired signer that leaves its purpose fails'
+	);
+	like( $kd->error, qr/purpose release with a serial above 1/,
+		'and the reason names the purpose and the serial' );
+
+	is(
+		$kd->check_bindings(
+			\@keys,
+			['fugubsd-1-release.pub.fugubsd-1-release.sig'], $root
+		),
+		undef,
+		'a retired signer that targets its own serial fails'
+	);
+
+	is(
+		$kd->check_bindings(
+			\@keys, ['fugubsd-1-root.pub.fugubsd-1-release.sig'],
+			$root
+		),
+		undef,
+		'a retired signer that targets the root fails'
+	);
+
+	# The set is the one source of a status, so a binding of a key
+	# outside it holds to no rule.
+	is(
+		$kd->check_bindings(
+			\@keys, ['fugubsd-1-root.pub.fugubsd-9-release.sig'],
+			$root
+		),
+		undef,
+		'a signer outside the key set fails'
+	);
+	like( $kd->error, qr/signer fugubsd-9-release\.pub, and the key set/,
+		'and the reason names the signer' );
+
+	is(
+		$kd->check_bindings(
+			\@keys, ['fugubsd-9-root.pub.fugubsd-2-release.sig'],
+			$root
+		),
+		undef,
+		'a target outside the key set fails'
+	);
+	like( $kd->error, qr/target fugubsd-9-root\.pub, and the key set/,
+		'and the reason names the target' );
+
+	is( $kd->check_bindings( \@keys, \@good, 'fugubsd-2-root.pub' ),
+		undef, 'a root outside the key set fails' );
+	like( $kd->error, qr/no root key named fugubsd-2-root\.pub/,
+		'and the reason names the root' );
+
+	is( $kd->check_bindings( \@keys, \@good, undef ),
+		undef, 'an absent root fails' );
+	like( $kd->error, qr/no root key named \(undef\)/, 'and the reason says so' );
+
+	# The reason of parse_binding reaches the caller, so one bad
+	# name in a directory names itself.
+	is( $kd->check_bindings( \@keys, ['fugubsd-1-root.pub'], $root ),
+		undef, 'a bad binding name fails' );
+	like( $kd->error, qr/does not match/, 'and the reason comes from the parser' );
+
+	# The status vocabulary holds, as it does for order.
+	is(
+		$kd->check_bindings(
+			[ { name => $root, status => 'live' } ],
+			[], $root
+		),
+		undef,
+		'a status outside the vocabulary fails'
+	);
+
+	my $one_name = 'fugubsd-1-root.pub.fugubsd-1-root.sig';
+	ok( !eval { $kd->check_bindings( \@keys, $one_name, $root ); 1 },
+		'a bindings list that is no array reference dies' );
+	like( $@, qr/bindings must be an array reference/, 'and the reason says so' );
+
+	ok( !eval { $kd->check_bindings( 'fugubsd-1-root.pub', [], $root ); 1 },
+		'a key set that is no array reference dies' );
+	like( $@, qr/keys must be an array reference/, 'and the reason says so' );
 };
 
 subtest 'keys_file holds each OpenPGP key in order' => sub {

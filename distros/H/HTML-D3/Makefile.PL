@@ -20,28 +20,38 @@ WriteMakefile(
 		? ('LICENSE'=> 'gpl_2')
 		: ()),
 	META_MERGE => {
+		optional_features => {
+			html_testing => {
+				description => 'Test the HTML output',
+				prereqs => { runtime => { recommends => { 'Test::HTML::T5' => 0 } } },
+			},
+		},
 		resources => {
 			repository => {
 				type => 'git',
 				url => 'https://github.com/nigelhorne/HTML-D3.git',
 				web => 'https://github.com/nigelhorne/HTML-D3',
-			},
-			bugtracker => {
-				web => 'https://github.com/nigelhorne/HTML-D3/issues',
-			},
+			}, bugtracker => {
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-D3',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-D3',
+				# web => 'https://github.com/nigelhorne/HTML-D3/issues',
+				# url => 'https://github.com/nigelhorne/HTML-D3/issues',
+				mailto => 'bug-HTML-D3@rt.cpan.org'
+			}
 		},
-	},
-	PREREQ_PM => {
+	}, PREREQ_PM => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'JSON::MaybeXS' => 0,	# Required for encoding data to JSON
 		'Object::Configure' => 0.24,
 		'Params::Get' => 0,
 		'Scalar::Util' => 0
+	# }, RECOMMENDED => {
+		# 'Test::HTML::T5' => 0,
 	}, TEST_REQUIRES => {
 		'IPC::System::Simple' => 0,
 		'Readonly' => 0,
 		'Test::DescribeMe' => 0,
-		'Test::HTML::T5' => 0,
+		# 'Test::HTML::T5' => 0,	# Removed because of build failures
 		'Test::Memory::Cycle' => 0,
 		'Test::Mockingbird' => 0.13,
 		'Test::Most' => 0,

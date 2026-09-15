@@ -1,19 +1,23 @@
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More;
+use File::Temp qw(tempdir);
 use XS::Log qw(:all);
 
-cmp_ok($XS::Log::VERSION, ">","1.00","Version $XS::Log::VERSION");
-printText("\n-------------------原文输出，测试开始--------------\n");
-printInf("This is info\n");
-printWarn("This is warning\n");
-printErr("This is error\n");
-
-my $user = "Alice";
-my $val  = 42;
-
-printInf("Hello %s, value=%d\n", $user, $val);
-printErr("File not found: %s\n", "/tmp/test.txt");
-printText("-------------------原文输出，测试结束--------------\n");
-
-__END__
+ok($XS::Log::VERSION >= 1.14, "version $XS::Log::VERSION");
+my $dir = tempdir(CLEANUP => 1);
+my $file = "$dir/test.log";
+ok(openLog($file, { level=>LOG_LEVEL_DEBUG, targets=>LOG_TARGET_FILE, flush_immediately=>1, show_timestamp=>0, show_log_level=>0, show_file_info=>0 }), 'openLog');
+printLog("text\n");
+printInf("info %s\n", 'ok');
+printWarn("warn\n");
+printErr("err\n");
+printBug("debug\n");
+printNote("trace\n");
+flushLog(); closeLog();
+ok(-f $file, 'log file exists');
+open my $fh, '<', $file or die $!;
+my $content = do { local $/; <$fh> };
+close $fh;
+ok(length($content) > 0, 'log file readable');
+done_testing;

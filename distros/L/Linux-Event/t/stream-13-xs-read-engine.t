@@ -11,7 +11,7 @@ use Linux::Event::IO::Sock::Stream;
 {
     package T::SmallReadStream;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return read_size => 4 }
+    sub stream_tuning ($class) { return read_size => 4 }
     sub on_data ($stream, $bytes) {
         my $state = $stream->data;
         $state->{got} .= $bytes;

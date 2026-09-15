@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::LicenseProvider 6.038;
+package Dist::Zilla::Role::LicenseProvider 6.039;
 # ABSTRACT: something that provides a license for the dist
 
 use Moose::Role;
@@ -25,6 +25,10 @@ use Dist::Zilla::Pragmas;
 #pod Plugins are responsible for injecting C<$copyright_holder> and
 #pod C<$copyright_year> arguments into the license if these arguments are defined.
 #pod
+#pod Note that C<$copyright_year> may not be a single integer.  The user might have
+#pod configured a range like C<2008 - 2012>, and any C<$this_year> token in the
+#pod configured year has already been replaced with the current year.
+#pod
 #pod =cut
 
 requires 'provide_license';
@@ -44,7 +48,7 @@ Dist::Zilla::Role::LicenseProvider - something that provides a license for the d
 
 =head1 VERSION
 
-version 6.038
+version 6.039
 
 =head1 DESCRIPTION
 
@@ -77,6 +81,10 @@ L<Software::License>.
 
 Plugins are responsible for injecting C<$copyright_holder> and
 C<$copyright_year> arguments into the license if these arguments are defined.
+
+Note that C<$copyright_year> may not be a single integer.  The user might have
+configured a range like C<2008 - 2012>, and any C<$this_year> token in the
+configured year has already been replaced with the current year.
 
 =head1 AUTHOR
 

@@ -102,6 +102,60 @@ my %LEDGER = (
 	'bar: data label in JSON'                          => 1,
 	'bar: d3.scaleBand present'                        => 1,
 
+	# render_animated_bar_chart
+	'anim-bar: die data not optional'                  => 1,
+	'anim-bar: die non-array (string)'                 => 1,
+	'anim-bar: die non-array (hashref)'                => 1,
+	'anim-bar: returns string'                         => 1,
+	'anim-bar: DOCTYPE present'                        => 1,
+	'anim-bar: D3 CDN loaded'                          => 1,
+	'anim-bar: SVG element present'                    => 1,
+	'anim-bar: d3.scaleBand present'                   => 1,
+	'anim-bar: transition present'                     => 1,
+	'anim-bar: stagger delay present'                  => 1,
+
+	# render_pie_chart
+	'pie: die data not optional'                       => 1,
+	'pie: die non-array (string)'                      => 1,
+	'pie: die non-array (hashref)'                     => 1,
+	'pie: returns string'                              => 1,
+	'pie: DOCTYPE present'                             => 1,
+	'pie: D3 CDN loaded'                               => 1,
+	'pie: SVG element present'                         => 1,
+	'pie: d3.pie present'                              => 1,
+	'pie: d3.schemeCategory10 present'                 => 1,
+
+	# render_animated_pie_chart
+	'anim-pie: die data not optional'                  => 1,
+	'anim-pie: die non-array'                          => 1,
+	'anim-pie: returns string'                         => 1,
+	'anim-pie: DOCTYPE present'                        => 1,
+	'anim-pie: D3 CDN loaded'                          => 1,
+	'anim-pie: SVG element present'                    => 1,
+	'anim-pie: attrTween present'                      => 1,
+	'anim-pie: d3.interpolate present'                 => 1,
+	'anim-pie: labels fade in with opacity'            => 1,
+
+	# render_pie_chart_snippet
+	'pie-snip: die non-array'                          => 1,
+	'pie-snip: returns hashref'                        => 1,
+	'pie-snip: svg_id is chart'                        => 1,
+	'pie-snip: html is string'                         => 1,
+	'pie-snip: no DOCTYPE'                             => 1,
+	'pie-snip: no html wrapper'                        => 1,
+	'pie-snip: SVG element present'                    => 1,
+	'pie-snip: d3.pie present'                         => 1,
+
+	# render_animated_line_chart
+	'anim-line: die non-array'                         => 1,
+	'anim-line: returns string'                        => 1,
+	'anim-line: DOCTYPE present'                       => 1,
+	'anim-line: D3 CDN loaded'                         => 1,
+	'anim-line: SVG element present'                   => 1,
+	'anim-line: d3.easeLinear present'                 => 1,
+	'anim-line: stroke-dashoffset present'             => 1,
+	'anim-line: circles fade in with opacity'          => 1,
+
 	# render_line_chart
 	'line: die non-array'                              => 1,
 	'line: returns string'                             => 1,
@@ -332,6 +386,250 @@ subtest 'render_bar_chart() -- output content' => sub {
 	mark('bar: d3.scaleBand present');
 
 	diag('render_bar_chart output length: ' . length($html)) if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_animated_bar_chart()
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_animated_bar_chart() -- validation errors' => sub {
+	my $chart = HTML::D3->new();
+
+	throws_ok(
+		sub { $chart->render_animated_bar_chart(undef) },
+		qr/\Q$ERR_NOT_OPTIONAL\E/,
+		'undef data dies with "Data is not optional"',
+	);
+	mark('anim-bar: die data not optional');
+
+	throws_ok(
+		sub { $chart->render_animated_bar_chart('a string') },
+		qr/\Q$ERR_ARRAY_OF_ARRAY\E/,
+		'string data dies with "Data must be an array of arrays"',
+	);
+	mark('anim-bar: die non-array (string)');
+
+	throws_ok(
+		sub { $chart->render_animated_bar_chart({ key => 'val' }) },
+		qr/\Q$ERR_ARRAY_OF_ARRAY\E/,
+		'hashref data dies with "Data must be an array of arrays"',
+	);
+	mark('anim-bar: die non-array (hashref)');
+};
+
+subtest 'render_animated_bar_chart() -- output content' => sub {
+	my $chart = HTML::D3->new(width => 800, height => 600, title => 'Anim Bar');
+	my $html  = $chart->render_animated_bar_chart(\@SIMPLE_DATA);
+
+	returns_ok($html, { type => 'string' }, 'return value is a plain string scalar');
+	mark('anim-bar: returns string');
+
+	like($html, qr/<!DOCTYPE html>/i, 'HTML5 DOCTYPE present');
+	mark('anim-bar: DOCTYPE present');
+
+	like($html, qr/\Q$D3_CDN\E/, 'D3 CDN URL present');
+	mark('anim-bar: D3 CDN loaded');
+
+	like($html, qr/<svg id="$SVG_ID"/, 'SVG element present');
+	mark('anim-bar: SVG element present');
+
+	like($html, qr/d3\.scaleBand/, 'uses d3.scaleBand for x-axis');
+	mark('anim-bar: d3.scaleBand present');
+
+	like($html, qr/\.transition\(\)/, 'D3 transition() present for animation');
+	mark('anim-bar: transition present');
+
+	like($html, qr/\.delay\(/, 'per-bar stagger delay present');
+	mark('anim-bar: stagger delay present');
+
+	diag('render_animated_bar_chart output length: ' . length($html)) if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_pie_chart()
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_pie_chart() -- validation errors' => sub {
+	my $chart = HTML::D3->new();
+
+	throws_ok(
+		sub { $chart->render_pie_chart(undef) },
+		qr/\Q$ERR_NOT_OPTIONAL\E/,
+		'undef data dies with "Data is not optional"',
+	);
+	mark('pie: die data not optional');
+
+	throws_ok(
+		sub { $chart->render_pie_chart('a string') },
+		qr/\Q$ERR_ARRAY_OF_ARRAY\E/,
+		'string data dies with "Data must be an array of arrays"',
+	);
+	mark('pie: die non-array (string)');
+
+	throws_ok(
+		sub { $chart->render_pie_chart({ key => 'val' }) },
+		qr/\Q$ERR_ARRAY_OF_ARRAY\E/,
+		'hashref data dies with "Data must be an array of arrays"',
+	);
+	mark('pie: die non-array (hashref)');
+};
+
+subtest 'render_pie_chart() -- output content' => sub {
+	my $chart = HTML::D3->new(width => 800, height => 600, title => 'Pie Test');
+	my $html  = $chart->render_pie_chart(\@SIMPLE_DATA);
+
+	returns_ok($html, { type => 'string' }, 'return value is a plain string scalar');
+	mark('pie: returns string');
+
+	like($html, qr/<!DOCTYPE html>/i, 'HTML5 DOCTYPE present');
+	mark('pie: DOCTYPE present');
+
+	like($html, qr/\Q$D3_CDN\E/, 'D3 CDN URL present');
+	mark('pie: D3 CDN loaded');
+
+	like($html, qr/<svg id="$SVG_ID"/, 'SVG element present');
+	mark('pie: SVG element present');
+
+	like($html, qr/d3\.pie\(\)/, 'd3.pie() generator present');
+	mark('pie: d3.pie present');
+
+	like($html, qr/d3\.schemeCategory10/, 'd3.schemeCategory10 colour scheme present');
+	mark('pie: d3.schemeCategory10 present');
+
+	diag('render_pie_chart output length: ' . length($html)) if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_animated_pie_chart()
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_animated_pie_chart() -- validation errors' => sub {
+	my $chart = HTML::D3->new();
+
+	throws_ok(
+		sub { $chart->render_animated_pie_chart(undef) },
+		qr/\Q$ERR_NOT_OPTIONAL\E/,
+		'undef data dies with "Data is not optional"',
+	);
+	mark('anim-pie: die data not optional');
+
+	throws_ok(
+		sub { $chart->render_animated_pie_chart('bad') },
+		qr/\Q$ERR_ARRAY_OF_ARRAY\E/,
+		'non-array data dies',
+	);
+	mark('anim-pie: die non-array');
+};
+
+subtest 'render_animated_pie_chart() -- output content' => sub {
+	my $chart = HTML::D3->new(width => 800, height => 600, title => 'Anim Pie');
+	my $html  = $chart->render_animated_pie_chart(\@SIMPLE_DATA);
+
+	returns_ok($html, { type => 'string' }, 'return value is a plain string scalar');
+	mark('anim-pie: returns string');
+
+	like($html, qr/<!DOCTYPE html>/i, 'HTML5 DOCTYPE present');
+	mark('anim-pie: DOCTYPE present');
+
+	like($html, qr/\Q$D3_CDN\E/, 'D3 CDN URL present');
+	mark('anim-pie: D3 CDN loaded');
+
+	like($html, qr/<svg id="$SVG_ID"/, 'SVG element present');
+	mark('anim-pie: SVG element present');
+
+	like($html, qr/attrTween/, 'attrTween animation present');
+	mark('anim-pie: attrTween present');
+
+	like($html, qr/d3\.interpolate/, 'd3.interpolate used for slice tween');
+	mark('anim-pie: d3.interpolate present');
+
+	like($html, qr/\.attr\("opacity",\s*0\)/, 'labels start at opacity 0 for fade-in');
+	mark('anim-pie: labels fade in with opacity');
+
+	diag('render_animated_pie_chart output length: ' . length($html)) if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_pie_chart_snippet()
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_pie_chart_snippet() -- validation errors' => sub {
+	throws_ok(
+		sub { HTML::D3->new()->render_pie_chart_snippet('bad') },
+		qr/\Q$ERR_ARRAY_OF_ARRAY\E/,
+		'non-array data dies',
+	);
+	mark('pie-snip: die non-array');
+};
+
+subtest 'render_pie_chart_snippet() -- return structure' => sub {
+	my $fragment = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA);
+
+	returns_ok($fragment, { type => 'hashref' }, 'return value is a hashref');
+	mark('pie-snip: returns hashref');
+
+	is($fragment->{svg_id}, 'chart', 'svg_id is "chart"');
+	mark('pie-snip: svg_id is chart');
+
+	returns_ok($fragment->{html}, { type => 'string' }, 'html value is a string');
+	mark('pie-snip: html is string');
+};
+
+subtest 'render_pie_chart_snippet() -- page-shell absent' => sub {
+	my $html = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA)->{html};
+
+	unlike($html, qr/<!DOCTYPE/i, 'no DOCTYPE in fragment');
+	mark('pie-snip: no DOCTYPE');
+
+	unlike($html, qr/<html/i, 'no <html> element in fragment');
+	mark('pie-snip: no html wrapper');
+
+	like($html, qr/<svg id="$SVG_ID"/, 'SVG element present in fragment');
+	mark('pie-snip: SVG element present');
+
+	like($html, qr/d3\.pie\(\)/, 'd3.pie() present in fragment');
+	mark('pie-snip: d3.pie present');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_animated_line_chart()
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_animated_line_chart() -- validation errors' => sub {
+	throws_ok(
+		sub { HTML::D3->new()->render_animated_line_chart('bad') },
+		qr/\Q$ERR_ARRAY_OF_ARRAY\E/,
+		'non-array data dies',
+	);
+	mark('anim-line: die non-array');
+};
+
+subtest 'render_animated_line_chart() -- output content' => sub {
+	my $chart = HTML::D3->new(width => 800, height => 600, title => 'Anim Line');
+	my $html  = $chart->render_animated_line_chart(\@SIMPLE_DATA);
+
+	returns_ok($html, { type => 'string' }, 'return value is a plain string scalar');
+	mark('anim-line: returns string');
+
+	like($html, qr/<!DOCTYPE html>/i, 'HTML5 DOCTYPE present');
+	mark('anim-line: DOCTYPE present');
+
+	like($html, qr/\Q$D3_CDN\E/, 'D3 CDN URL present');
+	mark('anim-line: D3 CDN loaded');
+
+	like($html, qr/<svg id="$SVG_ID"/, 'SVG element present');
+	mark('anim-line: SVG element present');
+
+	like($html, qr/d3\.easeLinear/, 'd3.easeLinear easing present');
+	mark('anim-line: d3.easeLinear present');
+
+	like($html, qr/stroke-dashoffset/, 'stroke-dashoffset animation present');
+	mark('anim-line: stroke-dashoffset present');
+
+	like($html, qr/\.attr\("opacity",\s*0\)/, 'circles start with opacity 0');
+	mark('anim-line: circles fade in with opacity');
+
+	diag('render_animated_line_chart output length: ' . length($html)) if $ENV{TEST_VERBOSE};
 };
 
 # ─────────────────────────────────────────────────────────────────────────────

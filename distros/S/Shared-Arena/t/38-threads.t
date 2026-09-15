@@ -50,7 +50,8 @@ is(scalar $cache->get('t'), 'from the thread', 'including what the thread wrote'
 
 for my $class (map { "Shared::Arena$_" } '', qw(
     ::Ring ::Ring::Cursor ::Ring::Group ::Map ::Bloom ::Histogram ::Cache
-    ::Rate ::CountMin ::Frozen ::Frozen::View ::Cuckoo ::Lease ::Scoreboard))
+    ::Rate ::CountMin ::Frozen ::Frozen::View ::Cuckoo ::Lease ::Scoreboard
+    ::HyperLogLog))
 {
     ok($class->can('CLONE_SKIP') && $class->CLONE_SKIP,
        "$class is not cloned into a new thread");

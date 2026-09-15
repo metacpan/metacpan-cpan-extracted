@@ -40,42 +40,42 @@ ok(!Linux::Event::IO::Sock::Listener->can('cancel'),
     'Listener has one close operation and no compatibility alias');
 
 like(exception(sub { Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'T::ListenerProbeStream', loop => $loop,
+    stream => { class => 'T::ListenerProbeStream' }, loop => $loop,
 ) }),
     qr/exactly one socket source/, 'one socket source is required');
 like(exception(sub {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::ListenerProbeStream',
+        stream => { class => 'T::ListenerProbeStream' },
         loop => $loop, host => '127.0.0.1', port => 0, unix => '/unused',
     );
 }), qr/exactly one socket source/, 'mixed socket sources are rejected');
 like(exception(sub {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::ListenerProbeStream',
+        stream => { class => 'T::ListenerProbeStream' },
         loop => $loop, host => '127.0.0.1',
     );
 }), qr/port must be an integer/, 'TCP source requires a port');
 like(exception(sub {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::ListenerProbeStream',
+        stream => { class => 'T::ListenerProbeStream' },
         loop => $loop, host => "127.0.0.1\0.invalid", port => 0,
     );
 }), qr/without NUL bytes/, 'host containing a NUL byte is rejected');
 like(exception(sub {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::ListenerProbeStream',
+        stream => { class => 'T::ListenerProbeStream' },
         loop => $loop, unix => "/tmp/linux-event\0.sock",
     );
 }), qr/without NUL bytes/, 'Unix path containing a NUL byte is rejected');
 like(exception(sub {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::ListenerProbeStream',
+        stream => { class => 'T::ListenerProbeStream' },
         loop => $loop, host => '127.0.0.1', port => 70_000,
     );
 }), qr/port must be at most 65535/, 'out-of-range port is rejected');
 like(exception(sub {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::ListenerProbeStream',
+        stream => { class => 'T::ListenerProbeStream' },
         loop => $loop, host => '127.0.0.1', port => 0,
         edge_triggered => 1, max_accept_per_tick => 1,
     );
@@ -83,13 +83,13 @@ like(exception(sub {
     'bounded accept drain cannot be edge-triggered');
 like(exception(sub {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::ListenerProbeStream',
+        stream => { class => 'T::ListenerProbeStream' },
         loop => $loop, host => '127.0.0.1', port => 0, surprise => 1,
     );
 }), qr/unknown options: surprise/, 'unknown options are rejected');
 like(exception(sub {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::ListenerProbeStream',
+        stream => { class => 'T::ListenerProbeStream' },
         loop => $loop, host => '127.0.0.1', port => 0, permissions => 0600,
     );
 }), qr/options not valid.*permissions/,
@@ -97,7 +97,7 @@ like(exception(sub {
 
 my $v6only_error = eval {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::ListenerProbeStream',
+        stream => { class => 'T::ListenerProbeStream' },
         host         => '127.0.0.1',
         port         => 0,
         v6only       => 1,
@@ -129,7 +129,7 @@ is("$error", 'accept: Too many open files (errno=24)',
     'Error stringifies with operation and errno');
 
 my $fatal_listener = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'T::ListenerProbeStream',
+    stream => { class => 'T::ListenerProbeStream' },
     host => '127.0.0.1', port => 0,
 );
 like(exception(sub { $fatal_listener->on_error($error) }),
@@ -140,7 +140,7 @@ is($STREAM_LISTENER_ERROR_CALLED, undef,
 $fatal_listener->close;
 
 my $recovering = T::RecoveringListener->new(
-    stream_class => 'T::ListenerProbeStream',
+    stream => { class => 'T::ListenerProbeStream' },
     host => '127.0.0.1', port => 0,
 );
 $recovering->on_error($error);
@@ -156,7 +156,7 @@ $recovering->close;
 }
 
 my $retry_listener = T::RecoveringListener->new(
-    stream_class => 'T::ListenerProbeStream',
+    stream => { class => 'T::ListenerProbeStream' },
     host         => '127.0.0.1',
     port         => 0,
 );

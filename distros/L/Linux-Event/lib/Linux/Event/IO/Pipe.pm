@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.112';
+our $VERSION = '0.114';
 
 use parent 'Linux::Event::_ByteStream';
 use Carp qw(croak);
@@ -81,11 +81,11 @@ one-way pipe combinations.
 
 Constructor callbacks let one Pipe capture lexical application state. A
 subclass becomes more valuable when many pipes share protocol policy: it can
-declare a native L<Linux::Event::Framer>, centralize C<stream_options> tuning,
+declare a native L<Linux::Event::Framer>, centralize C<stream_tuning> tuning,
 and provide named callbacks. For example, the Synopsis deliberately combines a
 delimiter-framing subclass with a lexical C<on_message> closure.
 
-C<stream_options> controls read size and fairness, callback batching, buffer
+C<stream_tuning> controls read size and fairness, callback batching, buffer
 and output limits, watermarks, and established deadlines. Framer and tuning
 policy are validated and cached once per subclass. Constructor callbacks
 override same-named methods for one Pipe and are cached once per object, so the
@@ -94,15 +94,15 @@ hot input path does not perform method lookup or callback-style selection.
 TLS does not apply to Pipe; TLS transport policy is specific to
 L<Linux::Event::IO::Sock::Stream>.
 
-=head2 stream_options
+=head2 stream_tuning
 
-Define C<stream_options> as a class method on the Pipe subclass. It returns
+Define C<stream_tuning> as a class method on the Pipe subclass. It returns
 key/value pairs, or one hash reference:
 
   package BulkPipe;
   use parent 'Linux::Event::IO::Pipe';
 
-  sub stream_options ($class) {
+  sub stream_tuning ($class) {
       return (
           read_size         => 131_072,
           read_budget_bytes => 524_288,
@@ -234,7 +234,7 @@ terminal ownership transfer and does not invoke C<on_close>.
 
 =head1 CLASS POLICY
 
-Subclasses may define C<stream_options> for the shared ordered-byte engine.
+Subclasses may define C<stream_tuning> for the shared ordered-byte engine.
 The complete option contract appears near the top of this document. These
 values are cached once per concrete subclass rather than parsed per instance.
 

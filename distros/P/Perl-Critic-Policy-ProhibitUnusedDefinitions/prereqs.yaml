@@ -1,0 +1,20 @@
+---
+runtime:
+  requires:
+    perl: '5.014'
+    Perl::Critic: '1.140'
+    Perl::Critic::Utils: '0'
+    PPI: '0'
+    Readonly: '0'
+    Cwd: '0'
+    File::Spec: '0'
+    Scalar::Util: '0'
+test:
+  requires:
+    Test::More: '0'
+    Test::NoWarnings: '0'
+    File::Temp: '0'
+    File::Path: '0'
+    File::Basename: '0'
+    FindBin::libs: '0'
+    Test::MockModule: '0'

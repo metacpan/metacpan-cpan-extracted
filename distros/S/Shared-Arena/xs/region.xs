@@ -136,6 +136,7 @@ CLONE_SKIP(...)
         Shared::Arena::Cuckoo::CLONE_SKIP       = 12
         Shared::Arena::Lease::CLONE_SKIP        = 13
         Shared::Arena::Scoreboard::CLONE_SKIP   = 14
+        Shared::Arena::HyperLogLog::CLONE_SKIP  = 15
     CODE:
         PERL_UNUSED_VAR(ix);
         RETVAL = 1;

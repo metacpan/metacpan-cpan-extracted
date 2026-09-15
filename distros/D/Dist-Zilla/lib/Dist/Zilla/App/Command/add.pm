@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::add 6.038;
+package Dist::Zilla::App::Command::add 6.039;
 # ABSTRACT: add a module to a dist
 
 use Dist::Zilla::Pragmas;
@@ -100,7 +100,7 @@ Dist::Zilla::App::Command::add - add a module to a dist
 
 =head1 VERSION
 
-version 6.038
+version 6.039
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,29 @@
 Revision history for Perl module Text::PO
 
+v1.0.2 2026-09-14T15:28:30+0900
+    - Fixed parser bug where duplicate msgids skipped via includes leaked their state
+      (msgid, msgstr, flags, reference) into the next block. With multi-line continuation
+      lines, this could produce fused msgids spanning two PO entries, or attach a leaked
+      msgstr to an unrelated msgid.
+    - Setters for msgid, msgstr, msgid_plural and msgctxt now always reset the field on
+      an empty quoted form (such as msgid "" / msgstr ""), even when the quoted content
+      is empty, instead of leaving any prior value in place. This is a defence-in-depth
+      fix that complements the boundary reset above.
+      Side effect: empty msgstr values now serialise as "" in JSON output instead of null.
+      Both forms are falsy in JavaScript, so consumers of as_json output are unaffected.
+    - Fixed a latent bug in the meta header processing, exposed by the fix above. The
+      block that parses the meta headers ran whenever the element list held a single
+      entry, on the assumption that a lone element was always the meta block. This is
+      not always true: when an include brings exactly one entry and the main file's
+      first own entry is a duplicate that gets skipped, the lone element is a genuine
+      entry whose msgstr is a plain scalar, and dereferencing it as an array reference
+      died under strict refs. The block now runs only when the element actually looks
+      like the meta block, that is an empty msgid whose msgstr is the array of header
+      lines.
+    - Added t/006_dup_include_leak.t regression test covering both the msgstr leak and
+      the msgid fusion scenarios.
+    - Corrected dngettext() to return a Text::PO::String instance by default too.
+
 v1.0.1 2026-04-28T11:01:58+0900
     - Updated dependencies
 

@@ -1,10 +1,10 @@
-package Pod::Weaver::Role::Plugin 4.021;
+package Pod::Weaver::Role::Plugin 4.022;
 # ABSTRACT: a Pod::Weaver plugin
 
 use Moose::Role;
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -71,7 +71,7 @@ Pod::Weaver::Role::Plugin - a Pod::Weaver plugin
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 PERL VERSION
 

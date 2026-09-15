@@ -7,16 +7,29 @@ use ForgeOps::Tracker::PiiScrubber qw(scrub scrub_string);
 
 my $MAX_FRAMES = 500;
 
+# How many lines of source to grab on either side of the culprit line (see
+# _attach_source_context), and the longest a single captured line is allowed to be before getting
+# truncated: guards against a single pathological minified/generated line ballooning the
+# payload. ForgeOps itself re-truncates on arrival too, the same "don't just trust the SDK"
+# posture $MAX_FRAMES already gets on the server side.
+my $CONTEXT_LINES = 5;
+my $MAX_CONTEXT_LINE_LENGTH = 500;
+
+# Identifies this client to the server's auto language-detection on the project the event lands
+# in (see Project#note_sdk_platform server-side); matches this repo's own sdks/perl directory
+# name, the same convention every other language's client follows.
+my $SDK_NAME = 'perl';
+
 sub new {
     my ($class, $configuration) = @_;
     return bless { configuration => $configuration }, $class;
 }
 
-# build($error, \%context) -- $error can be:
+# build($error, \%context): $error can be:
 #   - a blessed exception object exposing ->message (or overloaded stringification) and,
 #     optionally, ->trace returning a Devel::StackTrace-compatible object (frames() ->
-#     filename/line/subroutine) -- e.g. Throwable::Error, Moo::Exception-based classes.
-#   - a plain scalar, typically $@ after `die "..."` or `Carp::confess "..."` -- Perl appends
+#     filename/line/subroutine): e.g. Throwable::Error, Moo::Exception-based classes.
+#   - a plain scalar, typically $@ after `die "..."` or `Carp::confess "..."`: Perl appends
 #     " at FILE line N." to any die message that doesn't already end in "\n", and Carp::confess
 #     appends a full "\tPACKAGE::sub(...) called at FILE line N" chain on top of that; both are
 #     parsed below into real backtrace frames rather than left as one opaque string, verified
@@ -39,6 +52,7 @@ sub build {
         server_name     => $config->{server_name},
         context         => { %$context },
         tags            => {},
+        sdk_name        => $SDK_NAME,
     );
 
     return $config->{scrub_pii} ? $self->_scrub_payload(\%payload) : \%payload;
@@ -78,7 +92,7 @@ sub _parse_die_text {
 
     my @frames;
     my $message = shift @lines;
-    # "MESSAGE at FILE line N." -- what Perl itself appends to any die string not already ending
+    # "MESSAGE at FILE line N.": what Perl itself appends to any die string not already ending
     # in "\n", and the first line Carp::confess/croak produce too.
     if ($message =~ s/\s+at\s+(\S+)\s+line\s+(\d+)\.\s*$//) {
         push @frames, $self->_frame($1, $2, undef);
@@ -97,12 +111,13 @@ sub _parse_die_text {
 
 sub _frame {
     my ($self, $file, $line, $method) = @_;
-    return {
+    my $frame = {
         file   => $file,
         line   => defined($line) ? $line + 0 : undef,
         method => $method,
         in_app => $self->_in_app($file),
     };
+    return $self->_attach_source_context($frame);
 }
 
 sub _in_app {
@@ -115,6 +130,54 @@ sub _in_app {
     return $file !~ m{/(?:local|vendor)/lib/perl5/};
 }
 
+# Reads a few lines of source straight off disk around the culprit line, at die/confess-time, in
+# the same running process the error came from. Gated on two things: the frame has to be in_app
+# (never a vendored/system library: there'd be nothing meaningful to show, and it's not the host
+# app's own code to begin with), and configuration's capture_source_context has to be true (see
+# Configuration for why it defaults to true and why ForgeOps' own per-project setting, not this
+# flag, is the durable, protected way to turn it off). Best-effort: any file that can't be opened
+# (deleted, permission denied, a path that only ever existed inside a build step and isn't present
+# in this deployment) just means this one frame gets no source context, never a die of its own.
+sub _attach_source_context {
+    my ($self, $frame) = @_;
+    return $frame unless $self->{configuration}{capture_source_context} && $frame->{in_app};
+
+    my $lines = $self->_read_source_lines($frame->{file});
+    return $frame unless $lines;
+
+    my $index = $frame->{line} - 1;
+    return $frame unless $index >= 0 && $index <= $#$lines;
+
+    my $from = $index - $CONTEXT_LINES;
+    $from = 0 if $from < 0;
+    my $to = $index + $CONTEXT_LINES;
+    $to = $#$lines if $to > $#$lines;
+
+    $frame->{context_line} = _truncate_line($lines->[$index]);
+    $frame->{pre_context}  = [ map { _truncate_line($_) } @{$lines}[$from .. $index - 1] ];
+    $frame->{post_context} = [ map { _truncate_line($_) } @{$lines}[$index + 1 .. $to] ];
+
+    return $frame;
+}
+
+# Isolated into its own method (rather than inlined into _attach_source_context) so tests can
+# monkeypatch it to prove no read is ever attempted when capture_source_context is off.
+sub _read_source_lines {
+    my ($self, $file) = @_;
+    return undef unless defined $file && length $file;
+    open(my $fh, '<', $file) or return undef;
+    my @lines = <$fh>;
+    close $fh;
+    chomp @lines;
+    return \@lines;
+}
+
+sub _truncate_line {
+    my ($line) = @_;
+    return $line if length($line) <= $MAX_CONTEXT_LINE_LENGTH;
+    return substr($line, 0, $MAX_CONTEXT_LINE_LENGTH) . '...';
+}
+
 sub _scrub_payload {
     my ($self, $payload) = @_;
     my %scrubbed = %$payload;
@@ -124,6 +187,11 @@ sub _scrub_payload {
             my %frame = %$_;
             $frame{file}   = scrub_string($frame{file})   if defined $frame{file};
             $frame{method} = scrub_string($frame{method}) if defined $frame{method};
+            if (exists $frame{context_line}) {
+                $frame{context_line} = scrub_string($frame{context_line});
+                $frame{pre_context}  = [ map { scrub_string($_) } @{ $frame{pre_context} } ];
+                $frame{post_context} = [ map { scrub_string($_) } @{ $frame{post_context} } ];
+            }
             \%frame;
         } @{ $payload->{backtrace} }
     ];

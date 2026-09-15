@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "gpl_2"
    ],
@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Database::Abstraction" : "0.37",
+            "Database::Abstraction" : "0.41",
             "List::Util" : "1.33",
             "Object::Configure" : "0",
             "Params::Get" : "0.13",
@@ -52,6 +52,7 @@
             "DBI" : "0",
             "File::Temp" : "0",
             "IPC::System::Simple" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Exception" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0.13",
@@ -76,6 +77,6 @@
          "web" : "https://github.com/nigelhorne/Database-Join"
       }
    },
-   "version" : "v0.001.1",
+   "version" : "v0.003.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

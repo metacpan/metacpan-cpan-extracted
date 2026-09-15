@@ -12,21 +12,30 @@ Write [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vector_Gra
 
     my $s = Svg::Simple::new();
 
-    $s->text(x=>10, y=>10,
-      cdata             =>"Hello World",
-      text_anchor       =>"middle",
-      alignment_baseline=>"middle",
-      font_size         => 3.6,
-      font_family       =>"Arial",
-      fill              =>"black");
+    $s->g(id=>"g1", sub=>sub
+     {$s->text(x=>10, y=>10,
+        cdata             =>"Hello World",
+        text_anchor       =>"middle",
+        alignment_baseline=>"middle",
+        font_size         => 3.6,
+        font_family       =>"Arial",
+        fill              =>"black");
 
-    $s->circle(cx=>10, cy=>10, r=>8, stroke=>"blue", fill=>"transparent", opacity=>0.5);
-
+      $s->circle(cx=>10, cy=>10, r=>8, stroke=>"blue", fill=>"transparent", opacity=>0.5);
+     });
     say STDERR $s->print;
 
 <div>
     <img src="https://raw.githubusercontent.com/philiprbrenan/SvgSimple/main/lib/Svg/svg/test.svg">
 </div>
+
+A **-** in an [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics)
+keyword can be replaced with **\_** to reduce line noise.
+
+A **cdata=**"text"> keyword value pair will placed the text inside an open and closing pair of tags.
+
+A **sub=\\**sub{}> keyword value pair will create an open tag, call the supplied sub and then create a close tag to
+bracket svg statements together,
 
 A **-** in an [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics)
 keyword can be replaced with **\_** to reduce line noise.
@@ -50,18 +59,13 @@ whatever space the browser allocates to the
 If you wish to set these dimensions yourself, call the [print](https://metacpan.org/pod/print) method with
 overriding values as in:
 
-    say STDERR $s->print(width=>2000, height=>1000);
-
-If you wish to inline the generated [html](https://en.wikipedia.org/wiki/HTML)
-you should remove the first two lines of the generated code using a regular
-expression to remove the superfluous [xml](https://en.wikipedia.org/wiki/XML)
-headers.
+    say STDERR $s->print(x=>-100, y=>-100, width=>2000, height=>1000);
 
 # Description
 
 Write [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) using Perl syntax.
 
-Version 20231118.
+Version 20240308.
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see [Index](#index).
@@ -79,11 +83,11 @@ Create a new [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vec
 
 **Example:**
 
-    if (1)                                                                          
-    
+    if (1)
+
      {my $s = Svg::Simple::new();  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    
+
       $s->text(x=>10, y=>10,
         cdata             =>"Hello World",
         text_anchor       =>"middle",
@@ -91,14 +95,13 @@ Create a new [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vec
         font_size         => 3.6,
         font_family       =>"Arial",
         fill              =>"black");
-    
+
       $s->circle(cx=>10, cy=>10, r=>8, stroke=>"blue", fill=>"transparent", opacity=>0.5);
-    
+
       my $t = $s->print(svg=>q(svg/new));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
       ok($t =~ m(circle));
      }
-    
 
 <div>
     <img src="https://raw.githubusercontent.com/philiprbrenan/SvgSimple/main/lib/Svg/svg/new.svg">
@@ -116,13 +119,12 @@ Draw a grid.
 
 **Example:**
 
-    if (1)                                                                          
+    if (1)
      {my $s = Svg::Simple::new(grid=>10);
       $s->rect(x=>10, y=>10, width=>40, height=>30, stroke=>"blue", fill=>'transparent');
       my $t = $s->print(svg=>q(svg/grid));
       is_deeply(scalar(split /line/, $t), 32);
      }
-    
 
 <div>
     <img src="https://raw.githubusercontent.com/philiprbrenan/SvgSimple/main/lib/Svg/svg/grid.svg">
@@ -138,21 +140,54 @@ Print resulting [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_
 
 **Example:**
 
-    if (1)                                                                          
+    if (1)
      {my $s = Svg::Simple::new();
-    
+
       my @d = (width=>8, height=>8, stroke=>"blue", fill=>"transparent");           # Default values
       $s->rect(x=>1, y=>1, z=>1, @d, stroke=>"blue");                               # Defined earlier  but drawn above because of z order
       $s->rect(x=>4, y=>4, z=>0, @d, stroke=>"red");
-    
+
       my $t = $s->print(svg=>q(svg/rect));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
       is_deeply(scalar(split /rect/, $t), 3);
      }
-    
 
 <div>
     <img src="https://raw.githubusercontent.com/philiprbrenan/SvgSimple/main/lib/Svg/svg/rect.svg">
+</div>
+
+# Utility functions
+
+Extra features to make using Svg easier
+
+## arcPath ($svg, $N, $x1, $y1, $x2, $y2, $x3, $y3)
+
+Arc through three points along the circumference of a circle from the first point through the middle point to the last point
+
+       Parameter  Description
+    1  $svg       Svg
+    2  $N         Number of points on path
+    3  $x1        Start x
+    4  $y1        Start y
+    5  $x2        Middle x
+    6  $y2        Middle y
+    7  $x3        End x
+    8  $y3        End y
+
+**Example:**
+
+    if (1)
+     {my $d = {width=>8, height=>8, stroke_width=>0.1, stroke=>"blue", fill=>"transparent"};           # Default values
+      my $s = Svg::Simple::new(defaults=>$d);
+
+      my $p = $s->arcPath(64, 1,1, 3,2, 1, 3);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      $s->path(d=>"M 1 1  $p  Z");
+      $s->print(svg=>q(svg/arc1), width=>10, height=>10);
+     }
+
+<div>
+    <img src="https://raw.githubusercontent.com/philiprbrenan/SvgSimple/main/lib/Svg/svg/arc1.svg">
 </div>
 
 # Private Methods
@@ -167,13 +202,15 @@ Print resulting [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_
 
 # Index
 
-1 [AUTOLOAD](#autoload) - [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) methods.
+1 [arcPath](#arcpath) - Arc through three points along the circumference of a circle from the first point through the middle point to the last point
 
-2 [gridLines](#gridlines) - Draw a grid.
+2 [AUTOLOAD](#autoload) - [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) methods.
 
-3 [new](#new) - Create a new [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) object.
+3 [gridLines](#gridlines) - Draw a grid.
 
-4 [print](#print) - Print resulting [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) string.
+4 [new](#new) - Create a new [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) object.
+
+5 [print](#print) - Print resulting [Scalar Vector Graphics](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) string.
 
 # Installation
 
@@ -186,7 +223,7 @@ comprehend, use, modify and install via **cpan**:
 
 [philiprbrenan@gmail.com](mailto:philiprbrenan@gmail.com)
 
-[http://www.appaapps.com](http://www.appaapps.com)
+[http://prb.appaapps.com](http://prb.appaapps.com)
 
 # Copyright
 

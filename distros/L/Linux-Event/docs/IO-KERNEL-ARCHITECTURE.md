@@ -100,12 +100,15 @@ while the backing fd mechanism remains an implementation fact.
 
 ## Private behavior layers
 
-The private roots are:
+The private behavioral inheritance paths are:
 
 ```text
 Linux::Event::_IO
 |-- Linux::Event::_ByteStream
+|   `-- Linux::Event::_Socket::Stream
 `-- Linux::Event::_Socket
+    |-- Linux::Event::_Socket::Listener
+    `-- Linux::Event::_Socket::Dgram
 ```
 
 This is an implementation taxonomy only.
@@ -150,6 +153,14 @@ Shared behavior that exists because a descriptor is a socket:
 - socket options;
 - common ownership/lifecycle support.
 
+Connected stream sockets do not inherit this branch. Their fundamental
+behavior is ordered-byte processing, so `Linux::Event::_Socket::Stream`
+single-inherits `Linux::Event::_ByteStream` and composes the socket descriptor,
+connection, configuration, address, and transport facilities it needs.
+
+Private inheritance represents behavioral specialization rather than every
+conceptual "is a" relationship. Orthogonal capabilities are composed.
+
 Connection acquisition, listen/accept, stream-byte processing, and datagram
 processing stay in their specialized private layers.
 
@@ -169,8 +180,12 @@ Changes to this architecture must preserve these rules:
 2. Socket type and socket address family remain separate axes.
 3. Shared implementation belongs behind private boundaries, not generic public
    base objects.
-4. Public examples, POD, design documents, benchmarks, and diagnostics use the
+4. Behavioral implementation hierarchies use single inheritance; orthogonal
+   facilities use explicit composition.
+5. Public subclasses may own ordinary instance state; the core does not
+   interpret or manage that state.
+6. Public examples, POD, design documents, benchmarks, and diagnostics use the
    IO/Kernel taxonomy.
-5. Private implementation and native ABI names follow the coherent taxonomy.
-6. API changes that can affect hot paths require the full test matrix,
+7. Private implementation and native ABI names follow the coherent taxonomy.
+8. API changes that can affect hot paths require the full test matrix,
    distribution checks, and performance-regression suite.

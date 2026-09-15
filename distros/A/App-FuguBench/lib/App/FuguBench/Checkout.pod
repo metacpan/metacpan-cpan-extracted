@@ -1,0 +1,119 @@
+=head1 NAME
+
+App::FuguBench::Checkout - the checkout walk and the configuration
+reader
+
+=head1 SYNOPSIS
+
+    use App::FuguBench::Checkout;
+    use Fugu::CLI ();
+
+    my $checkout = App::FuguBench::Checkout->new(start => $start)
+        or return Fugu::CLI::EXIT_CONFIG_ERROR();
+
+    my ($dir, $home) = $checkout->config('wiki.dir');
+    $checkout->dir_value($dir) or die $checkout->error;
+
+=head1 DESCRIPTION
+
+B<App::FuguBench::Checkout> finds the checkout of a verb, and reads
+the keys of F<.toolingrc> there.
+
+The walk has two stops. The first stop is the nearest directory with
+a F<.toolingrc>, and that directory is the root. The second stop is
+the nearest F<.toolingrc> on the walk that holds a key. The directory
+of that file is the home of the key.
+
+A verb names the anchor of each relative value. A C<wiki.> value
+anchors at the home of C<wiki.origin>, and C<worktree.base> anchors
+at the root. A clone under F<Projects/> holds its own F<.toolingrc>
+without a C<wiki.origin> key, so the home of C<wiki.origin> is the
+workspace.
+
+=head2 new
+
+C<new(start =E<gt> $dir)> walks up from the start and records each
+directory that holds a F<.toolingrc>, nearest first. The method
+returns C<undef> when the walk reaches the filesystem root with none.
+
+=head2 root
+
+C<root> returns the directory of the first F<.toolingrc> on the walk.
+
+=head2 config
+
+C<config($key)> returns the value of one key and its home, as a
+two-element list. The value comes from the nearest F<.toolingrc> on
+the walk that holds the key, and the home is the directory of that
+file.
+
+A key that no file on the walk holds takes its default, with the root
+as its home. These are the keys and their defaults:
+
+=over 4
+
+=item C<wiki.dir>
+
+The directory of the library clone. The default is F<Wiki>.
+
+=item C<wiki.origin>
+
+The URL of the library repository. It has no default.
+
+=item C<wiki.project>
+
+The project name of a session at the root. The default is the name of
+the root directory.
+
+=item C<wiki.projects>
+
+The directory whose children are project clones. The default is
+F<Projects>.
+
+=item C<worktree.base>
+
+The directory of the worktrees. The default is F<.claude/worktrees>.
+
+=back
+
+A key with no default, and a key outside the table, give the empty
+list. A key outside the table belongs to another tool, and this
+module reads none of them.
+
+A line of F<.toolingrc> holds a key, whitespace, and a value. A line
+that starts with C<#> is a comment.
+
+=head2 dir_value
+
+C<dir_value($value)> is the shape check of a directory value. The
+value must be a relative path with no parent segment. The method
+returns the value, or C<undef> with the reason in C<error>.
+
+=head2 url_value
+
+C<url_value($value)> is the shape check of a URL value. The value
+must hold a scheme and an authority, as C<https://example.org/x>
+does. The method returns the value, or C<undef> with the reason in
+C<error>.
+
+=head2 error
+
+C<error> returns the reason of the last failed shape check, or
+C<undef>.
+
+=head1 RETURN VALUES
+
+C<new> returns a checkout or C<undef>. C<root> returns a directory
+name. C<config> returns a value and a home, or the empty list.
+C<dir_value> and C<url_value> return the value or C<undef>. C<error>
+returns a reason or C<undef>.
+
+=head1 SEE ALSO
+
+L<App::FuguBench>, L<Fugu::File>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

@@ -17,11 +17,11 @@ Database::Abstraction::Query - Fluent, chainable query builder for Database::Abs
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 =head1 SYNOPSIS
 
@@ -370,8 +370,8 @@ sub all
 	# Ensure _open() fires before checking the backend type.
 	$db->_open_table({});
 
-	if($db->{'berkeley'} || ($db->{'type'} // '') eq 'Deep') {
-		my $backend = $db->{'berkeley'} ? 'BerkeleyDB' : 'Deep';
+	if($db->{'berkeley'} || ($db->{'type'} // '') =~ /\A(?:Deep|XLSX)\z/) {
+		my $backend = $db->{'berkeley'} ? 'BerkeleyDB' : ($db->{'type'} // '');
 		croak(ref($db), ": query->all() with JOINs is not supported on $backend")
 			if @{$self->{'_joins'}};
 		my $rows = $db->selectall_arrayref({%{$self->{'_where'}}});
@@ -410,8 +410,8 @@ sub first
 
 	$db->_open_table({});
 
-	if($db->{'berkeley'} || ($db->{'type'} // '') eq 'Deep') {
-		my $backend = $db->{'berkeley'} ? 'BerkeleyDB' : 'Deep';
+	if($db->{'berkeley'} || ($db->{'type'} // '') =~ /\A(?:Deep|XLSX)\z/) {
+		my $backend = $db->{'berkeley'} ? 'BerkeleyDB' : ($db->{'type'} // '');
 		croak(ref($db), ": query->first() with JOINs is not supported on $backend")
 			if @{$self->{'_joins'}};
 		my $rows = $db->selectall_arrayref({%{$self->{'_where'}}});
@@ -452,8 +452,8 @@ sub count
 
 	$db->_open_table({});
 
-	if($db->{'berkeley'} || ($db->{'type'} // '') eq 'Deep') {
-		my $backend = $db->{'berkeley'} ? 'BerkeleyDB' : 'Deep';
+	if($db->{'berkeley'} || ($db->{'type'} // '') =~ /\A(?:Deep|XLSX)\z/) {
+		my $backend = $db->{'berkeley'} ? 'BerkeleyDB' : ($db->{'type'} // '');
 		croak(ref($db), ": query->count() with JOINs is not supported on $backend")
 			if @{$self->{'_joins'}};
 		return $db->count({%{$self->{'_where'}}});

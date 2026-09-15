@@ -2,11 +2,12 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Build v1.0.0 {
+class Alien::Xrepo::Build v1.0.1 {
     use Alien::Xrepo;
     use Alien::Xrepo::Build::Recipe;
     use Path::Tiny;
     use JSON::PP qw[encode_json decode_json];
+    use Config   ();
     #
     my @STAGES = qw[configure probe install gather export test];
     #
@@ -18,8 +19,11 @@ class Alien::Xrepo::Build v1.0.0 {
     field $checkpoint   : param //= undef;     # state file path; enables resume
     field $snapshot     : param //= undef;     # write gathered runtime data as JSON here
     field $export_dir   : param //= undef;     # also xrepo-export each package into this dir
+    field $share_dir    : param //= undef;     # shallow-install packages into <share_dir>/<pkg> (self-contained dist)
     field $probe_policy : param //= 'skip';    # skip|always|off
     field $resume       : param //= 0;
+    field $update_repo  : param //= 0;         # on install failure, `xrepo update-repo` once, then retry once
+
     #
     field $loaded_hooks = {};                  # recipe hook modules already registered
 
@@ -37,7 +41,10 @@ class Alien::Xrepo::Build v1.0.0 {
     method package_defs () { return $recipe->package_defs }
     #
     ADJUST {
-        unless ( ref $recipe ) {
+        if ( ref $recipe eq 'HASH' ) {
+            $recipe = Alien::Xrepo::Build::Recipe->new(%$recipe);
+        }
+        elsif ( !ref $recipe ) {
             $recipe = Alien::Xrepo::Build::Recipe->new( defined $recipe && -d $recipe ? ( dir => $recipe ) : ( file => $recipe ), );
         }
         die "probe_policy must be skip|always|off" unless $probe_policy =~ /^(?:skip|always|off)$/;
@@ -91,7 +98,7 @@ class Alien::Xrepo::Build v1.0.0 {
         my $store;
         eval { $store = $r->_store_dir( installdir => $root ) };
         $store //= $root;
-        $install_prop = { root => $root, profile => \%profile, probed => {}, store => $store, };
+        $install_prop = { root => $root, profile => \%profile, probed => {}, store => $store, share_dir => $share_dir, };
 
         for my $repo_def ( @{ $recipe->local_repos } ) {
             my $dir = path($repo_def)->absolute;
@@ -116,7 +123,9 @@ class Alien::Xrepo::Build v1.0.0 {
                     $install_prop->{probed}{$name} = { version => undef, satisfied => 1, root => $root };
                     next;
                 }
-                my %opts     = $recipe->opts_for( $name, %{ $install_prop->{profile} // {} } );
+                my %opts = $recipe->opts_for( $name, %{ $install_prop->{profile} // {} } );
+                my $inst = $self->_pkg_installdir($name);
+                $opts{installdir} = $inst if defined $inst;
                 my $expected = $recipe->version_for($name);
                 my $found;
                 eval {
@@ -137,25 +146,37 @@ class Alien::Xrepo::Build v1.0.0 {
         $runtime_prop->{packages} ||= {};
         $runtime_prop->{errors}   ||= {};
         my $profile = $install_prop->{profile} // {};
-        for my $name ( $recipe->packages ) {
+        for my $name ( $self->_install_order ) {
             if ( my $root = $self->_pkg_root($name) ) {
                 $runtime_prop->{packages}{$name} = $self->_root_entry($root);
                 say "[xrepo] $name satisfied by " . $recipe->pkg_roots->{$name} . "=$root; skipping install" if $verbose;
                 next;
             }
             my %opts = $recipe->opts_for( $name, %$profile );
+            my $inst = $self->_pkg_installdir($name);
+            $opts{installdir} = $inst if defined $inst;
             if ( $self->_can_skip_install($name) ) {
                 say "[xrepo] $name already satisfied by the store; skipping install" if $verbose;
                 next;
             }
             my $version = $recipe->version_for($name);
             say "Installing $name" . ( defined $version && length $version ? " $version" : '' ) . '...' if $verbose;
+            my %env = $self->_manager_tool_env($name);
+            local @ENV{ keys %env } = values %env if %env;
             my $info;
-            eval { $info = $r->install( $name, $version, %opts ); };
-            if ($@) {
+            my $attempt = 0;
+            while (1) {
+                $attempt++;
+                $info = eval { $r->install( $name, $version, %opts ) };
+                last if $info || !$@;
+                if ( $update_repo && $attempt < 2 ) {
+                    say "[xrepo] $name install failed; refreshing repositories to retry once..." if $verbose;
+                    eval { $r->update_repo };
+                    next;
+                }
                 warn "[!] $name failed to install: $@\n";
                 $runtime_prop->{errors}{$name} = "$@";
-                next;
+                last;
             }
             if ( ref $info eq 'Alien::Xrepo::PackageInfo' ) {
                 $runtime_prop->{packages}{$name} = $info->_data_printer(undef);
@@ -179,8 +200,13 @@ class Alien::Xrepo::Build v1.0.0 {
                 next;
             }
             my %opts = $recipe->opts_for( $name, %$profile );
+            my $inst = $self->_pkg_installdir($name);
+            $opts{installdir} = $inst if defined $inst;
+            my %env = $self->_manager_tool_env($name);
+            local @ENV{ keys %env } = values %env if %env;
             my $info;
             eval { $info = $r->fetch( $name, $recipe->version_for($name), %opts ); };
+
             if ($@) {
                 warn "[!] $name could not be gathered: $@\n";
                 $runtime_prop->{errors}{$name} //= "$@";
@@ -208,12 +234,22 @@ class Alien::Xrepo::Build v1.0.0 {
             }
         }
         if ($snapshot) {
+            my $packages = $runtime_prop->{packages} // {};
+            if ( defined $share_dir ) {
+                my %rebased;
+                for my $name ( keys %$packages ) {
+                    my %data = %{ $packages->{$name} // {} };
+                    $self->_share_rebase( $name, \%data );
+                    $rebased{$name} = \%data;
+                }
+                $packages = \%rebased;
+            }
             my $data = {
                 dist_name    => $recipe->name,
                 install_type => $install_type,
                 pkg_roots    => $recipe->pkg_roots,
-                packages     => $runtime_prop->{packages} // {},
-                errors       => $runtime_prop->{errors}   // {},
+                packages     => $packages,
+                errors       => $runtime_prop->{errors} // {},
                 digest       => $self->_config_digest
             };
             path($snapshot)->parent->mkpath if defined $snapshot;
@@ -305,6 +341,65 @@ class Alien::Xrepo::Build v1.0.0 {
         return 0 unless $probe->{satisfied};
         my %opts = $self->_opts_for_pkg( $name, %{ $install_prop->{profile} // {} } );
         !$opts{force};
+    }
+
+    method _install_order () {
+        my @pkgs = $recipe->packages;
+        my %ns;
+        for my $name (@pkgs) {
+            $ns{$1} = 1 if $name =~ /^([^:]+)::/;
+        }
+        my @tools = grep { $ns{$_} } @pkgs;
+        my @rest  = grep { !$ns{$_} } @pkgs;
+        return ( @tools, @rest );
+    }
+
+    method _manager_tool_env ($name) {
+        return () unless $name =~ /^([^:]+)::/;
+        my $ns  = $1;
+        my $rec = $runtime_prop->{packages}{$ns} // {};
+        return () unless ref $rec eq 'HASH';
+        my $dir = $rec->{installdir};
+        return () unless defined $dir && length $dir;
+        my $sep = $Config::Config{path_sep} // ( $^O eq 'MSWin32' ? ';' : ':' );
+        my %env = ( PATH => join( $sep, $dir, ( $ENV{PATH} // () ) ) );
+        $env{VCPKG_ROOT} = $dir if $ns eq 'vcpkg';
+        return %env;
+    }
+
+    # Shallow share install: when a share_dir is set, every package is installed
+    # into <share_dir>/<pkg> (its own little store) so the dist ships its own copy
+    # of the libraries and never depends on the xmake cache at runtime. The
+    # snapshot records those paths share-relative (see export/_share_rebase).
+    method _pkg_installdir ($name) {
+        return () unless defined $share_dir && length $share_dir;
+        return () if $name =~ /::/;
+        return path($share_dir)->absolute->child($name)->stringify;
+    }
+
+    # Rewrite an installed package's recorded paths to be relative to share_dir
+    # (so they survive `./Build install` relocating the share dir). Only paths
+    # that actually live under the share dir are made relative.
+    method _share_rebase ( $name, $data ) {
+        my $share = path($share_dir)->absolute->stringify;
+        for my $k (qw[includedirs libfiles linkdirs bindirs]) {
+            next unless ref $data->{$k} eq 'ARRAY';
+            $data->{$k} = [ map { $self->_under_share( $share, $_ ) } @{ $data->{$k} } ];
+        }
+        for my $k (qw[libpath installdir]) {
+            $data->{$k} = $self->_under_share( $share, $data->{$k} ) if defined $data->{$k};
+        }
+        return $data;
+    }
+
+    method _under_share ( $share, $p ) {
+        return $p unless defined $p && length $p;
+        my ( $s, $n ) = map { ( $_ // '' ) =~ s{\\}{/}gr } ( $share, $p );
+        $s =~ s{/$}{};
+        $s = lc($s) if $^O eq 'MSWin32';
+        $n = lc($n) if $^O eq 'MSWin32';
+        return $p unless index( $n, "$s/" ) == 0;
+        return substr( $p, length($share) + 1 );
     }
 
     method _checkpoint () {

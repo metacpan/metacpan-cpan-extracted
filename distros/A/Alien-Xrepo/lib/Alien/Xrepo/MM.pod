@@ -1,0 +1,107 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Alien::Xrepo::MM - ExtUtils::MakeMaker integration for Alien::Xrepo
+
+=head1 SYNOPSIS
+
+  # Makefile.PL
+  use v5.40;
+  use strict;
+  use warnings;
+  use Alien::Xrepo::MM;
+
+  Alien::Xrepo::MM->new(
+      module_name        => 'Exotic::Raylib6',
+      dist_abstract      => 'Build & install raylib 6 via xrepo',
+      dist_author        => 'Sanko Robinson',
+      dist_version       => 'v1.0.0',
+      license            => 'zlib',
+      requires           => { 'perl' => 'v5.40.0', 'Alien::Xrepo::Runtime' => 0 },
+      configure_requires => { 'Alien::Xrepo::MM' => 0 }
+  )->Write;
+
+And the C<Exotic::Raylib6> class declares its C<recipe()> once:
+
+  class Exotic::Raylib6 : isa(Alien::Xrepo::Runtime) {
+      method recipe {
+          return { name => 'Exotic-Raylib6', packages => [ { name => 'raylib' } ] };
+      }
+  }
+
+=head1 DESCRIPTION
+
+C<Alien::Xrepo::MM> is the L<ExtUtils::MakeMaker> sibling of L<Alien::Xrepo::MB>. Dist authors who build with C<make>
+instead of C<./Build> can swap out the build tool and change nothing else. The recipe is still declared once in the
+dist's module, the hermetic C<xrepo-snapshot.json> still lands in F<blib/lib/auto/share/dist/>, and C<make install>
+safely relocates it because C<ExtUtils::MakeMaker> copies the entirety of F<blib/lib>.
+
+C<Write()> performs the same actions as L<ExtUtils::MakeMaker/WriteMakefile> (arguments are translated the same way
+C<Alien::Xrepo::MB> maps its properties), and then adds a C<pure_all> dependency. Consequently, every C<make> execution
+runs a tiny Perl freshness check; the C<xrepo> pipeline only (re)runs when the snapshot is missing or older than the
+recipe inputs (F<Makefile.PL>, F<lib/C<module>.pm>, the loaded engine modules, and any local F<recipes/> tree).
+
+=head1 METHODS
+
+=head2 C<new>
+
+  my $mm = Alien::Xrepo::MM->new(
+      module_name         => 'Alien::Foo',
+      # all of these are optional
+      dist_abstract       => '...',
+      dist_author         => 'Your Name',
+      dist_version        => 'v1.0.0',
+      license             => 'artistic_2',
+      requires            => { ... },
+      configure_requires  => { ... },
+      build_requires      => { ... },
+      test_requires       => { ... },
+      xrepo_snapshot      => '...',   # override the derived snapshot path
+      xrepo_share_dir     => '...',   # override the shallow-install root
+      xrepo_cache         => 0,       # bypass the engine's on-disk cache
+      xrepo_update_repo   => 1        # refresh xrepo's repository index once
+                                      #   and retry a failing install
+  );
+
+Properties carry the exact same meanings as they do in L<Alien::Xrepo::MB>: C<xrepo_snapshot> defaults to
+F<blib/lib/auto/share/dist/<Dist>/xrepo-snapshot.json>, C<xrepo_share_dir> defaults to the snapshot's directory,
+C<xrepo_cache> defaults to C<0>, and C<xrepo_update_repo> defaults to C<0>.
+
+=head2 C<Write>
+
+Writes the F<Makefile> (and F<xrepo-mm.json>, read by C<make>) in the current directory. Called from F<Makefile.PL>.
+
+=head1 CONFIG FILE
+
+C<Write()> serializes F<xrepo-mm.json> directly next to F<Makefile.PL>. This file is how the C<make> hook knows the
+module name, snapshot path, share dir, cache flag, and the C<update_repo> toggle without risking shell-quoting issues.
+Running C<make realclean> removes it (it is included in the C<clean> FILES). It should never ship in the distribution:
+make sure to add it to F<MANIFEST.SKIP>.
+
+=head1 ALIEN::XREPO::MM::RUN
+
+  # invoked by the injected pure_all hook
+  perl -Ilib -MAlien::Xrepo::MM -e "Alien::Xrepo::MM::run('xrepo-mm.json')"
+
+Re-reads the config file, rebuilds the snapshot when stale, and silently exits if everything is current. If the config
+file is absent, it skips quietly so a build that merely loaded the module remains unharmed.
+
+=head1 SEE ALSO
+
+L<Alien::Xrepo>, L<Alien::Xrepo::MB>, L<Alien::Xrepo::Build>, L<ExtUtils::MakeMaker>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2. Other copyrights, terms, and conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=cut

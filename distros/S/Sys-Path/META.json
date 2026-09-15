@@ -1,10 +1,10 @@
 {
-   "abstract" : "supply autoconf style installation directories",
+   "abstract" : "provide autoconf-style installation directories",
    "author" : [
       "Jozef Kutej <jkutej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "system",
       "paths",
@@ -17,7 +17,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sys-Path",
    "prereqs" : {
@@ -27,7 +27,6 @@
             "File::Path" : "2.07",
             "File::Temp" : "0",
             "Test::Differences" : "0",
-            "Test::Exception" : "0",
             "Test::More" : "0"
          }
       },
@@ -41,8 +40,11 @@
             "Cwd" : "0",
             "Digest::MD5" : "0",
             "File::Spec" : "0",
-            "JSON::Util" : "0",
-            "List::MoreUtils" : "0",
+            "IO::Any" : "0.09",
+            "JSON::Util" : "0.06",
+            "List::Util" : "1.33",
+            "Module::Path" : "0",
+            "Shell::Guess" : "0",
             "Text::Diff" : "0"
          }
       }
@@ -50,7 +52,7 @@
    "provides" : {
       "Sys::Path" : {
          "file" : "lib/Sys/Path.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "Sys::Path::SPc" : {
          "file" : "lib/Sys/Path/SPc.pm",
@@ -69,6 +71,6 @@
          "url" : "git://github.com/jozef/Sys-Path.git"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

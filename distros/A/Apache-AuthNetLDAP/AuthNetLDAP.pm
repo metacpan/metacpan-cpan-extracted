@@ -4,7 +4,7 @@ use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
 use Net::LDAP;
-use mod_perl;
+use mod_perl2;
 
 require Exporter;
 
@@ -15,27 +15,17 @@ require Exporter;
 @EXPORT = qw(
 	
 );
-$VERSION = '0.29';
+$VERSION = '0.32';
 
-# setting the constants to help identify which version of mod_perl
-# is installed
-use constant MP2 => ($mod_perl::VERSION >= 1.99);
-
-# test for the version of mod_perl, and use the appropriate libraries
-BEGIN {
-	if (MP2) {
-		require Apache::Const;
-		require Apache::Access;
-		require Apache::Connection;
-		require Apache::Log;
-		require Apache::RequestRec;
-		require Apache::RequestUtil;
-		Apache::Const->import(-compile => 'HTTP_UNAUTHORIZED','OK','DECLINED');
-	} else {
-		require Apache::Constants;
-		Apache::Constants->import('HTTP_UNAUTHORIZED','OK','DECLINED');
-	}
-}
+# required libraries
+require Apache2::Const;
+require Apache2::Access;
+require Apache2::Connection;
+require Apache2::Log;
+require Apache2::RequestRec;
+require Apache2::RequestUtil;
+#Apache2::Const -compile => qw(HTTP_UNAUTHORIZED OK DECLINED);
+use Apache2::Const qw(:common :http);
 
 # Preloaded methods go here.
 
@@ -48,7 +38,7 @@ sub handler
     return $result if $result; 
  
    # change based on version of mod_perl 
-   my $user = MP2 ? $r->user : $r->connection->user;
+   my $user = $r->user;
 
    my $binddn = $r->dir_config('BindDN') || "";
    my $bindpwd = $r->dir_config('BindPWD') || "";
@@ -61,6 +51,9 @@ sub handler
    my $start_TLS = $r->dir_config('UseStartTLS') || "no";
    my $scope = $r->dir_config('SearchScope') || "sub";
    my $pwattr = $r->dir_config('AlternatePWAttribute') || "";
+   my $tlscertverify = $r->dir_config('TLSCertVerify') || "require";
+   my $tlscafile = $r->dir_config('TLSCAfile') || "";
+   my $tlscertverify = $r->dir_config('TLSCertVerify') || "require";
    my $domain = "";
 
    # remove the domainname if logging in from winxp
@@ -71,17 +64,32 @@ sub handler
    
    if ($password eq "") {
         $r->note_basic_auth_failure;
-	MP2 ? $r->log_error("user $user: no password supplied",$r->uri) : $r->log_reason("user $user: no password supplied",$r->uri); 
-        return MP2 ? Apache::HTTP_UNAUTHORIZED : Apache::Constants::HTTP_UNAUTHORIZED;
+	$r->log_error("user $user: no password supplied",$r->uri); 
+        return HTTP_UNAUTHORIZED;
    }
  
   
    my $ldap = new Net::LDAP($ldapserver, port => $ldapport);
    if (lc $start_TLS eq 'yes')
    {
-       $ldap->start_tls(verify => 'none')
-           or MP2 ? $r->log_error( "Unable to start_tls", $r->uri)
-                  : $r->log_reason("Unable to start_tls", $r->uri);
+       if ($tlscertverify ne 'none') {
+           if (!length($tlscafile)) {
+       		$ldap->start_tls(verify => $tlscertverify, cafile => $tlscafile)
+           		or $r->log_error( "Unable to start_tls", $r->uri);
+	   } 
+	   else
+	   {
+	        # neither tlscafile, nor tlscapath are set
+	        # One of them need to be set if $tlscertverify -ne 'none'
+           	$r->log_error( "Unable to start_tls. Please set either TLSCAfile.", $r->uri);
+	   }
+       }
+       else
+       {
+	       	## user has chosen not to verify server cert
+       		$ldap->start_tls(verify => $tlscertverify)
+           		or $r->log_error( "Unable to start_tls", $r->uri);
+       }
    }
 
    my $mesg;
@@ -99,7 +107,7 @@ sub handler
    if (my $error = $mesg->code())
    {
         $r->note_basic_auth_failure;
-        MP2 ? $r->log_error("user $user: LDAP Connection Failed: $error",$r->uri) : $r->log_reason("user $user: LDAP Connection Failed: $error",$r->uri);
+        $r->log_error("user $user: LDAP Connection Failed: $error",$r->uri);
    }
   
   
@@ -127,22 +135,22 @@ sub handler
     if (my $error = $mesg->code())
    {
         $r->note_basic_auth_failure;
-        MP2 ? $r->log_error("user $user: LDAP Connection Failed: $error",$r->uri) : $r->log_reason("user $user: LDAP Connection Failed: $error",$r->uri);
-        return MP2 ? Apache::HTTP_UNAUTHORIZED : Apache::Constants::HTTP_UNAUTHORIZED;
+        $r->log_error("user $user: LDAP Connection Failed: $error",$r->uri);
+        return HTTP_UNAUTHORIZED;
    }
 
    unless ($mesg->count())
    {
         $r->note_basic_auth_failure;
-	MP2 ? $r->log_error("user $user: user entry not found for filter: $uidattr=$user",$r->uri) : $r->log_reason("user $user: user entry not found for filter: $uidattr=$user",$r->uri); 
+	$r->log_error("user $user: user entry not found for filter: $uidattr=$user",$r->uri);
 	# If user is not found in ldap database, check for the next auth handler before failing 
 	if (lc($allowaltauth) eq "yes")
 	{
-           return MP2 ? Apache::DECLINED : Apache::Constants::DECLINED; 
+           return DECLINED; 
         }
         else
         {
-           return MP2 ? Apache::HTTP_UNAUTHORIZED : Apache::Constants::HTTP_UNAUTHORIZED;
+           return HTTP_UNAUTHORIZED;
         }
    }
  
@@ -156,18 +164,18 @@ sub handler
        $altfieldvalue =~ s/\s+$//;
        if ($altfieldvalue eq $password)
        {
-	   return MP2 ? Apache::OK : Apache::Constants::OK;
+	   return OK;
        }
        else
        {
 	# If user is not found in ldap database, check for the next auth handler before failing 
 	if (lc($allowaltauth) eq "yes")
 	{
-           return MP2 ? Apache::DECLINED : Apache::Constants::DECLINED; 
+           return DECLINED;
         }
         else
         {
-           return MP2 ? Apache::HTTP_UNAUTHORIZED : Apache::Constants::HTTP_UNAUTHORIZED;
+           return HTTP_UNAUTHORIZED;
         }
        }
    }
@@ -179,14 +187,14 @@ sub handler
   if (my $error = $mesg->code())
   {
         $r->note_basic_auth_failure;
-        MP2 ? $r->log_error("user $user: failed bind: $error",$r->uri) : $r->log_reason("user $user: failed bind: $error",$r->uri);
-        return MP2 ? Apache::HTTP_UNAUTHORIZED : Apache::Constants::HTTP_UNAUTHORIZED;
+        $r->log_error("user $user: failed bind: $error",$r->uri);
+        return HTTP_UNAUTHORIZED;
    }
         my $error = $mesg->code();
         my $dn = $entry->dn();
         # MP2 ? $r->log_error("AUTHDEBUG user $dn:$password bind: $error",$r->uri) : $r->log_reason("AUTHDEBUG user $dn:$password bind: $error",$r->uri);
 
- 	return MP2 ? Apache::OK : Apache::Constants::OK;
+ 	return OK;
 }
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
@@ -194,7 +202,7 @@ sub handler
 
 =head1 NAME
 
-Apache::AuthNetLDAP - mod_perl module that uses the Net::LDAP module for user authentication for Apache 
+Apache::AuthNetLDAP - mod_perl2 module that uses the Net::LDAP module for user authentication for Apache 
 
 =head1 SYNOPSIS
 
@@ -216,6 +224,9 @@ Apache::AuthNetLDAP - mod_perl module that uses the Net::LDAP module for user au
  # Set if you want to encrypt communication with LDAP server
  # and avoid sending clear text passwords over the network
  PerlSetVar UseStartTLS yes | no
+ #PerlSetVar TLSCertVerify require | optional | none # default: require
+ ## One of the following variables is required, if TLSCertVerify is 'require' or 'optional'
+ #PerlSetVar TLSCAfile "path to CA cert"
  
  # Set if you want to allow an alternate method of authentication
  PerlSetVar AllowAlternateAuth yes | no
@@ -309,6 +320,18 @@ IO::Socket::SSL is installed; this depends on Net::SSLeay, which
 depends on openssl.  Of course, the LDAP server must support Start TLS
 also.
 
+=item PerlSetVar TLSCertVerify
+
+Optional; can be 'require', 'optional', or 'none'. Default is 'require'. 
+
+TLS certificate verification level for start_tls() function.
+
+=item PerlSetVar TLSCAfile
+
+Required if TLSCertVerify is 'optional' or 'require'.
+
+Full path to CA file for TLS certificate verification 
+
 =back
 
 =head2 Uses for UIDAttr
@@ -359,15 +382,8 @@ Then in your httpd.conf file or .htaccess file, in either a <Directory> or <Loca
 
  PerlAuthenHandler Apache::AuthNetLDAP
 
-If you don't have mod_perl or Net::LDAP installed on your system, then the Makefile will prompt you to 
-install each of these modules. At this time, March 8, 2004, you may say yes to Net::LDAP, and yes for 
-mod_perl, if you are installing this module on apache 1.3.  (The reason being, that mod_perl 2 is under 
-development, and is not ready for download from CPAN at this time.  Therefore, your install of mod_perl,
-as initiated with the Makefile.PL, will fail. If you are going to install mod_perl 2, which is needed
-to work with Apache2, you will need to download it from:  http://perl.apache.org/download/index.html. 
-(Installation is beyond the scope of this document, but you can find documentation at:  
-http://perl.apache.org/docs/2.0/user/install/install.html#Installing_mod_perl_from_Source.)  
-Otherwise installation is the same.   
+If you don't have mod_perl2 or Net::LDAP installed on your system, then the Makefile will prompt you to 
+install each of these modules.  
 
 You may also notice that the Makefile.PL will ask you to install ExtUtils::AutoInstall.  This is 
 necessary for the installation process to automatically install any of the dependencies that you
@@ -380,7 +396,7 @@ Module Home: http://search.cpan.org/author/SPEEVES/
 =head1 AUTHOR
 
  Mark Wilcox mewilcox@unt.edu and
- Shannon Eric Peevey speeves@unt.edu
+ Shannon Eric Peevey shannonpeevey@gmail.com 
 
 =head1 SEE ALSO
 

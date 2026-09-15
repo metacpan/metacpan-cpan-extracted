@@ -12,7 +12,7 @@ use overload '&{}' => sub {
 }, bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Platypus closure object
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 
 sub new
@@ -51,23 +51,27 @@ sub call
 sub sticky
 {
   my($self) = @_;
-  return if $self->{sticky};
-  $self->{sticky} = 1;
-  $self->_sticky;
+  unless( $self->{sticky}) {
+    $self->{sticky} = 1;
+    $self->_sticky;
+  }
+  return $self;
 }
 
 
 sub unstick
 {
   my($self) = @_;
-  return unless $self->{sticky};
-  $self->{sticky} = 0;
-  $self->_unstick;
+  if( $self->{sticky} ) {
+    $self->{sticky} = 0;
+    $self->_unstick;
+  }
+  return $self;
 }
 
 package FFI::Platypus::ClosureData;
 
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 1;
 
@@ -83,7 +87,7 @@ FFI::Platypus::Closure - Platypus closure object
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 SYNOPSIS
 
@@ -137,11 +141,19 @@ the closure object as a code reference.
 Mark the closure sticky, meaning that it won't be free'd even if
 all the reference of the object fall out of scope.
 
+[version 2.12]
+
+Returns C<$self>, so this method may be chained.
+
 =head2 unstick
 
  $closure->unstick;
 
 Unmark the closure as sticky.
+
+[version 2.12]
+
+Returns C<$self>, so this method may be chained.
 
 =head1 AUTHOR
 

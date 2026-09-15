@@ -1,5 +1,11 @@
 # Changes for App::ipinfo
 
+1.012 2026-09-14T06:54:45Z
+	* change PAUSE account to BRIANDFOY
+
+1.011_01 2025-03-20T03:35:22Z
+	* dev version for look at Net::CIDR::Lite test failures
+
 1.01 2025-03-08T09:41:46Z
 	* first release of a command-line tool for IPinfo.io
 

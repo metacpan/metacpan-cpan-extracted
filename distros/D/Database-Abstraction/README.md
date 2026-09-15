@@ -4,7 +4,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.41
+Version 0.42
 
 # DESCRIPTION
 
@@ -12,6 +12,8 @@ Version 0.41
 interface over CSV, PSV, XML, SQLite, DBM::Deep, BerkeleyDB, and Excel (XLSX)
 files - local, remote (via SSH), or fetched from a URL - without writing any
 SQL.
+Effectively it allows you to access a database table, of many different
+database formats, as an object.
 
 Key features:
 
@@ -161,17 +163,26 @@ The module probes the `directory` for files in this priority order:
 - 4. `CSV`
 
     Comma (or custom) separated file, ending `.csv` or `.db`; can be
-    gzipped.  **Note:** the default separator is `!` not `,` for historical
+    gzipped.
+    **Note:** the default separator is `!` not `,` for historical
     reasons - pass `sep_char => ','` for standard CSVs.
 
-- 5. `Excel`
+- 5. `Excel` (`.xls`) and `XLSX` (`.xlsx`)
 
-    Excel workbook ending `.xlsx`.  Each worksheet is a separate SQL table;
-    the active worksheet is determined by the class-derived table name (or the
-    `table` constructor parameter - see ["SUBROUTINES/METHODS"](#subroutines-methods)).  Requires
-    [DBD::Excel](https://metacpan.org/pod/DBD%3A%3AExcel) (loaded lazily); [Spreadsheet::ParseXLSX](https://metacpan.org/pod/Spreadsheet%3A%3AParseXLSX) is used
-    automatically for modern `.xlsx` files when installed.  No slurp path:
-    `max_slurp_size` has no effect on the Excel backend.
+    Two separate Excel backends - one per file format:
+
+    - **.xls** - old binary format, opened via [DBD::Excel](https://metacpan.org/pod/DBD%3A%3AExcel) (which uses
+    [Spreadsheet::ParseExcel](https://metacpan.org/pod/Spreadsheet%3A%3AParseExcel) internally).  All queries go through DBI/SQL;
+    no in-memory slurp path.  `max_slurp_size` has no effect.
+    - **.xlsx** - modern OOXML format, parsed directly via
+    [Spreadsheet::ParseXLSX](https://metacpan.org/pod/Spreadsheet%3A%3AParseXLSX) and slurped into an in-memory hash (keyed mode)
+    or array (`no_entry` mode).  No DBI handle is created; all queries use
+    the in-memory fast-path.  Complex criteria (operator hashes, `-or`/`-and`)
+    will fall through to the SQL path and croak - use simple scalar criteria.
+
+    For both formats, each worksheet is a separate logical table; the active
+    worksheet is determined by the class-derived table name (or the `table`
+    constructor parameter).  Both modules are loaded lazily.
 
 - 6. `XML`
 

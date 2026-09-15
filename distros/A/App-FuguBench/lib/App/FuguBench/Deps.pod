@@ -1,0 +1,379 @@
+=head1 NAME
+
+App::FuguBench::Deps - the deps verb of fugubench
+
+=head1 SYNOPSIS
+
+    fugubench [-C <dir>] deps [--dry-run] [--os <name>] [--arch <name>] <environment>
+    fugubench [-C <dir>] deps --update-sums [--force] [--os <name>] [--arch <name>]
+
+=head1 DESCRIPTION
+
+B<App::FuguBench::Deps> holds the C<deps> verb. The verb reads the
+external dependencies that F<< deps/<OS>.txt >> names, and it
+installs each one. C<--dry-run> prints the command of each install,
+and it runs none of them. The environments are C<tool>, C<runtime>,
+C<test>, and C<develop>, and the verb takes one of them as its
+argument. C<--update-sums> records the digest of each download of the
+manifest, and it takes no environment word.
+
+The design comes from the synced F<scripts/deps> of Tooling. The
+trace of C<--dry-run> equals the trace of that script, line for line,
+over the manifest of every consumer. The test
+F<t/fugubench/deps-conformance.t> holds that comparison, and no
+consumer file changes.
+
+Every download goes through L<Fugu::Curl>, and each download that a
+manifest names takes its check before anything reads it. A run
+without C<--dry-run> then installs, and it runs each command as a
+child. On success the verb ends with one line that names the
+environment.
+
+=head2 command
+
+C<command($verb)> returns the entry of the L<Fugu::CLI> table. The
+module holds one verb, so it ignores the name.
+
+=head2 THE START DIRECTORY
+
+The verb reads F<< deps/<OS>.txt >> relative to the start directory,
+which C<-C> names, and it walks up to no checkout. A guest runs
+C<make deps> out of an extracted tarball, and that tree holds no
+F<.toolingrc>. The verb reads no path relative to the program.
+
+C<--os> and C<--arch> replace the two words of uname(3). Each word
+becomes part of a file name, so each one holds letters, digits, a
+dot, a dash, and an underscore, and each one starts with a letter or
+a digit. Every other word is a usage error.
+
+=head2 THE MANIFEST
+
+A line of the manifest holds an environment, a type, and a name, with
+whitespace between them. The types are C<pkg>, C<dist>, C<cpan>, and
+C<bin>. A C<#> at the start of the first word starts a comment.
+
+The verb validates every line before the first command, and not the
+lines of the wanted environment alone. A malformed line of another
+environment would otherwise stay invisible until someone installs
+that environment. An unknown environment, an unknown type, and a line
+of fewer than three words are each an error that names the line.
+
+A C<dist> name is one URL. A C<bin> name holds the command name, the
+URL, and, for an archive, the path of the file in the archive. An
+archive URL ends in F<.tar.gz>, F<.tgz>, or F<.zip>, and it needs the
+path. A plain URL takes none. A C<pkg> name and a C<cpan> name reach
+a package manager, so neither starts with a dash, and neither is a
+URL.
+
+A download URL starts with a scheme, and it names a file. It holds
+no parenthesis and no space, which the line format of
+F<deps/SHA256.txt> reserves. The downloader takes the URL as one
+argument, with no C<--> separator ahead of it. A URL that starts
+with a dash would reach the downloader as an option, and a scheme
+starts with a letter. The C<fetch> verb runs the same check over its
+own URL.
+
+A command name becomes a file name in the install directory, and an
+archive path becomes one in a temporary directory. tar and unzip read
+a leading dash as an option, so neither name starts with one, and an
+archive path holds no empty and no parent segment.
+
+Without a manifest for the system name, the verb reports that fact
+and returns 0.
+
+=head2 THE PLATFORM ALIASES
+
+A release asset spells one platform in more than one way. A manifest
+writes C<{os}> and C<{arch}> in place of a platform word, and the
+verb expands both, in the URL and in the archive path.
+
+The verb holds one alias table for each word, in preference order.
+Darwin gives C<darwin>, C<macOS>, and C<osx>. Linux gives C<linux>,
+and OpenBSD gives C<openbsd>. C<x86_64> and C<amd64> give C<amd64>,
+C<x64>, and C<x86_64>. C<aarch64> and C<arm64> give C<arm64> and
+C<aarch64>. An unknown word gives itself, and an unknown system name
+gives its own lower case.
+
+The verb forms one candidate for each alias pair, and it takes the
+candidate that F<deps/SHA256.txt> records. No match and more than one
+match are each an error that names the repair, and neither one asks
+the network. Each placeholder of the archive path must also sit in
+the URL, because only the URL selects the platform.
+
+=head2 THE DIGEST FILE
+
+F<deps/SHA256.txt> records a sha256 digest for each download with a
+versioned name, and the key is the whole download URL. The verb reads
+the file through the manifest reader of L<Fugu::Signify>, which
+rejects a bad line, a blank line, a digest that is not 64 hexadecimal
+characters, and a duplicate key. A silent skip would drop a check.
+
+An absent file, and a file with no line, each give the empty set.
+
+Each key of the file holds a scheme, because the file gathers many
+upstreams. A key that is a file name comes from an older file. It
+matches no download of this verb, so it stops an install, and the
+message names C<deps --update-sums> as the repair. The refresh reads
+the file with such a key, and it drops the one that it replaces.
+
+=head2 THE DOWNLOAD CHECK
+
+Each download lands in a temporary directory of its own, and the verb
+checks the bytes there. The signed manifest of a release lands beside
+the download, so a download named F<SHA256> would share one path with
+it.
+
+The recorded digest of F<deps/SHA256.txt> comes first, and the verb
+holds the download to it. Without one, the verb derives F<SHA256> and
+F<SHA256.sig> from the directory of the URL and fetches both. It
+verifies the signature, and then it holds the file to the digest that
+the manifest records for the file name. The signature covers the
+manifest, and the manifest covers the file, so the signature verifies
+before the file downloads.
+
+The two tiers key their digests apart. F<deps/SHA256.txt> gathers
+many upstreams, so it keys on the download URL. One release directory
+holds unique file names, so the signed manifest keys on the file
+name.
+
+The verification runs in-process, through L<Fugu::Signify> with the
+engine of L<Fugu::Ed25519>. No host needs signify(1), so a C<tool>
+entry takes the signify tier as every other entry does.
+
+An entry with no recorded digest and no declared key stops the run
+before the first download. A mismatch names the repair of its tier: a
+recorded digest names C<deps --update-sums --force>, and a signed
+digest names a report to the upstream, because the served file
+disagrees with the release.
+
+=head2 THE SIGNIFY KEYS
+
+The verb reads F<deps/KEYS.txt> and then F<deps/KEYS.local.txt>. The
+org pack owns the first file, and a consumer pins a third-party key
+in the second. A C<#> at the start of a line starts a comment.
+
+A key line holds a name and then one of two forms. Two fields give
+the key body, which is the second line of a signify public key file.
+Three fields give the URL of a key file and its sha256 digest, and
+the digest is the trust anchor. A key name holds letters, digits, a
+dot, a dash, and an underscore, and it appears one time. A key URL
+reaches the same downloader, so it takes the same shape check. Each
+other shape is an error that names the line.
+
+The line order is the trust order, and the current key comes first.
+Every declared key verifies every signify-tier download, so no key
+binds to one entry.
+
+A key of the URL form downloads into a temporary directory on each
+use, and the verb holds it to the recorded digest. A cached copy
+would carry the check of an earlier entry. A key that fails its
+digest, and a key that no server answers, leave the trust order with
+a warning. The verb tries the next key, and it reports each failure
+when no key verifies.
+
+An empty key set is valid. The signify tier of an install then stops
+with an error that names it. The signed-manifest probe of
+C<--update-sums> reports the same fact as a warning, and the refresh
+goes on. A manifest that no key verifies keeps the entry off the
+digest tier.
+
+=head2 THE DOWNLOADS
+
+Every download of the verb goes through L<Fugu::Curl>: the release
+asset, the signed manifest, the key file, and the standalone C<cpanm>
+script. The C<cpanm> download is the one download with no check,
+because no manifest names it.
+
+The probe for a signed manifest reads a 404 as the normal answer, and
+the verb writes nothing about it. A failed download of a key file
+leaves the trust order with a warning. Every other failed download
+stops the run with the reason of the downloader. One L<Fugu::Curl>
+serves the whole run, because it resolves the command of the host one
+time.
+
+C<--dry-run> asks no network. It reads the manifest, the digest file
+and the key set, and it names the download of each entry without a
+probe.
+
+=head2 THE TRACE
+
+C<--dry-run> prints each command that the verb would run, as one line
+that starts with C<+ > and holds each argument shell-quoted, and it
+runs none of them. A word passes bare when it holds word characters,
+a dot, a solidus, a colon, an equals sign, and a dash alone. Every
+other word, and the empty word, takes single quotes.
+
+The program gives no word to a shell. The quoting lets a reader of
+the trace see that an argument with a space is one argument. It
+belongs to the dry-run trace, which the conformance test reads.
+
+The trace of a dry run is the standard output, and so is the result
+line of an install. No line of a child reaches the standard output.
+
+A run without C<--dry-run> prints no trace line, so its standard
+output holds the result line alone. Each progress line waits for
+C<--verbose>. A warning and an error report a fault, and no run hides
+one.
+
+C<--verbose> traces each command on standard error, and it adds the
+progress lines: the entry list of each type, the key that verified a
+signed manifest, the bootstrap of C<cpanm>, and the local library.
+
+A C<--verbose> trace line carries a C<< run: >> lead, and it joins
+the words of the command raw. One run writes one form, because a
+child command and an in-process download take the same lead and the
+same join.
+
+The verb downloads in-process, so the trace names the fetch verb:
+C<< fugubench fetch <file> <url> >>. Each download takes a temporary
+directory of its own, because the signed manifest of a release lands
+beside it.
+
+=head2 THE COMMANDS OF ONE ENVIRONMENT
+
+The verb takes the entries of one environment in the order C<pkg>,
+C<dist>, C<cpan>, C<bin>. A package can give the toolchain that a
+dist build needs, and a dist can give a module that the cpan list
+builds on. A binary depends on nothing here. Each command below runs
+as a child, and it takes the environment of the run.
+
+Every entry of a type resolves, and takes its tier check, before the
+first download of that type. That pass reads the digest file and the
+key set, and it asks no network. A set with one entry that no tier
+covers downloads nothing, and a C<bin> set of that shape makes no
+install directory.
+
+The digest of an entry takes its check at the download of that entry,
+which the install of that entry follows. A mismatch on a later entry
+leaves an earlier one installed, and a mismatch on the first C<bin>
+entry leaves the new install directory behind. The two loops come
+from the synced F<scripts/deps>, and the dry-run trace holds the verb
+to that order.
+
+A C<pkg> entry reaches the package manager of the platform:
+C<pkg_add> on OpenBSD, C<apt-get install -y> under C<sudo> on Linux,
+and C<brew install> on Darwin. On Linux an C<apt-get update> runs
+first, and every package of the environment reaches one command. A
+system name with no package manager is an error.
+
+A C<cpan> entry and a C<dist> entry reach C<cpanm --notest>. With
+C<PERL_LOCAL_LIB_ROOT> in the environment, the command takes
+C<--local-lib> with that value. The C<cpanm> on PATH is the first
+choice, and the bare name keeps the trace readable. Without one, the
+verb downloads the standalone C<cpanm> script into a temporary
+directory, and this perl runs that script.
+
+A C<bin> entry installs into F<~/.local/bin>, with mode 755. The verb
+stops with an error when C<HOME> is unset, before the first C<bin>
+entry installs. The C<pkg>, C<dist>, and C<cpan> entries of the
+environment run first, in that order. For an archive, tar or unzip
+unpacks the one file of the entry, and the verb copies that file
+alone.
+
+A child that exits non-zero stops the run, and the message names the
+command. No later command of the environment runs, and the verb
+returns 1.
+
+=head2 THE DIGEST REFRESH
+
+C<deps --update-sums> records the digest of each download that the
+manifest of the system name names. The operator runs it, and the
+install path never does. It reads every environment of that one
+manifest, and it takes no environment word. It writes the digest
+file, so it takes no C<--dry-run>, and C<--force> belongs to it.
+
+The C<dist> entries and the C<bin> entries name every download of a
+manifest. A candidate URL that the file records already stays, so a
+version bump needs no hand edit.
+
+A digest covers a versioned name. Such a name carries a digit in the
+path of its URL, and a stable name carries none, or it holds
+F</releases/latest/>. The test reads the manifest, and never the
+network. A server that withholds its signature must not make the
+command pin the bytes that it serves.
+
+The command asks each distinct resolved directory of the candidates
+for a signed manifest, and never the directory of the template, which
+names no server. A manifest that answers keeps the entry off the
+digest tier, whether or not a key verifies it. An entry with a
+placeholder needs a recorded digest, and the signed manifest supplies
+it: a digest of the download itself would outrank the signature. An
+entry that reaches no candidate fails the run.
+
+Each other entry downloads. Each candidate takes a directory of its
+own, because two candidates can share a file name. A 404 is the
+absent answer of a candidate, and every other failed download stops
+the refresh. The command records the first candidate that answers,
+and it names each other one in a warning, because the install rejects
+a URL that two recorded candidates cover.
+
+C<--force> rewrites a recorded digest, pins a stable name, and
+overrides the signed-manifest test with a warning first. It drops
+every other recorded candidate of the same entry.
+
+The command drops a file-name key when it records the URL that
+replaces it, and it reports each drop. A key that one run cannot
+replace stays, because one run reads one manifest.
+
+A run that records nothing leaves the file as it was, and says so. A
+run with an entry that reached no candidate also leaves the file as
+it was, and it names the next step. The command reports a recorded
+URL only when it writes the file. The writer sorts the keys, so a
+second refresh makes a stable diff.
+
+=head1 RETURN VALUES
+
+C<command> returns a hash reference. Its body returns 0 after an
+install, 0 after the trace of a dry run, 0 after a refresh, and 0 for
+a system name that the checkout holds no manifest for. A usage error
+returns 2: an unknown environment word, no environment word, more
+than one, and a bad C<--os> or C<--arch> word. C<--update-sums> with
+an environment word, C<--update-sums> with C<--dry-run>, and
+C<--force> without C<--update-sums> each return 2 as well.
+
+A fault of a consumer file returns 3: a bad manifest line, a bad line
+of the digest file, a key of the digest file that is a file name, a
+bad key line, and an alias expansion that reaches no candidate or
+more than one. A refresh takes a key of the file-name form, and it
+returns 3 for a resolved URL that the digest file cannot hold.
+
+A failure of the run returns 1: an unset C<HOME>, a system name with
+no package manager, an entry that no tier covers, a failed download,
+a failed verification, a digest that does not match, and a child that
+exits non-zero. A refresh returns 1 for an entry that reached no
+candidate, and for a digest file that it cannot write.
+
+=head1 FILES
+
+=over 4
+
+=item F<< deps/<OS>.txt >>
+
+The manifest of one system name, relative to the start directory.
+
+=item F<deps/SHA256.txt>
+
+The recorded digest of each download, keyed on the download URL.
+
+=item F<deps/KEYS.txt>
+
+The signify public keys of the org pack, in trust order.
+
+=item F<deps/KEYS.local.txt>
+
+The signify public keys that this consumer pins. The verb reads them
+after the keys of the org pack.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::FuguBench>, L<App::FuguBench::Fetch>, L<Fugu::CLI>,
+L<Fugu::Curl>, L<Fugu::Ed25519>, L<Fugu::File>, L<Fugu::Log>,
+L<Fugu::Process>, L<Fugu::Signify>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

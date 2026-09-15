@@ -15,10 +15,13 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-use v5.36;
-
 package Fugu::Process;
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
+
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 
 use Config;
 use Fcntl     qw(F_DUPFD F_SETFD FD_CLOEXEC);
@@ -619,6 +622,47 @@ sub spawn_perl ( $class, %args )
 	$args{cmd} = [ $^X, @inc_flags, '-e', $code, @$extra_args ];
 
 	return $class->spawn_command(%args);
+}
+
+# $class->find_command($name, @defaults):
+#	Resolve a command to an executable path, or return undef.
+#	Every module that drives a command takes its command the same
+#	way, so the resolver sits at the process boundary.
+#
+#	A $name that holds a solidus is a path, and the method tests
+#	that path alone. A plain $name walks $ENV{PATH} for that name.
+#	An undef or an empty $name walks $ENV{PATH} over @defaults, in
+#	order, and answers the first one that the host has. The order
+#	of @defaults is the preference of the caller: a caller that
+#	needs gpg(1) version 2 names gpg2 before gpg.
+#
+#	A candidate resolves when it is a plain file and executable. A
+#	directory and a device therefore resolve nothing.
+#
+#	The method answers the resolved path, or undef. It runs no
+#	process, and it never dies. A caller resolves the command
+#	once, and it runs the command later.
+#
+#	Example:
+#		my $gpg = Fugu::Process->find_command(
+#			$args{command}, 'gpg2', 'gpg' );
+sub find_command ( $class, $name = undef, @defaults )
+{
+	my @names = defined $name && length $name ? ($name) : @defaults;
+
+	for my $candidate (@names) {
+		if ( index( $candidate, '/' ) >= 0 ) {
+			return $candidate if -f $candidate && -x _;
+			next;
+		}
+		for my $dir ( split /:/, $ENV{PATH} // '' ) {
+			next unless length $dir;
+			my $path = "$dir/$candidate";
+			return $path if -f $path && -x _;
+		}
+	}
+
+	return;
 }
 
 # _check_inherit($inherit):

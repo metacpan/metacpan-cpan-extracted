@@ -1,6 +1,12 @@
 Changelog for DBIx-ParseError-MySQL
 
-v1.0.4 2025-01-21T22:53:15
+v1.0.5 2026-09-11T22:00:53
+ - Pull request #6: SM-6891 (Brendan Byrd)
+ - Update README / LICENSE (Brendan Byrd)
+ - Add Aurora failover errors to the transient shutdown category (Brendan
+   Byrd)
+
+v1.0.4 2025-01-21T22:52:17
  - Update README / LICENSE (dmueller)
  - Update Makefile from upstream (dmueller)
  - Pull request #5: SM-4878 Allow max_execution_time errors to not be

@@ -74,10 +74,15 @@ subtest path_forms => sub {
         "an exclusion path that does not exist matches nothing"
     );
 
-    my $orig = Path::Tiny->cwd;
-    chdir("$root") or die "Could not chdir to '$root': $!";
+    my $orig   = Path::Tiny->cwd;
+    my $parent = $root->parent;
+    chdir("$parent") or die "Could not chdir to '$parent': $!";
     my $ok = eval {
-        is([$CLASS->filter("$dep", root => $root, exclude => 'deps')], [], "a relative exclusion resolves against the current directory");
+        is(
+            [$CLASS->filter("$dep", root => $root, exclude => 'deps')],
+            [],
+            "a relative exclusion resolves against the coverage root, not the current directory"
+        );
         1;
     };
     my $err = $@;

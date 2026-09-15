@@ -69,6 +69,7 @@
 #define SA_T_CUCKOO 9u
 #define SA_T_LEASE  10u
 #define SA_T_SCOREBOARD 11u
+#define SA_T_HLL    12u
 
 /* registry entry states. `state` is published LAST with a release store, so a
  * reader either sees a complete entry or no entry at all. */

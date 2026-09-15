@@ -12,8 +12,9 @@ my $builder = Module::Build->new(
         'Test::More'             => 0,
     },
     requires => {
-        'File::Spec'             => 0,
         'Getopt::Long'           => 0,
+        'Module::Metadata'       => 0,
+        'Module::Path'           => 0,
         'Pod::Usage'             => 0,
     },
     configure_requires  => { 'Module::Build' => '0.38' },

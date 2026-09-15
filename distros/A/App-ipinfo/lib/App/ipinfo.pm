@@ -13,7 +13,7 @@ use Geo::IPinfo;
 use Encode qw(decode);
 use String::Sprintf;
 
-our $VERSION = '1.01';
+our $VERSION = '1.012';
 
 __PACKAGE__->run(@ARGV) unless caller();
 
@@ -409,6 +409,8 @@ sub get_info ($app, $ip ) {
 
 	my $info = $ipinfo->$method($ip);
 
+	$app->{last_response} = $info;
+
 	# https://github.com/ipinfo/perl/pull/32
 	# cache hit is doubly wrapped in object
 	my @values = grep { eval { $_->isa('Geo::Details') } } values %$info;
@@ -524,7 +526,7 @@ in other services:
 
 =head1 COPYRIGHT
 
-Copyright © 2025, brian d foy, all rights reserved.
+Copyright © 2025-2026, brian d foy, all rights reserved.
 
 =head1 LICENSE
 

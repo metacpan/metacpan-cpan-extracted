@@ -269,7 +269,7 @@ sub benchmark_class ($mode, $batch) {
     }
 
     no strict 'refs';
-    *{"${class}::stream_options"} = $mode eq 'raw'
+    *{"${class}::stream_tuning"} = $mode eq 'raw'
         ? sub ($class_name) {
             return read_size => $read_size, read_batch_bytes => $batch;
         }

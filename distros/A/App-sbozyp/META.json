@@ -1,7 +1,7 @@
 {
-   "abstract" : "a package manager for Slackware's SlackBuilds.org",
+   "abstract" : "A package manager for Slackware's SlackBuilds.org",
    "author" : [
-      "Nicholas Hubbard <nicholashubbard@posteo.net>"
+      "Nicholas B. Hubbard <nicholashubbard@posteo.net>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
@@ -30,6 +30,13 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test2::Plugin::NoWarnings" : "0",
+            "Test2::V0" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "perl" : "5.034000"
@@ -45,6 +52,6 @@
          "url" : "https://github.com/NicholasBHubbard/sbozyp"
       }
    },
-   "version" : "v1.10.1",
+   "version" : "v1.10.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

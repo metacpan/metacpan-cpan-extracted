@@ -16,9 +16,11 @@ class Alien::Xrepo::Build::TestSpy {
     field $calls        : param = [];
     field $preinstalled : param = {};
     field $fail         : param = {};
+    field $fail_once    : param = {};
 
     method install ( $name, $version, %opts ) {
         push @$calls, { action => 'install', name => $name, version => $version, opts => {%opts} };
+        if ( $fail_once->{$name} ) { delete $fail_once->{$name}; die "boom once on $name"; }
         die "boom on $name" if $fail->{$name};
         return $self->_pkg( $name, $version );
     }
@@ -41,6 +43,11 @@ class Alien::Xrepo::Build::TestSpy {
 
     method add_repo ( $name, $url ) {
         push @$calls, { action => 'add_repo', name => $name, url => $url };
+    }
+
+    method update_repo ( $name //= () ) {
+        push @$calls, { action => 'update_repo', name => $name };
+        return 1;
     }
     method calls () { return $calls }
 
@@ -119,6 +126,37 @@ subtest 'a failed package isolates: siblings install, error recorded' => sub {
     ok exists $b->runtime_prop->{packages}{zstd},  'sibling before the failure installed';
     ok exists $b->runtime_prop->{packages}{ninja}, 'sibling after the failure installed';
     is $b->install_type, 'share', 'a partial success is still a share install';
+};
+subtest 'a pinned version reaches install and probe falls through' => sub {
+    my $spy = Alien::Xrepo::Build::TestSpy->new( preinstalled => { raylib => '6.0' } );
+    my $b   = build( [ { name => 'raylib', version => '6.0.x', kind => 'shared' } ], repo => $spy );
+    $b->run;
+    ok !$b->install_prop->{probed}{raylib}{satisfied}, 'exact-match probe cannot satisfy a 6.0.x pattern';
+    my (@installs) = grep { $_->{action} eq 'install' } @{ $spy->calls };
+    is scalar @installs,                              1,       'the pinned package was installed';
+    is $installs[0]{version},                         '6.0.x', 'install asked for the pinned version';
+    is $b->runtime_prop->{packages}{raylib}{version}, '6.0.x', 'runtime data carries the pinned version';
+};
+subtest 'update_repo refreshes repositories and retries the install once' => sub {
+    my $spy = Alien::Xrepo::Build::TestSpy->new( fail_once => { raylib => 1 } );
+    my $b   = build( ['raylib'], repo => $spy, probe_policy => 'off', update_repo => 1 );
+    $b->run;
+    my (@updates) = grep { $_->{action} eq 'update_repo' } @{ $spy->calls };
+    is scalar @updates, 1, 'registry refreshed exactly once';
+    my (@installs) = grep { $_->{action} eq 'install' } @{ $spy->calls };
+    is scalar @installs, 2, 'install attempted again after the refresh';
+    ok exists $b->runtime_prop->{packages}{raylib}, 'retried install resolved the package';
+    ok !exists $b->runtime_prop->{errors}{raylib},  'no error recorded after the retry succeeded';
+};
+subtest 'a still-failing install records the error after one refresh' => sub {
+    my $spy = Alien::Xrepo::Build::TestSpy->new( fail => { raylib => 1 } );
+    my $b   = build( ['raylib'], repo => $spy, probe_policy => 'off', update_repo => 1 );
+    $b->run;
+    my (@updates)  = grep { $_->{action} eq 'update_repo' } @{ $spy->calls };
+    my (@installs) = grep { $_->{action} eq 'install' } @{ $spy->calls };
+    is scalar @updates,  1, 'refresh ran before the final attempt';
+    is scalar @installs, 2, 'two attempts total';
+    like $b->runtime_prop->{errors}{raylib}, qr/boom/, 'failure recorded after the retry limit';
 };
 subtest 'gather fetches anything the install did not produce' => sub {
     my $spy = Alien::Xrepo::Build::TestSpy->new;
@@ -245,5 +283,88 @@ subtest 'pkg_roots ignore a variable that does not name a directory' => sub {
     is scalar @infos,                               1, 'probe consulted xrepo when the root env var was unusable';
     is $b->install_prop->{probed}{zstd}{satisfied}, 0, 'package not satisfied by a dead root';
     ok exists $b->runtime_prop->{packages}{zstd}, 'package installed via xrepo as normal';
+};
+subtest 'Build accepts a hashref recipe from a subclass recipe()' => sub {
+    my $spy = Alien::Xrepo::Build::TestSpy->new;
+    my $b   = Alien::Xrepo::Build->new(
+        recipe => {
+            name        => 'Alien-TestFull',
+            packages    => [ { name => 'zstd', version => '1.5.6', kind => 'shared' } ],
+            defaults    => { mode => 'release' },
+            local_repos => ['vendor/recipes'],
+        },
+        repo         => $spy,
+        root         => '/tmp/store',
+        probe_policy => 'off',
+    );
+    $b->run;
+    is $b->meta_prop->{name},             'Alien-TestFull', 'name from hashref recipe';
+    is $b->meta_prop->{packages},         ['zstd'],         'packages from hashref recipe';
+    is $b->install_prop->{profile}{mode}, 'release',        'defaults folded into profile';
+    my (@installs) = grep { $_->{action} eq 'install' } @{ $spy->calls };
+    is $installs[0]{opts}{kind},                    'shared',     'per-package def folded into install opts';
+    is $b->runtime_prop->{packages}{zstd}{version}, '1.5.6',      'install ran with the recipe version';
+    is $b->install_prop->{store},                   '/tmp/store', 'store root resolved';
+    is $b->install_type,                            'share',      'share install';
+};
+
+# Spy whose installs record opts and derive the reported paths from the
+# requested installdir, so share_dir behaviour can be verified without xrepo.
+class Alien::Xrepo::Build::TestShare {
+    field $calls : param = [];
+
+    method install ( $name, $version, %opts ) {
+        push @$calls, { action => 'install', name => $name, version => $version, opts => {%opts} };
+        return $self->_pkg( $name, $version, %opts );
+    }
+
+    method fetch ( $name, $version, %opts ) {
+        push @$calls, { action => 'fetch', name => $name, version => $version, opts => {%opts} };
+        return $self->_pkg( $name, $version, %opts );
+    }
+    method info   ( $name, %opts )           { push @$calls, { action => 'info',   name => $name, opts    => {%opts} }; return {}; }
+    method export ( $name, $version, %opts ) { push @$calls, { action => 'export', name => $name, version => $version, opts => {%opts} }; return 1; }
+    method add_repo ( $name, $url )          { push @$calls, { action => 'add_repo', name => $name, url => $url }; }
+    method calls () {$calls}
+
+    method _pkg ( $name, $version, %opts ) {
+        my $dir = defined $opts{installdir} ? $opts{installdir} : "/tmp/default/$name";
+        return Alien::Xrepo::PackageInfo->new(
+            includedirs => [ Path::Tiny::path($dir)->child('include')->stringify ],
+            libfiles    => [],
+            license     => undef,
+            linkdirs    => [],
+            links       => [],
+            shared      => 1,
+            static      => 0,
+            version     => $version // '1.2.3',
+            installdir  => $dir,
+            kind        => 'library',
+        );
+    }
+}
+subtest 'share_dir shallow-installs packages and records share-relative paths' => sub {
+    my $share = path($dir)->child('share');
+    my $snap  = $share->child('xrepo-snapshot.json');
+    my $spy   = Alien::Xrepo::Build::TestShare->new;
+    my $b     = Alien::Xrepo::Build->new(
+        recipe       => { name => 'Alien-TestFull', packages => [ { name => 'zstd', version => '1.5.6' }, 'libsdl3' ] },
+        repo         => $spy,
+        share_dir    => $share->stringify,
+        snapshot     => $snap,
+        probe_policy => 'off',
+    );
+    $b->run;
+    my (@installs) = grep { $_->{action} eq 'install' } @{ $spy->calls };
+    is scalar @installs,               2,                                         'both packages installed';
+    is $installs[0]{opts}{installdir}, path($share)->child('zstd')->stringify,    'zstd installation goes into the sharedir';
+    is $installs[1]{opts}{installdir}, path($share)->child('libsdl3')->stringify, 'libsdl3 installation goes into the sharedir';
+    my (@fetches) = grep { $_->{action} eq 'fetch' } @{ $spy->calls };
+    is scalar @fetches, 0, 'gather reuses install data (no extra fetch)';
+    my $data = decode_json( $snap->slurp_utf8 );
+    is $data->{packages}{zstd}{installdir}, 'zstd', 'snapshot installdir is share-relative';
+    like $data->{packages}{zstd}{includedirs}[0], qr/^zstd[\\\/]include$/, 'snapshot includedirs are share-relative';
+    is $data->{install_type},         'share',           'share install recorded';
+    is $b->install_prop->{share_dir}, $share->stringify, 'share_dir recorded in install_prop';
 };
 done_testing;

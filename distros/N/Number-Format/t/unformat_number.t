@@ -32,6 +32,9 @@ cmp_ok(unformat_number("4K", base => 1000), '==', 4000, '4x1000');
 cmp_ok(unformat_number("4KiB", base => 1024), '==', 4096, '4x1024 KiB');
 cmp_ok(unformat_number("4KiB", base => 1000), '==', 4000, '4x1000 KiB');
 cmp_ok(unformat_number("4G"), '==', 4294967296, '4G');
+cmp_ok(unformat_number("4T"), '==', 4 * 2**40, '4T');
+cmp_ok(unformat_number("4TiB", base => 1024), '==', 4 * 2**40, '4x1024 TiB');
+cmp_ok(unformat_number("4TiB", base => 1000), '==', 4 * 1e12,  '4x1000 TiB');
 cmp_ok(unformat_number("4G", base => 1), '==', 4, 'base 1');
 
 eval { unformat_number("4G", base => 1000000) };

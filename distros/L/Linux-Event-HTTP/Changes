@@ -1,0 +1,284 @@
+Revision history for Linux-Event-HTTP
+
+0.001  UNRELEASED
+    - Initial distribution scaffold.
+    - Establish HTTP protocol, transport, message, transaction, and high-level
+      client-operation boundaries.
+    - Use the flat Linux::Event::HTTP namespace and make the server-side transport
+      class Linux::Event::HTTP::Server::Connection.
+    - Require Linux::Event 0.113 for the Listener, tuning, TLS, and stream APIs used
+      by this distribution.
+    - Vendor picohttpparser for self-contained native HTTP/1 request-head parsing.
+    - Add strict obs-fold rejection and explicit header-count limits above pico.
+    - Add native Request state with lazy method, target, and header materialization.
+    - Preserve original header spelling, duplicate values, and legal underscore names.
+    - Validate HTTP/1 Host, Content-Length, Transfer-Encoding, body framing, and persistence.
+    - Reject ambiguous TE/CL framing and unsupported request transfer codings.
+    - Define Request and Response as direction-neutral HTTP message classes shared by
+      client and server code rather than endpoint-role-specific objects.
+    - Add public locally constructible Request and Response messages while preserving
+      the existing lazy XS-backed representation for parsed server Requests.
+    - Keep Response transport-independent: it owns response message metadata/body state
+      but no Connection, peer Request, output writer, or protocol-handoff lifecycle.
+    - Use protocol-neutral message accessors such as version(), while keeping HTTP/1
+      framing and persistence decisions private to the HTTP/1 execution layer.
+    - Add symmetric header APIs including add_header, remove_header, header_values,
+      exact indexed header access, content_length, body, and is_complete.
+    - Add Linux::Event::HTTP::Transaction to represent exactly one Request/Response
+      exchange with coarse lifecycle state, cancellation, completion, and errors.
+    - Keep the server callback shape on_request($conn, $req, $res); expose the active
+      exchange as $conn->transaction rather than adding another callback argument.
+    - Separate Response message completion from server transport-output completion so
+      Response->is_complete describes the HTTP message rather than socket write state.
+    - Move response-output start/completion state from Response to Transaction.
+    - Define Response->body as a complete scalar byte body declaration.
+    - Move incremental response-body producer ownership from Response to Transaction;
+      use $conn->transaction->response_body for server-side incremental output.
+    - Keep Body::Stream writes on Linux::Event's existing ordered-byte output machinery,
+      preserving cooperative backpressure and avoiding a second HTTP output queue.
+    - Make Transaction->response_body lazy and stable; selecting it does not commit
+      response metadata, while the first producer write or completion starts output
+      and freezes metadata.
+    - Keep complete scalar body and incremental producer selection mutually exclusive.
+    - Remove transitional public Response->write, Response->complete, and
+      Response->stream_body methods rather than carrying compatibility aliases into the
+      initial release.
+    - Remove Response connection/request/output/Upgrade lifecycle accessors so Request
+      and Response remain usable as the same message classes on client and server.
+    - Expose Request->is_complete at the actual received body boundary and
+      Response->is_complete at the complete scalar/final incremental body boundary.
+    - Lock response status and headers when protocol output commits the message, not
+      merely when complete body bytes become known.
+    - Defer scalar response output until the enclosing HTTP callback returns so metadata
+      may still be configured after body assignment.
+    - Add Transaction->send_response for a scalar Response completed later from another
+      event callback, avoiding a hidden Connection back-reference in Response.
+    - Stream Content-Length request bodies through cached on_body callbacks.
+    - Decode chunked request bodies natively with picohttpparser while preserving pipeline bytes.
+    - Add on_request_end request completion and body draining when no consumer is installed.
+    - Support HTTP/1.1 Expect: 100-continue and reject unsupported expectations with 417.
+    - Add automatic HTTP/1.1 chunked framing for incremental response output when
+      Content-Length is unknown.
+    - Fall back to close-delimited output for unknown-length HTTP/1.0 responses.
+    - Add HTTP::Server as a thin Listener convenience with retained constructor callbacks,
+      application data propagation, and configurable Server::Connection subclasses.
+    - Adopt Linux::Event Listener stream recipes for accepted HTTP Connections and remove
+      the private acceptance adapter so Listener constructs connection_class directly.
+    - Expose Server tuning and TLS deployment policy directly, use stream_tuning class
+      defaults, and distinguish accepted-Connection on_error from on_listener_error.
+    - Preserve constructor-callback override semantics through Server acceptance without
+      allocating per-connection wrapper closures or adding per-request Server dispatch.
+    - Compose HTTP body-producer drain/cancellation bookkeeping with custom Connection
+      on_drain and on_close lifecycle callbacks rather than replacing subclass behavior.
+    - Integrate HTTPS through Linux::Event declarative TLS policy on the configured
+      Server::Connection subclass, including server-handshake validation and HTTP/1.1 ALPN.
+    - Verify TLS readiness precedes HTTP dispatch and expose negotiated ALPN, protocol,
+      and cipher through ordinary Server::Connection transport accessors.
+    - Move validated HTTP/1.1 101 handoff from Response->upgrade to
+      Transaction->upgrade while preserving live transport state.
+    - Expose Transaction Upgrade pending state and complete the HTTP Transaction before
+      Linux::Event transition_to() hands the same live stream to the target protocol.
+    - Preserve same-read post-HTTP bytes across Upgrade, keep the normal request-end
+      callback lifecycle, and queue the 101 response before target-protocol output.
+    - Add Linux::Event::HTTP::Client::Connection as the low-level HTTP/1 client executor
+      on Linux::Event::IO::Sock::Stream.
+    - Serialize complete scalar Request messages and add Content-Length when needed.
+    - Add Transaction-owned streaming client Request bodies through the shared
+      Body::Stream producer abstraction without adding a second HTTP output queue.
+    - Enforce exact streamed Content-Length when declared; automatically use HTTP/1.1
+      chunked transfer coding for unknown-length streams and require Content-Length for
+      HTTP/1.0 streaming Requests.
+    - Compose streaming Request producer on_drain with Linux::Event transport drain and
+      custom Client::Connection subclass on_drain behavior.
+    - Cancel unfinished Request producers on early final Responses and mark the HTTP/1
+      connection non-reusable rather than continuing to emit bytes for a finished exchange.
+    - Parse HTTP/1 response heads strictly in Perl as the correctness baseline before
+      considering response-parser XS; reuse the existing native _HTTP1::Chunked decoder.
+    - Deliver client response bodies incrementally for Content-Length, chunked, and
+      close-delimited framing; drain/discard when no on_body callback is installed.
+    - Support informational responses, reject ambiguous TE/CL response framing, and
+      validate explicit HTTP/1.1 101 Upgrade handoff separately from ordinary 1xx flow.
+    - Add explicit client Upgrade handoff with upgrade_to and on_upgrade on both
+      Client::Connection and the high-level Client operation API.
+    - Require bodyless HTTP/1.1 Upgrade requests with Connection: Upgrade and at least one
+      offered Upgrade protocol; reject invalid requests before wire output.
+    - Validate 101 responses before handoff, including Connection: Upgrade, no message
+      framing fields, and selection of a protocol actually offered by the Request.
+    - Complete the HTTP Response and Transaction before Linux::Event transition_to()
+      hands the same live client stream object to the target protocol class.
+    - Preserve bytes already read after a 101 response head and deliver them to the
+      transitioned protocol class without another socket or transport queue.
+    - Regenerate Upgrade handshake fields across redirect hops and keep a successfully
+      upgraded stream permanently outside the HTTP idle-connection pool.
+    - Add explicit HTTP/1.1 CONNECT tunneling with tunnel_to and on_tunnel on
+      Client::Connection, using authority-form request targets and the same live
+      Linux::Event stream transition model as Upgrade.
+    - Add Client->connect_tunnel(proxy_url,target_authority,...) as a high-level explicit
+      tunnel operation without making ordinary requests implicitly proxy-aware.
+    - Reject CONNECT request bodies, Content-Length, and Transfer-Encoding by field
+      presence, require Host to match the authority target, and fail invalid CONNECT
+      configurations before protocol execution.
+    - Treat any successful 2xx CONNECT response as the HTTP-to-tunnel boundary at the end
+      of the response head, ignoring Content-Length and Transfer-Encoding on that 2xx and
+      preserving already-read bytes as tunnel input.
+    - Keep non-2xx CONNECT responses as ordinary HTTP so proxy errors such as 407 can use
+      normal incremental or bounded body handling and persistent proxy connections can be
+      reused when framing permits it.
+    - Keep successfully tunneled connections permanently outside the HTTP idle pool while
+      allowing an explicit HTTP or HTTPS proxy endpoint to be reused after failed CONNECT.
+    - Keep one in-flight Transaction per HTTP/1 client connection and support sequential
+      persistent reuse without enabling HTTP/1 pipelining.
+    - Make client Transaction cancellation close the HTTP/1 connection rather than risk
+      reusing a socket with an unfinished response on the wire.
+    - Add Linux::Event::HTTP::Client as the ordinary URL-oriented client entry point with
+      request/get/head/post/put/delete methods returning Client::Operation objects.
+    - Add Linux::Event::HTTP::Client::Operation as the high-level client lifecycle object;
+      keep Transaction defined as exactly one HTTP exchange while an Operation can retain
+      the ordered Transaction history for redirects and authentication retries.
+    - Use URI for URL parsing while keeping full URLs out of Request; synthesize Host and
+      use path/query as the canonical direct request-target.
+    - Add bounded automatic redirect following for 301, 302, 303, 307, and 308 with a
+      default max_redirects of five and a per-request override.
+    - Resolve relative Location values against the current absolute URL and preserve
+      inherited fragment state for redirect processing without transmitting fragments in
+      HTTP request-targets.
+    - Apply familiar redirect method semantics: 301/302 POST to GET, 303 to GET except
+      HEAD remains HEAD, and 307/308 preserve method and body.
+    - Replay complete scalar bodies on method-preserving redirects but reject automatic
+      replay of streaming Request producers because they are not inherently rewindable.
+    - Regenerate Host and HTTP framing fields for every redirect hop; strip Authorization
+      and caller-managed Cookie on cross-origin target redirects, retain manually supplied
+      Proxy-Authorization only for the same selected proxy route, and regenerate
+      connection-specific fields rather than forwarding them verbatim.
+    - Keep on_response/on_body/on_complete focused on the final response; expose
+      on_redirect($operation,$tx,$res,$next_url) for completed intermediate redirects while
+      retaining every Transaction in Operation history.
+    - Make max_redirects => 0 disable redirect interpretation completely so a 3xx,
+      including duplicate Location fields, is delivered as an ordinary final response.
+    - Add a bounded initial reuse policy that retains at most one idle connection per
+      route origin while allowing concurrent requests to use separate connections.
+    - Let each redirect hop independently evaluate its target origin while selecting or
+      reusing the operation's route connection when eligible.
+    - Integrate HTTPS through Linux::Event TLS transport policy with the same Client and
+      Client::Connection classes and HTTP/1.1-only ALPN advertisement.
+    - Add explicit buffer_body => $max_bytes client response buffering on top of the
+      incremental body path without introducing implicit or unbounded accumulation.
+    - Count the buffer limit against delivered body bytes after HTTP/1 transfer framing;
+      reject known oversized Content-Length bodies before accumulation and unknown-size
+      bodies when decoded accumulation would cross the configured bound.
+    - Apply the same response-buffer bound while intermediate redirect and authentication
+      challenge bodies are consumed.
+    - Keep buffered response metadata committed/read-only, expose the completed scalar
+      through Response->body only after the final message boundary, and close the HTTP/1
+      connection on buffer-limit failure so unread response bytes cannot be reused.
+    - Add client tests for scalar and streaming request bodies, fixed/chunked/
+      close-delimited responses, informational responses, ambiguous framing rejection,
+      cancellation, URL handling, connection reuse, concurrency, HTTPS, bounded
+      whole-response buffering, producer backpressure, early upload cancellation,
+      redirect chains, relative Location resolution, method/body transformation,
+      cross-origin credential stripping, redirect limits, disabled redirect policy,
+      client Upgrade validation, same-read protocol handoff, redirected Upgrade,
+      CONNECT validation, successful same-read tunnel handoff, non-2xx proxy response,
+      forward-proxy routing, default-proxy selection, cookie-jar target isolation,
+      target/proxy authentication retries, Digest auth-int context, authenticated CONNECT,
+      and streaming-body authentication replay refusal.
+    - Add a forked end-to-end HTTP benchmark harness with persistent connections,
+      pipelining, request-body workloads, latency percentiles, JSON output, and optional
+      Linux::Event loop profiling.
+    - Add a reproducible cross-server comparison harness for Linux::Event, Feersum,
+      Mojolicious, Node.js, Go, aiohttp, and optional libh2o reference runs.
+    - Keep on_request -> Response as the single server request API while transparently
+      optimizing eligible scalar Response->body calls with a narrow native builder.
+    - Consolidate request parsing, chunked decoding, response serialization, and the
+      default-final builder into one private Linux::Event::HTTP::_HTTP1 extension.
+    - Remove the benchmark-oriented on_request_final public shortcut while retaining its
+      useful optimization lesson inside the ordinary Response->body path.
+    - Preserve the native default scalar-response fast path while making it terminate the
+      same Transaction lifecycle as the general response path.
+    - Keep a focused response-finalization benchmark for supported callback shapes and
+      update the transaction-ladder contract for the callback-return body commit point.
+    - Add ordered keep-alive/pipelined request dispatch and deferred response support.
+    - Add focused Transaction tests covering pairing, request/response completion,
+      cancellation, body-producer backpressure, chunking, close delimiting, deferred
+      send, Upgrade, and the native scalar fast path.
+    - Simplify the README around the ordinary Client and Server APIs, leaving advanced
+      Connection, framing, and lifecycle detail in the architecture document and POD.
+    - Add parser benchmarks, provenance documentation, and distribution integrity tests.
+    - Add server-side Transaction->tunnel() and is_tunneling for explicit acceptance of
+      valid HTTP/1.1 CONNECT requests without adding a new server callback or message type.
+    - Validate server CONNECT authority-form targets, matching Host, absent request body
+      and framing fields, and a bodyless 2xx response with no framing fields or
+      Connection: close before scheduling handoff.
+    - Complete the server CONNECT Request/Response Transaction before Linux::Event
+      transition_to() hands the same accepted stream to the target protocol, preserving
+      already-read post-head bytes as tunnel input and retaining object identity.
+    - Keep rejected CONNECT requests on the ordinary HTTP response path so non-2xx bodies,
+      persistent reuse, and later pipelined requests continue to work normally.
+    - Keep upstream destination authorization, upstream connection creation, and byte
+      relay/bridge ownership outside Linux::Event::HTTP; server CONNECT adds no proxy
+      framework, second transport object, output queue, or protocol-specific XS.
+    - Add explicit per-request forward-proxy routing with proxy => $proxy_url for ordinary
+      high-level Client requests; direct requests remain origin-form while proxied
+      requests use HTTP/1 absolute-form and regenerate Host from the target URL.
+    - Keep target origin and route origin separate: redirects, target authentication,
+      cookies, and Operation URLs use the target, while connection acquisition, proxy
+      authentication, and idle reuse use the explicit proxy route.
+    - Allow HTTP or HTTPS proxy endpoints without making HTTPS target URLs imply CONNECT;
+      connect_tunnel() remains the explicit tunnel API.
+    - Add a Client-level default proxy, a read-only proxy accessor, per-request proxy
+      override, and proxy => undef as an explicit direct-route bypass.
+    - Keep Client::Connection proxy-unaware and add no environment-proxy discovery,
+      PAC/NO_PROXY policy, SOCKS behavior, second output queue, or proxy-specific XS.
+    - Add HTTP::CookieJar 0.014 as the cookie-policy implementation rather than
+      reimplementing RFC cookie storage and selection in Linux::Event::HTTP.
+    - Accept an explicitly injected Client cookie_jar and expose it through a read-only
+      accessor; do not create hidden cookie state or decide persistence/sharing policy.
+    - Generate Cookie from cookie_header($target_url) before each ordinary request exchange
+      and feed every Set-Cookie field to add($target_url,$value) before redirect,
+      authentication, or application response processing.
+    - Recompute jar-managed Cookie on every redirect target, keeping proxy routes entirely
+      outside cookie-origin decisions and delegating domain, path, expiry, Secure handling,
+      and cookie ordering to HTTP::CookieJar.
+    - Reject caller Cookie fields while cookie_jar is configured so cookie selection has
+      one owner; applications can seed or alter state directly through the jar.
+    - Keep connect_tunnel() outside cookie-jar policy.
+    - Add Uniform::HTTP::Auth 0.02 from the Uniform-HTTP distribution as the HTTP
+      authentication implementation rather than reimplementing Basic, Bearer, Digest,
+      challenge parsing, or Digest nonce state in Linux::Event::HTTP.
+    - Add Client auth and proxy_auth policy objects for target 401 / WWW-Authenticate and
+      proxy 407 / Proxy-Authenticate respectively, with Client defaults and per-operation
+      override/bypass.
+    - Keep Uniform responsible for authentication mechanics while Linux::Event::HTTP owns
+      challenge reception, target-versus-route origin selection, replayability, response
+      draining, connection reuse, retry Transactions, and callback lifecycle.
+    - Add max_auth_retries (default three), auth_retry_count, and separate redirect/auth
+      accounting so each automatic challenge retry is another Transaction without
+      distorting redirect_count.
+    - Supply Uniform the exact wire request-target: origin-form for direct requests,
+      absolute-form for ordinary proxy requests, and authority-form for CONNECT.
+    - Replay complete scalar Request bodies and supply entity_body for Digest auth-int,
+      while refusing automatic authentication retry for streaming producers because their
+      application state is not inherently rewindable.
+    - Keep generated Authorization and Proxy-Authorization attempt-local rather than
+      propagating them across redirects; allow a proxy-authenticated attempt that receives
+      target 401 to retain proxy authentication while adding target Authorization.
+    - Let connect_tunnel() use proxy_auth for 407 challenge/retry before successful 2xx
+      handoff, while keeping target auth and cookies outside CONNECT policy.
+    - Reject manually supplied Authorization or Proxy-Authorization when the corresponding
+      Uniform manager is active so each authentication field has one policy owner.
+    - Make Request and Response conform by behavior to the Uniform::HTTP 0.02 message
+      contract without replacing the native/live message classes or adding inheritance.
+    - Make public header_values return an array reference, preserve first-occurrence
+      position on header replacement, return undef for past-end indexed access, and expose
+      explicit buffered-body, mutability, lossless-header, and exact-target capabilities.
+    - Preserve the lazy XS-backed parsed Request representation and private list-oriented
+      header access for executor hot paths while exposing the Uniform-compatible public API.
+    - Pass the actual Linux::Event::HTTP::Request object to Uniform::HTTP::Auth 0.02 so
+      method, exact request-target, and buffered scalar body come through the shared
+      message contract without consuming incremental body producers.
+    - Add focused Uniform message-contract coverage including an XS-parsed native Request.
+    - Repair the transaction-lifecycle diagnostic to the Transaction-owned response
+      lifecycle and run its smoke mode in regular latest-Perl CI to prevent benchmark/API
+      drift before release.
+    - Complete CPAN metadata for all public modules, mark private helper packages no_index,
+      and include all advertised benchmark backends in the distribution MANIFEST.

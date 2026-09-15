@@ -62,14 +62,14 @@ is($stream->transport_name, 'plain',
 
 my $ok = eval { $stream->transition_to('T::TransportPipe'); 1 };
 ok(!$ok, 'socket stream cannot transition to a pipe protocol');
-like($@, qr/cannot cross the ordered-byte resource boundary/,
+like($@, qr/cannot change ordered-byte resource kind/,
     'socket-to-pipe rejection identifies the resource boundary');
 
 pipe(my $pipe_read, my $pipe_write) or die "pipe: $!";
 my $pipe = T::TransportPipe->new(loop => $loop, read_fh => $pipe_read);
 $ok = eval { $pipe->transition_to('T::TransportTwo'); 1 };
 ok(!$ok, 'pipe cannot transition to a socket-stream protocol');
-like($@, qr/cannot cross the ordered-byte resource boundary/,
+like($@, qr/cannot change ordered-byte resource kind/,
     'pipe-to-socket rejection identifies the resource boundary');
 $pipe->close;
 close $pipe_write;

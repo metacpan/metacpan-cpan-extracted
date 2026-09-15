@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::FileFinder 6.038;
+package Dist::Zilla::Role::FileFinder 6.039;
 # ABSTRACT: something that finds files within the distribution
 
 use Moose::Role;
@@ -56,7 +56,7 @@ Dist::Zilla::Role::FileFinder - something that finds files within the distributi
 
 =head1 VERSION
 
-version 6.038
+version 6.039
 
 =head1 DESCRIPTION
 

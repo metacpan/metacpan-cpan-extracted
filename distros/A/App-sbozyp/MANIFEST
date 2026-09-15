@@ -6,7 +6,6 @@ CONTRIBUTORS
 LICENSE
 MANIFEST
 Makefile.PL
-cpanfile
 
 package/sbozyp.conf
 package/sbozyp.blacklist

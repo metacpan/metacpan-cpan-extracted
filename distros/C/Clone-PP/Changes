@@ -1,5 +1,11 @@
 Revision history for Perl module Clone::PP
 
+1.09 2026-09-13 NEILB
+    - Use `our` rather than `use vars`.
+    - Clean up whitespace.
+    - Fix tests to be warnings and strict compatible.
+    - All from HAARG++
+
 1.08 2020-10-20 NEILB
     - Changed "sub main'dump" to "sub main::dump" in t/dump.pl, as that
       meant this distribution wouldn't build under cperl. RT#125171

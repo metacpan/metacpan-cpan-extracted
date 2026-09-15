@@ -1,42 +1,240 @@
 =head1 NAME
 
-Fugu::OpenPGP - read an armored OpenPGP public key as bytes
+Fugu::OpenPGP - read an armored OpenPGP public key as bytes, and drive gpg(1) over a key
 
 =head1 SYNOPSIS
 
     use Fugu::OpenPGP;
 
-    my ($binary, $reason) = Fugu::OpenPGP->decode_armor($armored_text);
-    die $reason unless defined $binary;
+    my $pgp = Fugu::OpenPGP->new;
+    die $pgp->error unless $pgp->is_available;
 
-    my $fingerprint = Fugu::OpenPGP->fingerprint($binary)
-        or die 'not a version 4 public key packet';
+    $pgp->generate(
+        email   => 'security@example.org',
+        expires => time + 2 * 365 * 86_400,
+        public  => '/etc/keys/example.asc',
+        secret  => '/etc/keys/example.sec',
+    ) or die $pgp->error;
 
-    my $hash = Fugu::OpenPGP->wkd_hash('security');
+    $pgp->sign(
+        secret    => '/etc/keys/example.sec',
+        file      => '/var/www/htdocs/KEYS',
+        signature => '/var/www/htdocs/KEYS.asc',
+    ) or die $pgp->error;
+
+    my $key = $pgp->verify(
+        keys      => ['/etc/keys/example.asc'],
+        file      => '/var/www/htdocs/KEYS',
+        signature => '/var/www/htdocs/KEYS.asc',
+    ) or die $pgp->error;
+
+    my $epoch = $pgp->expiry( public => '/etc/keys/example.asc' );
+    die $pgp->error unless defined $epoch;
+
+    # The byte reader needs no command.
+    my $binary = $pgp->decode_armor($armored_text)
+        or die $pgp->error;
+    my $fingerprint = $pgp->fingerprint($binary)
+        or die $pgp->error;
+
+    my $hash = $pgp->wkd_hash('security');
     # .well-known/openpgpkey/hu/$hash
 
 =head1 DESCRIPTION
 
-Fugu::OpenPGP decodes the armor of RFC 4880. It computes the version 4
-fingerprint of a public key packet. It also computes the Web Key
-Directory hash of a local part.
+Fugu::OpenPGP follows L<Fugu::Signer> over gpg(1). The parent holds
+the constructor and the command resolution, the three verbs, the run
+through L<Fugu::Process>, the key walk of a verification, and the
+failure convention. This module holds the byte reader, the temporary
+home, and the arguments of each gpg(1) command line.
 
-The module runs no command, so a caller needs no gpg(1). It holds
-class methods only, because it holds no state. It uses core
-L<Digest::SHA> and core L<MIME::Base64>, so it adds no dependency.
+The byte reader decodes the armor of RFC 4880. It computes the version
+4 fingerprint of a public key packet. It also computes the Web Key
+Directory hash of a local part. It runs no command, and it uses core
+L<Digest::SHA> and core L<MIME::Base64>, so it adds no dependency. Each
+reader is a method of the object, and a caller that reads bytes alone
+needs no gpg(1).
 
-The module reads a public key only. It holds no private key, it
-decrypts nothing, and it verifies no signature. gpg(1) owns those
-acts.
+The command part generates a key with an encryption subkey, it signs a
+file, it verifies a detached signature, and it reads the expiry of a
+key. Each half of a key enters as a path and leaves as a file, so no
+key byte enters Perl.
 
-Every recoverable failure returns C<undef>. In list context the second
-value holds the reason. The module never dies for bad input: a key
-file comes from outside, so bad bytes are data and not a programming
-error. The module never logs. The caller decides what to report.
+The command part needs GnuPG 2.2 or later. It gives
+C<--quick-generate-key>, C<--quick-add-key>, C<--pinentry-mode> and
+C<--import-options show-only> to the command, and it stops the agent
+with gpgconf(1). GnuPG 1.4 holds none of these, so a host that kept
+C<gpg> for version 1 must carry version 2 as C<gpg2>.
+
+Every recoverable failure returns C<undef>, and C<error> holds the
+reason. No method answers the reason as a second return value. The
+module never logs. The caller decides what to report.
+
+A reader never dies for bad input: a key file comes from outside, so
+bad bytes are data and not a programming error. A method dies for a
+missing necessary argument alone, because that is a programming error.
+
+=head2 The temporary home
+
+Each run of gpg(1) takes a temporary home of its own, and the run
+removes it. The module reads no home of the user, and no agent of the
+user. A caller therefore signs with one key while the operator holds
+another key in a keyring of their own.
+
+The home can hold a secret half, so it holds no group mode and no
+other mode. The generator names the destination of each half on the
+command line, so gpg(1) writes both halves itself.
+
+gpg 2 starts an agent under the home for a key operation, and an agent
+that outlives its home leaks a process. Each run therefore stops that
+agent with gpgconf(1) before it removes the home, per LIB-SIGNER-10.
+gpgconf(1) ships beside gpg(1), so the module names it beside the
+resolved command. An absent gpgconf(1) fails no call.
+
+The home sits under C<TMPDIR> with a short name. The agent socket sits
+in the home, and a unix socket path holds about 100 bytes.
+
+=head2 new
+
+C<new(command =E<gt> $command, timeout =E<gt> $seconds)> builds a
+generator, a signer and a verifier. The method resolves the command
+once, and it runs no process.
+
+C<command> names the gpg command, as a name or as an absolute path.
+Without the argument, the module walks C<$ENV{PATH}> over the search
+list C<gpg2>, then C<gpg>.
+
+C<timeout> is the bound of one run of the command, in seconds, and the
+default is C<GPG_TIMEOUT>. A key generation needs entropy, so this
+module raises the default of the parent.
+
+C<new> must not die for an absent command. It sets C<error> instead,
+and C<is_available> then returns 0.
+
+=head2 is_available
+
+C<is_available()> returns 1 when the object resolved an executable
+command, and 0 otherwise. The method runs no process, and it never
+dies. The byte reader needs no command, so the answer describes the
+command part alone.
+
+=head2 command
+
+C<command()> returns the resolved command, or C<undef>. An operator
+who installed the wrong C<gpg> needs this answer, and a caller can put
+it in a diagnostic.
+
+=head2 error
+
+C<error()> returns the reason of the most recent failure. It returns
+C<undef> after a success. Each method clears the reason before it
+starts.
+
+The reason of a failed run names the act and then the diagnostic of
+gpg(1). The module takes the last line of that diagnostic, because
+gpg(1) writes the reason last:
+
+    cannot sign /var/www/htdocs/KEYS: no default secret key: No secret key
+
+Each run takes C<LC_ALL=C>, so the diagnostic arrives in English under
+any locale of the caller.
+
+=head2 command_absent
+
+C<command_absent()> returns 1 when the most recent failure means that
+gpg(1) never ran. It covers a command that the search list did not
+resolve, and a command that failed to execve(2). It returns 0
+otherwise.
+
+An absent command is an install problem, and a failed signature is an
+integrity problem. The two answers let a caller tell them apart.
+
+=head2 generate
+
+C<generate(public =E<gt> $path, secret =E<gt> $path, email =E<gt>
+$address, expires =E<gt> $epoch)> makes one Ed25519 key with one user
+id, and one Curve25519 encryption subkey. It returns 1, or C<undef>
+with the reason in C<error>.
+
+C<public>, C<secret> and C<email> are necessary, and the method dies
+without one. gpg(1) writes each half as armored text at its path.
+
+The parent refuses a path that exists, so one call never overwrites a
+key. It writes the private half in a private directory beside the
+destination, it sets the owner-only mode there, and one rename then
+moves the file into place. The export of the private half runs first,
+so a failed call leaves no half behind.
+
+The user id holds the email alone, in the form C<E<lt>addressE<gt>>. A
+site publishes the public half, and a correspondent encrypts to the
+subkey.
+
+An angle bracket, a line ending or a NUL byte in C<email> would close
+that user id and open a second one, so the key would carry an address
+that the caller never named. The method refuses each of them, and an
+empty address, before the command runs. Such a call makes no key.
+
+C<expires> is optional, and it is seconds since the epoch, the unit
+that C<expiry> answers. It must be a whole number after the current
+time. The key and the subkey take the expiry that the caller named.
+gpg(1) writes each expiry as a duration from a creation time, so the
+subkey expiry can fall one second before the key expiry. With no
+C<expires> neither holds one.
+
+The key carries no passphrase, so the caller owns the storage of the
+private half.
+
+=head2 sign
+
+C<sign(secret =E<gt> $path, file =E<gt> $path, signature =E<gt>
+$path)> signs one file with a private half. It returns 1, or C<undef>
+with the reason in C<error>. Each argument is necessary, and the
+method dies without one.
+
+gpg(1) reads the private half from the path, and it writes the armored
+signature file itself, so no key byte enters Perl. A second call over
+one C<signature> path replaces the file, because a rotation signs one
+manifest again.
+
+The parent refuses an input path that is no plain file, before the
+command runs.
+
+=head2 verify
+
+C<verify(keys =E<gt> \@paths, file =E<gt> $path, signature =E<gt>
+$path)> verifies one detached signature against a key set, in trust
+order. Each argument is necessary, and the method dies without one. An
+empty C<keys> list is a programming error, and the method dies for it
+too.
+
+The method returns the public key file that verified the signature. It
+returns C<undef> on every failure. The walk pins one key in one run:
+the temporary home takes that one public half, so a signature of
+another key fails with C<Can't check signature: No public key>. A
+signature over other bytes fails with C<BAD signature>. The keyring of
+the operator holds no part in the answer.
+
+For a signature that no key verified, C<error> names the file and then
+each key with its own reason.
+
+=head2 expiry
+
+C<expiry(public =E<gt> $path)> returns the expiry of a public half, as
+seconds since the epoch. It returns 0 for a key that holds no expiry,
+and C<undef> with the reason in C<error> on a failure.
+
+The three answers differ on purpose. A caller tells C<no expiry> from
+C<cannot read> with one test, and a key with no expiry never reads as
+a key that expired.
+
+The read imports nothing: gpg(1) shows the key and drops it, so the
+home keeps no keyring. A file that is no key is a failure, and the
+reason comes from gpg(1).
 
 =head2 decode_armor
 
-C<decode_armor($text)> returns the binary form of an armored block.
+C<decode_armor($text)> returns the binary form of an armored block, or
+C<undef> with the reason in C<error>.
 
 The method reads the two delimiter lines, it skips the armor headers,
 it decodes the base64 body, and it compares the CRC-24 checksum line
@@ -120,7 +318,8 @@ first block.
 =head2 fingerprint
 
 C<fingerprint($binary)> returns the version 4 fingerprint of the first
-packet, in upper-case hexadecimal with no separator.
+packet, in upper-case hexadecimal with no separator, or C<undef> with
+the reason in C<error>.
 
 The fingerprint is the SHA-1 of the byte C<0x99>, the two-byte length
 of the public key packet body, and that body, per RFC 4880 section
@@ -148,7 +347,7 @@ than 4, and a truncated packet body are each a failure.
 =head2 wkd_hash
 
 C<wkd_hash($local)> returns the Web Key Directory hash of an email
-local part.
+local part, or C<undef> with the reason in C<error>.
 
 The hash is the z-base-32 form of the SHA-1 of the local part in lower
 case. C<gpg --locate-keys> asks for
@@ -205,34 +404,51 @@ The z-base-32 alphabet of the Web Key Directory.
 The initial value and the generator polynomial of the armor checksum,
 per RFC 4880 section 6.1.
 
+=item C<GPG_TIMEOUT>
+
+The default time bound of one gpg(1) call, 60 seconds. A command that
+a caller named can be the wrong program, and a key generation needs
+entropy.
+
+=item C<GPG_FLAGS>
+
+The flags of every gpg(1) call. They hold the command away from a
+terminal and away from a passphrase prompt.
+
 =back
 
 =head1 RETURN VALUES
 
-Each public method returns its answer in scalar context, or C<undef>
-on a failure. In list context each one returns the answer and
-C<undef>, or C<undef> and the reason.
+Each method returns its answer, or C<undef> on a failure, and C<error>
+holds the reason of that failure. No method answers the reason as a
+second return value.
 
-Each method takes bytes. A string that holds a code point above 255
-is a failure, and never an answer. L<Digest::SHA> dies on such a
-string, and a byte unpack takes the low byte of each character. A
-caller that holds text must encode it first.
+Each reader rejects a string that holds a code point above 255.
+L<Digest::SHA> dies on such a string, and a byte unpack takes the low
+byte of each character. A caller that holds text must encode it first.
 
 =head1 CAVEATS
 
-The module reads the first packet of a block only. An armored key
+The byte reader reads the first packet of a block only. An armored key
 holds a public key packet first, then the user id packets, the
-signature packets and the subkey packets. A caller that needs a
-subkey fingerprint needs a full packet walk, which this module does
-not hold.
+signature packets and the subkey packets. A caller that needs a subkey
+fingerprint needs a full packet walk, which this module does not hold.
 
-The module verifies no signature and no key expiry. A fingerprint
-proves which bytes the block holds. It proves nothing about who made
-them, or whether the key is still valid.
+A fingerprint proves which bytes the block holds. It proves nothing
+about who made them. C<verify> answers the second question, over the
+key set that the caller names.
+
+The module makes no revocation certificate, and it edits no user id. A
+retired key stays published, and a compromise takes a human decision.
+
+The generator makes a key with no passphrase, because a daemon holds
+no operator to type one. The caller owns the storage of the private
+half.
 
 =head1 SEE ALSO
 
-gpg(1), L<Digest::SHA>, L<MIME::Base64>, L<Fugu::KeyDir>
+gpg(1), gpgconf(1), L<Digest::SHA>, L<MIME::Base64>, L<Fugu::KeyDir>,
+L<Fugu::Process>, L<Fugu::Signer>, L<Fugu::Signify>
 
 =head1 AUTHORS
 

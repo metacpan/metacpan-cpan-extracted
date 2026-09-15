@@ -66,6 +66,33 @@ like(
     '=~ operator reports errors for invalid regular expressions'
 );
 
+# Regression test for CVE-2026-78497.
+# User-supplied regex code assertions must not be evaluated as Perl code.
+our $regex_code_executed = 0;
+my $regex_code_ok = eval {
+    $jq->run_query(
+        '"abc"',
+        q{match("(?{ $main::regex_code_executed = 1 })")}
+    );
+    1;
+};
+my $regex_code_error = $@;
+
+ok(
+    !$regex_code_ok,
+    'match() rejects runtime Perl code in regular expressions',
+);
+like(
+    $regex_code_error,
+    qr/match\(\): invalid regular expression/i,
+    'match() reports a regex error for runtime Perl code',
+);
+is(
+    $regex_code_executed,
+    0,
+    'runtime Perl code embedded in a regex was not executed',
+);
+
 my @regex_op_match = $jq->run_query('"abc"', 'select(. =~ "^a")');
 is_deeply(\@regex_op_match, [ 'abc' ], '=~ operator matches strings');
 
@@ -118,6 +145,21 @@ is_deeply(
         captures => [],
     },
     'match() honors extended flag (x) for whitespace',
+);
+
+my @extended_comment_match = $jq->run_query(
+    '"abc"',
+    'match("abc# trailing comment"; "x")',
+);
+is_deeply(
+    $extended_comment_match[0],
+    {
+        offset   => 0,
+        length   => 3,
+        string   => 'abc',
+        captures => [],
+    },
+    'match() preserves trailing comments in extended-mode patterns',
 );
 
 my @extended_default = $jq->run_query('"ab"', 'match("a b")');

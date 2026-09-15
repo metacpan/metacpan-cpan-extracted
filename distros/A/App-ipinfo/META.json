@@ -33,6 +33,7 @@
          "requires" : {
             "Carp" : "0",
             "Geo::IPinfo" : "0",
+            "Net::CIDR" : "0.23",
             "String::Sprintf" : "0",
             "perl" : "5.026"
          }
@@ -55,6 +56,6 @@
          "web" : "https://github.com/briandfoy/app-ipinfo"
       }
    },
-   "version" : "1.01",
+   "version" : "1.012",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

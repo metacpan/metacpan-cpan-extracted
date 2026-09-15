@@ -1,4 +1,4 @@
-package Pod::Weaver::Role::Transformer 4.021;
+package Pod::Weaver::Role::Transformer 4.022;
 # ABSTRACT: something that restructures a Pod5 document
 
 use Moose::Role;
@@ -31,7 +31,7 @@ Pod::Weaver::Role::Transformer - something that restructures a Pod5 document
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 PERL VERSION
 

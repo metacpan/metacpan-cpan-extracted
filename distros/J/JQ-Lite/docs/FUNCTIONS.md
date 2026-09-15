@@ -43,7 +43,7 @@ Functions are grouped by purpose for easier lookup.
 | `trim()`, `ltrimstr()`, `rtrimstr()` | Trim whitespace or prefixes/suffixes |
 | `startswith()`, `endswith()`         | Prefix/suffix test                   |
 | `contains(value)`                    | Substring or array inclusion (legacy array semantics) |
-| `contains_subset(value)`             | jq-style subset inclusion for arrays |
+| `contains_subset(value)`             | Recursive, order-insensitive multiset inclusion for arrays |
 | `inside(container)`                  | Whether input is inside container    |
 | `split(sep)`, `join(sep)`            | Split and join                       |
 | `substr(start, len)`                 | Substring extraction                 |
@@ -58,10 +58,13 @@ Functions are grouped by purpose for easier lookup.
   element equal to the provided value. Nested arrays must match exactly (order
   and length) to satisfy equality. Objects still use subset semantics and
   strings still use substring matching.
-- `contains_subset(value)`: opt-in jq-style subset matching for arrays. The
+- `contains_subset(value)`: recursive subset matching for arrays. The
   right-hand array is satisfied when every element can be matched anywhere in
   the left-hand array (order-insensitive) with multiset counting. Nested arrays
-  and objects are compared recursively using the same subset rules.
+  and objects are compared recursively using the same subset rules. This is not
+  a drop-in replacement for jq's `contains`: duplicate needles require duplicate
+  matching elements (`[1] | contains_subset([1,1])` is false), and scalar values
+  are compared after string coercion (`["1"] | contains_subset([1])` is true).
 
 ---
 
@@ -158,4 +161,3 @@ jq-lite users.json
 
 📚 For usage examples and environment compatibility, see [README.md](README.md).
 👉 Also available on [MetaCPAN — JQ::Lite](https://metacpan.org/pod/JQ::Lite)
-

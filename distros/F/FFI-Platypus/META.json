@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -104,6 +104,7 @@
             "Software::License::Perl_5" : "0"
          },
          "requires" : {
+            "Alien::Libbz2" : "0",
             "CHI" : "0",
             "Convert::Binary::C" : "0",
             "Devel::Hide" : "0",
@@ -170,7 +171,7 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_twitter" : "https://fosstodon.org/@PerlFFI"
    },
-   "version" : "2.11",
+   "version" : "2.12",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
@@ -194,8 +195,8 @@
       "Pete Houston (openstrike, HOUSTON)",
       "Lukas Mai (MAUKE)"
    ],
-   "x_generated_by_perl" : "v5.40.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

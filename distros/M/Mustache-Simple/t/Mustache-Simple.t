@@ -51,9 +51,14 @@ foreach my $yaml (@tests)
 #        next unless ++$count == 120;
 #	say STDERR "Test: $test->{name}";
 	SKIP: {
-	    foreach (@skip)
+	    foreach my $e (@skip)
 	    {
-		skip $test->{name}, 1 if $test->{name} ~~ $_;
+	      my $type = ref $e;
+	      if ( $type eq 'Regexp' ) {
+	        skip $test->{name}, 1 if $test->{name} =~ $e;
+	        next;
+	}
+		skip $test->{name}, 1 if $test->{name} eq $e;
 	    }
 	    eval {
 		my $mustache = new Mustache::Simple(

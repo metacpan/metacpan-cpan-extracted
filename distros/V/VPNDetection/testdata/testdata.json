@@ -398,10 +398,10 @@
           "provider": "mullvad",
           "last_seen": "2026-09-02",
           "confidence": "high",
-          "method": "openvpn_cert"
+          "method": "scan"
         },
         "hosting": {
-          "provider": "M247",
+          "provider": "m247",
           "confidence": "high",
           "last_seen": "2026-09-02"
         },
@@ -432,7 +432,7 @@
           "provider": "mullvad",
           "last_seen": "2026-09-02",
           "confidence": "high",
-          "method": "openvpn_cert"
+          "method": "scan"
         },
         "dcproxy": {
           "provider": "brightdata",
@@ -681,6 +681,1147 @@
       }
     }
   ],
+  "middleware": {
+    "why": "The framework middleware contract: how a block condition is evaluated, and which conditions must be refused outright. Field names are the WIRE names; each SDK maps them to its own idiom exactly as it maps a response.",
+    "conditions": [
+      {
+        "name": "flag-true-matches",
+        "why": "The simplest condition there is: a served flag that is true.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "is_vpn": true
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "flag-true-against-false",
+        "why": "A served flag that is false does not match.",
+        "body": {
+          "ip": "1.1.1.1",
+          "is_vpn": false,
+          "is_hosting": false,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": false,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {},
+          "hosting": {},
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {},
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "is_vpn": true
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "flag-absent-is-not-false",
+        "why": "The member is not in this plan, so the term can never match and must be reported. Absent means not-in-your-plan, never checked-and-no.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true
+        },
+        "condition": {
+          "is_hosting": true
+        },
+        "expect": {
+          "blocked": false,
+          "missing": [
+            "is_hosting"
+          ]
+        }
+      },
+      {
+        "name": "nested-provider-exact",
+        "why": "A condition reaches the evidence fields, not just the flags.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "is_vpn": true,
+          "vpn": {
+            "provider": "nordvpn"
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "nested-provider-case-insensitive",
+        "why": "Providers are lowercase slugs on the wire; a caller should not have to know that.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "vpn": {
+            "provider": "NordVPN"
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "nested-provider-mismatch",
+        "why": "A different provider does not match.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "vpn": {
+            "provider": "mullvad"
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "and-across-members",
+        "why": "Every member named must hold.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "is_vpn": true,
+          "is_hosting": true
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "and-one-fails",
+        "why": "One failing term fails the whole condition.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "is_vpn": true,
+          "is_tor": true
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "or-list-second-matches",
+        "why": "A list is OR: any one entry blocking is enough.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": [
+          {
+            "is_tor": true
+          },
+          {
+            "vpn": {
+              "provider": "nordvpn"
+            }
+          }
+        ],
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "or-list-none-match",
+        "why": "A list where nothing matches does not block.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": [
+          {
+            "is_tor": true
+          },
+          {
+            "vpn": {
+              "provider": "mullvad"
+            }
+          }
+        ],
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "array-any-of",
+        "why": "An array value is any-of, for an enum-like field.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "vpn": {
+            "confidence": [
+              "high",
+              "medium"
+            ]
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "array-none-of",
+        "why": "An any-of that contains nothing the answer carries.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "vpn": {
+            "confidence": [
+              "low"
+            ]
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "numeric-gte-inside",
+        "why": "The evidence counters are only useful with a threshold.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "resproxy": {
+            "hits": {
+              "gte": 5
+            }
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "numeric-gte-outside",
+        "why": "Below the threshold does not match.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "resproxy": {
+            "hits": {
+              "gte": 9
+            }
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "numeric-range-inside",
+        "why": "Every bound present must hold, so two of them are a range.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "resproxy": {
+            "hits": {
+              "gte": 5,
+              "lt": 100
+            }
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "numeric-exclusive-bound",
+        "why": "gt and lt are strict. Pinned because an off-by-one here reads as a working filter.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "resproxy": {
+            "hits": {
+              "gt": 7
+            }
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "numeric-inclusive-lower-bound",
+        "why": "gte INCLUDES the bound. hits is exactly 7 here, so a gte that compares strictly still passes every other numeric case and fails only this one.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "resproxy": {
+            "hits": {
+              "gte": 7
+            }
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "numeric-inclusive-upper-bound",
+        "why": "lte INCLUDES the bound, the mirror of the case above.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "resproxy": {
+            "hits": {
+              "lte": 7
+            }
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "numeric-exclusive-upper-bound",
+        "why": "lt EXCLUDES it. Together with numeric-exclusive-bound this pins all four comparators at the one value where inclusive and strict disagree.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "resproxy": {
+            "hits": {
+              "lt": 7
+            }
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "fractional-bound-on-an-integer-member",
+        "why": "Every numeric member the API serves is an integer, so the FRACTION has to come from the bound. Pinned because a comparison done in integers would round the bound and quietly widen or narrow the rule.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "resproxy": {
+            "hits_days_pct": {
+              "gte": 41.5
+            }
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "numeric-bound-on-absent-member",
+        "why": "A bound against a member this plan does not serve matches nothing and is reported.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true
+        },
+        "condition": {
+          "resproxy": {
+            "hits": {
+              "gte": 1
+            }
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": [
+            "resproxy"
+          ]
+        }
+      },
+      {
+        "name": "false-entry-is-ignored",
+        "why": "A false entry states nothing, so the remaining term decides. There is deliberately no way to write block-when-false, which would read as blocking everybody.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "is_vpn": true,
+          "is_tor": false
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "null-entry-is-ignored",
+        "why": "Null is ignored for the same reason false is.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "is_vpn": true,
+          "is_cdn": null
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "empty-detail-is-a-real-false",
+        "why": "An empty detail object means the flag above it is false. That is a served answer, not a plan gap, so it must not be reported as missing.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {}
+        },
+        "condition": {
+          "tor": {
+            "provider": "anything"
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "bogon-is-exempt",
+        "why": "A locally answered bogon carries every member by construction, so reporting coverage from it would tell a free-tier caller they hold the full plan.",
+        "bogon": "10.0.0.1",
+        "condition": {
+          "is_hosting": true
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      }
+    ],
+    "invalidConditions": [
+      {
+        "name": "empty-condition",
+        "why": "Nothing to satisfy means it matches every answer, which is a total outage.",
+        "condition": {}
+      },
+      {
+        "name": "every-entry-ignored",
+        "why": "Ignoring false leaves this constraining nothing, so it must be refused rather than silently blocking everybody.",
+        "condition": {
+          "is_vpn": false
+        }
+      },
+      {
+        "name": "empty-nested-object",
+        "why": "An empty nested object asserts only that the member is in your plan.",
+        "condition": {
+          "vpn": {}
+        }
+      }
+    ]
+  },
   "bogons": {
     "v4": [
       "0.0.0.0/8",

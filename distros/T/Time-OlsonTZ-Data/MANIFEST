@@ -249,6 +249,8 @@ lib/Time/OlsonTZ/Data/Australia/Lord_Howe.tz
 lib/Time/OlsonTZ/Data/Australia/Melbourne.tz
 lib/Time/OlsonTZ/Data/Australia/Perth.tz
 lib/Time/OlsonTZ/Data/Australia/Sydney.tz
+lib/Time/OlsonTZ/Data/CST6CDT.tz
+lib/Time/OlsonTZ/Data/EST5EDT.tz
 lib/Time/OlsonTZ/Data/Etc/GMT+1.tz
 lib/Time/OlsonTZ/Data/Etc/GMT+10.tz
 lib/Time/OlsonTZ/Data/Etc/GMT+11.tz
@@ -319,6 +321,8 @@ lib/Time/OlsonTZ/Data/Factory.tz
 lib/Time/OlsonTZ/Data/Indian/Chagos.tz
 lib/Time/OlsonTZ/Data/Indian/Maldives.tz
 lib/Time/OlsonTZ/Data/Indian/Mauritius.tz
+lib/Time/OlsonTZ/Data/MST7MDT.tz
+lib/Time/OlsonTZ/Data/PST8PDT.tz
 lib/Time/OlsonTZ/Data/Pacific/Apia.tz
 lib/Time/OlsonTZ/Data/Pacific/Auckland.tz
 lib/Time/OlsonTZ/Data/Pacific/Bougainville.tz

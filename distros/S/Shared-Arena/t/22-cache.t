@@ -192,15 +192,27 @@ SKIP: {
     # What the assertion is actually about is whether a child can READ what the
     # parent stored, and a pipe answers that exactly. Eviction is asserted
     # below, where it belongs.
+    #
+    # AND NOBODY CHURNS UNTIL EVERY CHILD HAS READ. The pipe alone still failed
+    # on the CPAN smoker with two processors, 0.02 on 5.36 and 5.38, as "child
+    # 4 said NOT ok": the read is safe from the child's own churn, but by the
+    # time the fourth child was scheduled to look, the other three were
+    # already writing - enough to evict the entry, or to hold its bucket
+    # mid-update for longer than a reader waits. So the children wait on a
+    # second pipe after reporting, and the parent closes it only once it has
+    # heard from all of them.
     pipe(my $rd, my $wr) or die "pipe: $!";
+    pipe(my $go_rd, my $go_wr) or die "pipe: $!";
     for my $kid (1 .. $KIDS) {
         my $pid = fork();
         die "fork: $!" unless defined $pid;
         if (!$pid) {
             close $rd;
+            close $go_wr;                 # or the parent's close never reaches EOF
             my $seen = ($c->get('from-parent'))[0] // '';
             print {$wr} (($seen eq 'before the fork') ? "ok\n" : "NOT ok\n");
             close $wr;
+            my $go = <$go_rd>;            # EOF when every child has reported
             # Enough churn from every process at once to make the buckets
             # contend, since eviction is the part that takes a lock.
             $c->set("churn$kid-$_", 'x' x 50) for 1 .. 500;
@@ -209,7 +221,9 @@ SKIP: {
         push @pids, $pid;
     }
     close $wr;
-    my @said = <$rd>;
+    close $go_rd;
+    my @said = <$rd>;                     # EOF once every child has closed its end
+    close $go_wr;                         # let them churn
     waitpid $_, 0 for @pids;
     chomp @said;
 

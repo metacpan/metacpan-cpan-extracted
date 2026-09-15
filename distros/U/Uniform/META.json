@@ -4,7 +4,7 @@
       "Joshua S. Day <HAX@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "mit"
    ],
@@ -39,6 +39,7 @@
       "test" : {
          "requires" : {
             "Test::Deep" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -54,6 +55,6 @@
          "web" : "https://github.com/haxmeister/perl-Uniform"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

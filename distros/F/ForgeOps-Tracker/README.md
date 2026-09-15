@@ -1,21 +1,26 @@
 # ForgeOps::Tracker
 
-Perl error reporting client for a private, self-hosted [ForgeOps](../../) tracker instance. Zero
+Perl error reporting client for a [ForgeOps](../../) instance. Zero
 non-core runtime dependencies: `HTTP::Tiny`, `JSON::PP`, `threads`, `threads::shared`,
 `Thread::Queue`, `POSIX`, `Cwd`, `Sys::Hostname`, and `Carp` are all part of core Perl (5.14+).
 `Plack` and `Dancer2` are only needed for their own optional integrations below.
 
 ## Installation
 
-Not yet indexed on CPAN -- install directly from the mirror repo instead:
+```bash
+cpanm ForgeOps::Tracker
+```
+
+Installing straight from the mirror repo also still works, if you'd rather pin a specific commit
+than a CPAN release:
 
 ```bash
 cpanm https://github.com/Luke-Popwell/forge-ops-tracker-perl.git
 ```
 
-That's a mirror, kept in sync automatically from `sdks/perl` in the main `forge_ops` repo (which is
-private, so isn't itself something `cpanm` could ever install from directly) -- develop against
-that repo, not this one. To build and run this SDK's own tests directly instead:
+That mirror is kept in sync automatically from `sdks/perl` in the main `forge_ops` repo (which is
+private, so isn't itself something `cpanm` could ever install from directly); develop against that
+repo, not this one. To build and run this SDK's own tests directly instead:
 
 ```bash
 cd sdks/perl
@@ -53,7 +58,7 @@ builder {
 
 The leading `+` matters: without it, Plack::Builder looks the name up under its own
 `Plack::Middleware::*` namespace instead of taking it as an exact class name. Works under any
-PSGI-speaking framework, not just plain PSGI apps -- Dancer2 itself ultimately runs on PSGI, so
+PSGI-speaking framework, not just plain PSGI apps: Dancer2 itself ultimately runs on PSGI, so
 this middleware would also catch what escapes a Dancer2 app, though the dedicated Dancer2 plugin
 below is the better fit there (it reports from inside Dancer2's own exception hook, with access to
 Dancer2's request object, rather than the raw PSGI `$env`).
@@ -62,7 +67,7 @@ Dancer2's request object, rather than the raw PSGI `$env`).
 
 ```perl
 use Dancer2;
-use ForgeOps::Tracker::Integrations::Dancer2;   # that's it -- no further wiring
+use ForgeOps::Tracker::Integrations::Dancer2;   # that's it: no further wiring
 ```
 
 Registers Dancer2's own `on_route_exception` hook, which fires for any exception a route throws
@@ -72,7 +77,7 @@ observes; Dancer2's own error response still renders exactly as if this plugin w
 ## What gets reported automatically, and what doesn't
 
 **An exception that escapes a route needs no further wiring at all** under either integration
-above. **An exception your own code catches and handles is different** -- report it explicitly at
+above. **An exception your own code catches and handles is different**: report it explicitly at
 the catch site:
 
 ```perl
@@ -86,7 +91,7 @@ if ($@) {
 
 There's deliberately no process-wide fallback hook here, and that's not an oversight. Perl's
 `$SIG{__DIE__}` is the only language-level hook that fires on every `die`, but it fires for
-**every** `die`, including one an enclosing `eval {}` goes on to catch and handle locally --
+**every** `die`, including one an enclosing `eval {}` goes on to catch and handle locally:
 there's no way for a `__DIE__` handler to know, at the moment it's called, whether the exception
 unwinding toward it will actually escape uncaught or not. Installing one here would report
 exceptions your own code already handles, breaking the invariant this client otherwise holds to
@@ -127,10 +132,31 @@ If your own exception classes expose a `->trace` method returning a `Devel::Stac
 object (as `Throwable::Error` and similar frameworks do), that's used directly instead and is more
 reliable than parsing any string.
 
+## Source context
+
+By default, each in_app backtrace frame (never a vendored/system library) is captured along with
+the 5 lines of source on either side of the culprit line, read straight off disk at die/confess
+time, so an issue's detail page can show the actual code that broke, not just a `file:line`
+reference. This never applies to a frame outside `app_root`, and it fails silently (no context,
+not an error) for any file that can't be opened for whatever reason.
+
+This is a real, deliberate exception to "off by default is safer": literal source code is being
+transmitted, not just a reference to it, and the real protection here is not this flag. Every
+project on ForgeOps has its own setting (on by default, off durably and immediately once an org
+owner turns it off, regardless of what any individual app's own `capture_source_context` is still
+set to) that governs whether the server will ever actually store what an SDK sends, see the in-app
+help docs. Use this option if you'd rather this client never even attempt the disk read in the
+first place:
+
+```perl
+ForgeOps::Tracker::init(dsn => '...', capture_source_context => 0);
+```
+
 ## PII scrubbing
 
-The message, backtrace, and any context/tags you attach are scanned for likely personal data -- email addresses, formatted SSNs/credit cards, known
-API key/token formats, and anything under a suspiciously-named key -- and redacted before the
+The message, backtrace, and any context/tags you attach are scanned for likely personal data
+(email addresses, formatted SSNs/credit cards, known API key/token formats, and anything under a
+suspiciously-named key) and redacted before the
 payload ever leaves this process. ForgeOps itself scrubs again on arrival regardless, so this is a
 second, earlier layer, not the only one.
 
@@ -139,6 +165,47 @@ To disable it:
 ```perl
 ForgeOps::Tracker::init(dsn => '...', scrub_pii => 0);
 ```
+
+## Performance monitoring
+
+Two more integrations, one per framework, time every request end to end and report it, bucketed
+by transaction name, for a dashboard widget on a project's Performance page (so it can show which
+parts of your app are actually slow, not just which ones raise). Counted in-process and flushed as
+a small periodic aggregate on a background thread, the same delivery philosophy as error
+reporting: a broken or unreachable tracker never affects the host app either way.
+
+```perl
+# PSGI / Plack
+use Plack::Builder;
+builder {
+    enable '+ForgeOps::Tracker::Integrations::PSGI';            # error reporting
+    enable '+ForgeOps::Tracker::Integrations::PSGIPerformance'; # performance monitoring
+    $app;
+};
+
+# Dancer2
+use Dancer2;
+use ForgeOps::Tracker::Integrations::Dancer2;              # error reporting
+use ForgeOps::Tracker::Integrations::Dancer2Performance;   # performance monitoring
+```
+
+The transaction name is the matched route pattern where one is available (Dancer2's own
+`spec_route`, e.g. `GET /users/:id`), so a distinct user id doesn't explode into its own separate
+transaction; plain PSGI has no route-matching concept of its own to read a pattern from, so that
+integration reports the raw request path instead. A Dancer2 request that never matches any route
+(a 404) isn't recorded at all: Dancer2's own `after_request` hook simply never fires for that case.
+
+```perl
+ForgeOps::Tracker::init(
+    dsn                        => '...',
+    track_performance          => 0,  # opt out entirely
+    performance_flush_interval => 30, # default 60 seconds
+);
+```
+
+Requires a ForgeOps plan that includes performance monitoring; on a plan that doesn't, the
+periodic flushes are simply rejected server-side and dropped, exactly like any other delivery
+failure.
 
 ## Running the tests
 

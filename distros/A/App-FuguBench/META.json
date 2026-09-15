@@ -1,0 +1,26 @@
+{
+   "abstract" : "outfit a FuguBSD checkout for a coding agent",
+   "author" : [
+      "Dick Olsson <hi@senzilla.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "scripts/dist",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "version" : 2
+   },
+   "name" : "App-FuguBench",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Fugu" : 0,
+            "perl" : "5.034"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

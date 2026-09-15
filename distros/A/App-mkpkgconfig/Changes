@@ -1,5 +1,11 @@
 Revision history for App-mkpkgconfig
 
+v2.0.2    2026-09-14 20:48:45 EDT
+
+  [BUGFIX]
+
+    * duplicate definition of --modversion
+
 v2.0.1    2020-08-21 13:54:28-04:00 America/New_York
 
   [BUILD]

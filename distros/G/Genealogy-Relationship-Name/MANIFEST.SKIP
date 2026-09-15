@@ -70,3 +70,8 @@ Genealogy-.*
 .test-script-*
 typescript
 mutation.json
+^xt/mutant_\d
+CLAUDE.md
+\.claude
+^relationships\.txt$
+\.circleci

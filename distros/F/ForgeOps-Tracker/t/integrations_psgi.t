@@ -10,14 +10,14 @@ use ForgeOps::Tracker;
 use ForgeOps::Tracker::Integrations::PSGI;
 
 my @reported;
-# Overriding the package sub via a local typeglob assignment, rather than mocking an object method
-# -- ForgeOps::Tracker's public API is a set of plain subs (report/init), not a class, the same
+# Overriding the package sub via a local typeglob assignment, rather than mocking an object method:
+# ForgeOps::Tracker's public API is a set of plain subs (report/init), not a class, the same
 # module-level-function shape sdks/node/src/index.js exposes for its own captureException.
 local *ForgeOps::Tracker::report = sub { push @reported, [@_]; };
 
 my $app = builder {
     # The leading '+' tells Plack::Builder to use this exact class name rather than prepending
-    # its default Plack::Middleware::* namespace prefix -- confirmed directly (the bare name
+    # its default Plack::Middleware::* namespace prefix: confirmed directly (the bare name
     # produced "Can't locate Plack/Middleware/ForgeOps/..."), not assumed from Plack::Builder's
     # own docs alone.
     enable '+ForgeOps::Tracker::Integrations::PSGI';

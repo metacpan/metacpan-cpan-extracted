@@ -40,65 +40,65 @@ require './t/dump.pl';
 package TIED_HASH;
 
 sub TIEHASH {
-	my $self = bless {}, shift;
-	return $self;
+    my $self = bless {}, shift;
+    return $self;
 }
 
 sub FETCH {
-	my $self = shift;
-	my ($key) = @_;
-	$main::hash_fetch++;
-	return $self->{$key};
+    my $self = shift;
+    my ($key) = @_;
+    $main::hash_fetch++;
+    return $self->{$key};
 }
 
 sub STORE {
-	my $self = shift;
-	my ($key, $value) = @_;
-	$self->{$key} = $value;
+    my $self = shift;
+    my ($key, $value) = @_;
+    $self->{$key} = $value;
 }
 
 sub FIRSTKEY {
-	my $self = shift;
-	scalar keys %{$self};
-	return each %{$self};
+    my $self = shift;
+    scalar keys %{$self};
+    return each %{$self};
 }
 
 sub NEXTKEY {
-	my $self = shift;
-	return each %{$self};
+    my $self = shift;
+    return each %{$self};
 }
 
 sub CLEAR {
-	%$self = ();  
+    %$self = ();
 }
 
 package TIED_ARRAY;
 
 sub TIEARRAY {
-	my $self = bless [], shift;
-	return $self;
+    my $self = bless [], shift;
+    return $self;
 }
 
 sub FETCH {
-	my $self = shift;
-	my ($idx) = @_;
-	$main::array_fetch++;
-	return $self->[$idx];
+    my $self = shift;
+    my ($idx) = @_;
+    $main::array_fetch++;
+    return $self->[$idx];
 }
 
 sub STORE {
-	my $self = shift;
-	my ($idx, $value) = @_;
-	$self->[$idx] = $value;
+    my $self = shift;
+    my ($idx, $value) = @_;
+    $self->[$idx] = $value;
 }
 
 sub FETCHSIZE {
-	my $self = shift;
-	return @{$self};
+    my $self = shift;
+    return @{$self};
 }
 
 sub CLEAR {
-	@$self = ();  
+    @$self = ();
 }
 
 sub EXTEND  { }
@@ -106,25 +106,25 @@ sub EXTEND  { }
 package TIED_SCALAR;
 
 sub TIESCALAR {
-	my $scalar;
-	my $self = bless \$scalar, shift;
-	return $self;
+    my $scalar;
+    my $self = bless \$scalar, shift;
+    return $self;
 }
 
 sub FETCH {
-	my $self = shift;
-	$main::scalar_fetch++;
-	return $$self;
+    my $self = shift;
+    $main::scalar_fetch++;
+    return $$self;
 }
 
 sub STORE {
-	my $self = shift;
-	my ($value) = @_;
-	$$self = $value;
+    my $self = shift;
+    my ($value) = @_;
+    $$self = $value;
 }
 
 sub CLEAR {
-	$$self = ();  
+    $$self = ();
 }
 
 1;

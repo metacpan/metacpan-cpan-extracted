@@ -1,5 +1,11 @@
 Release history for Getopt-Guided
 
+v3.3.2    2026-09-14T06:37:49Z
+          - Introduce ":all" export tag not using %EXPORT_TAGS package variable
+          - Remove redundancy in readopts() implementation
+          - Make some of the non-exported functions really private
+          - Add ABSTRACT source comment to main module
+
 v3.3.1    2026-09-11T15:34:52Z
           - Use hard-coded defaults even if readopts() reads nothing
 

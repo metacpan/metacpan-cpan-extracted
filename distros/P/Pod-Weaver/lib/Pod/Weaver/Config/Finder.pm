@@ -1,4 +1,4 @@
-package Pod::Weaver::Config::Finder 4.021;
+package Pod::Weaver::Config::Finder 4.022;
 # ABSTRACT: the reader for weaver.ini files
 
 use Moose;
@@ -26,7 +26,7 @@ Pod::Weaver::Config::Finder - the reader for weaver.ini files
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 PERL VERSION
 

@@ -1372,17 +1372,32 @@ sub _build_regex {
     $flags   = '' unless defined $flags;
 
     my %allowed = map { $_ => 1 } qw(i m s x);
-    my $modifiers = '';
+    my %enabled;
     for my $flag (split //, $flags) {
         return (undef, "unknown regex flag '$flag'") unless $allowed{$flag};
-        next if index($modifiers, $flag) >= 0;
-        $modifiers .= $flag;
+        $enabled{$flag} = 1;
     }
 
-    my $escaped = $pattern;
-    $escaped =~ s/'/\\'/g;
+    my $modifiers = join '', grep { $enabled{$_} } qw(i m s x);
 
-    my $regex = eval "qr'$escaped'$modifiers";
+    my $regex = eval {
+        $modifiers eq ''     ? qr/$pattern/
+      : $modifiers eq 'i'    ? qr/$pattern/i
+      : $modifiers eq 'm'    ? qr/$pattern/m
+      : $modifiers eq 's'    ? qr/$pattern/s
+      : $modifiers eq 'x'    ? qr/$pattern/x
+      : $modifiers eq 'im'   ? qr/$pattern/im
+      : $modifiers eq 'is'   ? qr/$pattern/is
+      : $modifiers eq 'ix'   ? qr/$pattern/ix
+      : $modifiers eq 'ms'   ? qr/$pattern/ms
+      : $modifiers eq 'mx'   ? qr/$pattern/mx
+      : $modifiers eq 'sx'   ? qr/$pattern/sx
+      : $modifiers eq 'ims'  ? qr/$pattern/ims
+      : $modifiers eq 'imx'  ? qr/$pattern/imx
+      : $modifiers eq 'isx'  ? qr/$pattern/isx
+      : $modifiers eq 'msx'  ? qr/$pattern/msx
+      :                         qr/$pattern/imsx;
+    };
     if ($@) {
         return (undef, $@);
     }

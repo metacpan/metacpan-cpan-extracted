@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
 
@@ -6,6 +9,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
+my $loaded;
 BEGIN { $| = 1; print "1..6\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Clone::PP qw( clone );
@@ -21,9 +25,7 @@ print "ok 1\n";
 
 package Test::Array;
 
-use vars @ISA;
-
-@ISA = qw(Clone::PP);
+our @ISA = qw(Clone::PP);
 
 sub new
   {
@@ -34,6 +36,7 @@ sub new
 
 package main;
                                                 
+my $test;
 sub ok     { print "ok $test\n"; $test++ }
 sub not_ok { print "not ok $test\n"; $test++ }
 
@@ -64,5 +67,5 @@ $c->[1][1][1] == $a->[1][1][1] ? ok : not_ok;
 
 my @circ = ();
 $circ[0] = \@circ;
-$aref = clone(\@circ);
+my $aref = clone(\@circ);
 Dumper(\@circ) eq Dumper($aref) ? ok : not_ok;

@@ -1,0 +1,33 @@
+Revision history for Business-PT-CodigoPostal
+
+0.02	ISO 3166-2, distritos() e paridade com o módulo espanhol
+
+	- iso_3166_2 e distrito_code. Os 18 distritos são PT-01 a PT-18 por
+	  ordem alfabética e as duas regiões autónomas quebram a série:
+	  Açores é PT-20 e Madeira PT-30. Faz falta a quem liga isto a um
+	  ERP, que escolhe o estado pelo código ISO.
+	- distritos() devolve os 20 para montar uma lista de escolha.
+	- A ordem da lista ignora os sinais: 'Açores' vinha depois de
+	  'Aveiro' e 'Évora' teria ido para o fim, porque 'Ç' e 'É' vêm
+	  depois do 'Z' por ponto de código.
+	- t/paridade.t compara a API com Business::ES::CodigoPostal e salta
+	  se esse não estiver instalado.
+	- As tabelas geradas passam a herdar a versão do módulo principal,
+	  em vez de a levarem escrita à mão.
+
+	A 0.01 chegou ao PAUSE mas nunca ao índice nem aos espelhos, e além
+	disso não levava nada do que está aqui em cima.
+
+0.01	Primeira versão
+
+	- validate_cp() valida o formato NNNN-NNN e devolve distrito e região.
+	- localidades() e asignado(), com os dados em
+	  Business::PT::CodigoPostal::Localidades, que só se carrega ao pedir
+	  localidades.
+	- Interface OO: new, set, distrito, region, insular, valid, error.
+	- Duas tabelas para o distrito em vez de uma regra: em Portugal o
+	  código postal não respeita as fronteiras dos distritos. O prefixo de
+	  dois dígitos é ambíguo em 25 de 79 casos; com quatro dígitos restam
+	  13 prefixos em 750, e esses resolvem-se com o código completo.
+	- Dados de GeoNames (CC BY 4.0): 737 prefixos, 5.043 excepções,
+	  197.772 códigos com localidade. Regeneráveis com maint/gen-datos.pl.

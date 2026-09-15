@@ -10,7 +10,7 @@ use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000029';
+our $VERSION = '0.000030';
 
 # Directly modifying this is a bad idea, but for the XS to work it needs to be
 # a package var, not a lexical.
@@ -169,8 +169,7 @@ sub filter {
     my $class = shift;
     my ($file, %params) = @_;
 
-    my $root = path($params{root} // '.');
-    $root = $root->realpath if $root->exists;
+    my $root = $class->_resolve_root($params{root});
 
     my $path = $INC{$file} ? path($INC{$file}) : path($file);
     $path = $path->realpath if $path->exists;
@@ -179,7 +178,7 @@ sub filter {
     # files resolve consistently with the relative() call below.
     return () unless $root->subsumes($path);
 
-    for my $exclude (@{$class->_exclude_roots($params{exclude})}) {
+    for my $exclude (@{$class->_exclude_roots($params{exclude}, $root)}) {
         return () if $exclude->subsumes($path);
     }
 
@@ -301,11 +300,17 @@ sub report {
     my $details = "This test covered " . scalar(keys %$data) . " source files.";
     my $type    = $FROM_MODIFIED ? 'split' : 'flat';
 
+    # Relative paths in the file list are resolved against this root. A consumer
+    # in another process cannot know it otherwise, and would have to guess from
+    # its own directory.
+    my $root = $class->_resolve_root($params{root})->stringify;
+
     my $ctx   = $params{ctx} // context();
     my $event = $ctx->send_ev2(
         about => {package => __PACKAGE__, details => $details},
 
         coverage => {
+            root         => $root,
             files        => $data,
             details      => $details,
             test_type    => $type,
@@ -348,9 +353,17 @@ sub _parse_params {
     return %params;
 }
 
+sub _resolve_root {
+    my $class = shift;
+    my ($root) = @_;
+
+    $root = path($root // '.');
+    return $root->exists ? $root->realpath : $root;
+}
+
 sub _exclude_roots {
     my $class = shift;
-    my ($exclude) = @_;
+    my ($exclude, $root) = @_;
 
     return [] unless defined $exclude;
 
@@ -360,15 +373,20 @@ sub _exclude_roots {
 
         my $path = path($item);
 
+        # A relative exclusion belongs to the tree being measured, not to
+        # whatever directory the process happens to be in when it reports.
+        $path = $root->child($path) if $root && !$path->is_absolute;
+
         # filter() runs once per recorded file and would otherwise resolve the
-        # same roots again for every one of them. Only absolute paths are
-        # cached, a relative one means something different after a chdir.
+        # same roots again for every one of them. Anything still relative here
+        # had no root to anchor to, and means something different after a
+        # chdir, so it is not cached.
         unless ($path->is_absolute) {
             push @out => $path->exists ? $path->realpath : $path->absolute;
             next;
         }
 
-        push @out => $EXCLUDE_ROOT_CACHE{"$item"} //= $path->exists ? $path->realpath : $path->absolute;
+        push @out => $EXCLUDE_ROOT_CACHE{"$path"} //= $path->exists ? $path->realpath : $path->absolute;
     }
 
     return \@out;
@@ -616,7 +634,8 @@ INLINE:
 An excluded path and everything under it, at any depth, is dropped before the
 coverage event is sent, so excluded files never reach tools consuming that
 event. Paths are compared component by component, so excluding C<lib> does not
-exclude a sibling C<library>. Relative paths are resolved against the current
+exclude a sibling C<library>. A relative path is resolved against the coverage
+root, so it keeps meaning the same tree in a process that has changed
 directory.
 
 Wildcards are not supported, an exclusion is a literal path. Excluding a whole
@@ -821,6 +840,11 @@ behave as they do in C<files()>.
 This will send a Test2 event containing coverage information. It will also
 return the event.
 
+The event's C<coverage> facet carries the processed file data from C<data()>
+under C<files>, and under C<root> the canonical absolute directory a relative
+file path is resolved against, so a consumer in another process can resolve
+them without guessing.
+
 Options:
 
 =over 4
@@ -835,8 +859,9 @@ This may be a L<Path::Tiny> instance or a plain string.
 
 Paths to leave out of the report entirely, along with everything under them.
 May be a single path or an arrayref of them, each a L<Path::Tiny> instance or
-a plain string. Relative paths are resolved against the current directory, and
-wildcards are not supported.
+a plain string. Relative paths are resolved against the coverage root when one
+is supplied, and against the current directory otherwise. Wildcards are not
+supported.
 
 When passed at import time this option may be given more than once instead of
 using an arrayref, which is how it survives the C<-M> command line form.
@@ -878,6 +903,10 @@ files. The default implementation removes any files that are not under the
 current directory which lets you focus on files in the distribution you are
 testing. You may return a modified filename if you wish to normalize it here,
 the default implementation will turn it into a relative path.
+
+A returned path must be relative to the root, or absolute. The coverage event
+names that root so that consumers can resolve relative paths, and a relative
+path that is not actually under it names the wrong file.
 
 If you provide a custom C<root> parameter, it may be a L<Path::Tiny> instance
 or a plain string.

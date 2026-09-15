@@ -1,7 +1,7 @@
 ---
-abstract: "a package manager for Slackware's SlackBuilds.org"
+abstract: "A package manager for Slackware's SlackBuilds.org"
 author:
-  - 'Nicholas Hubbard <nicholashubbard@posteo.net>'
+  - 'Nicholas B. Hubbard <nicholashubbard@posteo.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/NicholasBHubbard/sbozyp/issues
   repository: https://github.com/NicholasBHubbard/sbozyp
-version: v1.10.1
+version: v1.10.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

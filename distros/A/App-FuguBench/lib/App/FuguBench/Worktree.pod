@@ -1,0 +1,199 @@
+=head1 NAME
+
+App::FuguBench::Worktree - the worktree verb of fugubench
+
+=head1 SYNOPSIS
+
+    fugubench [-C <root>] worktree create <name>
+    fugubench [-C <root>] worktree remove [--force] <name>
+    fugubench [-C <root>] worktree list
+    fugubench [-C <root>] worktree clone <path>...
+
+=head1 DESCRIPTION
+
+B<App::FuguBench::Worktree> makes, removes, and lists the worktrees
+of one checkout, and it clones the gitignored trees of that checkout
+into a worktree. The subcommands are C<create>, C<remove>, C<list>,
+and C<clone>, and the verb reads the subcommand as its first
+argument. Every other word is an unknown subcommand, and it gives
+the usage error.
+
+=head2 THE ROOT
+
+The root of the verb is the main checkout. C<-C> names the start of
+the checkout walk, and the walk finds the F<.toolingrc> of the root.
+A linked worktree holds a F<.git> file, not a directory, so the verb
+refuses such a root. No worktree then nests under another one.
+
+The path of the root comes from C<abs_path>, because git reports the
+resolved path of each worktree. The two must agree, or the listing
+finds no worktree.
+
+The base of the worktrees is the C<worktree.base> key, and the
+default is F<.claude/worktrees>. The value resolves against the root,
+and not against the home of the key. A clone under F<Projects/> can
+inherit the key from the workspace above it, and the worktrees of
+that clone still belong to the clone.
+
+The value must name a directory below the root. A value of C<.>
+resolves to the root itself, and the base then holds every path of
+the checkout. Each subcommand refuses such a value.
+
+=head2 create
+
+C<create E<lt>nameE<gt>> makes the worktree at
+F<< <root>/<base>/<name> >>, on a new branch C<< <name> >> that
+starts at the local HEAD of the root. It writes the worktree path to
+standard output as the only line, and that line is the contract of
+the WorktreeCreate hook.
+
+A name holds letters, digits, a dot, a dash, an underscore, and a
+slash. The first character is a letter or a digit, because a name
+that starts with a dash reaches git as an option. A name holds no
+C<..> segment. The verb refuses a name whose worktree would sit
+inside an existing worktree.
+
+A second C<create> of a name whose worktree exists runs the bootstrap
+again, writes the path again, and returns 0. A caller can run the same
+create twice, and the second run does not fail. Each clone step of the
+bootstrap skips what exists, so the run repairs a bootstrap that
+stopped early.
+
+A path that exists, but that is no worktree of that name, is debris
+from a killed create. The verb refuses it, and the message names
+C<< <program> worktree remove <name> >> as the remedy.
+
+The verb makes the branch first, as its own step. That step is the
+lock against a parallel create of one name: one create is successful,
+and every other one stops and changes nothing. After that step the
+verb owns all that it makes.
+
+After the worktree exists, the verb runs
+C<< make -C <worktree> bootstrap MAIN=<root> >> when the worktree
+holds a makefile. The bootstrap belongs to the repository, and its
+target names the paths to clone.
+
+Each child of create leads its own process group. After a failure,
+and after SIGINT or SIGTERM, the verb stops that group and waits for
+it. An orphan child then makes no file while the cleanup removes
+files. The cleanup removes the worktree, the directory, and the
+branch. It prunes the worktree records of git, and each empty parent
+directory. Every step runs, also after a step that fails, so a failed
+create leaves no worktree and no branch.
+
+=head2 remove
+
+C<remove [--force] E<lt>nameE<gt>> takes the worktree of that name
+and deletes its branch. Only an operator runs it, and no hook calls
+it. A session captures its work in the clones inside its worktree,
+and an automatic removal destroys that work.
+
+Without C<--force> the subcommand refuses a worktree that holds work
+at risk, and it names each cause. The causes are an uncommitted
+change in the worktree or in a repository inside it, and a commit
+that no remote holds. A cause names the repository and the reason,
+and C<.> names the worktree itself. C<--force> overrides the refusal.
+
+The walk for the causes stops at each repository that it finds, and
+it skips F<scratch/> and a nested worktree directory. In a repository
+with no remote, a commit that the C<main> branch holds is safe. A
+linked worktree shares its ref store with the main checkout, so its
+count reads its own HEAD alone.
+
+The path resolves first, and the resolved path must sit under the
+base. A symbolic link in the base must not permit a removal outside
+the base. A parallel remove that takes the directory first is no
+error, and a second run changes nothing.
+
+The subcommand takes a locked worktree, debris from a killed create,
+and a worktree that a user removed by hand. When git refuses the
+directory, the subcommand deletes the directory itself and prunes the
+worktree records of git. It then deletes the branch, and it removes
+each empty parent directory up to the base. It never deletes the
+branch C<main>, and never the branch that the main checkout has
+checked out.
+
+git knows no debris of a killed create, and its discovery walks up
+from the debris to the checkout above it. So the subcommand trusts no
+answer of git about such a directory. The walk for the causes reads no
+state of it, and it reads each repository below it. The branch of the
+debris is the name of the worktree, and not a branch that git reports.
+
+=head2 list
+
+C<list> reports each worktree of the base with its name, its age in
+days, and its state. The line is C<%-40s %4s d  %s>. Without a
+worktree the subcommand writes C<no worktrees>.
+
+The state is C<clean>, or each cause of the refusal of C<remove>
+above. An operator reads the state to see which worktree is safe to
+remove, because no hook removes one.
+
+The age comes from the F<.git> file of the worktree. That file
+records the creation, and later work leaves it alone. A file that no
+read reaches gives the age C<?>.
+
+=head2 clone
+
+C<clone E<lt>pathE<gt>...> copies the gitignored paths of the main
+checkout into the current directory, with no network and no C<gh>. A
+bootstrap target of a worktree names the paths, so C<create> reaches
+this subcommand through C<make>.
+
+A path is relative, and it holds no C<..> segment and no C<.> alone.
+The first character is a letter, a digit, a dot, or an underscore: a
+gitignored path such as F<.env> starts with a dot, and a path that
+starts with a dash reaches git as an option. Every path passes the
+shape check before any work starts, so one bad path stops the run and
+changes nothing.
+
+A path that names a git repository gives a local clone, and the
+subcommand sets the C<origin> of the clone to the origin URL of the
+source. A path that names a directory of repositories gives one clone
+of each child. A path that names a plain file gives a copy of the
+file. A path that is absent in the main checkout gives a message, and
+no failure.
+
+The subcommand copies each regular F<.env> file of a cloned tree, at
+any depth, with the mode of the source. Those files are gitignored,
+so the clone of git holds none of them. The walk skips F<.git> and a
+nested worktree directory, and it copies no symbolic link: a F<.env>
+link is content of the repository, and it stays there.
+
+A destination that exists stays as it is, so a second run repairs a
+bootstrap that stopped early and keeps a local change. A symbolic
+link at the destination of a file copy goes first, and a regular file
+takes its place, so the copy writes no byte through the link.
+
+The subcommand writes inside the current directory only. In the main
+checkout itself it reports that fact and changes nothing. It writes
+no credential into a settings file: a F<.env> file is a file copy,
+and the HOME profiles hold the credentials.
+
+=head1 EXIT CODES
+
+The verb returns the exit codes of L<Fugu::CLI>. A subcommand that
+does its work returns 0.
+
+It returns 1 after a failure: a root that is no main checkout, a name
+of the wrong shape, a nest, a path that is no worktree of the name, a
+step that fails, or a signal. C<remove> returns 1 after a refusal,
+after a path that resolves outside the base, and after a directory or
+a branch that stays. C<clone> returns 1 after a path of the wrong
+shape, after a source that no read reaches, and after a clone or a
+copy that fails.
+
+A missing argument, an extra argument, and an unknown subcommand give
+the usage error and return 2. Every subcommand reads the base, so a
+C<worktree.base> value of the wrong shape returns 3 from each one. A
+value that resolves to the root returns 3 too.
+
+=head1 SEE ALSO
+
+L<App::FuguBench>, L<Fugu::CLI>, L<Fugu::Process>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

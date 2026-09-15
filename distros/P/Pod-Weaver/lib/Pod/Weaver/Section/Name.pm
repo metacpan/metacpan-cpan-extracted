@@ -1,4 +1,4 @@
-package Pod::Weaver::Section::Name 4.021;
+package Pod::Weaver::Section::Name 4.022;
 # ABSTRACT: add a NAME section with abstract (for your Perl module)
 
 use Moose;
@@ -6,7 +6,7 @@ with 'Pod::Weaver::Role::Section',
      'Pod::Weaver::Role::StringFromComment';
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -132,7 +132,7 @@ Pod::Weaver::Section::Name - add a NAME section with abstract (for your Perl mod
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

@@ -1,0 +1,68 @@
+{
+   "abstract" : "Build & install the SDL3 library family (libsdl3, image, ttf, mixer) via xrepo",
+   "author" : [
+      "Sanko Robinson"
+   ],
+   "description" : " ",
+   "dynamic_config" : 1,
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Exotic-SDL3",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Xrepo::MB" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Xrepo::MB" : "0",
+            "Module::Build" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Xrepo::Runtime" : "0",
+            "File::ShareDir" : "1.00"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Exotic::SDL3" : {
+         "file" : "lib/Exotic/SDL3.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "testing",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "v1.0.0",
+   "x_ignore" : [
+      ".tidyallrc",
+      ".gitignore",
+      ".clang-format",
+      ".github/**"
+   ]
+}

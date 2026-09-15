@@ -11,14 +11,16 @@ use constant PkgConfig => 'App::mkpkgconfig::PkgConfig';
 
 subtest 'default' => sub {
 
-    my $stdout;
+    my ( $stdout, $stderr );
     ok(
         lives {
-            $stdout = capture {
+            ( $stdout, $stderr ) = capture {
                 main( qw( --name foo --description foodesc --Cflags foo --modversion 1 ) )
             };
         } ) or diag $@;
 
+    isnt( $stderr, L(), 'nothing output to stderr' )
+      or diag $stderr;
 
     my $pkg;
     ok( lives { $pkg = PkgConfig->new_from( \$stdout ) } )
@@ -73,7 +75,7 @@ subtest 'requested' => sub {
                     '--modversion'  => 1,
                     '--var'         => 'bar=2',
                     '--usevars'     => 'requested',
-                  )
+                )
             }
         },
     ) or diag $@;
@@ -129,7 +131,7 @@ subtest 'needed' => sub {
                     '--modversion'  => 1,
                     '--var'         => 'bar=2',
                     '--usevars'     => 'needed',
-                  )
+                )
             }
         },
     ) or diag $@;
@@ -185,7 +187,7 @@ subtest 'auto' => sub {
                         '--prefix'  => 'root',
                         '--package' => 'mypkg',
                         '--usevars' => 'all',
-                      )
+                    )
                 }
             },
         ) or diag $@;
@@ -252,11 +254,11 @@ subtest 'auto' => sub {
                         '--name'        => 'foo',
                         '--description' => 'foodesc',
                         '--modversion'  => 1,
-                        '--auto'     => 'libdir',
-                        '--prefix'  => 'root',
-                        '--package' => 'mypkg',
-                        '--usevars' => 'requested',
-                      )
+                        '--auto'        => 'libdir',
+                        '--prefix'      => 'root',
+                        '--package'     => 'mypkg',
+                        '--usevars'     => 'requested',
+                    )
                 }
             },
         ) or diag $@;
@@ -322,11 +324,11 @@ subtest 'auto' => sub {
                         '--name'        => 'foo',
                         '--description' => 'foodesc',
                         '--modversion'  => 1,
-                        '--auto'     => 'libdir',
-                        '--prefix'  => 'root',
-                        '--package' => 'mypkg',
-                        '--usevars' => 'needed',
-                      )
+                        '--auto'        => 'libdir',
+                        '--prefix'      => 'root',
+                        '--package'     => 'mypkg',
+                        '--usevars'     => 'needed',
+                    )
                 }
             },
         ) or diag $@;

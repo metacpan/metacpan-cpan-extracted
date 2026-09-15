@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 85;
+use Test::Most tests => 107;
 use Readonly;
 use Scalar::Util qw(blessed refaddr);
 
@@ -172,7 +172,7 @@ Readonly::Hash my %ERR => (
 	remove_join_col => qr/Cannot remove join_column/,
 	unknown_col_carp => qr/not present in any configured database/,
 	set_logger      => qr/Usage: set_logger/,
-	invalid_db      => qr/databases\[\d+\] is not a Database::Abstraction object/,
+	invalid_db      => qr/databases\[\d+\] does not support/,
 	join_col_miss   => qr/join_column "[^"]*" is absent from databases\[\d+\]/,
 );
 
@@ -762,12 +762,12 @@ note '--- Section 9: _msg() paths ---';
 }
 
 # PATH-msg-4: known key + sprintf args → formatted string
-# error_invalid_db = 'databases[%d] is not a Database::Abstraction object'
+# error_invalid_db = 'databases[%d] does not support the selectall_arrayref/columns interface'
 {
 	my $err;
 	eval { Database::Join->new(databases => [{}], join_column => $JC) };
 	$err = $@;
-	like($err, qr/databases\[0\] is not a Database::Abstraction object/,
+	like($err, qr/databases\[0\] does not support/,
 		'_msg PATH-4: known key + %d arg → sprintf formats correctly');
 }
 
@@ -1024,6 +1024,251 @@ note '--- Section 13: _build_col_index() population paths ---';
 	my ($p, $s) = _std_dbs();
 	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
 	ok(defined $j->{_col_db}{$JC}, '_build_col_index PATH-2: join_col "entry" present in _col_db');
+}
+
+# ---------------------------------------------------------------------------
+# Collision-prefix fixture helper.
+# Primary:   $JC, notes ('prim-note') with schema.
+# Secondary: $JC, notes ('sec-note'), score (42) with schema.
+# 'notes' collides; 'score' does not.
+# ---------------------------------------------------------------------------
+sub _collision_pair {
+	my $p = PathDA->new(
+		cols   => [$JC, 'notes'],
+		rows   => [
+			{ $JC => 'k1', notes => 'prim-note' },
+			{ $JC => 'k2', notes => 'prim-k2'   },
+		],
+		schema => { $JC => { type => 'text' }, notes => { type => 'varchar', len => 100 } },
+	);
+	my $s = PathDA->new(
+		cols   => [$JC, 'notes', 'score'],
+		rows   => [
+			{ $JC => 'k1', notes => 'match-me', score => 1 },
+			{ $JC => 'k2', notes => 'other',    score => 2 },
+		],
+		schema => { $JC => { type => 'text' }, notes => { type => 'text', len => 50 }, score => { type => 'int' } },
+	);
+	return ($p, $s);
+}
+
+# ==========================================================================
+# Section 14: remove_column() execution paths
+# ==========================================================================
+
+note '--- Section 14: remove_column() paths ---';
+
+# PATH-rc-1: undef argument → no-op, returns $self (defined check fails: defined(undef) is false)
+{
+	my $j   = _std_join();
+	my $ret = $j->remove_column(undef);
+	is($ret, $j, 'remove_column PATH-1: undef → no-op, returns $self');
+}
+
+# PATH-rc-2: empty-string argument → no-op (length '' is 0 → inner block skipped)
+{
+	my $j   = _std_join();
+	my $ret = $j->remove_column('');
+	is($ret, $j, 'remove_column PATH-2: "" → no-op (length 0 guard), returns $self');
+}
+
+# PATH-rc-3: join_col itself → croak error_remove_join_col (first guard fires)
+{
+	my $j = _std_join();
+	throws_ok { $j->remove_column($JC) }
+		$ERR{remove_join_col},
+		'remove_column PATH-3: join_col argument → croak error_remove_join_col';
+}
+
+# PATH-rc-4: valid data column → _removed_cols updated, _col_db entry deleted,
+# both memoisation caches cleared.  Populate caches first to prove invalidation.
+{
+	my $j = _std_join();
+	$j->columns();		# populate _col_cache
+	$j->schema();		# populate _schema_cache
+	$j->remove_column('name');
+	ok( exists $j->{_removed_cols}{name}, 'remove_column PATH-4a: col added to _removed_cols');
+	ok(!defined $j->{_col_db}{name},      'remove_column PATH-4b: col deleted from _col_db');
+	ok(!defined $j->{_col_cache},         'remove_column PATH-4c: _col_cache cleared after removal');
+	ok(!defined $j->{_schema_cache},      'remove_column PATH-4d: _schema_cache cleared after removal');
+}
+
+# ==========================================================================
+# Section 15: _build_col_index() additional paths
+# ==========================================================================
+
+note '--- Section 15: _build_col_index() additional paths ---';
+
+# PATH-bci-3: join_map value is a reference → croak with heap-address guard message.
+# The guard at line "croak ... if ref $local_jc" fires before sprintf can produce
+# "HASH(0x...)" in the error string.
+{
+	my ($p, $s) = _std_dbs();
+	throws_ok {
+		Database::Join->new(
+			databases   => [$p, $s],
+			join_column => $JC,
+			join_map    => { 1 => {} },	# hashref value — must be rejected
+		)
+	} qr/join_map\[1\] must be a string/,
+		'_build_col_index PATH-3: join_map ref value → croak (heap-address guard)';
+}
+
+# PATH-bci-4: collision_prefix active → colliding col from secondary published as
+# "$prefix.$col" in _col_db; original col kept at index 0.
+{
+	my ($p, $s) = _collision_pair();
+	my $j = Database::Join->new(
+		databases        => [$p, $s],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'pfx' },
+	);
+	is($j->{_col_db}{'pfx.notes'}, 1,
+		'_build_col_index PATH-4a: colliding col published as "pfx.notes" at DB[1]');
+	is($j->{_col_db}{notes}, 0,
+		'_build_col_index PATH-4b: original "notes" remains at DB[0] (not overwritten)');
+}
+
+# PATH-bci-5: non-colliding col from prefixed DB published plain (no prefix applied).
+{
+	my ($p, $s) = _collision_pair();
+	my $j = Database::Join->new(
+		databases        => [$p, $s],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'pfx' },
+	);
+	is($j->{_col_db}{score}, 1,
+		'_build_col_index PATH-5a: non-colliding "score" published plain at DB[1]');
+	ok(!exists $j->{_col_db}{'pfx.score'},
+		'_build_col_index PATH-5b: non-colliding "score" NOT prefixed in _col_db');
+}
+
+# ==========================================================================
+# Section 16: schema() collision-prefix rename path
+# ==========================================================================
+
+note '--- Section 16: schema() collision-prefix rename path ---';
+
+# PATH-sch-6: DB[1] has collision renames → %{$renames} non-empty → slow path taken.
+# Within the slow path, $renames->{$col} is defined for the colliding column
+# ('notes' → 'pfx.notes') and undef for non-colliding columns ('score' → plain).
+{
+	my ($p, $s) = _collision_pair();
+	my $j   = Database::Join->new(
+		databases        => [$p, $s],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'pfx' },
+	);
+	my $sch = $j->schema();
+	ok(exists $sch->{notes},
+		'schema PATH-6a: collision → primary "notes" in schema (fast path for DB[0])');
+	ok(exists $sch->{'pfx.notes'},
+		'schema PATH-6b: collision → "pfx.notes" in schema (slow path rename for DB[1])');
+	ok(exists $sch->{score},
+		'schema PATH-6c: non-colliding "score" present in schema (slow path plain for DB[1])');
+}
+
+# ==========================================================================
+# Section 17: _joined_query() collision-rename merge path
+# ==========================================================================
+
+note '--- Section 17: _joined_query() collision-rename merge path ---';
+
+# PATH-jq-11: within the per-secondary merge loop the "elsif (my $pub = $renames->{$k})"
+# branch fires when the secondary row has a collision-renamed column.
+# The primary value is preserved; the secondary value appears under the prefixed key.
+{
+	my ($p, $s) = _collision_pair();
+	my $j   = Database::Join->new(
+		databases        => [$p, $s],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'pfx' },
+	);
+	my $row = $j->fetchrow_hashref($JC => 'k1');
+	is($row->{notes},        'prim-note',
+		'_joined_query PATH-11a: primary "notes" preserved (not overwritten by secondary)');
+	is($row->{'pfx.notes'},  'match-me',
+		'_joined_query PATH-11b: secondary "notes" merged under "pfx.notes" (collision rename branch)');
+}
+
+# ==========================================================================
+# Section 18: _partition_criteria() _col_unrename translation path
+# ==========================================================================
+
+note '--- Section 18: _partition_criteria() _col_unrename path ---';
+
+# PATH-part-5: criterion key is a published prefixed name ("pfx.notes").
+# _col_db{"pfx.notes"} = 1 → DB[1] owns it.
+# _col_unrename[1]{"pfx.notes"} = "notes" → per_db[1]{notes} = val (translated).
+# If the translation fails, per_db[1]{"pfx.notes"} = val → secondary DA sees no match
+# on an unknown column → returns all secondary rows → 2 rows after intersect.
+# If the translation works, per_db[1]{notes} = "match-me" → secondary returns k1 only
+# → intersect gives 1 row.
+{
+	my ($p, $s) = _collision_pair();
+	my $j = Database::Join->new(
+		databases        => [$p, $s],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'pfx' },
+	);
+	my $rows;
+	my $warns = _capture_warn { $rows = $j->selectall_arrayref('pfx.notes' => 'match-me') };
+	is(scalar @{$warns}, 0,
+		'_partition PATH-5a: prefixed criterion recognised (in _col_db) → no carp');
+	is(scalar @{$rows}, 1,
+		'_partition PATH-5b: criterion translated via _col_unrename → 1 matching row');
+}
+
+# ==========================================================================
+# Section 19: AUTOLOAD additional execution paths
+# ==========================================================================
+
+note '--- Section 19: AUTOLOAD additional paths ---';
+
+# PATH-al-9: column removed via remove_column → deleted from _col_db → AUTOLOAD
+# sees undefined $db_idx → croaks "unknown column" (same guard as PATH-al-3 but
+# triggered dynamically rather than with a name that was never present).
+{
+	my $j = _std_join();
+	$j->remove_column('score');
+	throws_ok { $j->score() }
+		$ERR{unknown_col_al},
+		'AUTOLOAD PATH-9: col removed via remove_column → AUTOLOAD croaks unknown column';
+}
+
+# PATH-al-10: no join_map, no filters → direct DA delegation in LIST context.
+# AUTOLOAD's "return $db->$col(@_)" propagates wantarray, so PathDirectDA::score
+# returns (90, 70) in list context instead of the scalar 90.
+{
+	my $p = PathDA->new(cols => [$JC, 'name'],
+		rows => [{ $JC => 'k1', name => 'Alice' }]);
+	my $s = PathDirectDA->new(
+		cols => [$JC, 'score'],
+		rows => [{ $JC => 'k1', score => 90 }],
+	);
+	my $j    = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my @vals = $j->score();	# list context → PathDirectDA::score returns (90, 70)
+	is(scalar @vals, 2,
+		'AUTOLOAD PATH-10: direct DA delegation, list context → DA method result in list context');
+}
+
+# ==========================================================================
+# Section 20: add_database() undef first argument path
+# ==========================================================================
+
+note '--- Section 20: add_database() undef first arg ---';
+
+# PATH-ad-undef: undef first arg triggers the fail-fast guard:
+# !ref(undef) is true → enters the guard branch → defined(undef) is false
+# → short-circuits the grep → unconditional croak error_invalid_db.
+# This path was previously causing an "uninitialized value" warning (now fixed
+# by the defined() guard added before the string-eq comparison).
+{
+	my ($p) = _std_dbs();
+	my $j = Database::Join->new(databases => [$p], join_column => $JC);
+	throws_ok { $j->add_database(undef) }
+		$ERR{invalid_db},
+		'add_database PATH-undef: undef first arg → croak invalid_db (defined() guard)';
 }
 
 done_testing();

@@ -1,8 +1,6 @@
 package XS::Log;
-#Build  MD5 : IUB9AMzYdq6WFBId+Gku6A
-#Build Time : 2025-09-24 09:47:55
-our $VERSION = 1.12;
-our $BUILDDATE = "2025-09-24";  #Build Time: 09:47:55
+our $VERSION = 1.16;
+our $BUILDDATE = "2026-09-14";  #Build Time: 02:14:11
 use strict;
 use warnings;
 use constant { 
@@ -32,12 +30,48 @@ our @EXPORT_OK = qw(
 	LOG_LEVEL_OFF LOG_LEVEL_FATAL LOG_LEVEL_ERROR LOG_LEVEL_WARN LOG_LEVEL_INFO LOG_LEVEL_TRACE LOG_LEVEL_DEBUG LOG_LEVEL_TEXT
 	LOG_MODE_CYCLE LOG_MODE_DAILY LOG_MODE_HOURLY 
 	LOG_TARGET_CONSOLE LOG_TARGET_FILE LOG_TARGET_SYSLOG
+	Fatal Error Warn Info Debug Trace Print Colored
 );
 # 定义导出标签 :all
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 XSLoader::load('XS::Log', $VERSION);
+
+#--------------------------------------------
+# 兼容Log2的相关函数:Fatal Error Warn Info Debug Trace Print Colored
+#--------------------------------------------
+sub Fatal{my $msg = shift; my ($pkg, $file, $line) = caller;xs_log_write(LOG_LEVEL_ERROR,$file,$line,$msg);}
+sub Error{my $msg = shift; my ($pkg, $file, $line) = caller;xs_log_write(LOG_LEVEL_ERROR,$file,$line,$msg);}
+sub Warn {my $msg = shift; my ($pkg, $file, $line) = caller;xs_log_write(LOG_LEVEL_WARN,$file,$line,$msg);}
+sub Info {my $msg = shift; my ($pkg, $file, $line) = caller;xs_log_write(LOG_LEVEL_INFO,$file,$line,$msg);}
+sub Debug{my $msg = shift; my ($pkg, $file, $line) = caller;xs_log_write(LOG_LEVEL_DEBUG,$file,$line,$msg);}
+sub Trace{my $msg = shift; my ($pkg, $file, $line) = caller;xs_log_write(LOG_LEVEL_TRACE,$file,$line,$msg);}
+sub Print{my $msg = shift;xs_log_write(LOG_LEVEL_TEXT,undef,undef,$msg);}
+
+sub Colored
+{
+	my $txt   = shift;
+	my $color = shift;
+#\033[30m黑色字\033[0m  black
+#\033[31m红色字\033[0m  red
+#\033[32m绿色字\033[0m  green  
+#\033[33m黄色字\033[0m  yellow 
+#\033[34m蓝色字\033[0m  blue
+#\033[35m紫色字\033[0m  magenta
+#\033[36m天蓝字\033[0m  cyan
+#\033[37m白色字\033[0m  white
+	if(lc($color) eq "black")		{$txt = "\033[30m$txt\033[0m";}
+	elsif(lc($color) eq "red")		{$txt = "\033[31m$txt\033[0m";}
+	elsif(lc($color) eq "green")	{$txt = "\033[32m$txt\033[0m";}
+	elsif(lc($color) eq "yellow")	{$txt = "\033[33m$txt\033[0m";}
+	elsif(lc($color) eq "blue")		{$txt = "\033[34m$txt\033[0m";}
+	elsif(lc($color) eq "magenta")	{$txt = "\033[35m$txt\033[0m";}
+	elsif(lc($color) eq "cyan")		{$txt = "\033[36m$txt\033[0m";}
+	elsif(lc($color) eq "white")	{$txt = "\033[37m$txt\033[0m";}
+	else{}
+	return $txt;
+}
 
 sub printNote {
 	my ($fmt, @args) = @_;
@@ -116,6 +150,7 @@ sub printLog {
 	my $msg = sprintf($fmt, @args);
 	xs_log_write(LOG_LEVEL_TEXT,"",0,$msg);
 }
+
 sub printRep {
 	my ($fmt, @args) = @_;
 	my $msg = sprintf($fmt, @args);

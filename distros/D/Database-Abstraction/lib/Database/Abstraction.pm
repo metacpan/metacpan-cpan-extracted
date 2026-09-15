@@ -64,11 +64,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 =head1 DESCRIPTION
 
@@ -76,6 +76,8 @@ C<Database::Abstraction> is a read-only ORM for Perl that gives a uniform
 interface over CSV, PSV, XML, SQLite, DBM::Deep, BerkeleyDB, and Excel (XLSX)
 files - local, remote (via SSH), or fetched from a URL - without writing any
 SQL.
+Effectively it allows you to access a database table, of many different
+database formats, as an object.
 
 Key features:
 
@@ -251,17 +253,31 @@ Pipe-separated file, ending C<.psv>
 =item 4. C<CSV>
 
 Comma (or custom) separated file, ending C<.csv> or C<.db>; can be
-gzipped.  B<Note:> the default separator is C<!> not C<,> for historical
+gzipped.
+B<Note:> the default separator is C<!> not C<,> for historical
 reasons - pass C<< sep_char => ',' >> for standard CSVs.
 
-=item 5. C<Excel>
+=item 5. C<Excel> (C<.xls>) and C<XLSX> (C<.xlsx>)
 
-Excel workbook ending C<.xlsx>.  Each worksheet is a separate SQL table;
-the active worksheet is determined by the class-derived table name (or the
-C<table> constructor parameter - see L</SUBROUTINES/METHODS>).  Requires
-L<DBD::Excel> (loaded lazily); L<Spreadsheet::ParseXLSX> is used
-automatically for modern C<.xlsx> files when installed.  No slurp path:
-C<max_slurp_size> has no effect on the Excel backend.
+Two separate Excel backends - one per file format:
+
+=over 4
+
+=item B<.xls> - old binary format, opened via L<DBD::Excel> (which uses
+L<Spreadsheet::ParseExcel> internally).  All queries go through DBI/SQL;
+no in-memory slurp path.  C<max_slurp_size> has no effect.
+
+=item B<.xlsx> - modern OOXML format, parsed directly via
+L<Spreadsheet::ParseXLSX> and slurped into an in-memory hash (keyed mode)
+or array (C<no_entry> mode).  No DBI handle is created; all queries use
+the in-memory fast-path.  Complex criteria (operator hashes, C<-or>/C<-and>)
+will fall through to the SQL path and croak - use simple scalar criteria.
+
+=back
+
+For both formats, each worksheet is a separate logical table; the active
+worksheet is determined by the class-derived table name (or the C<table>
+constructor parameter).  Both modules are loaded lazily.
 
 =item 6. C<XML>
 
@@ -839,7 +855,7 @@ sub _open :Protected
 			my $tmpdir_obj = File::Temp->newdir(CLEANUP => 1);
 			$self->{'_remote_tmpdir'} = $tmpdir_obj;	# auto-cleans on DESTROY
 			my $tmpdir = $tmpdir_obj->dirname();
-			for my $ext (qw(sql dbm deep db csv.gz db.gz psv xlsx csv xml)) {
+			for my $ext (qw(sql dbm deep db csv.gz db.gz psv xls xlsx csv xml)) {
 				my $remote_file = "$remote_dir/$dbname.$ext";
 				my $content = eval { scalar File::Slurp::Remote::read_remote_file($host, $remote_file) };
 				next unless defined($content) && length($content);
@@ -1031,8 +1047,10 @@ sub _open :Protected
 			# column_names is set — the DBI CSV connection will supply names instead.
 			if(((-s $slurp_file) <= $max_slurp_size) && !$params->{'column_names'}) {
 				if((-s $slurp_file) == 0) {
-					# Empty file
-					$self->{'data'} = ();
+					# Empty file — mirror what the newline-only path stores so
+					# fast-path query methods return 0/undef/[] instead of falling
+					# through to DBI (which croaks on a 0-column table).
+					$self->{'data'} = $self->{'no_entry'} ? undef : {};
 				} else {
 					require Text::xSV::Slurp;
 
@@ -1072,16 +1090,50 @@ sub _open :Protected
 			}
 			$self->{'type'} = 'CSV';
 		} else {
-			my $xlsx_file = File::Spec->catfile($dir, "$dbname.xlsx");
-			if(-r $xlsx_file) {
-				# Excel workbook via DBD::Excel — each worksheet is a SQL table.
-				# Loaded lazily; not required for any other backend.
+			my $xls_file = File::Spec->catfile($dir, "$dbname.xls");
+			if(-r $xls_file) {
+				# Old binary XLS format via DBD::Excel (Spreadsheet::ParseExcel).
+				# All queries go through DBI/SQL; no in-memory slurp path.
 				require DBD::Excel;
-				$dbh = DBI->connect("dbi:Excel:file=$xlsx_file", undef, undef, {
+				$dbh = DBI->connect("dbi:Excel:file=$xls_file", undef, undef, {
 					RaiseError => 1,
 					PrintError => 0,
-				}) or Carp::croak(ref($self), ": can't open $xlsx_file: $DBI::errstr");
+				}) or Carp::croak(ref($self), ": can't open $xls_file: $DBI::errstr");
 				$self->{'type'} = 'Excel';
+				$slurp_file = $xls_file;
+			} else {
+			my $xlsx_file = File::Spec->catfile($dir, "$dbname.xlsx");
+			if(-r $xlsx_file) {
+				# Modern OOXML format via Spreadsheet::ParseXLSX — slurped into
+				# an in-memory hash (keyed) or array (no_entry).  No DBI handle.
+				require Spreadsheet::ParseXLSX;
+				my $workbook = Spreadsheet::ParseXLSX->new()->parse($xlsx_file)
+					or Carp::croak(ref($self), ": can't parse $xlsx_file");
+				my ($sheet) = grep { $_->get_name() eq $table } $workbook->worksheets();
+				$sheet //= ($workbook->worksheets())[0];
+				Carp::croak(ref($self), ": no worksheet in $xlsx_file") unless $sheet;
+				my ($row_min, $row_max) = $sheet->row_range();
+				my ($col_min, $col_max) = $sheet->col_range();
+				my @headers;
+				for my $c ($col_min .. $col_max) {
+					my $cell = $sheet->get_cell($row_min, $c);
+					push @headers, $cell ? $cell->value() : "col$c";
+				}
+				my @data;
+				for my $r ($row_min + 1 .. $row_max) {
+					my %row;
+					for my $c ($col_min .. $col_max) {
+						my $cell = $sheet->get_cell($r, $c);
+						$row{$headers[$c - $col_min]} = $cell ? $cell->value() : undef;
+					}
+					push @data, \%row;
+				}
+				if($self->{'no_entry'}) {
+					$self->{'data'} = @data ? \@data : undef;
+				} else {
+					$self->{'data'} = { map { $_->{$self->{'id'}} => $_ } @data };
+				}
+				$self->{'type'} = 'XLSX';
 				$slurp_file = $xlsx_file;
 			} else {
 				$slurp_file = File::Spec->catfile($dir, "$dbname.xml");
@@ -1134,7 +1186,8 @@ sub _open :Protected
 				}
 				$self->{'type'} = 'XML';
 			}
-		}
+		}	# end: xlsx else (xml path)
+		}	# end: xls else
 	}
 
 	# ref() must be called on the variable, not on the result of 'eq'
@@ -1633,7 +1686,6 @@ sub fetchrow_hashref {
 
 	my $table = $self->_open_table($params);
 
-	# ::diag($self->{'type'});
 	if($self->{'data'} && (!$self->{'no_entry'}) && (scalar keys(%{$params}) == 1) && defined($params->{'entry'}) && !$self->_has_complex_criteria($params)) {
 		$self->_debug('Fast return from slurped data');
 		# Use exists(), fixate() locks the outer hash; accessing a missing key throws
@@ -1641,8 +1693,6 @@ sub fetchrow_hashref {
 	}
 
 	if($self->{'berkeley'}) {
-		# print STDERR ">>>>>>>>>>>>\n";
-		# ::diag(Data::Dumper->new([$self->{'berkeley'}])->Dump());
 		if((!$self->{'no_entry'}) && (scalar keys(%{$params}) == 1) && defined($params->{'entry'})) {
 			return { entry => $self->{'berkeley'}->{$params->{'entry'}} };
 		}
@@ -2274,6 +2324,7 @@ sub DESTROY
 		my $temp_fh = $self->{'_temp_fh'};
 		my $temp_path = eval { $temp_fh->filename() };
 		delete $self->{'_temp_fh'};
+		undef $temp_fh;	# Release the local strong reference
 		# Fallback explicit unlink if File::Temp didn't clean up
 		unlink($temp_path) if defined($temp_path) && -f $temp_path;
 	}

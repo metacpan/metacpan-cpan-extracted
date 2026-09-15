@@ -1,4 +1,7 @@
 package App::mkpkgconfig::PkgConfig::Entry;
+
+use v5.14;
+
 use strict;
 use warnings;
 
@@ -6,7 +9,7 @@ use warnings;
 
 use Syntax::Construct qw( non-destructive-subst );
 
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 use Regexp::Common 'balanced';
 
@@ -21,10 +24,11 @@ use Regexp::Common 'balanced';
 sub new {
     my ( $class, $name, $value ) = @_;
 
-    bless { name => $name,
-            value => $value,
-            depends => _parse_dependencies( $value ),
-            }, $class;
+    bless {
+        name    => $name,
+        value   => $value,
+        depends => _parse_dependencies( $value ),
+    }, $class;
 }
 
 
@@ -33,7 +37,7 @@ sub new {
 
 
 
-sub name            { return $_[0]->{name} }
+sub name { return $_[0]->{name} }
 
 
 
@@ -41,7 +45,7 @@ sub name            { return $_[0]->{name} }
 
 
 
-sub value           { return $_[0]->{value} }
+sub value { return $_[0]->{value} }
 
 
 
@@ -51,12 +55,10 @@ sub value           { return $_[0]->{value} }
 
 
 
-sub depends         { return @{ $_[0]->{depends} } }
+sub depends { return @{ $_[0]->{depends} } }
 
 sub _parse_dependencies {
-    my @depends =
-            map { s/(?:^[{])|(?:[}]$)//gr }
-            $_[0] =~ /(?<!\$)\$$RE{balanced}{-parens => '{}'}/g;
+    my @depends = map { s/(?:^[{])|(?:[}]$)//gr } $_[0] =~ /(?<!\$)\$$RE{balanced}{-parens => '{}'}/g;
 
     my %depends;
     @depends{@depends} = ();
@@ -96,7 +98,7 @@ App::mkpkgconfig::PkgConfig::Entry - Base class for PkgConfig Keywords and Varia
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 DESCRIPTION
 
@@ -105,7 +107,7 @@ B<PkgConfig::Entry> is the base class for C<PkgConfig> variables and keywords.
 Don't instantiate this class; instead, instantiate C<PkgConfig::Entry::Variable> and
 instantiate C<PkgConfig::Entry::Keyword>.  They have the same API as C<PkgConfig::Entry>
 
-=head1 ATTRIBUTES
+=head1 OBJECT ATTRIBUTES
 
 =head2 name
 
@@ -133,17 +135,17 @@ Returns a list of the names of the variables that the entry depends upon.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-app-mkpkgconfig@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=App-mkpkgconfig
+Please report any bugs or feature requests to bug-app-mkpkgconfig@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-mkpkgconfig>
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/app-mkpkgconfig
+  https://codeberg.org/djerius/p5-App-mkpkgconfig
 
 and may be cloned from
 
-  https://gitlab.com/djerius/app-mkpkgconfig.git
+  https://codeberg.org/djerius/p5-App-mkpkgconfig.git
 
 =head1 SEE ALSO
 
@@ -159,7 +161,7 @@ L<script::mkpkgconfig|script::mkpkgconfig>
 
 =head1 AUTHOR
 
-Diab Jerius <djerius@cpan.org>
+Diab Jerius <djerius@sao.si.edu>
 
 =head1 COPYRIGHT AND LICENSE
 

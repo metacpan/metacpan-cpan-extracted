@@ -1,5 +1,8 @@
 Revision history for Perl module Text::Diff
 
+1.46 2026-09-13 NEILB
+    - Removed duplicated code. PR from HAARG++
+
 1.45 2017-08-16 NEILB
     - Typo fixed in doc. Patch from Lucas Kanashiro++. RT#112564
     - Documentation improvements PR from David Gutteridge++.

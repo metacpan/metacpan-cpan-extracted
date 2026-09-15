@@ -5,7 +5,10 @@ lib/ForgeOps/Tracker/Configuration.pm
 lib/ForgeOps/Tracker/DeliveryQueue.pm
 lib/ForgeOps/Tracker/EventBuilder.pm
 lib/ForgeOps/Tracker/Integrations/Dancer2.pm
+lib/ForgeOps/Tracker/Integrations/Dancer2Performance.pm
 lib/ForgeOps/Tracker/Integrations/PSGI.pm
+lib/ForgeOps/Tracker/Integrations/PSGIPerformance.pm
+lib/ForgeOps/Tracker/PerformanceFlusher.pm
 lib/ForgeOps/Tracker/PiiScrubber.pm
 lib/ForgeOps/Tracker/Reporter.pm
 LICENSE.txt
@@ -17,8 +20,11 @@ t/configuration.t
 t/delivery_queue.t
 t/event_builder.t
 t/integrations_dancer2.t
+t/integrations_dancer2_performance.t
 t/integrations_psgi.t
+t/integrations_psgi_performance.t
 t/lib/EchoServer.pm
+t/performance_flusher.t
 t/pii_scrubber.t
 t/reporter.t
 t/tracker.t

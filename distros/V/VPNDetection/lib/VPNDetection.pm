@@ -18,7 +18,7 @@ use VPNDetection::Database;
 use VPNDetection::Error;
 use VPNDetection::Result;
 
-our $VERSION = '1.5.0';
+our $VERSION = '2.1.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -98,6 +98,42 @@ sub lookup_p {
         $self->{cache}->set($ip, $result) if $self->{cache};
         return $result;
     });
+}
+
+# The address our edge observed this client calling from. Deliberately not
+# cached: the cache is keyed by address, and which address this is IS the
+# question.
+sub my_ip {
+    my $self = shift;
+    $self->_assert_blocking_ok('my_ip');
+    return $self->_wait($self->my_ip_p(@_));
+}
+
+sub my_ip_p {
+    my ($self, %options) = @_;
+    $self->_check_options('my_ip', \%options, 'retries');
+
+    my $url = $self->_url('/myip');
+    my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
+    return $self->_retry_p($retries, sub { $self->_json_p($url) })
+        ->then(sub { VPNDetection::Result->from_wire(shift) });
+}
+
+# What this key is entitled to and what it has spent. Deliberately not cached:
+# the whole point is the number, and a cached one is wrong within seconds.
+sub my_account {
+    my $self = shift;
+    $self->_assert_blocking_ok('my_account');
+    return $self->_wait($self->my_account_p(@_));
+}
+
+sub my_account_p {
+    my ($self, %options) = @_;
+    $self->_check_options('my_account', \%options, 'retries');
+
+    my $url = $self->_url('/api/v1/account/me');
+    my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
+    return $self->_retry_p($retries, sub { $self->_json_p($url) });
 }
 
 # Classify many addresses concurrently, keyed by address rather than positional,
@@ -423,6 +459,44 @@ so a shared cache would serve one of them the other's shape.
 Returns a L<VPNDetection::Result>, or dies with a L<VPNDetection::Error>.
 C<retries> is the per-call option.
 
+=head2 my_ip
+
+    my $me = $client->my_ip;
+
+Classifies the address this client is calling from, returning a
+L<VPNDetection::Result>.
+
+The same answer C<lookup> would give for that address, at the same cost against
+your allowance. The address is the one our edge observed, so a call made through
+a proxy or a VPN reports the exit it left through - usually the point of asking.
+
+Deliberately B<not cached>. The cache is keyed by address, and which address this
+is IS the question: a machine that moves between networks would otherwise be told
+where it used to be.
+
+=head2 my_account
+
+    my $account = $client->my_account;
+    printf "%d of %d\n", $account->{usage}{requests}, $account->{usage}{quota};
+
+What this client's API key is entitled to, and how much of it has been used, as a
+hash reference with C<org_id>, C<apikey>, C<plan> and C<usage> keys.
+
+Named for what it answers rather than C<me>, which sits one letter from C<my_ip>
+and means something quite different: one is which address you are calling FROM,
+the other is which account you are calling AS.
+
+Unlike a lookup there is no useful unauthenticated answer, so a client built
+without an API key gets an unauthorized error rather than a partial one.
+
+Usage counts against the allowance window - the anniversary of the subscription,
+not the calendar month and not the billing period - and it is the same number a
+lookup is gated on. C<hard_limit> is C<undef> when we never stop serving, which
+is not the same as a limit of zero.
+
+Deliberately B<not cached>: the whole point is what has been spent, and a cached
+answer is a wrong one within seconds of the next request.
+
 =head2 lookup_batch
 
     my $answers = $client->lookup_batch(\@ips, %options);
@@ -449,7 +523,7 @@ Also exportable, for code with no client to hand:
 
 =head2 database
 
-    my $datasets = $client->database->list;
+    my $databases = $client->database->list;
 
 The licensed dataset downloads. See L<VPNDetection::Database>.
 

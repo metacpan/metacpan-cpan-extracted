@@ -34,6 +34,12 @@ our %ERRORS = (
     shutdown => [
         'WSREP has not yet prepared node for application use',
         'Server shutdown in progress',
+        'The MySQL server is running with the --read-only option so it cannot execute this statement',
+        'The MySQL server is running with the --super-read-only option so it cannot execute this statement',
+        'Cannot execute statement in a READ ONLY transaction',
+        'Running in read-only mode',
+        'Forwarded connection on Writer terminated; try restarting transaction',
+        'Internal write forwarding error',
     ],
     duplicate_value => [
         "Duplicate entry '12345' for key 'PRIMARY'",

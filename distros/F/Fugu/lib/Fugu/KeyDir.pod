@@ -21,6 +21,7 @@ Fugu::KeyDir - the names, the order and the generated text of a published key di
     );
 
     my @keys = (
+        { name => 'fugubsd-1-root.pub',    status => 'current' },
         { name => 'fugubsd-1-release.pub', status => 'retired' },
         { name => 'fugubsd-2-release.pub', status => 'current',
           since => '2026-09-06' },
@@ -30,6 +31,15 @@ Fugu::KeyDir - the names, the order and the generated text of a published key di
     my $rows = $dir->index_data(\@keys);
     my $text = $dir->keys_file(\@keys);
 
+    my $binding = $dir->binding_for(
+        target => 'fugubsd-1-root.pub',
+        signer => 'fugubsd-2-release.pub',
+    );
+    # fugubsd-1-root.pub.fugubsd-2-release.sig
+
+    $dir->check_bindings(\@keys, [$binding], 'fugubsd-1-root.pub')
+        or die $dir->error;
+
 =head1 DESCRIPTION
 
 An organization publishes its public keys under one prefix.
@@ -37,6 +47,10 @@ Fugu::KeyDir holds the generic parts of that key directory. It holds
 the file name pattern, the type of a key, and the status vocabulary.
 It also holds the order of a key set, and the text of the Apache
 C<KEYS> file, of the human index, and of C<security.txt>.
+
+The module also holds the name of a binding, and the retention rule of
+a set of bindings. A binding is the signature of one key file by
+another key.
 
 The module holds no policy. The organization word, each purpose, the
 contact and each date are arguments, so one tested implementation
@@ -55,8 +69,8 @@ The organization word holds lower-case letters and digits, and it
 starts on a letter. The serial is an integer with no padding, above
 zero, so a reader sorts it as a number. The purpose names what the key
 signs, and it holds lower-case letters, digits and hyphens. The
-extension names the type: C<pub> is a signify key, and C<asc> is an
-armored OpenPGP key.
+extension names the type: C<pub> is a signify key, C<asc> is an
+armored OpenPGP key, and C<pem> is an X.509 certificate.
 
 The serial starts at 1 for each purpose, and each rotation of that
 purpose adds one. A new purpose therefore starts at 1, and a
@@ -81,6 +95,32 @@ The stem, such as C<fugubsd-1-release>, is the key name in a
 description block and in a trust file. The name of a key never
 changes, and a retired key stays published at its URL, so a release
 that it signed still verifies.
+
+=head2 The binding
+
+A binding is the signature of one key file by another key of the
+directory. The file name is
+C<E<lt>target fileE<gt>.E<lt>signer stemE<gt>.E<lt>extE<gt>>, for
+example C<fugubsd-1-root.pub.fugubsd-2-release.sig>.
+
+The extension names the type of the signer: C<sig> is a signify
+signature, and C<asc> is an armored OpenPGP signature. A C<p7s>
+binding is a detached CMS signature of an X.509 signer. A later signer
+type adds its own extension.
+
+The key file of the signer is its stem with the key extension of that
+type. A C<sig> binding therefore names a C<.pub> key, an C<asc>
+binding names a C<.asc> key, and a C<p7s> binding names a C<.pem> key.
+C<parse_binding> answers that key file name, so the module holds the
+one extension table.
+
+The retention rule holds each binding of a directory. A signer that is
+C<current> or C<next> targets the root key, so each key in force
+attests the one anchor. A signer that is C<retired> targets a key of
+its own purpose with a higher serial, so a holder of the old key
+verifies the new one.
+
+The caller names the root key, because the module holds no purpose.
 
 =head2 The key set
 
@@ -174,6 +214,47 @@ C<parse_name>, so a caller never builds a name by hand.
 A serial that is not an integer above zero, a purpose outside the
 pattern, and an unknown type are each a failure.
 
+=head2 parse_binding
+
+C<parse_binding($filename)> returns the parts of a binding file name,
+as a hash reference with C<target>, C<signer> and C<type>.
+
+The C<target> and the C<signer> are each a key file name, and each one
+parses under C<parse_name>. The C<type> names the type of the signer.
+The name of a binding holds the stem of the signer, and the method
+completes it with the key extension of the type. The two parts
+therefore feed C<binding_for>, which names the same file again.
+
+Each of these is a failure:
+
+=over 4
+
+=item * an empty name, or a name with a solidus
+
+=item * a name that does not match the pattern
+
+=item * an unknown binding extension
+
+=item * a target that C<parse_name> rejects
+
+=item * a completed signer name that C<parse_name> rejects
+
+=back
+
+The reason of the last two holds the reason of C<parse_name>.
+
+=head2 binding_for
+
+C<binding_for(target =E<gt> $name, signer =E<gt> $name)> returns the
+file name of a binding. Each argument is a key file name. The method
+is the inverse of C<parse_binding>: the C<target> and the C<signer> of
+a parse name the same file again, so a caller never builds a name by
+hand.
+
+The type of the signer selects the extension of the binding. A target
+or a signer that C<parse_name> rejects is a failure, and a key type
+that signs no binding is a failure.
+
 =head2 next_serial
 
 C<next_serial(\@names, $purpose)> returns the serial that a rotation of
@@ -212,6 +293,39 @@ The method returns 1 on a pass. On a failure it returns C<undef>, and
 the reason names the purpose and the count. A purpose with two
 C<current> keys is the dangerous case: a reader cannot tell which key
 signs a release today.
+
+=head2 check_bindings
+
+C<check_bindings(\@keys, \@bindings, $root)> holds each binding to the
+retention rule. C<@bindings> holds binding file names, and C<$root> is
+the file name of the current root key.
+
+A signer that is C<current> or C<next> must target the root. A signer
+that is C<retired> must target a key of its own purpose with a higher
+serial.
+
+The method returns 1 on a pass. On a failure it returns C<undef>, and
+the reason names the binding and the fault.
+
+Each of these is a failure:
+
+=over 4
+
+=item * a root that the key set does not hold
+
+=item * a binding name that C<parse_binding> rejects
+
+=item * a signer or a target that the key set does not hold
+
+=item * a binding that breaks the retention rule
+
+=back
+
+The method dies when C<@bindings> is not an array reference, and for
+each programming error of C<order>.
+
+An empty C<@bindings> list passes: the method holds the bindings that
+a caller names, and it needs no binding for a key.
 
 =head2 keys_file
 
@@ -320,6 +434,9 @@ reference type, and an organization word that the pattern cannot hold.
 The module holds no key bytes. It never reads a key file, it computes
 no fingerprint, and it verifies nothing. L<Fugu::OpenPGP> computes a
 fingerprint, and L<Fugu::Signify> verifies a signature.
+
+C<check_bindings> reads names alone. It opens no binding file, and it
+verifies no signature: L<Fugu::Signify> verifies a signify signature.
 
 C<security_txt> writes the fields that a caller names. It does not
 check that C<expires> is a valid RFC 3339 stamp, and it does not check

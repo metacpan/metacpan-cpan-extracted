@@ -1,0 +1,37 @@
+Revision history for Uniform-HTTP
+
+0.02  2026-09-13
+    - Rename the distribution from Uniform-HTTP-Auth to Uniform-HTTP.
+    - Preserve the Uniform::HTTP::Auth module name and its 0.01 public API.
+    - Add canonical Uniform::HTTP::Message, Request, and Response objects.
+    - Preserve duplicate headers, original field names, and message order.
+    - Add explicit body, completeness, mutability, target-fidelity, and
+      header-fidelity capability methods for framework adapters.
+    - Define byte-string validation without implicit character encoding.
+    - Let prepare_authentication() consume a Uniform request contract while
+      retaining explicit method, request_target, and entity_body arguments.
+    - Keep transports, parsing, serialization, streaming, retries, and
+      framework lifecycle outside the distribution boundary.
+    - Add a normative message specification, adapter guide, and comprehensive
+      canonical-object and Auth integration tests.
+
+0.01  2026-09-13
+    - Initial release as Uniform-HTTP-Auth.
+    - Add transport-, framework-, and event-loop-agnostic HTTP authentication.
+    - Add challenge parsing, malformed-input reporting, and scheme selection.
+    - Add prepare_authentication() to prepare authentication field values without
+      performing network I/O or request retry.
+    - Add a simple origin-bound stored-credentials constructor for normal
+      applications, plus callback-based dynamic credential lookup for reusable
+      HTTP stacks and credential stores.
+    - Add Basic authentication per RFC 7617, including UTF-8 charset handling.
+    - Add Bearer authentication construction per RFC 6750.
+    - Add Digest authentication per RFC 7616, including MD5, SHA-256,
+      SHA-512/256, session variants, qop=auth/auth-int, UTF-8, userhash,
+      cryptographically secure cnonce generation, and nonce-count state.
+    - Isolate Digest state by HTTP protection space so unrelated origins do not
+      share nonce counts or cnonces.
+    - Preserve unknown authentication schemes for caller introspection.
+    - Represent malformed remote challenges as data rather than exceptions.
+    - Add complete public API POD, release documentation, distribution
+      packaging, and CI/disttest coverage for Perl 5.16 and current Perl.

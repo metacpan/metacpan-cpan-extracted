@@ -180,16 +180,16 @@ BEGIN
     our $JSON_CLASS;
     if( eval{ require Cpanel::JSON::XS; 1 } )
     {
-        $JSON_CLASS   = 'Cpanel::JSON::XS';
+        $JSON_CLASS = 'Cpanel::JSON::XS';
     }
     elsif( eval{ require JSON::XS; 1 } )
     {
-        $JSON_CLASS   = 'JSON::XS';
+        $JSON_CLASS = 'JSON::XS';
     }
     else
     {
         require JSON::PP;
-        $JSON_CLASS   = 'JSON::PP';
+        $JSON_CLASS = 'JSON::PP';
     }
 };
 

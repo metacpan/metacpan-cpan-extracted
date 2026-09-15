@@ -31,6 +31,15 @@ BEGIN {
 }
 
 
+eval {
+    require Alien::libhisto;
+    require version;
+    my $v = Alien::libhisto->VERSION;
+    if (defined $v && version->parse($v) < version->parse('0.4.0')) {
+        die "Alien::libhisto 0.4.0 or higher required (found $v). Please upgrade Alien::libhisto first.\n";
+    }
+};
+
 use Alien::Base::Wrapper qw( Alien::libhisto !export );
 
 
@@ -76,6 +85,10 @@ my %args = Alien::Base::Wrapper->mm_args2(
         },
     },
 );
+
+# Alien::Base::Wrapper clobbers Alien::libhisto in CONFIGURE_REQUIRES to 0;
+# restore 0.4.0 requirement so CPAN clients upgrade Alien::libhisto before configuring.
+$args{CONFIGURE_REQUIRES}{'Alien::libhisto'} = '0.4.0';
 
 my $alien_libs = Alien::libhisto->libs;
 $alien_libs =~ s/-lhisto/-lhistocli -lhisto/;

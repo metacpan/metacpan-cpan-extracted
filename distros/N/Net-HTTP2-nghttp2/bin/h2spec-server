@@ -1,15 +1,37 @@
 #!/usr/bin/env perl
 # PODNAME: h2spec-server
-# ABSTRACT: Minimal HTTP/2 server for conformance testing
+# ABSTRACT: Minimal HTTP/2 server for conformance and load testing
 use strict;
 use warnings;
+use Errno ();
+use Getopt::Long qw(GetOptions);
 use IO::Socket::INET;
-use Net::HTTP2::nghttp2;
+use Time::HiRes ();
+use Net::HTTP2::nghttp2 qw(NGHTTP2_NO_ERROR);
 use Net::HTTP2::nghttp2::Session;
 
 $| = 1;  # Autoflush
 
 die "nghttp2 not available\n" unless Net::HTTP2::nghttp2->available;
+
+use constant {
+    FRAME_DATA      => 0,
+    FRAME_HEADERS   => 1,
+    FLAG_END_STREAM => 0x1,
+    FLAG_END_HEADERS => 0x4,
+};
+
+# A streaming chunk for /stream, and how long the shutdown flush may take.
+use constant STREAM_CHUNK      => 'x' x 1024;
+use constant SHUTDOWN_DEADLINE => 2;
+
+my $stats = 0;
+my $help  = 0;
+GetOptions('stats' => \$stats, 'help' => \$help) or die usage();
+if ($help) {
+    print usage();
+    exit 0;
+}
 
 my $port = $ARGV[0] || 8080;
 
@@ -23,7 +45,22 @@ my $server = IO::Socket::INET->new(
 print STDERR "Listening on port $port (h2c)...\n";
 print STDERR "Run: h2spec -h localhost -p $port\n\n";
 
-while (my $client = $server->accept) {
+# SIGTERM is a graceful shutdown: the parent stops accepting and passes the
+# signal on, every connection announces GOAWAY and flushes what it can.
+my $terminating = 0;
+my $shutting_down = 0;
+my %children;
+$SIG{TERM} = sub { $terminating = 1 };
+
+while (!$terminating) {
+    my $client = $server->accept;
+
+    unless ($client) {
+        # The signal interrupts accept; anything else ends the loop.
+        next if $!{EINTR} && !$terminating;
+        last;
+    }
+
     # Fork to handle each connection
     my $pid = fork();
 
@@ -36,13 +73,16 @@ while (my $client = $server->accept) {
     if ($pid) {
         # Parent - close client and continue accepting
         close $client;
+        $children{$pid} = 1;
         # Reap any dead children
-        while (waitpid(-1, 1) > 0) {}
+        while ((my $done = waitpid(-1, 1)) > 0) { delete $children{$done} }
         next;
     }
 
     # Child process - handle this connection
     close $server;  # Child doesn't need listening socket
+    %children = ();
+    $SIG{TERM} = sub { $shutting_down = 1 };
 
     eval {
         handle_connection($client);
@@ -55,6 +95,29 @@ while (my $client = $server->accept) {
     exit 0;  # Child exits
 }
 
+# Graceful shutdown: let every connection send its GOAWAY before leaving.
+kill 'TERM', keys %children;
+my $deadline = Time::HiRes::time() + SHUTDOWN_DEADLINE + 1;
+while (keys %children && Time::HiRes::time() < $deadline) {
+    my $done = waitpid(-1, 1);
+    if ($done > 0) { delete $children{$done} }
+    else { Time::HiRes::sleep(0.02) }
+}
+close $server;
+exit 0;
+
+sub usage {
+    return <<'USAGE';
+Usage: h2spec-server [--stats] [port]
+
+  --stats   print per-connection frame counters to STDERR when the
+            connection ends
+  --help    this message
+
+Endpoints: /echo (default), /early, /stream?n=<chunks>
+USAGE
+}
+
 sub handle_connection {
     my ($client) = @_;
 
@@ -63,6 +126,16 @@ sub handle_connection {
 
     # Track pending responses
     my %pending_streams;
+    my %responded;
+    my $highest_stream    = 0;
+    my $streams_accepted  = 0;
+
+    # Per-connection counters, reported at connection end under --stats.
+    my %frames_sent;
+    my %frames_not_sent;
+    my $invalid_frames = 0;
+    my $errors         = 0;
+    my $early_resets   = 0;
 
     my $session;
     my $session_ref = \$session;
@@ -72,6 +145,8 @@ sub handle_connection {
             on_begin_headers => sub {
                 my ($stream_id) = @_;
                 $pending_streams{$stream_id} = {};
+                $streams_accepted++;
+                $highest_stream = $stream_id if $stream_id > $highest_stream;
                 return 0;
             },
             on_header => sub {
@@ -81,35 +156,29 @@ sub handle_connection {
             },
             on_frame_recv => sub {
                 my ($frame) = @_;
+                my $stream_id = $frame->{stream_id};
 
-                # Respond to completed requests (HEADERS with END_HEADERS and END_STREAM)
-                if ($frame->{type} == 1) {  # HEADERS
-                    my $stream_id = $frame->{stream_id};
-                    my $end_stream = $frame->{flags} & 0x1;
-                    my $end_headers = $frame->{flags} & 0x4;
+                if ($frame->{type} == FRAME_HEADERS) {
+                    return 0 unless $frame->{flags} & FLAG_END_HEADERS;
+                    return 0 unless $$session_ref;
 
-                    if ($end_headers && $end_stream && $$session_ref) {
-                        # This is a complete request without body
-                        eval {
-                            $$session_ref->submit_response($stream_id,
-                                status  => 200,
-                                headers => [['content-type', 'text/plain']],
-                                body    => "OK\n",
-                            );
-                        };
+                    my $path = $pending_streams{$stream_id}{':path'} // '/';
+
+                    # /early answers before the request body has arrived; every
+                    # other endpoint waits for the whole request.
+                    if (path_of($path) eq '/early') {
+                        respond($$session_ref, $stream_id, $path, \%responded);
+                    }
+                    elsif ($frame->{flags} & FLAG_END_STREAM) {
+                        respond($$session_ref, $stream_id, $path, \%responded);
                     }
                 }
-                # Handle DATA with END_STREAM (request body complete)
-                elsif ($frame->{type} == 0 && ($frame->{flags} & 0x1)) {
-                    my $stream_id = $frame->{stream_id};
+                # Request body complete
+                elsif ($frame->{type} == FRAME_DATA
+                    && ($frame->{flags} & FLAG_END_STREAM)) {
                     if ($$session_ref && exists $pending_streams{$stream_id}) {
-                        eval {
-                            $$session_ref->submit_response($stream_id,
-                                status  => 200,
-                                headers => [['content-type', 'text/plain']],
-                                body    => "OK\n",
-                            );
-                        };
+                        my $path = $pending_streams{$stream_id}{':path'} // '/';
+                        respond($$session_ref, $stream_id, $path, \%responded);
                     }
                 }
                 return 0;
@@ -118,6 +187,43 @@ sub handle_connection {
             on_stream_close => sub {
                 my ($stream_id) = @_;
                 delete $pending_streams{$stream_id};
+                delete $responded{$stream_id};
+                return 0;
+            },
+            on_frame_send => sub {
+                my ($frame) = @_;
+                $frames_sent{ $frame->{type} }++;
+
+                # The response has claimed its place in the output while the
+                # request half is still open: nothing more will be read from
+                # that stream, so close it. Submitting from inside the callback
+                # is the supported use; the flush already under way serializes
+                # the RST_STREAM, and mem_send must not be called from here.
+                return 0 unless $frame->{stream_id} > 0;
+                return 0 unless $frame->{flags} & FLAG_END_STREAM;
+                return 0 unless $frame->{type} == FRAME_HEADERS
+                             || $frame->{type} == FRAME_DATA;
+
+                my $remote_close =
+                    $$session_ref->get_stream_remote_close($frame->{stream_id});
+                if (defined $remote_close && $remote_close == 0) {
+                    $$session_ref->submit_rst_stream($frame->{stream_id},
+                        NGHTTP2_NO_ERROR);
+                    $early_resets++;
+                }
+                return 0;
+            },
+            on_frame_not_send => sub {
+                my ($frame, $lib_error_code) = @_;
+                $frames_not_sent{$lib_error_code}++;
+                return 0;
+            },
+            on_invalid_frame_recv => sub {
+                $invalid_frames++;
+                return 0;
+            },
+            on_error => sub {
+                $errors++;
                 return 0;
             },
         },
@@ -130,6 +236,11 @@ sub handle_connection {
     my $timeout = 5;  # 5 second timeout
 
     while (1) {
+        if ($shutting_down) {
+            shutdown_session($session, $client, $highest_stream);
+            last;
+        }
+
         # Send any pending data
         my $out = eval { $session->mem_send() };
         last if $@;
@@ -148,6 +259,11 @@ sub handle_connection {
         my $rin = '';
         vec($rin, fileno($client), 1) = 1;
         my $ready = select($rin, undef, undef, $timeout);
+
+        if ($shutting_down) {
+            shutdown_session($session, $client, $highest_stream);
+            last;
+        }
 
         if ($ready > 0) {
             my $buf;
@@ -174,17 +290,130 @@ sub handle_connection {
             last;
         }
     }
+
+    if ($stats) {
+        print STDERR sprintf(
+            "h2spec-server stats pid=%d streams_accepted=%d frames_sent=%s "
+                . "frames_not_sent=%s invalid_frames=%d errors=%d early_resets=%d\n",
+            $$,
+            $streams_accepted,
+            counter_string(\%frames_sent),
+            counter_string(\%frames_not_sent),
+            $invalid_frames,
+            $errors,
+            $early_resets,
+        );
+    }
+
+    return;
+}
+
+# "type:count;type:count", or "none" for an empty counter.
+sub counter_string {
+    my ($counter) = @_;
+    return 'none' unless %$counter;
+    return join ';', map { "$_:$counter->{$_}" }
+        sort { $a <=> $b } keys %$counter;
+}
+
+sub path_of {
+    my ($path) = @_;
+    $path =~ s/\?.*\z//s;
+    return $path;
+}
+
+sub query_param {
+    my ($path, $name) = @_;
+    my ($query) = $path =~ /\?(.*)\z/s;
+    return undef unless defined $query;
+    for my $pair (split /[&;]/, $query) {
+        my ($key, $value) = split /=/, $pair, 2;
+        return $value if defined $key && $key eq $name;
+    }
+    return undef;
+}
+
+sub respond {
+    my ($session, $stream_id, $path, $responded) = @_;
+
+    # A stream carries at most one response; /early answers on HEADERS and
+    # would otherwise answer again when the request body ends.
+    return if $responded->{$stream_id}++;
+
+    my $endpoint = path_of($path);
+
+    if ($endpoint eq '/stream') {
+        my $chunks = query_param($path, 'n');
+        $chunks = 1 unless defined $chunks && $chunks =~ /\A[0-9]+\z/;
+        $chunks = 1 if $chunks < 1;
+
+        # A chunk per call, trimmed to what nghttp2 has room for, so the body
+        # is exactly $chunks KiB however flow control divides it up.
+        my $remaining = $chunks * length STREAM_CHUNK;
+        eval {
+            $session->submit_response($stream_id,
+                status  => 200,
+                headers => [['content-type', 'application/octet-stream']],
+                body    => sub {
+                    my (undef, $max_length) = @_;
+                    return ('', 1) if $remaining <= 0;
+                    my $length = $remaining;
+                    $length = $max_length if $length > $max_length;
+                    $length = length STREAM_CHUNK if $length > length STREAM_CHUNK;
+                    $remaining -= $length;
+                    return (substr(STREAM_CHUNK, 0, $length),
+                        $remaining <= 0 ? 1 : 0);
+                },
+            );
+        };
+        return;
+    }
+
+    my $body = $endpoint eq '/early' ? "EARLY\n" : "OK\n";
+    eval {
+        $session->submit_response($stream_id,
+            status  => 200,
+            headers => [['content-type', 'text/plain']],
+            body    => $body,
+        );
+    };
+    return;
+}
+
+# Announce GOAWAY for the streams this connection accepted, then flush until
+# nghttp2 has nothing left to write or the deadline passes.
+sub shutdown_session {
+    my ($session, $client, $highest_stream) = @_;
+
+    eval {
+        $session->submit_goaway(
+            last_stream_id => $highest_stream,
+            error_code     => NGHTTP2_NO_ERROR,
+        );
+    };
+
+    my $deadline = Time::HiRes::time() + SHUTDOWN_DEADLINE;
+    while (Time::HiRes::time() < $deadline) {
+        my $out = eval { $session->mem_send() };
+        last if $@;
+        if (defined $out && length $out) {
+            my $written = syswrite($client, $out);
+            last unless defined $written;
+        }
+        last unless eval { $session->want_write() };
+    }
+    return;
 }
 
 __END__
 
 =head1 NAME
 
-h2spec-server - Minimal HTTP/2 server for conformance testing
+h2spec-server - Minimal HTTP/2 server for conformance and load testing
 
 =head1 SYNOPSIS
 
-    h2spec-server [port]
+    h2spec-server [--stats] [port]
 
     # Default port 8080
     h2spec-server
@@ -192,28 +421,80 @@ h2spec-server - Minimal HTTP/2 server for conformance testing
     # Custom port
     h2spec-server 9000
 
+    # Per-connection frame counters on STDERR
+    h2spec-server --stats 9000
+
     # Run h2spec against it
     h2spec -h localhost -p 9000
+
+    # Drive the early-response path
+    h2load -n 5000 -c 20 -m 50 -d bigfile http://localhost:9000/early
 
 =head1 DESCRIPTION
 
 A minimal HTTP/2 cleartext (h2c) server designed for testing with h2spec,
-the HTTP/2 conformance testing tool.
+the HTTP/2 conformance testing tool, and for load testing the binding's
+callback surface with h2load and nghttp.
 
 The server responds with "200 OK" to all valid requests. It uses a
 fork-per-connection model to handle h2spec's rapid test connections.
 
-=head1 FEATURES
+=head1 OPTIONS
 
 =over 4
 
-=item * HTTP/2 cleartext (h2c) - no TLS required
+=item C<--stats>
 
-=item * Fork-per-connection for concurrent test handling
+Print one counter line per connection to STDERR when that connection ends:
 
-=item * Responds to GET, HEAD, POST requests
+    h2spec-server stats pid=123 streams_accepted=50 frames_sent=0:50;1:50 \
+        frames_not_sent=none invalid_frames=0 errors=0 early_resets=50
 
-=item * Handles requests with and without body
+C<frames_sent> and C<frames_not_sent> are C<key:count> lists, keyed by HTTP/2
+frame type and by C<NGHTTP2_ERR_*> code respectively, or C<none> when empty.
+C<early_resets> counts the streams reset because the response finished while
+the request half was still open.
+
+=item C<--help>
+
+Print the usage message and exit.
+
+=back
+
+=head1 ENDPOINTS
+
+=over 4
+
+=item C</echo> (and any other path)
+
+Responds C<200> with a short static body once the whole request has arrived.
+
+=item C</early>
+
+Responds C<200> as soon as the request headers arrive, without reading the
+request body. The response therefore completes while the request half is still
+open, and the server closes the stream with RST_STREAM(NO_ERROR) from inside
+C<on_frame_send>. C<h2load -d FILE> against this endpoint drives that path on
+every request.
+
+=item C</stream?n=N>
+
+Responds C<200> with a streaming body of N KiB, produced a chunk at a time so a
+reset can land mid-body. Each chunk is at most 1 KiB and never larger than what
+nghttp2 asks for. N defaults to 1.
+
+=back
+
+=head1 SIGNALS
+
+=over 4
+
+=item SIGTERM
+
+Graceful shutdown. The listening process stops accepting and forwards the
+signal; each connection submits GOAWAY naming the highest stream it accepted,
+flushes until nghttp2 has nothing left to write or two seconds pass, and exits
+with status 0.
 
 =back
 

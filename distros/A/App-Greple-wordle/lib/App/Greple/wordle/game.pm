@@ -2,7 +2,6 @@ package App::Greple::wordle::game;
 use v5.14;
 use warnings;
 
-use Data::Dumper;
 use List::Util qw(any uniq);
 use List::MoreUtils qw(pairwise);
 use Getopt::EX::Colormap qw(colorize);
@@ -58,7 +57,7 @@ my %map_color = (
 
 sub keycolor {
     my($kmap, $cmap, $s) = @_;
-    join '', map colorize($cmap->{$kmap->{$_}//'_'}, $_), $s =~ /./g;
+    join '', map colorize($cmap->{$kmap->{$_}//'_'}, uc $_), $s =~ /./g;
 }
 
 sub keymap {
@@ -95,6 +94,22 @@ sub _result {
     } @_;
 }
 
+my %guess_color = (
+    G => '555/#6aaa64',
+    Y => '555/#c9b458',
+    K => '555/#787c7e',
+    );
+
+sub guess_color {
+    my $obj = shift;
+    my @result = _result(map lc, $obj->answer, @_);
+    map {
+	my @c = shift(@result) =~ /./g;
+	my @w = /./g;
+	join '', pairwise { colorize($guess_color{$a}, uc $b) } @c, @w;
+    } @_;
+}
+
 ######################################################################
 # hint
 ######################################################################
@@ -102,8 +117,8 @@ sub _result {
 my %hint_color = (
     G => 'G',
     Y => 'Y',
-    K => 'KU',
-    _ => 'K',
+    K => 'U',
+    _ => '',
     );
 
 sub hint_color {
@@ -141,8 +156,9 @@ sub _hint {
 	$a ? $a : "[^$b]";
     } @yes, @no;
     my $in = join '', map { "(?=.*$_)" } uniq $seen =~ /(?<!-)\w/g;
-    my $ex = sprintf '(?!.*[%s])', join('', uniq $seen =~ /(?<=-)\w/g);
-    $in . $ex . $match;
+    my $ex = join '', uniq $seen =~ /(?<=-)\w/g;
+    $ex = "(?!.*[$ex])" if $ex ne '';
+    '^' . $in . $ex . $match;
 }
 
 1;

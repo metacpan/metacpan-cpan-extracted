@@ -1,5 +1,12 @@
 Revision history for Math-Histo
 
+0.4.1   2026-09-13
+        - Fix compilation failure on Windows Strawberry Perl with PERL_IMPLICIT_SYS
+          by adding Perl interpreter thread context (pTHX_/aTHX_) to histo_xs_cli_capture.
+        - Enforce Alien::libhisto 0.4.0+ in CONFIGURE_REQUIRES to prevent Alien::Base::Wrapper
+          from resetting requirement to 0 and failing on outdated installations lacking kde.h.
+        - Add pre-configure version guard for Alien::libhisto in Makefile.PL.
+
 0.4.0   2026-09-08
         - Align with libhisto C core 0.4.0 release.
         - Require Alien::libhisto 0.4.0 in build and runtime prerequisites.

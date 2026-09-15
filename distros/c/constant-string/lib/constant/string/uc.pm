@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use constant (); 
 
-our $VERSION = '2026.267';
+our $VERSION = '2026.377';
 
 sub import {
     my ($class, @args) = @_;
@@ -39,7 +39,7 @@ version 2026.267
     use constant::string::uc qw( foo bar baz );
 
     print FOO;  # Outputs: foo
-    print BAR;  # Outputs: Bar
+    print BAR;  # Outputs: bar
 
 =head1 DESCRIPTION
 

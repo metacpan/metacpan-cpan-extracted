@@ -147,7 +147,7 @@ is_deeply(\@cols4, [qw(entry internal name score tier)],
 
 throws_ok {
 	$join->add_database('not_an_object');
-} qr/not a Database::Abstraction/i, 'non-object argument is rejected';
+} qr/does not support the selectall_arrayref/i, 'non-object argument is rejected';
 
 # ---------------------------------------------------------------------------
 # Error: new database lacks join_column

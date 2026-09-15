@@ -1,4 +1,4 @@
-package Dist::Zilla::Tester 6.038;
+package Dist::Zilla::Tester 6.039;
 # ABSTRACT: a testing-enabling stand-in for Dist::Zilla
 
 use Moose;
@@ -46,6 +46,11 @@ sub minter { 'Dist::Zilla::Tester::_Minter' }
     Dist::Zilla::Tester::_Role;
 
   use Moose::Role;
+
+  # The rmdir in DEMOLISH is expected to fail while other testers still have
+  # tempdirs under the shared root; only the last one out succeeds.
+  use autodie;
+  no autodie qw(rmdir);
 
   has tempdir_root => (
     is => 'rw', isa => 'Str|Undef',
@@ -112,9 +117,10 @@ sub minter { 'Dist::Zilla::Tester::_Minter' }
 }
 
 {
-  package Dist::Zilla::Tester::_Builder 6.038;
+  package Dist::Zilla::Tester::_Builder 6.039;
 
   use Moose;
+  use autodie;
   extends 'Dist::Zilla::Dist::Builder';
   with 'Dist::Zilla::Tester::_Role';
 
@@ -257,9 +263,10 @@ sub minter { 'Dist::Zilla::Tester::_Minter' }
 }
 
 {
-  package Dist::Zilla::Tester::_Minter 6.038;
+  package Dist::Zilla::Tester::_Minter 6.039;
 
   use Moose;
+  use autodie;
   extends 'Dist::Zilla::Dist::Minter';
   with 'Dist::Zilla::Tester::_Role';
 
@@ -369,7 +376,7 @@ Dist::Zilla::Tester - a testing-enabling stand-in for Dist::Zilla
 
 =head1 VERSION
 
-version 6.038
+version 6.039
 
 =head1 PERL VERSION
 

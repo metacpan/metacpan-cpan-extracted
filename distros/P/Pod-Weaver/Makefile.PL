@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020000;
+use 5.022000;
 
 use ExtUtils::MakeMaker 6.78;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Pod-Weaver",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.020000",
+  "MIN_PERL_VERSION" => "5.022000",
   "NAME" => "Pod::Weaver",
   "PREREQ_PM" => {
     "Config::MVP" => 2,
@@ -66,7 +66,7 @@ my %WriteMakefileArgs = (
     "Test::Differences" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "4.021",
+  "VERSION" => "4.022",
   "test" => {
     "TESTS" => "t/*.t"
   }

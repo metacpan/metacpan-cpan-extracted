@@ -46,7 +46,7 @@ les_emit_message(pTHX_ les_xsstate_t *st, SV *message)
         les_consumer_message(aTHX_ st, message);
         return;
     }
-    if (!st->descriptor->message_batch_size) {
+    if (!st->message_batch_size) {
         LES_STAT(st, message_callback_calls)++;
         les_call_two(aTHX_ st->input_cb, st->stream_sv, message);
         return;
@@ -64,11 +64,8 @@ les_emit_message(pTHX_ les_xsstate_t *st, SV *message)
     if (st->message_batch_bytes > LES_STAT(st, message_batch_peak_bytes))
         LES_STAT(st, message_batch_peak_bytes) = st->message_batch_bytes;
 
-    /* max_buffer also bounds the aggregate retained by one batch. Because the
-     * current message has already been decoded, the peak is less than two
-     * max_buffer values even when one frame crosses the remaining budget. */
-    if (st->message_batch_count >= st->descriptor->message_batch_size
-        || st->message_batch_bytes >= st->descriptor->max_buffer)
+    if (st->message_batch_count >= st->message_batch_size
+        || st->message_batch_bytes >= st->max_buffer)
         les_flush_message_batch(aTHX_ st);
 }
 
@@ -80,13 +77,13 @@ les_flush_raw_batch(pTHX_ les_xsstate_t *st)
     SV *bytes;
 
     if (!st || !st->input_len || st->descriptor->read_mode != LES_READ_DELIVER
-        || !st->descriptor->read_batch_bytes)
+        || !st->read_batch_bytes)
         return;
 
     data = les_input_data(st);
     len = st->input_len;
-    if ((UV)len > st->descriptor->read_batch_bytes)
-        len = (size_t)st->descriptor->read_batch_bytes;
+    if ((UV)len > st->read_batch_bytes)
+        len = (size_t)st->read_batch_bytes;
     bytes = sv_2mortal(newSVpvn(data, (STRLEN)len));
     les_input_consume(st, len);
     LES_STAT(st, read_batch_flushes)++;

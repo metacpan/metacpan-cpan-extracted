@@ -1,12 +1,70 @@
 Revision history for Database::Join
 
+0.003.0	Fri Sep 11 05:12:03 PM EDT 2026
+	[ Bug Fixes ]
+	- Replace isa('Database::Abstraction') guard in new() and add_database()
+	  with duck-typing (can('selectall_arrayref') && can('columns')).
+	  Database::Join now accepts any object that exposes those two methods,
+	  including wrapper classes (e.g. Database::BI::Model::DataSource) and
+	  chained Database::Join instances, without requiring them to inherit
+	  from Database::Abstraction.  Existing callers passing genuine
+	  Database::Abstraction subclasses are unaffected.
+
+0.002.0	Fri Sep 11 02:07:01 PM EDT 2026
+	[ Enhancements ]
+	- Add collision_prefix constructor parameter (HashRef[Str], keyed by
+	  zero-based database index).  When a secondary database has a column
+	  that collides with an existing column in the merged view, the secondary
+	  column is published as "$prefix.$col" so both values survive in every
+	  merged row.  Omitting collision_prefix preserves the previous
+	  last-database-wins behaviour unchanged.  Criteria on prefixed column
+	  names are correctly translated back to the database's own column name
+	  before the query is issued.  The join_column is never prefixed.
+	- Add t/collision-prefix.t: 12 subtests covering columns(), schema(),
+	  row merge, criteria routing by prefixed name, fetchrow_hashref,
+	  backward compat, index-0 ignore, non-colliding pass-through,
+	  remove_column, three-database chaining, and add_database.
+	- Add t/xlsx.t: end-to-end tests with XLSX-backed component databases
+	  (requires DBD::Excel + Spreadsheet::WriteExcel; skipped otherwise).
+	  Exercises left/inner/outer join, criteria routing, fetchrow_hashref,
+	  columns(), collision_prefix, and add_database against real .xlsx files.
+	  Documents that DBD::Excel returns empty schema() for XLSX databases.
+	- Hoist per-secondary-database constants (local join-column name, rename
+	  flag, rename map) outside the O(K*N*R) key/row/column merge loop,
+	  eliminating repeated hash lookups on every merged row.
+	- Seed the key_set hash via a hash slice instead of building an
+	  intermediate list, halving allocations for large primary result sets.
+	- Cache the removed-column list lazily in _removed_list (invalidated by
+	  remove_column) to avoid rebuilding keys(%_removed_cols) on every query.
+	- Iterate base rows directly from the indexed arrayref instead of copying
+	  into @base_rows, eliminating one array allocation per qualifying key.
+	- Restructure remove_column guard to a single early-return that covers
+	  both undef and empty-string inputs (boolean reduction).
+	- Remove dead store: _joined_query no longer evaluates had_criteria[0]
+	  for the primary database (it is never read).
+	- Remove spurious // {} fallback in _partition_criteria: _col_unrename
+	  entries are always hashrefs by construction.
+	- Harden AUTOLOAD regex: possessive quantifier \w++ prevents backtracking;
+	  $ anchor replaced by \z (never matches a trailing newline); /x modifier
+	  with inline comments added.  Private-method guard replaced with a
+	  substr() check, eliminating a second regex entirely.
+	[ Bug Fixes ]
+	- Fix heap-address leakage via collision_prefix: _build_col_index now
+	  rejects non-string values (refs) immediately, croaking with
+	  error_invalid_prefix before any column name is constructed.  Mirrors
+	  the existing join_map value type guard.
+	- Fix filter reference aliasing: the filters constructor parameter and
+	  the add_database filter option are now deep-copied (_copy_filters /
+	  _copy_criteria helpers) so post-construction mutation of the caller's
+	  hashref cannot widen the logical view or bypass row-security guarantees.
+
 0.001.1	Sun Aug 23 03:29:39 PM EDT 2026
 	[ Bug fixes ]
 	- Fix t/edge_cases.t false failures on CPAN Testers: heap-address guard tests
-	now inspect only the first line of $@ (the error text) rather than the full
-	exception string including croak's stack trace, which naturally contains
-	object addresses.
-	Fixes https://matrix.perl-magpie.org/results/def96e6c-9e2e-11f1-af92-fa432959d47e
+	  now inspect only the first line of $@ (the error text) rather than the full
+	  exception string including croak's stack trace, which naturally contains
+	  object addresses.
+	  Fixes https://matrix.perl-magpie.org/results/def96e6c-9e2e-11f1-af92-fa432959d47e
 
 0.001.0	Fri Aug 21 08:54:30 PM EDT 2026
     - Initial CPAN release.

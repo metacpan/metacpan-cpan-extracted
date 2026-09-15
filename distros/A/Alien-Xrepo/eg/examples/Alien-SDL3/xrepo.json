@@ -1,9 +1,0 @@
-{
-   "name" : "Alien-SDL3",
-   "packages" : [
-      { "name" : "libsdl3" },
-      { "name" : "libsdl3_image" },
-      { "name" : "libsdl3_ttf" },
-      { "name" : "libsdl3_mixer" }
-   ]
-}

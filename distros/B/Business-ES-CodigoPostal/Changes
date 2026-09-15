@@ -1,5 +1,16 @@
 Revision history for Business-ES-CodigoPostal
 
+0.04	provincias()
+
+	- provincias() devuelve las 52 por orden alfabetico, con la misma
+	  grafia que devuelve provincia(). Sale de la tabla de prefijos, que
+	  es la misma fuente, para que una lista de seleccion no pueda acabar
+	  diciendo algo distinto de lo que rellena el codigo postal.
+	- El orden ignora los acentos. Un sort a secas compara por punto de
+	  codigo y manda 'Alava' y 'Avila' detras de 'Zaragoza'.
+	- Paridad con Business::PT::CodigoPostal, que ya listaba sus
+	  distritos. t/paridad.t comprueba que las dos APIs no divergen.
+
 0.03	metodos, municipios y salidas de texto en caracteres
 
 	- insular(), set() y new() (estaban escritos y sin publicar).

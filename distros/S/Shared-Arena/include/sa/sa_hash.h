@@ -122,14 +122,18 @@ typedef struct {
     volatile unsigned char locks[SA_LOCK_STRIPES];
 } sa_hash_hdr;
 
-typedef struct sa_hash {
+#ifndef SA_HASH_FWD
+#define SA_HASH_FWD
+typedef struct sa_hash sa_hash;
+#endif
+struct sa_hash {
     sa_region   *arena;
     sa_hash_hdr *hdr;
     char        *slots;
     uint32_t     slot_size;
     uint64_t     nslots;
     uint64_t     pair_max;    /* key + value that fits one slot */
-} sa_hash;
+};
 
 #define SA_HSLOT_AT(m, i) \
     ((sa_hash_slot *)((m)->slots + (size_t)((i) % (m)->nslots) * (m)->slot_size))

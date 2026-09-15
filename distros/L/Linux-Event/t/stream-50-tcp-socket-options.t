@@ -77,7 +77,7 @@ our (@HOOKS, @ERRORS);
 
 my $loop = Linux::Event::Loop->new;
 my $listener = $loop->add(T::ConfiguredListener->new(
-    stream_class => 'T::ConfiguredServer', # required
+    stream       => { class => 'T::ConfiguredServer' },
     host         => '127.0.0.1',           # required
     port         => 0,                     # required
 ));

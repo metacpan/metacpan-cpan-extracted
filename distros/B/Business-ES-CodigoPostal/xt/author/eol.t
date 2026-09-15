@@ -14,7 +14,9 @@ my @files = (
     't/codigos.t',
     't/function.t',
     't/municipios.t',
-    't/pod.t'
+    't/paridad.t',
+    't/pod.t',
+    't/provincias.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

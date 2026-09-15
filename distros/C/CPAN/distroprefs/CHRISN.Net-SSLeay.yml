@@ -1,0 +1,9 @@
+---
+comment: |
+
+  patches from libnet-ssleay-perl_1.94-3
+
+match:
+  distribution: "CHRISN/Net-SSL-1.94.tar.gz"
+patches:
+  - ANDK/patches/Net-SSLeay-1.94-from-debian-1.94-3.patch.gz

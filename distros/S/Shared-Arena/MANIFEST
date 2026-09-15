@@ -19,6 +19,7 @@ include/sa/sa_format.h
 include/sa/sa_frozen.h
 include/sa/sa_hash.h
 include/sa/sa_hist.h
+include/sa/sa_hll.h
 include/sa/sa_lease.h
 include/sa/sa_map.h
 include/sa/sa_peer.h
@@ -38,6 +39,7 @@ lib/Shared/Arena/Cuckoo.pm
 lib/Shared/Arena/Frozen.pm
 lib/Shared/Arena/Frozen/View.pm
 lib/Shared/Arena/Histogram.pm
+lib/Shared/Arena/HyperLogLog.pm
 lib/Shared/Arena/Lease.pm
 lib/Shared/Arena/Map.pm
 lib/Shared/Arena/Rate.pm
@@ -75,6 +77,7 @@ t/34-cuckoo.t
 t/36-lease.t
 t/38-threads.t
 t/40-scoreboard.t
+t/44-hll.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -86,6 +89,7 @@ xs/cuckoo.xs
 xs/frozen.xs
 xs/group.xs
 xs/hist.xs
+xs/hll.xs
 xs/lease.xs
 xs/map.xs
 xs/rate.xs
@@ -96,6 +100,7 @@ xs/xop.xs
 xt/boilerplate.t
 xt/implicit-sys.t
 xt/rate-pool.t
+xt/typedef-guards.t
 xt/win32-fork.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,18 +4,33 @@ CONTRIBUTING.md
 docs/cli-contract.md
 docs/DESIGN.md
 docs/FUNCTIONS.md
+docs/jq-semantics-differences.md
 docs/library-contract.md
 docs/library-integration.md
+docs/v3-roadmap.md
 install-jq-lite.ps1
 lib/JQ/Lite.pm
+lib/JQ/Lite/AST.pm
+lib/JQ/Lite/Builtin.pm
+lib/JQ/Lite/Builtin/Aggregate.pm
+lib/JQ/Lite/Builtin/Array.pm
+lib/JQ/Lite/Builtin/Encoding.pm
+lib/JQ/Lite/Builtin/Math.pm
+lib/JQ/Lite/Builtin/Object.pm
+lib/JQ/Lite/Builtin/String.pm
+lib/JQ/Lite/Builtin/Type.pm
 lib/JQ/Lite/Error.pm
+lib/JQ/Lite/Evaluator.pm
 lib/JQ/Lite/Expression.pm
 lib/JQ/Lite/Filters.pm
 lib/JQ/Lite/Parser.pm
+lib/JQ/Lite/Runtime.pm
+lib/JQ/Lite/Tokenizer.pm
 lib/JQ/Lite/Util.pm
 lib/JQ/Lite/Util/Parsing.pm
 lib/JQ/Lite/Util/Paths.pm
 lib/JQ/Lite/Util/Transform.pm
+lib/JQ/Lite/Value.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -26,6 +41,7 @@ t/abs.t
 t/aggregate.t
 t/all.t
 t/any.t
+t/architecture.t
 t/arg_option.t
 t/argfile_cli.t
 t/argjson_cli.t
@@ -38,6 +54,7 @@ t/avg_by.t
 t/base64_format.t
 t/base64d.t
 t/basic.t
+t/builtin_dispatch.t
 t/case_transform.t
 t/ceil_floor.t
 t/chunks.t
@@ -80,7 +97,9 @@ t/index.t
 t/indices.t
 t/inside.t
 t/is_empty.t
+t/iterator_suffix.t
 t/join.t
+t/jq_semantic_differences.t
 t/json_formatter.t
 t/keys.t
 t/keys_unsorted.t
@@ -148,6 +167,7 @@ t/tsv_format.t
 t/type.t
 t/unique_by.t
 t/uri_format.t
+t/value_semantics.t
 t/values.t
 t/walk.t
 t/yaml_cli.t

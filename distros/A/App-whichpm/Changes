@@ -1,5 +1,10 @@
 Revision history for App-whichpm
 
+0.07   12 September 2026
+
+    * locate modules with Module::Path and read versions with Module::Metadata
+      without loading the target module
+
 0.06    14 April 2024
     * add -l and -I parameters to add @INC paths
     * fix -v vs -V with Getopt::Long (thanks Andreas Hadjiprocopis)
@@ -24,4 +29,3 @@ Revision history for App-whichpm
 
 0.01     5 Mar 2010
     * First version, released on an unsuspecting world.
-

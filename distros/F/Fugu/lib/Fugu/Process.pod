@@ -33,6 +33,10 @@ never by a wait-and-guess sleep(3). None of them runs a shell: the
 command is a list, so no argument needs quoting and no argument can
 become a shell operator.
 
+C<find_command()> starts no child. It resolves a command name to an
+executable path, so a caller resolves the command once and runs it
+later.
+
 The module keeps no state. Every method is a class method.
 
 The module reads the Perl configuration at compile time, so no
@@ -151,7 +155,8 @@ The parent always waits for the execve(2) to resolve. The child holds
 the write end of a close-on-exec pipe. A successful execve(2) closes
 that end, and the parent reads end-of-file. A failure leaves a message
 in the pipe, and the parent returns it in C<error>. Thus a command
-that does not exist reports its own reason at once.
+that does not exist reports its own reason at once. L</ERRORS> holds
+the form of each start reason.
 
 =head2 spawn_peer
 
@@ -272,6 +277,10 @@ The method reads standard output and standard error at the same time.
 A reader that took them in sequence would deadlock: a child that fills
 one pipe blocks until someone drains it.
 
+The method starts the child with the same fork-and-exec step as
+C<spawn_command()>. A failure to start it gives C<error> in the hash,
+and L</ERRORS> holds the form of each start reason.
+
 =head2 exit_code
 
 C<exit_code($status)> maps a raw waitpid(2) status, or the return
@@ -350,6 +359,26 @@ The paths travel as C<-I> flags in the argument list, not in
 C<PERL5LIB>. An C<env> argument that clears the environment
 therefore costs the child no module.
 
+=head2 find_command
+
+C<find_command($name, @defaults)> resolves a command to an executable
+path. It returns the path, or C<undef>. The method runs no process,
+and it never dies. A caller resolves the command once, and it runs
+the command later.
+
+A C<$name> that holds a solidus is a path, and the method tests that
+path alone. A plain C<$name> walks C<$ENV{PATH}> for that name. An
+undef or an empty C<$name> walks C<$ENV{PATH}> over C<@defaults>, in
+order, and returns the first one that the host has.
+
+The order of C<@defaults> is the preference of the caller. A caller
+that needs gpg(1) version 2 names C<gpg2> before C<gpg>, because a
+host that kept C<gpg> for version 1 carries version 2 under the
+second name.
+
+A candidate resolves when it is a plain file and executable. A
+directory and a device therefore resolve to nothing.
+
 =head1 RETURN VALUES
 
 C<spawn_command()> and C<spawn_perl()> return a hash reference. On
@@ -392,6 +421,15 @@ This example runs a helper and then stops it:
 No method dies for a failure of the system: the methods report such a
 failure through the hash reference or the boolean value that they
 return.
+
+A method that starts a child gives the reason of a start failure in
+C<error>. C<spawn_command()>, C<spawn_peer()>, C<spawn_perl()> and
+C<run()> share that step, so they share the form of the reason. The
+reason of a failed execve(2) starts with C<Cannot exec>. Each other
+start failure starts with another form, among them a failed pipe, a
+failed fork, a failed chdir and a failed redirect. A caller that must
+tell an absent command from a failure of the machinery reads that
+form, as L<Fugu::Signer> does.
 
 A programming error dies. These are the cases: an C<inherit> value
 that is not an array reference, an C<inherit> member with no

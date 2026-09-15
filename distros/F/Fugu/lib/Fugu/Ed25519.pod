@@ -1,0 +1,131 @@
+=head1 NAME
+
+Fugu::Ed25519 - verify an Ed25519 signature with core Perl
+
+=head1 SYNOPSIS
+
+    use Fugu::Ed25519;
+
+    my $verifier = Fugu::Ed25519->new;
+
+    my $ok = $verifier->verify(
+        key       => $public_key,    # 32 bytes
+        signature => $signature,     # 64 bytes
+        message   => $bytes,
+    );
+
+    die $verifier->error unless defined $ok;
+    die 'the signature does not verify' unless $ok;
+
+    $ok = $verifier->verify(
+        key       => $public_key,
+        signature => $signature,
+        file      => '/var/cache/SHA256',
+    );
+
+=head1 DESCRIPTION
+
+Fugu::Ed25519 verifies an Ed25519 signature, as RFC 8032 defines it.
+The module holds the field arithmetic over L<Math::BigInt>, the point
+decoder, and the check of section 5.1.7. It needs core Perl alone:
+L<Math::BigInt> for the arithmetic, L<Digest::SHA> for SHA-512, and
+nothing else.
+
+L<Fugu::Signify> uses the module for its C<perl> engine. A host
+verifies a signify(1) signature with no command installed.
+
+The module verifies only. It signs nothing, it makes no key, and it
+holds no private key operation. A private key operation stays with
+signify(1), which the signer of L<Fugu::Signify> runs.
+
+=head2 new
+
+C<new()> builds a verifier. The method takes no argument, and it never
+dies. The object holds the reason of the most recent shape error, and
+nothing else. One object serves any number of verifications.
+
+=head2 verify
+
+C<verify(key =E<gt> $bytes, signature =E<gt> $bytes, message =E<gt>
+$bytes)> verifies one signature.
+
+C<key> is the 32-byte public key, and C<signature> is the 64-byte
+signature. Both arguments are necessary. The caller names C<message>
+as a byte string, or C<file> as a path, and never both. A file streams
+through the hash, so a file of any size needs no memory.
+
+The method returns 1 for a signature that verifies, and 0 for one that
+does not. It returns C<undef> for a shape error, and C<error> then
+holds the reason.
+
+=head2 error
+
+C<error()> returns the reason of the most recent shape error, or
+C<undef>. C<verify> clears the reason before it starts.
+
+A signature that does not verify is not a shape error, so C<error>
+returns C<undef> after a return of 0. The answer is the whole answer:
+the file is not authentic.
+
+=head1 RETURN VALUES
+
+C<verify()> returns 1, 0, or C<undef>. The three answers are
+different, and a caller must tell them apart.
+
+C<undef> means that the caller gave bad input. A key that is not 32
+bytes, a signature that is not 64 bytes, and a string that holds a
+character above 255 are each a shape error. So is a file that does not
+open, and so is a call with neither C<message> nor C<file>, or with
+both. L<Digest::SHA> dies on a string above 255, and a byte unpack of
+one would give a wrong answer in place of a failure.
+
+0 means that the signature does not verify. A flipped bit, a scalar at
+or above the group order, and a point encoding that decodes to no
+point each give 0. The decoder takes the canonical encoding only: two
+encodings of one signature would let a signature count twice.
+
+=head1 PERFORMANCE
+
+L<Math::BigInt> takes the GMP or the Pari backend when the host has
+one, and the module names both in its C<try> list. The list adds no
+dependency: a host without either backend runs the pure-Perl one.
+
+One check takes a fraction of a second with the pure-Perl backend, and
+milliseconds with GMP. A caller therefore runs a few checks, and never
+a stream of them.
+
+=head1 CAVEATS
+
+The module cannot sign, and it takes no secret key. It also makes no
+key.
+
+The implementation is not constant time. Every input of a verification
+is public: the key, the signature, and the message all travel in the
+open. A timing side channel tells an attacker nothing that the
+signature file does not. The module holds no secret, so none can leak.
+
+The check takes the group equation C<[S]B = R + [k]A>, which section
+5.1.7 of RFC 8032 names as sufficient. It is stricter than the
+cofactored form, and it agrees with signify(1).
+
+The module runs no check on the order of a public key. The cofactored
+form accepts the same keys, so the choice of equation does not change
+this. A key of the neutral point makes C<[k]A> the neutral point for
+every C<k>. A signature of C<R> the neutral point and C<S> of zero
+thus verifies against any message. A key of another small order does
+the same whenever that order divides C<k>. A caller must check each
+public key that comes from a source it does not trust.
+
+A caller under pledge(2) needs C<rpath> for the C<file> form only. The
+module runs no command, and it opens no socket.
+
+=head1 SEE ALSO
+
+RFC 8032, signify(1), L<Digest::SHA>, L<Math::BigInt>,
+L<Fugu::Signify>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

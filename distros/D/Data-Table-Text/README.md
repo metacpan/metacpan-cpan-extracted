@@ -11516,6 +11516,3 @@ Hey! **The above document had some coding errors, which are explained below:**
 - Around line 12717:
 
     Unterminated L<...> sequence
-
-
-For documentation see: [CPAN](https://metacpan.org/pod/Data::Table::Text)

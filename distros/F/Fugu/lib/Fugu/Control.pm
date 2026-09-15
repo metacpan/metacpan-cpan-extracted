@@ -15,10 +15,13 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-use v5.36;
-
 package Fugu::Control;
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
+
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 
 use IO::Socket::UNIX;
 use JSON::PP ();
@@ -528,7 +531,7 @@ sub _log ($self)
 }
 
 package Fugu::Control::Client;
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
 
 use Errno qw(EACCES ENOENT);
 use IO::Socket::UNIX;

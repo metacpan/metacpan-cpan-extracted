@@ -20,6 +20,7 @@ use Socket qw(
 use Linux::Event::Error;
 use Linux::Event::Address;
 use Linux::Event::_Socket::Stream ();
+use Linux::Event::IO::Sock::Stream ();
 use Linux::Event::_ByteStream::Descriptor ();
 use Linux::Event::_SocketConfig ();
 
@@ -27,6 +28,8 @@ require XSLoader;
 XSLoader::load(__PACKAGE__);
 
 my %CLASS_DESCRIPTOR;
+my @STREAM_CALLBACK = Linux::Event::_ByteStream::_callback_names();
+my %STREAM_CALLBACK = map { $_ => 1 } @STREAM_CALLBACK;
 
 sub _descriptor_for ($class) {
     return $CLASS_DESCRIPTOR{$class} if exists $CLASS_DESCRIPTOR{$class};
@@ -247,43 +250,117 @@ sub _create_unix_listener ($path, $backlog, $unlink_existing, $permissions) {
     return ($fh, AF_UNIX);
 }
 
+sub _stream_recipe ($recipe) {
+    croak 'new(): stream must be a hash reference'
+        if ref($recipe) ne 'HASH';
+    my %stream = %$recipe;
+    my $stream_class = delete($stream{class})
+        // 'Linux::Event::IO::Sock::Stream';
+    croak 'new(): stream class must name a Linux::Event::_Socket::Stream subclass'
+        if ref($stream_class)
+        || !$stream_class->isa('Linux::Event::_Socket::Stream');
+
+    my $tuning = delete($stream{tuning}) // {};
+    croak 'new(): stream tuning must be a hash reference'
+        if ref($tuning) ne 'HASH';
+    my $data = delete $stream{data};
+    my $tls_enabled = exists $stream{tls};
+    my $tls = delete $stream{tls};
+    croak 'new(): stream tls must be a hash reference'
+        if $tls_enabled && ref($tls) ne 'HASH';
+
+    my %callback;
+    for my $name (@STREAM_CALLBACK) {
+        next if !exists $stream{$name};
+        my $value = delete $stream{$name};
+        croak "new(): stream $name must be a coderef"
+            if ref($value) ne 'CODE';
+        $callback{$name} = $value;
+    }
+    croak 'new(): stream has unknown options: '
+        . join(', ', sort keys %stream) if %stream;
+
+    my $prepared = Linux::Event::_ByteStream::Descriptor::prepared(
+        $stream_class, $tuning, \%callback,
+    );
+    Linux::Event::_ByteStream::Descriptor::validate_modes(
+        'new(): stream', $prepared, $prepared->{options}, \%callback,
+    );
+    my $input = Linux::Event::_ByteStream::Descriptor::effective_input_callback(
+        $prepared, $prepared->{options}, \%callback,
+    );
+    if (!$prepared->{consumer} && !$input) {
+        croak $prepared->{framer}
+            ? 'new(): accepted framed Stream requires on_message or on_messages'
+            : 'new(): accepted raw Stream requires on_data callback';
+    }
+
+    my %constructor_callback = map {
+        exists($callback{$_}) ? ($_ => $callback{$_}) : ()
+    } qw(on_drain on_eof on_error on_close on_ready on_transport_ready);
+    if (!$prepared->{consumer}) {
+        if (!$prepared->{framer}) {
+            $constructor_callback{on_data} = $input
+                if exists $callback{on_data};
+        } elsif ($prepared->{options}{message_batch_size}) {
+            $constructor_callback{on_messages} = $input
+                if exists $callback{on_messages};
+        } else {
+            $constructor_callback{on_message} = $input
+                if exists $callback{on_message};
+        }
+    }
+
+    my $tls_template;
+    if ($tls_enabled) {
+        require Linux::Event::TLS;
+        $tls_template = Linux::Event::TLS->_prepare_listener_server(
+            $stream_class, $tls,
+        );
+    }
+
+    return {
+        class                 => $stream_class,
+        descriptor            => $prepared,
+        data                  => $data,
+        tuning                => $prepared->{options},
+        callbacks             => \%callback,
+        constructor_callbacks => \%constructor_callback,
+        tls_template          => $tls_template,
+    };
+}
+
+sub _construct_prepared_stream ($stream_class, @arg) {
+    return $stream_class->new(@arg);
+}
+
 sub new ($class, %opt) {
     croak 'new(): must be called as a class method' if ref $class;
     my $loop = delete $opt{loop};
     croak 'new(): loop must be an object implementing add() and watch()'
         if defined($loop) && (!ref($loop) || !$loop->can('add')
             || !$loop->can('watch'));
-    my $stream_class = delete $opt{stream_class}
-        // croak 'new(): missing stream_class';
-    croak 'new(): stream_class must name a Linux::Event::_Socket::Stream subclass'
-        if ref($stream_class) || !$stream_class->isa('Linux::Event::_Socket::Stream');
-    $stream_class->_validate_accepted_configuration;
 
+    my $recipe = _stream_recipe(delete($opt{stream}) // {});
     my $descriptor = _descriptor_for($class);
-    my $stream_callbacks = Linux::Event::_ByteStream::_take_callbacks(
-        'new', \%opt,
-    );
-    my $stream_descriptor
-        = Linux::Event::_ByteStream::Descriptor::for_class($stream_class);
-    Linux::Event::_ByteStream::_validate_callback_modes(
-        'new', $stream_descriptor, $stream_callbacks,
-    );
-    Linux::Event::_ByteStream::_require_read_sink(
-        $stream_descriptor,
-        $stream_callbacks,
-        1,
-        'new(): accepted raw Stream requires on_data callback',
-        'new(): accepted framed Stream requires on_message, on_messages, or a native consumer',
-    );
+    my %listener_callback;
+    for my $name (qw(on_accept on_error)) {
+        next if !exists $opt{$name};
+        my $value = delete $opt{$name};
+        croak "new(): $name must be a coderef" if ref($value) ne 'CODE';
+        $listener_callback{$name} = $value;
+    }
+    $listener_callback{on_accept} //= $descriptor->{on_accept};
+    $listener_callback{on_error} //= $descriptor->{on_error};
+
     my %known = map { $_ => 1 } qw(
-        loop data backlog max_accept_per_tick edge_triggered
+        backlog max_accept_per_tick edge_triggered
         reuseaddr reuseport v6only unlink unlink_on_close permissions
         fh owns_socket host port unix bind_device
     );
     my @unknown = sort grep { !$known{$_} } keys %opt;
     croak 'new(): unknown options: ' . join(', ', @unknown) if @unknown;
     my %supplied = map { $_ => exists $opt{$_} } keys %opt;
-    my $data = delete $opt{data};
     my $backlog = _integer('backlog', delete($opt{backlog}) // 4096, 1);
     my $maximum = _integer(
         'max_accept_per_tick', delete($opt{max_accept_per_tick}) // 256, 0,
@@ -385,9 +462,10 @@ sub new ($class, %opt) {
 
     my $self = bless {
         descriptor          => $descriptor,
-        stream_class        => $stream_class,
+        stream_recipe       => $recipe,
+        listener_callbacks  => \%listener_callback,
         loop                => undef,
-        data                => $data,
+        data                => undef,
         fh                  => $fh,
         family              => _family_name($family),
         family_number       => $family,
@@ -403,26 +481,37 @@ sub new ($class, %opt) {
         watcher             => undef,
         accepted            => 0,
         last_error          => undef,
-        stream_callbacks    => $stream_callbacks,
     }, $class;
 
     $self->_attach_to_loop($loop) if $loop;
     return $self;
 }
 
-sub stream_class ($self) { $self->{stream_class} }
-
 sub _accept_client ($self, $fh, $peer) {
-    my $class = $self->{stream_class};
+    my $recipe = $self->{stream_recipe};
+    my $stream_class = $recipe->{class};
     my $stream;
     my $prepared = eval {
-        $stream = $class->new(
+        my $transport;
+        if (defined $recipe->{tls_template}) {
+            require Linux::Event::TLS;
+            $transport = Linux::Event::TLS->_listener_server_connection(
+                $recipe->{tls_template},
+            );
+        }
+        $stream = Linux::Event::_ByteStream::Descriptor::with_prepared(
+            $stream_class,
+            $recipe->{descriptor},
+            \&_construct_prepared_stream,
             fh        => $fh,
             peer      => $peer,
-            data      => $self->data,
+            data      => $recipe->{data},
             _accepted => 1,
-            %{ $self->{stream_callbacks} },
+            transport => $transport,
+            %{ $recipe->{constructor_callbacks} },
         );
+        $stream->{_effective_tuning} = $recipe->{tuning};
+        $stream->{_recipe_input_callbacks} = $recipe->{callbacks};
         $stream->_attach_to_loop($self->loop);
         1;
     };
@@ -443,10 +532,10 @@ sub _accept_client ($self, $fh, $peer) {
                 family    => $self->family,
             );
         $self->{last_error} = $error;
-        $self->{descriptor}{on_error}->($self, $error);
+        $self->{listener_callbacks}{on_error}->($self, $error);
         return;
     }
-    if (my $callback = $self->{descriptor}{on_accept}) {
+    if (my $callback = $self->{listener_callbacks}{on_accept}) {
         my $ok = eval { $callback->($self, $stream); 1 };
         if (!$ok) {
             my $message = "$@";
@@ -464,7 +553,7 @@ sub _accept_client ($self, $fh, $peer) {
                 family    => $self->family,
             );
             $self->{last_error} = $error;
-            $self->{descriptor}{on_error}->($self, $error);
+            $self->{listener_callbacks}{on_error}->($self, $error);
             return;
         }
     }
@@ -619,7 +708,7 @@ sub _accept_error ($self, $errno) {
     );
     $self->{last_error} = $error;
     $self->pause if $resource;
-    $self->{descriptor}{on_error}->($self, $error);
+    $self->{listener_callbacks}{on_error}->($self, $error);
     return;
 }
 
@@ -638,9 +727,10 @@ sub _listener_error_ready ($self) {
         path      => $self->{unix},
     );
     $self->{last_error} = $error;
+    my $on_error = $self->{listener_callbacks}{on_error};
     $self->_shutdown('failed', 1);
     my $reported = eval {
-        $self->{descriptor}{on_error}->($self, $error);
+        $on_error->($self, $error);
         1;
     };
     my $failure = $@;
@@ -661,7 +751,8 @@ sub _shutdown ($self, $state, $retain_loop = 0) {
     if (defined($self->{unix}) && $self->{unlink_on_close}) {
         unlink $self->{unix} if -S $self->{unix};
     }
-    delete $self->{stream_callbacks};
+    delete $self->{stream_recipe};
+    delete $self->{listener_callbacks};
     $self->{loop} = undef if !$retain_loop;
     return;
 }

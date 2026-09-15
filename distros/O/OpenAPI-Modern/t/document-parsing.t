@@ -175,37 +175,37 @@ subtest '/paths correctness' => sub {
     },
   );
 
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
         keywordLocation => '/paths/~1a~1{b}',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1a~1{b}')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/paths/~1a~1{b}')->to_string,
         error => 'duplicate of templated path "/a/{a}"',
       },
       {
         keywordLocation => '/paths/~1b~1{b}~1hi~1{yes}',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1b~1{b}~1hi~1{yes}')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/paths/~1b~1{b}~1hi~1{yes}')->to_string,
         error => 'duplicate of templated path "/b/{a}/hi/{yes}"',
       },
       {
         keywordLocation => '/paths/~1b~1{x}~1hi~1{no}',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1b~1{x}~1hi~1{no}')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/paths/~1b~1{x}~1hi~1{no}')->to_string,
         error => 'duplicate of templated path "/b/{a}/hi/{yes}"',
       },
       {
         keywordLocation => '/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}')->to_string,
         error => 'duplicate path template variable "c"',
       },
       {
         keywordLocation => '/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}')->to_string,
         error => 'duplicate path template variable "e"',
       },
       (map +{
         keywordLocation => jsonp('/paths', $_),
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#'.jsonp('/paths', $_))),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#'.jsonp('/paths', $_))->to_string,
         error => 'invalid path template "'.$_.'"',
       }, '/e/{e{}', '/f/?/g', '/h/#/i', '/täst/{id}'),
     ],
@@ -288,11 +288,11 @@ YAML
     schema => decode_yaml($yaml =~ s/operation_id_[a-z]/operation_id_dupe/gr),
   );
 
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [ map +{
         keywordLocation => $_.'/operationId',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#'.$_.'/operationId')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#'.$_.'/operationId')->to_string,
         error => 'duplicate of operationId at /components/callbacks/callback_a/$url_a/patch/callbacks/callback_z/$url_z/delete',
       },
       (
@@ -539,7 +539,7 @@ webhooks:
   bar: {}
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors when parsing this document');
+  is_equal([ $doc->errors ], [], 'no errors when parsing this document');
   cmp_result(
     my $index = { $doc->resource_index },
     {
@@ -983,42 +983,42 @@ tags:
     parent: foo
 YAML
 
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
         keywordLocation => '/tags/1/parent',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/1/parent')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/tags/1/parent')->to_string,
         error => 'parent of tag "bar" does not exist: "blech"',
       },
       {
         keywordLocation => '/tags/3/name',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/3/name')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/tags/3/name')->to_string,
         error => 'duplicate of tag at /tags/0: "foo"',
       },
       {
         keywordLocation => '/tags/4/name',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/4/name')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/tags/4/name')->to_string,
         error => 'duplicate of tag at /tags/1: "bar"',
       },
       {
         keywordLocation => '/tags/5/parent',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/5/parent')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/tags/5/parent')->to_string,
         error => 'circular reference between tags: "alpha" -> "beta" -> "alpha"',
       },
       {
         keywordLocation => '/tags/6/parent',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/6/parent')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/tags/6/parent')->to_string,
         error => 'circular reference between tags: "beta" -> "alpha" -> "beta"',
       },
       {
         keywordLocation => '/tags/7/name',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/7/name')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/tags/7/name')->to_string,
         error => 'duplicate of tag at /tags/0: "foo"',
       },
       {
         keywordLocation => '/tags/7/parent',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/7/parent')),
+        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api#/tags/7/parent')->to_string,
         error => 'circular reference between tags: "foo" -> "foo"',
       },
     ],
@@ -1089,7 +1089,6 @@ YAML
 };
 
 subtest 'bad references' => sub {
-  test_needs({ 'JSON::Schema::Modern', '0.632'});
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
     evaluator => my $js = JSON::Schema::Modern->new(strict => 1),
@@ -1120,27 +1119,27 @@ YAML
       {
         keywordLocation => '/components/responses/response0/$ref',
         absoluteKeywordLocation => 'foo/api.json#/components/responses/response0/$ref',
-        error => '$ref target "foo/api.json#/components/responses/does_not_exist" is a non-existent location',
+        error => 'response target "foo/api.json#/components/responses/does_not_exist" is a non-existent location',
       },
       {
         keywordLocation => '/components/responses/response1/$ref',
         absoluteKeywordLocation => 'foo/api.json#/components/responses/response1/$ref',
-        error => '$ref target "foo/api.json#/components" is not a referenceable location',
+        error => 'response target "foo/api.json#/components" is not a referenceable location',
       },
       {
         keywordLocation => jsonp(qw(/paths /foo/{foo_id}/bar!bloop $ref)),
         absoluteKeywordLocation => Mojo::URL->new('foo/api.json')->fragment(jsonp(qw(/paths /foo/{foo_id}/bar!bloop $ref)))->to_string,
-        error => '$ref target "foo/api.json#/components/pathItems/bloop" is a non-existent location'
+        error => 'path-item target "foo/api.json#/components/pathItems/bloop" is a non-existent location'
       },
       {
         keywordLocation => '/components/schemas/schema1/$ref',
         absoluteKeywordLocation => 'foo/api.json#/components/schemas/schema1/$ref',
-        error => '$ref target "foo/api.json#/components/schemas/does_not_exist" is a non-existent location',
+        error => 'schema target "foo/api.json#/components/schemas/does_not_exist" is a non-existent location',
       },
       {
         keywordLocation => '/components/schemas/schema2/$ref',
         absoluteKeywordLocation => 'foo/api.json#/components/schemas/schema2/$ref',
-        error => '$ref target "'.Mojo::URL->new('foo/api.json')->fragment(jsonp(qw(/paths /foo/{foo_id}/bar!bloop)))->to_string.'" is the wrong object type (path-item, expecting schema)',
+        error => 'schema target "'.Mojo::URL->new('foo/api.json')->fragment(jsonp(qw(/paths /foo/{foo_id}/bar!bloop)))->to_string.'" is the wrong object type (got path-item)',
       },
     ],
     'bad references to local destinations are identified',
@@ -1276,8 +1275,6 @@ YAML
   );
 
 
-  subtest 'bad references' => sub {
-  test_needs({ 'JSON::Schema::Modern', '0.632'});
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
     evaluator => $js = JSON::Schema::Modern->new(strict => 1),
@@ -1312,32 +1309,31 @@ YAML
       {
         keywordLocation => '/components/responses/response0/$ref',
         absoluteKeywordLocation => 'foo/api.json#/components/responses/response0/$ref',
-        error => '$ref target "foo/api.json#/components/responses/does_not_exist" is a non-existent location',
+        error => 'response target "foo/api.json#/components/responses/does_not_exist" is a non-existent location',
       },
       {
         keywordLocation => '/components/responses/response1/$ref',
         absoluteKeywordLocation => 'foo/api.json#/components/responses/response1/$ref',
-        error => '$ref target "foo/api.json#/components" is not a referenceable location',
+        error => 'response target "foo/api.json#/components" is not a referenceable location',
       },
       {
         keywordLocation => '/components/schemas/schema1/$ref',
         absoluteKeywordLocation => 'foo/api.json#/components/schemas/schema1/$ref',
-        error => '$ref target "foo/api.json#/components/schemas/does_not_exist" is a non-existent location',
+        error => 'schema target "foo/api.json#/components/schemas/does_not_exist" is a non-existent location',
       },
       {
         keywordLocation => '/components/schemas/schema2/$ref',
         absoluteKeywordLocation => 'foo/api.json#/components/schemas/schema2/$ref',
-        error => '$ref target "'.Mojo::URL->new('foo/api.json')->fragment(jsonp(qw(/paths /foo/{foo_id}/bar!bloop)))->to_string.'" is the wrong object type (path-item, expecting schema)',
+        error => 'schema target "'.Mojo::URL->new('foo/api.json')->fragment(jsonp(qw(/paths /foo/{foo_id}/bar!bloop)))->to_string.'" is the wrong object type (got path-item)',
       },
       {
         keywordLocation => '/paths/~1foo~1{foo_id}~1bar!bloop/$ref',
         absoluteKeywordLocation => 'foo/api.json#/paths/~1foo~1%7Bfoo_id%7D~1bar!bloop/$ref',
-        error => '$ref target "foo/api.json#/components/pathItems/bloop" is a non-existent location'
+        error => 'path-item target "foo/api.json#/components/pathItems/bloop" is a non-existent location'
       },
     ],
     'bad $refs to local destinations are identified',
   );
-  }; # end test_needs
 
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -1546,6 +1542,76 @@ YAML
   );
 
   is($doc->default('/components/parameters/MyParameter/style'), 'simple', '..and for a single value');
+};
+
+subtest 'bad security entries' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  securitySchemes:
+    basic0:
+      type: http
+      scheme: basic
+    basic1:
+      type: http
+      scheme: basic
+paths:
+  /pets:
+    get:
+      security:
+        - {}  # no security required
+        - basic0:
+            - write:pets
+            - read:pets
+        - basic1: []
+        - '#/components/securitySchemes/basic0': []
+        - unknown: []                                 # looks like a component name
+YAML
+
+  is_equal(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        keywordLocation => jsonp(qw(/paths /pets get security 4 unknown)),
+        absoluteKeywordLocation => 'http://localhost:1234/api#'.jsonp(qw(/paths /pets get security 4 unknown)),
+        error => 'security scheme "unknown" does not exist at "/components/securitySchemes"',
+      },
+    ],
+    'missing security scheme is found',
+  );
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /pets:
+    get:
+      security:
+        - '#/components/securitySchemes/unknown': []  # looks like a URI
+security:
+  - 'unknown/foo': []                                 # looks like a URI
+YAML
+
+  is_equal(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        keywordLocation => jsonp(qw(/paths /pets get security 0), '#/components/securitySchemes/unknown'),
+        absoluteKeywordLocation => 'http://localhost:1234/api#'.jsonp(qw(/paths /pets get security 0), '%23/components/securitySchemes/unknown'),
+        error => 'security-scheme target "http://localhost:1234/api#/components/securitySchemes/unknown" is a non-existent location',
+      },
+    ],
+    'a bad reference to security scheme is found',
+  );
+
+  cmp_result(
+    $doc->_deferred_references,
+    [
+      [ undef, jsonp(qw(/security 0 unknown/foo)), str('http://localhost:1234/unknown/foo'), 'security-scheme' ],
+    ],
+    'second unknown security scheme reference points to another document',
+  );
 };
 
 done_testing;

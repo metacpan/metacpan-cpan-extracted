@@ -399,8 +399,21 @@ safeguard rather than a benchmark-row duration.
 ## TLS
 
 `run-tls-microbench.pl` compares established plain and OpenSSL transport paths
-for public `IO::Sock::Stream` subclasses. TLS handshake cost is a separate
-lifecycle concern unless a benchmark mode explicitly includes it.
+for public `IO::Sock::Stream` subclasses. It deliberately excludes construction
+and handshake from the timed message interval.
+
+`run-tls-accept-setup-bench.pl` isolates accepted-connection TLS setup. The
+`fresh_context` row constructs and loads a server `SSL_CTX` for every simulated
+connection. The `prepared_clone` row prepares one Listener-style server context
+and then allocates only independent per-connection TLS state:
+
+```bash
+perl -Mblib bench/run-tls-accept-setup-bench.pl   --iterations=1000 --repeats=7   --json=bench/results/tls-accept-setup.json
+```
+
+The benchmark reports the one-time prepared-context cost separately and does
+not time TLS handshake. Together the two TLS harnesses distinguish deployment
+setup cost from steady-state encrypted I/O cost.
 
 Use the same certificate fixtures, OpenSSL build, Perl build, socket-buffer
 settings, and host state when comparing reports.

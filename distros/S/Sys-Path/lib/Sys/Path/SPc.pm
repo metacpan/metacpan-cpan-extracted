@@ -24,7 +24,7 @@ sub _path_types {qw(
 	srvdir
 )};
 
-# sub names inspired by http://www.gnu.org/software/autoconf/manual/html_node/Installation-Directory-Variables.html#Installation-Directory-Variables
+# Accessor names follow GNU autoconf installation-directory variables.
 use Config;                                                  # remove after install
 my $prefix = $Config::Config{'prefix'};                      # remove after install
 my $localstatedir =                                          # remove after install
@@ -66,39 +66,78 @@ __END__
 
 =head1 NAME
 
-SPc - build-time system path configuration
+Sys::Path::SPc - store build-time installation paths
 
 =head1 PATHS
 
-See L<Sys::Path/PATHS for details>
+This module defines the path accessors documented in L<Sys::Path/PATHS>. In a
+source checkout, C<prefix>, C<localstatedir>, C<sysconfdir>, and C<srvdir>
+accept a new value; the remaining accessors derive their values from those base
+paths and ignore arguments.
+
+During C<perl Build.PL>, C<inc::MyBuilder> replaces every accessor in the built
+copy with a constant containing the selected path. Consequently, accessors in
+an installed copy ignore arguments and cannot be reconfigured at runtime.
+
+=head2 _path_types
+
+Return the ordered accessor names used by the build configuration.
 
 =head2 prefix
 
+Return C<prefix>; see L<Sys::Path/prefix>.
+
 =head2 localstatedir
+
+Return C<localstatedir>; see L<Sys::Path/localstatedir>.
 
 =head2 sysconfdir
 
+Return C<sysconfdir>; see L<Sys::Path/sysconfdir>.
+
 =head2 datadir
+
+Return C<datadir>; see L<Sys::Path/datadir>.
 
 =head2 docdir
 
+Return C<docdir>; see L<Sys::Path/docdir>.
+
 =head2 localedir
+
+Return C<localedir>; see L<Sys::Path/localedir>.
 
 =head2 cachedir
 
+Return C<cachedir>; see L<Sys::Path/cachedir>.
+
 =head2 logdir
+
+Return C<logdir>; see L<Sys::Path/logdir>.
 
 =head2 spooldir
 
+Return C<spooldir>; see L<Sys::Path/spooldir>.
+
 =head2 rundir
+
+Return C<rundir>; see L<Sys::Path/rundir>.
 
 =head2 lockdir
 
+Return C<lockdir>; see L<Sys::Path/lockdir>.
+
 =head2 sharedstatedir
+
+Return C<sharedstatedir>; see L<Sys::Path/sharedstatedir>.
 
 =head2 webdir
 
+Return C<webdir>; see L<Sys::Path/webdir>.
+
 =head2 srvdir
+
+Return C<srvdir>; see L<Sys::Path/srvdir>.
 
 =head1 AUTHOR
 

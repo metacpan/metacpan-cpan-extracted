@@ -133,10 +133,12 @@ use Linux::Event::IO::Sock::Stream;
 my $loop = Linux::Event::Loop->new;
 
 my $listener = Linux::Event::IO::Sock::Listener->new(
-    loop         => $loop,
-    stream_class => 'EchoConnection',
-    host         => '127.0.0.1',
-    port         => 9999,
+    loop => $loop,
+    host => '127.0.0.1',
+    port => 9999,
+    stream => {
+        class => 'EchoConnection',
+    },
 );
 
 $loop->run;
@@ -150,13 +152,14 @@ requiring a connection subclass just to carry callback state:
 my $database = connect_database();
 
 my $listener = Linux::Event::IO::Sock::Listener->new(
-    loop         => $loop,
-    stream_class => 'Linux::Event::IO::Sock::Stream',
-    host         => '127.0.0.1',
-    port         => 9999,
-    on_data      => sub ($stream, $bytes) {
-        store_bytes($database, $stream, $bytes);
-        $stream->write($bytes);
+    loop => $loop,
+    host => '127.0.0.1',
+    port => 9999,
+    stream => {
+        on_data => sub ($stream, $bytes) {
+            store_bytes($database, $stream, $bytes);
+            $stream->write($bytes);
+        },
     },
 );
 ```
@@ -301,12 +304,12 @@ A framed type can call `$self->send($payload)` to apply its outbound framing
 rule. Serialization and application codecs remain a separate layer above
 framing.
 
-Class-level `stream_options()` remains the tuning hook for ordered-byte
+Class-level `stream_tuning()` remains the tuning hook for ordered-byte
 behavior. Tuning and method defaults are resolved once per subclass; optional
 constructor callbacks select an instance's effective cached CVs.
 
 ```perl
-sub stream_options ($class) {
+sub stream_tuning ($class) {
     return (
         read_size          => 65_536,
         read_budget_bytes  => 0,
@@ -330,26 +333,32 @@ readiness event merely to fill the configured batch size.
 
 ## TLS
 
-TLS is transport policy on a stream-socket subclass:
+TLS is acquisition policy for stream sockets. A server enables it in the
+Listener's generated-Stream recipe, so the same connection class can be used by
+both plain and TLS listeners:
 
 ```perl
-{
-    package SecureConnection;
-    use parent 'Linux::Event::IO::Sock::Stream';
-    use Linux::Event::TLS
-        verify => 1,
-        alpn   => ['my-protocol/1'];
-
-    sub on_data ($self, $bytes) {
-        process_plaintext($bytes);
-    }
-}
+my $secure = Linux::Event::IO::Sock::Listener->new(
+    loop => $loop,
+    host => '0.0.0.0',
+    port => 9443,
+    stream => {
+        class => 'EchoConnection',
+        tls => {
+            cert_file => $cert_file,
+            key_file  => $key_file,
+            alpn      => ['my-protocol/1'],
+        },
+    },
+);
 ```
 
-Server-side TLS declarations also provide `cert_file` and `key_file`. Accepted
-connections automatically use server handshake semantics; outbound `connect()`
-uses client handshake semantics. Framing operates on plaintext after the TLS
-transport layer.
+The Listener validates TLS policy and prepares reusable server context once;
+accepted connections allocate only their independent connection state. Plain
+Listeners allocate no TLS connection state. A Stream subclass may provide
+`tls_defaults()` for reusable policy such as ALPN or timeout defaults, but those
+defaults do not activate TLS. Outbound TLS remains selected by client
+acquisition policy. Framing operates on plaintext after the TLS transport layer.
 
 ## Datagram sockets
 

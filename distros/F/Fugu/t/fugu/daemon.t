@@ -1,6 +1,9 @@
 #!/usr/bin/env perl
 # ex:ts=8 sw=4:
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
 use FindBin  qw($RealBin);
 use lib "$RealBin/../../lib";
@@ -70,7 +73,10 @@ sub stop ($pid)
 	my $report  = "$dir/detach.txt";
 
 	my $status = start_daemon(<<"CODE");
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Cwd ();
 use Fugu::Daemon;
 Fugu::Daemon->daemonize(

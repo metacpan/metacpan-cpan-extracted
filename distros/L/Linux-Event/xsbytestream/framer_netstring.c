@@ -66,12 +66,12 @@ les_process_netstring(pTHX_ les_xsstate_t *st)
             return;
         }
         total_uv = payload_offset_uv + payload_len + 1;
-        if (st->descriptor->max_buffer && total_uv > st->descriptor->max_buffer) {
+        if (st->max_buffer && total_uv > st->max_buffer) {
             char msg[160];
             snprintf(msg, sizeof(msg),
                 "framed message requires %llu bytes, exceeds max_buffer=%llu",
                 (unsigned long long)total_uv,
-                (unsigned long long)st->descriptor->max_buffer);
+                (unsigned long long)st->max_buffer);
             les_call_framing_error(aTHX_ st, msg);
             return;
         }

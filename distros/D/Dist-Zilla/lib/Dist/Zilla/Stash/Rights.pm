@@ -1,4 +1,4 @@
-package Dist::Zilla::Stash::Rights 6.038;
+package Dist::Zilla::Stash::Rights 6.039;
 # ABSTRACT: a stash of your default licensing terms
 
 use Moose;
@@ -22,7 +22,7 @@ has copyright_holder => (
 
 has copyright_year => (
   is  => 'ro',
-  isa => 'Int',
+  isa => 'Str',
 );
 
 __PACKAGE__->meta->make_immutable;
@@ -40,7 +40,7 @@ Dist::Zilla::Stash::Rights - a stash of your default licensing terms
 
 =head1 VERSION
 
-version 6.038
+version 6.039
 
 =head1 PERL VERSION
 

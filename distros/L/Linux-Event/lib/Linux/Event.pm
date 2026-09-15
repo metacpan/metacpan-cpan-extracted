@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.112';
+our $VERSION = '0.114';
 
 1;
 
@@ -76,7 +76,7 @@ subclass method.
 Subclassing is a complementary performance and organization feature, not a
 requirement imposed merely to obtain a callback. A protocol subclass can
 declare native L<Linux::Event::Framer> policy, L<Linux::Event::TLS> policy,
-socket configuration, and C<stream_options>, C<datagram_options>, or
+socket configuration, and C<stream_tuning>, C<datagram_options>, or
 C<process_options> tuning once for every instance. Named callbacks and class
 policy are validated and cached once per subclass rather than rediscovered on
 each readiness event.
@@ -189,7 +189,7 @@ C<new()>.
 Subclassing is therefore not required merely to obtain callback scope. A raw
 stream socket, Pipe, or TTY can be used directly when no class-level protocol
 policy is needed. Class declarations remain the correct place for reusable
-policy such as C<stream_options()>, a L<Linux::Event::Framer> declaration,
+policy such as C<stream_tuning()>, a L<Linux::Event::Framer> declaration,
 socket policy, or L<Linux::Event::TLS> policy.
 
 For example, framing remains class policy while message handling may be a
@@ -250,15 +250,18 @@ C<on_data>. Ordered-byte lifecycle callbacks can also be supplied to the
 constructor. See L<Linux::Event::IO::Sock::Stream> and
 F<docs/FIRST-CLASS-STREAM-CALLBACKS.md> for the complete callback matrix.
 
-A listener then names that completed stream-socket class:
+A listener then uses that completed stream-socket class in its generated-Stream
+recipe:
 
   my $listener = Linux::Event::IO::Sock::Listener->new(
-      loop         => $loop,
-      stream_class => 'Protocol',
-      host         => '0.0.0.0',
-      port         => 9999,
-      on_message   => sub ($stream, $message) {
-          $stream->send($message);
+      loop => $loop,
+      host => '0.0.0.0',
+      port => 9999,
+      stream => {
+          class      => 'Protocol',
+          on_message => sub ($stream, $message) {
+              $stream->send($message);
+          },
       },
   );
 

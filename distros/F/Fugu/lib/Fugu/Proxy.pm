@@ -15,10 +15,13 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-use v5.36;
-
 package Fugu::Proxy;
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
+
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 
 use Fugu::File;
 use Fugu::Log;
@@ -472,7 +475,7 @@ sub _stream_file ( $self, $socket, $path, $size )
 }
 
 package Fugu::Proxy::Cache;
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
 
 use File::Basename qw(dirname);
 use Fugu::File;
@@ -705,7 +708,7 @@ sub walk ( $self, $dir, $callback )
 }
 
 package Fugu::Proxy::Meta;
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
 
 # Fugu::Proxy::Meta - the metadata of the cached files, in memory.
 #

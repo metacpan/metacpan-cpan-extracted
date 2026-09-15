@@ -35,6 +35,7 @@ t/db_noentry.t
 t/deep.t
 t/domain.t
 t/edge_cases.t
+t/empty_files.t
 t/eof.t
 t/eol.t
 t/extended_tests.t

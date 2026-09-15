@@ -46,7 +46,7 @@ paths:
     $ref: 'http://far_far_away/api2#/components/pathItems/my_path'
 YAML
 
-  cmp_result([$doc->errors], [], 'no errors during traversal');
+  is_equal([$doc->errors], [], 'no errors during traversal');
 
   my $openapi = OpenAPI::Modern->new(
     openapi_document => $doc,
@@ -70,7 +70,7 @@ components:
       get: {}
 YAML
 
-  cmp_result([$doc2->errors], [], 'no errors during traversal');
+  is_equal([$doc2->errors], [], 'no errors during traversal');
   $openapi->evaluator->add_document($doc2);
 
   like(

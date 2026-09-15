@@ -13,7 +13,7 @@ use Linux::Event::IO::Sock::Stream;
     package T::DeadlineDefaults;
     use parent 'Linux::Event::IO::Sock::Stream';
 
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return (
             idle_timeout  => 30,
             read_timeout  => 20,
@@ -27,14 +27,14 @@ use Linux::Event::IO::Sock::Stream;
 {
     package T::DeadlineInvalid;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return (idle_timeout => -1) }
+    sub stream_tuning ($class) { return (idle_timeout => -1) }
     sub on_data ($stream, $bytes) { return }
 }
 
 {
     package T::DeadlineTransition;
     use parent -norequire, 'T::DeadlineDefaults';
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return (
             idle_timeout  => 4,
             read_timeout  => 3,

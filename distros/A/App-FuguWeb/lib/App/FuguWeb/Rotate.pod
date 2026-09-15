@@ -12,39 +12,114 @@ App::FuguWeb::Rotate - write the key directory of a site
         url    => 'https://www.fugubsd.org/keys',
     );
 
+    # The first root mint. No root stands, so the new key signs
+    # its own manifest and each key in force binds to it.
     my $facts = $rotate->mint(
-        purpose => 'release',
-        secret  => '/tmp/new.sec',
-        signer  => '/tmp/current.sec',
+        purpose => 'root',
+        secret  => '/tmp/root-1.sec',
+        bind    => { 'fugubsd-1-release' => '/tmp/release-1.sec' },
     ) or die $rotate->error;
 
-    my $facts = $rotate->promote(
+    # A subordinate mint. The current root signs the manifest,
+    # and the new key binds to that root.
+    $facts = $rotate->mint(
         purpose => 'release',
-        secret  => '/tmp/next.sec',
+        secret  => '/tmp/release-2.sec',
+        signer  => '/tmp/root-1.sec',
+    ) or die $rotate->error;
+
+    # An OpenPGP mint. gpg(1) makes the key and the subkey, and
+    # the email is the one user id.
+    $facts = $rotate->mint(
+        purpose => 'contact',
+        type    => 'openpgp',
+        email   => 'security@fugubsd.org',
+        expires => '2028-01-01',
+        secret  => '/tmp/contact-1.sec',
+        signer  => '/tmp/root-1.sec',
+    ) or die $rotate->error;
+
+    # An import. An issuer makes a certificate, so no verb mints
+    # one, and the private key of the publisher signs its binding.
+    $facts = $rotate->import_key(
+        purpose => 'sign',
+        type    => 'x509',
+        file    => '/tmp/sign-1.pem',
+        secret  => '/tmp/sign-1.key',
+        signer  => '/tmp/root-1.sec',
+    ) or die $rotate->error;
+
+    # A subordinate promote. The retiring key signs the key that
+    # takes its place.
+    $facts = $rotate->promote(
+        purpose  => 'release',
+        signer   => '/tmp/root-1.sec',
+        retiring => '/tmp/release-1.sec',
     ) or die $rotate->error;
 
 =head1 DESCRIPTION
 
 L<App::FuguWeb::Keys> reads the key directory, and this class writes
-it. One class holds both steps of a rotation, so the reader and the
-writer share one implementation of the name pattern, the status
-vocabulary and the manifest.
+it. One class holds every step, so the reader and the writer share one
+implementation of the name pattern, the status vocabulary and the
+manifest.
+
+One signify key of the directory is the root of trust, and its purpose
+word is C<root>. The current root signs the manifest, and every other
+key of the directory binds to it with a signature of its own. A
+consumer that pins the root can therefore trust every key beside it.
 
 A consumer verifies a release against the copy of the public key that
 it holds. A release that a new key signs therefore fails in each
 consumer that holds the old copy. One rotation runs in two steps, and
 the trust order carries the gap.
 
-C<mint> makes the next key of a purpose. The current key of that
-purpose signs the manifest that names the new one. A consumer with the
-old copy can therefore still verify. C<promote> makes the new key
-current and retires the old one.
+C<mint> makes the next key of a purpose, and C<import_key> publishes a
+key that another tool made. C<promote> makes that key current and
+retires the old one. The first key of a purpose is current at once.
 
-The first mint of a purpose finds no current key. That key is current
-at once, and it signs its own manifest.
+A mint makes a signify pair or an OpenPGP key. An OpenPGP key is one
+Ed25519 primary key with one Curve25519 encryption subkey, and the
+email of the caller is its one user id.
 
-This class signs, and a site build does not. It is the one part of
-FuguWeb that needs C<signify(1)>.
+An issuer makes an X.509 certificate, so no verb mints one. The import
+publishes it, and the unencrypted PEM private key of the publisher
+signs its binding. A renewal is a rotation: the new certificate enters
+as the C<next> key, and a promote retires the old one.
+
+This class signs, and a site build does not. It runs no command of its
+own: L<Fugu::Signify> holds every call of C<signify(1)>,
+L<Fugu::OpenPGP> holds every call of C<gpg(1)>, and the class of each
+other key type holds every call of its own command.
+
+=head1 THE BINDINGS
+
+A binding is a detached signature by one key over the public key file
+of another key. Its file name is
+C<E<lt>target fileE<gt>.E<lt>signer stemE<gt>.E<lt>extE<gt>>, and
+L<Fugu::KeyDir> holds that name and the retention rule.
+
+The type of the signer key selects the signer and the extension. A
+signify key signs with C<signify(1)>, an OpenPGP key signs with
+C<gpg(1)>, and a certificate signs with C<openssl(1)>. A PEM private
+key names no certificate, so the signer of that type reads the
+published certificate of the key beside the private half.
+
+Each C<current> and C<next> key of a subordinate purpose holds one
+binding over the public key file of the current root. That signature
+proves that the holder of the root also holds the subordinate key.
+
+A promote writes a chain binding: the retiring key signs the public
+key file of the key that takes its place. A consumer that trusts the
+old key therefore reaches the new one. The chain binding stays
+published, as the retired key does, and the promote removes the root
+binding of the retired key.
+
+A first root mint and a root promote write the binding of each key in
+force again, because the root that those keys attest changes. The step
+takes the private half of each such key in C<bind>, and it refuses
+before it writes when one is absent. A root promote also removes each
+binding of the retired root, less a chain binding.
 
 =head1 THE TRUST RULES
 
@@ -60,17 +135,19 @@ one. A key file with no block, and a block with no file, each fail the
 step. A step that read the first key of a purpose would take a retired
 key for the current one.
 
-=item The current key signs
+=item The current root signs
 
-A mint of a purpose that holds a current key takes the private half of
-that key as C<signer>. It never signs with the key that it generated.
-A manifest that the new key signed would fail in every consumer.
+Every step but two takes the private half of the current root as
+C<signer>. A first root mint takes none, because no root stands and
+the new key signs its own manifest. A root promote takes none, because
+the key that it makes current signs.
 
 =item The signature verifies before it lands
 
-Each step stages the manifest and the signature in a temporary
-directory, and it verifies the signature against the published public
-key of the signer. Only a verified pair reaches the key directory.
+Each step stages the manifest, each binding and each signature in a
+temporary directory. It verifies each signature against the published
+public key of the signer, and only a verified file reaches the key
+directory.
 
 =item One mint waits for the promote
 
@@ -86,6 +163,10 @@ through a temporary file in the same directory, so a reader sees the
 old bytes or the new ones. A write that fails, and a check that fails
 after the writes, both put every file back.
 
+A binding that a step retires goes after every write. A run that stops
+between the two therefore leaves a file that the manifest does not
+name, and never a manifest that names a file which is gone.
+
 The private half of a new key lands last, after the check passes. A
 step that fails therefore leaves no key that the site does not
 publish.
@@ -93,12 +174,12 @@ publish.
 A process that dies inside a step leaves the checkout dirty. A caller
 runs a step and commits after it, so it commits nothing then.
 
-=item One directory holds one purpose
+=item One directory holds one root
 
-One manifest covers the whole directory, and one key signs it. A
-second purpose would leave the current key of the first unable to
-verify the pair, and no check would report it. A mint of another
-purpose therefore fails.
+One manifest covers the whole directory, and the current root signs
+it. A step of another purpose fails when the directory holds no
+current root. A directory whose keys hold no root is the state of a
+site before its first root mint, and that one step takes it.
 
 =item The reader decides
 
@@ -114,34 +195,88 @@ fails and the caller commits nothing.
 
 =item App::FuguWeb::Rotate->new(config => $config, ...)
 
-The rotation over one description. C<config> is an
-L<App::FuguWeb::Config>.
+The rotation over one key directory of one description. C<config> is
+an L<App::FuguWeb::Config>.
 
-A site that publishes its first key holds no C<keys> block, because
-such a block cannot load until a C<key> block stands beside it. The
-caller then names C<org>, and it can name C<dir> and C<url>. One
-commit carries the C<keys> block, the first C<key> block and the key
-itself.
+C<dir> names the directory that each step writes. A description with
+one C<keys> block needs none, and a description with several refuses a
+step without it. Each directory holds its own root of trust, per D-02,
+so a step of one directory reads no key of another.
 
-=item $rotate->mint(purpose => $word, secret => $path, signer => $path)
+A directory that publishes its first key holds no C<keys> block,
+because such a block cannot load until a C<key> block stands beside
+it. The caller then names C<bootstrap> and C<org>, and it can name
+C<dir> and C<url>. One commit carries the C<keys> block, the first
+C<key> block and the key itself. A second key directory of a site
+arrives the same way, and it takes C<dir>.
+
+C<bootstrap> is the intent to make that directory. A step without it
+refuses a C<dir> that no C<keys> block names, because a mistyped word
+would otherwise publish a second root of trust in silence. C<mint> and
+C<import_key> make a directory, and C<promote> makes none.
+
+=item $rotate->mint(purpose => $word, ...)
 
 Generate the next key of the purpose. The public half goes into the
 key directory, and the private half goes to C<secret> with no group
-mode and no other mode. C<signer> is the private half of the current
-key of the purpose, and a first mint takes none.
+mode and no other mode.
+
+C<type> names the key type. The default is C<signify>, and C<openpgp>
+is the other type that a mint makes. A mint of another type fails
+before it generates one byte. C<signer> is the private half of the
+current root key. C<bind> is a hash reference of key stem to path, and
+a first root mint takes one entry for each key in force.
+
+An OpenPGP mint needs C<email>, which becomes the one user id of the
+key, and it takes an optional C<expires>. C<expires> is a date of the
+form C<YYYY-MM-DD>, and the key expires at the start of that date in
+UTC. A mint with no C<expires> makes a key with no expiry. A mint of
+another type takes neither option.
+
+The C<key> block of an OpenPGP key takes the C<email> and the
+C<fingerprint> of the new key. The fingerprint comes from the key that
+the step generated, and never from an argument.
 
 C<secret> must name no file that stands, and it must not name
 C<signer>. The private half of a key is the one thing that a rotation
 cannot make again, and a caller holds each one in one place.
 
-The method answers a hash reference with C<name>, C<stem>, C<serial>
-and C<status>, or undef with a reason in C<error>.
+The method answers a hash reference with C<name>, C<stem>, C<serial>,
+C<status>, C<digest> and C<url>, or undef with a reason in C<error>.
+C<url> stands when the description names a published prefix.
 
-=item $rotate->promote(purpose => $word, secret => $path)
+=item $rotate->import_key(purpose => $word, file => $path, ...)
+
+Publish a key that another tool made, under the next name of the
+purpose. C<file> is the public key file, and C<secret> is the private
+half of that key, which writes the binding of the new key. The caller
+holds that half already, so the step writes no key file of its own.
+
+C<type> names the key type, and the step reads every type that a key
+directory holds: C<signify>, C<openpgp> and C<x509>. An C<x509>
+C<file> holds one PEM certificate, and a file that holds a private key
+or a second block fails the step. C<secret> is then an unencrypted PEM
+private key: the verbs take no passphrase, so a caller that holds a
+PKCS#12 file converts it first.
+
+The C<key> block of an OpenPGP key and of a certificate takes the
+C<fingerprint> of the key that the step published. An import takes no
+C<email>, because it generates no user id.
+
+The step takes every other option of a mint of its purpose, and it
+answers the same facts.
+
+=item $rotate->promote(purpose => $word, ...)
 
 Make the C<next> key of the purpose current, and retire the key that
-was current with an C<until> date. C<secret> is the private half of
-the key that this step makes current, and that key signs the manifest.
+was current with an C<until> date.
+
+C<retiring> is the private half of the key that retires, and it signs
+the chain binding. A promote of a subordinate purpose takes C<signer>,
+the private half of the current root, which signs the manifest. A root
+promote takes C<secret>, the private half of the key that becomes the
+root, which signs the manifest, and one C<bind> entry for each key in
+force.
 
 The retired key keeps its file and its published URL, so a release
 that it signed still verifies.
@@ -158,6 +293,12 @@ that holds this object reads the current state.
 
 The reason of the most recent failure, or undef.
 
+=item $rotate->tool_missing
+
+True when the failure was an absent command of a key type. A caller
+answers a missing tool with its own exit code, so a script tells it
+from a step that failed.
+
 =back
 
 =head1 WHAT THIS CLASS DOES NOT DO
@@ -169,7 +310,8 @@ declares the public one.
 =head1 SEE ALSO
 
 L<App::FuguWeb::Keys>, L<Fugu::KeyDir>, L<Fugu::Signify>,
-L<App::FuguWeb::Config>, C<signify(1)>
+L<Fugu::OpenPGP>, L<Fugu::X509>, L<App::FuguWeb::Config>,
+C<signify(1)>, C<gpg(1)>
 
 =head1 AUTHORS
 

@@ -1,0 +1,35 @@
+.gitignore
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+docs/ADAPTERS.md
+docs/AUTH-SPEC.md
+docs/MESSAGE-SPEC.md
+lib/Uniform/HTTP.pm
+lib/Uniform/HTTP/Message.pm
+lib/Uniform/HTTP/Request.pm
+lib/Uniform/HTTP/Response.pm
+lib/Uniform/HTTP/Auth.pm
+lib/Uniform/HTTP/Auth/Basic.pm
+lib/Uniform/HTTP/Auth/Bearer.pm
+lib/Uniform/HTTP/Auth/Digest.pm
+t/00-load.t
+t/01-basic.t
+t/02-bearer.t
+t/03-parse-select.t
+t/04-prepare-authentication.t
+t/05-digest.t
+t/06-errors.t
+t/07-digest-stale.t
+t/08-system-random.t
+t/09-static-credentials.t
+t/10-message.t
+t/11-request-response.t
+t/12-message-validation.t
+t/13-auth-request.t
+t/14-contract-boundary.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

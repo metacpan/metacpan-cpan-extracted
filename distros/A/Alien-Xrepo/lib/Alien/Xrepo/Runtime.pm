@@ -2,44 +2,50 @@ use v5.40;
 use feature qw[class try];
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Runtime v1.0.0 {
+class Alien::Xrepo::Runtime v1.0.1 {
     use Alien::Xrepo;
     use Alien::Xrepo::Build::Recipe;
+    use Config   ();
     use JSON::PP qw[decode_json];
     use Path::Tiny;
     use File::ShareDir ();
     #
-    field $pkg_name     : param = undef;
-    field $recipe       : param = undef;    # Recipe object (or file/dir) - alternative to inline pkg_name
-    field $root         : param = undef;
-    field $verbose      : param = 0;
-    field $repo         : param //= undef;  # injectable engine
-    field $snapshot     : param //= undef;  # path to a snapshot JSON (hermetic mode)
-    field $autodetect_snapshot : param //= 1;  # look for dist auto/share snapshots
-    field $install_opts : param = {};       # ambient profile merged under every package def
-    field $cache        : param //= 1;      # forward the engine's warm-start cache to Alien::Xrepo
+    field $pkg_name            : param = undef;
+    field $recipe              : param = undef;      # Recipe object (or file/dir) - alternative to inline pkg_name
+    field $root                : param = undef;
+    field $verbose             : param = 0;
+    field $repo                : param //= undef;    # injectable engine
+    field $snapshot            : param //= undef;    # path to a snapshot JSON (hermetic mode)
+    field $autodetect_snapshot : param //= 1;        # look for dist auto/share snapshots
+    field $install_opts        : param = {};         # ambient profile merged under every package def
+    field $cache               : param //= 1;        # forward the engine's warm-start cache to Alien::Xrepo
+
     #
-    field $recipe_obj = undef;              # resolved Alien::Xrepo::Build::Recipe
-    field $infos  = {};                     # package => Alien::Xrepo::PackageInfo
-    field $snap   = {};                     # package => raw snapshot data
-    field $r      = undef;                  # resolved Alien::Xrepo engine
+    field $recipe_obj        = undef;                # resolved Alien::Xrepo::Build::Recipe
+    field $infos             = {};                   # package => Alien::Xrepo::PackageInfo
+    field $snap              = {};                   # package => raw snapshot data
+    field $r                 = undef;                # resolved Alien::Xrepo engine
     field $snap_install_type = undef;
     #
     ADJUST {
-        if ( !defined $pkg_name && !defined $recipe && $self->can('pkg_name') ) {
-            $pkg_name = $self->pkg_name;
+        if ( !defined $pkg_name && !defined $recipe ) {
+            if ( $self->can('recipe') ) {
+                $recipe = $self->recipe;
+            }
+            elsif ( $self->can('pkg_name') ) {
+                $pkg_name = $self->pkg_name;
+            }
         }
-        die "pkg_name or a recipe is required" if !defined $pkg_name && !defined $recipe;
+        die "pkg_name, recipe, or a subclass recipe() is required" if !defined $pkg_name && !defined $recipe;
         if ( !keys %$install_opts && $self->can('install_opts') ) {
             $install_opts = { $self->install_opts };
         }
         $r = $repo // Alien::Xrepo->new( root => $root, verbose => $verbose, cache => $cache );
         if ( defined $recipe ) {
-            $recipe_obj = ref $recipe
-                ? $recipe
-                : Alien::Xrepo::Build::Recipe->new(
-                    defined $recipe && -d $recipe ? ( dir => $recipe ) : ( file => $recipe ),
-                );
+            $recipe_obj
+                = ref $recipe eq 'HASH' ? Alien::Xrepo::Build::Recipe->new(%$recipe) :
+                ref $recipe             ? $recipe :
+                Alien::Xrepo::Build::Recipe->new( defined $recipe && -d $recipe ? ( dir => $recipe ) : ( file => $recipe ), );
         }
         else {
             $recipe_obj = Alien::Xrepo::Build::Recipe->new( packages => $pkg_name );
@@ -47,8 +53,8 @@ class Alien::Xrepo::Runtime v1.0.0 {
         $self->_load_snapshot;
     }
     #
-    method package_names () {   $recipe_obj->packages }
-    method package_defs  () {   $recipe_obj->package_defs }
+    method package_names () { $recipe_obj->packages }
+    method package_defs ()  { $recipe_obj->package_defs }
     #
     # Hermetic mode: a snapshot file wins entirely (no xrepo subprocess).
     method _load_snapshot () {
@@ -61,22 +67,33 @@ class Alien::Xrepo::Runtime v1.0.0 {
         return unless defined $file && -e $file;
         my $data = eval { decode_json( path($file)->slurp_utf8 ) };
         return unless ref $data eq 'HASH';
-        $snap = $data->{packages}       // {};
+        $snap              = $data->{packages} // {};
         $snap_install_type = $data->{install_type};
+        my $base = path($file)->parent;
         for my $name ( keys %$snap ) {
-            $infos->{$name} = Alien::Xrepo::PackageInfo->new( %{ $snap->{$name} } );
+            my %pkg = %{ $snap->{$name} };
+            $self->_rebase_relative( $base, \%pkg );
+            $infos->{$name} = Alien::Xrepo::PackageInfo->new(%pkg);
         }
         return;
     }
 
-    # Where autodetect looks for a subclass: the installed dist's share dir then the source-tree build artifact layout.
-    # The snapshot written by the Build engine lives at <share>/<dist>/xrepo-snapshot.json, where <dist> is
-    # Alien-<module tail> (e.g. Alien::Zstandard -> Alien-Zstandard).
+    method _rebase_relative ( $base, $data ) {
+        $data->{$_} = [ map { $self->_snap_abs( $base, $_ ) } @{ $data->{$_} } ] for qw[includedirs libfiles linkdirs bindirs];
+        for my $k (qw[libpath installdir]) {
+            $data->{$k} = $self->_snap_abs( $base, $data->{$k} ) if defined $data->{$k};
+        }
+        return;
+    }
+
+    method _snap_abs ( $base, $p ) {
+        return $p if !defined $p || length $p == 0 || path($p)->is_absolute;
+        return $base->child($p)->stringify;
+    }
+
     sub _snapshot_candidates_for ( $class, $instance ) {
-        my @parts = split /::/, $instance;
-        shift @parts if $parts[0] eq 'Alien';
-        my $dist = 'Alien-' . join '-', @parts;
-        my @cand = path('blib', 'lib', 'auto', 'share', 'dist', $dist)->child('xrepo-snapshot.json')->stringify;
+        ( my $dist = $instance ) =~ s{::}{-}g;
+        my @cand  = path( 'blib', 'lib', 'auto', 'share', 'dist', $dist )->child('xrepo-snapshot.json')->stringify;
         my $share = eval { File::ShareDir::dist_dir($dist) };
         unshift @cand, path($share)->child('xrepo-snapshot.json')->stringify if $share;
         return @cand;
@@ -89,7 +106,8 @@ class Alien::Xrepo::Runtime v1.0.0 {
         my $info = $infos->{$pkg};
         return $info if defined $info;
         my $version = $recipe_obj->version_for($pkg);
-        my %opts    = $recipe_obj->opts_for( $pkg, %$install_opts );
+        my %ambient = ( %{ $recipe_obj->defaults // {} }, %$install_opts );
+        my %opts    = $recipe_obj->opts_for( $pkg, %ambient );
         my $resolved;
         try { $resolved = $r->fetch( $pkg, $version, %opts ) }
         catch ($e) {
@@ -109,8 +127,17 @@ class Alien::Xrepo::Runtime v1.0.0 {
     method libpath ( $pkg = undef ) { my $i = $self->_pkg_info($pkg); $i ? $i->libpath : undef }
     method ffi_lib ( $pkg = undef ) { $self->libpath($pkg) }
     method bin_dir ( $pkg = undef ) { my $i = $self->_pkg_info($pkg); $i ? $i->bin_dir : () }
+
+    # Prepend the package's shippable binary directories to PATH so a consumer
+    # can spawn the tool (e.g. ninja) without knowing where xrepo put it.
+    method prepend_to_path ( $pkg = undef ) {
+        my @dirs = $self->bin_dir($pkg);
+        return () unless @dirs;
+        $ENV{PATH} = join( $Config::Config{path_sep} // ':', @dirs, ( $ENV{PATH} // () ) );
+        return @dirs;
+    }
     method version ( $pkg = undef ) { my $i = $self->_pkg_info($pkg); $i ? $i->version : undef }
-    method kind    ( $pkg = undef ) { my $i = $self->_pkg_info($pkg); $i ? $i->kind : undef }
+    method kind    ( $pkg = undef ) { my $i = $self->_pkg_info($pkg); $i ? $i->kind    : undef }
     #
     method cflags ( $pkg = undef ) {
         my $i = $self->_pkg_info($pkg);
@@ -141,7 +168,7 @@ class Alien::Xrepo::Runtime v1.0.0 {
     #
     method install_type ( $pkg = undef ) {
         return $snap_install_type if defined $snap_install_type;
-        return $self->_pkg_info($pkg)         ? 'share' : 'system';
+        return $self->_pkg_info($pkg) ? 'share' : 'system';
     }
     #
     method split_flags ( $flags, $pkg = undef ) {
@@ -164,12 +191,11 @@ class Alien::Xrepo::Runtime v1.0.0 {
     method package_info ( $pkg = undef ) { $self->_pkg_info($pkg) }
 };
 #
-class Alien::Xrepo::Runtime::Alt v1.0.0 {
+class Alien::Xrepo::Runtime::Alt v1.0.1 {
     field $base : param;
-    field $pkg  : param;
+    field $pkg : reader(pkg_name) : param;
     method package_names ()      { $base->package_names }
     method package_info ()       { $base->package_info($pkg) }
-    method pkg_name ()           {$pkg}
     method alt ( $name = undef ) { $base->alt( $name // $pkg ) }
     method libpath ()            { $base->libpath($pkg) }
     method ffi_lib ()            { $base->libpath($pkg) }
@@ -183,6 +209,7 @@ class Alien::Xrepo::Runtime::Alt v1.0.0 {
     method dynamic_libs ()       { $base->dynamic_libs($pkg) }
     method dist_dir ()           { $base->dist_dir($pkg) }
     method install_type ()       { $base->install_type($pkg) }
+    method prepend_to_path ()    { $base->prepend_to_path($pkg) }
     method split_flags ($flags)    { $base->split_flags( $flags, $pkg ) }
     method find_header ($filename) { $base->find_header( $filename, $pkg ) }
 };

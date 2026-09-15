@@ -1,7 +1,7 @@
 ---
 abstract: 'create pkg-config metadata files'
 author:
-  - 'Diab Jerius <djerius@cpan.org>'
+  - 'Diab Jerius <djerius@sao.si.edu>'
 build_requires:
   Capture::Tiny: '0'
   Const::Fast: '0'
@@ -12,12 +12,12 @@ build_requires:
   IPC::Open3: '0'
   Test2::V0: '0'
   Test::More: '0'
-  perl: '5.013002'
+  perl: v5.14.0
 configure_requires:
   Module::Build::Tiny: '0.034'
-  perl: '5.013002'
+  perl: v5.14.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,19 +34,19 @@ no_index:
 provides:
   App::mkpkgconfig:
     file: lib/App/mkpkgconfig.pm
-    version: v2.0.1
+    version: v2.0.2
   App::mkpkgconfig::PkgConfig:
     file: lib/App/mkpkgconfig/PkgConfig.pm
-    version: v2.0.1
+    version: v2.0.2
   App::mkpkgconfig::PkgConfig::Entry:
     file: lib/App/mkpkgconfig/PkgConfig/Entry.pm
-    version: v2.0.1
+    version: v2.0.2
   App::mkpkgconfig::PkgConfig::Entry::Keyword:
     file: lib/App/mkpkgconfig/PkgConfig/Entry.pm
-    version: v2.0.1
+    version: v2.0.2
   App::mkpkgconfig::PkgConfig::Entry::Variable:
     file: lib/App/mkpkgconfig/PkgConfig/Entry.pm
-    version: v2.0.1
+    version: v2.0.2
 requires:
   Algorithm::Dependency::Ordered: '0'
   Algorithm::Dependency::Source::HoA: '0'
@@ -67,13 +67,13 @@ requires:
   constant: '0'
   namespace::clean: '0'
   parent: '0'
-  perl: '5.013002'
+  perl: v5.14.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-mkpkgconfig
-  repository: https://gitlab.com/djerius/app-mkpkgconfig.git
-version: v2.0.1
-x_generated_by_perl: v5.28.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  repository: https://codeberg.org/djerius/p5-App-mkpkgconfig.git
+version: v2.0.2
+x_generated_by_perl: v5.42.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: GPL-3.0-only

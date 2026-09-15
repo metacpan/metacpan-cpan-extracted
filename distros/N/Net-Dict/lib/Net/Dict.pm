@@ -16,8 +16,9 @@ use strict;
 use IO::Socket;
 use Net::Cmd;
 use Carp;
+use Encode;
 
-our $VERSION = '2.22';
+our $VERSION = '2.23';
 our $debug;
 
 #-----------------------------------------------------------------------
@@ -454,7 +455,7 @@ sub _get_database_list
         foreach (0..$dbNum-1) {
             ($name, $descr) = (split /\s/, $self->getline, 2);
             chomp $descr;
-            ${${*$self}{'net_dict_dbs'}}{$name} = _unquote($descr);
+            ${${*$self}{'net_dict_dbs'}}{$name} = decode("utf-8", _unquote($descr));
         }
 
         # Is there a way to do it right? Reading the dot line and the

@@ -1,16 +1,19 @@
 package MIDI::Drummer::Tiny::Grooves;
-$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7020';
+$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7101';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Common drum grooves
 
 use Moo;
 use strictures 2;
+use Carp;
 # use Data::Dumper::Compact qw(ddc); # debugging
 use File::ShareDir qw(dist_dir);
 use Path::Tiny;
 use MIDI::Drummer::Tiny ();
 use namespace::clean;
+
+extends 'MIDI::Drummer::Tiny';
 
 #pod =head1 SYNOPSIS
 #pod
@@ -35,9 +38,10 @@ use namespace::clean;
 #pod   $groove = $grooves->get_groove(0, $set);
 #pod   # get a numbered groove
 #pod   $groove = $grooves->get_groove(42);
-#pod   print "42. $groove->{cat}\n$groove->{name}";
 #pod
 #pod   my $density = $grooves->density($groove);
+#pod
+#pod   print "42. Density: $density, $groove->{cat}\n$groove->{name}";
 #pod
 #pod   # searching
 #pod   $set = $grooves->search({ cat => 'house' });
@@ -132,8 +136,7 @@ has drummer => (
 #pod The "resolution" duration that is given to the
 #pod L<MIDI::Drummer::Tiny/sync_patterns> method.
 #pod
-#pod This is initialized to the sixteenth duration of the drummer
-#pod L<MIDI::Drummer::Tiny> object.
+#pod Default: 'sn' (sixteenth-note)
 #pod
 #pod =cut
 
@@ -316,6 +319,7 @@ sub get_groove {
         my @keys = keys %$set;
         $groove_number = $keys[ int rand @keys ];
     }
+    carp "Groove: $groove_number\n" if $self->verbose;
     return $set->{$groove_number};
 }
 
@@ -349,6 +353,7 @@ sub search {
     }
     my $found = {};
     if ($args->{cat}) {
+        carp "Search category: $args->{cat}\n" if $self->verbose;
         my $string = lc $args->{cat};
         for my $k (keys %$set) {
             if (lc($set->{$k}{cat}) =~ /$string/) {
@@ -357,6 +362,7 @@ sub search {
         }
     }
     if ($args->{name}) {
+        carp "Search name: $args->{name}\n" if $self->verbose;
         my $string = lc $args->{name};
         for my $k (keys %$set) {
             if (lc($set->{$k}{name}) =~ /$string/) {
@@ -398,6 +404,7 @@ sub groove {
 sub swap_pat {
     my ($self, $pat, $source, $dest) = @_;
     if (!exists $pat->{$dest} && exists $pat->{$source}) {
+        carp "Swap patterns: $source for $dest\n" if $self->verbose;
         my $x = delete $pat->{$source};
         $pat->{$dest} = { num => $self->$dest, pat => $x->{pat} };
     }
@@ -421,6 +428,7 @@ sub density {
         my $ones =()= $pat->{groove}{$instrument}{pat} =~ /1/g;
         $density += $ones;
     }
+    carp "Pattern density: $density\n" if $self->verbose;
     return $density;
 }
 
@@ -438,7 +446,7 @@ MIDI::Drummer::Tiny::Grooves - Common drum grooves
 
 =head1 VERSION
 
-version 0.7020
+version 0.7101
 
 =head1 SYNOPSIS
 
@@ -463,9 +471,10 @@ version 0.7020
   $groove = $grooves->get_groove(0, $set);
   # get a numbered groove
   $groove = $grooves->get_groove(42);
-  print "42. $groove->{cat}\n$groove->{name}";
 
   my $density = $grooves->density($groove);
+
+  print "42. Density: $density, $groove->{cat}\n$groove->{name}";
 
   # searching
   $set = $grooves->search({ cat => 'house' });
@@ -550,8 +559,7 @@ new one is created when a method is called.
 The "resolution" duration that is given to the
 L<MIDI::Drummer::Tiny/sync_patterns> method.
 
-This is initialized to the sixteenth duration of the drummer
-L<MIDI::Drummer::Tiny> object.
+Default: 'sn' (sixteenth-note)
 
 =head2 kick, rimshot, snare, clap, conga, cowbell, shaker, closed, open, crash, hi_tom, mid_tom, low_tom
 

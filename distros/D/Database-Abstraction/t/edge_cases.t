@@ -971,31 +971,31 @@ subtest 'EC18: table parameter security and boundary conditions' => sub {
 
 # ===========================================================================
 # EC19 — XLSX backend: hostile conditions and boundary cases
-# Purpose: exercise the DBD::Excel-backed XLSX path under corrupted files,
-# worksheet isolation failures, and resource lifecycle edge cases.  The goal
-# is to ensure no segfaults, no data bleed between worksheets, and that the
-# DESTROY lifecycle is clean.
+# Purpose: exercise the Spreadsheet::ParseXLSX-backed XLSX path under corrupted
+# files, worksheet isolation failures, and resource lifecycle edge cases.
+# The goal is to ensure no segfaults, no data bleed between worksheets, and
+# that the DESTROY lifecycle is clean.
 # ===========================================================================
 
 my $have_xlsx_ec = eval {
-	require DBD::Excel;
-	require Spreadsheet::WriteExcel;
+	require Excel::Writer::XLSX;
+	require Spreadsheet::ParseXLSX;
 	1;
 };
 
 SKIP: {
-	skip 'DBD::Excel or Spreadsheet::WriteExcel not available for EC19', 10
+	skip 'Excel::Writer::XLSX or Spreadsheet::ParseXLSX not available for EC19', 10
 		unless $have_xlsx_ec;
 
 	{ package Database::ec19; use parent 'Database::Abstraction'; }
 
-	# Build a two-worksheet fixture:
+	# Build a two-worksheet OOXML fixture:
 	#   ec19  — entry / value   (2 rows)
 	#   other — entry / score   (1 row)
 	my $ec19_dir  = tempdir(CLEANUP => 1);
 	my $ec19_xlsx = File::Spec->catfile($ec19_dir, 'ec19.xlsx');
 	{
-		my $wb  = Spreadsheet::WriteExcel->new($ec19_xlsx);
+		my $wb  = Excel::Writer::XLSX->new($ec19_xlsx);
 		my $ws1 = $wb->add_worksheet('ec19');
 		$ws1->write(0, 0, 'entry'); $ws1->write(0, 1, 'value');
 		$ws1->write(1, 0, 'alpha'); $ws1->write(1, 1, 10);
@@ -1012,9 +1012,9 @@ SKIP: {
 	# EC19.1 — primary worksheet: count == 2
 	is($db_prim->count(), 2, 'EC19.1 XLSX primary worksheet count() == 2');
 
-	# EC19.2 — type is set to 'Excel' after the first query
-	is($db_prim->{'type'}, 'Excel',
-		'EC19.2 XLSX backend type is "Excel" after first query');
+	# EC19.2 — type is set to 'XLSX' after the first query (in-memory slurp path)
+	is($db_prim->{'type'}, 'XLSX',
+		'EC19.2 XLSX backend type is "XLSX" after first query');
 
 	# EC19.3 — table-override worksheet returns a different row count,
 	# proving the active worksheet changed and is independent of the primary.
@@ -1036,18 +1036,19 @@ SKIP: {
 		'EC19.5 concurrent queries on independent objects return correct isolated data');
 
 	# EC19.6 — 0-byte file named ec19zero.xlsx must not segfault.
-	# DBD::Excel is expected to croak at connect time; that is acceptable.
+	# Spreadsheet::ParseXLSX is expected to croak at parse time; that is acceptable.
 	# We only assert that the process does not die unexpectedly (segfault, SIGABRT).
 	{
 		{ package Database::ec19zero; use parent 'Database::Abstraction'; }
 		my $zero_dir = tempdir(CLEANUP => 1);
 		open my $fh, '>', File::Spec->catfile($zero_dir, 'ec19zero.xlsx'); close $fh;
 		eval { Database::ec19zero->new(directory => $zero_dir)->count() };
-		ok(1, 'EC19.6 0-byte .xlsx file does not segfault (croak at connect is acceptable)');
+		ok(1, 'EC19.6 0-byte .xlsx file does not segfault (croak at parse is acceptable)');
 		diag "EC19.6 error was: $@" if $@ && $ENV{TEST_VERBOSE};
 	}
 
 	# EC19.7 — random-bytes file masquerading as .xlsx must not segfault.
+	# ParseXLSX expects a ZIP/OOXML container; non-ZIP bytes cause a parse croak.
 	{
 		{ package Database::ec19junk; use parent 'Database::Abstraction'; }
 		my $junk_dir  = tempdir(CLEANUP => 1);

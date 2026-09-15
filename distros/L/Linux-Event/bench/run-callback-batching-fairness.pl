@@ -258,7 +258,7 @@ sub hot_class ($batch_size) {
         1;
     } or die "define hot Stream class: $@";
     no strict 'refs';
-    *{"${class}::stream_options"} = sub ($class_name) {
+    *{"${class}::stream_tuning"} = sub ($class_name) {
         return read_size => $read_size, message_batch_size => $batch_size;
     };
     if ($batch_size) {

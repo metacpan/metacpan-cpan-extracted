@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use FindBin qw($Bin);
 use Scalar::Util qw(refaddr);
+use Socket qw(AF_INET SOCK_STREAM inet_aton pack_sockaddr_in);
 
 use Linux::Event::Loop;
 use Linux::Event::IO::Sock::Listener;
@@ -16,11 +17,6 @@ our ($LOOP, $STATE, $CLIENT_ID);
 {
     package T::IntegratedTLSServer;
     use parent 'Linux::Event::IO::Sock::Stream';
-    use Linux::Event::TLS
-        cert_file => "$FindBin::Bin/tls-certs/server-cert.pem",
-        key_file  => "$FindBin::Bin/tls-certs/server-key.pem",
-        alpn      => ['les-integrated/1'];
-
     sub on_ready ($stream) {
         push @{ $stream->data->{server_order} }, 'ready';
         $stream->data->{server_ready}++;
@@ -91,9 +87,43 @@ $STATE = {
 };
 $LOOP = Linux::Event::Loop->new;
 
+my $plain_loop = Linux::Event::Loop->new;
+my $plain_transport;
+my $plain_listener = Linux::Event::IO::Sock::Listener->new(
+    loop => $plain_loop,
+    host => '127.0.0.1',
+    port => 0,
+    stream => {
+        class => 'T::IntegratedTLSServer',
+        data  => $STATE,
+    },
+    on_accept => sub ($listener, $stream) {
+        $plain_transport = $stream->transport;
+        $stream->close;
+        $plain_loop->stop;
+    },
+);
+socket(my $plain_client, AF_INET, SOCK_STREAM, 0) or die "socket: $!";
+connect($plain_client,
+    pack_sockaddr_in($plain_listener->port, inet_aton('127.0.0.1')))
+    or die "connect: $!";
+$plain_loop->run;
+ok(!defined($plain_transport),
+    'the same Stream class remains plain when Listener tls is omitted');
+close $plain_client;
+$plain_listener->close;
+
 my $listener = $LOOP->add(T::IntegratedTLSListener->new(
-    stream_class => 'T::IntegratedTLSServer',
-    host => '127.0.0.1', port => 0, data => $STATE,
+    host => '127.0.0.1', port => 0,
+    stream => {
+        class => 'T::IntegratedTLSServer',
+        data  => $STATE,
+        tls => {
+            cert_file => "$FindBin::Bin/tls-certs/server-cert.pem",
+            key_file  => "$FindBin::Bin/tls-certs/server-key.pem",
+            alpn      => ['les-integrated/1'],
+        },
+    },
 ));
 my $client = T::IntegratedTLSClient->connect(
     host => 'localhost', port => $listener->port, timeout => 5,

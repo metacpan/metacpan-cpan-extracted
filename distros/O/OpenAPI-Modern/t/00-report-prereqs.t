@@ -71,6 +71,9 @@ my @include = qw(
   JSON::PP
   HTTP::Headers::Fast::XS
   Mojolicious::Controller::REST
+  Sereal
+  Sereal::Decoder
+  Sereal::Encoder
   Cpanel::JSON::XS
   JSON::XS
   JSON::MaybeXS

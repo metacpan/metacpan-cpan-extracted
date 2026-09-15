@@ -14,21 +14,21 @@ use Linux::Event::_ByteStream ();
 {
     package T::Callbacks::RawMethod;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return read_size => 4 }
+    sub stream_tuning ($class) { return read_size => 4 }
     sub on_data ($stream, $bytes) { $stream->data->{method} .= $bytes }
 }
 
 {
     package T::Callbacks::RawOther;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return read_size => 4 }
+    sub stream_tuning ($class) { return read_size => 4 }
     sub on_data ($stream, $bytes) { $stream->data->{other} .= $bytes }
 }
 
 {
     package T::Callbacks::RawMissing;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return read_size => 4 }
+    sub stream_tuning ($class) { return read_size => 4 }
 }
 
 {
@@ -59,13 +59,13 @@ use Linux::Event::_ByteStream ();
     package T::Callbacks::BatchMissing;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', '|';
-    sub stream_options ($class) { return message_batch_size => 2 }
+    sub stream_tuning ($class) { return message_batch_size => 2 }
 }
 
 {
     package T::Callbacks::Limited;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return high_watermark => 32, low_watermark => 16,
             max_pending_bytes => 64;
     }
@@ -74,7 +74,7 @@ use Linux::Event::_ByteStream ();
 {
     package T::Callbacks::Drain;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return high_watermark => 4096, low_watermark => 1024;
     }
 }

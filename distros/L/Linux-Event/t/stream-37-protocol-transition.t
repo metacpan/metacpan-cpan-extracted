@@ -83,7 +83,7 @@ use Linux::Event::IO::Sock::Stream;
     package T::Transition::Small;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', "\n";
-    sub stream_options ($class) { return max_buffer => 4 }
+    sub stream_tuning ($class) { return max_buffer => 4 }
     sub on_message ($stream, $message) { return }
 }
 

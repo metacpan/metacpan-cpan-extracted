@@ -19,6 +19,11 @@ my $session = Net::HTTP2::nghttp2::Session->new_server(
         on_frame_recv    => sub { ... },
         on_data_chunk_recv => sub { ... },
         on_stream_close  => sub { ... },
+        # optional send-side and diagnostic callbacks
+        on_frame_send         => sub { ... },
+        on_frame_not_send     => sub { ... },
+        on_invalid_frame_recv => sub { ... },
+        on_error              => sub { ... },
     },
 );
 

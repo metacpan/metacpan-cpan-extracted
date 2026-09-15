@@ -76,7 +76,7 @@ YAML
     'unsupported construction arguments (but supported in the base class) generate warnings',
   );
 
-  cmp_result([ $doc->errors ], [], 'no errors when using an ignored constructor argument');
+  is_equal([ $doc->errors ], [], 'no errors when using an ignored constructor argument');
   cmp_result(
     $doc->{resource_index},
     {
@@ -176,7 +176,7 @@ ERRORS
       jsonSchemaDialect => undef,
     },
   );
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -200,7 +200,7 @@ ERRORS
       '$self' => 'https://example.com/api',
     },
   );
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -236,7 +236,7 @@ YAML
     schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 $self: '#fragment'
 YAML
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -283,7 +283,7 @@ YAML
 jsonSchemaDialect: https://metaschema/with/wrong/spec
 YAML
 
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -314,7 +314,7 @@ ERRORS
       paths => {},
     },
   );
-  cmp_result([ $doc->errors ], [], 'no errors when loading empty 3.0.4 document');
+  is_equal([ $doc->errors ], [], 'no errors when loading empty 3.0.4 document');
 };
 
 subtest 'openapi version checks' => sub {
@@ -322,7 +322,7 @@ subtest 'openapi version checks' => sub {
         my @oad_version = split /\./, $_;
         map join('.', @oad_version[0..1], $_), 0 .. $oad_version[2]
       }, SUPPORTED_OAD_VERSIONS->@*) {
-    cmp_result(
+    is_equal(
       [ warnings {
         JSON::Schema::Modern::Document::OpenAPI->new(
           schema => decode_yaml(<<"YAML"))
@@ -371,7 +371,7 @@ info:
   version: 1.2.3
 paths: {}
 YAML
-    cmp_result(
+    is_equal(
       [ map $_->TO_JSON, $doc->errors ],
       [
         {
@@ -399,7 +399,7 @@ components:
           $schema: https://json-schema.org/draft/2019-09/schema
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
+  is_equal([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
   is($doc->metaschema_uri, DEFAULT_METASCHEMA->{+OAS_VERSION}, 'default metaschema is used for the document');
 
   $js->add_document($doc);
@@ -486,7 +486,7 @@ components:
       not-a-keyword: 1
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
+  is_equal([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
@@ -522,7 +522,7 @@ components:
       maxLength: false  # this is a bad schema, but our custom dialect does not detect that
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors with a custom jsonSchemaDialect');
+  is_equal([ $doc->errors ], [], 'no errors with a custom jsonSchemaDialect');
   is($doc->metaschema_uri, DEFAULT_METASCHEMA->{+OAS_VERSION}, 'default (permissive) metaschema is saved');
 
   $js->add_document($doc);
@@ -572,7 +572,7 @@ components:
     Foo:
       maxLength: false,  # this is a bad schema, but our custom dialect does not detect that
 YAML
-  cmp_result([ $doc->errors ], [], 'no errors with a relative jsonSchemaDialect');
+  is_equal([ $doc->errors ], [], 'no errors with a relative jsonSchemaDialect');
   $js->add_document($doc);
 
   cmp_result(
@@ -611,7 +611,7 @@ components:
       x-todo: this one is okay
 YAML
 
-  cmp_result(
+  is_equal(
     ($doc->errors)[0]->TO_JSON,
     {
       instanceLocation => '/components/schemas/Foo/blah',
@@ -636,7 +636,7 @@ components:
       x-todo: this one is okay
 YAML
 
-  cmp_result(
+  is_equal(
     ($doc->errors)[0]->TO_JSON,
     {
       instanceLocation => '/components/schemas/Foo/blah',
@@ -658,7 +658,7 @@ $self: user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors with a relative $self and absolute original_uri');
+  is_equal([ $doc->errors ], [], 'no errors with a relative $self and absolute original_uri');
   is($doc->original_uri, 'http://localhost:1234/foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'http://localhost:1234/foo/user/api.json', 'canonical uri is $self resolved against retrieval uri');
   cmp_result(
@@ -684,7 +684,7 @@ $self: http://localhost:5555/user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors with an absolute $self');
+  is_equal([ $doc->errors ], [], 'no errors with an absolute $self');
   is($doc->original_uri, 'http://localhost:1234/foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'http://localhost:5555/user/api.json', 'canonical uri is $self, already absolute');
   cmp_result(
@@ -709,7 +709,7 @@ $self: user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors with a relative $self and relative original_uri');
+  is_equal([ $doc->errors ], [], 'no errors with a relative $self and relative original_uri');
   is($doc->original_uri, 'foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'foo/user/api.json', 'canonical uri is $self resolved against retrieval uri');
   cmp_result(
@@ -734,7 +734,7 @@ $self: http://localhost:5555/user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors with an absolute $self and relative original_uri');
+  is_equal([ $doc->errors ], [], 'no errors with an absolute $self and relative original_uri');
   is($doc->original_uri, 'foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'http://localhost:5555/user/api.json', 'canonical uri is $self, already absolute');
   cmp_result(

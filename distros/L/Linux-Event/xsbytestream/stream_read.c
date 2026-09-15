@@ -11,10 +11,6 @@ les_flush_framed_read_boundary(pTHX_ les_xsstate_t *st)
         les_process_existing_input(aTHX_ st, 1);
 }
 
-/* Settle delivery work owed by the descriptor that produced the current
- * read result. A callback may transition the Stream while the batch/consumer
- * flush is running; only a live, unpaused Stream may re-drive under that new
- * descriptor. */
 static int
 les_settle_read_boundary(pTHX_ les_xsstate_t *st,
     les_descriptor_t *descriptor)
@@ -59,33 +55,30 @@ les_read_ready(pTHX_ les_xsstate_t *st)
         char *target;
         size_t want;
 
-        /* A parser callback may have changed the descriptor while leaving an
-         * already-read suffix in native storage. Reinterpret that suffix
-         * before requesting more kernel data. */
         if (st->descriptor->read_mode != LES_READ_DELIVER
-            || !st->descriptor->read_batch_bytes)
+            || !st->read_batch_bytes)
             les_process_existing_input(aTHX_ st, 0);
         if (st->closed || LES_INPUT_PAUSED(st) || st->read_eof)
             break;
 
-        if (st->descriptor->read_budget_bytes
-            && drain_bytes >= (size_t)st->descriptor->read_budget_bytes)
+        if (st->read_budget_bytes
+            && drain_bytes >= (size_t)st->read_budget_bytes)
             break;
 
-        want = st->descriptor->read_size;
-        if (st->descriptor->read_budget_bytes
-            && want > (size_t)st->descriptor->read_budget_bytes - drain_bytes)
-            want = (size_t)st->descriptor->read_budget_bytes - drain_bytes;
+        want = st->read_size;
+        if (st->read_budget_bytes
+            && want > (size_t)st->read_budget_bytes - drain_bytes)
+            want = (size_t)st->read_budget_bytes - drain_bytes;
 
         if (st->descriptor->read_mode == LES_READ_DELIVER) {
-            if (st->descriptor->read_batch_bytes) {
+            if (st->read_batch_bytes) {
                 UV remaining;
 
-                if ((UV)st->input_len >= st->descriptor->read_batch_bytes) {
+                if ((UV)st->input_len >= st->read_batch_bytes) {
                     les_flush_raw_batch(aTHX_ st);
                     continue;
                 }
-                remaining = st->descriptor->read_batch_bytes - (UV)st->input_len;
+                remaining = st->read_batch_bytes - (UV)st->input_len;
                 if ((UV)want > remaining)
                     want = (size_t)remaining;
                 les_input_reserve(st, want);
@@ -94,20 +87,16 @@ les_read_ready(pTHX_ les_xsstate_t *st)
                 target = st->read_buffer;
             }
         } else {
-            if (st->descriptor->max_buffer) {
-                if (st->input_len >= st->descriptor->max_buffer) {
-                    les_descriptor_t *descriptor = st->descriptor;
+            if (st->max_buffer) {
+                if (st->input_len >= st->max_buffer) {
                     char msg[128];
-                    snprintf(msg, sizeof(msg), "input buffer exceeds max_buffer=%llu",
-                        (unsigned long long)st->descriptor->max_buffer);
+                    snprintf(msg, sizeof(msg), "input buffer cannot grow beyond max_buffer=%llu",
+                        (unsigned long long)st->max_buffer);
                     les_call_framing_error(aTHX_ st, msg);
-                    if (!st->closed && !st->read_paused
-                        && st->descriptor != descriptor)
-                        continue;
                     break;
                 }
-                if ((UV)want > st->descriptor->max_buffer - (UV)st->input_len)
-                    want = (size_t)(st->descriptor->max_buffer - (UV)st->input_len);
+                if ((UV)want > st->max_buffer - (UV)st->input_len)
+                    want = (size_t)(st->max_buffer - (UV)st->input_len);
             }
             les_input_reserve(st, want);
             target = st->input_buffer + st->input_start + st->input_len;
@@ -126,9 +115,9 @@ les_read_ready(pTHX_ les_xsstate_t *st)
             les_note_read_activity(aTHX_ st);
 
             if (st->descriptor->read_mode == LES_READ_DELIVER) {
-                if (st->descriptor->read_batch_bytes) {
+                if (st->read_batch_bytes) {
                     st->input_len += (size_t)result.count;
-                    if ((UV)st->input_len >= st->descriptor->read_batch_bytes)
+                    if ((UV)st->input_len >= st->read_batch_bytes)
                         les_flush_raw_batch(aTHX_ st);
                 } else {
                     SV *bytes = sv_2mortal(newSVpvn(

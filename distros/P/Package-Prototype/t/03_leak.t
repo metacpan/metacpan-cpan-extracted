@@ -22,7 +22,7 @@ for my $i (1..10) {
     my %data = map { string_random() => $types[int(rand $types_num)] } 1..$i;
     leaks_cmp_ok {
         Package::Prototype->bless({ %data });
-    } '==', $i;
+    } '==', 0;
 }
 
 no_leaks_ok {

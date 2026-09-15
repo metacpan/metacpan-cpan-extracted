@@ -1,7 +1,29 @@
 Revision history for Genealogy::Relationship::Name
 
-0.03	Thu May 21 21:45:41 EDT 2026
+0.04	Sun Sep 13 09:28:42 PM EDT 2026
+	[Enhancements]
+	- Completed high-step uncle/aunt translations (steps 11-18) for all
+	  supported languages: fr, de, de_ch, es, and fa (Farsi).  FR adds
+	  onzième–quinzième grand-oncle/grand-tante (14,1–18,1); DE/DE-CH add
+	  elftens–fuenfzehntens grossonkel/grosstante; ES maps all to tio/tia
+	  lejano/lejana; FA adds both generic and paternal/maternal side-specific
+	  keys for every new step.
+	- Added regression tests covering boundary entries (first and last of each
+	  new range) in t/unit.t.
+	[Bug Fixes]
+	- Fixed name() validation regex to accept de_ch (underscore form) as well
+	  as de-CH (BCP-47 hyphen form).  Previously, callers who iterated
+	  supported_languages() and passed the result to name() would get a
+	  validation error for 'de_ch'.
+	- Removed phantom runtime dependencies IPC::System::Simple and
+	  Readonly::Values::Months, which were declared in PREREQ_PM but never
+	  used.
+	- Added missing test dependencies Log::Abstraction and Scalar::Util to
+	  TEST_REQUIRES.
+	- Removed unused test dependencies Test::Returns and Test::Which from
+	  TEST_REQUIRES.
 
+0.03	Thu May 21 21:45:41 EDT 2026
 	[Enhancements]
 	- Expanded all relationship tables from 0-6 to 0-10 (ninth cousin coverage)
 	- Added Spanish (es), Farsi (fa), and Classical Latin (la) language tables

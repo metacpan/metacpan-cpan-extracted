@@ -7,15 +7,12 @@ install () {
     # target latest perl to get modules evicted from core
     # so can run on latest perl
     local CPM_OPTS=(
-        --without-test                          \
-        --target-perl=5.32.0
+        -L packed
+        --top-level-phase=runtime
+        --target-perl=5.42.0
     )
 
-    # uses --pp directly; can't get that into PERL_MB_OPT
-    cpm install "${CPM_OPTS[@]}" Params::Validate
-
     CPM_OPTS+=( --pureperl-only )
-
     cpm install "${CPM_OPTS[@]}"
 
     if (( ${#EXTRAS[*]} )); then
@@ -26,7 +23,7 @@ install () {
 cpm () {
     local exe=packer/bin/cpm
     if [ ! -x $exe ]; then
-        curl -fsSL --compressed https://git.io/cpm -o $exe
+        curl -fsSL --compressed https://raw.githubusercontent.com/skaji/cpm/main/cpm -o $exe
         chmod +x $exe
     fi
     unset -f cpm
@@ -43,30 +40,15 @@ fatpack-simple () {
 
 pack () {
 
-    local exclude=(
-        Class::Inspector
-        CPAN::Meta
-        CPAN::Meta::Check
-        Capture::Tiny
-        Dist::CheckConflicts
-        Module::Build
-        Sub::Info
-        Test2::Suite
-        Test::Builder
-        Test::ClassAPI
-        Test::Deep
-        Test::FailWarnings
-        Test::Fatal
-        Test::Needs
-        Test::Requires
-        Test::Tester
-        Test::Warnings
-    )
-    exclude=$(IFS=,; echo "${exclude[*]}")
+    local exclude=(   )
+
+    if [ "${#exclude[*]}" -gt 0 ]; then
+        exclude=(--exclude $(IFS=,; echo "${exclude[*]}"))
+    fi
 
     fatpack-simple                                      \
-        --exclude  $exclude                             \
-        --dir $PWD/local,$DIR/lib                       \
+        "${exclude[@]}"                                 \
+        --dir $PWD/packed,$DIR/lib                      \
         -o $DIR/$EXE  $DIR/script/$EXE |& tee pack.log
 
     perl -i.bak -pe 's{/usr/bin/perl}{/usr/bin/env perl}' $DIR/$EXE
@@ -114,7 +96,7 @@ eval $(perl -V:archname)
 PATH=$PWD/packer/bin:${PATH}
 export PERL5LIB=$PWD/packer/lib/perl5${PERL5LIB:+:$PERL5LIB}
 
-EXTRAS=( Devel::GlobalDestruction )
+# EXTRAS=( Devel::GlobalDestruction  )
 
 eval "$@"
 

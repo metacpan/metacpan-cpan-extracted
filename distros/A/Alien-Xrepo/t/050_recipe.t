@@ -38,24 +38,24 @@ subtest 'file round-trip (xrepo.json)' => sub {
     my $file = path($dir)->child('xrepo.json');
     $file->spew_utf8(
         encode_json(
-            {   name        => 'Alien-Zstandard',
+            {   name        => 'Exotic-Zstandard',
                 packages    => [ { name => 'zstd', version => '1.5.6', kind => 'shared' } ],
                 defaults    => { mode => 'release', configs => { legacy => 1 } },
                 pkg_roots   => { ZSTD => '$ZSTD' },
                 local_repos => ['vendor/recipes'],
-                hooks       => ['Alien::Zstandard::Hooks']
+                hooks       => ['Exotic::Zstandard::Hooks']
             }
         )
     );
     my $recipe = Alien::Xrepo::Build::Recipe->new( file => $file );
-    is $recipe->name,                        'Alien-Zstandard',         'name from file';
-    is [ $recipe->packages ],                ['zstd'],                  'packages from file';
-    is $recipe->version_for('zstd'),         '1.5.6',                   'version from file';
-    is $recipe->defaults->{mode},            'release',                 'defaults from file';
-    is $recipe->defaults->{configs}{legacy}, 1,                         'defaults configs from file';
-    is $recipe->pkg_roots->{ZSTD},           '$ZSTD',                   'pkg_roots from file';
-    is $recipe->local_repos->[0],            'vendor/recipes',          'local_repos from file';
-    is $recipe->hooks->[0],                  'Alien::Zstandard::Hooks', 'hooks from file';
+    is $recipe->name,                        'Exotic-Zstandard',         'name from file';
+    is [ $recipe->packages ],                ['zstd'],                   'packages from file';
+    is $recipe->version_for('zstd'),         '1.5.6',                    'version from file';
+    is $recipe->defaults->{mode},            'release',                  'defaults from file';
+    is $recipe->defaults->{configs}{legacy}, 1,                          'defaults configs from file';
+    is $recipe->pkg_roots->{ZSTD},           '$ZSTD',                    'pkg_roots from file';
+    is $recipe->local_repos->[0],            'vendor/recipes',           'local_repos from file';
+    is $recipe->hooks->[0],                  'Exotic::Zstandard::Hooks', 'hooks from file';
     my $from_dir = Alien::Xrepo::Build::Recipe->new( dir => $dir );
     is [ $from_dir->packages ], ['zstd'], 'dir form loads xrepo.json';
 };

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v1.0.1
+## Version v1.0.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2026/04/28
+## Modified 2026/05/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,7 +17,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION @META $DEF_META );
+    use vars qw( $VERSION @META $DEF_META $JSON_CLASS );
     use open ':std' => ':utf8';
     use Class::Struct;
     use DateTime::Format::Lite;
@@ -25,11 +25,26 @@ BEGIN
     use DateTime::Lite::TimeZone;
     use Encode ();
     use Fcntl qw( :DEFAULT );
-    use JSON ();
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( DateTime::Lite::TimeZone->new( name => 'local' ) ? 1 : 0 );
-    our $VERSION = 'v1.0.1';
+    # JSON backend detection: prefer Cpanel::JSON::XS (fastest, most rigorous), fall back
+    # to JSON::XS, then JSON::PP (core since Perl 5.14).
+    our $JSON_CLASS;
+    if( eval{ require Cpanel::JSON::XS; 1 } )
+    {
+        $JSON_CLASS   = 'Cpanel::JSON::XS';
+    }
+    elsif( eval{ require JSON::XS; 1 } )
+    {
+        $JSON_CLASS   = 'JSON::XS';
+    }
+    else
+    {
+        require JSON::PP;
+        $JSON_CLASS   = 'JSON::PP';
+    }
+    our $VERSION = 'v1.0.2';
 };
 
 use strict;
@@ -296,7 +311,7 @@ sub as_json
         }
         push( @{$hash->{elements}}, $ref );
     }
-    my $j = JSON->new->relaxed->allow_blessed->convert_blessed;
+    my $j = $JSON_CLASS->new->relaxed->allow_blessed->convert_blessed;
     # canonical = sorting hash keys
     foreach my $t ( qw( pretty utf8 indent canonical ) )
     {
@@ -698,13 +713,22 @@ sub parse
 
         if( !$inc_file->exists )
         {
-            # Add it as a comment so the user sees it
-            $e->add_comment( $c );
-            my $msg = "Include file $inc_name ($inc_file) does not exist at line $n";
-            warn( $msg ) if( $self->_is_warnings_enabled );
-            # Add a comment so translators see the problem:
-            $e->add_comment( "ERROR: $msg" );
-            return(1);
+            # Maybe the user has specified the include file as a domain, and so we try to find the file by adding '.po'
+            if( substr( "$inc_file", -3 ) ne '.po' &&
+                ( my $test_file = $self->new_file( "${inc_file}.po" ) )->exists )
+            {
+                $inc_file = $test_file;
+            }
+            else
+            {
+                # Add it as a comment so the user sees it
+                $e->add_comment( $c );
+                my $msg = "Include file $inc_name ($inc_file) does not exist at line $n";
+                warn( $msg ) if( $self->_is_warnings_enabled );
+                # Add a comment so translators see the problem:
+                $e->add_comment( "ERROR: $msg" );
+                return(1);
+            }
         }
 
         # Cycle detection: avoid infinite mutual includes
@@ -836,7 +860,14 @@ sub parse
                 {
                     if( ++$seen->{ $e->id // '' } > 1 )
                     {
-                        next;
+                        # next;
+                        # NOTE: Do NOT use `next` here. The $e reset block at the end
+                        # of this enclosing if-block MUST execute, otherwise the
+                        # skipped element's state (msgid, msgstr, flags, reference)
+                        # leaks into the next block. Worse, if the next block contains
+                        # continuation lines (e.g. `msgid ""` followed by multi-line
+                        # strings), `_add()` will push onto the existing arrayref
+                        # instead of starting fresh, producing fused msgids.
                     }
                     elsif( !$e->id && !length( $e->msgstr // '' ) )
                     {
@@ -851,10 +882,20 @@ sub parse
                 $e->{_po_line} = $n;
                 $e->encoding( $self->encoding ) if( $self->encoding );
                 $e->debug( $self->debug );
+                $lastSeen = '';
             }
 
             # special treatment for first item that contains the meta information
-            if( scalar( @$elem ) == 1 )
+            # NOTE: We only attempt to parse meta headers from the very first element
+            # when it actually looks like the meta block, that is: an empty msgid whose
+            # msgstr is the multi-line array of header lines.
+            # A single element is not necessarily the meta: when an include brings exactly
+            # one entry and the main file's first own entry is a duplicate that gets
+            # skipped, $elem->[0] is a real entry whose msgstr is a plain scalar, not an
+            # array reference. Dereferencing it as an array would die under strict refs.
+            if( scalar( @$elem ) == 1 &&
+                !length( $elem->[0]->msgid_as_text // '' ) &&
+                ref( $elem->[0]->msgstr ) eq 'ARRAY' )
             {
                 my $this = $elem->[0];
                 my $def = $this->msgstr || [];
@@ -975,7 +1016,13 @@ sub parse
         }
         elsif( /^msgid[[:blank:]]+"(.*?)"$/ )
         {
-            $e->msgid( $self->unquote( $1 ) ) if( length( $1 ) );
+            # NOTE: Always reset, even on empty string. An empty `msgid ""` either
+            # declares an empty msgid (rare but legal: the header element), or
+            # opens a multi-line msgid filled by subsequent continuation lines.
+            # In both cases the previous value of msgid must be cleared first,
+            # otherwise continuations will append to leaked state from a prior
+            # block (e.g. a duplicate that was skipped without reset).
+            $e->msgid( $self->unquote( $1 ) );
             $lastSeen = 'msgid';
         }
         # #: mainwindow.cpp:127
@@ -986,7 +1033,7 @@ sub parse
         # msgstr[1] "Tiempo: %1 segundos"
         elsif( /^msgid_plural[[:blank:]]+"(.*?)"[[:blank:]]*$/ )
         {
-            $e->msgid_plural( $self->unquote( $1 ) ) if( length( $1 ) );
+            $e->msgid_plural( $self->unquote( $1 ) );
             $e->plural(1);
             $lastSeen = 'msgid_plural';
         }
@@ -1002,12 +1049,12 @@ sub parse
         # msgstr ""
         elsif( /^msgctxt[[:blank:]]+"(.*?)"[[:blank:]]*$/ )
         {
-            $e->context( $self->unquote( $1 ) ) if( length( $1 ) );
+            $e->context( $self->unquote( $1 ) );
             $lastSeen = 'msgctxt';
         }
         elsif( /^msgstr[[:blank:]]+"(.*?)"[[:blank:]]*$/ )
         {
-            $e->msgstr( $self->unquote( $1 ) ) if( length( $1 ) );
+            $e->msgstr( $self->unquote( $1 ) );
             $lastSeen = 'msgstr';
         }
         elsif( /^msgstr\[(\d+)\][[:blank:]]+"(.*?)"[[:blank:]]*$/ )
@@ -1127,7 +1174,7 @@ sub parse2hash
         $io->binmode( ':utf8' );
         $io->read( $buff, -s( $file ) );
         $io->close;
-        my $j = JSON->new->relaxed;
+        my $j = $JSON_CLASS->new->relaxed;
         my $ref = {};
         # try-catch
         local $@;
@@ -1165,7 +1212,7 @@ sub parse2object
         $io->binmode( ':utf8' );
         $io->read( $buff, -s( $file ) );
         $io->close;
-        my $j = JSON->new->relaxed;
+        my $j = $JSON_CLASS->new->relaxed;
         my $ref = {};
         # try-catch
         local $@;
@@ -1737,7 +1784,7 @@ Or, maybe using the object overloading directly:
 
 =head1 VERSION
 
-    v1.0.1
+    v1.0.2
 
 =head1 DESCRIPTION
 

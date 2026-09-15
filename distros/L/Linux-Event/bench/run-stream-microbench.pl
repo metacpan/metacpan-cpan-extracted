@@ -25,13 +25,13 @@ use Linux::Event::IO::Sock::Stream;
 {
     package Linux::Event::Bench::CappedRawEchoStream;
     use parent -norequire, 'Linux::Event::Bench::RawEchoStream';
-    sub stream_options ($class) { return max_pending_bytes => 16 * 1024 * 1024 }
+    sub stream_tuning ($class) { return max_pending_bytes => 16 * 1024 * 1024 }
 }
 
 {
     package Linux::Event::Bench::DeadlineRawEchoStream;
     use parent -norequire, 'Linux::Event::Bench::RawEchoStream';
-    sub stream_options ($class) { return idle_timeout => 3_600 }
+    sub stream_tuning ($class) { return idle_timeout => 3_600 }
 }
 
 my @clients = (1, 10, 100, 1000);

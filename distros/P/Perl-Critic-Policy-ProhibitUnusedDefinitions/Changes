@@ -1,0 +1,7 @@
+Revision history for Perl-Critic-Policy-ProhibitUnusedDefinitions
+
+0.002 2026-09-14 TEODESIAN
+    - Fix issue with not detecting interpolated sub calls
+
+0.001 2026-09-11 TEODESIAN
+    - Initial Release

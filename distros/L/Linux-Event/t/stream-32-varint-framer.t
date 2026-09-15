@@ -11,7 +11,7 @@ use Linux::Event::Framer::Varint ();
     package T::VarintStream;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Varint';
-    sub stream_options ($class) { return read_size => 1 }
+    sub stream_tuning ($class) { return read_size => 1 }
     sub on_message ($stream, $message) {
         my $state = $stream->data;
         push @{ $state->{got} }, $message;

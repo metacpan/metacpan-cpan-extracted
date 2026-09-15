@@ -1,0 +1,412 @@
+#!/usr/bin/env perl
+
+use 5.014;
+
+use strict;
+use warnings FATAL => 'all';
+
+use re '/aa';
+
+=head1 NAME
+
+t/Perl-Critic-Policy-ProhibitUnusedDefinitions.t - which definitions it calls
+unused, which it does not, and where it looks to decide
+
+=head1 DESCRIPTION
+
+Every case is a small distribution written to a temporary directory, because
+the question this policy answers is about a distribution rather than a file.
+Each one gets a directory of its own, and so an index of its own.
+
+The second list matters as much as the first.  A policy that reports what is
+plainly in use gets switched off.
+
+=cut
+
+use Test::More;
+use Test::NoWarnings;
+use File::Temp       qw{tempdir};
+use File::Path       qw{make_path};
+use File::Basename   qw{dirname};
+use Test::MockModule qw{strict};
+
+use FindBin::libs;
+
+use Perl::Critic ();
+
+use_ok('Perl::Critic::Policy::ProhibitUnusedDefinitions');
+
+# -profile => q{} so Perl::Critic does not find this dist's own .perlcriticrc
+# and run every policy in it against the fixtures.
+sub critic {
+    my ($profile) = @_;
+    return Perl::Critic->new(
+        -profile         => $profile // q{},
+        '-single-policy' => 'ProhibitUnusedDefinitions',
+        -severity        => 1,
+    );
+}
+
+# A fresh distribution with these files in it.  A dist.ini is added unless the
+# case says undef, to be found as the root.
+sub dist {
+    my (%files) = @_;
+
+    my $root = tempdir( CLEANUP => 1 );
+    %files = ( 'dist.ini' => "name = Fixture\n", %files );
+    foreach my $name ( grep { defined $files{$_} } keys %files ) {
+        make_path( dirname("$root/$name") );
+        dist_file( $root, $name, $files{$name} );
+    }
+    return $root;
+}
+
+sub dist_file {
+    my ( $root, $name, $content ) = @_;
+    open( my $fh, '>', "$root/$name" ) or die "$root/$name: $!";
+    print {$fh} $content;
+    close($fh) or die "$root/$name: $!";
+    return;
+}
+
+sub found {
+    my ( $root, $file, $critic ) = @_;
+    return [ map { $_->description() } ( $critic // critic() )->critique("$root/$file") ];
+}
+
+sub sub_unused    { return "Sub $_[0] is never called from bin/ or lib/" }
+sub global_unused { return "Global $_[0] is never used in bin/, lib/, t/ or xt/" }
+sub const_unused  { return "Constant $_[0] is never used in bin/, lib/, t/ or xt/" }
+
+my $FOO_BAR = "package Foo;\nsub bar { 1 }\n1;\n";
+
+subtest 'what it reports' => sub {
+    my @cases = (
+        [ 'a sub nothing calls', { 'lib/Foo.pm' => $FOO_BAR }, 'lib/Foo.pm', [ sub_unused('Foo::bar') ] ],
+        [
+            'a sub only a test calls',
+            { 'lib/Foo.pm' => $FOO_BAR, 't/foo.t' => "use Foo;\nFoo::bar();\n", 'xt/foo.t' => "Foo->bar;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a sub that only calls itself',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { return bar() }\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a method that only calls itself',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { my \$s = shift; return \$s->bar }\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a sub with the same name in another package, called qualified',
+            { 'lib/Foo.pm' => $FOO_BAR, 'lib/Baz.pm' => "package Baz;\nsub bar { 1 }\nBaz::bar();\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a sub with the same name in another package, called unqualified',
+            { 'lib/Foo.pm' => $FOO_BAR, 'lib/Baz.pm' => "package Baz;\nsub bar { 1 }\nbar();\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a call after a package block has ended',
+            { 'lib/Foo.pm' => "package Foo {\n    sub bar { 1 }\n}\nbar();\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a string that spells the name',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\nmy \$c = __PACKAGE__->can('bar');\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a hash key that spells the name',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\nmy \$y = \$h{ bar };\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a string that spells the name inside an interpolated expression',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\nprint \"\@{[ 'bar' ]}\";\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a string that spells the name as a braced variable',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\nprint \"\${bar} \@{bar}\";\n1;\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a method call escaped inside a string',
+            { 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nprint \"\\\@{[ \$obj->bar ]}\";\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a method call inside a string that does not interpolate',
+            { 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nprint '\@{[ \$obj->bar ]}';\n" },
+            'lib/Foo.pm', [ sub_unused('Foo::bar') ],
+        ],
+        [
+            'a sub in a script nothing calls',
+            { 'bin/tool' => "#!/usr/bin/env perl\nsub usage { 1 }\n" },
+            'bin/tool', [ sub_unused('main::usage') ],
+        ],
+        [
+            'a global nothing reads',
+            { 'lib/Foo.pm' => "package Foo;\nour \$x = 1;\n1;\n" },
+            'lib/Foo.pm', [ global_unused('$Foo::x') ],
+        ],
+        [
+            'each unused global in one our',
+            { 'lib/Foo.pm' => "package Foo;\nour ( \$x, \@y, \%z );\nmy \$n = \@y;\n1;\n" },
+            'lib/Foo.pm', [ global_unused('$Foo::x'), global_unused('%Foo::z') ],
+        ],
+        [
+            'a constant nothing names',
+            { 'lib/Foo.pm' => "package Foo;\nuse constant PI => 3;\n1;\n" },
+            'lib/Foo.pm', [ const_unused('Foo::PI') ],
+        ],
+        [
+            'the unused one of a constant list',
+            { 'lib/Foo.pm' => "package Foo;\nuse constant { A => 1, B => 2 };\nmy \$x = A;\n1;\n" },
+            'lib/Foo.pm', [ const_unused('Foo::B') ],
+        ],
+    );
+
+    foreach my $case (@cases) {
+        my ( $name, $files, $file, $expected ) = @$case;
+        is_deeply( found( dist(%$files), $file ), $expected, $name );
+    }
+};
+
+subtest 'what it deliberately says nothing about' => sub {
+    my @cases = (
+        [
+            'a sub another module calls',
+            { 'lib/Foo.pm' => $FOO_BAR, 'lib/Baz.pm' => "package Baz;\nFoo::bar();\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a sub a script calls, the script having no extension',
+            { 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nuse Foo;\nFoo::bar();\n" },
+            'lib/Foo.pm',
+        ],
+        [ 'a sub its own package calls', { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\nbar();\n1;\n" }, 'lib/Foo.pm' ],
+        [
+            'a sub the same package calls from another file',
+            { 'lib/Foo.pm' => $FOO_BAR, 'lib/Foo/More.pm' => "package Foo;\nbar();\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a sub called as a method',
+            { 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nFoo->new->bar;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a sub called through SUPER',
+            { 'lib/Foo.pm' => $FOO_BAR, 'lib/Kid.pm' => "package Kid;\nsub baz { \$_[0]->SUPER::bar() }\n1;\n" },
+            'lib/Foo.pm',
+        ],
+        [ 'a sub called with &', { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\n&bar;\n1;\n" }, 'lib/Foo.pm' ],
+        [
+            'a sub taken by reference',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\nmy \$code = \\&bar;\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a sub reached through its glob',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\nmy \$code = *bar{CODE};\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a sub called as a fully qualified method',
+            { 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\n\$obj->Foo::bar;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a sub called as a method inside a hash subscript',
+            { 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nmy \$y = \$h{ \$obj->bar };\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a sub called as a method inside an array subscript',
+            { 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nmy \$y = \$a[ Foo->bar ];\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a sub called as a method inside a heredoc',
+            { 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nprint <<\"END\";\n\@{[ \$obj->bar ]}\nEND\n" },
+            'lib/Foo.pm',
+        ],
+        [
+            'a sub called as a method inside a string, through a scalar reference',
+            { 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nprint \"\${\\ \$obj->bar }\";\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a sub called as a method inside a block inside a string',
+            { 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nprint \"\@{[ map { \$_->bar } \@x ]}\";\n" },
+            'lib/Foo.pm',
+        ],
+        [
+            'a sub called inside a string by its own package',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\nprint \"\@{[ bar() ]}\";\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a sub exported by another package on its behalf',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\npackage main;\npush \@Foo::EXPORT_OK, 'bar';\n1;\n" },
+            'lib/Foo.pm',
+        ],
+        [
+            'a sub in a script the script calls',
+            { 'bin/tool' => "#!/usr/bin/env perl\nsub usage { 1 }\nusage();\n" }, 'bin/tool',
+        ],
+        [
+            'a global only a test reads',
+            { 'lib/Foo.pm' => "package Foo;\nour \$x = 1;\n1;\n", 't/foo.t' => "local \$Foo::x = 2;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a global only an author test reads',
+            { 'lib/Foo.pm' => "package Foo;\nour \$x = 1;\n1;\n", 'xt/foo.t' => "print \$Foo::x;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a global read inside a string',
+            { 'lib/Foo.pm' => "package Foo;\nour \$x = 1;\n1;\n", 't/foo.t' => qq{print "\$Foo::x\\n";\n} },
+            'lib/Foo.pm',
+        ],
+        [
+            'a global read inside a heredoc',
+            { 'lib/Foo.pm' => "package Foo;\nour \$x = 1;\nprint <<\"END\";\n\$x\nEND\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'an array read by element',
+            { 'lib/Foo.pm' => "package Foo;\nour \@x = (1);\nmy \$y = \$x[0];\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'an array read by its last index',
+            { 'lib/Foo.pm' => "package Foo;\nour \@x = (1);\nmy \$y = \$#x;\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a hash read by key',
+            { 'lib/Foo.pm' => "package Foo;\nour \%h = ( a => 1 );\nmy \$y = \$h{a};\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a hash read by key inside a string',
+            { 'lib/Foo.pm' => "package Foo;\nour \%h = ( a => 1 );\nprint \"\$h{a}\";\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a hash read by slice inside a string',
+            { 'lib/Foo.pm' => "package Foo;\nour \%h = ( a => 1 );\nprint \"\@h{'a'}\";\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a constant whose name is quoted',
+            { 'lib/Foo.pm' => "package Foo;\nuse constant 'PI' => 3;\nmy \$x = PI;\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a constant only a test names',
+            { 'lib/Foo.pm' => "package Foo;\nuse constant PI => 3;\n1;\n", 't/foo.t' => "my \$x = Foo::PI;\n" },
+            'lib/Foo.pm',
+        ],
+        [
+            'a constant named as a method',
+            { 'lib/Foo.pm' => "package Foo;\nuse constant PI => 3;\nmy \$x = __PACKAGE__->PI;\n1;\n" }, 'lib/Foo.pm',
+        ],
+        [
+            'a constant another constant names',
+            { 'lib/Foo.pm' => "package Foo;\nuse constant A => 1;\nuse constant B => A + 1;\nmy \$x = B;\n1;\n" },
+            'lib/Foo.pm',
+        ],
+        [
+            'anything exported',
+            {
+                'lib/Foo.pm' => "package Foo;\nuse parent 'Exporter';\nour \@EXPORT_OK = qw{bar \$x};\n" . "our \@EXPORT = ('baz');\nour \$x = 1;\nsub bar { 1 }\nsub baz { 1 }\n1;\n",
+            },
+            'lib/Foo.pm',
+        ],
+        [
+            'anything in an export tag',
+            { 'lib/Foo.pm' => "package Foo;\nour \%EXPORT_TAGS = ( all => [qw{bar}] );\nsub bar { 1 }\n1;\n" },
+            'lib/Foo.pm',
+        ],
+        [
+            'what perl calls or reads for you',
+            {
+                'lib/Foo.pm' => "package Foo;\nour \$VERSION = 1;\nour \@ISA = ();\n" . "sub DESTROY { 1 }\nsub BUILD { 1 }\nsub import { 1 }\nsub FETCH { 1 }\n1;\n",
+            },
+            'lib/Foo.pm',
+        ],
+        [ 'a forward declaration', { 'lib/Foo.pm' => "package Foo;\nsub bar;\n1;\n" }, 'lib/Foo.pm' ],
+        [
+            'a helper defined in a test',
+            { 't/foo.t' => "sub helper { 1 }\nour \$x = 1;\n", 't/lib/Helper.pm' => "package Helper;\nsub h { 1 }\n1;\n" },
+            't/foo.t',
+        ],
+        [
+            'a helper in a test library',
+            { 't/lib/Helper.pm' => "package Helper;\nsub h { 1 }\n1;\n" }, 't/lib/Helper.pm',
+        ],
+        [
+            'a file outside bin/ and lib/',
+            { 'Makefile.PL' => "sub MY::postamble { 1 }\n" }, 'Makefile.PL',
+        ],
+        [
+            'no dist.ini, and the root found from lib/ instead',
+            { 'dist.ini' => undef, 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nFoo::bar();\n" },
+            'lib/Foo.pm',
+        ],
+        [
+            'an explicit no critic',
+            { 'lib/Foo.pm' => "package Foo;\nsub bar { 1 }    ## no critic (ProhibitUnusedDefinitions)\n1;\n" },
+            'lib/Foo.pm',
+        ],
+    );
+
+    foreach my $case (@cases) {
+        my ( $name, $files, $file ) = @$case;
+        is_deeply( found( dist(%$files), $file ), [], $name );
+    }
+
+    is( scalar critic()->critique( \$FOO_BAR ), 0, 'source with no file name belongs to no distribution' );
+};
+
+subtest 'more names can be allowed, and are added to the defaults' => sub {
+    my $root = dist(
+        'lib/Foo.pm' => "package Foo;\nsub bar { 1 }\nsub qux { 1 }\nsub DESTROY { 1 }\n" . "our \$x = 1;\nour \$y = 1;\nour \$VERSION = 1;\n1;\n",
+    );
+
+    my $critic = critic( \"[ProhibitUnusedDefinitions]\nallow_subs = bar\nallow_globals = \$Foo::x\n" );
+    is_deeply(
+        found( $root, 'lib/Foo.pm', $critic ),
+        [ sub_unused('Foo::qux'), global_unused('$Foo::y') ],
+        'a bare sub name and a qualified global are exempt; DESTROY and $VERSION still are'
+    );
+
+    $critic = critic( \"[ProhibitUnusedDefinitions]\nallow_subs = Foo::qux\nallow_globals = \$y\n" );
+    is_deeply(
+        found( $root, 'lib/Foo.pm', $critic ),
+        [ sub_unused('Foo::bar'), global_unused('$Foo::x') ],
+        'and the other way about: a qualified sub and a bare global'
+    );
+};
+
+subtest 'code in a string that PPI cannot parse is skipped, not fatal' => sub {
+
+    my $root = dist( 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nprint \"\@{[ \$obj->bar ]}\";\n" );
+
+    # Built first, because building a Perl::Critic builds every installed
+    # policy, and some of those parse source from a scalar reference too.
+    my $critic = critic();
+
+    # Only a scalar reference is refused, which is how the policy hands PPI the
+    # code inside a string.  Files, the one being critiqued included, still parse.
+    my $new = PPI::Document->can('new');
+    my $ppi = Test::MockModule->new('PPI::Document');
+    $ppi->redefine( new => sub { return ref $_[1] eq 'SCALAR' ? undef : $new->(@_) } );
+
+    is_deeply( found( $root, 'lib/Foo.pm', $critic ), [ sub_unused('Foo::bar') ], 'the call it could not read is not a use' );
+};
+
+subtest 'the distribution is read once' => sub {
+    my $root = dist( 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nFoo::bar();\n" );
+    is_deeply( found( $root, 'lib/Foo.pm' ), [], 'called from the script' );
+
+    # Take the call away.  A new Perl::Critic, but the same distribution, so the
+    # same index -- which still has the call in it.
+    dist_file( $root, 'bin/tool', "#!/usr/bin/env perl\n" );
+    is_deeply( found( $root, 'lib/Foo.pm' ), [], 'the index built the first time is the one used' );
+
+    my $fresh = dist( 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\n" );
+    is_deeply( found( $fresh, 'lib/Foo.pm' ), [ sub_unused('Foo::bar') ], 'while another distribution gets its own' );
+};
+
+Test::NoWarnings::had_no_warnings();
+
+done_testing;

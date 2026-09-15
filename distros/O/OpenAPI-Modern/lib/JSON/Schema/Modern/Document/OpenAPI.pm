@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.147';
+our $VERSION = '0.148';
 
 use 5.020;
 use utf8;
@@ -256,7 +256,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
-  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @server_paths, %tag_operation_paths, @bad_3_0_paths, @references);
+  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @server_paths, @security_requirements, %tag_operation_paths, @bad_3_0_paths, @references);
   my $result = $evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
@@ -350,6 +350,9 @@ sub traverse ($self, $evaluator, $config_override = {}) {
           }
 
           push @server_paths, $state->{data_path} if $schema->{'$ref'} eq '#/$defs/server';
+
+          push @security_requirements, [ $state->{data_path}, $data ]
+            if $schema->{'$ref'} eq '#/$defs/security-requirement';
 
           return 1;
         },
@@ -518,6 +521,23 @@ sub traverse ($self, $evaluator, $config_override = {}) {
             'circular reference between tags: '.join(' -> ', map '"'.$_.'"', @seen, $tag->{name})),
           last
         if grep $_ eq $tag->{name}, @seen;
+    }
+  }
+
+  foreach my $sec_req_entry (@security_requirements) {
+    # name must be under components, or a URI. if uri, add to the list of references to check.
+    my ($location, $security_requirement) = $sec_req_entry->@*;
+
+    foreach my $name (keys $security_requirement->%*) {
+      if (not exists((($schema->{components}//{})->{securitySchemes}//{})->{$name})) {
+        if ($name =~ m/^[a-zA-Z0-9._-]+\z/) {
+          ()= E({ %$state, keyword_path => jsonp($location, $name) },
+            'security scheme "%s" does not exist at "/components/securitySchemes"', $name);
+        }
+        else {
+          push @references, [ undef, jsonp($location, $name), Mojo::URL->new($name)->to_abs($self->canonical_uri), 'security-scheme' ];
+        }
+      }
     }
   }
 
@@ -762,7 +782,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.147
+version 0.148
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

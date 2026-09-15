@@ -45,11 +45,13 @@ subtest 'Listener reuses one raw callback for accepted Streams' => sub {
         loop => $loop,
         host => '127.0.0.1',
         port => 0,
-        stream_class => 'T::ListenerCallbacks::Raw',
-        data => $state,
-        on_data => $callback,
-        on_ready => sub ($stream) { $stream->data->{ready}++ },
-        on_close => sub ($stream) { $stream->data->{close}++ },
+        stream => {
+            class => 'T::ListenerCallbacks::Raw',
+            data => $state,
+            on_data => $callback,
+            on_ready => sub ($stream) { $stream->data->{ready}++ },
+            on_close => sub ($stream) { $stream->data->{close}++ },
+        },
     );
     undef $callback;
     ok(defined($weak), 'Listener retains one shared callback CV');
@@ -78,11 +80,13 @@ subtest 'Listener propagates framed constructor callback' => sub {
         loop => $loop,
         host => '127.0.0.1',
         port => 0,
-        stream_class => 'T::ListenerCallbacks::Line',
-        on_message => sub ($stream, $value) {
-            push @message, $value;
-            $stream->close;
-            $loop->stop;
+        stream => {
+            class => 'T::ListenerCallbacks::Line',
+            on_message => sub ($stream, $value) {
+                push @message, $value;
+                $stream->close;
+                $loop->stop;
+            },
         },
     );
     my $client = client_for($listener, "line\n");
@@ -97,8 +101,10 @@ subtest 'Listener validates callback templates before accepting' => sub {
     my $made = eval {
         Linux::Event::IO::Sock::Listener->new(
             host => '127.0.0.1', port => 0,
-            stream_class => 'T::ListenerCallbacks::Raw',
-            on_message => sub { },
+            stream => {
+                class => 'T::ListenerCallbacks::Raw',
+                on_message => sub { },
+            },
         );
         1;
     };

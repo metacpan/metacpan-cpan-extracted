@@ -1,5 +1,8 @@
 Revision history for Test-Fatal
 
+0.019     2026-09-13 16:06:25+10:00 Australia/Melbourne
+        - lower required Perl to v5.8
+
 0.018     2025-11-06 12:47:58-05:00 America/Toronto
         - now requires perl v5.12.0
         - now tolerant of false exceptions coming from a boolean-overloaded

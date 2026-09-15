@@ -12,5 +12,11 @@ t/00_compile.t
 t/01_simple.t
 t/02_method.t
 t/03_leak.t
+t/04_lifetime.t
+t/05_signatures.t
+t/06_properties.t
+t/07_named_parameters.t
+t/08_unicode.t
+t/09_booleans.t
 META.yml
 MANIFEST

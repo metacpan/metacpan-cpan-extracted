@@ -7,7 +7,7 @@ use Test::More;
 
 {
 	package Stringy::Object;
-	use overload '""' => sub { shift->$* }, fallback => 1;
+	use overload '""' => sub { ${ shift() } }, fallback => 1;
 	sub new {
 		my ($pkg, $str) = @_;
 		bless \(my $o = $str), $pkg;

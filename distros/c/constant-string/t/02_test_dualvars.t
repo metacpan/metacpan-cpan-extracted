@@ -20,7 +20,7 @@ ok( THREE == 3, 'THREE is a constant with the numeric value 3' );
 
 ok( ONE   eq 'ONE',   'ONE is a constant with the string value "ONE"');
 ok( TWO   eq 'TWO',   'TWO is a constant with the string value "TWO"' );
-ok( THREE eq 'THREE', 'THREEE is a constant with the string value "THREE"' );
+ok( THREE eq 'THREE', 'THREE is a constant with the string value "THREE"' );
 
 
 

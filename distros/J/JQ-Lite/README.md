@@ -29,7 +29,7 @@ It is particularly suited for:
 jq-lite is available as an **official Alpine Linux package**:
 
 ```bash
-apk add perl-jq-lite
+apk add jq-lite # or perl-jq-lite
 ```
 
 ---
@@ -198,7 +198,7 @@ Administrator privileges are not required.
 
 ```dockerfile
 FROM alpine
-RUN apk add --no-cache perl-jq-lite
+RUN apk add --no-cache jq-lite # or perl-jq-lite
 ```
 
 jq-lite can be used as a **container-standard JSON processing tool**
@@ -232,6 +232,8 @@ for compatibility guarantees.
 * [`docs/library-contract.md`](docs/library-contract.md) — **stable Library API compatibility contract**
 * [`docs/library-integration.md`](docs/library-integration.md) — examples for downstream Perl/CPAN users
 * [`docs/FUNCTIONS.md`](docs/FUNCTIONS.md) — supported jq functions
+* [`docs/jq-semantics-differences.md`](docs/jq-semantics-differences.md) — jq 1.7 semantic differences in the current 2.x series
+* [`docs/v3-roadmap.md`](docs/v3-roadmap.md) — compatibility policy, migration plan, and release criteria for JQ::Lite 3.0
 * [`docs/DESIGN.md`](docs/DESIGN.md) — design principles and scope
 * [CPAN documentation](https://metacpan.org/pod/JQ::Lite)
 

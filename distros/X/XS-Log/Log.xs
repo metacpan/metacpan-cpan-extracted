@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : bTO8KdNuOXUI/qjnYirIyg
-* Build Time : 2025-09-23 11:51:03
-* Version    : 5.090124
+* Build  MD5 : Z2kKlVGmp8wl2Wxaqiw2Kw
+* Build Time : 2026-09-14 02:16:18
+* Version    : 6.090001
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "EXTERN.h"
@@ -76,6 +76,12 @@ setLogOptions(key, val)
     // 成功返回 SV* 类型的 true（Perl 中的真值）
     ST(0) = sv_2mortal(newSViv(1));
 
+
+void
+setLogLevel(flag)
+    int flag
+  CODE:
+    setLogLevel(flag);
 
 void
 setLogColor(flag)

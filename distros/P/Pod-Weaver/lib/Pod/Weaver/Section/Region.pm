@@ -1,11 +1,11 @@
-package Pod::Weaver::Section::Region 4.021;
+package Pod::Weaver::Section::Region 4.022;
 # ABSTRACT: find a region and put its contents in place where desired
 
 use Moose;
 with 'Pod::Weaver::Role::Section';
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -167,7 +167,7 @@ Pod::Weaver::Section::Region - find a region and put its contents in place where
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

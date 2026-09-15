@@ -80,13 +80,12 @@ les_maybe_drain_transition(pTHX_ les_xsstate_t *st)
 {
     if (!st->write_blocked)
         return;
-    if (st->pending_bytes > st->descriptor->low_watermark)
+    if (st->pending_bytes > st->low_watermark)
         return;
 
     st->write_blocked = 0;
     les_call_drain(aTHX_ st);
 }
-
 
 /*
  * Submit application bytes.  This function preserves write ordering: direct
@@ -163,8 +162,11 @@ les_write_submit(pTHX_ les_xsstate_t *st, SV *bytes_sv)
 
     if (!st->closed && off < len) {
         UV remaining = (UV)(len - off);
-        UV limit = st->descriptor->max_pending_bytes;
+        UV limit = st->max_pending_bytes;
 
+        /* Lowering max_pending_bytes never discards an existing queue. While
+         * the queue is above the new limit, any operation that would grow it
+         * fails until ordinary draining brings it back below the limit. */
         if (limit && (remaining > limit
             || st->pending_bytes > limit - remaining)) {
             UV attempted = st->pending_bytes;
@@ -178,8 +180,7 @@ les_write_submit(pTHX_ les_xsstate_t *st, SV *bytes_sv)
         les_queue_bytes(st, data + off, len - off);
     }
 
-    if (!st->write_blocked
-        && st->pending_bytes > st->descriptor->high_watermark)
+    if (!st->write_blocked && st->pending_bytes > st->high_watermark)
         st->write_blocked = 1;
 
     return (st->write_blocked ? 0 : LES_WRITE_FLOW_OK)
@@ -217,7 +218,6 @@ les_write_ready(pTHX_ les_xsstate_t *st)
             const char *pv = SvPV(seg->sv, pvlen);
             STRLEN avail = seg->len - seg->off;
 
-            /* seg->sv is created by newSVpvn(), so pvlen should equal len. */
             if (seg->off > pvlen || avail > pvlen - seg->off)
                 croak("internal Stream write segment bounds corrupted");
 

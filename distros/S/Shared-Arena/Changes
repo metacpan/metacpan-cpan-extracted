@@ -1,5 +1,22 @@
 Revision history for Shared::Arena
 
+0.05	2026-09-11
+        - FIXES the build on a C89 compiler, gcc 4.2.1 on the FreeBSD 9 smoker,
+          which refused 0.03 and 0.04 with "redefinition of typedef": four
+          tenants typedef-named their struct where the ABI header forward
+          declares it.i
+
+0.04	2026-09-11
+        - Add Shared::Arena::HyperLogLog, how many distinct keys in a few
+          kilobytes: an add is a lock-free max, so a pool shares one sketch
+          with nothing to contend on, and two sketches merge into their union.
+        - ABI version 3.
+        - FIXES two smoker FAILs on a two-processor box. t/22-cache.t let
+          children churn while a sibling was still reading; they now wait
+          until every read is reported. t/08-mpsc.t asserted the READER saw
+          several children, which needs the parent scheduled mid-storm; it
+          now asserts the children's sequence ranges overlapped.
+
 0.03	2026-09-11
         - Add Shared::Arena::Cuckoo, a shared filter that can remove a key.
         - Add Shared::Arena::Scoreboard, one row per worker published live:

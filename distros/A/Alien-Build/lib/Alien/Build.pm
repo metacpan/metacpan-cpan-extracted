@@ -12,7 +12,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.84'; # VERSION
+our $VERSION = '2.87'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1009,10 +1009,7 @@ sub test
 sub clean_install
 {
   my($self) = @_;
-  if($self->install_type eq 'share')
-  {
-    $self->_call_hook("clean_install");
-  }
+  $self->_call_hook("clean_install");
 }
 
 
@@ -1109,6 +1106,20 @@ sub add_requires
     { $self->{require}->{$phase}->{$module} = $version }
   }
   $self;
+}
+
+
+sub has_requires
+{
+  my $self = shift;
+  my $phase = shift;
+  my @has = keys %{ $self->{require}->{$phase} };
+  while(@_)
+  {
+    my $pattern = shift;
+    for (@has) { return 1 if index($_, $pattern) != -1; }
+  }
+  return ();
 }
 
 
@@ -1415,7 +1426,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.84
+version 2.87
 
 =head1 SYNOPSIS
 
@@ -2355,8 +2366,6 @@ Clean files from the final install location.  The default implementation removes
 files recursively except for the C<_alien> directory.  This is helpful when you have
 an old install with files that may break the new build.
 
-For a non-share install this doesn't do anything.
-
 =head2 system
 
  $build->system($command);
@@ -2406,6 +2415,13 @@ Add the requirement to the given phase.  Phase should be one of:
 =item system
 
 =back
+
+=head2 has_requires
+
+ if (Alien::Build->meta->has_requires($phase, $module_pat, ...)) {...}
+
+Tests to see if the given phase has any of the given substrings as
+a requirement. Phase as L</add_requires>.
 
 =head2 interpolator
 
@@ -2703,6 +2719,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 nick nauwelaerts (INPHOBIA)
 
 Florian Weimer
+
+Marcel Telka (mtelka)
 
 =head1 COPYRIGHT AND LICENSE
 

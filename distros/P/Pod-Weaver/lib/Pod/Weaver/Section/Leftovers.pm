@@ -1,4 +1,4 @@
-package Pod::Weaver::Section::Leftovers 4.021;
+package Pod::Weaver::Section::Leftovers 4.022;
 # ABSTRACT: a place to put everything that nothing else used
 
 use Moose;
@@ -6,7 +6,7 @@ with 'Pod::Weaver::Role::Section',
      'Pod::Weaver::Role::Finalizer';
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -85,7 +85,7 @@ Pod::Weaver::Section::Leftovers - a place to put everything that nothing else us
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

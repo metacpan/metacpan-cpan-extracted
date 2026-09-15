@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::NextRelease 6.038;
+package Dist::Zilla::Plugin::NextRelease 6.039;
 # ABSTRACT: update the next release number in your changelog
 
 use Moose;
@@ -283,7 +283,7 @@ Dist::Zilla::Plugin::NextRelease - update the next release number in your change
 
 =head1 VERSION
 
-version 6.038
+version 6.039
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,39 @@
+---
+abstract: 'Build & install raylib 6 (a C game/multimedia library) via xrepo'
+author:
+  - 'Sanko Robinson'
+build_requires:
+  Alien::Xrepo::MM: '0'
+  Test2::V0: '0'
+configure_requires:
+  Alien::Xrepo::MM: '0'
+  ExtUtils::MakeMaker: '0'
+  perl: v5.40.0
+dynamic_config: 1
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
+keywords: []
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Exotic-Raylib6
+no_index:
+  directory:
+    - eg
+    - t
+provides:
+  Exotic::Raylib6:
+    file: lib/Exotic/Raylib6.pm
+    version: v1.0.0
+requires:
+  Alien::Xrepo::Runtime: '0'
+  File::ShareDir: '1.00'
+resources:
+  license: http://www.zlib.net/zlib_license.html
+version: v1.0.0
+x_ignore:
+  - .tidyallrc
+  - .gitignore
+  - .clang-format
+  - .github/**
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

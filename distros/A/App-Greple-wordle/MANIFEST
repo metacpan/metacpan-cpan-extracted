@@ -1,6 +1,4 @@
-AGENTS.md
 Build.PL
-CLAUDE.md
 Changes
 LICENSE
 MANIFEST.SKIP
@@ -8,14 +6,14 @@ META.json
 README.md
 cpanfile
 lib/App/Greple/wordle.pm
-lib/App/Greple/wordle.pod
 lib/App/Greple/wordle/NYT.pm
 lib/App/Greple/wordle/ORIGINAL.pm
 lib/App/Greple/wordle/game.pm
-lib/App/Greple/wordle/util.pm
-lib/App/Greple/wordle/word_all.pm
-lib/App/Greple/wordle/word_hidden.pm
 minil.toml
 t/00_compile.t
+t/01_nyt_fetch.t
+t/02_setup_fetch.t
+t/03_guess_color.t
+t/04_default_data.t
 META.yml
 MANIFEST

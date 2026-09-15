@@ -74,4 +74,30 @@ subtest 'is_enabled is false outside the configured enabled_environments' => sub
     is($config->is_enabled, 0);
 };
 
+subtest 'track_performance defaults to true' => sub {
+    my $config = ForgeOps::Tracker::Configuration->new;
+
+    is($config->{track_performance}, 1);
+};
+
+subtest 'performance_flush_interval defaults to 60 seconds' => sub {
+    my $config = ForgeOps::Tracker::Configuration->new;
+
+    is($config->{performance_flush_interval}, 60);
+};
+
+subtest 'performance_samples_uri swaps events for performance_samples' => sub {
+    my $config = new_configuration();
+    $config->{dsn} = 'https://secret-key@tracker.example.com/api/v1/events';
+
+    is($config->performance_samples_uri, 'https://tracker.example.com/api/v1/performance_samples');
+};
+
+subtest 'performance_samples_uri is undef with no DSN' => sub {
+    my $config = new_configuration();
+    $config->{dsn} = undef;
+
+    is($config->performance_samples_uri, undef);
+};
+
 done_testing;

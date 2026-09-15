@@ -132,6 +132,7 @@ PPCODE:
     if (GIMME_V == G_ARRAY) {
         AV *av_result = (AV *)SvRV(result);
         IV len = av_len(av_result) + 1;
+        EXTEND(SP, len);
         for (IV i = 0; i < len; i++)
             ST(i) = AV_FETCH_MUST(av_result, i);
         XSRETURN(len);

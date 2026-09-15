@@ -1,0 +1,39 @@
+---
+abstract: 'Build & install the ninja build tool via xrepo'
+author:
+  - 'Sanko Robinson'
+build_requires:
+  Alien::Xrepo::MB: '0'
+  Test2::V0: '0'
+configure_requires:
+  Alien::Xrepo::MB: '0'
+  Module::Build: '0'
+  perl: v5.40.0
+dynamic_config: 1
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
+keywords: []
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Exotic-Ninja
+no_index:
+  directory:
+    - eg
+    - t
+provides:
+  Exotic::Ninja:
+    file: lib/Exotic/Ninja.pm
+    version: v1.0.0
+requires:
+  Alien::Xrepo::Runtime: '0'
+  File::ShareDir: '1.00'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: v1.0.0
+x_ignore:
+  - .tidyallrc
+  - .gitignore
+  - .clang-format
+  - .github/**
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

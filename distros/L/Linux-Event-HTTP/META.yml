@@ -1,0 +1,71 @@
+---
+abstract: 'Native high-performance HTTP protocol support for Linux::Event'
+author:
+  - 'Joshua S. Day <hax@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-Event-HTTP
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Linux::Event::HTTP::_ClientAuth
+    - Linux::Event::HTTP::_ClientConnect
+    - Linux::Event::HTTP::_ClientUpgrade
+    - Linux::Event::HTTP::_HTTP1
+    - Linux::Event::HTTP::_HTTP1::Chunked
+    - Linux::Event::HTTP::_ServerConnect
+    - Linux::Event::HTTP::_Upgrade
+provides:
+  Linux::Event::HTTP:
+    file: lib/Linux/Event/HTTP.pm
+    version: '0.001'
+  Linux::Event::HTTP::Body::Stream:
+    file: lib/Linux/Event/HTTP/Body/Stream.pm
+    version: '0.001'
+  Linux::Event::HTTP::Client:
+    file: lib/Linux/Event/HTTP/Client.pm
+    version: '0.001'
+  Linux::Event::HTTP::Client::Connection:
+    file: lib/Linux/Event/HTTP/Client/Connection.pm
+    version: '0.001'
+  Linux::Event::HTTP::Client::Operation:
+    file: lib/Linux/Event/HTTP/Client/Operation.pm
+    version: '0.001'
+  Linux::Event::HTTP::Request:
+    file: lib/Linux/Event/HTTP/Request.pm
+    version: '0.001'
+  Linux::Event::HTTP::Response:
+    file: lib/Linux/Event/HTTP/Response.pm
+    version: '0.001'
+  Linux::Event::HTTP::Server:
+    file: lib/Linux/Event/HTTP/Server.pm
+    version: '0.001'
+  Linux::Event::HTTP::Server::Connection:
+    file: lib/Linux/Event/HTTP/Server/Connection.pm
+    version: '0.001'
+  Linux::Event::HTTP::Transaction:
+    file: lib/Linux/Event/HTTP/Transaction.pm
+    version: '0.001'
+requires:
+  HTTP::CookieJar: '0.014'
+  Linux::Event: '0.113'
+  URI: '0'
+  Uniform::HTTP::Auth: '0.02'
+  perl: '5.036000'
+resources:
+  bugtracker: https://github.com/haxmeister/perl-Linux-Event-HTTP/issues
+  homepage: https://github.com/haxmeister/perl-Linux-Event-HTTP
+  repository: https://github.com/haxmeister/perl-Linux-Event-HTTP.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

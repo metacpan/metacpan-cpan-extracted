@@ -7,7 +7,6 @@ build_requires:
   IPC::System::Simple: '0'
   Readonly: '0'
   Test::DescribeMe: '0'
-  Test::HTML::T5: '0'
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0.13'
   Test::Most: '0'
@@ -18,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150014'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,6 +27,9 @@ no_index:
   directory:
     - t
     - inc
+optional_features:
+  html_testing:
+    description: 'Test the HTML output'
 requires:
   ExtUtils::MakeMaker: '6.64'
   JSON::MaybeXS: '0'
@@ -35,5 +37,5 @@ requires:
   Params::Get: '0'
   Scalar::Util: '0'
 resources: {}
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

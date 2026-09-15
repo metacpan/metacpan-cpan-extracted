@@ -15,10 +15,13 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-use v5.36;
-
 package Fugu::KeyDir;
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
+
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 
 # Fugu::KeyDir - the names, the order and the generated text of a
 # published key directory.
@@ -28,6 +31,11 @@ our $VERSION = '0.4.0';
 # pattern, the type of a key, and the status vocabulary. It also
 # holds the order of a key set, and the text of the Apache KEYS
 # file, of the human index, and of security.txt.
+#
+# The module also holds the name of a binding, and the retention
+# rule of a set of bindings. A binding is the signature of one key
+# file by another key. The caller names the root key, because the
+# module holds no purpose.
 #
 # The module holds no policy. The organization word, each purpose,
 # the contact and each date are arguments. A site build supplies
@@ -63,13 +71,28 @@ my %STATUS_RANK = do {
 use constant MAX_SERIAL_DIGITS => 9;
 
 # The extension of a key file selects its type. OpenBSD names a
-# signify key .pub, and the armored OpenPGP convention is .asc.
+# signify key .pub, and the armored OpenPGP convention is .asc. A
+# key directory publishes a certificate as PEM, so an X.509 key
+# file is .pem.
 my %TYPE_OF_EXTENSION = (
 	pub => 'signify',
 	asc => 'openpgp',
+	pem => 'x509',
 );
 
 my %EXTENSION_OF_TYPE = reverse %TYPE_OF_EXTENSION;
+
+# The extension of a binding names the type of its signer. signify(1)
+# writes a detached signature .sig, and the armored OpenPGP convention
+# is .asc. A detached CMS signature of an X.509 signer takes .p7s by
+# convention. A later signer type adds its own extension.
+my %TYPE_OF_BINDING_EXTENSION = (
+	sig => 'signify',
+	asc => 'openpgp',
+	p7s => 'x509',
+);
+
+my %BINDING_EXTENSION_OF_TYPE = reverse %TYPE_OF_BINDING_EXTENSION;
 
 # Fugu::KeyDir->new(%args):
 #	Build a key directory.
@@ -206,7 +229,7 @@ sub parse_name ( $self, $filename )
 #	%args:
 #		serial  => $n     # Required: above zero
 #		purpose => $word  # Required
-#		type    => $type  # Required: signify or openpgp
+#		type    => $type  # Required: signify, openpgp or x509
 #
 #	The method is the inverse of parse_name, so a caller never
 #	builds a name by hand. It returns undef on every failure, and
@@ -247,6 +270,125 @@ sub name_for ( $self, %args )
 	}
 
 	return "$self->{org}-$serial-$purpose.$extension";
+}
+
+# $self->parse_binding($filename):
+#	The parts of a binding file name, as a hash reference with
+#	target, signer and type. The method returns undef on every
+#	failure, and error holds the reason.
+#
+#	A binding is the signature of one key file by another key, and
+#	the name is <target file>.<signer stem>.<ext>. The extension
+#	names the type of the signer: sig for a signify signer, asc
+#	for an OpenPGP signer, and p7s for an X.509 signer.
+#
+#	The target and the signer are each a key file name. The name
+#	of a binding holds the stem of the signer, and the method
+#	completes it with the key extension of the type, such as
+#	fugubsd-1-root.pub. The answer therefore feeds binding_for,
+#	which names the same file again.
+sub parse_binding ( $self, $filename )
+{
+	$self->{error} = undef;
+
+	unless ( defined $filename && length $filename ) {
+		return $self->_fail('the binding file name is empty');
+	}
+
+	# A name is a file name and never a path, as in parse_name.
+	if ( $filename =~ m{/} ) {
+		return $self->_fail(
+			"the binding name holds a solidus: $filename");
+	}
+
+	# Neither a stem nor an extension holds a full stop, so the
+	# name splits into exactly four fields: the stem and the
+	# extension of the target, the stem of the signer, and the
+	# extension of the binding.
+	my @field = split /\./, $filename, -1;
+	unless ( @field == 4 ) {
+		return $self->_fail( 'the binding name does not match '
+			    . "<target file>.<signer stem>.<ext>: $filename" );
+	}
+
+	my $target    = "$field[0].$field[1]";
+	my $extension = $field[3];
+
+	my $type = $TYPE_OF_BINDING_EXTENSION{$extension};
+	unless ( defined $type ) {
+		return $self->_fail(
+			"unknown binding extension in $filename: $extension");
+	}
+
+	# The name holds the stem of the signer, and the answer holds
+	# its key file name: the key extension of the type completes
+	# the stem. The answer therefore feeds binding_for, and no
+	# caller holds a second copy of the extension table.
+	my $signer = $field[2] . '.' . $EXTENSION_OF_TYPE{$type};
+
+	# Each half is a key name, so parse_name holds it to the
+	# pattern and to the organization word. That method records a
+	# reason of its own, and this one reads the reason before
+	# _fail replaces it.
+	unless ( $self->parse_name($target) ) {
+		return $self->_fail(
+			"the target of $filename is no key name: "
+			    . $self->{error} );
+	}
+
+	unless ( $self->parse_name($signer) ) {
+		return $self->_fail(
+			"the signer of $filename is no key name: "
+			    . $self->{error} );
+	}
+
+	return {
+		target => $target,
+		signer => $signer,
+		type   => $type,
+	};
+}
+
+# $self->binding_for(%args):
+#	The file name of a binding.
+#
+#	%args:
+#		target => $name  # Required: a key file name
+#		signer => $name  # Required: a key file name
+#
+#	The binding name holds the stem of the signer, and the type of
+#	the signer selects the extension. The method is the inverse of
+#	parse_binding, so a caller never builds a name by hand. It
+#	returns undef on every failure, and error holds the reason.
+sub binding_for ( $self, %args )
+{
+	$self->{error} = undef;
+
+	my ( $target, $signer ) = @args{qw(target signer)};
+
+	# parse_name records a reason of its own, and this method
+	# reads the reason before _fail replaces it.
+	unless ( $self->parse_name($target) ) {
+		return $self->_fail(
+			'the target is no key name: ' . $self->{error} );
+	}
+
+	my $parts = $self->parse_name($signer);
+	unless ($parts) {
+		return $self->_fail(
+			'the signer is no key name: ' . $self->{error} );
+	}
+
+	# The two tables stand apart, so a key type reaches this
+	# method before its binding extension exists. An undefined
+	# extension would write the string "undef" into a file name.
+	my $extension = $BINDING_EXTENSION_OF_TYPE{ $parts->{type} };
+	unless ( defined $extension ) {
+		return $self->_fail(
+			"a key of the type $parts->{type} signs no binding");
+	}
+
+	return "$target.$parts->{stem}.$extension";
 }
 
 # $self->next_serial($names, $purpose):
@@ -355,6 +497,87 @@ sub check_statuses ( $self, $keys )
 				    . "$next next keys, and it must hold at most 1"
 			);
 		}
+	}
+
+	return 1;
+}
+
+# $self->check_bindings($keys, $bindings, $root):
+#	Hold each binding of a key directory to the retention rule.
+#
+#	$keys is the key set, $bindings is an array reference of
+#	binding file names, and $root is the file name of the current
+#	root key. The caller names the root, because the module holds
+#	no purpose.
+#
+#	The rule: a signer that is current or next signs the root, so
+#	each key in force attests the one anchor of the directory. A
+#	signer that is retired signs a key of its own purpose with a
+#	higher serial, so a holder of the old key verifies the new
+#	one.
+#
+#	The method returns 1 on a pass. It returns undef on a failure,
+#	and error names the binding and the fault.
+sub check_bindings ( $self, $keys, $bindings, $root )
+{
+	$self->{error} = undef;
+
+	unless ( ref $bindings eq 'ARRAY' ) {
+		die "bindings must be an array reference\n";
+	}
+
+	my $parsed = $self->_parse_set($keys) or return;
+
+	my %key;
+	$key{ $_->{name} } = $_ for @$parsed;
+
+	# Each key in force targets the root, so an absent root gives
+	# every one of those bindings the same reason.
+	unless ( defined $root && $key{$root} ) {
+		return $self->_fail( 'the key set holds no root key named '
+			    . ( $root // '(undef)' ) );
+	}
+
+	for my $name (@$bindings) {
+		my $parts = $self->parse_binding($name) or return;
+
+		# The status of the signer selects the rule, and the
+		# set is the one source of a status. parse_binding
+		# answers the key file name of the signer, so the set
+		# holds the answer under that name.
+		my $signer = $key{ $parts->{signer} };
+		unless ($signer) {
+			return $self->_fail( "the binding $name names the "
+				    . "signer $parts->{signer}, and the key "
+				    . 'set holds no such key' );
+		}
+
+		# A binding over an unpublished file verifies nothing,
+		# because a reader takes the target from the directory.
+		my $target = $key{ $parts->{target} };
+		unless ($target) {
+			return $self->_fail( "the binding $name names the "
+				    . "target $parts->{target}, and the key "
+				    . 'set holds no such key' );
+		}
+
+		if ( $signer->{status} eq 'retired' ) {
+			next
+			    if $target->{purpose} eq $signer->{purpose}
+			    && $target->{serial} > $signer->{serial};
+
+			return $self->_fail( "the retired signer "
+				    . "$parts->{signer} of $name must "
+				    . "target a key of the purpose "
+				    . "$signer->{purpose} with a serial above "
+				    . $signer->{serial} );
+		}
+
+		next if $parts->{target} eq $root;
+
+		return $self->_fail( "the $signer->{status} signer "
+			    . "$parts->{signer} of $name must target "
+			    . "the root key $root" );
 	}
 
 	return 1;

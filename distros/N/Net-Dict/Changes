@@ -1,5 +1,9 @@
 Revision history for Perl module Net::Dict
 
+2.23 2026-09-13 NEILB
+    - Database names are now UTF-8 decoded
+    - Updated tests to reflect changes in the dict.org databases
+
 2.22 2021-06-08 NEILB
     - Updated tests to reflect changes in the dict.org databases
 

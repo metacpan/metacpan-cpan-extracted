@@ -26,14 +26,31 @@ even from a different path, C<require> thinks it has already loaded
 the file. As such, I recommend you always require the full path to the
 file.
 
-The return value of the C<require> is a package name (in this case,
-the name of the main module. Use that to call the C<arguments> method.
+The return value of the C<require> is a package name, which in this case
+is the name of the main module. Use that to call the C<arguments> method.
 
 Even if this distribution needs a higher version of Perl, this bit
 only needs v5.8. You can play with the data structure with a primitive
 Perl.
 
 =cut
+
+BEGIN {
+use ExtUtils::MM_Any;
+no warnings qw(redefine);
+
+# get rid of the warning about README.pod, because I'm using it.
+# It's also in INSTALL.SKIP
+sub ExtUtils::MM_Any::libscan {
+    my($self,$path) = @_;
+
+    my($dirs,$file) = ($self->splitpath($path))[1,2];
+    return '' if grep /^(?:RCS|CVS|SCCS|\.svn|_darcs)$/,
+                     $self->splitdir($dirs), $file;
+
+    return $path;
+	}
+}
 
 use File::Spec::Functions qw(catfile);
 
@@ -69,6 +86,7 @@ my %WriteMakefile = (
 	'PREREQ_PM' => {
 		'Carp'            => '0',
 		'Geo::IPinfo'     => '0',
+		'Net::CIDR'       => '0.23', # https://github.com/svarshavchik/Net-CIDR/pull/2
 		'String::Sprintf' => '0',
 		},
 

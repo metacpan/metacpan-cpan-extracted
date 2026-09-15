@@ -1,307 +1,317 @@
 # Stream socket listener design
 
 `Linux::Event::IO::Sock::Listener` owns a listening Linux `SOCK_STREAM`
-socket and constructs one configured `Linux::Event::IO::Sock::Stream`
-subclass for every accepted connection.
+socket and generates one configured `Linux::Event::IO::Sock::Stream` for each
+accepted connection.
 
-The listener remains a distinct public leaf because its API is accept-oriented.
-A listening `SOCK_STREAM` socket is not exposed as though it were an established
-ordered-byte connection.
+The central model is:
 
-The selected Stream subclass is deliberately prominent policy: it declares the
-native framer, TLS server identity and verification behavior, socket policy,
-and `stream_options` tuning shared by every accepted connection. Listener
-constructor callback templates complement that reusable class policy with
-lexical state and are retained once rather than recreated per accept.
+> A Listener is a Stream generator.
+
+Listener configuration therefore has two distinct scopes:
+
+- top-level options configure the listening socket and accept engine;
+- `stream => { ... }` is the resolved recipe for generated connections.
+
+This boundary keeps bind/listen/accept policy separate from established
+ordered-byte connection policy without forcing applications to create a Stream
+subclass for simple servers.
 
 ## Public API
 
-```perl
-my $server_state = { connections => {} };
-
-my $listener = Linux::Event::IO::Sock::Listener->new(
-    loop                => $loop,
-    stream_class        => 'ServerConnection',
-    host                => '0.0.0.0',
-    port                => 9999,
-    backlog             => 4096,
-    max_accept_per_tick => 256,
-    edge_triggered      => 0,
-    data                => $server_state,
-);
-```
-
-Detached construction is equivalent:
-
-```perl
-my $listener = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'ServerConnection',
-    unix         => '/run/app.sock',
-    unlink       => 1,
-    permissions  => 0660,
-);
-$loop->add($listener);
-```
-
-The complete Listener tuning and socket-construction policy is:
-
-| Option | Default | Contract |
-| --- | ---: | --- |
-| `backlog` | 4,096 | Positive kernel listen backlog |
-| `max_accept_per_tick` | 256 | Non-negative fairness limit; zero drains to `EAGAIN` |
-| `edge_triggered` | 0 | Boolean; requires an unlimited per-tick drain |
-| `reuseaddr` | 1 | Boolean `SO_REUSEADDR` |
-| `reuseport` | 0 | Boolean `SO_REUSEPORT` |
-| `v6only` | unspecified | Optional boolean `IPV6_V6ONLY` |
-| `bind_device` | unspecified | Optional non-empty interface name |
-
-Unix listener policy additionally provides `unlink` (default false),
-`unlink_on_close` (default true), and optional permissions from `0` through
-`07777`. Accepted-connection tuning remains in the selected stream class's
-`stream_options()` and `socket_options()`.
-
-`stream_class` names the completed stream-socket subclass constructed for each
-accepted descriptor. The listener's `data` value is passed to each accepted
-object initially; `on_accept` can replace that connection's data if desired.
-
-The Listener constructor also accepts the ordered-byte callback names as
-templates for accepted Streams. For example:
+A raw server can use the default Stream class directly:
 
 ```perl
 my $listener = Linux::Event::IO::Sock::Listener->new(
     loop => $loop,
-    stream_class => 'Linux::Event::IO::Sock::Stream',
     host => '127.0.0.1',
     port => 9999,
-    on_data => sub ($stream, $bytes) {
-        $stream->write($bytes);
+
+    backlog             => 4096,
+    max_accept_per_tick => 256,
+
+    stream => {
+        on_data => sub ($stream, $bytes) {
+            $stream->write($bytes);
+        },
+    },
+
+    on_accept => sub ($listener, $stream) {
+        # Listener lifecycle callback
     },
 );
 ```
 
-The template names are `on_data`, `on_message`, `on_messages`, `on_ready`,
-`on_transport_ready`, `on_drain`, `on_eof`, `on_error`, and `on_close`, with
-the signatures documented in `FIRST-CLASS-STREAM-CALLBACKS.md`. One supplied
-CV is retained and reused for every accepted Stream. The Listener does not
-manufacture a new closure per connection. These constructor options configure
-accepted Streams; the Listener's own `on_accept` and `on_error` remain Listener
-subclass methods.
+A reusable protocol can still name a Stream subclass:
 
-## Socket type and address family
+```perl
+my $listener = Linux::Event::IO::Sock::Listener->new(
+    loop => $loop,
+    host => '0.0.0.0',
+    port => 9000,
+    stream => {
+        class => 'My::Connection',
+        data  => $initial_connection_state,
+        tuning => {
+            read_size         => 131_072,
+            read_budget_bytes => 524_288,
+            idle_timeout      => 30,
+        },
+        on_error => sub ($stream, $error) {
+            warn "$error\n";
+        },
+    },
+);
+```
 
-The listener always represents `SOCK_STREAM` in listening state. Its address
-family is selected independently.
+`class` defaults to `Linux::Event::IO::Sock::Stream`.
 
-Exactly one source form is required:
+## Listener-owned settings
 
-- `host => $host, port => $port` creates an IPv4/IPv6 listener;
-- `unix => $path` creates a filesystem Unix-domain stream listener;
-- `fh => $listening_socket` adopts an existing listening `SOCK_STREAM` handle.
+The following options remain top-level because they configure the listening
+resource or accept engine:
 
-A Unix listener is therefore not a separate public `Socket::Unix` class. Both
-Internet and Unix-domain listeners use `IO::Sock::Listener` because socket type
-and role are the same.
-
-Created listener sockets are nonblocking and close-on-exec and are owned by the
-listener. An adopted handle defaults to caller ownership; `owns_socket => 1`
-transfers ownership.
-
-`host => '*'` selects passive wildcard resolution. When `port => 0` is used,
-`port()` reports the kernel-assigned port after construction.
-
-## Source-specific configuration
-
-Internet listener options include:
-
+- `loop`
+- `host`
+- `port`
+- `unix`
+- `fh`
+- `owns_socket`
 - `backlog`
+- `max_accept_per_tick`
+- `edge_triggered`
 - `reuseaddr`
 - `reuseport`
 - `v6only`
 - `bind_device`
+- Unix listener ownership and permissions
+- Listener callbacks such as `on_accept` and `on_error`
 
-Unix-domain options include:
+`backlog` defaults to 4096. `max_accept_per_tick` defaults to 256. Zero drains
+acceptance until `EAGAIN` and is required by edge-triggered operation.
 
-- `backlog`
-- `unlink`
-- `unlink_on_close`
-- `permissions`
+Unix listener policy additionally includes `unlink`, `unlink_on_close`, and
+optional `permissions`.
 
-Options that have no meaning for the selected source are rejected rather than
-silently ignored.
+Exactly one socket source is selected:
 
-Examples:
+- `host => ..., port => ...` creates an Internet listener;
+- `unix => ...` creates a filesystem Unix-domain listener;
+- `fh => ...` adopts an existing listening socket.
 
-```perl
-my $tcp = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'ServerConnection',
-    host         => '::',
-    port         => 9999,
-    reuseaddr    => 1,
-    reuseport    => 0,
-    v6only       => 1,
-    bind_device  => 'eth0',
-);
-```
+## Generated Stream recipe
+
+The nested `stream` hash describes each generated connection. Supported policy
+includes:
 
 ```perl
-my $unix = Linux::Event::IO::Sock::Listener->new(
-    stream_class    => 'ServerConnection',
-    unix            => '/run/app.sock',
-    unlink          => 0,
-    unlink_on_close => 1,
-    permissions     => 0660,
-);
-```
+stream => {
+    class => 'My::Connection',
 
-```perl
-my $adopted = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'ServerConnection',
-    fh           => $socket,
-    owns_socket  => 0,
-);
-```
+    tuning => {
+        read_size          => 65_536,
+        read_budget_bytes  => 262_144,
+        read_batch_bytes   => 0,
+        message_batch_size => 0,
+        high_watermark     => 1_048_576,
+        low_watermark      => 262_144,
+        max_pending_bytes  => 0,
+        max_buffer         => 8_388_608,
+        idle_timeout       => 60,
+        read_timeout       => 0,
+        write_timeout      => 0,
+    },
 
-## Accept behavior
+    tls => {
+        cert_file => $cert_file,
+        key_file  => $key_file,
+    },
 
-Native code drains `accept4()` with atomic
-`SOCK_NONBLOCK | SOCK_CLOEXEC` flags.
+    data => $initial_data,
 
-`max_accept_per_tick` defaults to 256 to bound one level-triggered readiness
-turn. Zero means drain until EAGAIN and is required with
-`edge_triggered => 1`.
-
-Each accepted descriptor is used immediately to construct the configured
-`IO::Sock::Stream` subclass and attach that object to the same Loop. Linux::Event
-does not create a temporary accepted-descriptor registration first.
-
-## on_accept
-
-A listener subclass can observe each fully constructed connection:
-
-```perl
-package ServerListener;
-use parent 'Linux::Event::IO::Sock::Listener';
-
-sub on_accept ($listener, $connection) {
-    $listener->data->{connections}{ $connection->fd } = $connection;
+    on_data            => sub { ... },
+    on_message         => sub { ... },
+    on_messages        => sub { ... },
+    on_ready           => sub { ... },
+    on_transport_ready => sub { ... },
+    on_drain           => sub { ... },
+    on_eof             => sub { ... },
+    on_error           => sub { ... },
+    on_close           => sub { ... },
 }
 ```
 
-The sequence is:
+Recipe callback CVs are retained once. Linux::Event does not manufacture a new
+closure for every connection.
+
+## Recipe preparation
+
+The Listener resolves the generated-Stream recipe during construction, before
+it begins accepting traffic. The prepared recipe contains:
+
+- the resolved Stream class and cached class descriptor;
+- validated effective callback CVs;
+- effective initial tuning values;
+- optional prepared TLS server context and policy;
+- initial connection data;
+- normalized construction state.
+
+This is a cold-path operation. Per-accept work consumes the prepared recipe and
+does not repeat class-policy resolution or configuration merging.
+
+## Validation boundary
+
+Generated-Stream validity is checked when the Listener is constructed.
+
+A raw readable Stream requires an effective `on_data` callback. A framed Stream
+requires the message sink selected by its framing and batching policy unless a
+native consumer supplies that sink.
+
+Examples such as `stream => {}` therefore fail immediately instead of waiting
+for the first client connection.
+
+Framing remains class policy declared through `Linux::Event::Framer`; the
+Listener recipe does not redefine framing.
+
+## Stream tuning precedence
+
+Accepted connection tuning has three precedence levels:
+
+1. class defaults from `stream_tuning()`;
+2. Listener recipe overrides from `stream => { tuning => {...} }`;
+3. live per-object overrides from `$stream->tune(...)`.
+
+The effective mutable values live in each Stream's native state. The steady
+read/write path does not perform Perl hash lookups, class-vs-instance
+resolution, or recipe parsing.
+
+Live tuning changes are deterministic:
+
+- changing `message_batch_size` settles work owned by the previous batching
+  policy before the new policy becomes visible;
+- changed high/low watermarks immediately reconcile current backpressure;
+- lowering `max_pending_bytes` does not discard already queued output, but
+  future queue growth must satisfy the new limit;
+- lowering `max_buffer` does not discard already retained input, but future
+  growth must satisfy the new limit;
+- timeout changes re-arm or cancel deadline state as required.
+
+Framer identity, callback structure, native-consumer identity, and transport
+kind are not live tuning values.
+
+## TLS acquisition policy
+
+TLS belongs to connection acquisition, not to the Stream class identity.
+
+```perl
+my $secure = Linux::Event::IO::Sock::Listener->new(
+    loop => $loop,
+    host => '0.0.0.0',
+    port => 9443,
+    stream => {
+        class => 'My::Connection',
+        tls => {
+            cert_file => $cert_file,
+            key_file  => $key_file,
+            alpn      => ['my-protocol/1'],
+        },
+    },
+);
+
+my $plain = Linux::Event::IO::Sock::Listener->new(
+    loop => $loop,
+    host => '127.0.0.1',
+    port => 9000,
+    stream => {
+        class => 'My::Connection',
+    },
+);
+```
+
+Both listeners can generate the same Stream class. The first acquires TLS
+connections and the second acquires plain connections.
+
+A Stream subclass may define `tls_defaults()` for reusable server policy such
+as ALPN and handshake/shutdown timeouts. Those defaults do not activate TLS.
+Only `stream => { tls => {...} }` selects TLS for accepted connections.
+
+Ordinary server applications do not need to load `Linux::Event::TLS` directly.
+The Listener lazily loads the provider when a TLS recipe is present.
+
+## Prepared TLS server context
+
+During Listener construction, TLS setup:
+
+1. resolves optional class TLS defaults;
+2. merges Listener deployment overrides;
+3. validates the effective server configuration;
+4. loads certificate/key material;
+5. creates one reusable server `SSL_CTX` template.
+
+Each accepted TLS connection then allocates only its independent per-connection
+SSL state, binds the accepted descriptor, and attaches the existing native
+Stream transport ABI.
+
+Ordinary TLS reads, writes, handshakes, and shutdowns do not perform Perl
+configuration lookup or certificate parsing. Plain Streams allocate no TLS
+connection state.
+
+`bench/run-tls-accept-setup-bench.pl` measures fresh per-connection server
+context construction against cloning connection state from the prepared
+Listener-style context. `bench/run-tls-microbench.pl` remains the separate
+steady-state encrypted I/O benchmark.
+
+## Accept sequence
+
+Native code drains `accept4()` with atomic `SOCK_NONBLOCK | SOCK_CLOEXEC`
+flags. Each accepted descriptor follows this sequence:
 
 ```text
 accept4
-  -> construct stream_class
-  -> attach connection to Loop
-  -> listener on_accept
-  -> connection readiness
+  -> clone per-connection TLS state if the recipe enables TLS
+  -> construct resolved Stream class from the prepared recipe
+  -> attach Stream to the Listener's Loop
+  -> Listener on_accept
+  -> plain on_ready, or TLS handshake then on_ready
 ```
 
-For a plain stream socket, `on_ready` follows after `on_accept`. For TLS,
-`on_accept` still runs after attachment, while the connection's `on_ready` waits
-until handshake and verification succeed.
+`on_accept` observes the fully constructed Stream object. For TLS it runs after
+attachment, while application `on_ready` waits for transport handshake and
+verification.
 
-`on_accept` may inspect, retain, configure application state on, or close the
-connection.
+An `on_accept` exception closes only that accepted connection and reports a
+nonfatal callback error through the Listener error policy.
 
-Peer addresses are represented by `Linux::Event::Address` and formatted lazily.
-Applications that never inspect `peer()` avoid textual address conversion.
+## Socket policy and protocol policy
 
-## Accepted connection policy
+Established socket policy remains class policy through `socket_options()` and
+the cached cold-path `configure_socket()` hook.
 
-Buffering, framing, backpressure, and established deadline policy belong to the
-`stream_class` through `stream_options()`. Socket-specific established policy
-belongs to that same class through `socket_options()`.
+Core Listener/Stream policy should remain generic. Examples:
 
-Example TLS server connection:
+- listen backlog belongs to Listener core;
+- byte I/O timeouts belong to Stream tuning;
+- TLS certificate/key acquisition belongs to the Stream recipe;
+- HTTP keepalive belongs to an HTTP layer;
+- request-count or worker-recycling policy belongs above core.
 
-```perl
-package SecureServerConnection;
-use parent 'Linux::Event::IO::Sock::Stream';
-use Linux::Event::TLS
-    cert_file => '/etc/myapp/server-cert.pem',
-    key_file  => '/etc/myapp/server-key.pem',
-    alpn      => ['my-protocol/1'];
+The Listener recipe is deployment configuration for generated connections, not
+a place to accumulate protocol-server framework policy.
 
-sub stream_options ($class) {
-    return (
-        idle_timeout => 60,
-        max_buffer   => 8 * 1024 * 1024,
-    );
-}
+## Lifecycle
 
-sub socket_options ($class) {
-    return tcp_nodelay => 1;
-}
+`pause()` and `resume()` control acceptance without closing the listening
+socket. `close()` ends Listener ownership. `detach()` removes Loop readiness and
+returns the still-open listening handle according to the ownership contract.
 
-sub on_data ($stream, $bytes) {
-    $stream->write($bytes);
-}
-```
-
-The listener then names the completed class:
-
-```perl
-my $listener = Linux::Event::IO::Sock::Listener->new(
-    loop         => $loop,
-    stream_class => 'SecureServerConnection',
-    host         => '0.0.0.0',
-    port         => 9443,
-    data         => $server_state,
-);
-```
-
-A server TLS declaration is validated before the listener begins accepting
-traffic. Each accepted connection receives fresh server-side OpenSSL state.
-Accepted-Stream callback templates, when supplied to the Listener constructor,
-are passed directly into Stream construction and native-state seeding.
-
-Built-in accepted socket policy and the optional cached
-`configure_socket($class, $fh, 'accepted', $peer)` hook run before application
-readiness or TLS startup.
-
-## Listener lifecycle
-
-`pause()` and `resume()` control accepting without closing the listening
-socket. `close()` ends listener ownership. `detach()` removes Loop readiness and
-returns the still-open listener handle according to the ownership contract.
-
-`state()` reports the listener lifecycle state, including unattached,
-listening, paused, closed/failed, and detached states as defined by the
-implementation.
-
-## Errors
+`state()` reports Listener lifecycle such as `unattached`, `listening`,
+`paused`, `closed`, `failed`, and `detached`.
 
 Runtime failures use `Linux::Event::Error`. Resource exhaustion such as
-`EMFILE` pauses acceptance before reporting the error so a readable backlog
-cannot create a tight error loop.
-
-A listener subclass can handle runtime failure explicitly:
-
-```perl
-package AppListener;
-use parent 'Linux::Event::IO::Sock::Listener';
-
-sub on_error ($listener, $error) {
-    warn "$error\n";
-}
-```
-
-An exception from `on_accept` closes that accepted connection, suppresses its
-pending readiness callback, and reports a nonfatal callback error to the
-listener's error policy. The listening socket can remain active when the error
-is handled.
-
-## Address introspection
-
-`family()` reports semantic family names such as `inet`, `inet6`, or `unix`.
-`family_number()` exposes the native numeric address family. Convenience
-predicates can distinguish Internet versus Unix-domain sources without
-pretending address family is the socket type.
+`EMFILE` pauses acceptance before error delivery so a readable backlog cannot
+create a tight error loop.
 
 ## Private implementation boundary
 
-`Linux::Event::_Socket::Listener` is the private XS accept-engine boundary
-beneath the supported public contract `Linux::Event::IO::Sock::Listener`. It is
-`no_index`, excluded from META `provides`, and not an alternate public listener
-API.
+`Linux::Event::_Socket::Listener` is the private accept-engine boundary beneath
+`Linux::Event::IO::Sock::Listener`. It is not an alternate public Listener API.

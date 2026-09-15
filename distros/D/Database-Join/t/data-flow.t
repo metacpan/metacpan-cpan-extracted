@@ -39,7 +39,7 @@ use Scalar::Util qw(blessed refaddr weaken);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 40;
+	plan tests => 53;
 	use_ok('Database::Join');
 }
 
@@ -823,4 +823,268 @@ subtest 'single-DB join: no-criteria query returns all rows cleanly' => sub {
 	my $rows = $j->selectall_arrayref();
 	is scalar @{$rows}, 2,
 		'single-DB no-criteria query returns all rows (dead store harmless)';
+};
+
+# ===========================================================================
+# Section 10: _col_rename / _col_unrename DU chains (collision_prefix flow)
+#
+# These two per-db arrayrefs are defined in _build_col_index when a
+# collision_prefix is configured.  They are then used in two distinct places:
+#   _col_rename    → _joined_query merge (write merged{pub} from src{orig})
+#   _col_unrename  → _partition_criteria (translate caller pub criterion → orig)
+# ===========================================================================
+
+subtest '_col_rename[i]: populated correctly at construction (orig → published)' => sub {
+	# D: _col_rename[1]{notes} = 'cp.notes' in _build_col_index
+	# U: read in _joined_query merge loop to write merged{'cp.notes'}
+	my $prim = DFMinimalDA->new(cols => ['entry', 'notes'], rows => []);
+	my $sec  = DFMinimalDA->new(cols => ['entry', 'notes'], rows => []);
+	my $j    = Database::Join->new(
+		databases        => [$prim, $sec],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'cp' },
+	);
+	is_deeply $j->{_col_rename}[1], { notes => 'cp.notes' },
+		'_col_rename[1] maps original "notes" → published "cp.notes"';
+};
+
+subtest '_col_unrename[i]: populated correctly at construction (published → orig)' => sub {
+	# D: _col_unrename[1]{'cp.notes'} = 'notes' in _build_col_index (alongside rename)
+	# U: read in _partition_criteria to translate caller's 'cp.notes' → 'notes' for DA
+	my $prim = DFMinimalDA->new(cols => ['entry', 'notes'], rows => []);
+	my $sec  = DFMinimalDA->new(cols => ['entry', 'notes'], rows => []);
+	my $j    = Database::Join->new(
+		databases        => [$prim, $sec],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'cp' },
+	);
+	is_deeply $j->{_col_unrename}[1], { 'cp.notes' => 'notes' },
+		'_col_unrename[1] maps published "cp.notes" → original "notes"';
+};
+
+subtest '_col_unrename flows into _partition_criteria: prefixed criterion translated before DA call' => sub {
+	# DU chain: _col_unrename[$i]{pub} read in _partition_criteria →
+	#   per_db[$i]{orig_col} = $params{pub_col}
+	# The secondary DA must receive the original column name, not the prefixed one.
+	# Primary must also have 'notes' so the secondary's 'notes' collides and
+	# _col_unrename[1] is populated by _build_col_index.
+	my $prim = DFMinimalDA->new(
+		cols => ['entry', 'name', 'notes'],
+		rows => [{ entry => $K_A, name => 'Alpha', notes => 'note-prim' }],
+	);
+	my $sec = DFRecordingDA->new(
+		cols => ['entry', 'notes'],
+		rows => [{ entry => $K_A, notes => 'note-x' }],
+	);
+	my $j = Database::Join->new(
+		databases        => [$prim, $sec],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'cp' },
+	);
+	$j->selectall_arrayref('cp.notes' => 'note-x');
+	my $crit = $sec->received()->[-1]{hashref};
+	ok  exists($crit->{notes}),       'DA received the original column name "notes"';
+	ok !exists($crit->{'cp.notes'}),  '"cp.notes" not forwarded to DA (un-prefixed correctly)';
+	is  $crit->{notes}, 'note-x',     'criterion value preserved through unrename translation';
+};
+
+subtest '_col_rename flows into _joined_query merge: merged row keyed under published name' => sub {
+	# DU chain: _col_rename[$i]{orig} read in merge loop →
+	#   merged{pub_col} = src{orig_col}  (prefixed name, not original)
+	# Primary and secondary each have 'notes'; secondary's must appear as 'cp.notes'.
+	my $prim = DFMinimalDA->new(
+		cols => ['entry', 'notes'],
+		rows => [{ entry => $K_A, notes => 'note-prim' }],
+	);
+	my $sec = DFMinimalDA->new(
+		cols => ['entry', 'notes'],
+		rows => [{ entry => $K_A, notes => 'note-sec' }],
+	);
+	my $j = Database::Join->new(
+		databases        => [$prim, $sec],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'cp' },
+	);
+	my $row = $j->fetchrow_hashref(entry => $K_A);
+	is $row->{notes},      'note-prim', 'primary "notes" under plain key in merged row';
+	is $row->{'cp.notes'}, 'note-sec',  'secondary "notes" under prefixed "cp.notes" key';
+};
+
+# ===========================================================================
+# Section 11: Multi-row primary and last-secondary-wins DU (4 subtests)
+#
+# _fetch_indexed pushes ALL matching rows into indexed[$i]{$key}.
+# _joined_query iterates every primary row (@base_rows) producing one merged
+# result row each, but uses $sec_arr->[-1] for secondary databases (last wins).
+# ===========================================================================
+
+subtest 'primary DA with duplicate join keys: all rows produce merged results' => sub {
+	# D: indexed[0]{key} = [\%row1, \%row2] (push for every primary row)
+	# U: @base_rows = @{indexed[0]{key}} — iterates all, not just [-1]
+	# One merged result row is produced per primary row.
+	my $prim = DFMinimalDA->new(
+		cols => ['entry', 'name'],
+		rows => [
+			{ entry => $K_A, name => 'Alpha-1' },
+			{ entry => $K_A, name => 'Alpha-2' },  # same key, second row
+		],
+	);
+	my $sec = DFMinimalDA->new(
+		cols => ['entry', 'score'],
+		rows => [{ entry => $K_A, score => 100 }],
+	);
+	my $j    = Database::Join->new(databases => [$prim, $sec], join_column => $JC, join_type => 'inner');
+	my $rows = $j->selectall_arrayref();
+	is scalar @{$rows}, 2, 'one merged row per primary row (both primary rows retained)';
+	my %names = map { $_->{name} => 1 } @{$rows};
+	ok $names{'Alpha-1'}, 'Alpha-1 present';
+	ok $names{'Alpha-2'}, 'Alpha-2 present';
+	is $rows->[0]{score}, 100, 'secondary score overlaid onto first primary row';
+	is $rows->[1]{score}, 100, 'secondary score overlaid onto second primary row';
+};
+
+subtest 'secondary DA with duplicate join keys: last row wins' => sub {
+	# D: indexed[1]{key} = [\%first, \%last] (push for every secondary row)
+	# U: $sec_arr->[-1] — only the LAST secondary row is merged (last-wins)
+	my $prim = DFMinimalDA->new(
+		cols => ['entry', 'name'],
+		rows => [{ entry => $K_A, name => 'Alice' }],
+	);
+	my $sec = DFMinimalDA->new(
+		cols => ['entry', 'score'],
+		rows => [
+			{ entry => $K_A, score => 50 },   # earlier — overwritten
+			{ entry => $K_A, score => 99 },   # later  — wins
+		],
+	);
+	my $j   = Database::Join->new(databases => [$prim, $sec], join_column => $JC);
+	my $row = $j->fetchrow_hashref(entry => $K_A);
+	is $row->{score}, 99, 'last secondary row wins when key has multiple secondary rows';
+};
+
+subtest 'outer-join secondary-only key with multiple secondary rows: last secondary wins, one merged row' => sub {
+	# D: %key_set gains $K_C via outer-join union
+	# U: @base_rows = @{indexed[0]{K_C} // [{}]} — [{}] sentinel → ONE pass
+	# U: $sec_arr->[-1] — last secondary row still applies
+	# Result: exactly ONE merged row for the secondary-only key.
+	my $prim = DFMinimalDA->new(
+		cols => ['entry', 'a'],
+		rows => [{ entry => $K_A, a => 1 }],
+	);
+	my $sec = DFMinimalDA->new(
+		cols => ['entry', 'b'],
+		rows => [
+			{ entry => $K_C, b => 'first'  },
+			{ entry => $K_C, b => 'second' },  # $K_C not in primary; two secondary rows
+		],
+	);
+	my $j    = Database::Join->new(databases => [$prim, $sec], join_column => $JC, join_type => 'outer');
+	my $rows = $j->selectall_arrayref();
+	is scalar @{$rows}, 2, 'outer join: two keys ($K_A + $K_C)';
+	my ($kc_row) = grep { $_->{entry} eq $K_C } @{$rows};
+	is $kc_row->{b}, 'second', 'last secondary row wins for the outer-join secondary-only key';
+};
+
+# ===========================================================================
+# Section 12: _dbs / _db_cols array DU and updated() timestamp DU (3 subtests)
+# ===========================================================================
+
+subtest 'updated(): equal timestamps across all DAs returns that value' => sub {
+	# D: $_->updated() called for each DA; max() applied over all values
+	# U: result returned to caller as the join's modification time
+	# Edge case: all equal → max of N identical values must be the value itself.
+	my $da1 = DFMinimalDA->new(cols => ['entry'],        updated => 5_000_000);
+	my $da2 = DFMinimalDA->new(cols => ['entry', 'tag'], updated => 5_000_000);
+	my $j   = Database::Join->new(databases => [$da1, $da2], join_column => $JC);
+	is $j->updated(), 5_000_000,
+		'updated() returns the common timestamp when all component DAs agree';
+};
+
+subtest '_dbs array grows by exactly 1 per add_database call' => sub {
+	# D: _dbs = $p->{databases} at construction; length = N
+	# U: push @{$self->{_dbs}}, $db in add_database
+	my ($j) = _two_db_join();  # 2 databases
+	my $before = scalar @{$j->{_dbs}};
+	$j->add_database(DFMinimalDA->new(cols => ['entry', 'z'], rows => []));
+	is scalar @{$j->{_dbs}}, $before + 1,
+		'_dbs array length increases by exactly 1 after add_database';
+};
+
+subtest '_db_cols parallel to _dbs: same length and correct column presence hashes' => sub {
+	# D: @db_cols[$i] built in _build_col_index via map { $_ => 1 } @{$cols}
+	# U: not used inside _joined_query directly, but tested here as a structural invariant
+	my $da0 = DFMinimalDA->new(cols => ['entry', 'name'],  rows => []);
+	my $da1 = DFMinimalDA->new(cols => ['entry', 'score'], rows => []);
+	my $j   = Database::Join->new(databases => [$da0, $da1], join_column => $JC);
+	is scalar @{$j->{_db_cols}}, 2, '_db_cols length matches number of component DAs';
+	ok  $j->{_db_cols}[0]{name},   '"name"  in _db_cols[0] (DA-0 column)';
+	ok  $j->{_db_cols}[1]{score},  '"score" in _db_cols[1] (DA-1 column)';
+	ok !$j->{_db_cols}[0]{score},  '"score" not in _db_cols[0] (DA-0 does not have it)';
+};
+
+# ===========================================================================
+# Section 13: Interleaved mutations — cache invalidation sequence and
+#             _removed_cols persistence (3 subtests)
+# ===========================================================================
+
+subtest 'add_database then remove_column: caches invalidated in sequence' => sub {
+	# DU sequence:
+	#   D: col_cache via columns()
+	#   K: add_database invalidates it
+	#   D: col_cache re-derived by next columns()
+	#   K: remove_column invalidates it again
+	#   D: col_cache re-derived by final columns()
+	my ($j) = _two_db_join();
+	my $r0 = $j->columns();  # primes cache
+	ok !grep({ $_ eq 'region' } @{$r0}), 'region absent before add_database';
+
+	$j->add_database(DFMinimalDA->new(cols => ['entry', 'region'], rows => []));
+	my $r1 = $j->columns();
+	isnt refaddr($r0), refaddr($r1), 'add_database produces new cache arrayref';
+	ok grep({ $_ eq 'region' } @{$r1}), 'region present after add_database';
+
+	$j->remove_column('region');
+	my $r2 = $j->columns();
+	isnt refaddr($r1), refaddr($r2), 'remove_column produces another new cache arrayref';
+	ok !grep({ $_ eq 'region' } @{$r2}), 'region absent after remove_column';
+};
+
+subtest 'schema() updated correctly after add_database adds DA with schema metadata' => sub {
+	# D: schema_cache derived on first schema() call
+	# K: add_database invalidates schema_cache
+	# D: schema_cache re-derived; must now include new DA's columns and type metadata
+	my $prim = DFMinimalDA->new(
+		cols   => ['entry', 'name'],
+		schema => { entry => {type => 'TEXT'}, name => {type => 'TEXT'} },
+	);
+	my $j = Database::Join->new(databases => [$prim], join_column => $JC);
+	ok !exists($j->schema()->{price}), 'price absent from schema before add_database';
+
+	my $extra = DFMinimalDA->new(
+		cols   => ['entry', 'price'],
+		schema => { entry => {type => 'TEXT'}, price => {type => 'INTEGER'} },
+		rows   => [],
+	);
+	$j->add_database($extra);
+	my $s = $j->schema();
+	ok  exists($s->{price}),       'price present in schema after add_database';
+	is  $s->{price}{type}, 'INTEGER', 'price schema metadata is correct';
+};
+
+subtest '_removed_cols: entries accumulate across multiple remove_column calls, all applied in merge' => sub {
+	# D: _removed_cols{col} = 1 set by each remove_column call
+	# U: keys %{_removed_cols} collected before merge loop; all stripped from every merged row
+	# K: object destruction
+	my ($j) = _two_db_join();
+	$j->remove_column('score');
+	ok exists($j->{_removed_cols}{score}), 'score in _removed_cols after first call';
+
+	$j->remove_column('name');
+	ok exists($j->{_removed_cols}{score}), 'score still in _removed_cols after second call';
+	ok exists($j->{_removed_cols}{name}),  'name added to _removed_cols by second call';
+
+	my $rows = $j->selectall_arrayref();
+	ok !exists($rows->[0]{score}), 'score stripped from merged row';
+	ok !exists($rows->[0]{name}),  'name stripped from merged row';
+	ok  exists($rows->[0]{entry}), 'join_column still present (not stripped)';
 };

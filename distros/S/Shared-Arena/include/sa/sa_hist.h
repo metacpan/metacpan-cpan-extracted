@@ -68,14 +68,18 @@ typedef struct {
     volatile unsigned char locks[SA_LOCK_STRIPES];
 } sa_hist_hdr;
 
-typedef struct sa_hist {
+#ifndef SA_HIST_FWD
+#define SA_HIST_FWD
+typedef struct sa_hist sa_hist;
+#endif
+struct sa_hist {
     sa_region   *arena;
     sa_hist_hdr *hdr;
     volatile uint64_t *buckets;
     uint64_t     nbuckets;
     uint32_t     sigbits;
     uint64_t     max_value;
-} sa_hist;
+};
 
 /* The position of the highest set bit. Written out rather than
  * __builtin_clzll, which is not everywhere this claims to build. */

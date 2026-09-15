@@ -12,7 +12,7 @@ use File::chdir;
 use List::Util qw( pairmap );
 
 # ABSTRACT: Plugin for fetching files using wget
-our $VERSION = '2.84'; # VERSION
+our $VERSION = '2.87'; # VERSION
 
 
 sub _wget
@@ -24,6 +24,13 @@ sub _wget
   # The wget that BusyBox implements does not follow that same interface
   # as GNU wget and may not check ssl certs which is not good.
   return undef if $output =~ /BusyBox/;
+
+  # Wget2 (which some newer Linux distributions ship as /usr/bin/wget in
+  # place of GNU Wget) does not follow the same interface as GNU Wget either
+  # (in particular its -S output cannot be relied on to include the
+  # Content-Type header), so treat it as not found, same as BusyBox.
+  return undef if $output =~ /GNU Wget2/;
+
   return $wget;
 }
 
@@ -144,7 +151,7 @@ Alien::Build::Plugin::Fetch::Wget - Plugin for fetching files using wget
 
 =head1 VERSION
 
-version 2.84
+version 2.87
 
 =head1 SYNOPSIS
 
@@ -249,6 +256,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 nick nauwelaerts (INPHOBIA)
 
 Florian Weimer
+
+Marcel Telka (mtelka)
 
 =head1 COPYRIGHT AND LICENSE
 

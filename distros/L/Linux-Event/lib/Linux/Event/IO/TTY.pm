@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.112';
+our $VERSION = '0.114';
 
 use parent 'Linux::Event::_ByteStream';
 use Carp qw(croak);
@@ -66,10 +66,10 @@ need those settings configure the terminal separately.
 Constructor callbacks give each TTY ordinary lexical scope. A subclass is the
 right place for reusable terminal protocol policy: it can declare a native
 L<Linux::Event::Framer>, define named callbacks, and centralize
-C<stream_options> tuning. The Synopsis combines a delimiter-framing subclass
+C<stream_tuning> tuning. The Synopsis combines a delimiter-framing subclass
 with a per-object C<on_message> closure.
 
-C<stream_options> controls read size and fairness, callback batching, buffer
+C<stream_tuning> controls read size and fairness, callback batching, buffer
 and output limits, watermarks, and established deadlines. Linux::Event
 validates and caches framer, tuning, and method policy once per subclass.
 Constructor callbacks override same-named methods for one TTY and are retained
@@ -79,15 +79,15 @@ method-versus-closure branch.
 TLS does not apply to TTY; TLS transport policy is specific to
 L<Linux::Event::IO::Sock::Stream>.
 
-=head2 stream_options
+=head2 stream_tuning
 
-Define C<stream_options> as a class method on the TTY subclass. It returns
+Define C<stream_tuning> as a class method on the TTY subclass. It returns
 key/value pairs, or one hash reference:
 
   package InteractiveTTY;
   use parent 'Linux::Event::IO::TTY';
 
-  sub stream_options ($class) {
+  sub stream_tuning ($class) {
       return (
           read_size        => 16_384,
           read_batch_bytes => 4_096,
@@ -214,7 +214,7 @@ is queued. It is terminal and does not call C<on_close>.
 
 =head1 CLASS POLICY
 
-C<stream_options> configures the common ordered-byte engine. The complete
+C<stream_tuning> configures the common ordered-byte engine. The complete
 option contract appears near the top of this document. Policy is cached per
 subclass so ordinary readiness does not parse options or look up callbacks.
 

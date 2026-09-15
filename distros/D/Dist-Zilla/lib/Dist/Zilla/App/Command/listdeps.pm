@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::listdeps 6.038;
+package Dist::Zilla::App::Command::listdeps 6.039;
 # ABSTRACT: print your distribution's prerequisites
 
 use Dist::Zilla::Pragmas;
@@ -195,7 +195,7 @@ Dist::Zilla::App::Command::listdeps - print your distribution's prerequisites
 
 =head1 VERSION
 
-version 6.038
+version 6.039
 
 =head1 SYNOPSIS
 

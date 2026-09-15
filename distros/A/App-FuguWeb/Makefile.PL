@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME             => 'App::FuguWeb',
-	VERSION          => '0.5.0',
+	VERSION          => '0.6.1',
 	ABSTRACT         => 'build a documentation website for a Perl project',
 	LICENSE          => 'open_source',
 	MIN_PERL_VERSION => '5.036',

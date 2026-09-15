@@ -1,6 +1,4 @@
 use ExtUtils::MakeMaker;
-#Build  MD5 : BAgP7Fl10nxch0SUVKa3KA
-#Build Time : 2025-09-23 09:18:54
 
 WriteMakefile(
     NAME         => 'XS::Log',

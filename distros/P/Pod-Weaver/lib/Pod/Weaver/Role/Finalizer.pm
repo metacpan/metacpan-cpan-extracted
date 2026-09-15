@@ -1,4 +1,4 @@
-package Pod::Weaver::Role::Finalizer 4.021;
+package Pod::Weaver::Role::Finalizer 4.022;
 # ABSTRACT: something that goes back and finishes up after main weaving is over
 
 use Moose::Role;
@@ -32,7 +32,7 @@ Pod::Weaver::Role::Finalizer - something that goes back and finishes up after ma
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 PERL VERSION
 

@@ -490,6 +490,34 @@ static const char *sa_abi_sb_field_name(const sa_sb *b, uint32_t idx) {
     return b->hdr->fields[idx];
 }
 
+/* ---- the HyperLogLog ------------------------------------------------------- */
+
+static sa_hll *sa_abi_hll_open(sa_region *r, const char *name, size_t nlen,
+                               uint32_t precision, int *err)
+{
+    sa_reg *e;
+    uint64_t want;
+
+    if (err) *err = SA_E_OK;
+    if (!r) { if (err) *err = SA_E_NOENT; return NULL; }
+    if (precision && (precision < SA_HLL_MIN_P || precision > SA_HLL_MAX_P)) {
+        if (err) *err = SA_E_SHAPE;
+        return NULL;
+    }
+    /* precision 0 inherits an existing sketch's, as the Perl surface does. */
+    if (precision)                    want = sa_hll_bytes(precision);
+    else if (sa_find(r, name, nlen))  want = 0;
+    else                              want = sa_hll_bytes(14);
+    e = sa_carve(r, name, nlen, want, SA_T_HLL, err);
+    if (!e) return NULL;
+    return sa_hll_bind(r, e, precision, err);
+}
+
+static uint32_t sa_abi_hll_precision(const sa_hll *h) { return h ? h->p : 0; }
+
+/* sa_hll_free / _add / _count / _merge / _reset / _filled match the ABI
+ * signatures, so the table points straight at them. */
+
 /* ---- queue groups ---------------------------------------------------------- */
 
 static sa_group_h *sa_abi_group_open(sa_ring *r, const char *name, size_t nlen,
@@ -700,7 +728,17 @@ static const sa_abi SA_ABI = {
     sa_sb_read,
     sa_abi_sb_slots,
     sa_abi_sb_nfields,
-    sa_abi_sb_field_name
+    sa_abi_sb_field_name,
+
+    /* the HyperLogLog */
+    sa_abi_hll_open,
+    sa_hll_free,
+    sa_hll_add,
+    sa_hll_count,
+    sa_hll_merge,
+    sa_hll_reset,
+    sa_abi_hll_precision,
+    sa_hll_filled
 };
 
 /* ---- the selftest ---------------------------------------------------------
@@ -1420,6 +1458,62 @@ static int sa_abi_selftest(void)
             { A->sb_release(sb); SA_STEP(24); goto done; }
 
         A->sb_release(sb);
+    }
+
+    /* 25: the HyperLogLog. Add a thousand distinct keys at p = 10 and the
+     * estimate lands within its error bound; add them all AGAIN and it does
+     * not move at all, which is the property the sketch exists for. Then a
+     * merge widens it and a reset empties it. */
+    {
+        sa_hll *g1, *g2;
+        double c1, c1b, c2;
+        char kb[32];
+        int n, i;
+
+        g1 = A->hll_open(r, "selg", 4, 10, &err);
+        if (!g1 || err != SA_E_OK) { SA_STEP(25); goto done; }
+        if (A->hll_precision(g1) != 10) { A->hll_release(g1); SA_STEP(25); goto done; }
+        if (A->hll_count(g1) != 0.0)    { A->hll_release(g1); SA_STEP(25); goto done; }
+
+        for (i = 0; i < 1000; i++) {
+            n = sprintf(kb, "d%d", i);
+            A->hll_add(g1, kb, (size_t)n);
+        }
+        c1 = A->hll_count(g1);
+        /* p = 10 is 3.25% one sigma; 10% is past three, and deterministic. */
+        if (c1 < 900.0 || c1 > 1100.0) { A->hll_release(g1); SA_STEP(25); goto done; }
+        if (!A->hll_filled(g1))        { A->hll_release(g1); SA_STEP(25); goto done; }
+
+        for (i = 0; i < 1000; i++) {
+            n = sprintf(kb, "d%d", i);
+            if (A->hll_add(g1, kb, (size_t)n))   /* a repeat never changes it */
+                { A->hll_release(g1); SA_STEP(25); goto done; }
+        }
+        c1b = A->hll_count(g1);
+        if (c1b != c1) { A->hll_release(g1); SA_STEP(25); goto done; }
+
+        /* A second sketch of OTHER keys, merged in: the union is bigger. A
+         * precision of 0 must inherit the existing sketch's rather than
+         * default to 14 and refuse the shape. */
+        g2 = A->hll_open(r, "selg2", 5, 10, &err);
+        if (!g2) { A->hll_release(g1); SA_STEP(25); goto done; }
+        for (i = 0; i < 1000; i++) {
+            n = sprintf(kb, "e%d", i);
+            A->hll_add(g2, kb, (size_t)n);
+        }
+        if (!A->hll_merge(g1, g2)) { A->hll_release(g1); A->hll_release(g2); SA_STEP(25); goto done; }
+        c2 = A->hll_count(g1);
+        if (c2 < 1800.0 || c2 > 2200.0) { A->hll_release(g1); A->hll_release(g2); SA_STEP(25); goto done; }
+        A->hll_release(g2);
+        g2 = A->hll_open(r, "selg2", 5, 0, &err);      /* inherit p = 10 */
+        if (!g2 || A->hll_precision(g2) != 10)
+            { A->hll_release(g1); if (g2) A->hll_release(g2); SA_STEP(25); goto done; }
+        A->hll_release(g2);
+
+        A->hll_reset(g1);
+        if (A->hll_count(g1) != 0.0 || A->hll_filled(g1))
+            { A->hll_release(g1); SA_STEP(25); goto done; }
+        A->hll_release(g1);
     }
 
 done:

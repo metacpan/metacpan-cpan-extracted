@@ -27,8 +27,8 @@ my $state = {};
 my $listener;
 eval {
     $listener = Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::UnixStream',
-        loop => $loop, unix => $path, permissions => 0600, data => $state,
+        loop => $loop, unix => $path, permissions => 0600,
+        stream => { class => 'T::UnixStream', data => $state },
     );
     1;
 } or plan skip_all => "Unix stream listeners unavailable: $@";
@@ -54,7 +54,7 @@ ok(!-e $path, 'owned Unix listener removes path on close');
 my $original_directory = getcwd();
 chdir $directory or die "chdir $directory: $!";
 my $zero_path_listener = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'T::UnixStream', # required
+    stream       => { class => 'T::UnixStream' },
     unix         => '0',             # required
 );
 ok(-S '0', 'relative Unix listener path named zero is created');

@@ -1,6 +1,0 @@
-{
-   "name" : "Alien-lsquic",
-   "packages" : [
-      { "name" : "lsquic" }
-   ]
-}

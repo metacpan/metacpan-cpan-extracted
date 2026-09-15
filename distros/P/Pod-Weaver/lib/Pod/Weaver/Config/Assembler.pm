@@ -1,4 +1,4 @@
-package Pod::Weaver::Config::Assembler 4.021;
+package Pod::Weaver::Config::Assembler 4.022;
 # ABSTRACT: Pod::Weaver-specific subclass of Config::MVP::Assembler
 
 use Moose;
@@ -38,7 +38,7 @@ Pod::Weaver::Config::Assembler - Pod::Weaver-specific subclass of Config::MVP::A
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 PERL VERSION
 

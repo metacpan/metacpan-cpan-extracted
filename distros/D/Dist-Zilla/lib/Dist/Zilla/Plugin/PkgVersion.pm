@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PkgVersion 6.038;
+package Dist::Zilla::Plugin::PkgVersion 6.039;
 # ABSTRACT: add a $VERSION to your packages
 
 use Moose;
@@ -179,6 +179,24 @@ sub _version_assignment {
                         : $perl;
 }
 
+# PPI does not understand the perl v5.38 class syntax.  It turns a class
+# block into one opaque PPI::Statement, and any package statements after it
+# in the file are swallowed into that statement too.  We can't version the
+# class, but we can say so instead of silently shipping unversioned code.
+# This spots the `class NAME` shape without misfiring on `class->method`.
+sub _class_declarations ($self, $document) {
+  my $stmts = $document->find(sub {
+    my ($doc, $elem) = @_;
+    return unless ref $elem eq 'PPI::Statement';
+    my ($kw, $name) = $elem->schildren;
+    return unless $kw && $kw->isa('PPI::Token::Word') && $kw->content eq 'class';
+    return unless $name && $name->isa('PPI::Token::Word');
+    return 1;
+  });
+
+  return map {; ($_->schildren)[1]->content } @{ $stmts || [] };
+}
+
 sub munge_perl {
   my ($self, $file) = @_;
 
@@ -189,6 +207,14 @@ sub munge_perl {
     unless version::is_lax($version);
 
   my $document = $self->ppi_document_for_file($file);
+
+  for my $class ($self->_class_declarations($document)) {
+    $self->log([
+      '%s declares class %s, which will not get a version: PPI cannot parse class syntax yet',
+      $file->name,
+      $class,
+    ]);
+  }
 
   my $package_stmts = $document->find('PPI::Statement::Package');
   unless ($package_stmts) {
@@ -392,7 +418,7 @@ Dist::Zilla::Plugin::PkgVersion - add a $VERSION to your packages
 
 =head1 VERSION
 
-version 6.038
+version 6.039
 
 =head1 SYNOPSIS
 

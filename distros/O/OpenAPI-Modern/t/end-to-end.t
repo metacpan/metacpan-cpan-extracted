@@ -60,7 +60,7 @@ YAML
   my $app = Mojolicious->new;
   $app->routes->post('/foo/:foo_id' => sub ($c) {
     if ($c->stash('foo_id') =~ /^[a-z]+\z/) {
-      cmp_result(
+      is_equal(
         $openapi->validate_request($c->req)->TO_JSON,
         { valid => true },
         'a valid request is received',
@@ -70,7 +70,7 @@ YAML
     else {
       my $host = $c->req->headers->host;
 
-      cmp_result(
+      is_equal(
         $openapi->validate_request($c->req)->TO_JSON,
         {
           valid => false,
@@ -101,7 +101,7 @@ YAML
     ->status_is(200)
     ->json_is('/status', 'ok');
 
-  cmp_result(
+  is_equal(
     $openapi->validate_response($t->tx->res, { request => $t->tx->req })->TO_JSON,
     { valid => true },
     '...and results in a valid 200 response',
@@ -111,7 +111,7 @@ YAML
     ->status_is(400)
     ->json_is('/status', 'not ok');
 
-  cmp_result(
+  is_equal(
     $openapi->validate_response($t->tx->res, { request => $t->tx->req })->TO_JSON,
     {
       valid => false,

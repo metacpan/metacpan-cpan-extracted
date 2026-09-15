@@ -1,70 +1,80 @@
 Revision history for Sys-Path
+
+0.17    12 September 2026
+        - Serialized checksum-registry access and published updates atomically
+        - Preserved quotes and backslashes in generated path constants
+        - Honored configured shared-state paths during installation
+        - Aligned build options with path accessors while preserving aliases
+        - Used the user's login shell when examining configuration changes
+        - Located module distribution roots without loading the modules
+        - Added syspath.pl to print configured path keys and values
+
 0.16    13 October 2017
-        - Fix building on Perl without "." in @INC (thanks Petr Písař)
-        - cpants fixes (thanks Mohammad S Anwar)
+        - Fixed builds when Perl omits "." from @INC
+          (thanks to Petr Písař)
+        - Fixed CPANTS issues (thanks to Mohammad S Anwar)
 
 0.15    12 October 2017
-        - author tests moved to xt/
+        - Moved author tests to xt/
 
 0.14    6 Feb 2015
-        - use File::Spec->canonpath to pass the cwd test on win32 paltforms (thanks Jose Luis Perez Diez)
-        - mantain the same version in all packages (cpants);
+        - Used File::Spec->canonpath for the current-working-directory test on
+          Win32 (thanks to Jose Luis Perez Diez)
+        - Synchronized the version across packages for CPANTS
 
 0.13    18 Apr 2013
-        - add note before promting users during distribution installation
+        - Added an explanatory note before prompting during configuration
           (thanks to Daniel Perrett)
 
 0.12    21 Sep 2011
-        - find distribution root even when distribution lib/ path is not in @INC
+        - Located the distribution root when its lib/ directory is not in @INC
           (thanks to Salve J. Nilsen)
 
 0.11    10 Aug 2011
-        - now considering Build.PL and Makefile.PL when finding distribution root
-          (needed for `./Build disttest` where the t/ folder is not copied)
-        - add srvdir (/srv)
+        - Recognized Build.PL and Makefile.PL as distribution-root markers;
+          this supports `./Build disttest`, which does not copy t/
+        - Added srvdir (/srv)
 
 0.10    03 Nov 2009
-        - Pod updates
+        - Updated POD
 
 0.09    22 Oct 2009
-        - removed the Module::Build::SysPath from this distribution
-          + moved shareable functions from Module::Build::SysPath to
-          Sys::Path so that they can be used by other build/install
-          systems than Module::Build (thanks to Daxim!)
-        - removed support for $HOME/.syspath/SPc.pm. makes kind of no
-          sense as if the non-privileged user will be installing modules
-          using system Perl to his folder, he can as well configure and
-          install Sys::Path with his home configuration (thanks to Daxim)
-        - moved SPc to Sys::Path::SPc
+        - Removed Module::Build::SysPath from this distribution
+          + Moved reusable functions from Module::Build::SysPath to Sys::Path
+            so other build systems can use them (thanks to Daxim)
+        - Removed support for $HOME/.syspath/SPc.pm; users installing modules
+          locally with the system Perl can install Sys::Path with paths for
+          their home directory (thanks to Daxim)
+        - Moved SPc to Sys::Path::SPc
 
 0.08    9 Sep 2009
-        - store paths from initial run of `perl Build.PL`
-          (install can be run as root so homedir configuration will change)
-        - sharedstatedir (/var/lib) added
-        - conffiles support
-        - make conffiles and sharedstatedir files writeable
-        - added webdir (/var/www)
-        - will not auto install files from cachedir logdir spooldir rundir lockdir sharedstatedir webdir
+        - Preserved paths selected by `perl Build.PL` when installation runs as
+          another user, such as root
+        - Added sharedstatedir (/var/lib)
+        - Added configuration-file support
+        - Made configuration and shared-state files writable
+        - Added webdir (/var/www)
+        - Disabled automatic installation of files from cachedir, logdir,
+          spooldir, rundir, lockdir, sharedstatedir, and webdir
 
 0.07    4 Sep 2009
-        - fixed the "code =>" example
-        - removed dependency on 5.010
-        - removed dependency on IO::Any
-        - localedir added
+        - Fixed the "code =>" example
+        - Removed the dependency on Perl 5.10
+        - Removed the dependency on IO::Any
+        - Added localedir
 
 0.06    4 Sep 2009
-        - renamed configuration file from SysPathConfig to SPc
+        - Renamed the configuration file from SysPathConfig to SPc
 
 0.05    4 Sep 2009
-        - proper consistent versioning :)
+        - Made package versions consistent
 
 0.04    3 Sep 2009
-        - moved the Module::Build functions aways from Sys::Path
+        - Moved Module::Build-specific functions out of Sys::Path
 
 0.03    3 Sep 2009
 0.02    2 Sep 2009
-        - Build.PL tweaks
+        - Updated Build.PL
 
 0.01    Date/time
-        First version, released on an unsuspecting world.
-
+        - Initial release

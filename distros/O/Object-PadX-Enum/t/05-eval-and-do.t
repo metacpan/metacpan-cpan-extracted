@@ -4,9 +4,9 @@ use warnings;
 
 use Test2::V0;
 
-# String-eval contains its own compilation unit; UNITCHECK fires at end of
-# eval-compile, runtime follows inside the eval. Singletons should be usable
-# from the same eval immediately after the enum block.
+# String-eval contains its own compilation unit; the enum body executes while
+# the eval is compiled, so singletons are usable from the same eval
+# immediately after the enum block.
 {
    my $ord = eval q{
       use Object::PadX::Enum;
@@ -20,8 +20,8 @@ use Test2::V0;
    is( $ord, 1, 'eval-string enum: InEval->B->ordinal' );
 }
 
-# do BLOCK runs at runtime within the enclosing unit, after that unit's
-# UNITCHECK. The item/finalize ops execute when the block runs.
+# do BLOCK: the enum block inside it is finalized while the do BLOCK is
+# compiled, so the singletons already exist when the block runs.
 use Object::PadX::Enum;
 
 my $result = do {

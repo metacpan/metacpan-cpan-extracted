@@ -11,7 +11,7 @@ use Linux::Event::IO::Sock::Stream;
 {
     package T::OutputLimit;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return high_watermark => 4096, low_watermark => 1024,
             max_pending_bytes => 16_384;
     }
@@ -33,14 +33,14 @@ use Linux::Event::IO::Sock::Stream;
 {
     package T::SmallTarget;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return max_pending_bytes => 4096 }
+    sub stream_tuning ($class) { return max_pending_bytes => 4096 }
     sub on_data ($stream, $bytes) { }
 }
 
 {
     package T::NegativeOutputLimit;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) { return max_pending_bytes => -1 }
+    sub stream_tuning ($class) { return max_pending_bytes => -1 }
     sub on_data ($stream, $bytes) { }
 }
 

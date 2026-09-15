@@ -154,7 +154,7 @@ for my $interesting_module (qw(
         $prereq_pm->{$interesting_module} ||= 0;
     }
 }
-unless (exists $prereq_pm->{"LWP::UserAgent"} && $] ge '5.006') {
+unless (exists $prereq_pm->{"LWP::UserAgent"} && $] >= 5.006) {
     # allow bootstrap with pure perl HTTP, but skip if we have LWP::UserAgent already installed
     $prereq_pm->{'HTTP::Tiny'} = '0.005';
 
@@ -304,10 +304,10 @@ kwalify-distroprefs-slaymake:
 	$(PERL) `dirname $(PERL)`/slaymake validate
 
 ddify-distroprefs:
-	-$(PERL) -Ilib -e 'use YAML::Syck;use CPAN::Kwalify;use Kwalify qw(validate);use Data::Dumper;{my $$errors = 0; my $$files = 0; my $$perrors = 0;my $$distroprefs_path = $$INC{"CPAN/Kwalify.pm"};$$distroprefs_path =~ s{\.pm$$}{/distroprefs.yml};my $$schema = LoadFile($$distroprefs_path);for my $$yml (glob("distroprefs/*.yml")) {$$files++;my $$data = eval { LoadFile($$yml) };if (!$$data or $$@) {$$perrors++;warn "Parse error in $$yml: $$@\n";next;}$$errors++ if (!validate($$schema, $$data));my $$ddf=$$yml; $$ddf=~s{\.yml$$}{.dd}; open FH,">",$$ddf or die; print {FH} Data::Dumper->new([$$data])->Sortkeys(1)->Indent(1)->Useqq(1)->Dump}if ($$perrors||$$errors) { die "Found $$perrors parse errors and $$errors validate errors in $$files files" }else { warn "Validation OK ($$files files).\n" }}'
+	-$(PERL) -Ilib -e 'use $(YAML_MODULE);use CPAN::Kwalify;use Kwalify qw(validate);use Data::Dumper;{my $$errors = 0; my $$files = 0; my $$perrors = 0;my $$distroprefs_path = $$INC{"CPAN/Kwalify.pm"};$$distroprefs_path =~ s{\.pm$$}{/distroprefs.yml};my $$schema = LoadFile($$distroprefs_path);for my $$yml (glob("distroprefs/*.yml")) {$$files++;my $$data = eval { LoadFile($$yml) };if (!$$data or $$@) {$$perrors++;warn "Parse error in $$yml: $$@\n";next;}$$errors++ if (!validate($$schema, $$data));my $$ddf=$$yml; $$ddf=~s{\.yml$$}{.dd}; open FH,">",$$ddf or die; print {FH} Data::Dumper->new([$$data])->Sortkeys(1)->Indent(1)->Useqq(1)->Dump}if ($$perrors||$$errors) { die "Found $$perrors parse errors and $$errors validate errors in $$files files" }else { warn "Validation OK ($$files files).\n" }}'
 
 kwalify-distroprefs-straight:
-	-$(PERL) -Ilib -le 'use YAML::Syck;use CPAN::Kwalify;use Kwalify qw(validate);use Data::Dumper;{my $$errors = 0; my $$files = 0; my $$perrors = 0;my $$distroprefs_path = $$INC{"CPAN/Kwalify.pm"};$$distroprefs_path =~ s{\.pm$$}{/distroprefs.yml};my $$schema = LoadFile($$distroprefs_path);for my $$yml (glob("distroprefs/*.yml")) {$$files++;my $$data = eval { LoadFile($$yml) };if (!$$data or $$@) {$$perrors++;warn "Parse error in $$yml: $$@\n";next;}$$errors++ if (!validate($$schema, $$data));}if ($$perrors||$$errors) { die "Found $$perrors parse errors and $$errors validate errors in $$files files" }else { warn "Validation OK ($$files files).\n" }}'
+	-$(PERL) -Ilib -le 'use $(YAML_MODULE);use CPAN::Kwalify;use Kwalify qw(validate);use Data::Dumper;{my $$errors = 0; my $$files = 0; my $$perrors = 0;my $$distroprefs_path = $$INC{"CPAN/Kwalify.pm"};$$distroprefs_path =~ s{\.pm$$}{/distroprefs.yml};my $$schema = LoadFile($$distroprefs_path);for my $$yml (glob("distroprefs/*.yml")) {$$files++;my $$data = eval { LoadFile($$yml) };if (!$$data or $$@) {$$perrors++;warn "Parse error in $$yml: $$@\n";next;}$$errors++ if (!validate($$schema, $$data));}if ($$perrors||$$errors) { die "Found $$perrors parse errors and $$errors validate errors in $$files files" }else { warn "Validation OK ($$files files).\n" }}'
 
 setversion:
 	$(PERL) Makefile.PL --setversion
@@ -349,7 +349,7 @@ logs/.exists :
 	touch $@
 
 run :
-	$(PERL) -Ilib -MCPAN -eshell
+	$(PERL) -Irelated/CPAN-Plugin-TraceDeps/lib -Irelated/CPAN-Plugin-TraceMemory/lib -Ilib -MCPAN -eshell
 
 run_testenv_db :
 	$(PERL) -Ilib -It -MCPAN::MyConfig -MCPAN -deshell
@@ -748,7 +748,7 @@ st-prefs :: $base.st
 };
     if ($HAVE_YAML_SYCK) {
       push @m, qq{$base.st : Makefile
-	\$(PERL) -MYAML::Syck=LoadFile -MStorable=nstore -e '\$\$x=shift; \@y=LoadFile("\$\$x.yml"); nstore(\\\@y, "\$\$x.st")' $base
+	\$(PERL) -M\$(YAML_MODULE)=LoadFile -MStorable=nstore -e '\$\$x=shift; \@y=LoadFile("\$\$x.yml"); nstore(\\\@y, "\$\$x.st")' $base
 
 };
     }

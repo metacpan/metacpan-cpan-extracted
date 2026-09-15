@@ -103,20 +103,15 @@ eval { $dbinfo = $dict->dbInfo('web1651'); };
 ok(!$@ && !defined($dbinfo), "dbInfo() on a non-existent DB should return undef");
 
 #-----------------------------------------------------------------------
-# get the database info for the wordnet db, and compare with expected
+# Get the database info for the wordnet db, and compare with expected.
+# The dbinfo varies so let's just check it looks basically ok.
 #-----------------------------------------------------------------------
 $string = '';
 $dbinfo = undef;
 $title  = "Do we get expected DB info for wordnet?";
 eval { $dbinfo = $dict->dbInfo('wn'); };
-if (!$@
-    && defined($dbinfo))
-{
-    eq_or_diff($dbinfo, $TESTDATA{'dbinfo-wn'}, $title);
-}
-else {
-    fail($title);
-}
+ok(!$@ && defined($dbinfo) && $dbinfo =~ /WordNet.*Copyright.*by Princeton University/, $title);
+
 
 #-----------------------------------------------------------------------
 # METHOD: dbTitle

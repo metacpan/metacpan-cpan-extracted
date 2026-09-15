@@ -58,7 +58,7 @@ subtest 'missing arguments' => sub {
     'canonical_uri and schema is sufficient',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com'))->TO_JSON,
     {
       valid => false,
@@ -127,7 +127,7 @@ subtest 'missing arguments' => sub {
   # at OpenAPI construction time, and vocabulary classes are global.
   # What won't work (without further intervention) is trying to add a json schema that uses
   # the jsonSchemaDialect to the evaluator.
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com'))->TO_JSON,
     {
       valid => false,
@@ -155,7 +155,7 @@ subtest 'missing arguments' => sub {
         evaluator => $js,
       );
       is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
-      cmp_result($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
+      is_equal($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
       ok($openapi->evaluator->collect_annotations, 'original evaluator is still defined');
       memory_cycle_ok($openapi, 'no cycles');
     },
@@ -170,7 +170,7 @@ subtest 'missing arguments' => sub {
         evaluator => JSON::Schema::Modern->new(validate_formats => 0),
       );
       is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
-      cmp_result($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
+      is_equal($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
       ok(!$openapi->evaluator->validate_formats, 'evaluator overrides the default');
       memory_cycle_ok($openapi, 'no cycles');
     },
@@ -184,7 +184,7 @@ subtest 'missing arguments' => sub {
         openapi_schema => $minimal_schema,
       );
       is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
-      cmp_result($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
+      is_equal($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
       ok($openapi->evaluator->validate_formats, 'default evaluator is used');
       memory_cycle_ok($openapi, 'no cycles');
     },
@@ -213,7 +213,7 @@ subtest 'construct with document' => sub {
     },
   );
 
-  cmp_result([$doc->errors], [], 'no errors during traversal');
+  is_equal([$doc->errors], [], 'no errors during traversal');
 
   my $openapi = OpenAPI::Modern->new(
     openapi_document => $doc,
@@ -225,19 +225,19 @@ subtest 'construct with document' => sub {
     'canonical uri is taken from the document',
   );
 
-  cmp_result(
+  is_equal(
     scalar $openapi->evaluator->get('http://localhost:1234/api#/components/schemas/foo'),
     true,
     'can construct an openapi object with a pre-existing document',
   );
 
-  cmp_result(
+  is_equal(
     scalar $openapi->evaluator->get('https://spec.openapis.org/oas/'.OAS_VERSION.'/schema/latest#/type'),
     'object',
     'the main OAD schema is available from the evaluator used in OpenAPI::Modern construction',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->evaluator->_get_vocabulary_class('https://spec.openapis.org/oas/'.OAS_VERSION.'/vocab/base'),
     [
       'draft2020-12',

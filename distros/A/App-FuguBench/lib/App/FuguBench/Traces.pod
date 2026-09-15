@@ -1,0 +1,191 @@
+=head1 NAME
+
+App::FuguBench::Traces - the traces verb of fugubench
+
+=head1 SYNOPSIS
+
+    fugubench [-C <root>] traces [--root <dir>] [--name <name>]
+
+=head1 DESCRIPTION
+
+B<App::FuguBench::Traces> measures the Claude Code sessions of one
+checkout. Claude Code keeps one trace directory for each working
+directory, under F<~/.claude/projects/>. The name of the directory is
+the absolute path of the working directory, and the harness replaces
+each character outside a letter, a digit and a hyphen with a hyphen.
+
+The verb derives that name from the checkout root, it matches the
+trace directories of the checkout, and it prints one line for each
+session in them that holds a request. The verb takes no argument, and
+an argument gives the usage error.
+
+This verb and the hook verb hold the Claude Code assumptions of the
+program. Every other verb is agent-agnostic.
+
+=head2 THE NAME
+
+The name comes from the checkout root of C<-C>, or of the walk to the
+nearest F<.toolingrc>. The verb resolves that root to its real path,
+and it cuts the path at the last F<.claude/worktrees/> marker. A
+nested checkout holds the marker more than one time, and a cut at the
+first marker names the wrong checkout.
+
+A worktree holds a F<.toolingrc> of its own, so the walk stops in the
+worktree and the cut reaches the checkout. The sessions of a worktree
+then join the sessions of the checkout that holds it.
+
+=head2 THE MATCH
+
+Three name forms belong to one checkout: the checkout itself, a
+worktree of it, and a project clone in either of them. The match takes
+the exact forms, so a sibling checkout, such as a backup, stays out.
+
+=head2 THE OPTIONS
+
+C<--root E<lt>dirE<gt>> names a trace root in place of the directory
+under the home of the operator. A trace root that is no directory is a
+failure, and the message holds the path.
+
+C<--name E<lt>nameE<gt>> replaces the derived name. The verb then
+derives no name. It still reads the checkout, because the edits column
+takes its boundary from the checkout path.
+
+=head2 THE OUTPUT
+
+The verb prints a header, and one line for each session that holds a
+request. The lines sort by start time. A session with no request never
+reached the model, so it gets no line. A name that matches no
+directory gives one line, C<no session of E<lt>nameE<gt>>, and the
+verb returns 0.
+
+The columns are:
+
+=over 4
+
+=item C<session>
+
+The first eight characters of the session identifier.
+
+=item C<start>
+
+The time of the first record of the session, in UTC.
+
+=item C<reqs>
+
+The requests of the main session.
+
+=item C<peak>
+
+The largest context of one request: the fresh input tokens, the cache
+writes and the cache reads.
+
+=item C<out>
+
+The output tokens of the main session, thinking included.
+
+=item C<panel>
+
+The requests that hold a panel launch.
+
+=item C<edits>
+
+The file edits of the main session after the first panel launch.
+
+=item C<sub-in>
+
+The input tokens of every sub-agent of the session.
+
+=item C<sub-out>
+
+The output tokens of every sub-agent.
+
+=item C<rev-peak>
+
+The largest peak context of one panel reviewer.
+
+=back
+
+=head2 THE COUNTS
+
+One request writes one record for each content block, and each record
+carries the usage of the whole request. An early record can carry a
+partial count, so the verb takes the usage of the last record of a
+request. A record with no request identifier counts alone.
+
+The reader decodes each record until one carries a start time, and
+after that it decodes an assistant record only. A full parse of every
+record costs minutes over a long history. Every usage block and every
+C<tool_use> block sits in an assistant record, so the filter loses no
+count. A line that fails to decode is no record.
+
+A panel launch is a C<tool_use> block of the C<Agent> or C<Task> tool
+whose C<subagent_type> is C<reviewer>. A catch-all type,
+C<general-purpose> or C<claude>, and an absent type name no role, so
+the description decides: it holds the word C<panel>. Another type,
+such as a fixer, is no launch.
+
+The edits column takes the C<Edit>, C<Write>, C<MultiEdit> and
+C<NotebookEdit> blocks that come after the first panel launch. A block
+counts when its target is a repository file. An absolute target must
+sit inside the checkout path, on a directory boundary, so a write to
+the home of the operator or to a sibling checkout counts for nothing.
+A relative target sits inside the checkout, because the path resolves
+against the working directory of the session. A target under
+F<scratch/>, or a F<SCRATCHPAD*.md> file, is no repository file. A
+block with no target counts.
+
+The sub-agent traces sit under F<E<lt>sessionE<gt>/subagents/>, and
+under each workflow directory below it. The C<sub-in> and C<sub-out>
+columns hold every one of them together, so neither column measures
+one reviewer. Each sub-agent trace has a sibling F<.meta.json> that
+carries the identifier of its launch. The C<rev-peak> column maps the
+panel launches to their traces through it, and it reports the largest
+peak of them.
+
+=head2 command
+
+C<command($verb)> returns the entry of the L<Fugu::CLI> table. The
+module holds one verb, so it ignores the name.
+
+=head2 unveil_paths
+
+C<unveil_paths($app)> returns the unveil list of the sandbox row of
+the verb, as a list of entries for L<Fugu::Sandbox>. The dispatcher
+reads it before it enters the sandbox.
+
+The verb opens the trace files itself and runs no child, so its row
+unveils. The list holds the library directories of the interpreter,
+the checkout root, and the trace root. It holds nothing else.
+
+The library directories and the trace root are optional entries. The
+build of a perl records a directory that the host can omit, and the
+verb reports an absent trace root itself. A required entry would die
+in front of that report.
+
+The method resolves the checkout, because the unveil list names the
+checkout root. Every run
+reads the checkout, C<--name> included, because the edits column takes
+its boundary from the checkout path.
+
+=head1 RETURN VALUES
+
+C<command> returns a hash reference. C<unveil_paths> returns a list of
+unveil entries.
+
+The verb returns the exit codes of L<Fugu::CLI>. It returns 0 after a
+run that prints the sessions, and after a name that matches no
+directory. It returns 1 when the trace root is no directory, when no
+read reaches it, and when the real path of the checkout root fails.
+An argument gives the usage error and returns 2. A start under no
+F<.toolingrc> returns 3.
+
+=head1 SEE ALSO
+
+L<App::FuguBench>, L<App::FuguBench::Checkout>, L<Fugu::CLI>,
+L<Fugu::Sandbox>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

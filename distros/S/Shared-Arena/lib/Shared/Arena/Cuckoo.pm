@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Cuckoo - a shared set that answers "no" exactly, "yes" probably, 
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =head1 SYNOPSIS
 

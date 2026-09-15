@@ -6,7 +6,7 @@ use 5.014;
 use warnings;
 use utf8;
 
-our $VERSION = 2.003;
+our $VERSION = 2.005;
 
 use File::Spec qw();
 use JSON::PP   qw();
@@ -104,7 +104,7 @@ Alien::libmaxminddb - Find or install libmaxminddb
 
 =head1 VERSION
 
-version 2.003
+version 2.005
 
 =head1 SYNOPSIS
 
@@ -201,6 +201,10 @@ Thanks to all who have contributed patches and reported bugs:
 =item *
 
 Alex Granovskiy
+
+=item *
+
+Kurt Starsinic
 
 =back
 

@@ -12,6 +12,8 @@
 ^pm_to_blib$
 \.o$
 \.bs$
+^nghttp2\.c$
+^nghttp2\.xsc$
 
 # Avoid distribution artifacts
 ^Alien-nghttp2-[\d.]+/

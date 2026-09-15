@@ -1,0 +1,71 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 975586f6c52df64e509ea9d53f1d722ebd0655188d37b485a064f69157741c13 CHANGES
+SHA256 55af2a83df43c5d47761c4ffac45b92f4c79eca9e1649bcffe5c35ec017eead1 CONTRIBUTING.md
+SHA256 4bb36edd2bcafef11ca615f69607953a31ee05ae172b69990aee317e95653456 LICENSE
+SHA256 714fd5ecb626fab5f7e7deaa3a4cabbf4341da0114ff9640e4d71b5e989498cf MANIFEST
+SHA256 8382e14c6e0b16e0c85ca3c202265382aedf49c8375cacaea4c708613aac2d3b META.json
+SHA256 6d4d965a32654dc4356656de6b23091151733943269a819c628f0c03ec7aae9a META.yml
+SHA256 294f1bc6522af134127928363527ed99778e60374cdc685e537019216b48bbd7 Makefile.PL
+SHA256 4ac0f274177ff6568d5cef1892bce2ef9404eebae39e5b460ed9eebbf3625de8 README
+SHA256 e4d8cd006eb08921d39c71f349c99eea5c05c78fadb6c072db04d2bf66ba4134 README.md
+SHA256 8b96189a779ebeda2ec2e13c8e275391a55cae6dc88f27618f6f1a82cc05b61e examples/print-options-using-class-functions.pl
+SHA256 a030b353bca3411b1df7337ef5f22997fc19c975a95667518c6a076e23676035 examples/print-options.pl
+SHA256 c3d106060f09532140fca1af860bc7e8ccdaa20eae5c5ccd43d524f6a3f9f671 examples/registration.pl
+SHA256 5023dce24098b027d3c2fe5c6872e5b5f92364f9c602adc60d19690caafb1577 examples/schema.sql
+SHA256 81afdab418508ce067b4fc393ae73148f45851f48556827e03686e04adfc5258 examples/webauthn-using-class-functions.psgi
+SHA256 4d6be1cc79495984b78e6639f477550ddd17edac9109df8ae7b01226bd244b3d examples/webauthn.psgi
+SHA256 09d02b59ffbb220cd5927848f1bbeb60403f6e2cfb9aea237dfa70e462a434a1 lib/Web/Authn.pm
+SHA256 89f550cf8d0f01d51b863e3aa9d1511f627c36f149e6c375809ac305ad63376a lib/Web/Authn/Attestation.pm
+SHA256 99a75bfd0e67b74901408ce23589e3268fd045922b266ae2d05bf7e6587e8b64 lib/Web/Authn/CBOR.pm
+SHA256 bc28854d2f5784b534d2c314b6e0e50aa718b48bea9de0e3c3e0fb58c03df2b1 lib/Web/Authn/COSE.pm
+SHA256 7ff3068eddb8591315d19c19c228345fe9e756ac7696983de27766f51953dcc3 lib/Web/Authn/Cookbook.pm
+SHA256 52d4d78eb05b2aaad792e974d13acafabfdfb20058266e5e896e172d59a70ed9 lib/Web/Authn/Crypto.pm
+SHA256 335764b74df1ffdef20df5e263f05e532c406c734a86aedb553634cb5284e6e2 lib/Web/Authn/Exception.pm
+SHA256 f3d562402cf0e3cd505f4eada4e9f96a30304a925dafeb87a8d3f5062952561a lib/Web/Authn/NullObject.pm
+SHA256 42a8e0027307fa5614b0cbc66df70c82cff5682cea463711db7b134996289332 lib/Web/Authn/Parse.pm
+SHA256 7b2ee5508c785b485cbaad384a39f69029d1daad41d38bfd9cff483793ef7cf8 t/00.load.t
+SHA256 8448e9665cdc1a06329c049b2c303284c778670e59739f570019657bbc97d1c6 t/01.options.t
+SHA256 e3d81daf6135004da121d1799d2695e2b71105e59563abeb743d2e93d8f639ad t/02.parse.t
+SHA256 1007ececda82ae974ab8cfdd7829bc844872ea4e8590f6beafaa0f8ed794c7a4 t/03.cbor.t
+SHA256 4a88505d41a5caa1e6b079ecd96208fff2ad334cdac71ea1865b78a4abae9b5f t/04.parse-more.t
+SHA256 01fec08a1001e5da1e616204908b70959152aca441921ccafa07728e9511ec71 t/05.attestation.t
+SHA256 a0bee039d1df2681b4552ba7f262d25b93d577005c8c507c7e91c42e714fc616 t/06.verify.t
+SHA256 23ebdbcf16b3fdb897bfeb019e7f8bdf4fe0d66a9787fbd38913bcf3b9541a51 t/07.cose-exception.t
+SHA256 596a9cda31df48e312dfe163aaf0ec1fcdce66e0427eb93be577613d102e95bb t/08.threads.t
+SHA256 6d57ad1ccd3aedebb05e4af2e39e0cb0b456994af6ca2168b81db713e130dd8e t/09.overload.t
+SHA256 86e15de9a281b19557dd23a0e26f33ade4d12664368f600290a70e752b37c19f t/90.pod.t
+SHA256 e93a93d7249e9df42a22b5cf2c5e06f08803f5623bb5fda8baaad703d48a92a1 t/91.coverage.t
+SHA256 e3f33279eec6c41cb9400a58a574a8d9a3981a5f82120af6b9d3148c4c03f78b t/92.manifest.t
+SHA256 e1b791ad43ad1f5409ede48a2ae3519e81aa4461be48435187148dd5ce7462d1 t/93.signature.t
+SHA256 8a66667405ab32e5535b9bab3649ac51ab571ffc5663392fe024bffbf955c1de t/99.kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEENa28Ovg1XoRROdiWXzwCYc2y51IFAmqlSMoACgkQXzwCYc2y
+51J1JQ//Y3Va+ghnMXHMGKfupXIslVOSp7rgiNGBg6yp2V++aLVhRVKSLq5ENQAs
+94B2Ur5pK+4pM4nRGv86T8TDIuAIjNgr56j1lL8zbmHbfPJ6QaZexjPrSPwMmUwe
+6DXHgoBFTGrWel1+sC+zwDwOpgAHbRG52yVA44jtEDsiWQJp9pCjuXuK+DUL22qu
+O+gfLXNqJ+m/FHIW4pZV3R4AIvLEPJz7NmqKZO4Nq1GdO4tanx2yeixn1aLl3bje
+f9F2wMl7ra2F/tbXvABHd6sRPApkWycnyZQ7I4Ql7j9Kh/tPm6zwpRgEhkN5zSOt
+o1/krtD8QaxujtaNgVTGtLIDrYMDPv5KUEUC+4l+KN1xjAdY8NBUCA9cRiRvAAlY
+6dAbK1I7jVrmFYRRYO4by4Iqjjm7Q3YUJ+jV6Ies3QbGe0Pf1+W3HNIjXDKwj+rR
+AICI0XCNTVEhkkjZpFNR8pl+78YAwjfBr9Z+PqZRh+7uIng0kZo7fvNWg9PvB/H1
+11zymGlz2RFPZNJv+iBqDt+5l9gVNDAXkFd2kFOGEvXVyFIOjiz5kOACRKn9Y0+D
+cvAs8rTRvgv1ptmRpeiShqOGTbI8at8lMRNNi4m6usSBVfz4xaDteO3CNA5LlxU4
+tVdQWe+1I4gVGClk03ab9gfwuhEs1rquedBaOFlfVeX61eCc1dQ=
+=nSXD
+-----END PGP SIGNATURE-----

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.84
+    version 2.87
 
 SYNOPSIS
 
@@ -880,8 +880,6 @@ METHODS
     helpful when you have an old install with files that may break the new
     build.
 
-    For a non-share install this doesn't do anything.
-
  system
 
      $build->system($command);
@@ -928,6 +926,13 @@ META METHODS
     share
 
     system
+
+ has_requires
+
+     if (Alien::Build->meta->has_requires($phase, $module_pat, ...)) {...}
+
+    Tests to see if the given phase has any of the given substrings as a
+    requirement. Phase as "add_requires".
 
  interpolator
 
@@ -1219,6 +1224,8 @@ AUTHOR
     nick nauwelaerts (INPHOBIA)
 
     Florian Weimer
+
+    Marcel Telka (mtelka)
 
 COPYRIGHT AND LICENSE
 

@@ -1,7 +1,7 @@
 ---
 abstract: 'cPanel fork of JSON::XS, fast and correct serializing'
 author:
-  - 'Reini Urban <rurban@cpan.org>'
+  - 'Reini Urban <reini.urban@gmail.com>'
 build_requires:
   B: '0'
   Config: '0'
@@ -22,7 +22,7 @@ configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/rurban/Cpanel-JSON-XS/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rurban/Cpanel-JSON-XS
-version: '4.51'
+version: '4.52'
 x_contributors:
   - 'Ashley Willis <ashleyw@cpan.org>'
   - 'Chip Salzenberg <chip@pobox.com>'

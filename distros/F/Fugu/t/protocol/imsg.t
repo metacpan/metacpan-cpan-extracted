@@ -6,7 +6,10 @@
 # bytes out. The socket half is proven in t/fugu/imsg.t, over a real
 # socketpair.
 
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
 use Errno qw(EBADMSG EMSGSIZE);
 use FindBin qw($RealBin);

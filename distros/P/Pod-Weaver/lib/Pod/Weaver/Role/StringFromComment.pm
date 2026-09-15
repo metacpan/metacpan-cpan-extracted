@@ -1,10 +1,10 @@
-package Pod::Weaver::Role::StringFromComment 4.021;
+package Pod::Weaver::Role::StringFromComment 4.022;
 # ABSTRACT: Extract a string from a specially formatted comment
 
 use Moose::Role;
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -87,7 +87,7 @@ Pod::Weaver::Role::StringFromComment - Extract a string from a specially formatt
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

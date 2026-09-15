@@ -52,6 +52,11 @@ my @stale_callback_model = (
     qr/constructor closures and repeated method\/configuration lookup are not added to each readiness event/i,
 );
 
+my @retired_listener_api = (
+    qr/\bstream_class\s*=>/,
+    qr/\bstream_options\s*\(/,
+);
+
 my $retired_parent = qr{
     use\s+parent\s+['"]Linux::Event::
     (?:Stream|Socket|Listener|Datagram|Timer|Signal|Wakeup|Process)['"]
@@ -82,6 +87,11 @@ for my $relative (@current_docs) {
             "$relative does not teach the retired subclass-only callback performance model");
     }
 
+    for my $pattern (@retired_listener_api) {
+        unlike($text, $pattern,
+            "$relative does not teach the retired Listener/Stream configuration API");
+    }
+
     unlike($text, $retired_parent,
         "$relative does not subclass a retired top-level resource class in current guidance");
 }
@@ -103,6 +113,21 @@ for my $relative (glob(File::Spec->catfile($root, 'examples', '*.pl'))) {
     close $fh;
     unlike($text, $retired_parent,
         "$relative uses the current IO/Kernel subclassing surface");
+}
+
+my @current_benchmark = (
+    glob(File::Spec->catfile($root, 'bench', '*.pl')),
+    glob(File::Spec->catfile($root, 'bench', 'runtime-line', '*.pl')),
+);
+for my $path (@current_benchmark) {
+    open my $fh, '<', $path or die "open $path: $!";
+    local $/;
+    my $text = <$fh>;
+    close $fh;
+    for my $pattern (@retired_listener_api) {
+        unlike($text, $pattern,
+            "$path does not use the retired Listener/Stream configuration API");
+    }
 }
 
 my $makefile_pl = File::Spec->catfile($root, 'Makefile.PL');
@@ -152,6 +177,10 @@ for my $module (@public_modules) {
     unlike($pod,
         qr/Applications subclass the concrete leaf that describes the resource being used/i,
         "$module public POD does not require subclassing merely to use a concrete IO leaf");
+    for my $pattern (@retired_listener_api) {
+        unlike($pod, $pattern,
+            "$module public POD does not teach the retired Listener/Stream configuration API");
+    }
 }
 
 done_testing;

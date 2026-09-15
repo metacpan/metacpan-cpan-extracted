@@ -16,5 +16,6 @@ t/03_flatten_per_level.t
 t/04_flatten_per_level_complex.t
 t/05_circular_references.t
 t/06_memleak.t
+t/07_return_stack.t
 META.yml
 MANIFEST

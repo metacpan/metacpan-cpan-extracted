@@ -150,3 +150,60 @@ it helps ensure that data remains usable — regardless of environment or scale.
 ---
 
 © 2025 Shingo Kawamura
+
+## 8. Internal Query Architecture
+
+Query execution has an explicit internal pipeline:
+
+```text
+source text
+    ↓
+JQ::Lite::Tokenizer
+    ↓
+JQ::Lite::Parser
+    ↓
+JQ::Lite::AST
+    ↓
+JQ::Lite::Evaluator
+    ↓
+JQ::Lite::Runtime
+```
+
+The tokenizer owns source boundaries and currently emits top-level filter,
+pipe, and end-of-input tokens. Delimiters inside strings, arrays, objects, and
+parenthesized expressions remain within a filter token. This narrow lexer
+boundary allows syntax to move incrementally without changing 2.x behavior.
+
+The parser validates and compatibility-normalizes those filter tokens and
+builds a typed pipeline AST. The evaluator only walks AST nodes and controls
+stream propagation. The runtime owns JSON decoding and dispatch to the
+existing built-in and traversal implementations. This separation prevents
+parsing decisions from being mixed into the top-level evaluation loop.
+
+`JQ::Lite::Tokenizer`, `JQ::Lite::AST`, `JQ::Lite::Evaluator`, and
+`JQ::Lite::Runtime` are implementation details. They are intentionally outside
+the stable Library API and may evolve as more filter-local syntax is represented
+by dedicated AST node types. `JQ::Lite->new` and `run_query` remain the public
+entry points.
+
+`JQ::Lite::Value` is the shared value-semantics layer for the 3.0 evaluator.
+It classifies JSON values without conflating booleans, numbers, and strings,
+and provides recursive jq-style equality and total ordering for compound
+values. The stable 2.x filter implementation does not call this layer yet;
+that separation prevents preparatory 3.0 work from changing 2.x results.
+
+### Built-in registry
+
+`JQ::Lite::Filters` owns language constructs such as expressions, control
+flow, constructors, assignment, and traversal. Built-in filters are resolved
+through `JQ::Lite::Builtin`, whose internal registry supports both exact names
+and parameterized-call patterns. Implementations are grouped by responsibility
+under `JQ::Lite::Builtin::{Array,Object,String,Math,Aggregate,Encoding,Type}`.
+Category modules receive the evaluator owner and current input stream, so they
+can preserve streaming and error behaviour without depending on the parser or
+the top-level filter loop.
+
+The registry and all category packages are internal implementation details,
+like the tokenizer and evaluator layers. New built-ins should be registered in
+the narrowest applicable category rather than adding another branch to
+`JQ::Lite::Filters`.

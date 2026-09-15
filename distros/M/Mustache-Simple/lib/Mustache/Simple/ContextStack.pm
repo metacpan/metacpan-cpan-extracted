@@ -5,7 +5,7 @@ use warnings;
 use 5.10.1;
 use version;
 
-our $VERSION = version->declare('v1.3.6');
+our $VERSION = version->declare('v1.3.8');
 
 use Scalar::Util qw(blessed reftype);
 use Carp;

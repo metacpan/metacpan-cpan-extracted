@@ -1,5 +1,13 @@
 Revision history for constant-string
 
+2026.377  2026-09-13 17:23:01-0400
+          - Bump to 377
+2026.376001 2026-09-12 20:44:24-0400
+          - Fix tests for Perls 5.20 and earlier (avoid $*)
+2026.376  2026-09-12 20:16:42-0400
+          - Version bump
+2026.375  2026-09-11 18:24:01-0400
+          - Correct Synopsis, add constant::string::ucfirst and tests
 2026.267  2026-06-28 20:43:11-0400
           - In which we try and create a new version that is considered larger by PAUSE and mbtiny regenerate
 2026.026007 2026-06-28 20:28:03-0400

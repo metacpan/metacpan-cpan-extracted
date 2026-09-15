@@ -43,3 +43,15 @@ Revision history for Perl extension Apache::AuthNetLDAP.
 0.29  Sat May 01 2004
 	- add ability to test $password against an alternate password attribute.
   	  The alt attribute is signified by PerlSetVar PWAttr.
+
+0.30  Sun Sep 13 2026
+	- Remove mod_perl1 references in favor of mod_perl2
+	- Add TLSCertVerify and TLSCAfile variables
+	- Remove hardcoded verify => none from start_tls
+	- I will delete the Apache2::AuthNetLDAP module in favor of this one
+
+0.31 Sun Sep 13 2026
+        - add META.json
+
+0.32 Mon Sep 14 2026
+        - add provides section to META.json for indexing

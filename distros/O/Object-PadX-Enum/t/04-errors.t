@@ -17,7 +17,7 @@ use Object::PadX::Enum;
    like( $@, qr/item/, 'error message mentions item' );
 }
 
-# Runtime error: duplicate item name.
+# Compile-time error: duplicate item name.
 {
    my $ok = eval q{
       use Object::PadX::Enum;
@@ -31,7 +31,7 @@ use Object::PadX::Enum;
    like( $@, qr/Duplicate item 'SAME'/, 'duplicate error mentions name' );
 }
 
-# Runtime error: reserved item name.
+# Compile-time error: reserved item name.
 {
    my $ok = eval q{
       use Object::PadX::Enum;
@@ -44,7 +44,7 @@ use Object::PadX::Enum;
    like( $@, qr/reserved/, 'reserved error message' );
 }
 
-# Runtime error: reserved item name "name".
+# Compile-time error: reserved item name "name".
 {
    my $ok = eval q{
       use Object::PadX::Enum;

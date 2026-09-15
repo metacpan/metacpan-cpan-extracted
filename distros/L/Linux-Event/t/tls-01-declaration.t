@@ -27,6 +27,15 @@ use Linux::Event::TLS;
 }
 
 {
+    package T::RuntimeTLSServer;
+    use parent 'Linux::Event::IO::Sock::Stream';
+    sub tls_defaults ($class) {
+        return alpn => ['declaration-test/1'];
+    }
+    sub on_data ($stream, $bytes) { return }
+}
+
+{
     package T::DeclaredTLSClient;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::TLS
@@ -55,12 +64,18 @@ use Linux::Event::TLS;
 }
 
 my $listener = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'T::InheritedTLSServer',
-    host         => '127.0.0.1',
-    port         => 0,
+    host => '127.0.0.1',
+    port => 0,
+    stream => {
+        class => 'T::RuntimeTLSServer',
+        tls => {
+            cert_file => "$FindBin::Bin/tls-certs/server-cert.pem",
+            key_file  => "$FindBin::Bin/tls-certs/server-key.pem",
+        },
+    },
 );
 ok($listener->port > 0,
-    'Listener accepts an inherited TLS stream-socket declaration');
+    'Listener prepares runtime TLS from the generated-Stream recipe');
 $listener->close;
 
 my $client = T::DeclaredTLSClient->connect(
@@ -74,21 +89,30 @@ $client->close;
 
 my $ok = eval {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::TLSWithoutCertificate',
-        host         => '127.0.0.1',
-        port         => 0,
+        host => '127.0.0.1',
+        port => 0,
+        stream => {
+            class => 'T::TLSWithoutCertificate',
+            tls   => {},
+        },
     );
     1;
 };
 ok(!$ok, 'accepted TLS stream-socket declaration requires a certificate');
-like($@, qr/does not declare cert_file and key_file/,
+like($@, qr/requires cert_file and key_file/,
     'missing server credential error identifies the declaration');
 
 $ok = eval {
     Linux::Event::IO::Sock::Listener->new(
-        stream_class => 'T::TLSWithUnreadableCertificate',
-        host         => '127.0.0.1',
-        port         => 0,
+        host => '127.0.0.1',
+        port => 0,
+        stream => {
+            class => 'T::TLSWithUnreadableCertificate',
+            tls => {
+                cert_file => "$FindBin::Bin/tls-certs/missing-cert.pem",
+                key_file  => "$FindBin::Bin/tls-certs/missing-key.pem",
+            },
+        },
     );
     1;
 };

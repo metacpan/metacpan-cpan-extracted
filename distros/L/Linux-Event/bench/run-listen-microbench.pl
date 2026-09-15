@@ -13,7 +13,6 @@ use Socket qw(
 use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 
 use Linux::Event::IO::Sock::Stream;
-use Linux::Event::IO::Sock::Stream;
 use Linux::Event::IO::Sock::Listener;
 use Linux::Event::Loop;
 
@@ -162,15 +161,21 @@ sub one_run ($mode, $client_count) {
         );
     } elsif ($mode eq 'add') {
         $run->{listener} = BenchAutomaticListener->new(
-            stream_class => 'BenchAutomaticStream',
-            host => '127.0.0.1', port => 0, data => $run,
+            stream => {
+                class => 'BenchAutomaticStream',
+                data  => $run,
+            },
+            host => '127.0.0.1', port => 0,
         );
         $loop->add($run->{listener});
         $run->{port} = $run->{listener}->port;
     } else {
         $run->{listener} = BenchAutomaticListener->new(
-            stream_class => 'BenchAutomaticStream',
-            loop => $loop, host => '127.0.0.1', port => 0, data => $run,
+            stream => {
+                class => 'BenchAutomaticStream',
+                data  => $run,
+            },
+            loop => $loop, host => '127.0.0.1', port => 0,
         );
         $run->{port} = $run->{listener}->port;
     }

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 
-use parent qw(Linux::Event::_Socket Linux::Event::_ByteStream);
+use parent 'Linux::Event::_ByteStream';
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use Socket qw(SOL_SOCKET SO_ERROR SO_TYPE SOCK_STREAM SHUT_RD SHUT_WR);
@@ -15,39 +15,7 @@ use Linux::Event::_Socket::Connection ();
 use Linux::Event::_Socket::Descriptor ();
 use Linux::Event::_SocketConfig ();
 
-sub _declare_tls ($base, $target, $definition) {
-    Linux::Event::_Socket::Descriptor::declare_tls($base, $target, $definition);
-}
-
-sub _socket_type ($fh) {
-    my $packed = getsockopt($fh, SOL_SOCKET, SO_TYPE);
-    croak 'new(): fh is not a socket' if !defined($packed) || length($packed) < 4;
-    croak 'new(): fh is not a SOCK_STREAM socket'
-        if unpack('i', $packed) != SOCK_STREAM;
-    return;
-}
-
-sub _socket_setup ($fh, $descriptor, $override, $peer) {
-    _socket_type($fh);
-    my $packed_local = getsockname($fh);
-    croak 'new(): could not obtain local socket address'
-        if !defined $packed_local;
-    my $local = Linux::Event::Address->new($packed_local);
-    my %policy = map {
-        $_ => exists($override->{$_})
-            ? $override->{$_} : $descriptor->{options}{$_}
-    } Linux::Event::_SocketConfig::names();
-    Linux::Event::_SocketConfig::apply_policy(
-        $fh, $local->family_number, \%policy,
-    );
-    if (!defined $peer) {
-        my $packed_peer = getpeername($fh);
-        $peer = Linux::Event::Address->new($packed_peer)
-            if defined $packed_peer;
-    }
-    croak 'new(): fh is not a connected SOCK_STREAM socket' if !defined $peer;
-    return ($local, $peer, \%policy);
-}
+# Constructors and class lifecycle
 
 sub new ($class, %opt) {
     croak 'new(): must be called as a class method' if ref $class;
@@ -74,17 +42,20 @@ sub new ($class, %opt) {
         $fh, $socket_descriptor, $override, $peer,
     );
     if (my $tls = $socket_descriptor->{tls}) {
-        croak 'new(): transport cannot be supplied for a TLS-declared Socket'
-            if defined $transport;
-        require Linux::Event::TLS;
-        my $role = $accepted ? 'server' : $tls_role;
-        croak 'new(): a TLS-declared adopted fh requires tls_role'
-            if !defined $role;
-        croak 'new(): tls_role must be client or server'
-            if $role ne 'client' && $role ne 'server';
-        $transport = $role eq 'server'
-            ? Linux::Event::TLS->_server_from_declaration($tls)
-            : Linux::Event::TLS->_client_from_declaration($tls);
+        if (!$accepted) {
+            croak 'new(): transport cannot be supplied for a TLS-declared Socket'
+                if defined $transport;
+            require Linux::Event::TLS;
+            croak 'new(): a TLS-declared adopted fh requires tls_role'
+                if !defined $tls_role;
+            croak 'new(): tls_role must be client or server'
+                if $tls_role ne 'client' && $tls_role ne 'server';
+            $transport = $tls_role eq 'server'
+                ? Linux::Event::TLS->_server_from_declaration($tls)
+                : Linux::Event::TLS->_client_from_declaration($tls);
+        }
+        # Accepted sockets acquire TLS only from the Listener recipe.
+        # A class declaration/default never activates TLS by itself.
     } elsif (defined $tls_role) {
         croak 'new(): tls_role requires a Socket subclass declaring TLS';
     }
@@ -153,6 +124,142 @@ sub connect ($class, %opt) {
     );
     $self->_attach_to_loop($loop) if $loop;
     return $self;
+}
+
+sub CLONE ($class) {
+    Linux::Event::_Socket::Descriptor::clear_cache();
+    return;
+}
+
+sub CLONE_SKIP ($class) { 1 }
+
+# Accessors
+
+sub local ($self) { $self->{local} }
+sub peer ($self) { $self->{peer} }
+sub fd ($self) { $self->read_fd }
+
+sub tcp_nodelay ($self, @arg) {
+    $self->_socket_option('tcp_nodelay', @arg);
+}
+
+sub keepalive ($self, @arg) {
+    $self->_socket_option('keepalive', @arg);
+}
+
+sub keepalive_idle ($self, @arg) {
+    $self->_socket_option('keepalive_idle', @arg);
+}
+
+sub keepalive_interval ($self, @arg) {
+    $self->_socket_option('keepalive_interval', @arg);
+}
+
+sub keepalive_count ($self, @arg) {
+    $self->_socket_option('keepalive_count', @arg);
+}
+
+sub tcp_user_timeout ($self, @arg) {
+    $self->_socket_option('tcp_user_timeout', @arg);
+}
+
+sub send_buffer ($self, @arg) {
+    $self->_socket_option('send_buffer', @arg);
+}
+
+sub receive_buffer ($self, @arg) {
+    $self->_socket_option('receive_buffer', @arg);
+}
+
+sub selected_alpn ($self) {
+    my $transport = $self->{transport};
+    return $transport && $transport->can('selected_alpn')
+        ? $transport->selected_alpn : undef;
+}
+
+sub tls_protocol ($self) {
+    my $transport = $self->{transport};
+    return $transport && $transport->can('protocol')
+        ? $transport->protocol : undef;
+}
+
+sub tls_cipher ($self) {
+    my $transport = $self->{transport};
+    return $transport && $transport->can('cipher')
+        ? $transport->cipher : undef;
+}
+
+sub tls_stats ($self) {
+    my $transport = $self->{transport};
+    return $transport && $transport->can('stats')
+        ? $transport->stats : undef;
+}
+
+# Methods
+
+sub close_read ($self) {
+    return $self if $self->{closed} || $self->{read_closed} || $self->{read_eof};
+    croak 'close_read(): directional close is unavailable for TLS sockets'
+        if ($self->transport_name // 'plain') ne 'plain';
+    shutdown($self->fh, SHUT_RD) or do {
+        my $errno = 0 + $!;
+        $self->_fail_io('shutdown_read', $errno);
+        return $self;
+    };
+    return $self->SUPER::close_read;
+}
+
+sub close_write ($self) {
+    return $self if $self->{closed} || $self->{write_ended};
+    croak 'close_write(): use end() for TLS sockets'
+        if ($self->transport_name // 'plain') ne 'plain';
+    shutdown($self->fh, SHUT_WR) or do {
+        my $errno = 0 + $!;
+        $self->_fail_io('shutdown_write', $errno);
+        return $self;
+    };
+    return $self->SUPER::close_write;
+}
+
+sub detach ($self) {
+    my $handles = $self->SUPER::detach;
+    return $handles->{read_fh};
+}
+
+# Private helpers and internal overrides
+
+sub _declare_tls ($base, $target, $definition) {
+    Linux::Event::_Socket::Descriptor::declare_tls($base, $target, $definition);
+}
+
+sub _socket_type ($fh) {
+    my $packed = getsockopt($fh, SOL_SOCKET, SO_TYPE);
+    croak 'new(): fh is not a socket' if !defined($packed) || length($packed) < 4;
+    croak 'new(): fh is not a SOCK_STREAM socket'
+        if unpack('i', $packed) != SOCK_STREAM;
+    return;
+}
+
+sub _socket_setup ($fh, $descriptor, $override, $peer) {
+    _socket_type($fh);
+    my $packed_local = getsockname($fh);
+    croak 'new(): could not obtain local socket address'
+        if !defined $packed_local;
+    my $local = Linux::Event::Address->new($packed_local);
+    my %policy = map {
+        $_ => exists($override->{$_})
+            ? $override->{$_} : $descriptor->{options}{$_}
+    } Linux::Event::_SocketConfig::names();
+    Linux::Event::_SocketConfig::apply_policy(
+        $fh, $local->family_number, \%policy,
+    );
+    if (!defined $peer) {
+        my $packed_peer = getpeername($fh);
+        $peer = Linux::Event::Address->new($packed_peer)
+            if defined $packed_peer;
+    }
+    croak 'new(): fh is not a connected SOCK_STREAM socket' if !defined $peer;
+    return ($local, $peer, \%policy);
 }
 
 sub _validate_accepted_configuration ($class) {
@@ -268,39 +375,6 @@ sub _finish_transport_write ($self) {
     return 1;
 }
 
-sub close_read ($self) {
-    return $self if $self->{closed} || $self->{read_closed} || $self->{read_eof};
-    croak 'close_read(): directional close is unavailable for TLS sockets'
-        if ($self->transport_name // 'plain') ne 'plain';
-    shutdown($self->fh, SHUT_RD) or do {
-        my $errno = 0 + $!;
-        $self->_fail_io('shutdown_read', $errno);
-        return $self;
-    };
-    return $self->SUPER::close_read;
-}
-
-sub close_write ($self) {
-    return $self if $self->{closed} || $self->{write_ended};
-    croak 'close_write(): use end() for TLS sockets'
-        if ($self->transport_name // 'plain') ne 'plain';
-    shutdown($self->fh, SHUT_WR) or do {
-        my $errno = 0 + $!;
-        $self->_fail_io('shutdown_write', $errno);
-        return $self;
-    };
-    return $self->SUPER::close_write;
-}
-
-sub detach ($self) {
-    my $handles = $self->SUPER::detach;
-    return $handles->{read_fh};
-}
-
-sub local ($self) { $self->{local} }
-sub peer ($self) { $self->{peer} }
-sub fd ($self) { $self->read_fd }
-
 sub _socket_option ($self, $name, @argument) {
     croak "$name(): Socket is not established" if $self->{closed} || !$self->fh;
     croak "$name(): expected zero or one argument" if @argument > 1;
@@ -310,22 +384,5 @@ sub _socket_option ($self, $name, @argument) {
     ) if @argument;
     return Linux::Event::_SocketConfig::get_option($self->fh, $family, $name);
 }
-
-sub tcp_nodelay ($self, @arg) { $self->_socket_option('tcp_nodelay', @arg) }
-sub keepalive ($self, @arg) { $self->_socket_option('keepalive', @arg) }
-sub keepalive_idle ($self, @arg) { $self->_socket_option('keepalive_idle', @arg) }
-sub keepalive_interval ($self, @arg) { $self->_socket_option('keepalive_interval', @arg) }
-sub keepalive_count ($self, @arg) { $self->_socket_option('keepalive_count', @arg) }
-sub tcp_user_timeout ($self, @arg) { $self->_socket_option('tcp_user_timeout', @arg) }
-sub send_buffer ($self, @arg) { $self->_socket_option('send_buffer', @arg) }
-sub receive_buffer ($self, @arg) { $self->_socket_option('receive_buffer', @arg) }
-
-sub selected_alpn ($self) { my $t = $self->{transport}; $t && $t->can('selected_alpn') ? $t->selected_alpn : undef }
-sub tls_protocol ($self) { my $t = $self->{transport}; $t && $t->can('protocol') ? $t->protocol : undef }
-sub tls_cipher ($self) { my $t = $self->{transport}; $t && $t->can('cipher') ? $t->cipher : undef }
-sub tls_stats ($self) { my $t = $self->{transport}; $t && $t->can('stats') ? $t->stats : undef }
-
-sub CLONE ($class) { Linux::Event::_Socket::Descriptor::clear_cache(); return }
-sub CLONE_SKIP ($class) { 1 }
 
 1;

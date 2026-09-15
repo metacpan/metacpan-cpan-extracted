@@ -20,7 +20,7 @@ our $READ_SIZE = 262_144;
     use parent 'Linux::Event::Async::Stream';
     use Linux::Event::Framer 'Delimiter', "\n";
 
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return read_size => $main::READ_SIZE,
             read_budget_bytes => $main::READ_SIZE;
     }

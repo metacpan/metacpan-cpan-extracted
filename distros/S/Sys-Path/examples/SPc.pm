@@ -1,11 +1,5 @@
 package Acme::NewModule::SPc;
 
-=head1 NAME
-
-Acme::NewModule::SPc - system path configuration
-
-=cut
-
 use warnings;
 use strict;
 
@@ -27,58 +21,6 @@ sub _path_types {qw(
 	webdir
 )};
 
-=head1 PATHS
-
-=over 4
-
-=item sysconfdir
-
-FIXME desc
-
-=item datadir
-
-FIXME desc
-
-=item docdir
-
-FIXME desc
-
-=item localedir
-
-FIXME desc
-
-=item cachedir
-
-FIXME desc
-
-=item logdir
-
-FIXME desc
-
-=item spooldir
-
-FIXME desc
-
-=item rundir
-
-FIXME desc
-
-=item lockdir
-
-FIXME desc
-
-=item sharedstatedir
-
-FIXME desc
-
-=item webdir
-
-FIXME desc
-
-=back
-
-=cut
-
 sub prefix     { use Sys::Path; Sys::Path->find_distribution_root(__PACKAGE__); };
 sub sysconfdir { File::Spec->catdir(__PACKAGE__->prefix, 'conf') };
 sub datadir    { File::Spec->catdir(__PACKAGE__->prefix, 'share') };
@@ -94,3 +36,86 @@ sub webdir     { File::Spec->catdir(__PACKAGE__->prefix, 'www') };
 sub srvdir     { File::Spec->catdir(__PACKAGE__->prefix, 'srv') };
 
 1;
+
+__END__
+
+=head1 NAME
+
+Acme::NewModule::SPc - example distribution-local path configuration
+
+=head1 DESCRIPTION
+
+This example keeps an application's writable and read-only directories beneath
+its distribution root. It illustrates an alternative to the system-wide paths
+provided by C<Sys::Path::SPc>.
+
+=head1 PATHS
+
+=head2 _path_types
+
+Return the ordered names of the directory accessors intended for list-driven
+configuration. C<prefix> is omitted because it is discovered dynamically.
+
+Current limitation: C<srvdir> is also omitted even though this module defines
+that accessor.
+
+=head2 prefix
+
+Use C<Sys::Path::find_distribution_root> to locate the nearest ancestor
+containing F<MANIFEST>, F<Build.PL>, or F<Makefile.PL>.
+
+=head2 Directory accessors
+
+=over 4
+
+=item sysconfdir
+
+Return the distribution root followed by F<conf>.
+
+=item datadir
+
+Return the distribution root followed by F<share>.
+
+=item docdir
+
+Return the distribution root followed by F<doc>.
+
+=item localedir
+
+Return the distribution root followed by F<locale>.
+
+=item cachedir
+
+Return the distribution root followed by F<cache>.
+
+=item logdir
+
+Return the distribution root followed by F<log>.
+
+=item spooldir
+
+Return the distribution root followed by F<spool>.
+
+=item rundir
+
+Return the distribution root followed by F<run>.
+
+=item lockdir
+
+Return the distribution root followed by F<lock>.
+
+=item sharedstatedir
+
+Return the distribution root followed by F<lib>.
+
+=item webdir
+
+Return the distribution root followed by F<www>.
+
+=item srvdir
+
+Return the distribution root followed by F<srv>.
+
+=back
+
+=cut

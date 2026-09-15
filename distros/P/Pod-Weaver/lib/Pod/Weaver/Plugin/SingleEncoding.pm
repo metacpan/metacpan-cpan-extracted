@@ -1,4 +1,4 @@
-package Pod::Weaver::Plugin::SingleEncoding 4.021;
+package Pod::Weaver::Plugin::SingleEncoding 4.022;
 # ABSTRACT: ensure that there is exactly one =encoding of known value
 
 use Moose;
@@ -8,7 +8,7 @@ with(
 );
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -116,7 +116,7 @@ Pod::Weaver::Plugin::SingleEncoding - ensure that there is exactly one =encoding
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

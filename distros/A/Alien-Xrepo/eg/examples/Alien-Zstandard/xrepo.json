@@ -1,9 +1,0 @@
-{
-   "name" : "Alien-Zstandard",
-   "packages" : [
-      {
-         "kind" : "shared",
-         "name" : "zstd"
-      }
-   ]
-}

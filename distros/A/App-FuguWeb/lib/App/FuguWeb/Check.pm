@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Check;
-our $VERSION = '0.5.0';
+our $VERSION = '0.6.1';
 
 use App::FuguWeb;
 use App::FuguWeb::Keys;
@@ -104,7 +104,7 @@ sub run ($self)
 }
 
 # $self->_check_keys:
-#	Hold the key directory to the design. A description with no
+#	Hold each key directory to the design. A description with no
 #	keys block has no key directory, and the checks then find
 #	nothing to say.
 #
@@ -113,12 +113,12 @@ sub run ($self)
 #	and a stale digest are faults of the checkout.
 sub _check_keys ($self)
 {
-	my @problems =
-	    defined $self->{config}->keys_dir
-	    ? App::FuguWeb::Keys->new( config => $self->{config} )->problems
-	    : ();
+	my $config = $self->{config};
 
-	return @problems;
+	return map {
+		App::FuguWeb::Keys->new( config => $config, dir => $_ )
+		    ->problems
+	} $config->keys_dirs;
 }
 
 # $self->_check_inventory:

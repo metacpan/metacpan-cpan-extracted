@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Render;
-our $VERSION = '0.5.0';
+our $VERSION = '0.6.1';
 
 use App::FuguWeb::Manual;
 use Fugu::Log;

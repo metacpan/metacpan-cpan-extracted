@@ -47,6 +47,12 @@ my $r = $a->ring('storm', slots => 256, slot_size => 128);
 $a->region('gate', size => 16);
 $a->poke('gate', 0, 'wait');
 
+# Where each child leaves the first and last sequence the ring gave it, as
+# twenty decimal digits each, so the parent can tell afterwards whether the
+# children's publishing overlapped in time. See the assertion at the end.
+$a->region('ranges', size => $KIDS * 40);
+$a->poke('ranges', 0, ' ' x ($KIDS * 40));
+
 my $c = $r->cursor;
 
 my @pids;
@@ -62,10 +68,14 @@ for my $kid (1 .. $KIDS) {
         while ($a->peek('gate', 0, 4) ne 'go!!') {
             POSIX::_exit(2) if ++$spun > 50_000_000;
         }
+        my ($first, $last) = (0, 0);
         for my $i (1 .. $PER_KID) {
-            $r->publish(sprintf('c%02d', $kid),
-                        sprintf('%02d:%05d:', $kid, $i) . ('.' x $FILL));
+            my $seq = $r->publish(sprintf('c%02d', $kid),
+                                  sprintf('%02d:%05d:', $kid, $i) . ('.' x $FILL));
+            $first = $seq if !$first && $seq > 0;
+            $last  = $seq if $seq > 0;
         }
+        $a->poke('ranges', ($kid - 1) * 40, sprintf('%020d%020d', $first, $last));
         # _exit, not exit: the parent's END blocks and its test plan must not
         # run a second time in here.
         POSIX::_exit(0);
@@ -164,16 +174,37 @@ cmp_ok($cs{lapped}, '>', 0,
 is($out_of_order, 0,
    'no publisher\'s records were delivered out of the order it wrote them');
 
-# How many children got through at all is a fact about the scheduler, not a
-# promise the ring makes - with 256 slots and 16,000 records most of what every
-# child writes is lapped away. What matters is that more than one did, because
-# a run where they did not overlap tested nothing about contention.
-cmp_ok(scalar keys %by_kid, '>=', 2,
-       'records from at least two children interleaved, so the publishers '
-     . 'really were concurrent')
-    or diag 'only one child got through: this run did not test contention';
-diag sprintf 'delivered %d of %d, lapped %d, from %d of %d children',
-     $cs{delivered}, $TOTAL, $cs{lapped}, scalar keys %by_kid, $KIDS;
+# WERE THE PUBLISHERS CONCURRENT? Sequences come from one atomic in the order
+# they were handed out, so two children whose first-to-last ranges overlap were
+# publishing at the same time, whatever the reader was doing. That is the fact
+# to assert. Counting how many children the READER saw records from is not:
+# it depends on the parent getting scheduled during the storm, and on a
+# two-processor smoker with eight children spinning it was not - it drained
+# once, at the end, and saw one ring's worth of the last child's tail. That
+# failed 0.02 on that box while the ring itself had done nothing wrong.
+{
+    # two fixed-width fields, not a regex: there is no separator between them
+    my @range = map { my $s = $a->peek('ranges', $_ * 40, 40);
+                      $s =~ /^\d{40}$/ ? [ substr($s, 0, 20) + 0, substr($s, 20, 20) + 0 ]
+                                       : [ 0, 0 ] } 0 .. $KIDS - 1;
+    my $overlapping = 0;
+    for my $i (0 .. $KIDS - 1) {
+        for my $j ($i + 1 .. $KIDS - 1) {
+            my ($a1, $b1) = @{ $range[$i] };
+            my ($a2, $b2) = @{ $range[$j] };
+            next unless $a1 && $a2;
+            $overlapping++ if $a1 <= $b2 && $a2 <= $b1;
+        }
+    }
+    cmp_ok($overlapping, '>=', 1,
+           'at least two children were handed sequences in the same span, so the '
+         . 'publishers really were concurrent')
+        or diag 'no two ranges overlap: the children ran one after another and '
+              . 'this run did not test contention';
+    diag sprintf 'delivered %d of %d, lapped %d, from %d of %d children; %d pairs of '
+               . 'children overlapped in time',
+         $cs{delivered}, $TOTAL, $cs{lapped}, scalar keys %by_kid, $KIDS, $overlapping;
+}
 
 # Sequences are handed out by one atomic, so no two publishers can ever have
 # been given the same one. If they had been, the ring's own count would exceed

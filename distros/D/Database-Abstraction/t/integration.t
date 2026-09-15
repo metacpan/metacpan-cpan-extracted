@@ -1143,22 +1143,22 @@ note '=== P. Query builder + BerkeleyDB cross-module workflow ===';
 # SECTION Q — XLSX backend end-to-end workflow
 #
 # Builds a temporary .xlsx fixture (two worksheets) at runtime using
-# Spreadsheet::WriteExcel and verifies every core public method via the
-# DBD::Excel driver.  Covers: type detection, count(), selectall_arrayref(),
-# fetchrow_hashref(), AUTOLOAD, columns(), schema(), the 'table' constructor
-# override for worksheet selection, no_entry mode, multi-instance isolation,
-# and the table-name injection guard.
+# Excel::Writer::XLSX and verifies every core public method via the
+# Spreadsheet::ParseXLSX in-memory slurp path.  Covers: type detection,
+# count(), selectall_arrayref(), fetchrow_hashref(), AUTOLOAD, columns(),
+# schema(), the 'table' constructor override for worksheet selection,
+# no_entry mode, multi-instance isolation, and the table-name injection guard.
 # ---------------------------------------------------------------------------
 
 note '';
 note '=== Q. XLSX backend end-to-end ===';
 
 my $have_excel = do { local $@;
-	eval { require DBD::Excel; require Spreadsheet::WriteExcel; 1 }
+	eval { require Excel::Writer::XLSX; require Spreadsheet::ParseXLSX; 1 }
 };
 
 SKIP: {
-	skip 'DBD::Excel or Spreadsheet::WriteExcel not available', 28
+	skip 'Excel::Writer::XLSX or Spreadsheet::ParseXLSX not available', 28
 		unless $have_excel;
 
 	do {
@@ -1169,11 +1169,11 @@ SKIP: {
 	my $xlsx_dir = tempdir(CLEANUP => 1);
 	my $xlsx_file = File::Spec->catfile($xlsx_dir, 'integ_xlsx.xlsx');
 
-	# Build a two-worksheet workbook:
+	# Build a two-worksheet OOXML workbook:
 	#   integ_xlsx — entry / name / score  (3 data rows; matches class-derived table name)
 	#   summary    — entry / total          (2 data rows; used for 'table' override tests)
 	{
-		my $wb  = Spreadsheet::WriteExcel->new($xlsx_file);
+		my $wb  = Excel::Writer::XLSX->new($xlsx_file);
 		my $ws1 = $wb->add_worksheet('integ_xlsx');
 		$ws1->write(0, 0, 'entry');  $ws1->write(0, 1, 'name');   $ws1->write(0, 2, 'score');
 		$ws1->write(1, 0, 'alice'); $ws1->write(1, 1, 'Alice');  $ws1->write(1, 2, 90);
@@ -1194,8 +1194,8 @@ SKIP: {
 	# Q2 — type is set lazily; count() triggers _open()
 	is($db->count(), 3, 'Q2: count() returns 3 rows from XLSX');
 
-	# Q3 — type is 'Excel' after first query
-	is($db->{'type'}, 'Excel', 'Q3: type is "Excel" after first query');
+	# Q3 — type is 'XLSX' after first query (Spreadsheet::ParseXLSX slurp path)
+	is($db->{'type'}, 'XLSX', 'Q3: type is "XLSX" after first query');
 
 	# Q4 — selectall_arrayref() returns an arrayref of hashrefs
 	my $q_all = $db->selectall_arrayref();
@@ -1224,8 +1224,7 @@ SKIP: {
 	ok(scalar(grep { $_ eq 'name'  } @{$q_cols}),      'Q8c: columns() includes "name"');
 	ok(scalar(grep { $_ eq 'score' } @{$q_cols}),      'Q8d: columns() includes "score"');
 
-	# Q9 — schema() returns a hashref (Excel's DBI driver may not expose full PRAGMA
-	#        metadata, so we only verify the return type and not exact key coverage)
+	# Q9 — schema() returns a hashref (XLSX slurp uses first-row key inspection)
 	my $q_sch = $db->schema();
 	ok(ref($q_sch) eq 'HASH', 'Q9: schema() returns hashref for XLSX backend');
 
@@ -1242,17 +1241,17 @@ SKIP: {
 	# Q11 — AUTOLOAD against the alternate worksheet
 	is($db2->total('q1'), 100, 'Q11: table-override AUTOLOAD total(q1) == 100');
 
-	# Q12 — Multi-instance isolation: two objects on the same file are independent
+	# Q12 — Multi-instance isolation: two objects on the same file are independent;
+	# each gets its own slurped copy of $self->{'data'} so mutations don't bleed.
 	my $db3 = Database::integ_xlsx->new(directory => $xlsx_dir);
 	my $db4 = Database::integ_xlsx->new(directory => $xlsx_dir);
 	$db3->count(); $db4->count();    # both trigger _open_table
 	isnt($db3, $db4, 'Q12a: two objects are distinct references');
 
-	# Q13 — no_entry mode works on XLSX (SQL path; slurp not supported for binary formats)
+	# Q13 — no_entry mode works on XLSX (slurped into ARRAY ref)
 	my $db_ne = Database::integ_xlsx->new(
-		directory     => $xlsx_dir,
-		no_entry      => 1,
-		max_slurp_size => 0,
+		directory => $xlsx_dir,
+		no_entry  => 1,
 	);
 	cmp_ok($db_ne->count(), '>', 0, 'Q13: no_entry XLSX count() > 0');
 

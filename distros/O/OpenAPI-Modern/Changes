@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.148     2026-09-13 18:00:25Z
+          - now verifying security requirement objects in OpenAPI documents
+          - new --metaschema-uri option in "openapi-validate" script
+
 0.147     2026-08-13 17:29:08Z
           - support added for message bodies encoded with sequential
             multipart/* media-types such as multipart/mixed or

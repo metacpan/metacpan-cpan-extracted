@@ -4,7 +4,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 # VERSION
 
-Version 0.001.1
+Version 0.003.0
 
 # SYNOPSIS
 
@@ -104,6 +104,10 @@ Version 0.001.1
 single logical, read-only view.  Each component database is queried
 independently through its own `Database::Abstraction` interface.  The results
 are combined in Perl memory using a shared key column (`join_column`).
+In effect,
+this means that you can view data from more than one database using an intuitive,
+non-SQL,
+interface.
 
 The module exposes the same read-only API as `Database::Abstraction`:
 `selectall_arrayref`, `selectall_array`, `fetchrow_hashref`, `count`,
@@ -160,8 +164,9 @@ databases so that each database fetches only the relevant rows before the
 in-memory merge.
 
 When the same non-join column name exists in more than one database, the
-_last_ database in the `databases` array wins: its value overwrites earlier
-ones in merged rows.
+_last_ database in the `databases` array wins by default: its value
+overwrites earlier ones in merged rows.  Use `collision_prefix` to
+preserve both values under distinct names instead.
 
 # LIMITATIONS
 
@@ -243,11 +248,13 @@ ones in merged rows.
     but means the result respects all active filters and join-key translations,
     which may differ from what the owning database would return on its own.
 
-- Duplicate column names: last database wins
+- Duplicate column names: last database wins (unless collision\_prefix is set)
 
     When two component databases each have a column called `notes`, the second
     database's value silently overwrites the first in every merged row.  Use
-    `remove_columns` (or `remove_column`) to drop the unwanted duplicate.
+    `collision_prefix =` { 1 => 'right' }> to publish the second database's
+    `notes` as `right.notes` so both values survive, or use `remove_columns`
+    (or `remove_column`) to drop the unwanted duplicate entirely.
 
 # METHODS
 
@@ -256,14 +263,15 @@ ones in merged rows.
 ### SYNOPSIS
 
     my $join = Database::Join->new(
-        databases      => [ $db1, $db2 ],
-        join_column    => 'entry',
-        join_type      => 'left',
-        join_map       => { 1 => 'local_col' },
-        filters        => { 1 => { score => { '>' => 60 } } },
-        remove_columns => [ 'email', 'internal_id' ],
-        logger         => $log,
-        i18n           => $locale,
+        databases        => [ $db1, $db2 ],
+        join_column      => 'entry',
+        join_type        => 'left',
+        join_map         => { 1 => 'local_col' },
+        filters          => { 1 => { score => { '>' => 60 } } },
+        collision_prefix => { 1 => 'right' },
+        remove_columns   => [ 'email', 'internal_id' ],
+        logger           => $log,
+        i18n             => $locale,
     );
 
 ### DESCRIPTION
@@ -324,6 +332,25 @@ to calling `remove_column` once per name after construction.
                       # Zero-based database index => criteria hashref.
                       # Permanent row restrictions on individual databases.
                       # See the filters section for full details.
+
+    collision_prefix => { type => 'hashref', optional => 1 }
+                      # Zero-based database index (>0) => prefix string.
+                      # When a secondary database has a column that collides
+                      # with a column already present in the merged view, the
+                      # secondary column is published as "$prefix.$col" instead
+                      # of silently overwriting the earlier value.
+                      # Index 0 entries are silently ignored.
+                      # Omitting this parameter preserves the original
+                      # last-database-wins behaviour.
+                      # See the collision_prefix section for full details.
+                      #
+                      # DOMAIN -- EP valid:   absent or {} => last-database-wins (no change).
+                      # DOMAIN -- EP valid:   { N => 'prefix' } where N > 0 => colliding
+                      #                       columns from DB[N] published as "$prefix.$col";
+                      #                       non-colliding columns from the same DB added plain.
+                      # DOMAIN -- EP note:    index-0 entries are silently ignored.
+                      # DOMAIN -- Invariant:  join_column is never prefixed regardless of
+                      #                       collision_prefix configuration.
 
     remove_columns => { type => 'arrayref', optional => 1 }
                       # Column names to hide from the merged view.
@@ -495,6 +522,64 @@ When using `add_database`, pass `filter` (singular) to set the base
 criteria for the new database:
 
     $join->add_database($orders, filter => { age_days => { '>' => 60 } });
+
+## collision\_prefix - preserve colliding columns from secondary databases
+
+By default, when a column name appears in more than one database the _last_
+database wins: its value silently overwrites earlier ones in merged rows.
+This loses data and makes the origin invisible.
+
+`collision_prefix` changes this for secondary databases you designate.
+When a secondary database at index N has a column that already exists in the
+merged view, and `collision_prefix->{N}` is set, the colliding column is
+published as `"$prefix.$col"` instead of overwriting.  Both values are then
+visible: the original column keeps its name (from the earlier database), and
+the collision gets the prefixed name.
+
+`collision_prefix` is a hashref.  Each **key** is the **zero-based index** of
+a secondary database in the `databases` array (same numbering as `join_map`).
+Each **value** is the prefix string to prepend.  An index-0 entry is
+meaningless and silently ignored.  Omitting `collision_prefix` entirely
+preserves the previous last-wins behaviour and changes nothing.
+
+Non-colliding columns from a secondary database are always added as-is with
+no prefix, whether or not `collision_prefix` is configured.
+
+**Example -- sales table and products table, both with a "product" column**
+
+    # $sales    columns: id, product, amount, date
+    # $products columns: sku, product, price, category
+    # join on 'product' (left key) matched against 'sku' (right key via join_map)
+
+    my $join = Database::Join->new(
+        databases        => [$sales, $products],
+        join_column      => 'product',
+        join_map         => { 1 => 'sku' },
+        collision_prefix => { 1 => 'products' },
+    );
+
+    $join->columns;
+    # => ['amount', 'category', 'date', 'id', 'price', 'product', 'products.product']
+    #                                                               ^-- prefixed collision
+
+    my $row = $join->fetchrow_hashref(product => 'widget');
+    # $row->{product}            -- value from $sales
+    # $row->{'products.product'} -- value from $products (different row, same column name)
+    # $row->{price}              -- from $products, no collision, kept as-is
+
+**Querying on a prefixed column**
+
+Use the full published name as the criterion key:
+
+    my $rows = $join->selectall_arrayref('products.product' => 'widget');
+    # Internally routes as: product => 'widget' to $products
+
+**Interaction with remove\_column**
+
+`remove_column` operates on published names.  To suppress a prefixed
+collision column entirely, pass the prefixed name:
+
+    $join->remove_column('products.product');
 
 ## selectall\_arrayref
 
@@ -866,9 +951,18 @@ equivalent to a `filters` entry.
     filter         => { type => 'hashref',  optional => 1 }
                       # Permanent criteria for this database only.
                       # Same format as selectall_arrayref.
+                      #
+                      # DOMAIN -- EP valid:   hashref of criteria (may be {} for no-op).
+                      # DOMAIN -- EP absent:  no permanent filter applied; all rows visible.
+                      # DOMAIN -- Key-set:    a non-empty filter makes this DB an inner-join
+                      #                       partner regardless of the outer join_type.
 
     remove_columns => { type => 'arrayref', optional => 1 }
                       # Column names from this database to hide.
+                      #
+                      # DOMAIN -- EP valid:   arrayref of strings; non-existent columns silently
+                      #                       ignored; empty [] is a safe no-op.
+                      # DOMAIN -- EP invalid: join_column itself => croak error_remove_join_col.
 
 #### Output
 
@@ -1093,6 +1187,16 @@ can be localised by supplying an `i18n` object to `new`.
     **Fix:** The join key is required for the merge to work and cannot be hidden.
     Remove a different column.
 
+- `error_invalid_prefix`
+
+    **When:** A value in the `collision_prefix` hashref is a reference (e.g. a
+    hashref or arrayref) rather than a plain string.
+
+    **Fix:** All `collision_prefix` values must be plain strings.  A reference
+    would be stringified to `HASH(0x...)` or `ARRAY(0x...)`, leaking a heap
+    address into every column name returned by `columns()`, `schema()`, and all
+    query results.  Pass a plain string such as `'db2'` or `'secondary'`.
+
 - `warn_unknown_column` (carp)
 
     **When:** A criterion is passed for a column that does not exist in any
@@ -1300,6 +1404,30 @@ Unicode is used throughout this section as required by Z notation.
     join_map' = join_map
     filters'  = filters
     dbs'      = dbs
+
+## collision\_prefix
+
+    ─── CollisionPrefix ───────────────────────────────────────────────
+    collision_prefix : ℕ ⇸ STRING
+    dbs              : seq DATABASE_ABSTRACTION
+    col_db           : NAME ⇸ ℕ
+    ───────────────────────────────────────────────────────────────────
+    -- Only secondary databases (index > 0) carry a meaningful prefix:
+    dom collision_prefix ⊆ 1 ‥ (#dbs - 1)
+
+    -- Published name for column col from database i:
+    published(i, col) ==
+        if i ∈ dom collision_prefix ∧ col ∈ dom col_db ∧ col_db(col) < i
+        then (collision_prefix i) ^ "." ^ col
+        else col
+
+    -- col_db routes the published name to the owning database:
+    col_db(published(i, col)) = i
+
+    -- The original column name is never removed from an earlier database:
+    ∀ i : 1 ‥ #dbs-1; col : columns(dbs i) •
+        published(i, col) ≠ col  ⟹
+            ∃ j : 0 ‥ i-1 • col ∈ dom col_db ∧ col_db(col) = j
 
 ## join\_map
 

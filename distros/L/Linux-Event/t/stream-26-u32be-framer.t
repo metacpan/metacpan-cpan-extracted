@@ -10,7 +10,7 @@ use Linux::Event::Loop;
     package T::U32BEStream;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'U32BE';
-    sub stream_options ($class) { return read_size => 3 }
+    sub stream_tuning ($class) { return read_size => 3 }
     sub on_message ($stream, $message) {
         $stream->data->{got} = $message;
         $stream->data->{loop}->stop;

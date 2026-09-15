@@ -9,7 +9,7 @@ use POSIX qw(:termios_h);
 use Time::HiRes qw(time sleep);
 use IO::Select;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
     BLK         => "\xe2\x96\x80",   # U+2580 UPPER HALF BLOCK, as UTF-8 bytes

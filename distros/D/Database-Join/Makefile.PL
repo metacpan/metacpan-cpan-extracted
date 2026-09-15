@@ -12,16 +12,16 @@ if($^O eq 'darwin') {
 }
 
 WriteMakefile(
-	NAME             => 'Database::Join',
-	AUTHOR           => 'Nigel Horne <njh@nigelhorne.com>',
-	VERSION_FROM     => 'lib/Database/Join.pm',
-	ABSTRACT_FROM    => 'lib/Database/Join.pm',
-	LICENSE          => 'gpl_2',
+	NAME           => 'Database::Join',
+	AUTHOR         => 'Nigel Horne <njh@nigelhorne.com>',
+	VERSION_FROM   => 'lib/Database/Join.pm',
+	ABSTRACT_FROM  => 'lib/Database/Join.pm',
+	LICENSE        => 'gpl_2',
 	MIN_PERL_VERSION => '5.010001',
-	PREREQ_PM        => {
-		'autodie'                  => 0,
+	PREREQ_PM      => {
+		'autodie'                => 0,
 		'Carp'                     => 0,
-		'Database::Abstraction'    => '0.37',
+		'Database::Abstraction' => '0.41',
 		'List::Util'               => '1.33',
 		'Object::Configure'        => 0,
 		'Params::Get'              => '0.13',
@@ -35,27 +35,28 @@ WriteMakefile(
 		'DBI'                   => 0,
 		'File::Temp'            => 0,
 		'IPC::System::Simple'   => 0,
-		'Test::Exception'       => 0,
+		'Test::DescribeMe' => 0,
+		'Test::Exception'    => 0,
 		'Test::Memory::Cycle'   => 0,
-		'Test::Mockingbird'     => '0.13',
+		'Test::Mockingbird'     => 0.13,
 		'Test::Most'            => 0,
 		'Test::NoWarnings'      => 0,
-		'Test::Returns'         => '0.04',
+		'Test::Returns'       => '0.04',
 		'Test::Without::Module' => 0,
-		'Text::xSV::Slurp'      => 0,
+		'Text::xSV::Slurp'    => 0,
 	}, META_MERGE => {
 		'meta-spec' => { version => 2 },
-		resources   => {
+		resources => {
 			repository => {
 				type => 'git',
-				url  => 'https://github.com/nigelhorne/Database-Join.git',
-				web  => 'https://github.com/nigelhorne/Database-Join',
+				url => 'https://github.com/nigelhorne/Database-Join.git',
+				web => 'https://github.com/nigelhorne/Database-Join',
 			}, bugtracker => {
-				web    => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Join',
-				url    => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Join',
+				web  => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Join',
+				url  => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Join',
 				mailto => 'bug-Database-Join@rt.cpan.org',
 			},
 		},
 	}, dist => $dist,
-	clean => { FILES    => 'Database-Join-*' },
+	clean => { FILES  => 'Database-Join-*' },
 );

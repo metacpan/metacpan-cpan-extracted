@@ -1,11 +1,15 @@
 NetAddr::MAC - A MAC address object
 
+1.03    2026-09-14
+        - Accept bridge priority on mac_* functions GH#12
+        - to_eui64 now returns true when nothing to do GH#15
+
 1.02    2026-09-11
         - Add support for detecting multicast mac addresses GH#3
         - Correct behaviour of die_on_error GH#13
-        - Validate birdge priority GH#14
+        - Validate bridge priority GH#14
         - Fix defects in new() GH#8
-        - Octects longer than two hex digits no longer accepted. GH#9
+        - Octets longer than two hex digits no longer accepted. GH#9
         - Fix Empty-octet guard GH#10
         - BPR prefix octet count was stripped without being checked GH#11
 

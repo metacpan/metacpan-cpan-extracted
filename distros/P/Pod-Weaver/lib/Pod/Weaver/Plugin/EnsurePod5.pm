@@ -1,11 +1,11 @@
-package Pod::Weaver::Plugin::EnsurePod5 4.021;
+package Pod::Weaver::Plugin::EnsurePod5 4.022;
 # ABSTRACT: ensure that the Pod5 translator has been run on this document
 
 use Moose;
 with 'Pod::Weaver::Role::Preparer';
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -70,7 +70,7 @@ Pod::Weaver::Plugin::EnsurePod5 - ensure that the Pod5 translator has been run o
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

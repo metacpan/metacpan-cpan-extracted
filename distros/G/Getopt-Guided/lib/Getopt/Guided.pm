@@ -3,10 +3,22 @@ BEGIN { require 5.010000 }; ## no critic ( RequireUseStrict, RequireUseWarnings 
 use strict;
 use warnings;
 
+my $croakf = sub {
+  @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
+  require Carp;
+  goto &Carp::croak
+};
+
+my $program_name = sub {
+  require File::Basename;
+  File::Basename::basename( $0 )
+};
+
 #<<<
 package Getopt::Guided;
+# ABSTRACT: getopts implementation that follows POSIX utility guidelines
 BEGIN {
-our $VERSION = 'v3.3.1';
+our $VERSION = 'v3.3.2';
 }
 #>>>
 
@@ -30,24 +42,14 @@ sub EXIT_USAGE ()   { 2 }
 @Getopt::Guided::EXPORT_OK =
   qw( EOOD EXIT_SUCCESS EXIT_FAILURE EXIT_USAGE getopts processopts readopts print_version_info );
 
-sub program_name () {
-  require File::Basename;
-  File::Basename::basename( $0 )
-}
-
-sub croakf ( $@ ) {
-  @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
-  require Carp;
-  goto &Carp::croak
-}
-
 sub import {
   my $module = shift;
 
-  our @EXPORT_OK;
   my $target = caller;
+  our @EXPORT_OK;
+  @_ = @EXPORT_OK if @_ == 1 and $_[ 0 ] eq ':all';
   for my $function ( @_ ) {
-    croakf "%s: '%s' is not exported", $module, $function
+    $croakf->( "%s: '%s' is not exported", $module, $function )
       unless grep { $function eq $_ } @EXPORT_OK;
     no strict 'refs'; ## no critic ( ProhibitNoStrict )
     *{ "$target\::$function" } = $module->can( $function )
@@ -64,15 +66,15 @@ sub parse_spec ( $;\%$ ) {
   no warnings qw( uninitialized ); ## no critic ( ProhibitNoWarnings )
   while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcox ) {
     my ( $name, $indicator ) = ( $1, $2 );
-    croakf "%s parameter contains option '%s' multiple times", '$spec', $name
+    $croakf->( "%s parameter contains option '%s' multiple times", '$spec', $name )
       if exists $spec_as_hash->{ $name };
     $spec_as_hash->{ $name } = $indicator;
     ++$spec_length_got
   }
   my $offset = pos $spec;
-  croakf "%s parameter isn't a non-empty string of alphanumeric characters", '$spec'
+  $croakf->( "%s parameter isn't a non-empty string of alphanumeric characters", '$spec' )
     unless defined $offset and $offset == length $spec;
-  croakf '%s parameter specifies %d options (expected: %d)', '$spec', $spec_length_got, $spec_length_expected
+  $croakf->( '%s parameter specifies %d options (expected: %d)', '$spec', $spec_length_got, $spec_length_expected )
     if defined $spec_length_expected and $spec_length_got != $spec_length_expected;
 
   $spec_as_hash
@@ -83,7 +85,7 @@ sub getopts ( $\%;\@ ) {
   my ( $spec, $opts, $argv ) = @_;
 
   my $spec_as_hash = ref $spec eq 'HASH' ? $spec : parse_spec $spec;
-  croakf "%s parameter isn't an empty hash", '%$opts'
+  $croakf->( "%s parameter isn't an empty hash", '%$opts' )
     if %$opts;
   $argv = \@ARGV unless defined $argv;
 
@@ -160,7 +162,7 @@ sub getopts ( $\%;\@ ) {
     %$opts = ();
     # Prepare and print warning message:
     # Program name, type of error, and invalid option character
-    warn sprintf( "%s: %s -- %s\n", program_name(), @error ) ## no critic ( RequireCarping )
+    warn sprintf( "%s: %s -- %s\n", $program_name->(), @error ) ## no critic ( RequireCarping )
   }
 
   @error == 0
@@ -174,7 +176,7 @@ sub print_version_info {
   #               the caller's package name is Getopt::Guided
   # call frame 1: a run() function/method (the caller) usually calls processopts()
   #               the caller's package name is whatever it is (could be "main")
-  printf STDOUT "%s %s\nperl v%vd\n", program_name(), ( caller( 2 ) // 'main' )->VERSION, $^V;
+  printf STDOUT "%s %s\nperl v%vd\n", $program_name->(), ( caller( 2 ) // 'main' )->VERSION, $^V;
   EOOD
 }
 
@@ -216,7 +218,7 @@ sub processopts ( \@@ ) {
           # are posible values for $name.
           $rv eq EOOD ? return ( OD . $name ) : last
         }
-        croakf "'%s' is an unsupported destination reference type for the '%s' indicator", $dest_ref_type, $indicator
+        $croakf->( "'%s' is an unsupported destination reference type for the '%s' indicator", $dest_ref_type, $indicator )
       }
     }
   }
@@ -227,7 +229,7 @@ sub processopts ( \@@ ) {
     @$argv = @argv_backup; ## no critic ( RequireLocalizedPunctuationVars )
     # Prepare and print warning message:
     # Program name, eval error, and option character
-    warn sprintf( "%s: %s -- %s\n%s\n", program_name(), @error ) ## no critic ( RequireCarping )
+    warn sprintf( "%s: %s -- %s\n%s\n", $program_name->(), @error ) ## no critic ( RequireCarping )
   }
 
   @error == 0
@@ -237,27 +239,29 @@ sub readopts ( \@;@ ) {
   my $argv = shift;
 
   require File::Spec::Functions;
-  my $file =
-    File::Spec::Functions::catfile( $ENV{ XDG_CONFIG_HOME } // File::Spec::Functions::catdir( $ENV{ HOME }, '.config' ),
-    program_name() . 'rc' );
-  unless ( -f $file ) {
-    # Prepend hard defaults
-    unshift @$argv, @_;
-    return
-  }
+  if (
+    -f (
+      my $file = File::Spec::Functions::catfile(
+        $ENV{ XDG_CONFIG_HOME } // File::Spec::Functions::catdir( $ENV{ HOME }, '.config' ),
+        $program_name->() . 'rc'
+      )
+    )
+    )
+  {
+    open my $fh, '<:encoding(UTF-8)', $file ## no critic ( RequireBriefOpen )
+      or $croakf->( "Cannot open file '%s' for reading (%s)", $file, $! );
 
-  open my $fh, '<:encoding(UTF-8)', $file ## no critic ( RequireBriefOpen )
-    or croakf "Cannot open file '%s' for reading (%s)", $file, $!;
-
-  while ( <$fh> ) {
-    chomp;
-    next if m/\A (?: \#.* | ) \z/x;
-    if ( m/\A ( [[:alnum:]] ) (?: \ ( .+ ) )? \z/x ) {
-      unshift @$argv, ( OD . $1, defined $2 ? $2 : () );
-      next
+    while ( <$fh> ) {
+      chomp;
+      next if m/\A (?: \#.* | ) \z/x;
+      if ( m/\A ( [[:alnum:]] ) (?: \ ( .+ ) )? \z/x ) {
+        unshift @$argv, ( OD . $1, defined $2 ? $2 : () );
+        next
+      }
+      $croakf->( "File '%s' contains the invalid line '%s'", $file, $_ )
     }
-    croakf "File '%s' contains the invalid line '%s'", $file, $_
   }
+
   # Prepend hard defaults
   unshift @$argv, @_;
 

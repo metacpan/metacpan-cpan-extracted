@@ -15,6 +15,13 @@ $Alien::Build::Plugin::Fetch::LocalDir::VERSION        ||= '0.99';
 $Alien::Build::Plugin::Build::CMake::VERSION           ||= '0.99';
 $Alien::Build::Plugin::Gather::IsolateDynamic::VERSION ||= '0.99';
 
+diag "Alien::cmake3::VERSION = $Alien::cmake3::VERSION";
+diag "Alien::cmake3->bin_dir = ", my @bin_dir = Alien::cmake3->bin_dir;
+diag "Alien::cmake3->exe = ", my $exe = Alien::cmake3->exe;
+my $full_exe = @bin_dir ? Path::Tiny::path(@bin_dir)->child($exe) : $exe;
+diag "Alien::cmake3 full exe = $full_exe";
+diag "cmake --version:\n", `$full_exe --version`;
+
 my $xs = do { local $/; <DATA> };
 
 foreach my $type (qw( basic out-of-source ))

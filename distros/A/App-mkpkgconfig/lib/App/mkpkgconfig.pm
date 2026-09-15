@@ -2,10 +2,11 @@ package App::mkpkgconfig;
 
 # ABSTRACT: a really awesome library
 
+use v5.14;
 use strict;
 use warnings;
 
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 1;
 
@@ -31,7 +32,7 @@ App::mkpkgconfig - a really awesome library
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 SYNOPSIS
 
@@ -39,17 +40,17 @@ version v2.0.1
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-app-mkpkgconfig@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=App-mkpkgconfig
+Please report any bugs or feature requests to bug-app-mkpkgconfig@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-mkpkgconfig>
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/app-mkpkgconfig
+  https://codeberg.org/djerius/p5-App-mkpkgconfig
 
 and may be cloned from
 
-  https://gitlab.com/djerius/app-mkpkgconfig.git
+  https://codeberg.org/djerius/p5-App-mkpkgconfig.git
 
 =head1 SEE ALSO
 
@@ -65,7 +66,7 @@ L<script::mkpkgconfig|script::mkpkgconfig>
 
 =head1 AUTHOR
 
-Diab Jerius <djerius@cpan.org>
+Diab Jerius <djerius@sao.si.edu>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,20 @@
+picohttpparser
+
+Upstream: https://github.com/h2o/picohttpparser
+Revision: f4d94b48b31e0abae029ebeafcfd9ca0680ede58
+Revision date: 2026-04-06
+Imported: 2026-09-05
+
+Vendored files:
+  picohttpparser.c
+  picohttpparser.h
+  LICENSE
+
+License: MIT or Perl license, at the user's option.
+
+The vendored source is compiled from this distribution. Installation and
+building must not require access to the upstream repository or any other
+network resource.
+
+Initial import: no local modifications to picohttpparser.c or
+picohttpparser.h.

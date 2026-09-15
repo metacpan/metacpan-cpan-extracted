@@ -83,7 +83,7 @@ or extra Perl dispatch layer is introduced.
 Each concrete subclass receives one immutable descriptor containing:
 
 - resolved named callback CVs;
-- `stream_options()` values;
+- `stream_tuning()` values;
 - optional framer definition;
 - optional native consumer definition;
 - native descriptor configuration.
@@ -96,7 +96,7 @@ assembly occur at the class descriptor boundary. Constructor callbacks are
 validated and installed once per object, not selected for every readiness
 event or message.
 
-The method name `stream_options()` is retained as the public ordered-byte
+The method name `stream_tuning()` is retained as the public ordered-byte
 tuning hook. It describes shared engine policy; it does not imply a public
 generic `Linux::Event::Stream` object.
 

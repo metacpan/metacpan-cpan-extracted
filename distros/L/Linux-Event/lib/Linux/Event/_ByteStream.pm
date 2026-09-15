@@ -24,6 +24,550 @@ my @LIFECYCLE_CALLBACK = qw(
 );
 my @APPLICATION_CALLBACK = (@INPUT_CALLBACK, @LIFECYCLE_CALLBACK);
 
+# Constructors and class lifecycle
+
+sub new ($class, %opt) {
+    croak 'new(): must be called as a class method' if ref $class;
+    my $loop = delete $opt{loop};
+    croak 'new(): loop must be an object implementing add() and watch_fd()'
+        if defined($loop) && (!ref($loop) || !$loop->can('add')
+            || !$loop->can('watch_fd'));
+    my $fh = delete $opt{fh};
+    my $read_fh = delete $opt{read_fh};
+    my $write_fh = delete $opt{write_fh};
+    my $pending = delete($opt{_pending}) // 0;
+    my $data = delete $opt{data};
+    my $transport = delete $opt{_transport};
+    my $callback = _take_callbacks('new', \%opt);
+    my %timeout_override;
+    for my $name (qw(idle_timeout read_timeout write_timeout)) {
+        $timeout_override{$name} = _timeout_value('new():', $name,
+            delete $opt{$name}) if exists $opt{$name};
+    }
+    my $initial_deadline = exists($opt{deadline})
+        ? _deadline_spec('new', delete $opt{deadline}) : undef;
+    croak 'new(): unknown options: ' . join(', ', sort keys %opt) if %opt;
+    croak 'new(): fh cannot be combined with read_fh or write_fh'
+        if defined($fh) && (defined($read_fh) || defined($write_fh));
+    if (defined $fh) {
+        $read_fh = $fh;
+        $write_fh = $fh;
+    }
+    croak 'new(): at least one of fh, read_fh, or write_fh is required'
+        if !$pending && !defined($read_fh) && !defined($write_fh);
+    croak 'new(): internal pending mode cannot have filehandles'
+        if $pending && (defined($read_fh) || defined($write_fh));
+    for my $pair ([read_fh => $read_fh], [write_fh => $write_fh]) {
+        croak "new(): $pair->[0] must be a filehandle"
+            if defined($pair->[1]) && !defined(fileno($pair->[1]));
+    }
+    croak 'new(): internal transport must implement _stream_transport_bind()'
+        if defined($transport)
+        && (!ref($transport) || !$transport->can('_stream_transport_bind'));
+
+    my $descriptor = Linux::Event::_ByteStream::Descriptor::for_class($class);
+    _validate_callback_modes('new', $descriptor, $callback);
+    my %lifecycle_override = map {
+        exists($callback->{$_}) ? ($_ => $callback->{$_}) : ()
+    } @LIFECYCLE_CALLBACK;
+    my %input_callback = map {
+        exists($callback->{$_}) ? ($_ => $callback->{$_}) : ()
+    } @INPUT_CALLBACK;
+    my %timeout = map {
+        $_ => exists($timeout_override{$_})
+            ? $timeout_override{$_} : $descriptor->{options}{$_}
+    } qw(idle_timeout read_timeout write_timeout);
+    my $self = bless {
+        descriptor  => $descriptor,
+        loop        => undef,
+        read_fh     => $read_fh,
+        write_fh    => $write_fh,
+        read_capable => defined($read_fh) ? 1 : 0,
+        write_capable => defined($write_fh) ? 1 : 0,
+        read_watcher => undef,
+        write_watcher => undef,
+        data        => $data,
+        callbacks   => _effective_lifecycle_callbacks(
+            $descriptor, \%lifecycle_override,
+        ),
+        callback_overrides => \%lifecycle_override,
+        _input_callbacks => \%input_callback,
+        _input_callback_overrides => {
+            map { $_ => 1 } keys %input_callback
+        },
+        transport   => $transport,
+        xs_state    => undef,
+        read_paused => 0,
+        read_eof    => 0,
+        read_closed => defined($read_fh) ? 0 : 1,
+        write_ending => 0,
+        write_ended  => defined($write_fh) ? 0 : 1,
+        closed       => 0,
+        detached     => 0,
+        close_fired  => 0,
+        last_error   => undef,
+        transport_ready_fired => 0,
+        transport_deadline_watcher => undef,
+        transport_shutdown_started => 0,
+        timeout => \%timeout,
+        timeout_override => \%timeout_override,
+        initial_deadline => $initial_deadline,
+        operation_deadline_at => undef,
+        operation_deadline_name => undef,
+        operation_deadline_timeout => undef,
+        deadline_timer => undef,
+        deadline_started => 0,
+        deadline_tracking => 0,
+        deadline_read_started => undef,
+        deadline_write_started => undef,
+        _construction_pending => 1,
+    }, $class;
+    $self->_prepare_handles if !$pending;
+    if ($loop) {
+        my $attached = eval { $self->_attach_to_loop($loop); 1 };
+        if (!$attached) {
+            my $failure = $@ || 'Stream construction attachment failed';
+            $self->_abort_failed_construction;
+            delete $self->{_construction_pending};
+            die $failure;
+        }
+    }
+    delete $self->{_construction_pending};
+    return $self;
+}
+
+sub connect ($class, %opt) {
+    croak 'connect(): available only on Linux::Event::IO::Sock::Stream subclasses';
+}
+
+sub CLONE ($class) {
+    Linux::Event::_ByteStream::Descriptor::clear_cache();
+    return;
+}
+
+sub CLONE_SKIP ($class) { 1 }
+
+sub DESTROY ($self) {
+    $self->_abort_failed_construction if $self->{_construction_pending};
+    return;
+}
+
+# Accessors
+
+sub fh ($self) {
+    return undef if !defined($self->{read_fh}) || !defined($self->{write_fh});
+    return fileno($self->{read_fh}) == fileno($self->{write_fh})
+        ? $self->{read_fh} : undef;
+}
+
+sub read_fh ($self) { $self->{read_fh} }
+
+sub write_fh ($self) { $self->{write_fh} }
+
+sub read_fd ($self) {
+    return defined($self->{read_fh}) ? fileno($self->{read_fh}) : undef;
+}
+
+sub write_fd ($self) {
+    return defined($self->{write_fh}) ? fileno($self->{write_fh}) : undef;
+}
+
+sub has_read ($self) { !!$self->{read_capable} }
+
+sub has_write ($self) { !!$self->{write_capable} }
+
+sub loop ($self) { $self->{loop} }
+
+sub state ($self) {
+    return 'detached' if $self->{closed} && $self->{detached};
+    return 'closed' if $self->{closed};
+    return 'unattached' if !$self->{loop};
+    return 'connecting' if $self->{connection};
+    return 'active';
+}
+
+sub last_error ($self) { $self->{last_error} }
+
+sub transport ($self) { $self->{transport} }
+
+sub is_closed ($self) { !!$self->{closed} }
+
+sub is_terminal ($self) { !!$self->{closed} }
+
+sub is_read_paused ($self) { !!$self->{read_paused} }
+
+sub is_read_eof ($self) { !!$self->{read_eof} }
+
+sub is_read_closed ($self) { !!$self->{read_closed} }
+
+sub is_write_ended ($self) { !!$self->{write_ended} }
+
+sub is_write_blocked ($self) {
+    return !!$self->{xs_state}->is_write_blocked if $self->{xs_state};
+    return !!$self->{preconnect_write_blocked};
+}
+
+sub data ($self, @arg) {
+    $self->{data} = $arg[0] if @arg;
+    return $self->{data};
+}
+
+sub pending_bytes ($self) {
+    my $pending = $self->{preconnect_bytes} // 0;
+    $pending += $self->{xs_state}->pending_bytes if $self->{xs_state};
+    return $pending;
+}
+
+sub transport_name ($self) {
+    return $self->{xs_state}->transport_name if $self->{xs_state};
+    return undef;
+}
+
+sub is_transport_ready ($self) {
+    return !!$self->{xs_state}->transport_ready if $self->{xs_state};
+    return 0;
+}
+
+sub idle_timeout  ($self) { $self->{timeout}{idle_timeout} }
+
+sub read_timeout  ($self) { $self->{timeout}{read_timeout} }
+
+sub write_timeout ($self) { $self->{timeout}{write_timeout} }
+
+sub deadline ($self) {
+    return $self->{operation_deadline_at}
+        if defined $self->{operation_deadline_at};
+    my $spec = $self->{initial_deadline} or return undef;
+    return $spec->{seconds} if $spec->{absolute};
+    return undef;
+}
+
+sub deadline_operation ($self) {
+    return $self->{operation_deadline_name}
+        // ($self->{initial_deadline} && $self->{initial_deadline}{operation});
+}
+
+# Methods
+
+sub set_deadline ($self, %option) {
+    croak 'set_deadline(): stream is closed' if $self->{closed};
+    my $spec = _deadline_spec('set_deadline', \%option);
+    if (!$self->{deadline_started}) {
+        $self->{initial_deadline} = $spec;
+        return $self;
+    }
+    my $now = _deadline_now();
+    $self->{operation_deadline_at} = $spec->{absolute}
+        ? $spec->{seconds} : $now + $spec->{seconds};
+    $self->{operation_deadline_name} = $spec->{operation};
+    $self->{operation_deadline_timeout} = $spec->{absolute}
+        ? undef : $spec->{seconds};
+    $self->_rearm_stream_deadline;
+    return $self;
+}
+
+sub clear_deadline ($self) {
+    croak 'clear_deadline(): stream is closed' if $self->{closed};
+    $self->{initial_deadline} = undef;
+    $self->{operation_deadline_at} = undef;
+    $self->{operation_deadline_name} = undef;
+    $self->{operation_deadline_timeout} = undef;
+    $self->_rearm_stream_deadline if $self->{deadline_started};
+    return $self;
+}
+
+sub tune ($self, %override) {
+    Carp::croak('tune(): stream is closed') if $self->{closed};
+    my $xs_state = $self->{xs_state}
+        // Carp::croak('tune(): Stream must be established before live tuning');
+    my $descriptor = $self->{descriptor};
+    my $current = $self->{_effective_tuning} // $descriptor->{options};
+    my $effective = Linux::Event::_ByteStream::Descriptor::merge_tuning(
+        'tune():', $current, \%override,
+    );
+    Linux::Event::_ByteStream::Descriptor::validate_modes(
+        'tune():', $descriptor, $effective, {},
+    );
+
+    my %native = map { $_ => $effective->{$_} }
+        Linux::Event::_ByteStream::Descriptor::native_tuning_names();
+
+    if ($effective->{message_batch_size} != $current->{message_batch_size}) {
+        my $recipe = $self->{_recipe_input_callbacks} // {};
+        my $callback = Linux::Event::_ByteStream::Descriptor::effective_input_callback(
+            $descriptor, $effective, $recipe,
+        );
+        Carp::croak(
+            'tune(): changing message_batch_size requires the corresponding '
+            . 'on_message/on_messages callback',
+        ) if $self->{read_capable} && !$descriptor->{consumer} && !$callback;
+        $native{input_cb} = $callback;
+    }
+
+    $xs_state->_transition_validated($descriptor->{native}, \%native);
+    return $self if $self->{closed};
+
+    $self->{_effective_tuning} = $effective;
+    for my $name (qw(idle_timeout read_timeout write_timeout)) {
+        $self->{timeout}{$name} = $effective->{$name};
+        $self->{timeout_override}{$name} = $effective->{$name}
+            if exists $override{$name};
+    }
+
+    if ($self->{deadline_started}) {
+        my $needs_tracking = $self->_needs_activity_tracking;
+        if ($needs_tracking && !$self->{deadline_tracking}) {
+            $xs_state->_set_activity_tracking(1);
+            $self->{deadline_tracking} = 1;
+        } elsif (!$needs_tracking && $self->{deadline_tracking}) {
+            $xs_state->_set_activity_tracking(0);
+            $self->{deadline_tracking} = 0;
+        }
+        if (exists $override{read_timeout}) {
+            $self->{deadline_read_started}
+                = Linux::Event::_ByteStream::_deadline_now();
+        }
+        if (exists $override{write_timeout}) {
+            $self->{deadline_write_started} = $self->pending_bytes > 0
+                ? Linux::Event::_ByteStream::_deadline_now() : undef;
+        }
+        $self->_rearm_stream_deadline;
+    }
+
+    return $self;
+}
+
+sub write ($self, $bytes) {
+    croak 'write(): stream is closed' if $self->{closed};
+    croak 'write(): stream has no writable side'
+        if !defined $self->{write_fh} && !$self->{connection};
+    croak 'write(): writable side has ended'
+        if $self->{write_ending} || $self->{write_ended};
+    return 1 if !defined $bytes;
+    croak 'write(): bytes must be a scalar byte string' if ref $bytes;
+    $bytes = "$bytes";
+    croak 'write(): bytes must be a scalar byte string'
+        if !utf8::downgrade($bytes, 1);
+    return 1 if $bytes eq '';
+
+    if (!$self->{xs_state}) {
+        croak 'write(): stream has no pending or active transport'
+            if !$self->{connection};
+        my $pending = ($self->{preconnect_bytes} // 0) + length($bytes);
+        my $limit = $self->{descriptor}{options}{max_pending_bytes};
+        if ($limit && $pending > $limit) {
+            my $error = Linux::Event::Error->new(
+                type          => 'output_limit',
+                operation     => 'write',
+                message       => "pending output would exceed $limit bytes",
+                pending_bytes => $pending,
+                limit         => $limit,
+            );
+            $self->_fail($error);
+            return 0;
+        }
+        push @{ $self->{preconnect_output} //= [] }, "$bytes";
+        $self->{preconnect_bytes} = $pending;
+        if ($pending > $self->{descriptor}{options}{high_watermark}) {
+            $self->{preconnect_write_blocked} = 1;
+            return 0;
+        }
+        return 1;
+    }
+
+    my $was_pending = $self->pending_bytes;
+    my $status = $self->{xs_state}->_write($bytes);
+    $self->_request_write_ready if $status & 0x02;
+    if ($self->{deadline_started} && $self->{timeout}{write_timeout} > 0
+        && !$was_pending && $self->pending_bytes > 0) {
+        $self->{deadline_write_started} = _deadline_now();
+        $self->_rearm_stream_deadline;
+    }
+    return $status & 0x01 ? 1 : 0;
+}
+
+sub send ($self, $payload) {
+    my $framer = $self->{descriptor}{framer}
+        // croak 'send(): requires a framed Stream subclass';
+    my $bytes = $framer->{frame}->($framer->{native}, $payload);
+    return $self->write($bytes);
+}
+
+sub end ($self, $final_bytes = undef) {
+    return $self
+        if $self->{closed} || $self->{write_ending} || $self->{write_ended}
+        || (!defined($self->{write_fh}) && !$self->{connection});
+    $self->write($final_bytes) if defined($final_bytes) && $final_bytes ne '';
+    $self->{write_ending} = 1;
+    $self->_finish_write_side
+        if $self->{xs_state} && $self->pending_bytes == 0;
+    return $self;
+}
+
+sub pause_read ($self) {
+    return $self if $self->{closed};
+    croak 'pause_read(): stream has no readable side'
+        if !$self->{read_capable};
+    return $self
+        if $self->{read_eof} || $self->{read_closed} || $self->{read_paused};
+    $self->{read_paused} = 1;
+    $self->{xs_state}->_pause if $self->{xs_state};
+    $self->{read_watcher}->disable_read if $self->{read_watcher};
+    $self->_rearm_stream_deadline
+        if $self->{deadline_started} && $self->{timeout}{read_timeout} > 0;
+    return $self;
+}
+
+sub resume_read ($self) {
+    return $self if $self->{closed};
+    croak 'resume_read(): stream has no readable side'
+        if !$self->{read_capable};
+    return $self
+        if $self->{read_eof} || $self->{read_closed} || !$self->{read_paused};
+    $self->{read_paused} = 0;
+    $self->{deadline_read_started} = _deadline_now()
+        if $self->{deadline_started} && $self->{timeout}{read_timeout} > 0;
+    $self->{xs_state}->_resume if $self->{xs_state};
+    $self->{read_watcher}->enable_read
+        if $self->{read_watcher} && !$self->{xs_state}->consumer_paused;
+    $self->_rearm_stream_deadline
+        if $self->{deadline_started} && $self->{timeout}{read_timeout} > 0;
+    return $self;
+}
+
+sub transition_to ($self, $class, %opt) {
+    croak 'transition_to(): stream is closed' if $self->{closed};
+    croak 'transition_to(): target class is required'
+        if !defined($class) || ref($class) || $class eq '';
+    croak "transition_to(): $class is already active"
+        if ref($self) eq $class;
+    Linux::Event::_IO::_guard_transition_resource_kind($self, $class);
+
+    my $input = delete $opt{input};
+    croak 'transition_to(): input must be a byte string'
+        if defined($input) && ref($input);
+    if (defined $input) {
+        $input = "$input";
+        croak 'transition_to(): input must be a byte string'
+            if !utf8::downgrade($input, 1);
+    }
+    croak 'transition_to(): unknown options: ' . join(', ', sort keys %opt)
+        if %opt;
+
+    my $descriptor = Linux::Event::_ByteStream::Descriptor::for_class($class);
+    my $xs_state = $self->{xs_state}
+        // croak 'transition_to(): stream has no native state';
+    my $source_consumer = $self->{descriptor}{consumer};
+    my $target_consumer = $descriptor->{consumer};
+    my $source_ops = $source_consumer
+        ? $source_consumer->{operations_address} : 0;
+    my $target_ops = $target_consumer
+        ? $target_consumer->{operations_address} : 0;
+    croak 'transition_to(): cannot change native consumer provider'
+        if $source_ops != $target_ops;
+    _require_read_sink(
+        $descriptor,
+        $self->{_input_callback_overrides},
+        $self->{read_capable} && !$self->{read_closed} && !$self->{read_eof},
+        'transition_to(): target readable raw Stream has no on_data callback',
+        'transition_to(): target readable framed Stream has no message sink',
+    );
+
+    my $input_bytes = defined($input) ? length($input) : 0;
+    if ($descriptor->{framer} && $descriptor->{options}{max_buffer}) {
+        my $preserved = $xs_state->_input_buffered_bytes + $input_bytes;
+        croak 'transition_to(): preserved input exceeds target max_buffer'
+            if $preserved > $descriptor->{options}{max_buffer};
+    }
+    my $pending_limit = $descriptor->{options}{max_pending_bytes};
+    croak 'transition_to(): queued output exceeds target max_pending_bytes'
+        if $pending_limit && $xs_state->pending_bytes > $pending_limit;
+
+    # XS validates and swaps the immutable descriptor without invoking a
+    # callback. Update the Perl object's type before buffered input is allowed
+    # to enter the new callback set.
+    my $callbacks = _effective_lifecycle_callbacks(
+        $descriptor, $self->{callback_overrides},
+    );
+    $xs_state->_transition_validated($descriptor->{native}, $input);
+    $self->{descriptor} = $descriptor;
+    $self->{callbacks} = $callbacks;
+    bless $self, $class;
+    $self->_apply_transition_timeouts($descriptor);
+    $xs_state->_transition_ready;
+    return $self;
+}
+
+sub close ($self) {
+    $self->_close_now(1);
+    return $self;
+}
+
+sub close_read ($self) {
+    return $self if $self->{closed} || $self->{read_closed} || $self->{read_eof};
+    $self->{read_closed} = 1;
+    my $failure;
+    _teardown_step(\$failure, sub {
+        $self->{xs_state}->_close_read(6) if $self->{xs_state};
+    });
+    _teardown_step(\$failure, sub { $self->_release_read_side });
+    _teardown_step(\$failure, sub { $self->_close_now(1) })
+        if $self->{write_ended};
+    die $failure if defined $failure;
+    return $self;
+}
+
+sub close_write ($self) {
+    return $self if $self->{closed} || $self->{write_ended};
+    my $failure;
+    _teardown_step(\$failure, sub {
+        $self->{xs_state}->_close_write if $self->{xs_state};
+    });
+    $self->{write_ending} = 0;
+    $self->{write_ended} = 1;
+    _teardown_step(\$failure, sub { $self->_release_write_side });
+    _teardown_step(\$failure, sub { $self->_close_now(1) })
+        if $self->{read_eof} || $self->{read_closed};
+    die $failure if defined $failure;
+    return $self;
+}
+
+sub detach ($self) {
+    croak 'detach(): stream is already closed' if $self->{closed};
+    croak 'detach(): stream is not established'
+        if !defined($self->{read_fh}) && !defined($self->{write_fh});
+    croak 'detach(): pending output must drain before detach'
+        if $self->pending_bytes;
+    croak 'detach(): cannot detach a non-plain transport'
+        if ($self->transport_name // 'plain') ne 'plain';
+    my $handles = {
+        read_fh  => $self->{read_fh},
+        write_fh => $self->{write_fh},
+    };
+    my $failure;
+    _teardown_step(\$failure, sub { $self->_cancel_stream_deadline });
+    if (my $xs_state = delete $self->{xs_state}) {
+        _teardown_step(\$failure, sub { $xs_state->_close(5) });
+    }
+    _teardown_step(\$failure, sub { $self->_cancel_io_watchers });
+    $self->{closed} = 1;
+    delete @$self{qw(
+        callbacks callback_overrides _input_callbacks
+        _input_callback_overrides
+    )};
+    $self->{detached} = 1;
+    if (defined $failure) {
+        _teardown_step(\$failure, sub { $self->_close_handles });
+        die $failure;
+    } else {
+        $self->{read_fh} = undef;
+        $self->{write_fh} = undef;
+    }
+    return $handles;
+}
+
+# Private helpers and internal overrides
+
 sub _callback_names () { @APPLICATION_CALLBACK }
 
 sub _take_callbacks ($method, $option) {
@@ -279,127 +823,6 @@ sub _require_read_sink ($descriptor, $instance, $readable, $raw_error,
     return;
 }
 
-sub new ($class, %opt) {
-    croak 'new(): must be called as a class method' if ref $class;
-    my $loop = delete $opt{loop};
-    croak 'new(): loop must be an object implementing add() and watch_fd()'
-        if defined($loop) && (!ref($loop) || !$loop->can('add')
-            || !$loop->can('watch_fd'));
-    my $fh = delete $opt{fh};
-    my $read_fh = delete $opt{read_fh};
-    my $write_fh = delete $opt{write_fh};
-    my $pending = delete($opt{_pending}) // 0;
-    my $data = delete $opt{data};
-    my $transport = delete $opt{_transport};
-    my $callback = _take_callbacks('new', \%opt);
-    my %timeout_override;
-    for my $name (qw(idle_timeout read_timeout write_timeout)) {
-        $timeout_override{$name} = _timeout_value('new():', $name,
-            delete $opt{$name}) if exists $opt{$name};
-    }
-    my $initial_deadline = exists($opt{deadline})
-        ? _deadline_spec('new', delete $opt{deadline}) : undef;
-    croak 'new(): unknown options: ' . join(', ', sort keys %opt) if %opt;
-    croak 'new(): fh cannot be combined with read_fh or write_fh'
-        if defined($fh) && (defined($read_fh) || defined($write_fh));
-    if (defined $fh) {
-        $read_fh = $fh;
-        $write_fh = $fh;
-    }
-    croak 'new(): at least one of fh, read_fh, or write_fh is required'
-        if !$pending && !defined($read_fh) && !defined($write_fh);
-    croak 'new(): internal pending mode cannot have filehandles'
-        if $pending && (defined($read_fh) || defined($write_fh));
-    for my $pair ([read_fh => $read_fh], [write_fh => $write_fh]) {
-        croak "new(): $pair->[0] must be a filehandle"
-            if defined($pair->[1]) && !defined(fileno($pair->[1]));
-    }
-    croak 'new(): internal transport must implement _stream_transport_bind()'
-        if defined($transport)
-        && (!ref($transport) || !$transport->can('_stream_transport_bind'));
-
-    my $descriptor = Linux::Event::_ByteStream::Descriptor::for_class($class);
-    _validate_callback_modes('new', $descriptor, $callback);
-    my %lifecycle_override = map {
-        exists($callback->{$_}) ? ($_ => $callback->{$_}) : ()
-    } @LIFECYCLE_CALLBACK;
-    my %input_callback = map {
-        exists($callback->{$_}) ? ($_ => $callback->{$_}) : ()
-    } @INPUT_CALLBACK;
-    my %timeout = map {
-        $_ => exists($timeout_override{$_})
-            ? $timeout_override{$_} : $descriptor->{options}{$_}
-    } qw(idle_timeout read_timeout write_timeout);
-    my $self = bless {
-        descriptor  => $descriptor,
-        loop        => undef,
-        read_fh     => $read_fh,
-        write_fh    => $write_fh,
-        read_capable => defined($read_fh) ? 1 : 0,
-        write_capable => defined($write_fh) ? 1 : 0,
-        read_watcher => undef,
-        write_watcher => undef,
-        data        => $data,
-        callbacks   => _effective_lifecycle_callbacks(
-            $descriptor, \%lifecycle_override,
-        ),
-        callback_overrides => \%lifecycle_override,
-        _input_callbacks => \%input_callback,
-        _input_callback_overrides => {
-            map { $_ => 1 } keys %input_callback
-        },
-        transport   => $transport,
-        xs_state    => undef,
-        read_paused => 0,
-        read_eof    => 0,
-        read_closed => defined($read_fh) ? 0 : 1,
-        write_ending => 0,
-        write_ended  => defined($write_fh) ? 0 : 1,
-        closed       => 0,
-        detached     => 0,
-        close_fired  => 0,
-        last_error   => undef,
-        transport_ready_fired => 0,
-        transport_deadline_watcher => undef,
-        transport_shutdown_started => 0,
-        timeout => \%timeout,
-        timeout_override => \%timeout_override,
-        initial_deadline => $initial_deadline,
-        operation_deadline_at => undef,
-        operation_deadline_name => undef,
-        operation_deadline_timeout => undef,
-        deadline_timer => undef,
-        deadline_started => 0,
-        deadline_tracking => 0,
-        deadline_read_started => undef,
-        deadline_write_started => undef,
-        _construction_pending => 1,
-    }, $class;
-    $self->_prepare_handles if !$pending;
-    if ($loop) {
-        my $attached = eval { $self->_attach_to_loop($loop); 1 };
-        if (!$attached) {
-            my $failure = $@ || 'Stream construction attachment failed';
-            $self->_abort_failed_construction;
-            delete $self->{_construction_pending};
-            die $failure;
-        }
-    }
-    delete $self->{_construction_pending};
-    return $self;
-}
-
-sub connect ($class, %opt) {
-    croak 'connect(): available only on Linux::Event::IO::Sock::Stream subclasses';
-}
-
-sub CLONE ($class) {
-    Linux::Event::_ByteStream::Descriptor::clear_cache();
-    return;
-}
-
-sub CLONE_SKIP ($class) { 1 }
-
 sub _prepare_handles ($self) {
     my ($read_fh, $write_fh) = @$self{qw(read_fh write_fh)};
     my %prepared;
@@ -568,11 +991,6 @@ sub _abort_failed_construction ($self) {
     return;
 }
 
-sub DESTROY ($self) {
-    $self->_abort_failed_construction if $self->{_construction_pending};
-    return;
-}
-
 sub _fire_ready ($self) {
     return if $self->{closed} || ($self->{transport_ready_fired} & 0x02);
     $self->{transport_ready_fired} |= 0x02;
@@ -611,107 +1029,6 @@ sub _flush_preconnect_output ($self) {
         $self->_finish_write_side;
     }
     return;
-}
-
-sub fh ($self) {
-    return undef if !defined($self->{read_fh}) || !defined($self->{write_fh});
-    return fileno($self->{read_fh}) == fileno($self->{write_fh})
-        ? $self->{read_fh} : undef;
-}
-sub read_fh ($self) { $self->{read_fh} }
-sub write_fh ($self) { $self->{write_fh} }
-sub read_fd ($self) {
-    return defined($self->{read_fh}) ? fileno($self->{read_fh}) : undef;
-}
-sub write_fd ($self) {
-    return defined($self->{write_fh}) ? fileno($self->{write_fh}) : undef;
-}
-sub has_read ($self) { !!$self->{read_capable} }
-sub has_write ($self) { !!$self->{write_capable} }
-sub loop ($self) { $self->{loop} }
-sub state ($self) {
-    return 'detached' if $self->{closed} && $self->{detached};
-    return 'closed' if $self->{closed};
-    return 'unattached' if !$self->{loop};
-    return 'connecting' if $self->{connection};
-    return 'active';
-}
-sub last_error ($self) { $self->{last_error} }
-sub transport ($self) { $self->{transport} }
-sub is_closed ($self) { !!$self->{closed} }
-sub is_terminal ($self) { !!$self->{closed} }
-sub is_read_paused ($self) { !!$self->{read_paused} }
-sub is_read_eof ($self) { !!$self->{read_eof} }
-sub is_read_closed ($self) { !!$self->{read_closed} }
-sub is_write_ended ($self) { !!$self->{write_ended} }
-sub is_write_blocked ($self) {
-    return !!$self->{xs_state}->is_write_blocked if $self->{xs_state};
-    return !!$self->{preconnect_write_blocked};
-}
-
-sub data ($self, @arg) {
-    $self->{data} = $arg[0] if @arg;
-    return $self->{data};
-}
-
-sub pending_bytes ($self) {
-    my $pending = $self->{preconnect_bytes} // 0;
-    $pending += $self->{xs_state}->pending_bytes if $self->{xs_state};
-    return $pending;
-}
-
-sub transport_name ($self) {
-    return $self->{xs_state}->transport_name if $self->{xs_state};
-    return undef;
-}
-
-sub is_transport_ready ($self) {
-    return !!$self->{xs_state}->transport_ready if $self->{xs_state};
-    return 0;
-}
-
-sub idle_timeout  ($self) { $self->{timeout}{idle_timeout} }
-sub read_timeout  ($self) { $self->{timeout}{read_timeout} }
-sub write_timeout ($self) { $self->{timeout}{write_timeout} }
-
-sub set_deadline ($self, %option) {
-    croak 'set_deadline(): stream is closed' if $self->{closed};
-    my $spec = _deadline_spec('set_deadline', \%option);
-    if (!$self->{deadline_started}) {
-        $self->{initial_deadline} = $spec;
-        return $self;
-    }
-    my $now = _deadline_now();
-    $self->{operation_deadline_at} = $spec->{absolute}
-        ? $spec->{seconds} : $now + $spec->{seconds};
-    $self->{operation_deadline_name} = $spec->{operation};
-    $self->{operation_deadline_timeout} = $spec->{absolute}
-        ? undef : $spec->{seconds};
-    $self->_rearm_stream_deadline;
-    return $self;
-}
-
-sub clear_deadline ($self) {
-    croak 'clear_deadline(): stream is closed' if $self->{closed};
-    $self->{initial_deadline} = undef;
-    $self->{operation_deadline_at} = undef;
-    $self->{operation_deadline_name} = undef;
-    $self->{operation_deadline_timeout} = undef;
-    $self->_rearm_stream_deadline if $self->{deadline_started};
-    return $self;
-}
-
-sub deadline ($self) {
-    return $self->{operation_deadline_at}
-        if defined $self->{operation_deadline_at};
-    my $spec = $self->{initial_deadline} or return undef;
-    return $spec->{seconds} if $spec->{absolute};
-    return undef;
-}
-
-sub deadline_operation ($self) {
-    return $self->{operation_deadline_name}
-        // ($self->{initial_deadline} && $self->{initial_deadline}{operation});
 }
 
 sub _deadline_now () {
@@ -885,204 +1202,6 @@ sub _apply_transition_timeouts ($self, $descriptor) {
     return;
 }
 
-sub write ($self, $bytes) {
-    croak 'write(): stream is closed' if $self->{closed};
-    croak 'write(): stream has no writable side'
-        if !defined $self->{write_fh} && !$self->{connection};
-    croak 'write(): writable side has ended'
-        if $self->{write_ending} || $self->{write_ended};
-    return 1 if !defined $bytes;
-    croak 'write(): bytes must be a scalar byte string' if ref $bytes;
-    $bytes = "$bytes";
-    croak 'write(): bytes must be a scalar byte string'
-        if !utf8::downgrade($bytes, 1);
-    return 1 if $bytes eq '';
-
-    if (!$self->{xs_state}) {
-        croak 'write(): stream has no pending or active transport'
-            if !$self->{connection};
-        my $pending = ($self->{preconnect_bytes} // 0) + length($bytes);
-        my $limit = $self->{descriptor}{options}{max_pending_bytes};
-        if ($limit && $pending > $limit) {
-            my $error = Linux::Event::Error->new(
-                type          => 'output_limit',
-                operation     => 'write',
-                message       => "pending output would exceed $limit bytes",
-                pending_bytes => $pending,
-                limit         => $limit,
-            );
-            $self->_fail($error);
-            return 0;
-        }
-        push @{ $self->{preconnect_output} //= [] }, "$bytes";
-        $self->{preconnect_bytes} = $pending;
-        if ($pending > $self->{descriptor}{options}{high_watermark}) {
-            $self->{preconnect_write_blocked} = 1;
-            return 0;
-        }
-        return 1;
-    }
-
-    my $was_pending = $self->pending_bytes;
-    my $status = $self->{xs_state}->_write($bytes);
-    $self->_request_write_ready if $status & 0x02;
-    if ($self->{deadline_started} && $self->{timeout}{write_timeout} > 0
-        && !$was_pending && $self->pending_bytes > 0) {
-        $self->{deadline_write_started} = _deadline_now();
-        $self->_rearm_stream_deadline;
-    }
-    return $status & 0x01 ? 1 : 0;
-}
-
-sub send ($self, $payload) {
-    my $framer = $self->{descriptor}{framer}
-        // croak 'send(): requires a framed Stream subclass';
-    my $bytes = $framer->{frame}->($framer->{native}, $payload);
-    return $self->write($bytes);
-}
-
-sub end ($self, $final_bytes = undef) {
-    return $self
-        if $self->{closed} || $self->{write_ending} || $self->{write_ended}
-        || (!defined($self->{write_fh}) && !$self->{connection});
-    $self->write($final_bytes) if defined($final_bytes) && $final_bytes ne '';
-    $self->{write_ending} = 1;
-    $self->_finish_write_side
-        if $self->{xs_state} && $self->pending_bytes == 0;
-    return $self;
-}
-
-sub pause_read ($self) {
-    return $self if $self->{closed};
-    croak 'pause_read(): stream has no readable side'
-        if !$self->{read_capable};
-    return $self
-        if $self->{read_eof} || $self->{read_closed} || $self->{read_paused};
-    $self->{read_paused} = 1;
-    $self->{xs_state}->_pause if $self->{xs_state};
-    $self->{read_watcher}->disable_read if $self->{read_watcher};
-    $self->_rearm_stream_deadline
-        if $self->{deadline_started} && $self->{timeout}{read_timeout} > 0;
-    return $self;
-}
-
-sub resume_read ($self) {
-    return $self if $self->{closed};
-    croak 'resume_read(): stream has no readable side'
-        if !$self->{read_capable};
-    return $self
-        if $self->{read_eof} || $self->{read_closed} || !$self->{read_paused};
-    $self->{read_paused} = 0;
-    $self->{deadline_read_started} = _deadline_now()
-        if $self->{deadline_started} && $self->{timeout}{read_timeout} > 0;
-    $self->{xs_state}->_resume if $self->{xs_state};
-    $self->{read_watcher}->enable_read
-        if $self->{read_watcher} && !$self->{xs_state}->consumer_paused;
-    $self->_rearm_stream_deadline
-        if $self->{deadline_started} && $self->{timeout}{read_timeout} > 0;
-    return $self;
-}
-
-sub transition_to ($self, $class, %opt) {
-    croak 'transition_to(): stream is closed' if $self->{closed};
-    croak 'transition_to(): target class is required'
-        if !defined($class) || ref($class) || $class eq '';
-    croak "transition_to(): $class is already active"
-        if ref($self) eq $class;
-    my $source_socket = $self->isa('Linux::Event::_Socket::Stream') ? 1 : 0;
-    my $target_socket = $class->isa('Linux::Event::_Socket::Stream') ? 1 : 0;
-    croak 'transition_to(): cannot cross the ordered-byte resource boundary'
-        if $source_socket != $target_socket;
-
-    my $input = delete $opt{input};
-    croak 'transition_to(): input must be a byte string'
-        if defined($input) && ref($input);
-    if (defined $input) {
-        $input = "$input";
-        croak 'transition_to(): input must be a byte string'
-            if !utf8::downgrade($input, 1);
-    }
-    croak 'transition_to(): unknown options: ' . join(', ', sort keys %opt)
-        if %opt;
-
-    my $descriptor = Linux::Event::_ByteStream::Descriptor::for_class($class);
-    my $xs_state = $self->{xs_state}
-        // croak 'transition_to(): stream has no native state';
-    my $source_consumer = $self->{descriptor}{consumer};
-    my $target_consumer = $descriptor->{consumer};
-    my $source_ops = $source_consumer
-        ? $source_consumer->{operations_address} : 0;
-    my $target_ops = $target_consumer
-        ? $target_consumer->{operations_address} : 0;
-    croak 'transition_to(): cannot change native consumer provider'
-        if $source_ops != $target_ops;
-    _require_read_sink(
-        $descriptor,
-        $self->{_input_callback_overrides},
-        $self->{read_capable} && !$self->{read_closed} && !$self->{read_eof},
-        'transition_to(): target readable raw Stream has no on_data callback',
-        'transition_to(): target readable framed Stream has no message sink',
-    );
-
-    my $input_bytes = defined($input) ? length($input) : 0;
-    if ($descriptor->{framer} && $descriptor->{options}{max_buffer}) {
-        my $preserved = $xs_state->_input_buffered_bytes + $input_bytes;
-        croak 'transition_to(): preserved input exceeds target max_buffer'
-            if $preserved > $descriptor->{options}{max_buffer};
-    }
-    my $pending_limit = $descriptor->{options}{max_pending_bytes};
-    croak 'transition_to(): queued output exceeds target max_pending_bytes'
-        if $pending_limit && $xs_state->pending_bytes > $pending_limit;
-
-    # XS validates and swaps the immutable descriptor without invoking a
-    # callback. Update the Perl object's type before buffered input is allowed
-    # to enter the new callback set.
-    my $callbacks = _effective_lifecycle_callbacks(
-        $descriptor, $self->{callback_overrides},
-    );
-    $xs_state->_transition_validated($descriptor->{native}, $input);
-    $self->{descriptor} = $descriptor;
-    $self->{callbacks} = $callbacks;
-    bless $self, $class;
-    $self->_apply_transition_timeouts($descriptor);
-    $xs_state->_transition_ready;
-    return $self;
-}
-
-sub close ($self) {
-    $self->_close_now(1);
-    return $self;
-}
-
-sub close_read ($self) {
-    return $self if $self->{closed} || $self->{read_closed} || $self->{read_eof};
-    $self->{read_closed} = 1;
-    my $failure;
-    _teardown_step(\$failure, sub {
-        $self->{xs_state}->_close_read(6) if $self->{xs_state};
-    });
-    _teardown_step(\$failure, sub { $self->_release_read_side });
-    _teardown_step(\$failure, sub { $self->_close_now(1) })
-        if $self->{write_ended};
-    die $failure if defined $failure;
-    return $self;
-}
-
-sub close_write ($self) {
-    return $self if $self->{closed} || $self->{write_ended};
-    my $failure;
-    _teardown_step(\$failure, sub {
-        $self->{xs_state}->_close_write if $self->{xs_state};
-    });
-    $self->{write_ending} = 0;
-    $self->{write_ended} = 1;
-    _teardown_step(\$failure, sub { $self->_release_write_side });
-    _teardown_step(\$failure, sub { $self->_close_now(1) })
-        if $self->{read_eof} || $self->{read_closed};
-    die $failure if defined $failure;
-    return $self;
-}
-
 sub _release_read_side ($self) {
     my $read_watcher = delete $self->{read_watcher};
     if ($read_watcher) {
@@ -1119,40 +1238,6 @@ sub _release_write_side ($self) {
         $self->{write_fh} = undef;
     }
     return;
-}
-
-sub detach ($self) {
-    croak 'detach(): stream is already closed' if $self->{closed};
-    croak 'detach(): stream is not established'
-        if !defined($self->{read_fh}) && !defined($self->{write_fh});
-    croak 'detach(): pending output must drain before detach'
-        if $self->pending_bytes;
-    croak 'detach(): cannot detach a non-plain transport'
-        if ($self->transport_name // 'plain') ne 'plain';
-    my $handles = {
-        read_fh  => $self->{read_fh},
-        write_fh => $self->{write_fh},
-    };
-    my $failure;
-    _teardown_step(\$failure, sub { $self->_cancel_stream_deadline });
-    if (my $xs_state = delete $self->{xs_state}) {
-        _teardown_step(\$failure, sub { $xs_state->_close(5) });
-    }
-    _teardown_step(\$failure, sub { $self->_cancel_io_watchers });
-    $self->{closed} = 1;
-    delete @$self{qw(
-        callbacks callback_overrides _input_callbacks
-        _input_callback_overrides
-    )};
-    $self->{detached} = 1;
-    if (defined $failure) {
-        _teardown_step(\$failure, sub { $self->_close_handles });
-        die $failure;
-    } else {
-        $self->{read_fh} = undef;
-        $self->{write_fh} = undef;
-    }
-    return $handles;
 }
 
 sub _on_read_terminal_ready ($self) {

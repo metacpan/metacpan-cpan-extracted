@@ -1,4 +1,4 @@
-package Object::PadX::Enum 0.02;
+package Object::PadX::Enum 0.03;
 
 use v5.22;
 use warnings;
@@ -63,6 +63,9 @@ identifier under which the singleton was declared (e.g. C<"RED">). Inside the
 block, all normal C<Object::Pad> constructs (C<field>, C<method>, C<ADJUST>,
 ...) are available, plus the C<item> keyword.
 
+The entire block body is executed while it is being compiled, BEGIN-block
+style; see L</COMPILE-TIME SEMANTICS>.
+
 The following class-level attributes are accepted:
 
 =over 4
@@ -80,9 +83,9 @@ C<ADJUST> phasers from the parent are inherited normally. The parent's
 B<items> are I<not> inherited: the child has its own ordinal-zero-based item
 sequence, and accessing a parent item name on the child raises an error. The
 child's C<values>, C<from_ordinal> and C<from_name> see only the child's
-items. A parent enum must be finalized (i.e. its declaration must have
-already executed at runtime) before a child enum that inherits from it; in
-practice this is satisfied by normal source ordering and C<use> ordering.
+items. A parent enum must be declared before a child enum that inherits from
+it; since enums are finalized while they are compiled, normal source ordering
+and C<use> ordering satisfies this.
 
 =item C<:does(ROLE)>, C<:does(ROLE VERSION)>
 
@@ -103,6 +106,9 @@ Declares a named singleton instance of the enclosing C<enum>. C<ARGS> is the
 key/value list passed to the auto-generated constructor; the parentheses (and
 the arg list) are optional, so C<item FOO;> is equivalent to C<item FOO();>.
 
+C<ARGS> is evaluated at compile time and therefore must not depend on runtime
+state; see L</COMPILE-TIME SEMANTICS>.
+
 =back
 
 After the C<enum> block closes, the following class-level methods are
@@ -113,11 +119,63 @@ installed on the enum class for each declared singleton C<NAME>:
    $byord     = ClassName->from_ordinal(0);
    $byname    = ClassName->from_name("RED");
 
+The per-item accessors are installed as inlinable constant subs (of the kind
+created by L<constant>), so a function-style call such as
+C<< ClassName::NAME() >> is folded to a constant at the caller's compile
+time. Method-call syntax C<< ClassName->NAME >> dispatches through the same
+sub and returns the same singleton.
+
 Direct construction via C<< ClassName->new(...) >> is blocked after the
 C<enum> block closes; the only ways to obtain a singleton are the per-item
 accessor, C<from_name>, and C<from_ordinal>. Subclasses (whether plain
 C<class> or another C<enum>) may still call C<new> on themselves; the block
 applies only to direct invocation on the enum class itself.
+
+=head1 COMPILE-TIME SEMANTICS
+
+Enums are static, fixed sets of values, and the implementation treats them
+that way: the whole C<enum> block body is executed while it is being
+compiled, much like a C<BEGIN> block. In particular:
+
+=over 4
+
+=item *
+
+The singletons are constructed, and all accessors installed, as soon as the
+closing brace of the C<enum> block has been parsed. They are visible from any
+code compiled afterwards, including C<BEGIN> blocks later in the same file.
+
+=item *
+
+C<item> args are ordinary Perl expressions, but they are evaluated at compile
+time. An expression referencing runtime state (for example a lexical assigned
+during normal runtime) sees the value that variable has at compile time,
+usually C<undef>. Use only compile-time-computable expressions in C<item>
+args.
+
+=item *
+
+Any other plain statements written inside the block also run at compile time.
+
+=back
+
+Because construction happens at compile time, values derived from item args
+can be precomputed once per singleton instead of recomputed on every call.
+Assign them to a field in an C<ADJUST> block:
+
+   enum Raptor {
+      item VELOCIRAPTOR ( max_speed_kmh => 60, max_weight_kg => 15 );
+
+      field $max_speed_kmh :param :reader;
+      field $max_weight_kg :param :reader;
+
+      field $speed_per_kg :reader;
+      ADJUST { $speed_per_kg = $max_speed_kmh / $max_weight_kg }
+   }
+
+C<< Raptor->VELOCIRAPTOR->speed_per_kg >> then returns a value computed once,
+at compile time, through a plain generated reader instead of a computing
+method.
 
 =head1 CAVEATS
 
@@ -130,11 +188,9 @@ C<item> args. C<Object::PadX::Enum> does I<not> inject C<:param> automatically.
 
 =item *
 
-Singletons are constructed at the runtime of the compilation unit that
-contains the C<enum> declaration, after that unit's C<UNITCHECK> phase. They
-are therefore not visible from earlier C<BEGIN>/C<UNITCHECK> blocks of the
-same unit. Normal runtime code (including code inside C<do BLOCK> and
-C<eval "STRING"> blocks executed during main runtime) sees them as expected.
+The C<enum> block body executes at compile time, so C<item> args (and any
+other statements inside the block) must not depend on runtime state. See
+L</COMPILE-TIME SEMANTICS>.
 
 =item *
 
@@ -286,7 +342,8 @@ sub _begin_enum {
    return;
 }
 
-# Called at runtime, in source order, for each `item NAME(args)` statement.
+# Called at compile time (during execution of the enum body CV), in source
+# order, for each `item NAME(args)` statement.
 sub _register_item {
    my ( $class, $name, $line, @args ) = @_;
 
@@ -305,7 +362,8 @@ sub _register_item {
    return;
 }
 
-# Called at runtime, once, after all item statements for the enum have run.
+# Called at compile time, once, after all item statements for the enum have
+# run, while the closing brace of the enum block is being processed.
 sub _finalize_enum {
    my ( $class ) = @_;
 
@@ -316,6 +374,12 @@ sub _finalize_enum {
    my $ord_field  = $meta->get_field( '$ordinal' );
    my $name_field = $meta->get_field( '$_name'   );
    my @ordered;
+
+   # Instances cannot be constructed before the class is sealed. begin_class
+   # queues an auto-seal for UNITCHECK, but that is too late for compile-time
+   # construction; seal now. The later auto-seal is a no-op on an
+   # already-sealed class.
+   $meta->seal;
 
    my $n = 0;
    for my $item ( @{ $entry->{ items } } ) {
@@ -335,11 +399,19 @@ sub _finalize_enum {
    no strict 'refs';
    no warnings 'redefine';
 
+   # Item accessors are installed as inlinable constant subs (the same
+   # stash-slot technique constant.pm uses): a reference to a readonly scalar
+   # in the stash slot makes `Colors::RED()` constant-fold at the caller's
+   # compile time. Method-call syntax `Colors->RED` dispatches through the
+   # same constant sub unchanged.
+   my $stash = \%{ "${class}::" };
    my %own_names;
    for my $pair ( @ordered ) {
       my ( $name, $instance ) = @$pair;
       $own_names{ $name } = 1;
-      *{ "${class}::${name}" } = sub { $instance };
+      my $const = $instance;
+      Internals::SvREADONLY( $const, 1 );
+      $stash->{ $name } = \$const;
    }
 
    *{ "${class}::values" } = sub {

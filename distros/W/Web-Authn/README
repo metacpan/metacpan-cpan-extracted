@@ -1,0 +1,463 @@
+NAME
+    Web::Authn - Server-side WebAuthn / passkeys
+
+SYNOPSIS
+        use Web::Authn qw(
+            generate_registration_options
+            verify_registration_response
+            generate_authentication_options
+            verify_authentication_response
+            options_to_json
+            base64url_to_bytes
+        );
+
+        my $opts = generate_registration_options(
+            rp_id     => 'example.com',
+            rp_name   => 'Example Co',
+            user_name => 'bob',
+        );
+        my $json = options_to_json($opts);   # send to the browser
+
+        my $reg = verify_registration_response(
+            credential          => $browser_json,          # JSON or hash
+            expected_challenge  => $opts->{challenge},
+            expected_rp_id      => 'example.com',
+            expected_origin     => 'https://example.com',
+        );
+        # persist $reg->{credential_id}, $reg->{credential_public_key}, $reg->{sign_count}
+
+        my $assert_opts = generate_authentication_options(
+            rp_id => 'example.com',
+            allow_credentials => [
+                { type => 'public-key', id => $reg->{credential_id}, _bytes => 1 },
+            ],
+        );
+
+        my $ok = verify_authentication_response(
+            credential                   => $browser_json,
+            expected_challenge           => $assert_opts->{challenge},
+            expected_rp_id               => 'example.com',
+            expected_origin              => 'https://example.com',
+            credential_public_key        => $reg->{credential_public_key},
+            credential_current_sign_count => $reg->{sign_count},
+        );
+
+    Or, using the OO interface:
+
+        my $authn = Web::Authn->new(
+            rp_id           => 'example.com',
+            rp_name         => 'Example Co',
+            expected_origin => 'https://example.com',
+        );
+
+        my $opts = $authn->generate_registration_options( user_name => 'bob' ) ||
+            die( $authn->error );
+
+        my $reg = $authn->verify_registration_response(
+            credential         => $browser_json,
+            expected_challenge => $opts->{challenge},
+        ) || die( $authn->error );
+
+        $authn->fatal(1);   # subsequent errors die() as exception objects
+
+VERSION
+        v0.2.0
+
+DESCRIPTION
+    "Web::Authn" is a Perl port of Duo Labs' py_webauthn
+    <https://github.com/duo-labs/py_webauthn>. It implements the Relying
+    Party operations of the W3C WebAuthn Level 2/3 specifications: option
+    generation and cryptographic verification of registration and
+    authentication ceremonies.
+
+    Methods return, "undef" in scalar context or an empty list in list
+    context, on failure and store a Web::Authn::Exception on the object and
+    in "Web::Authn->error". They "die" only when "fatal" is true.
+
+    Functional wrappers remain exported on request and dispatch to a
+    temporary object.
+
+    See Web::Authn::Cookbook for integration.
+
+    It is not a user/session framework. You store challenges, credential
+    IDs, COSE public keys and signature counters yourself.
+
+    The usual integration is four JSON endpoints: register/begin,
+    register/complete, login/begin, login/complete. See the distribution
+    README.md for a full walk-through, storage schema, and frontend notes.
+
+EXPORTS
+    Nothing is exported by default. Request what you need:
+
+        use Web::Authn qw(
+            generate_registration_options
+            verify_registration_response
+            generate_authentication_options
+            verify_authentication_response
+            options_to_json
+            options_to_json_dict
+            base64url_to_bytes
+            bytes_to_base64url
+            generate_challenge
+            generate_user_handle
+        );
+
+METHODS
+    All generation/verification functions take a flat named-parameter hash.
+
+  generate_registration_options(%args)
+    Returns a Perl hash describing "PublicKeyCredentialCreationOptions".
+    Pass it through "options_to_json" before sending it to the browser.
+
+    Required: "rp_id", "rp_name", "user_name".
+
+    Optional:
+
+    "user_id"
+        Raw bytes identifying the account to the authenticator. Must not be
+        an email. Defaults to "generate_user_handle" (64 random bytes). Keep
+        this value stable for the life of the account.
+
+    "user_display_name"
+        Shown in the OS passkey UI. Defaults to "user_name".
+
+    "challenge"
+        Raw challenge bytes. Defaults to 64 CSPRNG bytes
+        (Bytes::Random::Secure).
+
+    "timeout"
+        Hint in milliseconds. Default 60000.
+
+    "attestation"
+        "none" (default), "indirect", "direct", or "enterprise".
+
+    "authenticator_selection"
+        Hash with "authenticator_attachment" ("platform" /
+        "cross-platform"), "resident_key" ("discouraged" / "preferred" /
+        "required"), "user_verification" ("required" / "preferred" /
+        "discouraged"). If "resident_key" is "required",
+        "require_resident_key" is also set.
+
+    "exclude_credentials"
+        Array of descriptor hashes "{ type, id, transports? }" so the same
+        authenticator cannot be re-registered. "id" is raw bytes.
+
+    "supported_pub_key_algs"
+        List of COSE algorithm identifiers. Default: EdDSA (-8), ES256 (-7),
+        RS256 (-257). Constants live in Web::Authn::COSE.
+
+    "hints"
+        Optional WebAuthn Level 3 hints: "security-key", "client-device",
+        "hybrid".
+
+    Dies via Carp if "rp_id", "rp_name", or "user_name" is empty.
+
+  generate_authentication_options(%args)
+    Returns "PublicKeyCredentialRequestOptions".
+
+    Required: "rp_id".
+
+    Optional: "challenge", "timeout" (default 60000), "allow_credentials"
+    (array of descriptors; omit or "[]" for usernameless / discoverable
+    credentials), "user_verification" (default "preferred").
+
+  options_to_json($options)
+    Serialises registration or authentication options to a JSON string
+    suitable for "Content-Type: application/json". Byte fields ("challenge",
+    "user.id", descriptor "id") become unpadded base64url. Keys are
+    camelCase as the WebAuthn spec uses them.
+
+  options_to_json_dict($options)
+    Same conversion, but returns a hash instead of a JSON string.
+
+  verify_registration_response(%args)
+    Implements WebAuthn §7.1. "credential" may be a JSON string or a hash in
+    the SimpleWebAuthn / py_webauthn shape ("id", "rawId", "type",
+    "response.clientDataJSON", "response.attestationObject" as base64url).
+
+    Required: "credential", "expected_challenge" (raw bytes you issued),
+    "expected_rp_id", "expected_origin" (full origin string, or an array of
+    allowed origins).
+
+    Optional: "require_user_presence" (default true),
+    "require_user_verification" (default false), "supported_pub_key_algs",
+    "pem_root_certs_bytes_by_fmt" (hash of attestation format name to array
+    of PEM/DER root certificates).
+
+    Returns a hash:
+
+        credential_id            raw bytes
+        credential_public_key    COSE_Key bytes (store as-is)
+        sign_count               integer
+        aaguid                   UUID string
+        fmt                      attestation format
+        credential_type          "public-key"
+        user_verified            0/1
+        attestation_object       raw bytes
+        credential_device_type   "singleDevice" | "multiDevice"
+        credential_backed_up     0/1
+
+    Dies with Web::Authn::Exception::InvalidRegistration on any check
+    failure.
+
+  verify_authentication_response(%args)
+    Implements WebAuthn §7.2.
+
+    Required: "credential", "expected_challenge", "expected_rp_id",
+    "expected_origin", "credential_public_key" (COSE bytes stored at
+    registration), "credential_current_sign_count".
+
+    Optional: "require_user_verification" (default false).
+
+    Returns:
+
+        credential_id            raw bytes
+        new_sign_count           persist this
+        credential_device_type
+        credential_backed_up
+        user_verified
+        user_handle              bytes or undef
+
+    The signature counter must strictly increase when either the stored or
+    reported count is non-zero; otherwise the response is rejected as a
+    possible cloned authenticator.
+
+    Dies with Web::Authn::Exception::InvalidAuthentication.
+
+  base64url_to_bytes($str)
+  bytes_to_base64url($bytes)
+    Unpadded base64url, as WebAuthn uses it.
+
+  generate_challenge($len)
+    CSPRNG bytes via Bytes::Random::Secure. $len defaults to 64 (WebAuthn
+    only requires 16).
+
+  generate_user_handle()
+    64 CSPRNG bytes for "PublicKeyCredentialUserEntity.id".
+
+  error
+        my $authn = Web::Authn->new( %bad_args );
+        if( !defined( $authn ) )
+        {
+            my $err = Web::Authn->error;
+            warn "Error: $err";
+        }
+
+    Instance and class method. When called with a message, constructs a
+    Web::Authn::Exception object, stores it internally, and either warns (if
+    "fatal" mode is off) or "die"s (if "fatal" mode is on). Returns "undef"
+    in scalar context, an empty list in list context.
+
+    When called without arguments, returns the most recent error object (or
+    "undef" if no error has occurred).
+
+  fatal
+        $authn->fatal(1); # Enable fatal exceptions
+        $authn->fatal(0); # Disable fatal exceptions
+        my $bool = $authn->fatal;
+
+    Sets or get the boolean value, whether to die upon exception, or not. If
+    set to true, then instead of setting an exception object, this module
+    will die with an exception object. You can catch the exception object
+    then after using "try". For example:
+
+        use v.5.34; # to be able to use try-catch blocks in perl
+        use experimental 'try';
+        no warnings 'experimental';
+        try
+        {
+            my $authn = Web::Authn->new( fatal => 1 );
+            # Forgot the 'rp_id':
+            my $bad = $authn->generate_registration_options( rp_id => '', rp_name => 'x', user_name => 'y' );
+        }
+        catch( $e )
+        {
+            say "Error occurred: ", $e->message;
+            # Error occurred: No value for width was provided.
+        }
+
+  pass_error
+        sub my_method
+        {
+            my $self = shift( @_ );
+            my $authn = Web::Authn->new( %bad_args ) ||
+                return( $self->pass_error( Web::Authn->error ) );
+            ...
+        }
+
+    Propagates the error stored in another object (or the class-level error)
+    into the current object's error slot, without constructing a new
+    exception. Used internally when a lower-level call fails and the caller
+    wants to surface the same error to its own caller.
+
+ATTESTATION FORMATS
+    "parse_attestation_object" in Web::Authn::Parse decodes the CBOR
+    "attestationObject" into "fmt", "authData" and "attStmt". "verify" in
+    Web::Authn::Attestation then dispatches on the "fmt" argument ("none",
+    "packed", "fido-u2f", "apple", "tpm", "android-safetynet",
+    "android-key"). That package has no "attestationObject" field; "fmt" is
+    a named parameter.
+
+    "none"
+        Statement must be empty. Typical for consumer passkeys.
+
+    "packed"
+        Signature over "authData || SHA-256(clientDataJSON)".
+        Self-attestation uses the credential public key; "x5c" uses the leaf
+        certificate (optional root pinning).
+
+    "fido-u2f"
+        U2F "verificationData", P-256, AAGUID all zeros.
+
+    "apple"
+        "x5c", nonce in OID 1.2.840.113635.100.8.2, subject public key
+        matches the credential key. Pass Apple's WebAuthn root via
+        "pem_root_certs_bytes_by_fmt".
+
+    "tpm"
+        "x5c", signature over "certInfo", "extraData" contains a hash of
+        "attToBeSigned".
+
+    "android-safetynet"
+        JWT signature, "ctsProfileMatch", nonce.
+
+    "android-key"
+        "x5c" plus packed-style signature.
+
+    Certificate chains against RP-supplied roots are validated in process
+    (CryptX verifies each certificate signature). There is no openssl(1)
+    subprocess. If you pass no roots, pinning is skipped (same as
+    py_webauthn).
+
+COSE ALGORITHMS
+    Verified with CryptX: ES256/384/512, Ed25519 (EdDSA), RS256/384/512,
+    PS256/384/512.
+
+    ML-DSA (-48/-49/-50) keys can be decoded; verification is not
+    implemented.
+
+EXCEPTIONS
+    See Web::Authn::Exception. Generation of empty "rp_id" etc. uses "croak"
+    in Carp instead.
+
+DEPENDENCIES
+    CryptX, Bytes::Random::Secure, and core Digest::SHA, JSON::PP,
+    MIME::Base64.
+
+REFERENCES
+    Normative documents this module is written against. Dated REC links are
+    pinned; undated "/TR/webauthn-3/" always resolves to the latest
+    published Level 3.
+
+  WebAuthn (W3C) — browser API and RP procedures
+    Level 3 Recommendation (25 August 2026) — current
+        <https://www.w3.org/TR/webauthn-3/>
+
+        Pinned: <https://www.w3.org/TR/2026/REC-webauthn-3-20260825/>
+
+        RP registration procedure:
+        <https://www.w3.org/TR/webauthn-3/#sctn-registering-a-new-credential
+        > (§7.1)
+
+        RP authentication procedure:
+        <https://www.w3.org/TR/webauthn-3/#sctn-verifying-assertion> (§7.2)
+
+        Attestation statement formats:
+        <https://www.w3.org/TR/webauthn-3/#sctn-defined-attestation-formats>
+        (§8)
+
+        Editor's Draft (next level): <https://w3c.github.io/webauthn/>
+
+        Working Group repo: <https://github.com/w3c/webauthn>
+
+    Level 2 Recommendation (8 April 2021)
+        <https://www.w3.org/TR/webauthn-2/>
+
+        Pinned: <https://www.w3.org/TR/2021/REC-webauthn-2-20210408/>
+
+    Level 1 Recommendation (4 March 2019)
+        <https://www.w3.org/TR/webauthn-1/>
+
+        Pinned: <https://www.w3.org/TR/2019/REC-webauthn-1-20190304/>
+
+    "verify_registration_response" implements §7.1.
+    "verify_authentication_response" implements §7.2.
+
+  CTAP / FIDO2 — authenticator protocol
+    WebAuthn is the web API. CTAP is how the platform talks to the
+    authenticator (USB, NFC, BLE, hybrid). Together they are FIDO2.
+
+    CTAP 2.2 Proposed Standard (28 February 2025)
+        <https://fidoalliance.org/specs/fido-v2.2-ps-20250228/fido-client-to
+        -authenticator-protocol-v2.2-ps-20250228.html>
+
+    CTAP 2.1 Proposed Standard
+        <https://fidoalliance.org/specs/fido-v2.1-ps-20210615/fido-client-to
+        -authenticator-protocol-v2.1-ps-20210615.html>
+
+    CTAP 2.0 (27 February 2018)
+        <https://fidoalliance.org/specs/fido-v2.0-id-20180227/fido-client-to
+        -authenticator-protocol-v2.0-id-20180227.html>
+
+    FIDO Alliance specifications index
+        <https://fidoalliance.org/specifications/>
+
+    ITU-T X.1278 (CTAP aligned)
+        <https://www.itu.int/rec/T-REC-X.1278>
+
+  Encoding and algorithms
+    RFC 8949 — CBOR
+        <https://www.rfc-editor.org/rfc/rfc8949.html>
+
+    RFC 8610 — CDDL
+        <https://www.rfc-editor.org/rfc/rfc8610.html>
+
+    RFC 9052 / 9053 — COSE
+        <https://www.rfc-editor.org/rfc/rfc9052.html>
+
+        <https://www.rfc-editor.org/rfc/rfc9053.html>
+
+    RFC 8812 — COSE/JOSE registrations used by WebAuthn (RS256 etc.)
+        <https://www.rfc-editor.org/rfc/rfc8812.html>
+
+    IANA COSE Algorithms registry
+        <https://www.iana.org/assignments/cose/cose.xhtml#algorithms>
+
+    IANA COSE Key Types / Elliptic Curves
+        <https://www.iana.org/assignments/cose/cose.xhtml>
+
+    RFC 5280 — X.509 (attestation "x5c")
+        <https://www.rfc-editor.org/rfc/rfc5280.html>
+
+    RFC 4648 §5 — base64url
+        <https://www.rfc-editor.org/rfc/rfc4648.html#section-5>
+
+  Related
+    FIDO Alliance — passkeys overview
+        <https://fidoalliance.org/passkeys/>
+
+    py_webauthn (API this port mirrors)
+        <https://github.com/duo-labs/py_webauthn>
+
+CREDITS
+    Duo Labs / Matthew Miller for his work on the Python's "py_webauthn".
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+SEE ALSO
+    Web::Authn::Cookbook, Web::Authn::Parse, Web::Authn::Attestation,
+    Web::Authn::Crypto, Web::Authn::COSE, Web::Authn::CBOR,
+    Web::Authn::Exception, Authen::WebAuthn
+
+    <https://github.com/duo-labs/py_webauthn>,
+    <https://www.w3.org/TR/webauthn-3/>, Authen::WebAuthn
+
+COPYRIGHT & LICENSE
+    Copyright(c) 2026 DEGUEST Pte. Ltd.
+
+    All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

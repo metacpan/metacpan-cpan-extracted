@@ -1,4 +1,4 @@
-package Pod::Weaver::Role::Dialect 4.021;
+package Pod::Weaver::Role::Dialect 4.022;
 # ABSTRACT: something that translates Pod subdialects to standard Pod5
 
 use Moose::Role;
@@ -31,7 +31,7 @@ Pod::Weaver::Role::Dialect - something that translates Pod subdialects to standa
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 PERL VERSION
 

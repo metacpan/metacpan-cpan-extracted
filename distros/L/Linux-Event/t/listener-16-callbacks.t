@@ -32,7 +32,7 @@ use Linux::Event::IO::Sock::Stream;
     use parent 'Linux::Event::IO::Sock::Listener';
 
     sub on_accept ($listener, $stream) {
-        $listener->data->{stream} = $stream;
+        $stream->data->{stream} = $stream;
         die "application rejected accept\n";
     }
 
@@ -46,11 +46,14 @@ use Linux::Event::IO::Sock::Stream;
 my $loop = Linux::Event::Loop->new;
 my $state = { ready => 0, closed => 0 };
 my $listener = T::FailingAcceptListener->new(
-    loop         => $loop,
-    stream_class => 'T::CallbackStream',
-    host         => '127.0.0.1',
-    port         => 0,
-    data         => $state,
+    loop => $loop,
+    host => '127.0.0.1',
+    port => 0,
+    stream => { class => 'T::CallbackStream', data => $state },
+    on_error => sub ($listener, $error) {
+        $state->{error} = $error;
+        $listener->loop->stop;
+    },
 );
 
 socket(my $client, AF_INET, SOCK_STREAM, 0) or die "socket: $!";
@@ -100,11 +103,14 @@ close $client;
 my $setup_loop = Linux::Event::Loop->new;
 my $setup_state = { setup_closed => 0 };
 my $setup_listener = T::SetupFailureListener->new(
-    loop         => $setup_loop,
-    stream_class => 'T::BrokenAttachStream',
-    host         => '127.0.0.1',
-    port         => 0,
-    data         => $setup_state,
+    loop => $setup_loop,
+    host => '127.0.0.1',
+    port => 0,
+    stream => { class => 'T::BrokenAttachStream', data => $setup_state },
+    on_error => sub ($listener, $error) {
+        $setup_state->{setup_error} = $error;
+        $listener->loop->stop;
+    },
 );
 socket(my $setup_client, AF_INET, SOCK_STREAM, 0) or die "socket: $!";
 connect($setup_client,

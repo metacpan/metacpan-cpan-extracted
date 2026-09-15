@@ -38,8 +38,8 @@ subtest 'exists' => sub {
             is(
                 $pkg->variable( 'prefix' ),
                 object {
-                    call name         => 'prefix';
-                    call value        => 'root';
+                    call name  => 'prefix';
+                    call value => 'root';
                     call_list depends => [];
                 },
                 'object'
@@ -48,9 +48,7 @@ subtest 'exists' => sub {
             is(
                 $pkg,
                 object {
-                    call_list [
-                        resolve_dependencies => $pkg->variable( 'prefix' )
-                    ] => bag {
+                    call_list [ resolve_dependencies => $pkg->variable( 'prefix' ) ] => bag {
                         item 'prefix';
                         end;
                     };
@@ -64,8 +62,8 @@ subtest 'exists' => sub {
             is(
                 $pkg->variable( 'exec_prefix' ),
                 object {
-                    call name         => 'exec_prefix';
-                    call value        => '${prefix}/exec';
+                    call name  => 'exec_prefix';
+                    call value => '${prefix}/exec';
                     call_list depends => bag {
                         item 'prefix';
                         end;
@@ -77,9 +75,7 @@ subtest 'exists' => sub {
             is(
                 $pkg,
                 object {
-                    call_list [
-                        resolve_dependencies => $pkg->variable( 'exec_prefix' )
-                    ] => bag {
+                    call_list [ resolve_dependencies => $pkg->variable( 'exec_prefix' ) ] => bag {
                         item 'exec_prefix';
                         item 'prefix';
                         end;
@@ -93,8 +89,8 @@ subtest 'exists' => sub {
             is(
                 $pkg->variable( 'foo' ),
                 object {
-                    call name         => 'foo';
-                    call value        => '${prefix}';
+                    call name  => 'foo';
+                    call value => '${prefix}';
                     call_list depends => bag {
                         item 'prefix';
                         end;
@@ -106,9 +102,7 @@ subtest 'exists' => sub {
             is(
                 $pkg,
                 object {
-                    call_list [
-                        resolve_dependencies => $pkg->variable( 'foo' )
-                    ] => bag {
+                    call_list [ resolve_dependencies => $pkg->variable( 'foo' ) ] => bag {
                         item 'foo';
                         item 'prefix';
                         end;
@@ -122,8 +116,8 @@ subtest 'exists' => sub {
             is(
                 $pkg->variable( 'bar' ),
                 object {
-                    call name         => 'bar';
-                    call value        => '${prefix}/${exec_prefix}';
+                    call name  => 'bar';
+                    call value => '${prefix}/${exec_prefix}';
                     call_list depends => bag {
                         item 'prefix';
                         item 'exec_prefix';
@@ -136,9 +130,7 @@ subtest 'exists' => sub {
             is(
                 $pkg,
                 object {
-                    call_list [
-                        resolve_dependencies => $pkg->variable( 'bar' )
-                    ] => bag {
+                    call_list [ resolve_dependencies => $pkg->variable( 'bar' ) ] => bag {
                         item 'bar';
                         item 'prefix';
                         item 'exec_prefix';
@@ -171,8 +163,8 @@ subtest 'exists' => sub {
             is(
                 $pkg->keyword( 'Pfx' ),
                 object {
-                    call name         => 'Pfx';
-                    call value        => '${prefix}/${exec_prefix}';
+                    call name  => 'Pfx';
+                    call value => '${prefix}/${exec_prefix}';
                     call_list depends => bag {
                         item 'prefix';
                         item 'exec_prefix';
@@ -185,9 +177,7 @@ subtest 'exists' => sub {
             is(
                 $pkg,
                 object {
-                    call_list [
-                        resolve_dependencies => $pkg->keyword( 'Pfx' )
-                    ] => bag {
+                    call_list [ resolve_dependencies => $pkg->keyword( 'Pfx' ) ] => bag {
                         item 'prefix';
                         item 'exec_prefix';
                         end;
@@ -225,8 +215,8 @@ subtest "doesn't exist" => sub {
     is(
         $pkg->variable( 'bar' ),
         object {
-            call name         => 'bar';
-            call value        => '${exec_prefix}';
+            call name  => 'bar';
+            call value => '${exec_prefix}';
             call_list depends => bag {
                 item 'exec_prefix';
                 end;
@@ -384,70 +374,70 @@ END
 
     my $pkg = PkgConfig->new_from( \$meta );
 
-    is ( $pkg,
-         object {
-             call_list variables => bag {
-                 item object {
-                     call name => 'prefix';
-                     call value => '/home/hp/unst';
-                 };
-                 item object {
-                     call name => 'exec_prefix';
-                     call value => '${prefix}';
-                 };
-                 item object {
-                     call name => 'libdir';
-                     call value => '${exec_prefix}/lib';
-                 };
-                 item object {
-                     call name => 'includedir';
-                     call value => '${prefix}/include';
-                 };
-                 end;
-             };
+    is(
+        $pkg,
+        object {
+            call_list variables => bag {
+                item object {
+                    call name  => 'prefix';
+                    call value => '/home/hp/unst';
+                };
+                item object {
+                    call name  => 'exec_prefix';
+                    call value => '${prefix}';
+                };
+                item object {
+                    call name  => 'libdir';
+                    call value => '${exec_prefix}/lib';
+                };
+                item object {
+                    call name  => 'includedir';
+                    call value => '${prefix}/include';
+                };
+                end;
+            };
 
-             call_list keywords => bag {
-                 item object {
-                     call name => 'Name';
-                     call value => 'GObject';
-                 };
-                 item object {
-                     call name => 'Description';
-                     call value => 'Object/type system for GLib';
-                 };
-                 item object {
-                     call name => 'Version';
-                     call value => '1.3.1';
-                 };
-                 item object {
-                     call name => 'URL';
-                     call value => 'http://www.gtk.org';
-                 };
-                 item object {
-                     call name => 'Requires';
-                     call value => 'glib-2.0 = 1.3.1';
-                 };
-                 item object {
-                     call name => 'Conflicts';
-                     call value => 'foobar <= 4.5';
-                 };
-                 item object {
-                     call name => 'Libs';
-                     call value => '-L${libdir} -lgobject-1.3';
-                 };
-                 item object {
-                     call name => 'Libs.private';
-                     call value => '-lm';
-                 };
-                 item object {
-                     call name => 'Cflags';
-                     call value => '-I${includedir}/glib-2.0 -I${libdir}/glib/include';
-                 };
-                 end;
-             };
+            call_list keywords => bag {
+                item object {
+                    call name  => 'Name';
+                    call value => 'GObject';
+                };
+                item object {
+                    call name  => 'Description';
+                    call value => 'Object/type system for GLib';
+                };
+                item object {
+                    call name  => 'Version';
+                    call value => '1.3.1';
+                };
+                item object {
+                    call name  => 'URL';
+                    call value => 'http://www.gtk.org';
+                };
+                item object {
+                    call name  => 'Requires';
+                    call value => 'glib-2.0 = 1.3.1';
+                };
+                item object {
+                    call name  => 'Conflicts';
+                    call value => 'foobar <= 4.5';
+                };
+                item object {
+                    call name  => 'Libs';
+                    call value => '-L${libdir} -lgobject-1.3';
+                };
+                item object {
+                    call name  => 'Libs.private';
+                    call value => '-lm';
+                };
+                item object {
+                    call name  => 'Cflags';
+                    call value => '-I${includedir}/glib-2.0 -I${libdir}/glib/include';
+                };
+                end;
+            };
 
-         }
-       );
+        } );
 
 };
 

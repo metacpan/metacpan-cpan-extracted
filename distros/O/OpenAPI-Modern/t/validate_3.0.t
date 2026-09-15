@@ -66,7 +66,7 @@ YAML
 
   my $request = request('POST', 'http://example.com/foo?q=1',
     [ 'Content-Type' => 'application/json' ], '{"nullable":1,"not_nullable":null}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -102,7 +102,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo',
     [ 'Content-Type' => 'application/json' ], '{"nullable":null,"not_nullable":"foo"}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'all body properties are the correct type',
@@ -170,7 +170,7 @@ YAML
     'downgrading is not supported',
   );
 
-  cmp_result(
+  is_equal(
     my $schema_3_1 = $doc_3_0->upgrade('3.1'),
     my $expected_schema_3_1 = decode_yaml(<<'YAML'),
 openapi: 3.1.2
@@ -205,12 +205,12 @@ YAML
   );
 
   my $doc_3_1 = JSON::Schema::Modern::Document::OpenAPI->new(schema => $schema_3_1);
-  cmp_result([ $doc_3_1->errors ], [], 'no errors in the converted 3.1 document');
+  is_equal([ $doc_3_1->errors ], [], 'no errors in the converted 3.1 document');
 
   bail_if_not_passing;
 
   $expected_schema_3_1->{openapi} = '3.1.1';
-  cmp_result(
+  is_equal(
     $doc_3_0->upgrade('3.1.1'),
     $expected_schema_3_1,
     'upgrade to an explicit version less than the current maximum point version',
@@ -220,13 +220,13 @@ YAML
   $expected_schema_3_2->{openapi} = SUPPORTED_OAD_VERSIONS->[-1];
   delete $expected_schema_3_2->{components}{responses}{responseA}{description};
 
-  cmp_result(
+  is_equal(
     my $schema_3_2 = $doc_3_0->upgrade('3.2'),
     $expected_schema_3_2,
     'upgrade to from 3.0 to 3.2',
   );
 
-  cmp_result(
+  is_equal(
     $doc_3_1->upgrade('3.2'),
     $expected_schema_3_2,
     'upgrade to from 3.1 to 3.2',
@@ -294,7 +294,7 @@ YAML
   my $request = request('POST', 'http://example.com/test1',
     [ 'Content-Type' => 'application/json' ], 'null');
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'null is an acceptable payload with the first null type',
@@ -303,7 +303,7 @@ YAML
   $request = request('POST', 'http://example.com/test2',
     [ 'Content-Type' => 'application/json' ], 'null');
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'null is an acceptable payload with the second null type',

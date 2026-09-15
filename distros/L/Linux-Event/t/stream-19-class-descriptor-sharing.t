@@ -70,7 +70,7 @@ is($unnormalized_spec{include_delimiter}, 7,
     package T::SharedLineStream;
     use parent 'Linux::Event::_ByteStream';
     use Linux::Event::Framer 'Delimiter', "\n";
-    sub stream_options ($class) { return read_size => 2 }
+    sub stream_tuning ($class) { return read_size => 2 }
     sub on_message ($stream, $message) {
         my $state = $stream->data;
         $state->{got} = $message;

@@ -169,32 +169,27 @@ sub submit_trailer {
     return $self->_submit_trailer_xs($stream_id, $headers);
 }
 
+sub submit_goaway {
+    my ($self, %args) = @_;
+
+    my $last_stream_id = delete $args{last_stream_id};
+    croak 'submit_goaway: last_stream_id is required'
+        unless defined $last_stream_id;
+    croak 'submit_goaway: last_stream_id must be an integer in 0 .. 0x7FFFFFFF'
+        unless $last_stream_id =~ /\A-?\d+\z/
+            && $last_stream_id >= 0 && $last_stream_id <= 0x7FFFFFFF;
+
+    my $error_code  = delete($args{error_code}) // Net::HTTP2::nghttp2::NGHTTP2_NO_ERROR();
+    my $opaque_data = delete $args{opaque_data};
+
+    return $self->_submit_goaway_xs($last_stream_id, $error_code, $opaque_data);
+}
+
 # Resume a deferred stream (call after data becomes available)
 sub resume_stream {
     my ($self, $stream_id) = @_;
     $self->_clear_deferred($stream_id);
     return $self->resume_data($stream_id);
-}
-
-# High-level push promise submission
-sub submit_push_promise {
-    my ($self, $stream_id, %args) = @_;
-
-    my $method  = delete $args{method} // 'GET';
-    my $path    = delete $args{path} or croak "path required for push promise";
-    my $scheme  = delete $args{scheme} // 'https';
-    my $authority = delete $args{authority};
-    my $headers = delete $args{headers} // [];
-
-    my @nv = (
-        [':method', $method],
-        [':path', $path],
-        [':scheme', $scheme],
-    );
-    push @nv, [':authority', $authority] if defined $authority;
-    push @nv, @$headers;
-
-    return $self->_submit_push_promise_xs($stream_id, \@nv);
 }
 
 1;
@@ -270,7 +265,8 @@ Arguments:
 
 Hashref of callback handlers. Required callbacks: C<on_begin_headers>,
 C<on_header>, C<on_frame_recv>. Optional: C<on_data_chunk_recv>,
-C<on_stream_close>.
+C<on_stream_close>, C<on_frame_send>, C<on_frame_not_send>,
+C<on_invalid_frame_recv>, C<on_error>.
 
 =item user_data
 
@@ -305,7 +301,9 @@ Arguments:
 =item callbacks
 
 Hashref of callback handlers. Recommended: C<on_header>,
-C<on_data_chunk_recv>, C<on_stream_close>.
+C<on_data_chunk_recv>, C<on_stream_close>. The optional C<on_frame_send>,
+C<on_frame_not_send>, C<on_invalid_frame_recv> and C<on_error> callbacks are
+accepted here too.
 
 =item user_data
 
@@ -490,6 +488,10 @@ Optional user data passed as third argument to the streaming callback.
 
 =back
 
+A stream carries at most one body provider. Submitting a second response with a
+body on a stream that already has one croaks with C<stream N already has a data
+provider>, leaving the response already in flight untouched.
+
 =head2 submit_trailer
 
     $session->submit_trailer(
@@ -518,12 +520,6 @@ terminal HEADERS block.
 A zero return means nghttp2 accepted the trailer block into its outbound
 queue. It does not mean the peer has received it. Invalid Perl input and
 immediate nghttp2 submission errors throw exceptions.
-
-=head2 submit_push_promise
-
-    my $promised_stream_id = $session->submit_push_promise($stream_id, %args);
-
-Submit a server push promise.
 
 =head2 submit_data
 
@@ -586,6 +582,66 @@ be an HTTP/2 wire error code (0 for C<NGHTTP2_NO_ERROR>).
 Send a RST_STREAM frame to abnormally terminate a stream. The
 C<$error_code> should be an HTTP/2 error code (e.g. 0 for NO_ERROR,
 8 for CANCEL).
+
+=head2 submit_goaway
+
+    $session->submit_goaway(
+        last_stream_id => $stream_id,
+        error_code     => NGHTTP2_NO_ERROR,
+        opaque_data    => 'shutting down',
+    );
+
+Queue a GOAWAY frame announcing a graceful shutdown. Streams numbered above
+C<last_stream_id> are abandoned; the peer may still finish the ones at or below
+it. The caller still calls C<mem_send> to flush the frame.
+
+Arguments:
+
+=over 4
+
+=item last_stream_id
+
+Required. The highest peer-initiated stream this session will still process.
+It must be a stream the peer could have opened: odd or zero for a server
+session, even or zero for a client session. HTTP/2 forbids raising this value
+once announced, so nghttp2 sends the lower of this value and any previously
+sent one. Must be an integer in C<0 .. 0x7FFFFFFF>; anything outside that
+range is refused before it reaches nghttp2.
+
+=item error_code
+
+An HTTP/2 wire error code. Defaults to C<NGHTTP2_NO_ERROR>.
+
+=item opaque_data
+
+Optional debug data carried with the frame, copied at submission time. Must
+be a byte string (octets), not a decoded character string; a wide-character
+string croaks.
+
+=back
+
+A zero return means nghttp2 accepted the frame into its outbound queue. An
+immediate nghttp2 submission error, such as an invalid C<last_stream_id>,
+throws an exception.
+
+=head2 get_stream_remote_close
+
+    my $closed = $session->get_stream_remote_close($stream_id);
+
+Returns 1 when the remote peer has half closed the stream, 0 when it may still
+send on it, and C<undef> when no such stream exists. On a server session this
+answers whether the request half is finished.
+
+=head2 get_stream_local_close
+
+    my $closed = $session->get_stream_local_close($stream_id);
+
+Returns 1 when this session has half closed the stream, 0 when it may still
+send on it, and C<undef> when no such stream exists. On a server session this
+answers whether the response half is finished.
+
+A stream is dropped once both halves close, so both queries answer C<undef>
+for a fully closed stream rather than 1.
 
 =head2 submit_ping
 
@@ -704,5 +760,80 @@ Called when body data is received on a stream.
     sub { my ($stream_id, $error_code) = @_; return 0; }
 
 Called when a stream is closed.
+
+=head2 on_frame_send
+
+    sub { my ($frame_hashref) = @_; return 0; }
+
+Called when a frame has been serialized, with the same hashref shape as
+C<on_frame_recv>. Optional.
+
+"Sent" here means written into the buffer the next C<mem_send> returns, not
+acknowledged or even transmitted by the peer. It is the point at which a frame
+carrying END_STREAM has irrevocably claimed its place in the output, which is
+what lets a caller reset the remaining half of a stream without racing flow
+control.
+
+=head2 on_frame_not_send
+
+    sub { my ($frame_hashref, $lib_error_code) = @_; return 0; }
+
+Called when a queued non-DATA frame was discarded instead of serialized, most
+often because the stream was reset while the frame was still waiting. The
+C<$lib_error_code> is a negative C<NGHTTP2_ERR_*> value, typically
+C<NGHTTP2_ERR_STREAM_CLOSING>. Optional.
+
+nghttp2 reports only non-DATA frames here. A pending DATA frame dropped by a
+reset produces no call, so silence is not proof that a body was delivered.
+
+A response submitted for a stream that was already closed is accepted by
+nghttp2 and discarded here with C<NGHTTP2_ERR_STREAM_CLOSED>. No
+C<on_stream_close> follows, because the stream closed before the response was
+submitted, so the body provider is released at this point instead. As with any
+release during a session call, the C<callback_data> is destroyed when the
+C<mem_send> or C<mem_recv> driving the flush returns. A discarded frame whose
+stream is still open leaves that stream's provider alone.
+
+=head2 on_invalid_frame_recv
+
+    sub { my ($frame_hashref, $lib_error_code) = @_; return 0; }
+
+Called when nghttp2 rejects a non-DATA frame from the peer, before it submits
+the RST_STREAM or GOAWAY the rejection calls for. The C<$lib_error_code> is a
+negative C<NGHTTP2_ERR_*> value describing the violation. For a rejected
+HEADERS or PUSH_PROMISE frame nghttp2 supplies no header fields. Optional.
+
+=head2 on_error
+
+    sub { my ($lib_error_code, $message) = @_; return 0; }
+
+Called when nghttp2 has a human-readable diagnostic to offer, such as a header
+field HTTP/2 does not permit. Intended for logging only: nghttp2 documents the
+wording as free to change between library versions, so match on
+C<$lib_error_code> rather than on C<$message>. Optional.
+
+=head2 Reentrancy
+
+A callback may queue further frames with the C<submit_*> methods, including
+from inside C<on_frame_send>. nghttp2 serializes them in order during the same
+flush. That includes resetting the stream the current frame belongs to:
+C<submit_rst_stream> from inside a callback is supported, and the response body
+provider for a stream closed that way is held until the flush returns, so the
+reset is safe even while the provider still has data pending. Such a provider
+produces no further data, and its Perl callback is not invoked again.
+
+C<mem_send> and C<mem_recv> drive the flush, so calling either from inside a
+callback croaks with C<mem_send called from inside a session callback> or
+C<mem_recv called from inside a session callback>. Catching that exception
+leaves the session usable; the flush already under way continues normally.
+
+A provider released during a session call that ends by a Perl exception is
+reclaimed by the next session call or by C<DESTROY>, not immediately.
+
+Destroying the session ends it for every method. Releasing the providers it
+still owns runs their C<callback_data> destructors, and a destructor that calls
+back into the session it is being torn down with croaks with
+C<Net::HTTP2::nghttp2::Session: session has been destroyed> rather than reaching
+a session nghttp2 has already deleted.
 
 =cut

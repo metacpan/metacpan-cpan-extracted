@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Pod::Weaver::PluginBundle::Default 4.021;
+package Pod::Weaver::PluginBundle::Default 4.022;
 # ABSTRACT: a bundle for the most commonly-needed prep work for a pod document
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -94,7 +94,7 @@ Pod::Weaver::PluginBundle::Default - a bundle for the most commonly-needed prep 
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

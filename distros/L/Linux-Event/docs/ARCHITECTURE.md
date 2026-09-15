@@ -61,6 +61,13 @@ Linux::Event::_Socket::Descriptor
 These are implementation boundaries only. Applications must not construct or
 subclass them.
 
+Private behavioral hierarchies use single inheritance. A connected stream
+socket fundamentally specializes the ordered-byte engine, so
+`Linux::Event::_Socket::Stream` inherits only `Linux::Event::_ByteStream` and
+composes its socket descriptor, connection, configuration, address, and
+transport facilities. Private inheritance does not encode every conceptual
+category relationship.
+
 Private implementation and XS ABI surfaces use the same coherent taxonomy:
 leading-underscore packages for shared IO/socket mechanics and `Kernel::*` for
 kernel resources. They are not advertised as public modules.

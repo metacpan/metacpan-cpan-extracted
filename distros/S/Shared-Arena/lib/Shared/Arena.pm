@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Frozen;
 
@@ -23,7 +23,7 @@ Shared::Arena - memory two processes can both read, without a syscall
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ C<Shared::Arena> is that region. It is mapped once, carved into named
 sub-regions, and read by every process that maps it without any of them
 copying, locking or calling into the kernel.
 
-Eleven things come with it to put in one.
+Twelve things come with it to put in one.
 
 =over 4
 
@@ -81,6 +81,10 @@ set being rotated.
 without storing any of them, which is how you find the loud one when you cannot
 bound how many there are.
 
+=item * L<Shared::Arena::HyperLogLog> - counts how many B<different> keys have
+been seen, in a few kilobytes: distinct visitors, distinct addresses, counted
+once across the pool rather than once per worker.
+
 =item * L<Shared::Arena::Histogram> - a distribution every process adds to at
 once, with no merge step and a bounded error.
 
@@ -101,8 +105,8 @@ in one pass, so a status page costs no pipe or socket per worker.
 
 =back
 
-The first eight store B<opaque bytes>, or in the case of the two filters and
-the sketch no keys at all, so a nested structure has to be flattened going in
+The first nine store B<opaque bytes>, or in the case of the two filters and
+the two sketches no keys at all, so a nested structure has to be flattened going in
 and rebuilt coming out. C<Shared::Arena::Frozen> is the one that does not
 rebuild, and it is the reason L<Frozen> is a prerequisite.
 C<Shared::Arena::Lease> and C<Shared::Arena::Scoreboard> store no caller data at
@@ -299,6 +303,23 @@ writer, so an update takes no lock; a supervisor reads every row in one pass.
 It is the inverse of the other tables: instead of many writers contending on
 one structure, each worker owns its own row and nobody contends at all. A dead
 worker's row is shown as not alive and reclaimed by the next worker to start.
+
+=head2 hll
+
+    my $hll = $arena->hll($name, precision => 14);
+
+A L<Shared::Arena::HyperLogLog> in this arena, created on first use. C<precision>
+is a power of two: the sketch costs C<2^precision> bytes and estimates to within
+about C<1.04 / sqrt(2^precision)>, which at the default of 14 is 0.8% for 16
+kilobytes. A later caller names the same precision or inherits it.
+
+How many B<different> keys, across every worker, in fixed space:
+
+    $hll->add($client_ip);          # in every worker, on every request
+    my $distinct = $hll->count;     # in one of them, whenever
+
+An add is lock-free and never contends, and adding a key twice changes
+nothing, so a visitor who lands on all eight workers is counted once.
 
 =head2 rate
 
@@ -591,7 +612,7 @@ L<Shared::Arena::Ring>, L<Shared::Arena::Ring::Cursor>, L<Shared::Arena::Map>,
 L<Shared::Arena::Bloom>, L<Shared::Arena::Histogram>, L<Shared::Arena::Cache>,
 L<Shared::Arena::Rate>, L<Shared::Arena::CountMin>, L<Shared::Arena::Cuckoo>,
 L<Shared::Arena::Ring::Group>, L<Shared::Arena::Lease>,
-L<Shared::Arena::Scoreboard>.
+L<Shared::Arena::Scoreboard>, L<Shared::Arena::HyperLogLog>.
 
 =head1 AUTHOR
 

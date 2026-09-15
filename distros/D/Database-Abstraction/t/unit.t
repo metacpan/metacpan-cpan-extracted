@@ -1215,24 +1215,24 @@ note '=== 20. new() safety guards ===';
 note '';
 note '=== 21. XLSX backend ===';
 {
-	my $have_excel = eval {
-		require DBD::Excel;
-		require Spreadsheet::WriteExcel;
+	my $have_xlsx = eval {
+		require Excel::Writer::XLSX;
+		require Spreadsheet::ParseXLSX;
 		1;
 	};
 
 	SKIP: {
-		skip 'DBD::Excel or Spreadsheet::WriteExcel not available', 11
-			unless $have_excel;
+		skip 'Excel::Writer::XLSX or Spreadsheet::ParseXLSX not available', 11
+			unless $have_xlsx;
 
-		# Build a temporary XLSX fixture with two worksheets.
+		# Build a temporary XLSX fixture (OOXML format) with two worksheets.
 		# test1  — entry / number  (primary, matches class-derived table name)
 		# sheet2 — entry / score   (used to verify the 'table' constructor param)
 		my $tmpdir = tempdir(CLEANUP => 1);
 		my $xlsx   = File::Spec->catfile($tmpdir, 'test1.xlsx');
 
 		{
-			my $wb  = Spreadsheet::WriteExcel->new($xlsx);
+			my $wb  = Excel::Writer::XLSX->new($xlsx);
 			my $ws1 = $wb->add_worksheet('test1');
 			$ws1->write(0, 0, 'entry');  $ws1->write(0, 1, 'number');
 			$ws1->write(1, 0, 'one');    $ws1->write(1, 1, 1);
@@ -1252,11 +1252,11 @@ note '=== 21. XLSX backend ===';
 		# 21.2  type is set lazily; count() triggers _open()
 		is($db->count(), 3, '21.2 count(): primary worksheet has 3 data rows');
 
-		# 21.3  type is now visible as 'Excel' (set during _open())
-		is($db->{'type'}, 'Excel',
-			'21.3 XLSX backend: type is "Excel" after first query');
+		# 21.3  type is now visible as 'XLSX' (slurped via Spreadsheet::ParseXLSX)
+		is($db->{'type'}, 'XLSX',
+			'21.3 XLSX backend: type is "XLSX" after first query');
 
-		# 21.4  AUTOLOAD column lookup works against the live worksheet
+		# 21.4  AUTOLOAD column lookup works against the slurped data
 		is($db->number('two'), 2,
 			'21.4 AUTOLOAD: number(two) returns 2 from XLSX');
 
@@ -1284,9 +1284,9 @@ note '=== 21. XLSX backend ===';
 		is($db2->score('alpha'), 90,
 			'21.9 table override: score(alpha) == 90');
 
-		# 21.10  no_entry mode works against XLSX (SQL path, no slurp)
+		# 21.10  no_entry mode works against XLSX (slurped into ARRAY ref)
 		my $db_ne = Database::test1->new(
-			directory => $tmpdir, no_entry => 1, max_slurp_size => 0
+			directory => $tmpdir, no_entry => 1
 		);
 		cmp_ok($db_ne->count(), '>', 0,
 			'21.10 no_entry: count() > 0 on XLSX backend');

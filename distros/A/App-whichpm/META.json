@@ -4,7 +4,7 @@
       "Jozef Kutej <jkutej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "app",
       "which",
@@ -32,8 +32,9 @@
       },
       "runtime" : {
          "requires" : {
-            "File::Spec" : "0",
             "Getopt::Long" : "0",
+            "Module::Metadata" : "0",
+            "Module::Path" : "0",
             "Pod::Usage" : "0"
          }
       }
@@ -41,7 +42,7 @@
    "provides" : {
       "App::whichpm" : {
          "file" : "lib/App/whichpm.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -56,6 +57,6 @@
          "url" : "http://github.com/jozef/App-whichpm/"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

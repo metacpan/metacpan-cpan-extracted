@@ -8,10 +8,10 @@ use experimental qw(switch);
 use version;
 
 # Don't forget to change the version in the pod
-our $VERSION = version->declare('v1.3.6');
+our $VERSION = version->declare('v1.3.8');
 
 use File::Spec;
-use Mustache::Simple::ContextStack v1.3.6;
+use Mustache::Simple::ContextStack v1.3.8;
 use Scalar::Util qw( reftype );
 
 use Carp;
@@ -30,7 +30,7 @@ See L<http://mustache.github.com/>.
 
 =head1 VERSION
 
-This document describes Mustache::Simple version 1.3.6
+This document describes Mustache::Simple version 1.3.8
 
 =head1 SYNOPSIS
 
@@ -102,34 +102,32 @@ subclassing.
 
 =cut
 
-
 #############################################################
 ##
 ##  Helper Functions
 ##
 ##
 
-sub dottags($;$)
-{
-    my $tag = shift;
-    my $type = shift // '';
-    my @dots = $tag =~ /(.*?)\.(.*)/;
-    my @tags = (
-        { pre => '', type => '#', txt => $dots[0] },
-        { pre => '', type => $type,  txt => $dots[1] },
-        { pre => '', type => '/', txt => $dots[0] },
-    );
-    return @tags;
+sub dottags($;$) {
+  my $tag  = shift;
+  my $type = shift // '';
+  my @dots = $tag =~ /(.*?)\.(.*)/;
+  my @tags = (
+    { pre => '', type => '#',   txt => $dots[0] },
+    { pre => '', type => $type, txt => $dots[1] },
+    { pre => '', type => '/',   txt => $dots[0] },
+  );
+  return @tags;
 }
 
 # Generate a regular expression for iteration
 # Passed the open and close tags
 # Returns the regular expression
-sub tag_match(@)
-{
-    my ($open, $close) = @_;
-    # Much of this regular expression stolen from Template::Mustache
-    qr/
+sub tag_match(@) {
+  my ( $open, $close ) = @_;
+
+  # Much of this regular expression stolen from Template::Mustache
+  qr/
         (?<pre> .*?)                # Text up to opening tag
         (?<tab> ^ \s*)?             # Indent white space
         (?: \Q$open\E \s*)          # Start of tag
@@ -146,28 +144,26 @@ sub tag_match(@)
 # Escape HTML entities
 # Passed a string
 # Returns an escaped string
-sub escape($)
-{
-    local $_ = shift;
-    s/&/&amp;/g;
-    s/"/&quot;/g;
-    s/</&lt;/g;
-    s/>/&gt;/g;
-    return $_;
+sub escape($) {
+  local $_ = shift;
+  s/&/&amp;/g;
+  s/"/&quot;/g;
+  s/</&lt;/g;
+  s/>/&gt;/g;
+  return $_;
 }
 
 # Reassemble the source code for an array of tags
 # Passed an array of tags
 # Returns the original source (roughly)
-sub reassemble(@)
-{
-    my @tags = @_;
-    my $last = pop @tags;
-    my $ans = '';
-    local $_;
-    no warnings 'uninitialized';
-    $ans .= "$_->{pre}$_->{tab}\{\{$_->{type}$_->{txt}\}\}" foreach (@tags);
-    return $ans . $last->{pre};
+sub reassemble(@) {
+  my @tags = @_;
+  my $last = pop @tags;
+  my $ans  = '';
+  local $_;
+  no warnings 'uninitialized';
+  $ans .= "$_->{pre}$_->{tab}\{\{$_->{type}$_->{txt}\}\}" foreach (@tags);
+  return $ans . $last->{pre};
 }
 
 #############################################################
@@ -226,19 +222,19 @@ Default: undef
 
 =cut
 
-sub new
-{
-    my $class = shift;
-    my %options = @_ == 1 ? %{$_[0]} : @_;  # Allow a hash to be passed, in case
-    my %defaults = (
-        path        => '.',
-        extension   => 'mustache',
-        delimiters  => [qw({{ }})],
-        stack       => new Mustache::Simple::ContextStack,
-    );
-    %options = (%defaults, %options);
-    my $self = \%options;
-    bless $self, $class;
+sub new {
+  my $class = shift;
+  my %options =
+      @_ == 1 ? %{ $_[0] } : @_;    # Allow a hash to be passed, in case
+  my %defaults = (
+    path       => '.',
+    extension  => 'mustache',
+    delimiters => [qw({{ }})],
+    stack      => new Mustache::Simple::ContextStack,
+  );
+  %options = ( %defaults, %options );
+  my $self = \%options;
+  bless $self, $class;
 }
 
 #############################################################
@@ -249,54 +245,196 @@ sub new
 
 # Breaks the template into separate tags, preserving the text
 # Returns an array ref of the tags and the trailing text
-sub match_template
-{
-    my $self = shift;
-    my $template = shift;
-    my $match = tag_match(@{$self->{delimiters}});      # start with standard delimiters
-    my @tags;
-    my $afters;
-    while ($template =~ /$match/g)
+sub match_template {
+  my $self     = shift;
+  my $template = shift;
+  my $match =
+      tag_match( @{ $self->{delimiters} } );  # start with standard delimiters
+  my @tags;
+  my $afters;
+  while ( $template =~ /$match/g ) {
+    my %tag = %+;    # pick up named parts from the regex
+    if ( $tag{type} eq '=' )    # change delimiters
     {
-        my %tag = %+;                   # pick up named parts from the regex
-        if ($tag{type} eq '=')          # change delimiters
-        {
-            my @delimiters = split /\s/, $tag{txt};
-            $self->{delimiters} = \@delimiters;
-            $match = tag_match(@delimiters);
-        }
-        $afters = $';           # save off the rest in case it's done
-        push @tags, \%tag;              # put the tag into the array
+      my @delimiters = split /\s/, $tag{txt};
+      $self->{delimiters} = \@delimiters;
+      $match = tag_match(@delimiters);
     }
-    return \@tags, $template if (@tags == 0);   # no tags, it's all afters
-    for (1 .. $#tags)
-    {                                   # lose a leading LF after sections
-        $tags[$_]->{pre} =~ s/^\r?\n// if $tags[$_ - 1]->{type} =~ m{^[#/^]$};
-    }
-    if (@tags > 1)
-    {
-        $tags[1]->{pre} =~ s/^\r?\n// if $tags[0]->{type} eq '=' and $tags[0]->{pre} =~ /^\s*$/;
-    }
-    foreach(0 .. $#tags)
-    {
-        $tags[$_]->{pre} =~ s/^\r?\n// if $tags[$_]->{type} =~ m{^[!]$};
-        $tags[$_]->{pre} =~ s/\r?\n$// if $tags[$_]->{type} =~ m{^[=]$};
-    }
-                                        # and from the trailing text
-    $afters =~ s/^\r?\n// if $tags[$#tags]->{type} =~ m{^[/!]$};
-    return \@tags, $afters;
+    $afters = $';               # save off the rest in case it's done
+    push @tags, \%tag;          # put the tag into the array
+  }
+  return \@tags, $template if ( @tags == 0 );    # no tags, it's all afters
+  for ( 1 .. $#tags ) {    # lose a leading LF after sections
+    $tags[$_]->{pre} =~ s/^\r?\n// if $tags[ $_ - 1 ]->{type} =~ m{^[#/^]$};
+  }
+  if ( @tags > 1 ) {
+    $tags[1]->{pre} =~ s/^\r?\n//
+        if $tags[0]->{type} eq '=' and $tags[0]->{pre} =~ /^\s*$/;
+  }
+  foreach ( 0 .. $#tags ) {
+    $tags[$_]->{pre} =~ s/^\r?\n// if $tags[$_]->{type} =~ m{^[!]$};
+    $tags[$_]->{pre} =~ s/\r?\n$// if $tags[$_]->{type} =~ m{^[=]$};
+  }
+
+  # and from the trailing text
+  $afters =~ s/^\r?\n// if $tags[$#tags]->{type} =~ m{^[/!]$};
+  return \@tags, $afters;
 }
 
 # Performs partial includes
 # Passed the current context, it calls the user code if any
 # Returns the partial rendered in the current context
-sub include_partial
-{
-    my $self = shift;
-    my $tag = shift;
-    my $result;
-    $tag = $self->partial->($tag) if (ref $self->partial eq 'CODE');
-    $self->render($tag);
+sub include_partial {
+  my $self = shift;
+  my $tag  = shift;
+  my $result;
+  $tag = $self->partial->($tag) if ( ref $self->partial eq 'CODE' );
+  $self->render($tag);
+}
+
+sub _resolve_variable {
+  my $self = shift;
+  my ($tag) = @_;
+  my $txt;
+  if ( $tag->{txt} eq '.' ) {
+    $txt = $self->{stack}->top;
+  }
+  elsif ( $tag->{txt} =~ /\./ ) {
+    my @dots = dottags $tag->{txt}, $tag->{type};
+    $txt = $self->resolve( undef, @dots );
+  }
+  else {
+    $txt = $self->find( $tag->{txt} );    # get the entry from the context
+    if ( defined $txt ) {
+      if ( ref $txt eq 'CODE' ) {
+        my $saved = $self->{delimiters};
+        $self->{delimiters} = [qw({{ }})];
+        $txt                = $self->render( $txt->() );
+        $self->{delimiters} = $saved;
+      }
+    }
+    else {
+      croak qq(No context for "$tag->{txt}") if $self->throw;
+      $txt = '';
+    }
+  }
+  $txt = "$tag->{tab}$txt" if $tag->{tab};    # replace the indent
+  return $tag->{type} ? $txt : escape $txt;
+}
+
+sub _resolve_section {
+  my $self = shift;
+  my ( $tags, $i ) = @_;
+  my $tag = $tags->[$i];                      # the current tag
+  my $j;
+  my $nested = 0;
+  for ( $j = $i + 1; $j < @$tags; $j++ )      # find the end
+  {
+    if ( $tag->{txt} eq $tags->[$j]->{txt} ) {
+      $nested++, next
+          if $tags->[$j]->{type} eq '#';      # nested sections with the
+      if ( $tags->[$j]->{type} eq '/' )       #   same name
+      {
+        next if $nested--;
+        last;
+      }
+    }
+  }
+  croak 'No end tag found for {{#' . $tag->{txt} . '}}' if $j == @$tags;
+  my @subtags = @$tags[ $i + 1 .. $j ];    # get the tags for the section
+  my $txt;
+  if ( $tag->{txt} =~ /\./ ) {
+    my @dots = dottags( $tag->{txt} );
+    $txt = $self->resolve( undef, @dots );
+  }
+  else {
+    # wantarray!!!
+    my @ret = $self->find( $tag->{txt} );    # get the entry from the context
+    if ( scalar @ret == 0 ) {
+      $txt = undef;
+    }
+    elsif ( scalar @ret == 1 ) {
+      $txt = $ret[0];
+    }
+    else {
+      $txt = \@ret;
+    }
+  }
+  my $result = '';
+  my $reftxt = reftype $txt;
+  if ( not defined $reftxt ) {
+    $result .= $self->resolve( undef, @subtags ) if $txt;
+    return ( $result, $j );
+  }
+  if ( 'ARRAY' eq $reftxt ) {    # an array of hashes (hopefully)
+    $result .= $self->resolve( $_, @subtags ) foreach @$txt;
+    return ( $result, $j );
+  }
+  if ( 'CODE' eq $reftxt ) {     # call user code which may call render()
+    $result .= $self->render( $txt->( reassemble @subtags ) );
+    return ( $result, $j );
+  }
+  if ( 'HASH' eq $reftxt ) {     # use the hash as context
+    return ( $result, $j ) unless scalar %$txt;
+    $result .= $self->resolve( $txt, @subtags );
+    return ( $result, $j );
+  }
+  $result .= $self->resolve( undef, @subtags ) if $txt;
+  return ( $result, $j );
+}
+
+sub _resolve_invert_section {
+  my $self = shift;
+  my ( $tags, $i ) = @_;
+  my $tag = $tags->[$i];         # the current tag
+  my $j;
+  my $nested = 0;
+  for ( $j = $i + 1; $j < @$tags; $j++ ) {
+    if ( $tag->{txt} eq $tags->[$j]->{txt} ) {
+      $nested++, next
+          if $tags->[$j]->{type} eq '^';    # nested sections with the
+      if ( $tags->[$j]->{type} eq '/' )     #   same name
+      {
+        next if $nested--;
+        last;
+      }
+    }
+  }
+  croak 'No end tag found for {{#' . $tag->{txt} . '}}' if $j == @$tags;
+  my @subtags = @$tags[ $i + 1 .. $j ];
+  my $txt;
+  if ( $tag->{txt} =~ /\./ ) {
+    my @dots = dottags( $tag->{txt} );
+    $txt = $self->resolve( undef, @dots );
+  }
+  else {
+    $txt = $self->find( $tag->{txt} );    # get the entry from the context
+  }
+  my $ans    = '';
+  my $reftxt = reftype $txt;
+  if ( not defined $reftxt ) {
+    $ans = $self->resolve( undef, @subtags ) unless $txt;
+  }
+  elsif ( 'ARRAY' eq $reftxt ) {
+    $ans = $self->resolve( undef, @subtags ) if @$txt == 0;
+  }
+  elsif ( 'HASH' eq $reftxt ) {
+    $ans = $self->resolve( undef, @subtags ) if keys %$txt == 0;
+  }
+  elsif ( 'CODE' eq $reftxt ) {
+
+    # Y
+    # $ans = $self->resolve(undef, @subtags) unless &$txt;
+    # The above line is rem'd out to comply with the test:
+    #   'Lambdas used for inverted sections should be considered truthy.'
+    # although I'm not sure I agree with it.
+    $ans = '';
+  }
+  else {
+    $ans = $self->resolve( undef, @subtags ) unless $txt;
+  }
+  $ans = "$tag->{tab}$ans" if $tag->{tab};    # replace the indent
+  return ( $ans, $j );
 }
 
 # This is the main worker function.  It builds up the result from the tags.
@@ -304,219 +442,94 @@ sub include_partial
 # Returns the final text
 # Note, this is called recursively, directly for sections and
 # indirectly via render() for partials
-sub resolve
-{
-    my $self = shift;
-    my $context = shift // {};
-    $self->push($context);
-    my @tags = @_;
-    my $result = '';
-    for (my $i = 0; $i < @tags; $i++)
-    {
-        my $tag  = $tags[$i];                   # the current tag
-        $result .= $tag->{pre};                 # add in the intervening text
-        given ($tag->{type})
-        {
-            when('!') {                         # it's a comment
-                # $result .= $tag->{tab} if $tag->{tab};
-            }
-            when('/') { break; }                # it's a section end - skip
-            when('=') { break; }                # delimiter change
-            when(/^([{&])?$/) {                 # it's a variable
-                my $txt;
-                if ($tag->{txt} eq '.')
-                {
-                    $txt = $self->{stack}->top;
-                }
-                elsif ($tag->{txt} =~ /\./)
-                {
-                    my @dots = dottags $tag->{txt}, $tag->{type};
-                    $txt = $self->resolve(undef, @dots);
-                }
-                else {
-                    $txt = $self->find($tag->{txt});    # get the entry from the context
-                    if (defined $txt)
-                    {
-                        if (ref $txt eq 'CODE')
-                        {
-                            my $saved = $self->{delimiters};
-                            $self->{delimiters} = [qw({{ }})];
-                            $txt = $self->render($txt->());
-                            $self->{delimiters} = $saved;
-                        }
-                    }
-                    else {
-                        croak qq(No context for "$tag->{txt}") if $self->throw;
-                        $txt = '';
-                    }
-                }
-                $txt = "$tag->{tab}$txt" if $tag->{tab};        # replace the indent
-                $result .= $tag->{type} ? $txt : escape $txt;
-            }
-            when('#') {                         # it's a section start
-                my $j;
-                my $nested = 0;
-                for ($j = $i + 1; $j < @tags; $j++) # find the end
-                {
-                    if ($tag->{txt} eq $tags[$j]->{txt})
-                    {
-                        $nested++, next if $tags[$j]->{type} eq '#';    # nested sections with the
-                        if ($tags[$j]->{type} eq '/')                   #   same name
-                        {
-                            next if $nested--;
-                            last;
-                        }
-                    }
-                }
-                croak 'No end tag found for {{#'.$tag->{txt}.'}}' if $j == @tags;
-                my @subtags =  @tags[$i + 1 .. $j]; # get the tags for the section
-                my $txt;
-                if ($tag->{txt} =~ /\./)
-                {
-                    my @dots = dottags($tag->{txt});
-                    $txt = $self->resolve(undef, @dots);
-                }
-                else {
-		    # wantarray!!!
-		    my @ret = $self->find($tag->{txt});    # get the entry from the context
-		    if (scalar @ret == 0) {
-			$txt = undef;
-		    } elsif (scalar @ret == 1) {
-			$txt = $ret[0];
-		    } else {
-			$txt = \@ret;
-		    }
-		}
-		given (reftype $txt)
-                {
-                    when ('ARRAY') {    # an array of hashes (hopefully)
-                        $result .= $self->resolve($_, @subtags) foreach @$txt;
-                    }
-                    when ('CODE') {     # call user code which may call render()
-                        $result .= $self->render($txt->(reassemble @subtags));
-                    }
-                    when ('HASH') {     # use the hash as context
-                        break unless scalar %$txt;
-                        $result .= $self->resolve($txt, @subtags);
-                    }
-                    default {           # resolve the tags in current context
-                        $result .= $self->resolve(undef, @subtags) if $txt;
-                    }
-                }
-                $i = $j;
-            }
-            when ('^') {                    # inverse section
-                my $j;
-                my $nested = 0;
-                for ($j = $i + 1; $j < @tags; $j++)
-                {
-                    if ($tag->{txt} eq $tags[$j]->{txt})
-                    {
-                        $nested++, next if $tags[$j]->{type} eq '^';    # nested sections with the
-                        if ($tags[$j]->{type} eq '/')                   #   same name
-                        {
-                            next if $nested--;
-                            last;
-                        }
-                    }
-                }
-                croak 'No end tag found for {{#'.$tag->{txt}.'}}' if $j == @tags;
-                my @subtags =  @tags[$i + 1 .. $j];
-                my $txt;
-                if ($tag->{txt} =~ /\./)
-                {
-                    my @dots = dottags($tag->{txt});
-                    $txt = $self->resolve(undef, @dots);
-                }
-                else {
-                    $txt = $self->find($tag->{txt});    # get the entry from the context
-                }
-                my $ans = '';
-                given (reftype $txt)
-                {
-                    when ('ARRAY') {
-                        $ans = $self->resolve(undef, @subtags) if @$txt == 0;
-                    }
-                    when ('HASH') {
-                        $ans = $self->resolve(undef, @subtags) if keys %$txt == 0;
-                    }
-                    when ('CODE') {
-#                       $ans = $self->resolve(undef, @subtags) unless &$txt;
-                        # The above line is rem'd out to comply with the test:
-                        #   'Lambdas used for inverted sections should be considered truthy.'
-                        # although I'm not sure I agree with it.
-                    }
-                    default {
-                        $ans = $self->resolve(undef, @subtags) unless $txt;
-                    }
-                }
-                $ans =  "$tag->{tab}$ans" if $tag->{tab};       # replace the indent
-                $result .= $ans;
-                $i = $j;
-            }
-            when ('>') {                # partial - see include_partial()
-                my $saved = $self->{delimiters};
-                $self->{delimiters} = [qw({{ }})];
-                $result .= $self->include_partial($tag->{txt});
-                $self->{delimiters} = $saved;
-            }
-            default {                   # allow for future expansion
-                croak "Unknown tag type in \{\{$_$tag->{txt}}}";
-            }
-        }
+sub resolve {
+  my $self    = shift;
+  my $context = shift // {};
+  $self->push($context);
+  my @tags   = @_;
+  my $result = '';
+  for ( my $i = 0; $i < @tags; $i++ ) {
+    my $tag = $tags[$i];       # the current tag
+    $result .= $tag->{pre};    # add in the intervening text
+    if ( $tag->{type} eq '!' or $tag->{type} eq '/' or $tag->{type} eq '=' ) {
+      # given ($tag->{type})
+      # when ('!') {             # it's a comment
+      #                          # $result .= $tag->{tab} if $tag->{tab};
+      # }
+      # when ('/') { break; }    # it's a section end - skip
+      # when ('=') { break; }    # delimiter change
+      next;
     }
-    $self->pop;
-    return $result;
+    elsif ( $tag->{type} eq '>' ) {    # partial - see include_partial()
+      my $saved = $self->{delimiters};
+      $self->{delimiters} = [qw({{ }})];
+      $result .= $self->include_partial( $tag->{txt} );
+      $self->{delimiters} = $saved;
+    }
+    elsif ( $tag->{type} eq '^' ) {    # inverse section
+      my ( $out, $j ) = $self->_resolve_invert_section( \@tags, $i );
+      $i = $j;
+      $result .= $out;
+    }
+    elsif ( $tag->{type} eq '#' ) {    # it's a section start
+      my ( $out, $j ) = $self->_resolve_section( \@tags, $i );
+      $i = $j;
+      $result .= $out;
+    }
+    elsif ( $tag->{type} =~ /^([{&])?$/ ) {
+      $result .= $self->_resolve_variable( $tag, );
+    }
+    else {
+      croak "Unknown tag type in \{\{$_$tag->{txt}}}";
+    }
+  }
+  $self->pop;
+  return $result;
 }
 
 # Push something a context onto the stack
-sub push
-{
-    my $self = shift;
-    my $value = shift;
-    $self->{stack}->push($value);
+sub push {
+  my $self  = shift;
+  my $value = shift;
+  $self->{stack}->push($value);
 }
 
 # Pop the context back off the stack
-sub pop
-{
-    my $self = shift;
-    my $value = $self->{stack}->pop;
-    return $value;
+sub pop {
+  my $self  = shift;
+  my $value = $self->{stack}->pop;
+  return $value;
 }
 
 # Find a value on the stack
-sub find
-{
-    my $self = shift;
-    my $value = shift;
-    return $self->{stack}->search($value);
+sub find {
+  my $self  = shift;
+  my $value = shift;
+  return $self->{stack}->search($value);
 }
 
 # Given a path and a filename
 # returns the first match that exists
 sub getfile($$);
-sub getfile($$)
-{
-    my ($path, $filename) = @_;
-    $filename =~ s/\r?\n$//; # not chomp $filename because of the possibility of \r\n
-    return if $filename =~ /\r?\n/;
-    my $fullfile;
-    if (ref $path && ref $path eq 'ARRAY')
-    {
-        foreach (@$path)
-        {
-            $fullfile = getfile $_, $filename;
-            last if $fullfile;
-        }
-    }
-    else {
-        $fullfile = File::Spec->catfile($path, $filename);
-        undef $fullfile unless -e $fullfile;
-    }
-    return $fullfile;
-}
 
+sub getfile($$) {
+  my ( $path, $filename ) = @_;
+  $filename
+      =~ s/\r?\n$//;  # not chomp $filename because of the possibility of \r\n
+  return if $filename =~ /\r?\n/;
+  my $fullfile;
+  if ( ref $path && ref $path eq 'ARRAY' ) {
+    foreach (@$path) {
+      $fullfile = getfile $_, $filename;
+      last if $fullfile;
+    }
+  }
+  else {
+    $fullfile = File::Spec->catfile( $path, $filename );
+    undef $fullfile unless -e $fullfile;
+  }
+  return $fullfile;
+}
 
 #############################################################
 ##
@@ -563,21 +576,19 @@ or
 
 =cut
 
-sub AUTOLOAD
-{
-    my $self = shift;
-    my $class = ref $self;
-    my $value = shift;
-    (my $name = our $AUTOLOAD) =~ s/.*:://;
-    my %ok = map { ($_, 1) } functions;
-    croak "Unknown function $class->$name()" unless $ok{$name};
-    $self->{$name} = $value if $value;
-    return $self->{$name};
+sub AUTOLOAD {
+  my $self  = shift;
+  my $class = ref $self;
+  my $value = shift;
+  ( my $name = our $AUTOLOAD ) =~ s/.*:://;
+  my %ok = map { ( $_, 1 ) } functions;
+  croak "Unknown function $class->$name()" unless $ok{$name};
+  $self->{$name} = $value if $value;
+  return $self->{$name};
 }
 
 # Prevent it being caught by AUTOLOAD
-sub DESTROY
-{
+sub DESTROY {
 }
 
 =head2 Instance methods
@@ -598,19 +609,18 @@ it simply returns the original string.
 
 =cut
 
-sub read_file($)
-{
-    my $self = shift;
-    my $file = shift;
-    return '' unless $file;
-    return $file if $file =~ /\{\{/;
-    my $extension = $self->extension;
-    (my $fullfile = $file) =~ s/(\.$extension)?$/.$extension/;
-    my $filepath = getfile $self->path, $fullfile;
-    return $file unless $filepath;
-    local $/;
-    open my $hand, "<:utf8", $filepath or croak "Can't open $filepath: $!";
-    <$hand>;
+sub read_file($) {
+  my $self = shift;
+  my $file = shift;
+  return '' unless $file;
+  return $file if $file =~ /\{\{/;
+  my $extension = $self->extension;
+  ( my $fullfile = $file ) =~ s/(\.$extension)?$/.$extension/;
+  my $filepath = getfile $self->path, $fullfile;
+  return $file unless $filepath;
+  local $/;
+  open my $hand, "<:utf8", $filepath or croak "Can't open $filepath: $!";
+  <$hand>;
 }
 
 =over
@@ -650,18 +660,19 @@ render() from a callback.
 
 =cut
 
-sub render
-{
-    my $self = shift;
-    my ($template, $context) = @_;
-    $context = {} unless $context;
-#    say "\$template = $template, ref \$context = ", ref $context;
-#    print Dumper $context;
-    $template = $self->read_file($template);
-    my ($tags, $tail) = $self->match_template($template);
-    # print reassemble(@$tags), $tail; exit;
-    my $result = $self->resolve($context, @$tags) . $tail;
-    return $result;
+sub render {
+  my $self = shift;
+  my ( $template, $context ) = @_;
+  $context = {} unless $context;
+
+  #    say "\$template = $template, ref \$context = ", ref $context;
+  #    print Dumper $context;
+  $template = $self->read_file($template);
+  my ( $tags, $tail ) = $self->match_template($template);
+
+  # print reassemble(@$tags), $tail; exit;
+  my $result = $self->resolve( $context, @$tags ) . $tail;
+  return $result;
 }
 
 =head1 COMPLIANCE WITH THE STANDARD

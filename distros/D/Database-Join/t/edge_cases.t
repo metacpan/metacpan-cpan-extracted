@@ -26,7 +26,7 @@ use Scalar::Util qw(blessed looks_like_number refaddr);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 70;
+	plan tests => 83;
 	use_ok('Database::Join');
 }
 
@@ -40,7 +40,7 @@ Readonly::Scalar my $K_GAMMA     => 'k003';
 Readonly::Scalar my $KEY_ZERO    => '0';        # false-but-defined join key
 
 Readonly::Scalar my $ERR_NO_DBS      => qr/At least one Database::Abstraction/;
-Readonly::Scalar my $ERR_INVALID_DB  => qr/is not a Database::Abstraction/;
+Readonly::Scalar my $ERR_INVALID_DB  => qr/does not support the selectall_arrayref/;
 Readonly::Scalar my $ERR_MISSING_JC  => qr/is absent from databases/;
 Readonly::Scalar my $ERR_REMOVE_JC   => qr/Cannot remove join_column/;
 Readonly::Scalar my $ERR_PRIVATE     => qr/cannot call private method/;
@@ -1103,4 +1103,261 @@ subtest 'outer join: three DBs all different key sets returns union' => sub {
 	is $by_key{x1}{a}, 1, 'x1 row has column a';
 	is $by_key{x2}{b}, 2, 'x2 row has column b';
 	is $by_key{x3}{c}, 3, 'x3 row has column c';
+};
+
+# ===========================================================================
+# Section 12: Zero-byte / empty-file simulation
+#
+# Database::Abstraction opens a backing file and derives column metadata from
+# its header row.  A 0-byte file has no header, so the DA's columns() returns
+# [].  Database::Join must detect this at construction time (or add_database
+# time) and croak with a clear error rather than silently mis-routing queries.
+#
+# These tests use MockEdgeDA->new(cols => []) to simulate a 0-byte backing
+# file.  Contrast with rows => [] (a file that has a header but no data rows),
+# which is valid and produces an empty but functional join.
+# ===========================================================================
+
+subtest 'zero-byte secondary: construction croaks (secondary lacks join_column)' => sub {
+	# Scenario: primary file is normal; secondary file is 0 bytes.
+	# The secondary DA has no columns, so the join_column is absent from it.
+	my $good = MockEdgeDA->new(
+		cols => ['entry', 'name'],
+		rows => [{ entry => $K_ALPHA, name => 'Alice' }],
+	);
+	my $empty = MockEdgeDA->new(cols => []);   # 0-byte secondary — no columns
+	throws_ok {
+		Database::Join->new(
+			databases   => [$good, $empty],
+			join_column => $JC,
+		)
+	} $ERR_MISSING_JC, 'zero-byte secondary (cols=[]) croaks join_col_missing';
+};
+
+subtest 'zero-byte all databases: construction croaks (primary also lacks join_column)' => sub {
+	# Scenario: every backing file is 0 bytes.  The primary DA also lacks all
+	# columns, so the first check (against the primary) fires immediately.
+	my $empty1 = MockEdgeDA->new(cols => []);
+	my $empty2 = MockEdgeDA->new(cols => []);
+	throws_ok {
+		Database::Join->new(
+			databases   => [$empty1, $empty2],
+			join_column => $JC,
+		)
+	} $ERR_MISSING_JC, 'all zero-byte databases croaks join_col_missing';
+};
+
+subtest 'zero-byte add_database: croaks (new DA lacks join_column)' => sub {
+	# Scenario: the join is constructed successfully, but add_database is called
+	# with a DA backed by a 0-byte file (no columns at all).
+	my $good = MockEdgeDA->new(
+		cols => ['entry', 'score'],
+		rows => [{ entry => $K_ALPHA, score => 42 }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$good],
+		join_column => $JC,
+	);
+	my $empty = MockEdgeDA->new(cols => []);   # 0-byte file added at runtime
+	throws_ok { $j->add_database($empty) }
+		$ERR_MISSING_JC, 'add_database with zero-byte DA croaks join_col_missing';
+};
+
+# ===========================================================================
+# Section 13: add_database hostile inputs (4 subtests)
+#
+# add_database uses manual argument parsing before validate_strict runs.
+# A non-reference first argument must be a recognised named-pair key, or the
+# fail-fast guard croaks immediately.  Any database value that is not a
+# blessed Database::Abstraction subclass also croaks.  Critically, a croak
+# must leave the join completely unmodified and still functional.
+# ===========================================================================
+
+subtest 'add_database: undef positional argument croaks error_invalid_db' => sub {
+	# undef is not a reference and is not in @_ADD_DB_KEYS; the fail-fast guard
+	# fires before validate_strict is even called.
+	my ($j) = _minimal_join();
+	throws_ok { $j->add_database(undef) }
+		$ERR_INVALID_DB, 'add_database(undef) croaks error_invalid_db';
+};
+
+subtest 'add_database: unblessed hashref positional argument croaks error_invalid_db' => sub {
+	# An unblessed hashref IS a reference so it passes the fail-fast guard and
+	# is extracted as the database object.  blessed({}) returns undef, so the
+	# isa('Database::Abstraction') check fails and error_invalid_db is croaked.
+	my ($j) = _minimal_join();
+	throws_ok { $j->add_database({}) }
+		$ERR_INVALID_DB, 'add_database({}) unblessed hashref croaks error_invalid_db';
+};
+
+subtest 'add_database: wrong-class blessed object croaks error_invalid_db' => sub {
+	# A blessed object that does not inherit Database::Abstraction is rejected
+	# by the isa check at the same point as an unblessed reference.
+	my ($j) = _minimal_join();
+	my $alien = bless {}, 'AddDB::AlienClass';
+	throws_ok { $j->add_database($alien) }
+		$ERR_INVALID_DB, 'add_database with non-DA blessed object croaks error_invalid_db';
+};
+
+subtest 'add_database: join remains fully functional after a failed call' => sub {
+	# A croak from add_database must not leave the join in a partially-mutated
+	# state.  The _dbs array, _col_db routing table, and memoisation caches
+	# must all be unchanged; subsequent queries must return correct results.
+	my ($j) = _minimal_join();
+	my $cols_before  = $j->columns();
+	my $count_before = $j->count();
+	eval { $j->add_database({}) };  # bad input -- will croak
+	ok $@, 'add_database({}) croaked as expected';
+	is_deeply $j->columns(), $cols_before,
+		'columns() unchanged after failed add_database';
+	is $j->count(), $count_before,
+		'count() unchanged after failed add_database';
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() }
+		'selectall_arrayref still works after failed add_database';
+	is scalar @{$rows}, $count_before, 'correct row count after failed add_database';
+};
+
+# ===========================================================================
+# Section 14: Data-level hostility -- row content boundaries (3 subtests)
+#
+# Database::Join does a shallow merge of row column values.  It must never
+# deep-copy, sanitise, or truncate those values.  Callers own their data;
+# the join is a transparent read-only view.
+# ===========================================================================
+
+subtest 'data: circular reference as a column value does not crash the merge' => sub {
+	# Perl allows a hashref to reference itself.  The merge copies the reference
+	# value (not a deep clone), so no infinite traversal can occur.  The test
+	# verifies that the merge lives and the returned value is the same reference.
+	my $circ = {};
+	$circ->{self} = $circ;  # circular reference
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'data'],
+		rows => [{ entry => $K_ALPHA, data => $circ }],
+	);
+	my $j = Database::Join->new(databases => [$da], join_column => $JC);
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() }
+		'merge of a row containing a circular reference lives';
+	is scalar @{$rows}, 1, 'one row returned';
+	is ref($rows->[0]{data}), 'HASH',
+		'column value is still a hashref after merge (not deep-copied or serialised)';
+};
+
+subtest 'data: explicit undef column value (non-join-column) is preserved in merged output' => sub {
+	# A row where a non-join column has an explicit undef value must appear in
+	# the output with that key present (exists) but undefined (not defined).
+	# The merge must not confuse "key exists with undef value" with "key absent".
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'notes'],
+		rows => [{ entry => $K_ALPHA, notes => undef }],
+	);
+	my $j   = Database::Join->new(databases => [$da], join_column => $JC);
+	my $row = $j->fetchrow_hashref(entry => $K_ALPHA);
+	ok defined $row,             'row is returned';
+	ok  exists($row->{notes}),  'notes key present in merged row (exists is true)';
+	ok !defined($row->{notes}), 'notes value is undef (not dropped or defaulted)';
+};
+
+subtest 'data: column values with embedded newlines and null bytes pass through unchanged' => sub {
+	# Database::Join documents no sanitisation of column values.  Raw binary
+	# data, embedded newlines, and null bytes must survive the merge unmolested.
+	Readonly::Scalar my $NL_VAL   => "line1\nline2\r\nline3";
+	Readonly::Scalar my $NULL_VAL => "pre\x00post";
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'raw', 'bin'],
+		rows => [{ entry => $K_ALPHA, raw => $NL_VAL, bin => $NULL_VAL }],
+	);
+	my $j   = Database::Join->new(databases => [$da], join_column => $JC);
+	my $row = $j->fetchrow_hashref(entry => $K_ALPHA);
+	is $row->{raw}, $NL_VAL,   'embedded newlines preserved verbatim in column value';
+	is $row->{bin}, $NULL_VAL, 'embedded null byte preserved verbatim in column value';
+};
+
+# ===========================================================================
+# Section 15: filters hostile configurations (3 subtests)
+#
+# _filters is a hashref keyed by database index.  These tests probe three
+# failure modes: a filter whose index has no corresponding database (orphaned),
+# a filter whose column name is absent from the target DA, and the interaction
+# between a filter and a subsequent remove_column on the same column.
+# ===========================================================================
+
+subtest 'filter: orphaned filter (index 99, no database at that index) is silently unused' => sub {
+	# _joined_query iterates over @{$self->{_dbs}}.  Index 99 is never reached
+	# because only index 0 is populated.  The orphaned filter entry in _filters
+	# must not cause a crash at construction time or query time.
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'x'],
+		rows => [{ entry => $K_ALPHA, x => 'val' }],
+	);
+	my $j;
+	lives_ok {
+		$j = Database::Join->new(
+			databases   => [$da],
+			join_column => $JC,
+			filters     => { 99 => { x => 'anything' } },  # index 99 has no database
+		);
+	} 'construction with out-of-range filter index lives';
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() }
+		'query lives with an orphaned filter index in _filters';
+	is scalar @{$rows}, 1, 'orphaned filter does not suppress the actual rows';
+};
+
+subtest 'filter: filter on a column absent from the DA results in zero qualifying rows' => sub {
+	# When the filter criteria contain a column the DA has no data for, every
+	# row fails to match (MockEdgeDA: grep for an absent key returns false).
+	# The filtered DA acts as inner-join partner, so the overall result is empty.
+	# This is expected documented behaviour (the filter was explicitly set).
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'name'],
+		rows => [
+			{ entry => $K_ALPHA, name => 'Alice' },
+			{ entry => $K_BETA,  name => 'Bob'   },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		filters     => { 0 => { ghost_col => 'nonexistent' } },
+	);
+	my $rows = $j->selectall_arrayref();
+	is scalar @{$rows}, 0,
+		'filter on column absent from DA produces zero rows (all fail the criterion)';
+};
+
+subtest 'filter + remove_column: filter still restricts results after its column is hidden' => sub {
+	# Removing a column from the output view (remove_column) must not disable a
+	# filter that references that column.  _removed_cols strips the column from
+	# merged result rows; the DA-level filter still restricts which rows enter
+	# the key set.
+	my $prim = MockEdgeDA->new(
+		cols => ['entry', 'name'],
+		rows => [
+			{ entry => $K_ALPHA, name => 'Alice' },
+			{ entry => $K_BETA,  name => 'Bob'   },
+		],
+	);
+	my $sec = MockEdgeDA->new(
+		cols => ['entry', 'score'],
+		rows => [
+			{ entry => $K_ALPHA, score => 95 },  # passes filter score > 80
+			{ entry => $K_BETA,  score => 50 },  # fails filter score > 80
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$prim, $sec],
+		join_column => $JC,
+		join_type   => 'left',
+		filters     => { 1 => { score => { '>' => 80 } } },
+	);
+	$j->remove_column('score');  # hide the filtered column from caller output
+	my $rows = $j->selectall_arrayref();
+	# Alice (score 95) passes the filter; Bob (score 50) does not.
+	# Even though 'score' is invisible to the caller, the filter must still apply.
+	is scalar @{$rows}, 1,             'filter still restricts after remove_column';
+	is $rows->[0]{name}, 'Alice',      'Alice (score 95) survives the hidden filter';
+	ok !exists($rows->[0]{score}),     'score column absent from output as expected';
 };

@@ -4,10 +4,10 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME             => 'Fugu',
-	VERSION          => '0.4.0',
+	VERSION          => '0.5.0',
 	ABSTRACT         => 'OpenBSD-style daemon utilities for Perl',
 	LICENSE          => 'open_source',
-	MIN_PERL_VERSION => '5.036',
+	MIN_PERL_VERSION => '5.034',
 	EXE_FILES        => [
 
 	],
@@ -23,8 +23,12 @@ WriteMakefile(
 		'lib/Fugu/Config.pod' => '$(INST_LIB)/Fugu/Config.pod',
 		'lib/Fugu/Control.pm' => '$(INST_LIB)/Fugu/Control.pm',
 		'lib/Fugu/Control.pod' => '$(INST_LIB)/Fugu/Control.pod',
+		'lib/Fugu/Curl.pm' => '$(INST_LIB)/Fugu/Curl.pm',
+		'lib/Fugu/Curl.pod' => '$(INST_LIB)/Fugu/Curl.pod',
 		'lib/Fugu/Daemon.pm' => '$(INST_LIB)/Fugu/Daemon.pm',
 		'lib/Fugu/Daemon.pod' => '$(INST_LIB)/Fugu/Daemon.pod',
+		'lib/Fugu/Ed25519.pm' => '$(INST_LIB)/Fugu/Ed25519.pm',
+		'lib/Fugu/Ed25519.pod' => '$(INST_LIB)/Fugu/Ed25519.pod',
 		'lib/Fugu/EventLoop.pm' => '$(INST_LIB)/Fugu/EventLoop.pm',
 		'lib/Fugu/EventLoop.pod' => '$(INST_LIB)/Fugu/EventLoop.pod',
 		'lib/Fugu/File.pm' => '$(INST_LIB)/Fugu/File.pm',
@@ -61,6 +65,8 @@ WriteMakefile(
 		'lib/Fugu/Sandbox.pod' => '$(INST_LIB)/Fugu/Sandbox.pod',
 		'lib/Fugu/Signal.pm' => '$(INST_LIB)/Fugu/Signal.pm',
 		'lib/Fugu/Signal.pod' => '$(INST_LIB)/Fugu/Signal.pod',
+		'lib/Fugu/Signer.pm' => '$(INST_LIB)/Fugu/Signer.pm',
+		'lib/Fugu/Signer.pod' => '$(INST_LIB)/Fugu/Signer.pod',
 		'lib/Fugu/Signify.pm' => '$(INST_LIB)/Fugu/Signify.pm',
 		'lib/Fugu/Signify.pod' => '$(INST_LIB)/Fugu/Signify.pod',
 		'lib/Fugu/StateFile.pm' => '$(INST_LIB)/Fugu/StateFile.pm',
@@ -69,6 +75,8 @@ WriteMakefile(
 		'lib/Fugu/TestLog.pod' => '$(INST_LIB)/Fugu/TestLog.pod',
 		'lib/Fugu/Timeout.pm' => '$(INST_LIB)/Fugu/Timeout.pm',
 		'lib/Fugu/Timeout.pod' => '$(INST_LIB)/Fugu/Timeout.pod',
+		'lib/Fugu/X509.pm' => '$(INST_LIB)/Fugu/X509.pm',
+		'lib/Fugu/X509.pod' => '$(INST_LIB)/Fugu/X509.pod',
 		'lib/Protocol/Imsg.pm' => '$(INST_LIB)/Protocol/Imsg.pm',
 		'lib/Protocol/Imsg.pod' => '$(INST_LIB)/Protocol/Imsg.pod'
 	},

@@ -7,7 +7,10 @@
 # unrestricted, or it takes down the rest of the suite. Never assert
 # in the children. The children share the TAP stream.
 
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
 use FindBin qw($RealBin);
 use lib "$RealBin/../../lib";
@@ -44,7 +47,10 @@ sub run_child ($source)
 # themselves only run on OpenBSD. A heredoc interpolation slip in one
 # once stayed hidden until a VM run.
 my $violation_child = <<'EOF';
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Fugu::Sandbox;
 use Socket qw(AF_INET SOCK_STREAM);
 use POSIX ();
@@ -56,7 +62,10 @@ EOF
 # The exit codes identify the failing step. Exit 1: a file outside
 # the view stayed readable. Exit 2: the file inside did not open.
 my $unveil_child = <<EOF . <<'BODY';
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Fugu::Sandbox;
 use POSIX ();
 my \$dir = '$dir';
@@ -72,7 +81,10 @@ BODY
 # unveil did not skip a missing optional path cleanly. Exit 5:
 # on_skip did not report the skipped path.
 my $dispositions_child = <<EOF . <<'BODY';
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Fugu::Sandbox;
 use POSIX ();
 my \$dir = '$dir';

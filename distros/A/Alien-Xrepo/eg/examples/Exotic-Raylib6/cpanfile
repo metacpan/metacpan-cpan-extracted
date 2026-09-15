@@ -1,0 +1,16 @@
+requires 'Alien::Xrepo::Runtime';
+requires 'File::ShareDir', '1.00';
+
+on configure => sub {
+    requires 'Alien::Xrepo::MM';
+    requires 'ExtUtils::MakeMaker';
+    requires 'perl', 'v5.40.0';
+};
+
+on build => sub {
+    requires 'Alien::Xrepo::MM';
+};
+
+on test => sub {
+    requires 'Test2::V0';
+};

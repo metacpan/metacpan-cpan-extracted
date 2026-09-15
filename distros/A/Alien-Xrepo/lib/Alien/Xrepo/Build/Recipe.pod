@@ -20,64 +20,70 @@ Alien::Xrepo::Build::Recipe - Load and validate an xrepo.json recipe
 
 =head1 DESCRIPTION
 
-C<xrepo.json> is a small JSON recipe consumed by L<Alien::Xrepo::Build>. This class loads it (from a file/directory or
-inline data), validates it, and normalizes the package entries. The allowed per-package keys are the installer flags
-taken by L<Alien::Xrepo> (C<plat>, C<arch>, C<mode>, C<kind>, C<toolchain>, C<vs*>, C<ndk>, C<sdk>, C<mingw>, C<jobs>,
-C<force>, ..., plus C<name>, C<version>, and the nested recipe options under C<configs>).
+C<xrepo.json> is a small JSON recipe optionally consumed by L<Alien::Xrepo::Build>. This class loads it (from a
+file/directory or inline data), validates it, and normalizes the package entries. The allowed per-package keys are the
+installer flags taken by L<Alien::Xrepo> (C<plat>, C<arch>, C<mode>, C<kind>, C<toolchain>, C<vs*>, C<ndk>, C<sdk>,
+C<mingw>, C<jobs>, C<force>, etc., alongside C<name>, C<version>, and nested recipe options under C<configs>).
+
+The inline form is exactly what an L<Alien::Xrepo::Runtime> subclass's C<recipe()> method returns (a hashref of the
+same keys), and L<Alien::Xrepo::Build> accepts that hashref directly. A distribution can therefore describe itself once
+(inside the class) and feed both the build engine and the runtime consumer from that single declaration without a
+dedicated C<xrepo.json> file.
 
 =head1 RECIPE FORMAT
 
     {
-       "name" : "Alien-Zstandard",
+       "name" : "Exotic-Zstandard",
        "packages" : [
           { "name" : "zstd", "kind" : "shared" }
        ],
        "defaults" : { "mode" : "release", "configs" : { "legacy" : 1 } },
        "pkg_roots" : { "ZSTD" : "$ZSTD" },
        "local_repos" : [ "vendor/recipes" ],
-       "hooks" : [ "Alien::Zstandard::Hooks" ]
+       "hooks" : [ "Exotic::Zstandard::Hooks" ]
     }
 
 C<packages> is required and must not be empty; order matters (the first entry is the primary package). C<local_repos>
-are registered with xrepo during the configure stage. C<pkg_roots> maps a package name to an advanced-user environment
-variable (mirroring Alien::Build's C<pkg_roots>): when the variable names an existing directory, C<Alien::Xrepo::Build>
-treats the package as system-provided there and never touches xrepo for it. C<hooks> names recipe hook modules; each is
-loaded once at the configure stage and invited to register its own stage hooks (see L<Alien::Xrepo::Build>).
+are registered with C<xrepo> during the configure stage. C<pkg_roots> maps a package name to an advanced-user
+environment variable (mirroring C<Alien::Build>'s C<pkg_roots>): when the variable names an existing directory,
+L<Alien::Xrepo::Build> treats the package as system-provided there and never touches C<xrepo> for it. C<hooks> names
+recipe hook modules; each is loaded once at the configure stage and invited to register its own stage hooks (see
+L<Alien::Xrepo::Build>).
 
 =head1 METHODS
 
 =over
 
-=item C<name()>
+=item C<name( )>
 
 The recipe's C<name>, or C<undef> when the recipe does not set one.
 
-=item C<packages()>
+=item C<packages( )>
 
 The normalized package names in declaration order (the first entry is the primary package).
 
-=item C<package_defs()>
+=item C<package_defs( )>
 
 A hashref of the normalized per-package definitions, keyed by package name.
 
-=item C<defaults()>
+=item C<defaults( )>
 
-The ambient options applied under every package: the same key set a package def accepts (C<plat>, C<arch>, C<mode>,
-C<kind>, C<jobs>, ...), plus the nested C<configs> hashref.
+The ambient options applied under every package: the exact same key set a package def accepts (C<plat>, C<arch>,
+C<mode>, C<kind>, C<jobs>, ...), plus the nested C<configs> hashref.
 
-=item C<pkg_roots()>
+=item C<pkg_roots( )>
 
 A hashref mapping a package name to an advanced-user environment variable name, mirroring L<Alien::Build>'s
 C<pkg_roots>. When the variable names an existing directory, L<Alien::Xrepo::Build> treats the package as
 system-provided there (see L<Alien::Xrepo::Build>).
 
-=item C<local_repos()>
+=item C<local_repos( )>
 
-An arrayref of directory paths to local xmake-repo trees (each containing a C<packages/> subdirectory).
-L<Alien::Xrepo::Build> registers each of them with xrepo during the configure stage, so packages that are not in the
-central xmake-repo can be installed.
+An arrayref of directory paths to local C<xmake-repo> trees (each containing a C<packages/> subdirectory).
+L<Alien::Xrepo::Build> registers each of them with C<xrepo> during the configure stage, ensuring packages that are not
+in the central C<xmake-repo> can still be cleanly installed.
 
-=item C<hooks()>
+=item C<hooks( )>
 
 An arrayref of recipe hook module names. L<Alien::Xrepo::Build> loads each module once during the configure stage and
 invokes its class method C<register_hooks($build)> so it can attach its own stage hooks (see L<Alien::Xrepo::Build>).
@@ -88,7 +94,8 @@ The per-package version constraint, or C<undef> when the recipe does not pin one
 
 =item C<opts_for( $name, %ambient )>
 
-Ambient options with the package's per-package def merged over them (flag keys override; C<configs> merge per-key).
+Ambient options with the package's per-package def merged over them. Flag keys override, while C<configs> merge on a
+per-key basis.
 
 =back
 

@@ -43,11 +43,15 @@
    "provides" : {
       "constant::string" : {
          "file" : "lib/constant/string.pm",
-         "version" : "2026.267"
+         "version" : "2026.377"
       },
       "constant::string::uc" : {
          "file" : "lib/constant/string/uc.pm",
-         "version" : "2026.267"
+         "version" : "2026.377"
+      },
+      "constant::string::ucfirst" : {
+         "file" : "lib/constant/string/ucfirst.pm",
+         "version" : "2026.377"
       }
    },
    "release_status" : "stable",
@@ -61,7 +65,7 @@
          "web" : "https://github.com/tehmoth/constant-string"
       }
    },
-   "version" : "2026.267",
+   "version" : "2026.377",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

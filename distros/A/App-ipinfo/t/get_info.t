@@ -74,7 +74,8 @@ subtest 'bogon' => sub {
 			close $stdout;
 
 			is $out, undef, 'nothing in standard output';
-			like $err, qr/is a bogon/, "error output notes <$ip> is a bogon";
+			like $err, qr/is a bogon/, "error output notes <$ip> is a bogon" or
+				diag explain $app->{last_response};
 			};
 		}
 	};

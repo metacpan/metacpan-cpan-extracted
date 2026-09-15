@@ -172,8 +172,9 @@ SYNOPSIS
     An excluded path and everything under it, at any depth, is dropped
     before the coverage event is sent, so excluded files never reach tools
     consuming that event. Paths are compared component by component, so
-    excluding lib does not exclude a sibling library. Relative paths are
-    resolved against the current directory.
+    excluding lib does not exclude a sibling library. A relative path is
+    resolved against the coverage root, so it keeps meaning the same tree
+    in a process that has changed directory.
 
     Wildcards are not supported, an exclusion is a literal path. Excluding
     a whole tree needs only the top of it.
@@ -379,6 +380,11 @@ CLASS METHODS
       This will send a Test2 event containing coverage information. It will
       also return the event.
 
+      The event's coverage facet carries the processed file data from
+      data() under files, and under root the canonical absolute directory a
+      relative file path is resolved against, so a consumer in another
+      process can resolve them without guessing.
+
       Options:
 
       root => Path::Tiny->new("...")
@@ -393,7 +399,8 @@ CLASS METHODS
 	Paths to leave out of the report entirely, along with everything
 	under them. May be a single path or an arrayref of them, each a
 	Path::Tiny instance or a plain string. Relative paths are resolved
-	against the current directory, and wildcards are not supported.
+	against the coverage root when one is supplied, and against the
+	current directory otherwise. Wildcards are not supported.
 
 	When passed at import time this option may be given more than once
 	instead of using an arrayref, which is how it survives the -M
@@ -435,6 +442,11 @@ CLASS METHODS
       files in the distribution you are testing. You may return a modified
       filename if you wish to normalize it here, the default implementation
       will turn it into a relative path.
+
+      A returned path must be relative to the root, or absolute. The
+      coverage event names that root so that consumers can resolve relative
+      paths, and a relative path that is not actually under it names the
+      wrong file.
 
       If you provide a custom root parameter, it may be a Path::Tiny
       instance or a plain string.

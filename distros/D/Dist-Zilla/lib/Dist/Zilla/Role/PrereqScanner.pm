@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::PrereqScanner 6.038;
+package Dist::Zilla::Role::PrereqScanner 6.039;
 # ABSTRACT: automatically extract prereqs from your modules
 
 use Moose::Role;
@@ -69,6 +69,7 @@ around mvp_multivalue_args => sub {
   my ($orig, $self) = @_;
   ($self->$orig, 'skips')
 };
+
 around mvp_aliases => sub {
   my ($orig, $self) = @_;
   my $aliases = $self->$orig;
@@ -76,8 +77,14 @@ around mvp_aliases => sub {
   return $aliases
 };
 
-
 requires 'scan_file_reqs';
+
+# this is a bunk heuristic and can still capture strings from pod - the
+# proper thing to do is grab all packages from Module::Metadata
+sub _declared_packages {
+  my ($self, $file) = @_;
+  return $file->content =~ /^[^#]*?(?:^|\s)package\s+([^\s;#]+)/mg;
+}
 
 sub scan_prereqs {
   my $self = shift;
@@ -98,6 +105,13 @@ sub scan_prereqs {
   my %reqs_by_phase;
   my %runtime_final;
   my @modules;
+
+  # The file finders normally cover the main module, but a main_module outside
+  # of lib/ (like a top-level .pm file) is invisible to them, so its packages
+  # get left in prereqs.
+  if ($self->zilla->_has_main_module_override) {
+    push @modules, $self->_declared_packages($self->zilla->main_module);
+  }
 
   for my $fileset (@sets) {
     my ($phase, $method) = @$fileset;
@@ -128,9 +142,7 @@ sub scan_prereqs {
       s{\.pm$}{} for @this_thing;
       s{/}{::}g for @this_thing;
 
-      # this is a bunk heuristic and can still capture strings from pod - the
-      # proper thing to do is grab all packages from Module::Metadata
-      push @this_thing, $file->content =~ /^[^#]*?(?:^|\s)package\s+([^\s;#]+)/mg;
+      push @this_thing, $self->_declared_packages($file);
       push @modules, @this_thing;
 
       # parse a file, and merge with existing prereqs
@@ -190,7 +202,7 @@ Dist::Zilla::Role::PrereqScanner - automatically extract prereqs from your modul
 
 =head1 VERSION
 
-version 6.038
+version 6.039
 
 =head1 PERL VERSION
 

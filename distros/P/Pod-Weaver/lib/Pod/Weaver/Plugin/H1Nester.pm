@@ -1,11 +1,11 @@
-package Pod::Weaver::Plugin::H1Nester 4.021;
+package Pod::Weaver::Plugin::H1Nester 4.022;
 # ABSTRACT: structure the input pod document into head1-grouped sections
 
 use Moose;
 with 'Pod::Weaver::Role::Transformer';
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -56,7 +56,7 @@ Pod::Weaver::Plugin::H1Nester - structure the input pod document into head1-grou
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

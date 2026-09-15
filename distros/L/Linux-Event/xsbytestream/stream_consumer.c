@@ -94,7 +94,22 @@ static const les_consumer_host_api_v1_t les_consumer_host_v1 = {
 int
 les_consumer_create(pTHX_ les_xsstate_t *st)
 {
-    if (!st || !st->descriptor || !st->descriptor->consumer_ops)
+    if (!st || !st->descriptor)
+        return 1;
+
+    /* The immutable descriptor is the construction template. Copy the
+     * effective operating defaults into connection-local state exactly once;
+     * ordinary I/O reads only these fields afterward. */
+    st->read_size = st->descriptor->read_size;
+    st->read_budget_bytes = st->descriptor->read_budget_bytes;
+    st->read_batch_bytes = st->descriptor->read_batch_bytes;
+    st->message_batch_size = st->descriptor->message_batch_size;
+    st->high_watermark = st->descriptor->high_watermark;
+    st->low_watermark = st->descriptor->low_watermark;
+    st->max_pending_bytes = st->descriptor->max_pending_bytes;
+    st->max_buffer = st->descriptor->max_buffer;
+
+    if (!st->descriptor->consumer_ops)
         return 1;
 
     st->consumer_ops = st->descriptor->consumer_ops;

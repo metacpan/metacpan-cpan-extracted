@@ -1,4 +1,4 @@
-requires 'perl', 'v5.18.2';
+requires 'perl', 'v5.24.0';
 
 requires 'App::Greple', '8.58';
 requires 'Getopt::EX', '2.1.6';
@@ -10,6 +10,9 @@ requires 'Try::Tiny';
 requires 'Text::VisualWidth::PP', '0.05';
 requires 'Data::Section::Simple';
 requires 'Mo';
+requires 'HTTP::Tiny';
+requires 'JSON::PP';
+recommends 'IO::Socket::SSL';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

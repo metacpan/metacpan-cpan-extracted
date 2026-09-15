@@ -108,7 +108,7 @@ The class-level ordered-byte option `max_buffer` is an independent hard bound
 on framed input storage. Its default is 8 MiB:
 
 ```perl
-sub stream_options ($class) {
+sub stream_tuning ($class) {
     return max_buffer => 32 * 1024 * 1024;
 }
 ```
@@ -168,7 +168,7 @@ Ordinary framed delivery calls `on_message` once per complete message. A
 pipelined protocol can explicitly select bounded array delivery:
 
 ```perl
-sub stream_options ($class) {
+sub stream_tuning ($class) {
     return message_batch_size => 32;
 }
 
@@ -192,7 +192,7 @@ specific message should use ordinary `on_message` delivery.
 
 ## Raw callback batching
 
-Raw mode can set `read_batch_bytes` in `stream_options()` to combine successful
+Raw mode can set `read_batch_bytes` in `stream_tuning()` to combine successful
 native reads before calling `on_data`. A partial raw batch also flushes when the
 current drain ends; it does not wait for a future readiness event.
 

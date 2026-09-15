@@ -14,6 +14,7 @@ use URI ();
 use Socket6 (); # to ensure dependency is met
 use HTML::Entities (); # to ensure dependency is met
 use URI::QueryParam (); # part of URI, to add helper methods
+use URI::Escape 'uri_escape_utf8';
 use MIME::Base64 'encode_base64';
 use Path::Class 'dir';
 use Module::Load ();
@@ -25,6 +26,9 @@ use URI::Based;
 use App::Netdisco::Util::Web qw/
   escape_results_token
   interval_to_daterange
+  page_title
+  pane_chrome
+  pane_history_header
   request_is_api
   request_is_api_report
   request_is_api_search
@@ -231,9 +235,10 @@ if (setting('template_paths') and ref [] eq ref setting('template_paths')) {
 }
 
 # here rather than earlier because template_paths is only resolved above
-foreach my $finding (scan_shadowed_files({ paths => [ site_local_paths() ] })) {
+foreach my $finding (scan_shadowed_files(
+  { paths => [ site_local_paths() ], startup => 1 })) {
     warning sprintf
-      '%s predates %s and its tab will render empty. Run "netdisco-do checksitelocal".',
+      '%s predates %s. Run "netdisco-do checksitelocal" for details.',
       $finding->{path}, $finding->{release};
 }
 
@@ -294,6 +299,11 @@ hook 'before' => sub {
       $key .= ('/' . param('tab'));
   }
   $key =~ s|.*/(\w+)/(\w+)$|${1}_${2}|;
+
+  # the admin pages are served from /admin/<task> but their sidebar options
+  # are configured, and read by the sidebar templates, under admintask_<task>
+  $key =~ s/^admin_/admintask_/;
+
   var(sidebar_key => $key);
 
   # trim whitespace
@@ -334,7 +344,7 @@ hook 'before_template' => sub {
     # allow portable static content
     $tokens->{uri_base} = request->base->path
       if request->base->path ne '/';
-    $tokens->{uri_base} .= ('/t/'. vars->{'tenant'})
+    $tokens->{uri_base} .= ('/t/'. uri_escape_utf8(vars->{'tenant'}))
       if vars->{'tenant'};
 
     # cache-busting suffix for the stylesheets and scripts in the layout.
@@ -595,6 +605,59 @@ get $swagger_base.'/**' => sub {
     send_file( join '/', 'swagger-ui', @{ (splat())[0] } );
 };
 
+# htmx applies a <title> found at the top level of a swapped response, the
+# HX-Push-Url and HX-Replace-Url headers to the address bar, and an element
+# carrying hx-swap-oob to whatever in the page has that id, so the chrome
+# around a pane comes from the response rather than from the browser reading
+# the page the fragment replaces.
+hook 'after' => sub {
+    my $r = shift; # a Dancer::Response
+
+    # htmx sends this on every request it makes, and htmx is the only thing
+    # that acts on the title, so it is a closer guard than X-Requested-With.
+    # It also keeps the title away from the CSV download of a report and from
+    # the API endpoints, which forward to these same paths.
+    #
+    # Read from the PSGI environment because request->header cannot be relied
+    # on: Dancer::Request::is_ajax carries the same workaround, for headers
+    # that Plack::Builder leaves unset, and netdisco-web-fg builds its app
+    # that way.
+    return unless request->env->{'HTTP_HX_REQUEST'};
+    return unless $r->status and $r->status =~ m/^2\d\d$/;
+
+    # the pane routes alone. Their two-segment shape is what excludes the
+    # report data and connected-node endpoints, neither of which replaces a
+    # pane and both of which would set the title wrongly.
+    my ($page, $tab) =
+      (request->path =~ m{/ajax/content/(device|search|report|admin)/(\w+)$})
+        or return;
+
+    $r->header( pane_history_header($page, $tab) );
+
+    # A tenant URL reaches its pane by forward, and Dancer runs this hook once
+    # for the inner request and again for the response it rebuilds from it.
+    # Without this the pane carries two titles, htmx lifts only the first, and
+    # the second is swapped into the pane as an element, which also makes an
+    # empty result set stop looking empty; the chrome would swap twice over
+    # itself. The header above needs no guard: setting it twice leaves one
+    # header, where prepending twice leaves two of everything.
+    return if var('nd_fragment_chrome');
+    var('nd_fragment_chrome' => 1);
+
+    my $title = page_title($page, $tab) || '';
+    my $chrome = pane_chrome($page, $tab);
+    return unless length $title or length $chrome;
+
+    # htmx only lifts a title that is a direct child of the fragment, so this
+    # goes first and nothing may wrap it. The chrome follows for the same
+    # reason: an out-of-band element is swapped from the top level of the
+    # fragment, which is also where htmx 4 will want its <hx-partial>.
+    $r->content(
+      (length $title
+        ? ('<title>'. HTML::Entities::encode_entities($title) .'</title>') : '')
+      . $chrome . ($r->content || ''));
+};
+
 # remove empty lines from CSV response
 # this makes writing templates much more straightforward!
 hook 'after' => sub {
@@ -613,13 +676,25 @@ hook 'after' => sub {
 };
 
 # support for tenancies
+
+# the segment is echoed back into the page as uri_base, which the layout and
+# the SNMP panes emit unfiltered, so only a configured tag may set it.
+sub _tenant_is_configured {
+    my $tenant = shift;
+    return 0 unless defined $tenant;
+    return scalar grep { defined $_ and $_ eq $tenant }
+                       @{ setting('tenant_tags') || [] };
+}
+
 any qr{^/t/(?<tenant>[^/]+)/?$} => sub {
     my $capture = captures;
+    pass unless _tenant_is_configured($capture->{'tenant'});
     var tenant => $capture->{'tenant'};
     forward '/';
 };
 any '/t/*/**' => sub {
     my ($tenant, $path) = splat;
+    pass unless _tenant_is_configured($tenant);
     var tenant => $tenant;
     forward (join '/', '', @$path, (request->path =~ m{/$} ? '' : ()));
 };

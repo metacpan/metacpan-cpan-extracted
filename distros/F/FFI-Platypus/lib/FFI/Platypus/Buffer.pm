@@ -7,10 +7,10 @@ use FFI::Platypus;
 use Exporter qw( import );
 
 our @EXPORT = qw( scalar_to_buffer buffer_to_scalar );
-our @EXPORT_OK = qw ( scalar_to_pointer grow set_used_length window );
+our @EXPORT_OK = qw ( scalar_to_pointer grow set_used_length window raw_scalar );
 
 # ABSTRACT: Convert scalars to C buffers
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 
 use constant _incantation =>
@@ -50,7 +50,7 @@ FFI::Platypus::Buffer - Convert scalars to C buffers
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =head1 SYNOPSIS
 
@@ -297,6 +297,23 @@ then you need to return a reference.
  
  my $ref = c_string();
  print $$ref, "\n";  # prints "Hello Perl" without the \0
+
+Not exported by default, but may be exported on request.
+
+=head2 raw_scalar
+
+ my $buffer = raw_scalar $size;
+
+Returns a new scalar of exactly C<$size> bytes, suitable for use as a
+buffer.  The contents of the returned scalar are B<not> initialized, so
+it will contain whatever happened to be in the memory that was allocated
+for it.  This makes it cheaper than the equivalent
+
+ my $buffer = "\0" x $size;
+
+when you are about to have a foreign function overwrite the whole thing
+anyway.  If you need the buffer zeroed out, use the C<"\0" x $size> form
+instead.
 
 Not exported by default, but may be exported on request.
 

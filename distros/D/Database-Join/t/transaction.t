@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 87;
+use Test::Most tests => 131;
 use Readonly;
 use Scalar::Util qw(refaddr);
 use Carp qw(croak);
@@ -600,3 +600,390 @@ is($s10->call_count(), 3, 'S10-P5b: secondary DA called 3 times (2nd was the cro
 # Final cross-check: columns() still reports correct view after all failure/recovery cycles
 ok((grep { $_ eq 'score' } @{ $j10->columns() }),
 	'S10-P6: columns() correct after full failure/recovery lifecycle');	# T87
+
+# ============================================================================
+# Section 11: Primary DA Mid-Flight Failure
+# When the primary (first) DA fails, the fetch loop exits immediately and the
+# secondary DA is never reached.
+# Lifecycle: baseline → enable primary failure → verify secondary not invoked
+# → disable → full recovery; result must be identical to baseline.
+# ============================================================================
+note '--- S11: Primary DA Mid-Flight Failure ---';
+
+my $p11 = TransactionDA->new(
+	cols => ['entry', 'name'],
+	rows => [ {%ALICE}, {%BOB} ],
+);
+my $s11 = TransactionDA->new(
+	cols => ['entry', 'score'],
+	rows => [
+		{ entry => $K1, score => $SCORE_HIGH },
+		{ entry => $K2, score => $SCORE_LOW  },
+	],
+);
+my $j11 = Database::Join->new(databases => [$p11, $s11], join_column => 'entry');
+
+# Phase 1: Baseline — capture call counts before failure injection
+my $baseline11 = $j11->selectall_arrayref();
+is(scalar @{$baseline11}, 2, 'S11-P1a: baseline → 2 rows');				# T88
+is($p11->call_count(), 1, 'S11-P1b: primary called once during baseline');		# T89
+is($s11->call_count(), 1, 'S11-P1c: secondary called once during baseline');		# T90
+
+# Phase 2: Enable failure on primary; secondary must not be called at all
+$p11->set_fail(1);
+throws_ok {
+	$j11->selectall_arrayref()
+} qr/TransactionDA: simulated mid-flight failure/,
+	'S11-P2: primary DA failure → exception propagates to caller';			# T91
+
+# Primary count increments (was invoked and threw); secondary count is unchanged
+is($p11->call_count(), 2, 'S11-P3: primary call count incremented by the failed attempt');	# T92
+is($s11->call_count(), 1, 'S11-P4: secondary NOT reached when primary fails first');	# T93
+
+# Phase 3: Recovery — disable failure; join object state must be uncorrupted
+$p11->set_fail(0);
+my $recovery11 = $j11->selectall_arrayref();
+is(scalar @{$recovery11}, 2, 'S11-P5a: after primary recovery, query returns 2 rows');	# T94
+is_deeply($recovery11, $baseline11,
+	'S11-P5b: recovered result identical to pre-failure baseline');			# T95
+
+# ============================================================================
+# Section 12: collision_prefix Transaction Lifecycle
+# Lifecycle: construct with collision_prefix → columns()/schema() naming →
+# merged row carries both prefixed and plain columns → query by prefixed
+# criterion routes to secondary and returns the correct row.
+# ============================================================================
+note '--- S12: collision_prefix Transaction Lifecycle ---';
+
+my $p12 = TransactionDA->new(
+	cols   => ['entry', 'notes'],
+	rows   => [
+		{ entry => $K1, notes => 'prim-k1' },
+		{ entry => $K2, notes => 'prim-k2' },
+	],
+	schema => { entry => { type => 'text' }, notes => { type => 'text' } },
+);
+my $s12 = TransactionDA->new(
+	cols   => ['entry', 'notes', 'score'],
+	rows   => [
+		{ entry => $K1, notes => 'sec-k1', score => $SCORE_HIGH },
+		{ entry => $K2, notes => 'sec-k2', score => $SCORE_LOW  },
+	],
+	schema => {
+		entry => { type => 'text' },
+		notes => { type => 'text', len => 50 },
+		score => { type => 'int' },
+	},
+);
+my $j12 = Database::Join->new(
+	databases        => [$p12, $s12],
+	join_column      => 'entry',
+	collision_prefix => { 1 => 'sec' },
+);
+
+# Phase 1: columns() reflects collision renaming; non-colliding col stays plain
+my %cols12 = map { $_ => 1 } @{ $j12->columns() };
+ok($cols12{notes},        'S12-P1a: primary "notes" in columns() (plain, no prefix)');		# T96
+ok($cols12{'sec.notes'},  'S12-P1b: secondary "notes" in columns() as "sec.notes"');		# T97
+ok($cols12{score},        'S12-P1c: non-colliding "score" in columns() plain');		# T98
+ok(!$cols12{'sec.score'}, 'S12-P1d: "sec.score" absent ("score" did not collide)');		# T99
+
+# Phase 2: Merged row carries both plain and prefixed columns
+my $row12 = $j12->fetchrow_hashref(entry => $K1);
+is($row12->{notes},       'prim-k1',   'S12-P2a: primary "notes" value preserved in row');	# T100
+is($row12->{'sec.notes'}, 'sec-k1',    'S12-P2b: secondary "notes" under "sec.notes" key');	# T101
+is($row12->{score},       $SCORE_HIGH, 'S12-P2c: non-colliding "score" value correct');	# T102
+
+# Phase 3: Query by prefixed criterion routes to secondary, returns correct row
+my $rows12c = $j12->selectall_arrayref('sec.notes' => 'sec-k1');
+is(scalar @{$rows12c}, 1, 'S12-P3a: query by prefixed col "sec.notes" → 1 row');		# T103
+is($rows12c->[0]{entry}, $K1, 'S12-P3b: the matching row is entry=k1');			# T104
+
+# ============================================================================
+# Section 13: join_type Lifecycle
+# Three separate join objects over the same DAs verify left/inner/outer
+# key-set semantics. k1: in both DAs; k2: primary only; k3: secondary only.
+# ============================================================================
+note '--- S13: join_type Lifecycle ---';
+
+my $p13 = TransactionDA->new(
+	cols => ['entry', 'name'],
+	rows => [
+		{ entry => $K1, name => 'Alice' },
+		{ entry => $K2, name => 'Bob'   },
+	],
+);
+my $s13 = TransactionDA->new(
+	cols => ['entry', 'score'],
+	rows => [
+		{ entry => $K1, score => $SCORE_HIGH },
+		{ entry => $K3, score => $SCORE_MID  },
+	],
+);
+
+# Left join (default): primary defines key set → k1+k2; k3 (secondary only) excluded
+my $j13l = Database::Join->new(
+	databases => [$p13, $s13], join_column => 'entry', join_type => 'left');
+my $rows13l = $j13l->selectall_arrayref();
+is(scalar @{$rows13l}, 2, 'S13-P1a: left join → 2 rows (k1+k2, k3 excluded)');		# T105
+my %keys13l = map { $_->{entry} => 1 } @{$rows13l};
+ok($keys13l{$K1},  'S13-P1b: k1 in left join result (present in both DAs)');			# T106
+ok($keys13l{$K2},  'S13-P1c: k2 in left join result (primary only)');				# T107
+ok(!$keys13l{$K3}, 'S13-P1d: k3 absent from left join (secondary only → excluded)');		# T108
+
+# Inner join: intersection of keys → k1 only
+my $j13i = Database::Join->new(
+	databases => [$p13, $s13], join_column => 'entry', join_type => 'inner');
+my $rows13i = $j13i->selectall_arrayref();
+is(scalar @{$rows13i}, 1, 'S13-P2a: inner join → 1 row (only k1 in both DAs)');		# T109
+is($rows13i->[0]{entry}, $K1, 'S13-P2b: inner join returns k1 (the shared key)');		# T110
+
+# Outer join: union of all keys → k1+k2+k3; sparse fields for non-present DAs
+my $j13o = Database::Join->new(
+	databases => [$p13, $s13], join_column => 'entry', join_type => 'outer');
+my $rows13o = $j13o->selectall_arrayref();
+is(scalar @{$rows13o}, 3, 'S13-P3a: outer join → 3 rows (union: k1+k2+k3)');			# T111
+my %keys13o = map { $_->{entry} => 1 } @{$rows13o};
+ok($keys13o{$K3}, 'S13-P3b: k3 present in outer join (secondary-only key)');			# T112
+my ($k2_row13) = grep { $_->{entry} eq $K2 } @{$rows13o};
+ok(!defined $k2_row13->{score},
+	'S13-P3c: k2 row (primary only) → score undef in outer join');				# T113
+
+# ============================================================================
+# Section 14: add_database Combined filter + remove_columns Lifecycle
+# Lifecycle: single-DA join → add_database with both filter and remove_columns
+# → verify hidden col absent → filter acts as inner-join constraint →
+# removed col absent from returned rows.
+# ============================================================================
+note '--- S14: add_database Combined filter + remove_columns ---';
+
+my $p14 = TransactionDA->new(
+	cols => ['entry', 'name'],
+	rows => [ {%ALICE}, {%BOB} ],
+);
+my $s14 = TransactionDA->new(
+	cols => ['entry', 'score', 'tag'],
+	rows => [
+		{ entry => $K1, score => $SCORE_HIGH, tag => 'gold'   },
+		{ entry => $K2, score => $SCORE_LOW,  tag => 'silver' },
+	],
+);
+my $j14 = Database::Join->new(databases => [$p14], join_column => 'entry');
+
+$j14->add_database($s14,
+	filter         => { score => { '>=' => $SCORE_MID } },
+	remove_columns => ['tag'],
+);
+
+# 'tag' hidden by remove_columns; 'score' exposed
+my %cols14 = map { $_ => 1 } @{ $j14->columns() };
+ok(!$cols14{tag},  'S14-P2a: "tag" hidden by remove_columns in add_database');			# T114
+ok($cols14{score}, 'S14-P2b: "score" present after add_database');				# T115
+
+# filter score>=80 → secondary acts as inner-join constraint; k2 (score=70) excluded
+my $rows14a = $j14->selectall_arrayref();
+is(scalar @{$rows14a}, 1,
+	'S14-P3: add_database filter acts as inner-join constraint → 1 row');			# T116
+is($rows14a->[0]{entry}, $K1,
+	'S14-P4: only k1 survives the score>=80 filter');					# T117
+
+# 'tag' absent from returned rows even though the secondary DA column exists
+ok(!exists $rows14a->[0]{tag},
+	'S14-P5: "tag" absent from merged row (removed by add_database remove_columns)');	# T118
+
+# ============================================================================
+# Section 15: Broadcast Copy Isolation Lifecycle
+# The join_column criterion (when an operator hashref) is shallow-copied per
+# recipient DA so a DA mutating its received copy cannot corrupt the copy
+# sent to subsequent DAs.
+# Lifecycle: 3-DA join where the middle DA (PoisonDA) injects a poison key into
+# its copy; the last DA (SnapshotDA) records the exact criterion it received and
+# the poison key must be absent from that snapshot.
+# ============================================================================
+note '--- S15: Broadcast Copy Isolation ---';
+
+{
+	package PoisonDA;
+	use parent -norequire, 'TransactionDA';
+	# Mutates the received entry operator hashref by adding a poison key, then
+	# delegates to the normal filter logic.  If broadcast copy is not working,
+	# subsequent DAs would also receive the poisoned hashref.
+	sub selectall_arrayref {
+		my ($self, $criteria) = @_;
+		if (ref $criteria->{entry} eq 'HASH') {
+			$criteria->{entry}{_poison} = 'yes';
+		}
+		return $self->SUPER::selectall_arrayref($criteria);
+	}
+}
+
+{
+	package SnapshotDA;
+	use parent -norequire, 'TransactionDA';
+	sub new {
+		my ($class, %args) = @_;
+		my $self = $class->SUPER::new(%args);
+		$self->{_snapshot} = undef;
+		return $self;
+	}
+	# Records a snapshot of the entry operator hashref at call time so the test
+	# can inspect exactly what this DA received (before any of its own processing).
+	sub selectall_arrayref {
+		my ($self, $criteria) = @_;
+		if (ref $criteria->{entry} eq 'HASH') {
+			$self->{_snapshot} = { %{ $criteria->{entry} } };
+		}
+		return $self->SUPER::selectall_arrayref($criteria);
+	}
+	sub snapshot { return $_[0]->{_snapshot} }
+}
+
+Readonly::Scalar my $EK1 => 1;
+Readonly::Scalar my $EK2 => 2;
+
+my $p15 = TransactionDA->new(
+	cols => ['entry', 'name'],
+	rows => [
+		{ entry => $EK1, name => 'Alice' },
+		{ entry => $EK2, name => 'Bob'   },
+	],
+);
+my $m15 = PoisonDA->new(
+	cols => ['entry', 'score'],
+	rows => [
+		{ entry => $EK1, score => $SCORE_HIGH },
+		{ entry => $EK2, score => $SCORE_LOW  },
+	],
+);
+my $l15 = SnapshotDA->new(
+	cols => ['entry', 'rank'],
+	rows => [
+		{ entry => $EK1, rank => 1 },
+		{ entry => $EK2, rank => 2 },
+	],
+);
+my $j15 = Database::Join->new(
+	databases   => [$p15, $m15, $l15],
+	join_column => 'entry',
+	join_type   => 'inner',
+);
+
+my $rows15 = $j15->selectall_arrayref(entry => { '>=' => $EK1 });
+is(scalar @{$rows15}, 2,
+	'S15-P1: 3-DA inner join with entry operator hashref → 2 rows');			# T119
+my $snap15 = $l15->snapshot();
+ok(defined $snap15,
+	'S15-P2: SnapshotDA captured a snapshot of its received entry criterion');		# T120
+ok(!exists $snap15->{_poison},
+	'S15-P3: broadcast copy isolated — poison key absent from SnapshotDA snapshot');	# T121
+ok(exists $snap15->{'>='},
+	'S15-P4: original ">=" operator preserved in SnapshotDA snapshot');			# T122
+
+# ============================================================================
+# Section 16: updated() Tracking Lifecycle
+# Lifecycle: construct with two DAs → updated() = max of initial timestamps →
+# add_database with higher timestamp → updated() increases →
+# add_database with lower timestamp → updated() unchanged.
+# ============================================================================
+note '--- S16: updated() Tracking Lifecycle ---';
+
+Readonly::Scalar my $TS_LOW  => 100;
+Readonly::Scalar my $TS_MID  => 200;
+Readonly::Scalar my $TS_HIGH => 300;
+
+my $p16 = TransactionDA->new(
+	cols    => ['entry', 'name'],
+	rows    => [ { entry => $K1, name => 'Alice' } ],
+	updated => $TS_MID,
+);
+my $s16 = TransactionDA->new(
+	cols    => ['entry', 'score'],
+	rows    => [ { entry => $K1, score => $SCORE_HIGH } ],
+	updated => $TS_LOW,
+);
+my $j16 = Database::Join->new(databases => [$p16, $s16], join_column => 'entry');
+
+# Phase 1: updated() = max(TS_MID, TS_LOW) = TS_MID
+is($j16->updated(), $TS_MID,
+	'S16-P1: initial updated() = max of primary and secondary timestamps');		# T123
+
+# Phase 2: add_database with HIGHER timestamp → updated() increases to new max
+my $t16a = TransactionDA->new(
+	cols    => ['entry', 'rank'],
+	rows    => [ { entry => $K1, rank => 1 } ],
+	updated => $TS_HIGH,
+);
+$j16->add_database($t16a);
+is($j16->updated(), $TS_HIGH,
+	'S16-P2: add_database with higher timestamp → updated() increases');		# T124
+
+# Phase 3: add_database with LOWER timestamp → updated() unchanged
+my $t16b = TransactionDA->new(
+	cols    => ['entry', 'flag'],
+	rows    => [ { entry => $K1, flag => 'x' } ],
+	updated => $TS_LOW,
+);
+$j16->add_database($t16b);
+is($j16->updated(), $TS_HIGH,
+	'S16-P3: add_database with lower timestamp leaves updated() at prior max');	# T125
+
+# Phase 4: Single-DA join → updated() equals that DA timestamp exactly
+my $j16s = Database::Join->new(
+	databases => [
+		TransactionDA->new(
+			cols    => ['entry', 'x'],
+			rows    => [ { entry => $K1, x => 1 } ],
+			updated => $TS_MID,
+		),
+	],
+	join_column => 'entry',
+);
+is($j16s->updated(), $TS_MID,
+	'S16-P4: single-DA join → updated() equals that DA timestamp');			# T126
+
+# ============================================================================
+# Section 17: Outer Join Sparse Row Idempotency
+# Lifecycle: outer join where primary has k1+k2 and secondary has k1+k3 →
+# first query produces 3 rows with undef fields for absent DAs → repeated
+# queries return identical sparse structure → count() agrees.
+# ============================================================================
+note '--- S17: Outer Join Sparse Row Idempotency ---';
+
+my $p17 = TransactionDA->new(
+	cols => ['entry', 'name'],
+	rows => [
+		{ entry => $K1, name => 'Alice' },
+		{ entry => $K2, name => 'Bob'   },
+	],
+);
+my $s17 = TransactionDA->new(
+	cols => ['entry', 'score'],
+	rows => [
+		{ entry => $K1, score => $SCORE_HIGH },
+		{ entry => $K3, score => $SCORE_MID  },
+	],
+);
+my $j17 = Database::Join->new(
+	databases   => [$p17, $s17],
+	join_column => 'entry',
+	join_type   => 'outer',
+);
+
+# Phase 1: Outer join returns all 3 distinct keys (union of both DAs)
+my $rows17a = $j17->selectall_arrayref();
+is(scalar @{$rows17a}, 3, 'S17-P1: outer join → 3 rows (union: k1+k2+k3)');		# T127
+
+# Phase 2: Sparse rows — primary-only k2 has no score; secondary-only k3 has no name
+my ($k2_17) = grep { $_->{entry} eq $K2 } @{$rows17a};
+my ($k3_17) = grep { $_->{entry} eq $K3 } @{$rows17a};
+ok(!defined $k2_17->{score}, 'S17-P2a: k2 (primary only) → score undef in outer join row');	# T128
+ok(!defined $k3_17->{name},  'S17-P2b: k3 (secondary only) → name undef in outer join row');	# T129
+
+# Phase 3: Repeated query produces identical sparse structure (idempotent)
+my $rows17b = $j17->selectall_arrayref();
+is_deeply($rows17a, $rows17b,
+	'S17-P3: repeated outer join query → identical sparse row structure');		# T130
+
+# Phase 4: count() consistent with selectall_arrayref() length for outer join
+is($j17->count(), scalar @{ $j17->selectall_arrayref() },
+	'S17-P4: count() agrees with selectall_arrayref() length in outer join');	# T131

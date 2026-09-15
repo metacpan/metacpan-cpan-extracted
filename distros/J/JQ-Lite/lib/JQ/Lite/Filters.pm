@@ -3,10 +3,10 @@ package JQ::Lite::Filters;
 use strict;
 use warnings;
 
-use List::Util qw(sum min max);
+use List::Util qw(sum min);
 use Scalar::Util qw(looks_like_number);
-use B qw(SVp_IOK SVp_NOK);
 use JQ::Lite::Util ();
+use JQ::Lite::Builtin ();
 
 sub apply {
     my ($self, $part, $results_ref, $out_ref) = @_;
@@ -643,62 +643,16 @@ sub apply {
             return 1;
         }
 
-        # support for length
-        if ($part eq 'length') {
-            @next_results = map {
-                if (!defined $_) {
-                    0;
-                }
-                elsif (ref $_ eq 'ARRAY') {
-                    scalar(@$_);
-                }
-                elsif (ref $_ eq 'HASH') {
-                    scalar(keys %$_);
-                }
-                elsif (!ref $_ || ref($_) eq 'JSON::PP::Boolean') {
-                    length("$_");
-                }
-                else {
-                    0;
-                }
-            } @results;
-            @$out_ref = @next_results;
+        my ($builtin_matched, $builtin_outputs)
+            = JQ::Lite::Builtin->dispatch($self, $part, \@results);
+        if ($builtin_matched) {
+            @$out_ref = @{$builtin_outputs};
             return 1;
         }
 
-        # support for keys
-        if ($part eq 'keys') {
-            @next_results = map {
-                if (ref $_ eq 'HASH') {
-                    [ sort keys %$_ ];
-                }
-                elsif (ref $_ eq 'ARRAY') {
-                    [ 0 .. $#{$_} ];
-                }
-                else {
-                    die 'keys(): argument must be an object or array';
-                }
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for keys_unsorted
-        if ($part eq 'keys_unsorted' || $part eq 'keys_unsorted()') {
-            @next_results = map {
-                if (ref $_ eq 'HASH') {
-                    [ keys %$_ ];
-                }
-                elsif (ref $_ eq 'ARRAY') {
-                    [ 0 .. $#{$_} ];
-                }
-                else {
-                    undef;
-                }
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
+        # Legacy built-in implementations below are retained temporarily while
+        # parameterized handlers move to the registry. Exact-name built-ins are
+        # dispatched by their category modules above.
 
         # support for assignment (e.g., .spec.replicas = 3)
         if (JQ::Lite::Util::_looks_like_assignment($part)) {
@@ -788,46 +742,6 @@ sub apply {
                 }
             } @results;
 
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for first
-        if ($part eq 'first') {
-            @next_results = map {
-                ref $_ eq 'ARRAY' && @$_ ? $$_[0] : undef
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for last
-        if ($part eq 'last') {
-            @next_results = map {
-                ref $_ eq 'ARRAY' && @$_ ? $$_[-1] : undef
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for rest
-        if ($part eq 'rest') {
-            @next_results = map {
-                ref $_ eq 'ARRAY'
-                ? (@$_ ? [ @$_[ 1 .. $#{$_} ] ] : [])
-                : $_
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for reverse
-        if ($part eq 'reverse') {
-            @next_results = map {
-                ref $_ eq 'ARRAY' ? [ reverse @$_ ]
-                : JQ::Lite::Util::_is_string_scalar($_) ? scalar reverse $_
-                : $_
-            } @results;
             @$out_ref = @next_results;
             return 1;
         }
@@ -1030,20 +944,6 @@ sub apply {
             return 1;
         }
 
-        # support for to_entries
-        if ($part eq 'to_entries') {
-            @next_results = map { JQ::Lite::Util::_to_entries($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for from_entries
-        if ($part eq 'from_entries') {
-            @next_results = map { JQ::Lite::Util::_from_entries($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
         # support for with_entries(filter)
         if ($part =~ /^with_entries\((.+)\)$/) {
             my $filter = $1;
@@ -1126,31 +1026,6 @@ sub apply {
             @keys = grep { defined $_ } @keys;
 
             @next_results = map { JQ::Lite::Util::_apply_pick($_, \@keys) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for merge_objects()
-        if ($part eq 'merge_objects()' || $part eq 'merge_objects') {
-            @next_results = map { JQ::Lite::Util::_apply_merge_objects($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for add
-        if ($part eq 'add') {
-            @next_results = map {
-                ref $_ eq 'ARRAY' ? sum(map { 0 + $_ } @$_) : $_
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for sum (alias for add)
-        if ($part eq 'sum') {
-            @next_results = map {
-                ref $_ eq 'ARRAY' ? sum(map { 0 + $_ } @$_) : $_
-            } @results;
             @$out_ref = @next_results;
             return 1;
         }
@@ -1306,171 +1181,8 @@ sub apply {
             return 1;
         }
 
-        # support for product
-        if ($part eq 'product') {
-            @next_results = map {
-                if (ref $_ eq 'ARRAY') {
-                    my $product    = 1;
-                    my $has_values = 0;
-                    for my $val (@$_) {
-                        next unless defined $val;
-                        $product *= (0 + $val);
-                        $has_values = 1;
-                    }
-                    $has_values ? $product : 1;
-                } else {
-                    $_;
-                }
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for min
-        if ($part eq 'min') {
-            @next_results = map {
-                ref $_ eq 'ARRAY' ? do {
-                my @numbers = JQ::Lite::Util::_extract_numeric_values($_);
-                @numbers ? min(@numbers) : undef;
-            } : $_
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for max
-        if ($part eq 'max') {
-            @next_results = map {
-                ref $_ eq 'ARRAY' ? do {
-                my @numbers = JQ::Lite::Util::_extract_numeric_values($_);
-                @numbers ? max(@numbers) : undef;
-            } : $_
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for avg
-        if ($part eq 'avg') {
-            @next_results = map {
-                ref $_ eq 'ARRAY' && @$_ ? sum(map { 0 + $_ } @$_) / scalar(@$_) : 0
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for abs
-        if ($part eq 'abs') {
-            @next_results = map {
-                if (!defined $_) {
-                    undef;
-                }
-                elsif (!ref $_) {
-                    looks_like_number($_) ? abs($_) : $_;
-                }
-                elsif (ref $_ eq 'ARRAY') {
-                    [ map { looks_like_number($_) ? abs($_) : $_ } @$_ ];
-                }
-                else {
-                    $_;
-                }
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for ceil()
-        if ($part eq 'ceil()' || $part eq 'ceil') {
-            @next_results = map { JQ::Lite::Util::_apply_numeric_function($_, \&JQ::Lite::Util::_ceil) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for floor()
-        if ($part eq 'floor()' || $part eq 'floor') {
-            @next_results = map { JQ::Lite::Util::_apply_numeric_function($_, \&JQ::Lite::Util::_floor) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for round()
-        if ($part eq 'round()' || $part eq 'round') {
-            @next_results = map { JQ::Lite::Util::_apply_numeric_function($_, \&JQ::Lite::Util::_round) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for clamp(min, max)
-        if ($part =~ /^clamp\((.*)\)$/) {
-            my @args = JQ::Lite::Util::_parse_arguments($1);
-            my $min  = @args ? JQ::Lite::Util::_normalize_numeric_bound($args[0]) : undef;
-            my $max  = @args > 1 ? JQ::Lite::Util::_normalize_numeric_bound($args[1]) : undef;
-
-            if (defined $min && defined $max && $min > $max) {
-                ($min, $max) = ($max, $min);
-            }
-
-            @next_results = map { JQ::Lite::Util::_apply_clamp($_, $min, $max) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for tostring()
-        if ($part eq 'tostring()' || $part eq 'tostring') {
-            @next_results = map { JQ::Lite::Util::_apply_tostring($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for tojson()
-        if ($part eq 'tojson()' || $part eq 'tojson') {
-            @next_results = map { JQ::Lite::Util::_apply_tojson($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for fromjson()
-        if ($part eq 'fromjson()' || $part eq 'fromjson') {
-            @next_results = map { JQ::Lite::Util::_apply_fromjson($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for to_number()
-        if ($part eq 'to_number()' || $part eq 'to_number') {
-            @next_results = map { JQ::Lite::Util::_apply_to_number($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
         if ($part eq 'tonumber()' || $part eq 'tonumber') {
             @next_results = map { JQ::Lite::Util::_tonumber($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for median
-        if ($part eq 'median') {
-            @next_results = map {
-                if (ref $_ eq 'ARRAY' && @$_) {
-                    my @numbers = sort { $a <=> $b }
-                        JQ::Lite::Util::_extract_numeric_values($_);
-
-                    if (@numbers) {
-                        my $count  = @numbers;
-                        my $middle = int($count / 2);
-                        if ($count % 2) {
-                            $numbers[$middle];
-                        } else {
-                            ($numbers[$middle - 1] + $numbers[$middle]) / 2;
-                        }
-                    } else {
-                        undef;
-                    }
-                } else {
-                    $_;
-                }
-            } @results;
             @$out_ref = @next_results;
             return 1;
         }
@@ -1618,23 +1330,6 @@ sub apply {
             return 1;
         }
 
-        # support for count
-        if ($part eq 'count') {
-            @next_results = map {
-                if (ref $_ eq 'ARRAY') {
-                    scalar(@$_);
-                }
-                elsif (!defined $_) {
-                    0;
-                }
-                else {
-                    1;    # count as 1 item for scalars and objects
-                }
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
         # support for all() / all(expr)
         if ($part =~ /^all(?:\((.*)\))?$/) {
             my $expr = defined $1 ? $1 : undef;
@@ -1713,148 +1408,6 @@ sub apply {
             return 1;
         }
 
-        # support for empty
-        if ($part eq 'empty') {
-            @results = ();  # discard all results
-            return 1;
-        }
-
-        # support for values
-        if ($part eq 'values') {
-            @next_results = map {
-                ref $_ eq 'HASH' ? [ values %$_ ] : $_
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for arrays
-        if ($part eq 'arrays()' || $part eq 'arrays') {
-            @next_results = map {
-                ref $_ eq 'ARRAY' ? $_ : ()
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for scalars
-        if ($part eq 'scalars()' || $part eq 'scalars') {
-            @next_results = map {
-                if (!defined $_) {
-                    undef;
-                }
-                elsif (!ref $_ || ref($_) eq 'JSON::PP::Boolean') {
-                    $_;
-                }
-                else {
-                    ();
-                }
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for objects
-        if ($part eq 'objects()' || $part eq 'objects') {
-            @next_results = map {
-                ref $_ eq 'HASH' ? $_ : ()
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for flatten()
-        if ($part eq 'flatten()' || $part eq 'flatten') {
-            @next_results = map {
-                ref $_ eq 'ARRAY'
-                    ? JQ::Lite::Util::_flatten_depth($_, 1)
-                    : $_
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for flatten_all()
-        if ($part eq 'flatten_all()' || $part eq 'flatten_all') {
-            @next_results = map {
-                if (ref $_ eq 'ARRAY') {
-                    JQ::Lite::Util::_flatten_all($_);
-                } else {
-                    $_;
-                }
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for flatten_depth(n)
-        if ($part =~ /^flatten_depth(?:\((.*)\))?$/) {
-            my $args_raw = defined $1 ? $1 : '';
-            my @args     = length $args_raw ? JQ::Lite::Util::_parse_arguments($args_raw) : ();
-            my $depth    = @args ? $args[0] : 1;
-
-            if (!defined $depth || !looks_like_number($depth)) {
-                $depth = 1;
-            }
-
-            $depth = int($depth);
-            $depth = 0 if $depth < 0;
-
-            @next_results = map {
-                if (ref $_ eq 'ARRAY') {
-                    JQ::Lite::Util::_flatten_depth($_, $depth);
-                } else {
-                    $_;
-                }
-            } @results;
-
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for type()
-        if ($part eq 'type()' || $part eq 'type') {
-            @next_results = map {
-                if (!defined $_) {
-                    'null';
-                }
-                elsif (ref($_) eq 'ARRAY') {
-                    'array';
-                }
-                elsif (ref($_) eq 'HASH') {
-                    'object';
-                }
-                elsif (ref($_) eq '') {
-                    my $sv    = B::svref_2object(\$_);
-                    my $flags = $sv->FLAGS;
-
-                    ($flags & (SVp_IOK | SVp_NOK)) ? 'number' : 'string';
-                }
-                elsif (ref($_) eq 'JSON::PP::Boolean') {
-                    'boolean';
-                }
-                else {
-                    'unknown';
-                }
-            } (@results ? @results : (undef)); 
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for nth(n)
-        if ($part =~ /^nth\((\d+)\)$/) {
-            my $index = $1;
-            @next_results = map {
-                if (ref $_ eq 'ARRAY') {
-                    $_->[$index]
-                } else {
-                    undef
-                }
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
         # support for del(key)
         if ($part =~ /^del\((.+?)\)$/) {
             my $key = $1;
@@ -1884,111 +1437,6 @@ sub apply {
             return 1;
         }
 
-        # support for compact()
-        if ($part eq 'compact()' || $part eq 'compact') {
-            @next_results = map {
-                if (ref $_ eq 'ARRAY') {
-                    [ grep { defined $_ } @$_ ]
-                } else {
-                    $_
-                }
-            } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for titlecase()
-        if ($part eq 'titlecase()' || $part eq 'titlecase') {
-            @next_results = map { JQ::Lite::Util::_apply_case_transform($_, 'titlecase') } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for upper()
-        if ($part eq 'upper()' || $part eq 'upper') {
-            @next_results = map { JQ::Lite::Util::_apply_case_transform($_, 'upper') } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for ascii_upcase
-        if ($part eq 'ascii_upcase()' || $part eq 'ascii_upcase') {
-            @next_results = map { JQ::Lite::Util::_apply_ascii_case_transform($_, 'upper') } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for ascii_downcase
-        if ($part eq 'ascii_downcase()' || $part eq 'ascii_downcase') {
-            @next_results = map { JQ::Lite::Util::_apply_ascii_case_transform($_, 'lower') } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for lower()
-        if ($part eq 'lower()' || $part eq 'lower') {
-            @next_results = map { JQ::Lite::Util::_apply_case_transform($_, 'lower') } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for trim()
-        if ($part eq 'trim()' || $part eq 'trim') {
-            @next_results = map { JQ::Lite::Util::_apply_trim($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for ltrimstr("prefix")
-        if ($part =~ /^ltrimstr\((.+)\)$/) {
-            my $needle = JQ::Lite::Util::_parse_string_argument($1);
-            @next_results = map { JQ::Lite::Util::_apply_trimstr($_, $needle, 'left') } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for rtrimstr("suffix")
-        if ($part =~ /^rtrimstr\((.+)\)$/) {
-            my $needle = JQ::Lite::Util::_parse_string_argument($1);
-            @next_results = map { JQ::Lite::Util::_apply_trimstr($_, $needle, 'right') } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for has(key)
-        if ($part =~ /^has\((.+)\)$/) {
-            my @args   = JQ::Lite::Util::_parse_arguments($1);
-            my $needle = @args ? $args[0] : undef;
-
-            @next_results = map { JQ::Lite::Util::_apply_has($_, $needle) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for contains(value)
-        if ($part =~ /^contains\((.+)\)$/) {
-            my $needle = JQ::Lite::Util::_parse_literal_argument($1);
-            @next_results = map { JQ::Lite::Util::_apply_contains($_, $needle) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for contains_subset(value)
-        if ($part =~ /^contains_subset\((.+)\)$/) {
-            my $needle = JQ::Lite::Util::_parse_literal_argument($1);
-            @next_results = map { JQ::Lite::Util::_apply_contains_subset($_, $needle) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for inside(container)
-        if ($part =~ /^inside\((.+)\)$/) {
-            my $container = JQ::Lite::Util::_parse_literal_argument($1);
-            @next_results = map { JQ::Lite::Util::_apply_inside($_, $container) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
         # support for test("pattern"[, "flags"])
         if ($part =~ /^test\((.+)\)$/) {
             my ($pattern_expr, $flags_expr) = JQ::Lite::Util::_split_semicolon_arguments($1, 2);
@@ -2007,106 +1455,6 @@ sub apply {
             my $flags   = defined $flags_expr   ? JQ::Lite::Util::_parse_string_argument($flags_expr)   : '';
 
             @next_results = map { JQ::Lite::Util::_apply_match($_, $pattern, $flags) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for startswith("prefix")
-        if ($part =~ /^startswith\((.+)\)$/) {
-            my $needle = JQ::Lite::Util::_parse_string_argument($1);
-            @next_results = map { JQ::Lite::Util::_apply_string_predicate($_, $needle, 'start') } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for endswith("suffix")
-        if ($part =~ /^endswith\((.+)\)$/) {
-            my $needle = JQ::Lite::Util::_parse_string_argument($1);
-            @next_results = map { JQ::Lite::Util::_apply_string_predicate($_, $needle, 'end') } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for explode()
-        if ($part eq 'explode()' || $part eq 'explode') {
-            @next_results = map { JQ::Lite::Util::_apply_explode($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for implode()
-        if ($part eq 'implode()' || $part eq 'implode') {
-            @next_results = map { JQ::Lite::Util::_apply_implode($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for replace(old, new)
-        if ($part =~ /^replace\((.+)\)$/) {
-            my ($search, $replacement) = JQ::Lite::Util::_parse_arguments($1);
-            $search      = defined $search      ? $search      : '';
-            $replacement = defined $replacement ? $replacement : '';
-
-            @next_results = map { JQ::Lite::Util::_apply_replace($_, $search, $replacement) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for @json (format value as JSON string)
-        if ($part eq '@json' || $part eq '@json()') {
-            @next_results = map { JQ::Lite::Util::_apply_tojson($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for @csv (format array/scalar as CSV row)
-        if ($part eq '@csv' || $part eq '@csv()') {
-            @next_results = map { JQ::Lite::Util::_apply_csv($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for @tsv (format array/scalar as TSV row)
-        if ($part eq '@tsv' || $part eq '@tsv()') {
-            @next_results = map { JQ::Lite::Util::_apply_tsv($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for @base64 (format value as base64 string)
-        if ($part eq '@base64' || $part eq '@base64()') {
-            @next_results = map { JQ::Lite::Util::_apply_base64($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for @base64d (decode base64-encoded string)
-        if ($part eq '@base64d' || $part eq '@base64d()') {
-            @next_results = map { JQ::Lite::Util::_apply_base64d($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for @uri (percent-encode value)
-        if ($part eq '@uri' || $part eq '@uri()') {
-            @next_results = map { JQ::Lite::Util::_apply_uri($_) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for split("separator")
-        if ($part =~ /^split\((.+)\)$/) {
-            my $separator = JQ::Lite::Util::_parse_string_argument($1);
-            @next_results = map { JQ::Lite::Util::_apply_split($_, $separator) } @results;
-            @$out_ref = @next_results;
-            return 1;
-        }
-
-        # support for substr(start[, length])
-        if ($part =~ /^substr(?:\((.*)\))?$/) {
-            my $args_raw = defined $1 ? $1 : '';
-            my @args = JQ::Lite::Util::_parse_arguments($args_raw);
-            @next_results = map { JQ::Lite::Util::_apply_substr($_, @args) } @results;
             @$out_ref = @next_results;
             return 1;
         }

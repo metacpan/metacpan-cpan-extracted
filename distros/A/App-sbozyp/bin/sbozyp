@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported version)
 
 package Sbozyp;
 
-our $VERSION = 'v1.10.1';
+our $VERSION = 'v1.10.2';
 
 use Cwd qw();
 use Digest::MD5 qw();
@@ -839,6 +839,19 @@ sub repo_is_cloned {
     return -d repo_dir().'.git' ? 1 : 0;
 }
 
+sub repo_supports_shallow_cloning {
+    my ($url) = @_;
+    my $trace_file = File::Temp->new(DIR=> $CONFIG{TMPDIR}, TEMPLATE => 'sbozyp_XXXXXX', CLEANUP => 1);
+    local $ENV{GIT_TRACE_PACKET} = Cwd::abs_path("$trace_file");
+    sbozyp_qx('git', '-c', 'protocol.version=0', 'ls-remote', '--', $url, 'HEAD');
+    return scalar grep { /< .*\\0(?:.* )?shallow(?: |$)/ } <$trace_file>;
+}
+
+sub repo_is_shallow_cloned {
+    my ($repo_dir) = @_;
+    return 'true' eq sbozyp_qx('git', '-C', $repo_dir, 'rev-parse', '--is-shallow-repository');
+}
+
 sub clone_repo {
     my $repo_dir = repo_dir();
     sbozyp_mkdir($repo_dir);
@@ -849,7 +862,7 @@ sub clone_repo {
     my $repo_git_branch = repo_git_branch();
     my $repo_git_url = repo_git_url();
     with_stdout_to_stderr(sub {
-        sbozyp_system('git', 'clone', '--progress', '--single-branch', '--branch', $repo_git_branch, '--no-tags', $repo_git_url, $repo_dir);
+        sbozyp_system('git', 'clone', '--branch', $repo_git_branch, '--progress', '--single-branch', '--no-tags', repo_supports_shallow_cloning($repo_git_url) ? ('--depth', '1') : (), $repo_git_url, $repo_dir);
     });
 }
 
@@ -858,7 +871,7 @@ sub sync_repo {
     if (repo_is_cloned()) {
         my $repo_git_branch = repo_git_branch();
         with_stdout_to_stderr(sub {
-            sbozyp_system('git', '-C', $repo_dir, 'fetch', '--progress', '--verbose');
+            sbozyp_system('git', '-C', $repo_dir, 'fetch', repo_is_shallow_cloned($repo_dir) ? ('--depth', '1') : (), '--progress', '--verbose');
             sbozyp_system('git', '-C', $repo_dir, 'reset', '--hard', '--quiet', "origin/$repo_git_branch");
         });
     } else {

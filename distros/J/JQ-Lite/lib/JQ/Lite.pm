@@ -5,11 +5,11 @@ use warnings;
 
 use JSON::PP ();
 
-use JQ::Lite::Filters;
+use JQ::Lite::Evaluator;
 use JQ::Lite::Parser;
-use JQ::Lite::Util ();
+use JQ::Lite::Runtime;
 
-our $VERSION = '2.50';
+our $VERSION = '2.55';
 
 sub new {
     my ($class, %opts) = @_;
@@ -43,28 +43,14 @@ sub run_query {
 sub _run_query_internal {
     my ($self, $json_text, $query) = @_;
 
-    my $data = JQ::Lite::Util::_decode_json($json_text);
+    my $runtime = JQ::Lite::Runtime->new(owner => $self);
+    my $data = $runtime->decode_input($json_text);
 
     return ($data) if !defined $query || $query =~ /^\s*\.\s*$/;
 
-    my @parts = JQ::Lite::Parser::parse_query($query);
-
-    my @results = ($data);
-    for my $part (@parts) {
-        my @next_results;
-
-        if (JQ::Lite::Filters::apply($self, $part, \@results, \@next_results)) {
-            @results = @next_results;
-            next;
-        }
-
-        for my $item (@results) {
-            push @next_results, JQ::Lite::Util::_traverse($item, $part);
-        }
-        @results = @next_results;
-    }
-
-    return @results;
+    my $ast = JQ::Lite::Parser::parse_ast($query);
+    my $evaluator = JQ::Lite::Evaluator->new(runtime => $runtime);
+    return $evaluator->evaluate($ast, $data);
 }
 
 1;
@@ -78,7 +64,7 @@ JQ::Lite - jq-compatible JSON query engine in pure Perl (no external binaries)
 
 =head1 VERSION
 
-Version 2.50
+Version 2.55
 
 =head1 SYNOPSIS
 
@@ -557,16 +543,21 @@ Example:
 
 =item * contains_subset(value)
 
-Opt-in jq-style subset containment. Behaves like C<contains/1>, but when
-arrays are involved the right-hand array must be a multiset subset of the
-left-hand one. Order does not matter and duplicate elements are honoured.
-Nested arrays inside hashes are evaluated with the same subset rules.
+Recursive, order-insensitive subset containment. Behaves like C<contains/1>,
+but when arrays are involved the right-hand array must be a multiset subset of
+the left-hand one. Duplicate needles require distinct matching elements, and
+scalar values are compared after string coercion. It is therefore not a
+drop-in implementation of jq's C<contains/1>, which can reuse one match for
+duplicate needles and keeps JSON scalar types distinct. Nested arrays inside
+hashes are evaluated with the same subset rules.
 
 Examples:
 
   [1,2,3] | contains_subset([2,3])            # => true
   [1,2,3] | contains_subset([3,2])            # => true
   [1,2,3] | contains_subset([4])              # => false
+  [1] | contains_subset([1,1])                # => false (jq contains => true)
+  ["1"] | contains_subset([1])                # => true  (jq contains => false)
   {"b":{"y":[1,2,3]}} | contains_subset({"b":{"y":[2]}})  # => true
 
 =item * test(pattern[, flags])

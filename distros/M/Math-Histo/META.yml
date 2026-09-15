@@ -7,7 +7,7 @@ build_requires:
   Test2::V0: '0.000060'
 configure_requires:
   Alien::Base::Wrapper: '1.97'
-  Alien::libhisto: '0'
+  Alien::libhisto: v0.4.0
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
@@ -28,5 +28,5 @@ requires:
 resources:
   bugtracker: https://github.com/tsee/libhisto/issues
   repository: https://github.com/tsee/libhisto.git
-version: v0.4.0
+version: v0.4.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

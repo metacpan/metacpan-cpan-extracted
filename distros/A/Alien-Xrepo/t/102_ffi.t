@@ -19,7 +19,7 @@ subtest Affix => sub {
     Affix::affix( $lib_path, [ zlibVersion => 'a_zlibVersion' ], [] => Affix::String() );
     my $v = a_zlibVersion();
     ok defined $v && length $v, 'Affix bound and called zlibVersion: ' . ( $v // '(undef)' );
-    like $v, qr{^\d+\.\d+\.\d+}, 'zlibVersion returned a semver-ish string';
+    like $v, qr[^\d+\.\d+\.\d+], 'zlibVersion returned a semver-ish string';
 };
 subtest 'FFI::Platypus' => sub {
     skip_all 'FFI::Platypus is not installed' unless eval { require FFI::Platypus; 1; };
@@ -28,7 +28,7 @@ subtest 'FFI::Platypus' => sub {
     $plat->attach( [ zlibVersion => 'p_zlibVersion' ] => [] => 'string' );
     my $v = p_zlibVersion();
     ok defined $v && length $v, 'Platypus bound and called zlibVersion: ' . ( $v // '(undef)' );
-    like $v, qr{^\d+\.\d+\.\d+}, 'zlibVersion returned a semver-ish string';
+    like $v, qr[^\d+\.\d+\.\d+], 'zlibVersion returned a semver-ish string';
 };
 #
 done_testing;

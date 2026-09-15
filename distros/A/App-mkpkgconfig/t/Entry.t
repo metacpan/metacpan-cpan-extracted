@@ -8,15 +8,15 @@ use constant Variable => 'App::mkpkgconfig::PkgConfig::Entry::Variable';
 
 subtest constant => sub {
     my $kwd = Keyword->new( 'Version', '1' );
-    is( $kwd->name,  'Version', 'name' );
-    is( $kwd->value, '1',       'value' );
-    is( [ $kwd->depends ], [], 'depends' );
+    is( $kwd->name,        'Version', 'name' );
+    is( $kwd->value,       '1',       'value' );
+    is( [ $kwd->depends ], [],        'depends' );
 };
 
 subtest 'one dependency' => sub {
     my $kwd = Keyword->new( 'Version', '${version}' );
-    is( $kwd->name,  'Version', 'name' );
-    is( $kwd->value, '${version}',       'value' );
+    is( $kwd->name,  'Version',    'name' );
+    is( $kwd->value, '${version}', 'value' );
     is(
         [ $kwd->depends ],
         bag {
@@ -29,8 +29,8 @@ subtest 'one dependency' => sub {
 
 subtest 'two dependencies' => sub {
     my $kwd = Keyword->new( 'Version', '${version}-${subversion}' );
-    is( $kwd->name,  'Version', 'name' );
-    is( $kwd->value, '${version}-${subversion}',       'value' );
+    is( $kwd->name,  'Version',                  'name' );
+    is( $kwd->value, '${version}-${subversion}', 'value' );
     is(
         [ $kwd->depends ],
         bag {

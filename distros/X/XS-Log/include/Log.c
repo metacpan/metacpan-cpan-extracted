@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : ZQaDDvbzQqSO2kEnjXFD1g
-* Build Time : 2025-09-24 09:44:42
-* Version    : 5.090130
+* Build  MD5 : 8f6jqw6yrm66ePomTN0BQg
+* Build Time : 2026-09-14 02:16:45
+* Version    : 6.090001
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "Log.h"
@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <sys/time.h> // 提供 gettimeofday 用于获取毫秒级时间
 #include <sys/file.h>
+#include <pthread.h>
 /***************************************************************************************
 颜色				前景色		背景色
 黑色				\033[30m	\033[40m
@@ -43,6 +44,17 @@
 
 
 // 日志模块全局状态
+static pthread_mutex_t g_log_mutex;
+static pthread_once_t g_log_mutex_once = PTHREAD_ONCE_INIT;
+static void init_log_mutex(void) {
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&g_log_mutex, &attr);
+    pthread_mutexattr_destroy(&attr);
+}
+static void lock_log(void) { pthread_once(&g_log_mutex_once, init_log_mutex); pthread_mutex_lock(&g_log_mutex); }
+static void unlock_log(void) { pthread_mutex_unlock(&g_log_mutex); }
 static struct {
     LogOptions options;
     FILE *log_file;
@@ -128,18 +140,19 @@ static const char* log_level_to_string(LogLevel level);
 
 // 初始化日志系统
 bool openLog(const char *log_filepath,const LogOptions* config) {
+	lock_log();
 	if (log_filepath == NULL || strlen(log_filepath) == 0) {
-        return false;
+        unlock_log(); return false;
     }
 	
     if (config == NULL) {
-        return false;
+        unlock_log(); return false;
     }
     memcpy(&g_config, config, sizeof(LogOptions));
     
     // 解析文件路径，分离基础路径、程序名和扩展名
     if (!parse_filepath(log_filepath)) {
-        return false;
+        unlock_log(); return false;
     }
     
     bool l = log_open_file();
@@ -148,27 +161,37 @@ bool openLog(const char *log_filepath,const LogOptions* config) {
 	{
 		r = rep_open_file();
 	}
+    unlock_log();
     return l && r;
 }
 void setLogLevel(int level)
 {
+	lock_log();
 	g_config.options.level = level;
+	unlock_log();
 }
 void setLogMode(int flag)
 {
+	lock_log();
 	g_config.options.mode = flag;
+	unlock_log();
 }
 void setLogColor(int flag)
 {
+	lock_log();
 	g_config.options.use_color = flag;
+	unlock_log();
 }
 void setLogTargets(int flag)
 {
+	lock_log();
 	g_config.options.targets = flag;
+	unlock_log();
 }
 // 设置配置项的函数
 bool setLogOptions(const char *key, long val) {
-    if (!key) return false;
+	lock_log();
+    if (!key) { unlock_log(); return false; }
 
     // 比较键名并设置对应的值
     if (strcmp(key, "level") == 0) {
@@ -193,22 +216,26 @@ bool setLogOptions(const char *key, long val) {
         g_config.options.flush_immediately = (bool)val;
     } else {
         // 未知的配置项
-        return false;
+        unlock_log(); return false;
     }
 
-    return true;
+    unlock_log(); return true;
 }
 void closeLog() {
+	lock_log();
     flushLog();
     log_close_file();
 	rep_close_file();
+    unlock_log();
 }
 void flushLog() {
+	lock_log();
     if (g_config.log_file != NULL) {
         fflush(g_config.log_file);
     }
     fflush(stdout);
     fflush(stderr);
+    unlock_log();
 }
 
 // 函数定义
@@ -499,6 +526,7 @@ static bool parse_filepath(const char* filepath) {
 		{
 			//可能TongSMT.P02.log，需要再次分离文件名称
 			dot = strrchr(filename, '.');
+			if (dot != NULL) {*dot = '\0';}
 			strncpy(g_config.rep_name, filename, sizeof(g_config.rep_name) - 1);
 			g_config.rep_name[sizeof(g_config.rep_name) - 1] = '\0';
 		}
@@ -591,11 +619,12 @@ static void log_rotate_file() {
 }
 
 void log_print(LogLevel level, const char *file, int line, const char *format, ...) {
-	if(level == LOG_LEVEL_OFF) return;
+	lock_log();
+	if(level == LOG_LEVEL_OFF) { unlock_log(); return;}
 	if(level != LOG_LEVEL_TEXT)
 	{
 		if (level > g_config.options.level) {
-			return;
+			unlock_log(); return;
 		}
 	}
     va_list args;
@@ -686,7 +715,7 @@ void log_print(LogLevel level, const char *file, int line, const char *format, .
 			case LOG_MODE_DAILY: {
 				char date_str[9];
 				strftime(date_str, sizeof(date_str), "%Y%m%d", tm_now);
-				if (date_str != g_config.cur_log_day) {
+				if (strcmp(date_str, g_config.cur_log_day) != 0) {
 					log_close_file();
 					log_open_file();
 				}
@@ -695,7 +724,7 @@ void log_print(LogLevel level, const char *file, int line, const char *format, .
 			case LOG_MODE_HOURLY: {
 				char hour_str[3];
 				strftime(hour_str, sizeof(hour_str), "%H", tm_now);
-				if (hour_str != g_config.cur_log_hour) {
+				if (strcmp(hour_str, g_config.cur_log_hour) != 0) {
 					log_close_file();
 					log_open_file();
 				}
@@ -712,18 +741,22 @@ void log_print(LogLevel level, const char *file, int line, const char *format, .
     // 如果是FATAL级别，终止程序
     if (level == LOG_LEVEL_FATAL) {
         closeLog();
+        unlock_log();
         exit(EXIT_FAILURE);
     }
+    unlock_log();
 }
 
 void log_write(LogLevel level, const char *file, int line, const char *message) {
+	lock_log();
+	if(message == NULL) { unlock_log(); return; }
 	size_t len = strlen(message);
 	if(message == NULL || len == 0) return;
-	if(level == LOG_LEVEL_OFF) return;
+	if(level == LOG_LEVEL_OFF) { unlock_log(); return;}
 	if(level != LOG_LEVEL_TEXT)
 	{
 		if (level > g_config.options.level) {
-			return;
+			unlock_log(); return;
 		}
 	}
     char buf[1024];
@@ -813,7 +846,7 @@ void log_write(LogLevel level, const char *file, int line, const char *message) 
 			case LOG_MODE_DAILY: {
 				char date_str[9];
 				strftime(date_str, sizeof(date_str), "%Y%m%d", tm_now);
-				if (date_str != g_config.cur_log_day) {
+				if (strcmp(date_str, g_config.cur_log_day) != 0) {
 					log_close_file();
 					log_open_file();
 				}
@@ -822,7 +855,7 @@ void log_write(LogLevel level, const char *file, int line, const char *message) 
 			case LOG_MODE_HOURLY: {
 				char hour_str[3];
 				strftime(hour_str, sizeof(hour_str), "%H", tm_now);
-				if (hour_str != g_config.cur_log_hour) {
+				if (strcmp(hour_str, g_config.cur_log_hour) != 0) {
 					log_close_file();
 					log_open_file();
 				}
@@ -839,14 +872,17 @@ void log_write(LogLevel level, const char *file, int line, const char *message) 
     // 如果是FATAL级别，终止程序
     if (level == LOG_LEVEL_FATAL) {
         closeLog();
+        unlock_log();
         exit(EXIT_FAILURE);
     }
+    unlock_log();
 }
 
 void rep_write(const char *message) {
-	if (!g_config.options.with_rep) return;
+	lock_log();
+	if (!g_config.options.with_rep) { unlock_log(); return;}
     size_t len = strlen(message);
-    if (len == 0) return;
+    if (len == 0) { unlock_log(); return;}
 
     // 输出到控制台
     if (g_config.options.targets & LOG_TARGET_CONSOLE) 
@@ -890,7 +926,7 @@ void rep_write(const char *message) {
 				tm_now = localtime(&now);
 	
 				strftime(date_str, sizeof(date_str), "%Y%m%d", tm_now);
-				if (date_str != g_config.cur_rep_day) {
+				if (strcmp(date_str, g_config.cur_rep_day) != 0) {
 					rep_close_file();
 					rep_open_file();
 				}
@@ -905,7 +941,8 @@ void rep_write(const char *message) {
 				tm_now = localtime(&now);
 				
 				strftime(hour_str, sizeof(hour_str), "%H", tm_now);
-				if (hour_str != g_config.cur_rep_hour) {
+
+				if (strcmp(hour_str, g_config.cur_rep_hour) != 0) {
 					rep_close_file();
 					rep_open_file();
 				}
@@ -913,4 +950,5 @@ void rep_write(const char *message) {
 			}
 		}     
     }
+    unlock_log();
 }

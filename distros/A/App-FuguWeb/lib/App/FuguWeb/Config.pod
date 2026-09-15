@@ -105,8 +105,8 @@ A C<keys> block adds its own rules. The description is rejected when:
 
 =item *
 
-a second C<keys> block appears, or a C<key> block stands with no
-C<keys> block;
+two C<keys> blocks name one directory, or one C<org> word, or a C<key>
+block stands with no C<keys> block;
 
 =item *
 
@@ -144,13 +144,16 @@ C<retired>, or a second block declares the same key;
 
 =item *
 
-a C<key> block of a signify key names an C<email> or a C<fingerprint>,
-which describe an OpenPGP key;
+a C<key> block names a setting that its type does not take: an
+C<email> or a C<fingerprint> on a signify key, and an C<email> on a
+certificate;
 
 =item *
 
-an C<email> is not a local part and a domain, or a C<fingerprint> is
-not 40 hexadecimal characters.
+an C<email> is not a local part and a domain, or a C<fingerprint> does
+not hold the width of its type. The fingerprint of an OpenPGP key
+holds 40 hexadecimal characters, and the SHA-256 of the DER of a
+certificate holds 64.
 
 =back
 
@@ -216,47 +219,68 @@ the description wrote them.
 
 Every path that the output directory must hold after a build: the
 pages of the description, one page for each manual of each group, the
-stylesheet, the assets, and the key directory. The build and the
+stylesheet, the assets, and each key directory. The build and the
 checks read the same list, so the two can never disagree about what
 the site holds.
 
-A site is one flat directory, so most of the list holds file names.
-The key directory is the one part below the root, so its entries hold
-a solidus.
+A site is one flat directory, so most of the list holds file names. A
+key directory is one part below the root, so its entries hold a
+solidus.
 
-=head2 keys_dir, keys_org, keys_contact, keys_expires, keys_url
+=head2 keys_dirs
 
-The settings of the C<keys> block. Each one is C<undef> when the
-description holds no such block, so C<keys_dir> is the test for one.
+The name of each key directory, in file order. The list is empty when
+the description holds no C<keys> block, so it is the test for one.
 
-    keys_dir     (the block name)  the directory below source_dir
-    keys_org     (required)        the first field of every key name
-    keys_contact                   the Contact field of security.txt
-    keys_expires                   the Expires field of security.txt
-    keys_url                       the published prefix of the
-                                   directory, with no trailing slash
+A description can hold several C<keys> blocks, and each one names one
+directory. Each directory holds its own root of trust, per D-02, and a
+binding never crosses a directory. Two blocks must not name one
+directory.
+
+=head2 keys_org, keys_contact, keys_expires, keys_url
+
+    my $org = $config->keys_org('keys');
+
+The settings of one C<keys> block. Each accessor takes the name of the
+directory, and each one answers C<undef> for a name that no block
+holds.
+
+    keys_org     (required)  the first field of every key name
+    keys_contact             the Contact field of security.txt
+    keys_expires             the Expires field of security.txt
+    keys_url                 the published prefix of the directory,
+                             with no trailing slash
 
 RFC 9116 makes C<Contact> and C<Expires> both necessary, so C<contact>
 and C<expires> stand or fall together. The C<Encryption> field needs
-an absolute URL, so a description that names no C<url> writes no such
-field.
+an absolute URL, so a block that names no C<url> writes no such field.
+
+A site publishes one F<security.txt>, so one block alone names the
+contact and the expiry. A second block that names either one fails the
+load.
 
 =head2 keys_path
 
-    my $dir  = $config->keys_path;
-    my $file = $config->keys_path('SHA256');
+    my $dir  = $config->keys_path('keys');
+    my $file = $config->keys_path( 'keys', 'SHA256' );
 
-The source key directory, or one file in it. The method answers
-C<undef> when the description holds no C<keys> block.
+One source key directory, or one file in it. The method answers
+C<undef> for a name that no C<keys> block holds.
 
 =head2 site_keys
 
-The C<key> blocks, in file order. Each entry is a hashref:
+    my @key = $config->site_keys('keys');
+
+The C<key> blocks of one key directory, in file order. The directory
+that holds the file owns the block, as the extension of that file owns
+the type. A stem that two directories hold fails the load.
+
+Each entry is a hashref:
 
     name         the key file in the directory
     stem         the block name, which is the name without the
                  extension
-    type         signify or openpgp, from the extension
+    type         signify, openpgp or x509, from the extension
     serial       the rotation count of the purpose
     purpose      what the key signs
     status       current, next or retired
@@ -269,11 +293,33 @@ The C<key> blocks, in file order. Each entry is a hashref:
 The list is named C<site_keys> and not C<keys>, because a method named
 C<keys> in the package makes every call of the builtin ambiguous.
 
+=head2 site_bindings
+
+    my @binding = $config->site_bindings('keys');
+
+The binding files of one key directory, in name order. A binding is
+the signature of one key file by another key of the same directory.
+Each entry is a hashref:
+
+    name     the binding file in the directory
+    target   the key file that the signature covers
+    signer   the key file of the key that signed it
+    type     the type of the signer
+
+A binding carries no block: its name holds every field, and
+L<Fugu::KeyDir> parses it. The list holds a binding whose target and
+whose signer are both keys of that directory, and
+L<App::FuguWeb::Keys> reports every other name as a stray file.
+
 =head2 key_paths
 
-Every path of the key directory in the output, relative to the output
-directory, or the empty list when the description holds no C<keys>
-block. L</inventory> holds the same paths.
+Every path of every key directory in the output, relative to the
+output directory, or the empty list when the description holds no
+C<keys> block. L</inventory> holds the same paths.
+
+The site holds one well-known tree, and each directory writes into it.
+The list therefore holds one entry for the policy file, and one for an
+address that two directories name.
 
 =head1 GROUPS
 

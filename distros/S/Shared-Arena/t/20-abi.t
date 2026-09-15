@@ -39,7 +39,7 @@ is(Shared::Arena::_abi_selftest(), 0,
 # it was built against. 0.03 appended map_store_ttl and the cuckoo filter,
 # taking it to 2. The next `is` proves the header and the compiled table agree
 # on that number, which is what actually matters.
-is(Shared::Arena::_abi_version(), 2,
+is(Shared::Arena::_abi_version(), 3,
    'the table is at version 2, matching sa_abi.h after the 0.03 appends');
 
 {
@@ -120,6 +120,9 @@ is(Shared::Arena::_abi_version(), 2,
             sb_open sb_release sb_take sb_field sb_begin sb_set_gauge
             sb_add_gauge sb_set_status sb_end sb_read sb_slots sb_nfields
             sb_field_name
+
+            hll_open hll_release hll_add hll_count hll_merge hll_reset
+            hll_precision hll_filled
         )], 'the entries are in the order they were published in');
 
         # Under PERL_IMPLICIT_SYS - every Strawberry perl - XSUB.h redefines

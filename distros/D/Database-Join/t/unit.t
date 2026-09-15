@@ -20,7 +20,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 81;
+	plan tests => 90;
 	use_ok('Database::Join');
 }
 
@@ -140,17 +140,31 @@ my %LEDGER = (
 	'filt:inner_partner'         => 1,
 	'filt:criteria_merge_and'    => 1,
 	'filt:scalar_replaces_base'  => 1,
+
+	# collision_prefix semantics (POD: "collision_prefix - preserve colliding columns")
+	'cp:new_param_stored'        => 1,  # constructor stores the hashref
+	'cp:columns_show_both'       => 1,  # both plain and prefixed names visible
+	'cp:join_col_not_prefixed'   => 1,  # join_column never gains a prefix
+	'cp:non_collision_plain'     => 1,  # non-colliding secondary column stays plain
+	'cp:index0_ignored'          => 1,  # index-0 entry is silently ignored
+	'cp:schema_prefixed_key'     => 1,  # schema keyed under prefixed name
+	'cp:rows_both_values'        => 1,  # merged row carries both values
+	'cp:criterion_prefixed_routes' => 1, # criterion on "pfx.col" routes to correct DA
+	'cp:remove_prefixed_col'     => 1,  # remove_column on published prefixed name works
 );
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-Readonly::Scalar my $JC     => 'entry';
-Readonly::Scalar my $COL_A  => 'name';
-Readonly::Scalar my $COL_B  => 'score';
-Readonly::Scalar my $COL_C  => 'tier';
-Readonly::Scalar my $TS_OLD => 1_000_000;
-Readonly::Scalar my $TS_NEW => 2_000_000;
+Readonly::Scalar my $JC          => 'entry';
+Readonly::Scalar my $COL_A       => 'name';
+Readonly::Scalar my $COL_B       => 'score';
+Readonly::Scalar my $COL_C       => 'tier';
+Readonly::Scalar my $TS_OLD      => 1_000_000;
+Readonly::Scalar my $TS_NEW      => 2_000_000;
+Readonly::Scalar my $CP_PREFIX   => 'b';         # collision_prefix value used in cp tests
+Readonly::Scalar my $COL_SHARED  => 'notes';     # the column that collides between two DBs
+Readonly::Scalar my $COL_PFX     => "b.notes";   # published prefixed name of the collision
 
 # ---------------------------------------------------------------------------
 # MinimalDA: inline Database::Abstraction stub.
@@ -297,7 +311,7 @@ subtest 'new: error_no_databases -- empty databases arrayref' => sub {
 subtest 'new: error_invalid_db -- non-DA object in databases' => sub {
 	plan tests => 1;
 	throws_ok { Database::Join->new(databases => [ bless {}, 'NotDA' ], join_column => $JC) }
-		qr/databases\[0\] is not a Database::Abstraction/,
+		qr/databases\[0\] does not support/,
 		'new() croaks with error_invalid_db for a non-DA element';
 	delete $LEDGER{'new:error_invalid_db'};
 };
@@ -712,7 +726,7 @@ subtest 'add_database: error_invalid_db for non-DA object' => sub {
 	plan tests => 1;
 	my $j = _two_db_join();
 	throws_ok { $j->add_database(bless {}, 'WrongClass') }
-		qr/is not a Database::Abstraction/,
+		qr/does not support the selectall_arrayref/,
 		'add_database() croaks with error_invalid_db for a non-DA argument';
 	delete $LEDGER{'adb:error_invalid_db'};
 };
@@ -1261,7 +1275,169 @@ subtest 'filters: scalar query criterion replaces the base filter for that colum
 };
 
 # ===========================================================================
-# SECTION 16 -- API ledger verification (must be last)
+# SECTION 16 -- collision_prefix semantics
+#
+# Exercises every documented behaviour of the collision_prefix parameter.
+# Uses two databases that share the column 'notes'.  With collision_prefix =>
+# { 1 => 'b' } the secondary's copy is published as 'b.notes'; without it the
+# last-database-wins default applies.
+# ===========================================================================
+
+# Helper: two-DB join where both databases have a 'notes' column.
+sub _collision_join {
+	my (%opts) = @_;
+	my $db_a = MinimalDA->new(
+		cols   => [$JC, $COL_SHARED, 'amount'],
+		rows   => [ { entry => 'K1', notes => 'note-a', amount => 10 } ],
+		schema => {
+			$JC        => { type => 'TEXT' },
+			$COL_SHARED => { type => 'TEXT' },
+			amount      => { type => 'INTEGER' },
+		},
+	);
+	my $db_b = MinimalDA->new(
+		cols   => [$JC, $COL_SHARED, 'price'],
+		rows   => [ { entry => 'K1', notes => 'note-b', price => 5 } ],
+		schema => {
+			$JC        => { type => 'TEXT' },
+			$COL_SHARED => { type => 'TEXT' },
+			price       => { type => 'INTEGER' },
+		},
+	);
+	return Database::Join->new(
+		databases        => [$db_a, $db_b],
+		join_column      => $JC,
+		collision_prefix => { 1 => $CP_PREFIX },
+		%opts,
+	);
+}
+
+subtest 'collision_prefix: constructor parameter stored in object' => sub {
+	plan tests => 1;
+	my $j = _collision_join();
+	is_deeply($j->{_collision_prefix}, { 1 => $CP_PREFIX },
+		'new() stores collision_prefix verbatim in the object');
+	delete $LEDGER{'cp:new_param_stored'};
+};
+
+subtest 'collision_prefix: columns() shows both original and prefixed names' => sub {
+	plan tests => 2;
+	# POD: "Both values are then visible: the original column keeps its name (from
+	# the earlier database), and the collision gets the prefixed name."
+	my $j     = _collision_join();
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok($col_h{$COL_SHARED}, "original '$COL_SHARED' present in columns() (from primary DB)");
+	ok($col_h{$COL_PFX},    "prefixed '$COL_PFX' present in columns() (collision from secondary)");
+	delete $LEDGER{'cp:columns_show_both'};
+};
+
+subtest 'collision_prefix: join_column never gains a prefix' => sub {
+	plan tests => 1;
+	# POD states the join_column is the shared merge key; it must not be renamed.
+	my $j     = _collision_join();
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok(!$col_h{"$CP_PREFIX.$JC"},
+		"prefixed join_column '$CP_PREFIX.$JC' is absent from columns()");
+	delete $LEDGER{'cp:join_col_not_prefixed'};
+};
+
+subtest 'collision_prefix: non-colliding secondary column published plain (no prefix)' => sub {
+	plan tests => 1;
+	# POD: "Non-colliding columns from a secondary database are always added as-is
+	# with no prefix, whether or not collision_prefix is configured."
+	my $j     = _collision_join();
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok($col_h{price} && !$col_h{"$CP_PREFIX.price"},
+		"non-colliding secondary column 'price' present plain with no prefix");
+	delete $LEDGER{'cp:non_collision_plain'};
+};
+
+subtest 'collision_prefix: index-0 entry is silently ignored (primary never prefixed)' => sub {
+	plan tests => 1;
+	# POD: "An index-0 entry is meaningless and silently ignored."
+	# With only an index-0 prefix, last-DB-wins applies as if collision_prefix were absent.
+	my $db_a = MinimalDA->new(cols => [$JC, $COL_SHARED], rows => [
+		{ entry => 'K1', notes => 'note-a' },
+	]);
+	my $db_b = MinimalDA->new(cols => [$JC, $COL_SHARED], rows => [
+		{ entry => 'K1', notes => 'note-b' },
+	]);
+	my $j = Database::Join->new(
+		databases        => [$db_a, $db_b],
+		join_column      => $JC,
+		collision_prefix => { 0 => $CP_PREFIX },  # index 0 is silently ignored
+	);
+	# Last-DB-wins should apply: 'notes' from db_b overwrites db_a's.
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok(!$col_h{"$CP_PREFIX.$COL_SHARED"},
+		"no prefixed column created when only index-0 entry given (silently ignored)");
+	delete $LEDGER{'cp:index0_ignored'};
+};
+
+subtest 'collision_prefix: schema() keyed under published prefixed name' => sub {
+	plan tests => 2;
+	my $j = _collision_join();
+	my $s = $j->schema();
+	ok(exists $s->{$COL_PFX},    "schema() has entry for prefixed name '$COL_PFX'");
+	ok(exists $s->{$COL_SHARED}, "schema() also has entry for plain '$COL_SHARED' (from primary)");
+	delete $LEDGER{'cp:schema_prefixed_key'};
+};
+
+subtest 'collision_prefix: merged row carries both the primary and prefixed secondary values' => sub {
+	plan tests => 2;
+	# POD example: "$row->{notes} -- from primary; $row->{'b.notes'} -- from secondary"
+	my $j   = _collision_join();
+	my $row = $j->fetchrow_hashref(entry => 'K1');
+	is($row->{$COL_SHARED}, 'note-a',
+		"merged row has primary value under plain name '$COL_SHARED'");
+	is($row->{$COL_PFX}, 'note-b',
+		"merged row has secondary value under prefixed name '$COL_PFX'");
+	delete $LEDGER{'cp:rows_both_values'};
+};
+
+subtest 'collision_prefix: criterion on prefixed name routes to the correct secondary DA' => sub {
+	plan tests => 2;
+	# POD example: "$join->selectall_arrayref('products.product' => 'widget')"
+	# "Internally routes as: product => 'widget' to the secondary database"
+	my $db_a = MinimalDA->new(
+		cols => [$JC, $COL_SHARED],
+		rows => [
+			{ entry => 'K1', notes => 'note-a1' },
+			{ entry => 'K2', notes => 'note-a2' },
+		],
+	);
+	my $db_b = MinimalDA->new(
+		cols => [$JC, $COL_SHARED],
+		rows => [
+			{ entry => 'K1', notes => 'note-b1' },
+			{ entry => 'K2', notes => 'note-b2' },
+		],
+	);
+	my $j    = Database::Join->new(
+		databases        => [$db_a, $db_b],
+		join_column      => $JC,
+		collision_prefix => { 1 => $CP_PREFIX },
+	);
+	my $rows = $j->selectall_arrayref($COL_PFX => 'note-b1');
+	is(scalar @{$rows}, 1,      "criterion '$COL_PFX => note-b1' returns exactly 1 row");
+	is($rows->[0]{entry}, 'K1', 'correct row (K1) returned');
+	delete $LEDGER{'cp:criterion_prefixed_routes'};
+};
+
+subtest 'collision_prefix: remove_column on the prefixed name hides that column' => sub {
+	plan tests => 2;
+	# POD: "remove_column operates on published names.  To suppress a prefixed
+	# collision column entirely, pass the prefixed name."
+	my $j = _collision_join();
+	$j->remove_column($COL_PFX);
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok(!$col_h{$COL_PFX},    "prefixed '$COL_PFX' absent from columns() after remove_column");
+	ok($col_h{$COL_SHARED},  "plain '$COL_SHARED' still present (primary unaffected)");
+	delete $LEDGER{'cp:remove_prefixed_col'};
+};
+
+# ===========================================================================
+# SECTION 17 -- API ledger verification (must be last)
 # Must run last so all deletes above have completed.
 # ===========================================================================
 

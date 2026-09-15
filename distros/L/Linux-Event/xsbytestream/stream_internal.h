@@ -48,6 +48,9 @@ typedef struct les_write_seg_s {
 } les_write_seg_t;
 
 typedef struct les_descriptor_s {
+    /* Class tuning defaults. These remain in the immutable descriptor as the
+     * construction/transition template. Live I/O reads the copied values in
+     * les_xsstate_t instead. */
     size_t read_size;
     UV read_budget_bytes;
     UV read_batch_bytes;
@@ -135,6 +138,18 @@ typedef struct les_xsstate_s {
     void *transport_context;
     les_descriptor_t *descriptor;
     SV *descriptor_sv;
+
+    /* Effective mutable tuning is connection-local. The read/write hot paths
+     * read these fields directly and never resolve class/instance policy. */
+    size_t read_size;
+    UV read_budget_bytes;
+    UV read_batch_bytes;
+    UV message_batch_size;
+    UV high_watermark;
+    UV low_watermark;
+    UV max_pending_bytes;
+    UV max_buffer;
+
     SV *input_cb;
     SV *instance_input_cb;
     SV *drain_cb;
@@ -199,9 +214,7 @@ typedef struct les_xsstate_s {
 } les_xsstate_t;
 
 #define LES_STAT(st, name) ((st)->stats.name)
-
 #define LES_INPUT_PAUSED(st) ((st)->read_paused || (st)->consumer_paused)
-
 
 extern const les_transport_ops_t les_plain_transport_ops;
 

@@ -1,4 +1,4 @@
-package Pod::Weaver::Section::Bugs 4.021;
+package Pod::Weaver::Section::Bugs 4.022;
 # ABSTRACT: a section for bugtracker info
 
 use Moose;
@@ -6,7 +6,7 @@ use Text::Wrap ();
 with 'Pod::Weaver::Role::Section';
 
 # BEGIN BOILERPLATE
-use v5.20.0;
+use v5.22.0;
 use warnings;
 use utf8;
 no feature 'switch';
@@ -128,7 +128,7 @@ Pod::Weaver::Section::Bugs - a section for bugtracker info
 
 =head1 VERSION
 
-version 4.021
+version 4.022
 
 =head1 OVERVIEW
 

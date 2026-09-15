@@ -17,3 +17,9 @@ system $ninja_exe, '--version';
 # Option B: put bin_dir first on PATH, so a plain 'ninja' resolves (and every child of this process inherits it)
 local $ENV{PATH} = join $Config{path_sep}, ( @bins, $ENV{PATH} );
 system 'ninja', '--version';
+__END__
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in
+the Artistic License 2. Other copyrights, terms, and conditions may apply to data transmitted
+through this module.

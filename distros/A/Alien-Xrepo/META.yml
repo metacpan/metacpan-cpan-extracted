@@ -34,27 +34,38 @@ no_index:
 provides:
   Alien::Xrepo:
     file: lib/Alien/Xrepo.pm
-    version: v1.0.0
+    version: v1.0.1
   Alien::Xrepo::Build:
     file: lib/Alien/Xrepo/Build.pm
-    version: v1.0.0
+    version: v1.0.1
+  Alien::Xrepo::Build::Dist:
+    file: lib/Alien/Xrepo/Build/Dist.pm
+    version: v1.0.1
   Alien::Xrepo::Build::Recipe:
     file: lib/Alien/Xrepo/Build/Recipe.pm
-    version: v1.0.0
+    version: v1.0.1
+  Alien::Xrepo::MB:
+    file: lib/Alien/Xrepo/MB.pm
+    version: v1.0.1
+  Alien::Xrepo::MM:
+    file: lib/Alien/Xrepo/MM.pm
+    version: v1.0.1
   Alien::Xrepo::PackageInfo:
     file: lib/Alien/Xrepo.pm
-    version: v1.0.0
+    version: v1.0.1
   Alien::Xrepo::Runtime:
     file: lib/Alien/Xrepo/Runtime.pm
-    version: v1.0.0
+    version: v1.0.1
   Alien::Xrepo::Runtime::Alt:
     file: lib/Alien/Xrepo/Runtime.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Alien::Xmake: v1.0.0
   Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
   File::ShareDir: '0'
   JSON::PP: '0'
+  Module::Build: '0'
   Path::Tiny: '0'
   Scalar::Util: '0'
   perl: v5.40.0
@@ -63,7 +74,7 @@ resources:
   homepage: https://github.com/sanko/Alien-Xrepo
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/sanko/Alien-Xrepo.git
-version: v1.0.0
+version: v1.0.1
 x_authority: cpan:SANKO
 x_ignore:
   - .tidyallrc

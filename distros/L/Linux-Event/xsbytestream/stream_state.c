@@ -107,9 +107,9 @@ les_state_stats_snapshot(pTHX_ les_xsstate_t *st)
     LES_PUSH_STAT(drain_calls);
     LES_PUSH_STAT(empty_calls);
 #undef LES_PUSH_STAT
-    av_push(values, newSVuv(st->descriptor->read_budget_bytes));
-    av_push(values, newSVuv(st->descriptor->read_batch_bytes));
-    av_push(values, newSVuv(st->descriptor->message_batch_size));
+    av_push(values, newSVuv(st->read_budget_bytes));
+    av_push(values, newSVuv(st->read_batch_bytes));
+    av_push(values, newSVuv(st->message_batch_size));
     av_push(values, newSVuv(st->input_len));
     av_push(values, newSViv(st->consumer_flush_pending ? 1 : 0));
     av_push(values, newSViv(st->consumer_paused ? 1 : 0));

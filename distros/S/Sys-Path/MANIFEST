@@ -8,7 +8,13 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+script/syspath.pl
 t/01_Sys-Path.t
+t/02-install-checksums.t
+t/03-builder-literals.t
+t/04-sharedstatedir-install.t
+t/05-build-options.t
+t/06-syspath.t
 t/libs/v1/Build.PL
 t/libs/v1/lib/TestDR/build.pm
 t/libs/v2/lib/TestDR/makefile.pm
@@ -16,6 +22,8 @@ t/libs/v2/Makefile.PL
 t/libs/v3/lib/TestDR/F/F2/t.pm
 t/libs/v3/MANIFEST
 t/libs/v3/t/.exists
+t/libs/v4/Build.PL
+t/libs/v4/lib/TestDR/broken.pm
 varlib/syspath/.exists
 xt/distribution.t
 xt/fixme.t

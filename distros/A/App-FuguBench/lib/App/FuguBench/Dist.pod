@@ -1,0 +1,134 @@
+=head1 NAME
+
+App::FuguBench::Dist - the shim verb and the install verb of fugubench
+
+=head1 SYNOPSIS
+
+    $ fugubench shim > scripts/fugubench
+    $ fugubench install
+    /home/operator/.local/bin/fugubench
+
+=head1 DESCRIPTION
+
+B<App::FuguBench::Dist> holds the C<shim> verb and the C<install>
+verb. A consumer runs the program through a wrapper shim, and that
+shim holds the version that it runs. A later plan of FuguBSD/Tooling
+adds the shim to the org pack, and a new version is then a new sync.
+
+Neither verb reads a checkout, so each one runs in a home with no
+F<.toolingrc>. A fresh clone runs the shim before any install.
+
+=head2 command
+
+C<command($verb)> returns the entry of the L<Fugu::CLI> table of one
+verb. The module holds two verbs, so it reads the name. An unknown
+name is a programming error of the verb table, and the method dies.
+
+=head1 THE SHIM VERB
+
+C<shim> prints one POSIX shell script to standard output. The script
+holds the download URL and the sha256 digest of the running file, so
+it pins one release. It fits in 60 lines, and a reader audits it in
+one screen.
+
+The script runs the file that C<FUGUBENCH> names, when that value
+names an executable. With no C<FUGUBENCH> in the environment, it
+runs the cached file under F<~/.cache/fugubench/>, under the
+directory of the version. With no cached file, it downloads the
+packed file with the first of C<curl>, C<wget>, and C<ftp> on
+C<PATH>. Each download follows a redirect, because a release asset
+answers one. It computes the digest with the first of C<sha256>,
+C<shasum> and C<sha256sum>. It then sets the mode 755 and moves the
+file into the cache, which is one rename.
+
+The script passes every argument through, and it exits with the code
+of the program.
+
+=head2 THE FAILURES OF THE SHIM
+
+A trap removes the download at every exit, so a failed download and
+a failed digest leave no file behind. A failed digest prints the
+expected and the computed value, and it exits 1. An absent
+downloader, and an absent digest tool, each name the three commands
+and exit 1.
+
+A C<FUGUBENCH> value that names no executable prints that value and
+exits 1. The script downloads no release then, because the developer
+named the file. An empty value names no executable as well, so the
+script refuses it.
+
+=head2 THE VERSION OF THE SHIM
+
+The shim pins the release that stamped the program. A checkout
+carries no stamp, and a build of a tree with no tag carries C<0.0.0>.
+No release holds either one, so the verb reports and returns 1. The
+message names the packed file of a release as the place to run it.
+
+The verb writes the version into shell text. So it refuses a version
+that is no dotted-decimal number, and it returns 1. A value with a
+space or a semicolon would write broken or injected shell.
+
+=head1 THE INSTALL VERB
+
+C<install> copies the running file to F<~/.local/bin/fugubench>, and
+it prints that path to standard output. The write is atomic, so a
+reader sees the old file or the new one. The mode of the copy is
+755, and a chmod sets it, because the open of the write takes the
+umask of the operator.
+
+The verb makes the install directory when it is absent. When no
+C<PATH> entry names that directory, the verb prints one hint line to
+standard error.
+
+The verb stops with an error when C<HOME> is unset, because the
+install directory sits under it.
+
+=head1 THE SANDBOX
+
+Each verb opens a file of its own and runs no child, so each row
+unveils the paths that it opens.
+
+=head2 shim_paths
+
+C<shim_paths> returns the unveil list of the C<shim> row: the
+library directories of the interpreter, and the directory of the
+running file. The verb reads that file and writes to standard
+output.
+
+=head2 install_paths
+
+C<install_paths> returns the unveil list of the C<install> row: the
+library directories of the interpreter, the directory of the running
+file, and the install directory. The verb reads that file and writes
+the copy.
+
+The install directory holds the running file after an install. Two
+entries then name one directory. unveil(2) returns EPERM on a second
+entry that widens a path, so the row keeps the wider entry alone. Its
+C<rwc> mode reads as well, so the row loses nothing.
+
+The method makes the install directory. unveil(2) hides every path
+that the list leaves out, and the list can name the install
+directory alone, so a mkdir under the parent would fail after the
+entry. The verb makes the directory as well, so the verb holds
+without this row.
+
+=head1 RETURN VALUES
+
+C<command> returns a hash reference. The body of C<shim> returns 0
+after the print. It returns 1 when no release stamped the running
+file, when the version is no dotted-decimal number, or when that file
+does not open. The body of C<install> returns 0 after the copy, and 1
+after a failed one. Either verb returns 2 for a command line that
+holds an argument.
+
+=head1 SEE ALSO
+
+L<App::FuguBench>, L<App::FuguBench::Version>, L<Fugu::CLI>,
+L<Fugu::File>, L<Fugu::Sandbox>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

@@ -48,6 +48,9 @@ my @library_error_names = qw(
     NGHTTP2_ERR_CALLBACK_FAILURE
     NGHTTP2_ERR_TEMPORAL_CALLBACK_FAILURE
     NGHTTP2_ERR_DEFERRED
+    NGHTTP2_ERR_STREAM_CLOSING
+    NGHTTP2_ERR_PROTO
+    NGHTTP2_ERR_HTTP_HEADER
 );
 
 is_deeply(
@@ -74,5 +77,8 @@ for my $name (@Net::HTTP2::nghttp2::EXPORT_OK) {
 
 is(Net::HTTP2::nghttp2::NGHTTP2_INTERNAL_ERROR(), 2, 'INTERNAL_ERROR has its RFC value');
 is(Net::HTTP2::nghttp2::NGHTTP2_CANCEL(), 8, 'CANCEL has its RFC value');
+is(Net::HTTP2::nghttp2::NGHTTP2_ERR_STREAM_CLOSING(), -511, 'STREAM_CLOSING has its nghttp2 value');
+is(Net::HTTP2::nghttp2::NGHTTP2_ERR_PROTO(), -505, 'PROTO has its nghttp2 value');
+is(Net::HTTP2::nghttp2::NGHTTP2_ERR_HTTP_HEADER(), -531, 'HTTP_HEADER has its nghttp2 value');
 
 done_testing;

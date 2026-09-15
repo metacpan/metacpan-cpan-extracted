@@ -153,10 +153,17 @@ pod_spelling_system:
     - nauwelaerts
     - cryptographic
     - TLS
-    - aggresive
     - CPUs
     - Florian
     - Weimer
+    - Fandiño
+    - Guervós
+    - Håkon
+    - Hægland
+    - Joaquín
+    - José
+    - Telka
+    - mtelka
 
 pod_coverage:
   skip: 0

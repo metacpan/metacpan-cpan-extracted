@@ -2,10 +2,10 @@ package Test2::EventFacet::Coverage;
 use strict;
 use warnings;
 
-our $VERSION = '0.000029';
+our $VERSION = '0.000030';
 
 BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
-use Test2::Util::HashBase qw{ files submap openmap };
+use Test2::Util::HashBase qw{ files submap openmap root };
 
 1;
 
@@ -32,6 +32,14 @@ This facet has a list of files covered by the test run.
 =item $string = $about->details()
 
 Summary of files run.
+
+=item $string = $about->{root}
+
+=item $string = $about->root()
+
+The directory a relative path in this facet is resolved against, itself a
+canonical absolute path. A consumer in another process needs this to know
+which files those paths name.
 
 =item $arrayref = $about->{files}
 

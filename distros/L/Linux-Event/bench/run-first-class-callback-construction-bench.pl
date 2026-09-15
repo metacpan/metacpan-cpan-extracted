@@ -149,7 +149,11 @@ sub run_style ($style, $repeat) {
     my $fresh_before = $FRESH_CLOSURES;
     my $listener = Linux::Event::Bench::CallbackListener->new(
         loop => $loop, host => '127.0.0.1', port => 0,
-        stream_class => $stream_class, data => $run, %callback,
+        stream => {
+            class => $stream_class,
+            data  => $run,
+            %callback,
+        },
     );
     $run->{port} = $listener->port;
 

@@ -1,0 +1,92 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Alien::Xrepo::MB - A Module::Build subclass that runs the xrepo build pipeline
+
+=head1 SYNOPSIS
+
+    # Build.PL
+    use v5.40;
+    use Alien::Xrepo::MB;
+
+    Alien::Xrepo::MB->new(
+        module_name   => 'Exotic::Zstandard',
+        dist_abstract => 'Build & install zstd via xrepo',
+        requires => {
+            'perl'                  => 'v5.40.0',
+            'Alien::Xrepo::Runtime' => 0,
+            'File::ShareDir'        => '1.00'
+        },
+        configure_requires => {
+            'Alien::Xrepo::MB' => 0,
+            'Module::Build'    => 0
+        },
+        test_requires => { 'Test2::V0' => 0 }
+    )->create_build_script;
+
+=head1 DESCRIPTION
+
+C<Alien::Xrepo::MB> is a L<Module::Build> subclass for the C<Alien::Xrepo> build engine. Running C<./Build> (which is
+what C<./Build test> invokes) first runs the C<xrepo> pipeline through L<Alien::Xrepo::Build>. It writes the hermetic
+run-time snapshot into the distribution's C<share> directory inside C<blib> before the normal C<code> action runs.
+
+The dist contains no C<xrepo.json>. The Alien class (C<< module_name >>) is loaded from C<lib/>, and its C<recipe()>
+method acts as the single declaration for both the build engine and the run-time layer (see L<Alien::Xrepo::Runtime>).
+Packages are shallow-installed into the dist's C<share> directory, and the snapshot records share-relative paths. As a
+result, consumers resolve from the dist's C<share> directory (never the C<xmake> cache) and the same snapshot remains
+valid after C<< ./Build install >> relocates the directory.
+
+=head2 Staleness
+
+The pipeline only (re)runs when the snapshot is missing or older than any of:
+
+=over
+
+=item * C<Build.PL>
+
+=item * C<lib/<class>.pm>
+
+=item * The engine modules themselves (C<Alien::Xrepo::MB>, C<Alien::Xrepo::Build>, C<Alien::Xrepo::Runtime>, C<Alien::Xrepo::Build::Recipe>)
+
+=item * Any files under the dist's local C<recipes/> tree
+
+=back
+
+This mirrors L<Module::Build>'s C<copy_if_modified> semantics, ensuring C<./Build test> does not rewrite an up-to-date
+snapshot.
+
+=head1 PROPERTIES
+
+In addition to the standard L<Module::Build> properties, you can configure:
+
+=over
+
+=item * C<xrepo_snapshot>: Where to write the snapshot. Defaults to the conventional C<< blib/lib/auto/share/dist/<Dist>/xrepo-snapshot.json >>, which is derived from the module name by translating C<::> to C<-> (e.g., C<Alien::Zstandard> becomes C<Alien-Zstandard>; C<Exotic::Zlib> becomes C<Exotic-Zlib>). Set this explicitly if the dist name does not match that derivation.
+
+=item * C<xrepo_share_dir>: Where packages are shallow-installed. Defaults to the snapshot's parent directory (the dist's C<share> directory).
+
+=item * C<xrepo_cache>: Pass C<0> (the default) to bypass C<Alien::Xrepo>'s on-disk resolution cache so no cache file lands inside the C<share> directory. Set to C<1> to keep the cache.
+
+=item * C<xrepo_update_repo>: Pass C<1> to refresh C<xrepo>'s repository index (C<xrepo update-repo>) once and retry an install that fails. Useful when a stale registry reports a precompiled artifact with a checksum that no longer matches the mirror.
+
+=back
+
+=head1 SEE ALSO
+
+L<Alien::Xrepo::Build>, L<Alien::Xrepo::Runtime>, L<Alien::Xrepo>, L<Alien::Xrepo::MM>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2. Other copyrights, terms, and conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=cut

@@ -45,17 +45,46 @@ C<build> and C<clean> take C<--out> I<dir>, which overrides the
 C<out_dir> setting. C<init> writes a starter description and is the one
 command that runs without one.
 
-C<rotate-key> writes the key directory, and L<App::FuguWeb::Rotate>
-holds the work. It takes C<--step> C<mint> or C<promote>, a
-C<--purpose> word, and a C<--secret> path. A mint of a purpose that
-holds a current key also takes C<--signer>, the private half of that
-key. It is the one command that signs, so it is the one command that
-needs C<signify(1)>, and it exits C<EXIT_TOOL_MISSING> without it.
+C<mint-key>, C<import-key> and C<promote-key> write one key directory,
+and L<App::FuguWeb::Rotate> holds the work. Each one takes a
+C<--purpose> word and a C<--dir> name. A description with one C<keys>
+block needs no C<--dir>, and one with several refuses a step without
+it. C<mint-key> and C<import-key> take a C<--type>,
+which defaults to C<signify>, and a C<--secret> path. C<import-key>
+also takes C<--file>, the public key file that it publishes.
+C<promote-key> takes C<--retiring>, the private half of the key that
+retires.
 
-A site that publishes its first key holds no C<keys> block, because
-such a block cannot load until a C<key> block stands beside it. The
-first mint therefore takes C<--org>, and it can take C<--dir> and
-C<--url>. One commit carries the block and the key.
+C<mint-key> makes a C<signify> key or an C<openpgp> key. An OpenPGP
+mint takes C<--email>, the one user id of the key, and an optional
+C<--expires> date of the form C<YYYY-MM-DD>.
+
+C<import-key> publishes a key of every type, C<x509> included. An
+issuer makes a certificate, so no verb mints one: C<--file> names one
+PEM certificate, and C<--secret> names its unencrypted PEM private
+key.
+
+One signify key of the directory is the root of trust, and its purpose
+word is C<root>. Every step but two takes C<--signer>, the private
+half of the current root. A root step takes one C<--bind>
+I<stem>=I<path> for each key in force. The verbs are the commands that
+sign, so they are the commands that need C<signify(1)>, and the
+command of each other type: C<gpg(1)> for an OpenPGP key and
+C<openssl(1)> for a certificate. Each one exits C<EXIT_TOOL_MISSING>
+without the command that its step needs.
+
+A directory that publishes its first key holds no C<keys> block,
+because such a block cannot load until a C<key> block stands beside
+it. The first mint therefore takes C<--bootstrap> and C<--org>, and it
+can take C<--dir> and C<--url>. C<--dir> defaults to C<keys> for a
+description that holds no C<keys> block, so the first mint of a whole
+site needs none. One commit carries the block and the key.
+
+C<--bootstrap> is the intent to make a key directory, and C<mint-key>
+and C<import-key> alone take it. A step without it refuses a C<--dir>
+that no C<keys> block names. Each key directory holds a root of trust
+of its own, so a mistyped C<--dir> would otherwise publish a second
+root in silence.
 
 =head1 EXIT CODES
 

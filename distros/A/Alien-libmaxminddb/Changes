@@ -1,5 +1,9 @@
 Revision history for Alien::libmaxminddb
 
+2.005  2026-09-12 06:56:49 CEST
+
+  - Fix version mismatch. Reported by Kurt Starsinic.
+
 2.004  2026-09-08 18:36:09 CEST
 
   - Update for libmaxminddb 1.14.0

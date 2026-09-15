@@ -11,6 +11,24 @@ use Linux::Event::_Socket::Stream ();
 use Linux::Event::_Socket::Listener ();
 use Linux::Event::_Socket::Dgram ();
 
+{
+    no strict 'refs';
+    my %parent = (
+        'Linux::Event::_ByteStream'       => 'Linux::Event::_IO',
+        'Linux::Event::_Socket'           => 'Linux::Event::_IO',
+        'Linux::Event::_Socket::Stream'   => 'Linux::Event::_ByteStream',
+        'Linux::Event::_Socket::Listener' => 'Linux::Event::_Socket',
+        'Linux::Event::_Socket::Dgram'    => 'Linux::Event::_Socket',
+    );
+    for my $class (sort keys %parent) {
+        is_deeply(
+            [@{"${class}::ISA"}],
+            [$parent{$class}],
+            "$class has one behavioral parent",
+        );
+    }
+}
+
 ok(Linux::Event::_ByteStream->isa('Linux::Event::_IO'),
     '_ByteStream is an internal IO specialization');
 ok(Linux::Event::_Socket->isa('Linux::Event::_IO'),
@@ -20,8 +38,8 @@ ok(!Linux::Event::_ByteStream->isa('Linux::Event::_Socket'),
 ok(!Linux::Event::_Socket->isa('Linux::Event::_ByteStream'),
     '_Socket does not imply ordered-byte semantics');
 
-ok(Linux::Event::_Socket::Stream->isa('Linux::Event::_Socket'),
-    'stream-socket implementation is socket-specific');
+ok(!Linux::Event::_Socket::Stream->isa('Linux::Event::_Socket'),
+    'stream-socket implementation composes rather than inherits socket facilities');
 ok(Linux::Event::_Socket::Stream->isa('Linux::Event::_ByteStream'),
     'stream-socket implementation reuses the ordered-byte engine');
 ok(Linux::Event::_Socket::Listener->isa('Linux::Event::_Socket'),

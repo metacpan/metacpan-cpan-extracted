@@ -57,6 +57,14 @@ subtest '_argv prefix and flags-before-spec invariant' => sub {
     my @argv = $repo->_argv( 'install', ['-y'], 'libsdl3_ttf >=3.2.2' );
     is $argv[-1], 'libsdl3_ttf >=3.2.2', 'versioned spec is a single trailing element';
 };
+subtest '_full_spec composes a pinned version into a single spec token' => sub {
+    is $repo->_full_spec( 'raylib', undef ),   'raylib',       'no version keeps the bare name';
+    is $repo->_full_spec( 'raylib', '' ),      'raylib',       'empty version ignored';
+    is $repo->_full_spec( 'raylib', '6.0.x' ), 'raylib 6.0.x', 'a pinned version joins the name';
+    my @argv = $repo->_argv( 'install', ['-y'], $repo->_full_spec( 'raylib', '6.0.x' ) );
+    is scalar @argv, 6,              'one spec token, no argv inflation';
+    is $argv[-1],    'raylib 6.0.x', 'pinned spec is the single trailing element';
+};
 subtest '_build_args configs boolean rendering' => sub {
 
     # A Perl built-in boolean (use feature 'true'/'false' via use v5.40) must render as the

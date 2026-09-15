@@ -1,7 +1,9 @@
 requires 'Alien::Xmake', 'v1.0.0';
 requires 'Capture::Tiny';
+requires 'ExtUtils::MakeMaker';
 requires 'File::ShareDir';
 requires 'JSON::PP';
+requires 'Module::Build';
 requires 'Path::Tiny';
 requires 'Scalar::Util';
 requires 'perl', 'v5.40.0';

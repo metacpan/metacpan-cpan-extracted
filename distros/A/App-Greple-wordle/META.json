@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.28",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -41,18 +41,23 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "IO::Socket::SSL" : "0"
+         },
          "requires" : {
             "App::Greple" : "8.58",
             "Data::Section::Simple" : "0",
             "Date::Calc" : "0",
             "Getopt::EX" : "v2.1.6",
             "Getopt::EX::Hashed" : "1.05",
+            "HTTP::Tiny" : "0",
+            "JSON::PP" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Mo" : "0",
             "Text::VisualWidth::PP" : "0.05",
             "Try::Tiny" : "0",
-            "perl" : "v5.18.2"
+            "perl" : "v5.24.0"
          }
       },
       "test" : {
@@ -64,7 +69,7 @@
    "provides" : {
       "App::Greple::wordle" : {
          "file" : "lib/App/Greple/wordle.pm",
-         "version" : "0.13"
+         "version" : "1.00"
       },
       "App::Greple::wordle::NYT" : {
          "file" : "lib/App/Greple/wordle/NYT.pm"
@@ -74,15 +79,6 @@
       },
       "App::Greple::wordle::game" : {
          "file" : "lib/App/Greple/wordle/game.pm"
-      },
-      "App::Greple::wordle::util" : {
-         "file" : "lib/App/Greple/wordle/util.pm"
-      },
-      "App::Greple::wordle::word_all" : {
-         "file" : "lib/App/Greple/wordle/word_all.pm"
-      },
-      "App::Greple::wordle::word_hidden" : {
-         "file" : "lib/App/Greple/wordle/word_hidden.pm"
       }
    },
    "release_status" : "stable",
@@ -97,7 +93,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-wordle"
       }
    },
-   "version" : "0.13",
+   "version" : "1.00",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

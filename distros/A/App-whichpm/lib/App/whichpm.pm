@@ -17,7 +17,7 @@ from shell:
 
 =head1 DESCRIPTION
 
-Loads a given module and reports it's location and version.
+Locates a given module and reports its path and version without loading it.
 
 The similar function can be achieved via:
 
@@ -32,9 +32,10 @@ The similar function can be achieved via:
 use warnings;
 use strict;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-use File::Spec;
+use Module::Metadata;
+use Module::Path qw(module_path);
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
@@ -55,7 +56,7 @@ same as L</find> only exported under C<which_pm> name.
 
 =head2 find($module_name)
 
-Loads the C<$module_name>.
+Locates C<$module_name> without loading it.
 
 In scalar context returns filename corresponding to C<$module_name>.
 In array context returns filename and version.
@@ -66,35 +67,18 @@ C<$module_name> can be either C<Some::Module::Name> or C<Some/Module/Name.pm>
 
 sub find {
 	my $module_name = shift;
-	my $module_filename;
 
 	if ($module_name =~ m/\.pm$/xms) {
 		$module_name     = substr($module_name, 0, -3);
 		$module_name     =~ s{[/\\]}{::}g;
 	}
 
-	$module_filename        = $module_name.'.pm';
-	my $module_inc_filename = join('/', split('::', $module_filename));
-	$module_filename        = File::Spec->catfile(split('::', $module_filename));
-
-	eval "use $module_name;";
-	my $filename = $INC{$module_inc_filename};
-
-	# if the filename is not in %INC then try to search the @INC folders
-	if (not $filename) {
-		foreach my $inc_path (@INC) {
-			my $module_full_filename = File::Spec->catfile($inc_path, $module_filename);
-			return $module_full_filename
-				if -f $module_full_filename;
-		}
-		return;
-	}
-
-	# MSWin32 has unix / in the %INC folder paths, so recreate the filename
-	$filename = File::Spec->catfile(split(m{[/\\]}, $filename));
+	my $filename = module_path($module_name);
+	return if not defined $filename;
 
 	if (wantarray) {
-		my $version  = eval { $module_name->VERSION };
+		my $metadata = Module::Metadata->new_from_file($filename);
+		my $version  = $metadata->version($module_name);
 		return ($filename, (defined $version ? $version : ()));
 	}
 
@@ -109,7 +93,7 @@ __END__
 =head1 SEE ALSO
 
 L<http://perlmonks.org/?node=whichpm>, L<pmpath|http://search.cpan.org/perldoc?pmpath>,
-L<Module::InstalledVersion>, L<Module::Info>
+L<Module::Path>, L<Module::Metadata>, L<Module::InstalledVersion>, L<Module::Info>
 
 =head1 AUTHOR
 

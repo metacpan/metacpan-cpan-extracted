@@ -29,22 +29,21 @@ WriteMakefile(
 	}, PREREQ_PM => {
 		'autodie' => 0,
 		'Carp' => 0,
-		'IPC::System::Simple' => 0,
 		'Object::Configure' => 0,
 		'Params::Get' => 0,
 		'Params::Validate::Strict' => 0.31,
-		'Readonly::Values::Months' => 0,
 		'Readonly' => 0,
 	# }, RECOMMENDED => {
 		# 'Net::DNS' => 0,
 		# 'LWP::UserAgent' => 0,
 		# 'HTML::LinkExtor' => 0
 	}, TEST_REQUIRES => {
+		'Log::Abstraction' => 0,
+		'IPC::System::Simple' => 0,
+		'Scalar::Util' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
-		'Test::Returns' => 0,
-		'Test::Which' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'Genealogy-Relationship-Name-*' },
 	# META_ADD => {

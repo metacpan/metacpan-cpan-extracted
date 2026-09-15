@@ -1,5 +1,10 @@
 Revision history for Perl module Module::Loader
 
+0.05 2026-09-13 NEILB
+    - When folders in @inc include trailing slash, find_modules()
+      was returning incorrect module names - first letter stripped.
+      Test and fix from Jozef Kutej.
+
 0.04 2021-03-11 NEILB
     - Include META.json in the release
     - Switched to github issues rather than RT

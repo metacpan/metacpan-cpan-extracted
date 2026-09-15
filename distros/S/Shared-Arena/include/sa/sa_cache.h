@@ -101,7 +101,11 @@ typedef struct {
     volatile unsigned char locks[SA_LOCK_STRIPES];
 } sa_cache_hdr;
 
-typedef struct sa_cache {
+#ifndef SA_CACHE_FWD
+#define SA_CACHE_FWD
+typedef struct sa_cache sa_cache;
+#endif
+struct sa_cache {
     sa_region     *arena;
     sa_cache_hdr  *hdr;
     char          *ways;
@@ -114,7 +118,7 @@ typedef struct sa_cache {
     uint64_t       pend_pid;
     uint32_t       pend_hits;
     uint32_t       pend_misses;
-} sa_cache;
+};
 
 #define SA_CWAY_AT(c, b, w) \
     ((sa_cache_way *)((c)->ways + \

@@ -35,6 +35,23 @@ use Linux::Event::Kernel::Process ();
     sub on_data ($self, $bytes) { }
 }
 {
+    package T::ArchitectureStatefulSockStream;
+    use parent 'Linux::Event::IO::Sock::Stream';
+
+    sub new ($class, %option) {
+        my $self = $class->SUPER::new(%option);
+        $self->{application_sequence} = 17;
+        return $self;
+    }
+
+    sub application_sequence ($self, @value) {
+        $self->{application_sequence} = $value[0] if @value;
+        return $self->{application_sequence};
+    }
+
+    sub on_data ($self, $bytes) { }
+}
+{
     package T::ArchitectureDgram;
     use parent 'Linux::Event::IO::Sock::Dgram';
     sub on_datagram ($self, $bytes, $peer) { }
@@ -105,6 +122,19 @@ ok($stream->isa('Linux::Event::IO::Sock::Stream'),
     'connected SOCK_STREAM constructs through the public leaf');
 $stream->close;
 close $stream_peer;
+
+socketpair(my $stateful_fh, my $stateful_peer, AF_UNIX, SOCK_STREAM, 0)
+    or die "stateful socketpair: $!";
+my $stateful = T::ArchitectureStatefulSockStream->new(fh => $stateful_fh);
+is($stateful->application_sequence, 17,
+    'Sock::Stream subclass owns ordinary instance state');
+$stateful->application_sequence(23);
+is($stateful->application_sequence, 23,
+    'Sock::Stream subclass accessor updates its own instance state');
+$stateful->close;
+is($stateful->application_sequence, 23,
+    'Stream teardown preserves unrelated subclass-owned state');
+close $stateful_peer;
 
 socketpair(my $pipe_socket, my $pipe_socket_peer, AF_UNIX, SOCK_STREAM, 0)
     or die "stream socketpair: $!";

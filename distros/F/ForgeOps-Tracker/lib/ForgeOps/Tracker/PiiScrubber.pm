@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use Exporter qw(import);
 
-# Redacts likely-sensitive content out of a payload before it ever leaves this process -- the
+# Redacts likely-sensitive content out of a payload before it ever leaves this process: the
 # same patterns ForgeOps itself applies again on arrival (defense in depth: this layer keeps the
 # data off the wire and out of any request logging in between; the server-side layer is what
-# actually protects the database). Ported from app/services/pii_scrubber.rb -- same key list, same
+# actually protects the database). Ported from app/services/pii_scrubber.rb: same key list, same
 # 8 regex patterns, same "[LABEL FILTERED]" replacement format, same REDACTED constant.
-# Deliberately does NOT support Project#additional_sensitive_keys -- confirmed server-side only
+# Deliberately does NOT support Project#additional_sensitive_keys: confirmed server-side only
 # (see that file's own header comment: extending the pattern list to arbitrary customer regexes is
 # a ReDoS risk best kept out of every client).
 our @EXPORT_OK = qw(scrub scrub_string REDACTED);
@@ -25,7 +25,7 @@ my @SENSITIVE_KEYS = qw(
     privatekey
 );
 
-# Order matters no more than it does in any other port -- each pattern is applied independently
+# Order matters no more than it does in any other port: each pattern is applied independently
 # to the same string, left to right, same as every other language's version.
 my @PATTERNS = (
     ['EMAIL',        qr/[a-zA-Z0-9._%+-]+\@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/],
@@ -38,7 +38,7 @@ my @PATTERNS = (
     ['GITHUB TOKEN',  qr/\bgh[pousr]_[A-Za-z0-9]{20,}\b/],
 );
 
-# scrub($value, $key) -- $value may be a scalar, an arrayref, or a hashref (Perl's own equivalent
+# scrub($value, $key): $value may be a scalar, an arrayref, or a hashref (Perl's own equivalent
 # of Ruby's Hash/Array/String/other dispatch). $key is the enclosing hash key $value was found
 # under (undef for a bare top-level value, or an array element), and is what the key-name check
 # runs against, mirroring app/services/pii_scrubber.rb's own recursive `scrub` exactly.

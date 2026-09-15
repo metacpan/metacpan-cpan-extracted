@@ -28,7 +28,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require DBD::SQLite; require DBI; require Database::Abstraction };
 	plan skip_all => 'DBD::SQLite, DBI, and Database::Abstraction required' if $@;
-	plan tests => 54;
+	plan tests => 64;
 	use_ok('Database::Join');
 }
 
@@ -980,4 +980,166 @@ subtest 'spy: column criterion routed only to the database that owns that column
 		'tier criterion NOT forwarded to intscore (which does not own tier)');
 };
 
-diag('section 14 done -- integration tests complete') if $ENV{TEST_VERBOSE};
+diag('section 14 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 15 -- collision_prefix: end-to-end workflow (5 subtests)
+#
+# collision_prefix maps a zero-based DB index to a prefix string.  When a
+# column in a secondary database collides with a column already in the merged
+# view, the secondary's copy is published as "prefix.col" so both values
+# survive in every merged row.  Non-colliding columns are always plain.
+# The join_column itself is never prefixed.  Index-0 entries are silently ignored.
+# ===========================================================================
+
+Readonly::Scalar my $CP_PFX    => 'ext';
+Readonly::Scalar my $COL_NOTES => 'notes';
+Readonly::Scalar my $COL_PFX_N => "$CP_PFX.$COL_NOTES";
+
+# Two in-memory DAs that both carry a 'notes' column.  DA-A also has 'amount';
+# DA-B also has 'price'.  Only 'notes' collides, so only it gets a prefix.
+my $cp_db_a = InMemDA->new(
+	cols => [$JC, $COL_NOTES, 'amount'],
+	rows => [
+		{ entry => 'K1', notes => 'note-a1', amount => 10 },
+		{ entry => 'K2', notes => 'note-a2', amount => 20 },
+	],
+);
+my $cp_db_b = InMemDA->new(
+	cols => [$JC, $COL_NOTES, 'price'],
+	rows => [
+		{ entry => 'K1', notes => 'note-b1', price =>  5 },
+		{ entry => 'K2', notes => 'note-b2', price => 15 },
+	],
+);
+
+subtest 'collision_prefix: columns() shows both the plain and prefixed names' => sub {
+	plan tests => 3;
+	my $j = Database::Join->new(
+		databases        => [$cp_db_a, $cp_db_b],
+		join_column      => $JC,
+		collision_prefix => { 1 => $CP_PFX },
+	);
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok($col_h{$COL_NOTES},        "plain '$COL_NOTES' (primary DB) in columns()");
+	ok($col_h{$COL_PFX_N},        "prefixed '$COL_PFX_N' (secondary collision) in columns()");
+	ok(!$col_h{"$CP_PFX.$JC"},    "join_column '$JC' never gains a prefix");
+};
+
+subtest 'collision_prefix: merged row carries both the primary and prefixed secondary values' => sub {
+	plan tests => 2;
+	my $j = Database::Join->new(
+		databases        => [$cp_db_a, $cp_db_b],
+		join_column      => $JC,
+		collision_prefix => { 1 => $CP_PFX },
+	);
+	my $row = $j->fetchrow_hashref($JC => 'K1');
+	is($row->{$COL_NOTES}, 'note-a1', "plain 'notes' holds the primary-DB value");
+	is($row->{$COL_PFX_N}, 'note-b1', "prefixed '$COL_PFX_N' holds the secondary-DB value");
+};
+
+subtest 'collision_prefix: criterion on prefixed name routes to the secondary database' => sub {
+	plan tests => 2;
+	my $j = Database::Join->new(
+		databases        => [$cp_db_a, $cp_db_b],
+		join_column      => $JC,
+		collision_prefix => { 1 => $CP_PFX },
+	);
+	my $rows = $j->selectall_arrayref($COL_PFX_N => 'note-b2');
+	is(scalar @{$rows}, 1,      "criterion on '$COL_PFX_N' returns exactly 1 row");
+	is($rows->[0]{$JC},  'K2',  'correct row (K2) returned when filtering on prefixed name');
+};
+
+subtest 'collision_prefix: remove_column on the prefixed name hides it; plain name survives' => sub {
+	plan tests => 2;
+	my $j = Database::Join->new(
+		databases        => [$cp_db_a, $cp_db_b],
+		join_column      => $JC,
+		collision_prefix => { 1 => $CP_PFX },
+	);
+	$j->remove_column($COL_PFX_N);
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok(!$col_h{$COL_PFX_N}, "prefixed '$COL_PFX_N' absent from columns() after remove_column");
+	ok($col_h{$COL_NOTES},  "plain '$COL_NOTES' still present after removing the prefixed name");
+};
+
+subtest 'collision_prefix: add_database applies pre-declared prefix for the new index' => sub {
+	plan tests => 2;
+	# Pre-declare collision_prefix at construction time, then add the secondary DB later.
+	# The prefix registered for index 1 must be applied when add_database runs.
+	my $j = Database::Join->new(
+		databases        => [$cp_db_a],
+		join_column      => $JC,
+		collision_prefix => { 1 => $CP_PFX },
+	);
+	$j->add_database($cp_db_b);
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok($col_h{$COL_PFX_N},   "prefixed '$COL_PFX_N' appears after add_database");
+	my $row = $j->fetchrow_hashref($JC => 'K1');
+	is($row->{$COL_PFX_N}, 'note-b1',
+		"merged row holds the correct value under the prefixed name after add_database");
+};
+
+diag('section 15 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 16 -- Miscellaneous public API surface (5 subtests)
+#
+# Rounds out the API coverage:
+#   selectall_array (list-context counterpart to selectall_arrayref),
+#   remove_columns constructor parameter (hide columns at birth),
+#   positional single-arg shorthand (POD states it equals the named-pair form),
+#   and the two documented unsupported-method croak paths (query, execute).
+# ===========================================================================
+
+subtest 'selectall_array: returns a flat list of row hashrefs (not a reference)' => sub {
+	plan tests => 3;
+	# POD: selectall_array is the list-context counterpart to selectall_arrayref.
+	# It returns a list of hashrefs in list context.
+	my @rows = $left_join->selectall_array();
+	ok(scalar @rows > 0,        'selectall_array returns a non-empty list');
+	ok(ref($rows[0]) eq 'HASH', 'each element is a hashref');
+	is(scalar @rows, $ALL_CUST, 'same row count as selectall_arrayref with no criteria');
+};
+
+subtest 'remove_columns constructor parameter hides columns from the very first query' => sub {
+	plan tests => 2;
+	# remove_columns (constructor) must apply before any query is issued.
+	my $j = Database::Join->new(
+		databases      => [$cust, $score],
+		join_column    => $JC,
+		remove_columns => ['email', 'age_days'],
+	);
+	my %col_h = map { $_ => 1 } @{ $j->columns() };
+	ok(!$col_h{email},    'email hidden by remove_columns constructor parameter');
+	ok(!$col_h{age_days}, 'age_days hidden by remove_columns constructor parameter');
+};
+
+subtest 'selectall_arrayref: positional single-arg is shorthand for join_column criterion' => sub {
+	plan tests => 2;
+	# POD: selectall_arrayref('k1') is syntactic sugar for selectall_arrayref(entry => 'k1')
+	my $by_shorthand = $left_join->selectall_arrayref($ALICE_KEY);
+	my $by_pair      = $left_join->selectall_arrayref($JC => $ALICE_KEY);
+	is(scalar @{$by_shorthand}, 1,         'positional shorthand returns exactly 1 row');
+	is_deeply($by_shorthand, $by_pair,     'positional shorthand equals the named-pair form');
+};
+
+subtest 'query(): croaks with the documented unsupported-operation message' => sub {
+	plan tests => 1;
+	# POD: query() is not implemented on Database::Join; callers must use selectall_arrayref.
+	my $j = Database::Join->new(databases => [$cust, $score], join_column => $JC);
+	throws_ok { $j->query() }
+		qr/not supported on Database::Join/,
+		'query() croaks with the documented message';
+};
+
+subtest 'execute(): croaks with the documented unsupported-operation message' => sub {
+	plan tests => 1;
+	# POD: execute() raw SQL is not implemented on Database::Join.
+	my $j = Database::Join->new(databases => [$cust, $score], join_column => $JC);
+	throws_ok { $j->execute() }
+		qr/not supported on Database::Join/,
+		'execute() croaks with the documented message';
+};
+
+diag('section 16 done -- integration tests complete') if $ENV{TEST_VERBOSE};

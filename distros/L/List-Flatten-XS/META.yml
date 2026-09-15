@@ -9,9 +9,9 @@ build_requires:
   Test::Valgrind: '0'
 configure_requires:
   Module::Build: '0.4005'
-  Module::Build::XSUtil: '0.03'
+  Module::Build::XSUtil: '0.19'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,16 +30,17 @@ no_index:
 provides:
   List::Flatten::XS:
     file: lib/List/Flatten/XS.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/Code-Hex/List-Flatten-XS/issues
-  homepage: https://github.com/Code-Hex/List-Flatten-XS
-  repository: git://github.com/Code-Hex/List-Flatten-XS.git
-version: '0.05'
+  bugtracker: https://github.com/Code-Hex/p5-List-Flatten-XS/issues
+  homepage: https://github.com/Code-Hex/p5-List-Flatten-XS
+  repository: https://github.com/Code-Hex/p5-List-Flatten-XS.git
+version: '0.06'
 x_authority: cpan:CODEHEX
 x_contributors:
-  - 'K <Code-Hex@users.noreply.github.com>'
+  - 'Kei Kamikawa <Code-Hex@users.noreply.github.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 0

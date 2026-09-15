@@ -56,6 +56,6 @@
          "web" : "https://github.com/jjn1056/Net-HTTP2-nghttp2"
       }
    },
-   "version" : "0.009",
+   "version" : "0.011",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

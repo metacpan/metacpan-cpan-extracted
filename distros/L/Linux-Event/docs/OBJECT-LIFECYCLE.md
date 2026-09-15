@@ -20,10 +20,12 @@ my $connection = ClientConnection->connect(
 );
 
 my $listener = Linux::Event::IO::Sock::Listener->new(
-    loop         => $loop,
-    stream_class => 'ServerConnection',
-    host         => '0.0.0.0',
-    port         => 9999,
+    loop   => $loop,
+    host   => '0.0.0.0',
+    port   => 9999,
+    stream => {
+        class => 'ServerConnection',
+    },
 );
 
 my $timer = SessionTimer->new(
@@ -64,9 +66,11 @@ my $connection = $loop->add(ClientConnection->connect(
 ));
 
 my $listener = $loop->add(Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'ServerConnection',
-    host         => '0.0.0.0',
-    port         => 9999,
+    host   => '0.0.0.0',
+    port   => 9999,
+    stream => {
+        class => 'ServerConnection',
+    },
 ));
 
 my $timer = $loop->add(SessionTimer->new(after => 30));
@@ -160,12 +164,13 @@ See `ORDERED-BYTE-IO-DESIGN.md` for the shared native engine and
 
 ## Listener acceptance
 
-The listener's `stream_class` must name `Linux::Event::IO::Sock::Stream` itself
-or a supported subclass. The base class is valid for raw accepted Streams whose
-behavior comes from Listener-supplied constructor callbacks; subclasses provide
-reusable class-level framing, tuning, socket, TLS, native-consumer, or method
-policy. Listener data is initially passed to each accepted connection.
-`on_accept` can replace connection data, retain the object, or close it.
+The Listener's `stream => {...}` recipe may name
+`Linux::Event::IO::Sock::Stream` itself or a supported subclass with its
+`class` member. The base class is valid for raw accepted Streams whose behavior
+comes from recipe callbacks; subclasses provide reusable class-level framing,
+tuning, socket, TLS, native-consumer, or method policy. Recipe `data` is
+initially passed to each accepted connection. `on_accept` can replace
+connection data, retain the object, or close it.
 
 Accepted connections do not receive an intermediate public watcher or temporary
 socket object. The accepted descriptor is transferred directly into the

@@ -1,5 +1,18 @@
 Revision history for Perl extension App-Greple-wordle
 
+1.00 2026-09-14T10:40:34Z
+
+    - Make NYT the default dataset
+    - Fetch NYT answers not included in the dataset with --compat
+    - Update NYT answers until 2026-09-13
+    - Show previous attempts together with the latest one (--history)
+    - Show words and keymap in upper case
+    - Use index modulo answer count for out-of-range index
+    - Fix hint command before any guess and debug command
+    - Do not use black color for hint words
+    - Remove legacy word list modules
+    - Require Perl 5.24
+
 0.13 2025-11-11T09:15:57Z
 
     - Add --data option to support multiple word datasets

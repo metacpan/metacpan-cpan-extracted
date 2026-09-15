@@ -9,7 +9,10 @@
 # allowlist of codecs. The test parses the use and require lines and
 # fails on a line that breaks a rule.
 
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
 use FindBin qw($RealBin);
 use File::Find ();
@@ -30,7 +33,7 @@ sub perl_files ($dir)
 # imports_in($file):
 #	Return the modules that the use and require lines of $file
 #	name, as [$line_number, $module] pairs. Version declarations
-#	such as 'use v5.36' are not modules and do not appear.
+#	such as 'use v5.34' are not modules and do not appear.
 sub imports_in ($file)
 {
 	open my $fh, '<', $file or die "Cannot read $file: $!";

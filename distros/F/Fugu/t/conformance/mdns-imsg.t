@@ -8,7 +8,10 @@
 # and next_message has no concept of a connection or an EOF, so both
 # keep their socketpair against Fugu::Imsg.
 
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
 use FindBin qw($RealBin);
 use lib "$RealBin/../../lib";

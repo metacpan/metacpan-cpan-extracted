@@ -1,0 +1,133 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Alien::Xrepo::Build::Dist - Base module for Alien::Xrepo::MB and Alien::Xrepo::MM
+
+=head1 SYNOPSIS
+
+    use Alien::Xrepo::Build::Dist;
+
+    my $dist = Alien::Xrepo::Build::Dist->new(
+        base_dir    => '.',
+        module_name => 'Exotic::Zlib',
+        script      => 'Build.PL'
+    );
+
+    $dist->dist_name;       # Exotic-Zlib
+    $dist->module_path;     # lib/Exotic/Zlib.pm
+    $dist->snapshot_path;   # blib/lib/auto/share/dist/Exotic-Zlib/xrepo-snapshot.json
+    $dist->recipe;          # the dist's recipe() hashref, loaded from lib/
+    $dist->snapshot_stale( $snapshot );   # 1 when the snapshot needs regenerating
+
+=head1 DESCRIPTION
+
+C<Alien::Xrepo::Build::Dist> is a tiny helper that both the C<Module::Build>-based C<Alien::Xrepo::MB> and the
+MakeMaker-based C<Alien::Xrepo::MM> use to describe the distribution they are building. Given the dist root, the alien
+module's name, and which build script drives it, the class derives everything the two builders need in common:
+
+=over
+
+=item * the dist's conventional name and the paths to its module and hermetic snapshot
+
+=item * the dist's recipe (loaded from C<lib/<class>.pm>, never the installed copy)
+
+=item * the freshness inputs whose age decides whether the snapshot must be regenerated
+
+=back
+
+The two consumers create one instance per build (see the C<_dist> method in L<Alien::Xrepo::MB> and
+L<Alien::Xrepo::MM>) and never subclass or store it: it is a value object describing the dist, not a stage of the
+L<Alien::Xrepo::Build> pipeline.
+
+=head1 METHODS
+
+=head2 C<new( %attr )>
+
+    Alien::Xrepo::Build::Dist->new(
+        base_dir    => '.',       # dist root, defaults to '.'
+        module_name => 'Exotic::Zlib',     # required
+        script      => 'Build.PL'          # defaults to 'Build.PL'
+    );
+
+B<C<module_name>> is required: it cannot be reverse-engineered from the directory name. C<script> names the build
+script whose mtime counts as a freshness input; pass C<'Makefile.PL'> for MakeMaker-based dists.
+
+=head2 C<base_dir( )>
+
+The dist root directory.
+
+=head2 C<module_name( )>
+
+The alien class' fully-qualified name (e.g. C<Exotic::Zlib>).
+
+=head2 C<script( )>
+
+The build script name (C<Build.PL> or C<Makefile.PL>).
+
+=head2 C<module_rel( )>
+
+The module's path relative to C<lib>, e.g. C<lib/Exotic/Zlib.pm> for C<Exotic::Zlib>.
+
+=head2 C<module_path( )>
+
+The absolute path to the module, C<< <base_dir>/<module_rel> >>.
+
+=head2 C<dist_name( )>
+
+The distribution-archive name: the module name with C<::> changed to C<->, e.g. C<Exotic::Zlib> -> C<Exotic-Zlib>.
+
+=head2 C<snapshot_path( )>
+
+The conventional place the hermetic snapshot lands:
+
+    <base_dir>/blib/lib/auto/share/dist/<dist_name>/xrepo-snapshot.json
+
+=head2 C<recipe()>
+
+The dist's single declaration: C<require>s C<< lib/<class>.pm >> and returns C<< <class>->new->recipe >> -- a hashref,
+an L<Alien::Xrepo::Build::Recipe> object, or a path, whichever the L<Alien::Xrepo::Runtime> subclass's C<recipe()>
+method returns. The module is loaded by its absolute path so it wins over any pre-installed copy. The engine normalizes
+whatever comes back.
+
+=head2 C<inputs( @engine_mods )>
+
+The inputs whose freshness determines whether the snapshot needs regenerating:
+
+=over
+
+=item * the build script (C<script>)
+
+=item * the module (C<module_path>)
+
+=item * each of C<@engine_mods> that is loaded into I<this> process (C<%INC>), so a parent install bump re-runs the
+examples
+
+=back
+
+Any local C<recipes/> tree is folded in by C<snapshot_stale>, not here.
+
+=head2 C<snapshot_stale( $snapshot, @engine_mods )>
+
+True when the snapshot is missing or older than any input (mirroring L<Module::Build>'s C<copy_if_modified> semantics)
+or any file under a local C<recipes/> tree. Returns true for a snapshot that is a directory or empty file: neither can
+be a valid snapshot.
+
+=head1 SEE ALSO
+
+L<Alien::Xrepo::Build>, L<Alien::Xrepo::MB>, L<Alien::Xrepo::MM>, L<Alien::Xrepo::Runtime>, L<Alien::Xrepo>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2. Other copyrights, terms, and conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=cut

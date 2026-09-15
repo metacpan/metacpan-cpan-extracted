@@ -21,7 +21,9 @@ my @files = (
     't/html_encode.t',
     't/inline_style.t',
     't/no_plain_tags.t',
-    't/tag.t'
+    't/style_order.t',
+    't/tag.t',
+    't/truecolor.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

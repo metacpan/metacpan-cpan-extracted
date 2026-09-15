@@ -1,0 +1,217 @@
+=head1 NAME
+
+Fugu::Curl - download one URL to one file, through curl, wget, or ftp
+
+=head1 SYNOPSIS
+
+    use Fugu::Curl;
+
+    my $curl = Fugu::Curl->new(timeout => 120);
+
+    die $curl->error unless $curl->is_available;
+
+    $curl->fetch('https://example.org/dl/asset.tgz', "$cache/asset.tgz")
+        or die $curl->error;
+
+    # A probe for an optional file.
+    unless ($curl->fetch($url, $path)) {
+        return if $curl->status eq 'http' && $curl->code == 404;
+        die $curl->error;
+    }
+
+=head1 DESCRIPTION
+
+Fugu::Curl downloads one URL to one file. Core Perl fetches no HTTPS
+URL: L<HTTP::Tiny> is core, but its TLS needs L<IO::Socket::SSL>,
+which is not. Every host holds one of three commands instead, and
+each command carries the TLS stack of the host.
+
+The module picks the first command that the host has, in the order
+C<curl>, C<wget>, C<ftp>. It runs that command through
+L<Fugu::Process>, with an argument list and never a shell. The three
+commands need three flag sets for the same four demands: follow a
+redirect, fail on an HTTP status of 400 or above, write to a named
+file, and stop after a time limit. The module holds one
+classification over the three dialects, so every caller reads one
+status set.
+
+A failed fetch leaves no file. The command writes to a temporary name
+in the directory of the destination, and the module renames that file
+on success. A reader of the destination therefore sees the old file
+or the new file, and never a partial one.
+
+Every recoverable failure returns C<undef>, and C<error> holds the
+reason. An absent command is a clean failure, and not a die. The
+module never logs. The caller decides what to report.
+
+The module verifies no checksum and no signature. L<Fugu::Signify>
+holds both. It also resumes no download, and it retries nothing: one
+call runs one command once.
+
+=head2 new
+
+C<new(command =E<gt> $command, timeout =E<gt> $seconds)> builds a
+downloader. The method resolves the command once, and it runs no
+process.
+
+The module resolves the command through
+C<Fugu::Process-E<gt>find_command()>, and holds no resolver of its
+own.
+
+C<command> names the command, as a plain name or as a path. A name
+that holds a solidus is a path.
+Without the argument, the module walks C<$ENV{PATH}> over the search
+list C<curl>, C<wget>, C<ftp>, and it takes the first one that the
+host has.
+
+The base name of the resolved command names the dialect, because the
+module holds one flag set for each of the three. A command under
+another name therefore resolves to nothing, and C<error> says so.
+
+C<timeout> bounds the whole fetch, in seconds. The default is 600. A
+release asset on a slow link needs minutes, and a stalled connection
+must not hold a bootstrap forever.
+
+C<new> must not die for an absent command. It sets C<error> instead,
+and C<is_available> then returns 0.
+
+=head2 is_available
+
+C<is_available()> returns 1 when the object resolved a command that
+it can drive. It returns 0 otherwise. The method runs no process, and
+it never dies.
+
+=head2 command
+
+C<command()> returns the resolved command path, or C<undef>. An
+operator who installed no downloader needs this answer, and a caller
+can put it in a diagnostic.
+
+=head2 status
+
+C<status()> returns the status of the most recent fetch. It returns
+C<undef> before the first fetch.
+
+=over 4
+
+=item C<ok> - the file arrived at the destination.
+
+=item C<http> - the server answered with a status of 400 or above.
+
+=item C<timeout> - the fetch passed the time limit.
+
+=item C<network> - the fetch failed, and no HTTP status explains it.
+
+=item C<absent> - no command resolved, or the command never ran.
+
+=back
+
+=head2 code
+
+C<code()> returns the HTTP status of the most recent fetch, where the
+command reported one. It returns C<undef> otherwise.
+
+curl reports the status for every fetch, through C<--write-out>. wget
+and ftp name the status in their diagnostic of a failed fetch, and
+they name none after a success. A caller therefore reads C<code>
+together with C<status>.
+
+=head2 error
+
+C<error()> returns the reason of the most recent failure. It returns
+C<undef> after a success. The message names the command, the URL and
+the reason, in that order:
+
+    curl: https://example.org/dl/asset.tgz: HTTP 404: curl: (22) The requested URL returned error: 404
+
+=head2 fetch
+
+C<fetch($url, $path)> downloads the URL to the path. The method
+returns 1 on success, and C<undef> on every failure.
+
+The command writes to a temporary name in the directory of C<$path>,
+so the rename that publishes the file stays inside one filesystem. A
+failure removes that temporary file, and the destination keeps
+whatever it held before the call.
+
+The rename is the last step. A destination that the module cannot
+rename over takes the C<network> status, because the status set holds
+no name for a local failure. The reason names the rename.
+
+=head2 arguments
+
+C<arguments($url, $tmp)> returns the argument list that C<fetch> runs
+for the resolved command, as an array reference. It returns C<undef>
+when no command resolved. The method runs no process.
+
+The list holds the command itself first, so a caller passes it
+straight to C<Fugu::Process-E<gt>run>. Each list carries the four
+demands of a fetch in the dialect of its command:
+
+    curl  --fail --location --silent --show-error --max-time N
+          --output TMP --write-out %{http_code} URL
+    wget  --no-verbose --tries=1 --timeout=N --output-document=TMP URL
+    ftp   -V -M -w N -o TMP URL
+
+wget and the ftp of OpenBSD follow a redirect and fail on an HTTP
+error by themselves, so their lists name neither.
+
+The method exists for a test: a host holds one of the three commands,
+and the list of each dialect must stay readable there. It also lets a
+caller report the exact command that a fetch ran.
+
+=head1 TIME LIMITS
+
+The C<timeout> option names one bound, and the module makes two of
+it. C<arguments> puts the value in the flag of the command, and
+C<fetch> gives L<Fugu::Process> the value plus 30 seconds. The
+command flag therefore fires first, and the process bound catches a
+command that ignores its own flag.
+
+The C<timeout> status covers both. curl reports a timeout of its own
+with exit 28. wget and the ftp of OpenBSD report none, so a stall
+under their own flag takes the C<network> status.
+
+=head1 THE ENVIRONMENT
+
+The module gives the child no environment of its own, so the child
+holds the environment of the parent. C<http_proxy>, C<https_proxy>,
+C<ftp_proxy>, and C<no_proxy> reach the command, and a host behind a
+proxy reaches a release through them.
+
+=head1 RETURN VALUES
+
+C<fetch()> returns 1 or C<undef>. C<arguments()> returns an array
+reference or C<undef>. C<is_available()> returns 1 or 0.
+C<command()>, C<status()>, C<code()> and C<error()> return the state
+of the object, or C<undef>.
+
+=head1 CAVEATS
+
+Each command verifies the certificate of the peer by default, and the
+module passes no flag that turns the check off. The trust store is
+the store of the command. The ftp of OpenBSD reads
+F</etc/ssl/cert.pem>.
+
+The C<ftp> of a Linux host is another program, and it fetches no HTTP
+URL. It sits last in the search list, so a host with curl or wget
+never reaches it.
+
+A caller under taint mode must pass C<command> as an absolute path.
+C<$ENV{PATH}> is tainted, so a path from the search list cannot reach
+execve(2) under C<perl -T>.
+
+A caller under pledge(2) needs the C<rpath>, C<wpath>, C<cpath> and
+C<proc exec> promises: the module writes a file, renames it, and runs
+a command. The pledge belongs to the program, not to a library
+method.
+
+=head1 SEE ALSO
+
+curl(1), wget(1), ftp(1), L<Fugu::Process>, L<Fugu::Signify>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

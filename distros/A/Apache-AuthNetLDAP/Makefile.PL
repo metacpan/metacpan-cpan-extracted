@@ -2,7 +2,7 @@
     # ExtUtils::AutoInstall Bootstrap Code, version 7.
     BEGIN{my$p='ExtUtils::AutoInstall';my$v=0.52;$p->VERSION||0>=$v
     or+eval"use $p $v;1"or+do{my$e=$ENV{PERL_EXTUTILS_AUTOINSTALL};
-    (!defined($e)||$e!~m/--(?:default|skip|testonly)/and-t STDIN or
+    (!defined($e)||$e!~m/--(?:default|skip|testonly)/ and -t STDIN or
     eval"use ExtUtils::MakeMaker;WriteMakefile(PREREQ_PM=>{'$p',$v}
     );1"and exit)and print"==> $p $v required. Install it from CP".
     "AN? [Y/n] "and<STDIN>!~/^n/i and print"*** Installing $p\n"and
@@ -12,22 +12,6 @@
     require CPANPLUS;CPANPLUS::install$p};eval"use $p $v;1"or eval{
     require CPAN;CPAN::install$p};eval"use $p $v;1"||die"*** Please
     manually install $p $v from cpan.org first...\n"}}}
-
-    # notify the user about mod_perl 2
-    BEGIN { print q{
-        **************** NOTICE *********************
-        If you are planning to use mod_perl2 and Apache2, please, do not
-        answer yes when prompted to install mod_perl.  You will need to
-        download mod_perl2 manually from
-        http://perl.apache.org/download/index.html
-        *********************************************
-    } }    
-
-    # optional pre-install handler; takes $module_name and $version
-    # sub MY::preinstall  { return 1; }	# return false to skip install
-
-    # optional post-install handler; takes $module_name, $version, $success
-    # sub MY::postinstall { return; }	# the return value doesn't matter
 
     # the above handlers must be declared before the 'use' statement
     use ExtUtils::AutoInstall (
@@ -41,12 +25,18 @@
 	-core		=> [
 		Convert::ASN1 => '',
 		Net::LDAP => '',
-	        mod_perl => '',
+		Apache2::Const => '',
+		Apache2::Access => '',
+		Apache2::Connection => '',
+		Apache2::Log => '',
+		Apache2::RequestRec => '',
+		Apache2::RequestUtil => '',
+	        mod_perl2 => '',
 	], 		# core modules; may also be 'all'
     );
 
     WriteMakefile(
-	AUTHOR          => 'Mark Wilcox (mjwilcox@wilcox.com) and Shannon Eric Peevey (speeves@unt.edu)',
+	AUTHOR          => 'Mark Wilcox (mjwilcox@wilcox.com) and Shannon Eric Peevey (shannonpeevey@gmail.com)',
 	ABSTRACT        => 'Apache::AuthNetLDAP -- Perl module which authenticates users via LDAP using the Net::LDAP module.',
 	NAME            => 'Apache::AuthNetLDAP',
 	VERSION_FROM    => 'AuthNetLDAP.pm',

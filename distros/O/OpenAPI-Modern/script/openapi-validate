@@ -13,6 +13,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
+use if -d '.git', 'Test::File::ShareDir', -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use Getopt::Long::Descriptive;
 use Mojo::File 'path';
 use Feature::Compat::Try;
@@ -21,6 +22,8 @@ use builtin::compat 'blessed';
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Document::OpenAPI;
 use OpenAPI::Modern::Utilities ':constants';
+
+local $| = 1; # do not buffer stdout
 
 my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   "$0 %o [filename] [filename] ...",
@@ -31,6 +34,7 @@ my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   ['dump-identifiers', 'print a list of all identifiers found in the schema'],
   ['with-defaults', 'include list of defaults for missing data'],
   ['upgrade:s', 'upgrade to the target version (default value: '.OAS_VERSIONS->[-1].')'],
+  ['metaschema-uri=s', 'override the URI of the metaschema to use for validation (e.g. "https://spec.openapis.org/oas/3.2/schema-base/2025-11-23")'],
   [],
 );
 
@@ -64,6 +68,7 @@ sub process ($encoded_document, $openapi = 0, $document_filename = undef) {
     try {
       $document = JSON::Schema::Modern::Document::OpenAPI->new(
         $document_filename ? (canonical_uri => $document_filename) : (),
+        $opt->metaschema_uri ? (metaschema_uri => $opt->metaschema_uri) : (),
         schema => $schema,
         evaluator => $js,
       );
@@ -156,7 +161,7 @@ openapi-validate - A command-line interface to OpenAPI document validation
 
 =head1 VERSION
 
-version 0.147
+version 0.148
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

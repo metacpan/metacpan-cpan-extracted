@@ -14,7 +14,9 @@ my @files = (
     't/codigos.t',
     't/function.t',
     't/municipios.t',
-    't/pod.t'
+    't/paridad.t',
+    't/pod.t',
+    't/provincias.t'
 );
 
 notabs_ok($_) foreach @files;

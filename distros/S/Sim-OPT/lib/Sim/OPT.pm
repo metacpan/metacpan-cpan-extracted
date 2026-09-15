@@ -80,7 +80,7 @@ eval { use Sim::OPTcue::Exogen::GBDT; 1 };
 eval { use Sim::OPTcue::Endogen::DWGN2; 1 };
 eval { use Sim::OPTcue::Endogen::NeuralBoltzmann; 1 };
 
-$VERSION = '0.997';
+$VERSION = '0.999';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
@@ -3928,7 +3928,11 @@ Sim::OPT.
 
 =head1 DESCRIPTION
 
-OPT is an optimization and parametric exploration program favouring problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module can seek for the least explored search paths when exploring new search spaces sequentially (following rules presented in: L<Gian Luca Brunetti (2016). “Cyclic overlapping block coordinate search for optimizing building design”. Automation in Construction, 71(2), pp. 242-261, DOI: 10.1016/j.autcon.2016.08.014|http://dx.doi.org/10.1016/j.autcon.2016.08.014>. Sim::OPT::Morph, the morphing module, can manipulate parameters of simulation models.
+OPT is an optimization and parametric exploration program favouring problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). 
+
+A distribution with some binary modules is also available at the addess L<https://sites.google.com/view/bioclimatic-design/home/software/simopt-optcue|https://sites.google.com/view/bioclimatic-design/home/software/simopt-optcue/>.
+
+The Sim::OPT::Takechange module can seek for the least explored search paths when exploring new search spaces sequentially (following rules presented in: L<Gian Luca Brunetti (2016). “Cyclic overlapping block coordinate search for optimizing building design”. Automation in Construction, 71(2), pp. 242-261, DOI: 10.1016/j.autcon.2016.08.014|http://dx.doi.org/10.1016/j.autcon.2016.08.014>. Sim::OPT::Morph, the morphing module, can manipulate parameters of simulation models.
 Other modules under the Sim::OPT namespace are Sim::OPT::Parcoord3d, a module which can convert 2D parallel coordinates plots into Autolisp instructions for obtaining 3D plots as Autocad drawings; and Sim::OPT::Interlinear, which can build metamodels from sparse multidimensional data, and the module Sim::OPT::Modish, capable of altering the shading values calculated with the L<ESP-r buildjng performance simulation platform|http://www.esru.strath.ac.uk/Programs/ESP-r.htm>.
 The Sim::OPT's morphing and reporting modules contain several additional functions specifically targeting the ESP-r building performance simulation platform.
 

@@ -1,0 +1,212 @@
+=head1 NAME
+
+App::FuguBench - the dispatcher of the fugubench program
+
+=head1 SYNOPSIS
+
+    use App::FuguBench;
+
+    exit App::FuguBench->new->run(@ARGV);
+
+=head1 DESCRIPTION
+
+B<App::FuguBench> is the dispatcher of C<fugubench>. Every verb
+shares it, and it holds the parts that every verb repeats: the option
+parse, the sandbox entry, the checkout discovery, and the child
+command.
+
+The dispatcher runs over L<Fugu::CLI>. That module parses the global
+options, finds the verb, parses the options of the verb, and calls
+it. Its exit codes are the codes of the program: 0 for success, 1 for
+a failure, 2 for a usage error, and 3 for a configuration error. No
+verb defines another code.
+
+Output has two channels. Standard output carries the result line of a
+verb, and nothing else, because a hook reads it. Every diagnostic
+goes to the logger of L<Fugu::Log>, which writes to standard error. A
+child command writes its own standard error there too, in full.
+
+=head2 new
+
+C<new> builds the dispatcher. The global options are C<-C E<lt>dirE<gt>>,
+which names the start of the checkout walk, and C<--verbose>, which
+traces each child command on standard error.
+
+The command table holds one entry for each verb module of this
+distribution. Each module has one class method, C<command($verb)>,
+that returns the entry of the L<Fugu::CLI> table: C<summary>,
+C<usage>, C<options> and C<run>. A module that holds one verb ignores
+the name. The body of the entry receives the dispatcher and the
+arguments of the verb.
+
+=head2 run
+
+C<run(@argv)> parses the command line, enters the sandbox row of the
+verb, dispatches, and returns the exit code.
+
+A command line with no verb is a usage error: the method prints the
+usage on standard error and returns 2. A global option in front of no
+verb gives the same error. C<--help>, C<-h>, and the word C<help> ask
+for the help, and the method prints it on standard output with the
+code 0.
+
+=head2 cli
+
+C<cli> returns the L<Fugu::CLI> dispatcher. A verb body reads its
+options with C<< $app->cli->option($name) >>, and it reports with
+C<< $app->cli->log >>.
+
+=head2 start
+
+C<start> returns the start directory of the run: the C<-C> value, or
+the current directory. A verb that reads a path relative to the
+start, and that walks up to no checkout, reads it here. C<deps> is
+that verb: it reads F<deps/E<lt>OSE<gt>.txt> there, and a guest runs
+it out of an extracted tarball that holds no F<.toolingrc>.
+
+=head2 checkout
+
+C<checkout> returns the L<App::FuguBench::Checkout> of the run. The
+walk runs on the first call, from the directory of C<start>. A verb
+that reads no checkout never starts it, so C<fugubench version> runs
+in a home with no F<.toolingrc>.
+
+The method returns C<undef> when no F<.toolingrc> sits above the
+start. The call of the verb names the start directory in the log, and
+the verb then returns the configuration code.
+
+The walk runs one time, and a failed walk stays failed. A sandbox row
+reads the checkout before the verb does, and that row reports nothing.
+So the report waits for the call of the verb, and it comes one time. A
+verb that rejects its argument list reports the usage, and no
+configuration error.
+
+C<checkout($checkout)> sets the checkout, for a verb that reads its
+start from a payload. The argument drops the report of a failed walk,
+so no later call writes it.
+
+=head2 command
+
+C<command(\@cmd, %args)> runs one child command through
+C<< Fugu::Process->run >>. The command is an argument list, and it
+never reaches a shell. Every other argument reaches
+C<< Fugu::Process->run >>, so a caller of the plain form names
+C<cwd>, C<stdin>, C<env> or C<timeout> there.
+
+The method writes the command line to standard error under
+C<--verbose>, before the child runs. After the child exits, it writes
+the captured standard error of the child to standard error, in full.
+
+C<command(\@cmd, group =E<gt> 1)> runs the child as the leader of its
+own session, so the child leads its own process group too. The
+method keeps the pid of the child in C<child> while it waits. After
+the exit it writes the output of the child to standard error, and it
+returns as the plain form does. A verb that must stop a whole process
+tree uses this form.
+
+The two streams of that child arrive on two files of one temporary
+directory, because the start opens each stream by its path. One path
+for both streams would truncate the file twice.
+
+Every other argument of the group form reaches
+C<< Fugu::Process->spawn_command >>, which takes C<stdin>, C<env>
+and C<inherit>. It takes neither C<cwd> nor C<timeout>, and it drops
+each one in silence. A caller that needs one of those two uses the
+plain form.
+
+C<stdin> carries one name and two meanings. The plain form takes a
+string, and it writes that string to the child. The group form takes a
+path, and it opens that path as the standard input of the child. The
+group form reads F</dev/null> without the argument.
+
+=head2 child
+
+C<child> returns the pid of the running child of the group form, or
+C<undef>. A signal handler reads it, and it stops the group with
+C<< Fugu::Process->terminate($app->child, group =E<gt> 1) >> before
+the handler starts its cleanup.
+
+=head2 error
+
+C<error> returns the reason of the last failure of C<command>, or
+C<undef>.
+
+=head1 THE SANDBOX
+
+One table in this module holds the sandbox row of each verb. A row
+names the pledge promises of the verb, and the unveil paths of a verb
+that opens a file of its own. The dispatcher resolves the row after
+the option parse, it unveils and pledges, and then the body runs. On a
+platform other than OpenBSD the calls change nothing.
+
+The unveil comes in front of the pledge. unveil(2) needs the C<unveil>
+promise, no row of the table holds that promise, and a pledge in front
+of the call would stop the program. A row with no list unveils
+nothing, and the whole filesystem stays in view.
+
+A row can name subcommands. The dispatcher then pledges the promises
+of the named subcommand, and the promises of the row for every other
+one.
+
+C<version> opens no file, so its row holds C<stdio> alone. C<stdio>
+denies open(2), and the row names no C<rpath>.
+
+C<wiki> and C<worktree> run git, and no row can name each file that a
+child opens. So each row unveils nothing. git pushes, so the row of
+C<wiki> adds the network promises. The C<list> subcommand of
+C<worktree> writes no file, so that subcommand drops the write
+promises.
+
+C<traces> opens its files itself and runs no child, so its row
+unveils. The list comes from the verb, because a path of it comes
+from an option and a path of it comes from the checkout.
+L<App::FuguBench::Traces> holds the list and the reason of each path.
+
+C<hook> runs the other verbs in its own process, so its row pledges
+the promises of C<wiki> and of C<worktree> together. Those verbs run
+git, so the row unveils nothing. The C<install> subcommand writes one
+file of its own, and the write promises of the row cover that write.
+The row names no unveil list, so no walk runs in front of the verb.
+
+C<doctor> runs git for the library check and for the fix, so its row
+unveils nothing too. It reads the settings file itself, and C<rpath>
+covers that read. It writes no file of its own: git writes every byte
+of the fix.
+
+The install of C<deps> runs a package manager, cpanm, and the
+commands of an archive, and each one writes outside every path of a
+row. So its row unveils nothing either. The file promises cover the
+manifest read and the digest file, C<proc exec> covers each child,
+and C<inet dns> covers each download.
+
+C<fetch> runs the downloader of L<Fugu::Curl> as a child, which
+writes its file beside the destination and renames it. So its row
+holds the promises of C<deps>, and it unveils nothing.
+
+=head1 RETURN VALUES
+
+C<new> returns a dispatcher. C<run> returns an exit code. C<cli>
+returns the L<Fugu::CLI> dispatcher. C<start> returns a directory
+path. C<checkout> returns a checkout or C<undef>.
+
+C<command> returns the captured standard output of the child, and
+C<undef> with the reason in C<error>. A child that writes nothing
+gives the empty string, so a caller tests the return value with
+C<defined>. The group form writes every stream of the child to
+standard error, so it gives the empty string after a successful run.
+C<child> returns a pid or C<undef>.
+
+=head1 SEE ALSO
+
+L<App::FuguBench::Checkout>, L<App::FuguBench::Deps>,
+L<App::FuguBench::Doctor>, L<App::FuguBench::Fetch>,
+L<App::FuguBench::Hook>, L<App::FuguBench::Traces>,
+L<App::FuguBench::Wiki>, L<App::FuguBench::Worktree>,
+L<Fugu::CLI>, L<Fugu::Curl>,
+L<Fugu::File>, L<Fugu::Log>, L<Fugu::Process>, L<Fugu::Sandbox>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

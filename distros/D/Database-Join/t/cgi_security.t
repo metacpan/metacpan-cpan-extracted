@@ -26,7 +26,7 @@ use Readonly;
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 48;
+	plan tests => 76;
 }
 
 use_ok('Database::Join');
@@ -460,7 +460,7 @@ sub make_join {
 			databases   => [ bless({}, 'NotDA') ],
 			join_column => 'entry',
 		);
-	} qr/not a Database::Abstraction/i,
+	} qr/does not support the selectall_arrayref/i,
 		'pre-condition: non-DA blessed object in databases is rejected';
 }
 
@@ -744,7 +744,7 @@ sub make_join {
 	my $join = make_join($db_a, $db_b);
 	throws_ok {
 		$join->add_database($SHELL_META);
-	} qr/not a Database::Abstraction/i,
+	} qr/does not support the selectall_arrayref/i,
 		'guard: hostile string to add_database is rejected by fail-fast guard';
 }
 
@@ -777,6 +777,390 @@ sub make_join {
 		'filter merge: wider query criterion does not widen the base filter (AND semantics)');
 	is($rows->[0]{name}, 'Alice',
 		'filter merge: only Alice survives (score=95 > 80); Bob excluded (score=70 not > 80)');
+}
+
+# ===========================================================================
+# SECTION 7 -- join_map Reference Type Guard (Heap Address Leakage Prevention)
+#
+# MP: Passing a reference as a join_map value would cause sprintf to interpolate
+#   it as "HASH(0x...)" or "SCALAR(0x...)", leaking a heap address in the error
+#   message.  _build_col_index rejects non-string values before any sprintf.
+# Proof: the first line of $@ must not contain a hex address pattern.
+#   (croak's stack trace is checked separately in CLAUDE.md edge_cases.t.)
+# ===========================================================================
+
+# Test 49
+# Exploit: scalar reference as join_map value; hopes to expose SCALAR(0x...) in error.
+{
+	my ($db_a, $db_b) = make_dbs();
+	local $@;
+	eval {
+		Database::Join->new(
+			databases   => [$db_a, $db_b],
+			join_column => 'entry',
+			join_map    => { 1 => \1 },  # scalar ref would stringify to 'SCALAR(0x...)'
+		);
+	};
+	my ($first_line) = split /\n/, ($@ // ''), 2;
+	unlike $first_line, qr/0x[0-9a-f]{4,}/i,
+		'join_map guard: scalar-ref value does not leak heap address in first error line';
+}
+
+# Test 50
+# Exploit: hashref as join_map value; hopes to expose HASH(0x...) in error.
+{
+	my ($db_a, $db_b) = make_dbs();
+	local $@;
+	eval {
+		Database::Join->new(
+			databases   => [$db_a, $db_b],
+			join_column => 'entry',
+			join_map    => { 1 => {} },  # hashref would stringify to 'HASH(0x...)'
+		);
+	};
+	my ($first_line) = split /\n/, ($@ // ''), 2;
+	unlike $first_line, qr/0x[0-9a-f]{4,}/i,
+		'join_map guard: hashref value does not leak heap address in first error line';
+}
+
+# ===========================================================================
+# SECTION 8 -- Internal Attribute Name Injection via Criteria
+#
+# Exploit: attacker passes Perl internal attribute names ('_col_db', '_join_col')
+#   as criteria column keys, hoping to corrupt internal routing state or read
+#   data owned by a different DA.
+# MP: _partition_criteria looks each column up in _col_db.  Internal attribute
+#   names are never registered there.  Unknown columns fall to carp+drop.
+# C: neither DB receives the internal-attribute key as a criterion.
+# ===========================================================================
+
+# Test 51
+# Exploit: '_col_db' as a criteria column key (the routing table itself).
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $join = make_join($db_a, $db_b);
+	local $SIG{__WARN__} = sub {};   # suppress expected carp
+	$join->selectall_arrayref('_col_db' => 'val');
+	ok(!exists $db_a->last_criteria->{'_col_db'},
+		'internal-attr injection: _col_db criteria key not sent to primary DB');
+	ok(!exists $db_b->last_criteria->{'_col_db'},
+		'internal-attr injection: _col_db criteria key not sent to secondary DB');
+}
+
+# Test 52
+# Exploit: '_join_col' as a criteria column key (the join-column name).
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $join = make_join($db_a, $db_b);
+	local $SIG{__WARN__} = sub {};
+	$join->selectall_arrayref('_join_col' => 'val');
+	ok(!exists $db_a->last_criteria->{'_join_col'},
+		'internal-attr injection: _join_col criteria key not sent to primary DB');
+	ok(!exists $db_b->last_criteria->{'_join_col'},
+		'internal-attr injection: _join_col criteria key not sent to secondary DB');
+}
+
+# ===========================================================================
+# SECTION 9 -- Circular Reference as Criteria Value (DoS via Infinite Recursion)
+#
+# Exploit: attacker passes a circular hashref as a criteria value hoping to
+#   trigger infinite recursion inside _merge_criteria or the broadcast copy
+#   path ({ %{$val} } for join_column operator hashrefs).
+# MP: _partition_criteria assigns non-join_column criteria values directly
+#   (no recursive walk).  Broadcast shallow-copy only copies top-level keys,
+#   so it terminates even on a circular structure.
+# C: no stack overflow; the circular ref is passed to the owning DA as-is.
+# ===========================================================================
+
+# Test 53
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $join = make_join($db_a, $db_b);
+	my $circ = {};
+	$circ->{self} = $circ;   # circular reference
+	lives_ok { $join->selectall_arrayref(score => $circ) }
+		'resilience: circular hashref as secondary-column criteria value does not recurse infinitely';
+}
+
+# ===========================================================================
+# SECTION 10 -- collision_prefix Hostile String Security
+#
+# Exploit: attacker controls the collision_prefix string (e.g. via an attacker-
+#   influenced configuration store) and injects an XSS payload or CRLF sequence.
+# MP: DJ uses the prefix only for string concatenation when building column names.
+#   It never generates HTTP headers or HTML.  The resulting column name is a plain
+#   Perl string -- not executed, not reflected into any HTTP response by DJ.
+# C: the hostile string becomes a literal column name.  No code execution.
+#   Output encoding remains the responsibility of the caller / CGI layer.
+# ===========================================================================
+
+# Test 54
+# Exploit: XSS payload as collision_prefix; hopes to inject <script> into HTTP output.
+{
+	my $db_a_pfx = MockSecDB->new(
+		columns => [qw(entry name)],
+		rows    => [ { entry => 'A1', name => 'Alice-primary' } ],
+	);
+	my $db_b_pfx = MockSecDB->new(
+		columns => [qw(entry name score)],  # 'name' collides; 'score' does not
+		rows    => [ { entry => 'A1', name => 'Eve-secondary', score => 95 } ],
+	);
+	Readonly::Scalar my $XSS_PREFIX => '<script>alert(1)</script>';
+	my $join_pfx = Database::Join->new(
+		databases        => [$db_a_pfx, $db_b_pfx],
+		join_column      => 'entry',
+		collision_prefix => { 1 => $XSS_PREFIX },
+	);
+	my $cols_pfx  = $join_pfx->columns();
+	my $pfx_col   = "$XSS_PREFIX.name";
+	ok((grep { $_ eq $pfx_col } @{$cols_pfx}),
+		'collision_prefix: XSS payload as prefix yields a literal column name string (not executed)');
+}
+
+# Test 55
+# Exploit: CRLF sequence as collision_prefix; hopes to split HTTP headers.
+{
+	my $db_a_crlf = MockSecDB->new(
+		columns => [qw(entry name)],
+		rows    => [],
+	);
+	my $db_b_crlf = MockSecDB->new(
+		columns => [qw(entry name)],
+		rows    => [],
+	);
+	Readonly::Scalar my $CRLF_PREFIX => "pfx\r\nX-Injected: evil";
+	my $join_crlf = Database::Join->new(
+		databases        => [$db_a_crlf, $db_b_crlf],
+		join_column      => 'entry',
+		collision_prefix => { 1 => $CRLF_PREFIX },
+	);
+	my $cols_crlf = $join_crlf->columns();
+	my $expected  = "$CRLF_PREFIX.name";
+	ok((grep { $_ eq $expected } @{$cols_crlf}),
+		'collision_prefix: CRLF in prefix string yields a literal column name (DJ generates no HTTP headers)');
+}
+
+# ===========================================================================
+# SECTION 11 -- AUTOLOAD Guard After Column Removal
+#
+# Exploit: attacker calls $join->tier() after 'tier' has been removed, hoping
+#   the AUTOLOAD dispatch still delegates to the DA and leaks data for
+#   the removed column.
+# MP: remove_column() deletes 'tier' from _col_db.
+#   AUTOLOAD resolves the method name against _col_db; 'tier' is no longer there.
+# C: croak with 'unknown column' -- no DA is ever contacted.
+# ===========================================================================
+
+# Test 56
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $join = make_join($db_a, $db_b);
+	$join->remove_column('tier');
+	throws_ok { $join->tier(entry => 'A1') }
+		qr/unknown column/i,
+		'AUTOLOAD guard: removed column invoked via AUTOLOAD croaks with unknown-column error';
+}
+
+# ===========================================================================
+# SECTION 12 -- count() Partition Isolation
+#
+# The existing tests prove selectall_arrayref() routes criteria correctly.
+# These tests prove the same partition isolation holds for count(), which
+# internally uses the same _joined_query() dispatch.
+# ===========================================================================
+
+# Test 57
+# Exploit: SQL injection in count() call via a primary-column criterion.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $join = make_join($db_a, $db_b);
+	$join->count(name => $DROP_TABLE);
+	ok( exists $db_a->last_criteria->{name},
+		'count() isolation: SQL injection in primary col criterion reaches primary DB');
+	ok(!exists $db_b->last_criteria->{name},
+		'count() isolation: SQL injection in primary col criterion does NOT reach secondary DB');
+}
+
+# Test 58
+# Exploit: SQL injection in count() call via a secondary-column criterion.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $join = make_join($db_a, $db_b);
+	$join->count(score => $SQL_INJECTION);
+	ok(!exists $db_a->last_criteria->{score},
+		'count() isolation: SQL injection in secondary col does NOT reach primary DB');
+	ok( exists $db_b->last_criteria->{score},
+		'count() isolation: SQL injection in secondary col reaches secondary DB only');
+}
+
+# ===========================================================================
+# SECTION 13 -- fetchrow_hashref() Partition Isolation
+#
+# Proves the same partition isolation holds for fetchrow_hashref(), which
+# also routes through _joined_query().
+# ===========================================================================
+
+# Test 59
+# Exploit: SQL injection in fetchrow_hashref() via a primary-column criterion.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $join = make_join($db_a, $db_b);
+	$join->fetchrow_hashref(name => $DROP_TABLE);
+	ok( exists $db_a->last_criteria->{name},
+		'fetchrow_hashref() isolation: SQL injection in primary col reaches primary DB only');
+	ok(!exists $db_b->last_criteria->{name},
+		'fetchrow_hashref() isolation: SQL injection in primary col does NOT reach secondary DB');
+}
+
+# ===========================================================================
+# SECTION 14 -- collision_prefix Reference Type Guard (Heap Address Leakage)
+#
+# Exploit: passing a reference as a collision_prefix value causes string
+#   interpolation in "$prefix.$col" to produce "HASH(0x...)" or
+#   "ARRAY(0x...)", leaking a heap address into every column name, columns(),
+#   schema(), and all row hashrefs returned to the caller.
+# MP: _build_col_index must reject non-string collision_prefix values before
+#   any column name is constructed, matching the existing join_map guard.
+# C: croak fires with error_invalid_prefix; no column is ever built with a
+#   heap address embedded in its name.
+# ===========================================================================
+
+# Test 65
+# Exploit: hashref as collision_prefix value (HASH(0x...) would leak).
+{
+	my ($db_a, $db_b) = make_dbs();
+	local $@;
+	eval {
+		Database::Join->new(
+			databases        => [$db_a, $db_b],
+			join_column      => 'entry',
+			collision_prefix => { 1 => {} },   # hashref instead of string
+		);
+	};
+	my ($first_line) = split /\n/, ($@ // ''), 2;
+	ok(length($first_line), 'collision_prefix guard: hashref value causes croak');
+	unlike $first_line, qr/0x[0-9a-f]{4,}/i,
+		'collision_prefix guard: hashref value does not leak heap address in error';
+}
+
+# Test 67
+# Exploit: arrayref as collision_prefix value (ARRAY(0x...) would leak).
+{
+	my ($db_a, $db_b) = make_dbs();
+	local $@;
+	eval {
+		Database::Join->new(
+			databases        => [$db_a, $db_b],
+			join_column      => 'entry',
+			collision_prefix => { 1 => [] },   # arrayref instead of string
+		);
+	};
+	my ($first_line) = split /\n/, ($@ // ''), 2;
+	ok(length($first_line), 'collision_prefix guard: arrayref value causes croak');
+	unlike $first_line, qr/0x[0-9a-f]{4,}/i,
+		'collision_prefix guard: arrayref value does not leak heap address in error';
+}
+
+# ===========================================================================
+# SECTION 15 -- Filter Reference Aliasing: Post-Construction Mutation
+#
+# Exploit: the caller holds the same hashref passed as `filters =>`.  After
+#   construction, the caller mutates (empties) the filter.  Without defensive
+#   copying, the next query sees an empty filter and the inner-join row-security
+#   guarantee is silently bypassed.
+# MP: _copy_filters() must deep-copy the filters hashref at construction time
+#   so that the stored filter is independent of the caller's original hash.
+# C: post-construction mutation of the original hashref has no effect on query
+#   results; the filter continues to restrict rows as originally configured.
+# ===========================================================================
+
+# Test 69
+# Exploit: empty the filter hashref after construction hoping row-security fails.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my %live_filter = (score => { '>' => 80 });  # Alice (95) passes; Bob (70) does not
+	my $join = Database::Join->new(
+		databases   => [$db_a, $db_b],
+		join_column => 'entry',
+		filters     => { 1 => \%live_filter },
+	);
+
+	# Attacker empties the caller's filter hash post-construction
+	%live_filter = ();
+
+	my $rows = $join->selectall_arrayref();
+	# If aliasing is present, %key_set would include Bob (filter gone → 2 rows).
+	# Defensive copy means the stored filter is unchanged → only Alice survives.
+	is(scalar @{$rows}, 1,
+		'filter alias: post-construction filter mutation cannot widen row set');
+	is($rows->[0]{name}, 'Alice',
+		'filter alias: Alice (score=95) still the only row after mutation');
+}
+
+# Test 71
+# Exploit: delete an entry from the filters hashref (coarser than emptying a sub-hash).
+{
+	my ($db_a, $db_b) = make_dbs();
+	my %outer_filter = (1 => { score => { '>' => 80 } });
+	my $join = Database::Join->new(
+		databases   => [$db_a, $db_b],
+		join_column => 'entry',
+		filters     => \%outer_filter,
+	);
+
+	# Attacker deletes the whole secondary-DB filter entry
+	delete $outer_filter{1};
+
+	my $rows = $join->selectall_arrayref();
+	is(scalar @{$rows}, 1,
+		'filter alias: deleting outer filter entry cannot bypass row-security');
+	is($rows->[0]{name}, 'Alice',
+		'filter alias: Alice still the only row after outer entry deletion');
+}
+
+# Test 73
+# Regression: add_database() filter parameter is also deep-copied.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $join = Database::Join->new(
+		databases   => [$db_a],
+		join_column => 'entry',
+	);
+	my %live_filter = (score => { '>' => 80 });
+	$join->add_database($db_b, filter => \%live_filter);
+
+	# Mutate the filter after add_database
+	%live_filter = ();
+
+	my $rows = $join->selectall_arrayref();
+	is(scalar @{$rows}, 1,
+		'add_database filter alias: post-add mutation cannot widen row set');
+	is($rows->[0]{name}, 'Alice',
+		'add_database filter alias: Alice still the only surviving row');
+}
+
+# Test 75
+# Confirm: a valid string collision_prefix does NOT croak.
+{
+	my $db_a_pfx = MockSecDB->new(
+		columns => [qw(entry name)],
+		rows    => [ { entry => 'A1', name => 'Alice' } ],
+	);
+	my $db_b_pfx = MockSecDB->new(
+		columns => [qw(entry name)],
+		rows    => [ { entry => 'A1', name => 'Bob'   } ],
+	);
+	my $join_ok;
+	lives_ok {
+		$join_ok = Database::Join->new(
+			databases        => [$db_a_pfx, $db_b_pfx],
+			join_column      => 'entry',
+			collision_prefix => { 1 => 'secondary' },  # valid plain string
+		);
+	} 'collision_prefix guard: plain string value does not croak';
+	my $cols = $join_ok->columns();
+	ok((grep { $_ eq 'secondary.name' } @{$cols}),
+		'collision_prefix guard: valid prefix produces correctly named collision column');
 }
 
 done_testing();

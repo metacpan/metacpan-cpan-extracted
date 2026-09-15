@@ -56,7 +56,7 @@ requires:
   experimental: '0'
   feature: '0'
   namespace::autoclean: '0'
-  perl: v5.20.0
+  perl: v5.22.0
   strict: '0'
   utf8: '0'
   warnings: '0'
@@ -64,7 +64,7 @@ resources:
   bugtracker: https://github.com/rjbs/Pod-Weaver/issues
   homepage: https://github.com/rjbs/Pod-Weaver
   repository: https://github.com/rjbs/Pod-Weaver.git
-version: '4.021'
+version: '4.022'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -393,7 +393,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '4.021'
+          tag: '4.022'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

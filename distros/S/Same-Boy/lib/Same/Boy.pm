@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # Optional symbolic exports for button masks (defined in XS; see the BOOT
 # block in Boy.xs).
@@ -26,7 +26,7 @@ Same::Boy - Game Boy and Game Boy Color emulator (SameBoy Core) for Perl
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

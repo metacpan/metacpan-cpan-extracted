@@ -9,6 +9,7 @@ README
 dist.json
 lib/constant/string.pm
 lib/constant/string/uc.pm
+lib/constant/string/ucfirst.pm
 t/00_use.t
 t/01_test_strings.t
 t/02_test_dualvars.t
@@ -16,3 +17,6 @@ t/03_test_objects.t
 t/04_test_uc_strngs.t
 t/05_test_uc_dualvars.t
 t/06_test_uc_objects.t
+t/07_test_ucfirst_strngs.t
+t/08_test_ucfirst_dualvars.t
+t/09_test_ucfirst_objects.t

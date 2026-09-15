@@ -1,5 +1,8 @@
 Revision history for Monitoring-Sneck
 
+1.4.2   2026-09-11/16:00
+        - add in error handling for open3
+
 1.4.1   2026-06-25/01:15
         - add some more tests
 
@@ -7,43 +10,43 @@ Revision history for Monitoring-Sneck
         - add missing depend on Proc::PID::File
 
 1.3.0   2026-02-02/12:45
-		- add -q to be quiet
-		- add -l for locking
+        - add -q to be quiet
+        - add -l for locking
 
 1.2.1   2025-10-17/10:00
-		- make sure .data.time is actually a int
+        - make sure .data.time is actually a int
 
 1.2.0   2025-10-14/17:45
-		- add -d to src_bin/sneck to print debugging info when run is called
+        - add -d to src_bin/sneck to print debugging info when run is called
 
 1.1.0   2025-07-25/01:45
-		- add run_time variables for total, checks, and debug
-		- fix an issue that could result in it complaining about undef
+        - add run_time variables for total, checks, and debug
+        - fix an issue that could result in it complaining about undef
 
 1.0.2   2025-04-11/14:15
-		- call waitpid to actually get the exit code
+        - call waitpid to actually get the exit code
 
 1.0.1   2025-04-07/10:30
-		- fix exit code stuff for debug
+        - fix exit code stuff for debug
 
 1.0.0   2025-04-07/10:00
-		- now captures stderr as well
-		- add debug checks that don't affect the end results and just provide additional info
+        - now captures stderr as well
+        - add debug checks that don't affect the end results and just provide additional info
 
 0.5.0   2024-01-13/20:00
-		 - update some docs and rework variables from %%%var%%% to /\%+var\%+/
+        - update some docs and rework variables from %%%var%%% to /\%+var\%+/
 
 0.4.0   2024-01-13/16:00
-		 - add enviromental variable support
+        - add enviromental variable support
 
 0.3.0   2024-01-10/20:15
-		 - convert to Pod::Usage
-		 - convert to IO::Compress::Gzip
-		 - now creates /var/cache/sneck.cache.snmp which contains the compressed output
+        - convert to Pod::Usage
+        - convert to IO::Compress::Gzip
+        - now creates /var/cache/sneck.cache.snmp which contains the compressed output
 
 0.2.0   2023-06-15/17:15
-		- Documentation cleanup
-		- convert to use src_bin
+        - Documentation cleanup
+        - convert to use src_bin
 
 
 0.1.0   2022-08-03/17:15

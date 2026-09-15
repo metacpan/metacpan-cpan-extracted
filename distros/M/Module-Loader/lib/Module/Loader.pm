@@ -1,10 +1,10 @@
 package Module::Loader;
-$Module::Loader::VERSION = '0.04';
+$Module::Loader::VERSION = '0.05';
 use 5.006;
 use strict;
 use warnings;
 use Path::Iterator::Rule;
-use File::Spec::Functions   qw/ catfile splitdir /;
+use File::Spec::Functions   qw/ catfile splitdir catdir /;
 use Carp                    qw/ croak /;
 
 sub new
@@ -32,7 +32,8 @@ sub find_modules
     my @baseparts     = split(/::/, $base);
     my %modules;
 
-    foreach my $directory (@INC) {
+    foreach my $inc_directory (@INC) {
+        my $directory = catdir($inc_directory);
         my $path = catfile($directory, @baseparts);
         next unless -d $path;
 

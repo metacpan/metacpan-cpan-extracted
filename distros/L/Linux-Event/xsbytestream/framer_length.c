@@ -19,12 +19,12 @@ les_decode_prefix(const unsigned char *p, int bytes, int little)
 int
 les_frame_fits_buffer(pTHX_ les_xsstate_t *st, UV prefix_bytes, UV payload_len)
 {
-    if (st->descriptor->max_buffer && payload_len > st->descriptor->max_buffer) {
+    if (st->max_buffer && payload_len > st->max_buffer) {
         char msg[160];
         snprintf(msg, sizeof(msg),
             "declared frame length=%llu exceeds max_buffer=%llu",
             (unsigned long long)payload_len,
-            (unsigned long long)st->descriptor->max_buffer);
+            (unsigned long long)st->max_buffer);
         les_call_framing_error(aTHX_ st, msg);
         return 0;
     }
@@ -32,13 +32,12 @@ les_frame_fits_buffer(pTHX_ les_xsstate_t *st, UV prefix_bytes, UV payload_len)
         les_call_framing_error(aTHX_ st, "frame length overflow");
         return 0;
     }
-    if (st->descriptor->max_buffer
-        && prefix_bytes + payload_len > st->descriptor->max_buffer) {
+    if (st->max_buffer && prefix_bytes + payload_len > st->max_buffer) {
         char msg[160];
         snprintf(msg, sizeof(msg),
             "framed message requires %llu bytes, exceeds max_buffer=%llu",
             (unsigned long long)(prefix_bytes + payload_len),
-            (unsigned long long)st->descriptor->max_buffer);
+            (unsigned long long)st->max_buffer);
         les_call_framing_error(aTHX_ st, msg);
         return 0;
     }

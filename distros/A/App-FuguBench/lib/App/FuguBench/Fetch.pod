@@ -1,0 +1,73 @@
+=head1 NAME
+
+App::FuguBench::Fetch - the fetch verb of fugubench
+
+=head1 SYNOPSIS
+
+    $ fugubench fetch /tmp/asset.tar.gz https://example.com/asset.tar.gz
+
+=head1 DESCRIPTION
+
+B<App::FuguBench::Fetch> holds the C<fetch> verb. The verb downloads
+one URL to one file through L<Fugu::Curl>, which runs curl, wget, or
+ftp. It is silent on success and returns 0.
+
+The argument order is the order of the F<ftp> helper of Tooling: the
+destination file first, and the URL after it. A make recipe that
+called the helper calls the verb, and the C<deps> verb names the verb
+in the trace of each download.
+
+The verb reads no checkout, so it runs in a tree with no
+F<.toolingrc>.
+
+=head2 THE URL
+
+L<Fugu::Curl> puts the URL last on the command line of the
+downloader, and it writes no C<--> separator ahead of it. A URL that
+starts with a dash would reach the downloader as an option, so the
+verb holds the URL to a shape check first. The URL starts with a
+scheme, and a scheme starts with a letter, so one rule covers both
+shapes.
+
+=head2 command
+
+C<command($verb)> returns the entry of the L<Fugu::CLI> table. The
+module holds one verb, so it ignores the name.
+
+=head2 check_url
+
+C<check_url($app, $url, $where)> holds one URL to that shape. It
+returns 1 for a URL that passes, and 0 for one that does not, which
+it reports. C<$where> names the source of the URL in the message. The
+C<deps> verb calls it over each manifest URL, so one check serves
+both verbs.
+
+=head1 FAILURE
+
+L<Fugu::Curl> writes the bytes beside the destination, and it renames
+the file on success. A failed download therefore leaves no file at
+the destination, and the destination keeps what it held before the
+call.
+
+The verb writes the reason of a failure to standard error and returns
+1. An absent downloader is one such failure, and the reason names the
+three commands.
+
+=head1 RETURN VALUES
+
+C<command> returns a hash reference. Its body returns 0 after the
+download, and 1 after a failed one. A command line that holds other
+than two arguments is a usage error, and it returns 2. A URL that
+fails the shape check is a usage error as well: the verb names the
+fault, prints the usage on standard error, and returns 2.
+
+=head1 SEE ALSO
+
+L<App::FuguBench>, L<App::FuguBench::Deps>, L<Fugu::CLI>,
+L<Fugu::Curl>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

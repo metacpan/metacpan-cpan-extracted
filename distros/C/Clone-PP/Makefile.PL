@@ -7,14 +7,13 @@ if ($mm_ver =~ /_/) { # dev version
 }
 
 WriteMakefile(
-    'NAME'	=> 'Clone::PP',
+    'NAME'         => 'Clone::PP',
     'VERSION_FROM' => 'lib/Clone/PP.pm', 
 
     PREREQ_PM      => {
         'Exporter' => 0,
         'strict'   => 0,
         'warnings' => 0,
-        'vars'     => 0,
     },
 
     ($mm_ver >= 6.48

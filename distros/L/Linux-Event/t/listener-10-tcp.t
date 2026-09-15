@@ -17,7 +17,7 @@ our ($LOOP, $STATE);
     use parent 'Linux::Event::IO::Sock::Listener';
 
     sub on_accept ($listener, $stream) {
-        my $state = $listener->data;
+        my $state = $stream->data;
         $state->{accepted_stream} = $stream;
         $state->{accept_loop} = $stream->loop;
         push @{ $state->{order} }, 'accept';
@@ -51,8 +51,8 @@ our ($LOOP, $STATE);
 $LOOP = Linux::Event::Loop->new;
 $STATE = { order => [] };
 my $listener = T::AcceptedTCPListener->new(
-    stream_class => 'T::AcceptedTCPStream',
-    loop => $LOOP, host => '127.0.0.1', port => 0, data => $STATE,
+    loop => $LOOP, host => '127.0.0.1', port => 0,
+    stream => { class => 'T::AcceptedTCPStream', data => $STATE },
 );
 
 is($listener->state, 'listening', 'loop constructor option attaches Listener');

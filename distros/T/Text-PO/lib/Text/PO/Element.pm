@@ -313,14 +313,14 @@ sub normalise
         $lines = $self->wrap( $text );
     }
     
-    if( scalar( @$lines ) > 1 )
+    if( defined( $lines ) && scalar( @$lines ) > 1 )
     {
         push( @res, sprintf( '%s ""', $type ) );
         push( @res, map( sprintf( '"%s"', $_ ), @$lines ) );
     }
     else
     {
-        push( @res, sprintf( '%s "%s"', $type, $lines->[0] ) );
+        push( @res, sprintf( '%s "%s"', $type, ( defined( $lines ) ? $lines->[0] : '' ) ) );
     }
     return( join( "\n", @res ) );
 }

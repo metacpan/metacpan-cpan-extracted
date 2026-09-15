@@ -13,13 +13,13 @@ use warnings;
 use utf8;
 
 use Exporter 'import';
-our @EXPORT_OK = qw(validate_cp municipios asignado);
+our @EXPORT_OK = qw(validate_cp municipios asignado provincias);
 
 use Class::XSAccessor {
   accessors => [qw(codigo ca error iso_3166_2 strict provincia prov_code region valid)]
 };
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 use constant PROVINCIAS =>
@@ -215,6 +215,26 @@ sub set {
 }
 
 
+## Salen de la tabla de prefijos, que es la misma fuente que usa provincia():
+## mantener una segunda lista a mano es justo lo que acaba divergiendo.
+##
+## El orden ignora los acentos. Un sort a secas compara por punto de codigo y
+## manda 'Álava' y 'Ávila' detras de 'Zaragoza', porque 'Á' es U+00C1 y cae
+## despues de la 'Z'. En una lista de seleccion eso se nota enseguida.
+sub provincias {
+    my %vistas = map { $_ => 1 } values %{ +PROVINCIAS };
+    return sort { _orden($a) cmp _orden($b) } keys %vistas;
+}
+
+sub _orden {
+    my $s = lc shift;
+    my %a = ("\x{e1}" => 'a', "\x{e9}" => 'e', "\x{ed}" => 'i',
+             "\x{f3}" => 'o', "\x{fa}" => 'u', "\x{fc}" => 'u', "\x{f1}" => 'n');
+    $s =~ s/([\x{e1}\x{e9}\x{ed}\x{f3}\x{fa}\x{fc}\x{f1}])/$a{$1}/g;
+    return $s;
+}
+
+
 sub municipios {
   my $cp = ref($_[0]) ? $_[0]->codigo : $_[0];
 
@@ -250,7 +270,7 @@ Business::ES::CodigoPostal - Validación de códigos postales españoles: provin
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -404,6 +424,15 @@ Fija nuevo código postal
   }
 
 Retorna 1 si el código posta es válido o 0 si no.
+
+=head2 provincias
+
+  my @p = provincias;   # ('Álava', 'Albacete', ... 'Zaragoza')
+
+Las 52 provincias por orden alfabético, con la misma grafía que devuelve
+C<provincia>. Sirve para montar una lista de selección sin mantenerla aparte, y
+así no puede acabar diciendo una cosa distinta de lo que rellena el código
+postal.
 
 =head2 municipios
 

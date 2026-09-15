@@ -209,7 +209,7 @@ is(Linux::Event::_ByteStream->_native_consumer_abi_version, 1,
 {
     package T::BudgetRaw;
     use parent 'Linux::Event::IO::Sock::Stream';
-    sub stream_options ($class) {
+    sub stream_tuning ($class) {
         return read_size => 4, read_budget_bytes => 4;
     }
     sub on_data ($stream, $bytes) {

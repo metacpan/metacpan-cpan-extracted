@@ -56,17 +56,22 @@ behavior is unchanged.
 
 The public `IO::Sock::Stream` leaf may be used directly for raw I/O when its
 required `on_data` callback is supplied to the constructor. A subclass remains
-necessary when declaring a framer, native consumer, TLS, `stream_options()`, or
-`socket_options()` because those are cached class policy.
+the reusable policy mechanism for a framer, native consumer, `stream_tuning()`,
+`socket_options()`, named callbacks, and optional TLS defaults. Accepted TLS is
+selected independently by the Listener recipe and is not part of Stream class
+identity.
 
-Framer selection, tuning, transport, and socket behavior remain class-level
-policy even when the effective application callback is constructor-supplied.
+Framer selection and socket defaults remain class-level policy. Listener recipe
+tuning can override class `stream_tuning()` for generated connections and a
+live Stream can subsequently change mutable ordered-byte policy with `tune()`.
 
 Raw, framed, batched, and native-consumer modes remain explicit. `on_data`
-cannot be used on a framed class; `on_message` and `on_messages` cannot be used
-on a raw class; `on_messages` requires `message_batch_size`; and Perl message
-callbacks cannot replace a native consumer. Invalid combinations fail during
-construction rather than during dispatch.
+cannot be used on a framed class and message callbacks cannot be used on a raw
+class. A framed class may provide both `on_message` and `on_messages` so a live
+`tune(message_batch_size => ...)` can switch delivery policy without changing
+protocol class; the callback required by the initial effective policy must
+exist. Perl message callbacks cannot replace a native consumer. Invalid
+combinations fail during construction rather than during dispatch.
 
 ## Dispatch model
 
@@ -97,29 +102,30 @@ descriptor. `close()` and failed construction release retained callbacks;
 
 ## Listener reuse
 
-An `IO::Sock::Listener` accepts the complete connected-Stream callback set as
-templates for its accepted Streams:
+An `IO::Sock::Listener` accepts the complete connected-Stream callback set in
+its generated-Stream recipe:
 
 ```perl
 my $listener = Linux::Event::IO::Sock::Listener->new(
     loop => $loop,
-    stream_class => 'Linux::Event::IO::Sock::Stream',
     host => '127.0.0.1',
     port => 9999,
-    on_data => sub ($stream, $bytes) {
-        $stream->write($bytes);
+    stream => {
+        on_data => sub ($stream, $bytes) {
+            $stream->write($bytes);
+        },
     },
 );
 ```
 
-The Listener retains one CV and supplies that same CV to every accepted
-Stream. Per-connection identity and mutable state normally belong in the
-Stream's `data`. Creating a fresh closure per connection is unnecessary unless
-the application truly needs distinct lexical state, and carries measurable
-construction cost.
+The Listener resolves the recipe once, retains one CV, and supplies that same
+CV to every accepted Stream. Per-connection identity and initial mutable state
+belong in `stream => { data => ... }`. Creating a fresh closure per connection
+is unnecessary unless the application truly needs distinct lexical state, and
+carries measurable construction cost.
 
-The Listener constructor's callback options configure accepted Streams. The
-Listener's own `on_accept` and `on_error` policies remain subclass methods.
+Top-level `on_accept` and `on_error` belong to the Listener itself. Stream
+callbacks such as `on_data` and Stream `on_error` belong inside `stream => {}`.
 
 ## Performance evidence
 

@@ -3,8 +3,11 @@ abstract: 'Read-only Database Abstraction Layer (ORM)'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  CHI: '0'
   DBD::CSV: '0'
   DBD::XMLSimple: '0.07'
+  DBM::Deep: '0'
+  Excel::Writer::XLSX: '0'
   ExtUtils::MakeMaker: '0'
   Fcntl: '0'
   File::Glob: '0'
@@ -15,11 +18,16 @@ build_requires:
   FindBin: '0'
   Gzip::Faster: '0'
   HTML::TableExtract: '0'
+  HTTP::Response: '0'
+  IPC::Run: '0'
   IPC::System::Simple: '0'
   JSON::MaybeXS: '0'
+  LWP::UserAgent: '0'
   LWP::UserAgent::Cached: '0'
   POSIX: '0'
   Readonly: '0'
+  Spreadsheet::ParseXLSX: '0'
+  Spreadsheet::WriteExcel: '0'
   Test::Carp: '0'
   Test::Compile: '0'
   Test::DescribeMe: '0'
@@ -33,11 +41,13 @@ build_requires:
   Test::Which: '0'
   Test::Without::Module: '0'
   Text::xSV::Slurp: '0'
+  Time::HiRes: '0'
   XML::Simple: '0'
+  YAML::XS: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -72,5 +82,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction
   repository: git://github.com/nigelhorne/Database-Abstraction.git
-version: '0.41'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

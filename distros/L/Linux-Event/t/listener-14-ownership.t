@@ -28,7 +28,7 @@ my $borrowed = raw_listener();
 my $borrowed_fd = fileno($borrowed);
 my $loop = Linux::Event::Loop->new;
 my $listener = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'T::OwnedStream', loop => $loop, fh => $borrowed,
+    stream => { class => 'T::OwnedStream' }, loop => $loop, fh => $borrowed,
 );
 is($listener->fd, $borrowed_fd, 'adopted listener preserves descriptor');
 ok(fcntl($borrowed, F_GETFL, 0) & O_NONBLOCK,
@@ -48,7 +48,7 @@ my $detached_source = raw_listener();
 my $detached_fd = fileno($detached_source);
 my $loop2 = Linux::Event::Loop->new;
 my $detaching = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'T::OwnedStream',
+    stream => { class => 'T::OwnedStream' },
     loop => $loop2, fh => $detached_source, owns_socket => 1,
 );
 my $detached = $detaching->detach;
@@ -70,7 +70,7 @@ our $FAILURE_CALLBACK_LOOP;
 my $failure_source = raw_listener();
 my $failure_loop = Linux::Event::Loop->new;
 my $failing = T::FailureListener->new(
-    stream_class => 'T::OwnedStream', # required
+    stream => { class => 'T::OwnedStream' }, # required
     loop         => $failure_loop,    # optional
     fh           => $failure_source,  # required for adoption
 );
@@ -85,7 +85,7 @@ close $failure_source;
 my $throwing_source = raw_listener();
 my $throwing_loop = Linux::Event::Loop->new;
 my $throwing = Linux::Event::IO::Sock::Listener->new(
-    stream_class => 'T::OwnedStream', # required
+    stream => { class => 'T::OwnedStream' }, # required
     loop         => $throwing_loop,   # optional
     fh           => $throwing_source, # required for adoption
 );

@@ -10,10 +10,10 @@ handshake/shutdown deadlines.
 ## Configuration
 
 Subclass defaults belong in the cached ordered-byte descriptor through the
-current `stream_options()` tuning hook:
+current `stream_tuning()` tuning hook:
 
 ```perl
-sub stream_options ($class) {
+sub stream_tuning ($class) {
     return (
         idle_timeout  => 60,
         read_timeout  => 30,
@@ -40,7 +40,8 @@ my $connection = ClientConnection->connect(
 
 The same established options can be used by appropriate Pipe/TTY construction
 paths and by an adopted established stream socket. A listener-created
-connection uses the configured `stream_class` defaults.
+connection uses its recipe class defaults followed by any
+`stream => { tuning => {...} }` overrides.
 
 An explicit zero constructor value disables a nonzero subclass default.
 Constructor overrides remain in force across `transition_to`; non-overridden

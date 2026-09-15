@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Build::Recipe v1.0.0 {
+class Alien::Xrepo::Build::Recipe v1.0.1 {
     use JSON::PP qw[decode_json];
     use Path::Tiny;
     use Scalar::Util qw[looks_like_number];
@@ -24,7 +24,7 @@ class Alien::Xrepo::Build::Recipe v1.0.0 {
         if ( defined $file || defined $dir ) {
             die 'Recipe: pass exactly one of file / dir / inline data'       if defined $file && defined $dir;
             die q[Recipe: inline 'packages' is ignored when a file is given] if defined $packages;
-            my $path = $file // path($dir)->child('xrepo.json');
+            my $path = $file // path($dir)->child('xrepo.json');    # Used during testing
             die 'Recipe file not found: ' . $path unless -e $path;
             my $data = eval { decode_json( path($path)->slurp_utf8 ) };
             die "Recipe '$path' is not valid JSON: $@" if !defined $data || ref $data ne 'HASH';

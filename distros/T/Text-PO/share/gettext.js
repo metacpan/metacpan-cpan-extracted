@@ -1,11 +1,11 @@
 /*
 * ----------------------------------------------------------------------------
 * PO Files Manipulation - Text-PO/share/gettext.js
-* Version v1.0.3
+* Version v1.1.1
 * Copyright(c) 2021-2026 DEGUEST Pte. Ltd.
 * Author: Jacques Deguest <jack@deguest.jp>
 * Created 2021/06/29
-* Modified 2026/02/23
+* Modified 2026/09/08
 * All rights reserved
 * 
 * This program is free software; you can redistribute  it  and/or  modify  it
@@ -1848,6 +1848,7 @@ function printf() {
     var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
     var TEXT_REGEXP  = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/;
 
+    // A real Unicode BCP47 regular expression is much more complex.
     var LOCALE_REGEXP = /^[a-z]{2}((?:[_-][A-Z]{2})(?:\.[\w-]+)?)?$/;
 
     var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
@@ -2119,7 +2120,14 @@ function printf() {
             }
             if( opts.hasOwnProperty( 'debug' ) )
             {
-                self.debug_level = parseInt( opts.debug );
+                if( typeof( opts.debug ) === 'boolean' )
+                {
+                    self.debug_level = 1;
+                }
+                else
+                {
+                    self.debug_level = parseInt( opts.debug );
+                }
                 delete( opts.debug );
             }
             else if( opts.hasOwnProperty( 'debug_level' ) )
@@ -2510,7 +2518,14 @@ function printf() {
             this.category = null;
             if( opts.hasOwnProperty( 'debug' ) )
             {
-                opts.debug_level = opts.debug;
+                if( typeof( opts.debug ) === 'boolean' )
+                {
+                    opts.debug_level = 1;
+                }
+                else
+                {
+                    opts.debug_level = opts.debug;
+                }
                 delete( opts.debug );
             }
             if( opts.hasOwnProperty( 'useCategory' ) )
@@ -2564,7 +2579,8 @@ function printf() {
                 throw new Error( "Language provided (\"" + this.locale + "\") is in an unsupported format. Use something like \"en_GB\", \"en-GB\" or simply \"en\" or even \"en_GB.utf-8\"." );
             }
 
-            this.locale = this.locale.replace( '-', '_' );
+            // We use Unicode BCP47 notation, and thus a hyphen
+            this.locale = this.locale.replace( '_', '-' );
             this.path = new URI( this.path );
             this.plural = [];
             window.Gettext.L10N = window.Gettext.L10N || {};
@@ -2767,7 +2783,7 @@ function printf() {
         {
             var self = this;
             var hash = self.getDomainHash();
-            locale = locale.replace( '-', '_' );
+            locale = locale.replace( '_', '-' );
             if( !self.isSupportedLanguage( locale ) )
             {
                 throw new Error( "Language requested \"" + locale + "\" to add item is not supported." );
@@ -2854,7 +2870,7 @@ function printf() {
             {
                 throw new Error( "Unsupported locale format \"" + lang + "\"." );
             }
-            lang = lang.replace( '-', '_' );
+            lang = lang.replace( '_', '-' );
             var hash = self.getDomainHash();
             return( hash.hasOwnProperty( lang ) );
         },
@@ -3156,7 +3172,7 @@ function printf() {
             if( opts.hasOwnProperty( 'locale' ) && 
                 typeof( opts.locale ) !== 'undefined' )
             {
-                opts.locale = opts.locale.replace( '-', '_' );
+                opts.locale = opts.locale.replace( '_', '-' );
                 self.debug( "Returning domain hash for domain \"" + opts.domain + "\" and locale \"" + opts.locale + "\" -> " + JSON.stringify( hash[ opts.domain ], null, 4 ) );
                 if( opts.locale.length == 0 )
                 {
@@ -3168,7 +3184,7 @@ function printf() {
             return( hash[ opts.domain ] );
         },
 
-        // example: <link rel="gettext" lang="ja_JP" href="/locale/ja_JP" />
+        // example: <link rel="gettext" lang="ja-JP" href="/locale/ja-JP" />
         /**
          * Return the uri path to localised content for a given language (a.k.a. locale) found in a <rel> html tag if any.
          *
@@ -3222,7 +3238,7 @@ function printf() {
             {
                 throw new Error( "Locale provided (" + lang + ") is in an unsupported format." );
             }
-            lang = lang.replace( '-', '_' );
+            lang = lang.replace( '_', '-' );
 
             if( !self.isSupportedLanguage( lang ) )
             {
@@ -3531,7 +3547,7 @@ function printf() {
             {
                 thisLang = document.getElementsByTagName('html')[0].getAttribute('lang');
             }
-            thisLang = thisLang.replace( '-', '_' );
+            thisLang = thisLang.replace( '_', '-' );
             // Force stringification if this is an object
             thisKey = thisKey + "";
             if( l10n.hasOwnProperty( thisLang ) )
@@ -3568,7 +3584,7 @@ function printf() {
             }
             if( !params.hasOwnProperty( 'lang' ) ) params.lang = document.getElementsByTagName('html')[0].getAttribute('lang');
             var thisKey = args.shift();
-            params.lang = params.lang.replace( '-', '_' );
+            params.lang = params.lang.replace( '_', '-' );
             //return( sprintf( getText( thisKey, params.lang ), ...args ) );
             var thisText = self.getText( thisKey, params.lang );
             var strLang = thisText.getLocale();
@@ -3690,7 +3706,7 @@ function printf() {
             opts.locale   = ( opts.locale || this.locale );
             opts.domain   = ( opts.domain || this.domain );
             opts.category = ( opts.category || this.category );
-            opts.locale   = opts.locale.replace('-','_');
+            opts.locale   = opts.locale.replace('_','-');
 
             // var dataUri = opts.path + "/" + opts.locale + "/" + opts.domain + ".json";
             var dataUri = opts.path + "/" + opts.locale + "/" + ( ( typeof( opts.category ) === 'string' && opts.category.length > 0 ) ? opts.category + "/" : "" ) + opts.domain + ".json";
@@ -3744,15 +3760,20 @@ function printf() {
                     if( !elem.msgid || !elem.msgstr )
                     {
                         console.warn( "Element at offset " + i + " is missing either a msgid or msgstr property at uri \"" + dataUri + "\"." );
-                        return;
+                        continue;
                     }
                     // Likely the meta information
                     else if( elem.msgid.length == 0 )
                     {
-                        return;
+                        continue;
                     }
                     self.debug( "Adding msgid \"" + elem.msgid + "\" -> \"" + JSON.stringify(elem) + "\"." );
                     hash[opts.domain][opts.locale][elem.msgid] = elem;
+                    // We load the plural form too if there is one.
+                    if( elem.hasOwnProperty('msgid_plural') )
+                    {
+                        hash[opts.domain][opts.locale][elem.msgid_plural] = elem;
+                    }
                 }
 
                 if( data.meta.hasOwnProperty( 'Plural-Forms' ) && data.meta['Plural-Forms'].length > 0 )
@@ -4025,7 +4046,7 @@ function printf() {
             }
 
             // Normalise to the underscore form used in L10N keys and file paths
-            locale = locale.replace( '-', '_' );
+            locale = locale.replace( '_', '-' );
             // Ensure we have a domain hash to inspect
             var l10n = self.getDomainHash();
             // If we do not have data for this locale yet, load it now.
@@ -4613,7 +4634,7 @@ Or:
 
 =head1 VERSION
 
-    v1.0.3
+    v1.1.0
 
 =head1 DESCRIPTION
 

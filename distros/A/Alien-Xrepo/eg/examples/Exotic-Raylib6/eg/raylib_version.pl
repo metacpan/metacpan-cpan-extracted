@@ -1,0 +1,13 @@
+use v5.40;
+use strict;
+use warnings;
+use Exotic::Raylib6;
+my $raylib = Exotic::Raylib6->new;
+die 'Exotic::Raylib6: package not installed; run `perl Makefile.PL && make` (gmake on Strawberry) first' unless $raylib->package_info;
+use FFI::Platypus;
+my $ffi = FFI::Platypus->new( api => 1, lib => [ $raylib->ffi_lib ] );
+$ffi->attach( TextToUpper => ['string'] => 'string' );
+say 'libpath:   ', $raylib->libpath;
+say 'ffi_lib:   ', $raylib->ffi_lib;
+say 'version:   ', $raylib->version;
+say 'raylib is: ', TextToUpper('xrepo') . '!';

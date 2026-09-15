@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I/home/phil/perl/cpan/SvgSimple/lib/
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/ -I/home/phil/perl/cpan/Math-Intersection-Circle-Line/lib/
 #-------------------------------------------------------------------------------
 # Test Svg::Simple
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016

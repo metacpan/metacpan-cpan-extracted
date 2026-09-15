@@ -10,10 +10,12 @@
 #
 
 use Net::Dict;
+use Encode;
+use utf8;
 
 $^W = 1;
 
-my $HOST = 'dalek';
+my $HOST = 'dict.org';
 my $PORT = 2628;
 
 my $WARNING;
@@ -95,7 +97,6 @@ else
 $string = '';
 eval { %dbhash = $dict->dbs(); };
 if (!$@
-    && defined %dbhash
     && do { foreach my $db (sort keys %dbhash) { $string .= "${db}:$dbhash{$db}\n"; }; 1; }
     && $string eq $TESTDATA{dblist})
 {
@@ -104,6 +105,7 @@ if (!$@
 else
 {
     print "not ok 4\n";
+    print STDERR "EXPECTED:\n$TESTDATA{dblist}\nGOT:\n$string\n";
 }
 
 #-----------------------------------------------------------------------
@@ -182,7 +184,6 @@ else
 $string = '';
 eval { %dbhash = $dict->dbs(); };
 if (!$@
-    && defined %dbhash
     && do { foreach my $db (sort keys %dbhash) { $string .= "${db}:$dbhash{$db}\n"; }; 1; }
     && $string eq $TESTDATA{'auth-dblist'})
 {
@@ -200,12 +201,553 @@ exit 0;
 
 __DATA__
 ==== dblist ====
-elements:Elements database 20001107
-foldoc:The Free On-line Dictionary of Computing (13 Mar 01)
-jargon:Jargon File (4.2.3, 23 NOV 2000)
+all:All Dictionaries (English-Only and Translating)
+bouvier:Bouvier's Law Dictionary, Revised 6th Ed (1856)
+cc-cedict:CC-CEDICT Chinese-English dictionary version 20260403
+devil:The Devil's Dictionary (1881-1906)
+easton:Easton's 1897 Bible Dictionary
+elements:The Elements (07Nov00)
+english:English Monolingual Dictionaries
+english-german:English - German Dictionary # Version: devel 2026-01-09
+fd-afr-deu:Afrikaans-German FreeDict Dictionary ver. 0.3.3
+fd-afr-eng:Afrikaans-English FreeDict Dictionary ver. 0.2.2
+fd-ara-eng:Arabic-English FreeDict Dictionary ver. 0.6.3
+fd-bre-fra:Breton-French FreeDict Dictionary (Geriadur Tomaz) ver. 0.8.3
+fd-cat-eng:català-English FreeDict+WikDict dictionary ver. 2024.10.10
+fd-cat-fin:català-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-cat-fra:català-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-cat-ita:català-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-cat-por:català-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-cat-spa:català-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ces-eng:Czech-English FreeDict Dictionary ver. 0.2.3
+fd-ckb-kmr:Sorani-Kurmanji Ferheng/FreeDict Dictionary ver. 0.2
+fd-cym-eng:Eurfa Cymraeg, Welsh-English Eurfa/Freedict dictionary ver. 0.2.3
+fd-dan-eng:Danish-English FreeDict Dictionary ver. 0.3.1
+fd-deu-bul:Deutsch-български език FreeDict+WikDict dictionary ver. 2020.10.04
+fd-deu-cat:Deutsch-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-ell:Deutsch-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-eng:German - English Ding/FreeDict dictionary ver. 1.9-fd1
+fd-deu-fin:Deutsch-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-fra:Deutsch-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-gle:Deutsch-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-ind:Deutsch-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-ita:German-Italian FreeDict Dictionary ver. 0.2.1
+fd-deu-kur:German-Kurdish Ferheng/FreeDict Dictionary ver. 0.2.2
+fd-deu-lit:Deutsch-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-nld:German-Dutch FreeDict Dictionary ver. 0.1.5
+fd-deu-pol:Deutsch-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-por:German-Portuguese FreeDict Dictionary ver. 0.2.3
+fd-deu-rus:Deutsch-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-spa:Deutsch-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-swe:Deutsch-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-tur:German-Turkish Ferheng/FreeDict Dictionary ver. 0.2.2
+fd-ell-bul:ελληνικά-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-cat:ελληνικά-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-deu:ελληνικά-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-eng:ελληνικά-English FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-fin:ελληνικά-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-fra:ελληνικά-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-gle:ελληνικά-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-ind:ελληνικά-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-ita:ελληνικά-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-jpn:ελληνικά-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-lat:ελληνικά-latine FreeDict+WikDict dictionary ver. 2022.04.06
+fd-ell-lit:ελληνικά-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-nld:ελληνικά-Nederlands FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-nor:ελληνικά-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-pol:ελληνικά-język polski FreeDict+WikDict dictionary ver. 2022.11.18
+fd-ell-por:ελληνικά-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-rus:ελληνικά-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-spa:ελληνικά-español FreeDict+WikDict dictionary ver. 2023.05.29
+fd-ell-swe:ελληνικά-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-afr:English-Afrikaans FreeDict Dictionary ver. 0.1.3
+fd-eng-ara:English-Arabic FreeDict Dictionary ver. 0.6.3
+fd-eng-bul:English-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-cat:English-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-ces:English-Czech dicts.info/FreeDict Dictionary ver. 0.1.3
+fd-eng-cym:Eurfa Saesneg, English-Welsh Eurfa/Freedict dictionary ver. 0.2.3
+fd-eng-dan:English-Danish FreeDict Dictionary ver. 0.1.0
+fd-eng-deu:English - German Ding/FreeDict dictionary ver. 1.9-fd1
+fd-eng-ell:English - Modern Greek XDXF/FreeDict dictionary ver. 0.1.1
+fd-eng-fin:English-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-fra:English-French FreeDict Dictionary ver. 0.1.6
+fd-eng-gle:English-Irish FreeDict Dictionary ver. 0.3.2
+fd-eng-hin:English-Hindi FreeDict Dictionary ver. 1.6
+fd-eng-hrv:English-Croatian FreeDict Dictionary ver. 0.2.2
+fd-eng-hun:English-Hungarian FreeDict Dictionary ver. 0.2.1
+fd-eng-ind:English-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-ita:English-Italian FreeDict Dictionary ver. 0.1.2
+fd-eng-jpn:English-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-lat:English-Latin FreeDict Dictionary ver. 0.1.2
+fd-eng-lit:English-Lithuanian FreeDict Dictionary ver. 0.7.2
+fd-eng-nld:English-Dutch FreeDict Dictionary ver. 0.2
+fd-eng-nor:English-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-pol:English - Polish Piotrowski+Saloni/FreeDict dictionary ver. 0.2
+fd-eng-por:English-Portuguese FreeDict Dictionary ver. 0.3
+fd-eng-rom:English-Romanian FreeDict Dictionary ver. 0.6.3
+fd-eng-rus:English-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-spa:English-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-srp:English-Serbian FreeDict Dictionary ver. 0.1.3
+fd-eng-swe:English-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-swh:English-Swahili xFried/FreeDict Dictionary ver. 0.2.2
+fd-eng-tur:English-Turkish FreeDict Dictionary ver. 0.3
+fd-eng-zho:English-中文 (Zhōngwén) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-epo-eng:Esperanto-English FreeDict dictionary ver. 1.0.1
+fd-fin-bul:suomi-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-cat:suomi-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-deu:suomi-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-ell:suomi-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-eng:suomi-English FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-fra:suomi-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-gle:suomi-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-ind:suomi-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-ita:suomi-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-jpn:suomi-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-lat:suomi-latine FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-lit:suomi-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-nld:suomi-Nederlands FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-nor:suomi-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-pol:suomi-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-por:suomi-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-spa:suomi-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-swe:suomi-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-bre:French-Breton FreeDict Dictionary (Geriadur Tomaz) ver. 0.2.7
+fd-fra-bul:français-български език FreeDict+WikDict dictionary ver. 2023.05.29
+fd-fra-cat:français-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-deu:français-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-ell:français-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-eng:French-English FreeDict Dictionary ver. 0.4.1
+fd-fra-fin:français-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-gle:français-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-ita:français-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-jpn:français-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-lat:français-latine FreeDict+WikDict dictionary ver. 2020.10.04
+fd-fra-lit:français-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-nld:French-Dutch FreeDict Dictionary ver. 0.2
+fd-fra-pol:français-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-por:français-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-rus:français-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-spa:français-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-swe:français-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-tur:français-Türkçe FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-zho:français-中文 (Zhōngwén) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-gla-deu:Scottish Gaelic-German FreeDict Dictionary ver. 0.2.1
+fd-gle-eng:Irish-English FreeDict Dictionary ver. 0.2
+fd-gle-pol:Irish-Polish FreeDict Dictionary ver. 0.1.2
+fd-hrv-eng:Croatian-English FreeDict Dictionary ver. 0.1.2
+fd-hun-eng:Hungarian-English FreeDict Dictionary ver. 0.4.1
+fd-isl-eng:íslenska - English FreeDict Dictionary ver. 0.1.1
+fd-ita-bul:italiano-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-cat:italiano-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-deu:Italian-German FreeDict Dictionary ver. 0.2.1
+fd-ita-ell:italiano-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-eng:Italian-English FreeDict Dictionary ver. 0.2
+fd-ita-fin:italiano-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-gle:italiano-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-ind:italiano-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-jpn:italiano-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-lit:italiano-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-nld:italiano-Nederlands FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-nor:italiano-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-pol:italiano-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-por:italiano-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-rus:italiano-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-spa:italiano-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-swe:italiano-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-tur:italiano-Türkçe FreeDict+WikDict dictionary ver. 2024.10.10
+fd-jpn-deu:Japanese-German FreeDict Dictionary ver. 0.2.0
+fd-jpn-eng:Japanese-English FreeDict Dictionary ver. 0.1
+fd-jpn-fra:Japanese-French FreeDict Dictionary ver. 0.1
+fd-jpn-rus:Japanese-Russian FreeDict Dictionary ver. 0.1
+fd-kha-deu:Khasi - German FreeDict Dictionary ver. 0.1.4
+fd-kha-eng:Khasi-English FreeDict Dictionary ver. 0.2.2
+fd-kur-deu:Kurdish-German Ferheng/FreeDict Dictionary ver. 0.1.2
+fd-kur-eng:Kurdish-English Ferheng/FreeDict Dictionary ver. 1.2
+fd-kur-tur:Kurdish-Turkish Ferheng/FreeDict Dictionary ver. 0.1.2
+fd-lat-deu:Lateinisch-Deutsch FreeDict-Wörterbuch ver. 1.0.3
+fd-lat-eng:Latin-English FreeDict Dictionary ver. 0.1.2
+fd-lit-eng:Lithuanian-English FreeDict Dictionary ver. 0.7.2
+fd-mkd-bul:Macedonian - Bulgarian FreeDict Dictionary ver. 0.1.1
+fd-nld-bul:Nederlands-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-cat:Nederlands-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-deu:Dutch-German FreeDict Dictionary ver. 0.2.1
+fd-nld-ell:Nederlands-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-eng:Dutch-English Freedict Dictionary ver. 0.2
+fd-nld-fin:Nederlands-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-fra:Nederlands-French FreeDict Dictionary ver. 0.2
+fd-nld-gle:Nederlands-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-ind:Nederlands-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2022.04.06
+fd-nld-ita:Nederlands-italiano FreeDict+WikDict dictionary ver. 2018.09.13
+fd-nld-lat:Nederlands-latine FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-lit:Nederlands-lietuvių kalba FreeDict+WikDict dictionary ver. 2020.10.04
+fd-nld-pol:Nederlands-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-por:Nederlands-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-rus:Nederlands-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-spa:Nederlands-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-swe:Nederlands-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nno-nob:Norwegian Nynorsk-Norwegian Bokmål FreeDict Dictionary ver. 0.1.1
+fd-oci-cat:Lenga d'òc - Català FreeDict Dictionary ver. 0.1.1
+fd-pol-bul:język polski-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-deu:język polski-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-ell:język polski-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-eng:język polski-English FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-fin:język polski-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-fra:język polski-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-gle:Polish-Irish FreeDict Dictionary ver. 0.1.2
+fd-pol-ind:język polski-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-ita:język polski-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-jpn:język polski-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-lit:język polski-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-nld:język polski-Nederlands FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-nor:język polski-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-por:język polski-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-rus:język polski-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-spa:język polski-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-swe:język polski-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-tur:język polski-Türkçe FreeDict+WikDict dictionary ver. 2024.10.10
+fd-por-deu:Portuguese-German FreeDict Dictionary ver. 0.2
+fd-por-eng:Portuguese-English FreeDict Dictionary ver. 0.2
+fd-por-fra:português-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-por-spa:português-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-deu:Русский-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-eng:Русский-English FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-fra:Русский-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-ita:Русский-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-pol:Русский-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-por:Русский-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-spa:Русский-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-san-deu:Sanskrit-German FreeDict Dictionary ver. 0.2.3
+fd-slk-eng:Slovak-English FreeDict Dictionary ver. 0.2.1
+fd-slv-eng:Slovenian-English FreeDict Dictionary ver. 0.1
+fd-spa-ast:Spanish - Asturian FreeDict Dictionary ver. 0.1.1
+fd-spa-cat:español-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-spa-deu:Spanish-German FreeDict Dictionary ver. 0.1
+fd-spa-eng:Spanish-English FreeDict Dictionary ver. 0.3.1
+fd-spa-fra:español-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-spa-por:Spanish-Portuguese FreeDict Dictionary ver. 0.2.1
+fd-spa-tur:español-Türkçe FreeDict+WikDict dictionary ver. 2024.10.10
+fd-srp-eng:Serbian - English FreeDict Dictionary ver. 0.2
+fd-swe-bul:Svenska-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-cat:Svenska-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-deu:Svenska-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-ell:Svenska-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-eng:Swedish-English FreeDict Dictionary ver. 0.2
+fd-swe-fin:Svenska-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-fra:Svenska-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-gle:Svenska-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-ita:Svenska-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-jpn:Svenska-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-lat:Svenska-latine FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-lit:Svenska-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-nld:Svenska-Nederlands FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-nor:Svenska-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-pol:Svenska-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-por:Svenska-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-rus:Svenska-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-spa:Svenska-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-tur:Svenska-Türkçe FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-zho:Svenska-中文 (Zhōngwén) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swh-eng:Swahili-English xFried/FreeDict Dictionary ver. 0.4.4
+fd-swh-pol:Swahili-Polish SSSP/FreeDict Dictionary ver. 0.2.3
+fd-tur-cat:Türkçe-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-tur-deu:Turkish-German FreeDict Dictionary ver. 0.2.3
+fd-tur-eng:Turkish-English FreeDict Dictionary ver. 0.3
+fd-tur-fin:Türkçe-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-tur-jpn:Türkçe-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-wol-fra:Wolof - French FreeDict dictionary ver. 0.1
+fd-zho-ind:中文 (Zhōngwén)-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-kur:中文 (Zhōngwén)-Kurdî FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-lat:中文 (Zhōngwén)-latine FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-lit:中文 (Zhōngwén)-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-mlg:中文 (Zhōngwén)-fiteny malagasy FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-nor:中文 (Zhōngwén)-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-rus:中文 (Zhōngwén)-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+foldoc:The Free On-line Dictionary of Computing (11 February 2025)
+gaz2k-counties:U.S. Gazetteer Counties (2000)
+gaz2k-places:U.S. Gazetteer Places (2000)
+gaz2k-zips:U.S. Gazetteer Zip Code Tabulation Areas (2000)
+gcide:The Collaborative International Dictionary of English v.0.48
+german-english:German - English Dictionary # Version: devel 2026-01-09
+hitchcock:Hitchcock's Bible Names Dictionary (late 1800's)
+jargon:The Jargon File (version 4.4.7, 29 Dec 2003)
+moby-thesaurus:Moby Thesaurus II by Grady Ward, 1.0
+trans:Translating Dictionaries
+vera:V.E.R.A. -- Virtual Entity of Relevant Acronyms (August 2020)
+wn:WordNet (r) 3.0 (2006)
+world02:CIA World Factbook 2002
 ==== auth-dblist ====
-devils:THE DEVIL'S DICTIONARY ((C)1911 Released April 15 1993)
-elements:Elements database 20001107
-foldoc:The Free On-line Dictionary of Computing (13 Mar 01)
-jargon:Jargon File (4.2.3, 23 NOV 2000)
+all:All Dictionaries (English-Only and Translating)
+bouvier:Bouvier's Law Dictionary, Revised 6th Ed (1856)
+cc-cedict:CC-CEDICT Chinese-English dictionary version 20260403
+devil:The Devil's Dictionary (1881-1906)
+easton:Easton's 1897 Bible Dictionary
+elements:The Elements (07Nov00)
+english:English Monolingual Dictionaries
+english-german:English - German Dictionary # Version: devel 2026-01-09
+fd-afr-deu:Afrikaans-German FreeDict Dictionary ver. 0.3.3
+fd-afr-eng:Afrikaans-English FreeDict Dictionary ver. 0.2.2
+fd-ara-eng:Arabic-English FreeDict Dictionary ver. 0.6.3
+fd-bre-fra:Breton-French FreeDict Dictionary (Geriadur Tomaz) ver. 0.8.3
+fd-cat-eng:català-English FreeDict+WikDict dictionary ver. 2024.10.10
+fd-cat-fin:català-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-cat-fra:català-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-cat-ita:català-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-cat-por:català-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-cat-spa:català-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ces-eng:Czech-English FreeDict Dictionary ver. 0.2.3
+fd-ckb-kmr:Sorani-Kurmanji Ferheng/FreeDict Dictionary ver. 0.2
+fd-cym-eng:Eurfa Cymraeg, Welsh-English Eurfa/Freedict dictionary ver. 0.2.3
+fd-dan-eng:Danish-English FreeDict Dictionary ver. 0.3.1
+fd-deu-bul:Deutsch-български език FreeDict+WikDict dictionary ver. 2020.10.04
+fd-deu-cat:Deutsch-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-ell:Deutsch-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-eng:German - English Ding/FreeDict dictionary ver. 1.9-fd1
+fd-deu-fin:Deutsch-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-fra:Deutsch-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-gle:Deutsch-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-ind:Deutsch-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-ita:German-Italian FreeDict Dictionary ver. 0.2.1
+fd-deu-kur:German-Kurdish Ferheng/FreeDict Dictionary ver. 0.2.2
+fd-deu-lit:Deutsch-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-nld:German-Dutch FreeDict Dictionary ver. 0.1.5
+fd-deu-pol:Deutsch-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-por:German-Portuguese FreeDict Dictionary ver. 0.2.3
+fd-deu-rus:Deutsch-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-spa:Deutsch-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-swe:Deutsch-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-deu-tur:German-Turkish Ferheng/FreeDict Dictionary ver. 0.2.2
+fd-ell-bul:ελληνικά-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-cat:ελληνικά-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-deu:ελληνικά-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-eng:ελληνικά-English FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-fin:ελληνικά-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-fra:ελληνικά-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-gle:ελληνικά-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-ind:ελληνικά-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-ita:ελληνικά-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-jpn:ελληνικά-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-lat:ελληνικά-latine FreeDict+WikDict dictionary ver. 2022.04.06
+fd-ell-lit:ελληνικά-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-nld:ελληνικά-Nederlands FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-nor:ελληνικά-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-pol:ελληνικά-język polski FreeDict+WikDict dictionary ver. 2022.11.18
+fd-ell-por:ελληνικά-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-rus:ελληνικά-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ell-spa:ελληνικά-español FreeDict+WikDict dictionary ver. 2023.05.29
+fd-ell-swe:ελληνικά-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-afr:English-Afrikaans FreeDict Dictionary ver. 0.1.3
+fd-eng-ara:English-Arabic FreeDict Dictionary ver. 0.6.3
+fd-eng-bul:English-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-cat:English-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-ces:English-Czech dicts.info/FreeDict Dictionary ver. 0.1.3
+fd-eng-cym:Eurfa Saesneg, English-Welsh Eurfa/Freedict dictionary ver. 0.2.3
+fd-eng-dan:English-Danish FreeDict Dictionary ver. 0.1.0
+fd-eng-deu:English - German Ding/FreeDict dictionary ver. 1.9-fd1
+fd-eng-ell:English - Modern Greek XDXF/FreeDict dictionary ver. 0.1.1
+fd-eng-fin:English-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-fra:English-French FreeDict Dictionary ver. 0.1.6
+fd-eng-gle:English-Irish FreeDict Dictionary ver. 0.3.2
+fd-eng-hin:English-Hindi FreeDict Dictionary ver. 1.6
+fd-eng-hrv:English-Croatian FreeDict Dictionary ver. 0.2.2
+fd-eng-hun:English-Hungarian FreeDict Dictionary ver. 0.2.1
+fd-eng-ind:English-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-ita:English-Italian FreeDict Dictionary ver. 0.1.2
+fd-eng-jpn:English-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-lat:English-Latin FreeDict Dictionary ver. 0.1.2
+fd-eng-lit:English-Lithuanian FreeDict Dictionary ver. 0.7.2
+fd-eng-nld:English-Dutch FreeDict Dictionary ver. 0.2
+fd-eng-nor:English-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-pol:English - Polish Piotrowski+Saloni/FreeDict dictionary ver. 0.2
+fd-eng-por:English-Portuguese FreeDict Dictionary ver. 0.3
+fd-eng-rom:English-Romanian FreeDict Dictionary ver. 0.6.3
+fd-eng-rus:English-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-spa:English-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-srp:English-Serbian FreeDict Dictionary ver. 0.1.3
+fd-eng-swe:English-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-eng-swh:English-Swahili xFried/FreeDict Dictionary ver. 0.2.2
+fd-eng-tur:English-Turkish FreeDict Dictionary ver. 0.3
+fd-eng-zho:English-中文 (Zhōngwén) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-epo-eng:Esperanto-English FreeDict dictionary ver. 1.0.1
+fd-fin-bul:suomi-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-cat:suomi-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-deu:suomi-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-ell:suomi-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-eng:suomi-English FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-fra:suomi-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-gle:suomi-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-ind:suomi-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-ita:suomi-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-jpn:suomi-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-lat:suomi-latine FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-lit:suomi-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-nld:suomi-Nederlands FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-nor:suomi-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-pol:suomi-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-por:suomi-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-spa:suomi-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fin-swe:suomi-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-bre:French-Breton FreeDict Dictionary (Geriadur Tomaz) ver. 0.2.7
+fd-fra-bul:français-български език FreeDict+WikDict dictionary ver. 2023.05.29
+fd-fra-cat:français-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-deu:français-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-ell:français-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-eng:French-English FreeDict Dictionary ver. 0.4.1
+fd-fra-fin:français-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-gle:français-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-ita:français-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-jpn:français-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-lat:français-latine FreeDict+WikDict dictionary ver. 2020.10.04
+fd-fra-lit:français-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-nld:French-Dutch FreeDict Dictionary ver. 0.2
+fd-fra-pol:français-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-por:français-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-rus:français-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-spa:français-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-swe:français-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-tur:français-Türkçe FreeDict+WikDict dictionary ver. 2024.10.10
+fd-fra-zho:français-中文 (Zhōngwén) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-gla-deu:Scottish Gaelic-German FreeDict Dictionary ver. 0.2.1
+fd-gle-eng:Irish-English FreeDict Dictionary ver. 0.2
+fd-gle-pol:Irish-Polish FreeDict Dictionary ver. 0.1.2
+fd-hrv-eng:Croatian-English FreeDict Dictionary ver. 0.1.2
+fd-hun-eng:Hungarian-English FreeDict Dictionary ver. 0.4.1
+fd-isl-eng:íslenska - English FreeDict Dictionary ver. 0.1.1
+fd-ita-bul:italiano-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-cat:italiano-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-deu:Italian-German FreeDict Dictionary ver. 0.2.1
+fd-ita-ell:italiano-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-eng:Italian-English FreeDict Dictionary ver. 0.2
+fd-ita-fin:italiano-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-gle:italiano-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-ind:italiano-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-jpn:italiano-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-lit:italiano-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-nld:italiano-Nederlands FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-nor:italiano-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-pol:italiano-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-por:italiano-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-rus:italiano-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-spa:italiano-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-swe:italiano-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-ita-tur:italiano-Türkçe FreeDict+WikDict dictionary ver. 2024.10.10
+fd-jpn-deu:Japanese-German FreeDict Dictionary ver. 0.2.0
+fd-jpn-eng:Japanese-English FreeDict Dictionary ver. 0.1
+fd-jpn-fra:Japanese-French FreeDict Dictionary ver. 0.1
+fd-jpn-rus:Japanese-Russian FreeDict Dictionary ver. 0.1
+fd-kha-deu:Khasi - German FreeDict Dictionary ver. 0.1.4
+fd-kha-eng:Khasi-English FreeDict Dictionary ver. 0.2.2
+fd-kur-deu:Kurdish-German Ferheng/FreeDict Dictionary ver. 0.1.2
+fd-kur-eng:Kurdish-English Ferheng/FreeDict Dictionary ver. 1.2
+fd-kur-tur:Kurdish-Turkish Ferheng/FreeDict Dictionary ver. 0.1.2
+fd-lat-deu:Lateinisch-Deutsch FreeDict-Wörterbuch ver. 1.0.3
+fd-lat-eng:Latin-English FreeDict Dictionary ver. 0.1.2
+fd-lit-eng:Lithuanian-English FreeDict Dictionary ver. 0.7.2
+fd-mkd-bul:Macedonian - Bulgarian FreeDict Dictionary ver. 0.1.1
+fd-nld-bul:Nederlands-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-cat:Nederlands-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-deu:Dutch-German FreeDict Dictionary ver. 0.2.1
+fd-nld-ell:Nederlands-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-eng:Dutch-English Freedict Dictionary ver. 0.2
+fd-nld-fin:Nederlands-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-fra:Nederlands-French FreeDict Dictionary ver. 0.2
+fd-nld-gle:Nederlands-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-ind:Nederlands-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2022.04.06
+fd-nld-ita:Nederlands-italiano FreeDict+WikDict dictionary ver. 2018.09.13
+fd-nld-lat:Nederlands-latine FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-lit:Nederlands-lietuvių kalba FreeDict+WikDict dictionary ver. 2020.10.04
+fd-nld-pol:Nederlands-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-por:Nederlands-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-rus:Nederlands-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-spa:Nederlands-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nld-swe:Nederlands-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-nno-nob:Norwegian Nynorsk-Norwegian Bokmål FreeDict Dictionary ver. 0.1.1
+fd-oci-cat:Lenga d'òc - Català FreeDict Dictionary ver. 0.1.1
+fd-pol-bul:język polski-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-deu:język polski-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-ell:język polski-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-eng:język polski-English FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-fin:język polski-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-fra:język polski-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-gle:Polish-Irish FreeDict Dictionary ver. 0.1.2
+fd-pol-ind:język polski-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-ita:język polski-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-jpn:język polski-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-lit:język polski-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-nld:język polski-Nederlands FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-nor:język polski-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-por:język polski-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-rus:język polski-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-spa:język polski-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-swe:język polski-Svenska FreeDict+WikDict dictionary ver. 2024.10.10
+fd-pol-tur:język polski-Türkçe FreeDict+WikDict dictionary ver. 2024.10.10
+fd-por-deu:Portuguese-German FreeDict Dictionary ver. 0.2
+fd-por-eng:Portuguese-English FreeDict Dictionary ver. 0.2
+fd-por-fra:português-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-por-spa:português-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-deu:Русский-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-eng:Русский-English FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-fra:Русский-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-ita:Русский-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-pol:Русский-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-por:Русский-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-rus-spa:Русский-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-san-deu:Sanskrit-German FreeDict Dictionary ver. 0.2.3
+fd-slk-eng:Slovak-English FreeDict Dictionary ver. 0.2.1
+fd-slv-eng:Slovenian-English FreeDict Dictionary ver. 0.1
+fd-spa-ast:Spanish - Asturian FreeDict Dictionary ver. 0.1.1
+fd-spa-cat:español-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-spa-deu:Spanish-German FreeDict Dictionary ver. 0.1
+fd-spa-eng:Spanish-English FreeDict Dictionary ver. 0.3.1
+fd-spa-fra:español-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-spa-por:Spanish-Portuguese FreeDict Dictionary ver. 0.2.1
+fd-spa-tur:español-Türkçe FreeDict+WikDict dictionary ver. 2024.10.10
+fd-srp-eng:Serbian - English FreeDict Dictionary ver. 0.2
+fd-swe-bul:Svenska-български език FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-cat:Svenska-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-deu:Svenska-Deutsch FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-ell:Svenska-ελληνικά FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-eng:Swedish-English FreeDict Dictionary ver. 0.2
+fd-swe-fin:Svenska-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-fra:Svenska-français FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-gle:Svenska-Gaeilge FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-ita:Svenska-italiano FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-jpn:Svenska-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-lat:Svenska-latine FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-lit:Svenska-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-nld:Svenska-Nederlands FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-nor:Svenska-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-pol:Svenska-język polski FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-por:Svenska-português FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-rus:Svenska-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-spa:Svenska-español FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-tur:Svenska-Türkçe FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swe-zho:Svenska-中文 (Zhōngwén) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-swh-eng:Swahili-English xFried/FreeDict Dictionary ver. 0.4.4
+fd-swh-pol:Swahili-Polish SSSP/FreeDict Dictionary ver. 0.2.3
+fd-tur-cat:Türkçe-català FreeDict+WikDict dictionary ver. 2024.10.10
+fd-tur-deu:Turkish-German FreeDict Dictionary ver. 0.2.3
+fd-tur-eng:Turkish-English FreeDict Dictionary ver. 0.3
+fd-tur-fin:Türkçe-suomi FreeDict+WikDict dictionary ver. 2024.10.10
+fd-tur-jpn:Türkçe-日本語 (にほんご) FreeDict+WikDict dictionary ver. 2024.10.10
+fd-wol-fra:Wolof - French FreeDict dictionary ver. 0.1
+fd-zho-ind:中文 (Zhōngwén)-Bahasa Indonesia FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-kur:中文 (Zhōngwén)-Kurdî FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-lat:中文 (Zhōngwén)-latine FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-lit:中文 (Zhōngwén)-lietuvių kalba FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-mlg:中文 (Zhōngwén)-fiteny malagasy FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-nor:中文 (Zhōngwén)-Norsk FreeDict+WikDict dictionary ver. 2024.10.10
+fd-zho-rus:中文 (Zhōngwén)-Русский FreeDict+WikDict dictionary ver. 2024.10.10
+foldoc:The Free On-line Dictionary of Computing (11 February 2025)
+gaz2k-counties:U.S. Gazetteer Counties (2000)
+gaz2k-places:U.S. Gazetteer Places (2000)
+gaz2k-zips:U.S. Gazetteer Zip Code Tabulation Areas (2000)
+gcide:The Collaborative International Dictionary of English v.0.48
+german-english:German - English Dictionary # Version: devel 2026-01-09
+hitchcock:Hitchcock's Bible Names Dictionary (late 1800's)
+jargon:The Jargon File (version 4.4.7, 29 Dec 2003)
+moby-thesaurus:Moby Thesaurus II by Grady Ward, 1.0
+trans:Translating Dictionaries
+vera:V.E.R.A. -- Virtual Entity of Relevant Acronyms (August 2020)
+wn:WordNet (r) 3.0 (2006)
+world02:CIA World Factbook 2002
 ==== END ====

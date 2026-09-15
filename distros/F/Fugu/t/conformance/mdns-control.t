@@ -2,7 +2,10 @@
 # ex:ts=8 sw=4:
 # Conformance tests for spec/protocol/MDNS-Control.md
 
-use v5.36;
+use v5.34;
+use warnings;
+use experimental 'signatures';
+no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
 use Config;
 use FindBin qw($RealBin);
